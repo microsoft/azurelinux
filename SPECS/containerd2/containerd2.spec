@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -42,6 +42,7 @@ BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
 Requires: runc >= 1.2.2
+Requires: openssl-libs >= 3.3.7-5
 
 # This package replaces the old name of containerd
 Provides: containerd = %{version}-%{release}
@@ -109,6 +110,10 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Sep 02 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-8
+- Require openssl-libs >= 3.3.7-5 to prevent Go 1.27 systemcrypto TLS failures
+  during provider-backed ML-KEM key generation.
+
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.2.4-7
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
   now selected automatically and supports CGO_ENABLED=0 on Linux.
