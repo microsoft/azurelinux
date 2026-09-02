@@ -33,5 +33,12 @@ jobs:
         run: |
           go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@$(cat .azldev-version)"
 
+      - name: Install editorconfig-checker
+        run: |
+          go install "github.com/editorconfig-checker/editorconfig-checker/v3/cmd/editorconfig-checker@$(cat .editorconfig-checker-version)"
+
       - name: "Validate config (strict)"
         run: azldev config dump > /dev/null
+
+      - name: "Validate TOML formatting"
+        run: scripts/ci/check-editorconfig.sh

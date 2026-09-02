@@ -127,6 +127,14 @@ For changes that affect RPM output, build and smoke-test the result. Pure docume
 or metadata changes don't require a rebuild. See the [`README.md`](README.md) for
 `azldev` commands.
 
+TOML files must also follow [`.editorconfig`](.editorconfig). Install the repository's
+pinned version of `editorconfig-checker` and run the same check used by CI:
+
+```bash
+go install "github.com/editorconfig-checker/editorconfig-checker/v3/cmd/editorconfig-checker@$(cat .editorconfig-checker-version)"
+scripts/ci/check-editorconfig.sh
+```
+
 ### Responding to review feedback
 
 You can address review comments however you like *during* review — additional commits
