@@ -16,9 +16,9 @@
 # mlnx-ofa_kernel — userspace utilities (OFED-versioned singleton).
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel
-Summary:        NVIDIA / Mellanox OFED userspace utilities (mlnx-ofa_kernel %{mlnx_ofa_version})
-Version:        %{mlnx_ofa_version}
-Release:        %{mlnx_ofa_release}%{?dist}
+Summary:        NVIDIA / Mellanox OFED userspace utilities (mlnx-ofa_kernel %{ofa_version})
+Version:        %{ofa_version}
+Release:        %{ofa_release}%{?dist}
 %global version %{_azl_kver}
 %global release %{_azl_krel}
 AutoReq:        no
@@ -34,7 +34,7 @@ Requires(postun): systemd
 
 %description -n mlnx-ofa_kernel
 InfiniBand "verbs", Access Layer and ULPs userspace utilities for the NVIDIA /
-Mellanox OFED stack (mlnx-ofa_kernel %{mlnx_ofa_version}, %{mlnx_ofa_release}):
+Mellanox OFED stack (mlnx-ofa_kernel %{ofa_version}, %{ofa_release}):
 openibd service, interface-manager scripts, ibdev2netdev, modprobe configs and
 udev rules. The kernel modules ship in the matching mlnx-ofa_kernel-modules
 package.
@@ -43,27 +43,27 @@ package.
 # mlnx-ofa_kernel-modules — the kernel modules (per-kernel).
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel-modules
-Summary:        NVIDIA / Mellanox OFED kernel modules (mlnx-ofa_kernel %{mlnx_ofa_version})
-Version:        %{mlnx_ofa_version}
-Release:        %{mlnx_ofa_release}.%{_azl_kver}.%{_azl_krel}
+Summary:        NVIDIA / Mellanox OFED kernel modules (mlnx-ofa_kernel %{ofa_version})
+Version:        %{ofa_version}
+Release:        %{ofa_release}.%{_azl_kver}.%{_azl_krel}
 # Restore the kernel NVR macros clobbered by the Version/Release tags above,
 # before %{KVERREL} (which expands %{release}) is used in the Provides/Requires below.
 %global version %{_azl_kver}
 %global release %{_azl_krel}
 AutoReq:        no
-Provides:       mlnx-ofa-kmod-version = %{mlnx_ofa_version}
-Provides:       mlnx-ofa-kmod-release = %{mlnx_ofa_release}
-Provides:       kmod-mlnx-ofa_kernel = %{mlnx_ofa_version}-%{mlnx_ofa_release}
-Obsoletes:      kmod-mlnx-ofa_kernel < %{mlnx_ofa_version}-%{mlnx_ofa_release}
-Provides:       mlnx-ofa_kernel-modules = %{mlnx_ofa_version}-%{mlnx_ofa_release}
-Obsoletes:      mlnx-ofa_kernel-modules < %{mlnx_ofa_version}-%{mlnx_ofa_release}
+Provides:       mlnx-ofa-kmod-version = %{ofa_version}
+Provides:       mlnx-ofa-kmod-release = %{ofa_release}
+Provides:       kmod-mlnx-ofa_kernel = %{ofa_version}-%{ofa_release}
+Obsoletes:      kmod-mlnx-ofa_kernel < %{ofa_version}-%{ofa_release}
+Provides:       mlnx-ofa_kernel-modules = %{ofa_version}-%{ofa_release}
+Obsoletes:      mlnx-ofa_kernel-modules < %{ofa_version}-%{ofa_release}
 Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
 
 %description -n mlnx-ofa_kernel-modules
 NVIDIA / Mellanox InfiniBand and Ethernet (mlx5) kernel modules built from
-mlnx-ofa_kernel %{mlnx_ofa_version} (%{mlnx_ofa_release}) against kernel
+mlnx-ofa_kernel %{ofa_version} (%{ofa_release}) against kernel
 %{KVERREL}.
 
 # -------------------------------------------------------------------------
@@ -72,18 +72,18 @@ mlnx-ofa_kernel %{mlnx_ofa_version} (%{mlnx_ofa_release}) against kernel
 # kmod.
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel-devel
-Summary:        Development files for mlnx-ofa_kernel (%{mlnx_ofa_version}, kernel %{KVERREL})
-Version:        %{mlnx_ofa_version}
-Release:        %{mlnx_ofa_release}.%{_azl_kver}.%{_azl_krel}
+Summary:        Development files for mlnx-ofa_kernel (%{ofa_version}, kernel %{KVERREL})
+Version:        %{ofa_version}
+Release:        %{ofa_release}.%{_azl_kver}.%{_azl_krel}
 # Restore the kernel NVR macros clobbered by the Version/Release tags above so
 # the kernel's own %files templates (which reference raw %{version}/%{release})
 # resolve to the kernel NVR again.
 %global version %{_azl_kver}
 %global release %{_azl_krel}
 AutoReq:        no
-Provides:  mlnx-ofa_kernel-devel = %{mlnx_ofa_version}-%{mlnx_ofa_release}
-Obsoletes: mlnx-ofa_kernel-devel < %{mlnx_ofa_version}-%{mlnx_ofa_release}
-Requires:  mlnx-ofa_kernel-source = %{mlnx_ofa_version}-%{mlnx_ofa_release}
+Provides:  mlnx-ofa_kernel-devel = %{ofa_version}-%{ofa_release}
+Obsoletes: mlnx-ofa_kernel-devel < %{ofa_version}-%{ofa_release}
+Requires:  mlnx-ofa_kernel-source = %{ofa_version}-%{ofa_release}
 Requires:       coreutils
 Requires:       pciutils
 Requires(post): %{_sbindir}/update-alternatives
@@ -104,8 +104,8 @@ the kernel build that produced them. Multiple kernel versions can coexist
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel-source
 Summary:        Source of the NVIDIA / Mellanox OFED main kernel driver
-Version:        %{mlnx_ofa_version}
-Release:        %{mlnx_ofa_release}%{?dist}
+Version:        %{ofa_version}
+Release:        %{ofa_release}%{?dist}
 # Restore the kernel NVR macros clobbered by the Version/Release tags above so
 # the kernel's own %files templates (which reference raw %{version}/%{release})
 # resolve to the kernel NVR again.
@@ -114,8 +114,8 @@ Release:        %{mlnx_ofa_release}%{?dist}
 AutoReq:        no
 
 %description -n mlnx-ofa_kernel-source
-Pristine source of the mlnx-ofa_kernel %{mlnx_ofa_version} driver under
-/usr/src/ofa_kernel-%{mlnx_ofa_version}/source/. Install this only to view the
+Pristine source of the mlnx-ofa_kernel %{ofa_version} driver under
+/usr/src/ofa_kernel-%{ofa_version}/source/. Install this only to view the
 driver sources; use mlnx-ofa_kernel-devel to build other drivers against it.
 %endif
 
@@ -139,13 +139,13 @@ if [ -z "$_mofa_srpm" ]; then
     echo "ERROR: mlnx-ofa_kernel SRPM not found inside %{SOURCE6100}" >&2
     exit 1
 fi
-rpm2cpio "$_mofa_srpm" | cpio -idm '*mlnx-ofa_kernel-%{mlnx_ofa_version}.tgz'
-tar -xf mlnx-ofa_kernel-%{mlnx_ofa_version}.tgz
-rm -rf MLNX_OFED_SRC-* mlnx-ofa_kernel-%{mlnx_ofa_version}.tgz
+rpm2cpio "$_mofa_srpm" | cpio -idm '*mlnx-ofa_kernel-%{ofa_version}.tgz'
+tar -xf mlnx-ofa_kernel-%{ofa_version}.tgz
+rm -rf MLNX_OFED_SRC-* mlnx-ofa_kernel-%{ofa_version}.tgz
 
 # Upstream %prep: apply OFED patches, autogen compat, then split into
 # source/ (pristine) + obj/ (per-flavor build dirs).
-pushd mlnx-ofa_kernel-%{mlnx_ofa_version}
+pushd mlnx-ofa_kernel-%{ofa_version}
 ofed_scripts/ofed_patch.sh || true
 if [ ! -f compat/configure ]; then (cd compat && ./autogen.sh); fi
 set -- *
@@ -164,10 +164,10 @@ popd
 %if "%{_kmod_phase}" == "build" && %{with_up_base}
 
 %ifarch x86_64 aarch64
-%{log_msg "Building mlnx-ofa_kernel %{mlnx_ofa_version} modules and py scripts for %{KVERREL}"}
-pushd %{_builddir}/mlnx-ofa_kernel-%{mlnx_ofa_version}
+%{log_msg "Building mlnx-ofa_kernel %{ofa_version} modules and py scripts for %{KVERREL}"}
+pushd %{_builddir}/mlnx-ofa_kernel-%{ofa_version}
 
-export EXTRA_CFLAGS='-DVERSION=\"%{mlnx_ofa_version}\"'
+export EXTRA_CFLAGS='-DVERSION=\"%{ofa_version}\"'
 export INSTALL_MOD_DIR=extra/mlnx-ofa_kernel
 export CONF_OPTIONS="--with-core-mod --with-user_mad-mod --with-user_access-mod --with-addr_trans-mod --with-mlx5-mod --with-mlxfw-mod --with-ipoib-mod"
 
@@ -216,12 +216,12 @@ popd
 %if "%{_kmod_phase}" == "install" && %{with_up_base}
 
 %ifarch x86_64 aarch64
-%{log_msg "Installing mlnx-ofa_kernel %{mlnx_ofa_version} modules, userspace, devel and source for %{KVERREL}"}
+%{log_msg "Installing mlnx-ofa_kernel %{ofa_version} modules, userspace, devel and source for %{KVERREL}"}
 
 export RECORD_PY_FILES=1
 export INSTALL_MOD_PATH=%{buildroot}
 export INSTALL_MOD_DIR=extra/mlnx-ofa_kernel
-_srcroot="%{_builddir}/mlnx-ofa_kernel-%{mlnx_ofa_version}"
+_srcroot="%{_builddir}/mlnx-ofa_kernel-%{ofa_version}"
 _objdir="${_srcroot}/obj/default"
 
 mkdir -p %{buildroot}%{_prefix}/src/ofa_kernel/%{_arch}
@@ -330,10 +330,10 @@ if [ -f "%{buildroot}%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERREL}/configure.mk.
 fi
 
 # ---- pristine source (mlnx-ofa_kernel-source) ----
-mkdir -p %{buildroot}%{_prefix}/src/ofa_kernel-%{mlnx_ofa_version}
-cp -a "${_srcroot}/source" %{buildroot}%{_prefix}/src/ofa_kernel-%{mlnx_ofa_version}/source
-ln -s ofa_kernel-%{mlnx_ofa_version}/source \
-    %{buildroot}%{_prefix}/src/mlnx-ofa_kernel-%{mlnx_ofa_version}
+mkdir -p %{buildroot}%{_prefix}/src/ofa_kernel-%{ofa_version}
+cp -a "${_srcroot}/source" %{buildroot}%{_prefix}/src/ofa_kernel-%{ofa_version}/source
+ln -s ofa_kernel-%{ofa_version}/source \
+    %{buildroot}%{_prefix}/src/mlnx-ofa_kernel-%{ofa_version}
 
 # ---- /etc/infiniband/info (upstream) ----
 mkdir -p %{buildroot}/etc/infiniband
@@ -476,9 +476,9 @@ fi
 
 %files -n mlnx-ofa_kernel-source
 %license %{_datadir}/licenses/mlnx-ofa_kernel/COPYING
-%dir %{_prefix}/src/ofa_kernel-%{mlnx_ofa_version}
-%{_prefix}/src/ofa_kernel-%{mlnx_ofa_version}/source
-%{_prefix}/src/mlnx-ofa_kernel-%{mlnx_ofa_version}
+%dir %{_prefix}/src/ofa_kernel-%{ofa_version}
+%{_prefix}/src/ofa_kernel-%{ofa_version}/source
+%{_prefix}/src/mlnx-ofa_kernel-%{ofa_version}
 %endif
 
 %endif

@@ -20,9 +20,9 @@
 %define azl_pkgrelease 8
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.57.04
-%define mlnx_ofa_version 26.04
-%define mlnx_ofa_vendor_release 0.8.5.0
-%define mlnx_ofa_release OFED.%{mlnx_ofa_version}.%{mlnx_ofa_vendor_release}
+%define ofa_version 26.04
+%define ofa_vendor_release 0.8.5.0
+%define ofa_release OFED.%{ofa_version}.%{ofa_vendor_release}
 
 # All Global changes to build and install go here.
 # Per the below section about __spec_install_pre, any rpm
@@ -1026,8 +1026,11 @@ Source5002: azurelinux-ca-20230216.pem
 Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
 Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
-Source6100: MLNX_OFED_SRC-%{mlnx_ofa_version}-%{mlnx_ofa_vendor_release}.tgz
+Source6100: MLNX_OFED_SRC-%{ofa_version}-%{ofa_vendor_release}.tgz
 Source6101: mlnx-ofa_kernel.inc
+Source6102: kmod-iser.inc
+Source6103: kmod-isert.inc
+Source6104: kmod-mft.inc
 
 ## Patches needed for building this package
 
@@ -1082,6 +1085,18 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase package
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
+
+%global _kmod_phase package
+%global _kmod_name isert
+%include %{_sourcedir}/kmod-isert.inc
+
+%global _kmod_phase package
+%global _kmod_name mft
+%include %{_sourcedir}/kmod-mft.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2067,6 +2082,18 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase prep
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
+
+%global _kmod_phase prep
+%global _kmod_name isert
+%include %{_sourcedir}/kmod-isert.inc
+
+%global _kmod_phase prep
+%global _kmod_name mft
+%include %{_sourcedir}/kmod-mft.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3147,6 +3174,18 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
 
+%global _kmod_phase build
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
+
+%global _kmod_phase build
+%global _kmod_name isert
+%include %{_sourcedir}/kmod-isert.inc
+
+%global _kmod_phase build
+%global _kmod_name mft
+%include %{_sourcedir}/kmod-mft.inc
+
 # AZL: Build NVIDIA after OFED so nvidia-peermem uses the matching
 # in-progress OFED headers and Module.symvers.
 %global _kmod_phase build
@@ -3661,6 +3700,18 @@ popd
 %global _kmod_phase install
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase install
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
+
+%global _kmod_phase install
+%global _kmod_name isert
+%include %{_sourcedir}/kmod-isert.inc
+
+%global _kmod_phase install
+%global _kmod_name mft
+%include %{_sourcedir}/kmod-mft.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4310,6 +4361,18 @@ fi\
 %global _kmod_phase files
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase files
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
+
+%global _kmod_phase files
+%global _kmod_name isert
+%include %{_sourcedir}/kmod-isert.inc
+
+%global _kmod_phase files
+%global _kmod_name mft
+%include %{_sourcedir}/kmod-mft.inc
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog

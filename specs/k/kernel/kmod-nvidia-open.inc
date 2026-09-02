@@ -28,6 +28,7 @@ Provides:       nvidia-open-kmod-version = %{nvidia_open_version}
 Provides:       nvidia-kmod = %{nvidia_open_version}
 Provides:       kmod-nvidia-open-uname-r = %{KVERREL}
 #Requires:       nvidia-driver-cuda = %{nvidia_open_version}
+Requires:       mlnx-ofa_kernel-modules = %{ofa_version}-%{ofa_release}
 Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
@@ -69,7 +70,7 @@ make %{?_smp_mflags} modules \
     KERNEL_UNAME="%{KVERREL}" \
     SYSSRC="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
     SYSOUT="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
-    OFA_DIR="%{_builddir}/mlnx-ofa_kernel-%{mlnx_ofa_version}/obj" \
+    OFA_DIR="%{_builddir}/mlnx-ofa_kernel-%{ofa_version}/obj" \
     IGNORE_CC_MISMATCH=1 \
     IGNORE_XEN_PRESENCE=1 \
     IGNORE_PREEMPT_RT_PRESENCE=1 \
