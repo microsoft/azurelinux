@@ -389,11 +389,17 @@ install -Dm0644 %{SOURCE18} -t %{buildroot}%{_prefix}/lib/systemd/system-preset/
 # systemd-tmpfiles-setup.service is deliberately NOT masked: wsl-setup relies on
 # it to materialize the WSLg X11/Wayland/PulseAudio socket links, so masking it
 # would break GUI application support.
+#
+# systemd-tmpfiles-clean.service/.timer are deliberately NOT masked either.
+# tmp.mount is masked below, so /tmp is a plain directory on the distribution's
+# persistent VHD and nothing else would ever age its contents. The periodic
+# clean is safe for WSLg because wsl-setup ships an entry for /tmp/.X11-unix,
+# and systemd-tmpfiles skips any path that has its own entry when cleaning a
+# parent directory (it logs 'a separate entry exists'), so the socket link
+# survives the 10d age /tmp inherits from tmpfiles.d/tmp.conf.
 install -d %{buildroot}%{_sysconfdir}/systemd/system
 for unit in systemd-vconsole-setup.service \
             tmp.mount \
-            systemd-tmpfiles-clean.service \
-            systemd-tmpfiles-clean.timer \
             systemd-tmpfiles-setup-dev.service \
             systemd-tmpfiles-setup-dev-early.service; do
     ln -s /dev/null %{buildroot}%{_sysconfdir}/systemd/system/"${unit}"
@@ -531,8 +537,6 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %{_prefix}/lib/systemd/system-preset/80-wsl.preset
 %{_sysconfdir}/systemd/system/systemd-vconsole-setup.service
 %{_sysconfdir}/systemd/system/tmp.mount
-%{_sysconfdir}/systemd/system/systemd-tmpfiles-clean.service
-%{_sysconfdir}/systemd/system/systemd-tmpfiles-clean.timer
 %{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
 %{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev-early.service
 %endif
