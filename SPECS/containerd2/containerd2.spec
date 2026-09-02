@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -70,15 +70,10 @@ used directly by developers or end-users.
 
 %build
 export BUILDTAGS="-mod=vendor"
-# cgo-less OpenSSL backend for our CGO_ENABLED=0 build (Go 1.26 systemcrypto needs cgo).
-# Go 1.26-only flag: remove at golang >= 1.27 (auto-selected there; else build fails).
-# Ref: https://github.com/microsoft/go/blob/microsoft/main/eng/doc/NocgoOpenSSL.md
-export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
-export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
@@ -114,6 +109,10 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.2.4-7
+- Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
+  now selected automatically and supports CGO_ENABLED=0 on Linux.
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-6
 - Patch for CVE-2026-56852
 
