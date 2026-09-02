@@ -1,0 +1,38 @@
+From 137aeb64cbb493d61d6945cac156aba5f0510780 Mon Sep 17 00:00:00 2001
+From: Miao Wang <shankerwangmiao@gmail.com>
+Date: Sat, 10 Feb 2024 12:51:15 +0800
+Subject: [PATCH] lan: fix lan print fails on unsupported parameters
+
+After upgrading to ipmitool 1.8.19, ipmitool lan print can only print out
+`Set in Progress` and other parameters are missing on our servers. After
+bisecting, commit:
+
+  351dad24a26f lan: Add processing of get/set specific CCs
+
+is identified to be the source of the problem, where the function
+get_lan_param_select is expected to consider several error codes it
+receives as empty response. It then constructs an empty response in `p`
+and assigns `p` to `rc` and the control flow falls through to the
+default case, which prints the error code in verbose mode and should
+return `rc` instead of `NULL`.
+
+Upstream Patch Reference: https://codeberg.org/IPMITool/ipmitool/commit/137aeb64cbb493d61d6945cac156aba5f0510780
+
+Signed-off-by: Miao Wang <shankerwangmiao@gmail.com>
+---
+ lib/ipmi_lanp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/ipmi_lanp.c b/lib/ipmi_lanp.c
+index fe0046f..26e7365 100644
+--- a/lib/ipmi_lanp.c
++++ b/lib/ipmi_lanp.c
+@@ -245,7 +245,7 @@ get_lan_param_select(struct ipmi_intf *intf, uint8_t chan, int param, int select
+ 			specific_val2str(rsp->ccode,
+ 			                 get_lan_cc_vals,
+ 			                 completion_code_vals));
+-		return NULL;
++		return rc;
+ 	}
+ 
+ 	p->data = rsp->data + 1;
