@@ -18,9 +18,11 @@ if [[ ${#toml_files[@]} -eq 0 ]]; then
   exit 0
 fi
 
-args=()
 if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
-  args+=(-format github-actions)
+  editorconfig-checker -format github-actions -- "${toml_files[@]}" |
+    sed -E \
+      -e 's|^::error file=([^,]+),line=([0-9]+)::|::error file=\1,line=\2::\1:\2: |' \
+      -e 's|^::error file=([^:]+)::|::error file=\1::\1: |'
+else
+  editorconfig-checker -- "${toml_files[@]}"
 fi
-
-editorconfig-checker "${args[@]}" -- "${toml_files[@]}"
