@@ -61,3 +61,47 @@ objcopy --dump-section .sbat=%{_builddir}/fwupd-efi-sbat.csv %{fwup_efi_fn}
 sed -i '/^fwupd-efi\.azurelinux,/i %{sbat_fedora_line}' %{_builddir}/fwupd-efi-sbat.csv
 objcopy --update-section .sbat=%{_builddir}/fwupd-efi-sbat.csv %{fwup_efi_fn}
 %pesign -s -i %{fwup_efi_fn} -o %{fwup_efi_fn}.tmp'''
+
+[[components.fwupd-efi.overlays]]
+description = "Sign the packaged EFI binary with the configured secure boot certificate"
+type = "spec-search-replace"
+section = "%install"
+regex = '^%pesign -s -i %\{fwup_efi_fn\}\.tmp -o %\{fwup_efi_fn\}\.signed$'
+replacement = '''PESIGN_CLIENT=/usr/bin/pesign
+TEST_FILE=%{fwup_efi_fn}.tmp
+SIGNED_TEST_FILE=%{fwup_efi_fn}.signed
+SIGNING_TYPES=",${SIGULDRY_PESIGN_BRIDGE_SIGNING_TYPES},"
+
+if [ -x "$PESIGN_CLIENT" ] && [[ "$SIGNING_TYPES" == *",secure-boot-esrp-prod-signing,"* ]]; then
+    pesign-client \
+        --verbose \
+        --debug \
+        --sign \
+        --certificate "cp-459159-pgp" \
+        --token "unused-token-name" \
+        --infile "$TEST_FILE" \
+        --outfile "$SIGNED_TEST_FILE"
+elif [ -x "$PESIGN_CLIENT" ] && [[ "$SIGNING_TYPES" == *",secure-boot-esrp-test-signing,"* ]]; then
+    pesign-client \
+        --verbose \
+        --debug \
+        --sign \
+        --certificate "cp-450778-pgp" \
+        --token "unused-token-name" \
+        --infile "$TEST_FILE" \
+        --outfile "$SIGNED_TEST_FILE"
+elif [ -x "$PESIGN_CLIENT" ] && [[ "$SIGNING_TYPES" == *",secure-boot-self-signing,"* ]]; then
+    pesign-client \
+        --verbose \
+        --debug \
+        --sign \
+        --certificate "secure-boot-self-signing" \
+        --token "unused-token-name" \
+        --infile "$TEST_FILE" \
+        --outfile "$SIGNED_TEST_FILE"
+else
+    %pesign -s -i %{fwup_efi_fn}.tmp -o %{fwup_efi_fn}.signed
+fi
+
+ls -la "$TEST_FILE"
+ls -la "$SIGNED_TEST_FILE"'''
