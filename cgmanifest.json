@@ -15802,6 +15802,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "openvmm",
+          "version": "0.1.0",
+          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openvswitch",
           "version": "3.3.9",
           "downloadUrl": "https://www.openvswitch.org/releases/openvswitch-3.3.9.tar.gz"
