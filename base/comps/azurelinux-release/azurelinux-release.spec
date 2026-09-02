@@ -540,7 +540,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 %changelog
 * Fri Sep 18 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-30
-- Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and getty@tty1 for the WSL variant
+- Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and the console getty units for the WSL variant
 - Mask the static console, /tmp and early tmpfiles units that WSL manages itself
 
 * Fri Sep 11 2026 Chris Co <chrco@microsoft.com> - 4.0-29
