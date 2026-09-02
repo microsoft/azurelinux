@@ -22,8 +22,8 @@
 #
 # Only units with an [Install] section can be turned off from a preset.
 # systemd-vconsole-setup.service, tmp.mount and the systemd-tmpfiles-setup-dev*
-# units are static, so azurelinux-release-wsl masks those instead. Keep the two
-# lists in sync with the comment in azurelinux-release.spec.
+# units are static, so azurelinux-release-identity-wsl masks those instead.
+# Keep the two lists in sync with the comment in azurelinux-release.spec.
 
 # WSL configures the network adapters; the distribution must not.
 disable systemd-networkd.service
