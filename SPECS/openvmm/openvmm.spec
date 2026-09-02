@@ -42,9 +42,8 @@ virtual machines on Linux via KVM or Microsoft Hypervisor.
 %global rust_target aarch64-unknown-linux-gnu
 %endif
 
-# Unit tests for the pure-logic crates in the openvmm binary's dependency
-# closure. The rest of the test suite drives a live VM, which needs
-# virtualization the build environment does not have.
+# A representative subset of the openvmm binary's dependency closure whose unit
+# tests need no live VM. Not exhaustive; more crates can be added over time.
 %global test_crates -p acpi -p consomme -p crypto -p loader -p mesh_protobuf -p openvmm_core -p openvmm_entry -p pal -p pci_core -p vhdx -p vm_topology -p vmcore -p vmm_core
 
 %prep
