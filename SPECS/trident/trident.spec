@@ -335,6 +335,9 @@ mkdir -p "$pcrlockroot"
 * Wed Sep 02 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 0.28.0-1
 - Update to version 0.28.0
 
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.26.0-2
+- Bump release to rebuild with rust
+
 * Wed Jul 29 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 0.26.0-1
 - Update to version 0.26.0
 

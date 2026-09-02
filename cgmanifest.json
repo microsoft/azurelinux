@@ -1827,8 +1827,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "51.1.101",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.101.tar.gz"
+          "version": "52.0.152",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v52.0.152.tar.gz"
         }
       }
     },
@@ -4410,8 +4410,8 @@
         "type": "other",
         "other": {
           "name": "gh",
-          "version": "2.97.0",
-          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.97.0.tar.gz"
+          "version": "2.98.0",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.98.0.tar.gz"
         }
       }
     },
@@ -4762,6 +4762,16 @@
           "name": "golang",
           "version": "1.26.7",
           "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.7-1/go1.26.7-20260819.2.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.27.0",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.0-1/go1.27.0-20260819.4.src.tar.gz"
         }
       }
     },
@@ -8711,8 +8721,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.7.1",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.1.tar.gz"
+          "version": "1.8.4",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.8.4.tar.gz"
         }
       }
     },
@@ -11821,8 +11831,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "10.10.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-10.10.0.tar.xz"
+          "version": "11.9.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-11.9.0.tar.xz"
         }
       }
     },
@@ -13131,8 +13141,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.18",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.18/source/mariadb-10.11.18.tar.gz"
+          "version": "10.11.19",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.19/source/mariadb-10.11.19.tar.gz"
         }
       }
     },
@@ -15785,6 +15795,16 @@
           "name": "opentelemetry-cpp",
           "version": "1.14.2",
           "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.14.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openvmm",
+          "version": "0.1.0",
+          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.1.0.tar.gz"
         }
       }
     },
@@ -26083,8 +26103,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "9.1.0",
-          "downloadUrl": "https://download.qemu.org/qemu-9.1.0.tar.xz"
+          "version": "10.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-10.1.0.tar.xz"
         }
       }
     },
@@ -27794,8 +27814,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.90.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz"
+          "version": "1.96.1",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.96.1-src.tar.xz"
         }
       }
     },
@@ -27806,6 +27826,16 @@
           "name": "rust-afterburn",
           "version": "5.8.2",
           "downloadUrl": "https://github.com/coreos/afterburn/archive/refs/tags/v5.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rust-bootstrap",
+          "version": "1.95.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/2026-04-16/cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz"
         }
       }
     },
