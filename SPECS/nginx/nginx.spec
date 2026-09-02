@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.28.3
-Release:        4%{?dist}
+Release:        8%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,11 @@ Patch8:         CVE-2026-42934.patch
 Patch9:         CVE-2026-42945.patch
 Patch10:        CVE-2026-42946.patch
 Patch11:        CVE-2026-9256.patch
+Patch12:        CVE-2026-49975.patch
+Patch13:        CVE-2026-48142.patch
+Patch14:        CVE-2026-42055.patch
+Patch15:        CVE-2026-56434.patch
+Patch16:        CVE-2026-42533.patch
 
 # njs patches start at 1001 to keep them separate from nginx patches
 Patch1001:      CVE-2026-8711.patch
@@ -183,6 +188,18 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-8
+- Patch for CVE-2026-56434 and CVE-2026-42533
+
+* Tue Jun 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-7
+- Patch for CVE-2026-42055
+
+* Sat Jun 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-6
+- Patch for CVE-2026-48142
+
+* Fri Jun 05 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.28.3-5
+- Patch for CVE-2026-49975
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-4
 - Patch for CVE-2026-9256
 

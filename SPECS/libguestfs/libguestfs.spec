@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        22%{?dist}
+Release:        24%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,7 +82,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  gdisk
 BuildRequires:  genisoimage
 BuildRequires:  gfs2-utils
-BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  glibc-static >= 2.38-21%{?dist}
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  gperf
 BuildRequires:  grep
@@ -850,8 +850,9 @@ extra=--with-supermin-packager-config=$(pwd)/yum.conf
 %if %{without appliances}
   --enable-appliance=no \
 %endif
-  --disable-erlang
-  $extra
+  --disable-erlang \
+  $extra \
+  --with-extra-packages="sqlite sqlite-libs sqlite-devel"
 
 # 'INSTALLDIRS' ensures that Perl and Ruby libs are installed in the
 # vendor dir, not the site dir.
@@ -862,9 +863,15 @@ extra=--with-supermin-packager-config=$(pwd)/yum.conf
 export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
 export LIBVIRT_DEBUG=1
+# Use the direct (no-libvirt) backend because the build chroot has no
+# running libvirtd and no /var/run/libvirt/libvirt-sock.  Force TCG so
+# the test does not require /dev/kvm to be present.
+export LIBGUESTFS_BACKEND=direct
+export LIBGUESTFS_BACKEND_SETTINGS=force_tcg
 
 if ! make quickcheck QUICKCHECK_TEST_TOOL_ARGS="-t 1200"; then
-    cat $HOME/.cache/libvirt/qemu/log/* && false
+    cat $HOME/.cache/libvirt/qemu/log/* 2>/dev/null || true
+    false
 fi
 %endif
 
@@ -1147,6 +1154,17 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.52.0-24
+- Bump to rebuild with updated glibc
+
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.52.0-23
+- Use direct backend with force_tcg in %%check so make quickcheck does not
+  require a running libvirtd / /var/run/libvirt/libvirt-sock in the build
+  chroot.
+- Add sqlite, sqlite-libs and sqlite-devel to supermin appliance via
+  --with-extra-packages so guestfsd (which depends on libsqlite3 via
+  librpm) can start inside the appliance.
+
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.52.0-22
 - Bump to rebuild with updated glibc
 

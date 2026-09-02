@@ -1,7 +1,7 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
 Version:        7.95
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,6 +22,8 @@ Patch0:         remove_openssl_macro.patch
 Patch1:		CVE-2024-8006.patch
 Patch2:		CVE-2023-7256.patch
 Patch3:		CVE-2025-11961.patch
+Patch4:		CVE-2026-58058.patch
+Patch5:		CVE-2026-72712.patch
 
 %description
 Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
@@ -66,6 +68,12 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Wed Aug 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 7.95-5
+- Patch for CVE-2026-72712
+
+* Tue Jun 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 7.95-4
+- Patch for CVE-2026-58058
+
 * Mon Jan 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 7.95-3
 - Patch for CVE-2025-11961
 

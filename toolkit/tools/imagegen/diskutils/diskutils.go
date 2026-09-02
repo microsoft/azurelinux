@@ -6,7 +6,9 @@
 package diskutils
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -20,7 +22,9 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sys/unix"
 )
 
 var (
@@ -36,11 +40,6 @@ var (
 		// ^metadata_csum_seed disables filesystem to store the metadata checksum seed in the superblock, hence disables changing uuid of mounted filesystem
 		"ext4": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal,extent,huge_file,flex_bg,metadata_csum,64bit,dir_nlink,extra_isize,^metadata_csum_seed"},
 	}
-
-	partedVersionRegex = regexp.MustCompile(`^parted \(GNU parted\) (\d+)\.(\d+)`)
-
-	// The default partition name used when the version of `parted` is too old (<3.5).
-	LegacyDefaultParitionName = "primary"
 )
 
 type blockDevicesOutput struct {
@@ -75,6 +74,7 @@ type PartitionInfo struct {
 	Mountpoint        string `json:"mountpoint"` // Example: /mnt/os/boot
 	PartLabel         string `json:"partlabel"`  // Example: boot
 	Type              string `json:"type"`       // Example: part
+	SizeInBytes       uint64 `json:"size"`       // Example: 4096
 }
 
 type loopbackListOutput struct {
@@ -86,30 +86,50 @@ type loopbackDevice struct {
 	BackingFile string `json:"back-file"`
 }
 
+type PartitionTablePartition struct {
+	// Populated from "sfdisk --json":
+	Path         string `json:"node"`  // Example: /dev/loop1p1
+	Start        int64  `json:"start"` // Example: 2048
+	Size         int64  `json:"size"`  // Example: 16384
+	PartTypeUuid string `json:"type"`  // Example: C12A7328-F81F-11D2-BA4B-00A0C93EC93B
+	PartUuid     string `json:"uuid"`  // Example: 2789D1BC-3909-4B06-AD2D-DA531DABF7C8
+	PartLabel    string `json:"name"`  // Example: rootfs
+
+	// Populated from "blkid --probe":
+	FileSystemType string // Example: vfat
+	FileSystemUuid string // Example: 4BD9-3A78
+}
+
+type PartitionTable struct {
+	Label      string                    `json:"label"`      // Example: gpt
+	Id         string                    `json:"id"`         // Example: 1DFD88CF-6214-4574-97A2-C605D411CFBE
+	Device     string                    `json:"device"`     // Example: /dev/loop1
+	Unit       string                    `json:"unit"`       // Example: sectors
+	FirstLba   int64                     `json:"firstlba"`   // Example: 2048
+	LastLba    int64                     `json:"lastlba"`    // Example: 8388574
+	SectorSize int                       `json:"sectorsize"` // Example: 512
+	Partitions []PartitionTablePartition `json:"partitions"`
+}
+
+type partitionTableOutput struct {
+	PartitionTable *PartitionTable `json:"partitiontable"`
+}
+
 const (
 	// AutoEndSize is used as the disk's "End" value to indicate it should be picked automatically
 	AutoEndSize = 0
 
-	EfiSystemPartitionTypeUuid = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
-	BiosBootPartitionTypeUuid  = "21686148-6449-6e6f-744e-656564454649"
+	EfiSystemPartitionTypeUuid    = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
+	BiosBootPartitionTypeUuid     = "21686148-6449-6e6f-744e-656564454649"
+	GenericLinuxPartitionTypeUuid = "0fc63daf-8483-4772-8e79-3d69d8477de4"
 )
 
 const (
 	// mappingFilePath is used for device mapping paths
 	mappingFilePath = "/dev/mapper/"
-
-	// maxPrimaryPartitionsForMBR is the maximum number of primary partitions
-	// allowed in the case of MBR partition
-	maxPrimaryPartitionsForMBR = 4
-
-	// name of all possible partition types
-	primaryPartitionType  = "primary"
-	extendedPartitionType = "extended"
-	logicalPartitionType  = "logical"
 )
 
 // Unit to byte conversion values
-// See https://www.gnu.org/software/parted/manual/parted.html#unit
 const (
 	B  = 1
 	KB = 1000
@@ -423,9 +443,99 @@ func WaitForLoopbackToDetach(devicePath string, diskPath string) error {
 	return fmt.Errorf("timed out waiting for loopback device (%s) for disk (%s) to close", devicePath, diskPath)
 }
 
-// WaitForDevicesToSettle waits for all udev events to be processed on the system.
+func WaitForDiskDevice(diskDevPath string) error {
+	err := waitForDevicesToSettle()
+	if err != nil {
+		return err
+	}
+
+	// 'udevadm settle' is sometimes not enough.
+	// So, double check that the partitions have been populated.
+	// Ideally, we would use 'udevadm wait' instead of 'udevadm settle'. But it is too new and so isn't universally
+	// available yet.
+	err = waitForDiskToPopulate(diskDevPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func waitForDiskToPopulate(diskDevPath string) error {
+	partitionTable, err := ReadDiskPartitionTable(diskDevPath)
+	if err != nil {
+		return err
+	}
+
+	if partitionTable == nil {
+		// Disk is empty.
+		return nil
+	}
+
+	_, err = retry.RunWithExpBackoff(context.Background(), func() error {
+		kernelPartitions, err := GetDiskPartitions(diskDevPath)
+		if err != nil {
+			return err
+		}
+
+		errs := []error(nil)
+		for _, partition := range partitionTable.Partitions {
+			info, found := sliceutils.FindValueFunc(kernelPartitions, func(info PartitionInfo) bool {
+				return info.Path == partition.Path
+			})
+			if !found {
+				err := fmt.Errorf("failed to find partition device node (%s)", partition.Path)
+				errs = append(errs, err)
+				continue
+			}
+
+			if !strings.EqualFold(partition.PartTypeUuid, info.PartitionTypeUuid) {
+				err := fmt.Errorf("partition's (%s) type UUID is wrong: expected (%s), actual (%s)",
+					partition.Path, partition.PartTypeUuid, info.PartitionTypeUuid)
+				errs = append(errs, err)
+			}
+
+			if !strings.EqualFold(partition.PartUuid, info.PartUuid) {
+				err := fmt.Errorf("partition's (%s) UUID is wrong: expected (%s), actual (%s)",
+					partition.Path, partition.PartUuid, info.PartUuid)
+				errs = append(errs, err)
+			}
+
+			if partition.PartLabel != info.PartLabel {
+				err := fmt.Errorf("partition's (%s) label is wrong: expected (%s), actual (%s)",
+					partition.Path, partition.PartLabel, info.PartLabel)
+				errs = append(errs, err)
+			}
+
+			if partition.FileSystemType != info.FileSystemType {
+				err := fmt.Errorf("partition's (%s) filesystem type is wrong: expected (%s), actual (%s)",
+					partition.Path, partition.FileSystemType, info.FileSystemType)
+				errs = append(errs, err)
+			}
+
+			if !strings.EqualFold(partition.FileSystemUuid, info.Uuid) {
+				err := fmt.Errorf("partition's (%s) filesystem UUID is wrong: expected (%s), actual (%s)",
+					partition.Path, partition.FileSystemUuid, info.Uuid)
+				errs = append(errs, err)
+			}
+		}
+
+		if len(errs) > 0 {
+			return errors.Join(errs...)
+		}
+
+		return nil
+	}, 10, 120*time.Millisecond, 2.0)
+	if err != nil {
+		return fmt.Errorf("timed out waiting for disk (%s) info to be populated:\n%w", diskDevPath, err)
+	}
+
+	return nil
+}
+
+// waitForDevicesToSettle waits for all udev events to be processed on the system.
 // This can be used to wait for partitions to be discovered after mounting a disk.
-func WaitForDevicesToSettle() error {
+func waitForDevicesToSettle() error {
 	logger.Log.Debugf("Waiting for devices to settle")
 	_, _, err := shell.Execute("udevadm", "settle")
 	if err != nil {
@@ -436,65 +546,30 @@ func WaitForDevicesToSettle() error {
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption,
-	diskKnownToBeEmpty bool,
 ) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, err error) {
-	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
 
-	// Clear any old partition table info to prevent errors during partition creation
-	if !diskKnownToBeEmpty {
-		_, stderr, err := shell.Execute("sfdisk", "--delete", diskDevPath)
-		if err != nil {
-			logger.Log.Warnf("Failed to clear partition table. Expected if the disk is blank: %v", stderr)
-		}
-	}
-
-	// Create new partition table
 	partitionTableType := disk.PartitionTableType
-	logger.Log.Debugf("Converting partition table type (%v) to parted argument", partitionTableType)
-	partedArgument, err := partitionTableType.ConvertToPartedArgument()
-	if err != nil {
-		err = fmt.Errorf("failed to convert partition table type (%v) to parted argument:\n%w", partitionTableType, err)
-		return
-	}
-	_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
-	if err != nil {
-		err = fmt.Errorf("failed to set partition table type using parted:\n%v\n%w", stderr, err)
-		return
-	}
 
-	usingExtendedPartition := (len(disk.Partitions) > maxPrimaryPartitionsForMBR) && (partitionTableType == configuration.PartitionTableTypeMbr)
-
-	partedSupportsEmptyStringArgs, err := PartedSupportsEmptyString()
+	// Create new partition table.
+	// This will also wipe the existing partition.
+	err = createPartitionTable(diskDevPath, partitionTableType)
 	if err != nil {
 		return
 	}
 
 	// Partitions assumed to be defined in sorted order
 	for idx, partition := range disk.Partitions {
-		partType, partitionNumber := obtainPartitionDetail(idx, usingExtendedPartition)
-		// Insert an extended partition
-		if partType == extendedPartitionType {
-			err = createExtendedPartition(diskDevPath, partitionTableType, disk.Partitions, partIDToFsTypeMap,
-				partDevPathMap, partedSupportsEmptyStringArgs)
-			if err != nil {
-				return
-			}
+		partitionNumber := idx + 1
 
-			// Update partType and partitionNumber
-			partType = logicalPartitionType
-			partitionNumber = partitionNumber + 1
-		}
-
-		partDevPath, err := createSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition, partType,
-			partedSupportsEmptyStringArgs)
+		partDevPath, err := createSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to create single partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
 		}
 
-		partFsType, err := FormatSinglePartition(partDevPath, partition)
+		partFsType, err := FormatSinglePartition(diskDevPath, partDevPath, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to format partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
@@ -513,16 +588,47 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 		partIDToFsTypeMap[partition.ID] = partFsType
 	}
+
+	// Wait for the disk's metadata to populate.
+	err = RefreshPartitions(diskDevPath)
+	if err != nil {
+		return
+	}
+
 	return
+}
+
+func createPartitionTable(diskDevPath string, partitionTableType configuration.PartitionTableType) error {
+	if partitionTableType != configuration.PartitionTableTypeGpt {
+		// When switching from "parted" to "sfdisk", MBR support was omitted.
+		return fmt.Errorf("only support for GPT disks is implemented")
+	}
+
+	// Create new partition table.
+	// This replaces any existing partition table.
+	sfdiskScript := "label: gpt"
+
+	// sfdisk only wipes pre-existing filesystem/RAID signatures when it is run interactively, so ask for it
+	// explicitly. Otherwise, stale signatures from a previous install survive in the newly partitioned space and
+	// confuse blkid/lsblk/udev. (This replaces the `sfdisk --delete` call that used to run before `parted mklabel`.)
+	err := shell.NewExecBuilder("flock", "--timeout", "5", diskDevPath, "sfdisk", "--lock=no", "--wipe=always",
+		"--wipe-partitions=always", diskDevPath).
+		Stdin(sfdiskScript).
+		LogLevel(logrus.DebugLevel, logrus.WarnLevel).
+		ErrorStderrLines(1).
+		Execute()
+	if err != nil {
+		return fmt.Errorf("failed to create partition table (%s) using sfdisk:\n%w", diskDevPath, err)
+	}
+
+	return nil
 }
 
 // createSinglePartition creates a single partition based on the partition config
 func createSinglePartition(diskDevPath string, partitionNumber int, partitionTableType configuration.PartitionTableType,
-	partition configuration.Partition, partType string, partedSupportsEmptyStringArgs bool,
+	partition configuration.Partition,
 ) (partDevPath string, err error) {
 	const (
-		fillToEndOption  = "100%"
-		sFmt             = "%ds"
 		timeoutInSeconds = "5"
 	)
 
@@ -531,143 +637,132 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		return
 	}
 
-	start := partition.Start * MiB / logicalSectorSize
-	end := partition.End*MiB/logicalSectorSize - 1
-	if partition.End == 0 {
-		end = 0
+	if partition.End != 0 && partition.Start >= partition.End {
+		return "", fmt.Errorf("invalid partition: start (%d) >= end (%d)", partition.Start, partition.End)
 	}
 
-	if partType == logicalPartitionType {
-		start = start + 1
-		if end != 0 {
-			end = end + 1
-		}
+	start := partition.Start * MiB / logicalSectorSize
+
+	// Note: an End of 0 means "no explicit end", not "ends at sector 0".
+	end := uint64(0)
+	if partition.End != 0 {
+		end = partition.End*MiB/logicalSectorSize - 1
 	}
 
 	// Check whether the start sector is 4K-aligned
 	start = alignSectorAddress(start, logicalSectorSize, physicalSectorSize)
 
+	sizeArg := ""
+	if end > 0 {
+		size := end - start + 1
+		sizeArg = fmt.Sprintf(", size=%d", size)
+	}
+
 	logger.Log.Debugf("Input partition start: %d, aligned start sector: %d", partition.Start, start)
 	logger.Log.Debugf("Input partition end: %d, end sector: %d", partition.End, end)
 
-	mkpartArgs := []string{"--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart"}
-
+	name := ""
+	typeId := ""
 	switch partitionTableType {
 	case configuration.PartitionTableTypeMbr:
-		// Part type.
-		mkpartArgs = append(mkpartArgs, partType)
+		// When switching from using "parted" to using "sfdisk", MBR support was omitted.
+		return "", fmt.Errorf("MBR support is not implemented")
 
 	case configuration.PartitionTableTypeGpt:
-		// Partition label.
-		if partition.Name == "" {
-			if partedSupportsEmptyStringArgs {
-				// For parted, you have to specify "" to represent an empty string.
-				mkpartArgs = append(mkpartArgs, `""`)
-			} else {
-				// This version of parted has no way to specify an empty partition name. :-(
-				// So, use the legacy label of "primary" (which was used in Azure Linux 2.0) instead.
-				logger.Log.Warnf("parted version <3.5 does not support empty partition names: using partition name '%s' instead",
-					LegacyDefaultParitionName)
-				mkpartArgs = append(mkpartArgs, LegacyDefaultParitionName)
+		name = escapeSfdiskString(partition.Name)
+		typeId = GenericLinuxPartitionTypeUuid
+
+		for _, flag := range partition.Flags {
+			switch flag {
+			case configuration.PartitionFlagESP, configuration.PartitionFlagBoot:
+				typeId = EfiSystemPartitionTypeUuid
+
+			case configuration.PartitionFlagGrub, configuration.PartitionFlagBiosGrub, configuration.PartitionFlagBiosGrubLegacy:
+				typeId = BiosBootPartitionTypeUuid
+
+			case configuration.PartitionFlagDeviceMapperRoot:
+				//Ignore, only used for internal tooling
+
+			default:
+				return partDevPath, fmt.Errorf("unknown partition (%d) flag (%v)", partitionNumber, flag)
 			}
-		} else {
-			mkpartArgs = append(mkpartArgs, partition.Name)
+		}
+
+		switch {
+		case partition.TypeUUID != "":
+			typeId = partition.TypeUUID
+
+		case partition.Type != "":
+			// Partition.IsValid() rejects unknown type names, but it is only run on configs that come from JSON.
+			// Check here as well so that a caller that builds a config programmatically can't end up writing an
+			// sfdisk script with an empty "type=" field.
+			uuid, found := configuration.PartitionTypeNameToUUID[partition.Type]
+			if !found {
+				return "", fmt.Errorf("unrecognized partition (%d) type (%s)", partitionNumber, partition.Type)
+			}
+			typeId = uuid
 		}
 	}
 
-	fsType := partition.FsType
-	if fsType == "vfat" {
-		// 'parted mkpart' requires value of either 'fat16' or 'fat32'.
-		fsType = "fat32"
-	}
+	sfdiskScript := fmt.Sprintf("unit: sectors\nstart=%d, type=%s, name=%s%s", start, typeId, name, sizeArg)
+	logger.Log.Debugf("sfdisk script:\n%s", sfdiskScript)
 
-	if fsType != "" {
-		mkpartArgs = append(mkpartArgs, fsType)
-	}
-
-	mkpartArgs = append(mkpartArgs, fmt.Sprintf(sFmt, start))
-
-	if end == 0 {
-		mkpartArgs = append(mkpartArgs, fillToEndOption)
-	} else {
-		mkpartArgs = append(mkpartArgs, fmt.Sprintf(sFmt, end))
-	}
-
-	_, stderr, err := shell.Execute("flock", mkpartArgs...)
+	err = shell.NewExecBuilder("flock", "--timeout", timeoutInSeconds, diskDevPath, "sfdisk", "--lock=no",
+		"--wipe-partitions=always", "--append", diskDevPath).
+		Stdin(sfdiskScript).
+		LogLevel(logrus.DebugLevel, logrus.WarnLevel).
+		ErrorStderrLines(1).
+		Execute()
 	if err != nil {
-		err = fmt.Errorf("failed to create partition using parted:\n%v\n%w", stderr, err)
+		return "", fmt.Errorf("failed to create partition using sfdisk:\n%w", err)
+	}
+
+	partDevPath, err = waitForPartitionCreation(diskDevPath, partitionNumber)
+	if err != nil {
 		return "", err
 	}
 
-	// Update kernel partition table information
-	//
-	// There can be a timing issue where partition creation finishes but the
-	// devtmpfs files are not populated in time for partition initialization.
-	// So to deal with this, we call partprobe here to query and flush the
-	// partition table information, which should enforce that the devtmpfs
-	// files are created when partprobe returns control.
-	//
-	// Added flock because "partprobe -s" apparently doesn't always block.
-	// flock is part of the util-linux package and helps to synchronize access
-	// with other cooperating processes. The important part is it will block
-	// if the fd is busy, and then execute the command. Adding a timeout
-	// to prevent us from possibly waiting forever.
-	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
-	if err != nil {
-		err = fmt.Errorf("failed to execute partprobe:\n%v\n%w", stderr, err)
-		return "", err
-	}
-	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
-	return InitializeSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
+	return partDevPath, nil
 }
 
-// Returns true if the version of 'parted' supports the 'type' session command.
-// Since v3.6
-func PartedSupportsTypeCommand() (bool, error) {
-	major, minor, err := getPartedVersion()
-	if err != nil {
-		return false, err
+// Adds escaping of string values for sfdisk scripts.
+//
+// Note: Support for string escaping was only added in util-linux v2.32.1 (commits: 75ef5a1, 810b313)
+//
+// util-linux versions of the supported build hosts:
+// - Ubuntu 22.04: v2.37.2
+// - Azure Linux 2.0: v2.37.4
+//
+// Both are well above the v2.36 already required by the "--lock" option used above, so it is fine to assume that
+// escaping is supported.
+func escapeSfdiskString(value string) string {
+	builder := strings.Builder{}
+	builder.WriteString("\"")
+
+	for _, c := range value {
+		switch {
+		case c == '"':
+			builder.WriteString("\\x22")
+
+		case c == '\\':
+			builder.WriteString("\\x5c")
+
+		case c < 0x20 || c == 0x7f:
+			// sfdisk scripts are line based, so a control character (a newline in particular) would let a
+			// partition name terminate the current directive and inject another one.
+			builder.WriteString(fmt.Sprintf("\\x%02x", c))
+
+		default:
+			builder.WriteRune(c)
+		}
 	}
 
-	supports := major >= 4 || (major == 3 && minor >= 6)
-	return supports, nil
+	builder.WriteString("\"")
+	return builder.String()
 }
 
-// Returns if the version of 'parted' supports empty (quoted) string parameters.
-// Specifically, parted v3.5+.
-func PartedSupportsEmptyString() (bool, error) {
-	major, minor, err := getPartedVersion()
-	if err != nil {
-		return false, err
-	}
-
-	supports := major >= 4 || (major == 3 && minor >= 5)
-	return supports, nil
-}
-
-func getPartedVersion() (int, int, error) {
-	stdout, _, err := shell.Execute("parted", "--version")
-	if err != nil {
-		err = fmt.Errorf("failed to get 'parted' version:\n%w", err)
-		return 0, 0, err
-	}
-
-	matches := partedVersionRegex.FindStringSubmatch(stdout)
-	if matches == nil {
-		err = fmt.Errorf("failed to parse 'parted' version:\n%w", err)
-		return 0, 0, err
-	}
-
-	major, _ := strconv.Atoi(matches[1])
-	minor, _ := strconv.Atoi(matches[2])
-
-	return major, minor, nil
-}
-
-// InitializeSinglePartition initializes a single partition based on the given partition configuration
-func InitializeSinglePartition(diskDevPath string, partitionNumber int,
-	partitionTableType configuration.PartitionTableType, partition configuration.Partition,
-) (partDevPath string, err error) {
+// waitForPartitionCreation waits for the device node of a newly created partition to appear.
+func waitForPartitionCreation(diskDevPath string, partitionNumber int) (partDevPath string, err error) {
 	const (
 		retryDuration    = time.Second
 		timeoutInSeconds = "5"
@@ -706,56 +801,12 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int,
 			logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
 		}
 		logger.Log.Warnf("Could not find any valid partition paths. Will retry up to %d times", totalAttempts)
-		err = fmt.Errorf("could not find partition to initialize in /dev")
+		err = fmt.Errorf("could not find partition (%d) in /dev", partitionNumber)
 		return err
 	}, totalAttempts, retryDuration)
-
 	if err != nil {
 		return
 	}
-
-	logger.Log.Debugf("Initializing partition device path: %v", partDevPath)
-
-	// Set partition friendly name and partition type UUID (only for gpt)
-	if partitionTableType == configuration.PartitionTableTypeGpt {
-		setGptPartitionType(partition, timeoutInSeconds, diskDevPath, partitionNumberStr)
-	}
-
-	// Set partition flags if necessary
-	for _, flag := range partition.Flags {
-		args := []string{diskDevPath, "--script", "set", partitionNumberStr}
-		var flagToSet string
-		switch flag {
-		case configuration.PartitionFlagESP:
-			flagToSet = "esp"
-		case configuration.PartitionFlagGrub, configuration.PartitionFlagBiosGrub, configuration.PartitionFlagBiosGrubLegacy:
-			flagToSet = "bios_grub"
-		case configuration.PartitionFlagBoot:
-			flagToSet = "boot"
-		case configuration.PartitionFlagDeviceMapperRoot:
-			//Ignore, only used for internal tooling
-		default:
-			return partDevPath, fmt.Errorf("partition %v - Unknown partition flag: %v", partitionNumber, flag)
-		}
-		if flagToSet != "" {
-			args = append(args, flagToSet, "on")
-			// Golang does not allow mixing of variadic and regular arguments. So add all of the flock args to
-			// the overall arg slice and pass that to execute
-			args = append([]string{"--timeout", timeoutInSeconds, diskDevPath, "parted"}, args...)
-			_, stderr, err := shell.Execute("flock", args...)
-			if err != nil {
-				logger.Log.Warnf("Failed to set flag (%s) using parted: %v", flagToSet, stderr)
-			}
-		}
-	}
-
-	// Make sure all partition information is actually updated.
-	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
-	if err != nil {
-		err = fmt.Errorf("failed to execute partprobe after partition initialization:\n%v\n%w", stderr, err)
-		return "", err
-	}
-	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
 
 	return
 }
@@ -764,31 +815,8 @@ func isDigit(c byte) bool {
 	return c >= '0' && c <= '9'
 }
 
-func setGptPartitionType(partition configuration.Partition, timeoutInSeconds, diskDevPath, partitionNumberStr string) (err error) {
-	if supports, _ := PartedSupportsTypeCommand(); !supports {
-		logger.Log.Warn("parted version <3.6 does not support the 'type' session command - skipping this operation")
-		return
-	}
-
-	if partition.TypeUUID != "" || partition.Type != "" {
-		var typeUUID string
-		if partition.TypeUUID != "" {
-			typeUUID = partition.TypeUUID
-		} else {
-			typeUUID = configuration.PartitionTypeNameToUUID[partition.Type]
-		}
-		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "type", partitionNumberStr, typeUUID)
-		if err != nil {
-			logger.Log.Warnf("failed to set partition type using parted: %v", stderr)
-			err = nil
-			// Not-fatal
-		}
-	}
-	return
-}
-
 // FormatSinglePartition formats the given partition to the type specified in the partition configuration
-func FormatSinglePartition(partDevPath string, partition configuration.Partition,
+func FormatSinglePartition(diskDevPath string, partDevPath string, partition configuration.Partition,
 ) (fsType string, err error) {
 	const (
 		totalAttempts = 5
@@ -798,7 +826,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 	fsType = partition.FsType
 
 	// Note: It is possible for the format partition command to fail with error "The file does not exist and no size was specified".
-	// This is due to a possible race condition in Linux/parted where the partition may not actually be ready after being newly created.
+	// This is due to a possible race condition in Linux where the partition may not actually be ready after being newly created.
 	// To handle such cases, we can retry the command.
 	switch fsType {
 	case "fat32", "fat16", "vfat", "ext2", "ext3", "ext4", "xfs":
@@ -808,12 +836,12 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 			fsType = "vfat"
 		}
 
-		mkfsArgs := []string{"-t", fsType}
+		mkfsArgs := []string{"--timeout", "5", diskDevPath, "mkfs", "-t", fsType}
 		mkfsArgs = append(mkfsArgs, mkfsOptions...)
 		mkfsArgs = append(mkfsArgs, partDevPath)
 
 		err = retry.Run(func() error {
-			_, stderr, err := shell.Execute("mkfs", mkfsArgs...)
+			_, stderr, err := shell.Execute("flock", mkfsArgs...)
 			if err != nil {
 				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
 				return err
@@ -897,15 +925,11 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	return
 }
 
+// GetDiskPartitions gets the kernel's view of a disk's partitions.
 func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
-	// Just in case the disk was only recently connected, wait for the OS to finish processing it.
-	err := WaitForDevicesToSettle()
-	if err != nil {
-		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
-	}
-
 	// Read the disk's partitions.
-	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID,PARTLABEL,TYPE", "--json", "--list")
+	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output",
+		"NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID,PARTLABEL,TYPE,SIZE", "--bytes", "--json", "--list")
 	if err != nil {
 		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
 	}
@@ -921,25 +945,64 @@ func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
 	return output.Devices, err
 }
 
-func createExtendedPartition(diskDevPath string, partitionTableType configuration.PartitionTableType,
-	partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string,
-	partedSupportsEmptyStringArgs bool,
-) (err error) {
-	// Create a new partition object for extended partition
-	extendedPartition := configuration.Partition{}
-	extendedPartition.ID = extendedPartitionType
-	extendedPartition.Start = partitions[maxPrimaryPartitionsForMBR-1].Start
-	extendedPartition.End = partitions[len(partitions)-1].End
-
-	partDevPath, err := createSinglePartition(diskDevPath, maxPrimaryPartitionsForMBR, partitionTableType,
-		extendedPartition, extendedPartitionType, partedSupportsEmptyStringArgs)
+// ReadPartitionTable reads the partition table directly from the disk.
+func ReadDiskPartitionTable(diskDevPath string) (*PartitionTable, error) {
+	// Read the partition table directly from disk.
+	stdout, stderr, err := shell.Execute("flock", "--timeout", "5", "--shared", diskDevPath,
+		"sfdisk", "--lock=no", "--dump", "--json", diskDevPath)
 	if err != nil {
-		err = fmt.Errorf("failed to create extended partition:\n%w", err)
-		return
+		if strings.Contains(stderr, "does not contain a recognized partition table") {
+			// Empty partition table.
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("failed to read partition table (%s):\n%s\n%w", diskDevPath, stderr, err)
 	}
-	partIDToFsTypeMap[extendedPartition.ID] = ""
-	partDevPathMap[extendedPartition.ID] = partDevPath
-	return
+
+	var output partitionTableOutput
+	if stdout == "" {
+		return output.PartitionTable, nil
+	}
+
+	err = json.Unmarshal([]byte(stdout), &output)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse disk (%s) partition table JSON:\n%w", diskDevPath, err)
+	}
+
+	if output.PartitionTable == nil {
+		// Disk is empty.
+		return nil, nil
+	}
+
+	partitionTable := output.PartitionTable
+
+	if partitionTable.Unit != "sectors" {
+		return nil, fmt.Errorf("sfdisk returned unexpected unit size '%s': expecting 'sectors'", partitionTable.Unit)
+	}
+
+	for i := range partitionTable.Partitions {
+		partition := &partitionTable.Partitions[i]
+
+		// Read the filesystem type directly from disk.
+		stdout, _, err := shell.Execute("flock", "--timeout", "5", "--shared", diskDevPath,
+			"blkid", "--probe", "-s", "TYPE", "-o", "value", partition.Path)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get filesystem type of partition (%s)\n%w", partition.Path, err)
+		}
+
+		partition.FileSystemType = strings.TrimSpace(stdout)
+
+		// Read the filesystem UUID directly from disk.
+		stdout, _, err = shell.Execute("flock", "--timeout", "5", "--shared", diskDevPath,
+			"blkid", "--probe", "-s", "UUID", "-o", "value", partition.Path)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get filesystem UUID of partition (%s)\n%w", partition.Path, err)
+		}
+
+		partition.FileSystemUuid = strings.TrimSpace(stdout)
+	}
+
+	return output.PartitionTable, nil
 }
 
 func getPartUUID(device string) (uuid string, err error) {
@@ -1023,29 +1086,45 @@ func alignSectorAddress(sectorAddr, logicalSectorSize, physicalSectorSize uint64
 	return
 }
 
-func obtainPartitionDetail(partitionIndex int, hasExtendedPartition bool) (partType string, partitionNumber int) {
-	const (
-		indexOffsetForNormalPartitionNumber  = 1
-		indexOffsetForLogicalPartitionNumber = 2
-	)
-
-	// partitionIndex is the index of the partition in the partition array, which starts at 0.
-	// partitionNumber, however, starts at 1 (E.g. /dev/sda1), and thus partitionNumber = partitionIndex + 1.
-	// In the case of logical partitions, since an extra extended partition has to be created first in order to
-	// to create logical partitions, so the partition number will further increase by 1, which equals partitionIndex + 2.
-
-	if hasExtendedPartition && partitionIndex >= (maxPrimaryPartitionsForMBR-1) {
-		if partitionIndex == (maxPrimaryPartitionsForMBR - 1) {
-			partType = extendedPartitionType
-			partitionNumber = partitionIndex + indexOffsetForNormalPartitionNumber
-		} else {
-			partType = logicalPartitionType
-			partitionNumber = partitionIndex + indexOffsetForLogicalPartitionNumber
-		}
-	} else {
-		partType = primaryPartitionType
-		partitionNumber = partitionIndex + indexOffsetForNormalPartitionNumber
+func RefreshPartitions(diskDevPath string) error {
+	err := requestKernelRereadPartitionTable(diskDevPath)
+	if err != nil {
+		return fmt.Errorf("failed to request partition table reread (%s):\n%w", diskDevPath, err)
 	}
 
-	return
+	err = WaitForDiskDevice(diskDevPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Requests that the kernel reread the partition table for the given disk device.
+func requestKernelRereadPartitionTable(diskDevPath string) error {
+	diskFile, err := os.OpenFile(diskDevPath, os.O_RDONLY, 0)
+	if err != nil {
+		return err
+	}
+	defer diskFile.Close()
+
+	waitTime := 125 * time.Millisecond
+	retries := 10
+	for i := 0; ; i = 1 {
+		_, _, errno := unix.Syscall(unix.SYS_IOCTL, diskFile.Fd(), unix.BLKRRPART, 0)
+		switch {
+		case errno == unix.EBUSY && i < retries:
+			// Something else is using the disk at the moment.
+			// So, retry in a little bit.
+			time.Sleep(waitTime)
+			waitTime *= 2
+			continue
+
+		case errno != 0:
+			return errno
+
+		default:
+			return nil
+		}
+	}
 }

@@ -1,0 +1,31 @@
+From d2e69485450bfc4aa943d349a5838aab066deaa7 Mon Sep 17 00:00:00 2001
+From: Kshitiz Godara <kgodara@microsoft.com>
+Date: Tue, 11 Aug 2026 00:00:00 +0000
+Subject: [PATCH] test: bound the styled_perf_bug benchmark loop
+
+styled_perf_bug reproduces the ephemeron-based performance regression
+fixed in v0.9.0 by printing formatting throughput indefinitely, which is
+useful when watching it by hand but hangs any automated test run.
+
+Run a fixed number of rounds instead, so the benchmark still exercises the
+Fmt.styled/Fmt.str code path that regressed and then terminates.
+---
+ test/styled_perf_bug.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/styled_perf_bug.ml b/test/styled_perf_bug.ml
+index d8e69a1..fe652e1 100644
+--- a/test/styled_perf_bug.ml
++++ b/test/styled_perf_bug.ml
+@@ -1,7 +1,7 @@
+ let n = 10000
+ 
+ let () =
+-  while true do
++  for _round = 1 to 5 do
+     let t0 = Unix.gettimeofday () in
+     for _i = 1 to n do
+       ignore @@ Fmt.str "Hello %a" Fmt.string "world"
+-- 
+2.53.0
+

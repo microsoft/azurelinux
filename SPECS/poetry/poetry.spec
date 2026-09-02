@@ -5,13 +5,14 @@ projects, ensuring you have the right stack everywhere.}
 Summary:        Python dependency management and packaging made easy
 Name:           %{pypi_name}
 Version:        1.8.5
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://poetry.eustace.io/
 Source0:        https://github.com/python-poetry/poetry/archive/refs/tags/%{version}.tar.gz#/poetry-%{version}.tar.gz
 Patch0:         CVE-2026-34591.patch
+Patch1:         CVE-2026-41140.patch
 # relax some too-strict dependencies that are specified in setup.py:
 # - importlib-metadata (either removed or too old in fedora)
 # - keyring (too new in fedora, but should be compatible)
@@ -86,8 +87,9 @@ pip3 install --ignore-installed \
             httpretty==1.1.4 \
             iniconfig==2.0.0 \
             installer==0.7.0 \
+            packaging==26.2 \
             pkginfo==1.12 \
-	        poetry==%{version} \
+            poetry==%{version} \
             poetry_plugin_export==1.8.0 \
             requests_toolbelt==1.0.0 \
             tomlkit==0.12.5 \
@@ -109,6 +111,14 @@ pip3 install --ignore-installed \
 %{python3_sitelib}/%{pypi_name}-%{version}.dist-info/
 
 %changelog
+* Tue Aug 11 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.8.5-3
+- Pin packaging==26.2 in %%check. packaging 26.3 changed the platform tag
+  computed by env.supported_tags, breaking test_prepare_directory_with_extensions
+  (expected linux_x86_64, built wheel tagged manylinux_2_38_x86_64).
+
+* Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.5-2
+- Patch for CVE-2026-41140
+
 * Tue Apr 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.5-1
 - Upgrade to version 1.8.5
 - Patch for CVE-2026-34591

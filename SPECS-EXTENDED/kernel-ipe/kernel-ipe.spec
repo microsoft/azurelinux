@@ -32,7 +32,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.139.1
+Version:        6.6.150.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -460,6 +460,30 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Aug 07 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.150.1-1
+- Auto-upgrade to 6.6.150.1
+
+* Thu Jul 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.145.2-1
+- Auto-upgrade to 6.6.145.2
+
+* Tue Jul 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.145.1-1
+- Auto-upgrade to 6.6.145.1
+
+* Tue Jul 14 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.144.1-2
+- Enable fscrypt for booted kernel
+
+* Mon Jul 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.144.1-1
+- Auto-upgrade to 6.6.144.1
+
+* Wed Jun 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.143.1-1
+- Auto-upgrade to 6.6.143.1
+
+* Tue Jun 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.142.1-1
+- Auto-upgrade to 6.6.142.1
+
+* Tue May 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.141.1-1
+- Auto-upgrade to 6.6.141.1
+
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.139.1-1
 - Auto-upgrade to 6.6.139.1
 

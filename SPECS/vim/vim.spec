@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.2.0488
+Version:        9.2.0976
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -223,6 +223,21 @@ fi
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Wed Aug 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0976-1
+- Auto-upgrade to 9.2.0976 - for CVE-2026-73073
+
+* Fri Aug 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0957-1
+- Auto-upgrade to 9.2.0957 - for CVE-2026-73078, CVE-2026-73074, CVE-2026-73072, CVE-2026-73077, CVE-2026-73076, CVE-2026-73070, CVE-2026-73075, CVE-2026-73071
+
+* Fri Jul 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0782-1
+- Auto-upgrade to 9.2.0782 - for CVE-2026-59856
+
+* Sat Jun 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0735-1
+- Auto-upgrade to 9.2.0735 - for CVE-2026-57452, CVE-2026-57455, CVE-2026-55895, CVE-2026-55693, CVE-2026-57456, CVE-2026-55892, CVE-2026-57451, CVE-2026-57453, CVE-2026-57454
+
+* Fri Jun 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0620-1
+- Auto-upgrade to 9.2.0620 - for CVE-2026-52858, CVE-2026-52859, CVE-2026-52860, CVE-2026-47162, CVE-2026-47167
+
 * Sat May 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0488-1
 - Auto-upgrade to 9.2.0488 - for CVE-2026-46483
 

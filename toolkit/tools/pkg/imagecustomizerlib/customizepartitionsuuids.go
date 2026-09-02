@@ -65,6 +65,12 @@ func resetPartitionsUuids(buildImageFile string, buildDir string) error {
 		newPartUuids[i] = newPartUuid
 	}
 
+	// Wait for the partition table updates to be processed.
+	err = diskutils.WaitForDiskDevice(loopback.DevicePath())
+	if err != nil {
+		return err
+	}
+
 	// Fix /etc/fstab file.
 	err = fixPartitionUuidsInFstabFile(partitions, newUuids, newPartUuids, buildDir)
 	if err != nil {

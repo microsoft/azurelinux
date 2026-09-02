@@ -101,7 +101,7 @@
 # See mariadb-libfmt.patch for detailed description.
 %bcond bundled_fmt 0
 %if %{with bundled_fmt}
-%global fmt_bundled_version 11.0.2
+%global fmt_bundled_version 12.2.0
 %endif
  
 # Include systemd files
@@ -130,7 +130,7 @@
 %global sameevr   %{epoch}:%{version}-%{release}
  
 Name:             %{majorname}
-Version:          10.11.17
+Version:          10.11.19
 Release:          1%{?dist}
 Epoch:            3
  
@@ -1767,6 +1767,14 @@ fi
 %endif
  
 %changelog
+* Tue Aug 25 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3:10.11.19-1
+- Upgrade to 10.11.19
+- Rebase mariadb-logrotate.patch and mariadb-libfmt.patch onto upstream context changes
+- Follow upstream's new compiler-conditional bundled fmt selection (12.2.0)
+
+* Fri May 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3:10.11.18-1
+- Auto-upgrade to 10.11.18 - for CVE-2026-48165, CVE-2026-48163
+
 * Mon May 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3:10.11.17-1
 - Auto-upgrade to 10.11.17 - for CVE-2026-44168, CVE-2026-44169, CVE-2026-44170, CVE-2026-44171, CVE-2026-44172, CVE-2026-44173
 

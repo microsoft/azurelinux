@@ -1,6 +1,6 @@
 Summary:        WebOb provides objects for HTTP requests and responses.
 Name:           python-webob
-Version:        1.8.8
+Version:        1.8.11
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -46,6 +46,12 @@ rm -f tests/performance_test.py
 %{python3_sitelib}/*
 
 %changelog
+* Mon Aug 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.11-1
+- Auto-upgrade to 1.8.11 - for CVE-2026-54770
+
+* Sun Jun 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.10-1
+- Auto-upgrade to 1.8.10 - for CVE-2026-44889
+
 * Tue Aug 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.8-1
 - Auto-upgrade to 1.8.8 - Fix CVE-2024-42353
 

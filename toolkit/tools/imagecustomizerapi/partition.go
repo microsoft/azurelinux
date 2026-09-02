@@ -17,11 +17,17 @@ type Partition struct {
 	// Note: When not provided, value is filled in by Disk.IsValid().
 	Start *DiskSize `yaml:"start"`
 	// End is the offset where the partition ends (exclusive).
+	// Note: When not provided, value may be filled in by Disk.IsValid().
 	End *DiskSize `yaml:"end"`
 	// Size is the size of the partition.
 	Size PartitionSize `yaml:"size"`
 	// Type specifies the type of partition the partition is.
 	Type PartitionType `yaml:"type"`
+
+	// filled records that Disk.IsValid() has already populated the values above.
+	// It allows IsValid() to be called more than once on the same object, which this repo does (see
+	// UnmarshalYaml() and validateConfig()).
+	filled bool
 }
 
 func (p *Partition) IsValid() error {
@@ -30,7 +36,9 @@ func (p *Partition) IsValid() error {
 		return err
 	}
 
-	if p.End != nil && p.Size.Type != PartitionSizeTypeUnset {
+	// Skip this check once Disk.IsValid() has filled in End, since doing so legitimately produces a partition
+	// that has both an End and a Size.
+	if !p.filled && p.End != nil && p.Size.Type != PartitionSizeTypeUnset {
 		return fmt.Errorf("cannot specify both end and size on partition (%s)", p.Id)
 	}
 

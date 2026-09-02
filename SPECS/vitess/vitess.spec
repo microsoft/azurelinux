@@ -3,14 +3,14 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        9%{?dist}
+Release:        13%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/vitessio/vitess
-#Source0:       https://github.com/vitessio/%{name}/archive/refs/tags/v%{version}.tar.gz
+#Source0:       https://github.com/vitessio/%%{name}/archive/refs/tags/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
@@ -34,7 +34,13 @@ Patch4:         CVE-2024-53257.patch
 Patch5:         CVE-2026-27965.patch
 Patch6:         CVE-2026-27969.patch
 Patch7:         CVE-2025-11065.patch
+Patch8:         CVE-2026-39821.patch
+Patch9:         CVE-2026-56852.patch
+Patch10:        CVE-2026-43871.patch
+Patch11:        CVE-2026-55969.patch
+Patch12:        CVE-2026-65959.patch
 BuildRequires: golang < 1.23
+BuildRequires: hostname
 
 %description
 Vitess is a database clustering system for horizontal scaling of MySQL through
@@ -97,6 +103,19 @@ install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 #   go/vt/vttablet/tabletserver/vstreamer - needs mysqlctl binary
 #   go/vt/wrangler/testlib            - needs mysqld (VT_MYSQL_ROOT)
 #   go/vt/zkctl                       - needs /usr/local/vitess/bin (zookeeper)
+
+# wrangler's fake-tablet init calls netutil.FullyQualifiedHostname(); map the
+# build chroot's (ephemeral) hostname so it resolves. localhost is already mapped.
+echo "127.0.0.1 $(hostname)" >> /etc/hosts 2>/dev/null || true
+
+export TMPDIR=$PWD/tmp
+mkdir -p $TMPDIR
+
+export VTDATAROOT=$PWD/vtdataroot
+mkdir -p $VTDATAROOT
+
+export VTROOT=$PWD
+
 go test -mod=vendor \
        ./go/mysql/binlog/... \
        ./go/mysql/capabilities/... \
@@ -149,6 +168,18 @@ go test -mod=vendor \
 %{_bindir}/*
 
 %changelog
+* Mon Aug 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-13
+- Patch for CVE-2026-65959
+
+* Mon Aug 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-12
+- Patch for CVE-2026-55969, CVE-2026-43871
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-11
+- Patch for CVE-2026-56852
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-10
+- Patch for CVE-2026-39821
+
 * Thu Feb 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-9
 - Patch for CVE-2025-11065
 

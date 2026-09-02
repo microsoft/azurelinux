@@ -3,6 +3,6 @@
     "rpcbind.service": "d746db0a910f04c1a175f0e22ca5ac2c335d1b5e89d30c6dea9ec25de8421034",
     "rpcbind.socket": "a6300d62826f275edb416e74e7601fd49f2708d60f9801f151137ab4ee4c0cb7",
     "rpcbind.sysconfig": "85a9d23df0bdbdd10076bb5732fb6ebca1aaaddac9ce96f05216453c7bfe486d",
-    "rpcbind-1.2.6.tar.bz2": "5613746489cae5ae23a443bb85c05a11741a5f12c8f55d2bb5e83b9defeee8de"
+    "rpcbind-1.2.9.tar.bz2": "ce5f1a87c566ef0b2897a28f50a75c1dc23fec413a46a7f4183423b6b6aa991b"
   }
 }

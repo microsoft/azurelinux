@@ -1,7 +1,7 @@
 Summary:        Linux NTFS userspace driver
 Name:           ntfs-3g
 Version:        2022.10.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,8 @@ Source0:        https://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
 Patch0:         ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch
 Patch1:         CVE-2023-52890.patch
 Patch2:         CVE-2026-40706.patch
+Patch3:         CVE-2026-56135.patch
+Patch4:         CVE-2026-56136.patch
 
 BuildRequires:  fuse-devel
 BuildRequires:  gnutls-devel
@@ -172,6 +174,9 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 %exclude %{_mandir}/man8/ntfs-3g*
 
 %changelog
+* Thu Aug 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2022.10.3-4
+- Patch for CVE-2026-56136, CVE-2026-56135
+
 * Fri Apr 17 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2022.10.3-3
 - Patch CVE-2026-40706
 

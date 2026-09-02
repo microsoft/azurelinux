@@ -1,0 +1,18 @@
+[Unit]
+Description=Microsoft Azure Linux Agent (ACL)
+Wants=network-online.target sshd.service sshd-keygen.service
+After=network-online.target sshd-keygen.service systemd-sysext.service
+
+ConditionFileIsExecutable=/usr/bin/waagent
+ConditionPathExists=/etc/waagent.conf
+
+[Service]
+Type=simple
+
+ExecStart=/usr/bin/python -u /usr/bin/waagent -daemon
+
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

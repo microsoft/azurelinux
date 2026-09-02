@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.26.3-20260508.1.src.tar.gz
+%global ms_go_filename  go1.27.0-20260819.4.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.26.3
+Version:        1.27.0
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -62,6 +62,7 @@ tar xf %{SOURCE5} --no-same-owner
 mv -v go go-bootstrap-04
 
 %setup -q -n go
+%autopatch -p1 -m 1
 
 %build
 # go 1.4 bootstraps with C.
@@ -110,6 +111,9 @@ rm -f  %{gopath}/src/runtime/*.c
   cd src
   ./make.bash --no-clean
 )
+
+# Nuke the final bootstrapper. Note: It is not used in any step under install, post, postrun
+rm -rf %{_libdir}/golang
 
 %install
 
@@ -166,6 +170,31 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Aug 20 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.27.0-1
+- Bump version to 1.27.0-1
+
+* Wed Aug 19 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.7-1
+- Bump version to 1.26.7-1
+
+* Fri Aug 14 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.6-1
+- Bump version to 1.26.6-1
+- Remove patch of CVE-2026-39821
+
+* Fri Jul 10 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.5-2
+- Bump version to 1.26.5-2
+
+* Wed Jul 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.5-1
+- Bump version to 1.26.5-1
+
+* Fri June 26 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-3
+- Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+
+* Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
+- Patch for CVE-2026-39821
+
+* Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.4-1
+- Bump version to 1.26.4-1
+
 * Fri May 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.3-1
 - Bump version to 1.26.3-1
 

@@ -3,16 +3,17 @@
 Summary: Network diagnostic tool combining 'traceroute' and 'ping'
 Name: mtr
 Version: 0.95
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: https://www.bitwizard.nl/mtr/
+URL:     https://www.bitwizard.nl/mtr/
 Source0: https://github.com/traviscross/mtr/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1: net-x%{name}.desktop
 Source2: mtr-gtk-pkexec-wrapper.sh
 Source3: org.fedoraproject.mtr.policy
-Patch0:CVE-2025-49809.patch
+Patch0:  CVE-2025-49809.patch
+Patch1:  CVE-2026-14461.patch
 
 BuildRequires: ncurses-devel
 BuildRequires: autoconf automake libtool git
@@ -62,6 +63,9 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
+* Sat Jul 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.95-4
+- Patch for CVE-2026-14461
+
 * Mon Jul 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.95-3
 - Patch for CVE-2025-49809
 

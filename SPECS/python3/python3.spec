@@ -5,8 +5,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.12.9
-Release:        11%{?dist}
+Version:        3.12.14
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,21 +17,6 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 # It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
-Patch1:         CVE-2025-4516.patch
-Patch2:         CVE-2025-4517.patch
-Patch3:         CVE-2025-6069.patch
-Patch4:         CVE-2025-8194.patch
-Patch5:         CVE-2025-8291.patch
-Patch6:         CVE-2025-6075.patch
-Patch7:         CVE-2025-12084.patch
-Patch8:         CVE-2025-13836.patch
-Patch9:         CVE-2025-13837.patch
-Patch10:        CVE-2025-11468.patch
-Patch11:        CVE-2026-0672.patch
-Patch12:        CVE-2026-0865.patch
-Patch13:        CVE-2026-1299.patch
-Patch14:        CVE-2026-4519.patch
-Patch15:        CVE-2026-1502.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -185,6 +170,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %check
 # vsock_loopback module needed by `test_socket` is not loaded by default in AzureLinux.
+# Load the freshly built libpython from the buildroot so the shared interpreter
+# does not run against the system libpython3.12.so.1.0.
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{buildroot}%{_bindir}/python3 -m test --exclude test_socket
 
 %ldconfig_scriptlets
@@ -254,6 +242,24 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Thu Aug 13 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.12.14-1
+- Upgrade to 3.12.14 for CVE-2026-18503, CVE-2026-15308, CVE-2026-7210, CVE-2026-4224
+- Remove patches CVE-2025-4516, CVE-2025-4517, CVE-2025-6069, CVE-2025-6075, CVE-2025-8194,
+  CVE-2025-8291, CVE-2025-11468, CVE-2025-12084, CVE-2025-13462, CVE-2025-13836, CVE-2025-13837,
+  CVE-2026-0672, CVE-2026-0864, CVE-2026-0865, CVE-2026-1299, CVE-2026-1502, CVE-2026-2297, CVE-2026-3087,
+  CVE-2026-3276, CVE-2026-3644, CVE-2026-4360, CVE-2026-4519, CVE-2026-4786, CVE-2026-6100, CVE-2026-6879,
+  CVE-2026-7774, CVE-2026-8328, CVE-2026-9669, CVE-2026-11972, CVE-2026-12003
+- Load buildroot libpython during %%check to fix libpython version mismatch (SIGBUS)
+
+* Wed Aug 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-14
+- Patch for CVE-2026-9669, CVE-2026-6879, CVE-2026-6100, CVE-2026-4786, CVE-2026-4360, CVE-2026-3644, CVE-2026-3276, CVE-2026-3087, CVE-2026-2297, CVE-2026-12003, CVE-2026-11972, CVE-2026-0864
+
+* Wed Jun 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-13
+- Patch for CVE-2026-7774
+
+* Mon May 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-12
+- Patch for CVE-2025-13462, CVE-2026-8328
+
 * Fri May 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-11
 - Patch for CVE-2026-1502
 
@@ -292,7 +298,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 * Thu Jan 30 2025 Bala <balakumaran.kannan@microsoft.com> - 3.12.3-6
 - Patch CVE-2023-27043
 
-* Mon Dec 10 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.12.3-5
+* Tue Dec 10 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.12.3-5
 - Patch CVE-2024-12254
 
 * Fri Sep 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.12.3-4

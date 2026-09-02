@@ -2,7 +2,7 @@
 Summary:        A very simplistic remote-command-executor
 Name:           python-%{pkgname}
 Version:        1.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,8 @@ remoto as well to inspect Ceph clusters.
 
 %prep
 %autosetup -n %{pkgname}-%{version}
+# Fix pytest compatibility: 'setup' not auto-called on plain classes in newer pytest
+sed -i 's/def setup(self)/def setup_method(self)/' remoto/tests/test_process.py remoto/tests/test_util.py
 
 %build
 %py3_build
@@ -53,6 +55,10 @@ python3 -m pytest -v remoto/tests
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.2.1-2
+- Rename `setup(self)` to `setup_method(self)` in tests; newer pytest no
+  longer auto-invokes `setup` on plain classes.
+
 * Wed Mar 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.2.1-1
 - Upgrade to latest upstream version
 - Pass check section with newer python environment

@@ -1,25 +1,23 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        3.19.1.kata3
+Version:        3.32.0.kata0
 Release:        4%{?dist}
-
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cargo.tar.gz
-Patch0:         CVE-2026-24054.patch
-Patch1:         rust-1.90-fixes.patch
-Patch2:         CVE-2026-24834.patch
-Patch3:         CVE-2026-25727.patch
-Patch4:         CVE-2026-25541.patch
-Patch5:         CVE-2025-11065.patch
-Patch6:         CVE-2026-41602.patch
-Patch7:         CVE-2026-39821.patch
-Patch8:         CVE-2026-33814.patch
+# Todo: revert back to %{name}-${version}-cargo.tar.gz next release
+# This is a temporary workaround so we can use a newer cargo tarball without having to make a new fork release
+Source1:        %{name}-3.32.0.kata1-cargo.tar.gz
+# Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
+Patch0:         dbs-arch-cpuid-unsafe.patch
+Patch1:         CVE-2025-11065.patch
+Patch2:         CVE-2026-41602.patch
+Patch3:         CVE-2026-56852.patch
+Patch4:         CVE-2026-50540.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -54,6 +52,19 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
 
+pushd %{_builddir}/%{name}-%{version}/src/runtime/config
+cp configuration-clh.toml configuration-clh-preview.toml
+cp configuration-clh-debug.toml configuration-clh-preview-debug.toml
+popd
+
+for config_file in \
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml; do
+  sed -i 's|^\[hypervisor\.clh\]$|[factory]\nenable_template = true\ntemplate_path = "/run/vc/vm/template"\n\n[hypervisor.clh]|' "${config_file}"
+  sed -i 's|^shared_fs = "virtio-fs"$|shared_fs = "none"|' "${config_file}"
+  sed -i 's|^default_maxmemory = .*$|default_maxmemory = 2048|' "${config_file}"
+done
+
 %define kata_path     /opt/kata-containers
 %define kata_bin      %{_prefix}/local/bin
 %define kata_shim_bin %{_prefix}/local/bin
@@ -65,16 +76,28 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
 PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
+install -m 0644 \
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml \
+  %{buildroot}%{defaults_kata}/
 
 %files
 %{kata_bin}/kata-collect-data.sh
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
+%{kata_bin}/kata-ctl
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-clh.toml
 %{defaults_kata}/configuration-clh-debug.toml
+%{defaults_kata}/configuration-clh-preview.toml
+%{defaults_kata}/configuration-clh-preview-debug.toml
+%{defaults_kata}/configuration-clh-runtime-rs.toml
+%{defaults_kata}/configuration-clh-runtime-rs-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
+%{kata_shim_bin}/containerd-shim-kata-v2-go
+%{kata_shim_bin}/containerd-shim-kata-v2-rs
 
 %license LICENSE
 %doc CONTRIBUTING.md
@@ -85,6 +108,7 @@ popd
 %dir %{tools_pkg}
 %dir %{tools_pkg}/tools
 %dir %{tools_pkg}/tools/osbuilder
+%{tools_pkg}/tools/osbuilder/VERSION
 %{tools_pkg}/tools/osbuilder/Makefile
 
 %dir %{tools_pkg}/tools/osbuilder/scripts
@@ -119,6 +143,28 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.32.0.kata0-4
+- Bump release to rebuild with rust
+
+* Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-3
+- Patch for CVE-2026-50540
+
+* Tue Aug 04 2026 Saul Paredes <saulparedes@microsoft.com>  - 3.32.0.kata0-2
+- Use smaller vendored sources
+
+* Mon Jul 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.32.0.kata0-1
+- Auto-upgrade to 3.32.0.kata0
+- Add preview configurations for VM templating
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.19.1.kata3-7
+- Patch for CVE-2026-56852
+
+* Mon Jun 08 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata3-6
+- Patch for CVE-2025-58160 and CVE-2026-27171
+
+* Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata3-5
+- Bump release to rebuild with rust
+
 * Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.19.1.kata3-4
 - Patch for CVE-2026-33814
 

@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 1%{?dist}
+Release: 7%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -21,10 +21,22 @@ Patch1:	tardev-support.patch
 Patch2:	CVE-2026-39882.patch
 Patch3:	CVE-2026-33814.patch
 Patch4:	fix-TestCgroupNamespace-cgroupv1.patch
+Patch5:	CVE-2026-39821.patch
+Patch6:	CVE-2026-42506.patch
+Patch7:	CVE-2026-27136.patch
+Patch8:	CVE-2026-53488.patch
+Patch9:	CVE-2026-53492.patch
+Patch10:	CVE-2026-50195.patch
+Patch11:	CVE-2026-53489.patch
+Patch12:	CVE-2026-47262.patch
+Patch13:	CVE-2026-25680.patch
+Patch14:	CVE-2026-25681.patch
+Patch15:	CVE-2026-42502.patch
+Patch16:	CVE-2026-56852.patch
 
 %{?systemd_requires}
 
-BuildRequires: golang < 1.25
+BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -97,7 +109,28 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Thu May 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-1
+* Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.2.4-7
+- Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
+  now selected automatically and supports CGO_ENABLED=0 on Linux.
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-6
+- Patch for CVE-2026-56852
+
+* Thu Jul 09 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-5
+- Remove 'BuildRequires: golang < 1.25' and set GOEXPERIMENT=ms_nocgo_opensslcrypto
+  to build with the default Go toolchain, resolving Go stdlib CVE-2026-25679,
+  CVE-2026-27139, CVE-2026-33811, CVE-2026-39836 (was built on Go 1.24.13).
+
+* Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-4
+- Patch for CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
+
+* Tue Jun 16 2026 Henry Beberman <henry.beberman@microsoft.com> - 2.2.4-3
+- Patch for CVE-2026-50195, CVE-2026-53488, CVE-2026-53492, CVE-2026-53489, CVE-2026-47262
+
+* Sat May 30 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.2.4-2
+- Resolve merge from fasttrack, bring patches for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136 forward to 2.2.4 version of containerd2.
+
+* Fri May 29 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-1
 - Upgrade to 2.2.4
 - Pulls in CVE-2026-46680 fix (PR #13448 / 0a8f65bef)
 - Remove CVE-2026-34986.patch (in v2.2.4: go-jose/v4 v4.1.4, PR #13292 / 4413816ce)
@@ -108,11 +141,14 @@ fi
 - Add fix-TestCgroupNamespace-cgroupv1.patch (PR #13240; allows %check on cgroup-v1 build hosts)
 - Regenerate multi-snapshotters-support.patch against v2.2.4 (upstream absorbed runtimeHandler plumbing in v2.2.3)
 
-* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-5
 - Patch for CVE-2026-33814
 
-* Mon Apr 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-3
+* Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
 - Patch for CVE-2026-39882
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-3
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
 
 * Fri Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-2
 - Modify CVE-2026-35469 patch for 2.1.6

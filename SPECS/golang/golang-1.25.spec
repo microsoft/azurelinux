@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.25.10-20260507.2.src.tar.gz
+%global ms_go_filename  go1.25.14-20260819.1.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.25.10
+Version:        1.25.14
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -57,6 +57,7 @@ tar xf %{SOURCE4} --no-same-owner
 mv -v go go-bootstrap-03
 
 %setup -q -n go
+%autopatch -p1 -m 1
 
 %build
 # go 1.4 bootstraps with C.
@@ -104,6 +105,9 @@ rm -f  %{gopath}/src/runtime/*.c
   cd src
   ./make.bash --no-clean
 )
+
+# Nuke the final bootstrapper. Note: It is not used in any step under install, post, postrun
+rm -rf %{_libdir}/golang
 
 %install
 
@@ -160,6 +164,26 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Aug 19 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.14-1
+- Bump version to 1.25.14-1
+
+* Fri Aug 14 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.13-1
+- Bump version to 1.25.13-1
+- Remove patch of CVE-2026-39821
+
+* Wed Jul 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.12-1
+- Bump version to 1.25.12-1
+
+
+* Fri June 26 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.25.11-3
+- Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+
+* Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.25.11.2
+- Patch for CVE-2026-39821
+
+* Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.11-1
+- Bump version to 1.25.11-1
+
 * Fri May 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.10-1
 - Bump version to 1.25.10-1
 

@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
 
+permissions:
+  contents: read
+
 jobs:
 
   build:
@@ -17,7 +20,10 @@ jobs:
     steps:
 
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+    - name: Install toolkit prerequisites
+      run: sudo make -C toolkit install-prereqs
 
     # This PR runner uses an older Ubuntu with rpm version 4.17, which doesn't understand some newer macros like %bcond
     - name: Define missing rpm macros
