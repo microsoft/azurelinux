@@ -9,8 +9,8 @@
 Summary:        Declarative, security-first OS lifecycle agent designed primarily for Azure Linux
 Name:           trident
 # Use hard-coded versions for distro build
-Version:        0.26.0
-Release:        2%{?dist}
+Version:        0.28.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Group:          Applications/System
@@ -77,6 +77,7 @@ Trident. This package provides the Trident tool
 and its dependencies for managing the lifecycle of Azure Linux hosts.
 
 %files
+%license LICENSE NOTICE
 %{_bindir}/%{name}
 %dir /etc/%{name}
 %{_unitdir}/%{name}d.service
@@ -101,6 +102,7 @@ Requires:       %{name} = %{version}-%{release}
 Trident files for the provisioning OS
 
 %files provisioning
+%license LICENSE
 %{_unitdir}/%{name}-network.service
 
 %post provisioning
@@ -123,6 +125,7 @@ Conflicts:      %{name}-install-service
 Trident files for SystemD commit services
 
 %files service
+%license LICENSE
 %{_unitdir}/%{name}.service
 
 %post service
@@ -145,6 +148,7 @@ Conflicts:      %{name}-service
 Trident files for SystemD install service
 
 %files install-service
+%license LICENSE
 %{_unitdir}/%{name}-install.service
 
 %post install-service
@@ -164,12 +168,22 @@ BuildArch:           noarch
 Requires:            selinux-policy-%{selinuxtype}
 Requires(post):      selinux-policy-%{selinuxtype}
 BuildRequires:       selinux-policy-devel
-%{?selinux_requires}
+# Explicit scriptlet-time deps for %%selinux_modules_install/%%selinux_modules_uninstall
+# (semodule, selinuxenabled, load_policy) used below. Deliberately NOT using the
+# %%{?selinux_requires} macro: on Azure Linux it also adds
+# Requires(post): policycoreutils-python-utils, which transitively pulls in the
+# full audit daemon package via audit-libs-python3/python3-audit. That package set
+# is unrelated to loading a compiled SELinux policy module and is not needed here.
+Requires(post):      libselinux-utils
+Requires(post):      policycoreutils
+Requires(postun):    libselinux-utils
+Requires(postun):    policycoreutils
 
 %description selinux
 Custom SELinux policy module
 
 %files selinux
+%license LICENSE
 %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
 %{_datadir}/selinux/devel/include/distributed/%{name}.if
 %ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
@@ -202,21 +216,31 @@ Statically defined .pcrlock files for PCR-based encryption. This is a workaround
 be removed once the fix is merged in AZL 4.0.
 
 %files static-pcrlock-files
+%license LICENSE
 %{_sharedstatedir}/pcrlock.d
 
 # ------------------------------------------------------------------------------
 
-%if %{defined rpm_ver}
-%package acl-agent
-Summary:        Trident ACL Agent
+%package acl
+Summary:        Trident ACL Components
 Requires:       %{name} = %{version}-%{release}
 
-%description acl-agent
-The Trident ACL Agent triggers updates of ACL images.
+%description acl
+The Trident ACL components required to orchestrate servicing of ACL images.
 
-%files acl-agent
+%files acl
+%license LICENSE NOTICE
 %{_bindir}/%{name}-acl-agent
-%endif
+%{_unitdir}/%{name}-acl-agent.service
+
+%post acl
+%systemd_post %{name}-acl-agent.service
+
+%preun acl
+%systemd_preun %{name}-acl-agent.service
+
+%postun acl
+%systemd_postun_with_restart %{name}-acl-agent.service
 
 # ------------------------------------------------------------------------------
 
@@ -248,11 +272,7 @@ export TRIDENT_VERSION="%{version}-%{release}"
 # Use %{trident_version} for Trident repo build
 export TRIDENT_VERSION="%{trident_version}"
 %endif
-%if %{defined rpm_ver}
 cargo build --release -p trident -p trident-acl-agent
-%else
-cargo build --release -p trident
-%endif
 
 mkdir selinux
 cp -p packaging/selinux-policy-trident/trident.fc selinux/
@@ -282,9 +302,8 @@ cargo test --all --no-fail-fast -- --skip test_run_systemd_check --skip test_pre
 
 %install
 install -D -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
-%if %{defined rpm_ver}
 install -D -m 755 target/release/%{name}-acl-agent %{buildroot}/%{_bindir}/%{name}-acl-agent
-%endif
+install -D -m 644 packaging/systemd/%{name}-acl-agent.service %{buildroot}%{_unitdir}/%{name}-acl-agent.service
 
 # Copy Trident SELinux policy module to /usr/share/selinux/packages
 install -D -m 0644 %{name}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
@@ -313,6 +332,9 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
+* Wed Sep 02 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 0.28.0-1
+- Update to version 0.28.0
+
 * Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.26.0-2
 - Bump release to rebuild with rust
 
