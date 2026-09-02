@@ -89,7 +89,7 @@ Patch118: CVE-2026-63074.patch
 Patch119: CVE-2026-63075.patch
 Patch120: CVE-2026-63076.patch
 Patch121: CVE-2026-75803.patch
-
+Patch122: CVE-2026-14457.patch
 License: Apache-2.0
 URL: http://www.openssl.org/
 
