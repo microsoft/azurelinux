@@ -1,0 +1,6 @@
+repos:
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: e8b4e28241a9ae8296ba6e4a491b5da4eda73283 # 3.11.1
+    hooks:
+      - id: editorconfig-checker
+        files: '\.toml$'
