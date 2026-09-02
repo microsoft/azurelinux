@@ -1,0 +1,23 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+bugs = [
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22929" },
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22930" },
+]
+
+# These defaults apply only when useradd creates an account; existing platform
+# accounts retain their current aging policy.
+[[overlays]]
+description = "Set the CIS maximum password age for new accounts"
+type = "file-search-replace"
+file = "shadow-utils.login.defs"
+regex = '(?m)^PASS_MAX_DAYS\s+\d+$'
+replacement = "PASS_MAX_DAYS\t365"
+
+[[overlays]]
+description = "Lock inactive password accounts after the CIS grace period"
+type = "file-search-replace"
+file = "shadow-utils.useradd"
+regex = '(?m)^INACTIVE=-?\d+$'
+replacement = "INACTIVE=30"
