@@ -9,7 +9,7 @@
 Summary:        Declarative, security-first OS lifecycle agent designed primarily for Azure Linux
 Name:           trident
 # Use hard-coded versions for distro build
-Version:        0.27.0
+Version:        0.28.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -332,8 +332,8 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
-* Mon Aug 31 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 0.27.0-1
-- Update to version 0.27.0
+* Wed Sep 02 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 0.28.0-1
+- Update to version 0.28.0
 
 * Wed Jul 29 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 0.26.0-1
 - Update to version 0.26.0
