@@ -80,7 +80,7 @@ wsl --list
 To use the distro:
 
 ```powershell
-wsl -d AzureLinux-4
+wsl -d AzureLinux-4.0
 ```
 
 </details>
