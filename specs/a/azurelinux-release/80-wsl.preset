@@ -28,8 +28,16 @@ disable systemd-resolved.service
 disable systemd-resolved-monitor.socket
 disable systemd-resolved-varlink.socket
 
-# tty1 is unreachable under WSL and claiming the console races with other
-# distributions running on the same host. The glob also covers the
+# WSL runs the distribution as a container, so systemd-getty-generator takes its
+# run_container() path: it pulls in console-getty.service and never instantiates
+# getty@tty1. console-getty.service gates on /dev/console, which WSL does
+# provide, so this is the console unit that actually starts.
+disable console-getty.service
+
+# getty@tty1 gates on /dev/tty0 and is not instantiated under WSL, so disabling
+# it only suppresses a skipped-condition entry in the journal. It is disabled
+# because the WSL maintainers asked for it by name when reviewing the
+# distribution listing (microsoft/WSL#41120). The glob also covers the
 # getty@.service template itself, which systemd's preset enables with
 # DefaultInstance=tty1.
 disable getty@*.service
