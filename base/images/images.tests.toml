@@ -1,0 +1,190 @@
+# ============================================================================
+# Image test catalog
+# ============================================================================
+#
+# Single source of truth for all image-runnable test definitions and
+# the named groups that bundle them.
+#
+# Schema:
+#   [tests.X]            : a single unit of testing — one configuration of
+#                          one runner/harness, with framework-specific
+#                          options under [tests.X.<framework>].
+#   [test-groups.X]      : a named bundle of tests an image (or component)
+#                          can reference instead of enumerating members.
+#
+# Image and component associations are NOT defined here. They live with
+# the entity that runs them:
+#   - base/images/images.toml          (tests.tests = [...])
+#   - base/comps/<name>/<name>.comp.toml (tests.tests = [...])
+#
+# Both fields can mix per-test and per-group references:
+#   tests.tests = [{ name = "static-image-checks" }, { group = "x" }]
+#
+# Declarative metadata on [tests.X]:
+#   description           : human-readable summary
+#   type                  : "pytest" | "tmt" | "lisa"
+#   kind                  : "functional" | "performance"
+#   long-running          : boolean; omit unless the test may run for hours
+#   required-capabilities : capability tokens the image must declare
+#
+# ============================================================================
+
+# =============================================================================
+# Static image checks (pytest)
+# =============================================================================
+
+# Single shared pytest suite for static (offline) image validation.
+[tests.static-image-checks]
+type        = "pytest"
+description = "Offline image validation (shared + image-specific tests)"
+kind        = "functional"
+
+[tests.static-image-checks.pytest]
+working-dir = "tests"
+install     = "pyproject"
+test-paths  = ["cases/static/"]
+# {capabilities} is substituted by azldev as a comma-separated list of
+# the capabilities set to `true` for the image (e.g.
+# "machine-bootable,systemd,runtime-package-management"). The pytest
+# plugin parses this into a set; @pytest.mark.require_capability("...")
+# tests that don't match are skipped.
+extra-args = [
+    "--image-path", "{image-path}",
+    "--image-name", "{image-name}",
+    "--capabilities", "{capabilities}",
+]
+
+# Runtime container tests — validate live container behavior via podman.
+[tests.runtime-container-tests]
+type        = "pytest"
+description = "Runtime container validation (exec into live containers)"
+kind        = "functional"
+required-capabilities = ["container"]
+
+[tests.runtime-container-tests.pytest]
+working-dir = "tests"
+install     = "pyproject"
+test-paths  = ["cases/runtime/"]
+extra-args = [
+    "--image-path", "{image-path}",
+    "--image-name", "{image-name}",
+    "--capabilities", "{capabilities}",
+]
+
+# =============================================================================
+# LISA tests
+# =============================================================================
+
+[tests.smoke-test]
+type                  = "lisa"
+description           = "LISA smoke test — fastest PR gate (pinned)"
+kind                  = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.smoke-test.lisa]
+criteria = { testcase-names = ["smoke_test"] }
+
+[tests.functional-core]
+type                  = "lisa"
+description           = "Core functional coverage (LISA priority=1)"
+kind                  = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.functional-core.lisa]
+criteria = { priority = [1] }
+
+[tests.functional-extended]
+type                  = "lisa"
+description           = "Extended functional coverage (LISA priority=2)"
+kind                  = "functional"
+long-running          = true
+required-capabilities = ["machine-bootable"]
+[tests.functional-extended.lisa]
+criteria = { category = "functional", priority = [2] }
+
+[tests.kernel-ltp]
+type                  = "lisa"
+description           = "Kernel LTP (Linux Test Project) suite"
+kind                  = "functional"
+long-running          = true
+required-capabilities = ["machine-bootable"]
+
+[tests.kernel-ltp.lisa]
+criteria = { testcase-names = ["verify_ltp_lite"] }
+
+[tests.xfs-filesystem]
+type                  = "lisa"
+description           = "XFS data-disk filesystem tests (standard + NVMe)"
+kind                  = "functional"
+required-capabilities = ["machine-bootable"]
+
+[tests.xfs-filesystem.lisa]
+criteria = { testcase-names = ["verify_xfs_standard_datadisk", "verify_xfs_nvme_datadisk"] }
+
+[tests.lisa-perf]
+type                  = "lisa"
+description           = "LISA performance test areas (network, nested, nvme, perf_tool, storage)"
+kind                  = "performance"
+long-running          = true
+required-capabilities = ["machine-bootable"]
+[tests.lisa-perf.lisa]
+criteria = [
+  { area = "network",   category = "performance" },
+  { area = "nested",    category = "performance" },
+  { area = "nvme",      category = "performance" },
+  { area = "perf_tool", category = "performance" },
+  { area = "storage",   category = "performance" },
+]
+
+[tests.lisa-fips]
+type                  = "lisa"
+description           = "LISA FIPS status and enablement tests"
+kind                  = "functional"
+required-capabilities = ["machine-bootable", "fips-enabled"]
+
+[tests.lisa-fips.lisa]
+criteria = { testcase-names = ["verify_azl_fips_status", "verify_fips_enablement"] }
+
+[tests.bvt-metrics]
+type                  = "lisa"
+description           = "BVT-equivalent boot timing and footprint metrics validation"
+kind                  = "functional"
+metrics-enabled       = true
+required-capabilities = ["machine-bootable"]
+
+[tests.bvt-metrics.lisa]
+criteria = { testcase-names = ["verify_bvt_boot_metrics", "verify_bvt_footprint"] }
+
+# ISO install: boots an installer ISO in QEMU and verifies the installed
+# system comes up and logs in. Requires the fulfillment request to supply
+# image.iso.iso_url (surfaced to the LISA runbook as the case-visible
+# `iso_url` variable) and a nested-virtualization-capable executor host.
+[tests.iso-install]
+type                  = "lisa"
+description           = "Installs Azure Linux from an installer ISO in QEMU and verifies the installed system boots and logs in"
+kind                  = "functional"
+required-capabilities = ["installer-media"]
+
+[tests.iso-install.lisa]
+criteria = { testcase-names = ["verify_azurelinux_iso_install"] }
+
+# ---- VM base test groups -------------------------------------------------
+
+# Functional coverage applicable to a VM-shaped Azure Linux image.
+[test-groups.vm-base-functional]
+description = "Functional coverage for VM base images"
+tests = [
+  { name = "smoke-test" },
+  { name = "functional-core" },
+  { name = "functional-extended" },
+  { name = "kernel-ltp" },
+  { name = "xfs-filesystem" },
+  { name = "bvt-metrics" },
+]
+
+# Performance-oriented coverage. Kept as a separate group because
+# performance runs typically have a different cadence and budget than
+# functional runs, and consumers may want to opt in independently.
+[test-groups.vm-base-performance]
+description = "Performance coverage for VM base images"
+tests = [
+  { name = "lisa-perf" },
+]

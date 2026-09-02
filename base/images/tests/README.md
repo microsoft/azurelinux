@@ -6,9 +6,11 @@ container) tests, all driven by pytest.
 
 ## How it gets invoked
 
-These tests are wired into `azldev` via the `[test-suites.*]` tables
-in `base/images/images.toml`, and referenced by each image's
-`tests.test-suites`. The standard entry point is:
+These tests are wired into `azldev` via the `[tests.*]` and
+`[test-groups.*]` tables in `base/images/images.tests.toml`, and
+referenced by each image's `tests.tests` in `base/images/images.toml`
+(e.g. `tests.tests = [{ name = "static-image-checks" }, { group = "..." }]`).
+The standard entry point is:
 
 ```bash
 azldev image build vm-base
@@ -32,8 +34,8 @@ container images strip the package manager and do not ship a repository package.
 
 ## Test suites
 
-| Suite | Description | Runs for |
-|-------|-------------|----------|
+| Test | Description | Runs for |
+|------|-------------|----------|
 | `static-image-checks` | Offline filesystem validation — mounts images read-only | All images |
 | `runtime-container-tests` | Live container tests via `podman exec` | Container images |
 
@@ -109,7 +111,8 @@ needed for the current `--image-type` is missing.
 
 ```
 base/images/
-├── images.toml                          # Image registry + test-suite wiring
+├── images.toml                          # Image registry + tests.tests wiring
+├── images.tests.toml                    # [tests.*] / [test-groups.*] catalog
 └── tests/
     ├── pyproject.toml                   # uv project: pytest + python-on-whales deps
     ├── conftest.py                      # Session fixtures (static + runtime)
