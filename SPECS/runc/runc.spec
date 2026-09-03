@@ -1,8 +1,8 @@
-%define         commit_hash d842d7719497cc3b774fd71620278ac9e17710e0
+%define         commit_hash bb14dabeb7185bb72c8c86735d090dcb20f36587
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.3.6
+Version:        1.4.3
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -12,7 +12,8 @@ URL:            https://github.com/opencontainers/runc
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  go-md2man
-BuildRequires:  golang < 1.25
+BuildRequires:  golang >= 1.26
+BuildRequires:  golang < 1.27
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
 Requires:       glibc
@@ -28,9 +29,11 @@ runc is a CLI tool for spawning and running containers according to the OCI spec
 
 %build
 export CGO_ENABLED=1
+export MS_GO_NOSYSTEMCRYPTO=1
 make %{?_smp_mflags} BUILDTAGS="seccomp" COMMIT="%{commit_hash}" man runc
 
 %check
+export MS_GO_NOSYSTEMCRYPTO=1
 unshare -m --propagation unchanged sh <<'EOF'
 if ! mountpoint -q /sys/fs/cgroup; then
     if mount -t cgroup2 none /sys/fs/cgroup; then
@@ -51,6 +54,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Thu Sep 03 2026 Nan Liu <liunan@microsoft.com> - 1.4.3-1
+- Upgrade to 1.4.3
+
 * Wed Jul 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.6-1
 - Auto-upgrade to 1.3.6 - for CVE-2026-41579
 
