@@ -17,8 +17,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.137.mshv2
-Release:        2%{?dist}
+Version:        6.18.34.mshv1
+Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -261,12 +261,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
-%{_datadir}/perf-core/strace/groups/file
-%{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Wed Aug 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.mshv1-1
+- Auto-upgrade to 6.18.34.mshv1
+
 * Mon Jun 13 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.137.mshv2-2
 - Enable CONFIG_EROFS_FS and related features
 - for confidentiality and snapshot/restore scenarios
