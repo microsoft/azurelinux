@@ -121,7 +121,30 @@ PR. Concretely:
 
 ### Validating your commits
 
-Before pushing, validate each commit, not just the tip of the branch. CI enforces that
+Before pushing, validate each commit, not just the tip of the branch. CI validates the
+Conventional Commit header of **every** commit in the PR (not the PR title), so make
+sure each commit's summary line follows the format above. PR titles only need to be
+descriptive — they are not required to follow Conventional Commits. Clean up any invalid
+or `fixup!` commits (see [Responding to review feedback](#responding-to-review-feedback))
+before your PR is approved.
+
+The check runs [commitlint](https://commitlint.js.org/) against the rules in
+[`commitlint.config.js`](commitlint.config.js), so you can reproduce it locally with the
+exact same configuration before pushing. Install the pinned tooling from the committed
+lockfile, then lint your branch:
+
+```bash
+# One-time (or after the lockfile changes): install the pinned commitlint.
+npm ci
+
+# Lint every commit on your branch that isn't on the target branch:
+npm run commitlint -- --from origin/4.0 --to HEAD
+
+# Or check a single message:
+echo "feat(demo): add capability" | npx commitlint
+```
+
+CI also enforces that
 rendered specs match the committed state, so re-render any components you touched.
 For changes that affect RPM output, build and smoke-test the result. Pure documentation
 or metadata changes don't require a rebuild. See the [`README.md`](README.md) for

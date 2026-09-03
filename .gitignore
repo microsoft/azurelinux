@@ -5,3 +5,6 @@ __pycache__/
 spec_review_kb.md
 .env
 .hyenas/
+
+# Node.js dependencies (installed by CI / local commitlint from package-lock.json)
+node_modules/
