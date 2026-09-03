@@ -1,36 +1,13 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        8.11.1
-Release:        11%{?dist}
+Version:        8.21.0
+Release:        1%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
-Patch0:         CVE-2025-0665.patch
-Patch1:         CVE-2025-0167.patch
-Patch2:         CVE-2025-0725.patch
-Patch3:         CVE-2025-10148.patch
-Patch4:         CVE-2025-14017.patch
-Patch5:         CVE-2026-1965.patch
-Patch6:         CVE-2026-3783.patch
-Patch7:         CVE-2026-3784.patch
-Patch8:         CVE-2026-4873.patch
-Patch9:         CVE-2026-6276.patch
-Patch10:        CVE-2026-7168.patch
-Patch11:        CVE-2026-5545.patch
-Patch12:        CVE-2026-6253.patch
-Patch13:        CVE-2026-6429.patch
-Patch14:        CVE-2026-12064.patch
-Patch15:        CVE-2026-8926.patch
-Patch16:        CVE-2026-8927.patch
-Patch17:        CVE-2026-8932.patch
-Patch18:        CVE-2026-8458.patch
-Patch19:        CVE-2026-10536.patch
-Patch20:        CVE-2026-8286.patch
-Patch21:        CVE-2026-9079.patch
-Patch22:        CVE-2026-11856.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
@@ -76,7 +53,6 @@ This package contains minimal set of shared curl libraries.
 %autosetup -p1
 
 %build
-autoreconf -fi
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -121,6 +97,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Tue Jul 21 2026 Vijayender Putta <v-vijputta@microsoft.com> - 8.21.0-1
+- Upgrade to 8.21.0
+- Dropped CVE-2025-0167, CVE-2025-0665, CVE-2025-0725 CVE-2025-10148, CVE-2025-14017, CVE-2026-1965, CVE-2026-3783, CVE-2026-3784, CVE-2026-4873, CVE-2026-5545, CVE-2026-6253, CVE-2026-6276, CVE-2026-6429, CVE-2026-7168, CVE-2026-12064, CVE-2026-8926, CVE-2026-8927, CVE-2026-8932, CVE-2026-8458, CVE-2026-10536, CVE-2026-8286, CVE-2026-9079, CVE-2026-11856 patches, dropped patches are covered in this version.
+
 * Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-11
 - Patch for CVE-2026-11856
 - Regenerate autotools files to include patched tests in make check.
