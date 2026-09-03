@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Thu, 3 Sep 2026 20:17:00 +0000
+Subject: [PATCH] tests: disable glibc malloc check
+
+The glibc malloc-debug checker interposes allocation APIs through
+libc_malloc_debug.so.0. SymCrypt has unversioned allocator references that
+can bind aligned_alloc to libc while binding free to the debug allocator,
+causing OpenSSL consumers to abort during provider initialization.
+
+Keep malloc perturbation enabled with values in glibc's valid 1-255 range
+to retain detection of uninitialized and use-after-free behavior without
+enabling the incompatible checked allocator.
+---
+ tests/Makefile.am | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 3af137f..cf49212 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -69,18 +69,15 @@ TESTS_ENVIRONMENT = \
+ 	LIBNBD_DEBUG=1 \
+ 	$(NULL)
+ 
+-# Enable malloc-check as a cheap way to find some use-after-free and
+-# uninitialized read problems when using glibc, and doesn't affect
+-# normal operation or other libc.
++# Perturb allocated and freed memory as a cheap way to find some
++# use-after-free and uninitialized read problems.
+-random = $(shell bash -c 'echo $$(( 1 + (RANDOM & 255) ))')
++random = $(shell bash -c 'echo $$(( 1 + (RANDOM % 255) ))')
+ if HAVE_GLIBC_234
+ TESTS_ENVIRONMENT += \
+-	LD_PRELOAD="$${LD_PRELOAD:+"$$LD_PRELOAD:"}libc_malloc_debug.so.0" \
+-	GLIBC_TUNABLES=glibc.malloc.check=1:glibc.malloc.perturb=$(random) \
++	GLIBC_TUNABLES=glibc.malloc.perturb=$(random) \
+ 	$(NULL)
+ else
+ TESTS_ENVIRONMENT += \
+-	MALLOC_CHECK_=1 \
+ 	MALLOC_PERTURB_=$(random) \
+ 	$(NULL)
+ endif
+-- 
+2.55.0
