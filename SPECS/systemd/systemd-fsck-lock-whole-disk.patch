@@ -1,6 +1,9 @@
 Lock the whole parent disk while fsck runs so udev cannot probe sibling
 partitions during filesystem repair.
 
+Wait up to 60 seconds for the lock. If the timeout expires, warn and run
+the filesystem check without the lock to preserve the previous behavior.
+
 Do not combine this implementation with native e2fsprogs (e2fsck)
 whole-disk locking. systemd-fsck retains its lock descriptor while waiting
 for fsck, so an independently opened exclusive lock in the child would
@@ -26,7 +29,15 @@ index 000ed69..8eb209a 100644
  #include "main-func.h"
  #include "parse-util.h"
  #include "path-util.h"
-@@ -233,8 +235,45 @@ static int fsck_progress_socket(void) {
+@@ -32,6 +34,7 @@
+ #include "socket-util.h"
+ #include "special.h"
+ #include "stdio-util.h"
++#include "time-util.h"
+
+ static bool arg_skip = false;
+ static bool arg_force = false;
+@@ -233,8 +236,47 @@ static int fsck_progress_socket(void) {
          return TAKE_FD(fd);
  }
 
@@ -58,7 +69,9 @@ index 000ed69..8eb209a 100644
 +                                       "Path '%s' no longer refers to block device %u:%u.",
 +                                       whole_disk, major(devno), minor(devno));
 +
-+        r = lock_generic(fd, LOCK_BSD, LOCK_EX);
++        r = lock_generic_with_timeout(fd, LOCK_BSD, LOCK_EX, 60 * USEC_PER_SEC);
++        if (r == -ETIMEDOUT)
++                return r;
 +        if (r < 0)
 +                return log_error_errno(r, "Failed to lock whole block device '%s': %m", whole_disk);
 +
@@ -72,12 +85,17 @@ index 000ed69..8eb209a 100644
          _cleanup_(sd_device_unrefp) sd_device *dev = NULL;
          _cleanup_free_ char *dpath = NULL;
          _cleanup_fclose_ FILE *console = NULL;
-@@ -333,6 +372,10 @@ static int run(int argc, char *argv[]) {
+@@ -333,6 +375,15 @@ static int run(int argc, char *argv[]) {
                  }
          }
 
 +        lock_fd = lock_whole_disk(device);
-+        if (lock_fd < 0)
++        if (lock_fd == -ETIMEDOUT) {
++                log_warning(
++                                "Timed out waiting 60 seconds for whole block device lock for '%s'; proceeding without lock.",
++                                device);
++                lock_fd = -EBADF;
++        } else if (lock_fd < 0)
 +                return lock_fd;
 +
          console = fopen("/dev/console", "we");
