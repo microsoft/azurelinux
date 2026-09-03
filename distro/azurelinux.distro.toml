@@ -6,7 +6,7 @@ description = "Azure Linux"
 #
 # This is an initial build of Azure Linux 4.0 that uses a Fedora 43
 # buildroot and Fedora 43 packages as build dependencies. The resulting
-# build outputs are consumed as inputs to Stage 2. 
+# build outputs are consumed as inputs to Stage 2.
 #
 
 [distros.azurelinux.versions.'4.0-stage1']
