@@ -13,7 +13,11 @@ Source2:        default.el
 Patch0:         CVE-2025-1244.patch
 Patch1:         CVE-2024-53920.patch
 Patch2:         CVE-2026-6861.patch
+<<<<<<< HEAD
 Patch3:         CVE-2026-77219.patch
+=======
+Patch3:         CVE-2026-79992.patch
+>>>>>>> 5f6667be01 ([AutoPR- Security] Patch emacs for CVE-2026-79992 [HIGH] (#18655))
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnutls-devel
@@ -132,8 +136,13 @@ rm -f *-filelist {common,el}-*-files
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+<<<<<<< HEAD
 * Mon Aug 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 29.4-5
 - Patch for CVE-2026-77219
+=======
+* Sun Aug 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 29.4-5
+- Patch for CVE-2026-79992
+>>>>>>> 5f6667be01 ([AutoPR- Security] Patch emacs for CVE-2026-79992 [HIGH] (#18655))
 
 * Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 29.4-4
 - Patch for CVE-2026-6861
