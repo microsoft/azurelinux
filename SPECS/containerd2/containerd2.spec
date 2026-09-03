@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -36,7 +36,9 @@ Patch16:	CVE-2026-56852.patch
 
 %{?systemd_requires}
 
-BuildRequires: golang
+# Temporarily stay on Go 1.26 until the Go 1.27 ML-KEM backend is fixed.
+BuildRequires: golang >= 1.26.7
+BuildRequires: golang < 1.27
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -70,10 +72,13 @@ used directly by developers or end-users.
 
 %build
 export BUILDTAGS="-mod=vendor"
+# Go 1.26 requires this experiment for cgo-less OpenSSL systemcrypto.
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
@@ -109,6 +114,12 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Sep 03 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-8
+- Temporarily build with Microsoft Go 1.26 to avoid the Go 1.27 systemcrypto
+  ML-KEM panic on OpenSSL 3.3.
+- Restore GOEXPERIMENT=ms_nocgo_opensslcrypto for the Go 1.26 cgo-less OpenSSL
+  backend.
+
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.2.4-7
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
   now selected automatically and supports CGO_ENABLED=0 on Linux.
