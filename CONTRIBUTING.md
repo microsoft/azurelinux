@@ -121,21 +121,35 @@ PR. Concretely:
 
 ### Validating your commits
 
-Before pushing, validate each commit, not just the tip of the branch. CI enforces that
+Before pushing, validate each commit, not just the tip of the branch. CI checks the
+Conventional Commit header of every commit in a pull request. It also enforces that
 rendered specs match the committed state, so re-render any components you touched.
 For changes that affect RPM output, build and smoke-test the result. Pure documentation
 or metadata changes don't require a rebuild. See the [`README.md`](README.md) for
 `azldev` commands.
 
-TOML files must also follow [`.editorconfig`](.editorconfig). Install pre-commit and
-run the same check used by CI:
+Commit-message and TOML checks are managed by pre-commit. Install it and run the
+file-oriented checks used by CI:
 
 ```bash
 python3 -m pip install -r scripts/ci/pre-commit/requirements.txt
 pre-commit run --all-files
 ```
 
-Run `pre-commit install` to execute configured checks automatically before each commit.
+Run `pre-commit install` to check files and commit messages automatically. Temporary
+`fixup!`, `squash!`, and `amend!` commits are accepted by the local commit-message hook
+to support review workflows, but CI rejects them from the final pull request history.
+
+CI checks every commit in the pull request automatically. After folding any temporary
+review commits into the final logical changes, you can run the same strict check locally
+before requesting approval:
+
+```bash
+pre-commit run commitizen-branch \
+  --hook-stage pre-push \
+  --from-ref origin/4.0 \
+  --to-ref HEAD
+```
 
 ### Responding to review feedback
 

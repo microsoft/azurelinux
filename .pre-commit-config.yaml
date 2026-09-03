@@ -1,6 +1,22 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
 repos:
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: e8b4e28241a9ae8296ba6e4a491b5da4eda73283 # 3.11.1
     hooks:
       - id: editorconfig-checker
         files: '\.toml$'
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: d910b66e2686a3ef6c3f438dec0f63ba3cf8d7ee # v4.18.0
+    hooks:
+      - id: commitizen
+        args:
+          - --allow-abort
+          - --allowed-prefixes
+          - "fixup!"
+          - "squash!"
+          - "amend!"
+          - --commit-msg-file
+      - id: commitizen-branch
