@@ -1,0 +1,25 @@
+[tool.commitizen]
+# Use a custom schema because Commitizen's built-in convention also accepts
+# types, such as "bump", that are not part of the Azure Linux convention.
+name = "cz_customize"
+# Reject fixup!, squash!, and amend! prefixes in CI. The local commit-msg hook
+# overrides this to allow those temporary commits during review.
+allowed_prefixes = []
+# Summary length is a documented guideline rather than a hard limit.
+message_length_limit = 0
+
+[tool.commitizen.customize]
+schema = "<type>(<optional scope>)<optional !>: <summary>"
+# Pattern breakdown:
+# (?s)^...$                          Match the complete message, including its body.
+# (feat|fix|...)                     Require a documented Azure Linux type.
+# (\([^()\r\n]+\))?                  Allow an optional, nonempty scope.
+# !?:                                Allow an optional breaking-change marker,
+#                                    followed by a colon and exactly one space.
+# [^\s.\r\n]                         Require the summary to start with content.
+# (?:[^\r\n]*[^\s.\r\n])?            Allow more summary text, but no final period.
+# ((\r?\n\r?\n.*)|(\s*))?            Require a blank line before an optional body.
+#
+# Commitizen strips whitespace surrounding the header before applying this
+# pattern, so leading or trailing header whitespace cannot be rejected here.
+schema_pattern = '(?s)^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^()\r\n]+\))?!?: [^\s.\r\n](?:[^\r\n]*[^\s.\r\n])?((\r?\n\r?\n.*)|(\s*))?$'

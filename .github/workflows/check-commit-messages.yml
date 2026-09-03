@@ -1,0 +1,42 @@
+name: "Check Commit Messages"
+
+on:
+  pull_request:
+
+# Cancel in-progress runs of this workflow if a new run is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Validate commit messages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install pre-commit
+        run: python -m pip install -r scripts/ci/pre-commit/requirements.txt
+
+      - name: Validate commit messages
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          pre-commit run commitizen-branch \
+            --hook-stage pre-push \
+            --from-ref "$BASE_SHA" \
+            --to-ref "$HEAD_SHA"
