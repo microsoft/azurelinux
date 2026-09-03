@@ -1,0 +1,2 @@
+[components.php]
+tests.tests = [{ name = "tmt-php-all" }]
