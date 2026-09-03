@@ -1,0 +1,7 @@
+[components.conmon]
+tests.tests = [
+    { name = "tmt-conmon-local-root" },
+    { name = "tmt-conmon-local-rootless" },
+    { name = "tmt-conmon-remote-root" },
+    { name = "tmt-conmon-remote-rootless" },
+]
