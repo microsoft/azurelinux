@@ -14,7 +14,7 @@ storage:
     - id: boot-a
       type: linux-generic
       label: boot-a
-      size: 100M
+      size: 128M
     - id: usr-a
       type: linux-generic
       size: 1G
