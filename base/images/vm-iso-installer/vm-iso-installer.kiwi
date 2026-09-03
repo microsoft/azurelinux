@@ -75,6 +75,10 @@
             target="/etc/anaconda/conf.d/azurelinux.conf"
             permissions="0644" />
         <file
+            name="dracut-nfs.conf"
+            target="/etc/dracut.conf.d/10-nfs.conf"
+            permissions="0644" />
+        <file
             name="anaconda-launcher.sh"
             target="/usr/local/bin/anaconda-launcher.sh"
             permissions="0755" />
@@ -107,6 +111,14 @@
 
         <!-- ISO live boot (Fedora dmsquash-live) -->
         <package name="dracut-live" />
+
+        <!-- NFS-served live root (root=live:nfs://...). dracut's 95nfs module
+             is skipped at initrd build time unless rpcbind, the nfs-utils
+             helpers (rpc.statd, mount.nfs, mount.nfs4) and sed are installed
+             in this image root. sed is otherwise only present transitively. -->
+        <package name="nfs-utils" />
+        <package name="rpcbind" />
+        <package name="sed" />
 
         <!-- Hyper-V guest integration -->
         <package name="hyperv-daemons" />
