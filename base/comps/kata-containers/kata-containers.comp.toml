@@ -1,3 +1,72 @@
 [components.kata-containers]
-# Release: 1%{?rcrel}%{?dist}
+# Release: 2%{?rcrel}%{?dist}
 release = { calculation = "manual" }
+
+# Remove the Windows-only import libraries from the vendored-dependencies archive.
+# The winapi-*-pc-windows-* and windows_*_{gnu,gnullvm,msvc} crates are all target-gated
+# (`[target.*-pc-windows-*]` / `cfg(target_env = ...)`), so they are never compiled on
+# Linux, but their lib/ static-import archives (`.a`/`.lib`) ship ~1.6M ar members in
+# aggregate (vendored several times over per arch/toolchain) and are flagged during
+# source package signing. Only the lib/ archives are dropped; each crate's Cargo.toml,
+# src, and .cargo-checksum.json skeleton is kept so cargo's resolve stays intact. The
+# archive is repacked; the resulting hash is pinned via the source-files entry below.
+[[components.kata-containers.overlays]]
+description = "Remove Windows-only winapi import libraries"
+type = "file-remove"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/winapi-*-pc-windows-*/lib/**"
+[components.kata-containers.overlays.metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[components.kata-containers.overlays]]
+description = "Remove Windows-only windows_* gnu/gnullvm import libraries"
+type = "file-remove"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/windows_*_gnu*/lib/**"
+[components.kata-containers.overlays.metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[components.kata-containers.overlays]]
+description = "Remove Windows-only windows_* msvc import libraries"
+type = "file-remove"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/windows_*_msvc*/lib/**"
+[components.kata-containers.overlays.metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+# Bump the release for the repacked (flagged-files-removed) archive. This is a
+# manual-release component, so the release is owned here via overlays rather than
+# by autorelease.
+[[components.kata-containers.overlays]]
+description = "Bump release for flagged-file removal"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?rcrel}%{?dist}"
+[components.kata-containers.overlays.metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[components.kata-containers.overlays]]
+description = "Add changelog entry for flagged-file removal"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Thu Sep 03 2026 Andrew Phelps <anphel@microsoft.com> - 3.26.0-2",
+    "- Remove flagged files",
+    "",
+]
+[components.kata-containers.overlays.metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+# Pin the post-overlay (repacked) vendor tarball, replacing the upstream sources entry.
+[[components.kata-containers.source-files]]
+filename = "kata-containers-3.26.0-vendor.tar.gz"
+hash = "b2fe1d7f3bee04e651d53505f3570afcef87f7349256c881a25df4fec8d6c6648868244ff29f4def969ae93e9c59956469fcfce0f3994b4c2eaf781bd5a183a7"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Removes the Windows-only winapi-*-pc-windows-* and windows_*_{gnu,gnullvm,msvc} static import libraries (lib/*.a and .lib) that are flagged during source package signing; the crates are target-gated to Windows and never built on Linux."
