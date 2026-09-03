@@ -185,7 +185,6 @@ overlay-files = ["overlays/*.overlay.toml"]
 [components.btrfs-progs]
 [components.bubblewrap]
 [components.build-helper-maven-plugin]
-[components.buildah]
 
 [components.bullet]
 [components.busybox]
