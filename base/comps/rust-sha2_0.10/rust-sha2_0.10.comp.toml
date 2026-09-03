@@ -1,0 +1,4 @@
+[components.'rust-sha2_0.10']
+# Fedora's own compat package for sha2 0.10.x, for consumers requiring
+# sha2 < 0.11.0. See rust-sha2.comp.toml.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "4b22e78ba80a86f4564295265dc3b9057c99a089" }

@@ -1,0 +1,6 @@
+[components.rust-hmac]
+# Pin past the distro default snapshot to Fedora f43 HEAD, providing hmac
+# 0.13.0, required by rust-zip 8.6.0 (crate(hmac/default) >= 0.13.0).
+# Consumers requiring hmac < 0.13.0 are served by rust-hmac0.12, distinct
+# from the pre-existing rust-hmac0.11 (an even older range).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "1bf863b1cf979a147fbf9a3f6bffc538cc82a591" }
