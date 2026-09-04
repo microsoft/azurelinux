@@ -19,7 +19,7 @@
 Summary:       Tools to access and modify virtual machine disk images
 Name:          guestfs-tools
 Version:       1.55.5
-Release: 4%{?dist}
+Release: 5%{?dist}
 License:       GPL-2.0-or-later AND LGPL-2.0-or-later
 
 # Build only for architectures that have a kernel
@@ -119,6 +119,7 @@ Obsoletes:     libguestfs-tools-c <= 1:1.45.2-1
 
 
 Patch0: 0001-tests-do-not-build-the-Windows-phony-guest-image.patch
+Patch1: 0002-tests-disable-glibc-malloc-check.patch
 %description
 guestfs-tools is a set of tools that can be used to make batch
 configuration changes to guests, get disk used/free statistics
