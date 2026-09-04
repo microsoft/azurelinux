@@ -51,6 +51,9 @@ Patch12:        CVE-2026-58050.patch
 Patch13:        CVE-2026-66034.patch
 Patch14:        CVE-2026-66033.patch
 Patch15:        CVE-2026-7598.patch
+Patch16:        CVE-2026-82251.patch
+Patch17:        CVE-2026-82252.patch
+Patch18:        CVE-2026-82253.patch
 
 # Note: the stage0 bootstrap toolchain (cargo/rustc/rust-std tarballs) is packaged
 # separately in rust-bootstrap, to keep this SRPM's size down. See SPECS/rust-bootstrap.
@@ -221,7 +224,7 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 %changelog
 * Tue Sep 01 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.96.1-2
 - Add patch for CVE-2026-58051, CVE-2026-58050, CVE-2026-66034, CVE-2026-66033,
-  CVE-2026-7598
+  CVE-2026-7598, CVE-2026-82251, CVE-2026-82252, CVE-2026-82253
 
 * Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.1-1
 - Move stage0 bootstrap toolchain tarballs (cargo/rustc/rust-std) out of this
