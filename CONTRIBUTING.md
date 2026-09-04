@@ -128,8 +128,8 @@ For changes that affect RPM output, build and smoke-test the result. Pure docume
 or metadata changes don't require a rebuild. See the [`README.md`](README.md) for
 `azldev` commands.
 
-Commit-message and TOML checks are managed by pre-commit. Install it and run the
-file-oriented checks used by CI:
+Commit-message, TOML, and YAML checks are managed by pre-commit. Install it and run
+the file-oriented checks used by CI:
 
 ```bash
 python3 -m pip install -r scripts/ci/pre-commit/requirements.txt

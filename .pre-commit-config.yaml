@@ -7,7 +7,7 @@ repos:
     rev: e8b4e28241a9ae8296ba6e4a491b5da4eda73283 # 3.11.1
     hooks:
       - id: editorconfig-checker
-        files: '\.toml$'
+        files: '\.(toml|ya?ml)$'
   - repo: https://github.com/commitizen-tools/commitizen
     rev: d910b66e2686a3ef6c3f438dec0f63ba3cf8d7ee # v4.18.0
     hooks:
