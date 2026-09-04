@@ -1,0 +1,15 @@
+# SymCrypt's unversioned allocator references can split between libc and
+# libc_malloc_debug when glibc's malloc-debug checked allocator is enabled.
+# This causes a crash on free() during SymCrypt load.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "unknown"
+bugs = [
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/23389" },
+]
+
+[[overlays]]
+description = "Disable incompatible glibc malloc-debug checking in tests"
+type = "patch-add"
+source = "../0001-tests-disable-glibc-malloc-check.patch"
