@@ -1,0 +1,60 @@
+# Remove the Windows-only import libraries from the vendored-dependencies archive and
+# drop their now-dangling entries from each crate's .cargo-checksum.json.
+#
+# The winapi-*-pc-windows-* and windows_*_{gnu,gnullvm,msvc} crates are all target-gated
+# (`[target.*-pc-windows-*]` / `cfg(target_env = ...)`), so they are never compiled on a
+# Linux build (the vendor archive is fully unpacked in %prep, but cargo only verifies
+# manifests for crates it actually builds). Their lib/ static-import archives (`.a`/`.lib`)
+# ship ~1.6M ar members in aggregate (vendored several times over per arch/toolchain), which
+# blows up recursive source-package scanning. Only the lib/ archives are dropped; each
+# crate's Cargo.toml/src/skeleton is kept so cargo's resolve stays intact.
+#
+# Cargo's directory source verifies every path listed in a manifest's `files` map and fails
+# with "failed to verify the checksum of <pkg>" when one is missing; it does not object to
+# files that exist but are unlisted, so deleting the removed lib/ entries is the correct fix.
+# In every affected manifest the lib/ keys sort between `build.rs` and `src/lib.rs`, so a
+# trailing comma is always present and the JSON stays valid. The archive is repacked; the
+# resulting hash is pinned via the source-files entry in kata-containers.comp.toml.
+
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove Windows-only winapi import libraries"
+type = "file-remove"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/winapi-*-pc-windows-*/lib/**"
+
+[[overlays]]
+description = "Remove Windows-only windows_* gnu/gnullvm import libraries"
+type = "file-remove"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/windows_*_gnu*/lib/**"
+
+[[overlays]]
+description = "Remove Windows-only windows_* msvc import libraries"
+type = "file-remove"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/windows_*_msvc*/lib/**"
+
+[[overlays]]
+description = "Drop removed winapi import libraries from cargo checksum manifests"
+type = "file-search-replace"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/winapi-*-pc-windows-*/.cargo-checksum.json"
+regex = '"lib/[^"]*":"[a-f0-9]{64}",'
+
+[[overlays]]
+description = "Drop removed windows_* gnu/gnullvm import libraries from cargo checksum manifests"
+type = "file-search-replace"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/windows_*_gnu*/.cargo-checksum.json"
+regex = '"lib/[^"]*":"[a-f0-9]{64}",'
+
+[[overlays]]
+description = "Drop removed windows_* msvc import libraries from cargo checksum manifests"
+type = "file-search-replace"
+archive = "kata-containers-3.26.0-vendor.tar.gz"
+file = "**/windows_*_msvc*/.cargo-checksum.json"
+regex = '"lib/[^"]*":"[a-f0-9]{64}",'
