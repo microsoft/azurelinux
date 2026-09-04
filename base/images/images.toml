@@ -123,6 +123,21 @@ container = false
 systemd = true
 runtime-package-management = true
 
+[images.1p-vm-base-gen2]
+description = "1P VM Base Gen2 Image (UEFI)"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2" }
+tests.tests = [
+  { name = "static-image-checks" },
+  { group = "vm-base-functional" },
+  { group = "vm-base-performance" },
+]
+
+[images.1p-vm-base-gen2.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
 [images.1p-vm-base-gen1-fips]
 description = "1P VM Base Gen1 FIPS Image (BIOS)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen1-fips" }

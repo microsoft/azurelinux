@@ -9,6 +9,11 @@
             <requires profile="LegacyBoot" />
             <requires profile="OnePBase" />
         </profile>
+        <profile name="1p-vm-base-gen2" description="1P VM Base Gen2 Image (UEFI)" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="UefiBoot" />
+            <requires profile="OnePBase" />
+        </profile>
         <profile name="1p-vm-base-gen1-fips" description="1P VM Base Gen1 FIPS Image (BIOS)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="Fips" />
@@ -30,6 +35,36 @@
         <timezone>UTC</timezone>
         <release-version>4.0</release-version>
         <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyS0 rd.shell=0" firmware="bios" overlayroot="false" eficsm="false" bootpartition="false" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="x86_64" profiles="1p-vm-base-gen2">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyS0 rd.shell=0" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="200" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="aarch64" profiles="1p-vm-base-gen2">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyAMA0 rd.shell=0" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="200" rootfs_label="azurelinux">
             <bootloader name="grub2" bls="true" console="serial" timeout="1" />
             <size unit="G">5</size>
             <oemconfig>
