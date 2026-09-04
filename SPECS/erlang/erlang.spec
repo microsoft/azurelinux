@@ -2,7 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.21
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,17 @@ Patch12:        CVE-2026-53422.patch
 Patch13:        CVE-2026-54887.patch
 Patch14:        CVE-2026-55950.patch
 Patch15:        CVE-2026-59250.patch
+Patch16:        CVE-2026-55951.patch
+Patch17:        CVE-2026-66357.patch
+Patch18:        CVE-2026-69664.patch
+Patch19:        CVE-2026-70399.patch
+Patch20:        CVE-2026-71380.patch
+Patch21:        CVE-2026-73270.patch
+Patch22:        CVE-2026-73276.patch
+Patch23:        CVE-2026-73812.patch
+Patch24:        CVE-2026-74835.patch
+Patch25:        CVE-2026-74994.patch
+Patch26:        CVE-2026-75538.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
@@ -69,6 +80,9 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+* Fri Sep 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-6
+- Patch for CVE-2026-75538, CVE-2026-74994, CVE-2026-74835, CVE-2026-73812, CVE-2026-73276, CVE-2026-73270, CVE-2026-71380, CVE-2026-70399, CVE-2026-69664, CVE-2026-66357, CVE-2026-55951
+
 
 * Tue Aug 11 2026 Aditya Singh <v-aditysing@microsoft.com> - 26.2.5.21-5
 - Patch for CVE-2026-53422, CVE-2026-54887, CVE-2026-55950, CVE-2026-59250
