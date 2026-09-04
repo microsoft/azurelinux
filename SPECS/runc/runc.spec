@@ -12,8 +12,7 @@ URL:            https://github.com/opencontainers/runc
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  go-md2man
-BuildRequires:  golang >= 1.26
-BuildRequires:  golang < 1.27
+BuildRequires:  golang < 1.25
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
 Requires:       glibc
@@ -29,11 +28,9 @@ runc is a CLI tool for spawning and running containers according to the OCI spec
 
 %build
 export CGO_ENABLED=1
-export MS_GO_NOSYSTEMCRYPTO=1
 make %{?_smp_mflags} BUILDTAGS="seccomp" COMMIT="%{commit_hash}" man runc
 
 %check
-export MS_GO_NOSYSTEMCRYPTO=1
 unshare -m --propagation unchanged sh <<'EOF'
 if ! mountpoint -q /sys/fs/cgroup; then
     if mount -t cgroup2 none /sys/fs/cgroup; then
