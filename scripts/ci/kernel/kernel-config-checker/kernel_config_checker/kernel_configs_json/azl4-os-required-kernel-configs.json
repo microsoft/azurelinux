@@ -3251,6 +3251,46 @@
           "justification": "Provide BBRv3 congestion control as an optional module on Azure Linux 4.0"
         },
         {
+          "name": "CONFIG_TYPEC",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            }
+          ],
+          "justification": "Enable x86 USB Type-C and UCSI support - PR: https://github.com/microsoft/azurelinux/pull/18300"
+        },
+        {
+          "name": "CONFIG_TYPEC_DP_ALTMODE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            }
+          ],
+          "justification": "Enable x86 USB Type-C and UCSI support - PR: https://github.com/microsoft/azurelinux/pull/18300"
+        },
+        {
+          "name": "CONFIG_TYPEC_UCSI",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            }
+          ],
+          "justification": "Enable x86 USB Type-C and UCSI support - PR: https://github.com/microsoft/azurelinux/pull/18300"
+        },
+        {
+          "name": "CONFIG_UCSI_ACPI",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            }
+          ],
+          "justification": "Enable x86 USB Type-C and UCSI support - PR: https://github.com/microsoft/azurelinux/pull/18300"
+        },
+        {
           "name": "CONFIG_UCLAMP_TASK",
           "values": [
             {
