@@ -1,0 +1,158 @@
+Lock the whole parent disk while fsck runs so udev cannot probe sibling
+partitions during filesystem repair.
+
+Do not combine this implementation with native e2fsprogs (e2fsck)
+whole-disk locking. systemd-fsck retains its lock descriptor while waiting
+for fsck, so an independently opened exclusive lock in the child would
+deadlock.
+
+diff --git a/src/fsck/fsck.c b/src/fsck/fsck.c
+index 000ed69667d51ccde248244a0408bf2db38b0932..47485fd8d40b363abbb93dc0383510b5f19f123a 100644
+--- a/src/fsck/fsck.c
++++ b/src/fsck/fsck.c
+@@ -15,6 +15,7 @@
+ #include "sd-device.h"
+ 
+ #include "alloc-util.h"
++#include "blockdev-util.h"
+ #include "bus-common-errors.h"
+ #include "bus-error.h"
+ #include "bus-locator.h"
+@@ -235,6 +236,7 @@ static int fsck_progress_socket(void) {
+ 
+ static int run(int argc, char *argv[]) {
+         _cleanup_close_pair_ int progress_pipe[2] = EBADF_PAIR;
++        _cleanup_close_ int lock_fd = -EBADF;
+         _cleanup_(sd_device_unrefp) sd_device *dev = NULL;
+         _cleanup_free_ char *dpath = NULL;
+         _cleanup_fclose_ FILE *console = NULL;
+@@ -339,6 +341,14 @@ static int run(int argc, char *argv[]) {
+             pipe(progress_pipe) < 0)
+                 return log_error_errno(errno, "pipe(): %m");
+
++        lock_fd = lock_whole_block_device(dev, LOCK_EX);
++        if (lock_fd < 0)
++                return log_device_error_errno(
++                                dev, lock_fd,
++                                "Failed to lock whole block device for '%s': %m", device);
++
++        log_device_debug(dev, "Locked whole block device while checking %s.", device);
++
+         r = safe_fork("(fsck)", FORK_RESET_SIGNALS|FORK_DEATHSIG_SIGTERM|FORK_LOG|FORK_RLIMIT_NOFILE_SAFE, &pid);
+         if (r < 0)
+                 return r;
+@@ -398,6 +411,7 @@ static int run(int argc, char *argv[]) {
+         }
+ 
+         exit_status = wait_for_terminate_and_check("fsck", pid, WAIT_LOG_ABNORMAL);
++        lock_fd = safe_close(lock_fd);
+         if (exit_status < 0)
+                 return exit_status;
+         if ((exit_status & ~FSCK_ERROR_CORRECTED) != FSCK_SUCCESS) {
+diff --git a/src/partition/makefs.c b/src/partition/makefs.c
+index 53439a4bbc5f042602a0b66efed3709aed232c06..6bd87e4613b8faed79d31d48c762f0950c7ac779 100644
+--- a/src/partition/makefs.c
++++ b/src/partition/makefs.c
+@@ -46,7 +46,7 @@ static int run(int argc, char *argv[]) {
+         if (S_ISBLK(st.st_mode)) {
+                 /* Lock the device so that udev doesn't interfere with our work */
+ 
+-                lock_fd = lock_whole_block_device(st.st_rdev, LOCK_EX);
++                lock_fd = lock_whole_block_device_from_devnum(st.st_rdev, LOCK_EX);
+                 if (lock_fd < 0)
+                         return log_error_errno(lock_fd, "Failed to lock whole block device of \"%s\": %m", device);
+         } else
+diff --git a/src/shared/blockdev-util.c b/src/shared/blockdev-util.c
+index c906aec109c0efef51a0459cf1d4be3847f2ba27..6f1de486318b2586dd3fd068dbf9eec6cf589c76 100644
+--- a/src/shared/blockdev-util.c
++++ b/src/shared/blockdev-util.c
+@@ -345,27 +345,40 @@ int get_block_device_harder(const char *path, dev_t *ret) {
+         return get_block_device_harder_fd(fd, ret);
+ }
+ 
+-int lock_whole_block_device(dev_t devt, int operation) {
++int lock_whole_block_device(sd_device *dev, int operation) {
+         _cleanup_close_ int lock_fd = -EBADF;
+-        dev_t whole_devt;
++        sd_device *whole_disk;
+         int r;
+ 
+         /* Let's get a BSD file lock on the whole block device, as per: https://systemd.io/BLOCK_DEVICE_LOCKING */
+ 
+-        r = block_get_whole_disk(devt, &whole_devt);
+-        if (r < 0)
+-                return r;
++        assert(dev);
+ 
+-        lock_fd = r = device_open_from_devnum(S_IFBLK, whole_devt, O_RDONLY|O_CLOEXEC|O_NONBLOCK, NULL);
++        r = block_device_get_whole_disk(dev, &whole_disk);
+         if (r < 0)
+                 return r;
+ 
++        lock_fd = sd_device_open(whole_disk, O_RDONLY|O_CLOEXEC|O_NONBLOCK|O_NOCTTY);
++        if (lock_fd < 0)
++                return lock_fd;
++
+         if (flock(lock_fd, operation) < 0)
+                 return -errno;
+ 
+         return TAKE_FD(lock_fd);
+ }
+ 
++int lock_whole_block_device_from_devnum(dev_t devt, int operation) {
++        _cleanup_(sd_device_unrefp) sd_device *dev = NULL;
++        int r;
++
++        r = sd_device_new_from_devnum(&dev, 'b', devt);
++        if (r < 0)
++                return r;
++
++        return lock_whole_block_device(dev, operation);
++}
++
+ int blockdev_partscan_enabled(int fd) {
+         _cleanup_free_ char *p = NULL, *buf = NULL;
+         unsigned long long ull;
+diff --git a/src/shared/blockdev-util.h b/src/shared/blockdev-util.h
+index 954a23df3e9116078abab3ee902c50732569a35e..7c2a56917167781bd0f25744af49691671ee1a31 100644
+--- a/src/shared/blockdev-util.h
++++ b/src/shared/blockdev-util.h
+@@ -38,7 +38,8 @@ int get_block_device(const char *path, dev_t *dev);
+ int get_block_device_harder_fd(int fd, dev_t *dev);
+ int get_block_device_harder(const char *path, dev_t *dev);
+ 
+-int lock_whole_block_device(dev_t devt, int operation);
++int lock_whole_block_device(sd_device *dev, int operation);
++int lock_whole_block_device_from_devnum(dev_t devt, int operation);
+ 
+ int blockdev_partscan_enabled(int fd);
+ 
+diff --git a/src/udev/udev-worker.c b/src/udev/udev-worker.c
+index 53722b21bd6dc156a3e91b5e066c6e0255c871d0..c135f1457d8d61684f36f36dc4199373c8c71094 100644
+--- a/src/udev/udev-worker.c
++++ b/src/udev/udev-worker.c
+@@ -103,20 +103,19 @@ static int worker_lock_whole_disk(sd_device *dev, int *ret_fd) {
+         if (r == 0)
+                 goto nolock;
+ 
+-        fd = sd_device_open(dev_whole_disk, O_RDONLY|O_CLOEXEC|O_NONBLOCK|O_NOCTTY);
++        fd = lock_whole_block_device(dev_whole_disk, LOCK_SH|LOCK_NB);
+         if (fd < 0) {
+                 bool ignore = ERRNO_IS_DEVICE_ABSENT(fd);
+ 
+-                log_device_debug_errno(dev, fd, "Failed to open '%s'%s: %m", val, ignore ? ", ignoring" : "");
++                log_device_debug_errno(
++                                dev, fd,
++                                "Failed to lock '%s'%s: %m", val, ignore ? ", ignoring" : "");
+                 if (!ignore)
+                         return fd;
+ 
+                 goto nolock;
+         }
+ 
+-        if (flock(fd, LOCK_SH|LOCK_NB) < 0)
+-                return log_device_debug_errno(dev, errno, "Failed to flock(%s): %m", val);
+-
+         *ret_fd = TAKE_FD(fd);
+         return 1;
+ 
