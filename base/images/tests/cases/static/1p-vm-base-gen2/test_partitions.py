@@ -11,7 +11,8 @@ from utils.types import PartitionInfo
 def test_has_root_partition(partition_table: list[PartitionInfo]) -> None:
     """Image must define exactly one root ('/') filesystem."""
     root_parts = [p for p in partition_table if p.mountpoint == "/"]
-    assert len(root_parts) == 1, f"Expected exactly one root partition, found {len(root_parts)}: {root_parts}"
+    if len(root_parts) != 1:
+        pytest.fail(f"Expected exactly one root partition, found {len(root_parts)}: {root_parts}")
 
 
 def test_has_efi_partition(partition_table: list[PartitionInfo]) -> None:
