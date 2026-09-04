@@ -13,7 +13,7 @@
 %global _azl_kver %{version}
 %global _azl_krel %{release}
 
-%package -n kmod-%{_kmod_name}
+%package -n mlnx-nfsrdma
 Summary:        Mellanox NFS/RDMA kernel modules
 Version:        %{ofa_version}
 Release:        %{ofa_release}.%{_azl_kver}.%{_azl_krel}
@@ -29,7 +29,7 @@ Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
 
-%description -n kmod-%{_kmod_name}
+%description -n mlnx-nfsrdma
 Mellanox NFS/RDMA kernel modules built from mlnx-nfsrdma %{ofa_version}
 (%{ofa_release}) against kernel %{KVERREL}.
 
@@ -89,13 +89,13 @@ popd
 %if "%{_kmod_phase}" == "files" && %{with_up_base}
 
 %ifarch x86_64 aarch64
-%post -n kmod-%{_kmod_name}
+%post -n mlnx-nfsrdma
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%postun -n kmod-%{_kmod_name}
+%postun -n mlnx-nfsrdma
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%files -n kmod-%{_kmod_name}
+%files -n mlnx-nfsrdma
 /lib/modules/%{KVERREL}/extra/mlnx-nfsrdma/
 
 %endif

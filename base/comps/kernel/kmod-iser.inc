@@ -20,7 +20,7 @@
 %global _azl_kver %{version}
 %global _azl_krel %{release}
 
-%package -n kmod-%{_kmod_name}
+%package -n iser
 Summary:        iser Driver
 Version:        %{ofa_version}
 Release:        %{ofa_release}.%{_azl_kver}.%{_azl_krel}
@@ -39,7 +39,7 @@ Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
 
-%description -n kmod-%{_kmod_name}
+%description -n iser
 Mellanox iSER kernel modules built from iser %{ofa_version}
 (%{ofa_release}) against kernel %{KVERREL}.     
 
@@ -111,13 +111,13 @@ popd
 %if "%{_kmod_phase}" == "files" && %{with_up_base}
 
 %ifarch x86_64 aarch64
-%post -n kmod-%{_kmod_name}
+%post -n iser
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%postun -n kmod-%{_kmod_name}
+%postun -n iser
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%files -n kmod-%{_kmod_name}
+%files -n iser
 /lib/modules/%{KVERREL}/extra/iser/
 
 %endif

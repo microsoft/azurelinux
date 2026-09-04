@@ -19,7 +19,7 @@
 %global _azl_kver %{version}
 %global _azl_krel %{release}
 
-%package -n kmod-%{_kmod_name}
+%package -n isert
 Summary:        isert Driver
 Version:        %{ofa_version}
 Release:        %{ofa_release}.%{_azl_kver}.%{_azl_krel}
@@ -35,7 +35,7 @@ Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
 
-%description -n kmod-%{_kmod_name}
+%description -n isert
 Mellanox iSERT kernel modules built from isert %{ofa_version}
 (%{ofa_release}) against kernel %{KVERREL}.
 
@@ -107,13 +107,13 @@ popd
 %if "%{_kmod_phase}" == "files" && %{with_up_base}
 
 %ifarch x86_64 aarch64
-%post -n kmod-%{_kmod_name}
+%post -n isert
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%postun -n kmod-%{_kmod_name}
+%postun -n isert
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%files -n kmod-%{_kmod_name}
+%files -n isert
 /lib/modules/%{KVERREL}/extra/isert/
 %endif
 

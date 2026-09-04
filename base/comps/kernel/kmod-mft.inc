@@ -18,7 +18,7 @@
 %global _azl_kver %{version}
 %global _azl_krel %{release}
 
-%package -n kmod-%{_kmod_name}
+%package -n kernel-mft
 Summary:        Mellanox Firmware Tools kernel modules
 Version:        %{mft_version}
 Release:        %{mft_release}.%{_azl_kver}.%{_azl_krel}
@@ -31,7 +31,7 @@ Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
 
-%description -n kmod-%{_kmod_name}
+%description -n kernel-mft
 Mellanox Firmware Tools kernel modules built for kernel %{KVERREL}.
 
 %endif
@@ -103,13 +103,13 @@ install -m 0644 %{_builddir}/kernel-mft-%{mft_version}/obj/default/mst_backward_
 %if "%{_kmod_phase}" == "files" && %{with_up_base}
 
 %ifarch x86_64 aarch64
-%post -n kmod-%{_kmod_name}
+%post -n kernel-mft
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%postun -n kmod-%{_kmod_name}
+%postun -n kernel-mft
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%files -n kmod-%{_kmod_name}
+%files -n kernel-mft
 /lib/modules/%{KVERREL}/extra/mft/
 
 %endif

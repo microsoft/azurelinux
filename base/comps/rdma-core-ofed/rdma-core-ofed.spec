@@ -52,6 +52,7 @@ Conflicts: srp_daemon < %{version}
 Conflicts: python3-pyverbs < %{version}
 }
 %{community_rdma_conflicts}
+Obsoletes: rdma-core < %{version}-%{release}
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
 #  providers/ipathverbs/ Dual licensed using a BSD license with an extra patent clause
@@ -172,6 +173,7 @@ scripts, dracut rules, and the rdma-ndd utility.
 
 %package devel
 %{community_rdma_conflicts}
+Obsoletes: rdma-core-devel < %{version}-%{release}
 Summary: RDMA core development libraries and headers
 Group: System Environment/Libraries
 Requires: libibverbs-ofed%{?_isa} = %{version}-%{release}
@@ -240,6 +242,7 @@ Automated build 1
 
 %package -n infiniband-diags-ofed
 %{community_rdma_conflicts}
+Obsoletes: infiniband-diags < %{version}-%{release}
 Provides: perl(IBswcountlimits)
 Provides: libibmad = %{version}-%{release}
 Obsoletes: libibmad < %{version}-%{release}
@@ -258,6 +261,7 @@ programs. These include MAD, SA, SMP, and other basic IB functions.
 
 %package -n infiniband-diags-compat-ofed
 %{community_rdma_conflicts}
+Obsoletes: infiniband-diags-compat < %{version}-%{release}
 Summary: OpenFabrics Alliance InfiniBand Diagnostic Tools
 
 %description -n infiniband-diags-compat-ofed
@@ -267,6 +271,7 @@ compatibility reasons.
 
 %package -n libibverbs-ofed
 %{community_rdma_conflicts}
+Obsoletes: libibverbs < %{version}-%{release}
 Provides: libcxgb4 = %{version}-%{release}
 Obsoletes: libcxgb4 < %{version}-%{release}
 Provides: libefa = %{version}-%{release}
@@ -330,6 +335,7 @@ Device-specific plug-in ibverbs userspace drivers are included:
 
 %package -n libibverbs-utils-ofed
 %{community_rdma_conflicts}
+Obsoletes: libibverbs-utils < %{version}-%{release}
 Summary: Examples for the libibverbs library
 Requires: libibverbs-ofed%{?_isa} = %{version}-%{release}
 
@@ -339,6 +345,7 @@ displays information about RDMA devices.
 
 %package -n ibacm-ofed
 %{community_rdma_conflicts}
+Obsoletes: ibacm < %{version}-%{release}
 Summary: InfiniBand Communication Manager Assistant
 Group: System Environment/Libraries
 %if "%{WITH_SYSTEMD}" == "1"
@@ -359,6 +366,7 @@ library knows how to talk directly to the ibacm daemon to retrieve data.
 
 %package -n libibumad-ofed
 %{community_rdma_conflicts}
+Obsoletes: libibumad < %{version}-%{release}
 Provides: libibumad3 = %{version}-%{release}
 Obsoletes: libibumad3 < %{version}-%{release}
 Summary: OpenFabrics Alliance InfiniBand umad (userspace management datagram) library
@@ -370,6 +378,7 @@ are used by the IB diagnostic and management tools, including OpenSM.
 
 %package -n librdmacm-ofed
 %{community_rdma_conflicts}
+Obsoletes: librdmacm < %{version}-%{release}
 Provides: librdmacm1 = %{version}-%{release}
 Obsoletes: librdmacm1 < %{version}-%{release}
 Provides: rsocket = %{version}-%{release}
@@ -383,6 +392,7 @@ librdmacm provides a userspace RDMA Communication Management API.
 
 %package -n librdmacm-utils-ofed
 %{community_rdma_conflicts}
+Obsoletes: librdmacm-utils < %{version}-%{release}
 Summary: Examples for the librdmacm library
 Group: System Environment/Libraries
 Requires: librdmacm-ofed%{?_isa} = %{version}-%{release}
@@ -393,6 +403,7 @@ Example test programs for the librdmacm library.
 
 %package -n srp_daemon-ofed
 %{community_rdma_conflicts}
+Obsoletes: srp_daemon < %{version}-%{release}
 Obsoletes: srptools < %{version}-%{release}
 Provides: srptools = %{version}-%{release}
 Obsoletes: openib-srptools <= 0.0.6
@@ -411,6 +422,7 @@ discover and use SCSI devices via the SCSI RDMA Protocol over InfiniBand.
 %if %{with_pyverbs}
 %package -n python3-pyverbs-ofed
 %{community_rdma_conflicts}
+Obsoletes: python3-pyverbs < %{version}-%{release}
 Summary: Python3 API over IB verbs
 %{?python_provide:%python_provide python%{python3_pkgversion}-pyverbs}
 

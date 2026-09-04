@@ -674,6 +674,7 @@ Provides: installonlypkg(kernel)
 #
 BuildRequires: kmod, bash, coreutils, tar, git-core, which
 BuildRequires: bzip2, xz, findutils, m4, perl-interpreter, perl-Carp, perl-devel, perl-generators, make, diffutils, gawk, %compression
+BuildRequires: autoconf, automake, libtool
 # Kernel EFI/Compression set by CONFIG_KERNEL_ZSTD
 %ifarch x86_64 aarch64
 BuildRequires: zstd
@@ -1033,6 +1034,7 @@ Source6103: kmod-isert.inc
 Source6104: kmod-mft.inc
 Source6105: kmod-mlnx-nfsrdma.inc
 Source6106: kmod-srp.inc
+Source6107: xpmem.inc
 
 ## Patches needed for building this package
 
@@ -1107,6 +1109,10 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name srp
 %include %{_sourcedir}/kmod-srp.inc
+
+%global _kmod_phase package
+%global _kmod_name xpmem
+%include %{_sourcedir}/xpmem.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2112,6 +2118,10 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name srp
 %include %{_sourcedir}/kmod-srp.inc
+
+%global _kmod_phase prep
+%global _kmod_name xpmem
+%include %{_sourcedir}/xpmem.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3212,6 +3222,10 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name mft
 %include %{_sourcedir}/kmod-mft.inc
 
+%global _kmod_phase build
+%global _kmod_name xpmem
+%include %{_sourcedir}/xpmem.inc
+
 # AZL: Build NVIDIA after OFED so nvidia-peermem uses the matching
 # in-progress OFED headers and Module.symvers.
 %global _kmod_phase build
@@ -3746,6 +3760,10 @@ popd
 %global _kmod_phase install
 %global _kmod_name srp
 %include %{_sourcedir}/kmod-srp.inc
+
+%global _kmod_phase install
+%global _kmod_name xpmem
+%include %{_sourcedir}/xpmem.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4415,6 +4433,10 @@ fi\
 %global _kmod_phase files
 %global _kmod_name srp
 %include %{_sourcedir}/kmod-srp.inc
+
+%global _kmod_phase files
+%global _kmod_name xpmem
+%include %{_sourcedir}/xpmem.inc
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
