@@ -225,7 +225,7 @@ Summary:        Package providing the identity for Azure Linux WSL.
 RemovePathPostfixes: .wsl
 Provides:       azurelinux-release-identity = %{version}-%{release}
 Conflicts:      azurelinux-release-identity
-Requires(meta): azurelinux-release-container = %{version}-%{release}
+Requires(meta): azurelinux-release-wsl = %{version}-%{release}
 
 
 %description identity-wsl
@@ -546,6 +546,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 * Fri Sep 18 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-30
 - Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and the console getty units for the WSL variant
 - Mask the generator-activated console getty and static vconsole, /tmp and early device setup units
+- Pair the WSL identity with the WSL release package rather than the container variant
 
 * Fri Sep 11 2026 Chris Co <chrco@microsoft.com> - 4.0-29
 - Remove the Kata preset now that kata-containers is no longer built
