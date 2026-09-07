@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 # Copyright (c) 2003 FreeIPMI Core Team
 
 Name:             freeipmi
-Version:          1.6.18
+Version:          1.6.19
 Release:          1%{?dist}
 Summary:          IPMI remote console and system management software
 License:          GPLv3+
@@ -348,6 +348,9 @@ rm -f %{buildroot}%{_datadir}/doc/%{name}/COPYING*
 %dir %{_localstatedir}/cache/ipmiseld
 
 %changelog
+* Sun Sep 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.19-1
+- Auto-upgrade to 1.6.19 - for CVE-2026-85504, CVE-2026-85508, CVE-2026-85505, CVE-2026-85509, CVE-2026-85506, CVE-2026-85507
+
 * Thu Jun 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.18-1
 - Auto-upgrade to 1.6.18 - for CVE-2026-50031
 
