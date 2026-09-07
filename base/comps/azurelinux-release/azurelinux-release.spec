@@ -379,26 +379,25 @@ sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/WSL/;s/<!--.*-->//;/^$/d' %
 # the first matching line, so it overrides both.
 install -Dm0644 %{SOURCE18} -t %{buildroot}%{_prefix}/lib/systemd/system-preset/
 
-# A preset can only act on units that have an [Install] section. The units
-# below are static -- systemd-vconsole-setup.service is pulled in by a udev
-# rule, and the rest by *.target.wants directories systemd ships in /usr/lib --
-# so masking is the only way to stop them. This is also exactly what WSL's
-# image validator looks for (an /etc/systemd/system entry pointing at
-# /dev/null).
+# Presets do not prevent dependency or generator activation. The getty generator
+# adds console-getty.service in containers regardless of its preset. The other
+# units below are static: systemd-vconsole-setup.service is pulled in by a udev
+# rule, and the rest by *.target.wants directories shipped in /usr/lib.
+# Mask them so those activation paths cannot start them. WSL's image validator
+# also recognizes these /etc/systemd/system symlinks to /dev/null.
 #
 # systemd-tmpfiles-setup.service is deliberately NOT masked: wsl-setup relies on
-# it to materialize the WSLg X11/Wayland/PulseAudio socket links, so masking it
-# would break GUI application support.
+# it to create /tmp/.X11-unix pointing at WSLg's X11 sockets. Wayland and
+# PulseAudio links are handled separately by the user tmpfiles service.
 #
 # systemd-tmpfiles-clean.service/.timer are deliberately NOT masked either.
-# tmp.mount is masked below, so /tmp is a plain directory on the distribution's
-# persistent VHD and nothing else would ever age its contents. The periodic
-# clean is safe for WSLg because wsl-setup ships an entry for /tmp/.X11-unix,
-# and systemd-tmpfiles skips any path that has its own entry when cleaning a
-# parent directory (it logs 'a separate entry exists'), so the socket link
-# survives the 10d age /tmp inherits from tmpfiles.d/tmp.conf.
+# With tmp.mount masked, keep periodic aging for the distribution's persistent
+# /tmp rather than relying on the host to clean it. wsl-setup gives
+# /tmp/.X11-unix its own tmpfiles entry, so the parent-directory clean skips
+# the link and does not recurse into WSLg's socket directory.
 install -d %{buildroot}%{_sysconfdir}/systemd/system
-for unit in systemd-vconsole-setup.service \
+for unit in console-getty.service \
+            systemd-vconsole-setup.service \
             tmp.mount \
             systemd-tmpfiles-setup-dev.service \
             systemd-tmpfiles-setup-dev-early.service; do
@@ -535,6 +534,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %{_prefix}/lib/os-release.wsl
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
 %{_prefix}/lib/systemd/system-preset/80-wsl.preset
+%{_sysconfdir}/systemd/system/console-getty.service
 %{_sysconfdir}/systemd/system/systemd-vconsole-setup.service
 %{_sysconfdir}/systemd/system/tmp.mount
 %{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
@@ -545,7 +545,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %changelog
 * Wed Sep 02 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-29
 - Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and the console getty units for the WSL variant
-- Mask the static console, /tmp and early tmpfiles units that WSL manages itself
+- Mask the generator-activated console getty and static vconsole, /tmp and early device setup units
 
 * Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-28
 - Disable secure redirects and IPv6 router advertisements for CIS hardening
