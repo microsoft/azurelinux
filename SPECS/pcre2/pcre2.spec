@@ -1,13 +1,14 @@
 Summary:        A library for Perl-compatible regular expressions
 Name:           pcre2
 Version:        10.42
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/C and C++
 URL:            https://www.pcre.org/
 Source0:        https://github.com/PhilipHazel/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2026-86145.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bzip2-devel
@@ -148,6 +149,7 @@ API.
 
 %prep
 %setup -q
+%patch 0 -p1
 
 %build
 # Available JIT archs see sljit/sljitConfig.h
@@ -235,6 +237,9 @@ make check -j1
 %{_libdir}/*.a
 
 %changelog
+* Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.42-4
+- Patch for CVE-2026-86145
+
 * Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> 10.42-3
 - Drop coreutils BuildRequires to break dependency cycle between pcre2, libselinux, and coreutils.
 
