@@ -83,6 +83,9 @@ To use the distro:
 wsl -d AzureLinux-4.0
 ```
 
+See [Systemd defaults in WSL images](./docs/wsl-systemd-policy.md) for the
+networking, console, and temporary-file policies.
+
 </details>
 
 ## What's in this branch?
