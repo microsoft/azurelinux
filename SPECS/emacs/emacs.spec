@@ -1,7 +1,7 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
 Version:        29.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source2:        default.el
 Patch0:         CVE-2025-1244.patch
 Patch1:         CVE-2024-53920.patch
 Patch2:         CVE-2026-6861.patch
+Patch3:         CVE-2026-79992.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnutls-devel
@@ -131,6 +132,9 @@ rm -f *-filelist {common,el}-*-files
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Sun Aug 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 29.4-5
+- Patch for CVE-2026-79992
+
 * Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 29.4-4
 - Patch for CVE-2026-6861
 

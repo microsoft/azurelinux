@@ -99,10 +99,10 @@ elfutils-libelf-0.189-6.azl3.x86_64.rpm
 elfutils-libelf-devel-0.189-6.azl3.x86_64.rpm
 elfutils-libelf-devel-static-0.189-6.azl3.x86_64.rpm
 elfutils-libelf-lang-0.189-6.azl3.x86_64.rpm
-expat-2.8.3-1.azl3.x86_64.rpm
-expat-debuginfo-2.8.3-1.azl3.x86_64.rpm
-expat-devel-2.8.3-1.azl3.x86_64.rpm
-expat-libs-2.8.3-1.azl3.x86_64.rpm
+expat-2.8.3-2.azl3.x86_64.rpm
+expat-debuginfo-2.8.3-2.azl3.x86_64.rpm
+expat-devel-2.8.3-2.azl3.x86_64.rpm
+expat-libs-2.8.3-2.azl3.x86_64.rpm
 file-5.45-1.azl3.x86_64.rpm
 file-debuginfo-5.45-1.azl3.x86_64.rpm
 file-devel-5.45-1.azl3.x86_64.rpm
@@ -344,8 +344,8 @@ perl-CPAN-Meta-YAML-0.018-514.azl3.noarch.rpm
 perl-Data-Dumper-2.188-514.azl3.x86_64.rpm
 perl-DBD-SQLite-1.74-2.azl3.x86_64.rpm
 perl-DBD-SQLite-debuginfo-1.74-2.azl3.x86_64.rpm
-perl-DBI-1.651-1.azl3.x86_64.rpm
-perl-DBI-debuginfo-1.651-1.azl3.x86_64.rpm
+perl-DBI-1.652-1.azl3.x86_64.rpm
+perl-DBI-debuginfo-1.652-1.azl3.x86_64.rpm
 perl-DBIx-Simple-1.37-7.azl3.noarch.rpm
 perl-DBM_Filter-0.06-514.azl3.noarch.rpm
 perl-debugger-1.60-514.azl3.noarch.rpm
@@ -553,7 +553,7 @@ python3-libcap-ng-0.8.4-1.azl3.x86_64.rpm
 python3-libmount-2.40.2-5.azl3.x86_64.rpm
 python3-libs-3.12.14-1.azl3.x86_64.rpm
 python3-libxml2-2.11.5-10.azl3.x86_64.rpm
-python3-lxml-4.9.3-2.azl3.x86_64.rpm
+python3-lxml-4.9.3-3.azl3.x86_64.rpm
 python3-magic-5.45-1.azl3.noarch.rpm
 python3-markupsafe-2.1.3-1.azl3.x86_64.rpm
 python3-newt-0.52.23-1.azl3.x86_64.rpm
