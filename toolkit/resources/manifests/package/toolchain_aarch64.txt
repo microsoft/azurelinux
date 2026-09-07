@@ -519,10 +519,10 @@ pkgconf-2.0.2-1.azl3.aarch64.rpm
 pkgconf-debuginfo-2.0.2-1.azl3.aarch64.rpm
 pkgconf-m4-2.0.2-1.azl3.noarch.rpm
 pkgconf-pkg-config-2.0.2-1.azl3.aarch64.rpm
-popt-1.19-1.azl3.aarch64.rpm
-popt-debuginfo-1.19-1.azl3.aarch64.rpm
-popt-devel-1.19-1.azl3.aarch64.rpm
-popt-lang-1.19-1.azl3.aarch64.rpm
+popt-1.19-2.azl3.aarch64.rpm
+popt-debuginfo-1.19-2.azl3.aarch64.rpm
+popt-devel-1.19-2.azl3.aarch64.rpm
+popt-lang-1.19-2.azl3.aarch64.rpm
 procps-ng-4.0.4-1.azl3.aarch64.rpm
 procps-ng-debuginfo-4.0.4-1.azl3.aarch64.rpm
 procps-ng-devel-4.0.4-1.azl3.aarch64.rpm
