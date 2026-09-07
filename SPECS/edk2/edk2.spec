@@ -165,6 +165,9 @@ Patch1027: CVE-2026-63074.patch
 Patch1028: CVE-2026-63076.patch
 Patch1029: CVE-2026-75803.patch
 Patch1030: CVE-2026-42770.patch
+
+# python3-devel and libuuid-devel are required for building tools.
+# python3-devel is also needed for varstore template generation and
 # verification with "ovmf-vars-generator".
 BuildRequires:  python3-devel
 BuildRequires:  libuuid-devel
@@ -817,14 +820,6 @@ done
 
 * Tue Jun 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-18
 - Patch for CVE-2026-9076, CVE-2026-7383, CVE-2026-45447, CVE-2026-45445, CVE-2026-42767, CVE-2026-42766, CVE-2026-34182, CVE-2026-34180
-
-- Patch for CVE-2025-2296
-
-* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-10
-- Patch for CVE-2025-9230
-
-* Mon Aug 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-9
-- Patch for CVE-2025-3770
 
 * Wed May 06 2026 Sumedh Sharma <sumsharma@microsoft.com> - 20240524git3e722403cd16-17
 - Enable build_aarch64 to build arm64 firmware bins
