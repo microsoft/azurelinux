@@ -20,9 +20,10 @@
 # 90-systemd.preset. The 80- prefix matches the convention fedora-release uses
 # for its variant presets (80-server.preset, 80-workstation.preset, ...).
 #
-# Only units with an [Install] section can be turned off from a preset.
-# systemd-vconsole-setup.service, tmp.mount and the systemd-tmpfiles-setup-dev*
-# units are static, so azurelinux-release-identity-wsl masks those instead.
+# Presets control installation-time enablement, not dependency activation.
+# azurelinux-release-identity-wsl also masks console-getty.service, which is
+# activated by a generator, and the static systemd-vconsole-setup.service,
+# tmp.mount and systemd-tmpfiles-setup-dev* units.
 # Keep the two lists in sync with the comment in azurelinux-release.spec.
 
 # WSL configures the network adapters; the distribution must not.
@@ -36,16 +37,13 @@ disable systemd-resolved.service
 disable systemd-resolved-monitor.socket
 disable systemd-resolved-varlink.socket
 
-# WSL runs the distribution as a container, so systemd-getty-generator takes its
-# run_container() path: it pulls in console-getty.service and never instantiates
-# getty@tty1. console-getty.service gates on /dev/console, which WSL does
-# provide, so this is the console unit that actually starts.
+# systemd-getty-generator adds console-getty.service in containers independently
+# of presets. The WSL identity package also masks it so the generated dependency
+# cannot start a console login service at boot.
 disable console-getty.service
 
-# getty@tty1 gates on /dev/tty0 and is not instantiated under WSL, so disabling
-# it only suppresses a skipped-condition entry in the journal. It is disabled
-# because the WSL maintainers asked for it by name when reviewing the
-# distribution listing (microsoft/WSL#41120). The glob also covers the
-# getty@.service template itself, which systemd's preset enables with
-# DefaultInstance=tty1.
+# A vendor preset can enable getty@tty1 through DefaultInstance=tty1 even when
+# the generator takes its container path. Disable the template and its instances
+# as requested by the WSL maintainers (microsoft/WSL#41120). The unit's
+# ConditionPathExists=/dev/tty0 is a runtime gate, not an enablement policy.
 disable getty@*.service
