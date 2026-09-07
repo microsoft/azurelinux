@@ -74,7 +74,11 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
+<<<<<<< HEAD
 * Sat Aug 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-19
+=======
+* Thu Aug 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-19
+>>>>>>> fc2ef5820e ([AutoPR- Security] Patch edk2 for CVE-2026-75803, CVE-2026-63076, CVE-2026-63074, CVE-2026-63072 [HIGH] (#18638))
 - Bump release for consistency with edk2 spec.
 
 * Tue Jun 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-18
