@@ -1,12 +1,12 @@
 %global nginx_user nginx
-%global njs_version 0.9.4
+%global njs_version 1.0.1
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.28.3
-Release:        8%{?dist}
+Version:        1.30.4
+Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,26 +19,6 @@ Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.ta
 %if 0%{?with_check}
 Source3:        nginx-tests.tgz
 %endif
-
-Patch1:         0001-remove-Werror-in-upstream-build-scripts.patch
-Patch2:         0002-fix-PIDFile-handling.patch
-Patch3:         0003-Add-SSL-passphrase-dialog.patch
-Patch4:         0004-Disable-ENGINE-support.patch
-Patch5:         0005-Compile-perl-module-with-O2.patch
-Patch6:         CVE-2026-40460.patch
-Patch7:         CVE-2026-40701.patch
-Patch8:         CVE-2026-42934.patch
-Patch9:         CVE-2026-42945.patch
-Patch10:        CVE-2026-42946.patch
-Patch11:        CVE-2026-9256.patch
-Patch12:        CVE-2026-49975.patch
-Patch13:        CVE-2026-48142.patch
-Patch14:        CVE-2026-42055.patch
-Patch15:        CVE-2026-56434.patch
-Patch16:        CVE-2026-42533.patch
-
-# njs patches start at 1001 to keep them separate from nginx patches
-Patch1001:      CVE-2026-8711.patch
 
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
@@ -188,6 +168,15 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Tue Sep 08 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.30.4-1
+- Upgrade to version 1.30.4 and njs to version 1.0.1
+- This upgrade fixes below CVEs, therefore removed patch files for them -
+  CVE-2026-40460, CVE-2026-40701, CVE-2026-42934, CVE-2026-42945, CVE-2026-42946
+  CVE-2026-9256, CVE-2026-49975, CVE-2026-48142, CVE-2026-42055, CVE-2026-56434
+  CVE-2026-42533, CVE-2026-8711
+- This upgrade also fixes below new CVEs -
+  CVE-2026-78669, CVE-2026-78222, CVE-2026-18329
+
 * Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-8
 - Patch for CVE-2026-56434 and CVE-2026-42533
 
