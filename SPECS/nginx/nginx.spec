@@ -20,6 +20,12 @@ Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.ta
 Source3:        nginx-tests.tgz
 %endif
 
+Patch1:         0001-remove-Werror-in-upstream-build-scripts.patch
+Patch2:         0002-fix-PIDFile-handling.patch
+Patch3:         0003-Add-SSL-passphrase-dialog.patch
+Patch4:         0004-Disable-ENGINE-support.patch
+Patch5:         0005-Compile-perl-module-with-O2.patch
+
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -64,13 +70,12 @@ The OpenTelemetry module for Nginx
 
 %prep
 %autosetup -N
-%autopatch -p1 -M 1000
+%autopatch -p1
 
 mkdir -p ../nginx-njs
 tar -C ../nginx-njs -xf %{SOURCE2}
 
 pushd ../nginx-njs/njs-%{njs_version}
-%autopatch -p1 -m 1001
 popd
 
 

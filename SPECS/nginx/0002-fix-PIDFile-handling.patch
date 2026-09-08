@@ -1,0 +1,107 @@
+From 03b18ac401de8df804b1cc455ded06359dae2374 Mon Sep 17 00:00:00 2001
+From: Felix Kaechele <felix@kaechele.ca>
+Date: Tue, 20 Apr 2021 21:28:18 -0400
+Subject: [PATCH 2/5] fix PIDFile handling
+ 
+Corresponding RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1869026
+ 
+Rejected upstream: https://trac.nginx.org/nginx/ticket/1897
+ 
+Taken from: https://git.launchpad.net/ubuntu/+source/nginx/tree/debian/patches/nginx-fix-pidfile.patch
+ 
+From original patch:
+Author: Tj <ubuntu@iam.tj>
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/nginx/+bug/1581864
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=876365
+Last-Update: 2020-06-24
+ 
+Signed-off-by: Felix Kaechele <felix@kaechele.ca>
+---
+ src/core/nginx.c         | 24 +++++++++++++++++++++---
+ src/os/unix/ngx_daemon.c |  8 ++++++--
+ 2 files changed, 27 insertions(+), 5 deletions(-)
+ 
+diff --git a/src/core/nginx.c b/src/core/nginx.c
+index 0deb27b7f98a..23edb59ff105 100644
+--- a/src/core/nginx.c
++++ b/src/core/nginx.c
+@@ -340,14 +340,21 @@ main(int argc, char *const *argv)
+         ngx_process = NGX_PROCESS_MASTER;
+     }
+ 
++    /* tell-tale to detect if this is parent or child process */
++    ngx_int_t child_pid = NGX_BUSY;
++
+ #if !(NGX_WIN32)
+ 
+     if (ngx_init_signals(cycle->log) != NGX_OK) {
+         return 1;
+     }
+ 
++    /* tell-tale that this code has been executed */
++    child_pid--;
++
+     if (!ngx_inherited && ccf->daemon) {
+-        if (ngx_daemon(cycle->log) != NGX_OK) {
++        child_pid = ngx_daemon(cycle->log);
++        if (child_pid == NGX_ERROR) {
+             return 1;
+         }
+ 
+@@ -360,8 +367,19 @@ main(int argc, char *const *argv)
+ 
+ #endif
+ 
+-    if (ngx_create_pidfile(&ccf->pid, cycle->log) != NGX_OK) {
+-        return 1;
++    /* If ngx_daemon() returned the child's PID in the parent process
++     * after the fork() set ngx_pid to the child_pid, which gets
++     * written to the PID file, then exit.
++     * For NGX_WIN32 always write the PID file
++     * For others, only write it from the parent process */
++    if (child_pid < NGX_OK || child_pid > NGX_OK) {
++	ngx_pid = child_pid > NGX_OK ? child_pid : ngx_pid;
++        if (ngx_create_pidfile(&ccf->pid, cycle->log) != NGX_OK) {
++            return 1;
++	}
++    }
++    if (child_pid > NGX_OK) {
++        exit(0);
+     }
+ 
+     if (ngx_log_redirect_stderr(cycle) != NGX_OK) {
+diff --git a/src/os/unix/ngx_daemon.c b/src/os/unix/ngx_daemon.c
+index 385c49b6c3d1..3719854c52b0 100644
+--- a/src/os/unix/ngx_daemon.c
++++ b/src/os/unix/ngx_daemon.c
+@@ -7,14 +7,17 @@
+ 
+ #include <ngx_config.h>
+ #include <ngx_core.h>
++#include <unistd.h>
+ 
+ 
+ ngx_int_t
+ ngx_daemon(ngx_log_t *log)
+ {
+     int  fd;
++    /* retain the return value for passing back to caller */
++    pid_t pid_child = fork();
+ 
+-    switch (fork()) {
++    switch (pid_child) {
+     case -1:
+         ngx_log_error(NGX_LOG_EMERG, log, ngx_errno, "fork() failed");
+         return NGX_ERROR;
+@@ -23,7 +26,8 @@ ngx_daemon(ngx_log_t *log)
+         break;
+ 
+     default:
+-        exit(0);
++        /* let caller do the exit() */
++        return pid_child;
+     }
+ 
+     ngx_parent = ngx_pid;
+-- 
+2.52.0
