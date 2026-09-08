@@ -122,10 +122,13 @@ jobs:
               sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Checkout a stable version of the specs
         uses: ./.github/actions/checkout-with-stable-pkgs
+
+      - name: Install toolkit prerequisites
+        run: sudo make -C toolkit install-prereqs
 
       - name: Prepare the build environment
         if: ${{ matrix.build-prep != '' }}

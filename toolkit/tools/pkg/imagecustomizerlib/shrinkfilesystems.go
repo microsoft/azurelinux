@@ -107,10 +107,11 @@ func shrinkFilesystems(imageLoopDevice string, verity []imagecustomizerapi.Verit
 			return fmt.Errorf("failed to resizepart %s with parted (and flock):\n%v", partitionLoopDevice, stderr)
 		}
 
-		// Re-read the partition table
-		err = refreshPartitions(imageLoopDevice)
+		// Changes to the partition table causes all of the disk's parition /dev nodes to be deleted and then
+		// recreated. So, wait for that to finish.
+		err = diskutils.WaitForDiskDevice(imageLoopDevice)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to wait for disk (%s) to update:\n%w", imageLoopDevice, err)
 		}
 	}
 	return nil

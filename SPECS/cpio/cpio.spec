@@ -1,13 +1,16 @@
 Summary:        cpio-2.13
 Name:           cpio
 Version:        2.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/System utilities
 URL:            https://www.gnu.org/software/cpio/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2026-66484.patch
+Patch1:         CVE-2026-66485.patch
+Patch2:         CVE-2026-66486.patch
 Conflicts:      toybox
 
 %description
@@ -58,6 +61,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14-2
+- Patch for CVE-2026-66486, CVE-2026-66485, CVE-2026-66484
+
 * Tue Nov 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.14-1
 - Upgrade to version 2.14
 

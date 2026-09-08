@@ -1,7 +1,7 @@
 Summary:        Network Time Protocol reference implementation
 Name:           ntp
 Version:        4.2.8p17
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT AND OpenLDAP AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,14 @@ Source5:        ntpdate.sysconfig
 Source6:        ntpdate.service
 Source7:        ntpd.service
 Source8:        LICENSE.PTR
+Patch0:         CVE-2026-63379.patch
+Patch1:         CVE-2026-63381.patch
+Patch2:         CVE-2026-63382.patch
+Patch3:         CVE-2026-63383.patch
+Patch4:         CVE-2026-63384.patch
+Patch5:         CVE-2026-63385.patch
+Patch6:         CVE-2026-63387.patch
+Patch7:         CVE-2026-63388.patch
 
 BuildRequires:  gcc >= 11.2.0
 BuildRequires:  glibc >= 2.34
@@ -61,7 +69,7 @@ ntpstat is a utility which reports the synchronisation
 state of the NTP daemon running on the local machine.
 
 %prep
-%setup -q -a 1
+%autosetup -a 1 -p1
 
 %build
 
@@ -84,8 +92,10 @@ make -C ntpstat-master CFLAGS="$CFLAGS"
 cp %{SOURCE8} .
 
 make DESTDIR=%{buildroot} install
-install -v -m755    -d %{buildroot}%{_docdir}/%{name}-%{version}
-cp -v -R html/*     %{buildroot}%{_docdir}/%{name}-%{version}/
+rm -f \
+    %{buildroot}%{_docdir}/%{name}/html/copyright.html \
+    %{buildroot}%{_docdir}/%{name}/html/hints/bsdi \
+    %{buildroot}%{_docdir}/%{name}/html/hints/freebsd
 install -vdm 755 %{buildroot}%{_sysconfdir}
 
 mkdir -p %{buildroot}%{_sharedstatedir}/ntp/drift
@@ -105,7 +115,6 @@ restrict -6 ::1
 driftfile %{_sharedstatedir}/ntp/drift/ntp.drift
 EOF
 
-install -D -m644 COPYRIGHT %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 rm -rf %{buildroot}%{_sysconfdir}/rc.d/*
 
 %{_fixperms} %{buildroot}/*
@@ -150,7 +159,7 @@ fi
 
 %files
 %defattr(-,root,root)
-%license COPYRIGHT LICENSE.PTR
+%license COPYRIGHT LICENSE.PTR html/copyright.html html/hints/bsdi html/hints/freebsd
 %dir %{_sharedstatedir}/ntp/drift
 %attr(0755, ntp, ntp) %{_sharedstatedir}/ntp/drift
 %attr(0750, root, root) %config(noreplace) %{_sysconfdir}/ntp.conf
@@ -169,10 +178,8 @@ fi
 %{_bindir}/ntptime
 %{_bindir}/sntp
 %{_bindir}/tickadj
-%{_docdir}/%{name}-%{version}/*
-%{_docdir}/ntp/*
-%{_docdir}/sntp/*
-%{_datadir}/licenses/ntp/LICENSE
+%doc %{_docdir}/ntp/*
+%doc %{_docdir}/sntp/*
 %{_mandir}/man1/ntpd.1.gz
 %{_mandir}/man1/ntpdc.1.gz
 %{_mandir}/man1/ntp-keygen.1.gz
@@ -197,6 +204,9 @@ fi
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
+* Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.2.8p17-3
+- Patch for CVE-2026-63388, CVE-2026-63387, CVE-2026-63385, CVE-2026-63384, CVE-2026-63383, CVE-2026-63382, CVE-2026-63381, CVE-2026-63379
+
 * Tue Mar 17 2026 Sudipta Pandit <sudpandit@microsoft.com> - 4.2.8p17-2
 - Fix ntpdate-wrapper to use /usr/bin/ntpdate
 

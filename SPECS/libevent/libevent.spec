@@ -1,6 +1,6 @@
 Summary:        An Event notification library.
 Name:           libevent
-Version:        2.1.12
+Version:        2.1.13
 Release:        1%{?dist}
 License:        BSD
 URL:            http://libevent.org 
@@ -58,6 +58,9 @@ make %{?_smp_mflags} -k check
 %{_libdir}/pkgconfig/libevent_extra.pc
 
 %changelog
+* Fri Aug 21 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.13-1
+- Auto-upgrade to 2.1.13 - for CVE-2026-63380, CVE-2026-63388, CVE-2026-63381, CVE-2026-63387, CVE-2026-63385, CVE-2026-63382, CVE-2026-63379, CVE-2026-63383, CVE-2026-63384
+
 * Fri Mar 11 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.1.12-1
 - Upgrade to 2.1.12
 

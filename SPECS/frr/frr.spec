@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        10.5.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
 Patch5:         0001-Fix-frr-c90-complaint-error.patch
+Patch6:         0006-fix-bison-output-file-directives.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -196,6 +197,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Wed Sep 02 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 10.5.4-2
+- Pass bison output file names via -o to build with hardened bison
+
 * Mon May 04 2026 Kanishk Bansal <kanbansal@microsoft.com> - 10.5.4-1
 - Upgrade to 10.5.4 for CVE-2026-37457
 

@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -285,6 +285,10 @@ cd %{_builddir}/glibc-build
 #      79 UNSUPPORTED
 #      12 XFAIL
 #       8 XPASS
+# Several tests only failed because they were killed at the 20s default timeout,
+# e.g. tst-malloc-too-large-malloc-hugetlb2 needs ~35s here (nearly all of it
+# kernel time for huge pages). Scale the timeout so slow tests still assert.
+export TIMEOUTFACTOR=10
 make %{?_smp_mflags} check ||:
 n=0
 # expected failures in local VM
@@ -388,6 +392,12 @@ grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.38-21
+- Set TIMEOUTFACTOR=10 in %%check. malloc/tst-malloc-too-large-malloc-hugetlb2
+  was killed at the 20s default timeout while it needs ~35s here, almost all of
+  it kernel time for huge pages, and it was the only failure not in the expected
+  list. It now passes instead of being tolerated.
+
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.38-20
 - Patch for CVE-2026-4046
 

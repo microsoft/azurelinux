@@ -1,7 +1,7 @@
 Summary:        Key table files, console fonts, and keyboard utilities
 Name:           kbd
 Version:        2.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          Applications/System
 URL:            http://ftp.altlinux.org/pub/people/legion/kbd
 Source0:        http://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz
 Patch0:         kbd-2.0.4-backspace-1.patch
+Patch1:         CVE-2026-72693.patch
 
 BuildRequires:  check >= 0.9.4
 
@@ -57,6 +58,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Sun Aug 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.0-3
+- Patch for CVE-2026-72693
+
 * Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.0-2
 - Updated patch application macros.
 

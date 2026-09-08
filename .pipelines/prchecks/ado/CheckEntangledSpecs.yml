@@ -1,0 +1,80 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Keep this definition in lock-step with .github/workflows/check-entangled-specs.yml.
+
+# Triggers are configured on the ADO pipeline definition.
+trigger: none
+
+parameters:
+  - name: debug
+    type: boolean
+    default: false
+    displayName: "Run in debug mode"
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+variables:
+  - group: "Agent pools (DEV)"
+  - name: system.debug
+    value: "${{ parameters.debug }}"
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      use1esentry: false # Required by the current hosted-pool configuration.
+      LinuxHostVersion:
+        Network: R1
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - stage: CheckEntangledSpecs
+        displayName: "Spec Entanglement Mismatch Check"
+        jobs:
+          - job: CheckEntangledSpecs
+            displayName: "Spec Entanglement Mismatch Check"
+            pool:
+              type: linux
+              isCustom: true
+              name: "$(DEV_AMD64_Managed_NoUMI_AZL3)"
+            variables:
+              ob_outputDirectory: "$(Pipeline.Workspace)/not_used/CheckEntangledSpecs"
+            steps:
+              - checkout: self
+                fetchDepth: 1
+
+              - bash: |
+                  set -euo pipefail
+
+                  echo "Installing Python 3.12 or later."
+                  sudo tdnf install -y python3 python3-pip
+                  python3 -c 'import sys; assert sys.version_info >= (3, 12), sys.version'
+                displayName: "Install Python 3.12 or later"
+
+              - task: PipAuthenticate@1
+                displayName: "Authenticate internal pip feed"
+                inputs:
+                  onlyAddExtraIndex: false
+                  artifactFeeds: "MarinerFeed"
+
+              - bash: |
+                  set -euo pipefail
+
+                  echo "Creating the virtual environment and installing dependencies."
+                  python3 -m venv "$(Agent.TempDirectory)/check-entangled-specs-venv"
+                  source "$(Agent.TempDirectory)/check-entangled-specs-venv/bin/activate"
+                  python -m pip install --quiet -r toolkit/scripts/requirements.txt
+
+                  echo "Running the entangled-spec checker unit tests."
+                  PYTHONPATH=toolkit/scripts python toolkit/scripts/tests/test_check_entangled_specs.py
+
+                  echo "Checking repository spec entanglements."
+                  python toolkit/scripts/check_entangled_specs.py .
+                displayName: "Check entangled specs"

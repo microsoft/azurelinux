@@ -1,0 +1,7 @@
+{
+    "packages": [
+        "edk2-hvloader",
+        "mshv",
+        "mshv-bootloader-lx"
+    ]
+}
