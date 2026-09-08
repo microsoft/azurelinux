@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/editorconfig-checker/editorconfig-checker/v3.11.1/.editorconfig-checker.schema.json",
+  "Exclude": [
+    "^specs/",
+    "^docs/terms/",
+    "^SECURITY\\.md$",
+    "^assets/NOTICE\\.md$"
+  ]
+}
