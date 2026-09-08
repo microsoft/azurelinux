@@ -1,0 +1,8 @@
+[components.nvidia-persistenced]
+spec = { type = "local", path = "nvidia-persistenced.spec" }
+
+[[components.nvidia-persistenced.source-files]]
+filename = "nvidia-persistenced-610.57.04.tar.bz2"
+hash = "f1b4bec67b92e9b83ece3f86217283d88424417b869ae58d2617efedef1c613581ecb6f3fc4a44f096ca451e776d56870c4a8f7336241ccd96c9d3cea1d4b575"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://download.nvidia.com/XFree86/nvidia-persistenced/nvidia-persistenced-610.57.04.tar.bz2" }

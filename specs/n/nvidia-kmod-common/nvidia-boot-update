@@ -1,0 +1,213 @@
+#!/usr/bin/sh
+
+
+# EL8 (grub2 with BootLoaderSpec patches)
+#
+# kernel options: grub.cfg + grubenv
+# kernel options in /boot/loader/entries/*.conf use kernelopts from /boot/grub2/grubenv
+# grubby
+#   - updates kernelopts in /boot/grub2/grubenv
+#   - does not update /etc/default/grub
+#   - does not update kernelopts in grub.cfg
+# grub.cfg:
+#   - UEFI: /etc/grub2-efi.cfg -> /boot/efi/EFI/<os>/grub.cfg
+#   - BIOS: /etc/grub2.cfg -> /boot/grub2/grub.cfg
+
+
+# EL9 + EL10 (grub2 with BootLoaderSpec patches)
+#
+# kernel options: grub.cfg + /etc/kernel/cmdline + /boot/loader/entries/*.conf
+# manually update: /etc/default/grub + /etc/kernel/cmdline
+# /etc/kernel/cmdline is not really used
+# grub2-mkconfig does not update /boot/loader/entries/*.conf
+# grub.cfg:
+#   - UEFI: /etc/grub2-efi.cfg -> /boot/efi/EFI/<os>/grub.cfg
+#   - BIOS: /etc/grub2.cfg -> /boot/grub2/grub.cfg
+
+
+# Fedora (grub2 with BootLoaderSpec patches)
+#
+# kernel options: grub.cfg + /etc/kernel/cmdline + /boot/loader/entries/*.conf
+# manually update: /etc/default/grub
+# grub2-mkconfig:
+#   - updates /boot/loader/entries/*.conf
+#   - updates /etc/kernel/cmdline
+# grub.cfg:
+#   - UEFI/BIOS: /boot/grub2/grub.cfg
+
+
+# Fedora (systemd-boot)
+#
+# kernel options: grub.cfg + /boot/efi/loader/entries/*.conf (UEFI only)
+# grubby as an updateloaderentries alias:
+#   - updates all entries in /boot/efi/loader/entries/*.conf
+#   - does not work with multiple parameters at once
+#   - does not update /etc/kernel/cmdline
+
+
+# Complete use case coverage, regardless of boot loaders:
+#
+#   - update options in /etc/default/grub
+#       - regenerate grub.cfg/grubenv
+#   - update options in /boot/{efi/}loader/entries/*.conf entries
+#   - update options in /etc/kernel/cmdline
+#   - cover both UEFI and BIOS case
+
+CMDLINE_ARGS_NVIDIA="rd.driver.blacklist=nouveau rd.driver.blacklist=nova-core"
+CMDLINE_ARGS_ALWAYS_REMOVE="nomodeset gfxpayload=vga=normal nouveau.modeset=0 nvidia-drm.modeset=1 nvidia-drm.fbdev=1 modprobe.blacklist=nouveau initcall_blacklist=simpledrm_platform_driver_init"
+
+print_usage() {
+cat <<EOF
+Tool to add or remove kernel command line options required for proper operation of the Nvidia driver.
+Its main use is to be called from the %post/%preun scripts of the Nvidia driver packages, but it can also be used in other contexts, for example in a kickstart file after the drivers have been already installed.
+
+Boot loaders supported:
+  - grub 2 with BootLoaderSpec patches (el8, el9, fedora)
+  - systemd-boot (fedora)
+
+Usage: nvidia-update-boot post|preun
+    post        Adjust necessary kernel command line options
+    preun       Remove all kernel command line options
+
+EOF
+}
+
+check() {
+  if [ ! -f /run/ostree-booted ]; then
+
+    if [ -f /etc/default/grub ]; then
+
+      # Grub 2 is installed
+      if [ -d /sys/firmware/efi ]; then
+        GRUB_CFG=/etc/grub2-efi.cfg
+      else
+        GRUB_CFG=/etc/grub2.cfg
+      fi
+
+      # Grub 2 with BootLoaderSpec patches, different path than systemd-boot
+      BLS_ENTRIES=/boot/loader/entries
+
+      . /etc/default/grub
+
+    elif [ ! -f /etc/default/grub ] && [ -f /etc/kernel/cmdline ]; then
+
+      # systemd-boot is installed, differnt path than Grub 2 with BootLoaderSpec patches
+      BLS_ENTRIES=/boot/efi/loader/entries
+
+    else
+
+      echo "Nvidia driver setup: no bootloader configured. Please run 'nvidia-boot-update post' manually."
+
+    fi
+
+  fi
+}
+
+post() {
+
+  # Edit GRUB configuration file
+  if [ -v GRUB_CFG ]; then
+
+    if [ -z "${GRUB_CMDLINE_LINUX}" ]; then
+      echo GRUB_CMDLINE_LINUX=\""$CMDLINE_ARGS_NVIDIA"\" >> /etc/default/grub
+    else
+      for param in $CMDLINE_ARGS_NVIDIA; do
+        echo ${GRUB_CMDLINE_LINUX} | grep -q $param
+        [ $? -eq 1 ] && GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} ${param}"
+      done
+      for param in $CMDLINE_ARGS_ALWAYS_REMOVE; do
+        echo ${GRUB_CMDLINE_LINUX} | grep -q $param
+        [ $? -eq 0 ] && GRUB_CMDLINE_LINUX="$(echo ${GRUB_CMDLINE_LINUX} | sed -e "s/ $param//g")"
+      done
+      sed -i -e "s|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX=\"${GRUB_CMDLINE_LINUX}\"|g" /etc/default/grub
+    fi
+
+    grub2-mkconfig -o $GRUB_CFG &>/dev/null
+
+  fi
+
+  # Edit BootLoaderSpec entries
+  if [ -v BLS_ENTRIES ]; then
+
+    for config_file in $BLS_ENTRIES/*.conf; do
+      for param in $CMDLINE_ARGS_NVIDIA; do
+        grep -q $param $config_file
+        [ $? -eq 1 ] && sed -i -e "s|^options.*|& $param|" $config_file
+      done
+      for param in $CMDLINE_ARGS_ALWAYS_REMOVE; do
+        grep -q $param $config_file
+        [ $? -eq 0 ] && sed -i -e "s| $param||" $config_file
+      done
+    done
+
+  fi
+
+  # Edit /etc/kernel/cmdline
+  if [ -f /etc/kernel/cmdline ]; then
+
+    for param in $CMDLINE_ARGS_NVIDIA; do
+      grep -q $param /etc/kernel/cmdline
+      [ $? -eq 1 ] && sed -i -e "s|^.*|& $param|" /etc/kernel/cmdline
+    done
+    for param in $CMDLINE_ARGS_ALWAYS_REMOVE; do
+      grep -q $param /etc/kernel/cmdline
+      [ $? -eq 0 ] && sed -i -e "s| $param||" /etc/kernel/cmdline
+    done
+
+  fi
+}
+
+preun() {
+
+  # Edit GRUB configuration file
+  if [ -v GRUB_CFG ]; then
+
+    for param in $CMDLINE_ARGS_NVIDIA; do
+      echo ${GRUB_CMDLINE_LINUX} | grep -q $param
+      [ $? -eq 0 ] && GRUB_CMDLINE_LINUX="$(echo ${GRUB_CMDLINE_LINUX} | sed -e "s/ $param//g")"
+    done
+    sed -i -e "s|^GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX=\"${GRUB_CMDLINE_LINUX}\"|g" /etc/default/grub
+
+    grub2-mkconfig -o $GRUB_CFG &>/dev/null
+
+  fi
+
+  # Edit BootLoaderSpec entries
+  if [ -v BLS_ENTRIES ]; then
+
+    for config_file in $BLS_ENTRIES/*.conf; do
+      for param in $CMDLINE_ARGS_NVIDIA; do
+        grep -q $param $config_file
+        [ $? -eq 0 ] && sed -i -e "s| $param||" $config_file
+      done
+    done
+
+  fi
+
+  # Edit /etc/kernel/cmdline
+  if [ -f /etc/kernel/cmdline ]; then
+
+    for param in $CMDLINE_ARGS_NVIDIA; do
+      grep -q $param /etc/kernel/cmdline
+      [ $? -eq 0 ] && sed -i -e "s| $param||" /etc/kernel/cmdline
+    done
+
+  fi
+}
+
+case "$1" in
+  post)
+    check
+    post
+    exit 0
+    ;;
+  preun)
+    check
+    preun
+    exit 0
+    ;;
+  *)
+    print_usage
+    exit 0
+    ;;
+esac

@@ -1,0 +1,2 @@
+[components.nvidia-open]
+spec = { type = "local", path = "nvidia-open.spec" }

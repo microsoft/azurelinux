@@ -1,0 +1,11 @@
+[components.nvidia-kmod-common]
+spec = { type = "local", path = "nvidia-kmod-common.spec" }
+
+# Vendor NVIDIA package; not present upstream. The firmware files are shipped
+# only inside NVIDIA's self-extracting .run installer, so it is used as the
+# source and unpacked in %prep (mirrors nvidia's own nvidia-generate-tarballs.sh).
+[[components.nvidia-kmod-common.source-files]]
+filename = "NVIDIA-Linux-x86_64-610.57.04.run"
+hash = "4c9566625716ba7257ed2203dbbabfbc7a2dfdfc8bcb16678212ec809dc7ff470d12973ad86ce5f925b271d04239425f43088e8e591cb4ed7f77ec0c8612ffc0"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://download.nvidia.com/XFree86/Linux-x86_64/610.57.04/NVIDIA-Linux-x86_64-610.57.04.run" }
