@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -33,6 +33,7 @@ Patch13:	CVE-2026-25680.patch
 Patch14:	CVE-2026-25681.patch
 Patch15:	CVE-2026-42502.patch
 Patch16:	CVE-2026-56852.patch
+Patch17:	CVE-2026-37236.patch
 
 %{?systemd_requires}
 
@@ -109,6 +110,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-8
+- Patch for CVE-2026-37236
+
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.2.4-7
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
   now selected automatically and supports CGO_ENABLED=0 on Linux.
