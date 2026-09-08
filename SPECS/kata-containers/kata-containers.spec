@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.32.0.kata0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -14,11 +14,12 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 Source1:        %{name}-3.32.0.kata1-cargo.tar.gz
 # Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
 Patch0:         dbs-arch-cpuid-unsafe.patch
-Patch1:         CVE-2025-11065.patch
-Patch2:         CVE-2026-41602.patch
-Patch3:         CVE-2026-56852.patch
-Patch4:         CVE-2026-50540.patch
-Patch5:         CVE-2026-77176.patch
+Patch1:         pathrs-tolerate-dot-separated-localversions.patch
+Patch2:         CVE-2025-11065.patch
+Patch3:         CVE-2026-41602.patch
+Patch4:         CVE-2026-56852.patch
+Patch5:         CVE-2026-50540.patch
+Patch6:         CVE-2026-77176.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -53,18 +54,6 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
 
-pushd %{_builddir}/%{name}-%{version}/src/runtime/config
-cp configuration-clh.toml configuration-clh-preview.toml
-cp configuration-clh-debug.toml configuration-clh-preview-debug.toml
-popd
-
-for config_file in \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml; do
-  sed -i 's|^\[hypervisor\.clh\]$|[factory]\nenable_template = true\ntemplate_path = "/run/vc/vm/template"\n\n[hypervisor.clh]|' "${config_file}"
-  sed -i 's|^shared_fs = "virtio-fs"$|shared_fs = "none"|' "${config_file}"
-  sed -i 's|^default_maxmemory = .*$|default_maxmemory = 2048|' "${config_file}"
-done
 
 %define kata_path     /opt/kata-containers
 %define kata_bin      %{_prefix}/local/bin
@@ -77,10 +66,6 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
 PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
-install -m 0644 \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml \
-  %{buildroot}%{defaults_kata}/
 
 %files
 %{kata_bin}/kata-collect-data.sh
@@ -93,8 +78,11 @@ install -m 0644 \
 %{defaults_kata}/configuration-clh-debug.toml
 %{defaults_kata}/configuration-clh-preview.toml
 %{defaults_kata}/configuration-clh-preview-debug.toml
-%{defaults_kata}/configuration-clh-runtime-rs.toml
-%{defaults_kata}/configuration-clh-runtime-rs-debug.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs-debug.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs-v2.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs-v2-debug.toml
+
 
 %{kata_shim_bin}/containerd-shim-kata-v2
 %{kata_shim_bin}/containerd-shim-kata-v2-go
@@ -144,6 +132,12 @@ install -m 0644 \
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Tue Sep 08 2026 Cameron Baird <cameronbaird@microsoft.com> - 3.32.0.kata0-6
+- TEMP to be squashed. Prep for kata-v2 release.
+- Account for node-builder-supplied confix matrix, configuration-clh-azure-runtime-rs..
+- Include patch to vendored pathrs package, fixing incompatibility between its
+    kernel version parsing and the mshv version semantics. 
+
 * Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-5
 - Patch for CVE-2026-77176
 
