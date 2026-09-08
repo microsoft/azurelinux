@@ -83,7 +83,7 @@ Release:        %{ofa_release}.%{_azl_kver}.%{_azl_krel}
 AutoReq:        no
 Provides:  mlnx-ofa_kernel-devel = %{ofa_version}-%{ofa_release}
 Obsoletes: mlnx-ofa_kernel-devel < %{ofa_version}-%{ofa_release}
-Requires:  mlnx-ofa_kernel-source = %{ofa_version}-%{ofa_release}
+Requires:  mlnx-ofa_kernel-source = %{ofa_version}-%{ofa_release}%{?dist}
 Requires:       coreutils
 Requires:       pciutils
 Requires(post): %{_sbindir}/update-alternatives
