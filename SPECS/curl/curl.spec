@@ -1,6 +1,6 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        8.21.0
+Version:        8.22.0
 Release:        1%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
@@ -97,9 +97,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
-* Tue Jul 21 2026 Vijayender Putta <v-vijputta@microsoft.com> - 8.21.0-1
-- Upgrade to 8.21.0
-- Dropped CVE-2025-0167, CVE-2025-0665, CVE-2025-0725 CVE-2025-10148, CVE-2025-14017, CVE-2026-1965, CVE-2026-3783, CVE-2026-3784, CVE-2026-4873, CVE-2026-5545, CVE-2026-6253, CVE-2026-6276, CVE-2026-6429, CVE-2026-7168, CVE-2026-12064, CVE-2026-8926, CVE-2026-8927, CVE-2026-8932, CVE-2026-8458, CVE-2026-10536, CVE-2026-8286, CVE-2026-9079, CVE-2026-11856 patches, dropped patches are covered in this version.
+* Tue Sep 08 2026 Vijayender Putta <v-vijputta@microsoft.com> - 8.22.0-1
+- Remove CVE patches fixed in upstream: CVE-2025-0167, CVE-2025-0665, CVE-2025-0725 CVE-2025-10148, CVE-2025-14017, CVE-2026-1965, CVE-2026-3783, CVE-2026-3784, CVE-2026-4873, CVE-2026-5545, CVE-2026-6253, CVE-2026-6276, CVE-2026-6429, CVE-2026-7168, CVE-2026-12064, CVE-2026-8926, CVE-2026-8927, CVE-2026-8932, CVE-2026-8458, CVE-2026-10536, CVE-2026-8286, CVE-2026-9079, CVE-2026-11856 patches, dropped patches are covered in this version.
+- Upgrade to 8.22.0 for CVE-2026-19931, CVE-2026-80231, CVE-2026-13608, CVE-2026-18924, CVE-2026-82209, CVE-2026-80230.
 
 * Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-11
 - Patch for CVE-2026-11856
