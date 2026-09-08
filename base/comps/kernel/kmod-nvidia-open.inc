@@ -24,7 +24,7 @@ Release:        %{_azl_kver}.%{_azl_krel}
 %global version %{_azl_kver}
 %global release %{_azl_krel}
 AutoReq:        no
-Provides:       nvidia-open-kmod-version = %{nvidia_open_version}
+Provides:       %{nvidia_kmod_name}-kmod-version = %{nvidia_open_version}
 Provides:       nvidia-kmod = %{nvidia_open_version}
 Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
