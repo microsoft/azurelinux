@@ -70,8 +70,7 @@ This module implements the URI class. Objects of this class represent
 updated by RFC 2732).
 
 %prep
-%setup -q -n URI-%{version}
-%patch 0 -p1
+%autosetup -p1 -n URI-%{version}
 chmod -c 644 uri-test
 
 %build
