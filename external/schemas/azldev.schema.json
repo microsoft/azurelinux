@@ -729,6 +729,14 @@
           "$ref": "#/$defs/ImagePublishConfig",
           "title": "Publish settings",
           "description": "Publishing settings for this image"
+        },
+        "architectures": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Architectures",
+          "description": "Architectures supported by this image (optional during repository migration; no project-wide default)"
         }
       },
       "additionalProperties": false,
