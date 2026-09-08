@@ -1,0 +1,15 @@
+{
+    "_comment": "Mirror of core-packages-image.json, except 'shim' is pinned to 15.8. shim 16.1 declares 'Conflicts: mshv-bootloader-lx', which is pulled in by packagelists/nested-virtualization-packages.json. Remove the pin and use core-packages-image.json again once a shim-16.1-compatible lxhvloader ships. See work item 63139272.",
+    "packages": [
+        "shim=15.8",
+        "grub2-efi-binary",
+        "ca-certificates",
+        "cronie-anacron",
+        "logrotate",
+        "core-packages-base-image",
+        "dracut-hostonly",
+        "dracut-vrf",
+        "initramfs",
+        "shadow-utils"
+    ]
+}
