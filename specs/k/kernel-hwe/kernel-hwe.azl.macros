@@ -5,8 +5,8 @@
 %azl_pkgrelease 1
 %config_package_name kernel
 %kabiversion 6.18.13
-%kernel_source_archive kernel-6.18.43.1.tar.gz
-%kernel_source_dir CBL-Mariner-Linux-Kernel-rolling-lts-azl4-hwe-6.18.43.1
+%kernel_source_archive kernel-6.18.48.1.tar.gz
+%kernel_source_dir CBL-Mariner-Linux-Kernel-rolling-lts-azl4-hwe-6.18.48.1
 %kextraversion 1
 %kversion 6
 %libperf_package_name libperf-hwe
@@ -21,5 +21,5 @@
 %rtla_package_name rtla-hwe
 %rv_package_name rv-hwe
 %source_package_name kernel
-%specrpmversion 6.18.43
+%specrpmversion 6.18.48
 %with_azl_config_overrides 1

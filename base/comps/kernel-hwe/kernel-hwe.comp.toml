@@ -22,13 +22,13 @@ source_package_name = "kernel"
 config_package_name = "kernel"
 azl_pkgrelease = "1"
 kextraversion = "1"
-specrpmversion = "6.18.43"
+specrpmversion = "6.18.48"
 patchversion = "6.18"
 kversion = "6"
 patchlevel = "18"
 kabiversion = "6.18.13"
-kernel_source_archive = "kernel-6.18.43.1.tar.gz"
-kernel_source_dir = "CBL-Mariner-Linux-Kernel-rolling-lts-azl4-hwe-6.18.43.1"
+kernel_source_archive = "kernel-6.18.48.1.tar.gz"
+kernel_source_dir = "CBL-Mariner-Linux-Kernel-rolling-lts-azl4-hwe-6.18.48.1"
 azl_config_prefix = "6.18"
 azl_config_override_prefix = "6.18-hwe"
 with_azl_config_overrides = "1"
@@ -43,11 +43,29 @@ rv_package_name = "rv-hwe"
 nvidia_kmod_name = "nvidia-open-hwe"
 nvidia_kmod_matched_name = "kmod-nvidia-open-hwe-matched"
 
+# Source acquisition processes the shared kernel manifest before render
+# filtering, so give its inherited entries their canonical source locations.
 [[components.kernel-hwe.source-files]]
-filename = "kernel-6.18.43.1.tar.gz"
-hash = "6941bcc7dc0b5e329b3a2bab967705e8c1eb1cb8ebe89a30d11c0db8dbb6c3ef68d6124c855f9912a27476335dd343c47b52209b252a36c2203842fc544b2b6d"
+filename = "linux-6.18.13.tar.xz"
+hash = "a1d1b27391ed55ae2b17dd25841037d3399e4d87900eb098af45b5b6bcedc095626971d069ff7a9daf46b6379705f3b88076206ecac68600bd04a35e7872440b"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4-hwe/6.18.43.1.tar.gz" }
+origin = { type = "download", uri = "https://src.fedoraproject.org/repo/pkgs/kernel/linux-6.18.13.tar.xz/sha512/a1d1b27391ed55ae2b17dd25841037d3399e4d87900eb098af45b5b6bcedc095626971d069ff7a9daf46b6379705f3b88076206ecac68600bd04a35e7872440b/linux-6.18.13.tar.xz" }
+replace-upstream = true
+replace-reason = "The shared source manifest retains this Fedora archive; use the original kernel namespace because kernel-hwe has no Fedora lookaside namespace."
+
+[[components.kernel-hwe.source-files]]
+filename = "kernel-6.18.45.1.tar.gz"
+hash = "710483b7d6cdb6bf06f686d457fb9f361421295c115a8adb6f71bb80c55c2bf42046d4fc747aa399c4d7d0b0b3dcf493bd66df399e423c34e5c6b80fc2c70dac"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.45.1.tar.gz" }
+replace-upstream = true
+replace-reason = "The shared source manifest includes the normal kernel archive; preserve its canonical URI because source acquisition occurs before HWE render filtering."
+
+[[components.kernel-hwe.source-files]]
+filename = "kernel-6.18.48.1.tar.gz"
+hash = "4784e2716a1483e4cff28171d49712fa91a19469db922895c94e290f8d2a61c034fcc7818318c0437afb07c87b7bd5a5acf7bb08edf761e22964f597c6f51ecd"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4-hwe/6.18.48.1.tar.gz" }
 
 # NVIDIA open GPU kernel module source tarball.
 [[components.kernel-hwe.source-files]]
