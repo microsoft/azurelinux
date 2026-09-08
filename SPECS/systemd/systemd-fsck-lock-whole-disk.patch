@@ -4,10 +4,16 @@ partitions during filesystem repair.
 Wait up to 60 seconds for the lock. If the timeout expires, warn and run
 the filesystem check without the lock to preserve the previous behavior.
 
-Do not combine this implementation with native e2fsprogs (e2fsck)
-whole-disk locking. systemd-fsck retains its lock descriptor while waiting
-for fsck, so an independently opened exclusive lock in the child would
-deadlock.
+This downstream workaround tracks the competing upstream proposals:
+
+- https://github.com/systemd/systemd/issues/43695
+- https://github.com/systemd/systemd/pull/43696
+- https://lore.kernel.org/linux-ext4/20260824224006.GB6038@frogsfrogsfrogs/t/
+
+Remove this patch when the selected upstream solution is integrated. It
+cannot coexist with native e2fsprogs (e2fsck) whole-disk locking:
+systemd-fsck retains its lock descriptor while waiting for fsck, so an
+independently opened exclusive lock in the child would deadlock.
 
 diff --git a/src/fsck/fsck.c b/src/fsck/fsck.c
 index 000ed69..8eb209a 100644
