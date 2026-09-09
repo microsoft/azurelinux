@@ -1,0 +1,500 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dallas Delaney <dadelan@microsoft.com>
+Date: Wed, 9 Sep 2026 02:54:39 +0000
+Subject: [PATCH 4/4] cri: integrate signed runtime snapshotters
+
+Refresh cached snapshotter state after unpack, propagate runtime-only snapshotter mappings and capabilities safely, derive local-pull signed-referrer handling from the selected snapshotter and diff service, preserve Azure Linux multi-snapshotter aliases, and reject deterministic required-policy mismatches without affecting overlayfs pulls.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+Copilot-Session: 925784b1-44a7-4d56-b04f-e527d2e0879f
+---
+ internal/cri/opts/container.go           |  14 ++-
+ internal/cri/server/images/image_pull.go |  31 +++++-
+ internal/cri/server/images/service.go    |  66 +++++++++++--
+ internal/cri/server/service.go           |   2 +-
+ internal/cri/store/image/image.go        |  10 +-
+ plugins/cri/cri.go                       |   6 +-
+ plugins/cri/images/plugin.go             | 121 +++++++++++++++++++++--
+ 7 files changed, 230 insertions(+), 20 deletions(-)
+
+diff --git a/internal/cri/opts/container.go b/internal/cri/opts/container.go
+index 563d2a9835f8afa83f45977f3a6bf9f1d5d296eb..b92242a886165057b739617845436f569ce1c3a5 100644
+--- a/internal/cri/opts/container.go
++++ b/internal/cri/opts/container.go
+@@ -21,6 +21,7 @@ import (
+ 	"errors"
+ 	"fmt"
+ 	"os"
++	"slices"
+ 	"strings"
+ 
+ 	"github.com/containerd/continuity/fs"
+@@ -37,6 +38,7 @@ import (
+ 	"github.com/containerd/containerd/v2/core/snapshots"
+ 	"github.com/containerd/containerd/v2/core/unpack"
+ 	snpkg "github.com/containerd/containerd/v2/pkg/snapshotters"
++	containerdplugins "github.com/containerd/containerd/v2/plugins"
+ )
+ 
+ // WithNewSnapshot wraps `containerd.WithNewSnapshot` so that if creating the
+@@ -65,11 +67,14 @@ func unpackImage(ctx context.Context, client *containerd.Client, i containerd.Im
+ 	}
+ 	defer done(ctx)
+ 
+-	matcher := platforms.Default()
++	matcher := i.Platform()
++	if matcher == nil {
++		matcher = platforms.Default()
++	}
+ 
+-	capabilities, err := client.GetSnapshotterCapabilities(ctx, snapshotter)
++	capabilities, err := client.GetUnpackSnapshotterCapabilities(ctx, snapshotter)
+ 	if err != nil {
+-		return err
++		return fmt.Errorf("validate dm-verity unpack configuration: %w", err)
+ 	}
+ 
+ 	u, err := unpack.NewUnpacker(
+@@ -93,6 +98,9 @@ func unpackImage(ctx context.Context, client *containerd.Client, i containerd.Im
+ 	childrenHandler = images.LimitManifests(childrenHandler, matcher, 1)
+ 
+ 	var h images.Handler = childrenHandler
++	if slices.Contains(capabilities, containerdplugins.CapabilityDmverityReferrers) {
++		h = snpkg.AppendCachedSignatureHandlerWrapper(i.ContentStore())(h)
++	}
+ 	if appendSnapshotLabels {
+ 		h = snpkg.AppendInfoHandlerWrapper(i.Name())(h)
+ 	}
+diff --git a/internal/cri/server/images/image_pull.go b/internal/cri/server/images/image_pull.go
+index 5889f6f1660558d3cba2bd5ca6ee5efd8f576725..ff1137e81ba8ad214b9152176132957d001a4042 100644
+--- a/internal/cri/server/images/image_pull.go
++++ b/internal/cri/server/images/image_pull.go
+@@ -25,6 +25,7 @@ import (
+ 	"net/http"
+ 	"net/url"
+ 	"path/filepath"
++	"slices"
+ 	"strconv"
+ 	"strings"
+ 	"sync"
+@@ -54,6 +55,7 @@ import (
+ 	"github.com/containerd/containerd/v2/internal/cri/util"
+ 	snpkg "github.com/containerd/containerd/v2/pkg/snapshotters"
+ 	"github.com/containerd/containerd/v2/pkg/tracing"
++	"github.com/containerd/containerd/v2/plugins"
+ )
+ 
+ // For image management:
+@@ -264,9 +266,32 @@ func (c *CRIImageService) pullImageWithLocalPull(
+ 	}
+ 
+ 	pullOpts = append(pullOpts, c.encryptedImagesPullOpts()...)
++	// WithImageHandlerWrapper stores a single wrapper, so each caller would
++	// overwrite the last. Compose them into one instead: enabling dm-verity
++	// referrers must not silently drop the remote-snapshot annotations.
++	var handlerWrappers []func(containerdimages.Handler) containerdimages.Handler
+ 	if !c.config.DisableSnapshotAnnotations {
+-		pullOpts = append(pullOpts,
+-			containerd.WithImageHandlerWrapper(snpkg.AppendInfoHandlerWrapper(ref)))
++		handlerWrappers = append(handlerWrappers, snpkg.AppendInfoHandlerWrapper(ref))
++	}
++	capabilities, err := c.effectiveSnapshotterCapabilities(snapshotter)
++	if err != nil {
++		return nil, fmt.Errorf("validate dm-verity pull configuration: %w", err)
++	}
++	if slices.Contains(capabilities, plugins.CapabilityDmverityReferrers) {
++		handlerWrappers = append(handlerWrappers, snpkg.AppendRetainedSignatureHandlerWrapperFromResolver(
++			resolver,
++			ref,
++			c.content,
++		))
++	}
++	if len(handlerWrappers) > 0 {
++		pullOpts = append(pullOpts, containerd.WithImageHandlerWrapper(
++			func(h containerdimages.Handler) containerdimages.Handler {
++				for i := len(handlerWrappers) - 1; i >= 0; i-- {
++					h = handlerWrappers[i](h)
++				}
++				return h
++			}))
+ 	}
+ 
+ 	if c.config.DiscardUnpackedLayers {
+@@ -863,6 +888,8 @@ func (c *CRIImageService) snapshotterFromPodSandboxConfig(ctx context.Context, i
+ 			annotations.RuntimeHandler)
+ 	}
+ 
++	c.runtimePlatformsMu.RLock()
++	defer c.runtimePlatformsMu.RUnlock()
+ 	if c.runtimePlatforms != nil {
+ 		if p, ok := c.runtimePlatforms[runtimeHandler]; ok && p.Snapshotter != snapshotter {
+ 			snapshotter = p.Snapshotter
+diff --git a/internal/cri/server/images/service.go b/internal/cri/server/images/service.go
+index 9654d206ac0e16dcb39d54557420063442be9810..e702c8e0d853d033f29417bbe4b4ca6b3a6ed764 100644
+--- a/internal/cri/server/images/service.go
++++ b/internal/cri/server/images/service.go
+@@ -18,6 +18,9 @@ package images
+ 
+ import (
+ 	"context"
++	"fmt"
++	"slices"
++	"sync"
+ 	"time"
+ 
+ 	containerd "github.com/containerd/containerd/v2/client"
+@@ -29,6 +32,7 @@ import (
+ 	imagestore "github.com/containerd/containerd/v2/internal/cri/store/image"
+ 	snapshotstore "github.com/containerd/containerd/v2/internal/cri/store/snapshot"
+ 	"github.com/containerd/containerd/v2/internal/kmutex"
++	"github.com/containerd/containerd/v2/plugins"
+ 	"github.com/containerd/log"
+ 	"github.com/containerd/platforms"
+ 	"golang.org/x/sync/semaphore"
+@@ -58,13 +62,22 @@ type CRIImageService struct {
+ 	// images is the lower level image store used for raw storage,
+ 	// no event publishing should currently be assumed
+ 	images images.Store
++	// content is the content store used to retain auxiliary image artifacts.
++	content content.Store
+ 	// client is a subset of the containerd client
+ 	// and will be replaced by image store and transfer service
+ 	client imageClient
+ 	// imageFSPaths contains path to image filesystem for snapshotters.
+ 	imageFSPaths map[string]string
+ 	// runtimePlatforms are the platforms configured for a runtime.
+-	runtimePlatforms map[string]ImagePlatform
++	runtimePlatforms   map[string]ImagePlatform
++	runtimePlatformsMu sync.RWMutex
++	// snapshotterCapabilities are the capabilities advertised by each configured
++	// snapshotter plugin.
++	snapshotterCapabilities map[string][]string
++	// diffServiceCapabilities are advertised by the selected diff-service
++	// applier chain.
++	diffServiceCapabilities []string
+ 	// imageStore stores all resources associated with images.
+ 	imageStore *imagestore.Store
+ 	// snapshotStore stores information of all snapshots.
+@@ -95,6 +108,10 @@ type CRIImageServiceOptions struct {
+ 
+ 	Snapshotters map[string]snapshots.Snapshotter
+ 
++	SnapshotterCapabilities map[string][]string
++
++	DiffServiceCapabilities []string
++
+ 	Client imageClient
+ 
+ 	Transferrer transfer.Transferrer
+@@ -118,10 +135,13 @@ func NewService(config criconfig.ImageConfig, options *CRIImageServiceOptions) (
+ 	svc := CRIImageService{
+ 		config:                      config,
+ 		images:                      options.Images,
++		content:                     options.Content,
+ 		client:                      options.Client,
+ 		imageStore:                  imagestore.NewStore(options.Images, options.Content, platforms.Default()),
+ 		imageFSPaths:                options.ImageFSPaths,
+ 		runtimePlatforms:            options.RuntimePlatforms,
++		snapshotterCapabilities:     options.SnapshotterCapabilities,
++		diffServiceCapabilities:     options.DiffServiceCapabilities,
+ 		snapshotStore:               snapshotstore.NewStore(),
+ 		transferrer:                 options.Transferrer,
+ 		unpackDuplicationSuppressor: kmutex.New(),
+@@ -142,19 +162,53 @@ func NewService(config criconfig.ImageConfig, options *CRIImageServiceOptions) (
+ // UpdateRuntimeSnapshotter adds or updates the snapshotter mapping for a runtime.
+ // This is called by the main CRI plugin after both image and runtime plugins are initialized,
+ // to propagate runtime-specific snapshotters configured in the runtime plugin's config.
+-func (c *CRIImageService) UpdateRuntimeSnapshotter(runtimeName string, imagePlatform ImagePlatform) {
++func (c *CRIImageService) UpdateRuntimeSnapshotter(runtimeName string, imagePlatform ImagePlatform, snapshotterCapabilities []string) {
++	c.runtimePlatformsMu.Lock()
++	defer c.runtimePlatformsMu.Unlock()
++
+ 	if c.runtimePlatforms == nil {
+ 		c.runtimePlatforms = make(map[string]ImagePlatform)
+ 	}
+-	// Don't override if already configured
+-	if _, exists := c.runtimePlatforms[runtimeName]; exists {
+-		log.L.Debugf("Runtime %q already has snapshotter configured, not overriding", runtimeName)
+-		return
++	if c.snapshotterCapabilities == nil {
++		c.snapshotterCapabilities = make(map[string][]string)
+ 	}
+ 	c.runtimePlatforms[runtimeName] = imagePlatform
++	if snapshotterCapabilities != nil {
++		c.snapshotterCapabilities[imagePlatform.Snapshotter] = append([]string(nil), snapshotterCapabilities...)
++	}
+ 	log.L.Infof("Registered runtime %q with snapshotter %q", runtimeName, imagePlatform.Snapshotter)
+ }
+ 
++func (c *CRIImageService) effectiveSnapshotterCapabilities(snapshotter string) ([]string, error) {
++	c.runtimePlatformsMu.RLock()
++	defer c.runtimePlatformsMu.RUnlock()
++
++	snapshotterCapabilities := c.snapshotterCapabilities[snapshotter]
++	diffSupportsDmverity := slices.Contains(c.diffServiceCapabilities, plugins.CapabilityDmverityReferrers)
++	snapshotterUsesErofs := slices.Contains(snapshotterCapabilities, plugins.CapabilityErofsLayers)
++	snapshotterRequiresDmverity := slices.Contains(snapshotterCapabilities, plugins.CapabilityDmveritySignaturesRequired)
++	if snapshotterRequiresDmverity && !diffSupportsDmverity {
++		return nil, fmt.Errorf("snapshotter %q requires dm-verity signatures but the diff service cannot materialize protected layers", snapshotter)
++	}
++	if snapshotterUsesErofs &&
++		slices.Contains(c.diffServiceCapabilities, plugins.CapabilityDmveritySignaturesRequired) &&
++		!snapshotterRequiresDmverity {
++		return nil, fmt.Errorf("diff service requires dm-verity signatures but snapshotter %q permits plain mounts", snapshotter)
++	}
++	if diffSupportsDmverity {
++		return append([]string(nil), snapshotterCapabilities...), nil
++	}
++
++	effective := make([]string, 0, len(snapshotterCapabilities))
++	for _, capability := range snapshotterCapabilities {
++		if capability != plugins.CapabilityDmverityReferrers &&
++			capability != plugins.CapabilityDmveritySignaturesRequired {
++			effective = append(effective, capability)
++		}
++	}
++	return effective, nil
++}
++
+ // LocalResolve resolves image reference locally and returns corresponding image metadata. It
+ // returns errdefs.ErrNotFound if the reference doesn't exist.
+ func (c *CRIImageService) LocalResolve(refOrID string) (imagestore.Image, error) {
+diff --git a/internal/cri/server/service.go b/internal/cri/server/service.go
+index ba462a574d60be138f0d6bb0410029c8a80486af..eb587b7df432c5b2edc197330594cf22c658e56e 100644
+--- a/internal/cri/server/service.go
++++ b/internal/cri/server/service.go
+@@ -115,7 +115,7 @@ type ImageService interface {
+ 
+ 	Config() criconfig.ImageConfig
+ 
+-	UpdateRuntimeSnapshotter(runtimeName string, imagePlatform images.ImagePlatform)
++	UpdateRuntimeSnapshotter(runtimeName string, imagePlatform images.ImagePlatform, snapshotterCapabilities []string)
+ }
+ 
+ // criService implements CRIService.
+diff --git a/internal/cri/store/image/image.go b/internal/cri/store/image/image.go
+index 2773c92f84244424d8639e4ea88b58308ae5f85c..3d6cbd4b2943a555526b0ce37466c79503074273 100644
+--- a/internal/cri/store/image/image.go
++++ b/internal/cri/store/image/image.go
+@@ -133,7 +133,14 @@ func (s *Store) update(ref string, img *Image) error {
+ 	}
+ 	if oldExist {
+ 		if oldID == img.ID {
+-			if s.store.isPinned(img.ID, ref) == img.Pinned {
++			wasPinned := s.store.isPinned(img.ID, ref)
++			// Unpacking into another snapshotter updates the config labels
++			// without changing the image ID. Refresh that cached metadata
++			// before taking the pin-only fast path.
++			if err := s.store.add(*img); err != nil {
++				return err
++			}
++			if wasPinned == img.Pinned {
+ 				return nil
+ 			}
+ 			if img.Pinned {
+@@ -274,6 +281,7 @@ func (s *store) add(img Image) error {
+ 	// Or else, merge and sort the references.
+ 	i.References = docker.Sort(util.MergeStringSlices(i.References, img.References))
+ 	i.Pinned = i.Pinned || img.Pinned
++	i.Snapshotters = img.Snapshotters
+ 	s.images[img.ID] = i
+ 	return nil
+ }
+diff --git a/plugins/cri/cri.go b/plugins/cri/cri.go
+index e2872d4b4f8dadf50e28faf3ff653cc6a2ae5368..4465562ed43406d0221e6dc8b6e2058251d225e8 100644
+--- a/plugins/cri/cri.go
++++ b/plugins/cri/cri.go
+@@ -95,7 +95,11 @@ func initCRIService(ic *plugin.InitContext) (any, error) {
+ 				Snapshotter: rt.Snapshotter,
+ 				Platform:    platforms.DefaultSpec(),
+ 			}
+-			imageSvc.UpdateRuntimeSnapshotter(runtimeName, imagePlatform)
++			var capabilities []string
++			if snapshotterPlugin := ic.Plugins().Get(plugins.SnapshotPlugin, rt.Snapshotter); snapshotterPlugin != nil {
++				capabilities = snapshotterPlugin.Meta.Capabilities
++			}
++			imageSvc.UpdateRuntimeSnapshotter(runtimeName, imagePlatform, capabilities)
+ 		}
+ 	}
+ 
+diff --git a/plugins/cri/images/plugin.go b/plugins/cri/images/plugin.go
+index 8be9b6285f445230bbcae5c717ffdc2de3e3fa7b..278ea845b93d561fc98a7a4ee61daa3d7dbbb326 100644
+--- a/plugins/cri/images/plugin.go
++++ b/plugins/cri/images/plugin.go
+@@ -21,6 +21,8 @@ import (
+ 	"fmt"
+ 	"path/filepath"
+ 	"runtime"
++	"slices"
++	"strings"
+ 
+ 	containerd "github.com/containerd/containerd/v2/client"
+ 	"github.com/containerd/containerd/v2/core/metadata"
+@@ -30,6 +32,7 @@ import (
+ 	"github.com/containerd/containerd/v2/internal/cri/constants"
+ 	"github.com/containerd/containerd/v2/internal/cri/server/images"
+ 	"github.com/containerd/containerd/v2/plugins"
++	"github.com/containerd/containerd/v2/plugins/services"
+ 	"github.com/containerd/containerd/v2/plugins/services/warning"
+ 	"github.com/containerd/containerd/v2/version"
+ 	"github.com/containerd/log"
+@@ -46,6 +49,7 @@ func init() {
+ 		ID:     "images",
+ 		Config: &config,
+ 		Requires: []plugin.Type{
++			plugins.DiffPlugin, // For deriving dm-verity referrer discovery
+ 			plugins.LeasePlugin,
+ 			plugins.MetadataPlugin,
+ 			plugins.SandboxStorePlugin,
+@@ -61,6 +65,18 @@ func init() {
+ 			}
+ 			mdb := m.(*metadata.DB)
+ 
++			// Referrer discovery is derived from both sides of the signed EROFS
++			// path: a differ that consumes the artifacts and an active snapshotter
++			// that mounts the result.
++			dmverityDifferAvailable := false
++			for _, p := range ic.Plugins().GetAll() {
++				if p.Registration.Type == plugins.DiffPlugin &&
++					slices.Contains(p.Meta.Capabilities, plugins.CapabilityDmverityReferrers) {
++					dmverityDifferAvailable = true
++					break
++				}
++			}
++
+ 			// only set the default value of config path, if both mirrors and
+ 			// config path are empty and we are on Linux.
+ 			// This also makes sure that if the loaded config already contains both config path and mirrors
+@@ -88,17 +104,102 @@ func init() {
+ 				criconfig.CheckLocalImagePullConfigs(ic.Context, &config)
+ 			}
+ 
++			snapshotters := map[string]struct{}{config.Snapshotter: {}}
++			for _, platform := range config.RuntimePlatforms {
++				name := platform.Snapshotter
++				if name == "" {
++					name = config.Snapshotter
++				}
++				snapshotters[name] = struct{}{}
++			}
++			var dmveritySnapshotters, requiredSnapshotters, erofsSnapshotters []string
++			for name := range snapshotters {
++				p := ic.Plugins().Get(plugins.SnapshotPlugin, name)
++				if p == nil {
++					continue
++				}
++				if slices.Contains(p.Meta.Capabilities, plugins.CapabilityErofsLayers) {
++					erofsSnapshotters = append(erofsSnapshotters, name)
++				}
++				if slices.Contains(p.Meta.Capabilities, plugins.CapabilityDmverityReferrers) {
++					dmveritySnapshotters = append(dmveritySnapshotters, name)
++				}
++				if slices.Contains(p.Meta.Capabilities, plugins.CapabilityDmveritySignaturesRequired) {
++					requiredSnapshotters = append(requiredSnapshotters, name)
++				}
++			}
++			slices.Sort(dmveritySnapshotters)
++			slices.Sort(requiredSnapshotters)
++			slices.Sort(erofsSnapshotters)
++
++			if dmverityDifferAvailable || len(requiredSnapshotters) > 0 {
++				ds, err := ic.GetByID(plugins.ServicePlugin, services.DiffService)
++				if err != nil {
++					return nil, fmt.Errorf("validate dm-verity diff service: %w", err)
++				}
++				reporter, ok := ds.(interface {
++					DmverityAppliers() (ordered []string, capable []string)
++				})
++				if !ok {
++					return nil, fmt.Errorf("diff service cannot report dm-verity applier capabilities")
++				}
++				ordered, capable := reporter.DmverityAppliers()
++				selectedCapable := len(ordered) > 0 && len(capable) > 0 && ordered[0] == capable[0]
++
++				if len(requiredSnapshotters) > 0 && !selectedCapable {
++					return nil, fmt.Errorf(
++						"snapshotter(s) [%s] require dm-verity signatures but the diff service applier chain [%s] "+
++							"cannot materialize protected layers",
++						strings.Join(requiredSnapshotters, ", "),
++						strings.Join(ordered, ", "),
++					)
++				}
++				if dmverityDifferAvailable && len(dmveritySnapshotters) > 0 && !selectedCapable {
++					return nil, fmt.Errorf(
++						"dm-verity referrer discovery is enabled but the diff service applier chain [%s] "+
++							"cannot consume dm-verity artifacts during local or deferred unpack; add a "+
++							"dm-verity capable differ to "+
++							"[plugins.\"io.containerd.service.v1.diff-service\"] default",
++						strings.Join(ordered, ", "))
++				}
++				if requiredReporter, ok := ds.(interface {
++					DmveritySignaturesRequired() bool
++				}); ok && requiredReporter.DmveritySignaturesRequired() {
++					var incompatible []string
++					for _, name := range erofsSnapshotters {
++						p := ic.Plugins().Get(plugins.SnapshotPlugin, name)
++						if p == nil || !slices.Contains(p.Meta.Capabilities, plugins.CapabilityDmveritySignaturesRequired) {
++							incompatible = append(incompatible, name)
++						}
++					}
++					if len(incompatible) > 0 {
++						return nil, fmt.Errorf(
++							"dm-verity signatures are required but EROFS snapshotter(s) [%s] permit plain mounts; "+
++								"set enable_dmverity_referrers = true and require_signatures = true",
++							strings.Join(incompatible, ", "),
++						)
++					}
++				}
++				if dmverityDifferAvailable && len(dmveritySnapshotters) > 0 {
++					log.G(ic.Context).Debugf(
++						"enabling dm-verity referrer discovery for snapshotter(s) [%s]",
++						strings.Join(dmveritySnapshotters, ", "),
++					)
++				}
++			}
++
+ 			ts, err := ic.GetSingle(plugins.TransferPlugin)
+ 			if err != nil {
+ 				return nil, err
+ 			}
+ 
+ 			options := &images.CRIImageServiceOptions{
+-				Content:          mdb.ContentStore(),
+-				RuntimePlatforms: map[string]images.ImagePlatform{},
+-				Snapshotters:     map[string]snapshots.Snapshotter{},
+-				ImageFSPaths:     map[string]string{},
+-				Transferrer:      ts.(transfer.Transferrer),
++				Content:                 mdb.ContentStore(),
++				RuntimePlatforms:        map[string]images.ImagePlatform{},
++				Snapshotters:            map[string]snapshots.Snapshotter{},
++				SnapshotterCapabilities: map[string][]string{},
++				ImageFSPaths:            map[string]string{},
++				Transferrer:             ts.(transfer.Transferrer),
+ 			}
+ 
+ 			ctrdCli, err := containerd.New(
+@@ -114,6 +215,15 @@ func init() {
+ 			options.Client = ctrdCli
+ 
+ 			allSnapshotters := mdb.Snapshotters()
++			for name := range allSnapshotters {
++				if p := ic.Plugins().Get(plugins.SnapshotPlugin, name); p != nil {
++					options.SnapshotterCapabilities[name] = append([]string(nil), p.Meta.Capabilities...)
++				}
++			}
++			if p := ic.Plugins().Get(plugins.ServicePlugin, services.DiffService); p != nil {
++				options.DiffServiceCapabilities = append([]string(nil), p.Meta.Capabilities...)
++			}
++
+ 			defaultSnapshotter := config.Snapshotter
+ 			if s, ok := allSnapshotters[defaultSnapshotter]; ok {
+ 				options.Snapshotters[defaultSnapshotter] = s
+@@ -145,7 +255,6 @@ func init() {
+ 					options.ImageFSPaths[snapshotter] = snapshotRoot(snapshotter)
+ 					log.L.Infof("Get image filesystem path %q for snapshotter %q", options.ImageFSPaths[snapshotter], snapshotter)
+ 				}
+-
+ 				platform := platforms.DefaultSpec()
+ 				if rp.Platform != "" {
+ 					p, err := platforms.Parse(rp.Platform)

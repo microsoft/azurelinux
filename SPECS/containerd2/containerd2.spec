@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.3.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -20,6 +20,11 @@ Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
 Patch2:	fix-TestCgroupNamespace-cgroupv1.patch
 Patch3:	CVE-2026-56852.patch
+Patch4:	0001-erofs-add-signed-dm-verity-mapper-foundation.patch
+Patch5:	0002-erofs-consume-signed-referrer-materializations.patch
+Patch6:	0003-remotes-bound-OCI-referrers-traversal.patch
+Patch7:	0004-cri-integrate-signed-runtime-snapshotters.patch
+Patch8:	0005-tests-cover-signed-EROFS-referrer-lifecycle.patch
 
 %{?systemd_requires}
 
@@ -101,6 +106,11 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Sep 09 2026 Dallas Delaney <dadelan@microsoft.com> - 2.3.4-2
+- Add default-off signed EROFS/dm-verity referrer support.
+- Add bounded OCI referrer traversal and runtime snapshotter integration.
+- Preserve the ordinary overlayfs path and cover the new lifecycle in %check.
+
 * Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
 - Upgrade to 2.3.4
 - Remove CVE patches fixed upstream
