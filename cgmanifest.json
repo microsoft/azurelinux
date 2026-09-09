@@ -29036,8 +29036,8 @@
         "type": "other",
         "other": {
           "name": "libkeysinuse",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.11.0.tar.gz"
+          "version": "1.11.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.11.1.tar.gz"
         }
       }
     },
