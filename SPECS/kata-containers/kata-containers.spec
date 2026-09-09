@@ -51,7 +51,7 @@ This package contains the scripts and files required to build the UVM
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-%make_build package
+%make_build RELEASE_VERSION=%{version}-%{release} package
 popd
 
 
@@ -63,8 +63,8 @@ popd
 
 %install
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
-PREFIX=%{buildroot} %make_build deploy-package-tools
+START_SERVICES=no PREFIX=%{buildroot} %make_build RELEASE_VERSION=%{version}-%{release} deploy-package
+PREFIX=%{buildroot} %make_build RELEASE_VERSION=%{version}-%{release} deploy-package-tools
 popd
 
 %files
@@ -137,6 +137,8 @@ popd
 - Account for node-builder-supplied confix matrix, configuration-clh-azure-runtime-rs..
 - Include patch to vendored pathrs package, fixing incompatibility between its
     kernel version parsing and the mshv version semantics. 
+- Pass RELEASE_VERSION=%{version}-%{release} to make commands so that
+    kata-runtime compiles in the exact distro version string. 
 
 * Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-5
 - Patch for CVE-2026-77176
