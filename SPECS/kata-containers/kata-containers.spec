@@ -13,13 +13,12 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 # This is a temporary workaround so we can use a newer cargo tarball without having to make a new fork release
 Source1:        %{name}-4.1.0.kata1-cargo.tar.gz
 # Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
-Patch0:         dbs-arch-cpuid-unsafe.patch
-Patch1:         pathrs-tolerate-dot-separated-localversions.patch
-Patch2:         CVE-2025-11065.patch
-Patch3:         CVE-2026-41602.patch
-Patch4:         CVE-2026-56852.patch
-Patch5:         CVE-2026-50540.patch
-Patch6:         CVE-2026-77176.patch
+Patch0:         pathrs-tolerate-dot-separated-localversions.patch
+Patch1:         CVE-2025-11065.patch
+Patch2:         CVE-2026-41602.patch
+Patch3:         CVE-2026-56852.patch
+Patch4:         CVE-2026-50540.patch
+Patch5:         CVE-2026-77176.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
