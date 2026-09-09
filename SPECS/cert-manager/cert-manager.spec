@@ -151,12 +151,6 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 * Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-9
 - Patch for CVE-2026-33814
 
-* Thu Feb 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-6
-- Patch for CVE-2025-58190, CVE-2025-47911
-
-* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-5
-- Patch for CVE-2025-11065
-
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-8
 - Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 
