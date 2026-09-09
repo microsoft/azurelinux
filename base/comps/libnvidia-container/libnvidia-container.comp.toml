@@ -1,0 +1,25 @@
+[components.libnvidia-container]
+spec = { type = "local", path = "libnvidia-container.spec" }
+release = { calculation = "autorelease" }
+
+[[components.libnvidia-container.source-files]]
+filename = "libnvidia-container-1.20.0.tar.gz"
+hash = "a46eeebda8ee60c21aee8c11caefdd0458cffd2e21e90bc7e9cecc92b444bd8abd440f0c46f0f1c3d4e61e73050b884a0ed1d42b137b2236e42ec20e77b9bff6"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/NVIDIA/libnvidia-container/archive/refs/tags/v1.20.0.tar.gz" }
+
+# modprobe-utils helper sources vendored by upstream's mk/nvidia-modprobe.mk
+# (independent pin from this repo's own nvidia-modprobe component).
+[[components.libnvidia-container.source-files]]
+filename = "nvidia-modprobe-550.54.14.tar.gz"
+hash = "279228aa315ff5fd1a23df23527aff58b2319f11f9fc7d939fa285ea933b4cc6d223451e20ecf7f50baba9f6c9c100e57cb77675d0d17fa77f19d3fea2ccc193"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/NVIDIA/nvidia-modprobe/archive/550.54.14.tar.gz" }
+
+# Vendored and statically linked per upstream's mk/libtirpc.mk; there is no
+# system-libtirpc build option.
+[[components.libnvidia-container.source-files]]
+filename = "libtirpc-1.3.2.tar.bz2"
+hash = "8664d5c4f842ee5acf83b9c1cadb7871f17b8157a7c4500e2236dcfb3a25768cab39f7c5123758dcd7381e30eb028ddfa26a28f458283f2dcea3426c9878c255"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://downloads.sourceforge.net/project/libtirpc/libtirpc/1.3.2/libtirpc-1.3.2.tar.bz2" }
