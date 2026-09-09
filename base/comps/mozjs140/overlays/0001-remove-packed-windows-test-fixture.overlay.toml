@@ -1,0 +1,32 @@
+# One logical change: drop the packed Windows PE media-sniffer test fixture and the
+# two references to it. The fixture is a 512-byte truncated, UPX-packed Win32 installer
+# used as a negative test case (regression test for bug 875769). This package builds
+# SpiderMonkey from js/src only — toolkit/components/mediasniffer is never built and
+# %check runs only jstests.py and jit_test.py — so nothing here reads the file, and it
+# is not shipped in any binary RPM. The registration and test case are removed with it
+# so no dangling reference is left behind.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove packed Windows executable media-sniffer test fixture"
+type = "file-remove"
+archive = "firefox-140.6.0esr.source.tar.xz"
+file = "toolkit/components/mediasniffer/test/unit/data/ff-inst.exe"
+
+[[overlays]]
+description = "Drop the removed fixture from the xpcshell support-files list"
+type = "file-search-replace"
+archive = "firefox-140.6.0esr.source.tar.xz"
+file = "toolkit/components/mediasniffer/test/unit/xpcshell.toml"
+regex = '.*ff-inst\.exe.*\n'
+
+# Two lines: the descriptive comment and the entry itself. Removing only the entry
+# would strand the comment above the unrelated bug1079747.mp4 case and mislabel it.
+[[overlays]]
+description = "Drop the media-sniffer test case that reads the removed fixture"
+type = "file-search-replace"
+archive = "firefox-140.6.0esr.source.tar.xz"
+file = "toolkit/components/mediasniffer/test/unit/test_mediasniffer_ext.js"
+regex = '.*(?:bug 875769|ff-inst\.exe).*\n'
