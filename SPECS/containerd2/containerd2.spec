@@ -37,7 +37,7 @@ Patch17:	CVE-2026-37236.patch
 
 %{?systemd_requires}
 
-BuildRequires: golang
+BuildRequires: golang >= 1.27.1
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -112,6 +112,7 @@ fi
 %changelog
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-8
 - Patch for CVE-2026-37236
+- Pinning golang to >= 1.27.1 to fix build error related to CGO_ENABLED.
 
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.2.4-7
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
