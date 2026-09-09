@@ -1,0 +1,10 @@
+[components.stb]
+
+# Pin the post-overlay (repacked) tarball, replacing the upstream sources entry.
+[[components.stb.source-files]]
+filename = "stb-f1c79c02822848a9bed4315b12c8c8f3761e1296.tar.gz"
+hash = "cd733567468a784b0403afbb652882d107af255366a5af1a35c86bca8a719af5de3342ecf12e0c3ba7191e41f6a09ede1fa66c65c00b2d67480af227327fd339"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Removes tests/oversample/oversample.exe, a prebuilt UPX-compressed Win32 executable carried in the upstream tree. It is the only compiled artifact in the archive, is referenced by neither the tests/Makefile targets built in %build nor the image_write_test run in %check, and is not shipped in any binary RPM."
