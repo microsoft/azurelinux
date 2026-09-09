@@ -1,0 +1,11 @@
+# ACL containerd composition root for an EROFS runtime.
+#
+# The boot-time selector uses this root after IPE activation succeeds, or for
+# images explicitly built with the static EROFS marker.
+version = 2
+
+imports = [
+  "/etc/containerd/config.toml",
+  "/usr/share/containerd2/acl-erofs.toml",
+  "/usr/share/containerd2/acl-erofs-runtime.toml",
+]

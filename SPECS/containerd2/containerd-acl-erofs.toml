@@ -1,0 +1,53 @@
+# ACL EROFS/dm-verity capability profile.
+#
+# The ACL composition roots import this profile whether CRI currently uses
+# overlayfs or EROFS. Runtime snapshotter selection remains separate in
+# acl-erofs-runtime.toml. Explicit overlayfs pulls remain isolated from signed
+# EROFS discovery; fetch-only transfers may retain referrers for later EROFS
+# unpack.
+version = 2
+
+# Explicitly opt this profile into dm-verity referrer handling. The snapshotter
+# still uses permissive "auto" mount policy: verify layers with a .dmverity
+# sidecar and mount ordinary EROFS layers plainly. An unset mode has the same
+# mount behavior but deliberately does not advertise the referrer capability.
+[plugins."io.containerd.snapshotter.v1.erofs"]
+  dmverity_mode = "auto"
+  enable_dmverity_referrers = true
+
+[plugins."io.containerd.transfer.v1.local"]
+  # Defining unpack_config REPLACES containerd's built-in default of
+  # {platform, overlayfs, walking differ}, so preserve that path for every
+  # supported ACL architecture alongside EROFS.
+  [[plugins."io.containerd.transfer.v1.local".unpack_config]]
+    platform = "linux/amd64"
+    snapshotter = "overlayfs"
+    differ = "walking"
+
+  [[plugins."io.containerd.transfer.v1.local".unpack_config]]
+    platform = "linux/amd64"
+    snapshotter = "erofs"
+    differ = "erofs"
+
+  [[plugins."io.containerd.transfer.v1.local".unpack_config]]
+    platform = "linux/arm64"
+    snapshotter = "overlayfs"
+    differ = "walking"
+
+  [[plugins."io.containerd.transfer.v1.local".unpack_config]]
+    platform = "linux/arm64"
+    snapshotter = "erofs"
+    differ = "erofs"
+
+[plugins."io.containerd.differ.v1.erofs"]
+  # Keep upstream local dm-verity formatting enabled for ordinary EROFS layers.
+  # Signed OCI-referrer handling is a separate capability and is negotiated
+  # only when the selected snapshotter advertises the same support.
+  enable_dmverity = true
+  enable_dmverity_referrers = true
+  enable_tar_index = true
+  # Must remain byte-compatible with the signing tool's mkfs.erofs invocation.
+  # The layer UUID is deliberately absent: the differ derives it from the layer
+  # digest and appends -U after these options, and precomputed artifacts are
+  # rejected unless their superblock carries that derived UUID.
+  mkfs_options = ["--sort=none", "-T", "0", "--mkfs-time"]

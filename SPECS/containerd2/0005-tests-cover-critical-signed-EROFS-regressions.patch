@@ -1,0 +1,278 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dallas Delaney <dadelan@microsoft.com>
+Date: Wed, 9 Sep 2026 22:57:36 +0000
+Subject: [PATCH 5/5] tests: cover critical signed EROFS regressions
+
+Keep only the mandatory compatibility updates and focused regression coverage for fatal oversized referrers, SELinux fsconfig unquoting with valid legacy mount data, and snapshot removal cleanup using the persisted snapshot ID.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+Copilot-Session: 925784b1-44a7-4d56-b04f-e527d2e0879f
+---
+ core/remotes/docker/referrers_test.go        | 62 ++++++++++++++++++-
+ internal/cri/server/container_status_test.go |  2 +-
+ internal/fsmount/fsmount_linux_test.go       | 64 ++++++++++++++++++++
+ plugins/mount/erofs/plugin_linux_test.go     | 16 +++++
+ plugins/snapshots/erofs/erofs_linux_test.go  | 44 ++++++++++++++
+ 5 files changed, 185 insertions(+), 3 deletions(-)
+ create mode 100644 internal/fsmount/fsmount_linux_test.go
+
+diff --git a/core/remotes/docker/referrers_test.go b/core/remotes/docker/referrers_test.go
+index 7e9bc40ba788b754204d1094a12bc898c6dc5713..62c2f3d7470a79bb0c54d0f84882561c8be4fb87 100644
+--- a/core/remotes/docker/referrers_test.go
++++ b/core/remotes/docker/referrers_test.go
+@@ -20,12 +20,14 @@ import (
+ 	"context"
+ 	"encoding/json"
+ 	"fmt"
++	"io"
+ 	"net/http"
+ 	"strings"
+ 	"testing"
+ 
+ 	"github.com/containerd/containerd/v2/core/remotes"
+ 	"github.com/containerd/errdefs"
++	"github.com/opencontainers/go-digest"
+ 	specs "github.com/opencontainers/image-spec/specs-go"
+ 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+ )
+@@ -95,8 +97,8 @@ func runReferrersTest(t *testing.T, name string, sf func(h http.Handler) (string
+ 		if !strings.Contains(err.Error(), "exceeds maximum allowed") {
+ 			t.Fatalf("unexpected error: %v", err)
+ 		}
+-		if !errdefs.IsNotFound(err) {
+-			t.Fatalf("unexpected error type: %v", err)
++		if errdefs.IsNotFound(err) {
++			t.Fatalf("oversized referrers response was classified as absence: %v", err)
+ 		}
+ 		return
+ 	}
+@@ -130,6 +132,62 @@ func runReferrersTest(t *testing.T, name string, sf func(h http.Handler) (string
+ 	}
+ }
+ 
++func TestFetchReferrersStreamedOversizeIsFatal(t *testing.T) {
++	fetcher, subject := newFocusedReferrersFetcher(t, "streamed-oversize", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		w.Header().Set("Content-Type", ocispec.MediaTypeImageIndex)
++		w.WriteHeader(http.StatusOK)
++		if flusher, ok := w.(http.Flusher); ok {
++			flusher.Flush()
++		}
++		_, _ = io.WriteString(w, `{"schemaVersion":2,"manifests":[],"padding":"`)
++		_, _ = io.WriteString(w, strings.Repeat("x", int(MaxManifestSize)+1))
++		_, _ = io.WriteString(w, `"}`)
++	}))
++
++	_, err := fetcher.FetchReferrers(t.Context(), subject)
++	if err == nil {
++		t.Fatal("streamed oversized referrers index unexpectedly succeeded")
++	}
++	if errdefs.IsNotFound(err) {
++		t.Fatalf("streamed oversized referrers index was classified as absence: %v", err)
++	}
++}
++
++func TestFetchReferrersTrueAbsenceIsEmpty(t *testing.T) {
++	fetcher, subject := newFocusedReferrersFetcher(t, "true-absence", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		http.NotFound(w, r)
++	}))
++
++	refs, err := fetcher.FetchReferrers(t.Context(), subject)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if len(refs) != 0 {
++		t.Fatalf("absent referrers returned %d descriptors, want 0", len(refs))
++	}
++}
++
++func newFocusedReferrersFetcher(t *testing.T, name string, handler http.Handler) (remotes.ReferrersFetcher, digest.Digest) {
++	t.Helper()
++	subject := newContent(ocispec.MediaTypeImageManifest, []byte(`{"schemaVersion":2}`))
++	mux := http.NewServeMux()
++	mux.Handle(fmt.Sprintf("/v2/%s/manifests/%s", name, subject.Digest()), subject)
++	mux.Handle(fmt.Sprintf("/v2/%s/referrers/%s", name, subject.Digest()), handler)
++
++	base, options, closeServer := tlsServer(logHandler{t, mux})
++	t.Cleanup(closeServer)
++	image := fmt.Sprintf("%s/%s@%s", base, name, subject.Digest())
++	resolver := NewResolver(options)
++	if _, _, err := resolver.Resolve(t.Context(), image); err != nil {
++		t.Fatal(err)
++	}
++	fetcher, err := resolver.Fetcher(t.Context(), image)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return fetcher.(remotes.ReferrersFetcher), subject.Digest()
++}
++
+ type testIndex struct {
+ 	manifests []testContent
+ }
+diff --git a/internal/cri/server/container_status_test.go b/internal/cri/server/container_status_test.go
+index a35dda2ce656ad803356891a81e63bcc58481d45..3172242746b79ade38a9269927b36e8595f6863a 100644
+--- a/internal/cri/server/container_status_test.go
++++ b/internal/cri/server/container_status_test.go
+@@ -392,7 +392,7 @@ func (s *fakeImageService) PullImage(context.Context, string, func(string) (stri
+ 	return "", errors.New("not implemented")
+ }
+ 
+-func (s *fakeImageService) UpdateRuntimeSnapshotter(runtimeName string, imagePlatform images.ImagePlatform) {
++func (s *fakeImageService) UpdateRuntimeSnapshotter(runtimeName string, imagePlatform images.ImagePlatform, snapshotterCapabilities []string) {
+ }
+ 
+ func patchExceptedWithState(expected *runtime.ContainerStatus, state runtime.ContainerState) {
+diff --git a/internal/fsmount/fsmount_linux_test.go b/internal/fsmount/fsmount_linux_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..76460a530bf2a9995e5fc82f9b27c897e870808c
+--- /dev/null
++++ b/internal/fsmount/fsmount_linux_test.go
+@@ -0,0 +1,64 @@
++//go:build linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package fsmount
++
++import (
++	"fmt"
++	"testing"
++)
++
++func TestApplyFilesystemOptionsUnquotesLSMValues(t *testing.T) {
++	const label = "system_u:object_r:container_file_t:s0:c1,c2"
++	for _, key := range []string{"context", "fscontext", "defcontext", "rootcontext"} {
++		t.Run(key, func(t *testing.T) {
++			option := fmt.Sprintf(`%s=%q`, key, label)
++			var got string
++			_, err := applyFilesystemOptions(
++				[]string{option},
++				func(_, value string) error { got = value; return nil },
++				func(string) error { return nil },
++			)
++			if err != nil {
++				t.Fatal(err)
++			}
++			if got != label {
++				t.Fatalf("fsconfig value = %q, want %q", got, label)
++			}
++			if option != fmt.Sprintf(`%s=%q`, key, label) {
++				t.Fatalf("legacy mount option was modified: %q", option)
++			}
++		})
++	}
++}
++
++func TestApplyFilesystemOptionsPreservesOtherStringValues(t *testing.T) {
++	const quoted = `"value,with,commas"`
++	var got string
++	_, err := applyFilesystemOptions(
++		[]string{"custom=" + quoted},
++		func(_, value string) error { got = value; return nil },
++		func(string) error { return nil },
++	)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if got != quoted {
++		t.Fatalf("non-LSM fsconfig value = %q, want %q", got, quoted)
++	}
++}
+diff --git a/plugins/mount/erofs/plugin_linux_test.go b/plugins/mount/erofs/plugin_linux_test.go
+index e38e4e28ed80a7f47ea4bc2532c486db6c4727ca..07e6478d2b31e4d672dd7c043f82acd7273e789a 100644
+--- a/plugins/mount/erofs/plugin_linux_test.go
++++ b/plugins/mount/erofs/plugin_linux_test.go
+@@ -21,6 +21,7 @@ import (
+ 	"os"
+ 	"os/exec"
+ 	"path/filepath"
++	"slices"
+ 	"strings"
+ 	"testing"
+ 
+@@ -247,3 +248,18 @@ func TestMountOptionsPageSizeLimit(t *testing.T) {
+ 		mount.Unmount(mountPoint, 0)
+ 	})
+ }
++
++func TestSharedLayerMountOptionsConverge(t *testing.T) {
++	taskPath := sharedLayerMountOptions(
++		[]string{"ro", "loop", `context="system_u:object_r:container_file_t:s0:c646,c927"`}, true, defaultSharedLayerContext)
++	containerPath := sharedLayerMountOptions([]string{"ro", "loop"}, true, defaultSharedLayerContext)
++	otherPod := sharedLayerMountOptions(
++		[]string{"ro", "loop", `context="system_u:object_r:container_file_t:s0:c154,c335"`}, true, defaultSharedLayerContext)
++
++	if !slices.Equal(taskPath, containerPath) || !slices.Equal(taskPath, otherPod) {
++		t.Fatalf("shared layer options diverged: task=%q container=%q other=%q", taskPath, containerPath, otherPod)
++	}
++	if got := strings.Join(taskPath, ","); got != `ro,context="`+defaultSharedLayerContext+`"` {
++		t.Fatalf("legacy mount data = %q, want quoted SELinux context", got)
++	}
++}
+diff --git a/plugins/snapshots/erofs/erofs_linux_test.go b/plugins/snapshots/erofs/erofs_linux_test.go
+index 2f3b89ba276d45b91d54d7bc1716406c230d715d..cb48614cae879d2f0d2a3ad3470fe4826230f984 100644
+--- a/plugins/snapshots/erofs/erofs_linux_test.go
++++ b/plugins/snapshots/erofs/erofs_linux_test.go
+@@ -884,3 +884,47 @@ func TestMountsWithMergedFsMetaOnTopParent(t *testing.T) {
+ 	assert.Equal(t, "format/bind", mounts[1].Type)
+ 	assert.Equal(t, "{{ mount 0 }}", mounts[1].Source)
+ }
++
++func TestRemoveUsesPersistedSnapshotIDForCleanup(t *testing.T) {
++	sn, err := NewSnapshotter(t.TempDir())
++	require.NoError(t, err)
++	s := sn.(*snapshotter)
++	t.Cleanup(func() { require.NoError(t, s.Close()) })
++
++	var id string
++	err = s.ms.WithTransaction(t.Context(), true, func(ctx context.Context) error {
++		snap, err := storage.CreateSnapshot(ctx, snapshots.KindActive, "active", "")
++		if err != nil {
++			return err
++		}
++		id = snap.ID
++		_, err = storage.CommitActive(ctx, "active", "committed", snapshots.Usage{})
++		return err
++	})
++	require.NoError(t, err)
++
++	require.NoError(t, os.MkdirAll(filepath.Dir(s.layerBlobPath(id)), 0755))
++	require.NoError(t, os.WriteFile(s.layerBlobPath(id), []byte("layer"), 0644))
++
++	var releasedLayer, cleanedUpper string
++	s.releaseDmverityDeviceFn = func(_ context.Context, path string) { releasedLayer = path }
++	s.cleanupUpperFn = func(path string) error { cleanedUpper = path; return nil }
++
++	require.NoError(t, s.Remove(t.Context(), "committed"))
++	assert.Equal(t, s.layerBlobPath(id), releasedLayer)
++	assert.Equal(t, s.upperPath(id), cleanedUpper)
++}
++
++func TestRemoveMissingSnapshotSkipsCleanup(t *testing.T) {
++	sn, err := NewSnapshotter(t.TempDir())
++	require.NoError(t, err)
++	s := sn.(*snapshotter)
++	t.Cleanup(func() { require.NoError(t, s.Close()) })
++
++	cleanupCalled := false
++	s.releaseDmverityDeviceFn = func(context.Context, string) { cleanupCalled = true }
++	s.cleanupUpperFn = func(string) error { cleanupCalled = true; return nil }
++
++	require.NoError(t, s.Remove(t.Context(), "missing"))
++	assert.False(t, cleanupCalled)
++}

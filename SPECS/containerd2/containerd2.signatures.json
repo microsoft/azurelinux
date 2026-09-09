@@ -2,6 +2,13 @@
  "Signatures": {
   "containerd.service": "a07bfcf412669b06673190b0779f48e652c9adcf1758289e849a00802804eec8",
   "containerd.toml": "5b3821236f09b4c858e0e098bbe1400f4dbbb47d360e39d21c61858b088c2896",
+  "containerd-acl-erofs.toml": "0480b54e58bb6aa0a51a8ceb67043207a505d7709c533d4c96ba32c4c56588d4",
+  "containerd-acl-config.toml": "1fe27aa9bf963a8c7164d5ffd951568c9ec43df3ba2e5edb6306e83d92eeb635",
+  "containerd-acl-profile.conf": "9d33eb571553abd9bfb9fdeedf1e1ab3674b84b80d0a52c567c92c461a8ddef1",
+  "containerd-acl-tmpfiles.conf": "f9386581986308508a05505b7c5fd32b6029d7abfeabc1d4111ecb10f8dc7bd9",
+  "containerd-acl-erofs-runtime.toml": "5fc15467d148997350b97e27cb4a1b278e82a3482a5781cb1fb306f69a4db2b8",
+  "containerd-acl-erofs-config.toml": "d0b26c8f90a34ad4153cf713000900c31f95ae6923225b0c08dfdfe970af0559",
+  "containerd-acl-select-profile": "5c880f1465b6e24bd561552d9d3cb72b8f729fae3388e510ef63974d75f59dd7",
   "containerd-2.3.4.tar.gz": "175bbf57d637c987fa742f846b43b1b8ba2c61af6a9eaec619c625e4a8a19b69"
  }
 }

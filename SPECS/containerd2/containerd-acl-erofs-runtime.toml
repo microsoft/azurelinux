@@ -1,0 +1,20 @@
+# ACL runtime EROFS selection.
+#
+# This delta is imported only when the boot-time selector observes an active
+# ACL IPE policy, or when the image explicitly carries the static EROFS marker.
+version = 2
+
+# Set the snapshotter in both the legacy and v3 locations. Imports are merged
+# before v2-to-v3 migration, and this file is imported last so it overrides
+# node-specific defaults such as overlayfs or overlaybd.
+[plugins."io.containerd.grpc.v1.cri"]
+  [plugins."io.containerd.grpc.v1.cri".containerd]
+    snapshotter = "erofs"
+
+[plugins."io.containerd.cri.v1.images"]
+  snapshotter = "erofs"
+
+[plugins."io.containerd.service.v1.diff-service"]
+  # Deferred first-use unpack runs through the generic diff service. The EROFS
+  # differ must see signed EROFS layers before the walking fallback.
+  default = ["erofs", "walking"]

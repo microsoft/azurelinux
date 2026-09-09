@@ -15,6 +15,13 @@ Distribution: Azure Linux
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
+Source3: containerd-acl-erofs.toml
+Source4: containerd-acl-config.toml
+Source5: containerd-acl-profile.conf
+Source6: containerd-acl-tmpfiles.conf
+Source7: containerd-acl-erofs-runtime.toml
+Source8: containerd-acl-erofs-config.toml
+Source9: containerd-acl-select-profile
 
 Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
@@ -24,7 +31,7 @@ Patch4:	0001-erofs-add-signed-dm-verity-mapper-foundation.patch
 Patch5:	0002-erofs-consume-signed-referrer-materializations.patch
 Patch6:	0003-remotes-bound-OCI-referrers-traversal.patch
 Patch7:	0004-cri-integrate-signed-runtime-snapshotters.patch
-Patch8:	0005-tests-cover-signed-EROFS-referrer-lifecycle.patch
+Patch8:	0005-tests-cover-critical-signed-EROFS-regressions.patch
 
 %{?systemd_requires}
 
@@ -59,6 +66,15 @@ low-level storage and network attachments, etc.
 containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
+%package erofs
+Summary: EROFS/dm-verity profile for Azure Container Linux
+Requires: %{name} = %{version}-%{release}
+Requires: erofs-utils
+
+%description erofs
+Provides the opt-in EROFS and signed dm-verity runtime profile used by Azure
+Container Linux. The main containerd2 package remains behavior-neutral.
+
 %prep
 %autosetup -p1 -n %{upstream_name}-%{version}
 
@@ -81,6 +97,14 @@ install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
 install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
 install -vdm 755 %{buildroot}/opt/containerd/{bin,lib}
 
+install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_datadir}/containerd2/acl-erofs.toml
+install -D -p -m 0644 %{SOURCE4} %{buildroot}%{_datadir}/containerd2/acl-config.toml
+install -D -p -m 0644 %{SOURCE5} %{buildroot}%{_prefix}/lib/systemd/system/containerd.service.d/90-acl-profile.conf
+install -D -p -m 0644 %{SOURCE6} %{buildroot}%{_prefix}/lib/tmpfiles.d/10-containerd-acl.conf
+install -D -p -m 0644 %{SOURCE7} %{buildroot}%{_datadir}/containerd2/acl-erofs-runtime.toml
+install -D -p -m 0644 %{SOURCE8} %{buildroot}%{_datadir}/containerd2/acl-erofs-config.toml
+install -D -p -m 0755 %{SOURCE9} %{buildroot}%{_libexecdir}/containerd2/acl-select-profile
+
 %post
 %systemd_post containerd.service
 
@@ -101,14 +125,28 @@ fi
 %{_mandir}/*
 %config(noreplace) %{_unitdir}/containerd.service
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
+%dir %{_sysconfdir}/containerd
 %dir /opt/containerd
 %dir /opt/containerd/bin
 %dir /opt/containerd/lib
+
+%files erofs
+%{_datadir}/containerd2/acl-erofs.toml
+%{_datadir}/containerd2/acl-config.toml
+%{_datadir}/containerd2/acl-erofs-runtime.toml
+%{_datadir}/containerd2/acl-erofs-config.toml
+%{_libexecdir}/containerd2/acl-select-profile
+%{_prefix}/lib/systemd/system/containerd.service.d/90-acl-profile.conf
+%{_prefix}/lib/tmpfiles.d/10-containerd-acl.conf
+%dir %{_datadir}/containerd2
+%dir %{_libexecdir}/containerd2
+%dir %{_prefix}/lib/systemd/system/containerd.service.d
 
 %changelog
 * Wed Sep 09 2026 Dallas Delaney <dadelan@microsoft.com> - 2.3.4-2
 - Add default-off signed EROFS/dm-verity referrer support.
 - Add bounded OCI referrer traversal and runtime snapshotter integration.
+- Package the opt-in containerd2-erofs profile consumed by Azure Container Linux.
 - Preserve the ordinary overlayfs path and cover the new lifecycle in %check.
 
 * Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
