@@ -1,0 +1,13 @@
+# Drop the prebuilt Win32 DLL that upstream ships alongside the Borland C++ Builder
+# project files. It is a compiled artifact, not source: nothing in configure.ac or any
+# Makefile.am references bcb/, the Linux build compiles the library from src/, and the
+# DLL is not installed into any binary RPM.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove the prebuilt Win32 DLL from the Borland C++ Builder tree"
+type = "file-remove"
+archive = "libmng-2.0.3.tar.gz"
+file = "bcb/win32dll/libmng.dll"
