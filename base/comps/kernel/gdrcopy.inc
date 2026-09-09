@@ -51,6 +51,9 @@ Requires:       kmod-nvidia-open = %{nvidia_open_version}-%{_azl_kver}.%{_azl_kr
 Requires:       gdrcopy%{?_isa} = %{gdrcopy_version}-%{gdrcopy_release}%{?dist}
 Requires(post): kmod
 Requires(postun): kmod
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
 
 %description -n kmod-gdrcopy
 The GDRCopy gdrdrv kernel module built for NVIDIA open driver
@@ -125,6 +128,11 @@ install -D -m 0755 tests/gdrcopy_sanity \
     %{buildroot}%{_bindir}/gdrcopy_sanity
 install -D -m 0644 LICENSE \
     %{buildroot}%{_datadir}/licenses/kmod-gdrcopy-%{KVERREL}/LICENSE
+# Upstream's service loads gdrdrv and creates /dev/gdrdrv on boot.
+install -D -m 0644 packages/rhel/gdrcopy.service \
+    %{buildroot}%{_unitdir}/gdrcopy.service
+install -D -m 0755 packages/rhel/init.d/gdrcopy \
+    %{buildroot}%{_libexecdir}/gdrcopy/gdrcopy
 popd
 %endif
 
@@ -138,9 +146,14 @@ popd
 %ifarch x86_64 aarch64
 %post -n kmod-gdrcopy
 %{_sbindir}/depmod -a %{KVERREL} || :
+%systemd_post gdrcopy.service
+
+%preun -n kmod-gdrcopy
+%systemd_preun gdrcopy.service
 
 %postun -n kmod-gdrcopy
 %{_sbindir}/depmod -a %{KVERREL} || :
+%systemd_postun_with_restart gdrcopy.service
 
 %files -n gdrcopy
 %license %{_datadir}/licenses/gdrcopy/LICENSE
@@ -155,6 +168,8 @@ popd
 %files -n kmod-gdrcopy
 %license %{_datadir}/licenses/kmod-gdrcopy-%{KVERREL}/LICENSE
 /lib/modules/%{KVERREL}/extra/gdrcopy/gdrdrv.ko.%{compext}
+%{_libexecdir}/gdrcopy/gdrcopy
+%{_unitdir}/gdrcopy.service
 %endif
 
 %endif
