@@ -13,7 +13,7 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # We can use the generate-source-tarball.sh script in the given folder along with the package version to build the tarball automatically.
 # In case we need to re-build this file manually:
-#   1. wget https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   1. wget https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%%{version}.tar.gz#/%%{name}-%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. Apply golang-version-upgrade.patch
