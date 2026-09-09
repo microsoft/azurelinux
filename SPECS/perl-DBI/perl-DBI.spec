@@ -4,7 +4,7 @@
 
 Summary:        A database access API for perl
 Name:           perl-DBI
-Version:        1.651
+Version:        1.652
 Release:        1%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
@@ -162,6 +162,9 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Aug 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.652-1
+- Auto-upgrade to 1.652 - for CVE-2026-73193, CVE-2026-73194
+
 * Thu Jul 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.651-1
 - Auto-upgrade to 1.651 - for CVE-2026-15043, CVE-2026-15392, CVE-2026-60081, CVE-2026-60082
 

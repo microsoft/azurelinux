@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        1.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -74,7 +74,6 @@ The Azure Linux OS Modifier is a tool that can modify an OS.
 %build
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
-export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make -C toolkit go-imagecustomizer REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y IMAGE_CUSTOMIZER_VERSION_PREVIEW=
 make -C toolkit go-osmodifier REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y
 
@@ -111,6 +110,10 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.6.0-2
+- Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
+  now selected automatically and supports CGO_ENABLED=0 on Linux.
+
 * Tue Aug 3 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.6.0-1
 - Upgrade to version 1.6.0
 - Enable systemd-ukify for arm64

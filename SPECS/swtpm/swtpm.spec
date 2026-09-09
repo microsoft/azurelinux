@@ -12,12 +12,13 @@
 Summary: TPM Emulator
 Name:           swtpm
 Version:        0.8.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD-3-Clause
 URL:            http://github.com/stefanberger/swtpm
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        %{url}/archive/%{gitcommit}/%{name}-%{gitshortcommit}.tar.gz
+Patch0:         CVE-2026-75900.patch
 
 BuildRequires:  make
 BuildRequires:  git-core
@@ -193,6 +194,9 @@ fi
 %{_datadir}/swtpm/swtpm-create-tpmca
 
 %changelog
+* Fri Aug 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.8.1-6
+- Patch for CVE-2026-75900
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.8.1-5
 - Add missing Vendor and Distribution tags.
 

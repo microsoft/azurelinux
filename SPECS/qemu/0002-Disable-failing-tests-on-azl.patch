@@ -3,73 +3,82 @@ From: Kanika Nema <kanikanema@microsoft.com>
 Date: Thu, 4 Apr 2024 14:33:33 +0000
 Subject: [PATCH] Disable tests that fail during azl rpmbuild check
 
-1. Disable post-copy eventfd based tests as they hang
-2. Disable TLS-PSK test as they fail (curve is unsupported error,
-possibly because psktool doesn't work on azl).
+1. Disable post-copy eventfd based tests as they hang.
+2. Disable TLS-PSK tests because the required curve is unsupported in Azure
+   Linux builds.
 
 Signed-off-by: Kanika Nema <kanikanema@microsoft.com>
 ---
- tests/qtest/migration-test.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ tests/qtest/migration/framework.c |  2 ++
+ tests/qtest/migration/tls-tests.c | 12 ++++++++++++
+ 2 files changed, 14 insertions(+)
 
---- a/b/tests/qtest/migration-test.c	2026-02-06 23:49:13.929537847 +0000
-+++ b/tests/qtest/migration-test.c	2026-02-06 23:49:36.409520951 +0000
-@@ -3808,6 +3808,8 @@
-     }
+diff --git a/tests/qtest/migration/framework.c b/tests/qtest/migration/framework.c
+index 4d43e65..b8d50c0 100644
+--- a/tests/qtest/migration/framework.c
++++ b/tests/qtest/migration/framework.c
+@@ -1028,6 +1028,8 @@ MigrationTestEnv *migration_get_env(void)
  
-     has_uffd = ufd_version_check();
+     env->has_dirty_ring = kvm_dirty_ring_supported();
+     env->has_uffd = ufd_version_check(&env->uffd_feature_thread_id);
 +    /* Unblock azl qemu tests, eventfd may not be working properly */
-+    has_uffd = 0;
-     arch = qtest_get_arch();
-     is_x86 = !strcmp(arch, "i386") || !strcmp(arch, "x86_64");
++    env->has_uffd = false;
+     env->arch = qtest_get_arch();
+     env->is_x86 = !strcmp(env->arch, "i386") || !strcmp(env->arch, "x86_64");
  
-@@ -3896,8 +3898,14 @@
- #endif
+diff --git a/tests/qtest/migration/tls-tests.c b/tests/qtest/migration/tls-tests.c
+index 136a0a8..2d5af2e 100644
+--- a/tests/qtest/migration/tls-tests.c
++++ b/tests/qtest/migration/tls-tests.c
+@@ -785,8 +785,14 @@ static void test_multifd_tcp_tls_x509_reject_anon_client(void)
  
- #ifdef CONFIG_GNUTLS
+ static void migration_test_add_tls_smoke(MigrationTestEnv *env)
+ {
 +/*
-+ * TLSPSK doesn't work in azl builds and fails with this error:
-+ * "qemu-system-x86_64: TLS handshake failed: The curve is unsupported"
-+ */
-+#if 0
-     migration_test_add("/migration/precopy/unix/tls/psk",
-                        test_precopy_unix_tls_psk);
-+#endif
- 
-     if (has_uffd) {
-         /*
-@@ -3928,10 +3936,16 @@
-                        test_precopy_tcp_switchover_ack);
- 
- #ifdef CONFIG_GNUTLS
-+/*
-+ * TLS PSK tests fail on azl rpmbuilds with error:
++ * TLS PSK tests fail on azl builds with this error:
 + * "qemu-system-x86_64: TLS handshake failed: The curve is unsupported"
 + */
 +#if 0
      migration_test_add("/migration/precopy/tcp/tls/psk/match",
                         test_precopy_tcp_tls_psk_match);
++#endif
+ }
+
+ void migration_test_add_tls(MigrationTestEnv *env)
+@@ -799,8 +805,10 @@ void migration_test_add_tls(MigrationTestEnv *env)
+         return;
+     }
+
++#if 0
+     migration_test_add("/migration/precopy/unix/tls/psk",
+                        test_precopy_unix_tls_psk);
++#endif
+ 
+     if (env->has_uffd) {
+         /*
+@@ -829,8 +837,10 @@ void migration_test_add_tls(MigrationTestEnv *env)
+                        test_precopy_unix_tls_x509_override_host);
+ #endif /* CONFIG_TASN1 */
+
++#if 0
      migration_test_add("/migration/precopy/tcp/tls/psk/mismatch",
                         test_precopy_tcp_tls_psk_mismatch);
 +#endif
  #ifdef CONFIG_TASN1
      migration_test_add("/migration/precopy/tcp/tls/x509/default-host",
                         test_precopy_tcp_tls_x509_default_host);
-@@ -4005,10 +4019,15 @@
-                        test_multifd_tcp_uadk);
- #endif
- #ifdef CONFIG_GNUTLS
-+/*
-+ * TLS PSK tests fail on azl rpmbuilds
-+ */
+@@ -848,10 +858,12 @@ void migration_test_add_tls(MigrationTestEnv *env)
+                        test_precopy_tcp_tls_x509_reject_anon_client);
+ #endif /* CONFIG_TASN1 */
+
 +#if 0
      migration_test_add("/migration/multifd/tcp/tls/psk/match",
                         test_multifd_tcp_tls_psk_match);
      migration_test_add("/migration/multifd/tcp/tls/psk/mismatch",
                         test_multifd_tcp_tls_psk_mismatch);
 +#endif
- #ifdef CONFIG_TASN1
-     migration_test_add("/migration/multifd/tcp/tls/x509/default-host",
-                        test_multifd_tcp_tls_x509_default_host);
+     if (env->has_uffd) {
+         migration_test_add("/migration/multifd+postcopy/tcp/tls/psk/match",
+                            test_multifd_postcopy_tcp_tls_psk_match);
 -- 
 2.25.1

@@ -1,0 +1,44 @@
+From a63a948b4afcc266a06ef18f2cb46440c48e8bb6 Mon Sep 17 00:00:00 2001
+From: stevenhorsman <steven@uk.ibm.com>
+Date: Mon, 1 Jun 2026 17:04:43 +0100
+Subject: [PATCH] libs: Remove unnecessary unsafe blocks in protection.rs
+
+Rust 1.94 now warns about unnecessary unsafe blocks around
+x86_64::__cpuid() calls. Remove the unsafe blocks as they are
+no longer needed.
+
+This fixes the following clippy warnings:
+- warning: unnecessary `unsafe` block at line 129
+- warning: unnecessary `unsafe` block at line 142
+
+Signed-off-by: stevenhorsman <steven@uk.ibm.com>
+Generated-By: IBM Bob
+
+Upstream-Commit: https://github.com/kata-containers/kata-containers/commit/a63a948b4afcc266a06ef18f2cb46440c48e8bb6
+Upstream-Status: Backport
+---
+ src/libs/kata-sys-util/src/protection.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libs/kata-sys-util/src/protection.rs b/src/libs/kata-sys-util/src/protection.rs
+index 77d2698d0de5..38a38009a501 100644
+--- a/src/libs/kata-sys-util/src/protection.rs
++++ b/src/libs/kata-sys-util/src/protection.rs
+@@ -126,7 +126,7 @@ pub fn arch_guest_protection(
+         // shouldn't hurt to double-check and have better logging if anything
+         // goes wrong.
+ 
+-        let fn0 = unsafe { x86_64::__cpuid(0) };
++        let fn0 = x86_64::__cpuid(0);
+         // The values in [ ebx, edx, ecx ] spell out "AuthenticAMD" when
+         // interpreted byte-wise as ASCII.  No need to bother here with an
+         // actual conversion to string though.
+@@ -139,7 +139,7 @@ pub fn arch_guest_protection(
+         }
+ 
+         // AMD64 Architecture Prgrammer's Manual Fn8000_001f docs on pg. 640
+-        let fn8000_001f = unsafe { x86_64::__cpuid(0x8000_001f) };
++        let fn8000_001f = x86_64::__cpuid(0x8000_001f);
+         if fn8000_001f.eax & 0x10 == 0 {
+             return Err(ProtectionError::CheckFailed("SEV not supported".to_owned()));
+         }

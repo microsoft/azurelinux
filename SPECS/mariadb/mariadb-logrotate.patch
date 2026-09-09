@@ -6,11 +6,11 @@ Adjust the 'mariadb.logrotate.sh' script in several ways:
   for the very unlikely, but possible scenario
   in which the debian config file would exist.
 
---- mariadb-10.11.6/support-files/mariadb.logrotate.sh	2023-11-08 16:51:43.000000000 +0100
-+++ mariadb-10.11.6/support-files/mariadb.logrotate.sh_patched	2023-12-17 18:03:36.955861025 +0100
+--- mariadb-10.11.19/support-files/mariadb.logrotate.sh	2023-11-08 16:51:43.000000000 +0100
++++ mariadb-10.11.19/support-files/mariadb.logrotate.sh_patched	2023-12-17 18:03:36.955861025 +0100
 @@ -6,7 +6,7 @@
- # Read https://mariadb.com/kb/en/error-log/ to learn more about logging and
- # https://mariadb.com/kb/en/rotating-logs-on-unix-and-linux/ about rotating logs.
+ # Read https://mariadb.com/docs/server/server-management/server-monitoring-logs/error-log to learn more about logging and
+ # https://mariadb.com/docs/server/server-management/server-monitoring-logs/rotating-logs-on-unix-and-linux about rotating logs.
  
 -@localstatedir@/mysqld.log @localstatedir@/mariadb.log @logdir@/*.log {
 +@LOG_LOCATION@ {
