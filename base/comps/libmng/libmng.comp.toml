@@ -1,0 +1,10 @@
+[components.libmng]
+
+# Pin the post-overlay (repacked) tarball, replacing the upstream sources entry.
+[[components.libmng.source-files]]
+filename = "libmng-2.0.3.tar.gz"
+hash = "960c76060c8d4f4289698c71705404d271673455e25ea35028e16b71d6d3279f1956c6b1a34cfdef023057bc7f827c61aa281142354811339a7e13b1ba1b2d40"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Removes bcb/win32dll/libmng.dll, a prebuilt UPX-compressed Win32 DLL carried in the upstream tarball. Nothing in the build system references it, and it is not shipped in any binary RPM."
