@@ -99,4 +99,11 @@ baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/sdk/$basearch
 enabled=1
 skip_if_unavailable=False
 
+[cuda]
+name=cuda
+# NVIDIA publishes aarch64 packages under "sbsa", not "aarch64"; this baseurl only resolves on x86_64.
+baseurl=https://developer.download.nvidia.com/compute/cuda/repos/azl3/{{ target_arch }}
+enabled=1
+skip_if_unavailable=True
+
 """

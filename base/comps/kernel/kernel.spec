@@ -17,9 +17,11 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 8
+%define azl_pkgrelease 9
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.57.04
+%define gdrcopy_version 2.6
+%define gdrcopy_release 1
 %define ofa_version 26.04
 %define ofa_vendor_release 0.8.5.0
 %define ofa_release OFED.%{ofa_version}.%{ofa_vendor_release}
@@ -1035,6 +1037,8 @@ Source6104: kmod-mft.inc
 Source6105: kmod-mlnx-nfsrdma.inc
 Source6106: kmod-srp.inc
 Source6107: xpmem.inc
+Source6010: gdrcopy-%{gdrcopy_version}.tar.gz
+Source6011: gdrcopy.inc
 
 ## Patches needed for building this package
 
@@ -1113,6 +1117,10 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name xpmem
 %include %{_sourcedir}/xpmem.inc
+
+%global _kmod_phase package
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2122,6 +2130,10 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name xpmem
 %include %{_sourcedir}/xpmem.inc
+
+%global _kmod_phase prep
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3232,6 +3244,12 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+# AZL: gdrdrv needs the NVIDIA open-gpu-kernel-modules source tree, so build
+# it after nvidia-open.
+%global _kmod_phase build
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
+
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
 
 # Module signing (modsign)
@@ -3764,6 +3782,10 @@ popd
 %global _kmod_phase install
 %global _kmod_name xpmem
 %include %{_sourcedir}/xpmem.inc
+
+%global _kmod_phase install
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4438,8 +4460,15 @@ fi\
 %global _kmod_name xpmem
 %include %{_sourcedir}/xpmem.inc
 
+%global _kmod_phase files
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Tue Sep 08 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.39-1.9
+- feat(kernel): add GDRCopy userspace and prebuilt kernel module packages
+
 * Mon Aug 31 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.39-1.8
 - feat(kmod-nvidia-open): upgrade to 610.57.04
 
