@@ -1,11 +1,11 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 193637f7ee8ae5f5aa5248f49e7baa3e6164966e
+%define commit_hash db8809540e1a7a9da5d518876894933ff55692ab
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.2.4
-Release: 8%{?dist}
+Version: 2.3.4
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -18,21 +18,8 @@ Source2: containerd.toml
 
 Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
-Patch2:	CVE-2026-39882.patch
-Patch3:	CVE-2026-33814.patch
-Patch4:	fix-TestCgroupNamespace-cgroupv1.patch
-Patch5:	CVE-2026-39821.patch
-Patch6:	CVE-2026-42506.patch
-Patch7:	CVE-2026-27136.patch
-Patch8:	CVE-2026-53488.patch
-Patch9:	CVE-2026-53492.patch
-Patch10:	CVE-2026-50195.patch
-Patch11:	CVE-2026-53489.patch
-Patch12:	CVE-2026-47262.patch
-Patch13:	CVE-2026-25680.patch
-Patch14:	CVE-2026-25681.patch
-Patch15:	CVE-2026-42502.patch
-Patch16:	CVE-2026-56852.patch
+Patch2:	fix-TestCgroupNamespace-cgroupv1.patch
+Patch3:	CVE-2026-56852.patch
 
 %{?systemd_requires}
 
@@ -114,6 +101,11 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
+- Upgrade to 2.3.4
+- Remove CVE patches fixed upstream
+- Rebase multi-snapshotter support and CVE-2026-56852 patches
+
 * Thu Sep 03 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-8
 - Temporarily build with Microsoft Go 1.26 to avoid the Go 1.27 systemcrypto
   ML-KEM panic on OpenSSL 3.3.
