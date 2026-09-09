@@ -1,0 +1,14 @@
+[components.mozjs140]
+
+# One file-remove plus two file-search-replace overlays make up this change; they are one
+# logical unit and live in overlays/0001-remove-packed-windows-test-fixture.overlay.toml,
+# auto-loaded via the project-wide overlay-files glob.
+
+# Pin the post-overlay (repacked) tarball, replacing the upstream sources entry.
+[[components.mozjs140.source-files]]
+filename = "firefox-140.6.0esr.source.tar.xz"
+hash = "8d88a7f2c50167b669d8a08d186077d0d5b9502aaaabf8dedbf994969bb3187312b41e6f6f821088b711b7de45d5bf16f20245107ab965324419759f2aece53e"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Removes toolkit/components/mediasniffer/test/unit/data/ff-inst.exe (a truncated, UPX-packed Windows installer used as a media-sniffing negative test fixture), plus the xpcshell registration and test case that read it; test-only, and only js/src is built from this tarball, so it is not shipped in any binary RPM."
