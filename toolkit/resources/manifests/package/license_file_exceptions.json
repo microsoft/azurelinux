@@ -62,6 +62,16 @@
             ]
         },
         {
+            "_comment1": "The licensing pages are documentation about rsyslog's license, not copies of a license file.",
+            "_comment2": "The generated download path can coincidentally contain a license-like substring in its hash.",
+            "PackageName": "rsyslog-doc",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/rsyslog/html/_downloads/[0-9a-f]+/rsyslog-example\\.conf$",
+                "^/usr/share/doc/rsyslog/html/_sources/licensing\\.rst\\.txt$",
+                "^/usr/share/doc/rsyslog/html/licensing\\.html$"
+            ]
+        },
+        {
             "_comment": "Rust ships upstream license texts for the bundled toolchain components under rustlib.",
             "PackageName": "rust",
             "IgnoredFilesRegexList": [
