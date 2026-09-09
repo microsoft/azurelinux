@@ -28,8 +28,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of popt.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 %build
 %configure \
 	--disable-silent-rules
