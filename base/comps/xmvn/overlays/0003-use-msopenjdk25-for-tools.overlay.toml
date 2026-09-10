@@ -1,0 +1,25 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Exclude the Fedora OpenJDK runtime dependency generated for XMvn tools"
+type = "spec-prepend-lines"
+lines = ["%global __requires_exclude ^java-25-openjdk-headless$"]
+
+[[overlays]]
+description = "Require Microsoft OpenJDK 25 for XMvn tools"
+type = "spec-append-lines"
+section = "%package"
+package = "tools"
+lines = ["Requires:       msopenjdk-25"]
+
+[[overlays]]
+description = "Use Microsoft OpenJDK 25 as the XMvn tools launcher fallback"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+	"",
+	"sed -i 's|/usr/lib/jvm/jre-25-openjdk|/usr/lib/jvm/msopenjdk-25|g' \\",
+	"    %{buildroot}%{_bindir}/xmvn-{install,resolve,subst}",
+]

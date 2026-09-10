@@ -1,0 +1,33 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add the Microsoft OpenJDK 25 XMvn 5 toolchain definition"
+type = "file-add"
+file = "toolchains-msopenjdk25.xml"
+source = "toolchains-msopenjdk25.xml"
+
+[[overlays]]
+description = "Register the Microsoft OpenJDK 25 XMvn 5 toolchain source"
+type = "spec-insert-tag"
+tag = "Source26"
+value = "toolchains-msopenjdk25.xml"
+
+[[overlays]]
+description = "Package an XMvn 5 toolchain binding for Microsoft OpenJDK 25"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+	"",
+	"install -p -m 644 %{SOURCE26} %{buildroot}%{_datadir}/%{name}/conf/toolchains-msopenjdk25.xml",
+	"%jp_binding --verbose --base-pkg %{name}-minimal --binding-pkg %{name}-toolchain-msopenjdk25 --variant msopenjdk25 --ghost %{name}-toolchains.xml --target %{_datadir}/%{name}/conf/toolchains-msopenjdk25.xml --requires msopenjdk-25",
+]
+
+[[overlays]]
+description = "Suggest the Microsoft OpenJDK 25 Maven 4 binding for XMvn 5"
+type = "spec-search-replace"
+section = "%package"
+package = "minimal"
+regex = '^Suggests:       maven4-openjdk25$'
+replacement = 'Suggests:       maven4-msopenjdk25'

@@ -1,0 +1,19 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Package an Ant JDK binding for Microsoft OpenJDK 25"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+	"",
+	"echo 'JAVA_HOME=%{_jvmdir}/msopenjdk-25' > %{buildroot}%{_javaconfdir}/ant-msopenjdk25.conf",
+	"%jp_binding --verbose --variant msopenjdk25 --ghost ant.conf --target %{_javaconfdir}/ant-msopenjdk25.conf --provides %{name}-jdk-binding --requires msopenjdk-25",
+]
+
+[[overlays]]
+description = "Suggest the Microsoft OpenJDK 25 binding for Ant"
+type = "spec-search-replace"
+regex = '^Suggests:       %\{name\}-openjdk25 = %\{version\}-%\{release\}$'
+replacement = 'Suggests:       %{name}-msopenjdk25 = %{version}-%{release}'

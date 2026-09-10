@@ -1,0 +1,60 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add Microsoft OpenJDK 25 build-tool binding packages"
+type = "spec-append-lines"
+section = "%description"
+package = "javapackages-compat"
+lines = [
+    "",
+    "%package -n maven-local-msopenjdk25",
+    "Summary:        Macros and scripts for Maven packaging with Microsoft OpenJDK 25",
+    "Requires:       msopenjdk-25",
+    "Requires:       %{name} = %{version}-%{release}",
+    "Requires:       javapackages-local-msopenjdk25 = %{version}-%{release}",
+    "Requires:       xmvn-minimal",
+    "Requires:       xmvn-toolchain-msopenjdk25",
+    "Requires:       mvn(org.fedoraproject.xmvn:xmvn-mojo)",
+    "Requires:       mvn(org.apache.maven.plugins:maven-compiler-plugin)",
+    "Requires:       mvn(org.apache.maven.plugins:maven-jar-plugin)",
+    "Requires:       mvn(org.apache.maven.plugins:maven-resources-plugin)",
+    "Requires:       mvn(org.apache.maven.plugins:maven-surefire-plugin)",
+    "",
+    "%description -n maven-local-msopenjdk25",
+    "This package provides macros and scripts to support packaging Maven artifacts",
+    "with Microsoft OpenJDK 25.",
+    "",
+    "%package -n javapackages-local-msopenjdk25",
+    "Summary:        Non-essential Java packaging support for Microsoft OpenJDK 25",
+    "Requires:       javapackages-common = %{version}-%{release}",
+    "Requires:       xmvn-tools",
+    "Requires:       msopenjdk-25",
+    "Requires:       xmvn-generator",
+    "Requires:       (ant-msopenjdk25 if ant)",
+    "",
+    "%description -n javapackages-local-msopenjdk25",
+    "This package provides non-essential macros and scripts to support Java packaging",
+    "with Microsoft OpenJDK 25.",
+]
+
+[[overlays]]
+description = "Generate Java packaging configuration for Microsoft OpenJDK 25"
+type = "spec-search-replace"
+section = "%build"
+regex = '^    --jvm=openjdk25=%\{_jvmdir\}/jre-25-openjdk$'
+replacement = """    --jvm=openjdk25=%{_jvmdir}/jre-25-openjdk \\
+    --jvm=msopenjdk25=%{_jvmdir}/msopenjdk-25"""
+
+[[overlays]]
+description = "Package Microsoft OpenJDK 25 Java build configuration"
+type = "spec-append-lines"
+section = "%files"
+package = "maven-local-openjdk25"
+lines = [
+    "",
+    "%files -n javapackages-local-msopenjdk25 -f files-local-msopenjdk25",
+    "",
+    "%files -n maven-local-msopenjdk25",
+]

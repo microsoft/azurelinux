@@ -1,0 +1,31 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build Maven with the Microsoft OpenJDK 25 packaging toolchain"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "maven-local-openjdk25"
+
+[[overlays]]
+description = "Require the Microsoft OpenJDK 25 Maven packaging toolchain"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "maven-local-msopenjdk25"
+
+[[overlays]]
+description = "Package a Maven JDK binding for Microsoft OpenJDK 25"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+	"",
+	"echo JAVA_HOME=%{_jvmdir}/msopenjdk-25 >%{buildroot}%{_javaconfdir}/maven%{?maven_version_suffix}-msopenjdk25.conf",
+	"%jp_binding --verbose --variant msopenjdk25 --ghost maven%{?maven_version_suffix}.conf --target %{_javaconfdir}/maven%{?maven_version_suffix}-msopenjdk25.conf --provides %{name}-jdk-binding --requires msopenjdk-25",
+]
+
+[[overlays]]
+description = "Suggest the Microsoft OpenJDK 25 binding for Maven"
+type = "spec-search-replace"
+regex = '^Suggests: %\{name\}-openjdk25 = %\{epoch\}:%\{version\}-%\{release\}$'
+replacement = 'Suggests: %{name}-msopenjdk25 = %{epoch}:%{version}-%{release}'
