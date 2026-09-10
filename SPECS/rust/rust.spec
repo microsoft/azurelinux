@@ -122,8 +122,6 @@ cp "$RUST_BOOTSTRAP_DIR"/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.x
 cp "$RUST_BOOTSTRAP_DIR"/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz "$BUILD_CACHE_DIR"
 %endif
 
-rm -rf vendor/libssh2-sys-0.3.1
-
 %build
 # Disable symbol generation
 export CFLAGS="`echo " %{build_cflags} " | sed 's/ -g//'`"
