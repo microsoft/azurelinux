@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/kernel-hwe.azl.macros}
+
 # Azure Linux local kernel spec.
 #
 # This is a maintained local spec (migrated from the previous azldev TOML
@@ -1047,6 +1050,7 @@ Source5004: %{azl_config_override_prefix}-aarch64-azl-override.config
 Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
 Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
+Source9999: kernel-hwe.azl.macros
 
 ## Patches needed for building this package
 
