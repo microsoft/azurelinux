@@ -1,0 +1,16 @@
+# Work around SymCrypt's unversioned allocator references splitting between
+# libc and libc_malloc_debug when glibc's checked allocator is enabled. The
+# incompatible bindings cause a crash on free() during SymCrypt load.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+bugs = [
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/23389" },
+    { url = "https://github.com/microsoft/SymCrypt/issues/62" },
+]
+
+[[overlays]]
+description = "Work around SymCrypt allocator interposition in tests"
+type = "patch-add"
+source = "../0001-tests-disable-glibc-malloc-check.patch"

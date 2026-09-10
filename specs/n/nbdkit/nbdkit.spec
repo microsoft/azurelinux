@@ -58,7 +58,7 @@
 
 Name:           nbdkit
 Version:        1.46.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        NBD server
 
 License:        BSD-3-Clause
@@ -223,6 +223,7 @@ Requires:       (%{name}-selinux if selinux-policy-%{selinuxtype})
 %endif
 
 
+Patch0: 0001-tests-disable-glibc-malloc-check.patch
 %description
 NBD is a protocol for accessing block devices (hard disks and
 disk-like things) over the network.
