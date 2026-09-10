@@ -1,6 +1,6 @@
-From 5dd75e202a9184c1b5783261fa2cc3aeb302f31a Mon Sep 17 00:00:00 2001
+From eb959ea2355cbf67ee34417dbf411b90af3ebfa5 Mon Sep 17 00:00:00 2001
 From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
-Date: Thu, 10 Sep 2026 10:44:56 +0000
+Date: Thu, 10 Sep 2026 15:53:41 +0000
 Subject: [PATCH] Backport upstream rustix#1663 to remove rustc_attrs from
  vendored tardev-snapshotter rustix
 
@@ -26,11 +26,7 @@ those crates' Makefiles set RUSTC_BOOTSTRAP=1, so their build.rs probes
 never succeed on stable rustc and the cfg is never enabled there; they
 are unaffected and are not touched by this patch.
 
-This backports the equivalent of upstream commit
-bytecodealliance/rustix#1663 ("Completely remove rustc_attrs", merged
-2026-08-18: "it appears rustc is no longer accepting user code using
-those attributes, so just comment them out entirely") to this vendored
-copy:
+This backports the same edits as upstream to this vendored copy:
   - build.rs: remove the rustc_attrs feature probe entirely
   - src/lib.rs: remove the now-unreachable feature(rustc_attrs) gate
   - src/backend/linux_raw/io/errno.rs: unconditionally allow
@@ -45,6 +41,8 @@ Cargo.toml.)
 
 This only forgoes niche-layout optimizations on these three internal
 types and has no other functional effect.
+
+Upstream Patch Reference: https://github.com/bytecodealliance/rustix/commit/aab946409792a9363cbac644c2fd0f7b2762f071.patch
 ---
  .../vendor/rustix/.cargo-checksum.json               |  2 +-
  src/tardev-snapshotter/vendor/rustix/build.rs        |  1 -
