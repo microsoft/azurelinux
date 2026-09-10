@@ -1,0 +1,49 @@
+# Systemd preset overrides for the Azure Linux WSL variant.
+#
+# WSL manages networking, DNS resolution and the console on behalf of the
+# distribution, so units that duplicate that management should not be enabled.
+# Three sources drive this list, and they do not fully overlap:
+#
+#   1. The WSL systemd recommendations:
+#      https://learn.microsoft.com/windows/wsl/build-custom-distro#systemd-recommendations
+#   2. DISCOURAGED_SYSTEM_UNITS in WSL's distribution validator,
+#      https://github.com/microsoft/WSL/blob/master/distributions/validate-modern.py
+#      which runs as the "Validate tar based distributions changes" check when
+#      the image is submitted for listing. It reports warnings, not errors.
+#   3. Review feedback from the WSL maintainers on microsoft/WSL#41120, which
+#      additionally called out the console units by name on the grounds that
+#      they fail when several distributions claim the console in parallel.
+#
+# systemd reads preset files from all preset directories in lexicographic
+# filename order and applies the first line that matches a unit, so this file
+# takes precedence over both Azure Linux's 90-default.preset and systemd's own
+# 90-systemd.preset. The 80- prefix matches the convention fedora-release uses
+# for its variant presets (80-server.preset, 80-workstation.preset, ...).
+#
+# Presets control installation-time enablement, not dependency activation.
+# azurelinux-release-identity-wsl also masks console-getty.service, which is
+# activated by a generator, and the static systemd-vconsole-setup.service,
+# tmp.mount and systemd-tmpfiles-setup-dev* units.
+# Keep the two lists in sync with the comment in azurelinux-release.spec.
+
+# WSL configures the network adapters; the distribution must not.
+disable systemd-networkd.service
+disable systemd-networkd.socket
+disable systemd-networkd-varlink.socket
+disable systemd-networkd-wait-online.service
+
+# WSL owns DNS resolution and writes /etc/resolv.conf itself.
+disable systemd-resolved.service
+disable systemd-resolved-monitor.socket
+disable systemd-resolved-varlink.socket
+
+# systemd-getty-generator adds console-getty.service in containers independently
+# of presets. The WSL identity package also masks it so the generated dependency
+# cannot start a console login service at boot.
+disable console-getty.service
+
+# A vendor preset can enable getty@tty1 through DefaultInstance=tty1 even when
+# the generator takes its container path. Disable the template and its instances
+# as requested by the WSL maintainers (microsoft/WSL#41120). The unit's
+# ConditionPathExists=/dev/tty0 is a runtime gate, not an enablement policy.
+disable getty@*.service

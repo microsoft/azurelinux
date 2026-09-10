@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        28%{?dist}
+Release:        29%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -49,6 +49,7 @@ Source14:       distro-template.swidtag
 Source15:       distro-variant-template.swidtag
 Source16:       20-azurelinux-defaults.conf
 Source17:       20-azure.conf
+Source18:       80-wsl.preset
 
 Source20:       chrony-azure.conf
 Source21:       50-azure-cloud.conf
@@ -224,7 +225,7 @@ Summary:        Package providing the identity for Azure Linux WSL.
 RemovePathPostfixes: .wsl
 Provides:       azurelinux-release-identity = %{version}-%{release}
 Conflicts:      azurelinux-release-identity
-Requires(meta): azurelinux-release-container = %{version}-%{release}
+Requires(meta): azurelinux-release-wsl = %{version}-%{release}
 
 
 %description identity-wsl
@@ -371,6 +372,37 @@ echo "VARIANT=\"WSL\"" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 echo "VARIANT_ID=wsl" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -i -e "s|(%{release_name}%{?prerelease})|(WSL%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/WSL/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
+
+# WSL manages networking, DNS and the console for the distribution, so the
+# units that duplicate that management must not be enabled. This preset sorts
+# before 90-default.preset and systemd's 90-systemd.preset, and systemd applies
+# the first matching line, so it overrides both.
+install -Dm0644 %{SOURCE18} -t %{buildroot}%{_prefix}/lib/systemd/system-preset/
+
+# Presets do not prevent dependency or generator activation. The getty generator
+# adds console-getty.service in containers regardless of its preset. The other
+# units below are static: systemd-vconsole-setup.service is pulled in by a udev
+# rule, and the rest by *.target.wants directories shipped in /usr/lib.
+# Mask them so those activation paths cannot start them. WSL's image validator
+# also recognizes these /etc/systemd/system symlinks to /dev/null.
+#
+# systemd-tmpfiles-setup.service is deliberately NOT masked: wsl-setup relies on
+# it to create /tmp/.X11-unix pointing at WSLg's X11 sockets. Wayland and
+# PulseAudio links are handled separately by the user tmpfiles service.
+#
+# systemd-tmpfiles-clean.service/.timer are deliberately NOT masked either.
+# With tmp.mount masked, keep periodic aging for the distribution's persistent
+# /tmp rather than relying on the host to clean it. wsl-setup gives
+# /tmp/.X11-unix its own tmpfiles entry, so the parent-directory clean skips
+# the link and does not recurse into WSLg's socket directory.
+install -d %{buildroot}%{_sysconfdir}/systemd/system
+for unit in console-getty.service \
+            systemd-vconsole-setup.service \
+            tmp.mount \
+            systemd-tmpfiles-setup-dev.service \
+            systemd-tmpfiles-setup-dev-early.service; do
+    ln -s /dev/null %{buildroot}%{_sysconfdir}/systemd/system/"${unit}"
+done
 %endif
 
 # Create the symlink for /etc/os-release
@@ -501,10 +533,21 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %files identity-wsl
 %{_prefix}/lib/os-release.wsl
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
+%{_prefix}/lib/systemd/system-preset/80-wsl.preset
+%{_sysconfdir}/systemd/system/console-getty.service
+%{_sysconfdir}/systemd/system/systemd-vconsole-setup.service
+%{_sysconfdir}/systemd/system/tmp.mount
+%{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
+%{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev-early.service
 %endif
 
 
 %changelog
+* Wed Sep 02 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-29
+- Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and the console getty units for the WSL variant
+- Mask the generator-activated console getty and static vconsole, /tmp and early device setup units
+- Pair the WSL identity with the WSL release package rather than the container variant
+
 * Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-28
 - Disable secure redirects and IPv6 router advertisements for CIS hardening
 
