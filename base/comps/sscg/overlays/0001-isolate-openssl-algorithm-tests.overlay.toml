@@ -1,0 +1,41 @@
+# SSCG deliberately tests algorithms and parameters across OpenSSL's complete
+# provider coverage. Azure Linux's kernel-FIPS configuration prefers SymCrypt,
+# whose implementations may advertise an algorithm family but reject parameters
+# that the default provider supports.
+#
+# The top-level openssl_conf setting names the section containing configuration
+# modules to initialize. Azure Linux's standard openssl_init section invokes the
+# providers module, whose kernel-FIPS path loads SymCrypt from a fixed system
+# path even if its drop-in is absent from the ambient configuration. Pointing to
+# a new initialization section is therefore the only nondestructive way to omit
+# SymCrypt. Keep the SSL and algorithm-property modules so system crypto policy
+# still applies. Because no provider is explicitly activated, OpenSSL implicitly
+# loads the default provider when SSCG first fetches an algorithm.
+
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+bugs = [
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/23391" },
+]
+
+[[overlays]]
+description = "Run SSCG algorithm coverage tests with the default OpenSSL provider"
+type = "spec-prepend-lines"
+section = "%check"
+lines = [
+    "# openssl_conf names the section containing configuration modules to run.",
+    "# Azure Linux's standard section invokes the providers module, whose",
+    "# kernel-FIPS path loads SymCrypt from a fixed system path. Copy the real",
+    "# configuration and select a test section that omits only that module.",
+    "sed -E 's/^[[:space:]]*openssl_conf[[:space:]]*=.*/openssl_conf = sscg_test_init/' \\",
+    "    /etc/pki/tls/openssl.cnf > openssl-sscg-tests.cnf",
+    "cat >> openssl-sscg-tests.cnf <<'EOF'",
+    "[sscg_test_init]",
+    "# Preserve system TLS and algorithm-property policy. With no provider",
+    "# explicitly activated, OpenSSL loads the default provider on first use.",
+    "ssl_conf = ssl_module",
+    "alg_section = evp_properties",
+    "EOF",
+    "export OPENSSL_CONF=\"$PWD/openssl-sscg-tests.cnf\"",
+]
