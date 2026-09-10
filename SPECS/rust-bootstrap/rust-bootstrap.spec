@@ -1,6 +1,6 @@
 Summary:        Prebuilt stage0 bootstrap toolchain used to build rust
 Name:           rust-bootstrap
-Version:        1.95.0
+Version:        1.97.1
 Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
@@ -14,7 +14,7 @@ BuildArch:      noarch
 #    consumed by rust.spec to bootstrap-compile a new toolchain from source.
 #  - When bumping "stage0_version"/"release_date" in rust.spec, bump the same
 #    values here (Version and %{release_date}) and rebuild this package first.
-%define release_date 2026-04-16
+%define release_date 2026-07-16
 
 Source0:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{version}-x86_64-unknown-linux-gnu.tar.xz
 Source1:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{version}-x86_64-unknown-linux-gnu.tar.xz

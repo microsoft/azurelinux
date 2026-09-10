@@ -78,7 +78,8 @@
 		"^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.md$",
 		"^/usr/share/doc/docs/html/core/.*/fn\\..*absd.*\\.html$",
 		"^/usr/share/doc/docs/html/rustc/platform-support/.*bsd.*\\.html$",
-		"^/usr/share/doc/docs/html/search\\.index/.*\\.js$"
+		"^/usr/share/doc/docs/html/search\\.index/.*\\.js$",
+		"^/usr/share/doc/docs/html/rust-by-example/.*/searchindex-[0-9a-f]+\\.js$"
 	    ]
 	 }
     ],

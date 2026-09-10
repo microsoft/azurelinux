@@ -3,12 +3,12 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2026-04-16
-%define stage0_version 1.95.0
+%define release_date 2026-07-16
+%define stage0_version 1.97.1
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.96.1
+Version:        1.98.1
 Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
@@ -35,17 +35,14 @@ Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 #
 
 Source1:        rustc-%{version}-src-cargo.tar.gz
-Patch0:         CVE-2025-53605.patch
-Patch1:         CVE-2025-67873.patch
-Patch2:         CVE-2025-68114.patch
-Patch3:         CVE-2025-4207.patch
-Patch4:         CVE-2025-12818.patch
-Patch5:         CVE-2026-24116.patch
-Patch6:         CVE-2025-58160.patch
-Patch7:         CVE-2026-2006.patch
-Patch8:         CVE-2026-34743.patch
-Patch9:         CVE-2026-40034.patch
-Patch10:        CVE-2026-47143.patch
+Patch0:         CVE-2025-4207.patch
+Patch1:         CVE-2025-12818.patch
+Patch2:         CVE-2026-24116.patch
+Patch3:         CVE-2025-58160.patch
+Patch4:         CVE-2026-2006.patch
+Patch5:         CVE-2026-34743.patch
+Patch6:         CVE-2026-66033.patch
+Patch7:         CVE-2026-7598.patch
 
 # Note: the stage0 bootstrap toolchain (cargo/rustc/rust-std tarballs) is packaged
 # separately in rust-bootstrap, to keep this SRPM's size down. See SPECS/rust-bootstrap.
@@ -214,6 +211,9 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 %{_libdir}/rustlib/src
 
 %changelog
+* Thu Sep 10 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.98.1-1
+- Upgrade to 1.98.1
+
 * Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.1-1
 - Move stage0 bootstrap toolchain tarballs (cargo/rustc/rust-std) out of this
   SRPM into a new rust-bootstrap BuildRequires package, to keep this SRPM small.
