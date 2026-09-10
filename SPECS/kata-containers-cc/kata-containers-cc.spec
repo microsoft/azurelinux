@@ -17,16 +17,19 @@ Source1:      %{sourceName}-3.15.0.aks1-cargo.tar.gz
 Source2:      %{sourceName}-%{version}-vendor.tar.gz
 Patch0:       rust-1.90-fixes.patch
 Patch1:       CVE-2026-41602.patch
-Patch2:       CVE-2025-5791.patch
-Patch3:       CVE-2025-4574.patch
-Patch4:       CVE-2026-42250.patch
-Patch5:       CVE-2026-43871.patch
-Patch6:       CVE-2026-48586.patch
-Patch7:       CVE-2026-55969.patch
-Patch8:       CVE-2026-50540.patch
-Patch9:       CVE-2026-44210.patch
-Patch10:      rust-fix-unstable-name-collisions.patch
-Patch11:      CVE-2026-84445.patch
+Patch2:       CVE-2026-39821.patch
+Patch3:       CVE-2026-33814.patch
+Patch4:       CVE-2025-5791.patch
+Patch5:       CVE-2025-4574.patch
+Patch6:       CVE-2026-42250.patch
+Patch7:       CVE-2026-56852.patch
+Patch8:       CVE-2026-43871.patch
+Patch9:       CVE-2026-48586.patch
+Patch10:      CVE-2026-55969.patch
+Patch11:      CVE-2026-50540.patch
+Patch12:      CVE-2026-44210.patch
+Patch13:      rust-fix-unstable-name-collisions.patch
+Patch9:       rustix-remove-rustc-attrs.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -166,9 +169,8 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Thu Sep 17 2026 Akhila <akhila@microsoft.com> - 3.15.0.aks0-21
-- Generate Source2 go vendor tarball by upgrading grpc to v1.83.2 to fix CVE-2026-84445 and CVE-2026-84304
-- Drop CVE-2026-39821, CVE-2026-33814 and CVE-2026-56852 patches, fixed by the new vendor tree
+* Thu Sep 10 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-21
+- Backport upstream rustix#1663 to build with latest rust
 
 * Wed Aug 26 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-20
 - Fix unstable_name_collisions rust build errors in kata-sys-util mount.rs
