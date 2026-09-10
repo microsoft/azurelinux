@@ -1,0 +1,128 @@
+From f9858b3d7c82bd8118361f7af9d4dcba340da0bb Mon Sep 17 00:00:00 2001
+From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
+Date: Thu, 10 Sep 2026 13:16:41 +0000
+Subject: [PATCH] Backport upstream rustix#1663 to remove rustc_attrs
+
+Rust removed support for the internal rustc_layout_scalar_valid_range_start
+/_end and rustc_nonnull_optimization_guaranteed attributes for external
+crates starting around rustc 1.97 (rust-lang/rust#155433,
+rust-lang/rust#156510), as part of an in-progress migration to pattern
+types. tardev-snapshotter's Makefile builds with RUSTC_BOOTSTRAP=1, which
+lets this crate's build.rs probe (use_feature_or_nothing("rustc_attrs"))
+successfully detect #![feature(rustc_attrs)] support and enable the
+rustc_attrs cfg, activating the now-forbidden attributes on Errno,
+BorrowedFd, and OwnedFd:
+
+  error: attributes starting with `rustc` are reserved for use by the
+  `rustc` compiler
+  error: cannot find attribute `rustc_layout_scalar_valid_range_start` in
+  this scope
+
+This applies the same edits as upstream commit bytecodealliance/rustix#1663
+("Completely remove rustc_attrs", merged 2026-08-18):
+  - build.rs: remove the rustc_attrs feature probe
+  - src/lib.rs: remove the now-unreachable feature(rustc_attrs) gate
+  - src/backend/linux_raw/io/errno.rs: unconditionally allow
+    unused_unsafe, and comment out the two scalar-valid-range attributes
+    on Errno
+  - src/io/fd/owned.rs: comment out the scalar-valid-range /
+    nonnull-optimization attributes on BorrowedFd and OwnedFd
+
+This only forgoes niche-layout optimizations on these three internal
+types and has no other functional effect.
+---
+ build.rs                          |  1 -
+ src/backend/linux_raw/io/errno.rs |  6 +++---
+ src/io/fd/owned.rs                | 12 ++++++------
+ src/lib.rs                        |  1 -
+ 4 files changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/build.rs b/build.rs
+index 320b305..41df155 100644
+--- a/build.rs
++++ b/build.rs
+@@ -11,7 +11,6 @@ fn main() {
+     // the rustc version.
+     println!("cargo:rerun-if-changed=build.rs");
+ 
+-    use_feature_or_nothing("rustc_attrs");
+ 
+     // Features only used in no-std configurations.
+     #[cfg(not(feature = "std"))]
+diff --git a/src/backend/linux_raw/io/errno.rs b/src/backend/linux_raw/io/errno.rs
+index a6d30ca..f0da63f 100644
+--- a/src/backend/linux_raw/io/errno.rs
++++ b/src/backend/linux_raw/io/errno.rs
+@@ -8,7 +8,7 @@
+ //! Linux uses error codes in `-4095..0`; we use rustc attributes to describe
+ //! this restricted range of values.
+ #![allow(unsafe_code)]
+-#![cfg_attr(not(rustc_attrs), allow(unused_unsafe))]
++#![allow(unused_unsafe)]
+ 
+ use super::super::c;
+ use crate::backend::fd::RawFd;
+@@ -25,8 +25,8 @@ use linux_raw_sys::errno;
+ #[derive(Eq, PartialEq, Hash, Copy, Clone)]
+ // Linux returns negated error codes, and we leave them in negated form, so
+ // error codes are in `-4095..0`.
+-#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0xf001))]
+-#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_end(0xffff))]
++//#[rustc_layout_scalar_valid_range_start(0xf001)]
++//#[rustc_layout_scalar_valid_range_end(0xffff)]
+ pub struct Errno(u16);
+ 
+ impl Errno {
+diff --git a/src/io/fd/owned.rs b/src/io/fd/owned.rs
+index 2b9238c..f0d7414 100644
+--- a/src/io/fd/owned.rs
++++ b/src/io/fd/owned.rs
+@@ -29,13 +29,13 @@ use core::mem::forget;
+ /// descriptor, which is then borrowed under the same lifetime.
+ #[derive(Copy, Clone)]
+ #[repr(transparent)]
+-#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
++//#[rustc_layout_scalar_valid_range_start(0)]
+ // libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
+ // 32-bit c_int. Below is -2, in two's complement, but that only works out
+ // because c_int is 32 bits.
+-#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE))]
++//#[rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)]
+ #[cfg_attr(staged_api, unstable(feature = "io_safety", issue = "87074"))]
+-#[cfg_attr(rustc_attrs, rustc_nonnull_optimization_guaranteed)]
++//#[rustc_nonnull_optimization_guaranteed]
+ pub struct BorrowedFd<'fd> {
+     fd: RawFd,
+     _phantom: PhantomData<&'fd OwnedFd>,
+@@ -50,13 +50,13 @@ pub struct BorrowedFd<'fd> {
+ /// passed as a consumed argument or returned as an owned value, and it never
+ /// has the value `-1`.
+ #[repr(transparent)]
+-#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
++//#[rustc_layout_scalar_valid_range_start(0)]
+ // libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
+ // 32-bit c_int. Below is -2, in two's complement, but that only works out
+ // because c_int is 32 bits.
+-#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE))]
++//#[rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)]
+ #[cfg_attr(staged_api, unstable(feature = "io_safety", issue = "87074"))]
+-#[cfg_attr(rustc_attrs, rustc_nonnull_optimization_guaranteed)]
++//#[rustc_nonnull_optimization_guaranteed]
+ pub struct OwnedFd {
+     fd: RawFd,
+ }
+diff --git a/src/lib.rs b/src/lib.rs
+index 3316c50..356ffb7 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -98,7 +98,6 @@
+ #![deny(missing_docs)]
+ #![allow(stable_features)]
+ #![cfg_attr(linux_raw, deny(unsafe_code))]
+-#![cfg_attr(rustc_attrs, feature(rustc_attrs))]
+ #![cfg_attr(doc_cfg, feature(doc_cfg))]
+ #![cfg_attr(all(wasi_ext, target_os = "wasi", feature = "std"), feature(wasi_ext))]
+ #![cfg_attr(
+-- 
+2.45.4
+
