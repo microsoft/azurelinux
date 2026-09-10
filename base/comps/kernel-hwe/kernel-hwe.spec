@@ -17,9 +17,11 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 3
+%define azl_pkgrelease 4
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.57.04
+# Short flavor name used to distinguish HWE-specific package identities.
+%define kernel_short_name hwe
 
 # All Global changes to build and install go here.
 # Per the below section about __spec_install_pre, any rpm
@@ -1070,9 +1072,9 @@ AutoProv: yes\
 
 
 
-# AZL: kmod subpackage declarations (nvidia-open)
+# AZL: kmod subpackage declarations (nvidia-open-hwe)
 %global _kmod_phase package
-%global _kmod_name nvidia-open
+%global _kmod_name nvidia-open-%{kernel_short_name}
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
@@ -2051,9 +2053,9 @@ SPECPACKAGE_NAME=%{name} RHJOBS=$RPM_BUILD_NCPUS ./process_configs.sh $OPTS %{sp
 cd ../..
 %endif
 
-# AZL: Prepare kmod subpackage sources (nvidia-open)
+# AZL: Prepare kmod subpackage sources (nvidia-open-hwe)
 %global _kmod_phase prep
-%global _kmod_name nvidia-open
+%global _kmod_name nvidia-open-%{kernel_short_name}
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
@@ -3131,9 +3133,9 @@ find Documentation -type d | xargs chmod u+w
 %{log_msg "end install docs"}
 %endif
 
-# AZL: Build kmod subpackage modules (nvidia-open)
+# AZL: Build kmod subpackage modules (nvidia-open-hwe)
 %global _kmod_phase build
-%global _kmod_name nvidia-open
+%global _kmod_name nvidia-open-%{kernel_short_name}
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
@@ -3636,9 +3638,9 @@ popd
 %endif
 
 ###
-# AZL: Install kmod subpackage files (nvidia-open)
+# AZL: Install kmod subpackage files (nvidia-open-hwe)
 %global _kmod_phase install
-%global _kmod_name nvidia-open
+%global _kmod_name nvidia-open-%{kernel_short_name}
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
@@ -4281,9 +4283,9 @@ fi\
 #
 #
 
-# AZL: kmod subpackage file lists and scriptlets (nvidia-open)
+# AZL: kmod subpackage file lists and scriptlets (nvidia-open-hwe)
 %global _kmod_phase files
-%global _kmod_name nvidia-open
+%global _kmod_name nvidia-open-%{kernel_short_name}
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
