@@ -17,14 +17,6 @@ standard library in Go 1.22:
 
 Go 1.27 added the `stdversion` analyzer to the set of vet checks that
 `go test` runs by default (`defaultVetFlags` in cmd/go/internal/test).
-That analyzer reports the use of standard library symbols newer than the
-language version declared in go.mod, so the %check section now fails with:
-
-    # github.com/tomwright/dasel/v2
-    # [github.com/tomwright/dasel/v2]
-    ./value.go:329:34: reflect.TypeFor requires go1.22 or later (module is go1.21)
-    ./value.go:330:38: reflect.TypeFor requires go1.22 or later (module is go1.21)
-    FAIL	github.com/tomwright/dasel/v2 [build failed]
 
 `go build` is unaffected, so only the test run breaks. Declaring `go 1.22`
 makes go.mod match the code's real requirement, which the spec already
