@@ -1,0 +1,53 @@
+From: Kanishk Bansal <kanbansal@microsoft.com>
+Date: Thu Sep 10 2026
+Subject: [PATCH] go.mod: declare the Go language version actually required (1.22)
+
+What
+----
+Bump the `go` directive in go.mod from `go 1.21` to `go 1.22`.
+
+Why
+---
+dasel v2.8.1 ships an inconsistent module declaration: go.mod declares
+`go 1.21`, but value.go uses `reflect.TypeFor`, which was added to the
+standard library in Go 1.22:
+
+    value.go:329: var sliceInterfaceType = reflect.TypeFor[[]any]()
+    value.go:330: var mapStringInterfaceType = reflect.TypeFor[map[string]interface{}]()
+
+Go 1.27 added the `stdversion` analyzer to the set of vet checks that
+`go test` runs by default (`defaultVetFlags` in cmd/go/internal/test).
+That analyzer reports the use of standard library symbols newer than the
+language version declared in go.mod, so the %check section now fails with:
+
+    # github.com/tomwright/dasel/v2
+    # [github.com/tomwright/dasel/v2]
+    ./value.go:329:34: reflect.TypeFor requires go1.22 or later (module is go1.21)
+    ./value.go:330:38: reflect.TypeFor requires go1.22 or later (module is go1.21)
+    FAIL	github.com/tomwright/dasel/v2 [build failed]
+
+`go build` is unaffected, so only the test run breaks. Declaring `go 1.22`
+makes go.mod match the code's real requirement, which the spec already
+encodes via `BuildRequires: golang >= 1.22`.
+
+Upstream reference
+------------------
+None. dasel v2.8.1 is the final release of the v2 line; upstream development
+moved to the v3 module path (github.com/tomwright/dasel/v3, go 1.25), so this
+defect will never be fixed on v2 and no upstream commit can be backported.
+
+Droppable
+---------
+Drop this patch when dasel is upgraded to a release whose go.mod declares
+go >= 1.22 (i.e. the v3 series).
+
+--- a/go.mod
++++ b/go.mod
+@@ -1,6 +1,6 @@
+ module github.com/tomwright/dasel/v2
+ 
+-go 1.21
++go 1.22
+ 
+ require (
+ 	github.com/alecthomas/chroma/v2 v2.13.0
