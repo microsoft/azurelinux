@@ -1,3 +1,29 @@
 [components.kata-containers]
-# Release: 1%{?rcrel}%{?dist}
+# Release: %[1 + %{azl_release}]%{?rcrel}%{?dist}
 release = { calculation = "manual" }
+
+[components.kata-containers.build.defines]
+# AZL-only release counter added to upstream's Release. Bump for an AZL rebuild,
+# since manual release calculation can't auto-bump the Release.
+azl_release = "1"
+
+[[components.kata-containers.overlays]]
+description = "Fold azl_release into upstream Release so AZL rebuilds bump independently (manual release calculation can't auto-bump)"
+type = "spec-set-tag"
+tag = "Release"
+value = "%[1 + %{azl_release}]%{?rcrel}%{?dist}"
+[components.kata-containers.overlays.metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+# The Windows-only import-library removal and the matching cargo-checksum pruning are one
+# logical change; they live in overlays/0001-remove-windows-import-libraries.overlay.toml
+# (auto-loaded via the project-wide overlay-files glob) under a single azl-pruning metadata
+# block. The repacked vendor tarball they produce is pinned below.
+[[components.kata-containers.source-files]]
+filename = "kata-containers-3.26.0-vendor.tar.gz"
+hash = "2a9018a423a83ca80741b203b6b96a6895bae8734751f293e3ce7de772664cd69c87ae2fb8d556e77f31ae52051ce518d7075315858a05b5638290f7ea447e4c"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Removes the Windows-only winapi-*-pc-windows-* and windows_*_{gnu,gnullvm,msvc} static import libraries (lib/*.a and .lib) that are flagged during source package signing, and drops the corresponding entries from each crate's .cargo-checksum.json; the crates are target-gated to Windows and never built on Linux."

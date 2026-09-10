@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/kata-containers.azl.macros}
+
 # go-rpm-macros are not available on RHEL.
 %global have_go_rpm_macros 1
 %global with_debug 0
@@ -59,7 +62,7 @@ workload isolation and security advantages of VMs. https://katacontainers.io/.}
 # Unlike for RHEL, we cannot strip it down because we build all components
 # (RHEL builds only build kata-agent)
 Name:       %{repo}
-Release:    1%{?rcrel}%{?dist}
+Release: %[1 + %{azl_release}]%{?rcrel}%{?dist}
 Summary:    Kata Containers version 3.x repository
 License:    Apache-2.0
 Url:        https://%{download}
@@ -69,6 +72,7 @@ Source2:    kata-osbuilder.sh
 Source3:    kata-osbuilder-generate.service
 Source4:    15-dracut.conf
 Source5:    50-kata
+Source9999: kata-containers.azl.macros
 
 # Keep this patch downstream as it'd be hard to justify such change upstream
 Patch0999:  0999-osbuilder-Adjust-agent_version-for-our-builds.patch
