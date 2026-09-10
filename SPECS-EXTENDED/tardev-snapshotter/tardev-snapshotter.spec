@@ -41,9 +41,7 @@ popd
 %autosetup -p1 -N
 
 # Apply Patch0 to the cached rustix sources (not part of the main source tree, so %%autosetup can't apply it).
-for rustix_dir in "$HOME"/.cargo/registry/src/*/rustix-0.37.27; do
-    patch -p1 -d "$rustix_dir" < %{PATCH0}
-done
+patch -p1 -d "$HOME/.cargo" < %{PATCH0}
 
 %build
 export CARGO_NET_OFFLINE=true
