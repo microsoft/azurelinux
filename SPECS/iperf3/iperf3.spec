@@ -1,7 +1,7 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
-Version:        3.17.1
-Release:        5%{?dist}
+Version:        3.21
+Release:        1%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,12 +9,7 @@ Group:          Applications/System
 URL:            https://github.com/esnet/iperf
 Source0:        https://github.com/esnet/iperf/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         disablepg.patch
-Patch2:         CVE-2024-53580.patch
-Patch3:         CVE-2025-54350.patch
-Patch4:         CVE-2025-54349.patch
-Patch5:         openssl_encrypt_buffer_size.patch
-Patch6:         CVE-2026-71217.patch
-Patch7:         CVE-2026-71218.patch
+Patch2:         CVE-2026-71217.patch
 BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
 BuildRequires:  openssl
@@ -74,6 +69,17 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Wed Sep 10 2026 Siva Kannan <sikannan@microsoft.com> - 3.21-1
+- Update to 3.21 to pick up upstream multi-threading stability fixes
+- Fixes client crash at end of test with high -P stream counts, introduced by
+  the thread-per-stream model in 3.16 (segfaults fixed in 3.18, socket-close
+  race and PTHREAD_CANCEL_DEFERRED change in 3.21)
+- Drop CVE-2024-53580.patch, fixed upstream in 3.18
+- Drop CVE-2025-54349.patch and CVE-2025-54350.patch, fixed upstream in 3.19.1
+- Drop openssl_encrypt_buffer_size.patch, fixed upstream in 3.20
+- Drop CVE-2026-71218.patch, fixed upstream in 3.21
+- Rebase CVE-2026-71217.patch onto upstream commit 494dd377
+
 * Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.17.1-5
 - Patch for CVE-2026-71218, CVE-2026-71217
 
