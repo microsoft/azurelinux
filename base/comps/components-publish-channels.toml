@@ -2963,9 +2963,11 @@ packages = [
     "javapackages-compat", # srpm: javapackages-tools
     # perl-Log-Dispatch-ApacheLog carved to sdk: requires perl(Apache2::Log) from mod_perl which is sdk-tier. Zero consumers in base. Rest of perl-Log-Dispatch SRPM stays in base.
     "perl-Log-Dispatch-ApacheLog", # srpm: perl-Log-Dispatch
-    # javapackages-local-openjdk25 + maven-local-openjdk25 carved to sdk: these are Java package-BUILD tooling (RPM dep generation, maven build helpers). javapackages-local-openjdk25 hard-Requires xmvn-generator (sdk); maven-local-openjdk25 hard-Requires javapackages-local-openjdk25. base ships Java RUNTIME macros via javapackages-tools/javapackages-common/javapackages-filesystem; building Java packages belongs in sdk.
+    # JDK-specific javapackages-local + maven-local bindings are carved to sdk: these are Java package-BUILD tooling (RPM dep generation, maven build helpers). javapackages-local bindings hard-Require xmvn-generator (sdk); maven-local bindings hard-Require their matching javapackages-local package. base ships Java RUNTIME macros via javapackages-tools/javapackages-common/javapackages-filesystem; building Java packages belongs in sdk.
     "javapackages-local-openjdk25", # srpm: javapackages-tools
+    "javapackages-local-msopenjdk25", # srpm: javapackages-tools
     "maven-local-openjdk25", # srpm: javapackages-tools
+    "maven-local-msopenjdk25", # srpm: javapackages-tools
     # fence-agents-amt + fence-agents-amt-ws carved to sdk: both depend on amtterm (Intel AMT serial-over-LAN client, demoted to sdk). Intel AMT-managed clusters are a niche enterprise-on-prem use case; cloud-hosted nodes use serial-console-via-IMDS.
     "fence-agents-amt", # srpm: fence-agents
     "fence-agents-amt-ws", # srpm: fence-agents

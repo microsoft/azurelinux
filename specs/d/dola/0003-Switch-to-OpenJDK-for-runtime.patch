@@ -14,7 +14,7 @@ index 1cce21e..1a6bf8c 100644
 @@ -1,5 +1,5 @@
  # Path to JVM library (libjvm.so).  Java 21 or newer is required.
 -%__dola_libjvm %{_jvmdir}/jre-21-openjdk/lib/server/libjvm.so
-+%__dola_libjvm %{_jvmdir}/jre-25-openjdk/lib/server/libjvm.so
++%__dola_libjvm %{_jvmdir}/msopenjdk-25/lib/server/libjvm.so
  
  # Class path of nested JVM.
  %__dola_classpath %{_javadir}/dola/dola-bsx.jar:%{_javadir}/plexus-classworlds.jar

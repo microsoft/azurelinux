@@ -1,0 +1,18 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Require Microsoft OpenJDK 25 for the Dola BSX runtime"
+type = "spec-search-replace"
+section = "%package"
+package = "bsx"
+regex = '^Requires:       java-25-openjdk-headless$'
+replacement = 'Requires:       msopenjdk-25'
+
+[[overlays]]
+description = "Load the Microsoft OpenJDK 25 JVM from Dola BSX"
+type = "file-search-replace"
+file = "0003-Switch-to-OpenJDK-for-runtime.patch"
+regex = 'jre-25-openjdk/lib/server/libjvm\.so'
+replacement = 'msopenjdk-25/lib/server/libjvm.so'
