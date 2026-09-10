@@ -148,8 +148,7 @@ PCRE2 is a re-working of the original PCRE library to provide an entirely new
 API.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 # Available JIT archs see sljit/sljitConfig.h
@@ -262,7 +261,7 @@ make check -j1
 - Add compatibility provides for pcre2-utf{16,32}
 - Require libpcre2-8-0, libpcre2-posix2 from base package
 
-* Tue May 18 2020 Andrew Phelps <anphel@microsoft.com> - 10.34-1
+* Mon May 18 2020 Andrew Phelps <anphel@microsoft.com> - 10.34-1
 - Update to version 10.34
 
 * Tue Mar 31 2020 Joe Schmitt <joschmit@microsoft.com> - 10.32-3
