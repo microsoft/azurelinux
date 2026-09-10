@@ -178,6 +178,8 @@ mkdir -p %{buildroot}/%{_defaultdocdir}
 mv %{buildroot}%{_docdir}/pcre2 %{buildroot}/%{_defaultdocdir}/pcre2-doc
 #empty dependecy_libs
 find %{buildroot} -type f -name "*.la" -delete -print
+mv %{buildroot}%{_defaultdocdir}/pcre2-doc/COPYING .
+mv %{buildroot}%{_defaultdocdir}/pcre2-doc/LICENCE .
 
 %check
 export LANG=POSIX
@@ -238,6 +240,7 @@ make check -j1
 %changelog
 * Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.42-4
 - Patch for CVE-2026-86145
+- Fix License issue.
 
 * Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> 10.42-3
 - Drop coreutils BuildRequires to break dependency cycle between pcre2, libselinux, and coreutils.
