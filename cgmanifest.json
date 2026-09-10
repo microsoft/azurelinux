@@ -3950,8 +3950,8 @@
         "type": "other",
         "other": {
           "name": "freeipmi",
-          "version": "1.6.18",
-          "downloadUrl": "https://ftp.gnu.org/gnu/freeipmi/freeipmi-1.6.18.tar.gz"
+          "version": "1.6.19",
+          "downloadUrl": "https://ftp.gnu.org/gnu/freeipmi/freeipmi-1.6.19.tar.gz"
         }
       }
     },
@@ -4762,6 +4762,16 @@
           "name": "golang",
           "version": "1.26.7",
           "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.7-1/go1.26.7-20260819.2.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.27.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.1-2/go1.27.1-20260904.9.src.tar.gz"
         }
       }
     },
@@ -6680,8 +6690,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.150.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.150.1.tar.gz"
+          "version": "6.6.152.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
         }
       }
     },
@@ -8371,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.150.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.150.1.tar.gz"
+          "version": "6.6.152.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
         }
       }
     },
@@ -8381,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.150.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.150.1.tar.gz"
+          "version": "6.6.152.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
         }
       }
     },
@@ -8391,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.150.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.150.1.tar.gz"
+          "version": "6.6.152.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
         }
       }
     },
@@ -8421,8 +8431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.150.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.150.1.tar.gz"
+          "version": "6.6.152.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
         }
       }
     },
@@ -8711,8 +8721,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.7.1",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.1.tar.gz"
+          "version": "1.8.4",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.8.4.tar.gz"
         }
       }
     },
@@ -10891,8 +10901,8 @@
         "type": "other",
         "other": {
           "name": "libpcap",
-          "version": "1.10.6",
-          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.6.tar.gz"
+          "version": "1.10.7",
+          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.7.tar.gz"
         }
       }
     },
@@ -11821,8 +11831,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "10.10.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-10.10.0.tar.xz"
+          "version": "11.9.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-11.9.0.tar.xz"
         }
       }
     },
@@ -14602,8 +14612,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "24.18.1",
-          "downloadUrl": "https://nodejs.org/download/release/v24.18.1/node-v24.18.1.tar.xz"
+          "version": "24.20.0",
+          "downloadUrl": "https://nodejs.org/download/release/v24.20.0/node-v24.20.0.tar.xz"
         }
       }
     },
@@ -15785,6 +15795,16 @@
           "name": "opentelemetry-cpp",
           "version": "1.14.2",
           "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.14.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openvmm",
+          "version": "0.1.0",
+          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.1.0.tar.gz"
         }
       }
     },
@@ -26083,8 +26103,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "9.1.0",
-          "downloadUrl": "https://download.qemu.org/qemu-9.1.0.tar.xz"
+          "version": "10.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-10.1.0.tar.xz"
         }
       }
     },
@@ -27794,8 +27814,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.90.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz"
+          "version": "1.96.1",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.96.1-src.tar.xz"
         }
       }
     },
@@ -27806,6 +27826,16 @@
           "name": "rust-afterburn",
           "version": "5.8.2",
           "downloadUrl": "https://github.com/coreos/afterburn/archive/refs/tags/v5.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rust-bootstrap",
+          "version": "1.95.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/2026-04-16/cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz"
         }
       }
     },
@@ -29606,8 +29636,8 @@
         "type": "other",
         "other": {
           "name": "trident",
-          "version": "0.26.0",
-          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.26.0.tar.gz"
+          "version": "0.28.0",
+          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.28.0.tar.gz"
         }
       }
     },
@@ -29686,8 +29716,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2025c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025c.tar.gz"
+          "version": "2026c",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2026c.tar.gz"
         }
       }
     },
@@ -30146,8 +30176,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.10",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.10.tar.gz"
+          "version": "8.0.11",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.11.tar.gz"
         }
       }
     },

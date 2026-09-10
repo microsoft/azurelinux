@@ -25,6 +25,9 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      - name: Install toolkit prerequisites
+        run: sudo make -C toolkit install-prereqs
+
       # For consistency, we use the same major/minor version of Python that Azure Linux ships
       - name: Setup Python 3.12
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0

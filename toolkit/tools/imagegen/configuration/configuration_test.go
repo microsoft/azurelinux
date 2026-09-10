@@ -232,26 +232,20 @@ func TestShouldFailMissingPartition(t *testing.T) {
 	assert.Equal(t, "failed to parse [Config]:\ninvalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (NOT_AN_ID) which has no corresponding partition on a [Disk]", err.Error())
 }
 
-func TestShouldFailMissmatchedGPTMountsWithNonMBRDisk(t *testing.T) {
+func TestShouldFailMbrDisk(t *testing.T) {
 	var checkedConfig Config
 	testConfig := expectedConfiguration
 
 	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
 	testConfig.Disks[0].PartitionTableType = PartitionTableTypeMbr
-	testConfig.Disks[0].Partitions = append([]Partition{}, expectedConfiguration.Disks[0].Partitions...)
-	testConfig.Disks[0].Partitions[0].Name = "LABEL_NAME"
-
-	testConfig.SystemConfigs = append([]SystemConfig{}, expectedConfiguration.SystemConfigs...)
-	testConfig.SystemConfigs[0].PartitionSettings = append([]PartitionSetting{}, expectedConfiguration.SystemConfigs[0].PartitionSettings...)
-	testConfig.SystemConfigs[0].PartitionSettings[0].MountIdentifier = MountIdentifierPartLabel
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (MyBoot) via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", err.Error())
+	assert.Equal(t, "invalid [Disks]:\ninvalid [PartitionTableType]: MBR partition tables are no longer supported, use (gpt) instead", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]:\ninvalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (MyBoot) via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\nfailed to parse [Disk]: failed to parse [PartitionTableType]: MBR partition tables are no longer supported, use (gpt) instead", err.Error())
 }
 
 func TestShouldFailPartLabelWithNoName(t *testing.T) {
@@ -334,7 +328,7 @@ var expectedConfiguration Config = Config{
 			},
 		},
 		{
-			PartitionTableType: "mbr",
+			PartitionTableType: "gpt",
 			MaxSize:            uint64(4096),
 			TargetDisk: TargetDisk{
 				Type:  "path",
