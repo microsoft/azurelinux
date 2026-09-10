@@ -1,11 +1,20 @@
---- apache-ant-1.10.7/build.xml	2019-09-01 08:14:10.000000000 +0200
-+++ apache-ant-1.10.7/build.xml	2019-10-12 12:30:11.014986025 +0200
-@@ -976,7 +976,7 @@
+--- apache-ant-1.10.18/build.xml	2026-09-03 16:22:52.000000000 +0000
++++ apache-ant-1.10.18/build.xml	2026-09-10 16:44:40.000000000 +0000
+@@ -1041,7 +1041,7 @@
           Create the essential distribution that can run Apache Ant
         ===================================================================
    -->
--  <target name="dist-lite" depends="jars,test-jar,-ant-dist-warn-jdk9+"
-+  <target name="dist-lite" depends="jars,-ant-dist-warn-jdk9+"
+-  <target name="dist-lite" depends="jars,test-jar,component-boms,-ant-dist-warn-jdk9+"
++  <target name="dist-lite" depends="jars,component-boms,-ant-dist-warn-jdk9+"
            description="--> creates a minimum distribution to run Apache Ant">
  
      <mkdir dir="${dist.dir}"/>
+@@ -2299,7 +2299,7 @@
+   </target>
+ 
+   <target name="component-boms"
+-          depends="-init-cyclonedx,jars,test-jar"
++          depends="-init-cyclonedx,jars"
+           xmlns:cdx="antlib:org.apache.ant.cyclonedx"
+           if="cyclonedx.antlib.present">
+ 
