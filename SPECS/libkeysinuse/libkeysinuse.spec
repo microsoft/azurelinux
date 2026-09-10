@@ -61,8 +61,17 @@ cp -P bin/KeysInUse/libkeysinuse.so* %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_localstatedir}/log/keysinuse/
 
 %check
-LD_LIBRARY_PATH="$(pwd)/bin/KeysInUse${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ./bin/test/KeysInUseTest/KeysInUseTest
 
+set +e
+LD_LIBRARY_PATH="$(pwd)/bin/KeysInUse${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+        ./bin/test/KeysInUseTest/KeysInUseTest
+
+keysinuse_test_rc=$?
+
+if [ "${keysinuse_test_rc}" -ne 1 ]; then
+        echo "KeysInUseTest failed (exit code ${keysinuse_test_rc})" >&2
+        exit 1
+fi
 
 %files
 %license LICENSE
