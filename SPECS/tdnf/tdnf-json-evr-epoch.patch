@@ -1,0 +1,33 @@
+From 45a5dd8fdb5c83cd7bb32c7e0f1b038be23d84d7 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <oliver.kurth@broadcom.com>
+Date: Fri, 4 Sep 2026 23:24:32 +0000
+Subject: [PATCH] fix: include epoch in Evr field of JSON transaction output
+
+JDPkgList() built the "Evr" field from pszVersion-pszRelease only,
+dropping the epoch for packages that have one non-zero. Other JSON
+output call sites already use the pre-populated pszEVR field, which
+includes epoch, so switch to that for consistency.
+
+Fixes vmware/tdnf#602
+
+Signed-off-by: Oliver Kurth <oliver.kurth@broadcom.com>
+---
+ tools/cli/lib/installcmd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/cli/lib/installcmd.c b/tools/cli/lib/installcmd.c
+index c2f30e4..45d875d 100644
+--- a/tools/cli/lib/installcmd.c
++++ b/tools/cli/lib/installcmd.c
+@@ -391,7 +391,7 @@ JDPkgList(
+ 
+         CHECK_JD_RC(jd_map_add_string(jd_pkg, "Name", pPkgInfo->pszName));
+         CHECK_JD_RC(jd_map_add_string(jd_pkg, "Arch", pPkgInfo->pszArch));
+-        CHECK_JD_RC(jd_map_add_fmt(jd_pkg, "Evr", "%s-%s", pPkgInfo->pszVersion, pPkgInfo->pszRelease));
++        CHECK_JD_RC(jd_map_add_string(jd_pkg, "Evr", pPkgInfo->pszEVR));
+         CHECK_JD_RC(jd_map_add_int(jd_pkg, "InstallSize", pPkgInfo->dwInstallSizeBytes));
+         CHECK_JD_RC(jd_map_add_string(jd_pkg, "Repo", pPkgInfo->pszRepoName));
+ 
+-- 
+2.45.4
+
