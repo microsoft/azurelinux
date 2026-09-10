@@ -3012,13 +3012,3 @@ packages = [
     # fscrypt %gopkg source -devel sub-package (noarch Go module sources, no compiled binary); fscrypt CLI + pam_fscrypt module stay in base. Kept in sdk for downstream Go builds.
     "golang-github-google-fscrypt-devel", # srpm: fscrypt
 ]
-
-# This group includes packages intentionally included in the `microsoft` repo.
-[component-groups.microsoft-packages]
-description = "microsoft packages"
-default-component-config.publish.srpm-channel = "rpm-microsoft-srpm"
-default-component-config.publish.rpm-channel = "rpm-microsoft"
-default-component-config.publish.debuginfo-channel = "rpm-microsoft-debuginfo"
-components = [
-    "azure-cli",
-]
