@@ -1,6 +1,6 @@
-From f9858b3d7c82bd8118361f7af9d4dcba340da0bb Mon Sep 17 00:00:00 2001
+From 091d765c17cedc6d0f1828c74f001718e256ab35 Mon Sep 17 00:00:00 2001
 From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
-Date: Thu, 10 Sep 2026 13:16:41 +0000
+Date: Thu, 10 Sep 2026 15:49:19 +0000
 Subject: [PATCH] Backport upstream rustix#1663 to remove rustc_attrs
 
 Rust removed support for the internal rustc_layout_scalar_valid_range_start
@@ -18,8 +18,6 @@ BorrowedFd, and OwnedFd:
   error: cannot find attribute `rustc_layout_scalar_valid_range_start` in
   this scope
 
-This applies the same edits as upstream commit bytecodealliance/rustix#1663
-("Completely remove rustc_attrs", merged 2026-08-18):
   - build.rs: remove the rustc_attrs feature probe
   - src/lib.rs: remove the now-unreachable feature(rustc_attrs) gate
   - src/backend/linux_raw/io/errno.rs: unconditionally allow
@@ -30,17 +28,19 @@ This applies the same edits as upstream commit bytecodealliance/rustix#1663
 
 This only forgoes niche-layout optimizations on these three internal
 types and has no other functional effect.
+
+Upstream Patch Reference: https://github.com/bytecodealliance/rustix/commit/aab946409792a9363cbac644c2fd0f7b2762f071.patch
 ---
- build.rs                          |  1 -
- src/backend/linux_raw/io/errno.rs |  6 +++---
- src/io/fd/owned.rs                | 12 ++++++------
- src/lib.rs                        |  1 -
+ .../rustix-0.37.27/build.rs                          |  1 -
+ .../rustix-0.37.27/src/backend/linux_raw/io/errno.rs |  6 +++---
+ .../rustix-0.37.27/src/io/fd/owned.rs                | 12 ++++++------
+ .../rustix-0.37.27/src/lib.rs                        |  1 -
  4 files changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/build.rs b/build.rs
+diff --git a/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/build.rs b/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/build.rs
 index 320b305..41df155 100644
---- a/build.rs
-+++ b/build.rs
+--- a/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/build.rs
++++ b/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/build.rs
 @@ -11,7 +11,6 @@ fn main() {
      // the rustc version.
      println!("cargo:rerun-if-changed=build.rs");
@@ -49,10 +49,10 @@ index 320b305..41df155 100644
  
      // Features only used in no-std configurations.
      #[cfg(not(feature = "std"))]
-diff --git a/src/backend/linux_raw/io/errno.rs b/src/backend/linux_raw/io/errno.rs
+diff --git a/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/backend/linux_raw/io/errno.rs b/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/backend/linux_raw/io/errno.rs
 index a6d30ca..f0da63f 100644
---- a/src/backend/linux_raw/io/errno.rs
-+++ b/src/backend/linux_raw/io/errno.rs
+--- a/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/backend/linux_raw/io/errno.rs
++++ b/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/backend/linux_raw/io/errno.rs
 @@ -8,7 +8,7 @@
  //! Linux uses error codes in `-4095..0`; we use rustc attributes to describe
  //! this restricted range of values.
@@ -73,10 +73,10 @@ index a6d30ca..f0da63f 100644
  pub struct Errno(u16);
  
  impl Errno {
-diff --git a/src/io/fd/owned.rs b/src/io/fd/owned.rs
+diff --git a/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/io/fd/owned.rs b/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/io/fd/owned.rs
 index 2b9238c..f0d7414 100644
---- a/src/io/fd/owned.rs
-+++ b/src/io/fd/owned.rs
+--- a/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/io/fd/owned.rs
++++ b/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/io/fd/owned.rs
 @@ -29,13 +29,13 @@ use core::mem::forget;
  /// descriptor, which is then borrowed under the same lifetime.
  #[derive(Copy, Clone)]
@@ -111,10 +111,10 @@ index 2b9238c..f0d7414 100644
  pub struct OwnedFd {
      fd: RawFd,
  }
-diff --git a/src/lib.rs b/src/lib.rs
+diff --git a/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/lib.rs b/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/lib.rs
 index 3316c50..356ffb7 100644
---- a/src/lib.rs
-+++ b/src/lib.rs
+--- a/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/lib.rs
++++ b/registry/src/index.crates.io-1949cf8c6b5b557f/rustix-0.37.27/src/lib.rs
 @@ -98,7 +98,6 @@
  #![deny(missing_docs)]
  #![allow(stable_features)]
