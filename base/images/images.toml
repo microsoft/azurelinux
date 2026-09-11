@@ -84,6 +84,21 @@ container = true
 systemd = false
 runtime-package-management = false
 
+[images.container-nginx]
+description = "Nginx Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "nginx-workload" }
+architectures = ["x86_64", "aarch64"]
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-nginx.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = true
+
 # ---- wsl ---------------------------------------------------------------
 
 [images.wsl]

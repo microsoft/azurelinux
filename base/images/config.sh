@@ -10,4 +10,12 @@ case ",${kiwi_profiles:-}," in
     *,distroless-minimal,*|*,distroless-base,*|*,distroless-debug,*|*,busybox-workload,*)
         exec /image/config-container-base.sh --mode=strip
         ;;
+    # These single-purpose workload images declare runtime-package-management
+    # = true and intentionally keep dnf5 + bash for runtime package
+    # management, so the destructive keep-list strip must not run. Still
+    # prune build-time-only byproducts (docs, locale data, dnf5 logs) that
+    # are never needed at runtime regardless of package manager presence.
+    *,nginx-workload,*)
+        exec /image/config-container-base.sh --mode=light
+        ;;
 esac

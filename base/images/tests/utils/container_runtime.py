@@ -19,7 +19,7 @@ from python_on_whales.exceptions import DockerException, NoSuchContainer, NoSuch
 from .tools import NativeTool
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterator, Sequence
     from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -34,6 +34,8 @@ PODMAN = NativeTool(
 
 _loaded_image_refs: set[str] = set()
 _built_image_cache: dict[tuple[Path, str], str] = {}
+
+_SLEEP_INFINITY = ("sleep", "infinity")
 
 
 class ContainerExecResult(NamedTuple):
@@ -233,17 +235,20 @@ def create_container(
     container_name: str | None = None,
     *,
     networks: list[str] | None = None,
+    command: Sequence[str] | None = _SLEEP_INFINITY,
 ) -> ContainerInstance:
     """Create and start a container with exec access.
 
     The container runs ``sleep infinity`` to stay alive for the duration
-    of the test, allowing repeated ``exec`` calls.
+    of the test, allowing repeated ``exec`` calls. Pass ``command=None``
+    to run the image's own default command instead.
 
     Args:
         client: Active python-on-whales Podman client.
         image_ref: Image ID or reference to run.
         container_name: Optional name; auto-generated if None.
         networks: Optional networks to attach the container to.
+        command: Command override; ``None`` uses the image's default command.
 
     Returns:
         A ContainerInstance with the container's ID, name, and image ref.
@@ -255,7 +260,7 @@ def create_container(
 
     container = client.container.run(
         image_ref,
-        command=["sleep", "infinity"],
+        command=command if command is not None else (),
         name=container_name,
         detach=True,
         networks=networks or [],
