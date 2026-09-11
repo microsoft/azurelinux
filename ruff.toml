@@ -71,9 +71,13 @@ ignore = [
 fixable = ["ALL"]
 
 [lint.per-file-ignores]
+"**/test_*.py" = ["S101"]
+"**/*_test.py" = ["S101"]
+
 # The image-test cases are a pytest filesystem hierarchy, not importable
-# packages. Only the sibling utils/ tree is packaged by pyproject.toml.
-"base/images/tests/cases/**/*.py" = ["INP001"]
+# packages, and use the repository-standard SPDX header without a separate
+# copyright line. Only the sibling utils/ tree is packaged by pyproject.toml.
+"base/images/tests/cases/**/*.py" = ["CPY001", "INP001"]
 "base/images/tests/conftest.py" = ["INP001"]
 
 # Helpers under scripts/ci/ are executed directly (python3 path/to/script.py)
