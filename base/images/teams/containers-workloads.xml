@@ -18,6 +18,10 @@
             <requires profile="PackageManagement" />
             <requires profile="ContainerCore" />
         </profile>
+        <profile name="postgres-workload" description="Azure Linux PostgreSQL Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
     </profiles>
 
     <preferences profiles="busybox-workload">
@@ -75,5 +79,30 @@
     <packages type="image" profiles="nginx-workload">
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
         <package name="nginx" />
+    </packages>
+
+    <!--
+      postgres-workload reuses ContainerCore + PackageManagement, same as
+      nginx-workload. Note this image intentionally ships only the
+      postgres server binary itself (no entrypoint/initdb wrapper, no
+      dedicated data volume setup): the default subcommand runs the
+      version subcommand as a minimal, always succeeding smoke check.
+      Running an actual PostgreSQL server requires initializing a data
+      directory (initdb) as the postgres user and is out of scope for this
+      single purpose image; see containers to build analysis notes.
+    -->
+    <preferences profiles="postgres-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/postgres" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/postgres">
+                    <argument name="--version" />
+                </subcommand>
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="postgres-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="postgresql-server" />
     </packages>
 </image>
