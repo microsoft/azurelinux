@@ -14,6 +14,10 @@
     -->
     <profiles>
         <profile name="busybox-workload" description="Azure Linux Busybox Container Image" import="false" />
+        <profile name="nginx-workload" description="Azure Linux Nginx Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
     </profiles>
 
     <preferences profiles="busybox-workload">
@@ -49,5 +53,27 @@
         <package name="azurelinux-release-container" />
         <package name="filesystem" />
         <package name="busybox" />
+    </packages>
+
+    <!--
+      nginx-workload reuses the shared ContainerCore + PackageManagement
+      layers (dnf-managed rootfs with bash) already used by the generic
+      container-base image, since nginx itself is typically run alongside a
+      shell for troubleshooting and its packaging expects a normal rootfs.
+    -->
+    <preferences profiles="nginx-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/nginx" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/sbin/nginx">
+                    <argument name="-g" />
+                    <argument name="&quot;daemon off;&quot;" />
+                </subcommand>
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="nginx-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="nginx" />
     </packages>
 </image>
