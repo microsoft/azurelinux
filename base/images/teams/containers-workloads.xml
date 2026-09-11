@@ -22,6 +22,10 @@
             <requires profile="PackageManagement" />
             <requires profile="ContainerCore" />
         </profile>
+        <profile name="telegraf-workload" description="Azure Linux Telegraf Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
     </profiles>
 
     <preferences profiles="busybox-workload">
@@ -104,5 +108,29 @@
     <packages type="image" profiles="postgres-workload">
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
         <package name="postgresql-server" />
+    </packages>
+
+    <!--
+      telegraf-workload reuses ContainerCore + PackageManagement, same as
+      nginx-workload and postgres-workload. Runs the telegraf agent using
+      its packaged default config (/etc/telegraf/telegraf.conf), which
+      has input plugins (cpu, mem, disk, etc.) enabled but no output
+      plugin configured. Running the default command as-is therefore
+      exits with "no outputs found" rather than reporting metrics; use
+      telegraf's test mode flag to gather metrics to stdout without a
+      configured output, or supply a custom config with an output plugin
+      enabled.
+    -->
+    <preferences profiles="telegraf-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/telegraf" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/telegraf" />
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="telegraf-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="telegraf" />
     </packages>
 </image>
