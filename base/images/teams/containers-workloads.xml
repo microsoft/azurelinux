@@ -37,6 +37,9 @@
             <requires profile="PackageManagement" />
             <requires profile="ContainerCore" />
         </profile>
+        <profile name="pytorch-workload" description="Azure Linux PyTorch Container Image" import="false">
+            <requires profile="PythonCore" />
+        </profile>
     </profiles>
 
     <preferences profiles="busybox-workload">
@@ -182,5 +185,23 @@
     <packages type="image" profiles="nodejs-workload">
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
         <package name="nodejs" />
+    </packages>
+
+    <!--
+      pytorch-workload reuses the shared PythonCore layer (see
+      python-workload above) and adds only python3-torch on top. Default
+      subcommand runs python3 so users can `import torch` interactively or
+      via a stdin script.
+    -->
+    <preferences profiles="pytorch-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/pytorch" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/python3" />
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="pytorch-workload">
+        <package name="python3-torch" />
     </packages>
 </image>

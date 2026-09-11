@@ -166,6 +166,20 @@ container = true
 systemd = false
 runtime-package-management = true
 
+[images.container-pytorch]
+description = "PyTorch Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "pytorch-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-pytorch.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = true
+
 # ---- wsl ---------------------------------------------------------------
 
 [images.wsl]
