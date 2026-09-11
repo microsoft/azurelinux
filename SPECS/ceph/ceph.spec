@@ -32,7 +32,8 @@ Patch17:        CVE-2025-52555.patch
 Patch18:        CVE-2024-48916.patch
 Patch19:        CVE-2025-9648.patch
 Patch20:        CVE-2024-47866.patch
-Patch21:        CVE-2025-30156-v18.2.2-backport.patch
+Patch21:        CVE-2026-54330.patch
+Patch22:        CVE-2025-30156-v18.2.2-backport.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
