@@ -37,7 +37,7 @@ pyright
 - Keep area-specific tests in a `tests/` directory rather than beside executable helper scripts.
 - Keep test-only dependencies in `tests/requirements.txt`; include the area's runtime requirements from there when tests import runtime modules. Do not add pytest to runtime requirements solely for tests.
 - Run tests explicitly with `python -m pytest <tests-dir>` so the selected interpreter and environment are unambiguous.
-- Ruff currently enforces `S101` in tests. Use `pytest.fail(...)` for explicit value checks and `pytest.raises(...)` for exceptions rather than bare `assert` statements.
+- Ruff ignores `S101` in pytest test modules (`test_*.py` and `*_test.py`). Prefer `assert` for explicit value checks and `pytest.raises(...)` for exceptions.
 - Direct-execution helper directories are not necessarily Python packages. When tests need to import sibling scripts, use a narrow `tests/conftest.py` path setup rather than creating a package API solely for tests.
 - If the Pyright CLI is not using the workspace virtual environment, pass it explicitly (for example, `pyright --pythonpath .venv/bin/python <path>`). Do not suppress missing imports that are installed in the configured environment.
 
