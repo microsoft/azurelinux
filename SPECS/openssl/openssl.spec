@@ -8,8 +8,8 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.7
-Release: 6%{?dist}
+Version: 3.5.8
+Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -36,11 +36,8 @@ Patch9: 0009-Add-Kernel-FIPS-mode-flag-support.patch
 # # Add support for PROFILE=SYSTEM system default cipherlist
 # AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
 # Patch7:   0007-Add-support-for-PROFILE-SYSTEM-system-default-cipher.patch
-# # Instead of replacing ectest.c and ec_curve.c, add the changes as a patch so
-# # that new modifications made to these files by upstream are not lost.
-Patch10:  0010-Add-changes-to-ectest-and-eccurve.patch
-# # remove unsupported EC curves
-Patch11:  0011-Remove-EC-curves.patch
+# # Remove unsupported EC curves and their tests.
+Patch10:  0010-Remove-unsupported-EC-curves.patch
 # # Disable explicit EC curves
 # # https://bugzilla.redhat.com/show_bug.cgi?id=2066412
 Patch12:  0012-Disable-explicit-ec.patch
@@ -57,8 +54,6 @@ Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
 # AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch49:  0049-Allow-disabling-of-SHA1-signatures.patch
-# # Support SHA1 in TLS in LEGACY crypto-policy (which is SECLEVEL=1)
-Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # See notes in the patch for details, but this patch will not be needed if
 # # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
@@ -66,30 +61,7 @@ Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 # algorithms that are used in the speed tests. This patch skips those tests.
 # If OpenSSL updates speed to be FIPS-tolerant, remove this patch.
 Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
-Patch83:  Allow-NULL-buffer-with-0-bsize.patch
 Patch100: CVE-2026-31791.patch
-Patch101: CVE-2026-34182.patch
-Patch102: CVE-2026-34180.patch
-Patch103: CVE-2026-34183.patch
-Patch104: CVE-2026-42766.patch
-Patch105: CVE-2026-42768.patch
-Patch106: CVE-2026-45445.patch
-Patch107: CVE-2026-45446.patch
-Patch108: CVE-2026-7383.patch
-Patch109: CVE-2026-9076.patch
-Patch110: CVE-2026-42767.patch
-Patch111: CVE-2026-45447.patch
-Patch112: CVE-2026-42769.patch
-Patch113: CVE-2026-42770.patch
-Patch114: 0117-Do-not-restrict-EVP_PKEY_Q_keygen-usage.patch
-Patch115: CVE-2026-54874.patch
-Patch116: CVE-2026-63072.patch
-Patch117: CVE-2026-63073.patch
-Patch118: CVE-2026-63074.patch
-Patch119: CVE-2026-63075.patch
-Patch120: CVE-2026-63076.patch
-Patch121: CVE-2026-75803.patch
-Patch122: CVE-2026-14457.patch
 License: Apache-2.0
 URL: http://www.openssl.org/
 
@@ -249,10 +221,8 @@ patch -p1 < %{SOURCE14}
 
 OPENSSL_ENABLE_MD5_VERIFY=
 export OPENSSL_ENABLE_MD5_VERIFY
-%if 0%{?rhel}
 OPENSSL_ENABLE_SHA1_SIGNATURES=
 export OPENSSL_ENABLE_SHA1_SIGNATURES
-%endif
 OPENSSL_SYSTEM_CIPHERS_OVERRIDE=xyz_nonexistent_file
 export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
 #run tests itself
@@ -385,6 +355,11 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Fri Sep 11 2026 Tobias Brick <tobiasb@microsoft.com> - 3.5.8-1
+- Upgrade to 3.5.8
+- Rebase downstream patches on Fedora 44
+- Remove patches included upstream
+
 * Wed Aug 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-6
 - Patch for CVE-2026-75803, CVE-2026-63076, CVE-2026-63075, CVE-2026-63074, CVE-2026-63073, CVE-2026-63072, CVE-2026-54874
 

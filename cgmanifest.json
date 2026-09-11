@@ -15763,8 +15763,8 @@
         "type": "other",
         "other": {
           "name": "openssl",
-          "version": "3.3.7",
-          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.7/openssl-3.3.7.tar.gz"
+          "version": "3.5.8",
+          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.5.8/openssl-3.5.8.tar.gz"
         }
       }
     },

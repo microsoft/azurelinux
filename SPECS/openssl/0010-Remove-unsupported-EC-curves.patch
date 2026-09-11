@@ -1,19 +1,79 @@
-From 1b52eeff21f095f940267ee63c87f59c132a40d7 Mon Sep 17 00:00:00 2001
-From: Tobias Brick <tobiasb@microsoft.com>
-Date: Wed, 17 Apr 2024 21:35:37 +0000
-Subject: [PATCH] Add changes to ectest and eccurve
----
- crypto/ec/ec_curve.c | 749 -------------------------------------------
- test/ectest.c        | 173 +---------
- 2 files changed, 8 insertions(+), 914 deletions(-)
+From abb90da4c709dab8c919dde2f73d5643da95a332 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:15 +0100
+Subject: [PATCH 09/57] RH: Drop weak curve definitions - RENAMED/SQUASHED
 
+Patch-name: 0010-Add-changes-to-ectest-and-eccurve.patch
+Patch-id: 10
+Patch-status: |
+    # # Instead of replacing ectest.c and ec_curve.c, add the changes as a patch so
+    # # that new modifications made to these files by upstream are not lost.
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+
+commit #2:
+Patch-name: 0011-Remove-EC-curves.patch
+Patch-id: 11
+Patch-status: |
+    # # remove unsupported EC curves
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ apps/speed.c                                  |   8 -
+ crypto/ec/ec_curve.c                          | 769 ------------------
+ crypto/evp/ec_support.c                       |  87 --
+ test/acvp_test.inc                            |   9 -
+ test/ecdsatest.h                              |  17 -
+ test/ectest.c                                 | 175 +---
+ test/recipes/15-test_genec.t                  |  27 -
+ test/recipes/30-test_evp_data/evppkey_ecc.txt |   1 +
+ 8 files changed, 10 insertions(+), 1083 deletions(-)
+
+diff --git a/apps/speed.c b/apps/speed.c
+index 6cf9748902..a36faa686d 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -458,8 +458,6 @@ static double ffdh_results[FFDH_NUM][1]; /* 1 op: derivation */
+ #endif /* OPENSSL_NO_DH */
+
+ enum ec_curves_t {
+-    R_EC_P160,
+-    R_EC_P192,
+     R_EC_P224,
+     R_EC_P256,
+     R_EC_P384,
+@@ -486,8 +484,6 @@ enum ec_curves_t {
+ };
+ /* list of ecdsa curves */
+ static const OPT_PAIR ecdsa_choices[ECDSA_NUM] = {
+-    { "ecdsap160", R_EC_P160 },
+-    { "ecdsap192", R_EC_P192 },
+     { "ecdsap224", R_EC_P224 },
+     { "ecdsap256", R_EC_P256 },
+     { "ecdsap384", R_EC_P384 },
+@@ -522,8 +518,6 @@ enum {
+ };
+ /* list of ecdh curves, extension of |ecdsa_choices| list above */
+ static const OPT_PAIR ecdh_choices[EC_NUM] = {
+-    { "ecdhp160", R_EC_P160 },
+-    { "ecdhp192", R_EC_P192 },
+     { "ecdhp224", R_EC_P224 },
+     { "ecdhp256", R_EC_P256 },
+     { "ecdhp384", R_EC_P384 },
+@@ -2042,8 +2036,6 @@ int speed_main(int argc, char **argv)
+      */
+     static const EC_CURVE ec_curves[EC_NUM] = {
+         /* Prime Curves */
+-        { "secp160r1", NID_secp160r1, 160 },
+-        { "nistp192", NID_X9_62_prime192v1, 192 },
+         { "nistp224", NID_secp224r1, 224 },
+         { "nistp256", NID_X9_62_prime256v1, 256 },
+         { "nistp384", NID_secp384r1, 384 },
 diff --git a/crypto/ec/ec_curve.c b/crypto/ec/ec_curve.c
-index 4d572fb..86fcea8 100644
+index c3bc92fd75..28c83df735 100644
 --- a/crypto/ec/ec_curve.c
 +++ b/crypto/ec/ec_curve.c
 @@ -30,34 +30,6 @@ typedef struct {
  } EC_CURVE_DATA;
- 
+
  /* the nist prime curves */
 -static const struct {
 -    EC_CURVE_DATA h;
@@ -49,7 +109,7 @@ index 4d572fb..86fcea8 100644
 @@ -184,167 +156,6 @@ static const struct {
          0xB7, 0x1E, 0x91, 0x38, 0x64, 0x09 }
  };
- 
+
 -#ifndef FIPS_MODULE
 -/* the x9.62 prime curves (minus the nist prime curves) */
 -static const struct {
@@ -213,9 +273,9 @@ index 4d572fb..86fcea8 100644
 -
  static const struct {
      EC_CURVE_DATA h;
-     unsigned char data[20 + 32 * 6];
-@@ -381,258 +192,6 @@ static const struct {
- 
+     unsigned char data[20 + 32 * 8];
+@@ -389,258 +200,6 @@ static const struct {
+
  #ifndef FIPS_MODULE
  /* the secg prime curves (minus the nist and x9.62 prime curves) */
 -static const struct {
@@ -473,11 +533,10 @@ index 4d572fb..86fcea8 100644
  static const struct {
      EC_CURVE_DATA h;
      unsigned char data[0 + 32 * 6];
-@@ -664,91 +223,6 @@ static const struct {
-         0xFF, 0xFF, 0xFF, 0xFE, 0xBA, 0xAE, 0xDC, 0xE6, 0xAF, 0x48, 0xA0, 0x3B,
+@@ -673,90 +232,6 @@ static const struct {
          0xBF, 0xD2, 0x5E, 0x8C, 0xD0, 0x36, 0x41, 0x41 }
  };
--
+
 -/* some wap/wtls curves */
 -static const struct {
 -    EC_CURVE_DATA h;
@@ -563,11 +622,11 @@ index 4d572fb..86fcea8 100644
 -        0x5C, 0x5C, 0x2A, 0x3D }
 -};
  #endif /* FIPS_MODULE */
- 
+
  #ifndef OPENSSL_NO_EC2M
-@@ -1996,174 +1470,6 @@ static const struct {
+@@ -2004,174 +1479,6 @@ static const struct {
   */
- 
+
  #ifndef FIPS_MODULE
 -static const struct {
 -    EC_CURVE_DATA h;
@@ -740,19 +799,20 @@ index 4d572fb..86fcea8 100644
  static const struct {
      EC_CURVE_DATA h;
      unsigned char data[0 + 32 * 6];
-@@ -2732,8 +2038,6 @@ static const ec_list_element curve_list[] = {
+@@ -2570,8 +1877,6 @@ static const ec_list_element curve_list[] = {
          "NIST/SECG curve over a 521 bit prime field" },
- 
+
      /* X9.62 curves */
 -    { NID_X9_62_prime192v1, &_EC_NIST_PRIME_192.h, 0,
 -        "NIST/X9.62/SECG curve over a 192 bit prime field" },
      { NID_X9_62_prime256v1, &_EC_X9_62_PRIME_256V1.h,
  #if defined(ECP_NISTZ256_ASM)
          EC_GFp_nistz256_method,
-@@ -2777,25 +2081,6 @@ static const ec_list_element curve_list[] = {
+@@ -2614,26 +1919,6 @@ static const ec_list_element curve_list[] = {
+
  static const ec_list_element curve_list[] = {
      /* prime field curves */
-     /* secg curves */
+-    /* secg curves */
 -    { NID_secp112r1, &_EC_SECG_PRIME_112R1.h, 0,
 -        "SECG/WTLS curve over a 112 bit prime field" },
 -    { NID_secp112r2, &_EC_SECG_PRIME_112R2.h, 0,
@@ -775,7 +835,7 @@ index 4d572fb..86fcea8 100644
  #ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
      { NID_secp224r1, &_EC_NIST_PRIME_224.h, EC_GFp_nistp224_method,
          "NIST/SECG curve over a 224 bit prime field" },
-@@ -2825,18 +2110,6 @@ static const ec_list_element curve_list[] = {
+@@ -2663,18 +1948,6 @@ static const ec_list_element curve_list[] = {
  #endif
          "NIST/SECG curve over a 521 bit prime field" },
      /* X9.62 curves */
@@ -794,10 +854,23 @@ index 4d572fb..86fcea8 100644
      { NID_X9_62_prime256v1, &_EC_X9_62_PRIME_256V1.h,
  #if defined(ECP_NISTZ256_ASM)
          EC_GFp_nistz256_method,
-@@ -2933,22 +2206,12 @@ static const ec_list_element curve_list[] = {
-     { NID_wap_wsg_idm_ecid_wtls5, &_EC_X9_62_CHAR2_163V1.h, 0,
-         "X9.62 curve over a 163 bit binary field" },
- #endif
+@@ -2758,36 +2031,6 @@ static const ec_list_element curve_list[] = {
+         "X9.62 curve over a 368 bit binary field" },
+     { NID_X9_62_c2tnb431r1, &_EC_X9_62_CHAR2_431R1.h, 0,
+         "X9.62 curve over a 431 bit binary field" },
+-    /*
+-     * the WAP/WTLS curves [unlike SECG, spec has its own OIDs for curves
+-     * from X9.62]
+-     */
+-    { NID_wap_wsg_idm_ecid_wtls1, &_EC_WTLS_1.h, 0,
+-        "WTLS curve over a 113 bit binary field" },
+-    { NID_wap_wsg_idm_ecid_wtls3, &_EC_NIST_CHAR2_163K.h, 0,
+-        "NIST/SECG/WTLS curve over a 163 bit binary field" },
+-    { NID_wap_wsg_idm_ecid_wtls4, &_EC_SECG_CHAR2_113R1.h, 0,
+-        "SECG curve over a 113 bit binary field" },
+-    { NID_wap_wsg_idm_ecid_wtls5, &_EC_X9_62_CHAR2_163V1.h, 0,
+-        "X9.62 curve over a 163 bit binary field" },
+-#endif
 -    { NID_wap_wsg_idm_ecid_wtls6, &_EC_SECG_PRIME_112R1.h, 0,
 -        "SECG/WTLS curve over a 112 bit prime field" },
 -    { NID_wap_wsg_idm_ecid_wtls7, &_EC_SECG_PRIME_160R2.h, 0,
@@ -806,18 +879,19 @@ index 4d572fb..86fcea8 100644
 -        "WTLS curve over a 112 bit prime field" },
 -    { NID_wap_wsg_idm_ecid_wtls9, &_EC_WTLS_9.h, 0,
 -        "WTLS curve over a 160 bit prime field" },
- #ifndef OPENSSL_NO_EC2M
-     { NID_wap_wsg_idm_ecid_wtls10, &_EC_NIST_CHAR2_233K.h, 0,
-         "NIST/SECG/WTLS curve over a 233 bit binary field" },
-     { NID_wap_wsg_idm_ecid_wtls11, &_EC_NIST_CHAR2_233B.h, 0,
-         "NIST/SECG/WTLS curve over a 233 bit binary field" },
- #endif
+-#ifndef OPENSSL_NO_EC2M
+-    { NID_wap_wsg_idm_ecid_wtls10, &_EC_NIST_CHAR2_233K.h, 0,
+-        "NIST/SECG/WTLS curve over a 233 bit binary field" },
+-    { NID_wap_wsg_idm_ecid_wtls11, &_EC_NIST_CHAR2_233B.h, 0,
+-        "NIST/SECG/WTLS curve over a 233 bit binary field" },
+-#endif
 -    { NID_wap_wsg_idm_ecid_wtls12, &_EC_WTLS_12.h, 0,
 -        "WTLS curve over a 224 bit prime field" },
- #ifndef OPENSSL_NO_EC2M
+-#ifndef OPENSSL_NO_EC2M
      /* IPSec curves */
      { NID_ipsec3, &_EC_IPSEC_155_ID3.h, 0,
-@@ -2959,18 +2222,6 @@ static const ec_list_element curve_list[] = {
+         "\n\tIPSec/IKE/Oakley curve #3 over a 155 bit binary field.\n"
+@@ -2797,18 +2040,6 @@ static const ec_list_element curve_list[] = {
          "\tNot suitable for ECDSA.\n\tQuestionable extension field!" },
  #endif
      /* brainpool curves */
@@ -836,8 +910,177 @@ index 4d572fb..86fcea8 100644
      { NID_brainpoolP256r1, &_EC_brainpoolP256r1.h, 0,
          "RFC 5639 curve over a 256 bit prime field" },
      { NID_brainpoolP256t1, &_EC_brainpoolP256t1.h, 0,
+diff --git a/crypto/evp/ec_support.c b/crypto/evp/ec_support.c
+index 20883c48f1..9715c6280d 100644
+--- a/crypto/evp/ec_support.c
++++ b/crypto/evp/ec_support.c
+@@ -20,89 +20,15 @@ typedef struct ec_name2nid_st {
+ static const EC_NAME2NID curve_list[] = {
+     /* prime field curves */
+     /* secg curves */
+-    { "secp112r1", NID_secp112r1 },
+-    { "secp112r2", NID_secp112r2 },
+-    { "secp128r1", NID_secp128r1 },
+-    { "secp128r2", NID_secp128r2 },
+-    { "secp160k1", NID_secp160k1 },
+-    { "secp160r1", NID_secp160r1 },
+-    { "secp160r2", NID_secp160r2 },
+-    { "secp192k1", NID_secp192k1 },
+-    { "secp224k1", NID_secp224k1 },
+     { "secp224r1", NID_secp224r1 },
+     { "secp256k1", NID_secp256k1 },
+     { "secp384r1", NID_secp384r1 },
+     { "secp521r1", NID_secp521r1 },
+     /* X9.62 curves */
+-    { "prime192v1", NID_X9_62_prime192v1 },
+-    { "prime192v2", NID_X9_62_prime192v2 },
+-    { "prime192v3", NID_X9_62_prime192v3 },
+-    { "prime239v1", NID_X9_62_prime239v1 },
+-    { "prime239v2", NID_X9_62_prime239v2 },
+-    { "prime239v3", NID_X9_62_prime239v3 },
+     { "prime256v1", NID_X9_62_prime256v1 },
+     /* characteristic two field curves */
+     /* NIST/SECG curves */
+-    { "sect113r1", NID_sect113r1 },
+-    { "sect113r2", NID_sect113r2 },
+-    { "sect131r1", NID_sect131r1 },
+-    { "sect131r2", NID_sect131r2 },
+-    { "sect163k1", NID_sect163k1 },
+-    { "sect163r1", NID_sect163r1 },
+-    { "sect163r2", NID_sect163r2 },
+-    { "sect193r1", NID_sect193r1 },
+-    { "sect193r2", NID_sect193r2 },
+-    { "sect233k1", NID_sect233k1 },
+-    { "sect233r1", NID_sect233r1 },
+-    { "sect239k1", NID_sect239k1 },
+-    { "sect283k1", NID_sect283k1 },
+-    { "sect283r1", NID_sect283r1 },
+-    { "sect409k1", NID_sect409k1 },
+-    { "sect409r1", NID_sect409r1 },
+-    { "sect571k1", NID_sect571k1 },
+-    { "sect571r1", NID_sect571r1 },
+-    /* X9.62 curves */
+-    { "c2pnb163v1", NID_X9_62_c2pnb163v1 },
+-    { "c2pnb163v2", NID_X9_62_c2pnb163v2 },
+-    { "c2pnb163v3", NID_X9_62_c2pnb163v3 },
+-    { "c2pnb176v1", NID_X9_62_c2pnb176v1 },
+-    { "c2tnb191v1", NID_X9_62_c2tnb191v1 },
+-    { "c2tnb191v2", NID_X9_62_c2tnb191v2 },
+-    { "c2tnb191v3", NID_X9_62_c2tnb191v3 },
+-    { "c2pnb208w1", NID_X9_62_c2pnb208w1 },
+-    { "c2tnb239v1", NID_X9_62_c2tnb239v1 },
+-    { "c2tnb239v2", NID_X9_62_c2tnb239v2 },
+-    { "c2tnb239v3", NID_X9_62_c2tnb239v3 },
+-    { "c2pnb272w1", NID_X9_62_c2pnb272w1 },
+-    { "c2pnb304w1", NID_X9_62_c2pnb304w1 },
+-    { "c2tnb359v1", NID_X9_62_c2tnb359v1 },
+-    { "c2pnb368w1", NID_X9_62_c2pnb368w1 },
+-    { "c2tnb431r1", NID_X9_62_c2tnb431r1 },
+-    /*
+-     * the WAP/WTLS curves [unlike SECG, spec has its own OIDs for curves
+-     * from X9.62]
+-     */
+-    { "wap-wsg-idm-ecid-wtls1", NID_wap_wsg_idm_ecid_wtls1 },
+-    { "wap-wsg-idm-ecid-wtls3", NID_wap_wsg_idm_ecid_wtls3 },
+-    { "wap-wsg-idm-ecid-wtls4", NID_wap_wsg_idm_ecid_wtls4 },
+-    { "wap-wsg-idm-ecid-wtls5", NID_wap_wsg_idm_ecid_wtls5 },
+-    { "wap-wsg-idm-ecid-wtls6", NID_wap_wsg_idm_ecid_wtls6 },
+-    { "wap-wsg-idm-ecid-wtls7", NID_wap_wsg_idm_ecid_wtls7 },
+-    { "wap-wsg-idm-ecid-wtls8", NID_wap_wsg_idm_ecid_wtls8 },
+-    { "wap-wsg-idm-ecid-wtls9", NID_wap_wsg_idm_ecid_wtls9 },
+-    { "wap-wsg-idm-ecid-wtls10", NID_wap_wsg_idm_ecid_wtls10 },
+-    { "wap-wsg-idm-ecid-wtls11", NID_wap_wsg_idm_ecid_wtls11 },
+-    { "wap-wsg-idm-ecid-wtls12", NID_wap_wsg_idm_ecid_wtls12 },
+-    /* IPSec curves */
+-    { "Oakley-EC2N-3", NID_ipsec3 },
+-    { "Oakley-EC2N-4", NID_ipsec4 },
+     /* brainpool curves */
+-    { "brainpoolP160r1", NID_brainpoolP160r1 },
+-    { "brainpoolP160t1", NID_brainpoolP160t1 },
+-    { "brainpoolP192r1", NID_brainpoolP192r1 },
+-    { "brainpoolP192t1", NID_brainpoolP192t1 },
+-    { "brainpoolP224r1", NID_brainpoolP224r1 },
+-    { "brainpoolP224t1", NID_brainpoolP224t1 },
+     { "brainpoolP256r1", NID_brainpoolP256r1 },
+     { "brainpoolP256t1", NID_brainpoolP256t1 },
+     { "brainpoolP320r1", NID_brainpoolP320r1 },
+@@ -111,8 +37,6 @@ static const EC_NAME2NID curve_list[] = {
+     { "brainpoolP384t1", NID_brainpoolP384t1 },
+     { "brainpoolP512r1", NID_brainpoolP512r1 },
+     { "brainpoolP512t1", NID_brainpoolP512t1 },
+-    /* SM2 curve */
+-    { "SM2", NID_sm2 },
+ };
+
+ const char *OSSL_EC_curve_nid2name(int nid)
+@@ -150,17 +74,6 @@ int ossl_ec_curve_name2nid(const char *name)
+ /* Functions to translate between common NIST curve names and NIDs */
+
+ static const EC_NAME2NID nist_curves[] = {
+-    { "B-163", NID_sect163r2 },
+-    { "B-233", NID_sect233r1 },
+-    { "B-283", NID_sect283r1 },
+-    { "B-409", NID_sect409r1 },
+-    { "B-571", NID_sect571r1 },
+-    { "K-163", NID_sect163k1 },
+-    { "K-233", NID_sect233k1 },
+-    { "K-283", NID_sect283k1 },
+-    { "K-409", NID_sect409k1 },
+-    { "K-571", NID_sect571k1 },
+-    { "P-192", NID_X9_62_prime192v1 },
+     { "P-224", NID_secp224r1 },
+     { "P-256", NID_X9_62_prime256v1 },
+     { "P-384", NID_secp384r1 },
+diff --git a/test/acvp_test.inc b/test/acvp_test.inc
+index 67787f3740..97ec1ff3e5 100644
+--- a/test/acvp_test.inc
++++ b/test/acvp_test.inc
+@@ -217,15 +217,6 @@ static const unsigned char ecdsa_sigver_s1[] = {
+     0xB1, 0xAC,
+ };
+ static const struct ecdsa_sigver_st ecdsa_sigver_data[] = {
+-    {
+-        "SHA-1",
+-        "P-192",
+-        ITM(ecdsa_sigver_msg0),
+-        ITM(ecdsa_sigver_pub0),
+-        ITM(ecdsa_sigver_r0),
+-        ITM(ecdsa_sigver_s0),
+-        PASS,
+-    },
+     {
+         "SHA2-512",
+         "P-521",
+diff --git a/test/ecdsatest.h b/test/ecdsatest.h
+index 700d7b5253..6aa4faa461 100644
+--- a/test/ecdsatest.h
++++ b/test/ecdsatest.h
+@@ -32,23 +32,6 @@ typedef struct {
+ } ecdsa_cavs_kat_t;
+
+ static const ecdsa_cavs_kat_t ecdsa_cavs_kats[] = {
+-    /* prime KATs from X9.62 */
+-    { NID_X9_62_prime192v1, NID_sha1,
+-        "616263", /* "abc" */
+-        "1a8d598fc15bf0fd89030b5cb1111aeb92ae8baf5ea475fb",
+-        "0462b12d60690cdcf330babab6e69763b471f994dd702d16a563bf5ec08069705ffff65e"
+-        "5ca5c0d69716dfcb3474373902",
+-        "fa6de29746bbeb7f8bb1e761f85f7dfb2983169d82fa2f4e",
+-        "885052380ff147b734c330c43d39b2c4a89f29b0f749fead",
+-        "e9ecc78106def82bf1070cf1d4d804c3cb390046951df686" },
+-    { NID_X9_62_prime239v1, NID_sha1,
+-        "616263", /* "abc" */
+-        "7ef7c6fabefffdea864206e80b0b08a9331ed93e698561b64ca0f7777f3d",
+-        "045b6dc53bc61a2548ffb0f671472de6c9521a9d2d2534e65abfcbd5fe0c707fd9f1ed2e"
+-        "65f09f6ce0893baf5e8e31e6ae82ea8c3592335be906d38dee",
+-        "656c7196bf87dcc5d1f1020906df2782360d36b2de7a17ece37d503784af",
+-        "2cb7f36803ebb9c427c58d8265f11fc5084747133078fc279de874fbecb0",
+-        "2eeae988104e9c2234a3c2beb1f53bfa5dc11ff36a875d1e3ccb1f7e45cf" },
+     /* prime KATs from NIST CAVP */
+     { NID_secp224r1, NID_sha224,
+         "699325d6fc8fbbb4981a6ded3c3a54ad2e4e3db8a5669201912064c64e700c139248cdc1"
 diff --git a/test/ectest.c b/test/ectest.c
-index 0233f87..93ba2ce 100644
+index 1e4ae9c63e..56cfc99421 100644
 --- a/test/ectest.c
 +++ b/test/ectest.c
 @@ -174,183 +174,26 @@ static int prime_field_tests(void)
@@ -849,13 +1092,13 @@ index 0233f87..93ba2ce 100644
 -        || !TEST_true(BN_hex2bn(&b, "1"))
 -        || !TEST_ptr(group = EC_GROUP_new_curve_GFp(p, a, b, ctx))
 -        || !TEST_true(EC_GROUP_get_curve(group, p, a, b, ctx)))
-+	/*
-+        * applications should use EC_GROUP_new_curve_GFp so
++        /*
++         * applications should use EC_GROUP_new_curve_GFp so
 +         * that the library gets to choose the EC_METHOD
 +         */
 +        || !TEST_ptr(group = EC_GROUP_new(EC_GFp_mont_method())))
          goto err;
- 
+
 -    TEST_info("Curve defined by Weierstrass equation");
 -    TEST_note("     y^2 = x^3 + a*x + b (mod p)");
 -    test_output_bignum("a", a);
@@ -920,8 +1163,7 @@ index 0233f87..93ba2ce 100644
 -    if (!TEST_size_t_ne(len, 0)
 -        || !TEST_true(EC_POINT_oct2point(group, P, buf, len, ctx))
 -        || !TEST_int_eq(0, EC_POINT_cmp(group, P, Q, ctx)))
-+        || !TEST_ptr(yplusone = BN_new()))
-         goto err;
+-        goto err;
 -    test_output_memory("Generator as octet string, compressed form:",
 -        buf, len);
 -
@@ -1005,8 +1247,9 @@ index 0233f87..93ba2ce 100644
 -                                    "FFFFFFFF99DEF836146BC9B1B4D22831"))
 -        || !TEST_true(EC_GROUP_set_generator(group, P, z, BN_value_one()))
 -        || !TEST_true(EC_POINT_get_affine_coordinates(group, P, x, y, ctx)))
--        goto err;
--
++        || !TEST_ptr(yplusone = BN_new()))
+         goto err;
+
 -    TEST_info("NIST curve P-192 -- Generator");
 -    test_output_bignum("x", x);
 -    test_output_bignum("y", y);
@@ -1023,16 +1266,17 @@ index 0233f87..93ba2ce 100644
 -            ctx))
 -        || !TEST_int_eq(EC_GROUP_get_degree(group), 192)
 -        || !group_order_tests(group)
- 
-         /* Curve P-224 (FIPS PUB 186-2, App. 6) */
- 
+-
+-        /* Curve P-224 (FIPS PUB 186-2, App. 6) */
++    /* Curve P-224 (FIPS PUB 186-2, App. 6) */
+
 -        || !TEST_true(BN_hex2bn(&p, "FFFFFFFFFFFFFFFFFFFFFFFF"
-+     if (!TEST_true(BN_hex2bn(&p, "FFFFFFFFFFFFFFFFFFFFFFFF"
++    if (!TEST_true(BN_hex2bn(&p,    "FFFFFFFFFFFFFFFFFFFFFFFF"
                                      "FFFFFFFF000000000000000000000001"))
          || !TEST_int_eq(1, BN_check_prime(p, ctx, NULL))
          || !TEST_true(BN_hex2bn(&a, "FFFFFFFFFFFFFFFFFFFFFFFF"
-@@ -3522,7 +3365,7 @@ int setup_tests(void)
- 
+@@ -3107,7 +2950,7 @@ int setup_tests(void)
+
      ADD_TEST(parameter_test);
      ADD_TEST(ossl_parameter_test);
 -    ADD_TEST(cofactor_range_test);
@@ -1040,6 +1284,65 @@ index 0233f87..93ba2ce 100644
      ADD_ALL_TESTS(cardinality_test, crv_len);
      ADD_TEST(prime_field_tests);
  #ifndef OPENSSL_NO_EC2M
--- 
-2.45.4
+diff --git a/test/recipes/15-test_genec.t b/test/recipes/15-test_genec.t
+index 4d5090fa39..0a90a602d8 100644
+--- a/test/recipes/15-test_genec.t
++++ b/test/recipes/15-test_genec.t
+@@ -41,37 +41,11 @@ plan skip_all => "This test is unsupported in a no-ec build"
+     if disabled("ec");
+
+ my @prime_curves = qw(
+-    secp112r1
+-    secp112r2
+-    secp128r1
+-    secp128r2
+-    secp160k1
+-    secp160r1
+-    secp160r2
+-    secp192k1
+-    secp224k1
+     secp224r1
+     secp256k1
+     secp384r1
+     secp521r1
+-    prime192v1
+-    prime192v2
+-    prime192v3
+-    prime239v1
+-    prime239v2
+-    prime239v3
+     prime256v1
+-    wap-wsg-idm-ecid-wtls6
+-    wap-wsg-idm-ecid-wtls7
+-    wap-wsg-idm-ecid-wtls8
+-    wap-wsg-idm-ecid-wtls9
+-    wap-wsg-idm-ecid-wtls12
+-    brainpoolP160r1
+-    brainpoolP160t1
+-    brainpoolP192r1
+-    brainpoolP192t1
+-    brainpoolP224r1
+-    brainpoolP224t1
+     brainpoolP256r1
+     brainpoolP256t1
+     brainpoolP320r1
+@@ -136,7 +110,6 @@ push(@other_curves, 'SM2')
+     if !disabled("sm2");
+
+ my @curve_aliases = qw(
+-    P-192
+     P-224
+     P-256
+     P-384
+diff --git a/test/recipes/30-test_evp_data/evppkey_ecc.txt b/test/recipes/30-test_evp_data/evppkey_ecc.txt
+index e6a2c9eb59..861c01e177 100644
+--- a/test/recipes/30-test_evp_data/evppkey_ecc.txt
++++ b/test/recipes/30-test_evp_data/evppkey_ecc.txt
+@@ -4561,3 +4561,4 @@ KeyName = ec3
+ Ctrl = group:P-192
+ Unapproved = 1
+ Ctrl = key-check:0
++Result = KEYGEN_GENERATE_ERROR
+--
+2.55.0
 
