@@ -22,6 +22,10 @@
             <requires profile="PackageManagement" />
             <requires profile="ContainerCore" />
         </profile>
+        <profile name="telegraf-workload" description="Azure Linux Telegraf Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
     </profiles>
 
     <preferences profiles="busybox-workload">
@@ -100,5 +104,27 @@
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
         <file name="postgres-entrypoint.sh" target="/usr/local/bin/postgres-entrypoint.sh" permissions="0755" />
         <package name="postgresql-server" />
+    </packages>
+
+    <!--
+      telegraf-workload reuses ContainerCore + PackageManagement, same as
+      nginx-workload and postgres-workload. Runs the telegraf agent using
+      its packaged default config (/etc/telegraf/telegraf.conf), which
+      has input plugins (cpu, mem, disk, etc.) enabled but no output
+      plugin configured. Users must mount a valid configuration with at
+      least one input and one output over that path. See
+      containers-workloads.md for an example.
+    -->
+    <preferences profiles="telegraf-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/telegraf" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/telegraf" />
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="telegraf-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="telegraf" />
     </packages>
 </image>

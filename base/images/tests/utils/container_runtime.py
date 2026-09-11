@@ -226,7 +226,7 @@ def cleanup_test_images(client: DockerClient) -> None:
                 logger.debug("Image remove skipped (%s): %s", image_ref, exc)
 
 
-def create_container(
+def create_container(  # noqa: PLR0913 - mirrors the supported container runtime options
     client: DockerClient,
     image_ref: str,
     container_name: str | None = None,
