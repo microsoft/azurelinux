@@ -220,10 +220,36 @@ def get_selinux_mode():
         ["getenforce"], capture_output=True, text=True, check=True
     ).stdout.strip()
 
+def get_system_manufacturer():
+    return subprocess.run(
+        ["cat", "/sys/devices/virtual/dmi/id/sys_vendor"], capture_output=True, text=True
+    ).stdout.strip()
+
+def get_host_type(sys_vendor):
+    if sys_vendor == "QEMU":
+        return "virtual"
+    return "physical"
+
+def get_architecture():
+    return subprocess.run(
+        ["uname", "-m"], capture_output=True, text=True, check=True
+    ).stdout.strip()
 
 def collect_system_info():
     print("Collecting system info...")
-    system_info = {"selinux_mode": get_selinux_mode()}
+
+    selinux_mode = get_selinux_mode()
+    architecture = get_architecture()
+    system_manufacturer = get_system_manufacturer()
+    host_type = get_host_type(system_manufacturer)
+
+    system_info = {
+        "selinux_mode": selinux_mode,
+        "architecture": architecture,
+        "system_manufacturer": system_manufacturer,
+        "host_type": host_type
+    } 
+
     return system_info
 
 
