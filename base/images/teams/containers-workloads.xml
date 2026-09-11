@@ -26,6 +26,13 @@
             <requires profile="PackageManagement" />
             <requires profile="ContainerCore" />
         </profile>
+        <profile name="PythonCore" description="Shared Python runtime for python/pytorch workloads" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
+        <profile name="python-workload" description="Azure Linux Python Container Image" import="false">
+            <requires profile="PythonCore" />
+        </profile>
     </profiles>
 
     <preferences profiles="busybox-workload">
@@ -133,4 +140,25 @@
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
         <package name="telegraf" />
     </packages>
+
+    <!--
+      PythonCore is the shared layer for python-workload and
+      pytorch-workload: both need only a bare python3 interpreter on top
+      of the usual ContainerCore + PackageManagement rootfs. Package
+      requirements specific to one leaf (e.g. python3-torch) are added
+      only in that leaf's own packages block.
+    -->
+    <packages type="image" profiles="PythonCore">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="python3" />
+    </packages>
+
+    <preferences profiles="python-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/python" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/python3" />
+            </containerconfig>
+        </type>
+    </preferences>
 </image>
