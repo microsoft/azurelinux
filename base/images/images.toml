@@ -110,6 +110,20 @@ container = true
 systemd = false
 runtime-package-management = true
 
+[images.container-postgres]
+description = "PostgreSQL Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "postgres-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-postgres.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = true
+
 # ---- wsl ---------------------------------------------------------------
 
 [images.wsl]
