@@ -75,6 +75,27 @@ container = true
 systemd = false
 runtime-package-management = false
 
+# ---- single-purpose workload containers ---------------------------------
+#
+# One well-known package (or small package family) per image, defined in
+# containers-workloads.xml. Shared package requirements across these images
+# are hoisted into workload-specific kiwi profiles (e.g. PythonCore) rather
+# than duplicated.
+
+[images.container-busybox]
+description = "Busybox Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "busybox-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-busybox.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
+
 # ---- wsl ---------------------------------------------------------------
 
 [images.wsl]
