@@ -13,7 +13,7 @@ For general questions and feedback, use [GitHub Discussions](https://github.com/
 ## Production support
 
 > [!NOTE]
-> Azure Linux 4.0 isn't generally available (GA) yet. 
+> Azure Linux 4.0 isn't generally available (GA) yet.
 
 If you're running a GA version of Azure Linux in production on Azure and you hit an outage, regression, or configuration problem, [open an Azure support request](https://learn.microsoft.com/azure/azure-portal/supportability/how-to-create-azure-support-request) through the Azure portal.
 
