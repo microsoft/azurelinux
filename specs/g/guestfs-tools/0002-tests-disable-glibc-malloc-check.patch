@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 4 Sep 2026 15:36:00 +0000
+Subject: [PATCH] tests: disable glibc malloc check
+
+The legacy glibc malloc checker interposes allocation APIs through
+libc_malloc_debug.so.0. SymCrypt has unversioned allocator references that
+can bind aligned_alloc to libc while binding free to the debug allocator,
+causing OpenSSL consumers to abort during provider initialization.
+
+Keep malloc perturbation enabled to retain detection of uninitialized and
+use-after-free behavior without enabling the incompatible checked allocator.
+---
+ run.in | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/run.in b/run.in
+index 4053fd2..be5cf48 100755
+--- a/run.in
++++ b/run.in
+@@ -100,14 +100,12 @@ if [ -z "$VIRT_BUILDER_DIRS" ]; then
+     export VIRT_BUILDER_DIRS
+ fi
+ 
+-# This is a cheap way to find some use-after-free and uninitialized
+-# read problems when using glibc.  But if we are valgrinding then
+-# don't use this because it can stop valgrind from working.
++# Perturb allocated and freed memory to find some use-after-free and
++# uninitialized read problems. Disable it when running under valgrind.
+ if [ -z "$VG" ]; then
+     random_val="$(@AWK@ 'BEGIN{srand(); print 1+int(255*rand())}' < /dev/null)"
+-    LD_PRELOAD="${LD_PRELOAD:+"$LD_PRELOAD:"}libc_malloc_debug.so.0"
+-    GLIBC_TUNABLES=glibc.malloc.check=1:glibc.malloc.perturb=$random_val
+-    export LD_PRELOAD GLIBC_TUNABLES
++    GLIBC_TUNABLES=glibc.malloc.perturb=$random_val
++    export GLIBC_TUNABLES
+ fi
+ 
+ # Do we have libtool?  If we have it then we can use it to make
+-- 
+2.55.0
+

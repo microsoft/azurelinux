@@ -15,6 +15,37 @@ description = "Drop the Windows phony-guest image (windows.img) from the test su
 type = "patch-add"
 source = "0001-tests-do-not-build-the-Windows-phony-guest-image.patch"
 
+[[components.guestfs-tools.overlays]]
+description = "Disable glibc's legacy checked allocator because it splits SymCrypt allocations between libc and malloc-debug; retain malloc perturbation and the full test suite. Tracks AB#23502."
+type = "patch-add"
+source = "0002-tests-disable-glibc-malloc-check.patch"
+
+[components.guestfs-tools.overlays.metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+bugs = [
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/23502" },
+    { url = "https://github.com/microsoft/SymCrypt/issues/62" },
+]
+
+# The direct backend can still select passt, which cannot create a user
+# namespace in the restricted mock/Koji sandbox. Shadow passt with a probe shim
+# that exits 2 so libguestfs falls back to QEMU SLIRP for the full test suite.
+[[components.guestfs-tools.overlays]]
+description = "Run %check with the direct libguestfs backend and force its QEMU SLIRP fallback because passt cannot create a user namespace in the restricted mock/Koji sandbox."
+type = "spec-prepend-lines"
+section = "%check"
+lines = [
+    "# Azure Linux mock blocks the user namespace required by passt. Make the passt",
+    "# capability probe fail so libguestfs uses its QEMU SLIRP fallback during tests.",
+    "export LIBGUESTFS_BACKEND=direct",
+    "mkdir -p .check-bin",
+    "printf '%s\\n' '#!/bin/sh' 'exit 2' > .check-bin/passt",
+    "chmod 0755 .check-bin/passt",
+    '''export PATH="$PWD/.check-bin:$PATH"''',
+]
+metadata = { category = "azl-compatibility", upstream-status = "inapplicable" }
+
 # test-virt-diff.sh is a golden-output test that modifies the fedora phony guest
 # and expects virt-diff to report only those changes. In this build environment
 # virt-diff additionally reports the guest's separate ext2 /boot partition entries
