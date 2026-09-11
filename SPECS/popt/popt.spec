@@ -1,13 +1,14 @@
 Summary:	Programs to parse command-line options
 Name:		popt
 Version:	1.19
-Release:    1%{?dist}
+Release:    2%{?dist}
 License:	MIT
 URL:		https://github.com/rpm-software-management/popt
 Group:		Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:	http://ftp.rpm.org/popt/releases/popt-1.x/%{name}-%{version}.tar.gz
+Patch0: 	CVE-2026-18743.patch
 %description
 The popt package contains the popt libraries which are used by
 some programs to parse command-line options.
@@ -27,7 +28,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of popt.
 
 %prep
-%setup -q
+%autosetup -p1
 %build
 %configure \
 	--disable-silent-rules
@@ -59,6 +60,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.19-2
+- Patch for CVE-2026-18743
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19-1
 - Auto-upgrade to 1.19 - Azure Linux 3.0 - package upgrades
 
