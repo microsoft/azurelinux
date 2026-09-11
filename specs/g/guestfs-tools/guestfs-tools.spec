@@ -19,7 +19,7 @@
 Summary:       Tools to access and modify virtual machine disk images
 Name:          guestfs-tools
 Version:       1.55.5
-Release: 4%{?dist}
+Release: 5%{?dist}
 License:       GPL-2.0-or-later AND LGPL-2.0-or-later
 
 # Build only for architectures that have a kernel
@@ -119,6 +119,7 @@ Obsoletes:     libguestfs-tools-c <= 1:1.45.2-1
 
 
 Patch0: 0001-tests-do-not-build-the-Windows-phony-guest-image.patch
+Patch1: 0002-tests-disable-glibc-malloc-check.patch
 %description
 guestfs-tools is a set of tools that can be used to make batch
 configuration changes to guests, get disk used/free statistics
@@ -260,6 +261,13 @@ make V=1 %{?_smp_mflags}
 # image to make the test modification -- a build-environment artifact the upstream
 # golden output does not expect. virt-diff itself is unaffected.
 export SKIP_TEST_VIRT_DIFF_SH=1
+# Azure Linux mock blocks the user namespace required by passt. Make the passt
+# capability probe fail so libguestfs uses its QEMU SLIRP fallback during tests.
+export LIBGUESTFS_BACKEND=direct
+mkdir -p .check-bin
+printf '%s\n' '#!/bin/sh' 'exit 2' > .check-bin/passt
+chmod 0755 .check-bin/passt
+export PATH="$PWD/.check-bin:$PATH"
 %ifarch %{test_arches}
 # Only run the tests with non-debug (ie. non-Rawhide) kernels.
 # XXX This tests for any debug kernel installed.
