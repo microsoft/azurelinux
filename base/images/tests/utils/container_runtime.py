@@ -233,6 +233,8 @@ def create_container(
     *,
     networks: list[str] | None = None,
     command: list[str] | None = _SLEEP_INFINITY,
+    envs: dict[str, str] | None = None,
+    volumes: list[tuple[str, str, str]] | None = None,
 ) -> ContainerInstance:
     """Create and start a container with exec access.
 
@@ -246,6 +248,8 @@ def create_container(
         container_name: Optional name; auto-generated if None.
         networks: Optional networks to attach the container to.
         command: Command override; ``None`` uses the image's default command.
+        envs: Optional environment variables for the container.
+        volumes: Optional ``(source, destination, options)`` volume mounts.
 
     Returns:
         A ContainerInstance with the container's ID, name, and image ref.
@@ -260,7 +264,9 @@ def create_container(
         command=command if command is not None else (),
         name=container_name,
         detach=True,
+        envs=envs or {},
         networks=networks or [],
+        volumes=volumes or [],
     )
 
     # Verify the container is running and exec works.
