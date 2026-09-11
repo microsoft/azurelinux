@@ -18,6 +18,10 @@
             <requires profile="PackageManagement" />
             <requires profile="ContainerCore" />
         </profile>
+        <profile name="postgres-workload" description="Azure Linux PostgreSQL Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
     </profiles>
 
     <preferences profiles="busybox-workload">
@@ -75,5 +79,26 @@
     <packages type="image" profiles="nginx-workload">
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
         <package name="nginx" />
+    </packages>
+
+    <!--
+      postgres-workload reuses ContainerCore + PackageManagement, same as
+      nginx-workload. Its entrypoint initializes an empty PGDATA directory,
+      creates the requested database, and then runs PostgreSQL as the
+      postgres user. A new database requires POSTGRES_PASSWORD unless
+      POSTGRES_HOST_AUTH_METHOD=trust is explicitly selected.
+    -->
+    <preferences profiles="postgres-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/postgres" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/local/bin/postgres-entrypoint.sh" />
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="postgres-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <file name="postgres-entrypoint.sh" target="/usr/local/bin/postgres-entrypoint.sh" permissions="0755" />
+        <package name="postgresql-server" />
     </packages>
 </image>

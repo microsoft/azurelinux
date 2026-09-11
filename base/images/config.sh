@@ -15,7 +15,7 @@ case ",${kiwi_profiles:-}," in
     # management, so the destructive keep-list strip must not run. Still
     # prune build-time-only byproducts (docs, locale data, dnf5 logs) that
     # are never needed at runtime regardless of package manager presence.
-    *,nginx-workload,*)
+    *,nginx-workload,*|*,postgres-workload,*)
         exec /image/config-container-base.sh --mode=light
         ;;
 esac
