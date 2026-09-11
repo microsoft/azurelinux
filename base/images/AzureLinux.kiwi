@@ -17,5 +17,6 @@
     <include from="this://./teams/cloud/marketplace.xml" />
     <include from="this://./teams/wsl.xml" />
     <include from="this://./teams/container.xml" />
+    <include from="this://./teams/containers-workloads.xml" />
     <include from="this://./teams/minimal-os.xml" />
 </image>

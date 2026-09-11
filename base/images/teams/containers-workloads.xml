@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <!--
+      Single-purpose "workload" container images: one well-known package (or
+      a small package family) shipped as a minimal, immediately-runnable OCI
+      image. These are distinct from the generic container-base/distroless
+      images in container.xml, which are meant to be extended by users.
+
+      Shared layers already defined in container.xml (ContainerCore,
+      PackageManagement) are reused here wherever the workload needs a
+      dnf-managed rootfs with a shell. Workload-specific shared layers (e.g.
+      PythonCore) are introduced only when two or more leaf profiles in this
+      file actually share package requirements.
+    -->
+    <profiles>
+        <profile name="busybox-workload" description="Azure Linux Busybox Container Image" import="false" />
+    </profiles>
+
+    <preferences profiles="busybox-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/busybox" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/sbin/busybox">
+                    <argument name="sh" />
+                </subcommand>
+            </containerconfig>
+        </type>
+    </preferences>
+
+    <!--
+      busybox-workload intentionally does not require ContainerCore: the
+      whole point of this image is a single statically-linked busybox binary
+      with no shell package (bash) alongside it. It duplicates the two
+      release/filesystem packages ContainerCore also carries, in exchange for
+      not depending on bash. Note that kiwi's dnf5 bootstrap machinery
+      (dnf5, bash, coreutils-single, rpm, ...) is still installed at build
+      time regardless of this profile's own package list: config.sh routes
+      this profile to config-container-base.sh in strip mode (see that
+      script) to force-remove bash/dnf5/rpm and autoremove everything not on
+      this profile's keep list, so the shipped image matches the documented
+      minimal footprint.
+    -->
+    <packages type="bootstrap" profiles="busybox-workload">
+        <package name="azurelinux-release-container" />
+        <package name="filesystem" />
+    </packages>
+    <packages type="image" profiles="busybox-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="azurelinux-release-container" />
+        <package name="filesystem" />
+        <package name="busybox" />
+    </packages>
+</image>
