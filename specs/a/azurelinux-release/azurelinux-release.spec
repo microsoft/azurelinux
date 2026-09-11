@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        28%{?dist}
+Release:        29%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -508,6 +508,9 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 
 %changelog
+* Fri Sep 11 2026 Chris Co <chrco@microsoft.com> - 4.0-29
+- Remove the Kata preset now that kata-containers is no longer built
+
 * Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-28
 - Disable secure redirects and IPv6 router advertisements for CIS hardening
 

@@ -297,10 +297,6 @@ enable docker.socket
 # Run fstrim weekly on filesystems listed in fstab
 enable fstrim.timer
 
-# oneshot to generate kata VM appliance at host bootup
-# for the booted kernel
-enable kata-osbuilder-generate.service
-
 # Enable rotation of system log files
 enable logrotate.timer
 

@@ -4,9 +4,9 @@
 # crate(libc/default) >= 0.2.186, < 0.3.0, which the snapshot's 0.2.181 does
 # not satisfy. Bumped to Fedora f43 HEAD as of 2026-08-11 (0.2.189).
 #
-# Reverse-dependency safety: the 5 in-tree consumers that hardcode a libc
-# requirement in their own spec (kata-containers, libblkio, nispor, nmstate
-# use open ">= 0.2.x, < 0.3.0" ranges; libkrun has a lower bound only,
+# Reverse-dependency safety: the 4 in-tree consumers that hardcode a libc
+# requirement in their own spec (libblkio, nispor, nmstate use open
+# ">= 0.2.x, < 0.3.0" ranges; libkrun has a lower bound only,
 # ">= 0.2.39" with no upper bound) are all satisfied by 0.2.189.
 # The ~200 additional rust-crate consumers resolve their libc constraint
 # dynamically at build time (%cargo_generate_buildrequires) and aren't

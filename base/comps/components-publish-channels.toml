@@ -716,7 +716,6 @@ components = [
     "jurand",
     "jzlib",
     "kabi-dw",
-    "kata-containers",
     "kbd",
     "kde-filesystem",
     "kdump-utils",
