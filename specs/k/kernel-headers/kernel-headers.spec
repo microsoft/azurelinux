@@ -26,7 +26,7 @@
 # AZL: RPM release counter. Bump for rebuilds without a version change. This
 # corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 1
+%define azl_pkgrelease 4
 
 # define buildid .local
 %define specversion 6.18.45
@@ -122,6 +122,9 @@ done
 %{_prefix}/*-linux-gnu/*
 
 %changelog
+* Fri Sep 11 2026 Tobias Brick <tobiasb@microsoft.com> - 6.18.45-1.4
+- chore(kernel-headers): bump release to stay aligned with kernel spec
+
 * Tue Sep 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.45-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.45.1
 

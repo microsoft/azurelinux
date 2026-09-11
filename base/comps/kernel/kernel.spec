@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 3
+%define azl_pkgrelease 4
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.57.04
 
@@ -857,7 +857,6 @@ BuildRequires: redhat-sb-certs >= 9.4-0.1
 Source0: kernel-%{specrpmversion}.%{kextraversion}.tar.gz
 
 Source1: Makefile.rhelver
-Source2: %{package_name}.changelog
 
 Source10: redhatsecurebootca5.cer
 Source13: redhatsecureboot501.cer
@@ -3228,8 +3227,6 @@ docdir=$RPM_BUILD_ROOT%{_datadir}/doc/kernel-doc-%{specversion}-%{pkgrelease}
 # copy the source over
 mkdir -p $docdir
 tar -h -f - --exclude=man --exclude='.*' -c Documentation | tar xf - -C $docdir
-cat %{SOURCE2} | xz > $docdir/kernel.changelog.xz
-chmod 0644 $docdir/kernel.changelog.xz
 
 # with_doc
 %endif
@@ -3949,7 +3946,6 @@ fi\
 %{_datadir}/doc/kernel-doc-%{specversion}-%{pkgrelease}/Documentation/*
 %dir %{_datadir}/doc/kernel-doc-%{specversion}-%{pkgrelease}/Documentation
 %dir %{_datadir}/doc/kernel-doc-%{specversion}-%{pkgrelease}
-%{_datadir}/doc/kernel-doc-%{specversion}-%{pkgrelease}/kernel.changelog.xz
 %endif
 
 %if %{with_perf}
@@ -4287,6 +4283,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Sep 11 2026 Tobias Brick <tobiasb@microsoft.com> - 6.18.45-1.4
+- chore(kernel): remove obsolete packaged changelog
+
 * Wed Sep 02 2026 Tobias Brick <tobiasb@microsoft.com> - 6.18.45-1.3
 - fix(kernel): resolve CIS Level 1 unused module findings
 - Ensure cramfs kernel module is not available

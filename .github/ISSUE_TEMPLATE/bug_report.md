@@ -37,7 +37,7 @@ A clear and concise description of what you expected to happen.
 What actually happened, including any error messages.
 
 **Screenshots or terminal output**
-Where helpful, include screenshots or terminal output. 
+Where helpful, include screenshots or terminal output.
 
 **Logs**
 Relevant system or application logs that show the error or unexpected behavior. Paste as text in fenced code blocks rather than screenshots.

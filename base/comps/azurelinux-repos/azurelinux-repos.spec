@@ -92,7 +92,7 @@ for ARCH in $(sed -ne "s/^azurelinux-%{version}-primary://p" %{SOURCE1}); do
         "%{buildroot}%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-%{version}-$ARCH" --test
 done
 # Ensure some arch key was imported
-gpg --no-default-keyring --keyring="$TMPRING" --list-keys | grep -A 2 '^pub\s' 
+gpg --no-default-keyring --keyring="$TMPRING" --list-keys | grep -A 2 '^pub\s'
 rm -f "$TMPRING"
 
 %files

@@ -18,7 +18,7 @@ Where would you use this feature? Check all that apply and include details:
 - [ ] Other (please describe)
 
 **Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. 
+A clear and concise description of what the problem is.
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.

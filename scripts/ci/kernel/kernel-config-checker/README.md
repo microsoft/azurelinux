@@ -100,7 +100,7 @@ The system uses a structured JSON schema with default and override sections:
             "value": "y"
           },
           {
-            "architecture": "arm64", 
+            "architecture": "arm64",
             "value": "m"
           }
         ],
@@ -137,7 +137,7 @@ The system uses a structured JSON schema with default and override sections:
 ### Value Types
 
 - `y` - Built into kernel
-- `m` - Built as module  
+- `m` - Built as module
 - `n` - Disabled ("is not set" or missing)
 - Custom values supported for specific configs
 
@@ -172,7 +172,7 @@ Adding new kernel configuration...
 Enter config name (e.g., CONFIG_EXAMPLE): CONFIG_X86_ONLY
 Enter values for each architecture (y/n/m or specific value, leave blank to skip):
 x86_64 value: y
-arm64 value: 
+arm64 value:
 Enter justification: Only needed on x86_64
 Add to [d]efault or [o]verride? [d]: d
 ✓ Added CONFIG_X86_ONLY to default section
@@ -185,7 +185,7 @@ Results in:
   "name": "CONFIG_X86_ONLY",
   "values": [
     {
-      "architecture": "x86_64", 
+      "architecture": "x86_64",
       "value": "y"
     }
   ],
