@@ -1,0 +1,163 @@
+diff --git a/drivers/hv/mshv_root.h b/drivers/hv/mshv_root.h
+index 686b782ee..c2281ca51 100644
+--- a/drivers/hv/mshv_root.h
++++ b/drivers/hv/mshv_root.h
+@@ -313,6 +313,7 @@ int hv_call_create_partition(u64 flags,
+ 			     struct hv_partition_creation_properties creation_properties,
+ 			     union hv_partition_isolation_properties isolation_properties,
+ 			     u64 *partition_id);
++int hv_call_scrub_partition(u64 partition_id);
+ int hv_call_initialize_partition(u64 partition_id);
+ int hv_call_finalize_partition(u64 partition_id);
+ int hv_call_delete_partition(u64 partition_id);
+diff --git a/drivers/hv/mshv_root_hv_call.c b/drivers/hv/mshv_root_hv_call.c
+index db5cdbff2..6d3a5dca0 100644
+--- a/drivers/hv/mshv_root_hv_call.c
++++ b/drivers/hv/mshv_root_hv_call.c
+@@ -144,6 +144,22 @@ int hv_call_create_partition(
+ 	return ret;
+ }
+ 
++int hv_call_scrub_partition(u64 partition_id)
++{
++	struct hv_input_scrub_partition input = { 0 };
++	u64 status;
++
++	input.partition_id = partition_id;
++	status = hv_do_fast_hypercall8(HVCALL_SCRUB_PARTITION, *(u64 *)&input);
++
++	if (!hv_result_success(status))
++		pr_err("%s: %s\n", __func__, hv_result_to_string(status));
++
++	trace_mshv_hvcall_scrub_partition(partition_id, status);
++
++	return hv_result_to_errno(status);
++}
++
+ int hv_call_initialize_partition(u64 partition_id)
+ {
+ 	struct hv_input_initialize_partition input = { 0 };
+diff --git a/drivers/hv/mshv_root_main.c b/drivers/hv/mshv_root_main.c
+index 5c927c3de..475a7cc5a 100644
+--- a/drivers/hv/mshv_root_main.c
++++ b/drivers/hv/mshv_root_main.c
+@@ -76,6 +76,7 @@ static int mshv_region_remap_pfns(struct mshv_mem_region *region,
+ 				  u32 map_flags, u64 pfn_offset,
+ 				  u64 pfn_count);
+ static void mshv_partition_destroy_region(struct kref *ref);
++static void drain_vp_signals(struct mshv_vp *vp);
+ 
+ 
+ #ifdef HYPERVISOR_CALLBACK_VECTOR
+@@ -3114,6 +3115,43 @@ mshv_partition_ioctl_initialize(struct mshv_partition *partition)
+ 	return ret;
+ }
+ 
++static int
++mshv_partition_ioctl_scrub(struct mshv_partition *partition)
++{
++	int ret;
++	u32 i;
++
++	ret = hv_call_scrub_partition(partition->pt_id);
++	if (ret)
++		return ret;
++
++	/*
++	 * Scrubbing the partition resets VPs internal state.
++	 * Essentially this means, that VPs become explicitly suspended and
++	 * all the state mirrored in Linux needs to be reset as well.
++	 */
++	for (i = 0; i < MSHV_MAX_VPS; ++i) {
++		struct mshv_vp *vp;
++
++		vp = partition->pt_vp_array[i];
++		if (!vp)
++			continue;
++
++		/*
++		 * Drain all pending signals for the VP to ensure there are
++		 * no signals in flight that can race with the scrubbing of
++		 * the Linux internal state.
++		 */
++		if (hv_scheduler_type == HV_SCHEDULER_TYPE_ROOT)
++			drain_vp_signals(vp);
++
++		vp->run.flags.intercept_suspended = 0;
++		atomic64_set(&vp->run.vp_signaled_count, 0);
++	}
++
++	return 0;
++}
++
+ static long
+ mshv_partition_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ {
+@@ -3186,6 +3224,9 @@ mshv_partition_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ 		ret = mshv_partition_snp_ioctl(ioctl, partition, arg);
+ 		break;
+ #endif /* HV_SUPPORTS_SEV_SNP_GUESTS */
++	case HVCALL_SCRUB_PARTITION:
++		ret = mshv_partition_ioctl_scrub(partition);
++		break;
+ 	default:
+ 		ret = -ENOTTY;
+ 	}
+diff --git a/include/hyperv/hvgdk_mini.h b/include/hyperv/hvgdk_mini.h
+index df43b4eb5..c1121a6a5 100644
+--- a/include/hyperv/hvgdk_mini.h
++++ b/include/hyperv/hvgdk_mini.h
+@@ -497,6 +497,7 @@ union hv_vp_assist_msr_contents {	 /* HV_REGISTER_VP_ASSIST_PAGE */
+ #define HVCALL_ENTER_SLEEP_STATE			0x0084
+ #define HVCALL_NOTIFY_PARTITION_EVENT			0x0087
+ #define HVCALL_NOTIFY_PORT_RING_EMPTY			0x008b
++#define HVCALL_SCRUB_PARTITION				0x008d
+ #define HVCALL_REGISTER_INTERCEPT_RESULT		0x0091
+ #define HVCALL_ASSERT_VIRTUAL_INTERRUPT			0x0094
+ #define HVCALL_CREATE_PORT				0x0095
+diff --git a/include/hyperv/hvhdk.h b/include/hyperv/hvhdk.h
+index 2d34b42ca..2d46107b1 100644
+--- a/include/hyperv/hvhdk.h
++++ b/include/hyperv/hvhdk.h
+@@ -1242,6 +1242,10 @@ struct hv_output_create_partition {
+ 	u64 partition_id;
+ } __packed;
+ 
++struct hv_input_scrub_partition {
++	u64 partition_id;
++} __packed;
++
+ struct hv_input_initialize_partition {
+ 	u64 partition_id;
+ } __packed;
+diff --git a/include/trace/events/mshv.h b/include/trace/events/mshv.h
+index 151940141..6b3755e1d 100644
+--- a/include/trace/events/mshv.h
++++ b/include/trace/events/mshv.h
+@@ -601,6 +601,26 @@ TRACE_EVENT(mshv_vp_event,
+ 		 )
+ );
+ 
++TRACE_EVENT(mshv_hvcall_scrub_partition,
++               TP_PROTO(u64 partition_id, u64 status),
++               TP_ARGS(partition_id, status),
++
++       TP_STRUCT__entry(
++               __field(u64, partition_id)
++               __field(u64, status)
++       ),
++
++       TP_fast_assign(
++               __entry->partition_id = partition_id;
++               __entry->status = status;
++       ),
++
++       TP_printk("partition_id=%llu status=0x%llx ",
++                 __entry->partition_id,
++                 __entry->status
++                )
++);
++
+ #endif /* _TRACE_MSHV_MAIN_H */
+ 
+ /* This part must be outside protection */
