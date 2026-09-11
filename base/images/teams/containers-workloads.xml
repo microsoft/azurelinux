@@ -33,6 +33,10 @@
         <profile name="python-workload" description="Azure Linux Python Container Image" import="false">
             <requires profile="PythonCore" />
         </profile>
+        <profile name="nodejs-workload" description="Azure Linux Node.js Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
     </profiles>
 
     <preferences profiles="busybox-workload">
@@ -155,4 +159,22 @@
             </containerconfig>
         </type>
     </preferences>
+
+    <!--
+      nodejs-workload reuses ContainerCore + PackageManagement, same as
+      nginx-workload/postgres-workload/telegraf-workload. Its default
+      subcommand starts the node REPL / can execute stdin scripts.
+    -->
+    <preferences profiles="nodejs-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/nodejs" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/node" />
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="nodejs-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="nodejs" />
+    </packages>
 </image>
