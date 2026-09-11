@@ -3,13 +3,14 @@
 
 Name:           perl-URI
 Version:        5.21
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A Perl module implementing URI parsing and manipulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/URI
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-%{version}.tar.gz#/perl-URI-%{version}.tar.gz
+Patch0:         CVE-2026-19953.patch
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -69,7 +70,7 @@ This module implements the URI class. Objects of this class represent
 updated by RFC 2732).
 
 %prep
-%setup -q -n URI-%{version}
+%autosetup -p1 -n URI-%{version}
 chmod -c 644 uri-test
 
 %build
@@ -92,6 +93,9 @@ make test
 %{_mandir}/man3/URI::*.3*
 
 %changelog
+* Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.21-3
+- Patch for CVE-2026-19953
+
 * Wed May 21 2025 Riken Maharjan <rmaharjan@microsoft.com> - 5.21-2
 - Fix ptest by adding missing runtime dep
 
