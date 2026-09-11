@@ -10,12 +10,16 @@ case ",${kiwi_profiles:-}," in
     *,distroless-minimal,*|*,distroless-base,*|*,distroless-debug,*|*,busybox-workload,*)
         exec /image/config-container-base.sh --mode=strip
         ;;
-    # These single-purpose workload images declare runtime-package-management
-    # = true and intentionally keep dnf5 + bash for runtime package
-    # management, so the destructive keep-list strip must not run. Still
-    # prune build-time-only byproducts (docs, locale data, dnf5 logs) that
-    # are never needed at runtime regardless of package manager presence.
-    *,nginx-workload,*|*,postgres-workload,*|*,telegraf-workload,*|*,python-workload,*|*,nodejs-workload,*)
-        exec /image/config-container-base.sh --mode=light
+    # Single-purpose workload images keep their declared application runtime
+    # and Bash, but remove DNF/RPM/repository state and unrelated bootstrap
+    # packages. PostgreSQL also needs writable runtime/data directories before
+    # the final image switches to the postgres user.
+    *,postgres-workload,*)
+        install -d -m 0700 -o postgres -g postgres /var/lib/pgsql/data
+        install -d -m 3775 -o postgres -g postgres /var/lib/pgsql/run
+        exec /image/config-container-base.sh --mode=runtime
+        ;;
+    *,nginx-workload,*|*,telegraf-workload,*|*,python-workload,*|*,nodejs-workload,*|*,pytorch-workload,*)
+        exec /image/config-container-base.sh --mode=runtime
         ;;
 esac

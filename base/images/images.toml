@@ -97,7 +97,7 @@ tests.tests = [
 machine-bootable = false
 container = true
 systemd = false
-runtime-package-management = true
+runtime-package-management = false
 
 [images.container-postgres]
 description = "PostgreSQL Container Image"
@@ -112,7 +112,7 @@ tests.tests = [
 machine-bootable = false
 container = true
 systemd = false
-runtime-package-management = true
+runtime-package-management = false
 
 [images.container-telegraf]
 description = "Telegraf Container Image"
@@ -127,7 +127,7 @@ tests.tests = [
 machine-bootable = false
 container = true
 systemd = false
-runtime-package-management = true
+runtime-package-management = false
 
 [images.container-python]
 description = "Python Container Image"
@@ -142,7 +142,7 @@ tests.tests = [
 machine-bootable = false
 container = true
 systemd = false
-runtime-package-management = true
+runtime-package-management = false
 
 [images.container-nodejs]
 description = "Node.js Container Image"
@@ -157,7 +157,22 @@ tests.tests = [
 machine-bootable = false
 container = true
 systemd = false
-runtime-package-management = true
+runtime-package-management = false
+
+[images.container-pytorch]
+description = "PyTorch Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "pytorch-workload" }
+architectures = ["x86_64", "aarch64"]
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-pytorch.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
 
 # ---- wsl ---------------------------------------------------------------
 
