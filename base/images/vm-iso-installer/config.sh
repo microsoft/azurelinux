@@ -60,6 +60,7 @@ INSTALL_PKGS=(
     efibootmgr
     kernel
     kernel-modules
+    nvme-cli
     openssh-server
     openssh-clients
     sudo
