@@ -21,7 +21,6 @@ COPY [ "./version-check-container.sh", \
 RUN tdnf install -y \
     bison \
     build-essential \
-    byacc \
     ca-certificates \
     ccache \
     cpio \
@@ -42,6 +41,7 @@ RUN tdnf install -y \
     wget \
     zip && \
     ln    -sf bash /bin/sh && \
+    ln    -sf bison /bin/yacc && \
     mkdir -pv $LFS/sources && \
     chmod -v a+wt $LFS/sources && \
     mkdir -pv $LFS/logs/temptoolchain && \
