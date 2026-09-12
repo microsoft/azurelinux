@@ -1,0 +1,407 @@
+From 6b12029e50ad716b8e124dd920ceb3f98f881045 Mon Sep 17 00:00:00 2001
+From: Chris Gunn <chrisgun@microsoft.com>
+Date: Wed, 26 Aug 2026 13:18:28 +0530
+Subject: [PATCH 2/2] Backport: Memory optimization
+
+Backport commit 68370e4 to v1.62.
+
+Co-authored-by: Tanvi Jagtap - Google LLC <139093547+tanvi-jagtap@users.noreply.github.com>
+Co-authored-by: ac-patel <akshitpatel@google.com>
+---
+ bazel/experiments.bzl                         |   1 +
+ .../transport/chttp2/transport/frame_data.cc  |  18 ++-
+ .../ext/transport/chttp2/transport/internal.h |   1 +
+ src/core/lib/experiments/experiments.cc       |  15 ++
+ src/core/lib/experiments/experiments.h        |  11 ++
+ src/core/lib/experiments/experiments.yaml     |   5 +
+ src/core/lib/experiments/rollouts.yaml        |   2 +
+ test/core/slice/c_slice_buffer_test.cc        | 138 +++++++++++++++++-
+ 8 files changed, 185 insertions(+), 6 deletions(-)
+
+diff --git a/bazel/experiments.bzl b/bazel/experiments.bzl
+index bba5f017bc..f7755a0ecf 100644
+--- a/bazel/experiments.bzl
++++ b/bazel/experiments.bzl
+@@ -26,6 +26,7 @@ EXPERIMENT_ENABLES = {
+     "event_engine_dns": "event_engine_dns",
+     "event_engine_listener": "event_engine_listener",
+     "free_large_allocator": "free_large_allocator",
++    "header_data_frame": "header_data_frame",
+     "http2_stats_fix": "http2_stats_fix",
+     "keepalive_fix": "keepalive_fix",
+     "keepalive_server_fix": "keepalive_server_fix",
+diff --git a/src/core/ext/transport/chttp2/transport/frame_data.cc b/src/core/ext/transport/chttp2/transport/frame_data.cc
+index fe0292a92c..d859a14a46 100644
+--- a/src/core/ext/transport/chttp2/transport/frame_data.cc
++++ b/src/core/ext/transport/chttp2/transport/frame_data.cc
+@@ -49,6 +49,7 @@ absl::Status grpc_chttp2_data_parser_begin_frame(uint8_t flags,
+   } else {
+     s->received_last_frame = false;
+   }
++  ++s->num_frames;
+ 
+   return absl::OkStatus();
+ }
+@@ -151,6 +152,7 @@ grpc_core::Poll<grpc_error_handle> grpc_deframe_unprocessed_incoming_frames(
+     s->stats.incoming.data_bytes += length;
+     grpc_slice_buffer_move_first_into_buffer(slices, 5, header);
+     grpc_slice_buffer_move_first(slices, length, stream_out->c_slice_buffer());
++    s->num_frames = 0;
+   }
+ 
+   return absl::OkStatus();
+@@ -161,8 +163,20 @@ grpc_error_handle grpc_chttp2_data_parser_parse(void* /*parser*/,
+                                                 grpc_chttp2_stream* s,
+                                                 const grpc_slice& slice,
+                                                 int is_last) {
+-  grpc_core::CSliceRef(slice);
+-  grpc_slice_buffer_add(&s->frame_storage, slice);
++  const size_t slice_len = GRPC_SLICE_LENGTH(slice);
++  bool is_small_frame = 0 < slice_len && slice_len < GRPC_SLICE_INLINED_SIZE;
++  bool multiple_small_frames =
++      (s->num_frames >= 64) &&
++      ((s->frame_storage.length / s->num_frames) < GRPC_SLICE_INLINED_SIZE);
++  if (GPR_UNLIKELY(multiple_small_frames && is_small_frame &&
++                   grpc_core::IsHeaderDataFrameEnabled())) {
++    uint8_t* append_ptr =
++        grpc_slice_buffer_tiny_add(&s->frame_storage, slice_len);
++    memcpy(append_ptr, GRPC_SLICE_START_PTR(slice), slice_len);
++  } else {
++    grpc_core::CSliceRef(slice);
++    grpc_slice_buffer_add(&s->frame_storage, slice);
++  }
+   grpc_chttp2_maybe_complete_recv_message(t, s);
+ 
+   if (is_last && s->received_last_frame) {
+diff --git a/src/core/ext/transport/chttp2/transport/internal.h b/src/core/ext/transport/chttp2/transport/internal.h
+index eaf7d0d99f..c85626fae5 100644
+--- a/src/core/ext/transport/chttp2/transport/internal.h
++++ b/src/core/ext/transport/chttp2/transport/internal.h
+@@ -624,6 +624,7 @@ struct grpc_chttp2_stream {
+   grpc_metadata_batch trailing_metadata_buffer;
+ 
+   grpc_slice_buffer frame_storage;  // protected by t combiner
++  size_t num_frames = 0;            // protected by t combiner
+ 
+   grpc_core::Timestamp deadline = grpc_core::Timestamp::InfFuture();
+ 
+diff --git a/src/core/lib/experiments/experiments.cc b/src/core/lib/experiments/experiments.cc
+index cef422f5f3..43cac48921 100644
+--- a/src/core/lib/experiments/experiments.cc
++++ b/src/core/lib/experiments/experiments.cc
+@@ -51,6 +51,9 @@ const char* const additional_constraints_event_engine_listener = "{}";
+ const char* const description_free_large_allocator =
+     "If set, return all free bytes from a \042big\042 allocator";
+ const char* const additional_constraints_free_large_allocator = "{}";
++const char* const description_header_data_frame =
++    "Managing header and data memory better";
++const char* const additional_constraints_header_data_frame = "{}";
+ const char* const description_http2_stats_fix =
+     "Fix on HTTP2 outgoing data stats reporting";
+ const char* const additional_constraints_http2_stats_fix = "{}";
+@@ -214,6 +217,8 @@ const ExperimentMetadata g_experiment_metadata[] = {
+      additional_constraints_event_engine_listener, nullptr, 0, false, true},
+     {"free_large_allocator", description_free_large_allocator,
+      additional_constraints_free_large_allocator, nullptr, 0, false, true},
++    {"header_data_frame", description_header_data_frame,
++     additional_constraints_header_data_frame, nullptr, 0, true, true},
+     {"http2_stats_fix", description_http2_stats_fix,
+      additional_constraints_http2_stats_fix, nullptr, 0, true, true},
+     {"keepalive_fix", description_keepalive_fix,
+@@ -329,6 +334,9 @@ const char* const additional_constraints_event_engine_listener = "{}";
+ const char* const description_free_large_allocator =
+     "If set, return all free bytes from a \042big\042 allocator";
+ const char* const additional_constraints_free_large_allocator = "{}";
++const char* const description_header_data_frame =
++    "Managing header and data memory better";
++const char* const additional_constraints_header_data_frame = "{}";
+ const char* const description_http2_stats_fix =
+     "Fix on HTTP2 outgoing data stats reporting";
+ const char* const additional_constraints_http2_stats_fix = "{}";
+@@ -492,6 +500,8 @@ const ExperimentMetadata g_experiment_metadata[] = {
+      additional_constraints_event_engine_listener, nullptr, 0, true, true},
+     {"free_large_allocator", description_free_large_allocator,
+      additional_constraints_free_large_allocator, nullptr, 0, false, true},
++    {"header_data_frame", description_header_data_frame,
++     additional_constraints_header_data_frame, nullptr, 0, true, true},
+     {"http2_stats_fix", description_http2_stats_fix,
+      additional_constraints_http2_stats_fix, nullptr, 0, true, true},
+     {"keepalive_fix", description_keepalive_fix,
+@@ -607,6 +617,9 @@ const char* const additional_constraints_event_engine_listener = "{}";
+ const char* const description_free_large_allocator =
+     "If set, return all free bytes from a \042big\042 allocator";
+ const char* const additional_constraints_free_large_allocator = "{}";
++const char* const description_header_data_frame =
++    "Managing header and data memory better";
++const char* const additional_constraints_header_data_frame = "{}";
+ const char* const description_http2_stats_fix =
+     "Fix on HTTP2 outgoing data stats reporting";
+ const char* const additional_constraints_http2_stats_fix = "{}";
+@@ -770,6 +783,8 @@ const ExperimentMetadata g_experiment_metadata[] = {
+      additional_constraints_event_engine_listener, nullptr, 0, true, true},
+     {"free_large_allocator", description_free_large_allocator,
+      additional_constraints_free_large_allocator, nullptr, 0, false, true},
++    {"header_data_frame", description_header_data_frame,
++     additional_constraints_header_data_frame, nullptr, 0, true, true},
+     {"http2_stats_fix", description_http2_stats_fix,
+      additional_constraints_http2_stats_fix, nullptr, 0, true, true},
+     {"keepalive_fix", description_keepalive_fix,
+diff --git a/src/core/lib/experiments/experiments.h b/src/core/lib/experiments/experiments.h
+index 179b3ad946..6a927c71c2 100644
+--- a/src/core/lib/experiments/experiments.h
++++ b/src/core/lib/experiments/experiments.h
+@@ -67,6 +67,8 @@ inline bool IsEventEngineClientEnabled() { return false; }
+ inline bool IsEventEngineDnsEnabled() { return false; }
+ inline bool IsEventEngineListenerEnabled() { return false; }
+ inline bool IsFreeLargeAllocatorEnabled() { return false; }
++#define GRPC_EXPERIMENT_IS_INCLUDED_HEADER_DATA_FRAME
++inline bool IsHeaderDataFrameEnabled() { return true; }
+ #define GRPC_EXPERIMENT_IS_INCLUDED_HTTP2_STATS_FIX
+ inline bool IsHttp2StatsFixEnabled() { return true; }
+ inline bool IsKeepaliveFixEnabled() { return false; }
+@@ -125,6 +127,8 @@ inline bool IsEventEngineDnsEnabled() { return false; }
+ #define GRPC_EXPERIMENT_IS_INCLUDED_EVENT_ENGINE_LISTENER
+ inline bool IsEventEngineListenerEnabled() { return true; }
+ inline bool IsFreeLargeAllocatorEnabled() { return false; }
++#define GRPC_EXPERIMENT_IS_INCLUDED_HEADER_DATA_FRAME
++inline bool IsHeaderDataFrameEnabled() { return true; }
+ #define GRPC_EXPERIMENT_IS_INCLUDED_HTTP2_STATS_FIX
+ inline bool IsHttp2StatsFixEnabled() { return true; }
+ inline bool IsKeepaliveFixEnabled() { return false; }
+@@ -183,6 +187,8 @@ inline bool IsEventEngineDnsEnabled() { return false; }
+ #define GRPC_EXPERIMENT_IS_INCLUDED_EVENT_ENGINE_LISTENER
+ inline bool IsEventEngineListenerEnabled() { return true; }
+ inline bool IsFreeLargeAllocatorEnabled() { return false; }
++#define GRPC_EXPERIMENT_IS_INCLUDED_HEADER_DATA_FRAME
++inline bool IsHeaderDataFrameEnabled() { return true; }
+ #define GRPC_EXPERIMENT_IS_INCLUDED_HTTP2_STATS_FIX
+ inline bool IsHttp2StatsFixEnabled() { return true; }
+ inline bool IsKeepaliveFixEnabled() { return false; }
+@@ -241,6 +247,7 @@ enum ExperimentIds {
+   kExperimentIdEventEngineDns,
+   kExperimentIdEventEngineListener,
+   kExperimentIdFreeLargeAllocator,
++  kExperimentIdHeaderDataFrame,
+   kExperimentIdHttp2StatsFix,
+   kExperimentIdKeepaliveFix,
+   kExperimentIdKeepaliveServerFix,
+@@ -320,6 +327,10 @@ inline bool IsHttp2StatsFixEnabled() {
+ inline bool IsKeepaliveFixEnabled() {
+   return IsExperimentEnabled(kExperimentIdKeepaliveFix);
+ }
++#define GRPC_EXPERIMENT_IS_INCLUDED_HEADER_DATA_FRAME
++inline bool IsHeaderDataFrameEnabled() {
++  return IsExperimentEnabled(kExperimentIdHeaderDataFrame);
++}
+ #define GRPC_EXPERIMENT_IS_INCLUDED_KEEPALIVE_SERVER_FIX
+ inline bool IsKeepaliveServerFixEnabled() {
+   return IsExperimentEnabled(kExperimentIdKeepaliveServerFix);
+diff --git a/src/core/lib/experiments/experiments.yaml b/src/core/lib/experiments/experiments.yaml
+index a1065096f3..9e010bdf4d 100644
+--- a/src/core/lib/experiments/experiments.yaml
++++ b/src/core/lib/experiments/experiments.yaml
+@@ -103,6 +103,11 @@
+   expiry: 2024/04/01
+   owner: alishananda@google.com
+   test_tags: [resource_quota_test]
++- name: header_data_frame
++  description: Managing header and data memory better
++  expiry: 2026/10/31
++  owner: ritulb@google.com
++  test_tags: []
+ - name: http2_stats_fix
+   description:
+     Fix on HTTP2 outgoing data stats reporting
+diff --git a/src/core/lib/experiments/rollouts.yaml b/src/core/lib/experiments/rollouts.yaml
+index 9b9217c66c..b7d84cf9a8 100644
+--- a/src/core/lib/experiments/rollouts.yaml
++++ b/src/core/lib/experiments/rollouts.yaml
+@@ -74,6 +74,8 @@
+     windows: true
+ - name: free_large_allocator
+   default: false
++- name : header_data_frame
++  default : true
+ - name: http2_stats_fix
+   default: true
+ - name: keepalive_fix
+diff --git a/test/core/slice/c_slice_buffer_test.cc b/test/core/slice/c_slice_buffer_test.cc
+index 53a697c25e..1656a313fd 100644
+--- a/test/core/slice/c_slice_buffer_test.cc
++++ b/test/core/slice/c_slice_buffer_test.cc
+@@ -29,7 +29,7 @@
+ 
+ static constexpr size_t kTotalDataLength = 4096;
+ 
+-void test_slice_buffer_add() {
++TEST(SliceBufferTest, Add) {
+   grpc_slice_buffer buf;
+   grpc_slice aaa = grpc_slice_from_copied_string("aaa");
+   grpc_slice bb = grpc_slice_from_copied_string("bb");
+@@ -70,7 +70,7 @@ static void free_data(void* data, size_t len) {
+   gpr_free(data);
+ }
+ 
+-void test_slice_buffer_add_contiguous_slices() {
++TEST(SliceBufferTest, AddContiguousSlices) {
+   grpc_slice_buffer buf;
+   grpc_slice_buffer_init(&buf);
+   char* data = reinterpret_cast<char*>(gpr_malloc(kTotalDataLength));
+@@ -94,7 +94,7 @@ void test_slice_buffer_add_contiguous_slices() {
+   grpc_slice_buffer_destroy(&buf);
+ }
+ 
+-void test_slice_buffer_move_first() {
++TEST(SliceBufferTest, MoveFirst) {
+   grpc_slice slices[3];
+   grpc_slice_buffer src;
+   grpc_slice_buffer dst;
+@@ -142,7 +142,7 @@ void test_slice_buffer_move_first() {
+   ASSERT_EQ(dst.length, dst_len);
+ }
+ 
+-void test_slice_buffer_first() {
++TEST(SliceBufferTest, First) {
+   grpc_slice slices[3];
+   slices[0] = grpc_slice_from_copied_string("aaa");
+   slices[1] = grpc_slice_from_copied_string("bbbb");
+@@ -183,6 +183,136 @@ void test_slice_buffer_first() {
+   ASSERT_EQ(buf.length, 0);
+ }
+ 
++TEST(SliceBufferTest, TinyAddEmptyBuffer) {
++  grpc_slice_buffer buf;
++  grpc_slice_buffer_init(&buf);
++
++  // Tiny add to an empty buffer.
++  uint8_t* p = grpc_slice_buffer_tiny_add(&buf, 5);
++  ASSERT_NE(p, nullptr);
++  memcpy(p, "hello", 5);
++
++  ASSERT_EQ(buf.count, 1);
++  ASSERT_EQ(buf.length, 5);
++
++  grpc_slice slice = grpc_slice_buffer_peek_first(&buf)[0];
++  ASSERT_EQ(GRPC_SLICE_LENGTH(slice), 5);
++  ASSERT_EQ(memcmp(GRPC_SLICE_START_PTR(slice), "hello", 5), 0);
++
++  grpc_slice_buffer_destroy(&buf);
++}
++
++TEST(SliceBufferTest, TinyAddAppendToInlined) {
++  grpc_slice_buffer buf;
++  grpc_slice_buffer_init(&buf);
++
++  // First tiny add
++  uint8_t* p1 = grpc_slice_buffer_tiny_add(&buf, 5);
++  memcpy(p1, "hello", 5);
++  ASSERT_EQ(buf.count, 1);
++  ASSERT_EQ(buf.length, 5);
++
++  // Second tiny add should append to the same slice.
++  uint8_t* p2 = grpc_slice_buffer_tiny_add(&buf, 6);
++  ASSERT_EQ(p2, p1 + 5);
++  memcpy(p2, " world", 6);
++
++  ASSERT_EQ(buf.count, 1);
++  ASSERT_EQ(buf.length, 11);
++
++  grpc_slice slice = grpc_slice_buffer_peek_first(&buf)[0];
++  ASSERT_EQ(GRPC_SLICE_LENGTH(slice), 11);
++  ASSERT_EQ(memcmp(GRPC_SLICE_START_PTR(slice), "hello world", 11), 0);
++
++  grpc_slice_buffer_destroy(&buf);
++}
++
++TEST(SliceBufferTest, TinyAddNotEnoughSpace) {
++  grpc_slice_buffer buf;
++  grpc_slice_buffer_init(&buf);
++
++  const size_t first_add_size = GRPC_SLICE_INLINED_SIZE - 3;
++  const size_t second_add_size = 5;
++
++  uint8_t* p1 = grpc_slice_buffer_tiny_add(&buf, first_add_size);
++  memset(p1, 'a', first_add_size);
++  ASSERT_EQ(buf.count, 1);
++  ASSERT_EQ(buf.length, first_add_size);
++
++  // This one should fall back to a new slice.
++  uint8_t* p2 = grpc_slice_buffer_tiny_add(&buf, second_add_size);
++  ASSERT_NE(p2, p1 + first_add_size);
++  memset(p2, 'b', second_add_size);
++
++  ASSERT_EQ(buf.count, 2);
++  ASSERT_EQ(buf.length, first_add_size + second_add_size);
++
++  // verify first slice
++  grpc_slice slice1 = grpc_slice_buffer_peek_first(&buf)[0];
++  ASSERT_EQ(GRPC_SLICE_LENGTH(slice1), first_add_size);
++
++  // verify second slice
++  grpc_slice slice2 = buf.slices[1];
++  ASSERT_EQ(GRPC_SLICE_LENGTH(slice2), second_add_size);
++
++  grpc_slice_buffer_destroy(&buf);
++}
++
++TEST(SliceBufferTest, TinyAddAfterRefcounted) {
++  grpc_slice_buffer buf;
++  grpc_slice_buffer_init(&buf);
++
++  // Add a refcounted slice (one that is longer than INLINED_SIZE)
++  grpc_slice s = grpc_slice_from_copied_string(
++      "this is a refcounted string that is large enough");
++  size_t initial_len = GRPC_SLICE_LENGTH(s);
++  grpc_slice_buffer_add(&buf, s);
++
++  ASSERT_EQ(buf.count, 1);
++  ASSERT_EQ(buf.length, initial_len);
++
++  // Tiny add should create a new slice, since previous is refcounted
++  uint8_t* p = grpc_slice_buffer_tiny_add(&buf, 5);
++  memcpy(p, "hello", 5);
++
++  ASSERT_EQ(buf.count, 2);
++  ASSERT_EQ(buf.length, initial_len + 5);
++
++  // verify second slice
++  grpc_slice slice2 = buf.slices[1];
++  ASSERT_EQ(GRPC_SLICE_LENGTH(slice2), 5);
++  ASSERT_EQ(memcmp(GRPC_SLICE_START_PTR(slice2), "hello", 5), 0);
++
++  grpc_slice_buffer_destroy(&buf);
++}
++
++TEST(SliceBufferTest, TinyAddEmbiggen) {
++  grpc_slice_buffer buf;
++  grpc_slice_buffer_init(&buf);
++
++  // Fill up the buffer capacity to trigger embiggen logic.
++  // capacity starts at GRPC_SLICE_BUFFER_INLINE_ELEMENTS.
++  for (size_t i = 0; i < GRPC_SLICE_BUFFER_INLINE_ELEMENTS + 1; ++i) {
++    grpc_slice s = grpc_slice_from_copied_string(
++        "large enough string to be refcounted so tiny add creates new slice");
++    grpc_slice_buffer_add(&buf, s);
++  }
++
++  size_t initial_count = buf.count;
++  size_t initial_len = buf.length;
++
++  uint8_t* p = grpc_slice_buffer_tiny_add(&buf, 5);
++  memcpy(p, "hello", 5);
++
++  ASSERT_EQ(buf.count, initial_count + 1);
++  ASSERT_EQ(buf.length, initial_len + 5);
++
++  grpc_slice slice_last = buf.slices[buf.count - 1];
++  ASSERT_EQ(GRPC_SLICE_LENGTH(slice_last), 5);
++  ASSERT_EQ(memcmp(GRPC_SLICE_START_PTR(slice_last), "hello", 5), 0);
++
++  grpc_slice_buffer_destroy(&buf);
++}
+ int main(int argc, char** argv) {
+   grpc::testing::TestEnvironment env(&argc, argv);
+   ::testing::InitGoogleTest(&argc, argv);
+-- 
+2.55.0
+
