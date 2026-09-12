@@ -16,6 +16,7 @@
 [images.vm-base]
 description = "VM Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "vm-base" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
@@ -31,6 +32,7 @@ runtime-package-management = true
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [
     { name = "static-image-checks" },
     { name = "runtime-container-tests" },
@@ -45,6 +47,7 @@ runtime-package-management = true
 [images.container-distroless-minimal]
 description = "Container Distroless Minimal Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-minimal" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [{ name = "static-image-checks" }]
 
 [images.container-distroless-minimal.capabilities]
@@ -56,6 +59,7 @@ runtime-package-management = false
 [images.container-distroless-base]
 description = "Container Distroless Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-base" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [{ name = "static-image-checks" }]
 
 [images.container-distroless-base.capabilities]
@@ -67,6 +71,7 @@ runtime-package-management = false
 [images.container-distroless-debug]
 description = "Container Distroless Debug Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-debug" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [{ name = "static-image-checks" }]
 
 [images.container-distroless-debug.capabilities]
@@ -80,6 +85,7 @@ runtime-package-management = false
 [images.wsl]
 description = "WSL Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "wsl" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [{ name = "static-image-checks" }]
 
 [images.wsl.capabilities]
@@ -92,6 +98,7 @@ wsl = true
 [images.vm-iso-installer]
 description = "VM ISO Installer"
 definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", profile = "vm-iso-installer" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [{ name = "iso-install" }]
 
 [images.vm-iso-installer.capabilities]
@@ -100,6 +107,7 @@ installer-media = true
 [images.minimal-os]
 description = "Minimal OS Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "minimal-os" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [{ name = "static-image-checks" }]
 
 [images.minimal-os.capabilities]
@@ -111,6 +119,7 @@ runtime-package-management = true
 [images.1p-vm-base-gen1]
 description = "1P VM Base Gen1 Image (BIOS)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen1" }
+architectures = ["x86_64"]
 tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
@@ -126,6 +135,7 @@ runtime-package-management = true
 [images.1p-vm-base-gen1-fips]
 description = "1P VM Base Gen1 FIPS Image (BIOS)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen1-fips" }
+architectures = ["x86_64"]
 tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
@@ -142,6 +152,7 @@ fips-enabled = true
 [images.1p-vm-base-gen2-fips]
 description = "1P VM Base Gen2 FIPS Image (UEFI)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2-fips" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
@@ -158,6 +169,7 @@ fips-enabled = true
 [images.marketplace-gen2]
 description = "Marketplace Gen2 Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "marketplace-gen2" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
@@ -173,6 +185,7 @@ runtime-package-management = true
 [images.marketplace-gen2-fips]
 description = "Marketplace Gen2 FIPS Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "marketplace-gen2-fips" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
