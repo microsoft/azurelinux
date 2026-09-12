@@ -1,7 +1,7 @@
 Summary:        Extremely fast and user friendly build system
 Name:           meson
 Version:        1.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,10 @@ BuildRequires:  cmake
 BuildRequires:  gtest
 BuildRequires:  gmock
 BuildRequires:  git
+# Let meson's unit test suite run in parallel via pytest (-n auto) instead of
+# falling back to slow sequential unittest execution.
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-xdist
 %endif
 
 Requires:       ninja-build
@@ -67,6 +71,12 @@ python3 ./run_tests.py
 %{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
 
 %changelog
+* Wed Jul 22 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.3.1-2
+- Add python3-pytest and python3-pytest-xdist build dependencies so meson's
+  unit test suite runs in parallel via pytest (-n auto) instead of the slow
+  sequential unittest fallback, substantially reducing %check runtime and
+  avoiding pipeline test timeouts.
+
 * Thu Feb 29 2024 Betty Lakes <bettylakes@microsoft.com> - 1.3.1-1
 - Update version to 1.3.1
 - Remove flaky and unsupported tests
