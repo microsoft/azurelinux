@@ -1,0 +1,78 @@
+From a194bf53752b5884ef21785c0ee08fc022df7390 Mon Sep 17 00:00:00 2001
+From: Joseph Marrero Corchado <jmarrero@redhat.com>
+Date: Thu, 19 Mar 2026 12:40:33 -0400
+Subject: [PATCH] deploy: Print status message on container early-return path
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Commit 24290328 ("Fix silent upgrade failure on container systems")
+fixed the case where an upgrade with a *new* base image was silently
+skipped, but introduced a subtler regression: when there is *no* update
+available on a container-based system, the early return at the
+skip_base_check path exits without printing any message.  The user sees
+exit code 0 and no output, which is confusing—on traditional ostree
+systems the same scenario prints "No upgrade available.".
+
+The root cause is that the early return added for the idempotent
+layering optimization fires for all container-based transactions when
+nothing changed, not just idempotent installs.  On the normal (non-
+container) path, skip_base_check is FALSE, so the flow reaches the
+message-printing code at the end of deploy_transaction_execute().
+On container systems it short-circuits before that.
+
+Fix this by emitting the appropriate "No upgrade available." or
+"No change." message before the early return, matching the messages
+used in the normal no-change path.  Add a regression test that
+verifies the message is printed on a container-based system.
+
+Closes: https://github.com/coreos/rpm-ostree/issues/5574
+
+Assisted-by: Claude Opus 4.6 (OpenCode)
+Signed-off-by: Joseph Marrero Corchado <jmarrero@redhat.com>
+---
+ src/daemon/rpmostreed-transaction-types.cxx    | 8 +++++++-
+ tests/kolainst/destructive/idempotent-layering | 8 ++++++++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/src/daemon/rpmostreed-transaction-types.cxx b/src/daemon/rpmostreed-transaction-types.cxx
+index 22edcde8..d60d70d4 100644
+--- a/src/daemon/rpmostreed-transaction-types.cxx
++++ b/src/daemon/rpmostreed-transaction-types.cxx
+@@ -1603,7 +1603,13 @@ deploy_transaction_execute (RpmostreedTransaction *transaction, GCancellable *ca
+    * need to continue to deploy. */
+   const bool have_refspec_or_revision = self->refspec || self->revision;
+   if (skip_base_check && !changed && !have_refspec_or_revision)
+-    return TRUE;
++    {
++      if (is_upgrade)
++        rpmostree_output_message ("No upgrade available.");
++      else
++        rpmostree_output_message ("No change.");
++      return TRUE;
++    }
+ 
+   if (dry_run)
+     /* Note early return here; we printed the transaction already */
+diff --git a/tests/kolainst/destructive/idempotent-layering b/tests/kolainst/destructive/idempotent-layering
+index 3b2ca9b9..4f4ad411 100755
+--- a/tests/kolainst/destructive/idempotent-layering
++++ b/tests/kolainst/destructive/idempotent-layering
+@@ -265,6 +265,14 @@ case "${AUTOPKGTEST_REBOOT_MARK:-}" in
+     assert_streq "${rc}" "77"
+     echo "ok upgrade --unchanged-exit-77 reports no change when already up to date"
+ 
++    # Test 9: Verify upgrade prints "No upgrade available." when already up to date
++    # Regression test for https://github.com/coreos/rpm-ostree/issues/5574
++    # Before this fix, container-based systems would exit silently with code 0
++    # without printing any message when no upgrade was available.
++    rpm-ostree upgrade 2>&1 | tee upgrade-output.txt
++    assert_file_has_content upgrade-output.txt "No upgrade available."
++    echo "ok upgrade prints 'No upgrade available.' on container-based system"
++
+     ;;
+   *) echo "unexpected mark: ${AUTOPKGTEST_REBOOT_MARK}"; exit 1;;
+ esac
+-- 
+2.53.0
+
