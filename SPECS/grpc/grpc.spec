@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.62.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,8 @@ Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{versi
 Source1:        %{name}-%{version}-submodules.tar.gz
 Patch0:         grpcio-cython3.patch
 Patch1:         CVE-2024-11407.patch
+Patch2:         Backport-Fixing-bug-in-GoAway-and-gRPC-Message-Compr.patch
+Patch3:         Backport-Memory-optimization.patch
 BuildRequires:  abseil-cpp-devel >= 20240116.0-2
 BuildRequires:  build-essential
 BuildRequires:  c-ares-devel
@@ -152,6 +154,9 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Sep 09 2026 chrisgun <chrisgun@microsoft.com> - 1.62.3-2
+- Fix for GHSA-hf3w-6hpw-qp67
+
 * Tue Mar 25 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.62.3-1
 - Upgrade to 1.62.3 to fix CVE-2024-7246
 
