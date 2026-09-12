@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 6.6.137.mshv1 Kernel Configuration
+# Linux/x86_64 6.6.152.mshv1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -1003,6 +1003,8 @@ CONFIG_INET_TABLE_PERTURB_ORDER=16
 # CONFIG_TCP_CONG_ADVANCED is not set
 CONFIG_TCP_CONG_CUBIC=y
 CONFIG_DEFAULT_TCP_CONG="cubic"
+CONFIG_TCP_SIGPOOL=y
+# CONFIG_TCP_AO is not set
 CONFIG_TCP_MD5SIG=y
 CONFIG_IPV6=y
 # CONFIG_IPV6_ROUTER_PREF is not set

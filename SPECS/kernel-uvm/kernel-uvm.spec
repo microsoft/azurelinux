@@ -16,7 +16,7 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.6.137.mshv1
+Version:        6.6.152.mshv1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -165,6 +165,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Wed Aug 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.152.mshv1-1
+- Auto-upgrade to 6.6.152.mshv1
+
 * Tue May 05 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.137.mshv1-1
 - Upgrade to 6.6.137.mshv1
 
