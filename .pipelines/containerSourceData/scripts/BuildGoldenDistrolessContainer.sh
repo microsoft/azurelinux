@@ -82,6 +82,16 @@ function create_distroless_container {
     MARINARA_IMAGE=${BASE_IMAGE_NAME_FULL/base\/core/$marinara}
     echo "MARINARA_IMAGE -> $MARINARA_IMAGE"
 
+    # Marinara is published to MCR by Stage 6 alongside base/core, but as an independent push.
+    # If the date-matched marinara tag is missing from MCR (rare — publish hiccup, GC, etc.), fall
+    # back to the floating :3.0 tag. Marinara is used only as a *builder* image whose contents don't
+    # ship in the final distroless image, so any recent 3.0 marinara is functionally equivalent.
+    marinaraFallback="mcr.microsoft.com/azurelinux/marinara:3.0"
+    if ! docker manifest inspect "$MARINARA_IMAGE" > /dev/null 2>&1; then
+        echo "WARNING: $MARINARA_IMAGE not found on registry; falling back to $marinaraFallback"
+        MARINARA_IMAGE="$marinaraFallback"
+    fi
+
     sed -E "s|^FROM .*builder$|FROM $MARINARA_IMAGE as builder|g" -i "$marinaraSrcDir/dockerfiles/dockerfile-new-image"
 
     # WORK_DIR has a directory named 'Stage' which created inside prepare_docker_directory function
