@@ -1,1 +1,2 @@
 [components.systemd]
+tests.tests = [{ name = "tmt-systemd-ci" }]

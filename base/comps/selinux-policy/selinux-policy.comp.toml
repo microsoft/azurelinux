@@ -1,4 +1,5 @@
 [components.selinux-policy]
+tests.tests = [{ name = "tmt-selinux-tier1" }]
 # Pin to 43.7-1 (commit f3fd2d04) for stage1 prod bring-up. Bumps from 43.4 to
 # the minimum required by ceph-selinux / cockpit-ws-selinux / container-selinux
 # built in the Fedora 43 snapshot, which need selinux-policy >= 43.7. Policy

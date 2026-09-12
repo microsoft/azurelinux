@@ -1,0 +1,2 @@
+[components.hostname]
+tests.tests = [{ name = "tmt-hostname-all" }]

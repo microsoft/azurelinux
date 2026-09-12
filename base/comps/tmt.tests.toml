@@ -1,0 +1,221 @@
+# TMT package-test catalog. Sources are pinned so reruns use the same upstream
+# metadata revision instead of a moving branch head. When a plan lives in a
+# component's RPM dist-git repository, its ref matches the component lock's
+# upstream commit. Independent test repositories are pinned to their own
+# maintained default branch because they do not carry Fedora release branches.
+
+[tests.tmt-dhcpcd-all]
+type = "tmt"
+description = "Dhcpcd upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-dhcpcd-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/dhcpcd.git", ref = "c9d18d35e12e41cf9045416a1cf37fecc4a26c9c" }
+plan = "/plans/all"
+
+[tests.tmt-selinux-tier1]
+type = "tmt"
+description = "SELinux and SELinux policy tier-one functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-selinux-tier1.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/selinux.git", ref = "534e38f96fde1c88ae9881ffea6c9fc592e82c71" }
+plan = "/plans/tier1"
+
+[tests.tmt-systemd-ci]
+type = "tmt"
+description = "Systemd continuous-integration plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-systemd-ci.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/systemd.git", ref = "531c815646006b8503e547f2da10862426d1d5b4" }
+plan = "/plans/ci"
+
+[tests.tmt-chrony-all]
+type = "tmt"
+description = "Chrony upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-chrony-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/chrony.git", ref = "0bd03b1f3a32ed28a2743882add69f37b33de8bc" }
+plan = "/plans/all"
+
+[tests.tmt-net-tools-tier1-public]
+type = "tmt"
+description = "Net-tools public tier-one plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-net-tools-tier1-public.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/net-tools.git", ref = "6b2ffd1b36ad50ee900a4a79f8aaac4dd0136e24" }
+plan = "/plans/tier1/public"
+
+[tests.tmt-hostname-all]
+type = "tmt"
+description = "Hostname upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-hostname-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/hostname.git", ref = "4aab6d5718c252dcf6fc7fe975c8caaa10b5acf9" }
+plan = "/plans/all"
+
+[tests.tmt-util-linux-ci]
+type = "tmt"
+description = "Util-linux continuous-integration plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-util-linux-ci.tmt]
+source = { git-url = "https://src.fedoraproject.org/rpms/util-linux.git", ref = "87d3c9659eaefe4bdf07486680da92826dbf9ef0" }
+plan = "/plans/ci"
+
+[tests.tmt-memcached-all]
+type = "tmt"
+description = "Memcached upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-memcached-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/memcached.git", ref = "8a62fd6a9a3086fef6573e715c08761c4b9e5a74" }
+plan = "/plans/all"
+
+[tests.tmt-rust-all]
+type = "tmt"
+description = "Rust upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-rust-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/rust.git", ref = "804bb6656719e3084b8a997ae61fb9b91fc96b19" }
+plan = "/plans/all"
+
+[tests.tmt-nodejs-all]
+type = "tmt"
+description = "Node.js upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-nodejs-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/nodejs.git", ref = "ecbe2863fa18304cfad9c9f5b0f35e189bd8887e" }
+plan = "/plans/all"
+
+[tests.tmt-glibc-ci]
+type = "tmt"
+description = "glibc continuous-integration plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-glibc-ci.tmt]
+source = { git-url = "https://src.fedoraproject.org/rpms/glibc.git", ref = "105bf4c71d7b55fdccc028b22dce154c5d5b6228" }
+plan = "/plans/ci"
+
+[tests.tmt-buildah]
+type = "tmt"
+description = "Buildah system test plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-buildah.tmt]
+source = { git-url = "https://src.fedoraproject.org/rpms/buildah.git", ref = "7841a780125d5d6f54ae6577f13c01fdd8e7c403" }
+plan = "/plans"
+
+[tests.tmt-bash]
+type = "tmt"
+description = "Bash shell functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-bash.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/shell.git", ref = "50c3a1ba7f9cc753440bf8d3395bfac02448c8ba" }
+plan = "/plans/bash"
+
+[tests.tmt-parted]
+type = "tmt"
+description = "Parted functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-parted.tmt]
+source = { git-url = "https://src.fedoraproject.org/rpms/parted.git", ref = "66c2ad5f018ccccbdaa60f883675cf6c0243aba7" }
+plan = "/plans/test-parted"
+
+[tests.tmt-php-all]
+type = "tmt"
+description = "PHP upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-php-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/php.git", ref = "16d1ba5dae51781387e52ea79e5a869c12c0a789" }
+plan = "/plans/all"
+
+[tests.tmt-skopeo]
+type = "tmt"
+description = "Skopeo system test plans"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-skopeo.tmt]
+source = { git-url = "https://github.com/containers/skopeo.git", ref = "23dddaad3d8f86f8c1d3204646b14aa0da86a85e" }
+plan = "/plans"
+
+[tests.tmt-podman-local-root]
+type = "tmt"
+description = "Podman local rootful system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-podman-local-root.tmt]
+source = { git-url = "https://src.fedoraproject.org/rpms/podman.git", ref = "d73888fdb51473e910daeed4963bfef2dce9e394" }
+plan = "/plans/system/local-root"
+
+[tests.tmt-podman-local-rootless]
+type = "tmt"
+description = "Podman local rootless system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-podman-local-rootless.tmt]
+source = { git-url = "https://src.fedoraproject.org/rpms/podman.git", ref = "d73888fdb51473e910daeed4963bfef2dce9e394" }
+plan = "/plans/system/local-rootless"
+
+[tests.tmt-podman-remote-root]
+type = "tmt"
+description = "Podman remote rootful system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-podman-remote-root.tmt]
+source = { git-url = "https://src.fedoraproject.org/rpms/podman.git", ref = "d73888fdb51473e910daeed4963bfef2dce9e394" }
+plan = "/plans/system/remote-root"
+
+[tests.tmt-podman-remote-rootless]
+type = "tmt"
+description = "Podman remote rootless system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-podman-remote-rootless.tmt]
+source = { git-url = "https://src.fedoraproject.org/rpms/podman.git", ref = "d73888fdb51473e910daeed4963bfef2dce9e394" }
+plan = "/plans/system/remote-rootless"
+
+[tests.tmt-conmon-local-root]
+type = "tmt"
+description = "Conmon coverage through Podman local rootful system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-local-root.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/local-root"
+
+[tests.tmt-conmon-local-rootless]
+type = "tmt"
+description = "Conmon coverage through Podman local rootless system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-local-rootless.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/local-rootless"
+
+[tests.tmt-conmon-remote-root]
+type = "tmt"
+description = "Conmon coverage through Podman remote rootful system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-remote-root.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/remote-root"
+
+[tests.tmt-conmon-remote-rootless]
+type = "tmt"
+description = "Conmon coverage through Podman remote rootless system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-remote-rootless.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/remote-rootless"
