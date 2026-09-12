@@ -31,7 +31,7 @@
 
 Name: rdma-core
 Version: 2601.0.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: RDMA core userspace libraries and daemons
 Group: System Environment/Libraries
 
@@ -45,6 +45,16 @@ Url: https://github.com/linux-rdma/rdma-core
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 Source0: %{_distro_sources_url}/rdma-core-%{version}.tar.gz
+# Enable the MANA userspace provider (libmana), disabled in the OFED tarball.
+Patch0: 0001-enable-mana-provider.patch
+# Add MANA device-memory and queue-pair enhancements.
+Patch1: 0001-providers-mana-do-not-check-cqid-on-creation.patch
+Patch2: 0002-providers-mana-Device-memory.patch
+Patch3: 0003-providers-mana-Optimize-poll-completion-path.patch
+Patch4: 0004-providers-mana-Retrieve-queue-type-from-queue-ID.patch
+Patch5: 0005-providers-mana-unify-rc_qp-to-be-rnic_qp.patch
+Patch6: 0006-providers-mana-allocate-destroy-MWs.patch
+Patch7: 0007-libibverbs-Extend-ibv_cmd_create_qp_ex2-with-driver-.patch
 # OFED: Build static libs by default.
 %define with_static %{?_without_static: 0} %{?!_without_static: 1}
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -391,7 +401,7 @@ easy, object-oriented access to IB verbs.
 %endif
 
 %prep
-%setup
+%autosetup -p1
 
 %build
 
@@ -710,9 +720,11 @@ fi
 %{_libdir}/libibverbs/*.so
 %ifnarch s390x s390
 %{_libdir}/libefa.so.*
+%{_libdir}/libmana.so.*
 %{_libdir}/libmlx4.so.*
 %{_libdir}/libmlx5.so.*
 %endif
+%config(noreplace) %{_sysconfdir}/libibverbs.d/mana.driver
 %config(noreplace) %{_sysconfdir}/libibverbs.d/mlx5.driver
 %doc installed_docs/libibverbs.md
 
@@ -811,7 +823,11 @@ fi
 %endif
 
 %changelog
-* Mon May 12 2026 Azure Linux Team - 2601.0.7-1
+* Thu Jul 09 2026 Kshitiz Godara <kgodara@microsoft.com> - 2601.0.7-2
+- Enable and package the MANA userspace provider (libmana)
+- All upstream patches for mana improvements
+
+* Tue May 12 2026 Azure Linux Team - 2601.0.7-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 59.0-1

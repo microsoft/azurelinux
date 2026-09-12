@@ -1,0 +1,134 @@
+From 6f8427b10d8afdc2ad717eb32f71e710d850560c Mon Sep 17 00:00:00 2001
+From: Konstantin Taranov <kotaranov@microsoft.com>
+Date: Fri, 14 Nov 2025 15:10:54 +0100
+Subject: [PATCH 2/7] providers/mana: Device memory
+
+Basic implementation of DM allowing to create and register
+DM memory and use its memory keys for networking.
+
+Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+---
+ providers/mana/mana.c | 67 +++++++++++++++++++++++++++++++++++++++++++
+ providers/mana/mana.h |  7 +++++
+ 2 files changed, 74 insertions(+)
+
+diff --git a/providers/mana/mana.c b/providers/mana/mana.c
+index 00636b7..a8091fa 100644
+--- a/providers/mana/mana.c
++++ b/providers/mana/mana.c
+@@ -258,6 +258,70 @@ int mana_dereg_mr(struct verbs_mr *vmr)
+ 	return 0;
+ }
+ 
++struct ibv_dm *mana_alloc_dm(struct ibv_context *context,
++			     struct ibv_alloc_dm_attr *dm_attr)
++{
++	struct verbs_dm *dm;
++	int ret;
++
++	dm = malloc(sizeof(*dm));
++	if (!dm)
++		return NULL;
++
++	ret = ibv_cmd_alloc_dm(context, dm_attr, dm, NULL);
++	if (ret) {
++		verbs_err(verbs_get_ctx(context),
++			  "Failed to alloc DM\n");
++		errno = ret;
++		free(dm);
++		return NULL;
++	}
++
++	return &dm->dm;
++}
++
++int mana_free_dm(struct ibv_dm *ibdm)
++{
++	struct verbs_dm *dm = container_of(ibdm, struct verbs_dm, dm);
++	int ret;
++
++	ret = ibv_cmd_free_dm(dm);
++	if (ret) {
++		verbs_err(verbs_get_ctx(ibdm->context), "Failed to free DM\n");
++		return ret;
++	}
++
++	free(dm);
++	return 0;
++}
++
++struct ibv_mr *mana_reg_dm_mr(struct ibv_pd *pd, struct ibv_dm *ibdm,
++			      uint64_t dm_offset, size_t length,
++			      unsigned int acc)
++{
++	struct verbs_dm *dm = container_of(ibdm, struct verbs_dm, dm);
++	struct verbs_mr *vmr;
++	int ret;
++
++	vmr = calloc(1, sizeof(*vmr));
++	if (!vmr) {
++		errno = ENOMEM;
++		return NULL;
++	}
++
++	ret = ibv_cmd_reg_dm_mr(pd, dm, dm_offset, length, acc,
++				vmr, NULL);
++	if (ret) {
++		verbs_err(verbs_get_ctx(pd->context),
++			  "Failed to register DM MR\n");
++		errno = ret;
++		free(vmr);
++		return NULL;
++	}
++
++	return &vmr->ibv_mr;
++}
++
+ static void mana_free_context(struct ibv_context *ibctx)
+ {
+ 	struct mana_context *context = to_mctx(ibctx);
+@@ -296,6 +360,7 @@ static void mana_async_event(struct ibv_context *context,
+ 
+ static const struct verbs_context_ops mana_ctx_ops = {
+ 	.alloc_pd = mana_alloc_pd,
++	.alloc_dm = mana_alloc_dm,
+ 	.async_event = mana_async_event,
+ 	.alloc_parent_domain = mana_alloc_parent_domain,
+ 	.create_cq = mana_create_cq,
+@@ -310,6 +375,7 @@ static const struct verbs_context_ops mana_ctx_ops = {
+ 	.destroy_rwq_ind_table = mana_destroy_rwq_ind_table,
+ 	.destroy_wq = mana_destroy_wq,
+ 	.free_context = mana_free_context,
++	.free_dm = mana_free_dm,
+ 	.modify_wq = mana_modify_wq,
+ 	.modify_qp = mana_modify_qp,
+ 	.poll_cq = mana_poll_cq,
+@@ -318,6 +384,7 @@ static const struct verbs_context_ops mana_ctx_ops = {
+ 	.query_device_ex = mana_query_device_ex,
+ 	.query_port = mana_query_port,
+ 	.reg_dmabuf_mr = mana_reg_dmabuf_mr,
++	.reg_dm_mr = mana_reg_dm_mr,
+ 	.reg_mr = mana_reg_mr,
+ 	.req_notify_cq = mana_arm_cq,
+ };
+diff --git a/providers/mana/mana.h b/providers/mana/mana.h
+index 597e33b..6f4e742 100644
+--- a/providers/mana/mana.h
++++ b/providers/mana/mana.h
+@@ -206,6 +206,13 @@ struct ibv_mr *mana_reg_dmabuf_mr(struct ibv_pd *pd, uint64_t offset,
+ struct ibv_mr *mana_reg_mr(struct ibv_pd *pd, void *addr, size_t length,
+ 			   uint64_t hca_va, int access);
+ 
++struct ibv_dm *mana_alloc_dm(struct ibv_context *context,
++			     struct ibv_alloc_dm_attr *dm_attr);
++int mana_free_dm(struct ibv_dm *ibdm);
++struct ibv_mr *mana_reg_dm_mr(struct ibv_pd *pd, struct ibv_dm *ibdm,
++			      uint64_t dm_offset, size_t length,
++			      unsigned int acc);
++
+ int mana_dereg_mr(struct verbs_mr *vmr);
+ 
+ struct ibv_cq *mana_create_cq(struct ibv_context *context, int cqe,
+-- 
+2.45.4
+
