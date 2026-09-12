@@ -63,7 +63,7 @@ os:
   selinux:
     mode: enforcing
   uki:
-    kernels: auto
+    mode: create
   kernelCommandLine:
     extraCommandLine:
     - console=tty0
