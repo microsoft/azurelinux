@@ -1,0 +1,2 @@
+sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md
+kernel-uki-virt-addons.@SBAT_SUFFIX,1,Microsoft,kernel-uki-virt-addons,@KVER,https://github.com/microsoft/azurelinux/issues
