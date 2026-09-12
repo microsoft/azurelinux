@@ -1,13 +1,16 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
 Version:        0.9.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/opensvc/multipath-tools
 Source0:        https://github.com/opensvc/multipath-tools/archive/refs/tags/%{version}.tar.gz#/multipath-tools-%{version}.tar.gz
+# Resume the DM map after a failed remove instead of leaking a suspend that
+# hangs the node (IcM 843545099 / ADO 2967359). Not yet fixed upstream.
+Patch0:         0001-resume-dm-map-after-failed-remove.patch
 BuildRequires:  userspace-rcu-devel
 BuildRequires:  libaio-devel
 BuildRequires:  device-mapper-devel
@@ -101,6 +104,10 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %{_mandir}/man8/kpartx.8*
 
 %changelog
+* Mon Sep 07 2026 Azure Linux Team <azurelinux@microsoft.com> - 0.9.6-2
+- Resume DM map after a failed remove to prevent a leaked suspend that leaves
+  an unkillable D-state task and node-wide sync() hang
+
 * Thu Nov 09 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 0.9.6-1
 - Upgrade to 0.9.6 - Azure Linux 3.0 - package upgrades
 
