@@ -57,6 +57,7 @@
         <package name="kernel-modules" />
         <!-- Provides xmllint for parsing Kiwi's effective config XML in config.sh. -->
         <package name="libxml2" />
+        <package name="nvme-cli" />
         <package name="selinux-policy-targeted" />
         <package name="setup" />
         <package name="shadow-utils" />
