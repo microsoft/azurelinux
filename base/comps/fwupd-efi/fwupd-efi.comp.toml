@@ -1,5 +1,8 @@
 [components.fwupd-efi]
 
+[components.fwupd-efi.build]
+emit-upstream-provenance = true
+
 # SBAT (AB#20493): add an Azure Linux vendor line to the fwupd EFI binary.
 #
 # fwupd-efi has no sbat.csv.in; its .sbat section is generated at build time by
@@ -16,19 +19,15 @@
 # Preserve the upstream Fedora provenance SBAT line as a macro (single source of
 # truth for the objcopy step below).
 [[components.fwupd-efi.overlays]]
-description = "SBAT: define the interim upstream-EVR macro and the Fedora provenance line"
+description = "SBAT: define the Fedora provenance line from azldev's upstream macros"
 type = "spec-search-replace"
 regex = '%global debug_package %\{nil\}'
 replacement = '''%global debug_package %{nil}
 
-# Interim upstream-EVR macro, pinned to the Fedora fwupd-efi NEVR we import from
-# (fwupd-efi-1.8-1.fc43). The provenance line below must carry the *upstream*
-# EVR, not the Azure Linux one; swap this for the azldev upstream-EVR macro once
-# bug 21798 lands (mirrors grub2's upstream_version_release).
-%global upstream_version_release 1.8-1.fc43
-
 # Upstream Fedora provenance SBAT line, preserved for revocation lineage (AB#20493).
-%global sbat_fedora_line fwupd-efi.fedora,1,The Fedora Project,fwupd-efi,%{upstream_version_release},https://src.fedoraproject.org/rpms/fwupd-efi'''
+%{!?fedora_upstream_version:%{error:missing Fedora upstream version}}
+%{!?fedora_upstream_release:%{error:missing Fedora upstream release}}
+%global sbat_fedora_line fwupd-efi.fedora,1,The Fedora Project,fwupd-efi,%{?fedora_upstream_version}-%{?fedora_upstream_release},https://src.fedoraproject.org/rpms/fwupd-efi'''
 
 # Retarget the single meson distro SBAT slot from Fedora to Azure Linux.
 [[components.fwupd-efi.overlays]]
