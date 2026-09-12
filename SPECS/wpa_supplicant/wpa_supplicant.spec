@@ -1,7 +1,7 @@
 Summary:        WPA client
 Name:           wpa_supplicant
 Version:        2.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,11 +40,13 @@ CONFIG_EAP_PEAP=y
 CONFIG_EAP_TLS=y
 CONFIG_EAP_TTLS=y
 CONFIG_IEEE8021X_EAPOL=y
+CONFIG_IEEE80211W=y
 CONFIG_IPV6=y
 CONFIG_LIBNL32=y
-CONFIG_PEERKEY=y
+CONFIG_OWE=y
 CONFIG_PKCS12=y
 CONFIG_READLINE=y
+CONFIG_SAE=y
 CFLAGS += -I/usr/include/libnl3
 EOF
 
@@ -97,6 +99,11 @@ EOF
 %{_sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf
 
 %changelog
+* Tue Jun 23 2026 Sindhu Karri <lakarri@microsoft.com> - 2.10-4
+- Enable WPA3-Personal (SAE), Protected Management Frames (IEEE80211W),
+  and Opportunistic Wireless Encryption (OWE) in build config.
+- Remove obsolete CONFIG_PEERKEY (removed upstream in 2.10).
+
 * Wed Mar 26 2025 Kanishk-Bansal <kanbansal@microsoft.com> - 2.10-3
 - Patch CVE-2025-24912
 
