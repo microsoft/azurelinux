@@ -20,7 +20,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -98,13 +98,16 @@ popd
 /boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
+* Mon Aug 17 2026 Aditya Singh <v-aditysing@microsoft.com> - 255-34
+- Bump release to match systemd spec.
+
 * Mon Jun 29 2026 Kshitiz Godara <kgodara@microsoft.com> - 255-33
 - Bump release to match systemd spec.
 
 * Wed Jun 24 2026 Vince Perri <viperri@microsoft.com> - 255-32
 - Bump release to match systemd spec
 
-* Wed May 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-31
+* Fri May 29 2026 Dan Streetman <ddstreet@ieee.org> - 255-31
 - Bump release to match systemd spec
 
 * Thu May 28 2026 Nikola Bojanic <nbojanic@microsoft.com> - 255-30
@@ -137,7 +140,7 @@ popd
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
 - Updating SRPM name to systemd-boot-signed-%%{buildarch}.
 
-* Fri Jan 10 2024 Aditya Dubey <adityadubey@microsoft.com> - 255-20
+* Fri Jan 10 2025 Aditya Dubey <adityadubey@microsoft.com> - 255-20
 - Updating to version 255-19
 - Includes patch for enhancing DNSSEC signature validation integrity
 

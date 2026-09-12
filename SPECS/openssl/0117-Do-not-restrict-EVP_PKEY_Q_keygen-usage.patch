@@ -1,0 +1,57 @@
+From a57c6f84920bff522bca5fede73f1a3f132d7cff Mon Sep 17 00:00:00 2001
+From: Matt Caswell <matt@openssl.org>
+Date: Mon, 16 Sep 2024 12:00:32 +0100
+Subject: [PATCH] Don't restrict what EVP_PKEY_Q_keygen can be used for
+
+The EVP_PKEY_Q_keygen function contains a list of algorithm type names
+and fails if the requested name is not in the list. This prevents the use
+of this function for externally supplied key type names.
+
+We should just assume that any unrecognised key type name does not require
+a parameter.
+
+Reviewed-by: Dmitry Belyavskiy <beldmit@gmail.com>
+Reviewed-by: Tim Hudson <tjh@openssl.org>
+Reviewed-by: Paul Dale <ppzgs1@gmail.com>
+(Merged from https://github.com/openssl/openssl/pull/25468)
+
+Backport adaptation for OpenSSL 3.3.7: refreshed the evp_lib.c hunk
+context and indentation only; the functional change is unmodified.
+---
+diff --git a/crypto/evp/evp_lib.c b/crypto/evp/evp_lib.c
+index 434801b..f9555ff 100644
+--- a/crypto/evp/evp_lib.c
++++ b/crypto/evp/evp_lib.c
+@@ -1221,17 +1221,9 @@ EVP_PKEY *EVP_PKEY_Q_keygen(OSSL_LIB_CTX *libctx, const char *propq,
+         name = va_arg(args, char *);
+         params[0] = OSSL_PARAM_construct_utf8_string(OSSL_PKEY_PARAM_GROUP_NAME,
+             name, 0);
+-    } else if (OPENSSL_strcasecmp(type, "ED25519") != 0
+-        && OPENSSL_strcasecmp(type, "X25519") != 0
+-        && OPENSSL_strcasecmp(type, "ED448") != 0
+-        && OPENSSL_strcasecmp(type, "X448") != 0
+-        && OPENSSL_strcasecmp(type, "SM2") != 0) {
+-        ERR_raise(ERR_LIB_EVP, ERR_R_PASSED_INVALID_ARGUMENT);
+-        goto end;
+     }
+     ret = evp_pkey_keygen(libctx, type, propq, params);
+ 
+-end:
+     va_end(args);
+     return ret;
+ }
+diff --git a/doc/man3/EVP_PKEY_keygen.pod b/doc/man3/EVP_PKEY_keygen.pod
+index cc6d174..51a914b 100644
+--- a/doc/man3/EVP_PKEY_keygen.pod
++++ b/doc/man3/EVP_PKEY_keygen.pod
+@@ -103,7 +103,9 @@ a B<size_t> parameter must be given to specify the size of the RSA key.
+ If I<type> is C<EC>,
+ a string parameter must be given to specify the name of the EC curve.
+ If I<type> is C<X25519>, C<X448>, C<ED25519>, C<ED448>, or C<SM2>
+-no further parameter is needed.
++no further parameter is needed. Other key types may be possible if they are
++supplied by the loaded providers. EVP_PKEY_Q_keygen() may be usable with such
++key types as long as they do not require further parameters.
+ 
+ =head1 RETURN VALUES
+ 

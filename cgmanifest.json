@@ -1827,8 +1827,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "51.1.101",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.101.tar.gz"
+          "version": "52.0.152",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v52.0.152.tar.gz"
         }
       }
     },
@@ -4762,6 +4762,16 @@
           "name": "golang",
           "version": "1.26.7",
           "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.7-1/go1.26.7-20260819.2.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.27.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.1-2/go1.27.1-20260904.9.src.tar.gz"
         }
       }
     },
@@ -8401,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.18.38.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.38.2.tar.gz"
+          "version": "6.18.43.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.43.1.tar.gz"
         }
       }
     },
@@ -8411,8 +8421,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.18.38.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.38.2.tar.gz"
+          "version": "6.18.43.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.43.1.tar.gz"
         }
       }
     },
@@ -8711,8 +8721,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.7.1",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.1.tar.gz"
+          "version": "1.8.4",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.8.4.tar.gz"
         }
       }
     },
@@ -9721,8 +9731,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.10.3",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2"
+          "version": "1.11.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.3.tar.bz2"
         }
       }
     },
@@ -9841,8 +9851,8 @@
         "type": "other",
         "other": {
           "name": "libgpg-error",
-          "version": "1.48",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.48.tar.bz2"
+          "version": "1.49",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.bz2"
         }
       }
     },
@@ -11821,8 +11831,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "10.10.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-10.10.0.tar.xz"
+          "version": "11.9.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-11.9.0.tar.xz"
         }
       }
     },
@@ -15785,6 +15795,16 @@
           "name": "opentelemetry-cpp",
           "version": "1.14.2",
           "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.14.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openvmm",
+          "version": "0.1.0",
+          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.1.0.tar.gz"
         }
       }
     },
@@ -26083,8 +26103,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "9.1.0",
-          "downloadUrl": "https://download.qemu.org/qemu-9.1.0.tar.xz"
+          "version": "10.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-10.1.0.tar.xz"
         }
       }
     },
@@ -27234,8 +27254,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-msgpack",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v1.7.2.tar.gz"
+          "version": "1.8.4",
+          "downloadUrl": "https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v1.8.4.tar.gz"
         }
       }
     },
@@ -29616,8 +29636,8 @@
         "type": "other",
         "other": {
           "name": "trident",
-          "version": "0.26.0",
-          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.26.0.tar.gz"
+          "version": "0.28.0",
+          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.28.0.tar.gz"
         }
       }
     },
@@ -29696,8 +29716,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2025c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025c.tar.gz"
+          "version": "2026c",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2026c.tar.gz"
         }
       }
     },

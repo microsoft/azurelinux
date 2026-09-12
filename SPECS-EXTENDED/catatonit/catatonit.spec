@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 
 Name: catatonit
 Version: 0.1.7
-Release: 28%{?dist}
+Release: 29%{?dist}
 Summary: A signal-forwarding process manager for containers
 License: GPLv3+
 URL: https://github.com/openSUSE/catatonit
@@ -13,7 +13,7 @@ BuildRequires: automake
 BuildRequires: file
 BuildRequires: gcc
 BuildRequires: git
-BuildRequires: glibc-static >= 2.38-20%{?dist}
+BuildRequires: glibc-static >= 2.38-21%{?dist}
 BuildRequires: libtool
 BuildRequires: make
 
@@ -61,6 +61,9 @@ ln -s %{_libexecdir}/%{name}/%{name} %{buildroot}%{_libexecdir}/podman/%{name}
 %{_libexecdir}/podman/%{name}
 
 %changelog
+* Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.1.7-29
+- Bump to rebuild with updated glibc
+
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.1.7-28
 - Bump to rebuild with updated glibc
 
