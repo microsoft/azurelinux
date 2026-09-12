@@ -1,0 +1,11 @@
+summary: Python self-test.	
+contact: python maintainers <python-maint@redhat.com>	
+discover:	
+  - name: python-selftest
+    how: fmf
+    url: https://src.fedoraproject.org/tests/python.git
+    filter: 'test: ./parallel.sh'
+environment:
+    X: "test_ssl test_asyncio test_hashlib test_ftplib test_httplib test_imaplib test_logging test_nntplib test_poplib test_urllib2_localnet test_urllib test_xmlrpc"
+execute:
+    how: tmt

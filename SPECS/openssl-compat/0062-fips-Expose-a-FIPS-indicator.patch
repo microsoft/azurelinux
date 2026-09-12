@@ -1,0 +1,466 @@
+From e3d6fca1af033d00c47bcd8f9ba28fcf1aa476aa Mon Sep 17 00:00:00 2001
+From: Clemens Lang <cllang@redhat.com>
+Date: Tue, 7 Jun 2022 12:02:49 +0200
+Subject: [PATCH] fips: Expose a FIPS indicator
+
+FIPS 140-3 requires us to indicate whether an operation was using
+approved services or not. The FIPS 140-3 implementation guidelines
+provide two basic approaches to doing this: implicit indicators, and
+explicit indicators.
+
+Implicit indicators are basically the concept of "if the operation
+passes, it was approved". We were originally aiming for implicit
+indicators in our copy of OpenSSL. However, this proved to be a problem,
+because we wanted to certify a signature service, and FIPS 140-3
+requires that a signature service computes the digest to be signed
+within the boundaries of the FIPS module. Since we were planning to
+certify fips.so only, this means that EVP_PKEY_sign/EVP_PKEY_verify
+would have to be blocked. Unfortunately, EVP_SignFinal uses
+EVP_PKEY_sign internally, but outside of fips.so and thus outside of the
+FIPS module boundary. This means that using implicit indicators in
+combination with certifying only fips.so would require us to block both
+EVP_PKEY_sign and EVP_SignFinal, which are the two APIs currently used
+by most users of OpenSSL for signatures.
+
+EVP_DigestSign would be acceptable, but has only been added in 3.0 and
+is thus not yet widely used.
+
+As a consequence, we've decided to introduce explicit indicators so that
+EVP_PKEY_sign and EVP_SignFinal can continue to work for now, but
+FIPS-aware applications can query the explicit indicator to check
+whether the operation was approved.
+
+To avoid affecting the ABI and public API too much, this is implemented
+as an exported symbol in fips.so and a private header, so applications
+that wish to use this will have to dlopen(3) fips.so, locate the
+function using dlsym(3), and then call it. These applications will have
+to build against the private header in order to use the returned
+pointer.
+
+Modify util/mkdef.pl to support exposing a symbol only for a specific
+provider identified by its name and path.
+
+Signed-off-by: Clemens Lang <cllang@redhat.com>
+---
+ doc/build.info                      |   6 ++
+ doc/man7/fips_module_indicators.pod | 154 ++++++++++++++++++++++++++++
+ providers/fips/fipsprov.c           |  71 +++++++++++++
+ providers/fips/indicator.h          |  66 ++++++++++++
+ util/mkdef.pl                       |  25 ++++-
+ util/providers.num                  |   1 +
+ 6 files changed, 322 insertions(+), 1 deletion(-)
+ create mode 100644 doc/man7/fips_module_indicators.pod
+ create mode 100644 providers/fips/indicator.h
+
+diff --git a/doc/build.info b/doc/build.info
+index b0aa4297a4..af235113bb 100644
+--- a/doc/build.info
++++ b/doc/build.info
+@@ -4389,6 +4389,10 @@ DEPEND[html/man7/fips_module.html]=man7/fips_module.pod
+ GENERATE[html/man7/fips_module.html]=man7/fips_module.pod
+ DEPEND[man/man7/fips_module.7]=man7/fips_module.pod
+ GENERATE[man/man7/fips_module.7]=man7/fips_module.pod
++DEPEND[html/man7/fips_module_indicators.html]=man7/fips_module_indicators.pod
++GENERATE[html/man7/fips_module_indicators.html]=man7/fips_module_indicators.pod
++DEPEND[man/man7/fips_module_indicators.7]=man7/fips_module_indicators.pod
++GENERATE[man/man7/fips_module_indicators.7]=man7/fips_module_indicators.pod
+ DEPEND[html/man7/life_cycle-cipher.html]=man7/life_cycle-cipher.pod
+ GENERATE[html/man7/life_cycle-cipher.html]=man7/life_cycle-cipher.pod
+ DEPEND[man/man7/life_cycle-cipher.7]=man7/life_cycle-cipher.pod
+@@ -4631,6 +4635,7 @@ html/man7/ct.html \
+ html/man7/des_modes.html \
+ html/man7/evp.html \
+ html/man7/fips_module.html \
++html/man7/fips_module_indicators.html \
+ html/man7/life_cycle-cipher.html \
+ html/man7/life_cycle-digest.html \
+ html/man7/life_cycle-kdf.html \
+@@ -4754,6 +4759,7 @@ man/man7/ct.7 \
+ man/man7/des_modes.7 \
+ man/man7/evp.7 \
+ man/man7/fips_module.7 \
++man/man7/fips_module_indicators.7 \
+ man/man7/life_cycle-cipher.7 \
+ man/man7/life_cycle-digest.7 \
+ man/man7/life_cycle-kdf.7 \
+diff --git a/doc/man7/fips_module_indicators.pod b/doc/man7/fips_module_indicators.pod
+new file mode 100644
+index 0000000000..23db2b395c
+--- /dev/null
++++ b/doc/man7/fips_module_indicators.pod
+@@ -0,0 +1,154 @@
++=pod
++
++=head1 NAME
++
++fips_module_indicators - Red Hat OpenSSL FIPS module indicators guide
++
++=head1 DESCRIPTION
++
++This guide documents how the Red Hat Enterprise Linux 9 OpenSSL FIPS provider
++implements Approved Security Service Indicators according to the FIPS 140-3
++Implementation Guidelines, section 2.4.C. See
++L<https://csrc.nist.gov/CSRC/media/Projects/cryptographic-module-validation-program/documents/fips%20140-3/FIPS%20140-3%20IG.pdf>
++for the FIPS 140-3 Implementation Guidelines.
++
++For all approved services except signatures, the Red Hat OpenSSL FIPS provider
++uses the return code as the indicator as understood by FIPS 140-3. That means
++that every operation that succeeds denotes use of an approved security service.
++Operations that do not succeed may not have been approved security services, or
++may have been used incorrectly.
++
++For signatures, an explicit indicator API is available to determine whether
++a selected operation is an approved security service, in combination with the
++return code of the operation. For a signature operation to be approved, the
++explicit indicator must claim it as approved, and it must succeed.
++
++=head2 Querying the explicit indicator
++
++The Red Hat OpenSSL FIPS provider exports a symbol named
++I<redhat_ossl_query_fipsindicator> that provides information on which signature
++operations are approved security functions. To use this function, either link
++against I<fips.so> directly, or load it at runtime using dlopen(3) and
++dlsym(3).
++
++    #include <openssl/core_dispatch.h>
++    #include "providers/fips/indicator.h"
++
++    void *provider = dlopen("/usr/lib64/ossl-modules/fips.so", RTLD_LAZY);
++    if (provider == NULL) {
++        fprintf(stderr, "%s\n", dlerror());
++        // handle error
++    }
++
++    const OSSL_RH_FIPSINDICATOR_ALORITHM *(*redhat_ossl_query_fipsindicator)(int) \
++        = dlsym(provider, "redhat_ossl_query_fipsindicator");
++    if (redhat_ossl_query_fipsindicator == NULL) {
++        fprintf(stderr, "%s\n", dlerror());
++        fprintf(stderr, "Does your copy of fips.so have the required Red Hat"
++                        " patches?\n");
++        // handle error
++    }
++
++Note that this uses the I<providers/fips/indicator.h> header, which is not
++public. Install the I<openssl-debugsource> package from the I<BaseOS-debuginfo>
++repository using I<dnf debuginfo-install openssl> and include
++I</usr/src/debug/openssl-3.*/> in the compiler's include path.
++
++I<redhat_ossl_query_fipsindicator> expects an operation ID as its only
++argument. Currently, the only supported operation ID is I<OSSL_OP_SIGNATURE> to
++obtain the indicators for signature operations. On success, the return value is
++a pointer to an array of I<OSSL_RH_FIPSINDICATOR_STRUCT>s. On failure, NULL is
++returned. The last entry in the array is indicated by I<algorithm_names> being
++NULL.
++
++    typedef struct ossl_rh_fipsindicator_algorithm_st {
++        const char *algorithm_names;     /* key */
++        const char *property_definition; /* key */
++        const OSSL_RH_FIPSINDICATOR_DISPATCH *indicators;
++    } OSSL_RH_FIPSINDICATOR_ALGORITHM;
++
++    typedef struct ossl_rh_fipsindicator_dispatch_st {
++        int function_id;
++        int approved;
++    } OSSL_RH_FIPSINDICATOR_DISPATCH;
++
++The I<algorithm_names> field is a colon-separated list of algorithm names from
++one of the I<PROV_NAMES_...> constants, e.g., I<PROV_NAMES_RSA>. strtok(3) can
++be used to locate the appropriate entry. See the example below, where
++I<algorithm> contains the algorithm name to search for:
++
++    const OSSL_RH_FIPSINDICATOR_DISPATCH *indicator_dispatch = NULL;
++    const OSSL_RH_FIPSINDICATOR_ALGORITHM *indicator =
++        redhat_ossl_query_fipsindicator(operation_id);
++    if (indicator == NULL) {
++        fprintf(stderr, "No indicator for operation, probably using implicit"
++                        " indicators.\n");
++        // handle error
++    }
++
++    for (; indicator->algorithm_names != NULL; ++indicator) {
++        char *algorithm_names = strdup(indicator->algorithm_names);
++        if (algorithm_names == NULL) {
++            perror("strdup(3)");
++            // handle error
++        }
++
++        const char *algorithm_name = strtok(algorithm_names, ":");
++        for (; algorithm_name != NULL; algorithm_name = strtok(NULL, ":")) {
++            if (strcasecmp(algorithm_name, algorithm) == 0) {
++                indicator_dispatch = indicator->indicators;
++                free(algorithm_names);
++                algorithm_names = NULL;
++                break;
++            }
++        }
++        free(algorithm_names);
++    }
++    if (indicator_dispatch == NULL) {
++        fprintf(stderr, "No indicator for algorithm %s.\n", algorithm);
++        // handle error
++    }
++
++If an appropriate I<OSSL_RH_FIPSINDICATOR_DISPATCH> array is available for the
++given algorithm name, it maps function IDs to their approval status. The last
++entry is indicated by a zero I<function_id>. I<approved> is
++I<OSSL_RH_FIPSINDICATOR_APPROVED> if the operation is an approved security
++service, or part of an approved security service, or
++I<OSSL_RH_FIPSINDICATOR_UNAPPROVED> otherwise. Any other value is invalid.
++Function IDs are I<OSSL_FUNC_*> constants from I<openssl/core_dispatch.h>,
++e.g., I<OSSL_FUNC_SIGNATURE_DIGEST_SIGN_UPDATE> or I<OSSL_FUNC_SIGNATURE_SIGN>.
++
++Assuming I<function_id> is the function in question, the following code can be
++used to query the approval status:
++
++    for (; indicator_dispatch->function_id != 0; ++indicator_dispatch) {
++        if (indicator_dispatch->function_id == function_id) {
++            switch (indicator_dispatch->approved) {
++                case OSSL_RH_FIPSINDICATOR_APPROVED:
++                    // approved security service
++                    break;
++                case OSSL_RH_FIPSINDICATOR_UNAPPROVED:
++                    // unapproved security service
++                    break;
++                default:
++                    // invalid result
++                    break;
++            }
++            break;
++        }
++    }
++
++=head1 SEE ALSO
++
++L<fips_module(7)>, L<provider(7)>
++
++=head1 COPYRIGHT
++
++Copyright 2022 Red Hat, Inc. All Rights Reserved.
++
++Licensed under the Apache License 2.0 (the "License").  You may not use
++this file except in compliance with the License.  You can obtain a copy
++in the file LICENSE in the source distribution or at
++L<https://www.openssl.org/source/license.html>.
++
++=cut
+diff --git a/providers/fips/fipsprov.c b/providers/fips/fipsprov.c
+index de391ce067..1cfd71c5cf 100644
+--- a/providers/fips/fipsprov.c
++++ b/providers/fips/fipsprov.c
+@@ -23,6 +23,7 @@
+ #include "self_test.h"
+ #include "crypto/context.h"
+ #include "internal/core.h"
++#include "indicator.h"
+ 
+ static const char FIPS_DEFAULT_PROPERTIES[] = "provider=fips,fips=yes";
+ static const char FIPS_UNAPPROVED_PROPERTIES[] = "provider=fips,fips=no";
+@@ -425,6 +426,68 @@ static const OSSL_ALGORITHM fips_signature[] = {
+     { NULL, NULL, NULL }
+ };
+ 
++static const OSSL_RH_FIPSINDICATOR_DISPATCH redhat_rsa_signature_indicators[] = {
++    { OSSL_FUNC_SIGNATURE_NEWCTX, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SIGN_INIT, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_SIGN, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_VERIFY_INIT, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_VERIFY, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_VERIFY_RECOVER_INIT, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_VERIFY_RECOVER, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_INIT, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_UPDATE, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_FINAL, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_INIT, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_UPDATE, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_FINAL, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_FREECTX, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DUPCTX, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_GET_CTX_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_GETTABLE_CTX_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SET_CTX_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SETTABLE_CTX_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_GET_CTX_MD_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_GETTABLE_CTX_MD_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SET_CTX_MD_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SETTABLE_CTX_MD_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { 0, OSSL_RH_FIPSINDICATOR_UNAPPROVED }
++};
++
++static const OSSL_RH_FIPSINDICATOR_DISPATCH redhat_ecdsa_signature_indicators[] = {
++    { OSSL_FUNC_SIGNATURE_NEWCTX, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SIGN_INIT, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_SIGN, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_VERIFY_INIT, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_VERIFY, OSSL_RH_FIPSINDICATOR_UNAPPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_INIT, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_UPDATE, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_SIGN_FINAL, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_INIT, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_UPDATE, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DIGEST_VERIFY_FINAL, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_FREECTX, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_DUPCTX, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_GET_CTX_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_GETTABLE_CTX_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SET_CTX_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SETTABLE_CTX_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_GET_CTX_MD_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_GETTABLE_CTX_MD_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SET_CTX_MD_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { OSSL_FUNC_SIGNATURE_SETTABLE_CTX_MD_PARAMS, OSSL_RH_FIPSINDICATOR_APPROVED },
++    { 0, OSSL_RH_FIPSINDICATOR_UNAPPROVED }
++};
++
++static const OSSL_RH_FIPSINDICATOR_ALGORITHM redhat_indicator_fips_signature[] = {
++    { PROV_NAMES_RSA, FIPS_DEFAULT_PROPERTIES,
++        redhat_rsa_signature_indicators },
++#ifndef OPENSSL_NO_EC
++    { PROV_NAMES_ECDSA, FIPS_DEFAULT_PROPERTIES,
++        redhat_ecdsa_signature_indicators },
++#endif
++    { NULL, NULL, NULL }
++};
++
+ static const OSSL_ALGORITHM fips_asym_cipher[] = {
+     { PROV_NAMES_RSA, FIPS_DEFAULT_PROPERTIES, ossl_rsa_asym_cipher_functions },
+     { NULL, NULL, NULL }
+@@ -527,6 +590,14 @@ static void fips_deinit_casecmp(void) {
+     return NULL;
+ }
+ 
++const OSSL_RH_FIPSINDICATOR_ALGORITHM *redhat_ossl_query_fipsindicator(int operation_id) {
++    switch (operation_id) {
++    case OSSL_OP_SIGNATURE:
++        return redhat_indicator_fips_signature;
++    }
++    return NULL;
++}
++
+ static void fips_teardown(void *provctx)
+ {
+     OSSL_LIB_CTX_free(PROV_LIBCTX_OF(provctx));
+diff --git a/providers/fips/indicator.h b/providers/fips/indicator.h
+new file mode 100644
+index 0000000000..b323efe44c
+--- /dev/null
++++ b/providers/fips/indicator.h
+@@ -0,0 +1,66 @@
++/*
++ * Copyright 2019-2021 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++#ifndef OPENSSL_FIPS_INDICATOR_H
++# define OPENSSL_FIPS_INDICATOR_H
++# pragma once
++
++# ifdef __cplusplus
++extern "C" {
++# endif
++
++# define OSSL_RH_FIPSINDICATOR_UNAPPROVED (0)
++# define OSSL_RH_FIPSINDICATOR_APPROVED (1)
++
++/*
++ * FIPS indicator dispatch table element.  function_id numbers and the
++ * functions are defined in core_dispatch.h, see macros with
++ * 'OSSL_CORE_MAKE_FUNC' in their names.
++ *
++ * An array of these is always terminated by function_id == 0
++ */
++typedef struct ossl_rh_fipsindicator_dispatch_st {
++    int function_id;
++    int approved;
++} OSSL_RH_FIPSINDICATOR_DISPATCH;
++
++/*
++ * Type to tie together algorithm names, property definition string and the
++ * algorithm implementation's FIPS indicator status in the form of a FIPS
++ * indicator dispatch table.
++ *
++ * An array of these is always terminated by algorithm_names == NULL
++ */
++typedef struct ossl_rh_fipsindicator_algorithm_st {
++    const char *algorithm_names;     /* key */
++    const char *property_definition; /* key */
++    const OSSL_RH_FIPSINDICATOR_DISPATCH *indicators;
++} OSSL_RH_FIPSINDICATOR_ALGORITHM;
++
++/**
++ * Query FIPS indicator status for the given operation.  Possible values for
++ * 'operation_id' are currently only OSSL_OP_SIGNATURE, as all other algorithms
++ * use implicit indicators.  The return value is an array of
++ * OSSL_RH_FIPSINDICATOR_ALGORITHMs, terminated by an entry with
++ * algorithm_names == NULL.  'algorithm_names' is a colon-separated list of
++ * algorithm names, 'property_definition' a comma-separated list of properties,
++ * and 'indicators' is a list of OSSL_RH_FIPSINDICATOR_DISPATCH structs.  This
++ * list is terminated by function_id == 0.  'function_id' is one of the
++ * OSSL_FUNC_* constants, e.g., OSSL_FUNC_SIGNATURE_DIGEST_SIGN_FINAL.
++ *
++ * If there is no entry in the returned struct for the given operation_id,
++ * algorithm name, or function_id, the algorithm is unapproved.
++ */
++const OSSL_RH_FIPSINDICATOR_ALGORITHM *redhat_ossl_query_fipsindicator(int operation_id);
++
++# ifdef __cplusplus
++}
++# endif
++
++#endif
+diff --git a/util/mkdef.pl b/util/mkdef.pl
+index a1c76f7c97..eda39b71ee 100755
+--- a/util/mkdef.pl
++++ b/util/mkdef.pl
+@@ -149,7 +149,8 @@ $ordinal_opts{filter} =
+         return
+             $item->exists()
+             && platform_filter($item)
+-            && feature_filter($item);
++            && feature_filter($item)
++            && fips_filter($item, $name);
+     };
+ my $ordinals = OpenSSL::Ordinals->new(from => $ordinals_file);
+ 
+@@ -205,6 +206,28 @@ sub feature_filter {
+     return $verdict;
+ }
+ 
++sub fips_filter {
++    my $item = shift;
++    my $name = uc(shift);
++    my @features = ( $item->features() );
++
++    # True if no features are defined
++    return 1 if scalar @features == 0;
++
++    my @matches = grep(/^ONLY_.*$/, @features);
++    if (@matches) {
++        # There is at least one only_* flag on this symbol, check if any of
++        # them match the name
++        for (@matches) {
++            if ($_ eq "ONLY_${name}") {
++                return 1;
++            }
++        }
++        return 0;
++    }
++    return 1;
++}
++
+ sub sorter_unix {
+     my $by_name = OpenSSL::Ordinals::by_name();
+     my %weight = (
+diff --git a/util/providers.num b/util/providers.num
+index 4e2fa81b98..77879d0e5f 100644
+--- a/util/providers.num
++++ b/util/providers.num
+@@ -1 +1,2 @@
+ OSSL_provider_init                     1	*	EXIST::FUNCTION:
++redhat_ossl_query_fipsindicator        1	*	EXIST::FUNCTION:ONLY_PROVIDERS/FIPS
+-- 
+2.35.3
+

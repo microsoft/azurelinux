@@ -1,0 +1,21 @@
+diff -up openssl-3.2.2/apps/pkcs12.c.xxx openssl-3.2.2/apps/pkcs12.c
+--- openssl-3.2.2/apps/pkcs12.c.xxx	2024-08-14 11:24:41.164589397 +0200
++++ openssl-3.2.2/apps/pkcs12.c	2024-08-14 11:28:21.071004221 +0200
+@@ -17,6 +17,7 @@
+ #include <openssl/asn1.h>
+ #include <openssl/crypto.h>
+ #include <openssl/err.h>
++#include <openssl/evp.h>
+ #include <openssl/pem.h>
+ #include <openssl/pkcs12.h>
+ #include <openssl/provider.h>
+@@ -708,6 +709,9 @@ int pkcs12_main(int argc, char **argv)
+         }
+ 
+         if (maciter != -1) {
++            if (EVP_default_properties_is_fips_enabled(NULL))
++                pbmac1_pbkdf2 = 1;
++
+             if (pbmac1_pbkdf2 == 1) {
+                 if (!PKCS12_set_pbmac1_pbkdf2(p12, mpass, -1, NULL,
+                                               macsaltlen, maciter,

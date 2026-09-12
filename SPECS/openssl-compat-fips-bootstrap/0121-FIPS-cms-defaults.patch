@@ -1,0 +1,84 @@
+From 097bcf136d444ee2383569e296b21ffc85f46e48 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <dbelyavs@redhat.com>
+Date: Thu, 4 Apr 2024 11:54:14 +0200
+Subject: [PATCH 50/50] 0121-FIPS-cms-defaults.patch
+
+Patch-name: 0121-FIPS-cms-defaults.patch
+Patch-id: 121
+Patch-status: |
+    # From CentOS 9
+---
+ apps/cms.c           | 11 ++++++++---
+ crypto/cms/cms_env.c | 10 ++++++++++
+ 2 files changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/apps/cms.c b/apps/cms.c
+index f93c98ac92..cd8dafe14f 100644
+--- a/apps/cms.c
++++ b/apps/cms.c
+@@ -20,6 +20,7 @@
+ #include <openssl/x509_vfy.h>
+ #include <openssl/x509v3.h>
+ #include <openssl/cms.h>
++#include <openssl/fips.h>
+ 
+ static int save_certs(char *signerfile, STACK_OF(X509) *signers);
+ static int cms_cb(int ok, X509_STORE_CTX *ctx);
+@@ -820,12 +821,16 @@ int cms_main(int argc, char **argv)
+ 
+     if (operation == SMIME_ENCRYPT) {
+         if (!cipher) {
++            if (FIPS_mode()) {
++                cipher = (EVP_CIPHER *)EVP_aes_128_cbc();
++            } else {
+ #ifndef OPENSSL_NO_DES
+-            cipher = (EVP_CIPHER *)EVP_des_ede3_cbc();
++                cipher = (EVP_CIPHER *)EVP_des_ede3_cbc();
+ #else
+-            BIO_printf(bio_err, "No cipher selected\n");
+-            goto end;
++                BIO_printf(bio_err, "No cipher selected\n");
++                goto end;
+ #endif
++           }
+         }
+ 
+         if (secret_key && !secret_keyid) {
+diff --git a/crypto/cms/cms_env.c b/crypto/cms/cms_env.c
+index b877e10619..f50f930ec2 100644
+--- a/crypto/cms/cms_env.c
++++ b/crypto/cms/cms_env.c
+@@ -14,6 +14,7 @@
+ #include <openssl/err.h>
+ #include <openssl/cms.h>
+ #include <openssl/evp.h>
++#include <openssl/fips.h>
+ #include "internal/sizes.h"
+ #include "crypto/asn1.h"
+ #include "crypto/evp.h"
+@@ -378,6 +379,10 @@ static int cms_RecipientInfo_ktri_init(CMS_RecipientInfo *ri, X509 *recip,
+             return 0;
+         if (EVP_PKEY_encrypt_init(ktri->pctx) <= 0)
+             return 0;
++        if (FIPS_mode()) {
++            if (EVP_PKEY_CTX_ctrl_str(ktri->pctx, "rsa_padding_mode", "oaep") <= 0)
++                return 0;
++        }
+     } else if (!ossl_cms_env_asn1_ctrl(ri, 0))
+         return 0;
+     return 1;
+@@ -543,6 +548,11 @@ static int cms_RecipientInfo_ktri_encrypt(const CMS_ContentInfo *cms,
+ 
+         if (EVP_PKEY_encrypt_init(pctx) <= 0)
+             goto err;
++
++        if (FIPS_mode()) {
++            if (EVP_PKEY_CTX_ctrl_str(pctx, "rsa_padding_mode", "oaep") <= 0)
++                goto err;
++        }
+     }
+ 
+     if (EVP_PKEY_encrypt(pctx, NULL, &eklen, ec->key, ec->keylen) <= 0)
+-- 
+2.44.0
+
