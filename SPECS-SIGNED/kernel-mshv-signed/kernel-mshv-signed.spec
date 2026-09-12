@@ -9,8 +9,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
-Version:        6.6.137.mshv2
-Release:        2%{?dist}
+Version:        6.18.34.mshv1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -140,6 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Wed Aug 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.mshv1-1
+- Auto-upgrade to 6.18.34.mshv1
+
 * Mon Jun 13 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.137.mshv2-2
 - Enable CONFIG_EROFS_FS and related features
 - for confidentiality and snapshot/restore scenarios
