@@ -91,6 +91,25 @@ Azure Linux 4 is an RPM-based distribution optimized for Azure and modern cloud 
 
 Deviations from upstream are declaratively defined and scoped to avoid unnecessary divergence or forking. This repository contains a mechanically rendered set of RPM package spec files derived from applying this layer to Fedora's upstream packaging sources.
 
+### Core userland in the VM image
+
+Azure Linux builds a broad set of RPM packages, but each image includes only the packages it needs. The standard VM image uses these components for common system roles:
+
+| Role | Component |
+|---|---|
+| C library | glibc (`glibc`) |
+| Core command-line utilities | GNU coreutils (`coreutils`) |
+| Shell | Bash (`bash`) |
+| Init, services, and networking | `systemd`, `systemd-networkd`, and `systemd-resolved` |
+| Package management | DNF5 (`dnf5`) over the RPM package format |
+| Privilege delegation | `sudo` |
+| Time synchronization | `chrony` |
+| DNS command-line tools | BIND utilities (`bind-utils`) |
+
+The wider package set also contains `mimalloc` and `uutils-coreutils`, but no image selects them to replace glibc's allocator or GNU coreutils. Container, distroless, minimal OS, WSL, and installer images select different package sets.
+
+This table records which implementation is chosen for each role, not the packages an image contains. For exact contents, see the [VM](base/images/vm-base/vm-base.kiwi), [container and distroless](base/images/container-base/container-base.kiwi), [minimal OS](base/images/minimal-os/minimal-os.kiwi), [WSL](base/images/wsl/wsl.kiwi), and [installer](base/images/vm-iso-installer/vm-iso-installer.kiwi) image definitions, which remain the source of truth.
+
 ## How Azure Linux is defined
 
 The distro is described almost entirely in TOML-based configuration files. Our open-source development tool, [`azldev`](https://github.com/microsoft/azure-linux-dev-tools), is used to apply this configuration to upstream Fedora spec files and packaging sources.
