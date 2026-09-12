@@ -34,7 +34,7 @@
          effective repository list from Kiwi's imported image description. -->
     <repository type="rpm-md" alias="azurelinux-base">
         <source
-            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch" />
+            path="https://packages.microsoft.com/azurelinux/4/preview/base/$basearch" />
     </repository>
 
     <packages type="image">
