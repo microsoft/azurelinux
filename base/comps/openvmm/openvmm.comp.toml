@@ -1,0 +1,20 @@
+# OpenVMM — modular, cross-platform virtual machine monitor.
+# Not packaged by Fedora; maintained as a local spec using rpmautospec
+# (%autorelease / %autochangelog).
+#
+# Upstream publishes a vendor archive as a release asset, so the build resolves
+# every crate offline from it. Both sources are fetched from the release tag.
+[components.openvmm]
+spec = { type = "local", path = "openvmm.spec" }
+
+[[components.openvmm.source-files]]
+filename = "openvmm-0.1.0.tar.gz"
+hash = "066c127e0f9b0e2fd34b5259b699688f8fed92d86f4b2d26c647057654568227aeb22de4d08ab1fc203f0b2f9a57144190bad778fc228d2ed456298a109c1f8b"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/openvmm/archive/openvmm-v0.1.0/openvmm-0.1.0.tar.gz" }
+
+[[components.openvmm.source-files]]
+filename = "openvmm-0.1.0-vendor.tar.gz"
+hash = "6ee0c42d2500808069c8083cb9340adc2fdf1ba01647679dbaa5350beb923454ec28405860afaa33f7a86676a20544cc32cc8385035babfdf3f9c44a6cc47ca1"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/openvmm/releases/download/openvmm-v0.1.0/openvmm-0.1.0-vendor.tar.gz" }
