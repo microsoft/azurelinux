@@ -1,0 +1,6 @@
+[components.rust-const-oid]
+# Pin past the distro default snapshot to Fedora f43 HEAD, providing
+# const-oid 0.10.2, required by digest 0.11's "oid" feature
+# (crate(const-oid/default) >= 0.10.0). Consumers requiring
+# const-oid < 0.10.0 are served by rust-const-oid0.9.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "3838eb7202ea6453f545162fb1d67e6097c6ec7e" }

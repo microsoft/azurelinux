@@ -1,0 +1,33 @@
+diff -Naur hmac-0.12.1-original/tests/mod.rs hmac-0.12.1/tests/mod.rs
+--- hmac-0.12.1-original/tests/mod.rs	1973-11-29 21:33:09.000000000 +0000
++++ hmac-0.12.1/tests/mod.rs	2026-06-08 11:28:44.468721102 +0100
+@@ -5,7 +5,6 @@
+ use hmac::{Hmac, SimpleHmac};
+ use sha1::Sha1;
+ use sha2::{Sha224, Sha256, Sha384, Sha512};
+-use streebog::{Streebog256, Streebog512};
+ 
+ // Test vectors from RFC 2104, plus wiki test
+ test!(hmac_md5_rfc2104, "md5", Hmac<md5::Md5>);
+@@ -21,21 +20,6 @@
+ test!(hmac_sha384_rfc4231_simple, "sha384", SimpleHmac<Sha384>);
+ test!(hmac_sha512_rfc4231_simple, "sha512", SimpleHmac<Sha512>);
+ 
+-// Test vectors from R 50.1.113-2016:
+-// https://tc26.ru/standard/rs/Р 50.1.113-2016.pdf
+-test!(hmac_streebog256, "streebog256", Hmac<Streebog256>);
+-test!(hmac_streebog512, "streebog512", Hmac<Streebog512>);
+-test!(
+-    hmac_streebog256_simple,
+-    "streebog256",
+-    SimpleHmac<Streebog256>
+-);
+-test!(
+-    hmac_streebog512_simple,
+-    "streebog512",
+-    SimpleHmac<Streebog512>
+-);
+-
+ // Tests from Project Wycheproof:
+ // https://github.com/google/wycheproof
+ test!(

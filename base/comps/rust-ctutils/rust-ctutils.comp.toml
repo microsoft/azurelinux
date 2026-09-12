@@ -3,8 +3,3 @@
 # in Fedora after AZL's distro-default snapshot date (2026-02-24), so no
 # commit exists at that snapshot.
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "da9d15459406cc056c9457bafa1779d8a8adaa6e" }
-
-# %check-only dep on proptest >= 1.11.0, unavailable in azl4-build today; the
-# library itself does not need proptest to build.
-[components.rust-ctutils.build]
-without = ["check"]

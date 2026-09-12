@@ -1,0 +1,13 @@
+--- hmac-0.12.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ hmac-0.12.1/Cargo.toml	2026-06-08T10:26:59.744575+00:00
+@@ -46,10 +46,6 @@
+ version = "0.10"
+ default-features = false
+ 
+-[dev-dependencies.streebog]
+-version = "0.10"
+-default-features = false
+-
+ [features]
+ reset = []
+ std = ["digest/std"]

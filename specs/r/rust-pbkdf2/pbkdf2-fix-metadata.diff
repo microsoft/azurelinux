@@ -1,11 +1,12 @@
---- pbkdf2-0.12.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ pbkdf2-0.12.2/Cargo.toml	2025-12-03T21:18:57.869426+00:00
-@@ -69,7 +69,7 @@
+--- pbkdf2-0.13.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ pbkdf2-0.13.0/Cargo.toml	2026-06-23T06:03:59.098253+00:00
+@@ -110,9 +110,6 @@
+ optional = true
  default-features = false
  
+-[dev-dependencies.belt-hash]
+-version = "0.2"
+-
  [dev-dependencies.hex-literal]
--version = "0.4.0"
-+version = ">=0.4.0, <2.0"
+ version = "1"
  
- [dev-dependencies.hmac]
- version = "0.12"

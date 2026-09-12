@@ -1,0 +1,4 @@
+[components.'rust-pbkdf2_0.12']
+# Fedora's own compat package for pbkdf2 0.12.x, for consumers requiring
+# pbkdf2 < 0.13.0. See rust-pbkdf2.comp.toml.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e84459d291d055c026d4b81d527abb3bf402980e" }

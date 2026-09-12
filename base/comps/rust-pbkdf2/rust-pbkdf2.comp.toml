@@ -1,0 +1,54 @@
+[components.rust-pbkdf2]
+# Pin past the distro default snapshot to Fedora f43 HEAD, providing
+# pbkdf2 0.13.0, required by rust-zip 8.6.0 (crate(pbkdf2/default) >=
+# 0.13.0). Consumers requiring pbkdf2 < 0.13.0 are served by
+# rust-pbkdf2_0.12.
+#
+# pbkdf2 0.13.0 also gained kdf/mcf/password-hash/phc/getrandom/rand_core
+# features. Azure Linux ships neither rust-kdf nor rust-mcf, and
+# rust-password-hash is still 0.5.0 (pbkdf2 needs >=0.6), so those features
+# and their optional deps are pruned here (mirroring the rust-image
+# avif/avif-native pruning) rather than left as unsatisfiable subpackages.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "64125a7336413fb33a8a876b293fed44d72d9292" }
+
+[[components.rust-pbkdf2.overlays]]
+description = "Drop pbkdf2's kdf/mcf/password-hash/phc/getrandom/rand_core features and their optional deps (AZL ships neither rust-kdf nor rust-mcf, and rust-password-hash is still 0.5.0 while pbkdf2 needs >=0.6)"
+type = "patch-add"
+source = "pbkdf2-drop-unsatisfiable-features.diff"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
+[[components.rust-pbkdf2.overlays]]
+description = "Drop the pbkdf2+kdf-devel subpackage (requires rust-kdf, not shipped on AZL)"
+type = "spec-remove-subpackage"
+package = "%{name}+kdf-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
+[[components.rust-pbkdf2.overlays]]
+description = "Drop the pbkdf2+mcf-devel subpackage (requires rust-mcf and password-hash>=0.6, not available on AZL)"
+type = "spec-remove-subpackage"
+package = "%{name}+mcf-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
+[[components.rust-pbkdf2.overlays]]
+description = "Drop the pbkdf2+password-hash-devel subpackage (requires password-hash>=0.6; AZL ships 0.5.0)"
+type = "spec-remove-subpackage"
+package = "%{name}+password-hash-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
+[[components.rust-pbkdf2.overlays]]
+description = "Drop the pbkdf2+phc-devel subpackage (requires password-hash/phc, needs password-hash>=0.6)"
+type = "spec-remove-subpackage"
+package = "%{name}+phc-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
+[[components.rust-pbkdf2.overlays]]
+description = "Drop the pbkdf2+getrandom-devel subpackage (requires password-hash/getrandom, needs password-hash>=0.6)"
+type = "spec-remove-subpackage"
+package = "%{name}+getrandom-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
+[[components.rust-pbkdf2.overlays]]
+description = "Drop the pbkdf2+rand_core-devel subpackage (requires password-hash/rand_core, needs password-hash>=0.6)"
+type = "spec-remove-subpackage"
+package = "%{name}+rand_core-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
