@@ -1,0 +1,767 @@
+From 8f4e665d68947daa514b9889efa25b7d6ffc82f6 Mon Sep 17 00:00:00 2001
+From: Matt Bearup <mbearup@microsoft.com>
+Date: Tue, 16 Jun 2026 09:29:45 -0700
+Subject: [PATCH] Add a plugin to support virtual snapshots using package file
+ time.
+
+---
+ CMakeLists.txt                                |   1 +
+ dnf5-plugins/CMakeLists.txt                   |   4 +
+ .../repo_snapshot_plugin/CMakeLists.txt       |  13 +
+ .../repo_snapshot_cmd_plugin.cpp              | 142 +++++++++++++
+ include/libdnf5/rpm/package.hpp               |   6 +
+ libdnf5-plugins/CMakeLists.txt                |   1 +
+ libdnf5-plugins/repo_snapshot/CMakeLists.txt  |  17 ++
+ .../repo_snapshot/repo_snapshot.conf          |   3 +
+ .../repo_snapshot/repo_snapshot.cpp           | 175 ++++++++++++++++++
+ .../repo_snapshot/repo_snapshot_filter.hpp    |  98 ++++++++++
+ libdnf5/rpm/package.cpp                       |   4 +
+ .../test_repo_snapshot_filter.cpp             | 100 ++++++++++
+ .../test_repo_snapshot_filter.hpp             |  32 ++++
+ test/libdnf5/rpm/test_package.cpp             |   9 +
+ test/libdnf5/rpm/test_package.hpp             |   2 +
+ 15 files changed, 607 insertions(+)
+ create mode 100644 dnf5-plugins/repo_snapshot_plugin/CMakeLists.txt
+ create mode 100644 dnf5-plugins/repo_snapshot_plugin/repo_snapshot_cmd_plugin.cpp
+ create mode 100644 libdnf5-plugins/repo_snapshot/CMakeLists.txt
+ create mode 100644 libdnf5-plugins/repo_snapshot/repo_snapshot.conf
+ create mode 100644 libdnf5-plugins/repo_snapshot/repo_snapshot.cpp
+ create mode 100644 libdnf5-plugins/repo_snapshot/repo_snapshot_filter.hpp
+ create mode 100644 test/libdnf5/plugins/repo_snapshot/test_repo_snapshot_filter.cpp
+ create mode 100644 test/libdnf5/plugins/repo_snapshot/test_repo_snapshot_filter.hpp
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 063dfff..daf22c5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,6 +32,7 @@ option(WITH_PLUGIN_EXPIRED_PGP_KEYS "Build a libdnf5 expired pgp keys plugin" ON
+ option(WITH_PLUGIN_RHSM "Build a libdnf5 rhsm (Red Hat Subscription Manager) plugin" OFF)
+ option(WITH_PYTHON_PLUGINS_LOADER "Build a special dnf5 plugin that loads Python plugins. Requires WITH_PYTHON3=ON." ON)
+ option(WITH_PLUGIN_LOCAL "Build a libdnf5 local plugin" ON)
++option(WITH_PLUGIN_REPO_SNAPSHOT "Build a libdnf5 repo snapshot plugin" ON)
+ 
+ # build options - features
+ option(WITH_COMPS "Build with comps groups and environments support" ON)
+diff --git a/dnf5-plugins/CMakeLists.txt b/dnf5-plugins/CMakeLists.txt
+index bca9866..5fd3a61 100644
+--- a/dnf5-plugins/CMakeLists.txt
++++ b/dnf5-plugins/CMakeLists.txt
+@@ -19,3 +19,7 @@ add_subdirectory("needs_restarting_plugin")
+ add_subdirectory("repoclosure_plugin")
+ add_subdirectory("reposync_plugin")
+ add_subdirectory("repomanage_plugin")
++
++if(WITH_PLUGIN_REPO_SNAPSHOT)
++add_subdirectory("repo_snapshot_plugin")
++endif()
+diff --git a/dnf5-plugins/repo_snapshot_plugin/CMakeLists.txt b/dnf5-plugins/repo_snapshot_plugin/CMakeLists.txt
+new file mode 100644
+index 0000000..50ee979
+--- /dev/null
++++ b/dnf5-plugins/repo_snapshot_plugin/CMakeLists.txt
+@@ -0,0 +1,13 @@
++# set gettext domain for translations (required by the M_() message macro)
++set(GETTEXT_DOMAIN dnf5-plugin-repo-snapshot)
++add_definitions(-DGETTEXT_DOMAIN=\"${GETTEXT_DOMAIN}\")
++
++add_library(repo_snapshot_cmd_plugin MODULE repo_snapshot_cmd_plugin.cpp)
++
++# disable the 'lib' prefix in order to create repo_snapshot_cmd_plugin.so
++set_target_properties(repo_snapshot_cmd_plugin PROPERTIES PREFIX "")
++
++target_link_libraries(repo_snapshot_cmd_plugin PRIVATE libdnf5 libdnf5-cli)
++target_link_libraries(repo_snapshot_cmd_plugin PRIVATE dnf5)
++
++install(TARGETS repo_snapshot_cmd_plugin LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/dnf5/plugins/)
+diff --git a/dnf5-plugins/repo_snapshot_plugin/repo_snapshot_cmd_plugin.cpp b/dnf5-plugins/repo_snapshot_plugin/repo_snapshot_cmd_plugin.cpp
+new file mode 100644
+index 0000000..02be640
+--- /dev/null
++++ b/dnf5-plugins/repo_snapshot_plugin/repo_snapshot_cmd_plugin.cpp
+@@ -0,0 +1,142 @@
++// Copyright Contributors to the DNF5 project
++// SPDX-License-Identifier: LGPL-2.1-or-later
++
++#include <dnf5/iplugin.hpp>
++#include <libdnf5-cli/argument_parser.hpp>
++#include <libdnf5/utils/bgettext/bgettext-mark-domain.h>
++
++#include "../../libdnf5-plugins/repo_snapshot/repo_snapshot_filter.hpp"
++
++#include <cstdlib>
++#include <cstring>
++
++using namespace dnf5;
++
++namespace {
++
++constexpr const char * PLUGIN_NAME{"repo_snapshot"};
++constexpr PluginVersion PLUGIN_VERSION{.major = 1, .minor = 0, .micro = 0};
++constexpr PluginAPIVersion REQUIRED_PLUGIN_API_VERSION{.major = 2, .minor = 0};
++
++constexpr const char * attrs[]{"author.name", "author.email", "description", nullptr};
++constexpr const char * attrs_value[]{
++    "Microsoft",
++    "azlinux@microsoft.com",
++    "Registers --snapshot-time and --snapshot-exclude-repos global CLI options."};
++
++
++class RepoSnapshotCmdPlugin : public IPlugin {
++public:
++    using IPlugin::IPlugin;
++
++    PluginAPIVersion get_api_version() const noexcept override { return REQUIRED_PLUGIN_API_VERSION; }
++    const char * get_name() const noexcept override { return PLUGIN_NAME; }
++    PluginVersion get_version() const noexcept override { return PLUGIN_VERSION; }
++    const char * const * get_attributes() const noexcept override { return attrs; }
++
++    const char * get_attribute(const char * attribute) const noexcept override {
++        for (size_t i = 0; attrs[i]; ++i) {
++            if (std::strcmp(attribute, attrs[i]) == 0) {
++                return attrs_value[i];
++            }
++        }
++        return nullptr;
++    }
++
++    void init() override;
++    std::vector<std::unique_ptr<Command>> create_commands() override;
++    void finish() noexcept override {}
++};
++
++
++void RepoSnapshotCmdPlugin::init() {
++    auto & ctx = get_context();
++    auto & parser = ctx.get_argument_parser();
++    auto & root_cmd = *parser.get_root_command();
++
++    // Get the global options group (registered by main.cpp).
++    auto & global_options_group = root_cmd.get_group("global_options");
++
++    // Register --snapshot-time global option.
++    auto snapshot_time = parser.add_new_named_arg("snapshot-time");
++    snapshot_time->set_long_name("snapshot-time");
++    snapshot_time->set_has_value(true);
++    snapshot_time->set_arg_value_help("POSIX_TIME");
++    snapshot_time->set_description(
++        "POSIX time to be used for client-side repository snapshot");
++    snapshot_time->set_parse_hook_func(
++        [](libdnf5::cli::ArgumentParser::NamedArg *,
++           [[maybe_unused]] const char * option,
++           const char * value) {
++            // Reject an invalid timestamp during CLI parsing so an install/upgrade
++            // does not silently run against the current (unfiltered) repository.
++            time_t parsed{0};
++            if (!repo_snapshot::parse_snapshot_time(value, parsed)) {
++                throw libdnf5::cli::ArgumentParserError(
++                    M_("--snapshot-time: invalid POSIX timestamp \"{}\""), std::string(value));
++            }
++            // Bridge the validated value to an environment variable for the libdnf5 plugin.
++            setenv("DNF5_SNAPSHOT_TIME", value, 1);
++            return true;
++        });
++    root_cmd.register_named_arg(snapshot_time);
++    global_options_group.register_argument(snapshot_time);
++
++    // Register --snapshot-exclude-repos global option.
++    auto snapshot_exclude = parser.add_new_named_arg("snapshot-exclude-repos");
++    snapshot_exclude->set_long_name("snapshot-exclude-repos");
++    snapshot_exclude->set_has_value(true);
++    snapshot_exclude->set_arg_value_help("REPO_ID,...");
++    snapshot_exclude->set_description(
++        "Repos to exclude from client-side repository snapshot");
++    snapshot_exclude->set_parse_hook_func(
++        [](libdnf5::cli::ArgumentParser::NamedArg *,
++           [[maybe_unused]] const char * option,
++           const char * value) {
++            // Bridge the CLI value to an environment variable for the libdnf5 plugin.
++            setenv("DNF5_SNAPSHOT_EXCLUDE_REPOS", value, 1);
++            return true;
++        });
++    root_cmd.register_named_arg(snapshot_exclude);
++    global_options_group.register_argument(snapshot_exclude);
++}
++
++
++std::vector<std::unique_ptr<Command>> RepoSnapshotCmdPlugin::create_commands() {
++    // No new commands — this plugin only adds global options.
++    return {};
++}
++
++
++std::exception_ptr last_exception;
++
++}  // namespace
++
++
++PluginAPIVersion dnf5_plugin_get_api_version(void) {
++    return REQUIRED_PLUGIN_API_VERSION;
++}
++
++const char * dnf5_plugin_get_name(void) {
++    return PLUGIN_NAME;
++}
++
++PluginVersion dnf5_plugin_get_version(void) {
++    return PLUGIN_VERSION;
++}
++
++IPlugin * dnf5_plugin_new_instance(
++    [[maybe_unused]] ApplicationVersion application_version, Context & context) try {
++    return new RepoSnapshotCmdPlugin(context);
++} catch (...) {
++    last_exception = std::current_exception();
++    return nullptr;
++}
++
++void dnf5_plugin_delete_instance(IPlugin * plugin_object) {
++    delete plugin_object;
++}
++
++std::exception_ptr * dnf5_plugin_get_last_exception(void) {
++    return &last_exception;
++}
+diff --git a/include/libdnf5/rpm/package.hpp b/include/libdnf5/rpm/package.hpp
+index c240a3d..4e38018 100644
+--- a/include/libdnf5/rpm/package.hpp
++++ b/include/libdnf5/rpm/package.hpp
+@@ -242,6 +242,12 @@ public:
+     // @replaces libdnf:libdnf/hy-package.h:function:dnf_package_get_buildtime(DnfPackage * pkg)
+     unsigned long long get_build_time() const;
+ 
++    /// @return File publish time from repo metadata (`<time file="...">`).
++    /// This is the time the package was published to the repository.
++    /// Requires a libsolv build that provides SOLVABLE_FILETIME.
++    /// @since 5.2
++    unsigned long long get_file_time() const;
++
+     // TODO not supported by libsolv: https://github.com/openSUSE/libsolv/issues/400
+     //std::string get_build_host();
+ 
+diff --git a/libdnf5-plugins/CMakeLists.txt b/libdnf5-plugins/CMakeLists.txt
+index e36b285..39dc4f7 100644
+--- a/libdnf5-plugins/CMakeLists.txt
++++ b/libdnf5-plugins/CMakeLists.txt
+@@ -7,3 +7,4 @@ add_subdirectory("expired-pgp-keys")
+ add_subdirectory("python_plugins_loader")
+ add_subdirectory("rhsm")
+ add_subdirectory("local")
++add_subdirectory("repo_snapshot")
+diff --git a/libdnf5-plugins/repo_snapshot/CMakeLists.txt b/libdnf5-plugins/repo_snapshot/CMakeLists.txt
+new file mode 100644
+index 0000000..11ae1db
+--- /dev/null
++++ b/libdnf5-plugins/repo_snapshot/CMakeLists.txt
+@@ -0,0 +1,17 @@
++# Build only when this plugin is enabled AND dnf5 command plugins are built:
++# the spec packages this hook plus its config alongside the command plugin
++# under %if %{with dnf5_plugins}. Gating on both avoids installed-but-unpackaged
++# files in a --without dnf5_plugins build.
++if(NOT WITH_PLUGIN_REPO_SNAPSHOT OR NOT WITH_DNF5_PLUGINS)
++    return()
++endif()
++
++add_library(repo_snapshot MODULE repo_snapshot.cpp)
++
++# disable the 'lib' prefix in order to create repo_snapshot.so
++set_target_properties(repo_snapshot PROPERTIES PREFIX "")
++
++target_link_libraries(repo_snapshot PRIVATE libdnf5)
++
++install(TARGETS repo_snapshot LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/libdnf5/plugins/")
++install(FILES "repo_snapshot.conf" DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/dnf/libdnf5-plugins")
+diff --git a/libdnf5-plugins/repo_snapshot/repo_snapshot.conf b/libdnf5-plugins/repo_snapshot/repo_snapshot.conf
+new file mode 100644
+index 0000000..e7002aa
+--- /dev/null
++++ b/libdnf5-plugins/repo_snapshot/repo_snapshot.conf
+@@ -0,0 +1,3 @@
++[main]
++name = repo_snapshot
++enabled = 1
+diff --git a/libdnf5-plugins/repo_snapshot/repo_snapshot.cpp b/libdnf5-plugins/repo_snapshot/repo_snapshot.cpp
+new file mode 100644
+index 0000000..8a357cb
+--- /dev/null
++++ b/libdnf5-plugins/repo_snapshot/repo_snapshot.cpp
+@@ -0,0 +1,175 @@
++// Copyright Contributors to the DNF5 project
++// SPDX-License-Identifier: LGPL-2.1-or-later
++
++#include "repo_snapshot_filter.hpp"
++
++#include <libdnf5/base/base.hpp>
++#include <libdnf5/plugin/iplugin.hpp>
++#include <libdnf5/repo/repo_query.hpp>
++#include <libdnf5/rpm/package_query.hpp>
++#include <libdnf5/rpm/package_sack.hpp>
++#include <libdnf5/rpm/package_set.hpp>
++
++#include <cstdlib>
++#include <cstring>
++#include <ctime>
++#include <set>
++#include <stdexcept>
++#include <string>
++
++using namespace libdnf5;
++
++namespace {
++
++constexpr const char * PLUGIN_NAME{"repo_snapshot"};
++constexpr plugin::Version PLUGIN_VERSION{.major = 1, .minor = 0, .micro = 0};
++constexpr PluginAPIVersion REQUIRED_PLUGIN_API_VERSION{.major = 2, .minor = 0};
++
++constexpr const char * attrs[]{"author.name", "author.email", "description", nullptr};
++constexpr const char * attrs_value[]{
++    "Microsoft",
++    "azlinux@microsoft.com",
++    "Client-side repository snapshot: filters packages by publish time."};
++
++
++class RepoSnapshotPlugin : public plugin::IPlugin {
++public:
++    RepoSnapshotPlugin(libdnf5::plugin::IPluginData & data, libdnf5::ConfigParser &)
++        : IPlugin(data) {}
++    ~RepoSnapshotPlugin() override = default;
++
++    PluginAPIVersion get_api_version() const noexcept override { return REQUIRED_PLUGIN_API_VERSION; }
++    const char * get_name() const noexcept override { return PLUGIN_NAME; }
++    plugin::Version get_version() const noexcept override { return PLUGIN_VERSION; }
++    const char * const * get_attributes() const noexcept override { return attrs; }
++
++    const char * get_attribute(const char * attribute) const noexcept override {
++        for (size_t i = 0; attrs[i]; ++i) {
++            if (std::strcmp(attribute, attrs[i]) == 0) {
++                return attrs_value[i];
++            }
++        }
++        return nullptr;
++    }
++
++    void init() override;
++    void repos_loaded() override;
++
++private:
++    time_t snapshot_time{0};
++    std::set<std::string> exclude_repos;
++};
++
++
++void RepoSnapshotPlugin::init() {
++    // Read snapshot_time from environment variable (set by the dnf5 CLI plugin
++    // when --snapshot-time is passed on the command line).
++    const char * env = std::getenv("DNF5_SNAPSHOT_TIME");
++    std::string time_str = env ? env : "";
++
++    if (time_str.empty()) {
++        return;
++    }
++
++    // Parse the POSIX timestamp. Fail closed on invalid input: proceeding with
++    // snapshotting disabled would silently operate on the current (unfiltered)
++    // repository even though a cutoff was explicitly requested via the
++    // environment (e.g. DNF5_SNAPSHOT_TIME set directly, bypassing the CLI).
++    if (!repo_snapshot::parse_snapshot_time(time_str, snapshot_time)) {
++        throw std::runtime_error(
++            "repo_snapshot plugin: invalid DNF5_SNAPSHOT_TIME '" + time_str +
++            "' (expected a positive POSIX timestamp); refusing to proceed unfiltered");
++    }
++
++    // Read excluded repos from environment variable (set by the dnf5 CLI plugin
++    // when --snapshot-exclude-repos is passed on the command line).
++    const char * exclude_env = std::getenv("DNF5_SNAPSHOT_EXCLUDE_REPOS");
++    if (exclude_env) {
++        exclude_repos = repo_snapshot::parse_exclude_repos(exclude_env);
++    }
++
++    auto & logger = *get_base().get_logger();
++    logger.info("repo_snapshot plugin: snapshot_time={}", snapshot_time);
++    if (!exclude_repos.empty()) {
++        std::string repos_list;
++        for (const auto & r : exclude_repos) {
++            if (!repos_list.empty()) repos_list += ", ";
++            repos_list += r;
++        }
++        logger.info("repo_snapshot plugin: excluding repos: {}", repos_list);
++    }
++}
++
++
++void RepoSnapshotPlugin::repos_loaded() {
++    if (snapshot_time <= 0) {
++        return;
++    }
++
++    auto & base = get_base();
++    auto & logger = *base.get_logger();
++
++    // Build a PackageQuery over all available packages (including excluded ones
++    // so we don't miss packages that other plugins may have excluded).
++    rpm::PackageQuery all_packages(base, rpm::PackageQuery::ExcludeFlags::IGNORE_EXCLUDES);
++
++    // Collect packages whose file time (publish time) exceeds the snapshot time.
++    // Requires a patched libsolv that provides SOLVABLE_FILETIME (enforced by the spec).
++    rpm::PackageSet to_exclude(base);
++
++    for (const auto & pkg : all_packages) {
++        // Use file_time (repo publish time) to decide inclusion in the snapshot.
++        // Missing publish time fails closed.
++        auto file_time = static_cast<time_t>(pkg.get_file_time());
++        if (repo_snapshot::should_exclude_package(
++                file_time, snapshot_time, pkg.is_installed(), pkg.get_repo_id(), exclude_repos)) {
++            to_exclude.add(pkg);
++        }
++    }
++
++    if (to_exclude.empty()) {
++        logger.info("repo_snapshot plugin: no packages excluded by snapshot filter");
++        return;
++    }
++
++    // Use add_user_excludes to hide the filtered packages from dependency resolution.
++    base.get_rpm_package_sack()->add_user_excludes(to_exclude);
++
++    logger.info("repo_snapshot plugin: excluded {} packages published after snapshot time {}", to_exclude.size(), snapshot_time);
++}
++
++
++std::exception_ptr last_exception;
++
++}  // namespace
++
++
++PluginAPIVersion libdnf_plugin_get_api_version(void) {
++    return REQUIRED_PLUGIN_API_VERSION;
++}
++
++const char * libdnf_plugin_get_name(void) {
++    return PLUGIN_NAME;
++}
++
++plugin::Version libdnf_plugin_get_version(void) {
++    return PLUGIN_VERSION;
++}
++
++plugin::IPlugin * libdnf_plugin_new_instance(
++    [[maybe_unused]] LibraryVersion library_version,
++    libdnf5::plugin::IPluginData & data,
++    libdnf5::ConfigParser & parser) try {
++    return new RepoSnapshotPlugin(data, parser);
++} catch (...) {
++    last_exception = std::current_exception();
++    return nullptr;
++}
++
++void libdnf_plugin_delete_instance(plugin::IPlugin * plugin_object) {
++    delete plugin_object;
++}
++
++std::exception_ptr * libdnf_plugin_get_last_exception(void) {
++    return &last_exception;
++}
+diff --git a/libdnf5-plugins/repo_snapshot/repo_snapshot_filter.hpp b/libdnf5-plugins/repo_snapshot/repo_snapshot_filter.hpp
+new file mode 100644
+index 0000000..536839d
+--- /dev/null
++++ b/libdnf5-plugins/repo_snapshot/repo_snapshot_filter.hpp
+@@ -0,0 +1,98 @@
++// Copyright Contributors to the DNF5 project
++// SPDX-License-Identifier: LGPL-2.1-or-later
++
++// Pure, side-effect-free helpers implementing the repo_snapshot filtering
++// policy. They are kept in a header (separate from the plugin glue code) so
++// they can be unit tested without loading the plugin or a real Base.
++
++#ifndef LIBDNF5_PLUGINS_REPO_SNAPSHOT_FILTER_HPP
++#define LIBDNF5_PLUGINS_REPO_SNAPSHOT_FILTER_HPP
++
++#include <cerrno>
++#include <cstdlib>
++#include <ctime>
++#include <set>
++#include <string>
++
++namespace repo_snapshot {
++
++/// Parse a POSIX timestamp string into a positive time_t.
++/// @param value  The string to parse (e.g. the value of --snapshot-time).
++/// @param out    Set to the parsed time on success; left unchanged on failure.
++/// @return true on success. false for empty input, non-numeric input,
++///         trailing garbage after the number, or a non-positive value.
++inline bool parse_snapshot_time(const std::string & value, time_t & out) {
++    if (value.empty()) {
++        return false;
++    }
++
++    errno = 0;
++    char * end = nullptr;
++    const long long parsed = std::strtoll(value.c_str(), &end, 10);
++    if (errno != 0 || end == value.c_str() || *end != '\0' || parsed <= 0) {
++        return false;
++    }
++
++    out = static_cast<time_t>(parsed);
++    return true;
++}
++
++/// Parse a comma-separated list of repo IDs into a set. Surrounding whitespace
++/// on each token is trimmed and empty tokens are dropped.
++inline std::set<std::string> parse_exclude_repos(const std::string & value) {
++    std::set<std::string> result;
++
++    std::string::size_type start = 0;
++    while (start < value.size()) {
++        auto pos = value.find(',', start);
++        if (pos == std::string::npos) {
++            pos = value.size();
++        }
++
++        auto token = value.substr(start, pos - start);
++        auto first = token.find_first_not_of(" \t");
++        if (first != std::string::npos) {
++            auto last = token.find_last_not_of(" \t");
++            result.insert(token.substr(first, last - first + 1));
++        }
++
++        start = pos + 1;
++    }
++
++    return result;
++}
++
++/// Decide whether a package should be excluded from the snapshot.
++///
++/// A package is kept (not excluded) when:
++///  - it is installed (installed packages are always kept), or
++///  - its repo is in the exclusion list.
++///
++/// Otherwise the decision is based only on the package's publish (file) time.
++/// When the file time is unavailable (0), the package is excluded because we
++/// cannot prove that it was published before the snapshot cutoff.
++inline bool should_exclude_package(
++    time_t file_time,
++    time_t snapshot_time,
++    bool is_installed,
++    const std::string & repo_id,
++    const std::set<std::string> & exclude_repos) {
++    if (is_installed) {
++        return false;
++    }
++
++    if (exclude_repos.count(repo_id) != 0) {
++        return false;
++    }
++
++    // Missing publish time cannot prove the package predates the snapshot.
++    if (file_time <= 0) {
++        return true;
++    }
++
++    return file_time > snapshot_time;
++}
++
++}  // namespace repo_snapshot
++
++#endif  // LIBDNF5_PLUGINS_REPO_SNAPSHOT_FILTER_HPP
+diff --git a/libdnf5/rpm/package.cpp b/libdnf5/rpm/package.cpp
+index bb7a7a3..89f0fc2 100644
+--- a/libdnf5/rpm/package.cpp
++++ b/libdnf5/rpm/package.cpp
+@@ -176,6 +176,10 @@ unsigned long long Package::get_build_time() const {
+     return get_rpm_pool(p_impl->base).lookup_num(p_impl->id.id, SOLVABLE_BUILDTIME);
+ }
+ 
++unsigned long long Package::get_file_time() const {
++    return get_rpm_pool(p_impl->base).lookup_num(p_impl->id.id, SOLVABLE_FILETIME);
++}
++
+ // TODO not supported by libsolv: https://github.com/openSUSE/libsolv/issues/400
+ //std::string Package::get_build_host() {
+ //    return libdnf5::utils::string::c_to_str(lookup_cstring(get_rpm_pool(base).id2solvable(id.id), SOLVABLE_BUILDHOST));
+diff --git a/test/libdnf5/plugins/repo_snapshot/test_repo_snapshot_filter.cpp b/test/libdnf5/plugins/repo_snapshot/test_repo_snapshot_filter.cpp
+new file mode 100644
+index 0000000..6fbec0f
+--- /dev/null
++++ b/test/libdnf5/plugins/repo_snapshot/test_repo_snapshot_filter.cpp
+@@ -0,0 +1,100 @@
++// Copyright Contributors to the DNF5 project
++// SPDX-License-Identifier: LGPL-2.1-or-later
++
++#include "test_repo_snapshot_filter.hpp"
++
++// The pure filtering helpers live alongside the plugin sources.
++#include "../../../../libdnf5-plugins/repo_snapshot/repo_snapshot_filter.hpp"
++
++#include <ctime>
++#include <set>
++#include <string>
++
++
++CPPUNIT_TEST_SUITE_REGISTRATION(RepoSnapshotFilterTest);
++
++
++void RepoSnapshotFilterTest::test_parse_snapshot_time_valid() {
++    time_t out = 0;
++    CPPUNIT_ASSERT(repo_snapshot::parse_snapshot_time("1700000000", out));
++    CPPUNIT_ASSERT_EQUAL(static_cast<time_t>(1700000000), out);
++
++    // Leading/trailing space is tolerated by strtoll's leading-space handling;
++    // a bare number with no trailing garbage must parse.
++    out = 0;
++    CPPUNIT_ASSERT(repo_snapshot::parse_snapshot_time("1", out));
++    CPPUNIT_ASSERT_EQUAL(static_cast<time_t>(1), out);
++}
++
++
++void RepoSnapshotFilterTest::test_parse_snapshot_time_invalid() {
++    // On failure `out` must be left untouched.
++    time_t out = 42;
++
++    CPPUNIT_ASSERT(!repo_snapshot::parse_snapshot_time("", out));
++    CPPUNIT_ASSERT(!repo_snapshot::parse_snapshot_time("abc", out));
++    CPPUNIT_ASSERT(!repo_snapshot::parse_snapshot_time("123abc", out));  // trailing garbage
++    CPPUNIT_ASSERT(!repo_snapshot::parse_snapshot_time("-5", out));      // negative
++    CPPUNIT_ASSERT(!repo_snapshot::parse_snapshot_time("0", out));       // non-positive
++
++    CPPUNIT_ASSERT_EQUAL(static_cast<time_t>(42), out);
++}
++
++
++void RepoSnapshotFilterTest::test_parse_exclude_repos() {
++    auto repos = repo_snapshot::parse_exclude_repos("repoA, repoB ,repoC");
++    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), repos.size());
++    CPPUNIT_ASSERT(repos.count("repoA") != 0);
++    CPPUNIT_ASSERT(repos.count("repoB") != 0);
++    CPPUNIT_ASSERT(repos.count("repoC") != 0);
++
++    // Empty input yields an empty set.
++    CPPUNIT_ASSERT(repo_snapshot::parse_exclude_repos("").empty());
++
++    // Empty/whitespace-only tokens are dropped.
++    CPPUNIT_ASSERT(repo_snapshot::parse_exclude_repos(" , , ").empty());
++}
++
++
++void RepoSnapshotFilterTest::test_should_exclude_before_after_cutoff() {
++    const std::set<std::string> no_excludes;
++    const time_t cutoff = 1000;
++
++    // Published before the cutoff -> kept.
++    CPPUNIT_ASSERT(!repo_snapshot::should_exclude_package(500, cutoff, false, "repo", no_excludes));
++
++    // Published exactly at the cutoff -> kept (filter is strictly after).
++    CPPUNIT_ASSERT(!repo_snapshot::should_exclude_package(1000, cutoff, false, "repo", no_excludes));
++
++    // Published after the cutoff -> excluded.
++    CPPUNIT_ASSERT(repo_snapshot::should_exclude_package(1500, cutoff, false, "repo", no_excludes));
++}
++
++
++void RepoSnapshotFilterTest::test_should_exclude_excluded_repo() {
++    const std::set<std::string> excludes{"protected"};
++
++    // Published after the cutoff, but the repo is excluded -> kept.
++    CPPUNIT_ASSERT(!repo_snapshot::should_exclude_package(1500, 1000, false, "protected", excludes));
++
++    // Published after the cutoff in a non-excluded repo -> excluded.
++    CPPUNIT_ASSERT(repo_snapshot::should_exclude_package(1500, 1000, false, "other", excludes));
++}
++
++
++void RepoSnapshotFilterTest::test_should_exclude_installed() {
++    const std::set<std::string> no_excludes;
++
++    // Installed packages are always kept, even if published after the cutoff.
++    CPPUNIT_ASSERT(!repo_snapshot::should_exclude_package(1500, 1000, true, "repo", no_excludes));
++}
++
++
++void RepoSnapshotFilterTest::test_should_exclude_missing_file_time() {
++    const std::set<std::string> no_excludes;
++    const time_t cutoff = 1000;
++
++    // Missing publish time is excluded because publication before the cutoff
++    // cannot be proven.
++    CPPUNIT_ASSERT(repo_snapshot::should_exclude_package(0, cutoff, false, "repo", no_excludes));
++}
+diff --git a/test/libdnf5/plugins/repo_snapshot/test_repo_snapshot_filter.hpp b/test/libdnf5/plugins/repo_snapshot/test_repo_snapshot_filter.hpp
+new file mode 100644
+index 0000000..06bf04c
+--- /dev/null
++++ b/test/libdnf5/plugins/repo_snapshot/test_repo_snapshot_filter.hpp
+@@ -0,0 +1,32 @@
++// Copyright Contributors to the DNF5 project
++// SPDX-License-Identifier: LGPL-2.1-or-later
++
++#ifndef TEST_LIBDNF5_PLUGINS_REPO_SNAPSHOT_FILTER_HPP
++#define TEST_LIBDNF5_PLUGINS_REPO_SNAPSHOT_FILTER_HPP
++
++#include <cppunit/extensions/HelperMacros.h>
++
++
++class RepoSnapshotFilterTest : public CppUnit::TestCase {
++    CPPUNIT_TEST_SUITE(RepoSnapshotFilterTest);
++    CPPUNIT_TEST(test_parse_snapshot_time_valid);
++    CPPUNIT_TEST(test_parse_snapshot_time_invalid);
++    CPPUNIT_TEST(test_parse_exclude_repos);
++    CPPUNIT_TEST(test_should_exclude_before_after_cutoff);
++    CPPUNIT_TEST(test_should_exclude_excluded_repo);
++    CPPUNIT_TEST(test_should_exclude_installed);
++    CPPUNIT_TEST(test_should_exclude_missing_file_time);
++    CPPUNIT_TEST_SUITE_END();
++
++public:
++    void test_parse_snapshot_time_valid();
++    void test_parse_snapshot_time_invalid();
++    void test_parse_exclude_repos();
++    void test_should_exclude_before_after_cutoff();
++    void test_should_exclude_excluded_repo();
++    void test_should_exclude_installed();
++    void test_should_exclude_missing_file_time();
++};
++
++
++#endif  // TEST_LIBDNF5_PLUGINS_REPO_SNAPSHOT_FILTER_HPP
+diff --git a/test/libdnf5/rpm/test_package.cpp b/test/libdnf5/rpm/test_package.cpp
+index a5694f8..fd1438a 100644
+--- a/test/libdnf5/rpm/test_package.cpp
++++ b/test/libdnf5/rpm/test_package.cpp
+@@ -129,6 +129,15 @@ void RpmPackageTest::test_get_build_time() {
+ }
+ 
+ 
++void RpmPackageTest::test_get_file_time() {
++    // The repo metadata declares `<time file="123" build="456"/>`, so file time
++    // (publish time) must be reported as 123 and be distinct from build time.
++    // This is the end-to-end guard the repo_snapshot plugin relies on: a build
++    // where file time is not wired up would report 0 here and fail.
++    CPPUNIT_ASSERT_EQUAL(123LLU, get_pkg("pkg-1.2-3.x86_64").get_file_time());
++}
++
++
+ // TODO not supported by libsolv: https://github.com/openSUSE/libsolv/issues/400
+ // void RpmPackageTest::test_get_build_host() {
+ //     CPPUNIT_ASSERT_EQUAL(std::string("Buildhost"), get_pkg("pkg-1.2-3.x86_64").get_build_host());
+diff --git a/test/libdnf5/rpm/test_package.hpp b/test/libdnf5/rpm/test_package.hpp
+index b28f098..4f88ec7 100644
+--- a/test/libdnf5/rpm/test_package.hpp
++++ b/test/libdnf5/rpm/test_package.hpp
+@@ -45,6 +45,7 @@ class RpmPackageTest : public BaseTestCase {
+     CPPUNIT_TEST(test_get_license);
+     CPPUNIT_TEST(test_get_sourcerpm);
+     CPPUNIT_TEST(test_get_build_time);
++    CPPUNIT_TEST(test_get_file_time);
+     //CPPUNIT_TEST(test_get_build_host);
+     CPPUNIT_TEST(test_get_packager);
+     CPPUNIT_TEST(test_get_vendor);
+@@ -96,6 +97,7 @@ public:
+     void test_get_license();
+     void test_get_sourcerpm();
+     void test_get_build_time();
++    void test_get_file_time();
+     //void test_get_build_host();
+     void test_get_packager();
+     void test_get_vendor();
+-- 
+2.55.0

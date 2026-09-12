@@ -5,3 +5,42 @@
 without = [
     "plugin_rhsm"
 ]
+
+# Add the repo_snapshot plugin (a dnf5 command plugin plus a libdnf5 hook
+# plugin) that implements virtual repository snapshots by filtering packages
+# on their file time. Depends on the libsolv solvable:filetime prerequisite.
+[[components.dnf5.overlays]]
+description = "Add repo_snapshot plugin for virtual snapshots using package file time"
+type = "patch-add"
+source = "0001-Add-a-plugin-to-support-virtual-snapshots-using-package-file-time.patch"
+
+# The repo_snapshot plugin reads a package's publish time via SOLVABLE_FILETIME,
+# which only exists in the patched Azure Linux libsolv. Pin the floor to the
+# 0.7.35-5 build that first added SOLVABLE_FILETIME (see
+# specs/l/libsolv/libsolv.spec changelog) so dnf5 cannot build or install
+# against an older, unpatched libsolv.
+[[components.dnf5.overlays]]
+description = "Require the patched libsolv headers (SOLVABLE_FILETIME) at build time for repo_snapshot"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "libsolv-devel >= 0.7.35-5"
+
+[[components.dnf5.overlays]]
+description = "Require the patched libsolv runtime (SOLVABLE_FILETIME) for the repo_snapshot hook plugin"
+type = "spec-add-tag"
+tag = "Requires"
+package = "libdnf5"
+value = "libsolv%{?_isa} >= 0.7.35-5"
+
+# The repo_snapshot patch builds two shared objects (a dnf5 command plugin
+# and a libdnf5 hook plugin) plus a config file.
+[[components.dnf5.overlays]]
+description = "Package the repo_snapshot command and hook plugins plus config in dnf5-plugins"
+type = "spec-append-lines"
+section = "%files"
+package = "dnf5-plugins"
+lines = [
+    "%{_libdir}/dnf5/plugins/repo_snapshot_cmd_plugin.so",
+    "%{_libdir}/libdnf5/plugins/repo_snapshot.so",
+    "%config %{_sysconfdir}/dnf/libdnf5-plugins/repo_snapshot.conf",
+]
