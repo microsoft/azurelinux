@@ -1,8 +1,8 @@
 {
-  "Signatures": {
-    "nginx-njs-0.9.4.tar.gz": "7b3a9f14b0f09311d9031c2a252cb0e23c06baac2e586a7d12c75aa6cba4ca0e",
-    "nginx-tests.tgz": "5847fdc454543df77e07026e7de737f9e7ff093c8ce4afcbc2093a64e570ff83",
-    "nginx.service": "73a1321ae35eafc4e02614cde224fc0bf20ceba97f969b3373dd73c15c22a0e1",
-    "nginx-1.28.3.tar.gz": "2c96a946bfb0882a21744ed429770a2123ae1828c7c48665092993ddee91a918"
-  }
+ "Signatures": {
+  "nginx-1.30.4.tar.gz": "4261dc90e9e47c1c4041276e9aaa3d48ebe2e664f728e14fa95ae6c67d57a08b",
+  "nginx-njs-1.0.1.tar.gz": "74372cfcbf11eb0a71bc555e19dc785f61d561d5663d254474da6c8c9e50a6a7",
+  "nginx-tests.tgz": "5847fdc454543df77e07026e7de737f9e7ff093c8ce4afcbc2093a64e570ff83",
+  "nginx.service": "73a1321ae35eafc4e02614cde224fc0bf20ceba97f969b3373dd73c15c22a0e1"
+ }
 }
