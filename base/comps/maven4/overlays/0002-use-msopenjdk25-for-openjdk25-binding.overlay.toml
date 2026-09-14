@@ -1,0 +1,17 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Point the existing Maven 4 OpenJDK 25 compatibility binding at Microsoft OpenJDK 25"
+type = "spec-search-replace"
+section = "%install"
+regex = '^echo JAVA_HOME=%\{_jvmdir\}/jre-25-openjdk >%\{buildroot\}%\{_javaconfdir\}/maven%\{\?maven_version_suffix\}-openjdk25\.conf$'
+replacement = 'echo JAVA_HOME=%{_jvmdir}/msopenjdk-25 >%{buildroot}%{_javaconfdir}/maven%{?maven_version_suffix}-openjdk25.conf'
+
+[[overlays]]
+description = "Require Microsoft OpenJDK 25 from the existing Maven 4 OpenJDK 25 compatibility package"
+type = "spec-search-replace"
+section = "%install"
+regex = '^%jp_binding --verbose --variant openjdk25 .* --requires java-25-openjdk-headless --recommends java-25-openjdk-devel$'
+replacement = '%jp_binding --verbose --variant openjdk25 --ghost maven%{?maven_version_suffix}.conf --target %{_javaconfdir}/maven%{?maven_version_suffix}-openjdk25.conf --provides %{name}-jdk-binding --requires msopenjdk-25'

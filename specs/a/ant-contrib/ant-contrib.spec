@@ -30,7 +30,7 @@ BuildRequires:  apache-ivy
 BuildRequires:  apache-commons-logging
 BuildRequires:  apache-commons-parent
 
-Requires:       java-25-headless
+Requires: msopenjdk-25
 Requires:       junit
 Requires:       ant-openjdk25 
 Requires:       xerces-j2

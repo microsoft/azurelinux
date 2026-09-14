@@ -81,7 +81,7 @@ Version:        4.11.0
 %global minorver %(foo=%{version}; a=(${foo//./ }); echo ${a[1]} )
 %global padding  %(digits=00; num=%{minorver}; echo ${digits:${#num}:${#digits}} )
 %global abiver   %(echo %{majorver}%{padding}%{minorver} )
-Release: 18%{?dist}
+Release: 19%{?dist}
 Summary:        Collection of algorithms for computer vision
 # This is normal three clause BSD.
 License:        BSD-3-Clause AND Apache-2.0 AND ISC
@@ -404,7 +404,7 @@ This package contains Python3 bindings for the OpenCV library.
 
 %package    java
 Summary:    Java bindings for apps which use OpenCV
-Requires:   java-headless
+Requires: msopenjdk-25
 Requires:   javapackages-filesystem
 Requires:   %{name}-core%{_isa} = %{version}-%{release}
 

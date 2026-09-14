@@ -1,0 +1,59 @@
+# Remove this group once repository policy makes msopenjdk-25 the sole eligible
+# provider for these components' generic Java development dependencies.
+[component-groups.msopenjdk25-direct-consumers]
+description = "Components with generic Java development dependencies that must build with Microsoft OpenJDK 25"
+components = [
+    "R",
+    "brltty",
+    "capstone",
+    "gnulib",
+    "graphviz",
+    "hdf",
+    "hdf5",
+    "libphonenumber",
+    "lujavrite",
+    "snowball",
+    "subversion",
+    "systemtap",
+    "vtk",
+    "z3",
+    "zbar",
+]
+
+[[component-groups.msopenjdk25-direct-consumers.default-component-config.overlays]]
+description = "Require Microsoft OpenJDK 25 for components with generic Java development dependencies"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "msopenjdk-25"
+
+[component-groups.msopenjdk25-direct-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+# Remove this group once msopenjdk-25 provides the standard java-headless and
+# java-25-headless capabilities used by existing Java runtime consumers.
+[component-groups.msopenjdk25-headless-consumers]
+description = "Components whose Java runtime dependency must resolve to Microsoft OpenJDK 25"
+components = [
+    "R",
+    "ant-contrib",
+    "antlr4-project",
+    "bsh",
+    "byteman",
+    "libwebp",
+    "octave",
+    "opencv",
+    "openmpi",
+    "sphinx",
+    "texlive-base",
+]
+
+[[component-groups.msopenjdk25-headless-consumers.default-component-config.overlays]]
+description = "Replace generic headless Java runtime requirements with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^Requires:\s+(java|java-25)-headless(\s+>=\s+1:1\.8)?$'
+replacement = 'Requires: msopenjdk-25'
+
+[component-groups.msopenjdk25-headless-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"

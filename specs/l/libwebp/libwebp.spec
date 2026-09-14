@@ -27,7 +27,7 @@
 
 Name:          libwebp
 Version:       1.6.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL:           http://webmproject.org/
 Summary:       Library and tools for the WebP graphics format
 # Additional IPR is licensed as well. See PATENTS file for details
@@ -110,7 +110,7 @@ images more efficiently.
 %package java
 Summary:       Java bindings for libwebp, a library for the WebP format
 Requires:      %{name}%{?_isa} = %{version}-%{release}
-Requires:      java-headless
+Requires: msopenjdk-25
 Requires:      jpackage-utils
 
 %description java

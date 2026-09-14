@@ -5,7 +5,7 @@
       <xmvn>xmvn</xmvn>
     </provides>
     <configuration>
-      <jdkHome>/usr/lib/jvm/java-25-openjdk</jdkHome>
+      <jdkHome>/usr/lib/jvm/msopenjdk-25</jdkHome>
     </configuration>
   </toolchain>
 </toolchains>

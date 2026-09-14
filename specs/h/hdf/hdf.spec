@@ -10,7 +10,7 @@
 
 Name: hdf
 Version: 4.3.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: A general purpose library and file format for storing scientific data
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD
@@ -36,6 +36,7 @@ BuildRequires: slf4j
 Obsoletes:     java-hdf < %{version}-%{release}
 %endif
 BuildRequires: make
+BuildRequires: msopenjdk-25
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 

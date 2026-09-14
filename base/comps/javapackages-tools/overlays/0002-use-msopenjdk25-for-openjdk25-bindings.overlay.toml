@@ -1,0 +1,26 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Back the existing Maven OpenJDK 25 compatibility binding with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+section = "%package"
+package = "maven-local-openjdk25"
+regex = '^Requires:\s+java-25-openjdk-devel$'
+replacement = 'Requires:       msopenjdk-25'
+
+[[overlays]]
+description = "Back the existing javapackages OpenJDK 25 compatibility binding with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+section = "%package"
+package = "javapackages-local-openjdk25"
+regex = '^Requires:\s+java-25-openjdk-devel$'
+replacement = 'Requires:       msopenjdk-25'
+
+[[overlays]]
+description = "Use Microsoft OpenJDK 25 for the existing openjdk25 Java packaging configuration"
+type = "spec-search-replace"
+section = "%build"
+regex = '^    --jvm=openjdk25=%\{_jvmdir\}/jre-25-openjdk$'
+replacement = '    --jvm=openjdk25=%{_jvmdir}/msopenjdk-25'
