@@ -1,0 +1,50 @@
+From eae3805f2895bd715193e67d7d2aa1fd0172bbba Mon Sep 17 00:00:00 2001
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Date: Fri, 11 Apr 2025 16:56:24 +0200
+Subject: [PATCH] swig: Workaround for reading sys/select.h ending with wrong
+ types.
+
+OpenSSL 3.5 includes sys/types.h from its public e_os2.h header. SWIG's
+-includeall processing then descends into sys/select.h and generates
+bindings for glibc-private fd_set members using incompatible feature
+macro state.
+
+Shadow sys/types.h for SWIG so the C compiler continues to consume the
+real system headers without exposing their internals to wrapper
+generation.
+
+Backported to the M2Crypto 0.38.0 setup.py layout.
+
+Upstream-commit: 31dc63e9740345706a756b4f85b5b32197cd97d3
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: 9263e47d-1d35-4cc8-b145-186d89239c15
+---
+ setup.py                     | 2 ++
+ system_shadowing/sys/types.h | 1 +
+ 2 files changed, 3 insertions(+)
+ create mode 100644 system_shadowing/sys/types.h
+
+diff --git a/setup.py b/setup.py
+index a1d58f2..fb9e42a 100644
+--- a/setup.py
++++ b/setup.py
+@@ -148,6 +148,8 @@ class _M2CryptoBuildExt(build_ext.build_ext):
+                 # this shortly to come up with a better fix.
+                 self.swig_opts.append('-D_MSC_VER=1500')
+ 
++        self.swig_opts.append('-Isystem_shadowing')
++
+         if sys.version_info[:1] >= (3,):
+             self.swig_opts.append('-py3')
+ 
+diff --git a/system_shadowing/sys/types.h b/system_shadowing/sys/types.h
+new file mode 100644
+index 0000000..40a8c17
+--- /dev/null
++++ b/system_shadowing/sys/types.h
+@@ -0,0 +1 @@
++/* empty */
+-- 
+2.55.0
+

@@ -1,7 +1,7 @@
 Summary:        Crypto and SSL toolkit for Python
 Name:           m2crypto
 Version:        0.38.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Source0:        https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b
 Patch0:         0001-skip-test_tls1_nok-which-cant-be-run-in-FIPS.patch
 Patch1:         CVE-2020-25657.patch
 Patch2:         CVE-2019-11358.patch
+Patch3:         0002-swig-Workaround-for-reading-sys-select.h.patch
 
 %description
 M2Crypto is a crypto and SSL toolkit for Python
@@ -81,6 +82,11 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} \
 %{python3_sitelib}/*
 
 %changelog
+* Mon Sep 14 2026 Tobias Brick <tobiasb@microsoft.com> - 0.38.0-6
+- Backport the upstream SWIG system-header shadowing workaround so
+  OpenSSL 3.5's inclusion of sys/types.h does not generate bindings for
+  glibc-private fd_set members.
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.38.0-5
 - Replace deprecated `setup.py test` with `pytest` and document the
   two real upstream Python-3.12 incompatibilities (vendored
