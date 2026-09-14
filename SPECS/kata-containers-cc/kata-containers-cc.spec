@@ -17,6 +17,7 @@ Source1:      %{sourceName}-3.15.0.aks1-cargo.tar.gz
 Source2:      %{sourceName}-%{version}-vendor.tar.gz
 Patch0:       rust-1.90-fixes.patch
 Patch1:       CVE-2026-41602.patch
+<<<<<<< HEAD
 Patch2:       CVE-2025-5791.patch
 Patch3:       CVE-2025-4574.patch
 Patch4:       CVE-2026-42250.patch
@@ -28,6 +29,21 @@ Patch9:       CVE-2026-44210.patch
 Patch10:      rust-fix-unstable-name-collisions.patch
 Patch11:      CVE-2026-84445.patch
 Patch12:      rustix-remove-rustc-attrs.patch
+=======
+Patch2:       CVE-2026-39821.patch
+Patch3:       CVE-2026-33814.patch
+Patch4:       CVE-2025-5791.patch
+Patch5:       CVE-2025-4574.patch
+Patch6:       CVE-2026-42250.patch
+Patch7:       CVE-2026-56852.patch
+Patch8:       CVE-2026-43871.patch
+Patch9:       CVE-2026-48586.patch
+Patch10:      CVE-2026-55969.patch
+Patch11:      CVE-2026-50540.patch
+Patch12:      CVE-2026-44210.patch
+Patch13:      rust-fix-unstable-name-collisions.patch
+Patch14:      rustix-remove-rustc-attrs.patch
+>>>>>>> 0ce88c3eb9 (Fix patch number for rustix-remove-rustc-attrs.patch in kata-containers-cc.spec)
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
