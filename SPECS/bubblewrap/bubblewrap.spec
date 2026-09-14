@@ -8,10 +8,9 @@ Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/containers/bubblewrap/
 Source0:        https://github.com/containers/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
-BuildRequires:  autoconf
-BuildRequires:  automake
 BuildRequires:  libcap-devel
-BuildRequires:  libtool
+BuildRequires:  meson
+BuildRequires:  ninja-build
 Requires:       libcap
 
 %description
@@ -23,17 +22,16 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 %autosetup -p1
 
 %build
-%configure \
-    --disable-silent-rules \
-    --with-priv-mode=none \
-    --disable-man
-%make_build
+%meson \
+    -Dman=disabled \
+    -Dselinux=disabled
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 %check
-%make_build check
+%meson_test
 
 %files
 %defattr(-,root,root)
@@ -45,6 +43,10 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 %changelog
 * Mon Sep 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.0-1
 - Auto-upgrade to 0.12.0 - for CVE-2026-87766
+- Switch to the Meson build system, as upstream removed Autotools in 0.11.0
+- Replace autoconf/automake/libtool build dependencies with meson and ninja-build
+- Explicitly disable SELinux support to preserve prior behavior under
+  Meson's --auto-features=enabled
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.0-1
 - Auto-upgrade to 0.8.0 - Azure Linux 3.0 - package upgrades
