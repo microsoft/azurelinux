@@ -32,6 +32,7 @@ BuildRequires:  perl(overload)
 BuildRequires:  perl(parent)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(strict)
+BuildRequires:  perl(Unicode::Normalize)
 BuildRequires:  perl(utf8)
 BuildRequires:  perl(warnings)
 # Test Suite
