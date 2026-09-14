@@ -4,7 +4,7 @@
 Summary:        dnf equivalent using C libs
 Name:           tdnf
 Version:        3.5.8
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,10 @@ Patch6:         fix-tests-for-azl.patch
 Patch7:         tdnf-add-installonlypkgs-config.patch
 Patch8:         tdnf-installonlypkgs.patch
 Patch10:        tdnf-installonly-install-status.patch
+
+# Backport of upstream commit: fix: include epoch in Evr field of JSON transaction output:
+# https://github.com/vmware/tdnf/commit/45a5dd8fdb5c83cd7bb32c7e0f1b038be23d84d7
+Patch11:        tdnf-json-evr-epoch.patch
 
 #Cmake requires binutils
 BuildRequires:  binutils
@@ -242,6 +246,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Wed Sep 09 2026 Vince Perri <viperri@microsoft.com> - 3.5.8-9
+- Include the epoch in the Evr field of JSON transaction output
+
 * Fri Aug 22 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 3.5.8-8
 - Add kernel-hwe installonlypkgs entry
 
