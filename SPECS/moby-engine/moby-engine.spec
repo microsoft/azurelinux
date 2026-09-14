@@ -144,7 +144,7 @@ fi
 %{_unitdir}/*
 
 %changelog
-* Fri Sep 11 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 25.0.3-21
+* Fri Sep 11 2026 Muhammad Falak Wani <mwani@microsoft.com> - 25.0.3-21
 - Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-84304, CVE-2026-37236
 
 * Thu Aug 27 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 25.0.3-20
