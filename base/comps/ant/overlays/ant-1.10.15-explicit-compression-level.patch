@@ -1,0 +1,16 @@
+diff --git a/src/etc/testcases/taskdefs/zip.xml b/src/etc/testcases/taskdefs/zip.xml
+index 6eb89c79f..092e42fe9 100644
+--- a/src/etc/testcases/taskdefs/zip.xml
++++ b/src/etc/testcases/taskdefs/zip.xml
+@@ -55,8 +55,8 @@
+   </target>
+ 
+   <target name="test6">
+-    <zip destFile="${output}/test6.zip" basedir=".">
++    <zip destFile="${output}/test6.zip" basedir="." level="1">
+       <include name="*.xml" />
+       <exclude name="zip.*" />
+     </zip>
+   </target>
+-- 
+2.47.3

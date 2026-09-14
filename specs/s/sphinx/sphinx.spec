@@ -23,7 +23,7 @@
 
 Name:		sphinx
 Version:	2.2.11
-Release: 37%{?dist}
+Release: 38%{?dist}
 Summary:	Free open-source SQL full-text search engine
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:	GPL-2.0-or-later
@@ -96,7 +96,7 @@ Sphinx search engine, http://sphinxsearch.com/
 %package java
 Summary:		Java API for Sphinx
 BuildRequires:	java-devel
-Requires:		java-headless
+Requires: msopenjdk-25
 Requires:		jpackage-utils
 
 

@@ -27,7 +27,7 @@
 
 Name:          libwebp
 Version:       1.6.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL:           http://webmproject.org/
 Summary:       Library and tools for the WebP graphics format
 # Additional IPR is licensed as well. See PATENTS file for details
@@ -72,6 +72,7 @@ BuildRequires:  mingw64-giflib
 BuildRequires:  mingw64-libpng
 BuildRequires:  mingw64-libjpeg
 %endif
+BuildRequires: msopenjdk-25
 
 
 %description
@@ -110,7 +111,7 @@ images more efficiently.
 %package java
 Summary:       Java bindings for libwebp, a library for the WebP format
 Requires:      %{name}%{?_isa} = %{version}-%{release}
-Requires:      java-headless
+Requires: msopenjdk-25
 Requires:      jpackage-utils
 
 %description java
@@ -166,8 +167,8 @@ swig -ignoremissing -I../src -java \
     -o libwebp_java_wrap.c libwebp.swig
 
 gcc %{__global_ldflags} %{optflags} -shared \
-    -I/usr/lib/jvm/java/include \
-    -I/usr/lib/jvm/java/include/linux \
+    -I%{_jvmdir}/msopenjdk-25/include \
+    -I%{_jvmdir}/msopenjdk-25/include/linux \
     -I../src \
     -L../%{_vpath_builddir} -lwebp libwebp_java_wrap.c \
     -o libwebp_jni.so

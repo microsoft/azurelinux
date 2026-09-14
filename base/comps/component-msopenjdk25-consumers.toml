@@ -1,0 +1,249 @@
+# Remove this group once repository policy makes msopenjdk-25 the sole eligible
+# provider for these components' generic Java development dependencies.
+[component-groups.msopenjdk25-direct-consumers]
+description = "Components with generic Java development dependencies that must build with Microsoft OpenJDK 25"
+components = [
+    "R",
+    "brltty",
+    "capstone",
+    "gnulib",
+    "graphviz",
+    "hdf",
+    "hdf5",
+    "libphonenumber",
+    "libwebp",
+    "snowball",
+    "subversion",
+    "systemtap",
+    "vtk",
+    "z3",
+    "zbar",
+]
+
+[[component-groups.msopenjdk25-direct-consumers.default-component-config.overlays]]
+description = "Require Microsoft OpenJDK 25 for components with generic Java development dependencies"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "msopenjdk-25"
+
+[component-groups.msopenjdk25-direct-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+# Remove this group once repository policy makes msopenjdk-25 the sole eligible
+# provider for generic Java runtime dependencies.
+[component-groups.msopenjdk25-headless-consumers]
+description = "Components whose Java runtime dependency must resolve to Microsoft OpenJDK 25"
+components = [
+    "R",
+    "ant-contrib",
+    "antlr4-project",
+    "bsh",
+    "libwebp",
+    "octave",
+    "opencv",
+    "openmpi",
+    "sphinx",
+    "texlive-base",
+]
+
+[[component-groups.msopenjdk25-headless-consumers.default-component-config.overlays]]
+description = "Replace generic headless Java runtime requirements with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^Requires:\s+(java|java-25)-headless(\s+>=\s+1:1\.8)?$'
+replacement = 'Requires: msopenjdk-25'
+
+[component-groups.msopenjdk25-headless-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[component-groups.msopenjdk25-lujavrite-consumers]
+description = "Build LuJavRite exclusively with Microsoft OpenJDK 25"
+components = [
+    "lujavrite",
+]
+
+[[component-groups.msopenjdk25-lujavrite-consumers.default-component-config.overlays]]
+description = "Replace LuJavRite's Fedora OpenJDK build requirement with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+java-25-openjdk-devel$'
+replacement = 'BuildRequires:  msopenjdk-25'
+
+[component-groups.msopenjdk25-lujavrite-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[component-groups.msopenjdk25-lujavrite-consumers.default-component-config.overlays]]
+description = "Provide the Java filesystem macros used to locate Microsoft OpenJDK 25"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "javapackages-filesystem"
+
+[component-groups.msopenjdk25-lujavrite-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[component-groups.msopenjdk25-lujavrite-consumers.default-component-config.overlays]]
+description = "Use Microsoft OpenJDK 25 when CMake discovers LuJavRite's JNI headers"
+type = "spec-prepend-lines"
+section = "%conf"
+lines = ["export JAVA_HOME=%{_jvmdir}/msopenjdk-25"]
+
+[component-groups.msopenjdk25-lujavrite-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[component-groups.msopenjdk25-lujavrite-consumers.default-component-config.overlays]]
+description = "Run LuJavRite's JNI tests with Microsoft OpenJDK 25"
+type = "spec-prepend-lines"
+section = "%check"
+lines = ["export JAVA_HOME=%{_jvmdir}/msopenjdk-25"]
+
+[component-groups.msopenjdk25-lujavrite-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Remove this group once msopenjdk-25 provides versioned java-devel and
+# java-25-devel capabilities compatible with Fedora-derived requirements.
+[component-groups.msopenjdk25-versioned-devel-consumers]
+description = "Components whose versioned Java development dependency must resolve to Microsoft OpenJDK 25"
+components = [
+    "byteman",
+    "ecj",
+    "gdal",
+    "maven-verifier-plugin",
+    "tomcat",
+]
+
+[[component-groups.msopenjdk25-versioned-devel-consumers.default-component-config.overlays]]
+description = "Replace versioned Java development requirements with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+java(-25)?-devel\s+>=\s+(1:)?(1\.6\.0|11|17)$'
+replacement = 'BuildRequires: msopenjdk-25-fedora-compat'
+
+[component-groups.msopenjdk25-versioned-devel-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+# The epoch-0 compatibility package cannot satisfy this epoch-1 requirement.
+[component-groups.msopenjdk25-epoch-headless-consumers]
+description = "Components whose epoch-1 headless Java requirement must resolve to Microsoft OpenJDK 25"
+components = [
+    "byteman",
+]
+
+[[component-groups.msopenjdk25-epoch-headless-consumers.default-component-config.overlays]]
+description = "Replace Byteman's epoch-1 headless Java requirement with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^Requires:\s+java-25-headless\s+>=\s+1:1\.8$'
+replacement = 'Requires: msopenjdk-25-fedora-compat'
+
+[component-groups.msopenjdk25-epoch-headless-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+# Remove this group once msopenjdk-25 participates in the standard JVM directory
+# alternatives used by these components.
+[component-groups.msopenjdk25-java-home-consumers]
+description = "Retarget hardcoded Java homes to Microsoft OpenJDK 25"
+components = [
+    "ecj",
+]
+
+[[component-groups.msopenjdk25-java-home-consumers.default-component-config.overlays]]
+description = "Use Microsoft OpenJDK 25 for hardcoded Java homes"
+type = "spec-search-replace"
+regex = '^export JAVA_HOME=/usr/lib/jvm/java(-openjdk)?$'
+replacement = 'export JAVA_HOME=/usr/lib/jvm/msopenjdk-25'
+
+[component-groups.msopenjdk25-java-home-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+# Remove these groups once msopenjdk-25 provides the standard JVM directory
+# aliases used by Fedora-derived package sources and configuration files.
+[component-groups.msopenjdk25-antlr-java-home-consumers]
+description = "Components that build against the generic Java SDK directory"
+components = [
+    "antlr4-project",
+]
+
+[[component-groups.msopenjdk25-antlr-java-home-consumers.default-component-config.overlays]]
+description = "Use Microsoft OpenJDK 25 as ANTLR's build-time JAVA_HOME"
+type = "spec-search-replace"
+section = "%build"
+regex = '^export JAVA_HOME=%\{_jvmdir\}/java$'
+replacement = 'export JAVA_HOME=%{_jvmdir}/msopenjdk-25'
+
+[component-groups.msopenjdk25-antlr-java-home-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[component-groups.msopenjdk25-libwebp-jni-consumers]
+description = "Components that compile JNI bindings against the generic Java SDK directory"
+components = [
+    "libwebp",
+]
+
+[[component-groups.msopenjdk25-libwebp-jni-consumers.default-component-config.overlays]]
+description = "Use Microsoft OpenJDK 25 headers for libwebp's JNI binding"
+type = "spec-search-replace"
+section = "%build"
+regex = '/usr/lib/jvm/java/include'
+replacement = '%{_jvmdir}/msopenjdk-25/include'
+
+[component-groups.msopenjdk25-libwebp-jni-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[component-groups.msopenjdk25-tomcat-java-home-consumers]
+description = "Components whose installed configuration uses the generic JRE directory"
+components = [
+    "tomcat",
+]
+
+[[component-groups.msopenjdk25-tomcat-java-home-consumers.default-component-config.overlays]]
+description = "Use Microsoft OpenJDK 25 in Tomcat's system-wide configuration"
+type = "file-search-replace"
+file = "tomcat-10.1.conf"
+regex = 'JAVA_HOME="/usr/lib/jvm/jre"'
+replacement = 'JAVA_HOME="/usr/lib/jvm/msopenjdk-25"'
+
+[component-groups.msopenjdk25-tomcat-java-home-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[component-groups.msopenjdk25-libdb-jni-consumers]
+description = "Components whose carried source patches use the generic Java SDK directory"
+components = [
+    "libdb",
+]
+
+[[component-groups.msopenjdk25-libdb-jni-consumers.default-component-config.overlays]]
+description = "Retarget libdb's JNI include patch to Microsoft OpenJDK 25"
+type = "file-search-replace"
+file = "db-4.5.20-jni-include-dir.patch"
+regex = '/usr/lib/jvm/java/include'
+replacement = '/usr/lib/jvm/msopenjdk-25/include'
+
+[component-groups.msopenjdk25-libdb-jni-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# XMvn's jpackage-script generator does not derive a runtime dependency from
+# ECJ's Microsoft OpenJDK installation path.
+[component-groups.msopenjdk25-explicit-runtime-consumers]
+description = "Components that need an explicit Microsoft OpenJDK 25 runtime dependency"
+components = [
+    "ecj",
+]
+
+[[component-groups.msopenjdk25-explicit-runtime-consumers.default-component-config.overlays]]
+description = "Require Microsoft OpenJDK 25 at runtime"
+type = "spec-insert-tag"
+tag = "Requires"
+value = "msopenjdk-25"
+
+[component-groups.msopenjdk25-explicit-runtime-consumers.default-component-config.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"

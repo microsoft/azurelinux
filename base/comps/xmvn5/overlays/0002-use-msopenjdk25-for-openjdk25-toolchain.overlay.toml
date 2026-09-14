@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Require the Microsoft OpenJDK 25 Fedora compatibility package from the XMvn 5 toolchain"
+type = "spec-search-replace"
+section = "%install"
+regex = '^%jp_binding --verbose --base-pkg %\{name\}-minimal --binding-pkg %\{name\}-toolchain-openjdk25 .* --requires java-25-openjdk-devel$'
+replacement = '%jp_binding --verbose --base-pkg %{name}-minimal --binding-pkg %{name}-toolchain-openjdk25 --variant openjdk25 --ghost %{name}-toolchains.xml --target %{_datadir}/%{name}/conf/toolchains-openjdk25.xml --requires msopenjdk-25-fedora-compat'

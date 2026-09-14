@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Configure the active SystemTap Java support with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^%global java_config --with-java=%\{_jvmdir\}/java$'
+replacement = '%global java_config --with-java=%{_jvmdir}/msopenjdk-25'

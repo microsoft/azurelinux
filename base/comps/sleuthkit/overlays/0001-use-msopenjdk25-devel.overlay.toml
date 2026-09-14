@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Replace the versioned generic Java development dependency with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^BuildRequires:  java-devel >= 1:1\.6\.0$'
+replacement = 'BuildRequires:  msopenjdk-25'

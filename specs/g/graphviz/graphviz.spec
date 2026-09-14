@@ -109,7 +109,7 @@
 Name:			graphviz
 Summary:		Graph Visualization Tools
 Version:		13.1.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 License:		epl-1.0 AND cpl-1.0 AND bsd-3-clause AND mit AND gpl-3.0-or-later WITH bison-exception-2.2 AND apache-1.1 AND lgpl-2.0-or-later WITH libtool-exception AND smlnj AND hpnd-uc
 URL:			http://www.graphviz.org/
 #Source0:		https://gitlab.com/%%{name}/%%{name}/-/archive/%%{version}/%%{name}-%%{version}.tar.bz2
@@ -210,6 +210,7 @@ BuildRequires:		doxygen
 %if %{GOLANG}
 BuildRequires:		golang
 %endif
+BuildRequires: msopenjdk-25
 Requires:		urw-base35-fonts
 # rhbz#1838679
 Patch0:			graphviz-12.0.0-gvpack-neato-static.patch
@@ -421,7 +422,7 @@ autoreconf -fi
 
 %if %{JAVA}
 # Hack in the java includes we need
-sed -i 's|for try_java_include in|& %{java_home}/include/ %{java_home}/include/linux/|' configure
+sed -i 's|for try_java_include in|& %{_jvmdir}/msopenjdk-25/include/ %{_jvmdir}/msopenjdk-25/include/linux/|' configure
 %endif
 # Rewrite config_ruby.rb to work with Ruby 2.2
 sed -i 's|expand(|expand(RbConfig::|' config/config_ruby.rb

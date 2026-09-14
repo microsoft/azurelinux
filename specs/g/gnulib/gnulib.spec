@@ -81,6 +81,7 @@ BuildRequires:		git
 BuildRequires:      make
 BuildRequires:      ncurses-devel
 BuildRequires:      python3-devel
+BuildRequires: msopenjdk-25
 
 
 %description

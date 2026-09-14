@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Compare explicit ZIP compression levels because Java 25 default compression can match level 9"
+type = "patch-add"
+source = "ant-1.10.15-explicit-compression-level.patch"

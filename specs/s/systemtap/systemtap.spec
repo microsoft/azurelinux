@@ -259,6 +259,7 @@ BuildRequires: kernel-devel
 # and some of the same Requires: as below
 BuildRequires: dejagnu gcc make
 %endif
+BuildRequires: msopenjdk-25
 
 
 
@@ -677,7 +678,7 @@ or within a container.
 %endif
 
 %if %{with_java}
-%global java_config --with-java=%{_jvmdir}/java
+%global java_config --with-java=%{_jvmdir}/msopenjdk-25
 %else
 %global java_config --without-java
 %endif

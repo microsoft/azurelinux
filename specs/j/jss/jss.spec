@@ -74,16 +74,16 @@ ExcludeArch: i686
 
 %if 0%{?fedora} && 0%{?fedora} >= 43
 
-%define java_devel java-25-openjdk-devel
-%define java_headless java-25-openjdk-headless
-%define java_home %{_jvmdir}/jre-25-openjdk
+%define java_devel msopenjdk-25
+%define java_headless msopenjdk-25
+%define java_home %{_jvmdir}/msopenjdk-25
 %define maven_local maven-local-openjdk25
 
 %else
 
-%define java_devel java-25-openjdk-devel
-%define java_headless java-25-openjdk-headless
-%define java_home %{_jvmdir}/jre-25-openjdk
+%define java_devel msopenjdk-25
+%define java_headless msopenjdk-25
+%define java_home %{_jvmdir}/msopenjdk-25
 %define maven_local maven-local
 
 %endif
