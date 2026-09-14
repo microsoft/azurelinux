@@ -32,6 +32,7 @@ Patch20:        CVE-2026-86140.patch
 Patch21:        CVE-2026-86142.patch
 Patch22:        CVE-2026-86143.patch
 Patch23:        CVE-2026-86144.patch
+Patch24:        CVE-2026-74860.patch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
@@ -104,7 +105,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.11.5-11
-- Patch for CVE-2026-86144, CVE-2026-86143, CVE-2026-86142, CVE-2026-86140, CVE-2026-86138, CVE-2026-86137
+- Patch for CVE-2026-86144, CVE-2026-86143, CVE-2026-86142, CVE-2026-86140, CVE-2026-86138, CVE-2026-86137, CVE-2026-74860
 
 * Tue Mar 17 2026 Vijayender Putta <v-vijputta@microsoft.com> - 2.11.5-10
 - Patch for CVE-2026-0989
