@@ -28,6 +28,19 @@ container = false
 systemd = true
 runtime-package-management = true
 
+# ---- cvm-poc -----------------------------------------------------------
+
+[images.cvm-poc]
+description = "Unsigned CVM Image PoC"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "cvm-poc" }
+tests.tests = [{ name = "static-image-checks" }]
+
+[images.cvm-poc.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }

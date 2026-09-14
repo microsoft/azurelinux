@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="CvmCore" description="Confidential VM boot packages" import="false">
+            <requires profile="CloudGuestCore" />
+        </profile>
+        <profile name="cvm-poc" description="Unsigned Azure Linux CVM proof of concept" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="CvmCore" />
+        </profile>
+    </profiles>
+    <preferences arch="x86_64" profiles="cvm-poc">
+        <version>0.1.0</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="none"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            firmware="efi"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="512"
+            rootfs_label="azurelinux">
+            <bootloader name="custom" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="CvmCore">
+        <file name="config-cvm.sh" target="/image/config-cvm.sh" permissions="0755" />
+        <package name="findutils" />
+        <package name="kernel-uki-virt" />
+        <package name="shim-unsigned-x64" />
+        <package name="systemd-boot-unsigned" />
+        <package name="tpm2-tools" />
+    </packages>
+</image>
