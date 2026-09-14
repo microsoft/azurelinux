@@ -1,0 +1,165 @@
+From: sthelkar <sthelkar@microsoft.com>
+Date: Tue, 1 Sep 2026 00:00:00 +0000
+Subject: [PATCH] libmultipath: resume DM map after a failed remove
+
+During map teardown, _dm_flush_map() suspends the device-mapper map, calls
+DM_DEVICE_REMOVE, and on failure must resume the map. Two defects leave the map
+suspended indefinitely:
+
+  1. After a failed remove it runs `dm_is_mpath(mapname)` and treats any result
+     other than 1 as "removed externally", returning success WITHOUT resuming.
+     But dm_is_mpath() returns -1 on a query error (e.g. a transient ioctl
+     failure during SCSI/LUN churn), so an error is misread as a removal and the
+     suspend is leaked.
+  2. In the normal failed-remove case the resume is a single fire-and-forget
+     DM_DEVICE_RESUME whose result is never verified.
+
+DM suspend is owned by user space: the kernel never auto-resumes. A leaked
+suspend makes any page-cache flush / sync() on the device block forever in
+uninterruptible D state, the holder pins the per-gendisk open_mutex, and the
+hang spreads node-wide (sync_bdevs() walks every block device) until a reboot.
+
+Fix by verifying state instead of trusting ioctl return values:
+ - after DM_DEVICE_SUSPEND, confirm with dm_is_suspended();
+ - treat only dm_is_mpath()==0 (definitively not a multipath map) as an external
+   removal; a query error (<0) is NOT a removal;
+ - add dm_resume_and_verify(), which retries DM_DEVICE_RESUME once (as
+   dm_addmap_reload() already does) and confirms the map is no longer suspended;
+ - if the map cannot be resumed, log a critical error and return failure rather
+   than leaving it silently suspended.
+
+Signed-off-by: sthelkar <sthelkar@microsoft.com>
+---
+ libmultipath/devmapper.c | 92 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 85 insertions(+), 7 deletions(-)
+
+diff --git a/libmultipath/devmapper.c b/libmultipath/devmapper.c
+--- a/libmultipath/devmapper.c
++++ b/libmultipath/devmapper.c
+@@ -1054,6 +1054,38 @@
+ 	return 0;
+ }
+ 
++/*
++ * A failed DM_DEVICE_RESUME can leave the map suspended. Retry once (as
++ * dm_addmap_reload() does) and verify the final state with dm_is_suspended()
++ * instead of trusting the ioctl return value. Returns 1 if the map is active
++ * (or already gone), 0 if it is still suspended.
++ */
++static int
++dm_resume_and_verify(const char *mapname, uint16_t udev_flags)
++{
++	int i;
++
++	for (i = 0; i < 2; i++) {
++		int r = dm_simplecmd_noflush(DM_DEVICE_RESUME, mapname,
++					     udev_flags);
++		int suspended = dm_is_suspended(mapname);
++
++		if (suspended == 0)
++			return 1;
++
++		/* The map may have been removed by another process. */
++		if (suspended < 0 && dm_is_mpath(mapname) == 0)
++			return 1;
++
++		condlog(r ? 2 : 1,
++			"%s: resume attempt %d did not activate the map",
++			mapname, i + 1);
++	}
++
++	condlog(0, "%s: map remains suspended after resume attempts", mapname);
++	return 0;
++}
++
+ int _dm_flush_map (const char * mapname, int need_sync, int deferred_remove,
+ 		   int need_suspend, int retries)
+ {
+@@ -1097,8 +1129,29 @@
+ 	}
+ 
+ 	do {
+-		if (need_suspend && queue_if_no_path != -1)
++		if (need_suspend && queue_if_no_path != -1) {
++			int suspended;
++
+ 			dm_simplecmd_flush(DM_DEVICE_SUSPEND, mapname, 0);
++			suspended = dm_is_suspended(mapname);
++			if (suspended != 1) {
++				if (suspended < 0 && dm_is_mpath(mapname) == 0) {
++					condlog(4, "multipath map %s removed externally",
++						mapname);
++					r = 0;
++					goto out;
++				}
++				condlog(0, "%s: failed to suspend map", mapname);
++				/*
++				 * If the state query failed, defensively try to
++				 * resume in case the suspend ioctl took effect.
++				 */
++				if (suspended < 0)
++					dm_resume_and_verify(mapname, udev_flags);
++				r = 1;
++				goto out;
++			}
++		}
+ 
+ 		r = dm_device_remove(mapname, need_sync, deferred_remove);
+ 
+@@ -1111,26 +1164,47 @@
+ 			}
+ 			condlog(4, "multipath map %s removed", mapname);
+ 			return 0;
+-		} else if (dm_is_mpath(mapname) != 1) {
+-			condlog(4, "multipath map %s removed externally",
+-				mapname);
+-			return 0; /*we raced with someone else removing it */
+ 		} else {
+-			condlog(2, "failed to remove multipath map %s",
+-				mapname);
++			int is_mpath = dm_is_mpath(mapname);
++
++			if (is_mpath == 0) {
++				condlog(4, "multipath map %s removed externally",
++					mapname);
++				return 0; /* raced. someone else removed it */
++			}
++			/*
++			 * dm_is_mpath() < 0 is a query error, NOT a removal.
++			 * Do not treat it as 'removed externally' - that would
++			 * skip the resume and leak a suspended map.
++			 */
++			if (is_mpath < 0)
++				condlog(1, "%s: unable to verify map after failed remove",
++					mapname);
++			else
++				condlog(2, "failed to remove multipath map %s",
++					mapname);
++
+ 			if (need_suspend && queue_if_no_path != -1) {
+-				dm_simplecmd_noflush(DM_DEVICE_RESUME,
+-						     mapname, udev_flags);
++				if (!dm_resume_and_verify(mapname, udev_flags)) {
++					r = 1;
++					goto out;
++				}
++			}
++			if (is_mpath < 0) {
++				r = 1;
++				goto out;
+ 			}
+ 		}
+ 		if (retries)
+ 			sleep(1);
+ 	} while (retries-- > 0);
+ 
++	r = 1;
++out:
+ 	if (queue_if_no_path == 1)
+ 		dm_queue_if_no_path(mapname, 1);
+ 
+-	return 1;
++	return r;
+ }
+ 
+ #ifdef LIBDM_API_DEFERRED
