@@ -29,7 +29,7 @@ Patch10:      CVE-2026-55969.patch
 Patch11:      CVE-2026-50540.patch
 Patch12:      CVE-2026-44210.patch
 Patch13:      rust-fix-unstable-name-collisions.patch
-Patch9:       rustix-remove-rustc-attrs.patch
+Patch14:      rustix-remove-rustc-attrs.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
