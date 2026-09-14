@@ -190,37 +190,37 @@ make check -j1
 %files
 
 %files -n libpcre2-8-0
-%license COPYING LICENCE
-%doc AUTHORS ChangeLog NEWS README
+%license COPYING LICENCE.md
+%doc AUTHORS.md ChangeLog NEWS README
 %{_libdir}/libpcre2-8.so.*
 
 %files -n libpcre2-16-0
-%license LICENCE
+%license LICENCE.md
 %{_libdir}/libpcre2-16.so.*
 
 %files -n libpcre2-32-0
-%license LICENCE
+%license LICENCE.md
 %{_libdir}/libpcre2-32.so.*
 
 %files -n libpcre2-posix2
-%license LICENCE
+%license LICENCE.md
 %{_libdir}/libpcre2-posix.so.*
 
 %files tools
-%license LICENCE
+%license LICENCE.md
 %{_bindir}/pcre2grep
 %{_bindir}/pcre2test
 %{_mandir}/man1/pcre2grep.1.gz
 %{_mandir}/man1/pcre2test.1.gz
 
 %files doc
-%license COPYING LICENCE
-%doc AUTHORS ChangeLog NEWS README
+%license COPYING LICENCE.md
+%doc AUTHORS.md ChangeLog NEWS README
 %doc doc/html doc/*.txt
 %doc %{_defaultdocdir}/pcre2-doc
 
 %files devel
-%license LICENCE
+%license LICENCE.md
 %{_bindir}/pcre2-config
 %{_includedir}/*
 %{_libdir}/*.so

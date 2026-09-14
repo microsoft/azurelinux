@@ -16214,7 +16214,7 @@
         "other": {
           "name": "pcre2",
           "version": "10.48",
-          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.48-RC1/pcre2-10.48-RC1.tar.bz2"
+          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.bz2"
         }
       }
     },
