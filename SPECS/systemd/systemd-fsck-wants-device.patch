@@ -1,0 +1,49 @@
+Use Wants instead of BindsTo for the generated initrd root filesystem
+checker and the static systemd-fsck@ template. Keep their After ordering
+so initial device discovery still precedes the filesystem check.
+
+This experimental alternative avoids stopping the checker solely because
+udev temporarily withdraws its filesystem UUID alias. It adds no device
+locks and leaves sysroot.mount dependencies and its UUID-based source
+unchanged. The generated systemd-fsck-usr.service retains BindsTo.
+
+Wants does not propagate device activation failure or automatically stop
+the checker on device removal. This change also does not restore a
+missing UUID link or retry a failed root mount.
+
+Related issue: https://github.com/systemd/systemd/issues/43695
+
+diff --git a/src/shared/generator.c b/src/shared/generator.c
+--- a/src/shared/generator.c
++++ b/src/shared/generator.c
+@@ -225,7 +225,7 @@ static int write_fsck_sysroot_service(
+                 "Documentation=man:%2$s(8)\n"
+                 "\n"
+                 "DefaultDependencies=no\n"
+-                "BindsTo=%3$s\n"
++                "%7$s=%3$s\n"
+                 "Conflicts=shutdown.target\n"
+                 "After=%4$s%5$slocal-fs-pre.target %3$s\n"
+                 "Before=shutdown.target\n"
+@@ -240,7 +240,8 @@ static int write_fsck_sysroot_service(
+                 device,
+                 strempty(extra_after),
+                 isempty(extra_after) ? "" : " ",
+-                escaped2);
++                escaped2,
++                streq(unit, SPECIAL_FSCK_ROOT_SERVICE) ? "Wants" : "BindsTo");
+
+         r = fflush_and_check(f);
+         if (r < 0)
+diff --git a/units/systemd-fsck@.service.in b/units/systemd-fsck@.service.in
+--- a/units/systemd-fsck@.service.in
++++ b/units/systemd-fsck@.service.in
+@@ -11,7 +11,7 @@
+ Description=File System Check on %f
+ Documentation=man:systemd-fsck@.service(8)
+ DefaultDependencies=no
+-BindsTo=%i.device
++Wants=%i.device
+ Conflicts=shutdown.target
+ After=%i.device systemd-fsck-root.service local-fs-pre.target
+ Before=systemd-quotacheck.service shutdown.target
