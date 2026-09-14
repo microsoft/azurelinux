@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.8.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,21 +28,28 @@ Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-11065.patch
-Patch1:         CVE-2026-39829.patch
-Patch2:         CVE-2026-42506.patch
-Patch3:         CVE-2026-46597.patch
-Patch4:         CVE-2026-39821.patch
-Patch5:         CVE-2026-39830.patch
-Patch6:         CVE-2026-39834.patch
-Patch7:         CVE-2026-27136.patch
-Patch8:         CVE-2026-25680.patch
-Patch9:         CVE-2026-25681.patch
-Patch10:        CVE-2026-39827.patch
-Patch11:        CVE-2026-39828.patch
-Patch12:        CVE-2026-39835.patch
-Patch13:        CVE-2026-42502.patch
-Patch14:        CVE-2026-33814.patch
-Patch15:        CVE-2026-56852.patch
+Patch1:         CVE-2026-33814.patch
+Patch2:         CVE-2026-39821.patch
+Patch3:         CVE-2026-27136.patch
+Patch4:         CVE-2026-42506.patch
+Patch5:         CVE-2026-42502.patch
+Patch6:         CVE-2026-25680.patch
+Patch7:         CVE-2026-25681.patch
+Patch8:         CVE-2026-46600.patch
+Patch9:         CVE-2026-39827.patch
+Patch10:        CVE-2026-39828.patch
+Patch11:        CVE-2026-39835.patch
+Patch12:        CVE-2026-39829.patch
+Patch13:        CVE-2026-39834.patch
+Patch14:        CVE-2026-46597.patch
+Patch15:        CVE-2026-39830.patch
+Patch16:        CVE-2026-56852.patch
+Patch17:        CVE-2026-39824.patch
+Patch18:        0001-Add-LiveMigration-Blackout-Observability.patch
+Patch19:        0002-Fix-hotplug-volume-detach-deadlock-in-virt-handler.patch
+Patch20:        0003-Fix-cleanupAttachmentPods-fallback-keeping-useless-old-pods.patch
+Patch21:        0004-Propagate-launcher-pull-secret-to-hotplug-helper-pods.patch
+
  
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -297,6 +304,10 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Tue Sep 14 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.8.4-2
+- Add hot plug volume and live migration observability patches
+- Add CVE-2026-39824 and CVE 2026-26600 patches
+
 * Tue Aug 25 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.8.4-1
 - Upgrade KubeVirt to v1.8.4
 - Remove CVE-2026-35469.patch and CVE-2026-7374.patch as they are fixed upstream.
