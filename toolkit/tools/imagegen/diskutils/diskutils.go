@@ -24,7 +24,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/sys/unix"
 )
 
 var (
@@ -589,8 +588,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 		partIDToFsTypeMap[partition.ID] = partFsType
 	}
 
-	// sfdisk already updated the partition table. LUKS/LVM may now hold
-	// partions open, so wait for metadata without issuing BLKRRPART
+	// Wait for the disk's metadata to populate
 	err = WaitForDiskDevice(diskDevPath)
 	if err != nil {
 		return
@@ -1085,47 +1083,4 @@ func alignSectorAddress(sectorAddr, logicalSectorSize, physicalSectorSize uint64
 	}
 
 	return
-}
-
-func RefreshPartitions(diskDevPath string) error {
-	err := requestKernelRereadPartitionTable(diskDevPath)
-	if err != nil {
-		return fmt.Errorf("failed to request partition table reread (%s):\n%w", diskDevPath, err)
-	}
-
-	err = WaitForDiskDevice(diskDevPath)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Requests that the kernel reread the partition table for the given disk device.
-func requestKernelRereadPartitionTable(diskDevPath string) error {
-	diskFile, err := os.OpenFile(diskDevPath, os.O_RDONLY, 0)
-	if err != nil {
-		return err
-	}
-	defer diskFile.Close()
-
-	waitTime := 125 * time.Millisecond
-	retries := 10
-	for i := 0; ; i++ {
-		_, _, errno := unix.Syscall(unix.SYS_IOCTL, diskFile.Fd(), unix.BLKRRPART, 0)
-		switch {
-		case errno == unix.EBUSY && i < retries:
-			// Something else is using the disk at the moment.
-			// So, retry in a little bit.
-			time.Sleep(waitTime)
-			waitTime *= 2
-			continue
-
-		case errno != 0:
-			return errno
-
-		default:
-			return nil
-		}
-	}
 }
