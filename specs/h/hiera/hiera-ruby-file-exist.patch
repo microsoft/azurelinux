@@ -1,0 +1,42 @@
+Subject: [PATCH] Use File.exist? when reading the Hiera version
+
+File.exists? was removed in Ruby 3.2. Exercise real version-file reads
+and missing files rather than only stubbing read_version_file.
+
+diff --git a/lib/hiera/version.rb b/lib/hiera/version.rb
+--- a/lib/hiera/version.rb
++++ b/lib/hiera/version.rb
+@@ -83,5 +83,5 @@
+   def self.read_version_file(path)
+-    if File.exists?(path)
++    if File.exist?(path)
+       File.read(path).chomp
+     end
+   end
+diff --git a/spec/unit/version_spec.rb b/spec/unit/version_spec.rb
+--- a/spec/unit/version_spec.rb
++++ b/spec/unit/version_spec.rb
+@@ -27,6 +27,23 @@
+     end
+   end
+ 
++  context "reading a VERSION file" do
++    it "reads and trims an existing file" do
++      Dir.mktmpdir("hiera-version") do |directory|
++        version_file = File.join(directory, "VERSION")
++        File.write(version_file, "1.2.3\n")
++        expect(subject.send(:read_version_file, version_file)).to eq("1.2.3")
++      end
++    end
++
++    it "returns nil when the file is absent" do
++      Dir.mktmpdir("hiera-version") do |directory|
++        version_file = File.join(directory, "VERSION")
++        expect(subject.send(:read_version_file, version_file)).to be_nil
++      end
++    end
++  end
++
+   context "with a VERSION file" do
+     it "is the content of the file" do
+       subject.expects(:read_version_file).with() do |path|
