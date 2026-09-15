@@ -1,0 +1,51 @@
+diff -uNr hiera-3.6.0.ORIG/lib/hiera/util.rb hiera-3.6.0/lib/hiera/util.rb
+--- hiera-3.6.0.ORIG/lib/hiera/util.rb	2019-11-13 09:43:32.600045630 +0100
++++ hiera-3.6.0/lib/hiera/util.rb	2019-11-13 09:43:46.007065887 +0100
+@@ -20,7 +20,7 @@
+       if microsoft_windows?
+          File.join(common_appdata, 'PuppetLabs', 'puppet', 'etc')
+       else
+-        '/etc/puppetlabs/puppet'
++        '/etc/puppet'
+       end
+     end
+ 
+@@ -28,7 +28,7 @@
+       if microsoft_windows?
+         File.join(common_appdata, 'PuppetLabs', 'code')
+       else
+-        '/etc/puppetlabs/code'
++        '/etc/puppet/code'
+       end
+     end
+ 
+diff -uNr hiera-3.6.0.ORIG/spec/unit/util_spec.rb hiera-3.6.0/spec/unit/util_spec.rb
+--- hiera-3.6.0.ORIG/spec/unit/util_spec.rb	2019-11-13 09:43:32.601045631 +0100
++++ hiera-3.6.0/spec/unit/util_spec.rb	2019-11-13 09:44:42.269091590 +0100
+@@ -23,7 +23,7 @@
+   describe 'Hiera::Util.config_dir' do
+     it 'should return the correct path for posix systems' do
+       Hiera::Util.expects(:file_alt_separator).returns(nil)
+-      expect(Hiera::Util.config_dir).to eq('/etc/puppetlabs/puppet')
++      expect(Hiera::Util.config_dir).to eq('/etc/puppet')
+     end
+ 
+     it 'should return the correct path for microsoft windows systems' do
+@@ -36,7 +36,7 @@
+   describe 'Hiera::Util.code_dir' do
+     it 'should return the correct path for posix systems' do
+       Hiera::Util.expects(:file_alt_separator).returns(nil)
+-      expect(Hiera::Util.code_dir).to eq('/etc/puppetlabs/code')
++      expect(Hiera::Util.code_dir).to eq('/etc/puppet/code')
+     end
+ 
+     it 'should return the correct path for microsoft windows systems' do
+@@ -49,7 +49,7 @@
+   describe 'Hiera::Util.var_dir' do
+     it 'should return the correct path for posix systems' do
+       Hiera::Util.expects(:file_alt_separator).returns(nil)
+-      expect(Hiera::Util.var_dir).to eq('/etc/puppetlabs/code/environments/%{environment}/hieradata')
++      expect(Hiera::Util.var_dir).to eq('/etc/puppet/code/environments/%{environment}/hieradata')
+     end
+ 
+     it 'should return the correct path for microsoft windows systems' do
