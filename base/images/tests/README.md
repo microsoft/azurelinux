@@ -129,9 +129,8 @@ base/images/
         │   ├── test_os_release.py       # Shared: /etc/os-release
         │   ├── test_oci_config.py       # Shared (container): OCI Config.User unset
         │   ├── test_packages.py         # Shared: rpm-db checks (capability-gated)
-        │   ├── 1p-vm-base-gen2/         # 1P Gen2 VM-specific static tests
-        │   │   ├── test_kernel.py
-        │   │   └── test_partitions.py
+        │   ├── test_kernel.py           # Shared: kernel modules/config (require_capability("machine-bootable"))
+        │   ├── test_partitions.py       # Shared: partition layout (require_capability("machine-bootable"))
         │   └── container-base/          # Container-specific static tests
         │       └── test_container.py
         └── runtime/                     # Live container tests (via podman exec)
