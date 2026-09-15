@@ -40,6 +40,7 @@
         <package name="iproute" />
         <package name="iputils" />
         <package name="jq" />
+        <package name="keyutils" />
         <package name="less" />
         <package name="lsof" />
         <package name="man-db" />
