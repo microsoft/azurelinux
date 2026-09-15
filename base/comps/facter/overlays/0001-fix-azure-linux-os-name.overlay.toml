@@ -1,0 +1,33 @@
+# Drop once upstream normalizes both Azure Linux and Microsoft Azure Linux.
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Preserve Azure in OS-name facts for the two-word Azure Linux release identity"
+type = "patch-add"
+source = "../0001-fix-azure-linux-os-name.patch"
+
+[[overlays]]
+description = "Apply the OS-name normalization fix after unpacking the upstream gem"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P0 -p1"]
+
+[[overlays]]
+description = "Include regression checks because the upstream gem omits its test suite"
+type = "file-add"
+file = "test-os-name.rb"
+source = "../test-os-name.rb"
+
+[[overlays]]
+description = "Make the OS-name regression checks available to the RPM build"
+type = "spec-add-tag"
+tag = "Source3"
+value = "test-os-name.rb"
+
+[[overlays]]
+description = "Verify structured and legacy OS-name facts for both Azure Linux identities"
+type = "spec-append-lines"
+section = "%check"
+lines = ['GEM_HOME="%{buildroot}%{gem_dir}" ruby %{SOURCE3}']

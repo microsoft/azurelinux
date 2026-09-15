@@ -1,0 +1,16 @@
+Subject: [PATCH] Normalize both Azure Linux release names to AzureLinux
+
+Azure Linux 4 uses NAME="Azure Linux" rather than "Microsoft Azure Linux".
+Take the last two words so both identities retain Azure in the OS name.
+
+--- a/lib/facter/resolvers/os_release.rb
++++ b/lib/facter/resolvers/os_release.rb
+@@ -98,7 +98,7 @@
+                                 os_name = os_name.split(' ')[0..1].join
+                                 os_name
+                               elsif os_name.downcase.end_with?('azure linux')
+-                                os_name.split(' ')[1..2].join
++                                os_name.split(' ')[-2..-1].join
+                               elsif os_name.downcase.end_with?('mariner')
+                                 os_name.split(' ')[-1].strip
+                               else
