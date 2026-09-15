@@ -37,8 +37,6 @@ timeout 3
 console-mode keep
 EOF
 
-systemctl enable cloud-init-local.service cloud-init.service cloud-config.service cloud-final.service
-systemctl enable sshd.service systemd-networkd.service systemd-resolved.service
 ln -sfn /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 rm -f /etc/machine-id
