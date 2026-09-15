@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.12.15
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,7 +12,7 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # How to re-build this file:
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2024-45338.patch
 Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2025-22868.patch
@@ -44,6 +44,7 @@ Patch27:        CVE-2026-73500.patch
 Patch28:        CVE-2026-37236.patch
 Patch29:        CVE-2026-56855.patch
 Patch30:        CVE-2026-78662.patch
+Patch31:        CVE-2026-83530.patch
 
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
@@ -135,12 +136,14 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Tue Sep 15 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.12.15-13
+- Patch for CVE-2026-83530
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-13
 - Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
 
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-12
 - Patch for CVE-2026-73500
-
 
 * Tue Jul 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-11
 - Patch for CVE-2026-63308
