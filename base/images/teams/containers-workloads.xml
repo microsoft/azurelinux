@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <!--
+      Single-purpose "workload" container images: one well-known package (or
+      a small package family) shipped as a minimal, immediately-runnable OCI
+      image. These are distinct from the generic container-base/distroless
+      images in container.xml, which are meant to be extended by users.
+
+      Shared layers already defined in container.xml (ContainerCore,
+      PackageManagement) are reused here wherever the workload needs a
+      dnf-managed rootfs with a shell. Workload-specific shared layers (e.g.
+      PythonCore) are introduced only when two or more leaf profiles in this
+      file actually share package requirements.
+    -->
+    <profiles>
+        <profile name="busybox-workload" description="Azure Linux Busybox Container Image" import="false" />
+        <profile name="nginx-workload" description="Azure Linux Nginx Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
+        <profile name="postgres-workload" description="Azure Linux PostgreSQL Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
+        <profile name="telegraf-workload" description="Azure Linux Telegraf Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
+        <profile name="PythonCore" description="Shared Python runtime for python/pytorch workloads" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
+        <profile name="python-workload" description="Azure Linux Python Container Image" import="false">
+            <requires profile="PythonCore" />
+        </profile>
+        <profile name="nodejs-workload" description="Azure Linux Node.js Container Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="ContainerCore" />
+        </profile>
+        <profile name="pytorch-workload" description="Azure Linux PyTorch Container Image" import="false">
+            <requires profile="PythonCore" />
+        </profile>
+    </profiles>
+
+    <preferences profiles="busybox-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/busybox" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/sbin/busybox">
+                    <argument name="sh" />
+                </subcommand>
+            </containerconfig>
+        </type>
+    </preferences>
+
+    <!--
+      busybox-workload intentionally does not require ContainerCore: the
+      whole point of this image is a single statically-linked busybox binary
+      with no shell package (bash) alongside it. It duplicates the two
+      release/filesystem packages ContainerCore also carries, in exchange for
+      not depending on bash. Note that kiwi's dnf5 bootstrap machinery
+      (dnf5, bash, coreutils-single, rpm, ...) is still installed at build
+      time regardless of this profile's own package list: config.sh routes
+      this profile to config-container-base.sh in strip mode (see that
+      script) to force-remove bash/dnf5/rpm and autoremove everything not on
+      this profile's keep list, so the shipped image matches the documented
+      minimal footprint.
+    -->
+    <packages type="bootstrap" profiles="busybox-workload">
+        <package name="azurelinux-release-container" />
+        <package name="filesystem" />
+    </packages>
+    <packages type="image" profiles="busybox-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="azurelinux-release-container" />
+        <package name="filesystem" />
+        <package name="busybox" />
+    </packages>
+
+    <!--
+      nginx-workload reuses the shared ContainerCore + PackageManagement
+      layers (dnf-managed rootfs with bash) already used by the generic
+      container-base image, since nginx itself is typically run alongside a
+      shell for troubleshooting and its packaging expects a normal rootfs.
+    -->
+    <preferences profiles="nginx-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/nginx" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/sbin/nginx">
+                    <argument name="-g" />
+                    <argument name="&quot;daemon off;&quot;" />
+                </subcommand>
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="nginx-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="nginx" />
+    </packages>
+
+    <!--
+      postgres-workload reuses ContainerCore + PackageManagement, same as
+      nginx-workload. Note this image intentionally ships only the
+      postgres server binary itself (no entrypoint/initdb wrapper, no
+      dedicated data volume setup): the default subcommand runs the
+      version subcommand as a minimal, always succeeding smoke check.
+      Running an actual PostgreSQL server requires initializing a data
+      directory (initdb) as the postgres user and is out of scope for this
+      single purpose image; see containers to build analysis notes.
+    -->
+    <preferences profiles="postgres-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/postgres" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/postgres">
+                    <argument name="--version" />
+                </subcommand>
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="postgres-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="postgresql-server" />
+    </packages>
+
+    <!--
+      telegraf-workload reuses ContainerCore + PackageManagement, same as
+      nginx-workload and postgres-workload. Runs the telegraf agent using
+      its packaged default config (/etc/telegraf/telegraf.conf), which
+      has input plugins (cpu, mem, disk, etc.) enabled but no output
+      plugin configured. Running the default command as-is therefore
+      exits with "no outputs found" rather than reporting metrics; use
+      telegraf's test mode flag to gather metrics to stdout without a
+      configured output, or supply a custom config with an output plugin
+      enabled.
+    -->
+    <preferences profiles="telegraf-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/telegraf" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/telegraf" />
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="telegraf-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="telegraf" />
+    </packages>
+
+    <!--
+      PythonCore is the shared layer for python-workload and
+      pytorch-workload: both need only a bare python3 interpreter on top
+      of the usual ContainerCore + PackageManagement rootfs. Package
+      requirements specific to one leaf (e.g. python3-torch) are added
+      only in that leaf's own packages block.
+    -->
+    <packages type="image" profiles="PythonCore">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="python3" />
+    </packages>
+
+    <preferences profiles="python-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/python" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/python3" />
+            </containerconfig>
+        </type>
+    </preferences>
+
+    <!--
+      nodejs-workload reuses ContainerCore + PackageManagement, same as
+      nginx-workload/postgres-workload/telegraf-workload. Its default
+      subcommand starts the node REPL / can execute stdin scripts.
+    -->
+    <preferences profiles="nodejs-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/nodejs" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/node" />
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="nodejs-workload">
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <package name="nodejs" />
+    </packages>
+
+    <!--
+      pytorch-workload reuses the shared PythonCore layer (see
+      python-workload above) and adds only python3-torch on top. Default
+      subcommand runs python3 so users can `import torch` interactively or
+      via a stdin script.
+    -->
+    <preferences profiles="pytorch-workload">
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/workload/pytorch" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/usr/bin/python3" />
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="image" profiles="pytorch-workload">
+        <package name="python3-torch" />
+    </packages>
+</image>
