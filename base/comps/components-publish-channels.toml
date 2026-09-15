@@ -299,6 +299,7 @@ components = [
     "extra-enforcer-rules",
     "f2fs-tools",
     "fabtests",
+    "facter",
     "fakeroot",
     "fapolicyd",
     "fcoe-utils",
