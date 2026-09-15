@@ -43,6 +43,9 @@ cp %{SOURCE0} %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} \
 %{_datadir}/rust-bootstrap/%{version}/
 
 %changelog
+* Tue Sep 15 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.97.1-1
+- Upgrade to 1.97.1
+
 * Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.95.0-1
 - Original version for Azure Linux. Split out of rust.spec to keep its SRPM small.
 - License verified.
