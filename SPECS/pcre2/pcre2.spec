@@ -175,6 +175,13 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
 %make_install
 mkdir -p %{buildroot}/%{_defaultdocdir}
 mv %{buildroot}%{_docdir}/pcre2 %{buildroot}/%{_defaultdocdir}/pcre2-doc
+
+# Upstream ships the license files in 'dist_doc_DATA', so they also land in the
+# documentation directory. They are packaged via '%%license' below, so drop the
+# documentation copies to avoid duplicate license files.
+rm -f %{buildroot}/%{_defaultdocdir}/pcre2-doc/COPYING
+rm -f %{buildroot}/%{_defaultdocdir}/pcre2-doc/LICENCE.md
+
 #empty dependecy_libs
 find %{buildroot} -type f -name "*.la" -delete -print
 
