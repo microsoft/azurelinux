@@ -117,6 +117,7 @@ runtime-package-management = true
 [images.1p-vm-base-gen2]
 description = "1P VM Base Gen2 Image (UEFI)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2" }
+architectures = ["x86_64", "aarch64"]
 tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
