@@ -2875,6 +2875,34 @@
         "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
       },
       {
+        "name": "CONFIG_USB_NET_AX88179_178A",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable ASIX AX88179/178A USB Ethernet adapters - Work item: https://dev.azure.com/mariner-org/mariner/_workitems/edit/23845"
+      },
+      {
+        "name": "CONFIG_USB_NET_CDC_NCM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable CDC NCM USB Ethernet adapters - Work item: https://dev.azure.com/mariner-org/mariner/_workitems/edit/23845"
+      },
+      {
         "name": "CONFIG_USB_SERIAL_CH341",
         "values": [
           {
