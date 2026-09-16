@@ -13,7 +13,10 @@ overlays = [
     { type = "spec-update-tag", tag = "Version", value = "1004" },
 
     # WORKAROUND: manually bump the Release value for Stage2 bring-up.
-    { type = "spec-update-tag", tag = "Release", value = "2%{?dist}" },
+    { type = "spec-update-tag", tag = "Release", value = "3%{?dist}" },
+
+    # We don't provide gnome-srpm-macros
+    { type = "spec-search-replace", regex = "Requires: gnome-srpm-macros", replacement = "#Requires: gnome-srpm-macros"},
 
     # Provide compatibility with Fedora's upstream version.
     { type = "spec-add-tag", tag = "Provides", value = "redhat-rpm-config = %{version}-%{release}" },
