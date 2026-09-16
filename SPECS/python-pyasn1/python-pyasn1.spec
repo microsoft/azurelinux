@@ -1,17 +1,13 @@
 Summary:        Implementation of ASN.1 types and codecs in Python programming language
 Name:           python-pyasn1
-Version:        0.4.8
-Release:        3%{?dist}
+Version:        0.6.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/pyasn1
 Source0:        https://files.pythonhosted.org/packages/source/p/pyasn1/pyasn1-%{version}.tar.gz
-Patch0:         CVE-2026-30922.patch
-Patch1:         CVE-2026-59884.patch
-Patch2:         CVE-2026-59885.patch
-Patch3:         CVE-2026-59886.patch
 BuildArch:      noarch
 
 %description
@@ -20,6 +16,9 @@ This is an implementation of ASN.1 types and codecs in Python programming langua
 %package -n     python3-pyasn1
 Summary:        Implementation of ASN.1 types and codecs in Python programming language
 BuildRequires:  python3-devel
+BuildRequires:  python3-wheel
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
 Requires:       python3
 
 %description -n python3-pyasn1
@@ -31,13 +30,16 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 %autosetup -p1 -n pyasn1-%{version}
 
 %build
-%py3_build
+# pyasn1 0.6.4 no longer supports the legacy setup.py build path used by %%py3_build.
+%pyproject_wheel
 
 %install
-%py3_install
+# Install from the wheel using the modern pyproject-based packaging flow.
+%pyproject_install
 
 %check
-%python3 setup.py test
+# Upstream tests pass under pytest; setup.py test is no longer available.
+%pytest
 
 %files -n python3-pyasn1
 %defattr(-,root,root,-)
@@ -45,6 +47,9 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jul 24 2026 BinduSri Adabala <v-badabala@microsoft.com> - 0.6.4-1
+- Upgrade to 0.6.4
+
 * Fri Jul 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.4.8-3
 - Patch for CVE-2026-59886, CVE-2026-59885, CVE-2026-59884
 
