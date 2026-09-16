@@ -1,5 +1,5 @@
 Name:           nvidia-modprobe
-Version:        610.57.04
+Version:        610.43.02
 Release:        1%{?dist}
 Summary:        NVIDIA kernel module loader
 License:        GPLv2+

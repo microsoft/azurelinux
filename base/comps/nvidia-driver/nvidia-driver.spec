@@ -8,7 +8,7 @@
 %global _unpackaged_files_terminate_build 0
 
 Name:           nvidia-driver
-Version:        610.57.04
+Version:        610.43.02
 Release:        1%{?dist}
 Summary:        NVIDIA's proprietary display driver for NVIDIA graphic cards
 License:        NVIDIA License

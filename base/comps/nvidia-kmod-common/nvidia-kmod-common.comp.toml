@@ -5,7 +5,7 @@ spec = { type = "local", path = "nvidia-kmod-common.spec" }
 # only inside NVIDIA's self-extracting .run installer, so it is used as the
 # source and unpacked in %prep (mirrors nvidia's own nvidia-generate-tarballs.sh).
 [[components.nvidia-kmod-common.source-files]]
-filename = "NVIDIA-Linux-x86_64-610.57.04.run"
-hash = "4c9566625716ba7257ed2203dbbabfbc7a2dfdfc8bcb16678212ec809dc7ff470d12973ad86ce5f925b271d04239425f43088e8e591cb4ed7f77ec0c8612ffc0"
+filename = "NVIDIA-Linux-x86_64-610.43.02.run"
+hash = "aa626828964bd9b68dffd07865d2fb05de09b0fe944d6ff8af20412601fc72459186eee580e290c379e1a2b74f8e88c6ee406016814850952cf9330e64ab3032"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://download.nvidia.com/XFree86/Linux-x86_64/610.57.04/NVIDIA-Linux-x86_64-610.57.04.run" }
+origin = { type = "download", uri = "https://download.nvidia.com/XFree86/Linux-x86_64/610.43.02/NVIDIA-Linux-x86_64-610.43.02.run" }

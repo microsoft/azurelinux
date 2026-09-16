@@ -17,9 +17,9 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 9
+%define azl_pkgrelease 10
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
-%define nvidia_open_version 610.57.04
+%define nvidia_open_version 610.43.02
 %define gdrcopy_version 2.6
 %define gdrcopy_release 1
 %define ofa_version 26.04
@@ -4466,6 +4466,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Mon Sep 14 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.39-1.10
+- align NVIDIA open kernel modules with Fabric Manager 610.43.02
+
 * Tue Sep 08 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.39-1.9
 - feat(kernel): add GDRCopy userspace and prebuilt kernel module packages
 

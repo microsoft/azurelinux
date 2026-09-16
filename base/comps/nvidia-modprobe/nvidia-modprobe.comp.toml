@@ -2,7 +2,7 @@
 spec = { type = "local", path = "nvidia-modprobe.spec" }
 
 [[components.nvidia-modprobe.source-files]]
-filename = "nvidia-modprobe-610.57.04.tar.bz2"
-hash = "abfef56e453133ef057163041b7f9b62a23879791254a0cc8f0b10fd730d54e54ccad4056dc1a829fd2d3c2caebba2a8cc06839240ed8571bf5f699750dc6534"
+filename = "nvidia-modprobe-610.43.02.tar.bz2"
+hash = "c94f4c820744c183b8584e1b74e2e6f50c752fde52ab133055999c1eedc5096e0d2788ee1bd7476b959c243df1ff6ebb5fae5c56e92f87b99573f2e52ec75ed5"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://download.nvidia.com/XFree86/nvidia-modprobe/nvidia-modprobe-610.57.04.tar.bz2" }
+origin = { type = "download", uri = "https://download.nvidia.com/XFree86/nvidia-modprobe/nvidia-modprobe-610.43.02.tar.bz2" }

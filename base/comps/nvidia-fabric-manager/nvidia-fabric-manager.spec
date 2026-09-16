@@ -20,8 +20,7 @@ ExclusiveArch:  x86_64 aarch64
 %global fm_arch sbsa
 %endif
 
-# AZL: no fabricmanager release exactly matches the nvidia-open driver pin
-# (610.57.04); 610.43.02 is the latest available in the same 610.x branch.
+# Keep Fabric Manager exactly aligned with the nvidia-open driver pin.
 Source0:        https://developer.download.nvidia.com/compute/cuda/redist/fabricmanager/linux-%{fm_arch}/fabricmanager-linux-%{fm_arch}-%{version}-archive.tar.xz
 
 BuildRequires:  systemd-devel

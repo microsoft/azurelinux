@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           nvidia-modprobe
-Version:        610.57.04
-Release:        1%{?dist}
+Version:        610.43.02
+Release: 2%{?dist}
 Summary:        NVIDIA kernel module loader
 License:        GPLv2+
 URL:            http://www.nvidia.com/object/unix.html

@@ -1,5 +1,5 @@
 Name:       nvidia-open
-Version:    610.57.04
+Version:    610.43.02
 Release:    1%{?dist}
 Summary:    NVIDIA Driver meta-package
 License:    NVIDIA License

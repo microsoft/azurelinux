@@ -9,7 +9,7 @@
 %global __provides_exclude_from ^%{_prefix}/local/cuda-%{cuda_major}.%{cuda_minor}/compat/.*$
 
 Name:           cuda-compat
-Version:        610.57.04
+Version:        610.43.02
 Release:        1%{?dist}
 Summary:        CUDA Compatibility Platform
 License:        NVIDIA License
