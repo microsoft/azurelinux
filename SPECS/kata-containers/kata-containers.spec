@@ -44,7 +44,7 @@ This package contains the scripts and files required to build the UVM
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-%make_build RELEASE_VERSION=%{version}-%{release} package
+%make_build KATA_PACKAGE_VERSION=%{version}-%{release} package
 popd
 
 
