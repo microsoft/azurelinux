@@ -1,6 +1,11 @@
 ## START: Set by rpmautospec
 ## (rpmautospec version 0.8.3)
-## RPMAUTOSPEC: autochangelog
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
 ## END: Set by rpmautospec
 
 # This spec file has been modified by azldev to include build configuration overlays.
@@ -17,7 +22,7 @@ Name: azurelinux-rpm-config
 # the older branch. When the branch diverges, bump the Version to the Fedora
 # release number.
 Version: 1004
-Release: 8%{?dist}
+Release: %autorelease -b8
 # config.guess, config.sub are GPL-3.0-or-later WITH Autoconf-exception-generic
 License: GPL-1.0-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic
 URL: https://aka.ms/azurelinux
@@ -102,7 +107,7 @@ Requires: fonts-srpm-macros
 # ↓ Provides macros.forge and forge.lua originally shipped by us
 Requires: forge-srpm-macros
 Requires: gap-srpm-macros
-Requires: gnome-srpm-macros
+#Requires: gnome-srpm-macros
 Requires: go-srpm-macros
 Requires: java-srpm-macros
 # ↓ Provides kmod.attr originally shipped by us
