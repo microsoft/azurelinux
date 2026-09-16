@@ -11,7 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.github.com/docker/buildx
 Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        docker-buildx-0.14.0-govendor-v1.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         CVE-2025-0495.patch
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-39882.patch
