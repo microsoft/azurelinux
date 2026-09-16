@@ -1,7 +1,7 @@
 Summary:        A library for Perl-compatible regular expressions
 Name:           pcre2
-Version:        10.42
-Release:        3%{?dist}
+Version:        10.48
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -175,6 +175,13 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
 %make_install
 mkdir -p %{buildroot}/%{_defaultdocdir}
 mv %{buildroot}%{_docdir}/pcre2 %{buildroot}/%{_defaultdocdir}/pcre2-doc
+
+# Upstream ships the license files in 'dist_doc_DATA', so they also land in the
+# documentation directory. They are packaged via '%%license' below, so drop the
+# documentation copies to avoid duplicate license files.
+rm -f %{buildroot}/%{_defaultdocdir}/pcre2-doc/COPYING
+rm -f %{buildroot}/%{_defaultdocdir}/pcre2-doc/LICENCE.md
+
 #empty dependecy_libs
 find %{buildroot} -type f -name "*.la" -delete -print
 
@@ -190,37 +197,37 @@ make check -j1
 %files
 
 %files -n libpcre2-8-0
-%license COPYING LICENCE
-%doc AUTHORS ChangeLog NEWS README
+%license COPYING LICENCE.md
+%doc AUTHORS.md ChangeLog NEWS README
 %{_libdir}/libpcre2-8.so.*
 
 %files -n libpcre2-16-0
-%license LICENCE
+%license LICENCE.md
 %{_libdir}/libpcre2-16.so.*
 
 %files -n libpcre2-32-0
-%license LICENCE
+%license LICENCE.md
 %{_libdir}/libpcre2-32.so.*
 
 %files -n libpcre2-posix2
-%license LICENCE
+%license LICENCE.md
 %{_libdir}/libpcre2-posix.so.*
 
 %files tools
-%license LICENCE
+%license LICENCE.md
 %{_bindir}/pcre2grep
 %{_bindir}/pcre2test
 %{_mandir}/man1/pcre2grep.1.gz
 %{_mandir}/man1/pcre2test.1.gz
 
 %files doc
-%license COPYING LICENCE
-%doc AUTHORS ChangeLog NEWS README
+%license COPYING LICENCE.md
+%doc AUTHORS.md ChangeLog NEWS README
 %doc doc/html doc/*.txt
 %doc %{_defaultdocdir}/pcre2-doc
 
 %files devel
-%license LICENCE
+%license LICENCE.md
 %{_bindir}/pcre2-config
 %{_includedir}/*
 %{_libdir}/*.so
@@ -235,6 +242,9 @@ make check -j1
 %{_libdir}/*.a
 
 %changelog
+* Mon Sep 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.48-1
+- Auto-upgrade to 10.48 - for CVE-2026-89156, CVE-2026-89157, CVE-2026-86145, CVE-2026-89158, CVE-2026-89160, CVE-2026-89162
+
 * Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> 10.42-3
 - Drop coreutils BuildRequires to break dependency cycle between pcre2, libselinux, and coreutils.
 
