@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.32.0.kata0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -11,16 +11,41 @@ Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Todo: revert back to %{name}-${version}-cargo.tar.gz next release
 # This is a temporary workaround so we can use a newer cargo tarball without having to make a new fork release
-Source1:        %{name}-3.32.0.kata1-cargo.tar.gz
+# The cargo tarball carries the Rust ".cargo"/"vendor" trees plus the Go "src/runtime/vendor" tree.
+# How to re-build this file (the Rust crates are carried over from the previous tarball):
+#   1. wget https://github.com/microsoft/kata-containers/archive/refs/tags/%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. tar -xf %%{name}-3.32.0.kata1-cargo.tar.gz
+#   5. cd src/runtime
+#   6. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+#   7. go mod tidy
+#   8. go mod vendor
+#   9. cd ../..
+#  10. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -czf %%{name}-3.32.0.kata2-cargo.tar.gz .cargo vendor src/runtime/vendor
+#
+#   NOTES:
+#       - Step 4 restores the Rust ".cargo"/"vendor" trees, which are reused as-is;
+#         only the Go tree under "src/runtime/vendor" is regenerated.
+#       - Unlike the other Go vendor tarballs in this repo, this one is gzip compressed.
+#       - Steps 2-10 are also automated by generate_source_tarball.sh, which expects the
+#         previous cargo tarball next to --srcTarball:
+#           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 2
+Source1:        %{name}-3.32.0.kata2-cargo.tar.gz
 # Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
 Patch0:         dbs-arch-cpuid-unsafe.patch
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-41602.patch
-Patch3:         CVE-2026-56852.patch
-Patch4:         CVE-2026-50540.patch
-Patch5:         CVE-2026-77176.patch
+Patch3:         CVE-2026-50540.patch
+Patch4:         CVE-2026-77176.patch
+Patch5:         CVE-2026-84304.patch
 BuildRequires:  azurelinux-release
-BuildRequires:  golang
+BuildRequires:  golang >= 1.25
 BuildRequires:  protobuf-compiler
 BuildRequires:  rust >= 1.85.0
 BuildRequires:  libseccomp-devel
@@ -144,6 +169,10 @@ install -m 0644 \
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Sep 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.32.0.kata0-6
+- Patch for CVE-2026-84304
+- Removed patches CVE-2026-56852
+
 * Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-5
 - Patch for CVE-2026-77176
 

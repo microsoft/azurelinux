@@ -1,0 +1,142 @@
+#!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Quit on failure
+set -e
+
+PKG_VERSION=""
+SRC_TARBALL=""
+VENDOR_VERSION="2"
+OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# The cargo tarball ships three trees: the Rust ".cargo"/"vendor" pair produced by
+# "cargo vendor", and the Go "src/runtime/vendor" tree produced by "go mod vendor".
+# Regenerating the Rust half needs a full cargo fetch, so the previous cargo tarball
+# is reused for it and only the Go half is refreshed. The previous tarball is expected
+# next to --srcTarball.
+CARGO_VERSION_IN="3.32.0.kata1"
+
+# parameters:
+#
+# --srcTarball    : src tarball file
+#                   this file contains the 'initial' source code of the component
+#                   and should be replaced with the new/modified src code
+# --outFolder     : folder where to copy the new tarball(s)
+# --pkgVersion    : package version
+# --vendorVersion : vendor version, used as the "kata<N>" suffix of the cargo tarball
+#
+PARAMS=""
+while (( "$#" )); do
+    case "$1" in
+        --srcTarball)
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            SRC_TARBALL=$2
+            shift 2
+        else
+            echo "Error: Argument for $1 is missing" >&2
+            exit 1
+        fi
+        ;;
+        --outFolder)
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            OUT_FOLDER=$2
+            shift 2
+        else
+            echo "Error: Argument for $1 is missing" >&2
+            exit 1
+        fi
+        ;;
+        --pkgVersion)
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            PKG_VERSION=$2
+            shift 2
+        else
+            echo "Error: Argument for $1 is missing" >&2
+            exit 1
+        fi
+        ;;
+        --vendorVersion)
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            VENDOR_VERSION=$2
+            shift 2
+        else
+            echo "Error: Argument for $1 is missing" >&2
+            exit 1
+        fi
+        ;;
+        -*|--*=) # unsupported flags
+        echo "Error: Unsupported flag $1" >&2
+        exit 1
+        ;;
+        *) # preserve positional arguments
+        PARAMS="$PARAMS $1"
+        shift
+        ;;
+  esac
+done
+
+echo "--srcTarball      -> $SRC_TARBALL"
+echo "--outFolder       -> $OUT_FOLDER"
+echo "--pkgVersion      -> $PKG_VERSION"
+echo "--vendorVersion   -> $VENDOR_VERSION"
+
+if [ -z "$PKG_VERSION" ]; then
+    echo "--pkgVersion parameter cannot be empty"
+    exit 1
+fi
+
+SRC_TARBALL=$(readlink -f "$SRC_TARBALL")
+OUT_FOLDER=$(readlink -f "$OUT_FOLDER")
+
+PKG_NAME="kata-containers"
+CARGO_TARBALL_IN="$(dirname "$SRC_TARBALL")/$PKG_NAME-$CARGO_VERSION_IN-cargo.tar.gz"
+
+if [ ! -f "$CARGO_TARBALL_IN" ]; then
+    echo "Missing previous cargo tarball: $CARGO_TARBALL_IN"
+    exit 1
+fi
+
+echo "-- create temp folder"
+tmpdir=$(mktemp -d)
+function cleanup {
+    echo "+++ cleanup -> remove $tmpdir"
+    rm -rf $tmpdir
+}
+trap cleanup EXIT
+
+TARBALL_FOLDER="$tmpdir/tarballFolder"
+mkdir -p $TARBALL_FOLDER
+cp $SRC_TARBALL $tmpdir
+
+pushd $tmpdir > /dev/null
+
+NAME_VER="$PKG_NAME-$PKG_VERSION"
+VENDOR_TARBALL="$OUT_FOLDER/$PKG_NAME-3.32.0.kata$VENDOR_VERSION-cargo.tar.gz"
+
+echo "Unpacking source tarball..."
+tar -xf $SRC_TARBALL
+
+cd $NAME_VER
+
+echo "Unpacking previous cargo tarball..."
+tar -xf "$CARGO_TARBALL_IN"
+
+echo "Vendor go modules..."
+cd src/runtime
+go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+go mod tidy
+go mod vendor
+cd ../..
+
+echo ""
+echo "========================="
+echo "Tar vendored tarball"
+tar  --sort=name \
+     --mtime="2021-04-26 00:00Z" \
+     --owner=0 --group=0 --numeric-owner \
+     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+     -czf "$VENDOR_TARBALL" .cargo vendor src/runtime/vendor
+
+popd > /dev/null
+echo "$PKG_NAME vendored modules are available at $VENDOR_TARBALL"
