@@ -2,7 +2,7 @@
 %define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.12.1
+Version:        103.13.0
 Release:        %autorelease
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -80,7 +80,7 @@ source %{SOURCE3}
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_includedir}
-install inc/symcrypt* %{buildroot}%{_includedir}
+install inc/symcrypt*.h inc/symcrypt*.inc %{buildroot}%{_includedir}
 # Use cp -P to preserve symbolic links
 cp -P %{__cmake_builddir}/module/generic/libsymcrypt.so* %{buildroot}%{_libdir}
 chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
