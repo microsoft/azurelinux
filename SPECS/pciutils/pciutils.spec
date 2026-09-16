@@ -3,7 +3,7 @@
 Summary:        System utilities to list pci devices
 Name:           pciutils
 Version:        3.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,8 @@ Group:          System Environment/System Utilities
 URL:            https://mj.ucw.cz/sw/pciutils
 Source0:        https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz
 Requires:       %{name}-libs = %{version}-%{release}
+Provides:	/sbin/lspci /sbin/setpci
+Provides:	/bin/lspci
 
 %description
 The pciutils package contains a set of programs for listing PCI devices, inspecting their status and setting their configuration registers.
@@ -45,6 +47,10 @@ make DESTDIR=%{buildroot} \
     SHARED=yes \
     install install-lib
 
+%if "%{_sbindir}" != "%{_bindir}"
+ln -sr %{buildroot}/%{_bindir}/lspci %{buildroot}/%{_sbindir}/lspci
+%endif
+
 %files
 %doc README ChangeLog pciutils.lsm
 %defattr(-,root,root)
@@ -64,6 +70,9 @@ make DESTDIR=%{buildroot} \
 %{_includedir}/*
 
 %changelog
+* Mon Jun 2 2025 TD Mackey <tdmackey@booleanhaiku.com=> - 3.11.1-2
+- add /sbin/lspci symlink to /bin/lspci for backwarsd compatibility
+
 * Wed Feb 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.11.1-1
 - Upgrade to 3.11.1
 - Package new binary, lspci
