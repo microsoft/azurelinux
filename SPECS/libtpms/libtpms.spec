@@ -1,6 +1,6 @@
 Name:           libtpms
 Version:        0.9.6
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Library providing Trusted Platform Module (TPM) functionality
 License:        BSD and TCGL
 
@@ -13,6 +13,7 @@ Source1:        %{url}/releases/download/v%{version}/v%{version}.tar.gz.asc#/%{n
 Source2:        gpgkey-B818B9CADF9089C2D5CEC66B75AD65802A0B4211.asc
 Patch1:         0001-Export-RSA-private-key-primes-to-OpenSSL.patch
 Patch2:         CVE-2025-49133.patch
+Patch3:         CVE-2026-85769.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -67,6 +68,9 @@ make check
 %{_mandir}/man3/TPM*
 
 %changelog
+* Wed Sep 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.9.6-9
+- Patch for CVE-2026-85769
+
 * Tue Jun 17 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.9.6-8
 - Patch CVE-2025-49133
 
