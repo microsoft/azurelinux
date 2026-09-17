@@ -19,7 +19,7 @@ Patch3:         CVE-2026-35469.patch
 Patch4:         CVE-2026-84304.patch
 
 BuildRequires: bash
-BuildRequires: golang >= 1.25.0
+BuildRequires: golang >= 1.25
 
 # conflicting packages
 Conflicts: docker-ce
@@ -54,10 +54,11 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 
 %changelog
 * Wed Sep 16 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 0.14.0-17
-- Patch for CVE-2026-84304
-- Removed patches CVE-2024-45337, CVE-2024-45338, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911, CVE-2025-47913, CVE-2025-58190, 
-  CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821, CVE-2026-39827, CVE-2026-39829,CVE-2026-39830, CVE-2026-39832,
-  CVE-2026-39833, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502, CVE-2026-42506, CVE-2026-46597, CVE-2026-46598, CVE-2026-56852 
+- Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445.
+- Remove patches which are fixed in new generated vendor tarball: CVE-2024-45337, CVE-2024-45338, CVE-2025-22869,
+  CVE-2025-22872, CVE-2025-47911, CVE-2025-47913, CVE-2025-58190, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821,
+  CVE-2026-39827, CVE-2026-39829,CVE-2026-39830, CVE-2026-39832, CVE-2026-39833, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502,
+  CVE-2026-42506, CVE-2026-46597, CVE-2026-46598, CVE-2026-56852
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.14.0-16
 - Patch for CVE-2026-56852
