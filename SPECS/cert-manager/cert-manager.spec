@@ -12,7 +12,7 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # How to re-build this file:
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
-Source1:        %{name}-%{version}-vendor-v2.tar.gz
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 Patch0:         CVE-2024-45338.patch
 Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2025-30204.patch
