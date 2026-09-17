@@ -11,7 +11,7 @@ Epoch: 1
 Summary: Eclipse Compiler for Java
 Name: ecj
 Version: %{eclipse_ver}
-Release: 17%{?dist}
+Release: 18%{?dist}
 URL: https://www.eclipse.org
 License: EPL-2.0
 
@@ -29,11 +29,12 @@ ExclusiveArch:  %{java_arches} noarch
 
 BuildRequires: ant-openjdk25 
 BuildRequires: javapackages-local-openjdk25
-BuildRequires: java-25-devel >= 1:11
+BuildRequires: msopenjdk-25-fedora-compat
 
 # Explicit requires for javapackages-tools since ecj
 # uses /usr/share/java-utils/java-functions
 Requires:       javapackages-tools
+Requires: msopenjdk-25-fedora-compat
 
 %description
 ECJ is the Java bytecode compiler of the Eclipse Platform.  It is also known as

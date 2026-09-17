@@ -1,0 +1,14 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# The generic `java` requirement can resolve to Fedora OpenJDK while it remains
+# available in the repository. Remove this overlay once msopenjdk-25 is the sole
+# eligible provider for Z3's generic Java runtime dependency.
+[[overlays]]
+description = "Run the java-z3 bindings with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+section = "%package"
+package = "java-z3"
+regex = '^Requires:\s+java$'
+replacement = 'Requires: msopenjdk-25'

@@ -40,7 +40,7 @@
 
 Name: brltty
 Version: 6.8
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: LGPL-2.0-or-later AND LGPL-2.1-or-later AND GPL-2.0-or-later
 URL: http://brltty.app/
 Source0: http://brltty.app/archive/%{name}-%{version}.tar.xz
@@ -215,7 +215,7 @@ This package provides the Python 3 binding for BrlAPI.
 Version: %{api_version}
 Requires: brlapi%{?_isa} = %{api_version}-%{release}
 BuildRequires: jpackage-utils
-BuildRequires: java-devel
+BuildRequires: msopenjdk-25-fedora-compat
 Summary: Java binding for BrlAPI
 %description -n brlapi-java
 This package provides the Java binding for BrlAPI.

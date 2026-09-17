@@ -7476,7 +7476,7 @@ License: LPPL-1.3c
 Summary: Cross-platform Java application to query OS information
 Requires: texlive-base
 Requires: texlive-kpathsea
-Requires: java-headless
+Requires: msopenjdk-25
 # shell
 BuildArch: noarch
 

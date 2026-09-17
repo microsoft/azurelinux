@@ -1,0 +1,13 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+# Xerces sets includeJavaRuntime="true", which makes Ant inspect java.vendor.
+# Microsoft OpenJDK 25 reports "Microsoft", so Ant mistakes it for the legacy
+# Microsoft JVM and looks for ${java.home}/Packages/*.ZIP. That directory does
+# not exist in modern JDKs; JDK 25 provides runtime classes through modules.
+[[overlays]]
+description = "Let JDK 25 provide its modular runtime instead of synthesizing legacy Java paths"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["sed -i 's/includeJavaRuntime=\"true\"/includeJavaRuntime=\"false\"/g' build.xml"]
