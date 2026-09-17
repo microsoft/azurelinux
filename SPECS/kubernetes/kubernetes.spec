@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        30%{?dist}
+Release:        31%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,45 +18,54 @@ Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://dl.k8s.io/v%%{version}/kubernetes-src.tar.gz -O %%{name}-v%%{version}.tar.gz
+#   2. mkdir sources && tar -xf %%{name}-v%%{version}.tar.gz -C sources
+#   3. cd sources
+#   4. Raise the "go" directive to 1.26.0 in "go.mod", "go.work" and every "staging/src/k8s.io/*/go.mod".
+#   5. go mod edit -require=google.golang.org/grpc@v1.83.2 \
+#                  -require=github.com/google/cel-go@v0.31.0 \
+#                  -require=golang.org/x/crypto@v0.57.0
+#      Repeat for each "staging/src/k8s.io/*/go.mod" that already pins the module.
+#   6. go mod tidy
+#   7. rm -rf vendor && go work vendor
+#   8. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -czf %%{name}-v%%{version}-vendor.tar.gz vendor
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - Step 7 must use "go work vendor", not "go mod vendor": kubernetes is a Go workspace and
+#         "go mod vendor" would copy the 30 staging modules into "vendor", which upstream does not do.
+#       - Steps 2-8 are also automated by generate_source_tarball.sh:
+#           ./generate_source_tarball.sh --srcTarball %%{name}-v%%{version}.tar.gz \
+#               --outFolder /tmp --pkgVersion %%{version}
+Source2:        %{name}-v%{version}-vendor.tar.gz
 Patch0:         CVE-2024-28180.patch
-Patch1:         CVE-2024-45338.patch
-Patch2:         CVE-2025-27144.patch
-Patch3:         CVE-2025-22868.patch
-Patch4:         CVE-2025-22869.patch
-Patch5:         CVE-2024-51744.patch
-Patch6:         CVE-2025-30204.patch
-Patch7:         CVE-2025-22872.patch
-Patch8:         CVE-2025-4563.patch
-Patch9:         CVE-2025-31133.patch
-Patch10:        CVE-2025-52565.patch
-Patch11:        CVE-2025-13281.patch
-Patch12:        CVE-2025-65637.patch
-Patch13:        CVE-2025-52881.patch
-Patch14:        CVE-2025-47911.patch
-Patch15:        CVE-2025-58190.patch
-Patch16:        CVE-2026-35469.patch
-Patch17:        CVE-2026-39821.patch
-Patch18:        CVE-2026-39829.patch
-Patch19:        CVE-2026-39830.patch
-Patch20:        CVE-2026-39834.patch
-Patch21:        CVE-2026-42506.patch
-Patch22:        CVE-2026-46597.patch
-Patch23:        CVE-2026-27136.patch
-Patch24:        CVE-2026-25680.patch
-Patch25:        CVE-2026-25681.patch
-Patch26:        CVE-2026-39827.patch
-Patch27:        CVE-2026-39835.patch
-Patch28:        CVE-2026-42502.patch
-Patch29:        CVE-2026-56852.patch
-Patch30:        CVE-2024-7598.patch
-Patch31:        CVE-2026-73500.patch
-Patch32:        CVE-2026-37236.patch
-Patch33:        CVE-2026-56855.patch
-Patch34:        CVE-2026-78662.patch
+Patch1:         CVE-2025-27144.patch
+Patch2:         CVE-2024-51744.patch
+Patch3:         CVE-2025-30204.patch
+Patch4:         CVE-2025-4563.patch
+Patch5:         CVE-2025-31133.patch
+Patch6:         CVE-2025-52565.patch
+Patch7:         CVE-2025-13281.patch
+Patch8:         CVE-2025-52881.patch
+Patch9:         CVE-2026-35469.patch
+Patch10:        CVE-2024-7598.patch
+Patch11:        CVE-2026-73500.patch
+Patch12:        CVE-2026-37236.patch
+Patch13:        CVE-2026-84304.patch
+Patch14:        fix-cel-go-otelgrpc-api-migration.patch
+Patch15:        fix-vendor-modules-for-runc-backports.patch
+Patch16:        fix-non-constant-format-strings.patch
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
-BuildRequires:  golang < 1.25
+BuildRequires:  golang >= 1.26
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -126,7 +135,11 @@ Summary:        Kubernetes pause
 Pause component for Microsoft Kubernetes %{version}.
 
 %prep
-%autosetup -p1 -c -n %{name}
+%autosetup -N -c -n %{name}
+# Source0 ships a vendor tree pinned to the old module set; replace it wholesale.
+rm -rf vendor
+tar -xf %{SOURCE2} --no-same-owner
+%autopatch -p1
 
 %build
 # set version information
@@ -166,15 +179,17 @@ strip %{_builddir}/%{name}/node/bin/pause
 popd
 
 %check
-# patch test script so it supports golang 1.15 which is now used to build kubernetes
-cd %{_builddir}/%{name}/src/hack/make-rules
-patch -p1 test.sh < %{SOURCE2}
+# Without this the test harness honours .go-version and tries to fetch go1.22.12,
+# which both violates the "local only" toolchain policy and predates our go.work directive.
+export FORCE_HOST_GO=y
+export KUBE_GIT_TREE_STATE="clean"
+export KUBE_GIT_VERSION=v%{version}
 
 # perform unit tests
 # Note:
 #   - components are not unit tested the same way
 #   - not all components have unit
-cd %{_builddir}/%{name}/src
+cd %{_builddir}/%{name}
 components_to_test=$(ls -1 %{_builddir}/%{name}/node/bin)
 
 for component in ${components_to_test}; do
@@ -305,6 +320,13 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Thu Sep 17 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.30.10-31
+- Patch for CVE-2026-84304, CVE-2026-84445, CVE-2026-83530
+- Removed patches CVE-2024-45338, CVE-2025-22868, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911,
+  CVE-2025-58190, CVE-2025-65637, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821,
+  CVE-2026-39827, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502,
+  CVE-2026-42506, CVE-2026-46597, CVE-2026-56852, CVE-2026-56855, CVE-2026-78662
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-30
 - Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
 
