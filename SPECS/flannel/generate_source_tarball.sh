@@ -78,7 +78,7 @@ trap cleanup EXIT
 pushd $tmpdir > /dev/null
 
 NAME_VER="flannel-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor.tar.gz"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor-v2.tar.gz"
 
 echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL

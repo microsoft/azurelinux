@@ -11,13 +11,13 @@ Group:          System Environment/Libraries
 URL:            https://github.com/flannel-io/flannel
 Source0:        https://github.com/flannel-io/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor-v2.tar.gz
-Patch1:         CVE-2023-44487.patch
-Patch2:         CVE-2025-30204.patch
-Patch3:         CVE-2024-51744.patch
-Patch4:         CVE-2025-65637.patch
-Patch5:         CVE-2026-32241.patch
-Patch6:         CVE-2026-73500.patch
-Patch7:         CVE-2026-84445.patch
+Patch0:         CVE-2023-44487.patch
+Patch1:         CVE-2025-30204.patch
+Patch2:         CVE-2024-51744.patch
+Patch3:         CVE-2025-65637.patch
+Patch4:         CVE-2026-32241.patch
+Patch5:         CVE-2026-73500.patch
+Patch6:         CVE-2026-84445.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
@@ -57,7 +57,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 * Wed Sep 16 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 0.24.2-32
 - Patch for CVE-2026-84304, CVE-2026-84445
 - Upgrade vendored google.golang.org/grpc to v1.83.2
-- Removed patch for CVE-2024-24786, CVE-2023-45288,  CVE-2026-39821, CVE-2026-56852
+- Removed patch for CVE-2024-24786, CVE-2023-45288, CVE-2026-39821, CVE-2026-56852
 
 * Wed Aug 19 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.24.2-31
 - Bump to rebuild with updated glibc
