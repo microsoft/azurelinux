@@ -18,7 +18,7 @@ Patch2:         CVE-2026-39882.patch
 Patch3:         CVE-2026-35469.patch
 Patch4:         CVE-2026-84304.patch
 
-BuildRequires:  golang
+BuildRequires:  golang >= 1.25
 Requires:       docker-cli
 Obsoletes:      moby-compose < %{version}-%{release}
 Provides:       moby-compose = %{version}-%{release}
@@ -51,7 +51,8 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 
 %changelog
 * Wed Sep 17 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 2.27.0-14
-- Upgrade vendored google.golang.org/grpc to v1.83.2 to fix CVE-2026-84304
+- Patch for CVE-2026-84304 and CVE-2026-84445
+- Upgrade vendored google.golang.org/grpc to v1.83.2
 - Removed patches for CVE-2024-45337, CVE-2024-45338, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911, CVE-2025-47913, CVE-2025-58190, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821, CVE-2026-39827, CVE-2026-39829, CVE-2026-39830, CVE-2026-39832, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502, CVE-2026-42506, CVE-2026-46597, CVE-2026-46598, CVE-2026-56852
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-13
