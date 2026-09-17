@@ -22,7 +22,7 @@
 
 Summary:        Apache Ant
 Name:           ant
-Version:        1.10.14
+Version:        1.10.18
 Release:        1%{?dist}
 License:        ASL 2.0 AND W3C
 Vendor:         Microsoft Corporation
@@ -263,6 +263,9 @@ popd
 %{_bindir}/*.py*
 
 %changelog
+* Thu Sep 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.18-1
+- Auto-upgrade to 1.10.18 - for CVE-2026-78254
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.14-1
 - Auto-upgrade to 1.10.14 - Azure Linux 3.0 - package upgrades
 
