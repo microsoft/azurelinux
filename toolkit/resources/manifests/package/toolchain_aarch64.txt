@@ -542,15 +542,9 @@ python3-flit-core-3.9.0-1.azl3.noarch.rpm
 python3-gpg-1.23.2-2.azl3.aarch64.rpm
 python3-jinja2-3.1.2-3.azl3.noarch.rpm
 python3-libcap-ng-0.8.4-1.azl3.aarch64.rpm
-<<<<<<< HEAD
-python3-libmount-2.40.2-5.azl3.aarch64.rpm
-python3-libs-3.12.14-2.azl3.aarch64.rpm
-python3-libxml2-2.11.5-10.azl3.aarch64.rpm
-=======
 python3-libmount-2.40.2-6.azl3.aarch64.rpm
 python3-libs-3.12.14-1.azl3.aarch64.rpm
 python3-libxml2-2.11.5-11.azl3.aarch64.rpm
->>>>>>> 80278fd341 ([AutoPR- Security] Patch libxml2 for CVE-2026-86144, CVE-2026-86143, CVE-2026-86142, CVE-2026-86140, CVE-2026-86138, CVE-2026-86137, CVE-2026-74860 [HIGH] (#18738))
 python3-lxml-4.9.3-3.azl3.aarch64.rpm
 python3-magic-5.45-1.azl3.noarch.rpm
 python3-markupsafe-2.1.3-1.azl3.aarch64.rpm
