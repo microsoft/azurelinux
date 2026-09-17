@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
 Version:        10.25.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,22 +19,19 @@ Source0:        https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf azure-storage-%{name}-%{version}-vendor.tar.gz vendor
+#           -cf azure-storage-%{name}-%{version}-vendor-v2.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        azure-storage-%{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2025-22868.patch
-Patch1:         CVE-2025-30204.patch
-Patch2:         CVE-2025-22870.patch
-Patch3:         CVE-2024-51744.patch
-Patch4:         CVE-2026-39821.patch
-Patch5:         CVE-2026-56852.patch
+Source1:        azure-storage-%{name}-%{version}-vendor-v2.tar.gz
+Patch0:         CVE-2025-30204.patch
+Patch1:         CVE-2024-51744.patch
+Patch2:         CVE-2026-84445.patch
 
-BuildRequires:  golang >= 1.17.9
+BuildRequires: golang >= 1.25
 BuildRequires:  git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -69,6 +66,9 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 10.25.1-9
+- Add patch for CVE-2026-84445
+
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 10.25.1-8
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
   now selected automatically and supports CGO_ENABLED=0 on Linux.
