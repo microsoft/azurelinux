@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use Microsoft OpenJDK 25 compatibility development requirements"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+java(-25)?-devel$'
+replacement = "BuildRequires: msopenjdk-25-fedora-compat"

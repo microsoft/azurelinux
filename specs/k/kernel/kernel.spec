@@ -20,7 +20,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 3
+%define azl_pkgrelease 4
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.43.02
 # AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
@@ -714,7 +714,7 @@ BuildRequires: zlib-devel binutils-devel newt-devel perl(ExtUtils::Embed) bison 
 BuildRequires: audit-libs-devel python3-setuptools
 BuildRequires: capstone-devel
 BuildRequires: elfutils-debuginfod-client-devel
-BuildRequires: java-devel
+BuildRequires: msopenjdk-25
 BuildRequires: libbabeltrace-devel
 BuildRequires: libpfm-devel
 BuildRequires: libtraceevent-devel
@@ -4327,6 +4327,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Oct 16 2026 Nan Liu <liunan@microsoft.com> - 6.18.50-1.4
+- build(kernel): use Microsoft OpenJDK 25 for perf
+
 * Mon Oct 05 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.50-1.3
 - Add mlnx-ofa_kernel
 - Rebuild the initramfs when mlnx-ofa_kernel-modules is installed or removed

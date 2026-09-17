@@ -5,5 +5,5 @@ release = { calculation = "manual" }
 description = "Bump release"
 type = "spec-set-tag"
 tag = "Release"
-value = "95%{?dist}.2"
+value = "95%{?dist}.3"
 metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }

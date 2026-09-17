@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# OpenMPI's Java bindings require the generic `java-25-devel` capability, which
+# can select Fedora OpenJDK. Remove this overlay once msopenjdk-25 provides that
+# capability directly and is its sole eligible repository provider.
+[[overlays]]
+description = "Replace OpenMPI's versioned Java development requirement with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^Requires:\s+java-25-devel$'
+replacement = 'Requires: msopenjdk-25-fedora-compat'
