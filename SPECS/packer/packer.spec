@@ -25,7 +25,7 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -czf %%{name}-%%{version}-vendor-v5.tar.gz vendor
+#           -czf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
