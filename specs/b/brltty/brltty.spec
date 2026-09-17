@@ -40,7 +40,7 @@
 
 Name: brltty
 Version: 6.8
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: LGPL-2.0-or-later AND LGPL-2.1-or-later AND GPL-2.0-or-later
 URL: http://brltty.app/
 Source0: http://brltty.app/archive/%{name}-%{version}.tar.xz
@@ -81,6 +81,7 @@ BuildRequires: python2-setuptools
 BuildRequires: python3-docutils
 BuildRequires: python3-setuptools
 %endif
+BuildRequires: msopenjdk-25
 Conflicts: brltty-minimal
 
 # work around a bug in the install process:
@@ -280,7 +281,7 @@ unset MAKEFLAGS
 
 %if %{with java}
 # Add the openjdk include directories to CPPFLAGS
-for i in -I/usr/lib/jvm/java/include{,/linux}; do
+for i in -I%{_jvmdir}/msopenjdk-25/include{,/linux}; do
       java_inc="$java_inc $i"
 done
 export CPPFLAGS="$java_inc"

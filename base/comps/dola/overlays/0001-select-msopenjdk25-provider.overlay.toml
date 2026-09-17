@@ -1,0 +1,29 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Require Microsoft OpenJDK compatibility when building Dola"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "msopenjdk-25-fedora-compat"
+
+[[overlays]]
+description = "Prevent Fedora epoch-1 OpenJDK from entering the Dola buildroot"
+type = "spec-insert-tag"
+tag = "BuildConflicts"
+value = "java-25-openjdk-headless >= 1:0"
+
+[[overlays]]
+description = "Require Microsoft OpenJDK compatibility when installing Dola"
+type = "spec-insert-tag"
+package = "bsx"
+tag = "Requires"
+value = "msopenjdk-25-fedora-compat"
+
+[[overlays]]
+description = "Prevent Fedora epoch-1 OpenJDK from satisfying Dola runtime dependencies"
+type = "spec-insert-tag"
+package = "bsx"
+tag = "Conflicts"
+value = "java-25-openjdk-headless >= 1:0"

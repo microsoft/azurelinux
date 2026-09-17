@@ -38,7 +38,7 @@
 
 Name:           R
 Version:        %{major_version}.%{minor_version}.%{patch_version}
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        A language for data analysis and graphics
 
 License:        GPL-2.0-or-later
@@ -78,7 +78,7 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  valgrind-devel
 %endif
 %ifarch %{java_arches}
-BuildRequires:  java-devel
+BuildRequires: msopenjdk-25-fedora-compat
 %endif
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -91,6 +91,7 @@ BuildRequires:  tex(upquote.sty)
 # No inconsolata on RHEL tex
 BuildRequires:  tex(inconsolata.sty)
 %endif
+BuildRequires: msopenjdk-25
 
 # R-devel will pull everything else
 Requires:       R-devel%{?_isa} = %{version}-%{release}
@@ -254,7 +255,7 @@ environment.
 %package java
 Summary:        R with Fedora provided Java Runtime Environment
 Requires(post): R-core%{?_isa} = %{version}-%{release}
-Requires:       java-headless
+Requires: msopenjdk-25
 
 %description java
 A language and environment for statistical computing and graphics.
@@ -329,7 +330,7 @@ export R_PDFVIEWER="%{_bindir}/xdg-open"
 export R_BROWSER="%{_bindir}/xdg-open"
 
 %ifarch %{java_arches}
-export JAVA_HOME=%{_jvmdir}/jre
+export JAVA_HOME=/usr/lib/jvm/msopenjdk-25
 %endif
 
 %configure \

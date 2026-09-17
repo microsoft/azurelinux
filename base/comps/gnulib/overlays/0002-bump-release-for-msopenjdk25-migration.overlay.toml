@@ -1,0 +1,19 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Bump gnulib release for the Microsoft OpenJDK 25 migration"
+type = "spec-update-tag"
+tag = "Release"
+value = "57.%{gitdate}git%{?dist}"
+
+[[overlays]]
+description = "Record the gnulib Microsoft OpenJDK 25 migration"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Thu Sep 17 2026 Nan Liu <liunan@microsoft.com> - 0-57.20251223git",
+    "- Migrate to Microsoft OpenJDK 25",
+    "",
+]

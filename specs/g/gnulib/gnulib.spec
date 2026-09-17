@@ -51,7 +51,7 @@ It can be used to improve portability and other functionality in your programs.
 
 Name:     gnulib
 Version:  0
-Release:  56.%{gitdate}git%{?dist}
+Release: 57.%{gitdate}git%{?dist}
 Summary:  GNU Portability Library
 License:  Public Domain and BSD and GPLv2+ and GPLv3 and GPLv3+ and LGPLv2 and LGPLv2+ and LGPLv3+
 URL:      https://www.gnu.org/software/gnulib
@@ -81,6 +81,7 @@ BuildRequires:		git
 BuildRequires:      make
 BuildRequires:      ncurses-devel
 BuildRequires:      python3-devel
+BuildRequires: msopenjdk-25
 
 
 %description
@@ -295,6 +296,9 @@ It can be enabled for specific files by setting appropriate git attributes.
 
 #-------------------------------------------------------------------------
 %changelog
+* Thu Sep 17 2026 Nan Liu <liunan@microsoft.com> - 0-57.20251223git
+- Migrate to Microsoft OpenJDK 25
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0-56.20251223git
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

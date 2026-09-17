@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use Microsoft OpenJDK 25 JNI headers for Graphviz Java support"
+type = "spec-search-replace"
+section = "%build"
+regex = '^sed -i .s\|for try_java_include in\|& %\{java_home\}/include/ %\{java_home\}/include/linux/\|. configure$'
+replacement = "sed -i 's|for try_java_include in|& %{_jvmdir}/msopenjdk-25/include/ %{_jvmdir}/msopenjdk-25/include/linux/|' configure"

@@ -134,7 +134,7 @@ f /var/log/stap-server/log 0644 stap-server stap-server -
 Name: systemtap
 # PRERELEASE
 Version: 5.5
-Release: 1%{?release_override}%{?dist}
+Release: 2%{?release_override}%{?dist}
 # for version, see also configure.ac
 
 
@@ -259,6 +259,7 @@ BuildRequires: kernel-devel
 # and some of the same Requires: as below
 BuildRequires: dejagnu gcc make
 %endif
+BuildRequires: msopenjdk-25
 
 
 
@@ -677,7 +678,7 @@ or within a container.
 %endif
 
 %if %{with_java}
-%global java_config --with-java=%{_jvmdir}/java
+%global java_config --with-java=%{_jvmdir}/msopenjdk-25
 %else
 %global java_config --without-java
 %endif
@@ -1378,6 +1379,9 @@ exit 0
 
 # PRERELEASE
 %changelog
+* Thu Sep 17 2026 Nan Liu <liunan@microsoft.com> - 5.5-2
+- Migrate to Microsoft OpenJDK 25
+
 * Fri May 01 2026 Frank Ch. Eigler <fche@redhat.com> - 5.5-1
 - Upstream release, see wiki page below for detailed notes.
   https://sourceware.org/systemtap/wiki/SystemTapReleases

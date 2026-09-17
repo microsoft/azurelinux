@@ -1,0 +1,19 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Back the Maven OpenJDK 25 binding with the Microsoft Fedora compatibility package"
+type = "spec-search-replace"
+section = "%package"
+package = "maven-local-openjdk25"
+regex = '^Requires:\s+java-25-openjdk-devel$'
+replacement = 'Requires:       msopenjdk-25-fedora-compat'
+
+[[overlays]]
+description = "Back the javapackages OpenJDK 25 binding with the Microsoft Fedora compatibility package"
+type = "spec-search-replace"
+section = "%package"
+package = "javapackages-local-openjdk25"
+regex = '^Requires:\s+java-25-openjdk-devel$'
+replacement = 'Requires:       msopenjdk-25-fedora-compat'

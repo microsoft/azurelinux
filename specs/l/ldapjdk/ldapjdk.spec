@@ -16,7 +16,7 @@ Name:             ldapjdk
 # Downstream release number:
 # - development/stabilization (unsupported): 0.<n> where n >= 1
 # - GA/update (supported): <n> where n >= 1
-%global           release_number 2
+%global           release_number 3
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
@@ -57,9 +57,9 @@ ExclusiveArch:    %{java_arches} noarch
 # Java
 ################################################################################
 
-%define java_devel java-25-openjdk-devel
-%define java_headless java-25-openjdk-headless
-%define java_home %{_jvmdir}/jre-25-openjdk
+%define java_devel msopenjdk-25
+%define java_headless msopenjdk-25
+%define java_home %{_jvmdir}/msopenjdk-25
 %define maven_local maven-local-openjdk25
 
 ################################################################################
@@ -165,6 +165,9 @@ ln -sf %{name}/ldaptools.pom %{buildroot}%{_mavenpomdir}/JPP-ldaptools.pom
 
 ################################################################################
 %changelog
+* Thu Sep 17 2026 Nan Liu <liunan@microsoft.com> - 5.6.0-3
+- Migrate to Microsoft OpenJDK 25
+
 * Fri Nov 28 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 5.6.0-2
 - Really rebuilt for java-25-openjdk as system jdk
 

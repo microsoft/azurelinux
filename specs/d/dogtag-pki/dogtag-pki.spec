@@ -19,7 +19,7 @@ Name:             dogtag-pki
 # Downstream release number:
 # - development/stabilization (unsupported): 0.<n> where n >= 1
 # - GA/update (supported): <n> where n >= 1
-%global           release_number 1
+%global           release_number 2
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
@@ -76,18 +76,18 @@ ExcludeArch: i686
 
 %if 0%{?fedora} && 0%{?fedora} >= 43 || 0%{?rhel} >= 11
 
-%define java_runtime java-25-openjdk
-%define java_devel java-25-openjdk-devel
-%define java_headless java-25-openjdk-headless
-%define java_home %{_jvmdir}/jre-25-openjdk
+%define java_runtime msopenjdk-25
+%define java_devel msopenjdk-25
+%define java_headless msopenjdk-25
+%define java_home %{_jvmdir}/msopenjdk-25
 %define maven_local maven-local-openjdk25
 
 %else
 
-%define java_runtime java-25-openjdk
-%define java_devel java-25-openjdk-devel
-%define java_headless java-25-openjdk-headless
-%define java_home %{_jvmdir}/jre-25-openjdk
+%define java_runtime msopenjdk-25
+%define java_devel msopenjdk-25
+%define java_headless msopenjdk-25
+%define java_home %{_jvmdir}/msopenjdk-25
 %define maven_local maven-local-openjdk25
 
 %endif
@@ -2077,6 +2077,9 @@ fi
 
 ################################################################################
 %changelog
+* Thu Sep 17 2026 Nan Liu <liunan@microsoft.com> - 11.8.0-2
+- Migrate to Microsoft OpenJDK 25
+
 * Tue Nov 04 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> - 11.8.0-1
 - Rebase to PKI 11.8.0
 

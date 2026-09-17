@@ -58,7 +58,7 @@
 
 Name:          gdal
 Version:       3.11.5
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:       GIS file format library
 License:       MIT
 URL:           http://www.gdal.org
@@ -165,7 +165,7 @@ BuildRequires: python3dist(lxml) >= 4.5.1
 %if %{with java}
 # For 'mvn_artifact' and 'mvn_install'
 BuildRequires: ant-openjdk25
-BuildRequires: java-devel >= 1:1.6.0
+BuildRequires: msopenjdk-25-fedora-compat
 BuildRequires: javapackages-local-openjdk25
 BuildRequires: jpackage-utils
 %endif
@@ -414,6 +414,7 @@ cp -a %{SOURCE4} .
 
 
 %build
+export JAVA_HOME=%{_jvmdir}/msopenjdk-25
 %cmake \
   -DCMAKE_INSTALL_INCLUDEDIR=include/gdal \
   -DGDAL_USE_EXTERNAL_LIB=ON \

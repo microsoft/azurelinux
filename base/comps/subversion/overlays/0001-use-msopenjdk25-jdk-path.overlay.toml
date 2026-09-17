@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use Microsoft OpenJDK 25 as the JDK for the active JavaHL binding"
+type = "spec-search-replace"
+regex = '^%define jdk_path /usr/lib/jvm/java$'
+replacement = '%define jdk_path %{_jvmdir}/msopenjdk-25'

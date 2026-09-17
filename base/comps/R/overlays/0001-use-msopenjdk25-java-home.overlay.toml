@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use Microsoft OpenJDK 25 as JAVA_HOME when configuring R Java support"
+type = "spec-search-replace"
+section = "%build"
+regex = '^export JAVA_HOME=%\{_jvmdir\}/jre$'
+replacement = 'export JAVA_HOME=/usr/lib/jvm/msopenjdk-25'

@@ -1,0 +1,19 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Bump Dogtag PKI release for the Microsoft OpenJDK 25 migration"
+type = "spec-search-replace"
+regex = '^%global\s+release_number 1$'
+replacement = "%global           release_number 2"
+
+[[overlays]]
+description = "Record the Dogtag PKI Microsoft OpenJDK 25 migration"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Thu Sep 17 2026 Nan Liu <liunan@microsoft.com> - 11.8.0-2",
+    "- Migrate to Microsoft OpenJDK 25",
+    "",
+]

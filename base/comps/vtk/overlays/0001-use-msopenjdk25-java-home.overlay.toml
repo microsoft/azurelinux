@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use Microsoft OpenJDK 25 as JAVA_HOME for the active VTK Java wrapper"
+type = "spec-search-replace"
+section = "%build"
+regex = '^export JAVA_HOME=%\{_prefix\}/lib/jvm/java$'
+replacement = 'export JAVA_HOME=%{_jvmdir}/msopenjdk-25'

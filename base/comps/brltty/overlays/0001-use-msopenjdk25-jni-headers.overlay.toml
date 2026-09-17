@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use Microsoft OpenJDK 25 JNI headers for the active brlapi Java binding"
+type = "spec-search-replace"
+section = "%build"
+regex = '^for i in -I/usr/lib/jvm/java/include\{,/linux\}; do$'
+replacement = 'for i in -I%{_jvmdir}/msopenjdk-25/include{,/linux}; do'

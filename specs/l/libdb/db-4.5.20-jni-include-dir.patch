@@ -6,7 +6,7 @@ diff -up db-4.7.25/dist/configure.ac.jni db-4.7.25/dist/configure.ac
  	AC_PROG_JAR
  	AC_PROG_JAVA
 -	AC_JNI_INCLUDE_DIR
-+	JNI_INCLUDE_DIRS="/usr/lib/jvm/java/include /usr/lib/jvm/java/include/linux"
++	JNI_INCLUDE_DIRS="/usr/lib/jvm/msopenjdk-25/include /usr/lib/jvm/msopenjdk-25/include/linux"
  
  	AC_MSG_CHECKING(java version)
          case "$JAVA" in
