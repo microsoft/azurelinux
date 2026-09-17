@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.12.15
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,38 +12,26 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # How to re-build this file:
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2024-45338.patch
 Patch1:         CVE-2025-27144.patch
-Patch2:         CVE-2025-22868.patch
-Patch3:         CVE-2025-22869.patch
-Patch4:         CVE-2025-30204.patch
-Patch5:         CVE-2025-32386.patch
-Patch6:         CVE-2025-22872.patch
-Patch7:         CVE-2025-11065.patch
-Patch8:         CVE-2025-47911.patch
-Patch9:         CVE-2025-58190.patch
-Patch10:        CVE-2026-35469.patch
-Patch11:        CVE-2026-27136.patch
-Patch12:        CVE-2026-39829.patch
-Patch13:        CVE-2026-39830.patch
-Patch14:        CVE-2026-39834.patch
-Patch15:        CVE-2026-42506.patch
-Patch16:        CVE-2026-46597.patch
-Patch17:        CVE-2026-39821.patch
-Patch18:        CVE-2026-25680.patch
-Patch19:        CVE-2026-25681.patch
-Patch20:        CVE-2026-39827.patch
-Patch21:        CVE-2026-39828.patch
-Patch22:        CVE-2026-39835.patch
-Patch23:        CVE-2026-42502.patch
-Patch24:        CVE-2026-33814.patch
-Patch25:        CVE-2026-56852.patch
-Patch26:        CVE-2026-63308.patch
-Patch27:        CVE-2026-73500.patch
-Patch28:        CVE-2026-37236.patch
-Patch29:        CVE-2026-56855.patch
-Patch30:        CVE-2026-78662.patch
+Patch2:         CVE-2025-30204.patch
+Patch3:         CVE-2025-32386.patch
+Patch4:         CVE-2025-22872.patch
+Patch5:         CVE-2025-11065.patch
+Patch6:         CVE-2025-47911.patch
+Patch7:         CVE-2025-58190.patch
+Patch8:         CVE-2026-35469.patch
+Patch9:         CVE-2026-27136.patch
+Patch10:        CVE-2026-42506.patch
+Patch11:        CVE-2026-42502.patch
+Patch12:        CVE-2026-33814.patch
+Patch13:        CVE-2026-63308.patch
+Patch14:        CVE-2026-73500.patch
+Patch15:        CVE-2026-37236.patch
+Patch16:        CVE-2026-56855.patch
+Patch17:        CVE-2026-78662.patch
+Patch18:        CVE-2026-84445.patch
 
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
@@ -135,12 +123,17 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Tue Sep 15 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.12.15-14
+- Patch for CVE-2026-83530, CVE-2026-84445
+- Removed patch for CVE-2025-22868,  CVE-2025-22869, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834,
+  CVE-2026-46597, CVE-2026-39821, CVE-2026-25680, CVE-2026-25681, CVE-2026-39827, CVE-2026-39828,
+  CVE-2026-39835, CVE-2026-56852
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-13
 - Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
 
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-12
 - Patch for CVE-2026-73500
-
 
 * Tue Jul 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-11
 - Patch for CVE-2026-63308
