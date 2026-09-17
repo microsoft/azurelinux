@@ -17,7 +17,7 @@ Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version
 # 1. wget https://github.com/kube-vip/%%{name}/archive/refs/tags/v%%{version}tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/toolkit/scripts/build_go_vendor_cache.sh %%{name}-%%{version}.tar.gz
 
-Source1: %{name}-%{version}-vendor-v2.tar.gz
+Source1: %{name}-%{version}-vendor-v3.tar.gz
 
 Patch0:       CVE-2026-73500.patch
 Patch1:       CVE-2026-37236.patch
