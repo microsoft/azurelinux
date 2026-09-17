@@ -19,7 +19,7 @@
 Summary:        CNI plugin providing multiple interfaces in containers
 Name:           multus
 Version:        4.0.2
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,22 +27,9 @@ Group:          System/Management
 URL:            https://github.com/intel/multus-cni
 Source0:        https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %define commit efdc0a5c7d1ea4bb236d638403420448b48782b3
-Patch0:         CVE-2023-3978.patch
-Patch1:         CVE-2023-44487.patch
-Patch2:         CVE-2023-45288.patch
-Patch3:         CVE-2024-45338.patch
-# CVE-2025-22872 will be fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
-Patch4:         CVE-2025-22872.patch
-Patch5:         CVE-2025-47911.patch
-Patch6:         CVE-2025-58190.patch
-Patch7:         CVE-2026-27136.patch
-Patch8:         CVE-2026-39821.patch
-Patch9:         CVE-2026-42506.patch
-Patch10:        CVE-2026-25680.patch
-Patch11:        CVE-2026-25681.patch
-Patch12:        CVE-2026-42502.patch
-Patch13:        CVE-2026-56852.patch
-BuildRequires:  golang < 1.25
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Patch0:         CVE-2026-84304.patch
+BuildRequires:  golang >= 1.25
 BuildRequires:  golang-packaging
 
 %description
@@ -63,7 +50,10 @@ This package contains the yaml file requried to download and run Multus
 containers in a Kubernetes cluster.
 
 %prep
-%autosetup -p1 -n %{name}-cni-%{version}
+%autosetup -n %{name}-cni-%{version} -N
+rm -rf vendor
+tar -xzf %{SOURCE1}
+%autopatch -p1
 
 %build
 VERSION=%{version} COMMIT=%{commit} ./hack/build-go.sh
@@ -84,6 +74,12 @@ install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
+ Thu Sep 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 4.0.2-11
+- Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445.
+- Remove patches which are fixed in new generated vendor tarball:CVE-2023-3978, CVE-2023-44487,
+  CVE-2023-45288, CVE-2024-45338, CVE-2025-22872, CVE-2025-47911, CVE-2025-58190, CVE-2026-27136,
+  CVE-2026-39821, CVE-2026-42506, CVE-2026-25680, CVE-2026-25681, CVE-2026-42502, CVE-2026-56852
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.0.2-10
 - Patch for CVE-2026-56852
 
