@@ -1,0 +1,22 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# The imported subpackage summary does not identify Microsoft OpenJDK as R's
+# selected Java provider.
+[[overlays]]
+description = "Describe Microsoft OpenJDK as R's Java runtime provider"
+type = "spec-update-tag"
+section = "%package"
+package = "java"
+tag = "Summary"
+value = "R with Microsoft provided Java Runtime Environment"
+
+# The imported package description explicitly names Fedora's OpenJDK runtime.
+[[overlays]]
+description = "Describe Microsoft OpenJDK in R's Java package details"
+type = "spec-search-replace"
+section = "%description"
+package = "java"
+regex = "^Fedora's openJDK\\.$"
+replacement = 'Microsoft Build of OpenJDK 25.'

@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 2
+%define azl_pkgrelease 3
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.57.04
 
@@ -700,7 +700,7 @@ BuildRequires: zlib-devel binutils-devel newt-devel perl(ExtUtils::Embed) bison 
 BuildRequires: audit-libs-devel python3-setuptools
 BuildRequires: capstone-devel
 BuildRequires: elfutils-debuginfod-client-devel
-BuildRequires: java-devel
+BuildRequires: msopenjdk-25
 BuildRequires: libbabeltrace-devel
 BuildRequires: libpfm-devel
 BuildRequires: libtraceevent-devel
@@ -4283,6 +4283,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Tue Oct 13 2026 Nan Liu <liunan@microsoft.com> - 6.18.50-1.3
+- build(kernel): use Microsoft OpenJDK 25 for perf
+
 * Fri Oct 02 2026 Chris Co <chrco@microsoft.com> - 6.18.50-1.2
 - feat(kernel): enable PCIe EDR for DPC
 

@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Sleuth Kit's epoch-qualified generic Java requirement can select Fedora
+# OpenJDK. Remove this overlay once msopenjdk-25 provides the matching `java`
+# capability and is its sole eligible repository provider.
+[[overlays]]
+description = "Replace Sleuth Kit's epoch-qualified Java runtime requirement with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^Requires:\s+java\s+>=\s+1:1\.17$'
+replacement = 'Requires: msopenjdk-25'

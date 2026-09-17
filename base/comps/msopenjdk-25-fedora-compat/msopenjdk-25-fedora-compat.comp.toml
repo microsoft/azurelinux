@@ -1,0 +1,2 @@
+[components.msopenjdk-25-fedora-compat]
+spec = { type = "local", path = "msopenjdk-25-fedora-compat.spec" }
