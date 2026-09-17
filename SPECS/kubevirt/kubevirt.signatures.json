@@ -1,5 +1,6 @@
 {
   "Signatures": {
-    "kubevirt-1.8.4.tar.gz": "5bfd1d3490b1abb0e9dfe43d4f7034f8e8e8a97cdc0889b8abf396a0fb77ee35"
+    "kubevirt-1.8.4.tar.gz": "5bfd1d3490b1abb0e9dfe43d4f7034f8e8e8a97cdc0889b8abf396a0fb77ee35",
+    "kubevirt-1.8.4-vendor.tar.gz": "a6c01705cc27dd43354302ea6cca54818ed8a220a10390f1af087ced16b37e95"
   }
 }
