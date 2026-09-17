@@ -1,7 +1,11 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
 Version:        0.0.10
+<<<<<<< HEAD
 Release:        9%{?dist}
+=======
+Release:        10%{?dist}
+>>>>>>> df59a69ed0 ([HIGH] Patch `kube-vip-cloud-provider` for CVE-2026-84445, CVE-2026-84304 and CVE-2026-83530 (#18835))
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
 Group:          Applications/Text
@@ -17,8 +21,9 @@ Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version
 # 1. wget https://github.com/kube-vip/%%{name}/archive/refs/tags/v%%{version}tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/toolkit/scripts/build_go_vendor_cache.sh %%{name}-%%{version}.tar.gz
 
-Source1: %{name}-%{version}-vendor.tar.gz
+Source1: %{name}-%{version}-vendor-v3.tar.gz
 
+<<<<<<< HEAD
 Patch1:        CVE-2023-47108.patch
 Patch2:        CVE-2024-45338.patch
 # CVE-2025-22872 is fixed in go net version .38.0 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
@@ -34,8 +39,13 @@ Patch11:       CVE-2026-42502.patch
 Patch12:       CVE-2026-56852.patch
 Patch13:       CVE-2026-73500.patch
 Patch14:       CVE-2026-37236.patch
+=======
+Patch0:       CVE-2026-73500.patch
+Patch1:       CVE-2026-37236.patch
+Patch2:       CVE-2026-84445.patch
+>>>>>>> df59a69ed0 ([HIGH] Patch `kube-vip-cloud-provider` for CVE-2026-84445, CVE-2026-84304 and CVE-2026-83530 (#18835))
 
-BuildRequires: golang >= 1.22
+BuildRequires: golang >= 1.25
 
 %description
 The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups.
@@ -54,6 +64,15 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+<<<<<<< HEAD
+=======
+* Wed Sep 16 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.0.10-10
+- Patch for CVE-2026-84445, CVE-2026-84304, CVE-2026-83530
+- Removed patch for CVE-2024-45338, CVE-2025-22872, CVE-2025-47911, CVE-2025-58190, CVE-2026-39821,
+  CVE-2026-42506, CVE-2026-27136, CVE-2026-25680, CVE-2026-25681, CVE-2026-42502, CVE-2026-56852
+- Pinned golang >= v1.25
+
+>>>>>>> df59a69ed0 ([HIGH] Patch `kube-vip-cloud-provider` for CVE-2026-84445, CVE-2026-84304 and CVE-2026-83530 (#18835))
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.10-9
 - Patch for CVE-2026-37236
 
