@@ -31,8 +31,6 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        cli-%{version}-vendor-v2.tar.gz
-
-
 Patch0:         jose-go127-registerhash.patch
 Patch1:         CVE-2026-84304.patch
 
@@ -69,9 +67,10 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 * Wed Sep 16 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 8.7.11-9
 - Patch for CVE-2026-84304, CVE-2026-84445
 - Upgrade vendored google.golang.org/grpc to v1.83.2
-- Removed patches for CVE-2024-45337, CVE-2024-45338, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911, CVE-2025-58190, CVE-2026-27136,
-  CVE-2026-39821, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834, CVE-2026-42506, CVE-2026-46597, CVE-2026-25680, CVE-2026-25681,
-  CVE-2026-39827, CVE-2026-39828, CVE-2026-39835, CVE-2026-42502, CVE-2026-56852
+- Removed patches for CVE-2024-45337, CVE-2024-45338, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911,
+  CVE-2025-58190, CVE-2026-27136, CVE-2026-39821, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834,
+  CVE-2026-42506, CVE-2026-46597, CVE-2026-25680, CVE-2026-25681, CVE-2026-39827, CVE-2026-39828,
+  CVE-2026-39835, CVE-2026-42502, CVE-2026-56852
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-8
 - Patch for CVE-2026-56852
