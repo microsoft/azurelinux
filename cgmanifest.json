@@ -12161,8 +12161,8 @@
         "type": "other",
         "other": {
           "name": "libXfont2",
-          "version": "2.0.8",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.8.tar.xz"
+          "version": "2.0.9",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.9.tar.xz"
         }
       }
     },
