@@ -77,13 +77,13 @@ trap cleanup EXIT
 
 pushd $tmpdir > /dev/null
 
-NAME_VER="compose-$PKG_VERSION"
+NAME_VER="docker-compose-$PKG_VERSION"
 VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-govendor-v2.tar.gz"
 
 echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
 
-cd "$NAME_VER"
+cd "compose-$PKG_VERSION"
 go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
 go mod tidy
 echo "Get vendored modules"
