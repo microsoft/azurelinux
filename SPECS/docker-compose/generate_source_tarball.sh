@@ -7,17 +7,15 @@ set -e
 
 PKG_VERSION=""
 SRC_TARBALL=""
-VENDOR_VERSION="1"
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # parameters:
 #
-# --srcTarball    : src tarball file
-#                   this file contains the 'initial' source code of the component
-#                   and should be replaced with the new/modified src code
-# --outFolder     : folder where to copy the new tarball(s)
-# --pkgVersion    : package version
-# --vendorVersion : vendor version
+# --srcTarball  : src tarball file
+#                 this file contains the 'initial' source code of the component
+#                 and should be replaced with the new/modified src code
+# --outFolder   : folder where to copy the new tarball(s)
+# --pkgVersion  : package version
 #
 PARAMS=""
 while (( "$#" )); do
@@ -49,15 +47,6 @@ while (( "$#" )); do
             exit 1
         fi
         ;;
-        --vendorVersion)
-        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-            VENDOR_VERSION=$2
-            shift 2
-        else
-            echo "Error: Argument for $1 is missing" >&2
-            exit 1
-        fi
-        ;;
         -*|--*=) # unsupported flags
         echo "Error: Unsupported flag $1" >&2
         exit 1
@@ -69,10 +58,9 @@ while (( "$#" )); do
   esac
 done
 
-echo "--srcTarball      -> $SRC_TARBALL"
-echo "--outFolder       -> $OUT_FOLDER"
-echo "--pkgVersion      -> $PKG_VERSION"
-echo "--vendorVersion   -> $VENDOR_VERSION"
+echo "--srcTarball   -> $SRC_TARBALL"
+echo "--outFolder    -> $OUT_FOLDER"
+echo "--pkgVersion   -> $PKG_VERSION"
 
 if [ -z "$PKG_VERSION" ]; then
     echo "--pkgVersion parameter cannot be empty"
@@ -87,31 +75,26 @@ function cleanup {
 }
 trap cleanup EXIT
 
-TARBALL_FOLDER="$tmpdir/tarballFolder"
-mkdir -p $TARBALL_FOLDER
-cp $SRC_TARBALL $tmpdir
-
 pushd $tmpdir > /dev/null
 
-PKG_NAME="docker-compose"
-NAME_VER="$PKG_NAME-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-govendor-v$VENDOR_VERSION.tar.gz"
+NAME_VER="compose-$PKG_VERSION"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-govendor-v2.tar.gz"
 
 echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
 
-echo "Vendor go modules..."
-cd compose-"$PKG_VERSION"
+cd "$NAME_VER"
+go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+go mod tidy
+echo "Get vendored modules"
 go mod vendor
 
-echo ""
-echo "========================="
-echo "Tar vendored tarball"
+echo "Tar vendored modules"
 tar  --sort=name \
      --mtime="2021-04-26 00:00Z" \
      --owner=0 --group=0 --numeric-owner \
      --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-     -czf "$VENDOR_TARBALL" vendor
+     -cf "$VENDOR_TARBALL" vendor
 
 popd > /dev/null
-echo "$PKG_NAME vendored modules are available at $VENDOR_TARBALL"
+echo "docker-compose vendored modules are available at $VENDOR_TARBALL"
