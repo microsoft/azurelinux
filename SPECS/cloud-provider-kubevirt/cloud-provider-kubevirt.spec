@@ -1,7 +1,7 @@
 Summary:        Package to create the cloud-provider-kubevirt binary.
 Name:           cloud-provider-kubevirt
 Version:        0.5.1
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubevirt/cloud-provider-kubevirt/
 Group:          System/Management
@@ -13,7 +13,7 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # We can use the generate-source-tarball.sh script in the given folder along with the package version to build the tarball automatically.
 # In case we need to re-build this file manually:
-#   1. wget https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   1. wget https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%%{version}.tar.gz#/%%{name}-%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. Apply golang-version-upgrade.patch
@@ -24,23 +24,16 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 Patch0:         initialization-and-configuration-handling.patch
 Patch1:         single-ip-address-for-node.patch
 Patch2:         golang-version-upgrade.patch
 Patch3:         instanceexists-watches-vms-instead-of-vmis.patch
-Patch4:         CVE-2025-47911.patch
-Patch5:         CVE-2025-58190.patch
-Patch6:         CVE-2026-27136.patch
-Patch7:         CVE-2026-39821.patch
-Patch8:         CVE-2026-42506.patch
-Patch9:         CVE-2026-25680.patch
-Patch10:        CVE-2026-25681.patch
-Patch11:        CVE-2026-42502.patch
-Patch12:        CVE-2026-56852.patch
-Patch13:        CVE-2026-73500.patch
+Patch4:         CVE-2026-73500.patch
+Patch5:         CVE-2026-37236.patch
+Patch6:         CVE-2026-84445.patch
 %global debug_package %{nil}
-BuildRequires:  golang < 1.25
+BuildRequires:  golang >= 1.25
 
 %define our_gopath %{_topdir}/.gopath
 
@@ -79,6 +72,14 @@ make test
 %{_bindir}/kubevirt-cloud-controller-manager
 
 %changelog
+* Wed Sep 16 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.5.1-9
+- Patch for CVE-2026-83530, CVE-2026-84445, CVE-2026-84304
+- Removed patch for CVE-2025-47911, CVE-2025-58190, CVE-2026-27136, CVE-2026-39821, CVE-2026-42506,
+  CVE-2026-25680, CVE-2026-25681, CVE-2026-42502, CVE-2026-56852, CVE-2026-83530 
+
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.5.1-8
+- Patch for CVE-2026-37236
+
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.5.1-7
 - Patch for CVE-2026-73500
 
