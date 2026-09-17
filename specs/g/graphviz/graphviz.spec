@@ -109,7 +109,7 @@
 Name:			graphviz
 Summary:		Graph Visualization Tools
 Version:		13.1.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 License:		epl-1.0 AND cpl-1.0 AND bsd-3-clause AND mit AND gpl-3.0-or-later WITH bison-exception-2.2 AND apache-1.1 AND lgpl-2.0-or-later WITH libtool-exception AND smlnj AND hpnd-uc
 URL:			http://www.graphviz.org/
 #Source0:		https://gitlab.com/%%{name}/%%{name}/-/archive/%%{version}/%%{name}-%%{version}.tar.bz2
@@ -146,7 +146,7 @@ BuildRequires:		libXaw-devel
 BuildRequires:		libSM-devel
 BuildRequires:		libXext-devel
 %if %{JAVA}
-BuildRequires:		java-devel
+BuildRequires: msopenjdk-25-fedora-compat
 BuildRequires:		javapackages-tools
 %endif
 %if %{with gdkpixbuf}

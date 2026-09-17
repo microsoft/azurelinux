@@ -9,7 +9,7 @@
 
 Name:		zbar
 Version:	0.23.93
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary:	Bar code reader
 
 License:	LGPL-2.1-or-later
@@ -33,7 +33,7 @@ BuildRequires:	qt5-qtbase-devel
 BuildRequires:	qt5-qtx11extras-devel
 BuildRequires:	xmlto
 %if %{JAVA}
-BuildRequires:	java-devel
+BuildRequires: msopenjdk-25
 %endif
 BuildRequires:	python3-devel
 BuildRequires:  python3-setuptools

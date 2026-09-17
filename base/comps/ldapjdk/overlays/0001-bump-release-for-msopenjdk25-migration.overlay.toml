@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Bump LDAP JDK release for the Microsoft OpenJDK 25 migration"
+type = "spec-search-replace"
+regex = '^%global\s+release_number 2$'
+replacement = "%global           release_number 3"

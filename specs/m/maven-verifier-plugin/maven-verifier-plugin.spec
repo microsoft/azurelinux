@@ -3,7 +3,7 @@
 
 Name:           maven-verifier-plugin
 Version:        1.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary:        Maven Verifier Plugin
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
@@ -14,7 +14,7 @@ Source0:        http://www.apache.org/dist/maven/plugins/%{name}-%{version}-sour
 BuildArch: noarch
 ExclusiveArch:  %{java_arches} noarch
 
-BuildRequires: java-25-devel >= 1:1.6.0
+BuildRequires: msopenjdk-25-fedora-compat
 BuildRequires: jpackage-utils
 BuildRequires: maven-local-openjdk25
 BuildRequires: mvn(junit:junit)

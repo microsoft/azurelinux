@@ -1,0 +1,46 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# The provider-bound ant-openjdk25 package cannot bootstrap Ant against the
+# Microsoft JDK binding selected below. Remove this overlay together with the
+# ant-unbound replacement once ant-openjdk25 is backed by Microsoft OpenJDK 25.
+[[overlays]]
+description = "Build Ant with its provider-neutral JDK binding"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "ant-openjdk25"
+
+# ant-unbound supplies Ant without selecting Fedora's OpenJDK binding during
+# the build. Remove this overlay once ant-openjdk25 is backed by Microsoft
+# OpenJDK 25 and can replace this bootstrap dependency.
+[[overlays]]
+description = "Add Ant's provider-neutral JDK binding build dependency"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "ant-unbound"
+
+# Ant still needs a JDK while using the unbound bootstrap package. Remove this
+# overlay once ant-openjdk25 itself pulls Microsoft OpenJDK 25 into the build.
+[[overlays]]
+description = "Build Ant with Microsoft OpenJDK 25"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "msopenjdk-25-fedora-compat"
+
+# The generated openjdk25 binding names Fedora's headless and development
+# packages. Remove this overlay once msopenjdk-25 provides those capabilities
+# and owns the JVM path used by the binding.
+[[overlays]]
+description = "Back Ant's openjdk25 binding with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+section = "%install"
+regex = '^%jp_binding --verbose --variant openjdk25 --ghost ant\.conf --target %\{_javaconfdir\}/ant-openjdk25\.conf --provides %\{name\}-jdk-binding --requires java-25-openjdk-headless --recommends java-25-openjdk-devel$'
+replacement = '%jp_binding --verbose --variant openjdk25 --ghost ant.conf --target %{_javaconfdir}/ant-openjdk25.conf --provides %{name}-jdk-binding --requires msopenjdk-25-fedora-compat'
+
+# Java 25's default ZIP compression can equal explicit level 9, invalidating
+# comparisons that assume the defaults differ.
+[[overlays]]
+description = "Compare explicit ZIP compression levels because Java 25 default compression can match level 9"
+type = "patch-add"
+source = "ant-1.10.15-explicit-compression-level.patch"

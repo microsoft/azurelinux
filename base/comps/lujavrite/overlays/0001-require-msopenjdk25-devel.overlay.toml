@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# LuJavRite names Fedora's OpenJDK 25 development package and uses its expected
+# JDK layout while building. Remove this overlay once msopenjdk-25 provides the
+# `java-25-openjdk-devel` capability and those development paths directly.
+[[overlays]]
+description = "Build LuJavRite with the Microsoft OpenJDK compatibility paths"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+java-25-openjdk-devel$'
+replacement = 'BuildRequires:  msopenjdk-25-fedora-compat'
