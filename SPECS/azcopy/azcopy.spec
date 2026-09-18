@@ -11,15 +11,15 @@ Source0:        https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
-#   1. wget https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v%{version}.tar.gz -O azure-storage-%{name}-%{version}.tar.gz
-#   2. tar -xf azure-storage-%{name}-%{version}.tar.gz
-#   3. cd azure-storage-%{name}-%{version}
+#   1. wget https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v%%{version}.tar.gz -O azure-storage-%%{name}-%%{version}.tar.gz
+#   2. tar -xf azure-storage-%%{name}-%%{version}.tar.gz
+#   3. cd azure-storage-%%{name}-%%{version}
 #   4. go mod vendor
 #   5. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf azure-storage-%{name}-%{version}-vendor-v2.tar.gz vendor
+#           -cf azure-storage-%%{name}-%%{version}-vendor-v2.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
@@ -68,19 +68,30 @@ go test -mod=vendor
 %changelog
 * Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 10.25.1-9
 - Add patch for CVE-2026-84445, CVE-2026-84304
+- Remove patches for CVE-2025-22868, CVE-2025-22870, CVE-2026-39821,
+  and CVE-2026-56852
 
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 10.25.1-8
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
   now selected automatically and supports CGO_ENABLED=0 on Linux.
 
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.25.1-7
+- Patch for CVE-2026-56852
+
 * Fri May 29 2026 Sumit Jena <sumitjena@microsoft.com> - 10.25.1-6
 - Fix ptests failures.
 
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.25.1-5
+- Patch for CVE-2026-39821
+
 * Fri Apr 11 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 10.25.1-4
-- Patch CVE-2024-51744
+- Patch CVE-2025-22870, CVE-2024-51744
 
 * Fri Mar 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.25.1-3
 - Patch CVE-2025-30204
+
+* Tue Mar 04 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.25.1-2
+- Fix CVE-2025-22868 with an upstream patch
 
 * Tue Aug 06 2024 Archana Choudhary <archana1@microsoft.com> - 10.25.1-1
 - Upgrade azcopy to latest 10.25.1 to fix multiple security issues  
