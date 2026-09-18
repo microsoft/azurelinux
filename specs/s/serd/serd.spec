@@ -5,7 +5,7 @@
 
 Name:           serd
 Version:        0.32.8
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        A lightweight C library for RDF syntax
 
 License:        ISC

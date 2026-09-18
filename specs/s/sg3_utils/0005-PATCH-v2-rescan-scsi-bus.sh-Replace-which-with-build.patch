@@ -1,0 +1,37 @@
+From a50dfbd3fd06460bf8ed1bbaa3ea397e4c6fed00 Mon Sep 17 00:00:00 2001
+From: Paul Evans <pevans@redhat.com>
+Date: Mon, 11 May 2026 12:26:21 +0100
+Subject: [PATCH] [PATCH v2] rescan-scsi-bus.sh Replace 'which' with build in
+ 'command -v'
+
+Replace use of 'which' command to determine the existence of an
+executable and replace with the built in 'command -v' to achieve
+the same result. And to also remove the package dependency for
+minimal environments where 'which' might not be available.
+
+Signed-off-by: Paul Evans <pevans@redhat.com>
+---
+v2: Fix implementation error
+---
+ scripts/rescan-scsi-bus.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/rescan-scsi-bus.sh b/scripts/rescan-scsi-bus.sh
+index 23a90bb4..e55e405d 100755
+--- a/scripts/rescan-scsi-bus.sh
++++ b/scripts/rescan-scsi-bus.sh
+@@ -1351,9 +1351,9 @@ if [ -w /sys/module/scsi_mod/parameters/default_dev_flags ] && [ $scan_flags !=
+     unset OLD_SCANFLAGS
+   fi
+ fi
+-DMSETUP=$(which dmsetup)
++DMSETUP=$(command -v dmsetup)
+ [ -z "$DMSETUP" ] && flush= && mp_enable=
+-MULTIPATH=$(which multipath)
++MULTIPATH=$(command -v multipath)
+ [ -z "$MULTIPATH" ] && flush= && mp_enable=
+ 
+ echo -n "Scanning SCSI subsystem for new devices"
+-- 
+2.54.0
+

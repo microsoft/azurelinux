@@ -41,7 +41,7 @@
 
 Name:           %{rocdecode_name}
 Version:        %{rocm_version}
-Release: 7%{?dist}
+Release:        4%{?dist}
 Summary:        High-performance video decode SDK for AMD GPUs
 
 Url:            https://github.com/ROCm/rocDecode

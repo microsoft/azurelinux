@@ -12,7 +12,7 @@
 
 Name:           sqlite2
 Version:        2.8.17
-Release: 50%{?dist}
+Release:        47%{?dist}
 
 Summary:        Embeddable SQL engine in a C library
 License:        blessing AND LicenseRef-Fedora-Public-Domain

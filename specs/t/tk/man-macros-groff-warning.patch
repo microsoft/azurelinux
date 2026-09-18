@@ -1,0 +1,11 @@
+--- a/doc/man.macros.orig	2025-05-07 00:52:23.982667528 +0000
++++ b/doc/man.macros	2025-05-07 00:52:31.614650370 +0000
+@@ -141,7 +141,7 @@
+ .de VS
+ .if !"\\$2"" .br
+ .mk ^Y
+-.ie n 'mc \s12\(br\s0
++.ie n 'mc \s[12]\(br\s0
+ .el .nr ^v 1u
+ ..
+ .\"	# VE - end of vertical sidebar

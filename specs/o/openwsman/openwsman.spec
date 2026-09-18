@@ -28,7 +28,7 @@
 
 Name:		openwsman
 Version:	2.8.1
-Release: 13%{?dist}
+Release:	10%{?dist}
 Summary:	Open source Implementation of WS-Management
 
 License:	BSD-3-Clause AND MIT

@@ -10,8 +10,8 @@
 
 Name:		perl-Cpanel-JSON-XS
 Summary:	JSON::XS for Cpanel, fast and correct serializing
-Version:	4.40
-Release: 4%{?dist}
+Version:	4.41
+Release:	1%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Cpanel-JSON-XS
 Source0:	https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
@@ -167,6 +167,17 @@ make test
 %{_mandir}/man3/Cpanel::JSON::XS::Type.3*
 
 %changelog
+* Thu May 28 2026 Paul Howarth <paul@city-fan.org> - 4.41-1
+- Update to 4.41
+  - Fix BOM-shift PV-corruption SIGABRT (CVE-2026-9516)
+  - Fix dupkeys_as_arrayref type confusion (CVE-2026-9334)
+  - Fix incr_parse single-quote string delimiter (GH#245)
+  - Fix a one-byte out-of-bounds heap read reachable via allow_barekey on
+    truncated input (GH#244)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.40-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Sep  9 2025 Paul Howarth <paul@city-fan.org> - 4.40-1
 - Update to 4.40
   - Fix overflow with overlong numbers, fuzzing only (CVE-2025-40929)

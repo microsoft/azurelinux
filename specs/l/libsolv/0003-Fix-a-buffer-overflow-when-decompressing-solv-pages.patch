@@ -1,0 +1,62 @@
+From 6ba8fbf6603a7fcfdb1744df52d6f0c291f7b29f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 5 May 2026 10:52:20 +0200
+Subject: [PATCH] Fix a buffer overflow when decompressing solv pages
+
+repopagestore_load_page_range() and
+repopagestore_read_or_setup_pages() functions called
+unchecked_decompress_buf() on compressed data which were just loaded
+from a solv file without validating them with check_decompress_buf().
+
+If the solv file was maliously crafted to decompress beyond
+REPOPAGE_BLOBSIZE-byte-sized stack-allocated buffer (e.g. 100lllll
+byte with high lllll counter at the end of the buffer), or
+a backreference was pointing out of the output buffer (e.g.
+a reference at the beginning of the buffer with high offset pointing
+before a start of the buffer), unchecked_decompress_buf() would read
+or write out of the output buffer, causing a buffer overflow.
+
+Trival fix would be calling check_decompress_buf() before
+unchecked_decompress_buf() as repopagestore_decompress_page() already
+does.
+
+Instead, this patch uses repopagestore_decompress_page() to do the
+check and decompression in a single step.
+
+Acknowledgement: Aisle Research
+
+CVE-2026-48864
+https://bugzilla.redhat.com/show_bug.cgi?id=2460425
+---
+ src/repopage.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/repopage.c b/src/repopage.c
+index a9a1c074..0967979b 100644
+--- a/src/repopage.c
++++ b/src/repopage.c
+@@ -779,8 +779,8 @@ repopagestore_load_page_range(Repopagestore *store, unsigned int pstart, unsigne
+ 	  if (compressed)
+ 	    {
+ 	      unsigned int out_len;
+-	      out_len = unchecked_decompress_buf(buf, in_len, dest, REPOPAGE_BLOBSIZE);
+-	      if (out_len != REPOPAGE_BLOBSIZE && pnum < store->num_pages - 1)
++	      out_len = repopagestore_decompress_page(buf, in_len, dest, REPOPAGE_BLOBSIZE);
++	      if (out_len == 0 || (out_len != REPOPAGE_BLOBSIZE && pnum < store->num_pages - 1))
+ 	        {
+ #ifdef DEBUG_PAGING
+ 	          fprintf(stderr, "can't decompress\n");
+@@ -947,8 +947,8 @@ repopagestore_read_or_setup_pages(Repopagestore *store, FILE *fp, unsigned int p
+ 	    }
+ 	  if (compressed)
+ 	    {
+-	      out_len = unchecked_decompress_buf(buf, in_len, dest, REPOPAGE_BLOBSIZE);
+-	      if (out_len != REPOPAGE_BLOBSIZE && i < npages - 1)
++	      out_len = repopagestore_decompress_page(buf, in_len, dest, REPOPAGE_BLOBSIZE);
++	      if (out_len == 0 || (out_len != REPOPAGE_BLOBSIZE && i < npages - 1))
+ 	        {
+ 		  return SOLV_ERROR_CORRUPT;
+ 	        }
+-- 
+2.54.0
+

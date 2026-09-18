@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.2.1
-Release: 13%{?dist}
+Release: 10%{?dist}
 Summary: RR is a test double framework with a terse syntax
 License: MIT
 URL: https://rr.github.io/rr

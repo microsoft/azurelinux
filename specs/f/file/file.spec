@@ -17,8 +17,8 @@
 
 Summary: Utility for determining file types
 Name: file
-Version: 5.46
-Release: 11%{?dist}
+Version: 5.48
+Release: 1%{?dist}
 
 # Main license is BSD-2-Clause-Darwin
 # Shipped exceptions:
@@ -50,18 +50,6 @@ Patch2: file-5.04-volume_key.patch
 Patch3: file-5.45-readelf-limit-revert.patch
 
 Patch4: file-5.46-fix-tests-rpm-magic.patch
-
-# upstream: https://github.com/file/file/commit/b874d520c592ecd55ebcae0d662dc6e54f5c5414
-Patch5: file-5.47-magic-entries.patch
-
-# upstream commit: https://github.com/file/file/commit/6bc6cf03ad4ad136088260e22f30c6d191c161a3
-Patch6: file-5.47-buffer-overrun-1.patch
-
-# upstream commit: https://github.com/file/file/commit/83aab94724a226c04bf8b85c9ceb2be91dca8dd5
-Patch7: file-5.47-buffer-overrun-2.patch
-
-# upstream commit: https://github.com/file/file/commit/b3384a1fbfa1fee99986e5750ab8e700de4f24ad
-Patch8: file-5.47-stack-overrun.patch
 
 URL: https://www.darwinsys.com/file/
 Requires: file-libs%{?_isa} = %{version}-%{release}
@@ -244,6 +232,13 @@ make -C tests check
 %endif
 
 %changelog
+* Fri Jul 10 2026 Vincent Mihalkovic <vmihalko@redhat.com> - 5.48-1
+- New upstream release 5.48; drop upstreamed patches
+- Fixes zipfile detection (rhbz#2427330)
+
+* Tue Mar 24 2026 Vincent Mihalkovic <vmihalko@redhat.com> - 5.46-9
+- Update python bytecode magic for 3.14+ / 3.15 and PyPy 3.10/3.11 (upstream dd9e7f7)
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 5.46-8
 - Rebuilt for Python 3.14.0rc3 bytecode
 

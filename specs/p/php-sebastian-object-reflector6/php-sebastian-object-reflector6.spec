@@ -10,13 +10,10 @@
 # Please, preserve the changelog entries
 #
 
-%bcond_with          tests
+%bcond_without       tests
 
-%global gh_commit    3ca042c2c60b0eab094f8a1b6a7093f4d4c72200
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   object-reflector
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -27,14 +24,14 @@
 %global php_home     %{_datadir}/php
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        6.0.0
-Release: 4%{?dist}
+Version:        6.1.0
+Release:        1%{?dist}
 Summary:        Allows reflection of object attributes, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -42,8 +39,8 @@ BuildRequires:  php(language) >= 8.4.1
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^13.0"
-BuildRequires:  phpunit13
+#        "phpunit/phpunit": "^13.3.0"
+BuildRequires:  phpunit13  >= 13.3.0
 %endif
 
 # from composer.json
@@ -67,7 +64,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -90,7 +87,7 @@ EOF
 
 : Run upstream test suite
 ret=0
-for cmd in php php84 php85; do
+for cmd in php php84 php85 php86; do
   if which $cmd; then
     $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
       %{_bindir}/phpunit13 --bootstrap vendor/autoload.php || ret=1
@@ -110,6 +107,10 @@ exit $ret
 
 
 %changelog
+* Thu Aug 13 2026 Remi Collet <remi@remirepo.net> - 6.1.0-1
+- update to 6.1.0
+- enable test suite
+
 * Fri Feb  6 2026 Remi Collet <remi@remirepo.net> - 6.0.0-1
 - update to 6.0.0
 - raise dependency on PHP 8.4

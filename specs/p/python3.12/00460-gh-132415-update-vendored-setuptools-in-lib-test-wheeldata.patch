@@ -21,7 +21,7 @@ Co-Authored-By: Victor Stinner <vstinner@python.org>
  5 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/Lib/test/support/__init__.py b/Lib/test/support/__init__.py
-index 4c22f131e3..e49e3668a3 100644
+index 1ee8ffc1b7..cab0f49366 100644
 --- a/Lib/test/support/__init__.py
 +++ b/Lib/test/support/__init__.py
 @@ -2308,7 +2308,7 @@ def _findwheel(pkgname):

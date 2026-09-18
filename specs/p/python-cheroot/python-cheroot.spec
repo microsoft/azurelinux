@@ -8,7 +8,7 @@
 
 Name:           python-%{pypi_name}
 Version:        10.0.1
-Release: 12%{?dist}
+Release:        10%{?dist}
 Summary:        Highly-optimized, pure-python HTTP server
 
 # Automatically converted from old format: BSD - review is highly recommended.
@@ -102,7 +102,11 @@ rm -rf html/.{doctrees,buildinfo}
 %py3_install
 
 %check
-LANG=C.utf-8 %{__python3} -m pytest --ignore=build -W ignore::DeprecationWarning -p no:unraisableexception
+# test_https_over_http_error expects an OpenSSL >=3.1 error string ('record
+# layer failure'), but Python's ssl module reports the mnemonic 'wrong version
+# number' instead. Upstream: https://github.com/cherrypy/cheroot/issues/645
+LANG=C.utf-8 %{__python3} -m pytest --ignore=build -W ignore::DeprecationWarning -p no:unraisableexception \
+    --deselect cheroot/test/test_ssl.py::test_https_over_http_error
 
 %files -n python3-%{pypi_name}
 %license LICENSE.md
@@ -118,6 +122,11 @@ LANG=C.utf-8 %{__python3} -m pytest --ignore=build -W ignore::DeprecationWarning
 %endif
 
 %changelog
+* Mon Jul 06 2026 Dan Radez <dradez@redhat.com> - 10.0.1-10
+- Skip test_https_over_http_error (upstream cherrypy/cheroot#645):
+  Python ssl reports 'wrong version number' where the test expects the
+  OpenSSL >=3.1 string 'record layer failure'.
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 10.0.1-9
 - Rebuilt for Python 3.14.0rc3 bytecode
 

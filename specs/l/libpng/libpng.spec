@@ -4,8 +4,8 @@
 Summary:       A library of functions for manipulating PNG image format files
 Name:          libpng
 Epoch:         2
-Version:       1.6.55
-Release: 4%{?dist}
+Version:       1.6.58
+Release:       1%{?dist}
 License:       zlib
 URL:           http://www.libpng.org/pub/png/
 
@@ -107,6 +107,12 @@ exit 0
 %{_bindir}/pngfix
 
 %changelog
+* Thu May 21 2026 Michal Hlavinka <mhlavink@redhat.com> - 2:1.6.58-1
+- updated to 1.6.58 (#2456815)
+
+* Mon Apr 06 2026 Michal Hlavinka <mhlavink@redhat.com> - 2:1.6.56-1
+- updated to 1.6.56 (#2451569)
+
 * Fri Feb 13 2026 Michal Hlavinka <mhlavink@redhat.com> - 2:1.6.55-1
 - updated to 1.6.55 (#2429529)
 

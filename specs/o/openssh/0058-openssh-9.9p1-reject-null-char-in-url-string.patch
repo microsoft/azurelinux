@@ -1,0 +1,24 @@
+diff --color -ruNp a/misc.c b/misc.c
+--- a/misc.c	2025-12-03 16:19:11.255135131 +0100
++++ b/misc.c	2025-12-03 16:21:53.769590836 +0100
+@@ -998,7 +998,7 @@ urldecode(const char *src)
+ 	size_t srclen;
+ 
+ 	if ((srclen = strlen(src)) >= SIZE_MAX)
+-		fatal_f("input too large");
++		return NULL;
+ 	ret = xmalloc(srclen + 1);
+ 	for (dst = ret; *src != '\0'; src++) {
+ 		switch (*src) {
+@@ -1006,9 +1006,10 @@ urldecode(const char *src)
+ 			*dst++ = ' ';
+ 			break;
+ 		case '%':
++			/* note: don't allow \0 characters */
+ 			if (!isxdigit((unsigned char)src[1]) ||
+ 			    !isxdigit((unsigned char)src[2]) ||
+-			    (ch = hexchar(src + 1)) == -1) {
++			    (ch = hexchar(src + 1)) == -1 || ch == 0) {
+ 				free(ret);
+ 				return NULL;
+ 			}

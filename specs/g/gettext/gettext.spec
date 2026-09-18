@@ -11,7 +11,7 @@
 Summary: GNU tools and libraries for localized translated messages
 Name: gettext
 Version: 0.25.1
-Release: 5%{?dist}
+Release: 2%{?dist}
 
 # The following are licensed under LGPLv2+:
 # - libintl and its headers

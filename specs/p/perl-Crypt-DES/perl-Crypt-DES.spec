@@ -10,7 +10,7 @@
 
 Name:           perl-Crypt-DES
 Version:        2.07
-Release: 46%{?dist}
+Release:        42%{?dist}
 Summary:        Perl DES encryption module
 License:        BSD-Systemics
 URL:            https://metacpan.org/release/Crypt-DES

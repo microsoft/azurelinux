@@ -3,7 +3,7 @@
 
 Name:           perl-File-Type
 Version:        0.22
-Release: 54%{?dist}
+Release:        51%{?dist}
 Summary:        Determine file type using magic
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Type

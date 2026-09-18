@@ -7,8 +7,8 @@
 %bcond_without perl_CryptX_enables_optional_test
 
 Name:           perl-CryptX
-Version:        0.087
-Release: 8%{?dist}
+Version:        0.089
+Release:        1%{?dist}
 Summary:        Cryptographic toolkit
 # src/ltc/*:    Unlicense
 # src/ltm/*:    Unlicense
@@ -27,6 +27,7 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
+BuildRequires:  perl(Time::HiRes)
 BuildRequires:  perl(warnings)
 # Run-time:
 BuildRequires:  perl(base)
@@ -53,8 +54,9 @@ BuildRequires:  perl(Storable) >= 2.0
 BuildRequires:  perl(Test::Pod)
 %endif
 
-Provides:       bundled(libtomcrypt) = 1.18.2-1.20250506gitd448df17
-Provides:       bundled(libtommath) = 1.2.0-1.20250611git839ae9ea
+Provides:       bundled(libtomcrypt) = 1.18.2-1.20260506git8b5af49b
+Provides:       bundled(libtommath) = 1.2.0-1.20260420gitae40a87
+
 
 # Remove under-specified dependencies
 %global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\((Math::BigFloat|Math::BigInt|Storable)\\)$
@@ -153,6 +155,16 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Sun May 10 2026 Xavier Bachelot <xavier@bachelot.org> - 0.089-1
+- Update to 0.089 (RHBZ#2468592)
+
+* Thu Apr 23 2026 Xavier Bachelot <xavier@bachelot.org> - 0.088-2
+- Add missing BR: perl(Time::HiRes)
+
+* Thu Apr 23 2026 Xavier Bachelot <xavier@bachelot.org> - 0.088-1
+- Update to 0.088 (RHBZ#2461073)
+  - Fix CVE-2026-41564 (RHBZ#2461084,RHBZ#2461085)
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.087-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

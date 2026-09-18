@@ -1,62 +1,104 @@
-From cfbf803dd3338a915f41bdfded69b34e7f21403d Mon Sep 17 00:00:00 2001
+From 125557ee9e1fc7a17a9488edfc404bb4e6070a4c Mon Sep 17 00:00:00 2001
 From: Tomas Mraz <tmraz@fedoraproject.org>
 Date: Mon, 12 Sep 2022 11:07:38 +0200
-Subject: [PATCH 1/7] Apply patch stunnel-5.50-authpriv.patch
+Subject: [PATCH 1/3] Apply patch stunnel-5.50-authpriv.patch
 
 Patch-name: stunnel-5.50-authpriv.patch
 Patch-id: 0
 From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
 ---
- doc/stunnel.8.in    | 2 +-
- doc/stunnel.html.in | 2 +-
- doc/stunnel.pod.in  | 2 +-
- src/options.c       | 4 ++++
- 4 files changed, 7 insertions(+), 3 deletions(-)
+ doc/stunnel.8.in       | 2 +-
+ doc/stunnel.html.in    | 2 +-
+ doc/stunnel.md         | 2 +-
+ doc/stunnel.pl.8.in    | 2 +-
+ doc/stunnel.pl.html.in | 2 +-
+ doc/stunnel.pl.md      | 2 +-
+ src/options.c          | 4 ++++
+ 7 files changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/doc/stunnel.8.in b/doc/stunnel.8.in
-index 8cd8bc0..b5d7d75 100644
+index 4179430..15f6fed 100644
 --- a/doc/stunnel.8.in
 +++ b/doc/stunnel.8.in
-@@ -209,7 +209,7 @@ requested to do so by an stunnel developer, or when you intend to get confused.
- .Sp
+@@ -201,7 +201,7 @@ developer, or when you intend to get confused.
+ .PP
  The default logging level is notice (5).
- .Sp
--The syslog 'daemon' facility will be used unless a facility name is supplied.
-+The syslog 'authpriv' facility will be used unless a facility name is supplied.
+ .PP
+-The syslog `daemon' facility will be used unless a facility name is
++The syslog `authpriv' facility will be used unless a facility name is
+ supplied.
  (Facilities are not supported on Win32.)
- .Sp
- Case is ignored for both facilities and levels.
+ .PP
 diff --git a/doc/stunnel.html.in b/doc/stunnel.html.in
-index a7931aa..cda5993 100644
+index 2cf83ca..55e3edc 100644
 --- a/doc/stunnel.html.in
 +++ b/doc/stunnel.html.in
-@@ -248,7 +248,7 @@
- 
+@@ -326,7 +326,7 @@ only meant to be understood by stunnel developers, and not by users.
+ Please either use the debug level when requested to do so by an stunnel
+ developer, or when you intend to get confused.</p>
  <p>The default logging level is notice (5).</p>
+-<p>The syslog ‘daemon’ facility will be used unless a facility name is
++<p>The syslog ‘authpriv’ facility will be used unless a facility name is
+ supplied. (Facilities are not supported on Win32.)</p>
+ <p>Case is ignored for both facilities and levels.</p></li>
+ <li><p><strong>EGD</strong> = EGD_PATH (Unix only)</p>
+diff --git a/doc/stunnel.md b/doc/stunnel.md
+index 6ad562b..9205950 100644
+--- a/doc/stunnel.md
++++ b/doc/stunnel.md
+@@ -142,7 +142,7 @@ An address parameter of an option may be either:
  
--<p>The syslog &#39;daemon&#39; facility will be used unless a facility name is supplied. (Facilities are not supported on Win32.)</p>
-+<p>The syslog &#39;authpriv&#39; facility will be used unless a facility name is supplied. (Facilities are not supported on Win32.)</p>
+     The default logging level is notice (5).
  
- <p>Case is ignored for both facilities and levels.</p>
+-    The syslog 'daemon' facility will be used unless a facility name is supplied. (Facilities are not supported on Win32.)
++    The syslog 'authpriv' facility will be used unless a facility name is supplied. (Facilities are not supported on Win32.)
  
-diff --git a/doc/stunnel.pod.in b/doc/stunnel.pod.in
-index a54b25d..f830cf3 100644
---- a/doc/stunnel.pod.in
-+++ b/doc/stunnel.pod.in
-@@ -197,7 +197,7 @@ requested to do so by an stunnel developer, or when you intend to get confused.
+     Case is ignored for both facilities and levels.
  
- The default logging level is notice (5).
+diff --git a/doc/stunnel.pl.8.in b/doc/stunnel.pl.8.in
+index d6f3e86..44051ac 100644
+--- a/doc/stunnel.pl.8.in
++++ b/doc/stunnel.pl.8.in
+@@ -208,7 +208,7 @@ informacje celem przesłania do wsparcia technicznego.
+ W przeciwnym wypadku próba analizy zawartości logów \f[B]będzie\f[R]
+ jedynie źródłem dodatkowego zamieszania.
+ .PP
+-O ile nie wyspecyfikowano podsystemu użyty będzie domyślny: daemon.
++O ile nie wyspecyfikowano podsystemu użyty będzie domyślny: authpriv.
+ Podsystemy nie są wspierane przez platformę Win32.
+ .PP
+ Wielkość liter jest ignorowana zarówno dla poziomu jak podsystemu.
+diff --git a/doc/stunnel.pl.html.in b/doc/stunnel.pl.html.in
+index 2f43df2..0f8d470 100644
+--- a/doc/stunnel.pl.html.in
++++ b/doc/stunnel.pl.html.in
+@@ -332,7 +332,7 @@ logowania jedynie jeśli jesteś programistką/programistą stunnela, albo
+ przygotowujesz szczegółowe informacje celem przesłania do wsparcia
+ technicznego. W przeciwnym wypadku próba analizy zawartości logów
+ <strong>będzie</strong> jedynie źródłem dodatkowego zamieszania.</p>
+-<p>O ile nie wyspecyfikowano podsystemu użyty będzie domyślny: daemon.
++<p>O ile nie wyspecyfikowano podsystemu użyty będzie domyślny: authpriv.
+ Podsystemy nie są wspierane przez platformę Win32.</p>
+ <p>Wielkość liter jest ignorowana zarówno dla poziomu jak
+ podsystemu.</p></li>
+diff --git a/doc/stunnel.pl.md b/doc/stunnel.pl.md
+index ebc7974..af3c944 100644
+--- a/doc/stunnel.pl.md
++++ b/doc/stunnel.pl.md
+@@ -138,7 +138,7 @@ Parametr adres może być:
  
--The syslog 'daemon' facility will be used unless a facility name is supplied.
-+The syslog 'authpriv' facility will be used unless a facility name is supplied.
- (Facilities are not supported on Win32.)
+     Jakkolwiek użycie *debug = debug* lub *debug = 7* zapewnia najbardziej szczegółowe logi, ich zawartość jest użyteczna jedynie dla programistów zajmujących się stunnelem. Użyj tego poziomu logowania jedynie jeśli jesteś programistką/programistą stunnela, albo przygotowujesz szczegółowe informacje celem przesłania do wsparcia technicznego. W przeciwnym wypadku próba analizy zawartości logów **będzie** jedynie źródłem dodatkowego zamieszania.
  
- Case is ignored for both facilities and levels.
+-    O ile nie wyspecyfikowano podsystemu użyty będzie domyślny: daemon. Podsystemy nie są wspierane przez platformę Win32.
++    O ile nie wyspecyfikowano podsystemu użyty będzie domyślny: authpriv. Podsystemy nie są wspierane przez platformę Win32.
+ 
+     Wielkość liter jest ignorowana zarówno dla poziomu jak podsystemu.
+ 
 diff --git a/src/options.c b/src/options.c
-index 5f8ad8b..6e4a18b 100644
+index 9a7b0aa..ae2d5c4 100644
 --- a/src/options.c
 +++ b/src/options.c
-@@ -1960,7 +1960,11 @@ NOEXPORT const char *parse_service_option(CMD cmd, SERVICE_OPTIONS **section_ptr
+@@ -2223,7 +2223,11 @@ NOEXPORT const char *parse_service_option(CMD cmd, SERVICE_OPTIONS **section_ptr
      case CMD_SET_DEFAULTS:
          section->log_level=LOG_NOTICE;
  #if !defined (USE_WIN32) && !defined (__vms)
@@ -69,5 +111,5 @@ index 5f8ad8b..6e4a18b 100644
          break;
      case CMD_SET_COPY:
 -- 
-2.39.2
+2.53.0
 

@@ -12,7 +12,7 @@
 
 Name:           lttng-tools
 Version:        2.14.0
-Release: 7%{?dist}
+Release:        4%{?dist}
 License:        GPL-2.0-only AND LGPL-2.1-only
 URL:            http://lttng.org
 Summary:        LTTng control and utility programs

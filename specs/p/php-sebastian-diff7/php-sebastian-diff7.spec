@@ -3,7 +3,7 @@
 
 # remirepo/fedora spec file for php-sebastian-diff7
 #
-# SPDX-FileCopyrightText:  Copyright 2013-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2013-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
@@ -12,11 +12,8 @@
 
 %bcond_without       tests
 
-%global gh_commit    7ab1ea946c012266ca32390913653d844ecd085f
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   diff
-%global gh_date      2025-02-07
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -28,29 +25,27 @@
 %global php_home     %{_datadir}/php
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        7.0.0
-Release: 7%{?dist}
+Version:        7.0.1
+Release:        1%{?dist}
 Summary:        Diff implementation, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
-# php-symfony4 going to disapear, php-symfony5 not available, only used for tests
-%global symfony_version 7.2.0
+# php-symfony* not available, only used for tests
+%global symfony_version 7.4.17
 Source2:        https://github.com/symfony/process/archive/v%{symfony_version}/php-symfony-process-%{symfony_version}.tar.gz
-
-Patch0:         https://github.com/sebastianbergmann/diff/commit/98c299d8486b460efd667d0d64f1a32dd588971d.patch
 
 BuildArch:      noarch
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
 BuildRequires:  php(language) >= 8.3
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^12.0",
-#        "symfony/process": "^7.2"
-BuildRequires:  phpunit12
+#        "phpunit/phpunit": "^12.5.33",
+#        "symfony/process": "^7.4.17"
+BuildRequires:  phpunit12  >= 12.5.33
 %endif
 
 # from composer.json
@@ -72,8 +67,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit} -a 2
-%patch -P0 -p1
+%setup -q -n %{gh_project}-%{version} -a 2
 
 
 %build
@@ -93,7 +87,7 @@ mkdir vendor
 
 : Run upstream test suite
 ret=0
-for cmd in php php83 php84; do
+for cmd in php php83 php84 php85 php86; do
   if which $cmd; then
     $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
       %{_bindir}/phpunit12 --bootstrap vendor/autoload.php || ret=1
@@ -114,6 +108,9 @@ exit $ret
 
 
 %changelog
+* Wed Aug 26 2026 Remi Collet <remi@remirepo.net> - 7.0.1-1
+- update to 7.0.1
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

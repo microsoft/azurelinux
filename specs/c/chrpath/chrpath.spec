@@ -3,7 +3,7 @@
 
 Name:           chrpath
 Version:        0.16
-Release: 29%{?dist}
+Release:        26%{?dist}
 Summary:        Modify rpath of compiled programs
 
 License:        GPL-2.0-or-later

@@ -1,0 +1,436 @@
+From cd7d6ca749e77d70611fb8b0fb92600bb5bf5af2 Mon Sep 17 00:00:00 2001
+From: Matej Slivka <mslivka@redhat.com>
+Date: Thu, 7 May 2026 12:18:57 +0200
+Subject: [PATCH 2/2] Update constraint order printout
+
+---
+ pcs/cli/constraint/output/set.py              |  9 ++--
+ pcs_test/Makefile.am                          |  2 +
+ pcs_test/resources/cib-all.xml                |  8 ++--
+ pcs_test/resources/constraint-commands        | 24 +++++-----
+ .../tier0/cli/constraint/output/__init__.py   |  0
+ .../tier0/cli/constraint/output/test_set.py   | 45 +++++++++++++++++++
+ pcs_test/tier0/cli/constraint/test_command.py |  2 +-
+ pcs_test/tier1/constraint/test_config.py      | 36 +++++++--------
+ pcs_test/tier1/legacy/test_constraints.py     | 16 +++----
+ pcs_test/tools/constraints_dto.py             |  8 ++--
+ 10 files changed, 97 insertions(+), 53 deletions(-)
+ create mode 100644 pcs_test/tier0/cli/constraint/output/__init__.py
+ create mode 100644 pcs_test/tier0/cli/constraint/output/test_set.py
+
+diff --git a/pcs/cli/constraint/output/set.py b/pcs/cli/constraint/output/set.py
+index 5395ebf7a..5335fdf47 100644
+--- a/pcs/cli/constraint/output/set.py
++++ b/pcs/cli/constraint/output/set.py
+@@ -1,7 +1,4 @@
+-from typing import (
+-    Optional,
+-    Sequence,
+-)
++from typing import Optional, Sequence
+ 
+ from pcs.cli.common.output import (
+     INDENT_STEP,
+@@ -12,7 +9,7 @@ from pcs.cli.common.output import (
+ from pcs.cli.reports.output import warn
+ from pcs.common.pacemaker.constraint import CibResourceSetDto
+ from pcs.common.str_tools import (
+-    format_list,
++    format_list_dont_sort,
+     format_optional,
+     indent,
+     pairs_to_text,
+@@ -56,7 +53,7 @@ def resource_set_to_text(
+     ]
+     set_options = [
+         "Resources: {resources}".format(
+-            resources=format_list(resource_set_dto.resources_ids)
++            resources=format_list_dont_sort(resource_set_dto.resources_ids)
+         )
+     ] + pairs_to_text(_resource_set_options_to_pairs(resource_set_dto))
+     output.extend(indent(set_options, indent_step=INDENT_STEP))
+diff --git a/pcs_test/Makefile.am b/pcs_test/Makefile.am
+index d54043ec0..64df39b80 100644
+--- a/pcs_test/Makefile.am
++++ b/pcs_test/Makefile.am
+@@ -99,7 +99,9 @@ EXTRA_DIST		= \
+ 			  tier0/cli/constraint/__init__.py \
+ 			  tier0/cli/constraint/location/__init__.py \
+ 			  tier0/cli/constraint/location/test_command.py \
++			  tier0/cli/constraint/output/__init__.py \
+ 			  tier0/cli/constraint/output/test_all.py \
++			  tier0/cli/constraint/output/test_set.py \
+ 			  tier0/cli/constraint/test_command.py \
+ 			  tier0/cli/constraint/test_parse_args.py \
+ 			  tier0/cli/constraint_colocation/__init__.py \
+diff --git a/pcs_test/resources/cib-all.xml b/pcs_test/resources/cib-all.xml
+index 2964a1857..8a9c5981a 100644
+--- a/pcs_test/resources/cib-all.xml
++++ b/pcs_test/resources/cib-all.xml
+@@ -175,12 +175,12 @@
+       </rsc_location>
+       <rsc_order first="R7" then="G2" score="-123" require-all="false" first-action="stop" then-action="stop" symmetrical="false" id="order-R7-G2-mandatory"/>
+       <rsc_order first="G2" then="B2" kind="Optional" first-action="start" then-action="start" id="order-G2-B2-Optional"/>
+-      <rsc_order kind="Optional" id="order_set_B2R6-cloneSe">
+-        <resource_set action="stop" require-all="false" id="order_set_B2R6-cloneSe_set">
+-          <resource_ref id="B2"/>
++      <rsc_order kind="Optional" id="order_set_R6-cloneB2Se">
++        <resource_set action="stop" require-all="false" id="order_set_R6-cloneB2Se_set">
+           <resource_ref id="R6-clone"/>
++          <resource_ref id="B2"/>
+         </resource_set>
+-        <resource_set action="promote" sequential="false" id="order_set_B2R6-cloneSe_set-1">
++        <resource_set action="promote" sequential="false" id="order_set_R6-cloneB2Se_set-1">
+           <resource_ref id="G1-clone"/>
+         </resource_set>
+       </rsc_order>
+diff --git a/pcs_test/resources/constraint-commands b/pcs_test/resources/constraint-commands
+index 8ac6b574e..5a293cffc 100644
+--- a/pcs_test/resources/constraint-commands
++++ b/pcs_test/resources/constraint-commands
+@@ -1,18 +1,18 @@
+ # set of commands to generate various constraints configuration
+-pcs -- constraint location add location-R7-non-existing-node--10000 resource%R7 non-existing-node -10000;
+-pcs -- constraint location add location-R7-another-one--INFINITY resource%R7 another-one -INFINITY;
+-pcs -- constraint location add location-R7-localhost-INFINITY resource%R7 localhost INFINITY \
++pcs -- constraint location add location-R7-non-existing-node--10000 resource%R7 non-existing-node score=-10000;
++pcs -- constraint location add location-R7-another-one--INFINITY resource%R7 another-one score=-INFINITY;
++pcs -- constraint location add location-R7-localhost-INFINITY resource%R7 localhost score=INFINITY \
+   resource-discovery=always;
+-pcs -- constraint location add location-G2-localhost-INFINITY resource%G2 localhost INFINITY;
+-pcs -- constraint location add location-R-localhost-INFINITY 'regexp%R*' localhost INFINITY;
++pcs -- constraint location add location-G2-localhost-INFINITY resource%G2 localhost score=INFINITY;
++pcs -- constraint location add location-R-localhost-INFINITY 'regexp%R*' localhost score=INFINITY;
+ pcs -- constraint location resource%R6-clone rule \
+   id=loc_constr_with_not_expired_rule-rule constraint-id=loc_constr_with_not_expired_rule role=Unpromoted score=500 \
+-  '#uname' eq node1 and date gt 2000-01-01;
+-pcs -- constraint location resource%R6-clone rule  \
++  '#uname eq node1 and date gt 2000-01-01';
++pcs -- constraint location resource%R6-clone rule \
+   id=loc_constr_with_not_expired_rule-1-rule constraint-id=loc_constr_with_not_expired_rule-1 role=Promoted score-attribute=test-attr \
+-  date gt 2010-12-31 and '#uname' eq node1;
+-pcs -- constraint colocation add Promoted G1-clone with Stopped R6-clone -100 \
+-  id=colocation-G1-clone-R6-clone--100;
++  'date gt 2010-12-31 and #uname eq node1';
++pcs -- constraint colocation add Promoted G1-clone with Stopped R6-clone \
++  id=colocation-G1-clone-R6-clone--100 score=-100;
+ pcs -- constraint colocation \
+   set R7 G2 role=Started \
+   set B2 R6-clone sequential=0 \
+@@ -22,9 +22,9 @@ pcs -- constraint order stop R7 then stop G2 \
+ pcs -- constraint order start G2 then start B2 \
+   id=order-G2-B2-Optional kind=Optional;
+ pcs -- constraint order \
+-  set B2 R6-clone require-all=0 action=stop \
++  set R6-clone B2 require-all=0 action=stop \
+   set G1-clone sequential=0 action=promote \
+-  setoptions id=order_set_B2R6-cloneSe kind=Optional;
++  setoptions id=order_set_R6-cloneB2Se kind=Optional;
+ pcs -- constraint ticket add custom-ticket1 Promoted G1-clone \
+   id=ticket-custom-ticket1-G1-clone-Promoted loss-policy=demote;
+ pcs -- constraint ticket \
+diff --git a/pcs_test/tier0/cli/constraint/output/__init__.py b/pcs_test/tier0/cli/constraint/output/__init__.py
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/pcs_test/tier0/cli/constraint/output/test_set.py b/pcs_test/tier0/cli/constraint/output/test_set.py
+new file mode 100644
+index 000000000..55031b066
+--- /dev/null
++++ b/pcs_test/tier0/cli/constraint/output/test_set.py
+@@ -0,0 +1,45 @@
++from unittest import TestCase
++
++from pcs.cli.constraint.output.order import set_constraint_to_text
++from pcs.common.pacemaker.constraint import (
++    CibConstraintOrderAttributesDto,
++    CibConstraintOrderSetDto,
++)
++from pcs.common.pacemaker.constraint.set import CibResourceSetDto
++
++
++class TestSetConstraintToTextResourceOrder(TestCase):
++    def test_resource_order_is_preserved(self):
++        result = set_constraint_to_text(
++            CibConstraintOrderSetDto(
++                resource_sets=[
++                    CibResourceSetDto(
++                        set_id="set1",
++                        sequential=None,
++                        require_all=None,
++                        ordering=None,
++                        action=None,
++                        role=None,
++                        score=None,
++                        kind=None,
++                        resources_ids=["c_rsc", "a_rsc", "b_rsc"],
++                    ),
++                ],
++                attributes=CibConstraintOrderAttributesDto(
++                    constraint_id="order1",
++                    symmetrical=None,
++                    require_all=None,
++                    score=None,
++                    kind=None,
++                ),
++            ),
++            with_id=False,
++        )
++        self.assertEqual(
++            result,
++            [
++                "Set Constraint:",
++                "  Resource Set:",
++                "    Resources: 'c_rsc', 'a_rsc', 'b_rsc'",
++            ],
++        )
+diff --git a/pcs_test/tier0/cli/constraint/test_command.py b/pcs_test/tier0/cli/constraint/test_command.py
+index 10ef22a7b..3886be648 100644
+--- a/pcs_test/tier0/cli/constraint/test_command.py
++++ b/pcs_test/tier0/cli/constraint/test_command.py
+@@ -69,7 +69,7 @@ class TestRemoveConstraint(TestCase):
+             "loc_constr_with_expired_rule-rule",
+             "loc_constr_with_not_expired_rule-1-rule",
+             "colocation-G1-clone-R6-clone--100",
+-            "order_set_B2R6-cloneSe",
++            "order_set_R6-cloneB2Se",
+             "ticket_set_R7B2G2",
+         ]
+         self._call_cmd(constraint_or_rule_ids)
+diff --git a/pcs_test/tier1/constraint/test_config.py b/pcs_test/tier1/constraint/test_config.py
+index 9e177ffb9..0fade2857 100644
+--- a/pcs_test/tier1/constraint/test_config.py
++++ b/pcs_test/tier1/constraint/test_config.py
+@@ -336,7 +336,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint:
+                 score=-1
+                 Resource Set:
+-                  Resources: 'G2', 'R7'
++                  Resources: 'R7', 'G2'
+                   role=Started
+                 Resource Set:
+                   Resources: 'B2', 'R6-clone'
+@@ -350,7 +350,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint:
+                 kind=Optional
+                 Resource Set:
+-                  Resources: 'B2', 'R6-clone'
++                  Resources: 'R6-clone', 'B2'
+                   require-all=0 action=stop
+                 Resource Set:
+                   Resources: 'G1-clone'
+@@ -362,7 +362,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint:
+                 ticket=ticket2
+                 Resource Set:
+-                  Resources: 'B2', 'G2', 'R7'
++                  Resources: 'R7', 'B2', 'G2'
+                   role=Stopped
+             """
+         )
+@@ -404,7 +404,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint:
+                 score=-1
+                 Resource Set:
+-                  Resources: 'G2', 'R7'
++                  Resources: 'R7', 'G2'
+                   role=Started
+                 Resource Set:
+                   Resources: 'B2', 'R6-clone'
+@@ -418,7 +418,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint:
+                 kind=Optional
+                 Resource Set:
+-                  Resources: 'B2', 'R6-clone'
++                  Resources: 'R6-clone', 'B2'
+                   require-all=0 action=stop
+                 Resource Set:
+                   Resources: 'G1-clone'
+@@ -430,7 +430,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint:
+                 ticket=ticket2
+                 Resource Set:
+-                  Resources: 'B2', 'G2', 'R7'
++                  Resources: 'R7', 'B2', 'G2'
+                   role=Stopped
+             """
+         )
+@@ -468,7 +468,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint: colocation_set_R7G2B2
+                 score=-1
+                 Resource Set: colocation_set_R7G2B2_set
+-                  Resources: 'G2', 'R7'
++                  Resources: 'R7', 'G2'
+                   role=Started
+                 Resource Set: colocation_set_R7G2B2_set-1
+                   Resources: 'B2', 'R6-clone'
+@@ -479,12 +479,12 @@ class ConstraintConfigText(TestCase):
+               start resource 'G2' then start resource 'B2' (id: order-G2-B2-Optional)
+                 kind=Optional
+             Order Set Constraints:
+-              Set Constraint: order_set_B2R6-cloneSe
++              Set Constraint: order_set_R6-cloneB2Se
+                 kind=Optional
+-                Resource Set: order_set_B2R6-cloneSe_set
+-                  Resources: 'B2', 'R6-clone'
++                Resource Set: order_set_R6-cloneB2Se_set
++                  Resources: 'R6-clone', 'B2'
+                   require-all=0 action=stop
+-                Resource Set: order_set_B2R6-cloneSe_set-1
++                Resource Set: order_set_R6-cloneB2Se_set-1
+                   Resources: 'G1-clone'
+                   sequential=0 action=promote
+             Ticket Constraints:
+@@ -494,7 +494,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint: ticket_set_R7B2G2
+                 ticket=ticket2
+                 Resource Set: ticket_set_R7B2G2_set
+-                  Resources: 'B2', 'G2', 'R7'
++                  Resources: 'R7', 'B2', 'G2'
+                   role=Stopped
+             """
+         )
+@@ -536,7 +536,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint: colocation_set_R7G2B2
+                 score=-1
+                 Resource Set: colocation_set_R7G2B2_set
+-                  Resources: 'G2', 'R7'
++                  Resources: 'R7', 'G2'
+                   role=Started
+                 Resource Set: colocation_set_R7G2B2_set-1
+                   Resources: 'B2', 'R6-clone'
+@@ -547,12 +547,12 @@ class ConstraintConfigText(TestCase):
+               start resource 'G2' then start resource 'B2' (id: order-G2-B2-Optional)
+                 kind=Optional
+             Order Set Constraints:
+-              Set Constraint: order_set_B2R6-cloneSe
++              Set Constraint: order_set_R6-cloneB2Se
+                 kind=Optional
+-                Resource Set: order_set_B2R6-cloneSe_set
+-                  Resources: 'B2', 'R6-clone'
++                Resource Set: order_set_R6-cloneB2Se_set
++                  Resources: 'R6-clone', 'B2'
+                   require-all=0 action=stop
+-                Resource Set: order_set_B2R6-cloneSe_set-1
++                Resource Set: order_set_R6-cloneB2Se_set-1
+                   Resources: 'G1-clone'
+                   sequential=0 action=promote
+             Ticket Constraints:
+@@ -562,7 +562,7 @@ class ConstraintConfigText(TestCase):
+               Set Constraint: ticket_set_R7B2G2
+                 ticket=ticket2
+                 Resource Set: ticket_set_R7B2G2_set
+-                  Resources: 'B2', 'G2', 'R7'
++                  Resources: 'R7', 'B2', 'G2'
+                   role=Stopped
+             """
+         )
+diff --git a/pcs_test/tier1/legacy/test_constraints.py b/pcs_test/tier1/legacy/test_constraints.py
+index 3b5986a67..697a046a8 100644
+--- a/pcs_test/tier1/legacy/test_constraints.py
++++ b/pcs_test/tier1/legacy/test_constraints.py
+@@ -1892,13 +1892,13 @@ Error: invalid option 'foo', allowed options are: 'id', 'kind', 'symmetrical'
+                   Set Constraint: colocation_set_s1d1
+                     score=INFINITY
+                     Resource Set: colocation_set_s1d1_set
+-                      Resources: 'dummy1', 'stateful1'
++                      Resources: 'stateful1', 'dummy1'
+                 Order Constraints:
+                   start resource 'stateful1' then start resource 'dummy1' (id: order-stateful1-dummy1-mandatory)
+                 Order Set Constraints:
+                   Set Constraint: order_set_s1d1
+                     Resource Set: order_set_s1d1_set
+-                      Resources: 'dummy1', 'stateful1'
++                      Resources: 'stateful1', 'dummy1'
+                 """
+             ),
+         )
+@@ -2103,13 +2103,13 @@ Error: invalid option 'foo', allowed options are: 'id', 'kind', 'symmetrical'
+                   Set Constraint: colocation_set_d1dy
+                     score=INFINITY
+                     Resource Set: colocation_set_d1dy_set
+-                      Resources: 'dummy', 'dummy1'
++                      Resources: 'dummy1', 'dummy'
+                 Order Constraints:
+                   start resource 'dummy' then start resource 'dummy1' (id: order-dummy-dummy1-mandatory)
+                 Order Set Constraints:
+                   Set Constraint: order_set_d1dy
+                     Resource Set: order_set_d1dy_set
+-                      Resources: 'dummy', 'dummy1'
++                      Resources: 'dummy1', 'dummy'
+                 """
+             ),
+         )
+@@ -2901,7 +2901,7 @@ Error: duplicate constraint already exists, use --force to override
+                   Set Constraint: colocation_set_D6D1
+                     score=INFINITY
+                     Resource Set: colocation_set_D6D1_set
+-                      Resources: 'D1', 'D6'
++                      Resources: 'D6', 'D1'
+                 Order Set Constraints:
+                   Set Constraint: order_set_D1D2
+                     Resource Set: order_set_D1D2_set
+@@ -2921,7 +2921,7 @@ Error: duplicate constraint already exists, use --force to override
+                       Resources: 'D5', 'D6'
+                   Set Constraint: order_set_D6D1
+                     Resource Set: order_set_D6D1_set
+-                      Resources: 'D1', 'D6'
++                      Resources: 'D6', 'D1'
+                 """
+             ),
+         )
+@@ -3098,7 +3098,7 @@ Error: duplicate constraint already exists, use --force to override
+                   Set Constraint: id4
+                     score=100
+                     Resource Set: id4_set
+-                      Resources: 'D1', 'D2'
++                      Resources: 'D2', 'D1'
+                 Order Constraints:
+                   start resource 'D1' then start resource 'D2' (id: id7)
+                   start resource 'D2' then start resource 'D1' (id: id8)
+@@ -3110,7 +3110,7 @@ Error: duplicate constraint already exists, use --force to override
+                   Set Constraint: id6
+                     kind=Mandatory
+                     Resource Set: id6_set
+-                      Resources: 'D1', 'D2'
++                      Resources: 'D2', 'D1'
+                 """
+             ),
+         )
+diff --git a/pcs_test/tools/constraints_dto.py b/pcs_test/tools/constraints_dto.py
+index b8a7a5f01..5f2b6ff4d 100644
+--- a/pcs_test/tools/constraints_dto.py
++++ b/pcs_test/tools/constraints_dto.py
+@@ -371,7 +371,7 @@ def get_all_constraints(
+             CibConstraintOrderSetDto(
+                 resource_sets=[
+                     CibResourceSetDto(
+-                        set_id="order_set_B2R6-cloneSe_set",
++                        set_id="order_set_R6-cloneB2Se_set",
+                         sequential=None,
+                         require_all=False,
+                         ordering=None,
+@@ -379,10 +379,10 @@ def get_all_constraints(
+                         role=None,
+                         score=None,
+                         kind=None,
+-                        resources_ids=["B2", "R6-clone"],
++                        resources_ids=["R6-clone", "B2"],
+                     ),
+                     CibResourceSetDto(
+-                        set_id="order_set_B2R6-cloneSe_set-1",
++                        set_id="order_set_R6-cloneB2Se_set-1",
+                         sequential=False,
+                         require_all=None,
+                         ordering=None,
+@@ -394,7 +394,7 @@ def get_all_constraints(
+                     ),
+                 ],
+                 attributes=CibConstraintOrderAttributesDto(
+-                    constraint_id="order_set_B2R6-cloneSe",
++                    constraint_id="order_set_R6-cloneB2Se",
+                     symmetrical=None,
+                     require_all=None,
+                     score=None,
+-- 
+2.54.0
+

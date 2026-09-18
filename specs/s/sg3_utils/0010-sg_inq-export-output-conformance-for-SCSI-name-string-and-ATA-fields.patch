@@ -1,0 +1,63 @@
+From 91981b9f091cf81b43fe5e8bbdb82fd0f90ebb8d Mon Sep 17 00:00:00 2001
+From: Paul Evans <pevans@redhat.com>
+Date: Tue, 2 Jun 2026 15:03:41 +0100
+Subject: [PATCH] sg_inq: --export output conformance for SCSI name string and
+ ATA fields
+
+Apply udev-conforming character encoding to VPD 0x83 designator type 8
+(SCSI name string) and the T10 vendor ID ATA subfield, matching the
+encoding already used by designator types 0 and 1 since commit
+4d770f10.
+
+Signed-off-by: Paul Evans <pevans@redhat.com>
+---
+ src/sg_inq.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/src/sg_inq.c b/src/sg_inq.c
+index b3b8127f..a3b78965 100644
+--- a/src/sg_inq.c
++++ b/src/sg_inq.c
+@@ -1919,8 +1919,17 @@ export_dev_ids(uint8_t * buff, int len, int verbose)
+                 }
+                 printf("\n");
+                 if (!memcmp(ip, "ATA_", 4)) {
+-                    printf("SCSI_IDENT_%s_ATA=%.*s\n", assoc_str,
+-                           k - 4, ip + 4);
++                    printf("SCSI_IDENT_%s_ATA=", assoc_str);
++                    for (m = 4; m < k; ++m) {
++                        if ((ip[m] >= '0' && ip[m] <= '9') ||
++                            (ip[m] >= 'A' && ip[m] <= 'Z') ||
++                            (ip[m] >= 'a' && ip[m] <= 'z') ||
++                            strchr("#+-.:=@_", ip[m]) != NULL)
++                            printf("%c", ip[m]);
++                        else
++                            printf("\\x%02x", ip[m]);
++                    }
++                    printf("\n");
+                 }
+             } else {
+                 for (m = 0; m < i_len; ++m)
+@@ -2043,8 +2052,17 @@ export_dev_ids(uint8_t * buff, int len, int verbose)
+                 break;
+             }
+
+-            printf("SCSI_IDENT_%s_NAME=%.*s\n", assoc_str, i_len,
+-                   (const char *)ip);
++            printf("SCSI_IDENT_%s_NAME=", assoc_str);
++            for (m = 0; m < i_len; ++m) {
++                if ((ip[m] >= '0' && ip[m] <= '9') ||
++                    (ip[m] >= 'A' && ip[m] <= 'Z') ||
++                    (ip[m] >= 'a' && ip[m] <= 'z') ||
++                    strchr("#+-.:=@_", ip[m]) != NULL)
++                    printf("%c", ip[m]);
++                else
++                    printf("\\x%02x", ip[m]);
++            }
++            printf("\n");
+             break;
+         case 9: /*  Protocol specific port identifier */
+             if (TPROTO_UAS == p_id) {
+--
+2.54.0
+

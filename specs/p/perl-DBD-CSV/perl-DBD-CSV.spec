@@ -3,11 +3,12 @@
 
 Name:           perl-DBD-CSV
 Version:        0.62
-Release: 6%{?dist}
+Release:        5%{?dist}
 Summary:        DBI driver for CSV files
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/DBD-CSV
 Source0:        https://cpan.metacpan.org/modules/by-module/DBD/DBD-CSV-%{version}.tgz
+Patch0:         DBD-CSV-0.62-dbi-1.648.patch
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -54,6 +55,11 @@ MS Excel data.
 
 %prep
 %setup -q -n DBD-CSV-%{version}
+
+# Fix test failure with DBI 1.648 onwards
+# Based on https://github.com/perl5-dbi/DBD-CSV/commit/ae091790398088a66b22fa572856bfeb4db4c78a
+%patch -P0 -p1
+
 chmod -c a-x ChangeLog README lib/DBD/*.pm lib/Bundle/DBD/*.pm
 
 %build
@@ -75,6 +81,12 @@ make test
 %{_mandir}/man3/DBD::CSV.3*
 
 %changelog
+* Mon Jun  8 2026 Paul Howarth <paul@city-fan.org> - 0.62-5
+- Fix test failure with DBI 1.648 onwards
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.62-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.62-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

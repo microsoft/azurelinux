@@ -3,7 +3,7 @@
 
 Name:           perl-Image-Base
 Version:        1.17
-Release: 35%{?dist}
+Release:        32%{?dist}
 Summary:        Base class for loading, manipulating and saving images in Perl
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

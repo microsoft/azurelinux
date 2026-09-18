@@ -32,7 +32,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        3.0.6
-Release: 14%{?dist}
+Release:        11%{?dist}
 Summary:        FilterIterator implementation that filters files based on a list of suffixes, version %{major}
 
 License:        BSD-3-Clause

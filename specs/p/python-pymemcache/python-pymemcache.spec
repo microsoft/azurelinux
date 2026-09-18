@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        4.0.0
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        A comprehensive, fast, pure Python memcached client
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

@@ -9,7 +9,7 @@ BuildRequires:    mkfontscale mkfontdir
 
 Epoch:      1
 Version:    2.1.5
-Release: 17%{?dist}
+Release:    14%{?dist}
 License:    OFL-1.1-RFN
 URL:        https://github.com/liberationfonts/liberation-fonts
 

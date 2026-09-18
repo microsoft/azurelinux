@@ -3,7 +3,7 @@
 
 Name:           perl-Spellunker
 Version:        0.4.0
-Release: 36%{?dist}
+Release:        33%{?dist}
 Summary:        Pure perl spelling checker implementation
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Spellunker

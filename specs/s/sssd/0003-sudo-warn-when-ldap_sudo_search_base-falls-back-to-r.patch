@@ -1,0 +1,80 @@
+From ff8c1b19bcdbf79b733b052a7d926bd920b1205d Mon Sep 17 00:00:00 2001
+From: Alexey Tikhonov <atikhono@redhat.com>
+Date: Fri, 3 Jul 2026 13:25:08 +0200
+Subject: [PATCH] sudo: warn when ldap_sudo_search_base falls back to root DN
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When ldap_sudo_search_base is not explicitly configured, SSSD falls back
+to the domain's naming context (root DN) and searches the entire LDAP
+directory tree for sudoRole objects. Any LDAP principal with write access
+to any subtree can inject a sudoRole granting arbitrary sudo privileges
+on every enrolled host.
+
+This patch adds a warning log when the fallback occurs, alerting
+administrators that their configuration searches the entire directory
+tree for sudo rules. A future hardening step would be to default to
+ou=sudoers,<base_dn> instead of the root DN.
+
+The warning approach preserves backwards compatibility while ensuring
+administrators are aware of the security implications.
+
+Based on the patch by: Ian Murphy <imurphy@redhat.com>
+Amended by: Alexey Tikhonov <atikhono@redhat.com>
+
+:fixes: CVE-2026-14474
+
+Reviewed-by: Sumit Bose <sbose@redhat.com>
+Reviewed-by: Tomáš Halman <thalman@redhat.com>
+---
+ src/providers/ldap/sdap.c           | 19 +++++++++++++++++++
+ src/tests/system/tests/test_ldap.py |  2 +-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/src/providers/ldap/sdap.c b/src/providers/ldap/sdap.c
+index 1ce1d704b..7aa9244aa 100644
+--- a/src/providers/ldap/sdap.c
++++ b/src/providers/ldap/sdap.c
+@@ -1341,6 +1341,25 @@ errno_t sdap_set_config_options_with_rootdse(struct sysdb_attrs *rootdse,
+ 
+     /* Sudo */
+     if (!sdom->sudo_search_bases) {
++        /* At some point make this option mandatory,
++         * i.e. disable sudo rules lookup if 'sudo_search_bases' not set.
++         */
++        DEBUG(SSSDBG_IMPORTANT_INFO,
++              "`ldap_sudo_search_base` is not set. SSSD will search the entire "
++              "directory tree (%s) for sudoRole objects. This may allow any "
++              "LDAP principal with write access to any subtree to inject "
++              "sudo rules granting arbitrary privileges. Set "
++              "`ldap_sudo_search_base` to restrict the search scope "
++              "(e.g., 'ou=sudoers,dc=example,dc=com').\n",
++              sdom->naming_context);
++       sss_log(SSS_LOG_ALERT,
++               "`ldap_sudo_search_base` is not set. SSSD will search the entire "
++               "directory tree (%s) for sudoRole objects. This may allow any "
++               "LDAP principal with write access to any subtree to inject "
++               "sudo rules granting arbitrary privileges. Set "
++               "`ldap_sudo_search_base` to restrict the search scope "
++               "(e.g., 'ou=sudoers,dc=example,dc=com').",
++               sdom->naming_context);
+        ret = sdap_set_search_base(opts, sdom,
+                                    SDAP_SUDO_SEARCH_BASE,
+                                    sdom->naming_context);
+diff --git a/src/tests/tests/system/tests/test_ldap.py b/src/tests/tests/system/tests/test_ldap.py
+index 9e21d73f6..36d988475 100644
+--- a/src/tests/tests/system/tests/test_ldap.py
++++ b/src/tests/tests/system/tests/test_ldap.py
+@@ -245,7 +245,7 @@ def test_ldap__search_base_is_discovered_and_defaults_to_root_dse(client: Client
+     client.sssd.dom("test")["ldap_search_base"] = ldap.ldap.naming_context
+ 
+     client.sssd.stop()
+-    client.sssd.clear()
++    client.sssd.clear(logs=True)
+     client.sssd.start()
+ 
+     assert client.auth.ssh.password("puser1", "Secret123"), "User 'puser1' login failed!"
+-- 
+2.54.0
+

@@ -1,0 +1,2956 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Michal Kolar <mkolar@redhat.com>
+Date: Fri, 3 Jul 2026 22:18:32 +0200
+Subject: gdb-backport-dap-core-file-support.patch
+
+;; Backport of upstream commit e492fb22b70
+;; gdb: backport DAP core file support
+
+Back-port the following upstream commits to enable core file support
+within GDB's DAP protocol implementation:
+
+  * 0a481bb9a6d gdb/dap: add support for opening core files
+  * 4ecaac39c26 gdb/python: new events.corefile_changed event
+  * ecac42af735 Always propagate exceptions in DAP
+  * fc8e5a565b3 gdb: make structured core file mappings processing global
+  * f69c1d03c4d gdb/python: add Corefile.mapped_files method
+  * 7862554bcf4 gdb/python: introduce gdb.Corefile API
+
+The commit messages for each individual commit follow:
+
+~~~ 0a481bb9a6d:
+
+gdb/dap: add support for opening core files
+
+This patch adds core file support to GDB's DAP interface.
+
+Core files are supported as a GDB specific argument to 'attach', the
+new argument is 'coreFile', the name of the core file to debug.
+
+I think handling core files via attach makes the most sense; attach is
+for connecting to existing processes, but these targets are (usually)
+stopped as soon as GDB attaches, and that's what a core file looks
+like, a target that was running, but is now stopped.  It just happens
+that core file targets are special in that the target cannot be
+resumed again, nor can the user modify the program state (e.g. write
+to memory or registers).
+
+Prior to starting this work I took a look at what lldb does.  The
+documentation is not super clear, but this page seems to indicate that
+lldb might also use the 'coreFile' argument to 'attach':
+
+  https://lldb.llvm.org/use/lldbdap.html#configuration-settings-reference
+
+Like I said, it's not very clear, but search for "coreFile" and you'll
+see it mentioned, just once, under the "attach" header.  In order to
+be compatible with lldb I used the same argument name with the same
+capitalisation.
+
+The new argument is added to the documentation and mentioned in NEWS.
+
+I had to make some changes to testsuite/lib/dap-support.exp to support
+this new feature.  There's a new dap_corefile proc to handle setting
+up the initial connection.  This seemed cleaner that overloading
+dap_attach, even though under the hood it is still an 'attach' request
+that gets sent.
+
+The new test tries to write to memory and registers with the core file
+target in place, neither of these requests succeed, which is what we
+want, but the exceptions are logged into the dap log file.  The
+dap_shutdown proc calls dap_check_log_file to check the log for
+exceptions, and these two exceptions are spotted and trigger a FAIL.
+To avoid this I've added a new "expected_exception_count" argument
+for dap_shutdown.  Now we check that we see the expected number of
+exceptions.  We don't check for the specific exception types right
+now, but as the test is already checking that the expected requests
+fail, I think we're OK.
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+~~~  4ecaac39c26:
+
+gdb/python: new events.corefile_changed event
+
+Add a new Python event registry, events.corefile_changed.  This event
+is emitted each time the corefile within an inferior changes.
+
+The event object has a single 'inferior' attribute which is the
+gdb.Inferior object for which the core file changed.  The user can
+then inspect Inferior.corefile to see details about the new core file,
+or this will be None if the core file was removed from the inferior.
+
+I've updated the existing test to cover this new event.
+
+The new test covers both the corefile_changed event, but also monitors
+the exited event.  This ties into the work done in the previous
+commit where we use whether the inferior has exited or not as a guard
+for whether core_target::exit_core_file_inferior should be called.
+Unloading a core file should result in a single corefile_changed event
+and a single exited event.
+
+Reviewed-By: Eli Zaretskii <eliz@gnu.org>
+
+~~~ ecac42af735:
+
+Always propagate exceptions in DAP
+
+This changes the DAP exec_and_log function to always transform an
+exception into a DAPException and propagate it.
+
+As the bug points out, we haven't always wrapped calls when
+appropriate.  I think it's better to cause the request to fail by
+default; if any spot truly needs to ignore errors, that is readily
+done at the point of call.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=33346
+
+~~~ fc8e5a565b3:
+
+gdb: make structured core file mappings processing global
+
+In corelow.c, within core_target::build_file_mappings, we have code
+that wraps around a call to gdbarch_read_core_file_mappings and
+provides more structure to the results.
+
+Specifically, gdbarch_read_core_file_mappings calls a callback once
+for every region of every mapped file.  The wrapper code groups all of
+the mappings for one file into an instance of 'struct mapped_file',
+this allows all of the mapped regions to be associated with the
+build-id and filename of a file.
+
+In the next commit I plan to make this information available via the
+Python API, and so I need to allow access to this structured wrapping
+outside of corelow.c.
+
+This commit renames 'struct mapped_file' to 'struct core_mapped_file'
+and moves the struct into gdbcore.h.  Then a new global function
+gdb_read_core_file_mappings is created into which I move the code to
+build the structured data.
+
+Then corelow.c is updated to call gdb_read_core_file_mappings.
+
+This commit does not extend the Python API, that is for the next
+commit.
+
+There should be no user visible changes after this commit.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=32844
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+~~~ f69c1d03c4d:
+
+gdb/python: add Corefile.mapped_files method
+
+Add a new Corefile.mapped_files method which returns a list of
+gdb.CorefileMappedFile objects.
+
+Each gdb.CorefileMappedFile object represents a file that was mapped
+into the process when the core file was created.
+
+A gdb.CorefileMappedFile has attributes:
+
+  + filename  -- A string, the name of the mapped file.
+  + build_id -- A string or None, the build-id of the mapped file if
+                GDB could find it (None if not).
+  + is_main_executable -- A boolean, True if this mapping is the main
+                          executable.
+  + regions -- A list containing the regions of this file that were
+               mapped into the process.
+
+The 'regions' list is a list of gdb.CorefileMappedFileRegion objects,
+each of these objects has the following attributes:
+
+  + start -- the start address within the inferior.
+  + end -- the end address within the inferior.
+  + file_offset -- the offset within the mapped file for this mapping.
+
+There are docs and tests.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=32844
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+~~~ 7862554bcf4:
+
+gdb/python: introduce gdb.Corefile API
+
+This commit starts adding some core file related features to the
+Python API.
+
+In this initial commit I've tried to keep the changes as small as
+possible for easy review.
+
+There's a new Python class gdb.Corefile, which represents a loaded
+core file.  This API doesn't allow the user to create their own
+gdb.Corefile objects, a core file must be loaded using the 'core-file'
+command, then a gdb.Corefile object can be obtained by querying the
+inferior in which the core file was loaded.
+
+There's a new attribute gdb.Inferior.corefile, this is None when no
+core file is loaded, or contains a gdb.Corefile object if a core file
+has been loaded.
+
+Currently, the gdb.Corefile object has one attribute, and one method,
+these are:
+
+  gdb.Corefile.filename -- the file name of the loaded core file.
+
+  gdb.Corefile.is_valid() -- indicates if a gdb.Corefile object is
+  valid or not.  See notes below.
+
+A gdb.Corefile object is only valid while the corresponding core file
+is loaded into an inferior.  Unloading the core file, or loading a
+different one will cause a gdb.Corefile object to become invalid.  For
+example:
+
+  (gdb) core-file /tmp/core.54313
+  ... snip ...
+  (gdb) python core=gdb.selected_inferior().corefile
+  (gdb) python print(core)
+  <gdb.Corefile inferior=1 filename='/tmp/core.54313'>
+  (gdb) python print(core.is_valid())
+  True
+  (gdb) core-file
+  No core file now.
+  (gdb) python print(core)
+  <gdb.Corefile (invalid)>
+  (gdb) python print(core.is_valid())
+  False
+  (gdb)
+
+In order to track changes to the core file, there is a new observable
+'core_file_changed', which accounts for the changes in corelow.c,
+observable,c, and observable.h.  Currently, this observable is not
+visible as a Python event.
+
+I chose to access the core file via the inferior even though the core
+file BFD object is actually stored within the program_space.  As such,
+it might seem that the natural choice would be to add the attribute as
+gdb.Progspace.corefile.
+
+For background reading on my choice, please see:
+
+  https://inbox.sourceware.org/gdb-patches/577f2c47793acb501c2611c0e6c7ea379f774830.1668789658.git.aburgess@redhat.com
+
+This patch was never merged, it is still on my backlog, but the
+observation in that work is that some targets are not really
+shareable.  For example, the core_target (corelow.c) stores
+information about the loaded core file within the target instance.  As
+such, each target instance represents a single loaded core file.
+
+Except that the BFD part of the core file is stored in the
+program_space, which is a little weird.
+
+During review, Tom made the observation, that maybe we should
+investigate moving the core file BFD into the core_target.  I'm
+inclined to agree with this as a direction of travel.
+
+All this leaves us with two observations:
+
+  1. Currently, loading a core file into an inferior, then using
+     'add-inferior' will try to share the core_target between
+     inferiors.  This is broken, and can trigger GDB crashes.  The
+     obvious fix, without reworking core_target, is just to prevent
+     this sharing, making core_target per-inferior.
+
+  2. Having the core file information split between the core_target
+     instance, and the BFD stored in the program_space is a little
+     weird, and is really just historical.  Planning for a future
+     where the BFD is also stored in the core_target might be wise.
+
+So, if we imagine that the BFD is (one day) moved into the
+core_target, and that the core_target really becomes non-shareable,
+then it is, I think, clearer that the corefile attribute should live
+on the gdb.Inferior object, not the gdb.Progspace object.
+
+There's testing for all the functionality added in this commit.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=32844
+
+Reviewed-By: Eli Zaretskii <eliz@gnu.org>
+Approved-By: Tom Tromey <tom@tromey.com>
+
+diff --git a/gdb/Makefile.in b/gdb/Makefile.in
+--- a/gdb/Makefile.in
++++ b/gdb/Makefile.in
+@@ -399,6 +399,7 @@ SUBDIR_PYTHON_SRCS = \
+ 	python/py-color.c \
+ 	python/py-connection.c \
+ 	python/py-continueevent.c \
++	python/py-corefile.c \
+ 	python/py-dap.c \
+ 	python/py-disasm.c \
+ 	python/py-event.c \
+diff --git a/gdb/NEWS b/gdb/NEWS
+--- a/gdb/NEWS
++++ b/gdb/NEWS
+@@ -13,6 +13,8 @@
+ 
+   ** GDB now supports the "completions" request.
+ 
++  ** The attach request now accepts the coreFile parameter.
++
+ * "set style" commands now supports numeric format for basic colors
+   from 0 to 255 and #RRGGBB format for TrueColor.
+ 
+@@ -176,6 +178,32 @@ info threads [-gid] [-stopped] [-running] [ID]...
+      unavailability like gdb.Value.is_optimized_out checks for
+      optimized out values.
+ 
++  ** New gdb.Corefile class which represents a loaded core file.  This
++     has an attribute Corefile.filename, the file name of the loaded
++     core file, and a method Corefile.is_valid(), which returns False
++     when a Corefile object becomes invalid (e.g. when the core file
++     is unloaded).  There is also Corefile.mapped_files() which
++     returns a list of CorefileMappedFile objects, representing files
++     that were mapped into the core file when it was created.
++
++  ** New gdb.CorefileMappedFile type representing a file that was
++     mapped when the core file was created.  Has read-only attributes
++     filename (string), build_id (string), is_main_executable
++     (boolean), and regions (list of CorefileMappedFileRegion objects).
++
++  ** New gdb.CorefileMappedFileRegion type, which represents a mapped
++     region of a file (see gdb.CorefileMappedFile above).  Has
++     read-only attributes start, end, and file_offset.
++
++  ** New Inferior.corefile attribute.  This read only attribute
++     contains the gdb.Corefile object if a core file is loaded into
++     the inferior, otherwise, this contains None.
++
++  ** New event registry gdb.events.corefile_changed, which emits a
++     CorefileChangedEvent whenever the core file associated with an
++     inferior changes.  The event has an 'inferior' attribute which is
++     the gdb.Inferior in which the core file has changed.
++
+ * Guile API
+ 
+   ** New type <gdb:color> for dealing with colors.
+diff --git a/gdb/corelow.c b/gdb/corelow.c
+--- a/gdb/corelow.c
++++ b/gdb/corelow.c
+@@ -53,6 +53,7 @@
+ #include "xml-tdesc.h"
+ #include "memtag.h"
+ #include "cli/cli-style.h"
++#include "observable.h"
+ 
+ #ifndef O_LARGEFILE
+ #define O_LARGEFILE 0
+@@ -365,108 +366,27 @@ core_target::core_target ()
+ void
+ core_target::build_file_mappings ()
+ {
+-  /* Type holding information about a single file mapped into the inferior
+-     at the point when the core file was created.  Associates a build-id
+-     with the list of regions the file is mapped into.  */
+-  struct mapped_file
+-  {
+-    /* Type for a region of a file that was mapped into the inferior when
+-       the core file was generated.  */
+-    struct region
+-    {
+-      /* Constructor.   See member variables for argument descriptions.  */
+-      region (CORE_ADDR start_, CORE_ADDR end_, CORE_ADDR file_ofs_)
+-	: start (start_),
+-	  end (end_),
+-	  file_ofs (file_ofs_)
+-      { /* Nothing.  */ }
+-
+-      /* The inferior address for the start of the mapped region.  */
+-      CORE_ADDR start;
+-
+-      /* The inferior address immediately after the mapped region.  */
+-      CORE_ADDR end;
+-
+-      /* The offset within the mapped file for this content.  */
+-      CORE_ADDR file_ofs;
+-    };
+-
+-    /* If not nullptr, then this is the build-id associated with this
+-       file.  */
+-    const bfd_build_id *build_id = nullptr;
+-
+-    /* If true then we have seen multiple different build-ids associated
+-       with the same filename.  The build_id field will have been set back
+-       to nullptr, and we should not set build_id in future.  */
+-    bool ignore_build_id_p = false;
+-
+-    /* All the mapped regions of this file.  */
+-    std::vector<region> regions;
+-  };
+-
+   gdb::unordered_map<std::string, struct bfd *> bfd_map;
+   gdb::unordered_set<std::string> unavailable_paths;
+ 
+   /* All files mapped into the core file.  The key is the filename.  */
+-  gdb::unordered_map<std::string, mapped_file> mapped_files;
+-
+-  /* See linux_read_core_file_mappings() in linux-tdep.c for an example
+-     read_core_file_mappings method.  */
+-  gdbarch_read_core_file_mappings (m_core_gdbarch,
+-				   current_program_space->core_bfd (),
+-
+-    /* After determining the number of mappings, read_core_file_mappings
+-       will invoke this lambda.  */
+-    [&] (ULONGEST)
+-      {
+-      },
+-
+-    /* read_core_file_mappings will invoke this lambda for each mapping
+-       that it finds.  */
+-    [&] (int num, ULONGEST start, ULONGEST end, ULONGEST file_ofs,
+-	 const char *filename, const bfd_build_id *build_id)
+-      {
+-	/* Architecture-specific read_core_mapping methods are expected to
+-	   weed out non-file-backed mappings.  */
+-	gdb_assert (filename != nullptr);
++  std::vector<core_mapped_file> mapped_files
++    = gdb_read_core_file_mappings (m_core_gdbarch,
++				   current_program_space->core_bfd ());
+ 
+-	/* Add this mapped region to the data for FILENAME.  */
+-	mapped_file &file_data = mapped_files[filename];
+-	file_data.regions.emplace_back (start, end, file_ofs);
+-	if (build_id != nullptr && !file_data.ignore_build_id_p)
+-	  {
+-	    if (file_data.build_id == nullptr)
+-	      file_data.build_id = build_id;
+-	    else if (!build_id_equal (build_id, file_data.build_id))
+-	      {
+-		warning (_("Multiple build-ids found for %ps"),
+-			 styled_string (file_name_style.style (), filename));
+-		file_data.build_id = nullptr;
+-		file_data.ignore_build_id_p = true;
+-	      }
+-	  }
+-      });
+-
+-  /* Get the build-id of the core file.  */
+-  const bfd_build_id *core_build_id
+-    = build_id_bfd_get (current_program_space->core_bfd ());
+-
+-  for (const auto &[filename, file_data] : mapped_files)
++  for (const core_mapped_file &file_data : mapped_files)
+     {
+-      /* If this mapped file has the same build-id as was discovered for
+-	 the core-file itself, then we assume this is the main
+-	 executable.  Record the filename as we can use this later.  */
+-      if (file_data.build_id != nullptr
+-	  && m_expected_exec_filename.empty ()
+-	  && build_id_equal (file_data.build_id, core_build_id))
+-	m_expected_exec_filename = filename;
++      /* If this mapped file is marked as the main executable then record
++	 the filename as we can use this later.  */
++      if (file_data.is_main_exec && m_expected_exec_filename.empty ())
++	m_expected_exec_filename = file_data.filename;
+ 
+       /* Use exec_file_find() to do sysroot expansion.  It'll
+ 	 also strip the potential sysroot "target:" prefix.  If
+ 	 there is no sysroot, an equivalent (possibly more
+ 	 canonical) pathname will be provided.  */
+       gdb::unique_xmalloc_ptr<char> expanded_fname
+-	= exec_file_find (filename.c_str (), nullptr);
++	= exec_file_find (file_data.filename.c_str (), nullptr);
+ 
+       bool build_id_mismatch = false;
+       if (expanded_fname != nullptr && file_data.build_id != nullptr)
+@@ -508,7 +428,7 @@ core_target::build_file_mappings ()
+ 	{
+ 	  abfd = find_objfile_by_build_id (current_program_space,
+ 					   file_data.build_id,
+-					   filename.c_str ());
++					   file_data.filename.c_str ());
+ 
+ 	  if (abfd != nullptr)
+ 	    {
+@@ -526,7 +446,7 @@ core_target::build_file_mappings ()
+ 	}
+ 
+       std::vector<mem_range> ranges;
+-      for (const mapped_file::region &region : file_data.regions)
++      for (const core_mapped_file::region &region : file_data.regions)
+ 	ranges.emplace_back (region.start, region.end - region.start);
+ 
+       if (expanded_fname == nullptr
+@@ -544,7 +464,7 @@ core_target::build_file_mappings ()
+ 	  bool content_is_in_core_file_p = true;
+ 
+ 	  /* Record all regions for this file as unavailable.  */
+-	  for (const mapped_file::region &region : file_data.regions)
++	  for (const core_mapped_file::region &region : file_data.regions)
+ 	    {
+ 	      /* Check to see if the region is available within the core
+ 		 file.  */
+@@ -576,33 +496,33 @@ core_target::build_file_mappings ()
+ 	  if (build_id_mismatch)
+ 	    {
+ 	      if (expanded_fname == nullptr
+-		  || filename == expanded_fname.get ())
++		  || file_data.filename == expanded_fname.get ())
+ 		warning (_("File %ps doesn't match build-id from core-file "
+ 			   "during file-backed mapping processing"),
+ 			 styled_string (file_name_style.style (),
+-					filename.c_str ()));
++					file_data.filename.c_str ()));
+ 	      else
+ 		warning (_("File %ps which was expanded to %ps, doesn't match "
+ 			   "build-id from core-file during file-backed "
+ 			   "mapping processing"),
+ 			 styled_string (file_name_style.style (),
+-					filename.c_str ()),
++					file_data.filename.c_str ()),
+ 			 styled_string (file_name_style.style (),
+ 					expanded_fname.get ()));
+ 	    }
+ 	  else if (!content_is_in_core_file_p)
+ 	    {
+ 	      if (expanded_fname == nullptr
+-		  || filename == expanded_fname.get ())
++		  || file_data.filename == expanded_fname.get ())
+ 		warning (_("Can't open file %ps during file-backed mapping "
+ 			   "note processing"),
+ 			 styled_string (file_name_style.style (),
+-					filename.c_str ()));
++					file_data.filename.c_str ()));
+ 	      else
+ 		warning (_("Can't open file %ps which was expanded to %ps "
+ 			   "during file-backed mapping note processing"),
+ 			 styled_string (file_name_style.style (),
+-					filename.c_str ()),
++					file_data.filename.c_str ()),
+ 			 styled_string (file_name_style.style (),
+ 					expanded_fname.get ()));
+ 	    }
+@@ -616,7 +536,7 @@ core_target::build_file_mappings ()
+ 				    abfd.get ());
+ 
+ 	  /* Create sections for each mapped region.  */
+-	  for (const mapped_file::region &region : file_data.regions)
++	  for (const core_mapped_file::region &region : file_data.regions)
+ 	    {
+ 	      /* Make new BFD section.  All sections have the same name,
+ 		 which is permitted by bfd_make_section_anyway().  */
+@@ -652,7 +572,7 @@ core_target::build_file_mappings ()
+ 	      soname = gdb_bfd_read_elf_soname (actual_filename);
+ 	    }
+ 
+-	  m_mapped_file_info.add (soname.get (), filename.c_str (),
++	  m_mapped_file_info.add (soname.get (), file_data.filename.c_str (),
+ 				  actual_filename, std::move (ranges),
+ 				  file_data.build_id);
+ 	}
+@@ -678,6 +598,9 @@ core_target::clear_core ()
+       clear_solib (current_program_space);
+ 
+       current_program_space->cbfd.reset (nullptr);
++
++      /* Notify that the core file has changed.  */
++      gdb::observers::core_file_changed.notify (current_inferior ());
+     }
+ }
+ 
+@@ -1278,6 +1201,9 @@ core_target_open (const char *arg, int from_tty)
+ 	  exception_print (gdb_stderr, except);
+ 	}
+     }
++
++  /* Notify that the core file has changed.  */
++  gdb::observers::core_file_changed.notify (current_inferior ());
+ }
+ 
+ void
+@@ -2156,6 +2082,103 @@ mapped_file_info::lookup (const char *filename,
+ 
+ /* See gdbcore.h.  */
+ 
++std::vector<core_mapped_file>
++gdb_read_core_file_mappings (struct gdbarch *gdbarch, struct bfd *cbfd)
++{
++  std::vector<core_mapped_file> results;
++
++  /* A map entry used while building RESULTS.  */
++  struct map_entry
++  {
++    explicit map_entry (core_mapped_file *ptr)
++      : file_data (ptr)
++    { /* Nothing.  */ }
++
++    /* Points to an entry in RESULTS, this allows entries to be quickly
++       looked up and updated as new mappings are read.  */
++    core_mapped_file *file_data = nullptr;
++
++    /* If true then we have seen multiple different build-ids associated
++       with the filename of FILE_DATA.  The FILE_DATA->build_id field will
++       have been set to nullptr, and we should not set FILE_DATA->build_id
++       in future.  */
++    bool ignore_build_id_p = false;
++  };
++
++  /* All files mapped into the core file.  The key is the filename.  */
++  gdb::unordered_map<std::string, map_entry> mapped_files;
++
++  /* Get the build-id of the core file.  At least on Linux, this will be
++     the build-id for the main executable.  If other targets add the
++     gdbarch_read_core_file_mappings method, then it might turn out that
++     this logic is no longer true, in which case this might need to move
++     into the gdbarch_read_core_file_mappings method.  */
++  const bfd_build_id *core_build_id = build_id_bfd_get (cbfd);
++
++  /* See linux_read_core_file_mappings() in linux-tdep.c for an example
++     read_core_file_mappings method.  */
++  gdbarch_read_core_file_mappings (gdbarch, cbfd,
++    /* After determining the number of mappings, read_core_file_mappings
++       will invoke this lambda.  */
++    [&] (ULONGEST)
++      {
++      },
++
++    /* read_core_file_mappings will invoke this lambda for each mapping
++       that it finds.  */
++    [&] (int num, ULONGEST start, ULONGEST end, ULONGEST file_ofs,
++	 const char *filename, const bfd_build_id *build_id)
++      {
++	/* Architecture-specific read_core_mapping methods are expected to
++	   weed out non-file-backed mappings.  */
++	gdb_assert (filename != nullptr);
++
++	/* Add this mapped region to the data for FILENAME.  */
++	auto iter = mapped_files.find (filename);
++	if (iter == mapped_files.end ())
++	  {
++	    /* Create entry in results list.  */
++	    results.emplace_back ();
++
++	    /* The entry to be added to the lookup map.  */
++	    map_entry entry (&results.back ());
++	    entry.file_data->filename = filename;
++
++	    /* Add entry to the quick lookup map and update ITER.  */
++	    auto inserted_result
++	      = mapped_files.insert ({filename, std::move (entry)});
++	    gdb_assert (inserted_result.second);
++	    iter = inserted_result.first;
++	  }
++
++	core_mapped_file &file_data = *iter->second.file_data;
++	bool &ignore_build_id_p = iter->second.ignore_build_id_p;
++
++	file_data.regions.emplace_back (start, end, file_ofs);
++	if (build_id != nullptr && !ignore_build_id_p)
++	  {
++	    if (file_data.build_id == nullptr)
++	      file_data.build_id = build_id;
++	    else if (!build_id_equal (build_id, file_data.build_id))
++	      {
++		warning (_("Multiple build-ids found for %ps"),
++			 styled_string (file_name_style.style (), filename));
++		file_data.build_id = nullptr;
++		ignore_build_id_p = true;
++	      }
++	  }
++
++	if (build_id != nullptr
++	    && core_build_id != nullptr
++	    && build_id_equal (build_id, core_build_id))
++	  file_data.is_main_exec = true;
++      });
++
++  return results;
++}
++
++/* See gdbcore.h.  */
++
+ std::optional <core_target_mapped_file_info>
+ core_target_find_mapped_file (const char *filename,
+ 			      std::optional<CORE_ADDR> addr)
+diff --git a/gdb/doc/gdb.texinfo b/gdb/doc/gdb.texinfo
+--- a/gdb/doc/gdb.texinfo
++++ b/gdb/doc/gdb.texinfo
+@@ -40029,10 +40029,10 @@ will set a temporary breakpoint at the program's first instruction, using
+ the same approach as the @code{starti} command.  @xref{Starting}.
+ @end table
+ 
+-@value{GDBN} defines some parameters that can be passed to the
+-@code{attach} request.  Either @code{pid} or @code{target} must be
+-specified, but if both are specified then @code{target} will be
+-ignored.
++@value{GDBN} defines some additional parameters that can be passed to
++the @code{attach} request.  One of @code{pid}, @code{target}, or
++@code{coreFile} must be specified.  If multiple are specified, they
++are checked for in that order, and the first one found is used.
+ 
+ @table @code
+ @item pid
+@@ -40048,6 +40048,10 @@ should be supplied.
+ @item target
+ The target to which @value{GDBN} should connect.  This is a string and
+ is passed to the @code{target remote} command.  @xref{Connecting}.
++
++@item coreFile
++A string that specifies a core file to use.  This corresponds to the
++@kbd{core-file} command.  @xref{core-file command}.
+ @end table
+ 
+ In response to the @code{disassemble} request, DAP allows the client
+diff --git a/gdb/doc/python.texi b/gdb/doc/python.texi
+--- a/gdb/doc/python.texi
++++ b/gdb/doc/python.texi
+@@ -233,6 +233,7 @@ optional arguments while skipping others.  Example:
+ * Disassembly In Python::       Instruction Disassembly In Python
+ * Missing Debug Info In Python:: Handle missing debug info from Python.
+ * Missing Objfiles In Python::  Handle objfiles from Python.
++* Core Files In Python::        Python representation of core files.
+ @end menu
+ 
+ @node Basic Python
+@@ -3626,6 +3627,15 @@ necessary quoting for the shell; when a sequence is assigned, the
+ quoting is applied by @value{GDBN}.
+ @end defvar
+ 
++@defvar Inferior.corefile
++If a core file has been loaded into this inferior (@pxref{core-file
++command}), then this contains a @code{gdb.Corefile} object that
++represents the loaded core file (@pxref{Core Files In Python}).
++
++If no core file has been loaded into this inferior, then this
++attribute contains @code{None}.
++@end defvar
++
+ A @code{gdb.Inferior} object has the following methods:
+ 
+ @defun Inferior.is_valid ()
+@@ -4094,6 +4104,17 @@ file is updated first, so when this event is emitted, the executable
+ filename will have changed, but the symbol filename might still hold
+ its previous value.
+ 
++@item events.corefile_changed
++Emits @code{gdb.CorefileChangedEvent} which indicates that the core
++file associated with a @code{gdb.Inferior} has changed, either a new
++core file has been loaded, or the existing core file has been
++unloaded (@pxref{Core Files In Python}).
++
++@defvar CorefileChangedEvent.inferior
++The @code{gdb.Inferior} in which the core file has changed
++(@pxref{Inferiors In Python}).
++@end defvar
++
+ @item events.new_progspace
+ This is emitted when @value{GDBN} adds a new program space
+ (@pxref{Progspaces In Python,,Program Spaces In Python}).  The event
+@@ -8624,6 +8645,106 @@ handlers, all of the matching handlers are enabled.  The
+ @code{enabled} field of each matching handler is set to @code{True}.
+ @end table
+ 
++@node Core Files In Python
++@subsubsection Core Files In Python
++@cindex python, core files
++
++When a core file is loaded into an inferior (@pxref{Inferiors In
++Python}) for examination (@pxref{core-file command}), information
++about the core file is contained in a @code{gdb.Corefile} object.
++
++The @code{gdb.Corefile} for an inferior can be accessed using the
++@code{Inferior.corefile} attribute.  This will be @code{None} if
++no core file is loaded.
++
++A @code{gdb.Corefile} object has the following attributes:
++
++@defvar Corefile.filename
++This read only attribute contains a non-empty string, the file name of
++the core file.  Attempting to access this attribute on an invalid
++@code{gdb.Corefile} object will raise a @code{RuntimeError} exception.
++@end defvar
++
++A @code{gdb.Corefile} object has the following methods:
++
++@defun Corefile.is_valid ()
++Returns @code{True} if the @code{gdb.Corefile} object is valid,
++@code{False} if not.  A @code{gdb.Corefile} object will become invalid
++when the core file is unloaded from the inferior using the
++@kbd{core-file} command (@pxref{core-file command}), or if the
++inferior in which the core file is loaded is deleted.  All other
++@code{gdb.Corefile} methods and attributes will throw an exception if
++it is invalid at the time the method is called, or the attribute
++accessed.
++@end defun
++
++@defun Corefile.mapped_files ()
++Return a list of @code{gdb.CorefileMappedFile} (see below) objects
++representing files that were mapped into the process when the core
++file was created.  This information is read from the @samp{NT_FILE}
++core file note on Linux.  Not every target supports accessing this
++information, for targets without support, an empty list will be
++returned.
++@end defun
++
++One may add arbitrary attributes to @code{gdb.Corefile} objects in the
++usual Python way.  This is useful if, for example, one needs to do
++some extra record keeping associated with the corefile.
++@xref{choosing attribute names}, for guidance on selecting a suitable
++name for new attributes.
++
++The @code{Corefile.mapped_files ()} method returns a list of
++@code{gdb.CorefileMappedFile} objects.  Each of these objects
++represents a file that was fully, or partially, mapped into the
++processes address space when the core file was created.
++
++A @code{gdb.CorefileMappedFile} object has the following attributes:
++
++@defvar CorefileMappedFile.filename
++This read only attribute contains a non-empty string, the file name of
++the mapped file.
++@end defvar
++
++@defvar CorefileMappedFile.build_id
++This read only attribute contains a non-empty string or @code{None}.
++This is the build-id of the mapped file extracted from the core file,
++or @code{None} if there was no build-id, or @value{GDBN} was unable to
++extract the build-id.
++@end defvar
++
++@defvar CorefileMappedFile.is_main_executable
++This read only attribute is @code{True} if @value{GDBN} believes this
++mapping represents the main executable for which this core file was
++created.  This will be @code{False} for all other mappings.
++@end defvar
++
++@defvar CorefileMappedFile.regions
++This read only attribute contains a list of
++@code{gdb.CorefileMappedFileRegion} objects.  Each of these objects
++describes a region of the file that was mapped into the process when
++the core file was created, further details are given below.
++@end defvar
++
++The @code{gdb.CorefileMappedFileRegion} object describes which part of
++a file that was mapped into a process when the core file was created.
++
++A @code{gdb.CorefileMappedFile} object has the following attributes:
++
++@defvar CorefileMappedFileRegion.start
++This read only attribute contains the start address of this mapping
++within the inferior.
++@end defvar
++
++@defvar CorefileMappedFileRegion.end
++This read only attribute contains end address of this mapping within
++the inferior.
++@end defvar
++
++@defvar CorefileMappedFileRegion.file_offset
++This read only attribute contains the offset within the mapped file
++for this mapping.
++@end defvar
++
+ @node Python Auto-loading
+ @subsection Python Auto-loading
+ @cindex Python auto-loading
+diff --git a/gdb/gdbcore.h b/gdb/gdbcore.h
+--- a/gdb/gdbcore.h
++++ b/gdb/gdbcore.h
+@@ -258,4 +258,47 @@ std::optional<core_target_mapped_file_info>
+ core_target_find_mapped_file (const char *filename,
+ 			      std::optional<CORE_ADDR> addr);
+ 
++/* Type holding information about a single file mapped into the inferior
++   at the point when the core file was created.  Associates a build-id
++   with the list of regions the file is mapped into.  */
++struct core_mapped_file
++{
++  /* Type for a region of a file that was mapped into the inferior when
++     the core file was generated.  */
++  struct region
++  {
++    /* Constructor.   See member variables for argument descriptions.  */
++    region (CORE_ADDR start_, CORE_ADDR end_, CORE_ADDR file_ofs_)
++      : start (start_),
++	end (end_),
++	file_ofs (file_ofs_)
++    { /* Nothing.  */ }
++
++    /* The inferior address for the start of the mapped region.  */
++    CORE_ADDR start;
++
++    /* The inferior address immediately after the mapped region.  */
++    CORE_ADDR end;
++
++    /* The offset within the mapped file for this content.  */
++    CORE_ADDR file_ofs;
++  };
++
++  /* The filename as recorded in the core file.  */
++  std::string filename;
++
++  /* If not nullptr, then this is the build-id associated with this
++     file.  */
++  const bfd_build_id *build_id = nullptr;
++
++  /* All the mapped regions of this file.  */
++  std::vector<region> regions;
++
++  /* True if this is the main executable.  */
++  bool is_main_exec = false;
++};
++
++extern std::vector<core_mapped_file> gdb_read_core_file_mappings
++  (struct gdbarch *gdbarch, struct bfd *cbfd);
++
+ #endif /* GDB_GDBCORE_H */
+diff --git a/gdb/observable.c b/gdb/observable.c
+--- a/gdb/observable.c
++++ b/gdb/observable.c
+@@ -76,6 +76,7 @@ DEFINE_OBSERVABLE (target_post_wait);
+ DEFINE_OBSERVABLE (new_program_space);
+ DEFINE_OBSERVABLE (free_program_space);
+ DEFINE_OBSERVABLE (tui_enabled);
++DEFINE_OBSERVABLE (core_file_changed);
+ 
+ } /* namespace observers */
+ } /* namespace gdb */
+diff --git a/gdb/observable.h b/gdb/observable.h
+--- a/gdb/observable.h
++++ b/gdb/observable.h
+@@ -260,6 +260,12 @@ extern observable <program_space */* pspace */> free_program_space;
+ 
+ extern observable<bool /* enabled */> tui_enabled;
+ 
++/* The core file loaded into the program space inferior INF has changed.
++   The process of changing has completed, i.e. when unloading, the unload
++   is now complete.  When loading a new core file, the load is complete,
++   shared libraries have been loaded, registers and threads read in, etc.  */
++extern observable<inferior */* inf */> core_file_changed;
++
+ } /* namespace observers */
+ 
+ } /* namespace gdb */
+diff --git a/gdb/python/lib/gdb/dap/events.py b/gdb/python/lib/gdb/dap/events.py
+--- a/gdb/python/lib/gdb/dap/events.py
++++ b/gdb/python/lib/gdb/dap/events.py
+@@ -161,7 +161,7 @@ _expected_pause = False
+ 
+ 
+ @in_gdb_thread
+-def exec_and_expect_stop(cmd, expected_pause=False, propagate_exception=False):
++def exec_and_expect_stop(cmd, expected_pause=False):
+     """A wrapper for exec_and_log that sets the continue-suppression flag.
+ 
+     When EXPECTED_PAUSE is True, a stop that looks like a pause (e.g.,
+@@ -174,7 +174,7 @@ def exec_and_expect_stop(cmd, expected_pause=False, propagate_exception=False):
+     # continuing.
+     _suppress_cont = not expected_pause
+     # FIXME if the call fails should we clear _suppress_cont?
+-    exec_and_log(cmd, propagate_exception)
++    exec_and_log(cmd)
+ 
+ 
+ # Map from gdb stop reasons to DAP stop reasons.  Some of these can't
+@@ -276,6 +276,31 @@ def _on_inferior_call(event):
+             send_event("stopped", obj)
+ 
+ 
++@in_gdb_thread
++def _on_corefile_changed(event):
++    # Ignore events relating to corefile being unloaded.
++    if event.inferior.corefile is None:
++        return
++
++    # Corefiles are usually attached via the 'attach' request, which
++    # sets the global _expected_stop_reason to 'attach'.  It is
++    # because of this that it is safe to forward to _on_stop, as when
++    # _expected_stop_reason is set _on_stop doesn't read the
++    # event.details, which EVENT doesn't have.
++    #
++    # However, if the user loads a core file via some mechanism other
++    # than the 'attach' request, e.g. they use the repl to issue a GDB
++    # 'core-file' command, then when we get here _expected_stop_reason
++    # will not be set.
++    #
++    # So, in either case, set _expected_stop_reason now.
++    global _expected_stop_reason
++    _expected_stop_reason = "attach"
++
++    # A corefile was loaded, announce that the inferior has stopped.
++    _on_stop(event)
++
++
+ gdb.events.stop.connect(_on_stop)
+ gdb.events.exited.connect(_on_exit)
+ gdb.events.new_thread.connect(_new_thread)
+@@ -284,3 +309,4 @@ gdb.events.cont.connect(_cont)
+ gdb.events.new_objfile.connect(_new_objfile)
+ gdb.events.free_objfile.connect(_objfile_removed)
+ gdb.events.inferior_call.connect(_on_inferior_call)
++gdb.events.corefile_changed.connect(_on_corefile_changed)
+diff --git a/gdb/python/lib/gdb/dap/launch.py b/gdb/python/lib/gdb/dap/launch.py
+--- a/gdb/python/lib/gdb/dap/launch.py
++++ b/gdb/python/lib/gdb/dap/launch.py
+@@ -59,12 +59,16 @@ class _LaunchOrAttachDeferredRequest(DeferredRequest):
+         super().reschedule()
+ 
+ 
++# Handle whitespace, quotes, and backslashes here.  Exactly what
++# to quote depends on libiberty's buildargv and safe-ctype.
++def escape_filename(filename):
++    return re.sub("[ \t\n\r\f\v\\\\'\"]", "\\\\\\g<0>", filename)
++
++
+ # A wrapper for the 'file' command that correctly quotes its argument.
+ @in_gdb_thread
+ def file_command(program):
+-    # Handle whitespace, quotes, and backslashes here.  Exactly what
+-    # to quote depends on libiberty's buildargv and safe-ctype.
+-    program = re.sub("[ \t\n\r\f\v\\\\'\"]", "\\\\\\g<0>", program)
++    program = escape_filename(program)
+     exec_and_log("file " + program)
+ 
+ 
+@@ -132,6 +136,7 @@ def attach(
+     program: Optional[str] = None,
+     pid: Optional[int] = None,
+     target: Optional[str] = None,
++    coreFile: Optional[str] = None,
+     **args,
+ ):
+     # The actual attach is handled by this function.
+@@ -143,11 +148,14 @@ def attach(
+             cmd = "attach " + str(pid)
+         elif target is not None:
+             cmd = "target remote " + target
++        elif coreFile is not None:
++            cmd = "core-file " + escape_filename(coreFile)
+         else:
+-            raise DAPException("attach requires either 'pid' or 'target'")
++            raise DAPException("attach requires either 'pid', 'target', or 'coreFile'")
+         expect_process("attach")
+         expect_stop("attach")
+         exec_and_log(cmd)
++
+         # Attach response does not have a body.
+         return None
+ 
+diff --git a/gdb/python/lib/gdb/dap/next.py b/gdb/python/lib/gdb/dap/next.py
+--- a/gdb/python/lib/gdb/dap/next.py
++++ b/gdb/python/lib/gdb/dap/next.py
+@@ -76,7 +76,7 @@ def step_in(
+ @request("stepOut")
+ def step_out(*, threadId: int, singleThread: bool = False, **args):
+     _handle_thread_step(threadId, singleThread, True)
+-    exec_and_expect_stop("finish &", propagate_exception=True)
++    exec_and_expect_stop("finish &")
+ 
+ 
+ @request("continue")
+diff --git a/gdb/python/lib/gdb/dap/server.py b/gdb/python/lib/gdb/dap/server.py
+--- a/gdb/python/lib/gdb/dap/server.py
++++ b/gdb/python/lib/gdb/dap/server.py
+@@ -19,6 +19,7 @@ import inspect
+ import json
+ import threading
+ from contextlib import contextmanager
++from typing import Optional
+ 
+ import gdb
+ 
+@@ -610,11 +611,29 @@ def terminate(**args):
+     exec_and_log("kill")
+ 
+ 
++@in_gdb_thread
++def _disconnect_or_kill(terminate: Optional[bool]):
++    inf = gdb.selected_inferior()
++    if inf.connection is None:
++        # Nothing to do here.
++        return
++    if terminate is None:
++        # The default depends on whether the inferior was attached or
++        # launched.
++        terminate = not inf.was_attached
++
++    if inf.corefile is not None:
++        exec_and_log("core-file")
++    elif terminate:
++        exec_and_log("kill")
++    elif inf.was_attached:
++        exec_and_log("detach")
++
++
+ @request("disconnect", on_dap_thread=True, expect_stopped=False)
+ @capability("supportTerminateDebuggee")
+-def disconnect(*, terminateDebuggee: bool = False, **args):
+-    if terminateDebuggee:
+-        send_gdb_with_response("kill")
++def disconnect(*, terminateDebuggee: Optional[bool] = None, **args):
++    send_gdb_with_response(lambda: _disconnect_or_kill(terminateDebuggee))
+     _server.shutdown()
+ 
+ 
+diff --git a/gdb/python/lib/gdb/dap/startup.py b/gdb/python/lib/gdb/dap/startup.py
+--- a/gdb/python/lib/gdb/dap/startup.py
++++ b/gdb/python/lib/gdb/dap/startup.py
+@@ -204,7 +204,7 @@ def log_stack(level=LogLevel.DEFAULT):
+ 
+ 
+ @in_gdb_thread
+-def exec_and_log(cmd, propagate_exception=False):
++def exec_and_log(cmd):
+     """Execute the gdb command CMD.
+     If logging is enabled, log the command and its output."""
+     log("+++ " + cmd)
+@@ -213,10 +213,10 @@ def exec_and_log(cmd, propagate_exception=False):
+         if output != "":
+             log(">>> " + output)
+     except gdb.error as e:
+-        if propagate_exception:
+-            raise DAPException(str(e)) from e
+-        else:
+-            log_stack()
++        # Don't normally want to see this, as it interferes with the
++        # test suite.
++        log_stack(LogLevel.FULL)
++        raise DAPException(str(e)) from e
+ 
+ 
+ @in_gdb_thread
+diff --git a/gdb/python/py-all-events.def b/gdb/python/py-all-events.def
+--- a/gdb/python/py-all-events.def
++++ b/gdb/python/py-all-events.def
+@@ -46,3 +46,4 @@ GDB_PY_DEFINE_EVENT(executable_changed)
+ GDB_PY_DEFINE_EVENT(new_progspace)
+ GDB_PY_DEFINE_EVENT(free_progspace)
+ GDB_PY_DEFINE_EVENT(tui_enabled)
++GDB_PY_DEFINE_EVENT(corefile_changed)
+diff --git a/gdb/python/py-corefile.c b/gdb/python/py-corefile.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/python/py-corefile.c
+@@ -0,0 +1,723 @@
++/* Python interface to core files.
++
++   Copyright (C) 2025 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++#include "python-internal.h"
++#include "progspace.h"
++#include "observable.h"
++#include "inferior.h"
++#include "gdbcore.h"
++#include "gdbsupport/rsp-low.h"
++#include "py-event.h"
++
++/* A gdb.Corefile object.  */
++
++struct corefile_object
++{
++  PyObject_HEAD
++
++  /* The inferior this core file is attached to.  This will be set to NULL
++     when the inferior is deleted, or if a different core file is loaded
++     for the inferior.  When this is NULL the gdb.Corefile object is
++     considered invalid.*/
++  struct inferior *inferior;
++
++  /* Dictionary holding user-added attributes.  This is the __dict__
++     attribute of the object.  This is an owning reference.  */
++  PyObject *dict;
++
++  /* A Tuple of gdb.CorefileMappedFile objects.  This tuple is only created
++     the first time the user calls gdb.Corefile.mapped_files(), the result
++     is cached here.  If this pointer is not NULL then this is an owning
++     pointer (i.e. this owns a reference to the Tuple).  */
++  PyObject *mapped_files;
++};
++
++extern PyTypeObject corefile_object_type
++    CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF ("corefile_object");
++
++/* A gdb.CorefileMapped object.  */
++
++struct corefile_mapped_file_object
++{
++  PyObject_HEAD
++
++  /* The name of a file that was mapped when the core file was created.
++     This is a 'str' object.  */
++  PyObject *filename;
++
++  /* The build-id of a file that was mapped when the core file was
++     created.  This is either a 'str' if the file had a build-id, or
++     'None' if there was no build-id for this file.  */
++  PyObject *build_id;
++
++  /* A List of gdb.CorefileMappedFileRegion objects.  */
++  PyObject *regions;
++
++  /* True if this represents the main executable from which the core file
++     was created.  */
++  bool is_main_exec_p;
++};
++
++extern PyTypeObject corefile_mapped_file_object_type
++    CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF ("corefile_mapped_file_object");
++
++/* A gdb.CorefileMappedFileRegion object.  */
++
++struct corefile_mapped_file_region_object
++{
++  PyObject_HEAD
++
++  /* The start and end addresses for this mapping, these are addresses
++     within the inferior's address space.  */
++  CORE_ADDR start;
++  CORE_ADDR end;
++
++  /* The offset within the mapped file for this mapping.  */
++  ULONGEST file_offset;
++};
++
++extern PyTypeObject corefile_mapped_file_region_object_type
++    CPYCHECKER_TYPE_OBJECT_FOR_TYPEDEF ("corefile_mapped_file_region_object");
++
++/* Clear the inferior pointer in a Corefile object OBJ when an inferior is
++   deleted.  */
++
++struct inferior_corefile_deleter
++{
++  void operator() (corefile_object *obj)
++  {
++    if (!gdb_python_initialized)
++      return;
++
++    gdbpy_enter enter_py;
++
++    /* When OBJECT goes out of scope this will Py_DECREF on OBJ.  */
++    gdbpy_ref<corefile_object> object (obj);
++
++    /* Clearing the inferior pointer marks the gdb.Corefile as invalid.  */
++    object->inferior = nullptr;
++  }
++};
++
++/* Store a gdb.Corefile object in an inferior's registry.  */
++
++static const registry<inferior>::key<corefile_object,
++				     inferior_corefile_deleter>
++     cfpy_inferior_corefile_data_key;
++
++/* See python-internal.h.  */
++
++gdbpy_ref<>
++gdbpy_core_file_from_inferior (inferior *inf)
++{
++  gdb_assert (inf != nullptr);
++  gdb_assert (inf->pspace != nullptr);
++
++  program_space *pspace = inf->pspace;
++
++  if (pspace->core_bfd () == nullptr)
++    return gdbpy_ref<>::new_reference (Py_None);
++
++  PyObject *result = (PyObject *) cfpy_inferior_corefile_data_key.get (inf);
++  if (result == nullptr)
++    {
++      gdbpy_ref<corefile_object> object
++	(PyObject_New (corefile_object, &corefile_object_type));
++      if (object == nullptr)
++	return nullptr;
++
++      /* Ensure the 'inferior' field is set to NULL.  If the PyDict_New
++	 call fails then the gdb.Corefile will be discarded and
++	 cfpy_dealloc will be called, which requires that the 'inferior' be
++	 set to NULL.  */
++      object->inferior = nullptr;
++      object->mapped_files = nullptr;
++      object->dict = PyDict_New ();
++      if (object->dict == nullptr)
++	return nullptr;
++
++      /* Now that the gdb.Corefile has been successfully initialised and we
++	 know that it is going to be passed back to the user, move it out
++	 of the invalid state by setting the 'inferior' field to a non NULL
++	 value.  */
++      object->inferior = inf;
++      cfpy_inferior_corefile_data_key.set (inf, object.get ());
++      result = (PyObject *) object.release ();
++    }
++
++  return gdbpy_ref<>::new_reference (result);
++}
++
++/* Return true if OBJ is valid.  */
++
++static bool
++cfpy_corefile_object_is_valid (const corefile_object *obj)
++{
++  if (obj->inferior == nullptr)
++    return false;
++
++  gdb_assert (obj->inferior->pspace != nullptr);
++
++  return obj->inferior->pspace->core_bfd () != nullptr;
++}
++
++/* Require that COREFILE_OBJ be a valid core file.  A valid core file
++   object has a valid program space, and the program space has a core file
++   loaded into it.  */
++#define CFPY_REQUIRE_VALID(corefile_obj)				\
++  do {									\
++    if (!cfpy_corefile_object_is_valid (corefile_obj))			\
++      {									\
++	PyErr_SetString (PyExc_RuntimeError,				\
++			 _("Corefile no longer exists."));		\
++	return nullptr;							\
++      }									\
++  } while (0)
++
++/* Read the gdb.Corefile.filename attribute.  */
++
++static PyObject *
++cfpy_get_filename (PyObject *self, void *closure)
++{
++  corefile_object *obj = (corefile_object *) self;
++
++  CFPY_REQUIRE_VALID (obj);
++
++  /* If the program space's core file had been cleared, then this Corefile
++     object would have been invalidated.  */
++  bfd *abfd = obj->inferior->pspace->core_bfd ();
++  gdb_assert (abfd != nullptr);
++
++  return host_string_to_python_string (bfd_get_filename (abfd)).release ();
++}
++
++/* Implementation of gdb.Corefile.is_valid (self) -> Boolean.
++   Returns True if this core file object is associated with a program space
++   that still exists, an the program space still has a core file loaded.  */
++
++static PyObject *
++cfpy_is_valid (PyObject *self, PyObject *args)
++{
++  corefile_object *obj = (corefile_object *) self;
++
++  if (!cfpy_corefile_object_is_valid (obj))
++    Py_RETURN_FALSE;
++
++  Py_RETURN_TRUE;
++}
++
++/* Implement gdb.Corefile.mapped_files ().  Return a List of
++   gdb.CorefileMappedFile objects.  The list is created the first time
++   this method is called, and then cached within the gdb.Corefile object,
++   future calls just return a reference to the same list.  */
++
++static PyObject *
++cfpy_mapped_files (PyObject *self, PyObject *args)
++{
++  corefile_object *obj = (corefile_object *) self;
++
++  CFPY_REQUIRE_VALID (obj);
++
++  /* If we have already created the List then just return another reference
++     to the existing list.  */
++  if (obj->mapped_files != nullptr)
++    {
++      Py_INCREF (obj->mapped_files);
++      return obj->mapped_files;
++    }
++
++  /* Get all the mapping data from GDB.  */
++  std::vector<core_mapped_file> mapped_files;
++  try
++    {
++      mapped_files
++	= gdb_read_core_file_mappings (obj->inferior->arch (),
++				       current_program_space->core_bfd ());
++    }
++  catch (const gdb_exception &except)
++    {
++      return gdbpy_handle_gdb_exception (nullptr, except);
++    }
++
++  /* Create a new list to hold the results.  */
++  gdbpy_ref<> tuple (PyTuple_New (mapped_files.size ()));
++  if (tuple == nullptr)
++    return nullptr;
++
++  /* Create each gdb.CorefileMappedFile object.  */
++  Py_ssize_t tuple_idx = 0;
++  for (const core_mapped_file &file : mapped_files)
++    {
++      /* The filename 'str' object.  */
++      gdbpy_ref<> filename
++	= host_string_to_python_string (file.filename.c_str ());
++      if (filename == nullptr)
++	return nullptr;
++
++      /* The build-id object.  Either a 'str' or 'None'.  */
++      gdbpy_ref<> build_id;
++      if (file.build_id != nullptr)
++	{
++	  std::string hex_form = bin2hex (file.build_id->data,
++					  file.build_id->size);
++
++	  build_id
++	    = host_string_to_python_string (hex_form.c_str ());
++	  if (build_id == nullptr)
++	    return nullptr;
++	}
++      else
++	build_id = gdbpy_ref<>::new_reference (Py_None);
++
++      /* List to hold all the gdb.CorefileMappedFileRegion objects.  */
++      gdbpy_ref<> regions (PyTuple_New (file.regions.size ()));
++      if (regions == nullptr)
++	return nullptr;
++
++      /* Create all the gdb.CorefileMappedFileRegion objects.  */
++      Py_ssize_t regions_idx = 0;
++      for (const core_mapped_file::region &r : file.regions)
++	{
++	  /* Actually create the object.  */
++	  gdbpy_ref<corefile_mapped_file_region_object> region_obj
++	    (PyObject_New (corefile_mapped_file_region_object,
++			   &corefile_mapped_file_region_object_type));
++	  if (region_obj == nullptr)
++	    return nullptr;
++
++	  /* Initialise the object.  */
++	  region_obj->start = r.start;
++	  region_obj->end = r.end;
++	  region_obj->file_offset = r.file_ofs;
++
++	  /* Add to the gdb.CorefileMappedFileRegion list.  */
++	  if (PyTuple_SetItem (regions.get (), regions_idx++,
++			       (PyObject *) region_obj.release ()) < 0)
++	    return nullptr;
++	}
++
++      /* Actually create the gdb.CorefileMappedFile object.  */
++      gdbpy_ref<corefile_mapped_file_object> entry
++	(PyObject_New (corefile_mapped_file_object,
++		       &corefile_mapped_file_object_type));
++      if (entry == nullptr)
++	return nullptr;
++
++      /* Initialise the object.  */
++      entry->filename = filename.release ();
++      entry->build_id = build_id.release ();
++      entry->regions = regions.release ();
++      entry->is_main_exec_p = file.is_main_exec;
++
++      /* Add to the gdb.CorefileMappedFile list.  */
++      if (PyTuple_SetItem (tuple.get (), tuple_idx++,
++			   (PyObject *) entry.release ()) < 0)
++	return nullptr;
++    }
++
++  /* No errors.  Move the reference currently in LIST into the Corefile
++     object itself.  Then create a new reference and hand this back to the
++     user.  */
++  obj->mapped_files = tuple.release ();
++  Py_INCREF (obj->mapped_files);
++  return obj->mapped_files;
++}
++
++/* Emit a CorefileChangedEvent event, INF is the inferior in which the core
++   file changed.  Return 0 on success, or a negative value on error.  */
++
++static int
++emit_corefile_changed_event (inferior *inf)
++{
++  /* If there are no listeners then we are done.  */
++  if (evregpy_no_listeners_p (gdb_py_events.corefile_changed))
++    return 0;
++
++  gdbpy_ref<> event_obj
++    = create_event_object (&corefile_changed_event_object_type);
++  if (event_obj == nullptr)
++    return -1;
++
++  gdbpy_ref<inferior_object> inf_obj = inferior_to_inferior_object (inf);
++  if (inf_obj == nullptr
++      || evpy_add_attribute (event_obj.get (), "inferior",
++			     (PyObject *) inf_obj.get ()) < 0)
++    return -1;
++
++  return evpy_emit_event (event_obj.get (), gdb_py_events.corefile_changed);
++}
++
++/* Callback from gdb::observers::core_file_changed.  The core file for
++   INF has been changed.  */
++
++static void
++cfpy_corefile_changed (inferior *inf)
++{
++  /* It's safe to do this even if Python is not initialized, but there
++     should be nothing to clear in that case.  */
++  cfpy_inferior_corefile_data_key.clear (inf);
++
++  if (!gdb_python_initialized)
++    return;
++
++  gdbpy_enter enter_py;
++
++  if (emit_corefile_changed_event (inf) < 0)
++    gdbpy_print_stack ();
++}
++
++/* Called when a gdb.Corefile is destroyed.  */
++
++static void
++cfpy_dealloc (PyObject *obj)
++{
++  corefile_object *corefile = (corefile_object *) obj;
++
++  /* Every gdb.Corefile is cached in an inferior's registry.  The only way
++     for a gdb.Corefile to be deallocated is to remove the object reference
++     from the registry (and dec its ref count), but before we do that, we
++     set the object's inferior pointer to NULL.  */
++  gdb_assert (corefile->inferior == nullptr);
++
++  Py_XDECREF (corefile->dict);
++  Py_XDECREF (corefile->mapped_files);
++
++  Py_TYPE (obj)->tp_free (obj);
++}
++
++/* __repr__ implementation for gdb.Corefile.  */
++
++static PyObject *
++cfpy_repr (PyObject *self)
++{
++  corefile_object *obj = (corefile_object *) self;
++
++  if (!cfpy_corefile_object_is_valid (obj))
++    return gdb_py_invalid_object_repr (self);
++
++  program_space *pspace = obj->inferior->pspace;
++  gdb_assert (pspace != nullptr);
++  return PyUnicode_FromFormat ("<%s inferior=%d filename='%s'>",
++			       Py_TYPE (self)->tp_name,
++			       obj->inferior->num,
++			       bfd_get_filename (pspace->core_bfd ()));
++}
++
++
++
++/* Called when a gdb.CorefileMappedFile is destroyed.  */
++
++static void
++cfmfpy_dealloc (PyObject *obj)
++{
++  corefile_mapped_file_object *mapped_file
++    = (corefile_mapped_file_object *) obj;
++
++  Py_XDECREF (mapped_file->filename);
++  Py_XDECREF (mapped_file->build_id);
++  Py_XDECREF (mapped_file->regions);
++
++  Py_TYPE (obj)->tp_free (obj);
++}
++
++/* Read the gdb.CorefileMappedFile.filename attribute.  */
++
++static PyObject *
++cfmfpy_get_filename (PyObject *self, void *closure)
++{
++  corefile_mapped_file_object *obj
++    = (corefile_mapped_file_object *) self;
++
++  gdb_assert (obj->filename != nullptr);
++
++  Py_INCREF (obj->filename);
++  return obj->filename;
++}
++
++/* Read the gdb.CorefileMappedFile.build_id attribute.  */
++
++static PyObject *
++cfmfpy_get_build_id (PyObject *self, void *closure)
++{
++  corefile_mapped_file_object *obj
++    = (corefile_mapped_file_object *) self;
++
++  gdb_assert (obj->build_id != nullptr);
++
++  Py_INCREF (obj->build_id);
++  return obj->build_id;
++}
++
++/* Read the gdb.CorefileMappedFile.regions attribute.  */
++
++static PyObject *
++cfmfpy_get_regions (PyObject *self, void *closure)
++{
++  corefile_mapped_file_object *obj
++    = (corefile_mapped_file_object *) self;
++
++  gdb_assert (obj->regions != nullptr);
++
++  Py_INCREF (obj->regions);
++  return obj->regions;
++}
++
++/* Read the gdb.CorefileMappedFile.is_main_executable attribute.  */
++
++static PyObject *
++cfmf_is_main_exec (PyObject *self, void *closure)
++{
++  corefile_mapped_file_object *obj
++    = (corefile_mapped_file_object *) self;
++
++  if (obj->is_main_exec_p)
++    Py_RETURN_TRUE;
++  else
++    Py_RETURN_FALSE;
++}
++
++
++
++/* Read the gdb.CorefileMappedFileRegion.start attribute.  */
++
++static PyObject *
++cfmfrpy_get_start (PyObject *self, void *closure)
++{
++  corefile_mapped_file_region_object *obj
++    = (corefile_mapped_file_region_object *) self;
++
++  return gdb_py_object_from_ulongest (obj->start).release ();
++}
++
++/* Read the gdb.CorefileMappedFileRegion.end attribute.  */
++
++static PyObject *
++cfmfrpy_get_end (PyObject *self, void *closure)
++{
++  corefile_mapped_file_region_object *obj
++    = (corefile_mapped_file_region_object *) self;
++
++  return gdb_py_object_from_ulongest (obj->end).release ();
++}
++
++/* Read the gdb.CorefileMappedFileRegion.file_offset attribute.  */
++
++static PyObject *
++cfmfrpy_get_file_offset (PyObject *self, void *closure)
++{
++  corefile_mapped_file_region_object *obj
++    = (corefile_mapped_file_region_object *) self;
++
++  return gdb_py_object_from_ulongest (obj->file_offset).release ();
++}
++
++
++
++static int
++gdbpy_initialize_corefile ()
++{
++  gdb::observers::core_file_changed.attach (cfpy_corefile_changed,
++					    "py-corefile");
++
++  if (gdbpy_type_ready (&corefile_object_type) < 0)
++    return -1;
++
++  if (gdbpy_type_ready (&corefile_mapped_file_object_type) < 0)
++    return -1;
++
++  if (gdbpy_type_ready (&corefile_mapped_file_region_object_type) < 0)
++    return -1;
++
++  return 0;
++}
++
++GDBPY_INITIALIZE_FILE (gdbpy_initialize_corefile);
++
++
++
++static gdb_PyGetSetDef corefile_getset[] =
++{
++  { "__dict__", gdb_py_generic_dict, nullptr,
++    "The __dict__ for the gdb.Corefile.", &corefile_object_type },
++  { "filename", cfpy_get_filename, nullptr,
++    "The filename of a valid Corefile object.", nullptr },
++  { nullptr }
++};
++
++static PyMethodDef corefile_object_methods[] =
++{
++  { "is_valid", cfpy_is_valid, METH_NOARGS,
++    "is_valid () -> Boolean.\n\
++Return true if this Corefile is valid, false if not." },
++  { "mapped_files", cfpy_mapped_files, METH_NOARGS,
++    "mapped_files () -> List of mapping tuples.\n\
++Return a list of tuples.  Each tuple represents a mapping from the\
++core file." },
++  { nullptr }
++};
++
++PyTypeObject corefile_object_type =
++{
++  PyVarObject_HEAD_INIT (nullptr, 0)
++  "gdb.Corefile",		  /*tp_name*/
++  sizeof (corefile_object),	  /*tp_basicsize*/
++  0,				  /*tp_itemsize*/
++  cfpy_dealloc,			  /*tp_dealloc*/
++  0,				  /*tp_print*/
++  0,				  /*tp_getattr*/
++  0,				  /*tp_setattr*/
++  0,				  /*tp_compare*/
++  cfpy_repr,			  /*tp_repr*/
++  0,				  /*tp_as_number*/
++  0,				  /*tp_as_sequence*/
++  0,				  /*tp_as_mapping*/
++  0,				  /*tp_hash */
++  0,				  /*tp_call*/
++  0,				  /*tp_str*/
++  0,				  /*tp_getattro*/
++  0,				  /*tp_setattro*/
++  0,				  /*tp_as_buffer*/
++  Py_TPFLAGS_DEFAULT,		  /*tp_flags*/
++  "GDB corefile object",	  /* tp_doc */
++  0,				  /* tp_traverse */
++  0,				  /* tp_clear */
++  0,				  /* tp_richcompare */
++  0,				  /* tp_weaklistoffset */
++  0,				  /* tp_iter */
++  0,				  /* tp_iternext */
++  corefile_object_methods,	  /* tp_methods */
++  0,				  /* tp_members */
++  corefile_getset,		  /* tp_getset */
++  0,				  /* tp_base */
++  0,				  /* tp_dict */
++  0,				  /* tp_descr_get */
++  0,				  /* tp_descr_set */
++  offsetof (corefile_object, dict), /* tp_dictoffset */
++  0,				  /* tp_init */
++  0,				  /* tp_alloc */
++  0,				  /* tp_new */
++};
++
++static gdb_PyGetSetDef corefile_mapped_file_object_getset[] =
++{
++  { "filename", cfmfpy_get_filename, nullptr,
++    "The filename of a CorefileMappedFile object.", nullptr },
++  { "build_id", cfmfpy_get_build_id, nullptr,
++    "The build-id of a CorefileMappedFile object or None.", nullptr },
++  { "regions", cfmfpy_get_regions, nullptr,
++    "The list of regions from a CorefileMappedFile object.", nullptr },
++  { "is_main_executable", cfmf_is_main_exec, nullptr,
++    "True for the main executable mapping, otherwise False.", nullptr },
++  { nullptr }
++};
++
++PyTypeObject corefile_mapped_file_object_type =
++{
++  PyVarObject_HEAD_INIT (NULL, 0)
++  "gdb.CorefileMappedFile",	  /*tp_name*/
++  sizeof (corefile_mapped_file_object),	/*tp_basicsize*/
++  0,				  /*tp_itemsize*/
++  cfmfpy_dealloc,		  /*tp_dealloc*/
++  0,				  /*tp_print*/
++  0,				  /*tp_getattr*/
++  0,				  /*tp_setattr*/
++  0,				  /*tp_compare*/
++  0,				  /*tp_repr*/
++  0,				  /*tp_as_number*/
++  0,				  /*tp_as_sequence*/
++  0,				  /*tp_as_mapping*/
++  0,				  /*tp_hash */
++  0,				  /*tp_call*/
++  0,				  /*tp_str*/
++  0,				  /*tp_getattro*/
++  0,				  /*tp_setattro*/
++  0,				  /*tp_as_buffer*/
++  Py_TPFLAGS_DEFAULT,		  /*tp_flags*/
++  "GDB corefile mapped file object",	/* tp_doc */
++  0,				  /* tp_traverse */
++  0,				  /* tp_clear */
++  0,				  /* tp_richcompare */
++  0,				  /* tp_weaklistoffset */
++  0,				  /* tp_iter */
++  0,				  /* tp_iternext */
++  0,				  /* tp_methods */
++  0,				  /* tp_members */
++  corefile_mapped_file_object_getset,	/* tp_getset */
++  0,				  /* tp_base */
++  0,				  /* tp_dict */
++  0,				  /* tp_descr_get */
++  0,				  /* tp_descr_set */
++  0,				  /* tp_dictoffset */
++  0,				  /* tp_init */
++  0,				  /* tp_alloc */
++  0,				  /* tp_new */
++};
++
++static gdb_PyGetSetDef corefile_mapped_file_region_object_getset[] =
++{
++  { "start", cfmfrpy_get_start, nullptr,
++    "The start address of a CorefileMappedFileRegion object.", nullptr },
++  { "end", cfmfrpy_get_end, nullptr,
++    "The end address of a CorefileMappedFileRegion object.", nullptr },
++  { "file_offset", cfmfrpy_get_file_offset, nullptr,
++    "The file offset of a CorefileMappedFileRegion object.", nullptr },
++  { nullptr }
++};
++
++PyTypeObject corefile_mapped_file_region_object_type =
++{
++  PyVarObject_HEAD_INIT (NULL, 0)
++  "gdb.CorefileMappedFileRegion",  /*tp_name*/
++  sizeof (corefile_mapped_file_region_object),	/*tp_basicsize*/
++  0,				  /*tp_itemsize*/
++  0,				  /*tp_dealloc*/
++  0,				  /*tp_print*/
++  0,				  /*tp_getattr*/
++  0,				  /*tp_setattr*/
++  0,				  /*tp_compare*/
++  0,				  /*tp_repr*/
++  0,				  /*tp_as_number*/
++  0,				  /*tp_as_sequence*/
++  0,				  /*tp_as_mapping*/
++  0,				  /*tp_hash */
++  0,				  /*tp_call*/
++  0,				  /*tp_str*/
++  0,				  /*tp_getattro*/
++  0,				  /*tp_setattro*/
++  0,				  /*tp_as_buffer*/
++  Py_TPFLAGS_DEFAULT,		  /*tp_flags*/
++  "GDB corefile mapped file region object",	/* tp_doc */
++  0,				  /* tp_traverse */
++  0,				  /* tp_clear */
++  0,				  /* tp_richcompare */
++  0,				  /* tp_weaklistoffset */
++  0,				  /* tp_iter */
++  0,				  /* tp_iternext */
++  0,				  /* tp_methods */
++  0,				  /* tp_members */
++  corefile_mapped_file_region_object_getset,	/* tp_getset */
++  0,				  /* tp_base */
++  0,				  /* tp_dict */
++  0,				  /* tp_descr_get */
++  0,				  /* tp_descr_set */
++  0,				  /* tp_dictoffset */
++  0,				  /* tp_init */
++  0,				  /* tp_alloc */
++  0,				  /* tp_new */
++};
+diff --git a/gdb/python/py-event-types.def b/gdb/python/py-event-types.def
+--- a/gdb/python/py-event-types.def
++++ b/gdb/python/py-event-types.def
+@@ -145,3 +145,8 @@ GDB_PY_DEFINE_EVENT_TYPE (tui_enabled,
+ 			  "TuiEnabledEvent",
+ 			  "GDB TUI enabled event object",
+ 			  event_object_type);
++
++GDB_PY_DEFINE_EVENT_TYPE (corefile_changed,
++			  "CorefileChangedEvent",
++			  "GDB corefile changed event",
++			  event_object_type);
+diff --git a/gdb/python/py-inferior.c b/gdb/python/py-inferior.c
+--- a/gdb/python/py-inferior.c
++++ b/gdb/python/py-inferior.c
+@@ -973,6 +973,22 @@ infpy_get_main_name (PyObject *self, void *closure)
+   return host_string_to_python_string (name).release ();
+ }
+ 
++/* Implement the Inferior.corefile getter.  Returns a gdb.Corefile
++   object, or None.  */
++
++static PyObject *
++infpy_get_core_file (PyObject *self, void *closure)
++{
++  inferior_object *inf = (inferior_object *) self;
++
++  INFPY_REQUIRE_VALID (inf);
++
++  inferior *inferior = inf->inferior;
++  gdb_assert (inferior != nullptr);
++
++  return gdbpy_core_file_from_inferior (inferior).release ();
++}
++
+ static void
+ infpy_dealloc (PyObject *obj)
+ {
+@@ -1062,6 +1078,8 @@ static gdb_PyGetSetDef inferior_object_getset[] =
+   { "progspace", infpy_get_progspace, NULL, "Program space of this inferior" },
+   { "main_name", infpy_get_main_name, nullptr,
+     "Name of 'main' function, if known.", nullptr },
++  { "corefile", infpy_get_core_file, nullptr,
++    "The corefile loaded in to this inferior, or None.", nullptr },
+   { NULL }
+ };
+ 
+diff --git a/gdb/python/python-internal.h b/gdb/python/python-internal.h
+--- a/gdb/python/python-internal.h
++++ b/gdb/python/python-internal.h
+@@ -1113,6 +1113,14 @@ extern std::optional<int> gdbpy_print_insn (struct gdbarch *gdbarch,
+ 					    CORE_ADDR address,
+ 					    disassemble_info *info);
+ 
++/* Return the gdb.Corefile object representing the core file loaded into
++   the program space of INF, or None if there is no core file loaded.  INF
++   must not be NULL.  If an error occurs then NULL is returned, and a
++   suitable Python error will be set.  */
++
++extern gdbpy_ref<> gdbpy_core_file_from_inferior (inferior *inf);
++
++
+ /* A wrapper for PyType_Ready that also automatically registers the
+    type in the appropriate module.  Returns 0 on success, -1 on error.
+    If MOD is supplied, then the type is added to that module.  If MOD
+diff --git a/gdb/testsuite/gdb.dap/attach-fail.exp b/gdb/testsuite/gdb.dap/attach-fail.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dap/attach-fail.exp
+@@ -0,0 +1,32 @@
++# Copyright 2025 Free Software Foundation, Inc.
++
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Test "attach" failure in DAP.
++
++require can_spawn_for_attach allow_dap_tests
++
++load_lib dap-support.exp
++
++# Passing an empty remote name here will guarantee a failure without
++# trying to find a real remote.
++set id [dap_target_remote {""}]
++
++dap_check_request_and_response "configurationDone" configurationDone
++
++set resp [lindex [dap_read_response attach $id] 0]
++gdb_assert {[dict get $resp success] == "false"} \
++    "attach failed"
++
++dap_shutdown
+diff --git a/gdb/testsuite/gdb.dap/corefile.c b/gdb/testsuite/gdb.dap/corefile.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dap/corefile.c
+@@ -0,0 +1,45 @@
++/* This testcase is part of GDB, the GNU debugger.
++
++   Copyright 2026 Free Software Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++#include <stdlib.h>
++
++int global_var = 0;
++
++void
++baz (void)
++{
++  abort ();
++}
++
++void
++bar (void)
++{
++  baz ();
++}
++
++void
++foo (void)
++{
++  bar ();
++}
++
++int
++main (void)
++{
++  foo ();
++  return 0;
++}
+diff --git a/gdb/testsuite/gdb.dap/corefile.exp b/gdb/testsuite/gdb.dap/corefile.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dap/corefile.exp
+@@ -0,0 +1,196 @@
++# Copyright 2026 Free Software Foundation, Inc.
++
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Test using "attach" in DAP for opening a core file.
++
++require allow_dap_tests
++
++load_lib dap-support.exp
++
++standard_testfile
++
++if {[build_executable ${testfile}.exp $testfile] == -1} {
++    return
++}
++
++set corefile [core_find $binfile {}]
++if {$corefile == ""} {
++    untested "unable to create or find corefile"
++    return
++}
++
++set other_corefile [standard_output_file "${testfile} with spaces.core"]
++remote_exec build "cp \"$corefile\" \"$other_corefile\""
++
++# Test that attaching to a core file works at all.
++set attach_id [dap_corefile $corefile $binfile]
++
++dap_check_request_and_response "configurationDone" configurationDone
++
++dap_check_response "attach response" attach $attach_id
++
++dap_wait_for_event_and_check "stopped" stopped \
++    "body reason" attach
++
++# Try 'continue', this should fail.
++set obj [dap_request_and_response continue \
++	     {o threadId [i 1]}]
++set response [lindex $obj 0]
++gdb_assert { [dict get $response success] == "false" } \
++    "continue with core file target"
++
++# Get a backtrace from the core file.
++set bt [lindex [dap_check_request_and_response "backtrace" stackTrace \
++		    {o threadId [i 1]}] 0]
++set frame_id [dict get [lindex [dict get $bt body stackFrames] 0] id]
++
++# Get all scopes for frame 0.  Search through scopes to find the
++# register scope.
++set scopes [dap_check_request_and_response "get scopes" scopes \
++		[format {o frameId [i %d]} $frame_id]]
++set scopes [dict get [lindex $scopes 0] body scopes]
++set reg_scope ""
++foreach s $scopes {
++    if {[dict get $s name] == "Registers"} {
++	set reg_scope $s
++    }
++}
++gdb_assert { $reg_scope ne "" } "found register scope"
++
++# Read all the registers from the register scope.
++set num [dict get $reg_scope variablesReference]
++set reply [lindex [dap_check_request_and_response "fetch all registers" \
++		      "variables" \
++		      [format {o variablesReference [i %d] count [i %d]} $num\
++			   [dict get $reg_scope namedVariables]]] 0]
++
++# Find the name and value of a register, we'll use this to try setting
++# a register below.
++set regs [dict get $reply body variables]
++gdb_assert {[llength $regs] > 0} "got at least one register"
++set reg_name [dict get [lindex $regs 0] name]
++set reg_value [dict get [lindex $regs 0] value]
++
++set obj [dap_request_and_response setExpression \
++	     {o expression [s global_var] value [s 23]}]
++set response [lindex $obj 0]
++gdb_assert { [dict get $response success] == "false" } \
++    "set global variable fails"
++set expected_exception_count 1
++
++# Try setting a register, this should fail as registers are not
++# writable for a core file target.  We need to write back a different
++# register value, so we add one to the current value.  This means we
++# can only run the test if the current register value is an integer.
++if {[string is integer -strict $reg_value]} {
++    set new_value [expr {$reg_value + 1}]
++    set obj [dap_request_and_response setExpression \
++		 {o expression [s \$$reg_name] value [s $new_value]}]
++    set response [lindex $obj 0]
++    gdb_assert { [dict get $response success] == "false" } \
++	"set register fails"
++    incr expected_exception_count
++}
++
++dap_shutdown false $expected_exception_count
++
++# Reconnect to the core file.  This time when we shutdown we will
++# request that the target be terminated, GDB should still just
++# disconnect though as core file targets cannot be killed.
++with_test_prefix "reattach" {
++    set attach_id [dap_corefile $corefile $binfile]
++
++    dap_check_request_and_response "configurationDone" configurationDone
++
++    dap_check_response "attach response" attach $attach_id
++
++    dap_wait_for_event_and_check "stopped" stopped \
++	"body reason" attach
++
++    # Request the target be terminated.  This doesn't make sense for
++    # core file targets (which cannot be killed), but GDB should
++    # handle this gracefully and just disconnect.
++    dap_shutdown true
++}
++
++# Test loading a core file with spaces in its name.
++with_test_prefix "core file with spaces" {
++    gdb_exit
++
++    # Test that attaching to a core file works at all.
++    set attach_id [dap_corefile $other_corefile]
++
++    dap_check_request_and_response "configurationDone" configurationDone
++
++    dap_check_response "attach response" attach $attach_id
++
++    dap_wait_for_event_and_check "stopped" stopped \
++	"body reason" attach
++
++    # Use the repl to issue an 'info inferiors' command.
++    set obj [dap_check_request_and_response "command repl" \
++		 evaluate {o expression [s "info inferiors"] context [s repl]}]
++    set response [lindex $obj 0]
++    set result [dict get $response body result]
++    set result [string map {\\n \n \\t \t} $result]
++    verbose -log "Info Inferiors Output:\n$result\n\n"
++
++    # Check that the output contains the header line, the executable
++    # name, and the core file name.  We didn't pass the executable
++    # name when loading the core file, but GDB should have been able
++    # to find the executable from the core file.
++    gdb_assert { [regexp "Num\\s+Description\\s+Connection\\s+Executable" $result] } \
++	"info inferiors column headers found"
++
++    gdb_assert { [regexp "[string_to_regexp $binfile]\\s*\n" $result] } \
++	"executable name was set during core file load"
++
++    dap_shutdown
++}
++
++# Test loading a core file via the repl.
++with_test_prefix "load core file via repl" {
++    gdb_exit
++
++    if {[dap_initialize] == ""} {
++	return
++    }
++
++    # Use the repl to issue a 'core-file' command.
++    set obj [dap_check_request_and_response "command repl" \
++		 evaluate [format {o expression [s "core-file %s"] context [s repl]} $corefile]]
++    set response [lindex $obj 0]
++    set result [dict get $response body result]
++    set result [string map {\\n \n \\t \t} $result]
++    verbose -log "Core-File Command Output:\n$result\n\n"
++
++    # By the time we got the response from the 'core-file' command,
++    # the stopped event, sent when we attach to a core file, should
++    # already have been seen, check for it now.
++    set ok false
++    foreach d [lindex $obj 1] {
++	if {[dict get $d type] != "event"
++	    || [dict get $d event] != "stopped"} {
++	    continue
++	}
++	if {[dict get $d body reason] == "attach"} {
++	    set ok true
++	    break
++	}
++    }
++    gdb_assert { $ok } "saw stopped event"
++
++    dap_shutdown
++}
+diff --git a/gdb/testsuite/gdb.python/py-corefile.c b/gdb/testsuite/gdb.python/py-corefile.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.python/py-corefile.c
+@@ -0,0 +1,25 @@
++/* Copyright 2025 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++#include <stdlib.h>
++
++int
++main (void)
++{
++  /* With correct ulimit, etc. this should cause a core dump.  */
++  abort ();
++}
+diff --git a/gdb/testsuite/gdb.python/py-corefile.exp b/gdb/testsuite/gdb.python/py-corefile.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.python/py-corefile.exp
+@@ -0,0 +1,365 @@
++# Copyright (C) 2025 Free Software Foundation, Inc.
++
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# This file is part of the GDB testsuite.  It tests the core file
++# support in Python.
++
++require isnative
++require {!is_remote host}
++
++load_lib gdb-python.exp
++
++require allow_python_tests
++
++standard_testfile
++
++if {[build_executable "build executable" $testfile $srcfile] == -1} {
++    return
++}
++
++set remote_python_file \
++    [gdb_remote_download host ${srcdir}/${subdir}/${testfile}.py]
++
++set corefile [core_find $binfile]
++if {$corefile == ""} {
++    unsupported "couldn't create or find corefile"
++    return
++}
++
++# Helper proc to run the 'core-file' command.  Takes optional arguments:
++#
++#   -corefile FILENAME : Load FILENAME as the new core file.  If this
++#                        argument is not given then the current core
++#                        file will be unloaded.
++#
++#   -inferior NUM : The inferior in which the corefile is being changed.
++#                   This is used to match the corefile_changed events
++#                   that will be emitted.
++#
++#   -prefix STRING : A test prefix, to make test names unique.
++#
++#   -replacement : There's already a core file loaded when this command
++#                  is being run.
++proc core_file_cmd { args } {
++    parse_some_args {
++	{corefile ""}
++	{inferior 1}
++	{prefix ""}
++	{replacement}
++    }
++
++    if { $prefix eq "" } {
++	if { $corefile eq "" } {
++	    set prefix "unload corefile"
++	} else {
++	    set prefix "load corefile"
++	}
++    }
++
++    with_test_prefix $prefix {
++	gdb_test "events corefile_changed check" \
++	    "^No corefile_changed event has been seen\\." \
++	    "no corefile event has been seen"
++
++	gdb_test "events exited check" \
++	    "^No exited event has been seen\\." \
++	    "no exited event has been seen"
++
++	if { $corefile eq "" } {
++	    gdb_test "core-file" "^No core file now\\." "unload current core file"
++
++	    gdb_test "events corefile_changed check" \
++		"Event 1/1, Inferior $inferior, Corefile None" \
++		"expected corefile event has been seen"
++
++	    gdb_test "events exited check" \
++		"Event 1/1, Inferior $inferior, Exit Code None" \
++		"expected exited event has been seen"
++	} else {
++	    gdb_test "core-file $corefile" ".*" "load core file"
++
++	    if { $replacement } {
++		gdb_test "events corefile_changed check" \
++		    [multi_line \
++			 "Event 1/2, Inferior $inferior, Corefile None" \
++			 "Event 2/2, Inferior $inferior, Corefile [string_to_regexp $corefile]"] \
++		    "expected corefile event has been seen"
++
++		gdb_test "events exited check" \
++		    "Event 1/1, Inferior $inferior, Exit Code None" \
++		    "expected exited event has been seen"
++	    } else {
++		gdb_test "events corefile_changed check" \
++		    "Event 1/1, Inferior $inferior, Corefile [string_to_regexp $corefile]" \
++		    "expected corefile event has been seen"
++
++		gdb_test "events exited check" \
++		    "^No exited event has been seen\\." \
++		    "no exited event was emitted"
++	    }
++	}
++    }
++
++    gdb_test_no_output -nopass "events corefile_changed reset"
++    gdb_test_no_output -nopass "events exited reset"
++}
++
++# A helper proc runs clean_restart passing through ARGS, and then loads the
++# test's Python script.
++proc clean_restart_and_load_py_script { args } {
++    clean_restart {*}$args
++
++    # Load the Python script into GDB.
++    gdb_test "source $::remote_python_file" "^Success" \
++	"source python script"
++}
++
++# Create a copy of the corefile.
++set other_corefile [standard_output_file ${testfile}-other.core]
++remote_exec build "cp $corefile $other_corefile"
++
++clean_restart_and_load_py_script
++
++gdb_test_no_output "python inf = gdb.selected_inferior()" \
++    "capture current inferior"
++
++gdb_test "python print(inf.corefile)" "^None" \
++    "Inferior.corefile is None before loading a core file"
++
++core_file_cmd -corefile $corefile
++
++set file_re [string_to_regexp $corefile]
++gdb_test "python print(inf.corefile)" "^<gdb\\.Corefile inferior=1 filename='$file_re'>" \
++    "Inferior.corefile is a valid object after loading a core file"
++
++gdb_test_no_output "python core1=inf.corefile" "capture gdb.Corefile object"
++
++gdb_test "python print(core1.__dict__)" "^\\{\\}" \
++    "print Corefile.__dict__ when empty"
++
++gdb_test_no_output "python core1._my_attribute = \"Hello\"" \
++    "write new attribute into Corefile object"
++
++gdb_test "python print(core1._my_attribute)" "^Hello" \
++    "immediately read new attribute"
++
++gdb_test "python print(core1.__dict__)" "^\\{'_my_attribute': 'Hello'\\}" \
++    "print Corefile.__dict__ after adding an attribute"
++
++gdb_test "python print(core1.filename)" "^$file_re" \
++    "Corefile.filename attribute works as expected"
++
++gdb_test "python print(core1.is_valid())" "^True" \
++    "Corefile.is_valid() is True while corefile is loaded"
++
++core_file_cmd
++
++gdb_test "python print(core1.is_valid())" "^False" \
++    "Corefile.is_valid() is False after corefile is unloaded"
++
++gdb_test "python print(core1.__dict__)" "^\\{'_my_attribute': 'Hello'\\}" \
++    "print Corefile.__dict__ with attribute when invalid"
++
++gdb_test "python print(core1)" "^<gdb\\.Corefile \\(invalid\\)>" \
++    "print an invalid gdb.Corefile object"
++
++gdb_test "python print(core1.filename)" \
++    [multi_line \
++	 "Python Exception <class 'RuntimeError'>: Corefile no longer exists\\." \
++	 "Error occurred in Python: Corefile no longer exists\\."] \
++    "error when reading filename from invalid Corefile"
++
++gdb_test "python print(inf.corefile)" "^None" \
++    "Inferior.corefile is None again after corefile unload"
++
++gdb_test "python print(core1._my_attribute)" "^Hello" \
++    "read new attribute from invalid core file"
++
++# Create a second inferior.
++gdb_test "add-inferior"
++gdb_test "inferior 2"
++
++with_test_prefix "in second inferior" {
++    core_file_cmd -corefile $corefile -inferior 2
++
++    gdb_test "python print(inf.corefile)" "^None" \
++	"first inferior still has no core file"
++
++    gdb_test_no_output "python core2=gdb.selected_inferior().corefile" \
++	"capture gdb.Corefile object"
++
++    # The _my_attribute was added to CORE1, not CORE2.  Check it
++    # doesn't somehow appear on CORE2.
++    gdb_test "python print(core2._my_attribute)" \
++	"AttributeError.*: 'gdb\\.Corefile' object has no attribute '_my_attribute'" \
++	"try to read attribute that doesn't exist"
++
++    gdb_test "python print(core2.filename)" "^$file_re" \
++	"Corefile.filename attribute works as expected"
++
++    gdb_test "inferior 1"
++}
++
++# Read the name of the core file from the second program space while
++# the current program space is the first one.
++gdb_test "python print(core2.filename)" "^$file_re" \
++    "Corefile.filename attribute works from different progspace"
++
++# Load the other corefile into the first inferior.
++core_file_cmd -corefile $other_corefile \
++    -prefix "load other corefile into inferior 1"
++
++# Delete the second inferior.  We need to switch to the second
++# inferior and unload its corefile before we can do that.  Then,
++# switch back to the first inferior, delete the second, and try to
++# read the filename of the core file from the (now deleted) second
++# inferior.  We should get an error about the gdb.Corefile being
++# invalid.
++with_test_prefix "remove second inferior" {
++    gdb_test "inferior 2"
++
++    gdb_test "python print(inf.corefile.filename)" \
++	"^[string_to_regexp $other_corefile]" \
++	"read inferior 1 corefile when in inferior 2"
++
++    gdb_test_no_output "python core1=inf.corefile" \
++	"capture inferior 1 gdb.Corefile while in inferior 2"
++
++    # This is a new CORE1 object, check that _my_attribute is gone.
++    gdb_test "python print(core1._my_attribute)" \
++	"AttributeError.*: 'gdb\\.Corefile' object has no attribute '_my_attribute'" \
++	"try to read attribute that doesn't exist"
++
++    core_file_cmd -inferior 2
++
++    gdb_test "python print(core2.filename)" \
++	[multi_line \
++	     "Python Exception <class 'RuntimeError'>: Corefile no longer exists\\." \
++	     "Error occurred in Python: Corefile no longer exists\\."] \
++	"error when reading filename from invalid Corefile"
++
++    gdb_test "inferior 1"
++
++    gdb_test "remove-inferiors 2"
++
++    gdb_test "python print(core2.is_valid())" "^False" \
++	"Corefile.is_valid() is False after corefile is unloaded, and Progspace is deleted"
++
++    gdb_test "python print(core2.filename)" \
++	[multi_line \
++	     "Python Exception <class 'RuntimeError'>: Corefile no longer exists\\." \
++	     "Error occurred in Python: Corefile no longer exists\\."] \
++	"error when reading filename of an invalid Corefile, from deleted program space"
++
++    gdb_test "python print(core1.is_valid())" "^True" \
++	"check inferior 1 core file is still valid"
++}
++
++# Test the Corefile.mapped_files() API.  The Python script that is
++# sourced here implements 'info proc mappings' in Python using the
++# mapped_files API.  The output from the built-in command, and the
++# Python command should be identical.
++with_test_prefix "test mapped files data" {
++    clean_restart_and_load_py_script
++
++    # Load the core file.
++    core_file_cmd -corefile $corefile
++
++    # Two files to write the output to.
++    set out_1 [standard_output_file ${gdb_test_file_name}-out-1.txt]
++    set out_2 [standard_output_file ${gdb_test_file_name}-out-2.txt]
++
++    # Run the built-in command, then the new Python command, capture
++    # the output.
++    gdb_test "pipe info proc mappings | tee $out_1" ".*" \
++	"capture built-in mappings output"
++    gdb_test "pipe info proc py-mappings | tee $out_2" ".*" \
++	"capture Python based mappings data"
++
++    # Check the output is identical.
++    gdb_test "shell diff -s $out_1 $out_2" \
++	"Files \[^\r\n\]+-out-1.txt and \[^\r\n\]+-out-2.txt are identical" \
++	"diff input and output one"
++
++    # Check build-ids within the core file mapping data.
++    gdb_test "check-build-ids" "^PASS"
++
++    # Check the is_main_executable flag in the mapping data.
++    gdb_test "check-main-executable" "^PASS"
++
++    # Check that the mapped files "list" is actually an immutable
++    # tuple.
++    gdb_test_no_output "python core = gdb.selected_inferior().corefile"
++    gdb_test_no_output "python mapped_files = core.mapped_files()"
++    gdb_test "python print(type(mapped_files))" \
++	"^<class 'tuple'>"
++    gdb_test "python mapped_files\[0\] = None" \
++	"'tuple' object does not support item assignment"
++    gdb_test "python print(mapped_files\[0\] is None)" "^False"
++
++    # And same for the list of regions for a mapped file.
++    gdb_test_no_output "python regions = mapped_files\[0\].regions"
++    gdb_test "python print(type(regions))" \
++	"^<class 'tuple'>"
++    gdb_test "python regions\[0\] = None" \
++	"'tuple' object does not support item assignment"
++}
++
++# Load a core file.  GDB should figure out which file is being debugged.
++# Then use 'start' to run this executable, this will replace the core file
++# target.  At least on Linux, this replacement is done without calling
++# target_detach.  This test checks that the expected core file changed and
++# inferior exited events are still seen.
++with_test_prefix "start from corefile" {
++    if { [gdb_protocol_is_native] } {
++	clean_restart_and_load_py_script
++
++	# Load the core file.
++	core_file_cmd -corefile $corefile
++
++	# Check GDB figured out the executable.
++	gdb_test "info inferiors 1" \
++	    "\[^\r\n\]+[string_to_regexp $binfile]\\s*" \
++	    "check executable was detected correctly"
++
++	gdb_test "start" \
++	    "Temporary breakpoint $::decimal, main \\(\\).*" \
++
++	gdb_test "events corefile_changed check" \
++	    "Event 1/1, Inferior 1, Corefile None" \
++	    "expected corefile event has been seen"
++
++	gdb_test "events exited check" \
++	    "Event 1/1, Inferior 1, Exit Code None" \
++	    "expected exited event has been seen"
++
++	gdb_test_no_output -nopass "events corefile_changed reset"
++	gdb_test_no_output -nopass "events exited reset"
++    }
++}
++
++# Load a core file, then load a different core file to replace it.
++# Check that the events that are emitted are as expected.
++with_test_prefix "load one core file over another" {
++    clean_restart_and_load_py_script
++
++    # Load the core file.
++    core_file_cmd -corefile $corefile \
++	-prefix "load first corefile"
++
++    core_file_cmd -corefile $other_corefile \
++	-prefix "load second corefile" \
++	-replacement
++}
+diff --git a/gdb/testsuite/gdb.python/py-corefile.py b/gdb/testsuite/gdb.python/py-corefile.py
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.python/py-corefile.py
+@@ -0,0 +1,261 @@
++# Copyright (C) 2025 Free Software Foundation, Inc.
++
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++import pathlib
++
++
++class Mapping:
++    def __init__(self, mapping, region):
++        self._mapping = mapping
++        self._region = region
++
++    @property
++    def start(self):
++        return self._region.start
++
++    @property
++    def end(self):
++        return self._region.end
++
++    @property
++    def offset(self):
++        return self._region.file_offset
++
++    @property
++    def filename(self):
++        return self._mapping.filename
++
++
++def info_proc_mappings():
++    print("Mapped address spaces:")
++    print("")
++    format_str = "%-18s %-18s %-18s %-18s %s "
++    print(format_str % ("Start Addr", "End Addr", "Size", "Offset", "File"))
++
++    core = gdb.selected_inferior().corefile
++    mappings = core.mapped_files()
++
++    result = []
++    for m in mappings:
++        for r in m.regions:
++            result.append(Mapping(m, r))
++
++    result.sort(key=lambda x: x.start)
++    for r in result:
++        sz = r.end - r.start
++        print(
++            format_str
++            % (
++                "0x%016x" % r.start,
++                "0x%016x" % r.end,
++                "0x%-16x" % sz,
++                "0x%-16x" % r.offset,
++                "%s" % r.filename,
++            )
++        )
++
++
++class InfoProcPyMappings(gdb.Command):
++    def __init__(self):
++        gdb.Command.__init__(self, "info proc py-mappings", gdb.COMMAND_DATA)
++
++    def invoke(self, args, from_tty):
++        info_proc_mappings()
++
++
++InfoProcPyMappings()
++
++
++class CheckBuildIds(gdb.Command):
++    def __init__(self):
++        gdb.Command.__init__(self, "check-build-ids", gdb.COMMAND_DATA)
++
++    def invoke(self, args, from_tty):
++        inf = gdb.selected_inferior()
++        objfiles = inf.progspace.objfiles()
++
++        path_to_build_id = {}
++
++        for o in objfiles:
++            if not o.is_file or o.build_id is None:
++                continue
++            p = pathlib.Path(o.filename).resolve()
++            b = o.build_id
++            path_to_build_id[p] = b
++
++        count = 0
++        core_mapped_files = inf.corefile.mapped_files()
++        for m in core_mapped_files:
++            p = pathlib.Path(m.filename).resolve()
++            b = m.build_id
++
++            if p in path_to_build_id:
++                count += 1
++                assert path_to_build_id[p] == b, "build-id mismatch for %s" % p
++
++        assert count > 0, "no mapped files checked"
++
++        print("PASS")
++
++
++CheckBuildIds()
++
++
++class CheckMainExec(gdb.Command):
++    def __init__(self):
++        gdb.Command.__init__(self, "check-main-executable", gdb.COMMAND_DATA)
++
++    def invoke(self, args, from_tty):
++        inf = gdb.selected_inferior()
++        pspace = inf.progspace
++        exec_filename = pathlib.Path(pspace.executable_filename).resolve()
++
++        count = 0
++        core_mapped_files = inf.corefile.mapped_files()
++        for m in core_mapped_files:
++            if not m.is_main_executable:
++                continue
++
++            p = pathlib.Path(m.filename).resolve()
++
++            count += 1
++            assert exec_filename == p, "main exec filename mismatch"
++
++        assert count == 1, "invalid main executable count"
++
++        print("PASS")
++
++
++CheckMainExec()
++
++
++# An 'events' prefix command.
++class events_cmd(gdb.Command):
++    """Information about recent Python events."""
++
++    def __init__(self):
++        gdb.Command.__init__(self, "events", gdb.COMMAND_USER, prefix=True)
++
++
++# An 'events corefile_changed' sub-command.
++class events_corefile_changed_cmd(gdb.Command):
++    """Check recent corefile_changed events.
++
++    Requires a single argument either 'check' or 'reset'.  With
++    'check', print details of every recent corefile_changed event.
++    With 'reset' clear the list of recent corefile_changed events."""
++
++    def __init__(self):
++        gdb.Command.__init__(self, "events corefile_changed", gdb.COMMAND_USER)
++        self._events = []
++        gdb.events.corefile_changed.connect(lambda e: self._corefile_changed_handler(e))
++
++    def _corefile_changed_handler(self, event):
++        assert isinstance(event, gdb.CorefileChangedEvent)
++        inf = event.inferior
++        assert isinstance(inf, gdb.Inferior)
++
++        corefile = inf.corefile
++        if corefile is not None:
++            assert corefile.is_valid()
++            corefile = corefile.filename
++
++        obj = {"inferior": inf.num, "corefile": corefile}
++        self._events.append(obj)
++
++    def invoke(self, args, from_tty):
++        if args == "check":
++            if len(self._events) == 0:
++                print("No corefile_changed event has been seen.")
++            else:
++                total = len(self._events)
++                for idx, obj in enumerate(self._events, start=1):
++                    inf_num = obj["inferior"]
++                    corefile = obj["corefile"]
++
++                    if corefile is None:
++                        msg = "None"
++                    else:
++                        msg = corefile
++
++                    print(
++                        "Event {}/{}, Inferior {}, Corefile {}".format(
++                            idx, total, inf_num, msg
++                        )
++                    )
++        elif args == "reset":
++            self._events = []
++        else:
++            raise gdb.GdbError("Unknown command args: {}".format(args))
++
++
++# An 'events exited' sub-command.
++class events_exited_cmd(gdb.Command):
++    """Check recent exited events.
++
++    Requires a single argument either 'check' or 'reset'.  With
++    'check', print details of every recent exited event.  With 'reset'
++    clear the list of recent exited events."""
++
++    def __init__(self):
++        gdb.Command.__init__(self, "events exited", gdb.COMMAND_USER)
++        self._events = []
++        gdb.events.exited.connect(lambda e: self._exited_handler(e))
++
++    def _exited_handler(self, event):
++        assert isinstance(event, gdb.ExitedEvent)
++        inf = event.inferior
++        assert isinstance(inf, gdb.Inferior)
++
++        if hasattr(event, "exit_code"):
++            assert isinstance(event.exit_code, int)
++            exit_code = event.exit_code
++        else:
++            exit_code = None
++
++        obj = {"inferior": inf.num, "exit_code": exit_code}
++        self._events.append(obj)
++
++    def invoke(self, args, from_tty):
++        if args == "check":
++            if len(self._events) == 0:
++                print("No exited event has been seen.")
++            else:
++                total = len(self._events)
++                for idx, obj in enumerate(self._events, start=1):
++                    inf_num = obj["inferior"]
++                    exit_code = obj["exit_code"]
++
++                    if exit_code is None:
++                        msg = "None"
++                    else:
++                        msg = exit_code
++
++                    print(
++                        "Event {}/{}, Inferior {}, Exit Code {}".format(
++                            idx, total, inf_num, msg
++                        )
++                    )
++        elif args == "reset":
++            self._events = []
++        else:
++            raise gdb.GdbError("Unknown command args: {}".format(args))
++
++
++events_cmd()
++events_corefile_changed_cmd()
++events_exited_cmd()
++
++print("Success")
+diff --git a/gdb/testsuite/lib/dap-support.exp b/gdb/testsuite/lib/dap-support.exp
+--- a/gdb/testsuite/lib/dap-support.exp
++++ b/gdb/testsuite/lib/dap-support.exp
+@@ -362,6 +362,22 @@ proc dap_attach {pid {prog ""}} {
+     return [dap_send_request attach $args]
+ }
+ 
++# Start gdb, send a DAP initialize request, and then an attach request
++# specifying COREFILE as the core file to attach to.  Returns the
++# empty string on failure, or the attach request sequence ID.
++proc dap_corefile {corefile {prog ""}} {
++    if {[dap_initialize "startup - initialize"] == ""} {
++	return ""
++    }
++
++    set args [format {o coreFile [s "%s"]} $corefile]
++    if {$prog != ""} {
++	append args [format { program [s "%s"]} $prog]
++    }
++
++    return [dap_send_request attach $args]
++}
++
+ # Start gdb, send a DAP initialize request, and then an attach request
+ # specifying TARGET as the remote target.  Returns the empty string on
+ # failure, or the attach request sequence ID.
+@@ -372,26 +388,33 @@ proc dap_target_remote {target} {
+     return [dap_send_request attach [format {o target [s %s]} $target]]
+ }
+ 
+-# Read the most recent DAP log file and check it for exceptions.
+-proc dap_check_log_file {} {
++# Read the most recent DAP log file and check it for exceptions.  We
++# expect to see exactly EXPECTED_EXCEPTION_COUNT exceptions in the log.
++proc dap_check_log_file { {expected_exception_count 0} } {
+     set fd [open [current_dap_log_file]]
+     set contents [read $fd]
+     close $fd
+ 
+-    set ok 1
++    set exception_count 0
+     foreach line [split $contents "\n"] {
+ 	if {[regexp "^Traceback" $line]} {
+-	    set ok 0
+-	    break
++	    incr exception_count
++	    if { $exception_count > $expected_exception_count} {
++		break
++	    }
+ 	}
+     }
+ 
+-    if {$ok} {
++    if {$exception_count == $expected_exception_count} {
+ 	pass "exceptions in log file"
+     } else {
+ 	verbose -log --  "--- DAP LOG START ---"
+ 	verbose -log -- $contents
+ 	verbose -log --  "--- DAP LOG END ---"
++	if { $expected_exception_count > 0 } {
++	    verbose -log -- [join [list "Expected $expected_exception_count" \
++					"exception(s), saw $exception_count"]]
++	}
+ 	fail "exceptions in log file"
+     }
+ }
+@@ -407,8 +430,9 @@ proc dap_check_log_file_re { re } {
+ }
+ 
+ # Cleanly shut down gdb.  TERMINATE is passed as the terminateDebuggee
+-# parameter to the request.
+-proc dap_shutdown {{terminate false}} {
++# parameter to the request.  The EXPECTED_EXCEPTION_COUNT is the
++# number of exceptions that we expect to see in the latest DAP log.
++proc dap_shutdown {{terminate false} {expected_exception_count 0}} {
+     dap_check_request_and_response "shutdown" disconnect \
+ 	[format {o terminateDebuggee [l %s]} $terminate]
+ 
+@@ -420,7 +444,7 @@ proc dap_shutdown {{terminate false}} {
+ 
+     clear_gdb_spawn_id
+ 
+-    dap_check_log_file
++    dap_check_log_file $expected_exception_count
+ }
+ 
+ # Search the event list EVENTS for an output event matching the regexp

@@ -3,7 +3,7 @@
 
 Name:           python-deprecated
 Version:        1.3.1
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Python decorator to deprecate old python classes, functions or methods
 License:        MIT
 URL:            https://github.com/laurent-laporte-pro/deprecated

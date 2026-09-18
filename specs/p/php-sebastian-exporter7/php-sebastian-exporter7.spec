@@ -3,7 +3,7 @@
 
 # remirepo/fedora spec file for php-sebastian-exporter7
 #
-# SPDX-FileCopyrightText:  Copyright 2013-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2013-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
@@ -12,11 +12,8 @@
 
 %bcond_without       tests
 
-%global gh_commit    016951ae10980765e4e7aee491eb288c64e505b7
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   exporter
-%global gh_date      2025-09-24
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -29,14 +26,14 @@
 %global pear_channel pear.phpunit.de
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        7.0.2
-Release: 4%{?dist}
+Version:        7.0.3
+Release:        1%{?dist}
 Summary:        Export PHP variables for visualization, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -45,18 +42,18 @@ BuildRequires:  php-mbstring
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^12.0",
-BuildRequires:  phpunit12
-BuildRequires:  (php-composer(%{pk_vendor}/recursion-context) >= 7.0 with php-composer(%{pk_vendor}/recursion-context) < 8)
+#        "phpunit/phpunit": "^12.5.25",
+BuildRequires:  phpunit12 >= 12.5.25
+BuildRequires:  (php-composer(%{pk_vendor}/recursion-context) >= 7.0.1 with php-composer(%{pk_vendor}/recursion-context) < 8)
 %endif
 
 # from composer.json
 #        "php": ">=8.3",
 #        "ext-mbstring": "*",
-#        "sebastian/recursion-context": "^7.0"
+#        "sebastian/recursion-context": "^7.0.1"
 Requires:       php(language) >= 8.3
 Requires:       php-mbstring
-Requires:       (php-composer(%{pk_vendor}/recursion-context) >= 7.0 with php-composer(%{pk_vendor}/recursion-context) < 8)
+Requires:       (php-composer(%{pk_vendor}/recursion-context) >= 7.0.1 with php-composer(%{pk_vendor}/recursion-context) < 8)
 # from phpcompatinfo report for version 5.0.0
 # Autoloader
 Requires:       php-composer(fedora/autoloader)
@@ -73,7 +70,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -116,6 +113,10 @@ exit $ret
 
 
 %changelog
+* Wed May 20 2026 Remi Collet <remi@remirepo.net> - 7.0.3-1
+- update to 7.0.3
+- raise dependency on sebastian/recursion-context 7.0.1
+
 * Wed Sep 24 2025 Remi Collet <remi@remirepo.net> - 7.0.2-1
 - update to 7.0.2
 

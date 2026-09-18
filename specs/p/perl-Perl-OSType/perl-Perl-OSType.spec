@@ -6,7 +6,7 @@
 
 Name:		perl-Perl-OSType
 Version:	1.010
-Release: 524%{?dist}
+Release:	521%{?dist}
 Summary:	Map Perl operating system names to generic types
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Perl-OSType

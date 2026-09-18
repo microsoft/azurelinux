@@ -8,7 +8,7 @@ Version:        5.6.3
 %forgemeta
 
 Name:           python-%{srcname}
-Release: 14%{?dist}
+Release:        12%{?dist}
 Summary:        Python disk-backed cache
 
 License:        Apache-2.0
@@ -16,6 +16,11 @@ URL:            https://grantjenks.com/docs/diskcache/
 # Pypi version does not have tests
 Source0:        %{forgesource}
 
+# Mitigate the risk of unsafe pickel deserialization.
+# This is a modified version of the upstream patch that changes the default
+# to a safe alternative.
+# https://github.com/grantjenks/python-diskcache/pull/359.patch
+Patch:          0001-CVE-2025-69872-unsafe-pickle.patch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-tox
@@ -55,8 +60,11 @@ sed -i 's/==4.2.*//g' tox.ini
 
 %files -n python3-%{srcname} -f %{pyproject_files}
 %doc README.rst
- 
+
 %changelog
+* Sun Mar 15 2026 Benson Muite <fed500@fedoraproject.org> - 5.6.4-12
+- Incorporate patch from Sam Doran to fix CVE-2025-69872
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.6.3-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

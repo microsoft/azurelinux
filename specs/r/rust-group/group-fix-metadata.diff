@@ -1,20 +1,24 @@
---- group-0.13.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ group-0.13.0/Cargo.toml	2023-05-30T13:44:09.882393+00:00
-@@ -25,10 +25,6 @@
- version = "0.13"
- default-features = false
+--- group-0.14.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ group-0.14.0/Cargo.toml	2026-08-04T13:24:38.140487+00:00
+@@ -42,10 +42,6 @@
+     "rand",
+     "rand_xorshift",
+ ]
+-wnaf-memuse = [
+-    "alloc",
+-    "memuse",
+-]
  
+ [lib]
+ name = "group"
+@@ -54,10 +50,6 @@
+ [dependencies.ff]
+ version = "0.14"
+ default-features = false
+-
 -[dependencies.memuse]
 -version = "0.2"
 -optional = true
--
+ 
  [dependencies.rand]
- version = "0.8"
- optional = true
-@@ -50,6 +46,5 @@
- alloc = []
- default = ["alloc"]
- tests = ["alloc", "rand", "rand_xorshift"]
--wnaf-memuse = ["alloc", "memuse"]
- [badges.maintenance]
- status = "actively-developed"
+ version = "0.10"

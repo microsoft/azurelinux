@@ -3,7 +3,7 @@
 
 Name:           perl-Font-AFM
 Version:        1.20
-Release: 54%{?dist}
+Release:        51%{?dist}
 Summary:        Perl interface to Adobe Font Metrics files
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -1,0 +1,681 @@
+From 4809c6cf43ac9709568e2637e127f5a76c9d845e Mon Sep 17 00:00:00 2001
+From: progier389 <progier@redhat.com>
+Date: Wed, 25 Feb 2026 18:00:24 +0100
+Subject: [PATCH] Issue 7267 - MDB_BAD_VALSIZE error when updating index
+ (#7268)
+
+* Issue 7267 - MDB_BAD_VALSIZE error when updating index
+* Improve import log when writer fails
+* Fix Sourcery AI comments
+* Fix INDEX_KEY_LENGTH typo
+
+Problem with the key prefix handling when key is too long and must be hashed.
+The issue is that the # that is prepended is not reset when iterating over the valueset values (Ending up with very long prefix)
+
+Also refactored the code to avoid duplicate the code that prepare the key from the attribute value (used when updating the index or retrieving a value from an index)
+
+Issue: #7267
+
+Reviewed by: @tbordaz , @vashirov (Thanks!)
+
+Co-authored-by: Viktor Ashirov <vashirov@redhat.com>
+
+---------
+
+Co-authored-by: Viktor Ashirov <vashirov@redhat.com>
+---
+ .../tests/suites/indexes/regression_test.py   |  85 +++++++++
+ ldap/servers/slapd/back-ldbm/attrcrypt.h      |   2 +-
+ ldap/servers/slapd/back-ldbm/back-ldbm.h      |   2 +
+ .../slapd/back-ldbm/db-bdb/bdb_import.c       |  39 +----
+ .../back-ldbm/db-mdb/mdb_import_threads.c     |  46 ++++-
+ ldap/servers/slapd/back-ldbm/index.c          | 161 +++++++-----------
+ ldap/servers/slapd/back-ldbm/ldbm_attrcrypt.c |  13 +-
+ .../servers/slapd/back-ldbm/proto-back-ldbm.h |   2 +-
+ ldap/servers/slapd/log.c                      |  43 +++++
+ ldap/servers/slapd/slapi-private.h            |   2 +
+ 10 files changed, 251 insertions(+), 144 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/indexes/regression_test.py b/dirsrvtests/tests/suites/indexes/regression_test.py
+index 71670de87..39f63e349 100644
+--- a/dirsrvtests/tests/suites/indexes/regression_test.py
++++ b/dirsrvtests/tests/suites/indexes/regression_test.py
+@@ -900,6 +900,91 @@ def test_concurrent_modifications_during_indexing(topo, homeDirectory_index_clea
+         user.delete()
+ 
+ 
++def test_idl_range_limit(topo, add_some_entries):
++    """Test nsslapd-rangelookthroughlimit and AND shortcut
++
++    :id: 746a5af2-d755-11f0-8b62-c85309d5c3e3
++    :setup: Standalone Instance with some entries
++    :steps:
++        1. Set nsslapd-rangelookthroughlimit
++        2. Open a new connection and bound it as an user
++        3. Perform Range search that hit nsslapd-rangelookthroughlimit and AND shortcut
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++    """
++
++    inst = topo.standalone
++    added_entries = add_some_entries
++
++    dbconfig = LDBMConfig(inst)
++    dbconfig.set('nsslapd-rangelookthroughlimit', "50")
++
++    conn = added_entries[0].bind(PW_DM)
++
++    entries = conn.search_s(DEFAULT_SUFFIX, ldap.SCOPE_SUBTREE, "(&(objectclass=nsOrgPerson)(sn=foo)(uid>=a))")
++    assert len(entries) == 3
++
++
++def test_large_multivalued_sn_attribute(topo):
++    """Test adding a user entry with 512 values for sn attribute, each 512 bytes
++
++    :id: 8f2a9b3c-e8d7-11ef-9a5f-482ae39447e5
++    :setup: Standalone Instance
++    :steps:
++        1. Create a user with 512 sn values, each 512 bytes long
++        2. Verify the user was created successfully
++        3. Search for the user and verify all sn values are present
++        4. Clean up the user entry
++    :expectedresults:
++        1. User is created successfully
++        2. User entry exists
++        3. All 512 sn values are present and have correct length
++        4. User is deleted successfully
++    """
++
++    inst = topo.standalone
++    users = UserAccounts(inst, DEFAULT_SUFFIX)
++
++    log.info("Creating user with 512 sn values, each 512 bytes")
++
++    # Generate 512 unique sn values, each 512 bytes long
++    # Use a pattern that makes each value unique but predictable
++    sn_values = []
++    for i in range(512):
++        # Create a 512-byte value with unique identifier at the start
++        value = f'sn_value_{i:04d}_' + 'x' * (512 - len(f'sn_value_{i:04d}_'))
++        sn_values.append(value)
++
++    # Create the user with first sn value
++    user_name = 'test_user_large_sn'
++    user = users.create(properties={
++        'uid': user_name,
++        'cn': user_name,
++        'sn': sn_values,
++        'uidNumber': '99999',
++        'gidNumber': '99999',
++        'homeDirectory': f'/home/{user_name}'
++    })
++
++    # Verify the entry was created and has all sn values
++    log.info("Verifying all sn values are present")
++    sn_attr_values = user.get_attr_vals_utf8('sn')
++
++    assert len(sn_attr_values) == 512, f"Expected 512 sn values, got {len(sn_attr_values)}"
++
++    # Verify each value has the correct length
++    for idx, value in enumerate(sn_attr_values):
++        assert len(value) == 512, f"sn value {idx} has length {len(value)}, expected 512"
++
++    log.info("Successfully created and verified user with 512 sn values of 512 bytes each")
++
++    # Clean up
++    user.delete()
++    log.info("User entry deleted successfully")
++
++
+ if __name__ == "__main__":
+     # Run isolated
+     # -s for DEBUG mode
+diff --git a/ldap/servers/slapd/back-ldbm/attrcrypt.h b/ldap/servers/slapd/back-ldbm/attrcrypt.h
+index d653ba951..dcbea80fe 100644
+--- a/ldap/servers/slapd/back-ldbm/attrcrypt.h
++++ b/ldap/servers/slapd/back-ldbm/attrcrypt.h
+@@ -10,7 +10,7 @@
+ #include <config.h>
+ #endif
+ 
+-/* Private tructures and #defines used in the attribute encryption code. */
++/* Private structures and #defines used in the attribute encryption code. */
+ 
+ #ifndef _ATTRCRYPT_H_
+ #define _ATTRCRYPT_H_
+diff --git a/ldap/servers/slapd/back-ldbm/back-ldbm.h b/ldap/servers/slapd/back-ldbm/back-ldbm.h
+index e23e7ff43..92aa1ddbb 100644
+--- a/ldap/servers/slapd/back-ldbm/back-ldbm.h
++++ b/ldap/servers/slapd/back-ldbm/back-ldbm.h
+@@ -104,6 +104,8 @@ typedef unsigned short u_int16_t;
+  */
+ #define BE_CHANGELOG_FILE     "replication_changelog"
+ 
++#define INDEX_KEY_LENGTH(lenval,lenprefix)  (lenval+lenprefix+2)
++
+ #define BDB_IMPL              "bdb"
+ #define BDB_BACKEND           "libback-ldbm" /* This backend plugin */
+ #define BDB_NEWIDL            "newidl"       /* new idl format */
+diff --git a/ldap/servers/slapd/back-ldbm/db-bdb/bdb_import.c b/ldap/servers/slapd/back-ldbm/db-bdb/bdb_import.c
+index a6cb10aec..489433801 100644
+--- a/ldap/servers/slapd/back-ldbm/db-bdb/bdb_import.c
++++ b/ldap/servers/slapd/back-ldbm/db-bdb/bdb_import.c
+@@ -75,9 +75,9 @@ static IDList *bdb_idl_union_allids(backend *be, struct attrinfo *ai, IDList *a,
+ #define DEBUG_SUBCOUNT_MSG(msg, ...) { debug_subcount(__FUNCTION__, __LINE__, (msg), __VA_ARGS__); }
+ #define DUMP_SUBCOUNT_KEY(msg, key, ret) { debug_subcount(__FUNCTION__, __LINE__, "ret=%d size=%u ulen=%u doff=%u dlen=%u", \
+                                                ret, (key).size, (key).ulen, (key).doff, (key).dlen); \
+-                                           if (ret == 0) hexadump(msg, (key).data, 0, (key).size); \
++                                           if (ret == 0) slapi_log_hexadump(SLAPI_LOG_INFO, msg, (key).data, (key).size); \
+                                            else if (ret == DB_BUFFER_SMALL) \
+-                                                hexadump(msg, (key).data, 0, (key).ulen); }
++                                                slapi_log_hexadump(SLAPI_LOG_INFO, msg, (key).data, (key).ulen); }
+ 
+ static void
+ debug_subcount(const char *funcname, int line, char *msg, ...)
+@@ -90,41 +90,6 @@ debug_subcount(const char *funcname, int line, char *msg, ...)
+     slapi_log_err(SLAPI_LOG_INFO, (char*)funcname, "DEBUG SUBCOUNT [%d] %s\n", line, buff);
+ }
+ 
+-/*
+- * Dump a memory buffer in hexa and ascii in error log
+- *
+- * addr - The memory buffer address.
+- * len - The memory buffer lenght.
+- */
+-static void
+-hexadump(char *msg, const void *addr, size_t offset, size_t len)
+-{
+-#define  HEXADUMP_TAB 4
+-/* 4 characters per bytes:  2 hexa digits, 1 space and the ascii  */
+-#define  HEXADUMP_BUF_SIZE (4*16+HEXADUMP_TAB)
+-    char hexdigit[] = "0123456789ABCDEF";
+-
+-    const unsigned char *pt = addr;
+-    char buff[HEXADUMP_BUF_SIZE+1];
+-    memset (buff, ' ', HEXADUMP_BUF_SIZE);
+-    buff[HEXADUMP_BUF_SIZE] = '\0';
+-    while (len > 0) {
+-        int dpl;
+-        for (dpl = 0; dpl < 16 && len>0; dpl++, len--) {
+-           buff[3*dpl] = hexdigit[((*pt) >> 4) & 0xf];
+-           buff[3*dpl+1] = hexdigit[(*pt) & 0xf];
+-           buff[3*16+HEXADUMP_TAB+dpl] = (*pt>=0x20 && *pt<0x7f) ? *pt : '.';
+-           pt++;
+-        }
+-        for (;dpl < 16; dpl++) {
+-           buff[3*dpl] = ' ';
+-           buff[3*dpl+1] = ' ';
+-           buff[3*16+HEXADUMP_TAB+dpl] = ' ';
+-        }
+-        slapi_log_err(SLAPI_LOG_INFO, msg, "[0x%08lx]  %s\n", offset, buff);
+-        offset += 16;
+-    }
+-}
+ #else
+ #define DEBUG_SUBCOUNT_MSG(msg, ...)
+ #define DUMP_SUBCOUNT_KEY(msg, key, ret)
+diff --git a/ldap/servers/slapd/back-ldbm/db-mdb/mdb_import_threads.c b/ldap/servers/slapd/back-ldbm/db-mdb/mdb_import_threads.c
+index 2270abd69..bfb902c02 100644
+--- a/ldap/servers/slapd/back-ldbm/db-mdb/mdb_import_threads.c
++++ b/ldap/servers/slapd/back-ldbm/db-mdb/mdb_import_threads.c
+@@ -1122,6 +1122,21 @@ dbmdb_import_entry_info_by_backentry(mdb_privdb_t *db, BulkQueueData_t *bqdata,
+     return dnrc;
+ }
+ 
++/* Log wqelmt details */
++void
++log_wqelmt(int loglvl, char *fname, WorkerQueueData_t *wqelmt)
++{
++    if (wqelmt->dn) {
++        slapi_log_err(loglvl, fname, "log_wqelmt: dn=%s\n", wqelmt->dn);
++    }
++    if (wqelmt->filename && wqelmt->lineno) {
++        slapi_log_err(loglvl, fname, "log_wqelmt: ldif=%s[%d]\n", wqelmt->filename, wqelmt->lineno);
++    }
++    if (wqelmt->data) {
++        size_t len = wqelmt->datalen ? wqelmt->datalen : strlen(wqelmt->data);
++        slapi_log_hexadump(loglvl, "log_wqelmt:data", wqelmt->data, len);
++    }
++}
+ 
+ /* producer thread for ldif import case:
+  * read through the given file list, parsing entries (str2entry), assigning
+@@ -1254,6 +1269,7 @@ dbmdb_import_producer(void *param)
+                 import_log_notice(job, SLAPI_LOG_ERR, "dbmdb_import_producer",
+                                   "ns_slapd software error: unexpected dbmdb_import_entry_info return code: %d.",
+                                   wqelmt.dnrc);
++                log_wqelmt(SLAPI_LOG_ERR, "dbmdb_import_producer", &wqelmt);
+                 abort();
+             case DNRC_OK:
+             case DNRC_SUFFIX:
+@@ -1757,6 +1773,7 @@ dbmdb_index_producer(void *param)
+                 import_log_notice(job, SLAPI_LOG_ERR, "dbmdb_index_producer",
+                                   "ns_slapd software error: unexpected dbmdb_import_entry_info return code: %d.",
+                                   tmpslot.dnrc);
++                log_wqelmt(SLAPI_LOG_ERR, "dbmdb_index_producer", &tmpslot);
+                 abort();
+             case DNRC_OK:
+             case DNRC_SUFFIX:
+@@ -3934,10 +3951,24 @@ dbmdb_import_writer(void*param)
+             if (!txn) {
+                 MDB_STAT_STEP(stats, MDB_STAT_TXNSTART);
+                 rc = TXN_BEGIN(ctx->ctx->env, NULL, 0, &txn);
++                if (rc) {
++                    slapi_log_err(SLAPI_LOG_ERR, "dbmdb_import_writer",
++                                  "Failed to begin a txn. Error is 0x%x: %s.\n",
++                                  rc, mdb_strerror(rc));
++                }
+             }
+             if (!rc) {
+                 MDB_STAT_STEP(stats, MDB_STAT_WRITE);
+                 rc = MDB_PUT(txn, slot->dbi->dbi, &slot->key, &slot->data, 0);
++                if (rc) {
++                    slapi_log_err(SLAPI_LOG_ERR, "dbmdb_import_writer",
++                                  "Failed to write record in dbi %s. Error is 0x%x: %s.\n",
++                                  slot->dbi->dbname, rc, mdb_strerror(rc));
++                    slapi_log_hexadump(SLAPI_LOG_ERR, "dbmdb_import_writer:key", 
++                                       slot->key.mv_data, slot->key.mv_size);
++                    slapi_log_hexadump(SLAPI_LOG_ERR, "dbmdb_import_writer:data", 
++                                       slot->data.mv_data, slot->data.mv_size);
++                }
+             }
+             MDB_STAT_STEP(stats, MDB_STAT_RUN);
+             nextslot = slot->next;
+@@ -3951,6 +3982,9 @@ dbmdb_import_writer(void*param)
+             rc = TXN_COMMIT(txn);
+             MDB_STAT_STEP(stats, MDB_STAT_RUN);
+             if (rc) {
++                slapi_log_err(SLAPI_LOG_ERR, "dbmdb_import_writer",
++                              "Failed to commit the txn. Error is 0x%x: %s.\n",
++                              rc, mdb_strerror(rc));
+                 break;
+             }
+             count = 0;
+@@ -3963,6 +3997,10 @@ dbmdb_import_writer(void*param)
+         MDB_STAT_STEP(stats, MDB_STAT_RUN);
+         if (!rc) {
+             txn = NULL;
++        } else {
++            slapi_log_err(SLAPI_LOG_ERR, "dbmdb_import_writer",
++                          "Failed to commit the txn. Error is 0x%x: %s.\n",
++                          rc, mdb_strerror(rc));
+         }
+     }
+     if (txn) {
+@@ -3975,13 +4013,17 @@ dbmdb_import_writer(void*param)
+     if (!rc) {
+         /* Ensure that all data are written on disk */
+         rc = mdb_env_sync(ctx->ctx->env, 1);
++        if (rc) {
++            slapi_log_err(SLAPI_LOG_ERR, "dbmdb_import_writer",
++                          "mdb_env_sync failed. Error is 0x%x: %s.\n",
++                          rc, mdb_strerror(rc));
++        }
+     }
+     MDB_STAT_END(stats);
+ 
+     if (rc) {
+         slapi_log_err(SLAPI_LOG_ERR, "dbmdb_import_writer",
+-                "Failed to write in the database. Error is 0x%x: %s.\n",
+-                rc, mdb_strerror(rc));
++                "Aborting import after failure.\n");
+         thread_abort(info);
+     } else {
+         char buf[200];
+diff --git a/ldap/servers/slapd/back-ldbm/index.c b/ldap/servers/slapd/back-ldbm/index.c
+index a5004be19..c108bce3c 100644
+--- a/ldap/servers/slapd/back-ldbm/index.c
++++ b/ldap/servers/slapd/back-ldbm/index.c
+@@ -881,6 +881,67 @@ index_read(
+     return index_read_ext(be, (char *)type, indextype, val, txn, err, NULL);
+ }
+ 
++/* Prepare an index key (hashed if too long, encrypted if needed from attribute value */
++int
++prepare_key(backend *be, struct attrinfo *a, char **buf, size_t *buflen,
++            int flags, const char *prefix, const struct berval *bvp, dbi_val_t *key)
++{
++    /* Key format is [Hash?] [prefix] [val] [\0] */
++    struct ldbminfo *li = (struct ldbminfo *)be->be_database->plg_private;
++    size_t plen = strlen(prefix);
++    struct berval *hashed_bvp = NULL;
++    struct berval *encrypted_bvp = NULL;
++    int rc = 0;
++
++    /* Hash large index key if necessary */
++    if (INDEX_KEY_LENGTH(bvp->bv_len,plen) >=  li->li_max_key_len) {
++        rc = attrcrypt_hash_large_index_key(be, prefix, a, bvp, &hashed_bvp);
++        if (rc) {
++            slapi_log_err(SLAPI_LOG_ERR, "index_read_ext_allids",
++                          "Failed to hash large index key for %s\n", a->ai_type);
++            return rc;
++        } else {
++            bvp = hashed_bvp;
++        }
++    }
++
++    /* Encrypt the index key if necessary */
++    if (rc == 0 && a->ai_attrcrypt && (0 == (flags & BE_INDEX_DONT_ENCRYPT))) {
++        rc = attrcrypt_encrypt_index_key(be, a, bvp, &encrypted_bvp);
++        if (rc) {
++            slapi_log_err(SLAPI_LOG_ERR, "addordel_values_sv",
++                          "Failed to encrypt index key for %s\n", a->ai_type);
++        } else {
++            bvp = encrypted_bvp;
++        }
++    }
++    if (hashed_bvp) {
++        prefix = slapi_ch_smprintf("%c%s",HASH_PREFIX, prefix);
++        plen++;
++    }
++    if (buf && buflen) {
++        if (plen+bvp->bv_len+1 > *buflen) {
++            *buflen = plen+bvp->bv_len+1;
++            *buf = slapi_ch_realloc(*buf, *buflen);
++        }
++        dblayer_value_concat(be, key, *buf, *buflen, prefix, plen, bvp->bv_val, bvp->bv_len, "", 1);
++    } else {
++        dblayer_value_concat(be, key, NULL, 0, prefix, plen, bvp->bv_val, bvp->bv_len, "", 1);
++    }
++
++    if (hashed_bvp) {
++        ber_bvfree(hashed_bvp);
++        hashed_bvp = NULL;
++        slapi_ch_free_string((char**)&prefix);
++    }
++    if (encrypted_bvp) {
++        ber_bvfree(encrypted_bvp);
++        encrypted_bvp = NULL;
++    }
++    return rc;
++}
++
++
+ /*
+  * Extended version of index_read.
+  * The unindexed flag can be used to distinguish between a
+@@ -917,7 +978,6 @@ index_read_ext_allids(
+     struct berval *hashed_val = NULL;
+     int is_and = 0;
+     unsigned int ai_flags = 0;
+-    struct ldbminfo *li = (struct ldbminfo *)be->be_database->plg_private;
+ 
+     *err = 0;
+ 
+@@ -1028,36 +1088,7 @@ index_read_ext_allids(
+     }
+ 
+     if (val != NULL) {
+-        size_t vlen;
+-        int ret = 0;
+-
+-        /* If necessary, hash this index key */
+-        if (val->bv_len >=  li->li_max_key_len) {
+-            ret = attrcrypt_hash_large_index_key(be, &prefix, ai, val, &hashed_val);
+-            if (ret) {
+-                slapi_log_err(SLAPI_LOG_ERR, "index_read_ext_allids",
+-                              "Failed to hash large index key for %s\n", basetype);
+-                *err = DBI_RC_OTHER;
+-                index_free_prefix(prefix);
+-                slapi_ch_free_string(&basetmp);
+-                return (NULL);
+-            }
+-            if (hashed_val) {
+-                val = hashed_val;
+-            }
+-        }
+-        /* If necessary, encrypt this index key */
+-        ret = attrcrypt_encrypt_index_key(be, ai, val, &encrypted_val);
+-        if (ret) {
+-            slapi_log_err(SLAPI_LOG_ERR, "index_read_ext_allids",
+-                          "Failed to encrypt index key for %s\n", basetype);
+-        }
+-        if (encrypted_val) {
+-            val = encrypted_val;
+-        }
+-        vlen = val->bv_len;
+-        dblayer_value_concat(be, &key, buf, sizeof(buf),
+-            prefix, strlen(prefix), val->bv_val, vlen, "", 1);
++        (void) prepare_key(be, ai, NULL, 0, 0, prefix, val, &key);
+     } else {
+         dblayer_value_concat(be, &key, buf, sizeof(buf), prefix, strlen(prefix),
+             "", 1, NULL, 0);
+@@ -1824,6 +1855,7 @@ index_range_read(
+     return index_range_read_ext(pb, be, type, indextype, operator, val, nextval, range, txn, err, 0);
+ }
+ 
++
+ static int
+ addordel_values_sv(
+     backend *be,
+@@ -1842,15 +1874,10 @@ addordel_values_sv(
+     int i = 0;
+     dbi_val_t key = {0};
+     dbi_txn_t *db_txn = NULL;
+-    size_t plen, vlen, len;
+     char *tmpbuf = NULL;
+     size_t tmpbuflen = 0;
+-    char *realbuf;
+     char *prefix = NULL;
+     const struct berval *bvp;
+-    struct berval *hashed_bvp = NULL;
+-    struct berval *encrypted_bvp = NULL;
+-    struct ldbminfo *li = (struct ldbminfo *)be->be_database->plg_private;
+     char *index_id = get_index_name(be, db, a);
+ 
+     slapi_log_err(SLAPI_LOG_TRACE, "addordel_values_sv", "%s_values\n",
+@@ -1889,66 +1916,14 @@ addordel_values_sv(
+         return (rc);
+     }
+ 
+-    plen = strlen(prefix);
+     for (i = 0; vals[i] != NULL; i++) {
+         bvp = slapi_value_get_berval(vals[i]);
+ 
+-        /* Hash large index key if necessary */
+-        if (bvp->bv_len >=  li->li_max_key_len) {
+-            rc = attrcrypt_hash_large_index_key(be, &prefix, a, bvp, &hashed_bvp);
+-            if (rc) {
+-                slapi_log_err(SLAPI_LOG_ERR, "index_read_ext_allids",
+-                              "Failed to hash large index key for %s\n", a->ai_type);
+-                break;
+-            } else {
+-                bvp = hashed_bvp;
+-                plen = strlen(prefix);
+-            }
+-        }
+-        /* Encrypt the index key if necessary */
+-        {
+-            if (a->ai_attrcrypt && (0 == (flags & BE_INDEX_DONT_ENCRYPT))) {
+-                rc = attrcrypt_encrypt_index_key(be, a, bvp, &encrypted_bvp);
+-                if (rc) {
+-                    slapi_log_err(SLAPI_LOG_ERR, "addordel_values_sv",
+-                                  "Failed to encrypt index key for %s\n", a->ai_type);
+-                } else {
+-                    bvp = encrypted_bvp;
+-                }
+-            }
++        rc = prepare_key(be, a, &tmpbuf, &tmpbuflen, flags, prefix, bvp, &key);
++        if (rc) {
++            break;
+         }
+ 
+-        vlen = bvp->bv_len;
+-        len = plen + vlen;
+-
+-        if (len < tmpbuflen) {
+-            realbuf = tmpbuf;
+-        } else {
+-            tmpbuf = slapi_ch_realloc(tmpbuf, len + 1);
+-            tmpbuflen = len + 1;
+-            realbuf = tmpbuf;
+-        }
+-
+-        assert(realbuf); /* For coverity */
+-        memcpy(realbuf, prefix, plen);
+-        memcpy(realbuf + plen, bvp->bv_val, vlen);
+-        realbuf[len] = '\0';
+-        /* Free the encrypted berval if necessary */
+-        if (hashed_bvp) {
+-            ber_bvfree(hashed_bvp);
+-            hashed_bvp = NULL;
+-        }
+-        if (encrypted_bvp) {
+-            ber_bvfree(encrypted_bvp);
+-            encrypted_bvp = NULL;
+-        }
+-        /* should be okay to use USERMEM here because we know what
+-         * the key is and it should never return a different value
+-         * than the one we pass in.
+-         */
+-        dblayer_value_set_buffer(be, &key, realbuf, plen + vlen + 1);
+-        key.ulen = tmpbuflen;
+-
+         if (slapi_is_loglevel_set(LDAP_DEBUG_TRACE)) {
+             char encbuf[BUFSIZ];
+ 
+@@ -1981,10 +1956,6 @@ addordel_values_sv(
+             ldbm_nasty(NASTY_MSG("addordel_values_sv"), index_id, 1130, rc);
+             break;
+         }
+-        if (NULL != key.dptr && realbuf != key.dptr) { /* realloc'ed */
+-            tmpbuf = key.dptr;
+-            tmpbuflen = key.size;
+-        }
+     }
+     index_free_prefix(prefix);
+     if (tmpbuf != NULL) {
+diff --git a/ldap/servers/slapd/back-ldbm/ldbm_attrcrypt.c b/ldap/servers/slapd/back-ldbm/ldbm_attrcrypt.c
+index 7bb57ca66..7cf30053c 100644
+--- a/ldap/servers/slapd/back-ldbm/ldbm_attrcrypt.c
++++ b/ldap/servers/slapd/back-ldbm/ldbm_attrcrypt.c
+@@ -1069,15 +1069,15 @@ attrcrypt_decrypt_index_key(backend *be,
+  *                  :     NULL - no hash or failure
+  */
+ int
+-attrcrypt_hash_large_index_key(backend *be, char **prefix, struct attrinfo *ai, const struct berval *in, struct berval **out)
++attrcrypt_hash_large_index_key(backend *be, const char *prefix, struct attrinfo *ai, const struct berval *in, struct berval **out)
+ {
+     int ret = 0;
+     struct berval *out_berval = NULL;
+     struct ldbminfo *li = (struct ldbminfo *)be->be_database->plg_private;
+-    char *new_prefix;
++    size_t final_key_len = INDEX_KEY_LENGTH(in->bv_len, strlen(prefix));
+ 
+     /* If the index key is too long (i.e mdb case) we must hash it */
+-    if (in->bv_len >=  li->li_max_key_len) {
++    if (final_key_len >=  li->li_max_key_len) {
+         PK11Context *c = PK11_CreateDigestContext(SEC_OID_MD5);
+         if (c != NULL) {
+             unsigned char hash[32];
+@@ -1091,16 +1091,13 @@ attrcrypt_hash_large_index_key(backend *be, char **prefix, struct attrinfo *ai,
+                 return ENOMEM;
+             }
+             slapi_log_err(SLAPI_LOG_TRACE, "attrcrypt_hash_large_index_key",
+-                          "Key lenght (%lu) >= max key lenght (%lu) so key must be hashed\n", in->bv_len, li->li_max_key_len);
++                          "Key lenght (%lu) >= max key lenght (%lu) so key must be hashed\n", final_key_len, li->li_max_key_len);
+             slapi_be_set_flag(be, SLAPI_BE_FLAG_DONT_BYPASS_FILTERTEST);
+             PK11_DigestBegin(c);
+             /* Compute hash for the key without the prefix */
+             PK11_DigestOp(c, (unsigned char *)in->bv_val, in->bv_len);
+             PK11_DigestFinal(c, hash, &hashLen, sizeof hash);
+-            /* Add HASH_PREFIX before the prefix */
+-            new_prefix = slapi_ch_smprintf("%c%s", HASH_PREFIX, *prefix);
+-            index_free_prefix(*prefix);
+-            *prefix = new_prefix;
++
+             /* Build the key: hash value in hexa */
+             hkey = slapi_ch_malloc(1+2*sizeof hash);
+             out_berval->bv_val = hkey;
+diff --git a/ldap/servers/slapd/back-ldbm/proto-back-ldbm.h b/ldap/servers/slapd/back-ldbm/proto-back-ldbm.h
+index 30a7aa11f..c882dac7b 100644
+--- a/ldap/servers/slapd/back-ldbm/proto-back-ldbm.h
++++ b/ldap/servers/slapd/back-ldbm/proto-back-ldbm.h
+@@ -622,7 +622,7 @@ int attrcrypt_encrypt_entry_inplace(backend *be, const struct backentry *inout);
+ int attrcrypt_encrypt_entry(backend *be, const struct backentry *in, struct backentry **out);
+ int attrcrypt_encrypt_index_key(backend *be, struct attrinfo *ai, const struct berval *in, struct berval **out);
+ int attrcrypt_decrypt_index_key(backend *be, struct attrinfo *ai, const struct berval *in, struct berval **out);
+-int attrcrypt_hash_large_index_key(backend *be, char **prefix, struct attrinfo *ai, const struct berval *in, struct berval **out);
++int attrcrypt_hash_large_index_key(backend *be, const char *prefix, struct attrinfo *ai, const struct berval *in, struct berval **out);
+ int attrcrypt_init(ldbm_instance *li);
+ int attrcrypt_cleanup_private(ldbm_instance *li);
+ 
+diff --git a/ldap/servers/slapd/log.c b/ldap/servers/slapd/log.c
+index 80c07382a..93101494b 100644
+--- a/ldap/servers/slapd/log.c
++++ b/ldap/servers/slapd/log.c
+@@ -93,6 +93,10 @@ static int slapi_log_map[] = {
+ #define FLUSH PR_TRUE
+ #define NO_FLUSH PR_FALSE
+ 
++#define  HEXADUMP_TAB 4
++/* 4 characters per bytes:  2 hexa digits, 1 space and the ascii  */
++#define  HEXADUMP_BUF_SIZE (4*16+HEXADUMP_TAB)
++
+ /**************************************************************************
+  * PROTOTYPES
+  *************************************************************************/
+@@ -3133,6 +3137,45 @@ slapi_log_backtrace(int loglevel)
+     }
+ }
+ 
++/*
++ * Dump a memory buffer in hexa and ascii in error log
++ *
++ * addr - The memory buffer address.
++ * len - The memory buffer lenght.
++ */
++void
++slapi_log_hexadump(int loglevel, char *fname, const void *addr, size_t len)
++{
++    char hexdigit[] = "0123456789ABCDEF";
++    const unsigned char *pt = addr;
++    char buff[HEXADUMP_BUF_SIZE+1];
++    size_t offset = 0;
++
++    if (!slapi_is_loglevel_set(loglevel)) {
++        return;
++    }
++    memset (buff, ' ', HEXADUMP_BUF_SIZE);
++    buff[HEXADUMP_BUF_SIZE] = '\0';
++    while (len > 0) {
++        int dpl;
++        for (dpl = 0; dpl < 16 && len>0; dpl++, len--) {
++           buff[3*dpl] = hexdigit[((*pt) >> 4) & 0xf];
++           buff[3*dpl+1] = hexdigit[(*pt) & 0xf];
++           buff[3*16+HEXADUMP_TAB+dpl] = (*pt>=0x20 && *pt<0x7f) ? *pt : '.';
++           pt++;
++        }
++        for (;dpl < 16; dpl++) {
++           buff[3*dpl] = ' ';
++           buff[3*dpl+1] = ' ';
++           buff[3*16+HEXADUMP_TAB+dpl] = ' ';
++        }
++        slapi_log_err(loglevel, fname, "[0x%08lx]  %s\n", offset, buff);
++        offset += 16;
++    }
++}
++
++
++
+ /******************************************************************************
+ * write in the access log
+ ******************************************************************************/
+diff --git a/ldap/servers/slapd/slapi-private.h b/ldap/servers/slapd/slapi-private.h
+index 72f4cd6f0..2da37ff6e 100644
+--- a/ldap/servers/slapd/slapi-private.h
++++ b/ldap/servers/slapd/slapi-private.h
+@@ -1527,6 +1527,8 @@ void slapi_pblock_set_task_warning(Slapi_PBlock *pb, task_warning warning);
+ int slapi_exists_or_add_internal(Slapi_DN *dn, const char *filter, const char *entry, const char *modifier_name);
+ 
+ void slapi_log_backtrace(int loglevel);
++void slapi_log_hexadump(int loglevel, char *fname, const void *addr, size_t len);
++
+ 
+ /*
+  * accesslog.c
+-- 
+2.54.0
+

@@ -10,14 +10,11 @@
 # Please, preserve the changelog entries
 #
 
-%bcond_with          tests
+%bcond_without       tests
 
 # github
-%global gh_commit    42412224607bd3931241bbd17f38e0f972f5a916
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   type
-%global gh_date      2026-02-06
 # packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -28,14 +25,14 @@
 %global ns_project   Type
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        7.0.0
-Release: 4%{?dist}
+Version:        7.0.2
+Release:        1%{?dist}
 Summary:        Collection of value objects that represent the types of the PHP type system, v%{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -44,8 +41,8 @@ BuildRequires:  php(language) >= 8.4.1
 BuildRequires:  php-fedora-autoloader-devel >= 1.0.0
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^13.0"
-BuildRequires:  phpunit13
+#        "phpunit/phpunit": "^13.3.0"
+BuildRequires:  phpunit13 >=  13.3
 %endif
 
 # from composer.json, "require": {
@@ -67,7 +64,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -90,12 +87,13 @@ cat <<EOF | tee vendor/autoload.php
 <?php
 require_once 'tests/autoload.php';
 require_once 'tests/_fixture/callback_function.php';
+require_once 'tests/_fixture/class_alias.php';
 require_once 'tests/_fixture/functions_that_declare_return_types.php';
 EOF
 
 : Run upstream test suite
 ret=0
-for cmd in php php84 php85; do
+for cmd in php php84 php85 php86; do
   if which $cmd; then
    $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
      %{_bindir}/phpunit13 --bootstrap vendor/autoload.php --no-coverage || ret=1
@@ -116,6 +114,15 @@ exit $ret
 
 
 %changelog
+* Tue Aug 11 2026 Remi Collet <remi@remirepo.net> - 7.0.2-1
+- update to 7.0.2
+
+* Wed May 20 2026 Remi Collet <remi@remirepo.net> - 7.0.1-1
+- update to 7.0.1
+
+* Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 7.0.0-2
+- enable test suite
+
 * Fri Feb  6 2026 Remi Collet <remi@remirepo.net> - 7.0.0-1
 - update to 7.0.0
 - raise dependency on PHP 8.4

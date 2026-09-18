@@ -1,0 +1,12 @@
+diff -up libmad/CMakeLists.txt.x86 libmad/CMakeLists.txt
+--- libmad/CMakeLists.txt.x86	2023-09-24 03:51:31.000000000 +0200
++++ libmad/CMakeLists.txt	2026-03-05 14:19:12.466050524 +0100
+@@ -61,7 +61,7 @@ option(ASO "Enable CPU Architecture Spec
+ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+   message(STATUS "Using 64 bit fixed point math")
+   option(FPM_64BIT "64 bit fixed point math" ON)
+-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86" OR "i386")
++elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "(x|i[3456])86")
+   message(STATUS "Using x86 fixed point math")
+   option (FPM_INTEL "x86 fixed point math" ON)
+   if(ASO)

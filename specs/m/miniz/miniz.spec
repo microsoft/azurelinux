@@ -3,7 +3,7 @@
 
 Name:       miniz
 Version:    3.1.0
-Release: 4%{?dist}
+Release:    1%{?dist}
 Summary:    Compression library implementing the zlib and Deflate
 # examples/example1.c:  Unlicense (refers to "unlicense" statement at the end
 #                       of tinfl.c from miniz-1.15)

@@ -3,7 +3,7 @@
 
 Name:           perl-Carp-Clan
 Version:        6.08
-Release: 24%{?dist}
+Release:        21%{?dist}
 Summary:        Perl module to print improved warning messages
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

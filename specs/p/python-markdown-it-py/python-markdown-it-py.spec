@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        3.0.0
-Release: 16%{?dist}
+Release:        13%{?dist}
 Summary:        Python port of markdown-it
 
 # SPDX

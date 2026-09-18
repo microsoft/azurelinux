@@ -33,12 +33,14 @@
 %endif
 
 Name:           perl-DBI
-Version:        1.647
-Release: 7%{?dist}
+Version:        1.652
+Release:        1%{?dist}
 Summary:        A database access API for perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://dbi.perl.org/
-Source0:        https://cpan.metacpan.org/modules/by-module/DBI/DBI-%{version}.tgz
+Source0:        https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-%{version}.tgz
+Patch0:         DBI-1.652-Fix-test-for-32bit-perl-report-in-PR-189.patch
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -75,7 +77,9 @@ BuildRequires:  perl(IO::Dir)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(IPC::Open3)
+BuildRequires:  perl(List::Util)
 BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Module::Load) >= 0.22
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Storable)
 BuildRequires:  perl(Symbol)
@@ -108,7 +112,7 @@ BuildRequires:  perl(File::Path)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(overload)
 BuildRequires:  perl(Test::More)
-BuildRequires:  perl(Test::Simple) >= 0.90
+BuildRequires:  perl(Test::Simple) >= 0.96
 %if %{with perl_DBI_enables_Clone}
 Suggests:       perl(Clone) >= 0.34
 %endif
@@ -243,7 +247,7 @@ make test
 
 %files
 # Changes already packaged as DBI::Changes
-%doc README.md ex/perl_dbi_nulls_test.pl ex/profile.pl
+%doc CONTRIBUTING.md README.md SECURITY.md ex/perl_dbi_nulls_test.pl ex/profile.pl
 %{_bindir}/dbipro*
 %{_bindir}/dbilogstrip
 %{perl_vendorarch}/*.p*
@@ -267,6 +271,21 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon Aug 17 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1.652-1
+- 1.652 bump (rhbz#2517102)
+- Fix CVE-2026-73194 and CVE-2026-73193
+
+* Mon Jul 20 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1.651-1
+- 1.651 bump (rhbz#2499925) - Fix CVE-2026-15043, CVE-2026-15392,
+  CVE-2026-60082 and CVE-2026-60081
+
+* Wed Jul 08 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1.650-1
+- 1.650 bump (rhbz#2497765) - Fix CVE-2026-14739, CVE-2026-14740 and CVE-2026-14380
+
+* Thu Jun 04 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1.648-1
+- 1.648 bump (rhbz#2484824)
+- Fix CVE-2026-9698 and CVE-2026-10879
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.647-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

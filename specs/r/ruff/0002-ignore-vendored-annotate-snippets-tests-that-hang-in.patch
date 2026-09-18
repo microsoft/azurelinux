@@ -1,0 +1,113 @@
+From 74842e17f726532e6faac923159c3a0b86ef577c Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 12 Mar 2025 19:34:50 +0100
+Subject: [PATCH 2/2] ignore vendored annotate-snippets tests that hang
+ indefinitely
+
+---
+ crates/ruff_annotate_snippets/tests/examples.rs | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/crates/ruff_annotate_snippets/tests/examples.rs b/crates/ruff_annotate_snippets/tests/examples.rs
+index d5e24f0b05..26a2371c29 100644
+--- a/crates/ruff_annotate_snippets/tests/examples.rs
++++ b/crates/ruff_annotate_snippets/tests/examples.rs
+@@ -1,6 +1,7 @@
+ use std::collections::BTreeSet;
+ 
+ #[test]
++#[ignore]
+ fn custom_error() {
+     let target = "custom_error";
+     let expected = snapbox::file!["../examples/custom_error.svg": TermSvg];
+@@ -8,6 +9,7 @@ fn custom_error() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn custom_level() {
+     let target = "custom_level";
+     let expected = snapbox::file!["../examples/custom_level.svg": TermSvg];
+@@ -15,6 +17,7 @@ fn custom_level() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn elide_header() {
+     let target = "elide_header";
+     let expected = snapbox::file!["../examples/elide_header.svg": TermSvg];
+@@ -22,6 +25,7 @@ fn elide_header() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn expected_type() {
+     let target = "expected_type";
+     let expected = snapbox::file!["../examples/expected_type.svg": TermSvg];
+@@ -29,6 +33,7 @@ fn expected_type() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn footer() {
+     let target = "footer";
+     let expected = snapbox::file!["../examples/footer.svg": TermSvg];
+@@ -36,6 +41,7 @@ fn footer() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn format() {
+     let target = "format";
+     let expected = snapbox::file!["../examples/format.svg": TermSvg];
+@@ -43,6 +49,7 @@ fn format() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn highlight_source() {
+     let target = "highlight_source";
+     let expected = snapbox::file!["../examples/highlight_source.svg": TermSvg];
+@@ -50,6 +57,7 @@ fn highlight_source() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn highlight_message() {
+     let target = "highlight_message";
+     let expected = snapbox::file!["../examples/highlight_message.svg": TermSvg];
+@@ -57,6 +65,7 @@ fn highlight_message() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn id_hyperlink() {
+     let target = "id_hyperlink";
+     let expected = snapbox::file!["../examples/id_hyperlink.svg": TermSvg];
+@@ -64,6 +73,7 @@ fn id_hyperlink() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn multislice() {
+     let target = "multislice";
+     let expected = snapbox::file!["../examples/multislice.svg": TermSvg];
+@@ -71,6 +81,7 @@ fn multislice() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn multi_suggestion() {
+     let target = "multi_suggestion";
+     let expected = snapbox::file!["../examples/multi_suggestion.svg": TermSvg];
+@@ -78,6 +89,7 @@ fn multi_suggestion() {
+ }
+ 
+ #[test]
++#[ignore]
+ fn struct_name_as_context() {
+     let target = "struct_name_as_context";
+     let expected = snapbox::file!["../examples/struct_name_as_context.svg": TermSvg];
+-- 
+2.55.0
+

@@ -8,7 +8,7 @@
 
 Name:               python-%{modname}
 Version:            7.0.0
-Release: 9%{?dist}
+Release:            6%{?dist}
 Summary:            Automatically mock your HTTP interactions to simplify and speed up testing
 
 License:            MIT

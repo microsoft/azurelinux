@@ -4,7 +4,7 @@
 Summary: A library for editing typed command lines
 Name: readline
 Version: 8.3
-Release: 5%{?dist}
+Release: 2%{?dist}
 
 # * Main sources are GPL-3.0-or-later
 # * examples/rlfe are GPL-2.0-or-later

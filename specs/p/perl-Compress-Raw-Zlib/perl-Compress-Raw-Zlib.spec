@@ -10,8 +10,8 @@
 
 
 Name:           perl-Compress-Raw-Zlib
-Version:        2.213
-Release: 524%{?dist}
+Version:        2.222
+Release:        1%{?dist}
 Summary:        Low-level interface to the zlib compression library
 # Zlib.xs:  (GPL-1.0-or-later OR Artistic-1.0-Perl) AND Zlib
 # Others:   GPL-1.0-or-later OR Artistic-1.0-Perl
@@ -19,7 +19,7 @@ Summary:        Low-level interface to the zlib compression library
 # zlib-src: Zlib
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND Zlib
 URL:            https://metacpan.org/release/Compress-Raw-Zlib
-Source0:        https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Zlib-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/P/PM/PMQS/Compress-Raw-Zlib-%{version}.tar.gz
 # Module Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -157,7 +157,7 @@ export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print
 make test COMPRESS_ZLIB_RUN_MOST=1
 
 %files
-%doc Changes README
+%doc Changes README SECURITY.md
 %{perl_vendorarch}/auto/Compress/
 %{perl_vendorarch}/Compress/
 %{_mandir}/man3/Compress::Raw::Zlib.3*
@@ -166,6 +166,9 @@ make test COMPRESS_ZLIB_RUN_MOST=1
 %{_libexecdir}/%{name}
 
 %changelog
+* Fri Mar 27 2026 Jitka Plesnikova <jplesnik@redhat.com> - 2.222-1
+- 2.222 bump (rhbz#2445592)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.213-521
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

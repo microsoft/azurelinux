@@ -1,0 +1,66 @@
+From 53b2e847e70dec8ba4ec1b0835928ad3ad0ff3b1 Mon Sep 17 00:00:00 2001
+From: digi-scrypt <digicrypt@gmail.com>
+Date: Fri, 5 Jun 2026 20:36:27 +0530
+Subject: [PATCH] confine tokenVocab lookup to the search directory
+
+---
+ .../org/antlr/v4/parse/TokenVocabParser.java  | 31 ++++++++++++++++---
+ 1 file changed, 27 insertions(+), 4 deletions(-)
+
+diff --git a/tool/src/org/antlr/v4/parse/TokenVocabParser.java b/tool/src/org/antlr/v4/parse/TokenVocabParser.java
+index cf84a923a5..cf7c180e20 100644
+--- a/tool/src/org/antlr/v4/parse/TokenVocabParser.java
++++ b/tool/src/org/antlr/v4/parse/TokenVocabParser.java
+@@ -137,7 +137,7 @@ public File getImportedVocabFile() {
+ 						  File.separator +
+ 						  vocabName +
+ 						  CodeGenerator.VOCAB_FILE_EXTENSION);
+-		if (f.exists()) {
++		if (isContainedIn(g.tool.libDirectory, f) && f.exists()) {
+ 			return f;
+ 		}
+ 
+@@ -146,10 +146,10 @@ public File getImportedVocabFile() {
+ 		// files are generated (in the base, not relative to the input
+ 		// location.)
+ 		f = new File(g.tool.outputDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
+-		if ( f.exists() ) {
++		if ( isContainedIn(g.tool.outputDirectory, f) && f.exists() ) {
+ 			return f;
+ 		}
+-		
++
+ 		// Still not found? Use the grammar's subfolder then.
+ 		String fileDirectory;
+ 
+@@ -162,6 +162,29 @@ public File getImportedVocabFile() {
+ 		else {
+ 			fileDirectory = g.fileName.substring(0, g.fileName.lastIndexOf(File.separatorChar));
+ 		}
+-		return new File(fileDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
++		f = new File(fileDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
++		if ( isContainedIn(fileDirectory, f) ) {
++			return f;
++		}
++		// tokenVocab is the value of a grammar option and can be any string,
++		// so a value like "../../foo" would resolve the .tokens file outside
++		// the search directory. Confine it to the directory's own file name
++		// so the load reports the vocab as missing rather than reading an
++		// arbitrary file.
++		return new File(fileDirectory, new File(vocabName).getName() + CodeGenerator.VOCAB_FILE_EXTENSION);
++	}
++
++	/** Is {@code f} the search {@code directory} itself or a descendant of it,
++	 *  after resolving any {@code ..} segments and symbolic links?
++	 */
++	private static boolean isContainedIn(String directory, File f) {
++		try {
++			String base = new File(directory).getCanonicalPath();
++			String target = new File(f.getCanonicalPath()).getCanonicalPath();
++			return target.equals(base) || target.startsWith(base + File.separator);
++		}
++		catch (IOException ioe) {
++			return false;
++		}
+ 	}
+ }

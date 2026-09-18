@@ -1,0 +1,19 @@
+--- uu_join-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_join-0.7.0/Cargo.toml	2026-03-16T15:19:31.980369+00:00
+@@ -70,16 +70,11 @@
+ features = ["i18n-collator"]
+ package = "uucore"
+ 
+-[dev-dependencies.divan]
+-version = "4.0.5"
+-package = "codspeed-divan-compat"
+-
+ [dev-dependencies.tempfile]
+ version = "3.15.0"
+ 
+ [dev-dependencies.uucore]
+ version = "0.7.0"
+-features = ["benchmark"]
+ package = "uucore"
+ 
+ [lints.clippy]

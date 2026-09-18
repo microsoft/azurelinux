@@ -12,7 +12,7 @@
 
 Name:           perl-DBD-MariaDB
 Version:        1.24
-Release: 6%{?dist}
+Release:        4%{?dist}
 Summary:        MariaDB and MySQL driver for the Perl5 Database Interface (DBI)
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/DBD-MariaDB/
@@ -89,8 +89,10 @@ Summary:        Tests for %{name}
 Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       perl-Test-Harness
 Requires:       hostname
-Requires:       mariadb
-Requires:       mariadb-server
+Requires:       mariadb-any
+Recommends:     mariadb
+Requires:       mariadb-server-any
+Recommends:     mariadb-server
 # Required to process t/testrules.yml
 Requires:       perl(CPAN::Meta::YAML)
 # Optional tests
@@ -164,8 +166,8 @@ cp -a %{_libexecdir}/%{name}/* ./
 # Load the variables
 . $DIR/$(basename %{SOURCE3})
 
-# Run tests
-prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+# Jobs can't be run in parallel
+prove -I .
 popd
 rm -rf "$DIR"
 EOF
@@ -189,6 +191,9 @@ make test %{?with_perl_DBD_MariaDB_enables_leak_test:EXTENDED_TESTING=1}
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jul 29 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1.24-4
+- Do not run tests in parallel
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.24-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

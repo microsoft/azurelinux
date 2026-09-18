@@ -3,7 +3,7 @@
 
 Name:           media-player-info
 Version:        23
-Release: 22%{?dist}
+Release:        19%{?dist}
 Summary:        Data files describing media player capabilities
 
 # Automatically converted from old format: BSD - review is highly recommended.

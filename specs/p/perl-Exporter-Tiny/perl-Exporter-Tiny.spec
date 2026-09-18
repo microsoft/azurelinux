@@ -3,7 +3,7 @@
 
 Name:		perl-Exporter-Tiny
 Version:	1.006002
-Release: 12%{?dist}
+Release:	9%{?dist}
 Summary:	An exporter with the features of Sub::Exporter but only core dependencies
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://exportertiny.github.io/

@@ -66,7 +66,7 @@
 Name:           ibus
 Version:        1.5.33
 # https://github.com/fedora-infra/rpmautospec/issues/101
-Release: 8%{?dist}
+Release:        6%{?dist}
 Summary:        Intelligent Input Bus for Linux OS
 License:        LGPL-2.1-or-later
 URL:            https://github.com/ibus/%name/wiki
@@ -648,9 +648,14 @@ dconf update || :
 %{_datadir}/installed-tests/ibus
 
 %changelog
+* Thu Jun 04 2026 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.33-6
+- Backport upstream patches
+- Make an IBusText own an updated IBusAttrList reference
+- Resolves: #2444787 SEGV with wrong anchor in surrounding-text in Wayland
+- Updates: #2480408 IBus callbacks in Wayland to clarify SEGVs
+
 * Fri Jan 09 2026 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.33-5
 - Resolves: #2419469 Fix SEGV with double bus_name_acquired_cb()
-- Resolves: #2424256 Delete Requires desktop-file-utils in spec
 - Resolves: #2425585 Separate lxqt-wayland-session and lxqt-x11-session in spec
 - Resolves: #2428238 Add awesome in spec
 - Rebase: #1797120 Fix assertion in panel_binding_construct()

@@ -8,17 +8,22 @@
 %endif
 
 Name:    bluez
-Version: 5.86
+Version: 5.87
 Release: 6%{?dist}
 Summary: Bluetooth utilities
 License: GPL-2.0-or-later
 URL:     http://www.bluez.org/
 
 Source0: https://www.kernel.org/pub/linux/bluetooth/%{name}-%{version}.tar.xz
-# https://patchwork.kernel.org/project/bluetooth/list/?series=1052631
-Patch1: big-endian-5.86.patch
-# https://patchwork.kernel.org/project/bluetooth/patch/0b3d55690ff2f0ed72271f2760ace8f76a81fb43.1771160059.git.pav@iki.fi/
-Patch2: 0001-a2dp-start-connecting-sink-profile-before-source.patch
+
+# git format-patch --stdout 5.87...30db66dc971bd1cd95d4a7b0eea296367ab65b3b
+Patch1: 5.87-bug-fixes-1.patch
+# CVE-2026-75032
+Patch2: avrcp-getfolderitems.patch
+# CVE-2026-80186
+Patch3: name2utf8-overflow.patch
+# CVE-2026-80185
+Patch4: sdp-xml-type-confusion.patch
 
 BuildRequires: dbus-devel >= 1.6
 BuildRequires: glib2-devel
@@ -80,7 +85,6 @@ be dropped by upstream. Utilities include:
 	- gatttool
 	- hciattach
 	- hciconfig
-	- hcidump
 	- hcitool
 	- meshctl
 	- rfcomm
@@ -172,6 +176,15 @@ install -m0755 attrib/gatttool $RPM_BUILD_ROOT%{_bindir}
 # Red Hat Bugzilla bug #1699680
 install -m0755 tools/avinfo $RPM_BUILD_ROOT%{_bindir}
 
+# "make install" fails to install avinfo
+install -m0755 tools/btsnoop $RPM_BUILD_ROOT%{_bindir}
+
+# btmgmt is not installed by "make install", but it is useful for debugging
+# some issues and to set the MAC address on HCIs which don't have their
+# MAC address configured 
+install -m0755 tools/btmgmt $RPM_BUILD_ROOT%{_bindir}
+install -m0644 doc/btmgmt.1 $RPM_BUILD_ROOT%{_mandir}/man1/
+
 # Remove libtool archive
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
@@ -240,11 +253,13 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %{_bindir}/bluemoon
 %{_bindir}/bluetoothctl
 %{_bindir}/btattach
+%{_bindir}/btmgmt
 %{_bindir}/btmon
 %{_bindir}/hex2hcd
 %{_bindir}/mpris-proxy
 %{_mandir}/man1/bluetoothctl.1.*
 %{_mandir}/man1/bluetoothctl-*.1.*
+%{_mandir}/man1/btmgmt.1.*
 %{_mandir}/man1/btattach.1.*
 %{_mandir}/man1/btmon.1.*
 %{_mandir}/man8/bluetoothd.8.*
@@ -266,7 +281,6 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %{_bindir}/gatttool
 %{_bindir}/hciattach
 %{_bindir}/hciconfig
-%{_bindir}/hcidump
 %{_bindir}/hcitool
 %{_bindir}/meshctl
 %{_bindir}/rfcomm
@@ -274,7 +288,6 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %{_mandir}/man1/ciptool.1.*
 %{_mandir}/man1/hciattach.1.*
 %{_mandir}/man1/hciconfig.1.*
-%{_mandir}/man1/hcidump.1.*
 %{_mandir}/man1/hcitool.1.*
 %{_mandir}/man1/rfcomm.1.*
 %{_mandir}/man1/sdptool.1.*
@@ -287,6 +300,7 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 
 %files libs-devel
 %doc doc/*txt
+%{_bindir}/btsnoop
 %{_bindir}/isotest
 %{_bindir}/l2test
 %{_bindir}/l2ping
@@ -295,6 +309,7 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %{_mandir}/man1/l2ping.1.*
 %{_mandir}/man1/rctest.1.*
 %{_mandir}/man5/org.bluez.*.5.*
+%{_mandir}/man7/btsnoop.7.*
 %{_mandir}/man7/hci.7.*
 %{_mandir}/man7/iso.7.*
 %{_mandir}/man7/l2cap.7.*
@@ -334,6 +349,34 @@ install emulator/btvirt ${RPM_BUILD_ROOT}/%{_libexecdir}/bluetooth/
 %{_userunitdir}/obex.service
 
 %changelog
+* Wed Aug 26 2026 Bastien Nocera <bnocera@redhat.com> - 5.87-6
+- Fix CVE-2026-80185 (Closes: #2524397)
+
+* Wed Aug 26 2026 Bastien Nocera <bnocera@redhat.com> - 5.87-5
+- Fix CVE-2026-80186 (Closes: #2524148)
+
+* Wed Aug 19 2026 Bastien Nocera <bnocera@redhat.com> - 5.87-4
+- Fix CVE-2026-75032 (Closes: #2517877)
+
+* Fri Jul 17 2026 Bastien Nocera <bnocera@redhat.com> - 5.87-3
+- Update to latest upstream HEAD to fix a number of possible crashes
+
+* Wed Jul 08 2026 Bastien Nocera <bnocera@redhat.com> - 5.87-2
+- Add post-release crash fix on disconnection
+
+* Sun Jul 05 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 5.87-1
+- Update to 5.87
+- Install new btsnoop tool
+
+* Mon Jun 22 2026 Bastien Nocera <bnocera@redhat.com> - 5.86-5
+- Fix BLE advertisments (Closes: #2489100)
+
+* Fri Feb 27 2026 Bastien Nocera <bnocera@redhat.com> - 5.86-4
+- Re-add btmgmt as it does not require bluetoothd to be running,
+  unlike bluetoothctl mgmt
+- Update audio output patch to be upstream version
+- Fix "bluetoothctl list" empty output (Closes: #2440346)
+
 * Mon Feb 16 2026 Bastien Nocera <bnocera@redhat.com> - 5.86-3
 - Fix audio output not working in some circumstances
 

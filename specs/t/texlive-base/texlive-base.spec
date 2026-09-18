@@ -28,7 +28,7 @@
 
 Name: %{shortname}-base
 Version: %{source_date}
-Release: 98%{?dist}
+Release: 95%{?dist}.1
 Epoch: 11
 Summary: TeX formatting system
 # The only files in the base package are directories, cache, and license texts
@@ -11127,6 +11127,9 @@ yes | %{_bindir}/updmap-sys --quiet --syncwithtrees >/dev/null 2>&1 || :
 %doc %{_texdir}/texmf-dist/doc/latex/yplan/
 
 %changelog
+* Wed Apr  1 2026 Tom Callaway <spot@fedoraproject.org> - 11:20230311-95.1
+- fix malformed patch to texdef breaking it (bz2453591)
+
 * Tue Feb 10 2026 Tom Callaway <spot@fedoraproject.org> - 11:20230311-95
 - update git-latexdiff to latest (bz2435847)
 

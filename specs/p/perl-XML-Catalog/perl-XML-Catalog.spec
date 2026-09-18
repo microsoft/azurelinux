@@ -6,11 +6,14 @@
 
 Name:           perl-XML-Catalog
 Version:        %(echo '%{cpan_version}' | tr -d 'v')
-Release: 36%{?dist}
+Release:        34%{?dist}
 Summary:        Resolve public identifiers and remap system identifiers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XML-Catalog
 Source0:        https://cpan.metacpan.org/authors/id/J/JF/JFEARN/XML-Catalog-%{cpan_version}.tar.gz
+# Adapt to changes in XML-Parser-2.48, bug #2457783, CPAN RT#176391,
+# proposed to upstream.
+Patch:          XML-Catalog-1.03-Adapt-to-changes-in-XML-Parser-2.48.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -47,7 +50,7 @@ Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
 
 %prep
-%setup -q -n XML-Catalog-%{cpan_version}
+%autosetup -p1 -n XML-Catalog-%{cpan_version}
 # Help generators to recognize Perl scripts
 for F in t/*.t; do
     perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
@@ -89,6 +92,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon Apr 20 2026 Petr Pisar <ppisar@redhat.com> - 1.03-34
+- Adapt to changes in XML-Parser-2.48 (bug #2457783)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.03-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

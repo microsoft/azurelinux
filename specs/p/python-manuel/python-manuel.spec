@@ -3,7 +3,7 @@
 
 Name:           python-manuel
 Version:        1.12.4
-Release: 17%{?dist}
+Release:        14%{?dist}
 Summary:        Build tested documentation
 
 # The content is Apache-2.0.  Other licenses are due to files copied in by

@@ -1,9 +1,9 @@
-diff -up mutt-1.9.1/doc/Makefile.am.lynx_no_backscapes mutt-1.9.1/doc/Makefile.am
---- mutt-1.9.1/doc/Makefile.am.lynx_no_backscapes	2018-04-12 15:30:14.881812698 +0200
-+++ mutt-1.9.1/doc/Makefile.am	2018-04-12 15:30:25.632968018 +0200
-@@ -109,7 +109,7 @@ uninstall-local:
+diff -up mutt-2.4.0/doc/Makefile.am.lynx_no_backscapes mutt-2.4.0/doc/Makefile.am
+--- mutt-2.4.0/doc/Makefile.am.lynx_no_backscapes	2026-06-12 07:03:22.000000000 +0200
++++ mutt-2.4.0/doc/Makefile.am	2026-06-28 22:59:45.674628590 +0200
+@@ -150,7 +150,7 @@ uninstall-local:
+ 	fi
  
- check:
  manual.txt: manual.html
 -	-LC_ALL=C lynx -localhost -dump -nolist -nonumbers -with_backspaces -display_charset=us-ascii manual.html > $@ || \
 +	-LC_ALL=C lynx -localhost -dump -nolist -display_charset=us-ascii manual.html > $@ || \

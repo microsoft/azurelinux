@@ -3,7 +3,7 @@
 
 # remirepo/fedora spec file for php-sebastian-cli-parser4
 #
-# SPDX-FileCopyrightText:  Copyright 2020-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2020-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
@@ -13,11 +13,8 @@
 %bcond_without       tests
 
 # github
-%global gh_commit    90f41072d220e5c40df6e8635f5dafba2d9d4d04
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   cli-parser
-%global gh_date      2025-09-14
 # packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -28,14 +25,14 @@
 %global ns_project   CliParser
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        4.2.0
-Release: 4%{?dist}
+Version:        4.2.1
+Release:        1%{?dist}
 Summary:        Library for parsing CLI options, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -44,8 +41,8 @@ BuildRequires:  php(language) >= 8.3
 BuildRequires:  php-fedora-autoloader-devel >= 1.0.0
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^12.0"
-BuildRequires:  phpunit12
+#        "phpunit/phpunit": "^12.5.25"
+BuildRequires:  phpunit12 >= 12.5.25
 %endif
 
 # from composer.json, "require": {
@@ -67,7 +64,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -108,6 +105,9 @@ exit $ret
 
 
 %changelog
+* Mon May 18 2026 Remi Collet <remi@remirepo.net> - 4.2.1-1
+- update to 4.2.1
+
 * Mon Sep 15 2025 Remi Collet <remi@remirepo.net> - 4.2.0-1
 - update to 4.2.0
 

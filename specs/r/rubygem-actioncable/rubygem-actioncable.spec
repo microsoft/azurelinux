@@ -11,7 +11,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 5%{?dist}
+Release: 2%{?dist}
 Summary: WebSocket framework for Rails
 License: MIT
 URL: https://rubyonrails.org

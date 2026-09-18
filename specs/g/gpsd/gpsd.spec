@@ -18,7 +18,7 @@ Name:           gpsd-epel
 Name:           gpsd
 %endif
 Version:        3.26.1
-Release: 9%{?dist}
+Release:        7%{?dist}
 Epoch:          1
 Summary:        Service daemon for mediating access to a GPS
 
@@ -41,6 +41,8 @@ Patch1:         gpsd-apistatus.patch
 Patch2:         gpsd-cve-2025-67268.patch
 # Fix integer underflow in handling of Navcom packets
 Patch3:         gpsd-cve-2025-67269.patch
+# Fix command injection in gpsprof
+Patch4:         gpsd-cve-2026-58459.patch
 
 BuildRequires:  gcc
 BuildRequires:  dbus-devel
@@ -401,6 +403,9 @@ rm -rf %{buildroot}%{_docdir}/gpsd
 %endif
 
 %changelog
+* Mon Jul 13 2026 Miroslav Lichvar <mlichvar@redhat.com> - 1:3.26.1-7
+- fix command injection in gpsprof (CVE-2026-58459)
+
 * Mon Jan 12 2026 Miroslav Lichvar <mlichvar@redhat.com> - 1:3.26.1-6
 - fix buffer overflow in NMEA2000 driver (CVE-2025-67268)
 - fix integer underflow in handling of Navcom packets (CVE-2025-67269)

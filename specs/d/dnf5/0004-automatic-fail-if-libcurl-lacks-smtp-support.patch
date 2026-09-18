@@ -1,0 +1,146 @@
+From ebd2dbc815eea311edce0fda7385d74b40b48352 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Wed, 25 Feb 2026 14:26:06 +0100
+Subject: [PATCH 4/4] automatic: fail if libcurl lacks smtp support
+
+Check SMTP protocol availability in configure(), before the upgrade
+cycle starts. If the "email" emitter is configured but the installed
+libcurl does not support the required protocol (smtp or smtps),
+exit with an error.
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ dnf5-plugins/automatic_plugin/automatic.cpp | 27 +++++++++
+ dnf5-plugins/automatic_plugin/emitters.cpp  | 63 +++++++--------------
+ 2 files changed, 49 insertions(+), 41 deletions(-)
+
+diff --git a/dnf5-plugins/automatic_plugin/automatic.cpp b/dnf5-plugins/automatic_plugin/automatic.cpp
+index 9a4350a2..29513a94 100644
+--- a/dnf5-plugins/automatic_plugin/automatic.cpp
++++ b/dnf5-plugins/automatic_plugin/automatic.cpp
+@@ -95,6 +95,17 @@ static bool server_available(std::string_view host, std::string_view service) {
+     return retval;
+ }
+ 
++/// Check whether the installed libcurl supports the given protocol (e.g. "smtp", "smtps").
++static bool curl_protocol_supported(std::string_view protocol) {
++    auto * ver = curl_version_info(CURLVERSION_NOW);
++    for (auto ptr = ver->protocols; ptr && *ptr; ++ptr) {
++        if (*ptr == protocol) {
++            return true;
++        }
++    }
++    return false;
++}
++
+ }  // namespace
+ 
+ 
+@@ -322,6 +333,22 @@ void AutomaticCommand::pre_configure() {
+ 
+ void AutomaticCommand::configure() {
+     auto & context = get_context();
++
++    // check whether email emitter can work with the installed libcurl
++    for (const auto & emitter_name : config_automatic.config_emitters.emit_via.get_value()) {
++        if (emitter_name == "email") {
++            std::string protocol = config_automatic.config_email.email_tls.get_value() == "yes" ? "smtps" : "smtp";
++            if (!curl_protocol_supported(protocol)) {
++                throw libdnf5::cli::CommandExitError(
++                    1,
++                    M_("The \"email\" emitter is configured but the installed libcurl does not support "
++                       "the {} protocol."),
++                    protocol);
++            }
++            break;
++        }
++    }
++
+     context.set_load_system_repo(true);
+     context.update_repo_metadata_from_advisory_options(
+         {}, config_automatic.config_commands.upgrade_type.get_value() == "security", false, false, false, {}, {}, {});
+diff --git a/dnf5-plugins/automatic_plugin/emitters.cpp b/dnf5-plugins/automatic_plugin/emitters.cpp
+index 037a8fc6..3e6a23af 100644
+--- a/dnf5-plugins/automatic_plugin/emitters.cpp
++++ b/dnf5-plugins/automatic_plugin/emitters.cpp
+@@ -25,8 +25,6 @@
+ #include <libdnf5/base/transaction_package.hpp>
+ #include <libdnf5/utils/bgettext/bgettext-lib.h>
+ #include <libdnf5/utils/format.hpp>
+-#include <stdio.h>
+-#include <string.h>
+ 
+ #include <cstdio>
+ #include <fstream>
+@@ -192,46 +190,29 @@ void EmitterEmail::notify() {
+                 protocol = "smtps";
+             }
+ 
+-            // TODO(mblaha): check smtp protocol availability?
+-            curl_version_info_data * ver;
+-            ver = curl_version_info(CURLVERSION_NOW);
+-            bool protocol_supported = false;
+-            for (auto ptr = ver->protocols; *ptr; ++ptr) {
+-                if (strcmp(*ptr, protocol) == 0) {
+-                    protocol_supported = true;
+-                    break;
+-                }
++            std::string email_host = libdnf5::utils::sformat(
++                "{}://{}:{}/",
++                protocol,
++                config_automatic.config_email.email_host.get_value(),
++                config_automatic.config_email.email_port.get_value());
++            curl_easy_setopt(curl, CURLOPT_URL, email_host.c_str());
++
++            curl_easy_setopt(curl, CURLOPT_MAIL_FROM, from.c_str());
++
++            for (const auto & eml : to) {
++                recipients = curl_slist_append(recipients, eml.c_str());
+             }
+-            if (protocol_supported) {
+-                std::string email_host = libdnf5::utils::sformat(
+-                    "{}://{}:{}/",
+-                    protocol,
+-                    config_automatic.config_email.email_host.get_value(),
+-                    config_automatic.config_email.email_port.get_value());
+-                curl_easy_setopt(curl, CURLOPT_URL, email_host.c_str());
+-
+-                curl_easy_setopt(curl, CURLOPT_MAIL_FROM, from.c_str());
+-
+-                for (const auto & eml : to) {
+-                    recipients = curl_slist_append(recipients, eml.c_str());
+-                }
+-                curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
+-
+-                FILE * payload_file = fmemopen(payload.data(), payload.size(), "r");
+-                curl_easy_setopt(curl, CURLOPT_READDATA, payload_file);
+-
+-                curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+-
+-                res = curl_easy_perform(curl);
+-                fclose(payload_file);
+-                if (res != CURLE_OK) {
+-                    std::cerr << "libcurl error while sending e-mail: " << curl_easy_strerror(res) << std::endl;
+-                }
+-            } else {
+-                std::cerr << "Error: installed version of libcurl does not support " << protocol
+-                          << " protocol. Cannot use \"email\" emitter to send the results. On Fedora please check that "
+-                             "libcurl package is installed."
+-                          << std::endl;
++            curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
++
++            FILE * payload_file = fmemopen(payload.data(), payload.size(), "r");
++            curl_easy_setopt(curl, CURLOPT_READDATA, payload_file);
++
++            curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
++
++            res = curl_easy_perform(curl);
++            fclose(payload_file);
++            if (res != CURLE_OK) {
++                std::cerr << "libcurl error while sending e-mail: " << curl_easy_strerror(res) << std::endl;
+             }
+ 
+             curl_slist_free_all(recipients);
+-- 
+2.53.0
+

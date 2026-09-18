@@ -4,7 +4,7 @@
 Summary: GNU collection of diff utilities
 Name: diffutils
 Version: 3.12
-Release: 6%{?dist}
+Release: 3%{?dist}
 URL: https://www.gnu.org/software/diffutils/diffutils.html
 Source: https://ftp.gnu.org/gnu/diffutils/diffutils-%{version}.tar.xz
 # upstream fixes

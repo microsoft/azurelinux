@@ -3,7 +3,7 @@
 
 # SPDX-License-Identifier: MIT
 Version:    1.6.2
-Release: 7%{?dist}
+Release:    4%{?dist}
 URL:        https://gitlab.com/rit-fonts/%{fontsource}
 
 Patch1:     %{name}-add-monospace-fallback.patch

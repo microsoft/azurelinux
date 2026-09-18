@@ -9,8 +9,8 @@
 
 
 Name: rabbitmq-server
-Version: 4.0.7
-Release: 8%{?dist}
+Version: 4.0.9
+Release: 5%{?dist}
 License: MPL-2.0
 Source0: https://github.com/rabbitmq/rabbitmq-server/releases/download/v%{version}/%{name}_%{version}.orig.tar.xz
 Source1: https://github.com/rabbitmq/rabbitmq-server/releases/download/v%{version}/%{name}_%{version}.orig.tar.xz.asc
@@ -20,11 +20,19 @@ Source3: rabbitmq-server.logrotate
 # curl -O https://raw.githubusercontent.com/rabbitmq/rabbitmq-server-release/rabbitmq_v3_6_16/packaging/RPMS/Fedora/rabbitmq-server.tmpfiles
 Source5: rabbitmq-server.tmpfiles
 Source6: rabbitmq-server-cuttlefish
-Patch1: rabbitmq-elixir-119.patch
-Patch2: rabbitmq-server-0002-Use-default-EPMD-socket.patch
-Patch3: rabbitmq-server-0003-Use-proto_dist-from-command-line.patch
-Patch4: rabbitmq-server-0004-force-python3.patch
-Patch5: rabbitmq-server-0005-Partially-revert-Use-template-in-rabbitmq-script-wra.patch
+Patch1: rabbitmq-server-0001-Use-default-EPMD-socket.patch
+Patch2: rabbitmq-server-0002-Use-proto_dist-from-command-line.patch
+Patch3: rabbitmq-server-0003-force-python3.patch
+Patch4: rabbitmq-server-0004-Greatly-simplified-wrapper-script-which-works-proper.patch
+Patch5: rabbitmq-server-0005-Allow-Elixir-1.19.patch
+Patch6: rabbitmq-server-0006-management-Sanitize-vhost-names-in-restart-forms.patch
+Patch7: rabbitmq-server-0007-Federation-management-Use-fmt_string-1-in-one-more-p.patch
+Patch8: rabbitmq-server-0008-Reject-bindings-to-Direct-Reply-to-virtual-queues.patch
+Patch9: rabbitmq-server-0009-Fix-error-popup-text-display.patch
+Patch10: rabbitmq-server-0010-HTTP-API-refactor-read_complete_body-1.patch
+Patch11: rabbitmq-server-0011-Remove-deprecated-endpoint.patch
+Patch12: rabbitmq-server-0012-Remove-deprecated-endpoint.patch
+Patch13: rabbitmq-server-0013-AMQP-0-9-1-apply-configure-checks-to-passive-queue-e.patch
 
 URL: https://www.rabbitmq.com/
 BuildRequires: elixir
@@ -113,6 +121,8 @@ for app in $(basename -a %{buildroot}%{_rabbit_libdir}/lib/rabbitmq_server-%{ver
        ln -s ../lib/rabbitmq_server-%{version}/sbin/${app} %{buildroot}%{_rabbit_libdir}/bin/${app}
 done
 
+ln -s ./lib/rabbitmq_server-%{version}/plugins %{buildroot}%{_rabbit_libdir}/plugins
+
 install -p -D -m 0755 %{S:3} %{buildroot}%{_rabbit_libdir}/bin/cuttlefish
 
 install -p -D -m 0755 scripts/rabbitmq-server.ocf %{buildroot}%{_exec_prefix}/lib/ocf/resource.d/rabbitmq/rabbitmq-server
@@ -180,6 +190,25 @@ rm -f %{_rabbit_libdir}/lib/rabbitmq_server-%{version}/ebin/rabbit.{rel,script,b
 
 
 %changelog
+* Thu Jul 30 2026 Peter Lemenkov <lemenkov@gmail.com> - 4.0.9-5
+- Fixed CVE-2026-57212, CVE-2026-57213, CVE-2026-57215, CVE-2026-57217,
+  CVE-2026-57219, CVE-2026-57221
+
+* Thu Jul 23 2026 Peter Lemenkov <lemenkov@gmail.com> - 4.0.9-4
+- Fixed CVE-2026-44839
+
+* Mon Apr 27 2026 Tobias Urdin <tobias.urdin@gmail.com> - 4.0.9-3
+- Update logrotate config
+
+Thu Mar 26 2026 Peter Lemenkov <lemenkov@gmail.com> - 4.0.9-2
+- Improve shell wrapper
+
+* Tue Mar 17 2026 Peter Lemenkov <lemenkov@gmail.com> - 4.0.9-1
+- Ver. 4.0.9
+
+* Sun Mar  8 2026 Peter Lemenkov <lemenkov@gmail.com> - 4.0.7-6
+- Fix plugin installation
+
 * Tue Feb 10 2026 Stephen Gallagher <sgallagh@redhat.com> - 4.0.7-5
 - Use PROJECT_VERSION instead of VERSION to set the internal version
 

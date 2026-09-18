@@ -4,7 +4,7 @@
 Name:           perl-MooseX-Role-Parameterized
 Summary:        Make your roles flexible through parameterization
 Version:        1.11
-Release: 21%{?dist}
+Release:        18%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/MooseX-Role-Parameterized
 Source0:        https://cpan.metacpan.org/modules/by-module/MooseX/MooseX-Role-Parameterized-%{version}.tar.gz

@@ -3,14 +3,14 @@
 
 # remirepo/fedora spec file for php-sebastian-exporter3
 #
-# SPDX-FileCopyrightText:  Copyright 2013-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2013-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
 # Please, preserve the changelog entries
 #
 %global bootstrap    0
-%global gh_commit    64cfeaa341951ceb2019d7b98232399d57bb2296
+%global gh_commit    0cd58aaf479f1e18dfef818b8b8a4ccba188e545
 %global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   exporter
@@ -31,8 +31,8 @@
 # NOTICE: used by phpunit 6, 7 and 8
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        3.1.8
-Release: 4%{?dist}
+Version:        3.1.9
+Release:        1%{?dist}
 Summary:        Export PHP variables for visualization, version %{major}
 
 License:        BSD-3-Clause
@@ -100,7 +100,7 @@ touch vendor/autoload.php
 
 : Run upstream test suite
 ret=0
-for cmd in php php81 php82 php83 php84 php85; do
+for cmd in php php82 php83 php84 php85 php86; do
   if which $cmd; then
     %{_bindir}/php -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
     %{_bindir}/phpunit8	  --verbose || ret=1
@@ -118,6 +118,9 @@ exit $ret
 
 
 %changelog
+* Tue Aug 11 2026 Remi Collet <remi@remirepo.net> - 3.1.9-1
+- update to 3.1.9
+
 * Wed Sep 24 2025 Remi Collet <remi@remirepo.net> - 3.1.8-1
 - update to 3.1.8
 

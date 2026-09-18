@@ -1,0 +1,70 @@
+From 3f5f32ef36cf2c797c9379eba1ba2d8b2fd9841b Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Fri, 6 Mar 2026 17:19:58 +0100
+Subject: [PATCH] Issue 7302 - dblib bdb2mdb fails on F43 -> F43 upgrade
+ (#7303)
+
+Bug Description:
+`db->stat` is stubbed with `nothing()` which returns DB_SUCCESS without
+populating the stats output parameter. Both `bdb_get_page_count()` and
+`bdb_get_entries_count()` then dereference the NULL stats pointer,
+causing a segfault.
+
+Fix Descrption:
+Add NULL checks for the stats pointer after `db->stat()` calls in both
+`bdb_get_page_count()` and `bdb_get_entries_count()`.
+
+Fixes: https://github.com/389ds/389-ds-base/issues/7302
+
+Reviewed by: @tbordaz, @progier389 (Thanks!)
+---
+ .../slapd/back-ldbm/db-bdb/bdb_layer.c        | 20 +++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/ldap/servers/slapd/back-ldbm/db-bdb/bdb_layer.c b/ldap/servers/slapd/back-ldbm/db-bdb/bdb_layer.c
+index 5c61e30b2..4e5f9fd98 100644
+--- a/ldap/servers/slapd/back-ldbm/db-bdb/bdb_layer.c
++++ b/ldap/servers/slapd/back-ldbm/db-bdb/bdb_layer.c
+@@ -1788,11 +1788,17 @@ bdb_get_page_count(dbi_db_t *db, uint32_t *count)
+     rc = ((DB*)db)->stat(db, (DB_TXN*)txn, (void *)&stats, 0);
+     if (rc != 0) {
+         slapi_log_err(SLAPI_LOG_ERR, "bdb_get_page_count",
+-                      "Failed to get bd statistics: db error - %d %s\n",
++                      "Failed to get db statistics: db error - %d %s\n",
+                       rc, db_strerror(rc));
+         rc = DBI_RC_OTHER;
++        *count = 0;
++    } else if (stats == NULL) {
++        slapi_log_err(SLAPI_LOG_INFO, "bdb_get_page_count",
++                      "Failed to get db statistics: stats is NULL, defaulting page count to 0\n");
++        *count = 0;
++    } else {
++        *count = stats->bt_pagecnt;
+     }
+-    *count = rc ? 0 : stats->bt_pagecnt;
+     slapi_ch_free((void **)&stats);
+     return rc;
+ }
+@@ -7084,11 +7090,17 @@ bdb_get_entries_count(dbi_db_t *db, dbi_txn_t *txn, int *count)
+     rc = ((DB*)db)->stat(db, (DB_TXN*)txn, (void *)&stats, 0);
+     if (rc != 0) {
+         slapi_log_err(SLAPI_LOG_ERR, "bdb_get_entries_count",
+-                      "Failed to get bd statistics: db error - %d %s\n",
++                      "Failed to get db statistics: db error - %d %s\n",
+                       rc, db_strerror(rc));
+         rc = DBI_RC_OTHER;
++        *count = 0;
++    } else if (stats == NULL) {
++        slapi_log_err(SLAPI_LOG_INFO, "bdb_get_entries_count",
++                      "Failed to get db statistics: stats is NULL, defaulting entries count to 0\n");
++        *count = 0;
++    } else {
++        *count = stats->bt_ndata;
+     }
+-    *count = rc ? 0 : stats->bt_ndata;
+     slapi_ch_free((void **)&stats);
+     return rc;
+ }
+-- 
+2.53.0
+

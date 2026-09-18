@@ -12,7 +12,7 @@
 
 Name:           ghc-%{pkg_name}
 Version:        1.6.10
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        X.509 collection accessing and storing methods
 
 License:        BSD-3-Clause

@@ -3,6 +3,7 @@
 
 %bcond_with lint
 %bcond_without tests
+%bcond_with polkit
 
 # Modern distributions (using RPM v4.20+; for example, Fedora 42+) do not
 # require the %%pre scriptlet for creating users/groups because the sysusers
@@ -21,8 +22,8 @@
 
 Summary: Builds packages inside chroots
 Name: mock
-Version: 6.6
-Release: 5%{?dist}
+Version: 6.8
+Release: 1%{?dist}
 License: GPL-2.0-or-later
 # Source is created by
 # git clone https://github.com/rpm-software-management/mock.git
@@ -34,16 +35,22 @@ URL: https://github.com/rpm-software-management/mock/
 BuildArch: noarch
 Requires: tar
 Requires: pigz
+%if %{without polkit}
 %if 0%{?mageia}
 Requires: usermode-consoleonly
 %else
 Requires: usermode
 %endif
+%endif
 Requires: createrepo_c
+
+%if %{with polkit}
+Requires: polkit
+%endif
 
 # We know that the current version of mock isn't compatible with older variants,
 # and we want to enforce automatic upgrades.
-Conflicts: mock-core-configs < 33
+Conflicts: mock-core-configs < 45.1
 
 # Requires 'mock-core-configs', or replacement (GitHub PR#544).
 Requires: mock-configs
@@ -80,7 +87,7 @@ BuildRequires: python%{python3_pkgversion}-rpmautospec-core
 
 BuildRequires: argparse-manpage
 
-%if 0%{?fedora} >= 38
+%if 0%{?fedora} >= 38 || 0%{?rhel} >= 11 || 0%{?mageia} >= 10 || 0%{?suse_version} >= 1600
 # DNF5 stack
 Recommends: dnf5
 Recommends: dnf5-plugins
@@ -99,6 +106,7 @@ Suggests: qemu-user-static
 Suggests: procenv
 Recommends: buildah
 Recommends: podman
+Recommends: skopeo
 Recommends: fuse-overlayfs
 
 %if %{with tests}
@@ -187,6 +195,12 @@ for i in docs/mock.1 docs/mock-parse-buildlog.1; do
     perl -p -i -e 's|\@VERSION\@|%{version}"|' $i
 done
 
+%if 0%{?fedora} >= 44 || 0%{?rhel} >= 11
+for i in docs/site-defaults.cfg py/mockbuild/config.py; do
+    perl -p -i -e 's|config_opts\["shadow_utils_isolation_option"\] = .*|config_opts["shadow_utils_isolation_option"] = "--root"|' "$i"
+done
+%endif
+
 ./precompile-bash-completion "mock.complete"
 
 argparse-manpage --pyfile ./py/mock-hermetic-repo.py --function _argparser > mock-hermetic-repo.1
@@ -203,16 +217,29 @@ install mockchain %{buildroot}%{_bindir}/mockchain
 install py/mock-hermetic-repo.py %{buildroot}%{_bindir}/mock-hermetic-repo
 install py/mock-parse-buildlog.py %{buildroot}%{_bindir}/mock-parse-buildlog
 install py/mock.py %{buildroot}%{_libexecdir}/mock/mock
+%if %{with polkit}
+install etc/polkit/mock-pkexec.sh %{buildroot}%{_bindir}/mock
+%else
 ln -s consolehelper %{buildroot}%{_bindir}/mock
- 
+%endif
+
 install -d %{buildroot}%{_sysconfdir}/pam.d
 cp -a etc/pam/* %{buildroot}%{_sysconfdir}/pam.d/
 
 install -d %{buildroot}%{_sysconfdir}/mock
 cp -a etc/mock/* %{buildroot}%{_sysconfdir}/mock/
 
+%if %{without polkit}
 install -d %{buildroot}%{_sysconfdir}/security/console.apps/
 cp -a etc/consolehelper/mock %{buildroot}%{_sysconfdir}/security/console.apps/%{name}
+%endif
+
+%if %{with polkit}
+install -d %{buildroot}%{_datadir}/polkit-1/actions
+install -d %{buildroot}%{_datadir}/polkit-1/rules.d
+cp -a etc/polkit/org.rpm.mock.policy %{buildroot}%{_datadir}/polkit-1/actions/org.rpm.mock.policy
+cp -a etc/polkit/org.rpm.mock.rules %{buildroot}%{_datadir}/polkit-1/rules.d/org.rpm.mock.rules
+%endif
 
 install -d %{buildroot}%{_datadir}/bash-completion/completions/
 cp -a etc/bash_completion.d/* %{buildroot}%{_datadir}/bash-completion/completions/
@@ -271,6 +298,11 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %{_datadir}/bash-completion/completions/mock
 %{_datadir}/bash-completion/completions/mock-parse-buildlog
 
+%if %{with polkit}
+%attr(0644,root,root) %{_datadir}/polkit-1/actions/org.rpm.mock.policy
+%attr(0644,root,root) %{_datadir}/polkit-1/rules.d/org.rpm.mock.rules
+%endif
+
 # executables
 %{_bindir}/mock
 %{_bindir}/mockchain
@@ -291,7 +323,9 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %config(noreplace) %{_sysconfdir}/%{name}/*.ini
 %config(noreplace) %{_sysconfdir}/%{name}/hermetic-build.cfg
 %config(noreplace) %{_sysconfdir}/pam.d/%{name}
+%if %{without polkit}
 %config(noreplace) %{_sysconfdir}/security/console.apps/%{name}
+%endif
 
 # directory for personal gpg keys
 %dir %{_sysconfdir}/pki/mock
@@ -332,8 +366,58 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 
 
 %changelog
-* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.6-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+* Tue Aug 11 2026 Pavel Raiskup <pavel@raiskup.cz> 6.8-1
+- bump Conflicts to mock-core-configs < 45.1
+- Document oci_platform_map as a temporary workaround
+- Allow --disable-plugin buildroot_lock with --calculate-build-dependencies
+- buildroot_lock: don't inspect bootstrap image when not used
+- No --allowerasing for `dnf5 list`
+- Include support for polkit (rajibade@amazon.com)
+- Add support for isolated %%check phase
+- Add pivot_root_chroot option to enable user namespaces (tkopecek@redhat.com)
+- fix: add HTTP 503 to retry status_forcelist in mock-hermetic-repo (scoheb@gmail.com)
+- unbreq plugin: disable SRPM caching (marian.koncek@mailbox.org)
+- unbreq plugin: do not treat not installed packages as unused (marian.koncek@mailbox.org)
+- Add system monitor plugin  (#1748) (yaneti@declera.com)
+- fix: reload uidManager with chrootuid/chrootgid from config
+- Don't use --allowerasing with 'dnf download' (logans@cottsay.net)
+- fix: add newline at the end of each line of available_pkgs.log (msuchy@redhat.com)
+- feat: remove pkgid from package_state plugin output (msuchy@redhat.com)
+- add rpm as deps to tox tests (msuchy@redhat.com)
+- fix: preserve readable permissions when copying spec files into chroot (#1300) (msuchy@redhat.com)
+- fix: add timeout to podman pull to prevent indefinite hangs (#1680) (msuchy@redhat.com)
+- bash-completion: localrepo takes a directory arg (linux@cmadams.net)
+- bash-completion: chain doesn't take an config arg (linux@cmadams.net)
+- fix: --verbose no longer duplicates build log into root log (#1302) (msuchy@redhat.com)
+- shadow_utils: useradd --root for newer systems (praiskup@redhat.com)
+- generate available_pkgs.log for dnf5/dnf4 package managers (msuchy@redhat.com)
+- fix: preserve dnf.conf/yum.conf timestamps when content is unchanged (msuchy@redhat.com)
+- feat: add OCI platform support for x86_64 sub-architecture containers (andrew.lukoshko@gmail.com)
+- Decode file:// repo paths before bootstrap bind mount (lukas.lipinsky@oracle.com)
+- Fix the tool check (tkopecek@redhat.com)
+- Refactor NS resolver logic for clarity and consistency
+
+* Tue Mar 03 2026 Pavel Raiskup <pavel@raiskup.cz> 6.7-1
+- mock: Use umask 0022 instead of 0002 to avoid strange permissions (ngompa@velocitylimitless.com)
+- expand_spec plugin: generating expanded-spec.txt in postdeps hook (yzhu@redhat.com)
+- do not fail (not just) hermetic builds for missing resolv.conf
+- use skopeo for hermetic bootstrap images (tkopecek@redhat.com)
+- support yum for hermetic build (tkopecek@redhat.com)
+- allow access to the buildroot binary RPMs even in hermetic builds (tkopecek@redhat.com)
+- adapt mock to Changes/droppingOfCertPemFile
+- file_util: improve rmtree performance (#1672) (Gerasimov.N.V)
+- disable traceLog() wrapper (will be removed)
+- `mock --scrub=all` now correctly backs up successful builds from the buildroot (sergio@serjux.com)
+- update subscription-manager instructions (msuchy@redhat.com)
+- configs: Switch openSUSE Tumbleweed to DNF5 (ngompa@opensuse.org)
+- depend on DNF5 for EL11+ distributions (ngompa@centosproject.org)
+- depend on DNF5 for Mageia 10+ and Cauldron (ngompa@mageia.org)
+- select personality for RISC-V DNF transactions
+- document --scrub=bootstrap (negativo17@gmail.com)
+- unbreq supports `--isolation=simple` and `--no-bootstrap-chroot` (marian.koncek@mailbox.org)
+- unbreq plugin no longer crashes for `(foo if bar)` build deps (marian.koncek@mailbox.org)
+- unbreq performance has been significantly improved through caching (marian.koncek@mailbox.org)
+- unbreq logs standard outputs of failed commands (mkoncek@users.noreply.github.com)
 
 * Mon Dec 08 2025 Pavel Raiskup <praiskup@redhat.com> 6.6-1
 - Make sure to install BuildRequires defined by macros (frostyx@email.cz)
@@ -798,7 +882,7 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 - load secondary groups [RHBZ#1264005]
 - pass --allowerasing by default to DNF [GH#251]
 - make include() functional for --chain [GH#263]
-- Removing buildstderr from log - configurable via 
+- Removing buildstderr from log - configurable via
   _mock_stderr_line_prefix (sisi.chlupova@gmail.com)
 - Fixup: Use rpm -qa --root instead of running rpm -qa in chroot
   (miro@hroncok.cz)

@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           libglib-testing
-Version:        0.1.0
-Release: 18%{?dist}
+Version:        0.1.1
+Release:        1%{?dist}
 Summary:        GLib-based test library and harness
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
@@ -52,6 +52,9 @@ for %{name}.
 %{_libdir}/pkgconfig/glib-testing-0.pc
 
 %changelog
+* Thu May 21 2026 Luigi Pavan <lpavan@redhat.com> - 0.1.1-1
+- Update to 0.1.1
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.0-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

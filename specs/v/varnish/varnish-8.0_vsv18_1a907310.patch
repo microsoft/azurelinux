@@ -1,0 +1,60 @@
+Based on upstream commit 1a9073102fb737a44a9cd46588f3c0e23590f8eb
+
+
+commit 1a9073102fb737a44a9cd46588f3c0e23590f8eb
+Author: Nils Goroll <nils.goroll@uplex.de>
+Date:   Thu Mar 5 14:28:02 2026 +0100
+
+    Handle absolute form with empty path
+    
+    This patch now adds dissection of
+    
+            http://example.com?/foo
+    
+    into Host: example.com, url: /?/foo
+    
+    Conflicts
+            both modified:   bin/varnishd/http1/cache_http1_proto.c
+            both modified:   bin/varnishtest/tests/r01255.vtc
+
+diff -u a/bin/varnishd/http1/cache_http1_proto.c b/bin/varnishd/http1/cache_http1_proto.c
+--- a/bin/varnishd/http1/cache_http1_proto.c	2026-06-16 22:03:12.617853250 +0200
++++ b/bin/varnishd/http1/cache_http1_proto.c	2026-06-16 22:05:04.321967181 +0200
+@@ -355,6 +355,7 @@
+ 	uint16_t retval;
+ 	const char *p;
+ 	const char *b = NULL, *e;
++	char c = '\0';
+ 
+ 	CHECK_OBJ_NOTNULL(htc, HTTP_CONN_MAGIC);
+ 	CHECK_OBJ_NOTNULL(hp, HTTP_MAGIC);
+@@ -374,9 +375,11 @@
+ 	    http_scheme_at(hp->hd[HTTP_HDR_URL].b, https))
+ 		b = hp->hd[HTTP_HDR_URL].b + 8;
+ 	if (b) {
+-		e = strchr(b, '/');
++		e = strpbrk(b, "/?");
+ 		if (e == NULL)
+ 			e = hp->hd[HTTP_HDR_URL].e;
++		else
++			c = *e;
+ 		if (e == b) {
+ 			// rfc9110 4.2.1 4.2.2 reject empty host
+ 			return (400);
+@@ -385,10 +388,15 @@
+ 		http_PrintfHeader(hp, "Host: %.*s", (int)(e - b), b);
+ 		hp->hd[HTTP_HDR_URL].b = e;
+ 		if (Tlen(hp->hd[HTTP_HDR_URL]) == 0) {
++			// empty path
+ 			if (http_method_eq(http_GetMethod(hp), OPTIONS))
+ 				hp->hd[HTTP_HDR_URL] = Tstr("*");
+ 			else
+ 				hp->hd[HTTP_HDR_URL] = Tstr("/");
++		} else if (c == '?') {
++			hp->hd[HTTP_HDR_URL].b--;
++			char *t = TRUST_ME(hp->hd[HTTP_HDR_URL].b);
++			*t = '/';
+ 		}
+ 	}
+ 
+

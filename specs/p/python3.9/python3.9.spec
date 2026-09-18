@@ -5,6 +5,15 @@
 # Top-level metadata
 # ==================
 
+# Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
+# Uses upstream bundled prebuilt wheels otherwise.
+# pip 26.1 no longer supports Python 3.9, so rpmwheels are disabled on Fedora 45+.
+%if 0%{?fedora} >= 45
+%bcond_with rpmwheels
+%else
+%bcond_without rpmwheels
+%endif
+
 %global pybasever 3.9
 
 # pybasever without the dot:
@@ -20,9 +29,106 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 9%{?dist}
-License: Python
+Release: 13%{?dist}
+# Python is Python-2.0.1
+# pip is MIT and bundles:
+#   CacheControl: Apache-2.0
+#   certifi: MPL-2.0
+#   chardet: LGPL-2.1-or-later
+#   colorama: BSD-3-Clause
+#   distlib: PSF-2.0
+#   distro: Apache-2.0
+#   idna: BSD-3-Clause
+#   msgpack: Apache-2.0
+#   packaging: Apache-2.0 OR BSD-2-Clause
+#   platformdirs: MIT
+#   pygments: BSD-2-Clause
+#   pyparsing: MIT
+#   pyproject-hooks: MIT
+#   requests: Apache-2.0
+#   resolvelib: ISC
+#   rich: MIT
+#   setuptools (pkg_resources): MIT
+#   six: MIT
+#   tenacity: Apache-2.0
+#   tomli: MIT
+#   typing_extensions: PSF-2.0
+#   urllib3: MIT
+#   webencodings: BSD-3-Clause
+# setuptools is MIT and bundles:
+#   autocommand: LGPL-3.0-or-later
+#   backports.tarfile: MIT
+#   importlib-metadata: Apache-2.0
+#   inflect: MIT
+#   jaraco.collections: MIT
+#   jaraco.context: MIT
+#   jaraco.functools: MIT
+#   jaraco.text: MIT
+#   more-itertools: MIT
+#   packaging: Apache-2.0 OR BSD-2-Clause
+#   platformdirs: MIT
+#   tomli: MIT
+#   typeguard: MIT
+#   typing-extensions: PSF-2.0
+#   wheel: MIT
+#   zipp: MIT
+%if %{with rpmwheels}
+License: Python-2.0.1
+%else
+License: Python-2.0.1 AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND MIT AND MPL-2.0 AND PSF-2.0 AND (Apache-2.0 OR BSD-2-Clause)
+%endif
 
+# If the rpmwheels condition is disabled, we use the bundled wheel packages
+# from Python with the versions defined near patch 189.
+# All of those also include a list of indirect bundled libs:
+# pip
+#  $ %%{_rpmconfigdir}/pythonbundles.py <(unzip -p Lib/ensurepip/_bundled/pip-*.whl pip/_vendor/vendor.txt)
+%global pip_bundled_provides %{expand:
+Provides: bundled(python3dist(cachecontrol)) = 0.12.11
+Provides: bundled(python3dist(certifi)) = 2022.12.7
+Provides: bundled(python3dist(chardet)) = 5.1
+Provides: bundled(python3dist(colorama)) = 0.4.6
+Provides: bundled(python3dist(distlib)) = 0.3.6
+Provides: bundled(python3dist(distro)) = 1.8
+Provides: bundled(python3dist(idna)) = 3.4
+Provides: bundled(python3dist(msgpack)) = 1.0.4
+Provides: bundled(python3dist(packaging)) = 21.3
+Provides: bundled(python3dist(platformdirs)) = 2.6.2
+Provides: bundled(python3dist(pygments)) = 2.13
+Provides: bundled(python3dist(pyparsing)) = 3.0.9
+Provides: bundled(python3dist(pyproject-hooks)) = 1
+Provides: bundled(python3dist(requests)) = 2.28.2
+Provides: bundled(python3dist(resolvelib)) = 0.8.1
+Provides: bundled(python3dist(rich)) = 12.6
+Provides: bundled(python3dist(setuptools)) = 44
+Provides: bundled(python3dist(six)) = 1.16
+Provides: bundled(python3dist(tenacity)) = 8.1
+Provides: bundled(python3dist(tomli)) = 2.0.1
+Provides: bundled(python3dist(typing-extensions)) = 4.4
+Provides: bundled(python3dist(urllib3)) = 1.26.14
+Provides: bundled(python3dist(webencodings)) = 0.5.1
+}
+# setuptools
+# vendor.txt not in .whl
+# %%{_rpmconfigdir}/pythonbundles.py <(unzip -l Lib/ensurepip/_bundled/setuptools-*.whl | grep -E '_vendor/.+dist-info/RECORD' | sed -E 's@^.*/([^-]+)-([^-]+)\.dist-info/.*$@\1==\2@')
+%global setuptools_bundled_provides %{expand:
+Provides: bundled(python3dist(autocommand)) = 2.2.2
+Provides: bundled(python3dist(backports-tarfile)) = 1.2
+Provides: bundled(python3dist(importlib-metadata)) = 8
+Provides: bundled(python3dist(inflect)) = 7.3.1
+Provides: bundled(python3dist(jaraco-collections)) = 5.1
+Provides: bundled(python3dist(jaraco-context)) = 5.3
+Provides: bundled(python3dist(jaraco-functools)) = 4.0.1
+Provides: bundled(python3dist(jaraco-text)) = 3.12.1
+Provides: bundled(python3dist(more-itertools)) = 10.3
+Provides: bundled(python3dist(packaging)) = 24.2
+Provides: bundled(python3dist(platformdirs)) = 4.2.2
+Provides: bundled(python3dist(tomli)) = 2.0.1
+Provides: bundled(python3dist(typeguard)) = 4.3
+Provides: bundled(python3dist(typing-extensions)) = 4.12.2
+Provides: bundled(python3dist(wheel)) = 0.45.1
+Provides: bundled(python3dist(zipp)) = 3.19.2
+}
 
 # ==================================
 # Conditionals controlling the build
@@ -65,10 +171,6 @@ License: Python
 #   setuptools are not available. Turn off the rpmwheels bcond until
 #   the two packages are built with wheels to get around the issue.
 %bcond_with bootstrap
-
-# Whether to use RPM build wheels from the python-{pip,setuptools}-wheel package
-# Uses upstream bundled prebuilt wheels otherwise
-%bcond_without rpmwheels
 
 # Expensive optimizations (mainly, profile-guided optimizations)
 %bcond_without optimizations
@@ -222,8 +324,7 @@ BuildRequires: bluez-libs-devel
 BuildRequires: bzip2
 BuildRequires: bzip2-devel
 BuildRequires: desktop-file-utils
-# See the runtime requirement in the -libs subpackage
-BuildRequires: expat-devel >= 2.6
+BuildRequires: expat-devel
 
 BuildRequires: findutils
 BuildRequires: gcc-c++
@@ -246,7 +347,6 @@ BuildRequires: libX11-devel
 BuildRequires: make
 BuildRequires: ncurses-devel
 
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: readline-devel
 BuildRequires: redhat-rpm-config >= 127
@@ -258,6 +358,10 @@ BuildRequires: tcl-devel < 1:9
 BuildRequires: tix-devel
 BuildRequires: tk-devel < 1:9
 BuildRequires: tzdata
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 %if %{with valgrind}
 BuildRequires: valgrind-devel
@@ -444,6 +548,45 @@ Patch475: 00475-cve-2025-15367.patch
 # gh-144125: email: verify headers are sound in BytesGenerator
 Patch476: 00476-cve-2026-1299.patch
 
+# 00478 # 88bb1e37c971fd1d6bda82a68b5ad873ed099f08
+# CVE-2026-4519
+#
+# Reject leading dashes in webbrowser URLs (GH-143931) (GH-146359)
+#
+# Cherry-picked from Python 3.10: ad4d5ba32af4d80b0dfa2ba9d8203bfb219e60a5
+Patch478: 00478-cve-2026-4519.patch
+
+# 00480 # 9f4b1483ecfbc8c08117133c239fba544fcb42e7
+# CVE-2026-4786
+#
+# Fix webbrowser `%%action` substitution bypass of dash-prefix check
+Patch480: 00480-cve-2026-4786.patch
+
+# 00482 # 51e25e8a804257b707e2021655037d07dcfa9cd6
+# CVE-2026-6100
+#
+# Fix a possible UAF in {LZMA,BZ2,_Zlib}Decompressor
+Patch482: 00482-cve-2026-6100.patch
+
+# 00489 # 67185f85f0bd506e1814a2a2f5580bad5b95ce45
+# Use BIO_eof to detect EOF for SSL_FILETYPE_ASN1
+#
+# In PEM, we need to parse until error and then suppress `PEM_R_NO_START_LINE`, because PEM allows arbitrary leading and trailing data. DER, however, does not. Parsing until error and suppressing `ASN1_R_HEADER_TOO_LONG` doesn't quite work because that error also covers some cases that should be rejected.
+#
+# Instead, check `BIO_eof` early and stop the loop that way.
+#
+# This fixes https://github.com/python/cpython/issues/151504 and adds compatibility with OpenSSL 3.5.7+
+#
+# (cherry-picked from commit acfe02f3b05436658d92add6b168538b30f357f0)
+Patch489: 00489-openssl-3.5.7.patch
+
+# 00491 # ac14737379922303720216b61803474c84f291ef
+# gh-149776: Skip UDP Lite tests if it's not supported
+#
+# Fix test_socket on Linux kernel 7.1 and newer: skip UDP Lite tests if
+# it's not supported.
+Patch491: 00491-gh-149776-skip-udp-lite-tests-if-it-s-not-supported.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -598,7 +741,9 @@ Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
 Provides: bundled(python3dist(pip)) = %{pip_version}
+%pip_bundled_provides
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
+%setuptools_bundled_provides
 %endif
 
 # Provides for the bundled libmpdec
@@ -618,14 +763,6 @@ Recommends: (%{pkgname}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
 
 # The zoneinfo module needs tzdata
 Requires: tzdata
-
-# The requirement on libexpat is generated, but we need to version it.
-# When built with expat >= 2.6, but installed with older expat, we get:
-#   ImportError: /usr/lib64/python3.X/lib-dynload/pyexpat.cpython-....so:
-#   undefined symbol: XML_SetReparseDeferralEnabled
-# This breaks many things, including python -m venv.
-# Other subpackages (like -debug) also need this, but they all depend on -libs.
-Requires: expat >= 2.6
 
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # In Fedora 31, several "unversioned" files like /usr/bin/pydoc and all the
@@ -819,7 +956,9 @@ Requires: python-setuptools-wheel
 Requires: python-pip-wheel
 %else
 Provides: bundled(python3dist(pip)) = %{pip_version}
+%pip_bundled_provides
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
+%setuptools_bundled_provides
 %endif
 
 # Provides for the bundled libmpdec
@@ -828,14 +967,6 @@ Provides: bundled(libmpdec) = %{libmpdec_version}
 
 # The zoneinfo module needs tzdata
 Requires: tzdata
-
-# The requirement on libexpat is generated, but we need to version it.
-# When built with expat >= 2.6, but installed with older expat, we get:
-#   ImportError: /usr/lib64/python3.X/lib-dynload/pyexpat.cpython-....so:
-#   undefined symbol: XML_SetReparseDeferralEnabled
-# This breaks many things, including python -m venv.
-# Other subpackages (like -debug) also need this, but they all depend on -libs.
-Requires: expat >= 2.6
 
 # Provides of the subpackages contained in flatpackage
 Provides: %{pkgname}-libs = %{version}-%{release}
@@ -866,12 +997,21 @@ that support it, such as CentOS or RHEL or older Fedora releases.
 %gpgverify -k2 -s1 -d0
 %autosetup -S git_am -N -n Python-%{upstream_version}
 
+# Verify the second level of bundled provides is up to date
+# Arguably this should be done in %%check, but %%prep has a faster feedback loop
+# setuptools.whl does not contain the vendored.txt files
+if [ -f %{_rpmconfigdir}/pythonbundles.py ]; then
+  %{_rpmconfigdir}/pythonbundles.py <(unzip -p Lib/ensurepip/_bundled/pip-*.whl pip/_vendor/vendor.txt) --compare-with '%pip_bundled_provides'
+  %{_rpmconfigdir}/pythonbundles.py <(unzip -l Lib/ensurepip/_bundled/setuptools-*.whl | grep -E '_vendor/.+dist-info/RECORD' | sed -E 's@^.*/([^-]+)-([^-]+)\.dist-info/.*$@\1==\2@') --compare-with '%setuptools_bundled_provides'
+fi
+
 # Apply patches up to 188
 %autopatch -M 188
 
 %if %{with rpmwheels}
 %autopatch 189
-rm Lib/ensurepip/_bundled/*.whl
+rm Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
+rm Lib/ensurepip/_bundled/setuptools-%{setuptools_version}-py3-none-any.whl
 %endif
 
 # Apply the remaining patches
@@ -1483,7 +1623,8 @@ CheckPython optimized
 %exclude %{pylibdir}/ensurepip/_bundled
 %else
 %dir %{pylibdir}/ensurepip/_bundled
-%{pylibdir}/ensurepip/_bundled/*.whl
+%{pylibdir}/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
+%{pylibdir}/ensurepip/_bundled/setuptools-%{setuptools_version}-py3-none-any.whl
 %{pylibdir}/ensurepip/_bundled/__init__.py
 %{pylibdir}/ensurepip/_bundled/__pycache__/*%{bytecode_suffixes}
 %endif
@@ -1933,6 +2074,29 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Jul 30 2026 Miro Hrončok <mhroncok@redhat.com> - 3.9.25-13
+ - Skip UDP Lite tests if it's not supported
+ - Fixes FTBFS on Linux kernel 7.1 and newer
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.25-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jul 02 2026 Miro Hrončok <mhroncok@redhat.com> - 3.9.25-11
+- Fix ssl.SSLError: [ASN1: NOT_ENOUGH_DATA] not enough data with OpenSSL 3.5.7+
+
+* Wed Apr 29 2026 Lumír Balhar <lbalhar@redhat.com> - 3.9.25-10
+- Switch to bundled wheels
+
+* Fri Apr 17 2026 Charalampos Stratakis <cstratak@redhat.com> - 3.9.25-9
+- Security fixes for CVE-2026-4786 and CVE-2026-6100
+Resolves: rhbz#2458019, rhbz#2458227
+
+* Sat Apr 11 2026 Miro Hrončok <mhroncok@redhat.com> - 3.9.25-8
+- Explicitly build with OpenSSL 3
+
+* Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.9.25-7
+- Security fix for CVE-2026-4519 (rhbz#2449735)
+
 * Tue Feb 10 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.9.25-6
 - Security fix for CVE-2026-1299
 

@@ -1,0 +1,128 @@
+From 78dfb8f76293ea6c6774b306afda3f878db0e827 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sat, 11 Jul 2026 08:09:28 +0100
+Subject: [PATCH] =?UTF-8?q?Don=E2=80=99t=20specify=20generate-import-lib?=
+ =?UTF-8?q?=20for=20PyO3=200.29?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Since the `generate-import-lib` feature is deprecated in PyO3 0.29 and
+no longer has any effect, https://github.com/PyO3/pyo3/pull/5866, this
+commit stops asking for it in test crates.
+---
+ test-crates/pyo3-abi3-and-abi3t/Cargo.toml                      | 2 --
+ test-crates/pyo3-abi3t/Cargo.toml                               | 1 -
+ test-crates/pyo3-mixed-include-exclude/Cargo.toml               | 2 +-
+ test-crates/pyo3-mixed-src/rust/Cargo.toml                      | 2 +-
+ .../rust/python/pyo3-mixed-workspace-py/Cargo.toml              | 2 +-
+ test-crates/pyo3-mixed/Cargo.toml                               | 2 +-
+ test-crates/pyo3-pure/Cargo.toml                                | 1 -
+ tests/run/sdist.rs                                              | 1 -
+ 8 files changed, 4 insertions(+), 9 deletions(-)
+
+diff --git a/test-crates/pyo3-abi3-and-abi3t/Cargo.toml b/test-crates/pyo3-abi3-and-abi3t/Cargo.toml
+index 67850096d..4984e8aed 100644
+--- a/test-crates/pyo3-abi3-and-abi3t/Cargo.toml
++++ b/test-crates/pyo3-abi3-and-abi3t/Cargo.toml
+@@ -13,12 +13,10 @@ default = ["abi3-and-abi3t-py315"]
+ abi3-and-abi3t-py315 = [
+     "pyo3/abi3-py38",
+     "pyo3/abi3t-py315",
+-    "pyo3/generate-import-lib",
+ ]
+ abi3-and-current-abi3t = [
+     "pyo3/abi3-py38",
+     "pyo3/abi3t",
+-    "pyo3/generate-import-lib",
+ ]
+ 
+ [lib]
+diff --git a/test-crates/pyo3-abi3t/Cargo.toml b/test-crates/pyo3-abi3t/Cargo.toml
+index e0963f727..7bf679c6a 100644
+--- a/test-crates/pyo3-abi3t/Cargo.toml
++++ b/test-crates/pyo3-abi3t/Cargo.toml
+@@ -8,7 +8,6 @@ license = "MIT"
+ [dependencies]
+ pyo3 = { version = "0.29.0", features = [
+     "abi3t-py315",
+-    "generate-import-lib",
+ ] }
+ 
+ [lib]
+diff --git a/test-crates/pyo3-mixed-include-exclude/Cargo.toml b/test-crates/pyo3-mixed-include-exclude/Cargo.toml
+index 5379fc5a9..5027603e1 100644
+--- a/test-crates/pyo3-mixed-include-exclude/Cargo.toml
++++ b/test-crates/pyo3-mixed-include-exclude/Cargo.toml
+@@ -6,7 +6,7 @@ description = "Implements a dummy function combining rust and python"
+ edition = "2021"
+ 
+ [dependencies]
+-pyo3 = { version = "0.29.0", features = ["generate-import-lib"] }
++pyo3 = { version = "0.29.0" }
+ 
+ [lib]
+ name = "pyo3_mixed_include_exclude"
+diff --git a/test-crates/pyo3-mixed-src/rust/Cargo.toml b/test-crates/pyo3-mixed-src/rust/Cargo.toml
+index 3dd63e936..70ab4c502 100644
+--- a/test-crates/pyo3-mixed-src/rust/Cargo.toml
++++ b/test-crates/pyo3-mixed-src/rust/Cargo.toml
+@@ -6,7 +6,7 @@ description = "Implements a dummy function combining rust and python"
+ edition = "2021"
+ 
+ [dependencies]
+-pyo3 = { version = "0.29.0", features = ["generate-import-lib"] }
++pyo3 = { version = "0.29.0" }
+ 
+ [lib]
+ name = "pyo3_mixed_src"
+diff --git a/test-crates/pyo3-mixed-workspace/rust/python/pyo3-mixed-workspace-py/Cargo.toml b/test-crates/pyo3-mixed-workspace/rust/python/pyo3-mixed-workspace-py/Cargo.toml
+index cc6ecdae1..a19bd7e3a 100644
+--- a/test-crates/pyo3-mixed-workspace/rust/python/pyo3-mixed-workspace-py/Cargo.toml
++++ b/test-crates/pyo3-mixed-workspace/rust/python/pyo3-mixed-workspace-py/Cargo.toml
+@@ -7,7 +7,7 @@ edition = "2021"
+ 
+ [dependencies]
+ pyo3-mixed-workspace = { path = "../../pyo3-mixed-workspace" }
+-pyo3 = { version = "0.29.0", features = ["generate-import-lib", ] }
++pyo3 = { version = "0.29.0" }
+ 
+ [lib]
+ name = "pyo3_mixed_workspace_py"
+diff --git a/test-crates/pyo3-mixed/Cargo.toml b/test-crates/pyo3-mixed/Cargo.toml
+index 30146ed97..b83103943 100644
+--- a/test-crates/pyo3-mixed/Cargo.toml
++++ b/test-crates/pyo3-mixed/Cargo.toml
+@@ -6,7 +6,7 @@ description = "Implements a dummy function combining rust and python"
+ edition = "2021"
+ 
+ [dependencies]
+-pyo3 = { version = "0.29.0", features = ["generate-import-lib"] }
++pyo3 = { version = "0.29.0" }
+ 
+ [lib]
+ name = "pyo3_mixed"
+diff --git a/test-crates/pyo3-pure/Cargo.toml b/test-crates/pyo3-pure/Cargo.toml
+index b2240d582..77c49d381 100644
+--- a/test-crates/pyo3-pure/Cargo.toml
++++ b/test-crates/pyo3-pure/Cargo.toml
+@@ -9,7 +9,6 @@ license = "MIT"
+ [dependencies]
+ pyo3 = { version = "0.29.0", features = [
+     "abi3-py39",
+-    "generate-import-lib",
+ ] }
+ 
+ [lib]
+diff --git a/tests/run/sdist.rs b/tests/run/sdist.rs
+index 2bbd54934..e945440f4 100644
+--- a/tests/run/sdist.rs
++++ b/tests/run/sdist.rs
+@@ -488,7 +488,6 @@ fn workspace_members_non_local_dep_sdist() {
+         [dependencies]
+         pyo3 = { version = "0.29.0", features = [
+             "abi3-py39",
+-            "generate-import-lib",
+         ] }
+ 
+         [lib]

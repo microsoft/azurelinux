@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name: libopenmpt
-Version: 0.8.4
-Release: 5%{?dist}
+Version: 0.8.9
+Release: 1%{?dist}
 
 %global tar_root %{name}-%{version}+release.autotools
 
@@ -30,6 +30,11 @@ BuildRequires: pulseaudio-libs-devel
 #BuildRequires: portaudio-devel
 #BuildRequires: SDL-devel
 #BuildRequires: SDL2-devel
+
+# Force recent mpg123-libs package for RHEL users with selective updates
+%if 0%{?rhel} && 0%{?rhel} < 11
+Requires: libmpg123{?_isa} >= 1.32.0
+%endif
 
 %description
 libopenmpt is a cross-platform C++ and C library to decode tracked music
@@ -96,6 +101,24 @@ chrpath --delete ${RPM_BUILD_ROOT}%{_bindir}/openmpt123
 
 
 %changelog
+* Wed Aug 19 2026 Michael Schwendt <mschwendt@fedoraproject.org> - 0.8.9-1
+- update to 0.8.9
+
+* Sat Aug 15 2026 Michael Schwendt <mschwendt@fedoraproject.org> - 0.8.8-1
+- update to 0.8.8
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sun May 17 2026 Michael Schwendt <mschwendt@fedoraproject.org> - 0.8.7-1
+- update to 0.8.7
+
+* Tue Mar 24 2026 Michael Schwendt <mschwendt@fedoraproject.org> - 0.8.6-1
+- update to 0.8.6 which fixes regression in 0.8.5
+
+* Sun Mar 22 2026 Michael Schwendt <mschwendt@fedoraproject.org> - 0.8.5-1
+- update to 0.8.5
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

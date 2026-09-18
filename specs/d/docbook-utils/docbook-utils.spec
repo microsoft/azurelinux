@@ -3,7 +3,7 @@
 
 Name: docbook-utils
 Version: 0.6.15
-Release: 6%{?dist}
+Release: 3%{?dist}
 
 Summary: Shell scripts for managing DocBook documents
 URL: https://github.com/devexp-db/docbook-utils

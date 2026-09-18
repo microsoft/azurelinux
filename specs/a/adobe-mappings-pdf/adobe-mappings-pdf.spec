@@ -4,7 +4,7 @@
 Name:             adobe-mappings-pdf
 Summary:          PDF mapping resources from Adobe
 Version:          20190401
-Release: 13%{?dist}
+Release:          10%{?dist}
 License:          BSD-3-Clause
 
 URL:              https://www.adobe.com/

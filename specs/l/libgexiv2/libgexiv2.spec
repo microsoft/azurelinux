@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           libgexiv2
-Version:        0.14.6
-Release: 5%{?dist}
+Version:        0.14.7
+Release:        1%{?dist}
 Summary:        Gexiv2 is a GObject-based wrapper around the Exiv2 library
 
 License:        GPL-2.0-or-later
@@ -81,6 +81,9 @@ This package contains the python3 bindings for %{name}
 %pycached %{python3_sitelib}/gi/overrides/GExiv2.py
 
 %changelog
+* Tue Aug 04 2026 Packit <hello@packit.dev> - 0.14.7-1
+- Update to version 0.14.7
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.14.6-2
 - Rebuilt for Python 3.14.0rc3 bytecode
 

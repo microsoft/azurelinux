@@ -11,7 +11,7 @@
 
 Name:          clutter
 Version:       1.26.4
-Release: 20%{?dist}
+Release:       17%{?dist}
 Summary:       Open Source software library for creating rich graphical user interfaces
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

@@ -5,7 +5,7 @@
 
 Name:           rubygem-%{gem_name}
 Version:        1.0.5
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        Extracting `assigns` and `assert_template` from ActionDispatch
 
 License:        MIT

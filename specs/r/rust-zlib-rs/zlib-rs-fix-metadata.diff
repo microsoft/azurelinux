@@ -1,5 +1,5 @@
---- zlib-rs-0.6.2/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ zlib-rs-0.6.2/Cargo.toml	2026-02-19T09:17:30.468648+00:00
+--- zlib-rs-0.6.7/Cargo.toml	2006-07-24T01:21:28+00:00
++++ zlib-rs-0.6.7/Cargo.toml	2026-08-04T12:11:14.397968+00:00
 @@ -28,11 +28,7 @@
  repository = "https://github.com/trifectatechfoundation/zlib-rs"
  
@@ -12,7 +12,7 @@
  avx512 = ["vpclmulqdq"]
  c-allocator = []
  default = [
-@@ -47,17 +43,6 @@
+@@ -48,17 +44,6 @@
  name = "zlib_rs"
  path = "src/lib.rs"
  

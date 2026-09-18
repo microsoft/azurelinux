@@ -12,11 +12,8 @@
 
 %bcond_without       tests
 
-%global gh_commit    6a7de5df2e094f9a80b40a522391a7e6022df5f6
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   comparator
-%global gh_date      2026-01-24
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -27,14 +24,14 @@
 %global ns_project   Comparator
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        7.1.4
-Release: 4%{?dist}
+Version:        7.1.8
+Release:        1%{?dist}
 Summary:        Compare PHP values for equality, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -45,23 +42,23 @@ BuildRequires:  php-mbstring
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^12.2"
-BuildRequires:  phpunit12 >= 12.2
+#        "phpunit/phpunit": "^12.5.25"
+BuildRequires:  phpunit12 >= 12.5.25
 BuildRequires:  (php-composer(%{pk_vendor}/diff)     >= 7.0   with php-composer(%{pk_vendor}/diff)     < 8)
-BuildRequires:  (php-composer(%{pk_vendor}/exporter) >= 7.0   with php-composer(%{pk_vendor}/exporter) < 8)
+BuildRequires:  (php-composer(%{pk_vendor}/exporter) >= 7.0.3 with php-composer(%{pk_vendor}/exporter) < 8)
 %endif
 
 # from composer.json
 #        "php": ">=8.3",
 #        "sebastian/diff": "^7.0",
-#        "sebastian/exporter": "^7.0"
+#        "sebastian/exporter": "^7.0.3"
 #        "ext-dom": "*",
 #        "ext-mbstring": "*"
 Requires:       php(language) >= 8.3
 Requires:       php-dom
 Requires:       php-mbstring
 Requires:       (php-composer(%{pk_vendor}/diff)     >= 7.0   with php-composer(%{pk_vendor}/diff)     < 8)
-Requires:       (php-composer(%{pk_vendor}/exporter) >= 7.0   with php-composer(%{pk_vendor}/exporter) < 8)
+Requires:       (php-composer(%{pk_vendor}/exporter) >= 7.0.3 with php-composer(%{pk_vendor}/exporter) < 8)
 # from phpcompatinfo report for version 6.3.0
 #   Only core, date, spl (bcmath is optional)
 # Autoloader
@@ -79,7 +76,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -127,6 +124,19 @@ exit $ret
 
 
 %changelog
+* Thu May 21 2026 Remi Collet <remi@remirepo.net> - 7.1.8-1
+- update to 7.1.8
+
+* Wed May 20 2026 Remi Collet <remi@remirepo.net> - 7.1.7-1
+- update to 7.1.7
+- raise dependency on sebastian/exporter 7.0.3
+
+* Tue Apr 14 2026 Remi Collet <remi@remirepo.net> - 7.1.6-1
+- update to 7.1.6
+
+* Wed Apr  8 2026 Remi Collet <remi@remirepo.net> - 7.1.5-1
+- update to 7.1.5
+
 * Mon Jan 26 2026 Remi Collet <remi@remirepo.net> - 7.1.4-1
 - update to 7.1.4
 

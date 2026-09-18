@@ -10,7 +10,7 @@
 
 Name:      weldr-client
 Version:   36.1
-Release: 4%{?dist}
+Release:   1%{?dist}
 # Upstream license specification: Apache-2.0
 License:   Apache-2.0
 Summary:   Command line utility to control osbuild-composer

@@ -10,7 +10,7 @@ Name: binutils%{?_with_debug:-debug}
 # The variable %%{source} (see below) should be set to indicate which of these
 # origins is being used.
 Version: 2.45.1
-Release: 7%{?dist}
+Release: 5%{?dist}
 License: GPL-3.0-or-later AND (GPL-3.0-or-later WITH Bison-exception-2.2) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND BSD-3-Clause AND GFDL-1.3-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-2.0-or-later
 URL: https://sourceware.org/binutils
 
@@ -30,6 +30,7 @@ URL: https://sourceware.org/binutils
 # --without systemzlib   Use the binutils version of zlib.  Default is to use the system version.
 # --without testsuite    Do not run the testsuite.  Default is to run it.
 # --without xxhash       Do not link against the xxhash library.
+# --without zstd         Do not link against the zstd library.
 
 # Other configuration options can be set by modifying the following defines.
 
@@ -144,6 +145,8 @@ URL: https://sourceware.org/binutils
 %bcond_without testsuite
 # Default: Use the xxhash-devel library.
 %bcond_without xxhash
+# Default: Use the libztsd-devel library.
+%bcond_without zstd
 
 # Note - in the future the gold linker may become deprecated.
 %ifnarch riscv64
@@ -418,6 +421,10 @@ BuildRequires: elfutils-debuginfod-client-devel
 
 %if %{with xxhash}
 BuildRequires: xxhash-devel
+%endif
+
+%if %{with zstd}
+BuildRequires: libzstd-devel
 %endif
 
 Requires(post): %{_sbindir}/alternatives
@@ -711,6 +718,14 @@ compute_global_configuration()
 
 %if %{with xxhash}
     CARGS="$CARGS --with-xxhash=yes"
+%else
+    CARGS="$CARGS --with-xxhash=no"
+%endif
+
+%if %{with zstd}
+    CARGS="$CARGS --with-zstd=yes"
+%else
+    CARGS="$CARGS --with-zstd=no"
 %endif
 
 %if %{default_compress_debug}
@@ -1475,6 +1490,9 @@ exit 0
 
 #----------------------------------------------------------------------------
 %changelog
+* Wed Apr 08 2026 Nick Clifton <nickc@redhat.com> - 2.45.1-5
+- Add support for zstd compression.  (#2454341)
+
 * Thu Jan 15 2026 Nick Clifton <nickc@redhat.com> - 2.45.1-4
 - Remove experimental Risc-V patch added with -2 revision.
 

@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        0.9.3
-Release: 12%{?dist}
+Release:        9%{?dist}
 Summary:        A pytest plugin for repeating test execution
 
 License:        MPL-2.0

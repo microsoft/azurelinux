@@ -3,7 +3,7 @@
 
 Name:           voikko-fi
 Version:        2.5
-Release: 12%{?dist}
+Release:        9%{?dist}
 Summary:        A description of Finnish morphology written for libvoikko
 
 License:        GPL-2.0-or-later

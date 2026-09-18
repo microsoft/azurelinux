@@ -5,7 +5,7 @@
 
 Name:           python-%{modname}
 Version:        3.1.1
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Lightweight in-process concurrent programming
 License:        MIT AND PSF-2.0
 URL:            https://github.com/python-greenlet/greenlet

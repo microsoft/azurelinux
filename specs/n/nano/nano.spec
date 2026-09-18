@@ -11,7 +11,7 @@
 Summary:         A small text editor
 Name:            nano
 Version:         8.5
-Release: 5%{?dist}
+Release:         3%{?dist}
 License:         GPL-3.0-or-later
 URL:             https://www.nano-editor.org
 
@@ -28,6 +28,14 @@ Source3:         nanorc
 Source11:        nano-default-editor.sh
 Source12:        nano-default-editor.csh
 Source13:        nano-default-editor.fish
+
+# history: create the ~/.local directory with limited access rights (CVE-2026-6842)
+# https://cgit.git.savannah.gnu.org/cgit/nano.git/commit/?id=cb43493e00e5777d2433ecf5db6402983b282d6f
+Patch: nano-CVE-2026-6842.patch
+
+# feedback: prevent interpretation of %s and similar in a filename (CVE-2026-6843)
+# https://cgit.git.savannah.gnu.org/cgit/nano.git/commit/?id=0b7328bce452bf1b0bbff81276425d4809a9b6fd
+Patch: nano-CVE-2026-6843.patch
 
 BuildRequires:   file-devel
 BuildRequires:   gettext-devel
@@ -136,6 +144,9 @@ install -Dpm 0644 %{SOURCE13} %{buildroot}%{_datadir}/fish/vendor_conf.d/%{basen
 
 
 %changelog
+* Thu Apr 30 2026 Lukáš Zaoral <lzaoral@redhat.com> - 8.5-3
+- fix CVE-2026-6842 and CVE-29026-6843
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 8.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

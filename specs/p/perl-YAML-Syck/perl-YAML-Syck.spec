@@ -9,8 +9,8 @@
 %endif
 
 Name:           perl-YAML-Syck
-Version:        1.36
-Release: 5%{?dist}
+Version:        1.47
+Release:        1%{?dist}
 Summary:        Fast, lightweight YAML loader and dumper
 # gram.*: GPL-2.0-or-later
 # *:      MIT
@@ -26,7 +26,7 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Dependencies of bundled ExtUtils::HasCompiler
 BuildRequires:  perl(base)
 BuildRequires:  perl(Carp)
@@ -38,7 +38,6 @@ BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(File::Temp)
 # Module Runtime
 BuildRequires:  perl(constant)
-# DynaLoader not used if XSLoader is available
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
@@ -47,6 +46,8 @@ BuildRequires:  perl(XSLoader)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::File)
+BuildRequires:  perl(IO::Handle)
+BuildRequires:  perl(parent)
 BuildRequires:  perl(Storable)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Tie::Hash)
@@ -54,8 +55,10 @@ BuildRequires:  perl(utf8)
 BuildRequires:  perl(warnings)
 # Optional Tests
 %if %{with perl_YAML_Syck_enables_optional_test}
+BuildRequires:  perl(B::Deparse)
 BuildRequires:  perl(Devel::Leak)
 BuildRequires:  perl(JSON)
+BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Symbol)
 %endif
 # Dependencies
@@ -73,12 +76,12 @@ structures to YAML strings, and the other way around.
 %setup -q -n YAML-Syck-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags} -DI_STDLIB=1 -DI_STRING=1 -std=gnu17"
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 \
+  OPTIMIZE="%{optflags} -DI_STDLIB=1 -DI_STRING=1"
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
@@ -95,6 +98,191 @@ make test
 %{_mandir}/man3/YAML::Syck.3*
 
 %changelog
+* Tue Jul 14 2026 Paul Howarth <paul@city-fan.org> - 1.47-1
+- Update to 1.47
+  Security:
+  - Fix four libsyck memory-safety CVEs reachable from the default
+    YAML::Syck::Load() path on untrusted input with no special flags (GH#213)
+    - CVE-2026-57075 (CWE-125): Out-of-bounds read in the base64 decoder
+      caused by signed-char indexing of the decode table on !!binary input
+    - CVE-2026-57076 (CWE-416): Use-after-free of an anchor key string shared
+      between the node and the anchors table
+    - CVE-2026-57077 (CWE-125): One-byte out-of-bounds read in the lexer
+      newline scan during block-scalar parsing (incomplete-fix follow-on
+      to CVE-2025-11683)
+    - CVE-2026-13713 (CWE-416/CWE-415): Use-after-free / double-free of an
+      anchor node on anchor redefinition, a remote-crash DoS from a 7-byte input
+  - Harden syck_base64dec() to bounds-check each read so it cannot run past a
+    non-NUL-terminated input buffer (defense-in-depth for callers passing raw
+    buffers; GH#213)
+  Bug Fixes:
+  - Fix: Enforce $MaxDepth on Load to prevent C-stack exhaustion from deeply
+    nested YAML/JSON input; YAML::Syck and JSON::Syck Load now default to 512,
+    matching Dump (GH#204)
+  - Fix: Emit YAML canonical forms (.nan, .inf, -.inf) for NaN/Inf values in
+    Dump so they roundtrip with ImplicitTyping instead of reloading as plain
+    strings (GH#201)
+  Maintenance:
+  - CI: add an AddressSanitizer job that builds the XS with
+    -fsanitize=address and runs the suite plus the CVE trigger inputs to catch
+    libsyck memory-safety defects; de-pin the libasan version so it tracks the
+    runner's GCC (GH#213)
+
+* Mon May 25 2026 Paul Howarth <paul@city-fan.org> - 1.46-1
+- Update to 1.46
+  Bug Fixes:
+  - Preserve string nature of numeric-looking values in Dump; pure strings (POK
+    only, no IOK/NOK) are now quoted to maintain roundtrip fidelity
+    (GH#199, GH#200)
+  - Accept trailing commas in flow sequences and mappings ([a, b,] and
+    {a: 1,}), valid per YAML 1.0/1.1/1.2 spec (GH#195, GH#196)
+  Maintenance:
+  - CI: upgrade install-with-cpm to v2 for compatibility with Perl versions
+    prior to 5.24 in perldocker containers (GH#197, GH#198)
+  - Clean up MANIFEST.SKIP: add #!include_default, remove redundant entries,
+    exclude .claude/ from distribution
+
+* Mon Apr 27 2026 Paul Howarth <paul@city-fan.org> - 1.45-1
+- Update to 1.45
+  Bug Fixes:
+  - Fix: Use syck_base64_free() to fix Windows "Free to wrong pool" crash in
+    base64 encode/decode buffers; also plugs a memory leak (GH#189)
+  - Fix: Clear type tag on blessed scalar alias early-return so the stale tag
+    no longer leaks onto the next emitted item (GH#193, GH#194, rhbz#2459200)
+  - Fix: Negative float#base60 values produce wrong results; strip sign before
+    accumulating and avoid negative zero for portable stringification (GH#191)
+  - Fix: Prevent memory leaks when Load/LoadJSON croak on parse errors (GH#192)
+  Maintenance:
+  - Test: Add coverage for SortKeys and JSON MaxDepth (GH#188)
+  - Test: Add error handling coverage for LoadFile/DumpFile (GH#190)
+  - Update README
+
+* Fri Apr  3 2026 Paul Howarth <paul@city-fan.org> - 1.44-1
+- Update to 1.44
+  Bug Fixes:
+  - Fix: Positive hex and octal values parsed as 0 with ImplicitTyping (GH#187)
+  - Fix: Resolve uintptr_t redefinition error on Win64 MinGW (GH#186)
+
+* Thu Apr  2 2026 Paul Howarth <paul@city-fan.org> - 1.43-1
+- Update to 1.43
+  Bug Fixes:
+  - Fix: Prevent resource leaks on croak/early-return paths in Dump (GH#161)
+  - Fix: Prevent output SV leaks on croak in Dump/DumpFile callers (GH#163)
+  - Fix: Load() in list context returns empty list for empty/undef input; also
+    applies to LoadBytes and LoadUTF8 (GH#164, GH#165)
+  - Fix: DumpCode serializes prototype string instead of code body (GH#168)
+  - Fix: Memory leak in !perl/scalar Load - newRV_inc should be newRV_noinc
+    (GH#170)
+  - Fix: Add pTHX_ to SAVEDESTRUCTOR_X callback for threaded Perl
+    (GH#175, GH#176)
+  - Fix: Add TODO guard for eval_pv leak on Perl < 5.14 (GH#179, GH#180)
+  - Fix: Negative hex and octal values parsed as 0 with ImplicitTyping (GH#183)
+  - Fix: Negative int#base60 values produce unsigned wraparound (GH#185)
+  Improvements:
+  - Modernize META_MERGE for CPANTS compliance (GH#162)
+  - Fix hash table size handling and remove compile warnings in syck_st (GH#174)
+  Maintenance:
+  - Restore TODO guard for Dump code leak test on Perl < 5.26 (GH#167)
+  - Resolve 2010 TODO in perl_json_postprocess with test coverage (GH#166)
+  - CI: Upgrade actions to resolve Node.js 20 deprecation warnings (GH#177)
+
+* Fri Mar 27 2026 Paul Howarth <paul@city-fan.org> - 1.42-1
+- Update to 1.42
+  Bug Fixes:
+  - Fix: Replace strtok() with strpbrk() and fix sign-compare warnings in
+    perl_syck.h (GH#145)
+  - Fix: Terminate plain scalars at document boundaries --- and ... (GH#150)
+  - Fix: Skip %%TAG and %%YAML directives in document header (GH#151)
+  - Fix: Plug SV leak when eval_pv croaks on bad perl/code blocks (GH#153)
+  - Fix: Allow non-specific tag '!' before block scalars (GH#27, GH#102)
+  - Fix: Remove spurious %%type <nodeId> for indent_open in gram.y
+    (GH#157, GH#158)
+  - Fix: Use modern bison %%define api.prefix directive (GH#159, GH#160)
+  Improvements:
+  - Implement YAML merge key (<<) support (GH#149)
+  Maintenance:
+  - Remove dead Perl 5.6/5.8 version guards from test files (GH#146)
+  - Add YAML 1.0 spec compliance audit and coverage tests (GH#148)
+  - Add comprehensive round-trip tests for YAML 1.0 spec features (GH#152)
+  - Remove unneeded TODO in t/json-basic.t (GH#154)
+  - Add regex Dump/Load/round-trip tests to perl tag scheme (GH#155)
+  - Do not require a .y file to build YAML::Syck; add brew support for bison
+  - Don't ship docs/ directory in tarball
+
+* Mon Mar 23 2026 Paul Howarth <paul@city-fan.org> - 1.41-1
+- Update to 1.41
+  Bug Fixes:
+  - Fix float parsing on -Dusequadmath perls: use Perl's Atof() instead of
+    strtod() so that floats like -3.14 are not corrupted by double-precision
+    rounding artifacts (GH#140, GH#141)
+
+* Sun Mar 22 2026 Paul Howarth <paul@city-fan.org> - 1.39-1
+- Update to 1.39
+  Bug Fixes:
+  - Fix: escape solidus (/) as \/ in JSON::Syck::Dump for XSS safety
+    (GH#125, GH#130)
+  - Fix: anchor tracking for blessed scalar refs in Dump (GH#126, GH#131)
+  - Fix: prevent buffer underflow in base60 (sexagesimal) parsing (GH#133)
+  - Fix: guard against NULL type from strtok in tag parsing (GH#135)
+  - Fix: correct copy-paste bug in syck_seq_assign() ASSERT macros (GH#137)
+  - Fix t/yaml-implicit-typing.t failure with -Duselongdouble perls
+    (GH#138, GH#139)
+  Improvements:
+  - Resolve TODO tests for empty/invalid YAML to match actual behaviour
+    (GH#127, GH#129)
+  Maintenance:
+  - Remove dead Perl 5.6 TODOs and convert 5.8 TODO to SKIP (GH#129)
+  - Add comprehensive implicit type resolution test suite (GH#137)
+  - Update MANIFEST to include all unit tests
+  - Clean up test names to remove unnecessary numbering
+
+* Thu Mar 19 2026 Paul Howarth <paul@city-fan.org> - 1.37-1
+- Update to 1.37
+  Features:
+  - Add LoadBytes, LoadUTF8, DumpBytes, DumpUTF8 functions (GH#51)
+  Fixes:
+  - Fix heap buffer overflow in the YAML emitter - CVE-2026-4177 (GH#67)
+  - Fix DumpFile with tied filehandles (IO::String, IO::Scalar) (GH#22)
+  - Fix _is_glob to recognize IO::Handle subclasses (GH#23)
+  - Fix memory leak when dumping filehandles (CPAN RT#41199, GH#42)
+  - Fix dumping of tied hashes (GH#31)
+  - Fix dumping strings starting with '...' as unquoted plain scalars (GH#34)
+  - Fix dumping strings with tabs and carriage returns as plain scalars (GH#59)
+  - Fix double-dash YAML parsing (RT#34073, GH#35)
+  - Fix extra newline after empty arrays/hashes in YAML output (GH#36)
+  - Remove trailing whitespace from YAML output lines (GH#37, GH#38, GH#39)
+  - Fix quoting of \r and \t in YAML output instead of emitting raw bytes
+    (GH#40)
+  - Fix growing !!perl/regexp objects in round-trips (GH#43)
+  - Fix quoted '=' being transformed into 'str' (GH#45)
+  - Fix backslash-space escape in double-quoted YAML strings (GH#61)
+  - Fix flow sequence comma separator not recognized without trailing space
+    (GH#60)
+  - Fix wide character warning in DumpFile (GH#28)
+  - Fix inline arrays without space after comma (GH#25)
+  - Fix: quote strings matching YAML implicit types to prevent round-trip
+    failures (GH#26)
+  - Fix JSON::Syck::Dump to use JSON-valid \uXXXX escapes in output (GH#21)
+  - Fix JSON::Syck::Load decoding of \/ and \uXXXX escape sequences (GH#30)
+  - Fix: apply JSON postprocessing to JSON::Syck::DumpFile output (GH#104)
+  - Fix: add tied-filehandle fallback to JSON::Syck::DumpFile (GH#98)
+  - Fix: handle JSON escape sequences in SingleQuote mode Load (GH#99)
+  - Fix: restore Perl 5.8 compatibility in test suite (GH#121)
+  - Fix: correct copy-paste error in Makefile.PL clean target (GH#101)
+  - Fix: correct $SortKeys POD default from false to true (GH#100)
+  - Fix: correct POD documentation errors (GH#103)
+  Maintenance:
+  - Add C23-compatible function prototypes for GCC 15 compatibility (GH#112)
+  - Silence macOS compiler warnings (GH#92)
+  - Guard stdint.h include for portability (HP-UX 11.11) (GH#33)
+  - Guard stdint.h include in syck_st.h for portability (GH#24)
+  - Update ppport.h to 3.68
+  - Add regression tests for magical variable dumping (GH#32)
+  - CI: modernize GitHub Actions workflow (GH#123, GH#124)
+  - CI: add disttest job to validate MANIFEST completeness
+- Use %%{make_build} and %%{make_install}
+- Drop workaround for C23 incompatibility
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.36-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

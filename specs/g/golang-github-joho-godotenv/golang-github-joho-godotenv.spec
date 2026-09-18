@@ -18,7 +18,7 @@ file).}
 %global godocs          README.md
 
 Name:           %{goname}
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        Go port of Ruby's dotenv library
 
 License:        MIT

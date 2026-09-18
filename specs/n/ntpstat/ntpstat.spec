@@ -3,7 +3,7 @@
 
 Name:		ntpstat
 Version:	0.6
-Release: 17%{?dist}
+Release:	14%{?dist}
 Summary:	Utility to print NTP synchronization status
 
 License:	MIT

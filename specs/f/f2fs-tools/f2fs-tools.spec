@@ -3,7 +3,7 @@
 
 Name:		f2fs-tools
 Version:	1.16.0
-Release: 12%{?dist}
+Release:	9%{?dist}
 Summary:	Tools for Flash-Friendly File System (F2FS)
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:	GPL-2.0-or-later

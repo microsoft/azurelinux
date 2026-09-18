@@ -3,8 +3,8 @@
 
 Summary: User space tools for kernel auditing
 Name: audit
-Version: 4.1.3
-Release: 4%{?dist}
+Version: 4.2.1
+Release: 1%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-or-later
 URL: https://github.com/linux-audit/audit-userspace/
 Source0: audit-userspace-%{version}.tar.gz
@@ -253,7 +253,10 @@ fi
 %attr(750,root,root) %{_libexecdir}/initscripts/legacy-actions/auditd/rotate
 %attr(750,root,root) %{_libexecdir}/initscripts/legacy-actions/auditd/state
 %attr(750,root,root) %{_libexecdir}/initscripts/legacy-actions/auditd/stop
-%attr(644,root,root) %{_sysconfdir}/bash_completion.d/audit.bash_completion
+%attr(644,root,root) %{_datadir}/bash-completion/completions/auditctl
+%{_datadir}/bash-completion/completions/ausearch
+%{_datadir}/bash-completion/completions/aureport
+%{_datadir}/bash-completion/completions/augenrules
 %ghost %{_runstatedir}/run/auditd.state
 %attr(-,root,-) %dir %{_var}/log/audit
 %attr(750,root,root) %dir /etc/audit/plugins.d
@@ -304,6 +307,30 @@ fi
 %attr(750,root,root) %{_sbindir}/audispd-zos-remote
 
 %changelog
+* Wed Jul 29 2026 Steve Grubb <sgrubb@redhat.com> 4.2.1-1
+- New upstream release
+
+* Fri Jul 24 2026 Python Maint <python-maint@redhat.com> - 4.2-3
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Fri Jul 24 2026 Steve Grubb <sgrubb@redhat.com> 4.2-2
+- Truncate comm instead of rejecting invalid length
+
+* Thu Jul 23 2026 Steve Grubb <sgrubb@redhat.com> 4.2-1
+- New upstream release
+
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 4.1.4-4
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 4.1.4-2
+- Rebuilt for Python 3.15
+
+* Mon Mar 23 2026 Steve Grubb <sgrubb@redhat.com> 4.1.4-1
+- New upstream release
+
 * Sun Feb 01 2026 Steve Grubb <sgrubb@redhat.com> 4.1.3-1
 - New upstream release
 

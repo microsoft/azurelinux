@@ -1,20 +1,23 @@
---- astral_async_http_range_reader-0.10.0/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ astral_async_http_range_reader-0.10.0/Cargo.toml	2026-02-10T11:39:20.816850+00:00
-@@ -74,7 +74,7 @@
- [dev-dependencies.assert_matches]
+--- astral_async_http_range_reader-0.11.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ astral_async_http_range_reader-0.11.0/Cargo.toml	2026-07-18T05:46:59.508272+00:00
+@@ -16,7 +16,10 @@
+ version = "0.11.0"
+ authors = ["Bas Zalmstra <zalmstra.bas@gmail.com>"]
+ build = false
+-exclude = ["test-data/*"]
++exclude = [
++    "release-plz.toml",
++    "test-data/*",
++]
+ autolib = false
+ autobins = false
+ autoexamples = false
+@@ -73,7 +76,7 @@
  version = "1.5.0"
  
--[dev-dependencies.async_zip]
-+[dev-dependencies.astral_async_zip]
- version = "0.0.17"
+ [dev-dependencies.astral_async_zip]
+-version = "0.0.17"
++version = "0.0.20"
  features = ["tokio"]
  default-features = false
-@@ -88,7 +88,7 @@
- default-features = false
  
- [dev-dependencies.rstest]
--version = "0.23.0"
-+version = "0.26.0"
- 
- [dev-dependencies.tokio]
- version = "1.33.0"

@@ -23,7 +23,7 @@
 Name:           ghc-%{pkg_name}
 Version:        2.2.3.0
 # can only be reset when all subpkgs bumped
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        Fast JSON parsing and encoding
 
 License:        BSD-3-Clause

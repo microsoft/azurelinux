@@ -10,18 +10,18 @@ Subject: [PATCH] coreutils-i18n.patch
  lib/mbchar.c                |  23 ++
  lib/mbchar.h                | 383 +++++++++++++++++
  lib/mbfile.c                |  20 +
- lib/mbfile.h                | 283 +++++++++++++
+ lib/mbfile.h                | 277 +++++++++++++
  m4/mbchar.m4                |  15 +
  m4/mbfile.m4                |  16 +
  src/cut.c                   | 508 +++++++++++++++++++++--
  src/expand-common.c         | 114 ++++++
  src/expand-common.h         |  12 +
  src/expand.c                |  90 +++-
- src/fold.c                  | 311 ++++++++++++--
+ src/fold.c                  | 312 ++++++++++++--
  src/local.mk                |   4 +-
  src/pr.c                    | 443 ++++++++++++++++++--
  src/sort.c                  | 790 +++++++++++++++++++++++++++++++++---
- src/unexpand.c              | 101 ++++-
+ src/unexpand.c              | 103 ++++-
  tests/Coreutils.pm          |   3 +
  tests/expand/mb.sh          | 183 +++++++++
  tests/i18n/sort.sh          |  29 ++
@@ -33,8 +33,8 @@ Subject: [PATCH] coreutils-i18n.patch
  tests/pr/pr-tests.pl        |  49 +++
  tests/sort/sort-merge.pl    |  42 ++
  tests/sort/sort.pl          |  40 +-
- tests/unexpand/mb.sh        | 172 ++++++++
- 30 files changed, 3632 insertions(+), 195 deletions(-)
+ tests/unexpand/mb.sh        | 189 +++++++++
+ 30 files changed, 3645 insertions(+), 196 deletions(-)
  create mode 100644 lib/mbchar.c
  create mode 100644 lib/mbchar.h
  create mode 100644 lib/mbfile.c
@@ -548,10 +548,10 @@ index 0000000..f4e3e77
 +#include "mbfile.h"
 diff --git a/lib/mbfile.h b/lib/mbfile.h
 new file mode 100644
-index 0000000..c852f31
+index 0000000..95c7c42
 --- /dev/null
 +++ b/lib/mbfile.h
-@@ -0,0 +1,283 @@
+@@ -0,0 +1,277 @@
 +/* Multibyte character I/O: macros for multi-byte encodings.
 +   Copyright (C) 2001, 2005, 2009-2025 Free Software Foundation, Inc.
 +
@@ -660,11 +660,7 @@ index 0000000..c852f31
 +
 +  /* If mbf->state is not in an initial state, some more 32-bit wide character
 +     may be hiding in the state.  We need to call mbrtoc32 again.  */
-+  #if GNULIB_MBRTOC32_REGULAR
-+  assert (mbsinit (&mbf->state));
-+  #else
 +  if (mbsinit (&mbf->state))
-+  #endif
 +    {
 +      /* Before using mbrtoc32, we need at least one byte.  */
 +      if (new_bufcount == 0)
@@ -746,7 +742,6 @@ index 0000000..c852f31
 +        }
 +      else
 +        {
-+          #if !GNULIB_MBRTOC32_REGULAR
 +          if (bytes == (size_t) -3)
 +            {
 +              /* The previous multibyte sequence produced an additional 32-bit
@@ -755,7 +750,6 @@ index 0000000..c852f31
 +              bytes = 0;
 +            }
 +          else
-+          #endif
 +            {
 +              bytes = mbf->bufcount + bytes;
 +              mbf->bufcount = new_bufcount;
@@ -1849,7 +1843,7 @@ index 5ec7ce9..65ac315 100644
  }
  
 diff --git a/src/fold.c b/src/fold.c
-index b64aad4..a156337 100644
+index b64aad4..241b17c 100644
 --- a/src/fold.c
 +++ b/src/fold.c
 @@ -23,10 +23,32 @@
@@ -2253,7 +2247,7 @@ index b64aad4..a156337 100644
  
          case 's':		/* Break at word boundaries. */
 diff --git a/src/local.mk b/src/local.mk
-index 188dda1..7db5753 100644
+index 3bfe814..e42bb79 100644
 --- a/src/local.mk
 +++ b/src/local.mk
 @@ -478,8 +478,8 @@ src_base32_CPPFLAGS = -DBASE_TYPE=32 $(AM_CPPFLAGS)
@@ -4108,7 +4102,7 @@ index 7af1a25..d3dc684 100644
            break;
  
 diff --git a/src/unexpand.c b/src/unexpand.c
-index ff234d7..7c36ef6 100644
+index ff234d7..06ea637 100644
 --- a/src/unexpand.c
 +++ b/src/unexpand.c
 @@ -39,6 +39,9 @@
@@ -4158,7 +4152,7 @@ index ff234d7..7c36ef6 100644
       tab stop, then MAX_COLUMN_WIDTH - 1 blanks, then a non-blank; so
       allocate MAX_COLUMN_WIDTH bytes to store the blanks.  */
 -  pending_blank = ximalloc (max_column_width);
-+  pending_blank = ximalloc (max_column_width * sizeof (mbf_char_t));
++  pending_blank = xinmalloc (max_column_width, sizeof (mbf_char_t));
 +
 +  if (found_bom == true)
 +    print_bom();
@@ -4219,7 +4213,7 @@ index ff234d7..7c36ef6 100644
  
                if (blank)
                  {
-@@ -175,16 +232,16 @@ unexpand (void)
+@@ -175,30 +232,31 @@ unexpand (void)
  
                    if (convert)
                      {
@@ -4237,9 +4231,10 @@ index ff234d7..7c36ef6 100644
 -                          column++;
 +                          column += mb_width (c);
  
-                           if (! (prev_blank && column == next_tab_column))
+-                          if (! (prev_blank && column == next_tab_column))
++                          if (! (prev_blank && column >= next_tab_column))
                              {
-@@ -192,13 +249,14 @@ unexpand (void)
+                               /* It is not yet known whether the pending blanks
                                   will be replaced by tabs.  */
                                if (column == next_tab_column)
                                  one_blank_before_tab_stop = true;
@@ -4327,7 +4322,7 @@ index b55fb9d..ac80f49 100644
            warn "$program_name: $test_name: test name is too long (> $max)\n";
 diff --git a/tests/expand/mb.sh b/tests/expand/mb.sh
 new file mode 100644
-index 0000000..dd6007c
+index 0000000..6d6497a
 --- /dev/null
 +++ b/tests/expand/mb.sh
 @@ -0,0 +1,183 @@
@@ -4513,7 +4508,7 @@ index 0000000..dd6007c
 +LC_ALL=C expand in1 in1 > out || fail=1
 +compare exp out > /dev/null 2>&1 || fail=1
 +
-+exit $fail
++Exit $fail
 diff --git a/tests/i18n/sort.sh b/tests/i18n/sort.sh
 new file mode 100644
 index 0000000..26c95de
@@ -5022,10 +5017,10 @@ index 2ee92c4..96c7965 100755
  my $verbose = $ENV{VERBOSE};
 diff --git a/tests/unexpand/mb.sh b/tests/unexpand/mb.sh
 new file mode 100644
-index 0000000..8a82d74
+index 0000000..9fa1823
 --- /dev/null
 +++ b/tests/unexpand/mb.sh
-@@ -0,0 +1,172 @@
+@@ -0,0 +1,189 @@
 +#!/bin/sh
 +
 +# Copyright (C) 2012-2015 Free Software Foundation, Inc.
@@ -5102,7 +5097,7 @@ index 0000000..8a82d74
 +e\t|ascii(1)
 +\u00E9\t|composed(1)
 +e\u0301\t|decomposed(1)
-+\u3000\t|ideo-space(2)
++\t|ideo-space(2)
 +\uFF0D\t|full-hypen(2)
 +' > exp || framework_failure_
 +
@@ -5124,7 +5119,7 @@ index 0000000..8a82d74
 +ä\xFF      |
 +        ä\xFF|
 +\xFF       ä|
-+äbcdef\xFF |
++äbcde\xFF  |
 +' > in || framework_failure_
 +
 +env printf '12345678
@@ -5134,7 +5129,7 @@ index 0000000..8a82d74
 +ä\xFF\t|
 +\tä\xFF|
 +\xFF\tä|
-+äbcdef\xFF\t|
++äbcde\xFF\t|
 +' > exp || framework_failure_
 +
 +unexpand -a < in > out || fail=1
@@ -5150,7 +5145,6 @@ index 0000000..8a82d74
 +.       .       .       .
 +   äöü  .    öüä.       ä xx
 +EOF
-+env printf '   äöü\t.    öüä.   \tä xx\n' >> in || framework_failure_
 +
 +printf "\xEF\xBB\xBF" > exp; cat <<\EOF >> exp || framework_failure_
 +1234567812345678123456781
@@ -5162,13 +5156,13 @@ index 0000000..8a82d74
 +   äöü	.    öüä.	ä xx
 +EOF
 +
-+unexpand < in > out || fail=1
++unexpand -a < in > out || fail=1
 +compare exp out > /dev/null 2>&1 || fail=1
 +
-+LANG=C unexpand < in > out || fail=1
++LANG=C unexpand -a < in > out || fail=1
 +compare exp out > /dev/null 2>&1 || fail=1
 +
-+LC_ALL=C unexpand < in > out || fail=1
++LC_ALL=C unexpand -a < in > out || fail=1
 +compare exp out > /dev/null 2>&1 || fail=1
 +
 +
@@ -5190,14 +5184,32 @@ index 0000000..8a82d74
 +EOF
 +
 +
-+unexpand in in > out || fail=1
++unexpand -a in in > out || fail=1
 +compare exp out > /dev/null 2>&1 || fail=1
 +
-+LANG=C unexpand in in > out || fail=1
++LANG=C unexpand -a in in > out || fail=1
 +compare exp out > /dev/null 2>&1 || fail=1
 +
-+LC_ALL=C unexpand in in > out || fail=1
++LC_ALL=C unexpand -a in in > out || fail=1
 +compare exp out > /dev/null 2>&1 || fail=1
++
++# Ensure overflow is handed gracefully
++# coreutils v9.11 induced a buffer overflow with mb_mul=4 (or 16).
++for mb_mul in 4 6; do
++  printf '   \n' | unexpand -t $(expr $SIZE_MAX / $mb_mul + 1) 2>err; ret=$?
++  test "$ret" = 1 || test "$ret" = 0 || { cat err; fail=1; }
++done
++
++# A blank whose display width exceeds the tab distance must not overrun
++# the pending-blank buffer.  With -t1 every column is a tab stop, so a
++# width-2 ideographic space steps over the stop without landing on it;
++# the run of blanks then grew pending_blank without bound.
++ideo_space=$(env printf '\u3000')
++{ yes "$ideo_space" | head -n 40000 | tr -d '\n'; echo; } |
++  unexpand -t1 >out 2>err; ret=$?
++test "$ret" = 0 || { cat err; fail=1; }
++
++Exit $fail
 -- 
-2.50.0
+2.54.0
 

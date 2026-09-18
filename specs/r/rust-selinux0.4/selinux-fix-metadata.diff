@@ -1,0 +1,11 @@
+--- selinux-0.4.6/Cargo.toml	1970-01-01T00:00:01+00:00
++++ selinux-0.4.6/Cargo.toml	2026-04-13T21:00:50.275001+00:00
+@@ -56,7 +56,7 @@
+ version = "0.1"
+ 
+ [dependencies.selinux-sys]
+-version = "0.6"
++version = ">=0.6,<0.8"
+ 
+ [dependencies.thiserror]
+ version = "1"

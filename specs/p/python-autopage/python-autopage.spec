@@ -20,7 +20,7 @@
 
 Name:           python-%{srcname}
 Version:        0.5.2
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        A Python library to provide automatic paging for console output
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

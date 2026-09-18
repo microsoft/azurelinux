@@ -8,7 +8,7 @@
 
 Name: tre
 Version: 0.9.0
-Release: 5%{?dist}
+Release: 2%{?dist}
 License: BSD-2-Clause
 %if 0%{?git}
 Source0: https://github.com/laurikari/tre/archive/%{commit}/tre-%{commit}.tar.gz

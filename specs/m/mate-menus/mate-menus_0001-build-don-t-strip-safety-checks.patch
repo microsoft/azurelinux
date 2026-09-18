@@ -1,0 +1,62 @@
+From 7607deba9354522a7ba124a2224c3253d23ef676 Mon Sep 17 00:00:00 2001
+From: Victor Kareh <vkareh@redhat.com>
+Date: Fri, 3 Jul 2026 11:58:18 -0400
+Subject: [PATCH] build: don't strip safety checks
+
+Both meson and autotools were stripping g_return_if_fail calls in the
+preprocessor. This meant that when mozo hit a NULL tree root during menu
+reload, the guard in matemenu_tree_item_ref did nothing and it crashed
+instead of returning gracefully.
+
+We change the guards to direct NULL checks and enable debug mode as the
+default to fix this.
+
+Fixes mate-desktop/mozo#90
+---
+ configure.ac            | 2 +-
+ libmenu/matemenu-tree.c | 9 +++++++--
+ 3 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4261842..d8335ee 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -10,7 +10,7 @@ AC_CONFIG_HEADERS(config.h)
+ 
+ AM_MAINTAINER_MODE
+ MATE_MAINTAINER_MODE_DEFINES
+-MATE_DEBUG_CHECK([no])
++MATE_DEBUG_CHECK
+ MATE_COMPILE_WARNINGS
+ 
+ # Before making a release, the LT_VERSION string should be modified.
+diff --git a/libmenu/matemenu-tree.c b/libmenu/matemenu-tree.c
+index f1ffa9d..293018b 100644
+--- a/libmenu/matemenu-tree.c
++++ b/libmenu/matemenu-tree.c
+@@ -1807,7 +1807,10 @@ gpointer
+ matemenu_tree_item_ref (gpointer itemp)
+ {
+   MateMenuTreeItem* item = (MateMenuTreeItem*) itemp;
+-  g_return_val_if_fail(item != NULL, NULL);
++
++  if (item == NULL)
++    return NULL;
++
+   g_return_val_if_fail(item->refcount > 0, NULL);
+ 
+   g_atomic_int_inc (&item->refcount);
+@@ -1822,7 +1825,9 @@ matemenu_tree_item_unref (gpointer itemp)
+ 
+   item = (MateMenuTreeItem *) itemp;
+ 
+-  g_return_if_fail (item != NULL);
++  if (item == NULL)
++    return;
++
+   g_return_if_fail (item->refcount > 0);
+ 
+   if (g_atomic_int_dec_and_test (&(item->refcount)))
+-- 
+2.54.0
+

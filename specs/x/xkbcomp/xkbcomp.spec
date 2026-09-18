@@ -3,7 +3,7 @@
 
 Name:       xkbcomp
 Version:    1.5.0
-Release: 4%{?dist}
+Release:    1%{?dist}
 Summary:    XKB keymap compiler
 
 License:    MIT-open-group AND HPND-DEC

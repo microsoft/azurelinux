@@ -3,7 +3,7 @@
 
 Name:           maven-verifier-plugin
 Version:        1.1
-Release: 14%{?dist}
+Release:        11%{?dist}
 Summary:        Maven Verifier Plugin
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

@@ -3,7 +3,7 @@
 
 Name:           perl-Class-Accessor
 Version:        0.51
-Release: 26%{?dist}
+Release:        23%{?dist}
 Summary:        Automated accessor generation
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Class-Accessor

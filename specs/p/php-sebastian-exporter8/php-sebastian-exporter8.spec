@@ -10,13 +10,11 @@
 # Please, preserve the changelog entries
 #
 
-%bcond_without       tests
+# Until phpunit 10.3 available
+%bcond_with          tests
 
-%global gh_commit    dc31f1f8e0186c8f0bb3e48fd4d51421d8905fea
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   exporter
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -29,14 +27,14 @@
 %global pear_channel pear.phpunit.de
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        8.0.0
-Release: 5%{?dist}
+Version:        8.2.1
+Release:        1%{?dist}
 Summary:        Export PHP variables for visualization, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -45,18 +43,18 @@ BuildRequires:  php-mbstring
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^13.0",
-BuildRequires:  phpunit13
-BuildRequires:  (php-composer(%{pk_vendor}/recursion-context) >= 8.0 with php-composer(%{pk_vendor}/recursion-context) < 9)
+#        "phpunit/phpunit": "^13.3",
+BuildRequires:  phpunit13 >= 13.3
+BuildRequires:  (php-composer(%{pk_vendor}/recursion-context) >= 8.0.1 with php-composer(%{pk_vendor}/recursion-context) < 9)
 %endif
 
 # from composer.json
 #        "php": ">=8.4.1",
 #        "ext-mbstring": "*",
-#        "sebastian/recursion-context": "^8.0"
+#        "sebastian/recursion-context": "^8.0.1"
 Requires:       php(language) >= 8.4.1
 Requires:       php-mbstring
-Requires:       (php-composer(%{pk_vendor}/recursion-context) >= 8.0 with php-composer(%{pk_vendor}/recursion-context) < 9)
+Requires:       (php-composer(%{pk_vendor}/recursion-context) >= 8.0.1 with php-composer(%{pk_vendor}/recursion-context) < 9)
 # from phpcompatinfo report for version 5.0.0
 # Autoloader
 Requires:       php-composer(fedora/autoloader)
@@ -73,7 +71,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -98,7 +96,7 @@ phpab --template fedora --output vendor/autoload.php tests/_fixture/
 
 : Run upstream test suite
 ret=0
-for cmd in php php84 php85; do
+for cmd in php php84 php85 php86; do
   if which $cmd; then
     $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
       %{_bindir}/phpunit13 --bootstrap vendor/autoload.php || ret=1
@@ -116,6 +114,25 @@ exit $ret
 
 
 %changelog
+* Fri Aug  7 2026 Remi Collet <remi@remirepo.net> - 8.2.1-1
+- update to 8.2.1
+- raise dependency on sebastian/recursion-context 8.0.1
+
+* Wed Jul 15 2026 Remi Collet <remi@remirepo.net> - 8.1.1-1
+- update to 8.1.1
+
+* Thu May 21 2026 Remi Collet <remi@remirepo.net> - 8.1.0-1
+- update to 8.1.0
+
+* Wed May 20 2026 Remi Collet <remi@remirepo.net> - 8.0.3-1
+- update to 8.0.3
+
+* Wed Apr 15 2026 Remi Collet <remi@remirepo.net> - 8.0.2-1
+- update to 8.0.2
+
+* Fri Apr 10 2026 Remi Collet <remi@remirepo.net> - 8.0.1-1
+- update to 8.0.1
+
 * Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 8.0.0-2
 - enable test suite
 

@@ -1,0 +1,93 @@
+From de4821ce559a2041f6a5d574aeca278df340e379 Mon Sep 17 00:00:00 2001
+From: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Date: Mon, 22 Jun 2026 09:42:36 -0700
+Subject: [PATCH] Remove fatal error for non mobile platform
+
+Downgrade to warning as some user do want to run on non Mobile
+platforms.
+
+Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+---
+ src/thd_engine.cpp          | 15 +++++----------
+ src/thd_engine.h            |  2 +-
+ src/thd_engine_adaptive.cpp |  4 +---
+ 3 files changed, 7 insertions(+), 14 deletions(-)
+
+diff --git a/src/thd_engine.cpp b/src/thd_engine.cpp
+index be924044..83aad268 100644
+--- a/src/thd_engine.cpp
++++ b/src/thd_engine.cpp
+@@ -253,22 +253,19 @@ void cthd_engine::enable_power_floor_event()
+ 	++current_zone_index;
+ }
+ 
+-int cthd_engine::check_acpi_platform_profile() {
+-	// Check PM profile and fail to start for non mobile platforms
++void cthd_engine::check_acpi_platform_profile() {
++	// Check PM profile and warn to start on non-mobile platforms
+ 	csys_fs pm_profile_fs("/sys/firmware/acpi/pm_profile");
+ 	if (pm_profile_fs.exists()) {
+ 		std::string pm_profile;
+ 		pm_profile_fs.read("", pm_profile);
+ 		thd_log_info("PM profile is %s\n", pm_profile.c_str());
+ 		if (pm_profile != "2" && pm_profile != "8") {
+-			thd_log_error("Non mobile platform, exiting..\n");
+-			return THD_FATAL_ERROR;
++			thd_log_warn("Non-mobile platform: thermal tables may not have been validated.\n");
+ 		}
+ 	} else {
+ 		thd_log_info("PM profile is not available, skipping check\n");
+ 	}
+-
+-	return THD_SUCCESS;
+ }
+ 
+ void cthd_engine::thd_parse_features()
+@@ -297,10 +294,6 @@ int cthd_engine::thd_engine_init(bool ignore_cpuid_check, bool adaptive) {
+ 		thd_log_debug("Ignore CPU ID check for MSRs\n");
+ 		proc_list_matched = true;
+ 	} else {
+-		if (check_acpi_platform_profile() != THD_SUCCESS) {
+-			return THD_FATAL_ERROR;
+-		}
+-
+ 		check_cpu_id();
+ 
+ 		if (!proc_list_matched) {
+@@ -311,6 +304,8 @@ int cthd_engine::thd_engine_init(bool ignore_cpuid_check, bool adaptive) {
+ 				return THD_ERROR;
+ 			}
+ 		}
++
++		check_acpi_platform_profile();
+ 	}
+ 
+ 	ret = read_thermal_sensors();
+diff --git a/src/thd_engine.h b/src/thd_engine.h
+index 781f1e55..ac39eef2 100644
+--- a/src/thd_engine.h
++++ b/src/thd_engine.h
+@@ -302,7 +302,7 @@ class cthd_engine {
+ 	void parser_deinit();
+ 	int debug_mode_on(void);
+ 
+-	int check_acpi_platform_profile();
++	void check_acpi_platform_profile();
+ 
+ 	int check_feature(thermald_feature_names_t feature) {
+ 		if (feature >= MAX_FEATURE) {
+diff --git a/src/thd_engine_adaptive.cpp b/src/thd_engine_adaptive.cpp
+index 5586523c..7a481994 100644
+--- a/src/thd_engine_adaptive.cpp
++++ b/src/thd_engine_adaptive.cpp
+@@ -660,9 +660,7 @@ int cthd_engine_adaptive::thd_engine_init(bool ignore_cpuid_check,
+ 	size_t size;
+ 	int res;
+ 
+-	if (check_acpi_platform_profile() != THD_SUCCESS) {
+-			return THD_FATAL_ERROR;
+-	}
++	check_acpi_platform_profile();
+ 
+ 	thd_parse_features();
+ 

@@ -7,24 +7,21 @@
 %bcond oscilloscope %{undefined rhel}
 
 Name: tuna
-Version: 0.20
-Release: 6%{?dist}
+Version: 0.21
+Release: 1%{?dist}
 License: GPL-2.0-only AND LGPL-2.1-only
 Summary: Application tuning GUI & command line utility
 Source: https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.xz
 Source9999: tuna.azl.macros
 URL: https://rt.wiki.kernel.org/index.php/Tuna
 BuildArch: noarch
-BuildRequires: python3-devel, gettext
-BuildRequires: pyproject-rpm-macros
-BuildRequires: python3-pip
-BuildRequires: python3-setuptools
-BuildRequires: python3-wheel
+BuildRequires: python3-devel
 Requires: python3-linux-procfs >= 0.6
 # This really should be a Suggests...
 # Requires: python-inet_diag
 
 # Patches
+Patch:	tuna-Add-error-handling-to-cpuset-profile-save-funct.patch
 
 %description
 Provides interface for changing scheduler and IRQ tunables, at whole CPU and at
@@ -85,20 +82,14 @@ install -p -m644 etc/tuna/example.conf %{buildroot}/%{_sysconfdir}/tuna/
 install -p -m644 etc/tuna.conf %{buildroot}/%{_sysconfdir}/
 install -p -m644 org.tuna.policy %{buildroot}/%{_datadir}/polkit-1/actions/
 
-# l10n-ed message catalogues
-for lng in `cat po/LINGUAS`; do
-        po=po/"$lng.po"
-        mkdir -p %{buildroot}/%{_datadir}/locale/${lng}/LC_MESSAGES
-        msgfmt $po -o %{buildroot}/%{_datadir}/locale/${lng}/LC_MESSAGES/%{name}.mo
-done
-
-%find_lang %name
+%if %{without oscilloscope}
+rm %{buildroot}%{_bindir}/oscilloscope
+%endif
 
 %if %{without oscilloscope}
 rm -f %{buildroot}%{_bindir}/oscilloscope
 %endif
-%files -f %{name}.lang -f %{pyproject_files}
-%doc ChangeLog
+%files -f %{pyproject_files}
 %{_bindir}/tuna
 %{_datadir}/tuna/
 %{_mandir}/man8/tuna.8.gz
@@ -114,6 +105,27 @@ rm -f %{buildroot}%{_bindir}/oscilloscope
 %endif
 
 %changelog
+* Wed Jul 29 2026 John Kacur <jkacur@redhat.com> - 0.21-1
+- Rebased to upstream tuna-0.21
+- Added patch to improve error handling for cpuset save
+- Removed translations (po/ files)
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.20-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 0.20-5
+- Rebuilt for Python 3.15
+
+* Fri May 15 2026 John Kacur <jkacur@redhat.com> - 0.20-4
+- Update pyproject.toml license format for modern setuptools
+- Disable the tuna apply functionality
+- Remove tuna apply from the man page
+- Print warning if setting affinity results in EPERM and continue
+- Add testing infrastructure using unittest framework
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.20-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Nov 04 2025 John Kacur <jkacur@redhat.com> - 0.20-2
 - Add python3-pip, python3-setuptools, python3-wheel BuildRequires
 - Delete setup.py in %%prep so pyproject.toml build is used

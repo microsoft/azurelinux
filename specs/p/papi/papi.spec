@@ -18,7 +18,7 @@
 Summary: Performance Application Programming Interface
 Name: papi
 Version: 7.2.0
-Release: 5%{?dist}
+Release: 2%{?dist}
 License: BSD-3-Clause
 Requires: papi-libs = %{version}-%{release}
 URL: http://icl.cs.utk.edu/papi/

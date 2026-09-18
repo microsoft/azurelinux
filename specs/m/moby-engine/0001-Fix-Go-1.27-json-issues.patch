@@ -1,0 +1,50 @@
+From 6cd0706cb8a1c4d6d5e1d56ca66ad370003872f2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20S=C3=A1ez?= <asm@redhat.com>
+Date: Fri, 17 Jul 2026 17:09:28 +0200
+Subject: [PATCH] Fix Go 1.27 json issues
+
+---
+ daemon/config/config_test.go | 4 +++-
+ daemon/pkg/opts/nri_opts.go  | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/daemon/config/config_test.go b/daemon/config/config_test.go
+index 559131b..8d1002e 100644
+--- a/daemon/config/config_test.go
++++ b/daemon/config/config_test.go
+@@ -2,6 +2,7 @@
+ 
+ import (
+ 	"encoding/json"
++	"errors"
+ 	"net/netip"
+ 	"os"
+ 	"path/filepath"
+@@ -41,7 +42,8 @@ func TestDaemonBrokenConfiguration(t *testing.T) {
+ 	configFile := makeConfigFile(t, `{"Debug": tru`)
+ 
+ 	_, err := MergeDaemonConfigurations(&Config{}, nil, configFile)
+-	assert.ErrorContains(t, err, `invalid character ' ' in literal true`)
++	var syntaxErr *json.SyntaxError
++	assert.Assert(t, errors.As(err, &syntaxErr), "expected JSON syntax error, got %v", err)
+ }
+ 
+ // TestDaemonConfigurationUnicodeVariations feeds various variations of Unicode into the JSON parser, ensuring that we
+diff --git a/daemon/pkg/opts/nri_opts.go b/daemon/pkg/opts/nri_opts.go
+index ba9c728..3033b23 100644
+--- a/daemon/pkg/opts/nri_opts.go
++++ b/daemon/pkg/opts/nri_opts.go
+@@ -19,8 +19,8 @@ type NRIOpts struct {
+ func (c *NRIOpts) UnmarshalJSON(raw []byte) error {
+ 	dec := json.NewDecoder(bytes.NewReader(raw))
+ 	dec.DisallowUnknownFields()
+-	type nc *NRIOpts // prevent recursion
+-	if err := dec.Decode(nc(c)); err != nil {
++	type nc NRIOpts // prevent recursion
++	if err := dec.Decode((*nc)(c)); err != nil {
+ 		return err
+ 	}
+ 	return nil
+-- 
+2.55.0
+

@@ -4,7 +4,7 @@
 Summary: The GNU disk partition manipulation program
 Name:    parted
 Version: 3.6
-Release: 16%{?dist}
+Release: 13%{?dist}
 License: GPL-3.0-or-later
 URL:     http://www.gnu.org/software/parted
 

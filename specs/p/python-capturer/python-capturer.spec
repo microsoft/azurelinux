@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        3.0
-Release: 25%{?dist}
+Release:        22%{?dist}
 Summary:        Easily capture stdout/stderr of the current process and subprocesses
 
 License:        MIT

@@ -6,7 +6,7 @@
 
 Name:           python-zopfli
 Version:        0.2.3
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        Zopfli module for python
 License:        Apache-2.0
 URL:            https://github.com/obp/py-zopfli

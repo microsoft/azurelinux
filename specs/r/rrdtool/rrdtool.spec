@@ -21,7 +21,7 @@
 Summary: Round Robin Database Tool to store and display time-series data
 Name: rrdtool
 Version: 1.9.0
-Release: 10%{?dist}
+Release: 8%{?dist}
 # gd license in php bindings isn't by default built-in
 License: gpl-1.0-or-later AND gpl-2.0-or-later AND gpl-2.0-or-later WITH rrdtool-floss-exception-2.0 AND mit AND lgpl-2.0-or-later AND lgpl-2.1-or-later AND bsd-source-code AND snprintf AND bsd-3-clause AND gpl-2.0-only AND licenseref-fedora-public-domain AND gtkbook
 URL: https://oss.oetiker.ch/rrdtool/
@@ -35,6 +35,8 @@ Patch3: rrdtool-1.6.0-ruby-2-fix.patch
 Patch4: rrdtool-1.4.8-php-ppc-fix.patch
 # fix compatibility with tcl 9.0
 Patch5: rrdtool-1.9.0-tcl90.patch
+# https://github.com/oetiker/rrdtool-1.x/commit/4218ec7127ba6c7ea1c20d7c8ea6e2b3f83df73a
+Patch6: rrdtool-1.9.0-safety-checks.patch
 
 BuildRequires: make
 BuildRequires: gcc-c++
@@ -183,6 +185,7 @@ The %{name}-lua package includes RRDtool bindings for Lua.
 %endif
 %patch -P4 -p1 -b .php-ppc-fix
 %patch -P5 -p1 -b .tcl90
+%patch -P6 -p1 -b .safety-checks
 
 # Fix to find correct python dir on lib64
 perl -pi -e 's|get_python_lib\(0,0,prefix|get_python_lib\(1,0,prefix|g' \
@@ -411,6 +414,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} php -n \
 %endif
 
 %changelog
+* Tue May 19 2026 Jaroslav Škarvada <jskarvad@redhat.com> - 1.9.0-8
+- Backported some safety checks from the rrdtool-1.10.0
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

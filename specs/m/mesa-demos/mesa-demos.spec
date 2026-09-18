@@ -6,7 +6,7 @@
 Summary: Mesa demos
 Name: mesa-demos
 Version: 9.0.0
-Release: 13%{?dist}
+Release: 10%{?dist}
 # SPDX
 License: MIT
 URL: http://www.mesa3d.org

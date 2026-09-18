@@ -6,7 +6,7 @@
 
 Name: rear
 Version: 2.9
-Release: 8%{?dist}
+Release: 5%{?dist}
 Summary: Relax-and-Recover is a Linux disaster recovery and system migration tool
 URL: https://relax-and-recover.org
 

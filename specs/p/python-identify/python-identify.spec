@@ -5,8 +5,8 @@
 %global pypi_name identify
 
 Name:           python-%{pypi_name}
-Version:        2.6.16
-Release: 5%{?dist}
+Version:        2.6.19
+Release:        1%{?dist}
 Summary:        File identification library for Python
 
 License:        MIT
@@ -64,6 +64,15 @@ Summary:        %{summary}
 
 
 %changelog
+* Fri Apr 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.6.19-1
+- 2.6.19
+
+* Mon Mar 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.6.18-1
+- 2.6.18
+
+* Tue Mar 03 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.6.17-1
+- 2.6.17
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.16-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

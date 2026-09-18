@@ -19,6 +19,7 @@
 %global forgeurl0 git://thekelleys.org.uk/dnsmasq.git
 # tag of selected version
 %global gittag v%{version}%{?extraversion}
+%global upstream_sources 0 3
 
 
 # Attempt to prepare source-git with downstream repos
@@ -26,8 +27,8 @@
 %bcond_without annocheck
 
 Name:           dnsmasq
-Version:        2.92
-Release:        1%{?extraversion:.%{extraversion}}%{?dist}
+Version:        2.92rel2
+Release:        2%{?extraversion:.%{extraversion}}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
 # SPDX identifiers already
@@ -238,6 +239,9 @@ fi
 %endif
 
 %changelog
+* Tue May 12 2026 Petr Menšík <pemensik@redhat.com> - 2.92rel2-9
+- Update to 2.92rel2 (rhbz#2469245)
+
 * Fri Jan 16 2026 Petr Menšík <pemensik@redhat.com> - 2.92-1
 - Update to 9.29 (rhbz#2429567)
 

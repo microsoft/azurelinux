@@ -3,7 +3,7 @@
 
 Name:           perl-Unicode-Collate
 Version:        1.31
-Release: 523%{?dist}
+Release:        520%{?dist}
 Summary:        Unicode Collation Algorithm
 # Collate/allkeys.txt:  Unicode-DFS-2016 (the file contains a link to
 #                       <http://www.unicode.org/terms_of_use.html>)

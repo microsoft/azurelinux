@@ -1,0 +1,35 @@
+--- hyper-1.11.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ hyper-1.11.0/Cargo.toml	2026-07-20T19:32:13.041776+00:00
+@@ -182,9 +182,6 @@
+ version = "0.3"
+ optional = true
+ 
+-[dev-dependencies.form_urlencoded]
+-version = "1"
+-
+ [dev-dependencies.futures-channel]
+ version = "0.3"
+ features = ["sink"]
+@@ -212,9 +209,6 @@
+ 
+ [dev-dependencies.serde_json]
+ version = "1.0"
+-
+-[dev-dependencies.spmc]
+-version = "0.3"
+ 
+ [dev-dependencies.tokio]
+ version = "1"
+@@ -236,12 +230,6 @@
+ 
+ [dev-dependencies.tokio-util]
+ version = "0.7.10"
+-
+-[dev-dependencies.tracing]
+-version = "0.1"
+-
+-[dev-dependencies.tracing-subscriber]
+-version = "0.3"
+ 
+ [lints.clippy]
+ absolute_paths = "allow"

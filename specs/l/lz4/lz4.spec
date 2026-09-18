@@ -5,7 +5,7 @@
 
 Name:           lz4
 Version:        1.10.0
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        Extremely fast compression algorithm
 
 License:        GPL-2.0-or-later AND BSD-2-Clause

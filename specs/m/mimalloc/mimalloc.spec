@@ -5,7 +5,7 @@
 
 Name:           mimalloc
 Version:        2.2.3
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        A general purpose allocator with excellent performance
 
 License:        MIT

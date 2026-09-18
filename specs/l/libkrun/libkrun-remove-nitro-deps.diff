@@ -1,21 +1,33 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index da9fd96..70b7af0 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -14,7 +14,6 @@ members = [
+     "src/hvf",
+     "src/devices",
+     "src/vmm",
+-    "src/aws_nitro",
+     "src/rutabaga_gfx",
+ ]
+ exclude = ["examples/gtk_display"]
 diff --git a/src/libkrun/Cargo.toml b/src/libkrun/Cargo.toml
-index a840c75..37d415d 100644
+index 4608fc5..1abe57c 100644
 --- a/src/libkrun/Cargo.toml
 +++ b/src/libkrun/Cargo.toml
-@@ -16,7 +16,6 @@ gpu = ["krun_display"]
- snd = []
+@@ -21,7 +21,6 @@ gpu = ["vmm/gpu", "devices/gpu", "krun_display"]
+ snd = ["vmm/snd", "devices/snd"]
  input = ["krun_input", "vmm/input", "devices/input"]
- virgl_resource_map2 = []
--aws-nitro = [ "dep:aws-nitro", "dep:nitro-enclaves" ]
+ virgl_resource_map2 = ["devices/virgl_resource_map2"]
+-aws-nitro = ["vmm/aws-nitro", "devices/aws-nitro", "dep:aws-nitro", "dep:nitro-enclaves"]
  
  [dependencies]
  crossbeam-channel = ">=0.5.15"
-@@ -40,8 +39,6 @@ hvf = { path = "../hvf" }
+@@ -45,8 +44,6 @@ hvf = { package = "krun-hvf", version = "=0.1.0-1.19.0", path = "../hvf" }
  [target.'cfg(target_os = "linux")'.dependencies]
- kvm-bindings = { version = ">=0.11", features = ["fam-wrappers"] }
- kvm-ioctls = ">=0.21"
--aws-nitro = { path = "../aws_nitro", optional = true }
+ kvm-bindings = { version = "0.12", features = ["fam-wrappers"] }
+ kvm-ioctls = "0.22"
+-aws-nitro = { package = "krun-aws-nitro", version = "=0.1.0-1.19.0", path = "../aws_nitro", optional = true }
 -nitro-enclaves = { version = "0.5.0", optional = true }
- vm-memory = { version = ">=0.13", features = ["backend-mmap"] }
+ vm-memory = { version = "0.17", features = ["backend-mmap"] }
  
  [lib]

@@ -3,7 +3,7 @@
 
 Name:           matio
 Version:        1.5.29
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Library for reading/writing Matlab MAT files
 
 License:        BSD-2-Clause

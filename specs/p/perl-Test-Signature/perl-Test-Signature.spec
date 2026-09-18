@@ -12,7 +12,7 @@
 
 Name:           perl-Test-Signature
 Version:        1.11
-Release: 38%{?dist}
+Release:        35%{?dist}
 Summary:        Automated SIGNATURE testing
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Signature

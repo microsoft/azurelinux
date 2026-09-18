@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:		python-ipyparallel
-Version:	9.0.2
-Release: 5%{?dist}
+Version:	9.2.0
+Release:	1%{?dist}
 Summary:	Interactive Parallel Computing with IPython
 
 License:	BSD-3-Clause
@@ -92,10 +92,19 @@ mv %{buildroot}%{_prefix}%{_sysconfdir} %{buildroot}%{_sysconfdir}
 %{python3_sitelib}/ipyparallel/tests
 
 %changelog
+* Fri Jun 19 2026 Mattias Ellert <mattias.ellert@physics.uu.se> - 9.2.0-1
+- Update to 9.2.0
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 9.1.0-2
+- Rebuilt for Python 3.15
+
+* Wed Mar 11 2026 Mattias Ellert <mattias.ellert@physics.uu.se> - 9.1.0-1
+- Update to 9.1.0
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9.0.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
-* Fri Oct 10 2025 Mattias Ellert  <mattias.ellert@physics.uu.se> - 9.0.2-1
+* Fri Oct 10 2025 Mattias Ellert <mattias.ellert@physics.uu.se> - 9.0.2-1
 - Update to 9.0.2
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 9.0.1-6

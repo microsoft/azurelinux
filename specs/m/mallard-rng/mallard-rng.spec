@@ -3,7 +3,7 @@
 
 Name:    mallard-rng
 Version: 1.1.0
-Release: 18%{?dist}
+Release: 15%{?dist}
 Summary: RELAX NG schemas for all Mallard versions
 
 License: MIT

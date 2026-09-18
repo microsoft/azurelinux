@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.9.0
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        Linux Distribution - a Linux OS platform information API
 
 License:        Apache-2.0

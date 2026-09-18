@@ -4,7 +4,7 @@
 Summary: Collection of performance monitoring tools for Linux
 Name: sysstat
 Version: 12.7.8
-Release: 4%{?dist}
+Release: 1%{?dist}
 License: GPL-2.0-or-later
 
 URL: http://sebastien.godard.pagesperso-orange.fr

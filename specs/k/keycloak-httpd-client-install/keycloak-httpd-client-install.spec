@@ -16,7 +16,7 @@
 
 Name:           %{srcname}
 Version:        1.3
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        %{summary}
 
 License:        GPL-3.0-or-later

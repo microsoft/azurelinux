@@ -14,7 +14,7 @@ misspelled words.
 
 Name:           python-%{pypi_name}
 Version:        7.3.3
-Release: 19%{?dist}
+Release:        16%{?dist}
 Summary:        %{sum}
 
 # Automatically converted from old format: BSD - review is highly recommended.

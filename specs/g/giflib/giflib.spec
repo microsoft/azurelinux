@@ -4,7 +4,7 @@
 Name:          giflib
 Summary:       A library and utilities for processing GIFs
 Version:       5.2.2
-Release: 12%{?dist}
+Release:       9%{?dist}
 
 License:       MIT
 URL:           http://www.sourceforge.net/projects/%{name}/
@@ -22,6 +22,9 @@ Patch2:        giflib_html-docs-consistent-ids.patch
 Patch3:        getarg.patch
 # Proposed patch for CVE-2025-31344
 Patch4:        https://raw.githubusercontent.com/OpenMandrivaAssociation/giflib/refs/heads/master/giflib-5.2.2-cve-2025-31344.patch
+# Backport patch for CVE-2026-23868
+# https://sourceforge.net/p/giflib/code/ci/f5b7267aed3665ef025c13823e454170d031c106/tree/gifalloc.c?diff=5146815377b7395944cb683a08c43eee3f631eb7
+Patch5:        CVE-2026-23868.patch
 
 BuildRequires: cmake
 BuildRequires: gcc
@@ -91,6 +94,9 @@ cp -a %{SOURCE1} .
 %{_mandir}/man1/*.1*
 
 %changelog
+* Sat Mar 21 2026 Sandro Mani <manisandro@gmail.com> - 5.2.2-9
+- Backport patch for CVE-2026-23868
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.2.2-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

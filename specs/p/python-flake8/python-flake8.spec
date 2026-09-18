@@ -3,7 +3,7 @@
 
 Name:             python-flake8
 Version:          6.1.0
-Release: 12%{?dist}
+Release:          9%{?dist}
 Summary:          Python code checking using pyflakes, pycodestyle, and mccabe
 
 License:          MIT

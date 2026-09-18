@@ -3,7 +3,7 @@
 
 Name:		libbs2b
 Version:	3.1.0
-Release: 39%{?dist}
+Release:	36%{?dist}
 Summary:	Bauer stereophonic-to-binaural DSP library
 
 License:	MIT

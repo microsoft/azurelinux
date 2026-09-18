@@ -3,7 +3,7 @@
 
 Name:           glpk
 Version:        5.0
-Release: 17%{?dist}
+Release:        14%{?dist}
 Summary:        GNU Linear Programming Kit
 
 # GPL-3.0-or-later: the project as a whole

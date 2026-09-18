@@ -61,6 +61,11 @@ def test_data(case_name, capfd, tmp_path, monkeypatch):
     for name, value in case.get('environ', {}).items():
         monkeypatch.setenv(name, value)
 
+    fedora = int(case.get('environ', {}).get('FEDORA', 0))
+    rhel = int(case.get('environ', {}).get('RHEL', 0))
+    monkeypatch.setattr('pyproject_buildrequires.REJECT_INVALID_EXTRAS',
+                        fedora >= 45 or rhel >= 11)
+
     def get_installed_version(dist_name):
         try:
             return str(case['installed'][dist_name])
@@ -69,9 +74,9 @@ def test_data(case_name, capfd, tmp_path, monkeypatch):
                 f'info not found for {dist_name}'
             )
     requirement_files = case.get('requirement_files', [])
-    requirement_files = [open(f) for f in requirement_files]
+    requirement_files = [Path(f) for f in requirement_files]
     use_build_system = case.get('use_build_system', True)
-    read_pyproject_dependencies = case.get('read_pyproject_dependencies', False)
+    pyproject_dependencies = case.get('pyproject_dependencies', False)
     try:
         generate_requires(
             get_installed_version=get_installed_version,
@@ -84,9 +89,10 @@ def test_data(case_name, capfd, tmp_path, monkeypatch):
             generate_extras=case.get('generate_extras', False),
             requirement_files=requirement_files,
             use_build_system=use_build_system,
-            read_pyproject_dependencies=read_pyproject_dependencies,
+            pyproject_dependencies=pyproject_dependencies,
             output=output,
             config_settings=case.get('config_settings'),
+            dependency_overrides=case.get('dependency_overrides', []),
         )
     except SystemExit as e:
         assert e.code == case['result']
@@ -119,6 +125,3 @@ def test_data(case_name, capfd, tmp_path, monkeypatch):
                 stderr_contains = [stderr_contains]
             for expected_substring in stderr_contains:
                 assert expected_substring.format(**locals()) in err
-    finally:
-        for req in requirement_files:
-            req.close()

@@ -5,7 +5,7 @@
 
 Name:           sblim-cmpi-base
 Version:        1.6.4
-Release: 34%{?dist}
+Release:        30%{?dist}
 Summary:        SBLIM CMPI Base Providers
 
 License:        EPL-1.0

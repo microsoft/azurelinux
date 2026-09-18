@@ -1,4 +1,4 @@
-#if defined(__x86_64__) || defined(__ia64__) || defined(__ppc64__) || defined(__powerpc64__) || defined(__s390x__) || defined(__aarch64__) || defined(__mips64)
+#if defined(__x86_64__) || defined(__ia64__) || defined(__ppc64__) || defined(__powerpc64__) || defined(__s390x__) || defined(__aarch64__) || defined(__mips64) || defined(__loongarch_lp64)
 #include "config.lib64.h"
 #elif defined(__sparc__) && defined (__arch64__) || (defined(__riscv) && __SIZEOF_POINTER__ == 8)
 #include "config.lib64.h"

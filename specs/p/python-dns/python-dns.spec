@@ -16,7 +16,7 @@
 
 Name:           python-dns
 Version:        2.8.0
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        DNS toolkit for Python
 
 # The entire package is licensed with both licenses, see LICENSE file

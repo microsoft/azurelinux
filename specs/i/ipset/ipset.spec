@@ -3,7 +3,7 @@
 
 Name:             ipset
 Version:          7.24
-Release: 5%{?dist}
+Release:          2%{?dist}
 Summary:          Manage Linux IP sets
 
 License:          GPL-2.0-only

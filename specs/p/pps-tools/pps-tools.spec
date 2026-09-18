@@ -3,7 +3,7 @@
 
 Name:		pps-tools
 Version:	1.0.3
-Release: 14%{?dist}
+Release:	11%{?dist}
 Summary:	LinuxPPS user-space tools
 
 License:	GPL-2.0-or-later

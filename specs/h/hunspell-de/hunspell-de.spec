@@ -4,7 +4,7 @@
 Name:          hunspell-de
 Summary:       German hunspell dictionaries
 Version:       20240224
-Release: 7%{?dist}
+Release:       4%{?dist}
 
 License:       GPL-2.0-only OR GPL-3.0-only
 URL:           https://cgit.freedesktop.org/libreoffice/dictionaries/tree/de

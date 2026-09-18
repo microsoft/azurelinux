@@ -3,7 +3,7 @@
 
 Name:           perl-Perl-Critic-Pulp
 Version:        100
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Some add-on perlcritic policies
 License:        GPL-3.0-or-later
 URL:            https://metacpan.org/release/Perl-Critic-Pulp

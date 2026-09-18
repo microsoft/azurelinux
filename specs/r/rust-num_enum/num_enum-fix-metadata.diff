@@ -1,0 +1,26 @@
+--- num_enum-0.7.6/Cargo.toml	2006-07-24T01:21:28+00:00
++++ num_enum-0.7.6/Cargo.toml	2026-05-18T10:40:07.744093+00:00
+@@ -67,14 +67,6 @@
+ path = "tests/into_primitive.rs"
+ 
+ [[test]]
+-name = "renamed_num_enum"
+-path = "tests/renamed_num_enum.rs"
+-
+-[[test]]
+-name = "try_build"
+-path = "tests/try_build.rs"
+-
+-[[test]]
+ name = "try_from_primitive"
+ path = "tests/try_from_primitive.rs"
+ 
+@@ -95,8 +87,5 @@
+ [dev-dependencies.paste]
+ version = "1"
+ 
+-[dev-dependencies.trybuild]
+-version = "1.0.98"
+-
+ [dev-dependencies.walkdir]
+ version = "2"

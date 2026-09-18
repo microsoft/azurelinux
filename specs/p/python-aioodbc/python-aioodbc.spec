@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        0.4.0
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        Library for accessing a ODBC databases from the asyncio
 
 License:        Apache-2.0

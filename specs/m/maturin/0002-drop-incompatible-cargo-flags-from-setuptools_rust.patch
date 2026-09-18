@@ -1,7 +1,7 @@
-From 8d3ca80d401db386ccb5e7568c395a78eede6edc Mon Sep 17 00:00:00 2001
+From 2583e12639914bd443e734de21e4079d82028077 Mon Sep 17 00:00:00 2001
 From: Fabio Valentini <decathorpe@gmail.com>
 Date: Mon, 19 May 2025 21:57:43 +0200
-Subject: [PATCH 2/6] drop incompatible cargo flags from setuptools_rust
+Subject: [PATCH 2/3] drop incompatible cargo flags from setuptools_rust
 
 ---
  setup.py | 18 +-----------------
@@ -46,5 +46,5 @@ index 5d9fd285..5c56178f 100644
      zip_safe=False,
  )
 -- 
-2.52.0
+2.55.0
 

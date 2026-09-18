@@ -1,0 +1,25 @@
+From acc903db3086a737936643a5dbbc0e22f9d5c421 Mon Sep 17 00:00:00 2001
+From: "H.Merijn Brand - Tux" <linux@tux.freedom.nl>
+Date: Mon, 17 Aug 2026 09:49:56 +0200
+Subject: [PATCH] Fix test for 32bit-perl (report in PR#189)
+
+---
+ t/60preparse.t | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/t/60preparse.t b/t/60preparse.t
+index 92bdc89..eff39be 100755
+--- a/t/60preparse.t
++++ b/t/60preparse.t
+@@ -148,7 +148,7 @@ ok( $DBI::err );
+ is( $DBI::errstr, "preparse found :p100000 which is outside the allowed range.");
+ is( pp($dbh, 'a = :2147483648', DBIpp_ph_qm, DBIpp_ph_cs|DBIpp_ph_cn), undef, 'exceeds limit');
+ ok( $DBI::err );
+-is( $DBI::errstr, "preparse found :p-2147483648 which is outside the allowed range.");
++like( $DBI::errstr, qr{^preparse found :p(?:-2147483648|2147483647) which is outside the allowed range.$});
+ is( pp($dbh, 'a = :12345678987654321', DBIpp_ph_qm, DBIpp_ph_cs|DBIpp_ph_cn), undef, 'exceeds limit');
+ ok( $DBI::err );
+ like( $DBI::errstr, qr{^preparse found :p\d+ which is outside the allowed range.$});
+-- 
+2.55.0
+

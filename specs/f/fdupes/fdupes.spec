@@ -8,7 +8,7 @@
 Name:           fdupes
 Epoch:          1
 Version:        2.4.0
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Finds duplicate files in a given set of directories
 
 License:        MIT

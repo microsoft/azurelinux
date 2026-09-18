@@ -9,7 +9,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.1.3
-Release: 14%{?dist}
+Release: 11%{?dist}
 Summary: Fast syntax highlighting for selected languages
 License: MIT
 URL: http://coderay.rubychan.de

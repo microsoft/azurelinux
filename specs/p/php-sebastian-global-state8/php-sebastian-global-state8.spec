@@ -3,7 +3,7 @@
 
 # spec file for php-sebastian-global-state8
 #
-# SPDX-FileCopyrightText:  Copyright 2014-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2014-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
@@ -12,11 +12,8 @@
 
 %bcond_without       tests
 
-%global gh_commit    ef1377171613d09edd25b7816f05be8313f9115d
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   global-state
-%global gh_date      2025-08-29
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -27,14 +24,14 @@
 %global php_home     %{_datadir}/php
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        8.0.2
-Release: 4%{?dist}
+Version:        8.0.3
+Release:        1%{?dist}
 Summary:        Snapshotting of global state, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -43,21 +40,21 @@ BuildRequires:  php(language) >= 8.3
 BuildRequires:  php-fedora-autoloader-devel >= 1.0.0
 %if %{with tests}
 BuildRequires:  (php-composer(sebastian/object-reflector)  >= 5.0     with php-composer(sebastian/object-reflector)  < 6)
-BuildRequires:  (php-composer(sebastian/recursion-context) >= 7.0     with php-composer(sebastian/recursion-context) < 8)
+BuildRequires:  (php-composer(sebastian/recursion-context) >= 7.0.1   with php-composer(sebastian/recursion-context) < 8)
 # from composer.json, "require-dev": {
 #        "ext-dom": "*",
-#        "phpunit/phpunit": "^12.0"
+#        "phpunit/phpunit": "^12.5.28"
 BuildRequires:  php-dom
-BuildRequires:  phpunit12
+BuildRequires:  phpunit12 >= 12.5.28
 %endif
 
 # from composer.json, "require": {
 #        "php": ">=8.3",
 #        "sebastian/object-reflector": "^5.0",
-#        "sebastian/recursion-context": "^7.0"
+#        "sebastian/recursion-context": "^7.0.1"
 Requires:       php(language) >= 8.3
 Requires:       (php-composer(sebastian/object-reflector)  >= 5.0     with php-composer(sebastian/object-reflector)  < 6)
-Requires:       (php-composer(sebastian/recursion-context) >= 7.0     with php-composer(sebastian/recursion-context) < 8)
+Requires:       (php-composer(sebastian/recursion-context) >= 7.0.1   with php-composer(sebastian/recursion-context) < 8)
 # from phpcompatinfo report for version 6.0.0
 # Autoloader
 Requires:       php-composer(fedora/autoloader)
@@ -75,7 +72,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -133,6 +130,10 @@ exit $ret
 
 
 %changelog
+* Tue Jun  2 2026 Remi Collet <remi@remirepo.net> - 8.0.3-1
+- update to 8.0.3
+- raise dependency on sebastian/recursion-context 7.0.1
+
 * Fri Aug 29 2025 Remi Collet <remi@remirepo.net> - 8.0.2-1
 - update to 8.0.2
 

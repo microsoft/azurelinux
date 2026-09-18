@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global	mainver		1.19.1
+%global	mainver		1.19.4
 #%%global	prever		.rc4
 
 %global	baserelease		1
@@ -54,6 +54,9 @@ BuildRequires:	gcc
 BuildRequires:	libxml2-devel
 BuildRequires:	libxslt-devel
 BuildRequires:	ruby-devel
+# gumbo:test
+BuildRequires:	gcc-c++
+BuildRequires:	gtest-devel
 # ruby27 needs this explicitly
 BuildRequires:	rubygem(racc)
 
@@ -122,6 +125,15 @@ sed -i \
 sed -i \
 	gumbo-parser/src/Makefile \
 	-e 's|^\(CFLAGS.*=.*\)$|\1 -fPIC|'
+
+# gumbo:test related
+sed -i \
+	gumbo-parser/Makefile \
+	-e '\@CFLAGS.*:=@s|^\(.*\)$|\1 %build_cflags|' \
+	-e '\@CXXFLAGS.*:=@s|^\(.*\)$|\1 %build_cflags|' \
+	-e 's|-std=c++11|-std=c++17|' \
+	-e '\@gtest_lib.*:=@s|googletest/make/gtest_main.a|%{_libdir}/libgtest_main.so %{_libdir}/libgtest.so|' \
+	%{nil}
 
 %build
 # Ummm...
@@ -205,6 +217,12 @@ popd
 rm -f %{buildroot}%{gem_cache}
 
 %check
+# gumbo:test
+cd gumbo-parser
+make build/run_tests %{?_smp_mflags}
+make check
+cd ..
+
 # Ah....
 # test_exslt(TestXsltTransforms) [./test/test_xslt_transforms.rb:93]
 # fails without TZ on sparc
@@ -236,6 +254,10 @@ if pkg-config --atleast-version 3.2 ruby ; then
 export NOKOGIRI_TEST_GC_LEVEL=major
 fi
 %endif
+
+# Nokogiri 1.19.4: skip on mock environment
+sed -i test/xml/test_schema.rb \
+	-e '\@describe.*CVE-2020-26247@N;s|unless Nokogiri|unless false \&\& Nokogiri|'
 
 env \
 	RUBYLIB=".:lib:test:%{buildroot}%{gem_extdir_mri}" \
@@ -279,6 +301,18 @@ popd
 %doc	%{gem_dir}/doc/%{gem_name}-%{mainver}%{?prever}/
 
 %changelog
+* Sat Jun 20 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.4-1
+- 1.19.4
+
+* Wed Jun 03 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.3-2
+- Execute gumbo testsuite
+
+* Tue Apr 28 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.3-1
+- 1.19.3
+
+* Fri Mar 20 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.2-1
+- 1.19.2
+
 * Tue Feb 17 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.1-1
 - 1.19.1
 

@@ -1,0 +1,121 @@
+From 16c97d4df31a5dee7197e09b89c80d5b978a53bd Mon Sep 17 00:00:00 2001
+From: Martin Wilck <mwilck@suse.com>
+Date: Tue, 13 Feb 2024 18:09:34 +0100
+Subject: [PATCH 1/2] sg_inq: fix missing output fields in --export format
+
+The SCSI_MODEL, SCSI_MODEL_ENC, SCSI_REVISION, and other fields are
+missing in the output of sg_inq with --export:
+
+$ sg_inq /dev/sda
+standard INQUIRY:
+  PQual=0  PDT=0  RMB=0  LU_CONG=0  hot_pluggable=0  version=0x05  [SPC-3]
+  [AERC=0]  [TrmTsk=0]  NormACA=0  HiSUP=0  Resp_data_format=2
+  SCCS=0  ACC=0  TPGS=0  3PC=0  Protect=0  [BQue=0]
+  EncServ=0  MultiP=0  [MChngr=0]  [ACKREQQ=0]  Addr16=0
+  [RelAdr=0]  WBus16=0  Sync=0  [Linked=0]  [TranDis=0]  CmdQue=1
+  [SPI: Clocking=0x0  QAS=0  IUS=0]
+    length=96 (0x60)   Peripheral device type: disk
+ Vendor identification: ATA
+ Product identification: SK hynix SC300 M
+ Product revision level: 0P00
+
+$ sg_inq --export /dev/sda
+SCSI_TPGS=0
+SCSI_TYPE=disk
+SCSI_VENDOR=ATA
+SCSI_VENDOR_ENC=ATA\x20\x20\x20\x20\x20
+
+The reason is that the parameter "len" is overwritten in std_inq_decode().
+Fix it by using block-local variables for calculating field lengths.
+
+Output after applying this patch:
+
+$ sg_inq --export /dev/sda
+SCSI_TPGS=0
+SCSI_TYPE=disk
+SCSI_VENDOR=ATA
+SCSI_VENDOR_ENC=ATA\x20\x20\x20\x20\x20
+SCSI_MODEL=SK_hynix_SC300_M
+SCSI_MODEL_ENC=SK\x20hynix\x20SC300\x20M
+SCSI_REVISION=0P00
+
+Fixes: 0f1230a ("sg_readcap+sg_luns: add --inhex= and json")
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+---
+ src/sg_inq.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/src/sg_inq.c b/src/sg_inq.c
+index b3b8127f..8e6b269d 100644
+--- a/src/sg_inq.c
++++ b/src/sg_inq.c
+@@ -2349,8 +2349,8 @@ std_inq_decode(const uint8_t * rp, int len, struct opts_t * op,
+             if (xtra_buff[i] == 0x09)
+                 xtra_buff[i] = ' ';
+         if (op->do_export) {
+-            len = encode_whitespaces((uint8_t *)xtra_buff, 8);
+-            if (len > 0) {
++            int vlen = encode_whitespaces((uint8_t *)xtra_buff, 8);
++            if (vlen > 0) {
+                 printf("SCSI_VENDOR=%s\n", xtra_buff);
+                 encode_string(xtra_buff, &rp[8], 8);
+                 printf("SCSI_VENDOR_ENC=%s\n", xtra_buff);
+@@ -2364,8 +2364,8 @@ std_inq_decode(const uint8_t * rp, int len, struct opts_t * op,
+             memcpy(xtra_buff, &rp[16], 16);
+             xtra_buff[16] = '\0';
+             if (op->do_export) {
+-                len = encode_whitespaces((uint8_t *)xtra_buff, 16);
+-                if (len > 0) {
++                int mlen = encode_whitespaces((uint8_t *)xtra_buff, 16);
++                if (mlen > 0) {
+                     printf("SCSI_MODEL=%s\n", xtra_buff);
+                     encode_string(xtra_buff, &rp[16], 16);
+                     printf("SCSI_MODEL_ENC=%s\n", xtra_buff);
+@@ -2380,8 +2380,8 @@ std_inq_decode(const uint8_t * rp, int len, struct opts_t * op,
+             memcpy(xtra_buff, &rp[32], 4);
+             xtra_buff[4] = '\0';
+             if (op->do_export) {
+-                len = encode_whitespaces((uint8_t *)xtra_buff, 4);
+-                if (len > 0)
++                int rlen = encode_whitespaces((uint8_t *)xtra_buff, 4);
++                if (rlen > 0)
+                     printf("SCSI_REVISION=%s\n", xtra_buff);
+             } else
+                 sgj_pr_hr(jsp, " Product revision level: %s\n", xtra_buff);
+@@ -2390,8 +2390,8 @@ std_inq_decode(const uint8_t * rp, int len, struct opts_t * op,
+             (' ' != rp[36])) {
+             memcpy(xtra_buff, &rp[36], len < 56 ? len - 36 : 20);
+             if (op->do_export) {
+-                len = encode_whitespaces((uint8_t *)xtra_buff, 20);
+-                if (len > 0)
++                int vlen = encode_whitespaces((uint8_t *)xtra_buff, 20);
++                if (vlen > 0)
+                     printf("VENDOR_SPECIFIC=%s\n", xtra_buff);
+             } else
+                 sgj_pr_hr(jsp, " Vendor specific: %s\n", xtra_buff);
+@@ -2404,9 +2404,9 @@ std_inq_decode(const uint8_t * rp, int len, struct opts_t * op,
+         if ((op->do_vendor > 1) && (len > 96)) {
+             memcpy(xtra_buff, &rp[96], len - 96);
+             if (op->do_export) {
+-                len = encode_whitespaces((uint8_t *)xtra_buff,
++                int vlen = encode_whitespaces((uint8_t *)xtra_buff,
+                                          len - 96);
+-                if (len > 0)
++                if (vlen > 0)
+                     printf("VENDOR_SPECIFIC=%s\n", xtra_buff);
+             } else
+                 sgj_pr_hr(jsp, " Vendor specific: %s\n", xtra_buff);
+@@ -2415,8 +2415,8 @@ std_inq_decode(const uint8_t * rp, int len, struct opts_t * op,
+             (0 == strncmp("OPEN-V", (const char *)&rp[16], 6))) {
+            memcpy(xtra_buff, &rp[212], 32);
+            if (op->do_export) {
+-                len = encode_whitespaces((uint8_t *)xtra_buff, 32);
+-                if (len > 0)
++                int vlen = encode_whitespaces((uint8_t *)xtra_buff, 32);
++                if (vlen > 0)
+                     printf("VENDOR_SPECIFIC_OPEN-V_LDEV_NAME=%s\n", xtra_buff);
+             } else
+                 sgj_pr_hr(jsp, " Vendor specific OPEN-V LDEV Name: %s\n",
+-- 
+2.53.0
+

@@ -1,7 +1,7 @@
---- rustls-0.23.36/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ rustls-0.23.36/Cargo.toml	2026-01-25T08:58:28.597831+00:00
+--- rustls-0.23.43/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rustls-0.23.43/Cargo.toml	2026-07-30T12:45:19.690933+00:00
 @@ -54,13 +54,6 @@
- ]
+ enum_no_repr_variant_discriminant_changed = "warn"
  
  [features]
 -aws-lc-rs = ["aws_lc_rs"]
@@ -35,7 +35,7 @@
  read_buf = [
      "rustversion",
      "std",
-@@ -105,25 +91,14 @@
+@@ -105,17 +91,6 @@
  name = "test_ca"
  path = "examples/internal/test_ca.rs"
  
@@ -51,26 +51,9 @@
 -default-features = false
 -
  [dependencies.brotli]
--version = "8"
-+version = ">=7,<9"
+ version = "8"
  features = ["std"]
- optional = true
- default-features = false
- 
- [dependencies.brotli-decompressor]
--version = "5.0.0"
-+version = ">=4,<6"
- optional = true
- 
- [dependencies.hashbrown]
-@@ -170,15 +145,12 @@
- version = "1.8"
- 
- [dependencies.zlib-rs]
--version = "0.5"
-+version = "0.6"
- optional = true
- 
+@@ -176,9 +151,6 @@
  [dev-dependencies.base64]
  version = "0.22"
  

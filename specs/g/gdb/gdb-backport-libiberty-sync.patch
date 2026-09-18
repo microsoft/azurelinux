@@ -1,0 +1,616 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <aburgess@redhat.com>
+Date: Thu, 14 May 2026 09:22:42 +0000
+Subject: gdb-backport-libiberty-sync.patch
+
+;; Backport of upstream commit be3a9405ceb4d6d6 to fix RHBZ 2368350, an
+;; out of memory issue with the D demangler.
+;;
+;; The commit being pulled in here is a commit that syncs multiple
+;; commits to libiberty from gcc to binutils-gdb.  Most of these commits
+;; are spelling and white space fixes, which should have no real impact.
+;; The only commit we actually care about is gcc commit bc4d9b6aeb3,
+;; which fixes the D demangler issue.
+;;
+;; This commit will not be needed once we rebase to GDB 18.
+
+libiberty: sync with gcc commit df3510f80e7c02d9
+
+Sync the libiberty/ directory with gcc commit
+df3510f80e7c02d9c19d7cb33759cd925880f53a.  This pulls in the following
+gcc commits and the associated updates to 'libiberty/ChangeLog':
+
+  * 06fb00cb66d libiberty: Fix typos in various files
+  * fbf903e5b9f Re-flow lines made longer than 80 characters by typo fixes
+  * cfb945957ee Regenerate some autoconf configure scripts after recent spelling fixes.
+  * bc4d9b6aeb3 libiberty: avoid exponential back reference issue in D demangler
+
+I have retained the changes that are in the following binutils-gdb
+commit, which are not in gcc:
+
+  commit 219822fd5db6305592b45677a3b38c02b523360e
+  Date:   Tue Apr 9 06:39:21 2024 -0700
+
+    mmap: Avoid the sanitizer configure check failure
+
+diff --git a/libiberty/ChangeLog b/libiberty/ChangeLog
+--- a/libiberty/ChangeLog
++++ b/libiberty/ChangeLog
+@@ -1,3 +1,62 @@
++2026-06-07  Andrew Burgess  <aburgess@redhat.com>
++
++	* d-demangle.c (struct dlang_info::options): New field,
++	carries options passed to the demangler.
++	(struct dlang_info::num_backrefs): Count total number of back
++	referenced types that have been processed.
++	(struct dlang_info::backref_depth): Count the depth of
++	recursive back references.
++	(dlang_type_backref): Track recursive back reference depth,
++	and the total number of back references encountered.  Bail out
++	early if the total number gets too high.
++	(dlang_demangle_init_info): Initialise new 'struct dlang_info'
++	fields.
++	(dlang_demangle): Pass demangler options to
++	dlang_demangle_init_info.
++	* testsuite/d-demangle-expected: Add new test.
++
++2026-06-01  Jakub Jelinek  <jakub@redhat.com>
++
++	* configure: Regenerate.
++
++2026-05-30  Dhruv Chawla  <dhruvc@nvidia.com>
++
++	* simple-object-mach-o.c (simple_object_mach_o_write_segment): Reflow
++	long line.
++
++2026-05-30  Dhruv Chawla  <dhruvc@nvidia.com>
++
++	* bcopy.c: Fix typos.
++	* bsearch.c: Likewise.
++	* bsearch_r.c: Likewise.
++	* configure.ac: Likewise.
++	* cp-demangle.c (d_print_comp_inner): Likewise.
++	(d_print_comp): Likewise.
++	* d-demangle.c (dlang_identifier): Likewise.
++	* dyn-string.c: Likewise.
++	* ldirname.c: Likewise.
++	* make-relative-prefix.c (make_relative_prefix_1): Likewise.
++	* obstacks.texi: Likewise.
++	* pex-win32.c (argv_to_cmdline): Likewise.
++	(spawn_script): Likewise.
++	* random.c (random): Likewise.
++	(setstate): Likewise.
++	* regex.c (WIDE_CHAR_SUPPORT): Likewise.
++	(convert_mbs_to_wcs): Likewise.
++	(PREFIX): Likewise.
++	(wcs_compile_range): Likewise.
++	(count_mbs_length): Likewise.
++	(wcs_re_match_2_internal): Likewise.
++	(byte_re_match_2_internal): Likewise.
++	* sigsetmask.c: Likewise.
++	* simple-object-elf.c (SHT_SYMTAB_SHNDX): Likewise.
++	(STV_HIDDEN): Likewise.
++	(simple_object_elf_copy_lto_debug_sections): Likewise.
++	* simple-object-mach-o.c (struct mach_o_header_32): Likewise.
++	(struct mach_o_header_64): Likewise.
++	(simple_object_mach_o_write_segment): Likewise.
++	* strsignal.c (defined): Likewise.
++
+ 2025-08-06  Matthieu Longo  <matthieu.longo@arm.com>
+ 
+ 	* testsuite/test-doubly-linked-list.c: disable debug logging on
+diff --git a/libiberty/bcopy.c b/libiberty/bcopy.c
+--- a/libiberty/bcopy.c
++++ b/libiberty/bcopy.c
+@@ -1,4 +1,4 @@
+-/* bcopy -- copy memory regions of arbitary length
++/* bcopy -- copy memory regions of arbitrary length
+ 
+ @deftypefn Supplemental void bcopy (char *@var{in}, char *@var{out}, int @var{length})
+ 
+diff --git a/libiberty/bsearch.c b/libiberty/bsearch.c
+--- a/libiberty/bsearch.c
++++ b/libiberty/bsearch.c
+@@ -60,7 +60,7 @@ is respectively less than, matching, or greater than the array member.
+  * is odd, moving left simply involves halving lim: e.g., when lim
+  * is 5 we look at item 2, so we change lim to 2 so that we will
+  * look at items 0 & 1.  If lim is even, the same applies.  If lim
+- * is odd, moving right again involes halving lim, this time moving
++ * is odd, moving right again involves halving lim, this time moving
+  * the base up one item past p: e.g., when lim is 5 we change base
+  * to item 3 and make lim 2 so that we will look at items 3 and 4.
+  * If lim is even, however, we have to shrink it by one before
+diff --git a/libiberty/bsearch_r.c b/libiberty/bsearch_r.c
+--- a/libiberty/bsearch_r.c
++++ b/libiberty/bsearch_r.c
+@@ -61,7 +61,7 @@ is respectively less than, matching, or greater than the array member.
+  * is odd, moving left simply involves halving lim: e.g., when lim
+  * is 5 we look at item 2, so we change lim to 2 so that we will
+  * look at items 0 & 1.  If lim is even, the same applies.  If lim
+- * is odd, moving right again involes halving lim, this time moving
++ * is odd, moving right again involves halving lim, this time moving
+  * the base up one item past p: e.g., when lim is 5 we change base
+  * to item 3 and make lim 2 so that we will look at items 3 and 4.
+  * If lim is even, however, we have to shrink it by one before
+diff --git a/libiberty/configure b/libiberty/configure
+--- a/libiberty/configure
++++ b/libiberty/configure
+@@ -5967,7 +5967,7 @@ _ACEOF
+ 
+ 
+ 
+-# Check for presense of long long
++# Check for presence of long long
+ ac_fn_c_check_type "$LINENO" "long long" "ac_cv_type_long_long" "$ac_includes_default"
+ if test "x$ac_cv_type_long_long" = xyes; then :
+ 
+diff --git a/libiberty/configure.ac b/libiberty/configure.ac
+--- a/libiberty/configure.ac
++++ b/libiberty/configure.ac
+@@ -302,7 +302,7 @@ AC_CHECK_SIZEOF([int])
+ AC_CHECK_SIZEOF([long])
+ AC_CHECK_SIZEOF([size_t])
+ 
+-# Check for presense of long long
++# Check for presence of long long
+ AC_CHECK_TYPE([long long],
+   [AC_DEFINE(HAVE_LONG_LONG, 1, [Define if you have the `long long' type.]) AC_CHECK_SIZEOF([long long])],
+   [])
+diff --git a/libiberty/cp-demangle.c b/libiberty/cp-demangle.c
+--- a/libiberty/cp-demangle.c
++++ b/libiberty/cp-demangle.c
+@@ -82,7 +82,7 @@
+ 
+    IN_GLIBCPP_V3
+       If defined, this file defines only __cxa_demangle() and
+-      __gcclibcxx_demangle_callback(), and no other publically visible
++      __gcclibcxx_demangle_callback(), and no other publicly visible
+       functions or variables.
+ 
+    STANDALONE_DEMANGLER
+@@ -5549,7 +5549,7 @@ d_print_comp_inner (struct d_print_info *dpi, int options,
+ 		const struct d_component_stack *dcse;
+ 		int found_self_or_parent = 0;
+ 
+-		/* This traversal is reentering SUB as a substition.
++		/* This traversal is reentering SUB as a substitution.
+ 		   If we are not beneath SUB or DC in the tree then we
+ 		   need to restore SUB's template stack temporarily.  */
+ 		for (dcse = dpi->component_stack; dcse != NULL;
+@@ -6341,7 +6341,7 @@ d_print_comp (struct d_print_info *dpi, int options,
+   dpi->recursion--;
+ }
+ 
+-/* Print a Java dentifier.  For Java we try to handle encoded extended
++/* Print a Java identifier.  For Java we try to handle encoded extended
+    Unicode characters.  The C++ ABI doesn't mention Unicode encoding,
+    so we don't it for C++.  Characters are encoded as
+    __U<hex-char>+_.  */
+diff --git a/libiberty/d-demangle.c b/libiberty/d-demangle.c
+--- a/libiberty/d-demangle.c
++++ b/libiberty/d-demangle.c
+@@ -175,8 +175,33 @@ struct dlang_info
+ {
+   /* The string we are demangling.  */
+   const char *s;
++
++  /* The options passed to the demangler.  */
++  int options;
++
+   /* The index of the last back reference.  */
+   int last_backref;
++
++  /* The total number of back referenced types, including nested back
++     referenced types.  This is reset to zero each time a back
++     reference is processed at the "top level" (i.e. not a nested back
++     reference).
++
++     Cases have been encountered where a back reference type includes
++     references to other back reference types, which include further
++     back references.  This was observed to a depth of 57.  If each
++     layer only references the layer before twice then the innermost
++     string will be duplicated 2^57 times!
++
++     We count the number of nested back references and compare this to
++     the recursion limit, even though this isn't strictly recursion.  */
++  int num_backrefs;
++
++  /* Track the depth of back references.  Depth 0 is considered the
++     top level.  When we encounter a back reference at this depth the
++     NUM_BACKREFS field is reset to 0.  At greater depths,
++     NUM_BACKREFS will be incremented.  */
++  int backref_depth;
+ };
+ 
+ /* Pass as the LEN to dlang_parse_template if symbol length is not known.  */
+@@ -411,6 +436,24 @@ dlang_type_backref (string *decl, const char *mangled, struct dlang_info *info,
+   if (mangled - info->s >= info->last_backref)
+     return NULL;
+ 
++  /* A back reference might point to a type that itself contains back
++     references, which might themselves contain back references.
++     There might not be recursion going on, but we can run into
++     problems of exponential growth caused by the inner type appearing
++     to be referenced 10s of millions of times.  */
++  if (info->backref_depth > 0)
++    {
++      if ((info->options & DMGL_NO_RECURSE_LIMIT) == 0
++	  && info->num_backrefs > DEMANGLE_RECURSION_LIMIT)
++	return NULL;
++
++      info->num_backrefs++;
++    }
++  else
++    info->num_backrefs = 0;
++
++  info->backref_depth++;
++
+   int save_refpos = info->last_backref;
+   info->last_backref = mangled - info->s;
+ 
+@@ -424,6 +467,7 @@ dlang_type_backref (string *decl, const char *mangled, struct dlang_info *info,
+     backref = dlang_type (decl, backref, info);
+ 
+   info->last_backref = save_refpos;
++  info->backref_depth--;
+ 
+   if (backref == NULL)
+     return NULL;
+@@ -1067,7 +1111,7 @@ dlang_identifier (string *decl, const char *mangled, struct dlang_info *info)
+ }
+ 
+ /* Extract the plain identifier from MANGLED and prepend/append it to DECL
+-   with special treatment for some magic compiler generted symbols.
++   with special treatment for some magic compiler generated symbols.
+    Return the remaining string on success or NULL on failure.  */
+ static const char *
+ dlang_lname (string *decl, const char *mangled, unsigned long len)
+@@ -1931,17 +1975,20 @@ dlang_parse_template (string *decl, const char *mangled,
+ /* Initialize the information structure we use to pass around information.  */
+ static void
+ dlang_demangle_init_info (const char *mangled, int last_backref,
+-			  struct dlang_info *info)
++			  int options, struct dlang_info *info)
+ {
+   info->s = mangled;
++  info->options = options;
+   info->last_backref = last_backref;
++  info->num_backrefs = 0;
++  info->backref_depth = 0;
+ }
+ 
+ /* Extract and demangle the symbol in MANGLED.  Returns the demangled
+    signature on success or NULL on failure.  */
+ 
+ char *
+-dlang_demangle (const char *mangled, int option ATTRIBUTE_UNUSED)
++dlang_demangle (const char *mangled, int options)
+ {
+   string decl;
+   char *demangled = NULL;
+@@ -1962,7 +2009,7 @@ dlang_demangle (const char *mangled, int option ATTRIBUTE_UNUSED)
+     {
+       struct dlang_info info;
+ 
+-      dlang_demangle_init_info (mangled, strlen (mangled), &info);
++      dlang_demangle_init_info (mangled, strlen (mangled), options, &info);
+       mangled = dlang_parse_mangle (&decl, mangled, &info);
+ 
+       /* Check that the entire symbol was successfully demangled.  */
+diff --git a/libiberty/dyn-string.c b/libiberty/dyn-string.c
+--- a/libiberty/dyn-string.c
++++ b/libiberty/dyn-string.c
+@@ -49,8 +49,8 @@ Boston, MA 02110-1301, USA.  */
+    function can be used with a dyn_string struct on the stack or
+    embedded in another object.  The contents of the string itself
+    are still dynamically allocated.  The string initially is capable
+-   of holding at least SPACE characeters, including the terminating
+-   NUL.  If SPACE is 0, it will silently be increated to 1.  
++   of holding at least SPACE characters, including the terminating
++   NUL.  If SPACE is 0, it will silently be increased to 1.  
+ 
+    If RETURN_ON_ALLOCATION_FAILURE is defined and memory allocation
+    fails, returns 0.  Otherwise returns 1.  */
+diff --git a/libiberty/ldirname.c b/libiberty/ldirname.c
+--- a/libiberty/ldirname.c
++++ b/libiberty/ldirname.c
+@@ -26,7 +26,7 @@ Given a pointer to a string containing a typical pathname
+ (@samp{/usr/src/cmd/ls/ls.c} for example), returns a string containing the
+ passed string up to, but not including, the final directory separator.
+ 
+-If the given pathname doesn't contain a directory separator then this funtion
++If the given pathname doesn't contain a directory separator then this function
+ returns the empty string; this includes an empty given pathname.  @code{NULL}
+ is returned on memory allocation error.
+ 
+diff --git a/libiberty/make-relative-prefix.c b/libiberty/make-relative-prefix.c
+--- a/libiberty/make-relative-prefix.c
++++ b/libiberty/make-relative-prefix.c
+@@ -410,7 +410,7 @@ make_relative_prefix_1 (const char *progname, const char *bin_prefix,
+ /* Do the full job, including symlink resolution.
+    This path will find files installed in the same place as the
+    program even when a soft link has been made to the program
+-   from somwhere else. */
++   from somewhere else. */
+ 
+ char *
+ make_relative_prefix (const char *progname, const char *bin_prefix,
+diff --git a/libiberty/obstacks.texi b/libiberty/obstacks.texi
+--- a/libiberty/obstacks.texi
++++ b/libiberty/obstacks.texi
+@@ -695,7 +695,7 @@ Initialize use of an obstack, with an initial chunk of
+ @var{chunk_size} bytes.
+ 
+ @item int obstack_specify_allocation (struct obstack *@var{obstack-ptr}, size_t chunk_size, size_t alignment, void *(*chunkfun) (size_t), void (*freefun) (void *))
+-Initialize use of an obstack, specifying intial chunk size, chunk
++Initialize use of an obstack, specifying initial chunk size, chunk
+ alignment, and memory allocation functions.
+ 
+ @item int obstack_specify_allocation_with_arg (struct obstack *@var{obstack-ptr}, size_t chunk_size, size_t alignment, void *(*chunkfun) (void *, size_t), void (*freefun) (void *, void *), void *arg)
+diff --git a/libiberty/pex-win32.c b/libiberty/pex-win32.c
+--- a/libiberty/pex-win32.c
++++ b/libiberty/pex-win32.c
+@@ -350,7 +350,7 @@ argv_to_cmdline (char *const *argv)
+       /* We only quote arguments that contain spaces, \t or " characters to
+ 	 prevent wasting 2 chars per argument of the CreateProcess 32k char
+ 	 limit.  We need only escape embedded double-quotes and immediately
+-	 preceeding backslash characters.  A sequence of backslach characters
++	 preceding backslash characters.  A sequence of backslach characters
+ 	 that is not followed by a double quote character will not be
+ 	 escaped.  */
+       needs_quotes = 0;
+@@ -363,7 +363,7 @@ argv_to_cmdline (char *const *argv)
+ 
+ 	  if (argv[i][j] == '"')
+ 	    {
+-	      /* Escape preceeding backslashes.  */
++	      /* Escape preceding backslashes.  */
+ 	      for (k = j - 1; k >= 0 && argv[i][k] == '\\'; k--)
+ 		cmdline_len++;
+ 	      /* Escape the quote character.  */
+@@ -695,7 +695,7 @@ spawn_script (struct pex_obj *obj,
+   int fd = _open (executable, _O_RDONLY);
+ 
+   /* Try to open script, check header format, extract interpreter path,
+-     and spawn script using that interpretter. */
++     and spawn script using that interpreter. */
+   if (fd >= 0)
+     {
+       char buf[MAX_PATH + 5];
+diff --git a/libiberty/random.c b/libiberty/random.c
+--- a/libiberty/random.c
++++ b/libiberty/random.c
+@@ -88,7 +88,7 @@ long int random (void);
+    then initialized to contain information for random number generation with
+    that much state information.  Good sizes for the amount of state
+    information are 32, 64, 128, and 256 bytes.  The state can be switched by
+-   calling the setstate() function with the same array as was initiallized
++   calling the setstate() function with the same array as was initialized
+    with initstate().  By default, the package runs with 128 bytes of state
+    information and generates far better random numbers than a linear
+    congruential generator.  If the amount of state information is less than
+@@ -362,7 +362,7 @@ setstate (void *arg_state)
+ 
+ /* If we are using the trivial TYPE_0 R.N.G., just do the old linear
+    congruential bit.  Otherwise, we do our fancy trinomial stuff, which is the
+-   same in all ther other cases due to all the global variables that have been
++   same in all the other cases due to all the global variables that have been
+    set up.  The basic operation is to add the number at the rear pointer into
+    the one at the front pointer.  Then both pointers are advanced to the next
+    location cyclically in the table.  The value returned is the sum generated,
+diff --git a/libiberty/regex.c b/libiberty/regex.c
+--- a/libiberty/regex.c
++++ b/libiberty/regex.c
+@@ -58,7 +58,7 @@
+ 
+ # define WIDE_CHAR_SUPPORT (HAVE_WCTYPE_H && HAVE_WCHAR_H && HAVE_BTOWC)
+ 
+-/* For platform which support the ISO C amendement 1 functionality we
++/* For platform which support the ISO C amendment 1 functionality we
+    support user defined character classes.  */
+ # if defined _LIBC || WIDE_CHAR_SUPPORT
+ /* Solaris 2.5 has a bug: <wchar.h> must be included before <wctype.h>.  */
+@@ -1235,7 +1235,7 @@ printchar (int c)
+ 
+ # ifdef WCHAR
+ /* This  convert a multibyte string to a wide character string.
+-   And write their correspondances to offset_buffer(see below)
++   And write their correspondences to offset_buffer(see below)
+    and write whether each wchar_t is binary data to is_binary.
+    This assume invalid multibyte sequences as binary data.
+    We assume offset_buffer and is_binary is already allocated
+@@ -1247,7 +1247,7 @@ static size_t convert_mbs_to_wcs (CHAR_T *dest, const unsigned char* src,
+ static size_t
+ convert_mbs_to_wcs (CHAR_T *dest, const unsigned char*src, size_t len,
+                     int *offset_buffer, char *is_binary)
+-     /* It hold correspondances between src(char string) and
++     /* It hold correspondences between src(char string) and
+ 	dest(wchar_t string) for optimization.
+ 	e.g. src  = "xxxyzz"
+              dest = {'X', 'Y', 'Z'}
+@@ -1281,7 +1281,7 @@ convert_mbs_to_wcs (CHAR_T *dest, const unsigned char*src, size_t len,
+ 
+       if (consumed <= 0)
+ 	/* failed to convert. maybe src contains binary data.
+-	   So we consume 1 byte manualy.  */
++	   So we consume 1 byte manually.  */
+ 	{
+ 	  *pdest = *psrc;
+ 	  consumed = 1;
+@@ -2174,7 +2174,7 @@ typedef struct
+ # ifndef DEFINED_ONCE
+ #  if defined _LIBC || WIDE_CHAR_SUPPORT
+ /* The GNU C library provides support for user-defined character classes
+-   and the functions from ISO C amendement 1.  */
++   and the functions from ISO C amendment 1.  */
+ #   ifdef CHARCLASS_NAME_MAX
+ #    define CHAR_CLASS_MAX_LENGTH CHARCLASS_NAME_MAX
+ #   else
+@@ -3416,7 +3416,7 @@ PREFIX(regex_compile) (const char *ARG_PREFIX(pattern),
+ 				  int32_t idx2 = table[ch];
+ 				  size_t len = weights[idx2];
+ 
+-				  /* Test whether the lenghts match.  */
++				  /* Test whether the lengths match.  */
+ 				  if (weights[idx] == len)
+ 				    {
+ 				      /* They do.  New compare the bytes of
+@@ -4389,7 +4389,7 @@ wcs_compile_range (CHAR_T range_start_char, const CHAR_T **p_ptr,
+ 	{
+ 	  /* range_start is a collating symbol.  */
+ 	  int32_t *wextra;
+-	  /* Retreive the index and get collation sequence value.  */
++	  /* Retrieve the index and get collation sequence value.  */
+ 	  wextra = (int32_t*)(extra + char_set[-range_start_char]);
+ 	  start_val = wextra[1 + *wextra];
+ 	}
+@@ -5502,7 +5502,7 @@ count_mbs_length(int *offset_buffer, int length)
+     return 0;
+ 
+   /* If there are no multibyte character, offset_buffer[i] == i.
+-   Optmize for this case.  */
++   Optimize for this case.  */
+   if (offset_buffer[length] == length)
+     return length;
+ 
+@@ -5538,7 +5538,7 @@ wcs_re_match_2_internal (struct re_pattern_buffer *bufp,
+ 			 struct re_registers *regs,
+                          int stop,
+      /* string1 == string2 == NULL means string1/2, size1/2 and
+-	mbs_offset1/2 need seting up in this function.  */
++	mbs_offset1/2 need setting up in this function.  */
+      /* We need wchar_t* buffers correspond to cstring1, cstring2.  */
+                          wchar_t *string1, int size1,
+                          wchar_t *string2, int size2,
+@@ -5739,7 +5739,7 @@ byte_re_match_2_internal (struct re_pattern_buffer *bufp,
+      fill them with converted string.  */
+   if (string1 == NULL && string2 == NULL)
+     {
+-      /* We need seting up buffers here.  */
++      /* We need setting up buffers here.  */
+ 
+       /* We must free wcs buffers in this function.  */
+       cant_free_wcs_buf = 0;
+diff --git a/libiberty/sigsetmask.c b/libiberty/sigsetmask.c
+--- a/libiberty/sigsetmask.c
++++ b/libiberty/sigsetmask.c
+@@ -1,7 +1,7 @@
+ /* Version of sigsetmask.c
+    Written by Steve Chamberlain (sac@cygnus.com).
+    Contributed by Cygnus Support.
+-   This file is in the public doamin. */
++   This file is in the public domain. */
+ 
+ /*
+ 
+diff --git a/libiberty/simple-object-elf.c b/libiberty/simple-object-elf.c
+--- a/libiberty/simple-object-elf.c
++++ b/libiberty/simple-object-elf.c
+@@ -198,7 +198,7 @@ typedef struct {
+ #define SHT_RELA	4		/* Relocation entries with addends */
+ #define SHT_REL		9		/* Relocation entries, no addends */
+ #define SHT_GROUP	17		/* Section contains a section group */
+-#define SHT_SYMTAB_SHNDX 18		/* Extended section indeces */
++#define SHT_SYMTAB_SHNDX 18		/* Extended section indices */
+ 
+ /* Values for sh_flags field.  */
+ 
+@@ -246,7 +246,7 @@ typedef struct
+ #define STB_WEAK	2	/* Weak global */
+ 
+ #define STV_DEFAULT	0	/* Visibility is specified by binding type */
+-#define STV_HIDDEN	2	/* Can only be seen inside currect component */
++#define STV_HIDDEN	2	/* Can only be seen inside current component */
+ 
+ /* Functions to fetch and store different ELF types, depending on the
+    endianness and size.  */
+@@ -1512,7 +1512,7 @@ simple_object_elf_copy_lto_debug_sections (simple_object_read *sobj,
+ 		 of __gnu_lto_slim symbol.  */
+ 	      if (st_shndx == SHN_COMMON)
+ 		discard = 1;
+-	      /* We also need to remove symbols refering to sections
++	      /* We also need to remove symbols referring to sections
+ 		 we'll eventually remove as with fat LTO objects
+ 		 we otherwise get duplicate symbols at final link
+ 		 (with GNU ld, gold is fine and ignores symbols in
+diff --git a/libiberty/simple-object-mach-o.c b/libiberty/simple-object-mach-o.c
+--- a/libiberty/simple-object-mach-o.c
++++ b/libiberty/simple-object-mach-o.c
+@@ -53,7 +53,7 @@ struct mach_o_header_32
+   unsigned char filetype[4];	/* Type of file.  */
+   unsigned char ncmds[4];	/* Number of load commands.  */
+   unsigned char sizeofcmds[4];	/* Total size of load commands.  */
+-  unsigned char flags[4];	/* Flags for special featues.  */
++  unsigned char flags[4];	/* Flags for special features.  */
+ };
+ 
+ /* Mach-O header (64-bit version).  */
+@@ -66,7 +66,7 @@ struct mach_o_header_64
+   unsigned char filetype[4];	/* Type of file.  */
+   unsigned char ncmds[4];	/* Number of load commands.  */
+   unsigned char sizeofcmds[4];	/* Total size of load commands.  */
+-  unsigned char flags[4];	/* Flags for special featues.  */
++  unsigned char flags[4];	/* Flags for special features.  */
+   unsigned char reserved[4];	/* Reserved.  Duh.  */
+ };
+ 
+@@ -1204,8 +1204,8 @@ simple_object_mach_o_write_segment (simple_object_write *sobj, int descriptor,
+       unsigned int i;
+ 
+       /* Write the section header for the wrapper.  */
+-      /* Account for any initial aligment - which becomes the alignment for this
+-	 created section.  */
++      /* Account for any initial alignment - which becomes the alignment for
++	 this created section.  */
+ 
+       secsize = (offset - index[0]);
+       if (!simple_object_mach_o_write_section_header (sobj, descriptor,
+@@ -1218,7 +1218,7 @@ simple_object_mach_o_write_segment (simple_object_write *sobj, int descriptor,
+ 						      errmsg, err))
+ 	return 0;
+ 
+-      /* Subtract the wrapper section start from the begining of each sub
++      /* Subtract the wrapper section start from the beginning of each sub
+ 	 section.  */
+ 
+       for (i = 1; i < nsects_in; ++i)
+diff --git a/libiberty/strsignal.c b/libiberty/strsignal.c
+--- a/libiberty/strsignal.c
++++ b/libiberty/strsignal.c
+@@ -152,7 +152,7 @@ static const struct signal_info signal_table[] =
+ #endif
+ #if defined (SIGIO)
+   /* "I/O pending" has also been suggested, but is misleading since the
+-     signal only happens when the process has asked for it, not everytime
++     signal only happens when the process has asked for it, not every time
+      I/O is pending. */
+   ENTRY(SIGIO, "SIGIO", "I/O possible"),
+ #endif
+@@ -208,7 +208,7 @@ static const struct signal_info signal_table[] =
+   ENTRY(SIGGRANT, "SIGGRANT", "Monitor mode granted"),
+ #endif
+ #if defined (SIGRETRACT)
+-  ENTRY(SIGRETRACT, "SIGRETRACT", "Need to relinguish monitor mode"),
++  ENTRY(SIGRETRACT, "SIGRETRACT", "Need to relinquish monitor mode"),
+ #endif
+ #if defined (SIGMSG)
+   ENTRY(SIGMSG, "SIGMSG", "Monitor mode data available"),
+diff --git a/libiberty/testsuite/d-demangle-expected b/libiberty/testsuite/d-demangle-expected
+--- a/libiberty/testsuite/d-demangle-expected
++++ b/libiberty/testsuite/d-demangle-expected
+@@ -1475,3 +1475,15 @@ demangle.anonymous.foo
+ --format=auto
+ _D8demangle9anonymous03fooZ
+ demangle.anonymous.foo
++#
++# This symbol was seen in the wild.  It has a pattern of back
++# references that result in exponential growth, with the innermost
++# type being referenced 10s of millions of times.  We use the
++# demangler's recursion limit to place a hard cap on back reference
++# usage, which causes the demangler to safely bail out before
++# consuming an excessive amount of memory.  Trying to demangle this
++# without the recursion limit in place will eventually cause the OOM
++# killer to kick in.
++--format=dlang
++_D3std6format5write__T14formattedWriteTDFAxaZvTaTS2ae5utils4text7functor__T13stringifiableTSQBqQBqQBi10primitives__TQCaSQCsQCsQCk11composition__T3seqTSQDxQDxQDpQCh__TQDySQEqQEqQEnQEl__T17formattingFunctorVAyaa2_2573Vii250TQrZ15__lambda_L40_C3TQBmZ7FunctorTSQHzQHzQHrQGj__TQIaSQIsQIsQIpQIn__TQEcVQDma2_2573Vii250TSQKdQKdQKaQJy__TQJtTSQKxQKxQKpQJh__TQKyS4btdu2ui6curses6Curses4Wand__T8withAttrTSQNfQNfQNcQNa__TQMvTSQNzQNzQNrQMj__TQOaSQOsQOsQOkQMa__T6selectTSQPqQPqQPiQOa__TQPrSQQjQQjQQbQOt__T12valueFunctorTbZQrFbZ17__lambda_L143_C57TbZQLbTSQSvQSvQSnQRf__TQSwSQToQToQTlQTj__T5fmtIfVQOlnTbTPFNaNbNiNfZQPdTSQVhQVhQUzQTr__TQViSQKkQKi7browser7Browser6updateMFZ__T17__lambda_L1185_C4TQSeTSQYiQYiQYfQYd__TQXyTSQZcQZcQYuQXm__TQZdSQZvQZvQZnQXd__TQLdTQKzTSQBAtQBAuQBAnQZg__TQBAxSQBBqQBBrQBBpQBBo__TQIgVQWonTbTSQBCvQBCwQBCpQBBi__TQBDaSQBDtQBDuQBDnQBCg__TQNoTSQBErQBEsQBEqQBEp__TQBElTSQBFqQBFrQBFkQBEd__TQBFvSQBGoQBGpQBGiQBDz__TQBDqTSQBHnQBHoQBHhQBGa__TQBHsSQBIlQBImQBIkQBIj__TQBDzVQBDka2_2573Vii250TSQBKcQBKdQBKbQBKa__TQBJwTSQBLbQBLcQBKvQBJo__TQBLgSQBAjQBAiQBAjQBAgQBAd__TQBAcTQBHcTSQBNhQBNiQBNgQBNf__TQBNbTSQBOgQBOhQBOaQBMt__TQBOlSQBDoQBDnQBDoQBDlQBDi__TQBDhTQBKhZQBDrMFEQBFcQBFbQBFcQBEzQBEw9AttributebKQBLzZ19__lambda_L503_C20_1TPSQBHlQBHkQBHlQBHiQBHfTQDfTbTSQBUdQBUeQBUcQBUb__TQBTxTSQBVcQBVdQBUwQBTp__TQBVhSQBWaQBWbQBVuQBTl__TQBTcTQBTcZ3funTQBTmZQBPyZQBWtFQCwZ13StringifiableZQBRcZQBXxFQKwZQBeTQBTkZQBMuMFQJdbQBTzQMwQBUgZ17__lambda_L503_C20TQIfTQKrTbTSQCBpQCBqQCBoQCBn__TQCBjTSQCCoQCCpQCCiQCBb__TQCCtSQCDmQCDnQCDgQCAx__TQCAoTQCAoTSQCEqQCErQCEkQCDd__TQCEvSQCFoQCFpQCFnQCFm__TQCBcVQCAna2_2573Vii250TQTyZ17__lambda_L40_C3_1TQUwZQCArTQCEpZQLnTQCEyTQEkTQCFhZQCBtZQCIoFQHfZQLvZQCClZQCJgFQZkZQMnZ17__lambda_L40_C3_3TQBBlZQCEcTQCIaTQBEpZQPdTQBEyTQCItTQBFiZQCFkZQCMfFQBHuZQPnZQBWuFQBJhZ19__lambda_L143_C57_1TQBKiZQCHoTSQCPjQCPkQCPdQCNw__TQCPoSQCQhQCQiQCQbQCOu__TQCAcTQBHeZQCAmFQBHoZ19__lambda_L143_C57_2TQBIpZQCLgZQBYxFNibQBQoQEeZQWnTQBRaZQCMkTSQCUfQCUgQCTzQCSs__TQCUkSQCVdQCVeQCVcQCVb__TQCBtVQCQcnTbTQBTpTQHgZQCCpFNibQBUgQHwZQBAfTQIfZQCQcZQBAtTQCImTQBXoTQEhZQCRaZQCXvFQBZyZQBBdZQCCaMFQCTqQCBmbSQCOjQCOiQCEbQCDx13ScrollContextPSQCPq5paths11BrowserPathZ20__lambda_L1195_C76_1TQBxZQCVqZQCJhFNibQCJbQCIqZQBGyTQCJpZQCWwTSQDErQDEsQDElQDDe__TQDEwSQDFpQDFqQDFoQDFn__TQCMfVQDAonTbTQCMeTQCLuZQCNcFNibQCMwQCMlZQBKtTQCMvZQDArZQBLiTQCTbTQCQbTQEkZQDBpZQDIkFQCVqZQBLsZQCXeMFQBTnbQCXfZ19__lambda_L503_C20_2TQBSlTQBUyTbTSQDLxQDLyQDLwQDLv__TQDLrTSQDMwQDMxQDMqQDLj__TQDNbSQDNuQDNvQDNoQDLf__TQDKwTSQDOtQDOuQDOnQDNg__TQDOySQDPrQDPsQDPqQDPp__TQDLfVQDKqa2_2573Vii250TQDEdZ17__lambda_L40_C3_7TQDFcZQDKwZQBVnTQEdZQDLkZQDSfFQGoZQBVmZQDMdZQDSyFQDJgZQBWgZ17__lambda_L40_C3_8TQDLeZQDNwZQBYnTQDRzTQDOcZQDOqZQDVlFQDVaZQBYtZQDYbFKQDXqMxAaQDXoZk
++_D3std6format5write__T14formattedWriteTDFAxaZvTaTS2ae5utils4text7functor__T13stringifiableTSQBqQBqQBi10primitives__TQCaSQCsQCsQCk11composition__T3seqTSQDxQDxQDpQCh__TQDySQEqQEqQEnQEl__T17formattingFunctorVAyaa2_2573Vii250TQrZ15__lambda_L40_C3TQBmZ7FunctorTSQHzQHzQHrQGj__TQIaSQIsQIsQIpQIn__TQEcVQDma2_2573Vii250TSQKdQKdQKaQJy__TQJtTSQKxQKxQKpQJh__TQKyS4btdu2ui6curses6Curses4Wand__T8withAttrTSQNfQNfQNcQNa__TQMvTSQNzQNzQNrQMj__TQOaSQOsQOsQOkQMa__T6selectTSQPqQPqQPiQOa__TQPrSQQjQQjQQbQOt__T12valueFunctorTbZQrFbZ17__lambda_L143_C57TbZQLbTSQSvQSvQSnQRf__TQSwSQToQToQTlQTj__T5fmtIfVQOlnTbTPFNaNbNiNfZQPdTSQVhQVhQUzQTr__TQViSQKkQKi7browser7Browser6updateMFZ__T17__lambda_L1185_C4TQSeTSQYiQYiQYfQYd__TQXyTSQZcQZcQYuQXm__TQZdSQZvQZvQZnQXd__TQLdTQKzTSQBAtQBAuQBAnQZg__TQBAxSQBBqQBBrQBBpQBBo__TQIgVQWonTbTSQBCvQBCwQBCpQBBi__TQBDaSQBDtQBDuQBDnQBCg__TQNoTSQBErQBEsQBEqQBEp__TQBElTSQBFqQBFrQBFkQBEd__TQBFvSQBGoQBGpQBGiQBDz__TQBDqTSQBHnQBHoQBHhQBGa__TQBHsSQBIlQBImQBIkQBIj__TQBDzVQBDka2_2573Vii250TSQBKcQBKdQBKbQBKa__TQBJwTSQBLbQBLcQBKvQBJo__TQBLgSQBAjQBAiQBAjQBAgQBAd__TQBAcTQBHcTSQBNhQBNiQBNgQBNf__TQBNbTSQBOgQBOhQBOaQBMt__TQBOlSQBDoQBDnQBDoQBDlQBDi__TQBDhTQBKhZQBDrMFEQBFcQBFbQBFcQBEzQBEw9AttributebKQBLzZ19__lambda_L503_C20_1TPSQBHlQBHkQBHlQBHiQBHfTQDfTbTSQBUdQBUeQBUcQBUb__TQBTxTSQBVcQBVdQBUwQBTp__TQBVhSQBWaQBWbQBVuQBTl__TQBTcTQBTcZ3funTQBTmZQBPyZQBWtFQCwZ13StringifiableZQBRcZQBXxFQKwZQBeTQBTkZQBMuMFQJdbQBTzQMwQBUgZ17__lambda_L503_C20TQIfTQKrTbTSQCBpQCBqQCBoQCBn__TQCBjTSQCCoQCCpQCCiQCBb__TQCCtSQCDmQCDnQCDgQCAx__TQCAoTQCAoTSQCEqQCErQCEkQCDd__TQCEvSQCFoQCFpQCFnQCFm__TQCBcVQCAna2_2573Vii250TQTyZ17__lambda_L40_C3_1TQUwZQCArTQCEpZQLnTQCEyTQEkTQCFhZQCBtZQCIoFQHfZQLvZQCClZQCJgFQZkZQMnZ17__lambda_L40_C3_3TQBBlZQCEcTQCIaTQBEpZQPdTQBEyTQCItTQBFiZQCFkZQCMfFQBHuZQPnZQBWuFQBJhZ19__lambda_L143_C57_1TQBKiZQCHoTSQCPjQCPkQCPdQCNw__TQCPoSQCQhQCQiQCQbQCOu__TQCAcTQBHeZQCAmFQBHoZ19__lambda_L143_C57_2TQBIpZQCLgZQBYxFNibQBQoQEeZQWnTQBRaZQCMkTSQCUfQCUgQCTzQCSs__TQCUkSQCVdQCVeQCVcQCVb__TQCBtVQCQcnTbTQBTpTQHgZQCCpFNibQBUgQHwZQBAfTQIfZQCQcZQBAtTQCImTQBXoTQEhZQCRaZQCXvFQBZyZQBBdZQCCaMFQCTqQCBmbSQCOjQCOiQCEbQCDx13ScrollContextPSQCPq5paths11BrowserPathZ20__lambda_L1195_C76_1TQBxZQCVqZQCJhFNibQCJbQCIqZQBGyTQCJpZQCWwTSQDErQDEsQDElQDDe__TQDEwSQDFpQDFqQDFoQDFn__TQCMfVQDAonTbTQCMeTQCLuZQCNcFNibQCMwQCMlZQBKtTQCMvZQDArZQBLiTQCTbTQCQbTQEkZQDBpZQDIkFQCVqZQBLsZQCXeMFQBTnbQCXfZ19__lambda_L503_C20_2TQBSlTQBUyTbTSQDLxQDLyQDLwQDLv__TQDLrTSQDMwQDMxQDMqQDLj__TQDNbSQDNuQDNvQDNoQDLf__TQDKwTSQDOtQDOuQDOnQDNg__TQDOySQDPrQDPsQDPqQDPp__TQDLfVQDKqa2_2573Vii250TQDEdZ17__lambda_L40_C3_7TQDFcZQDKwZQBVnTQEdZQDLkZQDSfFQGoZQBVmZQDMdZQDSyFQDJgZQBWgZ17__lambda_L40_C3_8TQDLeZQDNwZQBYnTQDRzTQDOcZQDOqZQDVlFQDVaZQBYtZQDYbFKQDXqMxAaQDXoZk

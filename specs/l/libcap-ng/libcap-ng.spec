@@ -4,8 +4,8 @@
 %global bpf_supported_arches aarch64 x86_64 ppc64le riscv64 s390x
 Summary: Alternate posix capabilities library
 Name: libcap-ng
-Version: 0.9.1
-Release: 4%{?dist}
+Version: 0.9.5
+Release: 1%{?dist}
 License: LGPL-2.0-or-later
 URL: https://github.com/stevegrubb/libcap-ng
 Source0: %{name}-%{version}.tar.gz
@@ -18,6 +18,7 @@ BuildRequires: libattr-devel
 BuildRequires: clang
 BuildRequires: bpftool libbpf-devel
 BuildRequires: audit-libs-devel
+BuildRequires: kernel-devel
 %endif
 
 %description
@@ -61,13 +62,20 @@ to determine the necessary capabilities for a program.
 
 %prep
 %setup -q
-touch NEWS
-autoreconf -fv --install
+touch -d @${SOURCE_DATE_EPOCH:?} NEWS
 
 %build
+# Locate suitable vmlinux.h. In normal builds under mock,
+# there'll be just one. But in case multiple kernel-devel packages
+# are installed, sort alphabetically and pick the last version.
+vmlinux_h="$(ls -1 /usr/src/kernels/*/vmlinux.h | sort -g | tail -n 1)"
+
+autoreconf -fv --install
 %configure --libdir=%{_libdir} \
 %ifarch %{bpf_supported_arches}
-	 --enable-cap-audit=yes \
+	--enable-cap-audit=yes \
+	--with-vmlinux-h-path="${vmlinux_h}" \
+	--with-vmlinux-h=provided \
 %endif
 	--with-python3
 
@@ -114,12 +122,41 @@ make check
 %attr(0644,root,root) %{_mandir}/man8/filecap.8.gz
 %attr(0644,root,root) %{_mandir}/man8/netcap.8.gz
 %attr(0644,root,root) %{_mandir}/man8/pscap.8.gz
+%attr(0644,root,root) %{_datadir}/bash-completion/completions/libcap-ng.bash_completion
+%{_datadir}/bash-completion/completions/cap-audit
+%{_datadir}/bash-completion/completions/filecap
+%{_datadir}/bash-completion/completions/netcap
+%{_datadir}/bash-completion/completions/pscap
 %ifarch %{bpf_supported_arches}
 %attr(0755,root,root) %{_bindir}/cap-audit
 %attr(0644,root,root) %{_mandir}/man8/cap-audit.8.gz
 %endif
 
 %changelog
+* Thu Aug 20 2026 Steve Grubb <sgrubb@redhat.com> 0.9.5-1
+- New upstream feature release
+
+* Thu Aug 20 2026 Steve Grubb <sgrubb@redhat.com> 0.9.4-1
+- New upstream feature release
+
+* Mon Aug 03 2026 Zbigniew Jędrzejewski-Szmek  <zbyszek@in.waw.pl> - 0.9.4-5
+- Use provided vmlinux.h to improve build reproducibility
+
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 0.9.3-4
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 0.9.3-2
+- Rebuilt for Python 3.15
+
+* Thu Apr 09 2026 Steve Grubb <sgrubb@redhat.com> 0.9.3-1
+- New upstream bugfix release
+
+* Tue Mar 24 2026 Steve Grubb <sgrubb@redhat.com> 0.9.2-1
+- New upstream bugfix release
+
 * Tue Feb 17 2026 Steve Grubb <sgrubb@redhat.com> 0.9.1-1
 - New upstream bugfix release
 

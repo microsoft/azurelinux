@@ -7,7 +7,7 @@
 Summary: An authorization framework
 Name: polkit
 Version: 126
-Release: 9%{?dist}
+Release: 6%{?dist}.2
 License: LGPL-2.0-or-later
 URL: https://github.com/polkit-org/polkit
 Source0: https://github.com/polkit-org/polkit/archive/refs/tags/%{version}.tar.gz
@@ -15,6 +15,10 @@ Source1: polkit.sysusers
 
 Patch1: loglevel-info-backport.patch
 Patch2: xml-nested-overflow.patch
+Patch3: 3aceadf.patch
+Patch4: 0004-polkitsubject-Fix-GVariant-ref-leak-for-pidfd-withou.patch
+Patch5: 0005-Aisle-www.aisle.com-reported-an-issue-with-unsanitiz.patch
+Patch6: CVE-2026-4897-getline-string-overflow.patch
 
 BuildRequires: gcc-c++
 BuildRequires: glib2-devel >= 2.30.0
@@ -164,6 +168,13 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/girepository-1.0/*.typelib
 
 %changelog
+* Fri Mar 27 2026 Jan Rybar <jrybar@redhat.com> - 126-6.2
+- CVE-2026-4897 aisle.com fix of unsanitized getline
+
+* Wed Mar 04 2026 Jan Rybar <jrybar@redhat.com> - 126-6.1
+- backport of upstream commits 9dca831, 4e67dde
+- PolkitSubject: avoid g_dbus warning
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 126-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

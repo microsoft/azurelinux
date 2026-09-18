@@ -6,7 +6,7 @@
 Summary:	Behaviour driven development (BDD) framework for Ruby
 Name:		rubygem-%{gem_name}
 Version:	3.13.1
-Release: 5%{?dist}
+Release:	2%{?dist}
 
 License:	MIT
 URL:		http://rspec.info

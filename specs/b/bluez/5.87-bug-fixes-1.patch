@@ -1,0 +1,2377 @@
+From 5bc6aa79e53700d56fc1f9f9364573ba4c78da65 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Thu, 2 Jul 2026 11:43:52 -0400
+Subject: [PATCH 01/19] adapter: Fix crash on dev_disconnected
+
+Commit 5d836f1c697c ("adapter: Fix failed bonding attempt after LE
+link disconnection") introduces a regression since it attempts to
+call device_is_connected after adapter_remove_connection which may
+free the device causing the following backtrace:
+
+    #0 0x5cd6e384262f in btd_device_bearer_is_connected src/device.c:3754
+    #1 0x5cd6e384266f in btd_device_is_connected src/device.c:3745
+    #2 0x5cd6e37f8614 in dev_disconnected src/adapter.c:8626
+
+Fixes: https://github.com/bluez/bluez/issues/2221
+---
+ src/adapter.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 538f63e0a153..210225243f00 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7612,12 +7612,16 @@ struct agent *adapter_get_agent(struct btd_adapter *adapter)
+ static void adapter_remove_connection(struct btd_adapter *adapter,
+ 						struct btd_device *device,
+ 						uint8_t bdaddr_type,
+-						uint8_t reason)
++						uint8_t reason,
++						bool *removed)
+ {
+ 	bool remove_device = false;
+ 
+ 	DBG("");
+ 
++	if (removed)
++		*removed = false;
++
+ 	if (!g_slist_find(adapter->connections, device)) {
+ 		btd_error(adapter->dev_id, "No matching connection for device");
+ 		return;
+@@ -7638,6 +7642,9 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
+ 
+ 		DBG("Removing temporary device %s", path);
+ 		btd_adapter_remove_device(adapter, device);
++
++		if (removed)
++			*removed = true;
+ 	}
+ }
+ 
+@@ -7665,10 +7672,10 @@ static void adapter_stop(struct btd_adapter *adapter)
+ 		uint8_t addr_type = btd_device_get_bdaddr_type(device);
+ 
+ 		adapter_remove_connection(adapter, device, BDADDR_BREDR,
+-						MGMT_DEV_DISCONN_UNKNOWN);
++						MGMT_DEV_DISCONN_UNKNOWN, NULL);
+ 		if (addr_type != BDADDR_BREDR)
+ 			adapter_remove_connection(adapter, device, addr_type,
+-						MGMT_DEV_DISCONN_UNKNOWN);
++						MGMT_DEV_DISCONN_UNKNOWN, NULL);
+ 	}
+ 
+ 	g_dbus_emit_property_changed(dbus_conn, adapter->path,
+@@ -8618,7 +8625,17 @@ static void dev_disconnected(struct btd_adapter *adapter,
+ 
+ 	device = btd_adapter_find_device(adapter, &addr->bdaddr, addr->type);
+ 	if (device) {
+-		adapter_remove_connection(adapter, device, addr->type, reason);
++		bool removed;
++
++		adapter_remove_connection(adapter, device, addr->type, reason,
++						&removed);
++		/* No need to continue if device was removed from the adapter,
++		 * as it will be freed and the disconnect notify will be called
++		 * in the device free callback.
++		 */
++		if (removed)
++			return;
++
+ 		disconnect_notify(device, reason);
+ 	}
+ 
+-- 
+2.54.0
+
+
+From b84aa894921037e1b1de00d282db2ee27a4ce63f Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Mon, 6 Jul 2026 10:59:28 -0400
+Subject: [PATCH 02/19] l2test: Fix calling getsockopt(BT_PHY)
+
+getsockopt(BT_PHY) expectes a 32 bits argument not a
+sizeof(struct sockaddr_l2).
+---
+ tools/l2test.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tools/l2test.c b/tools/l2test.c
+index aa05f5247c5e..08d2269936b9 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -358,7 +358,8 @@ static int print_info(int sk, struct l2cap_options *opts)
+ 	struct sockaddr_l2 addr;
+ 	socklen_t optlen;
+ 	struct l2cap_conninfo conn;
+-	int prio, phy;
++	int prio;
++	uint32_t phy;
+ 	char ba[18];
+ 
+ 	/* Get connection information */
+@@ -414,6 +415,8 @@ static int print_info(int sk, struct l2cap_options *opts)
+ 		conn.dev_class[0], prio, rcvbuf);
+ 
+ 
++	optlen = sizeof(phy);
++
+ 	if (!getsockopt(sk, SOL_BLUETOOTH, BT_PHY, &phy, &optlen)) {
+ 		syslog(LOG_INFO, "Supported PHY: 0x%08x", phy);
+ 		print_bitfield(2, phy, phy_table);
+-- 
+2.54.0
+
+
+From 3f283c8e0ab3bad17ee8c13fa0dcf251a16e4e25 Mon Sep 17 00:00:00 2001
+From: raghavendra <raghavendra.rao@collabora.com>
+Date: Thu, 2 Jul 2026 18:39:04 +0530
+Subject: [PATCH 03/19] shared/bap: Validate codec configuration parameters
+
+This is required for PTS test ASCS/SR/SPE/BI-07-C
+---
+ src/shared/bap.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 1f61227f82a7..6bc044a63758 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -29,6 +29,7 @@
+ #include "src/shared/gatt-client.h"
+ #include "src/shared/bap.h"
+ #include "src/shared/ascs.h"
++#include "src/shared/lc3.h"
+ #include "src/shared/bap-debug.h"
+ 
+ /* Maximum number of ASE(s) */
+@@ -3157,6 +3158,7 @@ static uint8_t ep_config(struct bt_bap_endpoint *ep, struct bt_bap *bap,
+ 	struct iovec cc;
+ 	const struct queue_entry *e;
+ 	struct bt_bap_codec codec;
++	uint8_t *ltv;
+ 
+ 	DBG(bap, "ep %p id 0x%02x dir 0x%02x", ep, ep->id, ep->dir);
+ 
+@@ -3190,6 +3192,19 @@ static uint8_t ep_config(struct bt_bap_endpoint *ep, struct bt_bap *bap,
+ 		return 0;
+ 	}
+ 
++	ltv = cc.iov_base;
++
++	if (req->codec.id == LC3_ID && cc.iov_len == 3 &&
++			ltv[0] == 0x02 &&
++			ltv[1] == LC3_CONFIG_DURATION &&
++			ltv[2] != LC3_CONFIG_DURATION_7_5 &&
++			ltv[2] != LC3_CONFIG_DURATION_10) {
++		ascs_ase_rsp_add(rsp, req->ase,
++				BT_ASCS_RSP_CONF_INVALID,
++				BT_ASCS_REASON_CODEC_DATA);
++		return 0;
++	}
++
+ 	switch (ep->dir) {
+ 	case BT_BAP_SINK:
+ 		e = queue_get_entries(bap->ldb->sinks);
+@@ -3207,6 +3222,13 @@ static uint8_t ep_config(struct bt_bap_endpoint *ep, struct bt_bap *bap,
+ 	codec.cid = le16_to_cpu(req->codec.cid);
+ 	codec.vid = le16_to_cpu(req->codec.vid);
+ 
++	if (codec.id != 0xff && (codec.cid || codec.vid)) {
++		ascs_ase_rsp_add(rsp, req->ase,
++				BT_ASCS_RSP_CONF_INVALID,
++				BT_ASCS_REASON_CODEC);
++		return 0;
++	}
++
+ 	for (; e; e = e->next) {
+ 		struct bt_bap_pac *pac = e->data;
+ 
+-- 
+2.54.0
+
+
+From 5c1c679ec304b8aadaa287cca59b38589d339e91 Mon Sep 17 00:00:00 2001
+From: raghavendra <raghavendra.rao@collabora.com>
+Date: Thu, 2 Jul 2026 18:39:05 +0530
+Subject: [PATCH 04/19] shared/bap: Validate unicast QoS configuration
+
+This is required for PTS tests ASCS/SR/SPE/BI-08-C and ASCS/SR/SPE/BI-10-C.
+---
+ src/shared/bap.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 6bc044a63758..f2be7c07ba5d 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -3316,6 +3316,32 @@ static uint8_t ep_qos(struct bt_bap_endpoint *ep, struct bt_bap *bap,
+ 		return 0;
+ 	}
+ 
++	if (ep->stream->lpac->codec.id == LC3_ID &&
++			qos->ucast.io_qos.interval < 0x0000ff) {
++		ascs_ase_rsp_add(rsp, ep->id,
++				BT_ASCS_RSP_CONF_INVALID,
++				BT_ASCS_REASON_INTERVAL);
++		return 0;
++	}
++
++	if (qos->ucast.framing != BT_ASCS_QOS_FRAMING_UNFRAMED &&
++			qos->ucast.framing != BT_ASCS_QOS_FRAMING_FRAMED) {
++		ascs_ase_rsp_add(rsp, ep->id,
++				BT_ASCS_RSP_CONF_INVALID,
++				BT_ASCS_REASON_FRAMING);
++		return 0;
++	}
++
++	if (!qos->ucast.io_qos.phys ||
++			(qos->ucast.io_qos.phys & ~(BT_BAP_CONFIG_PHY_1M |
++					BT_BAP_CONFIG_PHY_2M |
++					BT_BAP_CONFIG_PHY_CODEC))) {
++		ascs_ase_rsp_add(rsp, ep->id,
++				BT_ASCS_RSP_CONF_INVALID,
++				BT_ASCS_REASON_PHY);
++		return 0;
++	}
++
+ 	return stream_qos(ep->stream, qos, rsp);
+ }
+ 
+-- 
+2.54.0
+
+
+From 13b14db95089382701f54a46e6ef0120b69d4a62 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Tue, 7 Jul 2026 14:34:30 -0400
+Subject: [PATCH 05/19] shared/bap: Use util_ltv_foreach to process metadata
+
+This makes use of util_ltv_foreach to process the metadata entries
+instead of attempting to iterate over the entries manually which
+probably only works with the exact same order as used by PTS.
+---
+ src/shared/bap.c | 84 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 59 insertions(+), 25 deletions(-)
+
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index f2be7c07ba5d..db6f4f204787 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -3404,35 +3404,69 @@ static uint8_t stream_enable(struct bt_bap_stream *stream, struct iovec *meta,
+ 	return 0;
+ }
+ 
+-static bool ascs_metadata_rsp(struct bt_bap_endpoint *ep, struct iovec *meta,
+-							struct iovec *rsp)
++struct bap_metadata_process {
++	struct bt_bap_endpoint *ep;
++	uint16_t context;
++	struct iovec *rsp;
++	uint8_t err;
++};
++
++static void bap_metadata_process(size_t i, uint8_t l, uint8_t t, uint8_t *v,
++					void *user_data)
+ {
+-	struct bt_ltv *ltv;
+-	uint16_t supported_context = 0;
++	struct bap_metadata_process *data = user_data;
+ 	uint16_t context;
+ 
++	switch (t) {
++	case BAP_METADATA_PREF_CONTEXT_LTV_TYPE:
++		break;
++	case BAP_METADATA_CONTEXT_LTV_TYPE:
++		if (l != sizeof(context)) {
++			ascs_ase_rsp_add(data->rsp, data->ep->id,
++					BT_ASCS_RSP_METADATA_INVALID, t);
++			data->err = BT_ASCS_RSP_METADATA_INVALID;
++			break;
++		}
++
++		context = get_le16(v);
++		if (!context || (context & ~data->context)) {
++			ascs_ase_rsp_add(data->rsp, data->ep->id,
++					BT_ASCS_RSP_METADATA_INVALID, t);
++			data->err = BT_ASCS_RSP_METADATA_INVALID;
++		}
++
++		break;
++	case BAP_METADATA_PROGRAM_INFO_LTV_TYPE:
++	case BAP_METADATA_LANGUAGE_LTV_TYPE:
++		break;
++	default:
++		ascs_ase_rsp_add(data->rsp, data->ep->id,
++					BT_ASCS_RSP_METADATA_UNSUPPORTED,
++					t);
++		data->err = BT_ASCS_RSP_METADATA_UNSUPPORTED;
++		break;
++	};
++}
++
++static bool ascs_metadata_rsp(struct bt_bap_endpoint *ep, struct bt_bap *bap,
++				struct iovec *meta, struct iovec *rsp)
++{
++	struct bap_metadata_process data = {
++		.ep = ep,
++		.rsp = rsp,
++		.err = 0,
++	};
++
+ 	if (ep->stream && ep->stream->lpac)
+-		supported_context = ep->stream->lpac->qos.supported_context;
++		data.context = ep->stream->lpac->qos.supported_context;
+ 
+-	ltv = meta->iov_base;
+-	if (meta->iov_len >= sizeof(*ltv) &&
+-			(ltv->type < BAP_METADATA_PREF_CONTEXT_LTV_TYPE ||
+-			ltv->type > BAP_METADATA_LANGUAGE_LTV_TYPE)) {
+-		ascs_ase_rsp_add(rsp, ep->id,
+-				BT_ASCS_RSP_METADATA_UNSUPPORTED, ltv->type);
+-		return true;
+-	}
++	util_ltv_foreach(meta->iov_base, meta->iov_len, NULL,
++				bap_metadata_process, &data);
+ 
+-	if (meta->iov_len >= sizeof(*ltv) + sizeof(context) &&
+-			ltv->type == BAP_METADATA_CONTEXT_LTV_TYPE &&
+-			ltv->len == sizeof(context) + 1) {
+-		context = get_le16(ltv->value);
+-		if (!context || (context & ~supported_context)) {
+-			ascs_ase_rsp_add(rsp, ep->id,
+-					BT_ASCS_RSP_METADATA_INVALID,
+-					ltv->type);
+-			return true;
+-		}
++	if (data.err) {
++		DBG(bap, "ep %p id 0x%02x metadata error 0x%02x", ep, ep->id,
++				data.err);
++		return true;
+ 	}
+ 
+ 	return false;
+@@ -3469,7 +3503,7 @@ static uint8_t ep_enable(struct bt_bap_endpoint *ep, struct bt_bap *bap,
+ 		return 0;
+ 	}
+ 
+-	if (ascs_metadata_rsp(ep, &meta, rsp))
++	if (ascs_metadata_rsp(ep, bap, &meta, rsp))
+ 		return 0;
+ 
+ 	if (!ep->stream) {
+@@ -3705,7 +3739,7 @@ static uint8_t ep_metadata(struct bt_bap_endpoint *ep,
+ 	meta.iov_base = util_iov_pull_mem(iov, req->len);
+ 	meta.iov_len = req->len;
+ 
+-	if (ascs_metadata_rsp(ep, &meta, rsp))
++	if (ascs_metadata_rsp(ep, stream->bap, &meta, rsp))
+ 		return 0;
+ 
+ 	return stream_metadata(ep->stream, &meta, rsp);
+-- 
+2.54.0
+
+
+From 9e9f0a370c591c126c39225f5f50b88915d11095 Mon Sep 17 00:00:00 2001
+From: Rahul Samana <rahul.samana@oss.qualcomm.com>
+Date: Tue, 7 Jul 2026 12:05:43 +0530
+Subject: [PATCH 06/19] gobex: Fix use-after-free when cancelling SRM PUT
+ transfer
+
+In SRM mode put_get_data() queues the next packet during encoding of
+the current one, so transfer->req_id and pending_req->id can diverge.
+When g_obex_cancel_transfer() cancels the queued packet from tx_queue,
+cancel_complete() frees the transfer while pending_req still holds a
+callback pointing to it. Its G_OBEX_DEFAULT_TIMEOUT (10s) then fires
+on freed memory causing a SIGSEGV.
+
+Fix by clearing pending_req->rsp_func if it belongs to the same
+transfer being cancelled.
+---
+ gobex/gobex.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index df80d79f31bb..10a438391eae 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -861,6 +861,14 @@ gboolean g_obex_cancel_req(GObex *obex, guint req_id, gboolean remove_callback)
+ 
+ 	g_queue_delete_link(obex->tx_queue, match);
+ 
++	/* In SRM mode pending_req may belong to the same transfer but carry
++	 * a different req_id. Clear its callback to avoid use-after-free
++	 * when its timeout fires after transfer_free().
++	 */
++	if (remove_callback && obex->pending_req &&
++				obex->pending_req->rsp_data == p->rsp_data)
++		obex->pending_req->rsp_func = NULL;
++
+ immediate_completion:
+ 	p->cancelled = TRUE;
+ 	p->obex = g_obex_ref(obex);
+-- 
+2.54.0
+
+
+From 82af2beafc39510e2c4a439bf44faea711d6503f Mon Sep 17 00:00:00 2001
+From: Tom Catshoek <tomcatshoek@zeelandnet.nl>
+Date: Thu, 9 Jul 2026 14:27:04 +0200
+Subject: [PATCH 07/19] adapter: Fix crash on UUID discovery filter match
+
+is_filter_match() looks up each discovery-filter UUID in the queue of
+services parsed from a device advertisement. When that services list was
+migrated from a GSList to a struct queue, the queue_find() call kept
+GLib's g_slist_find_custom() argument order, passing the UUID string
+where queue_find() expects a match function and the comparison function
+where it expects the match data.
+
+As a result queue_find() calls the UUID string as if it were a function,
+jumping into non-executable heap and crashing bluetoothd with SIGSEGV as
+soon as an advertisement matches a UUID filter configured via
+SetDiscoveryFilter.
+
+Add a queue_match_func_t helper and pass the arguments in the correct
+order.
+
+Fixes: https://github.com/bluez/bluez/issues/2282
+---
+ src/adapter.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 210225243f00..4ffa32a52c13 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7184,6 +7184,14 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
+ 	}
+ }
+ 
++static bool match_uuid(const void *data, const void *match_data)
++{
++	const char *uuid = data;
++	const char *match = match_data;
++
++	return strcmp(uuid, match) == 0;
++}
++
+ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
+ 								int8_t rssi)
+ {
+@@ -7216,8 +7224,7 @@ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
+ 				 * uuid.
+ 				 */
+ 				if (queue_find(eir_data->services,
+-							m->data,
+-							g_strcmp) != NULL)
++							match_uuid, m->data))
+ 					got_match = true;
+ 			}
+ 		}
+-- 
+2.54.0
+
+
+From b7d71e5067856b0daf2f1f73b3fc95483236610e Mon Sep 17 00:00:00 2001
+From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Date: Fri, 10 Jul 2026 12:28:17 +0500
+Subject: [PATCH 08/19] a2dp: Fix loading of remote SEP from cache
+
+Commit 912f5efb0dd9 ("a2dp: Fix handling of codec capability storage")
+added an 'i >= 2' condition to the loop that parses the stored codec
+capabilities. Since i starts at 0 the loop body never runs, i stays 0,
+and the subsequent 'if (i != size)' check discards every endpoint found
+in the cache:
+
+  load_remote_sep() Unable to load LastUsed: rseid 6 not found
+
+With no remote SEP loaded, avdtp_discover() can no longer take the
+cached path and issues AVDTP Discover/Get All Capabilities on every
+reconnect, and a2dp_setup_remote_path() returns NULL so the transport
+ends up at /org/bluez/hciX/dev_YY/fd0 instead of .../sepN/fd0.
+
+The condition was presumably meant to bound the writes into data[128],
+which the original commit did not actually fix: caps is read with
+'%512s' so size / 2 can be up to 256. Validate size up front instead.
+
+Fixes: https://github.com/bluez/bluez/issues/2285
+---
+ profiles/audio/a2dp.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index c8adc3122563..a4ba1dacf943 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2398,7 +2398,16 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
+ 			delay_reporting = false;
+ 		}
+ 
+-		for (i = 0, size = strlen(caps); i < size && i >= 2; i += 2) {
++		size = strlen(caps);
++
++		g_free(value);
++
++		if (size % 2 || size / 2 > (int) sizeof(data)) {
++			warn("Unable to load Endpoint: seid %u", rseid);
++			continue;
++		}
++
++		for (i = 0; i < size; i += 2) {
+ 			uint8_t *tmp = data + i / 2;
+ 
+ 			if (sscanf(caps + i, "%02hhx", tmp) != 1) {
+@@ -2407,8 +2416,6 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
+ 			}
+ 		}
+ 
+-		g_free(value);
+-
+ 		if (i != size)
+ 			continue;
+ 
+-- 
+2.54.0
+
+
+From 2a3d3b0e6f83516736c3c8191fb9440475171600 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Fri, 10 Jul 2026 14:47:14 -0400
+Subject: [PATCH 09/19] monitor: Fix printing subpages bits after all subpages
+
+This fixes printing the decoded subpage bitfields after all subpages
+rather then after the subpage itself:
+
+before:
+
+        Features[1/0][8]:
+        00 03 00 00 00 00 00 00                          ........
+        Features[1/1][8]:
+        00 00 00 00 00 00 00 00                          ........
+        Features[1/2][8]:
+        00 00 00 00 00 00 00 00                          ........
+          Shorter Connection Intervals
+          Shorter Connection Intervals (Host Support)
+
+after:
+
+        Features[1/0][8]:
+        00 03 00 00 00 00 00 00                          ........
+          Shorter Connection Intervals
+          Shorter Connection Intervals (Host Support)
+---
+ monitor/packet.c | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
+
+diff --git a/monitor/packet.c b/monitor/packet.c
+index e62ad4cfb337..ba6ff8e8e551 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -2925,17 +2925,29 @@ static const struct bitfield_data features_msft[] = {
+ 
+ static void print_features_subpage(uint8_t page, uint8_t subpages,
+ 					const uint8_t *features_array,
+-					uint64_t *features)
++					uint64_t *features,
++					const struct bitfield_data *table)
+ {
+ 	int i, j;
+ 	char str[18];
+ 
+ 	for (i = 0; i < subpages; i++) {
++		uint64_t mask;
++
+ 		for (j = 0; j < 8; j++)
+ 			features[i] |= ((uint64_t) features_array[i * 8 + j])
+ 					<< (j * 8);
+ 		sprintf(str, "Features[%u/%u]", page, i);
+ 		print_hex_field(str, &features_array[i * 8], 8);
++
++		if (!table)
++			continue;
++
++		mask = print_bitfield(2, features[i], table);
++		if (mask)
++			print_text(COLOR_UNKNOWN_FEATURE_BIT,
++				"  Unknown features (0x%16.16" PRIx64 ")",
++				mask);
+ 	}
+ }
+ 
+@@ -2943,16 +2955,13 @@ static void print_features(uint8_t page, const uint8_t *features_array,
+ 								uint8_t type)
+ {
+ 	const struct bitfield_data *features_table = NULL;
+-	uint64_t mask, features[3] = {};
++	uint64_t features[3] = {};
+ 	uint8_t subpages = 1;
+-	int i;
+ 
+ 	/* LE pages 1-10 are 192 bits (24 octets) each */
+ 	if (type == 0x01 && page)
+ 		subpages = 3;
+ 
+-	print_features_subpage(page, subpages, features_array, features);
+-
+ 	switch (type) {
+ 	case 0x00:
+ 		switch (page) {
+@@ -2985,16 +2994,8 @@ static void print_features(uint8_t page, const uint8_t *features_array,
+ 		break;
+ 	}
+ 
+-	if (!features_table)
+-		return;
+-
+-	for (i = 0; i < subpages; i++) {
+-		mask = print_bitfield(2, features[i], features_table);
+-		if (mask)
+-			print_text(COLOR_UNKNOWN_FEATURE_BIT,
+-				"  Unknown features (0x%16.16" PRIx64 ")",
+-				mask);
+-	}
++	print_features_subpage(page, subpages, features_array, features,
++							features_table);
+ }
+ 
+ void packet_print_features_lmp(const uint8_t *features, uint8_t page)
+@@ -11065,7 +11066,7 @@ static const struct opcode_data opcode_table[] = {
+ 				"LE Read Minimum Supported Connection Interval",
+ 				null_cmd, 0, true, le_read_conn_interval_rsp,
+ 				sizeof(struct bt_hci_rsp_le_read_conn_interval),
+-				true },
++				false },
+ 	{ }
+ };
+ 
+-- 
+2.54.0
+
+
+From 0f2f53fd04d4eb73801de1f8ca16a40e3b12c034 Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Mon, 13 Jul 2026 16:50:23 +0300
+Subject: [PATCH 10/19] tools/sco-tester: fix missing clear of io_id in
+ callbacks
+
+Fixes issues
+
+GLib-CRITICAL **: Source ID 126 was not found when attempting to remove it
+---
+ tools/sco-tester.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index a2185b8ef198..fca99a91c20f 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
+@@ -1415,6 +1415,8 @@ static gboolean sco_accept_cb(GIOChannel *io, GIOCondition cond,
+ 	gboolean ret;
+ 	GIOChannel *new_io;
+ 
++	data->io_id = 0;
++
+ 	tester_debug("New connection");
+ 
+ 	sk = g_io_channel_unix_get_fd(io);
+-- 
+2.54.0
+
+
+From 9353c0ea9f6c1bacff00d9afef0d963796d86bd3 Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Mon, 13 Jul 2026 16:50:24 +0300
+Subject: [PATCH 11/19] tools/6lowpan-tester: fix race in Client Connect -
+ Disable
+
+It's possible client_l2cap_disconnect_cb() is called after 6lowpan
+disable on connect. Prevent failing test in finish_step() in this case.
+---
+ tools/6lowpan-tester.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tools/6lowpan-tester.c b/tools/6lowpan-tester.c
+index 95fdf206fc0c..738714d68dd1 100644
+--- a/tools/6lowpan-tester.c
++++ b/tools/6lowpan-tester.c
+@@ -648,8 +648,11 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
+ 	if (cdata->disable_on_connect) {
+ 		if (write_6lowpan("6lowpan_enable", "0"))
+ 			tester_test_failed();
+-		else
++		else {
++			data->handle = 0;
++			data->dcid = 0;
+ 			tester_test_passed();
++		}
+ 	}
+ }
+ 
+-- 
+2.54.0
+
+
+From ba08e0f6be0f2ac17de3c0609c64e1d1acaa1563 Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Mon, 13 Jul 2026 16:50:25 +0300
+Subject: [PATCH 12/19] tools/6lowpan-tester: add test for VHCI teardown
+ without disable
+
+Check 6lowpan teardown when controller disappers with active devices.
+Add test
+
+Client Connect - No Disable
+---
+ tools/6lowpan-tester.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/tools/6lowpan-tester.c b/tools/6lowpan-tester.c
+index 738714d68dd1..a8faf6eb5976 100644
+--- a/tools/6lowpan-tester.c
++++ b/tools/6lowpan-tester.c
+@@ -76,6 +76,9 @@ struct client_data {
+ 
+ 	/* Interface listener socket type, SOCK_RAW / DGRAM */
+ 	int sk_type;
++
++	/* Don't disable 6lowpan before adapter teardown */
++	bool no_teardown_disable;
+ };
+ 
+ static void print_debug(const char *str, void *user_data)
+@@ -264,6 +267,7 @@ static void test_pre_setup(const void *test_data)
+ static void test_post_teardown(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
++	const struct client_data *cdata = data->test_data;
+ 	int ret;
+ 
+ 	if (data->io_id > 0) {
+@@ -276,11 +280,13 @@ static void test_post_teardown(const void *test_data)
+ 		data->packet_fd = -1;
+ 	}
+ 
+-	ret = write_6lowpan("6lowpan_enable", "0");
+-	if (ret < 0) {
+-		tester_warn("Failed to disable 6lowpan");
+-		tester_post_teardown_failed();
+-		return;
++	if (!cdata || !cdata->no_teardown_disable) {
++		ret = write_6lowpan("6lowpan_enable", "0");
++		if (ret < 0) {
++			tester_warn("Failed to disable 6lowpan");
++			tester_post_teardown_failed();
++			return;
++		}
+ 	}
+ 
+ 	hciemu_unref(data->hciemu);
+@@ -317,6 +323,10 @@ static const struct client_data client_connect_disable = {
+ 	.disable_on_connect = true,
+ };
+ 
++static const struct client_data client_connect_no_disable = {
++	.no_teardown_disable = true,
++};
++
+ static const struct client_data client_connect_disconnect = {
+ 	.disconnect = true,
+ };
+@@ -653,6 +663,10 @@ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
+ 			data->dcid = 0;
+ 			tester_test_passed();
+ 		}
++	} else if (cdata->no_teardown_disable) {
++		data->handle = 0;
++		data->dcid = 0;
++		tester_test_passed();
+ 	}
+ }
+ 
+@@ -708,6 +722,10 @@ int main(int argc, char *argv[])
+ 							setup_powered_client,
+ 							test_connect);
+ 
++	test_6lowpan("Client Connect - No Disable", &client_connect_no_disable,
++							setup_powered_client,
++							test_connect);
++
+ 	test_6lowpan("Client Connect - Disconnect", &client_connect_disconnect,
+ 							setup_powered_client,
+ 							test_connect);
+-- 
+2.54.0
+
+
+From 1cfe2d8b2cbb8c645439464a217053d3cdc41e5f Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Mon, 13 Jul 2026 16:50:26 +0300
+Subject: [PATCH 13/19] tools/l2cap-tester: fix Set PHY test spurious failures
+
+Setting BT_PHY does not take effect instantaneously as kernel waits for
+controller, so checking getsockopt() sometimes fails here. In PHY tests,
+use retry with timeout to check again later.
+---
+ tools/l2cap-tester.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index a8cac3902b32..2771aee65814 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -277,7 +277,7 @@ static void test_data_free(void *test_data)
+ #define test_l2cap(name, type, data, setup, func) \
+ 	do { \
+ 		struct test_data *user; \
+-		user = malloc(sizeof(struct test_data)); \
++		user = calloc(1, sizeof(struct test_data)); \
+ 		if (!user) \
+ 			break; \
+ 		user->hciemu_type = type; \
+@@ -1657,8 +1657,10 @@ static gboolean socket_closed_cb(GIOChannel *io, GIOCondition cond,
+ 		tester_print("err %d != %d expected_err", -err,
+ 						l2data->expect_err);
+ 		tester_test_failed();
+-	} else
++	} else if (!data->step)
+ 		tester_test_passed();
++	else
++		tester_test_failed();
+ 
+ 	return FALSE;
+ }
+@@ -1729,12 +1731,13 @@ static gboolean check_phy(gpointer args)
+ 	}
+ 
+ 	if (l2data->phy && l2data->phy != data->phys) {
+-		tester_warn("phy 0x%08x != 0x%08x", l2data->phy, data->phys);
+-		tester_test_failed();
+-		goto done;
++		tester_print("phy 0x%08x != 0x%08x", l2data->phy, data->phys);
++
++		/* Retry */
++		return TRUE;
+ 	}
+ 
+-	tester_test_passed();
++	data->step--;
+ 
+ done:
+ 	shutdown(sk, SHUT_WR);
+@@ -1770,7 +1773,8 @@ static int check_phys(struct test_data *data, int sk)
+ 		}
+ 
+ 		/* Wait for the PHY to change */
+-		g_idle_add(check_phy, INT_TO_PTR(sk));
++		data->step++;
++		g_timeout_add(50, check_phy, INT_TO_PTR(sk));
+ 
+ 		return -EINPROGRESS;
+ 	}
+-- 
+2.54.0
+
+
+From 7f826d003ee7bc07698ddecf804697d55e7b9c86 Mon Sep 17 00:00:00 2001
+From: Ferose <ferose2@gmail.com>
+Date: Sat, 11 Jul 2026 00:02:30 -0700
+Subject: [PATCH 14/19] shared/bap: Fix rejecting re-attach of the same fd
+
+When the remote's STREAMING ASE notification arrives before
+iso_connect_cb() fires, the race handler in bap_state()
+(profiles/audio/bap.c) already attaches the io to the stream; the
+comment there notes "Order of STREAMING and iso_connect_cb() is
+nondeterministic". When iso_connect_cb() then calls
+bt_bap_stream_set_io() with the same fd, the guard in
+bap_ucast_set_io() sees an attached, non-connecting io and returns
+false. iso_connect_cb() treats that as fatal:
+
+  profiles/audio/bap.c:iso_connect_cb() Unable to set IO
+  profiles/audio/transport.c:bap_state_changed() Unable to get stream IO
+
+and tears down a CIS that btmon shows was established successfully
+(CIS Established status 0, both ISO data paths set up). With a device
+whose STREAMING notifications consistently win the race, streaming is
+never possible.
+
+Treat re-attaching the fd that is already attached as a no-op success,
+without re-running the per-stream state actions (which would send a
+duplicate Receiver Start Ready to a linked source ASE). Attaching a
+different fd to a non-connecting io remains an error.
+
+Fixes: https://github.com/bluez/bluez/issues/2223
+---
+ src/shared/bap.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index db6f4f204787..1660b8b2c1cf 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2589,9 +2589,18 @@ static unsigned int bap_bcast_release(struct bt_bap_stream *stream,
+ 
+ static bool bap_ucast_set_io(struct bt_bap_stream *stream, int fd)
+ {
+-	if (!stream || (fd >= 0 && stream->io && !stream->io->connecting))
++	if (!stream)
+ 		return false;
+ 
++	/*
++	 * The STREAMING state handler may already have attached this io
++	 * if the remote's ASE notification raced ahead of iso_connect_cb
++	 * (see bap_state() in profiles/audio/bap.c). Re-attaching the
++	 * same fd is a no-op success; only a different fd is an error.
++	 */
++	if (fd >= 0 && stream->io && !stream->io->connecting)
++		return stream_io_get_fd(stream->io) == fd;
++
+ 	bap_stream_set_io(stream, INT_TO_PTR(fd));
+ 
+ 	queue_foreach(stream->links, bap_stream_set_io, INT_TO_PTR(fd));
+-- 
+2.54.0
+
+
+From bc49d63210f23e0724e07f3e5838aff05fbaa4aa Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Sat, 11 Jul 2026 12:15:25 +0300
+Subject: [PATCH 15/19] lib: add iso_data_* macros to hci.h
+
+Add macros for parsing ISO Data Packet header items.
+---
+ lib/bluetooth/hci.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/lib/bluetooth/hci.h b/lib/bluetooth/hci.h
+index 732477ec4b55..2e4aa394e13e 100644
+--- a/lib/bluetooth/hci.h
++++ b/lib/bluetooth/hci.h
+@@ -2335,6 +2335,12 @@ typedef struct {
+ #define iso_flags_ts(f)		((f >> 2) & 0x0001)
+ #define iso_flags_pack(pb, ts)	((pb & 0x03) | ((ts & 0x01) << 2))
+ 
++/* ISO data length and flags pack/unpack */
++#define iso_data_len_pack(h, f)	((__u16) (((h) & 0x0fff) | \
++						  (((f) & 0x3) << 14)))
++#define iso_data_len(h)		((h) & 0x0fff)
++#define iso_data_flags(h)	((h) >> 14)
++
+ #endif /* _NO_HCI_DEFS */
+ 
+ /* HCI Socket options */
+-- 
+2.54.0
+
+
+From 1309d5f9305d132bc09705ffa4afa113c6491c2b Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Sat, 11 Jul 2026 12:15:26 +0300
+Subject: [PATCH 16/19] monitor: fix parsing of ISO packet data header and slen
+ check
+
+Check PB flag to see whether timestamp and data headers are present.
+
+Check bounds before accessing data. Bump handle_str length to fit
+maximum.
+
+Byteswap length values, and mask Packet_Status_Flag correctly.  Remove
+SDU length check, as we are not tracking fragmentation.
+
+Fixes: https://github.com/bluez/bluez/issues/2292
+Assisted-by: GLM-5.2
+---
+ monitor/packet.c | 69 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 46 insertions(+), 23 deletions(-)
+
+diff --git a/monitor/packet.c b/monitor/packet.c
+index ba6ff8e8e551..fb053e2b413f 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -14541,20 +14541,23 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 				bool in, const void *data, uint16_t size)
+ {
+ 	const struct bt_hci_iso_hdr *hdr = data;
+-	const struct bt_hci_iso_data_start *start;
+-	uint16_t handle = le16_to_cpu(hdr->handle);
+-	uint8_t flags = acl_flags(handle);
++	uint16_t handle, dlen;
++	uint8_t flags, pb_flag;
+ 	char label[8];
+-	char handle_str[56], extra_str[50], ts_str[16] = { 0 };
+-	struct index_buf_pool *pool = &index_list[index].iso;
++	char handle_str[100], extra_str[70], ts_str[16] = { 0 };
++	char sn_str[16] = { 0 }, slen_str[32] = { 0 };
++	struct index_buf_pool *pool;
+ 	struct packet_conn_data *conn;
+ 	size_t ts_size = 0;
++	bool have_hdr;
+ 
+ 	if (index >= MAX_INDEX) {
+ 		print_field("Invalid index (%d).", index);
+ 		return;
+ 	}
+ 
++	pool = &index_list[index].iso;
++
+ 	index_list[index].frame++;
+ 
+ 	if (size < sizeof(*hdr))
+@@ -14563,11 +14566,18 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	data += sizeof(*hdr);
+ 	size -= sizeof(*hdr);
+ 
++	handle = le16_to_cpu(hdr->handle);
++	flags = acl_flags(handle);
++	pb_flag = iso_flags_pb(flags);
++	dlen = le16_to_cpu(hdr->dlen);
++
++	have_hdr = (pb_flag == 0x00 || pb_flag == 0x02);
++
+ 	/* Detect if timestamp field is preset */
+ 	if (iso_flags_ts(flags)) {
+ 		ts_size = sizeof(uint32_t);
+ 
+-		if (size < ts_size)
++		if (size < ts_size || !have_hdr)
+ 			goto malformed;
+ 
+ 		snprintf(ts_str, sizeof(ts_str), " ts %u", get_le32(data));
+@@ -14576,20 +14586,40 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 		size -= ts_size;
+ 	}
+ 
+-	start = data;
++	if (have_hdr) {
++		const struct bt_hci_iso_data_start *start = data;
++		uint8_t sflags;
++		uint16_t slen;
++
++		if (size < sizeof(*start))
++			goto malformed;
++
++		sflags = iso_data_flags(le16_to_cpu(start->slen));
++		slen = iso_data_len(le16_to_cpu(start->slen));
++
++		if (slen)
++			snprintf(slen_str, sizeof(slen_str), " slen %u", slen);
++		if (sflags)
++			snprintf(slen_str + strlen(slen_str),
++					sizeof(slen_str) - strlen(slen_str),
++					" sflags %u", sflags);
++
++		snprintf(sn_str, sizeof(sn_str), " SN %u",
++							le16_to_cpu(start->sn));
++	}
++
+ 	conn = packet_get_conn_data(handle);
+ 
+ 	if (!in && pool->total)
+-		sprintf(handle_str, "Handle %d [%u/%u] SN %u",
+-			acl_handle(handle), ++pool->tx, pool->total, start->sn);
++		sprintf(handle_str, "Handle %d [%u/%u]%s",
++			acl_handle(handle), ++pool->tx, pool->total, sn_str);
+ 	else
+-		sprintf(handle_str, "Handle %u SN %u", acl_handle(handle),
+-			start->sn);
++		sprintf(handle_str, "Handle %u%s", acl_handle(handle), sn_str);
+ 
+ 	handle_str_append_addr(handle_str, conn);
+ 
+-	sprintf(extra_str, "flags 0x%2.2x dlen %u slen %u%s", flags, hdr->dlen,
+-							start->slen, ts_str);
++	sprintf(extra_str, "flags 0x%2.2x dlen %u%s%s", flags, dlen, slen_str,
++									ts_str);
+ 
+ 	if (conn)
+ 		sprintf(label, "%s", conn_type_str(conn->type));
+@@ -14601,18 +14631,11 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 
+ 	if (!in)
+ 		packet_enqueue_tx(tv, acl_handle(handle),
+-					index_list[index].frame, hdr->dlen);
++					index_list[index].frame, dlen);
+ 
+-	if (size + ts_size != hdr->dlen) {
++	if (size + ts_size != dlen) {
+ 		print_text(COLOR_ERROR, "invalid packet size (%d != %d)",
+-						size + (int)ts_size, hdr->dlen);
+-		packet_hexdump(data, size);
+-		return;
+-	}
+-
+-	if (size != start->slen + 4) {
+-		print_text(COLOR_ERROR, "invalid packet slen (%d+4 != %d)",
+-							start->slen, size);
++						size + (int)ts_size, dlen);
+ 		packet_hexdump(data, size);
+ 		return;
+ 	}
+-- 
+2.54.0
+
+
+From 7482aceece7044e688f20f113263b50c21d69fb6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+Date: Wed, 15 Jul 2026 17:51:44 +0200
+Subject: [PATCH 17/19] profiles/audio: fix UAF on external media service
+ teardown
+
+Keep media_app endpoint/player queues in sync with object lifetime to
+avoid stale pointers during proxy removal.
+
+When admin allowlist reapply removes audio services, endpoint/player
+objects may be destroyed through non-proxy paths first.
+Later proxy_removed_cb calls queue_remove_if() and matching by path
+can dereference freed endpoint/player memory.
+
+Fix by:
+- adding media_app back-references in media_endpoint/local_player
+- unlinking from app queues inside media_endpoint_remove or
+  local_player_remove
+- setting ownership when app-registering endpoint/player objects
+
+This prevents heap-use-after-free in match_endpoint_by_path or
+match_player_by_path during service disconnect.
+
+Assisted-by: GPT:GPT-5.3-Codex
+---
+ profiles/audio/media.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 5d9ea2cbcbce..95f9580b08ff 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -136,12 +136,14 @@ struct media_endpoint {
+ 	guint			watch;
+ 	GSList			*requests;
+ 	struct media_adapter	*adapter;
++	struct media_app	*app;
+ 	GSList			*transports;
+ 	struct endpoint_features	features;
+ };
+ 
+ struct local_player {
+ 	struct media_adapter	*adapter;
++	struct media_app	*app;
+ 	char			*sender;	/* Player DBus bus id */
+ 	char			*path;		/* Player object path */
+ 	GHashTable		*settings;	/* Player settings */
+@@ -305,6 +307,11 @@ static void media_endpoint_remove(void *data)
+ 	}
+ #endif
+ 
++	if (endpoint->app) {
++		queue_remove(endpoint->app->endpoints, endpoint);
++		endpoint->app = NULL;
++	}
++
+ 	info("Endpoint unregistered: sender=%s path=%s", endpoint->sender,
+ 			endpoint->path);
+ 
+@@ -2076,6 +2083,11 @@ static void local_player_remove(void *data)
+ {
+ 	struct local_player *mp = data;
+ 
++	if (mp->app) {
++		queue_remove(mp->app->players, mp);
++		mp->app = NULL;
++	}
++
+ 	info("Player unregistered: sender=%s path=%s", mp->sender, mp->path);
+ 
+ 	local_player_destroy(mp);
+@@ -3168,6 +3180,8 @@ static void app_register_endpoint(void *data, void *user_data)
+ 		return;
+ 	}
+ 
++	endpoint->app = app;
++
+ 	queue_push_tail(app->endpoints, endpoint);
+ 
+ 	return;
+@@ -3196,6 +3210,8 @@ static void app_register_player(void *data, void *user_data)
+ 	if (!player)
+ 		return;
+ 
++	player->app = app;
++
+ 	if (g_dbus_proxy_get_property(proxy, "PlaybackStatus", &iter)) {
+ 		if (!set_status(player, &iter))
+ 			goto fail;
+-- 
+2.54.0
+
+
+From b0abe23f58f1ecc44d9d0b6b328be72d2d2113b8 Mon Sep 17 00:00:00 2001
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Date: Wed, 15 Jul 2026 14:09:56 +0530
+Subject: [PATCH 18/19] doc/org.bluez.ChannelSounding1:Add Used by reference
+ and Examples
+
+Add :Used by: field linking to bluetoothctl cs submenu and
+Examples section showing corresponding bluetoothctl cs commands
+for D-Bus methods
+---
+ Makefile.am                        |   2 +
+ doc/org.bluez.ChannelSounding1.rst | 534 +++++++++++++++++++++++++++++
+ 2 files changed, 536 insertions(+)
+ create mode 100644 doc/org.bluez.ChannelSounding1.rst
+
+diff --git a/Makefile.am b/Makefile.am
+index 76c4ab5d4f4e..23b96c2e303f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -405,6 +405,7 @@ man_MANS += doc/org.bluez.Telephony.5 doc/org.bluez.Call.5
+ man_MANS += doc/org.bluez.ThermometerManager.5 \
+ 		doc/org.bluez.Thermometer.5 \
+ 		doc/org.bluez.ThermometerWatcher.5
++man_MANS += doc/org.bluez.ChannelSounding1.5
+ endif
+ manual_pages += doc/bluetoothd.8
+ manual_pages += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7 \
+@@ -445,6 +446,7 @@ manual_pages += doc/org.bluez.Telephony.5 doc/org.bluez.Call.5
+ manual_pages += doc/org.bluez.ThermometerManager.5 \
+ 		doc/org.bluez.Thermometer.5 \
+ 		doc/org.bluez.ThermometerWatcher.5
++manual_pages += doc/org.bluez.ChannelSounding1.5
+ 
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
+ 			src/main.conf profiles/network/network.conf \
+diff --git a/doc/org.bluez.ChannelSounding1.rst b/doc/org.bluez.ChannelSounding1.rst
+new file mode 100644
+index 000000000000..c06e1d7285e0
+--- /dev/null
++++ b/doc/org.bluez.ChannelSounding1.rst
+@@ -0,0 +1,534 @@
++==========================
++org.bluez.ChannelSounding1
++==========================
++
++----------------------------------------------
++BlueZ D-Bus Channel Sounding API documentation
++----------------------------------------------
++
++:Version: BlueZ
++:Date: June 2026
++:Manual section: 5
++:Manual group: Linux System Administration
++
++Interface
++=========
++
++:Service:	org.bluez
++:Interface:	org.bluez.ChannelSounding1
++:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++:Used by:	**bluetoothctl(1)**, **bluetoothctl-cs(1)**
++
++Methods
++-------
++
++void StartMeasurement(dict params)
++``````````````````````````````````
++
++Starts a Channel Sounding distance measurement procedure on the connected
++device. All configuration is supplied in a single ``a{sv}`` dictionary.
++Any key that is omitted retains its current value in the daemon.
++
++The device to measure is identified by the D-Bus object path on which
++this method is called
++(``[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX``).
++Only one measurement per device object may be active at a time. Calling
++**StartMeasurement** while a session is already active returns
++``org.bluez.Error.InProgress``.
++
++When ``role`` is Reflector (``0x02``), this method does not start a CS
++distance measurement: a Reflector never initiates a procedure locally,
++so it cannot start one via this call. Instead, all given configuration
++is applied and stored so the controller is ready to respond once a
++remote Initiator begins a procedure, and the method returns success
++without arming a local measurement session. The ``Active`` property
++only transitions to ``true`` when a remote-initiated procedure
++actually starts, which may happen well after this method returns (or
++not at all, if the remote never initiates one). Clients that watch
++``PropertiesChanged`` for ``Active`` (as **bluetoothctl-cs(1)** does)
++are notified of both the remote-initiated start and its eventual stop.
++
++For Initiator role (or Both), ``duration_secs`` and the device object
++path are the parameters that matter to start a measurement; every
++other key below is optional configuration with a usable default. For
++Reflector role, only ``role``, ``sync_ant_sel`` and ``max_tx_power``
++are required or have any effect — the remaining keys are accepted but
++otherwise unused, since no local procedure is armed.
++
++Supported dictionary keys:
++
++:uint32 duration_secs (Default: 0):
++
++	Duration in seconds before the measurement is stopped
++	automatically. A value of 0 disables the automatic timeout.
++
++:byte role (Default: 0x03):
++
++	CS role to use for the measurement.
++
++	Possible values:
++
++	:0x01: Initiator
++	:0x02: Reflector
++	:0x03: Both (Initiator and Reflector)
++
++:byte sync_ant_sel (Default: 0xFF):
++
++	CS sync antenna selection. Values 0xFE and 0xFF are reserved
++	by the Bluetooth specification.
++
++:byte max_tx_power (Default: 0x14):
++
++	Maximum TX power in dBm, treated as a signed value. Valid
++	range is -127 to +20 dBm.
++
++:byte config_id:
++
++	CS configuration identifier.
++
++:byte main_mode_type:
++
++	Main CS mode used in the procedure.
++
++:byte sub_mode_type:
++
++	Sub-mode within the main mode. Set to 0xFF when unused.
++
++:byte main_mode_min_steps:
++
++	Minimum number of CS main mode steps per CS subevent.
++
++:byte main_mode_max_steps:
++
++	Maximum number of CS main mode steps per CS subevent.
++
++:byte main_mode_repetition:
++
++	Number of times the main mode steps are repeated in a
++	subevent.
++
++:byte mode0_steps:
++
++	Number of CS Mode 0 steps at the beginning of each subevent.
++
++:byte rtt_types:
++
++	Round Trip Time measurement types for the configuration.
++
++:byte sync_phy:
++
++	PHY used for CS sync packets.
++
++	Possible values:
++
++	:0x01: LE 1M PHY
++	:0x02: LE 2M PHY
++
++:array{byte} channel_map:
++
++	10-byte channel map bitmap. Must be exactly 10 bytes.
++
++:byte channel_map_repetition:
++
++	Number of consecutive repetitions of the channel map.
++
++:byte channel_selection_type:
++
++	Algorithm used for CS channel selection.
++
++:byte channel_shape:
++
++	Shape used in the channel selection algorithm.
++
++:byte channel_jump:
++
++	Channel jump size used in the channel selection algorithm.
++
++:byte companion_signal_enable:
++
++	Set to 1 to transmit a companion signal alongside the CS
++	tone, 0 to disable.
++
++:uint16 max_procedure_duration:
++
++	Maximum duration of a single CS measurement procedure.
++
++:uint16 min_period_between_procedures:
++
++	Minimum time between consecutive CS measurement procedures.
++
++:uint16 max_period_between_procedures:
++
++	Maximum time between consecutive CS measurement procedures.
++
++:uint16 max_procedure_count:
++
++	Maximum number of CS measurement procedures to run.
++	A value of 0 means no limit.
++
++:array{byte} min_sub_event_len:
++
++	Minimum CS subevent length as a 3-byte little-endian value.
++	Must be exactly 3 bytes.
++
++:array{byte} max_sub_event_len:
++
++	Maximum CS subevent length as a 3-byte little-endian value.
++	Must be exactly 3 bytes.
++
++:byte tone_antenna_config_selection:
++
++	Antenna configuration used for CS tone exchanges.
++
++:byte phy:
++
++	PHY used during CS procedures.
++
++	Possible values:
++
++	:0x01: LE 1M PHY
++	:0x02: LE 2M PHY
++
++:byte tx_power_delta:
++
++	Difference between remote and local TX power during CS
++	procedures. 0x80 indicates not applicable.
++
++:byte preferred_peer_antenna:
++
++	Preferred antenna to be used by the peer device.
++
++:byte snr_control_initiator:
++
++	SNR control setting for the initiator role.
++	0xFF indicates no preference.
++
++:byte snr_control_reflector:
++
++	SNR control setting for the reflector role.
++	0xFF indicates no preference.
++
++Possible errors:
++
++:org.bluez.Error.InProgress:
++:org.bluez.Error.InvalidArgs:
++:org.freedesktop.DBus.Error.Failed:
++
++Examples:
++
++:bluetoothctl set role then start:
++	| [cs] > role 0x01
++	| [cs] > main_mode_type 2
++	| [cs] > start AA:BB:CC:DD:EE:FF
++:bluetoothctl start with defaults:
++	| [cs] > start [dev_addr] [duration_secs]
++:bluetoothctl configure as Reflector (applies settings, does not start a measurement):
++	| [cs] > role 0x02
++	| [cs] > start
++
++void StopMeasurement(void)
++``````````````````````````
++
++Stops the active Channel Sounding distance measurement on this device.
++The device is identified by the D-Bus object path on which this method
++is called — no session identifier is required.
++
++Raises ``org.bluez.Error.NotConnected`` if no measurement is active.
++
++Possible errors:
++
++:org.bluez.Error.NotConnected:
++:org.freedesktop.DBus.Error.Failed:
++
++In **bluetoothctl(1)**, the device address argument may be omitted only
++when a single measurement is active; it is required when multiple
++measurements are active.
++
++Examples:
++
++:bluetoothctl stop the only active measurement:
++	| [cs] > stop
++:bluetoothctl stop a specific device when multiple are active:
++	| [cs] > stop AA:BB:CC:DD:EE:FF
++
++Signals
++-------
++
++void ProcedureData(dict data)
++``````````````````````````````
++
++Emitted when a Channel Sounding measurement procedure completes on this
++device, carrying the raw CS procedure results as reported by the
++controller. Consumers such as an external ranging estimation daemon
++subscribe to this signal to compute distance estimates.
++
++:dict data:
++
++	:int32 procedureCounter:
++
++		Procedure counter value from the controller.
++
++	:int32 procedureSequence:
++
++		Sequence number of this procedure.
++
++	:byte initiatorSelectedTxPower:
++
++		TX power selected by the Initiator, treated as a signed
++		value.
++
++	:byte reflectorSelectedTxPower:
++
++		TX power selected by the Reflector, treated as a signed
++		value.
++
++	:uint32 initiatorSubeventCount:
++
++		Number of subevent results reported by the Initiator.
++
++	:array{dict} initiatorSubeventResults:
++
++		Present only when ``initiatorSubeventCount`` is greater
++		than 0. One entry per Initiator subevent, each with the
++		fields described in `Subevent Result`_ below.
++
++	:byte initiatorProcedureAbortReason:
++
++		Reason the Initiator's procedure was aborted, 0 if not
++		aborted.
++
++	:uint32 reflectorSubeventCount:
++
++		Number of subevent results reported by the Reflector.
++
++	:array{dict} reflectorSubeventResults:
++
++		Present only when ``reflectorSubeventCount`` is greater
++		than 0. One entry per Reflector subevent, each with the
++		fields described in `Subevent Result`_ below.
++
++	:byte reflectorProcedureAbortReason:
++
++		Reason the Reflector's procedure was aborted, 0 if not
++		aborted.
++
++	:dict procedureEnableConfig:
++
++		:byte toneAntennaConfigSelection:
++
++			Antenna configuration used for CS tone exchanges.
++
++		:uint32 subeventLenUs:
++
++			Subevent length in microseconds.
++
++		:byte subeventsPerEvent:
++
++			Number of subevents per event.
++
++		:uint32 subeventInterval:
++
++			Interval between subevents.
++
++		:uint32 eventInterval:
++
++			Interval between events.
++
++		:uint32 procedureInterval:
++
++			Interval between procedures.
++
++		:uint32 procedureCount:
++
++			Number of procedures configured.
++
++		:uint32 maxProcedureLen:
++
++			Maximum procedure length.
++
++	:dict csConfigParam:
++
++		:byte modeType:
++
++			Main CS mode used in the procedure.
++
++		:byte subModeType:
++
++			Sub-mode within the main mode.
++
++		:byte rttType:
++
++			Round Trip Time measurement type.
++
++		:array{byte} channelMap:
++
++			10-byte channel map bitmap.
++
++		:byte minMainModeSteps:
++		:byte maxMainModeSteps:
++		:byte mainModeRepetition:
++		:byte mode0Steps:
++
++		:byte role:
++
++			CS role in effect for the procedure (Initiator,
++			Reflector, or Both).
++
++		:byte csSyncPhyType:
++
++			PHY used for CS sync packets.
++
++		:byte channelSelectionType:
++		:byte ch3cShapeType:
++		:byte ch3cJump:
++		:byte channelMapRepetition:
++		:byte tIp1TimeUs:
++		:byte tIp2TimeUs:
++		:byte tFcsTimeUs:
++		:byte tPmTimeUs:
++		:byte tSwTimeUsSupportedByLocal:
++		:byte tSwTimeUsSupportedByRemote:
++
++		:uint32 bleConnInterval:
++
++			BLE connection interval in effect during the
++			procedure.
++
++Subevent Result
++~~~~~~~~~~~~~~~~
++
++Each element of ``initiatorSubeventResults`` and
++``reflectorSubeventResults`` is a dict with the following fields:
++
++:int32 startAclConnEvtCounter:
++
++	ACL connection event counter at the start of the subevent.
++
++:int32 freqComp:
++
++	Frequency compensation value.
++
++:byte refPwrLvl:
++
++	Reference power level, treated as a signed value.
++
++:byte numAntPaths:
++
++	Number of antenna paths used.
++
++:byte subeventAbortReason:
++
++	Reason the subevent was aborted, 0 if not aborted.
++
++:uint64 timestampNanos:
++
++	Timestamp of the subevent result, in nanoseconds.
++
++:uint32 numSteps:
++
++	Number of steps reported in this subevent.
++
++:array{dict} stepData:
++
++	One entry per step. Each entry has:
++
++	:byte stepMode:
++
++		CS step mode (0-3).
++
++	:byte stepChannel:
++
++		Channel used for the step.
++
++	:dict modeZeroData:
++
++		Present when ``stepMode`` is 0.
++
++		:byte packetQuality:
++		:byte packetRssiDbm:
++		:byte packetAntenna:
++
++		:int32 initiatorMeasuredFreqOffset:
++
++			Frequency offset measured by the Initiator.
++
++	:dict modeOneData:
++
++		Present when ``stepMode`` is 1.
++
++		:byte packetQuality:
++		:byte packetNadm:
++		:byte packetRssiDbm:
++
++		:int32 toaTodInitiator:
++
++			Time of Arrival / Time of Departure at the
++			Initiator.
++
++		:int32 todToaReflector:
++
++			Time of Departure / Time of Arrival at the
++			Reflector.
++
++		:byte packetAntenna:
++
++		:array{int32} packetPct1:
++
++			In-phase/quadrature sample pair, as
++			``[i_sample, q_sample]``.
++
++		:array{int32} packetPct2:
++
++			In-phase/quadrature sample pair, as
++			``[i_sample, q_sample]``.
++
++	:dict modeTwoData:
++
++		Present when ``stepMode`` is 2.
++
++		:byte antennaPermutationIndex:
++
++		:array{int32} tonePctIQSamples:
++
++			Interleaved in-phase/quadrature tone samples, as
++			``[i_sample, q_sample, ...]`` — one pair per
++			antenna path.
++
++		:array{byte} toneQualityIndicators:
++
++			One quality indicator byte per antenna path.
++
++	:dict modeThreeData:
++
++		Present when ``stepMode`` is 3. Contains the combined
++		fields of both **modeOneData** and **modeTwoData**.
++
++Properties
++----------
++
++boolean Active [readonly]
++`````````````````````````
++
++Indicates whether a CS distance measurement procedure is currently
++active on this device.
++
++Set to ``true`` when a procedure starts — either because the local
++Initiator called **StartMeasurement** successfully, or because the
++remote Initiator enabled a CS procedure on the local Reflector.
++
++Set to ``false`` when the procedure stops for any reason: the local
++application called **StopMeasurement**, the measurement duration timer
++expired, or the ACL connection was dropped.
++
++This property emits ``PropertiesChanged`` on every transition so that
++clients can track measurement state without polling.
++
++RESOURCES
++=========
++
++http://www.bluez.org
++
++REPORTING BUGS
++==============
++
++linux-bluetooth@vger.kernel.org
+-- 
+2.54.0
+
+
+From 30db66dc971bd1cd95d4a7b0eea296367ab65b3b Mon Sep 17 00:00:00 2001
+From: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
+Date: Wed, 15 Jul 2026 14:09:57 +0530
+Subject: [PATCH 19/19] doc/bluetoothctl-cs: Add :Uses: fields and document
+ arguments
+
+Add :Uses: fields to link commands to their corresponding D-Bus API
+methods, and document command arguments with usage examples
+---
+ Makefile.tools          |   5 +-
+ doc/bluetoothctl-cs.rst | 546 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 549 insertions(+), 2 deletions(-)
+ create mode 100644 doc/bluetoothctl-cs.rst
+
+diff --git a/Makefile.tools b/Makefile.tools
+index 6188449f1565..0646d52e14dc 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -359,7 +359,7 @@ man_MANS += doc/rctest.1 doc/l2ping.1 doc/btattach.1 doc/isotest.1 \
+ 		doc/bluetoothctl-gatt.1 doc/bluetoothctl-player.1 \
+ 		doc/bluetoothctl-scan.1 doc/bluetoothctl-transport.1 \
+ 		doc/bluetoothctl-assistant.1 doc/bluetoothctl-hci.1 \
+-		doc/bluetoothctl-telephony.1
++		doc/bluetoothctl-telephony.1 doc/bluetoothctl-cs.1
+ 
+ endif
+ 
+@@ -465,7 +465,8 @@ manual_pages += doc/hciattach.1 doc/hciconfig.1 doc/hcitool.1 \
+ 			doc/bluetoothctl-transport.1 \
+ 			doc/bluetoothctl-assistant.1 \
+ 			doc/bluetoothctl-hci.1 \
+-			doc/bluetoothctl-telephony.1
++			doc/bluetoothctl-telephony.1 \
++			doc/bluetoothctl-cs.1
+ 
+ if HID2HCI
+ udevdir = $(UDEV_DIR)
+diff --git a/doc/bluetoothctl-cs.rst b/doc/bluetoothctl-cs.rst
+new file mode 100644
+index 000000000000..bbc1d8565f91
+--- /dev/null
++++ b/doc/bluetoothctl-cs.rst
+@@ -0,0 +1,546 @@
++================
++bluetoothctl-cs
++================
++
++--------------------------
++Channel Sounding Submenu
++--------------------------
++
++:Version: BlueZ
++:Copyright: Free use of this software is granted under the terms of the GNU
++            Lesser General Public Licenses (LGPL).
++:Date: June 2026
++:Manual section: 1
++:Manual group: Linux System Administration
++
++SYNOPSIS
++========
++
++**bluetoothctl** [--options] [cs.commands]
++
++This submenu controls Bluetooth Channel Sounding (CS) distance measurement
++using the **org.bluez.ChannelSounding1(5)** D-Bus interface. It allows
++starting and stopping measurements and inspecting the current parameter
++state and active session identifier.
++
++Each CS parameter has its own **cs.<param>** set command (see the
++**CS Parameter Commands** section below). Overrides are applied to
++the local parameter state immediately, so **show** reflects them
++right away; **start** always uses whatever values are currently set.
++
++
++Channel Sounding Commands
++=========================
++
++start
++-----
++
++Starts a distance measurement on the connected device using the
++currently set CS parameters (see the **cs.<param>** commands below).
++All configuration is sent to the daemon in a single **StartMeasurement**
++call. On success the device path is printed to the console. Multiple
++simultaneous sessions across different devices are supported; each is
++tracked independently.
++
++Calling **start** on a device that already has an active measurement
++returns an error without starting a second session on the same device.
++
++For Initiator role (or Both), the mandatory parameters are the
++positional ``dev_addr`` and ``duration_secs``; every ``cs.<param>``
++command below is optional configuration with a usable default.
++
++If ``role`` is set to Reflector (``0x02``, via **cs.role**), **start**
++does not begin measuring distance: a Reflector never initiates a CS
++procedure. It only pushes the current parameters to the daemon and
++arms the device to respond once the remote Initiator starts one; the
++call still succeeds. When the remote side starts or stops a procedure,
++the console prints ``Measurement started``/``Measurement stopped`` for
++that device — use **show** or watch the ``Active`` property to see
++the same transition. In this role the only parameters that are
++required or have any effect are ``role``, ``sync_ant_sel`` and
++``max_tx_power``; every other **cs.<param>** command below is
++accepted but unused.
++
++Positional arguments are optional:
++
++- ``dev_addr`` — Bluetooth address of the target device; uses the only
++  available CS-capable device when omitted.
++- ``duration_secs`` — auto-stop timeout in seconds; ``0`` (default) means
++  no timeout.
++
++:Usage: **> start [dev_addr] [duration_secs]**
++:Uses: **org.bluez.ChannelSounding1(5)** method **StartMeasurement**
++:[dev_addr]: Bluetooth address of the target device (optional; uses the
++             only available CS-capable device when omitted)
++:[duration_secs]: Seconds before auto-stop (optional, default 0 = no timeout)
++
++:Example Start with all defaults, no timeout:
++	| **> start**
++:Example Start on a specific device:
++	| **> start AA:BB:CC:DD:EE:FF**
++:Example Start on a specific device with 10-second auto-stop:
++	| **> start AA:BB:CC:DD:EE:FF 10**
++:Example Start with 10-second auto-stop (single device, address omitted):
++	| **> start 0 10**
++:Example Start with 5-minute auto-stop:
++	| **> start AA:BB:CC:DD:EE:FF 300**
++
++stop
++----
++
++Stops an active CS distance measurement. When only one measurement is
++running the device address may be omitted. When multiple measurements
++are active the address is required to identify which one to stop.
++
++:Usage: **> stop [dev_addr]**
++:Uses: **org.bluez.ChannelSounding1(5)** method **StopMeasurement**
++:[dev_addr]: Bluetooth address of the device to stop (optional when
++             only one session is active; required otherwise)
++:Example Stop the only active measurement:
++	| **> stop**
++:Example Stop a specific device when multiple are active:
++	| **> stop AA:BB:CC:DD:EE:FF**
++:Example Stop a second device:
++	| **> stop 11:22:33:44:55:66**
++
++show
++----
++
++Displays all active measurements (device path for each) and the full
++set of CS parameter values that will be used on the next **start** call.
++When no measurements are active, ``none`` is shown.
++
++The parameter output is divided into three sections:
++
++- **Default Settings** — role, CS sync antenna selection, max TX power.
++- **CS Config Params** — per-procedure configuration fields including
++  mode type, step counts, PHY, and channel map.
++- **CS Frequency Params** — procedure scheduling fields including
++  duration, period, subevent lengths, and SNR control.
++
++:Usage: **> show**
++:Example Show active session and all CS parameters:
++	| **> show**
++
++CS Parameter Commands
++======================
++
++Each CS parameter is set with its own command, of the form
++``cs.<param> <value>``. Entering a param command with no value shows
++its current setting. Overrides apply to the local parameter state
++immediately, so **show** reflects them right away; **start** always
++uses whatever values are currently set. Array-valued parameters
++(``channel_map``, ``min_sub_event_len``, ``max_sub_event_len``) take
++colon-separated hex bytes with no ``0x`` prefix.
++
++:Usage: **> <param> [value]**
++
++role
++----
++
++Get/set the CS role.
++
++:Usage: **> role [0x01|0x02|0x03]**
++:[0x01|0x02|0x03]: ``0x01`` Initiator, ``0x02`` Reflector, ``0x03`` Both
++                   (optional, shows current if omitted; default ``0x03``)
++:Example Show current role:
++	| **> role**
++:Example Set role to Initiator only:
++	| **> role 0x01**
++:Example Set role to Reflector only (does not measure):
++	| **> role 0x02**
++:Example Set role to both Initiator and Reflector:
++	| **> role 0x03**
++
++sync_ant_sel
++------------
++
++Get/set the CS sync antenna selection.
++
++:Usage: **> sync_ant_sel [value]**
++:[value]: CS sync antenna selection; ``0xFE``/``0xFF`` reserved
++          (optional, shows current if omitted; default ``0xFF``)
++:Example Show current antenna selection:
++	| **> sync_ant_sel**
++:Example Select antenna 1:
++	| **> sync_ant_sel 0x01**
++
++max_tx_power
++------------
++
++Get/set the maximum TX power.
++
++:Usage: **> max_tx_power [dBm]**
++:[dBm]: Max TX power in dBm, signed (optional, shows current if
++        omitted; range −127 to +20; default ``20``)
++:Example Show current max TX power:
++	| **> max_tx_power**
++:Example Reduce max TX power to 10 dBm:
++	| **> max_tx_power 10**
++
++config_id
++---------
++
++Get/set the CS configuration identifier.
++
++:Usage: **> config_id [value]**
++:[value]: CS configuration identifier (optional, shows current if
++          omitted; default ``0``)
++:Example Show current config id:
++	| **> config_id**
++:Example Set config id to 1:
++	| **> config_id 1**
++
++main_mode_type
++--------------
++
++Get/set the CS main mode type.
++
++:Usage: **> main_mode_type [1|2|3]**
++:[1|2|3]: ``1`` Mode 1 (RTT), ``2`` Mode 2 (PBR), ``3`` Both (optional,
++          shows current if omitted; default ``1``)
++:Example Show current main mode type:
++	| **> main_mode_type**
++:Example Set main mode to Mode 2 (PBR):
++	| **> main_mode_type 2**
++:Example Set main mode to both RTT and PBR:
++	| **> main_mode_type 3**
++
++sub_mode_type
++-------------
++
++Get/set the CS sub-mode type within the main mode.
++
++:Usage: **> sub_mode_type [value]**
++:[value]: Sub-mode within main mode; ``0xFF`` = unused (optional,
++          shows current if omitted; default ``0xFF``)
++:Example Show current sub-mode type:
++	| **> sub_mode_type**
++:Example Set sub-mode type to 0x01:
++	| **> sub_mode_type 0x01**
++
++main_mode_min_steps
++--------------------
++
++Get/set the minimum CS main mode steps per subevent.
++
++:Usage: **> main_mode_min_steps [value]**
++:[value]: Min CS main mode steps per subevent (optional, shows
++          current if omitted; default ``2``)
++:Example Show current value:
++	| **> main_mode_min_steps**
++:Example Set minimum steps to 4:
++	| **> main_mode_min_steps 4**
++
++main_mode_max_steps
++--------------------
++
++Get/set the maximum CS main mode steps per subevent.
++
++:Usage: **> main_mode_max_steps [value]**
++:[value]: Max CS main mode steps per subevent (optional, shows
++          current if omitted; default ``3``)
++:Example Show current value:
++	| **> main_mode_max_steps**
++:Example Set maximum steps to 8:
++	| **> main_mode_max_steps 8**
++
++main_mode_repetition
++---------------------
++
++Get/set how many times main mode steps are repeated in a subevent.
++
++:Usage: **> main_mode_repetition [value]**
++:[value]: Repetition count (optional, shows current if omitted;
++          default ``1``)
++:Example Show current value:
++	| **> main_mode_repetition**
++:Example Repeat main mode steps twice:
++	| **> main_mode_repetition 2**
++
++mode0_steps
++-----------
++
++Get/set the number of CS Mode 0 steps at the beginning of each
++subevent.
++
++:Usage: **> mode0_steps [value]**
++:[value]: CS Mode 0 step count (optional, shows current if omitted;
++          default ``2``)
++:Example Show current value:
++	| **> mode0_steps**
++:Example Set Mode 0 steps to 3:
++	| **> mode0_steps 3**
++
++rtt_types
++---------
++
++Get/set the RTT measurement types bitmask.
++
++:Usage: **> rtt_types [value]**
++:[value]: RTT measurement types bitmask (optional, shows current if
++          omitted; default ``0``)
++:Example Show current value:
++	| **> rtt_types**
++:Example Set RTT types bitmask:
++	| **> rtt_types 0x01**
++
++sync_phy
++--------
++
++Get/set the PHY used for CS sync.
++
++:Usage: **> sync_phy [0x01|0x02]**
++:[0x01|0x02]: ``0x01`` LE 1M, ``0x02`` LE 2M (optional, shows current
++              if omitted; default ``0x01``)
++:Example Show current sync PHY:
++	| **> sync_phy**
++:Example Set CS sync PHY to LE 2M:
++	| **> sync_phy 0x02**
++
++channel_map
++-----------
++
++Get/set the 10-byte CS channel map bitmap.
++
++:Usage: **> channel_map [b0:b1:...:b9]**
++:[b0:b1:...:b9]: 10 colon-separated hex bytes (optional, shows current
++                 if omitted; default ``FC:FF:7F:FC:FF:FF:FF:FF:FF:1F``)
++:Example Show current channel map:
++	| **> channel_map**
++:Example Set a custom channel map (all enabled):
++	| **> channel_map FF:FF:FF:FF:FF:FF:FF:FF:FF:FF**
++
++channel_map_repetition
++-----------------------
++
++Get/set the number of consecutive repetitions of the channel map.
++
++:Usage: **> channel_map_repetition [value]**
++:[value]: Repetition count (optional, shows current if omitted;
++          default ``1``)
++:Example Show current value:
++	| **> channel_map_repetition**
++:Example Repeat the channel map 3 times:
++	| **> channel_map_repetition 3**
++
++channel_selection_type
++-----------------------
++
++Get/set the CS channel selection algorithm.
++
++:Usage: **> channel_selection_type [value]**
++:[value]: Channel selection algorithm (optional, shows current if
++          omitted; default ``0``)
++:Example Show current value:
++	| **> channel_selection_type**
++:Example Select algorithm 1:
++	| **> channel_selection_type 1**
++
++channel_shape
++-------------
++
++Get/set the shape used in the channel selection algorithm.
++
++:Usage: **> channel_shape [value]**
++:[value]: Channel shape (optional, shows current if omitted; default
++          ``0``)
++:Example Show current value:
++	| **> channel_shape**
++:Example Set channel shape to 1:
++	| **> channel_shape 1**
++
++channel_jump
++------------
++
++Get/set the channel jump size.
++
++:Usage: **> channel_jump [value]**
++:[value]: Channel jump size (optional, shows current if omitted;
++          default ``2``)
++:Example Show current value:
++	| **> channel_jump**
++:Example Set channel jump to 4:
++	| **> channel_jump 4**
++
++companion_signal_enable
++------------------------
++
++Get/set whether the companion signal is transmitted.
++
++:Usage: **> companion_signal_enable [0|1]**
++:[0|1]: ``1`` to transmit companion signal, ``0`` to disable (optional,
++        shows current if omitted; default ``0``)
++:Example Show current value:
++	| **> companion_signal_enable**
++:Example Enable the companion signal:
++	| **> companion_signal_enable 1**
++
++max_procedure_duration
++-----------------------
++
++Get/set the maximum duration of one CS measurement procedure.
++
++:Usage: **> max_procedure_duration [value]**
++:[value]: Maximum procedure duration (optional, shows current if
++          omitted; default ``1600``)
++:Example Show current value:
++	| **> max_procedure_duration**
++:Example Set max procedure duration to 800:
++	| **> max_procedure_duration 800**
++
++min_period_between_procedures
++-------------------------------
++
++Get/set the minimum time between consecutive procedures.
++
++:Usage: **> min_period_between_procedures [value]**
++:[value]: Minimum period (optional, shows current if omitted; default
++          ``30``)
++:Example Show current value:
++	| **> min_period_between_procedures**
++:Example Set minimum period to 50:
++	| **> min_period_between_procedures 50**
++
++max_period_between_procedures
++-------------------------------
++
++Get/set the maximum time between consecutive procedures.
++
++:Usage: **> max_period_between_procedures [value]**
++:[value]: Maximum period (optional, shows current if omitted; default
++          ``150``)
++:Example Show current value:
++	| **> max_period_between_procedures**
++:Example Set maximum period to 200:
++	| **> max_period_between_procedures 200**
++
++max_procedure_count
++--------------------
++
++Get/set the maximum number of procedures.
++
++:Usage: **> max_procedure_count [value]**
++:[value]: Max procedure count; ``0`` = no limit (optional, shows
++          current if omitted; default ``0``)
++:Example Show current value:
++	| **> max_procedure_count**
++:Example Limit the procedure count to 100:
++	| **> max_procedure_count 100**
++
++min_sub_event_len
++------------------
++
++Get/set the minimum CS subevent length.
++
++:Usage: **> min_sub_event_len [b0:b1:b2]**
++:[b0:b1:b2]: 3-byte LE value, colon-separated hex (optional, shows
++             current if omitted; default ``00:20:00``)
++:Example Show current value:
++	| **> min_sub_event_len**
++:Example Set minimum subevent length:
++	| **> min_sub_event_len 00:10:00**
++
++max_sub_event_len
++------------------
++
++Get/set the maximum CS subevent length.
++
++:Usage: **> max_sub_event_len [b0:b1:b2]**
++:[b0:b1:b2]: 3-byte LE value, colon-separated hex (optional, shows
++             current if omitted; default ``03:20:00``)
++:Example Show current value:
++	| **> max_sub_event_len**
++:Example Set maximum subevent length:
++	| **> max_sub_event_len 04:20:00**
++
++tone_antenna_config_selection
++-------------------------------
++
++Get/set the antenna configuration for CS tone exchanges.
++
++:Usage: **> tone_antenna_config_selection [value]**
++:[value]: Antenna config selection (optional, shows current if
++          omitted; default ``0x07``)
++:Example Show current value:
++	| **> tone_antenna_config_selection**
++:Example Set antenna config to 0x01:
++	| **> tone_antenna_config_selection 0x01**
++
++phy
++---
++
++Get/set the PHY used for CS procedures.
++
++:Usage: **> phy [0x01|0x02]**
++:[0x01|0x02]: ``0x01`` LE 1M, ``0x02`` LE 2M (optional, shows current
++              if omitted; default ``0x01``)
++:Example Show current procedure PHY:
++	| **> phy**
++:Example Set CS procedure PHY to LE 2M:
++	| **> phy 0x02**
++
++tx_power_delta
++--------------
++
++Get/set the remote vs local TX power delta.
++
++:Usage: **> tx_power_delta [value]**
++:[value]: TX power delta; ``0x80`` = not applicable (optional, shows
++          current if omitted; default ``0x80``)
++:Example Show current value:
++	| **> tx_power_delta**
++:Example Set TX power delta to 0x05:
++	| **> tx_power_delta 0x05**
++
++preferred_peer_antenna
++-----------------------
++
++Get/set the preferred antenna for the peer device.
++
++:Usage: **> preferred_peer_antenna [value]**
++:[value]: Preferred peer antenna (optional, shows current if omitted;
++          default ``0x03``)
++:Example Show current value:
++	| **> preferred_peer_antenna**
++:Example Prefer antenna 1 on the peer:
++	| **> preferred_peer_antenna 0x01**
++
++snr_control_initiator
++----------------------
++
++Get/set the SNR control for the initiator.
++
++:Usage: **> snr_control_initiator [value]**
++:[value]: SNR control; ``0xFF`` = no preference (optional, shows
++          current if omitted; default ``0xFF``)
++:Example Show current value:
++	| **> snr_control_initiator**
++:Example Prefer high SNR on the initiator:
++	| **> snr_control_initiator 0x01**
++
++snr_control_reflector
++----------------------
++
++Get/set the SNR control for the reflector.
++
++:Usage: **> snr_control_reflector [value]**
++:[value]: SNR control; ``0xFF`` = no preference (optional, shows
++          current if omitted; default ``0xFF``)
++:Example Show current value:
++	| **> snr_control_reflector**
++:Example Prefer high SNR on the reflector:
++	| **> snr_control_reflector 0x01**
++:Example Prefer high SNR on both roles:
++	| **> snr_control_initiator 0x01**
++	| **> snr_control_reflector 0x01**
++
++RESOURCES
++=========
++
++http://www.bluez.org
++
++REPORTING BUGS
++==============
++
++linux-bluetooth@vger.kernel.org
+-- 
+2.54.0
+

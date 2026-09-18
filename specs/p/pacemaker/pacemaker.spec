@@ -43,11 +43,11 @@
 ## Upstream pacemaker version, and its package version (baserelease
 ## can be incremented to build packages reliably considered "newer"
 ## than previously built packages with the same pcmkversion)
-%global pcmkversion 3.0.1
-%global baserelease 12
+%global pcmkversion 3.0.2
+%global baserelease 3
 
 ## Upstream commit (full commit ID, abbreviated commit ID, or tag) to build
-%global commit 16e74fc4da93a08514e1ec320fa9530b6c3d9fd5
+%global commit c75e25851c05c6b0ff48caeaa15854d5868ce428
 
 ## Since git v2.11, the extent of abbreviation is autoscaled by default
 ## (used to be constant of 7), so we need to convey it for non-tags, too.
@@ -194,6 +194,13 @@ Url:           https://www.clusterlabs.org/
 # You can use "spectool -s 0 pacemaker.spec" (rpmdevtools) to show final URL.
 Source0:       https://codeload.github.com/%{github_owner}/%{name}/tar.gz/%{archive_github_url}
 Source1:       pacemaker.sysusers
+
+# upstream commits
+Patch0:        0001-Med-libcrmcommon-Fix-checks-in-localized_remote_head.patch
+Patch1:        0002-High-libcrmcommon-Fix-integer-overflow-in-remote-mes.patch
+Patch2:        0003-High-libcrmcommon-Limit-the-max-size-of-a-remote-mes.patch
+Patch3:        0004-High-libcrmcommon-Fix-an-integer-overflow-in-pcmk__r.patch
+Patch4:        0005-Refactor-libcib-Remove-an-unnecessary-coverity-suppr.patch
 
 Requires:      resource-agents
 Requires:      %{pkgname_pcmk_libs}%{?_isa} = %{version}-%{release}
@@ -765,6 +772,14 @@ fi
 %{_datadir}/pkgconfig/pacemaker-schemas.pc
 
 %changelog
+* Wed Jun 17 2026 Klaus Wenninger <klaus.wenninger@aon.at> - 3.0.2-3
+- fix CVE-2026-10649: Fix integer overflows in remote message code
+
+* Wed Jun 3 2026 Klaus Wenninger <kwenning@redhat.com> - 3.0.2-1
+- Update for new upstream release tarball: Pacemaker-3.0.2,
+  for full details, see included ChangeLog.md file or
+  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-3.0.2
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.0.1-12
 - Rebuilt for Python 3.14.0rc3 bytecode (rhbz#2396740)
 

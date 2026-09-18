@@ -16,11 +16,11 @@
 %bcond_without       tests
 
 # Github
-%global gh_commit    a8b58fde2f4fbc69a064e1f80ff917607cf7737c
+%global gh_commit    2ea1bcdad040326c02edd6519cc9d1c5a9f6c87e
 %global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner    sebastianbergmann
 %global gh_project   php-code-coverage
-%global gh_date      2026-02-06
+%global gh_date      2026-04-01
 # Packagist
 %global pk_vendor    phpunit
 %global pk_project   php-code-coverage
@@ -31,8 +31,8 @@
 %global ver_major    13
 
 Name:           php-%{pk_vendor}-%{pk_project}%{ver_major}
-Version:        13.0.1
-Release: 6%{?dist}
+Version:        13.0.2
+Release:        1%{?dist}
 Summary:        PHP code coverage information, version %{ver_major}
 
 # SPDX: Main license is BSD-3-Clause
@@ -51,7 +51,6 @@ BuildRequires:  php(language) >= 8.4.1
 BuildRequires:  php-fedora-autoloader-devel >= 1.0.0
 %if %{with tests}
 BuildRequires:  (php-composer(nikic/php-parser)                   >= 5.7.0  with php-composer(nikic/php-parser)                   < 6)
-BuildRequires:  (php-composer(phpunit/php-file-iterator)          >= 7.0    with php-composer(phpunit/php-file-iterator)          < 8)
 BuildRequires:  (php-composer(phpunit/php-text-template)          >= 6.0    with php-composer(phpunit/php-text-template)          < 7)
 BuildRequires:  (php-composer(sebastian/complexity)               >= 6.0    with php-composer(sebastian/complexity)               < 7)
 BuildRequires:  (php-composer(sebastian/environment)              >= 9.0    with php-composer(sebastian/environment)              < 10)
@@ -75,7 +74,6 @@ BuildRequires:  php-xdebug
 #        "ext-libxml": "*",
 #        "ext-xmlwriter": "*",
 #        "nikic/php-parser": "^5.7.0",
-#        "phpunit/php-file-iterator": "^7.0",
 #        "phpunit/php-text-template": "^6.0",
 #        "sebastian/complexity": "^6.0",
 #        "sebastian/environment": "^9.0",
@@ -87,7 +85,6 @@ Requires:       php-dom
 Requires:       php-libxml
 Requires:       php-xmlwriter
 Requires:       (php-composer(nikic/php-parser)                   >= 5.7.0  with php-composer(nikic/php-parser)                   < 6)
-Requires:       (php-composer(phpunit/php-file-iterator)          >= 7.0    with php-composer(phpunit/php-file-iterator)          < 8)
 Requires:       (php-composer(phpunit/php-text-template)          >= 6.0    with php-composer(phpunit/php-text-template)          < 7)
 Requires:       (php-composer(sebastian/complexity)               >= 6.0    with php-composer(sebastian/complexity)               < 7)
 Requires:       (php-composer(sebastian/environment)              >= 9.0    with php-composer(sebastian/environment)              < 10)
@@ -135,7 +132,6 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{ver_major}/autoload.php
 cat << 'EOF' | tee -a src/autoload.php
 \Fedora\Autoloader\Dependencies::required([
     '%{php_home}/PhpParser5/autoload.php',
-    '%{php_home}/%{ns_vendor}/FileIterator7/autoload.php',
     '%{php_home}/%{ns_vendor}/Template6/autoload.php',
     '%{php_home}/%{ns_vendor}/Complexity6/autoload.php',
     '%{php_home}/%{ns_vendor}/Environment9/autoload.php',
@@ -194,6 +190,10 @@ exit $ret
 
 
 %changelog
+* Thu Apr  2 2026 Remi Collet <remi@remirepo.net> - 13.0.2-1
+- update to 13.0.2
+- drop dependency on phpunit/php-file-iterator
+
 * Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 13.0.1-2
 - enable test suite
 

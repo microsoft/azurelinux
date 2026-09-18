@@ -10,22 +10,23 @@
 # Please, preserve the changelog entries
 #
 
-%global gh_commit   f54941864e8976dc73987e2eccadf2436a172a95
-%global gh_short    %(c=%{gh_commit}; echo ${c:0:7})
-#global gh_date     20211001
-%global gh_owner    dloebl
-%global gh_project  cgif
 %global libname     libcgif
 %global soname      0
 
+# Github forge
+%global gh_vend          dloebl
+%global gh_proj          cgif
+%global forgeurl         https://github.com/%{gh_vend}/%{gh_proj}
+%global tag              v%{version}
+
 Name:          %{libname}
 Summary:       A fast and lightweight GIF encoder
-Version:       0.5.1
-Release: 4%{?dist}
 License:       MIT
-
-URL:           https://github.com/%{gh_owner}/%{gh_project}
-Source0:       https://github.com/%{gh_owner}/%{gh_project}/archive/%{gh_commit}/%{gh_project}-%{version}-%{gh_short}.tar.gz
+Version:       0.5.3
+Release:       1%{?dist}
+%forgemeta
+URL:            %{forgeurl}
+Source0:        %{forgesource}
 
 BuildRequires: gcc
 BuildRequires: meson >= 0.56
@@ -64,7 +65,7 @@ for %{libname}.
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%forgesetup
 
 
 %build
@@ -87,12 +88,22 @@ for %{libname}.
 
 %files devel
 %doc README.md
-%{_libdir}/pkgconfig/%{gh_project}.pc
+%{_libdir}/pkgconfig/%{gh_proj}.pc
 %{_libdir}/%{libname}.so
-%{_includedir}/%{gh_project}.h
+%{_includedir}/%{gh_proj}.h
 
 
 %changelog
+* Wed Apr  1 2026 Remi Collet <remi@remirepo.net> - 0.5.3-1
+- update to 0.5.3
+
+* Tue Mar 31 2026 Remi Collet <remi@remirepo.net> - 0.5.2-2
+- fix potential undefined behavior in cgif_addframe
+  CVE-2026-4985
+
+* Tue Feb 24 2026 Remi Collet <remi@remirepo.net> - 0.5.2-1
+- update to 0.5.2
+
 * Tue Jan 20 2026 Remi Collet <remi@remirepo.net> - 0.5.1-1
 - update to 0.5.1
 

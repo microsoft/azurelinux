@@ -1,0 +1,39 @@
+diff -Naur digest-0.11.3-original/README.md digest-0.11.3/README.md
+--- digest-0.11.3-original/README.md	2006-07-24 02:21:28.000000000 +0100
++++ digest-0.11.3/README.md	2026-06-07 19:13:43.140443904 +0100
+@@ -29,7 +29,7 @@
+ 
+ Now you can write the following code:
+ 
+-```rust
++```rust,ignore
+ use sha2::{Sha256, Digest};
+ 
+ let mut hasher = Sha256::new();
+@@ -48,7 +48,7 @@
+ Alternatively you can use chained approach, which is equivalent to the previous
+ example:
+ 
+-```rust
++```rust,ignore
+ use sha2::{Sha256, Digest};
+ 
+ let hash = Sha256::new()
+@@ -61,7 +61,7 @@
+ 
+ If the whole message is available you also can use convenience `digest` method:
+ 
+-```rust
++```rust,ignore
+ use sha2::{Sha256, Digest};
+ 
+ let hash = Sha256::digest(b"my message");
+@@ -73,7 +73,7 @@
+ You can write generic code over `Digest` (or other traits from `digest` crate)
+ trait which will work over different hash functions:
+ 
+-```rust
++```rust,ignore
+ use digest::Digest;
+ 
+ // Toy example, do not use it in practice!

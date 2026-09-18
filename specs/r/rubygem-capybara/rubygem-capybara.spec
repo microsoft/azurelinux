@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.40.0
-Release: 6%{?dist}
+Release: 3%{?dist}
 Summary: Capybara aims to simplify the process of integration testing Rack applications
 License: MIT
 URL: https://github.com/teamcapybara/capybara

@@ -5,7 +5,7 @@
 Name:           perl-Storable
 Epoch:          1
 Version:        3.37
-Release: 524%{?dist}
+Release:        521%{?dist}
 Summary:        Persistence for Perl data structures
 # Storable.pm:  GPL+ or Artistic
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

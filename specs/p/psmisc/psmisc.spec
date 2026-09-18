@@ -4,7 +4,7 @@
 Summary: Utilities for managing processes on your system
 Name: psmisc
 Version: 23.7
-Release: 9%{?dist}
+Release: 6%{?dist}
 License: GPL-2.0-or-later
 URL: https://gitlab.com/psmisc/psmisc
 

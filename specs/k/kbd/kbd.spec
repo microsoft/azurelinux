@@ -8,7 +8,7 @@
 
 Name:           kbd
 Version:        2.8.0
-Release: 6%{?dist}
+Release:        4%{?dist}
 Summary:        Tools for configuring the console (keyboard, virtual terminals, etc.)
 License:        GPL-2.0-or-later
 URL:            http://www.kbd-project.org/
@@ -37,6 +37,9 @@ Patch5:         kbd-2.0.2-unicode-start-font.patch
 Patch6:         kbd-2.4.0-covscan-fixes.patch
 # Patch7: adds vlock option to issue prompt before invokation of pam stack
 Patch7:         kbd-2.0.4-vlock-add-prompt-option.patch
+# Patch8: fixes CVE-2026-72693, backported from upstream
+# https://github.com/legionus/kbd/commit/78d5ae119742e87baa7dbe0f5c4107e7533fd698
+Patch8:         kbd-2.9.0-CVE-2026-72693.patch
 
 BuildRequires:  gcc, bison, flex, gettext, pam-devel, check-devel, automake
 BuildRequires:  console-setup, xkeyboard-config
@@ -187,6 +190,10 @@ fi
 %{kbd_datadir}/keymaps/legacy
 
 %changelog
+* Thu Aug 27 2026 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.8.0-4
+- Fix openvt -u process matching to be more conservative (CVE-2026-72693)
+  Resolves: #2513795
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

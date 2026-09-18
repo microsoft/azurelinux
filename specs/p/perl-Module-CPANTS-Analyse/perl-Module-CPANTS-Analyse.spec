@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           perl-Module-CPANTS-Analyse
-Version:        1.02
-Release: 9%{?dist}
+Version:        1.03
+Release:        1%{?dist}
 Summary:        Generate Kwalitee ratings for a distribution
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-CPANTS-Analyse
@@ -11,11 +11,10 @@ Source0:        https://cpan.metacpan.org/modules/by-module/Module/Module-CPANTS
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.58
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(ExtUtils::MakeMaker::CPANfile) >= 0.08
 # Module Runtime
 BuildRequires:  perl(Archive::Any::Lite) >= 0.06
@@ -58,6 +57,8 @@ BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::FailWarnings)
 BuildRequires:  perl(Test::More) >= 0.88
+# Optional Tests
+BuildRequires:  perl(Test::File) >= 1.993
 # Dependencies
 Requires:       perl(Archive::Any::Lite) >= 0.06
 Requires:       perl(Archive::Tar) >= 1.76
@@ -90,12 +91,11 @@ metadata for all distributions on CPAN.
 %setup -q -n Module-CPANTS-Analyse-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
+%{make_install}
 %{_fixperms} -c %{buildroot}
 
 %check
@@ -129,6 +129,18 @@ make test
 %{_mandir}/man3/Module::CPANTS::Kwalitee::Version.3*
 
 %changelog
+* Wed Jun 24 2026 Paul Howarth <paul@city-fan.org> - 1.03-1
+- Update to 1.03 (rhbz#2492167)
+  - Fix tests to work with newer Archive::Tar (GH#51)
+  - Check link errors and warnings while extracting an archive
+
+* Sun May 31 2026 Paul Howarth <paul@city-fan.org> - 1.02-8
+- Use relative symlinks rather than absolute symlinks in test (GH#51)
+- Use %%{make_build} and %%{make_install}
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.02-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.02-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

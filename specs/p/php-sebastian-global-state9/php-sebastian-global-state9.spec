@@ -10,13 +10,10 @@
 # Please, preserve the changelog entries
 #
 
-%bcond_with          tests
+%bcond_without       tests
 
-%global gh_commit    e52e3dc22441e6218c710afe72c3042f8fc41ea7
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   global-state
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -27,14 +24,14 @@
 %global php_home     %{_datadir}/php
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        9.0.0
-Release: 4%{?dist}
+Version:        9.0.1
+Release:        1%{?dist}
 Summary:        Snapshotting of global state, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -46,9 +43,9 @@ BuildRequires:  (php-composer(sebastian/object-reflector)  >= 6.0     with php-c
 BuildRequires:  (php-composer(sebastian/recursion-context) >= 8.0     with php-composer(sebastian/recursion-context) < 9)
 # from composer.json, "require-dev": {
 #        "ext-dom": "*",
-#        "phpunit/phpunit": "^13.0"
+#        "phpunit/phpunit": "^13.1.13"
 BuildRequires:  php-dom
-BuildRequires:  phpunit13
+BuildRequires:  phpunit13 >= 13.1.13
 %endif
 
 # from composer.json, "require": {
@@ -75,7 +72,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -133,6 +130,12 @@ exit $ret
 
 
 %changelog
+* Tue Jun  2 2026 Remi Collet <remi@remirepo.net> - 9.0.1-1
+- update to 9.0.1
+
+* Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 9.0.0-2
+- enable test suite
+
 * Fri Feb  6 2026 Remi Collet <remi@remirepo.net> - 9.0.0-1
 - update to 9.0.0
 - raise dependency on PHP 8.4

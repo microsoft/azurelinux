@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.5.2
-Release: 5%{?dist}
+Release: 2%{?dist}
 Summary: Sprockets Rails integration
 License: MIT
 URL: https://github.com/rails/sprockets-rails

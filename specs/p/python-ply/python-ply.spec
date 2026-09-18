@@ -8,7 +8,7 @@
 Name:           python-%{modname}
 Summary:        Python Lex-Yacc
 Version:        3.11
-Release: 35%{?dist}
+Release:        33%{?dist}
 License:        BSD-3-Clause
 URL:            http://www.dabeaz.com/ply/
 Source0:        http://www.dabeaz.com/ply/%{modname}-%{version}.tar.gz
@@ -18,6 +18,13 @@ Patch0:		262.patch
 # Fix build against Python 3.15
 # https://github.com/dabeaz/ply/pull/318
 Patch1:		python-ply-py315-fix.patch
+# Security fix for CVE-2025-56005
+# Downstream only
+# Upstream has been archived but the latest commits that remove
+# the vulnerable code present incompatibilities for packages
+# hence remove just the vulnerable code which is not used
+# anywhere.
+Patch2:   CVE-2025-56005.patch
 BuildArch:      noarch
 
 %description
@@ -60,6 +67,7 @@ Python 3 version.
 %setup -n %{modname}-%{version}
 %patch -P0 -p1 -b .262
 %patch -P1 -p1 -b .py315
+%patch -P2 -p1 -b .CVE-2025-56005
 find example/ -type f -executable -exec chmod -x {} ';'
 find example/ -type f -name '*.py' -exec sed -i \
   -e '1{\@^#!/usr/bin/env python@d}' -e '1{\@^#!/usr/local/bin/python@d}' \
@@ -93,6 +101,10 @@ popd
 %license LICENSE
 
 %changelog
+* Wed Mar 25 2026 Charalampos Stratakis <cstratak@redhat.com> - 3.11-33
+- Security fix for CVE-2025-56005
+- Fixes: rhbz#2437981
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.11-32
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

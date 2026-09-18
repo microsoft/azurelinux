@@ -1,0 +1,271 @@
+From 242903283b8b7a94155099fd7ec4358446ed712f Mon Sep 17 00:00:00 2001
+From: Joseph Marrero Corchado <jmarrero@redhat.com>
+Date: Mon, 9 Mar 2026 16:54:45 -0400
+Subject: [PATCH] Fix silent upgrade failure on container systems
+
+PR #5510 introduced an early return for container-based deployments
+to handle idempotent package layering, but it failed to check whether
+the base image itself had changed. This caused `rpm-ostree upgrade`
+to silently return success without staging a new deployment.
+
+Fold `remove_changed` and `override_changed` into the `changed`
+variable so the early return only triggers when truly nothing changed.
+
+Also fix a related crash in `rpmostree_context_assemble()` when
+`--idempotent --apply-live` is used on a package already in the base
+image: the empty transaction path hit `g_assert_not_reached()` instead
+of returning through `rpmostree_context_assemble_end()`.
+
+Closes: https://github.com/coreos/rpm-ostree/issues/5567
+Fixes: 4d4196e2 ("rpmostreed-transaction-types: don't use base-db when idempotent")
+Assisted-by: Claude Opus 4.6 (OpenCode)
+Signed-off-by: Joseph Marrero Corchado <jmarrero@redhat.com>
+---
+ src/daemon/rpmostreed-transaction-types.cxx   |  15 +-
+ src/libpriv/rpmostree-core.cxx                |   3 +
+ .../kolainst/destructive/idempotent-layering  | 139 +++++++++++++++---
+ 3 files changed, 132 insertions(+), 25 deletions(-)
+
+diff --git a/src/daemon/rpmostreed-transaction-types.cxx b/src/daemon/rpmostreed-transaction-types.cxx
+index e2002b28..22edcde8 100644
+--- a/src/daemon/rpmostreed-transaction-types.cxx
++++ b/src/daemon/rpmostreed-transaction-types.cxx
+@@ -1592,16 +1592,17 @@ deploy_transaction_execute (RpmostreedTransaction *transaction, GCancellable *ca
+                                                  cancellable, error))
+     return FALSE;
+   changed = changed || layering_changed;
++  /* Also fold in package removals and override resets so that the early
++   * return below won't fire when those operations need a new deployment. */
++  changed = changed || remove_changed || override_changed;
+ 
+-  /* When using containers and nothing changed after prep_layering, return early.
+-   * This happens when all requested packages are already present in the container image.
++  /* When using containers and nothing changed, return early. This happens
++   * when all requested packages are already present in the container image.
+    * For idempotent mode, this avoids the "No packages in transaction" error.
+-   * However, if packages were removed from the origin, or overrides were reset, we need to
+-   * deploy to update the origin even if no layering is needed. Similarly, if we're rebasing
+-   * (refspec) or deploying a specific revision, we need to deploy. */
+-  const bool origin_changed = layering_changed || remove_changed || override_changed;
++   * If we're rebasing (refspec) or deploying a specific revision, we also
++   * need to continue to deploy. */
+   const bool have_refspec_or_revision = self->refspec || self->revision;
+-  if (skip_base_check && !origin_changed && !have_refspec_or_revision)
++  if (skip_base_check && !changed && !have_refspec_or_revision)
+     return TRUE;
+ 
+   if (dry_run)
+diff --git a/src/libpriv/rpmostree-core.cxx b/src/libpriv/rpmostree-core.cxx
+index 5ef1d677..e944d909 100644
+--- a/src/libpriv/rpmostree-core.cxx
++++ b/src/libpriv/rpmostree-core.cxx
+@@ -4240,6 +4240,9 @@ rpmostree_context_assemble (RpmOstreeContext *self, GCancellable *cancellable, G
+     {
+       if (!self->allow_empty_transaction)
+         return glnx_throw (error, "No packages in transaction");
++      /* Empty transaction is allowed (e.g. idempotent layering where packages are already
++       * in the base image). Skip package assembly and just run the final transformations. */
++      return rpmostree_context_assemble_end (self, cancellable, error);
+     }
+ 
+   /* Sort the packages as rpmtsOrder() only reorder to satisfy dependencies
+diff --git a/tests/kolainst/destructive/idempotent-layering b/tests/kolainst/destructive/idempotent-layering
+index ae876d28..3b2ca9b9 100755
+--- a/tests/kolainst/destructive/idempotent-layering
++++ b/tests/kolainst/destructive/idempotent-layering
+@@ -1,13 +1,15 @@
+ #!/bin/bash
+ ## kola:
+ ##   # Increase timeout since this test involves rebasing, container operations,
+-##   # and kernel override/reset which requires additional reboots
+-##   timeoutMin: 30
++##   # kernel override/reset, and upgrade tests which require additional reboots
++##   timeoutMin: 45
+ ##   # This test only runs on FCOS
+ ##   distros: fcos
+ ##   # Needs internet access for package installation and koji access
+ ##   tags: "needs-internet platform-independent"
+ ##   minMemory: 2048
++##   # Need extra disk for multiple container builds and ostree deployments
++##   minDisk: 20
+ #
+ # Copyright (C) 2025 Red Hat, Inc.
+ #
+@@ -55,26 +57,36 @@ esac
+ image_dir=/var/tmp/fcos
+ image=oci:$image_dir
+ 
+-case "${AUTOPKGTEST_REBOOT_MARK:-}" in
+-  "")
+-    checksum=$(rpm-ostree status --json | jq -r '.deployments[0].checksum')
+-    rm -rf "${image_dir}"
+-    # Since we're switching OS update stream, turn off zincati
+-    systemctl mask --now zincati
+-    ostree container encapsulate --repo=/ostree/repo ${checksum} "${image}" --label ostree.bootable=TRUE
++# Helper function to build a derived container image with a version label.
++# This encapsulates the current ostree commit into a container image,
++# adds vim-enhanced to the base, and tags it with the given version.
++# Usage: build_derived_image <version_label>
++build_derived_image() {
++  local version_label="${1}"
++
++  local checksum
++  checksum=$(rpm-ostree status --json | jq -r '.deployments[0].checksum')
++  rm -rf "${image_dir}"
++  ostree container encapsulate --repo=/ostree/repo "${checksum}" \
++    "${image}" --label ostree.bootable=TRUE
++
++  skopeo copy "${image}" containers-storage:localhost/fcos
++  rm -rf "${image_dir}"
+ 
+-    skopeo copy $image containers-storage:localhost/fcos
+-    rm -rf "${image_dir}"
+-    td=$(mktemp -d)
+-    cd ${td}
+-cat > Containerfile << EOF
++  local td
++  td=$(mktemp -d)
++  (
++    cd "${td}"
++
++    cat > Containerfile << EOF
+ FROM localhost/fcos
+-# Pre-install vim in the container image
+ RUN dnf install -y vim-enhanced
++LABEL org.opencontainers.image.version "${version_label}"
+ EOF
+ 
+-    touched_resolv_conf=0
++    local touched_resolv_conf=0
+     if test '!' -f /etc/resolv.conf; then
++      local podmanv
+       podmanv=$(podman --version)
+       case "${podmanv#podman version }" in
+         3.*) touched_resolv_conf=1; touch /etc/resolv.conf;;
+@@ -84,9 +96,19 @@ EOF
+     if test "${touched_resolv_conf}" -eq 1; then
+       rm -vf /etc/resolv.conf
+     fi
++  )
++  rm -rf "${td}"
++}
++
++case "${AUTOPKGTEST_REBOOT_MARK:-}" in
++  "")
++    # Since we're switching OS update stream, turn off zincati
++    systemctl mask --now zincati
++
++    # Build initial derived image with version 1
++    build_derived_image 1
+ 
+     rpm-ostree rebase ostree-unverified-image:containers-storage:localhost/fcos-derived
+-    rm -rf "$image_dir"
+ 
+     /tmp/autopkgtest-reboot 1
+     ;;
+@@ -102,13 +124,24 @@ EOF
+ 
+ 
+     # Test 2: Install with --unchanged-exit-77 should exit with 77
++    # Note: --idempotent is needed because Test 1 already added vim-enhanced to requested-packages
+     set +e
+-    rpm-ostree install --allow-inactive --apply-live --unchanged-exit-77 -y vim-enhanced 2>&1 | tee out.txt
++    rpm-ostree install --allow-inactive --idempotent --apply-live --unchanged-exit-77 -y vim-enhanced 2>&1 | tee out.txt
+     rc=$?
+     set -e
+     assert_streq "${rc}" "77"
+     echo "ok unchanged-exit-77 for existing package"
+ 
++    # Test 2.5: Install without --idempotent when package is already requested
++    # Should fail gracefully with "already requested" error, not crash
++    set +e
++    rpm-ostree install --allow-inactive --apply-live --unchanged-exit-77 -y vim-enhanced 2>&1 | tee out.txt
++    rc=$?
++    set -e
++    assert_streq "${rc}" "1"
++    assert_file_has_content out.txt "already requested"
++    echo "ok install without --idempotent correctly rejects already-requested package"
++
+     # Test 3: Install with both --idempotent and --unchanged-exit-77
+     set +e
+     rpm-ostree install --allow-inactive --idempotent --apply-live --unchanged-exit-77 -y vim-enhanced
+@@ -162,6 +195,76 @@ EOF
+     rpmostree_assert_status '.deployments[0]["base-local-replacements"]|length == 0'
+     echo "ok override reset --all on container-based deployment"
+ 
++    /tmp/autopkgtest-reboot 4
++    ;;
++  4)
++    # Test 7: Upgrade with layered packages on container-based deployment
++    # This tests that rpm-ostree upgrade properly stages a new deployment
++    # when a new base container image is available (with layered packages).
++    # This is a regression test for https://github.com/coreos/rpm-ostree/issues/5567
++
++    # Verify current state: tmux is layered, no overrides
++    rpm -q tmux
++    rpm -q vim-enhanced
++    rpmostree_assert_status '.deployments[0]["base-local-replacements"]|length == 0'
++    rpmostree_assert_status '.deployments[0]["requested-packages"]|length > 0'
++    echo "Verified: tmux is layered, no overrides remain"
++
++    # Build a new version of the container image (version 2)
++    # This simulates a new upstream image becoming available
++    build_derived_image 2
++
++    # Run rpm-ostree upgrade - this should stage a new deployment
++    rpm-ostree upgrade
++
++    # Verify that a new deployment was staged
++    rpmostree_assert_status '.deployments|length >= 2'
++    rpmostree_assert_status '.deployments[0].staged == true'
++    # Verify the version changed to confirm the new image was deployed
++    rpmostree_assert_status '.deployments[0].version == "2"'
++    echo "ok upgrade with layered packages on container-based deployment"
++
++    /tmp/autopkgtest-reboot 5
++    ;;
++  5)
++    # Test 8: Upgrade WITHOUT layered packages on container-based deployment
++    # This is the EXACT scenario from https://github.com/coreos/rpm-ostree/issues/5567
++    # A container-based system with NO layered packages should still properly
++    # stage a new deployment when a new base image is available.
++
++    # First, remove any leftover layered package requests from previous phases.
++    # tmux and vim-enhanced are inactive (already in base), so we clean up
++    # all pending requests to get a pristine container-based deployment.
++    rpm-ostree cleanup -p
++    rpm-ostree reset
++
++    # Verify current state: no layered packages
++    rpm -q vim-enhanced
++    rpmostree_assert_status '(.deployments[0]["requested-packages"] // []) | length == 0'
++    rpmostree_assert_status '(.deployments[0]["requested-local-packages"] // []) | length == 0'
++    echo "Verified: no layered packages, clean container-based deployment"
++
++    # Build another new version of the container image (version 3)
++    build_derived_image 3
++
++    # Run rpm-ostree upgrade - this MUST stage a new deployment
++    # Before the fix for #5567, this would silently return success without deploying
++    rpm-ostree upgrade
++
++    # Verify that a new deployment was staged (not silently returned)
++    rpmostree_assert_status '.deployments|length >= 2'
++    rpmostree_assert_status '.deployments[0].staged == true'
++    # Verify the version changed to confirm the new image was deployed
++    rpmostree_assert_status '.deployments[0].version == "3"'
++    echo "ok upgrade without layered packages on container-based deployment"
++
++    # Also verify that running upgrade again correctly reports no change
++    # (test the "already up to date" path still works)
++    rc=0
++    rpm-ostree upgrade --unchanged-exit-77 || rc=$?
++    assert_streq "${rc}" "77"
++    echo "ok upgrade --unchanged-exit-77 reports no change when already up to date"
++
+     ;;
+   *) echo "unexpected mark: ${AUTOPKGTEST_REBOOT_MARK}"; exit 1;;
+ esac
+-- 
+2.52.0
+

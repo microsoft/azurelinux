@@ -1,12 +1,33 @@
 diff -Naur bcrypt-4.3.0-original/src/_bcrypt/Cargo.toml bcrypt-4.3.0/src/_bcrypt/Cargo.toml
---- bcrypt-4.3.0-original/src/_bcrypt/Cargo.toml	2025-02-27 20:17:02.000000000 -0500
-+++ bcrypt-4.3.0/src/_bcrypt/Cargo.toml	2025-06-21 11:39:31.510615224 -0400
+--- bcrypt-4.3.0-original/src/_bcrypt/Cargo.toml	2025-02-28 01:17:02.000000000 +0000
++++ bcrypt-4.3.0/src/_bcrypt/Cargo.toml	2026-07-07 05:40:25.336461224 +0100
 @@ -6,7 +6,7 @@
  publish = false
  
  [dependencies]
 -pyo3 = { version = "0.23.5", features = ["abi3"] }
-+pyo3 = { version = "0.25.1", features = ["abi3"] }
++pyo3 = { version = "0.29", features = ["abi3"] }
  bcrypt = "0.17"
  bcrypt-pbkdf = "0.10.0"
  base64 = "0.22.1"
+diff -Naur bcrypt-4.3.0-original/src/_bcrypt/src/lib.rs bcrypt-4.3.0/src/_bcrypt/src/lib.rs
+--- bcrypt-4.3.0-original/src/_bcrypt/src/lib.rs	2025-02-28 01:17:02.000000000 +0000
++++ bcrypt-4.3.0/src/_bcrypt/src/lib.rs	2026-07-07 05:33:44.389553292 +0100
+@@ -118,7 +118,7 @@
+         .map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid salt"))?;
+ 
+     let hashed = py
+-        .allow_threads(|| bcrypt::hash_with_salt(password, cost, raw_salt))
++        .detach(|| bcrypt::hash_with_salt(password, cost, raw_salt))
+         .map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid salt"))?;
+     Ok(pyo3::types::PyBytes::new(
+         py,
+@@ -175,7 +175,7 @@
+     }
+ 
+     pyo3::types::PyBytes::new_with(py, desired_key_bytes, |output| {
+-        py.allow_threads(|| {
++        py.detach(|| {
+             bcrypt_pbkdf::bcrypt_pbkdf(password, salt, rounds, output).unwrap();
+         });
+         Ok(())

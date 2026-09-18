@@ -3,7 +3,7 @@
 
 Name:		libavtp
 Version:	0.2.0
-Release: 14%{?dist}
+Release:	11%{?dist}
 Summary:	An AVTP protocol implementation
 
 License:	BSD-3-Clause

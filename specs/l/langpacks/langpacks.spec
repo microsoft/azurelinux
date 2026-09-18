@@ -3,7 +3,7 @@
 
 Name:      langpacks
 Version:   4.2
-Release: 8%{?dist}
+Release:   5%{?dist}
 Summary:   Langpacks meta-package
 
 License:   GPL-2.0-or-later

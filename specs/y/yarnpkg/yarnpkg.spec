@@ -11,11 +11,11 @@
 # don't require bundled modules
 %global __requires_exclude_from ^(%{nodejs_sitelib}/yarn/lib/.*|%{nodejs_sitelib}/yarn/bin/yarn(|\\.cmd|\\.ps1|pkg.*))$
 
-%global bundledate 20260126
+%global bundledate 20260402
 
 Name:           yarnpkg
 Version:        1.22.22
-Release: 20%{?dist}
+Release:        18%{?dist}
 Summary:        Fast, reliable, and secure dependency management.
 License:        BSD-2-Clause
 URL:            https://github.com/yarnpkg/yarn
@@ -35,12 +35,14 @@ Patch2:         CVE-2024-4067.patch
 Patch3:         CVE-2025-8262.patch
 # https://github.com/form-data/form-data/commit/3d1723080e6577a66f17f163ecd345a21d8d0fd0
 Patch4:         CVE-2025-8263.patch
+# Adapt for js-yaml 4.x
+Patch5:         yarn-jsyaml4.patch
 
 ExclusiveArch:  %{nodejs_arches}
 
 BuildRequires:  nodejs-packaging
 %if 0%{?fedora}
-BuildRequires:  nodejs-npm
+BuildRequires:  %{_bindir}/npm
 %else
 BuildRequires:  npm
 %endif
@@ -95,6 +97,13 @@ if [[ $(%{buildroot}%{_bindir}/yarn --version) == %{version} ]] ; then echo PASS
 
 
 %changelog
+* Thu Apr 02 2026 Sandro Mani <manisandro@gmail.com> - 1.22.22-18
+- Add yarn-jsyaml4.patch
+- Refresh vendor bundle, fixes CVE-2026-4800
+
+* Sat Mar 07 2026 Sandro Mani <manisandro@gmail.com> - 1.22.22-17
+- Refresh vendor bundle
+
 * Tue Jan 27 2026 Sandro Mani <manisandro@gmail.com> - 1.22.22-16
 - Refresh bundle, fixes CVE-2025-13465
 

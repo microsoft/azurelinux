@@ -1,9 +1,24 @@
---- uu_more-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ uu_more-0.0.27/Cargo.toml	2024-10-11T12:11:22.648893+00:00
-@@ -58,6 +58,3 @@
- version = "0.28"
- default-features = false
+--- uu_more-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_more-0.7.0/Cargo.toml	2026-03-16T15:46:54.744531+00:00
+@@ -68,16 +68,6 @@
  
--[target."cfg(target_os = \"macos\")".dependencies.crossterm]
--version = ">=0.27.0"
+ [target.'cfg(all(unix, not(target_os = "fuchsia")))'.dependencies]
+ 
+-[target.'cfg(target_os = "macos")'.dependencies.crossterm]
+-version = "0.29.0"
 -features = ["use-dev-tty"]
+-default-features = false
+-
+-[target."cfg(windows)".dependencies.crossterm]
+-version = "0.29.0"
+-features = ["windows"]
+-default-features = false
+-
+ [lints.clippy]
+ cargo_common_metadata = "allow"
+ cast_lossless = "allow"
+@@ -141,3 +131,4 @@
+     "cfg(fuzzing)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++

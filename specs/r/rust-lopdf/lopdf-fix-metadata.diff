@@ -1,5 +1,5 @@
---- lopdf-0.36.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ lopdf-0.36.0/Cargo.toml	2025-08-19T10:33:01.973627+00:00
+--- lopdf-0.38.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ lopdf-0.38.0/Cargo.toml	2026-03-12T19:19:28.125046+00:00
 @@ -37,6 +37,10 @@
  categories = ["text-processing"]
  license = "MIT"
@@ -11,7 +11,13 @@
  
  [badges.travis-ci]
  repository = "J-F-Liu/lopdf"
-@@ -62,45 +66,6 @@
+@@ -57,159 +61,11 @@
+ jiff = ["dep:jiff"]
+ serde = ["dep:serde"]
+ time = ["dep:time"]
+-wasm_js = ["getrandom/wasm_js"]
+ 
+ [lib]
  name = "lopdf"
  path = "src/lib.rs"
  
@@ -20,8 +26,52 @@
 -path = "examples/add_barcode.rs"
 -
 -[[example]]
+-name = "analyze_object_streams"
+-path = "examples/analyze_object_streams.rs"
+-
+-[[example]]
+-name = "analyze_page_contents"
+-path = "examples/analyze_page_contents.rs"
+-
+-[[example]]
+-name = "analyze_pdf"
+-path = "examples/analyze_pdf.rs"
+-
+-[[example]]
+-name = "analyze_references"
+-path = "examples/analyze_references.rs"
+-
+-[[example]]
+-name = "check_raw_objstream"
+-path = "examples/check_raw_objstream.rs"
+-
+-[[example]]
+-name = "compress_existing_pdf"
+-path = "examples/compress_existing_pdf.rs"
+-
+-[[example]]
 -name = "create"
 -path = "examples/create.rs"
+-
+-[[example]]
+-name = "create_text_heavy_pdf"
+-path = "examples/create_text_heavy_pdf.rs"
+-
+-[[example]]
+-name = "debug_compression_detailed"
+-path = "examples/debug_compression_detailed.rs"
+-
+-[[example]]
+-name = "debug_compression_full"
+-path = "examples/debug_compression_full.rs"
+-
+-[[example]]
+-name = "debug_object_stream"
+-path = "examples/debug_object_stream.rs"
+-
+-[[example]]
+-name = "debug_save_with_objstreams"
+-path = "examples/debug_save_with_objstreams.rs"
 -
 -[[example]]
 -name = "decrypt"
@@ -42,8 +92,20 @@
 -required-features = ["serde"]
 -
 -[[example]]
+-name = "final_compression_test"
+-path = "examples/final_compression_test.rs"
+-
+-[[example]]
+-name = "inspect_object_stream"
+-path = "examples/inspect_object_stream.rs"
+-
+-[[example]]
 -name = "merge"
 -path = "examples/merge.rs"
+-
+-[[example]]
+-name = "object_streams"
+-path = "examples/object_streams.rs"
 -
 -[[example]]
 -name = "print_annotations"
@@ -51,13 +113,65 @@
 -required-features = ["default"]
 -
 -[[example]]
+-name = "replace_partial_text"
+-path = "examples/replace_partial_text.rs"
+-
+-[[example]]
 -name = "rotate"
 -path = "examples/rotate.rs"
+-
+-[[example]]
+-name = "test_better_compression"
+-path = "examples/test_better_compression.rs"
+-
+-[[example]]
+-name = "test_decryption"
+-path = "examples/test_decryption.rs"
+-
+-[[example]]
+-name = "test_direct_objstream"
+-path = "examples/test_direct_objstream.rs"
+-
+-[[example]]
+-name = "test_filter_roundtrip"
+-path = "examples/test_filter_roundtrip.rs"
+-
+-[[example]]
+-name = "test_object_stream_creation"
+-path = "examples/test_object_stream_creation.rs"
+-
+-[[example]]
+-name = "test_object_stream_roundtrip"
+-path = "examples/test_object_stream_roundtrip.rs"
+-
+-[[example]]
+-name = "test_real_pdf_compression_with_fix"
+-path = "examples/test_real_pdf_compression_with_fix.rs"
+-
+-[[example]]
+-name = "test_structural_compression"
+-path = "examples/test_structural_compression.rs"
+-
+-[[example]]
+-name = "verify_decryption"
+-path = "examples/verify_decryption.rs"
+-
+-[[example]]
+-name = "verify_page_compression"
+-path = "examples/verify_page_compression.rs"
+-
+-[[example]]
+-name = "verify_pdf"
+-path = "examples/verify_pdf.rs"
+-
+-[[example]]
+-name = "verify_trailer_compression_fix"
+-path = "examples/verify_trailer_compression_fix.rs"
 -
  [[test]]
  name = "annotation"
  path = "tests/annotation.rs"
-@@ -120,14 +85,6 @@
+@@ -265,14 +121,6 @@
  [[test]]
  name = "utils"
  path = "tests/utils.rs"
@@ -72,7 +186,7 @@
  
  [dependencies.aes]
  version = "0.8.4"
-@@ -225,18 +182,8 @@
+@@ -376,24 +224,11 @@
  [dependencies.weezl]
  version = "0.1"
  
@@ -91,3 +205,9 @@
 -
  [dev-dependencies.tempfile]
  version = "3.3"
+ 
+ [dev-dependencies.ttf-parser]
+ version = "0.25.1"
+-
+-[dev-dependencies.wasm-bindgen-test]
+-version = "0.2"

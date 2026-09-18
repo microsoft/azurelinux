@@ -9,7 +9,7 @@
 %endif
 Name:           perl-Sys-Syslog
 Version:        0.36
-Release: 524%{?dist}
+Release:        521%{?dist}
 Summary:        Perl interface to the UNIX syslog(3) calls
 # README:               GPL+ or Artistic
 # ppport.h:             GPL+ or Artistic

@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.3.0
-Release: 6%{?dist}
+Release: 3%{?dist}
 Summary: Builders for MarkUp
 License: MIT
 URL: https://github.com/rails/builder

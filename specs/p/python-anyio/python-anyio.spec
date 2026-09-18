@@ -9,8 +9,8 @@ of either asyncio or trio.  It implements trio-like structured concurrency (SC)
 on top of asyncio, and works in harmony with the native SC of trio itself.}
 
 Name:           python-%{srcname}
-Version:        4.12.1
-Release: 4%{?dist}
+Version:        4.13.0
+Release:        1%{?dist}
 Summary:        Compatibility layer for multiple asynchronous event loop implementations
 License:        MIT
 URL:            https://github.com/agronholm/anyio
@@ -25,13 +25,12 @@ BuildRequires:  tomcli
 
 %package -n python3-%{srcname}
 Summary:        %{summary}
-BuildRequires:  python3-devel
+
 # Sphinx-generated HTML documentation is not suitable for packaging; see
 # https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
 # We could perhaps generate PDF documentation as a substitute, but instead we
 # simply drop the -doc subpackage.
 Obsoletes:      python-%{srcname}-doc < 3.7.1-7
-
 
 %description -n python3-%{srcname} %{common_description}
 
@@ -53,6 +52,11 @@ Obsoletes:      python-%{srcname}-doc < 3.7.1-7
 #   not to package it
 tomcli set pyproject.toml lists delitem \
     dependency-groups.test '(blockbuster|coverage|truststore|uvloop)\b.*'
+%if %{defined fc43}
+# Upstream wants pytest 8.4, but we can run the tests successfully with 8.3.5
+# by just skipping a few tests that require new features.
+%pyproject_patch_dependency pytest:set_lower:8.3.5
+%endif
 
 
 %generate_buildrequires
@@ -69,8 +73,12 @@ tomcli set pyproject.toml lists delitem \
 
 
 %check
-# https://github.com/agronholm/anyio/pull/1020#issuecomment-3477923712
-k="${k-}${k+ and }not (TestCapacityLimiter and test_bad_init_value[trio])"
+%if %{defined fc43}
+# Upstream wants pytest 8.4, but we can run the tests successfully with 8.3.5
+# by just skipping a few tests that require new features.
+k="${k-}${k+ and }not test_exception_group_filtering"
+k="${k-}${k+ and }not test_nested_exception_group_filtering"
+%endif
 
 %pytest -Wdefault -m "not network" -k "${k-}" -rsx -v
 
@@ -80,6 +88,15 @@ k="${k-}${k+ and }not (TestCapacityLimiter and test_bad_init_value[trio])"
 
 
 %changelog
+* Sun May 24 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 4.13.0-1
+- Update to 4.13.0 (close RHBZ#2450760)
+
+* Wed Jan 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 4.12.1-3
+- Report and skip test regressions on Python 3.15.0a5 (fix RHBZ#2431598)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.12.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Jan 06 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 4.12.1-1
 - Update to 4.12.1 (close RHBZ#2427391)
 

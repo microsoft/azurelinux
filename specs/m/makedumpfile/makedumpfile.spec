@@ -6,7 +6,7 @@
 Name: makedumpfile
 Version: 1.7.8
 Summary: make a small dumpfile of kdump
-Release: 4%{?dist}
+Release: 1%{?dist}
 
 License: GPL-2.0-only
 URL: https://github.com/makedumpfile/makedumpfile

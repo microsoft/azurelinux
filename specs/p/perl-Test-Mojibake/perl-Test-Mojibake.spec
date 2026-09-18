@@ -9,7 +9,7 @@
 
 Name:		perl-Test-Mojibake
 Version:	1.3
-Release: 37%{?dist}
+Release:	34%{?dist}
 Summary:	Check your source for encoding misbehavior
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Mojibake

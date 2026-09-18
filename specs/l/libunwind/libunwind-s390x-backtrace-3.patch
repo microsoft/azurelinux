@@ -1,0 +1,48 @@
+commit eb396ff249fd868eb589a385528401d435960bd5
+Author: Matt Turner <mattst88@gmail.com>
+Date:   Sun Apr 19 13:24:10 2026 -0400
+
+    dwarf: don't default SP to CFA on s390x
+    
+    The DWARF standard (§6.4) defines CFA as "the value of the stack
+    pointer at the call site in the previous frame", so defaulting
+    SP=CFA after a step is correct for ABIs where that holds.
+    
+    The s390x ELF ABI [1] defines CFA as R15+160 — the 160-byte
+    mandatory save area / back-chain header that every frame must
+    reserve.  This deviates from the DWARF definition: for a frameless
+    function (no stack allocation), CFA = R15_callee + 160 =
+    R15_caller + 160, not R15_caller.  Defaulting SP=DWARF_WHERE_CFA
+    after stepping through such a function (e.g. the kill syscall
+    wrapper, which emits no DW_CFA_offset rule for R15) therefore
+    produces the wrong R15 for the caller.  The subsequent frame then
+    computes its CFA 160 bytes too high, reads the return address from
+    the wrong location, finds zero, and terminates the unwind after only
+    2 frames instead of the expected ≥3.
+    
+    Exclude s390x from the SP=CFA default (ARM and MIPS N64 are already
+    excluded) so R15 falls back to DWARF_WHERE_SAME and the value from
+    the ucontext is preserved correctly.
+    
+    Fixes Gtest-trace and Ltest-trace on s390x.
+    
+    [1] https://refspecs.linuxfoundation.org/ELF/zSeries/lzsabi0_s390/x1564.html
+
+diff --git a/src/dwarf/Gparser.c b/src/dwarf/Gparser.c
+index f99e8262d10564c5..d4fb63bc0f7e169e 100644
+--- a/src/dwarf/Gparser.c
++++ b/src/dwarf/Gparser.c
+@@ -522,8 +522,11 @@ setup_fde (struct dwarf_cursor *c, dwarf_state_record_t *sr)
+   for (i = 0; i < DWARF_NUM_PRESERVED_REGS + 2; ++i)
+     set_reg (sr, i, DWARF_WHERE_SAME, 0);
+ 
+-#if !defined(UNW_TARGET_ARM) && !(defined(UNW_TARGET_MIPS) && _MIPS_SIM == _ABI64)
+-  // SP defaults to CFA (but is overridable)
++#if !defined(UNW_TARGET_ARM) && !(defined(UNW_TARGET_MIPS) && _MIPS_SIM == _ABI64) \
++    && !defined(UNW_TARGET_S390X)
++  /* SP defaults to CFA. s390x excluded: CFA = R15+160, so this default gives
++     caller's R15 = CFA instead of R15, breaking frameless functions like kill
++     that never emit DW_CFA_offset for R15. */
+   set_reg (sr, TDEP_DWARF_SP, DWARF_WHERE_CFA, 0);
+ #endif
+ 

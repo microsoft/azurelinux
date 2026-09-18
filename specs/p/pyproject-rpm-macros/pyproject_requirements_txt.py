@@ -69,7 +69,6 @@ def combine_logical_lines(lines):
     """Combine logical lines together (backslash line-continuation)"""
     pieces = []
     for line in lines:
-        line = line.rstrip('\n')
         # Whole-line comments *only* are removed before line-contionuation
         if COMMENT_RE.match(line):
             continue

@@ -8,6 +8,7 @@ from collections import defaultdict
 from keyword import iskeyword
 from pathlib import PosixPath, PurePosixPath
 from importlib.metadata import Distribution
+from packaging.utils import canonicalize_name
 
 
 # From RPM's build/files.c strtokWithQuotes delim argument
@@ -43,6 +44,24 @@ MANDIRS = [
     '/lib/*/man/man*',
     '/share/fish/man/man*',
 ]
+
+
+def canonical_name_from_distinfo(distinfo_dir_name):
+    """Extract the canonicalized distribution name from a .dist-info directory name.
+
+    Examples:
+
+        >>> canonical_name_from_distinfo('MarkupSafe-2.0.1.dist-info')
+        'markupsafe'
+
+        >>> canonical_name_from_distinfo('tldr-0.5.dist-info')
+        'tldr'
+
+        >>> canonical_name_from_distinfo('My.Package_name-1.0.dist-info')
+        'my-package-name'
+    """
+    raw = distinfo_dir_name.removesuffix('.dist-info').rsplit('-', 1)[0]
+    return canonicalize_name(raw)
 
 
 class BuildrootPath(PurePosixPath):
@@ -760,15 +779,31 @@ def parse_varargs(varargs):
     return globs, include_auto
 
 
-def load_parsed_record(pyproject_record):
+def load_parsed_record(pyproject_record, dist_name=None):
     parsed_record = {}
     with open(pyproject_record) as pyproject_record_file:
         content = json.load(pyproject_record_file)
 
-    if len(content) > 1:
-        raise FileExistsError("%pyproject_install has found more than one *.dist-info/RECORD file. "
-                              "Currently, %pyproject_save_files supports only one wheel → one file list mapping. "
-                              "Feel free to open a bugzilla for pyproject-rpm-macros and describe your usecase.")
+    # Map each record path to its canonical dist name
+    dist_names = {rp: canonical_name_from_distinfo(BuildrootPath(rp).parent.name)
+                  for rp in content}
+    available = sorted(dist_names.values())  # used in error messages
+
+    if dist_name:
+        normalized_target = canonicalize_name(dist_name)
+        content = {rp: files for rp, files in content.items()
+                   if dist_names[rp] == normalized_target}
+        if not content:
+            raise ValueError(
+                f"No dist-info found matching dist name '{dist_name}'. "
+                f"Available: {', '.join(available)}"
+            )
+    elif len(content) > 1:
+        raise ValueError(
+            "%pyproject_install has found more than one *.dist-info/RECORD file. "
+            "Use %pyproject_save_files -D <name> to select a package. "
+            f"Available: {', '.join(available)}"
+        )
 
     # Redefine strings stored in JSON to BuildRootPaths
     for record_path, files in content.items():
@@ -786,12 +821,12 @@ def dist_metadata(buildroot, record_path):
     return dist.metadata
 
 
-def pyproject_save_files_and_modules(buildroot, sitelib, sitearch, python_version, pyproject_record, prefix, assert_license, allow_no_modules, varargs):
+def pyproject_save_files_and_modules(buildroot, sitelib, sitearch, python_version, pyproject_record, prefix, assert_license, allow_no_modules, auto, varargs, dist_name=None):
     """
     Takes arguments from the %{pyproject_save_files} macro
 
-    Returns tuple: list of paths for the %files section and list of module names
-    for the %check section
+    Returns tuple: list of paths for the %files section, list of module names
+    for the %check section, and list of record paths (BuildrootPaths)
 
     Raises ValueError when assert_license is true and no License-File (PEP 639)
     is found.
@@ -801,6 +836,7 @@ def pyproject_save_files_and_modules(buildroot, sitelib, sitearch, python_versio
     sitedirs = sorted({sitelib, sitearch})
 
     globs, include_auto = parse_varargs(varargs)
+    include_auto = include_auto or auto
     if not globs and not allow_no_modules:
         raise ValueError(
             "At least one module glob needs to be provided to %pyproject_save_files. "
@@ -810,7 +846,7 @@ def pyproject_save_files_and_modules(buildroot, sitelib, sitearch, python_versio
         raise ValueError(
             "%pyproject_save_files -M cannot be used together with module globs."
         )
-    parsed_records = load_parsed_record(pyproject_record)
+    parsed_records = load_parsed_record(pyproject_record, dist_name)
 
     final_file_list = []
     final_module_list = []
@@ -841,11 +877,11 @@ def pyproject_save_files_and_modules(buildroot, sitelib, sitearch, python_versio
             "and include the %license file in %files manually."
         )
 
-    return final_file_list, final_module_list
+    return final_file_list, final_module_list, list(parsed_records)
 
 
 def main(cli_args):
-    file_section, module_names = pyproject_save_files_and_modules(
+    file_section, module_names, record_paths = pyproject_save_files_and_modules(
         cli_args.buildroot,
         cli_args.sitelib,
         cli_args.sitearch,
@@ -854,11 +890,26 @@ def main(cli_args):
         cli_args.prefix,
         cli_args.assert_license,
         cli_args.allow_no_modules,
+        cli_args.auto,
         cli_args.varargs,
+        cli_args.dist_name,
     )
 
-    cli_args.output_files.write_text("\n".join(file_section) + "\n", encoding="utf-8")
-    cli_args.output_modules.write_text("\n".join(module_names) + "\n", encoding="utf-8")
+    files_text = "\n".join(file_section) + "\n"
+    modules_text = "\n".join(module_names) + "\n"
+
+    cli_args.output_files.write_text(files_text, encoding="utf-8")
+    cli_args.output_modules.write_text(modules_text, encoding="utf-8")
+
+    # When no -D was given, also write to the named path (derived from dist-info)
+    # so that %{pyproject_files -D name} works even without -D in %pyproject_save_files
+    if not cli_args.dist_name:
+        record_path = record_paths[0]
+        normalized = canonical_name_from_distinfo(record_path.parent.name)
+        named_files = PosixPath(f"{cli_args.output_files}-{normalized}")
+        named_modules = PosixPath(f"{cli_args.output_modules}-{normalized}")
+        named_files.write_text(files_text, encoding="utf-8")
+        named_modules.write_text(modules_text, encoding="utf-8")
 
 
 def argparser():
@@ -867,7 +918,7 @@ def argparser():
         prog="%pyproject_save_files",
         add_help=False,
         # custom usage to add +auto
-        usage="%(prog)s  [-l|-L] MODULE_GLOB|-M [MODULE_GLOB ...] [+auto]",
+        usage="%(prog)s  [-l|-L] [-a|+auto] MODULE_GLOB|-M [MODULE_GLOB ...]",
     )
     parser.add_argument(
         '--help', action='help',
@@ -894,6 +945,14 @@ def argparser():
     parser.add_argument(
         "-M", "--allow-no-modules", action="store_true", default=False,
         help="Don't fail when no globs are provided, only include non-modules data in the generated filelist.",
+    )
+    parser.add_argument(
+        "-D", "--dist-name", type=str, default=None,
+        help="Save files for a specific distribution package (for multi-wheel installs).",
+    )
+    parser.add_argument(
+        "-a", "--auto", action="store_true", default=False,
+        help="Include all non-module, non-sitelib files (same as +auto).",
     )
     parser.add_argument(
         "varargs", nargs="*", metavar="MODULE_GLOB",

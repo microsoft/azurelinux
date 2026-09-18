@@ -1,0 +1,58 @@
+From a5e46ae06e3d66f5af25cad2b0c73bfe8b3ba688 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 12 Mar 2026 11:35:23 +0100
+Subject: [PATCH 15/16] Revert "OvmfPkg/X86QemuLoadImageLib: flip default for
+ EnableLegacyLoader to false"
+
+This reverts commit d2cbaefc082294eadaa30a3d5f0fa8ba264a574a.
+---
+ .../X86QemuLoadImageLib/X86QemuLoadImageLib.c     |  2 +-
+ OvmfPkg/RUNTIME_CONFIG.md                         | 15 ++++++---------
+ 2 files changed, 7 insertions(+), 10 deletions(-)
+
+diff --git a/OvmfPkg/Library/X86QemuLoadImageLib/X86QemuLoadImageLib.c b/OvmfPkg/Library/X86QemuLoadImageLib/X86QemuLoadImageLib.c
+index e888ac1a97ac..4679a7b8b12d 100644
+--- a/OvmfPkg/Library/X86QemuLoadImageLib/X86QemuLoadImageLib.c
++++ b/OvmfPkg/Library/X86QemuLoadImageLib/X86QemuLoadImageLib.c
+@@ -444,7 +444,7 @@ QemuLoadKernelImage (
+                     &Enabled
+                     );
+       if (EFI_ERROR (RetStatus)) {
+-        Enabled = FALSE;
++        Enabled = TRUE;
+       }
+ 
+       if (!Enabled) {
+diff --git a/OvmfPkg/RUNTIME_CONFIG.md b/OvmfPkg/RUNTIME_CONFIG.md
+index aad3f96d6efa..e8bea12945b8 100644
+--- a/OvmfPkg/RUNTIME_CONFIG.md
++++ b/OvmfPkg/RUNTIME_CONFIG.md
+@@ -153,19 +153,16 @@ without EFI stub.  If you are using kernels that old secure boot
+ support is the least of your problems though ...
+ 
+ The linux kernel is typically signed by the distro secure boot keys
+-and is verified by the distro `shim.efi` binary.  qemu version 10.0
+-(released in April 2025) got support for passing the shim binary
++and is verified by the distro `shim.efi` binary.  qemu release 10.0
++(ETA ~ March 2025) will get support for passing the shim binary
+ (additionally to kernel + initrd) to the firmware, so the usual secure
+ boot verification can work with direct kernel load too.
+ 
+-In edk2-stable202502 and newer the EnableLegacyLoader config option is
+-available and enabled by default.
++For now the legacy loader is enabled by default.  Once the new qemu
++release is available in most linux distros the defaut will be flipped
++to disabled.
+ 
+-In edk2-stable202602 and newer the EnableLegacyLoader config option is
+-disabled by default.
+-
+-Here is the qemu command line for direct kernel boot with secure boot
+-verification:
++Usage (qemu 10.0+):
+ 
+ ```
+ qemu-system-x86_64 \
+-- 
+2.55.0
+

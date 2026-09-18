@@ -7,7 +7,7 @@
 Summary: Utilities for devices that use SCSI command sets
 Name:    sg3_utils
 Version: 1.48
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: GPL-2.0-or-later AND BSD-2-Clause
 URL:     https://sg.danny.cz/sg/sg3_utils.html
 Source0: https://sg.danny.cz/sg/p/sg3_utils-%{version}.tar.xz
@@ -23,6 +23,27 @@ Patch1: 0002-rescan-scsi-bus.sh-remove-tmp-rescan-scsi-mpath-info.patch
 Patch2: 0003-rescan-scsi-bus.sh-fix-for-github.com-doug-gilbert-s.patch
 # https://github.com/doug-gilbert/sg3_utils/pull/47
 Patch3: udev_rules-avoid_spurious_warning_for_non-SCSI_devices.patch
+# https://github.com/doug-gilbert/sg3_utils/pull/68
+# rescan-scsi-bus.sh Correctly read RMB bit on enquiry
+Patch4: 0004-rescan-scsi-bus.sh-Correctly-read-RMB-bit-on-enquiry.patch
+# https://github.com/doug-gilbert/sg3_utils/pull/68
+# rescan-scsi-bus.sh Replace 'which' with build in 'command -v'
+Patch5: 0005-PATCH-v2-rescan-scsi-bus.sh-Replace-which-with-build.patch
+# https://github.com/doug-gilbert/sg3_utils/pull/75
+# Update sg_safte.c to update short option of version
+Patch6: 0006-Update-sg_safte.c-to-update-short-option-of-version.patch
+# https://github.com/doug-gilbert/sg3_utils/pull/56
+# Update sg_rdac.c to accept --help or -h without error
+Patch7: 0007-Update-sg_rdac.c-to-accept--help-or--h-without-erro.patch
+# https://github.com/doug-gilbert/sg3_utils/pull/49
+# sg_inq: fix missing output fields in --export format
+Patch8: 0008-sg_inq-fix-missing-output-fields-in--export-format.patch
+# https://github.com/doug-gilbert/sg3_utils/pull/49
+# sg_inq: re-add Unit serial number field
+Patch9: 0009-sg_inq-re-add-Unit-serial-number-field.patch
+# https://github.com/doug-gilbert/sg3_utils/pull/83
+# sg_inq-export-output-conformance-for-SCSI-name-string-and-ATA-fields
+Patch10: 0010-sg_inq-export-output-conformance-for-SCSI-name-string-and-ATA-fields.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: make
@@ -139,6 +160,23 @@ install -p -m 755 scripts/fc_wwpn_id %{buildroot}%{_udevlibdir}
 
 
 %changelog
+* Wed Jun 24 2026 Paul Evans <pevans@redhat.com> - 1.48-10
+- sg_inq: export output conformance for SCSI name string (RHEL-188083)
+
+* Mon May 11 2026 Paul Evans <pevans@redhat.com> - 1.48-9
+- rescan-scsi-bus.sh: Replace 'which' with built in 'command -v' [Patch v2]
+
+* Mon Feb 09 2026 Paul Evans <pevans@redhat.com> - 1.48-8
+- rescan-scsi-bus.sh: Correctly read RMB bit on enquiry (RHEL-122982)
+- rescan-scsi-bus.sh: Replace 'which' with built in 'command -v' (RHEL-70693)
+- sg_safte: update short option of version (RHEL-125869)
+- sg_rdac: accept --help or -h without error (RHEL-69439)
+- sg_inq: fix missing output fields in --export format (RHEL-119246)
+- sg_inq: re-add Unit serial number field (RHEL-119246)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.48-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.48-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

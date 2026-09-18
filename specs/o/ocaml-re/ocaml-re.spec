@@ -14,7 +14,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-re
 Version:        1.13.3
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        A regular expression library for OCaml
 
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception

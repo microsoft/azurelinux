@@ -1,0 +1,13 @@
+--- hashbrown-0.17.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ hashbrown-0.17.1/Cargo.toml	2026-08-20T10:38:10.780259+00:00
+@@ -147,10 +147,6 @@
+ version = "3.13.0"
+ features = ["allocator-api2"]
+ 
+-[dev-dependencies.criterion]
+-version = "0.7"
+-features = ["html_reports"]
+-
+ [dev-dependencies.fnv]
+ version = "1.0.7"
+ 

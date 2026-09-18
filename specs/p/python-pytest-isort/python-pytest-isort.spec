@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        4.0.0
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        Pytest plugin to check import ordering using isort
 
 # Automatically converted from old format: BSD - review is highly recommended.

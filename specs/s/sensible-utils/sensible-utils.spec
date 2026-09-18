@@ -3,7 +3,7 @@
 
 Name:           sensible-utils
 Version:        0.0.25
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Utilities for sensible alternative selection
 
 BuildArch:      noarch

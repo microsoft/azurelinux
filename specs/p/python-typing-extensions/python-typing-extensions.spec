@@ -2,17 +2,23 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           python-typing-extensions
-Version:        4.15.0
-Release: 5%{?dist}
+Version:        4.16.0
+Release:        4%{?dist}
 Summary:        Backported and Experimental Type Hints for Python
 
 License:        PSF-2.0
 URL:            https://pypi.org/project/typing-extensions/
 Source:         %{pypi_source typing_extensions}
 
-# fix test on 3.14
-# https://github.com/python/typing_extensions/pull/683
-Patch:          https://github.com/python/typing_extensions/pull/683.patch
+# Remove obsolete Literal deduplication assertion
+# https://github.com/python/typing_extensions/commit/79c903c7d9ec4cfa30b7ca38a795adc1c100b45a
+# From https://github.com/python/typing_extensions/pull/785.
+#
+# Fixes:
+#
+# test_typing_extensions.LiteralTests.test_args is failing with python 3.14.7
+# https://github.com/python/typing_extensions/issues/784
+Patch:          https://github.com/python/typing_extensions/commit/79c903c7d9ec4cfa30b7ca38a795adc1c100b45a.patch
 
 BuildArch:      noarch
 
@@ -45,6 +51,10 @@ Summary:       %{summary}
 %prep
 %autosetup -p1 -n typing_extensions-%{version}
 
+# This package builds successfully with flit-core 4
+# https://github.com/python/typing_extensions/pull/787
+%pyproject_patch_dependency flit_core:set_upper:5
+
 
 %generate_buildrequires
 %pyproject_buildrequires
@@ -70,6 +80,28 @@ cd src
 
 
 %changelog
+* Mon Aug 24 2026 Miro Hrončok <mhroncok@redhat.com> - 4.16.0-4
+- Allow building with flit-core 4+
+
+* Mon Aug 24 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 4.16.0-3
+- Patch for Python 3.14.7
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.16.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sun Jul 05 2026 Jonny Heggheim <hegjon@gmail.com> - 4.16.0-1
+- Updated to version 4.16.0
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 4.15.0-5
+- Rebuilt for Python 3.15
+
+* Mon Feb 09 2026 Miro Hrončok <mhroncok@redhat.com> - 4.15.0-4
+- Fix for Python 3.15.0a3+
+- Fixes: rhbz#2416981
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.15.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.15.0-2
 - Rebuilt for Python 3.14.0rc3 bytecode
 

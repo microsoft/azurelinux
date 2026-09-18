@@ -8,7 +8,7 @@ fi
 umask 022
 
 case "$1" in
-  alpha*|ia64*|ppc64*|powerpc64*|s390x*|x86_64*|aarch64*)
+  alpha*|ia64*|ppc64*|powerpc64*|s390x*|x86_64*|aarch64*|riscv64*)
    /usr/bin/gtk-query-immodules-2.0-64 --update-cache
    ;;
   *)

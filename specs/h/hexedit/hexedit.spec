@@ -8,7 +8,7 @@ Version: 1.6
 
 Summary: A hexadecimal file viewer and editor
 Name: hexedit
-Release: 12%{?dist}
+Release: 9%{?dist}
 License: GPL-2.0-or-later
 URL: http://rigaux.org/hexedit.html
 Source: %{forgesource}

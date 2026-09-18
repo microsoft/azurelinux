@@ -9,7 +9,7 @@
 
 Name:           python-pyperclip
 Version:        1.8.2
-Release: 18%{?dist}
+Release:        15%{?dist}
 Summary:        A cross-platform clipboard module for Python
 
 License:        BSD-3-Clause

@@ -6,7 +6,7 @@
 
 Name:           sassc
 Version:        3.6.2
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        Wrapper around libsass to compile CSS stylesheet
 
 License:        MIT

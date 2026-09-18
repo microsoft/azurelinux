@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Version: 0.301
-Release: 18%{?dist}
+Release: 15%{?dist}
 URL: https://gitlab.gnome.org/GNOME/cantarell-fonts/
 
 %global	common_description	%{expand:

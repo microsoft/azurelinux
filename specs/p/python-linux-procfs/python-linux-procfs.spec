@@ -8,7 +8,7 @@
 
 Name: python-linux-procfs
 Version: 0.7.4
-Release: 4%{?dist}
+Release: 3%{?dist}
 License: GPL-2.0-only
 Summary: Linux /proc abstraction classes
 Source: https://cdn.kernel.org/pub/software/libs/python/%{name}/%{name}-%{version}.tar.xz
@@ -18,6 +18,8 @@ BuildRequires: python3-devel
 BuildRequires: pyproject-rpm-macros
 
 # Patches
+Patch: python-linux-procfs-Update-pyproject.toml-license-fo.patch
+Patch: python-linux-procfs-Add-setup.py-for-older-distribut.patch
 
 %global _description\
 Abstractions to extract information from the Linux kernel /proc files.
@@ -52,6 +54,13 @@ Summary: %summary
 %license COPYING
 
 %changelog
+* Fri May 15 2026 John Kacur <jkacur@redhat.com> - 0.7.4-3
+- Update pyproject.toml license format for modern setuptools
+- Add setup.py for older distributions
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Oct 10 2025 John Kacur <jkacur@redhat.com> - 0.7.4-1
 - Rebase to v0.7.4 upstream and use pyproject.toml
 

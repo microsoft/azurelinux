@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.10.1
-Release: 15%{?dist}
+Release: 12%{?dist}
 Summary: A Ruby wrapper for Linux inotify, using FFI
 License: MIT
 URL: https://github.com/guard/rb-inotify

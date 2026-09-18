@@ -44,11 +44,11 @@ Name: %{?scl_prefix}gdb
 # See timestamp of source gnulib installed into gnulib/ .
 %global snapgnulib 20220501
 %global tarname gdb-%{version}
-Version: 17.1
+Version: 17.2
 
 # The release always contains a leading reserved number, start it at 1.
 # `upstream' is not a part of `name' to stay fully rpm dependencies compatible for the testing.
-Release: 6%{?dist}
+Release: 3%{?dist}
 
 License: GPL-3.0-or-later AND BSD-3-Clause AND FSFAP AND LGPL-2.1-or-later AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain AND GFDL-1.3-or-later AND LGPL-2.0-or-later WITH GCC-exception-2.0 AND GPL-3.0-or-later WITH GCC-exception-3.1 AND GPL-2.0-or-later WITH GNU-compiler-exception AND MIT
 # Do not provide URL for snapshots as the file lasts there only for 2 days.
@@ -144,7 +144,6 @@ Source4: gdbinit
 # Include the auto-generated file containing the "Patch:" directives.
 # See README.local-patches for more details.
 Source9998: _gdb.spec.Patch.include
-Source9999: _gdb.spec.patch.include
 %include %{SOURCE9998}
 
 BuildRequires: readline-devel%{buildisa} >= 7.0
@@ -332,7 +331,7 @@ and printing their data.
 This package provides INFO, HTML and PDF user manual for GDB.
 
 %prep
-%setup -q -n %{gdb_src}
+%autosetup -p1 -n %{gdb_src}
 
 # Files have `# <number> <file>' statements breaking VPATH / find-debuginfo.sh .
 (cd gdb;rm -fv $(perl -pe 's/\\\n/ /' <Makefile.in|sed -n 's/^YYFILES = //p'))
@@ -340,12 +339,6 @@ This package provides INFO, HTML and PDF user manual for GDB.
 # *.info* is needlessly split in the distro tar; also it would not get used as
 # we build in GDB_BUILD, just to be sure.
 find -name "*.info*"|xargs rm -f
-
-# Apply patches defined on _gdb.spec.Patch.include
-
-# Include the auto-generated patch directives.
-# See README.local-patches for more details.
-%include %{SOURCE9999}
 
 find -name "*.orig" | xargs rm -f
 ! find -name "*.rej" # Should not happen.
@@ -942,6 +935,48 @@ fi
 # endif scl
 
 %changelog
+* Wed Jul 22 2026 Guinevere Larsen <guinevere@redhat.com> - 17.2-3
+- Backport upstream commit f3ce0ce31fb3f056 to fix a regression on
+  s390x.
+
+* Wed Jul 8 2026 Andrew Burgess <aburgess@redhat.com>
+- Backport upstream commit 93f536d813c41527 to fix RHBZ 2498034.  This
+  commit will drop out when we rebase to GDB 18.
+
+* Wed Jul 8 2026 Andrew Burgess <aburgess@redhat.com>
+- Backport upstream commit be3a9405ceb4d6d6 to fix and issue with the
+  D demangler (RHBZ 2368350).  This commit will drop out when we
+  rebase to GDB 18.
+
+* Wed Jul 8 2026 Andrew Burgess <aburgess@redhat.com>
+- Adjust commit message in gdb-backport-dap-core-file-support.patch to
+  remove '---' string which confuses git.
+
+* Fri Jul 03 2026 Michal Kolar <mkolar@redhat.com> - 17.2-1
+- Rebase to FSF GDB 17.2.
+  Deleted: gdb-rhbz2435950-skip-revert.patch
+  Backport e492fb22b70, gdb: backport DAP core file support
+  Replace manual, multi-file patch inclusion with modern autosetup
+  Add rpminspect.yaml to define package-specific testing policy
+
+* Sat May 16 2026 Andrew Burgess <aburgess@redhat.com>
+- Backport the following upstream commits in order to address RHBZ
+  2467251: d980317c7f1, 958d06262a7, 7d1d7386561, 8915de0883c,
+  8f65ab7b71f.  These commits will all drop out when we rebase to GDB
+  18.
+
+* Tue Apr 21 2026 Andrew Burgess <aburgess@redhat.com>
+- Backport upstream commits 8bd08ee92c4 and cd289df068e to address
+  rhbz2366461.  These backports will not be needed once we rebase to
+  GDB 18.
+
+* Wed Feb 25 2026 Kevin Buettner <kevinb@redhat.com>
+- Backport upstream commit c1da013915e from Kevin Buettner to fix
+  gcore failures caused by glibc 2.42 guard page changes (RHBZ 2413405).
+- Backport upstream commit d2cc16cd7fc from Jan Vrany to fix
+  FAILs in gdb.base/fileio.exp caused by macro expansion of
+  path components in OUTDIR.
+
 * Wed Feb 11 2026 Guinevere Larsen <guinevere@redhat.com>
 - Backport upstream commit f08ffbbf269 to fix RHBZ 2435950
   This reverts a new feature that was never properly approved

@@ -20,17 +20,17 @@ Signed-off-by: Todd Zullinger <tmz@pobox.com>
  2 files changed, 30 insertions(+), 5 deletions(-)
 
 diff --git a/t/lib-git-svn.sh b/t/lib-git-svn.sh
-index ea28971e8e..04e660e2ba 100644
+index 52843f667de0..20bae909215c 100644
 --- a/t/lib-git-svn.sh
 +++ b/t/lib-git-svn.sh
-@@ -17,6 +17,7 @@ fi
+@@ -13,6 +13,7 @@ fi
  GIT_DIR=$PWD/.git
  GIT_SVN_DIR=$GIT_DIR/svn/refs/remotes/git-svn
  SVN_TREE=$GIT_SVN_DIR/svn-tree
 +SVNSERVE_PIDFILE="$PWD"/daemon.pid
  test_set_port SVNSERVE_PORT
  
- svn >/dev/null 2>&1
+ if ! svn help >/dev/null 2>&1
 @@ -119,10 +120,35 @@ require_svnserve () {
  }
  

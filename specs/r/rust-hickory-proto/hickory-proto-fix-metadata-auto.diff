@@ -1,0 +1,17 @@
+--- hickory-proto-0.26.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ hickory-proto-0.26.1/Cargo.toml	2026-05-26T13:51:39.640185+00:00
+@@ -220,9 +220,6 @@
+ 
+ [dev-dependencies]
+ 
+-[target.'cfg(target_os = "android")'.dependencies.jni]
+-version = "0.22.1"
+-
+ [lints.clippy]
+ bool_to_int_with_if = "allow"
+ default_trait_access = "warn"
+@@ -247,3 +244,4 @@
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(nightly)"]
++

@@ -3,7 +3,7 @@
 
 Name:		perl-XString
 Version:	0.005
-Release: 20%{?dist}
+Release:	17%{?dist}
 Summary:	Isolated String helpers from B
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/XString

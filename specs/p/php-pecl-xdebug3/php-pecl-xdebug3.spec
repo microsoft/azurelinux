@@ -3,7 +3,7 @@
 
 # Fedora spec file for php-pecl-xdebug3
 #
-# Copyright (c) 2010-2025 Remi Collet
+# Copyright (c) 2010-2026 Remi Collet
 # Copyright (c) 2006-2009 Christopher Stone
 #
 # License: MIT
@@ -17,26 +17,29 @@
 %global pie_vend   xdebug
 %global pie_proj   xdebug
 %global pecl_name  xdebug
-%global gh_commit  32dcc3da7bbff171f67e803f28ef4c098f8e2caf
-%global gh_short   %(c=%{gh_commit}; echo ${c:0:7})
 
 # version/release
-%global upstream_version 3.5.0
+%global upstream_version 3.5.3
 #global upstream_prever  alpha3
 #global upstream_lower   %%(echo %%{upstream_prever} | tr '[:upper:]' '[:lower:]')
-%global sources          src
+
+# Github forge
+%global gh_vend     %{pecl_name}
+%global gh_proj     %{pecl_name}
+%global forgeurl    https://github.com/%{gh_vend}/%{gh_proj}
+%global tag         %{upstream_version}%{?upstream_prever}
 
 # XDebug should be loaded after opcache
 %global ini_name  15-%{pecl_name}.ini
 
 Name:           php-pecl-xdebug3
 Summary:        Provides functions for function traces and profiling
-Version:        %{upstream_version}%{?upstream_prever:~%{upstream_lower}}
-Release: 4%{?dist}
-Source0:        https://github.com/%{pecl_name}/%{pecl_name}/archive/%{gh_commit}/%{pecl_name}-%{upstream_version}%{?upstream_prever}-%{gh_short}.tar.gz
-
 License:        Xdebug-1.03
+Version:        %{upstream_version}%{?upstream_prever:~%{upstream_lower}}
+Release:        1%{?dist}
+%forgemeta
 URL:            https://xdebug.org/
+Source0:        %{forgesource}
 
 ExcludeArch:    %{ix86}
 
@@ -90,20 +93,14 @@ Documentation: https://xdebug.org/docs/
 
 
 %prep
-%setup -qc
-mv %{pecl_name}-%{gh_commit} %{sources}
-mv %{sources}/package.xml .
+%forgesetup
 
-sed -e '/LICENSE/s/role="doc"/role="src"/' -i package.xml
-
-pushd %{sources}
 # Check extension version
 ver=$(sed -n '/XDEBUG_VERSION/{s/.* "//;s/".*$//;p}' php_xdebug.h)
 if test "$ver" != "%{upstream_version}%{?upstream_prever}%{?gh_date:-dev}"; then
    : Error: Upstream XDEBUG_VERSION version is ${ver}, expecting %{upstream_version}%{?upstream_perver}%{?gh_date:-dev}.
    exit 1
 fi
-popd
 
 cat << 'EOF' >%{ini_name}
 ; Enable xdebug extension module
@@ -112,13 +109,12 @@ zend_extension=%{pecl_name}.so
 ; Configuration
 ; See https://xdebug.org/docs/all_settings
 EOF
-sed -e '1,2d' %{sources}/%{pecl_name}.ini >>%{ini_name}
+sed -e '1,2d' %{pecl_name}.ini >>%{ini_name}
 
 head -n15 <%{ini_name}
 
 
 %build
-cd %{sources}
 %{__phpize}
 sed -e 's/INSTALL_ROOT/DESTDIR/' -i build/Makefile.global
 
@@ -140,15 +136,7 @@ install -Dpm 644 %{ini_name} %{buildroot}%{php_inidir}/%{ini_name}
 
 
 : Install the extension
-cd %{sources}
 %make_install
-
-: Install the Documentation
-for i in $(grep 'role="doc"' ../package.xml | sed -e 's/^.*name="//;s/".*$//')
-do
-  [ -f contrib/$i ] && j=contrib/$i || j=$i
-  install -Dpm 644 $j %{buildroot}%{pecl_docdir}/%{pecl_name}/$j
-done
 
 
 %check
@@ -182,13 +170,15 @@ if [ -s err.log ]; then
 fi
 
 %if %{with tests}
-cd %{sources}
 : Upstream test suite
 
 # see https://bugs.xdebug.org/view.php?id=2048
 rm tests/base/bug02036*.phpt
 # Erratic result
 rm tests/debugger/bug00998-ipv6.phpt
+# see https://bugs.xdebug.org/view.php?id=2434
+rm tests/debugger/bug02424-*.phpt
+rm tests/debugger/maps/map-minimum-path/minimum-path.phpt
 
 # bug00886 is marked as slow as it uses a lot of disk space
 TEST_OPTS="-q -x --show-diff"
@@ -201,8 +191,11 @@ TEST_PHP_ARGS="-n $modules -d zend_extension=%{buildroot}%{php_extdir}/%{pecl_na
 
 
 %files
-%license %{sources}/LICENSE
-%doc %{pecl_docdir}/%{pecl_name}
+%license LICENSE
+%doc composer.json
+%doc CREDITS
+%doc CONTRIBUTING.rst
+%doc README.rst
 %{pecl_xmldir}/%{name}.xml
 
 %config(noreplace) %{php_inidir}/%{ini_name}
@@ -210,6 +203,10 @@ TEST_PHP_ARGS="-n $modules -d zend_extension=%{buildroot}%{php_extdir}/%{pecl_na
 
 
 %changelog
+* Tue Jun  9 2026 Remi Collet <remi@remirepo.net> - 3.5.3-1
+- update to 3.5.3
+- open https://bugs.xdebug.org/view.php?id=2434 test failure on aarch64
+
 * Thu Dec  4 2025 Remi Collet <remi@remirepo.net> - 3.5.0-1
 - update to 3.5.0
 

@@ -7,7 +7,7 @@
 
 Name:		libffi
 Version:	3.5.2
-Release: 4%{?dist}
+Release:	1%{?dist}
 Summary:	A portable foreign function interface library
 # No license change for 3.5.2
 # No license change for 3.5.1

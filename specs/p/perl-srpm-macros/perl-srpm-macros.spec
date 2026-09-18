@@ -3,7 +3,7 @@
 
 Name:       perl-srpm-macros    
 Version:    1
-Release: 63%{?dist}
+Release:    60%{?dist}
 Summary:    RPM macros for building Perl source package from source repository
 License:    GPL-3.0-or-later
 Source0:    macros.perl-srpm

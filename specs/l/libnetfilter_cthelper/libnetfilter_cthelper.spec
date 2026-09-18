@@ -3,7 +3,7 @@
 
 Name:           libnetfilter_cthelper
 Version:        1.0.0
-Release: 34%{?dist}
+Release:        31%{?dist}
 Summary:        User-space infrastructure for connection tracking helpers
 License:        GPL-2.0-only
 URL:            http://www.netfilter.org/projects/libnetfilter_cthelper/index.html

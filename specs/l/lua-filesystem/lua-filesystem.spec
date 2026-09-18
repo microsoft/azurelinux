@@ -15,7 +15,7 @@
 
 Name:           lua-filesystem
 Version:        1.8.0
-Release: 18%{?dist}
+Release:        15%{?dist}
 Summary:        File System Library for the Lua Programming Language
 
 %global gitowner lunarmodules

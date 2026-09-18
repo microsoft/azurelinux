@@ -4,7 +4,7 @@
 Summary:	A modern implementation of a DBM
 Name:		tokyocabinet
 Version:	1.4.48
-Release: 31%{?dist}
+Release:	28%{?dist}
 License:	LGPL-2.1-or-later
 URL:		http://fallabs.com/tokyocabinet/
 Source:		http://fallabs.com/%{name}/%{name}-%{version}.tar.gz

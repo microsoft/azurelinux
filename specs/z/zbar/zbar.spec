@@ -9,7 +9,7 @@
 
 Name:		zbar
 Version:	0.23.93
-Release: 13%{?dist}
+Release:	9%{?dist}
 Summary:	Bar code reader
 
 License:	LGPL-2.1-or-later

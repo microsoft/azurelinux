@@ -8,7 +8,7 @@
 
 Name:       rocminfo
 Version:    %{rocm_version}
-Release: 5%{?dist}
+Release:    2%{?dist}
 Summary:    ROCm system info utility
 
 License:    NCSA

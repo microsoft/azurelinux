@@ -6,6 +6,29 @@
 # Note: This takes arbitrary options, to ease addition of new options to the real macro.
 %pyproject_buildrequires(-) echo 'pyproject-rpm-macros'
 
+# Similarly, we define a dummy (to be overridden) %%pyproject_files, to avoid:
+#   error: Bad option -D: %%files -n python3-... -f %%{pyproject_files -D ...}
+%pyproject_files(-) dummy
+
+# We need to define %%pyproject_patch_dependency here in the srpm macros, along with any path-related macros it uses,
+# because this macro is normally used in %%prep, before any generated BR is installed.
+# - The backward-compatible %%_pyproject_files_pkgversion suffix is used in all pyproject-rpm-macros directories.
+#   For the main Python it's empty, for all others it's "-3.X".
+# - We prefix all created files with %%_pyproject_files_prefix to make them unique.
+#   Ideally, we would put them into %%{buildsubdir}, but that value changes during the spec.
+#   The used value is similar to the one used to define the default %%buildroot.
+%_pyproject_files_pkgversion %{expr:"%{python3_pkgversion}" != "3" ? "-%{python3_pkgversion}" : ""}
+%_pyproject_files_prefix %{name}-%{version}-%{release}.%{_arch}%{_pyproject_files_pkgversion}
+%_pyproject_dep_overrides %{_builddir}/%{_pyproject_files_prefix}-pyproject-dep-overrides
+
+%pyproject_patch_dependency() %{expand:\\\
+%{!?1:%{error:%%pyproject_patch_dependency requires an argument}}\\\
+%{?2:%{error:%%pyproject_patch_dependency accepts exactly one argument per call}}\\\
+if [ -f %{__python3} ] && [ -f %{_rpmconfigdir}/redhat/pyproject_dependency_overrides.py ]; then
+  %{__python3} -Bs %{_rpmconfigdir}/redhat/pyproject_dependency_overrides.py '%1'
+fi
+echo '%1' >> %{_pyproject_dep_overrides}
+}
 
 # Declarative buildsystem, requires RPM 4.20+ to work
 # https://rpm-software-management.github.io/rpm/manual/buildsystem.html

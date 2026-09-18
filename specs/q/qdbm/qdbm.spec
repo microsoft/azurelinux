@@ -15,7 +15,7 @@ BuildRequires:	javapackages-local-openjdk%2 \
 
 Name:		qdbm
 Version:	1.8.78
-Release: 75%{?dist}
+Release:	71%{?dist}
 # SPDX confirmed
 License:	LGPL-2.1-or-later
 

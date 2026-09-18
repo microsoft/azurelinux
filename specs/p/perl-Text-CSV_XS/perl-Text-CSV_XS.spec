@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           perl-Text-CSV_XS
-Version:        1.61
-Release: 5%{?dist}
+Version:        1.62
+Release:        1%{?dist}
 Summary:        Comma-separated values manipulation routines
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Text-CSV_XS
@@ -21,7 +21,7 @@ BuildRequires:  perl(Config::Tiny)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Run-time:
 BuildRequires:  perl(Carp)
-# Specific version ≥ 3.20 for Encode is recommended but not required
+# Specific version ≥ 3.22 for Encode is recommended but not required
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(IO::Handle)
@@ -36,7 +36,7 @@ BuildRequires:  perl(Config)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Tie::Scalar)
 # Dependencies
-# Specific version ≥ 3.20 for Encode is recommended but not required
+# Specific version ≥ 3.22 for Encode is recommended but not required
 Requires:       perl(Encode)
 # IO::Handle is loaded by XS code
 Requires:       perl(IO::Handle)
@@ -83,6 +83,11 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_mandir}/man3/Text::CSV_XS.3*
 
 %changelog
+* Wed Apr 29 2026 Paul Howarth <paul@city-fan.org> - 1.62-1
+- Update to 1.62 (rhbz#2463743)
+  - It is 2026
+  - Fix possible stack corruption (GH#65, CVE-2026-7111)
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.61-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

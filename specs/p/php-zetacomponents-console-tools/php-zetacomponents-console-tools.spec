@@ -26,7 +26,7 @@
 
 Name:           php-%{gh_owner}-%{cname}
 Version:        1.7.5
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        Zeta %{gh_project} Component
 
 License:        Apache-2.0

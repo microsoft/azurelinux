@@ -1,0 +1,43 @@
+From 2d26abee2815fde560ca6dfa3c6f021200958fad Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 28 Jun 2026 10:16:41 +0100
+Subject: [PATCH] Downstream-only: omit tests that require network access
+
+---
+ src/lib.rs | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index c616c6f..f1fc34c 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -36,7 +36,7 @@
+ //!
+ //! In its simplest form, ureq looks like this:
+ //!
+-//! ```rust
++//! ```rust,ignore
+ //! let body: String = ureq::get("http://example.com")
+ //!     .header("Example-Header", "header value")
+ //!     .call()?
+@@ -183,7 +183,7 @@
+ //! ureq does not guarantee to default to ring indefinitely. `rustls` as a feature flag will always
+ //! work, but the specific crypto backend might change in a minor version.
+ //!
+-//! ```
++//! ```ignore
+ //! # #[cfg(feature = "rustls")]
+ //! # {
+ //! // This uses rustls
+@@ -351,7 +351,7 @@
+ //! sending the body, ureq will respect that header by not overriding it,
+ //! and by encoding the body or not, as indicated by the headers you set.
+ //!
+-//! ```
++//! ```ignore
+ //! let resp = ureq::put("https://httpbin.org/put")
+ //!     .header("Transfer-Encoding", "chunked")
+ //!     .send("Hello world")?;
+-- 
+2.54.0
+

@@ -3,7 +3,7 @@
 
 Name:           perl-Future-IO
 Version:        0.16
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        Future-returning IO core methods
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

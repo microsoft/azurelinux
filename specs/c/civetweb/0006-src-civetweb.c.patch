@@ -1,0 +1,26 @@
+From b8f93aafd3229fff5acea786b74b573202b169f3 Mon Sep 17 00:00:00 2001
+From: ferdymercury <ferdymercury@users.noreply.github.com>
+Date: Mon, 27 Apr 2026 12:13:45 +0200
+Subject: [PATCH] Only include deprecated header when really necessary
+
+deprecated ENGINE API is only used #if !defined(OPENSSL_API_1_1) && !defined(OPENSSL_API_3_0)
+---
+ src/civetweb.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/civetweb.c b/src/civetweb.c
+index f6a60e214..ecbd1a8a4 100644
+--- a/src/civetweb.c
++++ b/src/civetweb.c
+@@ -1797,7 +1797,10 @@ typedef struct SSL_CTX SSL_CTX;
+ #include <openssl/conf.h>
+ #include <openssl/crypto.h>
+ #include <openssl/dh.h>
+-#include <openssl/engine.h>
++
++#if defined(OPENSSL_API_1_0)
++#include <openssl/engine.h> // deprecated later on
++#endif
+ #include <openssl/err.h>
+ #include <openssl/opensslv.h>
+ #include <openssl/pem.h>

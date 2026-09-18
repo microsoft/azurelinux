@@ -1,0 +1,151 @@
+From: Oleg Nesterov <oleg@redhat.com>
+Subject: cscope: make it possible to add the new keywords
+Content-Type: text/plain; charset=us-ascii
+
+The linux kernel uses a lot of annotations which confuse cscope.
+Simple example:
+
+	$ cat -n test.c
+	     1	void func1(void) __acquires(RCU)
+	     2	{
+	     3		X = 1;
+	     4	}
+	     5
+	     6	void func2(void) __releases(RCU)
+	     7	{
+	     8		X = 1;
+	     9	}
+
+Without this patch:
+
+	$ ./src/cscope -bu test.c
+	$ ./src/cscope -dL -0 X
+	test.c __acquires 3 X = 1;
+	test.c __releases 8 X = 1;
+
+With this patch:
+
+	$ ./src/cscope -bu -K __acquires,__releases test.c
+	$ ./src/cscope -dL -0 X
+	test.c func1 3 X = 1;
+	test.c func2 8 X = 1;
+
+Signed-off-by: Oleg Nesterov <oleg@redhat.com>
+---
+ src/global.h |  1 +
+ src/lookup.c | 35 +++++++++++++++++++++++++++++++----
+ src/main.c   |  5 ++++-
+ 3 files changed, 36 insertions(+), 5 deletions(-)
+
+diff --git a/src/global.h b/src/global.h
+index a6f1486..5f75b68 100644
+--- a/src/global.h
++++ b/src/global.h
+@@ -342,6 +342,7 @@ char	*read_block(void);
+ char	*scanpast(char c);
+ 
+ 
++void	add_keyword(char *csk);
+ void	addcmd(int f, char *s);
+ void	addsrcfile(char *path);
+ void	askforchar(void);
+diff --git a/src/lookup.c b/src/lookup.c
+index d8595db..71e4aac 100644
+--- a/src/lookup.c
++++ b/src/lookup.c
+@@ -51,7 +51,9 @@ char	uniontext[] = "union";
+  * without changing the database file version and adding compatibility code
+  * for old databases.
+  */
+-struct	keystruct keyword[] = {
++#define KEYWORDS	64
++
++struct	keystruct keyword[KEYWORDS] = {
+ 	{"",		'\0',	NULL},	/* dummy entry */
+ 	{"#define",	' ',	NULL},	/* must be table entry 1 */
+ 	{"#include",	' ',	NULL},	/* must be table entry 2 */
+@@ -93,7 +95,32 @@ struct	keystruct keyword[] = {
+ 	{"signed",	' ',	NULL},
+ 	{"volatile",	' ',	NULL},
+ };
+-#define KEYWORDS	(sizeof(keyword) / sizeof(keyword[0]))
++
++static int keyword_nr = 38;
++
++void add_keyword(char *csk)
++{
++	for (;;) {
++		char *eok = strchrnul(csk, ',');
++		int last = !*eok;
++
++		*eok = 0;
++		if (*csk) {
++			if (keyword_nr == KEYWORDS) {
++				fprintf(stderr, "KEYWORDS overflow\n");
++				myexit(1);
++			}
++			keyword[keyword_nr].text = csk;
++			keyword[keyword_nr].delim = '(';
++			keyword_nr++;
++		}
++
++		if (last)
++			break;
++		csk = eok + 1;
++	}
++}
++
+ 
+ #define HASHMOD	(KEYWORDS * 2 + 1)
+ 
+@@ -106,8 +133,8 @@ initsymtab(void)
+ {
+     unsigned int i, j;
+     struct keystruct *p;
+-	
+-    for (i = 1; i < KEYWORDS; ++i) {
++
++    for (i = 1; i < keyword_nr; ++i) {
+ 	p = keyword + i;
+ 	j = hash(p->text) % HASHMOD;
+ 	p->next = hashtab[j];
+diff --git a/src/main.c b/src/main.c
+index 2ffabc3..055b222 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -153,7 +153,7 @@ char ** parse_options(int *argc, char **argv)
+ 	
+ 
+ 	while ((opt = getopt_long(argcc, argv,
+-	       "hVbcCdeF:f:I:i:kLl0:1:2:3:4:5:6:7:8:9:P:p:qRs:TUuvX",
++	       "hVbcCdeF:f:I:i:kLl0:1:2:3:4:5:6:7:8:9:P:p:qRs:TUuvXK:",
+ 	       lopts, &longind)) != -1) {
+ 		switch(opt) {
+ 
+@@ -273,6 +273,9 @@ char ** parse_options(int *argc, char **argv)
+ 		case 's':	/* additional source file directory */
+ 			sourcedir(optarg);
+ 			break;
++		case 'K':
++			add_keyword(optarg);
++			break;
+ 		}
+ 	}
+ 	/*
+diff --git a/doc/cscope.1 b/doc/cscope.1
+--- a/doc/cscope.1
++++ b/doc/cscope.1
+@@ -121,6 +121,11 @@ whitespace have to be enclosed in "doubl
+ filenames, any double-quote and backslash characters have to be
+ escaped by backslashes.
+ .TP
++.BI -K keyword[,keyword[,...]]
++Add an additional user-defined keyword(s). This is useful for example
++for the kernel sources with non-standard keywords like ``__acquires''
++and ``__releases''. The limit is 26 new keywords.
++.TP
+ .B -k
+ ``Kernel Mode'', turns off the use of the default include dir
+ (usually /usr/include) when building the database, since kernel
+-- 
+2.25.1.362.g51ebf55

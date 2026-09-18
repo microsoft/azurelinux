@@ -9,7 +9,7 @@
 
 Name:               python-requests-oauthlib
 Version:            1.3.1
-Release: 18%{?dist}
+Release:            15%{?dist}
 Summary:            OAuthlib authentication support for Requests.
 
 License:            ISC

@@ -28,14 +28,14 @@ from packaging.version import parse as parse_version
 class RpmVersion():
     def __init__(self, version_id):
         version = parse_version(version_id)
-        if isinstance(version._version, str):
+        if version.__class__.__name__ == 'LegacyVersion':
             self.version = version._version
         else:
-            self.epoch = version._version.epoch
-            self.version = list(version._version.release)
-            self.pre = version._version.pre
-            self.dev = version._version.dev
-            self.post = version._version.post
+            self.epoch = version.epoch
+            self.version = list(version.release)
+            self.pre = version.pre
+            self.dev = version.dev
+            self.post = version.post
             # version.local is ignored as it is not expected to appear
             # in public releases
             # https://www.python.org/dev/peps/pep-0440/#local-version-identifiers
@@ -63,9 +63,9 @@ class RpmVersion():
         if self.pre:
             rpm_suffix = '~{}'.format(''.join(str(x) for x in self.pre))
         elif self.dev:
-            rpm_suffix = '~~{}'.format(''.join(str(x) for x in self.dev))
+            rpm_suffix = '~~dev{}'.format(self.dev)
         elif self.post:
-            rpm_suffix = '^post{}'.format(self.post[1])
+            rpm_suffix = '^post{}'.format(self.post)
         else:
             rpm_suffix = ''
         return '{}{}{}'.format(rpm_epoch, rpm_version, rpm_suffix)

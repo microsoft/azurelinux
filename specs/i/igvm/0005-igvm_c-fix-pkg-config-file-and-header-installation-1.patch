@@ -1,0 +1,70 @@
+From 8bcd258f00f444791a93a74737c407b70bdafc4c Mon Sep 17 00:00:00 2001
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Mon, 23 Feb 2026 18:00:27 +0100
+Subject: [PATCH 5/5] igvm_c: fix pkg-config file and header installation
+ (#104)
+
+The generated igvm.pc had an empty Cflags field because cargo-c header
+support was fully disabled (enabled = false). Headers were also
+installed manually by the Makefile rather than through cargo-c.
+
+Switch to generation = false so that cargo-c knows headers exist but
+does not run cbindgen (which is handled by the Makefile). Use
+install.include to point cargo-c directly at the cbindgen-generated
+headers in igvm_c/include/, and let cargo cinstall take care of header
+installation.
+
+Add a dependency from $(LIBIGVM) on the generated headers so that cargo
+cbuild always runs after cbindgen.
+
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ igvm/Cargo.toml | 9 ++++++++-
+ igvm_c/Makefile | 4 +---
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/igvm/Cargo.toml b/igvm/Cargo.toml
+index 974300b..17a76c3 100644
+--- a/igvm/Cargo.toml
++++ b/igvm/Cargo.toml
+@@ -14,7 +14,14 @@ categories = ["virtualization", "parser-implementations"]
+ 
+ [package.metadata.capi.header]
+ # cbindgen is handled from igvm_c/Makefile
+-enabled = false
++generation = false
++
++[package.metadata.capi.pkg_config]
++# users include <igvm/igvm.h>, so let's strip igvm from Cflags
++strip_include_path_components = 1
++
++[package.metadata.capi.install.include]
++asset = [{from = "../igvm_c/include/igvm.h"}, {from = "../igvm_c/include/igvm_defs.h"}]
+ 
+ [package.metadata.docs.rs]
+ # Document all features
+diff --git a/igvm_c/Makefile b/igvm_c/Makefile
+index 7f08c99..ba98eb6 100644
+--- a/igvm_c/Makefile
++++ b/igvm_c/Makefile
+@@ -38,7 +38,7 @@ all: build test
+ 
+ build: $(API_DIR)/include/igvm.h $(TARGET_PATH)/dump_igvm$(EXE)
+ 
+-$(LIBIGVM):
++$(LIBIGVM): $(API_DIR)/include/igvm.h
+ 	$(CARGO) cbuild --prefix $(PREFIX) --features $(FEATURES) $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
+ 
+ $(TARGET_PATH)/libigvm_defs.rlib:
+@@ -71,8 +71,6 @@ clean:
+ 	rm -f $(API_DIR)/include/igvm.h $(API_DIR)/include/igvm_defs.h $(TARGET_PATH)/dump_igvm$(EXE) $(TARGET_PATH)/test_data$(EXE) $(TARGET_PATH)/igvm.bin
+ 
+ install: build
+-	mkdir -p $(DESTDIR)/$(PREFIX)/include/igvm
+-	install -m 644 $(IGVM_DIR)/igvm_c/include/* $(DESTDIR)/$(PREFIX)/include/igvm
+ 	$(CARGO) cinstall $(if $(DESTDIR), --destdir "$(DESTDIR)") --prefix "$(PREFIX)" --features $(FEATURES) $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
+ 	mkdir -p $(DESTDIR)/$(PREFIX)/bin/
+ 	install -m 755 $(TARGET_PATH)/dump_igvm$(EXE) $(DESTDIR)/$(PREFIX)/bin/
+-- 
+2.54.0
+

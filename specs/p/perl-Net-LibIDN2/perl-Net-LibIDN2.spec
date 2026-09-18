@@ -3,7 +3,7 @@
 
 Name:           perl-Net-LibIDN2
 Version:        1.02
-Release: 14%{?dist}
+Release:        11%{?dist}
 Summary:        Perl binding for GNU Libidn2
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Net-LibIDN2

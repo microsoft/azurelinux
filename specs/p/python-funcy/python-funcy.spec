@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.17
-Release: 16%{?dist}
+Release:        13%{?dist}
 Summary:        Fancy and practical functional tools
 
 License:        BSD-3-Clause

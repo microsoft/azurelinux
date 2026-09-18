@@ -1,9 +1,9 @@
---- is_executable-1.0.5/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ is_executable-1.0.5/Cargo.toml	2025-09-19T15:13:53.977862+00:00
+--- is_executable-1.0.6/Cargo.toml	2006-07-24T01:21:28+00:00
++++ is_executable-1.0.6/Cargo.toml	2026-06-18T13:45:33.959276+00:00
 @@ -44,6 +44,3 @@
  [dev-dependencies.diff]
  version = "0.1.10"
  
 -[target.'cfg(target_os = "windows")'.dependencies.windows-sys]
--version = "0.60"
+-version = ">=0.59, <=0.61"
 -features = ["Win32_Storage_FileSystem"]

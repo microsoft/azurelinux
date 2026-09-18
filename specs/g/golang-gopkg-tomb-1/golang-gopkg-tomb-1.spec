@@ -21,7 +21,7 @@ The Tomb package handles clean goroutine tracking and termination.}
 %global godocs          README.md
 
 Name:           %{goname}
-Release: 20%{?dist}
+Release:        17%{?dist}
 Summary:        Clean goroutine termination in the Go language
 License:        BSD-3-Clause
 URL:            %{gourl}

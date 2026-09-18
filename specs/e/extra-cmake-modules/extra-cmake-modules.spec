@@ -12,10 +12,10 @@
 
 Name:    extra-cmake-modules
 Summary: Additional modules for CMake build system
-Version: 6.23.0
-Release: 4%{?dist}
-# Automatically converted from old format: BSD - review is highly recommended.
-License: LicenseRef-Callaway-BSD
+Version: 6.29.0
+Release: 1%{?dist}
+# kde-modules/clang-format.cmake is MIT
+License: BSD-3-Clause AND BSD-2-Clause AND MIT
 URL:     https://api.kde.org/ecm/
 Source0: http://download.kde.org/%{stable_kf6}/frameworks/%{majmin_ver_kf6}/%{framework}-%{version}.tar.xz
 Source1: http://download.kde.org/%{stable_kf6}/frameworks/%{majmin_ver_kf6}/%{framework}-%{version}.tar.xz.sig
@@ -24,6 +24,9 @@ BuildArch:      noarch
 ## upstreamable patches
 # do not unconditionally link in base/core libpoppler library
 Patch2: extra-cmake-modules-5.39.0-poppler_overlinking.patch
+
+# test
+Patch3: 0001-Revert-Add-PYTHONPATH-to-prefix.sh-if-python-is-avai.patch
 
 ## downstream patches
 
@@ -88,6 +91,30 @@ make test ARGS="--output-on-failure --timeout 300" -C %{_vpath_builddir} ||:
 
 
 %changelog
+* Fri Aug 07 2026 Steve Cossette <farchord@gmail.com> - 6.29.0-1
+- 6.29.0
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Jul 04 2026 Steve Cossette <farchord@gmail.com> - 6.28.0-1
+- 6.28.0
+
+* Fri Jun 05 2026 Steve Cossette <farchord@gmail.com> - 6.27.0-1
+- 6.27.0
+
+* Thu May 14 2026 Steve Cossette <farchord@gmail.com> - 6.26.0-2
+- Fix for kde packages not being able to find python
+
+* Fri May 01 2026 Steve Cossette <farchord@gmail.com> - 6.26.0-1
+- 6.26.0
+
+* Thu Apr 09 2026 Steve Cossette <farchord@gmail.com> - 6.25.0-1
+- 6.25.0
+
+* Tue Mar 10 2026 Steve Cossette <farchord@gmail.com> - 6.24.0-1
+- 6.24.0
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.23.0-1
 - 6.23.0
 

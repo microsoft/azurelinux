@@ -1,6 +1,4 @@
-# This is a backward-compatible suffix used in all pyproject-rpm-macros directories
-# For the main Python it's empty, for all others it's "-3.X"
-%_pyproject_files_pkgversion %{expr:"%{python3_pkgversion}" != "3" ? "-%{python3_pkgversion}" : ""}
+# %%_pyproject_files_pkgversion defined in srpm macros
 
 # In RPM < 4.20 (4.19.9x is 4.20 alpha), there is no guaranteed, RPM-controlled per-build directory (%%mkbuilddir step).
 # Hence we use %%{buildsubdir} if available.
@@ -20,16 +18,35 @@
 #     https://docs.pytest.org/en/latest/reference.html#confval-norecursedirs
 %_pyproject_builddir %{_builddir}%{_pyproject_buildsubdir_compat}/.pyproject-builddir%{_pyproject_files_pkgversion}
 
-# We prefix all created files with this value to make them unique
-# Ideally, we would put them into %%{buildsubdir}, but that value changes during the spec
-# The used value is similar to the one used to define the default %%buildroot
-%_pyproject_files_prefix %{name}-%{version}-%{release}.%{_arch}%{_pyproject_files_pkgversion}
+# %%_pyproject_files_prefix defined in srpm macros
 
-%pyproject_files %{_builddir}/%{_pyproject_files_prefix}-pyproject-files
-%_pyproject_modules %{_builddir}/%{_pyproject_files_prefix}-pyproject-modules
-%_pyproject_ghost_distinfo %{_builddir}/%{_pyproject_files_prefix}-pyproject-ghost-distinfo
+# PEP 503 name normalization: lowercase, one or more [-_.] → single -
+%__pyproject_normalize_name(-) %{lua:print((rpm.expand("%1"):lower():gsub("[%-_.]+", "-")))}
+
+%__pyproject_getopt_restore %{lua:require("fedora.rpm.pyproject_getopt").restore()}
+
+%_pyproject_files_base %{_builddir}/%{_pyproject_files_prefix}-pyproject-files
+%_pyproject_modules_base %{_builddir}/%{_pyproject_files_prefix}-pyproject-modules
+%_pyproject_ghost_distinfo_base %{_builddir}/%{_pyproject_files_prefix}-pyproject-ghost-distinfo
+
+%pyproject_files(-) %{lua:
+require("fedora.rpm.pyproject_getopt").getopt({
+    {short="D", long="dist-name", value=true},
+})}%{_pyproject_files_base}%{?__pyproject_opt_D:-%{__pyproject_normalize_name %{__pyproject_opt_D}}}%{__pyproject_getopt_restore}
+
+%_pyproject_modules(-) %{lua:
+require("fedora.rpm.pyproject_getopt").getopt({
+    {short="D", long="dist-name", value=true},
+})}%{_pyproject_modules_base}%{?__pyproject_opt_D:-%{__pyproject_normalize_name %{__pyproject_opt_D}}}%{__pyproject_getopt_restore}
+
+%_pyproject_ghost_distinfo(-) %{lua:
+require("fedora.rpm.pyproject_getopt").getopt({
+    {short="D", long="dist-name", value=true},
+})}%{_pyproject_ghost_distinfo_base}%{?__pyproject_opt_D:-%{__pyproject_normalize_name %{__pyproject_opt_D}}}%{__pyproject_getopt_restore}
+
 %_pyproject_record %{_builddir}/%{_pyproject_files_prefix}-pyproject-record
 %_pyproject_buildrequires %{_builddir}/%{_pyproject_files_prefix}-pyproject-buildrequires
+# %%_pyproject_dep_overrides defined in srpm macros
 
 # Internal macro, takes %%set_build_flags and strips all the exports
 # TODO: Make such a list an actual source of %%set_build_flags (in redhat-rpm-config)
@@ -41,13 +58,22 @@
 # The value is read and used by the %%pytest and %%tox macros:
 %_set_pytest_addopts %global __pytest_addopts --ignore=%{_pyproject_builddir}
 
-%pyproject_wheel(C:) %{expand:\\\
+# %%pyproject_patch_dependency defined in srpm macros
+
+%pyproject_wheel(-) \
+%{lua:require("fedora.rpm.pyproject_getopt").getopt({
+    {short="C", long="config-settings", value=true, separator=","},
+    {short="d", long="directory", value=true},
+})}\
+%{expand:\\\
 %_set_pytest_addopts
+%{?__pyproject_opt_d:pushd "%{__pyproject_opt_d}"}
 mkdir -p "%{_pyproject_builddir}"
 %{_pyproject_build_flags} \\\
 TMPDIR="%{_pyproject_builddir}" \\\
 %{__python3} -Bs %{_rpmconfigdir}/redhat/pyproject_wheel.py %{?**} %{_pyproject_wheeldir}
-}
+%{?__pyproject_opt_d:popd}
+%{__pyproject_getopt_restore}}
 
 
 %pyproject_build_lib %{!?__pyproject_build_lib_warned:%{warn:The %%{pyproject_build_lib} macro is deprecated.
@@ -85,12 +111,13 @@ if [ -z "$specifier" ]; then
   echo 'ERROR: %%%%pyproject_install found no wheel in %%%%{_pyproject_wheeldir} %{_pyproject_wheeldir}' >&2
   exit 1
 fi
+PIP_CONFIG_FILE="${PIP_CONFIG_FILE:-/dev/null}" \
 TMPDIR="%{_pyproject_builddir}" %{__python3} -m pip install --root %{buildroot} --prefix %{_prefix} --no-deps --disable-pip-version-check --progress-bar off --verbose --ignore-installed --no-warn-script-location --no-index --no-cache-dir --find-links %{_pyproject_wheeldir} $specifier
 if [ -d %{buildroot}%{_bindir} ]; then
   %py3_shebang_fix %{buildroot}%{_bindir}/*
   rm -rfv %{buildroot}%{_bindir}/__pycache__
 fi
-rm -f %{_pyproject_ghost_distinfo}
+rm -f %{_pyproject_ghost_distinfo_base}
 site_dirs=()
 # Process %%{python3_sitelib} if exists
 if [ -d %{buildroot}%{python3_sitelib} ]; then
@@ -103,36 +130,67 @@ fi
 # Process all *.dist-info dirs in sitelib/sitearch
 for site_dir in ${site_dirs[@]}; do
   for distinfo in %{buildroot}$site_dir/*.dist-info; do
-    echo "%ghost %dir ${distinfo#%{buildroot}}" >> %{_pyproject_ghost_distinfo}
+    echo "%ghost %dir ${distinfo#%{buildroot}}" >> %{_pyproject_ghost_distinfo_base}
+    _normalized=$(PYTHONPATH=%{_rpmconfigdir}/redhat \\
+      %{__python3} -sBc \\
+      "import sys; from pyproject_save_files import canonical_name_from_distinfo; print(canonical_name_from_distinfo(sys.argv[1]))" \\
+      "$(basename ${distinfo})")
+    echo "%ghost %dir ${distinfo#%{buildroot}}" >> "%{_pyproject_ghost_distinfo_base}-${_normalized}"
     sed -i 's/pip/rpm/' ${distinfo}/INSTALLER
     PYTHONPATH=%{_rpmconfigdir}/redhat \\
       %{__python3} -B %{_rpmconfigdir}/redhat/pyproject_preprocess_record.py \\
       --buildroot %{buildroot} --record ${distinfo}/RECORD --output %{_pyproject_record}
     rm -fv ${distinfo}/RECORD
     rm -fv ${distinfo}/REQUESTED
+    if [ -f %{_pyproject_dep_overrides} ]; then
+      %{__python3} -B %{_rpmconfigdir}/redhat/pyproject_patch_metadata.py \\
+        --overrides %{_pyproject_dep_overrides} \\
+        --metadata ${distinfo}/METADATA
+    fi
   done
 done
-lines=$(wc -l %{_pyproject_ghost_distinfo} | cut -f1 -d" ")
+lines=$(wc -l %{_pyproject_ghost_distinfo_base} | cut -f1 -d" ")
 if [ $lines -ne 1 ]; then
-  echo -e "\\n\\nWARNING: %%%%pyproject_extras_subpkg won't work without explicit -i or -F, found $lines dist-info directories.\\n\\n" >&2
-  rm %{_pyproject_ghost_distinfo}  # any attempt to use this will fail
+  echo -e "%%%%pyproject_extras_subpkg will require -D <name> or explicit -i/-F with multiple dist-info directories (found $lines)." >&2
+  rm %{_pyproject_ghost_distinfo_base}  # any attempt to use this will fail
 fi
 }
 
 
-# Note: the three times nested questionmarked -i -f -F pattern means: If none of those options was used -- in that case, we inject our own -f
-%pyproject_extras_subpkg(n:i:f:FaA) %{expand:%{?python_extras_subpkg:%{python_extras_subpkg%{?!-i:%{?!-f:%{?!-F: -f %{_pyproject_ghost_distinfo}}}} %**}}}
+# Note: the three times nested __pyproject_opt_{i,f,F} pattern means: If none of those options was used -- in that case, we inject our own -f
+# -D selects the per-package ghost distinfo file for multi-wheel installs
+%pyproject_extras_subpkg(-) \
+%{lua:require("fedora.rpm.pyproject_getopt").getopt({
+    {short="n", long="name", value=true},
+    {short="i", long="dist-info-path", value=true},
+    {short="f", long="filelist", value=true},
+    {short="F", long="no-filelist"},
+    {short="a", long="noarch"},
+    {short="A", long="no-noarch"},
+    {short="D", long="dist-name", value=true},
+}, {
+    {"D", {"i", "f", "F"}},
+})}\
+%{expand:%{?python_extras_subpkg:%{python_extras_subpkg%{!?__pyproject_opt_i:%{!?__pyproject_opt_f:%{!?__pyproject_opt_F: -f %{_pyproject_ghost_distinfo %{?__pyproject_optflag_D}}}}} %{?__pyproject_optflag_n} %{?__pyproject_optflag_i} %{?__pyproject_optflag_f} %{?__pyproject_optflag_F} %{?__pyproject_optflag_a} %{?__pyproject_optflag_A} %{?__pyproject_positional_args}}}%{__pyproject_getopt_restore}}
 
 
 # Escaping shell-globs, percentage signs and spaces was reworked in RPM 4.19+
 # https://github.com/rpm-software-management/rpm/issues/1749#issuecomment-1020420616
 # Since we support both ways, we pass either 4.19 or 4.18 to the script, so it knows which one to use
 # Rather than passing the actual version, we let RPM compare the versions, as it is easier done here than in Python
-%pyproject_save_files(lLM) %{expand:\\\
+%pyproject_save_files(-) \
+%{lua:require("fedora.rpm.pyproject_getopt").getopt({
+    {short="l", long="assert-license"},
+    {short="L", long="no-assert-license"},
+    {short="M", long="allow-no-modules"},
+    {short="a", long="auto"},
+    {short="D", long="dist-name", value=true},
+})}\
+%{expand:\\\
 %{expr:v"0%{?rpmversion}" >= v"4.18.90" ? "RPM_FILES_ESCAPE=4.19" : "RPM_FILES_ESCAPE=4.18" } \\
 %{__python3} %{_rpmconfigdir}/redhat/pyproject_save_files.py \\
-  --output-files "%{pyproject_files}" \\
-  --output-modules "%{_pyproject_modules}" \\
+  --output-files "%{pyproject_files %{?__pyproject_optflag_D}}" \\
+  --output-modules "%{_pyproject_modules %{?__pyproject_optflag_D}}" \\
   --buildroot "%{buildroot}" \\
   --sitelib "%{python3_sitelib}" \\
   --sitearch "%{python3_sitearch}" \\
@@ -140,25 +198,42 @@ fi
   --pyproject-record "%{_pyproject_record}" \\
   --prefix "%{_prefix}" \\
   %{**}
-}
+%{__pyproject_getopt_restore}}
 
-# -t - Process only top-level modules
-# -e - Exclude the module names matching given glob, may be used repeatedly
-%pyproject_check_import(e:t) %{expand:\\\
-if [ ! -f "%{_pyproject_modules}" ]; then
-  echo 'ERROR: %%%%pyproject_check_import only works when %%%%pyproject_save_files is used' >&2
+%pyproject_check_import(-) \
+%{lua:require("fedora.rpm.pyproject_getopt").getopt({
+    {short="e", long="exclude", value=true, separator=" -e "},
+    {short="D", long="dist-name", value=true},
+    {short="t", long="top-level-only"},
+})}\
+%{expand:\\\
+if [ ! -f "%{_pyproject_modules %{?__pyproject_optflag_D}}" ]; then
+  _modules_glob=( %{_pyproject_modules_base}-* )
+  if [ -e "${_modules_glob[0]}" ]; then
+    _available=$(printf '%%s\n' "${_modules_glob[@]}" | sed 's|.*-pyproject-modules-||' | tr '\n' ' ')
+    echo "ERROR: %%%%pyproject_check_import requires -D <name> when %%%%pyproject_save_files was called with -D" >&2
+    echo "Available -D values: ${_available}" >&2
+  else
+    echo 'ERROR: %%%%pyproject_check_import only works when %%%%pyproject_save_files is used' >&2
+  fi
   exit 1
 fi
-%py3_check_import -f "%{_pyproject_modules}" %{?**}
-}
+%py3_check_import -f "%{_pyproject_modules %{?__pyproject_optflag_D}}" %{?__pyproject_optflag_e} %{?__pyproject_optflag_t} %{?__pyproject_positional_args}
+%{__pyproject_getopt_restore}}
 
 
-%_pyproject_check_import_allow_no_modules(e:t) \
-if [ -z "$(cat %{_pyproject_modules})" ]; then\
+%_pyproject_check_import_allow_no_modules(-) \
+%{lua:require("fedora.rpm.pyproject_getopt").getopt({
+    {short="e", long="exclude", value=true, separator=" -e "},
+    {short="D", long="dist-name", value=true},
+    {short="t", long="top-level-only"},
+})}\
+if [ -z "$(cat %{_pyproject_modules %{?__pyproject_optflag_D}})" ]; then\
   echo "No modules to check found, exiting check"\
 else\
   %pyproject_check_import %{?**}\
-fi
+fi\
+%{__pyproject_getopt_restore}
 
 
 %default_toxenv py%{python3_version_nodots}
@@ -172,50 +247,53 @@ fi
     ]"\
   ]
 
-%pyproject_buildrequires(rRxtNwpe:g:C:) %{expand:\\\
+%pyproject_buildrequires(-) \
+%{lua:require("fedora.rpm.pyproject_getopt").getopt({
+    {short="r", long="runtime"},
+    {short="R", long="no-runtime"},
+    {short="x", long="extras", value=true, separator=","},
+    {short="t", long="tox"},
+    {short="N", long="no-use-build-system"},
+    {short="w", long="wheel"},
+    {short="p", long="pyproject-dependencies"},
+    {short="e", long="toxenv", value=true, separator=","},
+    {short="g", long="dependency-groups", value=true, separator=","},
+    {short="C", long="config-settings", value=true, separator=","},
+    {short="d", long="directory", value=true},
+}, {
+    {"R", {"r", "x", "e", "t", "w", "p"}},
+    {"N", {"r", "x", "e", "t", "w", "p", "C"}},
+    {"w", {"p"}},
+})}\
+%{expand:\\\
 %_set_pytest_addopts
 # The default flags expect the package note file to exist
 # see https://bugzilla.redhat.com/show_bug.cgi?id=2097535
 %{?_package_note_flags:%_generate_package_note_file}
-%{-R:
-%{-r:%{error:The -R and -r options are mutually exclusive}}
-%{-x:%{error:The -R and -x options are mutually exclusive}}
-%{-e:%{error:The -R and -e options are mutually exclusive}}
-%{-t:%{error:The -R and -t options are mutually exclusive}}
-%{-w:%{error:The -R and -w options are mutually exclusive}}
-%{-p:%{error:The -R and -p options are mutually exclusive}}
+%{?__pyproject_opt_d:pushd "%{__pyproject_opt_d}" >&2}
+%{?__pyproject_opt_w:
+%{!?__pyproject_buildrequires_w_warned:%{warn:The %%pyproject_buildrequires -w/--wheel option is deprecated.
+It's not efficient to build the wheel several times during the build.
+The option is not scheduled for removal, but packagers should use the -p/--pyproject-dependencies option instead.
+}%global __pyproject_buildrequires_w_warned 1}
 }
-%{-N:
-%{-r:%{error:The -N and -r options are mutually exclusive}}
-%{-x:%{error:The -N and -x options are mutually exclusive}}
-%{-e:%{error:The -N and -e options are mutually exclusive}}
-%{-t:%{error:The -N and -t options are mutually exclusive}}
-%{-w:%{error:The -N and -w options are mutually exclusive}}
-%{-p:%{error:The -N and -p options are mutually exclusive}}
-%{-C:%{error:The -N and -C options are mutually exclusive}}
-%{-g:if [ -f pyproject.toml ]; then
+%{?__pyproject_opt_N:
+%{?__pyproject_opt_g:if [ -f pyproject.toml ]; then
   %_pyproject_tomlidep
 fi}
 }
-%{-w:
-%{!?__pyproject_buildrequires_w_warned:%{warn:The %%pyproject_buildrequires -w option is deprecated.
-It's not efficient to build the wheel several times during the build.
-The option is not scheduled for removal, but packagers should use the -p option instead.
-}%global __pyproject_buildrequires_w_warned 1}
-%{-p:%{error:The -w and -p options are mutually exclusive}}
-}
-%{-e:%{expand:%global toxenv %(%{__python3} -s %{_rpmconfigdir}/redhat/pyproject_construct_toxenv.py %{?**})}}
+%{?__pyproject_opt_e:%{expand:%global toxenv %{__pyproject_opt_e}}}
 echo 'pyproject-rpm-macros'  # first stdout line matches the implementation in macros.aaa-pyproject-srpm
 echo 'python%{python3_pkgversion}-devel'
 echo 'python%{python3_pkgversion}dist(packaging)'
-%{!-N:echo 'python%{python3_pkgversion}dist(pip) >= 19'
+%{!?__pyproject_opt_N:echo 'python%{python3_pkgversion}dist(pip) >= 19'
 if [ -f pyproject.toml ]; then
   %_pyproject_tomlidep
 elif [ -f setup.py ]; then
   # Note: If the default requirements change, also change them in the script!
   echo 'python%{python3_pkgversion}dist(setuptools) >= 40.8'
 else
-  echo 'ERROR: Neither pyproject.toml nor setup.py found, consider using %%%%pyproject_buildrequires -N <requirements-file> if this is not a Python package.' >&2
+  echo 'ERROR: Neither pyproject.toml nor setup.py found, consider using %%%%pyproject_buildrequires -N/--no-use-build-system <requirements-file> if this is not a Python package.' >&2
   exit 1
 fi}
 # setuptools assumes no pre-existing dist-info
@@ -225,23 +303,28 @@ if [ -f %{__python3} ]; then
   echo -n > %{_pyproject_buildrequires}
   %{_pyproject_build_flags} \\\
   TMPDIR="%{_pyproject_builddir}" \\\
-  RPM_TOXENV="%{toxenv}" FEDORA=%{?fedora} HOSTNAME="rpmbuild" %{__python3} -Bs %{_rpmconfigdir}/redhat/pyproject_buildrequires.py %{?!_python_no_extras_requires:--generate-extras} --python3_pkgversion %{python3_pkgversion} --wheeldir %{_pyproject_wheeldir} --output %{_pyproject_buildrequires} %{?**} >&2
+  RPM_TOXENV="%{toxenv}" FEDORA=%{?fedora} HOSTNAME="rpmbuild" %{__python3} -Bs %{_rpmconfigdir}/redhat/pyproject_buildrequires.py %{!?_python_no_extras_requires:--generate-extras} --python3_pkgversion %{python3_pkgversion} --wheeldir %{_pyproject_wheeldir} --output %{_pyproject_buildrequires} --dep-overrides-file %{_pyproject_dep_overrides} %{?**} >&2
   cat %{_pyproject_buildrequires}
 fi
 # Incomplete .dist-info dir might confuse importlib.metadata
 rm -rfv *.dist-info/ >&2
-}
+%{?__pyproject_opt_d:popd >&2}
+%{__pyproject_getopt_restore}}
 
 
-%tox(e:) %{expand:\\\
+%tox(-) \
+%{lua:require("fedora.rpm.pyproject_getopt").getopt({
+    {short="e", long="toxenv", value=true, separator=","},
+})}\
+%{expand:\\\
 TOX_TESTENV_PASSENV="${TOX_TESTENV_PASSENV:-*}" \\
-%{?py3_test_envvars}%{?!py3_test_envvars:PYTHONDONTWRITEBYTECODE=1 \\
+%{?py3_test_envvars}%{!?py3_test_envvars:PYTHONDONTWRITEBYTECODE=1 \\
 PATH="%{buildroot}%{_bindir}:$PATH" \\
 PYTHONPATH="${PYTHONPATH:-%{buildroot}%{python3_sitearch}:%{buildroot}%{python3_sitelib}}" \\
 %{?__pytest_addopts:PYTEST_ADDOPTS="${PYTEST_ADDOPTS:-} %{__pytest_addopts}"}} \\
 HOSTNAME="rpmbuild" \\
-%{__python3} -m tox --current-env --assert-config -q --recreate -e "%{-e:%{-e*}}%{!-e:%{toxenv}}" %{?*}
-}
+%{__python3} -m tox --current-env --assert-config -q --recreate -e "%{?__pyproject_opt_e}%{!?__pyproject_opt_e:%{toxenv}}" %{?__pyproject_positional_args}
+%{__pyproject_getopt_restore}}
 
 
 # Declarative buildsystem, requires RPM 4.20+ to work

@@ -9,7 +9,7 @@
 Name:           perl-%{cpan_name}
 Epoch:          2
 Version:        7.76
-Release: 524%{?dist}
+Release:        521%{?dist}
 Summary:        Create a module Makefile
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/%{cpan_name}

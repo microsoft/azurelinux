@@ -33,8 +33,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.66
-Release: 4%{?dist}
+Version: 2.4.68
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -106,7 +106,6 @@ Patch30: httpd-2.4.64-separate-systemd-fns.patch
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
-Patch61: httpd-2.4.65-hcheck-stuck.patch
 
 # Security fixes
 # Patch200: ...
@@ -849,6 +848,12 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Jun 09 2026 Luboš Uhliarik <luhliari@redhat.com> - 2.4.68-1
+- new version 2.4.68
+
+* Wed May 06 2026 Luboš Uhliarik <luhliari@redhat.com> - 2.4.67-1
+- new version 2.4.67
+
 * Tue Dec 09 2025 Luboš Uhliarik <luhliari@redhat.com> - 2.4.66-1
 - new version 2.4.66
 

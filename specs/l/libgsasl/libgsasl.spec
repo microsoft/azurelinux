@@ -3,13 +3,15 @@
 
 Name:           libgsasl
 Version:        1.10.0
-Release: 17%{?dist}
+Release:        17%{?dist}
 Summary:        GNU SASL library
 License:        LGPL-2.1-or-later
 URL:            https://www.gnu.org/software/gsasl/
 Source0:        https://ftp.gnu.org/gnu/gsasl/%{name}-%{version}.tar.gz
 Source1:        https://ftp.gnu.org/gnu/gsasl/%{name}-%{version}.tar.gz.sig
 Source2:        https://josefsson.org/54265e8c.txt
+Patch:          0001-GSSAPI-server-Boundary-check-gss_wrap-token-read-OOB.patch
+Patch:          0002-Fix-NULL-pointer-dereference-in-DIGEST-MD5-parser.patch
 BuildRequires:  gcc
 # for %%gpgverify
 BuildRequires:  gnupg2
@@ -37,7 +39,7 @@ developing applications that use %{name}.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%autosetup
+%autosetup -p2
 
 %build
 %configure --disable-static --disable-rpath --with-gssapi-impl=mit
@@ -62,6 +64,15 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_libdir}/pkgconfig/libgsasl.pc
 
 %changelog
+* Fri Aug  7 2026 Peter Lemenkov <lemenkov@gmail.com> - 1.10.0-17
+- Fix CVE-2026-48829
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Mar 26 2026 Peter Lemenkov <lemenkov@gmail.com> - 1.10.0-15
+- Fix CVE-2022-2469
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

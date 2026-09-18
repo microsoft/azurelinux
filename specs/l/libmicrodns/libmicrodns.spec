@@ -3,7 +3,7 @@
 
 Name:           libmicrodns
 Version:        0.2.0
-Release: 17%{?dist}
+Release:        14%{?dist}
 Summary:        Minimal mDNS resolver library
 
 License:        LGPL-2.1-or-later

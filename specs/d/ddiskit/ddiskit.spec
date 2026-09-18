@@ -14,7 +14,7 @@ Version:        3.6
 
 %forgemeta
 
-Release: 34%{?dist}
+Release:        31%{?dist}
 Summary:        Tool for Red Hat Enterprise Linux Driver Update Disk creation
 
 License:        GPL-3.0-only

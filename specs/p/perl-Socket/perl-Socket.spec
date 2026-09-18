@@ -3,8 +3,8 @@
 
 Name:           perl-Socket
 Epoch:          4
-Version:        2.040
-Release: 5%{?dist}
+Version:        2.043
+Release:        1%{?dist}
 Summary:        Networking constants and support functions
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Socket
@@ -96,6 +96,15 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Aug 19 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4:2.043-1
+- 2.043 bump (rhbz#2518011)
+
+* Tue Aug 18 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4:2.042-1
+- 2.042 bump (rhbz#2517500)
+
+* Mon Apr 27 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4:2.041-1
+- 2.041 bump (rhbz#2461914)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 4:2.040-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

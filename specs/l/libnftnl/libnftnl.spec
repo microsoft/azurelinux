@@ -3,7 +3,7 @@
 
 Name:           libnftnl
 Version:        1.2.9
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Library for low-level interaction with nftables Netlink's API over libmnl
 
 License:        GPL-2.0-or-later

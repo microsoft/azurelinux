@@ -3,7 +3,7 @@
 
 Name:           paps
 Version:        0.8.0
-Release: 17%{?dist}
+Release:        14%{?dist}
 
 License:        LGPL-2.0-or-later
 URL:            https://github.com/dov/paps

@@ -50,8 +50,8 @@
 
 Summary: PostgreSQL client programs
 Name: %{majorname}%{majorversion}
-Version: %{majorversion}.6
-Release: 4%{?dist}
+Version: %{majorversion}.11
+Release: 1%{?dist}
 
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
@@ -63,11 +63,11 @@ Url: http://www.postgresql.org/
 # that this be kept up with the latest minor release of the previous series;
 # but update when bugs affecting pg_dump output are fixed.
 %global prevmajorversion 16
-%global prevversion %{prevmajorversion}.10
+%global prevversion %{prevmajorversion}.15
 %global prev_prefix %{_libdir}/pgsql/postgresql-%{prevmajorversion}
 %global precise_version %{?epoch:%epoch:}%version-%release
 
-%global setup_version 8.9
+%global setup_version 8.12
 
 %global service_name postgresql.service
 
@@ -1357,6 +1357,21 @@ make -C postgresql-setup-%{setup_version} check
 
 
 %changelog
+* Thu Aug 13 2026 Packit <hello@packit.dev> - 17.11-1
+- Update to version 17.11
+- Resolves: rhbz#2515355
+
+* Thu May 14 2026 Packit <hello@packit.dev> - 17.10-1
+- Update to version 17.10
+- Resolves: rhbz#2477453
+
+* Fri Apr 24 2026 Petr Khartskhaev <pkhartsk@redhat.com> - 17.9-2
+- Update postgresql-setup to 8.12
+
+* Thu Feb 26 2026 Packit <hello@packit.dev> - 17.9-1
+- Update to version 17.9
+- Resolves: rhbz#2414833
+
 * Thu Aug 14 2025 Packit <hello@packit.dev> - 17.6-1
 - Update to version 17.6
 - Resolves: rhbz#2388579

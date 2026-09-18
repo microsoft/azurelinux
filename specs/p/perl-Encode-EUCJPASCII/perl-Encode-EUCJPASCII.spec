@@ -3,7 +3,7 @@
 
 Name:           perl-Encode-EUCJPASCII
 Version:        0.03
-Release: 51%{?dist}
+Release:        48%{?dist}
 Summary:        EucJP-ascii - An eucJP-open mapping
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Encode-EUCJPASCII

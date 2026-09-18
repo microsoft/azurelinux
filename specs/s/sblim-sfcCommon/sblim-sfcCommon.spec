@@ -3,7 +3,7 @@
 
 Name:		sblim-sfcCommon
 Version:	1.0.1
-Release: 31%{?dist}
+Release:	28%{?dist}
 Summary:	Common functions for SBLIM Small Footprint CIM Broker and CIM Client Library.
 
 License:	EPL-1.0

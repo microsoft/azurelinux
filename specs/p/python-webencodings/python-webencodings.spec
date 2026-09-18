@@ -7,7 +7,7 @@
 
 Name: python-%{srcname}
 Version: 0.5.1
-Release: 35%{?dist}
+Release: 32%{?dist}
 BuildArch: noarch
 
 # Automatically converted from old format: BSD - review is highly recommended.

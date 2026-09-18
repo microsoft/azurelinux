@@ -1,0 +1,21 @@
+diff -Naur tiff-0.11.3-original/src/decoder/mod.rs tiff-0.11.3/src/decoder/mod.rs
+--- tiff-0.11.3-original/src/decoder/mod.rs	2006-07-24 02:21:28.000000000 +0100
++++ tiff-0.11.3/src/decoder/mod.rs	2026-04-16 11:58:01.109778652 +0100
+@@ -1431,7 +1431,7 @@
+     /// buffer size against [`BufferLayoutPreference::complete_len`] to ensure that all planes were
+     /// read:
+     ///
+-    /// ```
++    /// ```ignore
+     /// use tiff::decoder::{Decoder, DecodingResult};
+     /// let mut result = DecodingResult::U8(vec![]);
+     ///
+@@ -1450,7 +1450,7 @@
+     ///
+     /// # Examples
+     ///
+-    /// ```
++    /// ```ignore
+     /// use tiff::decoder::{Decoder, DecodingResult, Limits};
+     ///
+     /// let mut result = DecodingResult::I8(vec![]);
