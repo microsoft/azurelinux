@@ -162,6 +162,7 @@ tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
   { group = "vm-base-performance" },
+  { group = "multi-sku-tests", sku-group = "multi-sku-default" },
 ]
 
 [images.marketplace-gen2.capabilities]
