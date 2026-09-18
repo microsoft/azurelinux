@@ -1,0 +1,7 @@
+[components.podman]
+tests.tests = [
+    { name = "tmt-podman-local-root" },
+    { name = "tmt-podman-local-rootless" },
+    { name = "tmt-podman-remote-root" },
+    { name = "tmt-podman-remote-rootless" },
+]

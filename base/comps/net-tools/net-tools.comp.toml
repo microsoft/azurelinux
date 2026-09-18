@@ -1,3 +1,4 @@
 [components.net-tools]
+tests.tests = [{ name = "tmt-net-tools-tier1-public" }]
 # Release: 0.74.%{checkout}%{?dist}
 release = { calculation = "manual" }

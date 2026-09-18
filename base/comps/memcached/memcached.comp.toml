@@ -1,0 +1,2 @@
+[components.memcached]
+tests.tests = [{ name = "tmt-memcached-all" }]
