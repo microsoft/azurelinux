@@ -90,13 +90,11 @@ echo "Get vendored modules"
 go mod vendor
 
 echo "Tar vendored modules"
-# go.mod/go.sum must ship too: 'go mod tidy' rewrote them, and -mod=vendor
-# rejects a vendor/modules.txt that disagrees with go.mod.
 tar  --sort=name \
      --mtime="2021-04-26 00:00Z" \
      --owner=0 --group=0 --numeric-owner \
      --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-     -cf "$VENDOR_TARBALL" vendor
+     -czf "$VENDOR_TARBALL" vendor
 
 popd > /dev/null
 echo "containerized-data-importer vendored modules are available at $VENDOR_TARBALL"
