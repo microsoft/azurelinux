@@ -21,7 +21,7 @@ Source0:        %{name}-%{version}.tar.gz
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor-v2.tar.gz
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 Patch0:         CVE-2024-6104.patch
 Patch1:         CVE-2024-51744.patch
 Patch2:         CVE-2025-11065.patch
