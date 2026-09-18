@@ -92,10 +92,12 @@ cd "prometheus-adapter-$PKG_VERSION"
 
 # Bump the modules carrying the CVE fixes. grpc v1.83.2 requires go >= 1.25 and
 # x/crypto v0.57.0 requires go >= 1.26, so raise the language level to match.
+# x/crypto must be pinned explicitly; MVS alone only selects v0.55.0.
 go mod edit -go=1.26.0
 go mod edit \
     -require=google.golang.org/grpc@v1.83.2 \
-    -require=github.com/google/cel-go@v0.31.0
+    -require=github.com/google/cel-go@v0.31.0 \
+    -require=golang.org/x/crypto@v0.57.0
 
 go mod tidy
 go mod vendor
