@@ -1,26 +1,15 @@
 Summary:        Plugin for discovering and advertising networking resources
 Name:           sriov-network-device-plugin
 Version:        3.7.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin
 Source0:        https://github.com/k8snetworkplumbingwg/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2024-45338.patch
-Patch1:		CVE-2024-45339.patch
-Patch2:         CVE-2025-22872.patch
-Patch3:         CVE-2025-47911.patch
-Patch4:         CVE-2025-58190.patch
-Patch5:         CVE-2026-39821.patch
-Patch6:         CVE-2026-42506.patch
-Patch7:         CVE-2026-27136.patch
-Patch8:         CVE-2026-25680.patch
-Patch9:         CVE-2026-25681.patch
-Patch10:        CVE-2026-42502.patch
-Patch11:        CVE-2026-56852.patch
-BuildRequires:  golang
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
+Patch0:         CVE-2026-84304.patch
+BuildRequires: golang >= 1.25
 Requires:       gawk
 Requires:       hwdata
 
@@ -47,6 +36,13 @@ install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}%{_datadir}/%{name}
 %{_datadir}/%{name}/ddptool-1.0.1.12.tar.gz
 
 %changelog
+* Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 3.7.0-8
+- Add patch for CVE-2026-84445, CVE-2026-84304
+- Remove patches for CVE-2024-45338, CVE-2024-45339, CVE-2025-22872,
+  CVE-2025-47911, CVE-2025-58190, CVE-2026-25680, CVE-2026-25681,
+  CVE-2026-27136, CVE-2026-39821, CVE-2026-42502, CVE-2026-42506,
+  and CVE-2026-56852
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.0-7
 - Patch for CVE-2026-56852
 
