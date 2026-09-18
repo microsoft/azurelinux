@@ -1,0 +1,1813 @@
+From e488a4986f02ff54aa752e6cb06f2a3398321a23 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 18 Sep 2026 13:30:09 +0000
+Subject: [PATCH] feat(fips): load package-selected provider
+
+Replace the hard-coded SymCrypt path with a package-selected FIPS
+provider. Require exactly one package-owned registration under
+/etc/pki/tls/azl-openssl-fips-provider.d, describing the provider,
+configuration section, and default properties to merge.
+
+Disable fallback loading before discovery and reject missing,
+ambiguous, malformed, inactive, or mismatched registrations. Load the
+selected provider before ambient providers, activate base, and merge its
+fetch properties without replacing application defaults.
+
+Cover registration discovery and validation, repeated activation,
+library-context isolation, property preservation, and fail-closed
+configuration initialization.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ crypto/evp/evp_fetch.c                        |   4 +-
+ crypto/provider_conf.c                        | 293 +++++++++-
+ include/crypto/evp.h                          |   2 +
+ include/internal/provider.h                   |  15 +
+ rh-openssl.cnf                                |   4 +-
+ test/build.info                               |  15 +
+ test/prov_conf_fips_bad_identity/symcrypt.cnf |  10 +
+ .../symcrypt.cnf                              |   9 +
+ .../symcrypt.cnf                              |  10 +
+ test/prov_conf_fips_hidden/.symcrypt.cnf      |   9 +
+ test/prov_conf_fips_inactive/symcrypt.cnf     |   8 +
+ .../duplicate-provider.cnf                    |   5 +
+ .../empty-config-section.cnf                  |   4 +
+ .../empty-properties.cnf                      |   4 +
+ .../empty-provider.cnf                        |   4 +
+ .../missing-config-section.cnf                |   3 +
+ .../missing-properties.cnf                    |   3 +
+ .../missing-provider.cnf                      |   3 +
+ .../missing-section.cnf                       |   3 +
+ test/prov_conf_fips_multiple/first.cnf        |   8 +
+ test/prov_conf_fips_multiple/second.cnf       |   8 +
+ test/prov_conf_fips_realinit.cnf              |  10 +
+ test/prov_conf_fips_realinit_test.c           |  41 ++
+ test/prov_conf_fips_registration_test.c       | 531 ++++++++++++++++++
+ test/prov_conf_fips_soft_load/symcrypt.cnf    |   9 +
+ test/prov_conf_fips_uppercase/symcrypt.CNF    |   9 +
+ test/prov_conf_fips_valid/symcrypt.cnf        |  10 +
+ test/prov_conf_symcrypt_active.cnf            |  14 +
+ test/prov_conf_symcrypt_app.cnf               |   7 +
+ test/prov_conf_symcrypt_missing.cnf           |  12 +
+ test/prov_conf_symcrypt_test.c                | 208 +++++++
+ .../recipes/03-test_prov_conf_fips_realinit.t |  36 ++
+ .../03-test_prov_conf_fips_registration.t     |  61 ++
+ test/recipes/03-test_prov_conf_symcrypt.t     |  39 ++
+ test/recipes/03-test_prov_conf_symcrypt_off.t |  39 ++
+ 35 files changed, 1420 insertions(+), 30 deletions(-)
+ create mode 100644 test/prov_conf_fips_bad_identity/symcrypt.cnf
+ create mode 100644 test/prov_conf_fips_bad_properties/symcrypt.cnf
+ create mode 100644 test/prov_conf_fips_dotted_identity/symcrypt.cnf
+ create mode 100644 test/prov_conf_fips_hidden/.symcrypt.cnf
+ create mode 100644 test/prov_conf_fips_inactive/symcrypt.cnf
+ create mode 100644 test/prov_conf_fips_metadata/duplicate-provider.cnf
+ create mode 100644 test/prov_conf_fips_metadata/empty-config-section.cnf
+ create mode 100644 test/prov_conf_fips_metadata/empty-properties.cnf
+ create mode 100644 test/prov_conf_fips_metadata/empty-provider.cnf
+ create mode 100644 test/prov_conf_fips_metadata/missing-config-section.cnf
+ create mode 100644 test/prov_conf_fips_metadata/missing-properties.cnf
+ create mode 100644 test/prov_conf_fips_metadata/missing-provider.cnf
+ create mode 100644 test/prov_conf_fips_metadata/missing-section.cnf
+ create mode 100644 test/prov_conf_fips_multiple/first.cnf
+ create mode 100644 test/prov_conf_fips_multiple/second.cnf
+ create mode 100644 test/prov_conf_fips_realinit.cnf
+ create mode 100644 test/prov_conf_fips_realinit_test.c
+ create mode 100644 test/prov_conf_fips_registration_test.c
+ create mode 100644 test/prov_conf_fips_soft_load/symcrypt.cnf
+ create mode 100644 test/prov_conf_fips_uppercase/symcrypt.CNF
+ create mode 100644 test/prov_conf_fips_valid/symcrypt.cnf
+ create mode 100644 test/prov_conf_symcrypt_active.cnf
+ create mode 100644 test/prov_conf_symcrypt_app.cnf
+ create mode 100644 test/prov_conf_symcrypt_missing.cnf
+ create mode 100644 test/prov_conf_symcrypt_test.c
+ create mode 100644 test/recipes/03-test_prov_conf_fips_realinit.t
+ create mode 100644 test/recipes/03-test_prov_conf_fips_registration.t
+ create mode 100644 test/recipes/03-test_prov_conf_symcrypt.t
+ create mode 100644 test/recipes/03-test_prov_conf_symcrypt_off.t
+
+diff --git a/crypto/evp/evp_fetch.c b/crypto/evp/evp_fetch.c
+index fbebca1..e300e5f 100644
+--- a/crypto/evp/evp_fetch.c
++++ b/crypto/evp/evp_fetch.c
+@@ -527,8 +527,8 @@ int EVP_set_default_properties(OSSL_LIB_CTX *libctx, const char *propq)
+     return evp_set_default_properties_int(libctx, propq, 1, 0);
+ }
+ 
+-static int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
+-                                        int loadconfig)
++int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
++                                 int loadconfig)
+ {
+     OSSL_PROPERTY_LIST **plp = ossl_ctx_global_properties(libctx, loadconfig);
+     OSSL_PROPERTY_LIST *pl1, *pl2;
+diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
+index 1e5053c..fe178a8 100644
+--- a/crypto/provider_conf.c
++++ b/crypto/provider_conf.c
+@@ -11,12 +11,15 @@
+ #include <openssl/trace.h>
+ #include <openssl/err.h>
+ #include <openssl/evp.h>
+-#include <unistd.h>
+ #include <openssl/conf.h>
+ #include <openssl/safestack.h>
+ #include <openssl/provider.h>
+ #include "internal/provider.h"
++#include "internal/o_dir.h"
+ #include "internal/cryptlib.h"
++#include "internal/common.h"
++#include "internal/property.h"
++#include "crypto/evp.h"
+ #include "provider_local.h"
+ #include "crypto/context.h"
+ 
+@@ -400,10 +403,257 @@ static int provider_conf_load(OSSL_LIB_CTX *libctx, const char *name,
+     return ok >= 0;
+ }
+ 
++# define AZL_FIPS_PROVIDER_CONF_DIR \
++    OPENSSLDIR "/azl-openssl-fips-provider.d"
++# define AZL_FIPS_PROVIDER_SECTION "azl_fips_provider"
++# define AZL_FIPS_PROVIDER_NAME "provider"
++# define AZL_FIPS_PROVIDER_CONFIG_SECTION "section"
++# define AZL_FIPS_PROVIDER_PROPERTIES "additional_default_properties"
++
++/*
++ * Configuration keys may carry a prefix ending in '.' to make repeated keys
++ * unique. Normalize those names before enforcing singular directives.
++ */
++static int section_get0_unique_value(
++    const STACK_OF(CONF_VALUE) *section, const char *key, const char **result)
++{
++    int i;
++
++    *result = NULL;
++    for (i = 0; i < sk_CONF_VALUE_num(section); i++) {
++        const CONF_VALUE *value = sk_CONF_VALUE_value(section, i);
++
++        if (value->name != NULL && strcmp(skip_dot(value->name), key) == 0) {
++            if (*result != NULL) {
++                ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                               "duplicate FIPS provider directive '%s'", key);
++                return 0;
++            }
++            *result = value->value;
++        }
++    }
++    return 1;
++}
++
++static int section_get0_required_unique_value(
++    const STACK_OF(CONF_VALUE) *section, const char *key, const char **result)
++{
++    if (!section_get0_unique_value(section, key, result))
++        return 0;
++    if (*result == NULL || **result == '\0') {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "missing or empty required FIPS provider directive '%s'",
++                       key);
++        return 0;
++    }
++    return 1;
++}
++
++char *ossl_provider_conf_find_fips_registration_path(const char *dir)
++{
++    const char *name;
++    char *registration = NULL;
++    OPENSSL_DIR_CTX *dirctx = NULL;
++
++    while ((name = OPENSSL_DIR_read(&dirctx, dir)) != NULL) {
++        char *path;
++        size_t path_len;
++
++        /*
++         * Count every case-insensitive .cnf name, including hidden files.
++         * Package-manager and editor backups do not have this suffix.
++         */
++        if (!HAS_CASE_SUFFIX(name, ".cnf"))
++            continue;
++
++        /* More than one candidate makes provider selection ambiguous. */
++        if (registration != NULL) {
++            ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                           "multiple FIPS provider registrations in %s",
++                           dir);
++            goto err;
++        }
++
++        path_len = strlen(dir) + strlen(name) + 2;
++        path = OPENSSL_malloc(path_len);
++        if (path == NULL)
++            goto err;
++        OPENSSL_strlcpy(path, dir, path_len);
++        OPENSSL_strlcat(path, "/", path_len);
++        OPENSSL_strlcat(path, name, path_len);
++        registration = path;
++    }
++
++    /* NULL with nonzero errno distinguishes a read error from normal EOF. */
++    if (errno != 0) {
++        ERR_raise_data(ERR_LIB_SYS, errno,
++                       "reading FIPS provider registration directory %s",
++                       dir);
++        goto err;
++    }
++
++    if (dirctx != NULL) {
++        int close_ok = OPENSSL_DIR_end(&dirctx);
++
++        dirctx = NULL;
++        if (!close_ok) {
++            ERR_raise_data(ERR_LIB_SYS, errno,
++                           "closing FIPS provider registration directory %s",
++                           dir);
++            goto err;
++        }
++    }
++    /* Success requires exactly one candidate; the caller owns its path. */
++    if (registration == NULL) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "no FIPS provider registration in %s", dir);
++        goto err;
++    }
++    return registration;
++
++ err:
++    if (dirctx != NULL)
++        OPENSSL_DIR_end(&dirctx);
++    OPENSSL_free(registration);
++    return NULL;
++}
++
++int ossl_provider_conf_activate_fips(OSSL_LIB_CTX *libctx,
++                                     const char *registration_path)
++{
++    PROVIDER_CONF_GLOBAL *pcgbl
++        = ossl_lib_ctx_get_data(libctx, OSSL_LIB_CTX_PROVIDER_CONF_INDEX);
++    STACK_OF(CONF_VALUE) *metadata, *provider_config;
++    OSSL_PROPERTY_LIST *parsed_properties;
++    CONF *registration_conf = NULL;
++    const char *provider, *section, *properties, *identity;
++    int active, ok = 0;
++
++    if (pcgbl == NULL) {
++        ERR_raise(ERR_LIB_CRYPTO, ERR_R_INTERNAL_ERROR);
++        return 0;
++    }
++
++    registration_conf = NCONF_new_ex(libctx, NCONF_default());
++    if (registration_conf == NULL
++            || NCONF_load(registration_conf, registration_path, NULL) <= 0)
++        goto end;
++
++    metadata = NCONF_get_section(registration_conf,
++                                 AZL_FIPS_PROVIDER_SECTION);
++    if (metadata == NULL) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "FIPS provider registration %s is missing section [%s]",
++                       registration_path, AZL_FIPS_PROVIDER_SECTION);
++        goto end;
++    }
++    if (!section_get0_required_unique_value(metadata, AZL_FIPS_PROVIDER_NAME,
++                                            &provider)
++            || !section_get0_required_unique_value(
++                   metadata, AZL_FIPS_PROVIDER_CONFIG_SECTION, &section)
++            || !section_get0_required_unique_value(
++                   metadata, AZL_FIPS_PROVIDER_PROPERTIES, &properties))
++        goto end;
++    /*
++     * provider_conf_load() strips a prefix ending in '.', so accepting one
++     * here would make the registered identity differ from the loaded name.
++     */
++    if (strchr(provider, '.') != NULL) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_PASSED_INVALID_ARGUMENT,
++                       "FIPS provider name '%s' must not contain '.'",
++                       provider);
++        goto end;
++    }
++    provider_config = NCONF_get_section(registration_conf, section);
++    if (provider_config == NULL) {
++        ERR_raise_data(ERR_LIB_CRYPTO, CRYPTO_R_PROVIDER_SECTION_ERROR,
++                       "section=%s not found", section);
++        goto end;
++    }
++    /*
++     * provider_conf_load() applies identity before activation. Reject a
++     * mismatch before it can activate a provider other than the registered one.
++     */
++    if (!section_get0_unique_value(provider_config, "identity", &identity))
++        goto end;
++    if (identity != NULL && strcmp(identity, provider) != 0) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_PASSED_INVALID_ARGUMENT,
++                       "FIPS provider identity '%s' does not match registered "
++                       "provider '%s'",
++                       identity, provider);
++        goto end;
++    }
++    /*
++     * Check the syntax before loading providers. If the later property merge
++     * fails, providers loaded by this function remain active; configuration
++     * has no rollback. The merge parses the string again.
++     */
++    parsed_properties = ossl_parse_query(libctx, properties, 1);
++    if (parsed_properties == NULL) {
++        ERR_raise(ERR_LIB_EVP, EVP_R_DEFAULT_QUERY_PARSE_ERROR);
++        goto end;
++    }
++    ossl_property_free(parsed_properties);
++
++    if (provider_conf_load(libctx, provider, section, registration_conf) != 1)
++        goto end;
++    /*
++     * soft_load may turn a failed activation into configuration success.
++     */
++    if (!CRYPTO_THREAD_read_lock(pcgbl->lock)) {
++        ERR_raise(ERR_LIB_CRYPTO, ERR_R_UNABLE_TO_GET_READ_LOCK);
++        goto end;
++    }
++    active = prov_already_activated(provider, pcgbl->activated_providers);
++    CRYPTO_THREAD_unlock(pcgbl->lock);
++    if (!active) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "FIPS provider '%s' was not activated by its registration",
++                       provider);
++        goto end;
++    }
++
++    /*
++     * The base provider supplies non-cryptographic support operations needed
++     * alongside a FIPS provider without weakening the FIPS property query.
++     */
++    if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
++        goto end;
++    /*
++     * Preserve existing application properties while adding the registration.
++     */
++    if (evp_default_properties_merge(libctx, properties, 0) != 1)
++        goto end;
++    ok = 1;
++
++ end:
++    NCONF_free(registration_conf);
++    return ok;
++}
++
++int ossl_provider_conf_activate_fips_from_dir(OSSL_LIB_CTX *libctx,
++                                              const char *dir)
++{
++    char *registration_path = NULL;
++    int ok = 0;
++
++    if (!ossl_provider_disable_fallback_loading(libctx))
++        goto end;
++    registration_path = ossl_provider_conf_find_fips_registration_path(dir);
++    if (registration_path != NULL)
++        ok = ossl_provider_conf_activate_fips(libctx, registration_path);
++
++ end:
++    OPENSSL_free(registration_path);
++    return ok;
++}
++
+ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+ {
+     STACK_OF(CONF_VALUE) *elist;
+     CONF_VALUE *cval;
++    OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
++    int in_kernel_fips = ossl_get_kernel_fips_flag() != 0;
+     int i;
+ 
+     OSSL_TRACE1(CONF, "Loading providers module: section %s\n",
+@@ -417,34 +667,23 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+         return 0;
+     }
+ 
+-    for (i = 0; i < sk_CONF_VALUE_num(elist); i++) {
+-        cval = sk_CONF_VALUE_value(elist, i);
+-        if (!provider_conf_load(NCONF_get0_libctx((CONF *)cnf),
+-                                cval->name, cval->value, cnf))
+-            return 0;
++    /*
++     * Load the registered FIPS provider before ambient providers so a
++     * same-name alias cannot satisfy the activation check.
++     */
++    if (in_kernel_fips
++            && !ossl_provider_conf_activate_fips_from_dir(
++                   libctx, AZL_FIPS_PROVIDER_CONF_DIR)) {
++        /*
++         * Forced FIPS configuration failures must override ignore-errors mode.
++         */
++        OSSL_LIB_CTX_set_conf_diagnostics(libctx, 1);
++        return 0;
+     }
+ 
+-    if (ossl_get_kernel_fips_flag() != 0) { /* XXX from provider_conf_load */
+-        OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
+-#  define FIPS_LOCAL_CONF           OPENSSLDIR "/fips_local.cnf"
+-
+-        if (access(FIPS_LOCAL_CONF, R_OK) == 0) {
+-            CONF *fips_conf = NCONF_new_ex(libctx, NCONF_default());
+-            if (NCONF_load(fips_conf, FIPS_LOCAL_CONF, NULL) <= 0)
+-                return 0;
+-
+-            if (provider_conf_load(libctx, "fips", "fips_sect", fips_conf) != 1) {
+-                NCONF_free(fips_conf);
+-                return 0;
+-            }
+-            NCONF_free(fips_conf);
+-        } else {
+-            if (provider_conf_activate(libctx, "fips", NULL, NULL, 0, NULL) != 1)
+-                return 0;
+-        }
+-        if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
+-            return 0;
+-        if (EVP_default_properties_enable_fips(libctx, 1) != 1)
++    for (i = 0; i < sk_CONF_VALUE_num(elist); i++) {
++        cval = sk_CONF_VALUE_value(elist, i);
++        if (!provider_conf_load(libctx, cval->name, cval->value, cnf))
+             return 0;
+     }
+ 
+diff --git a/include/crypto/evp.h b/include/crypto/evp.h
+index 3f1eed3..16ca594 100644
+--- a/include/crypto/evp.h
++++ b/include/crypto/evp.h
+@@ -933,6 +933,8 @@ int evp_method_store_remove_all_provided(const OSSL_PROVIDER *prov);
+ 
+ int evp_default_properties_enable_fips_int(OSSL_LIB_CTX *libctx, int enable,
+                                            int loadconfig);
++int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
++                                 int loadconfig);
+ int evp_set_default_properties_int(OSSL_LIB_CTX *libctx, const char *propq,
+                                    int loadconfig, int mirrored);
+ char *evp_get_global_properties_str(OSSL_LIB_CTX *libctx, int loadconfig);
+diff --git a/include/internal/provider.h b/include/internal/provider.h
+index c0f1d00..0f2feae 100644
+--- a/include/internal/provider.h
++++ b/include/internal/provider.h
+@@ -117,6 +117,21 @@ void ossl_provider_deinit_child(OSSL_LIB_CTX *ctx);
+ /* FIPS flag access */
+ int ossl_get_kernel_fips_flag(void);
+ 
++/* Return the allocated path to the sole Azure Linux provider registration. */
++char *ossl_provider_conf_find_fips_registration_path(const char *dir);
++/*
++ * Fail closed against fallback providers, then discover and activate the
++ * registration in dir.
++ */
++int ossl_provider_conf_activate_fips_from_dir(OSSL_LIB_CTX *libctx,
++                                              const char *dir);
++/*
++ * Process a registration as configuration. Failure may leave configuration
++ * effects in the library context; callers must treat it as fatal.
++ */
++int ossl_provider_conf_activate_fips(OSSL_LIB_CTX *libctx,
++                                     const char *registration_path);
++
+ # ifdef __cplusplus
+ }
+ # endif
+diff --git a/rh-openssl.cnf b/rh-openssl.cnf
+index fe2346e..126f419 100644
+--- a/rh-openssl.cnf
++++ b/rh-openssl.cnf
+@@ -42,7 +42,10 @@ tsa_policy1 = 1.2.3.4.1
+ tsa_policy2 = 1.2.3.4.5.6
+ tsa_policy3 = 1.2.3.4.5.7
+ 
++# Keep alg_section before providers: default_properties replaces the property
++# query, while FIPS provider registration merges into it.
+ [openssl_init]
++alg_section = evp_properties
+ providers = provider_sect
+ # Uncomment the sections that start with ## below to enable the legacy provider.
+ # Loading the legacy provider enables support for the following algorithms:
+@@ -55,7 +58,6 @@ providers = provider_sect
+ 
+ # Load default TLS policy configuration
+ ssl_conf = ssl_module
+-alg_section = evp_properties
+ 
+ [ evp_properties ]
+ #This section is intentionally added empty here
+diff --git a/test/build.info b/test/build.info
+index 3dca611..b50ab15 100644
+--- a/test/build.info
++++ b/test/build.info
+@@ -1113,6 +1113,21 @@ IF[{- !$disabled{tests} -}]
+   INCLUDE[context_internal_test]=.. ../include ../apps/include
+   DEPEND[context_internal_test]=../libcrypto.a libtestutil.a
+ 
++  PROGRAMS{noinst}=prov_conf_symcrypt_test
++  SOURCE[prov_conf_symcrypt_test]=prov_conf_symcrypt_test.c
++  INCLUDE[prov_conf_symcrypt_test]=.. ../include ../apps/include
++  DEPEND[prov_conf_symcrypt_test]=../libcrypto.a libtestutil.a
++
++  PROGRAMS{noinst}=prov_conf_fips_registration_test
++  SOURCE[prov_conf_fips_registration_test]=prov_conf_fips_registration_test.c
++  INCLUDE[prov_conf_fips_registration_test]=.. ../include ../apps/include
++  DEPEND[prov_conf_fips_registration_test]=../libcrypto.a libtestutil.a
++
++  PROGRAMS{noinst}=prov_conf_fips_realinit_test
++  SOURCE[prov_conf_fips_realinit_test]=prov_conf_fips_realinit_test.c
++  INCLUDE[prov_conf_fips_realinit_test]=../include
++  DEPEND[prov_conf_fips_realinit_test]=../libcrypto
++
+   IF[{- !$disabled{zlib} || !$disabled{brotli} || !$disabled{zstd} -}]
+     PROGRAMS{noinst}=bio_comp_test
+     SOURCE[bio_comp_test]=bio_comp_test.c
+diff --git a/test/prov_conf_fips_bad_identity/symcrypt.cnf b/test/prov_conf_fips_bad_identity/symcrypt.cnf
+new file mode 100644
+index 0000000..962cfe3
+--- /dev/null
++++ b/test/prov_conf_fips_bad_identity/symcrypt.cnf
+@@ -0,0 +1,10 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++activate = 1
++identity = impostor
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_fips_bad_properties/symcrypt.cnf b/test/prov_conf_fips_bad_properties/symcrypt.cnf
+new file mode 100644
+index 0000000..547d8fd
+--- /dev/null
++++ b/test/prov_conf_fips_bad_properties/symcrypt.cnf
+@@ -0,0 +1,9 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ,?fips=yes
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++activate = 1
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_fips_dotted_identity/symcrypt.cnf b/test/prov_conf_fips_dotted_identity/symcrypt.cnf
+new file mode 100644
+index 0000000..ebc68b5
+--- /dev/null
++++ b/test/prov_conf_fips_dotted_identity/symcrypt.cnf
+@@ -0,0 +1,10 @@
++[azl_fips_provider]
++provider = vendor.symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=vendor.symcryptprovider,?fips=yes
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++activate = 1
++identity = vendor.symcryptprovider
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_fips_hidden/.symcrypt.cnf b/test/prov_conf_fips_hidden/.symcrypt.cnf
+new file mode 100644
+index 0000000..d0d3c6f
+--- /dev/null
++++ b/test/prov_conf_fips_hidden/.symcrypt.cnf
+@@ -0,0 +1,9 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++activate = 1
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_fips_inactive/symcrypt.cnf b/test/prov_conf_fips_inactive/symcrypt.cnf
+new file mode 100644
+index 0000000..346bbc3
+--- /dev/null
++++ b/test/prov_conf_fips_inactive/symcrypt.cnf
+@@ -0,0 +1,8 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_fips_metadata/duplicate-provider.cnf b/test/prov_conf_fips_metadata/duplicate-provider.cnf
+new file mode 100644
+index 0000000..e33e893
+--- /dev/null
++++ b/test/prov_conf_fips_metadata/duplicate-provider.cnf
+@@ -0,0 +1,5 @@
++[azl_fips_provider]
++1.provider = symcryptprovider
++2.provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
+diff --git a/test/prov_conf_fips_metadata/empty-config-section.cnf b/test/prov_conf_fips_metadata/empty-config-section.cnf
+new file mode 100644
+index 0000000..e494e0b
+--- /dev/null
++++ b/test/prov_conf_fips_metadata/empty-config-section.cnf
+@@ -0,0 +1,4 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section =
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
+diff --git a/test/prov_conf_fips_metadata/empty-properties.cnf b/test/prov_conf_fips_metadata/empty-properties.cnf
+new file mode 100644
+index 0000000..c98018e
+--- /dev/null
++++ b/test/prov_conf_fips_metadata/empty-properties.cnf
+@@ -0,0 +1,4 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties =
+diff --git a/test/prov_conf_fips_metadata/empty-provider.cnf b/test/prov_conf_fips_metadata/empty-provider.cnf
+new file mode 100644
+index 0000000..fec0373
+--- /dev/null
++++ b/test/prov_conf_fips_metadata/empty-provider.cnf
+@@ -0,0 +1,4 @@
++[azl_fips_provider]
++provider =
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
+diff --git a/test/prov_conf_fips_metadata/missing-config-section.cnf b/test/prov_conf_fips_metadata/missing-config-section.cnf
+new file mode 100644
+index 0000000..7f3b9fb
+--- /dev/null
++++ b/test/prov_conf_fips_metadata/missing-config-section.cnf
+@@ -0,0 +1,3 @@
++[azl_fips_provider]
++provider = symcryptprovider
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
+diff --git a/test/prov_conf_fips_metadata/missing-properties.cnf b/test/prov_conf_fips_metadata/missing-properties.cnf
+new file mode 100644
+index 0000000..2ca3e40
+--- /dev/null
++++ b/test/prov_conf_fips_metadata/missing-properties.cnf
+@@ -0,0 +1,3 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
+diff --git a/test/prov_conf_fips_metadata/missing-provider.cnf b/test/prov_conf_fips_metadata/missing-provider.cnf
+new file mode 100644
+index 0000000..62af416
+--- /dev/null
++++ b/test/prov_conf_fips_metadata/missing-provider.cnf
+@@ -0,0 +1,3 @@
++[azl_fips_provider]
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
+diff --git a/test/prov_conf_fips_metadata/missing-section.cnf b/test/prov_conf_fips_metadata/missing-section.cnf
+new file mode 100644
+index 0000000..fca9fde
+--- /dev/null
++++ b/test/prov_conf_fips_metadata/missing-section.cnf
+@@ -0,0 +1,3 @@
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++activate = 1
+diff --git a/test/prov_conf_fips_multiple/first.cnf b/test/prov_conf_fips_multiple/first.cnf
+new file mode 100644
+index 0000000..7cc5ebb
+--- /dev/null
++++ b/test/prov_conf_fips_multiple/first.cnf
+@@ -0,0 +1,8 @@
++[azl_fips_provider]
++provider = first
++section = first_sect
++additional_default_properties = ?fips=yes
++
++[first_sect]
++module = /nonexistent/first.so
++activate = 1
+diff --git a/test/prov_conf_fips_multiple/second.cnf b/test/prov_conf_fips_multiple/second.cnf
+new file mode 100644
+index 0000000..5f65c38
+--- /dev/null
++++ b/test/prov_conf_fips_multiple/second.cnf
+@@ -0,0 +1,8 @@
++[azl_fips_provider]
++provider = second
++section = second_sect
++additional_default_properties = ?fips=yes
++
++[second_sect]
++module = /nonexistent/second.so
++activate = 1
+diff --git a/test/prov_conf_fips_realinit.cnf b/test/prov_conf_fips_realinit.cnf
+new file mode 100644
+index 0000000..12da8cb
+--- /dev/null
++++ b/test/prov_conf_fips_realinit.cnf
+@@ -0,0 +1,10 @@
++openssl_conf = openssl_init
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++default = default_sect
++
++[default_sect]
++activate = 1
+diff --git a/test/prov_conf_fips_realinit_test.c b/test/prov_conf_fips_realinit_test.c
+new file mode 100644
+index 0000000..5f2aea8
+--- /dev/null
++++ b/test/prov_conf_fips_realinit_test.c
+@@ -0,0 +1,41 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++#include <stdio.h>
++#include <openssl/crypto.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/provider.h>
++
++int main(void)
++{
++    EVP_MD *sha256 = NULL;
++    int ok = 1;
++
++    if (OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CONFIG, NULL)) {
++        fprintf(stderr, "kernel-FIPS initialization unexpectedly succeeded\n");
++        return 1;
++    }
++    ERR_clear_error();
++
++    if (OSSL_PROVIDER_available(NULL, "default")) {
++        fprintf(stderr, "default provider activated after initialization failure\n");
++        ok = 0;
++    }
++    ERR_clear_error();
++
++    sha256 = EVP_MD_fetch(NULL, "SHA2-256", NULL);
++    if (sha256 != NULL) {
++        fprintf(stderr, "SHA2-256 fetched after initialization failure\n");
++        ok = 0;
++    }
++    EVP_MD_free(sha256);
++
++    return ok ? 0 : 1;
++}
+diff --git a/test/prov_conf_fips_registration_test.c b/test/prov_conf_fips_registration_test.c
+new file mode 100644
+index 0000000..3e2882e
+--- /dev/null
++++ b/test/prov_conf_fips_registration_test.c
+@@ -0,0 +1,531 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++#include <string.h>
++#include <openssl/err.h>
++#include <openssl/evperr.h>
++#include <openssl/provider.h>
++#include "crypto/evp.h"
++#include "internal/provider.h"
++#include "testutil.h"
++
++static char *valid_dir;
++static char *valid_file;
++static char *hidden_dir;
++static char *hidden_file;
++static char *uppercase_dir;
++static char *uppercase_file;
++static char *empty_dir;
++static char *nonexistent_dir;
++static char *multiple_dir;
++static char *inactive_file;
++static char *bad_properties_file;
++static char *bad_identity_file;
++static char *soft_load_file;
++static char *missing_metadata_file;
++static char *missing_provider_file;
++static char *empty_provider_file;
++static char *missing_section_file;
++static char *empty_section_file;
++static char *missing_properties_file;
++static char *empty_properties_file;
++static char *duplicate_metadata_file;
++static char *dotted_identity_file;
++
++static int count_property_token(const char *properties, const char *token)
++{
++    const char *start = properties;
++    size_t token_len = strlen(token);
++    int count = 0;
++
++    while (start != NULL) {
++        const char *end = strchr(start, ',');
++        size_t len = end == NULL ? strlen(start) : (size_t)(end - start);
++
++        if (len == token_len && strncmp(start, token, len) == 0)
++            count++;
++        start = end == NULL ? NULL : end + 1;
++    }
++    return count;
++}
++
++static int check_last_error(int expected_reason, const char *expected_data)
++{
++    const char *data = NULL;
++    unsigned long error = ERR_peek_last_error_all(NULL, NULL, NULL, &data, NULL);
++
++    if (!TEST_ulong_ne(error, 0)
++            || (expected_reason != 0
++                && !TEST_int_eq(ERR_GET_REASON(error), expected_reason))
++            || !TEST_ptr(data)
++            || !TEST_true(strstr(data, expected_data) != NULL))
++        return 0;
++    return 1;
++}
++
++static int check_provider_initialized(OSSL_LIB_CTX *ctx, const char *name,
++                                      int expected)
++{
++    /* OSSL_PROVIDER_available() would activate fallbacks and alter the state. */
++    OSSL_PROVIDER *provider = ossl_provider_find(ctx, name, 1);
++    int initialized = provider != NULL
++                      && ossl_provider_get0_dispatch(provider) != NULL;
++    int ok = TEST_int_eq(initialized, expected);
++
++    ossl_provider_free(provider);
++    return ok;
++}
++
++static int check_no_registration_properties(OSSL_LIB_CTX *ctx)
++{
++    char *properties = evp_get_global_properties_str(ctx, 0);
++    int ok = properties == NULL
++             || (count_property_token(properties,
++                                      "?provider=symcryptprovider") == 0
++                 && count_property_token(properties, "?fips=yes") == 0);
++
++    OPENSSL_free(properties);
++    return TEST_true(ok);
++}
++
++static int check_registration_path(const char *dir, const char *expected)
++{
++    char *actual = ossl_provider_conf_find_fips_registration_path(dir);
++    int ok = TEST_ptr(actual) && TEST_str_eq(actual, expected);
++
++    OPENSSL_free(actual);
++    return ok;
++}
++
++static int test_find_valid_registration(void)
++{
++    return check_registration_path(valid_dir, valid_file);
++}
++
++static int test_find_hidden_registration(void)
++{
++    return check_registration_path(hidden_dir, hidden_file);
++}
++
++static int test_find_uppercase_registration(void)
++{
++    return check_registration_path(uppercase_dir, uppercase_file);
++}
++
++static int check_registration_failure(const char *dir, int expected_reason,
++                                      const char *expected_data)
++{
++    char *registration = ossl_provider_conf_find_fips_registration_path(dir);
++    int ok = TEST_ptr_null(registration)
++             && check_last_error(expected_reason, expected_data);
++
++    OPENSSL_free(registration);
++    ERR_clear_error();
++    return ok;
++}
++
++static int test_find_missing_registration(void)
++{
++    return check_registration_failure(empty_dir, ERR_R_INIT_FAIL,
++                                      "no FIPS provider registration");
++}
++
++static int test_find_nonexistent_directory(void)
++{
++    return check_registration_failure(nonexistent_dir, 0,
++                                      "reading FIPS provider registration directory");
++}
++
++static int test_find_multiple_registrations(void)
++{
++    return check_registration_failure(multiple_dir, ERR_R_INIT_FAIL,
++                                      "multiple FIPS provider registrations");
++}
++
++static int check_fips_state(OSSL_LIB_CTX *ctx)
++{
++    char *properties = evp_get_global_properties_str(ctx, 0);
++    int ok = TEST_true(OSSL_PROVIDER_available(ctx, "symcryptprovider"))
++             && TEST_true(OSSL_PROVIDER_available(ctx, "base"))
++             && TEST_ptr(properties)
++             && TEST_int_eq(count_property_token(
++                                properties,
++                                "?provider=symcryptprovider"),
++                            1)
++             && TEST_int_eq(count_property_token(properties, "?fips=yes"), 1);
++
++    OPENSSL_free(properties);
++    return ok;
++}
++
++static int check_activation(const char *registration, int expected)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int activated, ok = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    activated = ossl_provider_conf_activate_fips(ctx, registration);
++    if (!TEST_int_eq(activated, expected))
++        goto end;
++    if (expected && !check_fips_state(ctx))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int test_activate_valid_registration(void)
++{
++    return check_activation(valid_file, 1);
++}
++
++static int test_activate_valid_directory(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int ok = 0;
++
++    if (!TEST_ptr(ctx)
++            || !TEST_true(
++                   ossl_provider_conf_activate_fips_from_dir(ctx, valid_dir))
++            || !check_fips_state(ctx)
++            || !TEST_false(OSSL_PROVIDER_available(ctx, "default")))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int test_reject_inactive_registration(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int ok = 0;
++
++    if (!TEST_ptr(ctx)
++            || !TEST_false(
++                   ossl_provider_conf_activate_fips(ctx, inactive_file))
++            || !check_last_error(
++                   ERR_R_INIT_FAIL,
++                   "FIPS provider 'symcryptprovider' was not activated "
++                   "by its registration")
++            || !check_provider_initialized(ctx, "symcryptprovider", 0)
++            || !check_provider_initialized(ctx, "base", 0)
++            || !check_no_registration_properties(ctx))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int test_reject_bad_properties(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    unsigned long error;
++    int ok = 0;
++
++    if (!TEST_ptr(ctx)
++            || !TEST_false(
++                   ossl_provider_conf_activate_fips(ctx, bad_properties_file)))
++        goto end;
++    error = ERR_peek_last_error();
++    if (!TEST_int_eq(ERR_GET_LIB(error), ERR_LIB_EVP)
++            || !TEST_int_eq(ERR_GET_REASON(error),
++                            EVP_R_DEFAULT_QUERY_PARSE_ERROR)
++            || !check_provider_initialized(ctx, "symcryptprovider", 0)
++            || !check_provider_initialized(ctx, "base", 0)
++            || !check_no_registration_properties(ctx))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int test_reject_bad_identity(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int ok = 0;
++
++    if (!TEST_ptr(ctx)
++            || !TEST_false(
++                   ossl_provider_conf_activate_fips(ctx, bad_identity_file))
++            || !check_last_error(
++                   ERR_R_PASSED_INVALID_ARGUMENT,
++                   "FIPS provider identity 'impostor' does not match "
++                   "registered provider 'symcryptprovider'")
++            || !check_provider_initialized(ctx, "symcryptprovider", 0)
++            || !check_provider_initialized(ctx, "impostor", 0)
++            || !check_provider_initialized(ctx, "base", 0)
++            || !check_no_registration_properties(ctx))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int test_reject_unavailable_soft_load(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int ok = 0;
++
++    if (!TEST_ptr(ctx)
++            || !TEST_false(
++                   ossl_provider_conf_activate_fips(ctx, soft_load_file))
++            || !check_last_error(
++                   ERR_R_INIT_FAIL,
++                   "FIPS provider 'symcryptprovider' was not activated "
++                   "by its registration")
++            || !check_provider_initialized(ctx, "symcryptprovider", 0)
++            || !check_provider_initialized(ctx, "base", 0)
++            || !check_no_registration_properties(ctx))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int check_activation_error(const char *registration,
++                                  const char *expected_data)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int ok = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    if (!TEST_false(ossl_provider_conf_activate_fips(ctx, registration))
++            || !check_last_error(ERR_R_INIT_FAIL, expected_data))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int test_reject_missing_metadata(void)
++{
++    return check_activation_error(missing_metadata_file,
++                                  "missing section [azl_fips_provider]");
++}
++
++static int test_reject_missing_provider(void)
++{
++    return check_activation_error(missing_provider_file,
++                                  "required FIPS provider directive 'provider'");
++}
++
++static int test_reject_empty_provider(void)
++{
++    return check_activation_error(empty_provider_file,
++                                  "required FIPS provider directive 'provider'");
++}
++
++static int test_reject_missing_section(void)
++{
++    return check_activation_error(missing_section_file,
++                                  "required FIPS provider directive 'section'");
++}
++
++static int test_reject_empty_section(void)
++{
++    return check_activation_error(empty_section_file,
++                                  "required FIPS provider directive 'section'");
++}
++
++static int test_reject_missing_properties(void)
++{
++    return check_activation_error(
++        missing_properties_file,
++        "required FIPS provider directive 'additional_default_properties'");
++}
++
++static int test_reject_empty_properties(void)
++{
++    return check_activation_error(
++        empty_properties_file,
++        "required FIPS provider directive 'additional_default_properties'");
++}
++
++static int test_reject_duplicate_metadata(void)
++{
++    return check_activation_error(duplicate_metadata_file,
++                                  "duplicate FIPS provider directive 'provider'");
++}
++
++static int test_reject_dotted_provider(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int ok = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    if (!TEST_false(
++            ossl_provider_conf_activate_fips(ctx, dotted_identity_file))
++            || !check_last_error(
++                   ERR_R_PASSED_INVALID_ARGUMENT,
++                   "FIPS provider name 'vendor.symcryptprovider' "
++                   "must not contain '.'")
++            || !check_provider_initialized(ctx, "vendor.symcryptprovider", 0)
++            || !check_provider_initialized(ctx, "base", 0)
++            || !check_no_registration_properties(ctx))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int test_repeated_activation(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int ok = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    if (!TEST_true(ossl_provider_conf_activate_fips(ctx, valid_file))
++            || !TEST_true(ossl_provider_conf_activate_fips(ctx, valid_file))
++            || !check_fips_state(ctx))
++        goto end;
++    ok = 1;
++
++ end:
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx);
++    return ok;
++}
++
++static int test_library_context_isolation(void)
++{
++    OSSL_LIB_CTX *ctx_a = OSSL_LIB_CTX_new();
++    OSSL_LIB_CTX *ctx_b = OSSL_LIB_CTX_new();
++    OSSL_PROVIDER *provider_a = NULL;
++    OSSL_PROVIDER *provider_b = NULL;
++    int ok = 0;
++
++    if (!TEST_ptr(ctx_a) || !TEST_ptr(ctx_b))
++        goto end;
++
++    if (!TEST_true(ossl_provider_conf_activate_fips(ctx_a, valid_file))
++            || !check_fips_state(ctx_a))
++        goto end;
++
++    if (!check_provider_initialized(ctx_b, "symcryptprovider", 0)
++            || !check_provider_initialized(ctx_b, "base", 0)
++            || !check_no_registration_properties(ctx_b))
++        goto end;
++
++    if (!TEST_true(ossl_provider_conf_activate_fips(ctx_b, valid_file))
++            || !check_fips_state(ctx_b)
++            || !check_fips_state(ctx_a))
++        goto end;
++
++    provider_a = ossl_provider_find(ctx_a, "symcryptprovider", 1);
++    provider_b = ossl_provider_find(ctx_b, "symcryptprovider", 1);
++    if (!TEST_ptr(provider_a)
++            || !TEST_ptr(provider_b)
++            || !TEST_ptr_ne(provider_a, provider_b))
++        goto end;
++
++    if (!TEST_true(ossl_provider_conf_activate_fips(ctx_a, valid_file))
++            || !check_fips_state(ctx_a)
++            || !check_fips_state(ctx_b))
++        goto end;
++    ok = 1;
++
++ end:
++    ossl_provider_free(provider_a);
++    ossl_provider_free(provider_b);
++    ERR_clear_error();
++    OSSL_LIB_CTX_free(ctx_a);
++    OSSL_LIB_CTX_free(ctx_b);
++    return ok;
++}
++
++OPT_TEST_DECLARE_USAGE("valid_dir valid_file hidden_dir hidden_file "
++                       "uppercase_dir uppercase_file empty_dir nonexistent_dir "
++                       "multiple_dir inactive_file bad_properties_file "
++                       "bad_identity_file soft_load_file missing_metadata_file "
++                       "missing_provider_file empty_provider_file "
++                       "missing_section_file empty_section_file "
++                       "missing_properties_file empty_properties_file "
++                       "duplicate_metadata_file dotted_identity_file\n")
++
++int setup_tests(void)
++{
++    if (!test_skip_common_options())
++        return 0;
++    if (!TEST_ptr(valid_dir = test_get_argument(0))
++            || !TEST_ptr(valid_file = test_get_argument(1))
++            || !TEST_ptr(hidden_dir = test_get_argument(2))
++            || !TEST_ptr(hidden_file = test_get_argument(3))
++            || !TEST_ptr(uppercase_dir = test_get_argument(4))
++            || !TEST_ptr(uppercase_file = test_get_argument(5))
++            || !TEST_ptr(empty_dir = test_get_argument(6))
++            || !TEST_ptr(nonexistent_dir = test_get_argument(7))
++            || !TEST_ptr(multiple_dir = test_get_argument(8))
++            || !TEST_ptr(inactive_file = test_get_argument(9))
++            || !TEST_ptr(bad_properties_file = test_get_argument(10))
++            || !TEST_ptr(bad_identity_file = test_get_argument(11))
++            || !TEST_ptr(soft_load_file = test_get_argument(12))
++            || !TEST_ptr(missing_metadata_file = test_get_argument(13))
++            || !TEST_ptr(missing_provider_file = test_get_argument(14))
++            || !TEST_ptr(empty_provider_file = test_get_argument(15))
++            || !TEST_ptr(missing_section_file = test_get_argument(16))
++            || !TEST_ptr(empty_section_file = test_get_argument(17))
++            || !TEST_ptr(missing_properties_file = test_get_argument(18))
++            || !TEST_ptr(empty_properties_file = test_get_argument(19))
++            || !TEST_ptr(duplicate_metadata_file = test_get_argument(20))
++            || !TEST_ptr(dotted_identity_file = test_get_argument(21)))
++        return 0;
++
++    ADD_TEST(test_find_valid_registration);
++    ADD_TEST(test_find_hidden_registration);
++    ADD_TEST(test_find_uppercase_registration);
++    ADD_TEST(test_find_missing_registration);
++    ADD_TEST(test_find_nonexistent_directory);
++    ADD_TEST(test_find_multiple_registrations);
++    ADD_TEST(test_activate_valid_registration);
++    ADD_TEST(test_activate_valid_directory);
++    ADD_TEST(test_reject_inactive_registration);
++    ADD_TEST(test_reject_bad_properties);
++    ADD_TEST(test_reject_bad_identity);
++    ADD_TEST(test_reject_unavailable_soft_load);
++    ADD_TEST(test_reject_missing_metadata);
++    ADD_TEST(test_reject_missing_provider);
++    ADD_TEST(test_reject_empty_provider);
++    ADD_TEST(test_reject_missing_section);
++    ADD_TEST(test_reject_empty_section);
++    ADD_TEST(test_reject_missing_properties);
++    ADD_TEST(test_reject_empty_properties);
++    ADD_TEST(test_reject_duplicate_metadata);
++    ADD_TEST(test_reject_dotted_provider);
++    ADD_TEST(test_repeated_activation);
++    ADD_TEST(test_library_context_isolation);
++    return 1;
++}
+diff --git a/test/prov_conf_fips_soft_load/symcrypt.cnf b/test/prov_conf_fips_soft_load/symcrypt.cnf
+new file mode 100644
+index 0000000..3df960e
+--- /dev/null
++++ b/test/prov_conf_fips_soft_load/symcrypt.cnf
+@@ -0,0 +1,9 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/provider-does-not-exist.so
++activate = 1
++soft_load = 1
+diff --git a/test/prov_conf_fips_uppercase/symcrypt.CNF b/test/prov_conf_fips_uppercase/symcrypt.CNF
+new file mode 100644
+index 0000000..d0d3c6f
+--- /dev/null
++++ b/test/prov_conf_fips_uppercase/symcrypt.CNF
+@@ -0,0 +1,9 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++activate = 1
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_fips_valid/symcrypt.cnf b/test/prov_conf_fips_valid/symcrypt.cnf
+new file mode 100644
+index 0000000..1a64f24
+--- /dev/null
++++ b/test/prov_conf_fips_valid/symcrypt.cnf
+@@ -0,0 +1,10 @@
++[azl_fips_provider]
++provider = symcryptprovider
++section = symcrypt_prov_sect
++additional_default_properties = ?provider=symcryptprovider,?fips=yes
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++activate = 1
++identity = symcryptprovider
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_symcrypt_active.cnf b/test/prov_conf_symcrypt_active.cnf
+new file mode 100644
+index 0000000..36351ba
+--- /dev/null
++++ b/test/prov_conf_symcrypt_active.cnf
+@@ -0,0 +1,14 @@
++openssl_conf = openssl_init
++
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++symcryptprovider = symcrypt_prov_sect
++
++[symcrypt_prov_sect]
++module = ${ENV::OPENSSL_MODULES}/p_test.so
++activate = 1
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_symcrypt_app.cnf b/test/prov_conf_symcrypt_app.cnf
+new file mode 100644
+index 0000000..f96252a
+--- /dev/null
++++ b/test/prov_conf_symcrypt_app.cnf
+@@ -0,0 +1,7 @@
++openssl_conf = openssl_init
++
++[openssl_init]
++alg_section = evp_properties
++
++[evp_properties]
++default_properties = app.prop=1
+diff --git a/test/prov_conf_symcrypt_missing.cnf b/test/prov_conf_symcrypt_missing.cnf
+new file mode 100644
+index 0000000..9ca89d5
+--- /dev/null
++++ b/test/prov_conf_symcrypt_missing.cnf
+@@ -0,0 +1,12 @@
++openssl_conf = openssl_init
++
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++null = null_sect
++
++[null_sect]
++activate = 1
+diff --git a/test/prov_conf_symcrypt_test.c b/test/prov_conf_symcrypt_test.c
+new file mode 100644
+index 0000000..1bfcb4f
+--- /dev/null
++++ b/test/prov_conf_symcrypt_test.c
+@@ -0,0 +1,208 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++#include <stdlib.h>
++#include <string.h>
++#include <openssl/conf.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/provider.h>
++#include "crypto/evp.h"
++#include "internal/provider.h"
++#include "testutil.h"
++
++/*
++ * These tests exercise registration activation independently from the fixed
++ * production directory, parametrized by whether the registration is applied:
++ *
++ *   - Registration loads the provider even when the ambient configuration
++ *     does not mention it.
++ *   - The registration properties merge with application defaults.
++ *   - Outside kernel FIPS mode, the ordinary SymCrypt configuration activates
++ *     SymCrypt without changing default properties.
++ *   - Later unrelated provider configuration loads remain safe.
++ */
++
++static char *symcrypt_cnf = NULL;
++static char *unrelated_cnf = NULL;
++static char *app_cnf = NULL;
++static char *registration_cnf = NULL;
++static int apply_fips_registration = 0;
++
++static int has_property_token(const char *properties, const char *token)
++{
++    const char *start = properties;
++    size_t token_len = strlen(token);
++
++    while (start != NULL) {
++        const char *end = strchr(start, ',');
++        size_t len = end == NULL ? strlen(start) : (size_t)(end - start);
++
++        if (len == token_len && strncmp(start, token, len) == 0)
++            return 1;
++        start = end == NULL ? NULL : end + 1;
++    }
++    return 0;
++}
++
++/*
++ * Verify the default properties: the app-configured token is preserved, the
++ * SymCrypt and FIPS preferences are merged iff the registration is applied.
++ */
++static int check_properties(OSSL_LIB_CTX *ctx, int expect_app,
++                            int expect_symcrypt, int expect_fips)
++{
++    char *propstr = evp_get_global_properties_str(ctx, 0);
++    int testresult = 0;
++
++    if (!TEST_ptr(propstr))
++        return 0;
++    TEST_info("default properties: %s", propstr);
++
++    if (!TEST_int_eq(has_property_token(propstr, "app.prop=1"), expect_app))
++        goto err;
++    if (!TEST_int_eq(has_property_token(propstr,
++                                        "?provider=symcryptprovider"),
++                     expect_symcrypt))
++        goto err;
++    if (!TEST_int_eq(has_property_token(propstr, "?fips=yes"), expect_fips))
++        goto err;
++
++    testresult = 1;
++ err:
++    OPENSSL_free(propstr);
++    return testresult;
++}
++
++/*
++ * An ambient config that activates SymCrypt: the provider is available, the
++ * SymCrypt (and, with registration, FIPS + base) preferences are applied.
++ */
++static int test_standard_configuration(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    if (apply_fips_registration
++            && !TEST_true(ossl_provider_conf_activate_fips(ctx,
++                                                           registration_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, symcrypt_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_PROVIDER_available(ctx, "symcryptprovider")))
++        goto err;
++    if (apply_fips_registration
++            && !TEST_true(OSSL_PROVIDER_available(ctx, "base")))
++        goto err;
++    if (!check_properties(ctx, 0, apply_fips_registration,
++                          apply_fips_registration))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * Registration loading does not depend on the ambient configuration including
++ * the ordinary SymCrypt drop-in.
++ */
++static int test_registration_without_ambient_provider(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, app_cnf)))
++        goto err;
++    if (apply_fips_registration
++            && !TEST_true(ossl_provider_conf_activate_fips(ctx,
++                                                           registration_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, unrelated_cnf)))
++        goto err;
++    if (apply_fips_registration) {
++        if (!TEST_true(OSSL_PROVIDER_available(ctx, "symcryptprovider")))
++            goto err;
++        if (!TEST_true(OSSL_PROVIDER_available(ctx, "base")))
++            goto err;
++        if (!check_properties(ctx, 1, 1, 1))
++            goto err;
++    } else {
++        if (!TEST_false(OSSL_PROVIDER_available(ctx, "symcryptprovider")))
++            goto err;
++        if (!check_properties(ctx, 1, 0, 0))
++            goto err;
++    }
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * Once registration has succeeded, a later unrelated provider configuration
++ * load does not disturb the activated provider or its properties.
++ */
++static int test_unrelated_load_is_safe(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        goto err;
++    if (apply_fips_registration
++            && !TEST_true(ossl_provider_conf_activate_fips(ctx,
++                                                           registration_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, symcrypt_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, unrelated_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_PROVIDER_available(ctx, "symcryptprovider")))
++        goto err;
++    if (!check_properties(ctx, 0, apply_fips_registration,
++                          apply_fips_registration))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++OPT_TEST_DECLARE_USAGE("symcrypt_cnf unrelated_cnf app_cnf registration_cnf "
++                       "apply_fips_registration\n")
++
++int setup_tests(void)
++{
++    if (!test_skip_common_options()) {
++        TEST_error("Error parsing test options\n");
++        return 0;
++    }
++
++    if (!TEST_ptr(symcrypt_cnf = test_get_argument(0))
++            || !TEST_ptr(unrelated_cnf = test_get_argument(1))
++            || !TEST_ptr(app_cnf = test_get_argument(2))
++            || !TEST_ptr(registration_cnf = test_get_argument(3))
++            || !TEST_ptr(test_get_argument(4)))
++        return 0;
++
++    apply_fips_registration = atoi(test_get_argument(4)) != 0;
++
++    ADD_TEST(test_standard_configuration);
++    ADD_TEST(test_registration_without_ambient_provider);
++    ADD_TEST(test_unrelated_load_is_safe);
++    return 1;
++}
+diff --git a/test/recipes/03-test_prov_conf_fips_realinit.t b/test/recipes/03-test_prov_conf_fips_realinit.t
+new file mode 100644
+index 0000000..04e54ce
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_fips_realinit.t
+@@ -0,0 +1,36 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use Cwd qw(abs_path);
++use OpenSSL::Test qw/:DEFAULT bldtop_dir srctop_file/;
++
++setup("test_prov_conf_fips_realinit");
++
++my $registration_dir = "/etc/pki/tls/azl-openssl-fips-provider.d";
++my $has_registration = 0;
++
++if (opendir(my $dh, $registration_dir)) {
++    $has_registration = grep { /\.cnf\z/i } readdir($dh);
++    closedir($dh);
++}
++
++plan skip_all =>
++    "host has a production FIPS provider registration"
++    if $has_registration;
++
++plan tests => 1;
++
++$ENV{OPENSSL_FORCE_FIPS_MODE} = 1;
++$ENV{OPENSSL_CONF} =
++    abs_path(srctop_file("test", "prov_conf_fips_realinit.cnf"));
++$ENV{OPENSSL_MODULES} = abs_path(bldtop_dir("test"));
++
++ok(run(test(["prov_conf_fips_realinit_test"])),
++   "failed kernel-FIPS initialization cannot activate fallbacks");
+diff --git a/test/recipes/03-test_prov_conf_fips_registration.t b/test/recipes/03-test_prov_conf_fips_registration.t
+new file mode 100644
+index 0000000..87fc757
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_fips_registration.t
+@@ -0,0 +1,61 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use Cwd qw(abs_path);
++use OpenSSL::Test qw/:DEFAULT bldtop_dir result_dir srctop_dir srctop_file/;
++
++setup("test_prov_conf_fips_registration");
++
++plan tests => 1;
++
++delete $ENV{OPENSSL_FORCE_FIPS_MODE};
++$ENV{OPENSSL_MODULES} = abs_path(bldtop_dir("test"));
++
++my $empty = result_dir("prov_conf_fips_empty");
++mkdir $empty unless -d $empty;
++my $nonexistent = result_dir("prov_conf_fips_nonexistent");
++rmdir $nonexistent if -d $nonexistent;
++
++ok(run(test(["prov_conf_fips_registration_test",
++             srctop_dir("test", "prov_conf_fips_valid"),
++             srctop_file("test", "prov_conf_fips_valid", "symcrypt.cnf"),
++             srctop_dir("test", "prov_conf_fips_hidden"),
++             srctop_file("test", "prov_conf_fips_hidden", ".symcrypt.cnf"),
++             srctop_dir("test", "prov_conf_fips_uppercase"),
++             srctop_file("test", "prov_conf_fips_uppercase", "symcrypt.CNF"),
++             $empty,
++             $nonexistent,
++             srctop_dir("test", "prov_conf_fips_multiple"),
++             srctop_file("test", "prov_conf_fips_inactive", "symcrypt.cnf"),
++             srctop_file("test", "prov_conf_fips_bad_properties",
++                          "symcrypt.cnf"),
++             srctop_file("test", "prov_conf_fips_bad_identity",
++                          "symcrypt.cnf"),
++             srctop_file("test", "prov_conf_fips_soft_load",
++                          "symcrypt.cnf"),
++             srctop_file("test", "prov_conf_fips_metadata",
++                          "missing-section.cnf"),
++             srctop_file("test", "prov_conf_fips_metadata",
++                          "missing-provider.cnf"),
++             srctop_file("test", "prov_conf_fips_metadata",
++                          "empty-provider.cnf"),
++             srctop_file("test", "prov_conf_fips_metadata",
++                          "missing-config-section.cnf"),
++             srctop_file("test", "prov_conf_fips_metadata",
++                          "empty-config-section.cnf"),
++             srctop_file("test", "prov_conf_fips_metadata",
++                          "missing-properties.cnf"),
++             srctop_file("test", "prov_conf_fips_metadata",
++                          "empty-properties.cnf"),
++             srctop_file("test", "prov_conf_fips_metadata",
++                          "duplicate-provider.cnf"),
++             srctop_file("test", "prov_conf_fips_dotted_identity",
++                          "symcrypt.cnf")])),
++   "FIPS provider registration discovery and activation");
+diff --git a/test/recipes/03-test_prov_conf_symcrypt.t b/test/recipes/03-test_prov_conf_symcrypt.t
+new file mode 100644
+index 0000000..f17daa6
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_symcrypt.t
+@@ -0,0 +1,39 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use Cwd qw(abs_path);
++use OpenSSL::Test qw/:DEFAULT bldtop_dir srctop_file/;
++
++setup("test_prov_conf_symcrypt");
++
++delete $ENV{OPENSSL_FORCE_FIPS_MODE};
++
++my $host_fips = 0;
++if (open(my $fh, '<', '/proc/sys/crypto/fips_enabled')) {
++    my $val = <$fh>;
++    close($fh);
++    $host_fips = 1 if defined $val && $val =~ /^\s*1/;
++}
++
++plan skip_all =>
++    "host kernel is in FIPS mode; cannot isolate explicit registration"
++    if $host_fips;
++
++plan tests => 1;
++
++$ENV{OPENSSL_MODULES} = abs_path(bldtop_dir("test"));
++
++ok(run(test(["prov_conf_symcrypt_test",
++             srctop_file("test", "prov_conf_symcrypt_active.cnf"),
++             srctop_file("test", "prov_conf_symcrypt_missing.cnf"),
++             srctop_file("test", "prov_conf_symcrypt_app.cnf"),
++             srctop_file("test", "prov_conf_fips_valid", "symcrypt.cnf"),
++             "1"])),
++   "explicit FIPS registration activates and prefers its provider");
+diff --git a/test/recipes/03-test_prov_conf_symcrypt_off.t b/test/recipes/03-test_prov_conf_symcrypt_off.t
+new file mode 100644
+index 0000000..1d1e848
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_symcrypt_off.t
+@@ -0,0 +1,39 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use Cwd qw(abs_path);
++use OpenSSL::Test qw/:DEFAULT bldtop_dir srctop_file/;
++
++setup("test_prov_conf_symcrypt_off");
++
++delete $ENV{OPENSSL_FORCE_FIPS_MODE};
++
++my $host_fips = 0;
++if (open(my $fh, '<', '/proc/sys/crypto/fips_enabled')) {
++    my $val = <$fh>;
++    close($fh);
++    $host_fips = 1 if defined $val && $val =~ /^\s*1/;
++}
++
++plan skip_all =>
++    "host kernel is in FIPS mode; cannot exercise the non-FIPS path"
++    if $host_fips;
++
++plan tests => 1;
++
++$ENV{OPENSSL_MODULES} = abs_path(bldtop_dir("test"));
++
++ok(run(test(["prov_conf_symcrypt_test",
++             srctop_file("test", "prov_conf_symcrypt_active.cnf"),
++             srctop_file("test", "prov_conf_symcrypt_missing.cnf"),
++             srctop_file("test", "prov_conf_symcrypt_app.cnf"),
++             srctop_file("test", "prov_conf_fips_valid", "symcrypt.cnf"),
++             "0"])),
++   "non-FIPS mode uses only the ordinary SymCrypt configuration");
+-- 
+2.55.0
+
