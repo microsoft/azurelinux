@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.11.0
+Version:        1.11.2
 Release:        %autorelease
 License:        MIT
 Vendor:         Microsoft Corporation
