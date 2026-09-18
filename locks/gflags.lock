@@ -4,4 +4,4 @@ import-commit = '5c7e8e5037d2e8c58eae60916c663e8f1dd831be'
 upstream-commit = '5c7e8e5037d2e8c58eae60916c663e8f1dd831be'
 manual-bump = 2
 input-fingerprint = 'sha256:f651dc75d7acca9fab7427a2fd60faba2746436f6ded19bd7884ee50e98d5f04'
-resolution-input-hash = 'sha256:466421704711c4fd3c71f0b2ed715a0e61d49e3e26f3a2637fee755795849c8e'
+resolution-input-hash = 'sha256:2f28ab3acf76be3f204b5af6296868e6365fcd5554d51c959e59c14de0a10e87'
