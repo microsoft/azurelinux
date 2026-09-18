@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.32.0.kata0
-Release:        6%{?dist}
+Release:        5%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -125,14 +125,6 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Tue Sep 08 2026 Cameron Baird <cameronbaird@microsoft.com> - 3.32.0.kata0-6
-- TEMP to be squashed. Prep for kata-v2 release.
-- Account for node-builder-supplied confix matrix, configuration-clh-azure-runtime-rs..
-- Include patch to vendored pathrs package, fixing incompatibility between its
-    kernel version parsing and the mshv version semantics. 
-- Pass RELEASE_VERSION=%{version}-%{release} to make commands so that
-    kata-runtime compiles in the exact distro version string. 
-
 * Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-5
 - Patch for CVE-2026-77176
 
