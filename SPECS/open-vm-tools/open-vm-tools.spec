@@ -25,7 +25,7 @@
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
 Version:        12.3.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,6 +37,7 @@ Source3:        vmblock.mount
 Source4:        open-vm-tools.conf
 Source5:        vmtoolsd.pam
 Patch0:         CVE-2025-22247.patch
+Patch1:         CVE-2025-41244.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 #BuildRequires:    doxygen
@@ -334,6 +335,9 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Thu Jul 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 12.3.5-3
+- Patch for CVE-2025-41244
+
 * Fri May 09 2025 Andrew Phelps <anphel@microsoft.com> - 12.3.5-2
 - Add CVE-2025-22247.patch
 

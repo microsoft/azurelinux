@@ -1,7 +1,7 @@
 Summary:        Program for modifying or creating files
 Name:           patch
 Version:        2.7.6
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/patch/
 Source0:        https://ftp.gnu.org/gnu/patch/%{name}-%{version}.tar.gz
@@ -13,6 +13,8 @@ Patch3:         CVE-2018-20969.patch
 # This vulnerability is fixed with patch3.
 Patch4:         CVE-2019-13638.nopatch
 Patch5:         CVE-2019-13636.patch
+Patch6:         CVE-2026-56288.patch
+Patch7:         CVE-2026-56289.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +45,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Jul 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.6-10
+- Patch for CVE-2026-56289, CVE-2026-56288
+
 * Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.6-9
 - Updated patch application macros.
 

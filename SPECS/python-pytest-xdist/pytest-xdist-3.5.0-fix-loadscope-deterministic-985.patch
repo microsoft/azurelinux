@@ -1,0 +1,39 @@
+From 53ba367f2816a6e30732833a01e52b6665969516 Mon Sep 17 00:00:00 2001
+From: Toni Timonen <toni.timonen@iki.fi>
+Date: Tue, 31 Mar 2026 21:28:55 +0000
+Subject: [PATCH] fix: ensure consistent node workload assignment by sorting
+ nodes by gateway ID.
+
+Fixes the flaky test_workqueue_ordered_by_size test.
+---
+ changelog/985.bugfix.rst         | 1 +
+ src/xdist/scheduler/loadscope.py | 5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+ create mode 100644 changelog/985.bugfix.rst
+
+diff --git a/changelog/985.bugfix.rst b/changelog/985.bugfix.rst
+new file mode 100644
+index 00000000..89401d59
+--- /dev/null
++++ b/changelog/985.bugfix.rst
+@@ -0,0 +1 @@
++De-flaked test_workqueue_ordered_by_size.
+diff --git a/src/xdist/scheduler/loadscope.py b/src/xdist/scheduler/loadscope.py
+index 73162dcd..78ec636a 100644
+--- a/src/xdist/scheduler/loadscope.py
++++ b/src/xdist/scheduler/loadscope.py
+@@ -394,11 +394,12 @@ def schedule(self) -> None:
+                 unused_node.shutdown()
+ 
+         # Assign initial workload
+-        for node in self.nodes:
++        # Sort the nodes to keep assingment consistent (#985)
++        for node in sorted(self.nodes, key=lambda node: node.gateway.id):
+             self._assign_work_unit(node)
+ 
+         # Ensure nodes start with at least two work units if possible (#277)
+-        for node in self.nodes:
++        for node in sorted(self.nodes, key=lambda node: node.gateway.id):
+             self._reschedule(node)
+ 
+         # Initial distribution sent all tests, start node shutdown

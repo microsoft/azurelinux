@@ -1,7 +1,7 @@
 Summary:        Simple Python style checker in one Python file
 Name:           python-pycodestyle
 Version:        2.11.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,7 +35,8 @@ pycodestyle is a tool to check your Python code against some of the style conven
 %py3_install
 
 %check
-pip3 install tox
+# pin packaging==23.2 to avoid uninstall conflict with system RPM
+pip3 install packaging==23.2 tox
 tox -e py%{python3_version_nodots}
 
 %files -n python3-pycodestyle
@@ -45,6 +46,10 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/pycodestyle
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.11.0-2
+- Pin packaging==23.2 in %%check to avoid uninstall conflict with the
+  system RPM-managed packaging.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.11.0-1
 - Auto-upgrade to 2.11.0 - Azure Linux 3.0 - package upgrades
 

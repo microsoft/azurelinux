@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        26%{?dist}
+Release:        30%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,10 +47,15 @@ Patch25:        CVE-2026-25681.patch
 Patch26:        CVE-2026-39827.patch
 Patch27:        CVE-2026-39835.patch
 Patch28:        CVE-2026-42502.patch
-Patch29:        CVE-2024-7598.patch
+Patch29:        CVE-2026-56852.patch
+Patch30:        CVE-2024-7598.patch
+Patch31:        CVE-2026-73500.patch
+Patch32:        CVE-2026-37236.patch
+Patch33:        CVE-2026-56855.patch
+Patch34:        CVE-2026-78662.patch
 
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  glibc-static >= 2.38-21%{?dist}
 BuildRequires:  golang < 1.25
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -300,11 +305,23 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Sun Jun 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-26
-- Patch for CVE-2024-7598
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-30
+- Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
+
+* Tue Aug 18 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.30.10-29
+ - Bump to rebuild with updated glibc
+
+* Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-28
+ - Patch for CVE-2026-73500
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-27
+ - Patch for CVE-2024-7598
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-26
+ - Patch for CVE-2026-56852
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-25
-- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
+ - Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.30.10-24
 - Bump to rebuild with updated glibc

@@ -1,12 +1,13 @@
 Summary:        A free package dependency solver
 Name:           libsolv
 Version:        0.7.28
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
 Source0:        https://github.com/openSUSE/libsolv/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2026-9149.patch
 Patch1:         CVE-2026-9150.patch
+Patch2:         CVE-2026-48863.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,6 +83,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Thu Jul 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.7.28-5
+- Patch for CVE-2026-48863
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.7.28-4
 - Patch for CVE-2026-9150, CVE-2026-9149
 

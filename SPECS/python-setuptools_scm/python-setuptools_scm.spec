@@ -6,7 +6,7 @@
 Summary:        The blessed package to manage your versions by scm tags.
 Name:           python-%{srcname}
 Version:        8.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -63,7 +63,8 @@ It also handles file finders for the supported scm’s.
 
 %if %{with_check}
 %check
-pip3 install tox tox-current-env
+# pin packaging==23.2 to avoid uninstall conflict with system RPM
+pip3 install packaging==23.2 tox tox-current-env
 tox -e py%{python3_version_nodots}
 %endif
 
@@ -79,6 +80,10 @@ tox -e py%{python3_version_nodots}
  
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 8.0.3-2
+- Pin packaging==23.2 in %%check to avoid uninstall conflict with the
+  system RPM-managed packaging.
+
 * Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.3-1
 - Auto-upgrade to 8.0.3 - 3.0 package upgrade
 

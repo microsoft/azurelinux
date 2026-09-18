@@ -7,12 +7,15 @@
 Summary:        OCaml Format pretty-printer combinators
 Name:           ocaml-%{srcname}
 Version:        0.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://erratique.ch/software/fmt
 Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%{version}.tar.gz
+# test/styled_perf_bug is a hand-watched benchmark that loops forever; bound it
+# so it still exercises the regressed code path without hanging %%check.
+Patch0:         ocaml-fmt-bound-benchmark.patch
 
 BuildRequires:  ocaml >= 4.05.0
 BuildRequires:  ocaml-cmdliner-devel >= 0.9.8
@@ -101,6 +104,11 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Tue Aug 11 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.9.0-2
+- Bound the test/styled_perf_bug benchmark loop. It ran "while true", so %%check
+  never finished and hit the build timeout; it now runs a fixed number of rounds
+  and still exercises the Fmt.styled/Fmt.str path it was written to check.
+
 * Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.9.0-1
 - Upgrade to version 0.9.0
 

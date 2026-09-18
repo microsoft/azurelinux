@@ -1,7 +1,7 @@
 Summary:        library for laying out and rendering of text.
 Name:           pango
 Version:        1.51.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,6 +23,9 @@ BuildRequires:  libXft-devel
 BuildRequires:  meson
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(fribidi)
+%if 0%{?with_check}
+BuildRequires:  dejavu-sans-fonts
+%endif
 Requires:       harfbuzz-devel
 
 %description
@@ -70,6 +73,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/pangoft2.pc
 
 %changelog
+* Mon Jul 27 2026 Vijayender Putta <v-vijputta@microsoft.com> - 1.51.2-2
+- Fix ptest error
+
 * Wed Feb 21 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.51.2-1
 - Updated to package version 1.51.2 since this is the current latest offical release
 - Updated the patch to skip tests to skip known failures

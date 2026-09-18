@@ -89,6 +89,7 @@ type AttendedInstaller struct {
 // New creates and returns a new AttendedInstaller.
 func New(cfg configuration.Config, installationFunc func(configuration.Config, chan int, chan string) error, calamaresInstallFunc func() error) (attendedInstaller *AttendedInstaller, err error) {
 	finalConfig := configuration.Config{
+		Disks: append([]configuration.Disk{}, cfg.Disks...),
 		SystemConfigs: []configuration.SystemConfig{
 			configuration.SystemConfig{},
 		},

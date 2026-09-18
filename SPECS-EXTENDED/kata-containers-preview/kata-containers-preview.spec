@@ -5,7 +5,7 @@
 
 Name:           kata-containers-preview
 Version:        3.27.0~preview2
-Release:        1%{?dist}
+Release:        2%{?dist}
 
 Summary:        Kata Containers preview package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
@@ -14,6 +14,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{upstream_ver}.tar.gz#/kata-containers-%{upstream_ver}.tar.gz
 Source1:        kata-containers-%{upstream_ver}-cargo.tar.gz
+Patch0:         rust-fix-unstable-name-collisions.patch
+# This patch can be removed when this package is upgraded to v3.32.0
+Patch1:         rust-1.96-protection-cpuid.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -115,6 +118,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.27.0~preview2-2
+- Bump release to rebuild with rust
+
 * Mon Apr 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.27.0.preview2-1
 - Auto-upgrade to 3.27.0.preview2
 

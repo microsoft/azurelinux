@@ -3,7 +3,7 @@
 Summary:        Markdown implementation in Python
 Name:           python-%{pkgname}
 Version:        3.8.2
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ URL:            https://python-markdown.github.io/
 Source0:        https://github.com/Python-Markdown/markdown/releases/download/%{version}/%{pkgname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 Patch0:         0001-fix-pyproject-license-for-setuptools.patch
+Patch1:         0002-Fix-handling-of-incomplete-HTML-tags-in-code-spans.patch
 
 %description
 This is a Python implementation of John Grubers Markdown. It is
@@ -62,6 +63,16 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/markdown_py
 
 %changelog
+* Thu Sep 10 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.8.2-3
+- Add upstream patch (PR #1548) to fix incomplete HTML tags in code spans
+  with the new html.parser backported into Python 3.12.14.
+- Drop the %%prep test skips, no longer needed with Python 3.12.14.
+
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.8.2-2
+- Use %%{pkgname} (lowercase) for %%autosetup -n so the directory inside
+  the upstream tarball (markdown-3.8.2) matches; skip 2 tests broken by
+  Python 3.12 html.parser behaviour changes.
+
 * Fri May 08 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.8.2-1
 - Upgrade to 3.8.2 to fix the ptest error.
 

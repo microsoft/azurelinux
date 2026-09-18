@@ -2,7 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.21
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,28 @@ Patch2:         CVE-2026-48858.patch
 Patch3:         CVE-2026-48860.patch
 Patch4:         CVE-2026-49759.patch
 Patch5:         CVE-2026-49760.patch
-Patch6:         CVE-2026-54886.patch
+Patch6:         CVE-2026-42792.patch
+Patch7:         CVE-2026-55737.patch
+Patch8:         CVE-2026-55953.patch
+Patch9:         CVE-2026-58227.patch
+Patch10:        CVE-2026-59251.patch
+Patch11:        CVE-2026-54886.patch
+Patch12:        CVE-2026-53422.patch
+Patch13:        CVE-2026-54887.patch
+Patch14:        CVE-2026-55950.patch
+Patch15:        CVE-2026-59250.patch
+Patch16:        CVE-2026-55951.patch
+Patch17:        CVE-2026-66357.patch
+Patch18:        CVE-2026-69664.patch
+Patch19:        CVE-2026-70399.patch
+Patch20:        CVE-2026-73270.patch
+Patch21:        CVE-2026-73276.patch
+Patch22:        CVE-2026-73812.patch
+Patch23:        CVE-2026-74835.patch
+Patch24:        CVE-2026-74994.patch
+Patch25:        CVE-2026-75538.patch
+# Applied last: rebased on top of the other inets fixes it shares context with.
+Patch26:        CVE-2026-71380.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
@@ -60,8 +81,19 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
-* Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-3
+* Fri Sep 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-6
+- Patch for CVE-2026-75538, CVE-2026-74994, CVE-2026-74835, CVE-2026-73812, CVE-2026-73276, CVE-2026-73270, CVE-2026-71380, CVE-2026-70399, CVE-2026-69664, CVE-2026-66357, CVE-2026-55951
+- Also covers CVE-2026-71562, CVE-2026-70409, CVE-2026-70405, CVE-2026-66835, CVE-2026-59696, which share upstream fixes with the patches above
+
+
+* Tue Aug 11 2026 Aditya Singh <v-aditysing@microsoft.com> - 26.2.5.21-5
+- Patch for CVE-2026-53422, CVE-2026-54887, CVE-2026-55950, CVE-2026-59250
+
+* Sat Aug 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-4
 - Patch for CVE-2026-54886
+
+* Fri Jul 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-3
+- Patch for CVE-2026-59251, CVE-2026-58227, CVE-2026-55953, CVE-2026-55737, CVE-2026-42792
 
 * Tue Jun 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-2
 - Patch for CVE-2026-49760, CVE-2026-49759, CVE-2026-48860, CVE-2026-48858, CVE-2026-48856, CVE-2026-48855

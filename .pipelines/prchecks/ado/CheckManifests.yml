@@ -1,0 +1,82 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Keep this definition in lock-step with .github/workflows/check-manifests.yml.
+
+# Triggers are configured on the ADO pipeline definition.
+trigger: none
+
+parameters:
+  - name: debug
+    type: boolean
+    default: false
+    displayName: "Run in debug mode"
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+variables:
+  - group: "Agent pools (DEV)"
+  - name: system.debug
+    value: "${{ parameters.debug }}"
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      use1esentry: false # Required by the current hosted-pool configuration.
+      LinuxHostVersion:
+        Network: R1
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - stage: CheckManifests
+        displayName: "Check Manifests"
+        jobs:
+          - job: CheckManifests
+            displayName: "Check Manifests"
+            pool:
+              type: linux
+              isCustom: true
+              name: "$(DEV_AMD64_Managed_NoUMI_AZL3)"
+            variables:
+              ob_outputDirectory: "$(Pipeline.Workspace)/not_used/CheckManifests"
+            steps:
+              - checkout: self
+                fetchDepth: 1
+
+              - bash: |
+                  set -euo pipefail
+
+                  if [[ -n "$(rpm --eval '%bcond test 1')" ]]; then
+                    echo '%bcond() %[ (%{2}) ? "%{expand:%%bcond_without %{1}}" : "%{expand:%%bcond_with %{1}}" ]' > ~/.rpmmacros
+                  fi
+                displayName: "Define missing RPM macros"
+
+              - bash: |
+                  set -euo pipefail
+
+                  echo "Ensure toolchain and pkggen manifests match the versions in the spec files."
+                  echo "Run './scripts/toolchain/check_manifests.sh -a x86_64' from toolkit/ to validate locally."
+
+                  pushd toolkit
+                  ./scripts/toolchain/check_manifests.sh -a x86_64
+                  popd
+                displayName: "Check x86_64 manifests"
+
+              - bash: |
+                  set -euo pipefail
+
+                  echo "Ensure toolchain and pkggen manifests match the versions in the spec files."
+                  echo "Run './scripts/toolchain/check_manifests.sh -a aarch64' from toolkit/ to validate locally."
+
+                  pushd toolkit
+                  ./scripts/toolchain/check_manifests.sh -a aarch64
+                  popd
+                condition: always()
+                displayName: "Check aarch64 manifests"

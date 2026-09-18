@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.
 Patch0:         remove-docs-from-makefile.patch
 Patch1:         define-RPM_LD_FLAGS.patch
 Patch2:         fix_RPM_GNUC_DEPRECATED_headers.patch
+Patch3:         CVE-2026-44605.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  awk
@@ -266,6 +267,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Aug 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.18.2-2
+- Patch for CVE-2026-44605
+
 * Fri Mar 22 2024 Sam Meluch <sammeluch@microsoft.com> - 4.18.2-1
 - Upgrade rpm to version 4.18.2
 

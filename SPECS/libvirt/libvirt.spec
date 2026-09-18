@@ -11,12 +11,14 @@
 %define arches_zfs              %{arches_x86} %{power64} %{arm}
 %define arches_numactl          %{arches_x86} %{power64} aarch64 s390x
 %define arches_numad            %{arches_x86} %{power64} aarch64
+%define arches_ch               x86_64 aarch64
 
 # The hypervisor drivers that run in libvirtd
 %define with_qemu          0%{!?_without_qemu:1}
 %define with_lxc           0%{!?_without_lxc:1}
 %define with_libxl         0%{!?_without_libxl:1}
 %define with_vbox          0%{!?_without_vbox:1}
+%define with_ch            0
 
 %ifarch %{arches_qemu_kvm}
     %define with_qemu_kvm      %{with_qemu}
@@ -56,6 +58,7 @@
 
 # Other optional features
 %define with_numactl          0%{!?_without_numactl:1}
+%define with_userfaultfd_sysctl 1
 
 # A few optional bits off by default, we enable later
 %define with_fuse             0
@@ -95,6 +98,7 @@
 %define with_libxl 0
 %define with_hyperv 0
 %define with_lxc 0
+%define with_ch 0
 
 %define with_netcf 0
 
@@ -141,6 +145,9 @@
 
 %define with_modular_daemons 0
 
+# Preserve the iptables-first behavior used by previous Azure Linux releases.
+%define firewall_backend_priority iptables,nftables
+
 # Force QEMU to run as non-root
 %define qemu_user  qemu
 %define qemu_group  qemu
@@ -184,8 +191,8 @@
 
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
-Version:        10.10.0
-Release:        2%{?dist}
+Version:        11.9.0
+Release:        1%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -197,10 +204,10 @@ URL:            https://libvirt.org/
 Source:         https://download.libvirt.org/%{?mainturl}libvirt-%{version}.tar.xz
 Patch0:         libvirt-conf.patch
 Patch1:         CVE-2025-13193.patch
-Patch2:         CVE-2025-12748.patch
-Patch3:         libvirt-qemu-tpm-do-not-update-profile-name-for-transient-domains.patch
-Patch4:         libvirt-qemu-Rename-outgoingMigration-parameter-in-various-TPM-functions.patch
-Patch5:         libvirt-qemu-Properly-propagate-migration-state-to-TPM-cleanup-code.patch
+Patch2:         CVE-2026-61477.patch
+Patch3:         CVE-2026-63622.patch
+Patch4:         CVE-2026-63623.patch
+Patch5:         CVE-2026-18917.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -253,7 +260,7 @@ BuildRequires: gcc
     %if %{with_libxl}
 BuildRequires: xen-devel
     %endif
-BuildRequires: glib2-devel >= 2.56
+BuildRequires: glib2-devel >= 2.66
 BuildRequires: libxml2-devel
 BuildRequires: readline-devel
 BuildRequires: bash-completion >= 2.0
@@ -275,12 +282,7 @@ BuildRequires: libnl3-devel
 BuildRequires: libselinux-devel
 BuildRequires: iptables
 BuildRequires: ebtables
-# For modprobe
-BuildRequires: kmod
 BuildRequires: cyrus-sasl-devel
-BuildRequires: polkit >= 0.112
-# For mount/umount in FS driver
-BuildRequires: util-linux
     %if %{with_qemu}
 # For managing ACLs
 BuildRequires: libacl-devel
@@ -291,10 +293,6 @@ BuildRequires: qemu-img
     %if %{with_nbdkit}
 BuildRequires: libnbd-devel
     %endif
-# For LVM drivers
-BuildRequires: lvm2
-# For pool type=iscsi
-BuildRequires: iscsi-initiator-utils
     %if %{with_storage_iscsi_direct}
 # For pool type=iscsi-direct
 BuildRequires: libiscsi-devel
@@ -334,13 +332,8 @@ BuildRequires: libwsman-devel >= 2.6.3
 BuildRequires: audit-libs-devel
 # we need /usr/sbin/dtrace
 BuildRequires: systemtap-sdt-devel
-# For mount/umount in FS driver
-BuildRequires: util-linux
 # For showmount in FS driver (netfs discovery)
 BuildRequires: nfs-utils
-    %if %{with_numad}
-BuildRequires: numad
-    %endif
     %if %{with_wireshark}
 # was disabled before ... stay disabled?
 BuildRequires: wireshark-devel
@@ -381,6 +374,8 @@ Requires: libvirt-daemon-lock = %{version}-%{release}
 Requires: libvirt-daemon-plugin-lockd = %{version}-%{release}
 Requires: libvirt-daemon-log = %{version}-%{release}
 Requires: libvirt-daemon-proxy = %{version}-%{release}
+# For modprobe and rmmod
+Requires: kmod
 
 %description daemon
 Server side daemon required to manage the virtualization capabilities
@@ -433,6 +428,7 @@ resources
 %package daemon-plugin-lockd
 Summary: lockd client plugin for virtlockd
 Requires: libvirt-libs = %{version}-%{release}
+Requires: libvirt-daemon-common = %{version}-%{release}
 Requires: libvirt-daemon-lock = %{version}-%{release}
 
 %description daemon-plugin-lockd
@@ -553,6 +549,9 @@ Requires: qemu-img
 Obsoletes: libvirt-daemon-driver-storage-rbd < 5.2.0
     %endif
 Obsoletes: libvirt-daemon-driver-storage-sheepdog < 8.8.0
+    %if !%{with_storage_zfs}
+Obsoletes: libvirt-daemon-driver-storage-zfs < 11.4.0
+    %endif
 
 %description daemon-driver-storage-core
 The storage driver plugin for the libvirtd daemon, providing
@@ -1015,9 +1014,15 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
 %endif
 
 %if %{with_esx}
-    %define arg_esx -Ddriver_esx=enabled -Dcurl=enabled
+    %define arg_esx -Ddriver_esx=enabled
 %else
-    %define arg_esx -Ddriver_esx=disabled -Dcurl=disabled
+    %define arg_esx -Ddriver_esx=disabled
+%endif
+
+%if %{with_esx} || %{with_ch}
+    %define arg_curl -Dcurl=enabled
+%else
+    %define arg_curl -Dcurl=disabled
 %endif
 
 %if %{with_hyperv}
@@ -1030,6 +1035,12 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
     %define arg_vmware -Ddriver_vmware=enabled
 %else
     %define arg_vmware -Ddriver_vmware=disabled
+%endif
+
+%if %{with_ch}
+    %define arg_ch -Ddriver_ch=enabled
+%else
+    %define arg_ch -Ddriver_ch=disabled
 %endif
 
 %if %{with_storage_rbd}
@@ -1128,6 +1139,12 @@ Libvirt plugin for NSS for translating domain names into IP addresses.
     %define arg_remote_mode -Dremote_default_mode=legacy
 %endif
 
+%if %{with_userfaultfd_sysctl}
+    %define arg_userfaultfd_sysctl -Duserfaultfd_sysctl=enabled
+%else
+    %define arg_userfaultfd_sysctl -Duserfaultfd_sysctl=disabled
+%endif
+
 %define when  %(date +"%%F-%%T")
 %define where %(hostname)
 %define who   %{?packager}%{!?packager:Unknown}
@@ -1143,6 +1160,8 @@ export SOURCE_DATE_EPOCH=$(stat --printf='%Y' %{_specdir}/libvirt.spec)
 %meson \
            -Drunstatedir=%{_rundir} \
            -Dinitconfdir=%{_sysconfdir}/sysconfig \
+           -Dunitdir=%{_unitdir} \
+           -Dsysusersdir=%{_sysusersdir} \
            %{?arg_qemu} \
            %{?arg_openvz} \
            %{?arg_lxc} \
@@ -1154,11 +1173,12 @@ export SOURCE_DATE_EPOCH=$(stat --printf='%Y' %{_specdir}/libvirt.spec)
            -Ddriver_remote=enabled \
            -Ddriver_test=enabled \
            %{?arg_esx} \
+           %{?arg_curl} \
            %{?arg_hyperv} \
            %{?arg_vmware} \
+           %{?arg_ch} \
            -Ddriver_vz=disabled \
            -Ddriver_bhyve=disabled \
-           -Ddriver_ch=disabled \
            %{?arg_remote_mode} \
            -Ddriver_interface=enabled \
            -Ddriver_network=enabled \
@@ -1206,9 +1226,13 @@ export SOURCE_DATE_EPOCH=$(stat --printf='%Y' %{_specdir}/libvirt.spec)
            -Dqemu_moddir=%{qemu_moddir} \
            -Dqemu_datadir=%{qemu_datadir} \
            -Dtls_priority=%{tls_priority} \
+           -Dsysctl_config=enabled \
+           %{?arg_userfaultfd_sysctl} \
+           -Dssh_proxy=enabled \
            %{?enable_werror} \
            -Dexpensive_tests=enabled \
            -Dinit_script=systemd \
+           -Dfirewall_backend_priority=%{firewall_backend_priority} \
            -Ddocs=enabled \
            -Dtests=enabled \
            -Drpath=disabled \
@@ -1271,6 +1295,10 @@ rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/libvirt/libxl.conf
 rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/libvirtd.libxl
 rm -f $RPM_BUILD_ROOT%{_datadir}/augeas/lenses/libvirtd_libxl.aug
 rm -f $RPM_BUILD_ROOT%{_datadir}/augeas/lenses/tests/test_libvirtd_libxl.aug
+    %endif
+    %if ! %{with_ch}
+rm -f $RPM_BUILD_ROOT%{_datadir}/augeas/lenses/libvirtd_ch.aug
+rm -f $RPM_BUILD_ROOT%{_datadir}/augeas/lenses/tests/test_libvirtd_ch.aug
     %endif
 
 # Copied into libvirt-docs subpackage eventually
@@ -1727,7 +1755,9 @@ exit 0
 %config(noreplace) %{_sysconfdir}/libvirt/libvirtd.conf
 %config(noreplace) %{_prefix}/lib/sysctl.d/60-libvirtd.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/libvirtd
+%dir %{_datadir}/augeas/lenses
 %{_datadir}/augeas/lenses/libvirtd.aug
+%dir %{_datadir}/augeas/lenses/tests
 %{_datadir}/augeas/lenses/tests/test_libvirtd.aug
 %attr(0755, root, root) %{_sbindir}/libvirtd
 %{_mandir}/man8/libvirtd.8*
@@ -1748,9 +1778,11 @@ exit 0
 %dir %attr(0755, root, root) %{_libdir}/libvirt/connection-driver/
 %dir %attr(0755, root, root) %{_libdir}/libvirt/storage-backend/
 %dir %attr(0755, root, root) %{_libdir}/libvirt/storage-file/
+%dir %attr(0755, root, root) %{_libdir}/libvirt/lock-driver/
 %{_datadir}/polkit-1/actions/org.libvirt.unix.policy
 %{_datadir}/polkit-1/actions/org.libvirt.api.policy
 %{_datadir}/polkit-1/rules.d/50-libvirt.rules
+%{_sysusersdir}/libvirt.conf
 %dir %attr(0700, root, root) %{_localstatedir}/log/libvirt/
 %attr(0755, root, root) %{_libexecdir}/libvirt_iohelper
 %attr(0755, root, root) %{_bindir}/virt-ssh-helper
@@ -1781,7 +1813,6 @@ exit 0
 %{_mandir}/man8/virtlockd.8*
 
 %files daemon-plugin-lockd
-%dir %attr(0755, root, root) %{_libdir}/libvirt/lock-driver/
 %attr(0755, root, root) %{_libdir}/libvirt/lock-driver/lockd.so
 
 %files daemon-log
@@ -1920,7 +1951,6 @@ exit 0
 %ghost %dir %{_rundir}/libvirt/storage/
 %{_libdir}/libvirt/connection-driver/libvirt_driver_storage.so
 %{_libdir}/libvirt/storage-backend/libvirt_storage_backend_fs.so
-%{_libdir}/libvirt/storage-file/libvirt_storage_file_fs.so
 %{_mandir}/man8/virtstoraged.8*
 
 %files daemon-driver-storage-disk
@@ -1962,10 +1992,12 @@ exit 0
     %if %{with_qemu}
 %files daemon-driver-qemu
 %config(noreplace) %{_sysconfdir}/libvirt/virtqemud.conf
+    %if %{with_userfaultfd_sysctl}
 %config(noreplace) %{_prefix}/lib/sysctl.d/60-qemu-postcopy-migration.conf
+    %endif
 %{_datadir}/augeas/lenses/virtqemud.aug
 %{_datadir}/augeas/lenses/tests/test_virtqemud.aug
-%{_prefix}/lib/sysusers.d/libvirt-qemu.conf
+%{_sysusersdir}/libvirt-qemu.conf
 %{_unitdir}/virtqemud.service
 %{_unitdir}/virtqemud.socket
 %{_unitdir}/virtqemud-ro.socket
@@ -1977,11 +2009,11 @@ exit 0
 %config(noreplace) %{_sysconfdir}/libvirt/qemu.conf
 %config(noreplace) %{_sysconfdir}/libvirt/qemu-lockd.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/libvirtd.qemu
-%ghost %dir %{_rundir}/libvirt/qemu/
-%ghost %dir %{_rundir}/libvirt/qemu/dbus/
-%ghost %dir %{_rundir}/libvirt/qemu/passt/
-%ghost %dir %{_rundir}/libvirt/qemu/slirp/
-%ghost %dir %{_rundir}/libvirt/qemu/swtpm/
+%ghost %dir %attr(0755, %{qemu_user}, %{qemu_group}) %{_rundir}/libvirt/qemu/
+%ghost %dir %attr(0770, %{qemu_user}, %{qemu_group}) %{_rundir}/libvirt/qemu/dbus/
+%ghost %dir %attr(0755, %{qemu_user}, %{qemu_group}) %{_rundir}/libvirt/qemu/passt/
+%ghost %dir %attr(0755, %{qemu_user}, %{qemu_group}) %{_rundir}/libvirt/qemu/slirp/
+%ghost %dir %attr(0770, %{qemu_user}, %{qemu_group}) %{_rundir}/libvirt/qemu/swtpm/
 %dir %attr(0751, %{qemu_user}, %{qemu_group}) %{_localstatedir}/lib/libvirt/qemu/
 %dir %attr(0751, %{qemu_user}, %{qemu_group}) %{_localstatedir}/lib/libvirt/qemu/checkpoint/
 %dir %attr(0751, %{qemu_user}, %{qemu_group}) %{_localstatedir}/lib/libvirt/qemu/dump/
@@ -2197,6 +2229,16 @@ exit 0
 %endif
 
 %changelog
+* Tue Aug 25 2026 Harshit Gupta <guptaharshit@microsoft.com> - 11.9.0-1
+- Upgrade to 11.9.0.
+- Remove patches fixed or superseded upstream.
+
+* Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.10.0-4
+- Patch for CVE-2026-18917
+
+* Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.10.0-3
+- Patch for CVE-2026-63623, CVE-2026-63622, CVE-2026-61477
+
 * Tue Mar 24 2026 Harshit Gupta <guptaharshit@microsoft.com> - 10.10.0-2
 - Add patches from https://gitlab.com/redhat/centos-stream/rpms/libvirt
   to fix TPM handling in QEMU migrations.
@@ -2216,11 +2258,14 @@ exit 0
 * Fri Nov 21 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.0.0-6
 - Patch for CVE-2025-13193
 
-* Thu May 15 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-5
+* Sat May 24 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-5
 - Fixes CVE-2024-4418 with an upstream patch
 
 * Fri May 23 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-4
 - Fix for CVE-2024-1441 and CVE-2024-2494
+
+* Thu May 15 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-5
+- Fixes CVE-2024-4418 with an upstream patch
 
 * Thu May 30 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 10.0.0-3
 - Add patch to libvirt.conf to work with kubevirt.

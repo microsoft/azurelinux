@@ -1,7 +1,7 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
 Version:        3.17.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,8 @@ Patch2:         CVE-2024-53580.patch
 Patch3:         CVE-2025-54350.patch
 Patch4:         CVE-2025-54349.patch
 Patch5:         openssl_encrypt_buffer_size.patch
+Patch6:         CVE-2026-71217.patch
+Patch7:         CVE-2026-71218.patch
 BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
 BuildRequires:  openssl
@@ -72,6 +74,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.17.1-5
+- Patch for CVE-2026-71218, CVE-2026-71217
+
 * Tue Oct 14 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.17.1-4
 - Patch for openssl buffer size issue during RSA encryption
 

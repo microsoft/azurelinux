@@ -1,7 +1,7 @@
 Summary:        Package to create the cloud-provider-kubevirt binary.
 Name:           cloud-provider-kubevirt
 Version:        0.5.1
-Release:        5%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubevirt/cloud-provider-kubevirt/
 Group:          System/Management
@@ -13,7 +13,7 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # We can use the generate-source-tarball.sh script in the given folder along with the package version to build the tarball automatically.
 # In case we need to re-build this file manually:
-#   1. wget https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   1. wget https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs/tags/v%%{version}.tar.gz#/%%{name}-%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. Apply golang-version-upgrade.patch
@@ -37,6 +37,9 @@ Patch8:         CVE-2026-42506.patch
 Patch9:         CVE-2026-25680.patch
 Patch10:        CVE-2026-25681.patch
 Patch11:        CVE-2026-42502.patch
+Patch12:        CVE-2026-56852.patch
+Patch13:        CVE-2026-73500.patch
+Patch14:        CVE-2026-37236.patch
 %global debug_package %{nil}
 BuildRequires:  golang < 1.25
 
@@ -77,6 +80,15 @@ make test
 %{_bindir}/kubevirt-cloud-controller-manager
 
 %changelog
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.5.1-8
+- Patch for CVE-2026-37236
+
+* Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.5.1-7
+- Patch for CVE-2026-73500
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.5.1-6
+- Patch for CVE-2026-56852
+
 * Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.5.1-5
 - Patch for CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
 

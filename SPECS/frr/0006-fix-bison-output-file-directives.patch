@@ -1,0 +1,46 @@
+From 82dcd117d0ac8a34096b3f721d85f71fdd61023a Mon Sep 17 00:00:00 2001
+From: Swapnil Sahu <v-swapsahu@microsoft.com>
+Date: Sat, 22 Aug 2026 12:43:36 +0000
+Subject: [PATCH] pass bison output file names on the command line
+
+Hardened bison (CVE-2026-56390/56389) rejects %output/%defines directives whose
+value contains a slash, breaking FRR's "lib/command_parse.c" build. Drop those
+directives and pass the output path via bison's -o flag in the .y.c rule instead.
+
+---
+ lib/command_parse.y | 5 ++---
+ lib/subdir.am       | 2 +-
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/lib/command_parse.y b/lib/command_parse.y
+index fdb36c3..ea199dd 100644
+--- a/lib/command_parse.y
++++ b/lib/command_parse.y
+@@ -16,9 +16,8 @@
+ %define api.pure full
+ /* define api.prefix {cmd_yy} */
+ 
+-/* names for generated header and parser files */
+-%defines "lib/command_parse.h"
+-%output  "lib/command_parse.c"
++/* Output/header file names are supplied on the bison command line (-o) in
++ * lib/subdir.am; hardened bison rejects %output/%defines paths with a slash. */
+ 
+ /* note: code blocks are output in order, to both .c and .h:
+  *  1. %code requires
+diff --git a/lib/subdir.am b/lib/subdir.am
+index a598fe4..f667dd3 100644
+--- a/lib/subdir.am
++++ b/lib/subdir.am
+@@ -534,7 +534,7 @@ CLEANFILES += vtysh/vtysh_cmd.c $(vtysh_cmd_split)
+ .l.c:
+ 	$(AM_V_LEX)$(am__skiplex) $(LEXCOMPILE) $<
+ .y.c:
+-	$(AM_V_YACC)$(am__skipyacc) $(YACCCOMPILE) $<
++	$(AM_V_YACC)$(am__skipyacc) $(YACCCOMPILE) -o $@ $<
+ 
+ #
+ # generated sources & extra foo
+-- 
+2.45.4
+

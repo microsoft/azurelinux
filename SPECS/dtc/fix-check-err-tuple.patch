@@ -1,0 +1,19 @@
+--- a/pylibfdt/libfdt.i
++++ b/pylibfdt/libfdt.i
+@@ -293,9 +293,14 @@
+             index: Record to return (0=first)
+ 
+         Returns:
+-            Number of memory reserve-map records
++            List containing [address, size] for the memory reserve-map record
+         """
+-        return check_err(fdt_get_mem_rsv(self._fdt, index), quiet)
++        ret = fdt_get_mem_rsv(self._fdt, index)
++        if isinstance(ret, (list, tuple)):
++            # SWIG returns (errcode, address, size); check errcode and strip it
++            check_err(ret[0], quiet)
++            return list(ret[1:])
++        return check_err(ret, quiet)
+ 
+     def subnode_offset(self, parentoffset, name, quiet=()):
+         """Get the offset of a named subnode

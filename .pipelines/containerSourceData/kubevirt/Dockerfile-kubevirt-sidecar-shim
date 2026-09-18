@@ -1,0 +1,16 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN useradd -u 1001 --create-home -s /bin/bash sidecar-shim
+USER 1001
+
+#simple smoke test
+RUN ls /usr/bin/sidecar-shim
+
+ENTRYPOINT [ "/usr/bin/sidecar-shim" ]

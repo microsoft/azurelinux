@@ -1,14 +1,14 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
 Version:        0.0.10
-Release:        6%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
 Group:          Applications/Text
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-#Note that the source file should be renamed to the format {name}-%{version}.tar.gz
+#Note that the source file should be renamed to the format %%{name}-%%{version}.tar.gz
 
 # Steps to manually create the vendor tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
@@ -31,6 +31,9 @@ Patch8:        CVE-2026-27136.patch
 Patch9:        CVE-2026-25680.patch
 Patch10:       CVE-2026-25681.patch
 Patch11:       CVE-2026-42502.patch
+Patch12:       CVE-2026-56852.patch
+Patch13:       CVE-2026-73500.patch
+Patch14:       CVE-2026-37236.patch
 
 BuildRequires: golang >= 1.22
 
@@ -51,6 +54,15 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.10-9
+- Patch for CVE-2026-37236
+
+* Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.10-8
+- Patch for CVE-2026-73500
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.10-7
+- Patch for CVE-2026-56852
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.10-6
 - Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
 

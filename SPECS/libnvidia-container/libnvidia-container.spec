@@ -4,7 +4,7 @@
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
 Version:        1.17.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,7 +21,7 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  make
 BuildRequires:  rpcsvc-proto
 BuildRequires:  which
-BuildRequires:  golang < 1.24.0
+BuildRequires:  golang
 
 %description
 The nvidia-container library provides an interface to configure GNU/Linux
@@ -135,6 +135,9 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Fri Jul 10 2026 Henry Li <lihl@microsoft.com> - 1.17.8-2
+- Remove golang version cap
+
 * Thu Jul 24 2025 Sam Meluch <sammeluch@microsoft.com> - 1.17.8-1
 - Upgrade to version 1.17.8 in sync with nvidia-container-toolkit
 

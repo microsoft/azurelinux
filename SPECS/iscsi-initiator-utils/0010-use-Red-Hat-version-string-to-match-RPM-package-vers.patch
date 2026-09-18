@@ -16,8 +16,8 @@ index a0859b7..7ae461a 100644
  DESTDIR ?=
  
  # our VERSION String
--ISCSI_VERSION_STR ?= 2.1.9
-+ISCSI_VERSION_STR ?= 6.2.1.9
+-ISCSI_VERSION_STR ?= 2.1.12
++ISCSI_VERSION_STR ?= 6.2.1.12
  
  prefix = /usr
  exec_prefix =
@@ -29,8 +29,8 @@ index d49afbb..ab67096 100644
  
  project('open-iscsi', 'c',
    meson_version: '>= 0.54.0',
--  version: '2.1.9',
-+  version: '6.2.1.9',
+-  version: '2.1.12',
++  version: '6.2.1.12',
    license: 'LGPL-2.1-or-later',
    default_options: [
      'c_std=gnu99',

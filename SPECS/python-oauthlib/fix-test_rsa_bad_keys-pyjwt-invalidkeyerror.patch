@@ -1,0 +1,44 @@
+From 10e7a76e78d027a43fa88dbe133bc3e46e0af99b Mon Sep 17 00:00:00 2001
+From: Shawn Zivontsis <shawnz@shawnz.org>
+Date: Mon, 12 Aug 2024 12:29:28 -0400
+Subject: [PATCH] Fix new exception type for invalid key
+
+PyJWT changed RSAAlgorithm.prepare_key() to raise jwt.exceptions.InvalidKeyError
+(instead of letting the underlying ValueError from `cryptography` propagate)
+when it cannot parse a malformed PEM key string. InvalidKeyError is not a
+subclass of ValueError, so oauthlib's test_rsa_bad_keys test - which asserts
+that signing with the malformed key 'foobar' raises ValueError - fails with
+this newer PyJWT.
+
+This is a backport of the upstream fix from oauthlib 3.3.0:
+https://github.com/oauthlib/oauthlib/commit/3ba8fd6109ac1f9314215f3373027d86c032dffc
+https://github.com/oauthlib/oauthlib/issues/877
+
+Upstream Patch reference: https://github.com/oauthlib/oauthlib/commit/10e7a76e78d027a43fa88dbe133bc3e46e0af99b.patch
+--- a/tests/oauth1/rfc5849/test_signatures.py
++++ b/tests/oauth1/rfc5849/test_signatures.py
+@@ -1,4 +1,5 @@
+ # -*- coding: utf-8 -*-
++from jwt import InvalidKeyError
+ from oauthlib.oauth1.rfc5849.signature import (
+     base_string_uri, collect_parameters, normalize_parameters,
+     sign_hmac_sha1_with_client, sign_hmac_sha256_with_client,
+@@ -764,12 +765,17 @@
+ 
+         # Signing needs a private key
+ 
+-        for bad_value in [None, '', 'foobar']:
++        for bad_value in [None, '']:
+             self.assertRaises(ValueError,
+                               sign_rsa_sha1_with_client,
+                               self.eg_signature_base_string,
+                               MockClient(rsa_key=bad_value))
+ 
++        self.assertRaises(InvalidKeyError,
++                          sign_rsa_sha1_with_client,
++                          self.eg_signature_base_string,
++                          MockClient(rsa_key='foobar'))
++
+         self.assertRaises(AttributeError,
+                           sign_rsa_sha1_with_client,
+                           self.eg_signature_base_string,

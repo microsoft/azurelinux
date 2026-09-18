@@ -3,7 +3,7 @@
 Summary:        Extended http(s) Connections
 Name:           rubygem-%{gem_name}
 Version:        0.102.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Group:          Development/Languages
 URL:            https://github.com/excon/excon
 Source0:        https://github.com/excon/excon/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Patch0:         fix-file_list.patch
+Patch1:         CVE-2026-54171.patch
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
@@ -32,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.102.0-2
+- Patch for CVE-2026-54171
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.102.0-1
 - Auto-upgrade to 0.102.0 - Azure Linux 3.0 - package upgrades
 

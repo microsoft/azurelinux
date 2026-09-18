@@ -83,7 +83,7 @@ python3 pip_build.py --install
 
 
 %changelog
-* Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-8
+* Tue Aug 04 2026 Sushil Sati <v-sushilsati@microsoft.com> - 3.3.3-8
 - Patch for CVE-2026-12480
 
 * Tue Apr 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-7

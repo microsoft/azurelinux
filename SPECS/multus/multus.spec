@@ -19,7 +19,7 @@
 Summary:        CNI plugin providing multiple interfaces in containers
 Name:           multus
 Version:        4.0.2
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +41,7 @@ Patch9:         CVE-2026-42506.patch
 Patch10:        CVE-2026-25680.patch
 Patch11:        CVE-2026-25681.patch
 Patch12:        CVE-2026-42502.patch
+Patch13:        CVE-2026-56852.patch
 BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 
@@ -83,6 +84,9 @@ install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.0.2-10
+- Patch for CVE-2026-56852
+
 * Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.0.2-9
 - Patch for CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
 

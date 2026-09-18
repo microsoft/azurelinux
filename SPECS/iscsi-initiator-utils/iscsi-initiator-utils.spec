@@ -1,18 +1,16 @@
-%global commit0			c26218d9f8afdca44a492a4c3811648bd2880b26
-
 # Disable python2 build by default
 %bcond_with python2
 %bcond_without python3
 
 Summary:        iSCSI daemon and utility programs
 Name:           iscsi-initiator-utils
-Version:        2.1.9
+Version:        2.1.12
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.open-iscsi.com/
-Source0:        https://github.com/open-iscsi/open-iscsi/archive/%{commit0}.tar.gz#/open-iscsi-%{version}-%{commit0}.tar.gz
+Source0:        https://github.com/open-iscsi/open-iscsi/archive/refs/tags/%{version}.tar.gz#/open-iscsi-%{version}.tar.gz
 Source4:        04-iscsi
 Source5:        iscsi-tmpfiles.conf
 
@@ -113,7 +111,7 @@ libiscsi interface for interacting with %{name}
 # ended with python3
  
 %prep
-%autosetup -p1 -n open-iscsi-%{commit0} -Sgit_am
+%autosetup -p1 -n open-iscsi-%{version} -Sgit_am
  
 %build
 # avoid undefined references linking failures
@@ -152,14 +150,11 @@ rm $RPM_BUILD_ROOT/etc/iscsi/initiatorname.iscsi
 rm $RPM_BUILD_ROOT/etc/udev/rules.d/50-iscsi-firmware-login.rules
 rm $RPM_BUILD_ROOT/usr/lib/systemd/system-generators/ibft-rule-generator
 rm $RPM_BUILD_ROOT/usr/sbin/brcm_iscsiuio
-rm $RPM_BUILD_ROOT/usr/sbin/iscsi-gen-initiatorname
 rm $RPM_BUILD_ROOT/usr/sbin/iscsi_discovery
 rm $RPM_BUILD_ROOT/usr/sbin/iscsi_fw_login
 rm $RPM_BUILD_ROOT/usr/sbin/iscsi_offload
-rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi-gen-initiatorname.8
 rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi_discovery.8
 rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi_fw_login.8
-rm $RPM_BUILD_ROOT/var/lib/iscsi/ifaces/iface.example
  
 %{__install} -d $RPM_BUILD_ROOT%{_libexecdir}
 %{__install} -pm 755 etc/systemd/iscsi-mark-root-nodes $RPM_BUILD_ROOT%{_libexecdir}
@@ -187,6 +182,10 @@ pushd libiscsi
 %endif
 popd
  
+%check
+# libopeniscsiusr mkdir's only the leaf of its compiled-in DBROOT.
+mkdir -p %{_sharedstatedir}/iscsi/ifaces
+%meson_test
  
 %post
 %systemd_post iscsi.service iscsi-starter.service iscsid.service iscsid.socket iscsi-onboot.service iscsi-init.service iscsi-shutdown.service
@@ -211,6 +210,7 @@ popd
 systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || :
  
 %files
+%license COPYING
 %doc README
 %dir %{_sharedstatedir}/iscsi
 %dir %{_sharedstatedir}/iscsi/nodes
@@ -233,11 +233,13 @@ systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || 
 %{_tmpfilesdir}/iscsi.conf
 %dir %{_sysconfdir}/iscsi
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/iscsi/iscsid.conf
+%{_sbindir}/iscsi-gen-initiatorname
 %{_sbindir}/iscsi-iname
 %{_sbindir}/iscsiadm
 %{_sbindir}/iscsid
 %{_sbindir}/iscsistart
 %{_libdir}/libiscsi.so.0
+%{_mandir}/man8/iscsi-gen-initiatorname.8.gz
 %{_mandir}/man8/iscsi-iname.8.gz
 %{_mandir}/man8/iscsiadm.8.gz
 %{_mandir}/man8/iscsid.8.gz
@@ -276,6 +278,14 @@ systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || 
 %endif
 
 %changelog
+* Wed Aug 05 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.1.12-1
+- Update source to v2.1.12 to fix CVE-2026-44943 and CVE-2026-44944
+- Rebase downstream patches onto v2.1.12
+- Drop removal of no longer installed 'iface.example'
+- Retain 'iscsi-gen-initiatorname' required by 'iscsi-init.service'
+- Add '%%check' running the upstream 'libopeniscsiusr' test suite
+- Add missing '%%license' macro
+
 * Tue Jan 09 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 2.1.9
 - Update source to v2.1.9
 

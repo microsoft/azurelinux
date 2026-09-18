@@ -1,13 +1,14 @@
 Summary:        Device Tree Compiler
 Name:           dtc
 Version:        1.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://devicetree.org/
 Source0:        https://kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz
+Patch0:         fix-check-err-tuple.patch
 BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
@@ -78,6 +79,10 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.7.0-2
+- Add fix-check-err-tuple.patch to handle SWIG returning a tuple instead of
+  an integer from fdt_get_mem_rsv in pylibfdt.
+
 * Thu Feb 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.7.0-1
 - Update to version 1.7.0
 - Add %check section

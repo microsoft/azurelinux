@@ -2,7 +2,7 @@
 Summary:        Container class boilerplate killer
 Name:           python-%{srcname}
 Version:        5.0.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -71,11 +71,12 @@ rm -rf docs/_build/html/.buildinfo docs/_build/html/.doctrees
 
 %check
 # Perf tests require unmaintained 'characteristic' module
+# Pin pytest<9: pytest 9.x rejects duplicate parametrize IDs (test_tuple_pickle uses 'loads' twice)
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest>=5.4.0 \
+    'pytest>=5.4.0,<9' \
     pytest-cov>=2.7.1 \
     pytest-benchmark
 PATH=%{buildroot}%{_bindir}:${PATH} \
@@ -95,6 +96,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 5.0.0-12
+- Pin pytest<9 in %%check; pytest 9.x rejects duplicate parametrize IDs
+  (test_tuple_pickle uses `loads` twice).
+
 * Mon Mar 02 2026 Sumit Jena <v-sumitjena@microsoft.com> - 5.0.0-11
 - Added patch to avoid warnings while runnning ptests
 

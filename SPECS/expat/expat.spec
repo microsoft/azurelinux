@@ -1,14 +1,18 @@
 %define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
-Version:        2.8.2
-Release:        1%{?dist}
+Version:        2.8.3
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2026-66046.patch
+Patch1:         CVE-2026-76641.patch
+Patch2:         CVE-2026-76956.patch
+Patch3:         CVE-2026-76957.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -66,6 +70,12 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Fri Aug 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.8.3-2
+- Patch for CVE-2026-76957, CVE-2026-76956, CVE-2026-76641, CVE-2026-66046
+
+* Tue Aug 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8.3-1
+- Auto-upgrade to 2.8.3 - for CVE-2026-72522
+
 * Mon Jun 22 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.8.2-1
 - Upgrade to 2.8.2 to fix multiple CVEs
 

@@ -3,7 +3,7 @@
 # Shared object version of libkcapi.
 %global vmajor            1
 %global vminor            5
-%global vpatch            0
+%global vpatch            1
 # This package needs at least Linux Kernel v4.10.0.
 %global min_kernel_ver    4.10.0
 # Do we need to tweak sysctl.d? In newer versions of the Linux
@@ -65,12 +65,12 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.chronox.de/%{name}.html
-Source0:        https://www.chronox.de/%{name}/releases/%{version}/%{name}-1.5.0.tar.xz
+Source0:        https://www.chronox.de/%{name}/releases/%{version}/%{name}-%{version}.tar.xz
 BuildRequires:  bash
 BuildRequires:  clang
 BuildRequires:  coreutils
@@ -275,6 +275,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libexecdir}/%{name}/*
 
 %changelog
+* Mon Aug 10 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.5.1-1
+- Upgrade to version 1.5.1.
+- Fixes CVE-2026-71225, CVE-2026-71226, CVE-2026-71227.
+
 * Tue May 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.5.0-2
 - Install hard links from apps_hmaccalc to kcapi-hasher to
     resolve incompatibility with dracut.

@@ -1,12 +1,13 @@
 Summary:        A library for access to RESTful web services
 Name:           rest
 Version:        0.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.gnome.org
 Source0:        https://download.gnome.org/sources/%{name}/0.9/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-16615.patch
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  libsoup-devel
@@ -33,7 +34,7 @@ Requires:       %{name} = %{version}-%{release}
 Files for development with %{name}.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %meson -Dsoup2=false -Dgtk_doc=false
@@ -66,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/gir-1.0/RestExtras-1.0.gir
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.9.0-2
+- Patch for CVE-2026-16615
+
 * Fri Jan 28 2022 Henry Li <lihl@microsoft.com> - 0.9.0-1
 - Upgrade to version 0.9.0
 - Remove patch that no longer applies

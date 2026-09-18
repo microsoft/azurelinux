@@ -1,0 +1,44 @@
+From a95fe9d5ba2ce313b7f6fc932f8e010a9662a0d2 Mon Sep 17 00:00:00 2001
+From: Avadhut Naik <avadhut.naik@amd.com>
+Date: Wed, 5 Aug 2026 11:24:59 -0400
+Subject: [PATCH] rasdaemon: Fix SMCA bank type decoding
+
+Bits 47:44 of the MCA_IPID register are either reserved or, on some
+modern AMD systems viz. Genoa, denote the InstanceIdHi value. The bits
+therefore, should not be associated with SMCA bank type decoding.
+
+Mask out bits 47:44 before matching the register against the cached
+(HWID, MCATYPE) tuples so that bank type decoding is not erroneous.
+
+This is a backport of upstream rasdaemon commit b6a64416 adapted to the
+0.8.0 (HWID, MCATYPE) tuple encoding, which does not repack the tuple
+table nor contain the fixup_hwid() helper introduced in later releases.
+---
+ mce-amd-smca.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/mce-amd-smca.c b/mce-amd-smca.c
+index 27ca8aa..53e1367 100644
+--- a/mce-amd-smca.c
++++ b/mce-amd-smca.c
+@@ -564,7 +564,16 @@ static void decode_smca_error(struct mce_event *e)
+ 	const char *ip_name;
+ 	unsigned short xec = (e->status >> 16) & 0x3f;
+ 	const struct smca_hwid *s_hwid;
+-	uint32_t mcatype_hwid = EXTRACT(e->ipid, 32, 63);
++	/*
++	 * Bits 47:44 of the MCA_IPID register do not play a part in SMCA bank
++	 * type decoding. They are either reserved or, on some modern AMD systems
++	 * (e.g. Genoa), denote the InstanceIdHi value. They are not guaranteed to
++	 * be zero, so mask them out before comparing against the (HWID, MCATYPE)
++	 * tuples cached in smca_hwid_mcatypes[]; otherwise bank type decoding can
++	 * be erroneous. Backport of upstream commit b6a64416 ("rasdaemon: Fix
++	 * SMCA bank type decoding") adapted to the 0.8.0 tuple encoding.
++	 */
++	uint32_t mcatype_hwid = EXTRACT(e->ipid, 32, 63) & ~0x0000f000U;
+ 	uint8_t mcatype_instancehi = EXTRACT(e->ipid, 44, 47);
+ 	unsigned int csrow = -1, channel = -1;
+ 	unsigned int i;
+-- 
+2.50.1 (Apple Git-155)
+

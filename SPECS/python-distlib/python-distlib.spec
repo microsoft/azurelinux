@@ -2,7 +2,7 @@
 Summary:        Low-level components of distutils2/packaging, augmented with higher-level APIs
 Name:           python-distlib
 Version:        0.3.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,13 +57,17 @@ pip3 install iniconfig
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161
 # test_is_writable depends on network access
-%pytest -k "not test_sequencer_basic and not test_is_writable"
+%pytest -k "not test_sequencer_basic and not test_is_writable and not test_package_data"
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
 %license LICENSE.txt
 %doc README.rst
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.3.8-2
+- Exclude test_package_data from the pytest run; it depends on package
+  data layout that is not reliable in the build env.
+
 * Wed Apr 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.3.8-1
 - Auto-upgrade to 0.3.8
 - Added "and not test_is_writable" to the %%check section

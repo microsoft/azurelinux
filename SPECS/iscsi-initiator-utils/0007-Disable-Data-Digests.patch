@@ -9,10 +9,10 @@ Subject: [PATCH 6/6] Disable Data Digests
  2 files changed, 11 insertions(+), 11 deletions(-)
  
 diff --git a/etc/iscsid.conf b/etc/iscsid.conf
-index ec4d4df..e009c29 100644
+index d173437..7719522 100644
 --- a/etc/iscsid.conf
 +++ b/etc/iscsid.conf
-@@ -285,27 +285,23 @@ discovery.sendtargets.iscsi.MaxRecvDataSegmentLength = 32768
+@@ -308,27 +308,23 @@ discovery.sendtargets.iscsi.MaxRecvDataSegmentLength = 32768
  
  # To allow the targets to control the setting of the digest checking,
  # with the initiator requesting a preference of enabling the checking,
@@ -46,12 +46,12 @@ index ec4d4df..e009c29 100644
 +# The default is to never use HeaderDigests.
  #
  
- # For multipath configurations, you may want more than one session to be
+ # When using iSCSI over long range links with high round-trip time
 diff --git a/usr/idbm.c b/usr/idbm.c
-index ca4a4ec..32e99bc 100644
+index 22a1942..56490e7 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
-@@ -568,9 +568,13 @@ idbm_recinfo_node(node_rec_t *r, recinfo_t *ri)
+@@ -578,9 +578,13 @@ idbm_recinfo_node(node_rec_t *r, recinfo_t *ri)
  				 IDBM_SHOW, "None", "CRC32C", "CRC32C,None",
  				 "None,CRC32C", num, 1);
  		sprintf(key, CONN_DATA_DIGEST, i);

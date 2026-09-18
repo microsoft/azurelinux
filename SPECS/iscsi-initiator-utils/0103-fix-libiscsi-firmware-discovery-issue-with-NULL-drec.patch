@@ -6,8 +6,7 @@ Subject: [PATCH 1/1] fix libiscsi firmware discovery issue with NULL drec
 
 ---
  libiscsi/libiscsi.c | 2 +-
- usr/idbm.c          | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libiscsi/libiscsi.c b/libiscsi/libiscsi.c
 index c598aee..bddf9fc 100644
@@ -22,18 +21,5 @@ index c598aee..bddf9fc 100644
  
  		strlcpy(new_node->name, rec->name, LIBISCSI_VALUE_MAXLEN);
  		new_node->tpgt = rec->tpgt;
-diff --git a/usr/idbm.c b/usr/idbm.c
-index e9025bf..9cc9c40 100644
---- a/usr/idbm.c
-+++ b/usr/idbm.c
-@@ -2536,7 +2536,7 @@ int idbm_add_node(node_rec_t *newrec, discovery_rec_t *drec, int overwrite)
- 		if (rc)
- 			goto unlock;
- 
--		if (drec->type == DISCOVERY_TYPE_FW) {
-+		if (drec && drec->type == DISCOVERY_TYPE_FW) {
- 			log_debug(8, "setting firmware node 'startup' to 'onboot'");
- 			newrec->startup = ISCSI_STARTUP_ONBOOT;
- 			newrec->conn[0].startup = ISCSI_STARTUP_ONBOOT;
 -- 
 2.36.1

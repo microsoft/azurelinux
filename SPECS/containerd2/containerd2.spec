@@ -1,11 +1,11 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 193637f7ee8ae5f5aa5248f49e7baa3e6164966e
+%define commit_hash db8809540e1a7a9da5d518876894933ff55692ab
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.2.4
-Release: 4%{?dist}
+Version: 2.3.4
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -18,24 +18,14 @@ Source2: containerd.toml
 
 Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
-Patch2:	CVE-2026-39882.patch
-Patch3:	CVE-2026-33814.patch
-Patch4:	fix-TestCgroupNamespace-cgroupv1.patch
-Patch5:	CVE-2026-39821.patch
-Patch6:	CVE-2026-42506.patch
-Patch7:	CVE-2026-27136.patch
-Patch8:	CVE-2026-53488.patch
-Patch9:	CVE-2026-53492.patch
-Patch10:	CVE-2026-50195.patch
-Patch11:	CVE-2026-53489.patch
-Patch12:	CVE-2026-47262.patch
-Patch13:	CVE-2026-25680.patch
-Patch14:	CVE-2026-25681.patch
-Patch15:	CVE-2026-42502.patch
+Patch2:	fix-TestCgroupNamespace-cgroupv1.patch
+Patch3:	CVE-2026-56852.patch
+Patch4:	CVE-2026-37236.patch
 
 %{?systemd_requires}
 
-BuildRequires: golang < 1.25
+# Temporarily stay on Go 1.26 until the Go 1.27 ML-KEM backend is fixed.
+BuildRequires: (golang < 1.27 with golang >= 1.26.7)
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -69,10 +59,13 @@ used directly by developers or end-users.
 
 %build
 export BUILDTAGS="-mod=vendor"
+# Go 1.26 requires this experiment for cgo-less OpenSSL systemcrypto.
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
@@ -108,6 +101,31 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
+- Upgrade to 2.3.4
+- Remove CVE patches fixed upstream
+- Rebase multi-snapshotter support and CVE-2026-56852 patches
+
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-9
+- Patch for CVE-2026-37236
+
+* Thu Sep 03 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-8
+- Temporarily build with Microsoft Go 1.26 to avoid the Go 1.27 systemcrypto
+  ML-KEM panic on OpenSSL 3.3.
+- Restore GOEXPERIMENT=ms_nocgo_opensslcrypto for the Go 1.26 cgo-less OpenSSL
+  backend.
+
+* Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.2.4-7
+- Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
+  now selected automatically and supports CGO_ENABLED=0 on Linux.
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-6
+- Patch for CVE-2026-56852
+
+* Thu Jul 09 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-5
+- Remove 'BuildRequires: golang < 1.25' and set GOEXPERIMENT=ms_nocgo_opensslcrypto
+  to build with the default Go toolchain, resolving Go stdlib CVE-2026-25679,
+  CVE-2026-27139, CVE-2026-33811, CVE-2026-39836 (was built on Go 1.24.13).
 
 * Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-4
 - Patch for CVE-2026-42502, CVE-2026-25681, CVE-2026-25680

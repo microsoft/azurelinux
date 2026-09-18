@@ -3344,7 +3344,7 @@ index 0000000..caa4e66
 --- /dev/null
 +++ b/libiscsi/setup.py
 @@ -0,0 +1,9 @@
-+from distutils.core import setup, Extension
++from setuptools import setup, Extension
 +
 +module1 = Extension('libiscsi',
 +                    sources = ['pylibiscsi.c'],

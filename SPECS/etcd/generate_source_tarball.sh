@@ -5,6 +5,11 @@
 # Quit on failure
 set -e
 
+# etcd's go.mod files pin a newer Go release via the 'toolchain' directive than
+# the base system Go. Default to automatic toolchain selection so 'go' fetches
+# the required version on demand. An explicit GOTOOLCHAIN set by the caller wins.
+export GOTOOLCHAIN="${GOTOOLCHAIN:-auto}"
+
 PKG_VERSION=""
 SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -106,11 +111,29 @@ for component in server etcdctl etcdutl; do
     popd
 done
 
+# The dump tools are standalone modules that depend on etcd's in-tree modules.
+# Point every etcd dependency at the local source (relative to tools/<component>)
+# before running 'go mod tidy'. Without these replace rules, tidy resolves the
+# etcd modules from the network, pulling newer releases that require an even
+# newer Go toolchain and that have relocated packages (e.g. mvcc/backend,
+# mvcc/buckets), which breaks the build.
+etcd_local_modules=(
+    "go.etcd.io/etcd/api/v3=../../api"
+    "go.etcd.io/etcd/client/pkg/v3=../../client/pkg"
+    "go.etcd.io/etcd/client/v2=../../client/v2"
+    "go.etcd.io/etcd/client/v3=../../client/v3"
+    "go.etcd.io/etcd/pkg/v3=../../pkg"
+    "go.etcd.io/etcd/raft/v3=../../raft"
+    "go.etcd.io/etcd/server/v3=../../server"
+)
 for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     echo "==================================="
     echo "Get vendored modules for $component"
     go mod init go.etcd.io/etcd/tools/$component/v3
+    for replace_rule in "${etcd_local_modules[@]}"; do
+        go mod edit -replace "$replace_rule"
+    done
     go mod tidy
     go mod vendor
 

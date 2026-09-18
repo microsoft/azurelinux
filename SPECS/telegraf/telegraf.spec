@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        25%{?dist}
+Release:        32%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,7 +9,7 @@ Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarbbal.sh script to get the vendored sources.
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-v1-vendor.tar.gz
 
 Patch0:         CVE-2024-35255.patch
 Patch1:         CVE-2024-37298.patch
@@ -58,9 +58,23 @@ Patch41:        CVE-2026-39828.patch
 Patch43:        CVE-2026-39835.patch
 Patch44:        CVE-2026-42502.patch
 Patch45:        CVE-2026-46598.patch
-Patch46:        CVE-2025-29923.patch
-Patch47:        CVE-2025-46327.patch
-Patch48:        CVE-2026-54908.patch
+Patch46:        CVE-2026-58207.patch
+Patch47:        CVE-2026-58208.patch
+Patch48:        CVE-2026-58209.patch
+Patch49:        CVE-2026-58250.patch
+Patch50:        CVE-2026-58251.patch
+Patch51:        CVE-2026-58252.patch
+Patch52:        CVE-2026-58253.patch
+Patch53:        CVE-2026-56852.patch
+Patch54:        CVE-2025-29923.patch
+Patch55:        CVE-2025-46327.patch
+Patch56:        CVE-2026-54908.patch
+Patch57:        CVE-2026-54332.patch
+Patch58:        CVE-2026-65819.patch
+Patch59:        CVE-2026-79921.patch
+Patch60:        CVE-2026-37236.patch
+Patch61:        CVE-2026-56855.patch
+Patch62:        CVE-2026-78662.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -125,12 +139,33 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-* Thu Jul 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-25
+* Wed Sep 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-32
+- Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
+
+* Mon Aug 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-31
+- Patch for CVE-2026-79921
+
+* Thu Aug 13 2026 Sushil Sati <v-sushilsati@microsoft.com> - 1.31.0-30
+- Patch for CVE-2026-65819
+
+* Sat Aug 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-29
+- Patch for CVE-2026-54332
+
+* Fri Aug 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-28
 - Patch for CVE-2026-54908
 
-* Thu Jun 04 2026 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-24
+* Fri Aug 07 2026 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-27
 - Patch CVE-2025-29923
 - Patch CVE-2025-46327
+
+* Mon Aug 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-26
+- Upgrade thrift module to 0.24.0
+
+* Tue Jul 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-25
+- Patch for CVE-2026-56852
+
+* Sun Jul 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-24
+- Patch for CVE-2026-58253, CVE-2026-58252, CVE-2026-58251, CVE-2026-58250, CVE-2026-58209, CVE-2026-58208, CVE-2026-58207
 
 * Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-23
 - Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680

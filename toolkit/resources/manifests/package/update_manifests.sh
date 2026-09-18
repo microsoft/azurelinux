@@ -289,6 +289,8 @@ generate_pkggen_core () {
         grep "^azurelinux-repos" $TmpPkgGen
         grep "^libffi-" $TmpPkgGen
         grep "^libtasn1-" $TmpPkgGen
+        grep "^chkconfig-[0-9]" $TmpPkgGen
+        grep "^chkconfig-lang-[0-9]" $TmpPkgGen
         grep "^p11-kit-" $TmpPkgGen
         grep "^ca-certificates-shared-" $TmpPkgGen
         grep "^ca-certificates-tools-" $TmpPkgGen
@@ -302,8 +304,6 @@ generate_pkggen_core () {
         grep "^slang-[0-9]" $TmpPkgGen
         grep "^newt-[0-9]" $TmpPkgGen
         grep "^newt-lang-[0-9]" $TmpPkgGen
-        grep "^chkconfig-[0-9]" $TmpPkgGen
-        grep "^chkconfig-lang-[0-9]" $TmpPkgGen
         grep "^msopenjdk-" $TmpPkgGen
         grep "^pyproject-" $TmpPkgGen
         grep "^audit-" $TmpPkgGen

@@ -5,7 +5,7 @@
 Summary:        Python re-implementation of the Rails routes system
 Name:           python-%{pkgname}
 Version:        2.5.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 URL:            https://routes.readthedocs.io/en/latest/
 Vendor:         Microsoft Corporation
@@ -48,7 +48,8 @@ python3 setup.py build
 python3 setup.py install --root=%{buildroot}
 
 %check
-pip3 install tox==3.4.0
+# pin packaging==23.2 to avoid uninstall conflict; tox 4.x needed for py312 env
+pip3 install packaging==23.2 tox
 tox -e py%{python3_version_nodots}
 
 %files -n python3-%{pkgname}
@@ -57,6 +58,10 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.5.1-5
+- Pin packaging==23.2 and drop tox version pin in %%check; tox 4.x is
+  required for the py312 environment.
+
 * Sat Mar 26 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.5.1-1
 - Upgrade to version 2.5.1
 

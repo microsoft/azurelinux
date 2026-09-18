@@ -1,0 +1,75 @@
+From aadaf0b61a63b0c5112db8a35120c69bd722a07c Mon Sep 17 00:00:00 2001
+From: Richard Hughes <richard@hughsie.com>
+Date: Tue, 16 Jun 2026 11:07:06 +0100
+Subject: [PATCH] trivial: Only match metadata once per adopted device
+
+At the moment fwupd is loading the metadata for each parent device multiple
+times at startup, so rely on the new post-coldplug action instead.
+
+This restores load time performance to pre-"Re-process the device metadata".
+---
+ src/fu-engine.c | 30 ++++++++++++++----------------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
+
+diff --git a/src/fu-engine.c b/src/fu-engine.c
+index 4aa9fa87529e..4a2ee2d4b8a0 100644
+--- a/src/fu-engine.c
++++ b/src/fu-engine.c
+@@ -6683,43 +6683,41 @@ fu_engine_plugin_device_added_cb(FuPlugin *plugin, FuDevice *device, gpointer us
+ 	fu_engine_add_device(self, device);
+ }
+ 
++static void
++fu_engine_set_device_parent(FuEngine *self, FuDevice *device, FuDevice *parent)
++{
++	fu_device_set_parent(device, parent);
++	if (fu_engine_get_loaded(self)) {
++		fu_engine_ensure_device_supported(self, device);
++		fu_engine_ensure_device_supported(self, parent);
++	}
++}
++
+ static void
+ fu_engine_adopt_children_device(FuEngine *self, FuDevice *device, FuDevice *device_tmp)
+ {
+ 	if (fu_device_has_private_flag_quark(device, quarks[QUARK_HOST_FIRMWARE_CHILD]) &&
+ 	    fu_device_has_private_flag_quark(device_tmp, quarks[QUARK_HOST_FIRMWARE])) {
+-		fu_device_set_parent(device, device_tmp);
+-		fu_engine_ensure_device_supported(self, device_tmp);
++		fu_engine_set_device_parent(self, device, device_tmp);
+ 		return;
+ 	}
+ 	if (fu_device_has_private_flag_quark(device, quarks[QUARK_HOST_FIRMWARE]) &&
+ 	    fu_device_has_private_flag_quark(device_tmp, quarks[QUARK_HOST_FIRMWARE_CHILD])) {
+-		fu_device_set_parent(device_tmp, device);
+-		fu_engine_ensure_device_supported(self, device_tmp);
++		fu_engine_set_device_parent(self, device_tmp, device);
+ 		return;
+ 	}
+ 	if (fu_device_has_private_flag_quark(device, quarks[QUARK_HOST_CPU_CHILD]) &&
+ 	    fu_device_has_private_flag_quark(device_tmp, quarks[QUARK_HOST_CPU])) {
+-		fu_device_set_parent(device, device_tmp);
+-		fu_engine_ensure_device_supported(self, device_tmp);
++		fu_engine_set_device_parent(self, device, device_tmp);
+ 		return;
+ 	}
+ 	if (fu_device_has_private_flag_quark(device, quarks[QUARK_HOST_CPU]) &&
+ 	    fu_device_has_private_flag_quark(device_tmp, quarks[QUARK_HOST_CPU_CHILD])) {
+-		fu_device_set_parent(device_tmp, device);
+-		fu_engine_ensure_device_supported(self, device_tmp);
++		fu_engine_set_device_parent(self, device_tmp, device);
+ 		return;
+ 	}
+ }
+ 
+-static void
+-fu_engine_set_device_parent(FuEngine *self, FuDevice *device, FuDevice *parent)
+-{
+-	fu_device_set_parent(device, parent);
+-	fu_engine_ensure_device_supported(self, device);
+-	fu_engine_ensure_device_supported(self, parent);
+-}
+-
+ static void
+ fu_engine_adopt_children(FuEngine *self, FuDevice *device)
+ {

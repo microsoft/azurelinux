@@ -1,7 +1,7 @@
 Summary:        Advanced Trivial File Transfer Protocol (ATFTP) - TFTP server
 Name:           atftp
 Version:        0.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            http://sourceforge.net/projects/atftp
 License:        GPLv2+
 Group:          System Environment/Daemons
@@ -10,6 +10,9 @@ Distribution:   Azure Linux
 Source0:        http://sourceforge.net/projects/atftp/files/latest/download/%{name}-%{version}.tar.gz
 
 BuildRequires:  systemd
+# Enables atftpd's PCRE pattern-substitution feature (server --pcre option); the
+# test suite requires it to start the server.
+BuildRequires:  pcre2-devel
 Requires:       systemd
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
@@ -85,8 +88,13 @@ ATFTPD_BIND_ADDRESSES=
 EOF
 
 %check
-sed -i 's/^start_server$/chown -R nobody $DIRECTORY\nstart_server/g' test/test.sh || true
-make %{?_smp_mflags} check
+# atftpd drops privileges to "nobody", so: (1) make the mktemp server root ($TDIR)
+# accessible for get/put, and (2) make the server log ($SERVER_LOG) writable -
+# atftpd reopens its --logfile *after* the drop, so a root-owned log would revert
+# to syslog and the PCRE test's log grep would find nothing. $TDIR/$SERVER_LOG are
+# the upstream vars (the old sed used a stale unbound $DIRECTORY).
+sed -i 's/^start_server$/chmod -R a+rwX "$TDIR"\ntouch "$SERVER_LOG"; chmod a+rw "$SERVER_LOG"\nstart_server/g' test/test.sh || true
+make %{?_smp_mflags} check || { echo "===== test/test-suite.log ====="; cat test/test-suite.log 2>/dev/null; exit 1; }
 
 %pre
 if [ $1 -eq 1 ] ; then
@@ -127,6 +135,15 @@ fi
 
 
 %changelog
+* Wed Jul 29 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.8.0-2
+- Build atftpd with PCRE support (BuildRequires: pcre2-devel) so the server
+  --pcre option exists; without it the test suite could not start the server.
+- Fix %%check test suite: replace the stale unbound $DIRECTORY variable (which
+  aborted test.sh under "set -u") with chmods that give the privilege-dropping
+  atftpd access to the server root and a writable log (its post-drop log reopen
+  otherwise reverts to syslog, breaking the PCRE test); dump test-suite.log on
+  failure.
+
 * Wed Dec 20 2023 Muhammad Falak <mwani@microsoft.com> - 0.8.0-1
 - Bump version to 0.8.0
 

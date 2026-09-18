@@ -16,7 +16,7 @@ The pytest-xdist plugin extends py.test with some unique test execution modes:
 Summary:        py.test plugin for distributed testing and loop-on-failing modes
 Name:           python-%{pypi_name}
 Version:        3.5.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,11 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
 
 Patch0:         pytest-xdist-3.5.0-fix-pytest9-parser.patch
+# Backport of upstream PR pytest-dev/pytest-xdist#1318: sort loadscope
+# nodes by gateway id before assigning work units, so worker bootstrap
+# order does not change the assignment. Fixes flaky
+# test_workqueue_ordered_by_size (upstream issues #985, #1068, #1248).
+Patch1:         pytest-xdist-3.5.0-fix-loadscope-deterministic-985.patch
 %description %{_description}
 
 %package -n     python3-%{pypi_name}
@@ -82,6 +87,18 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/xdist/
 
 %changelog
+* Fri Jun 19 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.5.0-3
+- Backport upstream PR pytest-dev/pytest-xdist#1318 as
+  pytest-xdist-3.5.0-fix-loadscope-deterministic-985.patch: sort
+  loadscope nodes by gateway id before assigning the initial work
+  units, so the assignment no longer depends on the order in which
+  workers send worker_workerready to the master. This makes the
+  loadscope distribution deterministic across architectures and
+  loads, and fixes flaky test_workqueue_ordered_by_size on x86_64
+  (upstream issues #985, #1068, #1248). The upstream PR is approved
+  by the maintainer but not yet merged/released as of June 2026;
+  drop this patch once it ships in a pytest-xdist release.
+
 * Tue Mar 03 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.5.0-2
 - Add patch to fix parser ptest error.
 - Skip failing crash-output test incompatible with pytest 9

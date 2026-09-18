@@ -1,6 +1,6 @@
 # This package refers to PyJWT(https://github.com/jpadilla/pyjwt). Not to be confused with python-jwt(https://github.com/davedoesdev/python-jwt)
 # what it's called on pypi
-%global srcname PyJWT
+%global srcname pyjwt
 # what it's imported as
 %global libname jwt
 # name of egg info directory
@@ -17,14 +17,14 @@ claims to be transferred between two parties encoded as digitally signed and
 encrypted JSON objects.}
 
 Name:           python-jwt
-Version:        2.8.0
-Release:        2%{?dist}
+Version:        2.13.0
+Release:        1%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/jpadilla/pyjwt
-Source0:        https://files.pythonhosted.org/packages/30/72/8259b2bccfe4673330cea843ab23f86858a419d8f1493f66d413a76c7e3b/PyJWT-2.8.0.tar.gz
+Source0:        https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
@@ -36,10 +36,8 @@ BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-cryptography >= 3
 Requires:       python3-cryptography >= 3
-%if 0%{?with_check}
-BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-pip
-%endif
+BuildRequires:  python3-wheel
 %{?python_provide:%python_provide python3-%{pkgname}}
 
 %description -n python3-%{pkgname} %{common_description}
@@ -47,34 +45,38 @@ BuildRequires:  python3-pip
 
 %prep
 %autosetup -n %{srcname}-%{version}
-rm -rf %{eggname}.egg-info
+# Fix invalid [project].license format under PEP 621 by rewriting the string license 
+# field to legacy table form for older setuptools compatibility.
+sed -i 's/^license = "MIT"$/license = {text = "MIT"}/' pyproject.toml
 
 %generate_buildrequires
 %pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{libname}
 
 %check
 pip3 install tox==4.25.0 --ignore-installed
 tox
 
 %if %{with python3}
-%files -n python3-%{pkgname}
+%files -n python3-%{pkgname} -f %{pyproject_files}
 %doc README.rst AUTHORS.rst
 %license LICENSE
-%{python3_sitelib}/%{libname}
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 %endif
 
 %changelog
-* Tue Apr 08 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.8.0-2
+* Mon Jul 27 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.13.0-1
+- Upgrade to 2.13.0 to fix CVE-2026-48524, CVE-2026-32597, CVE-2026-48526, CVE-2026-48522 and CVE-2026-48525
+
+* Mon May 05 2025 Riken Maharjan <rmaharjan@microsoft.com> - 2.8.0-2
 - Fixed ptest
 
-* Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.8.0-1
+* Wed Jul 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.8.0-1
 - Updating to 2.8.0-1 for 3.0
 - Using literal package name so auto-upgrader can do its thing
 - Adding buildrequires & replacing check section with simple tox command

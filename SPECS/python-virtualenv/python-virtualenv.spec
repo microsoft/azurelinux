@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,8 @@ Patch1007:      CVE-2026-6357v0.patch
 Patch1008:      CVE-2026-6357v1.patch
 Patch1009:      CVE-2026-8643v0.patch
 Patch1010:      CVE-2026-8643v1.patch
+Patch1011:      CVE-2026-13346v0.patch
+Patch1012:      CVE-2026-13346v1.patch
 BuildArch:      noarch
 
 %description
@@ -75,6 +77,11 @@ virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/
 patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1007}
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/operations/install/wheel.py for CVE-2026-8643"
 patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1009}
+echo "Manually Patching
+virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/models/link.py
+virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/network/download.py
+virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/operations/prepare.py for CVE-2026-13346"
+patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1011}
 # Remove the original file
 rm -f src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl
 # After patching, re-zip the contents back into a .whl
@@ -101,6 +108,11 @@ virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pi
 patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1008}
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/operations/install/wheel.py for CVE-2026-8643"
 patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1010}
+echo "Manually Patching
+virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/models/link.py
+virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/network/download.py
+virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/operations/prepare.py for CVE-2026-13346"
+patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1012}
 rm -f src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl
 pushd unpacked_pip-25.3-py3-none-any
 zip -r ../src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl *
@@ -163,6 +175,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
+- Patch for CVE-2026-13346
+
 * Wed Jun 17 2026 Aditya Singh <v-aditysing@microsoft.com> - 20.36.1-5
 - Patch for CVE-2026-8643
 

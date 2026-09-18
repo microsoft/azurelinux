@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "gh-2.62.0.tar.gz": "8b0d44a7fccd0c768d5ef7c3fbd274851b5752084e47761f146852de6539193e",
-  "gh-2.62.0-vendor.tar.gz": "2b39f75a9a45aa5e7b8d95e6b5fd7a11a7504e6cd7c92e904027f129abe48599"
- }
+  "Signatures": {
+    "gh-2.98.0-vendor.tar.gz": "b6a20c170e93be9d779132aa680034f87afd0c5e83856652cbf1a9ca765f9897",
+    "gh-2.98.0.tar.gz": "abada9e8b550547ac93f99250f3ad4d90ad623fa245cb54cb058f78030a6a5f6"
+  }
 }
