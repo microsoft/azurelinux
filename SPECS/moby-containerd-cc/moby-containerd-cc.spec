@@ -14,7 +14,7 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: %{name}-%{version}-govendor-v1.tar.gz
+Source1: %{name}-%{version}-govendor-v2.tar.gz
 Source2: containerd.service
 Source3: containerd.toml
 Patch1: fix_cc_tests_for_golang1.21.patch

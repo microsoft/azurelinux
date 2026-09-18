@@ -107,6 +107,7 @@ go mod edit -modfile=go.mod -require=go.opentelemetry.io/contrib/instrumentation
 go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace@v1.44.0
 go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc@v1.44.0
 go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp@v1.44.0
+go mod edit -modfile=go.mod -require=github.com/klauspost/cpuid/v2@v2.1.0
 go mod tidy
 go mod vendor
 
