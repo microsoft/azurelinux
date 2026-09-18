@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.14.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,44 +21,40 @@ Source0:        %{name}-%{version}.tar.gz
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2024-6104.patch
-Patch1:         CVE-2024-45338.patch
-Patch2:         CVE-2025-27144.patch
-Patch3:         CVE-2025-22868.patch
-Patch4:         CVE-2025-29786.patch
-Patch5:         CVE-2025-30204.patch
-Patch6:         CVE-2025-29923.patch
-Patch7:         CVE-2025-22870.patch
-Patch8:         CVE-2024-51744.patch
-Patch9:         CVE-2025-22872.patch
-Patch10:        CVE-2025-68156.patch
-Patch11:        CVE-2025-68476.patch
-Patch12:        CVE-2025-11065.patch
-Patch13:        CVE-2025-47911.patch
-Patch14:        CVE-2025-58190.patch
-Patch15:        CVE-2026-2303.patch
-Patch16:        CVE-2026-35469.patch
-Patch17:        CVE-2026-39821.patch
-Patch18:        CVE-2026-42506.patch
-Patch19:        CVE-2026-27136.patch
-Patch20:        CVE-2026-25680.patch
-Patch21:        CVE-2026-25681.patch
-Patch22:        CVE-2026-42502.patch
-Patch23:        CVE-2026-41889.patch
-Patch24:        CVE-2026-56852.patch
-Patch25:        CVE-2026-73500.patch
-Patch26:        CVE-2026-79921.patch
-Patch27:        CVE-2026-37236.patch
+Patch1:         CVE-2024-51744.patch
+Patch2:         CVE-2025-11065.patch
+Patch3:         CVE-2025-29786.patch
+Patch4:         CVE-2025-68156.patch
+Patch5:         CVE-2025-29923.patch
+Patch6:         CVE-2025-30204.patch
+Patch7:         CVE-2025-68476.patch
+Patch8:         CVE-2026-2303.patch
+Patch9:         CVE-2026-35469.patch
+Patch10:        CVE-2026-37236.patch
+Patch11:        CVE-2026-41889.patch
+Patch12:        CVE-2026-73500.patch
+Patch13:        CVE-2026-79921.patch
+Patch14:        CVE-2026-84445.patch
 
-BuildRequires:  golang >= 1.15
+BuildRequires:  golang >= 1.25
 
 %description
 KEDA is a Kubernetes-based Event Driven Autoscaling component. 
 It provides event driven scale for any container running in Kubernetes 
 
 %prep
-%autosetup -p1 -a1
+%setup -q
+# Source0 carries a vendor tree for the module set of the original 2.14.1 release.
+# Unpacking Source1 over it only replaces overlapping paths, so packages the module
+# upgrade dropped (go.opencensus.io, grpc/internal/grpcrand, grpc/pickfirst.go, ...)
+# would survive and break the build: they are no longer listed in vendor/modules.txt,
+# and -mod=vendor refuses to resolve imports that reference them. Start from a clean
+# tree so the vendor directory matches Source1 exactly.
+rm -rf vendor
+%setup -q -T -D -a 1
+%autopatch -p1
 
 %build
 export LDFLAGS="-X=github.com/kedacore/keda/v2/version.GitCommit= -X=github.com/kedacore/keda/v2/version.Version=main"
@@ -86,6 +82,13 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Thu Sep 17 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.14.1-20
+- Patch for CVE-2026-84445, CVE-2026-84304, CVE-2026-83530
+- Removed patch for CVE-2024-45338, CVE-2025-22868, CVE-2025-22870, CVE-2025-22872, CVE-2025-27144,
+  CVE-2025-47911, CVE-2025-58190, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821,
+  CVE-2026-42502, CVE-2026-42506, CVE-2026-56852
+- Pinned golang >= 1.25
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14.1-19
 - Patch for CVE-2026-37236
 
