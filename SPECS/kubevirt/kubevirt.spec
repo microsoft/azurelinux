@@ -292,7 +292,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 - Drop CVE-2026-25680.patch, CVE-2026-25681.patch, CVE-2026-27136.patch, CVE-2026-33814.patch,
   CVE-2026-39821.patch, CVE-2026-42502.patch, CVE-2026-42506.patch, CVE-2026-39827.patch,
   CVE-2026-39828.patch, CVE-2026-39829.patch, CVE-2026-39830.patch, CVE-2026-39834.patch,
-  CVE-2026-39835.patch, CVE-2026-46597.patch fixed by golang.org/x/{net,crypto,text} v0.58.0, v0.55.0, v0.41.0
+  CVE-2026-39835.patch, CVE-2026-46597.patch, CVE-2026-56852.patch fixed by golang.org/x/{net,crypto,text} v0.58.0, v0.55.0, v0.41.0
 
 * Tue Aug 25 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.8.4-1
 - Upgrade KubeVirt to v1.8.4
