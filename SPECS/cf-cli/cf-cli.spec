@@ -5,7 +5,7 @@ Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 # Note: Upgrading the package also warrants an upgrade in the CF_BUILD_SHA
 Version:        8.7.11
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,42 +18,23 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 #   1. wget https://github.com/cloudfoundry/cli/archive/refs/tags/v%%{version}.tar.gz -O cli-%%{version}.tar.gz
 #   2. tar -xf cli-%%{version}.tar.gz
 #   3. cd cli-%%{version}
-#   4. go mod vendor
+#   4. go mod edit -require=google.golang.org/grpc@v1.83.2 && go mod tidy && go mod vendor
 #   5. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf cli-%%{version}-vendor.tar.gz vendor
+#           -cf cli-%%{version}-vendor-v2.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        cli-%{version}-vendor.tar.gz
+Source1:        cli-%{version}-vendor-v2.tar.gz
+Patch0:         jose-go127-registerhash.patch
+Patch1:         CVE-2026-84304.patch
 
-Patch0:         CVE-2024-45337.patch
-Patch1:         CVE-2024-45338.patch
-Patch2:         CVE-2025-22869.patch
-Patch3:         CVE-2025-22872.patch
-Patch4:         CVE-2025-47911.patch
-Patch5:         CVE-2025-58190.patch
-Patch6:         CVE-2026-27136.patch
-Patch7:         CVE-2026-39821.patch
-Patch8:         CVE-2026-39829.patch
-Patch9:         CVE-2026-39830.patch
-Patch10:        CVE-2026-39834.patch
-Patch11:        CVE-2026-42506.patch
-Patch12:        CVE-2026-46597.patch
-Patch13:        CVE-2026-25680.patch
-Patch14:        CVE-2026-25681.patch
-Patch15:        CVE-2026-39827.patch
-Patch16:        CVE-2026-39828.patch
-Patch17:        CVE-2026-39835.patch
-Patch18:        CVE-2026-42502.patch
-Patch19:        CVE-2026-56852.patch
-
-BuildRequires:  golang < 1.25
+BuildRequires:  golang >= 1.25
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
@@ -83,6 +64,14 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
+* Wed Sep 16 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 8.7.11-9
+- Patch for CVE-2026-84304, CVE-2026-84445
+- Upgrade vendored google.golang.org/grpc to v1.83.2
+- Removed patches for CVE-2024-45337, CVE-2024-45338, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911,
+  CVE-2025-58190, CVE-2026-27136, CVE-2026-39821, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834,
+  CVE-2026-42506, CVE-2026-46597, CVE-2026-25680, CVE-2026-25681, CVE-2026-39827, CVE-2026-39828,
+  CVE-2026-39835, CVE-2026-42502, CVE-2026-56852
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-8
 - Patch for CVE-2026-56852
 
