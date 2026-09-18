@@ -31,11 +31,11 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        cli-%{version}-vendor-v2.tar.gz
-Patch1:         CVE-2026-37236.patch
-Patch2:         CVE-2026-56855.patch
-Patch3:         CVE-2026-78662.patch
-Patch4:         jose-go127-registerhash.patch
-Patch5:         CVE-2026-84304.patch
+Patch0:         CVE-2026-37236.patch
+Patch1:         CVE-2026-56855.patch
+Patch2:         CVE-2026-78662.patch
+Patch3:         jose-go127-registerhash.patch
+Patch4:         CVE-2026-84304.patch
 
 BuildRequires:  golang >= 1.25
 
