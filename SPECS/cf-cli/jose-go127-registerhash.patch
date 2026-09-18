@@ -1,0 +1,27 @@
+From: Swapnil Sahu <v-swapsahu@microsoft.com>
+Date: Wed, 17 Sep 2026 13:02:00 +0000
+Subject: [PATCH] cf-cli: Fix Go 1.27+ panic in vendored jose crypto.RegisterHash
+
+Go 1.27 rejects crypto.RegisterHash(Hash(0)) with panic. Remove the init()
+function that registers the "none" algorithm (only used in tests). Keep the
+crypto import as other code still uses crypto.Hash types.
+
+---
+ vendor/github.com/SermoDigital/jose/crypto/none.go | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/vendor/github.com/SermoDigital/jose/crypto/none.go b/vendor/github.com/SermoDigital/jose/crypto/none.go
+index db3d139..a595938 100644
+--- a/vendor/github.com/SermoDigital/jose/crypto/none.go
++++ b/vendor/github.com/SermoDigital/jose/crypto/none.go
+@@ -7,10 +7,6 @@ import (
+ 	"io"
+ )
+ 
+-func init() {
+-	crypto.RegisterHash(crypto.Hash(0), h)
+-}
+-
+ // h is passed to crypto.RegisterHash.
+ func h() hash.Hash {
+ 	return &f{Writer: nil}
