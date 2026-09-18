@@ -74,7 +74,7 @@ install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
- Thu Sep 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 4.0.2-11
+* Thu Sep 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 4.0.2-11
 - Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445.
 - Remove patches which are fixed in new generated vendor tarball:CVE-2023-3978, CVE-2023-44487,
   CVE-2023-45288, CVE-2024-45338, CVE-2025-22872, CVE-2025-47911, CVE-2025-58190, CVE-2026-27136,
