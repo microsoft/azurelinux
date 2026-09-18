@@ -39,24 +39,6 @@ install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}%{_datadir}/%{name}
 * Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 3.7.0-8
 - Add patch for CVE-2026-84445, CVE-2026-84304
 
-* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.0-7
-- Patch for CVE-2026-56852
-
-* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.0-6
-- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
-
-* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.0-5
-- Patch for CVE-2025-47911, CVE-2025-58190
-
-* Wed Apr 23 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.7.0-4
-- Patch CVE-2025-22872
-
-* Fri Jan 31 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.7.0-3
-- Patch CVE-2024-45339
-
-* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.7.0-2
-- Patch CVE-2024-45338
-
 * Thu Jun 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.7.0-1
 - Auto-upgrade to 3.7.0 - address CVE-2022-1996
 
