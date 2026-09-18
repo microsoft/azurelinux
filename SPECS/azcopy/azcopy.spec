@@ -77,7 +77,7 @@ go test -mod=vendor
 - Fix ptests failures.
 
 * Fri Apr 11 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 10.25.1-4
-- Patch CVE-2025-22870, CVE-2024-51744
+- Patch CVE-2024-51744
 
 * Fri Mar 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.25.1-3
 - Patch CVE-2025-30204
