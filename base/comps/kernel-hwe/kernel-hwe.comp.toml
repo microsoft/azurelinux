@@ -1,0 +1,60 @@
+[components.kernel-hwe]
+# kernel-hwe reuses the maintained local kernel packaging while tracking the
+# rolling-lts/azl4-hwe source branch as an independently named package.
+spec = { type = "local", path = "kernel-hwe.spec" }
+
+# Keep release handling aligned with the source kernel spec.
+release = { calculation = "manual" }
+
+[components.kernel-hwe.build.defines]
+# Select 6.18.43.1 and its GitHub archive extraction directory without
+# diverging further from the current kernel spec.
+specrpmversion = "6.18.43"
+kernel_source_dir = "CBL-Mariner-Linux-Kernel-rolling-lts-azl4-hwe-6.18.43.1"
+
+# Preserve the copied kernel source manifest entry while directing lookaside
+# lookup to the original kernel namespace rather than the new component name.
+[[components.kernel-hwe.source-files]]
+filename = "linux-6.18.13.tar.xz"
+hash = "a1d1b27391ed55ae2b17dd25841037d3399e4d87900eb098af45b5b6bcedc095626971d069ff7a9daf46b6379705f3b88076206ecac68600bd04a35e7872440b"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://src.fedoraproject.org/repo/pkgs/kernel/linux-6.18.13.tar.xz/sha512/a1d1b27391ed55ae2b17dd25841037d3399e4d87900eb098af45b5b6bcedc095626971d069ff7a9daf46b6379705f3b88076206ecac68600bd04a35e7872440b/linux-6.18.13.tar.xz" }
+replace-upstream = true
+replace-reason = "The copied local source manifest retains this kernel lookaside entry; use the original kernel namespace because kernel-hwe has no Fedora lookaside namespace."
+
+# Azure Linux HWE kernel source tarball (rolling-lts/azl4-hwe).
+[[components.kernel-hwe.source-files]]
+filename = "kernel-6.18.43.1.tar.gz"
+hash = "6941bcc7dc0b5e329b3a2bab967705e8c1eb1cb8ebe89a30d11c0db8dbb6c3ef68d6124c855f9912a27476335dd343c47b52209b252a36c2203842fc544b2b6d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4-hwe/6.18.43.1.tar.gz" }
+replace-upstream = true
+replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
+
+# NVIDIA open GPU kernel module source tarball (kmod-nvidia-open subpackage).
+[[components.kernel-hwe.source-files]]
+filename = "open-gpu-kernel-modules-610.57.04.tar.gz"
+hash = "08d905b0eff99741cb9fa94109d71d73e477ece2ea888cce206644859ae84b6930ff96cde10c9c6a1dcfaa79d4de7fca2df2a56534b77f3b02c431276365d2c3"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/610.57.04.tar.gz" }
+replace-upstream = true
+replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
+
+# kABI reference tarballs (Source300/Source301). kABI checking is disabled in
+# Azure Linux, but the spec still declares these sources, so they must be present
+# to assemble the package. Keep these aligned with the source kernel component.
+[[components.kernel-hwe.source-files]]
+filename = "kernel-abi-stablelists-6.18.13.tar.xz"
+hash = "69bbcdd86ae7999b19de306c29bc5cef442e309a8b033900c10a206a97d61b8b4e6d7c6baf6d356daf14e85766bd6a31120b54cfd1eb1c773450e44bae5d2d9b"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://src.fedoraproject.org/repo/pkgs/kernel/kernel-abi-stablelists-6.18.13.tar.xz/sha512/69bbcdd86ae7999b19de306c29bc5cef442e309a8b033900c10a206a97d61b8b4e6d7c6baf6d356daf14e85766bd6a31120b54cfd1eb1c773450e44bae5d2d9b/kernel-abi-stablelists-6.18.13.tar.xz" }
+replace-upstream = true
+replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
+
+[[components.kernel-hwe.source-files]]
+filename = "kernel-kabi-dw-6.18.13.tar.xz"
+hash = "6473ea636d813e602a59d7332255c4b4597032501a2ed0507985800500451065618a0b6909663e3dc8db2b75c6f4ba10d498dbc41a3b42758cae38f30ca13115"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://src.fedoraproject.org/repo/pkgs/kernel/kernel-kabi-dw-6.18.13.tar.xz/sha512/6473ea636d813e602a59d7332255c4b4597032501a2ed0507985800500451065618a0b6909663e3dc8db2b75c6f4ba10d498dbc41a3b42758cae38f30ca13115/kernel-kabi-dw-6.18.13.tar.xz" }
+replace-upstream = true
+replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
