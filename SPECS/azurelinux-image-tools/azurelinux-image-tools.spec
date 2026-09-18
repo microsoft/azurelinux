@@ -113,16 +113,20 @@ go test -C toolkit/tools ./...
 %changelog
 * Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 1.6.0-3
 - Add patch for CVE-2026-84445, CVE-2026-84304
+- Removed patch for CVE-2026-56852
 
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.6.0-2
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
   now selected automatically and supports CGO_ENABLED=0 on Linux.
 
-* Tue Aug 3 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.6.0-1
+* Mon Aug 3 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.6.0-1
 - Upgrade to version 1.6.0
 - Enable systemd-ukify for arm64
 
-* Fri May 29 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.0-1
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.0-2
+- Patch for CVE-2026-56852
+
+* Mon Jun 01 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.0-1
 - Upgrade to version 1.5.0
 
 * Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-2
