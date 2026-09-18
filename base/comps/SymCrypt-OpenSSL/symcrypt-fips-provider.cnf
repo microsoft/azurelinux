@@ -1,0 +1,6 @@
+.include /etc/pki/tls/openssl.d/symcrypt_prov.cnf
+
+[azl_fips_provider]
+provider = symcryptprovider
+section = symcrypt_prov_sect
+additional_default_properties = ?provider=symcryptprovider,?fips=yes
