@@ -6,6 +6,7 @@
     "config": "f6215bb9113fb229ce6510bf56b162e5e36b1e7a7ea25dd7ec842aca41e4aa83",
     "kernel-mshv-6.6.137.mshv2.tar.gz": "30D61DCDEB145FD3B8BF7998D7E5C781B0FD9F5A15C803012C9172EF34416EF5",
     "config_aarch64": "8fda5822cf6c5265d238110917ad7b065417aac6b107b63e70f99c1deacb75a5",
-    "mshv-scrub-partition-patches-rebased.patch": "9b927d675fdffa34d5c6ce0b7b3c65c6b78eee5414093ea4cdb23caba9138e57"
+    "mshv-scrub-partition-patches-rebased.patch": "9b927d675fdffa34d5c6ce0b7b3c65c6b78eee5414093ea4cdb23caba9138e57",
+    "disable-vpsignal-reset-on-scrub.patch": "f19f13a8745cf8e41c1f9d8efc09130189bf24db209c3883e2e5bee283b1c64e"
   }
 }

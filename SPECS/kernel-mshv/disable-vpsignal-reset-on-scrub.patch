@@ -1,0 +1,16 @@
+diff --git a/drivers/hv/mshv_root_main.c b/drivers/hv/mshv_root_main.c
+index 361c7b659c34..0167b00a8ac9 100644
+--- a/drivers/hv/mshv_root_main.c
++++ b/drivers/hv/mshv_root_main.c
+@@ -3184,7 +3184,10 @@ mshv_partition_ioctl_scrub(struct mshv_partition *partition)
+ 			drain_vp_signals(vp);
+ 
+ 		vp->run.flags.intercept_suspended = 0;
+-		atomic64_set(&vp->run.vp_signaled_count, 0);
++		// NOTE: Commenting out the reset of VP's signaled count
++		// Because Hyper-V doesn't reset the VP's signaled count during a scrub,
++		// we should not reset it here either.
++		//atomic64_set(&vp->run.vp_signaled_count, 0);
+ 	}
+ 
+ 	return 0;
