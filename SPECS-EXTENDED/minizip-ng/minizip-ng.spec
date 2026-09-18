@@ -1,3 +1,4 @@
+%bcond_without compat
 %global compat_soname libminizip.so.1
 
 # Compatible with the following minizip-compat version.
@@ -11,7 +12,7 @@
 
 Name:           minizip-ng
 Version:        4.0.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Minizip-ng contrib in zlib-ng with the latest bug fixes and advanced features
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,7 +57,6 @@ Obsoletes:     minizip-ng < %{minizip_ng_obsoletes}
 
 # This part is mandatory for the renaming process
 # It can be removed in Fedora 42
-Provides: minizip <= %{version}-%{release}
 Obsoletes: minizip < 3.0.3
 
 %description   compat
@@ -77,7 +77,6 @@ Obsoletes:     minizip-ng-devel < %{minizip_ng_obsoletes}
 
 # This part is mandatory for the renaming process
 # It can be removed in Fedora 42
-Provides: minizip-devel <= %{version}-%{release}
 Obsoletes: minizip-devel < 3.0.3
 
 %description   compat-devel
@@ -177,6 +176,10 @@ _EOF_
 
 
 %changelog
+* Wed Jan 14 2026 Aditya Singh <v-aditysing@microsoft.com> - 4.0.7-3
+- Updated to build minizip-compat-devel package which is needed by
+- freexl package.
+
 * Fri Feb 21 2025 Archana Shettigar <v-shettigara@microsoft.com> - 4.0.7-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
