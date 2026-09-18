@@ -37,7 +37,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.4
-Release: 11%{?dist}
+Release: 12%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -147,7 +147,7 @@ Requires: coreutils
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Obsoletes: oqsprovider < 0.9.0
 
-Patch80: 0080-azl-force-symcrypt-in-kernel-fips-mode.patch
+Patch80: 0080-azl-load-registered-fips-provider.patch
 %description
 The OpenSSL toolkit provides support for secure communications between
 machines. OpenSSL includes a certificate management tool and shared
@@ -160,7 +160,8 @@ Requires: ca-certificates >= 2008-5
 Requires: crypto-policies >= 20180730
 Recommends: pkcs11-provider%{?_isa}
 %if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
-Requires: SymCrypt-OpenSSL >= 1.11.0
+Requires: openssl(fips-provider)
+Recommends: SymCrypt-OpenSSL >= 1.11.0
 %endif
 
 %description libs
@@ -382,6 +383,7 @@ done
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/certs
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/azl-openssl-fips-provider.d
 
 # Move runable perl scripts to bindir
 mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/*.pl $RPM_BUILD_ROOT%{_bindir}
@@ -458,6 +460,7 @@ install -m644 %{SOURCE9} \
 %dir %{_sysconfdir}/pki/tls/misc
 %dir %{_sysconfdir}/pki/tls/private
 %dir %{_sysconfdir}/pki/tls/openssl.d
+%dir %{_sysconfdir}/pki/tls/azl-openssl-fips-provider.d
 %config(noreplace) %{_sysconfdir}/pki/tls/openssl.cnf
 %config(noreplace) %{_sysconfdir}/pki/tls/ct_log_list.cnf
 
