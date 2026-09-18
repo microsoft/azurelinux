@@ -28,7 +28,7 @@ Patch8: CVE-2026-35469.patch
 Patch9: CVE-2026-46680.patch
 Patch10:CVE-2026-53488.patch
 Patch11:CVE-2026-84304.patch
-#Patch12:fix-non-constant-format-string.patch
+Patch12:fix-non-constant-format-string.patch
 
 %{?systemd_requires}
 
