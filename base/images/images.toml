@@ -92,7 +92,7 @@ wsl = true
 [images.vm-iso-installer]
 description = "VM ISO Installer"
 definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", profile = "vm-iso-installer" }
-tests.tests = [{ name = "iso-install" }]
+tests.tests = [{ name = "iso-validation" }]
 
 [images.vm-iso-installer.capabilities]
 installer-media = true

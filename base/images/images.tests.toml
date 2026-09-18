@@ -153,18 +153,17 @@ required-capabilities = ["machine-bootable"]
 [tests.bvt-metrics.lisa]
 criteria = { testcase-names = ["verify_bvt_boot_metrics", "verify_bvt_footprint"] }
 
-# ISO install: boots an installer ISO in QEMU and verifies the installed
-# system comes up and logs in. Requires the fulfillment request to supply
-# image.iso.iso_url (surfaced to the LISA runbook as the case-visible
-# `iso_url` variable) and a nested-virtualization-capable executor host.
-[tests.iso-install]
+# ISO validation: installs the ISO and verifies core OS functionality in
+# the guest.
+[tests.iso-validation]
 type                  = "lisa"
-description           = "Installs Azure Linux from an installer ISO in QEMU and verifies the installed system boots and logs in"
+description           = "Validates Azure Linux ISO installation and core OS functionality in the installed system"
 kind                  = "functional"
+long-running          = true
 required-capabilities = ["installer-media"]
 
-[tests.iso-install.lisa]
-criteria = { testcase-names = ["verify_azurelinux_iso_install"] }
+[tests.iso-validation.lisa]
+criteria = { testcase-names = ["verify_azurelinux_iso_install", "verify_lkg_iso_docker_container_workflows", "verify_lkg_iso_package_management_dnf", "verify_lkg_iso_dmi_firmware_metadata"] }
 
 # ---- VM base test groups -------------------------------------------------
 
