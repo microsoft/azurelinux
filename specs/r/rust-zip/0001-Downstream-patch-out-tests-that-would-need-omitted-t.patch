@@ -1,0 +1,40 @@
+From 94cc062574f07952bbcf73d6600c421ef1d70b55 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 20 May 2026 22:00:28 +0100
+Subject: [PATCH] Downstream: patch out tests that would need omitted test
+ files
+
+---
+ src/read.rs             | 2 ++
+ src/read/zip_archive.rs | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/src/read.rs b/src/read.rs
+index c081f3c0..94eee475 100644
+--- a/src/read.rs
++++ b/src/read.rs
+@@ -1270,6 +1270,8 @@ mod tests {
+         Ok(())
+     }
+ 
++    // Downstream patch: we do not include the test file needed for this test.
++    #[cfg(false)]
+     #[test]
+     #[cfg(feature = "deflate-flate2")]
+     fn test_utf8_extra_field() {
+diff --git a/src/read/zip_archive.rs b/src/read/zip_archive.rs
+index 3aed59a9..024e1bf8 100644
+--- a/src/read/zip_archive.rs
++++ b/src/read/zip_archive.rs
+@@ -857,6 +857,8 @@ mod tests {
+         assert_eq!(file.read(&mut decompressed).unwrap(), 12);
+     }
+ 
++    // Downstream patch: we do not include the test file needed for this test.
++    #[cfg(false)]
+     /// Only on little endian because we cannot use fs with miri CI
+     #[cfg(all(target_endian = "little", not(miri)))]
+     #[test]
+-- 
+2.54.0
+

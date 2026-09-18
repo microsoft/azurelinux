@@ -4,7 +4,7 @@
 %global debug_package %{nil}
 Name:		openfec
 Version:	1.4.2.6
-Release: 11%{?dist}
+Release:	7%{?dist}
 Summary:	Application-Level Forward Erasure Correction codes
 License:	CeCILL-C and GPLv2+ and BSD
 # GPLv2+:

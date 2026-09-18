@@ -1,0 +1,44 @@
+From 1d20e72c398e651e9afa7869281d257fdb263ebf Mon Sep 17 00:00:00 2001
+From: John Kacur <jkacur@redhat.com>
+Date: Fri, 20 Mar 2026 15:02:47 -0400
+Subject: [PATCH] Makefile: Use relative symlinks for Python scripts
+
+Use ln -rs to create relative symlinks instead of absolute symlinks
+for hwlatdetect and get_cyclictest_snapshot. This fixes RPM build
+warnings and makes the package relocatable.
+
+Absolute symlinks cause issues when:
+- Installing to different prefixes
+- Building in mock/containers
+- Package relocation is needed
+
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 83d2a33ecf05..80c3f1073560 100644
+--- a/Makefile
++++ b/Makefile
+@@ -235,7 +235,7 @@ install_hwlatdetect: hwlatdetect
+ 		mkdir -p "$(DESTDIR)$(bindir)" ; \
+ 		install -D -m 755 src/hwlatdetect/hwlatdetect.py $(DESTDIR)$(PYLIB)/hwlatdetect.py ; \
+ 		rm -f "$(DESTDIR)$(bindir)/hwlatdetect" ; \
+-		ln -s $(PYLIB)/hwlatdetect.py "$(DESTDIR)$(bindir)/hwlatdetect" ; \
++		ln -rs "$(DESTDIR)$(PYLIB)/hwlatdetect.py" "$(DESTDIR)$(bindir)/hwlatdetect" ; \
+ 	fi
+ 
+ .PHONY: install_get_cyclictest_snapshot
+@@ -244,7 +244,7 @@ install_get_cyclictest_snapshot: get_cyclictest_snapshot
+ 		mkdir -p "${DESTDIR}${bindir}" ; \
+ 		install -D -m 755 src/cyclictest/get_cyclictest_snapshot.py ${DESTDIR}${PYLIB}/get_cyclictest_snapshot.py ; \
+ 		rm -f "${DESTDIR}${bindir}/get_cyclictest_snapshot" ; \
+-		ln -s ${PYLIB}/get_cyclictest_snapshot.py "${DESTDIR}${bindir}/get_cyclictest_snapshot" ; \
++		ln -rs "${DESTDIR}${PYLIB}/get_cyclictest_snapshot.py" "${DESTDIR}${bindir}/get_cyclictest_snapshot" ; \
+ 	fi
+ 
+ .PHONY: install_manpages
+-- 
+2.53.0
+

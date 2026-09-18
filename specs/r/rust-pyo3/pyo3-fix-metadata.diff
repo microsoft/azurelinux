@@ -1,10 +1,20 @@
---- pyo3-0.27.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ pyo3-0.27.2/Cargo.toml	2025-12-29T20:33:30.364561+00:00
-@@ -152,7 +152,6 @@
+--- pyo3-0.29.2/Cargo.toml	2006-07-24T01:21:28+00:00
++++ pyo3-0.29.2/Cargo.toml	2026-08-08T18:53:15.220887+00:00
+@@ -147,7 +147,6 @@
      "time",
      "uuid",
  ]
 -generate-import-lib = ["pyo3-ffi/generate-import-lib"]
- macros = [
-     "pyo3-macros",
-     "indoc",
+ macros = ["pyo3-macros"]
+ multiple-pymethods = [
+     "inventory",
+@@ -558,9 +557,6 @@
+ 
+ [dev-dependencies.tempfile]
+ version = "3.12.0"
+-
+-[dev-dependencies.ui_test]
+-version = "0.30.4"
+ 
+ [dev-dependencies.uuid]
+ version = "1.10.0"

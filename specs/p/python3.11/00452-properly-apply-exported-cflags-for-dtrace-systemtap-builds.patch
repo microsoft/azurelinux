@@ -20,10 +20,10 @@ Co-authored-by: stratakis <cstratak@redhat.com>
  create mode 100644 Misc/NEWS.d/next/Build/2025-03-31-19-22-41.gh-issue-131865.PIJy7X.rst
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 81d4d50f82..0bd3447638 100644
+index ad29e1a0ca..79b07194bb 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -1453,7 +1453,7 @@ Python/frozen.o: $(FROZEN_FILES_OUT)
+@@ -1458,7 +1458,7 @@ Python/frozen.o: $(FROZEN_FILES_OUT)
  # an include guard, so we can't use a pipeline to transform its output.
  Include/pydtrace_probes.h: $(srcdir)/Include/pydtrace.d
  	$(MKDIR_P) Include
@@ -32,7 +32,7 @@ index 81d4d50f82..0bd3447638 100644
  	: sed in-place edit with POSIX-only tools
  	sed 's/PYTHON_/PyDTrace_/' $@ > $@.tmp
  	mv $@.tmp $@
-@@ -1463,7 +1463,7 @@ Python/import.o: $(srcdir)/Include/pydtrace.h
+@@ -1468,7 +1468,7 @@ Python/import.o: $(srcdir)/Include/pydtrace.h
  Modules/gcmodule.o: $(srcdir)/Include/pydtrace.h
  
  Python/pydtrace.o: $(srcdir)/Include/pydtrace.d $(DTRACE_DEPS)

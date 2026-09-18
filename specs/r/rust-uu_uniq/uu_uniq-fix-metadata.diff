@@ -1,0 +1,17 @@
+--- uu_uniq-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_uniq-0.7.0/Cargo.toml	2026-03-16T22:00:26.991073+00:00
+@@ -64,14 +64,9 @@
+ features = ["parser"]
+ package = "uucore"
+ 
+-[dev-dependencies.divan]
+-version = "4.0.5"
+-package = "codspeed-divan-compat"
+-
+ [dev-dependencies.uucore]
+ version = "0.7.0"
+ features = [
+-    "benchmark",
+     "parser",
+ ]
+ package = "uucore"

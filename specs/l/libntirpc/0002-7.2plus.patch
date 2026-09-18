@@ -1,0 +1,2792 @@
+diff -ur ntirpc-7.2/CMakeLists.txt ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/CMakeLists.txt
+--- ntirpc-7.2/CMakeLists.txt	2026-03-18 11:45:40.359470436 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/CMakeLists.txt	2026-05-18 19:40:20.000000000 -0400
+@@ -37,18 +37,7 @@
+ 
+ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+ 
+-# Install destination, if built standalone
+-get_property(USE_LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
+-if (USE_LIB64)
+-	set(LIB_INSTALL_DIR lib64 CACHE PATH
+-		"Specify name of libdir inside install path")
+-else (USE_LIB64)
+-	set(LIB_INSTALL_DIR lib CACHE PATH
+-		"Specify name of libdir inside install path")
+-endif (USE_LIB64)
+-
+-set(SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES})
+-set(BINARY_LIBRARIES ${BINARY_LIBRARIES})
++include(GNUInstallDirs)
+ 
+ include(GetGitRevisionDescription)
+ get_git_head_revision(GIT_REFSPEC _GIT_HEAD_COMMIT)
+@@ -317,21 +306,19 @@
+ endif (NOT TARGET dist)
+ 
+ if (NOT TARGET rpm)
+-add_custom_target( rpm DEPENDS dist)
+-add_custom_command(TARGET rpm
++add_custom_target( rpm
+                   COMMAND sh -c "rpmbuild -ta ${PKG_NAME}"
+ 		  VERBATIM
+ 		  DEPENDS dist)
+ 
+ set(RPMDEST "--define '_srcrpmdir ${CMAKE_CURRENT_BINARY_DIR}'")
+-add_custom_target( srpm DEPENDS dist)
+-add_custom_command(TARGET srpm
++add_custom_target( srpm
+                   COMMAND sh -c "rpmbuild ${RPMDEST} -ts ${PKG_NAME}"
+ 		  VERBATIM
+ 		  DEPENDS dist)
+ endif (NOT TARGET rpm)
+ ########### install files ###############
+ 
+-install(FILES  ${PROJECT_BINARY_DIR}/libntirpc.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+-install(DIRECTORY  ${NTIRPC_BASE_DIR}/ntirpc DESTINATION include)
+-install(FILES  ${PROJECT_BINARY_DIR}/ntirpc/version.h DESTINATION include/ntirpc)
++install(FILES  ${PROJECT_BINARY_DIR}/libntirpc.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
++install(DIRECTORY  ${NTIRPC_BASE_DIR}/ntirpc DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++install(FILES  ${PROJECT_BINARY_DIR}/ntirpc/version.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ntirpc)
+Only in ntirpc-7.2: CMakeLists.txt.orig
+Only in ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1: .github
+diff -ur ntirpc-7.2/libntirpc.pc.in.cmake ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/libntirpc.pc.in.cmake
+--- ntirpc-7.2/libntirpc.pc.in.cmake	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/libntirpc.pc.in.cmake	2026-05-18 19:40:20.000000000 -0400
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${prefix}/@LIB_INSTALL_DIR@
++libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+ includedir=${prefix}/include/ntirpc
+ 
+ Name: libntirpc
+diff -ur ntirpc-7.2/ntirpc/lttng/ntirpc_traces.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/lttng/ntirpc_traces.h
+--- ntirpc-7.2/ntirpc/lttng/ntirpc_traces.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/lttng/ntirpc_traces.h	2026-05-18 19:40:20.000000000 -0400
+@@ -32,6 +32,12 @@
+ #define __S2(x) __S1(x)
+ #define LINE_AS_STRING __S2(__LINE__)
+ 
++#ifndef UNUSED
++#define UNUSED_ATTR __attribute__((unused))
++#define UNUSED(...) UNUSED_(__VA_ARGS__)
++#define UNUSED_(arg) NOT_USED_##arg UNUSED_ATTR
++#endif
++
+ #ifdef USE_LTTNG_NTIRPC
+ 
+ #include "lttng_generator.h"
+@@ -57,7 +63,7 @@
+ 
+ /* We call the empty function with the variable args to avoid unused variables
+  * warning when LTTNG traces are disabled */
+-static void inline ntirpc_empty_function(const char* unused, ...) {}
++static void inline ntirpc_empty_function(const char* UNUSED(unused), ...) {}
+ 
+ #define NTIRPC_AUTO_TRACEPOINT(prov_name, event_name, log_level, ...) \
+ 		ntirpc_empty_function("unused", ##__VA_ARGS__)
+@@ -74,4 +80,4 @@
+ #endif /* TP_INT_ARR */
+ 
+ #endif // USE_LTTNG_NTIRPC
+-#endif // __NTIRPC_TRACES_H__
+\ No newline at end of file
++#endif // __NTIRPC_TRACES_H__
+diff -ur ntirpc-7.2/ntirpc/rpc/clnt.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/clnt.h
+--- ntirpc-7.2/ntirpc/rpc/clnt.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/clnt.h	2026-05-18 19:40:20.000000000 -0400
+@@ -115,6 +115,7 @@
+ 	mutex_t cl_lock;	/* serialize private data */
+ 	struct rpc_err cl_error; /* specific error code */
+ 	int32_t cl_refcnt;	/* handle reference count */
++	bool rdma_clnt;		/* transport rdma */
+ 	uint16_t cl_flags;	/* state flags */
+ 
+ } CLIENT;
+@@ -489,6 +490,11 @@
+ 				const rpcprog_t, const rpcvers_t,
+ 				const u_int, const u_int, const uint32_t);
+ 
++CLIENT *
++clnt_rdma_create(int fd, char *host, int port, int recv_sz,
++    int send_sz, int page_sz, const rpcprog_t prog,
++    const rpcvers_t vers, const uint32_t flags);
++
+ static inline CLIENT *
+ clnt_vc_ncreate(const int fd, const struct netbuf *raddr,
+ 		const rpcprog_t prog, const rpcvers_t vers,
+@@ -503,6 +509,9 @@
+  */
+ extern CLIENT *clnt_vc_ncreate_svc(const SVCXPRT *, const rpcprog_t,
+ 				   const rpcvers_t, const uint32_t);
++
++extern CLIENT *clnt_rdma_ncreatef(const SVCXPRT *, const rpcprog_t,
++				  const rpcvers_t, const uint32_t, bool);
+ /*
+  *      const SVCXPRT *xprt;                    -- active service xprt
+  *      const rpcprog_t prog;                   -- RPC program number
+diff -ur ntirpc-7.2/ntirpc/rpc/haproxy.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/haproxy.h
+--- ntirpc-7.2/ntirpc/rpc/haproxy.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/haproxy.h	2026-05-18 19:40:20.000000000 -0400
+@@ -30,6 +30,13 @@
+ 
+ #include "config.h"
+ 
++/* Adding macro for compatibilty of c++ compilation */
++#ifdef __cplusplus
++#ifndef _Static_assert
++#define _Static_assert static_assert
++#endif
++#endif
++
+ #ifndef _NTIRPC_RPC_HAPROXY_H
+ #define _NTIRPC_RPC_HAPROXY_H
+ 
+@@ -122,6 +129,7 @@
+ 	uint16_t src_port;
+ 	uint16_t dst_port;
+ };
++
+ _Static_assert(
+ 	sizeof(struct proxy_header_addr_ip4_part) == PP2_ADDR_LEN_INET,
+ 	"proxy_header_addr_ip4_part size is not equal to PP2_ADDR_LEN_INET");
+@@ -132,6 +140,7 @@
+ 	uint16_t src_port;
+ 	uint16_t dst_port;
+ };
++
+ _Static_assert(
+ 	sizeof(struct proxy_header_addr_ip6_part) == PP2_ADDR_LEN_INET6,
+ 	"proxy_header_addr_ip6_part size is not equal to PP2_ADDR_LEN_INET6");
+diff -ur ntirpc-7.2/ntirpc/rpc/svc.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/svc.h
+--- ntirpc-7.2/ntirpc/rpc/svc.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/svc.h	2026-05-18 19:40:20.000000000 -0400
+@@ -180,6 +180,7 @@
+ #define SVC_XPRT_FLAG_REMOTE_ADDR_SET	0x0200	/* remote addr was final set */
+ #define SVC_XPRT_FLAG_READY		0x0400	/* ready to use */
+ #define SVC_XPRT_FLAG_IOQ_WRITING	0x0800	/* xprt is used by svc_ioq_write */
++#define SVC_XPRT_FLAG_NO_SET		0x1000  /* do not register with rpcbind */
+ 
+ #define SVC_XPRT_FLAG_DESTROYED (SVC_XPRT_FLAG_DESTROYING \
+ 				| SVC_XPRT_FLAG_RELEASING)
+@@ -272,7 +273,11 @@
+ 		struct {
+ 			svc_req_fun_t process_cb;
+ 			svc_xprt_fun_t remote_addr_set_cb;
++#ifdef __cplusplus
++		}connection_dispatch_ops;
++#else
+ 		};
++#endif
+ 		svc_xprt_fun_t rendezvous_cb;
+ 	}  xp_dispatch;
+ 	SVCXPRT *xp_parent;
+@@ -315,6 +320,8 @@
+ 	int xp_ifindex;		/* interface index */
+ 	int xp_si_type;		/* si type */
+ 	int xp_type;		/* xprt type */
++	char *xp_ip;		/* remote ip */
++	int xp_port;		/* remote port */
+ 
+ 	int32_t xp_refcnt;	/* handle reference count */
+ 	uint16_t xp_flags;	/* flags */
+@@ -327,6 +334,10 @@
+ 		struct in6_pktinfo in6;
+ #endif
+ 	} xp_pktinfo;
++
++	/* Client details - IP Address & Port */
++	char xp_clnt_addr[INET6_ADDRSTRLEN];
++	uint16_t xp_clnt_port;
+ };
+ 
+ #define XPRT_FMT "xprt: [ptr = {},flags = {},fd = {},type = {},refcnt = {}]"
+diff -ur ntirpc-7.2/ntirpc/rpc/xdr.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/xdr.h
+--- ntirpc-7.2/ntirpc/rpc/xdr.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/xdr.h	2026-05-18 19:40:20.000000000 -0400
+@@ -123,7 +123,7 @@
+ 	VIO_DATA,               /* data buffer */
+ 	VIO_TRAILER_LEN,	/* length field for following TRAILER buffer */
+ 	VIO_TRAILER,            /* trailer buffer after data */
+-} vio_type;
++} vio_type_t;
+ 
+ /* XDR buffer vector descriptors */
+ typedef struct xdr_vio {
+@@ -133,7 +133,7 @@
+ 	uint8_t *vio_wrap;	/* maximum vio_tail */
+ 	uint32_t vio_length;	/* length of buffer, used for vector
+ 				   pre-allocation */
+-	vio_type vio_type;	/* type of buffer */   
++	vio_type_t vio_type;	/* type of buffer */   
+ } xdr_vio;
+ 
+ /* vio_wrap >= vio_tail >= vio_head >= vio_base */
+@@ -162,7 +162,11 @@
+ 				 * 0: not allocated */
+ 	u_int	uio_flags;
+ 	int32_t uio_references;
++#ifdef __cplusplus
++	xdr_vio uio_vio[1];
++#else
+ 	xdr_vio	uio_vio[0];	/* appended vectors */
++#endif
+ } xdr_uio;
+ 
+ /* Op flags */
+diff -ur ntirpc-7.2/ntirpc/rpc/xdr_inline.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/xdr_inline.h
+--- ntirpc-7.2/ntirpc/rpc/xdr_inline.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/ntirpc/rpc/xdr_inline.h	2026-05-18 19:40:20.000000000 -0400
+@@ -52,6 +52,17 @@
+ #include <rpc/types.h>
+ #include <rpc/xdr.h>
+ 
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#ifndef UNUSED
++#define UNUSED_ATTR __attribute__((unused))
++#define UNUSED(...) UNUSED_(__VA_ARGS__)
++#define UNUSED_(arg) NOT_USED_##arg UNUSED_ATTR
++#endif
++
++
+ /*
+  * XDR integers
+  */
+@@ -639,7 +650,7 @@
+ }
+ 
+ static inline bool
+-xdr_bytes_free(XDR *xdrs, char **cpp, size_t size)
++xdr_bytes_free(XDR *UNUSED(xdrs), char **cpp, size_t size)
+ {
+ 	if (*cpp) {
+ 		mem_free(*cpp, size);
+@@ -840,7 +851,7 @@
+ }
+ 
+ static inline bool
+-xdr_array_free(XDR *xdrs, char **cpp, u_int *sizep, u_int maxsize,
++xdr_array_free(XDR *xdrs, char **cpp, u_int *sizep, u_int UNUSED(maxsize),
+ 	       u_int selem, xdrproc_t xdr_elem)
+ {
+ 	char *target = *cpp;
+@@ -993,7 +1004,7 @@
+ }
+ 
+ static inline bool
+-xdr_string_free(XDR *xdrs, char **cpp)
++xdr_string_free(XDR *UNUSED(xdrs), char **cpp)
+ {
+ 	if (*cpp) {
+ 		mem_free(*cpp, strlen(*cpp) + 1);
+@@ -1064,4 +1075,8 @@
+ 	return (inline_xdr_u_int64_t(xdrs, (u_int64_t *) ullp));
+ }
+ 
++#ifdef __cplusplus
++}
++#endif /* extern "C" */
++
+ #endif				/* _TIRPC_INLINE_XDR_H */
+diff -ur ntirpc-7.2/src/clnt_generic.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/clnt_generic.c
+--- ntirpc-7.2/src/clnt_generic.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/clnt_generic.c	2026-05-18 19:40:20.000000000 -0400
+@@ -447,10 +447,43 @@
+ 	return (1);
+ }
+ 
++/*
++ * Helper function to insert RDMA client request into call_expires
++ */
++static void
++rdma_clnt_req_expire_insert(struct clnt_req *cc)
++{
++	struct cx_data *cx = CX_DATA(cc->cc_clnt);
++	struct rpc_dplx_rec *rec = cx->cx_rec;
++	struct opr_rbtree_node *nv;
++	struct timespec ts;
++
++	/* Calculate expiration time */
++	(void)clock_gettime(CLOCK_MONOTONIC_FAST, &ts);
++	timespecadd(&ts, &cc->cc_timeout, &ts);
++	cc->cc_expire_ms = timespec_ms(&ts);
++
++	rpc_dplx_rli(rec);
++	cc->cc_flags = CLNT_REQ_FLAG_EXPIRING;
++ repeat:
++	nv = opr_rbtree_insert(&rec->rdma_call_expires, &cc->cc_rqst);
++	if (nv) {
++		/* add this slightly later */
++		cc->cc_expire_ms++;
++		goto repeat;
++	}
++	rpc_dplx_rui(rec);
++}
++
+ enum clnt_stat
+ clnt_req_callback(struct clnt_req *cc)
+ {
+-	svc_rqst_expire_insert(cc);
++	/* Add to appropriate call_expires list based on transport type */
++	if (cc->cc_clnt->rdma_clnt) {
++		rdma_clnt_req_expire_insert(cc);
++	} else {
++		svc_rqst_expire_insert(cc);
++	}
+ 
+ 	return CLNT_CALL_ONCE(cc);
+ }
+@@ -492,6 +525,20 @@
+ 	return (RPC_SUCCESS);
+ }
+ 
++/*
++ * Helper function to remove RDMA client request from call_expires
++ */
++void
++rdma_clnt_req_expire_remove(struct clnt_req *cc)
++{
++	struct cx_data *cx = CX_DATA(cc->cc_clnt);
++	struct rpc_dplx_rec *rec = cx->cx_rec;
++
++	rpc_dplx_rli(rec);
++	opr_rbtree_remove(&rec->rdma_call_expires, &cc->cc_rqst);
++	rpc_dplx_rui(rec);
++}
++
+ void
+ clnt_req_reset(struct clnt_req *cc)
+ {
+@@ -505,7 +552,12 @@
+ 					   CLNT_REQ_FLAG_ACKSYNC |
+ 					   CLNT_REQ_FLAG_EXPIRING)
+ 	    & CLNT_REQ_FLAG_EXPIRING) {
+-		svc_rqst_expire_remove(cc);
++		/* Remove from appropriate call_expires list based on transport type */
++		if (cc->cc_clnt->rdma_clnt) {
++			rdma_clnt_req_expire_remove(cc);
++		} else {
++			svc_rqst_expire_remove(cc);
++		}
+ 		cc->cc_expire_ms = 0;	/* atomic barrier(s) */
+ 	}
+ }
+@@ -525,6 +577,7 @@
+ 	cc->cc_refreshes = 2;
+ 	cc->cc_timeout = timeout;
+ 
++
+ 	if (timeout.tv_nsec < 0 || timeout.tv_nsec > 999999999
+ 	 || timeout.tv_sec < 0) {
+ 		__warnx(TIRPC_DEBUG_FLAG_ERROR,
+@@ -585,7 +638,11 @@
+ 	if (atomic_postclear_uint16_t_bits(&cc->cc_flags,
+ 					   CLNT_REQ_FLAG_EXPIRING)
+ 	    & CLNT_REQ_FLAG_EXPIRING) {
+-		svc_rqst_expire_remove(cc);
++		if (cc->cc_clnt->rdma_clnt) {
++			rdma_clnt_req_expire_remove(cc);
++		} else {
++			svc_rqst_expire_remove(cc);
++		}
+ 		cc->cc_expire_ms = 0;	/* atomic barrier(s) */
+ 	}
+ 
+diff -ur ntirpc-7.2/src/clnt_internal.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/clnt_internal.h
+--- ntirpc-7.2/src/clnt_internal.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/clnt_internal.h	2026-05-18 19:40:20.000000000 -0400
+@@ -64,5 +64,9 @@
+ /* in svc_rqst.c */
+ void svc_rqst_expire_insert(struct clnt_req *);
+ void svc_rqst_expire_remove(struct clnt_req *);
+-
++void svc_rqst_expire_task(struct work_pool_entry *);
++int svc_rqst_expire_cmpf(const struct opr_rbtree_node *lhs,
++			 const struct opr_rbtree_node *rhs);
++void rdma_clnt_req_expire_remove(struct clnt_req *);
++bool clnt_data_isvalid(struct rpc_client *);
+ #endif				/* _CLNT_INTERNAL_H */
+diff -ur ntirpc-7.2/src/clnt_rdma.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/clnt_rdma.c
+--- ntirpc-7.2/src/clnt_rdma.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/clnt_rdma.c	2026-05-18 19:40:20.000000000 -0400
+@@ -54,6 +54,7 @@
+ #include <err.h>
+ #include "rpc_com.h"
+ #include "clnt_internal.h"
++#include "svc_internal.h"
+ #include "rpc_rdma.h"
+ 
+ #define MAX_DEFAULT_FDS		 20000
+@@ -88,29 +89,101 @@
+  * followed by CLNT_DESTROY() as necessary.
+  */
+ CLIENT *
+-clnt_rdma_ncreatef(RDMAXPRT *rdma_xprt,		/* init but NOT connect()ed */
++clnt_rdma_ncreatef(const SVCXPRT *xprt,		/* init but NOT connect()ed */
+ 		   const rpcprog_t program,
+ 		   const rpcvers_t version,
+-		   const u_int flags)
++		   const u_int flags, bool create)
+ {
+ 	struct cm_data *cm = clnt_rdma_data_zalloc();
+ 	CLIENT *cl = &cm->cm_cx.cx_c;
+ 	struct rpc_msg call_msg;
+ 	XDR xdrs[1];		/* temp XDR stream */
+ 
+-	cl->cl_ops = clnt_rdma_ops();
+-
+-	if (!rdma_xprt || rdma_xprt->state != RDMAXS_INITIAL) {
+-		__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-			"%s: %p@%p called with invalid transport address",
+-			__func__, cl, rdma_xprt);
+-		cl->cl_error.re_status = RPC_UNKNOWNADDR;
+-		return (cl);
++	RDMAXPRT *rdma_xprt = NULL;
++	if (create) {
++		rdma_xprt = rpc_rdma_allocate(((RDMAXPRT *)xprt)->xa);
++		if (!rdma_xprt) {
++			__warnx(TIRPC_DEBUG_FLAG_ERROR,
++				"%s: rdma allocate failed", __func__);
++			cl->cl_error.re_status = RPC_SYSTEMERROR;
++			return cl;
++		}
++	} else {
++		rdma_xprt = (RDMAXPRT *)xprt;
++		rdma_xprt->shared = true;
++		/* Take ref for shared xprt */
++		SVC_REF(&rdma_xprt->sm_dr.xprt, SVC_REF_FLAG_NONE);
+ 	}
++
+ 	cm->cm_cx.cx_rec = &rdma_xprt->sm_dr;
++	cl->cl_ops = clnt_rdma_ops();
++	cl->rdma_clnt = true;
+ 
+-	rpc_rdma_connect(rdma_xprt);
+-	rpc_rdma_connect_finalize(rdma_xprt);
++	/* This is used when we want to create seperate
++	 * connection for callback channel.
++	 * xprt we are passing is existing connection,
++	 * so we need separet flag to indicate we want to
++	 * create new connection or existing one as callback channel.
++	 * For NFSv4.1 its always false, since we want to use same connection. */
++	if (create) {
++		/* Copy remote ip */
++		svc_rdma_ops(&rdma_xprt->sm_dr.xprt);
++
++		rdma_xprt->sm_dr.xprt.xp_ip = mem_alloc(SOCK_NAME_MAX);
++		memcpy(rdma_xprt->sm_dr.xprt.xp_ip, xprt->xp_ip, SOCK_NAME_MAX);
++		rdma_xprt->sm_dr.xprt.xp_port = xprt->xp_port;
++
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "%s: create rdma clnt ip %s port %d",
++			__func__, rdma_xprt->sm_dr.xprt.xp_ip, rdma_xprt->sm_dr.xprt.xp_port);
++
++		/* RDMAX_CLIENT indicate is client connection from
++		 * server to client if we are creating new connection
++		 * for server listen connection we use xa->backlog
++		 * for client to server connection we use RDMAX_SERVER_CHILD */
++		rdma_xprt->server = RDMAX_CLIENT;
++
++		if (!rdma_xprt || rdma_xprt->state != RDMAXS_INITIAL) {
++			__warnx(TIRPC_DEBUG_FLAG_ERROR,
++				"%s: %p@%p called with invalid transport address",
++				__func__, cl, rdma_xprt);
++			cl->cl_error.re_status = RPC_UNKNOWNADDR;
++			return (cl);
++		}
++
++		if (rpc_rdma_connect_prepare(rdma_xprt)) {
++			__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: failed", __func__);
++			cl->cl_error.re_status = RPC_UNKNOWNADDR;
++			return (cl);
++		}
++
++		if (rpc_rdma_connect(rdma_xprt)) {
++			__warnx(TIRPC_DEBUG_FLAG_ERROR,
++				"%s: rdma connect failed", __func__);
++			cl->cl_error.re_status = RPC_UNKNOWNADDR;
++			return (cl);
++		}
++		if (rpc_rdma_connect_finalize(rdma_xprt)) {
++			__warnx(TIRPC_DEBUG_FLAG_ERROR,
++				"%s: rdma connect finalize failed", __func__);
++			cl->cl_error.re_status = RPC_UNKNOWNADDR;
++			return (cl);
++		}
++
++		struct rpc_dplx_rec *rec = REC_XPRT(xprt);
++		rdma_xprt->sm_dr.recvsz = rec->recvsz;
++		rdma_xprt->sm_dr.sendsz = rec->sendsz;
++		rdma_xprt->sm_dr.pagesz = rec->pagesz;
++
++		rdma_xprt->sm_dr.recv_hdr_sz = rec->recv_hdr_sz;
++		rdma_xprt->sm_dr.send_hdr_sz = rec->send_hdr_sz;
++
++		if (xdr_rdma_create(rdma_xprt)) {
++			__warnx(TIRPC_DEBUG_FLAG_ERROR,
++				"%s: buffer allocation failed", __func__);
++			cl->cl_error.re_status = RPC_SYSTEMERROR;
++			return (cl);
++		}
++	}
+ 
+ 	/*
+ 	 * initialize call message
+@@ -162,23 +235,42 @@
+ 		xdr_rdma_ioq_uv_fetch(&rdma_xprt->sm_dr.ioq, &rdma_xprt->cbqh,
+ 				 "call context", 1, IOQ_FLAG_NONE);
+ 	struct rpc_rdma_cbc *cbc = (struct rpc_rdma_cbc *)(_IOQ(have));
++
++        cbc->recvq.xdrs[0].x_lib[1] =
++        cbc->sendq.xdrs[0].x_lib[1] =
++        cbc->dataq.xdrs[0].x_lib[1] =
++        cbc->freeq.xdrs[0].x_lib[1] = rdma_xprt;
++
++        pthread_mutex_lock(&rdma_xprt->cbclist.qmutex);
++
++        cbc->call_inline = 1;
++        cbc->data_chunk_uv = NULL;
++        cbc->refcnt = 1; // Sentinel ref
++	SVC_REF(&rdma_xprt->sm_dr.xprt, SVC_REF_FLAG_NONE); // for cbc ref
++        cbc->cbc_flags = CBC_FLAG_RELEASE;
++        cbc->read_waits = 0;
++        cbc->write_waits = 0;
++        cbc->active = false;
++        cbc->non_registered_buf = NULL;
++        cbc->non_registered_buf_len = 0;
++
++        TAILQ_INSERT_TAIL(&rdma_xprt->cbclist.qh, &cbc->cbc_list, q);
++        rdma_xprt->cbclist.qcount++;
++        pthread_mutex_unlock(&rdma_xprt->cbclist.qmutex);
++
+ 	XDR *xdrs;
+ 	u_int32_t *uint32p;
+ 
+-	/* free old buffers (should do nothing) */
+-	xdr_ioq_release(&cbc->recvq.ioq_uv.uvqh);
+-	xdr_ioq_release(&cbc->sendq.ioq_uv.uvqh);
+-	xdr_rdma_callq(rdma_xprt);
+-
+-	cbc->recvq.xdrs[0].x_lib[1] =
+-	cbc->sendq.xdrs[0].x_lib[1] = rdma_xprt;
++	cc->cc_timeout.tv_sec = cc->cc_timeout.tv_nsec = 0;
+ 
+-	(void) xdr_rdma_ioq_uv_fetch(&cbc->sendq, &rdma_xprt->outbufs_data.uvqh,
++	/* Use hdr buffer since callbacks don't contain data */
++	(void) xdr_rdma_ioq_uv_fetch(&cbc->sendq, &rdma_xprt->outbufs_hdr.uvqh,
+ 				"call buffer", 1, IOQ_FLAG_NONE);
+ 	xdr_ioq_reset(&cbc->sendq, 0);
+ 
+ 	xdrs = cbc->sendq.xdrs;
+ 	cc->cc_error.re_status = RPC_SUCCESS;
++	xdrs->x_op = XDR_ENCODE;
+ 
+ 	mutex_lock(&cl->cl_lock);
+ 	uint32p = (u_int32_t *)&cx->cx_mcallc[0];
+@@ -194,16 +286,20 @@
+ 		__warnx(TIRPC_DEBUG_FLAG_CLNT_RDMA,
+ 			"%s: %p@%p failed",
+ 			__func__, cl, cx->cx_rec);
+-		xdr_ioq_release(&cbc->sendq.ioq_uv.uvqh);
++		cbc_release_it(cbc);
+ 		return (RPC_CANTENCODEARGS);
+ 	}
+ 	mutex_unlock(&cl->cl_lock);
+ 
++	/* send request and recv response */
+ 	if (!xdr_rdma_clnt_flushout(cbc)) {
++		cbc_release_it(cbc);
+ 		cl->cl_error.re_errno = errno;
+ 		return (RPC_CANTSEND);
+ 	}
+ 
++	cbc_release_it(cbc);
++
+ 	return (RPC_SUCCESS);
+ }
+ 
+diff -ur ntirpc-7.2/src/clnt_vc.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/clnt_vc.c
+--- ntirpc-7.2/src/clnt_vc.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/clnt_vc.c	2026-05-18 19:40:20.000000000 -0400
+@@ -73,6 +73,9 @@
+ #include "svc_ioq.h"
+ #include "clnt_internal.h"
+ #include "svc_internal.h"
++#ifdef USE_RPC_RDMA
++#include "rpc_rdma.h"
++#endif
+ 
+ static enum xprt_stat clnt_vc_process(struct svc_req *req);
+ static struct clnt_ops *clnt_vc_ops(void);
+@@ -124,6 +127,49 @@
+  *      server tranpsorts sharing an underlying bytestream (Matt).
+  */
+ 
++#ifdef USE_RPC_RDMA
++/* Create new RDMA client with specified connection parameters */
++CLIENT *
++clnt_rdma_create(int fd, char *host, int port, int recv_sz, int send_sz,
++    int page_sz, const rpcprog_t prog, const rpcvers_t vers,
++    const uint32_t flags)
++{
++	struct rpc_rdma_attr tmp_xa = {
++		.statistics_prefix = NULL,
++		.node = "::",
++		.port = "20049",                /* default port 20049 */
++		.sq_depth = 32,                 /* default was 50 */
++		.max_send_sge = 32,             /* minimum 2 */
++		.rq_depth = 32,                 /* default was 50 */
++		.max_recv_sge = 31,             /* minimum 1 */
++		.backlog = 10,                  /* minimum 2 */
++		.credits = 30,                  /* default 10 */
++		.destroy_on_disconnect = true,
++		.use_srq = false,
++	};
++	struct rpc_rdma_attr *use_xa = mem_alloc(sizeof(struct rpc_rdma_attr));
++	memcpy(use_xa, &tmp_xa, sizeof(struct rpc_rdma_attr));
++	SVCXPRT *xprt = svc_fd_ncreatef(fd, send_sz, recv_sz, flags);
++	if (!xprt) {
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: Failed to create xprt fd %d",
++			__func__, fd);
++		return NULL;
++	}
++	RDMAXPRT *rdma_xprt = (RDMAXPRT *)xprt;
++	rdma_xprt->xa = use_xa;
++	struct rpc_dplx_rec *rec = REC_XPRT(xprt);
++	rec->recvsz = RDMA_DATA_CHUNK_SZ;
++	rec->sendsz = RDMA_DATA_CHUNK_SZ;
++	rec->pagesz = page_sz;
++	rec->recv_hdr_sz = RDMA_HDR_CHUNK_SZ;
++	rec->send_hdr_sz = RDMA_HDR_CHUNK_SZ;
++	xprt->xp_ip = host;
++	xprt->xp_port = port;
++	/* create rdma_xprt using xprt */
++	return clnt_rdma_ncreatef(xprt, prog, vers, flags, true);
++}
++#endif
++
+ /*
+  * Create a client handle for a connection.
+  * Default options are set, which the user can change using clnt_control()'s.
+diff -ur ntirpc-7.2/src/CMakeLists.txt ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/CMakeLists.txt
+--- ntirpc-7.2/src/CMakeLists.txt	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/CMakeLists.txt	2026-05-18 19:40:20.000000000 -0400
+@@ -5,9 +5,6 @@
+   -D_GNU_SOURCE
+ )
+ 
+-# ok on Linux and FreeBSD w/GCC and clang compilers
+-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+-
+ ########### next target ###############
+ 
+ SET(ntirpc_common_SRCS
+@@ -27,7 +24,6 @@
+   getnetconfig.c
+   getnetpath.c
+   getpeereid.c
+-  getrpcent.c
+   mt_misc.c
+   pmap_prot.c
+   pmap_prot2.c
+@@ -136,7 +132,7 @@
+   SOVERSION "${NTIRPC_MAJOR_VERSION}${NTIRPC_MINOR_VERSION}"
+   )
+ 
+-install(TARGETS ntirpc DESTINATION ${LIB_INSTALL_DIR})
++install(TARGETS ntirpc DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+ ########### install files ###############
+ 
+diff -ur ntirpc-7.2/src/libntirpc.map.in.cmake ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/libntirpc.map.in.cmake
+--- ntirpc-7.2/src/libntirpc.map.in.cmake	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/libntirpc.map.in.cmake	2026-05-18 19:40:20.000000000 -0400
+@@ -70,6 +70,8 @@
+     clnt_vc_get_client_xprt;
+     clnt_vc_ncreatef;
+     clnt_vc_ncreate_svc;
++    clnt_rdma_create;
++    clnt_rdma_ncreatef;
+ 
+     # e*
+     endnetconfig;
+diff -ur ntirpc-7.2/src/lttng/CMakeLists.txt ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/lttng/CMakeLists.txt
+--- ntirpc-7.2/src/lttng/CMakeLists.txt	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/lttng/CMakeLists.txt	2026-05-18 19:40:20.000000000 -0400
+@@ -22,7 +22,7 @@
+   SOVERSION "${NTIRPC_MAJOR_VERSION}${NTIRPC_MINOR_VERSION}"
+ )
+ 
+-install(TARGETS ntirpc_tracepoints COMPONENT tracing DESTINATION ${LIB_INSTALL_DIR} )
++install(TARGETS ntirpc_tracepoints COMPONENT tracing DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+ 
+ add_library(ntirpc_lttng STATIC lttng_defines.c)
+ #add_sanitizers(ntirpc_lttng)
+diff -ur ntirpc-7.2/src/metrics_libntirpc.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/metrics_libntirpc.h
+--- ntirpc-7.2/src/metrics_libntirpc.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/metrics_libntirpc.h	2026-05-18 19:40:20.000000000 -0400
+@@ -33,6 +33,7 @@
+ #include <rpc/auth_gss.h>
+ #endif
+ #include <rpc/auth_stat.h>
++#include <time.h>
+ 
+ typedef enum gss_svc_auth_step {
+ 	VALIDATE_AUTH_DATA = 0,
+diff -ur ntirpc-7.2/src/monitoring/CMakeLists.txt ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/monitoring/CMakeLists.txt
+--- ntirpc-7.2/src/monitoring/CMakeLists.txt	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/monitoring/CMakeLists.txt	2026-05-18 19:40:20.000000000 -0400
+@@ -8,13 +8,13 @@
+ 
+ add_library(ntirpcmonitoring SHARED ${ntirpcmonitoring_SRCS})
+ add_sanitizers(ntirpcmonitoring)
+-set_target_properties(ntirpcmonitoring PROPERTIES COMPILE_FLAGS "-fPIC"
++set_target_properties(ntirpcmonitoring PROPERTIES
+   VERSION ${NTIRPC_VERSION}
+   SOVERSION "${NTIRPC_MAJOR_VERSION}${NTIRPC_MINOR_VERSION}"
+   )
+ target_include_directories(ntirpcmonitoring     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/prometheus-cpp-lite/core/include)
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors -Werror -Wall -Wextra")
+-install(TARGETS ntirpcmonitoring DESTINATION ${LIB_INSTALL_DIR})
++install(TARGETS ntirpcmonitoring DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+ ########### install files ###############
+-install(FILES  include/monitoring.h DESTINATION include/ntirpc)
++install(FILES  include/monitoring.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ntirpc)
+diff -ur ntirpc-7.2/src/rpc_dplx_internal.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/rpc_dplx_internal.h
+--- ntirpc-7.2/src/rpc_dplx_internal.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/rpc_dplx_internal.h	2026-05-18 19:40:20.000000000 -0400
+@@ -57,6 +57,7 @@
+ 	struct xdr_ioq ioq;
+ 	struct poolq_head writeq;	/**< poolq for write requests */
+ 	struct opr_rbtree call_replies;
++	struct opr_rbtree rdma_call_expires;	/**< call expiration tree for RDMA */
+ 	struct opr_rbtree_node fd_node;
+ 	struct {
+ 		rpc_dplx_lock_t lock;
+@@ -114,11 +115,16 @@
+ 	cond_destroy(&lock->we.cv);
+ }
+ 
++/* Forward declaration for call_expires comparison function */
++int svc_rqst_expire_cmpf(const struct opr_rbtree_node *lhs,
++			 const struct opr_rbtree_node *rhs);
++
+ static inline void
+ rpc_dplx_rec_init(struct rpc_dplx_rec *rec)
+ {
+ 	rpc_dplx_lock_init(&rec->recv.lock);
+ 	opr_rbtree_init(&rec->call_replies, clnt_req_xid_cmpf);
++	opr_rbtree_init(&rec->rdma_call_expires, svc_rqst_expire_cmpf);
+ 	mutex_init(&rec->xprt.xp_lock, NULL);
+ 	TAILQ_INIT(&rec->writeq.qh);
+ 	mutex_init(&rec->writeq.qmutex, NULL);
+diff -ur ntirpc-7.2/src/rpc_rdma.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/rpc_rdma.c
+--- ntirpc-7.2/src/rpc_rdma.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/rpc_rdma.c	2026-05-18 19:40:20.000000000 -0400
+@@ -74,6 +74,7 @@
+ #include "misc/abstract_atomic.h"
+ #include "rpc_rdma.h"
+ #include "svc_internal.h"
++#include "clnt_internal.h"
+ 
+ #ifdef HAVE_VALGRIND_MEMCHECK_H
+ #  include <valgrind/memcheck.h>
+@@ -329,7 +330,7 @@
+ 	int cleanup_count = 0;
+ 	struct poolq_head *ioqh = &rdma_xprt->cbclist;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s() before cleanup "
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "%s() before cleanup "
+ 	    "%p xp_refcnt %d active requests %d qcount %d",
+ 	    __func__, &rdma_xprt->sm_dr.xprt,
+ 	    rdma_xprt->sm_dr.xprt.xp_refcnt, rdma_xprt->active_requests,
+@@ -376,7 +377,7 @@
+ 				cbc_release = true;
+ 				cbc_release_count = cbc->write_waits;
+ 
+-				__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s active cbc %p "
++				__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "%s active cbc %p "
+ 				    "cbc_ref %d read_waits %d write_waits %d "
+ 				    "active requests %d rdma_xprt %p",
+ 				    __func__, cbc, cbc->refcnt, cbc->read_waits,
+@@ -386,7 +387,7 @@
+ 
+ 			if (!cbc_release) {
+ 				/* Pending request should cleanup this cbc */
+-				__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s active cbc %p "
++				__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "%s active cbc %p "
+ 				    "cbc_ref %d read_waits %d write_waits %d "
+ 				    "active requests %d rdma_xprt %p",
+ 				    __func__, cbc, cbc->refcnt, cbc->read_waits,
+@@ -417,7 +418,7 @@
+ 
+ 	pthread_mutex_unlock(&ioqh->qmutex);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s() after cleanup "
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "%s() after cleanup "
+ 	    "%p xp_refcnt %d active requests %d cleanup count %d "
+ 	    "qcount %d",
+ 	    __func__, &rdma_xprt->sm_dr.xprt,
+@@ -515,7 +516,7 @@
+ 
+ 		rpc_rdma_state.cq_thread_ids[rpc_rdma_state.cq_thread_count] = thrid;
+ 
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 			"%s() thread %lx spawned for epoll %d",
+ 			__func__,
+ 			(unsigned long)thrid,
+@@ -661,7 +662,7 @@
+ 		return rc;
+ 	}
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 		"%p:rpc_rdma_fd_add fd:%d epollfd:%d",
+ 		pthread_self(), fd, epollfd);
+ 
+@@ -671,7 +672,7 @@
+ int
+ rpc_rdma_fd_del(int fd, int epollfd)
+ {
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 		"%p:rpc_rdma_fd_del fd:%d epollfd:%d",
+ 		pthread_self(), fd, epollfd);
+ 
+@@ -844,8 +845,8 @@
+  *
+  * @return 0 on success, work completion status if not 0
+  */
+-static int
+-rpc_rdma_cq_event_handler(RDMAXPRT *rdma_xprt)
++int
++rpc_rdma_cq_event_handler(RDMAXPRT *rdma_xprt, int expected_poll_count)
+ {
+ 	struct ibv_wc wc[IBV_POLL_EVENTS];
+ 	struct ibv_cq *ev_cq;
+@@ -858,6 +859,9 @@
+ 	uint32_t len;
+ 	int poll_count = IBV_POLL_COUNT;
+ 
++	if (expected_poll_count)
++		poll_count = expected_poll_count;
++
+ 	rc = ibv_get_cq_event(rdma_xprt->comp_channel, &ev_cq, &ev_ctx);
+ 	if (rc) {
+ 		rc = errno;
+@@ -1047,6 +1051,56 @@
+ }
+ 
+ /**
++ * rpc_rdma_process_transport_expires: process expired client requests for a specific RDMA transport
++ * Similar to the call_expires processing in svc_rqst_epoll_loop
++ *
++ * @param[IN] rdma_xprt RDMA transport to process
++ * @param[IN] expire_ms current time in milliseconds
++ * @param[INOUT] timeout_ms pointer to timeout value to be updated
++ */
++static void
++rpc_rdma_process_transport_expires(RDMAXPRT *rdma_xprt, int expire_ms, int *timeout_ms)
++{
++	struct clnt_req *cc;
++	struct opr_rbtree_node *n_node;
++	struct rpc_dplx_rec *rec;
++	int min_timeout = *timeout_ms;
++
++	if (!rdma_xprt)
++		return;
++
++	rec = &rdma_xprt->sm_dr;
++
++	/* Process rdma_call_expires for this transport - similar to svc_rqst_epoll_loop */
++	rpc_dplx_rli(rec);
++	while ((n_node = opr_rbtree_first(&rec->rdma_call_expires))) {
++		cc = opr_containerof(n_node, struct clnt_req, cc_rqst);
++
++		if (cc->cc_expire_ms > expire_ms) {
++			int transport_timeout = cc->cc_expire_ms - expire_ms;
++			if (transport_timeout < min_timeout) {
++				min_timeout = transport_timeout;
++			}
++			break;
++		}
++
++		/* order dependent */
++		atomic_clear_uint16_t_bits(&cc->cc_flags,
++					   CLNT_REQ_FLAG_EXPIRING);
++		opr_rbtree_remove(&rec->rdma_call_expires, &cc->cc_rqst);
++		cc->cc_expire_ms = 0;	/* atomic barrier(s) */
++
++		atomic_inc_uint32_t(&cc->cc_refcnt);
++		cc->cc_wpe.fun = svc_rqst_expire_task;
++		cc->cc_wpe.arg = NULL;
++		work_pool_submit(&svc_work_pool, &cc->cc_wpe);
++	}
++	rpc_dplx_rui(rec);
++
++	*timeout_ms = min_timeout;
++}
++
++/**
+  * rpc_rdma_cq_thread: thread function which waits for new completion events
+  * and gives them to handler (then ack the event)
+  *
+@@ -1056,24 +1110,30 @@
+ {
+ 	RDMAXPRT *rdma_xprt;
+ 	struct epoll_event epoll_events[EPOLL_EVENTS];
++	struct timespec ts;
++	int timeout_ms;
++	int expire_ms;
+ 	int i;
+ 	int n;
+ 	int rc;
+ 	int epollfd = *((int *) arg);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
+-		"%p, Starting rpc_rdma_cq_thread epollfd:%d",
+-		pthread_self(), epollfd);
+-
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 		"%p, Starting rpc_rdma_cq_thread epollfd:%d",
+ 		pthread_self(), epollfd);
+ 
+ 	rcu_register_thread();
+ 
+ 	while (rpc_rdma_state.run_count > 0) {
++		timeout_ms = EPOLL_WAIT_MS;
++
++		/* Process call_expires for RDMA transports */
++		/* coarse nsec, not system time */
++		(void)clock_gettime(CLOCK_MONOTONIC_FAST, &ts);
++		expire_ms = timespec_ms(&ts);
++
+ 		n = epoll_wait(epollfd,
+-				epoll_events, EPOLL_EVENTS, EPOLL_WAIT_MS);
++				epoll_events, EPOLL_EVENTS, timeout_ms);
+ 		if (n == 0)
+ 			continue;
+ 
+@@ -1098,6 +1158,9 @@
+ 				continue;
+ 			}
+ 
++			/* Process call_expires for this RDMA transport */
++			rpc_rdma_process_transport_expires(rdma_xprt, expire_ms, &timeout_ms);
++
+ 			if (epoll_events[i].events == EPOLLERR
+ 			 || epoll_events[i].events == EPOLLHUP) {
+ 				__warnx(TIRPC_DEBUG_FLAG_ERROR,
+@@ -1116,7 +1179,7 @@
+ 
+ 			mutex_lock(&rdma_xprt->cm_lock);
+ 
+-			rc = rpc_rdma_cq_event_handler(rdma_xprt);
++			rc = rpc_rdma_cq_event_handler(rdma_xprt, 0);
+ 			if (rc) {
+ 				SVC_DESTROY(&rdma_xprt->sm_dr.xprt);
+ 			}
+@@ -1161,7 +1224,7 @@
+ 
+ 	switch (event->event) {
+ 	case RDMA_CM_EVENT_ADDR_RESOLVED:
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 			"%s() %p ADDR_RESOLVED",
+ 			__func__, rdma_xprt);
+ 		mutex_lock(&rdma_xprt->cm_lock);
+@@ -1171,7 +1234,7 @@
+ 		break;
+ 
+ 	case RDMA_CM_EVENT_ROUTE_RESOLVED:
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 			"%s() %p ROUTE_RESOLVED",
+ 			__func__, rdma_xprt);
+ 		mutex_lock(&rdma_xprt->cm_lock);
+@@ -1181,26 +1244,28 @@
+ 		break;
+ 
+ 	case RDMA_CM_EVENT_ESTABLISHED:
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 			"%s() %p ESTABLISHED",
+ 			__func__, rdma_xprt);
+ 
+ 		rdma_xprt->state = RDMAXS_CONNECTED;
+ 
+-		int cq_fd = rdma_xprt->comp_channel->fd;
+-		int cq_thread_index = cq_fd % NUM_CQ_EPOLL_THREADS;
+-		rc = rpc_rdma_fd_add(rdma_xprt, cq_fd,
++		if (rdma_xprt->server) {
++			int cq_fd = rdma_xprt->comp_channel->fd;
++			int cq_thread_index = cq_fd % NUM_CQ_EPOLL_THREADS;
++			rc = rpc_rdma_fd_add(rdma_xprt, cq_fd,
+ 				     rpc_rdma_state.cq_epollfd[cq_thread_index]);
+-		if (rc) {
+-			__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-				"%s:%u ERROR (return)",
+-				__func__, __LINE__);
++			if (rc) {
++				__warnx(TIRPC_DEBUG_FLAG_ERROR,
++					"%s:%u ERROR (return)",
++					__func__, __LINE__);
++			}
++			rpc_rdma_stats_add(rdma_xprt);
+ 		}
+-		rpc_rdma_stats_add(rdma_xprt);
+ 		break;
+ 
+ 	case RDMA_CM_EVENT_CONNECT_REQUEST:
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 			"%s() %p CONNECT_REQUEST",
+ 			__func__, rdma_xprt);
+ 		rpc_rdma_state.c_r.id_queue[0] = cm_id;
+@@ -1223,7 +1288,7 @@
+ 		break;
+ 
+ 	case RDMA_CM_EVENT_DISCONNECTED:
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 			"%s() %p[%u] DISCONNECT EVENT...",
+ 			__func__, rdma_xprt, rdma_xprt->state);
+ 
+@@ -1232,14 +1297,14 @@
+ 		break;
+ 
+ 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 			"%s() %p[%u] cma detected device removal!!!!",
+ 			__func__, rdma_xprt, rdma_xprt->state);
+ 		rc = ENODEV;
+ 		break;
+ 
+ 	case RDMA_CM_EVENT_TIMEWAIT_EXIT:
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 		    "%s() %p[%u] RDMA_CM_EVENT_TIMEWAIT_EXIT",
+ 		    __func__, rdma_xprt, rdma_xprt->state);
+ 
+@@ -1352,6 +1417,41 @@
+ 	pthread_exit(NULL);
+ }
+ 
++/* Handle RDMA connection manager events synchronously */
++int
++rpc_rdma_cm_event_handler_inline(RDMAXPRT *rdma_xprt, int expected_event)
++{
++	int rc = 0;
++	struct rdma_cm_event *event = NULL;
++
++	rc = rdma_get_cm_event(rdma_xprt->event_channel, &event);
++	if (rc) {
++		rc = errno;
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: rdma get event failed xprt %p "
++			"err %d", __func__, rdma_xprt, rc);
++		goto out;
++	}
++
++	if (event->event != expected_event) {
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: unexpected event %d, expected %d "
++			"xprt %s", __func__, event->event, expected_event);
++	}
++
++	SVC_REF(&rdma_xprt->sm_dr.xprt, SVC_REF_FLAG_NONE);
++
++	rc = rpc_rdma_cm_event_handler(rdma_xprt, event);
++
++	rdma_ack_cm_event(event);
++
++	SVC_RELEASE(&rdma_xprt->sm_dr.xprt, SVC_REF_FLAG_NONE);
++
++out:
++	if (rc)
++		SVC_DESTROY(&rdma_xprt->sm_dr.xprt);
++
++	return rc;
++}
++
+ /**
+  * rpc_rdma_destroy_stuff: destroys all qp-related stuff for us
+  *
+@@ -1373,7 +1473,8 @@
+ 	}
+ 
+ 	if (rdma_xprt->comp_channel) {
+-		if (rdma_xprt->state == RDMAXS_CONNECTED) {
++		if (rdma_xprt->server &&
++		    (rdma_xprt->state == RDMAXS_CONNECTED)) {
+ 			int cq_fd = ((RDMAXPRT *)rdma_xprt)->comp_channel->fd;
+ 			int cq_thread_index = cq_fd % NUM_CQ_EPOLL_THREADS;
+ 			rpc_rdma_fd_del(cq_fd,
+@@ -1396,7 +1497,7 @@
+ static void
+ rdma_destroy_cbcs(RDMAXPRT *rdma_xprt) {
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 	    "%s() Destroying xprt %p cbcs qcount %u qsize %u total cbcs_memory %u",
+ 	    __func__, rdma_xprt, rdma_xprt->cbqh.qcount, rdma_xprt->cbqh.qsize,
+ 	    rdma_xprt->cbqh.qcount * rdma_xprt->cbqh.qsize);
+@@ -1436,7 +1537,7 @@
+ 
+ static void
+ rdma_destroy_io_bufs(RDMAXPRT *rdma_xprt) {
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 	    "%s() Destroying xprt %p io_bufs",
+ 	    __func__, rdma_xprt);
+ 
+@@ -1456,13 +1557,13 @@
+ 			struct rpc_io_bufs *io_buf =
+ 				opr_containerof(have, struct rpc_io_bufs, q);
+ 
+-			__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s Destroy io_buf %p ioqh %p count %d",
++			__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "%s Destroy io_buf %p ioqh %p count %d",
+ 			    __func__, io_buf, ioqh, ioqh->qcount);
+ 
+ 			if ((io_buf->type == IO_BUF_ALL) ||
+ 			    (io_buf->type == IO_INBUF_HDR)) {
+ 				struct poolq_head *ioqh_bufs = &rdma_xprt->inbufs_hdr.uvqh;
+-				__warnx(TIRPC_DEBUG_FLAG_EVENT,
++				__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 				    "%s() Destroying %p inbufs_hdr head %p count %d io_buf %p",
+ 				    __func__, rdma_xprt, ioqh_bufs, ioqh_bufs->qcount, io_buf);
+ 				xdr_rdma_buf_pool_destroy(ioqh_bufs, io_buf);
+@@ -1471,7 +1572,7 @@
+ 			if ((io_buf->type == IO_BUF_ALL) ||
+ 			    (io_buf->type == IO_OUTBUF_HDR)) {
+ 				struct poolq_head *ioqh_bufs = &rdma_xprt->outbufs_hdr.uvqh;
+-				__warnx(TIRPC_DEBUG_FLAG_EVENT,
++				__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 				    "%s() Destroying %p outbufs_hdr head %p count %d io_buf %p",
+ 				    __func__, rdma_xprt, ioqh_bufs, ioqh_bufs->qcount, io_buf);
+ 				xdr_rdma_buf_pool_destroy(ioqh_bufs, io_buf);
+@@ -1480,7 +1581,7 @@
+ 			if ((io_buf->type == IO_BUF_ALL) ||
+ 			    (io_buf->type == IO_INBUF_DATA)) {
+ 				struct poolq_head *ioqh_bufs = &rdma_xprt->inbufs_data.uvqh;
+-				__warnx(TIRPC_DEBUG_FLAG_EVENT,
++				__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 				    "%s() Destroying %p inbufs_data head %p count %d io_buf %p",
+ 				    __func__, rdma_xprt, ioqh_bufs, ioqh_bufs->qcount, io_buf);
+ 				xdr_rdma_buf_pool_destroy(ioqh_bufs, io_buf);
+@@ -1489,7 +1590,7 @@
+ 			if ((io_buf->type == IO_BUF_ALL) ||
+ 			    (io_buf->type == IO_OUTBUF_DATA)) {
+ 				struct poolq_head *ioqh_bufs = &rdma_xprt->outbufs_data.uvqh;
+-				__warnx(TIRPC_DEBUG_FLAG_EVENT,
++				__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 				    "%s() Destroying %p outbufs_data head %p count %d io_buf %p",
+ 				    __func__, rdma_xprt, ioqh_bufs, ioqh_bufs->qcount, io_buf);
+ 				xdr_rdma_buf_pool_destroy(ioqh_bufs, io_buf);
+@@ -1590,7 +1691,7 @@
+  *
+  * @return rdma_xprt on success, NULL on failure
+  */
+-static RDMAXPRT *
++RDMAXPRT *
+ rpc_rdma_allocate(const struct rpc_rdma_attr *xa)
+ {
+ 	RDMAXPRT *rdma_xprt;
+@@ -1739,9 +1840,13 @@
+ 			__func__);
+ 		goto failure;
+ 	}
+-	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+-		"%s() NFS/RDMA engine bound recvsz %llu sendsz %llu rdma_xprt %p",
+-		__func__, rdma_xprt->sm_dr.recvsz, rdma_xprt->sm_dr.sendsz, rdma_xprt);
++
++	__warnx(TIRPC_DEBUG_FLAG_EVENT | TIRPC_DEBUG_FLAG_RPC_RDMA,
++		"%s() RDMA: NFS/RDMA transport ready on port %s recvsz=%llu sendsz=%llu xprt=%p",
++		__func__, xa->port,
++		(unsigned long long)rdma_xprt->sm_dr.recvsz,
++		(unsigned long long)rdma_xprt->sm_dr.sendsz,
++		rdma_xprt);
+ 
+ 	return (&rdma_xprt->sm_dr.xprt);
+ 
+@@ -1790,7 +1895,7 @@
+ 	    IBV_QP_PATH_MTU | IBV_QP_DEST_QPN | IBV_QP_RQ_PSN |
+ 	    IBV_QP_MAX_DEST_RD_ATOMIC | IBV_QP_MIN_RNR_TIMER, &qp_attr);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 		"%s() %p[%u] ibv_query_qp path mtu %d state %d qp type %d",
+ 		__func__, rdma_xprt, rdma_xprt->state, attr.qp_state,
+ 		attr.path_mtu, qp_attr.qp_type);
+@@ -1799,6 +1904,48 @@
+ 	return 0;
+ }
+ 
++/* Initialize RDMA client completion channel and queue */
++int
++rpc_rdma_setup_stuff_client(RDMAXPRT *rdma_xprt)
++{
++	int rc = 0;
++
++	rdma_xprt->comp_channel = ibv_create_comp_channel(rdma_xprt->cm_id->verbs);
++	if (!rdma_xprt->comp_channel) {
++		rc = errno;
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: create comp channel failed xprt %p "
++			"err %d", __func__, rdma_xprt, rc);
++		goto out;
++	}
++
++	rdma_xprt->cq = ibv_create_cq(rdma_xprt->cm_id->verbs, MAX_CQ_SIZE(rdma_xprt->xa),
++	    rdma_xprt, rdma_xprt->comp_channel, 0);
++	if (!rdma_xprt->cq) {
++		rc = errno;
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: create cq failed xprt %p err %d",
++			__func__, rdma_xprt, rc);
++		goto out;
++	}
++
++	rc = ibv_req_notify_cq(rdma_xprt->cq, 0);
++	if (rc) {
++		rc = errno;
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: notify cq failed xprt %p err %d",
++			__func__, rdma_xprt, rc);
++		goto out;
++	}
++
++	rc = rpc_rdma_create_qp(rdma_xprt, rdma_xprt->cm_id);
++	if (rc) {
++		rc = errno;
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: create qp failed xprt %p err %d",
++			__func__, rdma_xprt, rc);
++	}
++
++out:
++	return rc;
++}
++
+ /**
+  * rpc_rdma_setup_stuff: setup pd, qp an' stuff
+  *
+@@ -1921,10 +2068,14 @@
+ /**
+  * rpc_rdma_setup_cbq
+  */
+-static int
++int
+ rpc_rdma_setup_cbq(RDMAXPRT *rdma_xprt,
+     struct poolq_head *ioqh, u_int depth, u_int sge)
+ {
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
++		"%s: setup cbq xprt %p depth %d sge %d",
++		__func__, rdma_xprt, depth, sge);
++
+ 	if (ioqh->qsize) {
+ 		__warnx(TIRPC_DEBUG_FLAG_ERROR,
+ 			"%s() contexts already allocated",
+@@ -1948,7 +2099,7 @@
+ 		rpc_rdma_allocate_cbc_locked(ioqh);
+ 	}
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s Total cbcs_memory %u "
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "%s Total cbcs_memory %u "
+ 	    "qcount %u qsize %u xprt %p",
+ 	    __func__, ioqh->qcount * ioqh->qsize,
+ 	    ioqh->qcount, ioqh->qsize, rdma_xprt);
+@@ -2035,6 +2186,17 @@
+ 	}
+ 
+ 	rdma_xprt->state = RDMAXS_LISTENING;
++
++	/* Log at EVENT level that RDMA listener is up */
++	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++		"%s() RDMA: NFS/RDMA server is now listening on node %s port %s (backlog=%d sq_depth=%d rq_depth=%d)",
++		__func__,
++		rdma_xprt->xa->node ? rdma_xprt->xa->node : "*",
++		rdma_xprt->xa->port,
++		rdma_xprt->xa->backlog,
++		rdma_xprt->xa->sq_depth,
++		rdma_xprt->xa->rq_depth);
++
+ 	atomic_inc_int32_t(&rpc_rdma_state.run_count);
+ 
+ 	rc = rpc_rdma_thread_create_epoll(&rpc_rdma_state.cm_thread_id,
+@@ -2218,7 +2380,7 @@
+ {
+ 	struct rdma_cm_id *cm_id;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 		"%s() %p[%u] listening (after bind_server)",
+ 		__func__, l_rdma_xprt, l_rdma_xprt->state);
+ 
+@@ -2281,25 +2443,29 @@
+ 	struct rdma_addrinfo *res;
+ 	int rc;
+ 
+-	mutex_lock(&rdma_xprt->cm_lock);
+-
+ 	do {
+ 		memset(&hints, 0, sizeof(hints));
+ 		hints.ai_port_space = rdma_xprt->conn_type;
+ 
+-		rc = rdma_getaddrinfo(rdma_xprt->xa->node, rdma_xprt->xa->port,
++		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "%s: resolve %s port %d", __func__,
++			rdma_xprt->sm_dr.xprt.xp_ip, rdma_xprt->sm_dr.xprt.xp_port);
++		char port_str[SOCK_NAME_MAX];
++		snprintf(port_str, SOCK_NAME_MAX, "%d", rdma_xprt->sm_dr.xprt.xp_port);
++
++		rc = rdma_getaddrinfo(rdma_xprt->sm_dr.xprt.xp_ip, port_str,
+ 					&hints, &res);
+ 		if (rc) {
+ 			rc = errno;
+ 			__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-				"%s() %p[%u] rdma_getaddrinfo: %s (%d)",
+-				__func__, rdma_xprt, rdma_xprt->state, strerror(rc), rc);
++				"%s() %p[%u] rdma_getaddrinfo: %s (%d) ip %s port %d",
++				__func__, rdma_xprt, rdma_xprt->state, strerror(rc), rc,
++				rdma_xprt->sm_dr.xprt.xp_ip, rdma_xprt->sm_dr.xprt.xp_port);
+ 			break;
+ 		}
+ 
+ 		rc = rdma_resolve_addr(rdma_xprt->cm_id, res->ai_src_addr,
+ 					res->ai_dst_addr,
+-					__svc_params->idle_timeout);
++					5000);
+ 		if (rc) {
+ 			rc = errno;
+ 			__warnx(TIRPC_DEBUG_FLAG_ERROR,
+@@ -2309,14 +2475,8 @@
+ 		}
+ 		rdma_freeaddrinfo(res);
+ 
+-		while (rdma_xprt->state == RDMAXS_INITIAL) {
+-			cond_wait(&rdma_xprt->cm_cond, &rdma_xprt->cm_lock);
+-			__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+-				"%s() %p[%u] after cond_wait",
+-				__func__, rdma_xprt, rdma_xprt->state);
+-		}
+-
+-		if (rdma_xprt->state != RDMAXS_ADDR_RESOLVED) {
++		rc = rpc_rdma_cm_event_handler_inline(rdma_xprt, RDMA_CM_EVENT_ADDR_RESOLVED);
++		if (rc) {
+ 			__warnx(TIRPC_DEBUG_FLAG_ERROR,
+ 				"%s() Could not resolve addr",
+ 				__func__);
+@@ -2325,7 +2485,7 @@
+ 		}
+ 
+ 		rc = rdma_resolve_route(rdma_xprt->cm_id,
+-					__svc_params->idle_timeout);
++					5000);
+ 		if (rc) {
+ 			rdma_xprt->state = RDMAXS_ERROR;
+ 			__warnx(TIRPC_DEBUG_FLAG_ERROR,
+@@ -2334,14 +2494,8 @@
+ 			break;
+ 		}
+ 
+-		while (rdma_xprt->state == RDMAXS_ADDR_RESOLVED) {
+-			cond_wait(&rdma_xprt->cm_cond, &rdma_xprt->cm_lock);
+-			__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+-				"%s() %p[%u] after cond_wait",
+-				__func__, rdma_xprt, rdma_xprt->state);
+-		}
+-
+-		if (rdma_xprt->state != RDMAXS_ROUTE_RESOLVED) {
++		rc = rpc_rdma_cm_event_handler_inline(rdma_xprt, RDMA_CM_EVENT_ROUTE_RESOLVED);
++		if (rc) {
+ 			__warnx(TIRPC_DEBUG_FLAG_ERROR,
+ 				"%s() Could not resolve route",
+ 				__func__);
+@@ -2350,8 +2504,6 @@
+ 		}
+ 	} while (0);
+ 
+-	mutex_unlock(&rdma_xprt->cm_lock);
+-
+ 	return rc;
+ }
+ 
+@@ -2398,6 +2550,39 @@
+ 			__func__, rdma_xprt, rdma_xprt->state, strerror(rc), rc);
+ 	}
+ 
++	rc = rpc_rdma_cm_event_handler_inline(rdma_xprt, RDMA_CM_EVENT_ESTABLISHED);
++	if (rc) {
++		rc = errno;
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: conect failed xprt %p err %d",
++			__func__, rdma_xprt, rc);
++	}
++
++	return rc;
++}
++
++/* Prepare RDMA connection by creating event channel and CM ID */
++int
++rpc_rdma_connect_prepare(RDMAXPRT *rdma_xprt)
++{
++	int rc = 0;
++
++	rdma_xprt->event_channel = rdma_create_event_channel();
++	if (!rdma_xprt->event_channel) {
++		rc = errno;
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: create event channel failed "
++			"ip %s err %d", __func__, rdma_xprt->sm_dr.xprt.xp_ip, rc);
++		goto out;
++	}
++
++	rc = rdma_create_id(rdma_xprt->event_channel, &rdma_xprt->cm_id, rdma_xprt,
++	    rdma_xprt->conn_type);
++	if (rc) {
++		rc = errno;
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: create id failed ip %s err %d",
++			__func__, rdma_xprt->sm_dr.xprt.xp_ip, rc);
++		goto out;
++	}
++out:
+ 	return rc;
+ }
+ 
+@@ -2427,29 +2612,20 @@
+ 		return EINVAL;
+ 	}
+ 
+-	if (rdma_xprt->server) {
++	if (rdma_xprt->server != RDMAX_CLIENT) {
+ 		__warnx(TIRPC_DEBUG_FLAG_ERROR,
+ 			"%s() only called from client side!",
+ 			__func__);
+ 		return EINVAL;
+ 	}
+ 
+-	rc = rpc_rdma_thread_create_epoll(&rpc_rdma_state.cm_thread_id,
+-		rpc_rdma_cm_thread, rdma_xprt, &rpc_rdma_state.cm_epollfd);
+-	if (rc) {
+-		__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-			"%s() %p[%u] rpc_rdma_thread_create_epoll failed: %s (%d)",
+-			__func__, rdma_xprt, rdma_xprt->state, strerror(rc), rc);
+-		return rc;
+-	}
+-
+ 	rc = rpc_rdma_bind_client(rdma_xprt);
+ 	if (rc)
+ 		return rc;
+ 	rc = rpc_rdma_pd_get(rdma_xprt);
+ 	if (rc)
+ 		return rc;
+-	rc = rpc_rdma_setup_stuff(rdma_xprt);
++	rc = rpc_rdma_setup_stuff_client(rdma_xprt);
+ 	if (rc) {
+ 		rpc_rdma_destroy_stuff(rdma_xprt);
+ 		return rc;
+@@ -2457,11 +2633,7 @@
+ 	rc = rpc_rdma_setup_cbq(rdma_xprt, &rdma_xprt->cbqh,
+ 				rdma_xprt->xa->rq_depth + rdma_xprt->xa->sq_depth,
+ 				rdma_xprt->xa->credits);
+-	if (rc)
+-		return rc;
+-
+-	return rpc_rdma_fd_add(rdma_xprt, rdma_xprt->event_channel->fd,
+-				rpc_rdma_state.cm_epollfd);
++	return rc;
+ }
+ 
+ extern mutex_t ops_lock;
+diff -ur ntirpc-7.2/src/rpc_rdma.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/rpc_rdma.h
+--- ntirpc-7.2/src/rpc_rdma.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/rpc_rdma.h	2026-05-18 19:40:20.000000000 -0400
+@@ -87,6 +87,10 @@
+ #define CBC_FLAG_NONE		0x0000
+ #define CBC_FLAG_RELEASE	0x0001
+ #define CBC_FLAG_RELEASING	0x0002
++/* svc_request returned XPRT_SUSPEND (e.g. QOS, async request handling)
++ * wrap_callback deferred the sentinel cbc_release_it to xdr_rdma_svc_flushout
++ * so that dataq buffers remain valid across the suspension window. */
++#define CBC_FLAG_SENTINEL_PENDING 0x0004
+ 
+ #define RDMA_CB_TIMEOUT_SEC 10
+ 
+@@ -222,6 +226,7 @@
+ 					 * -1 (RDMAX_SERVER_CHILD):
+ 					 * server has accepted connection
+ 					 */
++	bool shared;
+ 
+ 	enum rdma_transport_state {
+ 		RDMAXS_INITIAL, 	/* assumes zero, never set */
+@@ -374,6 +379,7 @@
+ enum xprt_stat svc_rdma_rendezvous(SVCXPRT *);
+ 
+ /* client */
++int rpc_rdma_connect_prepare(RDMAXPRT *);
+ int rpc_rdma_connect(RDMAXPRT *);
+ int rpc_rdma_connect_finalize(RDMAXPRT *);
+ 
+@@ -383,7 +389,7 @@
+ void xdr_rdma_add_outbufs_data(RDMAXPRT *rdma_xprt);
+ void xdr_rdma_add_inbufs_hdr(RDMAXPRT *rdma_xprt);
+ void xdr_rdma_add_outbufs_hdr(RDMAXPRT *rdma_xprt);
+-void xdr_rdma_callq(RDMAXPRT *);
++void xdr_rdma_callq(RDMAXPRT *, int);
+ 
+ bool xdr_rdma_clnt_reply(XDR *, u_int32_t);
+ bool xdr_rdma_clnt_flushout(struct rpc_rdma_cbc *);
+@@ -406,4 +412,13 @@
+ int xdr_rdma_dereg_mr(RDMAXPRT *rdma_xprt, struct ibv_mr *mr,
+     uint8_t *buffer_aligned, uint32_t buffer_total);
+ 
++int rpc_rdma_cq_event_handler(RDMAXPRT *, int);
++
++RDMAXPRT * rpc_rdma_allocate(const struct rpc_rdma_attr *);
++
++int rpc_rdma_setup_cbq(RDMAXPRT *, struct poolq_head *,
++    u_int depth, u_int sge);
++
++void svc_rdma_ops(SVCXPRT *);
++
+ #endif /* !_TIRPC_RPC_RDMA_H */
+diff -ur ntirpc-7.2/src/svc.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc.c
+--- ntirpc-7.2/src/svc.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc.c	2026-05-18 19:40:20.000000000 -0400
+@@ -378,7 +378,7 @@
+  rpcb_it:
+ 	rwlock_unlock(&svc_lock);
+ 	/* now register the information with the local binder service */
+-	if (nconf) {
++	if (nconf && ((xprt->xp_flags & SVC_XPRT_FLAG_NO_SET) == 0)) {
+ 		/*LINTED const castaway */
+ 		dummy =
+ 		    rpcb_set(prog, vers, (struct netconfig *)nconf,
+diff -ur ntirpc-7.2/src/svc_internal.h ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_internal.h
+--- ntirpc-7.2/src/svc_internal.h	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_internal.h	2026-05-18 19:40:20.000000000 -0400
+@@ -30,6 +30,7 @@
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <misc/os_epoll.h>
++#include <arpa/inet.h>
+ #include <rpc/rpc_msg.h>
+ 
+ #include "rpc_dplx_internal.h"
+@@ -194,7 +195,46 @@
+ void svc_rqst_xprt_send_complete(SVCXPRT *);
+ void svc_rqst_unhook(SVCXPRT *);
+ 
++/* Allow much more space than we really need for a sock name. An IPV4 address
++ * embedded in IPv6 could use 45 bytes and then if we add a port, that would be
++ * an additional 6 bytes (:65535) for a total of 51, and then one more for NUL
++ * termination. We could use 64 instead of 128.
++ */
++#define SOCK_NAME_MAX 128
++
+ typedef struct sockaddr_storage sockaddr_t;
+ int svc_get_port(sockaddr_t *);
+ 
++static inline void *socket_addr(sockaddr_t *addr)
++{
++	switch (addr->ss_family) {
++	case AF_INET:
++		return &(((struct sockaddr_in *)addr)->sin_addr);
++	case AF_INET6:
++		return &(((struct sockaddr_in6 *)addr)->sin6_addr);
++#ifdef RPC_VSOCK
++	case AF_VSOCK:
++		return &(((struct sockaddr_vm *)addr)->svm_cid);
++#endif /* VSOCK */
++	default:
++		return addr;
++	}
++}
++
++static inline bool sprint_sockip(sockaddr_t *addr, char *buf, int len)
++{
++#ifdef RPC_VSOCK
++	if (addr->ss_family == AF_VSOCK) {
++		int rc = snprintf(buf, len, "%d",
++			 ((struct sockaddr_vm *)addr)->svm_cid));
++		return rc >= 0 && rc < len;
++	}
++#endif /* VSOCK */
++
++	if (addr->ss_family != AF_INET && addr->ss_family != AF_INET6)
++		return false;
++
++	return inet_ntop(addr->ss_family, socket_addr(addr), buf, len) != NULL;
++}
++
+ #endif				/* TIRPC_SVC_INTERNAL_H */
+diff -ur ntirpc-7.2/src/svc_rdma.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_rdma.c
+--- ntirpc-7.2/src/svc_rdma.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_rdma.c	2026-05-18 19:40:20.000000000 -0400
+@@ -60,7 +60,6 @@
+ #include <rpc/svc_rqst.h>
+ #include <rpc/svc_auth.h>
+ 
+-static void svc_rdma_ops(SVCXPRT *);
+ 
+ /*
+  * svc_rdma_rendezvous: waits for connection request
+@@ -95,11 +94,18 @@
+ 	memcpy(rdma_xprt->sm_dr.xprt.xp_remote.nb.buf, ss,
+ 		rdma_xprt->sm_dr.xprt.xp_remote.nb.len);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
+-		"%s:%u local %p remote %p xprt %p", __func__, __LINE__,
++	rdma_xprt->sm_dr.xprt.xp_ip = mem_alloc(SOCK_NAME_MAX);
++	sprint_sockip(ss, rdma_xprt->sm_dr.xprt.xp_ip,
++	    SOCK_NAME_MAX);
++	rdma_xprt->sm_dr.xprt.xp_port = svc_get_port(ss);
++
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
++		"%s:%u local %p remote %p xprt %p remote ip %s",
++		__func__, __LINE__,
+ 		&rdma_xprt->sm_dr.xprt.xp_local.nb,
+ 		&rdma_xprt->sm_dr.xprt.xp_remote.nb,
+-		&rdma_xprt->sm_dr.xprt);
++		&rdma_xprt->sm_dr.xprt,
++		rdma_xprt->sm_dr.xprt.xp_ip);
+ 
+ 	svc_rdma_ops(&rdma_xprt->sm_dr.xprt);
+ 	rdma_xprt->sm_dr.recvsz = req_rdma_xprt->sm_dr.recvsz;
+@@ -155,7 +161,7 @@
+ 	__warnx(TIRPC_DEBUG_FLAG_EVENT,
+ 		"%s:%u New RDMA client connected xprt %p, xp_fd %d, "
+ 		"qp_num %d, xp_fd %d is_rdma_enabled %d to local port %d "
+-		"from remote port %d ref %d epoll %#04x",
++		"from remote port %d ref %d epoll %#04x remote ip %s",
+ 		__func__, __LINE__,
+ 		&rdma_xprt->sm_dr.xprt, rdma_xprt->sm_dr.xprt.xp_fd,
+ 		rdma_xprt->qp->qp_num,
+@@ -165,7 +171,8 @@
+ 		rdma_xprt->sm_dr.xprt.xp_remote.nb.buf ?
+ 		svc_get_port(rdma_xprt->sm_dr.xprt.xp_remote.nb.buf) : 0,
+ 		rdma_xprt->sm_dr.xprt.xp_refcnt,
+-		rdma_xprt->sm_dr.xprt.xp_flags);
++		rdma_xprt->sm_dr.xprt.xp_flags,
++		rdma_xprt->sm_dr.xprt.xp_ip);
+ 
+ 	return (XPRT_IDLE);
+ }
+@@ -221,6 +228,27 @@
+ 		return (XPRT_DIED);
+ 	}
+ 
++	/* in order of likelihood */
++	if (req->rq_msg.rm_direction == CALL) {
++		/* an ordinary call header */
++		goto process_call;
++	}
++
++	if (req->rq_msg.rm_direction == REPLY) {
++		/* reply header (xprt OK) */
++		clnt_req_process_reply(req->rq_xprt, req);
++		return XPRT_IDLE;
++	}
++
++	__warnx(TIRPC_DEBUG_FLAG_WARN,
++		"%s: %p fd %d failed direction %" PRIu32
++		" (will set dead)",
++		__func__, req->rq_xprt, req->rq_xprt->xp_fd,
++		req->rq_msg.rm_direction);
++	return (XPRT_DIED);
++
++process_call:
++
+ 	/* the checksum */
+ 	req->rq_cksum = 0;
+ 
+@@ -289,7 +317,7 @@
+ 
+ 	svc_rqst_xprt_unregister_rdma(xprt, flags);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 	    "%s() %p[%u]",
+ 	    __func__, rdma_xprt, rdma_xprt->state);
+ 
+@@ -313,7 +341,7 @@
+ {
+ 	RDMAXPRT *rdma_xprt = RDMA_DR(REC_XPRT(xprt));
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 		"%s() %p xp_refcnt %" PRId32
+ 		" should actually destroy things @ %s:%d",
+ 		__func__, xprt, xprt->xp_refcnt, tag, line);
+@@ -368,7 +396,7 @@
+ 	return (TRUE);
+ }
+ 
+-static void
++void
+ svc_rdma_ops(SVCXPRT *xprt)
+ {
+ 	static struct xp_ops ops;
+diff -ur ntirpc-7.2/src/svc_rqst.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_rqst.c
+--- ntirpc-7.2/src/svc_rqst.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_rqst.c	2026-05-18 19:40:20.000000000 -0400
+@@ -297,7 +297,7 @@
+ static void svc_rqst_epoll_loop(struct work_pool_entry *wpe);
+ static void svc_complete_task(struct svc_rqst_rec *sr_rec, bool finished);
+ 
+-static int
++int
+ svc_rqst_expire_cmpf(const struct opr_rbtree_node *lhs,
+ 		     const struct opr_rbtree_node *rhs)
+ {
+@@ -371,7 +371,7 @@
+ 	ev_sig(sr_rec->sv[0], 0);	/* send wakeup */
+ }
+ 
+-static void
++void
+ svc_rqst_expire_task(struct work_pool_entry *wpe)
+ {
+ 	struct clnt_req *cc = opr_containerof(wpe, struct clnt_req, cc_wpe);
+diff -ur ntirpc-7.2/src/svc_vc.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_vc.c
+--- ntirpc-7.2/src/svc_vc.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_vc.c	2026-05-18 19:40:20.000000000 -0400
+@@ -74,6 +74,7 @@
+ #include <rpc/svc_auth.h>
+ #include <rpc/svc_rqst.h>
+ #include <rpc/xdr_ioq.h>
++#include <arpa/inet.h>
+ 
+ #include "rpc_com.h"
+ #include "clnt_internal.h"
+@@ -438,6 +439,7 @@
+ 	socklen_t len;
+ 	static int n = 1;
+ 	struct timeval timeval;
++	struct sockaddr *sa;
+ 
+ 	XPRT_AUTO_TRACEPOINT(xprt, rendezvous_start, TRACE_INFO,
+ 		"rendezvous_start");
+@@ -505,6 +507,28 @@
+ 	newxprt->xp_remote.nb.len = len;
+ 	XPRT_TRACE(newxprt, __func__, __func__, __LINE__);
+ 
++	sa = (struct sockaddr *)newxprt->xp_remote.nb.buf;
++	/* Store client information (IP & Port) in SVCXPRT */
++	if (newxprt->xp_remote.nb.len > 0 && sa != NULL) {
++		if (sa->sa_family == AF_INET) {
++			struct sockaddr_in *sin = (struct sockaddr_in *)sa;
++			inet_ntop(AF_INET, &sin->sin_addr, newxprt->xp_clnt_addr,
++					sizeof(newxprt->xp_clnt_addr));
++			newxprt->xp_clnt_port = ntohs(sin->sin_port);
++		} else if (sa->sa_family == AF_INET6) {
++			struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)sa;
++			inet_ntop(AF_INET6, &sin6->sin6_addr, newxprt->xp_clnt_addr,
++					sizeof(newxprt->xp_clnt_addr));
++			newxprt->xp_clnt_port = ntohs(sin6->sin6_port);
++		} else {
++			snprintf(newxprt->xp_clnt_addr, sizeof(newxprt->xp_clnt_addr), "unknown");
++			newxprt->xp_clnt_port = 0;
++		}
++	} else {
++		snprintf(newxprt->xp_clnt_addr, sizeof(newxprt->xp_clnt_addr), "no_addr");
++		newxprt->xp_clnt_port = 0;
++	}
++
+ 	/* XXX fvdl - is this useful? (Yes.  Matt) */
+ 	if (si.si_proto == IPPROTO_TCP) {
+ 		len = 1;
+@@ -979,7 +1003,7 @@
+ 	SVCXPRT *xprt, struct proxy_header_part *proxy_header_part)
+ {
+ 	enum haproxy_ret_code ret;
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
+ 		"%s: %p fd %d proxy ignored for local. len ignored: %d",
+ 		__func__, xprt, xprt->xp_fd, proxy_header_part->len);
+ 	const enum haproxy_ret_code ignore_remaining_data_result =
+@@ -1205,9 +1229,9 @@
+ 						xprt,
+ 						SVC_XPRT_FLAG_ADDED_RECV))) {
+ 					__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-						"%s: %p fd %d svc_rqst_rearm_events failed (will set dead)",
++						"%s: %p fd %d svc_rqst_rearm_events failed (will set dead) - clientip: %s:%u",
+ 						"svc_vc_wait",
+-						xprt, xprt->xp_fd);
++						xprt, xprt->xp_fd, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 					SVC_DESTROY(xprt);
+ 					code = EINVAL;
+ 				}
+@@ -1216,8 +1240,8 @@
+ 				return SVC_STAT(xprt);
+ 			}
+ 			__warnx(TIRPC_DEBUG_FLAG_WARN,
+-				"%s: %p fd %d recv errno %d (will set dead)",
+-				"svc_vc_wait", xprt, xprt->xp_fd, code);
++				"%s: %p fd %d recv errno %d (will set dead) - clientip: %s:%u",
++				"svc_vc_wait", xprt, xprt->xp_fd, code, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 			SVC_DESTROY(xprt);
+ 
+ 			XPRT_AUTO_TRACEPOINT(xprt, recv_err,
+@@ -1227,8 +1251,8 @@
+ 
+ 		if (unlikely(!rlen)) {
+ 			__warnx(TIRPC_DEBUG_FLAG_SVC_VC,
+-				"%s: %p fd %d recv closed (will set dead)",
+-				"svc_vc_wait", xprt, xprt->xp_fd);
++				"%s: %p fd %d recv closed (will set dead) - clientip: %s:%u",
++				"svc_vc_wait", xprt, xprt->xp_fd, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 			SVC_DESTROY(xprt);
+ 
+ 			XPRT_AUTO_TRACEPOINT(xprt, recv_empty,
+@@ -1243,6 +1267,16 @@
+ 			"sx_fbtbc = %08x", (int)xd->sx_fbtbc);
+ 
+ 		if (xd->sx_fbtbc == PP2_SIG_UINT32) {
++			/* Since this is haproxy header clear off sx_fbtbc
++			 * In case of HAPROXY_RET_CODE__IGNORE_LOCAL,
++			 * handle_haproxy_header() do rearm the xprt recv fd.
++			 * causing a race if the thread gets scheduled
++			 * out after rearm and epoll_wait gets data available
++			 * event, then new recv endup in elsecase
++			 * "if (!xd->sx_fbtbc)"
++			 * and will cause uv to NULL */
++			xd->sx_fbtbc = 0;
++
+ 			/* HA Proxy V2? */
+ 			enum haproxy_ret_code ret = handle_haproxy_header(xprt);
+ 			switch (ret) {
+@@ -1252,17 +1286,15 @@
+ 					return SVC_STAT(xprt);
+ 				}
+ 				/* Now look to see if there's more... */
+-	                        xd->sx_fbtbc = 0;
+ 				hap_again = true;
+ 				goto again;
+ 			case HAPROXY_RET_CODE__FAILURE:
+ 				SVC_DESTROY(xprt);
+ 				return SVC_STAT(xprt);
+ 			case HAPROXY_RET_CODE__IGNORE_LOCAL:
+-				/* clear off sx_fbtbc */
+-	                        xd->sx_fbtbc = 0;
+ 				return SVC_STAT(xprt);
+ 			case HAPROXY_RET_CODE__NOT_HAPROXY:
++				xd->sx_fbtbc = PP2_SIG_UINT32;
+ 				break;
+ 			}
+ 		}
+@@ -1276,8 +1308,8 @@
+ 
+ 		if (unlikely(!xd->sx_fbtbc)) {
+ 			__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-				"%s: %p fd %d fragment is zero (will set dead)",
+-				__func__, xprt, xprt->xp_fd);
++				"%s: %p fd %d fragment is zero (will set dead) - clientip: %s:%u",
++				__func__, xprt, xprt->xp_fd, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 			SVC_DESTROY(xprt);
+ 
+ 			XPRT_AUTO_TRACEPOINT(xprt, recv_no_record,
+@@ -1303,14 +1335,14 @@
+ 
+ 		if (code == EAGAIN || code == EWOULDBLOCK) {
+ 			__warnx(TIRPC_DEBUG_FLAG_SVC_VC,
+-				"%s: %p fd %d recv errno %d (try again)",
+-				__func__, xprt, xprt->xp_fd, code);
++				"%s: %p fd %d recv errno %d (try again) - clientip: %s:%u",
++				__func__, xprt, xprt->xp_fd, code, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 			if (unlikely(svc_rqst_rearm_events(
+ 						xprt,
+ 						SVC_XPRT_FLAG_ADDED_RECV))) {
+ 				__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-					"%s: %p fd %d svc_rqst_rearm_events failed (will set dead)",
+-					__func__, xprt, xprt->xp_fd);
++					"%s: %p fd %d svc_rqst_rearm_events failed (will set dead) - clientip: %s:%u",
++					__func__, xprt, xprt->xp_fd, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 				SVC_DESTROY(xprt);
+ 				code = EINVAL;
+ 			}
+@@ -1321,8 +1353,8 @@
+ 			return SVC_STAT(xprt);
+ 		}
+ 		__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-			"%s: %p fd %d recv errno %d (will set dead)",
+-			__func__, xprt, xprt->xp_fd, code);
++			"%s: %p fd %d recv errno %d (will set dead) - clientip: %s:%u",
++			__func__, xprt, xprt->xp_fd, code, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 		SVC_DESTROY(xprt);
+ 
+ 		XPRT_AUTO_TRACEPOINT(xprt, recv_error,
+@@ -1333,8 +1365,8 @@
+ 
+ 	if (unlikely(!rlen)) {
+ 		__warnx(TIRPC_DEBUG_FLAG_SVC_VC,
+-			"%s: %p fd %d recv closed (will set dead)",
+-			__func__, xprt, xprt->xp_fd);
++			"%s: %p fd %d recv closed (will set dead) - clientip: %s:%u",
++			__func__, xprt, xprt->xp_fd, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 		SVC_DESTROY(xprt);
+ 
+ 		XPRT_AUTO_TRACEPOINT(xprt, recv_closed,
+@@ -1358,8 +1390,8 @@
+ 		if (unlikely(svc_rqst_rearm_events(xprt,
+ 						   SVC_XPRT_FLAG_ADDED_RECV))) {
+ 			__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-				"%s: %p fd %d svc_rqst_rearm_events failed (will set dead)",
+-				__func__, xprt, xprt->xp_fd);
++				"%s: %p fd %d svc_rqst_rearm_events failed (will set dead) - clientip: %s:%u",
++				__func__, xprt, xprt->xp_fd, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 			XPRT_UNIQUE_AUTO_TRACEPOINT(xprt, rearm_failed,
+ 				TRACE_ERR, "Rearm failed");
+ 			SVC_DESTROY(xprt);
+@@ -1385,8 +1417,8 @@
+ 
+ 	if (unlikely(svc_rqst_rearm_events(xprt, SVC_XPRT_FLAG_ADDED_RECV))) {
+ 		__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-			"%s: %p fd %d svc_rqst_rearm_events failed (will set dead)",
+-			__func__, xprt, xprt->xp_fd);
++			"%s: %p fd %d svc_rqst_rearm_events failed (will set dead) - clientip: %s:%u",
++			__func__, xprt, xprt->xp_fd, xprt->xp_clnt_addr, xprt->xp_clnt_port);
+ 		xdr_ioq_destroy(xioq, xioq->ioq_s.qsize);
+ 		SVC_DESTROY(xprt);
+ 
+diff -ur ntirpc-7.2/src/svc_xprt.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_xprt.c
+--- ntirpc-7.2/src/svc_xprt.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/svc_xprt.c	2026-05-18 19:40:20.000000000 -0400
+@@ -414,11 +414,17 @@
+ 					goto restart;
+ 				}
+ 			}
+-			/* If exits earlier, clear the flag explicitly */
++			/*
++			 * Get the next node BEFORE releasing the reference.
++			 * SVC_RELEASE may trigger destruction if refcnt drops
++			 * to 0, which frees the memory. The memory can be
++			 * immediately reused by another xprt (use-after-free).
++			 */
++			n = opr_rbtree_next(n);
++			/* Now safe to release - we have the next node */
+ 			atomic_clear_uint16_t_bits(
+ 				&rec->xprt.xp_flags, SVC_XPRT_TREE_LOCKED);
+ 			SVC_RELEASE(&rec->xprt, SVC_RELEASE_FLAG_NONE);
+-			n = opr_rbtree_next(n);
+ 		}		/* curr partition */
+ 		rwlock_unlock(&t->lock); /* t !LOCKED */
+ 		p_ix++;
+diff -ur ntirpc-7.2/src/xdr_ioq.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/xdr_ioq.c
+--- ntirpc-7.2/src/xdr_ioq.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/xdr_ioq.c	2026-05-18 19:40:20.000000000 -0400
+@@ -260,6 +260,7 @@
+ 		    &rdma_xprt->last_extra_buf_allocation_time);
+ 	}
+ 
++	__warnx(TIRPC_DEBUG_FLAG_XDR, "io buf ref %p refs %d", io_buf, io_buf->refs);
+ 	return atomic_inc_uint32_t(&io_buf->refs);
+ }
+ 
+@@ -291,7 +292,7 @@
+ {
+ 	struct poolq_head *ioqh = get_data_poolq_head(io_buf, rdma_xprt);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s: Start shrinking xprt %p "
++	__warnx(TIRPC_DEBUG_FLAG_XDR, "%s: Start shrinking xprt %p "
+ 	    "io_buf %p refs %d ioqh %p count %d",
+ 	    __func__, rdma_xprt, io_buf, io_buf->refs, ioqh,
+ 	    ioqh->qcount);
+@@ -385,7 +386,7 @@
+ 			rdma_xprt->io_bufs_count--;
+ 			rdma_xprt->io_bufs.qcount--;
+ 
+-			__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s: xprt %p shrink "
++			__warnx(TIRPC_DEBUG_FLAG_XDR, "%s: xprt %p shrink "
+ 			    "io_buf %p refs %d io_bufs count %d %d",
+ 			    __func__, rdma_xprt, io_buf, io_buf->refs,
+ 			    rdma_xprt->io_bufs_count,
+@@ -403,6 +404,7 @@
+ 	struct rpc_io_bufs *io_buf = get_parent_chunk(have);
+ 	uint32_t refs = atomic_dec_uint32_t(&io_buf->refs);
+ 	RDMAXPRT *rdma_xprt = (RDMAXPRT *)io_buf->ctx;
++	__warnx(TIRPC_DEBUG_FLAG_XDR, "io buf unref %p refs %d", io_buf, io_buf->refs);
+ 
+ 	/* Check if its on on demand allocated data buf */
+ 	if (is_shrink_buf(io_buf, rdma_xprt)) {
+@@ -648,7 +650,7 @@
+ 			    io_buf->buffer_aligned, io_buf->buffer_total));
+ 			io_buf->mr = NULL;
+ 
+-			__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s() Free xprt %p mr "
++			__warnx(TIRPC_DEBUG_FLAG_XDR, "%s() Free xprt %p mr "
+ 			    "io_bufs %p size %u io_buf %p", __func__, rdma_xprt,
+ 			    io_buf->buffer_aligned, io_buf->buffer_total, io_buf);
+ 
+@@ -998,12 +1000,12 @@
+ 	}
+ 
+ 	/*
+-	 * Small RDMA Writes
+-	 * If data is inline, it should be part of nfs_buffer itself.
+-	 * So, to avoid the ILLEGAL_OP, start should advance by datalen
+-	 * to pick the correct OP while decoding the COMPOUND ops.
++	 * Small RDMA Writes (Inline RDMA)
++	 * The write data fits entirely within the current (NFS header) UV
++	 * at the current XDR position.  Return 'start' unchanged so that
++	 * XDR_FILLBUFS reads the actual data bytes.
+ 	 */
+-	return start + datalen;
++	return start;
+ 
+ }
+ 
+@@ -1027,9 +1029,15 @@
+ 	 * next nfs header in compound op. */
+ 	if (datalen > ((uintptr_t)xdrs->x_v.vio_tail - (uintptr_t)xdrs->x_data)) {
+ 		offset = (uintptr_t)xdrs->x_v.vio_tail - (uintptr_t)xdrs->x_data;
++		return start - offset;
+ 	}
+ 
+-	return start - offset;
++	/* Inline RDMA: 'start' is the position of the first data byte
++	 * (getstartdatapos returned it unchanged).  'datalen' here is
++	 * RNDUP(data_len), i.e. the data bytes plus any XDR alignment
++	 * padding.  Advance past both so the decoder is positioned at
++	 * the start of the next compound op. */
++	return start + datalen;
+ }
+ 
+ static bool
+@@ -1855,7 +1863,7 @@
+ 
+ 	while (idx < iov_count) {
+ 		/* Another TRAILER buffer to manage */
+-		vio_type vt = vector[idx].vio_type;
++		vio_type_t vt = vector[idx].vio_type;
+ 
+ 		__warnx(TIRPC_DEBUG_FLAG_XDR,
+ 			"Calling xdr_ioq_use_or_allocate for idx %d for %s",
+diff -ur ntirpc-7.2/src/xdr_rdma.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/xdr_rdma.c
+--- ntirpc-7.2/src/xdr_rdma.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/src/xdr_rdma.c	2026-05-18 19:40:20.000000000 -0400
+@@ -211,17 +211,18 @@
+ 	int ret = 0;
+ 	int32_t write_waits = atomic_dec_int32_t(&cbc->write_waits);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_XDR,
+-	    "%s() %p[%u] cbc %p cbc_ref %d write_waits %d\n",
+-	    __func__, rdma_xprt, rdma_xprt->state, cbc,
+-	    cbc->refcnt, write_waits);
+ 
+ 	if (rdma_xprt->sm_dr.xprt.xp_flags & SVC_XPRT_FLAG_DESTROYED) {
+-		__warnx(TIRPC_DEBUG_FLAG_ERROR, " %s rdma_xprt %p cbc %p "
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA, " %s rdma_xprt %p cbc %p "
+ 		    "cbc_ref %d write_waits %d already destroyed",
+ 		    __func__, rdma_xprt, cbc, cbc->refcnt, write_waits);
+ 
+ 		ret =  -1;
++	} else {
++		__warnx(TIRPC_DEBUG_FLAG_XDR,
++			"%s() %p[%u] cbc %p cbc_ref %d write_waits %d\n",
++			__func__, rdma_xprt, rdma_xprt->state, cbc,
++			cbc->refcnt, write_waits);
+ 	}
+ 
+ 	cbc_release_it(cbc);
+@@ -235,17 +236,18 @@
+ 	int ret = 0;
+ 	int write_waits = atomic_dec_int32_t(&cbc->write_waits);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-	    "%s() %p[%u] cbc %p refs %d write_waits %d\n",
+-	    __func__, rdma_xprt, rdma_xprt->state, cbc,
+-	    cbc->refcnt, write_waits);
+ 
+ 	if (rdma_xprt->sm_dr.xprt.xp_flags & SVC_XPRT_FLAG_DESTROYED) {
+-		__warnx(TIRPC_DEBUG_FLAG_ERROR, " %s rdma_xprt %p cbc %p "
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA, " %s rdma_xprt %p cbc %p "
+ 		    "cbc_ref %d write_waits %d already destroyed",
+ 		    __func__, rdma_xprt, cbc, cbc->refcnt, write_waits);
+ 
+ 		ret = -1;
++	} else {
++		__warnx(TIRPC_DEBUG_FLAG_ERROR,
++			"%s() %p[%u] cbc %p refs %d write_waits %d\n",
++			__func__, rdma_xprt, rdma_xprt->state, cbc,
++			cbc->refcnt, write_waits);
+ 	}
+ 
+ 	cbc_release_it(cbc);
+@@ -260,15 +262,15 @@
+ {
+ 	int ret = 0;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_XDR,
+-		"%s() %p[%u] cbc %p\n",
+-		__func__, rdma_xprt, rdma_xprt->state, cbc);
+-
+ 	if (rdma_xprt->sm_dr.xprt.xp_flags & SVC_XPRT_FLAG_DESTROYED) {
+-		__warnx(TIRPC_DEBUG_FLAG_ERROR, " %s rdma_xprt %p cbc %p "
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA, " %s rdma_xprt %p cbc %p "
+ 			"already destroyed", __func__, rdma_xprt, cbc);
+ 
+ 		ret = -1;
++	} else {
++		__warnx(TIRPC_DEBUG_FLAG_XDR,
++			"%s() %p[%u] cbc %p\n",
++			__func__, rdma_xprt, rdma_xprt->state, cbc);
+ 	}
+ 
+ 	xdr_rdma_callback_signal(cbc, rdma_xprt);
+@@ -283,15 +285,16 @@
+ {
+ 	int ret = 0;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-		"%s() %p[%u] cbc %p\n",
+-		__func__, rdma_xprt, rdma_xprt->state, cbc);
+-
+ 	if (rdma_xprt->sm_dr.xprt.xp_flags & SVC_XPRT_FLAG_DESTROYED) {
+-		__warnx(TIRPC_DEBUG_FLAG_ERROR, " %s rdma_xprt %p cbc %p "
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA, " %s rdma_xprt %p cbc %p "
+ 			"already destroyed", __func__, rdma_xprt, cbc);
+ 
+ 		ret = -1;
++	} else {
++		__warnx(TIRPC_DEBUG_FLAG_ERROR,
++			"%s() %p[%u] cbc %p\n",
++			__func__, rdma_xprt, rdma_xprt->state, cbc);
++
+ 	}
+ 
+ 	xdr_rdma_callback_signal(cbc, rdma_xprt);
+@@ -308,15 +311,16 @@
+ {
+ 	int ret = 0;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_ERROR,
+-		"Error in recv callback %s() %p[%u] cbc %p\n",
+-		__func__, rdma_xprt, rdma_xprt->state, cbc);
+-
+ 	if (rdma_xprt->sm_dr.xprt.xp_flags & SVC_XPRT_FLAG_DESTROYED) {
+-		__warnx(TIRPC_DEBUG_FLAG_ERROR, " %s rdma_xprt %p cbc %p "
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA, " %s rdma_xprt %p cbc %p "
+ 			"already destroyed", __func__, rdma_xprt, cbc);
+ 
+ 		ret = -1;
++	} else {
++		__warnx(TIRPC_DEBUG_FLAG_ERROR,
++			"Error in recv callback %s() %p[%u] cbc %p\n",
++			__func__, rdma_xprt, rdma_xprt->state, cbc);
++
+ 	}
+ 
+ 	cbc->cbc_flags = CBC_FLAG_RELEASE;
+@@ -355,6 +359,33 @@
+ 
+ 	atomic_dec_uint32_t(&rdma_xprt->active_requests);
+ 
++	if ((enum xprt_stat)ret == XPRT_SUSPEND) {
++		/*
++		 * The request was suspended mid-compound
++		 * e.g. QOS BW throttle, async IO backend.
++		 * No RDMA WRITE/SEND operations have been posted
++		 * yet, so cbc->refcnt is still 1 (sentinel only).  Releasing
++		 * the sentinel here would drop refcnt to 0, which triggers
++		 * xdr_rdma_ioq_release(&cbc->dataq), zeroing dataq.qcount and
++		 * returning data_chunk_uv to the pool while the suspended
++		 * request still holds a pointer to it.  The subsequent
++		 * xdr_rdma_svc_flushout call would then hit:
++		 *   assert(dataq.qcount > 0)  fires with qcount == 0
++		 *
++		 * Fix: mark FLAG_RELEASE (so cleanup fires when refs eventually
++		 * reach 0) but defer the sentinel cbc_release_it to
++		 * xdr_rdma_svc_flushout, which is called after RDMA operations
++		 * are posted on the resume path and their refs keep the cbc
++		 * alive.
++		 */
++		__warnx(TIRPC_DEBUG_FLAG_XDR,
++			"%s rdma_xprt %p cbc %p suspended, deferring "
++			"sentinel release to flushout",
++			__func__, rdma_xprt, cbc);
++		cbc->cbc_flags = CBC_FLAG_RELEASE | CBC_FLAG_SENTINEL_PENDING;
++		return ret;
++	}
++
+ err:
+ 	cbc->cbc_flags = CBC_FLAG_RELEASE;
+ 
+@@ -461,6 +492,35 @@
+ 	return 0;
+ }
+ 
++/* Post synchronous RDMA receive operation */
++static int
++xdr_rdma_post_recv_sync(RDMAXPRT *rdma_xprt, struct rpc_rdma_cbc *cbc, int sge)
++{
++	cbc->positive_cb = xdr_rdma_wrap_callback;
++	cbc->negative_cb = xdr_rdma_destroy_callback_recv;
++	cbc->callback_arg = NULL;
++	cbc->call_inline = 1;
++
++	SVC_REF(&rdma_xprt->sm_dr.xprt, SVC_REF_FLAG_NONE);
++
++	int ret = xdr_rdma_post_recv_n(rdma_xprt, cbc, sge);
++
++	if (ret) {
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s post_recv failed rdma_xprt %p "
++			"cbc %p error %d", __func__, rdma_xprt, cbc, ret);
++
++		cbc->cbc_flags = CBC_FLAG_RELEASE;
++
++		/* Release sentinel ref */
++		cbc_release_it(cbc);
++
++		SVC_DESTROY(&rdma_xprt->sm_dr.xprt);
++	}
++	rpc_rdma_cq_event_handler(rdma_xprt, 1);
++
++	return ret;
++}
++
+ /**
+  * xdr_rdma_post_recv_cb: Post receive chunk(s) with standard callbacks.
+  *
+@@ -655,6 +715,39 @@
+ 
+ }
+ 
++/* Post synchronous RDMA send operation with callback */
++static inline int
++xdr_rdma_sync_send_cb(RDMAXPRT *rdma_xprt, struct rpc_rdma_cbc *cbc, int sge)
++{
++	int ret;
++
++	cbc->positive_cb = xdr_rdma_respond_callback_send;
++	cbc->negative_cb = xdr_rdma_destroy_callback_send;
++	cbc->callback_arg = NULL;
++	cbc->call_inline = 1;
++	int32_t write_waits = atomic_inc_int32_t(&cbc->write_waits);
++
++	cbc_ref_it(cbc, rdma_xprt);
++
++	ret = xdr_rdma_post_send_n(rdma_xprt, cbc, sge, NULL, IBV_WR_SEND);
++
++	if (ret) {
++		write_waits = atomic_dec_int32_t(&cbc->write_waits);
++
++		cbc_release_it(cbc);
++
++		SVC_DESTROY(&rdma_xprt->sm_dr.xprt);
++
++		/* Assuming there won't be callback */
++		__warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: failed ret %d err %d"
++		    " rdma_xprt %p cbc %p cbc_ref %d write_waits %d",
++		    __func__, ret, errno, rdma_xprt, cbc, cbc->refcnt,
++		    write_waits);
++	}
++	rpc_rdma_cq_event_handler(rdma_xprt, 2);
++
++	return ret;
++}
+ /**
+  * Post a work chunk with standard callbacks.
+  *
+@@ -887,8 +980,10 @@
+ 
+ /* post recv buffers */
+ void
+-xdr_rdma_callq(RDMAXPRT *rdma_xprt)
++xdr_rdma_callq(RDMAXPRT *rdma_xprt, int sync)
+ {
++	int rc = 0;
++
+ 	/* Get context buf from cbqh and add to sm_dr
+ 	 * rpc_rdma_allocate->xdr_ioq_setup(&rdma_xprt->sm_dr.ioq);
+ 	 * Check if we have credits availabled from cbqh
+@@ -927,7 +1022,7 @@
+ 
+ 	pthread_mutex_lock(&rdma_xprt->cbclist.qmutex);
+ 
+-	cbc->call_inline = 0;
++	cbc->call_inline = sync;
+ 	cbc->data_chunk_uv = NULL;
+ 	cbc->refcnt = 1; // Sentinel ref
+ 	cbc->cbc_flags = CBC_FLAG_NONE;
+@@ -941,8 +1036,13 @@
+ 	rdma_xprt->cbclist.qcount++;
+ 	pthread_mutex_unlock(&rdma_xprt->cbclist.qmutex);
+ 
++	if (sync)
++		rc = xdr_rdma_post_recv_sync(rdma_xprt, cbc, 1);
++	else
++		rc = xdr_rdma_post_recv_cb(rdma_xprt, cbc, 1);
++
+ 	/* rdma_xprt ref is taken by xdr_rdma_post_recv_cb */
+-	if (xdr_rdma_post_recv_cb(rdma_xprt, cbc, 1)) {
++	if (rc) {
+ 		 __warnx(TIRPC_DEBUG_FLAG_ERROR, "%s: recv failed %p",
+ 			__func__, rdma_xprt);
+ 	}
+@@ -973,7 +1073,7 @@
+ 
+ 		data->rdma_uv = 1;
+ 
+-		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 			"%s() recvbuf at %p base %p",
+ 			__func__, data, b_addr);
+ 
+@@ -1047,7 +1147,7 @@
+ 	rdma_xprt->io_bufs_count++;
+ 	rdma_xprt->io_bufs.qcount++;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() io bufs count %u io_buf %p rdma_xprt %p",
+ 		__func__, rdma_xprt->io_bufs_count, io_buf, rdma_xprt);
+ 
+@@ -1071,7 +1171,7 @@
+ 	if (mr) {
+ 		atomic_add_uint64_t(&total_rdma_reg_mem, buffer_total);
+ 
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s: total_rdma_reg_mem %llu registered, "
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA, "%s: total_rdma_reg_mem %llu registered, "
+ 		    "registering for xprt %p mr %p buffer_aligned %p buffer_total %u",
+ 		    __func__, atomic_fetch_uint64_t(&total_rdma_reg_mem),
+ 		    rdma_xprt, mr, buffer_aligned, buffer_total);
+@@ -1104,7 +1204,7 @@
+ 	} else {
+ 		atomic_sub_uint64_t(&total_rdma_reg_mem, buffer_total);
+ 
+-		__warnx(TIRPC_DEBUG_FLAG_EVENT, "%s: total_rdma_reg_mem %llu registered, "
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA, "%s: total_rdma_reg_mem %llu registered, "
+ 		    "unregistering for xprt %p mr %p buffer_aligned %p buffer_total %u",
+ 		    __func__, atomic_fetch_uint64_t(&total_rdma_reg_mem),
+ 		    rdma_xprt, mr, buffer_aligned, buffer_total);
+@@ -1121,7 +1221,7 @@
+ 	uint32_t buffer_total = rdma_xprt->sm_dr.send_hdr_sz * hdr_qdepth;
+ 	struct rpc_io_bufs *io_buf = NULL;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_total %llu, sendsz %llu sq %llu rdma_xprt %p pagesz %llu",
+ 		__func__, buffer_total, rdma_xprt->sm_dr.send_hdr_sz, hdr_qdepth,
+ 		rdma_xprt, rdma_xprt->sm_dr.pagesz);
+@@ -1131,7 +1231,7 @@
+ 	assert(buffer_aligned);
+ 	memset(buffer_aligned, 0, buffer_total);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_aligned at %p protection domain %p rdma_xprt %p",
+ 		__func__, buffer_aligned, rdma_xprt->pd->pd, rdma_xprt);
+ 
+@@ -1158,7 +1258,7 @@
+ 	uint32_t buffer_total = rdma_xprt->sm_dr.sendsz * data_qdepth;
+ 	struct rpc_io_bufs *io_buf = NULL;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_total %llu, sendsz %llu sq %llu rdma_xprt %p pagesz %llu",
+ 		__func__, buffer_total, rdma_xprt->sm_dr.sendsz, data_qdepth,
+ 		rdma_xprt, rdma_xprt->sm_dr.pagesz);
+@@ -1168,7 +1268,7 @@
+ 	assert(buffer_aligned);
+ 	memset(buffer_aligned, 0, buffer_total);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_aligned at %p protection domain %p rdma_xprt %p",
+ 		__func__, buffer_aligned, rdma_xprt->pd->pd, rdma_xprt);
+ 
+@@ -1195,7 +1295,7 @@
+ 	uint32_t buffer_total = rdma_xprt->sm_dr.recv_hdr_sz * hdr_qdepth;
+ 	struct rpc_io_bufs *io_buf = NULL;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_total %llu, recvsz %llu rq %llu rdma_xprt %p pagesz %llu",
+ 		__func__, buffer_total, rdma_xprt->sm_dr.recv_hdr_sz, hdr_qdepth,
+ 		rdma_xprt, rdma_xprt->sm_dr.pagesz);
+@@ -1205,7 +1305,7 @@
+ 	assert(buffer_aligned);
+ 	memset(buffer_aligned, 0, buffer_total);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_aligned at %p protection domain %p rdma_xprt %p",
+ 		__func__, buffer_aligned, rdma_xprt->pd->pd, rdma_xprt);
+ 
+@@ -1232,7 +1332,7 @@
+ 	uint32_t buffer_total = rdma_xprt->sm_dr.recvsz * data_qdepth;
+ 	struct rpc_io_bufs *io_buf = NULL;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_total %llu, recvsz %llu rq %llu rdma_xprt %p pagesz %llu",
+ 		__func__, buffer_total, rdma_xprt->sm_dr.recvsz, data_qdepth,
+ 		rdma_xprt, rdma_xprt->sm_dr.pagesz);
+@@ -1242,7 +1342,7 @@
+ 	assert(buffer_aligned);
+ 	memset(buffer_aligned, 0, buffer_total);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_aligned at %p protection domain %p rdma_xprt %p",
+ 		__func__, buffer_aligned, rdma_xprt->pd->pd, rdma_xprt);
+ 
+@@ -1297,7 +1397,7 @@
+ 
+ 	rdma_xprt->buffer_total = tirpc_buff_total + total_hdr_sz;
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_total %llu(%llu + %llu), rdma_xprt %p pagesz %llu "
+ 		"recvsz data %llu hdr %llu rq %llu "
+ 		"sendsz data %llu hdr %llu sq %llu",
+@@ -1311,7 +1411,7 @@
+ 	assert(rdma_xprt->buffer_aligned);
+ 	memset(rdma_xprt->buffer_aligned, 0, rdma_xprt->buffer_total);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_EVENT,
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 		"%s() buffer_aligned at %p protection domain %p rdma_xprt %p",
+ 		__func__, rdma_xprt->buffer_aligned, rdma_xprt->pd->pd, rdma_xprt);
+ 
+@@ -1370,18 +1470,18 @@
+ 	 * we could have max cbcs required will be callq_size * 2 */
+ 	int callq_size = MAX_RECV_OUTSTANDING(rdma_xprt->xa);
+ 
+-	__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA, "callq size %d", callq_size);
++	__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA, "callq size %d", callq_size);
+ 
+ 	poolq_head_setup(&rdma_xprt->cbclist);
+ 
+ 	while (rdma_xprt->sm_dr.ioq.ioq_uv.uvqh.qcount < callq_size) {
+ 		/* Post callq_size buffers to do first recvs
+ 		 * callback will be done on recv which should rearam again */
+-		__warnx(TIRPC_DEBUG_FLAG_RPC_RDMA,
++		__warnx(TIRPC_DEBUG_FLAG_XDR_RDMA,
+ 			"%s() qcount %d callq size %d",
+ 			__func__, rdma_xprt->sm_dr.ioq.ioq_uv.uvqh.qcount,
+ 			callq_size);
+-		xdr_rdma_callq(rdma_xprt);
++		xdr_rdma_callq(rdma_xprt, 0);
+ 	}
+ 
+ 	return 0;
+@@ -1505,7 +1605,7 @@
+ 	assert(cbc->write_waits == 0);
+ 
+ 	/* Maintain max_outstanding */
+-	xdr_rdma_callq(rdma_xprt);
++	xdr_rdma_callq(rdma_xprt, 0);
+ 
+ 	/* Get inbuf from recvq */
+ 	cbc->call_uv = IOQ_(TAILQ_FIRST(&cbc->recvq.ioq_uv.uvqh.qh));
+@@ -1873,15 +1973,16 @@
+ 		allocate_header = 1;
+ 
+ 		if (allocate_header) {
+-			have = xdr_rdma_ioq_uv_fetch(&cbc->sendq, &rdma_xprt->outbufs_hdr.uvqh,
+-					"sreply buffer", 1, IOQ_FLAG_NONE);
+-
++			/* With ACL support we could need buffers >8k */
++			have = xdr_rdma_ioq_uv_fetch(&cbc->sendq, &rdma_xprt->outbufs_data.uvqh,
++				"sreply buffer", 1, IOQ_FLAG_NONE);
+ 
+ 			/* buffer is limited size */
+ 			IOQ_(have)->v.vio_head =
+ 			IOQ_(have)->v.vio_tail = IOQ_(have)->v.vio_base;
+ 			IOQ_(have)->v.vio_wrap = (char *)IOQ_(have)->v.vio_base
+-					+ rdma_xprt->sm_dr.send_hdr_sz;
++				+ rdma_xprt->sm_dr.sendsz;
++
+ 			/* make room at head for RDMA header */
+ 			xdr_ioq_reset(&cbc->sendq, 0);
+ 		}
+@@ -1903,16 +2004,35 @@
+ 				IOQ_(have)->v.vio_wrap = (char *)IOQ_(have)->v.vio_base
+ 					+ rdma_xprt->sm_dr.send_hdr_sz;
+ 			} else {
+-				/* For reply_list we copy from protocol buffer so allocate bigger
+-				 * chunk */
+-				assert(l <= rdma_xprt->sm_dr.sendsz);
++				/* For reply_list we copy from protocol buffer so allocate
++				 * bigger chunk.
++				 *
++				 * The client's reply chunk length (l) can legally exceed
++				 * sendsz: the client pre-registers a buffer of maxcount +
++				 * NFS COMPOUND overhead (a few hundred bytes), and when
++				 * maxcount == sendsz (= RDMA_DATA_CHUNK_SZ = 1 MiB) the
++				 * total l > sendsz.
++				 *
++				 * vio_wrap is set to min(l, sendsz):
++				 * l < sendsz: honour the client's actual chunk capacity.
++				 * l >= sendsz: cap at the physical buffer size to prevent
++				 * a server-side buffer overflow (the overflow data is
++				 * only NFS header bytes, far less than sendsz).
++				 *
++				 * The RDMA WRITE size is derived from ioquv_length() =
++				 * vio_tail - vio_head (actual bytes written by XDR), never
++				 * from l, so the transfer stays within both the server buffer
++				 * and the client's pre-registered region.
++				 */
+ 				have = xdr_rdma_ioq_uv_fetch(&cbc->sendq, &rdma_xprt->outbufs_data.uvqh,
+ 				    "sreply buffer", 1, IOQ_FLAG_NONE);
+ 
+-				/* buffer is limited size */
++				/* buffer is limited to min(l, sendsz) */
+ 				IOQ_(have)->v.vio_head =
+ 				IOQ_(have)->v.vio_tail = IOQ_(have)->v.vio_base;
+-				IOQ_(have)->v.vio_wrap = (char *)IOQ_(have)->v.vio_base + l;
++				IOQ_(have)->v.vio_wrap = (char *)IOQ_(have)->v.vio_base
++                                   + (l < rdma_xprt->sm_dr.sendsz
++                                      ? l : rdma_xprt->sm_dr.sendsz);
+ 			}
+ 		}
+ 		if (!allocate_header)
+@@ -1938,21 +2058,22 @@
+ bool
+ xdr_rdma_clnt_flushout(struct rpc_rdma_cbc *cbc)
+ {
+-/* FIXME: decide how many buffers we use in argument!!!!!! */
+-#define num_chunks (rdma_xprt->xa->credits - 1)
+-
+-	RDMAXPRT *rdma_xprt = x_rdma_xprt(cbc->recvq.xdrs);
++	RDMAXPRT *rdma_xprt = x_rdma_xprt(cbc->sendq.xdrs);
+ 	struct rpc_msg *msg;
+ 	struct rdma_msg *rmsg;
+-	struct xdr_write_list *w_array;
+ 	struct xdr_ioq_uv *head_uv;
+ 	struct xdr_ioq_uv *hold_uv;
+-	struct poolq_entry *have;
+-	int i = 0;
+ 
++	/* hold NFS request */
+ 	hold_uv = IOQ_(TAILQ_FIRST(&cbc->sendq.ioq_uv.uvqh.qh));
++
++	pthread_mutex_lock(&cbc->sendq.ioq_uv.uvqh.qmutex);
++	TAILQ_REMOVE(&cbc->sendq.ioq_uv.uvqh.qh, &hold_uv->uvq, q);
++	(cbc->sendq.ioq_uv.uvqh.qcount)--;
++	pthread_mutex_unlock(&cbc->sendq.ioq_uv.uvqh.qmutex);
++
+ 	msg = (struct rpc_msg *)(hold_uv->v.vio_head);
+-	xdr_tail_update(cbc->recvq.xdrs);
++	xdr_tail_update(cbc->sendq.xdrs);
+ 
+ 	switch(ntohl(msg->rm_direction)) {
+ 	    case CALL:
+@@ -1970,14 +2091,11 @@
+ 		return (false);
+ 	}
+ 
+-	cbc->recvq.ioq_uv.uvq_fetch = xdr_rdma_ioq_uv_fetch_nothing;
++	cbc->sendq.ioq_uv.uvq_fetch = xdr_rdma_ioq_uv_fetch_nothing;
+ 
+-	head_uv = IOQ_(xdr_rdma_ioq_uv_fetch(&cbc->recvq, &rdma_xprt->outbufs_data.uvqh,
++	head_uv = IOQ_(xdr_rdma_ioq_uv_fetch(&cbc->sendq, &rdma_xprt->outbufs_hdr.uvqh,
+ 					"c_head buffer", 1, IOQ_FLAG_NONE));
+ 
+-	(void)xdr_rdma_ioq_uv_fetch(&cbc->sendq, &rdma_xprt->inbufs_data.uvqh,
+-				"call buffers", num_chunks, IOQ_FLAG_NONE);
+-
+ 	rmsg = m_(head_uv->v.vio_head);
+ 	rmsg->rdma_xid = msg->rm_xid;
+ 	rmsg->rdma_vers = htonl(RPCRDMA_VERSION);
+@@ -1987,31 +2105,25 @@
+ 	/* no read, write chunks. */
+ 	rmsg->rdma_body.rdma_msg.rdma_reads = 0; /* htonl(0); */
+ 	rmsg->rdma_body.rdma_msg.rdma_writes = 0; /* htonl(0); */
+-
+-	/* reply chunk */
+-	w_array = (wl_t *)&rmsg->rdma_body.rdma_msg.rdma_reply;
+-	w_array->present = htonl(1);
+-	w_array->elements = htonl(num_chunks);
+-
+-	TAILQ_FOREACH(have, &cbc->sendq.ioq_uv.uvqh.qh, q) {
+-		struct xdr_rdma_segment *w_seg =
+-			&w_array->entry[i++].target;
+-		uint32_t length = ioquv_length(IOQ_(have));
+-
+-		w_seg->handle = htonl(rdma_xprt->mr->rkey);
+-		w_seg->length = htonl(length);
+-		xdr_encode_hyper((uint32_t*)&w_seg->offset,
+-				 (uintptr_t)IOQ_(have)->v.vio_head);
+-	}
++	rmsg->rdma_body.rdma_msg.rdma_reply = 0;
+ 
+ 	head_uv->v.vio_tail = head_uv->v.vio_head
+ 				+ xdr_rdma_header_length(rmsg);
+ 
++	pthread_mutex_lock(&cbc->sendq.ioq_uv.uvqh.qmutex);
++	TAILQ_INSERT_TAIL(&cbc->sendq.ioq_uv.uvqh.qh, &hold_uv->uvq, q);
++	(cbc->sendq.ioq_uv.uvqh.qcount)++;
++	pthread_mutex_unlock(&cbc->sendq.ioq_uv.uvqh.qmutex);
++
+ 	rpcrdma_dump_msg(head_uv, "clnthead", msg->rm_xid);
+ 	rpcrdma_dump_msg(hold_uv, "clntcall", msg->rm_xid);
+ 
+ 	/* actual send, callback will take care of cleanup */
+-	xdr_rdma_async_send_cb(rdma_xprt, cbc, 2);
++	cbc->have = TAILQ_FIRST(&cbc->sendq.ioq_uv.uvqh.qh);
++	if (rdma_xprt->shared)
++		xdr_rdma_async_send_cb(rdma_xprt, cbc, 2);
++	else
++		xdr_rdma_sync_send_cb(rdma_xprt, cbc, 2);
+ 	return (true);
+ }
+ 
+@@ -2211,6 +2323,7 @@
+ 		 * protocols and UIO_FLAG_REFER will be set.
+ 		 * first_buf = nfs_header buf + rdma_write bufs */
+ 		if (rdma_buf_used) {
++			/* data_chunk buffer will be set by x_putbufs to vio_head */
+ 			rdma_buf_addr = first_send_buf_uv->v.vio_head;
+ 			rdma_buf_len = ioquv_length(first_send_buf_uv);
+ 			if (first_send_buf_uv->u.uio_flags & UIO_FLAG_REFER)
+@@ -2262,8 +2375,13 @@
+ 			uint32_t length = ntohl(c_seg->length);
+ 			uint32_t nfs_header_len = ioquv_length(nfs_header_uv);
+ 
+-			assert(length <= rdma_xprt->sm_dr.sendsz);
+-
++			/* Do not assert, if length > sendsz: the client can legitimately
++			 * pre-register a reply chunk larger than sendsz (e.g. when
++			 * maxcount equals sendsz the total chunk includes NFS COMPOUND
++			 * overhead pushing l above sendsz). The actual RDMA WRITE size
++			 * is write_len = min(rdma_buf_len, length) <= sendsz, so the
++			 * transfer is always within the server's registered buffer.
++			 */
+ 			*w_seg = *c_seg;
+ 
+ 			__warnx(TIRPC_DEBUG_FLAG_XDR,
+@@ -2383,6 +2501,26 @@
+ 		uio_refer->uio_release(uio_refer, UIO_FLAG_NONE);
+ 	}
+ 
++	/*
++	 * Release the deferred sentinel ref when the request was suspended
++	 * by wrap_callback (e.g. QOS, async IO). In that path CBC_FLAG_RELEASE
++	 * was set but cbc_release_it was intentionally skipped to keep
++	 * cbc->dataq alive.  Now that all RDMA operations have been posted
++	 * (taking their own refs), it is safe to drop the sentinel.  The
++	 * last RDMA completion will then see refcnt==0 with CBC_FLAG_RELEASE
++	 * set and trigger the normal cbc cleanup.
++	 *
++	 * For the normal (non-suspended) path CBC_FLAG_SENTINEL_PENDING is
++	 * never set, so this is a no-op.
++	 */
++	if (cbc->cbc_flags & CBC_FLAG_SENTINEL_PENDING) {
++		cbc->cbc_flags &= ~CBC_FLAG_SENTINEL_PENDING;
++		__warnx(TIRPC_DEBUG_FLAG_XDR,
++			"%s rdma_xprt %p cbc %p releasing deferred sentinel",
++			__func__, rdma_xprt, cbc);
++		cbc_release_it(cbc);
++	}
++
+ 	__warnx(TIRPC_DEBUG_FLAG_XDR, "%s: cbc %p recvq %p %d sendq %p %d rdma_xprt %p",
+ 		__func__, cbc, &cbc->recvq, cbc->recvq.ioq_uv.uvqh.qcount, &cbc->sendq,
+ 		cbc->sendq.ioq_uv.uvqh.qcount, rdma_xprt);
+diff -ur ntirpc-7.2/tests/rpcping.c ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/tests/rpcping.c
+--- ntirpc-7.2/tests/rpcping.c	2025-09-23 10:05:19.000000000 -0400
++++ ntirpc-5c761bb186e9ea3f8a5bab77347ee12978256bd1/tests/rpcping.c	2026-05-18 19:40:20.000000000 -0400
+@@ -34,6 +34,7 @@
+ #include <rpc/rpc.h>
+ #include <rpc/svc_auth.h>
+ 
++
+ #include "lttng/ntirpc_traces.h"
+ #if defined(USE_LTTNG_NTIRPC) && !defined(LTTNG_PARSING)
+ #include "lttng/generated_traces/rpcping.h"
+@@ -44,6 +45,11 @@
+ static uint32_t rpcping_threads;
+ 
+ static struct timespec to = {30, 0};
++typedef enum {
++	TCP = 1,
++	RDMA = 2,
++	RAW = 3
++} proto_t;
+ 
+ struct state {
+ 	CLIENT *handle;
+@@ -53,6 +59,7 @@
+ 	struct timespec stopping;
+ 	int count;
+ 	int proc;
++	proto_t proto;
+ 	int id;
+ 	uint32_t failures;
+ 	uint32_t responses;
+@@ -183,9 +190,11 @@
+ 		}
+ 	}
+ 
+-	pthread_mutex_lock(&s->s_mutex);
+-	pthread_cond_wait(&s->s_cond, &s->s_mutex);
+-	pthread_mutex_unlock(&s->s_mutex);
++	if (s->proto != RDMA) {
++		pthread_mutex_lock(&s->s_mutex);
++		pthread_cond_wait(&s->s_cond, &s->s_mutex);
++		pthread_mutex_unlock(&s->s_mutex);
++	}
+ 	clock_gettime(CLOCK_MONOTONIC, &s->stopping);
+ 
+ 	if (atomic_dec_uint32_t(&rpcping_threads) > 0) {
+@@ -254,9 +263,13 @@
+ 	int proc = 0;
+ 	int send_sz = 8192;
+ 	int recv_sz = 8192;
++#ifdef USE_RPC_RDMA
++	int page_sz = sysconf(_SC_PAGESIZE);
++#endif
+ 	unsigned int failures = 0;
+ 	unsigned int timeouts = 0;
+ 	bool rpcbind = false;
++	proto_t proto_used = 0;
+ 
+ 	NTIRPC_AUTO_TRACEPOINT(rpcping, test, TRACE_INFO, "Boo");
+ 
+@@ -334,7 +347,8 @@
+ 					   "clnt_ncreate failed");
+ 				exit(2);
+ 			}
+-		} else {
++		} else if (strcmp(proto, "rdma")) {
++			proto_used = TCP;
+ 			/* connect to host:port */
+ 			struct sockaddr_storage ss;
+ 			struct netbuf raddr = {
+@@ -356,7 +370,26 @@
+ 					   "clnt_ncreate failed");
+ 				exit(4);
+ 			}
++		} else {
++			proto_used = RDMA;
++			int fd = get_conn_fd(host, port);
++			if (fd <= 0) {
++				perror("get_conn_fd failed");
++				exit(3);
++			}
++#ifdef USE_RPC_RDMA
++			clnt = clnt_rdma_create(fd, host, 20049, recv_sz,
++			    send_sz, page_sz, prog, vers, CLNT_CREATE_FLAG_CLOSE);
++			if (CLNT_FAILURE(clnt)) {
++				rpc_perror(&clnt->cl_error, "clnt_rdma_create failed");
++				exit(4);
++			}
++#else
++			perror("rdma not enabled");
++			exit(4);
++#endif
+ 		}
++
+ 		s = &states[i];
+ 		clnt->cl_u1 = s;
+ 
+@@ -364,6 +397,7 @@
+ 		s->id = i;
+ 		s->count = count;
+ 		s->proc = proc;
++		s->proto = proto_used;
+ 		pthread_create(&t, NULL, worker, s);
+ 	}
+ 

@@ -20,7 +20,7 @@
 Summary: PDF rendering library
 Name:    poppler
 Version: 25.07.0
-Release: 6%{?dist}
+Release: 5%{?dist}
 License: (GPL-2.0-only OR GPL-3.0-only) AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:     https://poppler.freedesktop.org/
 Source0: https://poppler.freedesktop.org/poppler-%{version}.tar.xz
@@ -35,6 +35,9 @@ Patch1:  poppler-0.90.0-position-independent-code.patch
 Patch3:  poppler-21.01.0-glib-introspection.patch
 
 Patch4:  poppler-25.07.0-cert-db.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=2403486
+Patch5:  poppler-25.07.0-duplicate-entries.patch
 
 BuildRequires: make
 BuildRequires: cmake
@@ -98,6 +101,7 @@ compile applications based on poppler.
 %package glib
 Summary: Glib wrapper for poppler
 Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: gobject-introspection
 
 %description glib
 %{summary}.
@@ -292,6 +296,13 @@ test "$(pkg-config --modversion poppler-qt6)" = "%{version}"
 %{_mandir}/man1/*
 
 %changelog
+* Mon May 11 2026 Marek Kasik <mkasik@redhat.com> - 25.07.0-5
+- Fix CVE-2025-52885
+- Resolves: #2403486
+
+* Sun Feb 01 2026 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 25.07.0-4
+- Add gobject-introspection Requires back to glib subpackage
+
 * Mon Nov 10 2025 Marek Kasik <mkasik@redhat.com> - 25.07.0-3
 - Fix search for directory with NSS database
 - Resolves: #2401577
@@ -914,7 +925,7 @@ test "$(pkg-config --modversion poppler-qt6)" = "%{version}"
 - tighten deps with %%_isa
 
 * Fri Sep 30 2011 Marek Kasik <mkasik@redhat.com> - 0.18.0-2
-- rebuild 
+- rebuild
 
 * Fri Sep 30 2011 Marek Kasik <mkasik@redhat.com> - 0.18.0-1
 - Update to 0.18.0

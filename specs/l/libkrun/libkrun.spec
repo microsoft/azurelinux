@@ -7,18 +7,22 @@
 
 %if 0%{?rhel}
 %global bundled_rust_deps 1
+%bcond_with gpu
+%bcond_with snd
 %else
 %global bundled_rust_deps 0
+%bcond_without gpu
+%bcond_without snd
 %endif
 
 Name:           libkrun
-Version:        1.17.4
-Release: 4%{?dist}
+Version:        1.19.0
+Release:        1%{?dist}
 Summary:        Dynamic library providing Virtualization-based process isolation capabilities
 
 License:        Apache-2.0
-URL:            https://github.com/containers/libkrun
-Source:         https://github.com/containers/libkrun/archive/refs/tags/v%{version}.tar.gz
+URL:            https://github.com/libkrun/libkrun
+Source:         https://github.com/libkrun/libkrun/archive/refs/tags/v%{version}.tar.gz
 %if 0%{?bundled_rust_deps}
 # Generated with:
 #  cargo vendor-filterer --platform=*-unknown-linux-gnu --features blk,net,gpu,snd,amd-sev
@@ -33,15 +37,21 @@ Patch1:         libkrun-remove-nitro-deps.diff
 Patch2:         libkrun-remove-tdx-deps.diff
 # Bump bzip2 dependency to match the version packaged in Fedora.
 Patch3:         libkrun-bump-bzip-dep.diff
+# Bump kvm-bindings dependency to match the version packaged in Fedora.
+Patch4:         libkrun-bump-kvm-bindings-dep.diff
+# Bump kvm-ioctls dependency to match the version packaged in Fedora.
+Patch5:         libkrun-bump-kvm-ioctls-dep.diff
 # For aarch64, remove references to SEV and TDX deps which are only available on x86_64
-Patch4:         libkrun-remove-sev-deps.diff
+Patch6:         libkrun-remove-sev-deps.diff
 %endif
 
 # libkrun only supports x86_64 and aarch64
 ExclusiveArch:  x86_64 aarch64
 
+%if 0%{?fedora}
 # Starting 1.11.0, libkrunfw is no longer build-time linked.
 Requires:  libkrunfw >= 5.0.0
+%endif
 
 # While this project is composed mostly of Rust code, this is not a
 # conventional Rust crate. The root of the project is a workspace, there's a C
@@ -56,10 +66,15 @@ Requires:  libkrunfw >= 5.0.0
 BuildRequires:  rust-packaging >= 21
 BuildRequires:  glibc-static
 BuildRequires:  binutils
+BuildRequires:  libcap-ng-devel
+%if %{with gpu}
 BuildRequires:  libepoxy-devel
 BuildRequires:  libdrm-devel
 BuildRequires:  virglrenderer-devel
+%endif
+%if %{with snd}
 BuildRequires:  pipewire-devel
+%endif
 BuildRequires:  clang-devel
 BuildRequires:  openssl-devel
 BuildRequires:  libcurl-devel
@@ -86,7 +101,7 @@ BuildRequires:  (crate(rand/default) >= 0.8.5 with crate(rand/default) < 0.9.0~)
 BuildRequires:  (crate(rand/default) >= 0.9.2 with crate(rand/default) < 0.10.0~)
 BuildRequires:  (crate(once_cell/default) >= 1.4.1 with crate(once_cell/default) < 2.0.0~)
 BuildRequires:  (crate(crossbeam-channel/default) >= 0.5.0 with crate(crossbeam-channel/default) < 0.6.0~)
-BuildRequires:  (crate(pipewire/default) >= 0.8.0 with crate(pipewire/default) < 0.9.0~)
+BuildRequires:  (crate(pipewire/default) >= 0.9.0 with crate(pipewire/default) < 0.10.0~)
 BuildRequires:  (crate(zerocopy/default) >= 0.8.0 with crate(zerocopy/default) < 0.9.0~)
 BuildRequires:  (crate(remain/default) >= 0.2.0 with crate(remain/default) < 0.3.0~)
 BuildRequires:  (crate(caps/default) >= 0.5.0 with crate(caps/default) < 0.6.0~)
@@ -96,6 +111,7 @@ BuildRequires:  (crate(bzip2/default) >= 0.6.0 with crate(bzip2/default) < 0.7.0
 BuildRequires:  (crate(zstd/default) >= 0.13.0 with crate(zstd/default) < 0.14.0~)
 BuildRequires:  (crate(flate2/default) >= 1.0.0 with crate(flate2/default) < 2.0.0~)
 BuildRequires:  (crate(static_assertions/default) >= 1.1.0 with crate(static_assertions/default) < 2.0.0~)
+BuildRequires:  (crate(thiserror/default) >= 1.0.0 with crate(thiserror/default) < 2.0.0~)
 BuildRequires:  (crate(thiserror/default) >= 2.0.0 with crate(thiserror/default) < 3.0.0~)
 BuildRequires:  (crate(capng/default) >= 0.2.3 with crate(capng/default) < 0.3.0~)
 
@@ -158,16 +174,16 @@ capabilities.
 %patch -P 1 -p1
 %patch -P 2 -p1
 %patch -P 3 -p1
-%if ! 0%{?build_sev}
 %patch -P 4 -p1
+%patch -P 5 -p1
+%if ! 0%{?build_sev}
+%patch -P 6 -p1
 %endif
 %cargo_prep
 %endif
 
 %build
-%make_build init/init
-%make_build libkrun.pc
-%make_build GPU=1 BLK=1 NET=1 SND=1
+%make_build BLK=1 NET=1 %{?with_gpu:GPU=1} %{?with_snd:SND=1}
 %if 0%{?build_sev}
     rm init/init
     %make_build SEV=1 init/init
@@ -224,6 +240,12 @@ capabilities.
 %endif
 
 %changelog
+* Wed Jun 10 2026 Sergio Lopez <slp@redhat.com> - 1.19.0-1
+- Update to version 1.19.0
+
+* Tue Apr 28 2026 Sergio Lopez <slp@redhat.com> - 1.18.0-1
+- Update to version 1.18.0
+
 * Wed Feb 18 2026 Sergio Lopez <slp@redhat.com> - 1.17.4-1
 - Update to version 1.17.4
 

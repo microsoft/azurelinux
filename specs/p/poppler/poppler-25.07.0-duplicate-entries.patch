@@ -1,0 +1,27 @@
+From 4ce27cc826bf90cc8dbbd8a8c87bd913cccd7ec0 Mon Sep 17 00:00:00 2001
+From: Kevin Backhouse <kevinbackhouse@github.com>
+Date: Wed, 3 Sep 2025 14:36:54 +0100
+Subject: [PATCH] Check for duplicate entries
+
+---
+ poppler/StructTreeRoot.cc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/poppler/StructTreeRoot.cc b/poppler/StructTreeRoot.cc
+index eb46147b..fc7bf4ce 100644
+--- a/poppler/StructTreeRoot.cc
++++ b/poppler/StructTreeRoot.cc
+@@ -136,6 +136,10 @@ void StructTreeRoot::parseNumberTreeNode(const Dict &node)
+                 }
+                 int keyVal = key.getInt();
+                 std::vector<Parent> &vec = parentTree[keyVal];
++                if (!vec.empty()) {
++                    error(errSyntaxError, -1, "Nums item at position {0:d} is a duplicate entry for key {1:d}", i, keyVal);
++                    continue;
++                }
+ 
+                 Object valueArray = nums.arrayGet(i + 1);
+                 if (valueArray.isArray()) {
+-- 
+2.54.0
+

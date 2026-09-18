@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           libjpeg-turbo
-Version:        3.1.2
-Release: 5%{?dist}
+Version:        3.1.4.1
+Release:        1%{?dist}
 Summary:        A MMX/SSE2/SIMD accelerated library for manipulating JPEG image files
 License:        Zlib AND BSD-3-Clause AND MIT AND IJG
 URL:            https://github.com/%{name}/%{name}
@@ -185,6 +185,12 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 %{_libdir}/pkgconfig/libturbojpeg.pc
 
 %changelog
+* Wed Apr 01 2026 Michal Hlavinka <mhlavink@redhat.com> - 3.1.4.1-1
+- updated to 3.1.4.1 (#2452006)
+
+* Mon Mar 09 2026 Michal Hlavinka <mhlavink@redhat.com> - 3.1.3-1
+- updated to 3.1.3 (#2421017)
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

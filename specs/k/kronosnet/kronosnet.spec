@@ -4,7 +4,7 @@
 ###############################################################################
 ###############################################################################
 ##
-##  Copyright (C) 2012-2022 Red Hat, Inc.  All rights reserved.
+##  Copyright (C) 2012-2026 Red Hat, Inc.  All rights reserved.
 ##
 ##  This copyrighted material is made available to anyone wishing to use,
 ##  modify, copy, or redistribute it subject to the terms and conditions
@@ -28,10 +28,15 @@
 %bcond_with rpmdebuginfo
 %bcond_with overriderpmdebuginfo
 %bcond_without buildman
+%bcond_without buildwsdissector
 %bcond_with installtests
 
 %if %{with overriderpmdebuginfo}
 %undefine _enable_debug_packages
+%endif
+
+%if %{with buildwsdissector}
+%define wireshark_plugindir %(pkg-config --variable plugindir wireshark)/epan
 %endif
 
 # main (empty) package
@@ -39,15 +44,14 @@
 
 Name: kronosnet
 Summary: Multipoint-to-Multipoint VPN daemon
-Version: 1.31
-Release: 5%{?dist}
+Version: 1.35
+Release: 1%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.1-or-later
 URL: https://kronosnet.org
 Source0: https://kronosnet.org/releases/%{name}-%{version}.tar.xz
 
 # Build dependencies
-BuildRequires: make
-BuildRequires: gcc libqb-devel
+BuildRequires: gcc libqb-devel make
 # required to build man pages
 %if %{with buildman}
 BuildRequires: libxml2-devel doxygen doxygen2man
@@ -84,6 +88,9 @@ BuildRequires: libnl3-devel
 %endif
 %if %{with runautogen}
 BuildRequires: autoconf automake libtool
+%endif
+%if %{with buildwsdissector}
+BuildRequires: wireshark-devel >= 4.6
 %endif
 
 %prep
@@ -154,6 +161,11 @@ BuildRequires: autoconf automake libtool
 	--enable-libnozzle \
 %else
 	--disable-libnozzle \
+%endif
+%if %{with buildwsdissector}
+       --enable-wireshark-dissector \
+%else
+       --disable-wireshark-dissector \
 %endif
 	--with-initdefaultdir=%{_sysconfdir}/sysconfig/ \
 	--with-systemddir=%{_unitdir}
@@ -434,11 +446,89 @@ Requires: libnozzle1%{_isa} = %{version}-%{release}
 %{_libdir}/kronosnet/tests/*
 %endif
 
+%if %{with buildwsdissector}
+%package -n kronosnet-wireshark
+Summary: Wireshark dissector plugin for kronosnet
+License: LGPL-2.1-or-later
+Requires: wireshark >= 4.6.0
+Requires: libknet1%{_isa} = %{version}-%{release}
+
+%description -n kronosnet-wireshark
+ Wireshark dissector plugin for better analysis of kronosnet / libknet traffic.
+
+%files -n kronosnet-wireshark
+%{wireshark_plugindir}/kronosnet.so
+%endif
+
 %if %{with rpmdebuginfo}
 %debug_package
 %endif
 
 %changelog
+* Mon Jul 20 2026 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.35-1
+- New upstream release
+- CVE-2026-15811 (LOW): encryption key exposure in memory after cryptographic configuration changes. Wipe cryptographic keys with explicit_bzero() before freeing to prevent exposure through memory disclosure vulnerabilities. (Resolves rhbz#2500850)
+- CVE-2026-15812 (LOW): access control list bypass via link ID spoofing on unencrypted dynamic links. Validate source address against claimed link_id and enable ACL by default. (Resolves rhbz#2500852)
+- CVE-2026-15813 (MEDIUM): memory corruption and out-of-bounds access via malformed network packet defragmentation. Validate fragment sequence numbers before accessing defragmentation buffers. (Resolves rhbz#2500864)
+- tests: add coverage for connected named AF_UNIX SOCK_STREAM sockets
+- libnozzle: Introduce test macros similar to libknet
+- docs: convert README to markdown format
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.34-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jun 30 2026 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.34-1
+- New upstream release (Resolves rhbz#2494753)
+- Important bugfixes:
+  Fix critical defragmentation buffer reclamation logic
+  Fix sequence number wraparound calculation in defragmentation
+  Add decompression buffer size validation
+  Fix SCTP reconnect thread race condition
+  Build fixes for int_decompress_bufsize without zlib
+- New features:
+  Add unique names to all threads for better debugging
+  Add Wireshark dissector plugin for kronosnet protocol analysis
+  Add API to enumerate supported cipher modes and hash algorithms
+  libnozzle: Platform-specific refactoring and native ioctl implementations
+  libnozzle: Add input validation for network prefixes
+  libnozzle: Portable type and macro abstractions for BSD/Solaris
+  Improve OpenSSL error logging to print entire error stack
+  Add CLAUDE.md documentation for AI-assisted development
+- Test suite improvements:
+  Add comprehensive defragmentation and sequence wraparound test suites
+  Improve test infrastructure with unified logging and injection helpers
+  libnozzle: Introduce test macros similar to libknet
+  Comprehensive test suite improvements and C99 compliance fixes
+  Test suite now supports parallel execution with "make -j check" on systems with sufficient resources
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.33-3
+- Rebuilt for openssl 4.0
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.33-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 14 2026 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.33-1
+- New upstream release
+- Build fixes for gcc-15
+- Build fixes for rust coreutils
+- Coverity tests cleanup
+- Release: ship all files for completeness
+
+* Thu Sep 25 2025 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.32-1
+- New upstream release
+- IMPORTANT: sctp support is now officially deprecated. It is disabled by default and it will be removed in knet 2.x.
+- Fix potential thread race condition in libnozzle close.
+- Fix wrong pointer in libknet RX thread, only triggered by old gcc (< 11).
+- Libnozzle: different fixes for BSD to deal with new tap driver changes and don´t leak interfaces.
+- New API call in libknet to allow configuring a dscp value for KNET_LINK_FLAG_TRAFFICHIPRIO.
+- Bump soname to reflect new API call.
+- Improve OpenSSL error handling.
+- Add support for OpenIndiana.
+- Documentation updates.
+- Fix several tests to better deal with execution timing.
+- Handle some new coverity errors.
+- Create and refine STYLE_GUIDE.md for project contributions.
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.31-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

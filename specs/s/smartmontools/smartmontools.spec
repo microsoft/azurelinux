@@ -10,7 +10,7 @@
 Summary:	Tools for monitoring SMART capable hard disks
 Name:		smartmontools
 Version:	7.5
-Release: 7%{?dist}
+Release:	9%{?dist}
 Epoch:		1
 License:	GPL-2.0-or-later
 URL:		https://www.smartmontools.org/
@@ -23,14 +23,18 @@ Source5:	drivedb.h
 Source6:	%{modulename}.te
 Source7:	%{modulename}.if
 Source8:	%{modulename}.fc
+Source9:	smartmontools.tmpfilesd
 
 #fedora/rhel specific
 Patch1:		smartmontools-5.38-defaultconf.patch
 
 BuildRequires: make
-BuildRequires:	gcc-c++ readline-devel ncurses-devel automake util-linux groff gettext
+BuildRequires:	gcc-c++ readline-devel ncurses-devel automake util-linux gettext
 BuildRequires:	libselinux-devel libcap-ng-devel
 BuildRequires:	systemd systemd-devel
+# For the _tmpfilesdir macro.
+BuildRequires: systemd-rpm-macros
+
 %if 0%{?with_selinux}
 # This ensures that the *-selinux package and all it’s dependencies are not pulled
 # into containers and other systems that do not use SELinux
@@ -103,6 +107,7 @@ chmod a-x -R examplescripts/*
 install -D -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/smartmontools
 install -D -p -m 755 %{SOURCE4} $RPM_BUILD_ROOT/%{_libexecdir}/%{name}/smartdnotify
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/%{name}/smartd_warning.d
+install -p -D -m 644 %{SOURCE9} $RPM_BUILD_ROOT%{_tmpfilesdir}/%{name}.conf
 rm -rf $RPM_BUILD_ROOT/etc/{rc.d,init.d}
 rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}
 mkdir -p $RPM_BUILD_ROOT%{_sharedstatedir}/%{name}
@@ -158,6 +163,7 @@ fi
 %{_sbindir}/smartd
 %{_sbindir}/update-smart-drivedb
 %{_sbindir}/smartctl
+%{_tmpfilesdir}/%{name}.conf
 %{_mandir}/man?/smart*.*
 %{_mandir}/man?/update-smart*.*
 %{_libexecdir}/%{name}
@@ -172,6 +178,22 @@ fi
 
 
 %changelog
+* Sat Aug 15 2026 Michal Hlavinka <mhlavink@redhat.com> - 1:7.5-9
+- use notify-send for notification for users with graphical sessions
+- smartd notify for all SMARTD_FAILTYPEs
+
+* Wed Jul 22 2026 Michal Hlavinka <mhlavink@redhat.com> - 1:7.5-8
+- update selinux policy
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.5-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.5-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 08 2025 Michal Hlavinka <mhlavink@redhat.com> - 1:7.5-5
+- use tmpfiles.d to create /var/lib/smartmontools
+
 * Thu Sep 04 2025 Michal Hlavinka <mhlavink@redhat.com> - 1:7.5-4
 - fix selinux for smartd warn script(rhbz#2367184)
 

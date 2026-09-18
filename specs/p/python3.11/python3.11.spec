@@ -16,11 +16,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.14
+%global general_version %{pybasever}.16
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 8%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -222,7 +222,6 @@ BuildRequires: make
 BuildRequires: mpdecimal-devel
 BuildRequires: ncurses-devel
 
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: readline-devel
 BuildRequires: redhat-rpm-config >= 127
@@ -234,6 +233,10 @@ BuildRequires: tcl-devel < 1:9
 BuildRequires: tix-devel
 BuildRequires: tk-devel < 1:9
 BuildRequires: tzdata
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 %if %{with valgrind}
 BuildRequires: valgrind-devel
@@ -351,34 +354,6 @@ Patch452: 00452-properly-apply-exported-cflags-for-dtrace-systemtap-builds.patch
 # stressed on OpenSSL 3.5.
 Patch462: 00462-fix-pyssl_seterror-handling-ssl_error_syscall.patch
 
-# 00471 # f7ffc7e947b58a4d33c7f5bb69674af20fe4875d
-# CVE-2025-12084
-#
-# * gh-142145: Remove quadratic behavior in node ID cache clearing (GH-142146)
-# * gh-142754: Ensure that Element & Attr instances have the ownerDocument attribute (GH-142794)
-Patch471: 00471-cve-2025-12084.patch
-
-# 00472 # 2ba215eaba508b2cdd7c3acfdf3b9a6e32872274
-# CVE-2025-13836
-#
-# gh-119451: Fix a potential denial of service in http.client (GH-119454)
-#
-# Reading the whole body of the HTTP response could cause OOM if
-# the Content-Length value is too large even if the server does not send
-# a large amount of data. Now the HTTP client reads large data by chunks,
-# therefore the amount of consumed memory is proportional to the amount
-# of sent data.
-Patch472: 00472-cve-2025-13836.patch
-
-# 00473 # 3c13163c5c0be4d073b081f19ad52c007c126d53
-# CVE-2026-0865
-#
-#  gh-143916: Reject control characters in wsgiref.headers.Headers  (GH-143917)
-#
-# * Add 'test.support' fixture for C0 control characters
-# * gh-143916: Reject control characters in wsgiref.headers.Headers
-Patch473: 00473-cve-2026-0865.patch
-
 # 00474 # 837ddca0372fa87ff9cee47142200caa21e77def
 # CVE-2025-15366
 #
@@ -394,6 +369,12 @@ Patch474: 00474-cve-2025-15366.patch
 #
 # (cherry-picked from commit b234a2b67539f787e191d2ef19a7cbdce32874e7)
 Patch475: 00475-cve-2025-15367.patch
+
+# 00494 # 430aab133397ed44cc9ee621fd311e02fee317b5
+# Increase the timeout of test_large_content_length_truncated
+#
+# It has started to fail randomly when run on s390x architecture.
+Patch494: 00494-increase-the-timeout-of-test_large_content_length_truncated.patch
 
 # (New patches go here ^^^)
 #
@@ -557,8 +538,12 @@ Requires: tzdata
 # We avoid this problem by requiring at least the same version of expat that
 # was used during the build time.
 # Other subpackages (like -debug) also need this, but they all depend on -libs.
+# Since expat 2.7.4, the library has versioned symbols and this is no longer needed,
+# as the generated requirement will be in the form of libexpat.so.1(LIBEXPAT_2.7.2) etc.
 %global expat_version %(LANG=C rpm -q --qf '%%{version}' expat.%{_target_cpu} | sed 's/.*not installed/0/')
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 
 %description -n %{pkgname}-libs
@@ -1723,6 +1708,32 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Aug 13 2026 Karolina Surma <ksurma@redhat.com> - 3.11.16-1
+- Update to Python 3.11.16
+
+* Thu Jul 30 2026 Miro Hrončok <mhroncok@redhat.com> - 3.11.15-7
+ - Skip UDP Lite tests if it's not supported
+ - Fixes FTBFS on Linux kernel 7.1 and newer
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.15-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jul 02 2026 Miro Hrončok <mhroncok@redhat.com> - 3.11.15-5
+- Fix ssl.SSLError: [ASN1: NOT_ENOUGH_DATA] not enough data with OpenSSL 3.5.7+
+
+* Fri Apr 17 2026 Charalampos Stratakis <cstratak@redhat.com> - 3.11.15-4
+- Security fixes for CVE-2026-1502, CVE-2026-4786, CVE-2026-6100, CVE-2026-2297, CVE 2026-3644, CVE-2026-4224
+Resolves: rhbz#2457941, rhbz#2458221, rhbz#2458013, rhbz#2444704, rhbz#2448188, rhbz#2448204
+
+* Sat Apr 11 2026 Miro Hrončok <mhroncok@redhat.com> - 3.11.15-3
+- Explicitly build with OpenSSL 3
+
+* Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.11.15-2
+- Security fix for CVE-2026-4519 (rhbz#2449727)
+
+* Tue Mar 03 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.15-1
+- Update to 3.11.15
+
 * Mon Feb 09 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.11.14-5
 - Security fixes for CVE-2026-0865, CVE-2025-15366 and CVE-2025-15367
 

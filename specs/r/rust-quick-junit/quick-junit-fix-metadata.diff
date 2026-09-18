@@ -1,0 +1,14 @@
+--- quick-junit-0.6.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ quick-junit-0.6.1/Cargo.toml	2026-07-14T20:29:36.623327+00:00
+@@ -87,11 +87,6 @@
+ name = "quick_junit"
+ path = "src/lib.rs"
+ 
+-[[bin]]
+-name = "generate-junit-corpus"
+-path = "src/bin/generate-junit-corpus.rs"
+-required-features = ["internal-testing"]
+-
+ [dependencies.chrono]
+ version = "0.4.44"
+ features = ["std"]

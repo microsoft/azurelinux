@@ -1,16 +1,24 @@
---- sequoia-openpgp-2.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ sequoia-openpgp-2.2.0/Cargo.toml	2026-02-09T17:41:09.215154+00:00
-@@ -77,8 +77,6 @@
- crypto-cng = [
+--- sequoia-openpgp-2.4.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ sequoia-openpgp-2.4.0/Cargo.toml	2026-07-02T22:12:43.439333+00:00
+@@ -79,8 +79,6 @@
      "dep:cipher",
+     "dep:cx448",
      "dep:eax",
 -    "dep:winapi",
 -    "dep:win-crypto-ng",
      "dep:ed25519",
      "dep:ed25519-dalek",
      "dep:num-bigint-dig",
-@@ -495,33 +493,6 @@
- version = ">=0.20, <0.23"
+@@ -90,7 +88,6 @@
+     "dep:hkdf",
+     "dep:sha2",
+     "dep:ocb3",
+-    "dep:zeroize",
+ ]
+ crypto-fuzzing = []
+ crypto-nettle = ["dep:nettle"]
+@@ -537,37 +534,6 @@
+ version = ">=0.20, <0.24"
  default-features = false
  
 -[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies.chrono]
@@ -40,11 +48,15 @@
 -optional = true
 -default-features = false
 -
- [lints.rust.unexpected_cfgs]
- level = "warn"
- priority = 0
-@@ -532,3 +503,4 @@
-     'cfg(osslconf, values("OPENSSL_NO_IDEA"))',
+-[target."cfg(windows)".dependencies.zeroize]
+-version = "1"
+-optional = true
+-
+ [lints.clippy.complexity]
+ level = "allow"
+ priority = -1
+@@ -591,3 +557,4 @@
      'cfg(osslconf, values("OPENSSL_NO_OCB"))',
+     'cfg(osslconf, values("OPENSSL_NO_DES"))',
  ]
 +

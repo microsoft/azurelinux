@@ -4,7 +4,7 @@
 Summary: Management tools for Virtual Data Optimizer
 Name: vdo
 Version: 8.3.0.73
-Release: 5%{?dist}
+Release: 2%{?dist}
 
 License: GPL-2.0-only
 URL: https://github.com/dm-vdo/vdo

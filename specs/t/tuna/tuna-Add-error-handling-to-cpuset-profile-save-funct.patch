@@ -1,0 +1,91 @@
+From 21926801be9c00416dad56d020cf60ba5b67443b Mon Sep 17 00:00:00 2001
+From: John Kacur <jkacur@redhat.com>
+Date: Wed, 29 Jul 2026 10:18:48 -0400
+Subject: [PATCH] tuna: Add error handling to cpuset profile save function
+
+The save_cpusets() function would crash with an unhandled exception
+if the parent directory of the target file didn't exist. This is
+problematic when users try to save to /etc/tuna/config.yaml and
+the /etc/tuna directory hasn't been created yet.
+
+This commit adds proper error handling:
+- Automatically creates parent directories if they don't exist
+  using os.makedirs() with exist_ok=True
+- Catches PermissionError and OSError exceptions
+- Returns 0 and prints clear error messages instead of crashing
+
+Also moves the os import to the top of the file for cleaner code
+and removes a duplicate import from within apply_cpusets().
+
+This matches the error handling already present in apply_cpusets()
+and provides a better user experience.
+
+Assisted-by: Claude:claude-sonnet-4-5
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ tuna/profile.py | 35 ++++++++++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 11 deletions(-)
+
+diff --git a/tuna/profile.py b/tuna/profile.py
+index 8372d081546f..fc1a64188c7e 100644
+--- a/tuna/profile.py
++++ b/tuna/profile.py
+@@ -9,6 +9,7 @@ including cpuset definitions.
+ """
+ 
+ import datetime
++import os
+ import sys
+ from ruamel.yaml import YAML
+ 
+@@ -64,16 +65,29 @@ def save_cpusets(filename, get_cpusets_info_func):
+     yaml.default_flow_style = False
+     yaml.width = 4096  # Avoid line wrapping
+ 
+-    with open(filename, 'w') as f:
+-        # Write header comments
+-        f.write("# Tuna RT System Profile - Cpuset Configuration\n")
+-        f.write(f"# Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+-        f.write("#\n")
+-        f.write("# This file can be applied with: tuna cpuset apply <filename>\n")
+-        f.write("#\n\n")
+-
+-        # Write YAML structure
+-        yaml.dump(profile, f)
++    try:
++        # Create parent directories if they don't exist
++        parent_dir = os.path.dirname(filename)
++        if parent_dir:  # Only if filename has a directory component
++            os.makedirs(parent_dir, exist_ok=True)
++
++        with open(filename, 'w') as f:
++            # Write header comments
++            f.write("# Tuna RT System Profile - Cpuset Configuration\n")
++            f.write(f"# Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
++            f.write("#\n")
++            f.write("# This file can be applied with: tuna cpuset apply <filename>\n")
++            f.write("#\n\n")
++
++            # Write YAML structure
++            yaml.dump(profile, f)
++
++    except PermissionError:
++        print(f"Error: Permission denied writing to '{filename}'", file=sys.stderr)
++        return 0
++    except OSError as e:
++        print(f"Error writing profile to '{filename}': {e}", file=sys.stderr)
++        return 0
+ 
+     return len(cpuset_entries)
+ 
+@@ -144,7 +158,6 @@ def apply_cpusets(filename, cpuset_module, verbose=False):
+ 
+         try:
+             # Check if cpuset already exists
+-            import os
+             cpuset_path = os.path.join('/sys/fs/cgroup', name)
+             if os.path.exists(cpuset_path):
+                 print(f"Warning: Cpuset '{name}' already exists, skipping", file=sys.stderr)
+-- 
+2.55.0
+

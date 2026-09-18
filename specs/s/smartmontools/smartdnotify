@@ -7,23 +7,21 @@ then
 fi
 
 # Notify desktop user
-MESSAGE="SMART Disk monitor:"
-case "$SMARTD_FAILTYPE" in
-    "EmailTest"|"Health"|"Temperature"|"Usage")
-        ;;
-    *)
-#       "CurrentPendingSector",       // 10
-#       "OfflineUncorrectableSector", // 11
-#       "FailedReadSmartErrorLog",    // 7
-#       "ErrorCount",                 // 4
-#       "FailedReadSmartData",        // 6
-#       "FailedHealthCheck",          // 5
-#       "FailedOpenDevice",           // 9
-#       "SelfTest",                   // 3
-#       "FailedReadSmartSelfTestLog", // 8
-      exit 0
-esac
+MESSAGE="SMART Disk monitor:
+$SMARTD_MESSAGE"
 
-echo "$MESSAGE
-$SMARTD_MESSAGE" | wall -n 2>/dev/null ||:
+if which notify-send >/dev/null 2>&1
+then
+  loginctl list-sessions --no-legend --no-pager 2>/dev/null | while read -r SESSION_ID SESS_UID USER SEAT LEADER TYPE CLASS TTY IDLE STATE; do
+    SESSION_TYPE=$(loginctl show-session "$SESSION_ID" -p Type --value 2>/dev/null)
+    case "$SESSION_TYPE" in
+      x11|wayland)
+        DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$SESS_UID/bus" \
+          runuser -u "$USER" -- notify-send -u critical -i drive-harddisk "SMART Disk Monitor" "$MESSAGE" 2>/dev/null ||:
+        ;;
+    esac
+  done
+fi
+
+echo "$MESSAGE" | wall -n 2>/dev/null ||:
 

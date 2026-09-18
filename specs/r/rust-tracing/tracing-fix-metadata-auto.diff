@@ -1,5 +1,5 @@
---- tracing-0.1.43/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ tracing-0.1.43/Cargo.toml	2026-01-09T19:06:09.067726+00:00
+--- tracing-0.1.44/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-0.1.44/Cargo.toml	2026-03-16T16:59:33.830499+00:00
 @@ -239,9 +239,6 @@
  [dev-dependencies.log]
  version = "0.4.17"

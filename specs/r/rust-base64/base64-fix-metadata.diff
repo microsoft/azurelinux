@@ -1,0 +1,12 @@
+--- base64-0.23.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ base64-0.23.1/Cargo.toml	2026-08-04T13:36:09.231176+00:00
+@@ -76,9 +76,6 @@
+ version = "4.6.4"
+ features = ["derive"]
+ 
+-[dev-dependencies.criterion]
+-version = "0.7.0"
+-
+ [dev-dependencies.rand]
+ version = "0.10.2"
+ 

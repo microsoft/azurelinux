@@ -5,8 +5,8 @@
 %global gtk3_version 3.20
 
 Name:           gspell
-Version:        1.14.2
-Release: 4%{?dist}
+Version:        1.14.4
+Release:        1%{?dist}
 Summary:        Spell-checking library for GTK+
 
 License:        LGPL-2.1-or-later
@@ -100,6 +100,13 @@ This package contains the full API documentation for %{name}.
 
 
 %changelog
+* Fri Jun 26 2026 Packit <hello@packit.dev> - 1.14.4-1
+- Update to version 1.14.4
+
+* Tue Mar 17 2026 Packit <hello@packit.dev> - 1.14.3-1
+- Update to version 1.14.3
+- Resolves: rhbz#2448322
+
 * Wed Dec 10 2025 Adrian Vovk <adrianvovk@gmail.com> - 1.14.2-1
 - Update to 1.14.2
 

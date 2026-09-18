@@ -33,7 +33,7 @@ There is a limited support for (deprecated) optparse objects, too.
 
 Name:           argparse-manpage
 Version:        4.7
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        %{sum Python}
 BuildArch:      noarch
 

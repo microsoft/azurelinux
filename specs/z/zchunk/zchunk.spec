@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           zchunk
-Version:        1.5.1
-Release: 6%{?dist}
+Version:        1.5.4
+Release:        1%{?dist}
 Summary:        Compressed file format that allows easy deltas
 License:        BSD-2-Clause AND MIT
 URL:            https://github.com/zchunk/zchunk
@@ -87,6 +87,22 @@ install contrib/gen_xml_dictionary %{buildroot}%{_libexecdir}/zck_gen_xml_dictio
 %{_includedir}/zck.h
 
 %changelog
+* Sun Aug 02 2026 Jonathan Dieter <jonathan@dieter.ie> - 1.5.4-1
+- Update to 1.5.4
+- Fix a few memory bugs
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.5.3-2
+- Rebuilt for openssl 4.0
+
+* Thu Jun 11 2026 Jonathan Wright <jonathan@almalinux.org> - 1.5.3-1
+- update to 1.5.3
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

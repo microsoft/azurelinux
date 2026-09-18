@@ -7,7 +7,7 @@
 
 Name:           json
 Version:        3.11.3
-Release: 7%{?dist}
+Release:        4%{?dist}
 
 # The entire source is MIT except
 # include/nlohmann/thirdparty/hedley/hedley.hpp, which is CC0-1.0

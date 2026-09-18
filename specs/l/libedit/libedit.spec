@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global snap 20251016
+%global snap 20260512
 
 # Build man pages with mdoc2man.awk to avoid circular dependencies
 %bcond bootstrap 0
@@ -9,7 +9,7 @@
 Summary:	The NetBSD Editline library
 Name:		libedit
 Version:	3.1
-Release:	57.%{snap}cvs%{?dist}
+Release:	58.%{snap}cvs%{?dist}
 
 # The project as a whole is BSD-3-Clause.
 # These files are BSD-2-Clause:
@@ -89,6 +89,9 @@ sed -i "s/lncurses/ltinfo/" configure
 %{_includedir}/editline/readline.h
 
 %changelog
+* Tue May 12 2026 Jerry James  <loganjerry@gmail.com> - 3.1-59.20260512cvs
+- New version (20260512-3.1)
+
 * Thu Oct 16 2025 Jerry James <loganjerry@gmail.com> - 3.1-57.20251016cvs
 - New version (20251016-3.1)
 - Add bootstrap mode that does not need groff-base

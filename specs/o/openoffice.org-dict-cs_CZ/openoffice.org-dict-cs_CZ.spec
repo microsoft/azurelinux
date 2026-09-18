@@ -6,7 +6,7 @@
 
 Name: openoffice.org-dict-cs_CZ
 Version: 20080822
-Release: 29%{?dist}
+Release: 26%{?dist}
 Summary: Czech spellchecker and hyphenation dictionaries for LibreOffice
 License: GPL-1.0-or-later
 URL: http://extensions.services.openoffice.org/en/project/dict-cs

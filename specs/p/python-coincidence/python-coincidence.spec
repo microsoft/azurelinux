@@ -7,7 +7,7 @@
 Name:           python-coincidence
 Version:        0.6.6
 %forgemeta
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        Helper functions for pytest
 
 License:        MIT

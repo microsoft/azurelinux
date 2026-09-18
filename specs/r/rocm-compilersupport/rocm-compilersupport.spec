@@ -28,8 +28,10 @@
 
 # Compression type and level for source/binary package payloads.
 #  "w7T0.xzdio"	xz level 7 using %%{getncpus} threads
-%global _source_payload w7T0.xzdio
-%global _binary_payload w7T0.xzdio
+# T0 (auto detect) can fail if cores are high and memory low
+# Use 6 threads, between OpenSUSE (4) and Fedora (8) build system defaults
+%global _source_payload w7T6.xzdio
+%global _binary_payload w7T6.xzdio
 
 %bcond_with debug
 %if %{with debug}

@@ -1,12 +1,27 @@
---- jiff-0.2.21/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ jiff-0.2.21/Cargo.toml	2026-02-23T06:33:18.788656+00:00
-@@ -79,28 +79,17 @@
+--- jiff-0.2.35/Cargo.toml	2006-07-24T01:21:28+00:00
++++ jiff-0.2.35/Cargo.toml	2026-07-27T10:51:02.638072+00:00
+@@ -70,7 +70,6 @@
+ alloc = [
+     "jcore/alloc",
+     "serde_core?/alloc",
+-    "defmt?/alloc",
+ ]
+ default = [
+     "std",
+@@ -81,23 +80,12 @@
      "tzdb-concatenated",
      "perf-inline",
  ]
+-defmt = [
+-    "dep:defmt",
+-    "jcore/defmt",
+-]
 -js = [
 -]
- logging = ["dep:log"]
+ logging = [
+     "dep:log",
+     "jcore/logging",
+ ]
  perf-inline = []
  serde = ["dep:serde_core"]
 -static = [
@@ -16,11 +31,13 @@
 -static-tz = ["dep:jiff-static"]
  std = [
      "alloc",
-     "log?/std",
-     "serde_core?/std",
+     "jcore/std",
+@@ -106,14 +94,9 @@
  ]
--tz-fat = ["jiff-static?/tz-fat"]
-+tz-fat = []
+ tz-fat = [
+     "jcore/tz-fat",
+-    "jiff-static?/tz-fat",
+ ]
  tz-system = [
      "std",
 -]
@@ -30,17 +47,25 @@
  ]
  tzdb-bundle-platform = [
      "alloc",
-@@ -115,14 +104,6 @@
- [[test]]
+@@ -129,22 +112,10 @@
  name = "integration"
  path = "tests/lib.rs"
+ 
+-[dependencies.defmt]
+-version = "1.0.0"
+-optional = true
+-
+ [dependencies.jcore]
+ version = "0.1.0"
+ default-features = false
+ package = "jiff-core"
 -
 -[dependencies.jiff-static]
 -version = "0.2"
 -optional = true
 -
 -[dependencies.jiff-tzdb]
--version = "0.1.5"
+-version = "0.1.8"
 -optional = true
  
  [dependencies.log]

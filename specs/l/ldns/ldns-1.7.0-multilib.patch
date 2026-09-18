@@ -1,7 +1,17 @@
-diff --git a/ldns-1.8.4/packaging/ldns-config.in b/ldns-1.8.4/packaging/ldns-config.in
+From 6148e4f15d6ac375556ee91974ee95b433944f5e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Fri, 5 Dec 2025 13:42:27 +0100
+Subject: [PATCH] Multiarch patch for architecture independent headers
+
+Downstream only.
+---
+ packaging/ldns-config.in | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/packaging/ldns-config.in b/packaging/ldns-config.in
 index 623f77e..2b961f9 100755
---- a/ldns-1.8.4/packaging/ldns-config.in
-+++ b/ldns-1.8.4/packaging/ldns-config.in
+--- a/packaging/ldns-config.in
++++ b/packaging/ldns-config.in
 @@ -3,16 +3,28 @@
  prefix="@prefix@"
  exec_prefix="@exec_prefix@"
@@ -54,3 +64,6 @@ index 623f77e..2b961f9 100755
      fi
      if [ $arg = "--version" ]
      then
+-- 
+2.52.0
+

@@ -3,7 +3,7 @@
 
 Name:           perl-Digest-SHA1
 Version:        2.13
-Release: 51%{?dist}
+Release:        48%{?dist}
 Summary:        Digest-SHA1 Perl module
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

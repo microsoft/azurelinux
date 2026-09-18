@@ -1,0 +1,908 @@
+This patch adds the --detect-renamed option which makes rsync notice files
+that either (1) match in size & modify-time (plus the basename, if possible)
+or (2) match in size & checksum (when --checksum was also specified) and use
+each match as an alternate basis file to speed up the transfer.
+
+The algorithm attempts to scan the receiving-side's files in an efficient
+manner.  If --delete[-before] is enabled, we'll take advantage of the
+pre-transfer delete pass to prepare any alternate-basis-file matches we
+might find.  If --delete-before is not enabled, rsync does the rename scan
+during the regular file-sending scan (scanning each directory right before
+the generator starts updating files from that dir).  In this latter mode,
+rsync might delay the updating of a file (if no alternate-basis match was
+yet found) until the full scan of the receiving side is complete, at which
+point any delayed files are processed.
+
+I chose to hard-link the alternate-basis files into a ".~tmp~" subdir that
+takes advantage of rsync's pre-existing partial-dir logic.  This uses less
+memory than trying to keep track of the matches internally, and also allows
+any deletions or file-updates to occur normally without interfering with
+these alternate-basis discoveries.
+
+To use this patch, run these commands for a successful build:
+
+    patch -p1 <patches/detect-renamed.diff
+    ./configure                                 (optional if already run)
+    make
+
+TODO:
+
+  The routine that makes missing directories for files that get renamed
+  down into a new sub-hierarchy doesn't properly handle the case where some
+  path elements might exist but not be a dir yet.  We need to either change
+  our stash-ahead algorithm (to not require unknown path elements) or we
+  need to create a better path-making routine.
+
+  We need to never return a match from fattr_find() that has a basis
+  file.  This will ensure that we don't try to give a renamed file to
+  a file that can't use it, while missing out on giving it to a file
+  that could use it.
+
+based-on: 3305a7a063ab0167cab5bf7029da53abaa9fdb6e
+diff --git a/backup.c b/backup.c
+index df9dac9..cbb7b39 100644
+--- a/backup.c
++++ b/backup.c
+@@ -203,7 +203,7 @@ char *get_backup_name(const char *fname)
+ 			}
+ 			if (backup_dir_len > 1)
+ 				dirbuf[backup_dir_len-1] = '\0';
+-			ret = make_path(dirbuf, 0);
++			ret = make_path(dirbuf, ACCESSPERMS, 0);
+ 			if (ret < 0)
+ 				return NULL;
+ 			initialized = 1;
+diff --git a/compat.c b/compat.c
+--- a/compat.c
++++ b/compat.c
+@@ -40,6 +40,7 @@ extern int checksum_seed;
+ extern int basis_dir_cnt;
+ extern int prune_empty_dirs;
+ extern int protocol_version;
++extern int detect_renamed;
+ extern int protect_args;
+ extern int preserve_uid;
+ extern int preserve_gid;
+@@ -172,6 +173,7 @@ void set_allow_inc_recurse(void)
+ 		allow_inc_recurse = 0;
+ 	else if (!am_sender
+ 	 && (delete_before || delete_after
++	  || detect_renamed
+ 	  || delay_updates || prune_empty_dirs))
+ 		allow_inc_recurse = 0;
+ 	else if (am_server && strchr(client_info, 'i') == NULL)
+diff --git a/delete.c b/delete.c
+--- a/delete.c
++++ b/delete.c
+@@ -25,6 +25,7 @@
+ extern int am_root;
+ extern int make_backups;
+ extern int max_delete;
++extern int detect_renamed;
+ extern char *backup_dir;
+ extern char *backup_suffix;
+ extern int backup_suffix_len;
+@@ -44,6 +45,8 @@ static inline int is_backup_file(char *fn)
+  * its contents, otherwise just checks for content.  Returns DR_SUCCESS or
+  * DR_NOT_EMPTY.  Note that fname must point to a MAXPATHLEN buffer!  (The
+  * buffer is used for recursion, but returned unchanged.)
++ *
++ * Note: --detect-rename may use this routine with DEL_NO_DELETIONS set!
+  */
+ static enum delret delete_dir_contents(char *fname, uint16 flags)
+ {
+@@ -63,7 +66,9 @@ static enum delret delete_dir_contents(char *fname, uint16 flags)
+ 	save_filters = push_local_filters(fname, dlen);
+ 
+ 	non_perishable_cnt = 0;
++	file_extra_cnt += SUM_EXTRA_CNT;
+ 	dirlist = get_dirlist(fname, dlen, 0);
++	file_extra_cnt -= SUM_EXTRA_CNT;
+ 	ret = non_perishable_cnt ? DR_NOT_EMPTY : DR_SUCCESS;
+ 
+ 	if (!dirlist->used)
+@@ -103,7 +108,8 @@ static enum delret delete_dir_contents(char *fname, uint16 flags)
+ 		if (S_ISDIR(fp->mode)) {
+ 			if (delete_dir_contents(fname, flags | DEL_RECURSE) != DR_SUCCESS)
+ 				ret = DR_NOT_EMPTY;
+-		}
++		} else if (detect_renamed && S_ISREG(fp->mode))
++			look_for_rename(fp, fname);
+ 		if (delete_item(fname, fp->mode, flags) != DR_SUCCESS)
+ 			ret = DR_NOT_EMPTY;
+ 	}
+@@ -126,6 +132,8 @@ static enum delret delete_dir_contents(char *fname, uint16 flags)
+  *
+  * Note that fbuf must point to a MAXPATHLEN buffer if the mode indicates it's
+  * a directory! (The buffer is used for recursion, but returned unchanged.)
++ *
++ * Also note: --detect-rename may use this routine with DEL_NO_DELETIONS set!
+  */
+ enum delret delete_item(char *fbuf, uint16 mode, uint16 flags)
+ {
+@@ -153,6 +161,9 @@ enum delret delete_item(char *fbuf, uint16 mode, uint16 flags)
+ 		/* OK: try to delete the directory. */
+ 	}
+ 
++	if (flags & DEL_NO_DELETIONS)
++		return DR_SUCCESS;
++
+ 	if (!(flags & DEL_MAKE_ROOM) && max_delete >= 0 && stats.deleted_files >= max_delete) {
+ 		skipped_deletes++;
+ 		return DR_AT_LIMIT;
+diff --git a/flist.c b/flist.c
+--- a/flist.c
++++ b/flist.c
+@@ -64,6 +64,7 @@ extern int non_perishable_cnt;
+ extern int prune_empty_dirs;
+ extern int copy_links;
+ extern int copy_unsafe_links;
++extern int detect_renamed;
+ extern int insecure_links;
+ extern int protocol_version;
+ extern int sanitize_paths;
+@@ -144,6 +145,8 @@ static inline uint32 wire_mtime_nsec_from_stat(const STRUCT_STAT *stp)
+ }
+ #endif
+ 
++struct file_list the_fattr_list;
++
+ static char empty_sum[MAX_DIGEST_LEN];
+ static int flist_count_offset; /* for --delete --progress */
+ static int show_filelist_progress;
+@@ -280,6 +283,45 @@ static inline int is_excluded(const char *fname, int is_dir, int filter_level)
+ 	return name_is_excluded(fname, is_dir ? NAME_IS_DIR : NAME_IS_FILE, filter_level);
+ }
+ 
++static int fattr_compare(struct file_struct **file1, struct file_struct **file2)
++{
++	struct file_struct *f1 = *file1;
++	struct file_struct *f2 = *file2;
++	int64 len1 = F_LENGTH(f1), len2 = F_LENGTH(f2);
++	int diff;
++
++	if (!f1->basename || !S_ISREG(f1->mode) || !len1) {
++		if (!f2->basename || !S_ISREG(f2->mode) || !len2)
++			return 0;
++		return 1;
++	}
++	if (!f2->basename || !S_ISREG(f2->mode) || !len2)
++		return -1;
++
++	/* Don't use diff for values that are longer than an int. */
++	if (len1 != len2)
++		return len1 < len2 ? -1 : 1;
++
++	if (always_checksum) {
++		diff = u_memcmp(F_SUM(f1), F_SUM(f2), flist_csum_len);
++		if (diff)
++			return diff;
++	} else if (f1->modtime != f2->modtime)
++		return f1->modtime < f2->modtime ? -1 : 1;
++
++	diff = u_strcmp(f1->basename, f2->basename);
++	if (diff)
++		return diff;
++
++	if (f1->dirname == f2->dirname)
++		return 0;
++	if (!f1->dirname)
++		return -1;
++	if (!f2->dirname)
++		return 1;
++	return u_strcmp(f1->dirname, f2->dirname);
++}
++
+ static void send_directory(int f, struct file_list *flist,
+ 			   char *fbuf, int len, int flags);
+ 
+@@ -2735,6 +2777,23 @@ struct file_list *recv_file_list(int f, int dir_ndx)
+ 	 * for a non-relative transfer in recv_file_entry(). */
+ 	flist_sort_and_clean(flist, relative_paths);
+ 
++	if (detect_renamed) {
++		int j = flist->used;
++		the_fattr_list.used = j;
++		the_fattr_list.files = new_array(struct file_struct *, j);
++		memcpy(the_fattr_list.files, flist->files,
++		       j * sizeof (struct file_struct *));
++		qsort(the_fattr_list.files, j,
++		      sizeof the_fattr_list.files[0], (int (*)(const void *, const void *))fattr_compare);
++		the_fattr_list.low = 0;
++		while (j-- > 0) {
++			struct file_struct *fp = the_fattr_list.files[j];
++			if (fp->basename && S_ISREG(fp->mode) && F_LENGTH(fp))
++				break;
++		}
++		the_fattr_list.high = j;
++	}
++
+ 	if (protocol_version < 30) {
+ 		/* Recv the io_error flag */
+ 		int err = read_int(f);
+diff --git a/generator.c b/generator.c
+index 7e5ad60..2058a33 100644
+--- a/generator.c
++++ b/generator.c
+@@ -84,6 +84,7 @@ extern int always_checksum;
+ extern int flist_csum_len;
+ extern char *partial_dir;
+ extern int alt_dest_type;
++extern int detect_renamed;
+ extern int whole_file;
+ extern int list_only;
+ extern int read_batch;
+@@ -102,11 +103,13 @@ extern char *tmpdir;
+ extern char *basis_dir[MAX_BASIS_DIRS+1];
+ extern struct file_list *cur_flist, *first_flist, *dir_flist;
+ extern filter_rule_list filter_list, daemon_filter_list;
++extern struct file_list the_fattr_list;
+ 
+ int maybe_ATTRS_REPORT = 0;
+ int maybe_ATTRS_ACCURATE_TIME = 0;
+ 
+ static dev_t dev_zero;
++static int unexplored_dirs = 1;
+ static int deldelay_size = 0, deldelay_cnt = 0;
+ static char *deldelay_buf = NULL;
+ static int deldelay_fd = -1;
+@@ -281,14 +284,19 @@ static void do_delayed_deletions(char *delbuf)
+  * all the --delete-WHEN options.  Note that the fbuf pointer must point to a
+  * MAXPATHLEN buffer with the name of the directory in it (the functions we
+  * call will append names onto the end, but the old dir value will be restored
+- * on exit). */
+-static void delete_in_dir(char *fbuf, struct file_struct *file, dev_t fs_dev)
++ * on exit).
++ *
++ * Note:  --detect-rename may use this routine with DEL_NO_DELETIONS set!
++ */
++static void delete_in_dir(char *fbuf, struct file_struct *file, dev_t fs_dev,
++			  int del_flags)
+ {
+ 	static int already_warned = 0;
+ 	static struct hashtable *dev_tbl;
+ 	struct file_list *dirlist;
+-	char delbuf[MAXPATHLEN];
+-	int dlen, i;
++	char *p, delbuf[MAXPATHLEN];
++	unsigned remainder;
++	int dlen, i, restore_dot = 0;
+ 
+ 	if (!fbuf) {
+ 		change_local_filter_dir(NULL, 0, 0);
+@@ -302,17 +310,22 @@ static void delete_in_dir(char *fbuf, struct file_struct *file, dev_t fs_dev)
+ 		maybe_send_keepalive(time(NULL), MSK_ALLOW_FLUSH);
+ 
+ 	if (io_error & IOERR_GENERAL && !ignore_errors) {
+-		if (already_warned)
++		if (!already_warned) {
++			rprintf(FINFO,
++			    "IO error encountered -- skipping file deletion\n");
++			already_warned = 1;
++		}
++		if (!detect_renamed)
+ 			return;
+-		rprintf(FINFO,
+-			"IO error encountered -- skipping file deletion\n");
+-		already_warned = 1;
+-		return;
++		del_flags |= DEL_NO_DELETIONS;
+ 	}
+ 
+ 	dlen = strlen(fbuf);
+ 	change_local_filter_dir(fbuf, dlen, F_DEPTH(file));
+ 
++	if (detect_renamed)
++		unexplored_dirs--;
++
+ 	if (one_file_system) {
+ 		if (!dev_tbl)
+ 			dev_tbl = hashtable_create(16, HT_KEY64);
+@@ -328,6 +341,14 @@ static void delete_in_dir(char *fbuf, struct file_struct *file, dev_t fs_dev)
+ 
+ 	dirlist = get_dirlist(fbuf, dlen, 0);
+ 
++	p = fbuf + dlen;
++	if (dlen == 1 && *fbuf == '.') {
++		restore_dot = 1;
++		p = fbuf;
++	} else if (dlen != 1 || *fbuf != '/')
++		*p++ = '/';
++	remainder = MAXPATHLEN - (p - fbuf);
++
+ 	/* If an item in dirlist is not found in flist, delete it
+ 	 * from the filesystem. */
+ 	for (i = dirlist->used; i--; ) {
+@@ -340,6 +361,10 @@ static void delete_in_dir(char *fbuf, struct file_struct *file, dev_t fs_dev)
+ 					f_name(fp, NULL));
+ 			continue;
+ 		}
++		if (detect_renamed && S_ISREG(fp->mode)) {
++			strlcpy(p, fp->basename, remainder);
++			look_for_rename(fp, fbuf);
++		}
+ 		/* Here we want to match regardless of file type.  Replacement
+ 		 * of a file with one of another type is handled separately by
+ 		 * a delete_item call with a DEL_MAKE_ROOM flag. */
+@@ -348,14 +373,19 @@ static void delete_in_dir(char *fbuf, struct file_struct *file, dev_t fs_dev)
+ 			if (!(fp->mode & S_IWUSR) && !am_root && fp->flags & FLAG_OWNED_BY_US)
+ 				flags |= DEL_NO_UID_WRITE;
+ 			f_name(fp, delbuf);
+-			if (delete_during == 2) {
+-				if (!remember_delete(fp, delbuf, flags))
++			if (delete_during == 2 && !(del_flags & DEL_NO_DELETIONS)) {
++				if (!remember_delete(fp, delbuf, del_flags | flags))
+ 					break;
+ 			} else
+-				delete_item(delbuf, fp->mode, flags);
+-		}
++				delete_item(delbuf, fp->mode, del_flags | flags);
++		} else if (detect_renamed && S_ISDIR(fp->mode))
++			unexplored_dirs++;
+ 	}
+ 
++	if (restore_dot)
++		fbuf[0] = '.';
++	fbuf[dlen] = '\0';
++
+ 	flist_free(dirlist);
+ }
+ 
+@@ -391,14 +421,125 @@ static void do_delete_pass(void)
+ 		 || !S_ISDIR(st.st_mode))
+ 			continue;
+ 
+-		delete_in_dir(fbuf, file, st.st_dev);
++		delete_in_dir(fbuf, file, st.st_dev, 0);
+ 	}
+-	delete_in_dir(NULL, NULL, dev_zero);
++	delete_in_dir(NULL, NULL, dev_zero, 0);
+ 
+ 	if (INFO_GTE(FLIST, 2) && !am_server)
+ 		rprintf(FINFO, "                    \r");
+ }
+ 
++/* Search for a regular file that matches either (1) the size & modified
++ * time (plus the basename, if possible) or (2) the size & checksum.  If
++ * we find an exact match down to the dirname, return -1 because we found
++ * an up-to-date file in the transfer, not a renamed file. */
++static int fattr_find(struct file_struct *f, char *fname)
++{
++	int low = the_fattr_list.low, high = the_fattr_list.high;
++	int mid, ok_match = -1, good_match = -1;
++	struct file_struct *fmid;
++	int diff;
++
++	while (low <= high) {
++		mid = (low + high) / 2;
++		fmid = the_fattr_list.files[mid];
++		if (F_LENGTH(fmid) != F_LENGTH(f)) {
++			if (F_LENGTH(fmid) < F_LENGTH(f))
++				low = mid + 1;
++			else
++				high = mid - 1;
++			continue;
++		}
++		if (always_checksum) {
++			/* We use the FLAG_FILE_SENT flag to indicate when we
++			 * have computed the checksum for an entry. */
++			if (!(f->flags & FLAG_FILE_SENT)) {
++				STRUCT_STAT st;
++				if (fmid->modtime == f->modtime
++				 && f_name_cmp(fmid, f) == 0)
++					return -1; /* assume we can't help */
++				st.st_size = F_LENGTH(f);
++				st.st_mtime = f->modtime;
++				file_checksum(fname, &st, F_SUM(f));
++				f->flags |= FLAG_FILE_SENT;
++			}
++			diff = u_memcmp(F_SUM(fmid), F_SUM(f), flist_csum_len);
++			if (diff) {
++				if (diff < 0)
++					low = mid + 1;
++				else
++					high = mid - 1;
++				continue;
++			}
++		} else {
++			if (fmid->modtime != f->modtime) {
++				if (fmid->modtime < f->modtime)
++					low = mid + 1;
++				else
++					high = mid - 1;
++				continue;
++			}
++		}
++		ok_match = mid;
++		diff = u_strcmp(fmid->basename, f->basename);
++		if (diff == 0) {
++			good_match = mid;
++			if (fmid->dirname == f->dirname)
++				return -1; /* file is up-to-date */
++			if (!fmid->dirname) {
++				low = mid + 1;
++				continue;
++			}
++			if (!f->dirname) {
++				high = mid - 1;
++				continue;
++			}
++			diff = u_strcmp(fmid->dirname, f->dirname);
++			if (diff == 0)
++				return -1; /* file is up-to-date */
++		}
++		if (diff < 0)
++			low = mid + 1;
++		else
++			high = mid - 1;
++	}
++
++	return good_match >= 0 ? good_match : ok_match;
++}
++
++void look_for_rename(struct file_struct *file, char *fname)
++{
++	struct file_struct *fp;
++	char *partialptr, *fn;
++	STRUCT_STAT st;
++	int ndx;
++
++	if (!partial_dir || (ndx = fattr_find(file, fname)) < 0)
++		return;
++
++	fp = the_fattr_list.files[ndx];
++	fn = f_name(fp, NULL);
++	/* We don't provide an alternate-basis file if there is a basis file. */
++	if (link_stat(fn, &st, 0) == 0)
++		return;
++
++	if (!dry_run) {
++		if ((partialptr = partial_dir_fname(fn)) == NULL
++		 || !handle_partial_dir(partialptr, PDIR_CREATE))
++			return;
++		/* We only use the file if we can hard-link it into our tmp dir. */
++		if (link(fname, partialptr) != 0) {
++			if (errno != EEXIST)
++				handle_partial_dir(partialptr, PDIR_DELETE);
++			return;
++		}
++	}
++
++	/* I think this falls into the -vv category with "%s is uptodate", etc. */
++	if (INFO_GTE(MISC, 2))
++		rprintf(FINFO, "found renamed: %s => %s\n", fname, fn);
++}
++
+ static inline int mtime_differs(STRUCT_STAT *stp, struct file_struct *file)
+ {
+ #ifdef ST_MTIME_NSEC
+@@ -1357,6 +1498,7 @@ static void list_file_entry(struct file_struct *f)
+ 	}
+ }
+ 
++static struct bitbag *delayed_bits = NULL;
+ static int phase = 0;
+ static int dflt_perms;
+ 
+@@ -1719,7 +1861,7 @@ static void recv_generator(char *fname, struct file_struct *file, int ndx,
+ 			 && do_stat_at(dn, &sx.st) < 0) {
+ 				if (dry_run)
+ 					goto parent_is_dry_missing;
+-				if (make_path(fname, MKP_DROP_NAME | MKP_SKIP_SLASH) < 0) {
++				if (make_path(fname, ACCESSPERMS, MKP_DROP_NAME | MKP_SKIP_SLASH) < 0) {
+ 					rsyserr(FERROR_XFER, errno,
+ 						"recv_generator: mkdir %s failed",
+ 						full_fname(dn));
+@@ -1875,7 +2017,7 @@ static void recv_generator(char *fname, struct file_struct *file, int ndx,
+ 			 * drop any cached (failed) dir fd before the retry. */
+ 			reset_dir_fd_cache();
+ 			if (!relative_paths || errno != ENOENT
+-			 || make_path(fname, MKP_DROP_NAME | MKP_SKIP_SLASH) < 0
++			 || make_path(fname, ACCESSPERMS, MKP_DROP_NAME | MKP_SKIP_SLASH) < 0
+ 			 || (gen_entry_mkdir(fname, file, file->mode|added_perms) < 0 && errno != EEXIST)) {
+ 				rsyserr(FERROR_XFER, errno,
+ 					"recv_generator: mkdir %s failed",
+@@ -1923,9 +2065,12 @@ static void recv_generator(char *fname, struct file_struct *file, int ndx,
+ 		}
+ 		else if (delete_during && f_out != -1 && !phase
+ 		    && !(file->flags & FLAG_MISSING_DIR)) {
+-			if (file->flags & FLAG_CONTENT_DIR)
+-				delete_in_dir(fname, file, real_sx.st.st_dev);
+-			else
++			if (file->flags & FLAG_CONTENT_DIR) {
++				if (detect_renamed && real_ret != 0)
++					unexplored_dirs++;
++				delete_in_dir(fname, file, real_sx.st.st_dev,
++					      delete_during < 0 ? DEL_NO_DELETIONS : 0);
++			} else
+ 				change_local_filter_dir(fname, strlen(fname), F_DEPTH(file));
+ 		}
+ 		prior_dir_file = file;
+@@ -2216,8 +2361,14 @@ static void recv_generator(char *fname, struct file_struct *file, int ndx,
+ 			goto cleanup;
+ 		}
+ #endif
+-		if (stat_errno == ENOENT)
++		if (stat_errno == ENOENT) {
++			if (detect_renamed && unexplored_dirs > 0
++			 && F_LENGTH(file)) {
++				bitbag_set_bit(delayed_bits, ndx);
++				return;
++			}
+ 			goto notify_others;
++		}
+ 		rsyserr(FERROR_XFER, stat_errno, "recv_generator: failed to stat %s",
+ 			full_fname(fname));
+ 		goto cleanup;
+@@ -2750,6 +2901,12 @@ void generate_files(int f_out, const char *local_name)
+ 	if (DEBUG_GTE(GENR, 1))
+ 		rprintf(FINFO, "generator starting pid=%d\n", (int)getpid());
+ 
++	if (detect_renamed) {
++		delayed_bits = bitbag_create(cur_flist->used);
++		if (!delete_before && !delete_during)
++			delete_during = -1;
++	}
++
+ 	if (delete_before && !solo_file && cur_flist->used > 0)
+ 		do_delete_pass();
+ 	if (delete_during == 2) {
+@@ -2758,7 +2915,7 @@ void generate_files(int f_out, const char *local_name)
+ 	}
+ 	info_levels[INFO_FLIST] = info_levels[INFO_PROGRESS] = 0;
+ 
+-	if (append_mode > 0 || whole_file < 0)
++	if (append_mode > 0 || detect_renamed || whole_file < 0)
+ 		whole_file = 0;
+ 	if (DEBUG_GTE(FLIST, 1)) {
+ 		rprintf(FINFO, "delta-transmission %s\n",
+@@ -2795,7 +2952,7 @@ void generate_files(int f_out, const char *local_name)
+ 						dirdev = MAKEDEV(DEV_MAJOR(devp), DEV_MINOR(devp));
+ 					} else
+ 						dirdev = MAKEDEV(0, 0);
+-					delete_in_dir(fbuf, fp, dirdev);
++					delete_in_dir(fbuf, fp, dirdev, 0);
+ 				} else
+ 					change_local_filter_dir(fbuf, strlen(fbuf), F_DEPTH(fp));
+ 			}
+@@ -2842,7 +2999,21 @@ void generate_files(int f_out, const char *local_name)
+ 	} while ((cur_flist = cur_flist->next) != NULL);
+ 
+ 	if (delete_during)
+-		delete_in_dir(NULL, NULL, dev_zero);
++		delete_in_dir(NULL, NULL, dev_zero, 0);
++	if (detect_renamed) {
++		if (delete_during < 0)
++			delete_during = 0;
++		detect_renamed = 0;
++
++		for (i = -1; (i = bitbag_next_bit(delayed_bits, i)) >= 0; ) {
++			struct file_struct *file = cur_flist->files[i];
++			if (local_name)
++				strlcpy(fbuf, local_name, sizeof fbuf);
++			else
++				f_name(file, fbuf);
++			recv_generator(fbuf, file, i, itemizing, code, f_out);
++		}
++	}
+ 	phase++;
+ 	if (DEBUG_GTE(GENR, 1))
+ 		rprintf(FINFO, "generate_files phase=%d\n", phase);
+diff --git a/main.c b/main.c
+--- a/main.c
++++ b/main.c
+@@ -726,7 +726,7 @@ static char *get_local_name(struct file_list *flist, char *dest_path)
+ 
+ 	if (mkpath_dest_arg && statret < 0 && (cp || file_total > 1)) {
+ 		int save_errno = errno;
+-		int ret = make_path(dest_path, file_total > 1 && !trailing_slash ? 0 : MKP_DROP_NAME);
++		int ret = make_path(dest_path, ACCESSPERMS, file_total > 1 && !trailing_slash ? 0 : MKP_DROP_NAME);
+ 		if (ret < 0)
+ 			goto mkdir_error;
+ 		if (ret && (INFO_GTE(NAME, 1) || stdout_format_has_i)) {
+diff --git a/options.c b/options.c
+--- a/options.c
++++ b/options.c
+@@ -91,6 +91,7 @@ int am_server = 0;
+ int am_sender = 0;
+ int am_starting_up = 1;
+ int relative_paths = -1;
++int detect_renamed = 0;
+ int implied_dirs = 1;
+ int missing_args = 0; /* 0 = FERROR_XFER, 1 = ignore, 2 = delete */
+ int numeric_ids = 0;
+@@ -743,6 +744,7 @@ static struct poptOption long_options[] = {
+   {"compare-dest",     0,  POPT_ARG_STRING, 0, OPT_COMPARE_DEST, 0, 0 },
+   {"copy-dest",        0,  POPT_ARG_STRING, 0, OPT_COPY_DEST, 0, 0 },
+   {"link-dest",        0,  POPT_ARG_STRING, 0, OPT_LINK_DEST, 0, 0 },
++  {"detect-renamed",   0,  POPT_ARG_NONE,   &detect_renamed, 0, 0, 0 },
+   {"fuzzy",           'y', POPT_ARG_NONE,   0, 'y', 0, 0 },
+   {"no-fuzzy",         0,  POPT_ARG_VAL,    &fuzzy_basis, 0, 0, 0 },
+   {"no-y",             0,  POPT_ARG_VAL,    &fuzzy_basis, 0, 0, 0 },
+@@ -2400,7 +2402,7 @@ int parse_arguments(int *argc_p, const char ***argv_p)
+ 		inplace = 1;
+ 	}
+ 
+-	if (delay_updates && !partial_dir)
++	if ((delay_updates || detect_renamed) && !partial_dir)
+ 		partial_dir = tmp_partialdir;
+ 
+ 	if (inplace) {
+@@ -2409,6 +2411,7 @@ int parse_arguments(int *argc_p, const char ***argv_p)
+ 			snprintf(err_buf, sizeof err_buf,
+ 				 "--%s cannot be used with --%s\n",
+ 				 append_mode ? "append" : "inplace",
++				 detect_renamed ? "detect-renamed" :
+ 				 delay_updates ? "delay-updates" : "partial-dir");
+ 			goto cleanup;
+ 		}
+@@ -2835,6 +2838,8 @@ void server_options(char **args, int *argc_p)
+ 			args[ac++] = "--super";
+ 		if (size_only)
+ 			args[ac++] = "--size-only";
++		if (detect_renamed)
++			args[ac++] = "--detect-renamed";
+ 		if (do_stats)
+ 			args[ac++] = "--stats";
+ 	} else {
+diff --git a/receiver.c b/receiver.c
+--- a/receiver.c
++++ b/receiver.c
+@@ -221,7 +221,7 @@ int open_tmpfile(char *fnametmp, const char *fname, struct file_struct *file)
+ 	 * information should have been previously transferred, but that may
+ 	 * not be the case with -R */
+ 	if (fd == -1 && relative_paths && errno == ENOENT
+-	 && make_path(fnametmp, MKP_SKIP_SLASH | MKP_DROP_NAME) == 0) {
++	 && make_path(fnametmp, ACCESSPERMS, MKP_SKIP_SLASH | MKP_DROP_NAME) == 0) {
+ 		/* Get back to name with XXXXXX in it. */
+ 		get_tmpname(fnametmp, fname, False);
+ 		fd = do_mkstemp(fnametmp, (file->mode|added_perms) & INITACCESSPERMS);
+diff --git a/rsync.1.md b/rsync.1.md
+--- a/rsync.1.md
++++ b/rsync.1.md
+@@ -507,6 +507,7 @@ has its own detailed description later in this manpage.
+ --modify-window=NUM, -@  set the accuracy for mod-time comparisons
+ --temp-dir=DIR, -T       create temporary files in directory DIR
+ --fuzzy, -y              find similar file for basis if no dest file
++--detect-renamed         try to find renamed files to speed the xfer
+ --compare-dest=DIR       also compare destination files relative to DIR
+ --copy-dest=DIR          ... and include copies of unchanged files
+ --link-dest=DIR          hardlink to files in DIR when unchanged
+@@ -2635,6 +2636,22 @@ expand it.
+     potential fuzzy-match files, so either use [`--delete-after`](#opt) or
+     specify some filename exclusions if you need to prevent this.
+ 
++0.  `--detect-renamed`
++
++    With this option, for each new source file (call it `src/S`), rsync looks
++    for a file `dest/D` anywhere in the destination that passes the quick check
++    with `src/S`.  If such a `dest/D` is found, rsync uses it as an alternate
++    basis for transferring `S`.  The idea is that if `src/S` was renamed from
++    `src/D` (as opposed to `src/S` passing the quick check with `dest/D` by
++    coincidence), the delta-transfer algorithm will find that all the data
++    matches between `src/S` and `dest/D`, and the transfer will be really fast.
++
++    By default, alternate-basis files are hard-linked into a directory named
++    ".~tmp~" in each file's destination directory, but if you've specified the
++    [`--partial-dir`](#opt) option, that directory will be used instead.  These
++    otential alternate-basis files will be removed as the transfer progresses.
++    This option conflicts with [`--inplace`](#opt) and [`--append`](#opt).
++
+ 0.  `--compare-dest=DIR`
+ 
+     This option instructs rsync to use _DIR_ on the destination machine as an
+diff --git a/rsync.h b/rsync.h
+--- a/rsync.h
++++ b/rsync.h
+@@ -287,7 +287,7 @@ enum filetype {
+ #define NDX_DEL_STATS -3
+ #define NDX_FLIST_OFFSET -101
+ 
+-/* For calling delete_item() and delete_dir_contents(). */
++/* For calling delete_item(), delete_dir_contents(), and delete_in_dir(). */
+ #define DEL_NO_UID_WRITE 	(1<<0) /* file/dir has our uid w/o write perm */
+ #define DEL_RECURSE		(1<<1) /* if dir, delete all contents */
+ #define DEL_DIR_IS_EMPTY	(1<<2) /* internal delete_FUNCTIONS use only */
+@@ -297,6 +297,7 @@ enum filetype {
+ #define DEL_FOR_DEVICE		(1<<6) /* making room for a replacement device */
+ #define DEL_FOR_SPECIAL 	(1<<7) /* making room for a replacement special */
+ #define DEL_FOR_BACKUP	 	(1<<8) /* the delete is for a backup operation */
++#define DEL_NO_DELETIONS	(1<<9) /* just check for renames w/o deleting */
+ 
+ #define DEL_MAKE_ROOM (DEL_FOR_FILE|DEL_FOR_DIR|DEL_FOR_SYMLINK|DEL_FOR_DEVICE|DEL_FOR_SPECIAL)
+ 
+diff --git a/util1.c b/util1.c
+index 87ff225..f634116 100644
+--- a/util1.c
++++ b/util1.c
+@@ -204,7 +204,7 @@ int set_times_at(int dfd, const char *name, STRUCT_STAT *stp)
+ /* Create any necessary directories in fname.  Any missing directories are
+  * created with default permissions.  Returns < 0 on error, or the number
+  * of directories created. */
+-int make_path(char *fname, int flags)
++int make_path(char *fname, mode_t mode, int flags)
+ {
+ 	char *end, *p;
+ 	int ret = 0;
+@@ -235,7 +235,7 @@ int make_path(char *fname, int flags)
+ 				else
+ 					errno = ENOTDIR;
+ 			}
+-		} else if (do_mkdir_at(fname, ACCESSPERMS) == 0) {
++		} else if (do_mkdir_at(fname, mode) == 0) {
+ 			ret++;
+ 			break;
+ 		}
+@@ -274,7 +274,7 @@ int make_path(char *fname, int flags)
+ 		p += strlen(p);
+ 		if (ret < 0) /* Skip mkdir on error, but keep restoring the path. */
+ 			continue;
+-		if (do_mkdir_at(fname, ACCESSPERMS) < 0)
++		if (do_mkdir_at(fname, mode) < 0)
+ 			ret = -ret - 1;
+ 		else
+ 			ret++;
+@@ -1425,6 +1425,32 @@ char *normalize_path(char *path, BOOL force_newbuf, unsigned int *len_ptr)
+ 	return path;
+ }
+ 
++/* We need to supply our own strcmp function for file list comparisons
++ * to ensure that signed/unsigned usage is consistent between machines. */
++int u_strcmp(const char *p1, const char *p2)
++{
++        for ( ; *p1; p1++, p2++) {
++		if (*p1 != *p2)
++			break;
++	}
++
++	return (int)*(uchar*)p1 - (int)*(uchar*)p2;
++}
++
++/* We need a memcmp function compares unsigned-byte values. */
++int u_memcmp(const void *p1, const void *p2, size_t len)
++{
++	const uchar *u1 = p1;
++	const uchar *u2 = p2;
++
++	while (len--) {
++		if (*u1 != *u2)
++			return (int)*u1 - (int)*u2;
++	}
++
++	return 0;
++}
++
+ /**
+  * Return a quoted string with the full pathname of the indicated filename.
+  * The string " (in MODNAME)" may also be appended.  The returned pointer
+@@ -1527,7 +1553,7 @@ int handle_partial_dir(const char *fname, int create)
+ 			}
+ 			statret = -1;
+ 		}
+-		if (statret < 0 && do_mkdir_at(dir, 0700) < 0) {
++		if (statret < 0 && make_path(dir, 0700, 0) < 0) {
+ 			operator_path_resolve = 0;
+ 			*fn = '/';
+ 			return 0;
+diff -Nurp a/rsync.1 b/rsync.1
+--- a/rsync.1
++++ b/rsync.1
+@@ -1,5 +1,5 @@
+ .TH "rsync" "1" "13 Aug 2026" "rsync 3.5.0" "User Commands"
+-.\" prefix=/usr
++.\" prefix=/usr/local
+ .P
+ .SH "NAME"
+ .P
+@@ -606,6 +606,7 @@ has its own detailed description later i
+ --modify-window=NUM, -@  set the accuracy for mod-time comparisons
+ --temp-dir=DIR, -T       create temporary files in directory DIR
+ --fuzzy, -y              find similar file for basis if no dest file
++--detect-renamed         try to find renamed files to speed the xfer
+ --compare-dest=DIR       also compare destination files relative to DIR
+ --copy-dest=DIR          ... and include copies of unchanged files
+ --link-dest=DIR          hardlink to files in DIR when unchanged
+@@ -2704,6 +2705,20 @@ alternate destination directories that are specified via
+ Note that the use of the \fB\-\-delete\fP option might get rid of any
+ potential fuzzy-match files, so either use \fB\-\-delete\-after\fP or
+ specify some filename exclusions if you need to prevent this.
++.IP "\fB\-\-detect-renamed\fP"
++With this option, for each new source file (call it \fBsrc/S\fP), rsync looks
++for a file \fBdest/D\fP anywhere in the destination that passes the quick check
++with \fBsrc/S\fP.  If such a \fBdest/D\fP is found, rsync uses it as an alternate
++basis for transferring \fBS\fP.  The idea is that if \fBsrc/S\fP was renamed from
++\fBsrc/D\fP (as opposed to \fBsrc/S\fP passing the quick check with \fBdest/D\fP by
++coincidence), the delta-transfer algorithm will find that all the data
++matches between \fBsrc/S\fP and \fBdest/D\fP, and the transfer will be really fast.
++.IP
++By default, alternate-basis files are hard-linked into a directory named
++".~tmp~" in each file's destination directory, but if you've specified the
++\fB\-\-partial-dir\fP option, that directory will be used instead.  These
++otential alternate-basis files will be removed as the transfer progresses.
++This option conflicts with \fB\-\-inplace\fP and \fB\-\-append\fP
+ .IP "\fB\-\-compare\-dest=DIR\fP"
+ This option instructs rsync to use \fIDIR\fP on the destination machine as an
+ additional hierarchy to compare destination files against doing transfers
+diff -Nurp a/rsync.1.html b/rsync.1.html
+--- a/rsync.1.html
++++ b/rsync.1.html
+@@ -499,6 +499,7 @@ has its own detailed description later i
+ --modify-window=NUM, -@  set the accuracy for mod-time comparisons
+ --temp-dir=DIR, -T       create temporary files in directory DIR
+ --fuzzy, -y              find similar file for basis if no dest file
++--detect-renamed         try to find renamed files to speed the xfer
+ --compare-dest=DIR       also compare destination files relative to DIR
+ --copy-dest=DIR          ... and include copies of unchanged files
+ --link-dest=DIR          hardlink to files in DIR when unchanged
+@@ -2470,6 +2471,21 @@ potential fuzzy-match files, so either u
+ specify some filename exclusions if you need to prevent this.</p>
+ </dd>
+ 
++<dt id="opt--detect-renamed"><code>--detect-renamed</code><a href="#opt--detect-renamed" class="tgt"></a></dt><dd>
++<p>With this option, for each new source file (call it <code>src/S</code>), rsync looks
++for a file <code>dest/D</code> anywhere in the destination that passes the quick check
++with <code>src/S</code>.  If such a <code>dest/D</code> is found, rsync uses it as an alternate
++basis for transferring <code>S</code>.  The idea is that if <code>src/S</code> was renamed from
++<code>src/D</code> (as opposed to <code>src/S</code> passing the quick check with <code>dest/D</code> by
++coincidence), the delta-transfer algorithm will find that all the data
++matches between <code>src/S</code> and <code>dest/D</code>, and the transfer will be really fast.</p>
++<p>By default, alternate-basis files are hard-linked into a directory named
++&quot;.~tmp~&quot; in each file's destination directory, but if you've specified the
++<a href="#opt--partial-dir"><code>--partial-dir</code></a> option, that directory will be used instead.  These
++otential alternate-basis files will be removed as the transfer progresses.
++This option conflicts with <a href="#opt--inplace"><code>--inplace</code></a> and <a href="#opt--append"><code>--append</code></a>.</p>
++</dd>
++
+ <dt id="opt--compare-dest"><code>--compare-dest=DIR</code><a href="#opt--compare-dest" class="tgt"></a></dt><dd>
+ <p>This option instructs rsync to use <u>DIR</u> on the destination machine as an
+ additional hierarchy to compare destination files against doing transfers
+diff -Nurp a/rsyncd.conf.5 b/rsyncd.conf.5
+--- a/rsyncd.conf.5
++++ b/rsyncd.conf.5
+@@ -1,5 +1,5 @@
+ .TH "rsyncd.conf" "5" "13 Aug 2026" "rsyncd.conf from rsync 3.5.0" "User Commands"
+-.\" prefix=/usr
++.\" prefix=/usr/local
+ .P
+ .SH "NAME"
+ .P
+@@ -73,11 +73,11 @@ and a single line something like this to
+ .RS 4
+ .P
+ .nf
+-rsync   stream  tcp     nowait  root   /usr/bin/rsync rsyncd --daemon
++rsync   stream  tcp     nowait  root   /usr/local/bin/rsync rsyncd --daemon
+ .fi
+ .RE
+ .P
+-Replace "/usr/bin/rsync" with the path to where you have rsync installed on
++Replace "/usr/local/bin/rsync" with the path to where you have rsync installed on
+ your system.  You will then need to send inetd a HUP signal to tell it to
+ reread its config file.
+ .P
+diff -Nurp a/rsyncd.conf.5.html b/rsyncd.conf.5.html
+--- a/rsyncd.conf.5.html
++++ b/rsyncd.conf.5.html
+@@ -77,10 +77,10 @@ command &quot;<code>rsync --daemon</code
+ </blockquote>
+ <p>and a single line something like this to /etc/inetd.conf:</p>
+ <blockquote>
+-<pre><code>rsync   stream  tcp     nowait  root   /usr/bin/rsync rsyncd --daemon
++<pre><code>rsync   stream  tcp     nowait  root   /usr/local/bin/rsync rsyncd --daemon
+ </code></pre>
+ </blockquote>
+-<p>Replace &quot;/usr/bin/rsync&quot; with the path to where you have rsync installed on
++<p>Replace &quot;/usr/local/bin/rsync&quot; with the path to where you have rsync installed on
+ your system.  You will then need to send inetd a HUP signal to tell it to
+ reread its config file.</p>
+ <p>Note that you should <strong>not</strong> send the rsync daemon a HUP signal to force it to
+diff -Nurp a/rsync-ssl.1 b/rsync-ssl.1
+--- a/rsync-ssl.1
++++ b/rsync-ssl.1
+@@ -1,5 +1,5 @@
+ .TH "rsync-ssl" "1" "13 Aug 2026" "rsync-ssl from rsync 3.5.0" "User Commands"
+-.\" prefix=/usr
++.\" prefix=/usr/local
+ .P
+ .SH "NAME"
+ .P

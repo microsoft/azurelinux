@@ -1,7 +1,7 @@
-From 6c8c4c8c85204943223b251d09ca1e93571a437a Mon Sep 17 00:00:00 2001
+From fddeff654d0002a27a75fcb9b50e02587822931b Mon Sep 17 00:00:00 2001
 From: Sahana Prasad <sprasad@localhost.localdomain>
 Date: Mon, 12 Sep 2022 11:07:38 +0200
-Subject: [PATCH 3/7] Use cipher configuration from crypto-policies
+Subject: [PATCH 2/3] Use cipher configuration from crypto-policies
 
 On Fedora, CentOS and RHEL, the system's crypto policies are the best
 source to determine which cipher suites to accept in TLS. On these
@@ -17,21 +17,22 @@ From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/options.c b/src/options.c
-index 6e4a18b..4d31815 100644
+index ae2d5c4..d616a85 100644
 --- a/src/options.c
 +++ b/src/options.c
-@@ -321,9 +321,9 @@ static const char *option_not_found=
+@@ -362,10 +362,10 @@ static const char *option_not_found=
      "Specified option name is not valid here";
  
  static const char *stunnel_cipher_list=
 -    "HIGH:!aNULL:!SSLv2:!DH:!kDHEPSK";
 +    "PROFILE=SYSTEM";
+ #ifdef USE_FIPS
  static const char *fips_cipher_list=
 -    "FIPS:!DH:!kDHEPSK";
 +    "PROFILE=SYSTEM";
+ #endif /* USE_FIPS */
  
  #ifndef OPENSSL_NO_TLS1_3
- static const char *stunnel_ciphersuites=
 -- 
-2.39.2
+2.53.0
 

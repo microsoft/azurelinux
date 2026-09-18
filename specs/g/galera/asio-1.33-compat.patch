@@ -1,0 +1,258 @@
+From: Michal Schorm <mschorm@redhat.com>
+Subject: [PATCH] Fix compilation with asio >= 1.33.0
+
+asio 1.33.0 permanently removed deprecated APIs. Seven categories of
+removals affect galera 26.4.25:
+
+- 'asio::io_service' type alias (use 'asio::io_context')
+- 'io_context::post()' member (use free fn 'asio::post(ctx, fn)')
+- 'io_context::reset()' member (renamed to 'io_context::restart()')
+- 'resolver::iterator' type (use 'resolver::results_type')
+- 'resolver::query' class (use 'resolver.resolve(host, service)')
+- 'asio::ip::address::from_string()' (use 'asio::ip::make_address()')
+- 'timer::expires_from_now()' (renamed to 'timer::expires_after()')
+
+All replacements are available since asio 1.11.0 or 1.13.0; the patch
+is backward-compatible with asio 1.30.x and needs no version guards.
+---
+--- a/galerautils/src/gu_asio_io_service_impl.hpp
++++ b/galerautils/src/gu_asio_io_service_impl.hpp
+@@ -16,7 +16,7 @@
+ 
+ #include "gu_asio.hpp"
+ 
+-#include "asio/io_service.hpp"
++#include "asio/io_context.hpp"
+ #ifdef GALERA_HAVE_SSL
+ #include "asio/ssl.hpp"
+ #endif // GALERA_HAVE_SSL
+@@ -35,9 +35,9 @@
+             , ssl_context_()
+ #endif // GALERA_HAVE_SSL
+         { }
+-        asio::io_service& native() { return io_service_; }
++        asio::io_context& native() { return io_service_; }
+     private:
+-        asio::io_service io_service_;
++        asio::io_context io_service_;
+     public:
+ #ifdef GALERA_HAVE_SSL
+         std::unique_ptr<asio::ssl::context> ssl_context_;
+--- a/galerautils/src/gu_asio_ip_address_impl.hpp
++++ b/galerautils/src/gu_asio_ip_address_impl.hpp
+@@ -65,7 +65,7 @@
+ 
+ static inline asio::ip::address make_address(const std::string& addr)
+ {
+-    return asio::ip::address::from_string(gu::unescape_addr(addr));
++    return asio::ip::make_address(gu::unescape_addr(addr));
+ }
+ 
+ static inline std::string any_addr(const asio::ip::address& addr)
+--- a/galerautils/src/gu_asio.cpp
++++ b/galerautils/src/gu_asio.cpp
+@@ -753,7 +753,7 @@
+ 
+ void gu::AsioIoService::post(std::function<void()> fun)
+ {
+-    impl_->native().post(fun);
++    asio::post(impl_->native(), fun);
+ }
+ 
+ void gu::AsioIoService::stop()
+@@ -763,7 +763,7 @@
+ 
+ void gu::AsioIoService::reset()
+ {
+-    impl_->native().reset();
++    impl_->native().restart();
+ }
+ 
+ gu::AsioIoService::Impl& gu::AsioIoService::impl()
+@@ -808,7 +808,7 @@
+     typedef asio::steady_timer native_timer_type;
+ #endif /* #if (__GNUC__ == 4 && __GNUC_MINOR__ == 4) */
+ 
+-    Impl(asio::io_service& io_service) : timer_(io_service) { }
++    Impl(asio::io_context& io_service) : timer_(io_service) { }
+     native_timer_type& native() { return timer_; }
+     void handle_wait(const std::shared_ptr<AsioSteadyTimerHandler>& handler,
+                      const asio::error_code& ec)
+@@ -845,7 +845,7 @@
+ void gu::AsioSteadyTimer::expires_from_now(
+     const AsioClock::duration& duration)
+ {
+-    impl_->native().expires_from_now(to_native_duration(duration));
++    impl_->native().expires_after(to_native_duration(duration));
+ }
+ 
+ void gu::AsioSteadyTimer::async_wait(
+--- a/galerautils/src/gu_asio_datagram.hpp
++++ b/galerautils/src/gu_asio_datagram.hpp
+@@ -35,7 +35,7 @@
+ 
+         ~AsioUdpSocket() noexcept(false);
+ 
+-        asio::ip::udp::resolver::iterator resolve_and_open(const gu::URI& uri);
++        asio::ip::udp::resolver::results_type resolve_and_open(const gu::URI& uri);
+ 
+         virtual void open(const gu::URI& uri) GALERA_OVERRIDE;
+ 
+--- a/galerautils/src/gu_asio_datagram.cpp
++++ b/galerautils/src/gu_asio_datagram.cpp
+@@ -19,14 +19,13 @@
+ 
+ #include <boost/bind.hpp>
+ 
+-static asio::ip::udp::resolver::iterator resolve_udp(
+-    asio::io_service& io_service,
++static asio::ip::udp::resolver::results_type resolve_udp(
++    asio::io_context& io_service,
+     const gu::URI& uri)
+ {
+     asio::ip::udp::resolver resolver(io_service);
+-    asio::ip::udp::resolver::query query(gu::unescape_addr(uri.get_host()),
+-                                         uri.get_port());
+-    return resolver.resolve(query);
++    return resolver.resolve(gu::unescape_addr(uri.get_host()),
++                            uri.get_port());
+ }
+ 
+ static bool is_multicast(const asio::ip::udp::endpoint& ep)
+@@ -95,13 +94,13 @@
+     close();
+ }
+ 
+-asio::ip::udp::resolver::iterator
++asio::ip::udp::resolver::results_type
+ gu::AsioUdpSocket::resolve_and_open(const gu::URI& uri)
+ {
+     try
+     {
+         auto resolve_result(resolve_udp(io_service_.impl().native(), uri));
+-        socket_.open(resolve_result->endpoint().protocol());
++        socket_.open(resolve_result.begin()->endpoint().protocol());
+         set_fd_options(socket_);
+         return resolve_result;
+     }
+@@ -141,7 +140,7 @@
+ {
+     try
+     {
+-        asio::ip::udp::resolver::iterator resolve_result;
++        asio::ip::udp::resolver::results_type resolve_result;
+         if (not socket_.is_open())
+         {
+             resolve_result = resolve_and_open(uri);
+@@ -164,18 +163,18 @@
+             ::make_address(
+                 uri.get_option("socket.if_addr",
+                                ::any_addr(
+-                                   resolve_result->endpoint().address())));
++                                   resolve_result.begin()->endpoint().address())));
+ 
+-        if (is_multicast(resolve_result->endpoint()))
++        if (is_multicast(resolve_result.begin()->endpoint()))
+         {
+-            join_group(socket_, resolve_result->endpoint(), local_if_);
++            join_group(socket_, resolve_result.begin()->endpoint(), local_if_);
+             socket_.set_option(
+                 asio::ip::multicast::enable_loopback(
+                     gu::from_string<bool>(uri.get_option("socket.if_loop", "false"))));
+             socket_.set_option(
+                 asio::ip::multicast::hops(
+                     gu::from_string<int>(uri.get_option("socket.mcast_ttl", "1"))));
+-            socket_.bind(*resolve_result);
++            socket_.bind(*resolve_result.begin());
+         }
+         else
+         {
+--- a/galerautils/src/gu_asio_socket_util.hpp
++++ b/galerautils/src/gu_asio_socket_util.hpp
+@@ -113,18 +113,17 @@
+     }
+ }
+ 
+-static inline asio::ip::tcp::resolver::iterator resolve_tcp(
+-    asio::io_service& io_service,
++static inline asio::ip::tcp::resolver::results_type resolve_tcp(
++    asio::io_context& io_service,
+     const gu::URI& uri)
+ {
+     asio::ip::tcp::resolver resolver(io_service);
+-    // Give query flags explicitly to avoid having AI_ADDRCONFIG in
++    // Give resolve flags explicitly to avoid having AI_ADDRCONFIG in
+     // underlying getaddrinfo() hint flags.
+-    asio::ip::tcp::resolver::query
+-        query(gu::unescape_addr(uri.get_host()),
+-              uri.get_port(),
+-              asio::ip::tcp::resolver::query::flags(0));
+-    return resolver.resolve(query);
++    return resolver.resolve(
++        gu::unescape_addr(uri.get_host()),
++        uri.get_port(),
++        asio::ip::resolver_base::flags(0));
+ }
+ 
+ template <class Socket>
+--- a/galerautils/src/gu_asio_stream_react.cpp
++++ b/galerautils/src/gu_asio_stream_react.cpp
+@@ -63,7 +63,7 @@
+ void gu::AsioStreamReact::open(const gu::URI& uri) try
+ {
+     auto resolve_result(resolve_tcp(io_service_.impl().native(), uri));
+-    socket_.open(resolve_result->endpoint().protocol());
++    socket_.open(resolve_result.begin()->endpoint().protocol());
+     set_fd_options(socket_);
+ }
+ catch (const asio::system_error& e)
+@@ -125,10 +125,10 @@
+     auto resolve_result(resolve_tcp(io_service_.impl().native(), uri));
+     if (not socket_.is_open())
+     {
+-        socket_.open(resolve_result->endpoint().protocol());
++        socket_.open(resolve_result.begin()->endpoint().protocol());
+     }
+     connected_ = true;
+-    socket_.async_connect(*resolve_result,
++    socket_.async_connect(*resolve_result.begin(),
+                           boost::bind(&AsioStreamReact::connect_handler,
+                                       shared_from_this(),
+                                       handler,
+@@ -201,10 +201,10 @@
+     auto resolve_result(resolve_tcp(io_service_.impl().native(), uri));
+     if (not socket_.is_open())
+     {
+-        socket_.open(resolve_result->endpoint().protocol());
++        socket_.open(resolve_result.begin()->endpoint().protocol());
+         set_fd_options(socket_);
+     }
+-    socket_.connect(resolve_result->endpoint());
++    socket_.connect(resolve_result.begin()->endpoint());
+     connected_ = true;
+     prepare_engine(false);
+     assign_addresses();
+@@ -870,7 +870,7 @@
+ void gu::AsioAcceptorReact::open(const gu::URI& uri) try
+ {
+     auto resolve_result(resolve_tcp(io_service_.impl().native(), uri));
+-    acceptor_.open(resolve_result->endpoint().protocol());
++    acceptor_.open(resolve_result.begin()->endpoint().protocol());
+     set_fd_options(acceptor_);
+ }
+ catch (const asio::system_error& e)
+@@ -889,12 +889,12 @@
+     auto resolve_result(resolve_tcp(io_service_.impl().native(), uri));
+     if (not acceptor_.is_open())
+     {
+-        acceptor_.open(resolve_result->endpoint().protocol());
++        acceptor_.open(resolve_result.begin()->endpoint().protocol());
+         set_fd_options(acceptor_);
+     }
+ 
+     acceptor_.set_option(asio::ip::tcp::socket::reuse_address(true));
+-    acceptor_.bind(*resolve_result);
++    acceptor_.bind(*resolve_result.begin());
+     acceptor_.listen();
+     listening_ = true;
+ }

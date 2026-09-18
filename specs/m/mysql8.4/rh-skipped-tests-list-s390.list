@@ -8,3 +8,16 @@ x.result_types              : BUG#0
 
 # Times out since 8.4.7
 rpl_gtid.rpl_perfschema_applier_status_by_worker_gtid_skipped_transaction_mts   : BUG#0
+
+# Fails since 8.0.46 / 8.4.9 / 9.7.0 on s390x
+# Bug#39129182 tightened InnoDB row size estimation in get_field_max_size().
+# Combined with zlib-ng DFLTCC compressBound() overhead on s390x,
+# compressed tables with small KEY_BLOCK_SIZE exceed row size limits.
+innodb.zlob_geom                            : BUG#0
+innodb_zip.4k                               : BUG#0
+innodb_zip.8k                               : BUG#0
+innodb_zip.bug52745                         : BUG#0
+innodb_zip.index_large_prefix               : BUG#0
+innodb_zip.index_large_prefix_4k            : BUG#0
+innodb_zip.index_large_prefix_8k            : BUG#0
+innodb_zip.prefix_index_liftedlimit         : BUG#0

@@ -3,8 +3,8 @@
 
 %global libjit_soversion 3
 Name:           jitterentropy
-Version:        3.6.0
-Release: 6%{?dist}
+Version:        3.7.0
+Release:        3%{?dist}
 Summary:        Library implementing the jitter entropy source
 
 License:        BSD-3-Clause OR GPL-2.0-only
@@ -16,6 +16,10 @@ BuildRequires: make
 
 # Disable Upstream Makefiles debuginfo strip on install
 Patch0: jitterentropy-rh-makefile.patch
+# Gcc with -std=c11 defines __powerpc__ only
+Patch1: jitterentropy-powerpc.patch
+# Restore previous jitterentropy public api
+Patch2: jitterentropy-api.patch
 
 %description
 Library implementing the CPU jitter entropy source
@@ -35,8 +39,8 @@ Development headers and libraries for jitterentropy
 %make_build
 
 %install
-mkdir -p %{buildroot}/usr/include/
-%make_install PREFIX=/usr LIBDIR=%{_lib}
+mkdir -p %{buildroot}%{_includedir}
+%make_install PREFIX=%{_prefix} LIBDIR=%{_lib}
 
 %files
 %doc README.md CHANGES.md
@@ -49,6 +53,19 @@ mkdir -p %{buildroot}/usr/include/
 %{_mandir}/man3/*
 
 %changelog
+* Wed May 20 2026 Vladislav Dronov <vdronov@redhat.com> - 3.7.0-3
+- Restore previous jitterentropy public api
+
+* Fri May 15 2026 Vladislav Dronov <vdronov@redhat.com> - 3.7.0-2
+- Simplify jent_get_nstime() for PowerPC
+
+* Fri May 15 2026 Vladislav Dronov <vdronov@redhat.com> - 3.7.0-1
+- Update to the upstream v3.7.0 @ e783cf1c
+- Fix PowerPC architecture detection code
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

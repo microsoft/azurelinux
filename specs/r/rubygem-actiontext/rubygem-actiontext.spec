@@ -11,7 +11,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 6%{?dist}
+Release: 2%{?dist}
 Summary: Rich text framework
 License: MIT
 URL: https://rubyonrails.org

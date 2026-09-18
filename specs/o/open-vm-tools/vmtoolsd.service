@@ -4,6 +4,7 @@ Documentation=http://github.com/vmware/open-vm-tools
 ConditionVirtualization=vmware
 Requires=vgauthd.service
 After=vgauthd.service
+Before=display-manager.service
 
 [Service]
 ExecStart=/usr/bin/vmtoolsd

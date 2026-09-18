@@ -1,0 +1,49 @@
+commit 1e749954a3c941592f46583113a06844be47311a
+Author: Matt Turner <mattst88@gmail.com>
+Date:   Fri Apr 10 11:46:37 2026 -0400
+
+    s390x: detect infinite loop in unw_step()
+    
+    When unwinding through a signal handler on s390x, the unwinder could
+    enter an infinite loop. This happened because dwarf_step() found DWARF
+    unwind info (via the .eh_frame FDE) that produced the same IP with a
+    bogus CFA, causing unw_step() to keep returning > 0 indefinitely.
+    
+    The reason is that setup_fde() initializes all register rules to
+    DWARF_WHERE_SAME instead of DWARF_WHERE_UNDEF (which the DWARF spec
+    requires). When a CIE doesn't explicitly mark the return address
+    register as undefined, the "same value" default causes the unwinder to
+    read a stale return address and loop.
+    
+    Add a defensive check (similar to ARM's arm_exidx_step and x86_64's
+    _unw_step_fallback): if dwarf_step() succeeds but IP is unchanged and
+    CFA didn't increase, stop unwinding.
+    
+    This fixes the s390x cross-compile CI job timing out on Gtest-bt.
+
+diff --git a/src/s390x/Gstep.c b/src/s390x/Gstep.c
+index c6b644177cd40dd9..792f5b6014049834 100644
+--- a/src/s390x/Gstep.c
++++ b/src/s390x/Gstep.c
+@@ -94,6 +94,8 @@ unw_step (unw_cursor_t *cursor)
+ {
+   struct cursor *c = (struct cursor *) cursor;
+   int ret = 0, val = c->validate, sig;
++  unw_word_t old_ip = c->dwarf.ip;
++  unw_word_t old_cfa = c->dwarf.cfa;
+ 
+ #if CONSERVATIVE_CHECKS
+   c->validate = 1;
+@@ -145,5 +147,12 @@ unw_step (unw_cursor_t *cursor)
+   if (unlikely (ret > 0 && c->dwarf.ip == 0))
+     return 0;
+ 
++  if (unlikely (ret > 0 && c->dwarf.ip == old_ip && c->dwarf.cfa <= old_cfa))
++    {
++      Dprintf ("%s: ip unchanged and cfa not advancing; stopping\n",
++               __FUNCTION__);
++      return 0;
++    }
++
+   return ret;
+ }

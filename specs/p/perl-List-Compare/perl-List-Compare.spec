@@ -3,7 +3,7 @@
 
 Name:           perl-List-Compare
 Version:        0.55
-Release: 17%{?dist}
+Release:        14%{?dist}
 Summary:        Compare elements of two or more lists
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/List-Compare

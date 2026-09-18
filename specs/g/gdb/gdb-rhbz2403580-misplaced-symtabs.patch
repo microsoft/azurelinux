@@ -92,7 +92,7 @@ diff --git a/gdb/dwarf2/line-header.h b/gdb/dwarf2/line-header.h
 diff --git a/gdb/dwarf2/read.c b/gdb/dwarf2/read.c
 --- a/gdb/dwarf2/read.c
 +++ b/gdb/dwarf2/read.c
-@@ -6222,8 +6222,8 @@ dwarf2_cu::setup_type_unit_groups (struct die_info *die)
+@@ -6227,8 +6227,8 @@ dwarf2_cu::setup_type_unit_groups (struct die_info *die)
  	      sf->symtab = allocate_symtab (cust, name, name_for_id);
  	    }
  
@@ -103,7 +103,7 @@ diff --git a/gdb/dwarf2/read.c b/gdb/dwarf2/read.c
  	}
      }
    else
-@@ -6241,7 +6241,7 @@ dwarf2_cu::setup_type_unit_groups (struct die_info *die)
+@@ -6246,7 +6246,7 @@ dwarf2_cu::setup_type_unit_groups (struct die_info *die)
        for (i = 0; i < file_names.size (); ++i)
  	{
  	  file_entry &fe = file_names[i];
@@ -112,7 +112,7 @@ diff --git a/gdb/dwarf2/read.c b/gdb/dwarf2/read.c
  	}
      }
  
-@@ -11584,7 +11584,7 @@ process_structure_scope (struct die_info *die, struct dwarf2_cu *cu)
+@@ -11589,7 +11589,7 @@ process_structure_scope (struct die_info *die, struct dwarf2_cu *cu)
  	    {
  	      /* Any related symtab will do.  */
  	      symtab
@@ -121,7 +121,7 @@ diff --git a/gdb/dwarf2/read.c b/gdb/dwarf2/read.c
  	    }
  	  else
  	    {
-@@ -16587,6 +16587,9 @@ dwarf_decode_lines (struct line_header *lh, struct dwarf2_cu *cu,
+@@ -16592,6 +16592,9 @@ dwarf_decode_lines (struct line_header *lh, struct dwarf2_cu *cu,
    if (decode_mapping)
      dwarf_decode_lines_1 (lh, cu, lowpc);
  
@@ -131,7 +131,7 @@ diff --git a/gdb/dwarf2/read.c b/gdb/dwarf2/read.c
    /* Make sure a symtab is created for every file, even files
       which contain only variables (i.e. no code with associated
       line numbers).  */
-@@ -16602,7 +16605,7 @@ dwarf_decode_lines (struct line_header *lh, struct dwarf2_cu *cu,
+@@ -16607,7 +16610,7 @@ dwarf_decode_lines (struct line_header *lh, struct dwarf2_cu *cu,
  	sf->symtab = allocate_symtab (cust, sf->name.c_str (),
  				      sf->name_for_id.c_str ());
  
@@ -140,7 +140,7 @@ diff --git a/gdb/dwarf2/read.c b/gdb/dwarf2/read.c
      }
  }
  
-@@ -16879,7 +16882,7 @@ new_symbol (struct die_info *die, struct type *type, struct dwarf2_cu *cu,
+@@ -16884,7 +16887,7 @@ new_symbol (struct die_info *die, struct type *type, struct dwarf2_cu *cu,
  	      if (fe == NULL)
  		complaint (_("file index out of range"));
  	      else

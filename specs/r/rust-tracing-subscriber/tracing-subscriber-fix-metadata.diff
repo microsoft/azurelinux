@@ -1,5 +1,5 @@
---- tracing-subscriber-0.3.20/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ tracing-subscriber-0.3.20/Cargo.toml	2025-09-01T17:37:48.048515+00:00
+--- tracing-subscriber-0.3.23/Cargo.toml	2006-07-24T01:21:28+00:00
++++ tracing-subscriber-0.3.23/Cargo.toml	2026-03-14T23:01:41.166936+00:00
 @@ -97,10 +97,6 @@
      "alloc",
      "tracing-core/std",

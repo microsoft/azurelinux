@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        4.9
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        Pure-Python RSA implementation
 
 License:        Apache-2.0

@@ -19,9 +19,6 @@
 %bcond_with          defcmd
 %endif
 
-%global gh_commit    adc7262fccc12de2b30f12a8aa0b33775d814f00
-%global gh_date      2026-02-18
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   phpunit
 # Packagist
@@ -33,18 +30,15 @@
 %global ver_major    11
 %global ver_minor    5
 
-%global upstream_version 11.5.55
-#global upstream_prever  dev
-
 Name:           %{pk_project}%{ver_major}
-Version:        %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
-Release: 4%{?dist}
+Version:        11.5.56
+Release:        1%{?dist}
 Summary:        The PHP Unit Testing framework version %{ver_major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{upstream_version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 # Fix command for autoload
@@ -84,10 +78,10 @@ BuildRequires:  php-fedora-autoloader-devel >= 1.0.0
 # From composer.json, "require": {
 #        "php": ">=8.2",
 #        "ext-dom": "*",
+#        "ext-filter": "*",
 #        "ext-json": "*",
 #        "ext-libxml": "*",
 #        "ext-mbstring": "*",
-#        "ext-xml": "*",
 #        "ext-xmlwriter": "*",
 #        "myclabs/deep-copy": "^1.13.4",
 #        "phar-io/manifest": "^2.0.4",
@@ -115,7 +109,6 @@ Requires:       php-dom
 Requires:       php-json
 Requires:       php-libxml
 Requires:       php-mbstring
-Requires:       php-xml
 Requires:       php-xmlwriter
 Requires:       (php-composer(myclabs/deep-copy) >= 1.13.4            with php-composer(myclabs/deep-copy) <  2)
 Requires:       (php-composer(phar-io/manifest) >= 2.0.4              with php-composer(phar-io/manifest) < 3)
@@ -169,7 +162,7 @@ Documentation: https://phpunit.de/documentation.html
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 %patch -P0 -p0 -b .rpm
 
 find . -name \*.rpm -delete -print
@@ -281,7 +274,7 @@ sed -e 's:@PATH@:%{buildroot}%{php_home}/%{ns_vendor}:' -i tests/bootstrap.php
 sed -e 's:%{php_home}/%{ns_vendor}:%{buildroot}%{php_home}/%{ns_vendor}:' -i phpunit
 
 ret=0
-for cmd in php php82 php83 php84 php85; do
+for cmd in php php82 php83 php84 php85 php86; do
   if which $cmd; then
      $cmd ./phpunit $OPT || ret=1
   fi
@@ -302,6 +295,9 @@ exit $ret
 
 
 %changelog
+* Tue Jul  7 2026 Remi Collet <remi@remirepo.net> - 11.5.56-1
+- update to 11.5.56
+
 * Wed Feb 18 2026 Remi Collet <remi@remirepo.net> - 11.5.55-1
 - update to 11.5.55
 

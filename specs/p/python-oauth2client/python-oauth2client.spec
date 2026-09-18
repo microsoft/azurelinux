@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        4.1.3
-Release: 35%{?dist}
+Release:        32%{?dist}
 Summary:        %{sum}
 
 License:        Apache-2.0

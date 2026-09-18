@@ -5,8 +5,8 @@
 
 Name:    kf6
 # This version MUST remain in sync with KF6 versions!
-Version: 6.23.0
-Release: 4%{?dist}
+Version: 6.29.0
+Release: 1%{?dist}
 Summary: Filesystem and RPM macros for KDE Frameworks 6
 License: BSD-3-Clause
 URL:     http://www.kde.org
@@ -98,6 +98,30 @@ sed -i \
 %{_rpmconfigdir}/macros.d/macros.kf6
 
 %changelog
+* Fri Aug 07 2026 Steve Cossette <farchord@gmail.com> - 6.29.0-1
+- 6.29.0
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Mon Jul 06 2026 Steve Cossette <farchord@gmail.com> - 6.28.0-1
+- 6.28.0
+
+* Sun Jul 05 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 6.27.0-2
+- Define KDE_INSTALL_QTMETATYPESDIR
+
+* Fri Jun 05 2026 Steve Cossette <farchord@gmail.com> - 6.27.0-1
+- 6.27.0
+
+* Fri May 01 2026 Steve Cossette <farchord@gmail.com> - 6.26.0-1
+- 6.26.0
+
+* Thu Apr 09 2026 Steve Cossette <farchord@gmail.com> - 6.25.0-1
+- 6.25.0
+
+* Tue Mar 10 2026 Steve Cossette <farchord@gmail.com> - 6.24.0-1
+- 6.24.0
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.23.0-1
 - 6.23.0
 

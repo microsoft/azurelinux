@@ -5,7 +5,7 @@
 
 Name:           vo-amrwbenc
 Version:        0.1.3
-Release: 26%{?dist}
+Release:        23%{?dist}
 Summary:        VisualOn AMR-WB encoder library
 License:        Apache-2.0
 URL:            http://opencore-amr.sourceforge.net/

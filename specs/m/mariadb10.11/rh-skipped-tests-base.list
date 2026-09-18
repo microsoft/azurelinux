@@ -6,6 +6,7 @@ main.ssl_crl                                 : #1399847
 # Expected to fail, the plugin is not build with server, but 'mariadb-connector-c' instead
 plugins.auth_ed25519                         :
 plugins.multiauth                            :
+plugins.mdev38550                           :
 
 # ------------------------------
 perfschema.nesting                           : #1399847

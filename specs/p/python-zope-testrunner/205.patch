@@ -1,0 +1,25 @@
+From 7dd2a8305d8c74af0f8b9b209106411b4f2f36cb Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Tue, 31 Mar 2026 11:01:36 +0200
+Subject: [PATCH] Skip _SubTest objects which are internal implementation
+ details exposed in Python 3.15+
+
+---
+ src/zope/testrunner/formatter.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/zope/testrunner/formatter.py b/src/zope/testrunner/formatter.py
+index c63b48a..86f362d 100644
+--- a/src/zope/testrunner/formatter.py
++++ b/src/zope/testrunner/formatter.py
+@@ -1457,6 +1457,10 @@ def parse_unittest(test):
+     if testId is None:
+         return None, None, None
+     testClassName = get_test_class_name(test)
++    # Skip _SubTest objects which are internal implementation details
++    # exposed in Python 3.15+
++    if testClassName == 'unittest.case._SubTest':
++        return None, None, None
+     testSuite = testClassName
+     testName = testId[len(testClassName) + 1:]
+     return testSuite, testName, testClassName

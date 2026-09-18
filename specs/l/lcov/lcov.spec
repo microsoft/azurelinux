@@ -3,7 +3,7 @@
 
 Name: lcov
 Version: 2.0
-Release: 9%{?dist}
+Release: 6%{?dist}
 
 Summary: LTP GCOV extension code coverage tool
 License: GPL-2.0-or-later

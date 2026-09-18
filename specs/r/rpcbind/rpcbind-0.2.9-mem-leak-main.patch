@@ -1,0 +1,30 @@
+commit d7db84aefb2e302bab281d4fba31e498528ef531
+Author: Scott Mayhew <smayhew@redhat.com>
+Date:   Wed Jul 1 08:31:13 2026 -0400
+
+    rpcbind: fix leak of nconf in main()
+    
+    Before reusing nconf in the getnetconfig() loop, we need to free the
+    memory that was previously allocated via getnetconfigent().  Fixes the
+    following leak reported by valgrind:
+    
+    ==9031== 1,136 (136 direct, 1,000 indirect) bytes in 1 blocks are definitely lost in loss record 63 of 67
+    ==9031==    at 0x485183E: malloc (vg_replace_malloc.c:447)
+    ==9031==    by 0x4879D1F: getnetconfigent (in /usr/lib64/libtirpc.so.3.0.0)
+    ==9031==    by 0x4004336: main (rpcbind.c:271)
+    
+    Signed-off-by: Scott Mayhew <smayhew@redhat.com>
+    Signed-off-by: Steve Dickson <steved@redhat.com>
+
+diff --git a/src/rpcbind.c b/src/rpcbind.c
+index 4212377..c39df97 100644
+--- a/src/rpcbind.c
++++ b/src/rpcbind.c
+@@ -282,6 +282,7 @@ main(int argc, char *argv[])
+ 	rpc_control(RPC_SVC_CONNMAXREC_SET, &maxrec);
+ 
+ 	init_transport(nconf);
++	freenetconfigent(nconf);
+ 
+ 	while ((nconf = getnetconfig(nc_handle))) {
+ 		if (nconf->nc_flag & NC_VISIBLE)

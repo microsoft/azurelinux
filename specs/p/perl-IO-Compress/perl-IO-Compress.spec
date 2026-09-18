@@ -10,18 +10,19 @@
 %bcond_with perl_IO_Compress_enables_optional_test
 %endif
 
-# Dependency version if different to this package version
-#global depver 2.201
+# Dependency versions if different to this package version
+%global depver_bzip2 2.218
+%global depver_zlib  2.222
 
 %{?perl_default_filter}
 
 Name:           perl-IO-Compress
-Version:        2.213
-Release: 524%{?dist}
+Version:        2.223
+Release:        1%{?dist}
 Summary:        Read and write compressed data
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IO-Compress
-Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Compress-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/P/PM/PMQS/IO-Compress-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -36,8 +37,8 @@ BuildRequires:  perl(File::Spec::Functions)
 # Module Runtime
 BuildRequires:  perl(bytes)
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(Compress::Raw::Bzip2) >= %{?depver}%{!?depver:%{version}}
-BuildRequires:  perl(Compress::Raw::Zlib) >= %{?depver}%{!?depver:%{version}}
+BuildRequires:  perl(Compress::Raw::Bzip2) >= %{?depver_bzip2}%{!?depver_bzip2:%{version}}
+BuildRequires:  perl(Compress::Raw::Zlib) >= %{?depver_zlib}%{!?depver_zlib:%{version}}
 BuildRequires:  perl(constant)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
@@ -181,7 +182,7 @@ export TEST_SKIP_VERSION_CHECK=1
 make test COMPRESS_ZLIB_RUN_%{?with_long_tests:ALL}%{!?with_long_tests:MOST}=1
 
 %files
-%doc Changes README examples/*
+%doc Changes README SECURITY.md examples/*
 %{_bindir}/streamzip
 %{_bindir}/zipdetails
 %{perl_privlib}/Compress/
@@ -214,6 +215,13 @@ make test COMPRESS_ZLIB_RUN_%{?with_long_tests:ALL}%{!?with_long_tests:MOST}=1
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Jul 30 2026 Jitka Plesnikova <jplesnik@redhat.com> - 2.223-1
+- 2.223 bump (rhbz#2497019)
+
+* Mon Jun 22 2026 Jitka Plesnikova <jplesnik@redhat.com> - 2.221-1
+- 2.221 bump (rhbz#2489325)
+  Fixed CVE-2025-15649, CVE-2026-48961, CVE-2026-48962, CVE-2026-48959
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.213-521
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

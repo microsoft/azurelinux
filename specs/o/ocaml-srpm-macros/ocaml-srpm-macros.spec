@@ -13,7 +13,7 @@
 
 Name:           ocaml-srpm-macros
 Version:        11
-Release: 5%{?dist}
+Release:        2%{?dist}
 
 Summary:        OCaml architecture macros
 License:        GPL-2.0-or-later

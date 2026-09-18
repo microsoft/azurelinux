@@ -1,0 +1,100 @@
+--- modules/syscalls/posix.lisp.orig	2026-02-21 00:33:08.000000000 -0700
++++ modules/syscalls/posix.lisp	2026-04-04 14:05:18.771695480 -0600
+@@ -101,16 +101,16 @@
+               make-file-stat (file dev ino mode nlink uid gid rdev size
+                               blksize blocks atime mtime ctime)))
+   (file    nil :read-only t)
+-  (dev       0 :type (unsigned-byte 32) :read-only t)
+-  (ino       0 :type (unsigned-byte 32) :read-only t)
++  (dev       0 :type (unsigned-byte 64) :read-only t)
++  (ino       0 :type (unsigned-byte 64) :read-only t)
+   (mode    nil :type list :read-only t)
+-  (nlink     1 :type (unsigned-byte 32) :read-only t)
++  (nlink     1 :type (unsigned-byte 64) :read-only t)
+   (uid     nil :type (or null (unsigned-byte 32)) :read-only t)
+   (gid     nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (rdev    nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (size      0 :type (unsigned-byte 32) :read-only t)
+-  (blksize nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (blocks  nil :type (or null (unsigned-byte 32)) :read-only t)
++  (rdev    nil :type (or null (unsigned-byte 64)) :read-only t)
++  (size      0 :type (unsigned-byte 64) :read-only t)
++  (blksize nil :type (or null (unsigned-byte 64)) :read-only t)
++  (blocks  nil :type (or null (unsigned-byte 64)) :read-only t)
+   (atime     0 :type (integer 0) :read-only t)
+   (mtime     0 :type (integer 0) :read-only t)
+   ;; win32: creation time
+@@ -123,17 +123,17 @@
+               make-stat-vfs (file bsize frsize blocks bfree bavail files
+                              ffree favail fsid flag namemax vol-name fs-type)))
+   (file    nil :read-only t)
+-  (bsize   nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (frsize  nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (blocks  nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (bfree   nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (bavail  nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (files   nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (ffree   nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (favail  nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (fsid    nil :type (or null (unsigned-byte 32)) :read-only t)
++  (bsize   nil :type (or null (unsigned-byte 64)) :read-only t)
++  (frsize  nil :type (or null (unsigned-byte 64)) :read-only t)
++  (blocks  nil :type (or null (unsigned-byte 64)) :read-only t)
++  (bfree   nil :type (or null (unsigned-byte 64)) :read-only t)
++  (bavail  nil :type (or null (unsigned-byte 64)) :read-only t)
++  (files   nil :type (or null (unsigned-byte 64)) :read-only t)
++  (ffree   nil :type (or null (unsigned-byte 64)) :read-only t)
++  (favail  nil :type (or null (unsigned-byte 64)) :read-only t)
++  (fsid    nil :type (or null (unsigned-byte 64)) :read-only t)
+   (flag    nil :type list :read-only t)
+-  (namemax nil :type (or null (unsigned-byte 32)) :read-only t)
++  (namemax nil :type (or null (unsigned-byte 64)) :read-only t)
+   (vol-name nil :type (or null string) :read-only t)
+   (fs-type nil :type (or null string) :read-only t))
+ ;;; ============================================================
+@@ -150,8 +150,8 @@
+ #+unix (progn
+ (defstruct (rlimit (:constructor make-rlimit (cur max)))
+   "see getrlimit(2) for details"
+-  (cur nil :type (or null (unsigned-byte 32)) :read-only t)
+-  (max nil :type (or null (unsigned-byte 32)) :read-only t))
++  (cur nil :type (or null (unsigned-byte 64)) :read-only t)
++  (max nil :type (or null (unsigned-byte 64)) :read-only t))
+ 
+ (defsetf rlimit (what) (cur max) `(set-rlimit ,what ,cur ,max))
+ 
+@@ -166,20 +166,20 @@
+   "see getrusage(3) for details"
+   (user-time 0.0d0 :type double-float :read-only t)
+   (system-time 0.0d0 :type double-float :read-only t)
+-  (max-rss 0 :type (signed-byte 32) :read-only t)
+-  (shared-memory 0 :type (signed-byte 32) :read-only t) ; kB-sec
+-  (data-memory 0 :type (signed-byte 32) :read-only t) ; kB-sec
+-  (stack-memory 0 :type (signed-byte 32) :read-only t) ; kB-sec
+-  (minor-page-faults 0 :type (signed-byte 32) :read-only t)
+-  (major-page-faults 0 :type (signed-byte 32) :read-only t)
+-  (num-swaps 0 :type (signed-byte 32) :read-only t)
+-  (blocks-input 0 :type (signed-byte 32) :read-only t)
+-  (blocks-output 0 :type (signed-byte 32) :read-only t)
+-  (messages-sent 0 :type (signed-byte 32) :read-only t)
+-  (messages-received 0 :type (signed-byte 32) :read-only t)
+-  (signals 0 :type (signed-byte 32) :read-only t)
+-  (context-switches-voluntary 0 :type (signed-byte 32) :read-only t)
+-  (context-switches-involuntary 0 :type (signed-byte 32) :read-only t))
++  (max-rss 0 :type (signed-byte 64) :read-only t)
++  (shared-memory 0 :type (signed-byte 64) :read-only t) ; kB-sec
++  (data-memory 0 :type (signed-byte 64) :read-only t) ; kB-sec
++  (stack-memory 0 :type (signed-byte 64) :read-only t) ; kB-sec
++  (minor-page-faults 0 :type (signed-byte 64) :read-only t)
++  (major-page-faults 0 :type (signed-byte 64) :read-only t)
++  (num-swaps 0 :type (signed-byte 64) :read-only t)
++  (blocks-input 0 :type (signed-byte 64) :read-only t)
++  (blocks-output 0 :type (signed-byte 64) :read-only t)
++  (messages-sent 0 :type (signed-byte 64) :read-only t)
++  (messages-received 0 :type (signed-byte 64) :read-only t)
++  (signals 0 :type (signed-byte 64) :read-only t)
++  (context-switches-voluntary 0 :type (signed-byte 64) :read-only t)
++  (context-switches-involuntary 0 :type (signed-byte 64) :read-only t))
+ )
+ 
+ ;;; ============================================================

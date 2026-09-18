@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.0.2
-Release: 13%{?dist}
+Release: 10%{?dist}
 Summary: Cucumber tag expressions for ruby
 License: MIT
 URL: https://cucumber.io/docs/cucumber/api/#tag-expressions

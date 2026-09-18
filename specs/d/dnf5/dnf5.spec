@@ -13,12 +13,29 @@
 
 Name:           dnf5
 Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
-Release: 4%{?dist}
+Release:        5%{?dist}
 Summary:        Command-line package manager
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/dnf5
 Source0:        %{url}/archive/%{version}/dnf5-%{version}.tar.gz
 Source9999: dnf5.azl.macros
+Patch1:         0001-dnf5daemon-server-Fix-daemon-crash-for-invalid-local.patch
+Patch2:         0002-automatic-document-SMTP-requirement-for-email-emitte.patch
+Patch3:         0003-automatic-relax-libcurl-full-dependency.patch
+Patch4:         0004-automatic-fail-if-libcurl-lacks-smtp-support.patch
+Patch5:         0005-state-Don-t-delete-.new-files-in-State-load.patch
+Patch6:         0006-Move-libdnf5-conf-config.h-creation-after-feature-de.patch
+Patch7:         0007-Honor-localpkg_gpgcheck-in-RPM-transaction-per-eleme.patch
+Patch8:         0008-transaction-Respect-nocrypto-tsflag-per-element.patch
+Patch9:         0009-spec-Require-rpm-libs-5.99.90-because-of-rpmteSetVfy.patch
+Patch10:        0010-refactor-remove-some-unread-variables.patch
+Patch11:        0011-package-Add-is_pkg_gpgcheck_enabled-method.patch
+Patch12:        0012-local-plugin-Use-separate-repo-for-packages-from-nog.patch
+Patch13:        0013-dnfdaemon-Pass-interactive-parameter-to-repo-key-imp.patch
+Patch14:        0014-dnfdaemon-Avoid-timeout-on-repo-key-import.patch
+Patch15:        0015-dnfdaemon-Add-repo_key_imported-informational-signal.patch
+Patch16:        0016-dnfdaemon-Document-interactive-option-in-D-Bus-API.patch
+Patch17:        0017-fix-rpm-report-unexpected-implicit-rpm-transaction-e.patch
 
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
@@ -391,6 +408,9 @@ License:        LGPL-2.1-or-later
 Requires:       libsolv%{?_isa} >= %{libsolv_version}
 Requires:       librepo%{?_isa} >= %{librepo_version}
 Requires:       sqlite-libs%{?_isa} >= %{sqlite_version}
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 11
+Requires:       rpm-libs%{?_isa} >= 5.99.90
+%endif
 %if %{with dnf5_obsoletes_dnf}
 Conflicts:      dnf-data < 4.20.0
 %endif
@@ -880,9 +900,9 @@ config-manager, copr, repoclosure, repomanage and reposync commands.
 Summary:        Package manager - automated upgrades
 License:        LGPL-2.1-or-later
 Requires:       dnf5%{?_isa} = %{version}-%{release}
-Requires:       libcurl-full%{?_isa}
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
+Recommends:     libcurl-full%{?_isa}
 Provides:       dnf5-command(automatic)
 %if %{with dnf5_obsoletes_dnf}
 Provides:       dnf-automatic = %{version}-%{release}
@@ -1058,6 +1078,27 @@ mkdir -p %{buildroot}%{_libdir}/libdnf5/plugins
 
 ln -sr %{buildroot}%{_bindir}/dnf5 %{buildroot}%{_bindir}/tdnf
 %changelog
+* Tue Aug 18 2026 Petr Pisar <ppisar@redhat.com> - 5.2.18.0-5
+- Report uneexpected implicit RPM transaction elements instead of a crash
+  (bug #2350481)
+
+* Wed May 20 2026 Petr Pisar <ppisar@redhat.com> - 5.2.18.0-4
+- Prevent from blocking non-interactive D-Bus sessions on repository key import
+  (bug #2458182)
+
+* Tue Apr 21 2026 Petr Pisar <ppisar@redhat.com> - 5.2.18.0-3
+- Make a dependency on libcurl-full for dnf5-plugin-automatic optional
+  (bug #2322918)
+- Work around a race in rotating system state files (bug #2457408)
+- Respect nocrypto tsflag when setting a transaction per-element verification
+  policy (bug #2443503)
+- Require rpm-libs >= 5.99.90 because of rpmteSetVfyLevel()
+- Handle caching unsigned packages in local plugin
+
+* Tue Mar 10 2026 Petr Pisar <ppisar@redhat.com> - 5.2.18.0-2
+- Fix a crash in dnf5daemon-server when receiving an unknown locale from
+  a D-Bus client (CVE-2026-3836) (bug #2445771)
+
 * Wed Feb 04 2026 Packit <hello@packit.dev> - 5.2.18.0-1
 - Update to version 5.2.18.0
 

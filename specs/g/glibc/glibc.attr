@@ -1,3 +1,0 @@
-%__glibc_requires %{_rpmconfigdir}/glibc.req
-%__glibc_magic ELF
-%__glibc_flags exeonly

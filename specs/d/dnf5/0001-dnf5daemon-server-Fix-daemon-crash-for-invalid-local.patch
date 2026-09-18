@@ -1,0 +1,55 @@
+From ef98e1cc9a7b084a1ee70723206b3a5f450c48ee Mon Sep 17 00:00:00 2001
+From: Jaroslav Rohel <jrohel@redhat.com>
+Date: Mon, 9 Mar 2026 17:28:56 +0100
+Subject: [PATCH] dnf5daemon-server: Fix daemon crash for invalid locale
+
+Add exception handling for set_thread_locale() to prevent daemon crash
+when a client sends an invalid locale string. Previously, an unhandled
+exception would crash the daemon, and this could be triggered by any
+unauthenticated client.
+
+When an exception occurs during locale setting execution continues with
+the default locale.
+---
+ dnf5daemon-server/threads_manager.hpp | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/dnf5daemon-server/threads_manager.hpp b/dnf5daemon-server/threads_manager.hpp
+index bb0ad51f..8b2ef302 100644
+--- a/dnf5daemon-server/threads_manager.hpp
++++ b/dnf5daemon-server/threads_manager.hpp
+@@ -59,8 +59,14 @@ public:
+                 std::optional<std::string> thread_locale = std::nullopt) {
+                 locale_t new_locale{nullptr};
+                 locale_t orig_locale{nullptr};
++
+                 if (thread_locale) {
+-                    orig_locale = set_thread_locale(thread_locale.value(), new_locale);
++                    try {
++                        orig_locale = set_thread_locale(thread_locale.value(), new_locale);
++                    } catch (const std::exception &) {
++                        // Cannot switch to the requested locale, continue with the current one
++                        thread_locale = std::nullopt;
++                    }
+                 }
+ 
+                 sdbus::MethodReply reply;
+@@ -127,8 +133,14 @@ public:
+                 static unsigned int counter{0};
+                 locale_t new_locale{nullptr};
+                 locale_t orig_locale{nullptr};
++
+                 if (thread_locale) {
+-                    orig_locale = set_thread_locale(thread_locale.value(), new_locale);
++                    try {
++                        orig_locale = set_thread_locale(thread_locale.value(), new_locale);
++                    } catch (const std::exception &) {
++                        // Cannot switch to the requested locale, continue with the current one
++                        thread_locale = std::nullopt;
++                    }
+                 }
+ 
+                 sdbus::MethodReply reply = call.createReply();
+-- 
+2.53.0
+

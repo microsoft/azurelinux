@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Fri, 14 Aug 2026 09:38:26 +0200
+Subject: 00494: Increase the timeout of test_large_content_length_truncated
+
+It has started to fail randomly when run on s390x architecture.
+---
+ Lib/test/test_httpservers.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Lib/test/test_httpservers.py b/Lib/test/test_httpservers.py
+index 5eb3c82fbd..aa8ad1c323 100644
+--- a/Lib/test/test_httpservers.py
++++ b/Lib/test/test_httpservers.py
+@@ -872,7 +872,7 @@ def test_large_content_length(self):
+             self.assertEqual(res.read(), b'%d %d' % (size, size) + self.linesep)
+ 
+     def test_large_content_length_truncated(self):
+-        with support.swap_attr(self.request_handler, 'timeout', 0.001):
++        with support.swap_attr(self.request_handler, 'timeout', support.LOOPBACK_TIMEOUT):
+             for w in range(18, 65):
+                 size = 1 << w
+                 headers = {'Content-Length' : str(size)}

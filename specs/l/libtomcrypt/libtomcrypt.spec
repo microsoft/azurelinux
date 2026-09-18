@@ -7,7 +7,7 @@
 
 Name:           libtomcrypt
 Version:        1.18.2
-Release: 25%{?dist}
+Release:        22%{?dist}
 Summary:        A comprehensive, portable cryptographic toolkit
 License:        Unlicense OR WTFPL
 URL:            http://www.libtom.net/

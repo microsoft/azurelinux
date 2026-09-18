@@ -1,0 +1,13 @@
+diff -Naur tagptr-0.2.0-original/src/lib.rs tagptr-0.2.0/src/lib.rs
+--- tagptr-0.2.0-original/src/lib.rs	1973-11-29 21:33:09.000000000 +0000
++++ tagptr-0.2.0/src/lib.rs	2026-07-19 07:32:45.941286328 +0100
+@@ -53,7 +53,9 @@
+ //!
+ //! let ptr = TagPtr::compose(&mut val, is_ok as usize);
+ //! let (reference, tag) = unsafe { ptr.decompose_mut() };
++//! #[cfg(target_pointer_width = "64")]
+ //! assert_eq!(reference, Some(&mut 0xCAFE));
++//! #[cfg(target_pointer_width = "64")]
+ //! assert_eq!(tag == 1, true);
+ //! ```
+ 

@@ -14,8 +14,8 @@
 %bcond malcontent %[!0%{?rhel}]
 
 Name:           flatpak
-Version:        1.16.3
-Release: 4%{?dist}
+Version:        1.16.6
+Release:        1%{?dist}
 Summary:        Application deployment framework for desktop apps
 
 License:        LGPL-2.1-or-later
@@ -293,6 +293,12 @@ fi
 
 
 %changelog
+* Fri Apr 10 2026 Michael Catanzaro <mcatanzaro@redhat.com> - 1.16.6-1
+- Update to 1.16.6
+
+* Wed Apr 08 2026 David King <amigadave@amigadave.com> - 1.16.4-1
+- Update to 1.16.4
+
 * Wed Jan 21 2026 David King <amigadave@amigadave.com> - 1.16.3-1
 - Update to 1.16.3
 

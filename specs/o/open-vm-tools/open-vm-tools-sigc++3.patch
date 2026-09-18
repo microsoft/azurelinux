@@ -1,0 +1,329 @@
+diff -Naur open-vm-tools-13.1.0-25218885.old/lib/include/sigc++2to3.h open-vm-tools-13.1.0-25218885/lib/include/sigc++2to3.h
+--- open-vm-tools-13.1.0-25218885.old/lib/include/sigc++2to3.h	2026-05-20 09:29:22.776385646 +0200
++++ open-vm-tools-13.1.0-25218885/lib/include/sigc++2to3.h	2026-05-20 09:43:29.750369887 +0200
+@@ -36,85 +36,6 @@
+ namespace sigc {
+ 
+ 
+-// Bridge slot syntax change
+-template <typename T_ret, typename... T_args>
+-class slot : public slot<T_ret(T_args...)> {
+-private:
+-   using _true_slot = slot<T_ret(T_args...)>;
+-public:
+-   inline slot() = default;
+-   inline slot(const _true_slot& src) : _true_slot(src) {}
+-   template<typename T_functor>
+-   inline slot(const T_functor& func) : _true_slot(func) {}
+-};
+-
+-template <typename T_ret>
+-using slot0 = slot<T_ret()>;
+-template <typename T_ret, typename T_arg1>
+-using slot1 = slot<T_ret(T_arg1)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2>
+-using slot2 = slot<T_ret(T_arg1, T_arg2)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3>
+-using slot3 = slot<T_ret(T_arg1, T_arg2, T_arg3)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4>
+-using slot4 = slot<T_ret(T_arg1, T_arg2, T_arg3, T_arg4)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5>
+-using slot5 = slot<T_ret(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6>
+-using slot6 = slot<T_ret(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6, typename T_arg7>
+-using slot7 = slot<T_ret(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7)>;
+-
+-
+-// Bridge signal syntax change
+-template <typename T_ret, typename... T_args>
+-class signal : public signal<T_ret(T_args...)>, public trackable {
+-public:
+-   signal() = default;
+-
+-   decltype(auto) make_slot() const {
+-      return mem_fun(*this, &signal::emit);
+-   }
+-};
+-
+-template <typename T_ret>
+-using signal0 = signal<T_ret()>;
+-template <typename T_ret, typename T_arg1>
+-using signal1 = signal<T_ret(T_arg1)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2>
+-using signal2 = signal<T_ret(T_arg1, T_arg2)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3>
+-using signal3 = signal<T_ret(T_arg1, T_arg2, T_arg3)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4>
+-using signal4 = signal<T_ret(T_arg1, T_arg2, T_arg3, T_arg4)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5>
+-using signal5 = signal<T_ret(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6>
+-using signal6 = signal<T_ret(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6)>;
+-template <typename T_ret, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6, typename T_arg7>
+-using signal7 = signal<T_ret(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7)>;
+-
+-
+-//Bridge bound_mem_functor
+-template <typename T_ret, typename T_obj>
+-using bound_mem_functor0 = bound_mem_functor<T_ret (T_obj::*)()>;
+-template <typename T_ret, typename T_obj, typename T_arg1>
+-using bound_mem_functor1 = bound_mem_functor<T_ret (T_obj::*)(T_arg1), T_arg1>;
+-template <typename T_ret, typename T_obj, typename T_arg1, typename T_arg2>
+-using bound_mem_functor2 = bound_mem_functor<T_ret (T_obj::*)(T_arg1, T_arg2), T_arg1, T_arg2>;
+-template <typename T_ret, typename T_obj, typename T_arg1, typename T_arg2, typename T_arg3>
+-using bound_mem_functor3 = bound_mem_functor<T_ret (T_obj::*)(T_arg1, T_arg2, T_arg3), T_arg1, T_arg2, T_arg3>;
+-template <typename T_ret, typename T_obj, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4>
+-using bound_mem_functor4 = bound_mem_functor<T_ret (T_obj::*)(T_arg1, T_arg2, T_arg3, T_arg4), T_arg1, T_arg2, T_arg3, T_arg4>;
+-template <typename T_ret, typename T_obj, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5>
+-using bound_mem_functor5 = bound_mem_functor<T_ret (T_obj::*)(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5), T_arg1, T_arg2, T_arg3, T_arg4, T_arg5>;
+-template <typename T_ret, typename T_obj, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6>
+-using bound_mem_functor6 = bound_mem_functor<T_ret (T_obj::*)(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6), T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6>;
+-template <typename T_ret, typename T_obj, typename T_arg1, typename T_arg2, typename T_arg3, typename T_arg4, typename T_arg5, typename T_arg6, typename T_arg7>
+-using bound_mem_functor7 = bound_mem_functor<T_ret (T_obj::*)(T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7), T_arg1, T_arg2, T_arg3, T_arg4, T_arg5, T_arg6, T_arg7>;
+-
+-
+-
+ // Add old mem_fun API for pointer
+ template<typename T_return, typename T_obj, typename... T_arg>
+ inline decltype(auto)
+@@ -131,13 +52,6 @@
+ }
+ 
+ 
+-// Stub sigc::ref impl
+-template <typename T>
+-inline decltype(auto) ref(T& t) { return std::ref(t); }
+-template <typename T>
+-inline decltype(auto) ref(const T& t) { return std::cref(t); }
+-
+-
+ } //namespace sigc
+ 
+ #endif // SIGCXX_MAJOR_VERSION >= 3
+diff -Naur open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dnd/copyPasteRpc.hh open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dnd/copyPasteRpc.hh
+--- open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dnd/copyPasteRpc.hh	2026-05-20 09:29:22.798851742 +0200
++++ open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dnd/copyPasteRpc.hh	2026-05-20 09:43:45.076288192 +0200
+@@ -39,18 +39,18 @@
+    virtual ~CopyPasteRpc(void) {};
+ 
+    /* sigc signals for CopyPaste source callback. */
+-   sigc::signal<void, uint32, bool, const CPClipboard*> srcRecvClipChanged;
+-   sigc::signal<void, uint32, const uint8 *, uint32> requestFilesChanged;
+-   sigc::signal<void, uint32, bool, const uint8 *, uint32> getFilesDoneChanged;
++   sigc::signal<void(uint32, bool, const CPClipboard*)> srcRecvClipChanged;
++   sigc::signal<void(uint32, const uint8 *, uint32)> requestFilesChanged;
++   sigc::signal<void(uint32, bool, const uint8 *, uint32)> getFilesDoneChanged;
+ 
+    /* sigc signal for CopyPaste destination callback. */
+-   sigc::signal<void, uint32, bool> destRequestClipChanged;
++   sigc::signal<void(uint32, bool)> destRequestClipChanged;
+ 
+    /* sigc signal for ping reply callback. */
+-   sigc::signal<void, uint32> pingReplyChanged;
++   sigc::signal<void(uint32)> pingReplyChanged;
+ 
+    /* sigc signal for rpc command reply received. */
+-   sigc::signal<void, uint32, uint32> cmdReplyChanged;
++   sigc::signal<void(uint32, uint32)> cmdReplyChanged;
+ 
+    virtual void Init(void) = 0;
+    virtual void SendPing(uint32 caps) = 0;
+diff -Naur open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dnd/dndRpc.hh open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dnd/dndRpc.hh
+--- open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dnd/dndRpc.hh	2026-05-20 09:29:22.798851742 +0200
++++ open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dnd/dndRpc.hh	2026-05-20 09:43:45.076633914 +0200
+@@ -40,30 +40,30 @@
+    virtual ~DnDRpc(void) {};
+ 
+    /* sigc signals for DnD source callback. */
+-   sigc::signal<void, uint32, const CPClipboard *> srcDragBeginChanged;
+-   sigc::signal<void, uint32> srcCancelChanged;
+-   sigc::signal<void, uint32, uint32, uint32> srcDropChanged;
++   sigc::signal<void(uint32, const CPClipboard *)> srcDragBeginChanged;
++   sigc::signal<void(uint32)> srcCancelChanged;
++   sigc::signal<void(uint32, uint32, uint32)> srcDropChanged;
+ 
+    /* sigc signals for DnD destination callback. */
+-   sigc::signal<void, uint32, int32> destDragEnterReplyChanged;
+-   sigc::signal<void, uint32> destPrivDragEnterChanged;
+-   sigc::signal<void, uint32, int32, int32> destPrivDragLeaveChanged;
+-   sigc::signal<void, uint32, int32, int32> destPrivDropChanged;
+-   sigc::signal<void, uint32, int32, int32> destDropChanged;
+-   sigc::signal<void, uint32> destCancelChanged;
+-
+-   sigc::signal<void, uint32, int32, int32> moveMouseChanged;
+-   sigc::signal<void, uint32, uint32> updateFeedbackChanged;
+-   sigc::signal<void, uint32, int32, int32> queryExitingChanged;
+-   sigc::signal<void, uint32> dragNotPendingChanged;
+-   sigc::signal<void, uint32, const uint8 *, uint32> requestFileChanged;
+-   sigc::signal<void, uint32, bool, const uint8 *, uint32> getFilesDoneChanged;
++   sigc::signal<void(uint32, int32)> destDragEnterReplyChanged;
++   sigc::signal<void(uint32)> destPrivDragEnterChanged;
++   sigc::signal<void(uint32, int32, int32)> destPrivDragLeaveChanged;
++   sigc::signal<void(uint32, int32, int32)> destPrivDropChanged;
++   sigc::signal<void(uint32, int32, int32)> destDropChanged;
++   sigc::signal<void(uint32)> destCancelChanged;
++
++   sigc::signal<void(uint32, int32, int32)> moveMouseChanged;
++   sigc::signal<void(uint32, uint32)> updateFeedbackChanged;
++   sigc::signal<void(uint32, int32, int32)> queryExitingChanged;
++   sigc::signal<void(uint32)> dragNotPendingChanged;
++   sigc::signal<void(uint32, const uint8 *, uint32)> requestFileChanged;
++   sigc::signal<void(uint32, bool, const uint8 *, uint32)> getFilesDoneChanged;
+ 
+    /* sigc signal for responding to ping reply */
+-   sigc::signal<void, uint32> pingReplyChanged;
++   sigc::signal<void(uint32)> pingReplyChanged;
+ 
+    /* sigc signal for rpc cmd reply received. */
+-   sigc::signal<void, uint32, uint32> cmdReplyChanged;
++   sigc::signal<void(uint32, uint32)> cmdReplyChanged;
+ 
+    /* DnD source. */
+    virtual bool SrcDragBeginDone(uint32 sessionId) = 0;
+diff -Naur open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dnd/fileTransferRpc.hh open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dnd/fileTransferRpc.hh
+--- open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dnd/fileTransferRpc.hh	2026-05-20 09:29:22.798851742 +0200
++++ open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dnd/fileTransferRpc.hh	2026-05-20 09:43:45.076405233 +0200
+@@ -38,8 +38,8 @@
+ public:
+    virtual ~FileTransferRpc(void) {};
+ 
+-   sigc::signal<void, uint32, const uint8 *, size_t> HgfsPacketReceived;
+-   sigc::signal<void, uint32, const uint8 *, size_t> HgfsReplyReceived;
++   sigc::signal<void(uint32, const uint8 *, size_t)> HgfsPacketReceived;
++   sigc::signal<void(uint32, const uint8 *, size_t)> HgfsReplyReceived;
+ 
+    virtual void Init(void) = 0;
+    virtual bool SendHgfsPacket(uint32 sessionId,
+diff -Naur open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dndGuestBase/guestCopyPaste.hh open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dndGuestBase/guestCopyPaste.hh
+--- open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dndGuestBase/guestCopyPaste.hh	2026-05-20 09:29:22.799454507 +0200
++++ open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dndGuestBase/guestCopyPaste.hh	2026-05-20 09:43:45.076349949 +0200
+@@ -48,9 +48,9 @@
+    GuestCopyPasteMgr(DnDCPTransport *transport);
+    ~GuestCopyPasteMgr(void);
+ 
+-   sigc::signal<void, const CPClipboard*> srcRecvClipChanged;
+-   sigc::signal<void> destRequestClipChanged;
+-   sigc::signal<void, bool> getFilesDoneChanged;
++   sigc::signal<void(const CPClipboard*)> srcRecvClipChanged;
++   sigc::signal<void()> destRequestClipChanged;
++   sigc::signal<void(bool)> getFilesDoneChanged;
+ 
+    GUEST_CP_STATE GetState(void) { return mCPState; }
+    void SetState(GUEST_CP_STATE state);
+diff -Naur open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dndGuestBase/guestDnD.hh open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dndGuestBase/guestDnD.hh
+--- open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/dndGuestBase/guestDnD.hh	2026-05-20 09:29:22.799454507 +0200
++++ open-vm-tools-13.1.0-25218885/services/plugins/dndcp/dndGuestBase/guestDnD.hh	2026-05-20 09:43:45.076109786 +0200
+@@ -73,18 +73,18 @@
+                ToolsAppCtx *ctx);
+    virtual ~GuestDnDMgr(void);
+ 
+-   sigc::signal<void, int, int> moveMouseChanged;
+-   sigc::signal<void, bool, int, int> updateDetWndChanged;
+-   sigc::signal<void, GUEST_DND_STATE> stateChanged;
++   sigc::signal<void(int, int)> moveMouseChanged;
++   sigc::signal<void(bool, int, int)> updateDetWndChanged;
++   sigc::signal<void(GUEST_DND_STATE)> stateChanged;
+ 
+-   sigc::signal<void, const CPClipboard*, std::string> srcDragBeginChanged;
+-   sigc::signal<void> srcDropChanged;
+-   sigc::signal<void> srcCancelChanged;
+-   sigc::signal<void, bool> getFilesDoneChanged;
++   sigc::signal<void(const CPClipboard*, std::string)> srcDragBeginChanged;
++   sigc::signal<void()> srcDropChanged;
++   sigc::signal<void()> srcCancelChanged;
++   sigc::signal<void(bool)> getFilesDoneChanged;
+ 
+-   sigc::signal<void> destCancelChanged;
+-   sigc::signal<void, int32, int32> privDropChanged;
+-   sigc::signal<void> destMoveDetWndToMousePosChanged;
++   sigc::signal<void()> destCancelChanged;
++   sigc::signal<void(int32, int32)> privDropChanged;
++   sigc::signal<void()> destMoveDetWndToMousePosChanged;
+ 
+    GuestDnDSrc *GetDnDSrc(void) { return mSrc; }
+    GuestDnDDest *GetDnDDest(void) { return mDest; }
+diff -Naur open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/xutils/xutils.cc open-vm-tools-13.1.0-25218885/services/plugins/dndcp/xutils/xutils.cc
+--- open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/xutils/xutils.cc	2026-05-20 09:29:22.800725292 +0200
++++ open-vm-tools-13.1.0-25218885/services/plugins/dndcp/xutils/xutils.cc	2026-05-20 09:43:45.076835564 +0200
+@@ -42,14 +42,14 @@
+ 
+ 
+ /* Actual definitions of the signals in this class. */
+-sigc::signal<void, Glib::RefPtr<Gdk::Screen> > currentDesktopChanged;
+-sigc::signal<void, Glib::RefPtr<Gdk::Screen> > desktopLayoutChanged;
+-sigc::signal<void, Glib::RefPtr<Gdk::Screen> > desktopGeometryChanged;
+-sigc::signal<void, Glib::RefPtr<Gdk::Screen> > desktopViewportChanged;
+-sigc::signal<void, Glib::RefPtr<Gdk::Screen> > windowStackChanged;
+-sigc::signal<void, Glib::RefPtr<Gdk::Screen> > windowManagerChanged;
+-sigc::signal<void, Glib::RefPtr<Gdk::Screen> > activeWindowChanged;
+-sigc::signal<void, Glib::RefPtr<Gdk::Screen> > workAreaChanged;
++sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> currentDesktopChanged;
++sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> desktopLayoutChanged;
++sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> desktopGeometryChanged;
++sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> desktopViewportChanged;
++sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> windowStackChanged;
++sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> windowManagerChanged;
++sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> activeWindowChanged;
++sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> workAreaChanged;
+ 
+ /* Necessary for calculating per-monitor _NET_WORKAREA in GetMonitorWorkArea() */
+ struct NETWMStrutPartial {
+diff -Naur open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/xutils/xutils.hh open-vm-tools-13.1.0-25218885/services/plugins/dndcp/xutils/xutils.hh
+--- open-vm-tools-13.1.0-25218885.old/services/plugins/dndcp/xutils/xutils.hh	2026-05-20 09:29:22.800725292 +0200
++++ open-vm-tools-13.1.0-25218885/services/plugins/dndcp/xutils/xutils.hh	2026-05-20 09:43:45.076492938 +0200
+@@ -65,22 +65,22 @@
+ 
+ uint32 GetNumDesktops(Glib::RefPtr<Gdk::Screen> screen);
+ uint32 GetCurrentDesktop(Glib::RefPtr<Gdk::Screen> screen);
+-extern sigc::signal<void, Glib::RefPtr<Gdk::Screen> > currentDesktopChanged;
++extern sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> currentDesktopChanged;
+ 
+ bool GetDesktopLayout(Glib::RefPtr<Gdk::Screen> screen,
+                       uint32& rows, uint32& columns, Gtk::CornerType& corner,
+                       Gtk::Orientation& orientation);
+-extern sigc::signal<void, Glib::RefPtr<Gdk::Screen> > desktopLayoutChanged;
++extern sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> desktopLayoutChanged;
+ 
+ bool GetDesktopGeometry(Glib::RefPtr<Gdk::Screen> screen,
+                         uint32& width, uint32& height);
+-extern sigc::signal<void, Glib::RefPtr<Gdk::Screen> > desktopGeometryChanged;
++extern sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> desktopGeometryChanged;
+ 
+ bool GetDesktopViewport(Glib::RefPtr<Gdk::Screen> screen,
+                         uint32 desktopIndex, VMPoint& viewport);
+-extern sigc::signal<void, Glib::RefPtr<Gdk::Screen> > desktopViewportChanged;
++extern sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> desktopViewportChanged;
+ 
+-extern sigc::signal<void, Glib::RefPtr<Gdk::Screen> > activeWindowChanged;
++extern sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> activeWindowChanged;
+ 
+ /* Window stacking */
+ void RaiseWindow(Glib::RefPtr<Gdk::Window> window,
+@@ -88,7 +88,7 @@
+                     Glib::RefPtr<Gdk::Window>(),
+                  guint32 timestamp = 0);
+ HostWindowList GetHostWindowStack();
+-extern sigc::signal<void, Glib::RefPtr<Gdk::Screen> > windowStackChanged;
++extern sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> windowStackChanged;
+ 
+ 
+ /* Multi-head */
+@@ -96,7 +96,7 @@
+                         int monitor, Gdk::Rectangle& rect);
+ 
+ utf::string GetWindowManagerName(Glib::RefPtr<Gdk::Screen> screen);
+-extern sigc::signal<void, Glib::RefPtr<Gdk::Screen> > windowManagerChanged;
++extern sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> windowManagerChanged;
+ 
+ void SetFullscreenMonitorsHint(Glib::RefPtr<Gdk::Window> window,
+                                std::vector<long> topology);
+@@ -109,7 +109,7 @@
+                         int& x, int& y, Gdk::ModifierType& mask);
+ 
+ 
+-extern sigc::signal<void, Glib::RefPtr<Gdk::Screen> > workAreaChanged;
++extern sigc::signal<void(Glib::RefPtr<Gdk::Screen>)> workAreaChanged;
+ 
+ bool GetXWindowSize(const Glib::RefPtr<Gdk::Window>& window, int& width,
+                     int& height);

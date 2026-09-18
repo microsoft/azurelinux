@@ -136,12 +136,10 @@
 # $dvi_mode = 0;
 
 # The command to start a DVI previewer
-# $dvi_previewer = 'start xdvi %O %S';
-$dvi_previewer = 'xdg-open %O %S';
+# $dvi_previewer = 'xdg-open %S';
 
 # The command to start a DVI previewer in landscape mode
-# $dvi_previewer_landscape = 'start xdvi -paper usr %O %S';
-$dvi_previewer_landscape = 'xdg-open %O %S';
+# $dvi_previewer_landscape = 'xdg-open %S';
 
 # The command to run when the DVI viewer is set to be updated by a command
 # $dvi_update_command = '';
@@ -239,7 +237,7 @@ $dvi_update_method = 1;
 # $hilatex_silent_switch = '-interaction=batchmode';
 
 # The command to invoke a HNT previewer
-$hnt_previewer = 'xdg-open %O %S';;
+# $hnt_previewer = 'xdg-open %S';
 
 # The basename of generated files
 # $jobname = "";
@@ -333,8 +331,7 @@ $hnt_previewer = 'xdg-open %O %S';;
 # $pdf_mode = 0;
 
 # The command to invoke a PDF previewer
-# $pdf_previewer = 'start acroread %O %S';
-$pdf_previewer = 'xdg-open %O %S';
+# $pdf_previewer = 'xdg-open %S';
 
 # The command to run when the PDF viewer is set to be updated by a command
 # $pdf_update_command = '';
@@ -381,12 +378,10 @@ $pdf_previewer = 'xdg-open %O %S';
 # $ps_filter = '';
 
 # The command to invoke a PostScript previewer
-# $ps_previewer = 'start gv %O %S';
-$ps_previewer = 'xdg-open %O %S';
+# $ps_previewer = 'xdg-open %S';
 
 # The command to invoke a PostScript previewer in landscape mode
-# $ps_previewer_landscape = 'start gv -swap %O %S';
-$ps_previewer_landscape = 'xdg-open %O %S';
+# $ps_previewer_landscape = 'xdg-open %S';
 
 # The command to run when the PostScript viewer is set to be updated by a
 # command

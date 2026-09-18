@@ -1,0 +1,148 @@
+From bd8989620ed6e80755f06cfdb18f5b4a3913493c Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Fri, 14 Aug 2026 16:01:18 +0200
+Subject: [PATCH] avrcp: Fix Out-of-Bounds Read in AVRCP GetFolderItems parsing
+
+If the "Displayable Name Length" is much longer than the size of the PDU
+packet we receive, then we might try to memcpy() past the end of the PDU
+packet.
+
+Be careful about clamping the name copying to the smallest of:
+- length specified in the PDU
+- left-over packet after the length field
+- size of the string we'll copy it into
+
+Reported-by: Elman Shahbazov <shahbazovelman97@gmail.com>
+---
+ profiles/audio/avrcp.c | 51 +++++++++++++++++++++++++-----------------
+ 1 file changed, 31 insertions(+), 20 deletions(-)
+
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 2194a913580f..23e959c76917 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -145,6 +145,8 @@
+ #define AVRCP_SCOPE_SEARCH				0x02
+ #define AVRCP_SCOPE_NOW_PLAYING			0x03
+ 
++#define NAME_MAX_LEN 255
++
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ 
+ struct avrcp_header {
+@@ -2608,30 +2610,45 @@ static const char *subtype_to_string(uint32_t subtype)
+ 	return "None";
+ }
+ 
++static gboolean parse_media_name(uint8_t *operands, uint16_t len,
++				size_t name_len_offset,
++				char *name, uint16_t *namelen)
++{
++	uint16_t namesize;
++
++	if (len < name_len_offset + 2)
++		return FALSE;
++
++	memset(name, 0, NAME_MAX_LEN);
++	namesize = MIN(get_be16(&operands[name_len_offset]),
++			len - name_len_offset - 2);
++	namesize = MIN(namesize, NAME_MAX_LEN - 1);
++	if (*namelen > 0) {
++		if (len < name_len_offset + 2 + namesize)
++			return FALSE;
++		memcpy(name, &operands[name_len_offset + 2], namesize);
++		strtoutf8(name, namesize);
++	}
++	if (namelen)
++		*namelen = namesize;
++	return TRUE;
++}
++
+ static struct media_item *parse_media_element(struct avrcp *session,
+ 					uint8_t *operands, uint16_t len)
+ {
+ 	struct avrcp_player *player;
+ 	struct media_player *mp;
+ 	struct media_item *item;
+-	uint16_t namelen, namesize;
+-	char name[255];
++	uint16_t namesize;
++	char name[NAME_MAX_LEN];
+ 	uint64_t uid;
+ 	uint8_t count;
+ 
+-	if (len < 13)
++	if (!parse_media_name(operands, len, 11, name, &namesize))
+ 		return NULL;
+ 
+ 	uid = get_be64(&operands[0]);
+-
+-	memset(name, 0, sizeof(name));
+-	namesize = get_be16(&operands[11]);
+-	namelen = MIN(namesize, sizeof(name) - 1);
+-	if (namelen > 0) {
+-		memcpy(name, &operands[13], namelen);
+-		strtoutf8(name, namelen);
+-	}
+-
+ 	count = operands[13 + namesize];
+ 
+ 	player = session->controller->player;
+@@ -2655,24 +2672,18 @@ static struct media_item *parse_media_folder(struct avrcp *session,
+ 	struct avrcp_player *player = session->controller->player;
+ 	struct media_player *mp = player->user_data;
+ 	struct media_item *item;
+-	uint16_t namelen;
+-	char name[255];
++	char name[NAME_MAX_LEN];
+ 	uint64_t uid;
+ 	uint8_t type;
+ 	uint8_t playable;
+ 
+-	if (len < 12)
++	if (!parse_media_name(operands, len, 12, name, NULL))
+ 		return NULL;
+ 
+ 	uid = get_be64(&operands[0]);
+ 	type = operands[8];
+ 	playable = operands[9];
+ 
+-	memset(name, 0, sizeof(name));
+-	namelen = MIN(get_be16(&operands[12]), sizeof(name) - 1);
+-	if (namelen > 0)
+-		memcpy(name, &operands[14], namelen);
+-
+ 	item = media_player_create_folder(mp, name, type, uid);
+ 	if (!item)
+ 		return NULL;
+-- 
+2.55.0
+
+From 8bf7fe4847833a76bd7e51d4d269b4b336389193 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Mon, 17 Aug 2026 10:11:19 +0200
+Subject: [PATCH] avrcp: Fix media/folder name not being set
+
+*namelen was used before being set.
+
+Fixes: bd8989620ed6 ("avrcp: Fix Out-of-Bounds Read in AVRCP GetFolderItems parsing")
+---
+ profiles/audio/avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 23e959c76917..028c1c254b82 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2623,7 +2623,7 @@ static gboolean parse_media_name(uint8_t *operands, uint16_t len,
+ 	namesize = MIN(get_be16(&operands[name_len_offset]),
+ 			len - name_len_offset - 2);
+ 	namesize = MIN(namesize, NAME_MAX_LEN - 1);
+-	if (*namelen > 0) {
++	if (namesize > 0) {
+ 		if (len < name_len_offset + 2 + namesize)
+ 			return FALSE;
+ 		memcpy(name, &operands[name_len_offset + 2], namesize);
+-- 
+2.55.0
+

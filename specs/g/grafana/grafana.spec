@@ -29,7 +29,7 @@ end}
 
 Name:             grafana
 Version:          10.2.6
-Release: 25%{?dist}
+Release:          22%{?dist}
 Summary:          Metrics dashboard and graph editor
 License:          AGPL-3.0-only
 URL:              https://grafana.org

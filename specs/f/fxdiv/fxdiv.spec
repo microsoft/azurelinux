@@ -10,7 +10,7 @@ Summary:        Header for division via fixed-point math
 Name:           fxdiv
 License:        MIT
 Version:        1.0^git%{date0}.%{shortcommit0}
-Release: 10%{?dist}
+Release:        7%{?dist}
 
 # Only a header
 BuildArch:      noarch

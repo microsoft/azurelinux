@@ -1,0 +1,42 @@
+From a8ded86017e1bdce8e2b5f3e69b1d798312d63f4 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Mon, 30 Mar 2026 13:44:57 +0100
+Subject: [PATCH 02/10] fsdiff: warn user when no
+ -s/--start-path/Options.from_path given
+
+Unless -q/--quiet/Options.quiet is specified issue a warning to the
+termional when a diff operation does not have any explicit start path
+defined (since these can almost always reasonably be assumed to be slow
+and costly).
+
+  # snapm snapset diff before-upgrade .
+  WARNING - Consider setting -s/--start-path to reduce diff runtime and memory usage
+  Gathering paths from before-upgrade /: Quit!
+
+Resolves: #968
+
+Suggested-by: Filip Suba <fsuba@redhat.com>
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ snapm/fsdiff/fsdiffer.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/snapm/fsdiff/fsdiffer.py b/snapm/fsdiff/fsdiffer.py
+index bd64f076..f9e2cf4f 100644
+--- a/snapm/fsdiff/fsdiffer.py
++++ b/snapm/fsdiff/fsdiffer.py
+@@ -163,6 +163,11 @@ class FsDiffer:
+         if options.no_mem_check:
+             _log_warn("RSS memory pressure safety checks disabled")
+ 
++        if not options.from_path and not options.quiet:
++            _log_warn(
++                "Consider setting -s/--start-path to reduce run time and memory usage"
++            )
++
+         #: Manager context for snapshot operations (used by future methods)
+         self.manager: "Manager" = manager
+         self.options: DiffOptions = options
+-- 
+2.53.0
+

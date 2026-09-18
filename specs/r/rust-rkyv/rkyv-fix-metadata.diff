@@ -1,5 +1,5 @@
---- rkyv-0.8.15/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ rkyv-0.8.15/Cargo.toml	2026-02-10T10:47:47.538378+00:00
+--- rkyv-0.8.18/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rkyv-0.8.18/Cargo.toml	2026-08-08T10:37:54.648401+00:00
 @@ -46,7 +46,6 @@
  aligned = []
  alloc = [
@@ -12,7 +12,7 @@
      "std",
      "bytecheck",
  ]
--hashbrown-0_16 = ["dep:hashbrown"]
+-hashbrown-0_17 = ["dep:hashbrown"]
 -indexmap-2 = [
 -    "dep:indexmap-2",
 -    "alloc",
@@ -40,7 +40,7 @@
  
  [lib]
  name = "rkyv"
-@@ -144,46 +127,16 @@
+@@ -148,52 +131,16 @@
  path = "benches/minecraft_savedata.rs"
  harness = false
  
@@ -63,7 +63,7 @@
 -package = "bytes"
 -
  [dependencies.hashbrown]
- version = "0.16"
+ version = "0.17"
  optional = true
  default-features = false
 -
@@ -79,6 +79,12 @@
 -default-features = false
 -package = "hashbrown"
 -
+-[dependencies.hashbrown-0_16]
+-version = "0.16"
+-optional = true
+-default-features = false
+-package = "hashbrown"
+-
 -[dependencies.indexmap-2]
 -version = "2"
 -optional = true
@@ -87,7 +93,7 @@
  
  [dependencies.munge]
  version = "0.4"
-@@ -211,48 +164,8 @@
+@@ -221,48 +168,8 @@
  default-features = false
  package = "smallvec"
  

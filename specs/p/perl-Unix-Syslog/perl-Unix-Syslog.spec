@@ -6,7 +6,7 @@
 
 Name:           perl-Unix-Syslog
 Version:        1.1
-Release: 57%{?dist}
+Release:        54%{?dist}
 Summary:        Perl interface to the UNIX syslog(3) calls
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Unix-Syslog

@@ -5,8 +5,8 @@
 
 Name:    kf6-%{framework}
 Summary: Framework for collecting user feedback for apps via telemetry and surveys
-Version: 6.23.0
-Release: 4%{?dist}
+Version: 6.29.0
+Release: 1%{?dist}
 
 License: MIT AND CC0-1.0 AND BSD-3-Clause
 URL:     https://invent.kde.org/frameworks/%{framework}
@@ -133,6 +133,33 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/org.kde.kuserfeedback
 
 
 %changelog
+* Fri Aug 07 2026 Steve Cossette <farchord@gmail.com> - 6.29.0-1
+- 6.29.0
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Jul 04 2026 Steve Cossette <farchord@gmail.com> - 6.28.0-1
+- 6.28.0
+
+* Fri Jun 05 2026 Steve Cossette <farchord@gmail.com> - 6.27.0-1
+- 6.27.0
+
+* Thu May 14 2026 Jan Grulich <jgrulich@redhat.com> - 6.26.0-2
+- Rebuild (qt6)
+
+* Fri May 01 2026 Steve Cossette <farchord@gmail.com> - 6.26.0-1
+- 6.26.0
+
+* Fri Apr 17 2026 Jan Grulich <jgrulich@redhat.com> - 6.25.0-2
+- Rebuild (qt6)
+
+* Thu Apr 09 2026 Steve Cossette <farchord@gmail.com> - 6.25.0-1
+- 6.25.0
+
+* Tue Mar 10 2026 Steve Cossette <farchord@gmail.com> - 6.24.0-1
+- 6.24.0
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.23.0-1
 - 6.23.0
 

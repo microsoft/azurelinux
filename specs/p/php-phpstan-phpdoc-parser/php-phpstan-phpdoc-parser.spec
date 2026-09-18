@@ -12,8 +12,6 @@
 
 %bcond_without       tests
 
-%global gh_commit    a004701b11273a26cd7955a61d67a7f1e525a45a
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     phpstan
 %global gh_project   phpdoc-parser
 %global php_home     %{_datadir}/php
@@ -22,14 +20,14 @@
 %global major        %nil
 
 Name:           php-%{gh_owner}-%{gh_project}%{major}
-Version:        2.3.2
-Release: 4%{?dist}
+Version:        2.3.3
+Release:        1%{?dist}
 Summary:        PHPDoc parser with support for nullable, intersection and generic types
 
 License:        MIT
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # git snapshot to retrieve test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -72,7 +70,7 @@ Next generation phpDoc parser with support for intersection types and generics.
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -104,7 +102,7 @@ sed -e 's:exec://exec:' -i tests/bootstrap.php
 # use auto_prepend_file to ensure we use new version (not old one pulled by PHPUnit)
 # ignore test using doctrine/annotations
 ret=0
-for cmdarg in "php %{phpunit}" php82 php83 php84 php85; do
+for cmdarg in "php %{phpunit}" php82 php83 php84 php85 php86; do
   if which $cmdarg; then
     set $cmdarg
     $1 -d auto_prepend_file=vendor/autoload.php \
@@ -130,6 +128,9 @@ exit $ret
 
 
 %changelog
+* Wed Jul  8 2026 Remi Collet <remi@remirepo.net> - 2.3.3-1
+- update to 2.3.3
+
 * Mon Jan 26 2026 Remi Collet <remi@remirepo.net> - 2.3.2-1
 - update to 2.3.2
 

@@ -8,7 +8,7 @@
 
 Name:           gtkmm2.4
 Version:        2.24.5
-Release: 26%{?dist}
+Release:        23%{?dist}
 
 Summary:        C++ interface for GTK2 (a GUI library for X)
 

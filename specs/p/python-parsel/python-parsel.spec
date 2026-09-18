@@ -5,7 +5,7 @@
 
 Name:           python-%{modname}
 Version:        1.10.0
-Release: 10%{?dist}
+Release:        7%{?dist}
 Summary:        Library to extract data from HTML and XML using XPath and CSS selectors
 
 License:        BSD-3-Clause

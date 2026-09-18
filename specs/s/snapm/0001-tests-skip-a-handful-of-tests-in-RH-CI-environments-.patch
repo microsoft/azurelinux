@@ -1,0 +1,113 @@
+From d35465f757f2294c0322be7a1731facc9ab9fed2 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Thu, 8 Jan 2026 18:24:16 +0000
+Subject: [PATCH 01/10] tests: skip a handful of tests in RH CI environments
+ #915
+
+Resolves: #915
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ tests/__init__.py     | 7 +++++++
+ tests/test_command.py | 4 +++-
+ tests/test_mounts.py  | 4 +++-
+ tests/test_plugin.py  | 3 ++-
+ 4 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/tests/__init__.py b/tests/__init__.py
+index fa39b9cb..989fc87f 100644
+--- a/tests/__init__.py
++++ b/tests/__init__.py
+@@ -101,3 +101,10 @@ def have_root():
+     and ``False`` otherwise.
+     """
+     return os.geteuid() == 0 and os.getegid() == 0
++
++
++def in_rh_ci():
++    """Return ``True`` if we appear to be running in CentOS/RHEL CI,
++    and ``False`` otherwise.
++    """
++    return os.environ.get("IN_RH_CI", None) is not None
+diff --git a/tests/test_command.py b/tests/test_command.py
+index c1e547fb..4319ecd3 100644
+--- a/tests/test_command.py
++++ b/tests/test_command.py
+@@ -18,7 +18,7 @@ from snapm.report import ReportOpts
+ import snapm.manager
+ import boom
+ 
+-from tests import MockArgs, have_root, BOOT_ROOT_TEST
++from tests import MockArgs, have_root, BOOT_ROOT_TEST, in_rh_ci
+ 
+ from ._util import LvmLoopBacked, StratisLoopBacked
+ 
+@@ -1079,6 +1079,7 @@ class CommandTests(CommandTestsBase):
+         args += ["snapset", "delete", "hourly.0"]
+         self.assertEqual(command.main(args), 0)
+ 
++    @unittest.skipIf(in_rh_ci(), "Tests running in RH CI pipeline")
+     def test_main_snapset_diff(self):
+         """Test 'snapm snapset diff' command."""
+         self.manager.create_snapshot_set("testset0", self.mount_points())
+@@ -1110,6 +1111,7 @@ class CommandTests(CommandTestsBase):
+         self.manager.delete_snapshot_sets(snapm.Selection(name="testset0"))
+         self.manager.delete_snapshot_sets(snapm.Selection(name="testset1"))
+ 
++    @unittest.skipIf(in_rh_ci(), "Tests running in RH CI pipeline")
+     def test_main_snapset_diffreport(self):
+         """Test 'snapm snapset diffreport' command."""
+         self.manager.create_snapshot_set("testset0", self.mount_points())
+diff --git a/tests/test_mounts.py b/tests/test_mounts.py
+index d6c7a5a3..db249341 100644
+--- a/tests/test_mounts.py
++++ b/tests/test_mounts.py
+@@ -24,7 +24,7 @@ import snapm.manager._mounts as mounts
+ import snapm.manager
+ from snapm.manager.plugins import format_snapshot_name, encode_mount_point
+ 
+-from tests import have_root, is_redhat
++from tests import have_root, is_redhat, in_rh_ci
+ from ._util import LoopBackDevices, LvmLoopBacked
+ 
+ ETC_FSTAB = "/etc/fstab"
+@@ -587,6 +587,7 @@ class MountsTests(MountsTestsBase):
+         # 4. Check that the mount was still discovered (it's just a warning)
+         self.assertEqual(len(new_mounts._mounts), 1)
+ 
++    @unittest.skipIf(in_rh_ci(), "Tests running in RH CI pipeline")
+     def test_discover_incomplete_api_mounts(self):
+         """
+         Tests that discovery logs warnings for missing API mounts.
+@@ -626,6 +627,7 @@ class MountsTestsExec(MountsTestsBase):
+     """
+     need_exec = True
+ 
++    @unittest.skipIf(in_rh_ci(), "Tests running in RH CI pipeline")
+     def test_mount_exec(self):
+         """
+         Tests running a command chrooted inside a mounted snapshot set.
+diff --git a/tests/test_plugin.py b/tests/test_plugin.py
+index bd4fec08..7532a2fb 100644
+--- a/tests/test_plugin.py
++++ b/tests/test_plugin.py
+@@ -14,7 +14,7 @@ log = logging.getLogger()
+ 
+ import snapm.manager.plugins as plugins
+ 
+-from tests import MockPlugin
++from tests import MockPlugin, in_rh_ci
+ 
+ 
+ def _find_device_mounts():
+@@ -85,6 +85,7 @@ class PluginTests(unittest.TestCase):
+         for name, origin in snapshot_names.items():
+             self.assertEqual(None, plugins.parse_snapshot_name(name, origin))
+ 
++    @unittest.skipIf(in_rh_ci(), "Tests running in RH CI pipeline")
+     def test_device_from_mount_point(self):
+         mounts = _find_device_mounts()
+         for mount in mounts:
+-- 
+2.53.0
+

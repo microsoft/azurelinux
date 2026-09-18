@@ -1,0 +1,27 @@
+From a91f4a6d60fc30d8bc51d54410c815cca83e90e6 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Tue, 27 Jan 2026 12:25:54 +0100
+Subject: [PATCH] Skip test_multi_process emitting a deprecation warning
+
+In RPM, the test emits a DeprecationWarning. Upstream test run doesn't.
+https://github.com/tornadoweb/tornado/issues/3623
+
+---
+ tornado/test/process_test.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tornado/test/process_test.py b/tornado/test/process_test.py
+index 0fdb941..37a2a72 100644
+--- a/tornado/test/process_test.py
++++ b/tornado/test/process_test.py
+@@ -48,6 +48,7 @@ class ProcessTest(unittest.TestCase):
+         signal.alarm(0)
+         super().tearDown()
+ 
++    @unittest.skip("DeprecationWarning: This process is multi-threaded, use of fork() may lead to deadlocks in the child.")
+     def test_multi_process(self):
+         # This test doesn't work on twisted because we use the global
+         # reactor and don't restore it to a sane state after the fork
+-- 
+2.52.0
+

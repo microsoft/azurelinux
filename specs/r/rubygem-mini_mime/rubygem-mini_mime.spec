@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.1.0
-Release: 13%{?dist}
+Release: 10%{?dist}
 Summary: A lightweight mime type lookup toy
 License: MIT
 URL: https://github.com/discourse/mini_mime

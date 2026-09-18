@@ -8,15 +8,13 @@
 
 Name:		gnome-bluetooth
 Epoch:		1
-Version:	47.1
-Release: 6%{?dist}
+Version:	47.2
+Release:	2%{?dist}
 Summary:	Bluetooth graphical utilities
 
 License:	GPL-2.0-or-later
 URL:		https://wiki.gnome.org/Projects/GnomeBluetooth
 Source0:	https://download.gnome.org/sources/gnome-bluetooth/47/gnome-bluetooth-%{tarball_version}.tar.xz
-# https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/merge_requests/223
-Patch0:         0001-tests-Fix-meson-setup-with-pygobject.patch
 
 %if 0%{?rhel}
 ExcludeArch:	s390 s390x
@@ -106,6 +104,12 @@ for writing applications that require a Bluetooth device selection widget.
 %{_datadir}/gtk-doc
 
 %changelog
+* Thu May 07 2026 Marek Kasik <mkasik@redhat.com> - 1:47.2-2
+- Remove upstreamed patch to fix FTBFS
+
+* Fri Apr 17 2026 Packit <hello@packit.dev> - 1:47.2-1
+- Update to version 47.2
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:47.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

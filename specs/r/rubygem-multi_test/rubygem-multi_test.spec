@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.1.2
-Release: 23%{?dist}
+Release: 20%{?dist}
 Summary: Wafter-thin gem to disable autorun of various testing libraries
 License: MIT
 URL: http://cukes.info

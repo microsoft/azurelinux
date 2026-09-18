@@ -6,7 +6,7 @@
 Summary:	Domain Name manipulation library for Ruby
 Name:		rubygem-%{gem_name}
 Version:	0.6.20240107
-Release: 9%{?dist}
+Release:	6%{?dist}
 
 # See LICENSE.txt
 # BSD-2-Clause: overall

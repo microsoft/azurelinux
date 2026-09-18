@@ -4,8 +4,8 @@
 %define soversion 6
 
 Name:           assimp
-Version:        6.0.4
-Release: 4%{?dist}
+Version:        6.0.5
+Release:        2%{?dist}
 Summary:        Library to import various 3D model formats into applications
 
 # Assimp is BSD
@@ -81,6 +81,7 @@ Summary: Header files and libraries for assimp
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: poly2tri-devel
 Requires: pugixml-devel
+Requires: zlib-devel
 
 %description devel
 This package contains the header files and libraries
@@ -163,7 +164,7 @@ exclude="utMD5Importer.importBoarMan|utMD5Importer.importBob|utMD2Importer.impor
 %doc Readme.md CREDITS
 %{_bindir}/assimp
 %{_libdir}/libassimp.so.6
-%{_libdir}/libassimp.so.6.0.4
+%{_libdir}/libassimp.so.6.0.5
 
 %files devel
 %{_includedir}/assimp/
@@ -180,6 +181,12 @@ exclude="utMD5Importer.importBoarMan|utMD5Importer.importBob|utMD2Importer.impor
 
 
 %changelog
+* Thu May 14 2026 Scott K Logan <logans@cottsay.net> - 6.0.5-2
+- Add missing dependency from assimp-devel on zlib-devel
+
+* Fri May 01 2026 Sandro Mani <manisandro@gmail.com> - 6.0.5-1
+- Update to 6.0.5
+
 * Tue Jan 27 2026 Sandro Mani <manisandro@gmail.com> - 6.0.4-1
 - Update to 6.0.4
 

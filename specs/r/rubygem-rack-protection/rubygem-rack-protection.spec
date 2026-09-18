@@ -7,7 +7,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.1.1
-Release: 5%{?dist}
+Release: 2%{?dist}
 Summary: Ruby gem that protects against typical web attacks
 License: MIT
 URL: https://sinatrarb.com/protection/

@@ -24,7 +24,7 @@
 
 Name:           rocm-omp
 Version:        %{rocm_version}
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        ROCm OpenMP
 
 Url:            https://github.com/ROCm/%{upstreamname}

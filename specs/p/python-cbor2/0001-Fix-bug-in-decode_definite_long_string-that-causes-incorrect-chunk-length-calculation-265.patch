@@ -1,0 +1,72 @@
+From ddc3993b96b7f7a8bad28c5ad7e250eb0037cd0b Mon Sep 17 00:00:00 2001
+From: Chenhao <24435007+tylzh97@users.noreply.github.com>
+Date: Wed, 22 Oct 2025 20:39:31 +0800
+Subject: [PATCH] Fix: bug in `decode_definite_long_string()` that causes
+ incorrect chunk length calculation (#265)
+
+(cherry picked from commit 2349197bea8ebd1bf57a68f4a6549d8fd7585e66)
+---
+ source/decoder.c      |  8 +++++++-
+ tests/test_decoder.py | 22 ++++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/source/decoder.c b/source/decoder.c
+index fd4d70c..a39d6f7 100644
+--- a/source/decoder.c
++++ b/source/decoder.c
+@@ -758,7 +758,7 @@ decode_definite_long_string(CBORDecoderObject *self, Py_ssize_t length)
+     char *buffer = NULL;
+     while (left) {
+         // Read up to 65536 bytes of data from the stream
+-        Py_ssize_t chunk_length = 65536 - buffer_size;
++        Py_ssize_t chunk_length = 65536 - buffer_length;
+         if (left < chunk_length)
+             chunk_length = left;
+ 
+@@ -828,7 +828,13 @@ decode_definite_long_string(CBORDecoderObject *self, Py_ssize_t length)
+                 memcpy(buffer, bytes_buffer + consumed, unconsumed);
+             }
+             buffer_length = unconsumed;
++        } else {
++            // All bytes consumed, reset buffer_length
++            buffer_length = 0;
+         }
++
++        Py_DECREF(chunk);
++        chunk = NULL;
+     }
+ 
+     if (ret && string_namespace_add(self, ret, length) == -1)
+diff --git a/tests/test_decoder.py b/tests/test_decoder.py
+index 25e0c6b..2ef87a2 100644
+--- a/tests/test_decoder.py
++++ b/tests/test_decoder.py
+@@ -260,6 +260,28 @@ def test_string_oversized(impl) -> None:
+         (impl.loads(unhexlify("aeaeaeaeaeaeaeaeae0108c29843d90100d8249f0000aeaeffc26ca799")),)
+ 
+ 
++def test_string_issue_264_multiple_chunks_utf8_boundary(impl) -> None:
++    """Test for Issue #264: UTF-8 characters split across multiple 65536-byte chunk boundaries."""
++    import struct
++
++    # Construct: 65535 'a' + '€' (3 bytes) + 65533 'b' + '€' (3 bytes) + 100 'd'
++    # Total: 131174 bytes, which spans 3 chunks (65536 + 65536 + 102)
++    total_bytes = 65535 + 3 + 65533 + 3 + 100
++
++    payload = b"\x7a" + struct.pack(">I", total_bytes)  # major type 3, 4-byte length
++    payload += b"a" * 65535
++    payload += "€".encode()  # U+20AC: E2 82 AC
++    payload += b"b" * 65533
++    payload += "€".encode()
++    payload += b"d" * 100
++
++    expected = "a" * 65535 + "€" + "b" * 65533 + "€" + "d" * 100
++
++    result = impl.loads(payload)
++    assert result == expected
++    assert len(result) == 131170  # 65535 + 1 + 65533 + 1 + 100 characters
++
++
+ @pytest.mark.parametrize(
+     "payload, expected",
+     [

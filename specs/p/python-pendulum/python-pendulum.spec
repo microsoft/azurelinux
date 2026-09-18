@@ -3,24 +3,20 @@
 
 %bcond tests 1
 
-# Package an unreleased snapshot to fix Python 3.14 issues,
-# https://github.com/python-pendulum/pendulum/issues/900.
-%global commit 628fd8510a8956647beedc685c0f0b6bfdc1eeec
-%global snapdate 20251024
-
 Name:           python-pendulum
-Version:        3.2.0~dev0^%{snapdate}git%{sub %{commit} 1 7}
-Release: 4%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 Summary:        Python datetimes made easy
 
 License:        MIT
 URL:            https://pendulum.eustace.io
 %global forgeurl https://github.com/sdispater/pendulum
-# Source:         %%{forgeurl}/archive/%%{version}/pendulum-%%{version}.tar.gz
-Source:         %{forgeurl}/archive/%{commit}/pendulum-%{commit}.tar.gz
+Source:         %{forgeurl}/archive/%{version}/pendulum-%{version}.tar.gz
 
-# Downstream-only: allow PyO3 0.26 until we have 0.27, RHBZ#2404994
-Patch:          0001-Allow-PyO3-0.26-until-we-have-0.27-RHBZ-2404994.patch
+# Update PyO3 to 0.29
+# https://github.com/python-pendulum/pendulum/pull/978
+# (Without changes to Cargo.lock)
+Patch:          pendulum-3.2.0-pyo3-0.29.patch
 
 BuildRequires:  python3-devel
 BuildRequires:  cargo-rpm-macros
@@ -58,7 +54,7 @@ Requires:       tzdata
 %description -n python3-pendulum %{common_description}
 
 %prep
-%autosetup -n pendulum-%{commit} -p1
+%autosetup -n pendulum-%{version} -p1
 # Remove tzdata dependency. We can rely on a system-wide timezone database.
 tomcli-set pyproject.toml lists delitem project.dependencies 'tzdata.*'
 # Remove pytest-benchmark dependency. We don't care about it in RPM builds.
@@ -66,9 +62,6 @@ sed -i '/@pytest.mark.benchmark/d' $(find tests -type f -name '*.py')
 %cargo_prep
 cd rust
 rm Cargo.lock
-# Remove unpackaged feature. This is only needed for Windows.
-tomcli-set Cargo.toml lists delitem dependencies.pyo3.features \
-    'generate-import-lib'
 
 %generate_buildrequires
 # For unclear reasons, maturin checks for all crate dependencies when it is
@@ -106,6 +99,16 @@ popd
 %doc README.rst
 
 %changelog
+* Tue Jun 30 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.2.0-1
+- Update to 3.2.0 (final); Fixes RHBZ#2435482
+- Update PyO3 to 0.29 (fixes RUSTSEC-2026-0176, RUSTSEC-2026-0177)
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 3.2.0~dev0^20251024git628fd85-3
+- Rebuilt for Python 3.15
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0~dev0^20251024git628fd85-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Oct 28 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 3.2.0~dev0^20251024git628fd85-1
 - Update to an unreleased snapshot with Python 3.14 support
 

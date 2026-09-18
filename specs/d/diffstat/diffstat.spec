@@ -4,7 +4,7 @@
 Summary: A utility which provides statistics based on the output of diff
 Name: diffstat
 Version: 1.68
-Release: 8%{?dist}
+Release: 5%{?dist}
 License: X11
 URL: https://invisible-island.net/diffstat
 Source0: https://invisible-island.net/archives/diffstat/%{name}-%{version}.tgz

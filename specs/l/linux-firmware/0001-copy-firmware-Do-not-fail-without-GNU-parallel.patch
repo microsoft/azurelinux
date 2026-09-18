@@ -1,0 +1,37 @@
+From ccbeeb0dcc56c6fa099d802a7210d62657d70a01 Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Mon, 24 Aug 2026 08:55:33 -0400
+Subject: [PATCH] copy-firmware: Do not fail without GNU parallel
+
+Some distributions (including Red Hat Enterprise Linux and its siblings)
+do not ship the GNU `parallel` command or include them in their build
+environment. They do, however, include automatic build flags that try to
+pass -jN to make.
+
+Instead of treating this as a failure, just warn the user that parallel
+builds are not supported without the GNU `parallel` command and just
+continue with serialized execution instead.
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ copy-firmware.sh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/copy-firmware.sh b/copy-firmware.sh
+index 6a32127e77cc35f8c15b3adc7030fa671d555b80..f9a609cf37afde46f86cfc8a0083ce0948263f31 100755
+--- a/copy-firmware.sh
++++ b/copy-firmware.sh
+@@ -53,7 +53,9 @@ while test $# -gt 0; do
+             num_jobs=$(echo "$1" | sed 's/-j//')
+             num_jobs=${num_jobs:-1}
+             if [ "$num_jobs" -gt 1 ] && ! has_gnu_parallel; then
+-                    err "the GNU parallel command is required to use -j"
++                    warn "the GNU parallel command is required to use -j"
++                    warn "running without parallel compression"
++                    num_jobs=1
+             fi
+             parallel_args_file=$(mktemp)
+             trap 'rm -f $parallel_args_file' EXIT INT QUIT TERM
+-- 
+2.55.0
+

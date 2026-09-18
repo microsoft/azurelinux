@@ -3,7 +3,7 @@
 
 Name:           speexdsp
 Version:        1.2.1
-Release: 13%{?dist}
+Release:        9%{?dist}
 Summary:        A voice compression format (DSP)
 
 License:        BSD-3-Clause

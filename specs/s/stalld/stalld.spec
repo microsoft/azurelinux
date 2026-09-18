@@ -2,13 +2,13 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:		stalld
-Version:	1.26.3
-Release: 4%{?dist}
+Version:	1.28.1
+Release:	1%{?dist}
 Summary:	Daemon that finds starving tasks and gives them a temporary boost
 
 License:	GPL-2.0-or-later AND GPL-2.0-only
 URL:		https://gitlab.com/rt-linux-tools/%{name}/%{name}.git
-Source0:	https://gitlab.com/rt-linux-tools/%{name}/-/archive/v%{version}/%{name}-%{version}.tar.bz2
+Source0:	https://gitlab.com/rt-linux-tools/%{name}/-/archive/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:	glibc-devel
 BuildRequires:	gcc
@@ -65,6 +65,109 @@ allow 10 microseconds of runtime for 1 second of clock time.
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Tue Jun 16 2026 Clark Williams <williams@redhat.com> - 1.28.1-1
+- stalld: bump version to 1.28.1
+- tests: Fix journal flush race in logging destinations test
+- Merge remote-tracking branch 'wander/dev' into devel
+- stalld: fix format string type mismatch in set_cpu_affinity
+- stalld: fix error return in queue_track_get_cpu
+- stalld: fix snprintf truncation check in is_runnable
+- stalld: fix missing null-termination in is_runnable
+- stalld: guard nextline() returns in sched_debug parsing
+- stalld: remove NULL deref in fill_waiting_task error handler
+- stalld: fix type mismatches in detect_task_format
+- stalld: fix format string type mismatch for time_t
+- stalld: use CLOCK_MONOTONIC for starvation detection
+- stalld: remove async-signal-unsafe calls from signal handler
+- stalld: fix data race on config_buffer_size
+- stalld: fix signed integer overflow in set_reservation
+- stalld: check pthread_create return in conservative_main
+- stalld: check pthread_create return in aggressive_main
+- stalld: fix buffer underflow in sched_debug_get
+- stalld: fix buffer underflow in read_proc_stat
+- stalld: fix uninitialized buffer use in find_debugfs_mount_point
+- stalld: fix inverted DAEMON_UMASK value
+- stalld: fix data race on thread_running
+- bpf: Replace linear task scan with hash map
+- tests: Fix async-signal-unsafe handler
+- tests: Reduce timing and replace sleeps with event waits
+- tests: Remove redundant sleeps after start_stalld
+- tests: Drop redundant sleeps in test_pidfile
+- tests: Replace init sleeps in test_affinity
+- tests: Reduce starvation_gen durations
+- tests: Reduce default wait timeouts
+- tests: Extract wait_for_process_exit helper
+- tests: Introduce and adopt process helpers
+- tests: Remove dead code after making fail() fatal
+- tests: Abort immediately on test failure
+- tests: Remove if-wrappers around assert calls
+- tests: Replace wait conditionals with asserts
+- tests: Introduce and adopt assert_success() helper
+- tests: Remove weak, redundant, and assertion-free test blocks
+- tests: Introduce and adopt assert_log_contains() helper
+- tests: Remove redundant pkill from cleanup
+- tests: Add idle CPU skipping assertion
+- tests: Fix CPU selection grep substring matches
+- tests: Add assertions to SCHED_OTHER restoration test
+- chore: Remove legacy test infrastructure and stale docs
+- tests: Fix repeated log match finding same line
+- tests: Fix subshell swallowing test results
+- tests: Fix boost verification in runtime and duration tests
+- tests: Introduce assert_stalld_rejects() helper
+- tests: Consolidate and adopt init_functional_test()
+- tests: Fix task exit timing in test_boost_restoration
+- tests: Introduce find_starved_child() helper
+- tests: Introduce starvation and boost asserts
+- tests: Introduce cleanup_scenario() helper
+- tests: Introduce test_section() helper
+- stalld: Reject --force_fifo in single-threaded mode
+
+* Tue May 19 2026 Clark Williams <williams@redhat.com> - 1.27.1-2
+- deal with bogus date in specfile changelog
+
+* Tue May 19 2026 Clark Williams <williams@redhat.com> - 1.27.1-1
+- Makefile: version bump to v1.27.1
+- stalld: make syslog logging opt-in by default
+- stalld: die on invalid CPU affinity
+- tests/functional: Fix invalid pidfile test in test_pidfile
+- tests/functional: Fix readiness detection and FIFO fallback in test_force_fifo
+- tests/functional: Accept FIFO fallback in test_fifo_boosting
+- tests/functional: Fix multi-CPU detection in test_starvation_detection
+- tests/helpers: Use pass()/fail() in assert functions
+- tests: Add fail() helper and use for all test failures
+- tests/functional: Use pass() for all test pass reporting
+- tests: Add pass() helper and replace assert_equals hack
+- tests/functional: Use timeout for invalid argument tests
+- tests/functional: Use timeout for error path in test_force_fifo
+- tests/functional: Use wait_for_stalld_ready() in test_backend_selection
+- tests/functional: Use start_stalld_with_log() in test_cpu_selection
+- tests/functional: Use start_stalld_with_log() in test_logging_destinations
+- tests/functional: Use start_stalld_with_log() in test_log_only
+- tests/functional: Add missing -a flag in test_starvation_detection
+- tests/functional: Remove duplicated -a flag in test_fifo_priority_starvation
+- tests/functional: Replace detection sleeps with event-driven helpers
+- tests/functional: Use start_starvation_gen() helper
+- tests/helpers: Add wait_for_starvation_detected() and wait_for_boost_detected()
+- tests/helpers: Add start_starvation_gen() helper function
+- tests/helpers: Flush stdout after starvation_gen startup messages
+- tests/helpers: Fix fractional sleep timeout bugs
+- tests/helpers: Add wait_for_stalld_ready() and use in start_stalld_with_log()
+- tests/helpers: Rewrite wait_for_log_message() with process substitution
+- tests/functional: Fix false positive log matching in test_logging_destinations
+- tests/functional: Remove redundant post-stop_stalld sleeps
+- tests/helpers: Fix relative path in backend detection functions
+- tests/helpers: Fix stop_stalld() timeout and shutdown logic
+- tests/helpers: Replace sleep with poll in start_stalld_with_log()
+- tests/functional: Fix test_logging_destinations.sh path and backend
+- tests/functional: Fix and refactor test_backend_selection.sh
+- tests: Add per-test runtime measurement to run_tests.sh
+- tests/helpers: Remove duplicate log() function
+- tests/helpers: Fix stalld daemon detection in start_stalld()
+- tests: Add pre-test and post-test cleanup of stalld processes
+
+* Sun Jan 18 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jan 15 2026 Clark Williams <williams@redhat.com> - 1.26.3-1
 - tests: Add pre-test and post-test cleanup of stalld processes
 - Makefile: version bump to v1.26.3

@@ -74,7 +74,7 @@ BuildRequires: metis-devel
 
 Name: superlu_dist
 Version: 8.2.0
-Release: 13%{?dist}
+Release: 10%{?dist}
 Epoch:   1
 Summary: Solution of large, sparse, nonsymmetric systems of linear equations
 # Automatically converted from old format: BSD - review is highly recommended.

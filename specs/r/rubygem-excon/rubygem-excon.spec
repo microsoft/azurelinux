@@ -11,7 +11,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.2.7
-Release: 5%{?dist}
+Release: 2%{?dist}
 Summary: Speed, persistence, http(s)
 License: MIT
 URL: https://github.com/excon/excon

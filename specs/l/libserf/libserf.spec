@@ -6,7 +6,7 @@
 
 Name:           libserf
 Version:        1.3.10
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        High-Performance Asynchronous HTTP Client Library
 License:        Apache-2.0
 URL:            https://serf.apache.org/

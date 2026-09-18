@@ -5,7 +5,7 @@ Summary:       Python module for GNU parted
 Name:          pyparted
 Epoch:         1
 Version:       3.13.0
-Release: 16%{?dist}
+Release:       13%{?dist}
 License:       GPL-2.0-or-later
 URL:           https://github.com/dcantrell/pyparted
 

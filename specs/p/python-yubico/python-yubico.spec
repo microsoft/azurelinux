@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        1.3.3
-Release: 25%{?dist}
+Release:        22%{?dist}
 Summary:        Pure-python library for interacting with Yubikeys
 
 License:        BSD-2-Clause

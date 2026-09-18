@@ -1,0 +1,14 @@
+diff --git a/Makefile.in b/Makefile.in
+index 699d995..4338272 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -271,9 +271,6 @@ rsync-ssl.1: rsync-ssl.1.md md-convert version.h Makefile
+ rsyncd.conf.5: rsyncd.conf.5.md md-convert version.h Makefile
+ 	@$(srcdir)/maybe-make-man rsyncd.conf.5.md
+ 
+-rrsync.1: support/rrsync.1.md md-convert Makefile
+-	@$(srcdir)/maybe-make-man support/rrsync.1.md
+-
+ .PHONY: clean
+ clean: cleantests
+ 	rm -f *~ $(OBJS) $(CHECK_PROGS) $(CHECK_OBJS) $(CHECK_COMPILE_OBJS) $(CHECK_SYMLINKS) @MAKE_RRSYNC@ \

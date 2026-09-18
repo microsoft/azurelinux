@@ -1,0 +1,59 @@
+From ded148888c501c2e9d21c23263d7c09aed4b97d6 Mon Sep 17 00:00:00 2001
+From: Aaron Merey <amerey@redhat.com>
+Date: Fri, 19 Dec 2025 12:33:33 -0500
+Subject: [PATCH] fix discarded const warning on newer gcc
+
+---
+ lib/pfmlib_common.c  | 15 +++++++++------
+ tests/validate_x86.c |  2 +-
+ 2 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/lib/pfmlib_common.c b/lib/pfmlib_common.c
+index 44b5de4..59a7cff 100644
+--- a/lib/pfmlib_common.c
++++ b/lib/pfmlib_common.c
+@@ -1625,12 +1625,6 @@ pfmlib_parse_event(const char *event, pfmlib_event_desc_t *d)
+ 	const char *pname = NULL;
+ 	int i, j, ret;
+ 
+-	/*
+-	 * support only one event at a time.
+-	 */
+-	p = strpbrk(event, PFMLIB_EVENT_DELIM);
+-	if (p)
+-		return PFM_ERR_INVAL;
+ 	/*
+ 	 * create copy because string is const
+ 	 */
+@@ -1638,6 +1632,15 @@ pfmlib_parse_event(const char *event, pfmlib_event_desc_t *d)
+ 	if (!str)
+ 		return PFM_ERR_NOMEM;
+ 
++	/*
++	 * support only one event at a time.
++	 */
++	p = strpbrk(s, PFMLIB_EVENT_DELIM);
++	if (p) {
++		free(s);
++		return PFM_ERR_INVAL;
++	}
++
+ 
+ 	/* check for optional PMU name */
+ 	p = strstr(s, PFMLIB_PMU_DELIM);
+diff --git a/tests/validate_x86.c b/tests/validate_x86.c
+index 500a697..68a776d 100644
+--- a/tests/validate_x86.c
++++ b/tests/validate_x86.c
+@@ -8018,7 +8018,7 @@ static int
+ check_pmu_supported(const char *evt)
+ {
+ 	pfm_pmu_info_t info;
+-	char *p;
++	const char *p;
+ 	int ret;
+ 	pfm_pmu_t i;
+ 
+-- 
+2.52.0
+

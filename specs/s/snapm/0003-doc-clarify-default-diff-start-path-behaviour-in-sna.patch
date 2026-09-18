@@ -1,0 +1,48 @@
+From 8d74490b35cb9592f554c4b5804fe0d4e5b6c77c Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Tue, 31 Mar 2026 13:04:52 +0100
+Subject: [PATCH 03/10] doc: clarify default diff start path behaviour in
+ snapm.8
+
+Related: #959
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ man/man8/snapm.8 | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/man/man8/snapm.8 b/man/man8/snapm.8
+index 9baad38e..dcc20ee9 100644
+--- a/man/man8/snapm.8
++++ b/man/man8/snapm.8
+@@ -1081,6 +1081,13 @@ Calculates the differences between the \fBfrom\fP and \fBto\fP targets. Targets
+ may be specified as a snapshot set name, or the special character \fB.\fP to
+ represent the currently running system (root file system).
+ .IP
++If \fB--start-path\fP is not specified the comparison proceeds from the root
++directory of the two volumes. This can be costly in terms of both time and
++memory: for better performance, specify one or more start paths in order to
++focus the difference generation on areas of interest. A resource use warning is
++emitted if no start path is given (this warning can be suppressed using the
++\fB--quiet\fP argument).
++.IP
+ The output format is controlled by \fB--output-format\fP. The \fBtree\fP
+ format provides a hierarchical view of changes, while \fBdiff\fP provides
+ standard unified diff output for modified content: see \fBOutput Formats\fP for
+@@ -1155,6 +1162,13 @@ Compare snapshot sets and output results in a tabular report.
+ Performs the same comparison logic as \fBsnapm snapset diff\fP but formats
+ the output as a report using the standard reporting columns.
+ .IP
++If \fB--start-path\fP is not specified the comparison proceeds from the root
++directory of the two volumes. This can be costly in terms of both time and
++memory: for better performance, specify one or more start paths in order to
++focus the difference generation on areas of interest. A resource use warning is
++emitted if no start path is given (this warning can be suppressed using the
++\fB--quiet\fP argument).
++.IP
+ This command supports standard reporting arguments including \fB--options\fP,
+ \fB--sort\fP, \fB--noheadings\fP, and \fB--json\fP.
+ .TP
+-- 
+2.53.0
+

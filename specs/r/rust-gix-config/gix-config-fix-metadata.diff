@@ -1,0 +1,16 @@
+--- gix-config-0.58.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ gix-config-0.58.0/Cargo.toml	2026-06-27T17:04:41.600196+00:00
+@@ -113,13 +113,6 @@
+ [dev-dependencies.bytesize]
+ version = "2.3.1"
+ 
+-[dev-dependencies.cap]
+-version = "0.1.2"
+-features = ["stats"]
+-
+-[dev-dependencies.criterion]
+-version = "0.8.2"
+-
+ [dev-dependencies.serial_test]
+ version = "3.4.0"
+ default-features = false

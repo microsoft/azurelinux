@@ -1,0 +1,20 @@
+diff --color -ruNp a/mux.c b/mux.c
+--- a/mux.c	2024-09-20 00:20:48.000000000 +0200
++++ b/mux.c	2026-04-09 15:02:36.016198814 +0200
+@@ -1137,6 +1137,16 @@ mux_master_process_proxy(struct ssh *ssh
+ 
+ 	debug_f("channel %d: proxy request", c->self);
+ 
++	if (options.control_master == SSHCTL_MASTER_ASK ||
++	    options.control_master == SSHCTL_MASTER_AUTO_ASK) {
++		if (!ask_permission("Allow multiplex proxy connection?")) {
++			debug2_f("proxy refused by user");
++			reply_error(reply, MUX_S_PERMISSION_DENIED, rid,
++			    "Permission denied");
++			return 0;
++		}
++	}
++
+ 	c->mux_rcb = channel_proxy_downstream;
+ 	if ((r = sshbuf_put_u32(reply, MUX_S_PROXY)) != 0 ||
+ 	    (r = sshbuf_put_u32(reply, rid)) != 0)

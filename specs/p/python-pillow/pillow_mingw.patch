@@ -1,6 +1,6 @@
 diff -rupN --no-dereference Pillow-11.3.0/setup.py Pillow-11.3.0-new/setup.py
 --- Pillow-11.3.0/setup.py	2025-07-01 09:41:24.000000000 +0200
-+++ Pillow-11.3.0-new/setup.py	2026-02-14 20:33:50.664889730 +0100
++++ Pillow-11.3.0-new/setup.py	2026-07-19 08:50:47.973345255 +0200
 @@ -144,7 +144,7 @@ class RequiredDependencyException(Except
      pass
  
@@ -66,7 +66,7 @@ diff -rupN --no-dereference Pillow-11.3.0/setup.py Pillow-11.3.0-new/setup.py
          build_ext.build_extensions(self)
 diff -rupN --no-dereference Pillow-11.3.0/src/libImaging/ImPlatform.h Pillow-11.3.0-new/src/libImaging/ImPlatform.h
 --- Pillow-11.3.0/src/libImaging/ImPlatform.h	2025-07-01 09:41:24.000000000 +0200
-+++ Pillow-11.3.0-new/src/libImaging/ImPlatform.h	2026-02-14 20:33:50.665283420 +0100
++++ Pillow-11.3.0-new/src/libImaging/ImPlatform.h	2026-07-19 08:50:47.973855846 +0200
 @@ -29,7 +29,7 @@
  #if defined(_WIN32) || defined(__CYGWIN__) /* WIN */
  
@@ -78,7 +78,7 @@ diff -rupN --no-dereference Pillow-11.3.0/src/libImaging/ImPlatform.h Pillow-11.
  #undef _WIN64
 diff -rupN --no-dereference Pillow-11.3.0/src/Tk/tkImaging.c Pillow-11.3.0-new/src/Tk/tkImaging.c
 --- Pillow-11.3.0/src/Tk/tkImaging.c	2025-07-01 09:41:24.000000000 +0200
-+++ Pillow-11.3.0-new/src/Tk/tkImaging.c	2026-02-14 20:33:50.665518654 +0100
++++ Pillow-11.3.0-new/src/Tk/tkImaging.c	2026-07-19 08:50:47.974163609 +0200
 @@ -321,7 +321,7 @@ load_tkinter_funcs(void) {
  
      /* Allocate module handlers array */

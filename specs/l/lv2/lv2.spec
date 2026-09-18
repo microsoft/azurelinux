@@ -3,7 +3,7 @@
 
 Name:           lv2
 Version:        1.18.10
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        Audio Plugin Standard
 
 # lv2specgen template.html is CC-AT-SA

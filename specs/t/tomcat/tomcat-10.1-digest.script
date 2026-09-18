@@ -34,7 +34,7 @@ export CLASSPATH
 MAIN_CLASS="org.apache.catalina.startup.Tool"
 BASE_FLAGS="-Dcatalina.home=\"$CATALINA_HOME\""
 BASE_OPTIONS=""
-BASE_JARS="commons-daemon tomcat/catalina servlet tomcat/tomcat-util tomcat/tomcat-coyote tomcat/tomcat-api tomcat/tomcat-util-scan"
+BASE_JARS="tomcat/catalina tomcat/tomcat-servlet-api tomcat/tomcat-util tomcat/tomcat-coyote tomcat/tomcat-api tomcat/tomcat-util-scan"
 
 # Set parameters
 set_classpath $BASE_JARS

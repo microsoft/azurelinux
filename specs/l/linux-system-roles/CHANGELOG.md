@@ -1,6 +1,324 @@
 Changelog
 =========
 
+[2.4.2] - 2026-08-24
+---------------------
+
+### Bug Fixes
+
+- podman - fix(quadlet_spec_paths): Test for file_src and template_src for restart should use length gt 0 (#325)
+
+[2.4.1] - 2026-08-20
+---------------------
+
+### Bug Fixes
+
+- systemd - fix: ansible 2.19+ removed invocation as part of the data rework. also fixed some tests (#163)
+
+[2.4.0] - 2026-08-10
+---------------------
+
+### New Features
+
+- sshd - feat: Write roles fingerprints to /var/log/sysroles.jsonl (#381)
+
+### Bug Fixes
+
+- podman - fix: re-order tasks to allow prune_images to complete on a new host (#318)
+
+[2.3.0] - 2026-08-08
+---------------------
+
+### New Features
+
+- certificate - feat: Implement support for passing an issuer argument to the provider. (#346)
+
+### Bug Fixes
+
+- certificate - fix: ensure role is idempotent (#355)
+
+[2.2.0] - 2026-08-07
+---------------------
+
+### New Features
+
+- ad_integration - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#208)
+- aide - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#100)
+- auditd - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#24)
+- cockpit - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#286)
+- fapolicyd - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#123)
+- gfs2 - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#114)
+- ha_cluster - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#412)
+- journald - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#170)
+- kernel_settings - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#325)
+- keylime_server - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#140)
+- logging - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#514)
+- metrics - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#334)
+- nbde_client - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#277)
+- nbde_server - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#252)
+- network - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#892)
+- podman - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#316)
+- postfix - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#249)
+- postgresql - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#200)
+- rhc - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#294)
+- snapshot - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#192)
+- ssh - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#254)
+- sudo - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#137)
+- systemd - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#158)
+- tlog - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#233)
+- trustee_client - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#46)
+- trustee_server - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#34)
+- vpn - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#269)
+
+### Bug Fixes
+
+- ha_cluster - fix: crmsh - Replace crm_verify with crm configure verify (#403)
+
+[2.1.0] - 2026-08-06
+---------------------
+
+### New Features
+
+- bootloader - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#230)
+- certificate - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#353)
+- crypto_policies - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#207)
+- firewall - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#378)
+- kdump - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#302)
+- selinux - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#369)
+- storage - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#641)
+- timesync - feat: Write roles fingerprints to /var/log/sysroles.jsonl [citest_skip] (#364)
+
+[2.0.0] - 2026-07-27
+---------------------
+
+### New Features
+
+- certificate - feat: manage system certificate trust, CA certificates (#341)
+- nbde_client - feat: Support extra dracut settings for static IP (#268)
+- podman - feat: prune unused images before pulling new ones during create/update (#312)
+- podman - feat: Add podman_run_as_ansible_user option (#307)
+- snapshot - feat: add support for revertable snapshots with boot-time rollback capability (#183)
+- timesync - feat: Support key and keyfile for authentication (#357)
+
+### Bug Fixes
+
+- aide - fix: Better support for check mode (#93)
+- bootloader - fix!: Do not enforce bootloader timeout default (#223)
+- bootloader - fix: Fix incorrect changed reporting in bootloader_settings module (#222)
+- bootloader - fix: Fix the role running grubby commands in check mode (#221)
+- bootloader - fix: Set mode for bootloader user and grub conf files to 0600 (#220)
+- nbde_client - fix: use hostonly_cmdline=yes on newer versions of OS (#267)
+- podman - fix: support kube specs with multiple Kubernetes objects (#303)
+
+[1.127.3] - 2026-07-23
+---------------------
+
+### Other Changes
+
+- no user-visible changes
+
+[1.127.2] - 2026-06-26
+---------------------
+
+### Bug Fixes
+
+- firewall - fix: ensure firewalld is responding to requests after starting (#365)
+
+[1.127.1] - 2026-06-25
+---------------------
+
+### Other Changes
+
+- no user-visible changes
+
+[1.127.0] - 2026-06-24
+---------------------
+
+### New Features
+
+- crypto_policies - feat: regenerate policy automatically if check fails, add crypto_policies_force_regenerate (#197)
+- podman - feat: Add restarts and restarts_on to allow services to be restarted if dependencies change (#296)
+
+### Bug Fixes
+
+- bootloader - fix: support duplicate option names with different values (#214)
+- firewall - fix: ensure rich rule handling is idempotent (#358)
+- nbde_server - fix: Prevent symlink following privilege escalation in nbde_server_tang module (#240)
+- podman - fix: use correct repo name for copr repo (#298)
+- selinux - fix: ensure policy modules are loaded before they can be referenced (#354)
+- storage - fix: only install stratis if requested (#624)
+- trustee_server - fix: do not use cert '-subj' with hostname to generate cert, use subjectAltName (#24)
+
+[1.126.0] - 2026-06-24
+---------------------
+
+### New Features
+
+- sshd - feat: Add verbosity-based logging to reduce verbose output (#366)
+
+[1.125.4] - 2026-06-12
+---------------------
+
+### Bug Fixes
+
+- firewall - fix: ignore network device interface file that is not found (#359)
+- firewall - fix: ensure firewall_config is reset (#355)
+- firewall - fix: role should not configure firewall if only getting facts (#354)
+
+[1.125.3] - 2026-06-02
+---------------------
+
+### Bug Fixes
+
+- network - fix: correctly retry device read when device is unstable (#874)
+- sudo - fix: use correct spacing before tags (#123)
+- sudo - fix: support continuation lines in scan_sudoers (#122)
+
+[1.125.2] - 2026-05-21
+---------------------
+
+### Bug Fixes
+
+- ad_integration - fix: set crypto_policies_reboot_ok to reboot and apply RC4 crypto policy (#194)
+
+[1.125.1] - 2026-05-13
+---------------------
+
+### Bug Fixes
+
+- ha_cluster - fix: check for corosync-qdevice service in bad state before stopping (#385)
+
+[1.125.0] - 2026-05-12
+---------------------
+
+### New Features
+
+- network - feat: Use verbosity-based logging in network role (#868)
+
+### Bug Fixes
+
+- podman - fix: Use verbosity level 3 for no_log (#289)
+- postgresql - fix: Use verbosity level 3 for no_log (#186)
+- rhc - fix: Use verbosity level 3 for no_log (#278)
+- snapshot - fix: Use verbosity level 3 for no_log (#172)
+- trustee_server - fix: Use verbosity level 3 for no_log (#18)
+
+[1.124.3] - 2026-05-08
+---------------------
+
+### Other Changes
+
+- no user-visible changes
+
+[1.124.2] - 2026-05-07
+---------------------
+
+### Other Changes
+
+- no user-visible changes
+
+[1.124.1] - 2026-05-07
+---------------------
+
+### Other Changes
+
+- no user-visible changes
+
+[1.124.0] - 2026-05-07
+---------------------
+
+### New Features
+
+- ad_integration - feat: new variable `ad_integration_secure_logging` defaulting to `true` (#192)
+- auditd - New Role
+- bootloader - feat: new variable `bootloader_secure_logging` defaulting to `true` (#209)
+- ha_cluster - feat: Parametrize no_log usage in ha_cluster role (#383)
+- ha_cluster - feat: export node attributes utilization (#382)
+- metrics - feat: new variable `metrics_secure_logging` defaulting to `true` (#315)
+- nbde_client - feat: new variable `nbde_client_secure_logging` defaulting to `true` (#257)
+- network - feat: add initial support for sle16+ (#863)
+- podman - feat: Parametrize no_log usage in podman role (#286)
+- postfix - feat: new variable `postfix_secure_logging` defaulting to `true` (#234)
+- postgresql - feat: new variable `postgresql_secure_logging` defaulting to `true` (#184)
+- trustee_client - New Role
+- trustee_server - New Role
+- vpn - feat: new variable `vpn_secure_logging` defaulting to `true` (#253)
+
+### Bug Fixes
+
+- firewall - fix: add verbosity-based no_log to facts modules (#349)
+- nbde_server - fix: firewall - use runtime instead of deprecated immediate (#234)
+- network - fix: handle_exceptions is not a valid parameter (#864)
+- rhc - fix: add verbosity-based no_log to facts modules (#276)
+- selinux - fix: add verbosity-based no_log to facts modules (#348)
+- snapshot - fix: issues found via code review (#170)
+- storage - fix: add verbosity-based no_log to facts modules (#619)
+- timesync - fix: add verbosity-based no_log to facts modules (#348)
+- tlog - fix: add verbosity-based no_log to facts modules (#219)
+
+[1.123.0] - 2026-05-07
+---------------------
+
+### New Features
+
+- sshd - feat: add role fingerprints to syslog (#361)
+- sshd - feat: Add new c10s options GSSAPIAllowS4U2Self and GSSAPIProxyS4U2Services (#357)
+
+[1.122.0] - 2026-04-28
+---------------------
+
+### New Features
+
+- ad_integration - feat: add role fingerprints to syslog (#188)
+- aide - feat: add role fingerprints to syslog (#81)
+- bootloader - feat: add role fingerprints to syslog (#205)
+- certificate - feat: add role fingerprints to syslog (#329)
+- cockpit - feat: add role fingerprints to syslog (#271)
+- crypto_policies - feat: add role fingerprints to syslog (#191)
+- fapolicyd - feat: add role fingerprints to syslog (#107)
+- firewall - feat: add role fingerprints to syslog (#345)
+- gfs2 - feat: add role fingerprints to syslog (#95)
+- ha_cluster - feat: export stonith levels (#376)
+- ha_cluster - feat: add role fingerprints to syslog (#375)
+- ha_cluster - feat: crmsh - Add support for QDevice, Qnet and Diskless SBD (#374)
+- journald - feat: add role fingerprints to syslog (#154)
+- kdump - feat: add role fingerprints to syslog (#287)
+- kernel_settings - feat: add role fingerprints to syslog (#308)
+- keylime_server - feat: add role fingerprints to syslog (#125)
+- logging - feat: add role fingerprints to syslog (#499)
+- metrics - feat: add role fingerprints to syslog (#312)
+- nbde_client - feat: add role fingerprints to syslog (#254)
+- nbde_server - feat: add role fingerprints to syslog (#232)
+- network - feat: add role fingerprints to syslog (#861)
+- podman - feat: add role fingerprints to syslog (#283)
+- postfix - feat: add role fingerprints to syslog (#231)
+- postgresql - feat: add role fingerprints to syslog (#181)
+- postgresql - feat: add SUSE/openSUSE support (#172)
+- rhc - feat: add role fingerprints to syslog (#273)
+- selinux - feat: add role fingerprints to syslog (#345)
+- snapshot - feat: add role fingerprints to syslog (#165)
+- snapshot - feat: add list command to report the status of LVM snapshots for specified VGs/LVs (#164)
+- ssh - feat: add role fingerprints to syslog (#236)
+- storage - feat: add role fingerprint to system journal (#614)
+- sudo - feat: add role fingerprints to syslog (#113)
+- systemd - feat: add role fingerprints to syslog (#141)
+- timesync - feat: add role fingerprints to syslog (#345)
+- tlog - feat: add role fingerprints to syslog (#216)
+- vpn - feat: add role fingerprints to syslog (#250)
+
+### Bug Fixes
+
+- storage - fix: use correct encryption_key parameter, improve error messages (#601)
+- sudo - fix: enable CI tests for openSUSE leap; handle missing /etc/sudoers (#112)
+
+[1.121.0] - 2026-03-16
+---------------------
+
+### New Features
+
+- certificate - feat: Add openSUSE Leap vars (#317)
+- storage - feat: Added support for debian 13 [WIP] (#598)
+
 [1.120.5] - 2026-02-23
 ---------------------
 

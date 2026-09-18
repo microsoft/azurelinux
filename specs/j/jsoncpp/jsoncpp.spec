@@ -14,7 +14,7 @@
 
 Name:           jsoncpp
 Version:        1.9.6
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        JSON library implemented in C++
 
 License:        LicenseRef-Fedora-Public-Domain OR MIT

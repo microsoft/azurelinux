@@ -6,7 +6,7 @@
 Summary: File compression utility
 Name: bzip2
 Version: 1.0.8
-Release: 24%{?dist}
+Release: 21%{?dist}
 License: BSD-4-Clause
 URL: https://sourceware.org/bzip2
 #Source0: http://www.bzip.org/%{version}/%{name}-%{version}.tar.gz

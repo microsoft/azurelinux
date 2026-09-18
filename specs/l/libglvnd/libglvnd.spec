@@ -16,7 +16,7 @@
 
 Name:           libglvnd
 Version:        1.7.0
-Release: 11%{?dist}
+Release:        8%{?dist}
 # Provide an upgrade path from the negativo17.org pkgs which have Epoch 1
 Epoch:          1
 Summary:        The GL Vendor-Neutral Dispatch library

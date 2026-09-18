@@ -3,7 +3,7 @@
 
 Name:           brotli
 Version:        1.2.0
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Lossless compression algorithm
 
 License:        MIT

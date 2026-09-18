@@ -11,21 +11,19 @@
 #
 %bcond_without       tests
 
-%global gh_commit    1f4efdd7d3beafe9807b08156dfcb176d18f1699
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     mockery
 %global gh_project   mockery
 %global ns_project   Mockery
 %global major        1
 
 Name:           php-mockery
-Version:        1.6.12
-Release: 7%{?dist}
+Version:        1.6.15
+Release:        1%{?dist}
 Summary:        Mockery is a simple but flexible PHP mock object framework
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 # Use our autoloader
@@ -35,11 +33,11 @@ BuildArch:      noarch
 %if %{with tests}
 BuildRequires:  php(language) >= 7.3
 # From composer.json, "require-dev": {
-#        "phpunit/phpunit": "^8.5 || ^9.6.17",
-#        "symplify/easy-coding-standard": "^12.1.4"
+#        "phpunit/phpunit": "^9.6.36",
+#        "symplify/easy-coding-standard": "^13.2.17"
 %global phpunit %{_bindir}/phpunit9
-BuildRequires: phpunit9 >= 9.6.17
-BuildRequires: (php-composer(hamcrest/hamcrest-php) >= 2.0.1 with php-composer(hamcrest/hamcrest-php) < 3)
+BuildRequires: phpunit9 >= 9.6.36
+BuildRequires: (php-composer(hamcrest/hamcrest-php) >= 2.0.1 with php-composer(hamcrest/hamcrest-php) < 4)
 BuildRequires:  php-pdo
 # Autoloader
 %endif
@@ -47,10 +45,9 @@ BuildRequires:  php-fedora-autoloader-devel
 
 # From composer.json, "require": {
 #        "php": ">=7.3",
-#        "lib-pcre": ">=7.0",
-#        "hamcrest/hamcrest-php": "~2.0"
+#        "hamcrest/hamcrest-php": "^2.0 || ^3.0"
 Requires:       php(language) >= 7.3
-Requires:      (php-composer(hamcrest/hamcrest-php) >= 2.0.1 with php-composer(hamcrest/hamcrest-php) < 3)
+Requires:      (php-composer(hamcrest/hamcrest-php) >= 2.0.1 with php-composer(hamcrest/hamcrest-php) < 4)
 # From phpcompatinfo report for version 1.4.2
 Requires:       php-pcre
 Requires:       php-spl
@@ -70,7 +67,7 @@ Autoloader: %{_datadir}/php/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 mv library/*.php library/%{ns_project}/
 phpab --template fedora --output library/%{ns_project}/autoload.php library
@@ -78,7 +75,10 @@ phpab --template fedora --output library/%{ns_project}/autoload.php library
 cat << 'EOF' | tee -a library/%{ns_project}/autoload.php
 
 \Fedora\Autoloader\Dependencies::required([
-    '/usr/share/php/Hamcrest2/autoload.php',
+    [
+        '/usr/share/php/Hamcrest3/autoload.php',
+        '/usr/share/php/Hamcrest2/autoload.php',
+    ],
     __DIR__ . '/helpers.php',
 ]);
 EOF
@@ -99,18 +99,40 @@ cp -rp library/%{ns_project} %{buildroot}/%{_datadir}/php/%{ns_project}%{major}
 
 %check
 %if %{with tests}
-: Use installed tree and our autoloader
-export COMPOSER_VENDOR_DIR=%{buildroot}%{_datadir}/php/%{ns_project}%{major}
+mkdir vendor
+phpab --output vendor/classmap.php \
+  tests/Unit \
+  tests/Fixture/PHP73 \
+  tests/Fixture/PHP74 \
+  tests/Fixture/PHP80 \
+  tests/Fixture/PHP81 \
+  tests/Fixture/PHP82 \
+  tests/Fixture/PHP83 \
+  tests/Fixture/PHP84 \
+  tests/Fixture/PHP85 \
+  tests/Fixture/PHP86 \
+  tests/Fixture/Namespaced
 
-phpab --output tests/classmap.php --exclude */SemiReservedWordsAsMethods.php tests/Mockery tests/Fixture
+cat << 'EOF' | tee vendor/autoload.php
+<?php
+require_once "%{buildroot}/%{_datadir}/php/%{ns_project}%{major}/autoload.php";
+require_once __DIR__ . "/classmap.php";
+require_once __DIR__ . "/../tests/Bootstrap.php";
+EOF
 
 : Run upstream test suite
 ret=0
 
 # need investigation
-rm tests/Mockery/MockeryCanMockClassesWithSemiReservedWordsTest.php
+rm tests/Unit/Mockery/HamcrestExpectationTest.php
 
-for cmd in php php81 php82 php83; do
+# Simple ooutput
+sed -e '/testdox/d' phpunit.xml.dist >phpunit.xml
+
+# For PHP 8.6
+sed -e '/Deprecations/d' -i phpunit.xml
+
+for cmd in php php82 php83 php84 php85 php86; do
   if which $cmd; then
     $cmd %{_bindir}/phpunit9 \
       --no-coverage \
@@ -130,6 +152,10 @@ exit $ret
 
 
 %changelog
+* Tue Aug 25 2026 Remi Collet <remi@remirepo.net> - 1.6.15-1
+- update to 1.6.15
+- allow hamcrest/hamcrest-php 3.0
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.12-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

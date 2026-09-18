@@ -3,7 +3,7 @@
 
 Name:           libspectre
 Version:        0.2.12
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        A library for rendering PostScript(TM) documents
 
 License:        GPL-2.0-or-later

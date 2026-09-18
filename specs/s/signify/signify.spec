@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:     signify
-Version:  32
-Release: 7%{?dist}
+Version:  33
+Release:  1%{?dist}
 Summary:  Sign and verify signatures on files
 
 # signify itself is ISC but uses other source codes, breakdown:
@@ -14,7 +14,7 @@ Summary:  Sign and verify signatures on files
 #                                  {fe,sc}25519.[ch] ge25519{.h,_base.data}
 #                                  and mod_{ed,ge}25519.c
 License:  ISC AND Beerware AND BSD-3-Clause AND MIT AND LicenseRef-Fedora-Public-Domain
-URL:      https://github.com/aperezdc/%{name}
+URL:      https://codeberg.org/aperezdc/%{name}
 Source0:  %url/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Source1:  %url/releases/download/v%{version}/%{name}-%{version}.tar.xz.asc
 Source2:  https://keys.openpgp.org/vks/v1/by-fingerprint/5AA3BC334FD7E3369E7C77B291C559DBE4C9123B
@@ -52,6 +52,12 @@ make check
 %{_mandir}/man1/signify.*
 
 %changelog
+* Mon May 11 2026 Robert Scheck <robert@fedoraproject.org> - 33-1
+- Update to release v33 (#2469961)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 32-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 32-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

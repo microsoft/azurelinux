@@ -33,7 +33,7 @@ diff --git a/gdb/doc/gdb.texinfo b/gdb/doc/gdb.texinfo
  * Man Pages::                   Manual pages
  * Copying::                     GNU General Public License says
                                  how you can copy and share @value{GDBN}
-@@ -50988,6 +50989,111 @@ Show the current verbosity setting.
+@@ -50986,6 +50987,111 @@ Show the current verbosity setting.
  
  @end table
  

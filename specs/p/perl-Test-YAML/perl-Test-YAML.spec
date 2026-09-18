@@ -6,7 +6,7 @@
 
 Name:		perl-Test-YAML
 Version:	1.07
-Release: 25%{?dist}
+Release:	22%{?dist}
 Summary:	Testing Module for YAML Implementations
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-YAML

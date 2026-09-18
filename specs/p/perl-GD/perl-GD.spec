@@ -2,13 +2,14 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           perl-GD
-Version:        2.83
-Release: 8%{?dist}
+Version:        2.86
+Release:        1%{?dist}
 Summary:        Perl interface to the GD graphics library
 License:        GPL-1.0-or-later OR Artistic-2.0
 URL:            https://metacpan.org/release/GD
 Source0:        https://cpan.metacpan.org/modules/by-module/GD/GD-%{version}.tar.gz
 Patch1:         GD-2.77-cflags.patch
+Patch2:         GD-2.84-XPM.patch
 # Module Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -20,7 +21,7 @@ BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::Constant) >= 0.23
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(ExtUtils::PkgConfig)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Spec)
@@ -39,6 +40,7 @@ BuildRequires:  perl(vars)
 # Test Suite
 # Note: optional test requirement perl(Test::Fork) not currently available in Fedora
 BuildRequires:  perl(constant)
+BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::Dir)
 BuildRequires:  perl(lib)
@@ -63,18 +65,25 @@ create PNG images on the fly or modify existing files.
 # Upstream wants -Wformat=1 but we don't
 %patch -P 1
 
+# Don't disable XPM support if GD config doesn't explicitly require -lX11
+%patch -P 2
+
 # Fix shellbangs in sample scripts
 perl -pi -e 's|/usr/local/bin/perl\b|%{__perl}|' \
       demos/{*.{pl,cgi},truetype_test}
+chmod -c -x demos/png2jpeg.pl
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
-make
+perl Makefile.PL \
+      INSTALLDIRS=vendor \
+      NO_PACKLIST=1 \
+      NO_PERLLOCAL=1 \
+      OPTIMIZE="%{optflags}"
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -empty -delete
-find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} -c %{buildroot}
 
 %check
@@ -96,6 +105,36 @@ make test TEST_VERBOSE=1
 %{_mandir}/man3/GD::Simple.3*
 
 %changelog
+* Tue Jun  9 2026 Paul Howarth <paul@city-fan.org> - 2.86-1
+- Update to 2.86
+  - Fix command injection via 2-arg open() in _make_filehandle (CVE-2026-11526)
+
+* Tue Jun  2 2026 Paul Howarth <paul@city-fan.org> - 2.85-1
+- Update to 2.85
+  - Tolerate runtime TIFF decode failures in autodetect (GH#62)
+  - Replace cpm with cpanm in github actions
+  - Fixed a minor precedence bug in t/z_manifest.t
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.84-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan  5 2026 Paul Howarth <paul@city-fan.org> - 2.84-1
+- Update to 2.84
+  - Added Makefile.PL --with and --without options to bypass autodetection
+    errors or upstream libgd or subsequent library errors (GH#55)
+  - Better support MSWin32 without gdlib.pc (requires manual --options and
+    --lib_gd_path)
+  - Work around broken ExtUtils::PkgConfig->find (GH#61)
+  - Fixed snprintf for newer MSVC (>= VS 2015)
+  - Added GD::Image::supported() image types method
+  - Added newFromTiffData() method
+  - Fixed t/GD.t for unsupported image types
+  - Add GIFANIM to the default since 2.0.33 (GH#56)
+  - Honor PKG_CONFIG_PATH for finding gdlib.pc (GH#57)
+  - Add demos/png2jpeg.pl
+- Don't disable XPM support if GD config doesn't explicitly require -lX11
+- Use %%{make_build} and %%{make_install}
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.83-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -24,7 +24,7 @@ index dcbc12c..7361fbd 100644
 +# regardless of the specified action.
  
  system.nfs4_acl			permissions
- system.nfs4acl			permissions
+ system.posix_acl_access		permissions
 -- 
 2.20.1
 
@@ -50,12 +50,11 @@ diff --git a/xattr.conf b/xattr.conf
 index 7361fbd..1ac5b2f 100644
 --- a/xattr.conf
 +++ b/xattr.conf
-@@ -11,8 +11,6 @@
+@@ -11,7 +11,6 @@
  # skip all extended attributes that are matched by any of the below patterns,
  # regardless of the specified action.
  
 -system.nfs4_acl			permissions
--system.nfs4acl			permissions
  system.posix_acl_access		permissions
  system.posix_acl_default	permissions
  trusted.SGI_ACL_DEFAULT		skip		# xfs specific

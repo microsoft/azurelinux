@@ -1,0 +1,19 @@
+--- uu_split-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_split-0.7.0/Cargo.toml	2026-03-16T19:03:37.239625+00:00
+@@ -73,16 +73,11 @@
+ ]
+ package = "uucore"
+ 
+-[dev-dependencies.divan]
+-version = "4.0.5"
+-package = "codspeed-divan-compat"
+-
+ [dev-dependencies.tempfile]
+ version = "3.15.0"
+ 
+ [dev-dependencies.uucore]
+ version = "0.7.0"
+-features = ["benchmark"]
+ package = "uucore"
+ 
+ [lints.clippy]

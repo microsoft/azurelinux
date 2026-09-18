@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        20.11.0
-Release: 18%{?dist}
+Release:        15%{?dist}
 Summary:        Operations with ISO 8601 durations
 
 License:        ISC

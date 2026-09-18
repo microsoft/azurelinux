@@ -6,7 +6,7 @@
 
 Name:           koji-flatpak
 Version:        %{project_version}
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Koji plugins for building Flatpaks
 
 License:        LGPL-2.1-only

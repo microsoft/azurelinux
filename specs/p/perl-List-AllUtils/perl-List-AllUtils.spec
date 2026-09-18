@@ -3,7 +3,7 @@
 
 Name:           perl-List-AllUtils
 Version:        0.19
-Release: 18%{?dist}
+Release:        15%{?dist}
 Summary:        Combines List::Util and List::SomeUtils
 # CODE_OF_CONDUCT.md:   CC-BY-4.0
 # lib/List/AllUtils.pm: Artistic-2.0

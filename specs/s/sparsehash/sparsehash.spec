@@ -7,7 +7,7 @@
 
 Name:           sparsehash
 Version:        2.0.3
-Release: 18%{?dist}
+Release:        15%{?dist}
 Summary:        Extremely memory-efficient C++ hash_map implementation
 
 # Automatically converted from old format: BSD - review is highly recommended.

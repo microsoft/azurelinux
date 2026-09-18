@@ -3,7 +3,7 @@
 
 Name:           devscripts
 Version:        2.25.33
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Scripts for Debian Package maintainers
 BuildArch:      noarch
 

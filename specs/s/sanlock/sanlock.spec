@@ -3,7 +3,7 @@
 
 Name:           sanlock
 Version:        3.9.5
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        A shared storage lock manager
 License:	GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:            https://pagure.io/sanlock/

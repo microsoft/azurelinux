@@ -1,18 +1,28 @@
---- sequoia-policy-config-0.8.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ sequoia-policy-config-0.8.1/Cargo.toml	2025-11-18T14:38:34.380555+00:00
-@@ -75,11 +75,8 @@
+--- sequoia-policy-config-0.8.2/Cargo.toml	2006-07-24T01:21:28+00:00
++++ sequoia-policy-config-0.8.2/Cargo.toml	2026-07-03T10:21:29.794538+00:00
+@@ -50,6 +50,10 @@
+ name = "check"
+ path = "tests/check.rs"
+ 
++[features]
++crypto-nettle = ["sequoia-openpgp/crypto-nettle"]
++crypto-openssl = ["sequoia-openpgp/crypto-openssl"]
++
+ [dependencies.anyhow]
+ version = "1.0.18"
+ 
+@@ -76,14 +80,6 @@
  version = "1"
  default-features = false
  
 -[target."cfg(not(windows))".dev-dependencies.sequoia-openpgp]
--version = "2"
+-version = "2.4.0"
 -features = [
 -    "crypto-nettle",
 -    "__implicit-crypto-backend-for-tests",
 -]
 -default-features = false
-+[features]
-+crypto-nettle = ["sequoia-openpgp/crypto-nettle"]
-+crypto-openssl = ["sequoia-openpgp/crypto-openssl"]
-+crypto-rust = ["sequoia-openpgp/crypto-rust"]
- 
+-
+ [lints.clippy.complexity]
+ level = "allow"
+ priority = -1

@@ -13,11 +13,8 @@
 %bcond_without       tests
 
 # Sources
-%global gh_commit    bb64d08145b021b67d5f253308a498b73ab0461e
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   environment
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -28,14 +25,14 @@
 %global ns_project   Environment
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        9.0.0
-Release: 5%{?dist}
+Version:        9.3.2
+Release:        1%{?dist}
 Summary:        Handle HHVM/PHP environments, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 
@@ -46,8 +43,8 @@ BuildRequires:  php-posix
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^13.0"
-BuildRequires:  phpunit13
+#        "phpunit/phpunit": "^13.1.11"
+BuildRequires:  phpunit13 >= 13.1.11
 %endif
 
 # from composer.json, "require": {
@@ -71,7 +68,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -90,7 +87,7 @@ cp -pr src %{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}
 %if %{with tests}
 %check
 mkdir vendor
-touch vendor/autoload.php
+ln -s %{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php vendor/autoload.php
 
 : Run tests
 ret=0
@@ -113,6 +110,24 @@ exit $ret
 
 
 %changelog
+* Tue May 26 2026 Remi Collet <remi@remirepo.net> - 9.3.2-1
+- update to 9.3.2
+
+* Thu May 21 2026 Remi Collet <remi@remirepo.net> - 9.3.1-1
+- update to 9.3.1
+
+* Wed Apr 15 2026 Remi Collet <remi@remirepo.net> - 9.3.0-1
+- update to 9.3.0
+
+* Mon Apr  6 2026 Remi Collet <remi@remirepo.net> - 9.2.0-1
+- update to 9.2.0
+
+* Mon Mar 23 2026 Remi Collet <remi@remirepo.net> - 9.1.0-1
+- update to 9.1.0
+
+* Tue Mar 17 2026 Remi Collet <remi@remirepo.net> - 9.0.1-1
+- update to 9.0.1
+
 * Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 9.0.0-2
 - enable test suite
 

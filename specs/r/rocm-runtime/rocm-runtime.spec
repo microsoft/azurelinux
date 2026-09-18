@@ -32,7 +32,7 @@
 
 Name:       %{runtime_name}
 Version:    %{rocm_version}
-Release: 6%{?dist}
+Release:    3%{?dist}
 Summary:    ROCm Runtime Library
 
 License:    NCSA

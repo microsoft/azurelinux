@@ -3,8 +3,8 @@
 
 Summary: X.Org X11 libXfont2 runtime library
 Name: libXfont2
-Version: 2.0.7
-Release: 6%{?dist}
+Version: 2.0.9
+Release: 1%{?dist}
 License: BSD-2-Clause AND BSD-4-Clause-UC AND HPND-sell-variant AND MIT-open-group AND SMLNJ AND X11
 URL: http://www.x.org
 
@@ -35,7 +35,7 @@ X.Org X11 libXfont development package
 %build
 autoreconf -v --install --force
 export CFLAGS="$RPM_OPT_FLAGS -Os"
-%configure --disable-static
+%configure --disable-static --disable-fc
 make %{?_smp_mflags}  
 
 %install
@@ -58,6 +58,22 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/pkgconfig/xfont2.pc
 
 %changelog
+* Wed Aug 05 2026 Peter Hutterer <peter.hutterer@redhat.com> - 2.0.9-1
+- libXfont2 2.0.9 (CVE-2026-59679, CVE-2026-44950)
+
+* Thu Jul 23 2026 Peter Hutterer <peter.hutterer@redhat.com> - 2.0.8-3
+- Disable X fontserver support. Deprecated for decades and this rules out a set
+  of potential vulnerabilities.
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jul 08 2026 Peter Hutterer <peter.hutterer@redhat.com> - 2.0.8-1
+- libXfont2 2.0.8 (CVE-2026-56001, CVE-2026-56002, CVE-2026-56003)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

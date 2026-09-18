@@ -18,7 +18,7 @@
 Name:           ghc-%{pkg_name}
 Version:        5.3.9
 # can only be reset when all subpkgs bumped
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        HTTP/2 library
 
 License:        BSD-3-Clause

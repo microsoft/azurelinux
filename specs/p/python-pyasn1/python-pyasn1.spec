@@ -2,11 +2,11 @@
 # Do not edit manually; changes may be overwritten.
 
 %global module pyasn1
-%global modules_version 0.4.1
+%global modules_version 0.4.2
 
 Name:           python-pyasn1
-Version:        0.6.2
-Release: 4%{?dist}
+Version:        0.6.4
+Release:        1%{?dist}
 Summary:        ASN.1 tools for Python
 License:        BSD-2-Clause
 Source0:        https://github.com/pyasn1/pyasn1/archive/v%{version}.tar.gz
@@ -54,7 +54,7 @@ BuildRequires:  python3-sphinx
 %build
 %pyproject_wheel
 
-pushd ../pyasn1-modules-%{modules_version}
+pushd ../pyasn1_modules-%{modules_version}
 %pyproject_wheel
 popd
 
@@ -86,6 +86,12 @@ popd
 %doc docs/build/html/*
 
 %changelog
+* Thu Jul 16 2026 Simon Pichugin <spichugi@redhat.com> - 0.6.4-1
+- Update to 0.6.4
+- Fixed quadratic complexity in OID/RELATIVE-OID decoders (CVE-2026-59885)
+- Limited BER/CER/DER long-form tag IDs to 20 octets (CVE-2026-59884)
+- Fixed excessive resource use in Real.__float__() (CVE-2026-59886)
+
 * Thu Feb 05 2026 Simon Pichugin <spichugi@redhat.com> - 0.6.2-1
 - Update to 0.6.2
 - Fixed continuation octet limits in OID/RELATIVE-OID decoder (CVE-2026-23490)

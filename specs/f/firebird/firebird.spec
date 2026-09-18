@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global         upversion 4.0.6.3221
+%global         upversion 4.0.7.3271
 %global         pkgversion Firebird-%{upversion}-0
 
 %global         major 4.0
@@ -13,14 +13,14 @@
 
 Name:           firebird
 Version:        %{upversion}
-Release: 4%{?dist}
+Release:        1%{?dist}
 
 Summary:        SQL relational database management system
 # Automatically converted from old format: Interbase - review is highly recommended.
 License:        Interbase-1.0
 URL:            http://www.firebirdsql.org/
 
-Source0:        https://github.com/FirebirdSQL/firebird/releases/download/v4.0.6/%{pkgversion}.tar.xz
+Source0:        https://github.com/FirebirdSQL/firebird/releases/download/v4.0.7/%{pkgversion}.tar.xz
 Source1:        firebird-logrotate
 Source2:        README.Fedora
 Source3:        firebird.service
@@ -379,6 +379,9 @@ fi
 
 
 %changelog
+* Fri Apr 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 4.0.7.3271-1
+- 4.0.7.3271
+
 * Thu Sep 25 2025 Gwyn Ciesla <gwync@protonmail.com> - 4.0.6.3221-1
 - 4.0.6.3221
 

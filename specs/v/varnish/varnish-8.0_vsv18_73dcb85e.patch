@@ -1,0 +1,258 @@
+Based on upstream commit 73dcb85eb8ad9fa9b462c5477d8c4b5061f615de 
+
+commit 73dcb85eb8ad9fa9b462c5477d8c4b5061f615de
+Author: Nils Goroll <nils.goroll@uplex.de>
+Date:   Tue Feb 3 09:15:02 2026 +0100
+
+    Fix http/1.1 "absolute form" dissection edge case
+    
+    RFC9110 4.2.3:
+    
+            When not being used as the target of an OPTIONS request, an empty path
+            component is equivalent to an absolute path of "/", so the normal form
+            is to provide a path of "/" instead.
+    
+    7.7:
+    
+            For example, a proxy forwarding a request to an origin server via
+            HTTP/1.1 will replace an empty path with "/" (Section 3.2.1 of
+            [HTTP/1.1]) or "*" (Section 3.2.4 of [HTTP/1.1]), depending on the
+            request method.
+    
+            (Pointed out by Dridi)
+    
+    Fixes VSV18
+    
+    Conflicts:
+            both modified: doc/changes.rst
+    
+    Edits:
+            cache_http1_proto.c: WKM does not exist yet in 8.0
+
+
+commit 5c016b070e1994fd8a430b45dac7dc3ee63f04d7
+Author: Nils Goroll <nils.goroll@uplex.de>
+Date:   Wed Mar 4 09:46:28 2026 +0100
+
+    Fix http/1.1 "absolute form" empty host handling
+    
+    RFC9110 4.2.1:
+    
+            A sender MUST NOT generate an "http" URI with an empty host identifier.
+            A recipient that processes such a URI reference MUST reject it as
+            invalid.
+    
+    4.2.2:
+    
+            A sender MUST NOT generate an "https" URI with an empty host identifier.
+            A recipient that processes such a URI reference MUST reject it as
+            invalid.
+    
+    Pointed out by Walid
+    
+    Related to VSV18
+    
+    Conflicts:
+            both modified:   doc/changes.rst
+
+
+diff --git a/bin/varnishd/http1/cache_http1_proto.c b/bin/varnishd/http1/cache_http1_proto.c
+index 1441b1d91..c710c6da5 100644
+--- a/bin/varnishd/http1/cache_http1_proto.c
++++ b/bin/varnishd/http1/cache_http1_proto.c
+@@ -375,10 +375,16 @@ HTTP1_DissectRequest(struct http_conn *htc, struct http *hp)
+ 		b = hp->hd[HTTP_HDR_URL].b + 8;
+ 	if (b) {
+ 		e = strchr(b, '/');
+-		if (e) {
+-			http_Unset(hp, H_Host);
+-			http_PrintfHeader(hp, "Host: %.*s", (int)(e - b), b);
+-			hp->hd[HTTP_HDR_URL].b = e;
++		if (e == NULL)
++			e = hp->hd[HTTP_HDR_URL].e;
++		http_Unset(hp, H_Host);
++		http_PrintfHeader(hp, "Host: %.*s", (int)(e - b), b);
++		hp->hd[HTTP_HDR_URL].b = e;
++		if (Tlen(hp->hd[HTTP_HDR_URL]) == 0) {
++			if (http_method_eq(http_GetMethod(hp), OPTIONS))
++				hp->hd[HTTP_HDR_URL] = Tstr("*");
++			else
++				hp->hd[HTTP_HDR_URL] = Tstr("/");
+ 		}
+ 	}
+ 
+diff -u a/bin/varnishtest/tests/r01255.vtc b/bin/varnishtest/tests/r01255.vtc
+--- a/bin/varnishtest/tests/r01255.vtc	2025-07-28 13:50:43.000000000 +0200
++++ b/bin/varnishtest/tests/r01255.vtc	2026-06-16 11:00:29.689109716 +0200
+@@ -1,19 +1,167 @@
+-varnishtest "Test RFC2616 5.2 compliance"
++varnishtest "Test RFC9112 3.2 compliance"
+ 
+-server s1 {
++server s1 -repeat 8 {
+ 	rxreq
+ 	txresp -hdr "Foo: 1"
+ } -start
+ 
+-varnish v1 -vcl+backend {
++varnish v1 -arg "-p vsl_mask=+ReqTarget" -vcl+backend {
++	sub vcl_req_method {
++		if (req.method == "CONNECT") {
++			return (pass);
++		}
++	}
+ 
+ 	sub vcl_deliver {
+ 		set resp.http.rxhost = req.http.host;
++		set resp.http.url = req.url;
+ 	}
+ } -start
+ 
++logexpect l1001 -v v1 -g vxid -q "vxid == 1001" {
++	fail add *	ReqURL
++	fail add *	End
++	expect 3 *	ReqTarget {^\Qhttp://www.example.com/bar\E$}
++	expect 0 =	ReqUnset  {^\Qhost: another\E$}
++	expect 0 =	ReqHeader {^\QHost: www.example.com\E$}
++        fail clear
++} -start
++
++logexpect l1003 -v v1 -g vxid -q "vxid == 1003" {
++	fail add *	ReqURL
++	fail add *	End
++	expect 3 *	ReqTarget {^\Qhttp://www.example.com/\E$}
++	expect 0 =	ReqUnset  {^\Qhost: another\E$}
++	expect 0 =	ReqHeader {^\QHost: www.example.com\E$}
++        fail clear
++} -start
++
++logexpect l1005 -v v1 -g vxid -q "vxid == 1005" {
++	fail add *	ReqURL
++	fail add *	End
++	expect 3 *	ReqTarget {^\Qhttp://www.example.com\E$}
++	expect 0 =	ReqUnset  {^\Qhost: another\E$}
++	expect 0 =	ReqHeader {^\QHost: www.example.com\E$}
++        fail clear
++} -start
++
++logexpect l1006 -v v1 -g vxid -q "vxid == 1006" {
++	fail add *	ReqURL
++	fail add *	End
++	expect 3 *	ReqTarget {^\Qhttp://www.example.com\E$}
++	expect 0 =	ReqUnset  {^\Qhost: another\E$}
++	expect 0 =	ReqHeader {^\QHost: www.example.com\E$}
++        fail clear
++	fail add *	End
++	expect 3 =	ReqMethod {^OPTIONS$}
++	expect 0 =	ReqURL {^\Q*\E$}
++        fail clear
++} -start
++
++logexpect l1008 -v v1 -g vxid -q "vxid == 1008" {
++	fail add *	End
++	expect 3 *	ReqTarget {^\Qexample.com:80\E$}
++	expect 2 =	ReqMethod {^CONNECT$}
++	expect 0 =	ReqURL {^\Qexample.com:80\E$}
++        fail clear
++} -start
++
++logexpect l1010 -v v1 -g vxid -q "vxid == 1010" {
++	fail add *	End
++	expect 3 *	ReqTarget {^\Q*\E$}
++	expect 2 =	ReqMethod {^OPTIONS$}
++	expect 0 =	ReqURL {^\Q*\E$}
++        fail clear
++} -start
++
+ client c1 {
+-	txreq -url http://www.example.com/bar
++	# 1001
++	txreq -url http://www.example.com/bar -hdr "host: another"
++	rxresp
++	expect resp.status == 200
++	expect resp.http.Foo == 1
++	expect resp.http.rxhost == www.example.com
++	expect resp.http.url == /bar
++
++	# 1003
++	txreq -url http://www.example.com/ -hdr "host: another"
++	rxresp
++	expect resp.status == 200
++	expect resp.http.Foo == 1
++	expect resp.http.rxhost == www.example.com
++	expect resp.http.url == /
++
++	# 1005
++	txreq -url http://www.example.com -hdr "host: another"
++	rxresp
++	expect resp.status == 200
++	expect resp.http.Foo == 1
++	expect resp.http.rxhost == www.example.com
++	expect resp.http.url == /
++
++	# 1006
++	txreq -method OPTIONS -url http://www.example.com -hdr "host: another"
++	rxresp
++	expect resp.status == 200
++	expect resp.http.Foo == 1
++	expect resp.http.rxhost == www.example.com
++	expect resp.http.url == *
++
++	# 1008
++	# we do not actually handle CONNECT here
++	txreq -req CONNECT -url example.com:80 -hdr "host: another"
++	rxresp
++	expect resp.status == 200
++	expect resp.http.Foo == 1
++	expect resp.http.rxhost == "another"
++	expect resp.http.url == "example.com:80"
++
++	# 1010
++	txreq -req OPTIONS -url "*" -hdr "host: another"
++	rxresp
++	expect resp.status == 200
++	expect resp.http.Foo == 1
++	expect resp.http.rxhost == "another"
++	expect resp.http.url == "*"
++
++	# https, otherwise like 1005
++	txreq -url https://www.example.com -hdr "host: another"
++	rxresp
++	expect resp.status == 200
++	expect resp.http.Foo == 1
++	expect resp.http.rxhost == www.example.com
++	expect resp.http.url == /
++
++	#
++	txreq -url https://www.example.com?/foo -hdr "host: another"
+ 	rxresp
++	expect resp.status == 200
++	expect resp.http.Foo == 1
+ 	expect resp.http.rxhost == www.example.com
++	expect resp.http.url == /?/foo
++
++	txreq -url http:///bar -hdr "host: another"
++	rxresp
++	expect resp.status == 400
++} -run
++
++client c2 {
++	txreq -url http:// -hdr "host: another"
++	rxresp
++	expect resp.status == 400
+ } -run
++
++client c3 {
++	txreq -method OPTIONS -url http:// -hdr "host: another"
++	rxresp
++	expect resp.status == 400
++} -run
++
++varnish v1 -expect MAIN.http1_absolute_form == 9
++
++logexpect l1001 -wait
++logexpect l1003 -wait
++logexpect l1005 -wait
++logexpect l1006 -wait
++logexpect l1008 -wait
++logexpect l1010 -wait

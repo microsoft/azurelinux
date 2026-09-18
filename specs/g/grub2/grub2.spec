@@ -22,7 +22,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release: 48%{?dist}
+Release:	43%{?dist}
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/
@@ -603,11 +603,27 @@ fi
 %endif
 
 %changelog
+* Wed Apr 08 2026 Leo Sandoval <lsandova@redhat.com> - 2.12-43
+- Revert 'verifiers: Allocate EFI pages instead of grub_malloc for verified buffer'
+- Resolves: #2453022
+- Resolves: #2451630
+- Resolves: #2450672
+- Related: #2427945
+- Related: #2263643
+
+* Fri Mar 20 2026 Peter Jones <pjones@redhat.com> - 2.12-42
+- Kick off another build to test nirik's work on the builders.
+
+* Thu Mar 19 2026 Josue Hernandez <josherna@redhat.com> - 2.12-41
+- verifiers: Allocate EFI pages instead of grub_malloc for verified buffer
+- Resolves: #2427945
+- Resolves: #2263643
+
 * Wed Aug 6 2025 Jan Stancek <jstancek@redhat.com> - 2.12-40
 - 55-set-boot-entry.install: fix initrd check
 - Resolves: #2386118
 
-* Tue Jul 15 2025 FeRD (Frank Dana) <ferdnyc@gmail.com> - 2.12-39
+* Fri Aug 01 2025 FeRD (Frank Dana) <ferdnyc@gmail.com> - 2.12-39
 - kernel-install: Suppress warnings about missing /etc/default/grub
   file when attempting to grep its contents
 

@@ -1,0 +1,68 @@
+From 2ea0233c2a547e062206b2e1d3cc6ad067eba85c Mon Sep 17 00:00:00 2001
+From: Joakim Tjernlund <joakim.tjernlund@nokia.com>
+Date: Fri, 10 Oct 2025 14:36:08 +0000
+Subject: [PATCH] daemon: fix crash when monitor changes during notification
+
+When monitors change during network events, suspend/resume, or hotplug,
+the daemon could use an invalid monitor index to look up the
+notification stack, causing a segfault.
+
+Validate the monitor index before use, and pass it directly when
+creating stacks instead of re-querying.
+
+Fixes #257
+---
+ src/daemon/daemon.c | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
+
+diff --git a/src/daemon/daemon.c b/src/daemon/daemon.c
+index 473a598..4ff9ea9 100644
+--- a/src/daemon/daemon.c
++++ b/src/daemon/daemon.c
+@@ -367,11 +367,11 @@ _gtk_get_monitor_num (GdkMonitor *monitor)
+ 	return -1;
+ }
+ 
+-static void create_stack_for_monitor(NotifyDaemon* daemon, GdkScreen* screen, GdkMonitor *monitor_num)
++static void create_stack_for_monitor(NotifyDaemon* daemon, GdkScreen* screen, GdkMonitor *monitor_num, int num)
+ {
+ 	NotifyScreen* nscreen = daemon->screen;
+ 
+-	nscreen->stacks[_gtk_get_monitor_num(monitor_num)] = notify_stack_new(daemon, screen, monitor_num, daemon->stack_location);
++	nscreen->stacks[num] = notify_stack_new(daemon, screen, monitor_num, daemon->stack_location);
+ }
+ 
+ static void on_screen_monitors_changed(GdkScreen* screen, NotifyDaemon* daemon)
+@@ -461,7 +461,7 @@ static void create_stacks_for_screen(NotifyDaemon* daemon, GdkScreen *screen)
+ 
+ 	for (i = 0; i < nscreen->n_stacks; i++)
+ 	{
+-		create_stack_for_monitor(daemon, screen, gdk_display_get_monitor (display, i));
++		create_stack_for_monitor(daemon, screen, gdk_display_get_monitor (display, i), i);
+ 	}
+ }
+ 
+@@ -1840,17 +1840,10 @@ static gboolean notify_daemon_notify_handler(NotifyDaemonNotifications *object,
+ 			monitor_id = gdk_display_get_monitor (gdk_display_get_default(), (int) daemon->screen->n_stacks - 1);
+ 		}
+ 
+-		if (monitor_id != NULL && _gtk_get_monitor_num (monitor_id) >= daemon->screen->n_stacks)
++		int mon_num = monitor_id != NULL ? _gtk_get_monitor_num (monitor_id) : -1;
++		if (mon_num >= 0 && mon_num < (int) daemon->screen->n_stacks)
+ 		{
+-			/* screw it - dump it on the last one we'll get
+-			 a monitors-changed signal soon enough*/
+-			monitor_id = gdk_display_get_monitor (gdk_display_get_default(), (int) daemon->screen->n_stacks - 1);
+-		}
+-
+-		/* If we still don't have a valid monitor, something is seriously wrong */
+-		if (monitor_id != NULL && daemon->screen->n_stacks > 0)
+-		{
+-			notify_stack_add_window (daemon->screen->stacks[_gtk_get_monitor_num (monitor_id)], nw, new_notification);
++			notify_stack_add_window (daemon->screen->stacks[mon_num], nw, new_notification);
+ 		}
+ 	}
+ 
+-- 
+2.54.0
+

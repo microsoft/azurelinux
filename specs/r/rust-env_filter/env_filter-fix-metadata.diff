@@ -1,0 +1,11 @@
+--- env_filter-1.0.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ env_filter-1.0.1/Cargo.toml	2026-03-25T16:25:09.563842+00:00
+@@ -94,7 +94,7 @@
+ features = ["std"]
+ 
+ [dependencies.regex]
+-version = "1.12.3"
++version = "1.12.2"
+ features = [
+     "std",
+     "perf",

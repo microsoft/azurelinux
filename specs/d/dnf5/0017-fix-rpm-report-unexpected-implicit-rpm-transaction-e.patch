@@ -1,0 +1,102 @@
+From 6fd585e55254bd7126d906a794a1f41fc510d488 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Mon, 25 May 2026 09:48:06 +0000
+Subject: [PATCH] fix(rpm): report unexpected implicit rpm transaction elements
+ instead of crashing
+
+Upstream commit: 96bf15bd7f7a2640d26ffa8fd6df8d3d3210dc16
+
+Workaround for https://github.com/rpm-software-management/rpm/issues/2837
+
+When the rpmdb contains duplicate versions of the same package across
+architectures (e.g. after an interrupted transaction), librpm's
+addSelfErasures() erases all installed packages with the same name
+during an upgrade. For packages with no ELF content (HEADERCOLOR == 0,
+such as -devel subpackages), librpm's skipColor() cannot distinguish
+architectures and erases cross-arch versions too. If the solver only
+planned to upgrade one architecture, the implicit erasures of the other
+have no matching REPLACED item, leaving them in implicit_ts_elements.
+This caused an assertion failure (SIGABRT) in Transaction::fill().
+
+Instead of crashing, report a clear error message listing the packages
+that would be unexpectedly removed and instruct the user to remove the
+duplicates before retrying.
+
+Fixes: https://github.com/rpm-software-management/dnf5/issues/518
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+Petr Pisar: Ported to 5.2.18.0
+---
+ libdnf5/base/transaction.cpp |  7 ++++++-
+ libdnf5/rpm/transaction.cpp  | 29 ++++++++++++++++++++++++++++-
+ 2 files changed, 34 insertions(+), 2 deletions(-)
+
+diff --git a/libdnf5/base/transaction.cpp b/libdnf5/base/transaction.cpp
+index fc7b2cb..4b56593 100644
+--- a/libdnf5/base/transaction.cpp
++++ b/libdnf5/base/transaction.cpp
+@@ -956,7 +956,12 @@ Transaction::TransactionRunResult Transaction::Impl::_run(
+ 
+     // fill and check the rpm transaction
+     libdnf5::rpm::Transaction rpm_transaction(base);
+-    rpm_transaction.fill(*transaction);
++    try {
++        rpm_transaction.fill(*transaction);
++    } catch (const rpm::TransactionError & e) {
++        transaction_problems.emplace_back(e.what());
++        return TransactionRunResult::ERROR_CHECK;
++    }
+     if (!rpm_transaction.check()) {
+         for (auto it : rpm_transaction.get_problems()) {
+             transaction_problems.emplace_back(it.to_string());
+diff --git a/libdnf5/rpm/transaction.cpp b/libdnf5/rpm/transaction.cpp
+index b4322e4..619de89 100644
+--- a/libdnf5/rpm/transaction.cpp
++++ b/libdnf5/rpm/transaction.cpp
+@@ -21,6 +21,7 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+ #include "transaction.hpp"
+ 
+ #include "conf/config.h"
++#include "utils/string.hpp"
+ 
+ #include "libdnf5/base/transaction.hpp"
+ #include "libdnf5/common/exception.hpp"
+@@ -192,7 +193,33 @@ void Transaction::fill(const base::Transaction & transaction) {
+                 break;
+         }
+     }
+-    libdnf_assert(implicit_ts_elements.empty(), "The rpm transaction contains more elements than requested");
++    if (!implicit_ts_elements.empty()) {
++        // Workaround for https://github.com/rpm-software-management/rpm/issues/2837
++        //
++        // librpm can implicitly add elements to the transaction that the
++        // solver did not plan (e.g. cross-arch erasures of packages with
++        // HEADERCOLOR == 0 during an upgrade). This typically happens when
++        // the rpmdb contains duplicate package versions across architectures
++        // after an interrupted transaction.
++        auto & logger = *base->get_logger();
++        std::vector<std::string> nevras;
++        for (const auto & [rpmdb_id, te] : implicit_ts_elements) {
++            auto nevra = fmt::format(
++                "{}-{}:{}-{}.{}", rpmteN(te), rpmteE(te) ? rpmteE(te) : "0", rpmteV(te), rpmteR(te), rpmteA(te));
++            logger.warning(
++                "Unexpected implicit rpm transaction element: {} type {} rpmdb id {}",
++                nevra,
++                static_cast<int>(rpmteType(te)),
++                rpmdb_id);
++            nevras.push_back(std::move(nevra));
++        }
++
++        throw TransactionError(
++            M_("The rpm transaction would unexpectedly remove packages not planned by the solver: {}. "
++               "This typically happens when the rpmdb contains duplicate package versions after an "
++               "interrupted upgrade. Please remove the duplicate packages using \"dnf remove\" and retry."),
++            libdnf5::utils::string::join(nevras, ", "));
++    }
+ 
+     // generate ordering for the rpm transaction
+     if (rpmtsOrder(ts)) {
+-- 
+2.55.0
+

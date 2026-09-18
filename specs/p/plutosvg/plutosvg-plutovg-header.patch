@@ -1,6 +1,6 @@
-diff -Naur plutosvg-0.0.6.old/source/plutosvg.h plutosvg-0.0.6/source/plutosvg.h
---- plutosvg-0.0.6.old/source/plutosvg.h	2025-03-17 11:52:39.696901595 +0100
-+++ plutosvg-0.0.6/source/plutosvg.h	2025-03-17 11:52:58.154640107 +0100
+diff -Naur plutosvg-0.0.8.old/source/plutosvg.h plutosvg-0.0.8/source/plutosvg.h
+--- plutosvg-0.0.8.old/source/plutosvg.h	2026-05-20 13:20:17.960599064 +0200
++++ plutosvg-0.0.8/source/plutosvg.h	2026-05-20 13:20:31.371860365 +0200
 @@ -23,7 +23,7 @@
  #ifndef PLUTOSVG_H
  #define PLUTOSVG_H
@@ -8,5 +8,5 @@ diff -Naur plutosvg-0.0.6.old/source/plutosvg.h plutosvg-0.0.6/source/plutosvg.h
 -#include <plutovg.h>
 +#include <plutovg/plutovg.h>
  
- #if !defined(PLUTOSVG_BUILD_STATIC) && (defined(_WIN32) || defined(__CYGWIN__))
- #define PLUTOSVG_EXPORT __declspec(dllexport)
+ #if defined(PLUTOSVG_BUILD_STATIC)
+ #define PLUTOSVG_EXPORT

@@ -6,7 +6,7 @@
 Summary: Utilities for working with md5sum implanted in ISO images
 Name:    isomd5sum
 Version: 1.2.5
-Release: 8%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 License: GPL-2.0-or-later
 

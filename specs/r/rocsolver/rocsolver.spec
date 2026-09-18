@@ -75,7 +75,7 @@
 
 Name:           %{rocsolver_name}
 Version:        %{rocm_version}
-Release: 5%{?dist}
+Release:        1%{?dist}
 Summary:        Next generation LAPACK implementation for ROCm platform
 Url:            https://github.com/ROCm/rocSOLVER
 

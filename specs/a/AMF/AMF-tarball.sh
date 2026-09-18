@@ -8,7 +8,7 @@ fi
 VERSION=$1
 NAME=AMF
 
-wget -q -c https://github.com/GPUOpen-LibrariesAndSDKs/AMF/archive/v$VERSION/$NAME-$VERSION.tar.gz
+wget -c https://github.com/GPUOpen-LibrariesAndSDKs/AMF/archive/v$VERSION/$NAME-$VERSION.tar.gz
 
 tar -xzf $NAME-$VERSION.tar.gz
 rm -f $NAME-$VERSION.tar.gz

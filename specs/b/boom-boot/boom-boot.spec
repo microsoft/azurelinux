@@ -6,12 +6,13 @@
 
 Name:		boom-boot
 Version:	1.6.8
-Release: 5%{?dist}
+Release:	3%{?dist}
 Summary:	%{summary}
 
 License:	Apache-2.0
 URL:		https://github.com/snapshotmanager/boom-boot
 Source0:	%{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:		0001-mounts-_parse_mount_unit-does-not-understand-hex-esc.patch
 
 BuildArch:	noarch
 
@@ -164,6 +165,10 @@ pytest-3 --log-level=debug -v
 
 
 %changelog
+* Mon May 11 2026 Bryn M. Reeves <bmr@redhat.com> - 1.6.8-3
+- Fix _parse_mount_unit() does not understand hex escapes or NFS/CIFS
+Resolves: bz#2469064
+
 * Fri Oct 31 2025 Bryn M. Reeves <bmr@redhat.com> - 1.6.8-2
 - Update tmt configuration to be version agnostic
 - Update to release 1.6.8.

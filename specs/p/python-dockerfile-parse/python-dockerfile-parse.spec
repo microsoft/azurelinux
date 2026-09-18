@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        2.0.1
-Release: 14%{?dist}
+Release:        11%{?dist}
 
 Summary:        Python library for Dockerfile manipulation
 # Automatically converted from old format: BSD - review is highly recommended.

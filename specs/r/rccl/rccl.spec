@@ -52,7 +52,7 @@
 
 Name:           %{rccl_name}
 Version:        %{rocm_version}
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        ROCm Communication Collectives Library
 
 Url:            https://github.com/ROCm/rccl

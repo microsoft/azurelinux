@@ -1,0 +1,38 @@
+From b325d5d82440126d0d59e608544bb284cc0ae399 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 28 Aug 2025 18:35:56 +0200
+Subject: [PATCH 3/5] igvm_c/Makefile: fix installation with empty destdir
+ (#97)
+
+"cargo cinstall" does not want --destdir to be empty:
+
+CARGO_TARGET_DIR=/workspace/igvm/igvm_c/../target_c cargo cinstall
+--destdir "" --prefix "/usr" --features "igvm-c"
+--manifest-path=/workspace/igvm/igvm_c/../igvm/Cargo.toml
+error: a value is required for '--destdir <DESTDIR>' but none was
+supplied
+
+So, leave it out completely if it is.
+
+Fixes: #96
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ igvm_c/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/igvm_c/Makefile b/igvm_c/Makefile
+index 1796e07..7f08c99 100644
+--- a/igvm_c/Makefile
++++ b/igvm_c/Makefile
+@@ -73,6 +73,6 @@ clean:
+ install: build
+ 	mkdir -p $(DESTDIR)/$(PREFIX)/include/igvm
+ 	install -m 644 $(IGVM_DIR)/igvm_c/include/* $(DESTDIR)/$(PREFIX)/include/igvm
+-	$(CARGO) cinstall --destdir "$(DESTDIR)" --prefix "$(PREFIX)" --features $(FEATURES) $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
++	$(CARGO) cinstall $(if $(DESTDIR), --destdir "$(DESTDIR)") --prefix "$(PREFIX)" --features $(FEATURES) $(EXTRA_PARAMS) --manifest-path=$(IGVM_DIR)/igvm/Cargo.toml
+ 	mkdir -p $(DESTDIR)/$(PREFIX)/bin/
+ 	install -m 755 $(TARGET_PATH)/dump_igvm$(EXE) $(DESTDIR)/$(PREFIX)/bin/
+-- 
+2.54.0
+

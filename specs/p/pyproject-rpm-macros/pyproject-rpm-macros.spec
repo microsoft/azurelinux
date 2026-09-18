@@ -17,36 +17,44 @@ License:        MIT
 #   Increment Y and reset Z when new macros or features are added
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
-Version:        1.18.6
-Release: 5%{?dist}
+Version:        1.23.2
+Release:        1%{?dist}
 
 # Macro files
-Source001:      macros.pyproject
-Source002:      macros.aaa-pyproject-srpm
+Source:         macros.pyproject
+Source:         macros.aaa-pyproject-srpm
 
-# Implementation files
-Source101:      pyproject_buildrequires.py
-Source102:      pyproject_save_files.py
-Source103:      pyproject_convert.py
-Source104:      pyproject_preprocess_record.py
-Source105:      pyproject_construct_toxenv.py
-Source106:      pyproject_requirements_txt.py
-Source107:      pyproject_wheel.py
+# Implementation files, Python
+Source:         pyproject_buildrequires.py
+Source:         pyproject_convert.py
+Source:         pyproject_dependency_overrides.py
+Source:         pyproject_patch_metadata.py
+Source:         pyproject_preprocess_record.py
+Source:         pyproject_requirements_txt.py
+Source:         pyproject_save_files.py
+Source:         pyproject_wheel.py
+
+# Implementation files, Lua
+Source:         pyproject_getopt.lua
 
 # Tests
-Source201:      test_pyproject_buildrequires.py
-Source202:      test_pyproject_save_files.py
-Source203:      test_pyproject_requirements_txt.py
-Source204:      compare_mandata.py
+Source:         compare_mandata.py
+Source:         test_dependency_overrides.py
+Source:         test_pyproject_buildrequires.py
+Source:         test_pyproject_getopt.lua
+Source:         test_pyproject_getopt_consistency.py
+Source:         test_pyproject_getopt_parser.py
+Source:         test_pyproject_requirements_txt.py
+Source:         test_pyproject_save_files.py
 
 # Test data
-Source301:      pyproject_buildrequires_testcases.yaml
-Source302:      pyproject_save_files_test_data.yaml
-Source303:      test_RECORD
+Source:         pyproject_buildrequires_testcases.yaml
+Source:         pyproject_save_files_test_data.yaml
+Source:         test_RECORD
 
 # Metadata
-Source901:      README.md
-Source902:      LICENSE
+Source:         README.md
+Source:         LICENSE
 
 URL:            https://src.fedoraproject.org/rpms/pyproject-rpm-macros
 
@@ -75,7 +83,7 @@ BuildRequires:  python3-rpm-macros
 Requires:       python-rpm-macros
 Requires:       python-srpm-macros
 Requires:       python3-rpm-macros
-Requires:       (pyproject-srpm-macros = %{?epoch:%{epoch}:}%{version}-%{release} if pyproject-srpm-macros)
+Requires:       pyproject-srpm-macros = %{?epoch:%{epoch}:}%{version}-%{release}
 
 # We use the following tools outside of coreutils
 Requires:       /usr/bin/find
@@ -116,8 +124,7 @@ takes precedence.
 
 
 %prep
-# Not strictly necessary but allows working on file names instead
-# of source numbers in install section
+# Allows working on file names, as sources have no meaningful numbers
 %setup -c -T
 cp -p %{sources} .
 
@@ -130,15 +137,18 @@ cp -p %{sources} .
 %install
 mkdir -p %{buildroot}%{_rpmmacrodir}
 mkdir -p %{buildroot}%{_rpmconfigdir}/redhat
+mkdir -p %{buildroot}%{_rpmluadir}/fedora/rpm
 install -pm 644 macros.pyproject %{buildroot}%{_rpmmacrodir}/
 install -pm 644 macros.aaa-pyproject-srpm %{buildroot}%{_rpmmacrodir}/
+install -pm 644 pyproject_getopt.lua %{buildroot}%{_rpmluadir}/fedora/rpm/
 install -pm 644 pyproject_buildrequires.py %{buildroot}%{_rpmconfigdir}/redhat/
 install -pm 644 pyproject_convert.py %{buildroot}%{_rpmconfigdir}/redhat/
 install -pm 644 pyproject_save_files.py  %{buildroot}%{_rpmconfigdir}/redhat/
 install -pm 644 pyproject_preprocess_record.py %{buildroot}%{_rpmconfigdir}/redhat/
-install -pm 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/redhat/
 install -pm 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/redhat/
 install -pm 644 pyproject_wheel.py %{buildroot}%{_rpmconfigdir}/redhat/
+install -pm 644 pyproject_patch_metadata.py %{buildroot}%{_rpmconfigdir}/redhat/
+install -pm 644 pyproject_dependency_overrides.py %{buildroot}%{_rpmconfigdir}/redhat/
 
 
 %if %{with tests}
@@ -157,9 +167,11 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 %{_rpmconfigdir}/redhat/pyproject_convert.py
 %{_rpmconfigdir}/redhat/pyproject_save_files.py
 %{_rpmconfigdir}/redhat/pyproject_preprocess_record.py
-%{_rpmconfigdir}/redhat/pyproject_construct_toxenv.py
 %{_rpmconfigdir}/redhat/pyproject_requirements_txt.py
 %{_rpmconfigdir}/redhat/pyproject_wheel.py
+%{_rpmconfigdir}/redhat/pyproject_patch_metadata.py
+%{_rpmconfigdir}/redhat/pyproject_dependency_overrides.py
+%{_rpmluadir}/fedora/rpm/pyproject_getopt.lua
 
 %doc README.md
 %license LICENSE
@@ -170,6 +182,56 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 
 
 %changelog
+* Sun Jul 26 2026 Miro Hrončok <mhroncok@redhat.com> - 1.23.2-1
+- Fixup a regression in %%pyproject_extras_subpkg
+
+* Thu Jul 23 2026 Miro Hrončok <mhroncok@redhat.com> - 1.23.1-1
+- getopt: Fix global macro clobbering with save/restore stack
+- %%pyproject_extras_subpkg: Add long options support
+- %%pyproject_extras_subpkg: Make -D/--dist-name mutually exclusive with -i/-f/-F
+- Set PIP_CONFIG_FILE=/dev/null by default when invoking pip to build the wheel
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.23.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Mon May 18 2026 Miro Hrončok <mhroncok@redhat.com> - 1.23.0-1
+- %%pyproject_save_files: Implement support for multi-package specfiles
+
+* Thu May 14 2026 Miro Hrončok <mhroncok@redhat.com> - 1.22.2-1
+- %%pyproject_buildrequires: Fix "Requirement satisfied/not satisfied" messages to show overridden constraints from %%pyproject_patch_dependency
+- %%pyproject_buildrequires: Stop using deprecated argparse.FileType
+
+* Thu May 07 2026 Miro Hrončok <mhroncok@redhat.com> - 1.22.1-1
+- Fix a regression wrt option parsing for macros with backslash-escaped newlines in argument list
+
+* Thu May 07 2026 Miro Hrončok <mhroncok@redhat.com> - 1.22.0-1
+- Add long option support for all public parametric macros
+- E.g. %%pyproject_buildrequires --no-runtime is equivalent to %%pyproject_buildrequires -R
+- %%pyproject_save_files: Allow to use --auto instead of +auto
+- %%pyproject_patch_dependency: Validate arguments early, in %%prep
+
+* Wed Apr 29 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 1.21.0-1
+- Implement extras validation
+- %%pyproject_buildrequires: validates if extras exist in upstream metadata, otherwise ValueError is raised on Fedora >=45 and RHEL >=11. It will emit a warning instead on older releases.
+- Both user-specified extras and metadata extras are normalized following PEP 685 conventions.
+
+* Tue Apr 28 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 1.20.1-1
+- Move %%pyproject_patch_dependency implementation to pyproject-srpm-macros
+- Make pyproject-rpm-macros depend on pyproject-srpm-macros
+- Resolves: rhbz#2463187
+
+* Fri Apr 24 2026 Charalampos Stratakis <cstratak@redhat.com> - 1.20.0-1
+- Add %%pyproject_patch_dependency macro for overriding dependency constraints
+- Overrides apply to both BuildRequires and runtime Requires (via METADATA patching)
+- Resolves: rhbz#2386906
+
+* Tue Mar 31 2026 Miro Hrončok <mhroncok@redhat.com> - 1.19.0-1
+- Add -d option for %%pyproject_buildrequires and %%pyproject_wheel to specify a working directory
+- Fixes: rhbz#2371389
+
+* Wed Mar 04 2026 Lumír Balhar <lbalhar@redhat.com> - 1.18.7-1
+- pyproject_convert: Use deprecated LegacyVersion (_version) only if necessary
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.18.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

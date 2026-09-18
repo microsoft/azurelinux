@@ -1,0 +1,39 @@
+commit fcd3161b98f8ff2964e3e275ad1c9977a37303f1
+Author: xuchenchen <xuchenchen@kylinos.cn>
+Date:   Thu May 28 11:11:28 2026 -0400
+
+    libnfsidmap: avoid malloc(0) for empty Local-Realms
+    
+    conf_get_list() can return an empty list when Local-Realms is present
+    but contains only empty fields, such as ", ,". In that case the Realms
+    list logging path computes a buffer size of zero and then writes a NUL
+    byte to the result of malloc(0).
+    
+    Reserve space for the terminating NUL byte and use calloc() so the log
+    buffer is valid even when the realm list is empty.
+    
+    Signed-off-by: xuchenchen <xuchenchen@kylinos.cn>
+    Signed-off-by: Steve Dickson <steved@redhat.com>
+
+diff --git a/support/nfsidmap/libnfsidmap.c b/support/nfsidmap/libnfsidmap.c
+index e1475879..5377a0ee 100644
+--- a/support/nfsidmap/libnfsidmap.c
++++ b/support/nfsidmap/libnfsidmap.c
+@@ -409,15 +409,14 @@ int nfs4_init_name_mapping(char *conffile)
+ 	if (idmap_verbosity >= 1) {
+ 		struct conf_list_node *r;
+ 		char *buf = NULL;
+-		int siz=0;
++		size_t siz = 1;
+ 
+ 		if (local_realms) {
+ 			TAILQ_FOREACH(r, &local_realms->fields, link) {
+ 				siz += (strlen(r->field)+4);
+ 			}
+-			buf = malloc(siz);
++			buf = calloc(1, siz);
+ 			if (buf) {
+-				*buf = 0;
+ 				TAILQ_FOREACH(r, &local_realms->fields, link) {
+ 					sprintf(buf+strlen(buf), "'%s' ", r->field);
+ 				}

@@ -1,0 +1,22 @@
+From 79c903c7d9ec4cfa30b7ca38a795adc1c100b45a Mon Sep 17 00:00:00 2001
+From: Alex Waygood <Alex.Waygood@Gmail.com>
+Date: Wed, 12 Aug 2026 13:13:00 +0100
+Subject: [PATCH] Remove obsolete Literal deduplication assertion (#785)
+
+---
+ src/test_typing_extensions.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/test_typing_extensions.py b/src/test_typing_extensions.py
+index 996d466c..938f2acc 100644
+--- a/src/test_typing_extensions.py
++++ b/src/test_typing_extensions.py
+@@ -1337,8 +1337,6 @@ def test_args(self):
+         self.assertEqual(Literal[1, 2, 3].__args__, (1, 2, 3))
+         self.assertEqual(Literal[1, 2, 3, 3].__args__, (1, 2, 3))
+         self.assertEqual(Literal[1, Literal[2], Literal[3, 4]].__args__, (1, 2, 3, 4))
+-        # Mutable arguments will not be deduplicated
+-        self.assertEqual(Literal[[], []].__args__, ([], []))
+ 
+     def test_union_of_literals(self):
+         self.assertEqual(Union[Literal[1], Literal[2]].__args__,

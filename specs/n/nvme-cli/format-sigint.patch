@@ -1,0 +1,28 @@
+From cb5a61895e7327827158ad32fc07e10722d8777e Mon Sep 17 00:00:00 2001
+From: g0l4 <g0l4@g0l4.top>
+Date: Wed, 24 Jun 2026 11:48:55 +0800
+Subject: [PATCH] nvme: fix ignored interruption in format command
+
+Add nvme_sigint_received wrapper around sleep, so it will exit instead
+of continue when a SIGINT is received.
+
+Signed-off-by: g0l4 <g0l4@g0l4.top>
+---
+ nvme.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/nvme.c b/nvme.c
+index cec40249fd..289f5257e3 100644
+--- a/nvme.c
++++ b/nvme.c
+@@ -7007,7 +7007,10 @@ static int format_cmd(int argc, char **argv, struct command *acmd, struct plugin
+ 			"WARNING: Format may irrevocably delete this device's data.\n"
+ 			"You have 10 seconds to press Ctrl-C to cancel this operation.\n\n"
+ 			"Use the force [--force] option to suppress this warning.\n");
++		nvme_sigint_received = false;
+ 		sleep(10);
++		if (nvme_sigint_received)
++			return -EINTR;
+ 		fprintf(stderr, "Sending format operation ...\n");
+ 	}
+ 

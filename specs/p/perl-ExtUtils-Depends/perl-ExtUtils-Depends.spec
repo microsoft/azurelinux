@@ -3,7 +3,7 @@
 
 Name:           perl-ExtUtils-Depends
 Version:        0.8002
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Easily build XS extensions that depend on XS extensions
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/ExtUtils-Depends

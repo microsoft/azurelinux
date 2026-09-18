@@ -56,7 +56,7 @@ index 2ffdcd1..75ac68b 100644
  .Cm netcontrol ,
  .Cm throughput ,
 diff --git a/netcat.c b/netcat.c
-index e3c9c93..d235c55 100644
+index 9361ff5..f044c3b 100644
 --- a/netcat.c
 +++ b/netcat.c
 @@ -32,6 +32,8 @@
@@ -177,12 +177,12 @@ index e3c9c93..d235c55 100644
  	} else if (argc == 1 && lflag) {
  		uport = argv[0];
  	} else if (argc == 2) {
-@@ -399,33 +463,6 @@ main(int argc, char *argv[])
+@@ -401,33 +465,6 @@ main(int argc, char *argv[])
  		}
  	}
  
 -	if (family == AF_UNIX) {
--		if (pledge("stdio rpath wpath cpath tmppath unix", NULL) == -1)
+-		if (pledge("stdio rpath wpath cpath unix", NULL) == -1)
 -			err(1, "pledge");
 -	} else if (Fflag && Pflag) {
 -		if (pledge("stdio inet dns sendfd tty", NULL) == -1)
@@ -211,7 +211,7 @@ index e3c9c93..d235c55 100644
  	if (!lflag && kflag)
  		errx(1, "must use -l with -k");
  	if (uflag && usetls)
-@@ -584,10 +621,6 @@ main(int argc, char *argv[])
+@@ -586,10 +623,6 @@ main(int argc, char *argv[])
  			if (s == -1)
  				err(1, NULL);
  			if (uflag && kflag) {
@@ -222,7 +222,7 @@ index e3c9c93..d235c55 100644
  				/*
  				 * For UDP and -k, don't connect the socket,
  				 * let it receive datagrams from multiple
-@@ -614,10 +647,6 @@ main(int argc, char *argv[])
+@@ -616,10 +649,6 @@ main(int argc, char *argv[])
  				if (rv == -1)
  					err(1, "connect");
  
@@ -233,7 +233,7 @@ index e3c9c93..d235c55 100644
  				if (vflag)
  					report_sock("Connection received",
  					    (struct sockaddr *)&z, len,
-@@ -943,8 +972,10 @@ remote_connect(const char *host, const char *port, struct addrinfo hints,
+@@ -945,8 +974,10 @@ remote_connect(const char *host, const char *port, struct addrinfo hints,
  		if (sflag || pflag) {
  			struct addrinfo ahints, *ares;
  
@@ -244,7 +244,7 @@ index e3c9c93..d235c55 100644
  			memset(&ahints, 0, sizeof(struct addrinfo));
  			ahints.ai_family = res->ai_family;
  			ahints.ai_socktype = uflag ? SOCK_DGRAM : SOCK_STREAM;
-@@ -1057,9 +1088,15 @@ local_listen(const char *host, const char *port, struct addrinfo hints)
+@@ -1059,9 +1090,15 @@ local_listen(const char *host, const char *port, struct addrinfo hints)
  		    res->ai_protocol)) == -1)
  			continue;
  
@@ -260,7 +260,7 @@ index e3c9c93..d235c55 100644
  
  		set_common_sockopts(s, res->ai_family);
  
-@@ -1564,11 +1601,13 @@ set_common_sockopts(int s, int af)
+@@ -1571,11 +1608,13 @@ set_common_sockopts(int s, int af)
  {
  	int x = 1;
  
@@ -274,7 +274,7 @@ index e3c9c93..d235c55 100644
  	if (Dflag) {
  		if (setsockopt(s, SOL_SOCKET, SO_DEBUG,
  		    &x, sizeof(x)) == -1)
-@@ -1579,9 +1618,14 @@ set_common_sockopts(int s, int af)
+@@ -1586,9 +1625,14 @@ set_common_sockopts(int s, int af)
  		    IP_TOS, &Tflag, sizeof(Tflag)) == -1)
  			err(1, "set IP ToS");
  
@@ -289,7 +289,7 @@ index e3c9c93..d235c55 100644
  	}
  	if (Iflag) {
  		if (setsockopt(s, SOL_SOCKET, SO_RCVBUF,
-@@ -1599,19 +1643,34 @@ set_common_sockopts(int s, int af)
+@@ -1606,19 +1650,34 @@ set_common_sockopts(int s, int af)
  		    IP_TTL, &ttl, sizeof(ttl)))
  			err(1, "set IP TTL");
  
@@ -324,7 +324,7 @@ index e3c9c93..d235c55 100644
  	}
  }
  
-@@ -1646,6 +1705,7 @@ process_tos_opt(char *s, int *val)
+@@ -1653,6 +1712,7 @@ process_tos_opt(char *s, int *val)
  		{ "cs7",		IPTOS_DSCP_CS7 },
  		{ "ef",			IPTOS_DSCP_EF },
  		{ "inetcontrol",	IPTOS_PREC_INTERNETCONTROL },
@@ -332,7 +332,7 @@ index e3c9c93..d235c55 100644
  		{ "lowdelay",		IPTOS_LOWDELAY },
  		{ "netcontrol",		IPTOS_PREC_NETCONTROL },
  		{ "reliability",	IPTOS_RELIABILITY },
-@@ -1815,6 +1875,9 @@ report_sock(const char *msg, const struct sockaddr *sa, socklen_t salen,
+@@ -1823,6 +1883,9 @@ report_sock(const char *msg, const struct sockaddr *sa, socklen_t salen,
  void
  help(void)
  {
@@ -342,7 +342,7 @@ index e3c9c93..d235c55 100644
  	usage(0);
  	fprintf(stderr, "\tCommand Summary:\n\
  	\t-4		Use IPv4\n\
-@@ -1857,7 +1920,7 @@ help(void)
+@@ -1865,7 +1928,7 @@ help(void)
  	\t-Z		Peer certificate file\n\
  	\t-z		Zero-I/O mode [used for scanning]\n\
  	Port numbers can be individual or ranges: lo-hi [inclusive]\n");

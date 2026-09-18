@@ -1,6 +1,6 @@
---- reqwest-middleware-0.5.1/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ reqwest-middleware-0.5.1/Cargo.toml	2026-02-06T06:55:01.357426+00:00
-@@ -79,13 +79,3 @@
+--- reqwest-middleware-0.5.2/Cargo.toml	2006-07-24T01:21:28+00:00
++++ reqwest-middleware-0.5.2/Cargo.toml	2026-05-19T20:01:12.659650+00:00
+@@ -80,13 +80,3 @@
  [dev-dependencies.reqwest]
  version = "0.13.1"
  features = ["rustls"]

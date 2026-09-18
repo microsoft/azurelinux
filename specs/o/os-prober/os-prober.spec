@@ -3,7 +3,7 @@
 
 Name:           os-prober
 Version:        1.81
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        Probes disks on the system for installed operating systems
 
 # For more information about licensing, see copyright file.

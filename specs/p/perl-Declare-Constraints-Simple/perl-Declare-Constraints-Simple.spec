@@ -3,7 +3,7 @@
 
 Name:		perl-Declare-Constraints-Simple
 Version:	0.03
-Release: 60%{?dist}
+Release:	57%{?dist}
 Summary:	Declarative Validation of Data Structures
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Declare-Constraints-Simple

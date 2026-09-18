@@ -3,7 +3,7 @@
 
 Name:           perl-File-DirList
 Version:        0.05
-Release: 17%{?dist}
+Release:        14%{?dist}
 Summary:        Provide a sorted list of directory content
 # Standard perl license, see README.md
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

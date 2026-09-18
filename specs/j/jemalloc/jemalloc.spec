@@ -6,7 +6,7 @@
 Name:           jemalloc
 Version:        5.3.0
 
-Release: 16%{?dist}
+Release:        13%{?dist}
 Summary:        General-purpose scalable concurrent malloc implementation
 
 # Automatically converted from old format: BSD - review is highly recommended.

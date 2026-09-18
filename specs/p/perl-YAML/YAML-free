@@ -15,7 +15,7 @@ case $# in
 	;;
 esac
 
-if echo "$YAML_tarball" | grep --silent -x 'YAML-[1-9][0-9]*\.[0-9][0-9.]*\.tar\.gz'; then
+if echo "$YAML_tarball" | grep --silent -Ex 'YAML-v?[1-9][0-9]*\.[0-9][0-9.]*\.tar\.gz'; then
 	YAML_free_tarball=$(echo "$YAML_tarball" | sed -e 's|^YAML|YAML-free|')
 	YAML_dirname=$(echo "$YAML_tarball" | sed -e 's|\.tar\.gz$||')
 else

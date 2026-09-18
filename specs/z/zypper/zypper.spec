@@ -8,7 +8,7 @@
 
 Name:           zypper
 Version:        1.14.94
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Command line package manager using libzypp
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

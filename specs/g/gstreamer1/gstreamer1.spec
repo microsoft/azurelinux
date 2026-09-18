@@ -19,8 +19,8 @@
 %endif
 
 Name:           gstreamer1
-Version:        1.26.10
-Release: 4%{?dist}
+Version:        1.26.11
+Release:        1%{?dist}
 Summary:        GStreamer streaming media framework runtime
 
 License:        LGPL-2.1-or-later
@@ -212,6 +212,9 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 
 
 %changelog
+* Mon Mar 30 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.26.11-1
+- 1.26.11
+
 * Tue Jan 06 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.26.10-1
 - 1.26.10
 

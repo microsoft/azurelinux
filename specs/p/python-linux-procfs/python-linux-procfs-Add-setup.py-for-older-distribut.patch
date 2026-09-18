@@ -1,0 +1,79 @@
+From db0befabfdecefc8ba3ef8f86d0704a5cf7ace9f Mon Sep 17 00:00:00 2001
+From: John Kacur <jkacur@redhat.com>
+Date: Wed, 19 Nov 2025 11:12:44 -0500
+Subject: [PATCH] python-linux-procfs: Add setup.py for older distributions
+
+Re-add setup.py to support older distributions that don't understand
+PEP 517/518 pyproject.toml-based builds. Modern distributions will
+continue to use pyproject.toml via the pyproject RPM macros.
+
+Includes PYTHONLIB calculation for proper --prefix install support
+on RPM-based systems.
+
+Assisted-By: Claude <noreply@anthropic.com>
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ setup.py | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+ create mode 100644 setup.py
+
+diff --git a/setup.py b/setup.py
+new file mode 100644
+index 000000000000..d048571c3b5c
+--- /dev/null
++++ b/setup.py
+@@ -0,0 +1,51 @@
++#!/usr/bin/python
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# setup.py - Legacy setup script for older distributions
++#
++# This file provides backwards compatibility for distributions that don't
++# support modern pyproject.toml-based builds (PEP 517/518).
++# For modern builds, use: pip install .
++#
++# IMPORTANT: Keep this file in sync with pyproject.toml
++
++import os
++from os.path import isfile, relpath
++import sysconfig
++from setuptools import setup, find_packages
++
++if isfile("MANIFEST"):
++    os.unlink("MANIFEST")
++
++SCHEME = 'rpm_prefix'
++if not SCHEME in sysconfig.get_scheme_names():
++    SCHEME = 'posix_prefix'
++
++# Get PYTHONLIB with no prefix so --prefix installs work.
++PYTHONLIB = relpath(sysconfig.get_path('platlib', SCHEME), '/usr')
++
++setup(
++    name="python-linux-procfs",
++    version="0.7.4",
++    description="Linux /proc abstraction classes",
++    author="Arnaldo Carvalho de Melo, John Kacur",
++    author_email="acme@redhat.com, jkacur@redhat.com",
++    maintainer="John Kacur",
++    maintainer_email="jkacur@redhat.com",
++    url="https://www.kernel.org/pub/software/libs/python/python-linux-procfs",
++    license="GPL-2.0-only",
++    long_description="""\
++Abstractions to extract information from the Linux kernel /proc files.
++""",
++    packages=find_packages(include=["procfs*"]),
++    scripts=["pflags"],
++    install_requires=[],
++    classifiers=[
++        "Development Status :: 4 - Beta",
++        "Intended Audience :: Developers",
++        "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
++        "Operating System :: POSIX :: Linux",
++        "Programming Language :: Python :: 3",
++        "Topic :: System :: Operating System Kernels :: Linux",
++    ],
++)
+-- 
+2.54.0
+

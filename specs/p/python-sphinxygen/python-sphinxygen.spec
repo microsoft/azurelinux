@@ -3,7 +3,7 @@
 
 Name:           python-sphinxygen
 Version:        1.0.10
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        A script to read Doxygen XML output and emit ReST for Sphinx
 
 # All files under ISC, though some tests and

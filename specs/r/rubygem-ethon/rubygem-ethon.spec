@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.15.0
-Release: 13%{?dist}
+Release: 10%{?dist}
 Summary: Libcurl wrapper
 License: MIT
 URL: https://github.com/typhoeus/ethon

@@ -1,0 +1,96 @@
+diff -up nfs-utils-2.8.7/utils/nfsdctl/nfsdctl.c.orig nfs-utils-2.8.7/utils/nfsdctl/nfsdctl.c
+--- nfs-utils-2.8.7/utils/nfsdctl/nfsdctl.c.orig	2026-03-30 13:55:26.554459688 -0400
++++ nfs-utils-2.8.7/utils/nfsdctl/nfsdctl.c	2026-03-30 14:00:59.204625649 -0400
+@@ -162,6 +162,8 @@ static const char *nfsd4_ops[] = {
+ 	[OP_REMOVEXATTR]	= "OP_REMOVEXATTR",
+ };
+ 
++static int fetch_current_listeners(struct nl_sock *sock);
++
+ static int error_handler(struct sockaddr_nl *nla, struct nlmsgerr *err,
+ 			 void *arg)
+ {
+@@ -441,7 +443,6 @@ static struct nl_sock *netlink_sock_allo
+ static struct nl_msg *netlink_msg_alloc(struct nl_sock *sock, int family)
+ {
+ 	struct nl_msg *msg;
+-	int id;
+ 
+ 	msg = nlmsg_alloc();
+ 	if (!msg) {
+@@ -474,7 +475,7 @@ static int lockd_nl_family_setup(struct
+ 	if (!lockd_nl_family) {
+ 		lockd_nl_family = resolve_family(sock, LOCKD_FAMILY_NAME, L_WARNING);
+ 		if (lockd_nl_family) {
+-			system("modprobe lockd");
++			lockd_nl_family = system("modprobe lockd");
+ 			lockd_nl_family = resolve_family(sock, LOCKD_FAMILY_NAME, L_ERROR);
+ 		}
+ 	}
+@@ -486,7 +487,7 @@ static int nfsd_nl_family_setup(struct n
+ 	if (!nfsd_nl_family) {
+ 		nfsd_nl_family = resolve_family(sock, NFSD_FAMILY_NAME, L_WARNING);
+ 		if (!nfsd_nl_family) {
+-			system("modprobe nfsd");
++			nfsd_nl_family = system("modprobe nfsd");
+ 			nfsd_nl_family = resolve_family(sock, NFSD_FAMILY_NAME, L_ERROR);
+ 		}
+ 	}
+@@ -501,7 +502,7 @@ static int getpolicy_handler(struct nl_m
+ 
+ 	nla_for_each_attr(attr, genlmsg_attrdata(gnlh, 0), genlmsg_attrlen(gnlh, 0), rem) {
+ 		struct nlattr *a, *b;
+-		int i, j, index;
++		int i, j;
+ 
+ 		if (nla_type(attr) == CTRL_ATTR_POLICY) {
+ 			nla_for_each_nested(a, attr, i) {
+@@ -523,7 +524,7 @@ static int query_nfsd_nl_policy(struct n
+ 	struct nlmsghdr *nlh;
+ 	struct nl_msg *msg;
+ 	struct nl_cb *cb;
+-	int opt, ret, id;
++	int ret;
+ 
+ 	if (!nfsd_nl_family_setup(sock))
+ 		return 1;
+@@ -721,6 +722,7 @@ static int threads_func(struct nl_sock *
+ 	int *pool_threads = NULL;
+ 	int minthreads = -1;
+ 	int opt, pools = 0;
++	bool zero_threads = false;
+ 
+ 	optind = 1;
+ 	while ((opt = getopt_long(argc, argv, "hm:", threads_options, NULL)) != -1) {
+@@ -762,12 +764,31 @@ static int threads_func(struct nl_sock *
+ 			}
+ 
+ 			pool_threads[i] = strtol(targv[i], &endptr, 0);
++			if (!pool_threads[i])
++				zero_threads = true;
+ 			if (!endptr || *endptr != '\0') {
+ 				xlog(L_ERROR, "Invalid threads value %s.", argv[1]);
+ 				return 1;
+ 			}
+ 		}
+ 	}
++	/* check if there are active listeners added */
++	if (fetch_current_listeners(sock)) {
++		xlog(L_ERROR, "Unable to determine if listeners were added");
++		return 1;
++	}
++	if (!nfsd_socket_count) {
++		if (zero_threads) {
++			/* Note: we can never have a server with threads and no
++			 * listener. If we ever add functionality to remove
++			 * listeners on an active server, we need to revisit this.
++			 */
++			return 0;
++		}
++		xlog(L_ERROR, "No active listeners added, not starting threads");
++		return 1;
++	}
++
+ 	return threads_doit(sock, cmd, 0, 0, pools, pool_threads, NULL, minthreads);
+ }
+ 

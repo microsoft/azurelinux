@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.7.5
-Release: 19%{?dist}
+Release: 16%{?dist}
 Summary: WebSocket protocol handler with pluggable I/O
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License: Apache-2.0

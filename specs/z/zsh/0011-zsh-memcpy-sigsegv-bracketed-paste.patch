@@ -1,0 +1,83 @@
+From b258cb7816323050d7e485171c92ad3f1046799e Mon Sep 17 00:00:00 2001
+From: Mikael Magnusson <mikachu@gmail.com>
+Date: Fri, 17 Jul 2026 22:53:21 +0200
+Subject: [PATCH] 54985: fix crash with bracketed-paste-magic and undo
+
+In particular, fc -P/-p didn't interact well with undo. Make sure we
+store/restore histline across those calls.
+
+(cherry-picked from commit 7708d466dfab8dd29f9ae5de12c74af37bf99a4d)
+---
+ Src/Zle/zle_main.c | 8 ++++++++
+ Src/hist.c         | 7 ++++++-
+ Src/zsh.h          | 3 ++-
+ 3 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/Src/Zle/zle_main.c b/Src/Zle/zle_main.c
+index 44ee63d..817e605 100644
+--- a/Src/Zle/zle_main.c
++++ b/Src/Zle/zle_main.c
+@@ -2168,6 +2168,14 @@ zle_main_entry(int cmd, va_list ap)
+ 	break;
+     }
+ 
++    case ZLE_CMD_GET_HIST_LINE:
++    {
++	zlong *p = va_arg(ap, zlong *);
++	*p = histline;
++
++	break;
++    }
++
+     default:
+ #ifdef DEBUG
+ 	    dputs("Bad command %d in zle_main_entry", cmd);
+diff --git a/Src/hist.c b/Src/hist.c
+index f58db23..85f329c 100644
+--- a/Src/hist.c
++++ b/Src/hist.c
+@@ -226,6 +226,7 @@ static struct histsave {
+     HashTable histtab;
+     Histent hist_ring;
+     zlong curhist;
++    zlong histline;
+     zlong histlinect;
+     zlong histsiz;
+     zlong savehistsiz;
+@@ -3846,6 +3847,10 @@ pushhiststack(char *hf, zlong hs, zlong shs, int level)
+     h->histsiz = histsiz;
+     h->savehistsiz = savehistsiz;
+     h->locallevel = level;
++    if (zleactive)
++	zleentry(ZLE_CMD_GET_HIST_LINE, &h->histline);
++    else
++	h->histline = 0;
+ 
+     memset(&lasthist, 0, sizeof lasthist);
+     if (hf) {
+@@ -3898,7 +3903,7 @@ pophiststack(void)
+     hist_ring = h->hist_ring;
+     curhist = h->curhist;
+     if (zleactive)
+-	zleentry(ZLE_CMD_SET_HIST_LINE, curhist);
++	zleentry(ZLE_CMD_SET_HIST_LINE, h->histline);
+     histlinect = h->histlinect;
+     histsiz = h->histsiz;
+     savehistsiz = h->savehistsiz;
+diff --git a/Src/zsh.h b/Src/zsh.h
+index 8fab0eb..32302ec 100644
+--- a/Src/zsh.h
++++ b/Src/zsh.h
+@@ -3244,7 +3244,8 @@ enum {
+     ZLE_CMD_REFRESH,
+     ZLE_CMD_SET_KEYMAP,
+     ZLE_CMD_GET_KEY,
+-    ZLE_CMD_SET_HIST_LINE
++    ZLE_CMD_SET_HIST_LINE,
++    ZLE_CMD_GET_HIST_LINE,
+ };
+ 
+ /***************************************/
+-- 
+2.55.0
+

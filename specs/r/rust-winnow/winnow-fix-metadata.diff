@@ -1,14 +1,14 @@
---- winnow-0.7.14/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ winnow-0.7.14/Cargo.toml	2025-12-27T20:47:43.790693+00:00
-@@ -93,7 +93,6 @@
+--- winnow-1.0.4/Cargo.toml	2006-07-24T01:21:28+00:00
++++ winnow-1.0.4/Cargo.toml	2026-07-14T13:24:49.411290+00:00
+@@ -95,7 +95,6 @@
      "std",
      "dep:anstream",
      "dep:anstyle",
 -    "dep:is_terminal_polyfill",
      "dep:terminal_size",
  ]
- default = ["std"]
-@@ -114,101 +113,6 @@
+ default = [
+@@ -123,150 +122,6 @@
  name = "winnow"
  path = "src/lib.rs"
  
@@ -16,101 +16,150 @@
 -name = "arithmetic"
 -path = "examples/arithmetic/main.rs"
 -test = true
--required-features = ["alloc"]
+-required-features = [
+-    "alloc",
+-    "ascii",
+-]
 -
 -[[example]]
 -name = "c_expression"
 -path = "examples/c_expression/main.rs"
--required-features = ["std"]
+-required-features = [
+-    "std",
+-    "ascii",
+-]
 -
 -[[example]]
 -name = "css"
 -path = "examples/css/main.rs"
 -test = true
--required-features = ["alloc"]
+-required-features = [
+-    "alloc",
+-    "parser",
+-]
 -
 -[[example]]
 -name = "custom_error"
 -path = "examples/custom_error.rs"
 -test = true
--required-features = ["alloc"]
+-required-features = [
+-    "alloc",
+-    "parser",
+-]
 -
 -[[example]]
 -name = "http"
 -path = "examples/http/main.rs"
--required-features = ["alloc"]
+-required-features = [
+-    "alloc",
+-    "ascii",
+-]
 -
 -[[example]]
 -name = "ini"
 -path = "examples/ini/main.rs"
 -test = true
--required-features = ["std"]
+-required-features = [
+-    "std",
+-    "ascii",
+-]
 -
 -[[example]]
 -name = "iterator"
 -path = "examples/iterator.rs"
+-required-features = ["ascii"]
 -
 -[[example]]
 -name = "json"
 -path = "examples/json/main.rs"
 -test = true
--required-features = ["std"]
+-required-features = [
+-    "std",
+-    "ascii",
+-]
 -
 -[[example]]
 -name = "json_iterator"
 -path = "examples/json_iterator.rs"
--required-features = ["std"]
+-required-features = [
+-    "std",
+-    "ascii",
+-]
 -
 -[[example]]
 -name = "ndjson"
 -path = "examples/ndjson/main.rs"
 -test = true
--required-features = ["std"]
+-required-features = [
+-    "std",
+-    "ascii",
+-]
 -
 -[[example]]
 -name = "s_expression"
 -path = "examples/s_expression/main.rs"
--required-features = ["alloc"]
+-required-features = [
+-    "alloc",
+-    "ascii",
+-]
 -
 -[[example]]
 -name = "string"
 -path = "examples/string/main.rs"
--required-features = ["alloc"]
+-required-features = [
+-    "alloc",
+-    "ascii",
+-]
 -
 -[[bench]]
 -name = "arithmetic"
 -path = "examples/arithmetic/bench.rs"
 -harness = false
--required-features = ["alloc"]
+-required-features = [
+-    "alloc",
+-    "ascii",
+-]
 -
 -[[bench]]
 -name = "c_expression"
 -path = "examples/c_expression/bench.rs"
 -harness = false
--required-features = ["std"]
+-required-features = [
+-    "std",
+-    "ascii",
+-]
 -
 -[[bench]]
 -name = "http"
 -path = "examples/http/bench.rs"
 -harness = false
--required-features = ["alloc"]
+-required-features = [
+-    "alloc",
+-    "ascii",
+-]
 -
 -[[bench]]
 -name = "ini"
 -path = "examples/ini/bench.rs"
 -harness = false
--required-features = ["std"]
+-required-features = [
+-    "std",
+-    "ascii",
+-]
 -
 -[[bench]]
 -name = "json"
 -path = "examples/json/bench.rs"
 -harness = false
--required-features = ["std"]
+-required-features = [
+-    "std",
+-    "ascii",
+-]
 -
  [dependencies.anstream]
  version = "0.6.15"
  optional = true
-@@ -217,10 +121,6 @@
+@@ -275,10 +130,6 @@
  version = "1.0.8"
  optional = true
  
@@ -121,7 +170,7 @@
  [dependencies.memchr]
  version = "2.7"
  optional = true
-@@ -238,12 +138,6 @@
+@@ -296,12 +147,6 @@
  
  [dev-dependencies.automod]
  version = "1.0.15"
@@ -134,7 +183,7 @@
  
  [dev-dependencies.lexopt]
  version = "0.3.1"
-@@ -257,9 +151,6 @@
+@@ -315,9 +160,6 @@
  [dev-dependencies.snapbox]
  version = "0.6.21"
  features = ["examples"]
@@ -144,7 +193,7 @@
  
  [lints.clippy]
  bool_assert_comparison = "allow"
-@@ -332,11 +223,6 @@
+@@ -390,11 +232,6 @@
  level = "warn"
  priority = -1
  

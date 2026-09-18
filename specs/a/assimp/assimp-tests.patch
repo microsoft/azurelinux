@@ -1,6 +1,6 @@
-diff -rupN --no-dereference assimp-6.0.4/CMakeLists.txt assimp-6.0.4-new/CMakeLists.txt
---- assimp-6.0.4/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/CMakeLists.txt	2026-01-27 13:39:45.836457790 +0100
+diff -rupN --no-dereference assimp-6.0.5/CMakeLists.txt assimp-6.0.5-new/CMakeLists.txt
+--- assimp-6.0.5/CMakeLists.txt	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/CMakeLists.txt	2026-05-01 23:05:57.545660372 +0200
 @@ -823,6 +823,7 @@ IF ( ASSIMP_BUILD_SAMPLES )
  ENDIF ()
  
@@ -9,9 +9,9 @@ diff -rupN --no-dereference assimp-6.0.4/CMakeLists.txt assimp-6.0.4-new/CMakeLi
    ADD_SUBDIRECTORY( test/ )
  ENDIF ()
  
-diff -rupN --no-dereference assimp-6.0.4/test/CMakeLists.txt assimp-6.0.4-new/test/CMakeLists.txt
---- assimp-6.0.4/test/CMakeLists.txt	2026-01-27 13:39:44.887952805 +0100
-+++ assimp-6.0.4-new/test/CMakeLists.txt	2026-01-27 13:39:45.836809190 +0100
+diff -rupN --no-dereference assimp-6.0.5/test/CMakeLists.txt assimp-6.0.5-new/test/CMakeLists.txt
+--- assimp-6.0.5/test/CMakeLists.txt	2026-05-01 23:05:56.680512653 +0200
++++ assimp-6.0.5-new/test/CMakeLists.txt	2026-05-01 23:05:57.545987970 +0200
 @@ -36,6 +36,7 @@
  #
  #----------------------------------------------------------------------

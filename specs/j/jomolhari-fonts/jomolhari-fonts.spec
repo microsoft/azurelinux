@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Version:        0.003
-Release: 47%{?dist}
+Release:        44%{?dist}
 
 URL: https://fonts.google.com/specimen/Jomolhari
 

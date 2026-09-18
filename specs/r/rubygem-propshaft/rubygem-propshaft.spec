@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.1.0
-Release: 5%{?dist}
+Release: 2%{?dist}
 Summary: Deliver assets for Rails
 License: MIT
 URL: https://github.com/rails/propshaft

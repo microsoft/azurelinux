@@ -1,0 +1,50 @@
+From 97806635b2c8c523a102ee7bd66847cac99d28aa Mon Sep 17 00:00:00 2001
+From: Luca Boccassi <luca.boccassi@gmail.com>
+Date: Sat, 14 Feb 2026 12:39:14 +0000
+Subject: [PATCH] libbpf: sync bpf_stream_vprintk declaration with kernel 7.0
+
+Fix build failures in BPF programs using libbpf 1.6.x and kernel 7.0:
+
+ $ /usr/src/kernels/6.20.0-0.rc0.260212gc22e26bd0906e.3.fc45.x86_64/scripts/extract-vmlinux /usr/lib/modules/6.20.0-0.rc0.260212gc22e26bd0906e.3.fc45.x86_64/vmlinuz > vmlinux_local
+ $ bpftool btf dump file vmlinux_local format c > vmlinux.h
+ $ cat <<EOF>test.c
+ #include "vmlinux.h"
+ #include <bpf/bpf_helpers.h>
+ int main(void){return 0;}
+ EOF
+ $ gcc test.c
+ /usr/include/bpf/bpf_helpers.h:318:12: error: conflicting types for ‘bpf_stream_vprintk’; have ‘int(int,  const char *, const void *, __u32,  void *)’ {aka ‘int(int,  const char *, const void *, unsigned int,  void *)’}
+   318 | extern int bpf_stream_vprintk(int stream_id, const char *fmt__str, const void *args,
+       |            ^~~~~~~~~~~~~~~~~~
+ vmlinux.h:167079:12: note: previous declaration of ‘bpf_stream_vprintk’ with type ‘int(int,  const char *, const void *, u32)’ {aka ‘int(int,  const char *, const void *, unsigned int)’}
+ 167079 | extern int bpf_stream_vprintk(int stream_id, const char *fmt__str, const void *args, u32 len__sz) __weak __ksym;
+        |            ^~~~~~~~~~~~~~~~~~
+---
+ src/bpf_helpers.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/bpf_helpers.h b/src/bpf_helpers.h
+index 80c0285..7f653ea 100644
+--- a/src/bpf_helpers.h
++++ b/src/bpf_helpers.h
+@@ -316,7 +316,7 @@ enum libbpf_tristate {
+ })
+ 
+ extern int bpf_stream_vprintk(int stream_id, const char *fmt__str, const void *args,
+-			      __u32 len__sz, void *aux__prog) __weak __ksym;
++			      __u32 len__sz) __weak __ksym;
+ 
+ #define bpf_stream_printk(stream_id, fmt, args...)				\
+ ({										\
+@@ -328,7 +328,7 @@ extern int bpf_stream_vprintk(int stream_id, const char *fmt__str, const void *a
+ 	___bpf_fill(___param, args);						\
+ 	_Pragma("GCC diagnostic pop")						\
+ 										\
+-	bpf_stream_vprintk(stream_id, ___fmt, ___param, sizeof(___param), NULL);\
++	bpf_stream_vprintk(stream_id, ___fmt, ___param, sizeof(___param));      \
+ })
+ 
+ /* Use __bpf_printk when bpf_printk call has 3 or fewer fmt args
+-- 
+2.47.3
+

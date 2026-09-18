@@ -10,7 +10,7 @@
 Summary: Very high compression ratio file archiver
 Name: p7zip
 Version: 16.02
-Release: 36%{?dist}
+Release: 33%{?dist}
 # Files under C/Compress/Lzma/ are dual LGPL or CPL
 # Automatically converted from old format: LGPLv2 and (LGPLv2+ or CPL) - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2 AND (LicenseRef-Callaway-LGPLv2+ OR CPL-1.0)

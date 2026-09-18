@@ -7,7 +7,7 @@
 
 %global __provides_exclude_from ^%{_libdir}/varnish/vmods
 
-%global abi 2e8180f788715e5bc44df08479d60c9435d79bdd
+%global abi 6884b75af9c9bdb2c9b6e2aa464a435e42cb4931
 %global vrt 21.0
 
 # Package scripts are now external
@@ -34,8 +34,8 @@
 
 Summary: High-performance HTTP accelerator
 Name: varnish
-Version: 7.7.1
-Release: 7%{?dist}
+Version: 7.7.3
+Release: 2%{?dist}
 License: BSD-2-Clause AND (BSD-2-Clause-FreeBSD AND BSD-3-Clause AND LicenseRef-Fedora-Public-Domain AND Zlib)
 URL: https://www.varnish-cache.org/
 Source0: http://varnish-cache.org/_downloads/%{name}-%{version}.tgz
@@ -46,6 +46,15 @@ Source3: https://github.com/jemalloc/jemalloc/releases/download/%{jemalloc_versi
 # Fix for h2 switch in varnishtest
 # https://github.com/varnishcache/varnish-cache/issues/4298
 Patch0:   varnish-7.7.0_fix_4298.patch
+
+# Upstream patches for VSV00018
+Patch1:   varnish-8.0_vsv18_f89df57a.patch
+Patch2:   varnish-8.0_vsv18_73dcb85e.patch
+Patch3:   varnish-8.0_vsv18_5c016b07.patch
+Patch4:   varnish-8.0_vsv18_e8eccd46.patch
+Patch5:   varnish-8.0_vsv18_1a907310.patch
+# Upstream patches for VSV00019
+Patch6:   varnish-8.0_vsv19_db19a0c6-9985187a.patch
 
 %if %{with bundled_jemalloc}
 # bundled jemalloc patch
@@ -156,11 +165,21 @@ Documentation files for %name
 %prep
 %setup -q
 %patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
+
 tar xzf %SOURCE1
 ln -s pkg-varnish-cache-%{commit1}/redhat redhat
 ln -s pkg-varnish-cache-%{commit1}/debian debian
 cp redhat/find-provides .
 sed -i 's,rst2man-3.6,rst2man-3.4,g; s,rst2html-3.6,rst2html-3.4,g; s,phinx-build-3.6,phinx-build-3.4,g' configure
+
+# Not yet implemented
+rm bin/varnishtest/tests/r01255.vtc
 
 # jemalloc
 %if %{with bundled_jemalloc}
@@ -226,7 +245,7 @@ export CFLAGS="$CFLAGS -ffloat-store -fexcess-precision=standard"
 %endif
 
 %if 0%{?fedora} > 41 || 0%{?rhel} > 10
-export CFLAGS="$CFLAGS -std=gnu17"
+export CFLAGS="$CFLAGS -std=gnu17 -Wno-error=discarded-qualifiers"
 %endif
 
 %ifarch s390x
@@ -410,7 +429,13 @@ test -f /etc/varnish/secret || (uuidgen > /etc/varnish/secret && chmod 0600 /etc
 
 
 %changelog
-* Fri Jun 31 2025 Luboš Uhliarik <luhliari@redhat.com> - 7.7.1-4
+* Mon Jun 15 2026 Ingvar Hagelund <ingvar@redpill-linpro.com> - 7.7.3-2
+- Update to latest 7.7.x release available, a security release
+- Includes fixes for VSV00017 aka CVE-2025-8671
+- Added patches for for VSV00018 aka CVE-2026-34475
+- Added patches for for VSV00019 aka CVE-2026-50052
+
+* Fri Jul 25 2025 Luboš Uhliarik <luhliari@redhat.com> - 7.7.1-4
 - bundle jemalloc in RHEL
 
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 7.7.1-3

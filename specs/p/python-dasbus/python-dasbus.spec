@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.7
-Release: 16%{?dist}
+Release:        13%{?dist}
 Summary:        DBus library in Python 3
 
 License:        LGPL-2.1-or-later

@@ -1,0 +1,33 @@
+commit a94929b05c9c40d6dc6e3a84d16e4d73d7368ea0
+Author: Steve Dickson <steved@redhat.com>
+Date:   Thu May 28 15:13:36 2026 -0400
+
+    Removed warnings in nfs_sockaddr2universal()
+    
+    in function 'nfs_sockaddr2universal',
+        inlined from 'nsm_xmit_getaddr.constprop' at ../../support/nsm/rpc.c:251:17:
+    ../../support/nfs/getport.c:459:24: warning: 'strndup' specified bound 108 exceeds source size 26 [-Wstringop-overread]
+      459 |                 return strndup(sun->sun_path, sizeof(sun->sun_path));
+          |                        ^
+    
+    Signed-off-by: Steve Dickson <steved@redhat.com>
+
+diff --git a/support/nfs/getport.c b/support/nfs/getport.c
+index 813f7bf9..608e185b 100644
+--- a/support/nfs/getport.c
++++ b/support/nfs/getport.c
+@@ -452,11 +452,12 @@ char *nfs_sockaddr2universal(const struct sockaddr *sap)
+ 	uint16_t port;
+ 	size_t count;
+ 	char *result;
+-	int len;
++	int len = sizeof(struct sockaddr);
+ 
+ 	switch (sap->sa_family) {
+ 	case AF_LOCAL:
+-		return strndup(sun->sun_path, sizeof(sun->sun_path));
++		size_t path_len = len - offsetof(struct sockaddr_un, sun_path);
++		return strndup(sun->sun_path, path_len);
+ 	case AF_INET:
+ 		if (inet_ntop(AF_INET, (const void *)&sin->sin_addr.s_addr,
+ 					buf, (socklen_t)sizeof(buf)) == NULL)

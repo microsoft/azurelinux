@@ -1,0 +1,75 @@
+--- MyST-NB-1.4.0/tests/test_execute.py.orig	2026-03-02 14:10:42.000000000 -0700
++++ MyST-NB-1.4.0/tests/test_execute.py	2026-05-26 14:02:45.180416670 -0600
+@@ -1,6 +1,7 @@
+ """Test sphinx builds which execute notebooks."""
+ 
+ import os
++import re
+ from pathlib import Path
+ 
+ from IPython import version_info as ipy_version
+@@ -35,6 +36,10 @@ def regress_nb_doc(file_regression, sphi
+             doctree_string = doctree_string.replace(
+                 Path(sphinx_run.app.srcdir).as_posix() + "/", ""
+             )
++        # Do not compare image filenames; they vary by matplotlib version
++        doctree_string = re.sub(r'(_build/jupyter_execute/)[a-z0-9]+(\.png)',
++                                r'\1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\2',
++                                doctree_string)
+         file_regression.check(doctree_string, extension=".xml", encoding="utf-8")
+ 
+ 
+--- MyST-NB-1.4.0/tests/test_execute/test_complex_outputs_unrun_auto.xml.orig	2026-03-02 14:10:42.000000000 -0700
++++ MyST-NB-1.4.0/tests/test_execute/test_complex_outputs_unrun_auto.xml	2026-05-26 12:01:38.506674573 -0600
+@@ -214,7 +214,7 @@
+                             (√5⋅ⅈ)      ⋅⎜─ - ──────⎟ + (-√5⋅ⅈ)      ⋅⎜─ + ──────⎟
+                                          ⎝2     5   ⎠                 ⎝2     5   ⎠
+                     <container mime_type="image/png">
+-                        <image candidates="{'*': '_build/jupyter_execute/c8709f293454a3bd1403356f37bbab536df1c4d65becfd4cdcf84adf951c6820.png'}" uri="_build/jupyter_execute/c8709f293454a3bd1403356f37bbab536df1c4d65becfd4cdcf84adf951c6820.png">
++                        <image candidates="{'*': '_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png'}" uri="_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png">
+                     <container mime_type="text/latex">
+                         <math_block classes="output text_latex" nowrap="0" number="True" xml:space="preserve">
+                             \displaystyle \left(\sqrt{5} i\right)^{\alpha} \left(\frac{1}{2} - \frac{2 \sqrt{5} i}{5}\right) + \left(- \sqrt{5} i\right)^{\alpha} \left(\frac{1}{2} + \frac{2 \sqrt{5} i}{5}\right)
+--- MyST-NB-1.4.0/tests/test_execute/test_complex_outputs_unrun_cache.xml.orig	2026-03-02 14:10:42.000000000 -0700
++++ MyST-NB-1.4.0/tests/test_execute/test_complex_outputs_unrun_cache.xml	2026-05-26 12:02:19.330411578 -0600
+@@ -214,7 +214,7 @@
+                             (√5⋅ⅈ)      ⋅⎜─ - ──────⎟ + (-√5⋅ⅈ)      ⋅⎜─ + ──────⎟
+                                          ⎝2     5   ⎠                 ⎝2     5   ⎠
+                     <container mime_type="image/png">
+-                        <image candidates="{'*': '_build/jupyter_execute/c8709f293454a3bd1403356f37bbab536df1c4d65becfd4cdcf84adf951c6820.png'}" uri="_build/jupyter_execute/c8709f293454a3bd1403356f37bbab536df1c4d65becfd4cdcf84adf951c6820.png">
++                        <image candidates="{'*': '_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png'}" uri="_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png">
+                     <container mime_type="text/latex">
+                         <math_block classes="output text_latex" nowrap="0" number="True" xml:space="preserve">
+                             \displaystyle \left(\sqrt{5} i\right)^{\alpha} \left(\frac{1}{2} - \frac{2 \sqrt{5} i}{5}\right) + \left(- \sqrt{5} i\right)^{\alpha} \left(\frac{1}{2} + \frac{2 \sqrt{5} i}{5}\right)
+--- MyST-NB-1.4.0/tests/test_execute/test_custom_convert_auto.xml.orig	2026-03-02 14:10:42.000000000 -0700
++++ MyST-NB-1.4.0/tests/test_execute/test_custom_convert_auto.xml	2026-05-26 12:02:51.049990074 -0600
+@@ -19,4 +19,4 @@
+                         <literal_block classes="output text_plain" language="myst-ansi" xml:space="preserve">
+                             <Figure size 640x480 with 1 Axes>
+                     <container mime_type="image/png">
+-                        <image candidates="{'*': '_build/jupyter_execute/9af310c61f9e96d898144e35f0dc3bf6757626c2072ad98732a4d71c1ec5ec59.png'}" uri="_build/jupyter_execute/9af310c61f9e96d898144e35f0dc3bf6757626c2072ad98732a4d71c1ec5ec59.png">
++                        <image candidates="{'*': '_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png'}" uri="_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png">
+--- MyST-NB-1.4.0/tests/test_execute/test_custom_convert_cache.xml.orig	2026-03-02 14:10:42.000000000 -0700
++++ MyST-NB-1.4.0/tests/test_execute/test_custom_convert_cache.xml	2026-05-26 12:03:18.785755977 -0600
+@@ -19,4 +19,4 @@
+                         <literal_block classes="output text_plain" language="myst-ansi" xml:space="preserve">
+                             <Figure size 640x480 with 1 Axes>
+                     <container mime_type="image/png">
+-                        <image candidates="{'*': '_build/jupyter_execute/9af310c61f9e96d898144e35f0dc3bf6757626c2072ad98732a4d71c1ec5ec59.png'}" uri="_build/jupyter_execute/9af310c61f9e96d898144e35f0dc3bf6757626c2072ad98732a4d71c1ec5ec59.png">
++                        <image candidates="{'*': '_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png'}" uri="_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png">
+--- MyST-NB-1.4.0/tests/test_execute/test_custom_convert_multiple_extensions_auto.xml.orig	2026-03-02 14:10:42.000000000 -0700
++++ MyST-NB-1.4.0/tests/test_execute/test_custom_convert_multiple_extensions_auto.xml	2026-05-26 12:03:58.097232879 -0600
+@@ -19,4 +19,4 @@
+                         <literal_block classes="output text_plain" language="myst-ansi" xml:space="preserve">
+                             <Figure size 640x480 with 1 Axes>
+                     <container mime_type="image/png">
+-                        <image candidates="{'*': '_build/jupyter_execute/9af310c61f9e96d898144e35f0dc3bf6757626c2072ad98732a4d71c1ec5ec59.png'}" uri="_build/jupyter_execute/9af310c61f9e96d898144e35f0dc3bf6757626c2072ad98732a4d71c1ec5ec59.png">
++                        <image candidates="{'*': '_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png'}" uri="_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png">
+--- MyST-NB-1.4.0/tests/test_execute/test_custom_convert_multiple_extensions_cache.xml.orig	2026-03-02 14:10:42.000000000 -0700
++++ MyST-NB-1.4.0/tests/test_execute/test_custom_convert_multiple_extensions_cache.xml	2026-05-26 12:04:33.680959979 -0600
+@@ -19,4 +19,4 @@
+                         <literal_block classes="output text_plain" language="myst-ansi" xml:space="preserve">
+                             <Figure size 640x480 with 1 Axes>
+                     <container mime_type="image/png">
+-                        <image candidates="{'*': '_build/jupyter_execute/9af310c61f9e96d898144e35f0dc3bf6757626c2072ad98732a4d71c1ec5ec59.png'}" uri="_build/jupyter_execute/9af310c61f9e96d898144e35f0dc3bf6757626c2072ad98732a4d71c1ec5ec59.png">
++                        <image candidates="{'*': '_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png'}" uri="_build/jupyter_execute/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.png">

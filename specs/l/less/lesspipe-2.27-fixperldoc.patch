@@ -1,0 +1,11 @@
+diff -up less-704/lesspipe-src/lesspipe.sh.fixperldoc less-704/lesspipe-src/lesspipe.sh
+--- less-704/lesspipe-src/lesspipe.sh.fixperldoc	2026-06-10 13:03:36.000000000 +0200
++++ less-704/lesspipe-src/lesspipe.sh	2026-08-19 10:29:42.581072760 +0200
+@@ -415,7 +415,6 @@ get_unpack_cmd () {
+ analyze_args () {
+ 	# determine how we are called
+ 	cmdtree=$(ps -oargs= 2>/dev/null)
+-	[[ $cmdtree == *perldoc\ * ]] && exit 0
+ 	while read -r line; do
+ 		arg1=${line%% *}; arg1=${arg1##*/}
+ 		[[ $arg1 == less ]] && lessarg=$line

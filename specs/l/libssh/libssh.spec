@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           libssh
-Version:        0.11.4
-Release: 4%{?dist}
+Version:        0.11.5
+Release:        1%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPL-2.1-or-later
 URL:            http://www.libssh.org
@@ -142,6 +142,9 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
+* Tue Jul 21 2026 Jakub Jelen <jjelen@redhat.com> - 0.11.5-1
+- New upstream security release (#2503148)
+
 * Tue Feb 10 2026 Jakub Jelen <jjelen@redhat.com> - 0.11.4-1
 - New upstream release fixing following security issues:
   - CVE-2025-14821: libssh loads configuration files from the C:\etc directory on Windows

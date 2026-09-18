@@ -1,69 +1,85 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global pypi_name cbor2
-
-Name:           python-%{pypi_name}
+Name:           python-cbor2
 Version:        5.6.5
-Release: 10%{?dist}
+Release:        8%{?dist}
 Summary:        Python CBOR (de)serializer with extensive tag support
-
 License:        MIT
 URL:            https://github.com/agronholm/cbor2
-Source0:        %{pypi_source}
+Source:         %{pypi_source cbor2}
+# CVE-2025-64076
+# https://github.com/agronholm/cbor2/pull/265
+Patch:          0001-Fix-bug-in-decode_definite_long_string-that-causes-incorrect-chunk-length-calculation-265.patch
 
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 
-%description
+%global _description %{expand:
 This library provides encoding and decoding for the Concise Binary Object
-Representation (CBOR) (RFC 7049) serialization format.
+Representation (CBOR) (RFC 7049) serialization format.}
 
-%package -n     python3-%{pypi_name}
+
+%description %_description
+
+
+%package -n     python3-cbor2
 Summary:        %{summary}
 
-%description -n python3-%{pypi_name}
-This library provides encoding and decoding for the Concise Binary Object
-Representation (CBOR) (RFC 7049) serialization format.
 
-%package -n python-%{pypi_name}-doc
+%description -n python3-cbor2 %_description
+
+
+%package -n python-cbor2-doc
 Summary:        cbor2 documentation
 BuildArch:      noarch
 BuildRequires:  python3dist(sphinx)
 BuildRequires:  python3dist(sphinx-rtd-theme)
 BuildRequires:  python3dist(sphinx-autodoc-typehints)
 
-%description -n python-%{pypi_name}-doc
+
+%description -n python-cbor2-doc
 Documentation for cbor2.
 
+
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -p 1 -n cbor2-%{version}
+
 
 %generate_buildrequires
 %pyproject_buildrequires -x test
 
+
 %build
 %pyproject_wheel
 
+
 %install
 %pyproject_install
-%pyproject_save_files %{pypi_name}
+%pyproject_save_files -l cbor2
 PYTHONPATH=${PWD} sphinx-build-3 docs html
 rm -rf html/.{doctrees,buildinfo}
+
 
 %check
 %pytest -v tests
 
-%files -n python3-%{pypi_name} -f %{pyproject_files}
-%doc README.rst
-%{python3_sitearch}/_%{pypi_name}%{python3_ext_suffix}
-%{_bindir}/%{pypi_name}
 
-%files -n python-%{pypi_name}-doc
+%files -n python3-cbor2 -f %{pyproject_files}
+%doc README.rst
+%{python3_sitearch}/_cbor2%{python3_ext_suffix}
+%{_bindir}/cbor2
+
+
+%files -n python-cbor2-doc
 %doc html
 %license LICENSE.txt
 
+
 %changelog
+* Fri Apr 10 2026 Carl George <carlwgeorge@fedoraproject.org> - 5.6.5-8
+- Backport upstream patch for CVE-2025-64076
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.6.5-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

@@ -34,11 +34,11 @@
 
 %global major_version 4
 %global minor_version 5
-%global patch_version 2
+%global patch_version 3
 
 Name:           R
 Version:        %{major_version}.%{minor_version}.%{patch_version}
-Release: 6%{?dist}
+Release:        1%{?dist}
 Summary:        A language for data analysis and graphics
 
 License:        GPL-2.0-or-later
@@ -145,21 +145,21 @@ Provides:       R(ABI) = %{bootstrap_abi}
 %add_submodule  base %{version}
 %add_submodule  boot 1.3-32
 %add_submodule  class 7.3-23
-%add_submodule  cluster 2.1.8.1
+%add_submodule  cluster 2.1.8.2
 %add_submodule  codetools 0.2-20
 %add_submodule  compiler %{version}
 %add_submodule  datasets %{version}
-%add_submodule  foreign 0.8-90
+%add_submodule  foreign 0.8-91
 %add_submodule  graphics %{version}
 %add_submodule  grDevices %{version}
 %add_submodule  grid %{version}
 %add_submodule  KernSmooth 2.23-26
-%add_submodule  lattice 0.22-7
+%add_submodule  lattice 0.22-9
 %add_submodule  MASS 7.3-65
 %add_submodule  Matrix 1.7-4
 Obsoletes:      R-Matrix < 0.999375-7
 %add_submodule  methods %{version}
-%add_submodule  mgcv 1.9-3
+%add_submodule  mgcv 1.9-4
 %add_submodule  nlme 3.1-168
 %add_submodule  nnet 7.3-20
 %add_submodule  parallel %{version}
@@ -168,7 +168,7 @@ Obsoletes:      R-Matrix < 0.999375-7
 %add_submodule  splines %{version}
 %add_submodule  stats %{version}
 %add_submodule  stats4 %{version}
-%add_submodule  survival 3.8-3
+%add_submodule  survival 3.8-6
 %add_submodule  tcltk %{version}
 %add_submodule  tools %{version}
 %add_submodule  translations %{version}
@@ -965,6 +965,9 @@ TZ="Europe/Paris" make check
 %{_libdir}/libRmath.a
 
 %changelog
+* Wed Mar 11 2026 Iñaki Úcar <iucar@fedoraproject.org> - 4.5.3-1
+- Update to 4.5.3
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.5.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

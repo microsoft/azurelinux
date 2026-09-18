@@ -1,0 +1,37 @@
+From 8849c2ef3944e8b1669568c58a4823c3aa66005e Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 15 Mar 2026 12:20:36 +0000
+Subject: [PATCH] Update nix dependency from 0.26 to 0.31
+
+https://github.com/nix-rust/nix/blob/v0.31.2/CHANGELOG.md
+---
+ admin-tool/Cargo.toml      |  2 +-
+ client-linuxapp/Cargo.toml |  2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/admin-tool/Cargo.toml b/admin-tool/Cargo.toml
+index 16436da5e..118a756e5 100644
+--- a/admin-tool/Cargo.toml
++++ b/admin-tool/Cargo.toml
+@@ -18,7 +18,7 @@ reqwest = "0.12"
+ serde = "1"
+ serde_yaml = "0.9"
+ pretty_env_logger = "0.5"
+-nix = "0.26"
++nix = { version = "0.31", features = ["net"] }
+ tokio = { version = "1", features = ["full"] }
+ 
+ fdo-data-formats = { path = "../data-formats", version = "0.5.5" }
+diff --git a/client-linuxapp/Cargo.toml b/client-linuxapp/Cargo.toml
+index 547fb334c..0148940c4 100644
+--- a/client-linuxapp/Cargo.toml
++++ b/client-linuxapp/Cargo.toml
+@@ -13,7 +13,7 @@ tokio = { version = "1", features = ["full"] }
+ sys-info = "0.9"
+ serde_bytes = "0.11"
+ rand = "0.8.4"
+-nix = "0.26"
++nix = { version = "0.31", features = ["fs", "user"] }
+ uuid = "1.3"
+ thiserror = "1"
+ libcryptsetup-rs = { version = ">= 0.11.2", features = ["mutex"] }

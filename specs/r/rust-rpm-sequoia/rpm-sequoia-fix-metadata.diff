@@ -1,5 +1,5 @@
---- rpm-sequoia-1.10.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ rpm-sequoia-1.10.1/Cargo.toml	2026-02-23T16:05:57.871791+00:00
+--- rpm-sequoia-1.10.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rpm-sequoia-1.10.2/Cargo.toml	2026-04-25T17:08:43.244631+00:00
 @@ -41,13 +41,10 @@
  status = "actively-developed"
  

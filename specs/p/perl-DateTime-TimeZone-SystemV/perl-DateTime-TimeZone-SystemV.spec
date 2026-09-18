@@ -10,7 +10,7 @@
 
 Name:           perl-DateTime-TimeZone-SystemV
 Version:        0.010
-Release: 27%{?dist}
+Release:        24%{?dist}
 Summary:        System V and POSIX timezone strings
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/DateTime-TimeZone-SystemV

@@ -3,7 +3,7 @@
 
 Name:           openblas-srpm-macros
 Version:        2
-Release: 23%{?dist}
+Release:        20%{?dist}
 Summary:        OpenBLAS architecture macros
 License:        MIT
 Source0:        macros.openblas-srpm

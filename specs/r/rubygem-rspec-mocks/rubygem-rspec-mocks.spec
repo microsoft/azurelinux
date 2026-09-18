@@ -1,12 +1,12 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global	majorver	3.13.7
+%global	majorver	3.13.8
 #%%global	preminorver	.rc6
 %global	rpmminorver	.%(echo %preminorver | sed -e 's|^\\.\\.*||')
 %global	fullver	%{majorver}%{?preminorver}
 
-%global	baserelease	3
+%global	baserelease	1
 
 %global	gem_name	rspec-mocks
 
@@ -125,6 +125,9 @@ cucumber
 %{gem_docdir}
 
 %changelog
+* Sun Mar 01 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.13.8-1
+- 3.13.8
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.13.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

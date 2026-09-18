@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.5.0
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Test asyncio code more easily
 
 License:        MIT

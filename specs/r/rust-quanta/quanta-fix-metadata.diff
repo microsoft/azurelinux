@@ -1,5 +1,5 @@
 --- quanta-0.12.6/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ quanta-0.12.6/Cargo.toml	2025-07-19T15:40:05.784382+00:00
++++ quanta-0.12.6/Cargo.toml	2026-02-25T16:07:06.990260+00:00
 @@ -37,7 +37,7 @@
  all-features = true
  
@@ -9,18 +9,21 @@
  flaky_tests = []
  prost = ["prost-types"]
  
-@@ -63,12 +63,12 @@
+@@ -63,15 +63,12 @@
  version = "1.4"
  
  [dependencies.prost-types]
 -version = "0.11"
-+version = "0.13"
++version = "0.14"
  optional = true
  default-features = false
  
  [dev-dependencies.average]
 -version = "0.14"
+-
+-[dev-dependencies.criterion]
+-version = "=0.3.3"
 +version = "0.15"
  
- [dev-dependencies.criterion]
- version = "=0.3.3"
+ [target.'cfg(not(any(target_os = "windows", target_arch = "wasm32")))'.dependencies.libc]
+ version = "0.2"

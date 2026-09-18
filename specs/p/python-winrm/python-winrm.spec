@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        0.5.0
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        Python libraries for interacting with windows remote management
 
 License:        MIT

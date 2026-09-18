@@ -1529,11 +1529,9 @@ index 40d688d6..15df591c 100644
  kex_gen_hash(
      int hash_alg,
      const struct sshbuf *client_version,
-diff --git a/kexgssc.c b/kexgssc.c
-new file mode 100644
-index 00000000..96f7b6f5
---- /dev/null
-+++ b/kexgssc.c
+diff --color -ruNp a/kexgssc.c b/kexgssc.c
+--- a/kexgssc.c	1970-01-01 01:00:00.000000000 +0100
++++ b/kexgssc.c	2026-03-18 10:36:48.368598424 +0100
 @@ -0,0 +1,706 @@
 +/*
 + * Copyright (c) 2001-2009 Simon Wilkinson. All rights reserved.
@@ -1662,7 +1660,7 @@ index 00000000..96f7b6f5
 +
 +	/* Verify that the hash matches the MIC we just got. */
 +	if (GSS_ERROR(ssh_gssapi_checkmic(gss, &gss->buf, &gss->msg_tok)))
-+		sshpkt_disconnect(ssh, "Hash's MIC didn't verify");
++		ssh_packet_disconnect(ssh, "Hash's MIC didn't verify");
 +
 +	gss_release_buffer(&gss->minor, &gss->msg_tok);
 +
@@ -1885,10 +1883,10 @@ index 00000000..96f7b6f5
 +			fatal("Failed to read token: %s", ssh_err(r));
 +		/* If we're already complete - protocol error */
 +		if (gss->major == GSS_S_COMPLETE)
-+			sshpkt_disconnect(ssh, "Protocol error: received token when complete");
++			ssh_packet_disconnect(ssh, "Protocol error: received token when complete");
 +	} else {
 +		if (gss->major != GSS_S_COMPLETE)
-+			sshpkt_disconnect(ssh, "Protocol error: did not receive final token");
++			ssh_packet_disconnect(ssh, "Protocol error: did not receive final token");
 +	}
 +	if ((r = sshpkt_get_end(ssh)) != 0)
 +		fatal("Expecting end of packet.");
@@ -2024,7 +2022,7 @@ index 00000000..96f7b6f5
 +
 +	/* Verify that the hash matches the MIC we just got. */
 +	if (GSS_ERROR(ssh_gssapi_checkmic(gss, &gss->buf, &gss->msg_tok)))
-+		sshpkt_disconnect(ssh, "Hash's MIC didn't verify");
++		ssh_packet_disconnect(ssh, "Hash's MIC didn't verify");
 +
 +	gss_release_buffer(&gss->minor, &gss->msg_tok);
 +
@@ -2225,10 +2223,10 @@ index 00000000..96f7b6f5
 +			fatal("Failed to read token: %s", ssh_err(r));
 +		/* If we're already complete - protocol error */
 +		if (gss->major == GSS_S_COMPLETE)
-+			sshpkt_disconnect(ssh, "Protocol error: received token when complete");
++			ssh_packet_disconnect(ssh, "Protocol error: received token when complete");
 +	} else {
 +		if (gss->major != GSS_S_COMPLETE)
-+			sshpkt_disconnect(ssh, "Protocol error: did not receive final token");
++			ssh_packet_disconnect(ssh, "Protocol error: did not receive final token");
 +	}
 +	if ((r = sshpkt_get_end(ssh)) != 0)
 +		fatal("Expecting end of packet.");
@@ -2241,12 +2239,10 @@ index 00000000..96f7b6f5
 +}
 +
 +#endif /* defined(GSSAPI) && defined(WITH_OPENSSL) */
-diff --git a/kexgsss.c b/kexgsss.c
-new file mode 100644
-index 00000000..8362081e
---- /dev/null
-+++ b/kexgsss.c
-@@ -0,0 +1,601 @@
+diff --color -ruNp a/kexgsss.c b/kexgsss.c
+--- a/kexgsss.c	1970-01-01 01:00:00.000000000 +0100
++++ b/kexgsss.c	2026-03-18 10:39:12.304514706 +0100
+@@ -0,0 +1,603 @@
 +/*
 + * Copyright (c) 2001-2009 Simon Wilkinson. All rights reserved.
 + *
@@ -2378,7 +2374,7 @@ index 00000000..8362081e
 +{
 +	struct kex *kex = ssh->kex;
 +	Gssctxt *gss = kex->gss;
-+	gss_buffer_desc msg_tok;
++	gss_buffer_desc msg_tok = GSS_C_EMPTY_BUFFER;
 +	u_char hash[SSH_DIGEST_MAX_LENGTH];
 +	size_t hashlen;
 +	struct sshbuf *shared_secret = NULL;
@@ -2462,7 +2458,8 @@ index 00000000..8362081e
 +	Gssctxt *gss = kex->gss;
 +	struct sshbuf *empty;
 +	struct sshbuf *client_pubkey = NULL;
-+	gss_buffer_desc recv_tok, send_tok = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc recv_tok = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc send_tok = GSS_C_EMPTY_BUFFER;
 +	OM_uint32 ret_flags = 0;
 +	int r;
 +
@@ -2538,7 +2535,8 @@ index 00000000..8362081e
 +		      struct ssh *ssh)
 +{
 +	Gssctxt *gss = ssh->kex->gss;
-+	gss_buffer_desc recv_tok, send_tok = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc recv_tok = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc send_tok = GSS_C_EMPTY_BUFFER;
 +	OM_uint32 ret_flags = 0;
 +	int r;
 +
@@ -2629,7 +2627,7 @@ index 00000000..8362081e
 +{
 +	struct kex *kex = ssh->kex;
 +	Gssctxt *gss = kex->gss;
-+	gss_buffer_desc msg_tok;
++	gss_buffer_desc msg_tok = GSS_C_EMPTY_BUFFER;
 +	u_char hash[SSH_DIGEST_MAX_LENGTH];
 +	size_t hashlen;
 +	const BIGNUM *pub_key, *dh_p, *dh_g;
@@ -2770,10 +2768,8 @@ index 00000000..8362081e
 +		fatal("GSS_GEX, bad parameters: %d !< %d !< %d", min, nbits, max);
 +
 +	kex->dh = mm_choose_dh(min, nbits, max);
-+	if (kex->dh == NULL) {
-+		sshpkt_disconnect(ssh, "Protocol error: no matching group found");
-+		fatal("Protocol error: no matching group found");
-+	}
++	if (kex->dh == NULL)
++		ssh_packet_disconnect(ssh, "Protocol error: no matching group found");
 +
 +	DH_get0_pqg(kex->dh, &dh_p, NULL, &dh_g);
 +	if ((r = sshpkt_start(ssh, SSH2_MSG_KEXGSS_GROUP)) != 0 ||
@@ -2805,7 +2801,8 @@ index 00000000..8362081e
 +		     struct ssh *ssh)
 +{
 +	Gssctxt *gss = ssh->kex->gss;
-+	gss_buffer_desc recv_tok, send_tok = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc recv_tok = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc send_tok = GSS_C_EMPTY_BUFFER;
 +	OM_uint32 ret_flags = 0;
 +	int r;
 +
@@ -2832,7 +2829,8 @@ index 00000000..8362081e
 +			 struct ssh *ssh)
 +{
 +	Gssctxt *gss = ssh->kex->gss;
-+	gss_buffer_desc recv_tok, send_tok = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc recv_tok = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc send_tok = GSS_C_EMPTY_BUFFER;
 +	OM_uint32 ret_flags = 0;
 +	int r;
 +

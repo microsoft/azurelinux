@@ -1,0 +1,35 @@
+From f9c82184ce88d8de3ffe588279b0bc41d3887998 Mon Sep 17 00:00:00 2001
+From: Lukas Beckmann <lbckmnn@mailbox.org>
+Date: Sun, 1 Mar 2026 22:24:06 +0100
+Subject: [PATCH 2/3] cyclictest: fix growing shm stat file
+
+On a received USR2 signal, the current statistics are written to a file
+in shared memory. Before that happens, it is truncated to zero to clear
+it.
+
+However, currently the shm file keeps growing with each received signal
+because the seek pointer is not updated by ftruncate.
+
+This is fixed by calling fseek after truncating.
+
+Signed-off-by: Lukas Beckmann <lbckmnn@mailbox.org>
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ src/cyclictest/cyclictest.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/cyclictest/cyclictest.c b/src/cyclictest/cyclictest.c
+index 191945e1e0db..960c90560668 100644
+--- a/src/cyclictest/cyclictest.c
++++ b/src/cyclictest/cyclictest.c
+@@ -1472,6 +1472,7 @@ static void sighand(int sig)
+ 			return;
+ 		}
+ 		rstat_ftruncate(rstat_fd, 0);
++		lseek(rstat_fd, 0, SEEK_SET);
+ 		quiet = 0;
+ 		dprintf(rstat_fd, "#---------------------------\n");
+ 		dprintf(rstat_fd, "# cyclictest current status:\n");
+-- 
+2.53.0
+

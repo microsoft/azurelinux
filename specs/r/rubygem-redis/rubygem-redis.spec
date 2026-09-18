@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 5.2.0
-Release: 6%{?dist}
+Release: 3%{?dist}
 Summary: A Ruby client library for Redis
 License: MIT
 URL: https://github.com/redis/redis-rb

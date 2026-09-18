@@ -1,6 +1,6 @@
-diff -rupN --no-dereference assimp-6.0.4/contrib/zlib/CMakeLists.txt assimp-6.0.4-new/contrib/zlib/CMakeLists.txt
---- assimp-6.0.4/contrib/zlib/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/contrib/zlib/CMakeLists.txt	2026-01-27 13:39:45.210518736 +0100
+diff -rupN --no-dereference assimp-6.0.5/contrib/zlib/CMakeLists.txt assimp-6.0.5-new/contrib/zlib/CMakeLists.txt
+--- assimp-6.0.5/contrib/zlib/CMakeLists.txt	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/contrib/zlib/CMakeLists.txt	2026-05-01 23:05:56.966699588 +0200
 @@ -196,7 +196,7 @@ if(MINGW)
      set(ZLIB_DLL_SRCS ${CMAKE_CURRENT_BINARY_DIR}/zlib1rc.obj)
  endif(MINGW)

@@ -43,7 +43,7 @@
 
 Name:           booth
 Version:        1.2
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        Ticket Manager for Multi-site Clusters
 License:        GPL-2.0-or-later
 Url:            https://github.com/%{github_owner}/%{name}

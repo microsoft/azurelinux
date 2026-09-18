@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        9.1.0
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Automated testing for the examples in your documentation
 
 License:        MIT

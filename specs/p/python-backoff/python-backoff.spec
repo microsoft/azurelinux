@@ -11,7 +11,7 @@ polling resources for externally generated content.
 
 Name:      python-%{srcname}
 Version:   2.2.1
-Release: 16%{?dist}
+Release:   13%{?dist}
 BuildArch: noarch
 
 License: MIT

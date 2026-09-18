@@ -3,7 +3,7 @@
 
 Name:       libecap
 Version:    1.0.1
-Release: 23%{?dist}
+Release:    20%{?dist}
 Summary:    Squid interface for embedded adaptation modules
 License:    BSD-2-Clause
 URL:        http://www.e-cap.org/

@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        17.0.0
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Unicodedata backport updated to the latest Unicode version
 
 License:        Apache-2.0

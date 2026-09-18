@@ -14,8 +14,8 @@
 
 Summary: Roles and playbooks to deploy FreeIPA servers, replicas and clients
 Name: ansible-freeipa
-Version: 1.16.0
-Release: 4%{?dist}
+Version: 1.17.0
+Release: 0%{?dist}
 URL: https://github.com/freeipa/ansible-freeipa
 License: GPL-3.0-or-later
 Source: https://github.com/freeipa/ansible-freeipa/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -150,7 +150,7 @@ done
 # Create collection and install to %{buildroot}%{ansible_collections_dir}
 # ansible-galaxy collection install creates ansible_collections directory
 # automatically in given path, therefore /..
-utils/build-galaxy-release.sh -o "%{version}" -p %{buildroot}%{ansible_collections_dir}/.. %{collection_namespace} %{collection_name}
+utils/build-collection.sh -o "%{version}" -p %{buildroot}%{ansible_collections_dir}/.. rpm
 
 cp %{buildroot}/%{ansible_collections_dir}/%{collection_namespace}/%{collection_name}/README.md .
 
@@ -162,6 +162,12 @@ cp %{buildroot}/%{ansible_collections_dir}/%{collection_namespace}/%{collection_
 %{ansible_collections_dir}/%{collection_namespace}/%{collection_name}
 
 %changelog
+* Thu Jul 23 2026 Thomas Woerner <twoerner@redhat.com> - 1.17.0-1
+- Update to version 1.17.0
+  https://github.com/freeipa/ansible-freeipa/releases/tag/v1.17.0
+  - New ipauser query state
+  - New ipagroup query state
+
 * Tue Jan 13 2026 Thomas Woerner <twoerner@redhat.com> - 1.16.0-1
 - Update to version 1.16.0
   https://github.com/freeipa/ansible-freeipa/releases/tag/v1.16.0

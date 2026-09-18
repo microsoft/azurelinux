@@ -3,7 +3,7 @@
 
 Name:           libjaylink
 Version:        0.3.0
-Release: 12%{?dist}
+Release:        9%{?dist}
 Summary:        Library for SEGGER J-Link and compatible devices
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

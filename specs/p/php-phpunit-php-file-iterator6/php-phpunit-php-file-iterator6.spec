@@ -3,7 +3,7 @@
 
 # remirepo/fedora spec file for php-phpunit-php-file-iterator6
 #
-# Copyright (c) 2009-2025 Christof Damian, Remi Collet
+# Copyright (c) 2009-2026 Christof Damian, Remi Collet
 #
 # License: MIT
 # http://opensource.org/licenses/MIT
@@ -13,11 +13,8 @@
 
 %bcond_without       tests
 
-%global gh_commit    3d1cd096ef6bea4bf2762ba586e35dbd317cbfd5
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   php-file-iterator
-%global gh_date      2026-02-02
 %global php_home     %{_datadir}/php
 # Packagist
 %global pk_vendor    phpunit
@@ -29,22 +26,22 @@
 
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        6.0.1
-Release: 4%{?dist}
+Version:        6.0.2
+Release:        1%{?dist}
 Summary:        FilterIterator implementation based on a list of suffixes, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
 BuildRequires:  php(language) >= 8.3
 %if %{with tests}
 # From composer.json, "require-dev"
-#        "phpunit/phpunit": "^12.0"
-BuildRequires:  phpunit12
+#        "phpunit/phpunit": "^12.5.33"
+BuildRequires:  phpunit12  >= 12.5.33
 %endif
 BuildRequires:  php-fedora-autoloader-devel
 
@@ -67,7 +64,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -89,7 +86,7 @@ touch vendor/autoload.php
 
 : Run upstream test suite
 ret=0
-for cmd in php php83 php84 php85; do
+for cmd in php php83 php84 php85 php86; do
   if which $cmd; then
     $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
       %{_bindir}/phpunit12 || ret=1
@@ -109,6 +106,9 @@ exit $ret
 
 
 %changelog
+* Wed Aug 26 2026 Remi Collet <remi@remirepo.net> - 6.0.2-1
+- update to 6.0.2
+
 * Tue Feb  3 2026 Remi Collet <remi@remirepo.net> - 6.0.1-1
 - update to 6.0.1
 

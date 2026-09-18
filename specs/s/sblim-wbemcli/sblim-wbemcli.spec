@@ -3,7 +3,7 @@
 
 Name:           sblim-wbemcli
 Version:        1.6.3
-Release: 33%{?dist}
+Release:        30%{?dist}
 Summary:        SBLIM WBEM Command Line Interface
 
 License:        EPL-1.0

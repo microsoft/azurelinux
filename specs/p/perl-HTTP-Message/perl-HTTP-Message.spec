@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           perl-HTTP-Message
-Version:        7.01
-Release: 4%{?dist}
+Version:        7.03
+Release:        1%{?dist}
 Summary:        HTTP style message
 # CONTRIBUTING.md:  CC0-1.0
 # other files:      GPL-1.0-or-later OR Artistic-1.0-Perl
@@ -129,6 +129,12 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Jul 23 2026 Michal Josef Špaček <mspacek@redhat.com> - 7.03-1
+- 7.03 bump
+
+* Mon Jun 08 2026 Michal Josef Špaček <mspacek@redhat.com> - 7.02-1
+- 7.02 bump
+
 * Fri Nov 07 2025 Michal Josef Špaček <mspacek@redhat.com> - 7.01-1
 - 7.01 bump
 

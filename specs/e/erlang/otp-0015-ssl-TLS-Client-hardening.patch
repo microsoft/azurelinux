@@ -1,0 +1,39 @@
+From: Ingela Anderton Andin <ingela@erlang.org>
+Date: Fri, 19 Jun 2026 11:27:05 +0200
+Subject: [PATCH] ssl: TLS Client hardening
+
+Guard TLS client  for  MITM injection of application data during
+"plain-text-window" during handshake.
+
+diff --git a/lib/ssl/src/tls_gen_connection.erl b/lib/ssl/src/tls_gen_connection.erl
+index eb40114a77..cfdc1a81e2 100644
+--- a/lib/ssl/src/tls_gen_connection.erl
++++ b/lib/ssl/src/tls_gen_connection.erl
+@@ -451,6 +451,27 @@ handle_protocol_record(#ssl_tls{type = ?APPLICATION_DATA}, StateName,
+                                              StateName == wait_finished->
+     Alert = ?ALERT_REC(?FATAL, ?UNEXPECTED_MESSAGE, application_data_before_handshake_or_intervened_in_post_handshake_auth),
+     ssl_gen_statem:handle_own_alert(Alert, StateName, State);
++handle_protocol_record(#ssl_tls{type = ?APPLICATION_DATA}, StateName,
++                       #state{static_env = #static_env{role = client},
++                              handshake_env = #handshake_env{renegotiation = {false, first}}
++                             } = State) when StateName == hello;
++                                             StateName == certify;
++                                             StateName == wait_stapling;
++                                             StateName == abbreviated;
++                                             StateName == cipher ->
++    %% Pre TLS-1.3 client guard "plain text window" for MITM injection
++    Alert = ?ALERT_REC(?FATAL, ?UNEXPECTED_MESSAGE,
++                       application_data_before_handshake_completion),
++    ssl_gen_statem:handle_own_alert(Alert, StateName, State);
++handle_protocol_record(#ssl_tls{type = ?APPLICATION_DATA}, StateName,
++                       #state{static_env = #static_env{role = client}
++                             } = State) when
++      StateName == start;
++      StateName == wait_sh ->
++    %% TLS-1.3 client guard "plain text window" for MITM injection
++    Alert = ?ALERT_REC(?FATAL, ?UNEXPECTED_MESSAGE,
++                       application_data_before_handshake_completion),
++    ssl_gen_statem:handle_own_alert(Alert, StateName, State);
+ handle_protocol_record(#ssl_tls{type = ?APPLICATION_DATA, fragment = Data}, StateName,
+                        #state{start_or_recv_from = From,
+                               socket_options = #socket_options{active = false}} = State0) when From =/= undefined ->

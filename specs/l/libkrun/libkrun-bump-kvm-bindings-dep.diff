@@ -1,0 +1,76 @@
+diff --git a/src/arch/Cargo.toml b/src/arch/Cargo.toml
+index 3ed8181..ea6ee2e 100644
+--- a/src/arch/Cargo.toml
++++ b/src/arch/Cargo.toml
+@@ -22,7 +22,7 @@ smbios = { package = "krun-smbios", version = "=0.1.0-1.19.0", path = "../smbios
+ utils = { package = "krun-utils", version = "=0.1.0-1.19.0", path = "../utils" }
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+-kvm-bindings = { version = "0.12", features = ["fam-wrappers"] }
++kvm-bindings = { version = "0.13", features = ["fam-wrappers"] }
+ kvm-ioctls = "0.22"
+ 
+ [dev-dependencies]
+diff --git a/src/cpuid/Cargo.toml b/src/cpuid/Cargo.toml
+index eec4ff2..ed4d9ef 100644
+--- a/src/cpuid/Cargo.toml
++++ b/src/cpuid/Cargo.toml
+@@ -14,5 +14,5 @@ tdx = []
+ vmm-sys-util = "0.14"
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+-kvm-bindings = { version = "0.12", features = ["fam-wrappers"] }
++kvm-bindings = { version = "0.13", features = ["fam-wrappers"] }
+ kvm-ioctls = "0.22"
+diff --git a/src/devices/Cargo.toml b/src/devices/Cargo.toml
+index b581bf0..667ff79 100644
+--- a/src/devices/Cargo.toml
++++ b/src/devices/Cargo.toml
+@@ -50,7 +50,7 @@ hvf = { package = "krun-hvf", version = "=0.1.0-1.19.0", path = "../hvf" }
+ [target.'cfg(target_os = "linux")'.dependencies]
+ rutabaga_gfx = { package = "krun-rutabaga-gfx", version = "=0.1.0-1.19.0", path = "../rutabaga_gfx", features = ["x"], optional = true }
+ caps = "0.5.5"
+-kvm-bindings = { version = "0.12", features = ["fam-wrappers"] }
++kvm-bindings = { version = "0.13", features = ["fam-wrappers"] }
+ kvm-ioctls = "0.22"
+ 
+ [target.'cfg(any(target_arch = "aarch64", target_arch = "riscv64"))'.dependencies]
+diff --git a/src/libkrun/Cargo.toml b/src/libkrun/Cargo.toml
+index 7c62e19..97b35d6 100644
+--- a/src/libkrun/Cargo.toml
++++ b/src/libkrun/Cargo.toml
+@@ -41,7 +41,7 @@ vmm = { package = "krun-vmm", version = "=0.1.0-1.19.0", path = "../vmm" }
+ hvf = { package = "krun-hvf", version = "=0.1.0-1.19.0", path = "../hvf" }
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+-kvm-bindings = { version = "0.12", features = ["fam-wrappers"] }
++kvm-bindings = { version = "0.13", features = ["fam-wrappers"] }
+ kvm-ioctls = "0.22"
+ vm-memory = { version = "0.17", features = ["backend-mmap"] }
+ 
+diff --git a/src/utils/Cargo.toml b/src/utils/Cargo.toml
+index edf2d0c..2e9d9f5 100644
+--- a/src/utils/Cargo.toml
++++ b/src/utils/Cargo.toml
+@@ -16,7 +16,7 @@ vmm-sys-util = "0.14"
+ crossbeam-channel = ">=0.5.15"
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+-kvm-bindings = { version = "0.12", features = ["fam-wrappers"] }
++kvm-bindings = { version = "0.13", features = ["fam-wrappers"] }
+ 
+ [target.'cfg(target_os = "macos")'.dependencies]
+ nix = { version = "0.30.1", features = ["fs"] }
+diff --git a/src/vmm/Cargo.toml b/src/vmm/Cargo.toml
+index 5148f6e..62e840f 100644
+--- a/src/vmm/Cargo.toml
++++ b/src/vmm/Cargo.toml
+@@ -52,7 +52,7 @@ cpuid = { package = "krun-cpuid", version = "=0.1.0-1.19.0", path = "../cpuid" }
+ zstd = "0.13"
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+-kvm-bindings = { version = "0.12", features = ["fam-wrappers"] }
++kvm-bindings = { version = "0.13", features = ["fam-wrappers"] }
+ kvm-ioctls = "0.22"
+ 
+ [target.'cfg(target_os = "macos")'.dependencies]

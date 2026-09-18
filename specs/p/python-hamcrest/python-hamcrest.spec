@@ -6,7 +6,7 @@
 
 Name:           python-%{modname}
 Version:        2.1.0
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Hamcrest matchers for Python
 
 License:        BSD-3-Clause

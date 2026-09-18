@@ -33,8 +33,11 @@ function repack {
 
 dcap_version=$(grep dcap_version linux-sgx*spec | head -1 | awk '{print $3}')
 
+# Strip two enclaves that static link an unapproved openssl
+# build. See more comments in linux-sgx-enclaves-prebuilt.spec
+# and linux-sgx.spec
 repack prebuilt_dcap_${dcap_version} \
        libcrypto.a \
        *.h *.H \
-       policy.wasm \
+       libsgx_qae.signed.so \
        libsgx_qve.signed.so

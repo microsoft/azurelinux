@@ -1,0 +1,185 @@
+This patch adds the options --detect-renamed-lax and --detect-moved.
+These modify the --detect-renamed algorithm to adopt a matching file
+without verifying that the content is as expected.  The former blindly
+accepts a file that matches in size and modified time.  The latter
+requires that the filename also match (ignoring any renamed files).
+
+This patch is EXPERIMENTAL, though it did work correctly in my light
+testing.
+
+To use this patch, run these commands for a successful build:
+
+    patch -p1 <patches/detect-renamed.diff
+    patch -p1 <patches/detect-renamed-lax.diff
+    ./configure                                 (optional if already run)
+    make
+
+FIXME: If a run with --detect-renamed-lax stages a different-basename
+destination file and then gets interrupted, a subsequent run that
+switches to --detect-moved blindly accepts the staged file.
+
+-- Matt McCutchen <hashproduct+rsync@gmail.com>
+
+based-on: patch/master/detect-renamed
+diff --git a/generator.c b/generator.c
+--- a/generator.c
++++ b/generator.c
+@@ -467,7 +467,9 @@ static int fattr_find(struct file_struct *f, char *fname)
+ 				continue;
+ 			}
+ 		}
+-		ok_match = mid;
++		/* --detect-moved doesn't allow non-basename matches */
++		if (detect_renamed != 3)
++			ok_match = mid;
+ 		diff = u_strcmp(fmid->basename, f->basename);
+ 		if (diff == 0) {
+ 			good_match = mid;
+@@ -1991,6 +1993,21 @@ static void recv_generator(char *fname, struct file_struct *file, int ndx,
+ 		fnamecmp = partialptr;
+ 		fnamecmp_type = FNAMECMP_PARTIAL_DIR;
+ 		statret = 0;
++		if (detect_renamed > 1 && quick_check_ok(FT_REG, fnamecmp, file, &sx.st)) {
++			/* Adopt the partial file. */
++			finish_transfer(fname, fnamecmp, NULL, NULL, file, 1, 1);
++			handle_partial_dir(partialptr, PDIR_DELETE);
++			if (itemizing)
++				itemize(fnamecmp, file, ndx, -1, &sx,
++						ITEM_LOCAL_CHANGE, fnamecmp_type, NULL);
++#ifdef SUPPORT_HARD_LINKS
++			if (preserve_hard_links && F_IS_HLINKED(file))
++				finish_hard_link(file, fname, ndx, &sx.st, itemizing, code, -1);
++#endif
++			if (remove_source_files == 1)
++				goto return_with_success;
++			goto cleanup;
++		}
+ 	}
+ 
+ 	if (!do_xfers)
+diff --git a/options.c b/options.c
+--- a/options.c
++++ b/options.c
+@@ -744,7 +744,9 @@ static struct poptOption long_options[] = {
+   {"compare-dest",     0,  POPT_ARG_STRING, 0, OPT_COMPARE_DEST, 0, 0 },
+   {"copy-dest",        0,  POPT_ARG_STRING, 0, OPT_COPY_DEST, 0, 0 },
+   {"link-dest",        0,  POPT_ARG_STRING, 0, OPT_LINK_DEST, 0, 0 },
+-  {"detect-renamed",   0,  POPT_ARG_NONE,   &detect_renamed, 0, 0, 0 },
++  {"detect-renamed",   0,  POPT_ARG_VAL,    &detect_renamed, 1, 0, 0 },
++  {"detect-renamed-lax",0, POPT_ARG_VAL,    &detect_renamed, 2, 0, 0 },
++  {"detect-moved",     0,  POPT_ARG_VAL,    &detect_renamed, 3, 0, 0 },
+   {"fuzzy",           'y', POPT_ARG_NONE,   0, 'y', 0, 0 },
+   {"no-fuzzy",         0,  POPT_ARG_VAL,    &fuzzy_basis, 0, 0, 0 },
+   {"no-y",             0,  POPT_ARG_VAL,    &fuzzy_basis, 0, 0, 0 },
+@@ -2838,8 +2840,14 @@ void server_options(char **args, int *argc_p)
+ 			args[ac++] = "--super";
+ 		if (size_only)
+ 			args[ac++] = "--size-only";
+-		if (detect_renamed)
+-			args[ac++] = "--detect-renamed";
++		if (detect_renamed) {
++			if (detect_renamed == 1)
++				args[ac++] = "--detect-renamed";
++			else if (detect_renamed == 2)
++				args[ac++] = "--detect-renamed-lax";
++			else
++				args[ac++] = "--detect-moved";
++		}
+ 		if (do_stats)
+ 			args[ac++] = "--stats";
+ 	} else {
+diff --git a/rsync.1.md b/rsync.1.md
+--- a/rsync.1.md
++++ b/rsync.1.md
+@@ -508,6 +508,8 @@ has its own detailed description later in this manpage.
+ --temp-dir=DIR, -T       create temporary files in directory DIR
+ --fuzzy, -y              find similar file for basis if no dest file
+ --detect-renamed         try to find renamed files to speed the xfer
++--detect-renamed-lax     ...& assume identical to src files (risky!)
++--detect-moved           ... only if basenames match (less risky)
+ --compare-dest=DIR       also compare destination files relative to DIR
+ --copy-dest=DIR          ... and include copies of unchanged files
+ --link-dest=DIR          hardlink to files in DIR when unchanged
+@@ -2652,6 +2654,20 @@ expand it.
+     otential alternate-basis files will be removed as the transfer progresses.
+     This option conflicts with [`--inplace`](#opt) and [`--append`](#opt).
+ 
++0.  `--detect-renamed-lax`
++
++    This version of [`--detect-renamed`](#opt) makes rsync hard-link `dest/D`
++    to `dest/S` without verifying that `src/S` and `dest/S` have the same data.
++    This poses a significant risk of corrupting the destination by representing
++    a new source file by an unrelated destination file that coincidentally
++    passes the quick check with the source file.  Use this option only if you
++    accept the risk and disk I/O is a bottleneck.
++
++0.  `--detect-moved`
++
++    A less risky variant of [`--detect-renamed-lax`](#opt) that only uses a
++    destination file that has the same basename as the new source file.
++
+ 0.  `--compare-dest=DIR`
+ 
+     This option instructs rsync to use _DIR_ on the destination machine as an
+diff -Nurp a/rsync.1 b/rsync.1
+--- a/rsync.1
++++ b/rsync.1
+@@ -607,6 +607,8 @@ has its own detailed description later i
+ --temp-dir=DIR, -T       create temporary files in directory DIR
+ --fuzzy, -y              find similar file for basis if no dest file
+ --detect-renamed         try to find renamed files to speed the xfer
++--detect-renamed-lax     ...& assume identical to src files (risky!)
++--detect-moved           ... only if basenames match (less risky)
+ --compare-dest=DIR       also compare destination files relative to DIR
+ --copy-dest=DIR          ... and include copies of unchanged files
+ --link-dest=DIR          hardlink to files in DIR when unchanged
+@@ -2719,6 +2721,16 @@ By default, alternate-basis files are hard-linked into a directory named
+ \fB\-\-partial-dir\fP option, that directory will be used instead.  These
+ otential alternate-basis files will be removed as the transfer progresses.
+ This option conflicts with \fB\-\-inplace\fP and \fB\-\-append\fP
++.IP "\fB\-\-detect-renamed-lax\fP"
++This version of \fB\-\-detect-renamed\fP makes rsync hard-link \fBdest/D\fP
++to \fBdest/S\fP without verifying that \fBsrc/S\fP and \fBdest/S\fP have the same data.
++This poses a significant risk of corrupting the destination by representing
++a new source file by an unrelated destination file that coincidentally
++passes the quick check with the source file.  Use this option only if you
++accept the risk and disk I/O is a bottleneck.
++.IP "\fB\-\-detect-moved\fP"
++A less risky variant of \fB\-\-detect-renamed-lax\fP that only uses a
++destination file that has the same basename as the new source file.
+ .IP "\fB\-\-compare\-dest=DIR\fP"
+ This option instructs rsync to use \fIDIR\fP on the destination machine as an
+ additional hierarchy to compare destination files against doing transfers
+diff -Nurp a/rsync.1.html b/rsync.1.html
+--- a/rsync.1.html
++++ b/rsync.1.html
+@@ -500,6 +500,8 @@ has its own detailed description later i
+ --temp-dir=DIR, -T       create temporary files in directory DIR
+ --fuzzy, -y              find similar file for basis if no dest file
+ --detect-renamed         try to find renamed files to speed the xfer
++--detect-renamed-lax     ...&amp; assume identical to src files (risky!)
++--detect-moved           ... only if basenames match (less risky)
+ --compare-dest=DIR       also compare destination files relative to DIR
+ --copy-dest=DIR          ... and include copies of unchanged files
+ --link-dest=DIR          hardlink to files in DIR when unchanged
+@@ -2486,6 +2488,20 @@ otential alternate-basis files will be r
+ This option conflicts with <a href="#opt--inplace"><code>--inplace</code></a> and <a href="#opt--append"><code>--append</code></a>.</p>
+ </dd>
+ 
++<dt id="opt--detect-renamed-lax"><code>--detect-renamed-lax</code><a href="#opt--detect-renamed-lax" class="tgt"></a></dt><dd>
++<p>This version of <a href="#opt--detect-renamed"><code>--detect-renamed</code></a> makes rsync hard-link <code>dest/D</code>
++to <code>dest/S</code> without verifying that <code>src/S</code> and <code>dest/S</code> have the same data.
++This poses a significant risk of corrupting the destination by representing
++a new source file by an unrelated destination file that coincidentally
++passes the quick check with the source file.  Use this option only if you
++accept the risk and disk I/O is a bottleneck.</p>
++</dd>
++
++<dt id="opt--detect-moved"><code>--detect-moved</code><a href="#opt--detect-moved" class="tgt"></a></dt><dd>
++<p>A less risky variant of <a href="#opt--detect-renamed-lax"><code>--detect-renamed-lax</code></a> that only uses a
++destination file that has the same basename as the new source file.</p>
++</dd>
++
+ <dt id="opt--compare-dest"><code>--compare-dest=DIR</code><a href="#opt--compare-dest" class="tgt"></a></dt><dd>
+ <p>This option instructs rsync to use <u>DIR</u> on the destination machine as an
+ additional hierarchy to compare destination files against doing transfers

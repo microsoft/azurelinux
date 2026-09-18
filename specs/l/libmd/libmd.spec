@@ -3,8 +3,8 @@
 
 Summary:        Library that provides message digest functions from BSD systems
 Name:           libmd
-Version:        1.1.0
-Release: 11%{?dist}
+Version:        1.2.0
+Release:        1%{?dist}
 # Breakdown in COPYING file of libmd release tarball
 License:        BSD-2-Clause AND BSD-3-Clause AND ISC AND Beerware AND LicenseRef-Fedora-Public-Domain
 URL:            https://www.hadrons.org/software/libmd/
@@ -67,22 +67,35 @@ make check
 %{_includedir}/sha2.h
 %{_includedir}/sha256.h
 %{_includedir}/sha512.h
+%{_includedir}/sha3.h
 %{_mandir}/man3/MD2*.3*
 %{_mandir}/man3/MD4*.3*
 %{_mandir}/man3/MD5*.3*
 %{_mandir}/man3/RMD160*.3*
 %{_mandir}/man3/SHA1*.3*
+%{_mandir}/man3/SHA224*.3*
 %{_mandir}/man3/SHA256*.3*
 %{_mandir}/man3/SHA384*.3*
 %{_mandir}/man3/SHA512*.3*
+%{_mandir}/man3/SHA3_*.3*
+%{_mandir}/man3/SHAKE128*.3*
+%{_mandir}/man3/SHAKE256*.3*
 %{_mandir}/man3/md2.3*
 %{_mandir}/man3/md4.3*
 %{_mandir}/man3/md5.3*
 %{_mandir}/man3/rmd160.3*
 %{_mandir}/man3/sha1.3*
 %{_mandir}/man3/sha2.3*
+%{_mandir}/man3/sha3.3*
+%{_mandir}/man3/shake.3*
 
 %changelog
+* Mon May 11 2026 Robert Scheck <robert@fedoraproject.org> 1.2.0-1
+- Upgrade to 1.2.0 (#2468687)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

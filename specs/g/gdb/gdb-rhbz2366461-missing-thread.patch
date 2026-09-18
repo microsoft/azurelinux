@@ -1,0 +1,499 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <aburgess@redhat.com>
+Date: Fri, 16 May 2025 17:56:58 +0100
+Subject: gdb-rhbz2366461-missing-thread.patch
+
+;; Backport upstream commit 8bd08ee92c4 to address rhbz2366461.  This
+;; commit will drop out with GDB 18.
+
+gdb: crash if thread unexpectedly disappears from thread list
+
+A bug was reported to Red Hat where GDB was crashing with an assertion
+failure, the assertion message is:
+
+  ../../gdb/regcache.c:432: internal-error: get_thread_regcache: Assertion `thread->state != THREAD_EXITED' failed.
+
+The backtrace for the crash is:
+
+  #5  0x000055a21da8a880 in internal_vproblem(internal_problem *, const char *, int, const char *, typedef __va_list_tag __va_list_tag *) (problem=problem@entry=0x55a21e289060 <internal_error_problem>, file=<optimized out>, line=<optimized out>, fmt=<optimized out>, ap=ap@entry=0x7ffec7576be0) at ../../gdb/utils.c:477
+  #6  0x000055a21da8aadf in internal_verror (file=<optimized out>, line=<optimized out>, fmt=<optimized out>, ap=ap@entry=0x7ffec7576be0) at ../../gdb/utils.c:503
+  #7  0x000055a21dcbd055 in internal_error_loc (file=file@entry=0x55a21dd33b71 "../../gdb/regcache.c", line=line@entry=432, fmt=<optimized out>) at ../../gdbsupport/errors.cc:57
+  #8  0x000055a21d8baaa9 in get_thread_regcache (thread=thread@entry=0x55a258de3a50) at ../../gdb/regcache.c:432
+  #9  0x000055a21d74fa18 in print_signal_received_reason (uiout=0x55a258b649b0, siggnal=GDB_SIGNAL_TRAP) at ../../gdb/infrun.c:9287
+  #10 0x000055a21d7daad9 in mi_interp::on_signal_received (this=0x55a258af5f60, siggnal=GDB_SIGNAL_TRAP) at ../../gdb/mi/mi-interp.c:372
+  #11 0x000055a21d76ef99 in interps_notify<void (interp::*)(gdb_signal), gdb_signal&> (method=&virtual table offset 88, this adjustment 974682) at ../../gdb/interps.c:369
+  #12 0x000055a21d76e58f in interps_notify_signal_received (sig=<optimized out>, sig@entry=GDB_SIGNAL_TRAP) at ../../gdb/interps.c:378
+  #13 0x000055a21d75074d in notify_signal_received (sig=GDB_SIGNAL_TRAP) at ../../gdb/infrun.c:6818
+  #14 0x000055a21d755af0 in normal_stop () at ../../gdb/gdbthread.h:432
+  #15 0x000055a21d768331 in fetch_inferior_event () at ../../gdb/infrun.c:4753
+
+The user is using a build of GDB with 32-bit ARM support included, and
+they gave the following description for what they were doing at the
+time of the crash:
+
+  Suspended the execution of the firmware in Eclipse.  The gdb was
+  connected to JLinkGDBServer with activated FreeRTOS awareness JLink
+  plugin.
+
+So they are remote debugging with a non-gdbserver target.
+
+Looking in normal_stop() we see this code:
+
+  /* As we're presenting a stop, and potentially removing breakpoints,
+     update the thread list so we can tell whether there are threads
+     running on the target.  With target remote, for example, we can
+     only learn about new threads when we explicitly update the thread
+     list.  Do this before notifying the interpreters about signal
+     stops, end of stepping ranges, etc., so that the "new thread"
+     output is emitted before e.g., "Program received signal FOO",
+     instead of after.  */
+  update_thread_list ();
+
+  if (last.kind () == TARGET_WAITKIND_STOPPED && stopped_by_random_signal)
+    notify_signal_received (inferior_thread ()->stop_signal ());
+
+Which accounts for the transition from frame #14 to frame #13.  But it
+is the update_thread_list() call which interests me.  This call asks
+the target (remote target in this case) for the current thread list,
+and then marks threads exited based on the answer.
+
+And so, if a (badly behaved) target (incorrectly) removes a thread
+from the thread list, then the update_thread_list() call will mark the
+impacted thread as exited, even if GDB is currently handling a signal
+stop event for that target.
+
+My guess for what's going on here then is this:
+
+  1. Thread receives a signal.
+  2. Remote target sends GDB a stop with signal packet.
+  3. Remote decides that the thread is going away soon, and marks the
+     thread as exited.
+  4. GDB asks for the thread list.
+  5. Remote sends back the thread list, which doesn't include the
+     event thread, as the remote things this thread has exited.
+  6. GDB marks the thread as exited, and then proceeds to try and
+     print the signal stop event for the event thread.
+  7. Printing the signal stop requires reading registers, which
+     requires a regache.  We can only get a regcache for a non-exited
+     thread, and so GDB raises an assertion.
+
+Using the gdbreplay test frame work I was able to reproduce this
+failure using gdbserver.  I create an inferior with two threads, the
+main thread sends a signal to the second thread, GDB sees the signal
+arrive and prints this information for the user.
+
+Having captured the trace of this activity, I then find the thread
+list reply in the log file, and modify it to remove the second thread.
+
+Now, when I replay the modified log file I see the same assertion
+complaining about an attempt to get a regcache for an exited thread.
+
+I'm not entirely sure the best way to fix this.  Clearly the problem
+here is a bad remote target.  But, replies from a remote target
+should (in my opinion) not be considered trusted, as a consequence, we
+should not be asserting based on data coming from a remote.  Instead,
+we should be giving warnings or errors and have GDB handle the bad
+data as best it can.
+
+This is the second attempt to fix this issue, my first patch can be
+seen here:
+
+  https://inbox.sourceware.org/gdb-patches/062e438c8677e2ab28fac6183d2ea6d444cb9121.1747567717.git.aburgess@redhat.com
+
+In the first patch I was to checking in normal_stop, immediately after
+the call to update_thread_list, to see if the current thread was now
+marked as exited.  However CI testing showed an issue with this
+approach; I was already checking for many different TARGET_WAITKIND_*
+kinds where the "is the current thread exited" question didn't make
+sense, and it turns out that the list of kinds in my first attempt was
+already insufficient.
+
+Rather than trying to just adding to the list, in this revised patch
+I'm proposing to move the "is this thread exited" check inside the
+block which handles signal stop events.
+
+Right now, the only part of normal_stop which I know relies on the
+current thread not being exited is the call to notify_signal_received,
+so before calling notify_signal_received I check to see if the current
+thread is now exited.  If it is then I print a warning to indicate
+that the thread has unexpectedly exited and that the current
+command (continue/step/etc) has been cancelled, I then change the
+current event type to TARGET_WAITKIND_SPURIOUS.
+
+GDB's output now looks like this in all-stop mode:
+
+  (gdb) continue
+  Continuing.
+  [New Thread 3483690.3483693]
+  [Thread 3483690.3483693 exited]
+  warning: Thread 3483690.3483693 unexpectedly exited after non-exit event
+  [Switching to Thread 3483690.3483693]
+  (gdb)
+
+The non-stop output is identical, except we don't switch thread (stop
+events never trigger a thread switch in non-stop mode).
+
+The include test makes use of the gdbreplay framework, and tests in
+all-stop and non-stop modes.  I would like to do more extensive
+testing of GDB's state after the receiving the unexpected thread list,
+but due to using gdbreplay for testing, this is quite hard.  Many
+commands, especially those looking at thread state, are likely to
+trigger additional packets being sent to the remote, which causes
+gdbreplay to bail out as the new packet doesn't match the original
+recorded state.  However, I really don't think it is a good idea to
+change gdbserver in order to "fake" this error case, so for now, using
+gdbreplay is the best idea I have.
+
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=2366461
+
+diff --git a/gdb/infrun.c b/gdb/infrun.c
+--- a/gdb/infrun.c
++++ b/gdb/infrun.c
+@@ -9562,7 +9562,38 @@ normal_stop ()
+   update_thread_list ();
+ 
+   if (last.kind () == TARGET_WAITKIND_STOPPED && stopped_by_random_signal)
+-    notify_signal_received (inferior_thread ()->stop_signal ());
++    {
++      gdb_assert (inferior_ptid != null_ptid);
++
++      /* Calling update_thread_list pulls information from the target.  For
++	 native targets we can be (reasonably) sure that the information we
++	 get back is sane, but for remote targets, we cannot reply on the
++	 returned thread list to be correct.
++
++	 Specifically, a remote target (not gdbserver), has been seen to
++	 prematurely remove threads from the thread list after sending a
++	 signal stop event.  The consequence of this, is that the thread
++	 might now be exited.  This is bad as, trying to calling
++	 notify_signal_received will cause GDB to read registers for the
++	 current thread, but requesting the regcache for an exited thread
++	 will trigger an assertion.
++
++	 Check for the exited thread case here, and convert the stop reason
++	 to a spurious stop event.  The thread exiting will have already
++	 been reported (when the thread list was parsed), so making this a
++	 spurious stop will cause GDB to drop back to the prompt.  */
++      if (inferior_thread ()->state != THREAD_EXITED)
++	notify_signal_received (inferior_thread ()->stop_signal ());
++      else
++	{
++	  warning (_("command aborted, %s unexpectedly exited after signal stop event"),
++		   target_pid_to_str (inferior_thread ()->ptid).c_str ());
++
++	  /* Mark this as a spurious stop.  GDB will return to the
++	     prompt.  The warning above tells the user why.  */
++	  last.set_spurious ();
++	}
++    }
+ 
+   /* As with the notification of thread events, we want to delay
+      notifying the user that we've switched thread context until
+diff --git a/gdb/testsuite/gdb.replay/missing-thread.c b/gdb/testsuite/gdb.replay/missing-thread.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.replay/missing-thread.c
+@@ -0,0 +1,61 @@
++/* This testcase is part of GDB, the GNU debugger.
++
++   Copyright 2025 Free Software Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++#include <pthread.h>
++#include <assert.h>
++#include <signal.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <stdbool.h>
++
++pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
++pthread_cond_t g_condvar = PTHREAD_COND_INITIALIZER;
++
++void *
++worker_function (void *arg)
++{
++  printf ("In worker, about to notify\n");
++  pthread_cond_signal (&g_condvar);
++
++  while (true)
++    sleep(1);
++
++  return NULL;
++}
++
++int
++main()
++{
++  pthread_t my_thread;
++
++  int result = pthread_create (&my_thread, NULL, worker_function, NULL);
++  assert (result == 0);
++
++  pthread_mutex_lock (&g_mutex);
++  pthread_cond_wait (&g_condvar, &g_mutex);
++
++  printf ("In main, have been woken.\n");
++  pthread_mutex_unlock (&g_mutex);
++
++  result = pthread_kill (my_thread, SIGTRAP);
++  assert (result == 0);
++
++  result = pthread_join (my_thread, NULL);
++  assert (result == 0);
++
++  return 0;
++}
+diff --git a/gdb/testsuite/gdb.replay/missing-thread.exp b/gdb/testsuite/gdb.replay/missing-thread.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.replay/missing-thread.exp
+@@ -0,0 +1,237 @@
++# Copyright 2025 Free Software Foundation, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++# This test confirms how GDB handles a badly behaving remote target.  The
++# remote target reports a stop event (signal delivery), then, as GDB is
++# processing the stop it syncs the thread list with the remote.
++#
++# The badly behaving remote target was dropping the signaled thread from the
++# thread list at this point, that is, the thread appeared to exit before an
++# exit event had been sent to (and seen by) GDB.
++#
++# At one point this was causing an assertion failed.  GDB would try to
++# process the signal stop event, and to do this would try to read some
++# registers.  Reading registers requires a regcache, and GDB will only
++# create a regcache for a non-exited thread.
++
++load_lib gdbserver-support.exp
++load_lib gdbreplay-support.exp
++
++require allow_gdbserver_tests
++require has_gdbreplay
++
++standard_testfile
++
++if { [build_executable "failed to build exec" $testfile $srcfile {debug pthreads}] } {
++    return -1
++}
++
++# Start the inferior and record a remote log for our interaction with it.
++# All we do is start the inferior and wait for thread 2 to receive a signal.
++# Check that GDB correctly shows the signal as received.  LOG_FILENAME is
++# where we should write the remote log.
++proc_with_prefix record_initial_logfile { log_filename } {
++    clean_restart $::testfile
++
++    # Make sure we're disconnected, in case we're testing with an
++    # extended-remote board, therefore already connected.
++    gdb_test "disconnect" ".*"
++
++    gdb_test_no_output "set sysroot" \
++	"setting sysroot before starting gdbserver"
++
++    # Start gdbserver like:
++    #   gdbserver :PORT ....
++    set res [gdbserver_start "" $::binfile]
++    set gdbserver_protocol [lindex $res 0]
++    set gdbserver_gdbport [lindex $res 1]
++
++    gdb_test_no_output "set remotelogfile $log_filename" \
++	"setup remotelogfile"
++
++    # Connect to gdbserver.
++    if {![gdb_target_cmd $gdbserver_protocol $gdbserver_gdbport] == 0} {
++	unsupported "$testfile (couldn't start gdbserver)"
++	return
++    }
++
++    gdb_breakpoint main
++    gdb_continue_to_breakpoint "continuing to main"
++
++    gdb_test "continue" \
++	"Thread $::decimal \[^\r\n\]+ received signal SIGTRAP, .*"
++
++    gdb_test "disconnect" ".*" \
++	"disconnect after seeing signal"
++}
++
++# Copy the remote log from IN_FILENAME to OUT_FILENAME, but modify one
++# particular line.
++#
++# The line to be modified is the last <threads>...</threads> line, this is
++# the reply from the remote that indicates the thread list.  It is expected
++# that the thread list will contain two threads.
++#
++# Whn DROP_BOTH is true then both threads will be removed from the modified
++# line.  Otherwise, only the second thread is removed.
++proc update_replay_log { in_filename out_filename drop_both } {
++    # Read IN_FILENAME into a list.
++    set fd [open $in_filename]
++    set data [read $fd]
++    close $fd
++    set lines [split $data "\n"]
++
++    # Find the last line in LINES that contains the <threads> list.
++    set idx -1
++    for { set i 0 } { $i < [llength $lines] } { incr i } {
++	if { [regexp "^r.*<threads>.*</threads>" [lindex $lines $i]] } {
++	    set idx $i
++	}
++    }
++
++    # Modify the line by dropping the second thread.  This does assume
++    # the thread order as seen in the <threads>...</threads> list, but
++    # this seems stable for now.
++    set line [lindex $lines $idx]
++    set fixed_log false
++    if {[regexp "^(r .*<threads>\\\\n)(<thread id.*/>\\\\n)(<thread id.*/>\\\\n)(</threads>.*)$" $line \
++	     match part1 part2 part3 part4]} {
++	if { $drop_both } {
++	    set line $part1$part4
++	} else {
++	    set line $part1$part2$part4
++	}
++	set lines [lreplace $lines $idx $idx $line]
++	set fixed_log true
++    }
++
++    # Write all the lines to OUT_FILENAME
++    set fd [open $out_filename "w"]
++    foreach l $lines {
++	puts $fd $l
++    }
++    close $fd
++
++    # Did we manage to update the log file?
++    return $fixed_log
++}
++
++# Replay the test process using REMOTE_LOG as the logfile to replay.  If
++# EXPECT_ERROR is true then after the final 'continue' we expect GDB to give
++# an error as the required thread is missing.  When EXPECT_ERROR is false
++# then we expect the test to complete as normal.  NON_STOP is eithe 'on' or
++# 'off' and indicates GDBs non-stop mode.
++proc_with_prefix replay_with_log { remote_log expect_error non_stop } {
++    clean_restart $::testfile
++
++    # Make sure we're disconnected, in case we're testing with an
++    # extended-remote board, therefore already connected.
++    gdb_test "disconnect" ".*"
++
++    gdb_test_no_output "set sysroot"
++
++    set res [gdbreplay_start $remote_log]
++    set gdbserver_protocol [lindex $res 0]
++    set gdbserver_gdbport [lindex $res 1]
++
++    # Connect to gdbserver.
++    if {![gdb_target_cmd $gdbserver_protocol $gdbserver_gdbport] == 0} {
++	fail "couldn't connect to gdbreplay"
++	return
++    }
++
++    gdb_breakpoint main
++    gdb_continue_to_breakpoint "continuing to main"
++
++    if { $expect_error } {
++	set expected_output \
++	    [list \
++		 "\\\[Thread \[^\r\n\]+ exited\\\]" \
++		 "warning: command aborted, Thread \[^\r\n\]+ unexpectedly exited after signal stop event"]
++
++	if { !$non_stop } {
++	    lappend expected_output "\\\[Switching to Thread \[^\r\n\]+\\\]"
++	}
++
++	gdb_test "continue" [multi_line {*}$expected_output]
++    } else {
++	# This is the original behaviour, we see this when running
++	# with the unmodified log.
++	gdb_test "continue" \
++	    "Thread ${::decimal}(?: \[^\r\n\]+)? received signal SIGTRAP, .*"
++    }
++
++    gdb_test "disconnect" ".*" \
++	"disconnect after seeing signal"
++}
++
++# Run the complete test cycle; generate an initial log file, modify the log
++# file, then check that GDB correctly handles replaying the modified log
++# file.
++#
++# NON_STOP is either 'on' or 'off' and indicates GDB's non-stop mode.
++proc run_test { non_stop } {
++    if { $non_stop } {
++	set suffix "-ns"
++    } else {
++	set suffix ""
++    }
++
++    # The replay log is placed in 'replay.log'.
++    set remote_log [standard_output_file replay${suffix}.log]
++    set missing_1_log [standard_output_file replay-missing-1${suffix}.log]
++    set missing_2_log [standard_output_file replay-missing-2${suffix}.log]
++
++    record_initial_logfile $remote_log
++
++    if { ![update_replay_log $remote_log $missing_1_log false] } {
++	fail "couldn't update remote replay log (drop 1 case)"
++    }
++
++    if { ![update_replay_log $remote_log $missing_2_log true] } {
++	fail "couldn't update remote replay log (drop 2 case)"
++    }
++
++    with_test_prefix "with unmodified log" {
++	# Replay with the unmodified log.  This confirms that we can replay this
++	# scenario correctly.
++	replay_with_log $remote_log false $non_stop
++    }
++
++    with_test_prefix "missing 1 thread log" {
++	# Now replay with the modified log, this time the thread that receives
++	# the event should be missing from the thread list, GDB will give an
++	# error when the inferior stops.
++	replay_with_log $missing_1_log true $non_stop
++    }
++
++    with_test_prefix "missing 2 threads log" {
++	# When we drop both threads from the <threads> reply, GDB doesn't
++	# actually remove both threads from the inferior; an inferior must
++	# always have at least one thread.  So in this case, as the primary
++	# thread is first, GDB drops this, then retains the second thread, which
++	# is the one we're stopping in, and so, we don't expect to see the error
++	# in this case.
++	replay_with_log $missing_2_log false $non_stop
++    }
++}
++
++# Run the test twice, with non-stop on and off.
++foreach_with_prefix non_stop { on off } {
++    save_vars { ::GDBFLAGS } {
++	append ::GDBFLAGS " -ex \"set non-stop $non_stop\""
++	run_test $non_stop
++    }
++}

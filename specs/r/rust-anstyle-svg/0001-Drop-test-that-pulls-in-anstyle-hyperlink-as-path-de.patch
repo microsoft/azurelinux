@@ -1,0 +1,24 @@
+From 1f951be4c232d3cb03be3c06cc3d65c873b0df71 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sun, 9 Aug 2026 21:10:51 +0200
+Subject: [PATCH] Drop test that pulls in anstyle-hyperlink as path dependency
+
+---
+ src/lib.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 975f470..6813320 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -652,6 +652,7 @@ fn sanitize_hyperlink(link: &str) -> String {
+ mod test {
+     use super::*;
+ 
++    #[cfg(any())]
+     #[test]
+     fn link_injection() {
+         let link = anstyle_hyperlink::Hyperlink::with_url("https://example.com/\">");
+-- 
+2.55.0
+

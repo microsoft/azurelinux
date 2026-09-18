@@ -3,7 +3,7 @@
 
 Name:       recode
 Version:    3.7.15
-Release: 5%{?dist}
+Release:    2%{?dist}
 Summary:    Conversion between character sets and surfaces
 # COPYING:              GPLv3 text
 # COPYING-LIB:          LGPLv3 text

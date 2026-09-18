@@ -1,0 +1,45 @@
+From e7573824374c869d33d8a67497c10d5762843a6e Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Thu, 4 Dec 2025 10:13:44 +0200
+Subject: [PATCH] Move libdnf5/conf/config.h creation after feature detection
+
+Features need to be detected before they can be written down, doh.
+In particular this is needed for the rpmteSetVfyLevel() symbol
+detection from 4db642138c76474553213b0f9005a78f32fbf932, which previously
+only worked by chance in some incremental build cases.
+
+Move the config header creation after all the detection is complete,
+next to the other configure_file() which is down there for similar
+reasons...
+
+Fixes: #2479
+---
+ libdnf5/CMakeLists.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/libdnf5/CMakeLists.txt b/libdnf5/CMakeLists.txt
+index f90ae3d1..b6cc12f2 100644
+--- a/libdnf5/CMakeLists.txt
++++ b/libdnf5/CMakeLists.txt
+@@ -7,9 +7,6 @@ if (NOT WITH_MODULEMD)
+     list(REMOVE_ITEM LIBDNF5_SOURCES ${LIBDNF5_SOURCES_MODULES})
+ endif()
+ 
+-# create config header file
+-configure_file("config.h.in" ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.h)
+-
+ # gather all pkg-config requires and write them to a .pc file later
+ list(APPEND LIBDNF5_PC_REQUIRES)
+ list(APPEND LIBDNF5_PC_REQUIRES_PRIVATE)
+@@ -137,6 +134,8 @@ list(JOIN LIBDNF5_PC_REQUIRES ", " LIBDNF5_PC_REQUIRES_STRING)
+ list(SORT LIBDNF5_PC_REQUIRES_PRIVATE)
+ list(JOIN LIBDNF5_PC_REQUIRES_PRIVATE ", " LIBDNF5_PC_REQUIRES_PRIVATE_STRING)
+ 
++# create config header file after feature detection is complete
++configure_file("config.h.in" ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.h)
+ 
+ # create a .pc file
+ configure_file("libdnf5.pc.in" ${CMAKE_CURRENT_BINARY_DIR}/libdnf5.pc @ONLY)
+-- 
+2.53.0
+

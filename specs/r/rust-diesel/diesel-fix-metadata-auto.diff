@@ -1,5 +1,5 @@
---- diesel-2.3.6/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ diesel-2.3.6/Cargo.toml	2026-02-04T16:04:41.223380+00:00
+--- diesel-2.3.12/Cargo.toml	2006-07-24T01:21:28+00:00
++++ diesel-2.3.12/Cargo.toml	2026-08-08T11:39:07.199102+00:00
 @@ -144,7 +144,6 @@
  serde_json = ["dep:serde_json"]
  sqlite = [
@@ -8,7 +8,7 @@
      "diesel_derives/sqlite",
      "time?/formatting",
      "time?/parsing",
-@@ -277,18 +276,6 @@
+@@ -277,24 +276,6 @@
  [dev-dependencies.tempfile]
  version = "3.10.1"
  
@@ -17,17 +17,23 @@
 -optional = true
 -default-features = false
 -
--[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.getrandom]
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.getrandom_02]
 -version = "0.2"
 -features = ["js"]
+-package = "getrandom"
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.getrandom_04]
+-version = "0.4"
+-features = ["wasm_js"]
+-package = "getrandom"
 -
 -[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.wasm-bindgen-test]
 -version = "0.3.49"
 -
  [target.'cfg(not(all(target_family = "wasm", target_os = "unknown")))'.dependencies.libsqlite3-sys]
- version = ">=0.17.2, <0.36.0"
+ version = ">=0.17.2, <0.39.0"
  features = ["bundled_bindings"]
-@@ -298,3 +285,4 @@
+@@ -308,3 +289,4 @@
  level = "warn"
  priority = 0
  check-cfg = ["cfg(diesel_docsrs)"]

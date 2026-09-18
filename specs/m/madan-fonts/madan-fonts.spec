@@ -4,7 +4,7 @@
 BuildRequires: fontforge
 
 Version: 2.000
-Release: 44%{?dist}
+Release: 41%{?dist}
 URL: http://madanpuraskar.org/
 
 %global fontlicense       GPL-1.0-or-later

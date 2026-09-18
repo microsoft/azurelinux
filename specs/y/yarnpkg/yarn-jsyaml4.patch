@@ -1,0 +1,30 @@
+diff -rupN yarn-1.22.22/src/lockfile/parse.js yarn-1.22.22-new/src/lockfile/parse.js
+--- yarn-1.22.22/src/lockfile/parse.js	2024-03-09 22:33:28.000000000 +0100
++++ yarn-1.22.22-new/src/lockfile/parse.js	2026-04-02 10:31:02.536547390 +0200
+@@ -9,7 +9,7 @@ import {LOCKFILE_VERSION} from '../const
+ import {MessageError} from '../errors.js';
+ import map from '../util/map.js';
+ 
+-const {safeLoad, FAILSAFE_SCHEMA} = require('js-yaml');
++const {load, FAILSAFE_SCHEMA} = require('js-yaml');
+ 
+ type Token = {
+   line: number,
+@@ -390,7 +390,7 @@ function parse(str: string, fileLoc: str
+       return parser.parse();
+     } catch (error1) {
+       try {
+-        return safeLoad(str, {
++        return load(str, {
+           schema: FAILSAFE_SCHEMA,
+         });
+       } catch (error2) {
+@@ -398,7 +398,7 @@ function parse(str: string, fileLoc: str
+       }
+     }
+   } else {
+-    const result = safeLoad(str, {
++    const result = load(str, {
+       schema: FAILSAFE_SCHEMA,
+     });
+     if (typeof result === 'object') {

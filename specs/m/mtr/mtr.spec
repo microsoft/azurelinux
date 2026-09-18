@@ -5,17 +5,13 @@
 
 Summary: Network diagnostic tool combining 'traceroute' and 'ping'
 Name: mtr
-Version: 0.95
-Release: 16%{?dist}
+Version: 0.96
+Release: 1%{?dist}
 Epoch: 2
 License: GPL-2.0-only
 URL: https://www.bitwizard.nl/mtr/
 Source0: https://github.com/traviscross/mtr/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1: net-x%{name}.desktop
-# https://github.com/traviscross/mtr/issues/469
-Patch0: https://github.com/traviscross/mtr/commit/5908af4c19188cb17b62f23368b6ef462831a0cb.patch#/mtr-0.95-snprintf-sizes.patch
-# https://github.com/traviscross/mtr/issues/232, https://github.com/traviscross/mtr/pull/484
-Patch1: https://github.com/traviscross/mtr/commit/74d312d7e67d002e184b37c7f278597ab06bf8e7.patch#/mtr-0.95-socket-binding.patch
 
 BuildRequires: gcc make ncurses-devel libcap-devel jansson-devel
 BuildRequires: autoconf automake libtool git
@@ -54,8 +50,6 @@ about each machine.
 
 %prep
 %setup -q
-%patch -P0 -p1 -b .snprintf-sizes
-%patch -P1 -p1 -b .socket-binding
 
 %build
 ./bootstrap.sh
@@ -87,6 +81,12 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE1}
 %{_datadir}/applications/net-x%{name}.desktop
 
 %changelog
+* Sat Jun 13 2026 Robert Scheck <robert@fedoraproject.org> - 2:0.96-1
+- Rebase to 0.96 (#2376581)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:0.95-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2:0.95-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -52,6 +52,10 @@ Patch106: coreutils-CVE-2025-5278.patch
 # https://cgit.git.savannah.gnu.org/cgit/coreutils.git/patch/?id=3d35b3c0e56bd556c90dc98c3e5e2e7289b0eb0d
 Patch107: coreutils-9.7-stty-arbitrary-baud-rates.patch
 
+# CVE-2026-56391 - uniq: fix read overrun with -w
+# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/commit/?id=d64e35a8a4c0e4608321433e0d84d917e4e36371
+Patch108: coreutils-9.11-CVE-2026-56391.patch
+
 # (sb) lin18nux/lsb compliance - multibyte functionality patch
 Patch800: coreutils-i18n.patch
 
@@ -304,6 +308,15 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %license COPYING
 
 %changelog
+* Mon Aug 03 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.7-10
+- CVE-2026-56391 - uniq: fix read overrun with -w (rhbz#2507449)
+
+* Thu Jun 11 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.7-9
+- unexpand: fix heap overflows
+
+* Mon Mar 09 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.7-8
+- fix unexpand/expand crash on invalid multibyte characters (rhbz#2443041)
+
 * Fri Jan 16 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.7-7
 - fold: fix processing of malformed UTF-8 sequences
 

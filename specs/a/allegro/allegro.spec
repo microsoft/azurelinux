@@ -3,7 +3,7 @@
 
 Name:           allegro
 Version:        4.4.3.1
-Release: 21%{?dist}
+Release:        18%{?dist}
 
 Summary:        A game programming library
 Summary(es):    Una libreria de programacion de juegos

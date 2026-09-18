@@ -37,7 +37,7 @@
 
 Name:           rocal
 Version:        %{rocm_version}
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        ROCm Augmentation Library
 
 Url:            https://github.com/ROCm/rocAL

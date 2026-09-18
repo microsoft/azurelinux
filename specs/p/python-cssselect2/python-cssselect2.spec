@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        0.8.0
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        CSS selectors for Python ElementTree
 License:        BSD-3-Clause
 URL:            https://doc.courtbouillon.org/cssselect2/stable/

@@ -10,7 +10,7 @@
 Name: hunspell-te
 Summary: Telugu hunspell dictionaries
 Version: 1.0.0
-Release: 30%{?dist}
+Release: 27%{?dist}
 Epoch:   1
 ##Upstream is unresponsive so unable to verify license version
 License:        GPL-1.0-or-later

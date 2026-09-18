@@ -1,17 +1,18 @@
-From 4820f2bb2f960e2f8e50b49842b506626869ed4b Mon Sep 17 00:00:00 2001
+From ad9b6cfb41e48b968cbc0fa1bb1dc309a2990fa1 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
-Date: Mon, 5 Feb 2024 01:01:29 -0500
+Date: Wed, 20 May 2026 14:42:10 +0200
 Subject: [PATCH 1/2] Don't try to import all of tools
 
 We delete gopls to package it separately, so 'all of tools' is unavailable.
 
+Co-authored-by: Alejandro Sáez <asm@redhat.com>
 Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 ---
  internal/gcimporter/stdlib_test.go | 9 ---------
  1 file changed, 9 deletions(-)
 
 diff --git a/internal/gcimporter/stdlib_test.go b/internal/gcimporter/stdlib_test.go
-index 85547a49d..d6a424e78 100644
+index 38488417b..6b853ff55 100644
 --- a/internal/gcimporter/stdlib_test.go
 +++ b/internal/gcimporter/stdlib_test.go
 @@ -9,7 +9,6 @@ import (
@@ -22,7 +23,7 @@ index 85547a49d..d6a424e78 100644
  	"testing"
  	"unsafe"
  
-@@ -39,14 +38,6 @@ func testStdlib(t *testing.T) {
+@@ -36,14 +35,6 @@ func TestStdlib(t *testing.T) {
  	cfg := &packages.Config{Mode: packages.LoadAllSyntax}
  	patterns := []string{"std"}
  	minPkgs := 225 // 'GOOS=plan9 go1.18 list std | wc -l' reports 228; most other platforms have more.
@@ -38,5 +39,5 @@ index 85547a49d..d6a424e78 100644
  	if err != nil {
  		t.Fatalf("failed to load/parse/type-check: %v", err)
 -- 
-2.50.0
+2.54.0
 

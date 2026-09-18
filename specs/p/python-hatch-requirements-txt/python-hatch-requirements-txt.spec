@@ -7,7 +7,7 @@
 Name:           python-hatch-requirements-txt
 Version:        0.4.1
 %forgemeta
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Hatchling plugin to read project dependencies from requirements.txt
 
 License:        MIT

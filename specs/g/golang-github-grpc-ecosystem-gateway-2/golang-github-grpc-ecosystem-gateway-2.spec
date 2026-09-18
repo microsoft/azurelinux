@@ -17,7 +17,7 @@ GRPC to JSON proxy generator following the gRPC HTTP spec.}
 %global godocs          docs examples ADOPTERS.md CONTRIBUTING.md README.md
 
 Name:           %{goname}
-Release: 20%{?dist}
+Release:        17%{?dist}
 Summary:        GRPC to JSON proxy generator following the gRPC HTTP spec
 
 # Upstream license specification: BSD-3-Clause

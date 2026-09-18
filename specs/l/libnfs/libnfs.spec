@@ -3,7 +3,7 @@
 
 Name:		libnfs
 Version:	6.0.2
-Release: 9%{?dist}
+Release:	9%{?dist}
 Summary:	Client library for accessing NFS shares over a network
 # The library is licensed as LGPL-2.1-or-later
 # The protocol definition is BSD-2-Clause
@@ -16,6 +16,10 @@ Source0:	%{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
 Patch0:         libnfs-6.0.2-fix_gnutls_undefined_symbols.patch
 # https://github.com/sahlberg/libnfs/commit/2cdfedaba379cbb512d3c203a1b9eae795f4fb23
 Patch1:         libnfs-6.0.2-fix_missing_include.patch
+# https://github.com/sahlberg/libnfs/commit/55c18ea33a83d667f79f0ef209c96895795c729f
+Patch2:         libnfs-6.0.2-CVE-2026-53689.patch
+# https://github.com/sahlberg/libnfs/commit/935b8db712b3c6649bc57ddc276526c4a31680de
+Patch3:         libnfs-6.0.2-CVE-2026-57918.patch
 
 BuildRequires:	automake
 BuildRequires:	gcc
@@ -60,6 +64,8 @@ NFS servers using libnfs.
 %setup -q -n %{name}-%{name}-%{version}
 %patch -P0 -p1
 %patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
 autoreconf -vif
 
 %build
@@ -94,6 +100,15 @@ rm -f %{buildroot}%{_libdir}/*.la
 %{_mandir}/man1/nfs-*.1*
 
 %changelog
+* Mon Aug 10 2026 Xavier Bachelot <xavier@bachelot.org> - 6.0.2-9
+- Add upstream patches for CVE-2026-53689 and CVE-2026-57918
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Jul 28 2025 Xavier Bachelot <xavier@bachelot.org> - 6.0.2-6
 - Add upstream patch to fix missing include
 

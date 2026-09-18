@@ -1,7 +1,7 @@
-diff -ur mutt-1.9.0.orig/init.h mutt-1.9.0/init.h
---- mutt-1.9.0.orig/init.h	2017-09-04 16:48:21.409528002 +0200
-+++ mutt-1.9.0/init.h	2017-09-04 16:49:26.505093636 +0200
-@@ -3510,7 +3510,7 @@
+diff -up mutt-2.4.0/init.h.ssl_ciphers mutt-2.4.0/init.h
+--- mutt-2.4.0/init.h.ssl_ciphers	2026-06-28 23:11:35.422009688 +0200
++++ mutt-2.4.0/init.h	2026-06-28 23:11:35.424291610 +0200
+@@ -4492,7 +4492,7 @@ struct option_t MuttVars[] = {
    */
  #  endif /* defined HAVE_SSL_PARTIAL_CHAIN */
  # endif /* defined USE_SSL_OPENSSL */
@@ -10,23 +10,24 @@ diff -ur mutt-1.9.0.orig/init.h mutt-1.9.0/init.h
    /*
    ** .pp
    ** Contains a colon-separated list of ciphers to use when using SSL.
-diff -ur mutt-1.9.0.orig/mutt_ssl_gnutls.c mutt-1.9.0/mutt_ssl_gnutls.c
---- mutt-1.9.0.orig/mutt_ssl_gnutls.c	2017-09-04 16:48:21.403528134 +0200
-+++ mutt-1.9.0/mutt_ssl_gnutls.c	2017-09-04 16:51:16.081679141 +0200
-@@ -286,6 +286,8 @@
+diff -up mutt-2.4.0/mutt_ssl_gnutls.c.ssl_ciphers mutt-2.4.0/mutt_ssl_gnutls.c
+--- mutt-2.4.0/mutt_ssl_gnutls.c.ssl_ciphers	2026-06-12 07:03:22.000000000 +0200
++++ mutt-2.4.0/mutt_ssl_gnutls.c	2026-06-28 23:14:48.314207958 +0200
+@@ -321,6 +321,8 @@ static int tls_set_priority(tlssockdata
    else
-     mutt_buffer_strcpy (priority, "NORMAL");
+     mutt_buffer_strcpy(priority, "NORMAL");
  
 +if (SslCiphers && strcmp(SslCiphers, "@SYSTEM"))
 +{
-   if (!option (OPTTLSV1_3))
+   if (!option(OPTTLSV1_3))
    {
      nproto--;
-@@ -313,6 +315,7 @@
-     mutt_error (_("All available protocols for TLS/SSL connection disabled"));
+@@ -352,7 +354,7 @@ static int tls_set_priority(tlssockdata
+     mutt_error(_("All available protocols for TLS/SSL connection disabled"));
      goto cleanup;
    }
+-
 +}
- 
-   if ((err = gnutls_priority_set_direct (data->state, mutt_b2s (priority), NULL)) < 0)
+   if ((err = gnutls_priority_set_direct(data->state, mutt_b2s(priority), NULL)) < 0)
    {
+     mutt_error("gnutls_priority_set_direct(%s): %s", mutt_b2s(priority), gnutls_strerror(err));

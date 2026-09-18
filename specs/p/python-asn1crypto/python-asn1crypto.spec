@@ -8,7 +8,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.5.1
-Release: 19%{?dist}
+Release:        16%{?dist}
 Summary:        Fast Python ASN.1 parser and serializer
 
 License:        MIT

@@ -1,0 +1,60 @@
+From de63068ba5a742b3437b3e0c2e67d7704657a562 Mon Sep 17 00:00:00 2001
+From: Zdenek Dohnal <zdohnal@redhat.com>
+Date: Mon, 18 May 2026 17:46:01 +0200
+Subject: [PATCH] Fixed Coverity issues
+
+---
+ scheduler/ipp.c | 13 +++++--------
+ scheduler/job.c |  2 --
+ 2 files changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/scheduler/ipp.c b/scheduler/ipp.c
+index 9a280e752..87670c326 100644
+--- a/scheduler/ipp.c
++++ b/scheduler/ipp.c
+@@ -5900,7 +5900,7 @@ create_subscriptions(
+   int			interval,	/* notify-time-interval */
+ 			lease;		/* notify-lease-duration */
+   unsigned		mask;		/* notify-events */
+-  ipp_attribute_t	*notify_events,/* notify-events(-default) */
++  ipp_attribute_t	*notify_events,	/* notify-events(-default) */
+ 			*notify_lease;	/* notify-lease-duration(-default) */
+ 
+ 
+@@ -6010,19 +6010,16 @@ create_subscriptions(
+ 
+     if (printer)
+     {
+-      notify_events = ippFindAttribute(printer->attrs, "notify-events-default",
+-                                       IPP_TAG_KEYWORD);
+-      notify_lease  = ippFindAttribute(printer->attrs,
+-                                       "notify-lease-duration-default",
+-                                       IPP_TAG_INTEGER);
++      // Get default events and lease duration for printer/class...
++      notify_events = ippFindAttribute(printer->attrs, "notify-events-default", IPP_TAG_KEYWORD);
+ 
+-      if (notify_lease)
++      if ((notify_lease = ippFindAttribute(printer->attrs, "notify-lease-duration-default", IPP_TAG_INTEGER)) != NULL)
+         lease = notify_lease->values[0].integer;
+     }
+     else
+     {
++      // No defaults...
+       notify_events = NULL;
+-      notify_lease  = NULL;
+     }
+ 
+     while (attr && attr->group_tag != IPP_TAG_ZERO)
+diff --git a/scheduler/job.c b/scheduler/job.c
+index f09751591..cc7bd4ba7 100644
+--- a/scheduler/job.c
++++ b/scheduler/job.c
+@@ -767,8 +767,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
+       cupsdLogJob(job, CUPSD_LOG_DEBUG,
+ 		  "Unable to add decompression filter - %s", strerror(errno));
+ 
+-      cupsArrayDelete(filters);
+-
+       abort_message = "Stopping job because the scheduler ran out of memory.";
+ 
+       goto abort_job;

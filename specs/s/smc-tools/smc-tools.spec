@@ -3,7 +3,7 @@
 
 Name:           smc-tools
 Version:        1.8.5
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Shared Memory Communication Tools
 
 License:        EPL-1.0

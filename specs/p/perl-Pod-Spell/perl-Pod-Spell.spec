@@ -3,7 +3,7 @@
 
 Name:           perl-Pod-Spell
 Version:        1.27
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        A formatter for spell-checking POD
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Pod-Spell

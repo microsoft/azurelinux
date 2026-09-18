@@ -1,0 +1,52 @@
+From c86af25adb675bd508c82aa686d0e1b5952b12fc Mon Sep 17 00:00:00 2001
+From: Martin Wilck <mwilck@suse.com>
+Date: Fri, 19 Apr 2024 23:03:14 +0200
+Subject: [PATCH 2/2] sg_inq: re-add Unit serial number field
+
+After 0f1230a ("sg_readcap+sg_luns: add --inhex= and json"), the
+"Unit serial number" output field is missing from sg_inq output:
+
+> ./sg_inq /dev/sda
+standard INQUIRY:
+  PQual=0  PDT=0  RMB=0  LU_CONG=0  hot_pluggable=0  version=0x05  [SPC-3]
+  [AERC=0]  [TrmTsk=0]  NormACA=0  HiSUP=0  Resp_data_format=2
+  SCCS=0  ACC=0  TPGS=0  3PC=0  Protect=0  [BQue=0]
+  EncServ=0  MultiP=0  [MChngr=0]  [ACKREQQ=0]  Addr16=0
+  [RelAdr=0]  WBus16=0  Sync=0  [Linked=0]  [TranDis=0]  CmdQue=1
+  [SPI: Clocking=0x0  QAS=0  IUS=0]
+    length=96 (0x60)   Peripheral device type: disk
+  Vendor identification: ATA
+  Product identification: SK hynix SC300 M
+  Product revision level: 0P00
+
+Previously, the command would also print
+
+  Unit serial number: FJ63N456110303C1E
+
+The problem is caused by checking "len" rather than op->maxlen
+in the condition that's evaluated for printing the unit serial numnber.
+
+Fixes: 0f1230a ("sg_readcap+sg_luns: add --inhex= and json")
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+---
+ src/sg_inq.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/sg_inq.c b/src/sg_inq.c
+index 8e6b269d..5d77d908 100644
+--- a/src/sg_inq.c
++++ b/src/sg_inq.c
+@@ -2428,8 +2428,8 @@ std_inq_decode(const uint8_t * rp, int len, struct opts_t * op,
+ 
+         if (as_json)
+             jo2p = std_inq_decode_js(rp, len, op, jop);
+-        if ((0 == len) && usn_buff[0])
+-            sgj_pr_hr(jsp, " Unit serial number: %s\n", usn_buff);
++        if ((0 == op->maxlen) && usn_buff[0])
++            sgj_pr_hr(jsp, "  Unit serial number: %s\n", usn_buff);
+         if (op->do_descriptors) {
+             sgj_opaque_p jap = sgj_named_subarray_r(jsp, jo2p,
+                                                 "version_descriptor_list");
+-- 
+2.53.0
+

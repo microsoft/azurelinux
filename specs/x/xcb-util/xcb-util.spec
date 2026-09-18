@@ -3,7 +3,7 @@
 
 Name:		xcb-util
 Version:	0.4.1
-Release: 11%{?dist}
+Release:	8%{?dist}
 Summary:	Convenience libraries sitting on top of libxcb
 License:	X11-distribute-modifications-variant
 URL:		http://xcb.freedesktop.org

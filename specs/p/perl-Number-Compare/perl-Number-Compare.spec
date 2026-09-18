@@ -3,7 +3,7 @@
 
 Name: 		perl-Number-Compare
 Version: 	0.03
-Release: 44%{?dist}
+Release: 	41%{?dist}
 Summary: 	Perl module for numeric comparisons
 License: 	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL: 		https://metacpan.org/release/Number-Compare

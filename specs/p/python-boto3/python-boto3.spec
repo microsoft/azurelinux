@@ -10,8 +10,8 @@
 %bcond awscrt 0
 
 Name:           python-boto3
-Version:        1.42.52
-Release: 4%{?dist}
+Version:        1.43.81
+Release:        1%{?dist}
 Summary:        The AWS SDK for Python
 
 License:        Apache-2.0
@@ -86,6 +86,297 @@ hardlink -c '%{buildroot}%{python3_sitelib}/boto3'
 %license LICENSE
 
 %changelog
+* Thu Aug 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.81-1
+- 1.43.81
+
+* Wed Aug 26 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.80-1
+- 1.43.80
+
+* Tue Aug 25 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.79-1
+- 1.43.79
+
+* Mon Aug 24 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.78-1
+- 1.43.78
+
+* Fri Aug 21 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.77-1
+- 1.43.77
+
+* Thu Aug 20 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.76-1
+- 1.43.76
+
+* Thu Aug 20 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.75-1
+- 1.43.75
+
+* Wed Aug 19 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.74-1
+- 1.43.74
+
+* Mon Aug 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.73-1
+- 1.43.73
+
+* Mon Aug 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.72-1
+- 1.43.72
+
+* Thu Aug 13 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.71-1
+- 1.43.71
+
+* Thu Aug 13 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.70-1
+- 1.43.70
+
+* Fri Aug 07 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.66-1
+- 1.43.66
+
+* Wed Aug 05 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.65-1
+- 1.43.65
+
+* Wed Aug 05 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.64-1
+- 1.43.64
+
+* Tue Aug 04 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.63-1
+- 1.43.63
+
+* Fri Jul 31 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.62-1
+- 1.43.62
+
+* Fri Jul 31 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.61-1
+- 1.43.61
+
+* Tue Jul 28 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.55-1
+- 1.43.55
+
+* Thu Jul 23 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.53-1
+- 1.43.53
+
+* Tue Jul 21 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.52-1
+- 1.43.52
+
+* Mon Jul 20 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.51-1
+- 1.43.51
+
+* Fri Jul 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.50-1
+- 1.43.50
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.43.49-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jul 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.49-1
+- 1.43.49
+
+* Tue Jul 14 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.48-1
+- 1.43.48
+
+* Tue Jul 14 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.47-1
+- 1.43.47
+
+* Mon Jul 13 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.46-1
+- 1.43.46
+
+* Thu Jul 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.45-1
+- 1.43.45
+
+* Thu Jul 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.44-1
+- 1.43.44
+
+* Wed Jul 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.43-1
+- 1.43.43
+
+* Tue Jul 07 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.42-1
+- 1.43.42
+
+* Mon Jul 06 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.41-1
+- 1.43.41
+
+* Thu Jul 02 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.39-1
+- 1.43.39
+
+* Wed Jul 01 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.38-1
+- 1.43.38
+
+* Tue Jun 30 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.37-1
+- 1.43.37
+
+* Tue Jun 23 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.36-1
+- 1.43.36
+
+* Mon Jun 22 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.34-1
+- 1.43.34
+
+* Fri Jun 19 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.33-1
+- 1.43.33
+
+* Fri Jun 19 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.32-1
+- 1.43.32
+
+* Tue Jun 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.31-1
+- 1.43.31
+
+* Tue Jun 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.30-1
+- 1.43.30
+
+* Fri Jun 12 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.29-1
+- 1.43.29
+
+* Thu Jun 11 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.28-1
+- 1.43.28
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 1.43.21-2
+- Rebuilt for Python 3.15
+
+* Wed Jun 03 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.21-1
+- 1.43.21
+
+* Tue Jun 02 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.20-1
+- 1.43.20
+
+* Mon Jun 01 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.19-1
+- 1.43.19
+
+* Mon Jun 01 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.18-1
+- 1.43.18
+
+* Fri May 29 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.17-1
+- 1.43.17
+
+* Thu May 28 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.16-1
+- 1.43.16
+
+* Wed May 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.15-1
+- 1.43.15
+
+* Fri May 22 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.14-1
+- 1.43.14
+
+* Fri May 22 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.13-1
+- 1.43.13
+
+* Wed May 20 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.12-1
+- 1.43.12
+
+* Wed May 20 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.11-1
+- 1.43.11
+
+* Thu May 14 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.8-1
+- 1.43.8
+
+* Wed May 13 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.7-1
+- 1.43.7
+
+* Fri May 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.6-1
+- 1.43.6
+
+* Tue May 05 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.4-1
+- 1.43.4
+
+* Tue May 05 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.3-1
+- 1.43.3
+
+* Mon May 04 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.2-1
+- 1.43.2
+
+* Tue Apr 28 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.97-1
+- 1.42.97
+
+* Mon Apr 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.96-1
+- 1.42.96
+
+* Fri Apr 24 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.95-1
+- 1.42.95
+
+* Thu Apr 23 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.94-1
+- 1.42.94
+
+* Tue Apr 21 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.92-1
+- 1.42.92
+
+* Fri Apr 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.90-1
+- 1.42.90
+
+* Tue Apr 14 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.89-1
+- 1.42.89
+
+* Fri Apr 10 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.88-1
+- 1.42.88
+
+* Thu Apr 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.86-1
+- 1.42.86
+
+* Tue Apr 07 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.84-1
+- 1.42.84
+
+* Fri Apr 03 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.83-1
+- 1.42.83
+
+* Thu Apr 02 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.82-1
+- 1.42.82
+
+* Thu Apr 02 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.81-1
+- 1.42.81
+
+* Tue Mar 31 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.80-1
+- 1.42.80
+
+* Tue Mar 31 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.79-1
+- 1.42.79
+
+* Fri Mar 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.78-1
+- 1.42.78
+
+* Wed Mar 25 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.76-1
+- 1.42.76
+
+* Mon Mar 23 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.74-1
+- 1.42.74
+
+* Mon Mar 23 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.73-1
+- 1.42.73
+
+* Fri Mar 20 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.72-1
+- 1.42.72
+
+* Thu Mar 19 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.71-1
+- 1.42.71
+
+* Tue Mar 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.70-1
+- 1.42.70
+
+* Tue Mar 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.69-1
+- 1.42.69
+
+* Mon Mar 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.68-1
+- 1.42.68
+
+* Thu Mar 12 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.67-1
+- 1.42.67
+
+* Wed Mar 11 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.66-1
+- 1.42.66
+
+* Tue Mar 10 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.65-1
+- 1.42.65
+
+* Tue Mar 10 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.64-1
+- 1.42.64
+
+* Mon Mar 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.63-1
+- 1.42.63
+
+* Mon Mar 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.62-1
+- 1.42.62
+
+* Tue Mar 03 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.60-1
+- 1.42.60
+
+* Mon Mar 02 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.59-1
+- 1.42.59
+
+* Thu Feb 26 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.58-1
+- 1.42.58
+
+* Wed Feb 25 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.57-1
+- 1.42.57
+
+* Wed Feb 25 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.56-1
+- 1.42.56
+
 * Thu Feb 19 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.42.52-1
 - 1.42.52
 

@@ -1,0 +1,43 @@
+From 7d65c05d6e3eeff3ce84654cfe33aafc6c4d7db3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 13 Apr 2026 16:02:01 +0200
+Subject: [PATCH] spec: Require rpm-libs >= 5.99.90 because of
+ rpmteSetVfyLevel()
+
+Commit 4db642138c76474553213b0f9005a78f32fbf932 (Honor per-repo
+pgp_gpgcheck=0 even in rpm's enforcing signature mode) started to call
+rpmteSetVfyLevel() if it is available in RPM library on build time.
+The function emerged in RPM 5.99.90.
+
+Users who update libdnf5 built against RPM >= 5.99.90 before updating
+RPM library on their system first will get a linking error on
+a subsequent execution of DNF5:
+
+    # dnf -y update --nogpgcheck --refresh --no-best --allowerasing
+    dnf: symbol lookup error: /lib64/libdnf5.so.2: undefined symbol: rpmteSetVfyLevel
+
+This can happen e.g. when partially upgrading (libdnf5 without
+rpm-libs) from Fedora 43 to 44.
+
+This patch prevents from upgrading DNF5 before RPM.
+---
+ dnf5.spec | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/dnf5.spec b/dnf5.spec
+index 3e4a7cdb..7848722f 100644
+--- a/dnf5.spec
++++ b/dnf5.spec
+@@ -441,6 +441,9 @@ License:        LGPL-2.1-or-later
+ #Requires:       libmodulemd{?_isa} >= {libmodulemd_version}
+ Requires:       libsolv%{?_isa} >= %{libsolv_version}
+ Requires:       librepo%{?_isa} >= %{librepo_version}
++%if 0%{?fedora} >= 43 || 0%{?rhel} >= 11
++Requires:       rpm-libs%{?_isa} >= 5.99.90
++%endif
+ Requires:       sqlite-libs%{?_isa} >= %{sqlite_version}
+ %if %{with dnf5_obsoletes_dnf}
+ Conflicts:      dnf-data < 4.20.0
+-- 
+2.53.0
+

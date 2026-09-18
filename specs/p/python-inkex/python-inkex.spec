@@ -12,7 +12,7 @@ Version:        1.4.0^%{commitdate}git%{shortcommit}
 %forgemeta
 
 Name:           python-%{srcname}
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Python extensions for Inkscape core
 
 License:        GPL-2.0-or-later

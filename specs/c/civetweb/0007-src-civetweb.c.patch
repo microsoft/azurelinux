@@ -1,0 +1,28 @@
+From b3449269bbf13852824d19f164d00810432649d0 Mon Sep 17 00:00:00 2001
+From: Mattias Ellert <mattias.ellert@physics.uu.se>
+Date: Thu, 20 Aug 2026 21:04:22 +0200
+Subject: [PATCH] Fix compilation with openssl 4
+
+X509_get_subject_name() and X509_get_issuer_name() now return const.
+---
+ src/civetweb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/civetweb.c b/src/civetweb.c
+index f6a60e21..e093e094 100644
+--- a/src/civetweb.c
++++ b/src/civetweb.c
+@@ -17125,8 +17125,8 @@ ssl_get_client_cert_info(const struct mg_connection *conn,
+ 		const EVP_MD *digest = EVP_get_digestbyname("sha1");
+ 
+ 		/* Get Subject and issuer */
+-		X509_NAME *subj = X509_get_subject_name(cert);
+-		X509_NAME *iss = X509_get_issuer_name(cert);
++		const X509_NAME *subj = X509_get_subject_name(cert);
++		const X509_NAME *iss = X509_get_issuer_name(cert);
+ 
+ 		/* Get serial number */
+ 		ASN1_INTEGER *serial = X509_get_serialNumber(cert);
+-- 
+2.55.0
+

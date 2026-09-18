@@ -10,7 +10,7 @@
 Summary: Config files for KDE
 Name:    kde-settings
 Version: 43.101
-Release: 6%{?dist}
+Release: 3%{?dist}
 
 License: MIT
 URL:     https://pagure.io/fedora-kde/kde-settings

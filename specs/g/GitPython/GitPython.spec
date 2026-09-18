@@ -4,8 +4,8 @@
 %global srcname GitPython
 
 Name:           %{srcname}
-Version:        3.1.46
-Release: 6%{?dist}
+Version:        3.1.60
+Release:        1%{?dist}
 Summary:        Python Git Library
 
 License:        BSD-3-Clause
@@ -62,6 +62,40 @@ Requires:       git-core
 %doc CHANGES AUTHORS
 
 %changelog
+* Wed Aug 26 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.60-1
+- Update to 3.1.60; close RHBZ#2523750
+- Fixes GHSA-g5vv-9gxw-82hx, GHSA-whh4-5q6c-9v3x, and GHSA-239g-whfq-7xj9
+
+* Sun Aug 16 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.59-1
+- Update to 3.1.59 (close RHBZ#2499503)
+- Fixes GHSA-5xxx-qhh7-9287, GHSA-3wxw-xv34-2frg, GHSA-8mcc-hrx5-hvxc,
+  GHSA-284h-m62q-gf8w, GHSA-7833-fr7j-v32q, GHSA-hh9p-6wh2-4mfc,
+  GHSA-9rj7-rf2p-w77r, GHSA-4gmw-gg2m-w46p, GHSA-wvpp-8hx9-p66j,
+  GHSA-jm78-9fvv-mhgr, GHSA-hmq2-w58f-27jc, GHSA-3f7w-8rr8-f37f,
+  GHSA-539m-9xh6-q6rr, and GHSA-p538-c434-8v24
+
+* Thu Jul 23 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.55-1
+- Update to 3.1.55: Fixes GHSA-2f96-g7mh-g2hx, GHSA-v396-v7q4-x2qj,
+  GHSA-956x-8gvw-wg5v, GHSA-rwj8-pgh3-r573, GHSA-3rp5-jjmw-4wv2,
+  GHSA-r9mr-m37c-5fr3, GHSA-fjr4-x663-mwxc, GHSA-6p8h-3wgx-97gf, and
+  GHSA-94p4-4cq8-9g67
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.50-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 3.1.50-2
+- Rebuilt for Python 3.15
+
+* Wed May 06 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.50-1
+- Update to 3.1.50; closes RHBZ#2466957 and fixes CVE-2026-42215
+
+* Wed Apr 29 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.49-1
+- Update to 3.1.49; closes RHBZ#2463714 and fixes GHSA-v87r-6q3f-2j67
+
+* Tue Apr 28 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.1.48-1
+- Update to 3.1.48; closes RHBZ#2460480, fixes GHSA-rpm5-65cw-6hj4,
+  fixes GHSA-x2qx-6953-8485, and fixes GHSA-7545-fcxq-7j24
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.46-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

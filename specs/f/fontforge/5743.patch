@@ -1,0 +1,39 @@
+From a04b3e4d72a1709d2cd7a7dfb6552ab1fe9a9d31 Mon Sep 17 00:00:00 2001
+From: Ahmet Furkan Kavraz <kavraz@amazon.com>
+Date: Fri, 30 Jan 2026 09:54:28 +0000
+Subject: [PATCH] Fix CVE-2025-15270: Heap buffer overflow in SFD kern class
+ parsing
+
+Fixes: CVE-2025-15270 | ZDI-25-1194 | ZDI-CAN-28563
+
+Co-authored-by: Ahmet Furkan Kavraz <kavraz@amazon.com>
+---
+ fontforge/sfd.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/fontforge/sfd.c b/fontforge/sfd.c
+index 6b980a4785..78df7a8ff3 100644
+--- a/fontforge/sfd.c
++++ b/fontforge/sfd.c
+@@ -8275,6 +8275,10 @@ bool SFD_GetFontMetaData( FILE *sfd,
+ 	for ( i=classstart; i<kc->first_cnt; ++i ) {
+ 	  if (kernclassversion < 3) {
+ 	    getint(sfd,&temp);
++	    if (temp < 0) {
++	      LogError(_("Corrupted SFD file: Invalid kern class name length %d. Aborting load."), temp);
++	      return false;
++	    }
+ 	    kc->firsts[i] = malloc(temp+1); kc->firsts[i][temp] = '\0';
+ 	    nlgetc(sfd);	/* skip space */
+ 	    fread(kc->firsts[i],1,temp,sfd);
+@@ -8292,6 +8296,10 @@ bool SFD_GetFontMetaData( FILE *sfd,
+ 	for ( i=1; i<kc->second_cnt; ++i ) {
+ 	  if (kernclassversion < 3) {
+ 	    getint(sfd,&temp);
++	    if (temp < 0) {
++	      LogError(_("Corrupted SFD file: Invalid kern class name length %d. Aborting load."), temp);
++	      return false;
++	    }
+ 	    kc->seconds[i] = malloc(temp+1); kc->seconds[i][temp] = '\0';
+ 	    nlgetc(sfd);	/* skip space */
+ 	    fread(kc->seconds[i],1,temp,sfd);

@@ -1,0 +1,27 @@
+From c49b26cb1e11bb160198a28ac5567b0154b49121 Mon Sep 17 00:00:00 2001
+From: Chris Lumens <clumens@redhat.com>
+Date: Thu, 28 May 2026 12:56:57 -0400
+Subject: [PATCH 5/5] Refactor: libcib: Remove an unnecessary coverity
+ suppression.
+
+With all the previous changes, this suppression is no longer necessary
+and can be removed.
+---
+ lib/cib/cib_remote.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lib/cib/cib_remote.c b/lib/cib/cib_remote.c
+index 8ba9bb8909..b9eb393afa 100644
+--- a/lib/cib/cib_remote.c
++++ b/lib/cib/cib_remote.c
+@@ -258,7 +258,6 @@ cib_remote_callback_dispatch(void *user_data)
+             return -1;
+     }
+ 
+-    // coverity[tainted_data] This can't easily be changed right now
+     msg = pcmk__remote_message_xml(&private->callback);
+     if (msg == NULL) {
+         private->start_time = 0;
+-- 
+2.54.0
+

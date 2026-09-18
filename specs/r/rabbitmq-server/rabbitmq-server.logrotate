@@ -5,8 +5,4 @@
         compress
         delaycompress
         notifempty
-        sharedscripts
-        postrotate
-            /usr/sbin/rabbitmqctl -q rotate_logs
-        endscript
 }

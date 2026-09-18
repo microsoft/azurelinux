@@ -28,7 +28,7 @@ BuildRequires:  cairo-devel
 BuildRequires:  make
 
 Version: 20250623
-Release: 5%{?dist}
+Release: 2%{?dist}
 URL:     https://github.com/googlefonts/noto-emoji
 
 %global foundry           Google

@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        2.4
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Resolve JSON Pointers in Python
 
 License:        BSD-3-Clause

@@ -3,9 +3,9 @@
 
 # Fedora spec file for php-pecl-msgpack
 #
-# Copyright (c) 2012-2024 Remi Collet
-# License: CC-BY-SA-4.0
-# http://creativecommons.org/licenses/by-sa/4.0/
+# SPDX-FileCopyrightText:  Copyright 2012-2026 Remi Collet
+# SPDX-License-Identifier: CECILL-2.1
+# http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
 # Please, preserve the changelog entries
 #
@@ -17,7 +17,7 @@
 # to disable test suite
 %bcond_without           tests
 
-%global upstream_version 3.0.0
+%global upstream_version 3.0.1
 #global upstream_prever  RC2
 #global upstream_lower   RC2
 %global sources          %{pecl_name}-%{upstream_version}%{?upstream_prever}
@@ -29,7 +29,7 @@
 Summary:       API for communicating with MessagePack serialization
 Name:          php-pecl-msgpack
 Version:       %{upstream_version}%{?upstream_lower:~%{upstream_lower}}
-Release: 7%{?dist}
+Release:       1%{?dist}
 Source:        https://pecl.php.net/get/%{pecl_name}-%{upstream_version}%{?upstream_prever}.tgz
 License:       BSD-3-Clause
 URL:           https://pecl.php.net/package/msgpack
@@ -176,6 +176,9 @@ TEST_PHP_ARGS="-n -d extension=apcu.so -d extension=$PWD/modules/%{pecl_name}.so
 
 
 %changelog
+* Tue Jun  2 2026 Remi Collet <remi@remirepo.net> - 3.0.1-1
+- update to 3.0.1
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

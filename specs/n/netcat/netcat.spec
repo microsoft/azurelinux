@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global commit d0cc618721a8b450997f44626c9d937245dc1b9a
+%global commit c2d38473df0e920291433bf258428b2db1d2fafb
 
 %if 0%{?fedora} || 0%{?rhel} > 8
 %global link_bin nc
@@ -14,8 +14,8 @@
 Summary:         OpenBSD netcat to read and write data across connections using TCP or UDP
 Name:            netcat
 # Version from CVS revision of OpenBSD netcat.c
-Version:         1.237
-Release: 6%{?dist}
+Version:         1.238
+Release:         1%{?dist}
 # BSD-3-Clause: nc.1 and netcat.c
 # BSD-2-Clause: atomicio.{c,h} and socks.c
 License:         BSD-3-Clause AND BSD-2-Clause
@@ -27,7 +27,7 @@ Source3:         https://raw.githubusercontent.com/openbsd/src/%{commit}/usr.bin
 Source4:         https://raw.githubusercontent.com/openbsd/src/%{commit}/usr.bin/nc/socks.c
 Source5:         https://raw.githubusercontent.com/openbsd/src/%{commit}/usr.bin/nc/Makefile
 # Port peculiarities from OpenBSD to Linux
-Patch0:          https://salsa.debian.org/debian/netcat-openbsd/-/raw/3dd21269220dd746eaf4e64a17b7257eba47c2c2/debian/patches/port-to-linux-with-libbsd.patch
+Patch0:          https://salsa.debian.org/debian/netcat-openbsd/-/raw/c6a48a9bd03b0b262c7cd3ad368eb21d522d1667/debian/patches/port-to-linux-with-libbsd.patch
 BuildRequires:   make
 BuildRequires:   gcc
 BuildRequires:   libbsd-devel
@@ -85,6 +85,9 @@ fi
 %{_mandir}/man1/netcat.1*
 
 %changelog
+* Wed May 20 2026 Robert Scheck <robert@fedoraproject.org> 1.238-1
+- Upgrade to 1.238 (#2480012)
+
 * Wed Jan 21 2026 Robert Scheck <robert@fedoraproject.org> 1.237-3
 - Do not use removed /etc/pki/tls/cert.pem bundle file for
   Fedora 43 >= and RHEL >= 11 (#2430274)

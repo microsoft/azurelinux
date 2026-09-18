@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Version:        3.052
-Release: 10%{?dist}
+Release:        7%{?dist}
 URL:            https://github.com/adobe-fonts/source-sans
 
 %global foundry adobe

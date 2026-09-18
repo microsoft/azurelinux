@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.4.6
-Release: 27%{?dist}
+Release:        24%{?dist}
 Summary:        WSGI Proxy that supports several HTTP backends
 
 License:        MIT

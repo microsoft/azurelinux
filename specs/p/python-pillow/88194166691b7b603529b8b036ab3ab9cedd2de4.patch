@@ -1,0 +1,24 @@
+diff -rupN --no-dereference Pillow-11.3.0/src/PIL/ImageShow.py Pillow-11.3.0-new/src/PIL/ImageShow.py
+--- Pillow-11.3.0/src/PIL/ImageShow.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/src/PIL/ImageShow.py	2026-07-19 08:50:48.642211901 +0200
+@@ -131,6 +131,7 @@ class WindowsViewer(Viewer):
+     options = {"compress_level": 1, "save_all": True}
+ 
+     def get_command(self, file: str, **options: Any) -> str:
++        file = file.replace("%", '"%"')
+         return (
+             f'start "Pillow" /WAIT "{file}" '
+             "&& ping -n 4 127.0.0.1 >NUL "
+diff -rupN --no-dereference Pillow-11.3.0/Tests/test_imageshow.py Pillow-11.3.0-new/Tests/test_imageshow.py
+--- Pillow-11.3.0/Tests/test_imageshow.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/Tests/test_imageshow.py	2026-07-19 08:50:48.642571321 +0200
+@@ -107,6 +107,9 @@ def test_viewers(viewer: ImageShow.Viewe
+     except NotImplementedError:
+         pass
+ 
++    # Check that percentages are escaped
++    assert "%" not in viewer.get_command("%").replace('""%""', "")
++
+ 
+ def test_ipythonviewer() -> None:
+     pytest.importorskip("IPython", reason="IPython not installed")

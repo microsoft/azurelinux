@@ -6,7 +6,7 @@
 
 Name:           perl-Inline
 Version:        0.87
-Release: 4%{?dist}
+Release:        2%{?dist}
 Summary:        Inline Perl module
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Url:            https://metacpan.org/release/Inline
@@ -43,8 +43,14 @@ BuildRequires:  perl(version) >= 0.82
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(Inline::Files)
+BuildRequires:  perl(JSON::PP)
+BuildRequires:  perl(List::Util)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(overload)
+BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Text::Diff)
+BuildRequires:  perl(XXX)
 # Test::Pod 1.41 not used
 BuildRequires:  perl(Test::Warn) >= 0.23
 %if %{with perl_Inline_enables_optional_test}
@@ -140,6 +146,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu May 21 2026 Michal Josef Špaček <mspacek@redhat.com> - 0.87-2
+- Fix test dependencies
+
 * Tue Aug 05 2025 Michal Josef Špaček <mspacek@redhat.com> - 0.87-1
 - 0.87 bump
   Bundle TestML back, in Inline is developer release of TestML.

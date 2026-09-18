@@ -46,7 +46,7 @@
 Summary: An open source implementation of SSH protocol version 2
 Name: openssh
 Version: %{openssh_ver}
-Release: 9%{?dist}
+Release: 12%{?dist}
 URL: http://www.openssh.com/portable.html
 Source0: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
 Source1: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz.asc
@@ -164,10 +164,6 @@ Patch0040: 0040-openssh-7.1p2-audit-race-condition.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=2049947
 Patch0041: 0041-openssh-9.0p1-audit-log.patch
 Patch0042: 0042-openssh-7.7p1-fips.patch
-# Add missing options from ssh_config into ssh manpage
-# upstream bug:
-# https://bugzilla.mindrot.org/show_bug.cgi?id=3455
-Patch0043: 0043-openssh-8.7p1-ssh-manpage.patch
 # Don't propose disallowed algorithms during hostkey negotiation
 # upstream MR:
 # https://github.com/openssh/openssh-portable/pull/323
@@ -185,11 +181,39 @@ Patch0051: 0051-Provide-better-error-for-non-supported-private-keys.patch
 Patch0052: 0052-Ignore-bad-hostkeys-in-known_hosts-file.patch
 # https://github.com/openssh/openssh-portable/pull/500
 Patch0053: 0053-support-authentication-indicators-in-GSSAPI.patch
+# upstream 487e8ac146f7d6616f65c125d5edb210519b833a
+Patch0054: 0054-openssh-9.9p1-scp-clear-setuid.patch
+# upstream c805b97b67c774e0bf922ffb29dfbcda9d7b5add
+Patch0055: 0055-openssh-9.9p1-mux-askpass-check.patch
+# upstream fd1c7e131f331942d20f42f31e79912d570081fa
+Patch0056: 0056-openssh-9.9p1-ecdsa-incomplete-application.patch
+# upstream fd1c7e131f331942d20f42f31e79912d570081fa
+Patch0057: 0057-openssh-9.9p1-authorized-keys-principles-option.patch
+# upstream 43b3bff47bb029f2299bacb6a36057981b39fdb0
+Patch0058: 0058-openssh-9.9p1-reject-null-char-in-url-string.patch
+# upstream 35d5917652106aede47621bb3f64044604164043
+# upstream 76685c9b09a66435cd2ad8373246adf1c53976d3
+# upstream 0a0ef4515361143cad21afa072319823854c1cf6
+# upstream 607bd871ec029e9aa22e632a22547250f3cae223
+# upstream 1340d3fa8e4bb122906a82159c4c9b91584d65ce
+Patch0059: 0059-openssh-10.0p1-reject-cntrl-chars-in-username.patch
+# upstream 36480181fa22f98e180b4f9e10203480c0346c78
+Patch0060: 0060-openssh-9.9p1-scp-remote-glob.patch
+# upstream e8bdfb151a356d0171fea4194dd205fbb252be23
+Patch0061: 0061-openssh-9.9p1-cve-2026-60002.patch
+# upstream 6a57081dc35acf3ee298108d4bc3580489608d5f
+Patch0062: 0062-openssh-10.4p1-CVE-2026-59995.patch
+# upstream 8dfe7ed6e2fd988de08df508355a196b956b2753
+# upstream d322f2ccf7da095ce94d1d99cb563246f61487b0
+# combines CVE-2026-59999 and CVE-2026-73283
+Patch0063: 0063-openssh-10.4p1-CVE-2026-59999.patch
+# upstream 9910d5ef53124ce1157d57bc11e222658aa41299
+Patch0064: 0064-openssh-10.5p1-CVE-2026-73282.patch
 
 #https://bugzilla.mindrot.org/show_bug.cgi?id=2581
 Patch1000: 1000-openssh-coverity.patch
 
-License: BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND sprintf AND LicenseRef-Fedora-Public-Domain AND X11-distribute-modifications-variant
+License: BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND snprintf AND LicenseRef-Fedora-Public-Domain AND X11-distribute-modifications-variant
 Requires: /sbin/nologin
 Requires: openssl-libs >= 3.5.0
 
@@ -589,6 +613,57 @@ test -f %{sysconfig_anaconda} && \
 %attr(0755,root,root) %{_libdir}/sshtest/sk-dummy.so
 
 %changelog
+* Wed Aug 19 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 10.0p1-12
+- Fix CVE-2026-59995 OpenSSH: sftp client allows attacker to control downloaded
+  file location
+- Fix CVE-2026-59999 and CVE-2026-73283: Security bypass due to incorrect
+  handling of forwarding and tunneling options
+- Fix CVE-2026-73282: avoid potential realloc use-after-free in the client if a
+  remote forwarding is added via the local session multiplexing socket while a
+  remote forwarding open request is pending with the server.
+
+* Fri Jul 17 2026 Zoltan Fridrich <zfridric@redhat.com> - 10.0p1-11
+- CVE-2026-59996: Fix remote glob result of ".." causing files to be placed
+  in unintended parent directories when scp performs remote-to-remote copy
+  via the local host
+  Resolves: rhbz#2498027
+- CVE-2026-60002: Fix use-after-free in cached hostkey during key re-exchange
+  Resolves: rhbz#2497966
+
+* Tue Jul 07 2026 Zoltan Fridrich <zfridric@redhat.com> - 10.0p1-10
+- CVE-2026-55653: Fix double free in openssh DH-GEX client path during
+  FIPS known-group validation that leads to client-side denial of service
+- CVE-2026-55654: Fix heap out-of-bounds read during GSSAPI indicator
+  cleanup due to missing NULL terminator
+- CVE-2026-55655: Fix MITM of X11 forwarding via abstract UNIX socket
+  pre-binding
+
+* Fri Apr 17 2026 Zoltan Fridrich <zfridric@redhat.com> - 10.0p1-9
+- CVE-2026-35385: Fix privilege escalation via scp legacy protocol
+  when not in preserving file mode
+  Resolves: rhbz#2454941
+- CVE-2026-35388: Add connection multiplexing confirmation for proxy-mode
+  multiplexing sessions
+  Resolves: rhbz#2454951
+- CVE-2026-35387: Fix incomplete application of PubkeyAcceptedAlgorithms
+  and HostbasedAcceptedAlgorithms with regard to ECDSA keys
+  Resolves: rhbz#2454944
+- CVE-2026-35414: Fix mishandling of authorized_keys principals option
+  Resolves: rhbz#2454943
+- CVE-2025-61985: Reject URL-strings with NULL characters
+- CVE-2025-61984, CVE-2026-35386: Reject usernames with control characters
+  Resolves: rhbz#2454961
+
+* Mon Mar 23 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 10.0p1-8
+- Fix typo in SPDX license name
+
+* Wed Mar 18 2026 Zoltan Fridrich <zfridric@redhat.com> - 10.0p1-7
+- CVE-2026-3497: Fix information disclosure or denial of service due
+  to uninitialized variables in gssapi-keyex
+  Resolves: rhbz#2447290
+- remove obsolete patch for ssh manual page
+  Resolves: rhbz#2442505
+
 * Wed Dec 10 2025 Pavol Žáčik <pzacik@redhat.com> - 10.0p1-6
 - Update gssapi-keyex patch to not abort KEX without hostkey
 

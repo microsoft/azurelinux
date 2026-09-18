@@ -1,0 +1,495 @@
+From 3e851ff5518cd0e4d7e95654b45159056e7f13f4 Mon Sep 17 00:00:00 2001
+From: Steve Grubb <ausearch.1@gmail.com>
+Date: Thu, 23 Jul 2026 11:24:22 -0400
+Subject: [PATCH] Fix large-file support on 32-bit builds
+Content-type: text/plain
+
+The build did not request a large-file ABI, and several translation units did not include the generated config header before system headers. On i686 this left off_t at 32 bits and exposed an incorrect trustdb_lmdb_test assumption that bulk import parses record sizes.
+
+Enable AC_SYS_LARGEFILE and consistently include config.h first so configure-selected feature macros apply to every C translation unit. Update the LMDB regression to import the ABI-independent record first, then verify that size-integrity lookup accepts the 4 GiB value with wide off_t and rejects it with narrow off_t.
+
+The database wire representation is unchanged, so existing LMDB files do not require migration and 64-bit builds retain their existing large-file ABI.
+---
+ configure.ac                            |  1 +
+ src/library/attr-sets.c                 |  2 ++
+ src/library/avl.c                       |  3 ++-
+ src/library/deb-backend.c               |  2 ++
+ src/library/llist.c                     |  2 ++
+ src/library/stack.c                     |  2 ++
+ src/library/string-util.c               |  2 ++
+ src/perf-test/fapolicyd-perf-test.c     |  4 ++--
+ src/tests/attr_sets_test.c              |  2 ++
+ src/tests/avl_test.c                    |  3 ++-
+ src/tests/cli_privilege_test.c          |  2 ++
+ src/tests/decision_defer_test.c         |  2 ++
+ src/tests/decision_timing_report_test.c |  2 ++
+ src/tests/elf_file_test.c               |  3 +++
+ src/tests/escape_test.c                 |  3 ++-
+ src/tests/event_test.c                  |  2 ++
+ src/tests/failure_action_test.c         |  2 ++
+ src/tests/fd_fgets_test.c               |  2 ++
+ src/tests/file_filter_test.c            |  2 ++
+ src/tests/filter_test.c                 |  2 ++
+ src/tests/gid_proc_test.c               |  2 ++
+ src/tests/ignore_mounts_risk_test.c     |  2 ++
+ src/tests/lru_test.c                    |  2 ++
+ src/tests/policy_concurrent_test.c      |  2 ++
+ src/tests/policy_reload_test.c          |  2 ++
+ src/tests/queue_test.c                  |  2 ++
+ src/tests/test-stubs.c                  |  2 ++
+ src/tests/trustdb_format_test.c         |  2 ++
+ src/tests/trustdb_lmdb_test.c           | 32 ++++++++++++++++++-------
+ src/tests/uid_proc_test.c               |  2 ++
+ 30 files changed, 81 insertions(+), 14 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b2e9f0e6ef65..5e5395e88ee0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5,6 +5,7 @@ AC_CONFIG_HEADERS([config.h])
+ AC_CONFIG_MACRO_DIR([m4])
+ 
+ AC_USE_SYSTEM_EXTENSIONS
++AC_SYS_LARGEFILE
+ 
+ AC_CANONICAL_TARGET
+ AM_INIT_AUTOMAKE(foreign subdir-objects)
+diff --git a/src/library/attr-sets.c b/src/library/attr-sets.c
+index b71e602b647c..80e238357c83 100644
+--- a/src/library/attr-sets.c
++++ b/src/library/attr-sets.c
+@@ -43,6 +43,8 @@
+  * released directly by attr_set_destroy().
+  */
+ 
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/library/avl.c b/src/library/avl.c
+index 72807df63ac7..f2f69ef6bd69 100644
+--- a/src/library/avl.c
++++ b/src/library/avl.c
+@@ -7,7 +7,8 @@
+  * Public License (LGPL). See the provenance note below.
+  */
+ 
+-//#include "config.h"
++#include "config.h"
++
+ #include <stddef.h> // for NULL
+ #include "avl.h"
+ 
+diff --git a/src/library/deb-backend.c b/src/library/deb-backend.c
+index 40e17f4349fd..b83fd3ffe490 100644
+--- a/src/library/deb-backend.c
++++ b/src/library/deb-backend.c
+@@ -19,6 +19,8 @@
+  * Boston, MA 02110-1335, USA.
+  */
+ 
++#include "config.h"
++
+ #include <dpkg/db-ctrl.h>
+ #include <dpkg/db-fsys.h>
+ #include <dpkg/pkg-array.h>
+diff --git a/src/library/llist.c b/src/library/llist.c
+index 0eb1d99d55ab..2778d2e60b69 100644
+--- a/src/library/llist.c
++++ b/src/library/llist.c
+@@ -24,6 +24,8 @@
+  *   Zoltan Fridrich <zfridric@redhat.com>
+  */
+ 
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/library/stack.c b/src/library/stack.c
+index 1a270ed6235d..21f55978b39c 100644
+--- a/src/library/stack.c
++++ b/src/library/stack.c
+@@ -22,6 +22,8 @@
+ *   Radovan Sroka <rsroka@redhat.com>
+ */
+ 
++#include "config.h"
++
+ #include "stack.h"
+ #include <stddef.h>
+ 
+diff --git a/src/library/string-util.c b/src/library/string-util.c
+index 7429db0009bc..7052ee1bd75b 100644
+--- a/src/library/string-util.c
++++ b/src/library/string-util.c
+@@ -23,6 +23,8 @@
+  *   Zoltan Fridrich <zfridric@redhat.com>
+  */
+ 
++#include "config.h"
++
+ #include <ctype.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/src/perf-test/fapolicyd-perf-test.c b/src/perf-test/fapolicyd-perf-test.c
+index c846cbe085ee..2f2c861a0f67 100644
+--- a/src/perf-test/fapolicyd-perf-test.c
++++ b/src/perf-test/fapolicyd-perf-test.c
+@@ -23,6 +23,8 @@
+  *   Ondrej Mosnacek <omosnace@redhat.com>
+  */
+ 
++#include "config.h"
++
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <stdatomic.h>
+@@ -31,8 +33,6 @@
+ #include <unistd.h>
+ #include <sys/time.h>
+ 
+-#include "config.h"
+-
+ #include "daemon-config.h"
+ #include "message.h"
+ #include "policy.h"
+diff --git a/src/tests/attr_sets_test.c b/src/tests/attr_sets_test.c
+index 42e048e7fbd6..6513bb1e9b64 100644
+--- a/src/tests/attr_sets_test.c
++++ b/src/tests/attr_sets_test.c
+@@ -1,3 +1,5 @@
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <error.h>
+diff --git a/src/tests/avl_test.c b/src/tests/avl_test.c
+index b1de0c8d4c16..0aa0c659e759 100644
+--- a/src/tests/avl_test.c
++++ b/src/tests/avl_test.c
+@@ -1,3 +1,5 @@
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <error.h>
+@@ -271,4 +273,3 @@ int main(void)
+ 
+ 	return 0;
+ }
+-
+diff --git a/src/tests/cli_privilege_test.c b/src/tests/cli_privilege_test.c
+index 7cf36c898667..f3fd77032ac7 100644
+--- a/src/tests/cli_privilege_test.c
++++ b/src/tests/cli_privilege_test.c
+@@ -2,6 +2,8 @@
+  * cli_privilege_test.c - verify fapolicyd-cli privilege policies
+  */
+ 
++#include "config.h"
++
+ #include <error.h>
+ #include <stdbool.h>
+ #include <stdlib.h>
+diff --git a/src/tests/decision_defer_test.c b/src/tests/decision_defer_test.c
+index 228d46bbff83..42c819156630 100644
+--- a/src/tests/decision_defer_test.c
++++ b/src/tests/decision_defer_test.c
+@@ -1,6 +1,8 @@
+ /*
+  * decision_defer_test.c - unit tests for subject-slot decision deferral
+  */
++#include "config.h"
++
+ #include <errno.h>
+ #include <pthread.h>
+ #include <stdio.h>
+diff --git a/src/tests/decision_timing_report_test.c b/src/tests/decision_timing_report_test.c
+index aebd9fe3323c..bc7d7ebe5479 100644
+--- a/src/tests/decision_timing_report_test.c
++++ b/src/tests/decision_timing_report_test.c
+@@ -1,6 +1,8 @@
+ /*
+  * decision_timing_report_test.c - timing report formatting tests
+  */
++#include "config.h"
++
+ #include <error.h>
+ #include <stdarg.h>
+ #include <stdbool.h>
+diff --git a/src/tests/elf_file_test.c b/src/tests/elf_file_test.c
+index 11dd774191f2..423c5c640082 100644
+--- a/src/tests/elf_file_test.c
++++ b/src/tests/elf_file_test.c
+@@ -10,6 +10,9 @@
+  */
+ 
+ #define _GNU_SOURCE
++
++#include "config.h"
++
+ #include <errno.h>
+ #include <error.h>
+ #include <fcntl.h>
+diff --git a/src/tests/escape_test.c b/src/tests/escape_test.c
+index f23762e4eb26..72ff2fd77046 100644
+--- a/src/tests/escape_test.c
++++ b/src/tests/escape_test.c
+@@ -2,8 +2,9 @@
+  * escape_test.c - tests for shell escaping helpers
+  */
+ 
+-#include "escape.h"
++#include "config.h"
+ 
++#include "escape.h"
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/tests/event_test.c b/src/tests/event_test.c
+index c142448f1a6f..34c33a9b3a68 100644
+--- a/src/tests/event_test.c
++++ b/src/tests/event_test.c
+@@ -1,6 +1,8 @@
+ /*
+  * event_test.c - unit tests for new_event subject/object cache behavior
+  */
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/tests/failure_action_test.c b/src/tests/failure_action_test.c
+index 1a3dae01c0a1..8d9e19e994c1 100644
+--- a/src/tests/failure_action_test.c
++++ b/src/tests/failure_action_test.c
+@@ -1,6 +1,8 @@
+ /*
+  * failure_action_test.c - verify internal failure action accounting
+  */
++#include "config.h"
++
+ #include <error.h>
+ #include <stdio.h>
+ #include <string.h>
+diff --git a/src/tests/fd_fgets_test.c b/src/tests/fd_fgets_test.c
+index 9167ae5d87ad..544fa28af7e1 100644
+--- a/src/tests/fd_fgets_test.c
++++ b/src/tests/fd_fgets_test.c
+@@ -1,3 +1,5 @@
++#include "config.h"
++
+ #include <assert.h>
+ #include <errno.h>
+ #include <fcntl.h>
+diff --git a/src/tests/file_filter_test.c b/src/tests/file_filter_test.c
+index e6851ce8973b..824a6360ad3f 100644
+--- a/src/tests/file_filter_test.c
++++ b/src/tests/file_filter_test.c
+@@ -2,6 +2,8 @@
+  * file_filter_test.c - ensure filter_prune_list handles basic lists
+  */
+ 
++#include "config.h"
++
+ #include "filter.h"
+ #include "llist.h"
+ 
+diff --git a/src/tests/filter_test.c b/src/tests/filter_test.c
+index 1e041cc80a50..39dd2d6f241c 100644
+--- a/src/tests/filter_test.c
++++ b/src/tests/filter_test.c
+@@ -1,6 +1,8 @@
+ /*
+  * filter_test.c - comprehensive tests for filter configuration
+  */
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/tests/gid_proc_test.c b/src/tests/gid_proc_test.c
+index be2a6b2e2738..8303f25e7d10 100644
+--- a/src/tests/gid_proc_test.c
++++ b/src/tests/gid_proc_test.c
+@@ -1,3 +1,5 @@
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+diff --git a/src/tests/ignore_mounts_risk_test.c b/src/tests/ignore_mounts_risk_test.c
+index 6e64e7a24641..46d316a1524d 100644
+--- a/src/tests/ignore_mounts_risk_test.c
++++ b/src/tests/ignore_mounts_risk_test.c
+@@ -4,6 +4,8 @@
+ 
+ #define _GNU_SOURCE
+ 
++#include "config.h"
++
+ #include <error.h>
+ #include <stdbool.h>
+ #include <stdio.h>
+diff --git a/src/tests/lru_test.c b/src/tests/lru_test.c
+index ebeb4feea97a..717d0ca1a701 100644
+--- a/src/tests/lru_test.c
++++ b/src/tests/lru_test.c
+@@ -1,3 +1,5 @@
++#include "config.h"
++
+ #include <error.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/tests/policy_concurrent_test.c b/src/tests/policy_concurrent_test.c
+index 87c13a7e3f8e..fd53e8ae3b02 100644
+--- a/src/tests/policy_concurrent_test.c
++++ b/src/tests/policy_concurrent_test.c
+@@ -6,6 +6,8 @@
+  * decisions today, but read-side rule iteration must not depend on the
+  * mutable llist cursor before worker threads can be introduced.
+  */
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/tests/policy_reload_test.c b/src/tests/policy_reload_test.c
+index 2a6d7e964282..a3838e25ccb8 100644
+--- a/src/tests/policy_reload_test.c
++++ b/src/tests/policy_reload_test.c
+@@ -5,6 +5,8 @@
+  * syslog parsing and during syslog parsing. In both cases, the previously
+  * published policy and its syslog field list must remain active.
+  */
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/tests/queue_test.c b/src/tests/queue_test.c
+index cbfea60bc82f..82fc416e0ef9 100644
+--- a/src/tests/queue_test.c
++++ b/src/tests/queue_test.c
+@@ -1,6 +1,8 @@
+ /*
+  * queue_test.c - verify queue metric accounting
+  */
++#include "config.h"
++
+ #include <errno.h>
+ #include <error.h>
+ #include <stdio.h>
+diff --git a/src/tests/test-stubs.c b/src/tests/test-stubs.c
+index b4da08d11ffe..42ec44af0b3b 100644
+--- a/src/tests/test-stubs.c
++++ b/src/tests/test-stubs.c
+@@ -6,6 +6,8 @@
+  * or CLI entry points.
+  */
+ 
++#include "config.h"
++
+ #include <stdatomic.h>
+ 
+ #include "conf.h"
+diff --git a/src/tests/trustdb_format_test.c b/src/tests/trustdb_format_test.c
+index 617e109e5965..3e29085474dc 100644
+--- a/src/tests/trustdb_format_test.c
++++ b/src/tests/trustdb_format_test.c
+@@ -1,6 +1,8 @@
+ // Copyright 2024 Red Hat
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ 
++#include "config.h"
++
+ #include <stdio.h>
+ #include <string.h>
+ #include <sys/types.h>
+diff --git a/src/tests/trustdb_lmdb_test.c b/src/tests/trustdb_lmdb_test.c
+index a0cc92b16134..5e54589cc6d1 100644
+--- a/src/tests/trustdb_lmdb_test.c
++++ b/src/tests/trustdb_lmdb_test.c
+@@ -2,6 +2,9 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ 
+ #define _GNU_SOURCE
++
++#include "config.h"
++
+ #include <stdatomic.h>
+ #include <errno.h>
+ #include <fcntl.h>
+@@ -638,8 +641,9 @@ static int test_data_format_round_trip(void)
+  * test_lmdb_large_size_import - verify the stored size is not tied to size_t.
+  *
+  * A 32-bit build with large-file support has a 64-bit off_t but a 32-bit
+- * size_t.  Import must retain the 4 GiB value on that ABI.  A genuinely
+- * narrow off_t cannot compare such a record, so the parser must reject it.
++ * size_t. Import must retain the 4 GiB value on that ABI. The bulk importer
++ * stores the ABI-independent wire record without parsing its size, so a
++ * genuinely narrow off_t must reject it during an integrity lookup.
+  *
+  * Returns 0 on success or a test-specific error code.
+  */
+@@ -648,8 +652,10 @@ static int test_lmdb_large_size_import(void)
+ 	conf_t cfg;
+ 	char dir[128];
+ 	char payload[256];
++	struct file_info info = { 0 };
+ 	long entries = 0;
+ 	int rc;
++	const trustdb_size_t large_size = UINT64_C(4294967296);
+ 	const char *path = "/usr/bin/large-size";
+ 	const char *digest =
+ 		"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+@@ -657,19 +663,27 @@ static int test_lmdb_large_size_import(void)
+ 	rc = with_temp_db(dir, sizeof(dir), &cfg);
+ 	CHECK(rc == 0, 13, "[ERROR:13] failed to open large-size LMDB");
+ 
++	cfg.integrity = IN_SIZE;
++	rc = decision_config_publish(&cfg);
++	CHECK(rc == 0, 14,
++	      "[ERROR:14] failed to publish size integrity config");
++
+ 	snprintf(payload, sizeof(payload), "%s " DATA_FORMAT "\n", path,
+-		 SRC_FILE_DB, UINT64_C(4294967296), digest);
++		 SRC_FILE_DB, large_size, digest);
+ 	rc = import_records(payload, &entries);
++	CHECK(rc == 0 && entries == 1, 15,
++	      "[ERROR:15] large-size record import failed");
++
+ 	if (sizeof(off_t) >= sizeof(trustdb_size_t)) {
+-		CHECK(rc == 0 && entries == 1, 14,
+-		      "[ERROR:14] large-size record import failed");
+-		CHECK(check_trust_database(path, NULL, -1) == 1, 15,
+-		      "[ERROR:15] large-size record lookup failed");
++		info.size = (off_t)large_size;
++		CHECK(check_trust_database(path, &info, -1) == 1, 16,
++		      "[ERROR:16] large-size record lookup failed");
+ 	} else {
+-		CHECK(rc != 0, 16,
+-		      "[ERROR:16] narrow off_t accepted large-size record");
++		CHECK(check_trust_database(path, &info, -1) == -1, 16,
++		      "[ERROR:16] narrow off_t parsed large-size record");
+ 	}
+ 
++	decision_config_destroy();
+ 	database_close_for_tests();
+ 	database_set_location(NULL, NULL);
+ 	CHECK(remove_lmdb_files(dir) == 0, 17,
+diff --git a/src/tests/uid_proc_test.c b/src/tests/uid_proc_test.c
+index 13ad11139af9..7655f42090d7 100644
+--- a/src/tests/uid_proc_test.c
++++ b/src/tests/uid_proc_test.c
+@@ -1,3 +1,5 @@
++#include "config.h"
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+-- 
+2.55.0
+

@@ -1,4 +1,4 @@
-From 236465ba9d380e1b6795f641ad3e8ef2b0271561 Mon Sep 17 00:00:00 2001
+From d16b5d3afbcc719ff31cf9a5bdb63a40b65d74ab Mon Sep 17 00:00:00 2001
 From: "Benjamin A. Beasley" <code@musicinmybrain.net>
 Date: Tue, 13 May 2025 07:09:41 -0400
 Subject: [PATCH] =?UTF-8?q?Downstream-only:=20Ignore=20a=20few=20tests=20w?=
@@ -25,12 +25,12 @@ and subsequent discussion.
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/lib.rs b/src/lib.rs
-index aac65cde9..8c2089187 100644
+index 5a8b40cef1..77ce82d414 100644
 --- a/src/lib.rs
 +++ b/src/lib.rs
-@@ -89,7 +89,7 @@
+@@ -102,7 +102,7 @@
  //!
- //! Use custom types inside of ZeroVec:
+ //! Use custom types inside of [`ZeroVec`]:
  //!
 -//! ```rust
 +//! ```rust,ignore
@@ -47,11 +47,11 @@ index aac65cde9..8c2089187 100644
  /// use zerofrom::ZeroFrom;
  /// use zerovec::ule::encode_varule_to_box;
 diff --git a/src/map/map.rs b/src/map/map.rs
-index 1dc974125..176029df1 100644
+index f4accbccea..ab917aa12e 100644
 --- a/src/map/map.rs
 +++ b/src/map/map.rs
 @@ -414,7 +414,7 @@ where
-     /// Same as `insert()`, but allows using [EncodeAsVarULE](crate::ule::EncodeAsVarULE)
+     /// Same as `insert()`, but allows using [`EncodeAsVarULE`](crate::ule::EncodeAsVarULE)
      /// types with the value to avoid an extra allocation when dealing with custom ULE types.
      ///
 -    /// ```rust
@@ -60,5 +60,5 @@ index 1dc974125..176029df1 100644
      /// use zerovec::ZeroMap;
      ///
 -- 
-2.49.0
+2.53.0
 

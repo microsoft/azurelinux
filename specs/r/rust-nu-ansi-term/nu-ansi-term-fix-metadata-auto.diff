@@ -1,11 +1,11 @@
---- nu-ansi-term-0.50.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ nu-ansi-term-0.50.1/Cargo.toml	2024-07-29T20:39:46.993492+00:00
-@@ -43,12 +43,3 @@
- derive_serde_style = ["serde"]
- gnu_legacy = []
+--- nu-ansi-term-0.50.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ nu-ansi-term-0.50.3/Cargo.toml	2026-05-11T11:09:50.143118+00:00
+@@ -81,12 +81,3 @@
+ [dev-dependencies.serde_json]
+ version = "1.0.94"
  
 -[target."cfg(windows)".dependencies.windows]
--version = "0.52.0"
+-version = ">=0.59, <=0.61"
 -features = [
 -    "Win32_Foundation",
 -    "Win32_System_Console",

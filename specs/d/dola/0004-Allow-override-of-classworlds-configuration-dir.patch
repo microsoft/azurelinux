@@ -1,0 +1,40 @@
+From 21f454a080d9aea38a5fe0b18e525de4f2a938e1 Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Sun, 8 Mar 2026 23:04:40 -0400
+Subject: [PATCH] Allow override of classworlds configuration directory
+
+This is necessary for Fedora flatpaks, as components needed by apps at
+runtime are built in /app (thereby affecting %_javaconfdir), but dola is
+only used at build time to generate dependencies and provides.
+
+Resolves: rhbz#2402661
+---
+ dola-bsx/src/main/lua/dola-bsx.lua    | 2 +-
+ dola-bsx/src/main/rpm/macros.dola-bsx | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/dola-bsx/src/main/lua/dola-bsx.lua b/dola-bsx/src/main/lua/dola-bsx.lua
+index e178d0b..1c8ea10 100644
+--- a/dola-bsx/src/main/lua/dola-bsx.lua
++++ b/dola-bsx/src/main/lua/dola-bsx.lua
+@@ -18,7 +18,7 @@ local lujavrite = require "lujavrite"
+ 
+ local libjvm = rpm.expand("%{__dola_libjvm}")
+ local classpath = rpm.expand("%{__dola_classpath}")
+-local classworlds_conf = rpm.expand("%{_javaconfdir}/dola/classworlds")
++local classworlds_conf = rpm.expand("%{__dola_classworlds}")
+ 
+ -- Initialize JVM
+ if not lujavrite.initialized() then
+diff --git a/dola-bsx/src/main/rpm/macros.dola-bsx b/dola-bsx/src/main/rpm/macros.dola-bsx
+index 1a6bf8c..2e70611 100644
+--- a/dola-bsx/src/main/rpm/macros.dola-bsx
++++ b/dola-bsx/src/main/rpm/macros.dola-bsx
+@@ -3,3 +3,6 @@
+ 
+ # Class path of nested JVM.
+ %__dola_classpath %{_javadir}/dola/dola-bsx.jar:%{_javadir}/plexus-classworlds.jar
++
++# Path to configuration directory
++%__dola_classworlds %{_javaconfdir}/dola/classworlds
+\ No newline at end of file

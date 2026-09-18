@@ -9,7 +9,7 @@
 
 Name:		qrupdate
 Version:	1.1.2
-Release: 37%{?dist}
+Release:	34%{?dist}
 Summary:	A Fortran library for fast updates of QR and Cholesky decompositions
 # Automatically converted from old format: GPLv3+ - review is highly recommended.
 License:	GPL-3.0-or-later

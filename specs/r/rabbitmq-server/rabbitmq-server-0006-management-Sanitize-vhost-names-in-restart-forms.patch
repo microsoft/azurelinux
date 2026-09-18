@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Davis <mcarsondavis@gmail.com>
+Date: Tue, 17 Jun 2025 11:54:07 -0400
+Subject: [PATCH] management: Sanitize vhost names in restart forms
+
+
+diff --git a/deps/rabbitmq_management/priv/www/js/tmpl/vhost.ejs b/deps/rabbitmq_management/priv/www/js/tmpl/vhost.ejs
+index 232fa1e501..3f15214e03 100644
+--- a/deps/rabbitmq_management/priv/www/js/tmpl/vhost.ejs
++++ b/deps/rabbitmq_management/priv/www/js/tmpl/vhost.ejs
+@@ -41,7 +41,7 @@
+             <% if (vhost.cluster_state[node] == "stopped"){ %>
+                 <form action="#/restart_vhost" method="post">
+                     <input type="hidden" name="node" value="<%= node %>"/>
+-                    <input type="hidden" name="vhost" value="<%= vhost.name %>"/>
++                    <input type="hidden" name="vhost" value="<%= fmt_string(vhost.name) %>"/>
+                     <input type="submit" value="Restart"/>
+                 </form>
+             <% } %>
+diff --git a/deps/rabbitmq_management/priv/www/js/tmpl/vhosts.ejs b/deps/rabbitmq_management/priv/www/js/tmpl/vhosts.ejs
+index c3dacaad7c..5880b06d70 100644
+--- a/deps/rabbitmq_management/priv/www/js/tmpl/vhosts.ejs
++++ b/deps/rabbitmq_management/priv/www/js/tmpl/vhosts.ejs
+@@ -92,7 +92,7 @@
+             <% if (state == "stopped"){ %>
+                 <form action="#/restart_vhost" method="post" class="confirm">
+                     <input type="hidden" name="node" value="<%= node %>"/>
+-                    <input type="hidden" name="vhost" value="<%= vhost.name %>"/>
++                    <input type="hidden" name="vhost" value="<%= fmt_string(vhost.name) %>"/>
+                     <input type="submit" value="Restart"/>
+                 </form>
+             <% } %>

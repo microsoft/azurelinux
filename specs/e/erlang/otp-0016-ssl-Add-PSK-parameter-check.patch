@@ -1,0 +1,27 @@
+From: Ingela Anderton Andin <ingela@erlang.org>
+Date: Tue, 23 Jun 2026 17:58:22 +0200
+Subject: [PATCH] ssl: Add PSK parameter check
+
+
+diff --git a/lib/ssl/src/tls_handshake_1_3.erl b/lib/ssl/src/tls_handshake_1_3.erl
+index a52c0a62ee..0a0c34d8fb 100644
+--- a/lib/ssl/src/tls_handshake_1_3.erl
++++ b/lib/ssl/src/tls_handshake_1_3.erl
+@@ -1696,7 +1696,16 @@ handle_pre_shared_key(#state{ssl_options = #{session_tickets := Tickets},
+                                                        OfferedPreSharedKeys}, Cipher) when Tickets =/= disabled ->
+     Tracker = proplists:get_value(session_tickets_tracker, Trackers),
+     #{prf := CipherHash} = ssl_cipher_format:suite_bin_to_map(Cipher),
+-    tls_server_session_ticket:use(Tracker, OfferedPreSharedKeys, CipherHash, HHistory).
++    #offered_psks{
++       identities = Identities,
++       binders = Binders
++      } = OfferedPreSharedKeys,
++    case length(Identities) == length(Binders) of
++        true ->
++            tls_server_session_ticket:use(Tracker, OfferedPreSharedKeys, CipherHash, HHistory);
++        false ->
++            {error, ?ALERT_REC(?FATAL, ?ILLEGAL_PARAMETER, illegal_pre_shared_key)}
++    end.
+ 
+ %% If the handshake includes a HelloRetryRequest, the initial
+ %% ClientHello and HelloRetryRequest are included in the transcript

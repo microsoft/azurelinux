@@ -13,7 +13,7 @@
 
 Name:		fuse3
 Version:	%{xyz_version}
-Release: 9%{?dist}
+Release:	6%{?dist}
 Summary:	File System in Userspace (FUSE) v3 utilities
 License:	GPL-1.0-or-later
 URL:		http://fuse.sf.net

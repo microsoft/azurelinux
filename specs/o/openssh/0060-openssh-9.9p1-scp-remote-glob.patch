@@ -1,0 +1,14 @@
+diff --color -ruNp a/scp.c b/scp.c
+--- a/scp.c	2026-07-14 11:40:47.754600847 +0200
++++ b/scp.c	2026-07-14 11:43:04.077524517 +0200
+@@ -2070,6 +2070,10 @@ throughlocal_sftp(struct sftp_conn *from
+ 			goto out;
+ 		}
+ 
++		/* Special handling for source of '..' */
++		if (strcmp(filename, "..") == 0)
++			filename = "."; /* Download to dest, not dest/.. */
++
+ 		if (targetisdir)
+ 			abs_dst = sftp_path_append(target, filename);
+ 		else

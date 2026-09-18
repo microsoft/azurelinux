@@ -8,7 +8,7 @@
 
 Name:           rust-%{crate}
 Version:        0.6.0
-Release: 14%{?dist}
+Release:        11%{?dist}
 Summary:        Specify and send TPM2 policies to satisfy object authorization
 
 # Upstream license specification: EUPL-1.2

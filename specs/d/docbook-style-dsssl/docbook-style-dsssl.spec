@@ -3,7 +3,7 @@
 
 Name: docbook-style-dsssl
 Version: 1.79
-Release: 45%{?dist}
+Release: 42%{?dist}
 
 Summary: Norman Walsh's modular stylesheets for DocBook
 

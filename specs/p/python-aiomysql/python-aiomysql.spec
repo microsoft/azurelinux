@@ -3,7 +3,7 @@
 
 Name:           python-aiomysql
 Version:        0.2.0
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        MySQL driver for asyncio
 
 License:        MIT

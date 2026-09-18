@@ -1,0 +1,66 @@
+From 4c80f4bde8de04199719b7e5d9b068a9d73ba7bf Mon Sep 17 00:00:00 2001
+From: Kai Uwe Broulik <kde@privat.broulik.de>
+Date: Mon, 18 May 2026 20:13:56 +0200
+Subject: [PATCH] libnotificationmanager: Return something of the correct type
+ for most roles
+
+Qt doesn't like the model not return anything (empty QVariant) when
+put in a required property for a model. For example required property string
+will happily convert to "undefined" as a string which then blows up in
+client code left and right.
+
+Therefore, return something of the correct type for most job properties.
+
+See also 1f246410 which addressed this in one case but seems Qt 6.11.1
+changed it again to be broken in more places.
+
+BUG: 520120
+---
+ libnotificationmanager/jobsmodel.cpp | 29 ++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/libnotificationmanager/jobsmodel.cpp b/libnotificationmanager/jobsmodel.cpp
+index 4bc820288f..459a7c639d 100644
+--- a/libnotificationmanager/jobsmodel.cpp
++++ b/libnotificationmanager/jobsmodel.cpp
+@@ -145,8 +145,37 @@ QVariant JobsModel::data(const QModelIndex &index, int role) const
+     // There's hardly a reason why it should show up as "unread".
+     case Notifications::ReadRole:
+         return true;
++
++    // Qt doesn't like the model not returning anything, for example
++    // casting it to  "undefined" as a string (when put in a required property string)
++    // blowing up in client code left and right.
++    case Notifications::NotifyRcNameRole:
++    case Notifications::OriginNameRole:
++    case Notifications::DefaultActionLabelRole:
++    case Notifications::ConfigureActionLabelRole:
++    case Notifications::ReplyActionLabelRole:
++    case Notifications::ReplyPlaceholderTextRole:
++    case Notifications::ReplySubmitButtonTextRole:
++    case Notifications::ReplySubmitButtonIconNameRole:
++    case Notifications::CategoryRole:
++        return QString();
++
++    case Notifications::ActionNamesRole:
+     case Notifications::ActionLabelsRole:
+         return QStringList();
++
++    case Notifications::HasDefaultActionRole:
++    case Notifications::ResidentRole:
++    case Notifications::TransientRole:
++    case Notifications::UserActionFeedbackRole:
++    case Notifications::HasReplyActionRole:
++        return false;
++
++    case Notifications::UrlsRole:
++        return QVariant::fromValue(QList<QUrl>());
++
++    case Notifications::UrgencyRole:
++        return Notifications::NormalUrgency;
+     }
+ 
+     return {};
+-- 
+GitLab
+

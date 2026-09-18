@@ -3,7 +3,7 @@
 
 Name:           game-music-emu
 Version:        0.6.4
-Release: 5%{?dist}
+Release:        2%{?dist}
 Provides:       libgme%{?_isa} = %{version}-%{release}
 Summary:        Video game music file emulation/playback library
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

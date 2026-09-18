@@ -1,6 +1,6 @@
---- arrayvec-0.7.6/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ arrayvec-0.7.6/Cargo.toml	2024-08-29T16:41:42.028259+00:00
-@@ -59,31 +59,12 @@
+--- arrayvec-0.7.8/Cargo.toml	2006-07-24T01:21:28+00:00
++++ arrayvec-0.7.8/Cargo.toml	2026-08-10T10:21:02.944843+00:00
+@@ -58,31 +58,12 @@
  path = "src/lib.rs"
  
  [[test]]
@@ -32,7 +32,7 @@
  
  [dependencies.serde]
  version = "1.0"
-@@ -94,9 +75,6 @@
+@@ -93,9 +74,6 @@
  version = "1.4"
  optional = true
  default-features = false

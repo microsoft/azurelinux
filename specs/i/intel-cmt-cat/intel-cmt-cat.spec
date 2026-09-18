@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global libpqos_ver 6.0.1
+%global libpqos_ver 7.0.0
 %global desc %{expand: \
 This package provides basic support for Intel Resource Director Technology
 including, Cache Monitoring Technology (CMT), Memory Bandwidth Monitoring
@@ -9,8 +9,8 @@ including, Cache Monitoring Technology (CMT), Memory Bandwidth Monitoring
 (CDP) and Memory Bandwidth Allocation (MBA).}
 
 Name:		intel-cmt-cat
-Version:	25.04
-Release: 6%{?dist}
+Version:	26.03
+Release:	1%{?dist}
 Summary:	Intel cache monitoring and allocation technology config tool
 
 License:	BSD-3-Clause
@@ -18,8 +18,6 @@ URL: 		https://github.com/intel/intel-cmt-cat
 Source: 	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 Patch0:		0001-alter-install-paths.patch
-Patch1:		0002-remove-build-and-install-of-examples.patch
-Patch2:		0003-allow-debian-flags-to-be-added.patch
 
 ExclusiveArch:	x86_64
 
@@ -56,7 +54,7 @@ Development files.
 %{_sbindir}/pqos-msr
 %{_sbindir}/pqos-os
 %{_sbindir}/rdtset
-%{_libdir}/libpqos.so.6
+%{_libdir}/libpqos.so.7
 %{_libdir}/libpqos.so.%{libpqos_ver}
 %{_mandir}/man8/membw.8*
 %{_mandir}/man8/pqos.8*
@@ -69,6 +67,12 @@ Development files.
 %{_libdir}/libpqos.so
 
 %changelog
+* Thu Jun 11 2026 Raghavan Kanagaraj <raghavan.kanagaraj@intel.com> - 26.03-1
+- New release 26.03
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 25.04-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 25.04-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

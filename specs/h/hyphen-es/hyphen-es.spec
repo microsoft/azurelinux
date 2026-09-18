@@ -4,7 +4,7 @@
 Name: hyphen-es
 Summary: Spanish hyphenation rules
 Version: 2.3
-Release: 23%{?dist}
+Release: 20%{?dist}
 Source: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_ANY.oxt
 URL: https://github.com/sbosio/rla-es/tree/master/separacion
 License: LGPL-3.0-or-later OR GPL-3.0-or-later OR MPL-1.1

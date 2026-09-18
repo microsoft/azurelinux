@@ -1,0 +1,161 @@
+From 1a469806cfd2a0fe66bc1cc88f2f81266ad5ff01 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Wed, 11 Feb 2026 17:16:38 +0000
+Subject: [PATCH] mounts: _parse_mount_unit() does not understand hex escapes
+ or NFS/CIFS
+
+There is a bug in boom.mounts._parse_mount_unit() when we receive
+(properly) hex-escaped mount strings that have embedded "\x3a" escapes
+(":" - NFS for e.g.). It also doesn't grok CIFS mounts that begin with
+"//".
+
+Fix both of these by extending the list of valid "what" prefix strings
+(and rename it from _DEV_PREFIXES to the more accurate _WHAT_PREFIXES),
+and unescaping the what/where values for validation.
+
+This can be easily reproduced with Snapshot Manager by running 'snapm
+snapset create -br something /some /mounts' on a system where NFS volumes
+exist in /etc/fstab:
+
+  [root@localhost snapm]# snapm -vv --debug=all snapset create -br testset
+  / /var
+  Traceback (most recent call last):
+    File "/root/src/git/snapm/bin/snapm", line 7, in <module>
+      r = main(sys.argv)
+    File "/root/src/git/snapm/snapm/command.py", line 3490, in main
+      status = cmd_args.func(cmd_args)
+    File "/root/src/git/snapm/snapm/command.py", line 1552, in _create_cmd
+      snapset = create_snapset(
+    File "/root/src/git/snapm/snapm/command.py", line 825, in create_snapset
+      return manager.create_snapshot_set(
+    File "/root/src/git/snapm/snapm/manager/_signals.py", line 46, in wrapper
+      ret = func(*args, **kwargs)
+    File "/root/src/git/snapm/snapm/manager/_manager.py", line 521, in wrapper
+      ret = func(*args, **kwargs)
+    File "/root/src/git/snapm/snapm/manager/_manager.py", line 1456, in create_snapshot_set
+      create_snapset_boot_entry(snapset)
+    File "/root/src/git/snapm/snapm/manager/_boot.py", line 247, in create_snapset_boot_entry
+      snapset.boot_entry = _create_boom_boot_entry(
+    File "/root/src/git/snapm/snapm/manager/_boot.py", line 202, in _create_boom_boot_entry
+      entry = boom.command.create_entry(
+    File "/root/src/git/boom-boot/boom/command.py", line 1159, in create_entry
+      mount_units = parse_mount_units(mounts)
+    File "/root/src/git/boom-boot/boom/mounts.py", line 142, in parse_mount_units
+      return [_parse_mount_unit(mnt.strip()) for mnt in mounts]
+    File "/root/src/git/boom-boot/boom/mounts.py", line 142, in <listcomp>
+      return [_parse_mount_unit(mnt.strip()) for mnt in mounts]
+    File "/root/src/git/boom-boot/boom/mounts.py", line 108, in _parse_mount_unit
+      raise BoomMountError.invalid_device(what)
+  boom.mounts.BoomMountError: Invalid mount device: nas0\x3a/data/stripe
+
+Resolves: #395
+
+Signed-off-by: root <root@c9s-snapm-vm1.evo>
+---
+ boom/mounts.py       | 38 ++++++++++++++++++++++++++++++++------
+ tests/test_mounts.py |  4 ++++
+ 2 files changed, 36 insertions(+), 6 deletions(-)
+
+diff --git a/boom/mounts.py b/boom/mounts.py
+index dfc31f7..776e498 100644
+--- a/boom/mounts.py
++++ b/boom/mounts.py
+@@ -65,7 +65,7 @@ SWAP_UNIT_FMT = "systemd.swap-extra=%s:%s"
+ #: The blkid command
+ _BLKID = "blkid"
+ 
+-_DEV_PREFIXES = ("/dev/", "UUID=", "LABEL=", "PARTUUID=", "PARTLABEL=")
++_WHAT_PREFIXES = ("/dev/", "UUID=", "LABEL=", "PARTUUID=", "PARTLABEL=", "//")
+ 
+ 
+ def _detect_fstype(dev):
+@@ -88,6 +88,27 @@ def _detect_fstype(dev):
+     raise BoomMountError.unknown_fstype(dev)
+ 
+ 
++def _unescape(escaped: str) -> str:
++    """
++    Unescape hex escapes in mount string values.
++
++    :param escaped: The string to unescape.
++    :type escaped: str
++    :returns: The unescaped string with hex escape values replaced by
++              literal character values.
++    :rtype: str
++    """
++    return (
++        escaped.replace("\\x20", " ")
++        .replace("\\x09", "\t")
++        .replace("\\x9", "\t")
++        .replace("\\x0a", "\n")
++        .replace("\\xa", "\n")
++        .replace("\\x3a", ":")
++        .replace("\\x5c", "\\")
++    )
++
++
+ def _parse_mount_unit(mount):
+     """Parse a boom command line mount specification into the format
+     required by the systemd boot syntax.
+@@ -101,10 +122,15 @@ def _parse_mount_unit(mount):
+     if len(parts) < 2:
+         raise BoomMountError.malformed_mount(mount)
+ 
+-    what = parts[0].strip()
+-    where = parts[1].strip()
++    # Preserve the escaped arguments: we will pass them on to the
++    # generated systemd units. Unescape hex encoding for validation.
++    orig_what = parts[0].strip()
++    orig_where = parts[1].strip()
++    what = _unescape(orig_what)
++    where = _unescape(orig_where)
+ 
+-    if not what.startswith(_DEV_PREFIXES):
++    # Handle device, CIFS, and NFS syntax
++    if not what.startswith(_WHAT_PREFIXES) and ":" not in what:
+         raise BoomMountError.invalid_device(what)
+ 
+     if len(parts) > 2:
+@@ -129,7 +155,7 @@ def _parse_mount_unit(mount):
+     if any(not part for part in [what, where, fstype, options]):
+         raise BoomMountError.malformed_mount(mount)
+ 
+-    return MOUNT_UNIT_FMT % (what, where, fstype, options)
++    return MOUNT_UNIT_FMT % (orig_what, orig_where, fstype, options)
+ 
+ 
+ def parse_mount_units(mounts):
+@@ -165,7 +191,7 @@ def _parse_swap_unit(swap):
+     if ":" in options:
+         raise BoomMountError.malformed_swap(swap)
+ 
+-    if not what.startswith(_DEV_PREFIXES):
++    if not what.startswith(_WHAT_PREFIXES):
+         raise BoomMountError.invalid_swap_device(what)
+ 
+     return SWAP_UNIT_FMT % (what, options)
+diff --git a/tests/test_mounts.py b/tests/test_mounts.py
+index 9eaff91..a056c0a 100644
+--- a/tests/test_mounts.py
++++ b/tests/test_mounts.py
+@@ -51,6 +51,8 @@ class MountsHelperTests(unittest.TestCase):
+             "/dev/test/var:/var:xfs",
+             "/dev/fedora/swap:none:swap:defaults",
+             "/dev/vda3:none:swap:pri=1,discard=pages,nofail",
++            "Amazing\\x3a/Grace:/AmazingGrace:nfs:defaults",
++            "//I/Shall/Not/Be:/Moved:cifs:defaults",
+         ]
+         xmount_str = [
+             "systemd.mount-extra=/dev/test/var:/var:xfs:defaults",
+@@ -61,6 +63,8 @@ class MountsHelperTests(unittest.TestCase):
+             "systemd.mount-extra=/dev/test/var:/var:xfs:defaults",
+             "systemd.mount-extra=/dev/fedora/swap:none:swap:defaults",
+             "systemd.mount-extra=/dev/vda3:none:swap:pri=1,discard=pages,nofail",
++            "systemd.mount-extra=Amazing\\x3a/Grace:/AmazingGrace:nfs:defaults",
++            "systemd.mount-extra=//I/Shall/Not/Be:/Moved:cifs:defaults",
+         ]
+ 
+         for mount, xmount in zip(mount_list, xmount_str):
+-- 
+2.53.0
+

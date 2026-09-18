@@ -8,7 +8,7 @@
 
 Name:           hipblas-common
 Version:        %{rocm_version}
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Common files shared by hipBLAS and hipBLASLt
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT

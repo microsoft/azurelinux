@@ -3,7 +3,7 @@
 
 Name:           python-pytest-param-files
 Version:        0.6.0
-Release: 10%{?dist}
+Release:        7%{?dist}
 Summary:        Create pytest parametrize decorators from external files
 
 # SPDX

@@ -3,7 +3,7 @@
 
 Name:           perl-Digest-MD5
 Version:        2.59
-Release: 523%{?dist}
+Release:        520%{?dist}
 Summary:        Perl interface to the MD5 algorithm
 # MD5.pm:       (GPL-1.0-or-later OR Artistic-1.0-Perl) AND RSA-MD
 # MD5.xs:       (GPL-1.0-or-later OR Artistic-1.0-Perl) AND RSA-MD

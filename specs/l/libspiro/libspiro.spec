@@ -3,7 +3,7 @@
 
 Name:           libspiro
 Version:        20240903
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        Library to simplify the drawing of beautiful curves
 
 # The files that are used to compile this library are all in GPLv3+

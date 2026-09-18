@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:		pciutils
-Version:	3.14.0
-Release: 5%{?dist}
+Version:	3.15.0
+Release:	1%{?dist}
 Summary:	PCI bus related utilities
 License:	GPL-2.0-or-later
 URL:		https://mj.ucw.cz/sw/pciutils/
@@ -117,6 +117,15 @@ diff -u %{SOURCE2} libpci_symbols_new.lst
 %{_mandir}/man7/*
 
 %changelog
+* Mon Jun 15 2026 Michal Hlavinka <mhlavink@redhat.com> - 3.15.0-1
+- updated to 3.15.0 (#2455221)
+
+* Wed Feb 04 2026 Sun Haiyong <sunhaiyong@zdbr.net> - 3.12.0-4
+- Add loongarch64
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

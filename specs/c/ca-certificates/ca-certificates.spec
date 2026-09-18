@@ -41,7 +41,7 @@ Name: ca-certificates
 Version: 2025.2.80_v9.0.304
 # for Rawhide, please always use release >= 2
 # for Fedora release branches, please use release < 2 (1.0, 1.1, ...)
-Release: 1.1%{?dist}
+Release: 1.2%{?dist}
 License: MIT AND GPL-2.0-or-later
 
 URL: https://fedoraproject.org/wiki/CA-Certificates
@@ -461,6 +461,10 @@ fi
 %ghost %{catrustdir}/extracted/edk2/cacerts.bin
 
 %changelog
+* Tue Jan 20 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 2025.2.80_v9.0.304-1.2
+- update documentation of update-ca-trust.8.txt
+- remove ca-legacy script dependence on /dev/null
+
 * Tue Aug 26 2025 Frantisek Krenzelok <fkrenzel@redhat.com> - 2025.2.80_v9.0.304-1.1
 - Revert the "Dropping of cert.pem file" change to restore legacy CA symlinks
 - https://fedoraproject.org/wiki/Changes/droppingOfCertPemFile

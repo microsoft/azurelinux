@@ -73,7 +73,7 @@ exclude_files = [
     "vendor/go.opentelemetry.io/otel/verify_examples.sh",
     "vendor/google.golang.org/grpc/regenerate.sh",
     "vendor/k8s.io/kubectl/pkg/util/i18n/translations/extract.py",
-    "docs/docs/scanner/license.md",
+    "docs/guide/scanner/license.md",
 ]
 detector = "trivy"
 
@@ -95,7 +95,7 @@ sha256sum = "d21cb1c60785d6d3a84a7059323ccafc45c645b1bbda281c76a62d66ad2d7dc3"
 expression = "MIT"
 [[licensing.licenses]]
 path = "pkg/iac/scanners/helm/test/mysql/README.md"
-sha256sum = "745fadb84a68937b060856d30dca16516a731d5685e03271ee6fa124295054b0"
+sha256sum = "99cd80ccf23c3d771ee4ac483ae9dab0247b2f9f340e18fa48e5b77ec1a24cc1"
 expression = "Apache-2.0"
 [[licensing.licenses]]
 path = "pkg/iac/scanners/helm/test/mysql/charts/common/README.md"
@@ -140,4 +140,24 @@ expression = "MIT"
 [[licensing.licenses]]
 path = "vendor/go.yaml.in/yaml/v2/LICENSE.libyaml"
 sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/github.com/segmentio/asm/LICENSE"
+sha256sum = "cca993712df289a5958bdef69031a5dac0f951ac15afeb313f9eeea55ed59443"
+expression = "MIT-0"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.BSD"
+sha256sum = "26be8a79415737dfe8edf1be62e71afeb8c770ed5a5605a06270d5701830f47c"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.MPL-2.0"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "MPL-2.0"
+[[licensing.licenses]]
+path = "vendor/cyphar.com/go-pathrs/COPYING"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "MPL-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/invopop/jsonschema/COPYING"
+sha256sum = "ed76298aa9c218e9010aa186c1107ceb6c7618db50ae0222b9a1b4196101a411"
 expression = "MIT"

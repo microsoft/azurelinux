@@ -1,4 +1,4 @@
-From 9c9f20128efdf041a093f0de37fc316c6ec18b66 Mon Sep 17 00:00:00 2001
+From b2cff8eb542495faa703f0ab6292c3125bdb5ac9 Mon Sep 17 00:00:00 2001
 From: Martin Krizek <martin.krizek@gmail.com>
 Date: Thu, 21 Nov 2024 17:06:18 +0100
 Subject: [PATCH 1/2] dnf5,apt: add auto_install_module_deps option (#84292)
@@ -255,13 +255,10 @@ index 24ae91432b..a0e4a4ef5a 100644
      try:
          Dnf5Module(module).run()
 diff --git a/test/integration/targets/apt/tasks/apt.yml b/test/integration/targets/apt/tasks/apt.yml
-index 64e00d3ca9..dda5fc1fab 100644
+index 1432844b89..d076234450 100644
 --- a/test/integration/targets/apt/tasks/apt.yml
 +++ b/test/integration/targets/apt/tasks/apt.yml
-@@ -8,17 +8,17 @@
-     distro_mirror: http://archive.ubuntu.com/ubuntu
-   when: ansible_distribution == 'Ubuntu'
- 
+@@ -1,14 +1,14 @@
 -# UNINSTALL 'python-apt'
 -#  The `apt` module has the smarts to auto-install `python-apt(3)`.  To test, we
 -#  will first uninstall `python-apt`.
@@ -282,7 +279,7 @@ index 64e00d3ca9..dda5fc1fab 100644
  - name: test fail uninstall hello without required apt deps in check mode
    apt:
      pkg: hello
-@@ -32,13 +32,25 @@
+@@ -22,13 +22,25 @@
    assert:
      that:
      - apt_result is failed
@@ -344,5 +341,5 @@ index d9a79ced7e..a36c17a202 100644
              name: dnf
            vars:
 -- 
-2.50.1
+2.54.0
 

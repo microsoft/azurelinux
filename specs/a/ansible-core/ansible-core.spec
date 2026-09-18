@@ -16,9 +16,9 @@
 %undefine _py3_shebang_s
 
 Name:           ansible-core
-Version:        2.18.12
+Version:        2.18.18~rc1
 %global uversion %{version_no_tilde %{quote:%nil}}
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        A radically simple IT automation system
 
 # The main license is GPLv3+. Many of the files in lib/ansible/module_utils
@@ -268,6 +268,10 @@ install -Dpm 0644 licenses/* -t %{buildroot}%{_pkglicensedir}
 
 
 %changelog
+* Thu Jun 11 2026 Maxwell G <maxwell@gtmx.me> - 2.18.18~rc1-1
+- Update to 2.18.18~rc1.
+- Mitigates CVE-2026-11332 (rhbz#2485397)
+
 * Thu Dec 11 2025 Maxwell G <maxwell@gtmx.me> - 2.18.12-1
 - Update to 2.18.12.
 

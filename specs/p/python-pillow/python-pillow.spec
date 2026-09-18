@@ -24,7 +24,7 @@
 
 Name:           python-%{srcname}
 Version:        11.3.0
-Release: 11%{?dist}
+Release:        10%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -37,6 +37,20 @@ Source9999: python-pillow.azl.macros
 Patch0:         pillow_mingw.patch
 # Backport fix for CVE-2026-25990
 Patch1:         https://github.com/python-pillow/Pillow/commit/9000313cc5d4a31bdcdd6d7f0781101abab553aa.patch
+# Backport fix for CVE-2026-40192
+Patch2:         https://github.com/python-pillow/Pillow/commit/3cb854e8b2bab43f40e342e665f9340d861aa628.patch
+# Backport fix for CVE-2026-55380
+Patch3:         https://github.com/python-pillow/Pillow/commit/f39b0ae6624eb2d7c5c5d651d9bb5fdbd96a8675.patch
+# Backport fix for CVE-2026-54060, CVE-2026-54059, CVE-2026-55379
+Patch4:         https://github.com/python-pillow/Pillow/commit/0a263e6264aa5399988d9acd3bbfbca2ca3ec77d.patch
+# Backport fix for CVE-2026-55798
+Patch5:         https://github.com/python-pillow/Pillow/commit/88194166691b7b603529b8b036ab3ab9cedd2de4.patch
+# Dependent patch for applying fix for CVE-2026-59197
+Patch6:         https://github.com/python-pillow/Pillow/commit/853ece9ed20c5d80ffa22dce8698869a9da8bbfc.patch
+# Backport fix for CVE-2026-59197
+Patch7:         https://github.com/python-pillow/Pillow/commit/cce3bdb867c77a3420261ed1bfdb6b0787ec8fc1.patch
+# Backport fix for CVE-2026-54058
+Patch8:         https://github.com/python-pillow/Pillow/commit/6a8de891fb00968e5ea79bfa84368ed90b3cfc1d.patch
 
 BuildRequires:  freetype-devel
 BuildRequires:  gcc
@@ -315,6 +329,16 @@ popd
 
 
 %changelog
+* Sun Jul 19 2026 Sandro Mani <manisandro@gmail.com> - 11.3.0-10
+- Backport fixes for CVE-2026-59197 and CVE-2026-54058
+
+* Tue Jul 07 2026 Sandro Mani <manisandro@gmail.com> - 11.3.0-9
+- Backport fixes for CVE-2026-55380, CVE-2026-54060, CVE-2026-54059,
+  CVE-2026-55379, CVE-2026-55798
+
+* Sat Apr 18 2026 Sandro Mani <manisandro@gmail.com> - 11.3.0-8
+- Backport fix for CVE-2026-40192
+
 * Sat Feb 14 2026 Sandro Mani <manisandro@gmail.com> - 11.1.0-7
 - Backport fix for CVE-2026-25990
 

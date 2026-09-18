@@ -1,0 +1,37 @@
+From 32c70aaba5837014fd3a2cb0b7e6b695d13043ad Mon Sep 17 00:00:00 2001
+From: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Date: Sat, 20 Jun 2026 16:11:27 -0700
+Subject: [PATCH] Allow desktop platform with ignore-cpuid-check
+
+Allow desktop platforms with --ignore-cpuid-check.
+
+Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+---
+ src/thd_engine.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/thd_engine.cpp b/src/thd_engine.cpp
+index a85639bf..be924044 100644
+--- a/src/thd_engine.cpp
++++ b/src/thd_engine.cpp
+@@ -291,16 +291,16 @@ void cthd_engine::thd_parse_features()
+ int cthd_engine::thd_engine_init(bool ignore_cpuid_check, bool adaptive) {
+ 	int ret;
+ 
+-	if (check_acpi_platform_profile() != THD_SUCCESS) {
+-		return THD_FATAL_ERROR;
+-	}
+-
+ 	adaptive_mode = adaptive;
+ 
+ 	if (ignore_cpuid_check) {
+ 		thd_log_debug("Ignore CPU ID check for MSRs\n");
+ 		proc_list_matched = true;
+ 	} else {
++		if (check_acpi_platform_profile() != THD_SUCCESS) {
++			return THD_FATAL_ERROR;
++		}
++
+ 		check_cpu_id();
+ 
+ 		if (!proc_list_matched) {

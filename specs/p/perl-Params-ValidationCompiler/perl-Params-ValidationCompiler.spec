@@ -10,7 +10,7 @@
 
 Name:		perl-Params-ValidationCompiler
 Version:	0.31
-Release: 11%{?dist}
+Release:	8%{?dist}
 Summary:	Build an optimized subroutine parameter validator once, use it forever
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/Params-ValidationCompiler

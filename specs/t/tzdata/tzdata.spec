@@ -3,17 +3,16 @@
 
 Summary: Timezone data
 Name: tzdata
-Version: 2025c
-%define tzdata_version 2025c
-%define tzcode_version 2025c
-Release: 4%{?dist}
+Version: 2026c
+%define tzdata_version 2026c
+%define tzcode_version 2026c
+Release: 1%{?dist}
 License: LicenseRef-Fedora-Public-Domain AND (GPL-2.0-only WITH ClassPath-exception-2.0)
 URL: https://www.iana.org/time-zones
 Source0: ftp://ftp.iana.org/tz/releases/tzdata%{tzdata_version}.tar.gz
 Source1: ftp://ftp.iana.org/tz/releases/tzcode%{tzcode_version}.tar.gz
 
 Patch002: 0002-Fix-have-snprintf-error.patch
-Patch003: 0003-continue-to-ship-posixrules.patch
 
 BuildRequires: make
 BuildRequires: gcc
@@ -45,9 +44,6 @@ This package contains timezone information for use by Java runtimes.
 %setup -q -c -a 1
 
 %patch -p1 -P 2
-%if 0%{?rhel}
-%patch -p1 -P 3
-%endif
 
 # zic now defaults to "-b slim" to control data bloat.
 # This can cause build issues for some packages.
@@ -149,6 +145,20 @@ echo ============END TESTING===========
 %{_datadir}/javazi-1.8
 
 %changelog
+* Mon Aug 10 2026 Patsy Griffin <patsy@redhat.com> - 2026c-1
+  Update to tzdata-2026c (#2498187)
+  - Alberta moved to permanent -06 on 2026-06-18.
+  - Morocco moves to permanent +00 on 2026-09-20.
+
+* Wed May 13 2026 Patsy Griffin <patsy@redhat.com> - 2026b-1
+  Update to tzdata-2026b (#2461119)
+  - British Columbia’s 2026-03-08 spring forward is expected
+    to be its last transition as it moves to permanent -07.
+
+* Fri Mar 13 2026 Patsy Griffin <patsy@redhat.com> - 2026a-1
+  Update to tzdata-2026a (#2443910)
+  - Correct the transition times for Moldova.
+
 * Sun Dec 14 2025 Patsy Griffin <patsy@redhat.com> - 2025c-1
   Update to tzdata-2025c (#2421294)
   - Update the expiration date for the leap seconds files.

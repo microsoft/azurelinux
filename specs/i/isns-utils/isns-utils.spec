@@ -3,7 +3,7 @@
 
 Name:           isns-utils
 Version:        0.103
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        The iSNS daemon and utility programs
 
 License:        LGPL-2.1-or-later

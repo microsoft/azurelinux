@@ -1,0 +1,58 @@
+From 948b2e86db456d531f204529d64ceaa17af98ef8 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Wed, 25 Feb 2026 08:52:06 +0100
+Subject: [PATCH 2/4] automatic: document SMTP requirement for email emitter
+
+Add documentation about the SMTP protocol requirement to the man page
+and default configuration file.
+
+For: https://bugzilla.redhat.com/show_bug.cgi?id=2322918
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ .../config/usr/share/dnf5/dnf5-plugins/automatic.conf      | 7 +++++++
+ doc/dnf5_plugins/automatic.8.rst                           | 4 ++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/dnf5-plugins/automatic_plugin/config/usr/share/dnf5/dnf5-plugins/automatic.conf b/dnf5-plugins/automatic_plugin/config/usr/share/dnf5/dnf5-plugins/automatic.conf
+index 8401e7a9..02ef6d9d 100644
+--- a/dnf5-plugins/automatic_plugin/config/usr/share/dnf5/dnf5-plugins/automatic.conf
++++ b/dnf5-plugins/automatic_plugin/config/usr/share/dnf5/dnf5-plugins/automatic.conf
+@@ -84,6 +84,13 @@ email_to = root
+ 
+ 
+ [email]
++# The "email" emitter sends messages directly via an SMTP server using libcurl.
++# It requires libcurl with SMTP protocol support. Some distributions ship a
++# minimal variant of libcurl without SMTP support.
++# On Fedora, run: dnf5 swap libcurl-minimal libcurl
++# Alternatively, use the "command_email" emitter which does not require
++# libcurl SMTP support.
++#
+ # The address to send email messages from.
+ email_from = root
+ 
+diff --git a/doc/dnf5_plugins/automatic.8.rst b/doc/dnf5_plugins/automatic.8.rst
+index bfd647c1..b5af9797 100644
+--- a/doc/dnf5_plugins/automatic.8.rst
++++ b/doc/dnf5_plugins/automatic.8.rst
+@@ -135,7 +135,7 @@ Choosing how the results should be reported.
+ ``emit_via``
+     list, default: ``stdio``
+ 
+-    List of emitters to report the results through. Available emitters are ``stdio`` to print the result to standard output, ``command`` to send the result to a custom command, ``command_email`` to send an email using a command, ``email`` to send the report via email using SMTP sever, and ``motd`` sends the result to */etc/motd.d/dnf5-automatic* file.
++    List of emitters to report the results through. Available emitters are ``stdio`` to print the result to standard output, ``command`` to send the result to a custom command, ``command_email`` to send an email using a command, ``email`` to send the report via email using SMTP server (see ``[email]`` section for requirements), and ``motd`` sends the result to */etc/motd.d/dnf5-automatic* file.
+ 
+ ``system_name``
+     string, default: hostname of the given system
+@@ -196,7 +196,7 @@ The command email emitter configuration. Variables usable in format string argum
+ ``[email]`` section
+ -------------------
+ 
+-The email emitter configuration.
++The email emitter configuration. This emitter sends messages directly via an SMTP server using ``libcurl``. It requires ``libcurl`` with SMTP protocol support. Some distributions ship a minimal variant of libcurl without SMTP support. On Fedora, this can be resolved by running ``dnf5 swap libcurl-minimal libcurl``. Alternatively, use the ``command_email`` emitter which does not require SMTP support in libcurl. Credentials for the SMTP server are read from the ``~/.netrc`` file.
+ 
+ ``email_from``
+     string, default: ``root``
+-- 
+2.53.0
+

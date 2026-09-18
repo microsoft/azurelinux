@@ -1,0 +1,207 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Luke Bakken <lrbakken@amazon.com>
+Date: Wed, 23 Jul 2025 22:44:17 -0700
+Subject: [PATCH] Fix error popup text display
+
+When validation fails for a policy parameter, the resulting popup can't
+be read due to one extra binary encoding as well as code that escapes
+HTML entites. Since the EJS template uses `<%= >` for the popup, it will
+display the text as-is, and not render any HTML.
+
+diff --git a/deps/rabbit/src/rabbit_definitions.erl b/deps/rabbit/src/rabbit_definitions.erl
+index 0f69b3ddf4..3b052b0495 100644
+--- a/deps/rabbit/src/rabbit_definitions.erl
++++ b/deps/rabbit/src/rabbit_definitions.erl
+@@ -709,6 +709,8 @@ format({shutdown, _} = Error) ->
+     rabbit_log:debug("Metadata store is unavailable: ~p", [Error]),
+     rabbit_data_coercion:to_binary(
+       rabbit_misc:format("Metadata store is unavailable. Please try again.", []));
++format(E) when is_binary(E) ->
++    E;
+ format(E) ->
+     rabbit_data_coercion:to_binary(rabbit_misc:format("~tp", [E])).
+ 
+@@ -732,8 +734,8 @@ add_parameter(VHost, Param, Username) ->
+     case Result of
+         ok                -> ok;
+         {error_string, E} ->
+-            S = rabbit_misc:format(" (~ts/~ts/~ts)", [VHost, Comp, Key]),
+-            exit(rabbit_data_coercion:to_binary(rabbit_misc:escape_html_tags(E ++ S)))
++            S = rabbit_misc:format(" (vhost: \"~ts\" / component: \"~ts\" / key: \"~ts\")", [VHost, Comp, Key]),
++            exit(rabbit_data_coercion:to_utf8_binary(E ++ S))
+     end.
+ 
+ add_global_parameter(Param, Username) ->
+@@ -769,8 +771,8 @@ add_policy(VHost, Param, Username) ->
+            maps:get('apply-to', Param, <<"all">>),
+            Username) of
+         ok                -> ok;
+-        {error_string, E} -> S = rabbit_misc:format(" (~ts/~ts)", [VHost, Key]),
+-                             exit(rabbit_data_coercion:to_binary(rabbit_misc:escape_html_tags(E ++ S)))
++        {error_string, E} -> S = rabbit_misc:format(" (vhost: \"~ts\" key: \"~ts\")", [VHost, Key]),
++                             exit(rabbit_data_coercion:to_utf8_binary(E ++ S))
+     end.
+ 
+ -spec add_vhost(map(), rabbit_types:username()) -> ok | no_return().
+diff --git a/deps/rabbit_common/src/rabbit_misc.erl b/deps/rabbit_common/src/rabbit_misc.erl
+index 09ff33a8ca..a5408ceecb 100644
+--- a/deps/rabbit_common/src/rabbit_misc.erl
++++ b/deps/rabbit_common/src/rabbit_misc.erl
+@@ -68,7 +68,7 @@
+ -export([get_parent/0]).
+ -export([store_proc_name/1, store_proc_name/2, get_proc_name/0]).
+ -export([moving_average/4]).
+--export([escape_html_tags/1, b64decode_or_throw/1]).
++-export([b64decode_or_throw/1]).
+ -export([get_env/3]).
+ -export([get_channel_operation_timeout/0]).
+ -export([random/1]).
+@@ -1181,25 +1181,6 @@ moving_average(Time,  HalfLife,  Next, Current) ->
+ random(N) ->
+     rand:uniform(N).
+ 
+--spec escape_html_tags(string()) -> binary().
+-
+-escape_html_tags(S) ->
+-    escape_html_tags(rabbit_data_coercion:to_list(S), []).
+-
+-
+--spec escape_html_tags(string(), string()) -> binary().
+-
+-escape_html_tags([], Acc) ->
+-    rabbit_data_coercion:to_binary(lists:reverse(Acc));
+-escape_html_tags("<" ++ Rest, Acc) ->
+-    escape_html_tags(Rest, lists:reverse("&lt;", Acc));
+-escape_html_tags(">" ++ Rest, Acc) ->
+-    escape_html_tags(Rest, lists:reverse("&gt;", Acc));
+-escape_html_tags("&" ++ Rest, Acc) ->
+-    escape_html_tags(Rest, lists:reverse("&amp;", Acc));
+-escape_html_tags([C | Rest], Acc) ->
+-    escape_html_tags(Rest, [C | Acc]).
+-
+ %% If the server we are talking to has non-standard net_ticktime, and
+ %% our connection lasts a while, we could get disconnected because of
+ %% a timeout unless we set our ticktime to be the same. So let's do
+diff --git a/deps/rabbitmq_management/src/rabbit_mgmt_util.erl b/deps/rabbitmq_management/src/rabbit_mgmt_util.erl
+index 88946e6943..63fc68b7c8 100644
+--- a/deps/rabbitmq_management/src/rabbit_mgmt_util.erl
++++ b/deps/rabbitmq_management/src/rabbit_mgmt_util.erl
+@@ -876,8 +876,7 @@ with_vhost_and_props(Fun, ReqData, Context) ->
+                             bad_request(Error, ReqData1, Context)
+                     end;
+                 {error, Reason} ->
+-                    bad_request(rabbit_mgmt_format:escape_html_tags(Reason),
+-                                ReqData1, Context)
++                    bad_request(Reason, ReqData1, Context)
+             end
+     end.
+ 
+diff --git a/deps/rabbitmq_management/src/rabbit_mgmt_wm_healthchecks.erl b/deps/rabbitmq_management/src/rabbit_mgmt_wm_healthchecks.erl
+index fe52f4a7aa..e9f46daed9 100644
+--- a/deps/rabbitmq_management/src/rabbit_mgmt_wm_healthchecks.erl
++++ b/deps/rabbitmq_management/src/rabbit_mgmt_wm_healthchecks.erl
+@@ -48,8 +48,7 @@ to_json(ReqData, Context) ->
+         {badrpc, Err} ->
+             failure(rabbit_mgmt_format:print("~tp", Err), ReqData, Context);
+         {error_string, Err} ->
+-            S = rabbit_mgmt_format:escape_html_tags(
+-                  rabbit_data_coercion:to_list(rabbit_mgmt_format:print(Err))),
++            S = rabbit_mgmt_format:print(Err),
+             failure(S, ReqData, Context)
+     end.
+ 
+diff --git a/deps/rabbitmq_management/src/rabbit_mgmt_wm_parameter.erl b/deps/rabbitmq_management/src/rabbit_mgmt_wm_parameter.erl
+index 3b277bef79..71ca1ba43b 100644
+--- a/deps/rabbitmq_management/src/rabbit_mgmt_wm_parameter.erl
++++ b/deps/rabbitmq_management/src/rabbit_mgmt_wm_parameter.erl
+@@ -61,10 +61,7 @@ accept_content(ReqData0, Context = #context{user = User}) ->
+                           ok ->
+                               {true, ReqData, Context};
+                           {error_string, Reason} ->
+-                              S = rabbit_mgmt_format:escape_html_tags(
+-                                    rabbit_data_coercion:to_list(Reason)),
+-                              rabbit_mgmt_util:bad_request(
+-                                rabbit_data_coercion:to_binary(S), ReqData, Context)
++                              rabbit_mgmt_util:bad_request(Reason, ReqData, Context)
+                       end
+               end)
+     end.
+diff --git a/deps/rabbitmq_management/src/rabbit_mgmt_wm_policy.erl b/deps/rabbitmq_management/src/rabbit_mgmt_wm_policy.erl
+index a91e5b1a55..df1960c6de 100644
+--- a/deps/rabbitmq_management/src/rabbit_mgmt_wm_policy.erl
++++ b/deps/rabbitmq_management/src/rabbit_mgmt_wm_policy.erl
+@@ -60,8 +60,7 @@ accept_content(ReqData0, Context = #context{user = #user{username = Username}})
+                           ok ->
+                               {true, ReqData, Context};
+                           {error_string, Reason} ->
+-                              rabbit_mgmt_util:bad_request(
+-                                rabbit_mgmt_format:escape_html_tags(Reason), ReqData, Context)
++                              rabbit_mgmt_util:bad_request(Reason, ReqData, Context)
+                       end
+               end)
+     end.
+diff --git a/deps/rabbitmq_management_agent/src/rabbit_mgmt_format.erl b/deps/rabbitmq_management_agent/src/rabbit_mgmt_format.erl
+index 9c5d4bd7bf..45960a19e9 100644
+--- a/deps/rabbitmq_management_agent/src/rabbit_mgmt_format.erl
++++ b/deps/rabbitmq_management_agent/src/rabbit_mgmt_format.erl
+@@ -15,7 +15,7 @@
+ -export([to_amqp_table/1, listener/1, web_context/1, properties/1, basic_properties/1]).
+ -export([record/2, to_basic_properties/1]).
+ -export([addr/1, port/1]).
+--export([format_nulls/1, escape_html_tags/1]).
++-export([format_nulls/1]).
+ -export([print/2, print/1]).
+ 
+ -export([format_queue_stats/1, format_queue_basic_stats/1,
+@@ -533,27 +533,6 @@ format_null_item([{_K, _V} | _T] = L) ->
+ format_null_item(Value) ->
+     Value.
+ 
+-
+--spec escape_html_tags(string()) -> binary().
+-
+-escape_html_tags(S) ->
+-    escape_html_tags(rabbit_data_coercion:to_list(S), []).
+-
+-
+--spec escape_html_tags(string(), string()) -> binary().
+-
+-escape_html_tags([], Acc) ->
+-    rabbit_data_coercion:to_binary(lists:reverse(Acc));
+-escape_html_tags("<" ++ Rest, Acc) ->
+-    escape_html_tags(Rest, lists:reverse("&lt;", Acc));
+-escape_html_tags(">" ++ Rest, Acc) ->
+-    escape_html_tags(Rest, lists:reverse("&gt;", Acc));
+-escape_html_tags("&" ++ Rest, Acc) ->
+-    escape_html_tags(Rest, lists:reverse("&amp;", Acc));
+-escape_html_tags([C | Rest], Acc) ->
+-    escape_html_tags(Rest, [C | Acc]).
+-
+-
+ -spec clean_consumer_details(proplists:proplist()) -> proplists:proplist().
+ clean_consumer_details(Obj) ->
+      case pget(consumer_details, Obj) of
+diff --git a/deps/rabbitmq_web_dispatch/src/rabbit_web_dispatch_access_control.erl b/deps/rabbitmq_web_dispatch/src/rabbit_web_dispatch_access_control.erl
+index c4561c27d4..86c5d6550d 100644
+--- a/deps/rabbitmq_web_dispatch/src/rabbit_web_dispatch_access_control.erl
++++ b/deps/rabbitmq_web_dispatch/src/rabbit_web_dispatch_access_control.erl
+@@ -273,8 +273,8 @@ not_authorised(Reason, ReqData, Context) ->
+ 
+ halt_response(Code, Type, Reason, ReqData, Context) ->
+     ReasonFormatted = format_reason(Reason),
+-    Json = #{<<"error">>  => Type,
+-             <<"reason">> => ReasonFormatted},
++    Json = #{error  => Type,
++             reason => ReasonFormatted},
+     ReqData1 = cowboy_req:reply(Code,
+         #{<<"content-type">> => <<"application/json">>},
+         rabbit_json:encode(Json), ReqData),
+@@ -286,7 +286,7 @@ not_authenticated(Reason, ReqData, Context, _AuthConfig) ->
+ format_reason(Tuple) when is_tuple(Tuple) ->
+     tuple(Tuple);
+ format_reason(Binary) when is_binary(Binary) ->
+-    Binary;
++    unicode:characters_to_binary(Binary);
+ format_reason(Other) ->
+     case is_string(Other) of
+         true ->  print("~ts", [Other]);

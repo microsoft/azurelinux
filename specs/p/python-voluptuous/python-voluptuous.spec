@@ -5,7 +5,7 @@
 
 Name:      python-%{srcname}
 Version:   0.15.2
-Release: 9%{?dist}
+Release:   6%{?dist}
 Summary:   Python data validation library
 
 License:   BSD-3-Clause

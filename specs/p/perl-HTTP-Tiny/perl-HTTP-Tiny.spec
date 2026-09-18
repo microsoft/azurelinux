@@ -5,8 +5,8 @@
 %bcond_without perl_HTTP_Tiny_enables_optional_deps
 
 Name:           perl-HTTP-Tiny
-Version:        0.090
-Release: 524%{?dist}
+Version:        0.096
+Release:        1%{?dist}
 Summary:        Small, simple, correct HTTP/1.1 client
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/HTTP-Tiny
@@ -34,6 +34,7 @@ BuildRequires:  perl(IO::Socket)
 BuildRequires:  perl(MIME::Base64)
 # Net::SSLeay 1.49 is an optional fall-back for IO::Socket::SSL
 BuildRequires:  perl(Socket)
+BuildRequires:  perl(Time::HiRes)
 BuildRequires:  perl(Time::Local)
 # Tests:
 # Data::Dumper not used
@@ -62,6 +63,7 @@ Recommends:     perl(IO::Socket::SSL) >= 1.968
 Recommends:     perl(Net::SSLeay) >= 1.49
 %endif
 Requires:       perl(MIME::Base64)
+Requires:       perl(Time::HiRes)
 Requires:       perl(Time::Local)
 
 # Filter modules bundled for tests
@@ -133,6 +135,12 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Jul 30 2026 Jitka Plesnikova <jplesnik@redhat.com> - 0.096-1
+- 0.096 bump (rhbz#2486197)
+
+* Wed May 20 2026 Jitka Plesnikova <jplesnik@redhat.com> - 0.094-1
+- 0.094 bump (rhbz#2478249)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.090-521
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

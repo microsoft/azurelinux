@@ -6,7 +6,7 @@
 
 Name:           libgdiplus
 Version:        6.1
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        An Open Source implementation of the GDI+ API
 License:        MIT
 URL:            http://www.mono-project.com/Main_Page

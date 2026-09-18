@@ -1,0 +1,274 @@
+Based on commit f89df57ab8e30ca5c8d04ba27870d473f17bedd4
+
+commit f89df57ab8e30ca5c8d04ba27870d473f17bedd4
+Author: Nils Goroll <nils.goroll@uplex.de>
+Date:   Tue Feb 3 10:33:14 2026 +0100
+
+    Add more defensive req.url checks to builtin.vcl
+    
+    As a defensive measure, we add vcl_req_url, which requires req.url to start with
+    "/" except for
+    
+            * the CONNECT method, where req.url contains hostname:port (for
+              http/1.1) and
+    
+            * the OPTIONS method, where req.url can be "*"
+    
+    Note that, by default, we do not accept CONNECT requests.
+    
+    As with all built-in "hooks", vcl_req_url can be overridden selectively from the
+    custom vcl.
+    
+    As a particular case, this, by default, prevents processing of https:// request
+    targets, unless the https_scheme feature flag is set.
+    
+    Conflict:
+            both modified:   doc/changes.rst
+
+diff -u a/bin/varnishd/builtin.vcl b/bin/varnishd/builtin.vcl
+--- a/bin/varnishd/builtin.vcl	2026-06-16 23:27:52.311584972 +0200
++++ b/bin/varnishd/builtin.vcl	2026-06-16 23:27:56.544046238 +0200
+@@ -41,6 +41,7 @@
+ }
+ 
+ sub vcl_builtin_recv {
++	call vcl_req_url;
+ 	call vcl_req_host;
+ 	call vcl_req_method;
+ 	call vcl_req_authorization;
+@@ -58,6 +59,16 @@
+ 		return (synth(400));
+ 	}
+ }
++
++sub vcl_req_url {
++	if (req.url == "*" && req.method == "OPTIONS") {
++		return;
++	}
++	# NB: we do not allow connect by default (see vcl_req_method)
++	if (req.url !~ "^/" && req.method != "CONNECT") {
++		return (synth(400));
++	}
++}
+ 
+ sub vcl_req_method {
+ 	if (req.method == "PRI") {
+diff --git a/bin/varnishtest/tests/b00026.vtc b/bin/varnishtest/tests/b00026.vtc
+index e12676985..1b0df4c04 100644
+--- a/bin/varnishtest/tests/b00026.vtc
++++ b/bin/varnishtest/tests/b00026.vtc
+@@ -2,13 +2,13 @@ varnishtest "Check the precedence for timeouts"
+ 
+ server s1 {
+ 	rxreq
+-	expect req.url == "from_backend"
++	expect req.url == "/from_backend"
+ 	delay 1
+ 	txresp
+ } -start
+ server s2 {
+ 	rxreq
+-	expect req.url == "from_vcl"
++	expect req.url == "/from_vcl"
+ 	delay 1.5
+ 	txresp
+ } -start
+@@ -26,13 +26,13 @@ varnish v1 -vcl {
+ 	}
+ 
+ 	sub vcl_recv {
+-		if (req.url  == "from_backend") {
++		if (req.url  == "/from_backend") {
+ 			return(pass);
+ 		}
+ 	}
+ 	sub vcl_backend_fetch {
+ 		set bereq.first_byte_timeout = 2s;
+-		if (bereq.url  == "from_backend") {
++		if (bereq.url  == "/from_backend") {
+ 			set bereq.backend = b1;
+ 		} else {
+ 			set bereq.backend = b2;
+@@ -42,10 +42,10 @@ varnish v1 -vcl {
+ varnish v1 -cliok "param.set first_byte_timeout 0.5"
+ 
+ client c1 {
+-	txreq -url "from_backend"
++	txreq -url "/from_backend"
+ 	rxresp
+ 	expect resp.status == 200
+-	txreq -url "from_vcl"
++	txreq -url "/from_vcl"
+ 	rxresp
+ 	expect resp.status == 200
+ } -run
+diff --git a/bin/varnishtest/tests/c00005.vtc b/bin/varnishtest/tests/c00005.vtc
+index 0a6e90517..74f6ed585 100644
+--- a/bin/varnishtest/tests/c00005.vtc
++++ b/bin/varnishtest/tests/c00005.vtc
+@@ -5,7 +5,7 @@ server s1 {
+ 	expect req.url == "/"
+ 	txresp -body "1111\n"
+ 	rxreq
+-	expect req.url == "foo"
++	expect req.url == "/foo"
+ 	txresp -body "2222\n"
+ } -start
+ 
+@@ -40,7 +40,7 @@ varnish v1 -vcl+backend {
+ } -start
+ 
+ client c1 {
+-	txreq -url "foo"
++	txreq -url "/foo"
+ 	rxresp
+ 	expect resp.status == 200
+ 	expect resp.http.acl == acl1
+diff --git a/bin/varnishtest/tests/e00009.vtc b/bin/varnishtest/tests/e00009.vtc
+index e15e56ae7..b40e89c9d 100644
+--- a/bin/varnishtest/tests/e00009.vtc
++++ b/bin/varnishtest/tests/e00009.vtc
+@@ -40,7 +40,7 @@ varnish v1 -expect MAIN.s_resp_bodybytes == 57
+ varnish v1  -cli "param.set feature +esi_disable_xml_check"
+ 
+ client c1 {
+-	txreq -url bar
++	txreq -url /bar
+ 	rxresp
+ 	expect resp.status == 200
+ 	expect resp.bodylen == 22
+diff --git a/bin/varnishtest/tests/e00019.vtc b/bin/varnishtest/tests/e00019.vtc
+index 1fb159ec0..e73286aa1 100644
+--- a/bin/varnishtest/tests/e00019.vtc
++++ b/bin/varnishtest/tests/e00019.vtc
+@@ -34,19 +34,19 @@ server s1 {
+ # Varnish 4
+ server s2 {
+ 	rxreq
+-	expect req.url == "bar/foo"
++	expect req.url == "/foo"
+ 	txresp -body {<INCL>}
+ } -start
+ 
+ varnish v1 -vcl+backend {
+ 	sub vcl_backend_fetch {
+-		if (bereq.url != "bar") {
++		if (bereq.url != "/bar") {
+ 			set bereq.backend = s2;
+ 		}
+ 	}
+ 
+ 	sub vcl_backend_response {
+-		if (bereq.url == "bar") {
++		if (bereq.url == "/bar") {
+ 			set beresp.do_esi = true;
+ 		}
+ 	}
+@@ -67,7 +67,7 @@ logexpect l1 -v v1 -g vxid -q "vxid == 1002" {
+ } -start
+ 
+ client c1 {
+-	txreq  -url bar
++	txreq  -url /bar
+ 	rxresp
+ 	expect resp.status == 200
+ 	expect resp.bodylen == 65856
+diff --git a/bin/varnishtest/tests/r02339.vtc b/bin/varnishtest/tests/r02339.vtc
+index 9ff18632d..e934bf45b 100644
+--- a/bin/varnishtest/tests/r02339.vtc
++++ b/bin/varnishtest/tests/r02339.vtc
+@@ -11,10 +11,10 @@ varnish v1 -vcl+backend {
+ 	import purge;
+ 
+ 	sub vcl_miss {
+-		if (req.url == "miss") { purge.hard(); }
++		if (req.url == "/miss") { purge.hard(); }
+ 	}
+ 	sub vcl_hit {
+-		if (req.url == "hit") { purge.hard(); }
++		if (req.url == "/hit") { purge.hard(); }
+ 	}
+ } -start
+ 
+@@ -39,15 +39,15 @@ logexpect l1 -v v1 {
+ } -start
+ 
+ client c1 {
+-	txreq -url hit
++	txreq -url /hit
+ 	rxresp
+ 	expect resp.status == 200
+ 
+-	txreq -url hit
++	txreq -url /hit
+ 	rxresp
+ 	expect resp.status == 200
+ 
+-	txreq -url miss
++	txreq -url /miss
+ 	rxresp
+ 	expect resp.status == 200
+ } -run
+@@ -59,7 +59,7 @@ varnish v1 -errvcl "Not available in subroutine 'vcl_purge'" {
+ 	import purge;
+ 
+ 	sub vcl_purge {
+-		if (req.url == "purge") { purge.hard(); }
++		if (req.url == "/purge") { purge.hard(); }
+ 	}
+ }
+ 
+@@ -67,7 +67,7 @@ varnish v1 -errvcl "Not available in subroutine 'vcl_pass'" {
+ 	import purge;
+ 
+ 	sub vcl_pass {
+-		if (req.url == "pass") { purge.hard(); }
++		if (req.url == "/pass") { purge.hard(); }
+ 	}
+ }
+ 
+@@ -75,7 +75,7 @@ varnish v1 -errvcl "Not available in subroutine 'vcl_deliver'" {
+ 	import purge;
+ 
+ 	sub vcl_deliver {
+-		if (req.url == "deliver") { purge.hard(); }
++		if (req.url == "/deliver") { purge.hard(); }
+ 	}
+ }
+ 
+@@ -83,7 +83,7 @@ varnish v1 -errvcl "Not available in subroutine 'vcl_synth'" {
+ 	import purge;
+ 
+ 	sub vcl_synth {
+-		if (req.url == "synth") { purge.hard(); }
++		if (req.url == "/synth") { purge.hard(); }
+ 	}
+ }
+ 
+@@ -91,7 +91,7 @@ varnish v1 -errvcl "Not available in subroutine 'vcl_backend_fetch'" {
+ 	import purge;
+ 
+ 	sub vcl_backend_fetch {
+-		if (bereq.url == "fetch") { purge.hard(); }
++		if (bereq.url == "/fetch") { purge.hard(); }
+ 	}
+ }
+ 
+@@ -99,7 +99,7 @@ varnish v1 -errvcl "Not available in subroutine 'vcl_backend_error'" {
+ 	import purge;
+ 
+ 	sub vcl_backend_error {
+-		if (bereq.url == "error") { purge.hard(); }
++		if (bereq.url == "/error") { purge.hard(); }
+ 	}
+ }
+ 
+@@ -107,6 +107,6 @@ varnish v1 -errvcl "Not available in subroutine 'vcl_backend_response'" {
+ 	import purge;
+ 
+ 	sub vcl_backend_response {
+-		if (bereq.url == "response") { purge.hard(); }
++		if (bereq.url == "/response") { purge.hard(); }
+ 	}
+ }
+

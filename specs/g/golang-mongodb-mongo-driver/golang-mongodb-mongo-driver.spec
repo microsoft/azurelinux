@@ -20,7 +20,7 @@ The Go driver for MongoDB.}
 %global godocs          examples CONTRIBUTING.md README.md
 
 Name:           %{goname}
-Release: 21%{?dist}
+Release:        18%{?dist}
 Summary:        Go driver for MongoDB
 
 # Upstream license specification: Apache-2.0

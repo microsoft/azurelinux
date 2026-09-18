@@ -1,0 +1,134 @@
+diff -rupN --no-dereference Pillow-11.3.0/src/PIL/BdfFontFile.py Pillow-11.3.0-new/src/PIL/BdfFontFile.py
+--- Pillow-11.3.0/src/PIL/BdfFontFile.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/src/PIL/BdfFontFile.py	2026-07-19 08:50:48.485746648 +0200
+@@ -69,6 +69,7 @@ def bdf_char(
+     # and x and y displacement (BBxoff0, BByoff0)
+     # of the lower left corner from the origin of the character.
+     width, height, x_disp, y_disp = (int(p) for p in props["BBX"].split())
++    Image._decompression_bomb_check((width, height))
+ 
+     # The word DWIDTH
+     # followed by the width in x and y of the character in device pixels.
+diff -rupN --no-dereference Pillow-11.3.0/src/PIL/FontFile.py Pillow-11.3.0-new/src/PIL/FontFile.py
+--- Pillow-11.3.0/src/PIL/FontFile.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/src/PIL/FontFile.py	2026-07-19 08:50:48.486101567 +0200
+@@ -74,7 +74,7 @@ class FontFile:
+             if glyph:
+                 d, dst, src, im = glyph
+                 h = max(h, src[3] - src[1])
+-                w = w + (src[2] - src[0])
++                w += src[2] - src[0]
+                 if w > WIDTH:
+                     lines += 1
+                     w = src[2] - src[0]
+@@ -89,6 +89,7 @@ class FontFile:
+         self.ysize = h
+ 
+         # paste glyphs into bitmap
++        Image._decompression_bomb_check((xsize, ysize))
+         self.bitmap = Image.new("1", (xsize, ysize))
+         self.metrics: list[
+             tuple[tuple[int, int], tuple[int, int, int, int], tuple[int, int, int, int]]
+diff -rupN --no-dereference Pillow-11.3.0/src/PIL/PcfFontFile.py Pillow-11.3.0-new/src/PIL/PcfFontFile.py
+--- Pillow-11.3.0/src/PIL/PcfFontFile.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/src/PIL/PcfFontFile.py	2026-07-19 08:50:48.486342490 +0200
+@@ -166,6 +166,7 @@ class PcfFontFile(FontFile.FontFile):
+                 descent = i8(fp.read(1)) - 128
+                 xsize = right - left
+                 ysize = ascent + descent
++                Image._decompression_bomb_check((xsize, ysize))
+                 append((xsize, ysize, left, right, width, ascent, descent, 0))
+ 
+         else:
+@@ -179,6 +180,7 @@ class PcfFontFile(FontFile.FontFile):
+                 attributes = i16(fp.read(2))
+                 xsize = right - left
+                 ysize = ascent + descent
++                Image._decompression_bomb_check((xsize, ysize))
+                 append((xsize, ysize, left, right, width, ascent, descent, attributes))
+ 
+         return metrics
+diff -rupN --no-dereference Pillow-11.3.0/Tests/test_font_bdf.py Pillow-11.3.0-new/Tests/test_font_bdf.py
+--- Pillow-11.3.0/Tests/test_font_bdf.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/Tests/test_font_bdf.py	2026-07-19 08:50:48.486608727 +0200
+@@ -4,7 +4,7 @@ import io
+ 
+ import pytest
+ 
+-from PIL import BdfFontFile, FontFile
++from PIL import BdfFontFile, FontFile, Image
+ 
+ filename = "Tests/images/courB08.bdf"
+ 
+@@ -24,6 +24,14 @@ def test_zero_width_chars() -> None:
+     BdfFontFile.BdfFontFile(io.BytesIO(data))
+ 
+ 
++def test_decompression_bomb() -> None:
++    with open(filename, "rb") as fp:
++        data = fp.read()
++    b = io.BytesIO(data.replace(b"BBX 1 1", b"BBX 13378 13378"))
++    with pytest.raises(Image.DecompressionBombError):
++        BdfFontFile.BdfFontFile(b)
++
++
+ def test_invalid_file() -> None:
+     with open("Tests/images/flower.jpg", "rb") as fp:
+         with pytest.raises(SyntaxError):
+diff -rupN --no-dereference Pillow-11.3.0/Tests/test_fontfile.py Pillow-11.3.0-new/Tests/test_fontfile.py
+--- Pillow-11.3.0/Tests/test_fontfile.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/Tests/test_fontfile.py	2026-07-19 08:50:48.486848155 +0200
+@@ -20,6 +20,13 @@ def test_compile() -> None:
+     assert font.ysize == 2
+ 
+ 
++def test_decompression_bomb() -> None:
++    font = FontFile.FontFile()
++    font.glyph[0] = ((0, 0), (0, 0, 0, 0), (0, 0, 10000, 10000), Image.new("L", (0, 0)))
++    with pytest.raises(Image.DecompressionBombError):
++        font.compile()
++
++
+ def test_save(tmp_path: Path) -> None:
+     tempname = str(tmp_path / "temp.pil")
+ 
+diff -rupN --no-dereference Pillow-11.3.0/Tests/test_font_pcf.py Pillow-11.3.0-new/Tests/test_font_pcf.py
+--- Pillow-11.3.0/Tests/test_font_pcf.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/Tests/test_font_pcf.py	2026-07-19 08:50:48.487107752 +0200
+@@ -1,12 +1,13 @@
+ from __future__ import annotations
+ 
+ import os
++from io import BytesIO
+ from pathlib import Path
+ from typing import AnyStr
+ 
+ import pytest
+ 
+-from PIL import FontFile, Image, ImageDraw, ImageFont, PcfFontFile
++from PIL import FontFile, Image, ImageDraw, ImageFont, PcfFontFile, _binary
+ 
+ from .helper import (
+     assert_image_equal_tofile,
+@@ -108,3 +109,21 @@ def test_high_characters(request: pytest
+     _test_high_characters(request, tmp_path, message)
+     # accept bytes instances.
+     _test_high_characters(request, tmp_path, message.encode("latin1"))
++
++
++def test_decompression_bomb() -> None:
++    with open(fontname, "rb") as fp:
++        data = fp.read()
++    b = BytesIO(
++        data[:900]
++        + _binary.o32le(0)  # jumbo format
++        + _binary.o32le(1)  # number of metrics
++        + _binary.o16le(0)  # left
++        + _binary.o16le(65535)  # right
++        + _binary.o16le(0)  # width
++        + _binary.o16le(0)  # ascent
++        + _binary.o16le(65535)  # descent
++        + _binary.o16le(0)  # attributes
++    )
++    with pytest.raises(Image.DecompressionBombError):
++        PcfFontFile.PcfFontFile(b)

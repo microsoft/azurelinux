@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Tue, 14 Apr 2026 11:36:04 -0700
+Subject: [PATCH] AMQP 0-9-1: apply `configure` checks to passive queue,
+ exchange declaration
+
+Just like we do for regular declarations.
+
+(cherry picked from commit 709a14e49e06c138a8cd672c9809ca34a2767962)
+(cherry picked from commit 72523af903702a710e3a922dd7b173df41e69c47)
+
+diff --git a/deps/rabbit/src/rabbit_amqp_management.erl b/deps/rabbit/src/rabbit_amqp_management.erl
+index bcc993b132..e60c967fe7 100644
+--- a/deps/rabbit/src/rabbit_amqp_management.erl
++++ b/deps/rabbit/src/rabbit_amqp_management.erl
+@@ -77,11 +77,13 @@ handle_http_req(<<"GET">>,
+                 _Query,
+                 null,
+                 Vhost,
+-                _User,
++                User,
+                 _ConnPid,
+-                PermCaches) ->
++                {PermCache0, TopicPermCache}) ->
+     QNameBin = rabbit_uri:urldecode(QNameBinQuoted),
+     QName = queue_resource(Vhost, QNameBin),
++    PermCache = check_resource_access(QName, configure, User, PermCache0),
++    PermCaches = {PermCache, TopicPermCache},
+     case rabbit_amqqueue:with(
+            QName,
+            fun(Q) ->
+diff --git a/deps/rabbit/src/rabbit_channel.erl b/deps/rabbit/src/rabbit_channel.erl
+index 04ce3e5283..74fa89e2fd 100644
+--- a/deps/rabbit/src/rabbit_channel.erl
++++ b/deps/rabbit/src/rabbit_channel.erl
+@@ -2509,9 +2509,10 @@ handle_method(#'queue.declare'{queue       = QueueNameBin,
+ handle_method(#'queue.declare'{queue   = QueueNameBin,
+                                nowait  = NoWait,
+                                passive = true},
+-              ConnPid, _AuthzContext, _CollectorPid, VHostPath, _User) ->
++              ConnPid, AuthzContext, _CollectorPid, VHostPath, User) ->
+     StrippedQueueNameBin = strip_cr_lf(QueueNameBin),
+     QueueName = rabbit_misc:r(VHostPath, queue, StrippedQueueNameBin),
++    check_configure_permitted(QueueName, User, AuthzContext),
+     Fun = fun (Q0) ->
+               QStat = maybe_stat(NoWait, Q0),
+               {QStat, Q0}
+@@ -2617,9 +2618,10 @@ handle_method(#'exchange.declare'{exchange    = XNameBin,
+                                             AutoDelete, Internal, Args);
+ handle_method(#'exchange.declare'{exchange    = ExchangeNameBin,
+                                   passive     = true},
+-              _ConnPid, _AuthzContext, _CollectorPid, VHostPath, _User) ->
++              _ConnPid, AuthzContext, _CollectorPid, VHostPath, User) ->
+     ExchangeName = rabbit_misc:r(VHostPath, exchange, strip_cr_lf(ExchangeNameBin)),
+     check_not_default_exchange(ExchangeName),
++    check_configure_permitted(ExchangeName, User, AuthzContext),
+     _ = rabbit_exchange:lookup_or_die(ExchangeName).
+ 
+ handle_deliver(CTag, Ack, Msgs, State) when is_list(Msgs) ->

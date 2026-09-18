@@ -8,13 +8,13 @@
 %bcond_with docs
 %endif
 # See https://github.com/valkey-io/valkey-doc/tags
-%global doc_version 8.1.5
+%global doc_version 8.1.8
 # Tests fail in mock, not in local build.
 %bcond_with tests
 
 Name:              valkey
-Version:           8.1.5
-Release: 4%{?dist}
+Version:           8.1.9
+Release:           1%{?dist}
 Summary:           A persistent key-value database
 # valkey: BSD-3-Clause
 # hiredis: BSD-3-Clause
@@ -445,6 +445,25 @@ fi
 
 
 %changelog
+* Wed Jul 22 2026 Remi Collet <remi@remirepo.net> - 8.1.9-1
+- Valkey 8.1.9 - Released Tue 21 July 2026
+- Upgrade urgency SECURITY: This release includes security fixes
+  CVE-2026-56684 CVE-2026-63639
+
+* Wed Jun  3 2026 Remi Collet <remi@remirepo.net> - 8.1.8-1
+- Valkey 8.1.8 - Tue 02 June 2026
+- Upgrade urgency HIGH:
+  There is a critical bug that may affect a subset of users.
+
+* Wed May  6 2026 Remi Collet <remi@remirepo.net> - 8.1.7-1
+- Valkey 8.1.7 - Tue 05 May 2026
+- Upgrade urgency SECURITY: This release includes security fixes.
+  CVE-2026-23479 CVE-2026-25243 CVE-2026-23631
+
+* Tue Feb 24 2026 Remi Collet <remi@fedoraproject.org> - 8.1.6-1
+- Valkey 8.1.6 - Released Mon 23 February 2026
+- Upgrade urgency SECURITY: This release includes security fixes
+
 * Thu Dec  4 2025 Remi Collet <remi@fedoraproject.org> - 8.1.5-1
 - Valkey 8.1.5 - Released Thu 04 December 2025
 - Upgrade urgency MODERATE

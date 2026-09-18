@@ -4,7 +4,7 @@
 
 Name:		console-setup
 Version:	1.239
-Release: 5%{?dist}
+Release:	2%{?dist}
 Summary:	Tools for configuring the console using X Window System key maps
 
 # For a breakdown of the licensing, see COPYRIGHT, copyright, copyright.fonts and copyright.xkb

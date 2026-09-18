@@ -1,0 +1,67 @@
+From 4b343522823403df01f6753082df83f07d18c217 Mon Sep 17 00:00:00 2001
+From: zdohnal <zdohnal@redhat.com>
+Date: Thu, 23 Jul 2026 16:54:46 +0200
+Subject: [PATCH] ieee.c: Fix possible infinite loop and avoid empty device_ids
+ (#170)
+
+If model in device id was empty, library got into infinite loop. There
+are several layers of protection now:
+
+- library now does not allow empty strings for key or value
+- device ids without values are thrown away
+- comparison now happens only when there is actual string to compare
+  with, aka length > 0
+
+Fixes: CVE-2026-64611
+---
+ cupsfilters/ieee1284.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/cupsfilters/ieee1284.c b/cupsfilters/ieee1284.c
+index 57abee09..7ab5ac6b 100644
+--- a/cupsfilters/ieee1284.c
++++ b/cupsfilters/ieee1284.c
+@@ -407,6 +407,12 @@ cfIEEE1284GetMakeModel(
+ 
+   num_values = cfIEEE1284GetValues(device_id, &values);
+ 
++  if (!num_values)
++  {
++    DEBUG_puts("cfIEEE1284GetMakeModel: no key:value pairs");
++    return (-1);
++  }
++
+   if ((mdl = cupsGetOption("MODEL", num_values, values)) == NULL)
+     mdl = cupsGetOption("MDL", num_values, values);
+ 
+@@ -573,6 +579,9 @@ cfIEEE1284GetValues(
+     *ptr = '\0';
+     device_id ++;
+ 
++    if (!key[0] || !value[0])
++      continue;
++
+     num_values = cupsAddOption(key, value, num_values, values);
+   }
+ 
+@@ -668,6 +677,7 @@ cfIEEE1284NormalizeMakeModel(
+   char	*bufptr;			// Pointer into buffer
+   char  sepchr = ' ';                   // Word separator character
+   int   compare = 0,                    // Format for comparing
++        compare_len = 0,                // Length of compared buffer
+         human = 0,                      // Format for human-readable string
+         lower = 0,                      // All letters lowercase
+         upper = 0,                      // All letters uppercase
+@@ -1151,7 +1161,8 @@ cfIEEE1284NormalizeMakeModel(
+     // Remove repeated manufacturer names...
+     //
+ 
+-    while (strncasecmp(buffer, modelptr, modelptr - buffer) == 0)
++    compare_len = modelptr - buffer;
++    while (compare_len > 0 && strncasecmp(buffer, modelptr, compare_len) == 0)
+       move_right_part(buffer, bufsize, modelptr, buffer - modelptr);
+ 
+     //
+-- 
+2.55.0
+

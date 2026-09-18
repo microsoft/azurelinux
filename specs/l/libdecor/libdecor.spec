@@ -3,7 +3,7 @@
 
 Name:           libdecor
 Version:        0.2.5
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Wayland client side decoration library
 
 License:        MIT

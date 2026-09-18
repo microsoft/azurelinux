@@ -7,7 +7,7 @@
 
 Name:           gcr3
 Version:        3.41.1
-Release: 14%{?dist}
+Release:        11%{?dist}
 Summary:        A library for bits of crypto UI and parsing
 
 # gck/pkcs11n.h is MPL 1.1/GPL 2.0/LGPL 2.1

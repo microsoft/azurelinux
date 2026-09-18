@@ -1,4 +1,4 @@
-policy_module(smartmon, 1.13.0)
+policy_module(smartmon, 1.14.0)
 
 ########################################
 #
@@ -15,7 +15,11 @@ gen_tunable(smartmon_3ware, false)
 
 require {
         class capability dac_override;
-        type tmpfs_t, tty_device_t, user_devpts_t, system_mail_t, systemd_logind_sessions_t, mail_home_t;
+        type tmpfs_t, fs_t, tty_device_t, user_devpts_t, system_mail_t, sssd_var_lib_t, systemd_logind_sessions_t, mail_home_t;
+        type kernel_t, sssd_public_t, sssd_t, devlog_t, systemd_logind_t, syslogd_var_run_t, unconfined_t;
+        type systemd_userdbd_runtime_t, systemd_homed_t, systemd_machined_t, systemd_userdbd_t;
+        type system_dbusd_t, system_dbusd_var_run_t;
+        type session_dbusd_tmp_t, user_tmp_t, unconfined_dbusd_t;
 }
 
 type fsdaemon_t;
@@ -51,9 +55,47 @@ allow smartdwarn_t smartdwarn_script_t:file execute_no_trans;
 init_read_utmp(smartdwarn_t)
 allow smartdwarn_t tty_device_t:chr_file { open write };
 allow smartdwarn_t user_devpts_t:chr_file { open write };
-allow smartdwarn_t self:capability { setgid dac_override };
+allow smartdwarn_t self:capability { setgid setuid dac_override };
 allow smartdwarn_t systemd_logind_sessions_t:dir { getattr open read search };
 allow smartdwarn_t systemd_logind_sessions_t:file { getattr open read };
+allow smartdwarn_t sssd_var_lib_t:dir search;
+allow smartdwarn_t sssd_var_lib_t:sock_file write;
+
+# for loginctl (sd_notify socket and system D-Bus)
+allow smartdwarn_t self:unix_dgram_socket { create getopt setopt connect write };
+allow smartdwarn_t kernel_t:unix_dgram_socket sendto;
+allow smartdwarn_t system_dbusd_var_run_t:dir search;
+allow smartdwarn_t system_dbusd_var_run_t:sock_file write;
+allow smartdwarn_t system_dbusd_t:unix_stream_socket connectto;
+allow smartdwarn_t system_dbusd_t:dbus send_msg;
+allow smartdwarn_t systemd_logind_t:dbus send_msg;
+allow smartdwarn_t unconfined_t:dbus send_msg;
+
+# for runuser (user lookup via SSSD)
+allow smartdwarn_t sssd_public_t:dir search;
+allow smartdwarn_t sssd_public_t:file { read open getattr map };
+allow smartdwarn_t sssd_t:unix_stream_socket connectto;
+
+# for runuser (user lookup via systemd-userdb)
+allow smartdwarn_t systemd_userdbd_runtime_t:dir { getattr open read search };
+allow smartdwarn_t systemd_userdbd_runtime_t:sock_file write;
+allow smartdwarn_t systemd_userdbd_runtime_t:lnk_file read;
+allow smartdwarn_t systemd_homed_t:unix_stream_socket connectto;
+allow smartdwarn_t systemd_machined_t:unix_stream_socket connectto;
+allow smartdwarn_t systemd_userdbd_t:unix_stream_socket connectto;
+
+# for runuser (PAM audit and syslog)
+allow smartdwarn_t self:netlink_audit_socket { create read write nlmsg_relay };
+allow smartdwarn_t self:process setsched;
+allow smartdwarn_t devlog_t:lnk_file read;
+allow smartdwarn_t devlog_t:sock_file write;
+allow smartdwarn_t syslogd_var_run_t:dir search;
+
+# for notify-send (user session D-Bus)
+allow smartdwarn_t user_tmp_t:dir search;
+allow smartdwarn_t session_dbusd_tmp_t:sock_file write;
+allow smartdwarn_t unconfined_dbusd_t:unix_stream_socket connectto;
+allow smartdwarn_t unconfined_dbusd_t:dbus send_msg;
 
 files_manage_generic_tmp_files(smartdwarn_t)
 term_open_unallocated_ttys(smartdwarn_t)
@@ -71,6 +113,7 @@ optional_policy(`
     mta_manage_home_rw(smartdwarn_t)
 ')
 allow smartdwarn_t tmpfs_t:filesystem getattr;
+allow smartdwarn_t fs_t:filesystem getattr;
 # for dead.letter when mail is undeliverable
 allow smartdwarn_t mail_home_t:file { getattr lock open write };
 

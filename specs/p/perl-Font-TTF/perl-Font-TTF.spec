@@ -3,7 +3,7 @@
 
 Name:          perl-Font-TTF
 Version:       1.06
-Release: 30%{?dist}
+Release:       27%{?dist}
 Summary:       Perl library for modifying TTF font files
 # other files:  Artistic 2.0
 ## not in binary packages

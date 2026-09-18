@@ -1,7 +1,7 @@
-From 540db50d3b83fdc5e10c424fcea2b6f9f1c44956 Mon Sep 17 00:00:00 2001
+From bb4673d750638fa3a1a74ee45207fd8ad6c5edd7 Mon Sep 17 00:00:00 2001
 From: Laszlo Ersek <lersek@redhat.com>
 Date: Thu, 4 Jun 2020 13:39:08 +0200
-Subject: [PATCH 02/21] MdeModulePkg: remove package-private Brotli include
+Subject: [PATCH 02/16] MdeModulePkg: remove package-private Brotli include
  path (RH only)
 
 Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
@@ -28,23 +28,21 @@ remove the include path too.
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 (cherry picked from commit e05e0de713c4a2b8adb6ff9809611f222bfe50ed)
 ---
- MdeModulePkg/MdeModulePkg.dec | 3 ---
- 1 file changed, 3 deletions(-)
+ MdeModulePkg/MdeModulePkg.dec | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/MdeModulePkg/MdeModulePkg.dec b/MdeModulePkg/MdeModulePkg.dec
-index 0775aa954ad6..0d981111edd9 100644
+index f6b1a73d7091..58079050083d 100644
 --- a/MdeModulePkg/MdeModulePkg.dec
 +++ b/MdeModulePkg/MdeModulePkg.dec
-@@ -27,9 +27,6 @@ [Includes]
-   Include
+@@ -28,7 +28,6 @@ [Includes]
    Test/Mock/Include
  
--[Includes.Common.Private]
+ [Includes.Common.Private]
 -  Library/BrotliCustomDecompressLib/brotli/c/include
--
+   Core/PrivateInclude
+ 
  [LibraryClasses]
-   ##  @libraryclass  Defines a set of methods to reset whole system.
-   ResetSystemLib|Include/Library/ResetSystemLib.h
 -- 
-2.51.1
+2.55.0
 

@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        8.4.0
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Python library that sorts lists using the "natural order" sort
 
 License:        MIT

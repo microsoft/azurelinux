@@ -19,7 +19,7 @@
 
 Name:       libdbusmenu
 Version:    %{ubuntu_release}.0
-Release: 33%{?dist}
+Release:    30%{?dist}
 Summary:    Library for passing menus over DBus
 
 # All files installed in final rpms use C sources with dual licensing headers.

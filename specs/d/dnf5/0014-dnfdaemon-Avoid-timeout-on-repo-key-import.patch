@@ -1,0 +1,53 @@
+From fdfe22546b5f2e27fe855924db4bd1a4b93f0256 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Wed, 29 Apr 2026 12:54:29 +0000
+Subject: [PATCH 14/16] dnfdaemon: Avoid timeout on repo key import
+
+When dnf5daemon-server needs to import a repository GPG key, it would
+emit a D-Bus signal and wait up to 5 minutes for client confirmation.
+This causes a hang when the client doesn't handle the signal (e.g.,
+GNOME Software) or the call is non-interactive.
+
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=2458182
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ dnf5daemon-server/callbacks.cpp | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/dnf5daemon-server/callbacks.cpp b/dnf5daemon-server/callbacks.cpp
+index 8c9cd9d0..d6b9137f 100644
+--- a/dnf5daemon-server/callbacks.cpp
++++ b/dnf5daemon-server/callbacks.cpp
+@@ -110,6 +110,20 @@ int DownloadCB::mirror_failure(void * user_cb_data, const char * msg, const char
+ 
+ 
+ bool KeyImportRepoCB::repokey_import(const libdnf5::rpm::KeyInfo & key_info) {
++    // Check Polkit authorization directly. When the dnf5daemon-server-polkit subpackage
++    // is installed, active local wheel-group users are pre-authorized and the key can be
++    // imported without the D-Bus signal/wait roundtrip that would otherwise hang clients
++    // like GNOME Software that don't handle the confirmation signal.
++    if (session.check_authorization(dnfdaemon::POLKIT_CONFIRM_KEY_IMPORT, session.get_sender(), interactive)) {
++        return true;
++    }
++
++    // If non-interactive and not authorized, reject immediately instead of waiting for a
++    // client confirmation that will never come.
++    if (!interactive) {
++        return false;
++    }
++
+     bool confirmed;
+     try {
+         auto signal = create_signal(dnfdaemon::INTERFACE_BASE, dnfdaemon::SIGNAL_REPO_KEY_IMPORT_REQUEST);
+@@ -123,7 +137,6 @@ bool KeyImportRepoCB::repokey_import(const libdnf5::rpm::KeyInfo & key_info) {
+     return confirmed;
+ }
+ 
+-
+ sdbus::Signal DbusTransactionCB::create_signal_pkg(
+     const SDBUS_INTERFACE_NAME_TYPE & interface,
+     const SDBUS_SIGNAL_NAME_TYPE & signal_name,
+-- 
+2.54.0
+

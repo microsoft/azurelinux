@@ -22,7 +22,7 @@
 Summary: KDE filesystem layout
 Name: kde-filesystem
 Version: 5
-Release: 9%{?dist}
+Release: 6%{?dist}
 
 License: LicenseRef-Not-Copyrightable
 

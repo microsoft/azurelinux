@@ -11,7 +11,7 @@
 
 Name:       rocm-bandwidth-test
 Version:    %{rocm_version}
-Release: 4%{?dist}
+Release:    1%{?dist}
 Summary:    Bandwidth test for ROCm
 
 # License mismatch

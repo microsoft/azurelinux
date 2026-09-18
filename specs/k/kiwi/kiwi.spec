@@ -17,24 +17,19 @@ and cloud systems like Xen, KVM, VMware, EC2 and more.
 
 
 Name:           kiwi
-Version:        10.2.37
-Release: 6%{?dist}
+Version:        10.3.11
+Release:        1%{?dist}
 URL:            http://osinside.github.io/kiwi/
 Summary:        Flexible operating system image builder
 License:        GPL-3.0-or-later
 # We must use the version uploaded to pypi, as it contains all the required files.
 Source0:        https://files.pythonhosted.org/packages/source/k/%{name}/%{name}-%{version}.tar.gz
 # qemu-img dependency is not available
-ExcludeArch:    %{ix86}
+ExcludeArch:    %{ix86} %{arm32}
 
 # Backports from upstream
-## Fix unit tests for aarch64 and ppc64le
-Patch0001:      https://github.com/OSInside/kiwi/pull/2937.patch
 
 # Proposed upstream
-## https://github.com/OSInside/kiwi/pull/2944
-## Fix crash when dracut doesn't have --printconfig error
-Patch0500:      0001-initrd-format-detection-make-dracut-printconfig-opti.patch
 
 # Fedora-specific patches
 ## Use buildah instead of umoci by default for OCI image builds
@@ -299,7 +294,6 @@ Requires:       kiwi-systemdeps-bootloaders = %{version}-%{release}
 Requires:       kiwi-systemdeps-iso-media = %{version}-%{release}
 Requires:       gdisk
 Requires:       lvm2
-Requires:       parted
 Requires:       kpartx
 Requires:       cryptsetup
 Requires:       mdadm
@@ -530,6 +524,9 @@ make buildroot=%{buildroot}/ install_dracut
 # Get rid of unnecessary doc files
 rm -rf %{buildroot}%{_docdir}/packages
 
+# Create ghost file for kiwi config
+touch %{buildroot}%{_sysconfdir}/kiwi.yml
+
 # Rename unversioned binaries
 mv %{buildroot}%{_bindir}/kiwi-ng %{buildroot}%{_bindir}/kiwi-ng-3
 
@@ -591,7 +588,10 @@ popd
 %{_bindir}/kiwi-ng
 %{_datadir}/bash-completion/completions/kiwi-ng
 %{_mandir}/man8/kiwi*
-%config(noreplace) %{_sysconfdir}/kiwi.yml
+%{_datadir}/kiwi/kiwi.yml.example
+%dir %{_datadir}/kiwi/kiwi.yml.d
+%dir %{_sysconfdir}/kiwi.yml.d
+%config(noreplace) %ghost %{_sysconfdir}/kiwi.yml
 
 %ifarch %{ix86} x86_64
 %files pxeboot
@@ -662,6 +662,27 @@ popd
 
 
 %changelog
+* Wed Aug 26 2026 Neal Gompa <ngompa@fedoraproject.org> - 10.3.11-1
+- Update to 10.3.11
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 10.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 10.3.0-3
+- Rebuilt for openssl 4.0
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 10.3.0-2
+- Rebuilt for Python 3.15
+
+* Mon Mar 30 2026 Neal Gompa <ngompa@fedoraproject.org> - 10.3.0-1
+- Update to 10.3.0
+
+* Fri Mar 13 2026 Neal Gompa <ngompa@fedoraproject.org> - 10.2.45-1
+- Update to 10.2.45
+
+* Thu Mar 12 2026 Neal Gompa <ngompa@fedoraproject.org> - 10.2.44-1
+- Update to 10.2.44
+
 * Mon Feb 02 2026 Adam Williamson <awilliam@redhat.com> - 10.2.37-3
 - Backport fix for crash when dracut doesn't have --printconfig option
 

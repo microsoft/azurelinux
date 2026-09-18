@@ -1,6 +1,6 @@
-diff -rupN --no-dereference Pillow-11.1.0/src/decode.c Pillow-11.1.0-new/src/decode.c
---- Pillow-11.1.0/src/decode.c	2025-01-02 06:00:59.000000000 +0100
-+++ Pillow-11.1.0-new/src/decode.c	2026-02-14 19:03:46.593414472 +0100
+diff -rupN --no-dereference Pillow-11.3.0/src/decode.c Pillow-11.3.0-new/src/decode.c
+--- Pillow-11.3.0/src/decode.c	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/src/decode.c	2026-07-19 08:50:48.110511586 +0200
 @@ -186,7 +186,8 @@ _setimage(ImagingDecoderObject *decoder,
          state->ysize = y1 - y0;
      }
@@ -11,10 +11,10 @@ diff -rupN --no-dereference Pillow-11.1.0/src/decode.c Pillow-11.1.0-new/src/dec
          state->ysize <= 0 || state->ysize + state->yoff > (int)im->ysize) {
          PyErr_SetString(PyExc_ValueError, "tile cannot extend outside image");
          return NULL;
-diff -rupN --no-dereference Pillow-11.1.0/src/encode.c Pillow-11.1.0-new/src/encode.c
---- Pillow-11.1.0/src/encode.c	2025-01-02 06:00:59.000000000 +0100
-+++ Pillow-11.1.0-new/src/encode.c	2026-02-14 19:03:46.593719582 +0100
-@@ -253,7 +253,8 @@ _setimage(ImagingEncoderObject *encoder,
+diff -rupN --no-dereference Pillow-11.3.0/src/encode.c Pillow-11.3.0-new/src/encode.c
+--- Pillow-11.3.0/src/encode.c	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/src/encode.c	2026-07-19 08:50:48.110954189 +0200
+@@ -254,7 +254,8 @@ _setimage(ImagingEncoderObject *encoder,
          state->ysize = y1 - y0;
      }
  

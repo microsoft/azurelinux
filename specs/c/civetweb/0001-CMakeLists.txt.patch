@@ -1,9 +1,35 @@
---- civetweb-1.16/CMakeLists.txt.orig	2025-07-16 07:44:16.982762892 -0400
-+++ civetweb-1.16/CMakeLists.txt	2025-07-16 07:44:32.894505768 -0400
-@@ -1,5 +1,5 @@
+--- civetweb-1.16/CMakeLists.txt.orig	2023-04-08 11:38:36.000000000 -0400
++++ civetweb-1.16/CMakeLists.txt	2026-08-07 13:43:10.279677132 -0400
+@@ -1,8 +1,6 @@
  # Use at least CMake 3.3
 -cmake_minimum_required (VERSION 3.3.0)
-+cmake_minimum_required (VERSION 3.3.0...4.0)
- cmake_policy(VERSION 3.2.2)
- cmake_policy(SET CMP0054 NEW)
- cmake_policy(SET CMP0057 NEW)
+-cmake_policy(VERSION 3.2.2)
+-cmake_policy(SET CMP0054 NEW)
+-cmake_policy(SET CMP0057 NEW)
++cmake_minimum_required (VERSION 3.10)
++cmake_policy(VERSION 3.10)
+ 
+ # Set up the project
+ project (civetweb)
+@@ -88,6 +86,11 @@
+ option(CIVETWEB_ENABLE_WEBSOCKETS "Enable websockets connections" OFF)
+ message(STATUS "Websockets support - ${CIVETWEB_ENABLE_WEBSOCKETS}")
+ 
++# X DOM sockets support
++option(CIVETWEB_ENABLE_X_DOM_SOCKET "Enable X DOM sockets support" OFF)
++message(STATUS "X DOM sockets support - ${CIVETWEB_ENABLE_X_DOM_SOCKET}")
++
++
+ # Server statistics support
+ option(CIVETWEB_ENABLE_SERVER_STATS "Enable server statistics" OFF)
+ message(STATUS "Server statistics support - ${CIVETWEB_ENABLE_SERVER_STATS}")
+@@ -494,6 +497,9 @@
+ if (CIVETWEB_ENABLE_WEBSOCKETS)
+   add_definitions(-DUSE_WEBSOCKET)
+ endif()
++if (CIVETWEB_ENABLE_X_DOM_SOCKET)
++   add_definitions(-DUSE_X_DOM_SOCKET)
++endif()
+ if (CIVETWEB_ENABLE_SERVER_STATS)
+   add_definitions(-DUSE_SERVER_STATS)
+ endif()

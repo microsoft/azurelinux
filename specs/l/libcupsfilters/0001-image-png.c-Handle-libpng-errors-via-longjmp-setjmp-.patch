@@ -1,0 +1,122 @@
+From e8888af31419acbd0cbcc8340f41a383f35aae12 Mon Sep 17 00:00:00 2001
+From: zdohnal <zdohnal@redhat.com>
+Date: Thu, 23 Jul 2026 12:50:20 +0200
+Subject: [PATCH] image-png.c: Handle libpng errors via longjmp()/setjmp()
+ (#168)
+
+Libpng expects callers to set their own error handlers if they don't
+want to abort the whole process, and this has to be handled by
+longjmp()/setjmp().
+
+It follows the C standard, so any C-standard compliant compiler should
+work fine. Setting pointers as volatile is to prevent possible undefined
+behavior.
+
+Fixes CVE-2026-64612
+
+Assisted-by: Claude Code by Anthropic
+---
+ cupsfilters/image-png.c | 73 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 68 insertions(+), 5 deletions(-)
+
+diff --git a/cupsfilters/image-png.c b/cupsfilters/image-png.c
+index a6fd9a6d..9f482faf 100644
+--- a/cupsfilters/image-png.c
++++ b/cupsfilters/image-png.c
+@@ -20,6 +20,35 @@
+ 
+ #ifdef HAVE_LIBPNG
+ #  include <png.h>	// Portable Network Graphics (PNG) definitions
++#  include <setjmp.h>
++
++
++//
++// Custom error handler for libpng — longjmp() back to the setjmp()
++// point in the caller instead of the default abort(), so a malformed
++// PNG results in a graceful error return.
++//
++
++static void
++cf_image_png_error_callback(png_structp     png,
++                            png_const_charp error_msg)
++{
++  DEBUG_printf(("DEBUG: libpng error: %s\n", error_msg));
++  longjmp(png_jmpbuf(png), 1);
++}
++
++
++//
++// Custom warning handler for libpng — log non-fatal issues
++// and return normally so processing continues.
++//
++
++static void
++cf_image_png_warning_callback(png_structp     png,
++                              png_const_charp warning_msg)
++{
++  DEBUG_printf(("DEBUG: libpng warning: %s\n", warning_msg));
++}
+ 
+ 
+ //
+@@ -51,18 +80,52 @@ _cfImageReadPNG(
+   int		bpp;			// Bytes per pixel
+   int		pass,			// Current pass
+ 		passes;			// Number of passes required
+-  cf_ib_t	*in,			// Input pixels
+-		*inptr,			// Pointer into pixels
+-		*out;			// Output pixels
++  cf_ib_t	* volatile in = NULL;	// Input pixels (volatile for setjmp)
++  cf_ib_t	*inptr;			// Pointer into pixels
++  cf_ib_t	* volatile out = NULL;	// Output pixels (volatile for setjmp)
+   png_color_16	bg;			// Background color
+ 
+ 
+   //
+-  // Setup the PNG data structures...
++  // Setup the PNG data structures with custom error/warning handlers
++  // so that a malformed PNG causes an error return instead of abort().
++  // Errors during struct creation are handled internally by libpng
++  // and result in a NULL return. Errors in any png_*() call after
++  // setjmp() trigger our error callback which longjmp()s back.
+   //
+ 
+-  pp   = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
++  pp = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,
++                              cf_image_png_error_callback,
++                              cf_image_png_warning_callback);
++  if (pp == NULL)
++  {
++    fclose(fp);
++    return (1);
++  }
++
+   info = png_create_info_struct(pp);
++  if (info == NULL)
++  {
++    png_destroy_read_struct(&pp, NULL, NULL);
++    fclose(fp);
++    return (1);
++  }
++
++  //
++  // Error handling jump point — if any png_*() call below triggers
++  // png_error(), our callback longjmp()s back here. The 'in' and
++  // 'out' pointers are initialized to NULL so free() is safe here
++  // even if longjmp() reverts them (C11 §7.13.2.1).
++  //
++
++  if (setjmp(png_jmpbuf(pp)))
++  {
++    free(in);
++    free(out);
++    png_destroy_read_struct(&pp, &info, NULL);
++    fclose(fp);
++    return (1);
++  }
+ 
+   //
+   // Initialize the PNG read "engine"...
+-- 
+2.55.0
+

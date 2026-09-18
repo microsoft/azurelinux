@@ -6,7 +6,7 @@
 Summary:	Persistent connections using Net::HTTP plus a speed fix
 Name:		rubygem-%{gem_name}
 Version:	4.0.6
-Release: 5%{?dist}
+Release:	2%{?dist}
 # SPDX confirmed
 License:	MIT
 

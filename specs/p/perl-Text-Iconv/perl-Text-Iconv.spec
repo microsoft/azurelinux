@@ -3,7 +3,7 @@
 
 Name:           perl-Text-Iconv
 Version:        1.7
-Release: 60%{?dist}
+Release:        57%{?dist}
 Summary:        Perl interface to iconv() codeset conversion function
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

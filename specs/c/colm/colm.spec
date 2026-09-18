@@ -3,7 +3,7 @@
 
 Name:           colm
 Version:        0.14.7
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        Programming language designed for the analysis of computer languages
 
 # aapl/ and some headers from src/ are the LGPLv2+

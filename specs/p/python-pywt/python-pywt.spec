@@ -7,7 +7,7 @@
 
 Name:           python-%{modname}
 Version:        1.8.0
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        PyWavelets, wavelet transform module
 License:        MIT
 URL:            https://pywavelets.readthedocs.io/en/latest

@@ -1,0 +1,46 @@
+From a16614accfdb3481264d7281843fadf439d9ab1b Mon Sep 17 00:00:00 2001
+From: Jan Friesse <jfriesse@redhat.com>
+Date: Thu, 2 Apr 2026 09:00:39 +0200
+Subject: [PATCH 1/2] totemsrp: Return error if sanity check fails
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Previously, the check_memb_commit_token_sanity function correctly
+checked the minimum message length. However, if the message was too
+short, it incorrectly returned a success code (0) instead of the
+expected failure code (-1).
+
+This commit ensures the appropriate error code is returned when the
+message length sanity check fails.
+
+Fixes: CVE-2026-35091
+
+Reported-by: Sebastián Alba Vives (@Sebasteuo / 0xS4bb1) <sebasjosue84@gmail.com>
+Signed-off-by: Jan Friesse <jfriesse@redhat.com>
+Also-proposed-by: nicholasyang <nicholas.yang@suse.com>
+Reviewed-by: Christine Caulfield <ccaulfie@redhat.com>
+---
+ exec/totemsrp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/exec/totemsrp.c b/exec/totemsrp.c
+index a716ae9..372a96d 100644
+--- a/exec/totemsrp.c
++++ b/exec/totemsrp.c
+@@ -3811,10 +3811,10 @@ static int check_memb_commit_token_sanity(
+ 		log_printf (instance->totemsrp_log_level_security,
+ 		    "Received memb_commit_token message is too short...  ignoring.");
+ 
+-		return (0);
++		return (-1);
+ 	}
+ 
+-	addr_entries= mct_msg->addr_entries;
++	addr_entries = mct_msg->addr_entries;
+ 	if (endian_conversion_needed) {
+ 		addr_entries = swab32(addr_entries);
+ 	}
+-- 
+1.8.3.1
+

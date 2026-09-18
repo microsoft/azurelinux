@@ -1,9 +1,12 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# ltx2unitxt(1) manual page conflicts with texlive-bibtexperllibs
+%global install_ltx2unitxt_manual 0
+
 Name:           perl-LaTeX-ToUnicode
-Version:        1.93
-Release: 2%{?dist}
+Version:        1.95
+Release:        1%{?dist}
 Summary:        Convert LaTeX commands to Unicode
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/LaTeX-ToUnicode
@@ -13,9 +16,13 @@ Source0:        https://cpan.metacpan.org/authors/id/B/BO/BORISV/LaTeX-ToUnicode
 Patch0:         LaTeX-ToUnicode-0.53-Do-not-add-bogus-paths-to-INC.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
+%if %{install_ltx2unitxt_manual}
+BuildRequires:  help2man
+%endif
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(:VERSION) >= 5.8.0
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
@@ -54,10 +61,17 @@ done
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{make_build}
+%if %{install_ltx2unitxt_manual}
+PERL5LIB=lib %{make_build} -f Makefile.TDS ltx2unitxt.1
+%endif
 
 %install
 %{make_install}
 %{_fixperms} %{buildroot}/*
+%if %{install_ltx2unitxt_manual}
+# Install generated documentation
+install -m 0644 -D -t %{buildroot}/%{_mandir}/man1 ltx2unitxt.1
+%endif
 # Install tests
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
 cp -a t %{buildroot}%{_libexecdir}/%{name}
@@ -78,6 +92,9 @@ make test
 %{perl_vendorlib}/LaTeX/ToUnicode
 %{perl_vendorlib}/LaTeX/ToUnicode.pm
 %{_bindir}/ltx2unitxt
+%if %{install_ltx2unitxt_manual}
+%{_mandir}/man1/ltx2unitxt.*
+%endif
 %{_mandir}/man3/LaTeX::ToUnicode.*
 %{_mandir}/man3/LaTeX::ToUnicode::*
 
@@ -85,6 +102,16 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jun 24 2026 Petr Pisar <ppisar@redhat.com> - 1.95-1
+- 1.95 bump
+
+* Tue Jun 23 2026 Petr Pisar <ppisar@redhat.com> - 1.94-2
+- Do not install ltx2unitxt(1) manual page because it is packaged in
+  texlive-bibtexperllibs
+
+* Tue Jun 23 2026 Petr Pisar <ppisar@redhat.com> - 1.94-1
+- 1.94 bump
+
 * Mon Sep 01 2025 Petr Pisar <ppisar@redhat.com> - 1.93-1
 - 1.93 bump
 

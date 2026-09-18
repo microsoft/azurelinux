@@ -1,3 +1,4 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Lemenkov <lemenkov@gmail.com>
 Date: Fri, 28 Jun 2024 15:45:38 +0200
 Subject: [PATCH] Disable non-deterministic tarball checksum tests
@@ -5,17 +6,18 @@ Subject: [PATCH] Disable non-deterministic tarball checksum tests
 Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
 
 diff --git a/test/hex_tarball_SUITE.erl b/test/hex_tarball_SUITE.erl
-index 5f7f398..a9a79c2 100644
+index 3945a74..b87caf1 100644
 --- a/test/hex_tarball_SUITE.erl
 +++ b/test/hex_tarball_SUITE.erl
-@@ -8,14 +8,12 @@
+@@ -8,7 +8,6 @@
  
  all() ->
      [
 -        disk_test,
          timestamps_and_permissions_test,
          symlinks_test,
-         memory_test,
+         symlinks_parent_dir_test,
+@@ -18,7 +17,6 @@ all() ->
          build_tools_test,
          requirements_test,
          decode_metadata_test,
@@ -23,7 +25,7 @@ index 5f7f398..a9a79c2 100644
          docs_test,
          too_big_to_create_test,
          too_big_to_unpack_test,
-@@ -73,46 +71,6 @@ memory_test(_Config) ->
+@@ -92,47 +90,6 @@ memory_test(_Config) ->
      }} = hex_tarball:unpack(Tarball, memory),
      ok.
  
@@ -41,15 +43,16 @@ index 5f7f398..a9a79c2 100644
 -    ok = file:change_mode(Foo, 8#100644),
 -    ok = file:write_file(filename:join(SrcDir, "not_whitelisted.erl"), <<"">>),
 -
--    Files = [{"empty", EmptyDir}, {"src", SrcDir}, {"src/foo.erl", Foo}],
+-    Files = [{"empty", "empty"}, {"src", "src"}, {"src/foo.erl", filename:join("src", "foo.erl")}],
 -    Metadata = #{
 -        <<"name">> => <<"foo">>, <<"version">> => <<"1.0.0">>, <<"build_tool">> => <<"rebar3">>
 -    },
+-    CreateConfig = maps:put(tarball_files_root, BaseDir, hex_core:default_config()),
 -    {ok, #{tarball := Tarball, inner_checksum := InnerChecksum, outer_checksum := OuterChecksum}} = hex_tarball:create(
--        Metadata, Files
+-        Metadata, Files, CreateConfig
 -    ),
 -    ?assertEqual(
--        <<"6D47908182CC721920B2F2C1D5777ED9E9EDBD86A29638448D97588AA0419C98">>,
+-        <<"3DED88F7BAC738294907ACEED89FE63C9914713F988E608F2B17D7AE6EAC8446">>,
 -        hex_tarball:format_checksum(OuterChecksum)
 -    ),
 -    {ok, #{inner_checksum := InnerChecksum, outer_checksum := OuterChecksum, metadata := Metadata}} = hex_tarball:unpack(
@@ -70,7 +73,7 @@ index 5f7f398..a9a79c2 100644
  timestamps_and_permissions_test(Config) ->
      BaseDir = ?config(priv_dir, Config),
      Foo = filename:join(BaseDir, "foo.sh"),
-@@ -275,59 +233,6 @@ decode_metadata_test(_Config) ->
+@@ -626,59 +583,6 @@ decode_metadata_test(_Config) ->
  
      ok.
  

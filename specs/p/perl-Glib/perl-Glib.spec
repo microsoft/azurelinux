@@ -10,7 +10,7 @@
 
 Name:           perl-Glib
 Version:        1.3294
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Perl interface to GLib
 License:        LGPL-2.1-or-later
 URL:            https://metacpan.org/release/Glib

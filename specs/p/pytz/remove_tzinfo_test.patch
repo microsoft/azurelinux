@@ -10,3 +10,15 @@ index b2640a8..4f5322b 100644
      def testRoundtrip(self):
          for zone in pytz.all_timezones:
              tz = pytz.timezone(zone)
+--- pytz-2026.3/pytz/tests/test_tzinfo.py.old	2026-08-04 13:16:32.483752520 -0500
++++ pytz-2026.3/pytz/tests/test_tzinfo.py	2026-08-04 13:16:53.250488191 -0500
+@@ -726,8 +726,8 @@
+         self.assertNotIn('Europe/Belfast', pytz.common_timezones)
+         self.assertNotIn('Europe/Belfast', pytz.common_timezones_set)
+ 
+-
+ class ZoneCaseInsensitivityTestCase(unittest.TestCase):
++    @unittest.skip('Fails with system-wide timezone database')
+     def test_lower_case_timezone_constructor_arg(self):
+         for tz in pytz.all_timezones_set:
+             from_lower = pytz.timezone(tz.lower())

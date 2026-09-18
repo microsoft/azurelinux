@@ -1,13 +1,35 @@
---- sequoia-wot-0.14.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ sequoia-wot-0.14.0/Cargo.toml	2025-03-08T12:15:32.749387+00:00
-@@ -85,10 +85,3 @@
- ]
+--- sequoia-wot-0.15.2/Cargo.toml	2006-07-24T01:21:28+00:00
++++ sequoia-wot-0.15.2/Cargo.toml	2026-05-27T17:12:00.552673+00:00
+@@ -78,27 +78,10 @@
+ version = "1"
  default-features = false
  
+-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies.chrono]
+-version = "0.4"
+-features = [
+-    "std",
+-    "wasmbind",
+-    "clock",
+-]
+-default-features = false
+-
+ [target."cfg(not(windows))".dev-dependencies.sequoia-openpgp]
+ version = "2"
+ features = [
+     "crypto-nettle",
+-    "__implicit-crypto-backend-for-tests",
+-]
+-default-features = false
+-
 -[target."cfg(windows)".dev-dependencies.sequoia-openpgp]
 -version = "2"
 -features = [
 -    "crypto-cng",
--    "__implicit-crypto-backend-for-tests",
--]
--default-features = false
+     "__implicit-crypto-backend-for-tests",
+ ]
+ default-features = false
+@@ -114,3 +97,4 @@
+ [lints.clippy.suspicious]
+ level = "deny"
+ priority = -1
++

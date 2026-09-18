@@ -5,7 +5,7 @@
  
 Name:		rb_libtorrent
 Version:	2.0.11
-Release: 6%{?dist}
+Release:	3%{?dist}
 Summary:	A C++ BitTorrent library aiming to be the best alternative
 
 License:	BSD
