@@ -1,0 +1,84 @@
+From 464ce7ca989e1274a6b1ece3d075e88b666a7a77 Mon Sep 17 00:00:00 2001
+From: DavidBar-On <david.cdb004@gmail.com>
+Date: Fri, 27 Sep 2024 18:33:58 +0300
+Subject: [PATCH] Fix for #1776 - do not limit JSON size for --get-server-output
+
+The MAX_PARAMS_JSON_STRING limit introduced by the CVE-2026-71218 fix
+(upstream 0128d035) is only meant to bound the Parameters JSON exchanged
+during PARAM_EXCHANGE. JSON_read() is shared by get_parameters() and
+get_results(), so the limit was also applied to the Results JSON, whose
+size grows with the number of streams (~152 bytes per stream). With
+-P 53 or more (or roughly -P 18 with --get-server-output) the Results
+JSON exceeds 8 KiB, JSON_read() returns NULL, get_results() fails with
+IERECVRESULTS and iperf_run_client() jumps to cleanup_and_fail, which
+calls pthread_cancel() on sender threads that were already cancelled and
+joined, crashing the client with SIGSEGV.
+
+Pass the maximum allowed size to JSON_read() so that only the Parameters
+exchange is bounded by MAX_PARAMS_JSON_STRING, while the Results
+exchange (max_size == 0) stays unbounded.
+
+Backported to 3.17.1: the upstream hunk for the size check does not apply
+as-is because the CVE-2026-71218 backport in this tree folded the "read
+size" and "size is reasonable" tests into a single if statement instead of
+upstream's nested ifs. The condition is adjusted in place, keeping the
+upstream semantics including the "hsize > 0" test.
+
+Signed-off-by: Azure Linux Security Servicing Account <azurelinux-security@microsoft.com>
+Upstream-reference: https://github.com/esnet/iperf/commit/464ce7ca989e1274a6b1ece3d075e88b666a7a77.patch
+---
+ src/iperf_api.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/iperf_api.c b/src/iperf_api.c
+index 356c6ff..dbb9bc0 100644
+--- a/src/iperf_api.c
++++ b/src/iperf_api.c
+@@ -99,7 +99,7 @@ static int diskfile_send(struct iperf_stream *sp);
+ static int diskfile_recv(struct iperf_stream *sp);
+ static int JSON_write(int fd, cJSON *json);
+ static void print_interval_results(struct iperf_test *test, struct iperf_stream *sp, cJSON *json_interval_streams);
+-static cJSON *JSON_read(int fd);
++static cJSON *JSON_read(int fd, int max_size);
+ static int JSONStream_Output(struct iperf_test *test, const char* event_name, cJSON* obj);
+ 
+ 
+@@ -2305,7 +2305,7 @@ get_parameters(struct iperf_test *test)
+     cJSON *j;
+     cJSON *j_p;
+ 
+-    j = JSON_read(test->ctrl_sck);
++    j = JSON_read(test->ctrl_sck, MAX_PARAMS_JSON_STRING);
+     if (j == NULL) {
+ 	i_errno = IERECVPARAMS;
+         r = -1;
+@@ -2647,7 +2647,7 @@ get_results(struct iperf_test *test)
+     int retransmits;
+     struct iperf_stream *sp;
+ 
+-    j = JSON_read(test->ctrl_sck);
++    j = JSON_read(test->ctrl_sck, 0);
+     if (j == NULL) {
+ 	i_errno = IERECVRESULTS;
+         r = -1;
+@@ -2835,7 +2835,7 @@ JSON_write(int fd, cJSON *json)
+ /*************************************************************/
+ 
+ static cJSON *
+-JSON_read(int fd)
++JSON_read(int fd, int max_size)
+ {
+     uint32_t hsize, nsize;
+     size_t strsize;
+@@ -2850,7 +2850,7 @@ JSON_read(int fd)
+      */
+     rc = Nread(fd, (char*) &nsize, sizeof(nsize), Ptcp);
+     hsize = ntohl(nsize);
+-    if (rc == sizeof(nsize) && hsize <= MAX_PARAMS_JSON_STRING) {
++    if (rc == sizeof(nsize) && hsize > 0 && (max_size == 0 || hsize <= max_size)) {
+ 	/* Allocate a buffer to hold the JSON */
+ 	strsize = hsize + 1;              /* +1 for trailing NULL */
+ 	if (strsize) {
+-- 
+2.45.4
+
