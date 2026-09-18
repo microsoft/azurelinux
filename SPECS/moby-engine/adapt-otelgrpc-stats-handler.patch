@@ -1,0 +1,242 @@
+From 5293bbc7aca11353e92ea7ee03a9b91c4da6f6ac Mon Sep 17 00:00:00 2001
+From: akhila-guruju <v-guakhila@microsoft.com>
+Date: Thu, 17 Sep 2026 06:21:43 +0000
+Subject: [PATCH] vendor: use otelgrpc stats handlers instead of the removed
+ unary interceptors
+
+The regenerated vendor tree pulls google.golang.org/grpc v1.83.2, which requires
+gax-go v2.17.0 -> google.golang.org/api v0.264.0 -> otelgrpc v0.61.0. Those are
+hard minimums, so otelgrpc cannot be held back.
+
+otelgrpc deprecated UnaryClientInterceptor / UnaryServerInterceptor in v0.46 and
+deleted them in v0.60, replacing them with gRPC stats handlers created by
+NewClientHandler / NewServerHandler. Moby 25.0.3 and the vendored buildkit
+v0.12.5 still call the deleted functions, so the build fails with
+"undefined: otelgrpc.UnaryServerInterceptor".
+
+This is the same migration upstream moby performed in v27.0.0.
+
+Notes on the conversion:
+
+  * A stats handler instruments unary *and* streaming RPCs, so the paired
+    otelgrpc.Stream*Interceptor calls are dropped as well; keeping them would
+    double-report every stream. The grpcerrors interceptors are untouched.
+
+  * The interceptor-based method filters are replaced by otelgrpc.WithFilter,
+    which takes a func(*stats.RPCTagInfo) bool. Note the inverted sense: the
+    filter returns true for RPCs that should be traced, whereas the old
+    wrappers returned early for RPCs that should be skipped. The two filtered
+    methods are preserved:
+      - TraceService/Export, which must not be traced or the trace exporter
+        would feed itself (infinite loop);
+      - Health/Check, whose 5s polling would otherwise flood the trace.
+
+  * filterServer/filterClient (session.go) and filterInterceptor (client.go)
+    become dead code once their callers are gone, so each is replaced in place
+    by the equivalent stats filter.
+
+Files changed (6), all six remaining otelgrpc.Unary* call sites:
+  api/server/router/grpc/grpc.go              server, TraceService/Export filter
+  daemon/daemon.go                            containerd client
+  libcontainerd/supervisor/remote_daemon.go   containerd client
+  vendor/.../buildkit/client/client.go        client, TraceService/Export filter
+  vendor/.../buildkit/session/grpc.go         client, Health/Check filter
+  vendor/.../buildkit/session/session.go      server, Health/Check filter
+
+Verified: cmd/dockerd and cmd/docker-proxy both build against the regenerated
+vendor tree with all preceding patches applied.
+---
+diff --git a/api/server/router/grpc/grpc.go b/api/server/router/grpc/grpc.go
+--- a/api/server/router/grpc/grpc.go
++++ b/api/server/router/grpc/grpc.go
+@@ -1,15 +1,14 @@
+ package grpc // import "github.com/docker/docker/api/server/router/grpc"
+ 
+ import (
+-	"context"
+ 	"strings"
+ 
+ 	"github.com/docker/docker/api/server/router"
+-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+ 	"github.com/moby/buildkit/util/grpcerrors"
+ 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+ 	"golang.org/x/net/http2"
+ 	"google.golang.org/grpc"
++	"google.golang.org/grpc/stats"
+ )
+ 
+ type grpcRouter struct {
+@@ -20,12 +19,14 @@
+ 
+ // NewRouter initializes a new grpc http router
+ func NewRouter(backends ...Backend) router.Router {
+-	unary := grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(unaryInterceptor(), grpcerrors.UnaryServerInterceptor))
+-	stream := grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(otelgrpc.StreamServerInterceptor(), grpcerrors.StreamServerInterceptor))
++	unary := grpc.UnaryInterceptor(grpcerrors.UnaryServerInterceptor)
++	stream := grpc.StreamInterceptor(grpcerrors.StreamServerInterceptor)
++	// A single stats handler replaces the otelgrpc unary and stream interceptors.
++	tracing := grpc.StatsHandler(otelgrpc.NewServerHandler(otelgrpc.WithFilter(filterTraceExport)))
+ 
+ 	r := &grpcRouter{
+ 		h2Server:   &http2.Server{},
+-		grpcServer: grpc.NewServer(unary, stream),
++		grpcServer: grpc.NewServer(unary, stream, tracing),
+ 	}
+ 	for _, b := range backends {
+ 		b.RegisterGRPC(r.grpcServer)
+@@ -45,16 +46,8 @@
+ 	}
+ }
+ 
+-func unaryInterceptor() grpc.UnaryServerInterceptor {
+-	withTrace := otelgrpc.UnaryServerInterceptor()
+-
+-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+-		// This method is used by the clients to send their traces to buildkit so they can be included
+-		// in the daemon trace and stored in the build history record. This method can not be traced because
+-		// it would cause an infinite loop.
+-		if strings.HasSuffix(info.FullMethod, "opentelemetry.proto.collector.trace.v1.TraceService/Export") {
+-			return handler(ctx, req)
+-		}
+-		return withTrace(ctx, req, info, handler)
+-	}
++// filterTraceExport excludes the endpoint clients use to push their own traces
++// into the daemon; tracing it would feed the exporter its own spans.
++func filterTraceExport(i *stats.RPCTagInfo) bool {
++	return !strings.HasSuffix(i.FullMethodName, "opentelemetry.proto.collector.trace.v1.TraceService/Export")
+ }
+diff --git a/daemon/daemon.go b/daemon/daemon.go
+--- a/daemon/daemon.go
++++ b/daemon/daemon.go
+@@ -962,8 +962,7 @@
+ 		// TODO(stevvooe): We may need to allow configuration of this on the client.
+ 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(defaults.DefaultMaxRecvMsgSize)),
+ 		grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(defaults.DefaultMaxSendMsgSize)),
+-		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+-		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()),
++		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+ 	}
+ 
+ 	if cfgStore.ContainerdAddr != "" {
+diff --git a/libcontainerd/supervisor/remote_daemon.go b/libcontainerd/supervisor/remote_daemon.go
+--- a/libcontainerd/supervisor/remote_daemon.go
++++ b/libcontainerd/supervisor/remote_daemon.go
+@@ -302,8 +302,7 @@
+ 				r.GRPC.Address,
+ 				containerd.WithTimeout(60*time.Second),
+ 				containerd.WithDialOpts([]grpc.DialOption{
+-					grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+-					grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()),
++					grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+ 					grpc.WithTransportCredentials(insecure.NewCredentials()),
+ 					grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(defaults.DefaultMaxRecvMsgSize)),
+ 					grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(defaults.DefaultMaxSendMsgSize)),
+diff --git a/vendor/github.com/moby/buildkit/client/client.go b/vendor/github.com/moby/buildkit/client/client.go
+--- a/vendor/github.com/moby/buildkit/client/client.go
++++ b/vendor/github.com/moby/buildkit/client/client.go
+@@ -29,6 +29,7 @@
+ 	"google.golang.org/grpc/codes"
+ 	"google.golang.org/grpc/credentials"
+ 	"google.golang.org/grpc/credentials/insecure"
++	"google.golang.org/grpc/stats"
+ )
+ 
+ type Client struct {
+@@ -105,8 +106,11 @@
+ 
+ 	if tracerProvider != nil {
+ 		var propagators = propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{})
+-		unary = append(unary, filterInterceptor(otelgrpc.UnaryClientInterceptor(otelgrpc.WithTracerProvider(tracerProvider), otelgrpc.WithPropagators(propagators))))
+-		stream = append(stream, otelgrpc.StreamClientInterceptor(otelgrpc.WithTracerProvider(tracerProvider), otelgrpc.WithPropagators(propagators)))
++		gopts = append(gopts, grpc.WithStatsHandler(otelgrpc.NewClientHandler(
++			otelgrpc.WithTracerProvider(tracerProvider),
++			otelgrpc.WithPropagators(propagators),
++			otelgrpc.WithFilter(filterTraceExport),
++		)))
+ 	}
+ 
+ 	if needDialer {
+@@ -390,13 +394,9 @@
+ 	return dialer, nil
+ }
+ 
+-func filterInterceptor(intercept grpc.UnaryClientInterceptor) grpc.UnaryClientInterceptor {
+-	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+-		if strings.HasSuffix(method, "opentelemetry.proto.collector.trace.v1.TraceService/Export") {
+-			return invoker(ctx, method, req, reply, cc, opts...)
+-		}
+-		return intercept(ctx, method, req, reply, cc, invoker, opts...)
+-	}
++// filterTraceExport keeps the trace-export RPC itself out of the trace.
++func filterTraceExport(i *stats.RPCTagInfo) bool {
++	return !strings.HasSuffix(i.FullMethodName, "opentelemetry.proto.collector.trace.v1.TraceService/Export")
+ }
+ 
+ type withGRPCDialOption struct {
+diff --git a/vendor/github.com/moby/buildkit/session/grpc.go b/vendor/github.com/moby/buildkit/session/grpc.go
+--- a/vendor/github.com/moby/buildkit/session/grpc.go
++++ b/vendor/github.com/moby/buildkit/session/grpc.go
+@@ -47,8 +47,11 @@
+ 	}
+ 
+ 	if span := trace.SpanFromContext(ctx); span.SpanContext().IsValid() {
+-		unary = append(unary, filterClient(otelgrpc.UnaryClientInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators))))
+-		stream = append(stream, otelgrpc.StreamClientInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators)))
++		dialOpts = append(dialOpts, grpc.WithStatsHandler(otelgrpc.NewClientHandler(
++			otelgrpc.WithTracerProvider(span.TracerProvider()),
++			otelgrpc.WithPropagators(propagators),
++			otelgrpc.WithFilter(filterHealthCheck),
++		)))
+ 	}
+ 
+ 	unary = append(unary, grpcerrors.UnaryClientInterceptor)
+diff --git a/vendor/github.com/moby/buildkit/session/session.go b/vendor/github.com/moby/buildkit/session/session.go
+--- a/vendor/github.com/moby/buildkit/session/session.go
++++ b/vendor/github.com/moby/buildkit/session/session.go
+@@ -16,6 +16,7 @@
+ 	"google.golang.org/grpc"
+ 	"google.golang.org/grpc/health"
+ 	"google.golang.org/grpc/health/grpc_health_v1"
++	"google.golang.org/grpc/stats"
+ )
+ 
+ const (
+@@ -59,8 +60,11 @@
+ 	serverOpts := []grpc.ServerOption{}
+ 
+ 	if span := trace.SpanFromContext(ctx); span.SpanContext().IsValid() {
+-		unary = append(unary, filterServer(otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators))))
+-		stream = append(stream, otelgrpc.StreamServerInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators)))
++		serverOpts = append(serverOpts, grpc.StatsHandler(otelgrpc.NewServerHandler(
++			otelgrpc.WithTracerProvider(span.TracerProvider()),
++			otelgrpc.WithPropagators(propagators),
++			otelgrpc.WithFilter(filterHealthCheck),
++		)))
+ 	}
+ 
+ 	unary = append(unary, grpcerrors.UnaryServerInterceptor)
+@@ -168,21 +172,7 @@
+ 	return "/" + s + "/" + m
+ }
+ 
+-// updates needed in opentelemetry-contrib to avoid this
+-func filterServer(intercept grpc.UnaryServerInterceptor) grpc.UnaryServerInterceptor {
+-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+-		if strings.HasSuffix(info.FullMethod, "Health/Check") {
+-			return handler(ctx, req)
+-		}
+-		return intercept(ctx, req, info, handler)
+-	}
+-}
+-
+-func filterClient(intercept grpc.UnaryClientInterceptor) grpc.UnaryClientInterceptor {
+-	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+-		if strings.HasSuffix(method, "Health/Check") {
+-			return invoker(ctx, method, req, reply, cc, opts...)
+-		}
+-		return intercept(ctx, method, req, reply, cc, invoker, opts...)
+-	}
++// filterHealthCheck keeps the periodic health-check chatter out of the trace.
++func filterHealthCheck(i *stats.RPCTagInfo) bool {
++	return !strings.HasSuffix(i.FullMethodName, "Health/Check")
+ }
