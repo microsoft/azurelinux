@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The Fedora WSL out of box experience script.
+# The Azure Linux WSL out of box experience script.
 #
 # This command runs the first time the user opens an interactive shell if
 # `cloud-init-main` is not enabled.
