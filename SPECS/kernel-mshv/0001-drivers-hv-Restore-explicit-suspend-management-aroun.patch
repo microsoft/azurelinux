@@ -1,0 +1,33 @@
+diff --git a/drivers/hv/mshv_root_main.c b/drivers/hv/mshv_root_main.c
+index 5c927c3de411..400a1c5e2df9 100644
+--- a/drivers/hv/mshv_root_main.c
++++ b/drivers/hv/mshv_root_main.c
+@@ -1024,6 +1024,12 @@ static long mshv_run_vp_with_root_scheduler(struct mshv_vp *vp)
+ 			return ret;
+ 	}
+ 
++	if (!vp->run.flags.intercept_suspend) {
++		ret = mshv_vp_clear_explicit_suspend(vp);
++		if (ret)
++			return ret;
++	}
++
+ 	do {
+ 		u32 flags = 0;
+ 		struct hv_output_dispatch_vp output;
+@@ -1074,6 +1080,15 @@ static long mshv_run_vp_with_root_scheduler(struct mshv_vp *vp)
+ 				if (ret)
+ 					break;
+ 			}
++
++			/*
++			 * Wait for the hypervisor to unblock the VP before
++			 * re-dispatching. The VP cannot be dispatched while in
++			 * the blocked state.
++			 */
++			ret = mshv_vp_wait_for_hv_kick(vp);
++			if (ret)
++				break;
+ 		} else {
+ 			/* HV_VP_DISPATCH_STATE_READY */
+ 			if (output.dispatch_event ==

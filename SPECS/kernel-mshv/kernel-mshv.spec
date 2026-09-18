@@ -18,7 +18,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        6.6.137.mshv2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -29,8 +29,10 @@ Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
 Source5:        config_aarch64
-Patch0:         mshv-scrub-partition-patches-rebased.patch
-Patch1:         disable-vpsignal-reset-on-scrub.patch
+Patch0:         0001-drivers-hv-Restore-explicit-suspend-management-aroun.patch
+Patch1:         mshv-scrub-partition-patches-rebased.patch
+Patch2:         disable-vpsignal-reset-on-scrub.patch
+Patch3:         update-ioctl-name.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -269,6 +271,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Sep 14 2026 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.137.mshv2-7
+- Add 0001-drivers-hv-Restore-explicit-suspend-management-aroun.patch
+
 * Mon Sep 14 2026 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.137.mshv2-6
 - Remove the debug messages printing patch.
 

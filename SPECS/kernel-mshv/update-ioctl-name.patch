@@ -1,0 +1,25 @@
+diff --git a/drivers/hv/mshv_root_main.c b/drivers/hv/mshv_root_main.c
+index f9ea08e3446b..626054f0339e 100644
+--- a/drivers/hv/mshv_root_main.c
++++ b/drivers/hv/mshv_root_main.c
+@@ -3519,7 +3519,7 @@ mshv_partition_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ 		ret = mshv_partition_snp_ioctl(ioctl, partition, arg);
+ 		break;
+ #endif /* HV_SUPPORTS_SEV_SNP_GUESTS */
+-	case HVCALL_SCRUB_PARTITION:
++	case MSHV_SCRUB_PARTITION:
+ 		ret = mshv_partition_ioctl_scrub(partition);
+ 		break;
+ 	default:
+diff --git a/include/uapi/linux/mshv.h b/include/uapi/linux/mshv.h
+index 06b1b1a39368..82f4f38e440c 100644
+--- a/include/uapi/linux/mshv.h
++++ b/include/uapi/linux/mshv.h
+@@ -454,6 +454,7 @@ struct mshv_root_hvcall {
+ /* SEV/SNP-related partition IOCTLs */
+ #define MSHV_MODIFY_GPA_HOST_ACCESS	_IOW(MSHV_IOCTL, 0x09, struct mshv_modify_gpa_host_access)
+ #define MSHV_IMPORT_ISOLATED_PAGES	_IOW(MSHV_IOCTL, 0x0A, struct mshv_import_isolated_pages)
++#define MSHV_SCRUB_PARTITION		_IO(MSHV_IOCTL, 0x0B)
+ /* TODO: Remove the following. They are replaceable with MSHV_ROOT_HVCALL */
+ #define MSHV_INSTALL_INTERCEPT		_IOW(MSHV_IOCTL, 0xF0, struct mshv_install_intercept)
+ #define MSHV_ASSERT_INTERRUPT		_IOW(MSHV_IOCTL, 0xF1, struct mshv_assert_interrupt)
