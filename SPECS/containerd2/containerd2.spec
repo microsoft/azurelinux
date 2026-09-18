@@ -31,8 +31,7 @@ Patch9:  CVE-2026-84304.patch
 %{?systemd_requires}
 
 # Temporarily stay on Go 1.26 until the Go 1.27 ML-KEM backend is fixed.
-BuildRequires: golang >= 1.26.7
-BuildRequires: golang < 1.27
+BuildRequires: golang = 1.26.7
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
