@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -13,32 +13,25 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
-Source1: containerd.service
-Source2: containerd.toml
+Source1: %{upstream_name}-%{version}-govendor-v1.tar.gz
+Source2: containerd.service
+Source3: containerd.toml
 
-Patch0:	multi-snapshotters-support.patch
-Patch1:	tardev-support.patch
-Patch2:	CVE-2026-39882.patch
-Patch3:	CVE-2026-33814.patch
-Patch4:	fix-TestCgroupNamespace-cgroupv1.patch
-Patch5:	CVE-2026-39821.patch
-Patch6:	CVE-2026-42506.patch
-Patch7:	CVE-2026-27136.patch
-Patch8:	CVE-2026-53488.patch
-Patch9:	CVE-2026-53492.patch
-Patch10:	CVE-2026-50195.patch
-Patch11:	CVE-2026-53489.patch
-Patch12:	CVE-2026-47262.patch
-Patch13:	CVE-2026-25680.patch
-Patch14:	CVE-2026-25681.patch
-Patch15:	CVE-2026-42502.patch
-Patch16:	CVE-2026-56852.patch
+Patch0:	 multi-snapshotters-support.patch
+Patch1:	 tardev-support.patch
+Patch2:	 CVE-2026-39882.patch
+Patch3:	 fix-TestCgroupNamespace-cgroupv1.patch
+Patch4:	 CVE-2026-53488.patch
+Patch5:	 CVE-2026-53492.patch
+Patch6:	 CVE-2026-50195.patch
+Patch7:	 CVE-2026-53489.patch
+Patch8:	 CVE-2026-47262.patch
+Patch9:  CVE-2026-84304.patch
 
 %{?systemd_requires}
 
 # Temporarily stay on Go 1.26 until the Go 1.27 ML-KEM backend is fixed.
-BuildRequires: golang >= 1.26.7
-BuildRequires: golang < 1.27
+BuildRequires: golang = 1.26.7
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -68,7 +61,10 @@ containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
+%autosetup -n %{upstream_name}-%{version} -N
+rm -rf vendor
+tar -xf %{SOURCE1}
+%autopatch -p1
 
 %build
 export BUILDTAGS="-mod=vendor"
@@ -85,8 +81,8 @@ make VERSION="%{version}" REVISION="%{commit_hash}" test
 make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
 
 mkdir -p %{buildroot}/%{_unitdir}
-install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
-install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
+install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/containerd.service
+install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/containerd/config.toml
 install -vdm 755 %{buildroot}/opt/containerd/{bin,lib}
 
 %post
@@ -114,6 +110,11 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Sep 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.2.4-9
+- Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445.
+- Remove patches which are fixed in new generated vendor tarball:CVE-2026-25680, CVE-2026-25681,
+  CVE-2026-27136, CVE-2026-33814, CVE-2026-39821, CVE-2026-42502, CVE-2026-42506, CVE-2026-56852
+
 * Thu Sep 03 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-8
 - Temporarily build with Microsoft Go 1.26 to avoid the Go 1.27 systemcrypto
   ML-KEM panic on OpenSSL 3.3.
