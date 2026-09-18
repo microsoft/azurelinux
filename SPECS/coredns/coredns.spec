@@ -45,14 +45,17 @@ Patch4:         CVE-2025-47950.patch
 Patch5:         CVE-2025-58063.patch
 Patch6:         CVE-2025-59530.patch
 Patch7:         CVE-2025-68156.patch
-Patch8:         CVE-2025-11065.patch
-Patch9:         CVE-2026-26017.patch
-Patch10:        CVE-2026-26018.patch
-Patch11:        CVE-2026-32936.patch
-Patch12:        CVE-2026-33489.patch
-Patch13:        CVE-2026-62299.patch
-Patch14:        CVE-2026-62994.patch
-Patch15:        CVE-2026-84445.patch
+Patch8:         CVE-2025-68151.patch
+Patch9:         CVE-2025-11065.patch
+Patch10:        CVE-2026-26017.patch
+Patch11:        CVE-2026-26018.patch
+Patch12:        CVE-2026-32934.patch
+Patch13:        CVE-2026-32936.patch
+Patch14:        CVE-2026-33489.patch
+Patch15:        CVE-2026-33190.patch
+Patch16:        CVE-2026-62299.patch
+Patch17:        CVE-2026-62994.patch
+Patch18:        CVE-2026-84445.patch
 
 BuildRequires:  golang >= 1.25
 
@@ -97,7 +100,7 @@ go install github.com/fatih/faillint@latest && \
 * Fri Sep 18 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 1.11.4-21
 - Patch for CVE-2026-84445, CVE-2026-84304
 - Upgrade vendored google.golang.org/grpc to v1.83.2
-- Removed patches for CVE-2025-22868, CVE-2025-68151, CVE-2026-32934, CVE-2026-33190, CVE-2026-39821, CVE-2026-56852
+- Removed patches for CVE-2025-22868, CVE-2026-39821, CVE-2026-56852
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-20
 - Patch for CVE-2026-62994
