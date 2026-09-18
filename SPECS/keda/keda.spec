@@ -14,14 +14,15 @@ Source0:        %{name}-%{version}.tar.gz
 #   1. wget https://github.com/kedacore/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
+#   4. patch -p1 < CVE-2026-84445.patch   # module upgrades carrying the CVE fixes
+#   5. rm -rf vendor && go mod vendor
+#   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -cf %%{name}-%%{version}-vendor-v4.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor-v3.tar.gz
+Source1:        %{name}-%{version}-vendor-v4.tar.gz
 Patch0:         CVE-2024-6104.patch
 Patch1:         CVE-2024-51744.patch
 Patch2:         CVE-2025-11065.patch
@@ -37,6 +38,7 @@ Patch11:        CVE-2026-41889.patch
 Patch12:        CVE-2026-73500.patch
 Patch13:        CVE-2026-79921.patch
 Patch14:        CVE-2026-84445.patch
+Patch15:        keda-dependency-uplift.patch
 
 BuildRequires:  golang >= 1.25
 
@@ -84,6 +86,9 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %changelog
 * Thu Sep 17 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.14.1-20
 - Patch for CVE-2026-84445, CVE-2026-84304, CVE-2026-83530
+- Upgraded cel-go to 0.31.0 and grpc to v1.83.2, which required uplifting
+  k8s.io/* to v0.31.14, controller-runtime to v0.19.7, cert-controller to v0.12.1
+  and custom-metrics-apiserver to v1.31.0
 - Removed patch for CVE-2024-45338, CVE-2025-22868, CVE-2025-22870, CVE-2025-22872, CVE-2025-27144,
   CVE-2025-47911, CVE-2025-58190, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821,
   CVE-2026-42502, CVE-2026-42506, CVE-2026-56852
