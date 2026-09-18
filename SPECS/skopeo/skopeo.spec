@@ -1,32 +1,31 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.4
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/containers/skopeo
 Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2022-2879.patch
 Patch1:         CVE-2024-6104.patch
-Patch2:         CVE-2023-45288.patch
-Patch3:         CVE-2024-9676.patch
-Patch4:         CVE-2025-27144.patch
-Patch5:         CVE-2025-58058.patch
-Patch6:         CVE-2025-58183.patch
-Patch7:         CVE-2025-11065.patch
-Patch8:         CVE-2026-24117.patch
-Patch9:         CVE-2026-32288.patch
-Patch10:        CVE-2026-39821.patch
-Patch11:        CVE-2026-56852.patch
+Patch2:         CVE-2024-9676.patch
+Patch3:         CVE-2025-27144.patch
+Patch4:         CVE-2025-58058.patch
+Patch5:         CVE-2025-58183.patch
+Patch6:         CVE-2025-11065.patch
+Patch7:         CVE-2026-24117.patch
+Patch8:         CVE-2026-32288.patch
+Patch9:         CVE-2026-84445.patch
 
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  go-md2man
-BuildRequires:  golang >= 1.18
+BuildRequires:  golang >= 1.25
 BuildRequires:  gpgme-devel
 BuildRequires:  libassuan-devel
 BuildRequires:  pkgconfig
@@ -37,7 +36,10 @@ Command line utility to inspect images and repositories directly on Docker
 registries without the need to pull them.
 
 %prep
-%autosetup -p1
+%autosetup -N
+rm -rf vendor
+tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 export GOPATH=%{our_gopath}
@@ -58,6 +60,10 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Thu Sep 17 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.14.4-13
+- Generate Source1 vendor tarball to fix CVE-2026-84445 and CVE-2026-84304
+- Drop patches for CVE-2023-45288, CVE-2026-39821 and CVE-2026-56852, already fixed by the upgraded golang.org/x/net and golang.org/x/text modules
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.4-12
 - Patch for CVE-2026-56852
 
