@@ -28,6 +28,53 @@
 #   required-capabilities : capability tokens the image must declare
 #
 # ============================================================================
+[sku-groups.multi-sku-amd64]
+description = "Azure x86-64 (Intel/AMD) VM sizes for multi-SKU performance coverage"
+arch = "amd64"
+vm-sizes = [
+  "Standard_D4ds_v5",
+  "Standard_D4s_v5",
+  "Standard_D4ads_v5",
+  "Standard_D64ads_v5",
+  "Standard_DS2_v2",
+  "Standard_DS3_v2",
+  "Standard_DS4_v2",
+  "Standard_DS5_v2",
+  "Standard_E4_v5",
+  "Standard_E4ads_v5",
+  "Standard_F1s",
+  "Standard_F4s_v2",
+  "Standard_F72s_v2",
+  "Standard_B4ms",
+  "Standard_NC6s_v3",
+]
+
+[sku-groups.multi-sku-arm64]
+description = "Azure Arm64 (Ampere/Cobalt) VM sizes for multi-SKU performance coverage"
+arch = "arm64"
+vm-sizes = [
+  "Standard_D4ps_v5",
+  "Standard_D16ps_v5",
+  "Standard_D16plds_v5",
+  "Standard_D32plds_v5",
+  "Standard_D64plds_v5",
+  "Standard_D16pls_v6",
+  "Standard_D96plds_v6",
+  "Standard_E16pds_v5",
+  "Standard_B16pls_v2",
+]
+
+# NVMe-capable SKUs (L-series). LISA's Nvme feature requirement auto-schedules
+# the nvme-perf test only on these, so no explicit capability tag is needed.
+[sku-groups.multi-sku-nvme]
+description = "Azure NVMe-capable (L-series) VM sizes for multi-SKU and NVMe performance coverage"
+arch = "amd64"
+vm-sizes = [
+  "Standard_L8s_v3",
+  "Standard_L8s_v2",
+  "Standard_L64s_v2",
+  "Standard_L80s_v2",
+]
 
 # =============================================================================
 # Static image checks (pytest)
@@ -134,6 +181,75 @@ criteria = [
   { area = "storage",   category = "performance" },
 ]
 
+# NVMe disk performance (fio). LISA only schedules it on NVMe-capable SKUs via
+# its Nvme feature requirement, so it is targeted through the multi-sku-nvme
+# sku-group rather than a capability tag.
+[tests.multi-sku-nvme]
+type                  = "lisa"
+description           = "NVMe disk performance (fio) on NVMe-capable SKUs"
+kind                  = "performance"
+long-running          = true
+metrics-enabled       = true
+required-capabilities = ["machine-bootable"]
+
+[tests.multi-sku-nvme.lisa]
+criteria = { area = "nvme", category = "multi_sku" }
+
+[tests.multi-sku-boot]
+type                  = "lisa"
+description           = "Multi-SKU boot performance tests"
+kind                  = "performance"
+long-running          = true
+metrics-enabled       = true
+required-capabilities = ["machine-bootable"]
+
+[tests.multi-sku-boot.lisa]
+criteria = { area = "boot", category = "multi_sku" }
+
+[tests.multi-sku-network]
+type                  = "lisa"
+description           = "Multi-SKU network performance tests"
+kind                  = "performance"
+long-running          = true
+metrics-enabled       = true
+required-capabilities = ["machine-bootable"]
+
+[tests.multi-sku-network.lisa]
+criteria = { area = "network", category = "multi_sku" }
+
+[tests.multi-sku-cpu]
+type                  = "lisa"
+description           = "Multi-SKU CPU performance tests"
+kind                  = "performance"
+long-running          = true
+metrics-enabled       = true
+required-capabilities = ["machine-bootable"]
+
+[tests.multi-sku-cpu.lisa]
+criteria = { area = "cpu", category = "multi_sku" }
+
+[tests.multi-sku-memory]
+type                  = "lisa"
+description           = "Multi-SKU memory performance tests"
+kind                  = "performance"
+long-running          = true
+metrics-enabled       = true
+required-capabilities = ["machine-bootable"]
+
+[tests.multi-sku-memory.lisa]
+criteria = { area = "memory", category = "multi_sku" }
+
+[tests.multi-sku-storage]
+type                  = "lisa"
+description           = "Multi-SKU storage performance tests"
+kind                  = "performance"
+long-running          = true
+metrics-enabled       = true
+required-capabilities = ["machine-bootable"]
+
+[tests.multi-sku-storage.lisa]
+criteria = { area = "storage", category = "multi_sku" }
+
 [tests.lisa-fips]
 type                  = "lisa"
 description           = "LISA FIPS status and enablement tests"
@@ -186,4 +302,27 @@ tests = [
 description = "Performance coverage for VM base images"
 tests = [
   { name = "lisa-perf" },
+]
+
+[test-groups.multi-sku-tests]
+description = "Multi-SKU performance coverage across all benchmark areas"
+tests = [
+  { name = "multi-sku-boot" },
+  { name = "multi-sku-network" },
+  { name = "multi-sku-cpu" },
+  { name = "multi-sku-memory" },
+  { name = "multi-sku-storage" },
+]
+
+# Same coverage as multi-sku-tests plus nvme-perf, for the NVMe-capable
+# (multi-sku-nvme) SKU group. Test-groups cannot nest, so members are listed.
+[test-groups.multi-sku-nvme-tests]
+description = "Multi-SKU coverage plus NVMe performance for NVMe-capable SKUs"
+tests = [
+  { name = "multi-sku-boot" },
+  { name = "multi-sku-network" },
+  { name = "multi-sku-cpu" },
+  { name = "multi-sku-memory" },
+  { name = "multi-sku-storage" },
+  { name = "multi-sku-nvme" },
 ]
