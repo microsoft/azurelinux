@@ -1,10 +1,5 @@
-Summary:        GitHub official command line tool
-Name:           gh
-Version:        2.98.0
+Version:        2.101.0
 Release:        2%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/cli/cli
 Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -61,8 +56,11 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
-* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.98.0-2
+* Thu Sep 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.101.0-2
 - Patch for CVE-2026-78662, CVE-2026-56855
+
+* Wed Sep 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.101.0-1
+- Auto-upgrade to 2.101.0 - for CVE-2026-84445, CVE-2026-84304, CVE-2026-56855, CVE-2026-78662, CVE-2026-72924
 
 * Sun Aug 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.98.0-1
 - Auto-upgrade to 2.98.0 - for CVE-2026-72924
