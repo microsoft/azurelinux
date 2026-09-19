@@ -1,28 +1,38 @@
 #!/bin/bash
 # config.sh — Kiwi config.sh hook for container image minimization
 #
-# Strips the image down to only the packages declared in the kiwi XML
-# (plus their transitive dependencies), producing a minimal "distroless"
-# container.
+# Invoked by /image/config.sh (see that file for the profile -> mode
+# routing table) with a single --mode argument selecting one of two
+# cleanup strategies:
 #
-# Strategy:
-#   1. Parse the kiwi XML to collect declared image packages
-#      (shared base + profile-specific).
-#   2. Resolve virtual Provides to real package names
-#      (e.g., system-release → azurelinux-release).
-#   3. Force-remove disallowed packages (bash, ca-certificates) while
-#      preserving generated certificate files via snapshot/restore.
-#   4. Mark all installed packages as auto-dependencies, re-mark
-#      declared packages as user-installed, then dnf autoremove
-#      strips everything else — including dnf and rpm themselves.
-#   5. Post-autoremove cleanup via statically-linked busybox: remove
-#      package manager state, locale stubs, docs, and leftover dirs.
+#   --mode=strip (distroless-*, busybox-workload; runtime-package-management
+#   = false profiles): strips the image down to only the packages declared
+#   in the kiwi XML (plus their transitive dependencies), producing a
+#   minimal, package-manager-less, shell-less container. Strategy:
+#     1. Parse the kiwi XML to collect declared image packages
+#        (shared base + profile-specific).
+#     2. Resolve virtual Provides to real package names
+#        (e.g., system-release → azurelinux-release).
+#     3. Force-remove disallowed packages (bash, ca-certificates) while
+#        preserving generated certificate files via snapshot/restore.
+#     4. Mark all installed packages as auto-dependencies, re-mark
+#        declared packages as user-installed, then dnf autoremove
+#        strips everything else — including dnf and rpm themselves.
+#     5. Post-autoremove cleanup via statically-linked busybox: remove
+#        package manager state, locale stubs, docs, and leftover dirs.
 #
-# Only type="image" packages are considered — bootstrap packages are
-# used by kiwi only during initial chroot setup and are not part of
-# the final image definition.
+#   --mode=light (the single-purpose *-workload images that declare
+#   runtime-package-management = true): dnf5/bash/rpm must stay
+#   functional, so no keep-list strip or autoremove runs. Only
+#   build-time-only byproducts that are never needed at runtime
+#   regardless of package-manager presence are pruned (docs, locale
+#   data, dnf5 logs).
 #
-# Output sections (for debugging):
+# Only type="image" packages are considered by --mode=strip — bootstrap
+# packages are used by kiwi only during initial chroot setup and are not
+# part of the final image definition.
+#
+# Output sections (for debugging, --mode=strip only):
 #   "Packages to KEEP"       — resolved names from the kiwi XML
 #   "Force-removing ..."     — disallowed packages stripped before autoremove
 #   "All installed packages" — full list before stripping
@@ -34,17 +44,6 @@ set -xuo pipefail
 echo "config.sh: building profile(s): ${kiwi_profiles:-<none>}"
 
 # ---------------------------------------------------------------------------
-# Only run for distroless profiles
-# ---------------------------------------------------------------------------
-# kiwi_profiles is a comma-separated list set by kiwi at build time
-# (e.g., "distroless-minimal").  Skip this entire script for non-distroless
-# builds (e.g., "container-base") — they don't need image stripping.
-if [[ ! "${kiwi_profiles:-}" =~ ^distroless ]]; then
-    echo "config.sh: profile '${kiwi_profiles:-}' does not start with 'distroless' — skipping."
-    exit 0
-fi
-
-# ---------------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------------
 
@@ -53,6 +52,42 @@ die() {
     echo "ERROR: $*" >&2
     exit 1
 }
+
+# ---------------------------------------------------------------------------
+# Mode selection
+# ---------------------------------------------------------------------------
+MODE=""
+for arg in "$@"; do
+    case "${arg}" in
+        --mode=*) MODE="${arg#--mode=}" ;;
+        *) die "unrecognized argument: ${arg}" ;;
+    esac
+done
+[[ -n "${MODE}" ]] || die "missing required --mode=strip|light argument"
+
+# ---------------------------------------------------------------------------
+# --mode=light: byproduct cleanup only, package manager stays functional
+# ---------------------------------------------------------------------------
+if [[ "${MODE}" == "light" ]]; then
+    echo "config.sh: --mode=light — pruning build-time byproducts only" \
+        "(package manager/shell are kept functional)"
+    # /usr/share/doc: build/man/example docs, never needed at runtime.
+    rm -rf /usr/share/doc
+    # /usr/share/licenses is intentionally NOT removed here: unlike the
+    # distroless/busybox --mode=strip path (which removes the packages
+    # entirely, so their license text is dropped along with them), these
+    # images keep the packages themselves installed -- removing just the
+    # license text while keeping the binaries is a distribution-obligation
+    # question, not a pure bloat cleanup, so it's left alone.
+    # /usr/share/locale: gettext message catalogs (translated strings),
+    # not needed for these non-interactive service/runtime images.
+    rm -rf /usr/share/locale
+    # /var/log/dnf5.log: build-time transaction log, never read at runtime.
+    rm -f /var/log/dnf5.log
+    exit 0
+fi
+
+[[ "${MODE}" == "strip" ]] || die "unknown --mode value: ${MODE} (expected strip or light)"
 
 # Extract package names from a <packages type="image"> section of the kiwi
 # XML definition.  Returns one package name per line.
@@ -264,6 +299,23 @@ echo "=== Pruning artifacts (post-autoremove) ==="
 
 # Systemd (removed by autoremove, but dirs/presets may linger).
 /tmp/busybox rm -rf /usr/lib/systemd
+
+# ---------------------------------------------------------------------------
+# 3d. busybox-workload only: install applet symlinks
+# ---------------------------------------------------------------------------
+# When the "busybox" package itself is on the keep list (busybox-workload),
+# the shared runtime test harness still needs a `sh`/`sleep`/`echo` on PATH
+# to start and exec into the container (it runs `sleep infinity` as the
+# keep-alive command and `echo`/a shell for exec calls) -- busybox does not
+# install applet symlinks itself. Wire up the minimum set the harness
+# needs; busybox dispatches on argv[0], so these are just symlinks, not
+# separate binaries.
+if printf '%s\n' "${RESOLVED_KEEP_PKGS}" | /tmp/busybox grep -qxF busybox; then
+    echo "=== Installing busybox applet symlinks (sh, sleep, echo) ==="
+    for applet in sh sleep echo; do
+        /tmp/busybox ln -sf /bin/busybox "/bin/${applet}"
+    done
+fi
 
 # Clean up busybox itself.
 /tmp/busybox rm -f /tmp/busybox
