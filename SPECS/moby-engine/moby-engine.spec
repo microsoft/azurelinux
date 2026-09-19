@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 20%{?dist}
+Release: 21%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -11,40 +11,31 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: docker.service
-Source2: docker.socket
+Source1: %{name}-%{version}-vendor-v1.tar.gz
+Source2: docker.service
+Source3: docker.socket
 
 Patch0:  CVE-2022-2879.patch
 Patch1:  enable-docker-proxy-libexec-search.patch
 Patch2:  CVE-2024-41110.patch
 Patch3:  CVE-2024-29018.patch
-Patch4:  CVE-2024-24786.patch
-Patch5:  CVE-2024-36621.patch
-Patch6:  CVE-2024-36620.patch
-Patch7:  CVE-2024-36623.patch
-Patch8:  CVE-2024-45337.patch
-Patch9:  CVE-2023-45288.patch
-Patch10: CVE-2025-22868.patch
-Patch11: CVE-2025-22869.patch
-Patch12: CVE-2025-30204.patch
-Patch13: CVE-2024-51744.patch
-Patch14: CVE-2025-58183.patch
+Patch4:  CVE-2024-36621.patch
+Patch5:  CVE-2024-36620.patch
+Patch6:  CVE-2024-36623.patch
+Patch7:  CVE-2025-30204.patch
+Patch8:  CVE-2024-51744.patch
+Patch9:  CVE-2025-58183.patch
 #This can be removed when upgraded to v25.0.15
-Patch15: fix-multiarch-image-push-tag.patch
-Patch16: CVE-2026-39882.patch
-Patch17: CVE-2026-32288.patch
-Patch18: CVE-2026-39821.patch
-Patch19: CVE-2026-39829.patch
-Patch20: CVE-2026-39830.patch
-Patch21: CVE-2026-39834.patch
-Patch22: CVE-2026-46597.patch
-Patch23: CVE-2026-39827.patch
-Patch24: CVE-2026-39835.patch
-Patch25: CVE-2026-56852.patch
-Patch26: CVE-2026-61712.patch
-Patch27: CVE-2026-75593.patch
-Patch28: CVE-2026-61711.patch
-Patch29: CVE-2026-17106.patch
+Patch10: fix-multiarch-image-push-tag.patch
+Patch11: CVE-2026-39882.patch
+Patch12: CVE-2026-32288.patch
+Patch13: CVE-2026-61712.patch
+Patch14: CVE-2026-75593.patch
+Patch15: CVE-2026-61711.patch
+Patch16: CVE-2026-17106.patch
+Patch17: CVE-2026-84445.patch
+# otelgrpc >= v0.60 dropped the unary interceptors; switch the call sites to stats handlers.
+Patch18: adapt-otelgrpc-stats-handler.patch
 
 %{?systemd_requires}
 
@@ -61,7 +52,7 @@ BuildRequires: make
 BuildRequires: pkg-config
 BuildRequires: systemd-devel
 BuildRequires: tar
-BuildRequires: golang
+BuildRequires: golang >= 1.25
 BuildRequires: git
 
 Requires: audit
@@ -91,7 +82,10 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%autosetup -p1 -n moby-%{version}
+%autosetup -n moby-%{version} -N
+rm -rf vendor
+tar -xf %{SOURCE1}
+%autopatch -p1
 
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_builddir}/moby-%{version} %{OUR_GOPATH}/src/github.com/docker/docker
@@ -118,8 +112,8 @@ mkdir -p %{buildroot}%{_sysconfdir}/udev/rules.d
 install -p -m 644 contrib/udev/80-docker.rules %{buildroot}%{_sysconfdir}/udev/rules.d/80-docker.rules
 
 mkdir -p %{buildroot}%{_unitdir}
-install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/docker.service
-install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.socket
+install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.service
+install -p -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/docker.socket
 
 %post
 if ! grep -q "^docker:" /etc/group; then
@@ -140,6 +134,16 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Thu Sep 17 2026 Akhila Guruju <v-guakhila@microsoft.com> - 25.0.3-21
+- Add vendored modules tarball with google.golang.org/grpc upgraded to v1.83.2 to fix CVE-2026-84445 and CVE-2026-84304
+- Patch vendor.mod and vendor.sum to match the regenerated vendor tree
+- Switch the otelgrpc call sites to stats handlers, the unary interceptors were
+  removed in otelgrpc v0.60
+- Drop CVE-2023-45288, CVE-2024-24786, CVE-2024-45337, CVE-2025-22868, CVE-2025-22869,
+  CVE-2026-39821, CVE-2026-39827, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834,
+  CVE-2026-39835, CVE-2026-46597 and CVE-2026-56852 patches, fixed by the refreshed
+  golang.org/x/{net,crypto,text,oauth2} and google.golang.org/protobuf modules
+
 * Thu Aug 27 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 25.0.3-20
 - Patch for CVE-2026-61711, CVE-2026-61712, CVE-2026-75593, CVE-2026-17106
 
