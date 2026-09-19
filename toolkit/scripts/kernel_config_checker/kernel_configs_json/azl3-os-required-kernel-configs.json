@@ -3153,6 +3153,16 @@
           "justification": "kernel-hwe 6.12 does not enable ICE_SWITCHDEV on arm64 - PR: https://github.com/microsoft/azurelinux/pull/10960"
         },
         {
+          "name": "CONFIG_PCI_P2PDMA",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Enable PCI peer-to-peer DMA for GPU pass-through on kernel-hwe arm64 - PR: https://github.com/microsoft/azurelinux/pull/18622"
+        },
+        {
           "name": "CONFIG_CRYPTO_DH",
           "values": [
             {

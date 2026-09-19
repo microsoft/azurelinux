@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        12%{?dist}
+Release:        14%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -23,22 +23,21 @@ Source0:        %{name}-%{version}.tar.gz
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -cf %%{name}-%%{version}-vendor-v2.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2017-14623.patch
-Patch1:         CVE-2024-45339.patch
-Patch2:         CVE-2025-22868.patch
-Patch3:         CVE-2025-22870.patch
-Patch4:         CVE-2024-53257.patch
-Patch5:         CVE-2026-27965.patch
-Patch6:         CVE-2026-27969.patch
-Patch7:         CVE-2025-11065.patch
-Patch8:         CVE-2026-39821.patch
-Patch9:         CVE-2026-56852.patch
-Patch10:        CVE-2026-43871.patch
-Patch11:        CVE-2026-55969.patch
-BuildRequires: golang < 1.23
+Patch1:         CVE-2024-53257.patch
+Patch2:         CVE-2026-27965.patch
+Patch3:         CVE-2026-27969.patch
+Patch4:         CVE-2025-11065.patch
+Patch5:         CVE-2026-43871.patch
+Patch6:         CVE-2026-55969.patch
+Patch7:         CVE-2026-65959.patch
+Patch8:         CVE-2026-84304.patch
+Patch9:         go-toolchain-compat.patch
+BuildRequires: golang >= 1.25
+BuildRequires: golang < 1.28
 BuildRequires: hostname
 
 %description
@@ -167,6 +166,15 @@ go test -mod=vendor \
 %{_bindir}/*
 
 %changelog
+* Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 19.0.4-14
+- Add patch for CVE-2026-84445, CVE-2026-84304
+- Add Go toolchain compatibility fixes go-toolchain-compat.patch
+- Remove patches for CVE-2024-45339, CVE-2025-22868, CVE-2025-22870,
+  CVE-2026-39821, and CVE-2026-56852
+
+* Mon Aug 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-13
+- Patch for CVE-2026-65959
+
 * Mon Aug 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-12
 - Patch for CVE-2026-55969, CVE-2026-43871
 

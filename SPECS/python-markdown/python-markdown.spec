@@ -3,7 +3,7 @@
 Summary:        Markdown implementation in Python
 Name:           python-%{pkgname}
 Version:        3.8.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ URL:            https://python-markdown.github.io/
 Source0:        https://github.com/Python-Markdown/markdown/releases/download/%{version}/%{pkgname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 Patch0:         0001-fix-pyproject-license-for-setuptools.patch
+Patch1:         0002-Fix-handling-of-incomplete-HTML-tags-in-code-spans.patch
 
 %description
 This is a Python implementation of John Grubers Markdown. It is
@@ -37,9 +38,6 @@ there are a few known issues.
 
 %prep
 %autosetup -p1 -n %{pkgname}-%{version}
-# Skip 2 tests that fail due to Python 3.12 html.parser behavior changes
-sed -i 's/def test_raw_missing_close_bracket/def _skip_test_raw_missing_close_bracket/' tests/test_syntax/blocks/test_html_blocks.py
-sed -i 's/def test_unclosed_comment_/def _skip_test_unclosed_comment_/' tests/test_syntax/blocks/test_html_blocks.py
 
 %build
 %pyproject_wheel
@@ -53,7 +51,6 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
   LICENSE.md > LICENSE.html
 
 %check
-# Skip test_raw_missing_close_bracket and test_unclosed_comment_ (Python 3.12 html.parser changes)
 %{__python3} -m unittest discover -v
 
 
@@ -66,6 +63,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/markdown_py
 
 %changelog
+* Thu Sep 10 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.8.2-3
+- Add upstream patch (PR #1548) to fix incomplete HTML tags in code spans
+  with the new html.parser backported into Python 3.12.14.
+- Drop the %%prep test skips, no longer needed with Python 3.12.14.
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.8.2-2
 - Use %%{pkgname} (lowercase) for %%autosetup -n so the directory inside
   the upstream tarball (markdown-3.8.2) matches; skip 2 tests broken by

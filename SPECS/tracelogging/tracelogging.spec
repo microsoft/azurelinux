@@ -1,7 +1,7 @@
 Summary:        tracelogging one-line structure logging API on top of LTTNG
 Name:           tracelogging
 Version:        0.3.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,7 +9,7 @@ Group:          System Environment
 URL:            https://github.com/microsoft/tracelogging
 Source0:        https://github.com/microsoft/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Migrate the test suite from Catch2 v2 to the Catch2 v3 API shipped by Azure Linux.
-Patch0:         tracelogging-migrate-catch2-v3.patch
+Patch0:         migrate-to-use-catch2-v3.patch
 BuildRequires:  cmake >= 3.6
 BuildRequires:  gcc
 BuildRequires:  lttng-ust-devel >= 2.13
@@ -67,6 +67,13 @@ mkdir build && cd build
 %{_libdir}/cmake/tracelogging
 
 %changelog
+* Thu Aug 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.3.1-4
+- Updating patch commit message so that few pipelines doesn't treat
+  the patch file as spec file.
+
+* Tue Aug 25 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.3.1-3
+- Update patch name to not start with module name.
+
 * Mon Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.3.1-2
 - Migrate test suite from Catch2 v2 to Catch2 v3 API to fix test build.
 

@@ -3,7 +3,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.46
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,8 +18,16 @@ Patch3:         CVE-2025-62813.patch
 Patch4:         CVE-2025-0838.patch
 # Patch to skip failing ptests on x86 architecture
 %ifarch x86_64
-Patch5:         skip-failing-ptests.patch 
+Patch5:         skip-failing-ptests.patch
 %endif
+Patch6:         CVE-2026-63379.patch
+Patch7:         CVE-2026-63381.patch
+Patch8:         CVE-2026-63382.patch
+Patch9:         CVE-2026-63383.patch
+Patch10:        CVE-2026-63384.patch
+Patch11:        CVE-2026-63385.patch
+Patch12:        CVE-2026-63387.patch
+Patch13:        CVE-2026-63388.patch
 
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
@@ -115,6 +123,9 @@ sudo -u test ctest --exclude-regex merge_large_tests || { cat Testing/Temporary/
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.0.46-2
+- Patch for CVE-2026-63388, CVE-2026-63387, CVE-2026-63385, CVE-2026-63384, CVE-2026-63383, CVE-2026-63382, CVE-2026-63381, CVE-2026-63379
+
 * Wed Apr 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.46-1
 - Upgrade to fix CVE-2026-6409, CVE-2026-34278, CVE-2026-35239, CVE-2026-21998, CVE-2026-35237,
   CVE-2026-22009, CVE-2026-34270, CVE-2026-34293, CVE-2026-34271, CVE-2026-22002, CVE-2026-22017,

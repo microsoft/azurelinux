@@ -10,7 +10,7 @@ on:
     branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
 
 env:
-  EXPECTED_GO_VERSION: "1.24"
+  EXPECTED_GO_VERSION: "1.25"
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
     steps:
 
     - name: Set up Go 1.x
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
       with:
         go-version: '${{ env.EXPECTED_GO_VERSION }}'
       id: go
@@ -32,7 +32,7 @@ jobs:
         go version && which go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
     - name: Check go.mod
       run: |
@@ -89,7 +89,7 @@ jobs:
         sudo env "PATH=$PATH" make go-test-coverage
 
     - name: Upload test coverage
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: TestCoverage
         path: toolkit/out/tools/test_coverage_report.html

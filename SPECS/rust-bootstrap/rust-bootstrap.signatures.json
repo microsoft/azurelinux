@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz": "e74edd2cf7d0f1f1383b4f00eb90c843750bc489e2ccf7214e6476678a907425",
+  "rustc-1.95.0-x86_64-unknown-linux-gnu.tar.xz": "8426a3d170a5879f5682f5fbdd024a1779b3951e7baba685af2d6dc32a6dfc15",
+  "rust-std-1.95.0-x86_64-unknown-linux-gnu.tar.xz": "047ea7098803d3500fa1072e9cee5392697e21525559e4458128a2bf874aa382",
+  "cargo-1.95.0-aarch64-unknown-linux-gnu.tar.xz": "7c070aeba9bbf12073646995a03f36c346bb5f541d0078ba6d9dc2a7adaaf6af",
+  "rustc-1.95.0-aarch64-unknown-linux-gnu.tar.xz": "0fe3689eeaed603e5ef24572d11597d3edadaefd2cb181674ad621260f2501d2",
+  "rust-std-1.95.0-aarch64-unknown-linux-gnu.tar.xz": "3a21b271b1ff973b94d69b25e7a39992f9fbcae1ab6d9475844a23e6ad3908ac"
+ }
+}

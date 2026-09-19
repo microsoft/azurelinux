@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,19 +27,31 @@ URL:            https://github.com/influxdata/influxdb
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# Use generate_source_tarbbal.sh to get this generated from a source code file.
+# Use generate_source_tarball.sh to get this generated from a source code file.
 # How to re-build this file:
 #   1. wget https://github.com/influxdata/influxdb/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
+#   4. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+#   5. go mod tidy
+#   6. go mod vendor
+#   7. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -czf %%{name}-%%{version}-vendor-v2.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
+#   NOTES:
+#       - Step 5 is required: bumping a module pulls in transitive dependencies that are
+#         otherwise missing from "go.sum", and "go mod vendor" fails without it. It also
+#         raises the "go" directive to 1.25.0, which gRPC 1.83.2 requires.
+#       - The script also regenerates the static assets tarball (Source2). Those assets are
+#         not bit-reproducible and are unaffected by Go module changes, so keep publishing
+#         the existing %%{name}-%%{version}-static-data.tar.gz and discard the new one.
+#       - Steps 2-7 are also automated by generate_source_tarball.sh:
+#           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 2
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 # Below is a manually created tarball, no download link.
 # predownloaded assets include ui assets and swager json. Used to replace fetch-assets and fetch-swagger script.
 # Use generate_source_tarbbal.sh to get this generated from a source code file.
@@ -58,35 +70,20 @@ Source6:        influxdb-user.conf
 Patch0:         CVE-2021-4238.patch
 Patch1:         CVE-2019-0205.patch
 Patch2:         CVE-2024-6104.patch
-Patch3:         CVE-2023-45288.patch
-Patch4:         CVE-2024-24786.patch
-Patch5:         CVE-2024-45338.patch
-Patch6:         CVE-2024-28180.patch
-Patch7:         CVE-2025-27144.patch
-Patch8:         CVE-2025-22868.patch
-Patch9:         CVE-2025-22870.patch
-Patch10:        CVE-2024-51744.patch
-Patch11:        CVE-2025-22872.patch
-Patch12:        CVE-2025-65637.patch
-Patch13:        CVE-2025-10543.patch
-Patch14:        CVE-2025-11065.patch
-Patch15:        CVE-2025-30204.patch
-Patch16:        CVE-2025-47911.patch
-Patch17:        CVE-2025-58190.patch
-Patch18:        CVE-2026-41602.patch
-Patch19:        CVE-2026-39821.patch
-Patch20:        CVE-2026-42506.patch
-Patch21:        CVE-2026-27136.patch
-Patch22:        CVE-2026-25680.patch
-Patch23:        CVE-2026-25681.patch
-Patch24:        CVE-2026-42502.patch
-Patch25:        CVE-2026-56852.patch
-Patch26:        CVE-2026-43871.patch
-Patch27:        CVE-2026-48586.patch
-Patch28:        CVE-2026-55969.patch
-Patch29:        CVE-2026-72816.patch
+Patch3:         CVE-2024-28180.patch
+Patch4:         CVE-2025-27144.patch
+Patch5:         CVE-2024-51744.patch
+Patch6:         CVE-2025-10543.patch
+Patch7:         CVE-2025-11065.patch
+Patch8:         CVE-2025-30204.patch
+Patch9:         CVE-2026-43871.patch
+Patch10:        CVE-2026-55969.patch
+Patch11:        CVE-2026-84304.patch
+Patch12:        fix-non-constant-format-strings.patch
+Patch13:        fix-proto-equality-in-tests.patch
+Patch14:        CVE-2026-72816.patch
 BuildRequires:  clang
-BuildRequires:  golang
+BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
 BuildRequires:  protobuf-devel
 BuildRequires:  rust < 1.85.0
@@ -174,8 +171,15 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-* Mon Aug 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-21
+* Fri Sep 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-22
 - Patch for CVE-2026-72816
+
+* Wed Sep 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.7.5-21
+- Patch for CVE-2026-84304
+- Removed patches CVE-2023-45288, CVE-2024-24786, CVE-2024-45338, CVE-2025-22868, CVE-2025-22870,
+  CVE-2025-22872, CVE-2025-47911, CVE-2025-58190, CVE-2025-65637, CVE-2026-25680, CVE-2026-25681,
+  CVE-2026-27136, CVE-2026-39821, CVE-2026-41602, CVE-2026-42502, CVE-2026-42506, CVE-2026-48586,
+  CVE-2026-56852
 
 * Mon Aug 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-20
 - Patch for CVE-2026-55969, CVE-2026-48586, CVE-2026-43871

@@ -53,7 +53,7 @@
             ]
         },
         {
-            "PartitionTableType": "mbr",
+            "PartitionTableType": "gpt",
             "MaxSize": 4096,
             "TargetDisk": {
                 "Type": "path",

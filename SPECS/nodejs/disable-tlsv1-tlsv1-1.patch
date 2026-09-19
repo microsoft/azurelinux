@@ -1,8 +1,8 @@
 diff --git a/src/crypto/crypto_context.cc b/src/crypto/crypto_context.cc
-index 3513afc5..146bed1b 100644
+index 05fc2a00..c62d6cf5 100644
 --- a/src/crypto/crypto_context.cc
 +++ b/src/crypto/crypto_context.cc
-@@ -1506,28 +1506,16 @@ void SecureContext::Init(const FunctionCallbackInfo<Value>& args) {
+@@ -1583,28 +1583,16 @@ void SecureContext::Init(const FunctionCallbackInfo<Value>& args) {
        min_version = 0;
        max_version = kMaxSupportedVersion;
        method = TLS_client_method();

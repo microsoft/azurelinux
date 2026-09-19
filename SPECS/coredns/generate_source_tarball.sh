@@ -78,12 +78,14 @@ trap cleanup EXIT
 pushd $tmpdir > /dev/null
 
 NAME_VER="coredns-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor.tar.gz"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor-v2.tar.gz"
 
 echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
 
 cd "$NAME_VER"
+go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+go mod tidy
 echo "Get vendored modules"
 go mod vendor
 
