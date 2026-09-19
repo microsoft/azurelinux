@@ -295,6 +295,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
   CVE-2026-39821.patch, CVE-2026-42502.patch, CVE-2026-42506.patch, CVE-2026-39827.patch,
   CVE-2026-39828.patch, CVE-2026-39829.patch, CVE-2026-39830.patch, CVE-2026-39834.patch,
   CVE-2026-39835.patch, CVE-2026-46597.patch, CVE-2026-56852.patch fixed by golang.org/x/{net,crypto,text} v0.58.0, v0.55.0, v0.41.0
+- Rebase CVE-2026-78662.patch, CVE-2026-56855.patch
 
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.4-2
 - Patch for CVE-2026-78662, CVE-2026-56855
