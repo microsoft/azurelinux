@@ -35,7 +35,6 @@ compile applications or shared objects that use c-ares.
 
 %prep
 %autosetup
-f=CHANGES ; iconv -f iso-8859-1 -t utf-8 $f -o $f.utf8 ; mv $f.utf8 $f
 
 %build
 autoreconf -if
@@ -99,7 +98,7 @@ fi
 %files
 %defattr(-, root, root)
 %license LICENSE.md
-%doc README.md README.msvc README.cares CHANGES NEWS
+%doc README.md README.msvc RELEASE-NOTES.md
 %{_libdir}/*.so.*
 
 %files devel
@@ -108,7 +107,6 @@ fi
 %{_includedir}/ares_build.h
 %{_includedir}/ares_dns.h
 %{_includedir}/ares_nameser.h
-%{_includedir}/ares_rules.h
 %{_includedir}/ares_version.h
 %{_includedir}/ares_dns_record.h
 %{_libdir}/*.so
@@ -118,6 +116,9 @@ fi
 %changelog
 * Sat Sep 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.34.8-1
 - Auto-upgrade to 1.34.8 - for CVE-2026-69184, CVE-2026-69186
+- Drop the CHANGES iconv conversion from %%prep, upstream replaced CHANGES with RELEASE-NOTES.md
+- Update %%doc to ship RELEASE-NOTES.md and drop the removed README.cares, CHANGES and NEWS files
+- Drop ares_rules.h, no longer installed upstream
 
 * Mon Apr 27 2026 Akarsh Chaudhary <v-akarshc@microsoft.com>- 1.30.0-2
 - Fixed ptest by removing acountry test from %check since it is removed upstream and no longer built.
