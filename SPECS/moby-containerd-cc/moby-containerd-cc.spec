@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 17%{?dist}
+Release: 18%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -14,31 +14,26 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: containerd.service
-Source2: containerd.toml
-Patch0: CVE-2023-47108.patch
-Patch1: CVE-2023-39325.patch
-Patch2: fix_cc_tests_for_golang1.21.patch
-Patch3: CVE-2024-24786.patch
-Patch4: CVE-2024-28180.patch
-Patch5: CVE-2023-45288.patch
-Patch7: CVE-2023-44487.patch
-Patch8: CVE-2025-27144.patch
-Patch9: CVE-2024-40635.patch
-Patch10:CVE-2024-25621.patch
-Patch11:CVE-2025-64329.patch
-Patch12:CVE-2026-39882.patch
-Patch13:CVE-2026-35469.patch
-Patch14:CVE-2026-39821.patch
-Patch15:CVE-2026-46680.patch
-Patch16:CVE-2026-53488.patch
-Patch17:CVE-2026-56852.patch
-Patch18:CVE-2026-37236.patch
+Source1: %{name}-%{version}-govendor-v2.tar.gz
+Source2: containerd.service
+Source3: containerd.toml
+Patch1: fix_cc_tests_for_golang1.21.patch
+Patch2: CVE-2024-28180.patch
+Patch3: CVE-2023-44487.patch
+Patch4: CVE-2025-27144.patch
+Patch5: CVE-2024-40635.patch
+Patch6: CVE-2024-25621.patch
+Patch7: CVE-2025-64329.patch
+Patch8: CVE-2026-35469.patch
+Patch9: CVE-2026-46680.patch
+Patch10:CVE-2026-53488.patch
+Patch11:CVE-2026-84304.patch
+Patch12:fix-non-constant-format-string.patch
 
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang < 1.23
+BuildRequires: golang >= 1.25
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -52,7 +47,10 @@ Conflicts: moby-engine <= 3.0.10
 This is the containerd runtime meant for use with confidential containers
 
 %prep
-%autosetup -p1 -n %{upstream_repo}-%{version}
+%autosetup -n %{upstream_repo}-%{version} -N
+rm -rf vendor
+tar -xf %{SOURCE1}
+%autopatch -p1
 
 %build
 export BUILDTAGS="-mod=vendor"
@@ -66,8 +64,8 @@ make VERSION="%{version}" REVISION="%{commit_hash}" test
 make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
 
 mkdir -p %{buildroot}/%{_unitdir}
-install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
-install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
+install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/containerd.service
+install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/containerd/config.toml
 
 %post
 %systemd_post containerd.service
@@ -91,6 +89,12 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Fri Sep 18 2026 jykanase <v-jykanase@microsoft.com> - 1.7.7-18
+- Patch for CVE-2026-84304
+- Remove patches which are fixed in new generated vendor tarball: CVE-2023-45288, CVE-2023-47108,
+  CVE-2024-24786, CVE-2026-39821, CVE-2026-39882, CVE-2026-56852, CVE-2023-39325
+- Fix non-constant format string vet errors surfaced by the go 1.25 directive
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-17
 - Patch for CVE-2026-37236
 
