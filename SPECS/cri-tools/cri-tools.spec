@@ -17,7 +17,7 @@ Source0:        https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         CVE-2026-35469.patch
 Patch1:         CVE-2026-84304.patch
-Patch2:        CVE-2026-37236.patch
+Patch2:         CVE-2026-37236.patch
 
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
