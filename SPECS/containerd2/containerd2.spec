@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.3.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -13,18 +13,18 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
-Source1: containerd.service
-Source2: containerd.toml
+Source1: %{upstream_name}-%{version}-govendor-v1.tar.gz
+Source2: containerd.service
+Source3: containerd.toml
 
 Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
 Patch2:	fix-TestCgroupNamespace-cgroupv1.patch
-Patch3:	CVE-2026-56852.patch
-Patch4:	CVE-2026-37236.patch
+Patch3:	CVE-2026-37236.patch
+Patch4: CVE-2026-84304.patch
 
 %{?systemd_requires}
 
-# Temporarily stay on Go 1.26 until the Go 1.27 ML-KEM backend is fixed.
 BuildRequires: (golang < 1.27 with golang >= 1.26.7)
 BuildRequires: go-md2man
 BuildRequires: make
@@ -55,7 +55,10 @@ containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
+%autosetup -n %{upstream_name}-%{version} -N
+rm -rf vendor
+tar -xf %{SOURCE1}
+%autopatch -p1
 
 %build
 export BUILDTAGS="-mod=vendor"
@@ -72,8 +75,8 @@ make VERSION="%{version}" REVISION="%{commit_hash}" test
 make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
 
 mkdir -p %{buildroot}/%{_unitdir}
-install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
-install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
+install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/containerd.service
+install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/containerd/config.toml
 install -vdm 755 %{buildroot}/opt/containerd/{bin,lib}
 
 %post
@@ -101,6 +104,10 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Sep 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.3.4-2
+- Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445.
+- Remove patches which are fixed in new generated vendor tarball: CVE-2026-56852
+
 * Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
 - Upgrade to 2.3.4
 - Remove CVE patches fixed upstream
