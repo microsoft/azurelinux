@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary: C source code tree search and browse tool 
 Name: cscope
 Version: 15.9
-Release: 8%{?dist}
+Release: 9%{?dist}
 Source0: https://downloads.sourceforge.net/project/%{name}/%{name}/%{version}/%{name}-%{version}.tar.gz
 URL: http://cscope.sourceforge.net
 License: BSD and GPLv2+
@@ -13,6 +13,7 @@ BuildRequires: autoconf automake
 Requires: emacs-filesystem coreutils
 
 Patch1: cscope-dblfree.patch
+Patch2: cscope-ncursesw.patch
 
 %define cscope_share_path %{_datadir}/cscope
 %define emacs_lisp_path %{_datadir}/emacs/site-lisp
@@ -29,6 +30,7 @@ matches for use in file editing.
 %prep
 %setup -q
 %patch 1 -p1 
+%patch 2 -p1
 
 autoreconf
 
@@ -76,6 +78,12 @@ rm -f %{emacs_lisp_path}/xcscope.el
 rm -f %{vim_plugin_path}/cctree.vim
 
 %changelog
+* Fri Apr 03 2026 Praveen K Paladugu <prapal@linux.microsoft.com> - 15.9-9
+- Prefer libncursesw over libncurses at configure time to fix SIGSEGV
+  in _nc_init_acs_sp (sp->_acs_map NULL) during initscr().
+  ncurses is built as wide-char (ncursesw) and the narrow stub
+  does not properly initialize per-screen ACS data.
+
 * Wed Nov 03 2021 Thomas Crain <thcrain@microsoft.com> - 15.9-8
 - Remove xemacs support
 

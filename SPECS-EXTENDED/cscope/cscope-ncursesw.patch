@@ -1,0 +1,30 @@
+--- a/configure.in
++++ b/configure.in
+@@ -254,6 +254,27 @@
+ AC_DEFUN([AC_SEARCH_NCURSES], [
+     AS_MESSAGE(checking "location of ncurses.h file"...)
+ 
++    dnl Prefer libncursesw (wide-character ncurses) when available.
++    dnl On modern Linux distributions such as Azure Linux, Fedora and RHEL,
++    dnl ncurses is built with wide-character support as the primary library.
++    dnl The narrow libncurses.so on these systems is a stub that does not
++    dnl properly initialize per-screen data (sp->_acs_map), which causes a
++    dnl SIGSEGV in _nc_init_acs_sp() at initscr() time.  Using libncursesw
++    dnl directly avoids this crash.
++    AC_CHECK_LIB([ncursesw], [initscr],
++        [if $search_ncurses; then
++             CURSES_LIBS="-lncursesw"
++             search_ncurses=false
++             has_curses=true
++             AC_DEFINE([USE_NCURSES], 1, [Use Ncurses?])
++             AC_DEFINE([HAS_CURSES], 1, [Found some version of curses])
++             if test -f /usr/include/ncurses.h; then
++                 CURSES_INCLUDEDIR=""
++             elif test -f /usr/include/ncursesw/ncurses.h; then
++                 CURSES_INCLUDEDIR="-I/usr/include/ncursesw"
++             fi
++         fi])
++
+     AC_NCURSES(/usr/include, ncurses.h, -lncurses,, "ncurses on /usr/include")
+     AC_NCURSES(/usr/include/ncurses, ncurses.h, -lncurses, -I/usr/include/ncurses, "ncurses on /usr/include/ncurses")
+     AC_NCURSES(/usr/local/include, ncurses.h, -L/usr/local/lib -lncurses, -I/usr/local/include, "ncurses on /usr/local")
