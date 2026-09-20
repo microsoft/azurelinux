@@ -92,7 +92,7 @@ fi
 * Fri Sep 18 2026 jykanase <v-jykanase@microsoft.com> - 1.7.7-18
 - Patch for CVE-2026-84304
 - Remove patches which are fixed in new generated vendor tarball: CVE-2023-45288, CVE-2023-47108,
-  CVE-2024-24786, CVE-2026-39821, CVE-2026-39882, CVE-2026-56852, CVE-2023-39325
+  CVE-2024-24786, CVE-2026-39821, CVE-2026-39882, CVE-2026-56852, CVE-2023-39325, CVE-2026-37236
 - Fix non-constant format string vet errors surfaced by the go 1.25 directive
 
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-17
