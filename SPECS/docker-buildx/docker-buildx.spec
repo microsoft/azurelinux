@@ -17,9 +17,9 @@ Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-39882.patch
 Patch3:         CVE-2026-35469.patch
 Patch4:         CVE-2026-84304.patch
-Patch27:        CVE-2026-37236.patch
-Patch28:        CVE-2026-56855.patch
-Patch29:        CVE-2026-78662.patch
+Patch5:         CVE-2026-37236.patch
+Patch6:         CVE-2026-56855.patch
+Patch7:         CVE-2026-78662.patch
 
 BuildRequires: bash
 BuildRequires: golang >= 1.25
