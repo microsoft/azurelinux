@@ -1,0 +1,35 @@
+# Azure Linux 3.0 pinned `datasource_list` inline in /etc/cloud/cloud.cfg; the
+# 4.0 rendered config does not set it, so cloud-init probes every supported
+# datasource on every boot before settling on Azure.
+#
+# Ship the same list as a cloud.cfg.d drop-in instead of patching the upstream
+# template, so the rendered cloud.cfg stays aligned with upstream.
+#
+# Measured on Standard_D8s_v6 (AZL 4.0): pinning the datasource reduced
+# cloud-init-local from ~2.6s to ~0.9s.
+
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add cloud.cfg.d drop-in pinning the Azure datasource"
+type = "file-add"
+file = "90-azure-datasource.cfg"
+source = "../90-azure-datasource.cfg"
+
+[[overlays]]
+description = "Register 90-azure-datasource.cfg as a Source tag"
+type = "spec-insert-tag"
+tag = "Source2"
+value = "90-azure-datasource.cfg"
+
+[[overlays]]
+description = "Install the Azure datasource drop-in into cloud.cfg.d"
+type = "spec-search-replace"
+section = "%install"
+regex = 'mkdir -p \$RPM_BUILD_ROOT/var/lib/cloud'
+replacement = '''# Pin the datasource list so cloud-init does not probe every provider at boot.
+install -Dm0644 %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/cloud/cloud.cfg.d/90-azure-datasource.cfg
+
+mkdir -p $RPM_BUILD_ROOT/var/lib/cloud'''
