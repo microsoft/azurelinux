@@ -29,6 +29,8 @@ Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
 Source5:        config_aarch64
+# Temporary local mitigation; drop once the upstream fix lands.
+Patch0:         0001-mm-vmscan-throttle-memcg-reclaim-on-writeback-cycling.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -267,6 +269,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %changelog
 * Wed Aug 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.mshv1-1
 - Auto-upgrade to 6.18.34.mshv1
+- Add temporary mm/vmscan mitigation for the memcg reclaim regression
 
 * Mon Jun 13 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.137.mshv2-2
 - Enable CONFIG_EROFS_FS and related features
