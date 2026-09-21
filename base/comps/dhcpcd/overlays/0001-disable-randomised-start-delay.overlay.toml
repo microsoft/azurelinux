@@ -1,0 +1,31 @@
+# dhcpcd applies a randomised delay before sending its first DHCP packet
+# (RFC 2131 anti-synchronisation). That trade-off targets large broadcast
+# domains of physical hosts booting together; on a cloud VM it only adds
+# latency to every DHCP transaction.
+#
+# cloud-init's Azure datasource runs dhcpcd during early boot to reach IMDS, so
+# the delay lands directly on the boot critical path.
+#
+# Measured on Standard_D8s_v6 (AZL 4.0, dhcpcd 10.3.0): the same cached-lease
+# invocation took 1.693s without `nodelay` and 0.104s with it. Azure Linux 3.0
+# shipped dhcpcd 10.0.8, which did not exhibit the delay (0.710s), so this is a
+# regression relative to 3.0 rather than a new tuning choice.
+#
+# NOTE: this changes the default for every dhcpcd consumer on the system, not
+# just cloud-init. That is intentional for a cloud-targeted distro, but it is a
+# behavioural change worth flagging in review.
+
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Disable dhcpcd's randomised initial delay (costly on cloud VMs)"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+  "",
+  "# Azure Linux: skip dhcpcd's randomised start delay; it serialises early boot",
+  "# on cloud VMs where anti-synchronisation provides no benefit.",
+  "echo 'nodelay' >> %{buildroot}%{_sysconfdir}/%{name}.conf",
+]
