@@ -1,8 +1,8 @@
-%define         commit_hash bb14dabeb7185bb72c8c86735d090dcb20f36587
+%define         commit_hash 8f2685a471d3347a686ad3909783d8aafc6bb208
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.4.3
+Version:        1.5.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -12,7 +12,9 @@ URL:            https://github.com/opencontainers/runc
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  go-md2man
-BuildRequires:  golang < 1.25
+# runc 1.5.1 requires Go >= 1.25. Temporarily stay on Go 1.26 until the Go 1.27
+# ML-KEM backend is fixed.
+BuildRequires:  (golang < 1.27 with golang >= 1.26.7)
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
 Requires:       glibc
@@ -51,6 +53,10 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Mon Sep 21 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.5.1-1
+- Upgrade to 1.5.1 to match the runc version pinned by containerd 2.4.0
+- Build with Go 1.26 since 1.5.1 requires Go >= 1.25
+
 * Thu Sep 03 2026 Nan Liu <liunan@microsoft.com> - 1.4.3-1
 - Upgrade to 1.4.3
 
