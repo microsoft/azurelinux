@@ -17,18 +17,18 @@ Source0:  https://github.com/microsoft/confidential-containers-containerd/archiv
 Source1: %{name}-%{version}-govendor-v2.tar.gz
 Source2: containerd.service
 Source3: containerd.toml
-Patch1: fix_cc_tests_for_golang1.21.patch
-Patch2: CVE-2024-28180.patch
-Patch3: CVE-2023-44487.patch
-Patch4: CVE-2025-27144.patch
-Patch5: CVE-2024-40635.patch
-Patch6: CVE-2024-25621.patch
-Patch7: CVE-2025-64329.patch
-Patch8: CVE-2026-35469.patch
-Patch9: CVE-2026-46680.patch
-Patch10:CVE-2026-53488.patch
-Patch11:CVE-2026-84304.patch
-Patch12:fix-non-constant-format-string.patch
+Patch0: fix_cc_tests_for_golang1.21.patch
+Patch1: CVE-2024-28180.patch
+Patch2: CVE-2023-44487.patch
+Patch3: CVE-2025-27144.patch
+Patch4: CVE-2024-40635.patch
+Patch5: CVE-2024-25621.patch
+Patch6: CVE-2025-64329.patch
+Patch7: CVE-2026-35469.patch
+Patch8: CVE-2026-46680.patch
+Patch9:CVE-2026-53488.patch
+Patch10:CVE-2026-84304.patch
+Patch11:fix-non-constant-format-string.patch
 
 %{?systemd_requires}
 
