@@ -1,49 +1,19 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        3.32.0.kata0
-Release:        6%{?dist}
+Version:        4.1.0.kata0
+Release:        1%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Todo: revert back to %{name}-${version}-cargo.tar.gz next release
-# This is a temporary workaround so we can use a newer cargo tarball without having to make a new fork release
-# The cargo tarball carries the Rust ".cargo"/"vendor" trees plus the Go "src/runtime/vendor" tree.
-# How to re-build this file (the Rust crates are carried over from the previous tarball):
-#   1. wget https://github.com/microsoft/kata-containers/archive/refs/tags/%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. cd %%{name}-%%{version}
-#   4. tar -xf %%{name}-3.32.0.kata1-cargo.tar.gz
-#   5. cd src/runtime
-#   6. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
-#   7. go mod tidy
-#   8. go mod vendor
-#   9. cd ../..
-#  10. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -czf %%{name}-3.32.0.kata2-cargo.tar.gz .cargo vendor src/runtime/vendor
-#
-#   NOTES:
-#       - Step 4 restores the Rust ".cargo"/"vendor" trees, which are reused as-is;
-#         only the Go tree under "src/runtime/vendor" is regenerated.
-#       - Unlike the other Go vendor tarballs in this repo, this one is gzip compressed.
-#       - Steps 2-10 are also automated by generate_source_tarball.sh, which expects the
-#         previous cargo tarball next to --srcTarball:
-#           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
-#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 2
-Source1:        %{name}-3.32.0.kata2-cargo.tar.gz
-# Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
-Patch0:         dbs-arch-cpuid-unsafe.patch
+Source1:        %{name}-%{version}-cargo.tar.gz
+Patch0:         pathrs-tolerate-dot-separated-localversions.patch
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-41602.patch
-Patch3:         CVE-2026-50540.patch
-Patch4:         CVE-2026-77176.patch
-Patch5:         CVE-2026-84304.patch
+Patch3:         CVE-2026-84304.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang >= 1.25
 BuildRequires:  protobuf-compiler
@@ -75,21 +45,9 @@ This package contains the scripts and files required to build the UVM
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-%make_build package
+%make_build PACKAGE_VERSION=%{version}-%{release} package
 popd
 
-pushd %{_builddir}/%{name}-%{version}/src/runtime/config
-cp configuration-clh.toml configuration-clh-preview.toml
-cp configuration-clh-debug.toml configuration-clh-preview-debug.toml
-popd
-
-for config_file in \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml; do
-  sed -i 's|^\[hypervisor\.clh\]$|[factory]\nenable_template = true\ntemplate_path = "/run/vc/vm/template"\n\n[hypervisor.clh]|' "${config_file}"
-  sed -i 's|^shared_fs = "virtio-fs"$|shared_fs = "none"|' "${config_file}"
-  sed -i 's|^default_maxmemory = .*$|default_maxmemory = 2048|' "${config_file}"
-done
 
 %define kata_path     /opt/kata-containers
 %define kata_bin      %{_prefix}/local/bin
@@ -99,13 +57,9 @@ done
 
 %install
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
-PREFIX=%{buildroot} %make_build deploy-package-tools
+START_SERVICES=no PREFIX=%{buildroot} %make_build RELEASE_VERSION=%{version}-%{release} deploy-package
+PREFIX=%{buildroot} %make_build RELEASE_VERSION=%{version}-%{release} deploy-package-tools
 popd
-install -m 0644 \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml \
-  %{buildroot}%{defaults_kata}/
 
 %files
 %{kata_bin}/kata-collect-data.sh
@@ -118,8 +72,11 @@ install -m 0644 \
 %{defaults_kata}/configuration-clh-debug.toml
 %{defaults_kata}/configuration-clh-preview.toml
 %{defaults_kata}/configuration-clh-preview-debug.toml
-%{defaults_kata}/configuration-clh-runtime-rs.toml
-%{defaults_kata}/configuration-clh-runtime-rs-debug.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs-debug.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs-v2.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs-v2-debug.toml
+
 
 %{kata_shim_bin}/containerd-shim-kata-v2
 %{kata_shim_bin}/containerd-shim-kata-v2-go
@@ -169,6 +126,9 @@ install -m 0644 \
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Fri Sep 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata0-1
+- Auto-upgrade to 4.1.0.kata0
+
 * Wed Sep 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.32.0.kata0-6
 - Patch for CVE-2026-84304
 - Removed patches CVE-2026-56852
