@@ -44,12 +44,11 @@ Patch27:        CVE-2025-46327.patch
 Patch28:        CVE-2026-54908.patch
 Patch29:        CVE-2026-54332.patch
 Patch30:        CVE-2026-65819.patch
-Patch31:        CVE-2026-79921.patch
-Patch32:        CVE-2026-37236.patch
-Patch33:        CVE-2026-56855.patch
-Patch34:        CVE-2026-78662.patch
-Patch35:        CVE-2026-84445.patch
-Patch36:        CVE-2026-77411.patch
+Patch31:        CVE-2026-37236.patch
+Patch32:        CVE-2026-56855.patch
+Patch33:        CVE-2026-78662.patch
+Patch34:        CVE-2026-84445.patch
+Patch35:        CVE-2026-77411.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -118,6 +117,7 @@ fi
 - Patch upgrades "github.com/rabbitmq/amqp091-go" from v1.9.0 to v1.15.0
 - This upgrade fixes CVE-2026-77403, CVE-2026-77405, CVE-2026-77406, CVE-2026-77407,
   CVE-2026-77408, CVE-2026-77409, CVE-2026-77410, CVE-2026-77411, CVE-2026-77412
+- Removed patch for CVE-2026-79921 which is fixed by this upgrade.
 
 * Thu Sep 17 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.31.0-33
 - Patch for CVE-2026-84445, CVE-2026-84304, CVE-2026-83530
