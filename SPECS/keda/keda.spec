@@ -33,10 +33,10 @@ Patch6:         CVE-2025-30204.patch
 Patch7:         CVE-2025-68476.patch
 Patch8:         CVE-2026-2303.patch
 Patch9:         CVE-2026-35469.patch
-Patch10:        CVE-2026-37236.patch
-Patch11:        CVE-2026-41889.patch
-Patch12:        CVE-2026-73500.patch
-Patch13:        CVE-2026-79921.patch
+Patch10:        CVE-2026-41889.patch
+Patch11:        CVE-2026-73500.patch
+Patch12:        CVE-2026-79921.patch
+Patch13:        CVE-2026-37236.patch
 Patch14:        CVE-2026-84445.patch
 Patch15:        keda-dependency-uplift.patch
 
