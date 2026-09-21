@@ -1,0 +1,36 @@
+# Azure Linux images boot with `console=ttyS0` on an emulated serial console.
+# Kernel console output is synchronous and every write traps to the hypervisor,
+# so the upstream default console loglevel of 7 (KERN_DEBUG) pushes ~630 kernel
+# messages through that console on a typical boot and measurably delays startup.
+#
+# Ship the same sysctl Azure Linux 3.0 provided (systemd-udev owned
+# /usr/lib/sysctl.d/10-console-messages.conf) so only warnings and above reach
+# the console. Full verbosity is still recorded in the journal and dmesg.
+#
+# Measured on Standard_D8s_v6: restoring this file plus suppressing systemd
+# status output reduced boot time by ~4.5s (20.9s -> 16.4s) on AZL 4.0.
+
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add 10-console-messages.conf sysctl source (lowers kernel console loglevel)"
+type = "file-add"
+file = "10-console-messages.conf"
+source = "../10-console-messages.conf"
+
+[[overlays]]
+description = "Register 10-console-messages.conf as a Source tag"
+type = "spec-insert-tag"
+tag = "Source27"
+value = "10-console-messages.conf"
+
+[[overlays]]
+description = "Install 10-console-messages.conf into /usr/lib/sysctl.d"
+type = "spec-search-replace"
+regex = 'install -Dm0644 -t %\{buildroot\}%\{_prefix\}/lib/sysctl\.d/ %\{SOURCE17\}'
+replacement = '''install -Dm0644 -t %{buildroot}%{_prefix}/lib/sysctl.d/ %{SOURCE17}
+
+# Lower the default kernel console loglevel; Azure serial consoles are slow.
+install -Dm0644 -t %{buildroot}%{_prefix}/lib/sysctl.d/ %{SOURCE27}'''
