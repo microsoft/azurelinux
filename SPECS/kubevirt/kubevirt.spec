@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.8.4
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -301,7 +301,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
-* Fri Aug 14 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.8.4-1
+* Fri Aug 14 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.8.4-3
 - Enable Kubevirt Sidecar
 - Add hotplug volue patches
 - Add live migration blackout observability patch
