@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.14.1
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,10 +35,10 @@ Patch8:         CVE-2026-2303.patch
 Patch9:         CVE-2026-35469.patch
 Patch10:        CVE-2026-41889.patch
 Patch11:        CVE-2026-73500.patch
-Patch12:        CVE-2026-79921.patch
-Patch13:        CVE-2026-37236.patch
-Patch14:        CVE-2026-84445.patch
-Patch15:        keda-dependency-uplift.patch
+Patch12:        CVE-2026-37236.patch
+Patch13:        CVE-2026-84445.patch
+Patch14:        keda-dependency-uplift.patch
+Patch15:        CVE-2026-77411.patch
 
 BuildRequires:  golang >= 1.25
 
@@ -84,6 +84,12 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Mon Sep 21 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.14.1-21
+- Patch upgrades "github.com/rabbitmq/amqp091-go" from v1.9.0 to v1.15.0
+- This upgrade fixes CVE-2026-77403, CVE-2026-77405, CVE-2026-77406, CVE-2026-77407,
+  CVE-2026-77408, CVE-2026-77409, CVE-2026-77410, CVE-2026-77411, CVE-2026-77412
+- Removed patch for CVE-2026-79921 as it is fixed by this upgrade.
+
 * Thu Sep 17 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.14.1-20
 - Patch for CVE-2026-84445, CVE-2026-84304, CVE-2026-83530
 - Upgraded cel-go to 0.31.0 and grpc to v1.83.2, which required uplifting
