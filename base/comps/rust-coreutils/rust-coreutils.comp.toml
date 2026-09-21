@@ -1,20 +1,23 @@
 [components.rust-coreutils]
-# Pin to the latest Fedora dist-git commit, which packages upstream 0.7.0.
-# The overlays below carry us forward to 0.9.0, which Fedora has not yet
-# packaged but is the version Azure Linux ships.
+# Pin to the last Fedora dist-git commit that still carried a spec, which
+# packages upstream 0.7.0. Fedora has since retired this dist-git repo in favour
+# of a new `uutils-coreutils` package (rawhide/f45 only, also still on 0.7.0),
+# so there is no newer upstream spec to track on the f43 branch AZL builds
+# against. The overlays below carry us forward to 0.12.0, the version Azure
+# Linux ships.
 spec = { type = "upstream", upstream-commit = "b86e8fd647f6f28854879e33db45721a9d566919" }
 
-# Bump from Fedora's 0.7.0 to upstream uutils/coreutils 0.9.0.
+# Bump from Fedora's 0.7.0 to upstream uutils/coreutils 0.12.0.
 [[components.rust-coreutils.overlays]]
-description = "Bump uutils-coreutils from Fedora's 0.7.0 to upstream 0.9.0"
+description = "Bump uutils-coreutils from Fedora's 0.7.0 to upstream 0.12.0"
 type = "spec-update-tag"
 tag = "Version"
-value = "0.9.0"
+value = "0.12.0"
 
 # Fedora's coreutils-fix-metadata.diff was generated against the 0.7.0 crate
-# and its hunk line numbers no longer apply to 0.9.0, so we drop it. Instead of
+# and its hunk line numbers no longer apply to 0.12.0, so we drop it. Instead of
 # reproducing its loosening, we pin selinux to the exact version frozen in the
-# vendored tree + Cargo.lock (0.6.2) so the manifest constraint matches the
+# vendored tree + Cargo.lock (0.6.3) so the manifest constraint matches the
 # locked artifact for this security-critical component.
 [[components.rust-coreutils.overlays]]
 description = "Drop Fedora's 0.7.0-targeted metadata patch reference (replaced by inline sed in %prep below)"
@@ -28,23 +31,40 @@ type = "file-remove"
 file = "coreutils-fix-metadata.diff"
 
 [[components.rust-coreutils.overlays]]
-description = "Pin the security-critical selinux crate to the exact vendored/locked version (=0.6.2)"
+description = "Pin the security-critical selinux crate to the exact vendored/locked version (=0.6.3)"
 type = "spec-append-lines"
 section = "%prep"
 lines = [
     "# selinux is security-critical; pin it to exactly the version frozen in the",
-    "# vendored tree and Cargo.lock (0.6.2). Upstream declares 'selinux = \"0.6\"'",
+    "# vendored tree and Cargo.lock (0.6.3). Upstream declares 'selinux = \"0.6\"'",
     "# (a caret range) in [workspace.dependencies]; tighten it to an exact pin so",
-    "# the manifest constraint matches the locked artifact. 0.6.2 already satisfies",
+    "# the manifest constraint matches the locked artifact. 0.6.3 already satisfies",
     "# and is locked, so the offline/--locked build stays reproducible.",
-    "sed -i '/^\\[workspace.dependencies\\]/,/^\\[/ s/^selinux = \"0.6\"$/selinux = \"=0.6.2\"/' Cargo.toml",
+    "sed -i '/^\\[workspace.dependencies\\]/,/^\\[/ s/^selinux = \"0.6\"$/selinux = \"=0.6.3\"/' Cargo.toml",
 ]
+
+# Upstream dropped the `exacl` crate in favour of reading the POSIX ACL xattrs
+# directly, and removed the `feat_acl` feature along with it. Fedora's 0.7.0
+# spec still passes feat_acl to every cargo macro, which aborts the 0.12.0 build
+# with an unknown-feature error. Both %global definitions (systemd_logind on and
+# off) have to be fixed.
+[[components.rust-coreutils.overlays]]
+description = "Drop the feature_flags entry for feat_acl, removed upstream in 0.12.0 (systemd_logind build)"
+type = "spec-search-replace"
+regex = '^%global feature_flags feat_acl,feat_os_unix,feat_selinux,feat_systemd_logind,uudoc$'
+replacement = "%global feature_flags feat_os_unix,feat_selinux,feat_systemd_logind,uudoc"
+
+[[components.rust-coreutils.overlays]]
+description = "Drop the feature_flags entry for feat_acl, removed upstream in 0.12.0 (non-systemd_logind build)"
+type = "spec-search-replace"
+regex = '^%global feature_flags feat_acl,feat_os_unix,feat_selinux,uudoc$'
+replacement = "%global feature_flags feat_os_unix,feat_selinux,uudoc"
 
 # --- Vendored build switch -------------------------------------------------
 # Azure Linux does not mirror Fedora's full rust2rpm crate ecosystem, so the
 # per-crate `BuildRequires: crate(...)` emitted by %cargo_generate_buildrequires
 # cannot be satisfied. Instead, ship a pre-populated `vendor/` tree (produced
-# with `cargo vendor` against the unpacked 0.9.0 sources) and build offline.
+# with `cargo vendor` against the unpacked 0.12.0 sources) and build offline.
 [[components.rust-coreutils.overlays]]
 description = "Add the cargo-vendored dependency tarball for offline build"
 type = "file-add"
@@ -83,12 +103,6 @@ type = "spec-add-tag"
 tag = "BuildRequires"
 value = "clang-devel"
 
-[[components.rust-coreutils.overlays]]
-description = "Linking against libacl (used by cp/mv attribute preservation) requires libacl-devel"
-type = "spec-add-tag"
-tag = "BuildRequires"
-value = "libacl-devel"
-
 # In vendor mode, %cargo_install doesn't populate %{crate_instdir} with the
 # upstream source tree, so the rust2rpm-style `devel` and `+<feature>-devel`
 # subpackages fail with "File not found". Stub %{crate_instdir} with the
@@ -103,17 +117,15 @@ lines = [
     "# Azure Linux: vendor-mode %%cargo_install skips the crate source copy.",
     "# Stub the files referenced by the inherited rust2rpm devel subpackages.",
     "mkdir -p %{buildroot}%{crate_instdir}",
-    "for f in LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md DEVELOPMENT.md README.md SECURITY.md; do",
+    "for f in LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md DEVELOPMENT.md README.md README.package.md SECURITY.md; do",
     "    install -m 0644 \"$f\" %{buildroot}%{crate_instdir}/\"$f\"",
     "done",
-    "# README.package.md is Fedora-specific; create an empty placeholder.",
-    "touch %{buildroot}%{crate_instdir}/README.package.md",
     "# Placeholder for the %ghost Cargo.toml referenced by +<feature>-devel subpackages.",
     "touch %{buildroot}%{crate_instdir}/Cargo.toml",
 ]
 
 # Strip the stale 0.7.0 entry from Fedora's `sources` lookaside file. The
-# 0.9.0 entry is appended by the `source-files` block below; without this
+# 0.12.0 entry is appended by the `source-files` block below; without this
 # overlay the rendered `sources` would list both versions, which is harmless
 # at build time but confusing to readers and to diff tooling.
 [[components.rust-coreutils.overlays]]
@@ -124,10 +136,10 @@ regex = '^SHA512 \(coreutils-0\.7\.0\.crate\) = [0-9a-f]+\n'
 replacement = ""
 
 [[components.rust-coreutils.overlays]]
-description = "Use the upstream GitHub release tarball for 0.9.0 instead of crate-based Source"
+description = "Use the upstream GitHub release tarball for 0.12.0 instead of crate-based Source"
 type = "spec-update-tag"
 tag = "Source"
-value = "coreutils-0.9.0.tar.gz"
+value = "coreutils-0.12.0.tar.gz"
 
 [[components.rust-coreutils.overlays]]
 description = "Set project URL to upstream GitHub project for tarball-sourced build"
@@ -135,13 +147,13 @@ type = "spec-update-tag"
 tag = "URL"
 value = "https://github.com/uutils/coreutils"
 
-# Stage the 0.9.0 source tarball in component sources to avoid lookaside
+# Stage the 0.12.0 source tarball in component sources to avoid lookaside
 # fetches for a version Fedora dist-git does not yet carry.
 [[components.rust-coreutils.overlays]]
-description = "Add the 0.9.0 source tarball from local component sources for build validation"
+description = "Add the 0.12.0 source tarball from local component sources for build validation"
 type = "file-add"
-file = "coreutils-0.9.0.tar.gz"
-source = "coreutils-0.9.0.tar.gz"
+file = "coreutils-0.12.0.tar.gz"
+source = "coreutils-0.12.0.tar.gz"
 
 # --- PATH-based coexistence with GNU coreutils -----------------------------
 # Azure Linux ships both GNU coreutils (owning the real files at %{_bindir})

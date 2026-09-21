@@ -17,11 +17,15 @@
 # prevents 0.7.0 from being silently installed if 0.0.27 is missing (dnf5
 # builddep otherwise skips the unsatisfiable pin without error). Each kind is
 # applied to both rust-uucore and rust-uucore_procs, for four overlay entries.
+#
+# `rust-coreutils` is deliberately absent: it builds from a vendored dependency
+# tree with %cargo_generate_buildrequires disabled, so it never emits a dynamic
+# crate(uucore) dependency to pin, and it carries its own uucore inside the
+# vendored 0.12.0 sources.
 
 [component-groups.rust-uucore-version-pin]
 description = "Pin crate(uucore) = 0.0.27 to prevent version skew with Fedora f43-updates"
 components = [
-    "rust-coreutils",
     "rust-uu_base32",
     "rust-uu_base64",
     "rust-uu_basename",
