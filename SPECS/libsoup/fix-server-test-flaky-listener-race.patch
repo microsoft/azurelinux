@@ -6,6 +6,7 @@ Subject: [PATCH] test-utils: fix deadlock in add_listener_in_thread()
 The mutex is locked in the wrong place here.
 
 Hopefully fixes #379
+
 Upstream-reference: https://gitlab.gnome.org/GNOME/libsoup/-/commit/3c0cee2cfddb9ba31b30421f2b3cdd3c5a255e99.patch
 ---
  tests/test-utils.c | 6 ++++--

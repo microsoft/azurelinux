@@ -164,7 +164,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
-* Sat Oct 10 2026 Swapnil Sahu <swapsahu@microsoft.com> - 3.4.4-17
+* Sat Oct 10 2026 Swapnil Sahu <swapsahu@microsoft.com> - 3.4.4-18
 - Patch for CVE-2026-77014, CVE-2026-85197
 - Resolve flaky server-test ptest with upstream test-utils fix
 
