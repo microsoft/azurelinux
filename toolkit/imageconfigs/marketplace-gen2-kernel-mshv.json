@@ -56,7 +56,7 @@
                 }
             ],
             "PackageLists": [
-                "packagelists/core-packages-image.json",
+                "packagelists/core-packages-image-mshv.json",
                 "packagelists/marketplace-tools-packages.json",
                 "packagelists/azurevm-packages.json",
                 "packagelists/hyperv-packages.json",

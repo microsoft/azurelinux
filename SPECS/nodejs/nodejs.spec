@@ -15,7 +15,7 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        24.20.0
+Version:        24.21.0
 Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
@@ -193,6 +193,9 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Wed Sep 09 2026 Kanishk Bansal <kanbansal@microsoft.com> - 24.21.0-1
+- Upgrade to 24.21.0 for CVE-2026-18149 CVE-2026-18540
+
 * Tue Sep 01 2026 Aditya Singh <v-aditysing@microsoft.com> - 24.20.0-1
 - Upgrade to 24.20.0 'Krypton' (LTS) (bundled npm 11.19.0).
 - Bundled ICU version remains the same as 78.3

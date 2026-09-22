@@ -1,0 +1,45 @@
+From 15346cd3a73f108bf11c57907b32737f8365d6bd Mon Sep 17 00:00:00 2001
+From: facelessuser <faceless.shop@gmail.com>
+Date: Mon, 21 Jul 2025 08:56:43 -0600
+Subject: [PATCH] Fix failing cases for Python 3.14
+
+New change requires us to monkey patch `locatetagend` to prevent
+capturing incomplete tags in code spans.
+
+Upstream: https://github.com/Python-Markdown/markdown/pull/1548
+(released in Python-Markdown 3.9.0)
+
+The `docs/changelog.md` hunk of the upstream commit is dropped as the
+file is not shipped in the sdist used here.
+---
+ markdown/htmlparser.py | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/markdown/htmlparser.py b/markdown/htmlparser.py
+index 478e70216..63e5df31b 100644
+--- a/markdown/htmlparser.py
++++ b/markdown/htmlparser.py
+@@ -69,6 +69,20 @@ htmlparser.locatestarttagend_tolerant = re.compile(r"""
+    )?
+   \s*                                 # trailing whitespace
+ """, re.VERBOSE)
++htmlparser.locatetagend = re.compile(r"""
++  [a-zA-Z][^`\t\n\r\f />]*           # tag name
++  [\t\n\r\f /]*                     # optional whitespace before attribute name
++  (?:(?<=['"\t\n\r\f /])[^`\t\n\r\f />][^\t\n\r\f /=>]*  # attribute name
++    (?:=                            # value indicator
++      (?:'[^']*'                    # LITA-enclosed value
++        |"[^"]*"                    # LIT-enclosed value
++        |(?!['"])[^>\t\n\r\f ]*     # bare value
++       )
++     )?
++    [\t\n\r\f /]*                   # possibly followed by a space
++   )*
++   >?
++""", re.VERBOSE)
+ 
+ # Match a blank line at the start of a block of text (two newlines).
+ # The newlines may be preceded by additional whitespace.
+-- 
+2.51.0
+

@@ -12,7 +12,7 @@
 
 Name:           strongswan
 Version:        5.9.14
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        An OpenSource IPsec-based VPN and TNC solution
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later
@@ -34,6 +34,16 @@ Patch5:         0001-Extending-timeout-for-test-cases-with-multiple-read-.patch
 Patch6:         CVE-2025-62291.patch
 Patch7:         CVE-2026-25075.patch
 Patch8:         CVE-2026-47895.patch
+Patch9:         CVE-2026-78123.patch
+Patch10:        CVE-2026-78124.patch
+Patch11:        CVE-2026-78126.patch
+Patch12:        CVE-2026-78127.patch
+Patch13:        CVE-2026-78129.patch
+Patch14:        CVE-2026-78130.patch
+Patch15:        CVE-2026-78131.patch
+Patch16:        CVE-2026-78132.patch
+Patch17:        CVE-2026-78134.patch
+Patch18:        CVE-2026-78135.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -428,6 +438,9 @@ install -D -m 0644 %{SOURCE3} %{buildroot}/%{_tmpfilesdir}/strongswan-starter.co
 %endif
 
 %changelog
+* Fri Sep 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.9.14-11
+- Patch for CVE-2026-78135, CVE-2026-78134, CVE-2026-78132, CVE-2026-78131, CVE-2026-78130, CVE-2026-78129, CVE-2026-78127, CVE-2026-78126, CVE-2026-78124, CVE-2026-78123
+
 * Mon Aug 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.9.14-10
 - Patch for CVE-2026-47895
 
