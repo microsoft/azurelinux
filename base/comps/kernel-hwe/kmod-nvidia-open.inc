@@ -24,7 +24,8 @@ Release:        %{_azl_kver}.%{_azl_krel}
 %global version %{_azl_kver}
 %global release %{_azl_krel}
 AutoReq:        no
-Provides:       nvidia-open-kmod-version = %{nvidia_open_version}
+# Kernel-flavor-specific capability; nvidia-kmod remains the shared driver capability.
+Provides:       %{_kmod_name}-kmod-version = %{nvidia_open_version}
 Provides:       nvidia-kmod = %{nvidia_open_version}
 Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
