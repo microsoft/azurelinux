@@ -111,10 +111,8 @@ MAIL_DIR	/var/spool/mail
 # Default "umask" value for pam_umask(8) on PAM enabled systems.
 # UMASK is also used by useradd(8) and newusers(8) to set the mode for new
 # home directories if HOME_MODE is not set.
-# 022 is the default value, but 027, or even 077, could be considered
-# for increased privacy. There is no One True Answer here: each sysadmin
-# must make up their mind.
-UMASK		022
+# Azure Linux uses 027 as the default for increased privacy.
+UMASK		027
 
 # HOME_MODE is used by useradd(8) and newusers(8) to set the mode for new
 # home directories.
