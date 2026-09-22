@@ -128,7 +128,7 @@ HOME_MODE	0700
 #	PASS_MIN_LEN	Minimum acceptable password length.
 #	PASS_WARN_AGE	Number of days warning given before a password expires.
 #
-PASS_MAX_DAYS	99999
+PASS_MAX_DAYS	365
 PASS_MIN_DAYS	0
 PASS_MIN_LEN	8
 PASS_WARN_AGE	7
