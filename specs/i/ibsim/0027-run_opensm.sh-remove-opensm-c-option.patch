@@ -1,0 +1,28 @@
+From 4da4369a5f3f37c96986949ac4ad797385791c94 Mon Sep 17 00:00:00 2001
+From: Honggang Li <honli@redhat.com>
+Date: Wed, 2 Jan 2019 21:13:02 +0800
+Subject: [PATCH 27/27] run_opensm.sh: remove opensm '-c' option
+
+The '-c' option needs a configuration file.
+
+Signed-off-by: Honggang Li <honli@redhat.com>
+---
+ scripts/run_opensm.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/run_opensm.sh b/scripts/run_opensm.sh
+index a225d81..5fd29b5 100755
+--- a/scripts/run_opensm.sh
++++ b/scripts/run_opensm.sh
+@@ -7,7 +7,7 @@ fi
+ 
+ if [ -z "$1" ] ; then
+ 	cmd=opensm
+-	cmd_args="-e -c -V -f ./osm.log -s 0"
++	cmd_args="-e -V -f ./osm.log -s 0"
+ else
+ 	cmd="$1"
+ 	shift
+-- 
+2.25.0
+

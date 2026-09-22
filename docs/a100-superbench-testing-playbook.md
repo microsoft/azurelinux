@@ -192,10 +192,12 @@ source ~/.bashrc
 # (e.g. cublas-function); without it they fail with
 # "numactl: command not found", surfaced as a non-zero return code. The
 # numactl-devel package provides numa.h for the cpu_copy native benchmark.
-sudo dnf install -y python3 python3-pip ansible boost-devel rsync git make gcc \
+sudo dnf install -y python3 python3-devel python3-pip ansible boost-devel rsync git make gcc \
+  gcc-c++ cmake ninja-build \
   numactl numactl-devel \
   openmpi-ofed prrte
 test -f /usr/include/numa.h
+test -f "$(python3 -c 'import sysconfig; print(sysconfig.get_path("include"))')/Python.h"
 sudo ln -sf /usr/bin/python3 /usr/bin/python
 
 # torch/torchvision: cu132 wheels exist for CUDA 13.2. Install the explicit
@@ -218,6 +220,25 @@ PY
 # transformers is imported unconditionally by superbench's model_benchmarks
 # package (pytorch_bert.py), so it's needed even for non-BERT test runs.
 python3 -m pip install transformers wheel pybind11
+
+# BERT and GPT FP8 Hybrid use NVIDIA Transformer Engine. Python 3.14 does not
+# have a precompiled TE 2.12 PyTorch wheel for this Torch/CUDA combination, so
+# python3-devel and a C++ build toolchain are required for the source fallback.
+# Match the AZL3 pipeline's <2.13 compatibility pin, but select the CUDA 13 core
+# explicitly; the unqualified "core" extra installs the CUDA 12 core package.
+NVTE_FRAMEWORK=pytorch NVTE_CUDA_ARCHS=90 MAX_JOBS="$(nproc)" \
+  python3 -m pip install --no-build-isolation \
+  "transformer_engine[pytorch,core-cu13]<2.13"
+
+python3 - <<'PY'
+import transformer_engine
+import transformer_engine.pytorch as te
+from transformer_engine.common.recipe import DelayedScaling, Format
+
+print(f"transformer_engine={transformer_engine.__version__}")
+print(f"FP8 format={Format.HYBRID}, recipe={DelayedScaling}, module={te.__name__}")
+PY
+python3 -m pip check
 
 # py3nvml is normally pulled in via setup.py's [nvworker] extra
 # (install_superbench.sh runs `pip install .[nvworker]`), but we install
@@ -684,6 +705,116 @@ localhost ansible_connection=local" > mix.ini
 sb run --no-docker --host-file mix.ini -c "$SB_RUNTIME_CONFIG" --output-dir ./sb-results
 ```
 
+### Rerun only BERT Large and GPT-2 Large FP8 Hybrid
+
+Run this on the H100 VM after the Transformer Engine import and FP8
+forward/backward checks pass. Start from the same effective single-node config
+used for the comparison so the model sizes, batch sizes, warmups, steps, and
+eight-rank layout remain unchanged. SuperBench's config field is singular:
+`parameters.precision`.
+
+```bash
+cd /opt/superbench
+source ~/.bashrc
+
+# Point this at the effective config used by the original single-node run.
+export SB_SOURCE_CONFIG="$SB_RUNTIME_CONFIG"
+export SB_FP8_CONFIG=./sb-h100-fp8-only.yaml
+export SB_FP8_OUTPUT="./sb-h100-fp8-$(date +%Y%m%d-%H%M%S)"
+test -s "$SB_SOURCE_CONFIG"
+
+python3 - "$SB_SOURCE_CONFIG" "$SB_FP8_CONFIG" <<'PY'
+import sys
+from pathlib import Path
+
+import yaml
+
+source, destination = map(Path, sys.argv[1:])
+with source.open(encoding="utf-8") as stream:
+  config = yaml.safe_load(stream)
+
+profiles = ["model-benchmarks:gpt", "model-benchmarks:bert"]
+benchmarks = config["superbench"]["benchmarks"]
+config["superbench"]["enable"] = profiles
+
+expected_models = {
+  "model-benchmarks:gpt": ["gpt2-large"],
+  "model-benchmarks:bert": ["bert-large"],
+}
+for profile in profiles:
+  benchmark = benchmarks[profile]
+  if benchmark.get("models") != expected_models[profile]:
+    raise RuntimeError(
+      f"Unexpected models for {profile}: {benchmark.get('models')}"
+    )
+  benchmark["parameters"]["precision"] = ["fp8_hybrid"]
+
+with destination.open("w", encoding="utf-8") as stream:
+  yaml.safe_dump(config, stream, sort_keys=False)
+PY
+
+# Fail before launching if the focused config contains any other workload.
+python3 - "$SB_FP8_CONFIG" <<'PY'
+import sys
+
+import yaml
+
+with open(sys.argv[1], encoding="utf-8") as stream:
+  config = yaml.safe_load(stream)["superbench"]
+
+expected = ["model-benchmarks:gpt", "model-benchmarks:bert"]
+assert config["enable"] == expected, config["enable"]
+for profile in expected:
+  assert config["benchmarks"][profile]["parameters"]["precision"] == [
+    "fp8_hybrid"
+  ]
+print(f"Focused config validated: {sys.argv[1]}")
+PY
+
+unset CUDA_VISIBLE_DEVICES
+cat > ./h100-single-node.ini <<'EOF'
+[all]
+localhost ansible_connection=local
+EOF
+sb run --no-docker \
+  --host-file ./h100-single-node.ini \
+  --config-file "$SB_FP8_CONFIG" \
+  --output-dir "$SB_FP8_OUTPUT"
+```
+
+After the run, require return code zero and both FP8 metrics for every rank:
+
+```bash
+python3 - "$SB_FP8_OUTPUT/results-summary.jsonl" <<'PY'
+import json
+import sys
+
+summary = {}
+with open(sys.argv[1], encoding="utf-8") as stream:
+  for line in stream:
+    if line.strip():
+      summary.update(json.loads(line))
+
+models = [
+  "model-benchmarks:gpt/pytorch-gpt2-large",
+  "model-benchmarks:bert/pytorch-bert-large",
+]
+for model in models:
+  for rank in range(8):
+    key = f"{model}/return_code:{rank}"
+    assert summary.get(key) == 0, f"{key}={summary.get(key)!r}"
+  for metric in (
+    "fp8_hybrid_train_step_time",
+    "fp8_hybrid_train_throughput",
+  ):
+    key = f"{model}/{metric}"
+    assert key in summary, f"Missing metric: {key}"
+    assert summary[key], f"Empty metric: {key}"
+
+print("All 16 BERT/GPT FP8 rank return codes are zero; all four metrics exist")
+PY
+```
+
 Pick `<config>.yaml` per SKU, matching `scripts/tests/run_sb_tests.sh` in
 `azlinux-ai-ml`: `superbench_nd-a100_config.yaml` (single-node) or
 `superbench_a100_distributed_config.yaml` (multi-node).
@@ -878,6 +1009,34 @@ Run local GPU benchmarks first, then enable `nccl-bw` and other distributed
 benchmarks. This separates per-node CUDA/NVSwitch failures from cross-node
 SSH, MPI, InfiniBand, and GPUDirect RDMA failures.
 
+### Verify the packaged `nvidia-peermem` module
+
+After building the kernel component, verify that the newest local
+`kmod-nvidia-open` RPM compiled `nvidia-peermem` with the MLNX OFED
+peer-memory registration API. This is a build-host check; it does not install
+or load the RPM:
+
+```bash
+cd /home/edehghani/repo/azurelinux
+
+rpm=$(find base/out -type f -name 'kmod-nvidia-open-*.rpm' -printf '%T@ %p\n' |
+  sort -nr | head -n1 | cut -d' ' -f2-)
+module_path=$(rpm2cpio "$rpm" | cpio -it 2>/dev/null |
+  grep '/nvidia-peermem\.ko\.xz$')
+
+rpm2cpio "$rpm" | cpio --quiet -i --to-stdout "$module_path" | xz -dc \
+  > base/build/work/scratch/nvidia-peermem.ko
+
+readelf -Ws base/build/work/scratch/nvidia-peermem.ko |
+  grep -E 'UND.*ib_(un)?register_peer_memory_client'
+```
+
+The command must print both `ib_register_peer_memory_client` and
+`ib_unregister_peer_memory_client`. No output means the module was built
+without the legacy InfiniBand peer-memory client path and will return
+`EINVAL` when loaded. DOCa user-space packages do not satisfy this check; the
+symbols must be provided by the matching MLNX OFED `ib_core` module.
+
 If the command appears idle, inspect the orchestration log from another VM 0
 shell. No process in `nvidia-smi` means the runner has not reached a GPU
 benchmark yet:
@@ -987,12 +1146,211 @@ controlling its eight local GPUs. A profile may reference
 generator removes that override when the file is absent so NCCL discovers the
 topology itself.
 
+## Azure Linux 3 pipeline comparisons
+
+### Two-node distributed comparison
+
+The Azure Linux 3 baseline comes from Azure DevOps pipeline run
+[`20260913.1`](https://dev.azure.com/mariner-org/mariner/_build/results?buildId=1202562),
+artifact `superbench-raw-results-nd-h100`, archive
+`superbench-results-nd-h100-multi-local.tar.gz`. The pipeline completed
+successfully on two `Standard_ND96isr_H100_v5` instances using image
+`Azlinux_HPC_NVIDIA_OpenRM_amd64/1.0.1202540`.
+
+The AZL3 and AZL4 runs used the same SuperBench v0.8 workload configuration:
+
+- 16 ranks across two nodes, with eight ranks per node and one GPU per rank.
+- Five NCCL all-reduce runs from 1 KiB through 8 GiB, with 20 warmups and
+  100 measured iterations.
+- Three 30-minute GPT-2 Large FP32 training runs with batch size 8 and
+  sequence length 224.
+
+The following comparison uses the median across the five NCCL runs. The
+percentage is `(AZL4 - AZL3) / AZL3 * 100`, so a negative bandwidth result
+means AZL4 was slower.
+
+| NCCL all-reduce size | AZL3 bus bandwidth | AZL4 bus bandwidth | AZL4 difference |
+| --- | ---: | ---: | ---: |
+| 64 MiB | 264.42 GB/s | 258.12 GB/s | -2.38% |
+| 256 MiB | 389.00 GB/s | 385.36 GB/s | -0.94% |
+| 1 GiB | 444.95 GB/s | 434.09 GB/s | -2.44% |
+| 4 GiB | 464.69 GB/s | 459.16 GB/s | -1.19% |
+| 8 GiB | 467.27 GB/s | 464.02 GB/s | -0.70% |
+
+GPT-2 values use the arithmetic mean across the three stress runs:
+
+| GPT-2 Large FP32 metric | AZL3 | AZL4 | AZL4 difference |
+| --- | ---: | ---: | ---: |
+| Training throughput | 64.821 samples/s | 63.340 samples/s | -2.28% |
+| Training step time | 123.789 ms | 126.763 ms | +2.40% |
+
+All 64 return-code fields in the AZL3 result summary were zero. AZL3's three
+throughput results were 63.834, 65.255, and 65.373 samples/s; AZL4's were
+63.573, 63.159, and 63.287 samples/s. AZL4 was therefore about 2.3% slower on
+mean throughput but more repeatable (0.27% coefficient of variation versus
+1.08%). AZL3 also had a single 338.21 GB/s result at 1 GiB, while its other
+four results were 444.10--446.60 GB/s; AZL4's five 1 GiB results stayed within
+431.63--441.85 GB/s.
+
+### Single-node comparison
+
+The single-node AZL3 baseline is the same pipeline artifact's
+`superbench-results-nd-h100-single-local.tar.gz` archive. It contains one
+independent eight-GPU result from each of the two pipeline VMs. The AZL4 result
+is `/home/edehghani/repo/sb-results-single-node`, which contains one eight-GPU
+node. Their `sb.config.yaml` files are byte-for-byte identical (SHA-256
+`363fc4ecfe59ddc60f1156768b74aacb00ec53b649cfeda94b482433834f8781`).
+
+The tables use medians: AZL3 has 16 samples for per-GPU metrics and two samples
+for node-level metrics, while AZL4 has eight and one respectively. A positive
+difference is better for bandwidth, FLOPS, and throughput; a negative
+difference is better for time measurements.
+
+#### P0 coverage in the single-node ND H100 config
+
+The latest P0 schema contains 84 requested metric keys. The single-node
+`superbench_nd-h100_h200_config.yaml` workload covers the 29 entries below; 28
+are supported on H100 and have comparable AZL3 and AZL4 values. `Exact` means the requested profile
+is selected directly. `Combined profile` means the requested split profile is
+not named literally, but the selected generic BERT or GPT profile runs the same
+model, action, and precision. Values are medians, and a positive difference is
+better for every metric in this table.
+
+| Requested P0 metric | Unit | ND H100 single-node config | AZL3 | Latest AZL4 | Difference |
+| --- | --- | --- | ---: | ---: | ---: |
+| `cublaslt-gemm/fp16_0_16384_16384_16384_flops` | TFLOP/s | Exact | 810.455 | 814.116 | +0.45% |
+| `cublaslt-gemm/fp32_0_16384_16384_16384_flops` | TFLOP/s | Exact | 446.320 | 447.805 | +0.33% |
+| `cublaslt-gemm/fp8e4m3_0_16384_16384_16384_flops` | TFLOP/s | Exact | 1,626.754 | 1,628.284 | +0.09% |
+| `gemm-flops/bf16_tc_flops` | GFLOP/s | Exact | 508,691.5 | 510,310.0 | +0.32% |
+| `gemm-flops/fp16_flops` | GFLOP/s | Exact | 56,521.2 | 56,385.8 | -0.24% |
+| `gemm-flops/fp16_tc_flops` | GFLOP/s | Exact | 557,471.5 | 557,843.5 | +0.07% |
+| `gemm-flops/fp32_flops` | GFLOP/s | Exact | 44,054.5 | 40,056.4 | -9.08% |
+| `gemm-flops/fp64_flops` | GFLOP/s | Exact | 27,253.8 | 27,257.9 | +0.02% |
+| `gemm-flops/fp64_tc_flops` | GFLOP/s | Exact | 32,921.2 | 32,919.1 | -0.01% |
+| `gemm-flops/int4_tc_iops` | GOP/s | Enabled, unsupported on H100 | - | - | - |
+| `gemm-flops/int8_tc_iops` | GOP/s | Exact | 994,593 | 998,145 | +0.36% |
+| `gemm-flops/tf32_tc_flops` | GFLOP/s | Exact | 252,895 | 252,358 | -0.21% |
+| `ib-loopback/ib_write_bw_8388608` | GB/s | Alias: `ib-loopback:8M` | 46.899 | 46.846 | -0.11% |
+| `model-benchmarks:bert/pytorch-bert-large/fp16_train_throughput` | samples/s | Exact | 900.302 | 903.656 | +0.37% |
+| `model-benchmarks:bert/pytorch-bert-large/fp32_train_throughput` | samples/s | Exact | 331.114 | 333.529 | +0.73% |
+| `model-benchmarks:bert@large-fp16/pytorch-bert-large/fp16_train_throughput` | samples/s | Combined profile: `model-benchmarks:bert` | 900.302 | 903.656 | +0.37% |
+| `model-benchmarks:bert@large-fp32/pytorch-bert-large/fp32_train_throughput` | samples/s | Combined profile: `model-benchmarks:bert` | 331.114 | 333.529 | +0.73% |
+| `model-benchmarks:bert@large-fp8/pytorch-bert-large/fp8_hybrid_train_throughput` | samples/s | Combined profile: `model-benchmarks:bert` | 1,009.966 | 1,023.049 | +1.30% |
+| `model-benchmarks:densenet/pytorch-densenet201/fp16_train_throughput` | samples/s | Exact | 1,009.734 | 1,032.773 | +2.28% |
+| `model-benchmarks:densenet/pytorch-densenet201/fp32_train_throughput` | samples/s | Exact | 747.632 | 749.664 | +0.27% |
+| `model-benchmarks:gpt/pytorch-gpt2-large/fp16_train_throughput` | samples/s | Exact | 222.991 | 227.124 | +1.85% |
+| `model-benchmarks:gpt/pytorch-gpt2-large/fp32_train_throughput` | samples/s | Exact | 106.397 | 106.653 | +0.24% |
+| `model-benchmarks:gpt@large-fp16/pytorch-gpt2-large/fp16_train_throughput` | samples/s | Combined profile: `model-benchmarks:gpt` | 222.991 | 227.124 | +1.85% |
+| `model-benchmarks:gpt@large-fp32/pytorch-gpt2-large/fp32_train_throughput` | samples/s | Combined profile: `model-benchmarks:gpt` | 106.397 | 106.653 | +0.24% |
+| `model-benchmarks:gpt@large-fp8/pytorch-gpt2-large/fp8_hybrid_train_throughput` | samples/s | Combined profile: `model-benchmarks:gpt` | 219.783 | 225.957 | +2.81% |
+| `model-benchmarks:lstm/pytorch-lstm/fp16_train_throughput` | samples/s | Exact | 24,422.038 | 25,319.863 | +3.68% |
+| `model-benchmarks:lstm/pytorch-lstm/fp32_train_throughput` | samples/s | Exact | 13,662.474 | 14,013.262 | +2.57% |
+| `model-benchmarks:resnet/pytorch-resnet152/fp16_train_throughput` | samples/s | Exact | 1,257.696 | 1,245.459 | -0.97% |
+| `model-benchmarks:resnet/pytorch-resnet152/fp32_train_throughput` | samples/s | Exact | 836.549 | 842.074 | +0.66% |
+
+The other 55 requested P0 keys are not selected by this config: CPU and
+host/device memory bandwidth; cuBLASLt FP4; every model inference metric; BERT
+Base; GPT-2 Small; DenseNet-169; ResNet-50 and ResNet-101; and Llama 2 7B. In
+particular, `cpu-memory-bw-latency` has a benchmark definition, but its line in
+`superbench.enable` is commented out. It therefore produced no raw result or
+`mem_max_bandwidth_stream-triad_like_bw` summary value in either run.
+`gemm-flops/int4_tc_iops` is the sole configured P0 entry without a result.
+Both runs completed `gemm-flops` successfully on all eight GPUs. SuperBench
+explicitly removes `int4_tc` from its kernel map for Hopper compute capability
+9.0 because the benchmark has no native H100 INT4 CUDA/Tensor Core path, so it
+skips that subtest without failing the overall benchmark.
+
+#### Communication
+
+| Single-node metric | AZL3 | AZL4 | AZL4 difference |
+| --- | ---: | ---: | ---: |
+| NCCL NVLink all-reduce, 1 GiB | 467.93 GB/s | 468.06 GB/s | +0.03% |
+| NCCL NVLink all-reduce, 4 GiB | 477.04 GB/s | 478.04 GB/s | +0.21% |
+| NCCL NVLink all-reduce, 8 GiB | 479.30 GB/s | 480.43 GB/s | +0.24% |
+| NCCL NVLink all-reduce, 16 GiB | 481.25 GB/s | 480.45 GB/s | -0.17% |
+| IB loopback, 8 MiB | 46.90 GB/s | 46.85 GB/s | -0.11% |
+| NCCL IB all-reduce, 1 GiB | 48.42 GB/s | 9.37 GB/s | -80.65% |
+| NCCL IB all-reduce, 4 GiB | 48.14 GB/s | 9.33 GB/s | -80.62% |
+| NCCL IB all-reduce, 8 GiB | 48.74 GB/s | 9.34 GB/s | -80.84% |
+
+NVLink and raw IB loopback performance are effectively unchanged. The AZL4
+NCCL-over-IB result is a significant regression across the whole measured
+range: it is 0.46 GB/s versus 8.90 GB/s at 1 MiB, reaches about 9.5 GB/s at
+16 MiB, and remains near 9.34 GB/s through 16 GiB. Both runs returned success,
+so this needs transport-level investigation rather than being treated as a
+failed sample. Because raw IB loopback remains within 0.11%, the evidence
+points to the NCCL/GPUDirect RDMA software path rather than basic adapter link
+bandwidth.
+
+#### GPU compute
+
+The `gemm-flops` values below are the benchmark's reported GFLOP/s medians.
+
+| GEMM metric | AZL3 | AZL4 | AZL4 difference |
+| --- | ---: | ---: | ---: |
+| FP32 | 44,054 | 40,056 | -9.08% |
+| TF32 tensor core | 252,895 | 252,358 | -0.21% |
+| FP16 tensor core | 557,472 | 557,844 | +0.07% |
+| BF16 tensor core | 508,692 | 510,310 | +0.32% |
+| FP64 tensor core | 32,921 | 32,919 | -0.01% |
+
+Tensor-core throughput is effectively equivalent. Conventional FP32 GEMM is
+the exception at 9.08% lower on AZL4 and should be reproduced before drawing a
+conclusion. At the cuBLASLt 8192x8192x8192 shape, the AZL4 differences ranged
+from -1.16% (FP16) to +2.64% (FP8 E5M2), with FP64, FP32, BF16, and FP8 E4M3
+all within 1.1%.
+
+Kernel launch event and wall times improved by 1.83% and 3.81% respectively.
+The computation/communication overlap times improved by 0.35% for matrix
+multiplication and 0.84% for element-wise multiplication. Sharding all-reduce
+time was unchanged (-0.03%), while sharding all-gather time regressed by 1.20%.
+
+#### Model training
+
+These are the reported per-node training-throughput medians in samples/s:
+
+| Model | Precision | AZL3 | AZL4 | AZL4 difference |
+| --- | --- | ---: | ---: | ---: |
+| GPT-2 Large | FP32 | 106.397 | 106.653 | +0.24% |
+| GPT-2 Large | FP16 | 222.991 | 227.124 | +1.85% |
+| GPT-2 Large | FP8 Hybrid | 219.783 | 225.957 | +2.81% |
+| BERT Large | FP32 | 331.114 | 333.529 | +0.73% |
+| BERT Large | FP16 | 900.302 | 903.656 | +0.37% |
+| BERT Large | FP8 Hybrid | 1,009.966 | 1,023.049 | +1.30% |
+| LSTM | FP32 | 13,662.474 | 14,013.262 | +2.57% |
+| LSTM | FP16 | 24,422.038 | 25,319.863 | +3.68% |
+| ResNet-152 | FP32 | 836.549 | 842.074 | +0.66% |
+| ResNet-152 | FP16 | 1,257.696 | 1,245.459 | -0.97% |
+| DenseNet-201 | FP32 | 747.632 | 749.664 | +0.27% |
+| DenseNet-201 | FP16 | 1,009.734 | 1,032.773 | +2.28% |
+| VGG-19 | FP32 | 988.862 | 1,017.185 | +2.86% |
+| VGG-19 | FP16 | 1,604.481 | 1,616.985 | +0.78% |
+
+AZL4 improved all 14 common model-throughput measurements. The original AZL4
+BERT and GPT run returned code 18 (`MODEL_CREATION_FAILURE`) on all eight ranks
+for FP8 Hybrid because `transformer_engine` was not installed. After installing
+Transformer Engine 2.12.0, the focused rerun returned zero on all eight ranks
+for both models. BERT Large FP8 Hybrid step time improved from 128.091 ms on
+AZL3 to 125.346 ms on AZL4 (-2.14%), while GPT-2 Large improved from 146.021 ms
+to 141.621 ms (-3.01%). All monitored corrected and uncorrected GPU ECC counts
+were zero. Conversely, AZL3 `dist-inference` returned code 33 on all 16 ranks
+and produced no usable performance metrics, while AZL4 completed it on all
+eight ranks. These are functional differences and should not be reduced to
+throughput percentages.
+
+Do not attribute these differences solely to the operating system. The
+AZL3 artifact reports NCCL `2.30.4+cuda13.0`, while the AZL4 run used NCCL
+`2.30.7+cuda13.3`. The pipeline artifact and task logs do not record the AZL3
+guest kernel or NVIDIA driver version. A controlled OS comparison must also
+match the image date, kernel, driver, CUDA, NCCL, PyTorch, SuperBench commit,
+VM placement, and benchmark configuration.
+
 ## Known gaps / not covered here
 
-- HPC-X, cuSPARSELt, and `transformer_engine` installs are skipped for a
-  minimal first pass — add back only if a specific test needs them (see
-  `install_nvidia_cuSPARSELT`, `install_nvidia_transformer_engine` in `azlinux-ai-ml`'s
-  `scripts/superbench/install_superbench.sh` for the full versions).
+- HPC-X and cuSPARSELt installs are skipped for a minimal first pass. Transformer
+  Engine is installed because BERT and GPT FP8 Hybrid require it (see
+  `install_nvidia_cuSPARSELT` and `install_nvidia_transformer_engine` in
+  `azlinux-ai-ml`'s `scripts/superbench/install_superbench.sh`).
 - No AZL4 path exists yet in `azlinux-ai-ml`'s ADO pipelines
   (`hpc_image_build.yml`, `hpc_image_build_dev.yml` are hardcoded to
   `imageOffer: azure-linux-3`) — this playbook is a manual workaround, not a

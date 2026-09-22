@@ -12,7 +12,7 @@
 
 Name:           nvidia-driver
 Version:        610.43.02
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        NVIDIA's proprietary display driver for NVIDIA graphic cards
 License:        NVIDIA License
 URL:            http://www.nvidia.com/object/unix.html

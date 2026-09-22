@@ -13,7 +13,7 @@
 
 Name:           cuda-compat
 Version:        610.43.02
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        CUDA Compatibility Platform
 License:        NVIDIA License
 URL:            http://www.nvidia.com/object/unix.html

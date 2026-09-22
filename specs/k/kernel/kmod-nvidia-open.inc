@@ -52,6 +52,7 @@ kernel %{KVERREL}.
 pushd %{_builddir}
 tar -xf %{SOURCE6000}
 popd
+patch -p1 -d %{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version} < %{SOURCE6003}
 %endif
 
 %endif
@@ -70,7 +71,8 @@ make %{?_smp_mflags} modules \
     KERNEL_UNAME="%{KVERREL}" \
     SYSSRC="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
     SYSOUT="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
-    OFA_DIR="%{_builddir}/mlnx-ofa_kernel-%{ofa_version}/obj" \
+    MLNX_OFED_KERNEL_DIR="%{_builddir}/mlnx-ofa_kernel-%{ofa_version}/obj" \
+    KBUILD_EXTRA_SYMBOLS="%{_builddir}/mlnx-ofa_kernel-%{ofa_version}/obj/default/Module.symvers" \
     IGNORE_CC_MISMATCH=1 \
     IGNORE_XEN_PRESENCE=1 \
     IGNORE_PREEMPT_RT_PRESENCE=1 \
