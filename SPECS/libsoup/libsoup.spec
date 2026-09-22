@@ -159,7 +159,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
-* Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-17
+* Tue Sep 22 2026 Swapnil Sahu <swapsahu@microsoft.com> - 3.4.4-17
 - Patch for CVE-2026-77014, CVE-2026-85197
 - Resolve flaky server-test ptest with upstream test-utils fix
 
