@@ -20,19 +20,3 @@ SYSTEMD_BOOT_EFI="%{buildroot}/usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.
 %define __pesign_client_cert systemd-boot-signer
 %pesign -s -i $SYSTEMD_BOOT_EFI -o $SYSTEMD_BOOT_EFI.signed
 mv $SYSTEMD_BOOT_EFI.signed $SYSTEMD_BOOT_EFI'''
-
-[[overlays]]
-description = "The non-OBS boot loader is now signed too, so never build the unsigned boot-unsigned package/description; only the signed boot package/description apply"
-type = "spec-search-replace"
-section = "%description"
-package = "ukify"
-regex = '^%if %\{without obs\}$'
-replacement = "%if 0"
-
-[[overlays]]
-description = "The non-OBS boot loader is now signed too, so never package the unsigned boot-unsigned files; only the signed boot files apply"
-type = "spec-search-replace"
-section = "%files"
-package = "ukify"
-regex = '^%if %\{without obs\}$'
-replacement = "%if 0"
