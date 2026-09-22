@@ -7,28 +7,21 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.32.0
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/kubernetes-sigs/cri-tools
 Source0:        https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2024-45338.patch
-Patch1:         CVE-2025-22872.patch
-Patch2:         CVE-2025-47911.patch
-Patch3:         CVE-2025-58190.patch
-Patch4:         CVE-2026-35469.patch
-Patch5:         CVE-2026-39821.patch
-Patch6:         CVE-2026-42506.patch
-Patch7:         CVE-2026-27136.patch
-Patch8:         CVE-2026-25680.patch
-Patch9:         CVE-2026-25681.patch
-Patch10:        CVE-2026-42502.patch
-Patch11:        CVE-2026-56852.patch
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Patch0:         CVE-2026-35469.patch
+Patch1:         CVE-2026-84304.patch
+Patch2:         CVE-2026-37236.patch
+
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
-BuildRequires:  golang < 1.25
+BuildRequires:  golang >= 1.25
 
 %description
 cri-tools aims to provide a series of debugging and validation tools for Kubelet CRI, which includes:
@@ -36,7 +29,10 @@ crictl: CLI for kubelet CRI.
 critest: validation test suites for kubelet CRI.
 
 %prep
-%autosetup -p1
+%autosetup -N
+rm -rf vendor
+tar -xzf %{SOURCE1}
+%autopatch -p1
 
 %build
 export VERSION="%{version}"
@@ -56,6 +52,14 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Thu Sep 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.32.0-9
+- Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445.
+- Remove patches which are fixed in new generated vendor tarball: CVE-2024-45338, CVE-2025-22872, CVE-2025-47911,
+  CVE-2025-58190, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821, CVE-2026-42502, CVE-2026-42506, CVE-2026-56852
+
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-8
+- Patch for CVE-2026-37236
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-7
 - Patch for CVE-2026-56852
 
