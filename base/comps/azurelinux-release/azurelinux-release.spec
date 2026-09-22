@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        29%{?dist}
+Release:        30%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -62,6 +62,7 @@ Source28:       azurelinux-sudo.logrotate
 Source29:       azurelinux-sugroup.conf
 Source30:       azurelinux-sshd-cis.conf
 Source31:       60-azurelinux-cis-module-denylist.conf
+Source32:       azurelinux-cis-shell-timeout.sh
 
 BuildArch:      noarch
 
@@ -349,6 +350,7 @@ install -Dm0644 %{SOURCE20} -t %{buildroot}%{_sysconfdir}/chrony.d/
 install -Dm0644 %{SOURCE21} -t %{buildroot}%{_prefix}/lib/systemd/networkd.conf.d/
 install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
 install -Dm0600 %{SOURCE30} %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
+install -Dm0644 %{SOURCE32} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
 
 install -Dm0644 %{SOURCE25} -t %{buildroot}%{_sysconfdir}/cloud/cloud.cfg.d/
 %endif
@@ -474,6 +476,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %if %{with cloud}
 %files cloud
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
 
 %files identity-cloud
 %{_prefix}/lib/os-release.cloud
@@ -505,6 +508,9 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 
 %changelog
+* Wed Sep 23 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-30
+- Configure cloud systems for the CIS rule "Ensure default user shell timeout is configured"
+
 * Fri Sep 11 2026 Chris Co <chrco@microsoft.com> - 4.0-29
 - Remove the Kata preset now that kata-containers is no longer built
 
