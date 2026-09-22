@@ -197,12 +197,13 @@ Summary: The Linux kernel
 #  the --with-release option overrides this setting.)
 %define debugbuildsenabled 1
 # define buildid .local
-%define specrpmversion 6.18.45
+%{!?specrpmversion:%define specrpmversion 6.18.45}
 %define specversion %{specrpmversion}
 %define patchversion 6.18
 %define pkgrelease %{azl_pkgrelease}
 %define kversion 6
 %define tarfile_release %{specrpmversion}
+%{!?kernel_source_dir:%define kernel_source_dir CBL-Mariner-Linux-Kernel-rolling-lts-azl4-%{specrpmversion}.%{kextraversion}}
 # This is needed to do merge window version magic
 %define patchlevel 18
 # This allows pkg_release to have configurable %%{?dist} tag
@@ -1031,6 +1032,9 @@ Source6002: kmod-nvidia-open.inc
 # Patch1: patch-%{patchversion}-redhat.patch (disabled for AzureLinux)
 %endif
 
+# AZL: Backport raw netlink schema support for max checks used by the HWE source.
+Patch2: netlink-raw-allow-max-check.patch
+
 # empty final patch to facilitate testing of kernel patches
 Patch999999: linux-kernel-test.patch
 
@@ -1833,7 +1837,7 @@ ApplyOptionalPatch()
 
 %{log_msg "Untar kernel tarball"}
 %setup -q -n kernel-%{tarfile_release} -c
-mv CBL-Mariner-Linux-Kernel-rolling-lts-azl4-%{specrpmversion}.%{kextraversion} linux-%{KVERREL}
+mv %{kernel_source_dir} linux-%{KVERREL}
 
 cd linux-%{KVERREL}
 # cp -a %{SOURCE1} . (disabled for AzureLinux — Makefile.rhelver is Red Hat-specific)
@@ -1844,6 +1848,7 @@ cd linux-%{KVERREL}
 # ApplyOptionalPatch patch-%{patchversion}-redhat.patch (disabled for AzureLinux)
 %endif
 
+ApplyOptionalPatch netlink-raw-allow-max-check.patch
 ApplyOptionalPatch linux-kernel-test.patch
 
 %{log_msg "End of patch applications"}
