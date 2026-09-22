@@ -51,7 +51,7 @@ Key fields:
 
 > **IMPORTANT:** Always save diagnostic instructions as a `.md` file in the working directory and reference it by path when spawning sub-agents — do NOT pass full prompt text inline in `runSubagent` calls. This ensures sub-agents can read instructions with file tools, avoids context window bloat in the orchestrator, and persists the instructions for debugging.
 
-1. Read the results file and filter `buildTasks` to only entries with `kojiInfo.kojiTaskStatus` of `"Failed"` or `taskStatus` of `"Failed"` (some failed builds may still have overall status "Completed"). Extract the `kojiTaskNumber` and `componentName` for each failed task.
+1. Read the results file and filter `buildTasks` to only entries with (`kojiInfo.kojiTaskStatus` of `"Failed"` and `taskStatus` not `"SkippedDuplicateNvr"`) or `taskStatus` of `"Failed"` (some failed builds may still have overall status "Completed"). Extract the `kojiTaskNumber` and `componentName` for each failed task.
 2. Configure the koji MCP tool:
   - If the user/prompt has provided a Koji base URL, use that.
   - Otherwise, check if the MCP tool is already configured with a base URL (the tool may have been pre-configured by the user or the orchestrator). If it is configured, use that URL.
