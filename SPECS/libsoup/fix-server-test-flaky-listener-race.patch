@@ -1,0 +1,45 @@
+From 3c0cee2cfddb9ba31b30421f2b3cdd3c5a255e99 Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@redhat.com>
+Date: Wed, 30 Apr 2025 14:13:41 -0500
+Subject: [PATCH] test-utils: fix deadlock in add_listener_in_thread()
+
+The mutex is locked in the wrong place here.
+
+Hopefully fixes #379
+
+Upstream-reference: https://gitlab.gnome.org/GNOME/libsoup/-/commit/3c0cee2cfddb9ba31b30421f2b3cdd3c5a255e99.patch
+---
+ tests/test-utils.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test-utils.c b/tests/test-utils.c
+index d29d117..ef546cc 100644
+--- a/tests/test-utils.c
++++ b/tests/test-utils.c
+@@ -605,9 +605,11 @@ static gboolean
+ add_listener_in_thread (gpointer user_data)
+ {
+ 	AddListenerData *data = user_data;
++	GUri *uri;
+ 
+-	data->uri = add_listener (data->server, data->scheme, data->host);
++	uri = add_listener (data->server, data->scheme, data->host);
+ 	g_mutex_lock (&data->mutex);
++	data->uri = uri;
+ 	g_cond_signal (&data->cond);
+ 	g_mutex_unlock (&data->mutex);
+ 
+@@ -639,9 +641,9 @@ soup_test_server_get_uri (SoupServer    *server,
+ 		data.host = host;
+ 		data.uri = NULL;
+ 
+-		g_mutex_lock (&data.mutex);
+ 		soup_add_completion (context, add_listener_in_thread, &data);
+ 
++		g_mutex_lock (&data.mutex);
+ 		while (!data.uri)
+ 			g_cond_wait (&data.cond, &data.mutex);
+ 
+-- 
+2.45.4
+
