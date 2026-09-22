@@ -1,0 +1,467 @@
+packages:
+  - name: modules-core
+    depends-on: []
+  - name: modules
+    depends-on:
+    - modules-core
+  - name: modules-internal
+    depends-on:
+    - modules-core
+    - modules
+  - name: modules-extra
+    depends-on:
+    - modules-core
+    - modules
+
+
+rules:
+  - .*kunit.*: modules-internal
+    exact_pkg: True
+  - .*test[^/]*.ko: modules-internal
+
+  - arch/.*: modules-core
+  - crypto/.*: modules-core
+
+  - drivers/accel/.*: modules-core
+  - drivers/accessibility/.*: modules-core
+  - drivers/acpi/video.*: modules
+  - drivers/acpi/.*: modules-core
+  - drivers/ata/.*: modules-core
+
+  - drivers/base/regmap/regmap-sdw.*: modules
+  - drivers/base/.*: modules-core
+  - drivers/block/floppy.*: modules-extra
+  - drivers/block/rnbd.*: modules
+  - drivers/block/.*: modules-core
+  - drivers/bus/.*: modules-core
+
+  - drivers/cdx/.*: modules-core
+  - drivers/char/mwave.*: modules
+  - drivers/char/.*: modules-core
+  - drivers/clk/.*: modules-core
+  - drivers/counter/.*: modules-core
+  - drivers/cpufreq/.*: modules-core
+  - drivers/crypto/caam/.*: modules
+  - drivers/crypto/cavium/.*: modules
+  - drivers/crypto/chelsio/.*: modules
+  - drivers/crypto/hisilicon/.*: modules
+  - drivers/crypto/marvell/.*: modules
+  - drivers/crypto/.*: modules-core
+  - drivers/cxl/.*: modules-core
+
+  - drivers/dax/.*: modules-core
+  - drivers/dca/.*: modules-core
+  - drivers/devfreq/.*: modules-core
+  - drivers/dma/.*: modules-core
+
+  - drivers/edac/.*: modules-core
+  - drivers/extcon/.*: modules-core
+
+  - drivers/firmware/iscsi_ibft.*: modules
+  - drivers/firmware/.*: modules-core
+  - drivers/fsi/.*: modules-core
+
+  - drivers/gnss/.*: modules-core
+  - drivers/gpio/gpio-dln2.*: modules-extra
+  - drivers/gpio/gpio-ljca.*: modules
+  - drivers/gpio/.*: modules-core
+  - drivers/gpu/drm/display/drm_.*: modules-core
+  - drivers/gpu/drm/drm.*: modules-core
+  - drivers/gpu/drm/etnaviv/.*: modules-core
+  - drivers/gpu/drm/gud/.*: modules-core
+  - drivers/gpu/drm/hyperv/.*: modules-core
+  - drivers/gpu/drm/imagination/.*: modules-core
+  - drivers/gpu/drm/lima/.*: modules-core
+  - drivers/gpu/drm/mxsfb/.*: modules-core
+  - drivers/gpu/drm/panfrost/.*: modules-core
+  - drivers/gpu/drm/qxl/.*: modules-core
+  - drivers/gpu/drm/scheduler/.*: modules-core
+  - drivers/gpu/drm/solomon/.*: modules-core
+  - drivers/gpu/drm/tidss/.*: modules-core
+  - drivers/gpu/drm/tiny/.*: modules-core
+  - drivers/gpu/drm/ttm/.*: modules-core
+  - drivers/gpu/drm/udl/.*: modules-core
+  - drivers/gpu/drm/v3d/.*: modules-core
+  - drivers/gpu/drm/vgem/.*: modules-core
+  - drivers/gpu/drm/virtio/.*: modules-core
+  - drivers/gpu/drm/vkms/.*: modules-core
+  - drivers/gpu/drm/vmwgfx/.*: modules-core
+  - drivers/gpu/drm/xlnx/.*: modules-core
+  - drivers/gpu/host1x/.*: modules-core
+
+  - drivers/hid/hid-asus.*: modules
+  - drivers/hid/hid-nintendo.*: modules
+  - drivers/hid/hid-picolcd.*: modules
+  - drivers/hid/hid-playstation.*: modules
+  - drivers/hid/surface-hid.*: modules
+  - drivers/hid/hid-prodikeys.*: modules
+  - drivers/hid/.*: modules-core
+  - drivers/hte/.*: modules-core
+  - drivers/hv/.*: modules-core
+  - drivers/hwmon/asus_wmi_sensors.*: modules
+  - drivers/hwmon/dell-smm-hwmon.*: modules
+  - drivers/hwmon/hp-wmi-sensors.*: modules
+  - drivers/hwmon/intel-m10-bmc-hwmon.*: modules
+  - drivers/hwmon/nct6775.*: modules
+  - drivers/hwmon/.*: modules-core
+  - drivers/hwspinlock/.*: modules-core
+  - drivers/hwtracing/.*: modules-core
+
+  - drivers/i2c/busses/i2c-dln2.*: modules-extra
+  - drivers/i2c/busses/i2c-ljca.*: modules
+  - drivers/i2c/.*: modules-core
+  - drivers/i3c/.*: modules-core
+  - drivers/iio/adc/dln2-adc.*: modules-extra
+  - drivers/iio/accel/.*: modules
+  - drivers/iio/common/cros_ec_sensors/.*: modules
+  - drivers/iio/light/.*: modules
+  - drivers/iio/pressure/.*: modules
+  - drivers/iio/proximity/.*: modules
+  - drivers/iio/.*: modules-core
+  - drivers/input/gameport/.*: modules
+  - drivers/input/joystick/.*: modules-extra
+  - drivers/input/misc/pcspkr.*: modules-extra
+  - drivers/input/tablet/.*: modules
+  - drivers/input/touchscreen/.*: modules
+  - drivers/input/.*: modules-core
+  - drivers/interconnect/.*: modules-core
+  - drivers/iommu/.*: modules-core
+  - drivers/irqchip/.*: modules-core
+
+  - drivers/mailbox/.*: modules-core
+  - drivers/md/.*: modules-core
+  - drivers/memory/dfl-emif.*: modules
+  - drivers/memory/.*: modules-core
+  - drivers/message/fusion/mptctl.*: modules-extra
+  - drivers/message/fusion/mptfc.*: modules-extra
+  - drivers/message/fusion/.*: modules
+  - drivers/message/.*: modules-core
+  - drivers/mfd/dln2.*: modules-extra
+  - drivers/misc/.*: modules-core
+  - drivers/mux/.*: modules-core
+
+  - drivers/net/amt.ko: modules-core
+  - drivers/net/bareudp.ko: modules-core
+  - drivers/net/bonding/.*: modules-core
+  - drivers/net/can/slcan/slcan.*: modules-extra
+  - drivers/net/can/usb/ems_usb.*: modules-extra
+  - drivers/net/can/vcan.*: modules-extra
+  - drivers/net/dummy.ko: modules-core
+  - drivers/net/eql.ko: modules-core
+
+  - drivers/net/ethernet/8390/.*: modules-core
+  - drivers/net/ethernet/adi/.*: modules-core
+  - drivers/net/ethernet/agere/.*: modules-core
+  - drivers/net/ethernet/altera/.*: modules-core
+  - drivers/net/ethernet/amazon/.*: modules-core
+  - drivers/net/ethernet/amd/.*: modules-core
+  - drivers/net/ethernet/apm/.*: modules-core
+  - drivers/net/ethernet/asix/.*: modules-core
+  - drivers/net/ethernet/brocade/.*: modules-core
+  - drivers/net/ethernet/cavium/.*: modules-core
+  - drivers/net/ethernet/dnet.ko: modules-core
+  - drivers/net/ethernet/engleder/.*: modules-core
+  - drivers/net/ethernet/ethoc.ko: modules-core
+  - drivers/net/ethernet/fealnx.ko: modules-core
+  - drivers/net/ethernet/freescale/.*: modules-core
+  - drivers/net/ethernet/fungible/.*: modules-core
+  - drivers/net/ethernet/google/.*: modules-core
+  - drivers/net/ethernet/hisilicon/.*: modules-core
+  - drivers/net/ethernet/ibm/.*: modules-core
+  - drivers/net/ethernet/intel/.*: modules-core
+  - drivers/net/ethernet/jme.ko: modules-core
+  - drivers/net/ethernet/litex/.*: modules-core
+  - drivers/net/ethernet/mellanox/.*: modules-core
+  - drivers/net/ethernet/microsoft/.*: modules-core
+  - drivers/net/ethernet/natsemi/.*: modules-core
+  - drivers/net/ethernet/netronome/.*: modules-core
+  - drivers/net/ethernet/pensando/.*: modules-core
+  - drivers/net/ethernet/rocker/rocker.*: modules-internal
+  - drivers/net/ethernet/qualcomm/.*: modules-core
+  - drivers/net/ethernet/realtek/.*: modules-core
+  - drivers/net/ethernet/renesas/.*: modules-core
+  - drivers/net/ethernet/socionext/.*: modules-core
+  - drivers/net/ethernet/vertexcom/.*: modules-core
+  - drivers/net/ethernet/wangxun/.*: modules-core
+  - drivers/net/ethernet/xilinx/.*: modules-core
+
+  - drivers/net/fjes/.*: modules-core
+  - drivers/net/geneve.ko: modules-core
+  - drivers/net/gtp.ko: modules-core
+  - drivers/net/hamradio/.*: modules-extra
+  - drivers/net/hyperv/.*: modules-core
+  - drivers/net/ifb.ko: modules-core
+  - drivers/net/ipa/.*: modules-core
+  - drivers/net/ipvlan/.*: modules-core
+  - drivers/net/macsec.ko: modules-core
+  - drivers/net/macvlan.ko: modules-core
+  - drivers/net/macvtap.ko: modules-core
+  - drivers/net/mctp/.*: modules-core
+  - drivers/net/mdio.*: modules-core
+  - drivers/net/mhi_net.ko: modules-core
+  - drivers/net/mii.ko: modules-core
+  - drivers/net/net_failover.ko: modules-core
+  - drivers/net/netdevsim/netdevsim.*: modules-internal
+  - drivers/net/netconsole.ko: modules-core
+  - drivers/net/nlmon.ko: modules-core
+  - drivers/net/pcs/.*: modules-core
+  - drivers/net/phy/.*: modules-core
+  - drivers/net/rionet.ko: modules-core
+  - drivers/net/slip/slip.*: modules-extra
+  - drivers/net/sungem_phy.ko: modules-core
+  - drivers/net/tap.ko: modules-core
+  - drivers/net/team/.*: modules-core
+  - drivers/net/thunderbolt/.*: modules-core
+  - drivers/net/tun.ko: modules-core
+  - drivers/net/veth.ko: modules-core
+  - drivers/net/virtio_net.ko: modules-core
+  - drivers/net/vmxnet3/.*: modules-core
+  - drivers/net/vrf.ko: modules-core
+  - drivers/net/vsockmon.ko: modules-core
+  - drivers/net/vxlan/.*: modules-core
+  - drivers/net/wireguard/.*: modules-core
+  - drivers/net/wireless/virtual/mac80211_hwsim.*: modules-internal
+  - drivers/net/wwan/wwan_hwsim.*: modules-internal
+  - drivers/net/wwan/.*: modules-core
+  - drivers/net/xen.*: modules-core
+
+  - drivers/nvdimm/.*: modules-core
+  - drivers/nvme/host/nvme-rdma.*: modules
+  - drivers/nvme/target/nvmet-rdma.*: modules
+  - drivers/nvme/.*: modules-core
+  - drivers/nvmem/nvmem_u-boot-env.*: modules
+  - drivers/nvmem/.*: modules-core
+
+  - drivers/parport/parport_serial.*: modules
+  - drivers/parport/.*: modules-core
+  - drivers/pci/pcie/aer_inject.*: modules-extra
+  - drivers/pci/.*: modules-core
+  - drivers/perf/.*: modules-core
+  - drivers/phy/.*: modules-core
+  - drivers/pinctrl/.*: modules-core
+  - drivers/pmdomain/.*: modules-core
+  - drivers/powercap/intel_rapl_tpmi.*: modules
+  - drivers/powercap/.*: modules-core
+  - drivers/pps/.*: modules-core
+  - drivers/ptp/ptp_mock.*: modules-internal
+  - drivers/ptp/ptp_dfl_tod.*: modules
+  - drivers/ptp/.*: modules-core
+  - drivers/pwm/.*: modules-core
+
+  - drivers/rapidio/.*: modules-core
+  - drivers/regulator/arizona-micsupp.*: modules
+  - drivers/regulator/.*: modules-core
+  - drivers/remoteproc/.*: modules-core
+  - drivers/reset/.*: modules-core
+  - drivers/rpmsg/.*: modules-core
+  - drivers/rtc/.*: modules-core
+
+  - drivers/s390/.*: modules-core
+
+  - drivers/scsi/3w.*: modules-core
+  - drivers/scsi/BusLogic.ko: modules-core
+  - drivers/scsi/a100u2w.ko: modules-core
+  - drivers/scsi/advansys.ko: modules-core
+  - drivers/scsi/am53c974.ko: modules-core
+  - drivers/scsi/arcmsr.*: modules-core
+  - drivers/scsi/atp870u.ko: modules-core
+  - drivers/scsi/ch.ko: modules-core
+  - drivers/scsi/cxlflash/.*: modules-core
+  - drivers/scsi/dc395x.ko: modules-core
+  - drivers/scsi/device_handler/.*: modules-core
+  - drivers/scsi/dmx3191d.ko: modules-core
+  - drivers/scsi/elx/.*: modules-core
+  - drivers/scsi/esp_scsi.ko: modules-core
+  - drivers/scsi/fdomain.*: modules-core
+  - drivers/scsi/hpsa.ko: modules-core
+  - drivers/scsi/hptiop.ko: modules-core
+  - drivers/scsi/hv_storvsc.ko: modules-core
+  - drivers/scsi/ibmvscsi.*: modules-core
+  - drivers/scsi/initio.ko: modules-core
+  - drivers/scsi/ipr.ko: modules-core
+  - drivers/scsi/ips.ko: modules-core
+  - drivers/scsi/iscsi_tcp.ko: modules-core
+  - drivers/scsi/libfc/.*: modules-core
+  - drivers/scsi/libiscsi.*: modules-core
+  - drivers/scsi/mpi3mr/.*: modules-core
+  - drivers/scsi/mvumi.ko: modules-core
+  - drivers/scsi/myrb.ko: modules-core
+  - drivers/scsi/myrs.ko: modules-core
+  - drivers/scsi/raid_class.ko: modules-core
+  - drivers/scsi/scsi_debug.ko: modules-core
+  - drivers/scsi/scsi_transport_.*: modules-core
+  - drivers/scsi/ses.ko: modules-core
+  - drivers/scsi/smartpqi/.*: modules-core
+  - drivers/scsi/snic/.*: modules-core
+  - drivers/scsi/st.ko: modules-core
+  - drivers/scsi/stex.ko: modules-core
+  - drivers/scsi/virtio_scsi.ko: modules-core
+  - drivers/scsi/vmw_pvscsi.ko: modules-core
+  - drivers/scsi/wd719x.ko: modules-core
+  - drivers/scsi/xen-scsifront.ko: modules-core
+
+  - drivers/slimbus/.*: modules-core
+  - drivers/soc/.*: modules-core
+  - drivers/spi/spi-altera-dfl.*: modules
+  - drivers/spi/spi-dln2.*: modules-extra
+  - drivers/spi/spi-ljca.*: modules
+  - drivers/spi/.*: modules-core
+  - drivers/spmi/.*: modules-core
+
+  - drivers/target/iscsi/cxgbit/cxgbit.*: modules
+  - drivers/target/sbp/sbp_target.*: modules
+  - drivers/target/target_core_user.*: modules
+  - drivers/target/.*: modules-core
+  - drivers/tee/.*: modules-core
+  - drivers/thermal/intel/int340x_thermal/int3406_thermal.*: modules
+  - drivers/thermal/.*: modules-core
+  - drivers/thunderbolt/.*: modules-core
+
+  - drivers/ufs/.*: modules-core
+  - drivers/usb/atm/.*: modules
+  - drivers/usb/gadget/function/usb_f_midi2.*: modules
+  - drivers/usb/image/.*: modules
+  - drivers/usb/misc/trancevibrator.*: modules-extra
+  - drivers/usb/misc/.*: modules
+  - drivers/usb/serial/.*: modules
+  - drivers/usb/typec/mux/nb7vpq904m.*: modules
+  - drivers/usb/usbip/.*: modules-extra
+  - drivers/usb/.*: modules-core
+
+  - drivers/vdpa/mlx5/mlx5_vdpa.*: modules
+  - drivers/vdpa/pds/pds_vdpa.*: modules
+  - drivers/vdpa/.*: modules-core
+  - drivers/vfio/pci/mlx5/mlx5-vfio-pci.*: modules
+  - drivers/vfio/pci/pds/pds-vfio-pc.*: modules
+  - drivers/vfio/.*: modules-core
+  - drivers/vhost/.*: modules-core
+  - drivers/video/backlight/apple_bl.*: modules
+  - drivers/video/.*: modules-core
+  - drivers/virt/.*: modules-core
+  - drivers/virtio/.*: modules-core
+
+  - drivers/watchdog/iTCO_wdt.*: modules
+  - drivers/watchdog/.*: modules-core
+
+  - drivers/xen/.*: modules-core
+
+  - drivers/w1/masters/ds2482.*: modules-extra
+  - drivers/w1/masters/ds2490.*: modules-extra
+  - drivers/w1/slaves/w1_ds2408.*: modules-extra
+  - drivers/w1/slaves/w1_ds2423.*: modules-extra
+  - drivers/w1/slaves/w1_ds2431.*: modules-extra
+  - drivers/w1/slaves/w1_ds2433.*: modules-extra
+  - drivers/w1/slaves/w1_ds2780.*: modules-extra
+  - drivers/w1/slaves/w1_ds2781.*: modules-extra
+  - drivers/w1/slaves/w1_ds28e04.*: modules-extra
+  - drivers/w1/slaves/w1_smem.*: modules-extra
+  - drivers/w1/slaves/w1_therm.*: modules-extra
+
+  - fs/9p/.*: modules-core
+  - fs/afs/.*: modules-core
+  - fs/affs/affs.*: modules-extra
+  - fs/bcachefs/.*: modules-core
+  - fs/befs/befs.*: modules-extra
+  - fs/binfmt_misc.ko: modules-core
+  - fs/cachefiles/.*: modules-core
+  - fs/ceph/.*: modules-core
+  - fs/coda/coda.*: modules-extra
+  - fs/dlm/.*: modules-extra
+  - fs/erofs/.*: modules-core
+  - fs/exfat/.*: modules-core
+  - fs/f2fs/.*: modules-core
+  - fs/fat/.*: modules-core
+  - fs/fuse/cuse.*: modules-extra
+  - fs/fuse/.*: modules-core
+  - fs/gfs2/.*: modules-extra
+  - fs/isofs/.*: modules-core
+  - fs/lockd/.*: modules-core
+  - fs/netfs/.*: modules-core
+  - fs/nfs.*: modules-core
+  - fs/nilfs2/nilfs2.*: modules-extra
+  - fs/nls/.*: modules-core
+  - fs/ntfs3/.*: modules-core
+  - fs/ocfs2/.*: modules-extra
+  - fs/orangefs/.*: modules-core
+  - fs/overlayfs/.*: modules-core
+  - fs/pstore/.*: modules-core
+  - fs/smb/.*: modules-core
+  - fs/squashfs/.*: modules-core
+  - fs/sysv/.*: modules-extra
+  - fs/ubifs/.*: modules-extra
+  - fs/udf/.*: modules-core
+  - fs/ufs/.*: modules-extra
+  - fs/vboxsf/.*: modules-core
+  - fs/xfs/.*: modules-core
+  - fs/zonefs/.*: modules-core
+
+  - kernel/locking/locktorture.*: modules-internal
+  - kernel/rcu/rcuscale.*: modules-internal
+  - kernel/rcu/rcutorture.*: modules-internal
+  - kernel/rcu/refscale.*: modules-internal
+  - kernel/scftorture.*: modules-internal
+  - kernel/torture.*: modules-internal
+  - kernel/.*: modules-core
+
+  - lib/.*: modules-core
+
+  - net/802/.*: modules-core
+  - net/8021q/.*: modules-core
+  - net/9p/9pnet_rdma.ko: modules
+  - net/9p/.*: modules-core
+  - net/appletalk/appletalk.*: modules-extra
+  - net/atm/br2684.*: modules-extra
+  - net/atm/clip.*: modules-extra
+  - net/atm/lec.*: modules-extra
+  - net/atm/pppoatm.*: modules-extra
+  - net/ax25/ax25.*: modules-extra
+  - net/batman-adv/batman-adv.*: modules-extra
+  - net/bridge/.*: modules-core
+  - net/ceph/.*: modules-core
+  - net/core/pktgen.*: modules-internal
+  - net/core/.*: modules-core
+  - net/dns_resolver/.*: modules-core
+  - net/hsr/.*: modules-core
+  - net/ife/.*: modules-core
+  - net/ipv4/tcp_bic.*: modules-extra
+  - net/ipv4/tcp_highspeed.*: modules-extra
+  - net/ipv4/tcp_htcp.*: modules-extra
+  - net/ipv4/tcp_hybla.*: modules-extra
+  - net/ipv4/tcp_illinois.*: modules-extra
+  - net/ipv4/tcp_lp.*: modules-extra
+  - net/ipv4/tcp_scalable.*: modules-extra
+  - net/ipv4/tcp_vegas.*: modules-extra
+  - net/ipv4/tcp_veno.*: modules-extra
+  - net/ipv4/tcp_westwood.*: modules-extra
+  - net/ipv4/tcp_yeah.*: modules-extra
+  - net/ipv4/.*: modules-core
+  - net/ipv6/.*: modules-core
+  - net/iucv/.*: modules-core
+  - net/kcm/.*: modules-core
+  - net/key/.*: modules-core
+  - net/l2tp/l2tp_debugfs.*: modules-extra
+  - net/l2tp/l2tp_eth.*: modules-extra
+  - net/l2tp/l2tp_netlink.*: modules-extra
+  - net/l2tp/l2tp_ppp.*: modules-extra
+  - net/llc/.*: modules-core
+  - net/netfilter/.*: modules-core
+  - net/netrom/netrom.*: modules-extra
+  - net/nsh/.*: modules-core
+  - net/openvswitch/.*: modules-core
+  - net/psample/.*: modules-core
+  - net/qrtr/.*: modules-core
+  - net/rds/rds.*: modules-extra
+  - net/rose/rose.*: modules-extra
+  - net/rxrpc/.*: modules-core
+  - net/sched/.*: modules-core
+  - net/sunrpc/xprtrdma/rpcrdma.*: modules
+  - net/sunrpc/.*: modules-core
+  - net/tipc/.*: modules-core
+  - net/tls/.*: modules-core
+  - net/vmw_vsock/.*: modules-core
+  - net/xdp/.*: modules-core
+  - net/xfrm/.*: modules-core
+
+  - virt/.*: modules-core
+
+  - default: modules
