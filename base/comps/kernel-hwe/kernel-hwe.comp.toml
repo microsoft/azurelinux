@@ -1,24 +1,33 @@
 [components.kernel-hwe]
-# Azure Linux maintains the kernel as a local spec (migrated away from the
-# azldev TOML-overlay-on-Fedora-upstream approach). The spec and all of its
-# source files live alongside this file in base/comps/kernel-hwe/. Edit
-# kernel-hwe.spec directly; AZL-specific changes are marked with "AZL:" comments.
+# kernel-hwe reuses the maintained local kernel packaging while tracking the
+# rolling-lts/azl4-hwe source branch as an independently named package.
 spec = { type = "local", path = "kernel-hwe.spec" }
 
-# The spec uses %{specrelease} (kextraversion.azl_pkgrelease.dist) which the
-# auto-calculator cannot parse. Release is managed manually: bump azl_pkgrelease
-# in kernel.spec when rebuilding without a version change. The
-# %changelog is hand-curated inline in the spec.
+# Keep release handling aligned with the source kernel spec.
 release = { calculation = "manual" }
 
-# --- Downloaded source tarballs (not vendored into the component dir) ---
+[components.kernel-hwe.build.defines]
+# Select 6.18.43.1 and its GitHub archive extraction directory without
+# diverging further from the current kernel spec.
+specrpmversion = "6.18.43"
+kernel_source_dir = "CBL-Mariner-Linux-Kernel-rolling-lts-azl4-hwe-6.18.43.1"
 
-# Azure Linux kernel source tarball (rolling-lts/azl4).
+# Preserve the copied kernel source manifest entry while directing lookaside
+# lookup to the original kernel namespace rather than the new component name.
 [[components.kernel-hwe.source-files]]
-filename = "kernel-6.18.45.1.tar.gz"
-hash = "710483b7d6cdb6bf06f686d457fb9f361421295c115a8adb6f71bb80c55c2bf42046d4fc747aa399c4d7d0b0b3dcf493bd66df399e423c34e5c6b80fc2c70dac"
+filename = "linux-6.18.13.tar.xz"
+hash = "a1d1b27391ed55ae2b17dd25841037d3399e4d87900eb098af45b5b6bcedc095626971d069ff7a9daf46b6379705f3b88076206ecac68600bd04a35e7872440b"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.45.1.tar.gz" }
+origin = { type = "download", uri = "https://src.fedoraproject.org/repo/pkgs/kernel/linux-6.18.13.tar.xz/sha512/a1d1b27391ed55ae2b17dd25841037d3399e4d87900eb098af45b5b6bcedc095626971d069ff7a9daf46b6379705f3b88076206ecac68600bd04a35e7872440b/linux-6.18.13.tar.xz" }
+replace-upstream = true
+replace-reason = "The copied local source manifest retains this kernel lookaside entry; use the original kernel namespace because kernel-hwe has no Fedora lookaside namespace."
+
+# Azure Linux HWE kernel source tarball (rolling-lts/azl4-hwe).
+[[components.kernel-hwe.source-files]]
+filename = "kernel-6.18.43.1.tar.gz"
+hash = "6941bcc7dc0b5e329b3a2bab967705e8c1eb1cb8ebe89a30d11c0db8dbb6c3ef68d6124c855f9912a27476335dd343c47b52209b252a36c2203842fc544b2b6d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4-hwe/6.18.43.1.tar.gz" }
 replace-upstream = true
 replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
 
@@ -33,8 +42,7 @@ replace-reason = "The local spec vendors the rendered sources manifest; this dec
 
 # kABI reference tarballs (Source300/Source301). kABI checking is disabled in
 # Azure Linux, but the spec still declares these sources, so they must be present
-# to assemble the package. Candidates for removal when the kABI/stablelist
-# machinery is trimmed from the spec.
+# to assemble the package. Keep these aligned with the source kernel component.
 [[components.kernel-hwe.source-files]]
 filename = "kernel-abi-stablelists-6.18.13.tar.xz"
 hash = "69bbcdd86ae7999b19de306c29bc5cef442e309a8b033900c10a206a97d61b8b4e6d7c6baf6d356daf14e85766bd6a31120b54cfd1eb1c773450e44bae5d2d9b"
