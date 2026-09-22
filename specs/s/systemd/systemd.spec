@@ -289,7 +289,7 @@ BuildRequires:  kernel-devel
 
 %if %{with obs}
 BuildRequires:  pesign-obs-integration
-%else
+%elif 0%{?want_bootloader}
 BuildRequires:  pesign
 %endif
 
