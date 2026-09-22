@@ -1,0 +1,26 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add pesign as the non-OBS Secure Boot signing dependency"
+type = "spec-search-replace"
+regex = '^BuildRequires:  pesign-obs-integration$'
+replacement = '''BuildRequires:  pesign-obs-integration
+%else
+BuildRequires:  pesign'''
+
+[[overlays]]
+description = "Use pesign-client for the non-OBS Secure Boot signing path"
+type = "spec-search-replace"
+regex = '^BRP_PESIGN_FILES=/usr/lib/systemd/boot/efi/systemd-boot%\{efi_arch\}\.efi BRP_PESIGN_PACKAGES=systemd-boot /usr/lib/rpm/brp-suse\.d/brp-99-pesign$'
+replacement = '''BRP_PESIGN_FILES=/usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi BRP_PESIGN_PACKAGES=systemd-boot /usr/lib/rpm/brp-suse.d/brp-99-pesign
+%else
+SYSTEMD_BOOT_EFI="%{buildroot}/usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi"
+pesign-client \
+    -s \
+    -i $SYSTEMD_BOOT_EFI \
+    -o $SYSTEMD_BOOT_EFI \
+    -t "OpenSC Card" \
+    -c "/CN=Fedora Secure Boot Signer" \
+    -F unused'''
