@@ -1,0 +1,41 @@
+From 2032d928c2520cba988fe57f888011a286bae1c8 Mon Sep 17 00:00:00 2001
+From: Ewoud Kohl van Wijngaarden <ewoud@kohlvanwijngaarden.nl>
+Date: Wed, 5 Mar 2025 14:01:47 +0100
+Subject: [PATCH] Avoid closing directory we're iterating
+
+Ruby 3.4 started error checking directory access and starts to raise
+Errno::EBADF.
+
+This particular loop iterates on all open file descriptors and one is
+the directory listing from Dir.foreach.
+
+In the past this could have led to leaked file descriptors, but it's
+unlikely since it's likely the last opened file descriptor and have the
+highest number.
+
+Link: https://github.com/ruby/ruby/commit/f2919bd11c570fc5f5440d1f101be38f61e3d16b
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=2349352
+---
+ lib/puppet/util.rb | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/lib/puppet/util.rb b/lib/puppet/util.rb
+index 06c7b11815db..37b37d614d3a 100644
+--- a/lib/puppet/util.rb
++++ b/lib/puppet/util.rb
+@@ -478,8 +478,10 @@ module Util
+       $stderr = STDERR
+ 
+       begin
+-        Dir.foreach('/proc/self/fd') do |f|
+-          if f != '.' && f != '..' && f.to_i >= 3
++        d = Dir.new('/proc/self/fd')
++        ignore_fds = ['.', '..', d.fileno.to_s]
++        d.each_child do |f|
++          if !ignore_fds.include?(f) && f.to_i >= 3
+             begin
+               IO.new(f.to_i).close
+             rescue
+-- 
+2.49.0
+
