@@ -1,15 +1,13 @@
 Summary:        WPA client
 Name:           wpa_supplicant
-Version:        2.10
-Release:        3%{?dist}
+Version:        2.12
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Communications
 URL:            https://w1.fi
 Source0:        https://w1.fi/releases/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-52160.patch
-Patch1:         CVE-2025-24912.patch
 BuildRequires:  libnl3-devel
 BuildRequires:  openssl-devel
 Requires:       libnl3
@@ -97,6 +95,9 @@ EOF
 %{_sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf
 
 %changelog
+* Mon Sep 21 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.12-1
+- Auto-upgrade to 2.12 - for CVE-2026-78807
+
 * Wed Mar 26 2025 Kanishk-Bansal <kanbansal@microsoft.com> - 2.10-3
 - Patch CVE-2025-24912
 
