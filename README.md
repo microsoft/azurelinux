@@ -80,7 +80,7 @@ wsl --list
 To use the distro:
 
 ```powershell
-wsl -d AzureLinux-4.0
+wsl -d AzureLinux-4
 ```
 
 See [Systemd defaults in WSL images](./docs/wsl-systemd-policy.md) for the
