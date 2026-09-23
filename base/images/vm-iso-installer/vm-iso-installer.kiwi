@@ -12,7 +12,7 @@
         <profile name="vm-iso-installer" description="Azure Linux ISO Installer" import="false" />
     </profiles>
     <preferences>
-        <version>0.1</version>
+        <version>0.1.0</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
         <keytable>us</keytable>
