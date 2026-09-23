@@ -255,8 +255,8 @@
         "type": "other",
         "other": {
           "name": "ant-junit",
-          "version": "1.10.14",
-          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.14-src.tar.gz"
+          "version": "1.10.18",
+          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.18-src.tar.gz"
         }
       }
     },
@@ -6690,8 +6690,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.152.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
+          "version": "6.6.157.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
         }
       }
     },
@@ -8381,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.152.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
+          "version": "6.6.157.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
         }
       }
     },
@@ -8391,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.152.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
+          "version": "6.6.157.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
         }
       }
     },
@@ -8401,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.152.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
+          "version": "6.6.157.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
         }
       }
     },
@@ -8411,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.18.43.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.43.1.tar.gz"
+          "version": "6.18.48.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.48.1.tar.gz"
         }
       }
     },
@@ -8421,8 +8421,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.18.43.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.43.1.tar.gz"
+          "version": "6.18.48.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.48.1.tar.gz"
         }
       }
     },
@@ -8431,8 +8431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.152.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.152.1.tar.gz"
+          "version": "6.6.157.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
         }
       }
     },
