@@ -6,7 +6,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,44 +20,44 @@ Source0:        %{name}-%{version}.tar.gz
 #   1. wget https://github.com/coredns/coredns/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
+#   4. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+#   5. go mod tidy
+#   6. go mod vendor
+#   7. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -cf %%{name}-%%{version}-vendor-v2.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2025-22868.patch
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 # Patch to fix the package test suite due to external akamai update
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
-Patch1:         coredns-example-net-test.patch
-Patch2:         CVE-2025-29786.patch
-Patch3:         CVE-2025-30204.patch
-Patch4:         CVE-2024-53259.patch
-Patch5:         CVE-2025-47950.patch
-Patch6:         CVE-2025-58063.patch
-Patch7:         CVE-2025-59530.patch
-Patch8:         CVE-2025-68156.patch
-Patch9:         CVE-2025-68151.patch
-Patch10:        CVE-2025-11065.patch
-Patch11:        CVE-2026-26017.patch
-Patch12:        CVE-2026-26018.patch
-Patch13:        CVE-2026-32934.patch
-Patch14:        CVE-2026-32936.patch
-Patch15:        CVE-2026-33489.patch
-Patch16:        CVE-2026-33190.patch
-Patch17:        CVE-2026-39821.patch
-Patch18:        CVE-2026-56852.patch
-Patch19:        CVE-2026-62299.patch
-Patch20:        CVE-2026-62994.patch
+Patch0:         coredns-example-net-test.patch
+Patch1:         CVE-2025-29786.patch
+Patch2:         CVE-2025-30204.patch
+Patch3:         CVE-2024-53259.patch
+Patch4:         CVE-2025-47950.patch
+Patch5:         CVE-2025-58063.patch
+Patch6:         CVE-2025-59530.patch
+Patch7:         CVE-2025-68156.patch
+Patch8:         CVE-2025-68151.patch
+Patch9:         CVE-2025-11065.patch
+Patch10:        CVE-2026-26017.patch
+Patch11:        CVE-2026-26018.patch
+Patch12:        CVE-2026-32934.patch
+Patch13:        CVE-2026-32936.patch
+Patch14:        CVE-2026-33489.patch
+Patch15:        CVE-2026-33190.patch
+Patch16:        CVE-2026-62299.patch
+Patch17:        CVE-2026-62994.patch
+Patch18:        CVE-2026-84445.patch
 
-BuildRequires:  golang < 1.25
+BuildRequires:  golang >= 1.25
 
 %description
 CoreDNS is a fast and flexible DNS server.
@@ -97,6 +97,11 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
+* Fri Sep 18 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 1.11.4-21
+- Patch for CVE-2026-84445, CVE-2026-84304
+- Upgrade vendored google.golang.org/grpc to v1.83.2
+- Removed patches for CVE-2025-22868, CVE-2026-39821, CVE-2026-56852
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-20
 - Patch for CVE-2026-62994
 

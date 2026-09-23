@@ -1,5 +1,6 @@
 {
-  "Signatures": {
-    "multus-4.0.2.tar.gz": "feeb117d805a254bdf15d2854c7b6939a92458aadbfb25f3ea40542d6775e34b"
-  }
+ "Signatures": {
+  "multus-4.0.2-govendor-v1.tar.gz": "111c41e942545d29819b9c0805d9152f61c82833572cfb0b5415c9814801d8fd",
+  "multus-4.0.2.tar.gz": "feeb117d805a254bdf15d2854c7b6939a92458aadbfb25f3ea40542d6775e34b"
+ }
 }

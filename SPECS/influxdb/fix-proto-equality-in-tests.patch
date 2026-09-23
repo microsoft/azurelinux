@@ -1,0 +1,71 @@
+From: Azure Linux Security Servicing Account <azurelinux-security@microsoft.com>
+Date: Wed, 17 Sep 2026 00:00:00 +0000
+Subject: [PATCH] Compare protobuf messages with protocmp in tests
+
+protobuf-go 1.36 keeps internal bookkeeping in generated messages, so
+reflect.DeepEqual reports identical payloads as unequal. Switch to
+cmp.Diff with protocmp.Transform(), matching the comparison already used
+elsewhere in this tree, which also reports a usable diff on failure.
+---
+diff --git a/prometheus/filter_test.go b/prometheus/filter_test.go
+--- a/prometheus/filter_test.go
++++ b/prometheus/filter_test.go
+@@ -2,13 +2,14 @@
+ 
+ import (
+ 	"fmt"
+-	"reflect"
+ 	"testing"
+ 
++	"github.com/google/go-cmp/cmp"
+ 	pr "github.com/influxdata/influxdb/v2/prometheus"
+ 	"github.com/prometheus/client_golang/prometheus"
+ 	dto "github.com/prometheus/client_model/go"
+ 	"google.golang.org/protobuf/proto"
++	"google.golang.org/protobuf/testing/protocmp"
+ )
+ 
+ func TestFilter_Gather(t *testing.T) {
+@@ -125,8 +126,8 @@
+ 				t.Errorf("Filter.Gather() error = %v, wantErr %v", err, tt.wantErr)
+ 				return
+ 			}
+-			if !reflect.DeepEqual(got, tt.want) {
+-				t.Errorf("Filter.Gather() = %v, want %v", got, tt.want)
++			if diff := cmp.Diff(tt.want, got, protocmp.Transform()); diff != "" {
++				t.Errorf("Filter.Gather() mismatch (-want +got):\n%s", diff)
+ 			}
+ 		})
+ 	}
+diff --git a/telemetry/handler_test.go b/telemetry/handler_test.go
+--- a/telemetry/handler_test.go
++++ b/telemetry/handler_test.go
+@@ -7,15 +7,16 @@
+ 	"io"
+ 	"net/http"
+ 	"net/http/httptest"
+-	"reflect"
+ 	"testing"
+ 	"time"
+ 
++	"github.com/google/go-cmp/cmp"
+ 	pr "github.com/influxdata/influxdb/v2/prometheus"
+ 	dto "github.com/prometheus/client_model/go"
+ 	"github.com/prometheus/common/expfmt"
+ 	"go.uber.org/zap/zaptest"
+ 	"google.golang.org/protobuf/proto"
++	"google.golang.org/protobuf/testing/protocmp"
+ )
+ 
+ func TestPushGateway_Handler(t *testing.T) {
+@@ -215,8 +216,8 @@
+ 				t.Errorf("decodePostMetricsRequest() error = %v, wantErr %v", err, tt.wantErr)
+ 				return
+ 			}
+-			if !reflect.DeepEqual(got, tt.want) {
+-				t.Errorf("decodePostMetricsRequest() = %v, want %v", got, tt.want)
++			if diff := cmp.Diff(tt.want, got, protocmp.Transform()); diff != "" {
++				t.Errorf("decodePostMetricsRequest() mismatch (-want +got):\n%s", diff)
+ 			}
+ 		})
+ 	}
