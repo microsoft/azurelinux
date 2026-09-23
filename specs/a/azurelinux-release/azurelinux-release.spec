@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        29%{?dist}
+Release:        30%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -52,6 +52,7 @@ Source14:       distro-template.swidtag
 Source15:       distro-variant-template.swidtag
 Source16:       20-azurelinux-defaults.conf
 Source17:       20-azure.conf
+Source18:       80-wsl.preset
 
 Source20:       chrony-azure.conf
 Source21:       50-azure-cloud.conf
@@ -227,7 +228,7 @@ Summary:        Package providing the identity for Azure Linux WSL.
 RemovePathPostfixes: .wsl
 Provides:       azurelinux-release-identity = %{version}-%{release}
 Conflicts:      azurelinux-release-identity
-Requires(meta): azurelinux-release-container = %{version}-%{release}
+Requires(meta): azurelinux-release-wsl = %{version}-%{release}
 
 
 %description identity-wsl
@@ -374,6 +375,18 @@ echo "VARIANT=\"WSL\"" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 echo "VARIANT_ID=wsl" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -i -e "s|(%{release_name}%{?prerelease})|(WSL%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/WSL/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
+
+# WSL systemd policy; see docs/wsl-systemd-policy.md. The preset disables
+# units, and the masks cover units that a preset cannot keep from starting.
+install -Dm0644 %{SOURCE18} -t %{buildroot}%{_prefix}/lib/systemd/system-preset/
+install -d %{buildroot}%{_sysconfdir}/systemd/system
+for unit in console-getty.service \
+            systemd-vconsole-setup.service \
+            tmp.mount \
+            systemd-tmpfiles-setup-dev.service \
+            systemd-tmpfiles-setup-dev-early.service; do
+    ln -s /dev/null %{buildroot}%{_sysconfdir}/systemd/system/"${unit}"
+done
 %endif
 
 # Create the symlink for /etc/os-release
@@ -504,10 +517,21 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %files identity-wsl
 %{_prefix}/lib/os-release.wsl
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
+%{_prefix}/lib/systemd/system-preset/80-wsl.preset
+%{_sysconfdir}/systemd/system/console-getty.service
+%{_sysconfdir}/systemd/system/systemd-vconsole-setup.service
+%{_sysconfdir}/systemd/system/tmp.mount
+%{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
+%{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev-early.service
 %endif
 
 
 %changelog
+* Fri Sep 18 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-30
+- Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and the console getty units for the WSL variant
+- Mask the generator-activated console getty and static vconsole, /tmp and early device setup units
+- Pair the WSL identity with the WSL release package rather than the container variant
+
 * Fri Sep 11 2026 Chris Co <chrco@microsoft.com> - 4.0-29
 - Remove the Kata preset now that kata-containers is no longer built
 

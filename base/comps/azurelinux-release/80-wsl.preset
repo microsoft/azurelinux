@@ -1,0 +1,16 @@
+# Azure Linux WSL variant: WSL provides networking, DNS and the console, so
+# the distribution's own services for them are disabled. See:
+#   https://learn.microsoft.com/windows/wsl/build-custom-distro#systemd-recommendations
+#   https://github.com/microsoft/WSL/blob/master/distributions/validate-modern.py
+
+disable systemd-networkd.service
+disable systemd-networkd.socket
+disable systemd-networkd-varlink.socket
+disable systemd-networkd-wait-online.service
+
+disable systemd-resolved.service
+disable systemd-resolved-monitor.socket
+disable systemd-resolved-varlink.socket
+
+disable console-getty.service
+disable getty@*.service
