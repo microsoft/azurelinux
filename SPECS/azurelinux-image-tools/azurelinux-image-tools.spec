@@ -14,7 +14,7 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # Use generate_source_tarball.sh script with the package version to build this tarball.
 #
-Source1:        %{name}-%{version}-vendor-v2.tar.gz
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 Patch0:         CVE-2026-84445.patch
 Patch1:         CVE-2026-81871.patch
 BuildRequires: golang >= 1.25
