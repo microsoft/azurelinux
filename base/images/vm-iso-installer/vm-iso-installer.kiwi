@@ -25,7 +25,8 @@
             kernelcmdline="console=ttyS0,115200 console=tty0 enforcing=0 audit=0 inst.text inst.lang=en_US.UTF-8 inst.nokill"
             firmware="uefi"
             hybridpersistent="false"
-            mediacheck="true">
+            mediacheck="true"
+            bundle_format="AzureLinux-4-%A">
             <bootloader name="grub2" timeout="5" grub_template="grub_template.cfg" />
         </type>
     </preferences>
