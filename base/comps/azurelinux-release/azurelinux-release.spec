@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        30%{?dist}
+Release:        31%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -63,6 +63,7 @@ Source29:       azurelinux-sugroup.conf
 Source30:       azurelinux-sshd-cis.conf
 Source31:       60-azurelinux-cis-module-denylist.conf
 Source32:       azurelinux-cis-shell-timeout.sh
+Source33:       00-rsyslog_filecreatemode.conf
 
 BuildArch:      noarch
 
@@ -351,6 +352,7 @@ install -Dm0644 %{SOURCE21} -t %{buildroot}%{_prefix}/lib/systemd/networkd.conf.
 install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
 install -Dm0600 %{SOURCE30} %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
 install -Dm0644 %{SOURCE32} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
+install -Dm0644 %{SOURCE33} -t %{buildroot}%{_sysconfdir}/rsyslog.d/
 
 install -Dm0644 %{SOURCE25} -t %{buildroot}%{_sysconfdir}/cloud/cloud.cfg.d/
 %endif
@@ -477,6 +479,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %files cloud
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.d/00-rsyslog_filecreatemode.conf
 
 %files identity-cloud
 %{_prefix}/lib/os-release.cloud
@@ -508,6 +511,9 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 
 %changelog
+* Thu Sep 24 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-31
+- Configure secure rsyslog log file creation mode for cloud systems
+
 * Wed Sep 23 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-30
 - Configure cloud systems for the CIS rule "Ensure default user shell timeout is configured"
 
