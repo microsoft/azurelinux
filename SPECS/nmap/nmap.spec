@@ -26,7 +26,6 @@ Patch4:		CVE-2026-58058.patch
 Patch5:		CVE-2026-72712.patch
 Patch6:		CVE-2026-89157.patch
 Patch7:		CVE-2026-89160.patch
-Patch8:		CVE-2026-89156.patch
 
 %description
 Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
@@ -72,7 +71,7 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 
 %changelog
 * Thu Sep 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 7.95-6
-- Patch for CVE-2026-89160, CVE-2026-89157, CVE-2026-89156
+- Patch for CVE-2026-89160, CVE-2026-89157
 
 * Wed Aug 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 7.95-5
 - Patch for CVE-2026-72712
