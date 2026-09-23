@@ -376,28 +376,9 @@ echo "VARIANT_ID=wsl" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -i -e "s|(%{release_name}%{?prerelease})|(WSL%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/WSL/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
 
-# WSL manages networking, DNS and the console for the distribution, so the
-# units that duplicate that management must not be enabled. This preset sorts
-# before 90-default.preset and systemd's 90-systemd.preset, and systemd applies
-# the first matching line, so it overrides both.
+# WSL systemd policy; see docs/wsl-systemd-policy.md. The preset disables
+# units, and the masks cover units that a preset cannot keep from starting.
 install -Dm0644 %{SOURCE18} -t %{buildroot}%{_prefix}/lib/systemd/system-preset/
-
-# Presets do not prevent dependency or generator activation. The getty generator
-# adds console-getty.service in containers regardless of its preset. The other
-# units below are static: systemd-vconsole-setup.service is pulled in by a udev
-# rule, and the rest by *.target.wants directories shipped in /usr/lib.
-# Mask them so those activation paths cannot start them. WSL's image validator
-# also recognizes these /etc/systemd/system symlinks to /dev/null.
-#
-# systemd-tmpfiles-setup.service is deliberately NOT masked: wsl-setup relies on
-# it to create /tmp/.X11-unix pointing at WSLg's X11 sockets. Wayland and
-# PulseAudio links are handled separately by the user tmpfiles service.
-#
-# systemd-tmpfiles-clean.service/.timer are deliberately NOT masked either.
-# With tmp.mount masked, keep periodic aging for the distribution's persistent
-# /tmp rather than relying on the host to clean it. wsl-setup gives
-# /tmp/.X11-unix its own tmpfiles entry, so the parent-directory clean skips
-# the link and does not recurse into WSLg's socket directory.
 install -d %{buildroot}%{_sysconfdir}/systemd/system
 for unit in console-getty.service \
             systemd-vconsole-setup.service \
