@@ -255,8 +255,8 @@
         "type": "other",
         "other": {
           "name": "ant-junit",
-          "version": "1.10.14",
-          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.14-src.tar.gz"
+          "version": "1.10.18",
+          "downloadUrl": "https://www.apache.org/dist/ant/source/apache-ant-1.10.18-src.tar.gz"
         }
       }
     },
