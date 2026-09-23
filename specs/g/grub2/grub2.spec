@@ -1,7 +1,8 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global upstream_version_release 2.12-40.fc43
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/grub2.azl.macros}
 
 # This package calls binutils components directly and would need to pass
 # in flags to enable the LTO plugins
@@ -22,7 +23,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release: 48%{?dist}
+Release: 49%{?dist}
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/
@@ -42,6 +43,7 @@ Source11:	grub.patches
 Source12:	sbat.csv.in
 Source13:	gen_grub_cfgstub
 Source14:	55-set-boot-entry.install
+Source9999: grub2.azl.macros
 
 %include %{SOURCE1}
 
@@ -198,7 +200,9 @@ This subpackage provides the GRUB user-space emulation modules.
 mkdir grub-%{grubefiarch}-%{tarversion}
 grep -A100000 '# stuff "make" creates' .gitignore > grub-%{grubefiarch}-%{tarversion}/.gitignore
 cp %{SOURCE4} grub-%{grubefiarch}-%{tarversion}/unifont.pcf.gz
-sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{upstream_version_release},g" \
+%{!?fedora_upstream_version:%{error:missing Fedora upstream version}}
+%{!?fedora_upstream_release:%{error:missing Fedora upstream release}}
+sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{?fedora_upstream_version}-%{?fedora_upstream_release},g" \
     %{SOURCE12} > grub-%{grubefiarch}-%{tarversion}/sbat.csv
 git add grub-%{grubefiarch}-%{tarversion}
 %endif
@@ -224,7 +228,9 @@ git add grub-emu-%{tarversion}
 mkdir grub-%{grubxenarch}-%{tarversion}
 grep -A100000 '# stuff "make" creates' .gitignore > grub-%{grubxenarch}-%{tarversion}/.gitignore
 cp %{SOURCE4} grub-%{grubxenarch}-%{tarversion}/unifont.pcf.gz
-sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{upstream_version_release},g" \
+%{!?fedora_upstream_version:%{error:missing Fedora upstream version}}
+%{!?fedora_upstream_release:%{error:missing Fedora upstream release}}
+sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{?fedora_upstream_version}-%{?fedora_upstream_release},g" \
     %{SOURCE12} > grub-%{grubxenarch}-%{tarversion}/sbat.csv
 git add grub-%{grubxenarch}-%{tarversion}
 %endif
@@ -232,7 +238,9 @@ git add grub-%{grubxenarch}-%{tarversion}
 mkdir grub-%{grubxenpvharch}-%{tarversion}
 grep -A100000 '# stuff "make" creates' .gitignore > grub-%{grubxenpvharch}-%{tarversion}/.gitignore
 cp %{SOURCE4} grub-%{grubxenpvharch}-%{tarversion}/unifont.pcf.gz
-sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{upstream_version_release},g" \
+%{!?fedora_upstream_version:%{error:missing Fedora upstream version}}
+%{!?fedora_upstream_release:%{error:missing Fedora upstream release}}
+sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{?fedora_upstream_version}-%{?fedora_upstream_release},g" \
     %{SOURCE12} > grub-%{grubxenpvharch}-%{tarversion}/sbat.csv
 git add grub-%{grubxenpvharch}-%{tarversion}
 %endif
