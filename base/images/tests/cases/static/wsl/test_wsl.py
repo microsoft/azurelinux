@@ -55,8 +55,8 @@ def test_wsl_registration(rootfs: Path) -> None:
     """Use a stable registration name and a real Azure Linux icon."""
     config = configparser.ConfigParser(interpolation=None)
     config.read_string(read_text_confined(rootfs, "etc/wsl-distribution.conf"))
-    if config["oobe"]["defaultName"] != "AzureLinux-4.0":
-        pytest.fail("WSL must register as AzureLinux-4.0, without a prerelease suffix")
+    if config["oobe"]["defaultName"] != "AzureLinux-4":
+        pytest.fail("WSL must register as AzureLinux-4, the name used by WSL's DistributionInfo.json entry")
     if config["shortcut"]["icon"] != "/usr/share/pixmaps/azurelinux-logo.ico":
         pytest.fail("WSL must reference the Azure Linux icon")
     icon = rootfs / "usr/share/pixmaps/azurelinux-logo.ico"
