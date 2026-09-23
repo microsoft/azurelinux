@@ -1,7 +1,7 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
-Version:        3.5.0
-Release:        2%{?dist}
+Version:        3.5.1
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,9 +9,11 @@ Group:          Appication/Internet
 URL:            https://rsync.samba.org/
 Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz
 Patch0:         CVE-2026-18743.patch
+BuildRequires:  libidn2-devel
 BuildRequires:  lz4-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  zlib-devel
+Requires:       libidn2
 Requires:       lz4
 Requires:       zlib
 
@@ -61,6 +63,10 @@ EOF
 %{_sysconfdir}/rsyncd.conf
 
 %changelog
+* Wed Sep 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.5.1-1
+- Upgrade to 3.5.1
+- Add libidn2-devel build dependency to enable IDN support required by configure
+
 * Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.5.0-2
 - Patch for CVE-2026-18743
 
