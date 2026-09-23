@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.18.48.mshv1 Kernel Configuration
+# Linux/arm64 6.18.52.mshv1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -774,6 +774,7 @@ CONFIG_GCC_PLUGINS=y
 # CONFIG_GCC_PLUGIN_LATENT_ENTROPY is not set
 CONFIG_FUNCTION_ALIGNMENT_4B=y
 CONFIG_FUNCTION_ALIGNMENT=4
+CONFIG_HAVE_ARCH_GET_SECUREBOOT=y
 # end of General architecture-dependent options
 
 CONFIG_RT_MUTEXES=y
