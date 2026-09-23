@@ -1,0 +1,14 @@
+--- !Policy
+product_versions:
+  - rhel-*
+decision_context: osci_compose_gate
+rules:
+  - !PassingTestCaseRule {test_case_name: cki.tier1-aarch64.functional}
+  - !PassingTestCaseRule {test_case_name: cki.tier1-ppc64le.functional}
+  - !PassingTestCaseRule {test_case_name: cki.tier1-s390x.functional}
+  - !PassingTestCaseRule {test_case_name: cki.tier1-x86_64.functional}
+  - !PassingTestCaseRule {test_case_name: s1-aws-ci_x86_64.brew-build.tier1.functional}
+  - !PassingTestCaseRule {test_case_name: s1-aws-ci_aarch64.brew-build.tier1.functional}
+  - !PassingTestCaseRule {test_case_name: s1-azure-ci_x86_64.brew-build.tier1.functional}
+  - !PassingTestCaseRule {test_case_name: s1-azure-ci_aarch64.brew-build.tier1.functional}
+  - !PassingTestCaseRule {test_case_name: s1-gcp-ci.brew-build.tier1.functional}
