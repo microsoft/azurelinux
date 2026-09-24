@@ -33,6 +33,8 @@ from pathlib import Path
 # Constants
 # ---------------------------------------------------------------------------
 
+MAX_COMPONENTS_IN_COMMAND = 30
+
 # ---------------------------------------------------------------------------
 # Git helpers
 # ---------------------------------------------------------------------------
@@ -105,7 +107,7 @@ def component_from_path(file_path: str, specs_dir: Path) -> str:
     file_abs = os.path.abspath(file_path)
     specs_abs = str(specs_dir.resolve())
     rel = Path(file_abs).relative_to(specs_abs)
-    if len(rel.parts) >= 2:
+    if len(rel.parts) >= 2:  # noqa: PLR2004 - layout is prefix/component
         return rel.parts[1]
     return rel.parts[0] if rel.parts else ""
 
@@ -295,7 +297,7 @@ def _unique_components(items: list[dict]) -> list[str]:
 
 # NOTE: _unique_components and _render_command are duplicated in post_render_comment.py
 def _render_command(components: list[str], use_all: bool = False) -> str:
-    if use_all or len(components) > 30:
+    if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component render -a --clean-stale"
     return f"azldev component render {' '.join(components)}"
 

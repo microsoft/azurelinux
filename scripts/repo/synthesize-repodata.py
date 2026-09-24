@@ -50,6 +50,7 @@ import urllib.parse
 import urllib.request
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from http import HTTPStatus
 from pathlib import Path
 
 import createrepo_c as cr
@@ -85,6 +86,8 @@ USER_AGENT = "synthesize-repodata/1"
 HTTP_TIMEOUT = 60.0
 HTTP_RETRIES = 3
 HTTP_BACKOFF_BASE = 1.0  # seconds; doubled per attempt.
+HTTP_SERVER_ERROR_MIN = HTTPStatus.INTERNAL_SERVER_ERROR
+HTTP_SERVER_ERROR_MAX = 600
 
 # repomd record types we generate ourselves in the output. The synth
 # tool only emits these — auxiliary records (updateinfo, group,
@@ -290,7 +293,7 @@ def _http_get(
                 shutil.copyfileobj(resp, fh)
             return
         except urllib.error.HTTPError as e:
-            if 500 <= e.code < 600 and attempt < retries - 1:
+            if HTTP_SERVER_ERROR_MIN <= e.code < HTTP_SERVER_ERROR_MAX and attempt < retries - 1:
                 last_exc = e
                 log(f"    HTTP {e.code} fetching {url}; retrying")
                 time.sleep(HTTP_BACKOFF_BASE * (2**attempt))
@@ -364,7 +367,7 @@ def download_repo_metadata(
     try:
         _http_get(repomd_url, repomd_path, ssl_context)
     except urllib.error.HTTPError as e:
-        if e.code == 404 and repo.origin == "prefix":
+        if e.code == HTTPStatus.NOT_FOUND and repo.origin == "prefix":
             log("    -> 404, skipping (prefix-derived, non-fatal)")
             shutil.rmtree(cache_dir, ignore_errors=True)
             return None
@@ -455,7 +458,7 @@ def _strip_srpm_suffix(rpm_sourcerpm: str | None) -> str:
     # Strip -release then -version (best-effort; matches the inspiration
     # script's approach).
     parts = s.rsplit("-", 2)
-    if len(parts) >= 3:
+    if len(parts) >= 3:  # noqa: PLR2004 - split yields name, version, release
         return parts[0]
     return s
 

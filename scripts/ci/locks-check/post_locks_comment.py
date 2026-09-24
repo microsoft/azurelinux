@@ -47,6 +47,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 COMMENT_MARKER = "<!-- LOCKS_CHECK -->"
+MAX_COMPONENTS_IN_COMMAND = 30
 MAX_FILE_LIST = 50
 MAX_COMMENT_CHARS = 60_000
 # Safety margin under MAX_COMMENT_CHARS — leaves room for the trailing
@@ -135,7 +136,7 @@ def parse_update_output(path: Path) -> list[dict]:
 
 
 def _update_command(components: list[str], use_all: bool = False) -> str:
-    if use_all or len(components) > 30:
+    if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component update -a"
     return f"azldev component update {' '.join('-p ' + c for c in components)}"
 
@@ -156,7 +157,9 @@ def format_comment(
     # inject arbitrary commands into a maintainer's terminal. Fall back to
     # `-a` if any name fails the same regex used for display so the
     # printed command is always safe to run as-is.
-    use_all = n_changed > 30 or any(not _SAFE_NAME_RE.match(name) for name in comp_names)
+    use_all = n_changed > MAX_COMPONENTS_IN_COMMAND or any(
+        not _SAFE_NAME_RE.match(name) for name in comp_names
+    )
     remediation_cmd = _update_command([] if use_all else comp_names, use_all=use_all)
 
     lines: list[str] = [

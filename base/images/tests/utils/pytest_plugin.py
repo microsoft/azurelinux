@@ -249,6 +249,6 @@ def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-unt
         # Auto-apply image() marker if there's an image-family subdir.
         # e.g. cases/static/vm-base/test_kernel.py → image("vm-base")
         #      cases/runtime/container-base/test_foo.py → image("container-base")
-        if len(remaining) >= 3:  # category + family_dir + file
+        if len(remaining) >= 3:  # noqa: PLR2004 - category + family_dir + file
             image_dir = remaining[1]
             item.add_marker(pytest.mark.image(image_dir))

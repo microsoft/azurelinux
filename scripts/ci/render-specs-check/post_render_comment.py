@@ -40,6 +40,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 COMMENT_MARKER = "<!-- RENDERED_SPEC_CHECK -->"
+MAX_COMPONENTS_IN_COMMAND = 30
 MAX_INLINE_DIFFS = 10
 MAX_FILE_LIST = 50
 MAX_COMMENT_CHARS = 60_000
@@ -99,7 +100,7 @@ def _fence_for(text: str) -> str:
 
 # NOTE: _render_command is duplicated in check_rendered_specs.py
 def _render_command(components: list[str], use_all: bool = False) -> str:
-    if use_all or len(components) > 30:
+    if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component render -a --clean-stale"
     return f"azldev component render {' '.join(components)}"
 
