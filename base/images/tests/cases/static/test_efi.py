@@ -7,7 +7,6 @@ import re
 from pathlib import Path
 
 import pytest
-
 from utils.types import PartitionInfo
 
 
