@@ -9,9 +9,12 @@ Use checked-in config, run in test mode, and verify mem metrics output.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from utils.container_runtime import ExecShell, WriteFile
+
+if TYPE_CHECKING:
+    from utils.container_runtime import ExecShell, WriteFile
 
 TELEGRAF_CONFIG = "/etc/telegraf/telegraf.conf"
 

@@ -13,14 +13,16 @@ from __future__ import annotations
 import logging
 import time
 import uuid
-from collections.abc import Iterator
-from pathlib import Path
-from typing import NamedTuple, Protocol, cast
+from typing import TYPE_CHECKING, NamedTuple, Protocol, cast
 
 from python_on_whales import DockerClient
 from python_on_whales.exceptions import DockerException, NoSuchContainer, NoSuchImage
 
 from .tools import NativeTool
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

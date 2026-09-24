@@ -16,10 +16,13 @@ wsl); it skips for VM images, which ship a provisioned raw disk.
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

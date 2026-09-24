@@ -11,9 +11,12 @@ HTTP server and checks its response.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from utils.container_runtime import AssertHttpServer, ExecShell
+
+if TYPE_CHECKING:
+    from utils.container_runtime import AssertHttpServer, ExecShell
 
 EXPECTED_RESPONSE = (Path(__file__).with_name("response.txt")).read_text().strip()
 
