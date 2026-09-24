@@ -11,6 +11,8 @@ import json
 import sys
 from pathlib import Path
 
+from pydantic import ValidationError
+
 from kernel_config_checker.schema.schema import (
     IntentionalKernelConfigSchema,
     save_schema,
@@ -150,7 +152,7 @@ def add_config_interactive(schema_path: Path) -> bool:
 
     try:
         validated = IntentionalKernelConfigSchema.model_validate(data)
-    except Exception as e:
+    except ValidationError as e:
         print(f"❌ Validation error: {e}")
         return False
 
@@ -168,7 +170,7 @@ def main() -> int | None:
 
     try:
         return 0 if add_config_interactive(Path(args.json_file)) else 1
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
         print(f"✗ Error adding config: {e}")
         return 1
 

@@ -194,7 +194,7 @@ def main() -> int | None:
         try:
             ok = add_config_interactive(Path(args.add_config))
             return 0 if ok else 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
             print(f"\u2717 Error adding config: {e}")
             return 1
 
@@ -205,7 +205,7 @@ def main() -> int | None:
             print(f"✓ Loaded intentional config: {json_file}")
             found = check_config_across_all(schema, config_name)
             return 0 if found else 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
             print(f"✗ Error checking config: {e}")
             return 1
 
@@ -240,7 +240,7 @@ def main() -> int | None:
         print("✗ Kernel configuration check failed")
         return 1
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
         print(f"✗ Error: {e}")
         return 1
 

@@ -17,7 +17,7 @@ import json
 import sys
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 
 class Finding(BaseModel):
@@ -246,7 +246,7 @@ def main() -> int:
         except json.JSONDecodeError as e:
             print(f"Invalid JSON: {e}", file=sys.stderr)
             return 2
-        except Exception as e:
+        except (OSError, ValidationError) as e:
             print(f"Validation failed: {e}", file=sys.stderr)
             return 2
 
@@ -277,7 +277,7 @@ def main() -> int:
     except json.JSONDecodeError as e:
         print(f"Invalid JSON: {e}", file=sys.stderr)
         return 2
-    except Exception as e:
+    except (OSError, ValidationError) as e:
         print(f"Validation failed: {e}", file=sys.stderr)
         return 2
 

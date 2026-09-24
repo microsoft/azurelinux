@@ -184,7 +184,7 @@ def workdir(request: pytest.FixtureRequest) -> Iterator[Path]:
             # rather than failing the test session at teardown.
             try:
                 shutil.rmtree(p, ignore_errors=True)
-            except Exception as exc:  # pragma: no cover
+            except Exception as exc:  # noqa: BLE001 - teardown must not fail  # pragma: no cover
                 logger.warning("Failed to remove work dir %s: %s", p, exc)
 
 

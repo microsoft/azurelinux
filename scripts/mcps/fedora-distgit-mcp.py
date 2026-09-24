@@ -166,7 +166,7 @@ def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, st
                 capture_output=True,
                 timeout=60,
             )
-        except Exception:
+        except (OSError, subprocess.SubprocessError):
             pass
         return repo_dir, None
 
@@ -272,7 +272,7 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
             return _add_status({"error": f"HTTP {e.code} fetching {url}: {e.reason}"}, full=False)
         except urllib.error.URLError as e:
             return _add_status({"error": f"can't fetch {url}: {e.reason}"}, full=False)
-        except Exception as e:
+        except OSError as e:
             return _add_status({"error": f"can't fetch {url}: {e}"}, full=False)
 
         try:
@@ -401,7 +401,7 @@ def distgit_search(
             )
         except subprocess.TimeoutExpired:
             return _add_status({"error": "Search timed out after 30s."}, full=False)
-        except Exception as e:
+        except OSError as e:
             return _add_status({"error": f"running git: {e}"}, full=False)
 
         output = result.stdout
@@ -481,7 +481,7 @@ def distgit_show(
             )
         except subprocess.TimeoutExpired:
             return _add_status({"error": "git show timed out after 30s."}, full=False)
-        except Exception as e:
+        except OSError as e:
             return _add_status({"error": f"running git: {e}"}, full=False)
 
         if result.returncode != 0:

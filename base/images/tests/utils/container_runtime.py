@@ -283,7 +283,7 @@ def create_container(
         logger.warning("Readiness check failed; removing container %s", container_name)
         try:
             container.remove(force=True)
-        except Exception as cleanup_exc:
+        except Exception as cleanup_exc:  # noqa: BLE001 - preserve the original startup failure
             logger.warning("Failed to clean up container %s: %s", container_name, cleanup_exc)
         raise
 

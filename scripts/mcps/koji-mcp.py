@@ -266,7 +266,7 @@ def koji_fetch(path: str, override_base_url: str | None = None) -> StatusDict:
                 },
                 full=False,
             )
-        except Exception as e:
+        except OSError as e:
             return _add_status(
                 {
                     "error": (
