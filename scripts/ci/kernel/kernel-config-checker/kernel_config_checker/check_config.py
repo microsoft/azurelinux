@@ -13,6 +13,7 @@ import argparse
 import sys
 from enum import Enum
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from kernel_config_checker.add_config import add_config_interactive
 from kernel_config_checker.schema.schema import (
@@ -21,8 +22,11 @@ from kernel_config_checker.schema.schema import (
     load_schema,
 )
 
+if TYPE_CHECKING:
+    from kernel_config_checker.schema.schema import KernelConfigValue
 
-def _resolve_value(value) -> str:
+
+def _resolve_value(value: KernelConfigValue | str) -> str:
     """Resolve an enum or string config value to its string representation."""
     return value.value if isinstance(value, Enum) else value
 
