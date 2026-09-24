@@ -1,0 +1,35 @@
+Taken from: <https://inbox.sourceware.org/libc-alpha/cover.1777546194.git.fweimer@redhat.com/>
+
+commit 7e090bee0c7a19274ac9b5ba1c27ef0165ed5bd7
+Author: Florian Weimer <fweimer@redhat.com>
+Date:   Thu Apr 30 12:52:07 2026 +0200
+
+    resolv: Remove incorrect parts of TSIG handling from ns_sprintrrf (CVE-2026-5435)
+    
+    TSIG handling was incomplete before.  Given that this is an obsolete
+    interface, it does not seem worthwhile to complete the implementation.
+    
+    This fixes bug 34033.
+
+diff --git a/resolv/ns_print.c b/resolv/ns_print.c
+index 5701e3d0c59f79f1..9c9e810781aaa4f4 100644
+--- a/resolv/ns_print.c
++++ b/resolv/ns_print.c
+@@ -513,17 +513,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 
+ 	case ns_t_tsig: {
+ 		/* BEW - need to complete this */
+-		int n;
+-
+ 		T(len = addname(msg, msglen, &rdata, origin, &buf, &buflen));
+-		T(addstr(" ", 1, &buf, &buflen));
+-		rdata += 8; /*%< time */
+-		n = ns_get16(rdata); rdata += INT16SZ;
+-		rdata += n; /*%< sig */
+-		n = ns_get16(rdata); rdata += INT16SZ; /*%< original id */
+-		sprintf(buf, "%d", ns_get16(rdata));
+-		rdata += INT16SZ;
+-		addlen(strlen(buf), &buf, &buflen);
+ 		break;
+ 	    }
+ 
