@@ -58,7 +58,7 @@ class SpecReviewReport(BaseModel):
     @classmethod
     def from_file(cls, path: str | Path) -> SpecReviewReport:
         """Load and validate a report from a JSON file."""
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             return cls.model_validate(json.load(f))
 
     @property
