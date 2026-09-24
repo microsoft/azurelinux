@@ -65,6 +65,7 @@ def from_specs_diff(path: Path, specs_dir: Path, renderable: set[str]) -> list[s
 
 
 def main() -> None:
+    """Print components whose rendered specs need regeneration."""
     p = argparse.ArgumentParser()
     p.add_argument("--changed-components-file", type=Path, required=True)
     p.add_argument("--specs-diff-file", type=Path, required=True)

@@ -40,6 +40,9 @@ pyright
 - Ruff permits bare `assert` statements under `tests/` directories because
   pytest uses them to provide detailed failure output. Use `pytest.fail(...)`
   for explicit failures and `pytest.raises(...)` when verifying exceptions.
+- Public functions in `test_*.py` files do not require docstrings; their names
+  should describe their testing purpose. Public helpers, fixtures, and plugin
+  hooks in support modules such as `conftest.py` still require docstrings.
 - Direct-execution helper directories are not necessarily Python packages. When tests need to import sibling scripts, use a narrow `tests/conftest.py` path setup rather than creating a package API solely for tests.
 - If the Pyright CLI is not using the workspace virtual environment, pass it explicitly (for example, `pyright --pythonpath .venv/bin/python <path>`). Do not suppress missing imports that are installed in the configured environment.
 

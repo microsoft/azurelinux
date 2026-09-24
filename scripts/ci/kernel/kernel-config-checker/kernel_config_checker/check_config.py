@@ -146,6 +146,7 @@ def check_config_across_all(schema: IntentionalKernelConfigSchema, config_name: 
 
 
 def main() -> int | None:
+    """Run kernel configuration validation from command-line arguments."""
     parser = argparse.ArgumentParser(description="Check kernel .config file against intentional configuration")
     parser.add_argument(
         "--add-config",

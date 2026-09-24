@@ -403,6 +403,7 @@ def generate_patch(
 
 
 def main() -> int:
+    """Check rendered specs and write the requested reports."""
     parser = argparse.ArgumentParser(
         description="Check rendered specs for drift. Outputs a JSON report and optional patch."
     )

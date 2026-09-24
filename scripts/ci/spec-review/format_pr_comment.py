@@ -116,6 +116,7 @@ def format_comment(report: dict, repo: str, sha: str, repo_root: Path | None = N
 
 
 def main() -> int:
+    """Format a spec-review report as a pull request comment."""
     parser = argparse.ArgumentParser(description="Format spec review as PR comment")
     parser.add_argument("file", type=Path, help="Path to report JSON")
     parser.add_argument("--repo", required=True, help="GitHub repo (owner/repo)")

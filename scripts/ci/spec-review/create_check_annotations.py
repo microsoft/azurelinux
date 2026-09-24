@@ -90,6 +90,7 @@ def generate_check_annotations(report: dict, repo_root: Path | None = None) -> l
 
 
 def main() -> int:
+    """Generate check annotations from a spec-review report."""
     parser = argparse.ArgumentParser(description="Generate check annotations from spec review")
     parser.add_argument("file", type=Path, help="Path to report JSON")
     parser.add_argument(
