@@ -56,9 +56,9 @@ load_env()
 _DEFAULT_BASE_URL = "https://src.fedoraproject.org"
 _base_url: str = _DEFAULT_BASE_URL
 
-_scratch_dir: str = os.path.join(os.environ.get("AZLDEV_WORK_DIR", "base/build/work"), "scratch", "distgit")
-_repos_dir: str = os.path.join(_scratch_dir, "repos")
-_fetch_dir: str = os.path.join(_scratch_dir, "fetched")
+_scratch_dir = Path(os.environ.get("AZLDEV_WORK_DIR", "base/build/work")) / "scratch" / "distgit"
+_repos_dir = _scratch_dir / "repos"
+_fetch_dir = _scratch_dir / "fetched"
 
 # Maximum number of cached repos before eviction kicks in
 _MAX_CACHED_REPOS = 5
@@ -68,11 +68,12 @@ def _add_status(result: StatusDict, *, full: bool) -> StatusDict:
     """Append server state to a tool result."""
     status: StatusDict = {
         "default_base_url": _base_url,
-        "scratch_dir": _scratch_dir,
+        "scratch_dir": str(_scratch_dir),
     }
     if full:
         repos = _cached_repos()
-        status["cached_repos"] = [os.path.relpath(r, _repos_dir) for r, _ in repos]
+        repos_dir = Path(_repos_dir)
+        status["cached_repos"] = [str(r.relative_to(repos_dir)) for r, _ in repos]
     return result | status
 
 
@@ -81,43 +82,44 @@ def _add_status(result: StatusDict, *, full: bool) -> StatusDict:
 # ---------------------------------------------------------------------------
 
 
-def _repo_path(package: str, base_url: str) -> str:
+def _repo_path(package: str, base_url: str) -> Path:
     """Return the on-disk path for a cached clone, namespaced by origin host."""
     hostname = urlparse(base_url).hostname or "unknown"
-    return os.path.join(_repos_dir, hostname, package)
+    return Path(_repos_dir) / hostname / package
 
 
-def _git_dir(package: str, base_url: str) -> str:
+def _git_dir(package: str, base_url: str) -> Path:
     """Return the .git directory for a cached clone."""
-    return os.path.join(_repo_path(package, base_url), ".git")
+    return _repo_path(package, base_url) / ".git"
 
 
-def _touch_repo(repo_dir: str) -> None:
+def _touch_repo(repo_dir: Path) -> None:
     """Update the mtime of a repo dir to track LRU."""
     os.utime(repo_dir)
 
 
-def _cached_repos() -> list[tuple[str, float]]:
+def _cached_repos() -> list[tuple[Path, float]]:
     """Return list of (repo_dir, mtime) sorted oldest-first.
 
     Scans ``_repos_dir/<hostname>/<package>`` (current layout) and also
     ``_repos_dir/<package>`` (legacy layout before host-namespacing) so
     old caches are still visible for eviction and cleanup.
     """
-    if not os.path.isdir(_repos_dir):
+    repos_dir = Path(_repos_dir)
+    if not repos_dir.is_dir():
         return []
-    repos: list[tuple[str, float]] = []
-    for entry in os.scandir(_repos_dir):
+    repos: list[tuple[Path, float]] = []
+    for entry in repos_dir.iterdir():
         if not entry.is_dir():
             continue
         # Legacy layout: _repos_dir/<package>/.git
-        if os.path.isdir(os.path.join(entry.path, ".git")):
-            repos.append((entry.path, entry.stat().st_mtime))
+        if (entry / ".git").is_dir():
+            repos.append((entry, entry.stat().st_mtime))
         else:
             # Current layout: _repos_dir/<hostname>/<package>/.git
-            for sub in os.scandir(entry.path):
-                if sub.is_dir() and os.path.isdir(os.path.join(sub.path, ".git")):
-                    repos.append((sub.path, sub.stat().st_mtime))
+            for sub in entry.iterdir():
+                if sub.is_dir() and (sub / ".git").is_dir():
+                    repos.append((sub, sub.stat().st_mtime))
     repos.sort(key=lambda x: x[1])
     return repos
 
@@ -133,7 +135,7 @@ def _evict_if_needed(*, auto_clean: bool) -> str | None:
         return None
 
     if not auto_clean:
-        names = [os.path.basename(r) for r, _ in repos]
+        names = [r.name for r, _ in repos]
         return (
             f"WARNING: Repo cache is full ({len(repos)}/{_MAX_CACHED_REPOS}). "
             f"Cached repos: {', '.join(names)}. "
@@ -156,7 +158,7 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
 
     repo_dir = _repo_path(package, base_url)
 
-    if os.path.isdir(os.path.join(repo_dir, ".git")):
+    if (repo_dir / ".git").is_dir():
         _touch_repo(repo_dir)
         # Fetch latest refs (best-effort)
         try:
@@ -168,18 +170,18 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
             )
         except (OSError, subprocess.SubprocessError):
             pass
-        return repo_dir, None
+        return str(repo_dir), None
 
     # Check cache capacity before cloning
     warn = _evict_if_needed(auto_clean=auto_clean)
     if warn:
         return "", warn
 
-    os.makedirs(os.path.dirname(repo_dir), exist_ok=True)
+    repo_dir.parent.mkdir(parents=True, exist_ok=True)
     clone_url = f"{base_url}/rpms/{package}.git"
     try:
         result = subprocess.run(
-            ["git", "clone", "--quiet", clone_url, repo_dir],
+            ["git", "clone", "--quiet", clone_url, str(repo_dir)],
             capture_output=True,
             text=True,
             timeout=120,
@@ -196,7 +198,7 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
         return "", f"git clone failed (exit {result.returncode}): {stderr}"
 
     _touch_repo(repo_dir)
-    return repo_dir, None
+    return str(repo_dir), None
 
 
 # ---------------------------------------------------------------------------
@@ -424,7 +426,7 @@ def distgit_search(
         if err:
             return _add_status({"error": err}, full=False)
 
-        git_dir = _git_dir(package, base)
+        git_dir = str(_git_dir(package, base))
         cmd = _build_search_command(git_dir, query, ref, mode)
         output, search_error = _run_search_command(cmd, mode, query, package, ref)
         if search_error is not None:
@@ -485,7 +487,7 @@ def distgit_show(
         if err:
             return _add_status({"error": err}, full=False)
 
-        git_dir = _git_dir(package, base)
+        git_dir = str(_git_dir(package, base))
 
         try:
             result = subprocess.run(
@@ -532,21 +534,23 @@ def distgit_cleanup(
         removed_bytes = 0
 
         # Clean fetched files
-        if os.path.isdir(_fetch_dir):
-            for entry in os.scandir(_fetch_dir):
+        fetch_dir = Path(_fetch_dir)
+        if fetch_dir.is_dir():
+            for entry in fetch_dir.iterdir():
                 if entry.is_file():
                     removed_bytes += entry.stat().st_size
-                    Path(entry.path).unlink()
+                    entry.unlink()
                     removed_files += 1
 
         # Clean repos
         removed_repos_count = 0
-        if remove_repos and os.path.isdir(_repos_dir):
+        repos_dir = Path(_repos_dir)
+        if remove_repos and repos_dir.is_dir():
             # Count actual repos (hostname/package) before bulk-removing the tree.
             removed_repos_count = len(_cached_repos())
-            for entry in os.scandir(_repos_dir):
+            for entry in repos_dir.iterdir():
                 if entry.is_dir():
-                    shutil.rmtree(entry.path, ignore_errors=True)
+                    shutil.rmtree(entry, ignore_errors=True)
 
         return _add_status(
             {
