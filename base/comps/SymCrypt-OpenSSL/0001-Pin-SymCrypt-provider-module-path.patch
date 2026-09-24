@@ -1,0 +1,28 @@
+From 7fc9c7058243061a3cc217414ecedd9a66f14ef0 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 18 Sep 2026 14:37:17 +0000
+Subject: [PATCH] fix(config): pin SymCrypt provider module path
+
+Load the provider from the packaged module path so OpenSSL FIPS
+registration cannot be redirected through the provider search path.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ SymCryptProvider/symcrypt_prov.cnf | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/SymCryptProvider/symcrypt_prov.cnf b/SymCryptProvider/symcrypt_prov.cnf
+index 6cebccc..474927c 100644
+--- a/SymCryptProvider/symcrypt_prov.cnf
++++ b/SymCryptProvider/symcrypt_prov.cnf
+@@ -8,6 +8,7 @@
+ symcryptprovider = symcrypt_prov_sect
+ 
+ [symcrypt_prov_sect]
++module = /usr/lib64/ossl-modules/symcryptprovider.so
+ activate = 1
+ identity = symcryptprovider
+ keysinuse = keysinuse_sect
+-- 
+2.55.0
+

@@ -1,0 +1,50 @@
+# Load Azure Linux's registered OpenSSL FIPS provider in kernel FIPS mode.
+# Provider packages own their registrations and satisfy a virtual capability;
+# Fedora's fips_local.cnf symlink is therefore obsolete.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+# The fips.so-removal overlay (in openssl.comp.toml) also enables Fedora's
+# FIPS-provider dependency. Azure Linux requires the virtual provider
+# capability and prefers the currently supported SymCrypt implementation.
+[[overlays]]
+type = "spec-search-replace"
+regex = '^Requires: openssl-fips-provider$'
+replacement = '''Requires: openssl(fips-provider)
+Recommends: SymCrypt-OpenSSL >= 1.11.0'''
+description = "Use the Azure Linux FIPS-provider capability"
+
+[[overlays]]
+type = "patch-add"
+source = "../0080-azl-load-registered-fips-provider.patch"
+description = "Load the registered FIPS provider in kernel FIPS mode"
+
+# OpenSSL owns the provider-neutral registration directory. Provider packages
+# own only their individual registration files within it.
+[[overlays]]
+type = "spec-search-replace"
+regex = '^mkdir -p \$RPM_BUILD_ROOT%\{_sysconfdir\}/pki/tls/openssl\.d$'
+replacement = '''mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/azl-openssl-fips-provider.d'''
+description = "Create the Azure Linux FIPS-provider registration directory"
+
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%dir %\{_sysconfdir\}/pki/tls/openssl\.d$'
+replacement = '''%dir %{_sysconfdir}/pki/tls/openssl.d
+%dir %{_sysconfdir}/pki/tls/azl-openssl-fips-provider.d'''
+description = "Assign registration directory ownership to openssl-libs"
+
+# Azure Linux reads provider-owned registrations instead of fips_local.cnf.
+[[overlays]]
+type = "spec-search-replace"
+regex = '^ln -s /etc/crypto-policies/back-ends/openssl_fips\.config \$RPM_BUILD_ROOT%\{_sysconfdir\}/pki/tls/fips_local\.cnf$'
+replacement = ''
+description = "Remove obsolete fips_local.cnf symlink creation"
+
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%config %\{_sysconfdir\}/pki/tls/fips_local\.cnf$'
+replacement = ''
+description = "Remove obsolete fips_local.cnf from %files"

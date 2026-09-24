@@ -8,6 +8,8 @@ Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        symcrypt-fips-provider.cnf
+Patch0:         0001-Pin-SymCrypt-provider-module-path.patch
 
 BuildRequires:  openssl-devel >= 3.5.0
 BuildRequires:  openssl-devel-engine >= 3.5.0
@@ -19,6 +21,8 @@ BuildRequires:  make
 
 Requires:       SymCrypt >= 103.12.0
 Requires:       openssl-libs
+Provides:       openssl(fips-provider)
+Conflicts:      openssl(fips-provider)
 
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
@@ -53,6 +57,7 @@ mkdir -p %{buildroot}%{_libdir}/engines-3/
 mkdir -p %{buildroot}%{_libdir}/ossl-modules/
 mkdir -p %{buildroot}%{_includedir}
 mkdir -p %{buildroot}%{_sysconfdir}/pki/tls/openssl.d/
+mkdir -p %{buildroot}%{_sysconfdir}/pki/tls/azl-openssl-fips-provider.d/
 mkdir -p %{buildroot}%{_localstatedir}/log/keysinuse/
 
 # We still install the engine for backwards compatibility with legacy applications. Callers must
@@ -61,6 +66,7 @@ install %{__cmake_builddir}/SymCryptEngine/dynamic/symcryptengine.so %{buildroot
 install %{__cmake_builddir}/SymCryptProvider/symcryptprovider.so %{buildroot}%{_libdir}/ossl-modules/symcryptprovider.so
 install SymCryptEngine/inc/e_scossl.h %{buildroot}%{_includedir}/e_scossl.h
 install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/openssl.d/symcrypt_prov.cnf
+install %{SOURCE1} %{buildroot}%{_sysconfdir}/pki/tls/azl-openssl-fips-provider.d/symcrypt.cnf
 
 %check
 # Run in a subshell so the exit code of the test does not affect the main shell's exit code.
@@ -81,6 +87,7 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/op
 %{_libdir}/ossl-modules/symcryptprovider.so
 %{_includedir}/e_scossl.h
 %config %{_sysconfdir}/pki/tls/openssl.d/symcrypt_prov.cnf
+%config %{_sysconfdir}/pki/tls/azl-openssl-fips-provider.d/symcrypt.cnf
 
 # The log directory for certsinuse logging has permissions set to 1733.
 # These permissions are a result of a security review to mitigate potential risks:

@@ -7,9 +7,8 @@ spec = { type = "upstream", upstream-commit = "0990e54a2f6b6b8e4f3e238175382505f
 
 # Azure Linux does not ship fips.so. Extend the existing RHEL fips.so-deletion
 # path to cover Azure Linux so the module and its config are excluded from the
-# package. This also enables the Requires: openssl-fips-provider guard, which
-# the SymCrypt overlay (overlays/0001-force-symcrypt-fips.overlay.toml)
-# rewrites to Requires: SymCrypt-OpenSSL.
+# package. This also enables the FIPS-provider dependency, which the Azure Linux
+# overlay rewrites to the provider-neutral virtual capability.
 [[components.openssl.overlays]]
 type = "spec-search-replace"
 regex = '%if \( %\{defined rhel\} && \(! %\{defined centos\}\) && \(! %\{defined eln\}\) \)'
