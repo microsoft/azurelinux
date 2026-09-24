@@ -32,6 +32,8 @@ PODMAN = NativeTool(
 _loaded_image_refs: set[str] = set()
 _built_image_cache: dict[tuple[Path, str], str] = {}
 
+_SLEEP_INFINITY = ["sleep", "infinity"]
+
 
 class ContainerExecResult(NamedTuple):
     """Result of executing a command inside a container.
@@ -224,23 +226,30 @@ def cleanup_test_images(client: DockerClient) -> None:
                 logger.debug("Image remove skipped (%s): %s", image_ref, exc)
 
 
-def create_container(
+def create_container(  # noqa: PLR0913 - mirrors the supported container runtime options
     client: DockerClient,
     image_ref: str,
     container_name: str | None = None,
     *,
     networks: list[str] | None = None,
+    command: list[str] | None = _SLEEP_INFINITY,
+    envs: dict[str, str] | None = None,
+    volumes: list[tuple[str, str, str]] | None = None,
 ) -> ContainerInstance:
     """Create and start a container with exec access.
 
     The container runs ``sleep infinity`` to stay alive for the duration
-    of the test, allowing repeated ``exec`` calls.
+    of the test, allowing repeated ``exec`` calls. Pass ``command=None``
+    to run the image's own default command instead.
 
     Args:
         client: Active python-on-whales Podman client.
         image_ref: Image ID or reference to run.
         container_name: Optional name; auto-generated if None.
         networks: Optional networks to attach the container to.
+        command: Command override; ``None`` uses the image's default command.
+        envs: Optional environment variables for the container.
+        volumes: Optional ``(source, destination, options)`` volume mounts.
 
     Returns:
         A ContainerInstance with the container's ID, name, and image ref.
@@ -252,10 +261,12 @@ def create_container(
 
     container = client.container.run(
         image_ref,
-        command=["sleep", "infinity"],
+        command=command if command is not None else (),
         name=container_name,
         detach=True,
+        envs=envs or {},
         networks=networks or [],
+        volumes=volumes or [],
     )
 
     # Verify the container is running and exec works.

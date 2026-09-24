@@ -75,6 +75,111 @@ container = true
 systemd = false
 runtime-package-management = false
 
+# ---- single-purpose workload containers ---------------------------------
+#
+# One well-known package (or small package family) per image, defined in
+# containers-workloads.xml. Shared package requirements across these images
+# are hoisted into workload-specific kiwi profiles (e.g. PythonCore) rather
+# than duplicated.
+
+[images.container-busybox]
+description = "Busybox Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "busybox-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-busybox.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
+
+[images.container-nginx]
+description = "Nginx Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "nginx-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-nginx.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
+
+[images.container-postgres]
+description = "PostgreSQL Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "postgres-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-postgres.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
+
+[images.container-telegraf]
+description = "Telegraf Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "telegraf-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-telegraf.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
+
+[images.container-python]
+description = "Python Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "python-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-python.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
+
+[images.container-nodejs]
+description = "Node.js Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "nodejs-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-nodejs.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
+
+[images.container-pytorch]
+description = "PyTorch Container Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "pytorch-workload" }
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
+
+[images.container-pytorch.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
+
 # ---- wsl ---------------------------------------------------------------
 
 [images.wsl]
