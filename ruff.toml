@@ -18,6 +18,11 @@ target-version = "py312"
 select = ["ALL"] # Everything
 ignore = [
     "COM812", # Conflicts with formatter.
+    # Keep exception messages beside the conditions that produce them.
+    # Introducing a temporary variable solely to shorten traceback source
+    # lines adds indirection without improving behavior or error handling.
+    "EM101",
+    "EM102",
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
     "S607",   # Requiring abspath for all binaries used is very restrictive
     "T201",   # These scripts are fine to use `print` for output
