@@ -65,6 +65,7 @@ from _repo_layout import (
     KIND_MAIN,
     KIND_SRPMS,
     SUBREPOS,
+    validate_repo_url,
 )
 
 if TYPE_CHECKING:
@@ -87,6 +88,7 @@ HTTP_RETRIES = 3
 HTTP_BACKOFF_BASE = 1.0  # seconds; doubled per attempt.
 HTTP_SERVER_ERROR_MIN = HTTPStatus.INTERNAL_SERVER_ERROR
 HTTP_SERVER_ERROR_MAX = 600
+
 
 # repomd record types we generate ourselves in the output. The synth
 # tool only emits these — auxiliary records (updateinfo, group,
@@ -277,13 +279,17 @@ def _http_get(
     URLs that point at a missing file) so the caller can react
     (e.g. silently skip 404 / ENOENT from a prefix-derived sub-repo).
     """
+    validate_repo_url(url)
     dest.parent.mkdir(parents=True, exist_ok=True)
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    req = urllib.request.Request(  # noqa: S310 - Repository URL scheme is allowlisted above.
+        url,
+        headers={"User-Agent": USER_AGENT},
+    )
     last_exc: BaseException | None = None
     for attempt in range(retries):
         try:
             with (
-                urllib.request.urlopen(
+                urllib.request.urlopen(  # noqa: S310 - Request URL was validated above.
                     req,
                     timeout=timeout,
                     context=ssl_context,
@@ -1202,6 +1208,8 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901 - phases are clear
             cache_dir = download_repo_metadata(repo, cache_root, ssl_context)
         except urllib.error.HTTPError as e:
             return fatal(f"HTTP {e.code} fetching {repo.url}/repodata/repomd.xml (origin={repo.origin})")
+        except ValueError as e:
+            return fatal(str(e))
         if cache_dir is not None:
             repo_to_dir[repo] = cache_dir
     log(f"    {len(repo_to_dir)} repo(s) successfully downloaded ({len(repos) - len(repo_to_dir)} skipped)")

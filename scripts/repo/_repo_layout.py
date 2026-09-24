@@ -16,6 +16,7 @@ loader / validator layer that has to be kept in sync with the data.
 
 from __future__ import annotations
 
+import urllib.parse
 from dataclasses import dataclass
 
 CHANNELS: tuple[str, ...] = ("base", "sdk")
@@ -24,6 +25,21 @@ KIND_MAIN = "main"
 KIND_DEBUGINFO = "debuginfo"
 KIND_SRPMS = "srpms"
 ALL_KINDS: tuple[str, ...] = (KIND_MAIN, KIND_DEBUGINFO, KIND_SRPMS)
+ALLOWED_REPO_SCHEMES = frozenset({"file", "http", "https"})
+
+
+class UnsupportedRepoSchemeError(ValueError):
+    """Indicate that a repository URL uses a disallowed scheme."""
+
+
+def validate_repo_url(url: str) -> None:
+    """Reject repository URLs whose scheme urllib must not open."""
+    scheme = urllib.parse.urlsplit(url).scheme.lower()
+    if scheme not in ALLOWED_REPO_SCHEMES:
+        allowed = ", ".join(sorted(ALLOWED_REPO_SCHEMES))
+        raise UnsupportedRepoSchemeError(
+            f"unsupported repository URL scheme {scheme or '<missing>'!r} for {url!r}; expected one of: {allowed}"
+        )
 
 
 @dataclass(frozen=True)

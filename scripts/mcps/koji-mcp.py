@@ -227,9 +227,16 @@ def koji_fetch(  # noqa: C901 - security checks belong in one request pipeline
             ssl_ctx.check_hostname = False
             ssl_ctx.verify_mode = ssl.CERT_NONE
 
-        req = urllib.request.Request(url, headers={"User-Agent": "koji-mcp/1.0"})
+        req = urllib.request.Request(  # noqa: S310 - URL passed validate_base_url and check_ssrf.
+            url,
+            headers={"User-Agent": "koji-mcp/1.0"},
+        )
         try:
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=10) as resp:
+            with urllib.request.urlopen(  # noqa: S310 - Request URL was validated above.
+                req,
+                context=ssl_ctx,
+                timeout=10,
+            ) as resp:
                 data = resp.read()
         except urllib.error.URLError as e:
             # urllib wraps SSL errors inside URLError.reason
