@@ -178,7 +178,10 @@ def koji_allow_insecure(override_base_url: str | None = None) -> StatusDict:
 
 
 @mcp.tool()
-def koji_fetch(path: str, override_base_url: str | None = None) -> StatusDict:
+def koji_fetch(  # noqa: C901 - security checks belong in one request pipeline
+    path: str,
+    override_base_url: str | None = None,
+) -> StatusDict:
     """Fetch a page or log from Koji.
 
     `path` is appended to the base URL. The base URL is resolved as: `override_base_url` if provided, otherwise the

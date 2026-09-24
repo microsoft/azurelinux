@@ -33,6 +33,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -103,6 +104,91 @@ def _render_command(components: list[str], use_all: bool = False) -> str:
     if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component render -a --clean-stale"
     return f"azldev component render {' '.join(components)}"
+
+
+@dataclass
+class _CommentBudget:
+    """Track the current comment size against its maximum."""
+
+    used: int
+    cap: int
+
+
+def _append_content_diffs(
+    lines: list[str],
+    content_diffs: list[dict[str, str]],
+    budget: _CommentBudget,
+) -> None:
+    """Append inline content diffs without exceeding the comment budget."""
+    lines.extend(["### Content diffs", ""])
+    shown = 0
+    for item in content_diffs:
+        if shown >= MAX_INLINE_DIFFS:
+            remaining = len(content_diffs) - shown
+            lines.extend(
+                [
+                    f"*… and {remaining} more file(s). "
+                    "Run the remediation command above to see all changes.*",
+                    "",
+                ]
+            )
+            break
+        path = _safe_path(item["path"])
+        diff_text = item.get("diff", "")
+        fence = _fence_for(diff_text)
+        # Keep attacker-controlled paths and diff bodies in code formatting.
+        block = f"<details>\n<summary>`{path}`</summary>\n\n{fence}diff\n{diff_text}\n{fence}\n\n</details>\n"
+        if budget.used + len(block) > budget.cap:
+            remaining = len(content_diffs) - shown
+            lines.extend(
+                [
+                    f"*… and {remaining} more file(s) — comment size limit reached. "
+                    "Run the remediation command above to see all changes.*",
+                    "",
+                ]
+            )
+            break
+        lines.append(block)
+        budget.used += len(block)
+        shown += 1
+
+
+def _append_file_list(
+    lines: list[str],
+    header: str,
+    description: str,
+    items: list[dict[str, str]],
+    budget: _CommentBudget,
+) -> None:
+    """Append a bulleted file list without exceeding the comment budget."""
+    lines.extend([header, "", description, ""])
+    shown = 0
+    truncated_for_size = False
+    for item in items[:MAX_FILE_LIST]:
+        entry = f"- `{_safe_path(item['path'])}`"
+        # +1 for the newline added by the final "\n".join(lines).
+        if budget.used + len(entry) + 1 > budget.cap:
+            truncated_for_size = True
+            break
+        lines.append(entry)
+        budget.used += len(entry) + 1
+        shown += 1
+    if truncated_for_size:
+        remaining = len(items) - shown
+        note = (
+            f"\n*… and {remaining} more file(s) — comment size limit reached. "
+            "Run the remediation command above to see all changes.*"
+        )
+    elif len(items) > MAX_FILE_LIST:
+        remaining = len(items) - MAX_FILE_LIST
+        note = f"\n*… and {remaining} more file(s).*"
+    else:
+        note = None
+    if note is not None:
+        lines.append(note)
+        budget.used += len(note) + 1
+    lines.append("")
+    budget.used += 1
 
 
 def format_comment(
@@ -179,96 +265,30 @@ def format_comment(
     # rejected for being too large is effectively invisible (the post step
     # has continue-on-error: true), so a fork PR author could otherwise
     # suppress the drift warning by spamming long or numerous paths.
-    body_so_far = len("\n".join(lines))
-    budget_cap = MAX_COMMENT_CHARS - COMMENT_BUDGET_MARGIN
+    budget = _CommentBudget(
+        used=len("\n".join(lines)),
+        cap=MAX_COMMENT_CHARS - COMMENT_BUDGET_MARGIN,
+    )
 
     if content_diffs:
-        lines.append("### Content diffs")
-        lines.append("")
-        shown = 0
-        for item in content_diffs:
-            if shown >= MAX_INLINE_DIFFS:
-                remaining = n_diff - shown
-                lines.append(f"*… and {remaining} more file(s). Run the remediation command above to see all changes.*")
-                lines.append("")
-                break
-            path = _safe_path(item["path"])
-            diff_text = item.get("diff", "")
-            fence = _fence_for(diff_text)
-            # Emit fixed raw HTML for the collapsible wrapper (`<details>` and
-            # `<summary>`), but keep attacker-controlled content in markdown
-            # code formatting: the path is rendered as code in the summary, and
-            # the diff body is inside a dynamically chosen fence longer than any
-            # backtick run in the diff text.
-            block = f"<details>\n<summary>`{path}`</summary>\n\n{fence}diff\n{diff_text}\n{fence}\n\n</details>\n"
-            if body_so_far + len(block) > budget_cap:
-                remaining = n_diff - shown
-                lines.append(
-                    f"*… and {remaining} more file(s) — comment size limit reached. "
-                    "Run the remediation command above to see all changes.*"
-                )
-                lines.append("")
-                break
-            lines.append(block)
-            body_so_far += len(block)
-            shown += 1
-
-    def _append_file_list(
-        header: str,
-        description: str,
-        items: list[dict],
-    ) -> None:
-        """Append a bulleted file list, enforcing the shared comment budget.
-
-        Stops early once the cumulative body size gets near the GitHub
-        limit, so a fork PR can't suppress the warning by producing either
-        very long paths or a huge number of them.
-        """
-        nonlocal body_so_far
-        lines.append(header)
-        lines.append("")
-        lines.append(description)
-        lines.append("")
-        shown = 0
-        truncated_for_size = False
-        for item in items[:MAX_FILE_LIST]:
-            entry = f"- `{_safe_path(item['path'])}`"
-            # +1 for the newline added by the final "\n".join(lines).
-            if body_so_far + len(entry) + 1 > budget_cap:
-                truncated_for_size = True
-                break
-            lines.append(entry)
-            body_so_far += len(entry) + 1
-            shown += 1
-        if truncated_for_size:
-            remaining = len(items) - shown
-            note = (
-                f"\n*… and {remaining} more file(s) — comment size limit reached. "
-                "Run the remediation command above to see all changes.*"
-            )
-        elif len(items) > MAX_FILE_LIST:
-            remaining = len(items) - MAX_FILE_LIST
-            note = f"\n*… and {remaining} more file(s).*"
-        else:
-            note = None
-        if note is not None:
-            lines.append(note)
-            body_so_far += len(note) + 1
-        lines.append("")
-        body_so_far += 1
+        _append_content_diffs(lines, content_diffs, budget)
 
     if extra_files:
         _append_file_list(
+            lines,
             "### Files to add",
             "These files are produced by `azldev component render` but are missing from your branch. Add them.",
             extra_files,
+            budget,
         )
 
     if missing_files:
         _append_file_list(
+            lines,
             "### Files to remove",
             "These files are in your branch but are not produced by render. Remove them.",
             missing_files,
+            budget,
         )
 
     return "\n".join(lines)

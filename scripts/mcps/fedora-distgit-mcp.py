@@ -291,6 +291,92 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
         return _add_status({"output": output}, full=False)
 
 
+def _validate_search_request(query: str, ref: str, mode: str) -> str | None:
+    """Return an error message when a dist-git search request is invalid."""
+    valid_modes = ("pickaxe", "grep", "log-grep")
+    if mode not in valid_modes:
+        return f"mode must be one of {valid_modes}, got {mode!r}"
+    if not query:
+        return "query must not be empty."
+    if ref != "--all" and ref.startswith("-"):
+        return f"ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."
+    if mode == "grep" and ref == "--all":
+        return "--all is not supported for grep mode; specify a single ref (e.g. 'rawhide')."
+    return None
+
+
+def _build_search_command(git_dir: str, query: str, ref: str, mode: str) -> list[str]:
+    """Build the git command for a validated dist-git search request."""
+    if mode == "pickaxe":
+        ref_args = ["--all"] if ref == "--all" else [ref]
+        return [
+            "git",
+            "--git-dir",
+            git_dir,
+            "log",
+            "--oneline",
+            "-20",
+            f"-S{query}",
+            *ref_args,
+            "--",
+        ]
+    if mode == "grep":
+        return [
+            "git",
+            "--git-dir",
+            git_dir,
+            "grep",
+            "-n",
+            "-i",
+            "-e",
+            query,
+            ref,
+            "--",
+        ]
+    ref_args = ["--all"] if ref == "--all" else [ref]
+    return [
+        "git",
+        "--git-dir",
+        git_dir,
+        "log",
+        "--oneline",
+        "-20",
+        f"--grep={query}",
+        *ref_args,
+    ]
+
+
+def _run_search_command(
+    cmd: list[str],
+    mode: str,
+    query: str,
+    package: str,
+    ref: str,
+) -> tuple[str, StatusDict | None]:
+    """Run a git search command and translate expected failures."""
+    try:
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        return "", _add_status({"error": "Search timed out after 30s."}, full=False)
+    except (OSError, ValueError) as e:
+        return "", _add_status({"error": f"running git: {e}"}, full=False)
+
+    output = result.stdout
+    if result.returncode != 0 and not output:
+        # git grep returns 1 for "no match" — that's expected.
+        if mode == "grep" and result.returncode == 1:
+            message = f"No matches found for {query!r} in {package} at {ref}."
+            return "", _add_status({"output": message}, full=False)
+        stderr = result.stderr.strip()
+        return "", _add_status({"error": f"git exited with {result.returncode}: {stderr}"}, full=False)
+    return output, None
+
+
 @mcp.tool()
 def distgit_search(
     package: str,
@@ -330,90 +416,19 @@ def distgit_search(
         else:
             base = _base_url
 
-        valid_modes = ("pickaxe", "grep", "log-grep")
-        if mode not in valid_modes:
-            return _add_status({"error": f"mode must be one of {valid_modes}, got {mode!r}"}, full=False)
-        if not query:
-            return _add_status({"error": "query must not be empty."}, full=False)
-        if ref != "--all" and ref.startswith("-"):
-            return _add_status(
-                {"error": f"ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."},
-                full=False,
-            )
+        validation_error = _validate_search_request(query, ref, mode)
+        if validation_error:
+            return _add_status({"error": validation_error}, full=False)
 
         repo_dir, err = _ensure_repo(package, auto_clean, base)
         if err:
             return _add_status({"error": err}, full=False)
 
         git_dir = _git_dir(package, base)
-
-        # Build the git command
-        if mode == "pickaxe":
-            ref_args = ["--all"] if ref == "--all" else [ref]
-            cmd = [
-                "git",
-                "--git-dir",
-                git_dir,
-                "log",
-                "--oneline",
-                "-20",
-                f"-S{query}",
-                *ref_args,
-                "--",
-            ]
-        elif mode == "grep":
-            if ref == "--all":
-                return _add_status(
-                    {"error": "--all is not supported for grep mode; specify a single ref (e.g. 'rawhide')."},
-                    full=False,
-                )
-            cmd = [
-                "git",
-                "--git-dir",
-                git_dir,
-                "grep",
-                "-n",
-                "-i",
-                "-e",
-                query,
-                ref,
-                "--",
-            ]
-        elif mode == "log-grep":
-            ref_args = ["--all"] if ref == "--all" else [ref]
-            cmd = [
-                "git",
-                "--git-dir",
-                git_dir,
-                "log",
-                "--oneline",
-                "-20",
-                f"--grep={query}",
-                *ref_args,
-            ]
-
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-        except subprocess.TimeoutExpired:
-            return _add_status({"error": "Search timed out after 30s."}, full=False)
-        except OSError as e:
-            return _add_status({"error": f"running git: {e}"}, full=False)
-
-        output = result.stdout
-        if result.returncode != 0 and not output:
-            # git grep returns 1 for "no match" — that's expected
-            if mode == "grep" and result.returncode == 1:
-                return _add_status(
-                    {"output": f"No matches found for {query!r} in {package} at {ref}."},
-                    full=False,
-                )
-            stderr = result.stderr.strip()
-            return _add_status({"error": f"git exited with {result.returncode}: {stderr}"}, full=False)
+        cmd = _build_search_command(git_dir, query, ref, mode)
+        output, search_error = _run_search_command(cmd, mode, query, package, ref)
+        if search_error is not None:
+            return search_error
 
         if not output.strip():
             return _add_status(

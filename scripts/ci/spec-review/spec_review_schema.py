@@ -144,7 +144,7 @@ def _findings_set(reviews: list[SpecReview], severity: str) -> dict[tuple[str, s
     return result
 
 
-def compare_reports(
+def compare_reports(  # noqa: C901 - branches mirror comparison sections
     report_a: SpecReviewReport,
     report_b: SpecReviewReport,
     report_final: SpecReviewReport,
@@ -216,7 +216,7 @@ def compare_reports(
         print()
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901 - CLI modes are clearer in one dispatcher
     """Validate, summarize, or compare spec-review reports."""
     import argparse
 

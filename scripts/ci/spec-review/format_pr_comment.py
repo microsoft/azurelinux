@@ -21,7 +21,12 @@ from _common import get_repo_relative_path
 MAX_RAW_JSON_CHARS = 50_000
 
 
-def format_comment(report: dict, repo: str, sha: str, repo_root: Path | None = None) -> str:
+def format_comment(  # noqa: C901 - branches mirror report sections
+    report: dict,
+    repo: str,
+    sha: str,
+    repo_root: Path | None = None,
+) -> str:
     """Format the report as a markdown comment."""
     reviews = report.get("spec_reviews", [])
 

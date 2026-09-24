@@ -862,35 +862,25 @@ class _RepoWriter:
 # ---------------------------------------------------------------------------
 
 
-def emit_repos(
-    repo_to_dir: dict[InputRepo, Path],
+def _collect_emission_plan(
     universe: dict[UniverseKey, UniverseEntry],
     decisions: dict[UniverseKey, RoutingDecision],
-    output_dir: Path,
-) -> tuple[dict[Destination, int], list[dict], list[dict]]:
-    """Route each package from the input repositories to its destination.
-
-    Returns (per_destination_counts, unpublished_records, fallback_records).
-
-    Counts are per NEVRA. The unpublished and fallback reports both dedupe
-    by (kind, arch, name) since the routing reason is name-based and
-    listing every NEVRA of an affected name would just be noise.
-    """
-    # Precompute counts per destination (for XML headers), unpublished
-    # records (excluded from output), and fallback records (routed via
-    # Phase-4 inheritance rather than an explicit publishChannel).
+) -> tuple[
+    Counter[Destination],
+    list[dict[str, object]],
+    list[dict[str, object]],
+]:
+    """Collect destination counts and deduplicated routing reports."""
     dest_counts: Counter[Destination] = Counter()
-    unpublished: list[dict] = []
+    unpublished: list[dict[str, object]] = []
     unpub_seen: set[tuple[str, str, str]] = set()
-    fallbacks: list[dict] = []
+    fallbacks: list[dict[str, object]] = []
     fb_seen: set[tuple[str, str, str]] = set()
     for key, decision in decisions.items():
-        kind = key[0]
-        arch = key[1]
-        name = key[2]
+        kind, arch, name = key[:3]
         entry = universe[key]
+        nameslot = (kind, arch, name)
         if decision.dest_channel is None:
-            nameslot = (kind, arch, name)
             if nameslot not in unpub_seen:
                 unpub_seen.add(nameslot)
                 unpublished.append(
@@ -906,22 +896,39 @@ def emit_repos(
             continue
         dest = Destination(decision.dest_channel, kind, arch)
         dest_counts[dest] += 1
-        if decision.inherited:
-            nameslot = (kind, arch, name)
-            if nameslot not in fb_seen:
-                fb_seen.add(nameslot)
-                fallbacks.append(
-                    {
-                        "name": name,
-                        "kind": kind,
-                        "arch": arch,
-                        "source_repo": entry.repo.url,
-                        "source_package": entry.source_pkg_name,
-                        "dest_channel": decision.dest_channel,
-                        "reason": decision.reason,
-                        "tie_break_used": decision.tie_break_used,
-                    }
-                )
+        if decision.inherited and nameslot not in fb_seen:
+            fb_seen.add(nameslot)
+            fallbacks.append(
+                {
+                    "name": name,
+                    "kind": kind,
+                    "arch": arch,
+                    "source_repo": entry.repo.url,
+                    "source_package": entry.source_pkg_name,
+                    "dest_channel": decision.dest_channel,
+                    "reason": decision.reason,
+                    "tie_break_used": decision.tie_break_used,
+                }
+            )
+    return dest_counts, unpublished, fallbacks
+
+
+def emit_repos(
+    repo_to_dir: dict[InputRepo, Path],
+    universe: dict[UniverseKey, UniverseEntry],
+    decisions: dict[UniverseKey, RoutingDecision],
+    output_dir: Path,
+) -> tuple[dict[Destination, int], list[dict], list[dict]]:
+    """Route each package from the input repositories to its destination.
+
+    Returns (per_destination_counts, unpublished_records, fallback_records).
+
+    Counts are per NEVRA. The unpublished and fallback reports both dedupe
+    by (kind, arch, name) since the routing reason is name-based and
+    listing every NEVRA of an affected name would just be noise.
+    """
+    # Precompute writer counts and deduplicated routing reports.
+    dest_counts, unpublished, fallbacks = _collect_emission_plan(universe, decisions)
 
     # Open writers up-front with correct counts.
     writers: dict[Destination, _RepoWriter] = {d: _RepoWriter(d, output_dir, n) for d, n in dest_counts.items()}
@@ -1155,7 +1162,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:  # noqa: C901 - phases are clearer in one pipeline
     """Synthesize routed Azure Linux repositories."""
     args = parse_args(argv)
     arches = tuple(args.arch) if args.arch else DEFAULT_ARCHES

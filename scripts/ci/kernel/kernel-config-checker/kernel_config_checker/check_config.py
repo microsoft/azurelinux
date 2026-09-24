@@ -150,7 +150,7 @@ def check_config_across_all(schema: IntentionalKernelConfigSchema, config_name: 
     return True
 
 
-def main() -> int | None:
+def main() -> int | None:  # noqa: C901 - CLI modes are clearer in one dispatcher
     """Run kernel configuration validation from command-line arguments."""
     parser = argparse.ArgumentParser(description="Check kernel .config file against intentional configuration")
     parser.add_argument(

@@ -162,7 +162,7 @@ def probe_repo(probe_url: str, *, timeout: float = PROBE_TIMEOUT) -> tuple[str, 
         return _PROBE_FAIL, f"OS error: {e}"
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:  # noqa: C901 - repository discovery is one workflow
     """Discover Azure Linux repositories and execute dnf."""
     if argv is None:
         argv = sys.argv[1:]
