@@ -1,0 +1,18 @@
+From: Nan Liu <liunan@microsoft.com>
+Date: Fri, 18 Sep 2026 00:00:00 +0000
+Subject: [PATCH] cri: tolerate wrapped ENOTSUP from SELinux relabel
+
+label.Relabel can return a PathError wrapping ENOTSUP. Use errors.Is so the
+existing unsupported-filesystem tolerance also handles wrapped errors.
+---
+ internal/cri/opts/spec_linux_opts.go | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/internal/cri/opts/spec_linux_opts.go b/internal/cri/opts/spec_linux_opts.go
+--- a/internal/cri/opts/spec_linux_opts.go
++++ b/internal/cri/opts/spec_linux_opts.go
+@@ -205,2 +205,2 @@
+-				ENOTSUP := syscall.Errno(0x5f) // Linux specific error code, this branch will not execute on non Linux platforms.
+-				if err := label.Relabel(src, mountLabel, false); err != nil && err != ENOTSUP {
++				if err := label.Relabel(src, mountLabel, false); err != nil &&
++					!errors.Is(err, syscall.ENOTSUP) {
