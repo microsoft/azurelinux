@@ -3,6 +3,54 @@
     "name": "default",
     "kernel_configs": [
       {
+        "name": "CONFIG_BT",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep Bluetooth disabled on both Azure Linux kernel architectures."
+      },
+      {
+        "name": "CONFIG_WLAN_VENDOR_INTEL",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep Intel Wi-Fi disabled on both Azure Linux kernel architectures."
+      },
+      {
+        "name": "CONFIG_WLAN",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep WLAN drivers disabled on both Azure Linux kernel architectures."
+      },
+      {
+        "name": "CONFIG_USB_VIDEO_CLASS",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep USB webcams disabled on both Azure Linux kernel architectures."
+      },
+      {
+        "name": "CONFIG_ACPI_AC",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep laptop AC adapters disabled on both Azure Linux kernel architectures."
+      },
+      {
+        "name": "CONFIG_ACPI_BATTERY",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep laptop batteries disabled on both Azure Linux kernel architectures."
+      },
+      {
         "name": "CONFIG_AMD_MEM_ENCRYPT",
         "values": [
           {
