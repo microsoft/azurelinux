@@ -1,6 +1,6 @@
 Summary:        LTTng is an open source tracing framework for Linux.
 Name:           lttng-tools
-Version:        2.13.11
+Version:        2.14.0
 Release:        1%{?dist}
 License:        GPLv2 and LGPLv2+
 URL:            https://lttng.org/
@@ -10,13 +10,17 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 BuildRequires: libxml2-devel >= 2.7.6
+BuildRequires: gcc-c++
 BuildRequires: m4
 BuildRequires: elfutils-devel
 BuildRequires: popt-devel
-BuildRequires: userspace-rcu-devel >= 0.8.0
-BuildRequires: lttng-ust-devel >= 2.13.1
-Requires:      lttng-ust >= 2.13.1
-Requires:      userspace-rcu >= 0.8.0
+BuildRequires: libbabeltrace2-devel
+BuildRequires: userspace-rcu-devel >= 0.14.0
+BuildRequires: lttng-ust-devel >= 2.14.0
+BuildRequires: lttng-ust-devel < 2.15.0
+Requires:      lttng-ust >= 2.14.0
+Requires:      lttng-ust < 2.15.0
+Requires:      userspace-rcu >= 0.14.0
 Requires:      elfutils
 Requires:      libxml2
 
@@ -35,6 +39,8 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.la' -delete
+# LICENSE is shipped via %license; drop the duplicate copy under the doc dir.
+rm -f %{buildroot}%{_docdir}/%{name}/LICENSE
 
 %files
 %license LICENSE
@@ -45,6 +51,11 @@ find %{buildroot} -name '*.la' -delete
 %exclude %{_libdir}/debug
 
 %changelog
+* Tue Aug 25 2026 Ankita Pareek <ankitapareek@microsoft.com> - 2.14.0-1
+- Backport lttng-tools 2.14.0 from the Azure Linux 4.0 branch for per-channel buffer allocation support.
+- Add gcc-c++ and libbabeltrace2-devel BuildRequires required by the 2.14 build.
+- Drop duplicate LICENSE from the doc directory (shipped via %%license).
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.11-1
 - Auto-upgrade to 2.13.11 - Azure Linux 3.0 - package upgrades
 
