@@ -5,8 +5,12 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from utils.types import PartitionInfo
+
+if TYPE_CHECKING:
+    from utils.types import PartitionInfo
 
 
 def test_has_root_partition(partition_table: list[PartitionInfo]) -> None:

@@ -7,9 +7,12 @@ from __future__ import annotations
 
 import logging
 import subprocess
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .tools import NativeTool
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

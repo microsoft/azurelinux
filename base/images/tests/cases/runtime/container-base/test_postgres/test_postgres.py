@@ -6,10 +6,13 @@
 from __future__ import annotations
 
 import contextlib
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 import pytest
 from utils.container_runtime import ExecShell, wait_until_service_ready
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 DB_PORT = 5432
 DB_NAME = "postgres"

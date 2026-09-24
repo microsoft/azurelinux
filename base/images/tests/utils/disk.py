@@ -7,11 +7,14 @@ from __future__ import annotations
 
 import logging
 import xml.etree.ElementTree as ET
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .extract import _guestfs_env, _run
 from .tools import NativeTool
 from .types import DiskInfo, PartitionInfo
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

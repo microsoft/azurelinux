@@ -9,8 +9,12 @@ OpenMPI installed on top of the image-under-test.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from utils.container_runtime import ExecShell
+
+if TYPE_CHECKING:
+    from utils.container_runtime import ExecShell
 
 MPI_RUN = "/usr/lib64/openmpi/bin/mpirun"
 PRTE_RUN = "/usr/lib64/openmpi/bin/prterun"

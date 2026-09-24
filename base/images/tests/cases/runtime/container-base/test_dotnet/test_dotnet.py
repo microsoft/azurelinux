@@ -11,8 +11,12 @@ that communicates with it over localhost.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from utils.container_runtime import AssertHttpServer, ExecShell
+
+if TYPE_CHECKING:
+    from utils.container_runtime import AssertHttpServer, ExecShell
 
 EXPECTED_RESPONSE = "Hello World!"
 

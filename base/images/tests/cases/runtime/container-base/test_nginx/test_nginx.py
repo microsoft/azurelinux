@@ -9,8 +9,12 @@ nginx installed on top of the image-under-test.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from utils.container_runtime import AssertHttpServer, ExecShell
+
+if TYPE_CHECKING:
+    from utils.container_runtime import AssertHttpServer, ExecShell
 
 
 @pytest.mark.dockerfile
