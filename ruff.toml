@@ -43,11 +43,19 @@ fixable = ["ALL"]
 # Test names describe the behavior under test; require docstrings for helpers
 # and plugins under tests/, but not for the test functions themselves.
 "**/test_*.py" = ["D103"]
+# The image-test cases are a pytest filesystem hierarchy, not importable
+# packages. Only the sibling utils/ tree is packaged by pyproject.toml.
+"base/images/tests/cases/**/*.py" = ["INP001"]
+"base/images/tests/conftest.py" = ["INP001"]
 
 # Helpers under scripts/ci/ are executed directly (python3 path/to/script.py)
 # with sibling-module imports, not imported as a package, so they intentionally
 # have no __init__.py. Silence the implicit-namespace-package rule for that tree.
 "scripts/ci/**/*.py" = ["INP001"]
+# These helpers are likewise imported by directly executed sibling scripts,
+# including the extensionless scripts/repo/dnf-with-azl-repos entry point.
+"scripts/mcps/_mcp_utils.py" = ["INP001"]
+"scripts/repo/_repo_layout.py" = ["INP001"]
 
 [lint.isort]
 # Just force this, its better than dealing with a mishmash of modules that have annotations and those that don't
