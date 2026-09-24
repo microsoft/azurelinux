@@ -27,6 +27,14 @@
         "justification": "Keep WLAN drivers disabled on both Azure Linux kernel architectures."
       },
       {
+        "name": "CONFIG_USB_VIDEO_CLASS",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep USB webcams disabled on both Azure Linux kernel architectures."
+      },
+      {
         "name": "CONFIG_AMD_MEM_ENCRYPT",
         "values": [
           {
