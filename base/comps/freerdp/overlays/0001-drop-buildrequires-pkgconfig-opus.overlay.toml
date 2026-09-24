@@ -13,6 +13,6 @@ value = "pkgconfig(opus)"
 [[overlays]]
 description = "Disable opus audio codec in FreeRDP (-DWITH_OPUS=OFF)"
 type = "spec-search-replace"
-section = "%build"
+section = "%conf"
 regex = "-DWITH_OPUS=ON \\\\"
 replacement = "-DWITH_OPUS=OFF \\"
