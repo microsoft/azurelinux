@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Compute the render set: components flagged by `azldev component changed`
 plus components whose spec tree was touched directly in the PR.
 

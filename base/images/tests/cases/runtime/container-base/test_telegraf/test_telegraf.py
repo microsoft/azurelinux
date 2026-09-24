@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Validate Telegraf runtime behavior on container-base images.
 
@@ -51,4 +53,3 @@ def test_telegraf_file_output_plugin_writes_metrics(
         'test -s /tmp/telegraf-metrics.out && grep -q "mem,host" /tmp/telegraf-metrics.out'
     )
     assert result.exit_code == 0, f"telegraf file output validation failed: {result.output}"
-

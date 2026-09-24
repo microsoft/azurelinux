@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Format spec review report as a GitHub PR comment with clickable links.
 
 Usage:

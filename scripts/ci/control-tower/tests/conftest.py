@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Pytest configuration for Control Tower CI helper tests."""
 
 from __future__ import annotations

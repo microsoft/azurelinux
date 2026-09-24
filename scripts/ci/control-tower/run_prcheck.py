@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Call the Control Tower 'prcheck' API and wait for the resulting job to finish.
 
 Flow:

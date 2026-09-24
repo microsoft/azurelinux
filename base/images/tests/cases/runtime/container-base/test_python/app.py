@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Minimal stdlib HTTP server used to validate the Python runtime."""
 
 from __future__ import annotations

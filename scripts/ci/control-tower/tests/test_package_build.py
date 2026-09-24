@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Contract tests for Control Tower package-build entry points."""
 
 from __future__ import annotations

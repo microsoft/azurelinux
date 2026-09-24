@@ -41,5 +41,10 @@ fixable = ["ALL"]
 # Just force this, its better than dealing with a mishmash of modules that have annotations and those that don't
 required-imports = ["from __future__ import annotations"]
 
+[lint.flake8-copyright]
+# Microsoft OSS headers intentionally omit the year.
+notice-rgx = "(?i)Copyright \\(c\\)"
+author = "Microsoft Corporation"
+
 [lint.pydocstyle]
 convention = "google"

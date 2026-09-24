@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Shared pytest fixtures for kernel config validation checks."""
 
 from __future__ import annotations

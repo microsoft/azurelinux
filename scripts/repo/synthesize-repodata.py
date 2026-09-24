@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Route packages from one or more upstream RPM repos into the standard
 Azure Linux per-channel/per-arch layout.
 

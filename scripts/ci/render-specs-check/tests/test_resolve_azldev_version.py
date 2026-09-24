@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Tests for post-merge azldev version resolution."""
 
 from __future__ import annotations
