@@ -84,10 +84,10 @@ echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
 
 cd "$NAME_VER"
-go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2 -require=github.com/go-openapi/swag@v0.27.1
 go mod tidy
 echo "Get vendored modules"
-# kubevirt ships a go.work (root + staging/src/kubevirt.io/{api,client-go}), so
+# kubevirt ships a go.work, so
 # 'go mod vendor' is rejected in workspace mode; 'go work vendor' produces the
 # workspace-wide vendor/ tree that upstream ships.
 go work vendor

@@ -27,11 +27,12 @@ Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v1.tar.gz
 Patch0:         CVE-2025-11065.patch
 Patch1:         CVE-2026-84445.patch
 Patch2:         CVE-2026-56855.patch
 Patch3:         CVE-2026-78662.patch
+Patch4:         CVE-2026-93450.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -290,7 +291,8 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 
 %changelog
 * Thu Sep 17 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.8.4-3
-- Patch for CVE-2026-84445 and CVE-2026-84304 by generating new go vendor tarball with google.golang.org/grpc v1.83.2
+- Patch for CVE-2026-84445 and CVE-2026-84304, CVE-2026-93450 by generating new go vendor tarball
+  with google.golang.org/grpc v1.83.2 and github.com/go-openapi/swag@v0.27.1
 - Drop CVE-2026-25680.patch, CVE-2026-25681.patch, CVE-2026-27136.patch, CVE-2026-33814.patch,
   CVE-2026-39821.patch, CVE-2026-42502.patch, CVE-2026-42506.patch, CVE-2026-39827.patch,
   CVE-2026-39828.patch, CVE-2026-39829.patch, CVE-2026-39830.patch, CVE-2026-39834.patch,
