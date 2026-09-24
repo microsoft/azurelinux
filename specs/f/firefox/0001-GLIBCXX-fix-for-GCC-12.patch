@@ -1,0 +1,31 @@
+diff -up firefox-142.0/build/unix/stdc++compat/stdc++compat.cpp.0001-GLIBCXX-fix-for-GCC-12 firefox-142.0/build/unix/stdc++compat/stdc++compat.cpp
+--- firefox-142.0/build/unix/stdc++compat/stdc++compat.cpp.0001-GLIBCXX-fix-for-GCC-12	2025-08-11 20:04:27.000000000 +0200
++++ firefox-142.0/build/unix/stdc++compat/stdc++compat.cpp	2025-08-14 15:02:05.496137133 +0200
+@@ -24,6 +24,7 @@
+    GLIBCXX_3.4.27 is from gcc 10
+    GLIBCXX_3.4.28 is from gcc 10
+    GLIBCXX_3.4.29 is from gcc 11
++   GLIBCXX_3.4.30 is from gcc 12
+ 
+ This file adds the necessary compatibility tricks to avoid symbols with
+ version GLIBCXX_3.4.20 and bigger, keeping binary compatibility with
+@@ -94,6 +95,19 @@ void operator delete(void* ptr, size_t s
+ }
+ #  endif
+ 
++#if _GLIBCXX_RELEASE >= 12
++namespace std {
++
++/* This avoids the GLIBCXX_3.4.30 symbol version. */
++void __attribute__((weak))
++__glibcxx_assert_fail(const char* __file, int __line, const char* __function,
++                      const char* __condition) {
++  MOZ_CRASH();
++}
++
++}  // namespace std
++#endif
++
+ /* While we generally don't build with exceptions, we have some host tools
+  * that do use them. libstdc++ from GCC 5.0 added exception constructors with
+  * char const* argument. Older versions only have a constructor with

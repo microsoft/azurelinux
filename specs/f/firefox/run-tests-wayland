@@ -1,0 +1,80 @@
+#!/usr/bin/bash
+# usage: run-tests-wayland [test flavour]
+
+set -x
+
+RUN_XPCSHELL_TEST=1
+RUN_REFTEST=1
+RUN_MOCHITEST=1
+RUN_CRASHTEST=1
+
+while (( "$#" )); do
+  SELECTED_TEST=$1
+  if [ "$SELECTED_TEST" = "xpcshell" ] ; then
+    RUN_XPCSHELL_TEST=1
+  elif [ "$SELECTED_TEST" = "reftest" ] ; then
+    RUN_REFTEST=1
+  elif [ "$SELECTED_TEST" = "mochitest" ] ; then
+    RUN_MOCHITEST=1
+  elif [ "$SELECTED_TEST" = "crashtest" ] ; then
+    RUN_CRASHTEST=1
+  fi
+  shift
+done
+
+export MACH_USE_SYSTEM_PYTHON=1
+export MOZ_NODE_PATH=/usr/bin/node
+
+MOCHITEST_PARAMS="--timeout 1 --chunk-by-dir 4"
+TEST_DIR="test_results"
+mkdir $TEST_DIR
+
+env | grep "DISPLAY"
+
+# Fix for system nss
+ln -s /usr/bin/certutil objdir/dist/bin/certutil
+ln -s /usr/bin/pk12util objdir/dist/bin/pk12util
+
+NCPUS="`/usr/bin/getconf _NPROCESSORS_ONLN`"
+
+export MOZ_ENABLE_WAYLAND=1
+
+if [ $RUN_XPCSHELL_TEST -ne 0 ] ; then
+#  ./mach xpcshell-test 2>&1 | cat - | tee $TEST_DIR/xpcshell
+  ./mach xpcshell-test --enable-webrender 2>&1 | cat - | tee $TEST_DIR/xpcshell-wr
+  sleep 60
+fi
+
+# Basic render testing
+export TEST_PARAMS="--setpref reftest.ignoreWindowSize=true --setpref widget.wayland.test-workarounds.enabled=true"
+#export TEST_FLAVOUR=""
+#if [ $RUN_REFTEST -ne 0 ] ; then
+#  ./mach reftest --marionette localhost:$(($(($RANDOM))+2000)) $TEST_PARAMS 2>&1 | tee $TEST_DIR/reftest$TEST_FLAVOUR
+#fi
+#if [ $RUN_CRASHTEST -ne 0 ] ; then
+#  ./mach crashtest --marionette localhost:$(($(($RANDOM))+2000)) $TEST_PARAMS 2>&1 | tee $TEST_DIR/crashtest$TEST_FLAVOUR
+#fi
+#if [ $RUN_MOCHITEST -ne 0 ] ; then
+#  ./mach mochitest --marionette localhost:$(($(($RANDOM))+2000)) $MOCHITEST_PARAMS $TEST_PARAMS 2>&1 | tee $TEST_DIR/mochitest$TEST_FLAVOUR
+#fi
+
+# WebRender testing
+export TEST_PARAMS="--enable-webrender $TEST_PARAMS"
+export TEST_FLAVOUR="-wr"
+# Use dom/base/test or dom/base/test/chrome for short version
+export MOCHITEST_DIR='dom'
+if [ $RUN_REFTEST -ne 0 ] ; then
+  ./mach reftest $TEST_PARAMS 2>&1 | tee $TEST_DIR/reftest$TEST_FLAVOUR
+  sleep 60
+fi
+if [ $RUN_CRASHTEST -ne 0 ] ; then
+  ./mach crashtest $TEST_PARAMS 2>&1 | tee $TEST_DIR/crashtest$TEST_FLAVOUR
+  sleep 60
+fi
+if [ $RUN_MOCHITEST -ne 0 ] ; then
+  ./mach mochitest $MOCHITEST_DIR $MOCHITEST_PARAMS $TEST_PARAMS 2>&1 | tee $TEST_DIR/mochitest$TEST_FLAVOUR
+  sleep 60
+fi
+
+rm -f  objdir/dist/bin/certutil
+rm -f  objdir/dist/bin/pk12util

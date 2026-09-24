@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/bin/node "$@" 2>&1 | cat -

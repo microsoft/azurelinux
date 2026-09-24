@@ -1,0 +1,37 @@
+From 5cf3af3181f7a0fb8d59ca5fe8daa011c1918d19 Mon Sep 17 00:00:00 2001
+From: Ryan Wiedemann <Ryan1729@gmail.com>
+Date: Mon, 25 Oct 2021 22:11:48 -0600
+Subject: [PATCH] Predeclare stbhw__process struct to fix warnings
+
+A subset of the warnings as produced by `clang`.
+```
+./../stb_herringbone_wang_tile.h:369:41: warning: declaration of 'struct stbhw__process' will not be visible outside of this function [-Wvisibility]
+typedef void stbhw__process_rect(struct stbhw__process *p, int xpos, int ypos,
+                                        ^
+./../stb_herringbone_wang_tile.h:401:43: warning: incompatible pointer types passing 'stbhw__process *' (aka 'struct stbhw__process *') to parameter of type 'struct stbhw__process *' [-Wincompatible-pointer-types]
+                        p->process_h_rect(p, xpos, ypos, a,b,c,d,e,f);
+                                          ^
+./../stb_herringbone_wang_tile.h:425:43: warning: incompatible pointer types passing 'stbhw__process *' (aka 'struct stbhw__process *') to parameter of type 'struct stbhw__process *' [-Wincompatible-pointer-types]
+                        p->process_v_rect(p, xpos, ypos, a,b,c,d,e,f);
+                                          ^
+./../stb_herringbone_wang_tile.h:929:21: warning: incompatible pointer types assigning to 'stbhw__process_rect *' (aka 'void (*)(struct stbhw__process *, int, int, int, int, int, int, int, int)') from 'void (stbhw__process *, int, int, int, int, int, int, int, int)' (aka 'void (struct stbhw__process *, int, int, int, int, int, int, int, int)') [-Wincompatible-pointer-types]
+   p.process_h_rect = stbhw__parse_h_rect;
+                    ^ ~~~~~~~~~~~~~~~~~~~
+```
+---
+ stb_herringbone_wang_tile.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/stb_herringbone_wang_tile.h b/stb_herringbone_wang_tile.h
+index 5517941f7a..92c238bb24 100644
+--- a/stb_herringbone_wang_tile.h
++++ b/stb_herringbone_wang_tile.h
+@@ -366,6 +366,8 @@ STBHW_EXTERN const char *stbhw_get_last_error(void)
+ //  need to try to do more sophisticated parsing of edge color
+ //  markup or something.
+ 
++struct stbhw__process;
++
+ typedef void stbhw__process_rect(struct stbhw__process *p, int xpos, int ypos,
+                                  int a, int b, int c, int d, int e, int f);
+ 

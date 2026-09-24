@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+# Analyze and print specialized (basic/webrender) test results
+
+TEST_DIR=$1
+TEST_FLAVOUR=$2
+
+MPASS=`grep "TEST_END: Test OK" $TEST_DIR/mochitest$TEST_FLAVOUR | wc -l`
+MERR=`grep "TEST_END: Test ERROR" $TEST_DIR/mochitest$TEST_FLAVOUR | wc -l`
+MUNEX=`grep "TEST-UNEXPECTED-FAIL" $TEST_DIR/mochitest$TEST_FLAVOUR | wc  -l`
+echo "Mochitest   PASSED: $MPASS FAILED: $MERR UNEXPECTED-FAILURES: $MUNEX"
+
+XPCPASS=`grep --text "Expected results:" $TEST_DIR/xpcshell$TEST_FLAVOUR | cut -d ' ' -f 3`
+XPCFAIL=`grep --text "Unexpected results:" $TEST_DIR/xpcshell$TEST_FLAVOUR | cut -d ' ' -f 3`
+echo "XPCShell:   PASSED: $XPCPASS FAILED: $XPCFAIL"
+
+CRPASS=`grep "REFTEST INFO | Successful:" $TEST_DIR/crashtest$TEST_FLAVOUR | cut -d ' ' -f 5`
+CRFAIL=`grep "^REFTEST INFO | Unexpected:" $TEST_DIR/crashtest$TEST_FLAVOUR | cut -d ' ' -f 5`
+echo "Crashtest:  PASSED: $CRPASS FAILED: $CRFAIL"
+
+RFPASS=`grep --text "REFTEST INFO | Successful:" $TEST_DIR/reftest$TEST_FLAVOUR | cut -d ' ' -f 5`
+RFUN=`grep --text "^REFTEST INFO | Unexpected:" $TEST_DIR/reftest$TEST_FLAVOUR | cut -d ' ' -f 5`
+RFKNOWN=`grep --text "REFTEST INFO | Known problems:" $TEST_DIR/reftest$TEST_FLAVOUR | cut -d ' ' -f 6`
+echo "Reftest:    PASSED: $RFPASS FAILED: $RFUN Known issues: $RFKNOWN"

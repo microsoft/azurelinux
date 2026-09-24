@@ -1,0 +1,18 @@
+diff -up firefox-154.0-build/firefox-154.0/config/rules.mk.pgo-simple firefox-154.0-build/firefox-154.0/config/rules.mk
+--- firefox-154.0-build/firefox-154.0/config/rules.mk.pgo-simple	2026-08-12 23:13:24.000000000 +0200
++++ firefox-154.0-build/firefox-154.0/config/rules.mk	2026-08-13 12:37:48.663956455 +0200
+@@ -172,9 +172,14 @@ endif
+ # Don't build SIMPLE_PROGRAMS during the MOZ_PROFILE_GENERATE pass, and do not
+ # attempt to install them
+ ifdef MOZ_PROFILE_GENERATE
++_PGO_SKIPPED_SIMPLE_PROGRAMS := $(SIMPLE_PROGRAMS)
+ $(foreach category,$(INSTALL_TARGETS),\
+   $(eval $(category)_FILES := $(foreach file,$($(category)_FILES),$(if $(filter $(SIMPLE_PROGRAMS),$(notdir $(file))),,$(file)))))
+ SIMPLE_PROGRAMS :=
++# Create empty placeholders so misc:: install rules from backend.mk
++# that copy these binaries to _tests/ don't fail on missing files.
++$(_PGO_SKIPPED_SIMPLE_PROGRAMS):
++	@touch $@
+ endif
+ 
+ ifdef COMPILE_ENVIRONMENT

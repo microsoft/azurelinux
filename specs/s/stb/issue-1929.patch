@@ -1,0 +1,12 @@
+diff -Naur stb-904aa67e1e2d1dec92959df63e700b166d5c1022-original/stb_image.h stb-904aa67e1e2d1dec92959df63e700b166d5c1022/stb_image.h
+--- stb-904aa67e1e2d1dec92959df63e700b166d5c1022-original/stb_image.h	2026-04-08 15:03:56.525512525 +0100
++++ stb-904aa67e1e2d1dec92959df63e700b166d5c1022/stb_image.h	2026-04-08 15:04:54.459417151 +0100
+@@ -5534,7 +5534,7 @@
+ {
+    stbi_uc *out;
+    unsigned int mr=0,mg=0,mb=0,ma=0, all_a;
+-   stbi_uc pal[256][4];
++   stbi_uc pal[256][4] = {0};
+    int psize=0,i,j,width;
+    int flip_vertically, pad, target;
+    stbi__bmp_data info;

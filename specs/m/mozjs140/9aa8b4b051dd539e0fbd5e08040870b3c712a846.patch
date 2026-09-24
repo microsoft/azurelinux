@@ -1,0 +1,24 @@
+From 9aa8b4b051dd539e0fbd5e08040870b3c712a846 Mon Sep 17 00:00:00 2001
+From: Philip Chimento <philip.chimento@gmail.com>
+Date: Wed, 16 Jul 2025 22:50:50 -0700
+Subject: [PATCH] Bug 1973994 - mozjs-140.pc does not contain -DXP_UNIX on
+ Linux
+
+Temporary fix.
+---
+ js/src/js-config.h.in | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/js/src/js-config.h.in b/js/src/js-config.h.in
+index 8372623586..498ea968ba 100644
+--- a/js/src/js-config.h.in
++++ b/js/src/js-config.h.in
+@@ -68,4 +68,8 @@
+ #undef MOZJS_MAJOR_VERSION
+ #undef MOZJS_MINOR_VERSION
+ 
++/* Controls API in UniquePtrExtensions.h. */
++#undef XP_UNIX
++#undef XP_WIN
++
+ #endif /* js_config_h */

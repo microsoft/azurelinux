@@ -1,0 +1,24 @@
+From f9a5eaee846f1a19fbcda2f5adb5238a94cbbc2f Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 24 Aug 2021 11:45:48 -0400
+Subject: [PATCH] Fix signature of dummy realloc() for STB_VORBIS_NO_CRT
+
+---
+ stb_vorbis.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/stb_vorbis.c b/stb_vorbis.c
+index 3e5c2504c..c1703426e 100644
+--- a/stb_vorbis.c
++++ b/stb_vorbis.c
+@@ -594,8 +594,8 @@ enum STBVorbisError
+ #else // STB_VORBIS_NO_CRT
+    #define NULL 0
+    #define malloc(s)   0
+-   #define free(s)     ((void) 0)
+-   #define realloc(s)  0
++   #define free(p)     ((void) 0)
++   #define realloc(p, s)  0
+ #endif // STB_VORBIS_NO_CRT
+ 
+ #include <limits.h>

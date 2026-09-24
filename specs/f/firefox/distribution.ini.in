@@ -1,0 +1,9 @@
+[Global]
+id=__ID__
+version=1.0
+about=Mozilla Firefox for __NAME__
+
+[Preferences]
+app.distributor=__ID__
+app.distributor.channel=__ID__
+app.partner.fedora=__ID__

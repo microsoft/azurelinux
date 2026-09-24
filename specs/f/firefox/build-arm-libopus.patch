@@ -1,0 +1,12 @@
+diff -up firefox-66.0/media/libopus/silk/arm/arm_silk_map.c.old firefox-66.0/media/libopus/silk/arm/arm_silk_map.c
+--- firefox-66.0/media/libopus/silk/arm/arm_silk_map.c.old	2019-03-12 21:07:35.356677522 +0100
++++ firefox-66.0/media/libopus/silk/arm/arm_silk_map.c	2019-03-12 21:07:42.937693394 +0100
+@@ -28,7 +28,7 @@ POSSIBILITY OF SUCH DAMAGE.
+ # include "config.h"
+ #endif
+ 
+-#include "main_FIX.h"
++#include "fixed/main_FIX.h"
+ #include "NSQ.h"
+ #include "SigProc_FIX.h"
+ 

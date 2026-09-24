@@ -1,0 +1,645 @@
+diff -up firefox-155.0/third_party/libwebrtc/common_video/BUILD.gn.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/common_video/BUILD.gn
+--- firefox-155.0/third_party/libwebrtc/common_video/BUILD.gn.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:58.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/common_video/BUILD.gn	2026-08-27 12:03:57.125421714 +0200
+@@ -97,6 +97,10 @@ rtc_library("common_video") {
+       "../rtc_base/containers:flat_map",
+     ]
+   }
++
++  if (!is_ios) {
++    defines = [ "HAVE_LIBYUV_JPEG" ]
++  }
+ }
+ 
+ rtc_source_set("frame_counts") {
+diff -up firefox-155.0/third_party/libwebrtc/common_video/common_video_gn/moz.build.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/common_video/common_video_gn/moz.build
+--- firefox-155.0/third_party/libwebrtc/common_video/common_video_gn/moz.build.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:57.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/common_video/common_video_gn/moz.build	2026-08-27 12:03:57.125568098 +0200
+@@ -20,6 +20,7 @@ DEFINES["WEBRTC_LIBRARY_IMPL"] = True
+ DEFINES["WEBRTC_MOZILLA_BUILD"] = True
+ DEFINES["WEBRTC_NON_STATIC_TRACE_EVENT_HANDLERS"] = "0"
+ DEFINES["WEBRTC_STRICT_FIELD_TRIALS"] = "0"
++DEFINES["HAVE_LIBYUV_JPEG"] = True
+ 
+ FINAL_LIBRARY = "xul"
+ 
+diff -up firefox-155.0/third_party/libwebrtc/common_video/libyuv/include/webrtc_libyuv.h.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/common_video/libyuv/include/webrtc_libyuv.h
+--- firefox-155.0/third_party/libwebrtc/common_video/libyuv/include/webrtc_libyuv.h.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:57.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/common_video/libyuv/include/webrtc_libyuv.h	2026-08-27 12:03:57.125648087 +0200
+@@ -84,6 +84,22 @@ int ConvertFromI420(const VideoFrame& sr
+                     int dst_sample_size,
+                     uint8_t* dst_frame);
+ 
++int ConvertToI420(const uint8_t* sample,
++                  size_t sample_size,
++                  uint8_t* dst_y,
++                  int dst_stride_y,
++                  uint8_t* dst_u,
++                  int dst_stride_u,
++                  uint8_t* dst_v,
++                  int dst_stride_v,
++                  int src_width,
++                  int src_height,
++                  int src_stride,
++                  int dst_width,
++                  int dst_height,
++                  uint32_t rotation,
++                  uint32_t fourcc);
++
+ scoped_refptr<I420BufferInterface> ScaleVideoFrameBuffer(
+     const I420BufferInterface& source,
+     int dst_width,
+diff -up firefox-155.0/third_party/libwebrtc/common_video/libyuv/libyuv_unittest.cc.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/common_video/libyuv/libyuv_unittest.cc
+--- firefox-155.0/third_party/libwebrtc/common_video/libyuv/libyuv_unittest.cc.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:57.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/common_video/libyuv/libyuv_unittest.cc	2026-08-27 12:03:57.125709162 +0200
+@@ -172,12 +172,12 @@ TEST_F(TestLibYuv, ConvertTest) {
+   EXPECT_EQ(0, ConvertFromI420(*orig_frame_, VideoType::kRGB24, 0,
+                                res_rgb_buffer2.get()));
+ 
+-  ret = libyuv::ConvertToI420(
++  ret = ConvertToI420(
+       res_rgb_buffer2.get(), 0, res_i420_buffer->MutableDataY(),
+       res_i420_buffer->StrideY(), res_i420_buffer->MutableDataU(),
+       res_i420_buffer->StrideU(), res_i420_buffer->MutableDataV(),
+-      res_i420_buffer->StrideV(), 0, 0, width_, height_,
+-      res_i420_buffer->width(), res_i420_buffer->height(), libyuv::kRotate0,
++      res_i420_buffer->StrideV(), width_, height_, 0, res_i420_buffer->width(),
++      res_i420_buffer->height(), static_cast<uint32_t>(libyuv::kRotate0),
+       ConvertVideoType(VideoType::kRGB24));
+ 
+   EXPECT_EQ(0, ret);
+@@ -196,12 +196,12 @@ TEST_F(TestLibYuv, ConvertTest) {
+   EXPECT_EQ(0, ConvertFromI420(*orig_frame_, VideoType::kUYVY, 0,
+                                out_uyvy_buffer.get()));
+ 
+-  ret = libyuv::ConvertToI420(
++  ret = ConvertToI420(
+       out_uyvy_buffer.get(), 0, res_i420_buffer->MutableDataY(),
+       res_i420_buffer->StrideY(), res_i420_buffer->MutableDataU(),
+       res_i420_buffer->StrideU(), res_i420_buffer->MutableDataV(),
+-      res_i420_buffer->StrideV(), 0, 0, width_, height_,
+-      res_i420_buffer->width(), res_i420_buffer->height(), libyuv::kRotate0,
++      res_i420_buffer->StrideV(), width_, height_, 0, res_i420_buffer->width(),
++      res_i420_buffer->height(), static_cast<uint32_t>(libyuv::kRotate0),
+       ConvertVideoType(VideoType::kUYVY));
+ 
+   EXPECT_EQ(0, ret);
+@@ -218,12 +218,12 @@ TEST_F(TestLibYuv, ConvertTest) {
+   EXPECT_EQ(0, ConvertFromI420(*orig_frame_, VideoType::kYUY2, 0,
+                                out_yuy2_buffer.get()));
+ 
+-  ret = libyuv::ConvertToI420(
++  ret = ConvertToI420(
+       out_yuy2_buffer.get(), 0, res_i420_buffer->MutableDataY(),
+       res_i420_buffer->StrideY(), res_i420_buffer->MutableDataU(),
+       res_i420_buffer->StrideU(), res_i420_buffer->MutableDataV(),
+-      res_i420_buffer->StrideV(), 0, 0, width_, height_,
+-      res_i420_buffer->width(), res_i420_buffer->height(), libyuv::kRotate0,
++      res_i420_buffer->StrideV(), width_, height_, 0, res_i420_buffer->width(),
++      res_i420_buffer->height(), static_cast<uint32_t>(libyuv::kRotate0),
+       ConvertVideoType(VideoType::kYUY2));
+ 
+   EXPECT_EQ(0, ret);
+@@ -242,12 +242,12 @@ TEST_F(TestLibYuv, ConvertTest) {
+   EXPECT_EQ(0, ConvertFromI420(*orig_frame_, VideoType::kRGB565, 0,
+                                out_rgb565_buffer.get()));
+ 
+-  ret = libyuv::ConvertToI420(
++  ret = ConvertToI420(
+       out_rgb565_buffer.get(), 0, res_i420_buffer->MutableDataY(),
+       res_i420_buffer->StrideY(), res_i420_buffer->MutableDataU(),
+       res_i420_buffer->StrideU(), res_i420_buffer->MutableDataV(),
+-      res_i420_buffer->StrideV(), 0, 0, width_, height_,
+-      res_i420_buffer->width(), res_i420_buffer->height(), libyuv::kRotate0,
++      res_i420_buffer->StrideV(), width_, height_, 0, res_i420_buffer->width(),
++      res_i420_buffer->height(), static_cast<uint32_t>(libyuv::kRotate0),
+       ConvertVideoType(VideoType::kRGB565));
+ 
+   EXPECT_EQ(0, ret);
+@@ -269,12 +269,12 @@ TEST_F(TestLibYuv, ConvertTest) {
+   EXPECT_EQ(0, ConvertFromI420(*orig_frame_, VideoType::kARGB, 0,
+                                out_argb8888_buffer.get()));
+ 
+-  ret = libyuv::ConvertToI420(
++  ret = ConvertToI420(
+       out_argb8888_buffer.get(), 0, res_i420_buffer->MutableDataY(),
+       res_i420_buffer->StrideY(), res_i420_buffer->MutableDataU(),
+       res_i420_buffer->StrideU(), res_i420_buffer->MutableDataV(),
+-      res_i420_buffer->StrideV(), 0, 0, width_, height_,
+-      res_i420_buffer->width(), res_i420_buffer->height(), libyuv::kRotate0,
++      res_i420_buffer->StrideV(), width_, height_, 0, res_i420_buffer->width(),
++      res_i420_buffer->height(), static_cast<uint32_t>(libyuv::kRotate0),
+       ConvertVideoType(VideoType::kARGB));
+ 
+   EXPECT_EQ(0, ret);
+diff -up firefox-155.0/third_party/libwebrtc/common_video/libyuv/webrtc_libyuv.cc.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/common_video/libyuv/webrtc_libyuv.cc
+--- firefox-155.0/third_party/libwebrtc/common_video/libyuv/webrtc_libyuv.cc.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:57.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/common_video/libyuv/webrtc_libyuv.cc	2026-08-27 12:03:57.125835468 +0200
+@@ -10,8 +10,10 @@
+ 
+ #include "common_video/libyuv/include/webrtc_libyuv.h"
+ 
++#include <climits>
+ #include <cstddef>
+ #include <cstdint>
++#include <cstdlib>
+ 
+ #include "api/scoped_refptr.h"
+ #include "api/video/i420_buffer.h"
+@@ -23,6 +25,7 @@
+ #include "third_party/libyuv/include/libyuv/convert.h"
+ #include "third_party/libyuv/include/libyuv/convert_from.h"
+ #include "third_party/libyuv/include/libyuv/planar_functions.h"
++#include "third_party/libyuv/include/libyuv/rotate.h"
+ #include "third_party/libyuv/include/libyuv/scale.h"
+ #include "third_party/libyuv/include/libyuv/video_common.h"
+ 
+@@ -146,6 +149,323 @@ int ConvertFromI420(const VideoFrame& sr
+       ConvertVideoType(dst_video_type));
+ }
+ 
++int ConvertToI420(const uint8_t* sample,
++                  size_t sample_size,
++                  uint8_t* dst_y,
++                  int dst_stride_y,
++                  uint8_t* dst_u,
++                  int dst_stride_u,
++                  uint8_t* dst_v,
++                  int dst_stride_v,
++                  int src_width,
++                  int src_height,
++                  int src_stride,
++                  int dst_width,
++                  int dst_height,
++                  uint32_t rotation,
++                  uint32_t fourcc) {
++  if (src_height == INT_MIN || dst_height == INT_MIN) {
++    return -1;
++  }
++
++  const int abs_src_height = (src_height < 0) ? -src_height : src_height;
++  const int abs_dst_height = (dst_height < 0) ? -dst_height : dst_height;
++
++  if (!dst_y || !dst_u || !dst_v || !sample || src_width <= 0 ||
++      src_width > INT_MAX / 4 || dst_width <= 0 || src_height == 0 ||
++      dst_height == 0 || dst_width > src_width ||
++      abs_dst_height > abs_src_height) {
++    return -1;
++  }
++
++  uint32_t format = libyuv::CanonicalFourCC(fourcc);
++
++  // Calculate the unpadded stride if no explicit value is set.
++  if (src_stride == 0) {
++    switch (format) {
++      case libyuv::FOURCC_YUY2:
++      case libyuv::FOURCC_UYVY:
++      case libyuv::FOURCC_RGBP:
++      case libyuv::FOURCC_RGBO:
++      case libyuv::FOURCC_R444:
++        src_stride = src_width * 2;
++        break;
++      case libyuv::FOURCC_24BG:
++      case libyuv::FOURCC_RAW:
++        src_stride = src_width * 3;
++        break;
++      case libyuv::FOURCC_ARGB:
++      case libyuv::FOURCC_BGRA:
++      case libyuv::FOURCC_ABGR:
++      case libyuv::FOURCC_RGBA:
++        src_stride = src_width * 4;
++        break;
++      case libyuv::FOURCC_I400:
++      case libyuv::FOURCC_NV12:
++      case libyuv::FOURCC_NV21:
++      case libyuv::FOURCC_I420:
++      case libyuv::FOURCC_YV12:
++      case libyuv::FOURCC_I422:
++      case libyuv::FOURCC_YV16:
++        // Follow the V4L2 definition for strides of subsampled formats:
++        // > To avoid ambiguities drivers must return a bytesperline value
++        // > rounded up to a multiple of the scale factor.
++        // https://www.kernel.org/doc/html/v7.1/userspace-api/media/v4l/pixfmt-v4l2.html
++        src_stride = (src_width + 1) & ~1;
++        break;
++      case libyuv::FOURCC_I444:
++      case libyuv::FOURCC_YV24:
++        src_stride = src_width;
++        break;
++      case libyuv::FOURCC_MJPG:
++        break;
++      default:
++        return -1;
++    }
++  } else {
++    switch (format) {
++      case libyuv::FOURCC_YUY2:
++      case libyuv::FOURCC_UYVY:
++      case libyuv::FOURCC_I400:
++      case libyuv::FOURCC_NV12:
++      case libyuv::FOURCC_NV21:
++      case libyuv::FOURCC_I420:
++      case libyuv::FOURCC_YV12:
++      case libyuv::FOURCC_I422:
++      case libyuv::FOURCC_YV16:
++        // Follow the V4L2 definition for strides of subsampled formats:
++        // > To avoid ambiguities drivers must return a bytesperline value
++        // > rounded up to a multiple of the scale factor.
++        // https://www.kernel.org/doc/html/v7.1/userspace-api/media/v4l/pixfmt-v4l2.html
++        if ((src_stride % 2) != 0)
++          return -1;
++        break;
++      default:
++        break;
++    }
++  }
++
++  int r = 0;
++  const bool need_buf =
++      (rotation && format != libyuv::FOURCC_I420 &&
++       format != libyuv::FOURCC_NV12 && format != libyuv::FOURCC_NV21 &&
++       format != libyuv::FOURCC_YV12) ||
++      dst_y == sample;
++  const int inv_dst_height =
++      (src_height < 0) ? -abs_dst_height : abs_dst_height;
++  uint8_t* rotate_buffer = NULL;
++  uint8_t* tmp_y;
++  uint8_t* tmp_u;
++  uint8_t* tmp_v;
++  int tmp_y_stride;
++  int tmp_u_stride;
++  int tmp_v_stride;
++
++  // One pass rotation is available for some formats. For the rest, convert
++  // to I420 (with optional vertical flipping) into a temporary I420 buffer,
++  // and then rotate the I420 to the final destination buffer.
++  // For in-place conversion, if destination dst_y is same as source sample,
++  // also enable temporary buffer.
++  if (need_buf) {
++    size_t y_size = (size_t)dst_width * abs_dst_height;
++    size_t uv_size = (size_t)((dst_width + 1) / 2) * ((abs_dst_height + 1) / 2);
++    if (uv_size > SIZE_MAX / 2 || y_size > SIZE_MAX - uv_size * 2) {
++      return -1;  // Invalid size.
++    }
++    const size_t rotate_buffer_size = y_size + uv_size * 2;
++    rotate_buffer = new uint8_t[rotate_buffer_size];
++    if (!rotate_buffer) {
++      return 1;  // Out of memory runtime error.
++    }
++    tmp_y = dst_y;
++    tmp_u = dst_u;
++    tmp_v = dst_v;
++    tmp_y_stride = dst_stride_y;
++    tmp_u_stride = dst_stride_u;
++    tmp_v_stride = dst_stride_v;
++    dst_y = rotate_buffer;
++    dst_u = dst_y + y_size;
++    dst_v = dst_u + uv_size;
++    dst_stride_y = dst_width;
++    dst_stride_u = dst_stride_v = ((dst_width + 1) / 2);
++  }
++
++  switch (format) {
++    // Single plane formats
++    case libyuv::FOURCC_YUY2: {
++      r = libyuv::YUY2ToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    }
++    case libyuv::FOURCC_UYVY: {
++      r = libyuv::UYVYToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    }
++    case libyuv::FOURCC_RGBP:
++      r = libyuv::RGB565ToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                               dst_stride_u, dst_v, dst_stride_v, dst_width,
++                               inv_dst_height);
++      break;
++    case libyuv::FOURCC_RGBO:
++      r = libyuv::ARGB1555ToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                                 dst_stride_u, dst_v, dst_stride_v, dst_width,
++                                 inv_dst_height);
++      break;
++    case libyuv::FOURCC_R444:
++      r = libyuv::ARGB4444ToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                                 dst_stride_u, dst_v, dst_stride_v, dst_width,
++                                 inv_dst_height);
++      break;
++    case libyuv::FOURCC_24BG:
++      r = libyuv::RGB24ToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                              dst_stride_u, dst_v, dst_stride_v, dst_width,
++                              inv_dst_height);
++      break;
++    case libyuv::FOURCC_RAW:
++      r = libyuv::RAWToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                            dst_stride_u, dst_v, dst_stride_v, dst_width,
++                            inv_dst_height);
++      break;
++    case libyuv::FOURCC_ARGB:
++      r = libyuv::ARGBToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    case libyuv::FOURCC_BGRA:
++      r = libyuv::BGRAToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    case libyuv::FOURCC_ABGR:
++      r = libyuv::ABGRToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    case libyuv::FOURCC_RGBA:
++      r = libyuv::RGBAToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    case libyuv::FOURCC_I400:
++      r = libyuv::I400ToI420(sample, src_stride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    // Biplanar formats
++    case libyuv::FOURCC_NV12: {
++      const uint8_t* src_y = sample;
++      const uint8_t* src_uv = src_y + ((ptrdiff_t)src_stride * abs_src_height);
++      r = libyuv::NV12ToI420Rotate(src_y, src_stride, src_uv, src_stride, dst_y,
++                                   dst_stride_y, dst_u, dst_stride_u, dst_v,
++                                   dst_stride_v, dst_width, inv_dst_height,
++                                   (libyuv::RotationMode)rotation);
++      break;
++    }
++    case libyuv::FOURCC_NV21: {
++      const uint8_t* src_y = sample;
++      const uint8_t* src_uv = src_y + ((ptrdiff_t)src_stride * abs_src_height);
++      // Call NV12 but with dst_u and dst_v parameters swapped.
++      r = libyuv::NV12ToI420Rotate(src_y, src_stride, src_uv, src_stride, dst_y,
++                                   dst_stride_y, dst_v, dst_stride_v, dst_u,
++                                   dst_stride_u, dst_width, inv_dst_height,
++                                   (libyuv::RotationMode)rotation);
++      break;
++    }
++    // Triplanar formats
++    case libyuv::FOURCC_I420:
++    case libyuv::FOURCC_YV12: {
++      const uint8_t* src_y = sample;
++      const uint8_t* src_u;
++      const uint8_t* src_v;
++      // Follow the V4L2 definition:
++      // > When the image format is planar the bytesperline value applies to the
++      // > first plane and is divided by the same factor as the width field for
++      // > the other planes.
++      // https://www.kernel.org/doc/html/v7.1/userspace-api/media/v4l/pixfmt-v4l2.html
++      int halfstride = src_stride / 2;
++      int halfheight = (abs_src_height + 1) / 2;
++      if (format == libyuv::FOURCC_YV12) {
++        src_v = src_y + (ptrdiff_t)src_stride * abs_src_height;
++        src_u = src_v + halfstride * (ptrdiff_t)halfheight;
++      } else {
++        src_u = src_y + (ptrdiff_t)src_stride * abs_src_height;
++        src_v = src_u + halfstride * (ptrdiff_t)halfheight;
++      }
++      r = libyuv::I420Rotate(src_y, src_stride, src_u, halfstride, src_v,
++                             halfstride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height, (libyuv::RotationMode)rotation);
++      break;
++    }
++    case libyuv::FOURCC_I422:
++    case libyuv::FOURCC_YV16: {
++      const uint8_t* src_y = sample;
++      const uint8_t* src_u;
++      const uint8_t* src_v;
++      // Follow the V4L2 definition:
++      // > When the image format is planar the bytesperline value applies to the
++      // > first plane and is divided by the same factor as the width field for
++      // > the other planes.
++      // https://www.kernel.org/doc/html/v7.1/userspace-api/media/v4l/pixfmt-v4l2.html
++      int halfstride = src_stride / 2;
++      if (format == libyuv::FOURCC_YV16) {
++        src_v = src_y + (ptrdiff_t)src_stride * abs_src_height;
++        src_u = src_v + halfstride * (ptrdiff_t)abs_src_height;
++      } else {
++        src_u = src_y + (ptrdiff_t)src_stride * abs_src_height;
++        src_v = src_u + halfstride * (ptrdiff_t)abs_src_height;
++      }
++      r = libyuv::I422ToI420(src_y, src_stride, src_u, halfstride, src_v,
++                             halfstride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    }
++    case libyuv::FOURCC_I444:
++    case libyuv::FOURCC_YV24: {
++      const uint8_t* src_y = sample;
++      const uint8_t* src_u;
++      const uint8_t* src_v;
++      if (format == libyuv::FOURCC_YV24) {
++        src_v = src_y + src_stride * (ptrdiff_t)abs_src_height;
++        src_u = src_v + src_stride * (ptrdiff_t)abs_src_height;
++      } else {
++        src_u = src_y + src_stride * (ptrdiff_t)abs_src_height;
++        src_v = src_u + src_stride * (ptrdiff_t)abs_src_height;
++      }
++      r = libyuv::I444ToI420(src_y, src_stride, src_u, src_stride, src_v,
++                             src_stride, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, dst_width,
++                             inv_dst_height);
++      break;
++    }
++#ifdef HAVE_LIBYUV_JPEG
++    case libyuv::FOURCC_MJPG:
++      r = libyuv::MJPGToI420(sample, sample_size, dst_y, dst_stride_y, dst_u,
++                             dst_stride_u, dst_v, dst_stride_v, src_width,
++                             abs_src_height, dst_width, inv_dst_height);
++      break;
++#endif
++    default:
++      r = -1;  // unknown fourcc - return failure code.
++  }
++
++  if (need_buf) {
++    if (!r) {
++      r = libyuv::I420Rotate(dst_y, dst_stride_y, dst_u, dst_stride_u, dst_v,
++                             dst_stride_v, tmp_y, tmp_y_stride, tmp_u,
++                             tmp_u_stride, tmp_v, tmp_v_stride, dst_width,
++                             abs_dst_height, (libyuv::RotationMode)rotation);
++    }
++    free(rotate_buffer);
++  }
++
++  return r;
++}
++
+ scoped_refptr<I420ABufferInterface> ScaleI420ABuffer(
+     const I420ABufferInterface& buffer,
+     int target_width,
+diff -up firefox-155.0/third_party/libwebrtc/modules/video_capture/linux/video_capture_pipewire.cc.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/modules/video_capture/linux/video_capture_pipewire.cc
+--- firefox-155.0/third_party/libwebrtc/modules/video_capture/linux/video_capture_pipewire.cc.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:59.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/modules/video_capture/linux/video_capture_pipewire.cc	2026-08-27 12:05:23.836837038 +0200
+@@ -375,36 +375,6 @@ void VideoCaptureModulePipeWire::OnForma
+   spa_pod_builder_push_object(&builder, &frame, SPA_TYPE_OBJECT_ParamBuffers,
+                               SPA_PARAM_Buffers);
+ 
+-  if (media_subtype == SPA_MEDIA_SUBTYPE_raw) {
+-    // Enforce stride without padding.
+-    size_t stride;
+-    switch (configured_capability_.videoType) {
+-      case VideoType::kI420:
+-      case VideoType::kNV12:
+-        stride = configured_capability_.width;
+-        break;
+-      case VideoType::kYUY2:
+-      case VideoType::kUYVY:
+-      case VideoType::kRGB565:
+-        stride = configured_capability_.width * 2;
+-        break;
+-      case VideoType::kRGB24:
+-      case VideoType::kBGR24:
+-        stride = configured_capability_.width * 3;
+-        break;
+-      case VideoType::kARGB:
+-      case VideoType::kABGR:
+-      case VideoType::kBGRA:
+-        stride = configured_capability_.width * 4;
+-        break;
+-      default:
+-        RTC_LOG(LS_ERROR) << "Unsupported video format.";
+-        return;
+-    }
+-    spa_pod_builder_add(&builder, SPA_PARAM_BUFFERS_stride, SPA_POD_Int(stride),
+-                        0);
+-  }
+-
+   const int buffer_types =
+       (1 << SPA_DATA_DmaBuf) | (1 << SPA_DATA_MemFd) | (1 << SPA_DATA_MemPtr);
+   spa_pod_builder_add(
+@@ -483,17 +453,6 @@ void VideoCaptureModulePipeWire::Process
+     h = static_cast<struct spa_meta_header*>(
+         spa_buffer_find_meta_data(spaBuffer, SPA_META_Header, sizeof(*h)));
+ 
+-    struct spa_meta_videotransform* videotransform;
+-    videotransform =
+-        static_cast<struct spa_meta_videotransform*>(spa_buffer_find_meta_data(
+-            spaBuffer, SPA_META_VideoTransform, sizeof(*videotransform)));
+-    if (videotransform) {
+-      VideoRotation rotation =
+-          VideorotationFromPipeWireTransform(videotransform->transform);
+-      SetCaptureRotation(rotation);
+-      SetApplyRotation(rotation != kVideoRotation_0);
+-    }
+-
+     if (h && (h->flags & SPA_META_HEADER_FLAG_CORRUPTED)) {
+       RTC_LOG(LS_INFO) << "Dropping corrupted frame.";
+       pw_stream_queue_buffer(stream_, buffer);
+@@ -508,6 +467,19 @@ void VideoCaptureModulePipeWire::Process
+       continue;
+     }
+ 
++    SetStride(spaBuffer->datas[0].chunk->stride);
++
++    struct spa_meta_videotransform* videotransform;
++    videotransform =
++        static_cast<struct spa_meta_videotransform*>(spa_buffer_find_meta_data(
++            spaBuffer, SPA_META_VideoTransform, sizeof(*videotransform)));
++    if (videotransform) {
++      VideoRotation rotation =
++          VideorotationFromPipeWireTransform(videotransform->transform);
++      SetCaptureRotation(rotation);
++      SetApplyRotation(rotation != kVideoRotation_0);
++    }
++
+     if (spaBuffer->datas[0].type == SPA_DATA_DmaBuf ||
+         spaBuffer->datas[0].type == SPA_DATA_MemFd) {
+       ScopedBuf frame;
+diff -up firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture.h.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture.h
+--- firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture.h.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:57.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture.h	2026-08-27 12:03:57.126064427 +0200
+@@ -155,6 +155,9 @@ class VideoCaptureModule : public RefCou
+   // Return whether the rotation is applied or left pending.
+   virtual bool GetApplyRotation() = 0;
+ 
++  virtual void SetStride(int32_t stride) {};
++  virtual int32_t GetStride() { return 0; };
++
+   // Mozilla: TrackingId setter for use in profiler markers.
+   virtual void SetTrackingId(uint32_t aTrackingIdProcId) {}
+ 
+diff -up firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture_impl.cc.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture_impl.cc
+--- firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture_impl.cc.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:58.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture_impl.cc	2026-08-27 12:03:57.126118328 +0200
+@@ -31,7 +31,6 @@
+ #include "rtc_base/time_utils.h"
+ #include "rtc_base/trace_event.h"
+ #include "system_wrappers/include/clock.h"
+-#include "third_party/libyuv/include/libyuv/convert.h"
+ #include "third_party/libyuv/include/libyuv/rotate.h"
+ 
+ namespace webrtc {
+@@ -94,6 +93,7 @@ VideoCaptureImpl::VideoCaptureImpl(Clock
+       _lastProcessFrameTimeNanos(clock->TimeInMicroseconds() * 1000),
+       _rotateFrame(kVideoRotation_0),
+       apply_rotation_(false),
++      stride_(0),
+       clock_(clock) {
+   _requestedCapability.width = kDefaultWidth;
+   _requestedCapability.height = kDefaultHeight;
+@@ -230,11 +230,11 @@ int32_t VideoCaptureImpl::IncomingFrame(
+     std::swap(dst_width, dst_height);
+   }
+ 
+-  const int conversionResult = libyuv::ConvertToI420(
++  const int conversionResult = ConvertToI420(
+       videoFrame, videoFrameLength, buffer->MutableDataY(), buffer->StrideY(),
+       buffer->MutableDataU(), buffer->StrideU(), buffer->MutableDataV(),
+-      buffer->StrideV(), 0, 0,  // No Cropping
+-      width, height, dst_width, dst_height, rotation_mode,
++      buffer->StrideV(), width, height, stride_, dst_width, dst_height,
++      static_cast<uint32_t>(rotation_mode),
+       ConvertVideoType(frameInfo.videoType));
+   if (conversionResult != 0) {
+     RTC_LOG(LS_ERROR) << "Failed to convert capture frame from type "
+@@ -300,6 +300,16 @@ bool VideoCaptureImpl::GetApplyRotation(
+   return apply_rotation_;
+ }
+ 
++void VideoCaptureImpl::SetStride(int32_t stride) {
++  MutexLock lock(&api_lock_);
++  stride_ = stride;
++}
++
++int32_t VideoCaptureImpl::GetStride() {
++  MutexLock lock(&api_lock_);
++  return stride_;
++}
++
+ void VideoCaptureImpl::UpdateFrameCount() {
+   RTC_CHECK_RUNS_SERIALIZED(&capture_checker_);
+ 
+diff -up firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture_impl.h.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture_impl.h
+--- firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture_impl.h.libwebrtc-video-capture-implement-buffer-stride-support-for-pipewire	2026-08-26 23:11:58.000000000 +0200
++++ firefox-155.0/third_party/libwebrtc/modules/video_capture/video_capture_impl.h	2026-08-27 12:03:57.126176457 +0200
+@@ -70,6 +70,8 @@ class RTC_EXPORT VideoCaptureImpl : publ
+   int32_t SetCaptureRotation(VideoRotation rotation) override;
+   bool SetApplyRotation(bool enable) override;
+   bool GetApplyRotation() override;
++  void SetStride(int32_t stride) override;
++  int32_t GetStride() override;
+ 
+   const char* CurrentDeviceName() const override;
+ 
+@@ -131,6 +133,10 @@ class RTC_EXPORT VideoCaptureImpl : publ
+   // Indicate whether rotation should be applied before delivered externally.
+   bool apply_rotation_ RTC_GUARDED_BY(api_lock_);
+ 
++  // Explicit input buffer stride. Left to 0 implies implicit stride based on
++  // format and width.
++  int32_t stride_ RTC_GUARDED_BY(api_lock_);
++
+   Clock* const clock_;
+ };
+ }  // namespace videocapturemodule
