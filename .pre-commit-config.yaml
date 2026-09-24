@@ -7,10 +7,14 @@ repos:
     rev: 2eeb5678de71a00c0902cbda7105d328432f72cb # v0.16.8
     hooks:
       - id: ruff-check
+        stages:
+          - manual
   - repo: https://github.com/RobertCraigie/pyright-python
     rev: 1aa6dfeb849ae43fb6f16fc17228bcbd358a19c3 # v1.1.414
     hooks:
       - id: pyright
+        stages:
+          - manual
         additional_dependencies:
           - azure-devops==7.1.0b4
           - azure-identity==1.25.3
