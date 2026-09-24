@@ -1,4 +1,14 @@
-extend-exclude = ["base/build", "base/out", "specs"]
+extend-exclude = [
+    # Generated build artifacts and output trees are not source.
+    "base/build",
+    "base/out",
+    # Imported upstream kernel tooling is maintained with the kernel sources.
+    # This does not exclude Azure Linux-owned tooling under scripts/ci/kernel.
+    "base/comps/kernel",
+    # Package sources may contain vendored or upstream Python code that we do
+    # not maintain as part of the repository's Python tooling.
+    "specs",
+]
 
 line-length = 120
 
@@ -19,6 +29,9 @@ extend-select = ["D401"]
 fixable = ["ALL"]
 
 [lint.per-file-ignores]
+# Bare assertions are pytest's standard assertion mechanism.
+"**/tests/**/*.py" = ["S101"]
+
 # Helpers under scripts/ci/ are executed directly (python3 path/to/script.py)
 # with sibling-module imports, not imported as a package, so they intentionally
 # have no __init__.py. Silence the implicit-namespace-package rule for that tree.
