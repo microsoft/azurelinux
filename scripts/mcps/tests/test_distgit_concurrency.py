@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Microsoft Corporation.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 """Concurrency regression tests for the Fedora dist-git MCP server."""
 

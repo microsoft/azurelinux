@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Resolve the azldev version that will be present after a PR merges.
 
 Resolved values are printed as ``key=value`` records; diagnostics go to stderr.

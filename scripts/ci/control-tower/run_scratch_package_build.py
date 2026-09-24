@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Submit a scratch package build to Control Tower and wait as requested."""
 
 from __future__ import annotations

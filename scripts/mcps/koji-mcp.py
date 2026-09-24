@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Koji MCP Server.
 
 Exposes tools for setting a Koji base URL and fetching pages/logs relative
