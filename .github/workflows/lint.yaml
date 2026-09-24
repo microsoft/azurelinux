@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   lint:
-    name: "Lint"
+    name: "Validate TOML config"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -44,14 +44,5 @@ jobs:
       - name: "Validate config (strict)"
         run: azldev config dump > /dev/null
 
-      - name: "Run existing pre-commit checks"
-        env:
-          SKIP: ruff-check,pyright
+      - name: "Run pre-commit checks"
         run: pre-commit run --all-files --show-diff-on-failure
-
-      - name: "Run Python checks"
-        run: |
-          status=0
-          pre-commit run ruff-check --all-files --show-diff-on-failure || status=$?
-          pre-commit run pyright --all-files --show-diff-on-failure || status=$?
-          exit "$status"
