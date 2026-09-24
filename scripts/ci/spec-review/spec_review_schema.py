@@ -205,6 +205,7 @@ def compare_reports(
 
 
 def main() -> int:
+    """Validate, summarize, or compare spec-review reports."""
     import argparse
 
     # Route to compare subcommand if first arg is "compare"
