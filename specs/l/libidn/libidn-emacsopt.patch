@@ -1,0 +1,39 @@
+diff -up libidn-1.43/configure.ac.emacsopt libidn-1.43/configure.ac
+--- libidn-1.43/configure.ac.emacsopt	2025-03-21 11:35:33.000000000 +0100
++++ libidn-1.43/configure.ac	2025-03-24 12:45:04.864958142 +0100
+@@ -53,7 +53,6 @@ AM_MISSING_PROG(HELP2MAN, help2man, $mis
+ AM_MISSING_PROG([DOT], [dot])
+ AM_MISSING_PROG([GS], [gs])
+ AM_ICONV
+-AM_PATH_LISPDIR
+ 
+ AM_GNU_GETTEXT([external])
+ AM_GNU_GETTEXT_VERSION([0.19.8])
+@@ -102,6 +101,14 @@ AM_CONDITIONAL(JAVA, test "$enable_java"
+ AC_MSG_CHECKING([if implementation in Java should be built])
+ AC_MSG_RESULT($enable_java)
+ 
++# Check for Emacs
++AC_ARG_ENABLE(emacs, AC_HELP_STRING([--disable-emacs], [disable Emacs support]),
++		enable_emacs=$enableval, enable_emacs=yes)
++AM_CONDITIONAL(EMACS, test "$enable_emacs" != "no")
++if test "$enable_emacs" != "no"; then
++    AM_PATH_LISPDIR
++fi
++
+ # Check for C#
+ if test -n "$HAVE_CSHARPCOMP"; then
+   gt_CSHARPEXEC
+diff -up libidn-1.43/src/Makefile.am.emacsopt libidn-1.43/src/Makefile.am
+--- libidn-1.43/src/Makefile.am.emacsopt	2025-03-21 11:35:33.000000000 +0100
++++ libidn-1.43/src/Makefile.am	2025-03-24 12:44:29.520981625 +0100
+@@ -20,7 +20,9 @@ AM_CFLAGS = $(WERROR_CFLAGS) $(WARN_CFLA
+ AM_CPPFLAGS = -I$(top_srcdir)/lib -I../lib -I$(top_srcdir)/gl -I../gl
+ AM_CPPFLAGS += -DLOCALEDIR=\"$(localedir)\"
+ 
++if EMACS
+ dist_lisp_DATA = punycode.el idna.el
++endif
+ 
+ bin_PROGRAMS = idn
+ idn_SOURCES = idn.c

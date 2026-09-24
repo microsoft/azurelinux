@@ -1,0 +1,61 @@
+Taken from: <https://inbox.sourceware.org/libc-alpha/cover.1777546194.git.fweimer@redhat.com/>
+
+Author: Florian Weimer <fweimer@redhat.com>
+Date:   Thu Apr 30 12:52:02 2026 +0200
+
+    resolv: Check for inet_ntop failure in ns_sprintrrf
+    
+    This makes the output more consistent (either failure or complete
+    output) and helps with systematic testing with varying buffer
+    sizes.
+
+diff --git a/resolv/ns_print.c b/resolv/ns_print.c
+index cef2212fd24b772b..5701e3d0c59f79f1 100644
+--- a/resolv/ns_print.c
++++ b/resolv/ns_print.c
+@@ -141,7 +141,8 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 	case ns_t_a:
+ 	  if (rdlen != (size_t)NS_INADDRSZ)
+ 			goto formerr;
+-		(void) inet_ntop(AF_INET, rdata, buf, buflen);
++		if (inet_ntop (AF_INET, rdata, buf, buflen) == NULL)
++		  return -1;
+ 		addlen(strlen(buf), &buf, &buflen);
+ 		break;
+ 
+@@ -308,10 +309,11 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 
+ 	case ns_t_aaaa:
+ 	  if (rdlen != (size_t)NS_IN6ADDRSZ)
+-			goto formerr;
+-		(void) inet_ntop(AF_INET6, rdata, buf, buflen);
+-		addlen(strlen(buf), &buf, &buflen);
+-		break;
++	    goto formerr;
++	  if (inet_ntop (AF_INET6, rdata, buf, buflen) == NULL)
++	    return -1;
++	  addlen(strlen(buf), &buf, &buflen);
++	  break;
+ 
+ 	case ns_t_loc: {
+ 		char t[255];
+@@ -400,7 +402,8 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 			goto formerr;
+ 
+ 		/* Address. */
+-		(void) inet_ntop(AF_INET, rdata, buf, buflen);
++		if (inet_ntop (AF_INET, rdata, buf, buflen) == NULL)
++		  return -1;
+ 		addlen(strlen(buf), &buf, &buflen);
+ 		rdata += NS_INADDRSZ;
+ 
+@@ -542,7 +545,8 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 			if (rdata + pbyte >= edata) goto formerr;
+ 			memset(&a, 0, sizeof(a));
+ 			memcpy(&a.s6_addr[pbyte], rdata, sizeof(a) - pbyte);
+-			(void) inet_ntop(AF_INET6, &a, buf, buflen);
++			if (inet_ntop (AF_INET6, &a, buf, buflen) == NULL)
++			  return -1;
+ 			addlen(strlen(buf), &buf, &buflen);
+ 			rdata += sizeof(a) - pbyte;
+ 		}

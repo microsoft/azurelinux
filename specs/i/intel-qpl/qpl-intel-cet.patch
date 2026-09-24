@@ -1,0 +1,45 @@
+--- a/sources/isal/CMakeLists.txt	2025-12-02 14:42:56.000000000 +0100
++++ b/sources/isal/CMakeLists.txt	2025-12-02 14:42:56.000000000 +0100
+@@ -103,3 +103,18 @@
+     # Setting POSIX compliance level for Linux builds (to use strnlen() function on Linux)
+     target_compile_definitions(isal PRIVATE _POSIX_C_SOURCE=200809L)
+ endif()
++
++# Enable Intel CET support in assembler sources
++check_c_source_compiles("
++    #if !defined(__CET__) || (__CET__ & 1) == 0
++    #error CET_BIT_0_NOT_SET
++    #endif
++    int main() { return 0; }
++" INTEL_CET_ENABLED)
++
++if(INTEL_CET_ENABLED)
++    target_compile_options(isal_asm PUBLIC "-DINTEL_CET_ENABLED")
++    message(STATUS "Intel CET protection is ENABLED")
++else()
++    message(STATUS "Intel CET protection is NOT enabled")
++endif()
+--- a/sources/isal/include/reg_sizes.asm	2025-12-02 14:42:56.000000000 +0100
++++ b/sources/isal/include/reg_sizes.asm	2025-12-02 14:42:56.000000000 +0100
+@@ -182,6 +182,21 @@
+ 
+ %define XWORD(reg) reg %+ x
+ 
++%ifdef INTEL_CET_ENABLED
++  %ifdef __NASM_VER__
++    %ifidn __OUTPUT_FORMAT__,elf32
++section .note.gnu.property  note  alloc noexec align=4
++DD 0x00000004,0x0000000c,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003
++    %endif
++    %ifidn __OUTPUT_FORMAT__,elf64
++section .note.gnu.property  note  alloc noexec align=8
++DD 0x00000004,0x00000010,0x00000005,0x00554e47
++DD 0xc0000002,0x00000004,0x00000003,0x00000000
++    %endif
++  %endif
++%endif
++
+ %ifidn __OUTPUT_FORMAT__,elf32
+ section .note.GNU-stack noalloc noexec nowrite progbits
+ section .text

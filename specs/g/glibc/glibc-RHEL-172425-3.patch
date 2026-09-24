@@ -1,0 +1,92 @@
+Taken from: <https://inbox.sourceware.org/libc-alpha/cover.1777546194.git.fweimer@redhat.com/>
+
+Author: Florian Weimer <fweimer@redhat.com>
+Date:   Thu Apr 30 12:52:13 2026 +0200
+
+    resolv: Fix buffer overreads in ns_sprintrrf (CVE-2026-6238)
+    
+    Check that the RDATA payload does not require more than RDATALEN
+    bytes while processing it.  The fixes cover A6, CERT, LOC, TKEY,
+    TSIG records.
+    
+    The vulnerable LOC record handling was first introduced before
+    glibc 2.0, in commit ee188d555b8c32ad9704a7440cab400af967292f.
+    
+    CERT, TSIG, TKEY handling came with commit
+    b43b13ac2544b11f35be301d1589b51a8473e32b, released with glibc 2.2.
+    
+    A6 record handling was introduced in commit
+    91633816430e7ec5a19fe3ff510a7c4822a9557e ("* resolv/ns_print.c
+    (ns_sprintrrf): Handle ns_t_a6 and ns_t_opt."), which went into glibc
+    2.7.
+    
+    This fixes bug 34069.
+
+diff --git a/resolv/ns_print.c b/resolv/ns_print.c
+index 9c9e810781aaa4f4..4953f4716001d82b 100644
+--- a/resolv/ns_print.c
++++ b/resolv/ns_print.c
+@@ -318,7 +318,8 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 	case ns_t_loc: {
+ 		char t[255];
+ 
+-		/* XXX protocol format checking? */
++		if (rdlen != 16)
++		  goto formerr;
+ 		(void) loc_ntoa(rdata, t);
+ 		T(addstr(t, strlen(t), &buf, &buflen));
+ 		break;
+@@ -444,6 +445,8 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 		char base64_cert[8192], tmp[40];
+ 		const char *leader;
+ 
++		if (rdlen < 2 * NS_INT16SZ + 1)
++			goto formerr;
+ 		c_type  = ns_get16(rdata); rdata += NS_INT16SZ;
+ 		key_tag = ns_get16(rdata); rdata += NS_INT16SZ;
+ 		alg = (u_int) *rdata++;
+@@ -490,23 +493,31 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 		T(addstr(" ", 1, &buf, &buflen));
+ 
+ 		/* Inception. */
++		if (edata - rdata < NS_INT32SZ)
++			goto formerr;
+ 		t = ns_get32(rdata);  rdata += NS_INT32SZ;
+ 		len = SPRINTF((tmp, "%lu ", t));
+ 		T(addstr(tmp, len, &buf, &buflen));
+ 
+ 		/* Expiration. */
++		if (edata - rdata < NS_INT32SZ)
++			goto formerr;
+ 		t = ns_get32(rdata);  rdata += NS_INT32SZ;
+ 		len = SPRINTF((tmp, "%lu ", t));
+ 		T(addstr(tmp, len, &buf, &buflen));
+ 
+ 		/* Mode , Error, Key Size. */
+ 		/* Priority, Weight, Port. */
++		if (edata - rdata < 3 * NS_INT16SZ)
++			goto formerr;
+ 		mode = ns_get16(rdata);  rdata += NS_INT16SZ;
+ 		err  = ns_get16(rdata);  rdata += NS_INT16SZ;
+ 		keysize  = ns_get16(rdata);  rdata += NS_INT16SZ;
+ 		len = SPRINTF((tmp, "%u %u %u ", mode, err, keysize));
+ 		T(addstr(tmp, len, &buf, &buflen));
+ 
++		if (edata - rdata < keysize)
++			goto formerr;
+ 		/* XXX need to dump key, print otherdata length & other data */
+ 		break;
+ 	    }
+@@ -532,9 +543,10 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
+ 
+ 		/* address suffix: provided only when prefix len != 128 */
+ 		if (pbit < 128) {
+-			if (rdata + pbyte >= edata) goto formerr;
++			unsigned int bytelen = sizeof(a) - pbyte;
++			if (edata - rdata < bytelen) goto formerr;
+ 			memset(&a, 0, sizeof(a));
+-			memcpy(&a.s6_addr[pbyte], rdata, sizeof(a) - pbyte);
++			memcpy(&a.s6_addr[pbyte], rdata, bytelen);
+ 			if (inet_ntop (AF_INET6, &a, buf, buflen) == NULL)
+ 			  return -1;
+ 			addlen(strlen(buf), &buf, &buflen);

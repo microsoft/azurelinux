@@ -1,0 +1,50 @@
+Short description: Add 4 ISO-8859-15 locales to SUPPORTED for Euro symbol.
+Author(s): Fedora glibc team <glibc@lists.fedoraproject.org>
+Origin: PATCH
+Bug-RHEL: #61908
+Upstream status: not-needed
+
+Very early RHL 7.3 requirement to add these locales so users can
+get access to Euro symbol. We should review this bug and decide if
+the UTF-8 locales are now serving the same purpose and drop the
+additional locales.
+
+* Tue Mar 26 2002 Jakub Jelinek <jakub@redhat.com> 2.2.5-28
+- add a couple of .ISO-8859-15 locales (#61908)
+
+diff --git a/localedata/SUPPORTED b/localedata/SUPPORTED
+index c8b63cc2fe2b4547..32088fdef06a14a3 100644
+--- a/localedata/SUPPORTED
++++ b/localedata/SUPPORTED
+@@ -103,6 +103,7 @@ cy_GB.UTF-8/UTF-8 \
+ cy_GB/ISO-8859-14 \
+ da_DK.UTF-8/UTF-8 \
+ da_DK/ISO-8859-1 \
++da_DK.ISO-8859-15/ISO-8859-15 \
+ de_AT.UTF-8/UTF-8 \
+ de_AT/ISO-8859-1 \
+ de_AT@euro/ISO-8859-15 \
+@@ -140,6 +141,7 @@ en_DK.UTF-8/UTF-8 \
+ en_DK/ISO-8859-1 \
+ en_GB.UTF-8/UTF-8 \
+ en_GB/ISO-8859-1 \
++en_GB.ISO-8859-15/ISO-8859-15 \
+ en_HK.UTF-8/UTF-8 \
+ en_HK/ISO-8859-1 \
+ en_IE.UTF-8/UTF-8 \
+@@ -157,6 +159,7 @@ en_SG.UTF-8/UTF-8 \
+ en_SG/ISO-8859-1 \
+ en_US.UTF-8/UTF-8 \
+ en_US/ISO-8859-1 \
++en_US.ISO-8859-15/ISO-8859-15 \
+ en_ZA.UTF-8/UTF-8 \
+ en_ZA/ISO-8859-1 \
+ en_ZM/UTF-8 \
+@@ -425,6 +428,7 @@ sv_FI/ISO-8859-1 \
+ sv_FI@euro/ISO-8859-15 \
+ sv_SE.UTF-8/UTF-8 \
+ sv_SE/ISO-8859-1 \
++sv_SE.ISO-8859-15/ISO-8859-15 \
+ sw_KE/UTF-8 \
+ sw_TZ/UTF-8 \
+ syr/UTF-8 \

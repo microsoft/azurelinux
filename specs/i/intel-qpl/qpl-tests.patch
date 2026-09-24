@@ -1,0 +1,78 @@
+--- a/tools/CMakeLists.txt	2025-12-02 14:42:56.000000000 +0100
++++ b/tools/CMakeLists.txt	2025-12-02 14:42:56.000000000 +0100
+@@ -19,9 +19,12 @@
+     add_subdirectory(utils)
+     set(TEMP_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+     set(CMAKE_CXX_CLANG_TIDY "")
+-    add_subdirectory(third-party/google-test EXCLUDE_FROM_ALL)
++    # add_subdirectory(third-party/google-test EXCLUDE_FROM_ALL)
+     set(CMAKE_CXX_CLANG_TIDY ${TEMP_CMAKE_CXX_CLANG_TIDY})
+     add_subdirectory(tests)
++    install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/testdata
++                      DESTINATION share/intel-qpl
++                      COMPONENT RUNTIME)
+     if (UNIX)
+         # Disable building google-benchmarks tests
+         SET(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+@@ -27,18 +27,18 @@ if (QPL_BUILD_TESTS)
+         SET(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+         set(TEMP_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+         set(CMAKE_CXX_CLANG_TIDY "")
+-        add_subdirectory(third-party/benchmark EXCLUDE_FROM_ALL)
++        # add_subdirectory(third-party/benchmark EXCLUDE_FROM_ALL)
+         set(CMAKE_CXX_CLANG_TIDY ${TEMP_CMAKE_CXX_CLANG_TIDY})
+-        add_subdirectory(benchmarks)
++        # add_subdirectory(benchmarks)
+     endif ()
+ endif ()
+ 
+ add_subdirectory(pkg-config)
+ 
+ install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/configs
+-                  DESTINATION share/${CMAKE_PROJECT_NAME}
++                  DESTINATION share/intel-qpl
+                   COMPONENT        RUNTIME)
+ install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/scripts
+-                  DESTINATION share/${CMAKE_PROJECT_NAME}
++                  DESTINATION share/intel-qpl
+                   COMPONENT        RUNTIME
+                   FILE_PERMISSIONS USE_SOURCE_PERMISSIONS)
+--- a/tools/tests/functional/CMakeLists.txt	2025-12-02 14:42:56.000000000 +0100
++++ b/tools/tests/functional/CMakeLists.txt	2025-12-02 14:42:56.000000000 +0100
+@@ -22,6 +22,8 @@ add_executable(tests main.cpp
+                $<TARGET_OBJECTS:unit_tests>)
+ 
+ qpl_set_common_target_settings(tests)
++set_target_properties(tests PROPERTIES
++                      OUTPUT_NAME qpl-func-tests)
+ 
+ get_property(LIB_DEPS GLOBAL PROPERTY QPL_LIB_DEPS)
+ 
+@@ -41,6 +43,9 @@ target_compile_definitions(tests
+ target_compile_options(tests
+         PRIVATE $<TARGET_PROPERTY:tests_common,COMPILE_OPTIONS>)
+ 
++install(TARGETS tests
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
++
+ # Test groups that run under target: make test
+ 
+ # Smoke tests are a group of small number of tests that can run in a few seconds on any HW.
+--- a/tools/tests/cross_tests/CMakeLists.txt	2025-12-02 14:42:56.000000000 +0100
++++ b/tools/tests/cross_tests/CMakeLists.txt	2025-12-02 14:42:56.000000000 +0100
+@@ -14,6 +14,8 @@ file(GLOB SOURCES *.cpp)
+ add_executable(cross_tests ${SOURCES})
+ 
+ qpl_set_common_target_settings(cross_tests)
++set_target_properties(cross_tests PROPERTIES
++                      OUTPUT_NAME qpl-cross-tests)
+ 
+ get_target_property(QPL_SOURCE_DIR qpl SOURCE_DIR)
+ 
+@@ -31,3 +33,6 @@ target_link_libraries(cross_tests
+ 
+ target_compile_definitions(cross_tests PRIVATE $<TARGET_PROPERTY:tests_common,COMPILE_DEFINITIONS>)
+ target_compile_options(cross_tests PRIVATE $<TARGET_PROPERTY:tests_common,COMPILE_OPTIONS>)
++
++install(TARGETS cross_tests
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
