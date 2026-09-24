@@ -1,0 +1,55 @@
+From: Saul Paredes <saulparedes@microsoft.com>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH] mm: vmscan: throttle memcg reclaim when writeback folios have
+ already cycled
+
+Local mitigation, pending upstream resolution.
+
+Between v6.15 and v6.16, memcg reclaim in a tight cgroup began re-cycling
+folios that are already under writeback instead of waiting for IO to
+complete. Each pass rescans the same folios, frees almost none of them and
+churns the LRU, so try_charge_memcg() exhausts MAX_RECLAIM_RETRIES and
+invokes the OOM killer while reclaimable page cache is still present.
+
+Observed with a Kata Containers pod (1 GiB limit, 32 MiB RuntimeClass
+overhead, 1056 MiB pod cgroup) where Cloud Hypervisor faults in 984 MiB of
+guest memory as shmem with swap disabled. Reproduces on both MSHV and KVM,
+on vanilla and Azure Linux kernels, and is independent of MGLRU and THP
+settings.
+
+Measured on Standard_D16ds_v5 with vanilla v6.18 + KVM, 10 runs each:
+
+                        kills    pgrefill max    steal/scan worst
+  v6.18                  7/10      19,660,999          0.0017
+  v6.18 + this patch     0/10          81,702          0.8374
+
+Fisher exact on the kill counts: p = 0.0031. fio throughput also improved
+(~970 MB vs ~906 MB per 30 s run), so the added throttling does not cost
+IO.
+
+Signed-off-by: Saul Paredes <saulparedes@microsoft.com>
+---
+ mm/vmscan.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -2102,6 +2102,17 @@ static unsigned long shrink_inactive_list(unsigned long nr_to_scan,
+ 			reclaim_throttle(pgdat, VMSCAN_THROTTLE_WRITEBACK);
+ 	}
+ 
++	/*
++	 * Filesystem writeback is no longer submitted from direct reclaim.  If
++	 * memcg reclaim finds that every writeback folio has already cycled
++	 * through reclaim once, let IO completion make progress instead of
++	 * immediately cycling the batch again.
++	 */
++	if (cgroup_reclaim(sc) && writeback_throttling_sane(sc) &&
++	    stat.nr_writeback && stat.nr_congested == stat.nr_writeback &&
++	    current_may_throttle())
++		reclaim_throttle(pgdat, VMSCAN_THROTTLE_WRITEBACK);
++
+ 	sc->nr.dirty += stat.nr_dirty;
+ 	sc->nr.congested += stat.nr_congested;
+ 	sc->nr.unqueued_dirty += stat.nr_unqueued_dirty;
