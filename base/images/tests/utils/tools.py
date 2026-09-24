@@ -33,7 +33,7 @@ import shutil
 from dataclasses import dataclass
 
 # Module-level registry, populated by ``NativeTool.__post_init__``.
-_REGISTRY: list["NativeTool"] = []
+_REGISTRY: list[NativeTool] = []
 
 
 @dataclass(frozen=True)

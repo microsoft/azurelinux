@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Fedora Dist-Git MCP Server — exposes tools for querying Fedora's package
+"""Fedora Dist-Git MCP Server — exposes tools for querying Fedora's package
 repositories via the Pagure API and performing git-level searches (pickaxe,
 grep) on cloned repos.
 
@@ -218,7 +217,8 @@ def set_distgit_url(base_url: str) -> StatusDict:
     """Set the Fedora dist-git base URL.
 
     Defaults to https://src.fedoraproject.org. Only needs to be called if
-    using a mirror or alternate instance."""
+    using a mirror or alternate instance.
+    """
     global _base_url
     with _tool_lock:
         old_url = _base_url
@@ -241,7 +241,8 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
       - /api/0/rpms/atlas/git/branches (list branches)
       - /rpms/atlas/raw/rawhide/f/atlas.spec  (raw spec file)
 
-    Response is written to a temp file. Use read_file or grep_search to inspect."""
+    Response is written to a temp file. Use read_file or grep_search to inspect.
+    """
     with _tool_lock:
         if override_base_url:
             base, err = validate_base_url(override_base_url)

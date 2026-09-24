@@ -7,7 +7,6 @@ from unittest.mock import Mock
 import client
 import pytest
 
-
 _PIPELINE_ENV = {
     "AZURESUBSCRIPTION_CLIENT_ID": "client-id",
     "AZURESUBSCRIPTION_SERVICE_CONNECTION_ID": "service-connection-id",
