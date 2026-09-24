@@ -13,7 +13,7 @@
 
 Name:           dnf5
 Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Command-line package manager
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/dnf5
@@ -263,6 +263,8 @@ BuildRequires:  rubygem-test-unit
 BuildRequires:  python3-devel
 %endif
 
+Patch0: 0001-Add-a-plugin-to-support-virtual-snapshots-using-package-file-time.patch
+BuildRequires: libsolv-devel >= 0.7.35-5
 Provides: tdnf = %{version}-%{release}
 %description
 DNF5 is a command-line package manager that automates the process of installing,
@@ -395,6 +397,7 @@ Requires:       sqlite-libs%{?_isa} >= %{sqlite_version}
 Conflicts:      dnf-data < 4.20.0
 %endif
 
+Requires: libsolv%{?_isa} >= 0.7.35-5
 %description -n libdnf5
 Package management library.
 
@@ -876,6 +879,9 @@ config-manager, copr, repoclosure, repomanage and reposync commands.
 
 # ========== dnf5-automatic plugin ==========
 
+%{_libdir}/dnf5/plugins/repo_snapshot_cmd_plugin.so
+%{_libdir}/libdnf5/plugins/repo_snapshot.so
+%config %{_sysconfdir}/dnf/libdnf5-plugins/repo_snapshot.conf
 %package plugin-automatic
 Summary:        Package manager - automated upgrades
 License:        LGPL-2.1-or-later
