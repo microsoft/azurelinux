@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+#
+# Run Firefox under Wayland
+#
+
+export MOZ_ENABLE_WAYLAND=1
+exec /__PREFIX__/bin/firefox "$@"

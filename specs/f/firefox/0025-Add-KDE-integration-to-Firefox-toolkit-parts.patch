@@ -1,0 +1,1343 @@
+diff -up firefox-119.0/modules/libpref/moz.build.integration firefox-119.0/modules/libpref/moz.build
+--- firefox-119.0/modules/libpref/moz.build.integration	2023-10-19 21:54:34.000000000 +0200
++++ firefox-119.0/modules/libpref/moz.build	2023-10-31 08:59:03.719124766 +0100
+@@ -126,6 +126,10 @@ UNIFIED_SOURCES += [
+     "SharedPrefMap.cpp",
+ ]
+ 
++LOCAL_INCLUDES += [
++    '/toolkit/xre'
++]
++
+ gen_all_tuple = tuple(gen_h + gen_cpp + gen_rs)
+ 
+ GeneratedFile(
+diff -up firefox-119.0/modules/libpref/Preferences.cpp.integration firefox-119.0/modules/libpref/Preferences.cpp
+--- firefox-119.0/modules/libpref/Preferences.cpp.integration	2023-10-19 21:54:34.000000000 +0200
++++ firefox-119.0/modules/libpref/Preferences.cpp	2023-10-31 08:59:03.719124766 +0100
+@@ -95,6 +95,7 @@
+ #ifdef MOZ_BACKGROUNDTASKS
+ #  include "mozilla/BackgroundTasks.h"
+ #endif
++#include "nsKDEUtils.h"
+ 
+ #ifdef DEBUG
+ #  include <map>
+diff -up firefox-119.0/python/mozbuild/mozpack/chrome/flags.py.integration firefox-119.0/python/mozbuild/mozpack/chrome/flags.py
+--- firefox-119.0/python/mozbuild/mozpack/chrome/flags.py.integration	2023-10-19 21:54:34.000000000 +0200
++++ firefox-119.0/python/mozbuild/mozpack/chrome/flags.py	2023-10-31 08:59:03.719124766 +0100
+@@ -234,6 +234,7 @@ class Flags(OrderedDict):
+         "tablet": Flag,
+         "process": StringFlag,
+         "backgroundtask": StringFlag,
++        "desktop": StringFlag,
+     }
+     RE = re.compile(r"([!<>=]+)")
+ 
+diff -up firefox-119.0/python/mozbuild/mozpack/chrome/manifest.py.integration firefox-119.0/python/mozbuild/mozpack/chrome/manifest.py
+--- firefox-119.0/python/mozbuild/mozpack/chrome/manifest.py.integration	2023-10-19 21:54:34.000000000 +0200
++++ firefox-119.0/python/mozbuild/mozpack/chrome/manifest.py	2023-10-31 08:59:03.719124766 +0100
+@@ -43,6 +43,7 @@ class ManifestEntry(object):
+         "process",
+         "contentaccessible",
+         "backgroundtask",
++        "desktop",
+     ]
+ 
+     def __init__(self, base, *flags):
+diff -up firefox-119.0/toolkit/components/downloads/moz.build.integration firefox-119.0/toolkit/components/downloads/moz.build
+--- firefox-119.0/toolkit/components/downloads/moz.build.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/toolkit/components/downloads/moz.build	2023-10-31 08:59:03.720124801 +0100
+@@ -51,5 +51,9 @@ if CONFIG["MOZ_PLACES"]:
+ 
+ FINAL_LIBRARY = "xul"
+ 
++LOCAL_INCLUDES += [
++    '/toolkit/xre'
++]
++
+ with Files("**"):
+     BUG_COMPONENT = ("Toolkit", "Downloads API")
+diff -up firefox-119.0/toolkit/mozapps/downloads/HelperAppDlg.sys.mjs.integration firefox-119.0/toolkit/mozapps/downloads/HelperAppDlg.sys.mjs
+--- firefox-119.0/toolkit/mozapps/downloads/HelperAppDlg.sys.mjs.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/toolkit/mozapps/downloads/HelperAppDlg.sys.mjs	2023-10-31 08:59:03.720124801 +0100
+@@ -1246,26 +1246,56 @@ nsUnknownContentTypeDialog.prototype = {
+         this.chosenApp = params.handlerApp;
+       }
+     } else if ("@mozilla.org/applicationchooser;1" in Cc) {
+-      var nsIApplicationChooser = Ci.nsIApplicationChooser;
+-      var appChooser = Cc["@mozilla.org/applicationchooser;1"].createInstance(
+-        nsIApplicationChooser
+-      );
+-      appChooser.init(
+-        this.mDialog,
+-        this.dialogElement("strings").getString("chooseAppFilePickerTitle")
+-      );
+-      var contentTypeDialogObj = this;
+-      let appChooserCallback = function appChooserCallback_done(aResult) {
+-        if (aResult) {
+-          contentTypeDialogObj.chosenApp = aResult.QueryInterface(
+-            Ci.nsILocalHandlerApp
+-          );
+-        }
+-        contentTypeDialogObj.finishChooseApp();
+-      };
+-      appChooser.open(this.mLauncher.MIMEInfo.MIMEType, appChooserCallback);
+-      // The finishChooseApp is called from appChooserCallback
+-      return;
++      // handle the KDE case which is implemented in the filepicker
++      // therefore falling back to Gtk2 like behaviour if KDE is running
++      // FIXME this should be better handled in the nsIApplicationChooser
++      // interface
++      var env = Components.classes["@mozilla.org/process/environment;1"]
++                          .getService(Components.interfaces.nsIEnvironment);
++      if (env.get('KDE_FULL_SESSION') == "true")
++      {
++        var nsIFilePicker = Ci.nsIFilePicker;
++        var fp = Cc["@mozilla.org/filepicker;1"]
++                    .createInstance(nsIFilePicker);
++        fp.init(this.mDialog,
++                this.dialogElement("strings").getString("chooseAppFilePickerTitle"),
++                nsIFilePicker.modeOpen);
++
++        fp.appendFilters(nsIFilePicker.filterApps);
++
++        fp.open(aResult => {
++          if (aResult == nsIFilePicker.returnOK && fp.file) {
++            // Remember the file they chose to run.
++            var localHandlerApp =
++              Cc["@mozilla.org/uriloader/local-handler-app;1"].
++                         createInstance(Ci.nsILocalHandlerApp);
++            localHandlerApp.executable = fp.file;
++            this.chosenApp = localHandlerApp;
++          }
++          this.finishChooseApp();
++        });
++      } else {
++        var nsIApplicationChooser = Ci.nsIApplicationChooser;
++        var appChooser = Cc["@mozilla.org/applicationchooser;1"].createInstance(
++          nsIApplicationChooser
++        );
++        appChooser.init(
++          this.mDialog,
++          this.dialogElement("strings").getString("chooseAppFilePickerTitle")
++        );
++        var contentTypeDialogObj = this;
++        let appChooserCallback = function appChooserCallback_done(aResult) {
++          if (aResult) {
++            contentTypeDialogObj.chosenApp = aResult.QueryInterface(
++              Ci.nsILocalHandlerApp
++            );
++          }
++          contentTypeDialogObj.finishChooseApp();
++        };
++        appChooser.open(this.mLauncher.MIMEInfo.MIMEType, appChooserCallback);
++        // The finishChooseApp is called from appChooserCallback
++        return;
++      }
+     } else {
+       var nsIFilePicker = Ci.nsIFilePicker;
+       var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+diff -up firefox-119.0/toolkit/system/unixproxy/nsUnixSystemProxySettings.cpp.integration firefox-119.0/toolkit/system/unixproxy/nsUnixSystemProxySettings.cpp
+--- firefox-119.0/toolkit/system/unixproxy/nsUnixSystemProxySettings.cpp.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/toolkit/system/unixproxy/nsUnixSystemProxySettings.cpp	2023-10-31 08:59:03.720124801 +0100
+@@ -16,6 +16,8 @@
+ #include "nsISupportsPrimitives.h"
+ #include "nsIGSettingsService.h"
+ #include "nsReadableUtils.h"
++#include "nsPrintfCString.h"
++#include "nsKDEUtils.h"
+ 
+ using namespace mozilla;
+ 
+@@ -39,6 +41,8 @@ class nsUnixSystemProxySettings final :
+                                  nsACString& aResult);
+   nsresult SetProxyResultFromGSettings(const char* aKeyBase, const char* aType,
+                                        nsACString& aResult);
++  nsresult GetProxyFromKDE(const nsACString& aScheme, const nsACString& aHost,
++                           PRInt32 aPort, nsACString& aResult);
+ };
+ 
+ NS_IMPL_ISUPPORTS(nsUnixSystemProxySettings, nsISystemProxySettings)
+@@ -393,6 +397,9 @@ nsresult nsUnixSystemProxySettings::GetP
+                                                    const nsACString& aHost,
+                                                    const int32_t aPort,
+                                                    nsACString& aResult) {
++  if (nsKDEUtils::kdeSupport())
++    return GetProxyFromKDE(aScheme, aHost, aPort, aResult);
++
+   if (mProxySettings) {
+     nsresult rv = GetProxyFromGSettings(aScheme, aHost, aPort, aResult);
+     if (NS_SUCCEEDED(rv)) return rv;
+@@ -401,6 +408,28 @@ nsresult nsUnixSystemProxySettings::GetP
+   return GetProxyFromEnvironment(aScheme, aHost, aPort, aResult);
+ }
+ 
++nsresult nsUnixSystemProxySettings::GetProxyFromKDE(const nsACString& aScheme,
++                                                    const nsACString& aHost,
++                                                    PRInt32 aPort,
++                                                    nsACString& aResult) {
++  nsAutoCString url;
++  url = aScheme;
++  url += "://";
++  url += aHost;
++  if (aPort >= 0) {
++    url += ":";
++    url += nsPrintfCString("%d", aPort);
++  }
++  nsTArray<nsCString> command;
++  command.AppendElement("GETPROXY"_ns);
++  command.AppendElement(url);
++  nsTArray<nsCString> result;
++  if (!nsKDEUtils::command(command, &result) || result.Length() != 1)
++    return NS_ERROR_FAILURE;
++  aResult = result[0];
++  return NS_OK;
++}
++
+ NS_IMPL_COMPONENT_FACTORY(nsUnixSystemProxySettings) {
+   auto result = MakeRefPtr<nsUnixSystemProxySettings>();
+   result->Init();
+diff -up firefox-119.0/toolkit/xre/moz.build.integration firefox-119.0/toolkit/xre/moz.build
+--- firefox-119.0/toolkit/xre/moz.build.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/toolkit/xre/moz.build	2023-10-31 08:59:03.720124801 +0100
+@@ -96,7 +96,9 @@ elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "ui
+         "UIKitDirProvider.mm",
+     ]
+ elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "gtk":
++    EXPORTS += ['nsKDEUtils.h']
+     UNIFIED_SOURCES += [
++        "nsKDEUtils.cpp",
+         "nsNativeAppSupportUnix.cpp",
+     ]
+     CXXFLAGS += CONFIG["MOZ_X11_SM_CFLAGS"]
+diff -up firefox-119.0/toolkit/xre/nsKDEUtils.cpp.integration firefox-119.0/toolkit/xre/nsKDEUtils.cpp
+--- firefox-119.0/toolkit/xre/nsKDEUtils.cpp.integration	2023-10-31 08:59:03.721124836 +0100
++++ firefox-119.0/toolkit/xre/nsKDEUtils.cpp	2023-10-31 08:59:03.721124836 +0100
+@@ -0,0 +1,286 @@
++/* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#include "nsKDEUtils.h"
++#include "nsIWidget.h"
++#include "nsISupportsPrimitives.h"
++#include "nsIMutableArray.h"
++#include "nsComponentManagerUtils.h"
++#include "nsArrayUtils.h"
++
++#include <gtk/gtk.h>
++
++#include <limits.h>
++#include <stdio.h>
++#include <sys/wait.h>
++#include <sys/resource.h>
++#include <unistd.h>
++#include <X11/Xlib.h>
++// copied from X11/X.h as a hack since for an unknown
++// reason it's not picked up from X11/X.h
++#ifndef None
++#  define None 0L /* universal null resource or null atom */
++#endif
++
++// #define DEBUG_KDE
++#ifdef DEBUG_KDE
++#  define KMOZILLAHELPER "kmozillahelper"
++#else
++// not need for lib64, it's a binary
++#  define KMOZILLAHELPER "/usr/lib/mozilla/kmozillahelper"
++#endif
++
++#define KMOZILLAHELPER_VERSION 6
++#define MAKE_STR2(n) #n
++#define MAKE_STR(n) MAKE_STR2(n)
++
++static bool getKdeSession() {
++  if (PR_GetEnv("KDE_FULL_SESSION")) {
++    return true;
++  }
++  return false;
++}
++
++static bool getKdeSupport() {
++  nsTArray<nsCString> command;
++  command.AppendElement("CHECK"_ns);
++  command.AppendElement("KMOZILLAHELPER_VERSION"_ns);
++  bool kde = nsKDEUtils::command(command);
++#ifdef DEBUG_KDE
++  fprintf(stderr, "KDE RUNNING %d\n", kde);
++#endif
++  return kde;
++}
++
++nsKDEUtils::nsKDEUtils() : commandFile(NULL), replyFile(NULL) {}
++
++nsKDEUtils::~nsKDEUtils() {
++  //    closeHelper(); not actually useful, exiting will close the fd too
++}
++
++nsKDEUtils* nsKDEUtils::self() {
++  static nsKDEUtils s;
++  return &s;
++}
++
++static bool helperRunning = false;
++static bool helperFailed = false;
++
++bool nsKDEUtils::kdeSession() {
++  static bool session = getKdeSession();
++  return session;
++}
++
++bool nsKDEUtils::kdeSupport() {
++  static bool support = kdeSession() && getKdeSupport();
++  return support && helperRunning;
++}
++
++struct nsKDECommandData {
++  FILE* file;
++  nsTArray<nsCString>* output;
++  GMainLoop* loop;
++  bool success;
++};
++
++static gboolean kdeReadFunc(GIOChannel*, GIOCondition, gpointer data) {
++  nsKDECommandData* p = static_cast<nsKDECommandData*>(data);
++  char buf[8192];  // TODO big enough
++  bool command_done = false;
++  bool command_failed = false;
++  while (!command_done && !command_failed &&
++         fgets(buf, 8192, p->file) !=
++             NULL) {  // TODO what if the kernel splits a line into two chunks?
++                      // #ifdef DEBUG_KDE
++    //         fprintf( stderr, "READ: %s %d\n", buf, feof( p->file ));
++    // #endif
++    if (char* eol = strchr(buf, '\n')) *eol = '\0';
++    command_done = (strcmp(buf, "\\1") == 0);
++    command_failed = (strcmp(buf, "\\0") == 0);
++    nsAutoCString line(buf);
++    line.ReplaceSubstring("\\n", "\n");
++    line.ReplaceSubstring(
++        "\\"
++        "\\",
++        "\\");  //  \\ -> \ , i.e. unescape
++    if (p->output && !(command_done || command_failed))
++      p->output->AppendElement(nsCString(buf));  // TODO utf8?
++  }
++  bool quit = false;
++  if (feof(p->file) || command_failed) {
++    quit = true;
++    p->success = false;
++  }
++  if (command_done) {  // reading one reply finished
++    quit = true;
++    p->success = true;
++  }
++  if (quit) {
++    if (p->loop) g_main_loop_quit(p->loop);
++    return FALSE;
++  }
++  return TRUE;
++}
++
++bool nsKDEUtils::command(const nsTArray<nsCString>& command,
++                         nsTArray<nsCString>* output) {
++  return self()->internalCommand(command, NULL, false, output);
++}
++
++bool nsKDEUtils::command(nsIArray* command, nsIArray** output) {
++  nsTArray<nsCString> in;
++  PRUint32 length;
++  command->GetLength(&length);
++  for (PRUint32 i = 0; i < length; i++) {
++    nsCOMPtr<nsISupportsCString> str = do_QueryElementAt(command, i);
++    if (str) {
++      nsAutoCString s;
++      str->GetData(s);
++      in.AppendElement(s);
++    }
++  }
++
++  nsTArray<nsCString> out;
++  bool ret = self()->internalCommand(in, NULL, false, &out);
++
++  if (!output) return ret;
++
++  nsCOMPtr<nsIMutableArray> result = do_CreateInstance(NS_ARRAY_CONTRACTID);
++  if (!result) return false;
++
++  for (PRUint32 i = 0; i < out.Length(); i++) {
++    nsCOMPtr<nsISupportsCString> rstr =
++        do_CreateInstance(NS_SUPPORTS_CSTRING_CONTRACTID);
++    if (!rstr) return false;
++
++    rstr->SetData(out[i]);
++    result->AppendElement(rstr);
++  }
++
++  NS_ADDREF(*output = result);
++  return ret;
++}
++
++bool nsKDEUtils::commandBlockUi(const nsTArray<nsCString>& command,
++                                GtkWindow* parent,
++                                nsTArray<nsCString>* output) {
++  return self()->internalCommand(command, parent, true, output);
++}
++
++bool nsKDEUtils::internalCommand(const nsTArray<nsCString>& command,
++                                 GtkWindow* parent, bool blockUi,
++                                 nsTArray<nsCString>* output) {
++  if (!startHelper()) return false;
++  feedCommand(command);
++  // do not store the data in 'this' but in extra structure, just in case there
++  // is reentrancy (can there be? the event loop is re-entered)
++  nsKDECommandData data;
++  data.file = replyFile;
++  data.output = output;
++  data.success = false;
++  if (blockUi) {
++    data.loop = g_main_loop_new(NULL, FALSE);
++    GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
++    if (parent && gtk_window_get_group(parent))
++      gtk_window_group_add_window(gtk_window_get_group(parent),
++                                  GTK_WINDOW(window));
++    gtk_widget_realize(window);
++    gtk_widget_set_sensitive(window, TRUE);
++    gtk_grab_add(window);
++    GIOChannel* channel = g_io_channel_unix_new(fileno(data.file));
++    g_io_add_watch(channel,
++                   static_cast<GIOCondition>(G_IO_IN | G_IO_ERR | G_IO_HUP),
++                   kdeReadFunc, &data);
++    g_io_channel_unref(channel);
++    g_main_loop_run(data.loop);
++    g_main_loop_unref(data.loop);
++    gtk_grab_remove(window);
++    gtk_widget_destroy(window);
++  } else {
++    data.loop = NULL;
++    while (kdeReadFunc(NULL, static_cast<GIOCondition>(0), &data))
++      ;
++  }
++  return data.success;
++}
++
++bool nsKDEUtils::startHelper() {
++  if (helperRunning) return true;
++  if (helperFailed) return false;
++  helperFailed = true;
++  int fdcommand[2];
++  int fdreply[2];
++  if (pipe(fdcommand) < 0) return false;
++  if (pipe(fdreply) < 0) {
++    close(fdcommand[0]);
++    close(fdcommand[1]);
++    return false;
++  }
++  char* args[2] = {const_cast<char*>(KMOZILLAHELPER), NULL};
++  switch (fork()) {
++    case -1: {
++      close(fdcommand[0]);
++      close(fdcommand[1]);
++      close(fdreply[0]);
++      close(fdreply[1]);
++      return false;
++    }
++    case 0:  // child
++    {
++      if (dup2(fdcommand[0], STDIN_FILENO) < 0) _exit(1);
++      if (dup2(fdreply[1], STDOUT_FILENO) < 0) _exit(1);
++      int maxfd = 1024;  // close all other fds
++      struct rlimit rl;
++      if (getrlimit(RLIMIT_NOFILE, &rl) == 0) maxfd = rl.rlim_max;
++      for (int i = 3; i < maxfd; ++i) close(i);
++#ifdef DEBUG_KDE
++      execvp(KMOZILLAHELPER, args);
++#else
++      execv(KMOZILLAHELPER, args);
++#endif
++      _exit(1);  // failed
++    }
++    default:  // parent
++    {
++      commandFile = fdopen(fdcommand[1], "w");
++      replyFile = fdopen(fdreply[0], "r");
++      close(fdcommand[0]);
++      close(fdreply[1]);
++      if (commandFile == NULL || replyFile == NULL) {
++        closeHelper();
++        return false;
++      }
++      // ok, helper ready, getKdeRunning() will check if it works
++    }
++  }
++  helperFailed = false;
++  helperRunning = true;
++  return true;
++}
++
++void nsKDEUtils::closeHelper() {
++  if (commandFile != NULL)
++    fclose(commandFile);  // this will also make the helper quit
++  if (replyFile != NULL) fclose(replyFile);
++  helperRunning = false;
++}
++
++void nsKDEUtils::feedCommand(const nsTArray<nsCString>& command) {
++  for (int i = 0; i < command.Length(); ++i) {
++    nsCString line = command[i];
++    line.ReplaceSubstring("\\",
++                          "\\"
++                          "\\");  // \ -> \\ , i.e. escape
++    line.ReplaceSubstring("\n", "\\n");
++#ifdef DEBUG_KDE
++    fprintf(stderr, "COMM: %s\n", line.get());
++#endif
++    fputs(line.get(), commandFile);
++    fputs("\n", commandFile);
++  }
++  fputs("\\E\n",
++        commandFile);  // done as \E, so it cannot happen in normal data
++  fflush(commandFile);
++}
+diff -up firefox-119.0/toolkit/xre/nsKDEUtils.h.integration firefox-119.0/toolkit/xre/nsKDEUtils.h
+--- firefox-119.0/toolkit/xre/nsKDEUtils.h.integration	2023-10-31 08:59:03.721124836 +0100
++++ firefox-119.0/toolkit/xre/nsKDEUtils.h	2023-10-31 08:59:03.721124836 +0100
+@@ -0,0 +1,53 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#ifndef nsKDEUtils_h__
++#define nsKDEUtils_h__
++
++#include "nsString.h"
++#include "nsTArray.h"
++#include <stdio.h>
++
++typedef struct _GtkWindow GtkWindow;
++
++class nsIArray;
++
++class NS_EXPORT nsKDEUtils {
++ public:
++  /* Returns true if running inside a KDE session (regardless of whether there
++     is KDE support available for Firefox). This should be used e.g. when
++     determining dialog button order but not for code that requires the KDE
++     support. */
++  static bool kdeSession();
++  /* Returns true if running inside a KDE session and KDE support is available
++     for Firefox. This should be used everywhere where the external helper is
++     needed. */
++  static bool kdeSupport();
++  /* Executes the given helper command, returns true if helper returned success.
++   */
++  static bool command(const nsTArray<nsCString>& command,
++                      nsTArray<nsCString>* output = NULL);
++  static bool command(nsIArray* command, nsIArray** output = NULL);
++  /* Like command(), but additionally blocks the parent widget like if there was
++     a modal dialog shown and enters the event loop (i.e. there are still paint
++     updates, this is for commands that take long). */
++  static bool commandBlockUi(const nsTArray<nsCString>& command,
++                             GtkWindow* parent,
++                             nsTArray<nsCString>* output = NULL);
++
++ private:
++  nsKDEUtils();
++  ~nsKDEUtils();
++  static nsKDEUtils* self();
++  bool startHelper();
++  void closeHelper();
++  void feedCommand(const nsTArray<nsCString>& command);
++  bool internalCommand(const nsTArray<nsCString>& command, GtkWindow* parent,
++                       bool isParent, nsTArray<nsCString>* output);
++  FILE* commandFile;
++  FILE* replyFile;
++};
++
++#endif  // nsKDEUtils
+diff -up firefox-119.0/uriloader/exthandler/HandlerServiceParent.cpp.integration firefox-119.0/uriloader/exthandler/HandlerServiceParent.cpp
+--- firefox-119.0/uriloader/exthandler/HandlerServiceParent.cpp.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/uriloader/exthandler/HandlerServiceParent.cpp	2023-10-31 08:59:03.721124836 +0100
+@@ -18,7 +18,7 @@
+ #include "nsComponentManagerUtils.h"
+ #include "nsServiceManagerUtils.h"
+ #ifdef MOZ_WIDGET_GTK
+-#  include "unix/nsGNOMERegistry.h"
++#  include "unix/nsCommonRegistry.h"
+ #endif
+ 
+ using mozilla::dom::ContentHandlerService;
+@@ -310,8 +310,8 @@ mozilla::ipc::IPCResult HandlerServicePa
+   }
+ #ifdef MOZ_WIDGET_GTK
+   // Check the GNOME registry for a protocol handler
+-  *aHandlerExists =
+-      nsGNOMERegistry::HandlerExists(PromiseFlatCString(aProtocolScheme).get());
++  *aHandlerExists = nsCommonRegistry::HandlerExists(
++      PromiseFlatCString(aProtocolScheme).get());
+ #else
+   *aHandlerExists = false;
+ #endif
+diff -up firefox-119.0/uriloader/exthandler/moz.build.integration firefox-119.0/uriloader/exthandler/moz.build
+--- firefox-119.0/uriloader/exthandler/moz.build.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/uriloader/exthandler/moz.build	2023-10-31 08:59:03.721124836 +0100
+@@ -86,7 +86,9 @@ else:
+ 
+ if CONFIG["MOZ_WIDGET_TOOLKIT"] == "gtk":
+     UNIFIED_SOURCES += [
++        "unix/nsCommonRegistry.cpp",
+         "unix/nsGNOMERegistry.cpp",
++        "unix/nsKDERegistry.cpp",
+         "unix/nsMIMEInfoUnix.cpp",
+     ]
+ elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "android":
+@@ -134,6 +136,7 @@ LOCAL_INCLUDES += [
+     "/dom/ipc",
+     "/netwerk/base",
+     "/netwerk/protocol/http",
++    "/toolkit/xre",
+ ]
+ 
+ if CONFIG["MOZ_ENABLE_DBUS"]:
+diff -up firefox-119.0/uriloader/exthandler/unix/nsCommonRegistry.cpp.integration firefox-119.0/uriloader/exthandler/unix/nsCommonRegistry.cpp
+--- firefox-119.0/uriloader/exthandler/unix/nsCommonRegistry.cpp.integration	2023-10-31 08:59:03.721124836 +0100
++++ firefox-119.0/uriloader/exthandler/unix/nsCommonRegistry.cpp	2023-10-31 08:59:03.721124836 +0100
+@@ -0,0 +1,42 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#include "nsCommonRegistry.h"
++
++#include "nsGNOMERegistry.h"
++#include "nsKDERegistry.h"
++#include "nsString.h"
++#include "nsKDEUtils.h"
++
++/* static */ bool nsCommonRegistry::HandlerExists(const char* aProtocolScheme) {
++  if (nsKDEUtils::kdeSupport())
++    return nsKDERegistry::HandlerExists(aProtocolScheme);
++  return nsGNOMERegistry::HandlerExists(aProtocolScheme);
++}
++
++/* static */ nsresult nsCommonRegistry::LoadURL(nsIURI* aURL) {
++  if (nsKDEUtils::kdeSupport()) return nsKDERegistry::LoadURL(aURL);
++  return nsGNOMERegistry::LoadURL(aURL);
++}
++
++/* static */ void nsCommonRegistry::GetAppDescForScheme(
++    const nsACString& aScheme, nsAString& aDesc) {
++  if (nsKDEUtils::kdeSupport())
++    return nsKDERegistry::GetAppDescForScheme(aScheme, aDesc);
++  return nsGNOMERegistry::GetAppDescForScheme(aScheme, aDesc);
++}
++
++/* static */ already_AddRefed<nsMIMEInfoBase>
++nsCommonRegistry::GetFromExtension(const nsACString& aFileExt) {
++  if (nsKDEUtils::kdeSupport())
++    return nsKDERegistry::GetFromExtension(aFileExt);
++  return nsGNOMERegistry::GetFromExtension(aFileExt);
++}
++
++/* static */ already_AddRefed<nsMIMEInfoBase> nsCommonRegistry::GetFromType(
++    const nsACString& aMIMEType) {
++  if (nsKDEUtils::kdeSupport()) return nsKDERegistry::GetFromType(aMIMEType);
++  return nsGNOMERegistry::GetFromType(aMIMEType);
++}
+diff -up firefox-119.0/uriloader/exthandler/unix/nsCommonRegistry.h.integration firefox-119.0/uriloader/exthandler/unix/nsCommonRegistry.h
+--- firefox-119.0/uriloader/exthandler/unix/nsCommonRegistry.h.integration	2023-10-31 08:59:03.721124836 +0100
++++ firefox-119.0/uriloader/exthandler/unix/nsCommonRegistry.h	2023-10-31 08:59:03.721124836 +0100
+@@ -0,0 +1,28 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#ifndef nsCommonRegistry_h__
++#define nsCommonRegistry_h__
++
++#include "nsIURI.h"
++#include "nsCOMPtr.h"
++
++class nsMIMEInfoBase;
++
++class nsCommonRegistry {
++ public:
++  static bool HandlerExists(const char* aProtocolScheme);
++
++  static nsresult LoadURL(nsIURI* aURL);
++
++  static void GetAppDescForScheme(const nsACString& aScheme, nsAString& aDesc);
++
++  static already_AddRefed<nsMIMEInfoBase> GetFromExtension(
++      const nsACString& aFileExt);
++
++  static already_AddRefed<nsMIMEInfoBase> GetFromType(
++      const nsACString& aMIMEType);
++};
++
++#endif
+diff -up firefox-119.0/uriloader/exthandler/unix/nsKDERegistry.cpp.integration firefox-119.0/uriloader/exthandler/unix/nsKDERegistry.cpp
+--- firefox-119.0/uriloader/exthandler/unix/nsKDERegistry.cpp.integration	2023-10-31 08:59:03.722124870 +0100
++++ firefox-119.0/uriloader/exthandler/unix/nsKDERegistry.cpp	2023-10-31 08:59:03.722124870 +0100
+@@ -0,0 +1,75 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#include "mozilla/StaticPrefs_browser.h"
++#include "nsKDERegistry.h"
++#include "prlink.h"
++#include "prmem.h"
++#include "nsString.h"
++#include "nsMIMEInfoUnix.h"
++#include "nsKDEUtils.h"
++
++/* static */ bool nsKDERegistry::HandlerExists(const char* aProtocolScheme) {
++  nsTArray<nsCString> command;
++  command.AppendElement("HANDLEREXISTS"_ns);
++  command.AppendElement(nsAutoCString(aProtocolScheme));
++  return nsKDEUtils::command(command);
++}
++
++/* static */ nsresult nsKDERegistry::LoadURL(nsIURI* aURL) {
++  nsTArray<nsCString> command;
++  command.AppendElement("OPEN"_ns);
++  nsCString url;
++  aURL->GetSpec(url);
++  command.AppendElement(url);
++  bool rv = nsKDEUtils::command(command);
++  if (!rv) return NS_ERROR_FAILURE;
++
++  return NS_OK;
++}
++
++/* static */ void nsKDERegistry::GetAppDescForScheme(const nsACString& aScheme,
++                                                     nsAString& aDesc) {
++  nsTArray<nsCString> command;
++  command.AppendElement("GETAPPDESCFORSCHEME"_ns);
++  command.AppendElement(aScheme);
++  nsTArray<nsCString> output;
++  if (nsKDEUtils::command(command, &output) && output.Length() == 1)
++    CopyUTF8toUTF16(output[0], aDesc);
++}
++
++/* static */ already_AddRefed<nsMIMEInfoBase> nsKDERegistry::GetFromExtension(
++    const nsACString& aFileExt) {
++  NS_ASSERTION(aFileExt[0] != '.', "aFileExt shouldn't start with a dot");
++  nsTArray<nsCString> command;
++  command.AppendElement("GETFROMEXTENSION"_ns);
++  command.AppendElement(aFileExt);
++  return GetFromHelper(command);
++}
++
++/* static */ already_AddRefed<nsMIMEInfoBase> nsKDERegistry::GetFromType(
++    const nsACString& aMIMEType) {
++  nsTArray<nsCString> command;
++  command.AppendElement("GETFROMTYPE"_ns);
++  command.AppendElement(aMIMEType);
++  return GetFromHelper(command);
++}
++
++/* static */ already_AddRefed<nsMIMEInfoBase> nsKDERegistry::GetFromHelper(
++    const nsTArray<nsCString>& command) {
++  nsTArray<nsCString> output;
++  if (nsKDEUtils::command(command, &output) && output.Length() == 3) {
++    nsCString mimetype = output[0];
++    RefPtr<nsMIMEInfoUnix> mimeInfo = new nsMIMEInfoUnix(mimetype);
++    NS_ENSURE_TRUE(mimeInfo, nullptr);
++    nsCString description = output[1];
++    mimeInfo->SetDescription(NS_ConvertUTF8toUTF16(description));
++    nsCString handlerAppName = output[2];
++    mimeInfo->SetPreferredAction(nsIMIMEInfo::saveToDisk);
++    mimeInfo->SetDefaultDescription(NS_ConvertUTF8toUTF16(handlerAppName));
++    return mimeInfo.forget();
++  }
++  return nullptr;
++}
+diff -up firefox-119.0/uriloader/exthandler/unix/nsKDERegistry.h.integration firefox-119.0/uriloader/exthandler/unix/nsKDERegistry.h
+--- firefox-119.0/uriloader/exthandler/unix/nsKDERegistry.h.integration	2023-10-31 08:59:03.722124870 +0100
++++ firefox-119.0/uriloader/exthandler/unix/nsKDERegistry.h	2023-10-31 08:59:03.722124870 +0100
+@@ -0,0 +1,35 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#ifndef nsKDERegistry_h__
++#define nsKDERegistry_h__
++
++#include "nsIURI.h"
++#include "nsCOMPtr.h"
++#include "nsTArray.h"
++
++class nsMIMEInfoBase;
++// class nsAutoCString;
++// class nsCString;
++
++class nsKDERegistry {
++ public:
++  static bool HandlerExists(const char* aProtocolScheme);
++
++  static nsresult LoadURL(nsIURI* aURL);
++
++  static void GetAppDescForScheme(const nsACString& aScheme, nsAString& aDesc);
++
++  static already_AddRefed<nsMIMEInfoBase> GetFromExtension(
++      const nsACString& aFileExt);
++
++  static already_AddRefed<nsMIMEInfoBase> GetFromType(
++      const nsACString& aMIMEType);
++
++ private:
++  static already_AddRefed<nsMIMEInfoBase> GetFromHelper(
++      const nsTArray<nsCString>& command);
++};
++
++#endif  // nsKDERegistry_h__
+diff -up firefox-119.0/uriloader/exthandler/unix/nsMIMEInfoUnix.cpp.integration firefox-119.0/uriloader/exthandler/unix/nsMIMEInfoUnix.cpp
+--- firefox-119.0/uriloader/exthandler/unix/nsMIMEInfoUnix.cpp.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/uriloader/exthandler/unix/nsMIMEInfoUnix.cpp	2023-10-31 08:59:03.722124870 +0100
+@@ -5,16 +5,19 @@
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ #include "nsMIMEInfoUnix.h"
+-#include "nsGNOMERegistry.h"
++#include "nsCommonRegistry.h"
+ #include "nsIGIOService.h"
+ #include "nsNetCID.h"
+ #include "nsIIOService.h"
+ #ifdef MOZ_ENABLE_DBUS
+ #  include "nsDBusHandlerApp.h"
+ #endif
++#if defined(XP_UNIX) && !defined(XP_MACOSX)
++#  include "nsKDEUtils.h"
++#endif
+ 
+ nsresult nsMIMEInfoUnix::LoadUriInternal(nsIURI* aURI) {
+-  return nsGNOMERegistry::LoadURL(aURI);
++  return nsCommonRegistry::LoadURL(aURI);
+ }
+ 
+ NS_IMETHODIMP
+@@ -29,15 +32,15 @@ nsMIMEInfoUnix::GetHasDefaultHandler(boo
+   *_retval = false;
+ 
+   if (mClass == eProtocolInfo) {
+-    *_retval = nsGNOMERegistry::HandlerExists(mSchemeOrType.get());
++    *_retval = nsCommonRegistry::HandlerExists(mSchemeOrType.get());
+   } else {
+     RefPtr<nsMIMEInfoBase> mimeInfo =
+-        nsGNOMERegistry::GetFromType(mSchemeOrType);
++        nsCommonRegistry::GetFromType(mSchemeOrType);
+     if (!mimeInfo) {
+       nsAutoCString ext;
+       nsresult rv = GetPrimaryExtension(ext);
+       if (NS_SUCCEEDED(rv)) {
+-        mimeInfo = nsGNOMERegistry::GetFromExtension(ext);
++        mimeInfo = nsCommonRegistry::GetFromExtension(ext);
+       }
+     }
+     if (mimeInfo) *_retval = true;
+@@ -59,6 +62,21 @@ nsresult nsMIMEInfoUnix::LaunchDefaultWi
+   nsAutoCString nativePath;
+   aFile->GetNativePath(nativePath);
+ 
++  if (nsKDEUtils::kdeSupport()) {
++    bool supports;
++    if (NS_SUCCEEDED(GetHasDefaultHandler(&supports)) && supports) {
++      nsTArray<nsCString> command;
++      command.AppendElement("OPEN"_ns);
++      command.AppendElement(nativePath);
++      command.AppendElement("MIMETYPE"_ns);
++      command.AppendElement(mSchemeOrType);
++      if (nsKDEUtils::command(command)) return NS_OK;
++    }
++    if (!GetDefaultApplication()) return NS_ERROR_FILE_NOT_FOUND;
++
++    return LaunchWithIProcess(GetDefaultApplication(), nativePath);
++  }
++
+   nsCOMPtr<nsIGIOService> giovfs = do_GetService(NS_GIOSERVICE_CONTRACTID);
+   if (!giovfs) {
+     return NS_ERROR_FAILURE;
+diff -up firefox-119.0/uriloader/exthandler/unix/nsOSHelperAppService.cpp.integration firefox-119.0/uriloader/exthandler/unix/nsOSHelperAppService.cpp
+--- firefox-119.0/uriloader/exthandler/unix/nsOSHelperAppService.cpp.integration	2023-10-19 21:54:42.000000000 +0200
++++ firefox-119.0/uriloader/exthandler/unix/nsOSHelperAppService.cpp	2023-10-31 08:59:03.722124870 +0100
+@@ -10,7 +10,7 @@
+ #include "nsOSHelperAppService.h"
+ #include "nsMIMEInfoUnix.h"
+ #ifdef MOZ_WIDGET_GTK
+-#  include "nsGNOMERegistry.h"
++#  include "nsCommonRegistry.h"
+ #  ifdef MOZ_BUILD_APP_IS_BROWSER
+ #    include "nsIToolkitShellService.h"
+ #    include "nsIGNOMEShellService.h"
+@@ -1106,7 +1106,7 @@ nsresult nsOSHelperAppService::OSProtoco
+   if (!XRE_IsContentProcess()) {
+ #ifdef MOZ_WIDGET_GTK
+     // Check the GNOME registry for a protocol handler
+-    *aHandlerExists = nsGNOMERegistry::HandlerExists(aProtocolScheme);
++    *aHandlerExists = nsCommonRegistry::HandlerExists(aProtocolScheme);
+ #else
+     *aHandlerExists = false;
+ #endif
+@@ -1126,7 +1126,7 @@ nsresult nsOSHelperAppService::OSProtoco
+ NS_IMETHODIMP nsOSHelperAppService::GetApplicationDescription(
+     const nsACString& aScheme, nsAString& _retval) {
+ #ifdef MOZ_WIDGET_GTK
+-  nsGNOMERegistry::GetAppDescForScheme(aScheme, _retval);
++  nsCommonRegistry::GetAppDescForScheme(aScheme, _retval);
+   return _retval.IsEmpty() ? NS_ERROR_NOT_AVAILABLE : NS_OK;
+ #else
+   return NS_ERROR_NOT_AVAILABLE;
+@@ -1231,7 +1231,7 @@ already_AddRefed<nsMIMEInfoBase> nsOSHel
+ #ifdef MOZ_WIDGET_GTK
+     LOG("Looking in GNOME registry\n");
+     RefPtr<nsMIMEInfoBase> gnomeInfo =
+-        nsGNOMERegistry::GetFromExtension(aFileExt);
++        nsCommonRegistry::GetFromExtension(aFileExt);
+     if (gnomeInfo) {
+       LOG("Got MIMEInfo from GNOME registry\n");
+       return gnomeInfo.forget();
+@@ -1344,7 +1344,7 @@ already_AddRefed<nsMIMEInfoBase> nsOSHel
+ 
+ #ifdef MOZ_WIDGET_GTK
+   if (handler.IsEmpty()) {
+-    RefPtr<nsMIMEInfoBase> gnomeInfo = nsGNOMERegistry::GetFromType(aMIMEType);
++    RefPtr<nsMIMEInfoBase> gnomeInfo = nsCommonRegistry::GetFromType(aMIMEType);
+     if (gnomeInfo) {
+       LOG("Got MIMEInfo from GNOME registry without extensions; setting them "
+           "to %s\n",
+diff -up firefox-119.0/widget/gtk/moz.build.integration firefox-119.0/widget/gtk/moz.build
+--- firefox-119.0/widget/gtk/moz.build.integration	2023-10-31 08:59:03.704124244 +0100
++++ firefox-119.0/widget/gtk/moz.build	2023-10-31 08:59:03.723124906 +0100
+@@ -161,6 +161,7 @@ LOCAL_INCLUDES += [
+     "/layout/xul",
+     "/other-licenses/atk-1.0",
+     "/third_party/cups/include",
++    "/toolkit/xre",
+     "/widget",
+     "/widget/headless",
+     "/widget/x11",
+diff -up firefox-119.0/widget/gtk/nsFilePicker.cpp.integration firefox-119.0/widget/gtk/nsFilePicker.cpp
+--- firefox-119.0/widget/gtk/nsFilePicker.cpp.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/widget/gtk/nsFilePicker.cpp	2023-10-31 08:59:03.723124906 +0100
+@@ -5,6 +5,7 @@
+ 
+ #include <dlfcn.h>
+ #include <gtk/gtk.h>
++#include <gdk/gdkx.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
+@@ -30,6 +31,8 @@
+ #include "WidgetUtilsGtk.h"
+ 
+ #include "nsFilePicker.h"
++#include "nsKDEUtils.h"
++#include "nsURLHelper.h"
+ 
+ #undef LOG
+ #ifdef MOZ_LOGGING
+@@ -310,7 +313,8 @@ NS_IMETHODIMP
+ nsFilePicker::AppendFilter(const nsAString& aTitle, const nsAString& aFilter) {
+   if (aFilter.EqualsLiteral("..apps")) {
+     // No platform specific thing we can do here, really....
+-    return NS_OK;
++    // Unless it's KDE.
++    if (mMode != modeOpen || !nsKDEUtils::kdeSupport()) return NS_OK;
+   }
+ 
+   nsAutoCString filter, name;
+@@ -420,6 +424,31 @@ nsFilePicker::Open(nsIFilePickerShownCal
+   // Can't show two dialogs concurrently with the same filepicker
+   if (mRunning) return NS_ERROR_NOT_AVAILABLE;
+ 
++  // KDE file picker is not handled via callback
++  if (nsKDEUtils::kdeSupport()) {
++    mCallback = aCallback;
++    mRunning = true;
++    NS_ADDREF_THIS();
++    g_idle_add(
++        [](gpointer data) -> gboolean {
++          nsFilePicker* queuedPicker = (nsFilePicker*)data;
++          nsIFilePicker::ResultCode result;
++          queuedPicker->kdeFileDialog(&result);
++          if (queuedPicker->mCallback) {
++            queuedPicker->mCallback->Done(result);
++            queuedPicker->mCallback = nullptr;
++          } else {
++            queuedPicker->mResult = result;
++          }
++          queuedPicker->mRunning = false;
++          NS_RELEASE(queuedPicker);
++          return G_SOURCE_REMOVE;
++        },
++        this);
++
++    return NS_OK;
++  }
++
+   NS_ConvertUTF16toUTF8 title(mTitle);
+ 
+   GtkWindow* parent_widget =
+@@ -701,6 +730,205 @@ void nsFilePicker::Done(void* file_choos
+   NS_RELEASE_THIS();
+ }
+ 
++nsCString nsFilePicker::kdeMakeFilter(int index) {
++  nsCString buf = mFilters[index];
++  for (PRUint32 i = 0; i < buf.Length(); ++i)
++    if (buf[i] == ';')  // KDE separates just using spaces
++      buf.SetCharAt(' ', i);
++  if (!mFilterNames[index].IsEmpty()) {
++    buf += "|";
++    buf += mFilterNames[index].get();
++  }
++  return buf;
++}
++
++static PRInt32 windowToXid(nsIWidget* widget) {
++  GtkWindow* parent_widget =
++      GTK_WINDOW(widget->GetNativeData(NS_NATIVE_SHELLWIDGET));
++  GdkWindow* gdk_window =
++      gtk_widget_get_window(gtk_widget_get_toplevel(GTK_WIDGET(parent_widget)));
++  return GDK_WINDOW_XID(gdk_window);
++}
++
++NS_IMETHODIMP nsFilePicker::kdeFileDialog(nsIFilePicker::ResultCode* aReturn) {
++  NS_ENSURE_ARG_POINTER(aReturn);
++
++  if (mMode == modeOpen && mFilters.Length() == 1 &&
++      mFilters[0].EqualsLiteral("..apps"))
++    return kdeAppsDialog(aReturn);
++
++  nsCString title;
++  title.Adopt(ToNewUTF8String(mTitle));
++
++  const char* arg = NULL;
++  if (mAllowURLs) {
++    switch (mMode) {
++      case nsIFilePicker::modeOpen:
++      case nsIFilePicker::modeOpenMultiple:
++        arg = "GETOPENURL";
++        break;
++      case nsIFilePicker::modeSave:
++        arg = "GETSAVEURL";
++        break;
++      case nsIFilePicker::modeGetFolder:
++        arg = "GETDIRECTORYURL";
++        break;
++    }
++  } else {
++    switch (mMode) {
++      case nsIFilePicker::modeOpen:
++      case nsIFilePicker::modeOpenMultiple:
++        arg = "GETOPENFILENAME";
++        break;
++      case nsIFilePicker::modeSave:
++        arg = "GETSAVEFILENAME";
++        break;
++      case nsIFilePicker::modeGetFolder:
++        arg = "GETDIRECTORYFILENAME";
++        break;
++    }
++  }
++
++  nsAutoCString directory;
++  if (mDisplayDirectory) {
++    mDisplayDirectory->GetNativePath(directory);
++  } else if (mPrevDisplayDirectory) {
++    mPrevDisplayDirectory->GetNativePath(directory);
++  }
++
++  nsAutoCString startdir;
++  if (!directory.IsEmpty()) {
++    startdir = directory;
++  }
++  if (mMode == nsIFilePicker::modeSave) {
++    if (!startdir.IsEmpty()) {
++      startdir += "/";
++      startdir += ToNewUTF8String(mDefault);
++    } else
++      startdir = ToNewUTF8String(mDefault);
++  }
++
++  nsAutoCString filters;
++  PRInt32 count = mFilters.Length();
++  if (count == 0)  // just in case
++    filters = "*";
++  else {
++    filters = kdeMakeFilter(0);
++    for (PRInt32 i = 1; i < count; ++i) {
++      filters += "\n";
++      filters += kdeMakeFilter(i);
++    }
++  }
++
++  nsTArray<nsCString> command;
++  command.AppendElement(nsAutoCString(arg));
++  command.AppendElement(startdir);
++  if (mMode != nsIFilePicker::modeGetFolder) {
++    command.AppendElement(filters);
++    nsAutoCString selected;
++    selected.AppendInt(mSelectedType);
++    command.AppendElement(selected);
++  }
++  command.AppendElement(title);
++  if (mMode == nsIFilePicker::modeOpenMultiple)
++    command.AppendElement("MULTIPLE"_ns);
++  if (PRInt32 xid = windowToXid(mParentWidget)) {
++    command.AppendElement("PARENT"_ns);
++    nsAutoCString parent;
++    parent.AppendInt(xid);
++    command.AppendElement(parent);
++  }
++
++  nsTArray<nsCString> output;
++  if (nsKDEUtils::commandBlockUi(
++          command,
++          GTK_WINDOW(mParentWidget->GetNativeData(NS_NATIVE_SHELLWIDGET)),
++          &output)) {
++    *aReturn = nsIFilePicker::returnOK;
++    mFiles.Clear();
++    if (mMode != nsIFilePicker::modeGetFolder) {
++      mSelectedType = atoi(output[0].get());
++      output.RemoveElementAt(0);
++    }
++    if (mMode == nsIFilePicker::modeOpenMultiple) {
++      mFileURL.Truncate();
++      PRUint32 count = output.Length();
++      for (PRUint32 i = 0; i < count; ++i) {
++        nsCOMPtr<nsIFile> localfile;
++        nsresult rv = NS_NewNativeLocalFile(output[i], PR_FALSE,
++                                            getter_AddRefs(localfile));
++        if (NS_SUCCEEDED(rv)) mFiles.AppendObject(localfile);
++      }
++    } else {
++      if (output.Length() == 0)
++        mFileURL = nsCString();
++      else if (mAllowURLs)
++        mFileURL = output[0];
++      else  // GetFile() actually requires it to be url even for local files :-/
++      {
++        nsCOMPtr<nsIFile> localfile;
++        nsresult rv = NS_NewNativeLocalFile(output[0], PR_FALSE,
++                                            getter_AddRefs(localfile));
++        if (NS_SUCCEEDED(rv))
++          rv = net_GetURLSpecFromActualFile(localfile, mFileURL);
++      }
++    }
++    // Remember last used directory.
++    nsCOMPtr<nsIFile> file;
++    GetFile(getter_AddRefs(file));
++    if (file) {
++      nsCOMPtr<nsIFile> dir;
++      file->GetParent(getter_AddRefs(dir));
++      nsCOMPtr<nsIFile> localDir(dir);
++      if (localDir) {
++        localDir.swap(mPrevDisplayDirectory);
++      }
++    }
++    if (mMode == nsIFilePicker::modeSave) {
++      nsCOMPtr<nsIFile> file;
++      GetFile(getter_AddRefs(file));
++      if (file) {
++        bool exists = false;
++        file->Exists(&exists);
++        if (exists)  // TODO do overwrite check in the helper app
++          *aReturn = nsIFilePicker::returnReplace;
++      }
++    }
++  } else {
++    *aReturn = nsIFilePicker::returnCancel;
++  }
++  return NS_OK;
++}
++
++NS_IMETHODIMP nsFilePicker::kdeAppsDialog(nsIFilePicker::ResultCode* aReturn) {
++  NS_ENSURE_ARG_POINTER(aReturn);
++
++  nsCString title;
++  title.Adopt(ToNewUTF8String(mTitle));
++
++  nsTArray<nsCString> command;
++  command.AppendElement("APPSDIALOG"_ns);
++  command.AppendElement(title);
++  if (PRInt32 xid = windowToXid(mParentWidget)) {
++    command.AppendElement("PARENT"_ns);
++    nsAutoCString parent;
++    parent.AppendInt(xid);
++    command.AppendElement(parent);
++  }
++
++  nsTArray<nsCString> output;
++  if (nsKDEUtils::commandBlockUi(
++          command,
++          GTK_WINDOW(mParentWidget->GetNativeData(NS_NATIVE_SHELLWIDGET)),
++          &output)) {
++    *aReturn = nsIFilePicker::returnOK;
++    mFileURL = output.Length() > 0 ? output[0] : nsCString();
++  } else {
++    *aReturn = nsIFilePicker::returnCancel;
++  }
++  return NS_OK;
++}
++
+ // All below functions available as of GTK 3.20+
+ void* nsFilePicker::GtkFileChooserNew(const gchar* title, GtkWindow* parent,
+                                       GtkFileChooserAction action,
+diff -up firefox-119.0/widget/gtk/nsFilePicker.h.integration firefox-119.0/widget/gtk/nsFilePicker.h
+--- firefox-119.0/widget/gtk/nsFilePicker.h.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/widget/gtk/nsFilePicker.h	2023-10-31 08:59:03.723124906 +0100
+@@ -76,6 +76,12 @@ class nsFilePicker : public nsBaseFilePi
+  private:
+   static nsIFile* mPrevDisplayDirectory;
+ 
++  bool kdeRunning();
++  bool getKdeRunning();
++  NS_IMETHODIMP kdeFileDialog(nsIFilePicker::ResultCode* aReturn);
++  NS_IMETHODIMP kdeAppsDialog(nsIFilePicker::ResultCode* aReturn);
++  nsCString kdeMakeFilter(int index);
++
+   void* GtkFileChooserNew(const gchar* title, GtkWindow* parent,
+                           GtkFileChooserAction action,
+                           const gchar* accept_label);
+diff -up firefox-119.0/xpcom/components/ManifestParser.cpp.integration firefox-119.0/xpcom/components/ManifestParser.cpp
+--- firefox-119.0/xpcom/components/ManifestParser.cpp.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/xpcom/components/ManifestParser.cpp	2023-10-31 08:59:03.723124906 +0100
+@@ -43,6 +43,7 @@
+ #include "nsIScriptError.h"
+ #include "nsIXULAppInfo.h"
+ #include "nsIXULRuntime.h"
++#include "nsKDEUtils.h"
+ 
+ using namespace mozilla;
+ 
+@@ -394,6 +395,7 @@ void ParseManifest(NSLocationType aType,
+   constexpr auto kOs = u"os"_ns;
+   constexpr auto kOsVersion = u"osversion"_ns;
+   constexpr auto kABI = u"abi"_ns;
++  constexpr auto kDesktop = u"desktop"_ns;
+   constexpr auto kProcess = u"process"_ns;
+ #if defined(MOZ_WIDGET_ANDROID)
+   constexpr auto kTablet = u"tablet"_ns;
+@@ -453,6 +455,7 @@ void ParseManifest(NSLocationType aType,
+   }
+ 
+   nsAutoString osVersion;
++  nsAutoString desktop;
+ #if defined(XP_WIN)
+ #  pragma warning(push)
+ #  pragma warning(disable : 4996)  // VC12+ deprecates GetVersionEx
+@@ -461,14 +464,17 @@ void ParseManifest(NSLocationType aType,
+     nsTextFormatter::ssprintf(osVersion, u"%ld.%ld", info.dwMajorVersion,
+                               info.dwMinorVersion);
+   }
++  desktop = u"win"_ns;
+ #  pragma warning(pop)
+ #elif defined(MOZ_WIDGET_COCOA)
+   SInt32 majorVersion = nsCocoaFeatures::macOSVersionMajor();
+   SInt32 minorVersion = nsCocoaFeatures::macOSVersionMinor();
+   nsTextFormatter::ssprintf(osVersion, u"%ld.%ld", majorVersion, minorVersion);
++  desktop = u"macosx"_ns);
+ #elif defined(MOZ_WIDGET_GTK)
+   nsTextFormatter::ssprintf(osVersion, u"%ld.%ld", gtk_major_version,
+                             gtk_minor_version);
++  desktop = nsKDEUtils::kdeSession() ? u"kde"_ns : u"gnome"_ns;
+ #elif defined(MOZ_WIDGET_ANDROID)
+   bool isTablet = false;
+   if (jni::IsAvailable()) {
+@@ -476,6 +482,7 @@ void ParseManifest(NSLocationType aType,
+     osVersion.Assign(release->ToString());
+     isTablet = java::GeckoAppShell::IsTablet();
+   }
++  desktop = u"android"_ns;
+ #endif
+ 
+   if (XRE_IsContentProcess()) {
+@@ -576,6 +583,7 @@ void ParseManifest(NSLocationType aType,
+                                     : eUnspecified;
+ #endif
+     int flags = 0;
++    TriState stDesktop = eUnspecified;
+ 
+     while ((token = nsCRT::strtok(whitespace, kWhitespace, &whitespace)) &&
+            ok) {
+@@ -585,6 +593,7 @@ void ParseManifest(NSLocationType aType,
+       if (CheckStringFlag(kApplication, wtoken, appID, stApp) ||
+           CheckOsFlag(kOs, wtoken, osTarget, stOs) ||
+           CheckStringFlag(kABI, wtoken, abi, stABI) ||
++          CheckStringFlag(kDesktop, wtoken, desktop, stDesktop) ||
+           CheckStringFlag(kProcess, wtoken, process, stProcess) ||
+           CheckVersionFlag(kOsVersion, wtoken, osVersion, stOsVersion) ||
+           CheckVersionFlag(kAppVersion, wtoken, appVersion, stAppVersion) ||
+@@ -644,6 +653,7 @@ void ParseManifest(NSLocationType aType,
+ 
+     if (!ok || stApp == eBad || stAppVersion == eBad ||
+         stGeckoVersion == eBad || stOs == eBad || stOsVersion == eBad ||
++        stDesktop == eBad ||
+ #ifdef MOZ_WIDGET_ANDROID
+         stTablet == eBad ||
+ #endif
+diff -up firefox-119.0/xpcom/components/moz.build.integration firefox-119.0/xpcom/components/moz.build
+--- firefox-119.0/xpcom/components/moz.build.integration	2023-10-19 21:54:44.000000000 +0200
++++ firefox-119.0/xpcom/components/moz.build	2023-10-31 08:59:03.723124906 +0100
+@@ -71,6 +71,7 @@ LOCAL_INCLUDES += [
+     "/js/xpconnect/loader",
+     "/layout/build",
+     "/modules/libjar",
++    "/toolkit/xre",
+ ]
+ 
+ if CONFIG["MOZ_WIDGET_TOOLKIT"] == "gtk":
+diff -up firefox-119.0/xpcom/io/nsLocalFileUnix.cpp.integration firefox-119.0/xpcom/io/nsLocalFileUnix.cpp
+--- firefox-119.0/xpcom/io/nsLocalFileUnix.cpp.integration	2023-10-19 21:54:43.000000000 +0200
++++ firefox-119.0/xpcom/io/nsLocalFileUnix.cpp	2023-10-31 08:59:03.724124940 +0100
+@@ -51,6 +51,7 @@
+ 
+ #ifdef MOZ_WIDGET_GTK
+ #  include "nsIGIOService.h"
++#  include "nsKDEUtils.h"
+ #endif
+ 
+ #ifdef MOZ_WIDGET_COCOA
+@@ -2172,10 +2173,18 @@ nsLocalFile::Reveal() {
+   }
+ 
+ #ifdef MOZ_WIDGET_GTK
++  nsAutoCString url;
+   nsCOMPtr<nsIGIOService> giovfs = do_GetService(NS_GIOSERVICE_CONTRACTID);
+-  if (!giovfs) {
+-    return NS_ERROR_FAILURE;
++  url = mPath;
++  if (nsKDEUtils::kdeSupport()) {
++    nsTArray<nsCString> command;
++    command.AppendElement("REVEAL"_ns);
++    command.AppendElement(mPath);
++    return nsKDEUtils::command(command) ? NS_OK : NS_ERROR_FAILURE;
+   }
++
++  if (!giovfs) return NS_ERROR_FAILURE;
++
+   return giovfs->RevealFile(this);
+ #elif defined(MOZ_WIDGET_COCOA)
+   CFURLRef url;
+@@ -2197,6 +2206,13 @@ nsLocalFile::Launch() {
+   }
+ 
+ #ifdef MOZ_WIDGET_GTK
++  if (nsKDEUtils::kdeSupport()) {
++    nsTArray<nsCString> command;
++    command.AppendElement("OPEN"_ns);
++    command.AppendElement(mPath);
++    return nsKDEUtils::command(command) ? NS_OK : NS_ERROR_FAILURE;
++  }
++
+   nsCOMPtr<nsIGIOService> giovfs = do_GetService(NS_GIOSERVICE_CONTRACTID);
+   if (!giovfs) {
+     return NS_ERROR_FAILURE;

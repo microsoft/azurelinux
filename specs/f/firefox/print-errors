@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+# Print failed tests
+
+TEST_DIR=$1
+TEST_FLAVOUR=$2
+
+grep "TEST-UNEXPECTED-FAIL" $TEST_DIR/mochitest$TEST_FLAVOUR 2>&1 > failures-mochitest$TEST_FLAVOUR.txt
+grep --text -e "  FAIL " -e "  TIMEOUT " $TEST_DIR/xpcshell$TEST_FLAVOUR 2>&1 > failures-xpcshell$TEST_FLAVOUR.txt
+grep --text -e "REFTEST TEST-UNEXPECTED-PASS" -e "REFTEST TEST-UNEXPECTED-FAIL" $TEST_DIR/reftest$TEST_FLAVOUR 2>&1 > failures-reftest$TEST_FLAVOUR.txt

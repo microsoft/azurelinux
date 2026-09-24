@@ -1,0 +1,12 @@
+diff -up firefox-133.0/widget/gtk/nsWindow.cpp.1196777 firefox-133.0/widget/gtk/nsWindow.cpp
+--- firefox-133.0/widget/gtk/nsWindow.cpp.1196777	2024-11-22 09:32:52.293470407 +0100
++++ firefox-133.0/widget/gtk/nsWindow.cpp	2024-11-22 10:21:54.996441520 +0100
+@@ -191,7 +191,7 @@ constexpr gint kEvents =
+     GDK_VISIBILITY_NOTIFY_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
+     GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_SMOOTH_SCROLL_MASK |
+     GDK_TOUCH_MASK | GDK_SCROLL_MASK | GDK_POINTER_MOTION_MASK |
+-    GDK_PROPERTY_CHANGE_MASK;
++    GDK_PROPERTY_CHANGE_MASK | GDK_FOCUS_CHANGE_MASK;
+ 
+ /* utility functions */
+ static bool is_mouse_in_window(GdkWindow* aWindow, gdouble aMouseX,

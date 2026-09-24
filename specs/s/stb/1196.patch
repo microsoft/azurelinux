@@ -1,0 +1,22 @@
+From 49c16b0c2a4efa72d0ce6ea05d3fa7d9e8fc6cba Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 19 Aug 2021 12:57:27 -0400
+Subject: [PATCH] Add missing initializer braces in stb_easy_font.h
+
+---
+ stb_easy_font.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/stb_easy_font.h b/stb_easy_font.h
+index b66325847b..5f7511560a 100644
+--- a/stb_easy_font.h
++++ b/stb_easy_font.h
+@@ -202,7 +202,7 @@ static int stb_easy_font_print(float x, float y, char *text, unsigned char color
+     float start_x = x;
+     int offset = 0;
+ 
+-    stb_easy_font_color c = { 255,255,255,255 }; // use structure copying to avoid needing depending on memcpy()
++    stb_easy_font_color c = { { 255,255,255,255 } }; // use structure copying to avoid needing depending on memcpy()
+     if (color) { c.c[0] = color[0]; c.c[1] = color[1]; c.c[2] = color[2]; c.c[3] = color[3]; }
+ 
+     while (*text && offset < vbuf_size) {

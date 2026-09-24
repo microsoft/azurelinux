@@ -1,0 +1,273 @@
+diff -up firefox-155.0/gfx/gl/gtest/moz.build.D318191 firefox-155.0/gfx/gl/gtest/moz.build
+--- firefox-155.0/gfx/gl/gtest/moz.build.D318191	2026-08-26 23:11:41.000000000 +0200
++++ firefox-155.0/gfx/gl/gtest/moz.build	2026-08-27 11:24:19.402580859 +0200
+@@ -6,8 +6,15 @@ LOCAL_INCLUDES += [
+     "/gfx/gl",
+ ]
+ 
++include("/ipc/chromium/chromium-config.mozbuild")
++
+ UNIFIED_SOURCES += [
+     "TestColorspaces.cpp",
+ ]
+ 
++if CONFIG["MOZ_WIDGET_TOOLKIT"] == "gtk":
++    UNIFIED_SOURCES += [
++        "TestMozFramebuffer.cpp",
++    ]
++
+ FINAL_LIBRARY = "xul-gtest"
+diff -up firefox-155.0/gfx/gl/gtest/TestMozFramebuffer.cpp.D318191 firefox-155.0/gfx/gl/gtest/TestMozFramebuffer.cpp
+--- firefox-155.0/gfx/gl/gtest/TestMozFramebuffer.cpp.D318191	2026-08-27 11:24:19.402718907 +0200
++++ firefox-155.0/gfx/gl/gtest/TestMozFramebuffer.cpp	2026-08-27 11:24:19.402718907 +0200
+@@ -0,0 +1,82 @@
++/* This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
++
++#include "GLContext.h"
++#include "GLContextProvider.h"
++#include "MozFramebuffer.h"
++#include "ScopedGLHelpers.h"
++#include "gfxPlatform.h"
++#include "gtest/gtest.h"
++
++namespace mozilla::gl {
++
++static already_AddRefed<GLContext> CreateTestContext(
++    nsACString* const aFailureId) {
++  return GLContextProvider::CreateHeadless({}, aFailureId);
++}
++
++TEST(MozFramebuffer, OwnedColorBackingIsDeletedWithFramebuffer)
++{
++  gfxPlatform::GetPlatform();
++
++  nsCString failureId;
++  RefPtr<GLContext> gl = CreateTestContext(&failureId);
++  ASSERT_TRUE(gl)
++  << failureId.get();
++  ASSERT_TRUE(gl->MakeCurrent());
++
++  const gfx::IntSize size(16, 16);
++  GLuint texture = gl->CreateTexture();
++  {
++    const ScopedBindTexture bindTexture(gl, texture);
++    gl->TexParams_SetClampNoMips(LOCAL_GL_TEXTURE_2D);
++    gl->fTexImage2D(LOCAL_GL_TEXTURE_2D, 0, LOCAL_GL_RGBA, size.width,
++                    size.height, 0, LOCAL_GL_RGBA, LOCAL_GL_UNSIGNED_BYTE,
++                    nullptr);
++  }
++  ASSERT_TRUE(gl->fIsTexture(texture));
++
++  {
++    auto framebuffer = MozFramebuffer::CreateForBacking(
++        gl, size, 0, false, false, LOCAL_GL_TEXTURE_2D, texture);
++    ASSERT_TRUE(framebuffer);
++  }
++
++  EXPECT_FALSE(gl->fIsTexture(texture));
++}
++
++TEST(MozFramebuffer, BorrowedColorBackingSurvivesFramebufferDestruction)
++{
++  gfxPlatform::GetPlatform();
++
++  nsCString failureId;
++  RefPtr<GLContext> gl = CreateTestContext(&failureId);
++  ASSERT_TRUE(gl)
++  << failureId.get();
++  ASSERT_TRUE(gl->MakeCurrent());
++
++  const gfx::IntSize size(16, 16);
++  GLuint texture = gl->CreateTexture();
++  {
++    const ScopedBindTexture bindTexture(gl, texture);
++    gl->TexParams_SetClampNoMips(LOCAL_GL_TEXTURE_2D);
++    gl->fTexImage2D(LOCAL_GL_TEXTURE_2D, 0, LOCAL_GL_RGBA, size.width,
++                    size.height, 0, LOCAL_GL_RGBA, LOCAL_GL_UNSIGNED_BYTE,
++                    nullptr);
++  }
++  ASSERT_TRUE(gl->fIsTexture(texture));
++
++  {
++    auto framebuffer = MozFramebuffer::CreateForBacking(
++        gl, size, 0, false, false, LOCAL_GL_TEXTURE_2D, texture,
++        MozFramebuffer::ColorBackingOwnership::Borrowed);
++    ASSERT_TRUE(framebuffer);
++    EXPECT_EQ(framebuffer->ColorTex(), texture);
++  }
++
++  EXPECT_TRUE(gl->fIsTexture(texture));
++  gl->DeleteTexture(texture);
++}
++
++}  // namespace mozilla::gl
+diff -up firefox-155.0/gfx/gl/MozFramebuffer.cpp.D318191 firefox-155.0/gfx/gl/MozFramebuffer.cpp
+--- firefox-155.0/gfx/gl/MozFramebuffer.cpp.D318191	2026-08-26 23:11:40.000000000 +0200
++++ firefox-155.0/gfx/gl/MozFramebuffer.cpp	2026-08-27 11:29:08.891005510 +0200
+@@ -69,37 +69,41 @@ UniquePtr<MozFramebuffer> MozFramebuffer
+                     (depth || stencil) ? DepthAndStencilBuffer::Create(
+                                              gl, size, samples, depth, stencil)
+                                        : nullptr,
+-                    colorTarget, colorName);
++                    colorTarget, colorName,
++                    ColorBackingOwnership::Owned);
+ }
+ 
+ UniquePtr<MozFramebuffer> MozFramebuffer::CreateForBacking(
+     GLContext* const gl, const gfx::IntSize& size, const uint32_t samples,
+     bool depth, bool stencil, const GLenum colorTarget,
+-    const GLuint colorName) {
++    const GLuint colorName,
++    ColorBackingOwnership colorBackingOwnership) {
+   return CreateImpl(gl, size, samples,
+                     (depth || stencil) ? DepthAndStencilBuffer::Create(
+                                              gl, size, samples, depth, stencil)
+                                        : nullptr,
+-                    colorTarget, colorName);
++                    colorTarget, colorName, colorBackingOwnership);
+ }
+ 
+ /* static */ UniquePtr<MozFramebuffer>
+ MozFramebuffer::CreateForBackingWithSharedDepthAndStencil(
+     const gfx::IntSize& size, const uint32_t samples, GLenum colorTarget,
+     GLuint colorName,
+-    const RefPtr<DepthAndStencilBuffer>& depthAndStencilBuffer) {
++    const RefPtr<DepthAndStencilBuffer>& depthAndStencilBuffer,
++    ColorBackingOwnership colorBackingOwnership) {
+   auto gl = depthAndStencilBuffer->gl();
+   if (!gl || !gl->MakeCurrent()) {
+     return nullptr;
+   }
+   return CreateImpl(gl, size, samples, depthAndStencilBuffer, colorTarget,
+-                    colorName);
++                    colorName, colorBackingOwnership);
+ }
+ 
+ /* static */ UniquePtr<MozFramebuffer> MozFramebuffer::CreateImpl(
+     GLContext* const gl, const gfx::IntSize& size, const uint32_t samples,
+     const RefPtr<DepthAndStencilBuffer>& depthAndStencilBuffer,
+-    const GLenum colorTarget, const GLuint colorName) {
++    const GLenum colorTarget, const GLuint colorName,
++    ColorBackingOwnership colorBackingOwnership) {
+   GLuint fb = gl->CreateFramebuffer();
+   const ScopedBindFramebuffer bindFB(gl, fb);
+ 
+@@ -137,7 +141,8 @@ MozFramebuffer::CreateForBackingWithShar
+   }
+ 
+   return UniquePtr<MozFramebuffer>(new MozFramebuffer(
+-      gl, size, fb, samples, depthAndStencilBuffer, colorTarget, colorName));
++      gl, size, fb, samples, depthAndStencilBuffer, colorTarget, colorName,
++      colorBackingOwnership));
+ }
+ 
+ /* static */ RefPtr<DepthAndStencilBuffer> DepthAndStencilBuffer::Create(
+@@ -187,14 +192,16 @@ MozFramebuffer::CreateForBackingWithShar
+ MozFramebuffer::MozFramebuffer(
+     GLContext* const gl, const gfx::IntSize& size, GLuint fb,
+     const uint32_t samples, RefPtr<DepthAndStencilBuffer> depthAndStencilBuffer,
+-    const GLenum colorTarget, const GLuint colorName)
++    const GLenum colorTarget, const GLuint colorName,
++    ColorBackingOwnership colorBackingOwnership)
+     : mWeakGL(gl),
+       mSize(size),
+       mSamples(samples),
+       mFB(fb),
+       mColorTarget(colorTarget),
+       mDepthAndStencilBuffer(std::move(depthAndStencilBuffer)),
+-      mColorName(colorName) {
++      mColorName(colorName),
++      mColorBackingOwnership(colorBackingOwnership) {
+   MOZ_ASSERT(mColorTarget);
+   MOZ_ASSERT(mColorName);
+ }
+@@ -207,7 +214,9 @@ MozFramebuffer::~MozFramebuffer() {
+ 
+   gl->DeleteFramebuffer(mFB);
+ 
+-  DeleteByTarget(gl, mColorTarget, mColorName);
++  if (mColorBackingOwnership == ColorBackingOwnership::Owned) {
++    DeleteByTarget(gl, mColorTarget, mColorName);
++  }
+ }
+ 
+ bool MozFramebuffer::HasDepth() const {
+diff -up firefox-155.0/gfx/gl/MozFramebuffer.h.D318191 firefox-155.0/gfx/gl/MozFramebuffer.h
+--- firefox-155.0/gfx/gl/MozFramebuffer.h.D318191	2026-08-26 23:11:41.000000000 +0200
++++ firefox-155.0/gfx/gl/MozFramebuffer.h	2026-08-27 11:26:51.124546166 +0200
+@@ -43,7 +43,13 @@ class DepthAndStencilBuffer final : publ
+ };
+ 
+ class MozFramebuffer final {
++ public:
++  // A borrowed color backing must outlive the MozFramebuffer that wraps it.
++  enum class ColorBackingOwnership { Owned, Borrowed };
++
++ private:
+   const WeakPtr<GLContext> mWeakGL;
++  const ColorBackingOwnership mColorBackingOwnership;
+ 
+  public:
+   const gfx::IntSize mSize;
+@@ -66,7 +72,9 @@ class MozFramebuffer final {
+   // Assumes that gl is the current context.
+   static UniquePtr<MozFramebuffer> CreateForBacking(
+       GLContext* gl, const gfx::IntSize& size, uint32_t samples, bool depth,
+-      bool stencil, GLenum colorTarget, GLuint colorName);
++      bool stencil, GLenum colorTarget, GLuint colorName,
++      ColorBackingOwnership colorBackingOwnership =
++      ColorBackingOwnership::Owned);
+ 
+   // Create a new framebuffer backed by an existing texture or buffer.
+   // Use the same GLContext, size, and samples as framebufferToShareWith.
+@@ -76,19 +84,23 @@ class MozFramebuffer final {
+   static UniquePtr<MozFramebuffer> CreateForBackingWithSharedDepthAndStencil(
+       const gfx::IntSize& size, const uint32_t samples, GLenum colorTarget,
+       GLuint colorName,
+-      const RefPtr<DepthAndStencilBuffer>& depthAndStencilBuffer);
++      const RefPtr<DepthAndStencilBuffer>& depthAndStencilBuffer,
++      ColorBackingOwnership colorBackingOwnership =
++          ColorBackingOwnership::Owned);
+ 
+  private:
+   MozFramebuffer(GLContext* gl, const gfx::IntSize& size, GLuint fb,
+                  uint32_t samples,
+                  RefPtr<DepthAndStencilBuffer> depthAndStencilBuffer,
+-                 GLenum colorTarget, GLuint colorName);
++                 GLenum colorTarget, GLuint colorName,
++                 ColorBackingOwnership colorBackingOwnership);
+ 
+   // gl must be the current context when this is called.
+   static UniquePtr<MozFramebuffer> CreateImpl(
+       GLContext* const gl, const gfx::IntSize& size, const uint32_t samples,
+       const RefPtr<DepthAndStencilBuffer>& depthAndStencilBuffer,
+-      const GLenum colorTarget, const GLuint colorName);
++      const GLenum colorTarget, const GLuint colorName,
++      ColorBackingOwnership colorBackingOwnership);
+ 
+  public:
+   ~MozFramebuffer();
+diff -up firefox-155.0/gfx/layers/SurfacePoolWayland.cpp.D318191 firefox-155.0/gfx/layers/SurfacePoolWayland.cpp
+--- firefox-155.0/gfx/layers/SurfacePoolWayland.cpp.D318191	2026-08-26 23:11:40.000000000 +0200
++++ firefox-155.0/gfx/layers/SurfacePoolWayland.cpp	2026-08-27 11:30:02.112072624 +0200
+@@ -296,7 +296,8 @@ UniquePtr<MozFramebuffer> SurfacePoolWay
+     // framebuffer that shares it.
+     if (auto buffer = GetDepthBufferForSharing(aProofOfLock, aGL, aSize)) {
+       return MozFramebuffer::CreateForBackingWithSharedDepthAndStencil(
+-          aSize, 0, LOCAL_GL_TEXTURE_2D, aTexture, buffer);
++          aSize, 0, LOCAL_GL_TEXTURE_2D, aTexture, buffer,
++          MozFramebuffer::ColorBackingOwnership::Borrowed);
+     }
+   }
+ 
+@@ -305,7 +306,7 @@ UniquePtr<MozFramebuffer> SurfacePoolWay
+   // mDepthBuffers.
+   UniquePtr<MozFramebuffer> fb = MozFramebuffer::CreateForBacking(
+       aGL, aSize, 0, aNeedsDepthBuffer, aNeedsDepthBuffer, LOCAL_GL_TEXTURE_2D,
+-      aTexture);
++      aTexture, MozFramebuffer::ColorBackingOwnership::Borrowed);
+   if (fb && fb->GetDepthAndStencilBuffer()) {
+     mDepthBuffers.AppendElement(
+         DepthBufferEntry{aGL, aSize, fb->GetDepthAndStencilBuffer().get()});
