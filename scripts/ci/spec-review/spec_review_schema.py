@@ -30,6 +30,7 @@ class Finding(BaseModel):
     @field_validator("citation", mode="before")
     @classmethod
     def normalize_citation(cls, v: str | None) -> str | None:
+        """Normalize empty citation markers to ``None``."""
         if v in (None, "N/A", "n/a", ""):
             return None
         return v
@@ -45,6 +46,7 @@ class SpecReview(BaseModel):
 
     @property
     def spec_name(self) -> str:
+        """Return the spec file's base name."""
         return Path(self.spec_file).name
 
 
@@ -55,26 +57,32 @@ class SpecReviewReport(BaseModel):
 
     @classmethod
     def from_file(cls, path: str | Path) -> SpecReviewReport:
+        """Load and validate a report from a JSON file."""
         with open(path, encoding="utf-8") as f:
             return cls.model_validate(json.load(f))
 
     @property
     def total_errors(self) -> int:
+        """Return the total number of errors."""
         return sum(len(r.errors) for r in self.spec_reviews)
 
     @property
     def total_warnings(self) -> int:
+        """Return the total number of warnings."""
         return sum(len(r.warnings) for r in self.spec_reviews)
 
     @property
     def total_suggestions(self) -> int:
+        """Return the total number of suggestions."""
         return sum(len(r.suggestions) for r in self.spec_reviews)
 
     @property
     def has_errors(self) -> bool:
+        """Return whether the report contains errors."""
         return self.total_errors > 0
 
     def print_summary(self):
+        """Print aggregate finding counts."""
         status = "ERRORS FOUND" if self.has_errors else "No errors"
         print(f"{status}")
         print(
@@ -82,6 +90,7 @@ class SpecReviewReport(BaseModel):
         )
 
     def print_errors(self):
+        """Print all error findings."""
         for review in self.spec_reviews:
             if review.errors:
                 print(f"\n{review.spec_name}:")
@@ -91,6 +100,7 @@ class SpecReviewReport(BaseModel):
                         print(f"     {e.citation}")
 
     def print_warnings(self):
+        """Print all warning findings."""
         for review in self.spec_reviews:
             if review.warnings:
                 print(f"\n{review.spec_name}:")
@@ -100,6 +110,7 @@ class SpecReviewReport(BaseModel):
                         print(f"     {w.citation}")
 
     def print_suggestions(self):
+        """Print all suggestion findings."""
         for review in self.spec_reviews:
             if review.suggestions:
                 print(f"\n{review.spec_name}:")
@@ -109,6 +120,7 @@ class SpecReviewReport(BaseModel):
                         print(f"     {s.citation}")
 
     def to_summary_dict(self) -> dict:
+        """Return aggregate finding counts as a dictionary."""
         return {
             "specs": len(self.spec_reviews),
             "errors": self.total_errors,

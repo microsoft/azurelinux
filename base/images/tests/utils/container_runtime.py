@@ -53,19 +53,19 @@ class ContainerExecResult(NamedTuple):
 class ExecShell(Protocol):
     """Run a shell command string inside a test container."""
 
-    def __call__(self, command: str, *, shell: str = "bash") -> ContainerExecResult: ...
+    def __call__(self, command: str, *, shell: str = "bash") -> ContainerExecResult: ...  # noqa: D102 - contract documented by protocol class
 
 
 class WriteFile(Protocol):
     """Write file content into a test container (trailing newline normalized)."""
 
-    def __call__(self, path: str, content: str) -> ContainerExecResult: ...
+    def __call__(self, path: str, content: str) -> ContainerExecResult: ...  # noqa: D102 - contract documented by protocol class
 
 
 class WaitForHttp(Protocol):
     """Poll an in-container HTTP endpoint until it responds, or raise on timeout."""
 
-    def __call__(
+    def __call__(  # noqa: D102 - contract documented by protocol class
         self,
         url: str,
         *,
@@ -79,7 +79,7 @@ class WaitForHttp(Protocol):
 class AssertHttpServer(Protocol):
     """Start an HTTP server in the container, wait for it, and assert the response body."""
 
-    def __call__(
+    def __call__(  # noqa: D102 - contract documented by protocol class
         self,
         start_command: str,
         url: str,

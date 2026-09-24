@@ -152,6 +152,7 @@ class InputRepo:
     origin: str  # 'prefix' (404 silent) | 'explicit' (404 fatal)
 
     def cache_key(self) -> str:
+        """Return a stable filesystem-safe cache key."""
         # Stable, filesystem-safe; uniqueness comes from the full URL.
         safe = self.url.replace("://", "_").replace("/", "_").replace(":", "_")
         return f"{self.kind}-{self.arch}-{safe}"
@@ -795,6 +796,7 @@ class Destination:
     arch: str  # x86_64 | aarch64 | src
 
     def relpath(self) -> str:
+        """Return the destination path relative to the repository root."""
         if self.kind == KIND_MAIN:
             return f"{self.channel}/{self.arch}"
         if self.kind == KIND_DEBUGINFO:
