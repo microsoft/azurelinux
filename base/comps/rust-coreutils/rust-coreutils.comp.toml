@@ -109,20 +109,27 @@ value = "clang-devel"
 # expected doc/license files so those (otherwise unused in AZL) subpackages
 # still build. A follow-up should drop these subpackages entirely via a local
 # spec since AZL does not consume `crate(...)` BuildRequires.
+#
+# Anchored on the last upstream %install line rather than appended: upstream
+# closes %install with a bare `%if %{with check}` whose %endif lives past the
+# end of %check, so anything appended to the section lands inside that
+# conditional and silently disappears from a --without check build.
 [[components.rust-coreutils.overlays]]
 description = "Stub %{crate_instdir} so the inherited rust2rpm -devel subpackages can build under vendor mode"
-type = "spec-append-lines"
+type = "spec-search-replace"
 section = "%install"
-lines = [
-    "# Azure Linux: vendor-mode %%cargo_install skips the crate source copy.",
-    "# Stub the files referenced by the inherited rust2rpm devel subpackages.",
-    "mkdir -p %{buildroot}%{crate_instdir}",
-    "for f in LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md DEVELOPMENT.md README.md README.package.md SECURITY.md; do",
-    "    install -m 0644 \"$f\" %{buildroot}%{crate_instdir}/\"$f\"",
-    "done",
-    "# Placeholder for the %ghost Cargo.toml referenced by +<feature>-devel subpackages.",
-    "touch %{buildroot}%{crate_instdir}/Cargo.toml",
-]
+regex = '^rm %\{buildroot\}%\{_bindir\}/uudoc$'
+replacement = '''
+rm %{buildroot}%{_bindir}/uudoc
+
+# Azure Linux: vendor-mode %%cargo_install skips the crate source copy.
+# Stub the files referenced by the inherited rust2rpm devel subpackages.
+mkdir -p %{buildroot}%{crate_instdir}
+for f in LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md DEVELOPMENT.md README.md README.package.md SECURITY.md; do
+    install -m 0644 "$f" %{buildroot}%{crate_instdir}/"$f"
+done
+# Placeholder for the %ghost Cargo.toml referenced by +<feature>-devel subpackages.
+touch %{buildroot}%{crate_instdir}/Cargo.toml'''
 
 # Strip the stale 0.7.0 entry from Fedora's `sources` lookaside file. The
 # 0.12.0 entry is appended by the `source-files` block below; without this
@@ -202,29 +209,35 @@ type = "spec-insert-tag"
 tag = "Source4"
 value = "uutils-coreutils.fish"
 
+# Anchored on the last upstream %install line for the same reason as the
+# %{crate_instdir} stub overlay above: appending to %install would place these
+# lines inside upstream's trailing `%if %{with check}`, while %files lists the
+# resulting paths unconditionally.
 [[components.rust-coreutils.overlays]]
 description = "Create plain-named uutils symlinks in /usr/lib/uutils/bin and install the per-shell PATH profile snippets"
-type = "spec-append-lines"
+type = "spec-search-replace"
 section = "%install"
-lines = [
-    "# Azure Linux: expose uutils utilities under plain names in a private",
-    "# directory so the profile snippets can put them first on PATH without",
-    "# colliding with the GNU coreutils files in %{_bindir}. Link to the shipped",
-    "# uu_* entries, which is robust to the upstream layout (multicall binary,",
-    "# shell wrapper, or standalone binaries).",
-    "install -d %{buildroot}%{_prefix}/lib/uutils/bin",
-    "for _uu in %{buildroot}%{_bindir}/uu_*; do",
-    "    _base=$(basename \"$_uu\")",
-    "    ln -sr \"$_uu\" \"%{buildroot}%{_prefix}/lib/uutils/bin/${_base#uu_}\"",
-    "done",
-    "# PATH indirection profiles so uutils is the default for interactive shells.",
-    "install -d %{buildroot}%{_sysconfdir}/profile.d",
-    "install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/profile.d/uutils-coreutils.sh",
-    "install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/profile.d/uutils-coreutils.csh",
-    "# fish reads vendor conf.d snippets automatically.",
-    "install -d %{buildroot}%{_datadir}/fish/vendor_conf.d",
-    "install -m 0644 %{SOURCE4} %{buildroot}%{_datadir}/fish/vendor_conf.d/uutils-coreutils.fish",
-]
+regex = '^rm %\{buildroot\}%\{_bindir\}/uudoc$'
+replacement = '''
+rm %{buildroot}%{_bindir}/uudoc
+
+# Azure Linux: expose uutils utilities under plain names in a private
+# directory so the profile snippets can put them first on PATH without
+# colliding with the GNU coreutils files in %{_bindir}. Link to the shipped
+# uu_* entries, which is robust to the upstream layout (multicall binary,
+# shell wrapper, or standalone binaries).
+install -d %{buildroot}%{_prefix}/lib/uutils/bin
+for _uu in %{buildroot}%{_bindir}/uu_*; do
+    _base=$(basename "$_uu")
+    ln -sr "$_uu" "%{buildroot}%{_prefix}/lib/uutils/bin/${_base#uu_}"
+done
+# PATH indirection profiles so uutils is the default for interactive shells.
+install -d %{buildroot}%{_sysconfdir}/profile.d
+install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/profile.d/uutils-coreutils.sh
+install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/profile.d/uutils-coreutils.csh
+# fish reads vendor conf.d snippets automatically.
+install -d %{buildroot}%{_datadir}/fish/vendor_conf.d
+install -m 0644 %{SOURCE4} %{buildroot}%{_datadir}/fish/vendor_conf.d/uutils-coreutils.fish'''
 
 [[components.rust-coreutils.overlays]]
 description = "Own the private uutils bin dir and the per-shell profile snippets in the uutils-coreutils package"
