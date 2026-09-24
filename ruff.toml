@@ -21,6 +21,10 @@ ignore = [
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
     "S607",   # Requiring abspath for all binaries used is very restrictive
     "T201",   # These scripts are fine to use `print` for output
+    # Detailed exception messages belong beside the condition that raises
+    # them; moving each message into a one-off exception class adds code
+    # without improving error handling or the public exception boundary.
+    "TRY003",
 ]
 
 # We want D401 still, even though google style omits it.
