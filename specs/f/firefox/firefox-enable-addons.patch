@@ -1,0 +1,13 @@
+diff -up firefox-125.0/browser/app/profile/firefox.js.addons firefox-125.0/browser/app/profile/firefox.js
+--- firefox-125.0/browser/app/profile/firefox.js.addons	2024-04-09 10:34:30.728405003 +0200
++++ firefox-125.0/browser/app/profile/firefox.js	2024-04-09 10:36:01.444584632 +0200
+@@ -58,7 +58,8 @@ pref("extensions.systemAddon.update.enab
+ 
+ // Disable add-ons that are not installed by the user in all scopes by default.
+ // See the SCOPE constants in AddonManager.sys.mjs for values to use here.
+-pref("extensions.autoDisableScopes", 15);
++pref("extensions.autoDisableScopes", 0);
++pref("extensions.showMismatchUI", false);
+ // Scopes to scan for changes at startup.
+ pref("extensions.startupScanScopes", 0);
+ 

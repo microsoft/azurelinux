@@ -1,0 +1,143 @@
+.TH FIREFOX 1 "July 10, 2019" firefox "Linux User's Manual"
+.SH NAME
+firefox \- a Web browser for X11 derived from the Mozilla browser
+
+.SH SYNOPSIS
+.B firefox
+[\fIOPTIONS\fR ...] [\fIURL\fR]
+
+.SH DESCRIPTION
+\fBMozilla Firefox\fR is an open-source web browser, designed for
+standards compliance, performance and portability.
+
+.SH OPTIONS
+A summary of the options supported by \fBfirefox\fR is included below.
+
+.SS "X11 options"
+.TP
+.BI \-\-display= DISPLAY
+X display to use
+.TP
+.B \--sync
+Make X calls synchronous
+.TP
+.B \-\-g-fatal-warnings
+Make all warnings fatal
+
+.SS "Firefox options"
+.TP
+.B \-h, \--help
+Show summary of options.
+.TP
+.B \-v, \--version
+Print Firefox version.
+.TP
+\fB\-P\fR \fIprofile\fR
+Start with \fIprofile\fR.
+.TP
+\fB\-\-profile\fR \fIpath\fR
+Start with profile at \fIpath\fR.
+.TP
+\fB\-\-migration\fR
+Start with migration wizard.
+.TP
+.B \-\-ProfileManager
+Start with ProfileManager.
+.TP
+\fB\-\-no\-remote\fR
+Do not accept or send remote commands; implies \fB--new-instance\fR.
+.TP
+\fB\-\-new\-instance\fR
+Open new instance, not a new window in running instance.
+.TP
+\fB\-\-UILocale\fR \fIlocale\fR
+Start with \fIlocale\fR resources as UI Locale.
+.TP
+\fB\-\-safe\-mode\fR
+Disables extensions and themes for this session.
+.TP
+\fB\--allow-downgrade\fR
+Allows downgrading a profile.                                              
+.TP
+\fB\--MOZ_LOG\fR=\fImodules\fR
+Treated as \fBMOZ_LOG\fR=\fImodules\fR environment variable, overrides it.           
+.TP
+\fB\--MOZ_LOG_FILE\fR=\fIfile\fR
+Treated as \fBMOZ_LOG_FILE\fR=\fIfile\fR environment variable, overrides it.  If
+MOZ_LOG_FILE is not specified as an argument or as an environment variable,
+logging will be written to stdout.
+.TP
+\fB\-\-headless\fR
+Run without a GUI.
+.TP
+\fB\-\-save-recordings\fR
+Save recordings for all content processes to a directory.
+.TP
+\fB\-\-browser\fR
+Open a browser window.
+.TP
+\fB\-\-new-window\fR \fIurl\fR
+Open \fIurl\fR in a new window.
+.TP
+\fB\-\-new-tab\fR \fIurl\fR
+Open \fIurl\fR in a new tab.
+.TP
+\fB\-\-private-window\fR \fIurl\fR
+Open \fIurl\fR in a new private window.
+.TP
+\fB\-\-preferences\fR
+Open Preferences dialog.
+.TP
+\fB\-\-screenshot\fR [\fIpath\fR]
+Save screenshot to \fIpath\fR or in working directory.
+.TP
+\fB\-\-window-size\fR \fIwidth\fR[,\fIheight\fR]
+Width and optionally height of screenshot.
+.TP
+\fB\-\-search\fR \fIterm\fR
+Search \fIterm\fR with your default search engine.
+.TP
+\fB\-\-setDefaultBrowser\fR
+Set this app as the default browser.
+.TP
+\fB\-\-jsconsole\fR
+Open the Browser Console.
+.TP
+\fB\-\-jsdebugger\fR
+Open the Browser Toolbox.
+.TP
+\fB\-\-wait-for-jsdebugger\fR
+Spin event loop until JS debugger connects.  Enables debugging (some) application startup code paths.  Only has an effect when \fI--jsdebugger\fR is also supplied.
+.TP
+\fB\-\-devtools\fR
+Open DevTools on initial load.
+.TP
+\fB\-\-start-debugger-server\fR [ws:][\fIport\fR|\fIpath\fR]
+Start the debugger server on a TCP port or Unix domain socket path. Defaults to TCP port 6000. Use WebSocket protocol if ws: prefix is specified.
+.TP
+\fB\-\-recording\fR \fIfile\fR
+Record drawing for a given URL.
+.TP
+\fB\-\-recording-output\fR \fIfile\fR
+Specify destination file for a drawing recording.
+
+.SH FILES
+\fI/usr/bin/firefox\fR - shell script wrapping
+\fBfirefox\fR
+.br
+\fI/usr/lib64/firefox/firefox\fR - \fBfirefox\fR
+executable
+
+.SH VERSION
+68.0
+
+.SH BUGS
+To report a bug, please visit \fIhttp://bugzilla.mozilla.org/\fR
+
+.SH AUTHORS
+.TP
+.B The Mozilla Organization
+.I http://www.mozilla.org/about.html
+.TP
+.B Tobias Girstmair
+.I https://gir.st/

@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+# Print reftest failures and compose them to html
+
+TEST_DIR="$1"
+TEST_FLAVOUR="$2"
+OUTPUT_FILE="failures-reftest$TEST_FLAVOUR.html"
+
+grep --text -e "REFTEST TEST-UNEXPECTED-PASS" -e "REFTEST TEST-UNEXPECTED-FAIL" -e "IMAGE 1 (TEST):" -e "IMAGE 2 (REFERENCE):" $TEST_DIR/reftest$TEST_FLAVOUR 2>&1 > $OUTPUT_FILE
+sed -i '/REFTEST   IMAGE 1/a ">' $OUTPUT_FILE
+sed -i '/REFTEST   IMAGE 2/a "><BR><BR>' $OUTPUT_FILE
+sed -i '/REFTEST TEST/a <BR>' $OUTPUT_FILE
+sed -i -e 's/^REFTEST   IMAGE 1 (TEST): /<img border=2 src="/' $OUTPUT_FILE
+sed -i -e 's/^REFTEST   IMAGE 2 (REFERENCE): /<img border=2 src="/' $OUTPUT_FILE

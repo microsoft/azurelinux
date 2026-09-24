@@ -1,0 +1,22 @@
+From 6ebe8ce6a3267c96454de3cd453269b4c4053a3e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Mon, 9 Aug 2021 14:41:14 +0200
+Subject: [PATCH] Don't die on SpiderMonkey checks
+
+---
+ config/run_spidermonkey_checks.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/config/run_spidermonkey_checks.py b/config/run_spidermonkey_checks.py
+index 0f842d9..b49db52 100644
+--- a/config/run_spidermonkey_checks.py
++++ b/config/run_spidermonkey_checks.py
+@@ -11,5 +11,3 @@ import sys
+ def main(output, lib_file, *scripts):
+     for script in scripts:
+         retcode = subprocess.call([sys.executable, script], cwd=buildconfig.topsrcdir)
+-        if retcode != 0:
+-            raise Exception(script + " failed")
+--
+2.31.1
+

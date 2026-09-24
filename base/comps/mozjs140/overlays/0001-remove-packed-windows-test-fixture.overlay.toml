@@ -12,13 +12,13 @@ upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove packed Windows executable media-sniffer test fixture"
 type = "file-remove"
-archive = "firefox-140.6.0esr.source.tar.xz"
+archive = "firefox-140.13.0esr.source.tar.xz"
 file = "toolkit/components/mediasniffer/test/unit/data/ff-inst.exe"
 
 [[overlays]]
 description = "Drop the removed fixture from the xpcshell support-files list"
 type = "file-search-replace"
-archive = "firefox-140.6.0esr.source.tar.xz"
+archive = "firefox-140.13.0esr.source.tar.xz"
 file = "toolkit/components/mediasniffer/test/unit/xpcshell.toml"
 regex = '.*ff-inst\.exe.*\n'
 
@@ -27,6 +27,6 @@ regex = '.*ff-inst\.exe.*\n'
 [[overlays]]
 description = "Drop the media-sniffer test case that reads the removed fixture"
 type = "file-search-replace"
-archive = "firefox-140.6.0esr.source.tar.xz"
+archive = "firefox-140.13.0esr.source.tar.xz"
 file = "toolkit/components/mediasniffer/test/unit/test_mediasniffer_ext.js"
 regex = '.*(?:bug 875769|ff-inst\.exe).*\n'

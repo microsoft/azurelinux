@@ -1,0 +1,25 @@
+From 3741e6fea656d3f1b9578d59f14d8945aea92a10 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jaroslav=20Loba=C4=8Devski?= <jarlob@github.com>
+Date: Thu, 19 Oct 2023 17:07:26 +0200
+Subject: [PATCH] Out of bounds heap buffer write
+ (`GHSL-2023-171/CVE-2023-45681`)
+
+---
+ stb_vorbis.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/stb_vorbis.c b/stb_vorbis.c
+index 3e5c2504c0..6ebd7dcb95 100644
+--- a/stb_vorbis.c
++++ b/stb_vorbis.c
+@@ -3661,6 +3661,10 @@ static int start_decoder(vorb *f)
+    f->comment_list = NULL;
+    if (f->comment_list_length > 0)
+    {
++      if (INT_MAX / sizeof(char*) < f->comment_list_length) {
++         f->comment_list_length = 0;
++         return error(f, VORBIS_outofmem);
++      }
+       f->comment_list = (char**) setup_malloc(f, sizeof(char*) * (f->comment_list_length));
+       if (f->comment_list == NULL)                  return error(f, VORBIS_outofmem);
+    }

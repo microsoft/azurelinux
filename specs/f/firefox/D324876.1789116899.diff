@@ -1,0 +1,19 @@
+diff --git a/widget/gtk/nsAppShell.cpp b/widget/gtk/nsAppShell.cpp
+--- a/widget/gtk/nsAppShell.cpp
++++ b/widget/gtk/nsAppShell.cpp
+@@ -624,10 +624,14 @@
+     }
+     if (!StaticPrefs::widget_wayland_session_management_enabled_AtStartup()) {
+       LOGW("nsAppShell::IsSessionRestoreSupported(): disabled by pref.");
+       return false;
+     }
++    if (IsGnomeDesktopEnvironment()) {
++      LOGW("nsAppShell::IsSessionRestoreSupported(): disabled due to Bug 2070815.");
++      return false;
++    }
+ 
+     GType waylandWindowType = g_type_from_name("GdkWaylandWindow");
+     bool supported =
+         waylandWindowType &&
+         g_signal_lookup("xdg-toplevel-realized", waylandWindowType);
+

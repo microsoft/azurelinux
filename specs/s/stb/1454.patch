@@ -1,0 +1,24 @@
+From 4e58258d8c434111fe2e8f1146ae0a72b0e8c554 Mon Sep 17 00:00:00 2001
+From: Neil Bickford <nbickford@nvidia.com>
+Date: Sat, 25 Feb 2023 05:13:25 -0800
+Subject: [PATCH] Fix nullptr dereference when a PIC file causes
+ stbi__pic_load_core to return 0, and the requested number of components to
+ stbi_load_from_memory is not 0 or 4
+
+---
+ stb_image.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/stb_image.h b/stb_image.h
+index 5e807a0a6..7e6ddeefd 100644
+--- a/stb_image.h
++++ b/stb_image.h
+@@ -6527,7 +6527,7 @@ static void *stbi__pic_load(stbi__context *s,int *px,int *py,int *comp,int req_c
+ 
+    if (!stbi__pic_load_core(s,x,y,comp, result)) {
+       STBI_FREE(result);
+-      result=0;
++      return 0;
+    }
+    *px = x;
+    *py = y;
