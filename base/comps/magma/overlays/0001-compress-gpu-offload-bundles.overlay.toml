@@ -1,0 +1,11 @@
+# Upstream fix: https://src.fedoraproject.org/rpms/magma/c/849744832c73767bc47e7e72a63673dbd0b7e105
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/magma/c/849744832c73767bc47e7e72a63673dbd0b7e105" }]
+
+[[overlays]]
+description = "Compress embedded GPU offload bundles to reduce the installed libraries from several gigabytes without removing supported GPU targets."
+type = "spec-prepend-lines"
+section = "%build"
+lines = ["export HIPCC_COMPILE_FLAGS_APPEND=--offload-compress"]
