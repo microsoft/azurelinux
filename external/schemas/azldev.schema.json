@@ -443,14 +443,6 @@
           "title": "Package groups",
           "description": "Definitions of package groups for shared binary package configuration"
         },
-        "test-suites": {
-          "additionalProperties": {
-            "$ref": "#/$defs/TestSuiteConfig"
-          },
-          "type": "object",
-          "title": "Test Suites",
-          "description": "Definitions of test suites for this project"
-        },
         "tests": {
           "additionalProperties": {
             "$ref": "#/$defs/TestDefinition"
@@ -637,26 +629,6 @@
       "additionalProperties": false,
       "type": "object"
     },
-    "GitSourceConfig": {
-      "properties": {
-        "git-url": {
-          "type": "string",
-          "title": "Git URL",
-          "description": "URL of the git repository"
-        },
-        "ref": {
-          "type": "string",
-          "title": "Ref",
-          "description": "Commit SHA to check out (full hex hash)"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "git-url",
-        "ref"
-      ]
-    },
     "ImageCapabilities": {
       "properties": {
         "machine-bootable": {
@@ -729,6 +701,18 @@
           "$ref": "#/$defs/ImagePublishConfig",
           "title": "Publish settings",
           "description": "Publishing settings for this image"
+        },
+        "architectures": {
+          "items": {
+            "type": "string",
+            "enum": [
+              "x86_64",
+              "aarch64"
+            ]
+          },
+          "type": "array",
+          "title": "Architectures",
+          "description": "Architectures supported by this image (optional; unset means unrestricted)"
         }
       },
       "additionalProperties": false,
@@ -782,14 +766,6 @@
     },
     "ImageTestsConfig": {
       "properties": {
-        "test-suites": {
-          "items": {
-            "$ref": "#/$defs/TestSuiteRef"
-          },
-          "type": "array",
-          "title": "Test Suites",
-          "description": "List of test suite references that apply to this image"
-        },
         "tests": {
           "items": {
             "$ref": "#/$defs/TestRef"
@@ -801,53 +777,6 @@
       },
       "additionalProperties": false,
       "type": "object"
-    },
-    "LisaConfig": {
-      "properties": {
-        "framework": {
-          "$ref": "#/$defs/GitSourceConfig",
-          "title": "Framework",
-          "description": "Git source for the LISA framework"
-        },
-        "test-cases": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "title": "Test cases",
-          "description": "LISA test case names to run; combined into a generated runbook's criteria"
-        },
-        "pip-pre-install": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "title": "Pip pre-install",
-          "description": "Pip packages to install before the framework (for overriding version pins)"
-        },
-        "pip-extras": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "title": "Pip extras",
-          "description": "Pip extras to install from the LISA framework package"
-        },
-        "extra-args": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "title": "Extra arguments",
-          "description": "Additional arguments passed to LISA. Supports {image-path} {image-name} {capabilities} placeholders."
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "framework",
-        "test-cases"
-      ]
     },
     "Origin": {
       "properties": {
@@ -872,7 +801,7 @@
         "script": {
           "type": "string",
           "title": "Script",
-          "description": "Shell script filename (relative to the component spec directory) to run in mock to generate this source file. Required when origin type is 'custom'."
+          "description": "Plain shell script filename with no path separators. Relative to the declaring config file for upstream components or the component spec directory for local components. Required when origin type is 'custom'."
         },
         "mock-packages": {
           "items": {
@@ -1080,43 +1009,6 @@
       "additionalProperties": false,
       "type": "object"
     },
-    "PytestConfig": {
-      "properties": {
-        "working-dir": {
-          "type": "string",
-          "title": "Working directory",
-          "description": "Directory to use as CWD when running pytest"
-        },
-        "test-paths": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "title": "Test paths",
-          "description": "Test file paths or directories passed to pytest. Glob patterns are expanded."
-        },
-        "extra-args": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "title": "Extra arguments",
-          "description": "Additional arguments passed to pytest. Use {image-path} as a placeholder for the image path."
-        },
-        "install": {
-          "type": "string",
-          "enum": [
-            "pyproject",
-            "requirements",
-            "none"
-          ],
-          "title": "Install mode",
-          "description": "How to install Python dependencies: pyproject, requirements, or none (default)"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
     "ReleaseConfig": {
       "properties": {
         "calculation": {
@@ -1288,6 +1180,11 @@
           "type": "boolean",
           "title": "Disable GPG check",
           "description": "Opt out of GPG signature verification for repos in this set"
+        },
+        "disable-ssl-verify": {
+          "type": "boolean",
+          "title": "Disable SSL verification",
+          "description": "Disable TLS certificate verification for repos in this set"
         },
         "arches": {
           "items": {
@@ -1681,53 +1578,6 @@
       },
       "additionalProperties": false,
       "type": "object"
-    },
-    "TestSuiteConfig": {
-      "properties": {
-        "description": {
-          "type": "string",
-          "title": "Description",
-          "description": "Description of this test suite"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "pytest",
-            "lisa"
-          ],
-          "title": "Type",
-          "description": "Type of test framework (pytest or lisa)"
-        },
-        "pytest": {
-          "$ref": "#/$defs/PytestConfig",
-          "title": "Pytest config",
-          "description": "Pytest-specific configuration (required when type is pytest)"
-        },
-        "lisa": {
-          "$ref": "#/$defs/LisaConfig",
-          "title": "LISA config",
-          "description": "LISA-specific configuration used to generate and run a LISA runbook (optional)"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "type"
-      ]
-    },
-    "TestSuiteRef": {
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "Name of the test suite (must match a key in [test-suites])"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "name"
-      ]
     },
     "ToolsConfig": {
       "properties": {
