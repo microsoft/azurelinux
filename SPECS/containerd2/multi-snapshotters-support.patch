@@ -19,45 +19,45 @@ here are:
  internal/cri/server/images/image_pull.go     | 12 +++++++-----
  internal/cri/server/sandbox_run.go           | 12 +++++++-----
  internal/cri/server/service.go               |  2 +-
- internal/cri/store/image/image.go            | 29 ++++++++++++++++++++++------
+ internal/cri/store/image/image.go            | 29 +++++++++++++++++++++++------
  6 files changed, 42 insertions(+), 21 deletions(-)
 
 diff --git a/integration/image_pull_timeout_test.go b/integration/image_pull_timeout_test.go
-index fc90953..aa4d2ba 100644
+index d1f5474..b3e6229 100644
 --- a/integration/image_pull_timeout_test.go
 +++ b/integration/image_pull_timeout_test.go
-@@ -93,7 +93,7 @@ func testCRIImagePullTimeoutBySlowCommitWriter(t *testing.T, useLocal bool) {
-
+@@ -96,7 +96,7 @@ func testCRIImagePullTimeoutBySlowCommitWriter(t *testing.T, useLocal bool) {
  	ctx := namespaces.WithNamespace(logtest.WithT(context.Background(), t), k8sNamespace)
+ 	ctx = withPullHTTPTrace(ctx)
 
 -	_, err = criService.PullImage(ctx, pullProgressTestImageName, nil, nil, "")
 +	_, err = criService.PullImage(ctx, pullProgressTestImageName, nil, nil, "", "")
  	assert.NoError(t, err)
  }
 
-@@ -220,7 +220,7 @@ func testCRIImagePullTimeoutByHoldingContentOpenWriter(t *testing.T, useLocal bo
- 	go func() {
+@@ -224,7 +224,7 @@ func testCRIImagePullTimeoutByHoldingContentOpenWriter(t *testing.T, useLocal bo
  		defer close(errCh)
 
--		_, err := criService.PullImage(ctx, pullProgressTestImageName, nil, nil, "")
-+		_, err := criService.PullImage(ctx, pullProgressTestImageName, nil, nil, "", "")
+ 		tctx := withPullHTTPTrace(ctx)
+-		_, err := criService.PullImage(tctx, pullProgressTestImageName, nil, nil, "")
++		_, err := criService.PullImage(tctx, pullProgressTestImageName, nil, nil, "", "")
  		errCh <- err
  	}()
 
-@@ -316,7 +316,7 @@ func testCRIImagePullTimeoutByNoDataTransferred(t *testing.T, useLocal bool) {
- 		dctx, _, err := cli.WithLease(ctx)
+@@ -321,7 +321,7 @@ func testCRIImagePullTimeoutByNoDataTransferred(t *testing.T, useLocal bool) {
  		assert.NoError(t, err)
 
+ 		dctx = withPullHTTPTrace(dctx)
 -		_, err = criService.PullImage(dctx, fmt.Sprintf("%s/%s", mirrorURL.Host, "containerd/volume-ownership:2.1"), nil, nil, "")
 +		_, err = criService.PullImage(dctx, fmt.Sprintf("%s/%s", mirrorURL.Host, "containerd/volume-ownership:2.1"), nil, nil, "", "")
 
  		assert.Equal(t, context.Canceled, errors.Unwrap(err), "[%v] expected canceled error, but got (%v)", idx, err)
  		assert.True(t, mirrorSrv.limiter.clearHitCircuitBreaker(), "[%v] expected to hit circuit breaker", idx)
 diff --git a/internal/cri/server/container_status_test.go b/internal/cri/server/container_status_test.go
-index a35dda2..4824529 100644
+index 18e7d0c..9f183d8 100644
 --- a/internal/cri/server/container_status_test.go
 +++ b/internal/cri/server/container_status_test.go
-@@ -388,7 +388,7 @@ func (s *fakeImageService) Config() criconfig.ImageConfig {
+@@ -391,7 +391,7 @@ func (s *fakeImageService) Config() criconfig.ImageConfig {
  	return criconfig.ImageConfig{}
  }
 
@@ -67,7 +67,7 @@ index a35dda2..4824529 100644
  }
 
 diff --git a/internal/cri/server/images/image_pull.go b/internal/cri/server/images/image_pull.go
-index 5889f6f..ec3cdf7 100644
+index 648b622..bed55e0 100644
 --- a/internal/cri/server/images/image_pull.go
 +++ b/internal/cri/server/images/image_pull.go
 @@ -113,14 +113,14 @@ func (c *GRPCCRIImageService) PullImage(ctx context.Context, r *runtime.PullImag
@@ -103,19 +103,19 @@ index 5889f6f..ec3cdf7 100644
 
  	span.SetAttributes(
 diff --git a/internal/cri/server/sandbox_run.go b/internal/cri/server/sandbox_run.go
-index 8d3a12b..9d81a79 100644
+index 831c2e8..b4877c2 100644
 --- a/internal/cri/server/sandbox_run.go
 +++ b/internal/cri/server/sandbox_run.go
-@@ -292,7 +292,7 @@ func (c *criService) RunPodSandbox(ctx context.Context, r *runtime.RunPodSandbox
- 	// containers anyway, the CRI layer will pre-pull the pause container to guarantee
- 	// it exists (even though it's counter to the purpose of the sandbox API). This may
- 	// be removed/deprecated in the distant future, if we decide to remove pause containers.
--	if err := c.ensurePauseImageExists(ctx, r.GetConfig(), r.GetRuntimeHandler()); err != nil {
-+	if err := c.ensurePauseImageExists(ctx, r.GetConfig(), r.GetRuntimeHandler(), c.ImageService.RuntimeSnapshotter(ctx, ociRuntime)); err != nil {
- 		return nil, err
- 	}
-
-@@ -406,7 +406,7 @@ func (c *criService) RunPodSandbox(ctx context.Context, r *runtime.RunPodSandbox
+@@ -296,7 +296,7 @@ func (c *criService) RunPodSandbox(ctx context.Context, r *runtime.RunPodSandbox
+ 	// Runtimes set disable_pause_image_pull = true to tell the CRI layer that they manage
+ 	// pause image availability on their own (e.g. shim sandboxers).
+ 	if !ociRuntime.DisablePauseImagePull {
+-		if err := c.ensurePauseImageExists(ctx, r.GetConfig(), r.GetRuntimeHandler()); err != nil {
++		if err := c.ensurePauseImageExists(ctx, r.GetConfig(), r.GetRuntimeHandler(), c.ImageService.RuntimeSnapshotter(ctx, ociRuntime)); err != nil {
+ 			return nil, err
+ 		}
+ 	} else {
+@@ -413,7 +413,7 @@ func (c *criService) RunPodSandbox(ctx context.Context, r *runtime.RunPodSandbox
  	return &runtime.RunPodSandboxResponse{PodSandboxId: id}, nil
  }
 
@@ -124,7 +124,7 @@ index 8d3a12b..9d81a79 100644
  	imageConfig := c.ImageService.Config()
 
  	ref := criconfig.DefaultSandboxImage
-@@ -415,14 +415,16 @@ func (c *criService) ensurePauseImageExists(ctx context.Context, config *runtime
+@@ -422,14 +422,16 @@ func (c *criService) ensurePauseImageExists(ctx context.Context, config *runtime
  		ref = img
  	}
 
@@ -145,10 +145,10 @@ index 8d3a12b..9d81a79 100644
  		return fmt.Errorf("failed to pull image %q: %w", ref, err)
  	}
 diff --git a/internal/cri/server/service.go b/internal/cri/server/service.go
-index ba462a5..f1ad127 100644
+index 9ec2712..5e1cdb3 100644
 --- a/internal/cri/server/service.go
 +++ b/internal/cri/server/service.go
-@@ -101,7 +101,7 @@ type RuntimeService interface {
+@@ -100,7 +100,7 @@ type RuntimeService interface {
  type ImageService interface {
  	RuntimeSnapshotter(ctx context.Context, ociRuntime criconfig.Runtime) string
 

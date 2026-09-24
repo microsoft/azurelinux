@@ -1,10 +1,10 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash db8809540e1a7a9da5d518876894933ff55692ab
+%define commit_hash a7fe631d96c08fb14cf8eff0afdc280e99c30a94
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.3.4
+Version: 2.4.0
 Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
@@ -18,9 +18,6 @@ Source2: containerd.toml
 
 Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
-Patch2:	fix-TestCgroupNamespace-cgroupv1.patch
-Patch3:	CVE-2026-56852.patch
-Patch4:	CVE-2026-37236.patch
 
 %{?systemd_requires}
 
@@ -101,6 +98,12 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Mon Sep 21 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.4.0-1
+- Upgrade to 2.4.0 for CVE-2026-84445, CVE-2026-84304
+- Remove CVE-2026-56852 and CVE-2026-37236 patches fixed upstream
+- Remove fix-TestCgroupNamespace-cgroupv1 patch merged upstream
+- Rebase multi-snapshotter support patch
+
 * Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
 - Upgrade to 2.3.4
 - Remove CVE patches fixed upstream
