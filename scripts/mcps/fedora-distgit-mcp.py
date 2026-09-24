@@ -2,13 +2,12 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-"""Fedora Dist-Git MCP Server — exposes tools for querying Fedora's package
-repositories via the Pagure API and performing git-level searches (pickaxe,
-grep) on cloned repos.
+"""Expose Fedora package repository queries through MCP.
 
-All fetched content and cloned repos are stored under a gitignored scratch
-directory to avoid bloating LLM context. Agents use read_file / grep_search
-on the resulting files.
+Query repositories through the Pagure API and perform git-level searches
+(pickaxe, grep) on cloned repos. All fetched content and cloned repos are
+stored under a gitignored scratch directory to avoid bloating LLM context.
+Agents use read_file / grep_search on the resulting files.
 
 Repo caching: clones are kept between calls so repeated queries on the same
 package don't re-clone. A configurable limit (default 5) caps the number of

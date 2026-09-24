@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-"""Compute the render set: components flagged by `azldev component changed`
-plus components whose spec tree was touched directly in the PR.
+"""Compute the render set for changed components.
 
-Emits one component name per line on stdout (azldev dedupes internally).
+Include components flagged by `azldev component changed` and components whose
+spec tree was touched directly in the PR. Emit one component name per line on
+stdout (azldev dedupes internally).
 """
 from __future__ import annotations
 

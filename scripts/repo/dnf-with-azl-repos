@@ -2,11 +2,10 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
-"""dnf-with-azl-repos -- invoke ``dnf`` against Azure Linux repos
-discovered under one or more URL prefixes that follow the Standard
-Azure Linux Repo Layout.
+"""Invoke ``dnf`` against Azure Linux repositories.
 
-For each ``--repo-prefix`` URL the conventional sub-repos described in
+Discover repositories under URL prefixes that follow the Standard Azure Linux
+Repo Layout. For each ``--repo-prefix`` URL the conventional sub-repos described in
 ``_repo_layout.SUBREPOS`` are HEAD-probed; any sub-repo whose
 ``repodata/repomd.xml`` returns 404 is silently skipped (it just
 isn't published under that prefix). Other failure modes -- HTTP

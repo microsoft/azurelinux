@@ -2,8 +2,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-"""Route packages from one or more upstream RPM repos into the standard
-Azure Linux per-channel/per-arch layout.
+"""Route upstream RPM packages into the standard Azure Linux layout.
 
 Reads multiple input RPM repositories (with `$basearch` expansion), unions
 their packages, asks `azldev package list --rpm-file ...` to assign each
@@ -243,9 +242,10 @@ def parse_explicit_repo(spec: str, arches: Iterable[str]) -> list[InputRepo]:
 
 
 def dedup_input_repos(repos: Iterable[InputRepo]) -> list[InputRepo]:
-    """Drop duplicate (kind, arch, url) entries, preserving order. Explicit
-    origin wins over prefix origin so 404s remain fatal where the user asked
-    for them explicitly.
+    """Drop duplicate input repositories while preserving order.
+
+    Explicit origin wins over prefix origin so 404s remain fatal where the
+    user asked for them explicitly.
     """
     seen: dict[tuple[str, str, str], InputRepo] = {}
     for r in repos:
@@ -326,8 +326,9 @@ def _http_get(
 
 
 def build_ssl_context(ca_bundle: Path | None, insecure: bool) -> ssl.SSLContext | None:
-    """Return an SSLContext honouring --ca-bundle / --insecure, or None for
-    Python's default behaviour.
+    """Build an SSL context for the requested verification settings.
+
+    Return ``None`` when Python's default verification behavior is sufficient.
     """
     if insecure:
         ctx = ssl.create_default_context()
@@ -422,9 +423,7 @@ UniverseKey = tuple[str, str, str, str, str, str, str]
 
 @dataclass
 class UniverseEntry:
-    """One NEVRA slot in the unioned package universe (one entry per
-    distinct package version).
-    """
+    """Represent one distinct package version in the package universe."""
 
     repo: InputRepo
     source_pkg_name: str  # extracted from rpm_sourcerpm (or pkg name for srpms)
@@ -464,9 +463,7 @@ def _strip_srpm_suffix(rpm_sourcerpm: str | None) -> str:
 
 
 def _find_metadata_path(repo_dir: Path, kind: str) -> str:
-    """Return the absolute path of *kind* (primary|filelists|other) for the
-    cached repo at *repo_dir*.
-    """
+    """Return the cached repository's absolute metadata path for *kind*."""
     repomd = cr.Repomd()
     cr.xml_parse_repomd(str(repo_dir / "repodata" / "repomd.xml"), repomd, lambda *_: True)
     for rec in repomd.records:
@@ -481,9 +478,7 @@ def build_package_universe(
     dict[UniverseKey, UniverseEntry],
     list[dict],
 ]:
-    """First pass: scan only primary.xml of each repo to build the
-    package universe (one entry per distinct NEVRA) and the rpm_source_map
-    for azldev.
+    """Build the package universe from each repository's primary metadata.
 
     Returns (universe, rpm_source_map) where:
       universe[(kind, arch, name, epoch, version, release, pkg_arch)]
@@ -647,9 +642,7 @@ def query_azldev(
 
 @dataclass
 class RoutingDecision:
-    """Per-universe-entry decision: where the package should land, or why
-    it was excluded.
-    """
+    """Record where a package should land or why it was excluded."""
 
     dest_channel: str | None = None  # 'base' | 'sdk' | None (=excluded)
     reason: str = ""  # human-readable provenance
@@ -875,8 +868,7 @@ def emit_repos(
     decisions: dict[UniverseKey, RoutingDecision],
     output_dir: Path,
 ) -> tuple[dict[Destination, int], list[dict], list[dict]]:
-    """Second pass over each input repo: stream every package, decide its
-    destination, set its absolute location_href, hand it to the writer.
+    """Route each package from the input repositories to its destination.
 
     Returns (per_destination_counts, unpublished_records, fallback_records).
 
@@ -1018,13 +1010,13 @@ def write_unpublished_report(unpublished: list[dict], output_dir: Path) -> tuple
 
 
 def write_fallback_report(fallbacks: list[dict], output_dir: Path) -> tuple[Path, Path]:
-    """Mirror :func:`write_unpublished_report` for inheritance-fallback
-    routings. These packages WERE routed (so they appear in the published
-    repos) but only because Phase-4 inferred a channel from sibling rpms
-    rather than reading an explicit ``publishChannel`` from azldev. Once
-    the underlying TOML config publishes srpm/debuginfo channels
-    explicitly the fallback path goes away and these reports should
-    shrink to zero.
+    """Write reports for packages routed through channel inheritance.
+
+    These packages appear in the published repositories, but only because
+    Phase 4 inferred a channel from sibling RPMs rather than reading an
+    explicit ``publishChannel`` from azldev. Once the underlying TOML config
+    publishes srpm/debuginfo channels explicitly, these reports should shrink
+    to zero.
     """
     json_path = output_dir / "fallback-channel-packages.json"
     txt_path = output_dir / "fallback-channel-packages.txt"
@@ -1063,12 +1055,12 @@ def write_fallback_report(fallbacks: list[dict], output_dir: Path) -> tuple[Path
 
 
 class _OrderedRepoSourceAction(argparse.Action):
-    """Append (option_string, value) into a single shared list across
-    --repo-prefix and --repo, preserving CLI order.
+    """Preserve the relative order of repository source arguments.
 
-    This matters because cross-repo NEVRA dedup keeps the first repo
-    seen, so command-line order is the user's only knob to control
-    which input wins for an overlapping NEVRA.
+    Append ``(option_string, value)`` into a shared list across
+    ``--repo-prefix`` and ``--repo``. Cross-repository NEVRA deduplication
+    keeps the first repository seen, so command-line order controls which
+    input wins for an overlapping NEVRA.
     """
 
     def __call__(self, parser, namespace, values, option_string=None):
