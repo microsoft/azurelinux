@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 6
+%define azl_pkgrelease 7
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.57.04
 
@@ -4283,6 +4283,12 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Sep 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.45-1.7
+- fix(kernel): disable Bluetooth on arm64
+- fix(kernel): disable Intel Wi-Fi and WLAN drivers on arm64
+- fix(kernel): disable USB Video Class on arm64
+- fix(kernel): disable ACPI AC and battery on arm64
+
 * Wed Sep 23 2026 Hayden Barnes <hbarnes@herodevs.com> - 6.18.45-1.6
 - feat(kernel): enable x86 USB Type-C and UCSI
 
