@@ -1,0 +1,1102 @@
+From 936e081bd752ca0a883568aaf3b5752c9eaccb12 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <dbelyavs@redhat.com>
+Date: Mon, 21 Aug 2023 15:38:21 +0200
+Subject: [PATCH 36/48] 
+ 0080-rand-Forbid-truncated-hashes-SHA-3-in-FIPS-prov.patch
+
+Patch-name: 0080-rand-Forbid-truncated-hashes-SHA-3-in-FIPS-prov.patch
+Patch-id: 80
+Patch-status: |
+    # We believe that some changes present in CentOS are not necessary
+    # because ustream has a check for FIPS version
+---
+ providers/implementations/rands/drbg_hash.c |  12 ++
+ providers/implementations/rands/drbg_hmac.c |  12 ++
+ test/recipes/30-test_evp_data/evprand.txt   | 129 ++++++++++++++++++++
+ 3 files changed, 153 insertions(+)
+
+diff --git a/providers/implementations/rands/drbg_hash.c b/providers/implementations/rands/drbg_hash.c
+index fb824abfa6..b90fee6dec 100644
+--- a/providers/implementations/rands/drbg_hash.c
++++ b/providers/implementations/rands/drbg_hash.c
+@@ -471,6 +471,18 @@ static int drbg_hash_set_ctx_params(void *vctx, const OSSL_PARAM params[])
+         if (!ossl_drbg_verify_digest(libctx, md))
+             return 0;   /* Error already raised for us */
+ 
++#ifdef FIPS_MODULE
++    if (!EVP_MD_is_a(md, SN_sha1)
++            && !EVP_MD_is_a(md, SN_sha256)
++            && !EVP_MD_is_a(md, SN_sha512)) {
++        ERR_raise_data(ERR_LIB_PROV, PROV_R_DIGEST_NOT_ALLOWED,
++                       "%s is not an acceptable hash function for an SP 800-90A"
++                       " DRBG according to FIPS 140-3 IG, section D.R",
++                       EVP_MD_get0_name(md));
++        return 0;
++    }
++#endif /* defined(FIPS_MODULE) */
++
+         /* These are taken from SP 800-90 10.1 Table 2 */
+         hash->blocklen = EVP_MD_get_size(md);
+         /* See SP800-57 Part1 Rev4 5.6.1 Table 3 */
+diff --git a/providers/implementations/rands/drbg_hmac.c b/providers/implementations/rands/drbg_hmac.c
+index 664a074639..cbd4d0f519 100644
+--- a/providers/implementations/rands/drbg_hmac.c
++++ b/providers/implementations/rands/drbg_hmac.c
+@@ -367,6 +367,18 @@ static int drbg_hmac_set_ctx_params(void *vctx, const OSSL_PARAM params[])
+     if (md != NULL && !ossl_drbg_verify_digest(libctx, md))
+         return 0;   /* Error already raised for us */
+ 
++#ifdef FIPS_MODULE
++    if (!EVP_MD_is_a(md, SN_sha1)
++            && !EVP_MD_is_a(md, SN_sha256)
++            && !EVP_MD_is_a(md, SN_sha512)) {
++        ERR_raise_data(ERR_LIB_PROV, PROV_R_DIGEST_NOT_ALLOWED,
++                       "%s is not an acceptable hash function for an SP 800-90A"
++                       " DRBG according to FIPS 140-3 IG, section D.R",
++                       EVP_MD_get0_name(md));
++        return 0;
++    }
++#endif /* defined(FIPS_MODULE) */
++
+     if (!ossl_prov_macctx_load_from_params(&hmac->ctx, params,
+                                            NULL, NULL, NULL, libctx))
+         return 0;
+diff --git a/test/recipes/30-test_evp_data/evprand.txt b/test/recipes/30-test_evp_data/evprand.txt
+index 0e2ee82c58..7a17e7b3e1 100644
+--- a/test/recipes/30-test_evp_data/evprand.txt
++++ b/test/recipes/30-test_evp_data/evprand.txt
+@@ -7388,6 +7388,7 @@ Nonce.14 = 7239f92b63fb3dbe
+ PersonalisationString.14 = 8d2e2ca3985bd2538a71f02cc3eb5568
+ Output.14 = 0e4cb328c03faaedbec7215725851069bceae4332de6a70e3521dd065f2f7923485969571ebd7f24be460fd901c6b3e356da6ee5262ef2d76ad14eb0f697f8fb92af2f46630198c5f7018860886147b3
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -8659,6 +8660,7 @@ AdditionalInputA.14 = e5c633ca50dcd83e0a34d397df53f6d7a6f7170a3f81f0e6
+ AdditionalInputB.14 = 5f0beb5a2d2968e83ba87c92bfa420fd6e8526fbbfdea128
+ Output.14 = 8bec11df1022aa50d95daeaf23d78d6ee45c43c5768b90181e106c7df8ff333d7cb87ca1ab83f8742370db1c8c0c0c22f141ff4de33ae8bdb14fee7e6c069819320629c66d94c7c97ff52930a3c1dcd501b60f0f84bda4720ee187ae858a6e068326eda5809716e366d1b608c61b0100
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -8709,6 +8711,7 @@ Entropy.14 = 1194beb668839c47c73e7516f9ba09d23dec3553b3b5532f75b260106dcc2abf
+ Nonce.14 = 3c8a77351e93065d584feeb08c8424a9
+ Output.14 = fabd48bfcdd07968239fe538c2d8c9bde2e257b9b244078f39287c7ee90de167fff56a693c4e64f45081635511b5fd031c0270a31b4a014e44c0516a55ae72345aa11dffcda4ccf8cda50f6948d5ae425d8d53ad5c74cef1364277990156796e1c5dfa1ef095c0d8983477eb24241135760b02c86c86d4ec3627edac8c1a7e32
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -8789,6 +8792,7 @@ AdditionalInputA.14 = 626385595bef7103af0af700e1df048d7572286af709289b7894d2ab09
+ AdditionalInputB.14 = bfe8946dbf27d3a2127ec600351c3920d2531eb9419408233e0a888059b5eb68
+ Output.14 = ee6d07661828213e6453d94faaf76345c70949eca4965714c350313b0bcd8e079e6a07f8b2f7a91bcb7ef39a61568fd1c40ab78f154b3582f830095d571de29f81f9565e46b560d34c32bff55341a991f8e863bd9242c7cdd366be12538bb6922f1abfa19e7998aac61d465fc46538ee9142acc66786f4516ef4105fe1d80372
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -8854,6 +8858,7 @@ Nonce.14 = de2186bafa82b0d08a0b8215e3424512
+ PersonalisationString.14 = d96db27febe22db935b117dc3068374e39c5b2119b497e3c1d858ef649e01de5
+ Output.14 = d04435a8aab397cfcee5151f7aa24298ffc6eee4f577cda42d5e154b8d28cb2f0f945f11a15ed5b76486c88f03081cfd262d94a8e0b332e3c9c608461dcc8eba20d7db209810d25c226fda9fe218022a9b2c96876cb16c06c0553dd84ce57e20338c3d3e03c59ce22e668e25c2c50d5cc9afab91f50a28680964c2dacb9d2fb3
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -8949,6 +8954,7 @@ AdditionalInputA.14 = 5d9446eff72d59529a90b498d8f40983b3b2904f63664fc0aa1de8700d
+ AdditionalInputB.14 = e19707aafa391e8622539d52a05d930292bd0f7c17825dbed5fb7a2f8734081b
+ Output.14 = 6ce2ae37349cbef9ebd1f9b85485810a22d430d94abf66912dd7b6cc751400e777be2f1cebc19d65694a456b2c6429cefd95eb934030846708d50be3b274c2f7de299f3c311038491f271448c7d02ff51de048fa1184e8ee06b7b46a9f123daecbebae4a2183dc8eb6976abf0dae7cdbea6017cd1500f37dfadcce0c1956ea87
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -8999,6 +9005,7 @@ Entropy.14 = a7a1dbf7f828555610197e71e0ad563b8691589c5289ced03e9ef83b6f9ff938
+ Nonce.14 = 4274788c5d80e26ec1ac3a57b9c7c0df
+ Output.14 = 5a907a26c1ef588219d4c69fcf4c5c283ab148a77588a40b323bd24e6dfb29551c4b6116c4d61349f5f8bd9ed497f38b239c37283902beb3c9700c768fa289ee4573f92316efb860a5ca4267b328f03c13138b774b4b9f7516003a699f7a0854a0efb045a5932753a771c2cc6119202b33336f10edb715bcce1d20ff503dda01
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9079,6 +9086,7 @@ AdditionalInputA.14 = de1bbca12357943b4489cc7209b3f063b51b91acc168ec5e0ad88048b6
+ AdditionalInputB.14 = 6ddd9aba4f100ef902ba50adee53ef44a4f45564c13e774e69557e36a357e7cf
+ Output.14 = 544ec80a966644454886fb97a0f05eb6a4a25fcbce795b5e5b27ee06ba14b7de18dbf54f80a670b87c76c336ac9af16c8958ad6c1bde9a97aa4c1ab5823d24a53c64f6766ce6eb9b7085cf7282499c37fc1e2e825f53bc357bf36d5901e0ae93cd3bd821fa18b5aa17548560f7ad6ef38124814fccf9b2b89de61cfc27c7269b
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9144,6 +9152,7 @@ Nonce.14 = ab7843b73ecb4858f2cc5e9dfca803ef
+ PersonalisationString.14 = dee559515084d8ac49c3803f09f3d5fed3b307946a2752c267677f22786a0125
+ Output.14 = a12f5e8ea3bb174934c15e5d114ba615da33210c98c38d7fde4b5aef9aecdeaef311d929d7fece7fee11db67134c3326b413b8dc17766ba4fb881105db68688b148fd95d812f6538b14f25afaae84d39025336136d270bd643f2a6c7164930372fb1c8f4f0dab60283e9d8d3440ce8dc66761c5d5c4c13cc3a367feb4869b559
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9239,6 +9248,7 @@ AdditionalInputA.14 = ead8c0dcf4ddc909aab96eadab509a46908ee5f090983af609f08d8a8b
+ AdditionalInputB.14 = f357bda8f2048929a4e31969ec978cc333d58b4fc09a8aa1b73ec9bdfaa1a8f6
+ Output.14 = 901aabb3f065be08e2f8072d5d3ffcb28ab291420644e407e7a6a3346b75a5be535bdbdd5a8245998689450292df877233ef0783e0bd1765413193790995d884ffcb2c8dc35fe4cfc12def2f091866d735b1dcfc9d8d8c26903d50e9397b1bbd674bb81fc908361b2bddb68f02031d87588cc3e94210422674e93fea6a5329af
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9289,6 +9299,7 @@ Entropy.14 = dfa94c198483c5daa046f1dd1e4e83f854fd6c5cbc3465f671bdfd36837779ab
+ Nonce.14 = 298de64bbd817d009a71c1424ae839f9
+ Output.14 = bfb9a54ce31406a82608aebc826441f8f633813a0c3bad723b802f3e905a6ee3512ff3513062aea51f93be17aebf1cfcd81868e85db3db9aa98680f974001fda8fe6a644f5efbb9d6e52e99ff606ef1ed7cd3b17fa6c6844790ed58da6df61aba0c200d7dff943588f4520891798098bddc65797b2f99c05efa090c60dc48a4e
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9369,6 +9380,7 @@ AdditionalInputA.14 = 066b072d48f6cc6bb00273e0bc0ebc086235fe79af1fbdb46318f56c62
+ AdditionalInputB.14 = cfb58f59c6d56993b9f0b5ba1643554072cf4ae8013c236120044ae909083f5f
+ Output.14 = d5dd7f55ffa7d53fc0f679cddadeb869f39b29a6d394c9f1185b11ebefbcb43419c6a26ae3c9ab9d456e2cdba1aead05e67eabd3596526ee431ba7cab7f94838062fcec2363cf0e19849ffef30064263b3a059ce38aa02c2729bff5af9450e035161816724163906112205196c642bfd70f36abb4639fd6e4f7f6a879ebbcc62
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9434,6 +9446,7 @@ Nonce.14 = ea7d3c3b8f6da0667d7f0d543c68d7d1
+ PersonalisationString.14 = 86c20a7e794c887898d5bc00e98398276a4e3ad8d674fb808a63a44330490d2b
+ Output.14 = ee8e21ff48af611a17d33e130f4e4224330efcc1402b6d55aaf1f514553b880f18df68c0e4279854eb2e9b904c552f69f0e1badc347ebe336b70456f221e07a2fc78df72551d99df3755997029ee1461e2b6e396370096d7e8c2dfceb73214a72ae2b25ccc60b92dd71988eda811ceac4b7c335528249aaf82826a14c142007c
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9529,6 +9542,7 @@ AdditionalInputA.14 = ea12ddcafa4f578b8b43337508dd8627844d185b10af7de7e907d113c6
+ AdditionalInputB.14 = 0cc670275cd2b0eac5df123eb1fd73c2f2b093b76806943918cf49930fa97515
+ Output.14 = 88dc727007c0e03c8d27d00c87876f8990b271964a5275f636ecd7f18cac9c869e5f9df5fb2d34e7f89c2e9819af562a706a03d9be9318896f5ab16573aebbfd94a681cbf27e7202b8674437667893246c267785d0deca5033de88a61bf5158177391c2e3232ea6f812c468d5629ed9f89ad0bec0f6c7a469f56331f9eba1cd2
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9579,6 +9593,7 @@ Entropy.14 = 6b9f904ac4b16d36e06a1bddc501d7ef98d5685c1ceadd0a6e1622e0c1e73716
+ Nonce.14 = 4a42f39e5a241a2b96db29055159c91f
+ Output.14 = 785014b0460831b7b67346c6997217b0f6c8e7313687ea6ff4d0b09a0786bd6ac362a0b1ddc6ab8c9c624625a379cbec7f11cf30ddab23cdec054b986175cdae0ca4ba4610e0711bc94e9ab706539d5fa2c1a4fd3cd49042696b58dce465f8e09a200e7d214cda357021c62248a01aeb95f8ffa8bd49d354fdccf4c71eec3491
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -9659,6 +9674,7 @@ AdditionalInputA.14 = 147d51711ae8a420f165db0000d9d0cb9e9cd5447311eed43d7cc9217d
+ AdditionalInputB.14 = 2910968bb1976a1b8ced116e673f408da6fc563695c918ac0a230b0bb800c707
+ Output.14 = 357a7269b30ca744e213d894f5c45d0db9fba897e0c863a56062f5018ad9be9f37b8d550014ed68f2c34bf5195c0b7460df171ff3bd4a590578670c92470d876c8de19d48a6d7fa15fc7996be78d3cc8a5c657439f4bb9865bd56e187d5df2531a405e3e0f4b87c611aa8e226b8b0266290f06f8062456a7a4bf0896e4ddd948
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -10995,6 +11011,7 @@ AdditionalInputA.14 = 23e4e6b0e0c1b28a6f9731f8b09960ce7adac17527b3bbaca7c811daea
+ AdditionalInputB.14 = dc7fac6aeded9e17b5bb5e2bcad9424d42dc07e809da59d52caecba6e75ca457
+ Output.14 = 5a42b35cf1b72d2520d92719a94ef1a7ca5b6d6c7eef2de25c8ea44c1fc3a9a5ff2128f47bbe58084a0c7a3fc790626eff5666b4c1e68fb2f53de3370b29c398d5067b255f5f7f29fdb0f8bc256ee3afbe78a33981626837c55f981e56eb2e1bdd89ca081e48f6da7ce6576fbd37dbd57a3f41cf410cb375614af239f2e10218e777fb97a55d9cc73243882b8d8d2a2c812fbdeaaed90b5bd71a274b4b171cd7e661912c9b3de1714a3fe4931d8fc7cb1c9f64f4e37d4e5dbc31602d2f8699e0
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11045,6 +11062,7 @@ Entropy.14 = 471746177fa3ebbc1f1e06fa42d61d5d491abc82eb7d66e749b87d562a7eff34
+ Nonce.14 = 42f8a1ee9b09940e9e1dc64f51a78b4b
+ Output.14 = 238c9889284139945e657d2c4312ee3ca2013de69be10bdc8b90d54867889f2c15c6cc933913457d4f5a00bd52b0216d90c56bcb341dde7496218861b083f80d8c933627e19b7bd8b73d6dda1bb0b2b0f1f90e2b453cd063938cec3a08f34e5581c1322329d87709e552a97e8a8c8e8e598a5c5cd6623ad1eb9f7ddd12739b1d157b1020cb8cef19402938d31b74e490c0ce75a9f57a17476df1cffa55de73bb8151071edf396c3b9e4607b07c7e2b45c249f5a8194cca1e97af78be47cec0ab0096cf588f3d4432393a8f5423a165d585e2e5f98fe47510d9415418aba28aab1193261036214c35d8ba04650b4539be6b9f7377e3c75ed236d0e69cce004906
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11125,6 +11143,7 @@ AdditionalInputA.14 = 4b69404b80b6f2fec36a7dff1b194a228761694129efa6c6b9a044f553
+ AdditionalInputB.14 = 519c4cf1b30500f729e5426d76373c291e26cafceb594c10c96bdb9aef4b42fa
+ Output.14 = 53568141a5c09b6b02ac4ab674d341aa6300f8be93c0f36a7376a6850abfce068927510a1b98301aaa29252cfadfe5a2f241abc677e9e70fbca287c579acd276c2eec5c8b508f2b119a40164c6a12c0e0ca1d3d53595bbebe32fda2eef2b613329a614a28d3b374a7b031b49dba74b465a7db60a8dbdcc9e952ea143e9d5a3a651c1b0d6dad79341a7c3fd5816933f2579cc005f3c5655eb8d3f9d1e4562a756ecca3fc1d688c9824391ec8444c6024774a295c44c17fe592694dcf41f305f50a16e07fc28e247bb3d9dd0c52c6fde79df84c8d521606cec9a55f909691f5cfd797b69304dff5b60ac816b0d5046a47c2434127da1fbaa86d2844f5164a9dbdd
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11190,6 +11209,7 @@ Nonce.14 = 8680d7b3f0a8ae576bb0f75364b463ea
+ PersonalisationString.14 = c0bf8f2ca4efb48b8dca73ca7148da3cd5981c5a459be32db5a14fc7762c68d6
+ Output.14 = 269b3b656e58f9aeed32c80700d9d1b863b0253b3b33155cc0849efbedfa51cff82262c9342cff7f1a7a58a5954fe66547baa1831fee55ae0d322674c6c784095f43b30c1887fb9fa5e7e7f1905da2808ab810ecd224ab403b6f562bac54e65cf7f0473991ce7d7cbc1a669a022fde3141a9880d974b7ede2fad24a3263570443cab0e8017d242fb4c2032dc8be56d8fc1e0e8f92254c7480e4941259ecc29ea47a1d11e074148b259ff95a94711d767f0655f1e0574dfdc4ae4f27b12015af86aefd36f6c10056c3d83e639e3641cdd8ba178f7779dcf502bab3d7588cffb72f6489981aaa7139c255df0e76bf6bba32e4f547327da4597745b15042869b2c2
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11285,6 +11305,7 @@ AdditionalInputA.14 = 64278bb6b8224b93c0b5339726fb752f6d81e85b204d76376d99779ff1
+ AdditionalInputB.14 = 4995815c060c80e9bead55dfe823b869862bd0e5b4357afe810a53c68d4b0e7b
+ Output.14 = 9b4249e1e692153ecd20e968f86eb31bf9a22d3671d0ce9d3eea243bfc70890644a95d551cb9956cc3770e95c2f14ff154760cba1b24c51c41f7a961a4502aa053068751618eaaf743e0d37fd41ab4969444519c22c8fd96f9eb1be6ff3ae01a25abba84a259dad8bbc78f47dcab3ac2242e6974a56454999b4c59243102b731fc4bb4e01c92d36f232ca8cfe00fcbc0ac200c2e403d17d5d1dd3d6c2095ddd15ad58a070f18b69a5f5d3f240435d298bd48bd9be028ccaeb10997f88857a848882f51a193522bb0b979b37b5508775fe150cab8ce97c0760b7418b5bbe496562fe639540e77c1025c0e191fe000aa5d1e49bf02a5a3c6f46b40dd2c47786d45
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11335,6 +11356,7 @@ Entropy.14 = 337373a24fe76f025575b3dbd7eeedd03d3459d6ef44cd53335a9c4963cc45de
+ Nonce.14 = ebbea7e8e1a3a45c58044b65ab7688b9
+ Output.14 = 21ae4510a133fa0906c873eb73e00d777b68a45a1de8759b1497f5146f0c45cf612b02e972ec93ebccbb85c9adaf0f5942fcfbb3b808482f05497f2f4734dd6d42c8413e1bd1bad10463dd4b4cf29f1662c15efc6d24955b1e54a60508d9ed008c9d29f8a6bddfe564c21473271350137452f4601179af37e19d553ec738539cfd7a8df17f07e1f9db5df776256e3c00199997307de394a8ba41be2829defbd8105fcb3cda215219fecb607eb1e7137a29eef188ca7eb349d2d1fe27edc2526ccc6d8f1af7eec9c06910f3909907f966d5904b32577f2715cc32ac08f1b5e25a734716ffddf60c57d422b515ce817b605ead2f875db7a789e351b660704f0cbc
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11415,6 +11437,7 @@ AdditionalInputA.14 = 771e91743429c40a2e3ececc9a3d73a92336c9c988c5d9dde47563b631
+ AdditionalInputB.14 = ae1a58611aa54df3c655a1f20985552ed9e3610e92170a0de1a4573a5a1f93d7
+ Output.14 = b2534bf690444513bdfecb35bd616b0de47b7cca7f8ab9c5e823b468da62855601b59c6bb75cf34fe3dbc7f795536b9619d243c0f6960895d6710130fbfda2a0bff803e856f1cf21a63e86e59be0d6da7516b697e9ff95c341913ff27c8abe10e6af1b7ad8dec9f7aab46b8d35c103f9bff3016b39ec24026a7b582f6e95261031f734e29a1b64c65639cf238381e5f7e31da624ad24290930501132c860118b6c59052aaa7cf982486219431311453a431a1cf50deaf068e2f9993c0ab851c9aec72be8f7c5c57ed03c488befe6ffc256efe6db52b7734c042b69a5ed74e2593c4788c5fa8a03a5017b927bb8f1c8262925d734c5604639a9b441187b0d95e3
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11480,6 +11503,7 @@ Nonce.14 = 78e7f6e9e8e1511bc0ba7f230b65fe47
+ PersonalisationString.14 = 37544eb1992fc569ff259946d639a00230ec1196c5565b8f9da62d9ce552e09a
+ Output.14 = 0ddbb84e21d4d7110b933bbeaddb35ad81dc1f331ac8293695b30924f2713eca6f93a13d520da4486f32a12412a927d00e3f27009a944056a5805b0e050f5bf6c6bd32c523c1d607d6e3e97b59fd059a610d664396f69961599ce7f0a0cbd1dcff15474ac267e36c0b871c559fd13b7ff0c3fcc11ff8dac26761a42697c3744981cc5c5ac10cd0f3b285c4ceb4a550ecead095f90fb6f53aa302218ede7ed5ae5deac91a83f957d15ee901746d11777b23c327ee811966690f5f253c7c314a2bf2bea73ca46c6c8cc332c3493f9d023029d762fc90e5dddbb838f2225c521f196332812570a17455b3db45306aa9100ca83185395435137a0b961531cbcafc03
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11575,6 +11599,7 @@ AdditionalInputA.14 = 8dab17e96142c890eb16981b97364223e815130bdb0c0c284e50dd3349
+ AdditionalInputB.14 = 1439e2d19a99703fc35607b5bde55331eca67b2b9a9f7587ddba0dd1fe690ab2
+ Output.14 = aa088ba4682bd2285e90c7967a7b8a518e0ec45afd490d367022893e3822c09d967d06ff28748b5de3fb33b071b73c581bd893b6641a72cd5db35540b904eae19765cc121ca4dc9404530114c3369fa80d20dd63c8c09559c4be48aa26ca77b47579dc52fdf0eb2f2db84ab688b87f63097140aef65410fcd7a81c2bddb2c92f9d67b2e46647aadd9b85c9e17ff8b579cd672708282981ba54d854e7c9a1de66621845ae2d337a90025ccbdd1b0d695790b1f977b1e944bbc04d16a9a399628bfb33f98b40e13567514d8ce0b23340803718ea3da44fa84c923f2a85ba21495c2f9541cbe8cadc0b230b1b942e934eb4fe95c3754a77a09641ad730a550fc24e
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11625,6 +11650,7 @@ Entropy.14 = 5f72e390aa960846a0004d266e3741b6fe0aaac98d9d87b4cbaaa7a2af0d0bdf
+ Nonce.14 = 2074991cf0c22cd34b2de48ea1f9ec66
+ Output.14 = 7bf54b69e455c7941e8e24ef59b5525dc1ed3b7f934333713b9dc305dcae2cd1b74648149e04bb4f4e00b110926a6bfead7adef954b6d7e180ff820192677efa3c0c8af6a3e201d8d555cc599cdd2626d8778ea2c7a2a8e0c99e719929ae9ac4fb9a7e5176da8987508d1152909f456a4ce9461188e264cda1c879af1a8cca6c182e73c164986cbf07f441756791fa1fae40b784800335d94b0b54135831044bf0cb5dbb5c0c71de6b6ae33d6b87782d34be3cbc2991ad109d6c0440916d91baf96c4375ecdc9f09dca79671a45309c408062cd08ee623c8de007cda3b3d110425d7e8fee13b2a14215033d9ea2397cc6b5c995f37273a00dbcdf9437bc77857
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11705,6 +11731,7 @@ AdditionalInputA.14 = 97f8c1e98fd25289be846d80f667341a095dfbabd610c691ad6b2b901c
+ AdditionalInputB.14 = 136912d2805ab8ffcb4e7d6a81e37e14b7f7bb65dd0241d56f11d7c72dd5de1d
+ Output.14 = 2e1f4954107f3654f51024f032518ba91512c9d8005265ff35248487b8c87d8862b8caaae27898a22f9ba7a0297fc071ceb6a1612bb99c0f15210a11f5a0725158832996f15106a7c43a216f90501c0dfb36933be940a875d4f6b0e5c29edb01614a26cb3ff7b906762fd6435eb7cec8c88f5fd7c4d76fcb018c08987108117c95d4d35c1c59efc06358c7abe7a73012ae4440b2ec86c3664e5549b8b0a30d6c8538d6e5151f9c17f9ce026556508b8b3d926e4364839bb526a94c7d8abf4c1241cd844bc6227a01d024affaedd4701129fb0f9b5ae853c7085ca13ec78ffa3476ddb1c1e71942c351c3ce9a855ccfa4c3c7f92b59d5b67e8eab16b699b7ed5b
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11770,6 +11797,7 @@ Nonce.14 = fe9dfa1b683fa9cc70b7c7f8c81185b2
+ PersonalisationString.14 = 7e86cf4111fbea8fa9b180a1bd9ff3e9d233304b1d293adffa49ce8e77f400ab
+ Output.14 = ca0a6268d034f6817edcb6875b4754b5e9b2061ce0bc2bcd27c28065d8258b40ae63bf6d1e15521196da0afea8139c10d7bf3b54694a82d24476c578991fce1371e40b78087d95b1117650af7134567513a017353bb4af85cdc98db757cec9f92df42b7323b1e5d05387debb02750683a5553bdfb5f9fa34e14d29e09ad18bc6ef2380c173a19631abde085369ff47fa8b4fdfebe13b95b90c6f5841fe5aa6334edcfae26c13cc5d14d17a02d684b64bd55841831bde4c75de7d49bdc1a405d4e3e0d327bec44644e972349a49cbd48a4d3b8e984f5847ffeba950fff55bba9b287d51d8475f7799752208da31d91853fe6d04d97ea2a33d53b07a4fc787be2a
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11865,6 +11893,7 @@ AdditionalInputA.14 = 91e14e178a033e26e6f6a0b0f3890fa46f83731a14cf31445c51a92166
+ AdditionalInputB.14 = 20299371a1de6f994260d1c59c1d3f731d8f70fea6e9389b3ede54d47594414d
+ Output.14 = 1b4efcce136b40bdc792d1607d4ab4fadc10d5e2b22eacca6f412d3aa1c60320bf825778e7ff8296db9ea360e068350f90d7d4947dc9a2e2a4074653458784059ceebf2a97db0e4a29f7c6107783fa3683b6846b8c8ce7161082405643bb84d602c6c36ca79b2b6562417f0d15f46a4fbdc445d50935f49eedf01bb131d104385369fdf88d91518618134a37c5bf73140400cced73795910ad0d2a89db2d79355ecedbcdabf135219d2afd7ac28cd7e45c6fd4e913ce5d464fd6de6e4c62b76ff86c28b0ab27a3c2622cacec075c790a7ff2f57f99ccb89c590a1dfb5a1862200c9cdf97f94eef18ddc85cf9830be662cec1885a629a6603add9396fb26341d9
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11915,6 +11944,7 @@ Entropy.14 = c5ebb2ae08a03815e496c2db1e2a650b40893ea78fbd7ca8434edcde4432a43e
+ Nonce.14 = 0cede46aca7d2a60f2e98eb3c7d1dba7
+ Output.14 = 6d8eeb5ba130de7dca993b44b46e08894fd84ab8c347992aeeac56ce5fb5f435bba92f1129aaf9b3035aa117301a1289acc222cdac043dac58b62567102dd5a57483d79fd703e188a0fe47254bb20b361281b5b8cedded86ba9b6d86deb30e539eb7ee007131ab2af99408f38ec7fd66bec4f1ed71251c149dbf8393b6dbe96cdeb9a3b5ee065ec8636444e72339ed2cb27fbbe5421f7f141940d6fa1cf570b8dd0393625ae16b10df2f1f6fe35dba15a732357dcdf4f56abcbb47a4640dcef618e27d049e27f2af7b8634faad00280e004cfe3f52d63185eccd6c4937a026830c38e1ed6aa9bfeaf739416706f63bb8b1475ac25d734db28e39163aa0c69c52
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -11995,6 +12025,7 @@ AdditionalInputA.14 = def9d8f7b18023b69c6cd4121c0adbc2a89b3ca37333d4523261d5eb20
+ AdditionalInputB.14 = 06051dec796525094018b436605bd2ddd66359a2836a5996e8262bb7763fadc0
+ Output.14 = 29e8184e37a5c26670bdc95c842c602ed8b0cf102ca144133e8cc841e1dc32fd038a72c26b8be8a568db60a4cfbd52b0d8b74cdf180a4931d6dd19a255104db105b3366d75e8f6afd0e5fab4dc14f6deac82e7703eb6a61f22b79bdad8ac7fab95a58a71f80fa510542615c305f7cbf84790060f17e7d78ab5d4b0ca34fad47133a0627b803c1caee3b97fe47626a8590672e2211f39cbe1b79d1999fb772b884122c8e50c59fdd3de13a53e805f40f8aa35501571a4c4cce79a8f738e60a43a11afdbed94e26f474ba5cd6ff5cdaf00d0fb84109aeb3510f1ea576c70ae78cdd0415a0521f3ff4083f9160011dcd6e2802cfbbbdfe9c4a3b114dd47b3a6cddb
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -12060,6 +12091,7 @@ Nonce.14 = 7b9a876017e5e14bd6a19719c73035da
+ PersonalisationString.14 = eb97028b093f820b182384baafa56ecf196dc11ebc515a405ac24f73e465ae9a
+ Output.14 = 3791ee66e505257b0bebc4319897e80ea8a70577b8a85d809cc7e4c77a458e8517368e2eaa7c0623b91ab3ebc4de3240e00e5f0cd20524d73b8000f00a3cecf869bee26763db9689dfaad9b5f21e3975f750e0c6b694d7df35fea26b2ff3c2bc679b5ecaf129320dde8245677aab9fb54b8faa97d394adae687a35b00f026430ef29bc7226957dac5edbc4a70dc82fcac00bf89d97e11d2a3e6ecfc4af4536c329ed3f4dda201db47236b03f30daf71e6368a18ab6224a023fca2ead589d9ea165d66fbce2b37a630d18ef1c97a619cd8949f16f44a9bc0f5837737d7fa4355587af5ab452f53fb82dd8b8b4706cf04e77938d7e0c3a9744c353edd0c6931591
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -31145,6 +31177,7 @@ Output.14 = 01f11971835819c1148aa079eea09fd5b1aa3ac6ba557ae3317b1a33f4505174cf9d
+ 
+ Title = Hash DRBG No Reseed Tests (from NIST test vectors)
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31195,6 +31228,7 @@ Entropy.14 = 6fe9597b59903b1af4012a15368af7b1
+ Nonce.14 = fd3e84b3a96caaff
+ Output.14 = 1eee4c786476d488e58d0e065bb025db548787fafbe757f29ee2bd4781cf69216091ba2b68919b54ad3070ac72a2342320eb1e697b9115acbe07e194d060562e4d0fd966ab29e2c5e560574b2dac04ce
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31275,6 +31309,7 @@ AdditionalInputA.14 = 93dc424bd0d266879601745a23317141
+ AdditionalInputB.14 = a17321015d327c5dc0bc1e130aad81ee
+ Output.14 = f682834b5b492e09ff8e0f2c80683b032a3b262d16bc609c550dc0e74a4b7d8ebc0e3b8f2c9970d90aec9a82497dded20422b17b9e3cc3bca771cbe717ddaed5a7a6ae2601c7f765eaa719b71624e83b
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31340,6 +31375,7 @@ Nonce.14 = fa9adae924417150
+ PersonalisationString.14 = dbad22c389c527715d21a5bdf38c1fad
+ Output.14 = a18d57e672218956e6c8cb9901d02888f3587177c3e11e1a99ea72370347b953a9f122c9446dfa109723b27f36fbf15edf103a56741c24968592479cfe30bc0053fa7b9818e9debcc494db64d15d038b
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31435,6 +31471,7 @@ AdditionalInputA.14 = e488e16f48c61dd2152afe925eceee92
+ AdditionalInputB.14 = 12c692abd90ab485f4d9499680a6893f
+ Output.14 = 8ba04617a135d8abe0c3c0a170e7472e7ed750eac706e5c3ed8305d6f6f8a1a53e0c52d4853b21ab8951e80970b426008ae11952ff364817b6856ef0810860dc65faea487b5d7c3f3d63fd443756d2a8
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31485,6 +31522,7 @@ Entropy.14 = ceb354444d1a29c0c3e8a1cc24d02846
+ Nonce.14 = 86d3fd9fc51f8b19
+ Output.14 = 6f90ad611987a37bac54bea0782ac78215b7d17ecdd3991a81a36d0e263c6f0dda2c102cfba56b26c7b74b5dd2548be9bc81c7958e9d19821583c6f388132b9e19ae7609add9a296c1e92d66a2ef5464
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31565,6 +31603,7 @@ AdditionalInputA.14 = 32d09b604a65dc8daa35cdc34141b751
+ AdditionalInputB.14 = b8186a294c7824b7c550c1054badec00
+ Output.14 = ae9a091cfafbf0e74c2be8ad4b984e824a24e65ba7610b0f3ab1750e2f12de1620db6bb8c493b3d8b06ab78e69cf2dffd73d4322a67ee7725aad84fb458b8f26cf04846850202e53c874213221e761e5
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31630,6 +31669,7 @@ Nonce.14 = 8368ee0e29d35c67
+ PersonalisationString.14 = f189a80d5619f53cce878ed57522a468
+ Output.14 = aeac5933065c33ce2ace2531a193e367f73c83fc328f61ee2627f6f3841914c6b8a3ff767f96b3c3b685bac931af9ec10c6f3efe25b5109bb647b120e3a3f6971a4ec41f4ef0c7a900fdb09d7ff3b247
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31725,6 +31765,7 @@ AdditionalInputA.14 = af578fbbb8a830947e9b4e2c9e729336
+ AdditionalInputB.14 = 5a69864ca39da1ba4719dfe1dc850a4a
+ Output.14 = 8b846f03cb66f7e49fdddf7cc449a5f3f6ccdc17ae7e2265a5d0e39ea10fc3e6cffefc04147b773a1584e429fe99e885f278aff74a49d8c842e7ccd870f1330692fc9c4836dac5046c544be74652da26
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31775,6 +31816,7 @@ Entropy.14 = b7ddb82f5664834b4fb17778d22e62f2
+ Nonce.14 = 52461924becab175
+ Output.14 = 8735d06e26814ee54b5daca4e1da3e321a5a19b062ec0c3afbe3b16f23332a687fadb29e65208130c3d667c075660ff70aea96430fee254c472686b8e82ca359a57bbdc3004bb3eb641c1f97e4b19e02
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31855,6 +31897,7 @@ AdditionalInputA.14 = 7725ef70592c362d70b088ed639f9d9b
+ AdditionalInputB.14 = 5ab2e0067c3b384e55a78492f0f6ed44
+ Output.14 = ca095da39d9c21d7da073d9c95d2e415503b33c327d739f1838bbea4fc6f0254fdaf8ef6152e9263f46b864f39c7104d1d337d99fee588061152e623d7e00a27e03b5d16fe6e543453a31d4dafeda3b5
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -31920,6 +31963,7 @@ Nonce.14 = 4e838a124e4b53df
+ PersonalisationString.14 = 163e393b290a4d390ab0beb392f52d26
+ Output.14 = 76234afc296ea36a44254f999ac31fca258a24427cf4bfe2c54495fc41478ec4a00b540659b3b9461cc6188bc1f57c19ae414bd18aa81eca7b9d765a784f0ef24335e46c2c77b8dc915f5d12c26bc653
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -32015,6 +32059,7 @@ AdditionalInputA.14 = 27486f8dae1b36462639ff7eee869a29
+ AdditionalInputB.14 = d1bfc7eabd8eddf622297012169f351b
+ Output.14 = 4c893c3d1ed3a190fa88e159d6c99f26a02fb5fccb98bdef9fe43f1f492f490109224ba6c317db9569f618984409f2fb3db0b1e2cd4b95746f159cca76f1204f6d2a4c455c547a39a5f79fec95c8f4cd
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -32065,6 +32110,7 @@ Entropy.14 = f484b922f492d19b58407c242ab90e76
+ Nonce.14 = 8952a0a4b666b0c8
+ Output.14 = 2d77235fa273cab3c1bb176d44817cc25300b3f0172a0b5aaa66b282c015d426edec5f1ebbfc0269956b85994167992a71002586923ea234be6c5df09f47d89132e440827b89f7ff97e032b3f74fe32f
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -32145,6 +32191,7 @@ AdditionalInputA.14 = 9e3ea6eac120d663e330d282ca9b9d7c
+ AdditionalInputB.14 = b8d71fce7779a9906b9790cd1d4e48d5
+ Output.14 = 63d28a300a329ca202b98498c9f46912620bc85c246f034dca4186cd9b0e0810a363785878effde90aec8cb584862524eebf940c44fed21cb580d4115f3e0dda07e0e4a66689c2ff3e9b87edfaa4d051
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -32210,6 +32257,7 @@ Nonce.14 = 7239f92b63fb3dbe
+ PersonalisationString.14 = 8d2e2ca3985bd2538a71f02cc3eb5568
+ Output.14 = 0e4cb328c03faaedbec7215725851069bceae4332de6a70e3521dd065f2f7923485969571ebd7f24be460fd901c6b3e356da6ee5262ef2d76ad14eb0f697f8fb92af2f46630198c5f7018860886147b3
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -33481,6 +33529,7 @@ AdditionalInputA.14 = e5c633ca50dcd83e0a34d397df53f6d7a6f7170a3f81f0e6
+ AdditionalInputB.14 = 5f0beb5a2d2968e83ba87c92bfa420fd6e8526fbbfdea128
+ Output.14 = 8bec11df1022aa50d95daeaf23d78d6ee45c43c5768b90181e106c7df8ff333d7cb87ca1ab83f8742370db1c8c0c0c22f141ff4de33ae8bdb14fee7e6c069819320629c66d94c7c97ff52930a3c1dcd501b60f0f84bda4720ee187ae858a6e068326eda5809716e366d1b608c61b0100
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -33531,6 +33580,7 @@ Entropy.14 = 1194beb668839c47c73e7516f9ba09d23dec3553b3b5532f75b260106dcc2abf
+ Nonce.14 = 3c8a77351e93065d584feeb08c8424a9
+ Output.14 = fabd48bfcdd07968239fe538c2d8c9bde2e257b9b244078f39287c7ee90de167fff56a693c4e64f45081635511b5fd031c0270a31b4a014e44c0516a55ae72345aa11dffcda4ccf8cda50f6948d5ae425d8d53ad5c74cef1364277990156796e1c5dfa1ef095c0d8983477eb24241135760b02c86c86d4ec3627edac8c1a7e32
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -33611,6 +33661,7 @@ AdditionalInputA.14 = 626385595bef7103af0af700e1df048d7572286af709289b7894d2ab09
+ AdditionalInputB.14 = bfe8946dbf27d3a2127ec600351c3920d2531eb9419408233e0a888059b5eb68
+ Output.14 = ee6d07661828213e6453d94faaf76345c70949eca4965714c350313b0bcd8e079e6a07f8b2f7a91bcb7ef39a61568fd1c40ab78f154b3582f830095d571de29f81f9565e46b560d34c32bff55341a991f8e863bd9242c7cdd366be12538bb6922f1abfa19e7998aac61d465fc46538ee9142acc66786f4516ef4105fe1d80372
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -33676,6 +33727,7 @@ Nonce.14 = de2186bafa82b0d08a0b8215e3424512
+ PersonalisationString.14 = d96db27febe22db935b117dc3068374e39c5b2119b497e3c1d858ef649e01de5
+ Output.14 = d04435a8aab397cfcee5151f7aa24298ffc6eee4f577cda42d5e154b8d28cb2f0f945f11a15ed5b76486c88f03081cfd262d94a8e0b332e3c9c608461dcc8eba20d7db209810d25c226fda9fe218022a9b2c96876cb16c06c0553dd84ce57e20338c3d3e03c59ce22e668e25c2c50d5cc9afab91f50a28680964c2dacb9d2fb3
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -33771,6 +33823,7 @@ AdditionalInputA.14 = 5d9446eff72d59529a90b498d8f40983b3b2904f63664fc0aa1de8700d
+ AdditionalInputB.14 = e19707aafa391e8622539d52a05d930292bd0f7c17825dbed5fb7a2f8734081b
+ Output.14 = 6ce2ae37349cbef9ebd1f9b85485810a22d430d94abf66912dd7b6cc751400e777be2f1cebc19d65694a456b2c6429cefd95eb934030846708d50be3b274c2f7de299f3c311038491f271448c7d02ff51de048fa1184e8ee06b7b46a9f123daecbebae4a2183dc8eb6976abf0dae7cdbea6017cd1500f37dfadcce0c1956ea87
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -33821,6 +33874,7 @@ Entropy.14 = a7a1dbf7f828555610197e71e0ad563b8691589c5289ced03e9ef83b6f9ff938
+ Nonce.14 = 4274788c5d80e26ec1ac3a57b9c7c0df
+ Output.14 = 5a907a26c1ef588219d4c69fcf4c5c283ab148a77588a40b323bd24e6dfb29551c4b6116c4d61349f5f8bd9ed497f38b239c37283902beb3c9700c768fa289ee4573f92316efb860a5ca4267b328f03c13138b774b4b9f7516003a699f7a0854a0efb045a5932753a771c2cc6119202b33336f10edb715bcce1d20ff503dda01
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -33901,6 +33955,7 @@ AdditionalInputA.14 = de1bbca12357943b4489cc7209b3f063b51b91acc168ec5e0ad88048b6
+ AdditionalInputB.14 = 6ddd9aba4f100ef902ba50adee53ef44a4f45564c13e774e69557e36a357e7cf
+ Output.14 = 544ec80a966644454886fb97a0f05eb6a4a25fcbce795b5e5b27ee06ba14b7de18dbf54f80a670b87c76c336ac9af16c8958ad6c1bde9a97aa4c1ab5823d24a53c64f6766ce6eb9b7085cf7282499c37fc1e2e825f53bc357bf36d5901e0ae93cd3bd821fa18b5aa17548560f7ad6ef38124814fccf9b2b89de61cfc27c7269b
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -33966,6 +34021,7 @@ Nonce.14 = ab7843b73ecb4858f2cc5e9dfca803ef
+ PersonalisationString.14 = dee559515084d8ac49c3803f09f3d5fed3b307946a2752c267677f22786a0125
+ Output.14 = a12f5e8ea3bb174934c15e5d114ba615da33210c98c38d7fde4b5aef9aecdeaef311d929d7fece7fee11db67134c3326b413b8dc17766ba4fb881105db68688b148fd95d812f6538b14f25afaae84d39025336136d270bd643f2a6c7164930372fb1c8f4f0dab60283e9d8d3440ce8dc66761c5d5c4c13cc3a367feb4869b559
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -34061,6 +34117,7 @@ AdditionalInputA.14 = ead8c0dcf4ddc909aab96eadab509a46908ee5f090983af609f08d8a8b
+ AdditionalInputB.14 = f357bda8f2048929a4e31969ec978cc333d58b4fc09a8aa1b73ec9bdfaa1a8f6
+ Output.14 = 901aabb3f065be08e2f8072d5d3ffcb28ab291420644e407e7a6a3346b75a5be535bdbdd5a8245998689450292df877233ef0783e0bd1765413193790995d884ffcb2c8dc35fe4cfc12def2f091866d735b1dcfc9d8d8c26903d50e9397b1bbd674bb81fc908361b2bddb68f02031d87588cc3e94210422674e93fea6a5329af
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -34111,6 +34168,7 @@ Entropy.14 = dfa94c198483c5daa046f1dd1e4e83f854fd6c5cbc3465f671bdfd36837779ab
+ Nonce.14 = 298de64bbd817d009a71c1424ae839f9
+ Output.14 = bfb9a54ce31406a82608aebc826441f8f633813a0c3bad723b802f3e905a6ee3512ff3513062aea51f93be17aebf1cfcd81868e85db3db9aa98680f974001fda8fe6a644f5efbb9d6e52e99ff606ef1ed7cd3b17fa6c6844790ed58da6df61aba0c200d7dff943588f4520891798098bddc65797b2f99c05efa090c60dc48a4e
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -34191,6 +34249,7 @@ AdditionalInputA.14 = 066b072d48f6cc6bb00273e0bc0ebc086235fe79af1fbdb46318f56c62
+ AdditionalInputB.14 = cfb58f59c6d56993b9f0b5ba1643554072cf4ae8013c236120044ae909083f5f
+ Output.14 = d5dd7f55ffa7d53fc0f679cddadeb869f39b29a6d394c9f1185b11ebefbcb43419c6a26ae3c9ab9d456e2cdba1aead05e67eabd3596526ee431ba7cab7f94838062fcec2363cf0e19849ffef30064263b3a059ce38aa02c2729bff5af9450e035161816724163906112205196c642bfd70f36abb4639fd6e4f7f6a879ebbcc62
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -34256,6 +34315,7 @@ Nonce.14 = ea7d3c3b8f6da0667d7f0d543c68d7d1
+ PersonalisationString.14 = 86c20a7e794c887898d5bc00e98398276a4e3ad8d674fb808a63a44330490d2b
+ Output.14 = ee8e21ff48af611a17d33e130f4e4224330efcc1402b6d55aaf1f514553b880f18df68c0e4279854eb2e9b904c552f69f0e1badc347ebe336b70456f221e07a2fc78df72551d99df3755997029ee1461e2b6e396370096d7e8c2dfceb73214a72ae2b25ccc60b92dd71988eda811ceac4b7c335528249aaf82826a14c142007c
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -34351,6 +34411,7 @@ AdditionalInputA.14 = ea12ddcafa4f578b8b43337508dd8627844d185b10af7de7e907d113c6
+ AdditionalInputB.14 = 0cc670275cd2b0eac5df123eb1fd73c2f2b093b76806943918cf49930fa97515
+ Output.14 = 88dc727007c0e03c8d27d00c87876f8990b271964a5275f636ecd7f18cac9c869e5f9df5fb2d34e7f89c2e9819af562a706a03d9be9318896f5ab16573aebbfd94a681cbf27e7202b8674437667893246c267785d0deca5033de88a61bf5158177391c2e3232ea6f812c468d5629ed9f89ad0bec0f6c7a469f56331f9eba1cd2
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -34401,6 +34462,7 @@ Entropy.14 = 6b9f904ac4b16d36e06a1bddc501d7ef98d5685c1ceadd0a6e1622e0c1e73716
+ Nonce.14 = 4a42f39e5a241a2b96db29055159c91f
+ Output.14 = 785014b0460831b7b67346c6997217b0f6c8e7313687ea6ff4d0b09a0786bd6ac362a0b1ddc6ab8c9c624625a379cbec7f11cf30ddab23cdec054b986175cdae0ca4ba4610e0711bc94e9ab706539d5fa2c1a4fd3cd49042696b58dce465f8e09a200e7d214cda357021c62248a01aeb95f8ffa8bd49d354fdccf4c71eec3491
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -34481,6 +34543,7 @@ AdditionalInputA.14 = 147d51711ae8a420f165db0000d9d0cb9e9cd5447311eed43d7cc9217d
+ AdditionalInputB.14 = 2910968bb1976a1b8ced116e673f408da6fc563695c918ac0a230b0bb800c707
+ Output.14 = 357a7269b30ca744e213d894f5c45d0db9fba897e0c863a56062f5018ad9be9f37b8d550014ed68f2c34bf5195c0b7460df171ff3bd4a590578670c92470d876c8de19d48a6d7fa15fc7996be78d3cc8a5c657439f4bb9865bd56e187d5df2531a405e3e0f4b87c611aa8e226b8b0266290f06f8062456a7a4bf0896e4ddd948
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -34546,6 +34609,7 @@ Nonce.14 = 66ad2a0d5de624f3d709cc95e5c99220
+ PersonalisationString.14 = 6f7f8f1ffdcf859adcf6020d5cffdd8e3e1bdcaef0b22e9e61384b888f1b3537
+ Output.14 = 1bc4cd76787f031df8e4f592f56a845f7d8aa200aca0b910e68f149cde112d0f1e127faa7fae25ca4299eacf9e49e132f3e4083f1c5fb0304b714f06cea122bc1392cbe18289d2411ae08642a9196b654a8b177c127b9215f9df815eceb254b8d9b4f632d25d123ceec686124e58b3606ff1ce51fce0752f42232c03694a1d8a
+ 
++Availablein = default
+ RAND = HASH-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -39331,6 +39395,7 @@ Output.14 = c731cc7b21c42730bd3cca61fc5250b507ad08b24ac471d526f2217f15dc4d1fea85
+ 
+ Title = HMAC DRBG No Reseed Tests (from NIST test vectors)
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39381,6 +39446,7 @@ Entropy.14 = 5d80883ce24feb3911fdeb8e730f9588
+ Nonce.14 = 6a63c01478ecd62b
+ Output.14 = 9e351b853091add2047e9ea2da07d41fa4ace03db3d4a43217e802352f1c97382ed7afee5cb2cf5848a93ce0a25a28cdc8e96ccdf14875cb9f845790800d542bac81d0be53376385baa5e7cbe2c3b469
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39461,6 +39527,7 @@ AdditionalInputA.14 = 7206a271499fb2ef9087fb8843b1ed64
+ AdditionalInputB.14 = f14b17febd813294b3c4b22b7bae71b0
+ Output.14 = 49c35814f44b54bf13f0db52bd8a7651d060ddae0b6dde8edbeb003dbc30a7ffea1ea5b08ebe1d50b52410b972bec51fd174190671eecae201568b73deb0454194ef5c7b57b13320a0ac4dd60c04ae3b
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39526,6 +39593,7 @@ Nonce.14 = 296bfe331b6578e6
+ PersonalisationString.14 = 4fccbf2d3c73a8e1e92273a33e648eaa
+ Output.14 = 90dc6e1532022a9fe2161604fc79536b4afd9af06ab8adbb77f7490b355d0db3368d102d723a0d0f70d10475f9e99771fb774f7ad0ba7b5fe22a50bfda89e0215a014dc1f1605939590aa783360eb52e
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39621,6 +39689,7 @@ AdditionalInputA.14 = 4de6c923346d7adc16bbe89b9a184a79
+ AdditionalInputB.14 = 9e9e3412635aec6fcfb9d00da0c49fb3
+ Output.14 = 48ac8646b334e7434e5f73d60a8f6741e472baabe525257b78151c20872f331c169abe25faf800991f3d0a45c65e71261be0c8e14a1a8a6df9c6a80834a4f2237e23abd750f845ccbb4a46250ab1bb63
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39671,6 +39740,7 @@ Entropy.14 = f41d60edb7749acb68111045000ccef2
+ Nonce.14 = bb5fb8962ca3002f
+ Output.14 = 262821119be1ee0bceedc1bcfd04f7fa2e199b2a7522c4a3a98c4174e0ac4ddcf7323dee2fcf9fbd2fe26c4fad347f7199be105730441f042865aeef50b89c00aa661361b6a1f20849bc7c70aa294543
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39751,6 +39821,7 @@ AdditionalInputA.14 = b4894bbb6435ffeb710bf5ae440bd744
+ AdditionalInputB.14 = 689fb48c27983ededdd56d5a6b2c0345
+ Output.14 = dfe8a9e17b938a1782fc3dba4f234dd9c9e36b67b28e1d901ca6b3628689aa4d2ae6b005ae3ce97e0d1e645da2710162294606ce51638b91e9c46d8f7f4f1a217e44c36b560f78b0541fececcf49b9b9
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39816,6 +39887,7 @@ Nonce.14 = 3c9434b7d7e18472
+ PersonalisationString.14 = 55bfc33da17f712877829b7f8a134e55
+ Output.14 = 705950e4790ada95b99ace57e31115610ebc65d755fe587eae8fb1aeae463bea8b50a278f45e61d3433272ec31b0d48afcf219f5f4a0adb20537be9c7cb65911df28976aed4b4278cc524639a1ca5f40
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39911,6 +39983,7 @@ AdditionalInputA.14 = 7ee4f3670c4671f128cbd743c408bdd1
+ AdditionalInputB.14 = 38f8003e8fb8c119534a2c3400a87f8d
+ Output.14 = fedbb1636b83c5cc5379c9aa4d1319df6d30770e469c2f7bd65b4b74d9bc880d520e11b2c3642a7c4cb6d6138d1d92f716317dd762c0a841e56e7e0226971a7f470e918d44b4f374f9e7e3b5209516d3
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -39961,6 +40034,7 @@ Entropy.14 = 5b6aaaf5c4e5acdacd2c0c14648eeb3f
+ Nonce.14 = 353cc1174da7f766
+ Output.14 = f7664dd99fb870dad1a45a4ddb870c9936fb42b3a063336e447f15703c5a95dd79eacd9f41cd0c1b4f2e1a45229aca140f463c1beab47aa0525e5bd6e1accf360bc8525430ba05fd14d1f008009fd586
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -40041,6 +40115,7 @@ AdditionalInputA.14 = 4eb5c1192fa86b355237b5a8bd43ebf9
+ AdditionalInputB.14 = 7323d1a6f983b7d16df6b0aa9d14adb4
+ Output.14 = cd41a0d7371b2eeb790fa8335660385c418ba84507ba94d1d1015b3353cdcad556993c19388461fd2cce38cc9fbc00e707b18dea9d712ac0616b443b23aee8131c295a1a741ffde36b2032bdb8ae2f6f
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -40106,6 +40181,7 @@ Nonce.14 = 9bee7502db25ae7f
+ PersonalisationString.14 = d0e8fa47aed6b67ca4e8e521f733921c
+ Output.14 = 3c649d295fd9b98082706f3f841f5275834143698c202da4c881c7d0a3c9995329a54d440fc4d21ab596e95e5b6651c6e7138b332c97ef771bc6e3b0b3fa09090ffb402ed1116d8395e5f1cfea3eae6b
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -40201,6 +40277,7 @@ AdditionalInputA.14 = d56ade0d74ea34577eb12a899d18d382
+ AdditionalInputB.14 = ea83bdba8490ffd136def5f7d9240c59
+ Output.14 = cd3d8174d8af97387ff02707d2757ce685ffb5d8dd91d95b8af4a3a757f9321b0e908096cd1321de0599640b7d81f43606b12e029ae158ed568ce1db429be75285c655e15f88da859f09b4cd843a0b61
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -40251,6 +40328,7 @@ Entropy.14 = 1c3fc8de26ddc78651c9c2e4ba874ee0
+ Nonce.14 = ca6a2d3cc5495dd0
+ Output.14 = d00ff8d3b8ca273cf7c3650e36c892018c0f765da45ab5b902c5accb30ffe01a99d3b86752195dc9aa1232fc852790ef51860fd114bdc78ae02acb5ab2021ec726829591d623b0b66329e641c1f915ce
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -40331,6 +40409,7 @@ AdditionalInputA.14 = b180d77e0ef217268d2d4dc9d4a9532f
+ AdditionalInputB.14 = b192957f3e98f7595768d00834eee1d9
+ Output.14 = 7d4791ccae7980ad19e5d8eb8932ea8ea1756710349ab8b771558cfe471a278dcc263b737486179a4ffad12d5311d23912c3a46f07152808d288be2dfd2b315fc4f6df6418029be52daed643dd3c6110
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -40396,6 +40475,7 @@ Nonce.14 = 84f7310a7ab653e6
+ PersonalisationString.14 = 0fb2233c2cea27d17b6dd93bc4621285
+ Output.14 = a2f373a523ac9f2524b059d0c23bcaa905e15948c7ebf71b6e82150aef562dae4003c1a8a3748cfd553d9a51a8f9450b9d569d96d897fed50eee23978e49b364c64db63fac9dc0fe9e8b58836aa04a74
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 0
+@@ -41667,6 +41747,7 @@ AdditionalInputA.14 = a58757b98280d90e84d6cf4e2fa89c01a9e6aad22d6cff0d
+ AdditionalInputB.14 = a3f5de1ec6d0ccd39fa153899f0c1a414106a2aa182acf31
+ Output.14 = b1797707f1217d81c8463b44957df350dd139073b056c50d1c912fa111f9cb488bfb7d2ec6faebd078171cd6b71171ae33698ff96c7225d7fd36ddcfeb2630464974d12b3e03877bc73ce1a2f89aea7ff7ddc8ac85708b35dd94d3972875e2d3e7237ec33871e99301202b52e2ff89db
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -41717,6 +41798,7 @@ Entropy.14 = 451ed024bc4b95f1025b14ec3616f5e42e80824541dc795a2f07500f92adc665
+ Nonce.14 = 2f28e6ee8de5879db1eccd58c994e5f0
+ Output.14 = 3fb637085ab75f4e95655faae95885166a5fbb423bb03dbf0543be063bcd48799c4f05d4e522634d9275fe02e1edd920e26d9accd43709cb0d8f6e50aa54a5f3bdd618be23cf73ef736ed0ef7524b0d14d5bef8c8aec1cf1ed3e1c38a808b35e61a44078127c7cb3a8fd7addfa50fcf3ff3bc6d6bc355d5436fe9b71eb44f7fd
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -41797,6 +41879,7 @@ AdditionalInputA.14 = 4f53db89b9ba7fc00767bc751fb8f3c103fe0f76acd6d5c7891ab15b2b
+ AdditionalInputB.14 = 582c2a7d34679088cca6bd28723c99aac07db46c332dc0153d1673256903b446
+ Output.14 = 6311f4c0c4cd1f86bd48349abb9eb930d4f63df5e5f7217d1d1b91a71d8a6938b0ad2b3e897bd7e3d8703db125fab30e03464fad41e5ddf5bf9aeeb5161b244468cfb26a9d956931a5412c97d64188b0da1bd907819c686f39af82e91cfeef0cbffb5d1e229e383bed26d06412988640706815a6e820796876f416653e464961
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -41862,6 +41945,7 @@ Nonce.14 = a59394e0af764e2f21cf751f623ffa6c
+ PersonalisationString.14 = eb8164b3bf6c1750a8de8528af16cffdf400856d82260acd5958894a98afeed5
+ Output.14 = fc5701b508f0264f4fdb88414768e1afb0a5b445400dcfdeddd0eba67b4fea8c056d79a69fd050759fb3d626b29adb8438326fd583f1ba0475ce7707bd294ab01743d077605866425b1cbd0f6c7bba972b30fbe9fce0a719b044fcc1394354895a9f8304a2b5101909808ddfdf66df6237142b6566588e4e1e8949b90c27fc1f
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -41957,6 +42041,7 @@ AdditionalInputA.14 = 288e948a551284eb3cb23e26299955c2fb8f063c132a92683c1615ecae
+ AdditionalInputB.14 = d975b22f79e34acf5db25a2a167ef60a10682dd9964e15533d75f7fa9efc5dcb
+ Output.14 = ee8d707eea9bc7080d58768c8c64a991606bb808600cafab834db8bc884f866941b4a7eb8d0334d876c0f1151bccc7ce8970593dad0c1809075ce6dbca54c4d4667227331eeac97f83ccb76901762f153c5e8562a8ccf12c8a1f2f480ec6f1975ac097a49770219107d4edea54fb5ee23a8403874929d073d7ef0526a647011a
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42007,6 +42092,7 @@ Entropy.14 = 17da1efd3e5250dfde3ef1683bd9cf4d4432a2f223399664f7645763bebd5ebd
+ Nonce.14 = 0b160c67b97d5302972b5c517bed5a7c
+ Output.14 = 859bab959dd16f2cddb05376b3d3e46cd13c191c18203bf3c0bbd5803cc559aacce48d88564166fd5f43c22d08cda1acd8004f36915739796a39ca96f8e7def14b58a8ee55ff72de7e2e2727389e027657447e32e47d4ea2f0fda48e86046d111cc334bebf4ee1019199c94fdb26169661cec0b0c47176cb5fb7aed8ad35afb1
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42087,6 +42173,7 @@ AdditionalInputA.14 = 50687524beffed38fe27963340483886645153311dbd4d10d86e7d6b26
+ AdditionalInputB.14 = 1e3ebe4a54c3092d540ad2898ec3be1af84a1d515c013632402ffdeede7caa8b
+ Output.14 = 007139a46072d9dbb6589b8ecf5f287d3aebb13b480ffcd6e95f0b2f916cd99e75f30a21971298257a80c17e9e41f8e0874dc9da8f6c18007a6e4cd5971df083ae62bb7b9f1bd4926f17e5574535f6009c0068b4ea3a50e2ba6c6aa6c7729fbe8ba58b4b795740ff6ae2f3d6fbe3e06828080cd1dcfb11771ec98ad9e0bac0b7
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42152,6 +42239,7 @@ Nonce.14 = 2b653a89e549e3b1ee7817f5864fa684
+ PersonalisationString.14 = 814146b3b340e042557b0e8482fcc496a14c02d89195782679172e99654991ed
+ Output.14 = 3ea100cf50c25d7b2ef286b5fa0720f344de2d568979e7349befa23589083e835205cdf6a4670722fff04260e54618c9c00af75cc26eee665b64e7e628ec4c56a8086dcd583681170f60d565bd97d0f416e4c231e281081b0fcd16c8db63ea9029abbfcb068bf57a36364aa9e27603f447adf337baa35f049a129abdc899f808
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42247,6 +42335,7 @@ AdditionalInputA.14 = 95f6df9905b652de6d08399f61956acf943fe412bc71de60d6b69881f8
+ AdditionalInputB.14 = 87b818568ed80f7c2e8f5b5d7be403f8badf9fa0e716aaf1d6409957b242aa07
+ Output.14 = 45b5182f313a26008bb4ab82f68a12e7c783c243ba1ac6d8bfaed44ddddb607f964ace9c3505d59ef5a3691143a4845491661a1dff8ac4de2e56b54e263ac3aef86966fd656b5a65d4f3b89731d50fa919663bd5691678ee5f8f499e84b1822bd0b91409b62cf98c176df7e812513f3252d25d15fe13ef9f253af477d16bcfcd
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42297,6 +42386,7 @@ Entropy.14 = 32695b2c55839eb3a048fabedcae1f23bf0c7206280ba4ba0d08b9bd9f119908
+ Nonce.14 = 01f2a4cf8a9311abe5ecf58d6661dc5a
+ Output.14 = 4a4f44f418d585e03f508f2ff05345abffeafd75f610a957be7f3ccaae31ba28e69bf8ae441a405fdbc0ee761e39c76b69062f5a3866fc296be1ad306e6584ab2d250d717605c70a17c46a298f714e4e820c85a1fb84f4d61b9857a40c2902193ad703c78635a2791abe6abca6124229ed75827135c27f1a04d244e1d73ff059
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42377,6 +42467,7 @@ AdditionalInputA.14 = 2e51dbbfda8c92f2c838bd85ca5dfd7f35504fae1ad438431b61c2f062
+ AdditionalInputB.14 = 00f507a359585778988b6bb6b91f23d4ab29d2adbe632e4cd4646c8cd5f1b76a
+ Output.14 = b7adbbf07414551464711ad9a718315b0587db2782d34179b70b4c0e323a91ad9de40933023e3a6be71cd50dc58953ad1bf66354bc45dcd9ea23682d487b43903a8f426182536e170af8b04460c586d8ca56e4c307ab7116d8130634dc9a58e1c3077bbddd6bd58c8a0fb9b18c4b839aacf5fcd711c611db120e6a605745e86a
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42442,6 +42533,7 @@ Nonce.14 = 3f9e88b93a6e69d070328c2c570c3be9
+ PersonalisationString.14 = bbe702bbd2265e73aa073f47ce55fb65902abbe51635b414df688c60868546e1
+ Output.14 = 0280555ba6b2379dce7cd56615d7d86feadb8ad995e2852a0607e663a34b1e0342c7bc649adcb204e271eeb87521591fad74b3bd841971cb100ae5f21599b732d8c5f9d578c1113da7034b580013720e62b1d013e28205d5024f8b1eb3219e6cf821792713354cf1349d32a64f32ecdbd7578c55e401fbea57f21ea3ebef0f9f
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42537,6 +42629,7 @@ AdditionalInputA.14 = 38684dfa6edbd61e464e49f7d01932802a5a5d824db6b1df6087e84a8e
+ AdditionalInputB.14 = 4949b08a12656c497cc6760791982c0d4e674b0f8a14be730a91689ee77e981a
+ Output.14 = fda39bf8dc1aa785422281dec946bad99d5ead17cac55d47bdb9bd0a80a72f3c611f92bcf29e3e45475426a7a9f139b755f332cf75035b047697f4131c9bbc9ee825ede9a743b14f02dea122194405864aa2b538ed5cdf40ecf81e02bed1556ce0e7974548f050b084b8f3626c0fb2c7272d42cdcb039af4c7d957e285b53b5b
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42587,6 +42680,7 @@ Entropy.14 = 1006646f977b83f4d90870f24b3b72d0b4947037f7671a64ce3b52829506a519
+ Nonce.14 = 5698d50f59c42b26339d218fc985a41d
+ Output.14 = 44ab1d22fd3a84f8847c33d0fb0aea66408d5181b8ea95416beddd9784d86d72d2851857b503253016036246cea11f2ad2bd18fe56508697a50b14e7c85bd9b002deadbce5ff9f72508b6ebce741dd7803a2d8633dbec235cccd37c089c9d747a52000ed4cc1dc8545ddb65e784a698bdc74a6ff4fd7b3dbed31a22f83b4fd8f
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42667,6 +42761,7 @@ AdditionalInputA.14 = 8d72118578abbd90ddbe6115ab10b499afa26c2360eaf6fa118ba590ac
+ AdditionalInputB.14 = 6ca4d45fcbd0c7e964557b2bd7622a528b4722335b47383f7bca004b7cd5cf04
+ Output.14 = 360d9ff3111c6b713fc641b571b582770991885f2fea806a485006a1b4f41ece4ce83dcabfd403edde77780c044c96e85ce5d1f1a368ad881a64be8c41e87f0a682ab67170ae05a24b08b4a9178d13ac9928ecb3b5e23e745d93aaa5f111c335c77cb9a5c3da8163cb428fef60da737b884105ae57616637b0e40bad9594bd51
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -42732,6 +42827,7 @@ Nonce.14 = 50f723edc4f658862758e149e7ae4f20
+ PersonalisationString.14 = 39d43e627ab7c7a6d12fce4cd8c001678bfadd9d07d4086674e5d8bdef4ac62e
+ Output.14 = 02e68bf3f78812aa270619b307dc0e57b05b8310084ecd1914a67d93b77127e0b3ec40e359adc451eac8788ac708fde70575fc1b9bbfd291bf5b8d7bda7bcc23a0271ba0bb0e6d617132399bd6cedf5a9a683ea98b3b0dd3bc6d811e4f66c9ec751012992cf54e3ce474e09b31ba9c01ea231d4fa8f09441e204c4d3285c78d0
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-256
+ PredictionResistance = 0
+@@ -44003,6 +44099,7 @@ AdditionalInputA.14 = 73cd5580972f69bb4b0d0cd8915a5b594c3a9fa40b82d6b37446dff4c0
+ AdditionalInputB.14 = 304c2001d8bfb9f1b23f3b336db9f5da17752cbaba782d8932d2641aab4c34b8
+ Output.14 = 5771705c788e15fd5f656d4b5555d532ee4c48453be651a69c30fa706abe7719d9842028c667fab59aab97fe64a6140baa5d42dbfb7ecd58f2ce557a7b8b2c01669232e0b8bb0ddc6ef8dbe627ec5b370ec74553640982a14bd38ad9824b9651b717f8e90f539c42d04f7cff648c38b26abf38dd2a777348a4c2872f6551ef0f9e148bec810025779e7cbe1055cb0250a764fca5a1feba53bba64b7ea0c4dd3d56a7e6b4f8a157264e6666d356fe5a7a29fde7f4391662c4e69f471c21c6beeb
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44053,6 +44150,7 @@ Entropy.14 = 2c13e44674e89aa105fc11b05e8526769a53ab0b4688f3d0d9cf23af4c8469bb
+ Nonce.14 = 700ac6a616c1d1bb7bd8ff7e96a4d250
+ Output.14 = f778161306fc5f1d9e649b2a26983f31266a84bc79dd1b0016c8de53706f9812c4cebdbde78a3592bc7752303154acd7f4d27c2d5751fc7b1fee62677a71fc90e259dfb4b6a9c372515fac6efe01958d199888c360504ffa4c7cf4517918c430f5640fedc738e0cc1fcec33945a34a62ca61a71a9067298d34ac4a93751ddcd9a0f142748a1f0a81a948c6c6a16179e70b6f13633fd03b838da20f81450b4fdc1752e98e71296f1941ca58e71b73ea93e99a98f58d0892fa16de6a16c602036ac857dd75f9ac2c9185932103db5430e80cde9131e814a0bf3f3e7a2200a7152424472fd27f791a854f29aecc448f8d3fca3f93290266df3193d9e13e08907ab2
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44133,6 +44231,7 @@ AdditionalInputA.14 = 6cfccdd8253cc5b284701ef8d16f8888f79100373a7df50f43a122591b
+ AdditionalInputB.14 = 5795ae5be47a7f793423820352505e3890bac3805c102020e48226deab70140a
+ Output.14 = 4a398c114f2e0ac330893d103b585cadcf9cd3b2ac7e46cde15b2f32cc4b9a7c7172b1a73f86d6d12d02973e561fa7f615e30195f7715022df75157f41dc7f9a50029350e308e3345c9ab2029bdc0f1b72c195db098c26c1ab1864224504c72f48a64d722e41b00707c7f2f6cdfe8634d06abe838c85b419c02bf419b88cde35324b1bfdaddff8b7e95f6af0e55b5ff3f5475feb354f2a7a490597b36080322265b213541682572616f3d3276c713a978259d607c6d69eec26d524ba38163a329103e39e3b0a8ec989eca74f287d6d39c7ceda4df8558faeb9d25149963430f33b108dc136a4f9bfa416b3ceaa6632cd5505fe14fb0d78cf15f2acfa03b9c307
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44198,6 +44297,7 @@ Nonce.14 = fff1f2e2ac117af8b2cb023f0dd6c6ea
+ PersonalisationString.14 = 0a4c2df69d6c69df0a9c58ab7c886ed9db294f5fe98eb066fde543b409ee91e0
+ Output.14 = ae35e947a538e7da73f944b4dea689c064b144b753fe597369e58ec4868099c0f000995949e82dc3e5c00555a2cfe48c8a87e87ae5e7402e2b1679e413cc556f08796269ef3ea83d6a49116349a31710964fb2f936cccf249472eab3267cc1ca0073ff4d964eefc82dd1559c3737661f8b206757a64c756680fb7ab6be8cb433b93f21a04c1e99c777ac26c1f34918794085ee593ca27ae991c53d141e52f90e7872bbb036dce78e6a33e2d638360f9c15d5746d6ff13c1bcdff1cd01749fa51c3c72e68c0ce57423d4915abe84c15cfb3301d0c3b8ffc6a1962c1fd981790fa2a3da60d70e8e8557e4b2e7458ad85f5141ad46e1db751893e8327c8197571e8
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44293,6 +44393,7 @@ AdditionalInputA.14 = 2b2dbe3834d8be93f1396b19be83bd96823dd82740da71c5eeb7b21865
+ AdditionalInputB.14 = 49c322fc1bec86d3e20628d9bdc1644e6f5e0237c7c694746bfee32a00145696
+ Output.14 = 9110cec7d07e6e32724bf043e73021b3ca0e4516b619d036ac9a00914e12f01ece71989f55c1caccd542c60a9cccffb91e203fd39dca2d92c8eb03ee7ee88abf21dc6891de326c3190f25ee9ab44ca72d178db0f846969465b25a07dcc83777e6b63a7f9f1a8246dd31ce50cd9eb70e6e383c9ad4dae19f7cec8bfe079b36d309c28b10161c28b8d66c357c7ee01f07403a596366725fd5bd3a5de3cb40dcf60aac10635615b866ae633fbdb7ece41695d533757d9d16c6d44fd170fae77c15b7426ed6ec8c9d6e9245cd5e19e8dc3c8c7e671007ce8454413bd07407e8a2248bee95a7669db6ee47377b4490a6251abb60cd4e2e404ab88aa4948e71ecec50c
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44343,6 +44444,7 @@ Entropy.14 = 1436be35237c34bac5b5b36b24c998380883fb52621daa420112cb57bc84745c
+ Nonce.14 = ed884f91a94c1b0a51f316df776283af
+ Output.14 = c74ce568f0c465e79ef3700857cc8857b74ec8c075cada3f2698ff69569318b130b5b079ac5b69814d057097b0a107a546b011db601b2f7aa1708effd6479f383d7d484a5df76b63f1419eb360991475b2cd97590a1887487a76cd6fde7764cba5f101e4614c635ba7b1e18724a0a8fb39ca0948bffc441b6aa0216cf3c28ae6c06a24ad1bbe68970e06884d3b68325a3d7c1dce9a2fe87d565dccdcee7c62ed32b577763f510f0029a99530209628359bedf4bbfed1a13c222692d8cae60ca736df834a6e316db27642ed5839d2e11716a5c06e8d067e8548d7ac0687da801d292e2a6f414d7470d2e72261188347878d18e00fab3d4c15cb4c4a73cf963437
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44423,6 +44525,7 @@ AdditionalInputA.14 = 48e994654ab1d109511a3b34f5fa9f12b8da17da510d7a71e3839ba86b
+ AdditionalInputB.14 = 949ee0617b277a3ddf4a51343104704775d91797be1826d78051496a87d9113d
+ Output.14 = c4bce916b00a8583ebe1e85feaa1f076315ec9433e18afa1252061a62fc7558491678cb31048e4b4551b697e8dcb58dff951337f0fb7a41546d9a7838a1da149cb44558d324eab9e7ae147e8ead666e3d4eabc9978626efc8710ba8b5eb485d5693e5d6cac36ddd3a1a878ffbc77e9ec5d333cdae2b5803dcbba70d4e0dc60366dae5cf25990f3ae6147c99ec6c998397a1ac02b1b6ef6867aa897ca90b7fb938e3ddeef57e40897a644a4f08e37c995210e00f07145d5b3620ce673072525f9f74adf79ad703c4a09adc6eadcf77e76c6b032270d4c68f01672decf9aa0e941086188304fc33a28f53bf121df747b7dfdc00ddfe68f6d06ab7e82295f70652e
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44488,6 +44591,7 @@ Nonce.14 = 70916df78dd9ea799230435b3e48686b
+ PersonalisationString.14 = bf755696adb9c92839798798f836b063cbbe987f0163ef3f4a97222c888f5da0
+ Output.14 = 411cd8e76e711447e8a93ca95aa3aac5e51f559d65a8385a15e71877ac8472a347d9d453bd6761655711ce2133900d28e41cfd1292d28848646e5cbdcac1e60e49e62aab169b1735e701e38d65ccc073f277972ca85444dea86c19c0c08317dbbeca4fbd5d4295c9da71b89623d0028cebf1ab68fd0aef5b37e76e2e0b3e7f72eee04c01b6afb180b1fa0c370975526b788ec4db076a16a798671451af3e20d323684e232a25d78aaa8ee43f734f1555bf0a324053c7c895dc3e098621e189962a914f486cd7a5ff330f39316afb762b1a06cf8b593ca00d7edf739e2e6827a7af662f33bb09fad09d6bdb3a565f2bd32512c79927d390c79a1cc6db968b13a0
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44583,6 +44687,7 @@ AdditionalInputA.14 = 6f9f47857a60b6f3f9fe9a83ebcec5f16ca73e236d2af5b0daab45c0b9
+ AdditionalInputB.14 = e6628fbe4a774bc5383218302b7c565da5a5bd9f19db6182b444af5ae5f62739
+ Output.14 = d701c1824a82ff1803c4b59f490c3f37850ce85b5905059ac4484f5049f31772ab8401bc9b8fc1fd6ca06d01f01caecb3cbd914ea9574f497df0316a0d56e2830c8a908ba78d1dbe243d0fbc560c407052ec02e9c77f7b12264a46316a777955ae87a71f2da9cef2811f6328ccb288343abb65a36359c07122cb4e6639397829c48dbf8a821ddf00ddec2f294e48d05adfd0f7a706bfc337387bb7923641d08c288d23ed5a2a20f34684549f9f6b3d74ac0f04e10c7dec04aceac369f505d7ccacdf30ea0662cbab001740922e9ac32b6968e0c5a640345d1132e883e07fc82858980489893d0e38960883e989c41e72ee967c00b9a943f0666d1f5e93e848ef
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44633,6 +44738,7 @@ Entropy.14 = f5ee32b61bd57a4a4d51309e846f636560a8bb2a576c65d37a3f715ff1878014
+ Nonce.14 = c638557dae4f9ab6e078c61d54d0f566
+ Output.14 = e929e6c5c4a629c49fbb8623aea903ea129bb6484ed542cf940dd97bedc292e8bce924ef0cc57fa9b50b17b82618a840375874735560aea57e4e9701e4ecd0e812d1bf9fdecf67f431e4d7f6f455dfe4bd3b9a1553c574b0bfbc933a31580319c97682dd990c7081b711c2fa67a4eb54472be39f634c5dd901848c012c309c43f34d189a72c219acf8ca393d3f2cb292d62bb4d5e88f2b6e5e0422dafeac17415af623473f26ec24e65082123db9b9c00dbce3ca1942269fdf66f14add6c486a00527a39b050c2f3a6bc461e750f6e33236de198742284998bff98b7b3f6566e66679b3d8a1e63561fb5f8228867b8ff92230a9f2a6b9427821b6d55a359994d
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44713,6 +44819,7 @@ AdditionalInputA.14 = db7b290176b65f826aac2190a912672f8a9c97815706af33732f68b1f7
+ AdditionalInputB.14 = 13425f17d8fbcca3b4d7793a53507a85813f6f50d3365d680c0620d5fe1bfc33
+ Output.14 = 12d4cfe6574dddbf9de82b8a357bbd6e32a3addb7022c313ac401d0aecfbdfbc7229822f7db9012e8bb0e2907fd48d3eb435ef8368802e5eb948f1bd8d47569b694e23979652f6978b568d7e2288b596afbc67b6c1e0d662240356dc6257d9d273a9ca9f7dfc9bd4175a50ad5b328056c37046e734a76384d7418591a7604f332a457f2fbb277dce4fd2729fdd1319dc3a56b9901a50dc90feaf5969cd9e450bd8716e44253ca55c4e1dcf791658cc467cfba613c27a96f67bd68dd8ccf46bbca4294a0f548b919626d1712ed4290ec90c1098a082699450738d32a8c6516d83bd54a42413bc0ea0b37fe5d6b0663806df67f61d2c553aba3aed3f9aff111d2d
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44778,6 +44885,7 @@ Nonce.14 = c600da30d68cddd9b823433845111880
+ PersonalisationString.14 = 8896ff67866ff1f59c8e5074d91e6b9112410c9b6a1eefbcf05a1b8c7123dc89
+ Output.14 = ad8150de910a0bbdad0a674d032919ac3304d5977fc43ad5d5b1fa9be46f22e94f5c2747db228315b0d0505867fd97f9b1582f97b4693ed542c416df1847a85bcd4ad07d6348a4df78412e3df4e675def7f44b1895a8a2156c811040a46198a863c0107aebc3a426b4c2b9ac294b227d323879a70cdf7ceeee7f6f51f102c3ba4ae9a7343aff295b664c869f2c2d6e4396362fdae7d9b5eb0802f37ff7a3a7f1c944044b1bd9b21fbf23f191c6f538398164c2d1b67390e7b059b1c9f5bb031b89a23895ac65770182c8072fb0ad4a7be055d9a4653d08e6b22a61ebdfb66adec2629030f47aca70a06d68c9e1c041ceb2dc9bcd1ceaf61655ef7bbb1653f3d6
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44873,6 +44981,7 @@ AdditionalInputA.14 = 4adc98c66aa72da2c63172aba2a6c59fb20aa7b195a0b79edc709bfa99
+ AdditionalInputB.14 = 83485ecbf938b8035d047956a3a1bea5adb66c4a7a24b21dfce4269681c31bae
+ Output.14 = 6c69a58a3b27c73ac396840a93ff914219fa80241d39d65890ea612017d7b92b12062fbc0e3c39508c86023f7d70e9b156b4a766465c01c554acd6b5d78568d2087834b3b14f3fdc4d4b959e78ae2fa5298c87321b777afaea4a5c271a584a23a262f8b679cc8198ccd116c88dcf529a6677ebf5189d287f56eb445ad7313acce013b3fe49fb5212cdc3cf8c5ed15aa26b1135d7d9e0570719c4230c104a652fb36ffc57e219e735c03346d18eb57bcba813965bcb39b6a81da624838ba7b9a65d3b684a021f4071c66ce705974f2bd0ce1ad6727136d77529e3b400db0d14ffeabbac877cdf6a38ca66d83492a90482343a5a427ae8b8f77a2f724aa30c11b9
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -44923,6 +45032,7 @@ Entropy.14 = 60da58990a377a615436ef43b1199f88c7a4629653dde2350a4c5115c42e52f6
+ Nonce.14 = 592033d0de138ae7082c03553e3bfdf9
+ Output.14 = 7a770dbe8e1d3af1dae5b93acd9e6f1748a4a6a88229a875d23b37665e0cc96d888dfdc428a32cab378a9ebe22409709cd9d11f0c751c08d98eeac13b6f76f0f51ccea254cae23177c3aa207c59b5ce221b93442d037256d553275a6c4b5c83c1fe555a630e37d8277e02c050c19e145a71ec98b96ae3ae44c9ff87c4501c1ff7fd5231510ac9df623b3fb178e147f07d1fe02b48e877cba89a822c91b5af56b71d60116c49f80d87656144854909a7d718b5aa8f071f18357c2c9f9b6c0fac3195040f26b86aa936fd35ff37287aa140cd01ca6c5e577d815790d6fcb1a57569d23e801e2eb2b669ae7cf17d87f9ee66e0b515bcab09087e111da199b6a15b2
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -45003,6 +45113,7 @@ AdditionalInputA.14 = 967911f9412d40f2c62e43f48ff965bb1579a2ace388c781e125fe70f4
+ AdditionalInputB.14 = 052c401de1053b8dea309196bb8e326d4b643371976d1ff6be0a6ea4ad27e5e9
+ Output.14 = f7e8cdc3f8d2796414b9c83486d746cb8b1675b37d0d7546392c59622c693045dbcb10e9343524a6e7a9cc757717af22ddb8127bcdfb29cb8da409bd69d42aed9708cb2f904dff562a695be004ab25d31b8485bdd677c96d156ce8037726519d1949cc15e91acfd1c7c0bd58058b72c7d340b2f0bb12115ef44af6d20ce5f429d681b614e06bcddbf8ba00b40732b4dd425d1a87b663afce0e9a87b942a543b055f00b2428de12464a1309fccd0a15d512691e3858666ea4dc6084283deb075877c0162dbaf8318c9cda01ca611d72fac0b386a753ef35f438757cdf732a61a1f6123d1de3f61eb072d022f56c679a86f7a05bd6fa420ba39ed2973d4007b9cc
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -45068,6 +45179,7 @@ Nonce.14 = 0a6bef6b736129740978e31c3fa279e8
+ PersonalisationString.14 = a5ca2491479bda16341b2c14339a5307fc2e2f5df4fa625e0ea351a95a14f588
+ Output.14 = df587647f8d440a6c8034e757cd47f28d0e58f8aad9a047cdc8a70a8b1cd0d8185240d47bc5d2f4657205ed218ec38307e68efad94714630cd490b939719a4a07ab994793112c021969a8c69872903315c74b00b677648673e5883b5f46e075550092914cfeab05454226ee3d2154698f368bfda0b8b99eff5d111c1649a0f7e67ec0f637c6d3466994d655066a95732590e521ca055b048dbafd219be1a04fcd047c3722c4adf29ebd8486e7171359292e11ac6b740b4d51093383d64d2a45e51115c689ae29357366f2013eb9b420c6bd069d22c2110182e842eccadae81797a5f57d9ff47311f094ea0a25d7e329fcccb93c28b92ed85ccc2d690a84f2b2a
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 0
+@@ -68233,6 +68345,7 @@ Output.14 = 6af689cec62a633492f6e24b754d38dd6ab0b556e91802d72f14dc8c0e9ff50df728
+ 
+ Title = HMAC DRBG Prediction Resistance Tests (from NIST test vectors)
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -68313,6 +68426,7 @@ EntropyPredictionResistanceA.14 = ae706e740dda50209b20acf90dfa8cec
+ EntropyPredictionResistanceB.14 = b4d4b4bc7cba4daa285ff88ce9e8d451
+ Output.14 = 74acba48f0216087f18042ff14101707c27d281e5ddbc19c722bec3f77bf17ca31239382f4fc1d4dd0f44c296bc2f10f74864951f7da19a23e3e598ac43fb8bbdd1fca8047b98689ef1c05bc81102bb5
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -68423,6 +68537,7 @@ AdditionalInputB.14 = ccdb3f7d7f6a4d169f5f2e24ec481fcb
+ EntropyPredictionResistanceB.14 = be4a2c87c875be0e1be01aadf2efeef6
+ Output.14 = bfcc8f2ece23d22545ec2176aabd083855923ca9a673b54b66a3e2562212aad3cc74c4c8976de259cc95a2f09a85b7acd1f18c343eff0368a80e73a547efdcd954816b38df1c19556d714897e317d69f
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -68518,6 +68633,7 @@ EntropyPredictionResistanceA.14 = f324c09f96434ceea7e756fc2f55a0b3
+ EntropyPredictionResistanceB.14 = f043b6e11fc2f671ec00f4d478b791c6
+ Output.14 = 40e87b822b1000441884a38b8776baa69fbea99962571e8a20d8af012d50c8c211860ad579869ec880320ea8057d5cb0de9496ec57d8b594ca8be5b94219eaa800af7205f8a83b66c87e0fee9aa9732f
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -68643,6 +68759,7 @@ AdditionalInputB.14 = 0d5a2183c9f9ca6941f6a617892f5e47
+ EntropyPredictionResistanceB.14 = 998f9cde45b1dc22db6d2d7bfd4f3930
+ Output.14 = 934fe82b0951b97dafc5ba16e87b0459691156b42ff2dbbbd8f6ed9b04be952af267c6a17fbfc86de91f9f07eed482a5362b176216a8963af485503ba93b2e82c03a3ee6225077d90cd961e24f6026f6
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -68723,6 +68840,7 @@ EntropyPredictionResistanceA.14 = 427b47ed008e489cfd06e1a6e0a9f07b
+ EntropyPredictionResistanceB.14 = e5ee8df96c0e929446502a4bbd23ab22
+ Output.14 = a544ea7c3362570f48a42635f4b79f615d11a5d8a480d85ac71e4be90074fbd5e2d368d00755e95a262d79ed262003d3e2a26f82c37d091ae763a01fba08c87b3ec0ce817bbab8d1905f91f021b7d7d0
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -68833,6 +68951,7 @@ AdditionalInputB.14 = 3e95f86a7168410eac0c84995c187fd9
+ EntropyPredictionResistanceB.14 = fd15dfdd8cfeeb7ce0c76f759dfd47df
+ Output.14 = 480d9cbbfa6c923866179318b293c52c9ad86c2ee27faa745873a77d0242afe669d1773fd9c17284097ee8e644aa054deefbb9c73732ba6b5004623df15edeb49ef2e1bc8dbe023f7104ea1395d9fd38
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -68928,6 +69047,7 @@ EntropyPredictionResistanceA.14 = 845decbe6e03e423b3660bfe7db383bf
+ EntropyPredictionResistanceB.14 = f4ee7409c076201255bc78ec82ca5530
+ Output.14 = ac57a08b77c528b834df2757069b6330f05a9196fbbb17300f9c31ef596f551ecc56fa3256c0ab1534df4955f2da1e8d98026b7c5e07290faa5131a95d0fa35a56b075752656ab61a74f889fbb735c58
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -69053,6 +69173,7 @@ AdditionalInputB.14 = 063e444dc2990f59e04839fd5e9eaeb6
+ EntropyPredictionResistanceB.14 = e059229538a827fe9b7e5caa44fb1e3d
+ Output.14 = 62efebd7730c6999fd052b98e2bf26eebc96b617a03fe2f1aa7ea3be1aea833f705a3ef3776adc7578f5bb6955a60853ef267fbc18aa3d57b8e0d9134c81e8ffadd0c66d385e5d535d74a615fa896757
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -69133,6 +69254,7 @@ EntropyPredictionResistanceA.14 = 74b72e7e1c5f16bf0389dafed9a86ae4
+ EntropyPredictionResistanceB.14 = adef9418a342b4717e93df6450429a38
+ Output.14 = eae51f34bfaa2970f41c3211ec228cfccc1d3c0fcc077d1d9ba159b3bac8685bc5783f61c67fdd4beca05dd4f14afcfc4d554ae75f73842637671102c3b81cabc9a0638cecad5a6615171be5265d5454
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -69243,6 +69365,7 @@ AdditionalInputB.14 = 696d9380b814b456ca59ed58ea765400
+ EntropyPredictionResistanceB.14 = d57fb196a634da13ba8695098ed79f9c
+ Output.14 = 069848aef419759b75896cd507a109f685228b5639470afeac0caa853f1c3dbe373f99db76bf06fe8bac356bedf6bf18787043970fb0a185c8a0a4d8482aa3059eeba0d244fc03c9b72857dc5188d44b
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -69338,6 +69461,7 @@ EntropyPredictionResistanceA.14 = 015ef1f359f60a391b3720d578731070
+ EntropyPredictionResistanceB.14 = 963736987090fe71e69b4a2480d9b314
+ Output.14 = c75a102bea830a8a58d9a9a43cb03b21aea75d8d2a08c37aaae9180a5e1c78e5700b20a5fe1c7ef0a7e3d2adcf539c4c1357946a328a057e719b97d802b586910f804c166d4884d8bbb3bbc03074c53a
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -69463,6 +69587,7 @@ AdditionalInputB.14 = e0b7ad60c542e6c2b324652fd2d7cdc6
+ EntropyPredictionResistanceB.14 = dc7ea852c3e5467977c7946e77223567
+ Output.14 = 0e2e5f47ca8ce1c7fdae1b49d6bc8594da1458eb8dfb35e0602d3812df7532cf6213eba8e75302444529565c40d23d0a336c4cadde37f0def2c3d412984360b65c668ef43263fada16b28860f6ee6ceb
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -69543,6 +69668,7 @@ EntropyPredictionResistanceA.14 = 4912a46c447c2de26dbbaec01817d2a6
+ EntropyPredictionResistanceB.14 = c182dc35363cd7e04394c28030e6d6b9
+ Output.14 = 976daafdf1dd5163e88a928d91933678cda9c8ef9a8251070ee8a6b42efda3c00a73303d0426da4a4af7c587174dce9936bfbb68a73979afee9f3a5b4fb4da2eb2b2f2f1c0948b63b45bf583412b2890
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -69653,6 +69779,7 @@ AdditionalInputB.14 = 8022a4985c745515682102a25b379301
+ EntropyPredictionResistanceB.14 = 8cc2d8a789d343547ee48869f57ae225
+ Output.14 = 5707c544445358767b1c4d6c319b6a8d9be38afbf945dd4e869e9136d63c9d74aa872139e8bdd374510ebcf8c36c39e45ff31596fa58721c2a089dea7b418b3f7a00d78c6ba531adbb59ae2ab44bb683
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -69748,6 +69875,7 @@ EntropyPredictionResistanceA.14 = 701b8e70583effd1c4e901c50966127e
+ EntropyPredictionResistanceB.14 = 40e9ad701b63ee7bd6132d7f056a1f09
+ Output.14 = a76b3e058ed1a8ca5860b15abe08a607894207d3d3be5bf6c3dc99c01523c85bf18927bc6d3f66cfef63a238aaef1ee87998100faabeef0d2518f3ccc0423d776a440ec9a87c5601fdf45c309c264dcd
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-1
+ PredictionResistance = 1
+@@ -76340,6 +76468,7 @@ EntropyPredictionResistanceA.14 = a918ec35414b0bf1d9ba3b80ef838e75b9504fb6b77e40
+ EntropyPredictionResistanceB.14 = c25de5d8b1f17acb7303c4a652ea1bcf284bfdc08a12c40ece16e3125fc8757e
+ Output.14 = a3072880e72e76ec1e467d7c4f4ab8013eca926c96f075a0a25f5550931f4d6b3aff2057ae6fc1382d579e8963ee24459d76d7414d250aaf5b302a539775862e26596176de2891589defa7aa66f763126c7fb7ced0fa80f3f5e1f0d15295e6025fad617e554838876c8c8efb4bef1e1227a1c967afe99540c1992328a70798167eaea5a768f1f4395178dc914cde01b8e6b98266a66c5c079e19e5d3b6599c6dec24e8e155b310164299d1b4d31ab2e0c3b917b0cb627a4cc19c86061c74c849aab764feacd33de7472b7c4e1403cb38f8f1c3062e75966b2e2c0b2d7d966271f3d180440aa2ed2194bbf7d8b9415a5c5bb7f3df7cf2d02740cd4366ee3781a9
+ 
++Availablein = default
+ RAND = HMAC-DRBG
+ Digest = SHA-512
+ PredictionResistance = 1
+-- 
+2.41.0
+

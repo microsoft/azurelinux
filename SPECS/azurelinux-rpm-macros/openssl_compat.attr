@@ -1,0 +1,17 @@
+# Adds regular openssl* provides to openssl-compat* packages.
+# For example, openssl-compat will provide openssl and openssl-compat-libs will provide openssl-libs.
+%__openssl_compat_provides() %{lua:
+  local name = rpm.expand("%{name}")
+  local version = rpm.expand("%{version}")
+  local release = rpm.expand("%{release}")
+  local isa = rpm.expand("%{_isa}") -- e.g. (x86-64), (aarch64), or empty for noarch
+
+  if string.match(name, "^openssl%-compat") then
+    local base = string.gsub(name, "%-compat", "")
+    -- Always print both lines; for noarch, isa is empty, so only the first line is meaningful
+    print(base .. " = " .. version .. "-" .. release .. "\\n" .. base .. isa .. " = " .. version .. "-" .. release)
+  end
+}
+
+# Specs must opt in by setting _openssl_compat_provides to 1 like.
+%__openssl_compat_path %{?_openssl_compat_provides:.*}

@@ -1,0 +1,68 @@
+From 41df9ae215cee9574e17e6f887c96a7c97d588f5 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tmraz@fedoraproject.org>
+Date: Thu, 24 Sep 2020 09:03:40 +0200
+Subject: Use more general default values in openssl.cnf
+
+Also set sha256 as default hash, although that should not be
+necessary anymore.
+
+(was openssl-1.1.1-defaults.patch)
+---
+ apps/openssl.cnf | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/apps/openssl.cnf b/apps/openssl.cnf
+index 97567a67be..eb25a0ac48 100644
+--- a/apps/openssl.cnf
++++ b/apps/openssl.cnf
+@@ -104,7 +104,7 @@ cert_opt 	= ca_default		# Certificate field options
+ 
+ default_days	= 365			# how long to certify for
+ default_crl_days= 30			# how long before next CRL
+-default_md	= default		# use public key default MD
++default_md	= sha256		# use SHA-256 by default
+ preserve	= no			# keep passed DN ordering
+ 
+ # A few difference way of specifying how similar the request should look
+@@ -136,6 +136,7 @@ emailAddress		= optional
+ ####################################################################
+ [ req ]
+ default_bits		= 2048
++default_md		= sha256
+ default_keyfile 	= privkey.pem
+ distinguished_name	= req_distinguished_name
+ attributes		= req_attributes
+@@ -158,17 +159,18 @@ string_mask = utf8only
+ 
+ [ req_distinguished_name ]
+ countryName			= Country Name (2 letter code)
+-countryName_default		= AU
++countryName_default		= XX
+ countryName_min			= 2
+ countryName_max			= 2
+ 
+ stateOrProvinceName		= State or Province Name (full name)
+-stateOrProvinceName_default	= Some-State
++#stateOrProvinceName_default	= Default Province
+ 
+ localityName			= Locality Name (eg, city)
++localityName_default		= Default City
+ 
+ 0.organizationName		= Organization Name (eg, company)
+-0.organizationName_default	= Internet Widgits Pty Ltd
++0.organizationName_default	= Default Company Ltd
+ 
+ # we can do this but it is not needed normally :-)
+ #1.organizationName		= Second Organization Name (eg, company)
+@@ -177,7 +179,7 @@ localityName			= Locality Name (eg, city)
+ organizationalUnitName		= Organizational Unit Name (eg, section)
+ #organizationalUnitName_default	=
+ 
+-commonName			= Common Name (e.g. server FQDN or YOUR name)
++commonName			= Common Name (eg, your name or your server\'s hostname)
+ commonName_max			= 64
+ 
+ emailAddress			= Email Address
+-- 
+2.26.2
+

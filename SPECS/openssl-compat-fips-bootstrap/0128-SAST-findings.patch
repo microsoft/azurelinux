@@ -1,0 +1,12 @@
+diff -up openssl-3.2.2/crypto/x509/pcy_tree.c.xxx openssl-3.2.2/crypto/x509/pcy_tree.c
+--- openssl-3.2.2/crypto/x509/pcy_tree.c.xxx	2024-08-14 14:14:13.144850097 +0200
++++ openssl-3.2.2/crypto/x509/pcy_tree.c	2024-08-14 14:14:53.213826481 +0200
+@@ -110,6 +110,8 @@ static int tree_init(X509_POLICY_TREE **ptree, STACK_OF(X509) *certs,
+ 
+     *ptree = NULL;
+ 
++    if (n < 0)
++        return X509_PCY_TREE_INTERNAL;
+     /* Can't do anything with just a trust anchor */
+     if (n == 0)
+         return X509_PCY_TREE_EMPTY;

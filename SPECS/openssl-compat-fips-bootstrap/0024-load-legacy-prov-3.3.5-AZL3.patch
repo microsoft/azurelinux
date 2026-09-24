@@ -1,0 +1,79 @@
+From 8bbbef7bb93b0e449cf046038304485d975242cb Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 31 Jul 2023 09:41:28 +0200
+Subject: [PATCH] 0024-load-legacy-prov.patch
+
+Patch-name: 0024-load-legacy-prov.patch
+Patch-id: 24
+Patch-status: |
+    # Instructions to load legacy provider in openssl.cnf
+From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
+---
+ apps/openssl.cnf    | 27 ++++++++++++++-------------
+ doc/man5/config.pod |  8 ++++++++
+ 2 files changed, 22 insertions(+), 13 deletions(-)
+
+diff --git a/apps/openssl.cnf b/apps/openssl.cnf
+index 00f0d24..3a01f2f 100644
+--- a/apps/openssl.cnf
++++ b/apps/openssl.cnf
+@@ -54,23 +54,24 @@ tsa_policy3 = 1.2.3.4.5.7
+ providers = provider_sect
+ 
+ # List of providers to load
++# Uncomment the sections that start with ## below to enable the legacy provider.
++# Loading the legacy provider enables support for the following algorithms:
++# Hashing Algorithms / Message Digests: MD2, MD4, MDC2, WHIRLPOOL, RIPEMD160
++# Symmetric Ciphers: Blowfish, CAST, DES, IDEA, RC2, RC4,RC5, SEED
++# Key Derivation Function (KDF): PBKDF1
++# In general it is not recommended to use the above mentioned algorithms for
++# security critical operations, as they are cryptographically weak or vulnerable
++# to side-channel attacks and as such have been deprecated.
++
+ [provider_sect]
+ default = default_sect
+-# The fips section name should match the section name inside the
+-# included fipsmodule.cnf.
+-# fips = fips_sect
+-
+-# If no providers are activated explicitly, the default one is activated implicitly.
+-# See man 7 OSSL_PROVIDER-default for more details.
+-#
+-# If you add a section explicitly activating any other provider(s), you most
+-# probably need to explicitly activate the default provider, otherwise it
+-# becomes unavailable in openssl.  As a consequence applications depending on
+-# OpenSSL may not work correctly which could lead to significant system
+-# problems including inability to remotely access the system.
++##legacy = legacy_sect
++##
+ [default_sect]
+-# activate = 1
++activate = 1
+ 
++##[legacy_sect]
++##activate = 1
+ 
+ ####################################################################
+ [ ca ]
+diff --git a/doc/man5/config.pod b/doc/man5/config.pod
+index 4e095c0..435273b 100644
+--- a/doc/man5/config.pod
++++ b/doc/man5/config.pod
+@@ -284,6 +284,14 @@ Note this setting defaults to off if not provided
+ All parameters in the section as well as sub-sections are made
+ available to the provider.
+ 
++=head3 Loading the legacy provider
++
++Uncomment the sections that start with ## in openssl.cnf
++to enable the legacy provider.
++Note: In general it is not recommended to use the above mentioned algorithms for
++security critical operations, as they are cryptographically weak or vulnerable
++to side-channel attacks and as such have been deprecated.
++
+ =head3 Default provider and its activation
+ 
+ If no providers are activated explicitly, the default one is activated implicitly.
+-- 
+2.45.4
+

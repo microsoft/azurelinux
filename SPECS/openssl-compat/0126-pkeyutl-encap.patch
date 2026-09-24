@@ -1,0 +1,431 @@
+From 77a0eabe15b9c8c0fb5fde27f6ce1c593c278e20 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Wed, 7 Aug 2024 17:17:18 +0200
+Subject: [PATCH 1/3] Support of en/decapsulation in the pkeyutl command
+
+---
+ apps/pkeyutl.c | 83 +++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 69 insertions(+), 14 deletions(-)
+
+diff --git a/apps/pkeyutl.c b/apps/pkeyutl.c
+index b5390c64c2a81..a14ad88217823 100644
+--- a/apps/pkeyutl.c
++++ b/apps/pkeyutl.c
+@@ -24,7 +24,7 @@ static EVP_PKEY_CTX *init_ctx(const char *kdfalg, int *pkeysize,
+                               const char *keyfile, int keyform, int key_type,
+                               char *passinarg, int pkey_op, ENGINE *e,
+                               const int impl, int rawin, EVP_PKEY **ppkey,
+-                              EVP_MD_CTX *mctx, const char *digestname,
++                              EVP_MD_CTX *mctx, const char *digestname, const char *kemop,
+                               OSSL_LIB_CTX *libctx, const char *propq);
+ 
+ static int setup_peer(EVP_PKEY_CTX *ctx, int peerform, const char *file,
+@@ -32,7 +32,8 @@ static int setup_peer(EVP_PKEY_CTX *ctx, int peerform, const char *file,
+ 
+ static int do_keyop(EVP_PKEY_CTX *ctx, int pkey_op,
+                     unsigned char *out, size_t *poutlen,
+-                    const unsigned char *in, size_t inlen);
++                    const unsigned char *in, size_t inlen,
++                    unsigned char *secret, size_t *psecretlen);
+ 
+ static int do_raw_keyop(int pkey_op, EVP_MD_CTX *mctx,
+                         EVP_PKEY *pkey, BIO *in,
+@@ -47,6 +48,7 @@ typedef enum OPTION_choice {
+     OPT_DERIVE, OPT_SIGFILE, OPT_INKEY, OPT_PEERKEY, OPT_PASSIN,
+     OPT_PEERFORM, OPT_KEYFORM, OPT_PKEYOPT, OPT_PKEYOPT_PASSIN, OPT_KDF,
+     OPT_KDFLEN, OPT_R_ENUM, OPT_PROV_ENUM,
++    OPT_DECAP, OPT_ENCAP, OPT_SECOUT, OPT_KEMOP,
+     OPT_CONFIG,
+     OPT_RAWIN, OPT_DIGEST
+ } OPTION_CHOICE;
+@@ -64,6 +66,8 @@ const OPTIONS pkeyutl_options[] = {
+     {"encrypt", OPT_ENCRYPT, '-', "Encrypt input data with public key"},
+     {"decrypt", OPT_DECRYPT, '-', "Decrypt input data with private key"},
+     {"derive", OPT_DERIVE, '-', "Derive shared secret"},
++    {"decap", OPT_DECAP, '-', "Decapsulate shared secret"},
++    {"encap", OPT_ENCAP, '-', "Encapsulate shared secret"},
+     OPT_CONFIG_OPTION,
+ 
+     OPT_SECTION("Input"),
+@@ -81,13 +85,14 @@ const OPTIONS pkeyutl_options[] = {
+ 
+     OPT_SECTION("Output"),
+     {"out", OPT_OUT, '>', "Output file - default stdout"},
++    {"secret", OPT_SECOUT, '>', "File to store secret on encapsulation"},
+     {"asn1parse", OPT_ASN1PARSE, '-',
+      "parse the output as ASN.1 data to check its DER encoding and print errors"},
+     {"hexdump", OPT_HEXDUMP, '-', "Hex dump output"},
+     {"verifyrecover", OPT_VERIFYRECOVER, '-',
+      "Verify RSA signature, recovering original signature input data"},
+ 
+-    OPT_SECTION("Signing/Derivation"),
++    OPT_SECTION("Signing/Derivation/Encapsulation"),
+     {"digest", OPT_DIGEST, 's',
+      "Specify the digest algorithm when signing the raw input data"},
+     {"pkeyopt", OPT_PKEYOPT, 's', "Public key options as opt:value"},
+@@ -94,6 +99,7 @@ const OPTIONS pkeyutl_options[] = {
+      "Public key option that is read as a passphrase argument opt:passphrase"},
+     {"kdf", OPT_KDF, 's', "Use KDF algorithm"},
+     {"kdflen", OPT_KDFLEN, 'p', "KDF algorithm output length"},
++    {"kemop", OPT_KEMOP, 's', "KEM operation specific to the key algorithm"},
+ 
+     OPT_R_OPTIONS,
+     OPT_PROV_OPTIONS,
+@@ -103,23 +109,23 @@ const OPTIONS pkeyutl_options[] = {
+ int pkeyutl_main(int argc, char **argv)
+ {
+     CONF *conf = NULL;
+-    BIO *in = NULL, *out = NULL;
++    BIO *in = NULL, *out = NULL, *secout = NULL;
+     ENGINE *e = NULL;
+     EVP_PKEY_CTX *ctx = NULL;
+     EVP_PKEY *pkey = NULL;
+-    char *infile = NULL, *outfile = NULL, *sigfile = NULL, *passinarg = NULL;
++    char *infile = NULL, *outfile = NULL, *secoutfile = NULL, *sigfile = NULL, *passinarg = NULL;
+     char hexdump = 0, asn1parse = 0, rev = 0, *prog;
+-    unsigned char *buf_in = NULL, *buf_out = NULL, *sig = NULL;
++    unsigned char *buf_in = NULL, *buf_out = NULL, *sig = NULL, *secret = NULL;
+     OPTION_CHOICE o;
+     int buf_inlen = 0, siglen = -1;
+     int keyform = FORMAT_UNDEF, peerform = FORMAT_UNDEF;
+     int keysize = -1, pkey_op = EVP_PKEY_OP_SIGN, key_type = KEY_PRIVKEY;
+     int engine_impl = 0;
+     int ret = 1, rv = -1;
+-    size_t buf_outlen;
++    size_t buf_outlen = 0, secretlen = 0;
+     const char *inkey = NULL;
+     const char *peerkey = NULL;
+-    const char *kdfalg = NULL, *digestname = NULL;
++    const char *kdfalg = NULL, *digestname = NULL, *kemop = NULL;
+     int kdflen = 0;
+     STACK_OF(OPENSSL_STRING) *pkeyopts = NULL;
+     STACK_OF(OPENSSL_STRING) *pkeyopts_passin = NULL;
+@@ -147,6 +153,9 @@ int pkeyutl_main(int argc, char **argv)
+         case OPT_OUT:
+             outfile = opt_arg();
+             break;
++        case OPT_SECOUT:
++            secoutfile = opt_arg();
++            break;
+         case OPT_SIGFILE:
+             sigfile = opt_arg();
+             break;
+@@ -216,6 +225,15 @@ int pkeyutl_main(int argc, char **argv)
+         case OPT_DERIVE:
+             pkey_op = EVP_PKEY_OP_DERIVE;
+             break;
++        case OPT_DECAP:
++            pkey_op = EVP_PKEY_OP_DECAPSULATE;
++            break;
++        case OPT_ENCAP:
++            pkey_op = EVP_PKEY_OP_ENCAPSULATE;
++            break;
++        case OPT_KEMOP:
++            kemop = opt_arg();
++            break;
+         case OPT_KDF:
+             pkey_op = EVP_PKEY_OP_DERIVE;
+             key_type = KEY_NONE;
+@@ -303,7 +321,7 @@ int pkeyutl_main(int argc, char **argv)
+     }
+     ctx = init_ctx(kdfalg, &keysize, inkey, keyform, key_type,
+                    passinarg, pkey_op, e, engine_impl, rawin, &pkey,
+-                   mctx, digestname, libctx, app_get0_propq());
++                   mctx, digestname, kemop, libctx, app_get0_propq());
+     if (ctx == NULL) {
+         BIO_printf(bio_err, "%s: Error initializing context\n", prog);
+         goto end;
+@@ -387,7 +405,7 @@ int pkeyutl_main(int argc, char **argv)
+         goto end;
+     }
+ 
+-    if (pkey_op != EVP_PKEY_OP_DERIVE) {
++    if (pkey_op != EVP_PKEY_OP_DERIVE && pkey_op != EVP_PKEY_OP_ENCAPSULATE) {
+         in = bio_open_default(infile, 'r', FORMAT_BINARY);
+         if (infile != NULL) {
+             struct stat st;
+@@ -402,6 +420,16 @@ int pkeyutl_main(int argc, char **argv)
+     if (out == NULL)
+         goto end;
+ 
++    if (pkey_op == EVP_PKEY_OP_ENCAPSULATE) {
++        if (secoutfile == NULL) {
++            BIO_printf(bio_err, "Encapsulation requires '-secret' argument\n");
++            goto end;
++        }
++        secout = bio_open_default(secoutfile, 'w', FORMAT_BINARY);
++        if (secout == NULL)
++            goto end;
++    }
++
+     if (sigfile != NULL) {
+         BIO *sigbio = BIO_new_file(sigfile, "rb");
+ 
+@@ -473,13 +501,15 @@ int pkeyutl_main(int argc, char **argv)
+             rv = 1;
+         } else {
+             rv = do_keyop(ctx, pkey_op, NULL, (size_t *)&buf_outlen,
+-                          buf_in, (size_t)buf_inlen);
++                          buf_in, (size_t)buf_inlen, NULL, (size_t *)&secretlen);
+         }
+         if (rv > 0 && buf_outlen != 0) {
+             buf_out = app_malloc(buf_outlen, "buffer output");
++            if (secretlen > 0)
++                secret = app_malloc(secretlen, "secret output");
+             rv = do_keyop(ctx, pkey_op,
+                           buf_out, (size_t *)&buf_outlen,
+-                          buf_in, (size_t)buf_inlen);
++                          buf_in, (size_t)buf_inlen, secret, (size_t *)&secretlen);
+         }
+     }
+     if (rv <= 0) {
+@@ -500,6 +530,8 @@ int pkeyutl_main(int argc, char **argv)
+     } else {
+         BIO_write(out, buf_out, buf_outlen);
+     }
++    if (secretlen > 0)
++        BIO_write(secout, secret, secretlen);
+ 
+  end:
+     if (ret != 0)
+@@ -510,9 +542,11 @@ int pkeyutl_main(int argc, char **argv)
+     release_engine(e);
+     BIO_free(in);
+     BIO_free_all(out);
++    BIO_free_all(secout);
+     OPENSSL_free(buf_in);
+     OPENSSL_free(buf_out);
+     OPENSSL_free(sig);
++    OPENSSL_free(secret);
+     sk_OPENSSL_STRING_free(pkeyopts);
+     sk_OPENSSL_STRING_free(pkeyopts_passin);
+     NCONF_free(conf);
+@@ -524,7 +558,7 @@ static EVP_PKEY_CTX *init_ctx(const char *kdfalg, int *pkeysize,
+                               char *passinarg, int pkey_op, ENGINE *e,
+                               const int engine_impl, int rawin,
+                               EVP_PKEY **ppkey, EVP_MD_CTX *mctx, const char *digestname,
+-                              OSSL_LIB_CTX *libctx, const char *propq)
++                              const char *kemop, OSSL_LIB_CTX *libctx, const char *propq)
+ {
+     EVP_PKEY *pkey = NULL;
+     EVP_PKEY_CTX *ctx = NULL;
+@@ -642,6 +676,18 @@ static EVP_PKEY_CTX *init_ctx(const char *kdfalg, int *pkeysize,
+         case EVP_PKEY_OP_DERIVE:
+             rv = EVP_PKEY_derive_init(ctx);
+             break;
++
++        case EVP_PKEY_OP_ENCAPSULATE:
++            rv = EVP_PKEY_encapsulate_init(ctx, NULL);
++            if (rv > 0 && kemop != NULL)
++                rv = EVP_PKEY_CTX_set_kem_op(ctx, kemop);
++            break;
++
++        case EVP_PKEY_OP_DECAPSULATE:
++            rv = EVP_PKEY_decapsulate_init(ctx, NULL);
++            if (rv > 0 && kemop != NULL)
++                rv = EVP_PKEY_CTX_set_kem_op(ctx, kemop);
++            break;
+         }
+     }
+ 
+@@ -679,7 +725,8 @@ static int setup_peer(EVP_PKEY_CTX *ctx, int peerform, const char *file,
+ 
+ static int do_keyop(EVP_PKEY_CTX *ctx, int pkey_op,
+                     unsigned char *out, size_t *poutlen,
+-                    const unsigned char *in, size_t inlen)
++                    const unsigned char *in, size_t inlen,
++                    unsigned char *secret, size_t *pseclen)
+ {
+     int rv = 0;
+     switch (pkey_op) {
+@@ -703,6 +750,14 @@ static int do_keyop(EVP_PKEY_CTX *ctx, int pkey_op,
+         rv = EVP_PKEY_derive(ctx, out, poutlen);
+         break;
+ 
++    case EVP_PKEY_OP_ENCAPSULATE:
++        rv = EVP_PKEY_encapsulate(ctx, out, poutlen, secret, pseclen);
++        break;
++
++    case EVP_PKEY_OP_DECAPSULATE:
++        rv = EVP_PKEY_decapsulate(ctx, out, poutlen, in, inlen);
++        break;
++
+     }
+     return rv;
+ }
+
+From 1598da873df55887c2d878549f74b7aaed6d5fde Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Wed, 7 Aug 2024 17:50:51 +0200
+Subject: [PATCH 2/3] Encap/decap in pkeyutl - documentation
+
+---
+ doc/man1/openssl-pkeyutl.pod.in | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/doc/man1/openssl-pkeyutl.pod.in b/doc/man1/openssl-pkeyutl.pod.in
+index 50c2030aa353c..9de50dd6cee8f 100644
+--- a/doc/man1/openssl-pkeyutl.pod.in
++++ b/doc/man1/openssl-pkeyutl.pod.in
+@@ -13,6 +13,7 @@ B<openssl> B<pkeyutl>
+ [B<-rawin>]
+ [B<-digest> I<algorithm>]
+ [B<-out> I<file>]
++[B<-secret> I<file>]
+ [B<-sigfile> I<file>]
+ [B<-inkey> I<filename>|I<uri>]
+ [B<-keyform> B<DER>|B<PEM>|B<P12>|B<ENGINE>]
+@@ -28,8 +29,11 @@ B<openssl> B<pkeyutl>
+ [B<-encrypt>]
+ [B<-decrypt>]
+ [B<-derive>]
++[B<-encap>]
++[B<-decap>]
+ [B<-kdf> I<algorithm>]
+ [B<-kdflen> I<length>]
++[B<-kemop> I<operation>]
+ [B<-pkeyopt> I<opt>:I<value>]
+ [B<-pkeyopt_passin> I<opt>[:I<passarg>]]
+ [B<-hexdump>]
+@@ -79,6 +83,10 @@ then the B<-rawin> option must be also specified.
+ Specifies the output filename to write to or standard output by
+ default.
+ 
++=item B<-secret> I<filename>
++
++Specifies the output filename to write the secret to on I<-encap>.
++
+ =item B<-sigfile> I<file>
+ 
+ Signature file, required and allowed for B<-verify> operations only
+@@ -147,6 +155,31 @@ Decrypt the input data using a private key.
+ 
+ Derive a shared secret using the peer key.
+ 
++=item B<-encap>
++
++Encapsulate a generated secret using a private key.
++The encapsulated result (binary data) is written to standard output by default,
++or else to the file specified with I<-out>.
++The I<-secret> option must also be provided to specify the output file for the
++secret value generated in the encapsulation process.
++
++=item B<-decap>
++
++Decapsulate the secret using a private key.
++The result (binary data) is written to standard output by default, or else to
++the file specified with I<-out>.
++
++=item B<-kemop> I<operation>
++
++This option is used for I<-encap>/I<-decap> commands and specifies the KEM
++operation specific for the key algorithm when there is no default KEM
++operation.
++If the algorithm has the default KEM operation, this option can be omitted.
++
++See L<EVP_PKEY_CTX_set_kem_op(3)> and algorithm-specific KEM documentation e.g.
++L<EVP_KEM-RSA(7)>, L<EVP_KEM-EC(7)>, L<EVP_KEM-X25519(7)>, and
++L<EVP_KEM-X448(7)>.
++
+ =item B<-kdf> I<algorithm>
+ 
+ Use key derivation function I<algorithm>.  The supported algorithms are
+
+From 1fe7d5b3d96e2ce1e822a4e6e042959af55b0145 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 8 Aug 2024 13:45:19 +0200
+Subject: [PATCH 3/3] Encap/decap in pkeyutl - tests
+
+---
+ test/decap_out.bin             |  3 +++
+ test/encap_out.bin             |  4 ++++
+ test/encap_secret.bin          |  3 +++
+ test/recipes/20-test_pkeyutl.t | 34 ++++++++++++++++++++++++++++++++--
+ 4 files changed, 42 insertions(+), 2 deletions(-)
+ create mode 100644 test/decap_out.bin
+ create mode 100644 test/encap_out.bin
+ create mode 100644 test/encap_secret.bin
+
+diff --git a/test/decap_out.bin b/test/decap_out.bin
+new file mode 100644
+index 0000000000000..b94441ed1c002
+--- /dev/null
++++ b/test/decap_out.bin
+@@ -0,0 +1,3 @@
++6W«¡ŠòÌn‘©ú;’ù¡ÃÄmç Ä¥ÉB[HãÕË#äÓ‡(™‡h]:\³PŸ›xñe¡ƒbòé)G¿fõÈ"¨ıË­fË	ÊıJİ)ïşÜì{ªHm‚\PÃº+¸PŞ¸%èÄ/jÏ™%çØ†È<_æ~–
++K—JEhßù‡©lEa¼:¢(Ÿå/\Ñ®Íb€Ã®©Ê×È-g,AYœ‹4
++lÚtÚN­)~\HU4yáŸ	}qJŸ€”t#¦}.™üTÅı”?ÚØÏŠĞÿcD=üLõ¨nmv{—éÅ¿Ô‹È£®
+\ No newline at end of file
+diff --git a/test/encap_out.bin b/test/encap_out.bin
+new file mode 100644
+index 0000000000000..024fc40550f15
+--- /dev/null
++++ b/test/encap_out.bin
+@@ -0,0 +1,4 @@
++¼:÷Ùy‚Ä‰5°ã ÿÙ[Û2ê<¾ê?«î±qÕª1·µŒ¸ºæİ>YÎMå¯¬3Pİ
++ìÛO’2rÈÙŠíùAd"Gç„m‡2mÏÄ7x•Ñhú7-ÿ@:?NµÇrSê‹œKÁ¡è`«t¥ÉŸªÓxiéå¤´'	Mhøñ‘˜3rŞÚƒ–Sd¦ğO±£ãHT„F§ş
++®‹kZ'xšFÛKùx”q"ĞÒúl@04E‰†Ìû;c¾iA}U÷ÆŒP6ık0–‰ó%DôòLÄ.U– aO¨(LIı®QÇç¢ÏA
++Œ[´uÔØ4s$¨†Ò%tÕB
+\ No newline at end of file
+diff --git a/test/encap_secret.bin b/test/encap_secret.bin
+new file mode 100644
+index 0000000000000..b94441ed1c002
+--- /dev/null
++++ b/test/encap_secret.bin
+@@ -0,0 +1,3 @@
++6W«¡ŠòÌn‘©ú;’ù¡ÃÄmç Ä¥ÉB[HãÕË#äÓ‡(™‡h]:\³PŸ›xñe¡ƒbòé)G¿fõÈ"¨ıË­fË	ÊıJİ)ïşÜì{ªHm‚\PÃº+¸PŞ¸%èÄ/jÏ™%çØ†È<_æ~–
++K—JEhßù‡©lEa¼:¢(Ÿå/\Ñ®Íb€Ã®©Ê×È-g,AYœ‹4
++lÚtÚN­)~\HU4yáŸ	}qJŸ€”t#¦}.™üTÅı”?ÚØÏŠĞÿcD=üLõ¨nmv{—éÅ¿Ô‹È£®
+\ No newline at end of file
+diff --git a/test/recipes/20-test_pkeyutl.t b/test/recipes/20-test_pkeyutl.t
+index 76e4f0a869459..e9472a21352e2 100644
+--- a/test/recipes/20-test_pkeyutl.t
++++ b/test/recipes/20-test_pkeyutl.t
+@@ -13,11 +13,11 @@ use File::Spec;
+ use File::Basename;
+ use OpenSSL::Test qw/:DEFAULT srctop_file ok_nofips/;
+ use OpenSSL::Test::Utils;
+-use File::Compare qw/compare_text/;
++use File::Compare qw/compare_text compare/;
+ 
+ setup("test_pkeyutl");
+ 
+-plan tests => 14;
++plan tests => 19;
+ 
+ # For the tests below we use the cert itself as the TBS file
+ 
+@@ -200,3 +200,33 @@ SKIP: {
+                     "-rawin");
+     };
+ }
++
++#Encap/decap tests
++# openssl pkeyutl -encap -pubin -inkey rsa_pub.pem -secret secret.bin -out encap_out.bin
++# openssl pkeyutl -decap -inkey rsa_priv.pem -in encap_out.bin -out decap_out.bin
++# decap_out is equal to secret
++SKIP: {
++    skip "RSA is not supported by this OpenSSL build", 3
++        if disabled("rsa");
++
++    # Self-compat
++    ok(run(app(([ 'openssl', 'pkeyutl', '-encap', '-pubin', '-kemop', 'RSASVE',
++                  '-inkey', srctop_file('test', 'testrsa2048pub.pem'),
++                  '-out', 'encap_out.bin', '-secret', 'secret.bin']))),
++                  "RSA pubkey encapsulation");
++    ok(run(app(([ 'openssl', 'pkeyutl', '-decap', '-kemop', 'RSASVE',
++                  '-inkey', srctop_file('test', 'testrsa2048.pem'),
++                  '-in', 'encap_out.bin', '-out', 'decap_out.bin']))),
++                  "RSA pubkey decapsulation");
++    is(compare("secret.bin", "decap_out.bin"), 0, "Secret is correctly decapsulated");
++
++    # Pregenerated
++    ok(run(app(([ 'openssl', 'pkeyutl', '-decap', '-kemop', 'RSASVE',
++                  '-inkey', srctop_file('test', 'testrsa2048.pem'),
++                  '-in', srctop_file('test', 'encap_out.bin'), '-out', 'decap_out_etl.bin']))),
++                  "RSA pubkey decapsulation - pregenerated");
++
++    is(compare(srctop_file('test', 'encap_secret.bin'), "decap_out_etl.bin"), 0,
++               "Secret is correctly decapsulated - pregenerated");
++}
++

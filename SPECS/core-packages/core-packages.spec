@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        %{azl}.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,6 +49,44 @@ Requires:       which
 %description    base-image
 %{summary}
 
+%package        base-image-compat
+Summary:        Metapackage defining the basic set of packages (no kernel) with openssl-compat used by images such as VHDs, VHDXs and ISOs.
+Requires:       %{name}-container-compat = %{version}-%{release}
+Requires:       azurelinux-rpm-macros
+Requires:       bc
+Requires:       chrony
+Requires:       cpio
+Requires:       cracklib-dicts
+Requires:       cryptsetup
+Requires:       dbus
+Requires:       e2fsprogs
+Requires:       file
+Requires:       gdbm
+Requires:       iana-etc
+Requires:       libtool
+Requires:       iproute
+Requires:       iptables
+Requires:       iputils
+Requires:       irqbalance
+Requires:       lvm2
+Requires:       lz4
+Requires:       net-tools
+Requires:       openssh-clients
+Requires:       pkg-config
+Requires:       procps-ng
+Requires:       sudo
+Requires:       systemd
+Requires:       systemd-networkd
+Requires:       systemd-resolved
+Requires:       systemd-udev
+Requires:       tar
+Requires:       tzdata
+Requires:       util-linux
+Requires:       which
+
+%description    base-image-compat
+%{summary}
+
 %package        container
 Summary:        Metapackage to install the basic set of packages used all image types.
 Requires:       bash
@@ -83,15 +121,54 @@ Requires:       zlib
 %description    container
 %{summary}
 
+%package        container-compat
+Summary:        Metapackage to install the basic set of packages used all image types, using openssl-compat.
+Requires:       bash
+Requires:       bzip2
+Requires:       ca-certificates-base
+Requires:       curl
+Requires:       elfutils-libelf
+Requires:       expat
+Requires:       filesystem
+Requires:       findutils
+Requires:       grep
+Requires:       gzip
+Requires:       azurelinux-release
+Requires:       azurelinux-repos-cloud-native
+Requires:       azurelinux-repos-ms-non-oss
+Requires:       azurelinux-repos-ms-oss
+Requires:       azurelinux-repos
+Requires:       ncurses-libs
+Requires:       openssl-compat
+Requires:       openssl-compat-libs
+Requires:       readline
+Requires:       rpm
+Requires:       rpm-libs
+Requires:       sed
+Requires:       sqlite-libs
+Requires:       dnf
+Requires:       xz
+Requires:       zlib
+
+%description    container-compat
+%{summary}
+
 %prep
 
 %build
 
 %files base-image
 
+%files base-image-compat
+
 %files container
 
+%files container-compat
+
 %changelog
+* Tue Oct 28 2025 Tobias Brick <tobiasb@microsoft.com> - 3.0-8
+- Add openssl-compat package lists.
+
 * Thu May 29 2025 Andrew Phelps <anphel@microsoft.com> - 3.0-7
 - Add azurelinux-repos-cloud-native to the base container
 

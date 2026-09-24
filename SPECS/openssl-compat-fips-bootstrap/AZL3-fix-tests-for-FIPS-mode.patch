@@ -1,0 +1,74 @@
+From ce7c61babbe714fe8f6d1408ee546d85d6643e5d Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Tue, 4 Nov 2025 20:32:25 +0000
+Subject: [PATCH] fix tests for FIPS mode
+
+---
+ providers/fips/self_test_data.inc    | 4 ++++
+ test/recipes/30-test_evp.t           | 1 +
+ test/recipes/30-test_pairwise_fail.t | 2 +-
+ 3 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/providers/fips/self_test_data.inc b/providers/fips/self_test_data.inc
+index abdc536..2cb5fe3 100644
+--- a/providers/fips/self_test_data.inc
++++ b/providers/fips/self_test_data.inc
+@@ -498,6 +498,7 @@ static const ST_KAT_PARAM kbkdf_params[] = {
+     ST_KAT_PARAM_END()
+ };
+ 
++#if 0
+ static const char kbkdf_kmac_mac[] = "KMAC128";
+ static unsigned char kbkdf_kmac_label[] = {
+     0xB5, 0xB5, 0xF3, 0x71, 0x9F, 0xBE, 0x5B, 0x3D,
+@@ -524,6 +525,7 @@ static const ST_KAT_PARAM kbkdf_kmac_params[] = {
+     ST_KAT_PARAM_OCTET(OSSL_KDF_PARAM_INFO, kbkdf_kmac_context),
+     ST_KAT_PARAM_END()
+ };
++#endif
+ 
+ static const char tls13_kdf_digest[] = "SHA256";
+ static int tls13_kdf_extract_mode = EVP_KDF_HKDF_MODE_EXTRACT_ONLY;
+@@ -615,12 +617,14 @@ static const ST_KAT_KDF st_kat_kdf_tests[] =
+         kbkdf_params,
+         ITM(kbkdf_expected)
+     },
++#if 0
+     {
+         OSSL_SELF_TEST_DESC_KDF_KBKDF_KMAC,
+         OSSL_KDF_NAME_KBKDF,
+         kbkdf_kmac_params,
+         ITM(kbkdf_kmac_expected)
+     },
++#endif
+     {
+         OSSL_SELF_TEST_DESC_KDF_HKDF,
+         OSSL_KDF_NAME_HKDF,
+diff --git a/test/recipes/30-test_evp.t b/test/recipes/30-test_evp.t
+index fb121e1..88cd4a0 100644
+--- a/test/recipes/30-test_evp.t
++++ b/test/recipes/30-test_evp.t
+@@ -99,6 +99,7 @@ my @defltfiles = qw(
+                      evpkdf_scrypt.txt
+                      evpkdf_tls11_prf.txt
+                      evpkdf_hmac_drbg.txt
++                     evpkdf_kbkdf_kmac.txt
+                      evpmac_blake.txt
+                      evpmac_poly1305.txt
+                      evpmac_siphash.txt
+diff --git a/test/recipes/30-test_pairwise_fail.t b/test/recipes/30-test_pairwise_fail.t
+index fa467b4..d87088d 100644
+--- a/test/recipes/30-test_pairwise_fail.t
++++ b/test/recipes/30-test_pairwise_fail.t
+@@ -75,7 +75,7 @@ SKIP: {
+ 
+ SKIP: {
+     skip "Skip EDDSA test because of no ecx in this build", 1
+-        if disabled("ecx");
++        if 1; # disabled("ecx"); AZL3: eddsa is disabled in fips.
+ 
+     run(test(["fips_version_test", "-config", $provconf, ">=3.3.0"]),
+              capture => 1, statusvar => \my $exit);
+-- 
+2.45.4
+
