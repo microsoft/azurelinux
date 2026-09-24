@@ -135,7 +135,7 @@ def parse_update_output(path: Path) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 
-def _update_command(components: list[str], use_all: bool = False) -> str:
+def _update_command(components: list[str], *, use_all: bool = False) -> str:
     if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component update -a"
     return f"azldev component update {' '.join('-p ' + c for c in components)}"

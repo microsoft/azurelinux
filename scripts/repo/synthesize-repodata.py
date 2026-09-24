@@ -325,7 +325,7 @@ def _http_get(
 # ---------------------------------------------------------------------------
 
 
-def build_ssl_context(ca_bundle: Path | None, insecure: bool) -> ssl.SSLContext | None:
+def build_ssl_context(ca_bundle: Path | None, *, insecure: bool) -> ssl.SSLContext | None:
     """Build an SSL context for the requested verification settings.
 
     Return ``None`` when Python's default verification behavior is sufficient.
@@ -1169,7 +1169,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901 - phases are clear
 
     if args.ca_bundle is not None and not args.ca_bundle.is_file():
         return fatal(f"--ca-bundle path does not exist: {args.ca_bundle}")
-    ssl_context = build_ssl_context(args.ca_bundle, args.insecure)
+    ssl_context = build_ssl_context(args.ca_bundle, insecure=args.insecure)
 
     repo_sources: list[tuple[str, str]] = args.repo_sources or []
     if not repo_sources:

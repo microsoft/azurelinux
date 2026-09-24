@@ -122,7 +122,7 @@ def _cached_repos() -> list[tuple[str, float]]:
     return repos
 
 
-def _evict_if_needed(auto_clean: bool) -> str | None:
+def _evict_if_needed(*, auto_clean: bool) -> str | None:
     """Evict oldest repo(s) if cache is at capacity.
 
     Returns None on success, or a warning string if eviction is needed
@@ -148,7 +148,7 @@ def _evict_if_needed(auto_clean: bool) -> str | None:
     return None
 
 
-def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, str | None]:
+def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str, str | None]:
     """Ensure a clone exists for `package`. Returns (repo_dir, error_or_None)."""
     name_err = validate_package_name(package)
     if name_err:
@@ -171,7 +171,7 @@ def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, st
         return repo_dir, None
 
     # Check cache capacity before cloning
-    warn = _evict_if_needed(auto_clean)
+    warn = _evict_if_needed(auto_clean=auto_clean)
     if warn:
         return "", warn
 
@@ -383,7 +383,7 @@ def distgit_search(
     query: str,
     ref: str = "rawhide",
     mode: str = "pickaxe",
-    auto_clean: bool = False,
+    auto_clean: bool = False,  # noqa: FBT001, FBT002 - MCP schema field is named
     override_base_url: str | None = None,
 ) -> StatusDict:
     """Search a Fedora package's git history or content.
@@ -420,7 +420,7 @@ def distgit_search(
         if validation_error:
             return _add_status({"error": validation_error}, full=False)
 
-        repo_dir, err = _ensure_repo(package, auto_clean, base)
+        repo_dir, err = _ensure_repo(package, base, auto_clean=auto_clean)
         if err:
             return _add_status({"error": err}, full=False)
 
@@ -453,7 +453,7 @@ def distgit_search(
 def distgit_show(
     package: str,
     commit: str,
-    auto_clean: bool = False,
+    auto_clean: bool = False,  # noqa: FBT001, FBT002 - MCP schema field is named
     override_base_url: str | None = None,
 ) -> StatusDict:
     """Show a specific commit from a Fedora package's dist-git repo.
@@ -481,7 +481,7 @@ def distgit_show(
         if not re.match(r"^[a-fA-F0-9]{4,40}$", commit):
             return _add_status({"error": "commit must be a hex SHA hash (4-40 chars)."}, full=False)
 
-        repo_dir, err = _ensure_repo(package, auto_clean, base)
+        repo_dir, err = _ensure_repo(package, base, auto_clean=auto_clean)
         if err:
             return _add_status({"error": err}, full=False)
 
@@ -518,7 +518,9 @@ def distgit_show(
 
 
 @mcp.tool()
-def distgit_cleanup(remove_repos: bool = True) -> StatusDict:
+def distgit_cleanup(
+    remove_repos: bool = True,  # noqa: FBT001, FBT002 - MCP schema field is named
+) -> StatusDict:
     """Remove fetched temp files and (optionally) cached repos.
 
     Args:

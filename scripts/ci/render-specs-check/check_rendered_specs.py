@@ -296,7 +296,7 @@ def _unique_components(items: list[dict]) -> list[str]:
 
 
 # NOTE: _unique_components and _render_command are duplicated in post_render_comment.py
-def _render_command(components: list[str], use_all: bool = False) -> str:
+def _render_command(components: list[str], *, use_all: bool = False) -> str:
     if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component render -a --clean-stale"
     return f"azldev component render {' '.join(components)}"
