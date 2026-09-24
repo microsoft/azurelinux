@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Repack the gnome-autoar upstream tarball with its encrypted test fixtures removed.
 
 The three ``tests/files/extract/test-encrypted*/`` fixtures ship

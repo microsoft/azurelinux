@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """dnf-with-azl-repos -- invoke ``dnf`` against Azure Linux repos
 discovered under one or more URL prefixes that follow the Standard
@@ -46,7 +48,7 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _repo_layout import (  # noqa: E402
+from _repo_layout import (
     KIND_DEBUGINFO,
     KIND_SRPMS,
     SUBREPOS,
@@ -63,15 +65,18 @@ _PROBE_FAIL = "fail"            # everything else -- surfaced to the user.
 
 
 def die(msg: str, *, code: int = 2) -> None:
+    """Print an error message and terminate the process."""
     print(f"{PROG}: {msg}", file=sys.stderr, flush=True)
     sys.exit(code)
 
 
 def log(msg: str) -> None:
+    """Write an informational message to standard error."""
     print(msg, file=sys.stderr, flush=True)
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
+    """Parse wrapper options while preserving arguments for dnf."""
     parser = argparse.ArgumentParser(
         prog=PROG,
         description=__doc__,
@@ -158,6 +163,7 @@ def probe_repo(probe_url: str, *, timeout: float = PROBE_TIMEOUT) -> tuple[str, 
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Discover Azure Linux repositories and execute dnf."""
     if argv is None:
         argv = sys.argv[1:]
     args = parse_args(argv)

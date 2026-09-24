@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Route packages from one or more upstream RPM repos into the standard
 Azure Linux per-channel/per-arch layout.
 
@@ -48,13 +51,14 @@ import urllib.request
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
 
 import createrepo_c as cr
 
 # `_repo_layout` is a sibling module in this directory.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _repo_layout import (  # noqa: E402
+from typing import TYPE_CHECKING
+
+from _repo_layout import (
     ALL_KINDS,
     CHANNELS,
     KIND_DEBUGINFO,
@@ -62,6 +66,9 @@ from _repo_layout import (  # noqa: E402
     KIND_SRPMS,
     SUBREPOS,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 # Repo root: this file lives at <repo>/scripts/repo/<name>.py, so the
 # project root is three parents up.
@@ -115,14 +122,17 @@ INHERITANCE_TIE_BREAK_DEFAULT = "base"
 
 
 def log(msg: str) -> None:
+    """Write an informational message to standard error."""
     print(msg, file=sys.stderr, flush=True)
 
 
 def warn(msg: str) -> None:
+    """Write a warning message to standard error."""
     print(f"WARN: {msg}", file=sys.stderr, flush=True)
 
 
 def fatal(msg: str) -> int:
+    """Write an error message and return a failure status."""
     print(f"ERROR: {msg}", file=sys.stderr, flush=True)
     return 1
 
@@ -148,6 +158,7 @@ class InputRepo:
 
 
 def expand_repo_prefix(prefix: str, arches: Iterable[str]) -> list[InputRepo]:
+    """Expand a standard repository prefix into concrete input repos."""
     base = prefix.rstrip("/")
     out: list[InputRepo] = []
     for sub in SUBREPOS:
@@ -230,14 +241,13 @@ def parse_explicit_repo(spec: str, arches: Iterable[str]) -> list[InputRepo]:
 def dedup_input_repos(repos: Iterable[InputRepo]) -> list[InputRepo]:
     """Drop duplicate (kind, arch, url) entries, preserving order. Explicit
     origin wins over prefix origin so 404s remain fatal where the user asked
-    for them explicitly."""
+    for them explicitly.
+    """
     seen: dict[tuple[str, str, str], InputRepo] = {}
     for r in repos:
         key = (r.kind, r.arch, r.url)
         existing = seen.get(key)
-        if existing is None:
-            seen[key] = r
-        elif r.origin == "explicit" and existing.origin == "prefix":
+        if existing is None or (r.origin == "explicit" and existing.origin == "prefix"):
             seen[key] = r
     return list(seen.values())
 
@@ -354,7 +364,7 @@ def download_repo_metadata(
         _http_get(repomd_url, repomd_path, ssl_context)
     except urllib.error.HTTPError as e:
         if e.code == 404 and repo.origin == "prefix":
-            log(f"    -> 404, skipping (prefix-derived, non-fatal)")
+            log("    -> 404, skipping (prefix-derived, non-fatal)")
             shutil.rmtree(cache_dir, ignore_errors=True)
             return None
         raise
@@ -364,7 +374,7 @@ def download_repo_metadata(
         # that as the local-fs equivalent so prefix-derived sub-repos
         # under ``file://`` fixtures are silently skipped just like 404s.
         if isinstance(e.reason, FileNotFoundError) and repo.origin == "prefix":
-            log(f"    -> not found, skipping (prefix-derived, non-fatal)")
+            log("    -> not found, skipping (prefix-derived, non-fatal)")
             shutil.rmtree(cache_dir, ignore_errors=True)
             return None
         raise
@@ -409,7 +419,8 @@ UniverseKey = tuple[str, str, str, str, str, str, str]
 @dataclass
 class UniverseEntry:
     """One NEVRA slot in the unioned package universe (one entry per
-    distinct package version)."""
+    distinct package version).
+    """
 
     repo: InputRepo
     source_pkg_name: str  # extracted from rpm_sourcerpm (or pkg name for srpms)
@@ -439,8 +450,7 @@ def _strip_srpm_suffix(rpm_sourcerpm: str | None) -> str:
     if not rpm_sourcerpm:
         return ""
     s = rpm_sourcerpm
-    if s.endswith(".src.rpm"):
-        s = s[: -len(".src.rpm")]
+    s = s.removesuffix(".src.rpm")
     # Strip -release then -version (best-effort; matches the inspiration
     # script's approach).
     parts = s.rsplit("-", 2)
@@ -451,7 +461,8 @@ def _strip_srpm_suffix(rpm_sourcerpm: str | None) -> str:
 
 def _find_metadata_path(repo_dir: Path, kind: str) -> str:
     """Return the absolute path of *kind* (primary|filelists|other) for the
-    cached repo at *repo_dir*."""
+    cached repo at *repo_dir*.
+    """
     repomd = cr.Repomd()
     cr.xml_parse_repomd(str(repo_dir / "repodata" / "repomd.xml"), repomd, lambda *_: True)
     for rec in repomd.records:
@@ -579,6 +590,7 @@ def query_azldev(
     scratch_dir: Path,
     known_components: set[str],
 ) -> AzldevRouting:
+    """Resolve package routing through azldev."""
     map_path = scratch_dir / "rpm_source_map.json"
     map_path.write_text(json.dumps(rpm_source_map, indent=2))
 
@@ -602,7 +614,7 @@ def query_azldev(
         rtype = row.get("type", "")
         component = row.get("component", "") or ""
         raw_channel = row.get("publishChannel", "") or ""
-        channel = raw_channel[len(CHANNEL_PREFIX) :] if raw_channel.startswith(CHANNEL_PREFIX) else raw_channel
+        channel = raw_channel.removeprefix(CHANNEL_PREFIX)
         if component and component not in known_components:
             # Foreign package: azldev synthesised a default channel for
             # something not actually built by AZL. Track and skip.
@@ -632,7 +644,8 @@ def query_azldev(
 @dataclass
 class RoutingDecision:
     """Per-universe-entry decision: where the package should land, or why
-    it was excluded."""
+    it was excluded.
+    """
 
     dest_channel: str | None = None  # 'base' | 'sdk' | None (=excluded)
     reason: str = ""  # human-readable provenance
@@ -972,6 +985,7 @@ def emit_repos(
 
 
 def write_unpublished_report(unpublished: list[dict], output_dir: Path) -> tuple[Path, Path]:
+    """Write JSON and text reports for unpublished packages."""
     json_path = output_dir / "unpublished-packages.json"
     txt_path = output_dir / "unpublished-packages.txt"
     json_path.write_text(json.dumps(unpublished, indent=2))
@@ -1061,6 +1075,7 @@ class _OrderedRepoSourceAction(argparse.Action):
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse repository synthesis command-line arguments."""
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -1138,6 +1153,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Synthesize routed Azure Linux repositories."""
     args = parse_args(argv)
     arches = tuple(args.arch) if args.arch else DEFAULT_ARCHES
 

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Tests for Control Tower credential selection."""
 
 from __future__ import annotations
@@ -6,7 +9,6 @@ from unittest.mock import Mock
 
 import client
 import pytest
-
 
 _PIPELINE_ENV = {
     "AZURESUBSCRIPTION_CLIENT_ID": "client-id",

@@ -161,6 +161,7 @@ def add_config_interactive(schema_path: Path) -> bool:
 
 
 def main() -> int | None:
+    """Run the interactive kernel configuration update command."""
     parser = argparse.ArgumentParser(description="Interactively add a new kernel config")
     parser.add_argument("json_file", help="Path to the intentional config JSON file")
     args = parser.parse_args()

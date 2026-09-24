@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""
-Format spec review report as a GitHub PR comment with clickable links.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+"""Format spec review report as a GitHub PR comment with clickable links.
 
 Usage:
     python format_pr_comment.py report.json --repo owner/repo --sha abc123
 """
+from __future__ import annotations
 
 import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 from _common import get_repo_relative_path
 
@@ -19,7 +21,7 @@ from _common import get_repo_relative_path
 MAX_RAW_JSON_CHARS = 50_000
 
 
-def format_comment(report: dict, repo: str, sha: str, repo_root: Optional[Path] = None) -> str:
+def format_comment(report: dict, repo: str, sha: str, repo_root: Path | None = None) -> str:
     """Format the report as a markdown comment."""
     reviews = report.get("spec_reviews", [])
 
@@ -114,6 +116,7 @@ def format_comment(report: dict, repo: str, sha: str, repo_root: Optional[Path] 
 
 
 def main() -> int:
+    """Format a spec-review report as a pull request comment."""
     parser = argparse.ArgumentParser(description="Format spec review as PR comment")
     parser.add_argument("file", type=Path, help="Path to report JSON")
     parser.add_argument("--repo", required=True, help="GitHub repo (owner/repo)")

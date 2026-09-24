@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Pytest plugin for Azure Linux image validation.
 
@@ -58,6 +60,7 @@ def parse_capabilities(raw: str | None) -> set[str]:
 
 
 def pytest_addoption(parser) -> None:  # type: ignore[no-untyped-def]
+    """Register command-line options for Azure Linux image tests."""
     group = parser.getgroup("image", "Azure Linux image validation")
     group.addoption(
         "--image-path",

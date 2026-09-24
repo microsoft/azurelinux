@@ -1,8 +1,12 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Compute the render set: components flagged by `azldev component changed`
 plus components whose spec tree was touched directly in the PR.
 
 Emits one component name per line on stdout (azldev dedupes internally).
 """
+from __future__ import annotations
 
 import argparse
 import json
@@ -61,6 +65,7 @@ def from_specs_diff(path: Path, specs_dir: Path, renderable: set[str]) -> list[s
 
 
 def main() -> None:
+    """Print components whose rendered specs need regeneration."""
     p = argparse.ArgumentParser()
     p.add_argument("--changed-components-file", type=Path, required=True)
     p.add_argument("--specs-diff-file", type=Path, required=True)

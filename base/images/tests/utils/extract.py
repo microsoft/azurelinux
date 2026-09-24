@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Image mounting/unmounting orchestration.
 
@@ -14,11 +16,13 @@ import os
 import shutil
 import subprocess
 import tarfile
-from collections.abc import Callable
 from pathlib import Path, PurePosixPath
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .tools import NativeTool
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 

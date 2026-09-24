@@ -37,10 +37,25 @@ pyright
 - Keep area-specific tests in a `tests/` directory rather than beside executable helper scripts.
 - Keep test-only dependencies in `tests/requirements.txt`; include the area's runtime requirements from there when tests import runtime modules. Do not add pytest to runtime requirements solely for tests.
 - Run tests explicitly with `python -m pytest <tests-dir>` so the selected interpreter and environment are unambiguous.
-- Ruff currently enforces `S101` in tests. Use `pytest.fail(...)` for explicit value checks and `pytest.raises(...)` for exceptions rather than bare `assert` statements.
-- Direct-execution helper directories are not necessarily Python packages. When tests need to import sibling scripts, use a narrow `tests/conftest.py` path setup rather than creating a package API solely for tests.
+- Ruff permits bare `assert` statements under `tests/` directories because
+  pytest uses them to provide detailed failure output. Use `pytest.fail(...)`
+  for explicit failures and `pytest.raises(...)` when verifying exceptions.
+- Test functions in `test_*.py` files do not require docstrings; their names
+  should describe the behavior under test. Test helpers, fixtures, and plugin
+  hooks still require docstrings when Ruff treats them as public functions.
+- Image-test directories under `base/images/tests/cases/` organize pytest
+  scenarios and are not Python packages; only the sibling `utils/` tree is
+  packaged by that project's `pyproject.toml`.
+- Direct-execution helper directories are not necessarily Python packages.
+  This includes sibling imports under `scripts/ci`, `scripts/mcps`, and
+  `scripts/repo`. When tests need to import sibling scripts, use a narrow
+  `tests/conftest.py` path setup rather than creating a package API solely for
+  tests.
 - If the Pyright CLI is not using the workspace virtual environment, pass it explicitly (for example, `pyright --pythonpath .venv/bin/python <path>`). Do not suppress missing imports that are installed in the configured environment.
 
 ## Scope
 
-Both tools currently scan: `.github/`, `base/`, `scripts/`. Generated/vendored paths (`base/build`, `base/out`, `specs`, `**/__pycache__`, `**/.venv`, `**/venv`, `**/node_modules`) are excluded.
+Both tools currently scan: `.github/`, `base/`, `scripts/`. Generated or
+externally maintained paths (`base/build`, `base/comps/kernel`, `base/out`,
+`specs`, `**/__pycache__`, `**/.venv`, `**/venv`, `**/node_modules`) are
+excluded. Azure Linux-owned tooling under `scripts/ci/kernel` remains in scope.

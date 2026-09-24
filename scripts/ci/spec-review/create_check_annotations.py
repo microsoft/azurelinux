@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-"""
-Generate GitHub Check annotations from spec review report.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+"""Generate GitHub Check annotations from spec review report.
 
 Usage:
     python create_check_annotations.py report.json --workflow-commands
     python create_check_annotations.py report.json --json
     python create_check_annotations.py report.json --repo-root /path/to/repo
 """
+from __future__ import annotations
 
 import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 from _common import get_repo_relative_path
 
@@ -24,7 +26,7 @@ _SEVERITY_MAP = {
 }
 
 
-def _iter_findings(report: dict, repo_root: Optional[Path] = None):
+def _iter_findings(report: dict, repo_root: Path | None = None):
     """Yield (spec_file, category, finding) for every finding in the report."""
     for review in report.get("spec_reviews", []):
         spec_file = get_repo_relative_path(review.get("spec_file", ""), repo_root)
@@ -55,7 +57,7 @@ def escape_workflow_command(s: str) -> str:
     return s.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A").replace(":", "%3A").replace(",", "%2C")
 
 
-def generate_workflow_commands(report: dict, repo_root: Optional[Path] = None) -> list[str]:
+def generate_workflow_commands(report: dict, repo_root: Path | None = None) -> list[str]:
     """Generate GitHub Actions workflow commands for annotations."""
     commands = []
     for spec_file, category, finding in _iter_findings(report, repo_root):
@@ -67,7 +69,7 @@ def generate_workflow_commands(report: dict, repo_root: Optional[Path] = None) -
     return commands
 
 
-def generate_check_annotations(report: dict, repo_root: Optional[Path] = None) -> list[dict]:
+def generate_check_annotations(report: dict, repo_root: Path | None = None) -> list[dict]:
     """Generate annotations for GitHub Checks API."""
     annotations = []
     for spec_file, category, finding in _iter_findings(report, repo_root):
@@ -88,6 +90,7 @@ def generate_check_annotations(report: dict, repo_root: Optional[Path] = None) -
 
 
 def main() -> int:
+    """Generate check annotations from a spec-review report."""
     parser = argparse.ArgumentParser(description="Generate check annotations from spec review")
     parser.add_argument("file", type=Path, help="Path to report JSON")
     parser.add_argument(

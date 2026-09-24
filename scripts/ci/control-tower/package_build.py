@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Shared mechanics for Control Tower package-build entry points."""
 
 from __future__ import annotations

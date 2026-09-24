@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Basic runtime tests for container-base images.
 
@@ -8,7 +10,10 @@ running container. Each test gets a fresh container instance via the
 
 from __future__ import annotations
 
-from utils.container_runtime import ExecShell
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from utils.container_runtime import ExecShell
 
 
 def test_shell_accessible(container_exec_shell: ExecShell) -> None:

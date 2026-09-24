@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
-Validate spec review report JSON and print findings.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+"""Validate spec review report JSON and print findings.
 
 Usage:
     python spec_review_schema.py report.json [--errors] [--warnings] [--json]
@@ -9,11 +11,11 @@ Exit codes:
     0 = Valid report (regardless of findings)
     2 = Invalid JSON, file error, or schema validation failure
 """
+from __future__ import annotations
 
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -22,12 +24,12 @@ class Finding(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     description: str = Field(..., min_length=1)
-    citation: Optional[str] = None
-    line: Optional[int] = Field(None, ge=1, description="Line number in the spec file")
+    citation: str | None = None
+    line: int | None = Field(None, ge=1, description="Line number in the spec file")
 
     @field_validator("citation", mode="before")
     @classmethod
-    def normalize_citation(cls, v: Optional[str]) -> Optional[str]:
+    def normalize_citation(cls, v: str | None) -> str | None:
         if v in (None, "N/A", "n/a", ""):
             return None
         return v
@@ -52,7 +54,7 @@ class SpecReviewReport(BaseModel):
     spec_reviews: list[SpecReview] = Field(..., min_length=1)
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "SpecReviewReport":
+    def from_file(cls, path: str | Path) -> SpecReviewReport:
         with open(path, encoding="utf-8") as f:
             return cls.model_validate(json.load(f))
 
@@ -203,6 +205,7 @@ def compare_reports(
 
 
 def main() -> int:
+    """Validate, summarize, or compare spec-review reports."""
     import argparse
 
     # Route to compare subcommand if first arg is "compare"

@@ -5,6 +5,7 @@
         "**/.venv",
         "**/venv",
         "base/build",
+        "base/comps/kernel",
         "base/out",
         "specs"
     ],

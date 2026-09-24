@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Root conftest — fixtures for image validation.
 
@@ -15,11 +17,10 @@ import subprocess
 import tempfile
 import time
 import uuid
-from collections.abc import Iterator
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from python_on_whales import DockerClient
 from utils.container_runtime import (
     AssertHttpServer,
     ContainerExecResult,
@@ -52,7 +53,12 @@ from utils.pytest_plugin import (
     detect_image_type,
     parse_capabilities,
 )
-from utils.types import DiskInfo, PartitionInfo
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from python_on_whales import DockerClient
+    from utils.types import DiskInfo, PartitionInfo
 
 logger = logging.getLogger(__name__)
 

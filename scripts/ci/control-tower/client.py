@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Shared HTTP client for Azure Linux Control Tower scenario calls.
 
 Provides:
@@ -87,10 +90,10 @@ def make_credential() -> TokenCredential:
         )
 
     return AzurePipelinesCredential(
-        tenant_id=cast(str, values["tenant_id"]),
-        client_id=cast(str, values["client_id"]),
-        service_connection_id=cast(str, values["service_connection_id"]),
-        system_access_token=cast(str, values["system_access_token"]),
+        tenant_id=cast("str", values["tenant_id"]),
+        client_id=cast("str", values["client_id"]),
+        service_connection_id=cast("str", values["service_connection_id"]),
+        system_access_token=cast("str", values["system_access_token"]),
     )
 
 

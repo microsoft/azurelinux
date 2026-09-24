@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
-Check rendered specs for drift.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+"""Check rendered specs for drift.
 
 Runs inside the render container: compares the committed specs tree against
 the working tree (after `azldev component render -a` has been run) and writes
@@ -59,7 +61,7 @@ def _resolve_head_blobs(paths: list[str]) -> dict[str, str]:
     if not paths:
         return {}
     raw = _git_bytes("ls-tree", "-z", "HEAD", "--", *paths).decode("utf-8")
-    out: dict[str, str] = {p: "" for p in paths}
+    out: dict[str, str] = dict.fromkeys(paths, "")
     for entry in raw.split("\0"):
         if not entry:
             continue
@@ -401,6 +403,7 @@ def generate_patch(
 
 
 def main() -> int:
+    """Check rendered specs and write the requested reports."""
     parser = argparse.ArgumentParser(
         description="Check rendered specs for drift. Outputs a JSON report and optional patch."
     )

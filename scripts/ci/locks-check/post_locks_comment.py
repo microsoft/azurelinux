@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
-Post (or update/delete) a PR comment with `azldev component update` results.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+"""Post (or update/delete) a PR comment with `azldev component update` results.
 
 Reads the JSON output produced by `azldev component update -a -O json` and
 posts a formatted comment listing components whose lock files would change.
@@ -144,6 +146,7 @@ def format_comment(
     run_id: str | None = None,
     repo: str | None = None,
 ) -> str:
+    """Format lock-file drift as a GitHub pull request comment."""
     n_changed = len(changed)
 
     comp_names: list[str] = sorted({entry["component"] for entry in changed})
@@ -266,6 +269,7 @@ def find_existing_comments(repo: str, pr: str) -> list[str]:
 
 
 def post_or_update_comment(repo: str, pr: str, body: str) -> None:
+    """Create or update the bot's lock-file drift comment."""
     existing_ids = find_existing_comments(repo, pr)
     fd, body_path = tempfile.mkstemp(prefix="locks-check-comment-", suffix=".md")
     try:
@@ -305,6 +309,7 @@ def post_or_update_comment(repo: str, pr: str, body: str) -> None:
 
 
 def delete_comment_if_exists(repo: str, pr: str) -> None:
+    """Delete existing lock-file drift comments."""
     for existing_id in find_existing_comments(repo, pr):
         print(f"Deleting stale comment {existing_id}")
         try:
@@ -327,6 +332,7 @@ def delete_comment_if_exists(repo: str, pr: str) -> None:
 
 
 def main() -> int:
+    """Post lock-file drift results from command-line arguments."""
     parser = argparse.ArgumentParser(description="Post `azldev component update` drift as a PR comment.")
     parser.add_argument(
         "--update-output",
