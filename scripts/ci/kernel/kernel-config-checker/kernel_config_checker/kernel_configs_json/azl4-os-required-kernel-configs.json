@@ -3,6 +3,14 @@
     "name": "default",
     "kernel_configs": [
       {
+        "name": "CONFIG_BT",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep Bluetooth disabled on both Azure Linux kernel architectures."
+      },
+      {
         "name": "CONFIG_AMD_MEM_ENCRYPT",
         "values": [
           {
