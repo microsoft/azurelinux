@@ -1,0 +1,77 @@
+diff --git a/widget/gtk/nsWindowWayland.cpp b/widget/gtk/nsWindowWayland.cpp
+--- a/widget/gtk/nsWindowWayland.cpp
++++ b/widget/gtk/nsWindowWayland.cpp
+@@ -55,30 +55,31 @@
+ 
+   Likewise we use GetWorkspaceID() to create/save the xdg_toplevel session
+   for later restore.
+ */
+ 
+-bool GenerateWorkspaceID(nsAString& aName) {
++// Make the GenerateWorkspaceID() failures fatal as missing workspace ID
++// leads to broken profile (Bug 2059617).
++static void GenerateWorkspaceID(nsAString& aName) {
+   nsresult rv;
+   nsCOMPtr<nsIUUIDGenerator> uuidGenerator =
+       do_GetService("@mozilla.org/uuid-generator;1", &rv);
+-  if (NS_WARN_IF(NS_FAILED(rv))) {
+-    return false;
++  if (NS_FAILED(rv)) {
++    MOZ_CRASH("Missing component!");
+   }
+ 
+   nsID id;
+   rv = uuidGenerator->GenerateUUIDInPlace(&id);
+-  if (NS_WARN_IF(NS_FAILED(rv))) {
+-    return false;
++  if (NS_FAILED(rv)) {
++    MOZ_CRASH("GenerateUUIDInPlace() failed!");
+   }
+ 
+   char chars[NSID_LENGTH];
+   id.ToProvidedString(chars);
+ 
+   // NSID_LENGTH counts the null terminator.
+   aName.AssignASCII(chars, NSID_LENGTH - 1);
+-  return true;
+ }
+ 
+ static struct xdg_toplevel* GetXdgToplevelFromGdkWindow(GdkWindow* aWindow) {
+   static auto sGdkWaylandWindowGetXdgToplevel =
+       (struct xdg_toplevel * (*)(GdkWindow*))
+@@ -111,10 +112,19 @@
+     LOG("nsWindowWayland::CreateRestoreSession(): failed to get restore "
+         "session, quit.");
+     return false;
+   }
+ 
++  // If we have old profile / workspace ID just replace it by
++  // UUID to avoid protocol error crash (Bug 2059617).
++  nsresult ret;
++  (void)mWorkspaceID.ToInteger(&ret);
++  if (NS_SUCCEEDED(ret)) {
++    GenerateWorkspaceID(mWorkspaceID);
++    aRestoreWindow = false;
++  }
++
+   NS_ConvertUTF16toUTF8 id(mWorkspaceID);
+   if (aRestoreWindow) {
+     mSessionRestoreToken =
+         xdg_session_v1_restore_toplevel(session, toplevel, id.get());
+   } else {
+@@ -126,12 +136,12 @@
+       id.get(), aRestoreWindow, mSessionRestoreToken);
+   return !!mSessionRestoreToken;
+ }
+ 
+ void nsWindowWayland::GetWorkspaceID(nsAString& workspaceID) {
+-  if (mWorkspaceID.IsEmpty() && !GenerateWorkspaceID(mWorkspaceID)) {
+-    return;
++  if (mWorkspaceID.IsEmpty()) {
++    GenerateWorkspaceID(mWorkspaceID);
+   }
+   workspaceID.Assign(mWorkspaceID);
+ 
+   LOG("nsWindowWayland::GetWorkspaceID() ID %s token %p",
+       NS_ConvertUTF16toUTF8(mWorkspaceID).get(), mSessionRestoreToken);
+

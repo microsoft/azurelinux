@@ -6,7 +6,7 @@
 
 # Pin the post-overlay (repacked) tarball, replacing the upstream sources entry.
 [[components.mozjs140.source-files]]
-filename = "firefox-140.6.0esr.source.tar.xz"
+filename = "firefox-140.13.0esr.source.tar.xz"
 hash = "8d88a7f2c50167b669d8a08d186077d0d5b9502aaaabf8dedbf994969bb3187312b41e6f6f821088b711b7de45d5bf16f20245107ab965324419759f2aece53e"
 hash-type = "SHA512"
 origin = { type = "overlay" }

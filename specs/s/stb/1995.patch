@@ -1,0 +1,39 @@
+From 1fd7ff9fdb97f301264226302a4d70b1074a6b66 Mon Sep 17 00:00:00 2001
+From: Brandon Barrante <aetherai@aethersystems.net>
+Date: Sun, 6 Sep 2026 19:04:39 -0400
+Subject: [PATCH] stb_sprintf: don't write buf[-1] on snprintf(buf, 0, ...)
+ (fixes #1963)
+
+The top gate in STB_SPRINTF_DECORATE(vsnprintf) only entered the count-only path when both count == 0 AND buf was NULL. A caller passing a valid buffer with count == 0 (the shape callers use to ask 'how big would this be?') fell through to the else branch, computed l = (int)(c.buf - buf) = 0, hit the l >= count clamp, dropped to l = count - 1 = -1, and executed buf[-1] = 0 -- one byte out-of-bounds before the caller's buffer.
+
+The C standard is explicit that snprintf(buf, 0, ...) must not write. glibc, musl and the BSD snprintf all skip the null terminator when count == 0.
+
+Extend the gate to count <= 0 so the count-only path handles both the null-buf and the non-null-buf cases the same way. The count-only path uses stbsp__count_clamp_callback which only accumulates length and never dereferences buf, so it's safe with buf == NULL. Behavior for count > 0 is unchanged.
+
+Verified under ASan/UBSan on master 2c980bb5: stack layout puts pad_after immediately before buf; before the fix, snprintf(buf, 0, ...) sets pad_after[15] to 0x00; after the fix it stays as 'B'. Positive controls (normal snprintf, truncation, count=1, count=0-with-null-buf) all still pass.
+
+Fixes: #1963
+Reported-by: JerryGW (github.com/JerryGW)
+Signed-off-by: Brandon Barrante <aetherai@aethersystems.net>
+---
+ stb_sprintf.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/stb_sprintf.h b/stb_sprintf.h
+index ca432a6bca..6625d6eed0 100644
+--- a/stb_sprintf.h
++++ b/stb_sprintf.h
+@@ -1431,8 +1431,12 @@ STBSP__PUBLICDEF int STB_SPRINTF_DECORATE( vsnprintf )( char * buf, int count, c
+ {
+    stbsp__context c;
+ 
+-   if ( (count == 0) && !buf )
++   if ( count <= 0 )
+    {
++      // C standard: snprintf(buf, 0, ...) writes nothing, returns the count
++      // the full output would have taken. Handle this whether or not the
++      // caller passed a valid buffer -- writing buf[count - 1] with count == 0
++      // is an out-of-bounds write before the caller's buffer.
+       c.length = 0;
+ 
+       STB_SPRINTF_DECORATE( vsprintfcb )( stbsp__count_clamp_callback, &c, c.tmp, fmt, va );

@@ -1,0 +1,84 @@
+diff --git a/widget/gtk/nsWindowWayland.h b/widget/gtk/nsWindowWayland.h
+--- a/widget/gtk/nsWindowWayland.h
++++ b/widget/gtk/nsWindowWayland.h
+@@ -234,11 +234,11 @@
+ 
+   RefPtr<mozilla::WaylandVsyncSource> mWaylandVsyncSource;
+   RefPtr<mozilla::VsyncDispatcher> mWaylandVsyncDispatcher;
+   LayoutDeviceIntPoint mNativeLockedPoint;
+   xdg_toplevel_session_v1* mSessionRestoreToken = nullptr;
+-  nsString mSessionID;
++  nsString mWorkspaceID;
+ 
+   gulong mXdgToplevelRealizedID = 0;
+ 
+   zwp_locked_pointer_v1* mLockedPointer = nullptr;
+   zwp_relative_pointer_v1* mRelativePointer = nullptr;
+diff --git a/widget/gtk/nsWindowWayland.cpp b/widget/gtk/nsWindowWayland.cpp
+--- a/widget/gtk/nsWindowWayland.cpp
++++ b/widget/gtk/nsWindowWayland.cpp
+@@ -111,11 +111,11 @@
+     LOG("nsWindowWayland::CreateRestoreSession(): failed to get restore "
+         "session, quit.");
+     return false;
+   }
+ 
+-  NS_ConvertUTF16toUTF8 id(mSessionID);
++  NS_ConvertUTF16toUTF8 id(mWorkspaceID);
+   if (aRestoreWindow) {
+     mSessionRestoreToken =
+         xdg_session_v1_restore_toplevel(session, toplevel, id.get());
+   } else {
+     mSessionRestoreToken =
+@@ -126,17 +126,17 @@
+       id.get(), aRestoreWindow, mSessionRestoreToken);
+   return !!mSessionRestoreToken;
+ }
+ 
+ void nsWindowWayland::GetWorkspaceID(nsAString& workspaceID) {
+-  if (mSessionID.IsEmpty() && !GenerateWorkspaceID(mSessionID)) {
++  if (mWorkspaceID.IsEmpty() && !GenerateWorkspaceID(mWorkspaceID)) {
+     return;
+   }
+-  workspaceID.Assign(mSessionID);
++  workspaceID.Assign(mWorkspaceID);
+ 
+   LOG("nsWindowWayland::GetWorkspaceID() ID %s token %p",
+-      NS_ConvertUTF16toUTF8(mSessionID).get(), mSessionRestoreToken);
++      NS_ConvertUTF16toUTF8(mWorkspaceID).get(), mSessionRestoreToken);
+ 
+   if (mSessionRestoreToken) {
+     return;
+   }
+ 
+@@ -154,11 +154,11 @@
+ };
+ #endif
+ 
+ void nsWindowWayland::RestoreXdgToplevel() {
+   LOG("nsWindowWayland::RestoreXdgToplevel() ID %s GdkWindow [%p]",
+-      NS_ConvertUTF16toUTF8(mSessionID).get(), GetToplevelGdkWindow());
++      NS_ConvertUTF16toUTF8(mWorkspaceID).get(), GetToplevelGdkWindow());
+   if (CreateRestoreSession(/* aRestoreWindow */ true)) {
+ #ifdef MOZ_LOGGING
+     if (LOG_ENABLED()) {
+       xdg_toplevel_session_v1_add_listener(mSessionRestoreToken,
+                                            &sSessionListener, this);
+@@ -166,14 +166,14 @@
+ #endif
+   }
+ }
+ 
+ void nsWindowWayland::MoveToWorkspace(const nsAString& workspaceIDStr) {
+-  mSessionID.Assign(workspaceIDStr);
++  mWorkspaceID.Assign(workspaceIDStr);
+   LOG("nsWindowWayland::MoveToWorkspace() session ID %s "
+       "mWaitingToSessionRestore %d mNeedsShow %d",
+-      NS_ConvertUTF16toUTF8(mSessionID).get(), mWaitingToSessionRestore,
++      NS_ConvertUTF16toUTF8(mWorkspaceID).get(), mWaitingToSessionRestore,
+       mNeedsShow);
+   if (!mWaitingToSessionRestore) {
+     return;
+   }
+   mWaitingToSessionRestore = false;
+

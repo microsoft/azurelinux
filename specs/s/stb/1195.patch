@@ -1,0 +1,59 @@
+From 5818c4e48a7e7d4c21aacf3cd6f1c7e12f770924 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 18 Aug 2021 13:22:14 -0400
+Subject: [PATCH] Fix misleading indentation in stb_divide.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With -Wmisleading-indentation (part of -Wall), gcc 11.2.1 warns:
+
+  In file included from test_c_compilation.c:22:
+  ../stb_divide.h: In function 'test':
+  ../stb_divide.h:316:4: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+    316 |    if (show) printf("(%+11d,%+2d)  ", q,r); stbdiv_check(q,r,a,b, "trunc",a);
+        |    ^~
+  ../stb_divide.h:316:45: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+    316 |    if (show) printf("(%+11d,%+2d)  ", q,r); stbdiv_check(q,r,a,b, "trunc",a);
+        |                                             ^~~~~~~~~~~~
+  ../stb_divide.h:318:4: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+    318 |    if (show) printf("(%+11d,%+2d)  ", q,r); stbdiv_check(q,r,a,b, "floor",b);
+        |    ^~
+  ../stb_divide.h:318:45: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+    318 |    if (show) printf("(%+11d,%+2d)  ", q,r); stbdiv_check(q,r,a,b, "floor",b);
+        |                                             ^~~~~~~~~~~~
+  ../stb_divide.h:320:4: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+    320 |    if (show) printf("(%+11d,%+2d)\n", q,r); stbdiv_check(q,r,a,b, "euclidean",1);
+        |    ^~
+  ../stb_divide.h:320:45: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+    320 |    if (show) printf("(%+11d,%+2d)\n", q,r); stbdiv_check(q,r,a,b, "euclidean",1);
+        |                                             ^~~~~~~~~~~~
+
+This commit moves each call to stbdiv_check(…) to the following line to
+make clear that it is unconditional and to resolve the warning.
+---
+ stb_divide.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/stb_divide.h b/stb_divide.h
+index 6a51e3f2e..4c24143c4 100644
+--- a/stb_divide.h
++++ b/stb_divide.h
+@@ -313,11 +313,14 @@ void test(int a, int b)
+    int q,r;
+    if (show) printf("(%+11d,%+d) |  ", a,b);
+    q = stb_div_trunc(a,b), r = stb_mod_trunc(a,b);
+-   if (show) printf("(%+11d,%+2d)  ", q,r); stbdiv_check(q,r,a,b, "trunc",a);
++   if (show) printf("(%+11d,%+2d)  ", q,r);
++   stbdiv_check(q,r,a,b, "trunc",a);
+    q = stb_div_floor(a,b), r = stb_mod_floor(a,b);
+-   if (show) printf("(%+11d,%+2d)  ", q,r); stbdiv_check(q,r,a,b, "floor",b);
++   if (show) printf("(%+11d,%+2d)  ", q,r);
++   stbdiv_check(q,r,a,b, "floor",b);
+    q = stb_div_eucl (a,b), r = stb_mod_eucl (a,b);
+-   if (show) printf("(%+11d,%+2d)\n", q,r); stbdiv_check(q,r,a,b, "euclidean",1);
++   if (show) printf("(%+11d,%+2d)\n", q,r);
++   stbdiv_check(q,r,a,b, "euclidean",1);
+ }
+ 
+ void testh(int a, int b)

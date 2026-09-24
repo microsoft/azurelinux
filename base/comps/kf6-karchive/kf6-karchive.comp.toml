@@ -1,4 +1,4 @@
-# The upstream KDE `karchive-6.23.0.tar.xz` ships several autotest fixtures
+# The upstream KDE `karchive-6.30.0.tar.xz` ships several autotest fixtures
 # that trip anti-malware scanning on the AZL RPM-signing pipeline, which
 # rejects encrypted / unscannable payloads inside SRPMs:
 #
@@ -19,9 +19,9 @@
 [components.kf6-karchive]
 
 [[components.kf6-karchive.source-files]]
-filename = "karchive-6.23.0.tar.xz"
-hash = "dc92a030772bfea4fd270e0bf5aa1e6b9f0bb45fed19ad8c2c992fd8f36238c4730efebe7ac2d950c6be91213cd062afd0f69f404733678e511c74b94d09ad4a"
+filename = "karchive-6.30.0.tar.xz"
+hash = "4ef6e3c360b24ef942c7d1d698d0295caa50ea9269fbfb9759f6835b0fca00c455c0b11e7c8a1a69f05bda2e354f590459074c09924844f45eece2ab2de557ac"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/kf6-karchive/karchive-6.23.0.tar.xz/sha512/dc92a030772bfea4fd270e0bf5aa1e6b9f0bb45fed19ad8c2c992fd8f36238c4730efebe7ac2d950c6be91213cd062afd0f69f404733678e511c74b94d09ad4a/karchive-6.23.0.tar.xz" }
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/kf6-karchive/karchive-6.30.0.tar.xz/sha512/4ef6e3c360b24ef942c7d1d698d0295caa50ea9269fbfb9759f6835b0fca00c455c0b11e7c8a1a69f05bda2e354f590459074c09924844f45eece2ab2de557ac/karchive-6.30.0.tar.xz" }
 replace-upstream = true
 replace-reason = "AZL-repacked tarball with autotest fixtures stripped that trip anti-malware scanning on the AZL RPM-signing pipeline: autotests/data/password_protected.7z (password-protected 7-Zip) and autotests/data/zip64_extra_zip64_size_first.zip.gz (ZIP64 edge-case fixture whose inner .zip the scanner rejects after decompressing the .gz wrapper). The autotests are not built or run in our spec (no %check, BUILD_TESTING is off), so removing these test fixtures is functionally inert. See modify_source.sh."

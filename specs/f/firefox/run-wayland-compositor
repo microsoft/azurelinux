@@ -1,0 +1,59 @@
+#!/usr/bin/bash
+# Run wayland compositor and set WAYLAND_DISPLAY env variable
+
+set -x
+
+echo export DESKTOP_SESSION=gnome > $HOME/.xsessionrc
+echo export XDG_CURRENT_DESKTOP=GNOME > $HOME/.xsessionrc
+echo export XDG_SESSION_TYPE=wayland >> $HOME/.xsessionrc
+
+# Turn off the screen saver and screen locking
+gsettings set org.gnome.desktop.screensaver idle-activation-enabled false
+gsettings set org.gnome.desktop.screensaver lock-enabled false
+gsettings set org.gnome.desktop.screensaver lock-delay 3600
+
+# Disable the screen saver
+# This starts the gnome-keyring-daemon with an unlocked login keyring. libsecret uses this to
+# store secrets. Firefox uses libsecret to store a key that protects sensitive information like
+# credit card numbers.
+if test -z "$DBUS_SESSION_BUS_ADDRESS" ; then
+    # if not found, launch a new one
+    eval `dbus-launch --sh-syntax`
+fi
+
+if [ -z "$XDG_RUNTIME_DIR" ]; then
+  export XDG_RUNTIME_DIR=$HOME
+fi
+
+export WAYLAND_DISPLAY=firefox-pgo-wayland-0
+if [ -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  rm -f $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
+  rm -f $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY.lock
+fi
+
+echo "Launch mutter for $WAYLAND_DISPLAY"
+mutter --headless --virtual-monitor 1920x1080 --wayland-display=$WAYLAND_DISPLAY --no-x11 & MUTTER_PID=$!
+export MUTTER_PID
+echo "Mutter PID $MUTTER_PID"
+
+echo "Waiting for mutter to start..."
+sleep 5
+retry_count=0
+max_retries=5
+until [ $retry_count -gt $max_retries ]; do
+  if [ -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+    retry_count=$(($max_retries + 1))
+  else
+    retry_count=$(($retry_count + 1))
+    echo "Waiting for Mutter, retry: $retry_count"
+    sleep 2
+  fi
+done
+
+if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
+  echo "Mutter failed to start!"
+  exit 1
+fi
+
+echo "Mutter is running, $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY is here."
+

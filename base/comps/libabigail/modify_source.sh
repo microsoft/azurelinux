@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# libabigail: deterministic strip-and-repack of upstream `libabigail-2.9.tar.xz`
+# libabigail: deterministic strip-and-repack of upstream `libabigail-2.10.tar.xz`
 # with the PR30329 testsuite fixture set (which trips anti-malware scanning on
 # the AZL RPM-signing pipeline) removed. The corresponding two entries in
 # `tests/test-abidiff-exit.cc` that exercise the removed fixture are dropped
@@ -9,7 +9,7 @@
 # Rationale lives in the comp.toml `replace-reason` field.
 #
 # Usage:   bash base/comps/libabigail/modify_source.sh
-# Output:  base/build/work/scratch/libabigail/libabigail-2.9.tar.xz (+ .sha512)
+# Output:  base/build/work/scratch/libabigail/libabigail-2.10.tar.xz (+ .sha512)
 # The upstream tarball is cached under a `.upstream` suffix; re-runs reuse it.
 
 set -euo pipefail
@@ -25,12 +25,12 @@ umask 022
 # --- Constants --------------------------------------------------------------
 
 readonly COMPONENT="libabigail"
-readonly UPSTREAM_VERSION="2.9"
+readonly UPSTREAM_VERSION="2.10"
 readonly UPSTREAM_FILENAME="${COMPONENT}-${UPSTREAM_VERSION}.tar.xz"
 readonly UPSTREAM_TOPDIR="${COMPONENT}-${UPSTREAM_VERSION}"
 readonly UPSTREAM_URL="https://mirrors.kernel.org/sourceware/libabigail/${UPSTREAM_FILENAME}"
 
-readonly UPSTREAM_SHA512="5bdf5ec49a5931a61bf28317b41eee583d6277d00ac621b2d2a97bbc0d816c3662bcfe13a5ac7aeee11c947afb69a5a0a9a8015fcebad09965b45af9b1e23606"
+readonly UPSTREAM_SHA512="e3dcc0b5657b1448d0c6925108f0ff77bef633a1757656285594513124585c3f70b10c7733ec2a5916a6cbd7fd4e17e48b375fd69f58fe7cc974f18bb9098c89"
 
 # Directory (relative to ${UPSTREAM_TOPDIR}) to strip in its entirety. The
 # PR30329 fixture set is a libabigail abidiff regression test built around a
@@ -126,18 +126,6 @@ echo "[5/5] Repacking deterministically as ${UPSTREAM_FILENAME}"
 #   --mtime=@<epoch>        fixed mtime
 #   --format=gnu            handles long paths deterministically
 # LC_ALL=C pins sort collation so --sort=name is locale-independent.
-# xz -9e -T1 picks max compression with single-threaded output (multi-threaded
-# xz produces non-deterministic byte streams). The upstream tarball is .xz so
-# we re-emit .xz to keep the filename and Source0 unchanged.
-#
-# Heads-up: this step is slow. libabigail-2.9 unpacks to ~990 MiB (the source
-# tree is dominated by abidiff regression-test fixtures), so the single-
-# threaded `xz -9e` pass below is on the order of minutes, not seconds.
-# Reference timing on a 12th-gen Intel desktop (i9-12900K, 12 vCPUs): ~6-7
-# minutes wall time for the full tar+xz pipeline (xz dominates; tar itself
-# is a few seconds). The download (~500 MiB) and extract/strip steps before
-# this finish in well under a minute on the same hardware. Slower CPUs can
-# easily push this past 10 minutes -- so if it looks hung, give it time.
 MODIFIED_TARBALL="${WORKDIR}/${UPSTREAM_FILENAME}"
 rm -f "${MODIFIED_TARBALL}"
 LC_ALL=C tar \
@@ -147,7 +135,7 @@ LC_ALL=C tar \
     --mtime="${DETERMINISTIC_MTIME}" \
     --format=gnu \
     -cf - "${UPSTREAM_TOPDIR}" \
-    | xz -9e -T1 -c > "${MODIFIED_TARBALL}"
+    | xz -c > "${MODIFIED_TARBALL}"
 
 MODIFIED_SHA512="$(sha512sum "${MODIFIED_TARBALL}" | awk '{print $1}')"
 echo "${MODIFIED_SHA512}  ${UPSTREAM_FILENAME}" > "${MODIFIED_TARBALL}.sha512"

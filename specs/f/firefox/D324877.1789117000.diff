@@ -1,0 +1,17 @@
+diff --git a/modules/libpref/init/StaticPrefList.yaml b/modules/libpref/init/StaticPrefList.yaml
+--- a/modules/libpref/init/StaticPrefList.yaml
++++ b/modules/libpref/init/StaticPrefList.yaml
+@@ -20896,11 +20896,11 @@
+   mirror: always
+ 
+ # Use xdg-session-management-v1 for session restore on Wayland.
+ - name: widget.wayland.session-management.enabled
+   type: bool
+-  value: @IS_EARLY_BETA_OR_EARLIER@
++  value: true
+   mirror: once
+ 
+ # Use native D&D session type on Wayland instead of Gtk.
+ # Recently disabled due compositor bugs (Bug 2046911).
+ - name: widget.wayland.native-data-session
+

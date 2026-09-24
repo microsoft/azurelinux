@@ -1,4 +1,4 @@
-# The upstream libabigail tarball `libabigail-2.9.tar.xz` (Source0) ships an
+# The upstream libabigail tarball `libabigail-2.10.tar.xz` (Source0) ships an
 # abidiff regression-test fixture set whose two separated-debuginfo files trip
 # anti-malware scanning on the AZL RPM-signing pipeline, which rejects
 # encrypted / unscannable payloads inside SRPMs:
@@ -22,10 +22,10 @@
 [components.libabigail]
 
 [[components.libabigail.source-files]]
-filename = "libabigail-2.9.tar.xz"
-hash = "efa38b7de791d97910e292dc638537c98d920a68201110727bb5c2d6a6055b6da24beace05db5d540ef4349ce2b4f1592a6aceb4e4249e30a179a037bec2f5d4"
+filename = "libabigail-2.10.tar.xz"
+hash = "9e6c3d62393a9547f302b1b5d82f1de4ba3343200fe24e667325e45d6e263fc9f043a35b52b6c1b8f05cc6b285ca87bee84eb2a6fd21d26cd6bc0f98de1f076d"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/libabigail/libabigail-2.9.tar.xz/sha512/efa38b7de791d97910e292dc638537c98d920a68201110727bb5c2d6a6055b6da24beace05db5d540ef4349ce2b4f1592a6aceb4e4249e30a179a037bec2f5d4/libabigail-2.9.tar.xz" }
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/libabigail/libabigail-2.10.tar.xz/sha512/9e6c3d62393a9547f302b1b5d82f1de4ba3343200fe24e667325e45d6e263fc9f043a35b52b6c1b8f05cc6b285ca87bee84eb2a6fd21d26cd6bc0f98de1f076d/libabigail-2.10.tar.xz" }
 replace-upstream = true
 replace-reason = "Repacked source tarball with tests/data/test-abidiff-exit/PR30329/ removed (two libsqlite3.so.0.8.6.debug fixtures inside it were flagged as packer_high_entropy:eod by the AZL signing-pipeline AV scanner). The matching InOutSpec entries in tests/test-abidiff-exit.cc are dropped by the companion overlay patch tests-drop-PR30329-fixture-entries.patch. See modify_source.sh."
 

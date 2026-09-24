@@ -1,0 +1,12 @@
+diff -up firefox-148.0.2/build/moz.configure/toolchain.configure.wasm32-wasip1 firefox-148.0.2/build/moz.configure/toolchain.configure
+--- firefox-148.0.2/build/moz.configure/toolchain.configure.wasm32-wasip1	2026-03-17 11:36:05.388699485 +0100
++++ firefox-148.0.2/build/moz.configure/toolchain.configure	2026-03-17 11:36:31.848758944 +0100
+@@ -1112,7 +1112,7 @@ def compiler_wrapper(wrapper, ccache):
+ 
+ @dependable
+ def wasm():
+-    return split_triplet("wasm32-wasi", allow_wasi=True)
++    return split_triplet("wasm32-wasip1", allow_wasi=True)
+ 
+ 
+ @template

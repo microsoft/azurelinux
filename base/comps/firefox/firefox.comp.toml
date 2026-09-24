@@ -1,31 +1,4 @@
 [components.firefox]
-# Upstream Fedora ships `Release: 1%{?pre_tag}%{?dist}`. We rewrite that line
-# (see overlay below) to `Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}`
-# so the AZL release counter is composed with — rather than replacing —
-# upstream's value. That way the only knob to turn for an AZL-only rebuild
-# is `azl_release` in build.defines below.
-release = { calculation = "manual" }
-
-[components.firefox.build.defines]
-# AZL-only release counter. Added to upstream's leading Release integer (1
-# at the pinned f43 commit) via the overlay below, keeping a single-number
-# Fedora-style Release schema. Bump whenever an AZL-only change requires a
-# new RPM (e.g. new overlay, build-flag change) WITHOUT moving the upstream
-# pin. Reset to "1" when bumping the upstream pin (so the first AZL build
-# on a new upstream is always Release == N+1 where N is whatever the new
-# upstream pin ships).
-#
-# Current value accounts for prior AZL changes already updating this
-# component's input fingerprint:
-#   1. 'feat: introduce deterministic commit resolution via Azure Linux
-#      lock file'
-#   2. 'fix(firefox): set manual release calculation'
-#   3. 'feat(firefox): add azl_release counter for independent rebuild
-#      tracking' (introduces the azl_release counter mechanism)
-#   4. 'feat(firefox): strip malware-flagged files from source tarball'
-#   5. 'fix(firefox): drop fdk-aac-free-devel and Fedora fdk-aac patch'
-azl_release = "5"
-
 # The upstream Mozilla source tarball ships content flagged by the AZL RPM
 # signing pipeline as obfuscated / malware-like (e.g. an obfuscated Windows
 # binary used only by media-sniffer unit tests, crashtest HTML that trips
@@ -51,9 +24,9 @@ azl_release = "5"
 # unmodified upstream tarball alongside our repacked one. This is handled
 # by `replace-upstream = true` on the source-files entry below.
 [[components.firefox.source-files]]
-filename = "firefox-148.0.source.tar.xz"
-hash = "c9c9f29fbd8f889bf3cf3d88776e1a62da7b2a65d386538d2bd048dd70caaaf8324adb5303a5fa9aa73c2cf6eb9f89cb4b34f9e67c4208d88636dd5376af90a9"
+filename = "firefox-156.0.1.source.tar.xz"
+hash = "924ed481ce9bd8aba58e4f9699b34dc8285dce306a94b5bfc6379cc12770aafc72a8b88ec8f48ad4aa5afe6fd84011b77c8d4ab1c18d9a1a62c21a0d7f442139"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/firefox/firefox-148.0.source.tar.xz/sha512/c9c9f29fbd8f889bf3cf3d88776e1a62da7b2a65d386538d2bd048dd70caaaf8324adb5303a5fa9aa73c2cf6eb9f89cb4b34f9e67c4208d88636dd5376af90a9/firefox-148.0.source.tar.xz" }
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/firefox/firefox-156.0.1.source.tar.xz/sha512/924ed481ce9bd8aba58e4f9699b34dc8285dce306a94b5bfc6379cc12770aafc72a8b88ec8f48ad4aa5afe6fd84011b77c8d4ab1c18d9a1a62c21a0d7f442139/firefox-156.0.1.source.tar.xz" }
 replace-upstream = true
 replace-reason = "AZL-repacked tarball with malware-flagged upstream test fixtures stripped (trips RPM signing pipeline); see modify_source.sh REMOVE_PATHS"

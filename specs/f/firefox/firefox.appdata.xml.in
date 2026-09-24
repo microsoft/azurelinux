@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2019 Firefox contributors -->
+<component type="desktop">
+  <id>firefox.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>Firefox</name>
+  <summary>Web Browser</summary>
+  <summary xml:lang="ca">Navegador web</summary>
+  <summary xml:lang="cs">Webový prohlížeč</summary>
+  <summary xml:lang="es">Navegador web</summary>
+  <summary xml:lang="fa">مرورگر اینترنتی</summary>
+  <summary xml:lang="fi">WWW-selain</summary>
+  <summary xml:lang="fr">Navigateur Web</summary>
+  <summary xml:lang="hu">Webböngésző</summary>
+  <summary xml:lang="it">Browser Web</summary>
+  <summary xml:lang="ja">ウェブ・ブラウザ</summary>
+  <summary xml:lang="ko">웹 브라우저</summary>
+  <summary xml:lang="nb">Nettleser</summary>
+  <summary xml:lang="nl">Webbrowser</summary>
+  <summary xml:lang="nn">Nettlesar</summary>
+  <summary xml:lang="no">Nettleser</summary>
+  <summary xml:lang="pl">Przeglądarka WWW</summary>
+  <summary xml:lang="pt">Navegador Web</summary>
+  <summary xml:lang="pt_BR">Navegador Web</summary>
+  <summary xml:lang="sk">Internetový prehliadač</summary>
+  <summary xml:lang="sv">Webbläsare</summary>
+  <description>
+    <p>
+      Bringing together all kinds of awesomeness to make browsing better for you.
+      Get to your favorite sites quickly – even if you don’t remember the URLs.
+      Type your term into the location bar (aka the Awesome Bar) and the autocomplete
+      function will include possible matches from your browsing history, bookmarked
+      sites and open tabs.
+    </p>
+  </description>
+  <url type="homepage">https://www.mozilla.org</url>
+  <update_contact>stransky@redhat.com</update_contact>
+  <kudos>
+    <kudo>ModernToolkit</kudo>
+    <kudo>SearchProvider</kudo>
+  </kudos>
+  <project_group>Mozilla</project_group>
+  <project_license>GPL-3.0+</project_license>
+  <developer_name>Mozilla Corporation</developer_name>
+  <url type="bugtracker">https://bugzilla.mozilla.org/</url>
+  <url type="help">https://support.mozilla.org/</url>
+  <translation type="gettext">firefox</translation>
+  <provides>
+    <id>firefox.desktop</id>
+  </provides>
+  <screenshots>
+    <screenshot type="default">https://raw.githubusercontent.com/hughsie/fedora-appstream/master/screenshots-extra/firefox/a.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/hughsie/fedora-appstream/master/screenshots-extra/firefox/b.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/hughsie/fedora-appstream/master/screenshots-extra/firefox/c.png</screenshot>
+  </screenshots>
+  <releases>
+    <release version="__VERSION__" date="__DATE__"/>
+  </releases>
+</component>

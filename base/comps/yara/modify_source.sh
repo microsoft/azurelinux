@@ -5,7 +5,7 @@
 # Background
 # ----------
 # An automated malware scan in the package signing pipeline rejects
-# multiple files inside the upstream `yara-4.5.4.tar.gz` tarball that
+# multiple files inside the upstream `yara-4.5.7.tar.gz` tarball that
 # are benign by intent but match generic malware heuristics by design.
 # The full list lives in `STRIP_PATHS` below and falls into two
 # flavours:
@@ -55,20 +55,20 @@
 #   bash modify_source.sh
 #
 # Outputs (under base/build/work/scratch/yara/):
-#   yara-4.5.4-azl-stripped.tar.gz
-#   yara-4.5.4-azl-stripped.tar.gz.sha512
+#   yara-4.5.7-azl-stripped.tar.gz
+#   yara-4.5.7-azl-stripped.tar.gz.sha512
 #
-# After running upload `yara-4.5.4-azl-stripped.tar.gz` as the blob payload at
+# After running upload `yara-4.5.7-azl-stripped.tar.gz` as the blob payload at
 # the lookaside URL pattern (modified container) for filename
-# `yara-4.5.4.tar.gz`.  The exact URL is printed by this script.
+# `yara-4.5.7.tar.gz`.  The exact URL is printed by this script.
 
 set -euo pipefail
 
-UPSTREAM_URL="https://github.com/VirusTotal/yara/archive/v4.5.4.tar.gz"
-ORIGINAL_NAME="yara-4.5.4.tar.gz"
-ORIGINAL_SHA512="b1da40636f9e55bb07cc911479e6dfa8dc7a4fa3f6b9f10b9f669d741d7af51a1d31e044f9842ec3ab9c6ac9788fbdb89a1686c9e3f22f68d1f9e5fb3db22167"
-MODIFIED_NAME="yara-4.5.4-azl-stripped.tar.gz"
-EXTRACTED_DIRNAME="yara-4.5.4"
+UPSTREAM_URL="https://github.com/VirusTotal/yara/archive/v4.5.7.tar.gz"
+ORIGINAL_NAME="yara-4.5.7.tar.gz"
+ORIGINAL_SHA512="ff53b0606fa947a9ab882c1e4c610586c28b8383873c4ee589e380e7478229e5ef11572650884dbcd8e487061f744e2e0ce70807bc9d8685e2cb4f781301a05b"
+MODIFIED_NAME="yara-4.5.7-azl-stripped.tar.gz"
+EXTRACTED_DIRNAME="yara-4.5.7"
 
 # Files to remove from the upstream tarball.
 #
@@ -174,7 +174,7 @@ rm -f "${MODIFIED_NAME}"
 tar --sort=name \
     --mtime='2024-01-01 00:00:00 UTC' \
     --owner=0 --group=0 --numeric-owner \
-    -cf - "${EXTRACTED_DIRNAME}" | gzip -n -9 > "${MODIFIED_NAME}"
+    -cf - "${EXTRACTED_DIRNAME}" | gzip -n > "${MODIFIED_NAME}"
 
 MODIFIED_SHA512=$(sha512sum "${MODIFIED_NAME}" | awk '{print $1}')
 echo "${MODIFIED_SHA512}  ${MODIFIED_NAME}" > "${MODIFIED_NAME}.sha512"
@@ -199,7 +199,7 @@ Next steps:
            --auth-mode login \\
            --account-name azltempstaginglookaside \\
            --container-name repo \\
-           --name "pkgs_modified/yara/yara-4.5.4.tar.gz/sha512/${MODIFIED_SHA512}/yara-4.5.4.tar.gz" \\
+           --name "pkgs_modified/yara/yara-4.5.7.tar.gz/sha512/${MODIFIED_SHA512}/yara-4.5.7.tar.gz" \\
            --file "${WORKDIR}/${MODIFIED_NAME}"
 
   3. The hash + URI in base/comps/yara/yara.comp.toml are
