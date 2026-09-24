@@ -2,11 +2,17 @@
 <image>
     <profiles>
         <profile name="Fips" description="FIPS boot support" import="false" />
-        <profile name="UefiBoot" description="Architecture-specific UEFI boot packages" import="false" />
+        <profile name="UefiFstab" description="UEFI fstab configuration" import="false" />
+        <profile name="UefiBoot" description="Architecture-specific UEFI boot packages" import="false">
+            <requires profile="UefiFstab" />
+        </profile>
         <profile name="LegacyBoot" description="Legacy BIOS boot packages" import="false" />
     </profiles>
     <packages type="image" profiles="Fips">
         <package name="dracut-fips" />
+    </packages>
+    <packages type="image" profiles="UefiFstab">
+        <file name="configure-efi-fstab.sh" target="/etc/fstab.script" permissions="0755" />
     </packages>
     <packages type="image" profiles="UefiBoot">
         <package name="efibootmgr" />
