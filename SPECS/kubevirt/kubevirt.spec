@@ -20,35 +20,25 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.8.4
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor-v1.tar.gz
 Patch0:         CVE-2025-11065.patch
-Patch1:         CVE-2026-39829.patch
-Patch2:         CVE-2026-42506.patch
-Patch3:         CVE-2026-46597.patch
-Patch4:         CVE-2026-39821.patch
-Patch5:         CVE-2026-39830.patch
-Patch6:         CVE-2026-39834.patch
-Patch7:         CVE-2026-27136.patch
-Patch8:         CVE-2026-25680.patch
-Patch9:         CVE-2026-25681.patch
-Patch10:        CVE-2026-39827.patch
-Patch11:        CVE-2026-39828.patch
-Patch12:        CVE-2026-39835.patch
-Patch13:        CVE-2026-42502.patch
-Patch14:        CVE-2026-33814.patch
-Patch15:        CVE-2026-56852.patch
- 
+Patch1:         CVE-2026-84445.patch
+Patch2:         CVE-2026-56855.patch
+Patch3:         CVE-2026-78662.patch
+Patch4:         CVE-2026-93450.patch
+
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
-BuildRequires:  golang >= 1.24
+BuildRequires:  golang >= 1.25
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
@@ -153,7 +143,10 @@ Group:          System/Packages
 The package provides Kubevirt end-to-end tests.
 
 %prep
-%autosetup -p1
+%autosetup -N
+rm -rf vendor
+tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 mkdir -p go/src/kubevirt.io go/pkg
@@ -297,11 +290,23 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Sep 17 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.8.4-3
+- Patch for CVE-2026-84445 and CVE-2026-84304, CVE-2026-93450 by generating new go vendor tarball
+  with google.golang.org/grpc v1.83.2 and github.com/go-openapi/swag@v0.27.1
+- Drop CVE-2026-25680.patch, CVE-2026-25681.patch, CVE-2026-27136.patch, CVE-2026-33814.patch,
+  CVE-2026-39821.patch, CVE-2026-42502.patch, CVE-2026-42506.patch, CVE-2026-39827.patch,
+  CVE-2026-39828.patch, CVE-2026-39829.patch, CVE-2026-39830.patch, CVE-2026-39834.patch,
+  CVE-2026-39835.patch, CVE-2026-46597.patch, CVE-2026-56852.patch fixed by golang.org/x/{net,crypto,text} v0.58.0, v0.55.0, v0.41.0
+- Rebase CVE-2026-78662.patch, CVE-2026-56855.patch
+
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.4-2
+- Patch for CVE-2026-78662, CVE-2026-56855
+
 * Tue Aug 25 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.8.4-1
 - Upgrade KubeVirt to v1.8.4
 - Remove CVE-2026-35469.patch and CVE-2026-7374.patch as they are fixed upstream.
 
-* Mon Aug 18 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.7.1-10
+* Tue Aug 18 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.7.1-10
 - Add Kubevirt sidecar
 
 * Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.7.1-9
