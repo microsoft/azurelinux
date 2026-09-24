@@ -81,7 +81,7 @@ class SpecReviewReport(BaseModel):
         """Return whether the report contains errors."""
         return self.total_errors > 0
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print aggregate finding counts."""
         status = "ERRORS FOUND" if self.has_errors else "No errors"
         print(f"{status}")
@@ -89,7 +89,7 @@ class SpecReviewReport(BaseModel):
             f"Specs: {len(self.spec_reviews)} | Errors: {self.total_errors} | Warnings: {self.total_warnings} | Suggestions: {self.total_suggestions}"
         )
 
-    def print_errors(self):
+    def print_errors(self) -> None:
         """Print all error findings."""
         for review in self.spec_reviews:
             if review.errors:
@@ -99,7 +99,7 @@ class SpecReviewReport(BaseModel):
                     if e.citation:
                         print(f"     {e.citation}")
 
-    def print_warnings(self):
+    def print_warnings(self) -> None:
         """Print all warning findings."""
         for review in self.spec_reviews:
             if review.warnings:
@@ -109,7 +109,7 @@ class SpecReviewReport(BaseModel):
                     if w.citation:
                         print(f"     {w.citation}")
 
-    def print_suggestions(self):
+    def print_suggestions(self) -> None:
         """Print all suggestion findings."""
         for review in self.spec_reviews:
             if review.suggestions:

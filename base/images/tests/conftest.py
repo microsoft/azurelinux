@@ -55,7 +55,7 @@ from utils.pytest_plugin import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Callable, Iterator
 
     from python_on_whales import DockerClient
     from utils.types import DiskInfo, PartitionInfo
@@ -315,7 +315,7 @@ def partition_table(disk_info: DiskInfo | None, image_type: str) -> list[Partiti
 
 
 @pytest.fixture(scope="session")
-def podman_client(image_type: str):
+def podman_client(image_type: str) -> Iterator[DockerClient | None]:
     """Session-scoped python-on-whales Podman client; skips for non-container images."""
     if image_type != "container":
         yield None
@@ -365,7 +365,7 @@ def _effective_image(podman_client: DockerClient, container_image_ref: str, requ
 def running_container(
     podman_client: DockerClient, image_type: str,
     container_image_ref: str | None, request: pytest.FixtureRequest,
-):
+) -> Iterator[ContainerInstance]:
     """Fresh container per test with guaranteed teardown.
 
     If marked with ``@pytest.mark.dockerfile()``, builds a custom
@@ -390,7 +390,10 @@ def running_container(
 
 
 @pytest.fixture
-def container_exec(podman_client: DockerClient, running_container: ContainerInstance):
+def container_exec(
+    podman_client: DockerClient,
+    running_container: ContainerInstance,
+) -> Callable[[list[str]], ContainerExecResult]:
     """Callable to execute commands in the running test container.
 
     Usage::
