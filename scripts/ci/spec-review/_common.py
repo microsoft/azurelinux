@@ -1,10 +1,10 @@
 """Shared utilities for spec review scripts."""
+from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 
-def get_repo_relative_path(spec_file: str, repo_root: Optional[Path] = None) -> str:
+def get_repo_relative_path(spec_file: str, repo_root: Path | None = None) -> str:
     """Convert absolute path to repo-relative path.
 
     Uses repo_root if available; falls back to filename only so that

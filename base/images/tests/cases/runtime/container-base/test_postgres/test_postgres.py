@@ -97,7 +97,7 @@ def _assert_bad_auth_rejected(exec_shell: ExecShell, host: str) -> None:
     assert "authentication failed" in bad_auth.output, f"unexpected auth error: {bad_auth.output}"
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_postgresql_version(container_exec_shell: ExecShell) -> None:
     """The PostgreSQL server binary reports a version."""
     result = container_exec_shell("postgres --version")
@@ -105,7 +105,7 @@ def test_postgresql_version(container_exec_shell: ExecShell) -> None:
     assert "postgres (PostgreSQL)" in result.output
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_postgresql_database_server(container_exec_shell: ExecShell) -> None:
     """Server accepts TCP connections and handles create/insert/select."""
     _start_postgresql(container_exec_shell)
@@ -113,7 +113,7 @@ def test_postgresql_database_server(container_exec_shell: ExecShell) -> None:
     _run_crud_workflow(container_exec_shell, "localhost")
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_postgresql_cross_container(client_server_exec_shell: tuple[ExecShell, ExecShell, str]) -> None:
     """A client container reaches a server container's database over the network."""
     server_exec, client_exec, server_host = client_server_exec_shell

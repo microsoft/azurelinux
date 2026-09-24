@@ -3,6 +3,7 @@ plus components whose spec tree was touched directly in the PR.
 
 Emits one component name per line on stdout (azldev dedupes internally).
 """
+from __future__ import annotations
 
 import argparse
 import json

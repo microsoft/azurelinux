@@ -14,28 +14,28 @@ from utils.container_runtime import ExecShell, WriteFile
 TELEGRAF_CONFIG = "/etc/telegraf/telegraf.conf"
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_telegraf_emits_mem_metrics(container_exec_shell: ExecShell) -> None:
-    """telegraf --test must emit mem plugin measurement output."""
+    """Telegraf --test must emit mem plugin measurement output."""
     result = container_exec_shell(f"telegraf --config {TELEGRAF_CONFIG} --test")
     assert result.exit_code == 0, f"telegraf --test failed: {result.output}"
     assert "mem,host" in result.output
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_telegraf_reports_version_and_plugin_usage(container_exec_shell: ExecShell) -> None:
-    """telegraf binary should report version and cpu plugin usage details."""
+    """Telegraf binary should report version and cpu plugin usage details."""
     result = container_exec_shell("telegraf --version && telegraf --usage cpu")
     assert result.exit_code == 0, f"telegraf version/usage check failed: {result.output}"
     assert "Telegraf" in result.output
     assert "cpu" in result.output.lower()
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_telegraf_file_output_plugin_writes_metrics(
     container_exec_shell: ExecShell, write_file_in_container: WriteFile
 ) -> None:
-    """telegraf should be able to flush metrics to file output."""
+    """Telegraf should be able to flush metrics to file output."""
     config_body = (
         Path(__file__).parent / "configs" / "file_output.conf"
     ).read_text(encoding="utf-8")

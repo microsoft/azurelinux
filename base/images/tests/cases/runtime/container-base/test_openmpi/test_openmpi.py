@@ -16,17 +16,17 @@ MPI_CC = "/usr/lib64/openmpi/bin/mpicc"
 MPI_TIMEOUT_SECS = 30
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_openmpi_mpirun_version(container_exec_shell: ExecShell) -> None:
-    """mpirun binary must exist and report version."""
+    """Mpirun binary must exist and report version."""
     result = container_exec_shell(f"OMPI_PRTERUN={PRTE_RUN} {MPI_RUN} --version")
     assert result.exit_code == 0, f"mpirun --version failed: {result.output}"
     assert "Open MPI" in result.output
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_openmpi_runs_multiple_ranks(container_exec_shell: ExecShell) -> None:
-    """mpirun should launch two ranks in a single container."""
+    """Mpirun should launch two ranks in a single container."""
     result = container_exec_shell(
         f"OMPI_PRTERUN={PRTE_RUN} "
         "OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 "
@@ -42,7 +42,7 @@ def test_openmpi_runs_multiple_ranks(container_exec_shell: ExecShell) -> None:
     assert ranks == ["rank=0", "rank=1"], f"unexpected rank output: {result.output}"
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_openmpi_send_receive_between_two_ranks(container_exec_shell: ExecShell) -> None:
     """Two MPI ranks should exchange tagged messages successfully."""
     compile_and_run = (

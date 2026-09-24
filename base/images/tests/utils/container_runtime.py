@@ -11,8 +11,9 @@ from __future__ import annotations
 import logging
 import time
 import uuid
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator, NamedTuple, Protocol, cast
+from typing import NamedTuple, Protocol, cast
 
 from python_on_whales import DockerClient
 from python_on_whales.exceptions import DockerException, NoSuchContainer, NoSuchImage

@@ -46,7 +46,7 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _repo_layout import (  # noqa: E402
+from _repo_layout import (
     KIND_DEBUGINFO,
     KIND_SRPMS,
     SUBREPOS,
