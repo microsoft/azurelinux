@@ -11,6 +11,22 @@
         "justification": "Keep Bluetooth disabled on both Azure Linux kernel architectures."
       },
       {
+        "name": "CONFIG_WLAN_VENDOR_INTEL",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep Intel Wi-Fi disabled on both Azure Linux kernel architectures."
+      },
+      {
+        "name": "CONFIG_WLAN",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep WLAN drivers disabled on both Azure Linux kernel architectures."
+      },
+      {
         "name": "CONFIG_AMD_MEM_ENCRYPT",
         "values": [
           {
