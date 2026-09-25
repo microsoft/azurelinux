@@ -66,8 +66,6 @@ EOF
 * Wed Sep 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.5.1-1
 - Upgrade to 3.5.1
 - Add libidn2-devel build dependency to enable IDN support required by configure
-
-* Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.5.0-2
 - Patch for CVE-2026-18743
 
 * Fri Aug 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-1
