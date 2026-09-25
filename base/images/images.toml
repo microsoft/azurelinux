@@ -11,23 +11,6 @@
 # distro builds.
 # ============================================================================
 
-# ---- vm-base -----------------------------------------------------------
-
-[images.vm-base]
-description = "VM Base Image"
-definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "vm-base" }
-tests.tests = [
-  { name = "static-image-checks" },
-  { group = "vm-base-functional" },
-  { group = "vm-base-performance" },
-]
-
-[images.vm-base.capabilities]
-machine-bootable = true
-container = false
-systemd = true
-runtime-package-management = true
-
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }
@@ -118,6 +101,21 @@ tests.tests = [
 ]
 
 [images.1p-vm-base-gen1.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.1p-vm-base-gen2]
+description = "1P VM Base Gen2 Image (UEFI)"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2" }
+tests.tests = [
+  { name = "static-image-checks" },
+  { group = "vm-base-functional" },
+  { group = "vm-base-performance" },
+]
+
+[images.1p-vm-base-gen2.capabilities]
 machine-bootable = true
 container = false
 systemd = true
