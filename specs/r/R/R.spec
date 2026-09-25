@@ -38,7 +38,7 @@
 
 Name:           R
 Version:        %{major_version}.%{minor_version}.%{patch_version}
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        A language for data analysis and graphics
 
 License:        GPL-2.0-or-later
@@ -78,7 +78,7 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  valgrind-devel
 %endif
 %ifarch %{java_arches}
-BuildRequires:  java-devel
+BuildRequires:  msopenjdk-25
 %endif
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -254,7 +254,7 @@ environment.
 %package java
 Summary:        R with Fedora provided Java Runtime Environment
 Requires(post): R-core%{?_isa} = %{version}-%{release}
-Requires:       java-headless
+Requires:       msopenjdk-25
 
 %description java
 A language and environment for statistical computing and graphics.

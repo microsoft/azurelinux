@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build Maven Verifier Plugin with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^BuildRequires: java-25-devel >= 1:1\.6\.0$'
+replacement = "BuildRequires: msopenjdk-25"

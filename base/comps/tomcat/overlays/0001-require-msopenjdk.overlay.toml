@@ -1,0 +1,15 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build Tomcat with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^BuildRequires: java-25-devel >= 17$'
+replacement = "BuildRequires: msopenjdk-25"
+
+[[overlays]]
+description = "Run Tomcat with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^Requires:      \(java-headless >= 11 or java-25 >= 11\)$'
+replacement = "Requires:      msopenjdk-25"

@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build ECJ with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^BuildRequires: java-25-devel >= 1:11$'
+replacement = "BuildRequires: msopenjdk-25"

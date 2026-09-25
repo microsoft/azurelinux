@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use the provider-neutral JRE path for Dola's embedded JVM"
+type = "file-search-replace"
+file = "0003-Switch-to-OpenJDK-for-runtime.patch"
+regex = '%\{_jvmdir\}/jre-25-openjdk/lib/server/libjvm\.so'
+replacement = "%{_jvmdir}/jre/lib/server/libjvm.so"

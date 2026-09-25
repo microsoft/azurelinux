@@ -1,0 +1,11 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Run Dola's embedded JVM with Microsoft OpenJDK"
+type = "spec-search-replace"
+section = "%package"
+package = "bsx"
+regex = '^Requires:       java-25-openjdk-headless$'
+replacement = "Requires:       msopenjdk-25"

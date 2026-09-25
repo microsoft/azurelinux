@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use the provider-neutral JDK directory when Apache Ivy runs Ant"
+type = "spec-search-replace"
+section = "%build"
+regex = "^sed -i '\\$a JAVA_HOME=/usr/lib/jvm/java-25-openjdk' ~/\\.ant/ant\\.conf$"
+replacement = "sed -i '$a JAVA_HOME=/usr/lib/jvm/java' ~/.ant/ant.conf"

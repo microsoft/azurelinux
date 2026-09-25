@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use the provider-neutral JVM directory for Ant's OpenJDK 25 binding"
+type = "spec-search-replace"
+section = "%install"
+regex = "^echo 'JAVA_HOME=%\\{_jvmdir\\}/jre-25-openjdk' > %\\{buildroot\\}%\\{_javaconfdir\\}/ant-openjdk25\\.conf$"
+replacement = "echo 'JAVA_HOME=%{_jvmdir}/jre' > %{buildroot}%{_javaconfdir}/ant-openjdk25.conf"

@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Map the OpenJDK 25 packaging profile to the provider-neutral JRE directory"
+type = "spec-search-replace"
+section = "%build"
+regex = '^    --jvm=openjdk25=%\{_jvmdir\}/jre-25-openjdk$'
+replacement = "    --jvm=openjdk25=%{_jvmdir}/jre"

@@ -1,0 +1,33 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build VTK Java bindings with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^BuildRequires: java-devel$'
+replacement = "BuildRequires: msopenjdk-25"
+
+[[overlays]]
+description = "Define Java filesystem macros for VTK packaging"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "javapackages-filesystem"
+
+[[overlays]]
+description = "Run VTK Java bindings with Microsoft OpenJDK"
+type = "spec-add-tag"
+package = "java"
+tag = "Requires"
+value = "msopenjdk-25"
+
+[[overlays]]
+description = "Develop VTK Java bindings with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^Requires: java-devel$'
+replacement = "Requires: msopenjdk-25"
+
+[[overlays]]
+description = "Avoid the unadvertised Microsoft OpenJDK libjawt capability"
+type = "spec-prepend-lines"
+lines = ['%global __requires_exclude ^libjawt\.so.*$']

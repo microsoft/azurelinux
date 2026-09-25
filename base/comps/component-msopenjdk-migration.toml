@@ -1,0 +1,134 @@
+# Shared overlays for the migration from Fedora OpenJDK packages to
+# Microsoft OpenJDK 25. Keep only byte-identical overlay operations here;
+# component-specific changes remain in each component's overlays directory.
+#
+# When removing a group, remove it only after every listed component meets the
+# group's removal condition. Render every member and compare `diff-sources`
+# before dropping or changing a shared overlay.
+
+# Fedora removed these OpenJDK 21 bindings independently in each component.
+# Remove this group once the pinned Fedora sources include all three commits:
+# ant/4ca7a3b, maven/e19767f, and maven4/4b6c6ee.
+[component-groups.msopenjdk-remove-openjdk21-jdk-bindings]
+description = "Remove Fedora OpenJDK 21 JDK bindings that Azure Linux cannot satisfy"
+components = ["ant", "maven", "maven4"]
+
+[[component-groups.msopenjdk-remove-openjdk21-jdk-bindings.default-component-config.overlays]]
+description = "Remove openjdk21 JDK binding lines — AZL does not ship java-21-openjdk"
+type = "spec-search-replace"
+section = "%install"
+regex = '.*openjdk21.*'
+replacement = ""
+
+[component-groups.msopenjdk-remove-openjdk21-jdk-bindings.default-component-config.overlays.metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://src.fedoraproject.org/rpms/ant/c/4ca7a3b" },
+    { url = "https://src.fedoraproject.org/rpms/maven/c/e19767f" },
+    { url = "https://src.fedoraproject.org/rpms/maven4/c/4b6c6ee" },
+]
+
+# Fedora removed these OpenJDK 21 toolchains independently in each component.
+# Remove this group once the pinned Fedora sources include both commits:
+# xmvn/2c9d321 and xmvn5/b9afca4.
+[component-groups.msopenjdk-remove-openjdk21-xmvn-toolchains]
+description = "Remove Fedora OpenJDK 21 XMvn toolchains that Azure Linux cannot satisfy"
+components = ["xmvn", "xmvn5"]
+
+[[component-groups.msopenjdk-remove-openjdk21-xmvn-toolchains.default-component-config.overlays]]
+description = "Remove openjdk21 toolchain lines — AZL does not ship java-21-openjdk"
+type = "spec-search-replace"
+section = "%install"
+regex = '.*openjdk21.*'
+replacement = ""
+
+[component-groups.msopenjdk-remove-openjdk21-xmvn-toolchains.default-component-config.overlays.metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://src.fedoraproject.org/rpms/xmvn/c/2c9d321" },
+    { url = "https://src.fedoraproject.org/rpms/xmvn5/c/b9afca4" },
+]
+
+# Remove this group when Maven's Fedora spec uses a provider-neutral JAVA_HOME
+# and its OpenJDK 25 binding selects Microsoft OpenJDK without package-specific
+# dependency rewrites in Azure Linux.
+[component-groups.msopenjdk-maven-bindings]
+description = "Bind Maven 3 and Maven 4 to Microsoft OpenJDK 25"
+components = ["maven", "maven4"]
+
+[[component-groups.msopenjdk-maven-bindings.default-component-config.overlays]]
+description = "Use the provider-neutral JRE directory for Maven's OpenJDK 25 binding"
+type = "spec-search-replace"
+section = "%install"
+regex = '^echo JAVA_HOME=%\{_jvmdir\}/jre-25-openjdk >%\{buildroot\}%\{_javaconfdir\}/maven%\{\?maven_version_suffix\}-openjdk25\.conf$'
+replacement = "echo JAVA_HOME=%{_jvmdir}/jre >%{buildroot}%{_javaconfdir}/maven%{?maven_version_suffix}-openjdk25.conf"
+
+[component-groups.msopenjdk-maven-bindings.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[component-groups.msopenjdk-maven-bindings.default-component-config.overlays]]
+description = "Bind Maven's OpenJDK 25 integration to Microsoft OpenJDK"
+type = "spec-search-replace"
+section = "%install"
+regex = '^%jp_binding --verbose --variant openjdk25 --ghost maven%\{\?maven_version_suffix\}\.conf --target %\{_javaconfdir\}/maven%\{\?maven_version_suffix\}-openjdk25\.conf --provides %\{name\}-jdk-binding --requires java-25-openjdk-headless --recommends java-25-openjdk-devel$'
+replacement = "%jp_binding --verbose --variant openjdk25 --ghost maven%{?maven_version_suffix}.conf --target %{_javaconfdir}/maven%{?maven_version_suffix}-openjdk25.conf --provides %{name}-jdk-binding --requires msopenjdk-25 --recommends msopenjdk-25"
+
+[component-groups.msopenjdk-maven-bindings.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Remove this group when XMvn's Fedora toolchain file uses a provider-neutral
+# JDK path. The jp_binding calls differ between XMvn versions and stay local.
+[component-groups.msopenjdk-xmvn-provider-path]
+description = "Use the provider-neutral JDK path in XMvn OpenJDK 25 toolchains"
+components = ["xmvn", "xmvn5"]
+
+[[component-groups.msopenjdk-xmvn-provider-path.default-component-config.overlays]]
+description = "Use the provider-neutral JDK directory for XMvn's OpenJDK 25 toolchain"
+type = "file-search-replace"
+file = "toolchains-openjdk25.xml"
+regex = '<jdkHome>/usr/lib/jvm/java-25-openjdk</jdkHome>'
+replacement = "<jdkHome>/usr/lib/jvm/java</jdkHome>"
+
+[component-groups.msopenjdk-xmvn-provider-path.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Remove this group when the Fedora specs expose a provider override or use
+# generic Java capabilities and provider-neutral paths for these macros.
+[component-groups.msopenjdk-dogtag-jss-java-macros]
+description = "Retarget shared Dogtag and JSS Java macros to Microsoft OpenJDK 25"
+components = ["dogtag-pki", "jss"]
+
+[[component-groups.msopenjdk-dogtag-jss-java-macros.default-component-config.overlays]]
+description = "Retarget java_devel to Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = "^%define java_devel java-(21|25)-openjdk-devel$"
+replacement = "%define java_devel msopenjdk-25"
+
+[component-groups.msopenjdk-dogtag-jss-java-macros.default-component-config.overlays.metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[component-groups.msopenjdk-dogtag-jss-java-macros.default-component-config.overlays]]
+description = "Retarget java_headless to Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = "^%define java_headless java-(21|25)-openjdk-headless$"
+replacement = "%define java_headless msopenjdk-25"
+
+[component-groups.msopenjdk-dogtag-jss-java-macros.default-component-config.overlays.metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[component-groups.msopenjdk-dogtag-jss-java-macros.default-component-config.overlays]]
+description = "Retarget java_home to the provider-neutral JRE directory"
+type = "spec-search-replace"
+regex = '^%define java_home %\{_jvmdir\}/jre-(21|25)-openjdk$'
+replacement = "%define java_home %{_jvmdir}/jre"
+
+[component-groups.msopenjdk-dogtag-jss-java-macros.default-component-config.overlays.metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"

@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Bind Ant's OpenJDK 25 integration to Microsoft OpenJDK"
+type = "spec-search-replace"
+section = "%install"
+regex = '^%jp_binding --verbose --variant openjdk25 --ghost ant\.conf --target %\{_javaconfdir\}/ant-openjdk25\.conf --provides %\{name\}-jdk-binding --requires java-25-openjdk-headless --recommends java-25-openjdk-devel$'
+replacement = "%jp_binding --verbose --variant openjdk25 --ghost ant.conf --target %{_javaconfdir}/ant-openjdk25.conf --provides %{name}-jdk-binding --requires msopenjdk-25 --recommends msopenjdk-25"

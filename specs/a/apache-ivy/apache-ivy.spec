@@ -10,7 +10,7 @@
 
 Name:           apache-%{jarname}
 Version:        2.5.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Java-based dependency manager
 License:        Apache-2.0
 URL:            https://ant.apache.org/ivy
@@ -144,7 +144,7 @@ rm -rf asciidoc
 # create custom ant configuration
 mkdir -p ~/.ant
 cp /etc/ant.conf ~/.ant
-sed -i '$a JAVA_HOME=/usr/lib/jvm/java-25-openjdk' ~/.ant/ant.conf
+sed -i '$a JAVA_HOME=/usr/lib/jvm/java' ~/.ant/ant.conf
 
 ant -Divy.mode=local \
     -f build-release.xml \

@@ -1,0 +1,15 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build Byteman with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^BuildRequires:    java-25-devel >= 1:11$'
+replacement = "BuildRequires:    msopenjdk-25"
+
+[[overlays]]
+description = "Run Byteman with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^Requires:         java-25-headless >= 1:1\.8$'
+replacement = "Requires:         msopenjdk-25"

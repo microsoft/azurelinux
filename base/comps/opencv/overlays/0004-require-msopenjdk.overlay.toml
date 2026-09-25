@@ -1,0 +1,15 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build OpenCV Java bindings with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^BuildRequires:  java-devel$'
+replacement = "BuildRequires:  msopenjdk-25"
+
+[[overlays]]
+description = "Run OpenCV Java bindings with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^Requires:   java-headless$'
+replacement = "Requires:   msopenjdk-25"

@@ -1,0 +1,19 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use Microsoft OpenJDK for Maven local builds"
+type = "spec-search-replace"
+section = "%package"
+package = "maven-local-openjdk25"
+regex = '^Requires:       java-25-openjdk-devel$'
+replacement = "Requires:       msopenjdk-25"
+
+[[overlays]]
+description = "Use Microsoft OpenJDK for Java package builds"
+type = "spec-search-replace"
+section = "%package"
+package = "javapackages-local-openjdk25"
+regex = '^Requires:       java-25-openjdk-devel$'
+replacement = "Requires:       msopenjdk-25"

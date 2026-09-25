@@ -1,0 +1,27 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build Open MPI Java bindings with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^BuildRequires:  java-25-devel$'
+replacement = "BuildRequires:  msopenjdk-25"
+
+[[overlays]]
+description = "Run Open MPI Java bindings with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^Requires:       java-25-headless$'
+replacement = "Requires:       msopenjdk-25"
+
+[[overlays]]
+description = "Develop Open MPI Java bindings with Microsoft OpenJDK"
+type = "spec-search-replace"
+regex = '^Requires:       java-25-devel$'
+replacement = "Requires:       msopenjdk-25"
+
+[[overlays]]
+description = "Configure Open MPI with the provider-neutral Java home"
+type = "spec-prepend-lines"
+section = "%build"
+lines = ['export JAVA_HOME=$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")']
