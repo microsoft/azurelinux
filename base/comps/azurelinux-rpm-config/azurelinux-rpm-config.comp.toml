@@ -12,8 +12,8 @@ overlays = [
     # Set our version.
     { type = "spec-update-tag", tag = "Version", value = "1004" },
 
-    # WORKAROUND: manually bump the Release value for Stage2 bring-up.
-    { type = "spec-update-tag", tag = "Release", value = "3%{?dist}" },
+    # We messed this up before, so let's set a autorelease minimum. If we can fix our tooling maybe this can be removed later.
+    { type = "spec-update-tag", tag = "Release", value = "%autorelease -b3" },
 
     # We don't provide gnome-srpm-macros
     { type = "spec-search-replace", regex = "Requires: gnome-srpm-macros", replacement = "#Requires: gnome-srpm-macros"},
