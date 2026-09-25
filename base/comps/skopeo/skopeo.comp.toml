@@ -1,0 +1,2 @@
+[components.skopeo]
+tests.tests = [{ name = "tmt-skopeo" }]

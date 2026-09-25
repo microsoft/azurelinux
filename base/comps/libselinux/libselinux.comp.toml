@@ -1,0 +1,2 @@
+[components.libselinux]
+tests.tests = [{ name = "tmt-selinux-tier1" }]

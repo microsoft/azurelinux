@@ -1,1 +1,2 @@
 [components.util-linux]
+tests.tests = [{ name = "tmt-util-linux-ci" }]
