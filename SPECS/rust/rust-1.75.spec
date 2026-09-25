@@ -192,7 +192,7 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Fri Sep 18 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-32
+* Fri Sep 25 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-32
 - Add patch for CVE-2026-82254
 
 * Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.75.0-31
