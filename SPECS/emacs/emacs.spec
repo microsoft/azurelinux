@@ -16,6 +16,7 @@ Patch2:         CVE-2026-6861.patch
 Patch3:         CVE-2026-79992.patch
 Patch4:         CVE-2026-77219.patch
 Patch5:         CVE-2026-96269.patch
+Patch6:         CVE-2026-96442.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  gnutls-devel
@@ -135,7 +136,7 @@ rm -f *-filelist {common,el}-*-files
 
 %changelog
 * Wed Sep 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 29.4-7
-- Patch for CVE-2026-96269
+- Patch for CVE-2026-96269, CVE-2026-96442
 
 * Thu Sep 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 29.4-6
  - Patch for CVE-2026-77219
