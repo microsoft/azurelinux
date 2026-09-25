@@ -1,0 +1,16 @@
+[components.bootc]
+
+# bootc 1.13 runs `bootupctl` through `bwrap` during `bootc install` to install
+# the bootloader from the target deployment (crates/lib/src/bootloader.rs,
+# crates/utils/src/bwrap.rs). The Fedora spec does not require bubblewrap
+# because it is usually pulled in transitively (e.g. by rpm-ostree), so a
+# minimal bootc image fails `bootc install to-disk` with bwrap not found.
+# Upstream dropped the bwrap path after 1.13; remove this overlay when bootc is
+# updated to a version that runs bootupctl via chroot instead.
+# Ref: https://github.com/microsoft/azurelinux/issues/18817
+
+[[components.bootc.overlays]]
+description = "Add Requires: bubblewrap, needed by bootc install to run bootupctl"
+type = "spec-add-tag"
+tag = "Requires"
+value = "bubblewrap"
