@@ -1,13 +1,15 @@
 Summary:        Logrotate
 Name:           logrotate
 Version:        3.21.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/logrotate/logrotate/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
+
+BuildRequires:  libselinux-devel
 BuildRequires:  popt-devel
 BuildRequires:  systemd-devel
 Requires:       popt
@@ -25,7 +27,10 @@ the log file gets to a certain size.
 
 %build
 ./autogen.sh
-./configure --prefix=%{_prefix} --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
+./configure \
+    --prefix=%{_prefix} \
+    --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status \
+    --with-selinux=yes
 make %{?_smp_mflags}
 
 # Disable dateext since it can cause rotation to fail if run twice in a day
@@ -40,6 +45,9 @@ touch %{buildroot}%{_localstatedir}/lib/logrotate/logrotate.status
 install -p -m 644 examples/logrotate.conf %{buildroot}%{_sysconfdir}/logrotate.conf
 install -p -m 644 examples/logrotate.{service,timer} %{buildroot}%{_unitdir}/
 install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
+
+%check
+./logrotate --version 2>&1 | grep -Eq '^[[:space:]]*SELinux support:[[:space:]]+yes$'
 
 %post
 %systemd_post logrotate.{service,timer}
@@ -61,6 +69,9 @@ install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
 %ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 
 %changelog
+* Tue Sep 15 2026 Brian Tray <briantray@microsoft.com> - 3.21.0-2
+- Enable SELinux context preservation for rotated files.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.21.0-1
 - Auto-upgrade to 3.21.0 - Azure Linux 3.0 - package upgrades
 
