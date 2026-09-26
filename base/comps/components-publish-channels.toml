@@ -229,6 +229,7 @@ components = [
     "device-mapper-multipath",
     "device-mapper-persistent-data",
     "DevIL",
+    "devscripts",
     "dhcpcd",
     "dialog",
     "diffstat",
@@ -1403,6 +1404,7 @@ components = [
     "perl-Digest-HMAC",
     "perl-Digest-MD5",
     "perl-Digest-SHA",
+    "perl-Digest-SHA1",
     "perl-Dist-CheckConflicts",
     "perl-DynaLoader-Functions",
     "perl-Email-Date-Format",
@@ -1898,6 +1900,7 @@ components = [
     "python-configargparse",
     "python-configobj",
     "python-configshell",
+    "python-construct",
     "python-cramjam",
     "python-crypt-r",
     "python-cryptography",
@@ -2049,6 +2052,7 @@ components = [
     "python-psycopg2",
     "python-ptyprocess",
     "python-pyasn1",
+    "python-pybeam",
     "python-pycares",
     "python-pycdio",
     "python-pycodestyle",
@@ -2137,6 +2141,7 @@ components = [
     "python-testscenarios",
     "python-testtools",
     "python-threadpoolctl",
+    "python-tomli-w",
     "python-torch",
     "python-tornado",
     "python-tpm2-pytss",
@@ -3010,4 +3015,7 @@ packages = [
     "ghc-ShellCheck-prof", # srpm: ShellCheck
     # fscrypt %gopkg source -devel sub-package (noarch Go module sources, no compiled binary); fscrypt CLI + pam_fscrypt module stay in base. Kept in sdk for downstream Go builds.
     "golang-github-google-fscrypt-devel", # srpm: fscrypt
+    # devscripts main package: Debian packaging helper scripts with a large perl/dpkg-dev
+    # dependency tree. Only devscripts-checkbashisms (hard-required by rpmlint) belongs in base.
+    "devscripts", # srpm: devscripts
 ]
