@@ -166,6 +166,7 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
                 cwd=repo_dir,
                 capture_output=True,
                 timeout=60,
+                check=True,
             )
         except (OSError, subprocess.SubprocessError):
             pass
@@ -184,6 +185,7 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
             capture_output=True,
             text=True,
             timeout=120,
+            check=False,
         )
     except subprocess.TimeoutExpired:
         shutil.rmtree(repo_dir, ignore_errors=True)
@@ -367,6 +369,7 @@ def _run_search_command(
             capture_output=True,
             text=True,
             timeout=30,
+            check=False,
         )
     except subprocess.TimeoutExpired:
         return "", _add_status({"error": "Search timed out after 30s."}, full=False)
@@ -500,6 +503,7 @@ def distgit_show(
                 capture_output=True,
                 text=True,
                 timeout=30,
+                check=False,
             )
         except subprocess.TimeoutExpired:
             return _add_status({"error": "git show timed out after 30s."}, full=False)
