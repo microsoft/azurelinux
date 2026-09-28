@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 class _DnfModule(Protocol):
     def probe_repo(self, probe_url: str, *, timeout: float = 30.0) -> tuple[str, str | None]:
         """Describe the dnf wrapper's repository probe."""
+        ...
 
 
 @pytest.fixture

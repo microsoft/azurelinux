@@ -504,7 +504,7 @@ def build_package_universe(
         primary = _find_metadata_path(repo_dir, "primary")
         log(f"  scanning {repo.kind}/{repo.arch}: {repo.url}")
 
-        def pkgcb(pkg: cr.Package, *, _repo: InputRepo = repo):
+        def pkgcb(pkg: cr.Package, *, _repo: InputRepo = repo) -> None:
             key: UniverseKey = (_repo.kind, _repo.arch) + _pkg_identity(pkg)
             if _repo.kind == KIND_SRPMS:
                 source_name = pkg.name

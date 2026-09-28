@@ -403,7 +403,7 @@ def container_exec(
             assert result.exit_code == 0
             assert "hello" in result.output
     """
-    def _exec(command: list[str]):
+    def _exec(command: list[str]) -> ContainerExecResult:
         return exec_in_container(
             podman_client,
             running_container.container_name,
@@ -423,7 +423,7 @@ def container_exec_shell(podman_client: DockerClient, running_container: Contain
             assert result.exit_code == 0
             assert "hello" in result.output
     """
-    def _exec_shell(command: str, *, shell: str = "bash"):
+    def _exec_shell(command: str, *, shell: str = "bash") -> ContainerExecResult:
         return exec_in_container(
             podman_client,
             running_container.container_name,
@@ -447,7 +447,7 @@ def write_file_in_container(container_exec_shell: ExecShell) -> WriteFile:
             assert result.exit_code == 0
     """
 
-    def _write(path: str, content: str):
+    def _write(path: str, content: str) -> ContainerExecResult:
         normalized_content = content.rstrip("\n") + "\n"
         write_cmd = (
             f"printf %s {shlex.quote(normalized_content)} > "
@@ -532,7 +532,7 @@ def wait_for_http(container_exec_shell: ExecShell) -> WaitForHttp:
         delay: float = 1.0,
         connect_timeout: float = 2.0,
         max_time: float = 5.0,
-    ):
+    ) -> ContainerExecResult:
         result = None
         for _ in range(retries):
             result = container_exec_shell(
@@ -575,7 +575,7 @@ def assert_http_server(container_exec_shell: ExecShell, wait_for_http: WaitForHt
         *,
         retries: int = 5,
         delay: float = 1.0,
-    ):
+    ) -> ContainerExecResult:
         start = container_exec_shell(start_command)
         assert start.exit_code == 0, f"failed to start server: {start.output}"
 
