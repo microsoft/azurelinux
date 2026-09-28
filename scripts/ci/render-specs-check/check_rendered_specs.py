@@ -97,16 +97,16 @@ def component_from_path(file_path: str, specs_dir: Path) -> str:
     absolute path (azldev's `WithAbsolutePaths` resolves it during config
     dump) while `git diff --name-only` emits repo-relative paths. We use
     `.resolve()` on `specs_dir` to canonicalize that absolute path, and
-    `os.path.abspath` (lexical, does NOT follow symlinks) on `file_path`
+    lexical path normalization (which does NOT follow symlinks) on `file_path`
     so attacker-controlled symlinks under specs_dir can't escape the
     component-attribution check by resolving outside the tree or to a
     sibling component. The `is_symlink()` branch in `build_content_diffs`
     is the layer that actually refuses to read symlinks; this function
     just needs to label them correctly without crashing.
     """
-    file_abs = os.path.abspath(file_path)
-    specs_abs = str(specs_dir.resolve())
-    rel = Path(file_abs).relative_to(specs_abs)
+    file_abs = Path(os.path.normpath(Path.cwd() / file_path))
+    specs_abs = specs_dir.resolve()
+    rel = file_abs.relative_to(specs_abs)
     if len(rel.parts) >= 2:  # noqa: PLR2004 - layout is prefix/component
         return rel.parts[1]
     return rel.parts[0] if rel.parts else ""
