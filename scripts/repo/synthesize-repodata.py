@@ -820,7 +820,7 @@ class _RepoWriter:
         ("other", "other_db", cr.OtherXmlFile, cr.OtherSqlite),
     )
 
-    def __init__(self, dest: Destination, output_dir: Path, pkg_count: int):
+    def __init__(self, dest: Destination, output_dir: Path, pkg_count: int) -> None:
         self.dest = dest
         self.repodata_dir = output_dir / dest.relpath() / "repodata"
         if self.repodata_dir.exists():
@@ -1084,7 +1084,7 @@ class _OrderedRepoSourceAction(argparse.Action):
         namespace: argparse.Namespace,
         values: str | Sequence[object] | None,
         option_string: str | None = None,
-    ):
+    ) -> None:
         items = getattr(namespace, self.dest, None)
         if items is None:
             items = []
