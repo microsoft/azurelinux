@@ -413,7 +413,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 * Thu May 01 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-3
 - Skip some test cases that are failing in the current version of conda using Fedora (License: MIT)
 
-* Fri April 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-2
+* Fri Apr 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-2
 - Add missing python3-pluggy package
 
 * Wed Feb 26 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-1
