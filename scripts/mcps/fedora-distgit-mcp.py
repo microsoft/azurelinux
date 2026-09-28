@@ -23,6 +23,7 @@ auto-approved.
 from __future__ import annotations
 
 import contextlib
+import http.client
 import json
 import os
 import re
@@ -178,8 +179,13 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
     if warn:
         return "", warn
 
-    repo_dir.parent.mkdir(parents=True, exist_ok=True)
     clone_url = f"{base_url}/rpms/{package}.git"
+    return _clone_repo(repo_dir, clone_url)
+
+
+def _clone_repo(repo_dir: Path, clone_url: str) -> tuple[str, str | None]:
+    """Clone a dist-git repository and translate expected failures."""
+    repo_dir.parent.mkdir(parents=True, exist_ok=True)
     try:
         result = subprocess.run(
             ["git", "clone", "--quiet", clone_url, str(repo_dir)],
@@ -201,6 +207,30 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
 
     _touch_repo(repo_dir)
     return str(repo_dir), None
+
+
+def _fetch_url(url: str) -> tuple[bytes, StatusDict | None]:
+    """Fetch a validated dist-git URL and translate expected failures."""
+    req = urllib.request.Request(  # noqa: S310 - URL passed validate_base_url and check_ssrf.
+        url,
+        headers={"User-Agent": "fedora-distgit-mcp/1.0"},
+    )
+
+    try:
+        with urllib.request.urlopen(  # noqa: S310 - Request URL was validated above.
+            req,
+            timeout=15,
+        ) as resp:
+            return resp.read(), None
+    except urllib.error.HTTPError as e:
+        error = f"HTTP {e.code} fetching {url}: {e.reason}"
+    except urllib.error.URLError as e:
+        error = f"can't fetch {url}: {e.reason}"
+    except (OSError, UnicodeError) as e:
+        error = f"can't fetch {url}: {e}"
+    except http.client.HTTPException as e:
+        error = f"can't fetch {url}: {e}"
+    return b"", _add_status({"error": error}, full=False)
 
 
 # ---------------------------------------------------------------------------
@@ -268,23 +298,9 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
         if ssrf_err:
             return _add_status({"error": ssrf_err}, full=False)
 
-        req = urllib.request.Request(  # noqa: S310 - URL passed validate_base_url and check_ssrf.
-            url,
-            headers={"User-Agent": "fedora-distgit-mcp/1.0"},
-        )
-
-        try:
-            with urllib.request.urlopen(  # noqa: S310 - Request URL was validated above.
-                req,
-                timeout=15,
-            ) as resp:
-                data = resp.read()
-        except urllib.error.HTTPError as e:
-            return _add_status({"error": f"HTTP {e.code} fetching {url}: {e.reason}"}, full=False)
-        except urllib.error.URLError as e:
-            return _add_status({"error": f"can't fetch {url}: {e.reason}"}, full=False)
-        except OSError as e:
-            return _add_status({"error": f"can't fetch {url}: {e}"}, full=False)
+        data, fetch_error = _fetch_url(url)
+        if fetch_error is not None:
+            return fetch_error
 
         try:
             text = data.decode("utf-8")
@@ -390,7 +406,7 @@ def _run_search_command(
 
 
 @mcp.tool()
-def distgit_search(
+def distgit_search(  # noqa: PLR0913, PLR0917 - parameters define the public MCP schema
     package: str,
     query: str,
     ref: str = "rawhide",
@@ -461,6 +477,27 @@ def distgit_search(
         return _add_status({"output": written, "repo_dir": repo_dir}, full=False)
 
 
+def _run_git_show(git_dir: str, commit: str) -> tuple[str, str | None]:
+    """Run git show and translate expected failures."""
+    try:
+        result = subprocess.run(
+            ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit, "--"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return "", "git show timed out after 30s."
+    except (OSError, ValueError) as e:
+        return "", f"running git: {e}"
+
+    if result.returncode != 0:
+        stderr = result.stderr.strip()
+        return "", f"git show failed (exit {result.returncode}): {stderr}"
+    return result.stdout, None
+
+
 @mcp.tool()
 def distgit_show(
     package: str,
@@ -499,27 +536,9 @@ def distgit_show(
 
         git_dir = str(_git_dir(package, base))
 
-        try:
-            result = subprocess.run(
-                ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit, "--"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-                check=False,
-            )
-        except subprocess.TimeoutExpired:
-            return _add_status({"error": "git show timed out after 30s."}, full=False)
-        except OSError as e:
-            return _add_status({"error": f"running git: {e}"}, full=False)
-
-        if result.returncode != 0:
-            stderr = result.stderr.strip()
-            return _add_status(
-                {"error": f"git show failed (exit {result.returncode}): {stderr}"},
-                full=False,
-            )
-
-        output = result.stdout
+        output, show_error = _run_git_show(git_dir, commit)
+        if show_error is not None:
+            return _add_status({"error": show_error}, full=False)
 
         written = write_output(
             output,
