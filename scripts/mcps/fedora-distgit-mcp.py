@@ -225,7 +225,8 @@ def set_distgit_url(base_url: str) -> StatusDict:
     Defaults to https://src.fedoraproject.org. Only needs to be called if
     using a mirror or alternate instance.
     """
-    global _base_url
+    # This tool intentionally updates process-wide MCP configuration under lock.
+    global _base_url  # noqa: PLW0603
     with _tool_lock:
         old_url = _base_url
         normalized, err = validate_base_url(base_url)
