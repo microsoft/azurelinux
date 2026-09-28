@@ -1,0 +1,33 @@
+From c8143074cf3954b1e169904eb9d843cfbe14acc3 Mon Sep 17 00:00:00 2001
+From: Brad King <brad.king@kitware.com>
+Date: Tue, 2 Sep 2025 11:41:10 -0400
+Subject: [PATCH] cmCTestCurl: Avoid using undocumented type for
+ CURLOPT_PROXYTYPE values
+
+Since upstream curl commit `1a12663d06` (CURLOPT: bump `CURLPROXY_*`
+enums to `long`, drop casts, 2025-07-28), the `CURLPROXY_*` constants
+are integer literals instead of `enum curl_proxytype`.  It turns out
+that `curl_easy_setopt` has always expected a `long` anyway, and that
+`curl_proxytype` is not documented for public use.
+
+Fixes: #27178
+Upstream patch reference: https://github.com/Kitware/CMake/commit/c8143074cf3954b1e169904eb9d843cfbe14acc3
+---
+ Source/CTest/cmCTestCurl.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/CTest/cmCTestCurl.h b/Source/CTest/cmCTestCurl.h
+index 7836f4b9c78..9113890b5a1 100644
+--- a/Source/CTest/cmCTestCurl.h
++++ b/Source/CTest/cmCTestCurl.h
+@@ -52,7 +52,7 @@ class cmCTestCurl
+   std::vector<std::string> HttpHeaders;
+   std::string HTTPProxyAuth;
+   std::string HTTPProxy;
+-  curl_proxytype HTTPProxyType;
++  long HTTPProxyType;
+   bool UseHttp10 = false;
+   bool Quiet = false;
+   int TimeOutSeconds = 0;
+-- 
+2.49.0
