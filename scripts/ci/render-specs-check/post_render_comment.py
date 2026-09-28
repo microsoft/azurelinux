@@ -34,6 +34,12 @@ import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from _report_types import ContentDiff, RenderedFile, RenderReport
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -115,7 +121,7 @@ class _CommentBudget:
 
 def _append_content_diffs(
     lines: list[str],
-    content_diffs: list[dict[str, str]],
+    content_diffs: Sequence[ContentDiff],
     budget: _CommentBudget,
 ) -> None:
     """Append inline content diffs without exceeding the comment budget."""
@@ -158,7 +164,7 @@ def _append_file_list(
     lines: list[str],
     header: str,
     description: str,
-    items: list[dict[str, str]],
+    items: Sequence[RenderedFile],
     budget: _CommentBudget,
 ) -> None:
     """Append a bulleted file list without exceeding the comment budget."""
@@ -193,7 +199,7 @@ def _append_file_list(
 
 
 def format_comment(
-    report: dict,
+    report: RenderReport,
     artifacts_url: str | None = None,
     run_id: str | None = None,
     repo: str | None = None,
@@ -407,7 +413,7 @@ def main() -> int:
 
     try:
         with args.report.open(encoding="utf-8") as f:
-            report = json.load(f)
+            report = cast("RenderReport", json.load(f))
     except (FileNotFoundError, json.JSONDecodeError) as exc:
         print(f"Error reading report: {exc}", file=sys.stderr)
         return 1

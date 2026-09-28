@@ -28,6 +28,12 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from _report_types import ContentDiff, RenderedFile, RenderReport
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -136,13 +142,13 @@ def classify_changes(specs_dir: Path) -> tuple[list[str], list[str], list[str]]:
     return changed, extra, missing
 
 
-def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[dict]:
+def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[ContentDiff]:
     """Build diff entries for changed files.
 
     Reads committed and working-tree versions, compares them, and returns
     a list of diff entries for files that actually differ.
     """
-    real_diffs: list[dict] = []
+    real_diffs: list[ContentDiff] = []
     # Resolve all HEAD blob hashes up front so we can fetch each file's
     # committed contents by hash (`git cat-file blob <sha>`) instead of by
     # rev-parse string (`git show HEAD:<path>`). The hash form sidesteps a
@@ -265,11 +271,11 @@ def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[dict]
 
 
 def build_report(
-    content_diffs: list[dict],
+    content_diffs: list[ContentDiff],
     extra_files: list[str],
     missing_files: list[str],
     specs_dir: Path,
-) -> dict:
+) -> RenderReport:
     """Build the JSON-serialisable report."""
     return {
         "content_diffs": content_diffs,
@@ -283,7 +289,7 @@ def build_report(
 # ---------------------------------------------------------------------------
 
 
-def _unique_components(items: list[dict]) -> list[str]:
+def _unique_components(items: Sequence[RenderedFile]) -> list[str]:
     seen: set[str] = set()
     out: list[str] = []
     for item in items:
@@ -303,7 +309,7 @@ def _render_command(components: list[str], *, use_all: bool = False) -> str:
 
 
 def generate_patch(
-    content_diffs: list[dict],
+    content_diffs: Sequence[ContentDiff],
     extra_files: list[str],
     missing_files: list[str],
     specs_dir: Path,
