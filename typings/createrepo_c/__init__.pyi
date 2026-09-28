@@ -1,0 +1,73 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+from collections.abc import Callable, Iterator
+
+SHA256: int
+
+class Package:
+    name: str
+    epoch: str | None
+    version: str
+    release: str
+    arch: str
+    rpm_sourcerpm: str | None
+    location_base: str | None
+    location_href: str | None
+
+class RepomdRecord:
+    type: str
+    location_href: str | None
+    checksum: str
+    def __init__(self, record_type: str, path: str) -> None: ...
+    def fill(self, checksum_type: int) -> None: ...
+
+class Repomd:
+    records: list[RepomdRecord]
+    def set_record(self, record: RepomdRecord) -> None: ...
+    def xml_dump(self) -> str: ...
+
+class _XmlFile:
+    def __init__(self, path: str) -> None: ...
+    def set_num_of_pkgs(self, count: int) -> None: ...
+    def add_pkg(self, package: Package) -> None: ...
+    def close(self) -> None: ...
+
+class PrimaryXmlFile(_XmlFile): ...
+class FilelistsXmlFile(_XmlFile): ...
+class OtherXmlFile(_XmlFile): ...
+
+class _Sqlite:
+    def __init__(self, path: str) -> None: ...
+    def add_pkg(self, package: Package) -> None: ...
+    def dbinfo_update(self, checksum: str) -> None: ...
+    def close(self) -> None: ...
+
+class PrimarySqlite(_Sqlite): ...
+class FilelistsSqlite(_Sqlite): ...
+class OtherSqlite(_Sqlite): ...
+
+class PackageIterator:
+    def __init__(
+        self,
+        *,
+        primary_path: str,
+        filelists_path: str,
+        other_path: str,
+        warningcb: Callable[..., bool],
+    ) -> None: ...
+    def __iter__(self) -> Iterator[Package]: ...
+
+def xml_parse_repomd(
+    path: str,
+    repomd: Repomd,
+    warningcb: Callable[..., bool],
+) -> None: ...
+
+def xml_parse_primary(
+    path: str,
+    *,
+    pkgcb: Callable[[Package], None],
+    do_files: bool,
+    warningcb: Callable[..., bool],
+) -> None: ...

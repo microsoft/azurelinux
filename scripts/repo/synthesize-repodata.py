@@ -51,12 +51,12 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from http import HTTPStatus
 from pathlib import Path
+from typing import TYPE_CHECKING, Protocol, TypedDict, cast
 
-import createrepo_c as cr
+import createrepo_c as cr  # pyright: ignore[reportMissingModuleSource]
 
 # `_repo_layout` is a sibling module in this directory.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from typing import TYPE_CHECKING
 
 from _repo_layout import (
     ALL_KINDS,
@@ -88,6 +88,88 @@ HTTP_RETRIES = 3
 HTTP_BACKOFF_BASE = 1.0  # seconds; doubled per attempt.
 HTTP_SERVER_ERROR_MIN = HTTPStatus.INTERNAL_SERVER_ERROR
 HTTP_SERVER_ERROR_MAX = 600
+
+
+class RpmSourceMapEntry(TypedDict):
+    """Package-to-source-package input consumed by azldev."""
+
+    packageName: str
+    sourcePackageName: str
+
+
+class AzldevComponentRow(TypedDict, total=False):
+    """Relevant fields returned by `azldev comp list`."""
+
+    name: str
+
+
+class AzldevPackageRow(TypedDict, total=False):
+    """Relevant fields returned by `azldev package list`."""
+
+    packageName: str
+    type: str
+    component: str
+    publishChannel: str
+    group: str
+
+
+class RoutingRecord(TypedDict):
+    """Normalized azldev routing data for one package."""
+
+    component: str
+    channel: str
+    raw_channel: str
+    group: str
+
+
+class UnpublishedRecord(TypedDict):
+    """Report entry for one package excluded from routed repositories."""
+
+    name: str
+    kind: str
+    arch: str
+    source_repo: str
+    source_package: str
+    reason: str
+
+
+class FallbackRecord(UnpublishedRecord):
+    """Report entry for one package routed through channel inheritance."""
+
+    dest_channel: str
+    tie_break_used: bool
+
+
+class _XmlWriter(Protocol):
+    """Subset of createrepo_c XML writer methods used by this script."""
+
+    def set_num_of_pkgs(self, count: int) -> None: ...
+
+    def add_pkg(self, package: cr.Package) -> None: ...
+
+    def close(self) -> None: ...
+
+
+class _SqliteWriter(Protocol):
+    """Subset of createrepo_c SQLite writer methods used by this script."""
+
+    def add_pkg(self, package: cr.Package) -> None: ...
+
+    def dbinfo_update(self, checksum: str) -> None: ...
+
+    def close(self) -> None: ...
+
+
+class _XmlWriterFactory(Protocol):
+    """Construct a createrepo_c XML writer."""
+
+    def __call__(self, path: str, /) -> _XmlWriter: ...
+
+
+class _SqliteWriterFactory(Protocol):
+    """Construct a createrepo_c SQLite writer."""
+
+    def __call__(self, path: str, /) -> _SqliteWriter: ...
 
 
 # repomd record types we generate ourselves in the output. The synth
@@ -474,7 +556,7 @@ def _find_metadata_path(repo_dir: Path, kind: str) -> str:
     cr.xml_parse_repomd(str(repo_dir / "repodata" / "repomd.xml"), repomd, lambda *_: True)
     for rec in repomd.records:
         if rec.type == kind:
-            return str(repo_dir / rec.location_href)
+            return str(repo_dir / cast("str", rec.location_href))
     raise RuntimeError(f"{repo_dir}/repodata: no `{kind}` record in repomd.xml")
 
 
@@ -482,7 +564,7 @@ def build_package_universe(
     repo_to_dir: dict[InputRepo, Path],
 ) -> tuple[
     dict[UniverseKey, UniverseEntry],
-    list[dict],
+    list[RpmSourceMapEntry],
 ]:
     """Build the package universe from each repository's primary metadata.
 
@@ -535,7 +617,7 @@ def build_package_universe(
 
         cr.xml_parse_primary(primary, pkgcb=pkgcb, do_files=False, warningcb=lambda *_: True)
 
-    rpm_source_map = sorted(
+    rpm_source_map: list[RpmSourceMapEntry] = sorted(
         ({"packageName": pn, "sourcePackageName": sn} for pn, sn in src_map_set),
         key=lambda r: (r["packageName"], r["sourcePackageName"]),
     )
@@ -566,8 +648,8 @@ def query_known_components(repo_root: Path) -> set[str]:
     if proc.returncode != 0:
         sys.stderr.write(proc.stderr)
         raise RuntimeError("azldev comp list -a failed")
-    rows = json.loads(proc.stdout)
-    names = {row["name"] for row in rows if row.get("name")}
+    rows = cast("list[AzldevComponentRow]", json.loads(proc.stdout))
+    names = {name for row in rows if (name := row.get("name"))}
     log(f"    {len(names)} legitimate component(s)")
     return names
 
@@ -577,12 +659,12 @@ class AzldevRouting:
     """Resolved azldev routing tables, keyed for lookup."""
 
     # By type, then by package name. publishChannel may be empty.
-    rpm: dict[str, dict] = field(default_factory=dict)
-    srpm: dict[str, dict] = field(default_factory=dict)
+    rpm: dict[str, RoutingRecord] = field(default_factory=dict)
+    srpm: dict[str, RoutingRecord] = field(default_factory=dict)
     # Component -> Counter[channel-suffix] for inheritance fallback. Only
     # populated from rpm rows whose component is a legitimate Azure Linux
     # component AND that have a non-empty, allowed publishChannel.
-    component_channels: dict[str, Counter] = field(default_factory=dict)
+    component_channels: dict[str, Counter[str]] = field(default_factory=dict)
     # Names rejected because their component is not a legitimate AZL
     # component (i.e. azldev fell back to project-default routing for
     # something that isn't actually built by AZL).
@@ -591,7 +673,7 @@ class AzldevRouting:
 
 def query_azldev(
     repo_root: Path,
-    rpm_source_map: list[dict],
+    rpm_source_map: list[RpmSourceMapEntry],
     scratch_dir: Path,
     known_components: set[str],
 ) -> AzldevRouting:
@@ -610,10 +692,10 @@ def query_azldev(
     if proc.returncode != 0:
         sys.stderr.write(proc.stderr)
         raise RuntimeError("azldev package list --rpm-file failed")
-    rows = json.loads(proc.stdout)
+    rows = cast("list[AzldevPackageRow]", json.loads(proc.stdout))
 
     routing = AzldevRouting()
-    component_channels: dict[str, Counter] = defaultdict(Counter)
+    component_channels: dict[str, Counter[str]] = defaultdict(Counter)
     for row in rows:
         name = row.get("packageName", "")
         rtype = row.get("type", "")
@@ -625,7 +707,7 @@ def query_azldev(
             # something not actually built by AZL. Track and skip.
             routing.foreign_names.add(name)
             continue
-        record = {
+        record: RoutingRecord = {
             "component": component,
             "channel": channel,  # may be ""
             "raw_channel": raw_channel,
@@ -658,7 +740,7 @@ class RoutingDecision:
 
 def _inherit_channel(
     component: str,
-    component_channels: dict[str, Counter],
+    component_channels: dict[str, Counter[str]],
     tie_break_default: str = INHERITANCE_TIE_BREAK_DEFAULT,
 ) -> tuple[str | None, str, bool]:
     """Infer a publish channel for *component* from its sibling rpms.
@@ -811,7 +893,10 @@ class _RepoWriter:
     """Manages the createrepo_c XML+sqlite triple for one destination."""
 
     # (xml record name, db record name, xml class, db class)
-    _STREAMS: tuple[tuple[str, str, type, type], ...] = (
+    _STREAMS: tuple[
+        tuple[str, str, _XmlWriterFactory, _SqliteWriterFactory],
+        ...,
+    ] = (
         ("primary", "primary_db", cr.PrimaryXmlFile, cr.PrimarySqlite),
         ("filelists", "filelists_db", cr.FilelistsXmlFile, cr.FilelistsSqlite),
         ("other", "other_db", cr.OtherXmlFile, cr.OtherSqlite),
@@ -824,7 +909,9 @@ class _RepoWriter:
             shutil.rmtree(self.repodata_dir)
         self.repodata_dir.mkdir(parents=True, exist_ok=True)
 
-        self._streams: list[tuple[str, str, str, str, object, object]] = []
+        self._streams: list[
+            tuple[str, str, str, str, _XmlWriter, _SqliteWriter]
+        ] = []
         for xml_name, db_name, xml_cls, db_cls in self._STREAMS:
             xml_path = str(self.repodata_dir / f"{xml_name}.xml.gz")
             db_path = str(self.repodata_dir / f"{xml_name}.sqlite")
@@ -872,14 +959,14 @@ def _collect_emission_plan(
     decisions: dict[UniverseKey, RoutingDecision],
 ) -> tuple[
     Counter[Destination],
-    list[dict[str, object]],
-    list[dict[str, object]],
+    list[UnpublishedRecord],
+    list[FallbackRecord],
 ]:
     """Collect destination counts and deduplicated routing reports."""
     dest_counts: Counter[Destination] = Counter()
-    unpublished: list[dict[str, object]] = []
+    unpublished: list[UnpublishedRecord] = []
     unpub_seen: set[tuple[str, str, str]] = set()
-    fallbacks: list[dict[str, object]] = []
+    fallbacks: list[FallbackRecord] = []
     fb_seen: set[tuple[str, str, str]] = set()
     for key, decision in decisions.items():
         kind, arch, name = key[:3]
@@ -923,7 +1010,11 @@ def emit_repos(
     universe: dict[UniverseKey, UniverseEntry],
     decisions: dict[UniverseKey, RoutingDecision],
     output_dir: Path,
-) -> tuple[dict[Destination, int], list[dict], list[dict]]:
+) -> tuple[
+    dict[Destination, int],
+    list[UnpublishedRecord],
+    list[FallbackRecord],
+]:
     """Route each package from the input repositories to its destination.
 
     Returns (per_destination_counts, unpublished_records, fallback_records).
@@ -993,13 +1084,16 @@ def emit_repos(
 # ---------------------------------------------------------------------------
 
 
-def write_unpublished_report(unpublished: list[dict], output_dir: Path) -> tuple[Path, Path]:
+def write_unpublished_report(
+    unpublished: list[UnpublishedRecord],
+    output_dir: Path,
+) -> tuple[Path, Path]:
     """Write JSON and text reports for unpublished packages."""
     json_path = output_dir / "unpublished-packages.json"
     txt_path = output_dir / "unpublished-packages.txt"
     json_path.write_text(json.dumps(unpublished, indent=2))
 
-    by_reason: dict[str, list[dict]] = defaultdict(list)
+    by_reason: dict[str, list[UnpublishedRecord]] = defaultdict(list)
     for r in unpublished:
         by_reason[r["reason"]].append(r)
 
@@ -1021,7 +1115,10 @@ def write_unpublished_report(unpublished: list[dict], output_dir: Path) -> tuple
     return json_path, txt_path
 
 
-def write_fallback_report(fallbacks: list[dict], output_dir: Path) -> tuple[Path, Path]:
+def write_fallback_report(
+    fallbacks: list[FallbackRecord],
+    output_dir: Path,
+) -> tuple[Path, Path]:
     """Write reports for packages routed through channel inheritance.
 
     These packages appear in the published repositories, but only because
@@ -1034,7 +1131,7 @@ def write_fallback_report(fallbacks: list[dict], output_dir: Path) -> tuple[Path
     txt_path = output_dir / "fallback-channel-packages.txt"
     json_path.write_text(json.dumps(fallbacks, indent=2))
 
-    by_reason: dict[str, list[dict]] = defaultdict(list)
+    by_reason: dict[str, list[FallbackRecord]] = defaultdict(list)
     for r in fallbacks:
         by_reason[r["reason"]].append(r)
 
