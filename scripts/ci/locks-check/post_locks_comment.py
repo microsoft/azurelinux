@@ -40,6 +40,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import NotRequired, TypedDict, TypeGuard
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -74,6 +75,14 @@ _SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9._\-+]+$")
 _SAFE_COMMIT_RE = re.compile(r"^[a-f0-9]{4,64}$")
 
 
+class UpdateEntry(TypedDict):
+    """Fields consumed from one azldev component-update result."""
+
+    component: str
+    changed: bool
+    upstreamCommit: NotRequired[str]
+
+
 def _safe_name(name: str) -> str:
     """Return a markdown-safe, length-bounded rendering of a component name."""
     if not _SAFE_NAME_RE.match(name):
@@ -96,7 +105,18 @@ def _safe_commit(commit: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def parse_update_output(path: Path) -> list[dict]:
+def _is_update_entry(value: object) -> TypeGuard[UpdateEntry]:
+    """Return whether a JSON value has the expected update-entry shape."""
+    if not isinstance(value, dict):
+        return False
+    if not isinstance(value.get("component"), str):
+        return False
+    if not isinstance(value.get("changed"), bool):
+        return False
+    return "upstreamCommit" not in value or isinstance(value["upstreamCommit"], str)
+
+
+def parse_update_output(path: Path) -> list[UpdateEntry]:
     """Parse the JSON emitted by `azldev component update -a -O json`.
 
     Returns a list of components whose ``changed`` field is True (possibly
@@ -122,11 +142,13 @@ def parse_update_output(path: Path) -> list[dict]:
             f"Error: update output has unexpected shape (expected null or list, got {type(data).__name__})"
         )
 
+    entries: list[UpdateEntry] = []
     for entry in data:
-        if not isinstance(entry, dict) or "component" not in entry or "changed" not in entry:
+        if not _is_update_entry(entry):
             raise SystemExit(f"Error: update output entry has unexpected shape: {entry!r}")
+        entries.append(entry)
 
-    return [entry for entry in data if entry["changed"] is True]
+    return [entry for entry in entries if entry["changed"]]
 
 
 # ---------------------------------------------------------------------------
@@ -141,7 +163,7 @@ def _update_command(components: list[str], *, use_all: bool = False) -> str:
 
 
 def format_comment(
-    changed: list[dict],
+    changed: list[UpdateEntry],
     artifacts_url: str | None = None,
     run_id: str | None = None,
     repo: str | None = None,
