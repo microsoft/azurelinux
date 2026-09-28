@@ -9,6 +9,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import NotRequired, TypedDict, cast
 
 from pydantic import ValidationError
 
@@ -18,7 +19,36 @@ from kernel_config_checker.schema.schema import (
 )
 
 
-def _select_override(data: dict) -> str:
+class ArchConfigData(TypedDict):
+    """Mutable JSON shape for one architecture-specific config value."""
+
+    architecture: str
+    value: str
+
+
+class KernelConfigData(TypedDict):
+    """Mutable JSON shape for one intentional kernel configuration."""
+
+    name: str
+    values: list[ArchConfigData]
+    justification: str
+
+
+class KernelObjectData(TypedDict):
+    """Mutable JSON shape for a default or override kernel section."""
+
+    name: str
+    kernel_configs: list[KernelConfigData]
+
+
+class SchemaData(TypedDict):
+    """Mutable pre-validation shape for the intentional config document."""
+
+    default: NotRequired[KernelObjectData]
+    overrides: NotRequired[list[KernelObjectData]]
+
+
+def _select_override(data: SchemaData) -> str:
     """Prompt user to select or create an override section."""
     overrides = data.get("overrides", [])
     if not overrides:
@@ -46,7 +76,7 @@ def _select_override(data: dict) -> str:
             return choice
 
 
-def _find_existing(configs: list, name: str) -> int | None:
+def _find_existing(configs: list[KernelConfigData], name: str) -> int | None:
     """Return the index of an existing config with the given name, or None."""
     for i, cfg in enumerate(configs):
         if cfg.get("name") == name:
@@ -54,7 +84,10 @@ def _find_existing(configs: list, name: str) -> int | None:
     return None
 
 
-def _insert_or_replace(configs: list, new_config: dict) -> bool:
+def _insert_or_replace(
+    configs: list[KernelConfigData],
+    new_config: KernelConfigData,
+) -> bool:
     """Insert config, prompting to replace if a duplicate exists.
 
     Returns True if the config was added/replaced, False if the user declined.
@@ -72,7 +105,11 @@ def _insert_or_replace(configs: list, new_config: dict) -> bool:
     return True
 
 
-def _add_config_to_data(data: dict, new_config: dict, override_name: str | None) -> str | None:
+def _add_config_to_data(
+    data: SchemaData,
+    new_config: KernelConfigData,
+    override_name: str | None,
+) -> str | None:
     """Add a config entry to the data dict. Returns section label or None if aborted."""
     if override_name is None:
         if "default" not in data:
@@ -124,12 +161,12 @@ def add_config_interactive(schema_path: Path) -> bool:
         return False
 
     with schema_path.open(encoding="utf-8") as f:
-        data = json.load(f)
+        data = cast("SchemaData", json.load(f))
 
     target = input("\nAdd to [d]efault or [o]verride? [d]: ").strip().lower()
     override_name = _select_override(data) if target.startswith("o") else None
 
-    values = []
+    values: list[ArchConfigData] = []
     if x86_64_value:
         values.append({"architecture": "x86_64", "value": x86_64_value})
     if arm64_value:
@@ -139,7 +176,7 @@ def add_config_interactive(schema_path: Path) -> bool:
         print("❌ Error: At least one architecture value must be provided")
         return False
 
-    new_config = {
+    new_config: KernelConfigData = {
         "name": config_name,
         "values": values,
         "justification": justification,

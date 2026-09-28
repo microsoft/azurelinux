@@ -12,7 +12,7 @@ import argparse
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from kernel_config_checker.add_config import add_config_interactive
 from kernel_config_checker.schema.schema import (
@@ -22,7 +22,15 @@ from kernel_config_checker.schema.schema import (
 )
 
 if TYPE_CHECKING:
-    from kernel_config_checker.schema.schema import KernelConfigValue
+    from kernel_config_checker.schema.schema import Architecture, KernelConfigValue
+
+
+class ConfigExpectation(TypedDict):
+    """Resolved expected value and its policy provenance."""
+
+    expected: str
+    justification: str
+    source: str
 
 
 def _resolve_value(value: KernelConfigValue | str) -> str:
@@ -38,9 +46,13 @@ def _get_arch_value(kernel_config: KernelConfig, architecture: str) -> str | Non
     return None
 
 
-def _collect_configs(kernel_configs: list[KernelConfig], architecture: str, source: str) -> dict[str, dict]:
+def _collect_configs(
+    kernel_configs: list[KernelConfig],
+    architecture: str,
+    source: str,
+) -> dict[str, ConfigExpectation]:
     """Collect config expectations for a given architecture."""
-    configs = {}
+    configs: dict[str, ConfigExpectation] = {}
     for kc in kernel_configs:
         value = _get_arch_value(kc, architecture)
         if value is not None:
@@ -131,7 +143,7 @@ def check_config_across_all(schema: IntentionalKernelConfigSchema, config_name: 
         print("❌ Not found")
         return False
 
-    all_values: dict = {}
+    all_values: dict[Architecture, list[tuple[str, str]]] = {}
     for section_name, kernel_config in found_configs:
         for arch_pair in kernel_config.values:
             all_values.setdefault(arch_pair.architecture, []).append((section_name, _resolve_value(arch_pair.value)))
