@@ -168,15 +168,15 @@ def expand_repo_prefix(prefix: str, arches: Iterable[str]) -> list[InputRepo]:
     out: list[InputRepo] = []
     for sub in SUBREPOS:
         if sub.per_arch:
-            for arch in arches:
-                out.append(
-                    InputRepo(
-                        sub.kind,
-                        arch,
-                        f"{base}/{sub.subpath.replace('$basearch', arch)}",
-                        "prefix",
-                    )
+            out.extend(
+                InputRepo(
+                    sub.kind,
+                    arch,
+                    f"{base}/{sub.subpath.replace('$basearch', arch)}",
+                    "prefix",
                 )
+                for arch in arches
+            )
         else:
             out.append(
                 InputRepo(
@@ -214,15 +214,15 @@ def parse_explicit_repo(spec: str, arches: Iterable[str]) -> list[InputRepo]:
         return [InputRepo(KIND_SRPMS, SRPM_ARCH, url.rstrip("/"), "explicit")]
     out: list[InputRepo] = []
     if "$basearch" in url:
-        for arch in arches:
-            out.append(
-                InputRepo(
-                    kind,
-                    arch,
-                    url.replace("$basearch", arch).rstrip("/"),
-                    "explicit",
-                )
+        out.extend(
+            InputRepo(
+                kind,
+                arch,
+                url.replace("$basearch", arch).rstrip("/"),
+                "explicit",
             )
+            for arch in arches
+        )
     else:
         # No $basearch: caller is asserting "this URL is for one specific
         # arch". We can't tell which from the URL alone, so we infer from the
@@ -505,7 +505,7 @@ def build_package_universe(
         log(f"  scanning {repo.kind}/{repo.arch}: {repo.url}")
 
         def pkgcb(pkg: cr.Package, *, _repo: InputRepo = repo) -> None:
-            key: UniverseKey = (_repo.kind, _repo.arch) + _pkg_identity(pkg)
+            key: UniverseKey = (_repo.kind, _repo.arch, *_pkg_identity(pkg))
             if _repo.kind == KIND_SRPMS:
                 source_name = pkg.name
             else:
@@ -684,7 +684,7 @@ def _inherit_channel(
     tied = [ch for ch, n in ranked if n == top_count]
 
     if len(tied) > 1:
-        picked = tie_break_default if tie_break_default in tied else sorted(tied)[0]
+        picked = tie_break_default if tie_break_default in tied else min(tied)
         reason = (
             f"inherited from sibling rpms (component={component}, "
             f"channels={dict(ranked)}, tied at {top_count}, picked "
@@ -725,7 +725,7 @@ def decide_routing(
     """
     decisions: dict[UniverseKey, RoutingDecision] = {}
     tied_components_warned: set[str] = set()
-    for key, entry in universe.items():
+    for key in universe:
         kind = key[0]
         name = key[2]
         # Foreign packages (azldev fell back to project defaults for an
@@ -956,7 +956,7 @@ def emit_repos(
             warningcb=lambda *_: True,
         )
         for pkg in pkg_iter:
-            key: UniverseKey = (repo.kind, repo.arch) + _pkg_identity(pkg)
+            key: UniverseKey = (repo.kind, repo.arch, *_pkg_identity(pkg))
             entry = universe.get(key)
             if entry is None or entry.repo.url != repo.url:
                 # Either filtered out earlier (shouldn't happen) or this is
