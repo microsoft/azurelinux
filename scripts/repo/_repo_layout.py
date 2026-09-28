@@ -49,17 +49,21 @@ class SubrepoSpec:
     name: str  # stable short identifier (e.g. "base", "sdk-srpms")
     channel: str  # one of CHANNELS
     kind: str  # one of ALL_KINDS
-    per_arch: bool  # True iff `subpath` contains $basearch
     subpath: str  # path under a layout prefix
+
+    @property
+    def per_arch(self) -> bool:
+        """Return whether this sub-repository has one path per architecture."""
+        return "$basearch" in self.subpath
 
 
 SUBREPOS: tuple[SubrepoSpec, ...] = (
-    SubrepoSpec("base", "base", KIND_MAIN, True, "base/$basearch"),
-    SubrepoSpec("base-debuginfo", "base", KIND_DEBUGINFO, True, "base/debuginfo/$basearch"),
-    SubrepoSpec("base-srpms", "base", KIND_SRPMS, False, "base/srpms"),
-    SubrepoSpec("sdk", "sdk", KIND_MAIN, True, "sdk/$basearch"),
-    SubrepoSpec("sdk-debuginfo", "sdk", KIND_DEBUGINFO, True, "sdk/debuginfo/$basearch"),
-    SubrepoSpec("sdk-srpms", "sdk", KIND_SRPMS, False, "sdk/srpms"),
+    SubrepoSpec("base", "base", KIND_MAIN, "base/$basearch"),
+    SubrepoSpec("base-debuginfo", "base", KIND_DEBUGINFO, "base/debuginfo/$basearch"),
+    SubrepoSpec("base-srpms", "base", KIND_SRPMS, "base/srpms"),
+    SubrepoSpec("sdk", "sdk", KIND_MAIN, "sdk/$basearch"),
+    SubrepoSpec("sdk-debuginfo", "sdk", KIND_DEBUGINFO, "sdk/debuginfo/$basearch"),
+    SubrepoSpec("sdk-srpms", "sdk", KIND_SRPMS, "sdk/srpms"),
 )
 
 
@@ -68,5 +72,4 @@ SUBREPOS: tuple[SubrepoSpec, ...] = (
 # against typos in any future edit.
 assert all(s.channel in CHANNELS for s in SUBREPOS)
 assert all(s.kind in ALL_KINDS for s in SUBREPOS)
-assert all(s.per_arch == ("$basearch" in s.subpath) for s in SUBREPOS)
 assert len({s.name for s in SUBREPOS}) == len(SUBREPOS)
