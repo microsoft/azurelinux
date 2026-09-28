@@ -67,9 +67,11 @@ SUBREPOS: tuple[SubrepoSpec, ...] = (
 )
 
 
-# A handful of light invariants asserted at import time. These can
-# never fire with the constant above unmodified, but they guard
-# against typos in any future edit.
-assert all(s.channel in CHANNELS for s in SUBREPOS)
-assert all(s.kind in ALL_KINDS for s in SUBREPOS)
-assert len({s.name for s in SUBREPOS}) == len(SUBREPOS)
+# Validate the fixed table at import time so future edits fail immediately,
+# including when Python runs with assertions disabled.
+if not all(s.channel in CHANNELS for s in SUBREPOS):
+    raise ValueError("SUBREPOS contains an unsupported channel")
+if not all(s.kind in ALL_KINDS for s in SUBREPOS):
+    raise ValueError("SUBREPOS contains an unsupported kind")
+if len({s.name for s in SUBREPOS}) != len(SUBREPOS):
+    raise ValueError("SUBREPOS contains duplicate names")
