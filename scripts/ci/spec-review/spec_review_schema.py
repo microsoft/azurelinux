@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
@@ -152,120 +153,156 @@ def _findings_set(reviews: list[SpecReview], severity: str) -> dict[tuple[str, s
     return result
 
 
-def compare_reports(  # noqa: C901 - branches mirror comparison sections
-    report_a: SpecReviewReport,
-    report_b: SpecReviewReport,
-    report_final: SpecReviewReport,
-    label_a: str = "Reviewer A",
-    label_b: str = "Reviewer B",
-    label_final: str = "Synthesized",
-) -> None:
-    """Print a human-readable comparison of two reviewer reports and the synthesis."""
-    severities = ["errors", "warnings", "suggestions"]
-    icons = {"errors": "ERROR", "warnings": "WARNING", "suggestions": "SUGGESTION"}
+@dataclass(frozen=True)
+class LabeledReport:
+    """A validated report paired with its display label."""
 
-    # --- Per-model summary table ---
-    col_w = max(len(label_a), len(label_b), len(label_final), 5) + 2
+    label: str
+    report: SpecReviewReport
+
+
+@dataclass(frozen=True)
+class ReportComparison:
+    """The two reviewer reports and their synthesized result."""
+
+    reviewer_a: LabeledReport
+    reviewer_b: LabeledReport
+    synthesized: LabeledReport
+
+
+def _print_comparison_summary(comparison: ReportComparison) -> None:
+    """Print aggregate counts for each report in a comparison."""
+    reports = (comparison.reviewer_a, comparison.reviewer_b, comparison.synthesized)
+    col_w = max(*(len(item.label) for item in reports), 5) + 2
     print(f"┌─{'─' * col_w}─┬────────┬──────────┬─────────────┐")
     print(f"│ {'Model':<{col_w}} │ Errors │ Warnings │ Suggestions │")
     print(f"├─{'─' * col_w}─┼────────┼──────────┼─────────────┤")
-    for label, report in [
-        (label_a, report_a),
-        (label_b, report_b),
-        (label_final, report_final),
-    ]:
+    for item in reports:
         print(
-            f"│ {label:<{col_w}} │ {report.total_errors:>6} │ "
-            f"{report.total_warnings:>8} │ {report.total_suggestions:>11} │"
+            f"│ {item.label:<{col_w}} │ {item.report.total_errors:>6} │ "
+            f"{item.report.total_warnings:>8} │ "
+            f"{item.report.total_suggestions:>11} │"
         )
     print(f"└─{'─' * col_w}─┴────────┴──────────┴─────────────┘")
     print()
 
-    # --- Per-severity diff ---
-    for sev in severities:
-        set_a = _findings_set(report_a.spec_reviews, sev)
-        set_b = _findings_set(report_b.spec_reviews, sev)
-        set_final = _findings_set(report_final.spec_reviews, sev)
 
-        all_keys = set(set_a) | set(set_b)
-        kept = all_keys & set(set_final)
-        dropped = all_keys - set(set_final)
-        added = set(set_final) - all_keys  # synthesizer invented new ones
-
-        if not any([kept, dropped, added]):
-            continue
-
-        print(f"── {icons[sev]} {sev.upper()} ──")
-
-        if kept:
-            print(f"  Kept ({len(kept)}):")
-            for spec, desc in sorted(kept):
-                sources = []
-                if (spec, desc) in set_a:
-                    sources.append("A")
-                if (spec, desc) in set_b:
-                    sources.append("B")
-                print(f"    + [{'+'.join(sources)}] {spec}: {desc}")
-
-        if dropped:
-            print(f"  Dropped ({len(dropped)}):")
-            for spec, desc in sorted(dropped):
-                sources = []
-                if (spec, desc) in set_a:
-                    sources.append("A")
-                if (spec, desc) in set_b:
-                    sources.append("B")
-                print(f"    - [{'+'.join(sources)}] {spec}: {desc}")
-
-        if added:
-            print(f"  Added by synthesizer ({len(added)}):")
-            for spec, desc in sorted(added):
-                print(f"    + {spec}: {desc}")
-
-        print()
+def _finding_sources(
+    key: tuple[str, str],
+    findings_a: dict[tuple[str, str], Finding],
+    findings_b: dict[tuple[str, str], Finding],
+) -> str:
+    """Return the reviewer labels that reported one finding."""
+    sources = []
+    if key in findings_a:
+        sources.append("A")
+    if key in findings_b:
+        sources.append("B")
+    return "+".join(sources)
 
 
-def main() -> int:  # noqa: C901 - CLI modes are clearer in one dispatcher
-    """Validate, summarize, or compare spec-review reports."""
-    # Route to compare subcommand if first arg is "compare"
-    if len(sys.argv) > 1 and sys.argv[1] == "compare":
-        parser = argparse.ArgumentParser(description="Compare multi-model spec review reports")
-        parser.add_argument("_cmd", metavar="compare")
-        parser.add_argument("report_a", type=Path, help="Report from reviewer A")
-        parser.add_argument("report_b", type=Path, help="Report from reviewer B")
-        parser.add_argument("report_final", type=Path, help="Final synthesized report")
-        parser.add_argument("--label-a", default="Reviewer A", help="Display label for reviewer A")
-        parser.add_argument("--label-b", default="Reviewer B", help="Display label for reviewer B")
-        parser.add_argument(
-            "--label-final",
-            default="Synthesized",
-            help="Display label for final report",
+def _print_severity_comparison(
+    comparison: ReportComparison,
+    severity: str,
+    icon: str,
+) -> None:
+    """Print kept, dropped, and synthesized-only findings for one severity."""
+    findings_a = _findings_set(comparison.reviewer_a.report.spec_reviews, severity)
+    findings_b = _findings_set(comparison.reviewer_b.report.spec_reviews, severity)
+    findings_final = _findings_set(comparison.synthesized.report.spec_reviews, severity)
+
+    all_keys = set(findings_a) | set(findings_b)
+    kept = all_keys & set(findings_final)
+    dropped = all_keys - set(findings_final)
+    added = set(findings_final) - all_keys
+
+    if not any((kept, dropped, added)):
+        return
+
+    print(f"── {icon} {severity.upper()} ──")
+    if kept:
+        print(f"  Kept ({len(kept)}):")
+        for spec, description in sorted(kept):
+            sources = _finding_sources((spec, description), findings_a, findings_b)
+            print(f"    + [{sources}] {spec}: {description}")
+    if dropped:
+        print(f"  Dropped ({len(dropped)}):")
+        for spec, description in sorted(dropped):
+            sources = _finding_sources((spec, description), findings_a, findings_b)
+            print(f"    - [{sources}] {spec}: {description}")
+    if added:
+        print(f"  Added by synthesizer ({len(added)}):")
+        for spec, description in sorted(added):
+            print(f"    + {spec}: {description}")
+    print()
+
+
+def compare_reports(comparison: ReportComparison) -> None:
+    """Print a human-readable comparison of two reviewer reports and the synthesis."""
+    _print_comparison_summary(comparison)
+    for severity, icon in (
+        ("errors", "ERROR"),
+        ("warnings", "WARNING"),
+        ("suggestions", "SUGGESTION"),
+    ):
+        _print_severity_comparison(comparison, severity, icon)
+
+
+def _run_compare(argv: list[str]) -> int:
+    """Run the multi-model report comparison command."""
+    parser = argparse.ArgumentParser(description="Compare multi-model spec review reports")
+    parser.add_argument("_cmd", metavar="compare")
+    parser.add_argument("report_a", type=Path, help="Report from reviewer A")
+    parser.add_argument("report_b", type=Path, help="Report from reviewer B")
+    parser.add_argument("report_final", type=Path, help="Final synthesized report")
+    parser.add_argument("--label-a", default="Reviewer A", help="Display label for reviewer A")
+    parser.add_argument("--label-b", default="Reviewer B", help="Display label for reviewer B")
+    parser.add_argument(
+        "--label-final",
+        default="Synthesized",
+        help="Display label for final report",
+    )
+    args = parser.parse_args(argv)
+
+    try:
+        comparison = ReportComparison(
+            reviewer_a=LabeledReport(args.label_a, _load_report(args.report_a)),
+            reviewer_b=LabeledReport(args.label_b, _load_report(args.report_b)),
+            synthesized=LabeledReport(args.label_final, _load_report(args.report_final)),
         )
-        args = parser.parse_args()
+    except FileNotFoundError as exc:
+        print(f"File not found: {exc}", file=sys.stderr)
+        return 2
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON: {exc}", file=sys.stderr)
+        return 2
+    except (OSError, UnicodeError, ValidationError) as exc:
+        print(f"Validation failed: {exc}", file=sys.stderr)
+        return 2
 
-        try:
-            ra = _load_report(args.report_a)
-            rb = _load_report(args.report_b)
-            rf = _load_report(args.report_final)
-        except FileNotFoundError as e:
-            print(f"File not found: {e}", file=sys.stderr)
-            return 2
-        except json.JSONDecodeError as e:
-            print(f"Invalid JSON: {e}", file=sys.stderr)
-            return 2
-        except (OSError, ValidationError) as e:
-            print(f"Validation failed: {e}", file=sys.stderr)
-            return 2
+    compare_reports(comparison)
+    return 0
 
-        compare_reports(ra, rb, rf, args.label_a, args.label_b, args.label_final)
-        return 0
 
-    # Handle --schema flag before argparse to avoid positional arg requirement
-    if len(sys.argv) > 1 and sys.argv[1] == "--schema":
-        print(json.dumps(SpecReviewReport.model_json_schema(), indent=2))
-        return 0
+def _print_requested_findings(
+    report: SpecReviewReport,
+    args: argparse.Namespace,
+) -> None:
+    """Print the finding categories selected by validation CLI flags."""
+    show_all = args.all
+    show_errors = args.errors or show_all or not any(
+        (args.errors, args.warnings, args.suggestions)
+    )
+    if show_errors:
+        report.print_errors()
+    if args.warnings or show_all:
+        report.print_warnings()
+    if args.suggestions or show_all:
+        report.print_suggestions()
 
-    # Original validate behavior
+
+def _run_validate(argv: list[str]) -> int:
+    """Run the report validation and inspection command."""
     parser = argparse.ArgumentParser(description="Validate spec review report")
     parser.add_argument("file", type=Path, help="Path to report JSON")
     parser.add_argument("--errors", action="store_true", help="Print errors", default=False)
@@ -274,39 +311,38 @@ def main() -> int:  # noqa: C901 - CLI modes are clearer in one dispatcher
     parser.add_argument("--all", action="store_true", help="Print all findings", default=False)
     parser.add_argument("--json", action="store_true", help="Output summary as JSON", default=False)
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     try:
         report = SpecReviewReport.from_file(args.file)
     except FileNotFoundError:
         print(f"File not found: {args.file}", file=sys.stderr)
         return 2
-    except json.JSONDecodeError as e:
-        print(f"Invalid JSON: {e}", file=sys.stderr)
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON: {exc}", file=sys.stderr)
         return 2
-    except (OSError, ValidationError) as e:
-        print(f"Validation failed: {e}", file=sys.stderr)
+    except (OSError, UnicodeError, ValidationError) as exc:
+        print(f"Validation failed: {exc}", file=sys.stderr)
         return 2
 
     if args.json:
         print(json.dumps(report.to_summary_dict(), indent=2))
     else:
         report.print_summary()
-        # If --all or no specific flags, show errors by default
-        show_all = args.all
-        show_errors = args.errors or show_all or (not args.errors and not args.warnings and not args.suggestions)
-        show_warnings = args.warnings or show_all
-        show_suggestions = args.suggestions or show_all
+        _print_requested_findings(report, args)
 
-        if show_errors:
-            report.print_errors()
-        if show_warnings:
-            report.print_warnings()
-        if show_suggestions:
-            report.print_suggestions()
-
-    # Only return error if there is an issue loading the report
     return 0
+
+
+def main() -> int:
+    """Validate, summarize, or compare spec-review reports."""
+    argv = sys.argv[1:]
+    if argv and argv[0] == "compare":
+        return _run_compare(argv)
+    if argv and argv[0] == "--schema":
+        print(json.dumps(SpecReviewReport.model_json_schema(), indent=2))
+        return 0
+    return _run_validate(argv)
 
 
 if __name__ == "__main__":

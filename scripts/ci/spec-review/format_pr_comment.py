@@ -13,6 +13,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import TypedDict
 
 from _common import get_repo_relative_path
 
@@ -21,8 +22,98 @@ from _common import get_repo_relative_path
 MAX_RAW_JSON_CHARS = 50_000
 
 
-def format_comment(  # noqa: C901 - branches mirror report sections
-    report: dict,
+class RawFinding(TypedDict, total=False):
+    """Finding fields consumed by the PR comment renderer."""
+
+    description: str
+    citation: str | None
+
+
+class RawReview(TypedDict, total=False):
+    """Per-spec fields consumed by the PR comment renderer."""
+
+    spec_file: str
+    errors: list[RawFinding]
+    warnings: list[RawFinding]
+    suggestions: list[RawFinding]
+
+
+class RawReport(TypedDict, total=False):
+    """Report fields consumed by the PR comment renderer."""
+
+    spec_reviews: list[RawReview]
+
+
+def _status_text(total_errors: int, total_warnings: int) -> str:
+    """Return the pull request status heading for aggregate finding counts."""
+    if total_errors > 0:
+        return "❌ **Spec Review Failed**"
+    if total_warnings > 0:
+        return "⚠️ **Spec Review Passed with Warnings**"
+    return "✅ **Spec Review Passed**"
+
+
+def _append_finding_group(
+    lines: list[str],
+    findings: list[RawFinding],
+    emoji: str,
+    label: str,
+) -> None:
+    """Append one expandable severity group to the comment."""
+    if not findings:
+        return
+    lines.extend(["<details>", f"<summary>{emoji} {label} ({len(findings)})</summary>", ""])
+    for finding in findings:
+        description = finding.get("description", "")
+        citation = finding.get("citation")
+        lines.append(f"- {description}")
+        if citation and citation not in ("N/A", "n/a"):
+            lines.append(f"  - 📖 [{citation}]({citation})")
+    lines.extend(["", "</details>", ""])
+
+
+def _append_review(
+    lines: list[str],
+    review: RawReview,
+    repo: str,
+    sha: str,
+    repo_root: Path | None,
+) -> None:
+    """Append all findings for one reviewed spec file."""
+    groups = (
+        (review.get("errors", []), "❌", "Errors"),
+        (review.get("warnings", []), "⚠️", "Warnings"),
+        (review.get("suggestions", []), "💡", "Suggestions"),
+    )
+    if not any(findings for findings, _, _ in groups):
+        return
+
+    spec_file = review.get("spec_file", "unknown")
+    spec_path = get_repo_relative_path(spec_file, repo_root)
+    spec_name = Path(spec_file).name
+    if Path(spec_path).is_absolute():
+        spec_link = f"`{spec_name}`"
+    else:
+        spec_link = f"[`{spec_name}`](https://github.com/{repo}/blob/{sha}/{spec_path})"
+    lines.extend([f"### {spec_link}", ""])
+
+    for findings, emoji, label in groups:
+        _append_finding_group(lines, findings, emoji, label)
+
+
+def _append_raw_report(lines: list[str], report: RawReport) -> None:
+    """Append the collapsible raw JSON report, respecting GitHub's size limit."""
+    raw_json = json.dumps(report, indent=2)
+    lines.extend(["<details>", "<summary>📄 Raw JSON Report</summary>", ""])
+    if len(raw_json) > MAX_RAW_JSON_CHARS:
+        lines.append("*Report too large to display inline. See uploaded artifacts for the full report.*")
+    else:
+        lines.extend(["```json", raw_json, "```"])
+    lines.extend(["", "</details>"])
+
+
+def format_comment(
+    report: RawReport,
     repo: str,
     sha: str,
     repo_root: Path | None = None,
@@ -34,18 +125,10 @@ def format_comment(  # noqa: C901 - branches mirror report sections
     total_warnings = sum(len(r.get("warnings", [])) for r in reviews)
     total_suggestions = sum(len(r.get("suggestions", [])) for r in reviews)
 
-    # Status header
-    if total_errors > 0:
-        status = "❌ **Spec Review Failed**"
-    elif total_warnings > 0:
-        status = "⚠️ **Spec Review Passed with Warnings**"
-    else:
-        status = "✅ **Spec Review Passed**"
-
     # Hidden marker for finding/updating this comment
     lines = [
         "<!-- SPEC_REVIEW_BOT -->",
-        f"## {status}",
+        f"## {_status_text(total_errors, total_warnings)}",
         "",
         "| Type | Count |",
         "|------|-------|",
@@ -59,63 +142,14 @@ def format_comment(  # noqa: C901 - branches mirror report sections
 
     # Format each spec file's findings
     for review in reviews:
-        spec_file = review.get("spec_file", "unknown")
-        errors = review.get("errors", [])
-        warnings = review.get("warnings", [])
-        suggestions = review.get("suggestions", [])
-
-        if not (errors or warnings or suggestions):
-            continue
-
-        # Make spec file a clickable link (only if we resolved a relative path)
-        spec_path = get_repo_relative_path(spec_file, repo_root)
-        spec_name = Path(spec_file).name
-        if Path(spec_path).is_absolute():
-            spec_link = f"`{spec_name}`"
-        else:
-            spec_link = f"[`{spec_name}`](https://github.com/{repo}/blob/{sha}/{spec_path})"
-        lines.append(f"### {spec_link}")
-        lines.append("")
-
-        for findings, emoji, label in [
-            (errors, "❌", "Errors"),
-            (warnings, "⚠️", "Warnings"),
-            (suggestions, "💡", "Suggestions"),
-        ]:
-            if findings:
-                lines.append("<details>")
-                lines.append(f"<summary>{emoji} {label} ({len(findings)})</summary>")
-                lines.append("")
-                for f in findings:
-                    desc = f.get("description", "")
-                    citation = f.get("citation")
-                    if citation and citation not in ("N/A", "n/a", ""):
-                        lines.append(f"- {desc}")
-                        lines.append(f"  - 📖 [{citation}]({citation})")
-                    else:
-                        lines.append(f"- {desc}")
-                lines.append("")
-                lines.append("</details>")
-                lines.append("")
+        _append_review(lines, review, repo, sha, repo_root)
 
     # If no spec files had any findings, add an all-clear message
     if total_errors == 0 and total_warnings == 0 and total_suggestions == 0:
         lines.append("✨ No issues found in any reviewed spec files.")
         lines.append("")
 
-    # Add raw JSON in collapsed section (truncate if too large for GH comment limit)
-    raw_json = json.dumps(report, indent=2)
-    lines.append("<details>")
-    lines.append("<summary>📄 Raw JSON Report</summary>")
-    lines.append("")
-    if len(raw_json) > MAX_RAW_JSON_CHARS:
-        lines.append("*Report too large to display inline. See uploaded artifacts for the full report.*")
-    else:
-        lines.append("```json")
-        lines.append(raw_json)
-        lines.append("```")
-    lines.append("")
-    lines.append("</details>")
+    _append_raw_report(lines, report)
 
     return "\n".join(lines)
 
