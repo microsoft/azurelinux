@@ -19,3 +19,16 @@ repos:
           - "amend!"
           - --commit-msg-file
       - id: commitizen-branch
+  - repo: https://github.com/lycheeverse/lychee
+    rev: 2bba271688c1abb1503097a064e6c3bc1d1b6a9b # lychee-v0.24.2
+    hooks:
+      - id: lychee-system
+        args:
+          - .
+          - --hidden
+          - --offline
+          - --verbose
+          - --include-verbatim
+          - --include-fragments
+          - --no-progress
+        pass_filenames: false
