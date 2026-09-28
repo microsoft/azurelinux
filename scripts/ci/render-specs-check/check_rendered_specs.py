@@ -67,7 +67,7 @@ def _resolve_head_blobs(paths: list[str]) -> dict[str, str]:
     for entry in raw.split("\0"):
         if not entry:
             continue
-        # Format: "<mode> <type> <sha>\t<path>"
+        # Format: "<mode> <type> <sha>\t<path>"  # noqa: ERA001
         meta, _, path = entry.partition("\t")
         try:
             _, kind, sha = meta.split(" ")

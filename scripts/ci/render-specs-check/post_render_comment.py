@@ -98,7 +98,7 @@ def _fence_for(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-# NOTE: _render_command is duplicated in check_rendered_specs.py
+# Keep this command formatting synchronized with check_rendered_specs.py.
 def _render_command(components: list[str], *, use_all: bool = False) -> str:
     if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component render -a --clean-stale"
