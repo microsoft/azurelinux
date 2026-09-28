@@ -10,6 +10,7 @@ import ssl
 import subprocess
 import urllib.error
 import urllib.request
+from email.message import Message
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -69,7 +70,7 @@ def test_distgit_fetch_preserves_http_error(monkeypatch: pytest.MonkeyPatch) -> 
             "https://example.test/missing",
             404,
             "Not Found",
-            {},
+            Message(),
             None,
         )
 

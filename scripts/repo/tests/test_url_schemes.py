@@ -6,7 +6,10 @@ from __future__ import annotations
 
 import importlib.machinery
 import importlib.util
+import urllib.error
 import urllib.request
+from email.message import Message
+from http import HTTPStatus
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, cast
 
@@ -15,6 +18,7 @@ from _repo_layout import UnsupportedRepoSchemeError, validate_repo_url
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from typing import Self
 
 
 class _DnfModule(Protocol):
@@ -74,3 +78,89 @@ def test_probe_supports_file_repositories(dnf_module: _DnfModule, tmp_path: Path
 
     assert status == "ok"
     assert error is None
+
+
+class _Response:
+    """Minimal context-managed URL response for probe tests."""
+
+    def __init__(self, status: int) -> None:
+        self.status = status
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, *_args: object) -> None:
+        return None
+
+
+def test_probe_reports_non_success_status(
+    dnf_module: _DnfModule,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Treat non-2xx responses that do not raise as failures."""
+    monkeypatch.setattr(
+        urllib.request,
+        "urlopen",
+        lambda *_args, **_kwargs: _Response(HTTPStatus.INTERNAL_SERVER_ERROR),
+    )
+
+    status, error = dnf_module.probe_repo("https://example.test/repo")
+
+    assert status == "fail"
+    assert error == "HTTP 500"
+
+
+@pytest.mark.parametrize(
+    ("exception", "expected"),
+    [
+        (
+            urllib.error.HTTPError(
+                "https://example.test/repo",
+                HTTPStatus.NOT_FOUND,
+                "Not Found",
+                Message(),
+                None,
+            ),
+            ("missing", None),
+        ),
+        (
+            urllib.error.HTTPError(
+                "https://example.test/repo",
+                HTTPStatus.FORBIDDEN,
+                "Forbidden",
+                Message(),
+                None,
+            ),
+            ("fail", "HTTP 403"),
+        ),
+        (
+            urllib.error.URLError(FileNotFoundError()),
+            ("missing", None),
+        ),
+        (
+            urllib.error.URLError("connection refused"),
+            ("fail", "URL error: connection refused"),
+        ),
+        (
+            TimeoutError(),
+            ("fail", "timed out after 7s"),
+        ),
+        (
+            OSError("network down"),
+            ("fail", "OS error: network down"),
+        ),
+    ],
+)
+def test_probe_translates_transport_errors(
+    dnf_module: _DnfModule,
+    monkeypatch: pytest.MonkeyPatch,
+    exception: BaseException,
+    expected: tuple[str, str | None],
+) -> None:
+    """Preserve the probe outcome assigned to each transport failure."""
+    def fail(*_args: object, **_kwargs: object) -> None:
+        raise exception
+
+    monkeypatch.setattr(urllib.request, "urlopen", fail)
+
+    assert dnf_module.probe_repo("https://example.test/repo", timeout=7) == expected

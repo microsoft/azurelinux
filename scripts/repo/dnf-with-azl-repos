@@ -157,23 +157,28 @@ def probe_repo(probe_url: str, *, timeout: float = PROBE_TIMEOUT) -> tuple[str, 
             # successful urlopen there already proved the file exists.
             status = getattr(resp, "status", None)
             if status is None or HTTPStatus.OK <= status < HTTPStatus.MULTIPLE_CHOICES:
-                return _PROBE_OK, None
-            return _PROBE_FAIL, f"HTTP {status}"
+                result = (_PROBE_OK, None)
+            else:
+                result = (_PROBE_FAIL, f"HTTP {status}")
     except urllib.error.HTTPError as e:
-        if e.code == HTTPStatus.NOT_FOUND:
-            return _PROBE_MISSING, None
-        return _PROBE_FAIL, f"HTTP {e.code}"
+        result = (
+            (_PROBE_MISSING, None)
+            if e.code == HTTPStatus.NOT_FOUND
+            else (_PROBE_FAIL, f"HTTP {e.code}")
+        )
     except urllib.error.URLError as e:
         # urllib wraps a `file://` ENOENT as URLError(FileNotFoundError);
         # treat that as MISSING so local fixtures behave like the HTTP 404
         # case.
         if isinstance(e.reason, FileNotFoundError):
-            return _PROBE_MISSING, None
-        return _PROBE_FAIL, f"URL error: {e.reason}"
+            result = (_PROBE_MISSING, None)
+        else:
+            result = (_PROBE_FAIL, f"URL error: {e.reason}")
     except TimeoutError:
-        return _PROBE_FAIL, f"timed out after {timeout:.0f}s"
+        result = (_PROBE_FAIL, f"timed out after {timeout:.0f}s")
     except OSError as e:
-        return _PROBE_FAIL, f"OS error: {e}"
+        result = (_PROBE_FAIL, f"OS error: {e}")
+    return result
 
 
 def main(argv: list[str] | None = None) -> int:  # noqa: C901 - repository discovery is one workflow

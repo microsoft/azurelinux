@@ -1169,71 +1169,118 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: list[str] | None = None) -> int:  # noqa: C901 - phases are clearer in one pipeline
-    """Synthesize routed Azure Linux repositories."""
-    args = parse_args(argv)
-    arches = tuple(args.arch) if args.arch else DEFAULT_ARCHES
+@dataclass(frozen=True)
+class SynthesisConfig:
+    """Validated configuration for one repository synthesis run."""
 
+    arches: tuple[str, ...]
+    repo_sources: list[tuple[str, str]]
+    repo_root: Path
+    output_dir: Path
+    cache_root: Path
+    ssl_context: ssl.SSLContext | None
+    keep_cache: bool
+
+
+def _prepare_config(args: argparse.Namespace) -> tuple[SynthesisConfig | None, str | None]:
+    """Validate CLI arguments and prepare output paths."""
     if args.ca_bundle is not None and not args.ca_bundle.is_file():
-        return fatal(f"--ca-bundle path does not exist: {args.ca_bundle}")
+        return None, f"--ca-bundle path does not exist: {args.ca_bundle}"
     ssl_context = build_ssl_context(args.ca_bundle, insecure=args.insecure)
 
     repo_sources: list[tuple[str, str]] = args.repo_sources or []
     if not repo_sources:
-        return fatal("at least one --repo-prefix or --repo must be provided")
+        return None, "at least one --repo-prefix or --repo must be provided"
 
     output_dir: Path = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     cache_root = output_dir / ".cache"
     cache_root.mkdir(parents=True, exist_ok=True)
+    arches = tuple(args.arch) if args.arch else DEFAULT_ARCHES
+    return (
+        SynthesisConfig(
+            arches=arches,
+            repo_sources=repo_sources,
+            repo_root=args.repo_root,
+            output_dir=output_dir,
+            cache_root=cache_root,
+            ssl_context=ssl_context,
+            keep_cache=args.keep_cache,
+        ),
+        None,
+    )
 
-    # ---- Resolve the InputRepo list ------------------------------------
+
+def _resolve_input_repos(config: SynthesisConfig) -> tuple[list[InputRepo], str | None]:
+    """Resolve ordered CLI repository sources into concrete input repos."""
     log("==> Resolving input repos ...")
     repos: list[InputRepo] = []
-    for option, value in repo_sources:
+    for option, value in config.repo_sources:
         if option == "--repo-prefix":
-            repos.extend(expand_repo_prefix(value, arches))
+            repos.extend(expand_repo_prefix(value, config.arches))
         else:  # --repo
             try:
-                repos.extend(parse_explicit_repo(value, arches))
+                repos.extend(parse_explicit_repo(value, config.arches))
             except ValueError as e:
-                return fatal(str(e))
+                return [], str(e)
     repos = dedup_input_repos(repos)
     log(f"    {len(repos)} candidate input repo(s) after dedup")
+    return repos, None
 
-    # ---- Phase 1: download repodata ------------------------------------
+
+def _download_input_repos(
+    repos: list[InputRepo],
+    config: SynthesisConfig,
+) -> tuple[dict[InputRepo, Path], str | None]:
+    """Download input repodata and return its cache locations."""
     log("==> Downloading repodata ...")
     repo_to_dir: dict[InputRepo, Path] = {}
     for repo in repos:
         try:
-            cache_dir = download_repo_metadata(repo, cache_root, ssl_context)
+            cache_dir = download_repo_metadata(
+                repo,
+                config.cache_root,
+                config.ssl_context,
+            )
         except urllib.error.HTTPError as e:
-            return fatal(f"HTTP {e.code} fetching {repo.url}/repodata/repomd.xml (origin={repo.origin})")
+            error = (
+                f"HTTP {e.code} fetching {repo.url}/repodata/repomd.xml (origin={repo.origin})"
+            )
+            return {}, error
         except ValueError as e:
-            return fatal(str(e))
+            return {}, str(e)
         if cache_dir is not None:
             repo_to_dir[repo] = cache_dir
     log(f"    {len(repo_to_dir)} repo(s) successfully downloaded ({len(repos) - len(repo_to_dir)} skipped)")
 
     if not repo_to_dir:
-        return fatal("no input repos with usable repodata; nothing to route")
+        return {}, "no input repos with usable repodata; nothing to route"
+    return repo_to_dir, None
 
-    # ---- Phase 2: build package universe + source map ------------------
+
+def _run_routing_pipeline(
+    repo_to_dir: dict[InputRepo, Path],
+    config: SynthesisConfig,
+) -> None:
+    """Build the package universe, route packages, and write reports."""
     log("==> Building package universe ...")
     universe, src_map = build_package_universe(repo_to_dir)
     log(f"    {len(universe)} unique (kind, arch, NEVRA) entries; {len(src_map)} unique (pkg, srpm) pairs for azldev")
 
-    # ---- Phase 3: query azldev -----------------------------------------
     log("==> Querying azldev for routing ...")
-    known_components = query_known_components(args.repo_root)
-    routing = query_azldev(args.repo_root, src_map, output_dir, known_components)
+    known_components = query_known_components(config.repo_root)
+    routing = query_azldev(
+        config.repo_root,
+        src_map,
+        config.output_dir,
+        known_components,
+    )
     log(
         f"    azldev returned {len(routing.rpm)} rpm row(s), "
         f"{len(routing.srpm)} srpm row(s), "
         f"{len(routing.foreign_names)} foreign name(s) (excluded)"
     )
 
-    # ---- Phase 4: per-entry routing decisions --------------------------
     log("==> Computing routing decisions ...")
     decisions = decide_routing(universe, routing)
     n_pub = sum(1 for d in decisions.values() if d.dest_channel is not None)
@@ -1241,29 +1288,49 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901 - phases are clear
     n_inh = sum(1 for d in decisions.values() if d.inherited)
     log(f"    routed: {n_pub} | unpublished: {n_unpub} | inheritance-fallback used: {n_inh}")
 
-    # ---- Phase 5+6: open writers and emit ------------------------------
     log("==> Writing per-destination repos ...")
-    dest_counts, unpublished, fallbacks = emit_repos(repo_to_dir, universe, decisions, output_dir)
+    dest_counts, unpublished, fallbacks = emit_repos(
+        repo_to_dir,
+        universe,
+        decisions,
+        config.output_dir,
+    )
 
-    # ---- Phase 7: unpublished + fallback reports -----------------------
     log("==> Writing unpublished-packages report ...")
-    json_path, txt_path = write_unpublished_report(unpublished, output_dir)
+    json_path, txt_path = write_unpublished_report(unpublished, config.output_dir)
     log(f"    -> {json_path.name}, {txt_path.name}")
 
     log("==> Writing fallback-channel-packages report ...")
-    fb_json, fb_txt = write_fallback_report(fallbacks, output_dir)
+    fb_json, fb_txt = write_fallback_report(fallbacks, config.output_dir)
     log(f"    -> {fb_json.name}, {fb_txt.name}")
 
-    # ---- Summary -------------------------------------------------------
     log("\n==> Summary")
     for dest in sorted(dest_counts, key=lambda d: (d.channel, d.kind, d.arch)):
         log(f"    {dest.relpath():35s}  {dest_counts[dest]:6d} pkg(s)")
     log(f"    {'(unpublished)':35s}  {len(unpublished):6d} pkg(s)")
     log(f"    {'(fallback-channel)':35s}  {len(fallbacks):6d} pkg(s)")
 
-    if not args.keep_cache:
+
+def main(argv: list[str] | None = None) -> int:
+    """Synthesize routed Azure Linux repositories."""
+    args = parse_args(argv)
+    config, config_error = _prepare_config(args)
+    if config_error is not None or config is None:
+        return fatal(config_error or "invalid synthesis configuration")
+
+    repos, repo_error = _resolve_input_repos(config)
+    if repo_error is not None:
+        return fatal(repo_error)
+
+    repo_to_dir, download_error = _download_input_repos(repos, config)
+    if download_error is not None:
+        return fatal(download_error)
+
+    _run_routing_pipeline(repo_to_dir, config)
+
+    if not config.keep_cache:
         with contextlib.suppress(FileNotFoundError):
-            shutil.rmtree(cache_root)
+            shutil.rmtree(config.cache_root)
     return 0
 
 
