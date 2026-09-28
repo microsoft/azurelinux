@@ -126,8 +126,10 @@ def _append_content_diffs(
             remaining = len(content_diffs) - shown
             lines.extend(
                 [
-                    f"*… and {remaining} more file(s). "
-                    "Run the remediation command above to see all changes.*",
+                    (
+                        f"*… and {remaining} more file(s). "
+                        "Run the remediation command above to see all changes.*"
+                    ),
                     "",
                 ]
             )
@@ -141,8 +143,10 @@ def _append_content_diffs(
             remaining = len(content_diffs) - shown
             lines.extend(
                 [
-                    f"*… and {remaining} more file(s) — comment size limit reached. "
-                    "Run the remediation command above to see all changes.*",
+                    (
+                        f"*… and {remaining} more file(s) — comment size limit reached. "
+                        "Run the remediation command above to see all changes.*"
+                    ),
                     "",
                 ]
             )

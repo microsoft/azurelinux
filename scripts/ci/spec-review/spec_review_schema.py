@@ -92,7 +92,8 @@ class SpecReviewReport(BaseModel):
         status = "ERRORS FOUND" if self.has_errors else "No errors"
         print(f"{status}")
         print(
-            f"Specs: {len(self.spec_reviews)} | Errors: {self.total_errors} | Warnings: {self.total_warnings} | Suggestions: {self.total_suggestions}"
+            f"Specs: {len(self.spec_reviews)} | Errors: {self.total_errors} | "
+            f"Warnings: {self.total_warnings} | Suggestions: {self.total_suggestions}"
         )
 
     def print_errors(self) -> None:
@@ -173,7 +174,8 @@ def compare_reports(  # noqa: C901 - branches mirror comparison sections
         (label_final, report_final),
     ]:
         print(
-            f"│ {label:<{col_w}} │ {report.total_errors:>6} │ {report.total_warnings:>8} │ {report.total_suggestions:>11} │"
+            f"│ {label:<{col_w}} │ {report.total_errors:>6} │ "
+            f"{report.total_warnings:>8} │ {report.total_suggestions:>11} │"
         )
     print(f"└─{'─' * col_w}─┴────────┴──────────┴─────────────┘")
     print()
