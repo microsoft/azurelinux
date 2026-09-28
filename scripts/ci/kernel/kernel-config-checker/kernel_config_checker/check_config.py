@@ -192,10 +192,10 @@ def main() -> int | None:  # noqa: C901 - CLI modes are clearer in one dispatche
     if args.add_config:
         try:
             ok = add_config_interactive(Path(args.add_config))
-            return 0 if ok else 1
         except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
             print(f"\u2717 Error adding config: {e}")
             return 1
+        return 0 if ok else 1
 
     if args.check_all:
         try:
@@ -203,10 +203,10 @@ def main() -> int | None:  # noqa: C901 - CLI modes are clearer in one dispatche
             schema = load_schema(Path(json_file))
             print(f"✓ Loaded intentional config: {json_file}")
             found = check_config_across_all(schema, config_name)
-            return 0 if found else 1
         except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
             print(f"✗ Error checking config: {e}")
             return 1
+        return 0 if found else 1
 
     if not all(
         [
@@ -235,13 +235,15 @@ def main() -> int | None:  # noqa: C901 - CLI modes are clearer in one dispatche
 
         if is_valid:
             print("✓ Kernel configuration check passed")
-            return 0
-        print("✗ Kernel configuration check failed")
-        return 1
+            exit_code = 0
+        else:
+            print("✗ Kernel configuration check failed")
+            exit_code = 1
 
     except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
         print(f"✗ Error: {e}")
         return 1
+    return exit_code
 
 
 if __name__ == "__main__":

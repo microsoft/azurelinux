@@ -263,18 +263,19 @@ def create_container(
         networks=networks or [],
     )
 
-    # Verify the container is running and exec works.
+    # Keep readiness failures inside this boundary so every startup failure
+    # removes the container before propagating to the caller.
     try:
         container.reload()
         if container.state.status != "running":
-            raise ContainerRuntimeError(
+            raise ContainerRuntimeError(  # noqa: TRY301
                 f"Container {container_name} is not running "
                 f"(status: {container.state.status})"
             )
 
         result = exec_in_container(client, container_name, ["echo", "ready"])
         if result.exit_code != 0:
-            raise ContainerRuntimeError(
+            raise ContainerRuntimeError(  # noqa: TRY301
                 f"Container exec readiness check failed for {container_name} "
                 f"(exit_code={result.exit_code}, output={result.output!r})"
             )

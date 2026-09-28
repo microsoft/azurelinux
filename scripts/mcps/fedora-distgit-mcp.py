@@ -22,6 +22,7 @@ auto-approved.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
@@ -162,7 +163,7 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
     if (repo_dir / ".git").is_dir():
         _touch_repo(repo_dir)
         # Fetch latest refs (best-effort)
-        try:
+        with contextlib.suppress(OSError, subprocess.SubprocessError):
             subprocess.run(
                 ["git", "fetch", "--quiet", "--all"],
                 cwd=repo_dir,
@@ -170,8 +171,6 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
                 timeout=60,
                 check=True,
             )
-        except (OSError, subprocess.SubprocessError):
-            pass
         return str(repo_dir), None
 
     # Check cache capacity before cloning

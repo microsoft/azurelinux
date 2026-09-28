@@ -109,9 +109,9 @@ def parse_update_output(path: Path) -> list[dict]:
         with path.open(encoding="utf-8") as f:
             data = json.load(f)
     except FileNotFoundError as exc:
-        raise SystemExit(f"Error: update output not found: {exc}")
+        raise SystemExit(f"Error: update output not found: {exc}") from exc
     except json.JSONDecodeError as exc:
-        raise SystemExit(f"Error: update output is not valid JSON: {exc}")
+        raise SystemExit(f"Error: update output is not valid JSON: {exc}") from exc
 
     # azldev emits a literal JSON `null` when no entries are produced.
     if data is None:
