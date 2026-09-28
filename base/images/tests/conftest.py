@@ -257,7 +257,7 @@ def disk_info(image_path: Path | None, image_type: str) -> DiskInfo | None:
 
 @pytest.fixture(scope="session")
 def os_release(rootfs: Path) -> dict[str, str]:
-    """Parsed ``/etc/os-release``."""
+    """Parse ``/etc/os-release``."""
     os_release_path = rootfs / "etc" / "os-release"
     logger.debug("Looking for os-release at %s", os_release_path)
     if not os_release_path.exists():
@@ -273,7 +273,7 @@ def os_release(rootfs: Path) -> dict[str, str]:
 
 @pytest.fixture(scope="session")
 def installed_package_sizes(rootfs: Path) -> dict[str, int]:
-    """Mapping of installed RPM package name to on-disk size in bytes.
+    """Map installed RPM package names to on-disk sizes in bytes.
 
     Single source of truth for installed-package data; the
     :func:`installed_packages` fixture derives its name set from this.

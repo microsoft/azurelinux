@@ -53,6 +53,7 @@ class NativeTool:
     when: str = "always"  # "always", "vm", "container"
 
     def __post_init__(self) -> None:
+        """Register this tool in the module-level dependency registry."""
         _REGISTRY.append(self)
 
 

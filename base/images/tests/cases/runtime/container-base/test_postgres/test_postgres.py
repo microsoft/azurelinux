@@ -94,7 +94,7 @@ def _run_crud_workflow(exec_shell: ExecShell, host: str) -> None:
 
 
 def _assert_bad_auth_rejected(exec_shell: ExecShell, host: str) -> None:
-    """A wrong password must be rejected, proving the scram rule is enforced (not trust)."""
+    """Verify that a wrong password is rejected by the scram rule."""
     bad_auth = exec_shell(
         f"PGPASSWORD=wrong psql -h {host} -p {DB_PORT} -U {DB_USER} -d {DB_NAME} -c 'SELECT 1;'",
     )

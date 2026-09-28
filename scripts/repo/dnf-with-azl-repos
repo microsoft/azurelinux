@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
-"""Invoke ``dnf`` against Azure Linux repositories.
+r"""Invoke ``dnf`` against Azure Linux repositories.
 
 Discover repositories under URL prefixes that follow the Standard Azure Linux
 Repo Layout. For each ``--repo-prefix`` URL the conventional sub-repos described in
@@ -14,7 +14,7 @@ as fatal so that a transient outage cannot silently shrink the repo
 set passed to ``dnf``. Reachable sub-repos are added with one
 ``--repofrompath <id>,<url> --enablerepo=<id>`` pair each, then any
 trailing dnf arguments are appended verbatim and the wrapper
-``execvp``\\s into ``dnf``.
+``execvp``\s into ``dnf``.
 
 Usage:
     dnf-with-azl-repos [--repo-prefix URL]... [--no-debuginfo]
