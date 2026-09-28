@@ -105,9 +105,8 @@ def deleted_kernel_config_files(repo_root: Path, base_sha: str, head_sha: str) -
 
 
 def _tracked_changed_kernel_config_cases(pytestconfig: pytest.Config) -> list[tuple[str, str, str]]:
-    repo_root = (
-        Path(pytestconfig.getoption("repo_root")).resolve() if pytestconfig.getoption("repo_root") else _git_repo_root()
-    )
+    repo_root_option = pytestconfig.getoption("repo_root")
+    repo_root = Path(repo_root_option).resolve() if repo_root_option else _git_repo_root()
     checker_root = _checker_root()
     base_sha = pytestconfig.getoption("base_sha") or "HEAD^"
     head_sha = pytestconfig.getoption("head_sha") or "HEAD"
