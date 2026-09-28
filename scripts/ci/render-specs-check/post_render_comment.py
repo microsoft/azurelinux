@@ -120,8 +120,7 @@ def _append_content_diffs(
 ) -> None:
     """Append inline content diffs without exceeding the comment budget."""
     lines.extend(["### Content diffs", ""])
-    shown = 0
-    for item in content_diffs:
+    for shown, item in enumerate(content_diffs):
         if shown >= MAX_INLINE_DIFFS:
             remaining = len(content_diffs) - shown
             lines.extend(
@@ -153,7 +152,6 @@ def _append_content_diffs(
             break
         lines.append(block)
         budget.used += len(block)
-        shown += 1
 
 
 def _append_file_list(
