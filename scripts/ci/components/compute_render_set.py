@@ -12,19 +12,48 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from typing import NotRequired, TypedDict, TypeGuard
 
 
-def _load_entries(path: Path) -> list[dict]:
+class ChangedComponent(TypedDict):
+    """Fields consumed from one azldev component-changed entry."""
+
+    component: str
+    changeType: NotRequired[str]
+    sourcesChange: NotRequired[bool]
+
+
+def _is_changed_component(value: object) -> TypeGuard[ChangedComponent]:
+    """Return whether a JSON value has the fields consumed by this script."""
+    if not isinstance(value, dict):
+        return False
+    if not isinstance(value.get("component"), str):
+        return False
+    if "changeType" in value and not isinstance(value["changeType"], str):
+        return False
+    return "sourcesChange" not in value or isinstance(value["sourcesChange"], bool)
+
+
+def _load_entries(path: Path) -> list[ChangedComponent]:
     """Load the changed-components JSON."""
-    return json.loads(path.read_text(encoding="utf-8"))
+    data: object = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        raise TypeError(f"changed-components JSON must be a list, got {type(data).__name__}")
+
+    entries: list[ChangedComponent] = []
+    for entry in data:
+        if not _is_changed_component(entry):
+            raise TypeError(f"invalid changed-components entry: {entry!r}")
+        entries.append(entry)
+    return entries
 
 
-def _renderable_components(entries: list[dict]) -> set[str]:
+def _renderable_components(entries: list[ChangedComponent]) -> set[str]:
     """Component names that azldev can still render (everything except deleted)."""
     return {e["component"] for e in entries if e.get("changeType") != "deleted"}
 
 
-def from_changed(entries: list[dict]) -> list[str]:
+def from_changed(entries: list[ChangedComponent]) -> list[str]:
     """Components from `azldev component changed` JSON.
 
     Includes anything that is not 'deleted' and either has a non-'unchanged'
