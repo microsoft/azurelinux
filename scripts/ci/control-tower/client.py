@@ -36,7 +36,7 @@ from urllib3.util.retry import Retry
 if TYPE_CHECKING:
     from azure.core.credentials import TokenCredential
 
-type JsonValue = None | bool | int | float | str | Sequence[JsonValue] | Mapping[str, JsonValue]
+type JsonValue = bool | int | float | str | Sequence[JsonValue] | Mapping[str, JsonValue] | None
 type JsonObject = dict[str, JsonValue]
 
 # JobStatus values from the Control Tower service
