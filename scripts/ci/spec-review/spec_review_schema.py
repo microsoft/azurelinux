@@ -128,7 +128,7 @@ class SpecReviewReport(BaseModel):
                     if s.citation:
                         print(f"     {s.citation}")
 
-    def to_summary_dict(self) -> dict:
+    def to_summary_dict(self) -> dict[str, int | bool]:
         """Return aggregate finding counts as a dictionary."""
         return {
             "specs": len(self.spec_reviews),

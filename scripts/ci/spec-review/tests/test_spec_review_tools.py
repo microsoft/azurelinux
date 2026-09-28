@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 SCRIPT_DIR = REPO_ROOT / "scripts" / "ci" / "spec-review"
 SCHEMA_SCRIPT = SCRIPT_DIR / "spec_review_schema.py"
 FORMAT_SCRIPT = SCRIPT_DIR / "format_pr_comment.py"
+ANNOTATIONS_SCRIPT = SCRIPT_DIR / "create_check_annotations.py"
 INVALID_REPORT_EXIT = 2
 
 
@@ -323,6 +324,79 @@ def test_format_comment_truncates_oversized_raw_json(tmp_path: Path) -> None:
     assert result.returncode == 0
     assert "Report too large to display inline" in result.stdout
     assert "x" * 100 not in result.stdout
+
+
+def test_annotations_json_preserves_finding_fields(
+    tmp_path: Path,
+    reports: dict[str, dict[str, object]],
+) -> None:
+    """Render finding data for the GitHub Checks API."""
+    report_path = _write_report(tmp_path, "report", reports["a"])
+
+    result = _run(
+        ANNOTATIONS_SCRIPT,
+        report_path,
+        "--json",
+        "--repo-root",
+        REPO_ROOT,
+    )
+
+    assert result.returncode == 0
+    assert result.stderr == ""
+    assert json.loads(result.stdout) == [
+        {
+            "path": "base/a.spec",
+            "start_line": 1,
+            "end_line": 1,
+            "annotation_level": "failure",
+            "message": "shared error\n\nRef: https://example.com/e",
+            "title": "Spec Error",
+        },
+        {
+            "path": "base/a.spec",
+            "start_line": 1,
+            "end_line": 1,
+            "annotation_level": "warning",
+            "message": "dropped warning",
+            "title": "Spec Warning",
+        },
+    ]
+
+
+def test_annotations_workflow_commands_escape_metadata(tmp_path: Path) -> None:
+    """Escape workflow-command delimiters in paths and finding messages."""
+    report: dict[str, object] = {
+        "spec_reviews": [
+            {
+                "spec_file": "base/a,b.spec",
+                "errors": [
+                    {
+                        "description": "bad: value\nnext",
+                        "citation": "https://example.com/a,b",
+                        "line": 7,
+                    }
+                ],
+                "warnings": [],
+                "suggestions": [],
+            }
+        ]
+    }
+    report_path = _write_report(tmp_path, "report", report)
+
+    result = _run(
+        ANNOTATIONS_SCRIPT,
+        report_path,
+        "--workflow-commands",
+        "--repo-root",
+        REPO_ROOT,
+    )
+
+    assert result.returncode == 0
+    assert result.stderr == ""
+    assert result.stdout == (
+        "::error file=base/a%2Cb.spec,line=7::"
+        "bad%3A value%0Anext (Ref: https%3A//example.com/a%2Cb)\n"
+    )
 
 
 def test_invalid_json_fails_cleanly(tmp_path: Path) -> None:

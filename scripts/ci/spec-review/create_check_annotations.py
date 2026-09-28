@@ -15,12 +15,14 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from _common import get_repo_relative_path
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
+
+    from _report_types import RawFinding, RawReport
 
 # Mapping from finding category to (workflow command level, checks API level, checks API title)
 _SEVERITY_MAP = {
@@ -30,10 +32,21 @@ _SEVERITY_MAP = {
 }
 
 
+class CheckAnnotation(TypedDict):
+    """One GitHub Checks API annotation."""
+
+    path: str
+    start_line: int
+    end_line: int
+    annotation_level: str
+    message: str
+    title: str
+
+
 def _iter_findings(
-    report: dict,
+    report: RawReport,
     repo_root: Path | None = None,
-) -> Iterator[tuple[str, str, dict[str, object]]]:
+) -> Iterator[tuple[str, str, RawFinding]]:
     """Yield (spec_file, category, finding) for every finding in the report."""
     for review in report.get("spec_reviews", []):
         spec_file = get_repo_relative_path(review.get("spec_file", ""), repo_root)
@@ -43,7 +56,7 @@ def _iter_findings(
 
 
 def _format_message(
-    finding: dict,
+    finding: RawFinding,
     escape_fn: Callable[[str], str] | None = None,
 ) -> str:
     """Build a message string from a finding, optionally escaping it."""
@@ -67,7 +80,7 @@ def escape_workflow_command(s: str) -> str:
     return s.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A").replace(":", "%3A").replace(",", "%2C")
 
 
-def generate_workflow_commands(report: dict, repo_root: Path | None = None) -> list[str]:
+def generate_workflow_commands(report: RawReport, repo_root: Path | None = None) -> list[str]:
     """Generate GitHub Actions workflow commands for annotations."""
     commands = []
     for spec_file, category, finding in _iter_findings(report, repo_root):
@@ -79,9 +92,12 @@ def generate_workflow_commands(report: dict, repo_root: Path | None = None) -> l
     return commands
 
 
-def generate_check_annotations(report: dict, repo_root: Path | None = None) -> list[dict]:
+def generate_check_annotations(
+    report: RawReport,
+    repo_root: Path | None = None,
+) -> list[CheckAnnotation]:
     """Generate annotations for GitHub Checks API."""
-    annotations = []
+    annotations: list[CheckAnnotation] = []
     for spec_file, category, finding in _iter_findings(report, repo_root):
         _, api_level, title = _SEVERITY_MAP[category]
         line = finding.get("line") or 1
@@ -119,7 +135,7 @@ def main() -> int:
 
     try:
         with args.file.open(encoding="utf-8") as f:
-            report = json.load(f)
+            report = cast("RawReport", json.load(f))
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1

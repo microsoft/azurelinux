@@ -13,35 +13,16 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import TypedDict
+from typing import TYPE_CHECKING
 
 from _common import get_repo_relative_path
+
+if TYPE_CHECKING:
+    from _report_types import RawFinding, RawReport, RawReview
 
 # GitHub PR comment body limit is 65535 chars. Leave room for the
 # surrounding markdown structure.
 MAX_RAW_JSON_CHARS = 50_000
-
-
-class RawFinding(TypedDict, total=False):
-    """Finding fields consumed by the PR comment renderer."""
-
-    description: str
-    citation: str | None
-
-
-class RawReview(TypedDict, total=False):
-    """Per-spec fields consumed by the PR comment renderer."""
-
-    spec_file: str
-    errors: list[RawFinding]
-    warnings: list[RawFinding]
-    suggestions: list[RawFinding]
-
-
-class RawReport(TypedDict, total=False):
-    """Report fields consumed by the PR comment renderer."""
-
-    spec_reviews: list[RawReview]
 
 
 def _status_text(total_errors: int, total_warnings: int) -> str:
