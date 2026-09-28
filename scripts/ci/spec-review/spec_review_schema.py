@@ -21,6 +21,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 
 
 class Finding(BaseModel):
+    """One actionable issue or suggestion identified in a spec file."""
+
     model_config = ConfigDict(extra="forbid")
 
     description: str = Field(..., min_length=1)
@@ -37,6 +39,8 @@ class Finding(BaseModel):
 
 
 class SpecReview(BaseModel):
+    """Validated findings for one reviewed spec file."""
+
     model_config = ConfigDict(extra="forbid")
 
     spec_file: str = Field(..., min_length=1)
@@ -51,6 +55,8 @@ class SpecReview(BaseModel):
 
 
 class SpecReviewReport(BaseModel):
+    """Validated collection of per-spec review results."""
+
     model_config = ConfigDict(extra="forbid")
 
     spec_reviews: list[SpecReview] = Field(..., min_length=1)

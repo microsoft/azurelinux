@@ -12,6 +12,8 @@ RESPONSE = Path(__file__).with_name("response.txt").read_bytes()
 
 
 class Handler(BaseHTTPRequestHandler):
+    """Serve the fixed response used to validate the Python runtime."""
+
     def do_GET(self) -> None:
         """Serve the fixed runtime-validation response."""
         self.send_response(200)

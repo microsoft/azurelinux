@@ -793,6 +793,8 @@ def decide_routing(
 
 @dataclass(frozen=True)
 class Destination:
+    """One channel, package kind, and architecture output repository."""
+
     channel: str  # 'base' | 'sdk'
     kind: str  # main | debuginfo | srpms
     arch: str  # x86_64 | aarch64 | src
