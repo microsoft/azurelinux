@@ -52,9 +52,10 @@ fixable = ["ALL"]
 # with sibling-module imports, not imported as a package, so they intentionally
 # have no __init__.py. Silence the implicit-namespace-package rule for that tree.
 "scripts/ci/**/*.py" = ["INP001"]
-# These helpers are likewise imported by directly executed sibling scripts,
-# including the extensionless scripts/repo/dnf-with-azl-repos entry point.
+# These helpers and entry points are likewise used through direct execution
+# with sibling imports rather than as importable packages.
 "scripts/mcps/_mcp_utils.py" = ["INP001"]
+"scripts/mcps/fedora-distgit-mcp.py" = ["INP001"]
 "scripts/repo/_repo_layout.py" = ["INP001"]
 
 [lint.isort]
