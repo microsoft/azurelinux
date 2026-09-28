@@ -23,4 +23,5 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    HTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+    # Model a network service inside an isolated, disposable test container.
+    HTTPServer(("0.0.0.0", 8080), Handler).serve_forever()  # noqa: S104

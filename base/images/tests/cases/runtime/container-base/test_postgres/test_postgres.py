@@ -76,6 +76,7 @@ def _run_crud_workflow(exec_shell: ExecShell, host: str) -> None:
     """Create a table, insert two rows, and read them back against the DB at ``host``."""
     psql = f"PGPASSWORD={DB_PASSWORD} psql -h {host} -p {DB_PORT} -U {DB_USER} -d {DB_NAME}"
 
+    # All queries and values in this test workflow are fixed; none accept external input.
     create = exec_shell(f'{psql} -c "CREATE TABLE cities (name varchar(80), location point);"')
     assert create.exit_code == 0, f"create failed: {create.output}"
     assert "CREATE TABLE" in create.output
@@ -88,7 +89,7 @@ def _run_crud_workflow(exec_shell: ExecShell, host: str) -> None:
     assert insert.exit_code == 0, f"insert failed: {insert.output}"
     assert insert.output.count("INSERT 0 1") == EXPECTED_ROWS, f"expected two inserts: {insert.output}"
 
-    select = exec_shell(f'{psql} -c "SELECT * FROM cities;"')
+    select = exec_shell(f'{psql} -c "SELECT * FROM cities;"')  # noqa: S608
     assert select.exit_code == 0, f"select failed: {select.output}"
     assert f"{EXPECTED_ROWS} rows" in select.output, f"expected {EXPECTED_ROWS} rows: {select.output}"
 

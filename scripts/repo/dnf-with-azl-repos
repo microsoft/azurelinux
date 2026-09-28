@@ -241,7 +241,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901 - repository disco
         die("no repos discovered under any --repo-prefix")
 
     cmd = ["dnf", *dnf_args, *args.dnf_args]
-    os.execvp(cmd[0], cmd)
+    # dnf is a fixed executable invoked with an argument list, not a shell command.
+    # The wrapper has no cleanup left to perform, so dnf replaces this process.
+    os.execvp(cmd[0], cmd)  # noqa: S606
 
 
 if __name__ == "__main__":
