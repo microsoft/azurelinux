@@ -11,7 +11,11 @@ positional test-path argument.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
+
+from utils.tools import check_tools
 
 # Map file-extension suffixes to image types for auto-detection.
 _EXT_TO_TYPE: dict[str, str] = {
@@ -133,8 +137,6 @@ def pytest_configure(config: pytest.Config) -> None:
         "BASE_IMAGE build arg.",
     )
 
-    from utils.tools import check_tools
-
     # Validate that exactly one of --image-path or --image-ref is provided.
     image_path_raw = config.getoption("--image-path", default=None)
     image_ref_raw = config.getoption("--image-ref", default=None)
@@ -227,8 +229,6 @@ def pytest_collection_modifyitems(
     image subdir) get no ``image`` marker and run for every image.
     """
     del config
-
-    from pathlib import Path
 
     for item in items:
         parts = Path(str(item.fspath)).parts

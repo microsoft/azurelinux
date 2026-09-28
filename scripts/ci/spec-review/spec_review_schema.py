@@ -13,6 +13,7 @@ Exit codes:
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -226,8 +227,6 @@ def compare_reports(  # noqa: C901 - branches mirror comparison sections
 
 def main() -> int:  # noqa: C901 - CLI modes are clearer in one dispatcher
     """Validate, summarize, or compare spec-review reports."""
-    import argparse
-
     # Route to compare subcommand if first arg is "compare"
     if len(sys.argv) > 1 and sys.argv[1] == "compare":
         parser = argparse.ArgumentParser(description="Compare multi-model spec review reports")
