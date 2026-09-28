@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
     branches:
-      - toml
+      - 4.0
 
 # Cancel in-progress runs of this workflow if a new run is triggered.
 concurrency:

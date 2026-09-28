@@ -1,4 +1,6 @@
 exclude_path = [
+   # Exclude Git internals now that hidden paths are scanned.
+   "(^|/)[.]git/",
    # Exclude validation of links in rendered specs/content.
    "(^|/)specs/"
 ]
