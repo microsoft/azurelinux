@@ -98,18 +98,12 @@ def submit_and_monitor(
     print(json.dumps(request.payload, indent=2))
 
     base_url = api_base_url.rstrip("/")
-    credential = ct.make_credential()
-    token_holder = ct.TokenHolder(token=ct.get_token(credential, api_audience))
-    session = ct.make_session()
+    client = ct.make_context(base_url, api_audience)
 
     try:
         build_response = ct.post_scenario(
-            session,
-            base_url,
+            client,
             request.path,
-            credential,
-            api_audience,
-            token_holder,
             request.payload,
             context=request.context,
         )
@@ -131,11 +125,7 @@ def submit_and_monitor(
     print(f"Polling job {job_id} for up to {poll_timeout_seconds}s for a terminal status...")
     try:
         final, timed_out = ct.poll_until_terminal(
-            session,
-            base_url,
-            credential,
-            api_audience,
-            token_holder,
+            client,
             job_id,
             poll_timeout_seconds,
         )
