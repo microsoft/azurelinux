@@ -1082,6 +1082,8 @@ class _OrderedRepoSourceAction(argparse.Action):
         values: str | Sequence[object] | None,
         option_string: str | None = None,
     ) -> None:
+        del parser
+
         items = getattr(namespace, self.dest, None)
         if items is None:
             items = []

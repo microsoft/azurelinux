@@ -226,6 +226,8 @@ def pytest_collection_modifyitems(
     Tests directly under ``cases/static/`` or ``cases/runtime/`` (no
     image subdir) get no ``image`` marker and run for every image.
     """
+    del config
+
     from pathlib import Path
 
     for item in items:
