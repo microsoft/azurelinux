@@ -26,9 +26,10 @@ Patch5: CVE-2024-25621.patch
 Patch6: CVE-2025-64329.patch
 Patch7: CVE-2026-35469.patch
 Patch8: CVE-2026-46680.patch
-Patch9:CVE-2026-53488.patch
+Patch9: CVE-2026-53488.patch
 Patch10:CVE-2026-84304.patch
 Patch11:fix-non-constant-format-string.patch
+Patch12:CVE-2026-53493.patch
 
 %{?systemd_requires}
 
@@ -91,6 +92,7 @@ fi
 %changelog
 * Fri Sep 18 2026 jykanase <v-jykanase@microsoft.com> - 1.7.7-18
 - Patch for CVE-2026-84304
+- Patch for CVE-2026-53493
 - Remove patches which are fixed in new generated vendor tarball: CVE-2023-45288, CVE-2023-47108,
   CVE-2024-24786, CVE-2026-39821, CVE-2026-39882, CVE-2026-56852, CVE-2023-39325, CVE-2026-37236
 - Fix non-constant format string vet errors surfaced by the go 1.25 directive
