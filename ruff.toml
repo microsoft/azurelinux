@@ -1,4 +1,14 @@
-extend-exclude = ["base/build", "base/out", "specs"]
+extend-exclude = [
+    # Generated build artifacts and output trees are not source.
+    "base/build",
+    "base/out",
+    # Imported upstream kernel tooling is maintained with the kernel sources.
+    # This does not exclude Azure Linux-owned tooling under scripts/ci/kernel.
+    "base/comps/kernel",
+    # Package sources may contain vendored or upstream Python code that we do
+    # not maintain as part of the repository's Python tooling.
+    "specs",
+]
 
 line-length = 120
 
@@ -7,22 +17,110 @@ target-version = "py312"
 [lint]
 select = ["ALL"] # Everything
 ignore = [
+    # Existing repository debt. Remove codes from this baseline as focused
+    # cleanup changes make each rule green.
+    "ANN001",
+    "ANN201",
+    "ANN202",
+    "ANN204",
+    "ARG001",
+    "ARG002",
+    "B007",
+    "B904",
+    "BLE001",
+    "C420",
+    "C901",
     "COM812", # Conflicts with formatter.
+    "CPY001",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D205",
+    "D209",
+    "D212",
+    "D301",
+    "D401",
+    "D403",
+    "E501",
+    "EM101",
+    "EM102",
+    "ERA001",
+    "EXE001",
+    "F541",
+    "FBT001",
+    "FBT002",
+    "FBT003",
+    "FURB188",
+    "FURB192",
+    "I001",
+    "I002",
+    "PERF102",
+    "PERF401",
+    "PLC0415",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR0917",
+    "PLR2004",
+    "PLW0603",
+    "PLW1510",
+    "PLW2901",
+    "PT023",
+    "PTH100",
+    "PTH103",
+    "PTH112",
+    "PTH118",
+    "PTH119",
+    "PTH120",
+    "PTH123",
+    "RUF005",
+    "RUF036",
+    "RUF100",
+    "S101",
+    "S104",
+    "S108",
+    "S110",
+    "S310",
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
+    "S606",
     "S607",   # Requiring abspath for all binaries used is very restrictive
+    "S608",
+    "SIM102",
+    "SIM105",
+    "SIM108",
+    "SIM113",
+    "SIM114",
     "T201",   # These scripts are fine to use `print` for output
+    "TC002",
+    "TC003",
+    "TC006",
+    "TRY003",
+    "TRY300",
+    "TRY301",
+    "UP035",
+    "UP037",
+    "UP045",
 ]
-
-# We want D401 still, even though google style omits it.
-extend-select = ["D401"]
 
 fixable = ["ALL"]
 
 [lint.per-file-ignores]
+# The image-test cases are a pytest filesystem hierarchy, not importable
+# packages. Only the sibling utils/ tree is packaged by pyproject.toml.
+"base/images/tests/cases/**/*.py" = ["INP001"]
+"base/images/tests/conftest.py" = ["INP001"]
+
 # Helpers under scripts/ci/ are executed directly (python3 path/to/script.py)
 # with sibling-module imports, not imported as a package, so they intentionally
 # have no __init__.py. Silence the implicit-namespace-package rule for that tree.
 "scripts/ci/**/*.py" = ["INP001"]
+# These helpers and entry points are likewise used through direct execution
+# with sibling imports rather than as importable packages.
+"scripts/mcps/_mcp_utils.py" = ["INP001"]
+"scripts/repo/_repo_layout.py" = ["INP001"]
 
 [lint.isort]
 # Just force this, its better than dealing with a mishmash of modules that have annotations and those that don't
