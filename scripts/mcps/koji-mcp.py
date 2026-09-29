@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Koji MCP Server.
 
 Exposes tools for setting a Koji base URL and fetching pages/logs relative
@@ -17,6 +20,7 @@ as many pages/logs as needed without bothering the user again.
 
 from __future__ import annotations
 
+import http.client
 import os
 import ssl
 import sys
@@ -80,7 +84,7 @@ if _insecure_urls:
     )
 
 
-def _add_status(result: StatusDict, full: bool) -> StatusDict:
+def _add_status(result: StatusDict, *, full: bool) -> StatusDict:
     """Build a snapshot of the MCP server's current state."""
     status = {
         "default_base_url": _base_url,
@@ -121,7 +125,8 @@ def set_koji_url(base_url: str) -> StatusDict:
     KOJI_BASE_URL environment variable, but the tool will still
     allow resetting it at runtime.
     """
-    global _base_url
+    # This tool intentionally updates process-wide MCP configuration under lock.
+    global _base_url  # noqa: PLW0603
     with _tool_lock:
         old_url = _base_url
         normalized, err = validate_base_url(base_url)
@@ -174,8 +179,110 @@ def koji_allow_insecure(override_base_url: str | None = None) -> StatusDict:
         return _add_status({"allowed_url": url}, full=True)
 
 
+def _resolve_fetch_url(
+    path: str,
+    override_base_url: str | None,
+) -> tuple[str, str, StatusDict | None]:
+    """Resolve and validate the base URL and request path."""
+    if override_base_url:
+        base, err = validate_base_url(override_base_url)
+        if err:
+            return "", "", _add_status({"error": err}, full=False)
+    else:
+        base = _base_url
+
+    if not base:
+        error = "No Koji URL available. Pass override_base_url or call set_koji_url first."
+        return "", "", _add_status({"error": error}, full=False)
+    if not path.startswith("/"):
+        return "", "", _add_status({"error": "path must start with '/'"}, full=False)
+
+    url = base + path
+    ssrf_err = check_ssrf(base, url)
+    if ssrf_err:
+        return "", "", _add_status({"error": ssrf_err}, full=False)
+    return base, url, None
+
+
+def _ssl_context(url: str, base: str) -> ssl.SSLContext | None:
+    """Build an insecure SSL context only for an explicitly approved URL."""
+    if urlparse(url).scheme != "https" or base not in _insecure_urls:
+        return None
+
+    ssl_ctx = ssl.create_default_context()
+    ssl_ctx.check_hostname = False
+    ssl_ctx.verify_mode = ssl.CERT_NONE
+    return ssl_ctx
+
+
+def _connection_error(url: str, error: object) -> StatusDict:
+    """Return the standard Koji connectivity error."""
+    return _add_status(
+        {
+            "error": (
+                f"can't fetch {url}: {error}. "
+                "NOTE: Koji is typically only accessible via a secure connection "
+                "(e.g., VPN or corporate network). If you are seeing connection "
+                "errors or timeouts, please verify that you are connected to the "
+                "appropriate network before retrying."
+            )
+        },
+        full=False,
+    )
+
+
+def _fetch_url(
+    req: urllib.request.Request,
+    ssl_ctx: ssl.SSLContext | None,
+    base: str,
+    url: str,
+) -> tuple[bytes, StatusDict | None]:
+    """Fetch a validated Koji URL and translate expected failures."""
+    try:
+        with urllib.request.urlopen(  # noqa: S310 - Request URL was validated above.
+            req,
+            context=ssl_ctx,
+            timeout=10,
+        ) as resp:
+            return resp.read(), None
+    except urllib.error.URLError as e:
+        # urllib wraps SSL errors inside URLError.reason
+        if isinstance(e.reason, (ssl.SSLCertVerificationError, ssl.SSLError)):
+            _ssl_errors_seen.add(base)
+            return b"", _add_status(
+                {
+                    "error": (
+                        f"SSL certificate verification failed for {url}: "
+                        f"{e.reason}. "
+                        "The server **may** be using a self-signed "
+                        "certificate (don't assume — it could be a "
+                        "misconfiguration or an attack). "
+                        "You **MUST** inform the user about the security "
+                        "implications of allowing insecure connections, "
+                        "then offer the user a selection of two options: "
+                        "proceed or abort (use 'ask_questions/ask_user' "
+                        "tools if available, with 'no' as the "
+                        "default/first option). "
+                        "If the user chooses to proceed, call the "
+                        "koji_allow_insecure tool. "
+                        "DO NOT proceed without explicit user approval "
+                        "for the SPECIFIC URL."
+                    )
+                },
+                full=False,
+            )
+        return b"", _connection_error(url, e)
+    except (OSError, UnicodeError) as e:
+        return b"", _connection_error(url, e)
+    except http.client.HTTPException as e:
+        return b"", _connection_error(url, e)
+
+
 @mcp.tool()
-def koji_fetch(path: str, override_base_url: str | None = None) -> StatusDict:
+def koji_fetch(
+    path: str,
+    override_base_url: str | None = None,
+) -> StatusDict:
     """Fetch a page or log from Koji.
 
     `path` is appended to the base URL. The base URL is resolved as: `override_base_url` if provided, otherwise the
@@ -189,93 +296,17 @@ def koji_fetch(path: str, override_base_url: str | None = None) -> StatusDict:
     without bloating the LLM context.
     """
     with _tool_lock:
-        if override_base_url:
-            base, err = validate_base_url(override_base_url)
-            if err:
-                return _add_status({"error": err}, full=False)
-        else:
-            base = _base_url
+        base, url, request_error = _resolve_fetch_url(path, override_base_url)
+        if request_error is not None:
+            return request_error
 
-        if not base:
-            return _add_status(
-                {"error": "No Koji URL available. Pass override_base_url or call set_koji_url first."},
-                full=False,
-            )
-
-        if not path.startswith("/"):
-            return _add_status({"error": "path must start with '/'"}, full=False)
-
-        url = base + path
-
-        # Guard against SSRF via URL authority tricks (e.g. path="@evil.com/..." or ":8080/...")
-        ssrf_err = check_ssrf(base, url)
-        if ssrf_err:
-            return _add_status({"error": ssrf_err}, full=False)
-
-        parsed_url = urlparse(url)
-
-        # SSL: verify certs by default, only disable if the user explicitly opted in
-        ssl_ctx = None
-        if parsed_url.scheme == "https" and base in _insecure_urls:
-            ssl_ctx = ssl.create_default_context()
-            ssl_ctx.check_hostname = False
-            ssl_ctx.verify_mode = ssl.CERT_NONE
-
-        req = urllib.request.Request(url, headers={"User-Agent": "koji-mcp/1.0"})
-        try:
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=10) as resp:
-                data = resp.read()
-        except urllib.error.URLError as e:
-            # urllib wraps SSL errors inside URLError.reason
-            if isinstance(e.reason, (ssl.SSLCertVerificationError, ssl.SSLError)):
-                _ssl_errors_seen.add(base)
-                return _add_status(
-                    {
-                        "error": (
-                            f"SSL certificate verification failed for {url}: "
-                            f"{e.reason}. "
-                            "The server **may** be using a self-signed "
-                            "certificate (don't assume — it could be a "
-                            "misconfiguration or an attack). "
-                            "You **MUST** inform the user about the security "
-                            "implications of allowing insecure connections, "
-                            "then offer the user a selection of two options: "
-                            "proceed or abort (use 'ask_questions/ask_user' "
-                            "tools if available, with 'no' as the "
-                            "default/first option). "
-                            "If the user chooses to proceed, call the "
-                            "koji_allow_insecure tool. "
-                            "DO NOT proceed without explicit user approval "
-                            "for the SPECIFIC URL."
-                        )
-                    },
-                    full=False,
-                )
-            return _add_status(
-                {
-                    "error": (
-                        f"can't fetch {url}: {e}. "
-                        "NOTE: Koji is typically only accessible via a secure connection "
-                        "(e.g., VPN or corporate network). If you are seeing connection "
-                        "errors or timeouts, please verify that you are connected to the "
-                        "appropriate network before retrying."
-                    )
-                },
-                full=False,
-            )
-        except Exception as e:
-            return _add_status(
-                {
-                    "error": (
-                        f"can't fetch {url}: {e}. "
-                        "NOTE: Koji is typically only accessible via a secure connection "
-                        "(e.g., VPN or corporate network). If you are seeing connection "
-                        "errors or timeouts, please verify that you are connected to the "
-                        "appropriate network before retrying."
-                    )
-                },
-                full=False,
-            )
+        req = urllib.request.Request(  # noqa: S310 - URL passed validate_base_url and check_ssrf.
+            url,
+            headers={"User-Agent": "koji-mcp/1.0"},
+        )
+        data, fetch_error = _fetch_url(req, _ssl_context(url, base), base, url)
+        if fetch_error is not None:
+            return fetch_error
 
         try:
             text = data.decode("utf-8")

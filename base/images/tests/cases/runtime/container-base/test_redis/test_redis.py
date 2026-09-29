@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Validate the Redis server on the container-base image."""
 
@@ -17,7 +19,7 @@ def _start_redis(container_exec_shell: ExecShell) -> None:
     wait_until_service_ready(container_exec_shell, "redis-cli ping", contains="PONG")
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_redis_version(container_exec_shell: ExecShell) -> None:
     """The Redis server reports its version."""
     _start_redis(container_exec_shell)
@@ -26,7 +28,7 @@ def test_redis_version(container_exec_shell: ExecShell) -> None:
     assert "redis_version:" in result.output
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_redis_cross_container(client_server_exec_shell: tuple[ExecShell, ExecShell, str]) -> None:
     """A client container reaches the server container's Redis over the network and runs LPUSH."""
     server_exec, client_exec, server_host = client_server_exec_shell

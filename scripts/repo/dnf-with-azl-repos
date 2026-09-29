@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
-"""dnf-with-azl-repos -- invoke ``dnf`` against Azure Linux repos
-discovered under one or more URL prefixes that follow the Standard
-Azure Linux Repo Layout.
+r"""Invoke ``dnf`` against Azure Linux repositories.
 
-For each ``--repo-prefix`` URL the conventional sub-repos described in
+Discover repositories under URL prefixes that follow the Standard Azure Linux
+Repo Layout. For each ``--repo-prefix`` URL the conventional sub-repos described in
 ``_repo_layout.SUBREPOS`` are HEAD-probed; any sub-repo whose
 ``repodata/repomd.xml`` returns 404 is silently skipped (it just
 isn't published under that prefix). Other failure modes -- HTTP
@@ -13,7 +14,7 @@ as fatal so that a transient outage cannot silently shrink the repo
 set passed to ``dnf``. Reachable sub-repos are added with one
 ``--repofrompath <id>,<url> --enablerepo=<id>`` pair each, then any
 trailing dnf arguments are appended verbatim and the wrapper
-``execvp``\\s into ``dnf``.
+``execvp``\s into ``dnf``.
 
 Usage:
     dnf-with-azl-repos [--repo-prefix URL]... [--no-debuginfo]
@@ -43,13 +44,16 @@ import shutil
 import sys
 import urllib.error
 import urllib.request
+from http import HTTPStatus
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _repo_layout import (  # noqa: E402
+from _repo_layout import (
     KIND_DEBUGINFO,
     KIND_SRPMS,
     SUBREPOS,
+    UnsupportedRepoSchemeError,
+    validate_repo_url,
 )
 
 PROG = Path(sys.argv[0]).name
@@ -63,15 +67,18 @@ _PROBE_FAIL = "fail"            # everything else -- surfaced to the user.
 
 
 def die(msg: str, *, code: int = 2) -> None:
+    """Print an error message and terminate the process."""
     print(f"{PROG}: {msg}", file=sys.stderr, flush=True)
     sys.exit(code)
 
 
 def log(msg: str) -> None:
+    """Write an informational message to standard error."""
     print(msg, file=sys.stderr, flush=True)
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
+    """Parse wrapper options while preserving arguments for dnf."""
     parser = argparse.ArgumentParser(
         prog=PROG,
         description=__doc__,
@@ -107,6 +114,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
     if not args.repo_prefix:
         die("at least one --repo-prefix URL is required (try --help)")
+    for prefix in args.repo_prefix:
+        try:
+            validate_repo_url(prefix)
+        except UnsupportedRepoSchemeError as e:
+            die(str(e))
 
     excluded: set[str] = set()
     if args.no_debuginfo:
@@ -126,38 +138,51 @@ def probe_repo(probe_url: str, *, timeout: float = PROBE_TIMEOUT) -> tuple[str, 
     non-2xx HTTP status. The error string is suitable for inclusion in
     a fatal-error message so the user can see the underlying cause.
     """
+    try:
+        validate_repo_url(probe_url)
+    except UnsupportedRepoSchemeError as e:
+        return _PROBE_FAIL, str(e)
+
     url = f"{probe_url.rstrip('/')}/repodata/repomd.xml"
-    req = urllib.request.Request(
+    req = urllib.request.Request(  # noqa: S310 - Repository URL scheme is allowlisted above.
         url, method="HEAD", headers={"User-Agent": USER_AGENT}
     )
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(  # noqa: S310 - Request URL was validated above.
+            req,
+            timeout=timeout,
+        ) as resp:
             # ``status`` is the HTTP status code for http(s); for
-            # ``file://`` and other non-HTTP schemes urllib's response
-            # has no status attribute -- a successful urlopen there
-            # already proved the file exists.
+            # ``file://`` responses have no status attribute -- a
+            # successful urlopen there already proved the file exists.
             status = getattr(resp, "status", None)
-            if status is None or 200 <= status < 300:
-                return _PROBE_OK, None
-            return _PROBE_FAIL, f"HTTP {status}"
+            if status is None or HTTPStatus.OK <= status < HTTPStatus.MULTIPLE_CHOICES:
+                result = (_PROBE_OK, None)
+            else:
+                result = (_PROBE_FAIL, f"HTTP {status}")
     except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return _PROBE_MISSING, None
-        return _PROBE_FAIL, f"HTTP {e.code}"
+        result = (
+            (_PROBE_MISSING, None)
+            if e.code == HTTPStatus.NOT_FOUND
+            else (_PROBE_FAIL, f"HTTP {e.code}")
+        )
     except urllib.error.URLError as e:
         # urllib wraps a `file://` ENOENT as URLError(FileNotFoundError);
         # treat that as MISSING so local fixtures behave like the HTTP 404
         # case.
         if isinstance(e.reason, FileNotFoundError):
-            return _PROBE_MISSING, None
-        return _PROBE_FAIL, f"URL error: {e.reason}"
+            result = (_PROBE_MISSING, None)
+        else:
+            result = (_PROBE_FAIL, f"URL error: {e.reason}")
     except TimeoutError:
-        return _PROBE_FAIL, f"timed out after {timeout:.0f}s"
+        result = (_PROBE_FAIL, f"timed out after {timeout:.0f}s")
     except OSError as e:
-        return _PROBE_FAIL, f"OS error: {e}"
+        result = (_PROBE_FAIL, f"OS error: {e}")
+    return result
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:  # noqa: C901 - repository discovery is one workflow
+    """Discover Azure Linux repositories and execute dnf."""
     if argv is None:
         argv = sys.argv[1:]
     args = parse_args(argv)
@@ -221,7 +246,9 @@ def main(argv: list[str] | None = None) -> int:
         die("no repos discovered under any --repo-prefix")
 
     cmd = ["dnf", *dnf_args, *args.dnf_args]
-    os.execvp(cmd[0], cmd)
+    # dnf is a fixed executable invoked with an argument list, not a shell command.
+    # The wrapper has no cleanup left to perform, so dnf replaces this process.
+    os.execvp(cmd[0], cmd)  # noqa: S606
 
 
 if __name__ == "__main__":

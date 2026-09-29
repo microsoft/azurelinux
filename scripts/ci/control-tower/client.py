@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Shared HTTP client for Azure Linux Control Tower scenario calls.
 
 Provides:
@@ -33,7 +36,7 @@ from urllib3.util.retry import Retry
 if TYPE_CHECKING:
     from azure.core.credentials import TokenCredential
 
-type JsonValue = None | bool | int | float | str | Sequence[JsonValue] | Mapping[str, JsonValue]
+type JsonValue = bool | int | float | str | Sequence[JsonValue] | Mapping[str, JsonValue] | None
 type JsonObject = dict[str, JsonValue]
 
 # JobStatus values from the Control Tower service
@@ -65,6 +68,17 @@ class TokenHolder:
     token: str
 
 
+@dataclass(frozen=True)
+class ControlTowerContext:
+    """Shared transport and authentication state for Control Tower requests."""
+
+    session: requests.Session
+    base_url: str
+    credential: TokenCredential
+    audience: str
+    token_holder: TokenHolder
+
+
 def make_credential() -> TokenCredential:
     """Create a renewable pipeline credential or a local Azure CLI credential."""
     values = {
@@ -87,10 +101,10 @@ def make_credential() -> TokenCredential:
         )
 
     return AzurePipelinesCredential(
-        tenant_id=cast(str, values["tenant_id"]),
-        client_id=cast(str, values["client_id"]),
-        service_connection_id=cast(str, values["service_connection_id"]),
-        system_access_token=cast(str, values["system_access_token"]),
+        tenant_id=cast("str", values["tenant_id"]),
+        client_id=cast("str", values["client_id"]),
+        service_connection_id=cast("str", values["service_connection_id"]),
+        system_access_token=cast("str", values["system_access_token"]),
     )
 
 
@@ -120,6 +134,18 @@ def make_session() -> requests.Session:
 def get_token(credential: TokenCredential, audience: str) -> str:
     """Acquire a bearer token for the given audience."""
     return credential.get_token(f"{audience}/.default").token
+
+
+def make_context(base_url: str, audience: str) -> ControlTowerContext:
+    """Create shared transport and authentication state for one workflow."""
+    credential = make_credential()
+    return ControlTowerContext(
+        session=make_session(),
+        base_url=base_url,
+        credential=credential,
+        audience=audience,
+        token_holder=TokenHolder(token=get_token(credential, audience)),
+    )
 
 
 def _auth_headers(token: str) -> dict[str, str]:
@@ -195,20 +221,17 @@ def format_error(response: requests.Response) -> str:
 
 
 def _request_with_refresh(
-    session: requests.Session,
+    client: ControlTowerContext,
     method: str,
     url: str,
-    credential: TokenCredential,
-    audience: str,
-    token_holder: TokenHolder,
     *,
     json_payload: JsonObject | None = None,
 ) -> requests.Response:
     """Issue a request. On a 401, refresh the bearer token once and retry."""
-    response = session.request(
+    response = client.session.request(
         method,
         url,
-        headers=_auth_headers(token_holder.token),
+        headers=_auth_headers(client.token_holder.token),
         json=json_payload,
         timeout=(10, 60),
     )
@@ -217,11 +240,11 @@ def _request_with_refresh(
             "Bearer token rejected (401) — refreshing and retrying once...",
             flush=True,
         )
-        token_holder.token = get_token(credential, audience)
-        response = session.request(
+        client.token_holder.token = get_token(client.credential, client.audience)
+        response = client.session.request(
             method,
             url,
-            headers=_auth_headers(token_holder.token),
+            headers=_auth_headers(client.token_holder.token),
             json=json_payload,
             timeout=(10, 60),
         )
@@ -245,12 +268,8 @@ def _parse_json_object(response: requests.Response, context: str) -> JsonObject:
 
 
 def post_scenario(
-    session: requests.Session,
-    base_url: str,
+    client: ControlTowerContext,
     path: str,
-    credential: TokenCredential,
-    audience: str,
-    token_holder: TokenHolder,
     payload: JsonObject,
     *,
     context: str,
@@ -263,14 +282,11 @@ def post_scenario(
     """
     if not path.startswith("/"):
         path = "/" + path
-    url = f"{base_url}{path}"
+    url = f"{client.base_url}{path}"
     response = _request_with_refresh(
-        session,
+        client,
         "POST",
         url,
-        credential,
-        audience,
-        token_holder,
         json_payload=payload,
     )
     if not response.ok:
@@ -279,16 +295,12 @@ def post_scenario(
 
 
 def get_job_status(
-    session: requests.Session,
-    base_url: str,
-    credential: TokenCredential,
-    audience: str,
-    token_holder: TokenHolder,
+    client: ControlTowerContext,
     job_id: str,
 ) -> JsonObject:
     """GET the job status. Refreshes the bearer token on 401 and retries once."""
-    url = f"{base_url}/api/Workflow/jobs/status/{job_id}"
-    response = _request_with_refresh(session, "GET", url, credential, audience, token_holder)
+    url = f"{client.base_url}/api/Workflow/jobs/status/{job_id}"
+    response = _request_with_refresh(client, "GET", url)
     if not response.ok:
         raise RuntimeError("Control Tower job status request failed.\n" + format_error(response))
     return _parse_json_object(response, "Control Tower job status")
@@ -330,11 +342,7 @@ def _poll_interval_seconds(elapsed_seconds: float) -> int:
 
 
 def poll_until_terminal(
-    session: requests.Session,
-    base_url: str,
-    credential: TokenCredential,
-    audience: str,
-    token_holder: TokenHolder,
+    client: ControlTowerContext,
     job_id: str,
     poll_timeout_seconds: int,
 ) -> tuple[JsonObject, bool]:
@@ -353,7 +361,7 @@ def poll_until_terminal(
     job_status_object: JsonObject = {}
 
     while True:
-        job_status_object = get_job_status(session, base_url, credential, audience, token_holder, job_id)
+        job_status_object = get_job_status(client, job_id)
         raw_status = job_status_object.get("status")
         current_status = raw_status if isinstance(raw_status, str) else "Unknown"
         elapsed = int(time.monotonic() - start)

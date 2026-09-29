@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Resolve the ``(base, source)`` commit range for a post-merge delta build.
 
 Strategy (see ``.github/workflows/ado/templates/steps/commit-range-postmerge.yml``):

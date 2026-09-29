@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Container runtime orchestration using python-on-whales.
 
@@ -11,13 +13,16 @@ from __future__ import annotations
 import logging
 import time
 import uuid
-from pathlib import Path
-from typing import Iterator, NamedTuple, Protocol, cast
+from typing import TYPE_CHECKING, NamedTuple, Protocol, cast
 
 from python_on_whales import DockerClient
 from python_on_whales.exceptions import DockerException, NoSuchContainer, NoSuchImage
 
 from .tools import NativeTool
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -48,19 +53,19 @@ class ContainerExecResult(NamedTuple):
 class ExecShell(Protocol):
     """Run a shell command string inside a test container."""
 
-    def __call__(self, command: str, *, shell: str = "bash") -> ContainerExecResult: ...
+    def __call__(self, command: str, *, shell: str = "bash") -> ContainerExecResult: ...  # noqa: D102 - contract documented by protocol class
 
 
 class WriteFile(Protocol):
     """Write file content into a test container (trailing newline normalized)."""
 
-    def __call__(self, path: str, content: str) -> ContainerExecResult: ...
+    def __call__(self, path: str, content: str) -> ContainerExecResult: ...  # noqa: D102 - contract documented by protocol class
 
 
 class WaitForHttp(Protocol):
     """Poll an in-container HTTP endpoint until it responds, or raise on timeout."""
 
-    def __call__(
+    def __call__(  # noqa: D102 - contract documented by protocol class
         self,
         url: str,
         *,
@@ -74,7 +79,7 @@ class WaitForHttp(Protocol):
 class AssertHttpServer(Protocol):
     """Start an HTTP server in the container, wait for it, and assert the response body."""
 
-    def __call__(
+    def __call__(  # noqa: D102 - contract documented by protocol class
         self,
         start_command: str,
         url: str,
@@ -258,18 +263,19 @@ def create_container(
         networks=networks or [],
     )
 
-    # Verify the container is running and exec works.
+    # Keep readiness failures inside this boundary so every startup failure
+    # removes the container before propagating to the caller.
     try:
         container.reload()
         if container.state.status != "running":
-            raise ContainerRuntimeError(
+            raise ContainerRuntimeError(  # noqa: TRY301
                 f"Container {container_name} is not running "
                 f"(status: {container.state.status})"
             )
 
         result = exec_in_container(client, container_name, ["echo", "ready"])
         if result.exit_code != 0:
-            raise ContainerRuntimeError(
+            raise ContainerRuntimeError(  # noqa: TRY301
                 f"Container exec readiness check failed for {container_name} "
                 f"(exit_code={result.exit_code}, output={result.output!r})"
             )
@@ -278,7 +284,7 @@ def create_container(
         logger.warning("Readiness check failed; removing container %s", container_name)
         try:
             container.remove(force=True)
-        except Exception as cleanup_exc:
+        except Exception as cleanup_exc:  # noqa: BLE001 - preserve the original startup failure
             logger.warning("Failed to clean up container %s: %s", container_name, cleanup_exc)
         raise
 

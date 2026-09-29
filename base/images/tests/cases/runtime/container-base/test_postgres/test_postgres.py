@@ -1,13 +1,18 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Validate the PostgreSQL server on the container-base image."""
 
 from __future__ import annotations
 
 import contextlib
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 import pytest
 from utils.container_runtime import ExecShell, wait_until_service_ready
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 DB_PORT = 5432
 DB_NAME = "postgres"
@@ -71,6 +76,7 @@ def _run_crud_workflow(exec_shell: ExecShell, host: str) -> None:
     """Create a table, insert two rows, and read them back against the DB at ``host``."""
     psql = f"PGPASSWORD={DB_PASSWORD} psql -h {host} -p {DB_PORT} -U {DB_USER} -d {DB_NAME}"
 
+    # All queries and values in this test workflow are fixed; none accept external input.
     create = exec_shell(f'{psql} -c "CREATE TABLE cities (name varchar(80), location point);"')
     assert create.exit_code == 0, f"create failed: {create.output}"
     assert "CREATE TABLE" in create.output
@@ -83,13 +89,13 @@ def _run_crud_workflow(exec_shell: ExecShell, host: str) -> None:
     assert insert.exit_code == 0, f"insert failed: {insert.output}"
     assert insert.output.count("INSERT 0 1") == EXPECTED_ROWS, f"expected two inserts: {insert.output}"
 
-    select = exec_shell(f'{psql} -c "SELECT * FROM cities;"')
+    select = exec_shell(f'{psql} -c "SELECT * FROM cities;"')  # noqa: S608
     assert select.exit_code == 0, f"select failed: {select.output}"
     assert f"{EXPECTED_ROWS} rows" in select.output, f"expected {EXPECTED_ROWS} rows: {select.output}"
 
 
 def _assert_bad_auth_rejected(exec_shell: ExecShell, host: str) -> None:
-    """A wrong password must be rejected, proving the scram rule is enforced (not trust)."""
+    """Verify that a wrong password is rejected by the scram rule."""
     bad_auth = exec_shell(
         f"PGPASSWORD=wrong psql -h {host} -p {DB_PORT} -U {DB_USER} -d {DB_NAME} -c 'SELECT 1;'",
     )
@@ -97,7 +103,7 @@ def _assert_bad_auth_rejected(exec_shell: ExecShell, host: str) -> None:
     assert "authentication failed" in bad_auth.output, f"unexpected auth error: {bad_auth.output}"
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_postgresql_version(container_exec_shell: ExecShell) -> None:
     """The PostgreSQL server binary reports a version."""
     result = container_exec_shell("postgres --version")
@@ -105,7 +111,7 @@ def test_postgresql_version(container_exec_shell: ExecShell) -> None:
     assert "postgres (PostgreSQL)" in result.output
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_postgresql_database_server(container_exec_shell: ExecShell) -> None:
     """Server accepts TCP connections and handles create/insert/select."""
     _start_postgresql(container_exec_shell)
@@ -113,7 +119,7 @@ def test_postgresql_database_server(container_exec_shell: ExecShell) -> None:
     _run_crud_workflow(container_exec_shell, "localhost")
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_postgresql_cross_container(client_server_exec_shell: tuple[ExecShell, ExecShell, str]) -> None:
     """A client container reaches a server container's database over the network."""
     server_exec, client_exec, server_host = client_server_exec_shell

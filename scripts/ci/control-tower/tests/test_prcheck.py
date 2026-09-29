@@ -1,12 +1,18 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Contract tests for the Control Tower PR-check entry point."""
 
 from __future__ import annotations
 
 from argparse import Namespace
+from typing import TYPE_CHECKING
 from unittest.mock import Mock
 
-import pytest
 import run_prcheck
+
+if TYPE_CHECKING:
+    import pytest
 
 
 def test_main_uses_pipeline_service_connection(monkeypatch: pytest.MonkeyPatch) -> None:

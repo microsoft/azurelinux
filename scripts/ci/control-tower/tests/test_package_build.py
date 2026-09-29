@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Contract tests for Control Tower package-build entry points."""
 
 from __future__ import annotations
@@ -49,9 +52,9 @@ def _submit(*, wait_for_completion: bool = False) -> None:
 class TestPackageBuildLifecycle:
     """Verify shared submission and polling behavior."""
 
+    @pytest.mark.usefixtures("lifecycle_mocks")
     def test_uses_pipeline_service_connection(
         self,
-        lifecycle_mocks: tuple[Mock, Mock, Mock, Mock],
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Use the identity authenticated by the enclosing AzureCLI task."""

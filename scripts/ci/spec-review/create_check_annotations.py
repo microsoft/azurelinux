@@ -1,20 +1,28 @@
 #!/usr/bin/env python3
-"""
-Generate GitHub Check annotations from spec review report.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+"""Generate GitHub Check annotations from spec review report.
 
 Usage:
     python create_check_annotations.py report.json --workflow-commands
     python create_check_annotations.py report.json --json
     python create_check_annotations.py report.json --repo-root /path/to/repo
 """
+from __future__ import annotations
 
 import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from _common import get_repo_relative_path
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+
+    from _report_types import RawFinding, RawReport
 
 # Mapping from finding category to (workflow command level, checks API level, checks API title)
 _SEVERITY_MAP = {
@@ -24,7 +32,21 @@ _SEVERITY_MAP = {
 }
 
 
-def _iter_findings(report: dict, repo_root: Optional[Path] = None):
+class CheckAnnotation(TypedDict):
+    """One GitHub Checks API annotation."""
+
+    path: str
+    start_line: int
+    end_line: int
+    annotation_level: str
+    message: str
+    title: str
+
+
+def _iter_findings(
+    report: RawReport,
+    repo_root: Path | None = None,
+) -> Iterator[tuple[str, str, RawFinding]]:
     """Yield (spec_file, category, finding) for every finding in the report."""
     for review in report.get("spec_reviews", []):
         spec_file = get_repo_relative_path(review.get("spec_file", ""), repo_root)
@@ -33,7 +55,10 @@ def _iter_findings(report: dict, repo_root: Optional[Path] = None):
                 yield spec_file, category, finding
 
 
-def _format_message(finding: dict, escape_fn=None) -> str:
+def _format_message(
+    finding: RawFinding,
+    escape_fn: Callable[[str], str] | None = None,
+) -> str:
     """Build a message string from a finding, optionally escaping it."""
     desc = finding.get("description", "")
     citation = finding.get("citation")
@@ -55,7 +80,7 @@ def escape_workflow_command(s: str) -> str:
     return s.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A").replace(":", "%3A").replace(",", "%2C")
 
 
-def generate_workflow_commands(report: dict, repo_root: Optional[Path] = None) -> list[str]:
+def generate_workflow_commands(report: RawReport, repo_root: Path | None = None) -> list[str]:
     """Generate GitHub Actions workflow commands for annotations."""
     commands = []
     for spec_file, category, finding in _iter_findings(report, repo_root):
@@ -67,9 +92,12 @@ def generate_workflow_commands(report: dict, repo_root: Optional[Path] = None) -
     return commands
 
 
-def generate_check_annotations(report: dict, repo_root: Optional[Path] = None) -> list[dict]:
+def generate_check_annotations(
+    report: RawReport,
+    repo_root: Path | None = None,
+) -> list[CheckAnnotation]:
     """Generate annotations for GitHub Checks API."""
-    annotations = []
+    annotations: list[CheckAnnotation] = []
     for spec_file, category, finding in _iter_findings(report, repo_root):
         _, api_level, title = _SEVERITY_MAP[category]
         line = finding.get("line") or 1
@@ -88,6 +116,7 @@ def generate_check_annotations(report: dict, repo_root: Optional[Path] = None) -
 
 
 def main() -> int:
+    """Generate check annotations from a spec-review report."""
     parser = argparse.ArgumentParser(description="Generate check annotations from spec review")
     parser.add_argument("file", type=Path, help="Path to report JSON")
     parser.add_argument(
@@ -105,8 +134,8 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        with open(args.file, encoding="utf-8") as f:
-            report = json.load(f)
+        with args.file.open(encoding="utf-8") as f:
+            report = cast("RawReport", json.load(f))
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1

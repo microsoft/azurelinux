@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """File content parsers for image validation."""
 
@@ -5,9 +7,12 @@ from __future__ import annotations
 
 import logging
 import subprocess
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .tools import NativeTool
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +30,8 @@ def parse_os_release(content: str) -> dict[str, str]:
     Handles quoted and unquoted values per the os-release spec.
     """
     result: dict[str, str] = {}
-    for line in content.splitlines():
-        line = line.strip()
+    for raw_line in content.splitlines():
+        line = raw_line.strip()
         if not line or line.startswith("#"):
             continue
         if "=" not in line:
@@ -35,7 +40,7 @@ def parse_os_release(content: str) -> dict[str, str]:
         key = key.strip()
         value = value.strip()
         # Strip matching quotes
-        if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):  # noqa: PLR2004 - matching quotes require two characters
             value = value[1:-1]
         result[key] = value
     logger.debug("Parsed os-release: %d keys", len(result))

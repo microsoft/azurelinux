@@ -1,17 +1,18 @@
-#!/usr/bin/env python3
-"""
-Post (or update/delete) a PR comment with rendered-spec drift results.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+r"""Post (or update/delete) a PR comment with rendered-spec drift results.
 
 Reads the JSON report produced by check_rendered_specs.py and posts a
 formatted comment on the PR. Designed to run in a workflow_run context
 where the base repo's GITHUB_TOKEN is available (needed for fork PRs).
 
 Usage:
-    python post_render_comment.py \\
-        --report render-check-report.json \\
-        --repo owner/repo \\
-        --pr 123 \\
-        --artifacts-url https://... \\
+    python post_render_comment.py \
+        --report render-check-report.json \
+        --repo owner/repo \
+        --pr 123 \
+        --artifacts-url https://... \
         --run-id 12345
 
 Exit codes:
@@ -31,13 +32,21 @@ import re
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from _report_types import ContentDiff, RenderedFile, RenderReport
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
 COMMENT_MARKER = "<!-- RENDERED_SPEC_CHECK -->"
+MAX_COMPONENTS_IN_COMMAND = 30
 MAX_INLINE_DIFFS = 10
 MAX_FILE_LIST = 50
 MAX_COMMENT_CHARS = 60_000
@@ -95,19 +104,107 @@ def _fence_for(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-# NOTE: _render_command is duplicated in check_rendered_specs.py
-def _render_command(components: list[str], use_all: bool = False) -> str:
-    if use_all or len(components) > 30:
+# Keep this command formatting synchronized with check_rendered_specs.py.
+def _render_command(components: list[str], *, use_all: bool = False) -> str:
+    if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component render -a --clean-stale"
     return f"azldev component render {' '.join(components)}"
 
 
+@dataclass
+class _CommentBudget:
+    """Track the current comment size against its maximum."""
+
+    used: int
+    cap: int
+
+
+def _append_content_diffs(
+    lines: list[str],
+    content_diffs: Sequence[ContentDiff],
+    budget: _CommentBudget,
+) -> None:
+    """Append inline content diffs without exceeding the comment budget."""
+    lines.extend(["### Content diffs", ""])
+    for shown, item in enumerate(content_diffs):
+        if shown >= MAX_INLINE_DIFFS:
+            remaining = len(content_diffs) - shown
+            lines.extend(
+                [
+                    (
+                        f"*… and {remaining} more file(s). "
+                        "Run the remediation command above to see all changes.*"
+                    ),
+                    "",
+                ]
+            )
+            break
+        path = _safe_path(item["path"])
+        diff_text = item.get("diff", "")
+        fence = _fence_for(diff_text)
+        # Keep attacker-controlled paths and diff bodies in code formatting.
+        block = f"<details>\n<summary>`{path}`</summary>\n\n{fence}diff\n{diff_text}\n{fence}\n\n</details>\n"
+        if budget.used + len(block) > budget.cap:
+            remaining = len(content_diffs) - shown
+            lines.extend(
+                [
+                    (
+                        f"*… and {remaining} more file(s) — comment size limit reached. "
+                        "Run the remediation command above to see all changes.*"
+                    ),
+                    "",
+                ]
+            )
+            break
+        lines.append(block)
+        budget.used += len(block)
+
+
+def _append_file_list(
+    lines: list[str],
+    header: str,
+    description: str,
+    items: Sequence[RenderedFile],
+    budget: _CommentBudget,
+) -> None:
+    """Append a bulleted file list without exceeding the comment budget."""
+    lines.extend([header, "", description, ""])
+    shown = 0
+    truncated_for_size = False
+    for item in items[:MAX_FILE_LIST]:
+        entry = f"- `{_safe_path(item['path'])}`"
+        # +1 for the newline added by the final "\n".join(lines).
+        if budget.used + len(entry) + 1 > budget.cap:
+            truncated_for_size = True
+            break
+        lines.append(entry)
+        budget.used += len(entry) + 1
+        shown += 1
+    if truncated_for_size:
+        remaining = len(items) - shown
+        note = (
+            f"\n*… and {remaining} more file(s) — comment size limit reached. "
+            "Run the remediation command above to see all changes.*"
+        )
+    elif len(items) > MAX_FILE_LIST:
+        remaining = len(items) - MAX_FILE_LIST
+        note = f"\n*… and {remaining} more file(s).*"
+    else:
+        note = None
+    if note is not None:
+        lines.append(note)
+        budget.used += len(note) + 1
+    lines.append("")
+    budget.used += 1
+
+
 def format_comment(
-    report: dict,
+    report: RenderReport,
     artifacts_url: str | None = None,
     run_id: str | None = None,
     repo: str | None = None,
 ) -> str:
+    """Format rendered-spec drift as a GitHub pull request comment."""
     content_diffs = report.get("content_diffs", [])
     extra_files = report.get("extra_files", [])
     missing_files = report.get("missing_files", [])
@@ -175,96 +272,30 @@ def format_comment(
     # rejected for being too large is effectively invisible (the post step
     # has continue-on-error: true), so a fork PR author could otherwise
     # suppress the drift warning by spamming long or numerous paths.
-    body_so_far = len("\n".join(lines))
-    budget_cap = MAX_COMMENT_CHARS - COMMENT_BUDGET_MARGIN
+    budget = _CommentBudget(
+        used=len("\n".join(lines)),
+        cap=MAX_COMMENT_CHARS - COMMENT_BUDGET_MARGIN,
+    )
 
     if content_diffs:
-        lines.append("### Content diffs")
-        lines.append("")
-        shown = 0
-        for item in content_diffs:
-            if shown >= MAX_INLINE_DIFFS:
-                remaining = n_diff - shown
-                lines.append(f"*… and {remaining} more file(s). Run the remediation command above to see all changes.*")
-                lines.append("")
-                break
-            path = _safe_path(item["path"])
-            diff_text = item.get("diff", "")
-            fence = _fence_for(diff_text)
-            # Emit fixed raw HTML for the collapsible wrapper (`<details>` and
-            # `<summary>`), but keep attacker-controlled content in markdown
-            # code formatting: the path is rendered as code in the summary, and
-            # the diff body is inside a dynamically chosen fence longer than any
-            # backtick run in the diff text.
-            block = f"<details>\n<summary>`{path}`</summary>\n\n{fence}diff\n{diff_text}\n{fence}\n\n</details>\n"
-            if body_so_far + len(block) > budget_cap:
-                remaining = n_diff - shown
-                lines.append(
-                    f"*… and {remaining} more file(s) — comment size limit reached. "
-                    "Run the remediation command above to see all changes.*"
-                )
-                lines.append("")
-                break
-            lines.append(block)
-            body_so_far += len(block)
-            shown += 1
-
-    def _append_file_list(
-        header: str,
-        description: str,
-        items: list[dict],
-    ) -> None:
-        """Append a bulleted file list, enforcing the shared comment budget.
-
-        Stops early once the cumulative body size gets near the GitHub
-        limit, so a fork PR can't suppress the warning by producing either
-        very long paths or a huge number of them.
-        """
-        nonlocal body_so_far
-        lines.append(header)
-        lines.append("")
-        lines.append(description)
-        lines.append("")
-        shown = 0
-        truncated_for_size = False
-        for item in items[:MAX_FILE_LIST]:
-            entry = f"- `{_safe_path(item['path'])}`"
-            # +1 for the newline added by the final "\n".join(lines).
-            if body_so_far + len(entry) + 1 > budget_cap:
-                truncated_for_size = True
-                break
-            lines.append(entry)
-            body_so_far += len(entry) + 1
-            shown += 1
-        if truncated_for_size:
-            remaining = len(items) - shown
-            note = (
-                f"\n*… and {remaining} more file(s) — comment size limit reached. "
-                "Run the remediation command above to see all changes.*"
-            )
-        elif len(items) > MAX_FILE_LIST:
-            remaining = len(items) - MAX_FILE_LIST
-            note = f"\n*… and {remaining} more file(s).*"
-        else:
-            note = None
-        if note is not None:
-            lines.append(note)
-            body_so_far += len(note) + 1
-        lines.append("")
-        body_so_far += 1
+        _append_content_diffs(lines, content_diffs, budget)
 
     if extra_files:
         _append_file_list(
+            lines,
             "### Files to add",
             "These files are produced by `azldev component render` but are missing from your branch. Add them.",
             extra_files,
+            budget,
         )
 
     if missing_files:
         _append_file_list(
+            lines,
             "### Files to remove",
             "These files are in your branch but are not produced by render. Remove them.",
             missing_files,
+            budget,
         )
 
     return "\n".join(lines)
@@ -303,6 +334,7 @@ def find_existing_comments(repo: str, pr: str) -> list[str]:
 
 
 def post_or_update_comment(repo: str, pr: str, body: str) -> None:
+    """Create or update the bot's rendered-spec drift comment."""
     existing_ids = find_existing_comments(repo, pr)
     fd, body_path = tempfile.mkstemp(prefix="render-check-comment-", suffix=".md")
     try:
@@ -342,6 +374,7 @@ def post_or_update_comment(repo: str, pr: str, body: str) -> None:
 
 
 def delete_comment_if_exists(repo: str, pr: str) -> None:
+    """Delete existing rendered-spec drift comments."""
     for existing_id in find_existing_comments(repo, pr):
         print(f"Deleting stale comment {existing_id}")
         try:
@@ -364,6 +397,7 @@ def delete_comment_if_exists(repo: str, pr: str) -> None:
 
 
 def main() -> int:
+    """Post rendered-spec drift results from command-line arguments."""
     parser = argparse.ArgumentParser(description="Post rendered-spec drift results as a PR comment.")
     parser.add_argument(
         "--report",
@@ -378,8 +412,8 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        with open(args.report, encoding="utf-8") as f:
-            report = json.load(f)
+        with args.report.open(encoding="utf-8") as f:
+            report = cast("RenderReport", json.load(f))
     except (FileNotFoundError, json.JSONDecodeError) as exc:
         print(f"Error reading report: {exc}", file=sys.stderr)
         return 1
@@ -408,7 +442,7 @@ def main() -> int:
     if summary_file and body:
         max_summary = 1_000_000  # GH step summary limit is 1024 KiB
         summary = body[:max_summary] if len(body) > max_summary else body
-        with open(summary_file, "a", encoding="utf-8") as sf:
+        with Path(summary_file).open("a", encoding="utf-8") as sf:
             sf.write(summary)
             sf.write("\n")
 

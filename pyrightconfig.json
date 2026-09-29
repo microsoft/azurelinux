@@ -5,9 +5,11 @@
         "**/.venv",
         "**/venv",
         "base/build",
+        "base/comps/kernel",
         "base/out",
         "specs"
     ],
+    "stubPath": "typings",
     "typeCheckingMode": "standard",
     "pythonVersion": "3.12",
     "pythonPlatform": "Linux",

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Minimal stdlib HTTP server used to validate the Python runtime."""
 
 from __future__ import annotations
@@ -9,7 +12,10 @@ RESPONSE = Path(__file__).with_name("response.txt").read_bytes()
 
 
 class Handler(BaseHTTPRequestHandler):
-    def do_GET(self):  # noqa: N802 - http.server API
+    """Serve the fixed response used to validate the Python runtime."""
+
+    def do_GET(self) -> None:
+        """Serve the fixed runtime-validation response."""
         self.send_response(200)
         self.send_header("Content-Type", "text/plain")
         self.end_headers()
@@ -17,4 +23,5 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    HTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+    # Model a network service inside an isolated, disposable test container.
+    HTTPServer(("0.0.0.0", 8080), Handler).serve_forever()  # noqa: S104

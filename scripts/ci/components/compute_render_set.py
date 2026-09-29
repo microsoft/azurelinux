@@ -1,25 +1,59 @@
-"""Compute the render set: components flagged by `azldev component changed`
-plus components whose spec tree was touched directly in the PR.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
-Emits one component name per line on stdout (azldev dedupes internally).
+"""Compute the render set for changed components.
+
+Include components flagged by `azldev component changed` and components whose
+spec tree was touched directly in the PR. Emit one component name per line on
+stdout (azldev dedupes internally).
 """
+from __future__ import annotations
 
 import argparse
 import json
 from pathlib import Path
+from typing import NotRequired, TypedDict, TypeGuard
 
 
-def _load_entries(path: Path) -> list[dict]:
+class ChangedComponent(TypedDict):
+    """Fields consumed from one azldev component-changed entry."""
+
+    component: str
+    changeType: NotRequired[str]
+    sourcesChange: NotRequired[bool]
+
+
+def _is_changed_component(value: object) -> TypeGuard[ChangedComponent]:
+    """Return whether a JSON value has the fields consumed by this script."""
+    if not isinstance(value, dict):
+        return False
+    if not isinstance(value.get("component"), str):
+        return False
+    if "changeType" in value and not isinstance(value["changeType"], str):
+        return False
+    return "sourcesChange" not in value or isinstance(value["sourcesChange"], bool)
+
+
+def _load_entries(path: Path) -> list[ChangedComponent]:
     """Load the changed-components JSON."""
-    return json.loads(path.read_text(encoding="utf-8"))
+    data: object = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        raise TypeError(f"changed-components JSON must be a list, got {type(data).__name__}")
+
+    entries: list[ChangedComponent] = []
+    for entry in data:
+        if not _is_changed_component(entry):
+            raise TypeError(f"invalid changed-components entry: {entry!r}")
+        entries.append(entry)
+    return entries
 
 
-def _renderable_components(entries: list[dict]) -> set[str]:
+def _renderable_components(entries: list[ChangedComponent]) -> set[str]:
     """Component names that azldev can still render (everything except deleted)."""
     return {e["component"] for e in entries if e.get("changeType") != "deleted"}
 
 
-def from_changed(entries: list[dict]) -> list[str]:
+def from_changed(entries: list[ChangedComponent]) -> list[str]:
     """Components from `azldev component changed` JSON.
 
     Includes anything that is not 'deleted' and either has a non-'unchanged'
@@ -53,7 +87,7 @@ def from_specs_diff(path: Path, specs_dir: Path, renderable: set[str]) -> list[s
         if not line.startswith(prefix):
             continue
         parts = line[len(prefix) :].split("/", 2)
-        if len(parts) >= 2 and parts[1]:
+        if len(parts) >= 2 and parts[1]:  # noqa: PLR2004 - layout is prefix/component
             name = parts[1]
             if name in renderable:
                 out.append(name)
@@ -61,6 +95,7 @@ def from_specs_diff(path: Path, specs_dir: Path, renderable: set[str]) -> list[s
 
 
 def main() -> None:
+    """Print components whose rendered specs need regeneration."""
     p = argparse.ArgumentParser()
     p.add_argument("--changed-components-file", type=Path, required=True)
     p.add_argument("--specs-diff-file", type=Path, required=True)

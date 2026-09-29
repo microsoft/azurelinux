@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
-Check rendered specs for drift.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+"""Check rendered specs for drift.
 
 Runs inside the render container: compares the committed specs tree against
 the working tree (after `azldev component render -a` has been run) and writes
@@ -26,10 +28,18 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from _report_types import ContentDiff, RenderedFile, RenderReport
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
+
+MAX_COMPONENTS_IN_COMMAND = 30
 
 # ---------------------------------------------------------------------------
 # Git helpers
@@ -59,11 +69,11 @@ def _resolve_head_blobs(paths: list[str]) -> dict[str, str]:
     if not paths:
         return {}
     raw = _git_bytes("ls-tree", "-z", "HEAD", "--", *paths).decode("utf-8")
-    out: dict[str, str] = {p: "" for p in paths}
+    out: dict[str, str] = dict.fromkeys(paths, "")
     for entry in raw.split("\0"):
         if not entry:
             continue
-        # Format: "<mode> <type> <sha>\t<path>"
+        # Format: "<mode> <type> <sha>\t<path>"  # noqa: ERA001
         meta, _, path = entry.partition("\t")
         try:
             _, kind, sha = meta.split(" ")
@@ -93,17 +103,17 @@ def component_from_path(file_path: str, specs_dir: Path) -> str:
     absolute path (azldev's `WithAbsolutePaths` resolves it during config
     dump) while `git diff --name-only` emits repo-relative paths. We use
     `.resolve()` on `specs_dir` to canonicalize that absolute path, and
-    `os.path.abspath` (lexical, does NOT follow symlinks) on `file_path`
+    lexical path normalization (which does NOT follow symlinks) on `file_path`
     so attacker-controlled symlinks under specs_dir can't escape the
     component-attribution check by resolving outside the tree or to a
     sibling component. The `is_symlink()` branch in `build_content_diffs`
     is the layer that actually refuses to read symlinks; this function
     just needs to label them correctly without crashing.
     """
-    file_abs = os.path.abspath(file_path)
-    specs_abs = str(specs_dir.resolve())
-    rel = Path(file_abs).relative_to(specs_abs)
-    if len(rel.parts) >= 2:
+    file_abs = Path(os.path.normpath(Path.cwd() / file_path))
+    specs_abs = specs_dir.resolve()
+    rel = file_abs.relative_to(specs_abs)
+    if len(rel.parts) >= 2:  # noqa: PLR2004 - layout is prefix/component
         return rel.parts[1]
     return rel.parts[0] if rel.parts else ""
 
@@ -132,13 +142,13 @@ def classify_changes(specs_dir: Path) -> tuple[list[str], list[str], list[str]]:
     return changed, extra, missing
 
 
-def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[dict]:
+def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[ContentDiff]:
     """Build diff entries for changed files.
 
     Reads committed and working-tree versions, compares them, and returns
     a list of diff entries for files that actually differ.
     """
-    real_diffs: list[dict] = []
+    real_diffs: list[ContentDiff] = []
     # Resolve all HEAD blob hashes up front so we can fetch each file's
     # committed contents by hash (`git cat-file blob <sha>`) instead of by
     # rev-parse string (`git show HEAD:<path>`). The hash form sidesteps a
@@ -261,11 +271,11 @@ def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[dict]
 
 
 def build_report(
-    content_diffs: list[dict],
+    content_diffs: list[ContentDiff],
     extra_files: list[str],
     missing_files: list[str],
     specs_dir: Path,
-) -> dict:
+) -> RenderReport:
     """Build the JSON-serialisable report."""
     return {
         "content_diffs": content_diffs,
@@ -279,7 +289,7 @@ def build_report(
 # ---------------------------------------------------------------------------
 
 
-def _unique_components(items: list[dict]) -> list[str]:
+def _unique_components(items: Sequence[RenderedFile]) -> list[str]:
     seen: set[str] = set()
     out: list[str] = []
     for item in items:
@@ -292,14 +302,14 @@ def _unique_components(items: list[dict]) -> list[str]:
 
 
 # NOTE: _unique_components and _render_command are duplicated in post_render_comment.py
-def _render_command(components: list[str], use_all: bool = False) -> str:
-    if use_all or len(components) > 30:
+def _render_command(components: list[str], *, use_all: bool = False) -> str:
+    if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component render -a --clean-stale"
     return f"azldev component render {' '.join(components)}"
 
 
 def generate_patch(
-    content_diffs: list[dict],
+    content_diffs: Sequence[ContentDiff],
     extra_files: list[str],
     missing_files: list[str],
     specs_dir: Path,
@@ -401,6 +411,7 @@ def generate_patch(
 
 
 def main() -> int:
+    """Check rendered specs and write the requested reports."""
     parser = argparse.ArgumentParser(
         description="Check rendered specs for drift. Outputs a JSON report and optional patch."
     )
@@ -439,7 +450,7 @@ def main() -> int:
 
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
-        with open(args.report, "w", encoding="utf-8") as f:
+        with args.report.open("w", encoding="utf-8") as f:
             json.dump(report, f, indent=2)
         print(f"Report written to {args.report}")
 

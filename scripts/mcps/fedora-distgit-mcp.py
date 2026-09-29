@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
-"""
-Fedora Dist-Git MCP Server — exposes tools for querying Fedora's package
-repositories via the Pagure API and performing git-level searches (pickaxe,
-grep) on cloned repos.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
-All fetched content and cloned repos are stored under a gitignored scratch
-directory to avoid bloating LLM context. Agents use read_file / grep_search
-on the resulting files.
+"""Expose Fedora package repository queries through MCP.
+
+Query repositories through the Pagure API and perform git-level searches
+(pickaxe, grep) on cloned repos. All fetched content and cloned repos are
+stored under a gitignored scratch directory to avoid bloating LLM context.
+Agents use read_file / grep_search on the resulting files.
 
 Repo caching: clones are kept between calls so repeated queries on the same
 package don't re-clone. A configurable limit (default 5) caps the number of
@@ -22,6 +22,8 @@ auto-approved.
 
 from __future__ import annotations
 
+import contextlib
+import http.client
 import json
 import os
 import re
@@ -55,9 +57,9 @@ load_env()
 _DEFAULT_BASE_URL = "https://src.fedoraproject.org"
 _base_url: str = _DEFAULT_BASE_URL
 
-_scratch_dir: str = os.path.join(os.environ.get("AZLDEV_WORK_DIR", "base/build/work"), "scratch", "distgit")
-_repos_dir: str = os.path.join(_scratch_dir, "repos")
-_fetch_dir: str = os.path.join(_scratch_dir, "fetched")
+_scratch_dir = Path(os.environ.get("AZLDEV_WORK_DIR", "base/build/work")) / "scratch" / "distgit"
+_repos_dir = _scratch_dir / "repos"
+_fetch_dir = _scratch_dir / "fetched"
 
 # Maximum number of cached repos before eviction kicks in
 _MAX_CACHED_REPOS = 5
@@ -67,11 +69,12 @@ def _add_status(result: StatusDict, *, full: bool) -> StatusDict:
     """Append server state to a tool result."""
     status: StatusDict = {
         "default_base_url": _base_url,
-        "scratch_dir": _scratch_dir,
+        "scratch_dir": str(_scratch_dir),
     }
     if full:
         repos = _cached_repos()
-        status["cached_repos"] = [os.path.relpath(r, _repos_dir) for r, _ in repos]
+        repos_dir = Path(_repos_dir)
+        status["cached_repos"] = [str(r.relative_to(repos_dir)) for r, _ in repos]
     return result | status
 
 
@@ -80,48 +83,51 @@ def _add_status(result: StatusDict, *, full: bool) -> StatusDict:
 # ---------------------------------------------------------------------------
 
 
-def _repo_path(package: str, base_url: str) -> str:
+def _repo_path(package: str, base_url: str) -> Path:
     """Return the on-disk path for a cached clone, namespaced by origin host."""
     hostname = urlparse(base_url).hostname or "unknown"
-    return os.path.join(_repos_dir, hostname, package)
+    return Path(_repos_dir) / hostname / package
 
 
-def _git_dir(package: str, base_url: str) -> str:
+def _git_dir(package: str, base_url: str) -> Path:
     """Return the .git directory for a cached clone."""
-    return os.path.join(_repo_path(package, base_url), ".git")
+    return _repo_path(package, base_url) / ".git"
 
 
-def _touch_repo(repo_dir: str) -> None:
+def _touch_repo(repo_dir: Path) -> None:
     """Update the mtime of a repo dir to track LRU."""
     os.utime(repo_dir)
 
 
-def _cached_repos() -> list[tuple[str, float]]:
+def _cached_repos() -> list[tuple[Path, float]]:
     """Return list of (repo_dir, mtime) sorted oldest-first.
 
     Scans ``_repos_dir/<hostname>/<package>`` (current layout) and also
     ``_repos_dir/<package>`` (legacy layout before host-namespacing) so
     old caches are still visible for eviction and cleanup.
     """
-    if not os.path.isdir(_repos_dir):
+    repos_dir = Path(_repos_dir)
+    if not repos_dir.is_dir():
         return []
-    repos: list[tuple[str, float]] = []
-    for entry in os.scandir(_repos_dir):
+    repos: list[tuple[Path, float]] = []
+    for entry in repos_dir.iterdir():
         if not entry.is_dir():
             continue
         # Legacy layout: _repos_dir/<package>/.git
-        if os.path.isdir(os.path.join(entry.path, ".git")):
-            repos.append((entry.path, entry.stat().st_mtime))
+        if (entry / ".git").is_dir():
+            repos.append((entry, entry.stat().st_mtime))
         else:
             # Current layout: _repos_dir/<hostname>/<package>/.git
-            for sub in os.scandir(entry.path):
-                if sub.is_dir() and os.path.isdir(os.path.join(sub.path, ".git")):
-                    repos.append((sub.path, sub.stat().st_mtime))
+            repos.extend(
+                (sub, sub.stat().st_mtime)
+                for sub in entry.iterdir()
+                if sub.is_dir() and (sub / ".git").is_dir()
+            )
     repos.sort(key=lambda x: x[1])
     return repos
 
 
-def _evict_if_needed(auto_clean: bool) -> str | None:
+def _evict_if_needed(*, auto_clean: bool) -> str | None:
     """Evict oldest repo(s) if cache is at capacity.
 
     Returns None on success, or a warning string if eviction is needed
@@ -132,7 +138,7 @@ def _evict_if_needed(auto_clean: bool) -> str | None:
         return None
 
     if not auto_clean:
-        names = [os.path.basename(r) for r, _ in repos]
+        names = [r.name for r, _ in repos]
         return (
             f"WARNING: Repo cache is full ({len(repos)}/{_MAX_CACHED_REPOS}). "
             f"Cached repos: {', '.join(names)}. "
@@ -147,7 +153,7 @@ def _evict_if_needed(auto_clean: bool) -> str | None:
     return None
 
 
-def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, str | None]:
+def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str, str | None]:
     """Ensure a clone exists for `package`. Returns (repo_dir, error_or_None)."""
     name_err = validate_package_name(package)
     if name_err:
@@ -155,33 +161,38 @@ def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, st
 
     repo_dir = _repo_path(package, base_url)
 
-    if os.path.isdir(os.path.join(repo_dir, ".git")):
+    if (repo_dir / ".git").is_dir():
         _touch_repo(repo_dir)
         # Fetch latest refs (best-effort)
-        try:
+        with contextlib.suppress(OSError, subprocess.SubprocessError):
             subprocess.run(
                 ["git", "fetch", "--quiet", "--all"],
                 cwd=repo_dir,
                 capture_output=True,
                 timeout=60,
+                check=True,
             )
-        except Exception:
-            pass
-        return repo_dir, None
+        return str(repo_dir), None
 
     # Check cache capacity before cloning
-    warn = _evict_if_needed(auto_clean)
+    warn = _evict_if_needed(auto_clean=auto_clean)
     if warn:
         return "", warn
 
-    os.makedirs(os.path.dirname(repo_dir), exist_ok=True)
     clone_url = f"{base_url}/rpms/{package}.git"
+    return _clone_repo(repo_dir, clone_url)
+
+
+def _clone_repo(repo_dir: Path, clone_url: str) -> tuple[str, str | None]:
+    """Clone a dist-git repository and translate expected failures."""
+    repo_dir.parent.mkdir(parents=True, exist_ok=True)
     try:
         result = subprocess.run(
-            ["git", "clone", "--quiet", clone_url, repo_dir],
+            ["git", "clone", "--quiet", clone_url, str(repo_dir)],
             capture_output=True,
             text=True,
             timeout=120,
+            check=False,
         )
     except subprocess.TimeoutExpired:
         shutil.rmtree(repo_dir, ignore_errors=True)
@@ -195,7 +206,31 @@ def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, st
         return "", f"git clone failed (exit {result.returncode}): {stderr}"
 
     _touch_repo(repo_dir)
-    return repo_dir, None
+    return str(repo_dir), None
+
+
+def _fetch_url(url: str) -> tuple[bytes, StatusDict | None]:
+    """Fetch a validated dist-git URL and translate expected failures."""
+    req = urllib.request.Request(  # noqa: S310 - URL passed validate_base_url and check_ssrf.
+        url,
+        headers={"User-Agent": "fedora-distgit-mcp/1.0"},
+    )
+
+    try:
+        with urllib.request.urlopen(  # noqa: S310 - Request URL was validated above.
+            req,
+            timeout=15,
+        ) as resp:
+            return resp.read(), None
+    except urllib.error.HTTPError as e:
+        error = f"HTTP {e.code} fetching {url}: {e.reason}"
+    except urllib.error.URLError as e:
+        error = f"can't fetch {url}: {e.reason}"
+    except (OSError, UnicodeError) as e:
+        error = f"can't fetch {url}: {e}"
+    except http.client.HTTPException as e:
+        error = f"can't fetch {url}: {e}"
+    return b"", _add_status({"error": error}, full=False)
 
 
 # ---------------------------------------------------------------------------
@@ -218,8 +253,10 @@ def set_distgit_url(base_url: str) -> StatusDict:
     """Set the Fedora dist-git base URL.
 
     Defaults to https://src.fedoraproject.org. Only needs to be called if
-    using a mirror or alternate instance."""
-    global _base_url
+    using a mirror or alternate instance.
+    """
+    # This tool intentionally updates process-wide MCP configuration under lock.
+    global _base_url  # noqa: PLW0603
     with _tool_lock:
         old_url = _base_url
         normalized, err = validate_base_url(base_url)
@@ -241,7 +278,8 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
       - /api/0/rpms/atlas/git/branches (list branches)
       - /rpms/atlas/raw/rawhide/f/atlas.spec  (raw spec file)
 
-    Response is written to a temp file. Use read_file or grep_search to inspect."""
+    Response is written to a temp file. Use read_file or grep_search to inspect.
+    """
     with _tool_lock:
         if override_base_url:
             base, err = validate_base_url(override_base_url)
@@ -260,17 +298,9 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
         if ssrf_err:
             return _add_status({"error": ssrf_err}, full=False)
 
-        req = urllib.request.Request(url, headers={"User-Agent": "fedora-distgit-mcp/1.0"})
-
-        try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = resp.read()
-        except urllib.error.HTTPError as e:
-            return _add_status({"error": f"HTTP {e.code} fetching {url}: {e.reason}"}, full=False)
-        except urllib.error.URLError as e:
-            return _add_status({"error": f"can't fetch {url}: {e.reason}"}, full=False)
-        except Exception as e:
-            return _add_status({"error": f"can't fetch {url}: {e}"}, full=False)
+        data, fetch_error = _fetch_url(url)
+        if fetch_error is not None:
+            return fetch_error
 
         try:
             text = data.decode("utf-8")
@@ -288,13 +318,100 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
         return _add_status({"output": output}, full=False)
 
 
+def _validate_search_request(query: str, ref: str, mode: str) -> str | None:
+    """Return an error message when a dist-git search request is invalid."""
+    valid_modes = ("pickaxe", "grep", "log-grep")
+    if mode not in valid_modes:
+        return f"mode must be one of {valid_modes}, got {mode!r}"
+    if not query:
+        return "query must not be empty."
+    if ref != "--all" and ref.startswith("-"):
+        return f"ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."
+    if mode == "grep" and ref == "--all":
+        return "--all is not supported for grep mode; specify a single ref (e.g. 'rawhide')."
+    return None
+
+
+def _build_search_command(git_dir: str, query: str, ref: str, mode: str) -> list[str]:
+    """Build the git command for a validated dist-git search request."""
+    if mode == "pickaxe":
+        ref_args = ["--all"] if ref == "--all" else [ref]
+        return [
+            "git",
+            "--git-dir",
+            git_dir,
+            "log",
+            "--oneline",
+            "-20",
+            f"-S{query}",
+            *ref_args,
+            "--",
+        ]
+    if mode == "grep":
+        return [
+            "git",
+            "--git-dir",
+            git_dir,
+            "grep",
+            "-n",
+            "-i",
+            "-e",
+            query,
+            ref,
+            "--",
+        ]
+    ref_args = ["--all"] if ref == "--all" else [ref]
+    return [
+        "git",
+        "--git-dir",
+        git_dir,
+        "log",
+        "--oneline",
+        "-20",
+        f"--grep={query}",
+        *ref_args,
+    ]
+
+
+def _run_search_command(
+    cmd: list[str],
+    mode: str,
+    query: str,
+    package: str,
+    ref: str,
+) -> tuple[str, StatusDict | None]:
+    """Run a git search command and translate expected failures."""
+    try:
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return "", _add_status({"error": "Search timed out after 30s."}, full=False)
+    except (OSError, ValueError) as e:
+        return "", _add_status({"error": f"running git: {e}"}, full=False)
+
+    output = result.stdout
+    if result.returncode != 0 and not output:
+        # git grep returns 1 for "no match" — that's expected.
+        if mode == "grep" and result.returncode == 1:
+            message = f"No matches found for {query!r} in {package} at {ref}."
+            return "", _add_status({"output": message}, full=False)
+        stderr = result.stderr.strip()
+        return "", _add_status({"error": f"git exited with {result.returncode}: {stderr}"}, full=False)
+    return output, None
+
+
 @mcp.tool()
-def distgit_search(
+def distgit_search(  # noqa: PLR0913, PLR0917 - parameters define the public MCP schema
     package: str,
     query: str,
     ref: str = "rawhide",
     mode: str = "pickaxe",
-    auto_clean: bool = False,
+    auto_clean: bool = False,  # noqa: FBT001, FBT002 - MCP schema field is named
     override_base_url: str | None = None,
 ) -> StatusDict:
     """Search a Fedora package's git history or content.
@@ -327,90 +444,19 @@ def distgit_search(
         else:
             base = _base_url
 
-        valid_modes = ("pickaxe", "grep", "log-grep")
-        if mode not in valid_modes:
-            return _add_status({"error": f"mode must be one of {valid_modes}, got {mode!r}"}, full=False)
-        if not query:
-            return _add_status({"error": "query must not be empty."}, full=False)
-        if ref != "--all" and ref.startswith("-"):
-            return _add_status(
-                {"error": f"ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."},
-                full=False,
-            )
+        validation_error = _validate_search_request(query, ref, mode)
+        if validation_error:
+            return _add_status({"error": validation_error}, full=False)
 
-        repo_dir, err = _ensure_repo(package, auto_clean, base)
+        repo_dir, err = _ensure_repo(package, base, auto_clean=auto_clean)
         if err:
             return _add_status({"error": err}, full=False)
 
-        git_dir = _git_dir(package, base)
-
-        # Build the git command
-        if mode == "pickaxe":
-            ref_args = ["--all"] if ref == "--all" else [ref]
-            cmd = [
-                "git",
-                "--git-dir",
-                git_dir,
-                "log",
-                "--oneline",
-                "-20",
-                f"-S{query}",
-                *ref_args,
-                "--",
-            ]
-        elif mode == "grep":
-            if ref == "--all":
-                return _add_status(
-                    {"error": "--all is not supported for grep mode; specify a single ref (e.g. 'rawhide')."},
-                    full=False,
-                )
-            cmd = [
-                "git",
-                "--git-dir",
-                git_dir,
-                "grep",
-                "-n",
-                "-i",
-                "-e",
-                query,
-                ref,
-                "--",
-            ]
-        elif mode == "log-grep":
-            ref_args = ["--all"] if ref == "--all" else [ref]
-            cmd = [
-                "git",
-                "--git-dir",
-                git_dir,
-                "log",
-                "--oneline",
-                "-20",
-                f"--grep={query}",
-                *ref_args,
-            ]
-
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-        except subprocess.TimeoutExpired:
-            return _add_status({"error": "Search timed out after 30s."}, full=False)
-        except Exception as e:
-            return _add_status({"error": f"running git: {e}"}, full=False)
-
-        output = result.stdout
-        if result.returncode != 0 and not output:
-            # git grep returns 1 for "no match" — that's expected
-            if mode == "grep" and result.returncode == 1:
-                return _add_status(
-                    {"output": f"No matches found for {query!r} in {package} at {ref}."},
-                    full=False,
-                )
-            stderr = result.stderr.strip()
-            return _add_status({"error": f"git exited with {result.returncode}: {stderr}"}, full=False)
+        git_dir = str(_git_dir(package, base))
+        cmd = _build_search_command(git_dir, query, ref, mode)
+        output, search_error = _run_search_command(cmd, mode, query, package, ref)
+        if search_error is not None:
+            return search_error
 
         if not output.strip():
             return _add_status(
@@ -431,11 +477,32 @@ def distgit_search(
         return _add_status({"output": written, "repo_dir": repo_dir}, full=False)
 
 
+def _run_git_show(git_dir: str, commit: str) -> tuple[str, str | None]:
+    """Run git show and translate expected failures."""
+    try:
+        result = subprocess.run(
+            ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit, "--"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return "", "git show timed out after 30s."
+    except (OSError, ValueError) as e:
+        return "", f"running git: {e}"
+
+    if result.returncode != 0:
+        stderr = result.stderr.strip()
+        return "", f"git show failed (exit {result.returncode}): {stderr}"
+    return result.stdout, None
+
+
 @mcp.tool()
 def distgit_show(
     package: str,
     commit: str,
-    auto_clean: bool = False,
+    auto_clean: bool = False,  # noqa: FBT001, FBT002 - MCP schema field is named
     override_base_url: str | None = None,
 ) -> StatusDict:
     """Show a specific commit from a Fedora package's dist-git repo.
@@ -463,32 +530,15 @@ def distgit_show(
         if not re.match(r"^[a-fA-F0-9]{4,40}$", commit):
             return _add_status({"error": "commit must be a hex SHA hash (4-40 chars)."}, full=False)
 
-        repo_dir, err = _ensure_repo(package, auto_clean, base)
+        repo_dir, err = _ensure_repo(package, base, auto_clean=auto_clean)
         if err:
             return _add_status({"error": err}, full=False)
 
-        git_dir = _git_dir(package, base)
+        git_dir = str(_git_dir(package, base))
 
-        try:
-            result = subprocess.run(
-                ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit, "--"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-        except subprocess.TimeoutExpired:
-            return _add_status({"error": "git show timed out after 30s."}, full=False)
-        except Exception as e:
-            return _add_status({"error": f"running git: {e}"}, full=False)
-
-        if result.returncode != 0:
-            stderr = result.stderr.strip()
-            return _add_status(
-                {"error": f"git show failed (exit {result.returncode}): {stderr}"},
-                full=False,
-            )
-
-        output = result.stdout
+        output, show_error = _run_git_show(git_dir, commit)
+        if show_error is not None:
+            return _add_status({"error": show_error}, full=False)
 
         written = write_output(
             output,
@@ -500,7 +550,9 @@ def distgit_show(
 
 
 @mcp.tool()
-def distgit_cleanup(remove_repos: bool = True) -> StatusDict:
+def distgit_cleanup(
+    remove_repos: bool = True,  # noqa: FBT001, FBT002 - MCP schema field is named
+) -> StatusDict:
     """Remove fetched temp files and (optionally) cached repos.
 
     Args:
@@ -512,21 +564,23 @@ def distgit_cleanup(remove_repos: bool = True) -> StatusDict:
         removed_bytes = 0
 
         # Clean fetched files
-        if os.path.isdir(_fetch_dir):
-            for entry in os.scandir(_fetch_dir):
+        fetch_dir = Path(_fetch_dir)
+        if fetch_dir.is_dir():
+            for entry in fetch_dir.iterdir():
                 if entry.is_file():
                     removed_bytes += entry.stat().st_size
-                    Path(entry.path).unlink()
+                    entry.unlink()
                     removed_files += 1
 
         # Clean repos
         removed_repos_count = 0
-        if remove_repos and os.path.isdir(_repos_dir):
+        repos_dir = Path(_repos_dir)
+        if remove_repos and repos_dir.is_dir():
             # Count actual repos (hostname/package) before bulk-removing the tree.
             removed_repos_count = len(_cached_repos())
-            for entry in os.scandir(_repos_dir):
+            for entry in repos_dir.iterdir():
                 if entry.is_dir():
-                    shutil.rmtree(entry.path, ignore_errors=True)
+                    shutil.rmtree(entry, ignore_errors=True)
 
         return _add_status(
             {

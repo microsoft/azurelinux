@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""Route packages from one or more upstream RPM repos into the standard
-Azure Linux per-channel/per-arch layout.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+"""Route upstream RPM packages into the standard Azure Linux layout.
 
 Reads multiple input RPM repositories (with `$basearch` expansion), unions
 their packages, asks `azldev package list --rpm-file ...` to assign each
@@ -47,21 +49,27 @@ import urllib.parse
 import urllib.request
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from http import HTTPStatus
 from pathlib import Path
-from typing import Iterable
+from typing import TYPE_CHECKING, Protocol, TypedDict, cast
 
-import createrepo_c as cr
+import createrepo_c as cr  # pyright: ignore[reportMissingModuleSource]
 
 # `_repo_layout` is a sibling module in this directory.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _repo_layout import (  # noqa: E402
+
+from _repo_layout import (
     ALL_KINDS,
     CHANNELS,
     KIND_DEBUGINFO,
     KIND_MAIN,
     KIND_SRPMS,
     SUBREPOS,
+    validate_repo_url,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
 
 # Repo root: this file lives at <repo>/scripts/repo/<name>.py, so the
 # project root is three parents up.
@@ -78,6 +86,91 @@ USER_AGENT = "synthesize-repodata/1"
 HTTP_TIMEOUT = 60.0
 HTTP_RETRIES = 3
 HTTP_BACKOFF_BASE = 1.0  # seconds; doubled per attempt.
+HTTP_SERVER_ERROR_MIN = HTTPStatus.INTERNAL_SERVER_ERROR
+HTTP_SERVER_ERROR_MAX = 600
+
+
+class RpmSourceMapEntry(TypedDict):
+    """Package-to-source-package input consumed by azldev."""
+
+    packageName: str
+    sourcePackageName: str
+
+
+class AzldevComponentRow(TypedDict, total=False):
+    """Relevant fields returned by `azldev comp list`."""
+
+    name: str
+
+
+class AzldevPackageRow(TypedDict, total=False):
+    """Relevant fields returned by `azldev package list`."""
+
+    packageName: str
+    type: str
+    component: str
+    publishChannel: str
+    group: str
+
+
+class RoutingRecord(TypedDict):
+    """Normalized azldev routing data for one package."""
+
+    component: str
+    channel: str
+    raw_channel: str
+    group: str
+
+
+class UnpublishedRecord(TypedDict):
+    """Report entry for one package excluded from routed repositories."""
+
+    name: str
+    kind: str
+    arch: str
+    source_repo: str
+    source_package: str
+    reason: str
+
+
+class FallbackRecord(UnpublishedRecord):
+    """Report entry for one package routed through channel inheritance."""
+
+    dest_channel: str
+    tie_break_used: bool
+
+
+class _XmlWriter(Protocol):
+    """Subset of createrepo_c XML writer methods used by this script."""
+
+    def set_num_of_pkgs(self, count: int) -> None: ...
+
+    def add_pkg(self, package: cr.Package) -> None: ...
+
+    def close(self) -> None: ...
+
+
+class _SqliteWriter(Protocol):
+    """Subset of createrepo_c SQLite writer methods used by this script."""
+
+    def add_pkg(self, package: cr.Package) -> None: ...
+
+    def dbinfo_update(self, checksum: str) -> None: ...
+
+    def close(self) -> None: ...
+
+
+class _XmlWriterFactory(Protocol):
+    """Construct a createrepo_c XML writer."""
+
+    def __call__(self, path: str, /) -> _XmlWriter: ...
+
+
+class _SqliteWriterFactory(Protocol):
+    """Construct a createrepo_c SQLite writer."""
+
+    def __call__(self, path: str, /) -> _SqliteWriter: ...
+
 
 # repomd record types we generate ourselves in the output. The synth
 # tool only emits these — auxiliary records (updateinfo, group,
@@ -115,14 +208,17 @@ INHERITANCE_TIE_BREAK_DEFAULT = "base"
 
 
 def log(msg: str) -> None:
+    """Write an informational message to standard error."""
     print(msg, file=sys.stderr, flush=True)
 
 
 def warn(msg: str) -> None:
+    """Write a warning message to standard error."""
     print(f"WARN: {msg}", file=sys.stderr, flush=True)
 
 
 def fatal(msg: str) -> int:
+    """Write an error message and return a failure status."""
     print(f"ERROR: {msg}", file=sys.stderr, flush=True)
     return 1
 
@@ -142,25 +238,27 @@ class InputRepo:
     origin: str  # 'prefix' (404 silent) | 'explicit' (404 fatal)
 
     def cache_key(self) -> str:
+        """Return a stable filesystem-safe cache key."""
         # Stable, filesystem-safe; uniqueness comes from the full URL.
         safe = self.url.replace("://", "_").replace("/", "_").replace(":", "_")
         return f"{self.kind}-{self.arch}-{safe}"
 
 
 def expand_repo_prefix(prefix: str, arches: Iterable[str]) -> list[InputRepo]:
+    """Expand a standard repository prefix into concrete input repos."""
     base = prefix.rstrip("/")
     out: list[InputRepo] = []
     for sub in SUBREPOS:
         if sub.per_arch:
-            for arch in arches:
-                out.append(
-                    InputRepo(
-                        sub.kind,
-                        arch,
-                        f"{base}/{sub.subpath.replace('$basearch', arch)}",
-                        "prefix",
-                    )
+            out.extend(
+                InputRepo(
+                    sub.kind,
+                    arch,
+                    f"{base}/{sub.subpath.replace('$basearch', arch)}",
+                    "prefix",
                 )
+                for arch in arches
+            )
         else:
             out.append(
                 InputRepo(
@@ -198,15 +296,15 @@ def parse_explicit_repo(spec: str, arches: Iterable[str]) -> list[InputRepo]:
         return [InputRepo(KIND_SRPMS, SRPM_ARCH, url.rstrip("/"), "explicit")]
     out: list[InputRepo] = []
     if "$basearch" in url:
-        for arch in arches:
-            out.append(
-                InputRepo(
-                    kind,
-                    arch,
-                    url.replace("$basearch", arch).rstrip("/"),
-                    "explicit",
-                )
+        out.extend(
+            InputRepo(
+                kind,
+                arch,
+                url.replace("$basearch", arch).rstrip("/"),
+                "explicit",
             )
+            for arch in arches
+        )
     else:
         # No $basearch: caller is asserting "this URL is for one specific
         # arch". We can't tell which from the URL alone, so we infer from the
@@ -228,16 +326,16 @@ def parse_explicit_repo(spec: str, arches: Iterable[str]) -> list[InputRepo]:
 
 
 def dedup_input_repos(repos: Iterable[InputRepo]) -> list[InputRepo]:
-    """Drop duplicate (kind, arch, url) entries, preserving order. Explicit
-    origin wins over prefix origin so 404s remain fatal where the user asked
-    for them explicitly."""
+    """Drop duplicate input repositories while preserving order.
+
+    Explicit origin wins over prefix origin so 404s remain fatal where the
+    user asked for them explicitly.
+    """
     seen: dict[tuple[str, str, str], InputRepo] = {}
     for r in repos:
         key = (r.kind, r.arch, r.url)
         existing = seen.get(key)
-        if existing is None:
-            seen[key] = r
-        elif r.origin == "explicit" and existing.origin == "prefix":
+        if existing is None or (r.origin == "explicit" and existing.origin == "prefix"):
             seen[key] = r
     return list(seen.values())
 
@@ -263,23 +361,26 @@ def _http_get(
     URLs that point at a missing file) so the caller can react
     (e.g. silently skip 404 / ENOENT from a prefix-derived sub-repo).
     """
+    validate_repo_url(url)
     dest.parent.mkdir(parents=True, exist_ok=True)
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    req = urllib.request.Request(  # noqa: S310 - Repository URL scheme is allowlisted above.
+        url,
+        headers={"User-Agent": USER_AGENT},
+    )
     last_exc: BaseException | None = None
     for attempt in range(retries):
         try:
             with (
-                urllib.request.urlopen(
+                urllib.request.urlopen(  # noqa: S310 - Request URL was validated above.
                     req,
                     timeout=timeout,
                     context=ssl_context,
                 ) as resp,
-                open(dest, "wb") as fh,
+                dest.open("wb") as fh,
             ):
                 shutil.copyfileobj(resp, fh)
-            return
         except urllib.error.HTTPError as e:
-            if 500 <= e.code < 600 and attempt < retries - 1:
+            if HTTP_SERVER_ERROR_MIN <= e.code < HTTP_SERVER_ERROR_MAX and attempt < retries - 1:
                 last_exc = e
                 log(f"    HTTP {e.code} fetching {url}; retrying")
                 time.sleep(HTTP_BACKOFF_BASE * (2**attempt))
@@ -301,6 +402,7 @@ def _http_get(
                 time.sleep(HTTP_BACKOFF_BASE * (2**attempt))
                 continue
             raise
+        return
     # Defensive: loop only exits via return/raise above.
     if last_exc is not None:
         raise last_exc
@@ -311,9 +413,10 @@ def _http_get(
 # ---------------------------------------------------------------------------
 
 
-def build_ssl_context(ca_bundle: Path | None, insecure: bool) -> ssl.SSLContext | None:
-    """Return an SSLContext honouring --ca-bundle / --insecure, or None for
-    Python's default behaviour.
+def build_ssl_context(ca_bundle: Path | None, *, insecure: bool) -> ssl.SSLContext | None:
+    """Build an SSL context for the requested verification settings.
+
+    Return ``None`` when Python's default verification behavior is sufficient.
     """
     if insecure:
         ctx = ssl.create_default_context()
@@ -353,8 +456,8 @@ def download_repo_metadata(
     try:
         _http_get(repomd_url, repomd_path, ssl_context)
     except urllib.error.HTTPError as e:
-        if e.code == 404 and repo.origin == "prefix":
-            log(f"    -> 404, skipping (prefix-derived, non-fatal)")
+        if e.code == HTTPStatus.NOT_FOUND and repo.origin == "prefix":
+            log("    -> 404, skipping (prefix-derived, non-fatal)")
             shutil.rmtree(cache_dir, ignore_errors=True)
             return None
         raise
@@ -364,7 +467,7 @@ def download_repo_metadata(
         # that as the local-fs equivalent so prefix-derived sub-repos
         # under ``file://`` fixtures are silently skipped just like 404s.
         if isinstance(e.reason, FileNotFoundError) and repo.origin == "prefix":
-            log(f"    -> not found, skipping (prefix-derived, non-fatal)")
+            log("    -> not found, skipping (prefix-derived, non-fatal)")
             shutil.rmtree(cache_dir, ignore_errors=True)
             return None
         raise
@@ -408,14 +511,13 @@ UniverseKey = tuple[str, str, str, str, str, str, str]
 
 @dataclass
 class UniverseEntry:
-    """One NEVRA slot in the unioned package universe (one entry per
-    distinct package version)."""
+    """Represent one distinct package version in the package universe."""
 
     repo: InputRepo
     source_pkg_name: str  # extracted from rpm_sourcerpm (or pkg name for srpms)
 
 
-def _pkg_identity(pkg) -> tuple[str, str, str, str, str]:
+def _pkg_identity(pkg: cr.Package) -> tuple[str, str, str, str, str]:
     """Return the package's NEVRA tuple (name, epoch, version, release, arch).
 
     Epoch is normalised to '0' when missing/empty so two records that differ
@@ -424,7 +526,7 @@ def _pkg_identity(pkg) -> tuple[str, str, str, str, str]:
     return (pkg.name, pkg.epoch or "0", pkg.version, pkg.release, pkg.arch)
 
 
-def _format_nevra(pkg) -> str:
+def _format_nevra(pkg: cr.Package) -> str:
     """Return a human-readable NEVRA string, suitable for log/warn messages."""
     epoch = pkg.epoch or "0"
     epoch_prefix = f"{epoch}:" if epoch != "0" else ""
@@ -439,24 +541,22 @@ def _strip_srpm_suffix(rpm_sourcerpm: str | None) -> str:
     if not rpm_sourcerpm:
         return ""
     s = rpm_sourcerpm
-    if s.endswith(".src.rpm"):
-        s = s[: -len(".src.rpm")]
+    s = s.removesuffix(".src.rpm")
     # Strip -release then -version (best-effort; matches the inspiration
     # script's approach).
     parts = s.rsplit("-", 2)
-    if len(parts) >= 3:
+    if len(parts) >= 3:  # noqa: PLR2004 - split yields name, version, release
         return parts[0]
     return s
 
 
 def _find_metadata_path(repo_dir: Path, kind: str) -> str:
-    """Return the absolute path of *kind* (primary|filelists|other) for the
-    cached repo at *repo_dir*."""
+    """Return the cached repository's absolute metadata path for *kind*."""
     repomd = cr.Repomd()
     cr.xml_parse_repomd(str(repo_dir / "repodata" / "repomd.xml"), repomd, lambda *_: True)
     for rec in repomd.records:
         if rec.type == kind:
-            return str(repo_dir / rec.location_href)
+            return str(repo_dir / cast("str", rec.location_href))
     raise RuntimeError(f"{repo_dir}/repodata: no `{kind}` record in repomd.xml")
 
 
@@ -464,11 +564,9 @@ def build_package_universe(
     repo_to_dir: dict[InputRepo, Path],
 ) -> tuple[
     dict[UniverseKey, UniverseEntry],
-    list[dict],
+    list[RpmSourceMapEntry],
 ]:
-    """First pass: scan only primary.xml of each repo to build the
-    package universe (one entry per distinct NEVRA) and the rpm_source_map
-    for azldev.
+    """Build the package universe from each repository's primary metadata.
 
     Returns (universe, rpm_source_map) where:
       universe[(kind, arch, name, epoch, version, release, pkg_arch)]
@@ -488,8 +586,8 @@ def build_package_universe(
         primary = _find_metadata_path(repo_dir, "primary")
         log(f"  scanning {repo.kind}/{repo.arch}: {repo.url}")
 
-        def pkgcb(pkg, *, _repo=repo):
-            key: UniverseKey = (_repo.kind, _repo.arch) + _pkg_identity(pkg)
+        def pkgcb(pkg: cr.Package, *, _repo: InputRepo = repo) -> None:
+            key: UniverseKey = (_repo.kind, _repo.arch, *_pkg_identity(pkg))
             if _repo.kind == KIND_SRPMS:
                 source_name = pkg.name
             else:
@@ -519,7 +617,7 @@ def build_package_universe(
 
         cr.xml_parse_primary(primary, pkgcb=pkgcb, do_files=False, warningcb=lambda *_: True)
 
-    rpm_source_map = sorted(
+    rpm_source_map: list[RpmSourceMapEntry] = sorted(
         ({"packageName": pn, "sourcePackageName": sn} for pn, sn in src_map_set),
         key=lambda r: (r["packageName"], r["sourcePackageName"]),
     )
@@ -550,8 +648,8 @@ def query_known_components(repo_root: Path) -> set[str]:
     if proc.returncode != 0:
         sys.stderr.write(proc.stderr)
         raise RuntimeError("azldev comp list -a failed")
-    rows = json.loads(proc.stdout)
-    names = {row["name"] for row in rows if row.get("name")}
+    rows = cast("list[AzldevComponentRow]", json.loads(proc.stdout))
+    names = {name for row in rows if (name := row.get("name"))}
     log(f"    {len(names)} legitimate component(s)")
     return names
 
@@ -561,12 +659,12 @@ class AzldevRouting:
     """Resolved azldev routing tables, keyed for lookup."""
 
     # By type, then by package name. publishChannel may be empty.
-    rpm: dict[str, dict] = field(default_factory=dict)
-    srpm: dict[str, dict] = field(default_factory=dict)
+    rpm: dict[str, RoutingRecord] = field(default_factory=dict)
+    srpm: dict[str, RoutingRecord] = field(default_factory=dict)
     # Component -> Counter[channel-suffix] for inheritance fallback. Only
     # populated from rpm rows whose component is a legitimate Azure Linux
     # component AND that have a non-empty, allowed publishChannel.
-    component_channels: dict[str, Counter] = field(default_factory=dict)
+    component_channels: dict[str, Counter[str]] = field(default_factory=dict)
     # Names rejected because their component is not a legitimate AZL
     # component (i.e. azldev fell back to project-default routing for
     # something that isn't actually built by AZL).
@@ -575,10 +673,11 @@ class AzldevRouting:
 
 def query_azldev(
     repo_root: Path,
-    rpm_source_map: list[dict],
+    rpm_source_map: list[RpmSourceMapEntry],
     scratch_dir: Path,
     known_components: set[str],
 ) -> AzldevRouting:
+    """Resolve package routing through azldev."""
     map_path = scratch_dir / "rpm_source_map.json"
     map_path.write_text(json.dumps(rpm_source_map, indent=2))
 
@@ -593,22 +692,22 @@ def query_azldev(
     if proc.returncode != 0:
         sys.stderr.write(proc.stderr)
         raise RuntimeError("azldev package list --rpm-file failed")
-    rows = json.loads(proc.stdout)
+    rows = cast("list[AzldevPackageRow]", json.loads(proc.stdout))
 
     routing = AzldevRouting()
-    component_channels: dict[str, Counter] = defaultdict(Counter)
+    component_channels: dict[str, Counter[str]] = defaultdict(Counter)
     for row in rows:
         name = row.get("packageName", "")
         rtype = row.get("type", "")
         component = row.get("component", "") or ""
         raw_channel = row.get("publishChannel", "") or ""
-        channel = raw_channel[len(CHANNEL_PREFIX) :] if raw_channel.startswith(CHANNEL_PREFIX) else raw_channel
+        channel = raw_channel.removeprefix(CHANNEL_PREFIX)
         if component and component not in known_components:
             # Foreign package: azldev synthesised a default channel for
             # something not actually built by AZL. Track and skip.
             routing.foreign_names.add(name)
             continue
-        record = {
+        record: RoutingRecord = {
             "component": component,
             "channel": channel,  # may be ""
             "raw_channel": raw_channel,
@@ -631,8 +730,7 @@ def query_azldev(
 
 @dataclass
 class RoutingDecision:
-    """Per-universe-entry decision: where the package should land, or why
-    it was excluded."""
+    """Record where a package should land or why it was excluded."""
 
     dest_channel: str | None = None  # 'base' | 'sdk' | None (=excluded)
     reason: str = ""  # human-readable provenance
@@ -642,7 +740,7 @@ class RoutingDecision:
 
 def _inherit_channel(
     component: str,
-    component_channels: dict[str, Counter],
+    component_channels: dict[str, Counter[str]],
     tie_break_default: str = INHERITANCE_TIE_BREAK_DEFAULT,
 ) -> tuple[str | None, str, bool]:
     """Infer a publish channel for *component* from its sibling rpms.
@@ -668,7 +766,7 @@ def _inherit_channel(
     tied = [ch for ch, n in ranked if n == top_count]
 
     if len(tied) > 1:
-        picked = tie_break_default if tie_break_default in tied else sorted(tied)[0]
+        picked = tie_break_default if tie_break_default in tied else min(tied)
         reason = (
             f"inherited from sibling rpms (component={component}, "
             f"channels={dict(ranked)}, tied at {top_count}, picked "
@@ -709,7 +807,7 @@ def decide_routing(
     """
     decisions: dict[UniverseKey, RoutingDecision] = {}
     tied_components_warned: set[str] = set()
-    for key, entry in universe.items():
+    for key in universe:
         kind = key[0]
         name = key[2]
         # Foreign packages (azldev fell back to project defaults for an
@@ -721,10 +819,7 @@ def decide_routing(
                 "component is not a legitimate Azure Linux component",
             )
             continue
-        if kind == KIND_SRPMS:
-            row = routing.srpm.get(name)
-        else:
-            row = routing.rpm.get(name)
+        row = routing.srpm.get(name) if kind == KIND_SRPMS else routing.rpm.get(name)
         if row is None:
             decisions[key] = RoutingDecision(None, "no azldev entry for package")
             continue
@@ -777,11 +872,14 @@ def decide_routing(
 
 @dataclass(frozen=True)
 class Destination:
+    """One channel, package kind, and architecture output repository."""
+
     channel: str  # 'base' | 'sdk'
     kind: str  # main | debuginfo | srpms
     arch: str  # x86_64 | aarch64 | src
 
     def relpath(self) -> str:
+        """Return the destination path relative to the repository root."""
         if self.kind == KIND_MAIN:
             return f"{self.channel}/{self.arch}"
         if self.kind == KIND_DEBUGINFO:
@@ -795,20 +893,25 @@ class _RepoWriter:
     """Manages the createrepo_c XML+sqlite triple for one destination."""
 
     # (xml record name, db record name, xml class, db class)
-    _STREAMS: tuple[tuple[str, str, type, type], ...] = (
+    _STREAMS: tuple[
+        tuple[str, str, _XmlWriterFactory, _SqliteWriterFactory],
+        ...,
+    ] = (
         ("primary", "primary_db", cr.PrimaryXmlFile, cr.PrimarySqlite),
         ("filelists", "filelists_db", cr.FilelistsXmlFile, cr.FilelistsSqlite),
         ("other", "other_db", cr.OtherXmlFile, cr.OtherSqlite),
     )
 
-    def __init__(self, dest: Destination, output_dir: Path, pkg_count: int):
+    def __init__(self, dest: Destination, output_dir: Path, pkg_count: int) -> None:
         self.dest = dest
         self.repodata_dir = output_dir / dest.relpath() / "repodata"
         if self.repodata_dir.exists():
             shutil.rmtree(self.repodata_dir)
         self.repodata_dir.mkdir(parents=True, exist_ok=True)
 
-        self._streams: list[tuple[str, str, str, str, object, object]] = []
+        self._streams: list[
+            tuple[str, str, str, str, _XmlWriter, _SqliteWriter]
+        ] = []
         for xml_name, db_name, xml_cls, db_cls in self._STREAMS:
             xml_path = str(self.repodata_dir / f"{xml_name}.xml.gz")
             db_path = str(self.repodata_dir / f"{xml_name}.sqlite")
@@ -851,36 +954,25 @@ class _RepoWriter:
 # ---------------------------------------------------------------------------
 
 
-def emit_repos(
-    repo_to_dir: dict[InputRepo, Path],
+def _collect_emission_plan(
     universe: dict[UniverseKey, UniverseEntry],
     decisions: dict[UniverseKey, RoutingDecision],
-    output_dir: Path,
-) -> tuple[dict[Destination, int], list[dict], list[dict]]:
-    """Second pass over each input repo: stream every package, decide its
-    destination, set its absolute location_href, hand it to the writer.
-
-    Returns (per_destination_counts, unpublished_records, fallback_records).
-
-    Counts are per NEVRA. The unpublished and fallback reports both dedupe
-    by (kind, arch, name) since the routing reason is name-based and
-    listing every NEVRA of an affected name would just be noise.
-    """
-    # Precompute counts per destination (for XML headers), unpublished
-    # records (excluded from output), and fallback records (routed via
-    # Phase-4 inheritance rather than an explicit publishChannel).
+) -> tuple[
+    Counter[Destination],
+    list[UnpublishedRecord],
+    list[FallbackRecord],
+]:
+    """Collect destination counts and deduplicated routing reports."""
     dest_counts: Counter[Destination] = Counter()
-    unpublished: list[dict] = []
+    unpublished: list[UnpublishedRecord] = []
     unpub_seen: set[tuple[str, str, str]] = set()
-    fallbacks: list[dict] = []
+    fallbacks: list[FallbackRecord] = []
     fb_seen: set[tuple[str, str, str]] = set()
     for key, decision in decisions.items():
-        kind = key[0]
-        arch = key[1]
-        name = key[2]
+        kind, arch, name = key[:3]
         entry = universe[key]
+        nameslot = (kind, arch, name)
         if decision.dest_channel is None:
-            nameslot = (kind, arch, name)
             if nameslot not in unpub_seen:
                 unpub_seen.add(nameslot)
                 unpublished.append(
@@ -896,22 +988,43 @@ def emit_repos(
             continue
         dest = Destination(decision.dest_channel, kind, arch)
         dest_counts[dest] += 1
-        if decision.inherited:
-            nameslot = (kind, arch, name)
-            if nameslot not in fb_seen:
-                fb_seen.add(nameslot)
-                fallbacks.append(
-                    {
-                        "name": name,
-                        "kind": kind,
-                        "arch": arch,
-                        "source_repo": entry.repo.url,
-                        "source_package": entry.source_pkg_name,
-                        "dest_channel": decision.dest_channel,
-                        "reason": decision.reason,
-                        "tie_break_used": decision.tie_break_used,
-                    }
-                )
+        if decision.inherited and nameslot not in fb_seen:
+            fb_seen.add(nameslot)
+            fallbacks.append(
+                {
+                    "name": name,
+                    "kind": kind,
+                    "arch": arch,
+                    "source_repo": entry.repo.url,
+                    "source_package": entry.source_pkg_name,
+                    "dest_channel": decision.dest_channel,
+                    "reason": decision.reason,
+                    "tie_break_used": decision.tie_break_used,
+                }
+            )
+    return dest_counts, unpublished, fallbacks
+
+
+def emit_repos(
+    repo_to_dir: dict[InputRepo, Path],
+    universe: dict[UniverseKey, UniverseEntry],
+    decisions: dict[UniverseKey, RoutingDecision],
+    output_dir: Path,
+) -> tuple[
+    dict[Destination, int],
+    list[UnpublishedRecord],
+    list[FallbackRecord],
+]:
+    """Route each package from the input repositories to its destination.
+
+    Returns (per_destination_counts, unpublished_records, fallback_records).
+
+    Counts are per NEVRA. The unpublished and fallback reports both dedupe
+    by (kind, arch, name) since the routing reason is name-based and
+    listing every NEVRA of an affected name would just be noise.
+    """
+    # Precompute writer counts and deduplicated routing reports.
+    dest_counts, unpublished, fallbacks = _collect_emission_plan(universe, decisions)
 
     # Open writers up-front with correct counts.
     writers: dict[Destination, _RepoWriter] = {d: _RepoWriter(d, output_dir, n) for d, n in dest_counts.items()}
@@ -931,7 +1044,7 @@ def emit_repos(
             warningcb=lambda *_: True,
         )
         for pkg in pkg_iter:
-            key: UniverseKey = (repo.kind, repo.arch) + _pkg_identity(pkg)
+            key: UniverseKey = (repo.kind, repo.arch, *_pkg_identity(pkg))
             entry = universe.get(key)
             if entry is None or entry.repo.url != repo.url:
                 # Either filtered out earlier (shouldn't happen) or this is
@@ -971,12 +1084,16 @@ def emit_repos(
 # ---------------------------------------------------------------------------
 
 
-def write_unpublished_report(unpublished: list[dict], output_dir: Path) -> tuple[Path, Path]:
+def write_unpublished_report(
+    unpublished: list[UnpublishedRecord],
+    output_dir: Path,
+) -> tuple[Path, Path]:
+    """Write JSON and text reports for unpublished packages."""
     json_path = output_dir / "unpublished-packages.json"
     txt_path = output_dir / "unpublished-packages.txt"
     json_path.write_text(json.dumps(unpublished, indent=2))
 
-    by_reason: dict[str, list[dict]] = defaultdict(list)
+    by_reason: dict[str, list[UnpublishedRecord]] = defaultdict(list)
     for r in unpublished:
         by_reason[r["reason"]].append(r)
 
@@ -998,20 +1115,23 @@ def write_unpublished_report(unpublished: list[dict], output_dir: Path) -> tuple
     return json_path, txt_path
 
 
-def write_fallback_report(fallbacks: list[dict], output_dir: Path) -> tuple[Path, Path]:
-    """Mirror :func:`write_unpublished_report` for inheritance-fallback
-    routings. These packages WERE routed (so they appear in the published
-    repos) but only because Phase-4 inferred a channel from sibling rpms
-    rather than reading an explicit ``publishChannel`` from azldev. Once
-    the underlying TOML config publishes srpm/debuginfo channels
-    explicitly the fallback path goes away and these reports should
-    shrink to zero.
+def write_fallback_report(
+    fallbacks: list[FallbackRecord],
+    output_dir: Path,
+) -> tuple[Path, Path]:
+    """Write reports for packages routed through channel inheritance.
+
+    These packages appear in the published repositories, but only because
+    Phase 4 inferred a channel from sibling RPMs rather than reading an
+    explicit ``publishChannel`` from azldev. Once the underlying TOML config
+    publishes srpm/debuginfo channels explicitly, these reports should shrink
+    to zero.
     """
     json_path = output_dir / "fallback-channel-packages.json"
     txt_path = output_dir / "fallback-channel-packages.txt"
     json_path.write_text(json.dumps(fallbacks, indent=2))
 
-    by_reason: dict[str, list[dict]] = defaultdict(list)
+    by_reason: dict[str, list[FallbackRecord]] = defaultdict(list)
     for r in fallbacks:
         by_reason[r["reason"]].append(r)
 
@@ -1044,15 +1164,23 @@ def write_fallback_report(fallbacks: list[dict], output_dir: Path) -> tuple[Path
 
 
 class _OrderedRepoSourceAction(argparse.Action):
-    """Append (option_string, value) into a single shared list across
-    --repo-prefix and --repo, preserving CLI order.
+    """Preserve the relative order of repository source arguments.
 
-    This matters because cross-repo NEVRA dedup keeps the first repo
-    seen, so command-line order is the user's only knob to control
-    which input wins for an overlapping NEVRA.
+    Append ``(option_string, value)`` into a shared list across
+    ``--repo-prefix`` and ``--repo``. Cross-repository NEVRA deduplication
+    keeps the first repository seen, so command-line order controls which
+    input wins for an overlapping NEVRA.
     """
 
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str | Sequence[object] | None,
+        option_string: str | None = None,
+    ) -> None:
+        del parser
+
         items = getattr(namespace, self.dest, None)
         if items is None:
             items = []
@@ -1061,6 +1189,7 @@ class _OrderedRepoSourceAction(argparse.Action):
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse repository synthesis command-line arguments."""
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -1137,68 +1266,118 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: list[str] | None = None) -> int:
-    args = parse_args(argv)
-    arches = tuple(args.arch) if args.arch else DEFAULT_ARCHES
+@dataclass(frozen=True)
+class SynthesisConfig:
+    """Validated configuration for one repository synthesis run."""
 
+    arches: tuple[str, ...]
+    repo_sources: list[tuple[str, str]]
+    repo_root: Path
+    output_dir: Path
+    cache_root: Path
+    ssl_context: ssl.SSLContext | None
+    keep_cache: bool
+
+
+def _prepare_config(args: argparse.Namespace) -> tuple[SynthesisConfig | None, str | None]:
+    """Validate CLI arguments and prepare output paths."""
     if args.ca_bundle is not None and not args.ca_bundle.is_file():
-        return fatal(f"--ca-bundle path does not exist: {args.ca_bundle}")
-    ssl_context = build_ssl_context(args.ca_bundle, args.insecure)
+        return None, f"--ca-bundle path does not exist: {args.ca_bundle}"
+    ssl_context = build_ssl_context(args.ca_bundle, insecure=args.insecure)
 
     repo_sources: list[tuple[str, str]] = args.repo_sources or []
     if not repo_sources:
-        return fatal("at least one --repo-prefix or --repo must be provided")
+        return None, "at least one --repo-prefix or --repo must be provided"
 
     output_dir: Path = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     cache_root = output_dir / ".cache"
     cache_root.mkdir(parents=True, exist_ok=True)
+    arches = tuple(args.arch) if args.arch else DEFAULT_ARCHES
+    return (
+        SynthesisConfig(
+            arches=arches,
+            repo_sources=repo_sources,
+            repo_root=args.repo_root,
+            output_dir=output_dir,
+            cache_root=cache_root,
+            ssl_context=ssl_context,
+            keep_cache=args.keep_cache,
+        ),
+        None,
+    )
 
-    # ---- Resolve the InputRepo list ------------------------------------
+
+def _resolve_input_repos(config: SynthesisConfig) -> tuple[list[InputRepo], str | None]:
+    """Resolve ordered CLI repository sources into concrete input repos."""
     log("==> Resolving input repos ...")
     repos: list[InputRepo] = []
-    for option, value in repo_sources:
+    for option, value in config.repo_sources:
         if option == "--repo-prefix":
-            repos.extend(expand_repo_prefix(value, arches))
+            repos.extend(expand_repo_prefix(value, config.arches))
         else:  # --repo
             try:
-                repos.extend(parse_explicit_repo(value, arches))
+                repos.extend(parse_explicit_repo(value, config.arches))
             except ValueError as e:
-                return fatal(str(e))
+                return [], str(e)
     repos = dedup_input_repos(repos)
     log(f"    {len(repos)} candidate input repo(s) after dedup")
+    return repos, None
 
-    # ---- Phase 1: download repodata ------------------------------------
+
+def _download_input_repos(
+    repos: list[InputRepo],
+    config: SynthesisConfig,
+) -> tuple[dict[InputRepo, Path], str | None]:
+    """Download input repodata and return its cache locations."""
     log("==> Downloading repodata ...")
     repo_to_dir: dict[InputRepo, Path] = {}
     for repo in repos:
         try:
-            cache_dir = download_repo_metadata(repo, cache_root, ssl_context)
+            cache_dir = download_repo_metadata(
+                repo,
+                config.cache_root,
+                config.ssl_context,
+            )
         except urllib.error.HTTPError as e:
-            return fatal(f"HTTP {e.code} fetching {repo.url}/repodata/repomd.xml (origin={repo.origin})")
+            error = (
+                f"HTTP {e.code} fetching {repo.url}/repodata/repomd.xml (origin={repo.origin})"
+            )
+            return {}, error
+        except ValueError as e:
+            return {}, str(e)
         if cache_dir is not None:
             repo_to_dir[repo] = cache_dir
     log(f"    {len(repo_to_dir)} repo(s) successfully downloaded ({len(repos) - len(repo_to_dir)} skipped)")
 
     if not repo_to_dir:
-        return fatal("no input repos with usable repodata; nothing to route")
+        return {}, "no input repos with usable repodata; nothing to route"
+    return repo_to_dir, None
 
-    # ---- Phase 2: build package universe + source map ------------------
+
+def _run_routing_pipeline(
+    repo_to_dir: dict[InputRepo, Path],
+    config: SynthesisConfig,
+) -> None:
+    """Build the package universe, route packages, and write reports."""
     log("==> Building package universe ...")
     universe, src_map = build_package_universe(repo_to_dir)
     log(f"    {len(universe)} unique (kind, arch, NEVRA) entries; {len(src_map)} unique (pkg, srpm) pairs for azldev")
 
-    # ---- Phase 3: query azldev -----------------------------------------
     log("==> Querying azldev for routing ...")
-    known_components = query_known_components(args.repo_root)
-    routing = query_azldev(args.repo_root, src_map, output_dir, known_components)
+    known_components = query_known_components(config.repo_root)
+    routing = query_azldev(
+        config.repo_root,
+        src_map,
+        config.output_dir,
+        known_components,
+    )
     log(
         f"    azldev returned {len(routing.rpm)} rpm row(s), "
         f"{len(routing.srpm)} srpm row(s), "
         f"{len(routing.foreign_names)} foreign name(s) (excluded)"
     )
 
-    # ---- Phase 4: per-entry routing decisions --------------------------
     log("==> Computing routing decisions ...")
     decisions = decide_routing(universe, routing)
     n_pub = sum(1 for d in decisions.values() if d.dest_channel is not None)
@@ -1206,29 +1385,49 @@ def main(argv: list[str] | None = None) -> int:
     n_inh = sum(1 for d in decisions.values() if d.inherited)
     log(f"    routed: {n_pub} | unpublished: {n_unpub} | inheritance-fallback used: {n_inh}")
 
-    # ---- Phase 5+6: open writers and emit ------------------------------
     log("==> Writing per-destination repos ...")
-    dest_counts, unpublished, fallbacks = emit_repos(repo_to_dir, universe, decisions, output_dir)
+    dest_counts, unpublished, fallbacks = emit_repos(
+        repo_to_dir,
+        universe,
+        decisions,
+        config.output_dir,
+    )
 
-    # ---- Phase 7: unpublished + fallback reports -----------------------
     log("==> Writing unpublished-packages report ...")
-    json_path, txt_path = write_unpublished_report(unpublished, output_dir)
+    json_path, txt_path = write_unpublished_report(unpublished, config.output_dir)
     log(f"    -> {json_path.name}, {txt_path.name}")
 
     log("==> Writing fallback-channel-packages report ...")
-    fb_json, fb_txt = write_fallback_report(fallbacks, output_dir)
+    fb_json, fb_txt = write_fallback_report(fallbacks, config.output_dir)
     log(f"    -> {fb_json.name}, {fb_txt.name}")
 
-    # ---- Summary -------------------------------------------------------
     log("\n==> Summary")
     for dest in sorted(dest_counts, key=lambda d: (d.channel, d.kind, d.arch)):
         log(f"    {dest.relpath():35s}  {dest_counts[dest]:6d} pkg(s)")
     log(f"    {'(unpublished)':35s}  {len(unpublished):6d} pkg(s)")
     log(f"    {'(fallback-channel)':35s}  {len(fallbacks):6d} pkg(s)")
 
-    if not args.keep_cache:
+
+def main(argv: list[str] | None = None) -> int:
+    """Synthesize routed Azure Linux repositories."""
+    args = parse_args(argv)
+    config, config_error = _prepare_config(args)
+    if config_error is not None or config is None:
+        return fatal(config_error or "invalid synthesis configuration")
+
+    repos, repo_error = _resolve_input_repos(config)
+    if repo_error is not None:
+        return fatal(repo_error)
+
+    repo_to_dir, download_error = _download_input_repos(repos, config)
+    if download_error is not None:
+        return fatal(download_error)
+
+    _run_routing_pipeline(repo_to_dir, config)
+
+    if not config.keep_cache:
         with contextlib.suppress(FileNotFoundError):
-            shutil.rmtree(cache_root)
+            shutil.rmtree(config.cache_root)
     return 0
 
 

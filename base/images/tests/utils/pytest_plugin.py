@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Pytest plugin for Azure Linux image validation.
 
@@ -9,7 +11,11 @@ positional test-path argument.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
+
+from utils.tools import check_tools
 
 # Map file-extension suffixes to image types for auto-detection.
 _EXT_TO_TYPE: dict[str, str] = {
@@ -57,7 +63,8 @@ def parse_capabilities(raw: str | None) -> set[str]:
     return {c.strip() for c in raw.split(",") if c.strip()}
 
 
-def pytest_addoption(parser) -> None:  # type: ignore[no-untyped-def]
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Register command-line options for Azure Linux image tests."""
     group = parser.getgroup("image", "Azure Linux image validation")
     group.addoption(
         "--image-path",
@@ -105,7 +112,7 @@ def pytest_addoption(parser) -> None:  # type: ignore[no-untyped-def]
     )
 
 
-def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
+def pytest_configure(config: pytest.Config) -> None:
     """Register markers and fail fast if required native tools are missing."""
     config.addinivalue_line(
         "markers",
@@ -130,8 +137,6 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
         "BASE_IMAGE build arg.",
     )
 
-    from utils.tools import check_tools
-
     # Validate that exactly one of --image-path or --image-ref is provided.
     image_path_raw = config.getoption("--image-path", default=None)
     image_ref_raw = config.getoption("--image-ref", default=None)
@@ -152,9 +157,8 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
         caps = parse_capabilities(config.getoption("--capabilities", default=None))
         if caps:
             image_type = derive_image_type_from_capabilities(caps)
-    if image_type is None:
-        if config.getoption("--image-ref", default=None):
-            image_type = "container"
+    if image_type is None and config.getoption("--image-ref", default=None):
+        image_type = "container"
     if image_type is None:
         image_path = config.getoption("--image-path", default=None)
         if image_path:
@@ -197,7 +201,10 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         pytest.skip(f"test is specific to image family '{expected}' (running: '{image_name}')")
 
 
-def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-untyped-def]
+def pytest_collection_modifyitems(
+    config: pytest.Config,
+    items: list[pytest.Item],
+) -> None:
     """Auto-apply markers based on directory layout under ``cases/``.
 
     Layout convention (after restructure)::
@@ -221,7 +228,7 @@ def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-unt
     Tests directly under ``cases/static/`` or ``cases/runtime/`` (no
     image subdir) get no ``image`` marker and run for every image.
     """
-    from pathlib import Path
+    del config
 
     for item in items:
         parts = Path(str(item.fspath)).parts
@@ -246,6 +253,6 @@ def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-unt
         # Auto-apply image() marker if there's an image-family subdir.
         # e.g. cases/static/vm-base/test_kernel.py → image("vm-base")
         #      cases/runtime/container-base/test_foo.py → image("container-base")
-        if len(remaining) >= 3:  # category + family_dir + file
+        if len(remaining) >= 3:  # noqa: PLR2004 - category + family_dir + file
             image_dir = remaining[1]
             item.add_marker(pytest.mark.image(image_dir))

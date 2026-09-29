@@ -1,6 +1,7 @@
-#!/usr/bin/env python3
-"""
-Post (or update/delete) a PR comment with `azldev component update` results.
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+r"""Post (or update/delete) a PR comment with `azldev component update` results.
 
 Reads the JSON output produced by `azldev component update -a -O json` and
 posts a formatted comment listing components whose lock files would change.
@@ -14,11 +15,11 @@ Update JSON shape (top-level on stdout):
                                                are reflected in the comment
 
 Usage:
-    python post_locks_comment.py \\
-        --update-output update-output.json \\
-        --repo owner/repo \\
-        --pr 123 \\
-        --artifacts-url https://... \\
+    python post_locks_comment.py \
+        --update-output update-output.json \
+        --repo owner/repo \
+        --pr 123 \
+        --artifacts-url https://... \
         --run-id 12345
 
 Exit codes:
@@ -39,12 +40,14 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import NotRequired, TypedDict, TypeGuard
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
 COMMENT_MARKER = "<!-- LOCKS_CHECK -->"
+MAX_COMPONENTS_IN_COMMAND = 30
 MAX_FILE_LIST = 50
 MAX_COMMENT_CHARS = 60_000
 # Safety margin under MAX_COMMENT_CHARS — leaves room for the trailing
@@ -72,6 +75,14 @@ _SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9._\-+]+$")
 _SAFE_COMMIT_RE = re.compile(r"^[a-f0-9]{4,64}$")
 
 
+class UpdateEntry(TypedDict):
+    """Fields consumed from one azldev component-update result."""
+
+    component: str
+    changed: bool
+    upstreamCommit: NotRequired[str]
+
+
 def _safe_name(name: str) -> str:
     """Return a markdown-safe, length-bounded rendering of a component name."""
     if not _SAFE_NAME_RE.match(name):
@@ -94,7 +105,18 @@ def _safe_commit(commit: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def parse_update_output(path: Path) -> list[dict]:
+def _is_update_entry(value: object) -> TypeGuard[UpdateEntry]:
+    """Return whether a JSON value has the expected update-entry shape."""
+    if not isinstance(value, dict):
+        return False
+    if not isinstance(value.get("component"), str):
+        return False
+    if not isinstance(value.get("changed"), bool):
+        return False
+    return "upstreamCommit" not in value or isinstance(value["upstreamCommit"], str)
+
+
+def parse_update_output(path: Path) -> list[UpdateEntry]:
     """Parse the JSON emitted by `azldev component update -a -O json`.
 
     Returns a list of components whose ``changed`` field is True (possibly
@@ -104,12 +126,12 @@ def parse_update_output(path: Path) -> list[dict]:
     error than miss real drift.
     """
     try:
-        with open(path, encoding="utf-8") as f:
+        with path.open(encoding="utf-8") as f:
             data = json.load(f)
     except FileNotFoundError as exc:
-        raise SystemExit(f"Error: update output not found: {exc}")
+        raise SystemExit(f"Error: update output not found: {exc}") from exc
     except json.JSONDecodeError as exc:
-        raise SystemExit(f"Error: update output is not valid JSON: {exc}")
+        raise SystemExit(f"Error: update output is not valid JSON: {exc}") from exc
 
     # azldev emits a literal JSON `null` when no entries are produced.
     if data is None:
@@ -120,11 +142,13 @@ def parse_update_output(path: Path) -> list[dict]:
             f"Error: update output has unexpected shape (expected null or list, got {type(data).__name__})"
         )
 
+    entries: list[UpdateEntry] = []
     for entry in data:
-        if not isinstance(entry, dict) or "component" not in entry or "changed" not in entry:
+        if not _is_update_entry(entry):
             raise SystemExit(f"Error: update output entry has unexpected shape: {entry!r}")
+        entries.append(entry)
 
-    return [entry for entry in data if entry["changed"] is True]
+    return [entry for entry in entries if entry["changed"]]
 
 
 # ---------------------------------------------------------------------------
@@ -132,18 +156,19 @@ def parse_update_output(path: Path) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 
-def _update_command(components: list[str], use_all: bool = False) -> str:
-    if use_all or len(components) > 30:
+def _update_command(components: list[str], *, use_all: bool = False) -> str:
+    if use_all or len(components) > MAX_COMPONENTS_IN_COMMAND:
         return "azldev component update -a"
     return f"azldev component update {' '.join('-p ' + c for c in components)}"
 
 
 def format_comment(
-    changed: list[dict],
+    changed: list[UpdateEntry],
     artifacts_url: str | None = None,
     run_id: str | None = None,
     repo: str | None = None,
 ) -> str:
+    """Format lock-file drift as a GitHub pull request comment."""
     n_changed = len(changed)
 
     comp_names: list[str] = sorted({entry["component"] for entry in changed})
@@ -153,7 +178,9 @@ def format_comment(
     # inject arbitrary commands into a maintainer's terminal. Fall back to
     # `-a` if any name fails the same regex used for display so the
     # printed command is always safe to run as-is.
-    use_all = n_changed > 30 or any(not _SAFE_NAME_RE.match(name) for name in comp_names)
+    use_all = n_changed > MAX_COMPONENTS_IN_COMMAND or any(
+        not _SAFE_NAME_RE.match(name) for name in comp_names
+    )
     remediation_cmd = _update_command([] if use_all else comp_names, use_all=use_all)
 
     lines: list[str] = [
@@ -266,6 +293,7 @@ def find_existing_comments(repo: str, pr: str) -> list[str]:
 
 
 def post_or_update_comment(repo: str, pr: str, body: str) -> None:
+    """Create or update the bot's lock-file drift comment."""
     existing_ids = find_existing_comments(repo, pr)
     fd, body_path = tempfile.mkstemp(prefix="locks-check-comment-", suffix=".md")
     try:
@@ -305,6 +333,7 @@ def post_or_update_comment(repo: str, pr: str, body: str) -> None:
 
 
 def delete_comment_if_exists(repo: str, pr: str) -> None:
+    """Delete existing lock-file drift comments."""
     for existing_id in find_existing_comments(repo, pr):
         print(f"Deleting stale comment {existing_id}")
         try:
@@ -327,6 +356,7 @@ def delete_comment_if_exists(repo: str, pr: str) -> None:
 
 
 def main() -> int:
+    """Post lock-file drift results from command-line arguments."""
     parser = argparse.ArgumentParser(description="Post `azldev component update` drift as a PR comment.")
     parser.add_argument(
         "--update-output",
@@ -362,7 +392,7 @@ def main() -> int:
     if summary_file and body:
         max_summary = 1_000_000  # GH step summary limit is 1024 KiB
         summary = body[:max_summary] if len(body) > max_summary else body
-        with open(summary_file, "a", encoding="utf-8") as sf:
+        with Path(summary_file).open("a", encoding="utf-8") as sf:
             sf.write(summary)
             sf.write("\n")
 

@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # SPDX-License-Identifier: MIT
 """Validate the Memcached server on the container-base image."""
 
@@ -22,7 +24,7 @@ def _start_memcached(container_exec_shell: ExecShell) -> None:
     )
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_memcached_version(container_exec_shell: ExecShell) -> None:
     """The Memcached server binary reports a version."""
     result = container_exec_shell("memcached --version")
@@ -30,7 +32,7 @@ def test_memcached_version(container_exec_shell: ExecShell) -> None:
     assert "memcached" in result.output
 
 
-@pytest.mark.dockerfile()
+@pytest.mark.dockerfile
 def test_memcached_set_get(container_exec_shell: ExecShell) -> None:
     """Store a value with memcached and read it back."""
     _start_memcached(container_exec_shell)

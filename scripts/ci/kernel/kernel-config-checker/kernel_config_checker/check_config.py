@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 """Simple kernel config checker script.
+
 Checks a Linux kernel .config file against intentional configuration settings.
 """
 
@@ -12,6 +12,7 @@ import argparse
 import sys
 from enum import Enum
 from pathlib import Path
+from typing import TYPE_CHECKING, TypedDict
 
 from kernel_config_checker.add_config import add_config_interactive
 from kernel_config_checker.schema.schema import (
@@ -20,8 +21,19 @@ from kernel_config_checker.schema.schema import (
     load_schema,
 )
 
+if TYPE_CHECKING:
+    from kernel_config_checker.schema.schema import Architecture, KernelConfigValue
 
-def _resolve_value(value) -> str:
+
+class ConfigExpectation(TypedDict):
+    """Resolved expected value and its policy provenance."""
+
+    expected: str
+    justification: str
+    source: str
+
+
+def _resolve_value(value: KernelConfigValue | str) -> str:
     """Resolve an enum or string config value to its string representation."""
     return value.value if isinstance(value, Enum) else value
 
@@ -34,9 +46,13 @@ def _get_arch_value(kernel_config: KernelConfig, architecture: str) -> str | Non
     return None
 
 
-def _collect_configs(kernel_configs: list[KernelConfig], architecture: str, source: str) -> dict[str, dict]:
+def _collect_configs(
+    kernel_configs: list[KernelConfig],
+    architecture: str,
+    source: str,
+) -> dict[str, ConfigExpectation]:
     """Collect config expectations for a given architecture."""
-    configs = {}
+    configs: dict[str, ConfigExpectation] = {}
     for kc in kernel_configs:
         value = _get_arch_value(kc, architecture)
         if value is not None:
@@ -51,9 +67,9 @@ def _collect_configs(kernel_configs: list[KernelConfig], architecture: str, sour
 def parse_kernel_config(config_path: Path) -> dict[str, str]:
     """Parse a Linux kernel .config file."""
     config = {}
-    with open(config_path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
+    with config_path.open(encoding="utf-8") as f:
+        for raw_line in f:
+            line = raw_line.strip()
             if line.startswith("#") and "is not set" in line:
                 config_name = line.split()[1]
                 config[config_name] = "n"
@@ -127,7 +143,7 @@ def check_config_across_all(schema: IntentionalKernelConfigSchema, config_name: 
         print("❌ Not found")
         return False
 
-    all_values: dict = {}
+    all_values: dict[Architecture, list[tuple[str, str]]] = {}
     for section_name, kernel_config in found_configs:
         for arch_pair in kernel_config.values:
             all_values.setdefault(arch_pair.architecture, []).append((section_name, _resolve_value(arch_pair.value)))
@@ -145,7 +161,8 @@ def check_config_across_all(schema: IntentionalKernelConfigSchema, config_name: 
     return True
 
 
-def main() -> int | None:
+def main() -> int | None:  # noqa: C901 - CLI modes are clearer in one dispatcher
+    """Run kernel configuration validation from command-line arguments."""
     parser = argparse.ArgumentParser(description="Check kernel .config file against intentional configuration")
     parser.add_argument(
         "--add-config",
@@ -187,10 +204,10 @@ def main() -> int | None:
     if args.add_config:
         try:
             ok = add_config_interactive(Path(args.add_config))
-            return 0 if ok else 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
             print(f"\u2717 Error adding config: {e}")
             return 1
+        return 0 if ok else 1
 
     if args.check_all:
         try:
@@ -198,10 +215,10 @@ def main() -> int | None:
             schema = load_schema(Path(json_file))
             print(f"✓ Loaded intentional config: {json_file}")
             found = check_config_across_all(schema, config_name)
-            return 0 if found else 1
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
             print(f"✗ Error checking config: {e}")
             return 1
+        return 0 if found else 1
 
     if not all(
         [
@@ -230,13 +247,15 @@ def main() -> int | None:
 
         if is_valid:
             print("✓ Kernel configuration check passed")
-            return 0
-        print("✗ Kernel configuration check failed")
-        return 1
+            exit_code = 0
+        else:
+            print("✗ Kernel configuration check failed")
+            exit_code = 1
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - CLI boundary converts failures to exit status
         print(f"✗ Error: {e}")
         return 1
+    return exit_code
 
 
 if __name__ == "__main__":
