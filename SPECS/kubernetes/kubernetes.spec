@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        30%{?dist}
+Release:        31%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,7 +56,7 @@ Patch34:        CVE-2026-78662.patch
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
-BuildRequires:  golang < 1.25
+BuildRequires:  golang
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -305,6 +305,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.30.10-31
+- Remove 'BuildRequires: golang < 1.25' pin to build with the default Go toolchain.
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-30
 - Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
 

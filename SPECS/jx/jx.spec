@@ -1,7 +1,7 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.10.182
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,7 +31,7 @@ Patch0:         CVE-2025-58058.patch
 Patch1:         CVE-2026-39821.patch
 Patch2:         CVE-2026-56852.patch
 
-BuildRequires:  golang < 1.25
+BuildRequires:  golang
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
@@ -65,6 +65,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 3.10.182-6
+- Remove 'BuildRequires: golang < 1.25' pin to build with the default Go toolchain.
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.10.182-5
 - Patch for CVE-2026-56852
 
