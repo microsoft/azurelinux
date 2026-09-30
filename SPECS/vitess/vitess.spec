@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -36,7 +36,6 @@ Patch6:         CVE-2026-55969.patch
 Patch7:         CVE-2026-65959.patch
 Patch8:         CVE-2026-84304.patch
 Patch9:         go-toolchain-compat.patch
-BuildRequires: golang >= 1.25
 BuildRequires: golang < 1.28
 BuildRequires: hostname
 
@@ -166,6 +165,9 @@ go test -mod=vendor \
 %{_bindir}/*
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 19.0.4-15
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
 * Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 19.0.4-14
 - Add patch for CVE-2026-84445, CVE-2026-84304
 - Add Go toolchain compatibility fixes go-toolchain-compat.patch

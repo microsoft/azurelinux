@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,7 +82,7 @@ Patch11:        CVE-2026-84304.patch
 Patch12:        fix-non-constant-format-strings.patch
 Patch13:        fix-proto-equality-in-tests.patch
 BuildRequires:  clang
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang
 BuildRequires:  kernel-headers
 BuildRequires:  protobuf-devel
 BuildRequires:  rust < 1.85.0
@@ -170,6 +170,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.7.5-22
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
 * Wed Sep 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.7.5-21
 - Patch for CVE-2026-84304
 - Removed patches CVE-2023-45288, CVE-2024-24786, CVE-2024-45338, CVE-2025-22868, CVE-2025-22870,

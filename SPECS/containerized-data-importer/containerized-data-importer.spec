@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.62.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,8 +32,7 @@ Patch2:         CVE-2025-58183.patch
 Patch3:         CVE-2026-32288.patch
 Patch4:         CVE-2026-35469.patch
 Patch5:         CVE-2026-84445.patch
-# Regenerated vendor tree pulls modules whose go.mod requires go >= 1.25.
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
 BuildRequires:  pkgconfig
@@ -229,6 +228,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.62.0-9
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
 * Wed Sep 16 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.62.0-8
 - Generate new vendor tarball to fix CVE-2026-84445 and CVE-2026-84304
 - Rebase CVE-2026-35469.patch to apply cleanly

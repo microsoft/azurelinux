@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        1.6.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -16,7 +16,7 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 #
 Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2026-84445.patch
-BuildRequires: golang >= 1.25
+BuildRequires: golang
 BuildRequires: e2fsprogs
 BuildRequires: systemd-udev
 Requires: %{name}-imagecustomizer = %{version}-%{release}
@@ -111,6 +111,9 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.6.0-4
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
 * Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 1.6.0-3
 - Add patch for CVE-2026-84445, CVE-2026-84304
 - Removed patch for CVE-2026-56852
