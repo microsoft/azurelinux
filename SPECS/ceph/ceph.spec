@@ -4,7 +4,7 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        18.2.7
+Version:        18.2.8
 Release:        13%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
@@ -2072,6 +2072,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Wed Sep 30 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-13
+- Upgrade to 18.2.8.
+
 * Thu Sep 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.2.2-13
 - Patch for CVE-2026-54330
 
