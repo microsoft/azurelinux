@@ -1,3 +1,6 @@
+# Copyright 2026 Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Shared pytest fixtures for kernel config validation checks."""
 
 from __future__ import annotations
@@ -13,7 +16,7 @@ from kernel_config_checker.schema.schema import (
     load_schema,
 )
 
-KERNEL_CONFIG_PATH_PATTERN = re.compile(r"^base/comps/kernel.*/.*config.*$")
+KERNEL_CONFIG_PATH_PATTERN = re.compile(r"^base/comps/kernel[^/]*/[^/]+\.config$")
 KERNEL_CONFIG_JSON_PATH = Path("kernel_config_checker/kernel_configs_json/azl4-os-required-kernel-configs.json")
 
 
@@ -102,9 +105,8 @@ def deleted_kernel_config_files(repo_root: Path, base_sha: str, head_sha: str) -
 
 
 def _tracked_changed_kernel_config_cases(pytestconfig: pytest.Config) -> list[tuple[str, str, str]]:
-    repo_root = (
-        Path(pytestconfig.getoption("repo_root")).resolve() if pytestconfig.getoption("repo_root") else _git_repo_root()
-    )
+    option = pytestconfig.getoption("repo_root")
+    repo_root = Path(option).resolve() if option else _git_repo_root()
     checker_root = _checker_root()
     base_sha = pytestconfig.getoption("base_sha") or "HEAD^"
     head_sha = pytestconfig.getoption("head_sha") or "HEAD"

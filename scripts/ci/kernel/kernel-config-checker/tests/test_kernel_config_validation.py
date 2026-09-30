@@ -1,3 +1,6 @@
+# Copyright 2026 Microsoft Corporation.
+# Licensed under the MIT License.
+
 """Pytest-backed kernel config validation checks."""
 
 from __future__ import annotations
@@ -5,12 +8,29 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
+from conftest import _kernel_config_path
 from kernel_config_checker.check_config import check_kernel_config, parse_kernel_config
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     from kernel_config_checker.schema.schema import IntentionalKernelConfigSchema
+
+
+@pytest.mark.parametrize(
+    ("path", "expected"),
+    [
+        ("base/comps/kernel/6.18-aarch64-azl.config", True),
+        ("base/comps/kernel-rt/kernel-rt-x86_64.config", True),
+        ("base/comps/kernel/process_configs.sh", False),
+        ("base/comps/kernel/generate_all_configs.sh", False),
+        ("base/comps/kernel/configs/example.txt", False),
+    ],
+)
+def test_kernel_config_path_selects_only_config_files(path: str, *, expected: bool) -> None:
+    """Do not treat kernel helper scripts as config files when selecting changed paths."""
+    if _kernel_config_path(path) != expected:
+        pytest.fail(f"Incorrect kernel config path classification: {path}")
 
 
 def test_deleted_kernel_config_files_are_rejected(deleted_kernel_config_files: list[str]) -> None:
