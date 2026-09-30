@@ -423,6 +423,7 @@ done
 %changelog
 * Fri Oct 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.6-6
 - Patch for CVE-2026-19026, CVE-2026-19025, CVE-2025-2309, CVE-2025-2308
+- The CVE-2026-19026 patch also addresses CVE-2026-19027 and CVE-2026-19028
 
 * Wed Oct 07 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.14.6-5
 - Patch for CVE-2026-106547
