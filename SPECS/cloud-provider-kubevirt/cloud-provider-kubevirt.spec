@@ -1,7 +1,7 @@
 Summary:        Package to create the cloud-provider-kubevirt binary.
 Name:           cloud-provider-kubevirt
 Version:        0.5.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubevirt/cloud-provider-kubevirt/
 Group:          System/Management
@@ -40,7 +40,7 @@ Patch11:        CVE-2026-97032.patch
 Patch12:        CVE-2026-78661.patch
 Patch13:        CVE-2026-97045.patch
 %global debug_package %{nil}
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang
 
 %define our_gopath %{_topdir}/.gopath
 
@@ -79,6 +79,9 @@ make test
 %{_bindir}/kubevirt-cloud-controller-manager
 
 %changelog
+* Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 0.5.1-12
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.5.1-11
 - Patch for CVE-2026-97045, CVE-2026-78661
 
