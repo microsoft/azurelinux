@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.8
-Release:        13%{?dist}
+Release:        15%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -33,6 +33,7 @@ Patch16:        CVE-2020-14378.patch
 Patch19:        CVE-2025-9648.patch
 Patch20:        CVE-2024-47866.patch
 Patch21:        CVE-2026-54330.patch
+Patch22:        ceph-volume-importlib-metadata-compat.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -395,6 +396,7 @@ of cluster membership, configuration, and state.
 %package mgr
 Summary:        Ceph Manager Daemon
 Requires:       ceph-base = %{version}-%{release}
+Requires:       ceph-mgr-modules-core = %{version}-%{release}
 
 %description mgr
 ceph-mgr enables python modules that provide services (such as the REST
@@ -443,6 +445,7 @@ Requires:       python%{python3_pkgversion}-pyOpenSSL
 Requires:       python%{python3_pkgversion}-requests
 Requires:       python%{python3_pkgversion}-dateutil
 Requires:       python%{python3_pkgversion}-cherrypy
+Requires:       python%{python3_pkgversion}-more-itertools
 Requires:       python%{python3_pkgversion}-PyYAML
 Requires:       python%{python3_pkgversion}-werkzeug
 %description mgr-modules-core
@@ -2072,6 +2075,13 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu Oct 01 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-15
+- Fix ceph-volume compatibility with Python 3.12.
+- Add the missing more-itertools dependency for manager modules.
+
+* Thu Oct 01 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-14
+- Require the core manager modules from ceph-mgr.
+
 * Wed Sep 30 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-13
 - Upgrade to 18.2.8.
 
