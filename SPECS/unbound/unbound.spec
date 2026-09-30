@@ -1,6 +1,6 @@
 Summary:        unbound dns server
 Name:           unbound
-Version:        1.26.0
+Version:        1.26.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -96,6 +96,9 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Wed Sep 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.26.1-1
+- Auto-upgrade to 1.26.1 - for CVE-2026-77860, CVE-2026-77955, CVE-2026-78227, CVE-2026-80225, CVE-2026-81634, CVE-2026-81642, CVE-2026-82717, CVE-2026-82720 and CVE-2026-85501
+
 * Tue Aug 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.26.0-1
 - Auto-upgrade to 1.26.0 - Fix error in log printout in fix for CVE-2026-50248, when the primary name is bogus.
 - Release adds Unit Test for all CVE fixes

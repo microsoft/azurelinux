@@ -1,7 +1,7 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
 Version:        3.17.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ Patch4:         CVE-2025-54349.patch
 Patch5:         openssl_encrypt_buffer_size.patch
 Patch6:         CVE-2026-71217.patch
 Patch7:         CVE-2026-71218.patch
+Patch8:         results_json_no_size_limit.patch
 BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
 BuildRequires:  openssl
@@ -74,6 +75,10 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Tue Sep 15 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.17.1-6
+- Apply upstream 464ce7ca to limit only the parameters JSON size, fixing a
+  client segfault at high parallel stream counts introduced by the CVE-2026-71218
+
 * Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.17.1-5
 - Patch for CVE-2026-71218, CVE-2026-71217
 

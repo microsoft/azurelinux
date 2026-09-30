@@ -192,7 +192,7 @@
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
 Version:        11.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -208,6 +208,7 @@ Patch2:         CVE-2026-61477.patch
 Patch3:         CVE-2026-63622.patch
 Patch4:         CVE-2026-63623.patch
 Patch5:         CVE-2026-18917.patch
+Patch6:         CVE-2026-77159.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -2229,6 +2230,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Sep 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 11.9.0-2
+- Patch for CVE-2026-77159
+
 * Tue Aug 25 2026 Harshit Gupta <guptaharshit@microsoft.com> - 11.9.0-1
 - Upgrade to 11.9.0.
 - Remove patches fixed or superseded upstream.

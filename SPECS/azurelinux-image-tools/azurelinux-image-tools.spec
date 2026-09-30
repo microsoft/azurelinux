@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        1.6.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -14,9 +14,10 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # Use generate_source_tarball.sh script with the package version to build this tarball.
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2026-56852.patch
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
+Patch0:         CVE-2026-84445.patch
 BuildRequires: golang >= 1.25
+BuildRequires: e2fsprogs
 BuildRequires: systemd-udev
 Requires: %{name}-imagecustomizer = %{version}-%{release}
 
@@ -110,18 +111,22 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 1.6.0-3
+- Add patch for CVE-2026-84445, CVE-2026-84304
+- Removed patch for CVE-2026-56852
+
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.6.0-2
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
   now selected automatically and supports CGO_ENABLED=0 on Linux.
 
-* Tue Aug 3 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.6.0-1
+* Mon Aug 3 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.6.0-1
 - Upgrade to version 1.6.0
 - Enable systemd-ukify for arm64
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.0-2
 - Patch for CVE-2026-56852
 
-* Fri May 29 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.0-1
+* Mon Jun 01 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.0-1
 - Upgrade to version 1.5.0
 
 * Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-2

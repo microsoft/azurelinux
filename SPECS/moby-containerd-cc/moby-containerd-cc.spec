@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 16%{?dist}
+Release: 17%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -33,6 +33,7 @@ Patch14:CVE-2026-39821.patch
 Patch15:CVE-2026-46680.patch
 Patch16:CVE-2026-53488.patch
 Patch17:CVE-2026-56852.patch
+Patch18:CVE-2026-37236.patch
 
 %{?systemd_requires}
 
@@ -90,6 +91,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-17
+- Patch for CVE-2026-37236
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-16
 - Patch for CVE-2026-56852
 
