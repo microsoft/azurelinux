@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.8
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -34,6 +34,7 @@ Patch19:        CVE-2025-9648.patch
 Patch20:        CVE-2024-47866.patch
 Patch21:        CVE-2026-54330.patch
 Patch22:        ceph-volume-importlib-metadata-compat.patch
+Patch23:        mgr-subinterpreter-modules.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -2075,6 +2076,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu Oct 01 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-16
+- Load manager modules in the main Python interpreter by default.
+
 * Thu Oct 01 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-15
 - Fix ceph-volume compatibility with Python 3.12.
 - Add the missing more-itertools dependency for manager modules.
