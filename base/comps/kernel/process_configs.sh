@@ -184,6 +184,10 @@ checkoptions()
 			if (NR==FNR) {
 				configs[a[1]]=a[2];
 			} else {
+				# Dummy compiler tools used for config validation generate
+				# different tool version metadata from the real build toolchain.
+				if (a[1] ~ /^CONFIG_(CC_VERSION_TEXT|GCC_VERSION|AS_VERSION|LD_VERSION|PAHOLE_VERSION|RUSTC_VERSION|RUSTC_LLVM_VERSION)$/)
+					next;
 				if (configs[a[1]] != "" && configs[a[1]] != a[2])
 					 print "Found "a[1]"="a[2]" after generation, had " a[1]"="configs[a[1]]" in Source tree";
 			}
@@ -216,6 +220,30 @@ checkoptions()
 	else
 		rm -f .mismatches"${count}"
 	fi
+}
+
+# olddefconfig silently drops unknown symbols; distinguish them from options
+# that still exist in Kconfig but are unavailable due to dependencies.
+check_unsupported_configs()
+{
+	local cfg=$1
+	local count=$2
+	local arch=$3
+	local variant=$4
+
+	/usr/bin/awk '
+		NR == FNR { supported[$1] = 1; next }
+		/^CONFIG_[A-Za-z0-9_]+=/ { symbol = $0; sub(/=.*/, "", symbol) }
+		/^# CONFIG_[A-Za-z0-9_]+ is not set$/ { symbol = $2 }
+		!/^CONFIG_[A-Za-z0-9_]+=/ && !/^# CONFIG_[A-Za-z0-9_]+ is not set$/ { next }
+		!(symbol in supported) { print "Unsupported " symbol " in " FILENAME ":" FNR }
+	' .kconfig_symbols "$cfg" > .unsupported"${count}"
+
+	if test -s .unsupported"${count}"; then
+		echo "Unknown Kconfig symbols in ${arch} ${variant}:" >> .errors"${count}"
+		cat .unsupported"${count}" >> .errors"${count}"
+	fi
+	rm -f .unsupported"${count}"
 }
 
 # Parse the output of 'make listnewconfig' and 'make helpnewconfig'
@@ -396,6 +424,7 @@ function process_config()
 	cat "$cfg" > "$cfgorig"
 
 	echo "Processing $cfg ... "
+	check_unsupported_configs "$cfgorig" "$count" "$arch" "$variant"
 
 	# shellcheck disable=SC2086
 	make ${MAKEOPTS} ARCH="$arch" CROSS_COMPILE="$(get_cross_compile "$arch")" KCONFIG_CONFIG="$cfgorig" listnewconfig >& .listnewconfig"${count}"
@@ -444,6 +473,13 @@ function process_configs()
 {
 	# assume we are in $source_tree/configs, need to get to top level
 	pushd "$(switch_to_toplevel)" &>/dev/null
+	# Collect all declared symbols once, before processing configs in parallel.
+	# Checking Kconfig rather than the generated .config avoids rejecting options
+	# that still exist but are disabled by dependencies for this architecture.
+	find . -type f -name 'Kconfig*' -print0 |
+		xargs -0 -r /usr/bin/awk '($1 == "config" || $1 == "menuconfig") && $2 ~ /^[A-Za-z0-9_]+$/ { print "CONFIG_" $2 }' |
+		sort -u > .kconfig_symbols
+	test -s .kconfig_symbols || die "No Kconfig symbols found in kernel source tree"
 
 	count=0
 	for cfg in "$SCRIPT_DIR/${SPECPACKAGE_NAME}${KVERREL}"*.config
@@ -451,17 +487,21 @@ function process_configs()
 		if [ "$count" -eq 0 ]; then
 			# do the first one by itself so that tools are built
 			process_config "$cfg" "$count"
+		else
+			process_config "$cfg" "$count" &
+			# shellcheck disable=SC2004
+			waitpids[${count}]=$!
 		fi
-		process_config "$cfg" "$count" &
-		# shellcheck disable=SC2004
-		waitpids[${count}]=$!
 		((count++))
 		while [ "$(jobs | grep -c Running)" -ge "$RHJOBS" ]; do :; done
 	done
 	# shellcheck disable=SC2048
 	for pid in ${waitpids[*]}; do
-		wait "${pid}"
+		if ! wait "${pid}"; then
+			RETURNCODE=1
+		fi
 	done
+	rm -f .kconfig_symbols
 
 	rm "$SCRIPT_DIR"/*.config*.old
 
