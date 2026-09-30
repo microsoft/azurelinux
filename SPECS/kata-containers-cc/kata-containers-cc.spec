@@ -30,7 +30,6 @@ Patch11:      CVE-2026-84445.patch
 Patch12:      rustix-remove-rustc-attrs.patch
 Patch13:      CVE-2026-93599.patch
 Patch14:      CVE-2026-93600.patch
-Patch15:      CVE-2026-93601.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
