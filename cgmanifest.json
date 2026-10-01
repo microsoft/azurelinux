@@ -26704,8 +26704,8 @@
         "type": "other",
         "other": {
           "name": "rsync",
-          "version": "3.5.0",
-          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.5.0.tar.gz"
+          "version": "3.5.1",
+          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.5.1.tar.gz"
         }
       }
     },
