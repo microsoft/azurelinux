@@ -52,7 +52,7 @@ Patch19:        0004-Propagate-launcher-pull-secret-to-hotplug-helper-pods.patch
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
-BuildRequires:  golang >= 1.24
+BuildRequires:  golang < 1.27
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
