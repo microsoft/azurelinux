@@ -13,8 +13,8 @@ referenced by each image's `tests.tests` in `base/images/images.toml`
 The standard entry point is:
 
 ```bash
-azldev image build vm-base
-azldev image test  vm-base
+azldev image build 1p-vm-base-gen2
+azldev image test  1p-vm-base-gen2
 
 azldev image build container-base
 azldev image test  container-base
@@ -47,7 +47,7 @@ cd base/images/tests
 # Static tests — VM image
 uv run pytest cases/static/ \
     --image-path /path/to/image.raw \
-    --image-name vm-base \
+    --image-name 1p-vm-base-gen2 \
     --capabilities machine-bootable,systemd,runtime-package-management
 
 # Static tests — Container image
@@ -129,9 +129,8 @@ base/images/
         │   ├── test_os_release.py       # Shared: /etc/os-release
         │   ├── test_oci_config.py       # Shared (container): OCI Config.User unset
         │   ├── test_packages.py         # Shared: rpm-db checks (capability-gated)
-        │   ├── vm-base/                 # VM-specific static tests
-        │   │   ├── test_kernel.py
-        │   │   └── test_partitions.py
+        │   ├── test_kernel.py           # Shared: kernel modules/config (require_capability("machine-bootable"))
+        │   ├── test_partitions.py       # Shared: partition layout (require_capability("machine-bootable"))
         │   └── container-base/          # Container-specific static tests
         │       └── test_container.py
         └── runtime/                     # Live container tests (via podman exec)
