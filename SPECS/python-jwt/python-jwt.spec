@@ -72,6 +72,8 @@ tox
 %changelog
 * Tue Sep 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.1-1
 - Auto-upgrade to 2.15.1 - for CVE-2026-102267, CVE-2026-101917, CVE-2026-102269, CVE-2026-102270, CVE-2026-102268
+  CVE-2026-101918, CVE-2026-102265, CVE-2026-102266, CVE-2026-102271, CVE-2026-102272, CVE-2026-102273, CVE-2026-102274 
+  CVE-2026-102275
 
 * Mon Jul 27 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.13.0-1
 - Upgrade to 2.13.0 to fix CVE-2026-48524, CVE-2026-32597, CVE-2026-48526, CVE-2026-48522 and CVE-2026-48525
