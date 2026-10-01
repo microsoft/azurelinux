@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
-Version:        6.18.34.mshv2
+Version:        6.18.34.mshv3
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -140,6 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Thu Oct 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.mshv3-1
+- Auto-upgrade to 6.18.34.mshv3
+
 * Tue Sep 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.mshv2-1
 - Auto-upgrade to 6.18.34.mshv2
 

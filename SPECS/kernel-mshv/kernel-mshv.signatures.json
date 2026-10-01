@@ -5,6 +5,6 @@
     "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
     "config": "3edf06eec4d9090c9d3d6849f55f93c476bc144604252af23dca99a5e9b934b3",
     "config_aarch64": "7bd17f13395b8aafc0b99e9c49ffd0ffaac8a3d82bd4f5162c34bf2971ad96c5",
-    "kernel-mshv-6.18.34.mshv2.tar.gz": "e222d9c213d85af73c66349702d674e4b7a6489581d0aa57454835df03683812"
+    "kernel-mshv-6.18.34.mshv3.tar.gz": "6d58baaa4170f75c7a83a93cf3c4b5c06687e4c8992b4c00d15647fb1ea05f9c"
   }
 }
