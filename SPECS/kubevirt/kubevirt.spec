@@ -47,6 +47,7 @@ Patch16:        0001-Add-LiveMigration-Blackout-Observability.patch
 Patch17:        0002-Fix-hotplug-volume-detach-deadlock-in-virt-handler.patch
 Patch18:        0003-Fix-cleanupAttachmentPods-fallback-keeping-useless-old-pods.patch
 Patch19:        0004-Propagate-launcher-pull-secret-to-hotplug-helper-pods.patch
+Patch20:        0005-virt-api-accept-large-identity-header-sets-with-Go-1.27.patch
  
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
