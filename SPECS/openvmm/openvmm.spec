@@ -1,7 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           openvmm
-Version:        0.1.0
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        Modular, cross-platform virtual machine monitor
 Group:          Applications/System
@@ -75,6 +75,9 @@ cargo test --release --locked --offline --lib --target %{rust_target} %{test_cra
 %{_bindir}/openvmm
 
 %changelog
+* Thu Oct 01 2026 Ben Hillis <benhill@microsoft.com> - 0.2.0-1
+- Update to version 0.2.0
+
 * Thu Aug 13 2026 Ben Hillis <benhill@microsoft.com> - 0.1.0-1
 - Original version for Azure Linux
 - License verified
