@@ -1,0 +1,37 @@
+# Azure Linux branding for what wsl-setup installs on the running system.
+#
+# %post keeps upstream's os-release-derived registration name,
+# "${NAME// /}-${VERSION_ID%.*}", which is "AzureLinux-4" for every 4.x
+# release.
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://github.com/microsoft/WSL/pull/41120" }]
+
+# Upstream defaults the icon to fedora-logo.ico. Point it at the real Azure
+# Linux asset rather than the compatibility symlink in azurelinux-logos.
+[[overlays]]
+description = "Pass the Azure Linux icon to wsl-setup instead of Fedora's default"
+type = "spec-search-replace"
+section = "%post"
+regex = '^%\{_bindir\}/wsl-setup$'
+replacement = '%{_bindir}/wsl-setup --icon %{_datadir}/pixmaps/azurelinux-logo.ico'
+
+# /usr/libexec/wsl/oobe.sh is installed onto the running system and is the
+# first thing a user interacts with, so it should not describe itself as the
+# Fedora OOBE script.
+[[overlays]]
+description = "Drop Fedora branding from the OOBE script header"
+type = "file-search-replace"
+file = "wsl-oobe.sh"
+regex = 'The Fedora WSL out of box experience script\.'
+replacement = "The Azure Linux WSL out of box experience script."
+
+# The template becomes /usr/lib/wsl-distribution.conf (symlinked from
+# /etc/wsl-distribution.conf), so its example command is user-visible.
+[[overlays]]
+description = "Use the Azure Linux artifact name in the wsl-distribution.conf example command"
+type = "file-search-replace"
+file = "wsl-distribution.conf"
+regex = 'wsl --install --from-file \./Fedora\.wsl'
+replacement = "wsl --install --from-file ./AzureLinux.wsl"
