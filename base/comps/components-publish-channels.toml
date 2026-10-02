@@ -2582,6 +2582,7 @@ components = [
     "xorg-x11-fonts",
     "xorg-x11-proto-devel",
     "xorg-x11-server-Xwayland",
+    "xorg-x11-xauth",
     "xprop",
     "xrandr",
     "xrdb",
