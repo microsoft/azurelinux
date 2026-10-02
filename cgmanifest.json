@@ -15803,8 +15803,8 @@
         "type": "other",
         "other": {
           "name": "openvmm",
-          "version": "0.1.0",
-          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.1.0.tar.gz"
+          "version": "0.2.0",
+          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.2.0.tar.gz"
         }
       }
     },
