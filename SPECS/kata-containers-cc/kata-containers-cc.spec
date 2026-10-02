@@ -30,6 +30,7 @@ Patch11:      CVE-2026-84445.patch
 Patch12:      rustix-remove-rustc-attrs.patch
 Patch13:      CVE-2026-93599.patch
 Patch14:      CVE-2026-93600.patch
+Patch15:      CVE-2026-42784.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -170,7 +171,7 @@ fi
 
 %changelog
 * Mon Sep 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-22
-- Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599
+- Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599, CVE-2026-42784
 
 * Thu Sep 21 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-22                 - Backport upstream rustix#1663 to build with latest rust
 
