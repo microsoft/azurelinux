@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   lint:
-    name: "Validate TOML config"
+    name: "Lint and validate config"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
