@@ -1,0 +1,28 @@
+[components.python-ml-dtypes]
+# python-ml-dtypes was added to Fedora for f45/rawhide. We have to pin
+# explicitly.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "445b74248e7c416755fc07eb05b488fa1ab380e1" }
+
+# Fedora's %prep pins the pyproject.toml build-system requirement to
+# setuptools >= 80.9. AZL4 has 78.1.1 and an upgrade is not feasible.
+# ml_dtypes' is not an actual feature requirement, we can loosen it.
+[[components.python-ml-dtypes.overlays]]
+description = "Loosen setuptools pin from >=80.9 to >=78.1 to match; ml_dtypes does not use setuptools >=80.9-only feature"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^sed -i .s/"setuptools\.\*",/"setuptools >= 80\.9",/g. pyproject\.toml$'
+replacement = "sed -i 's/\"setuptools.*\",/\"setuptools >= 78.1\",/g' pyproject.toml"
+
+# ml_dtypes' float8.h relies on Eigen::numext::get_integer_by_size<> added to Eigen
+# after 3.4.0 and that version is not released. We are at 3.4.0. Rather than
+# complicate deps further by forcing a non-dist-git upgrade of eigen we backport a
+# minimal compatible definition of the missing trait directly into float8.h, matching
+# Eigen's upstream (unreleased) implementation.
+[[components.python-ml-dtypes.overlays]]
+description = "Backport Eigen::numext::get_integer_by_size<> shim into float8.h for compatibility with Eigen 3.4.0"
+type = "patch-add"
+source = "0001-float8-add-eigen-numext-get_integer_by_size-shim.patch"
+
+[components.python-ml-dtypes.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "needs-upstream-hook"
