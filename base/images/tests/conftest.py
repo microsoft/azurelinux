@@ -303,6 +303,32 @@ def partition_table(disk_info: DiskInfo | None, image_type: str) -> list[Partiti
     return disk_info.partitions
 
 
+@pytest.fixture(scope="session")
+def boot_entry_kernel_options(rootfs: Path) -> dict[Path, list[str]]:
+    """Kernel command-line options keyed by BLS boot entry path."""
+    entries_dir = rootfs / "boot" / "loader" / "entries"
+    entries = sorted(entries_dir.glob("*.conf"))
+    if not entries:
+        pytest.fail(f"No boot loader entries found under {entries_dir}")
+
+    options_by_entry: dict[Path, list[str]] = {}
+    for entry in entries:
+        option_lines = []
+        for line in entry.read_text().splitlines():
+            fields = line.split(maxsplit=1)
+            if fields and fields[0] == "options":
+                if len(fields) != 2:
+                    pytest.fail(f"Boot loader options are empty in {entry}")
+                option_lines.append(fields[1])
+        if len(option_lines) != 1:
+            pytest.fail(
+                f"Expected exactly one options line in {entry}, "
+                f"found {len(option_lines)}"
+            )
+        options_by_entry[entry] = shlex.split(option_lines[0])
+    return options_by_entry
+
+
 # ---------------------------------------------------------------------------
 # Container runtime fixtures
 # ---------------------------------------------------------------------------
