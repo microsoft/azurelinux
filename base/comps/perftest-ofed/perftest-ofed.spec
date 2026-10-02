@@ -13,6 +13,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  rdma-core-ofed-devel
 BuildRequires:  pciutils-devel
 BuildRequires:  autoconf automake gcc-c++ libtool
+BuildRequires:  cuda-driver-devel-13-2
 
 %global __requires_exclude_from ^%{_libdir}/libperftest_kernels\.so$
 
@@ -32,6 +33,14 @@ tar -xf perftest-%{version}.tar.gz
 %setup -q -T -D -n %{upstream_name}-%{version}
 
 %build
+# NVIDIA ships cuda.h under an arch-specific "targets/<arch>-linux" path;
+# aarch64 uses the "sbsa" name, not "aarch64" (matches gdrcopy.inc).
+%ifarch x86_64
+%global _cuda_h_path /usr/local/cuda-13.2/targets/x86_64-linux/include/cuda.h
+%endif
+%ifarch aarch64
+%global _cuda_h_path /usr/local/cuda-13.2/targets/sbsa-linux/include/cuda.h
+%endif
 %configure \
 %if %{?_cuda_h_path:1}0
         CUDA_H_PATH=%{_cuda_h_path}
