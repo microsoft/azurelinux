@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.8
-Release:        16%{?dist}
+Release:        14%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -35,6 +35,7 @@ Patch20:        CVE-2024-47866.patch
 Patch21:        CVE-2026-54330.patch
 Patch22:        ceph-volume-importlib-metadata-compat.patch
 Patch23:        mgr-subinterpreter-modules.patch
+Patch24:        rgw-common-link-openssl.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -2076,18 +2077,15 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
-* Thu Oct 01 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-16
-- Load manager modules in the main Python interpreter by default.
-
-* Thu Oct 01 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-15
+* Fri Oct 02 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-14
+- Upgrade to 18.2.8 and remove patches included upstream.
+- Package extblkdev plugins in ceph-base.
+- Package core manager modules separately and require them from ceph-mgr.
+- Exclude the restful manager module until its dependency is available.
 - Fix ceph-volume compatibility with Python 3.12.
 - Add the missing more-itertools dependency for manager modules.
-
-* Thu Oct 01 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-14
-- Require the core manager modules from ceph-mgr.
-
-* Wed Sep 30 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-13
-- Upgrade to 18.2.8.
+- Load manager modules in the main Python interpreter by default.
+- Link rgw_common consumers with OpenSSL SSL.
 
 * Thu Sep 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.2.2-13
 - Patch for CVE-2026-54330
