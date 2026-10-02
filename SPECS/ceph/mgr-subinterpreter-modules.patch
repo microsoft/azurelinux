@@ -1,0 +1,135 @@
+From 239b0dc8a9c42449ee1faa1bf78bdcc380345ae2 Mon Sep 17 00:00:00 2001
+From: Samuel Just <sjust@redhat.com>
+Date: Fri, 7 Nov 2025 23:56:14 +0000
+Subject: [PATCH] mgr: add mgr_subinterpreter_modules config
+
+Upstream-reference: https://github.com/ceph/ceph/commit/239b0dc8a9c42449ee1faa1bf78bdcc380345ae2.patch
+
+This changes the default behavior of ceph-mgr from running each module
+in a distinct subinterpreter to running them in the main interpreter.
+Modules can opt back into subinterpreters after compatibility testing.
+
+Adapted for Reef by retaining its existing interpreter cleanup model and
+moving its argv and sys.path setup after interpreter selection so both
+main-interpreter and subinterpreter modules receive the same environment.
+
+Fixes: https://tracker.ceph.com/issues/73857
+Fixes: https://tracker.ceph.com/issues/73859
+Signed-off-by: Samuel Just <sjust@redhat.com>
+---
+ src/common/options/CMakeLists.txt |  2 ++
+ src/common/options/mgr.yaml.in    | 13 +++++++++++++
+ src/mgr/PyModule.cc               | 43 ++++++++++++++++++++++++++++++-------------
+ 3 files changed, 45 insertions(+), 13 deletions(-)
+
+diff --git a/src/common/options/CMakeLists.txt b/src/common/options/CMakeLists.txt
+index 2976c14..3bf6b3d 100644
+--- a/src/common/options/CMakeLists.txt
++++ b/src/common/options/CMakeLists.txt
+@@ -82,6 +82,8 @@ if(WITH_MGR)
+   endif()
+ endif()
+ 
++set(mgr_subinterpreter_modules "")
++
+ add_options(global)
+ add_options(cephfs-mirror)
+ add_options(crimson)
+diff --git a/src/common/options/mgr.yaml.in b/src/common/options/mgr.yaml.in
+index ef8f3cb..4aa83e8 100644
+--- a/src/common/options/mgr.yaml.in
++++ b/src/common/options/mgr.yaml.in
+@@ -138,6 +138,19 @@ options:
+   - mgr_module_path
+   flags:
+   - startup
++- name: mgr_subinterpreter_modules
++  type: str
++  level: advanced
++  desc: List of manager modules to load in independent subinterpreters
++  long_desc: A comma delimited list of module names. This list is read by manager
++    when it starts. By default, manager loads each module into the main interpreter.
++    Modules in this list will instead be loaded into independent subinterpreters.
++    Specifying '*' will cause all modules to be run in independent subinterpreters.
++  default: @mgr_subinterpreter_modules@
++  services:
++  - mgr
++  flags:
++  - startup
+ - name: mgr_initial_modules
+   type: str
+   level: basic
+diff --git a/src/mgr/PyModule.cc b/src/mgr/PyModule.cc
+index 20234ec576..861bc13d89 100644
+--- a/src/mgr/PyModule.cc
++++ b/src/mgr/PyModule.cc
+@@ -19,8 +19,11 @@
+ 
+ #include "PyModule.h"
+ 
++#include <algorithm>
++
+ #include "include/stringify.h"
+ #include "common/BackTrace.h"
++#include "common/split.h"
+ #include "global/signal_handler.h"
+ 
+ #include "common/debug.h"
+@@ -346,8 +349,18 @@ int PyModule::load(PyThreadState *pMainThreadState)
+ {
+   ceph_assert(pMainThreadState != nullptr);
+ 
+-  // Configure sub-interpreter
+-  {
++  const auto subinterpreter_modules_opt = g_conf().get_val<std::string>(
++    "mgr_subinterpreter_modules");
++  const auto subinterpreter_modules = ceph::split(subinterpreter_modules_opt);
++  const bool use_main_interpreter =
++    std::count(subinterpreter_modules.begin(), subinterpreter_modules.end(), "*") == 0 &&
++    std::count(subinterpreter_modules.begin(), subinterpreter_modules.end(), module_name) == 0;
++
++  if (use_main_interpreter) {
++    derr << "Loading module " << module_name << " in main interpreter" << dendl;
++    pMyThreadState.set(pMainThreadState);
++  } else {
++    derr << "Loading module " << module_name << " in sub-interpreter" << dendl;
+     SafeThreadState sts(pMainThreadState);
+     Gil gil(sts);
+ 
+@@ -357,19 +370,23 @@ int PyModule::load(PyThreadState *pMainThreadState)
+       return -EINVAL;
+     } else {
+       pMyThreadState.set(thread_state);
+-      // Some python modules do not cope with an unpopulated argv, so lets
+-      // fake one.  This step also picks up site-packages into sys.path.
+-      const wchar_t *argv[] = {L"ceph-mgr"};
+-      PySys_SetArgv(1, (wchar_t**)argv);
+-      // Configure sys.path to include mgr_module_path
+-      string paths = (g_conf().get_val<std::string>("mgr_module_path") + ':' +
+-                      get_site_packages() + ':');
+-      wstring sys_path(wstring(begin(paths), end(paths)) + Py_GetPath());
+-      PySys_SetPath(const_cast<wchar_t*>(sys_path.c_str()));
+-      dout(10) << "Computed sys.path '"
+-	       << string(begin(sys_path), end(sys_path)) << "'" << dendl;
+     }
+   }
++  {
++    Gil gil(pMyThreadState);
++    // Some python modules do not cope with an unpopulated argv, so lets
++    // fake one.  This step also picks up site-packages into sys.path.
++    const wchar_t *argv[] = {L"ceph-mgr"};
++    PySys_SetArgv(1, (wchar_t**)argv);
++    // Configure sys.path to include mgr_module_path
++    string paths = (g_conf().get_val<std::string>("mgr_module_path") + ':' +
++                    get_site_packages() + ':');
++    wstring sys_path(wstring(begin(paths), end(paths)) + Py_GetPath());
++    PySys_SetPath(const_cast<wchar_t*>(sys_path.c_str()));
++    dout(10) << "Computed sys.path '"
++             << string(begin(sys_path), end(sys_path)) << "'" << dendl;
++  }
++
+   // Environment is all good, import the external module
+   {
+     Gil gil(pMyThreadState);
+-- 
+2.51.0

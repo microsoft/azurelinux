@@ -1,0 +1,31 @@
+From 3f1cd1b44a8ef60c6f8fd460df5559145a059930 Mon Sep 17 00:00:00 2001
+From: Sandeep Karambelkar <skarambelkar@microsoft.com>
+Date: Fri, 2 Oct 2026 00:00:00 +0000
+Subject: [PATCH] rgw: link rgw_common with OpenSSL SSL
+
+Upstream-reference: https://github.com/ceph/ceph/commit/3f1cd1b44a8ef60c6f8fd460df5559145a059930.patch
+
+rgw_rest_sts.cc calls SSL_get_error and other libssl functions. Since
+rgw_common is a static library, expose OpenSSL::SSL in its public link
+interface so consumers such as dbstore-bin link libssl after the archive.
+
+Signed-off-by: Sandeep Karambelkar <skarambelkar@microsoft.com>
+---
+ src/rgw/CMakeLists.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/rgw/CMakeLists.txt b/src/rgw/CMakeLists.txt
+index 87876c526..e56948bf7 100644
+--- a/src/rgw/CMakeLists.txt
++++ b/src/rgw/CMakeLists.txt
+@@ -266,6 +266,7 @@ target_link_libraries(rgw_common
+     RapidJSON::RapidJSON
+     spawn
+-    fmt::fmt)
++    fmt::fmt
++    OpenSSL::SSL)
+ target_include_directories(rgw_common
+   PUBLIC "${CMAKE_SOURCE_DIR}/src/rgw/services"
+   PUBLIC "${CMAKE_SOURCE_DIR}/src/rgw/driver/rados"
+-- 
+2.51.0
