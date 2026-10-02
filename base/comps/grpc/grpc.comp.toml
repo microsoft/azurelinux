@@ -12,3 +12,12 @@ description = "Add libpfm-devel so libpfm-enabled google-benchmark's CMake confi
 type = "spec-add-tag"
 tag = "BuildRequires"
 value = "libpfm-devel"
+
+[[components.grpc.overlays]]
+description = "Add Provides: python-grpcio to python3-grpcio. Fedora's python-grpcio package was retired in favor of grpc's python3-grpcio subpackage; this lets components that still reference python-grpcio resolve against this subpackage."
+type = "spec-add-tag"
+section = "%package"
+package = "python3-grpcio"
+tag = "Provides"
+value = "python-grpcio = %{version}-%{release}"
+metadata = { category = "azl-compatibility", upstream-status = "inapplicable" }
