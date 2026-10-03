@@ -1,0 +1,16 @@
+[ req ]
+default_bits = 4096
+distinguished_name = req_distinguished_name
+prompt = no
+x509_extensions = myexts
+
+[ req_distinguished_name ]
+O = Fedora
+CN = Fedora kernel signing key
+emailAddress = kernel-team@fedoraproject.org
+
+[ myexts ]
+basicConstraints=critical,CA:FALSE
+keyUsage=digitalSignature
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid
