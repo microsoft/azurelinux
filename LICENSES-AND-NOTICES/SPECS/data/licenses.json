@@ -3192,6 +3192,7 @@
                 "bootengine",
                 "coreos-cloudinit",
                 "coreos-init",
+                "erlang27",
                 "ignition-flatcar",
                 "koji-fedoramessaging",
                 "python-nocaselist",
