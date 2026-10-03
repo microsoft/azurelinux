@@ -1,0 +1,6 @@
+[components.rust-proptest]
+# Pin past the distro default snapshot (proptest 1.9.0) to Fedora f43 HEAD,
+# providing 1.11.0, required by rust-ctutils 0.4.2
+# (crate(proptest/default) >= 1.11.0). No compat package needed; no other
+# in-tree consumer requires the older range.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "73ccd819a175dc490f9c60e9930bd0676ba29811" }

@@ -1,0 +1,5 @@
+[components.rust-aes]
+# Pin past the distro default snapshot to Fedora f43 HEAD, providing aes
+# 0.9.1, required by rust-zip 8.6.0 (crate(aes/default) >= 0.9.0).
+# Consumers requiring aes < 0.9.0 are served by rust-aes0.8.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e194e176071e881f0c537bba923dedb85b0bf8c3" }

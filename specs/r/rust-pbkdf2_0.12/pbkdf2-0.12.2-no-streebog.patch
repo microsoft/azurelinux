@@ -1,0 +1,21 @@
+diff -Naur pbkdf2-0.12.2-original/tests/mod.rs pbkdf2-0.12.2/tests/mod.rs
+--- pbkdf2-0.12.2-original/tests/mod.rs	2006-07-24 02:21:28.000000000 +0100
++++ pbkdf2-0.12.2/tests/mod.rs	2026-06-08 11:40:25.779340803 +0100
+@@ -2,6 +2,8 @@
+ use hex_literal::hex;
+ use pbkdf2::pbkdf2_hmac_array as f;
+ use sha1::Sha1;
++// Downstream-only: drop streebog dev-dependency to avoid a compat package
++#[cfg(false)]
+ use streebog::Streebog512;
+ 
+ /// Tests from RFC 6070:
+@@ -43,6 +45,8 @@
+ 
+ /// Test vectors from R 50.1.111-2016:
+ /// https://tc26.ru/standard/rs/Р 50.1.111-2016.pdf
++// Downstream-only: drop streebog dev-dependency to avoid a compat package
++#[cfg(false)]
+ #[test]
+ fn gost() {
+     assert_eq!(

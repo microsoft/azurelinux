@@ -1,0 +1,4 @@
+[components.'rust-const-oid0.9']
+# Fedora's own compat package for const-oid 0.9.x, for consumers requiring
+# const-oid < 0.10.0. See rust-const-oid.comp.toml.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "47e3ee51179b196d930cc69069ad023b396252d1" }

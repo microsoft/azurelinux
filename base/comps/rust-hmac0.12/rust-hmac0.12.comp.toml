@@ -1,0 +1,4 @@
+[components.'rust-hmac0.12']
+# Fedora's own compat package for hmac 0.12.x, for consumers requiring
+# hmac < 0.13.0. See rust-hmac.comp.toml.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "22666a19753ee1e9df683ead09e72703c33d7207" }

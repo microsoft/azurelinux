@@ -1,0 +1,4 @@
+[components.'rust-aes0.8']
+# Fedora's own compat package for aes 0.8.x, for consumers requiring
+# aes < 0.9.0. See rust-aes.comp.toml.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "662190332f07ed9635bb919500e3b67bfe4db7bd" }
