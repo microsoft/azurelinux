@@ -2326,6 +2326,7 @@
                 "libconfuse",
                 "libgdiplus",
                 "libimobiledevice-glue",
+                "libkeysinuse",
                 "libmaxminddb",
                 "libmetalink",
                 "libsafec",
