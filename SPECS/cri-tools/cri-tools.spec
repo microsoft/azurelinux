@@ -7,7 +7,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.32.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,7 +29,7 @@ Patch11:        CVE-2026-56852.patch
 Patch12:        CVE-2026-37236.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
-BuildRequires:  golang < 1.25
+BuildRequires:  golang
 
 %description
 cri-tools aims to provide a series of debugging and validation tools for Kubelet CRI, which includes:
@@ -57,6 +57,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.32.0-9
+- Remove 'BuildRequires: golang < 1.25' pin to build with the default Go toolchain.
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-8
 - Patch for CVE-2026-37236
 

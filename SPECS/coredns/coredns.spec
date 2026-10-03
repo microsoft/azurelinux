@@ -6,7 +6,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,7 +57,7 @@ Patch16:        CVE-2026-62299.patch
 Patch17:        CVE-2026-62994.patch
 Patch18:        CVE-2026-84445.patch
 
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang
 
 %description
 CoreDNS is a fast and flexible DNS server.
@@ -97,6 +97,9 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.11.4-22
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
 * Fri Sep 18 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 1.11.4-21
 - Patch for CVE-2026-84445, CVE-2026-84304
 - Upgrade vendored google.golang.org/grpc to v1.83.2

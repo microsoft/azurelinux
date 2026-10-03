@@ -1,7 +1,7 @@
 Summary:        The command line for DC/OS
 Name:           dcos-cli
 Version:        1.2.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,7 +16,7 @@ Patch4:         CVE-2025-65637.patch
 Patch5:         CVE-2025-30204.patch
 Patch6:         CVE-2026-56852.patch
 
-BuildRequires:  golang < 1.25
+BuildRequires:  golang
 BuildRequires:  git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -52,6 +52,9 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.2.0-23
+- Remove 'BuildRequires: golang < 1.25' pin to build with the default Go toolchain.
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-22
 - Patch for CVE-2026-56852
 

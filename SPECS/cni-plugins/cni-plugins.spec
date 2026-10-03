@@ -1,7 +1,7 @@
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni-plugins
 Version:        1.4.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,7 +22,7 @@ Patch8:         CVE-2026-42502.patch
 Patch9:         CVE-2026-25680.patch
 
 %define _default_cni_plugins_dir /opt/cni/bin
-BuildRequires:  golang >= 1.5
+BuildRequires:  golang
 Provides:       kubernetes-cni
 
 %description
@@ -50,6 +50,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.4.0-7
+- Remove 'BuildRequires: golang >= 1.5' pin; the default Go toolchain satisfies it.
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-6
 - Patch for CVE-2026-42506, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
 

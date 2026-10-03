@@ -30,7 +30,7 @@ Epoch: 0
 Version: 1.43.1
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 ExclusiveArch: aarch64 ppc64le s390x x86_64
@@ -42,7 +42,7 @@ Patch0: 0001-Run-selective-tests.patch
 Patch1: 0001-fix-copier-arguments.patch
 BuildRequires: device-mapper-devel
 BuildRequires: git-core
-BuildRequires: golang >= 1.25.0
+BuildRequires: golang
 BuildRequires: glib2-devel
 BuildRequires: glibc-static >= 2.38-21%{?dist}
 %if !%{defined gobuild}
@@ -174,6 +174,9 @@ make test-unit
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 0:1.43.1-4
+- Remove 'BuildRequires: golang >= 1.25.0' pin; the default Go toolchain satisfies it.
+
 * Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 0:1.43.1-3
 - Bump to rebuild with updated glibc
 

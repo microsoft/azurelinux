@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.33
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,7 +42,7 @@ Source1:        etcd.service
 #             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
-BuildRequires:  golang >= 1.25.12
+BuildRequires:  golang
 
 %description
 A highly-available key value store for shared configuration and service discovery.
@@ -143,6 +143,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 3.5.33-2
+- Remove 'BuildRequires: golang >= 1.25.12' pin; the default Go toolchain satisfies it.
+
 * Mon Jul 27 2026 Aditya Singh <v-aditysing@microsoft.com> - 3.5.33-1
 - Upgrade to version 3.5.33.
 - Fixes CVE-2026-56852 by upgrading vendor package golang.org/x/text from version 0.37.0 => 0.39.0.

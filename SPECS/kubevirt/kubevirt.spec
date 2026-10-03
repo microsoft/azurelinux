@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.8.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,7 +50,7 @@ Patch17:        CVE-2026-78662.patch
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
-BuildRequires:  golang >= 1.24
+BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
@@ -299,6 +299,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.8.4-3
+- Remove 'BuildRequires: golang >= 1.24' pin; the default Go toolchain satisfies it.
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.4-2
 - Patch for CVE-2026-78662, CVE-2026-56855
 

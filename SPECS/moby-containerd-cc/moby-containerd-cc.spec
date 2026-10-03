@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 17%{?dist}
+Release: 18%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -38,7 +38,7 @@ Patch18:CVE-2026-37236.patch
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang < 1.23
+BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -56,14 +56,14 @@ This is the containerd runtime meant for use with confidential containers
 
 %build
 export BUILDTAGS="-mod=vendor"
-make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
+make VERSION="%{version}" REVISION="%{commit_hash}" EXTRA_LDFLAGS="-checklinkname=0 -s -w" binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
-make VERSION="%{version}" REVISION="%{commit_hash}" test
+make VERSION="%{version}" REVISION="%{commit_hash}" EXTRA_LDFLAGS="-checklinkname=0 -s -w" test
 
 %install
-make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
+make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" EXTRA_LDFLAGS="-checklinkname=0 -s -w" install install-man
 
 mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
@@ -91,6 +91,10 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.7.7-18
+- Remove 'BuildRequires: golang < 1.23' pin to build with the default Go toolchain.
+- Fix build on ARM64
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-17
 - Patch for CVE-2026-37236
 

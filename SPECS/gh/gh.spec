@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.101.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 
 Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
 
-BuildRequires:  golang >= 1.26.5
+BuildRequires:  golang
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}
@@ -59,6 +59,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.101.0-2
+- Remove 'BuildRequires: golang >= 1.26.5' pin; the default Go toolchain satisfies it.
+
 * Wed Sep 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.101.0-1
 - Auto-upgrade to 2.101.0 - for CVE-2026-84445, CVE-2026-84304, CVE-2026-56855, CVE-2026-78662, CVE-2026-72924
 

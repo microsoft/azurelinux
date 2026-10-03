@@ -1,7 +1,7 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
 Version:        0.0.10
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
 Group:          Applications/Text
@@ -23,7 +23,7 @@ Patch0:       CVE-2026-73500.patch
 Patch1:       CVE-2026-37236.patch
 Patch2:       CVE-2026-84445.patch
 
-BuildRequires: golang >= 1.25
+BuildRequires: golang
 
 %description
 The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups.
@@ -42,6 +42,9 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 0.0.10-11
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
 * Wed Sep 16 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.0.10-10
 - Patch for CVE-2026-84445, CVE-2026-84304, CVE-2026-83530
 - Removed patch for CVE-2024-45338, CVE-2025-22872, CVE-2025-47911, CVE-2025-58190, CVE-2026-39821,

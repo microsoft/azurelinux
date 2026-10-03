@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.14.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,7 +51,7 @@ Patch25:        CVE-2026-73500.patch
 Patch26:        CVE-2026-79921.patch
 Patch27:        CVE-2026-37236.patch
 
-BuildRequires:  golang >= 1.15
+BuildRequires:  golang
 
 %description
 KEDA is a Kubernetes-based Event Driven Autoscaling component. 
@@ -86,6 +86,9 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Wed Sep 30 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.14.1-20
+- Remove 'BuildRequires: golang >= 1.15' pin; the default Go toolchain satisfies it.
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14.1-19
 - Patch for CVE-2026-37236
 
