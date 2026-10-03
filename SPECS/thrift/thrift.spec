@@ -65,7 +65,7 @@
 # change is a SONAME change and dependencies need to be rebuilt
 Summary: Software framework for cross-language services development
 Name:    thrift
-Version: 0.24.0
+Version: 0.25.0
 Release: 1%{?dist}
 
 # Parts of the source are used under the BSD and zlib licenses, but
@@ -409,6 +409,9 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %endif
  
 %changelog
+* Sat Oct 03 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.25.0-1
+- Auto-upgrade to 0.25.0 - for CVE-2026-82458, CVE-2026-82459, CVE-2026-85087, CVE-2026-85494, CVE-2026-91135, CVE-2026-92834, CVE-2026-93925, CVE-2026-93926, CVE-2026-94634, CVE-2026-94636, CVE-2026-94652
+
 * Tue Jul 28 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 0.24.0-1
 - Upgrade to 0.24.0 for CVE-2026-48144, CVE-2026-49158, CVE-2026-58023, CVE-2026-58662, CVE-2026-66053, CVE-2026-55970, CVE-2026-41608, CVE-2026-55969, CVE-2026-43871, CVE-2026-48586, CVE-2026-48145, CVE-2026-55971, CVE-2026-41606, CVE-2026-41607
 - Removed CVE patches fixed in upstream: CVE-2025-48431, CVE-2026-41602, CVE-2026-41603, CVE-2026-41605, CVE-2026-41636

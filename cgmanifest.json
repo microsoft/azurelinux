@@ -29406,8 +29406,8 @@
         "type": "other",
         "other": {
           "name": "thrift",
-          "version": "0.24.0",
-          "downloadUrl": "https://archive.apache.org/dist/thrift/0.24.0/thrift-0.24.0.tar.gz"
+          "version": "0.25.0",
+          "downloadUrl": "https://archive.apache.org/dist/thrift/0.25.0/thrift-0.25.0.tar.gz"
         }
       }
     },
