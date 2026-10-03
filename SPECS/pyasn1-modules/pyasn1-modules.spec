@@ -1,13 +1,13 @@
 Summary:        A collection of ASN.1-based protocols modules.
 Name:           pyasn1-modules
-Version:        0.2.8
+Version:        0.4.2
 Release:        1%{?dist}
 Url:            https://pypi.python.org/pypi/pyasn1-modules
 License:        BSD
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://github.com/etingof/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/e9/e6/78ebbb10a8c8e4b61a59249394a4a594c1a7af95593dc933a349c8d00964/pyasn1_modules-%{version}.tar.gz
 BuildRequires:  python3-devel
 %if 0%{?with_check}
 BuildRequires:  python3-pyasn1
@@ -28,8 +28,7 @@ It's thought to be useful to protocol developers and testers.
 All modules are py2k/py3k-compliant.
 
 %prep
-%autosetup
-%py3_shebang_fix .
+%autosetup -n pyasn1_modules-%{version}
 
 %build
 %py3_build
@@ -46,6 +45,10 @@ PYTHONPATH=.:%{buildroot}%{python3_sitelib} %python3 tests/__main__.py
 %{python3_sitelib}/*
 
 %changelog
+* Mon Jul 20 2026 BinduSri Adabala <v-badabala@microsoft.com> - 0.4.2-1
+- Upgrade to version 0.4.2
+- Switch source from GitHub source to PyPI
+
 * Mon Mar 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.2.8-1
 - Upgrade to latest upstream version
 - Switch source from PyPI to GitHub source
