@@ -2077,8 +2077,8 @@
         "type": "other",
         "other": {
           "name": "containerd2",
-          "version": "2.3.4",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.4.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.4.0.tar.gz"
         }
       }
     },
@@ -27774,8 +27774,8 @@
         "type": "other",
         "other": {
           "name": "runc",
-          "version": "1.4.3",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.4.3.tar.gz"
+          "version": "1.5.1",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.5.1.tar.gz"
         }
       }
     },
