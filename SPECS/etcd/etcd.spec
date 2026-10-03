@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.33
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,12 @@ Source1:        etcd.service
 #             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
+# Both patches touch vendored code, so they are applied in %%build, where each
+# component unpacks its own vendor tarball. Patch1 is server-only: 'server' is
+# the sole component vendoring grpc-gateway, and the patch also adjusts
+# embed/serve.go alongside it.
+Patch0:         CVE-2026-84304.patch
+Patch1:         CVE-2026-37236.patch
 BuildRequires:  golang >= 1.25.12
 
 %description
@@ -69,6 +75,10 @@ mkdir -p %{ETCD_OUT_DIR}
 for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH0}
+    if [ "$component" = "server" ]; then
+        patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH1}
+    fi
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
@@ -82,6 +92,7 @@ mkdir -p %{ETCD_TOOLS_OUT_DIR}
 for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH0}
     go build \
         -o %{ETCD_TOOLS_OUT_DIR}
     popd
@@ -143,6 +154,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Tue Sep 15 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.5.33-2
+- Patch for CVE-2026-84304, CVE-2026-37236.
+
 * Mon Jul 27 2026 Aditya Singh <v-aditysing@microsoft.com> - 3.5.33-1
 - Upgrade to version 3.5.33.
 - Fixes CVE-2026-56852 by upgrading vendor package golang.org/x/text from version 0.37.0 => 0.39.0.
