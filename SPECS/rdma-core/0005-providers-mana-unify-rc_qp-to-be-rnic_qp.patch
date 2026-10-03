@@ -1,0 +1,572 @@
+From 7c1c1bd8be8d7fe0c8f7623e4bfcef997411b411 Mon Sep 17 00:00:00 2001
+From: Konstantin Taranov <kotaranov@microsoft.com>
+Date: Wed, 17 Dec 2025 15:59:39 +0100
+Subject: [PATCH 5/7] providers/mana: unify rc_qp to be rnic_qp
+
+Abstract helpers and data structures to handle a general RNIC QP.
+This change helps to introduce new QP types and reuse the same
+helpers and the same general fields (e.g., psn, msn).
+
+Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+---
+ providers/mana/cq.c           | 28 ++++++++--------
+ providers/mana/gdma.h         |  2 +-
+ providers/mana/mana.c         | 15 +++++----
+ providers/mana/mana.h         | 27 ++++++++-------
+ providers/mana/qp.c           | 62 +++++++++++++++++------------------
+ providers/mana/rollback.h     |  6 ++--
+ providers/mana/shadow_queue.h |  4 +--
+ providers/mana/wr.c           | 34 +++++++++----------
+ 8 files changed, 90 insertions(+), 88 deletions(-)
+
+diff --git a/providers/mana/cq.c b/providers/mana/cq.c
+index 372c503..367d5a2 100644
+--- a/providers/mana/cq.c
++++ b/providers/mana/cq.c
+@@ -105,7 +105,7 @@ static enum ibv_wc_status vendor_error_to_wc_error(uint32_t vendor_error)
+ static void fill_verbs_from_shadow_wqe(struct mana_qp *qp, struct ibv_wc *wc,
+ 				       const struct shadow_wqe_header *shadow_wqe)
+ {
+-	const struct rc_rq_shadow_wqe *rc_wqe = (const struct rc_rq_shadow_wqe *)shadow_wqe;
++	const struct rnic_rq_shadow_wqe *rq_wqe = (const struct rnic_rq_shadow_wqe *)shadow_wqe;
+ 
+ 	wc->wr_id = shadow_wqe->wr_id;
+ 	wc->status = vendor_error_to_wc_error(shadow_wqe->vendor_error);
+@@ -116,8 +116,8 @@ static void fill_verbs_from_shadow_wqe(struct mana_qp *qp, struct ibv_wc *wc,
+ 	wc->pkey_index = 0;
+ 
+ 	if (shadow_wqe->opcode & IBV_WC_RECV) {
+-		wc->byte_len = rc_wqe->byte_len;
+-		wc->imm_data = htobe32(rc_wqe->imm_or_rkey);
++		wc->byte_len = rq_wqe->byte_len;
++		wc->imm_data = htobe32(rq_wqe->imm_or_rkey);
+ 	}
+ }
+ 
+@@ -236,8 +236,8 @@ int mana_arm_cq(struct ibv_cq *ibcq, int solicited)
+ 
+ static inline bool get_next_signal_psn(struct mana_qp *qp, uint32_t *psn)
+ {
+-	struct rc_sq_shadow_wqe *shadow_wqe =
+-		(struct rc_sq_shadow_wqe *)shadow_queue_get_next_to_signal(&qp->shadow_sq);
++	struct rnic_sq_shadow_wqe *shadow_wqe =
++		(struct rnic_sq_shadow_wqe *)shadow_queue_get_next_to_signal(&qp->shadow_sq);
+ 
+ 	if (!shadow_wqe)
+ 		return false;
+@@ -251,14 +251,14 @@ static inline int advance_send_completions(struct mana_qp *qp, uint32_t psn,
+ {
+ 	struct mana_gdma_queue *recv_queue = mana_ib_get_rreq(qp);
+ 	struct mana_gdma_queue *send_queue = mana_ib_get_sreq(qp);
+-	struct rc_sq_shadow_wqe *shadow_wqe;
++	struct rnic_sq_shadow_wqe *shadow_wqe;
+ 	int produced = 0;
+ 
+-	if (!PSN_LT(psn, qp->rc_qp.sq_psn))
++	if (!PSN_LT(psn, qp->sq_psn))
+ 		return 0;
+ 
+ 	while (produced < nwc &&
+-	       (shadow_wqe = (struct rc_sq_shadow_wqe *)
++	       (shadow_wqe = (struct rnic_sq_shadow_wqe *)
+ 		shadow_queue_get_next_to_consume(&qp->shadow_sq)) != NULL) {
+ 		if (PSN_LT(psn, shadow_wqe->end_psn))
+ 			break;
+@@ -303,7 +303,7 @@ static inline int handle_rc_requester_cqe(struct mana_qp *qp, struct gdma_cqe *c
+ 
+ 	gdma_arm_normal_cqe(recv_queue, arm_psn);
+ 
+-	struct rc_sq_shadow_wqe *next = (struct rc_sq_shadow_wqe *)
++	struct rnic_sq_shadow_wqe *next = (struct rnic_sq_shadow_wqe *)
+ 		shadow_queue_get_next_to_consume(&qp->shadow_sq);
+ 	if (!next)
+ 		*consumed = true;
+@@ -317,9 +317,9 @@ static inline int handle_responder_cqe(struct mana_qp *qp, struct gdma_cqe *cqe,
+ 				       struct ibv_wc *wc)
+ {
+ 	struct mana_gdma_queue *recv_queue = mana_ib_get_rresp(qp);
+-	struct rc_rq_shadow_wqe *shadow_wqe;
++	struct rnic_rq_shadow_wqe *shadow_wqe;
+ 
+-	shadow_wqe = (struct rc_rq_shadow_wqe *)shadow_queue_get_next_to_consume(&qp->shadow_rq);
++	shadow_wqe = (struct rnic_rq_shadow_wqe *)shadow_queue_get_next_to_consume(&qp->shadow_rq);
+ 	if (!shadow_wqe) {
+ 		verbs_warn_datapath(verbs_get_ctx(qp->ibqp.qp.context),
+ 				    "responder CQE wqid=%u qp_num=%u: shadow_wqe not found\n",
+@@ -327,14 +327,14 @@ static inline int handle_responder_cqe(struct mana_qp *qp, struct gdma_cqe *cqe,
+ 		return 0;
+ 	}
+ 
+-	uint32_t offset_cqe = cqe->rdma_cqe.rc_recv.rx_wqe_offset / GDMA_WQE_ALIGNMENT_UNIT_SIZE;
++	uint32_t offset_cqe = cqe->rdma_cqe.rnic_recv.rx_wqe_offset / GDMA_WQE_ALIGNMENT_UNIT_SIZE;
+ 	uint32_t offset_wqe = shadow_wqe->header.unmasked_queue_offset & GDMA_QUEUE_OFFSET_MASK;
+ 
+ 	if (offset_cqe != offset_wqe)
+ 		return 0;
+ 
+-	shadow_wqe->byte_len = cqe->rdma_cqe.rc_recv.msg_len;
+-	shadow_wqe->imm_or_rkey = cqe->rdma_cqe.rc_recv.imm_data;
++	shadow_wqe->byte_len = cqe->rdma_cqe.rnic_recv.msg_len;
++	shadow_wqe->imm_or_rkey = cqe->rdma_cqe.rnic_recv.imm_data;
+ 
+ 	switch (cqe->rdma_cqe.cqe_type) {
+ 	case CQE_TYPE_RC_WRITE_IMM:
+diff --git a/providers/mana/gdma.h b/providers/mana/gdma.h
+index ee0b808..1f797c7 100644
+--- a/providers/mana/gdma.h
++++ b/providers/mana/gdma.h
+@@ -180,7 +180,7 @@ union mana_rdma_cqe {
+ 		uint32_t reserved2	: 8;
+ 		uint32_t imm_data;
+ 		uint32_t rx_wqe_offset;
+-	} rc_recv;
++	} rnic_recv;
+ 	struct {
+ 		uint32_t cqe_type	: 8;
+ 		uint32_t vendor_error	: 9;
+diff --git a/providers/mana/mana.c b/providers/mana/mana.c
+index a8091fa..eb9bb99 100644
+--- a/providers/mana/mana.c
++++ b/providers/mana/mana.c
+@@ -39,6 +39,9 @@ void *mana_alloc_mem(size_t size)
+ {
+ 	void *buf;
+ 
++	if (size == 0)
++		return NULL;
++
+ 	buf = mmap(NULL, size, PROT_READ | PROT_WRITE,
+ 		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+ 
+@@ -57,8 +60,10 @@ unmap:
+ 
+ void mana_dealloc_mem(void *buf, size_t size)
+ {
+-	ibv_dofork_range(buf, size);
+-	munmap(buf, size);
++	if (buf) {
++		ibv_dofork_range(buf, size);
++		munmap(buf, size);
++	}
+ }
+ 
+ int create_shadow_queue(struct shadow_queue *queue, uint32_t length, uint32_t stride)
+@@ -78,10 +83,8 @@ int create_shadow_queue(struct shadow_queue *queue, uint32_t length, uint32_t st
+ 
+ void destroy_shadow_queue(struct shadow_queue *queue)
+ {
+-	if (queue->buffer) {
+-		mana_dealloc_mem(queue->buffer, queue->stride * queue->length);
+-		queue->buffer = NULL;
+-	}
++	mana_dealloc_mem(queue->buffer, queue->stride * queue->length);
++	queue->buffer = NULL;
+ }
+ 
+ int mana_query_device_ex(struct ibv_context *context,
+diff --git a/providers/mana/mana.h b/providers/mana/mana.h
+index 970c302..1f8a147 100644
+--- a/providers/mana/mana.h
++++ b/providers/mana/mana.h
+@@ -45,11 +45,11 @@
+ #define PSN_ADD(PSN, DELTA) (((PSN) + (DELTA)) & PSN_MASK)
+ 
+ enum user_queue_types {
+-	USER_RC_SEND_QUEUE_REQUESTER = 0,
+-	USER_RC_SEND_QUEUE_RESPONDER = 1,
+-	USER_RC_RECV_QUEUE_REQUESTER = 2,
+-	USER_RC_RECV_QUEUE_RESPONDER = 3,
+-	USER_RC_QUEUE_TYPE_MAX = 4,
++	USER_RNIC_SEND_QUEUE_REQUESTER = 0,
++	USER_RNIC_SEND_QUEUE_RESPONDER = 1,
++	USER_RNIC_RECV_QUEUE_REQUESTER = 2,
++	USER_RNIC_RECV_QUEUE_RESPONDER = 3,
++	USER_RNIC_QUEUE_TYPE_MAX = 4,
+ };
+ 
+ #define QUEUE_TYPE_MASK 0x3
+@@ -119,20 +119,19 @@ struct mana_ib_raw_qp {
+ 	uint32_t tx_vp_offset;
+ };
+ 
+-struct mana_ib_rc_qp {
+-	struct mana_gdma_queue queues[USER_RC_QUEUE_TYPE_MAX];
+-	uint32_t sq_ssn;
+-	uint32_t sq_psn;
++struct mana_ib_rnic_qp {
++	struct mana_gdma_queue queues[USER_RNIC_QUEUE_TYPE_MAX];
+ };
+ 
+ struct mana_qp {
+ 	struct verbs_qp ibqp;
+ 	pthread_spinlock_t sq_lock;
+ 	pthread_spinlock_t rq_lock;
+-
++	uint32_t sq_ssn;
++	uint32_t sq_psn;
+ 	union {
+ 		struct mana_ib_raw_qp raw_qp;
+-		struct mana_ib_rc_qp rc_qp;
++		struct mana_ib_rnic_qp rnic_qp;
+ 	};
+ 
+ 	enum ibv_mtu mtu;
+@@ -149,17 +148,17 @@ struct mana_qp {
+ 
+ static inline struct mana_gdma_queue *mana_ib_get_rresp(struct mana_qp *qp)
+ {
+-	return &qp->rc_qp.queues[USER_RC_RECV_QUEUE_RESPONDER];
++	return &qp->rnic_qp.queues[USER_RNIC_RECV_QUEUE_RESPONDER];
+ }
+ 
+ static inline struct mana_gdma_queue *mana_ib_get_rreq(struct mana_qp *qp)
+ {
+-	return &qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER];
++	return &qp->rnic_qp.queues[USER_RNIC_RECV_QUEUE_REQUESTER];
+ }
+ 
+ static inline struct mana_gdma_queue *mana_ib_get_sreq(struct mana_qp *qp)
+ {
+-	return &qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER];
++	return &qp->rnic_qp.queues[USER_RNIC_SEND_QUEUE_REQUESTER];
+ }
+ 
+ struct mana_wq {
+diff --git a/providers/mana/qp.c b/providers/mana/qp.c
+index a408e83..1b828ff 100644
+--- a/providers/mana/qp.c
++++ b/providers/mana/qp.c
+@@ -218,19 +218,19 @@ static uint32_t get_queue_size(struct ibv_qp_init_attr *attr, enum user_queue_ty
+ 
+ 	if (attr->qp_type == IBV_QPT_RC) {
+ 		switch (type) {
+-		case USER_RC_SEND_QUEUE_REQUESTER:
++		case USER_RNIC_SEND_QUEUE_REQUESTER:
+ 			/* WQE must have at least one SGE */
+ 			/* For write with imm we need one extra SGE */
+ 			sges = max(1U, attr->cap.max_send_sge) + 1;
+ 			size = attr->cap.max_send_wr * get_large_wqe_size(sges);
+ 			break;
+-		case USER_RC_SEND_QUEUE_RESPONDER:
++		case USER_RNIC_SEND_QUEUE_RESPONDER:
+ 			size = MANA_PAGE_SIZE;
+ 			break;
+-		case USER_RC_RECV_QUEUE_REQUESTER:
++		case USER_RNIC_RECV_QUEUE_REQUESTER:
+ 			size = MANA_PAGE_SIZE;
+ 			break;
+-		case USER_RC_RECV_QUEUE_RESPONDER:
++		case USER_RNIC_RECV_QUEUE_RESPONDER:
+ 			/* WQE must have at least one SGE */
+ 			sges = max(1U, attr->cap.max_recv_sge);
+ 			size = attr->cap.max_recv_wr * get_wqe_size(sges);
+@@ -242,14 +242,14 @@ static uint32_t get_queue_size(struct ibv_qp_init_attr *attr, enum user_queue_ty
+ 
+ 	size = align_hw_size(size);
+ 
+-	if (attr->qp_type == IBV_QPT_RC && type == USER_RC_SEND_QUEUE_REQUESTER)
++	if (attr->qp_type == IBV_QPT_RC && type == USER_RNIC_SEND_QUEUE_REQUESTER)
+ 		size += sizeof(struct mana_ib_rollback_shared_mem);
+ 
+ 	return size;
+ }
+ 
+-static struct ibv_qp *mana_create_qp_rc(struct ibv_pd *ibpd,
+-					struct ibv_qp_init_attr *attr)
++static struct ibv_qp *mana_create_qp_rnic(struct ibv_pd *ibpd,
++					  struct ibv_qp_init_attr *attr)
+ {
+ 	struct mana_context *ctx = to_mctx(ibpd->context);
+ 	struct mana_ib_create_rc_qp_resp *qp_resp_drv;
+@@ -271,33 +271,33 @@ static struct ibv_qp *mana_create_qp_rc(struct ibv_pd *ibpd,
+ 	qp->sq_sig_all = attr->sq_sig_all;
+ 
+ 	if (create_shadow_queue(&qp->shadow_sq, attr->cap.max_send_wr,
+-				sizeof(struct rc_sq_shadow_wqe))) {
++				sizeof(struct rnic_sq_shadow_wqe))) {
+ 		verbs_err(verbs_get_ctx(ibpd->context), "Failed to alloc sq shadow queue\n");
+ 		errno = ENOMEM;
+ 		goto free_qp;
+ 	}
+ 
+ 	if (create_shadow_queue(&qp->shadow_rq, attr->cap.max_recv_wr,
+-				sizeof(struct rc_rq_shadow_wqe))) {
+-		verbs_err(verbs_get_ctx(ibpd->context), "Failed to alloc rc shadow queue\n");
++				sizeof(struct rnic_rq_shadow_wqe))) {
++		verbs_err(verbs_get_ctx(ibpd->context), "Failed to alloc rq shadow queue\n");
+ 		errno = ENOMEM;
+ 		goto destroy_shadow_sq;
+ 	}
+ 
+-	for (i = 0; i < USER_RC_QUEUE_TYPE_MAX; ++i) {
+-		qp->rc_qp.queues[i].db_page = ctx->db_page;
+-		qp->rc_qp.queues[i].size = get_queue_size(attr, i);
+-		qp->rc_qp.queues[i].buffer = mana_alloc_mem(qp->rc_qp.queues[i].size);
++	for (i = 0; i < USER_RNIC_QUEUE_TYPE_MAX; ++i) {
++		qp->rnic_qp.queues[i].db_page = ctx->db_page;
++		qp->rnic_qp.queues[i].size = get_queue_size(attr, i);
++		qp->rnic_qp.queues[i].buffer = mana_alloc_mem(qp->rnic_qp.queues[i].size);
+ 
+-		if (!qp->rc_qp.queues[i].buffer) {
++		if (qp->rnic_qp.queues[i].size != 0 && !qp->rnic_qp.queues[i].buffer) {
+ 			verbs_err(verbs_get_ctx(ibpd->context),
+ 				  "Failed to allocate memory for RC queue %d\n", i);
+ 			errno = ENOMEM;
+ 			goto destroy_queues;
+ 		}
+ 
+-		qp_cmd_drv->queue_buf[i] = (uintptr_t)qp->rc_qp.queues[i].buffer;
+-		qp_cmd_drv->queue_size[i] = qp->rc_qp.queues[i].size;
++		qp_cmd_drv->queue_buf[i] = (uintptr_t)qp->rnic_qp.queues[i].buffer;
++		qp_cmd_drv->queue_size[i] = qp->rnic_qp.queues[i].size;
+ 	}
+ 
+ 	mana_ib_init_rb_shmem(qp);
+@@ -311,10 +311,10 @@ static struct ibv_qp *mana_create_qp_rc(struct ibv_pd *ibpd,
+ 		goto free_rb;
+ 	}
+ 
+-	for (i = 0; i < USER_RC_QUEUE_TYPE_MAX; ++i)
+-		qp->rc_qp.queues[i].id = qp_resp_drv->queue_id[i];
++	for (i = 0; i < USER_RNIC_QUEUE_TYPE_MAX; ++i)
++		qp->rnic_qp.queues[i].id = qp_resp_drv->queue_id[i];
+ 
+-	qp->ibqp.qp.qp_num = qp->rc_qp.queues[USER_RC_RECV_QUEUE_RESPONDER].id;
++	qp->ibqp.qp.qp_num = qp->rnic_qp.queues[USER_RNIC_RECV_QUEUE_RESPONDER].id;
+ 
+ 	ret = mana_store_qp(ctx, qp);
+ 	if (ret) {
+@@ -330,7 +330,7 @@ free_rb:
+ 	mana_ib_deinit_rb_shmem(qp);
+ destroy_queues:
+ 	while (i-- > 0)
+-		mana_dealloc_mem(qp->rc_qp.queues[i].buffer, qp->rc_qp.queues[i].size);
++		mana_dealloc_mem(qp->rnic_qp.queues[i].buffer, qp->rnic_qp.queues[i].size);
+ 	destroy_shadow_queue(&qp->shadow_rq);
+ destroy_shadow_sq:
+ 	destroy_shadow_queue(&qp->shadow_sq);
+@@ -346,7 +346,7 @@ struct ibv_qp *mana_create_qp(struct ibv_pd *ibpd,
+ 	case IBV_QPT_RAW_PACKET:
+ 		return mana_create_qp_raw(ibpd, attr);
+ 	case IBV_QPT_RC:
+-		return mana_create_qp_rc(ibpd, attr);
++		return mana_create_qp_rnic(ibpd, attr);
+ 	default:
+ 		verbs_err(verbs_get_ctx(ibpd->context),
+ 			  "QP type %u is not supported\n", attr->qp_type);
+@@ -356,7 +356,7 @@ struct ibv_qp *mana_create_qp(struct ibv_pd *ibpd,
+ 	return NULL;
+ }
+ 
+-static void mana_ib_modify_rc_qp(struct mana_qp *qp, struct ibv_qp_attr *attr, int attr_mask)
++static void mana_ib_modify_rnic_qp(struct mana_qp *qp, struct ibv_qp_attr *attr, int attr_mask)
+ {
+ 	int i;
+ 
+@@ -367,9 +367,9 @@ static void mana_ib_modify_rc_qp(struct mana_qp *qp, struct ibv_qp_attr *attr, i
+ 		qp->ibqp.qp.state = attr->qp_state;
+ 		switch (attr->qp_state) {
+ 		case IBV_QPS_RESET:
+-			for (i = 0; i < USER_RC_QUEUE_TYPE_MAX; ++i) {
+-				qp->rc_qp.queues[i].prod_idx = 0;
+-				qp->rc_qp.queues[i].cons_idx = 0;
++			for (i = 0; i < USER_RNIC_QUEUE_TYPE_MAX; ++i) {
++				qp->rnic_qp.queues[i].prod_idx = 0;
++				qp->rnic_qp.queues[i].cons_idx = 0;
+ 			}
+ 			mana_ib_reset_rb_shmem(qp);
+ 			reset_shadow_queue(&qp->shadow_rq);
+@@ -380,8 +380,8 @@ static void mana_ib_modify_rc_qp(struct mana_qp *qp, struct ibv_qp_attr *attr, i
+ 			break;
+ 		case IBV_QPS_RTS:
+ 			if (attr_mask & IBV_QP_SQ_PSN) {
+-				qp->rc_qp.sq_ssn = 1;
+-				qp->rc_qp.sq_psn = attr->sq_psn;
++				qp->sq_ssn = 1;
++				qp->sq_psn = attr->sq_psn;
+ 				gdma_arm_normal_cqe(mana_ib_get_rreq(qp), attr->sq_psn);
+ 			}
+ 			break;
+@@ -409,7 +409,7 @@ int mana_modify_qp(struct ibv_qp *ibqp, struct ibv_qp_attr *attr, int attr_mask)
+ 		goto cleanup;
+ 	}
+ 
+-	mana_ib_modify_rc_qp(qp, attr, attr_mask);
++	mana_ib_modify_rnic_qp(qp, attr, attr_mask);
+ 
+ cleanup:
+ 	pthread_spin_unlock(&qp->rq_lock);
+@@ -464,8 +464,8 @@ int mana_destroy_qp(struct ibv_qp *ibqp)
+ 		destroy_shadow_queue(&qp->shadow_sq);
+ 		destroy_shadow_queue(&qp->shadow_rq);
+ 		mana_ib_deinit_rb_shmem(qp);
+-		for (i = 0; i < USER_RC_QUEUE_TYPE_MAX; ++i)
+-			mana_dealloc_mem(qp->rc_qp.queues[i].buffer, qp->rc_qp.queues[i].size);
++		for (i = 0; i < USER_RNIC_QUEUE_TYPE_MAX; ++i)
++			mana_dealloc_mem(qp->rnic_qp.queues[i].buffer, qp->rnic_qp.queues[i].size);
+ 		break;
+ 	default:
+ 		verbs_err(verbs_get_ctx(ibqp->context),
+diff --git a/providers/mana/rollback.h b/providers/mana/rollback.h
+index e91b7ee..59621a5 100644
+--- a/providers/mana/rollback.h
++++ b/providers/mana/rollback.h
+@@ -29,7 +29,7 @@ static inline struct mana_ib_rollback_shared_mem
+ {
+ 	struct mana_ib_rollback_shared_mem *rb_shmem;
+ 	struct mana_gdma_queue *req_sq =
+-		&qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER];
++		&qp->rnic_qp.queues[USER_RNIC_SEND_QUEUE_REQUESTER];
+ 
+ 	rb_shmem = (struct mana_ib_rollback_shared_mem *)
+ 		((uint8_t *)req_sq->buffer + req_sq->size);
+@@ -41,7 +41,7 @@ static inline void mana_ib_init_rb_shmem(struct mana_qp *qp)
+ {
+ 	// take some bytes for rollback memory
+ 	struct mana_gdma_queue *req_sq =
+-		&qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER];
++		&qp->rnic_qp.queues[USER_RNIC_SEND_QUEUE_REQUESTER];
+ 	req_sq->size -= sizeof(struct mana_ib_rollback_shared_mem);
+ 
+ 	struct mana_ib_rollback_shared_mem *rb_shmem =
+@@ -56,7 +56,7 @@ static inline void mana_ib_deinit_rb_shmem(struct mana_qp *qp)
+ {
+ 	// return back bytes for rollback memory
+ 	struct mana_gdma_queue *req_sq =
+-		&qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER];
++		&qp->rnic_qp.queues[USER_RNIC_SEND_QUEUE_REQUESTER];
+ 	req_sq->size += sizeof(struct mana_ib_rollback_shared_mem);
+ }
+ 
+diff --git a/providers/mana/shadow_queue.h b/providers/mana/shadow_queue.h
+index a1d18e8..01d7e4f 100644
+--- a/providers/mana/shadow_queue.h
++++ b/providers/mana/shadow_queue.h
+@@ -30,13 +30,13 @@ struct shadow_wqe_header {
+ 	uint64_t wr_id;
+ };
+ 
+-struct rc_sq_shadow_wqe {
++struct rnic_sq_shadow_wqe {
+ 	struct  shadow_wqe_header header;
+ 	uint32_t end_psn;
+ 	uint32_t read_posted_wqe_size_in_bu;
+ };
+ 
+-struct rc_rq_shadow_wqe {
++struct rnic_rq_shadow_wqe {
+ 	struct shadow_wqe_header header;
+ 	uint32_t byte_len;
+ 	uint32_t imm_or_rkey;
+diff --git a/providers/mana/wr.c b/providers/mana/wr.c
+index afff20a..280dc59 100644
+--- a/providers/mana/wr.c
++++ b/providers/mana/wr.c
+@@ -133,8 +133,8 @@ gdma_post_rq_wqe(struct mana_gdma_queue *wq, struct ibv_sge *sgl,  struct rdma_r
+ 	return 0;
+ }
+ 
+-static int mana_ib_rc_post_recv(struct ibv_qp *ibqp, struct ibv_recv_wr *wr,
+-				struct ibv_recv_wr **bad_wr)
++static int mana_ib_post_recv(struct ibv_qp *ibqp, struct ibv_recv_wr *wr,
++			     struct ibv_recv_wr **bad_wr)
+ {
+ 	struct mana_context *mc = container_of(verbs_get_ctx(ibqp->context),
+ 					struct mana_context, ibv_ctx);
+@@ -191,7 +191,7 @@ int mana_post_recv(struct ibv_qp *ibqp, struct ibv_recv_wr *wr,
+ {
+ 	switch (ibqp->qp_type) {
+ 	case IBV_QPT_RC:
+-		return mana_ib_rc_post_recv(ibqp, wr, bad);
++		return mana_ib_post_recv(ibqp, wr, bad);
+ 	default:
+ 		verbs_err(verbs_get_ctx(ibqp->context), "QPT not supported %d\n", ibqp->qp_type);
+ 		return EOPNOTSUPP;
+@@ -277,8 +277,8 @@ gdma_post_sq_wqe(struct mana_gdma_queue *wq, struct ibv_sge *sgl, struct rdma_se
+ }
+ 
+ static inline int
+-mana_ib_rc_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
+-			     struct rc_sq_shadow_wqe *shadow_wqe)
++mana_ib_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
++			  struct rnic_sq_shadow_wqe *shadow_wqe)
+ {
+ 	bool signaled = ((wr->send_flags & IBV_SEND_SIGNALED) != 0) || qp->sq_sig_all;
+ 	enum  gdma_work_req_flags flags = GDMA_WORK_REQ_NONE;
+@@ -297,7 +297,7 @@ mana_ib_rc_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
+ 	if (wr->opcode == IBV_WR_RDMA_READ) {
+ 		struct rdma_recv_oob recv_oob = {0};
+ 
+-		recv_oob.psn_start = qp->rc_qp.sq_psn;
++		recv_oob.psn_start = qp->sq_psn;
+ 		ret = gdma_post_rq_wqe(mana_ib_get_rreq(qp), wr->sg_list,
+ 				       &recv_oob, num_sge, GDMA_WORK_REQ_CHECK_SN, &gdma_wqe);
+ 		if (ret) {
+@@ -315,8 +315,8 @@ mana_ib_rc_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
+ 	send_oob.fence = (wr->send_flags & IBV_SEND_FENCE) != 0;
+ 	send_oob.signaled = signaled;
+ 	send_oob.solicited = (wr->send_flags & IBV_SEND_SOLICITED) != 0;
+-	send_oob.psn = qp->rc_qp.sq_psn;
+-	send_oob.ssn = qp->rc_qp.sq_ssn;
++	send_oob.psn = qp->sq_psn;
++	send_oob.ssn = qp->sq_ssn;
+ 
+ 	switch (wr->opcode) {
+ 	case IBV_WR_SEND_WITH_INV:
+@@ -354,15 +354,15 @@ mana_ib_rc_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
+ 		goto cleanup;
+ 	}
+ 
+-	qp->rc_qp.sq_psn = PSN_ADD(qp->rc_qp.sq_psn, PSN_DELTA(msg_sz, qp->mtu));
+-	qp->rc_qp.sq_ssn = PSN_INC(qp->rc_qp.sq_ssn);
++	qp->sq_psn = PSN_ADD(qp->sq_psn, PSN_DELTA(msg_sz, qp->mtu));
++	qp->sq_ssn = PSN_INC(qp->sq_ssn);
+ 
+ 	shadow_wqe->header.wr_id = wr->wr_id;
+ 	shadow_wqe->header.opcode = convert_wr_to_wc(wr->opcode);
+ 	shadow_wqe->header.flags = signaled ? 0 : MANA_NO_SIGNAL_WC;
+ 	shadow_wqe->header.posted_wqe_size_in_bu = gdma_wqe.size_in_bu;
+ 	shadow_wqe->header.unmasked_queue_offset = gdma_wqe.unmasked_wqe_index;
+-	shadow_wqe->end_psn = PSN_DEC(qp->rc_qp.sq_psn);
++	shadow_wqe->end_psn = PSN_DEC(qp->sq_psn);
+ 
+ 	return 0;
+ 
+@@ -370,8 +370,8 @@ cleanup:
+ 	return EINVAL;
+ }
+ 
+-static int mana_ib_rc_post_send(struct ibv_qp *ibqp, struct ibv_send_wr *wr,
+-				struct ibv_send_wr **bad_wr)
++static int mana_ib_post_send(struct ibv_qp *ibqp, struct ibv_send_wr *wr,
++			     struct ibv_send_wr **bad_wr)
+ {
+ 	struct mana_qp *qp = container_of(ibqp, struct mana_qp, ibqp.qp);
+ 	int ret = 0;
+@@ -398,11 +398,11 @@ static int mana_ib_rc_post_send(struct ibv_qp *ibqp, struct ibv_send_wr *wr,
+ 		}
+ 
+ 		/* Fill shadow queue data */
+-		struct rc_sq_shadow_wqe *shadow_wqe = (struct rc_sq_shadow_wqe *)
++		struct rnic_sq_shadow_wqe *shadow_wqe = (struct rnic_sq_shadow_wqe *)
+ 			shadow_queue_producer_entry(&qp->shadow_sq);
+-		memset(shadow_wqe, 0, sizeof(struct rc_sq_shadow_wqe));
++		memset(shadow_wqe, 0, sizeof(struct rnic_sq_shadow_wqe));
+ 
+-		ret = mana_ib_rc_post_send_request(qp, wr, shadow_wqe);
++		ret = mana_ib_post_send_request(qp, wr, shadow_wqe);
+ 		if (ret) {
+ 			verbs_err(verbs_get_ctx(qp->ibqp.qp.context),
+ 				  "Failed to post send request ret %d\n", ret);
+@@ -430,7 +430,7 @@ int mana_post_send(struct ibv_qp *ibqp, struct ibv_send_wr *wr,
+ {
+ 	switch (ibqp->qp_type) {
+ 	case IBV_QPT_RC:
+-		return mana_ib_rc_post_send(ibqp, wr, bad);
++		return mana_ib_post_send(ibqp, wr, bad);
+ 	default:
+ 		verbs_err(verbs_get_ctx(ibqp->context), "QPT not supported %d\n", ibqp->qp_type);
+ 		return EOPNOTSUPP;
+-- 
+2.45.4
+

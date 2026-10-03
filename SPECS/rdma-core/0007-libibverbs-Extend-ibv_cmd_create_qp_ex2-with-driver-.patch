@@ -1,0 +1,162 @@
+From 22d416ce8ed83d5a6927b92d40968f50d57d3a39 Mon Sep 17 00:00:00 2001
+From: Jiri Pirko <jiri@nvidia.com>
+Date: Tue, 5 May 2026 13:39:10 +0200
+Subject: [PATCH 7/7] libibverbs: Extend ibv_cmd_create_qp_ex2() with driver
+ chain
+
+Add a driver command-buffer chain argument to the private QP create
+helper ibv_cmd_create_qp_ex2() and build its command buffer with
+DECLARE_CMD_BUFFER_LINK_COMPAT(), mirroring ibv_cmd_create_cq_ex2().
+This lets a provider link a driver-namespace command buffer onto the
+create-QP ioctl; later commits use it to attach per-buffer UMEM
+attributes (UVERBS_ATTR_CREATE_QP_*_BUF_UMEM).
+
+Update all existing callers (mlx4, mlx5, hns, mana, rxe, ionic) to
+pass NULL as they have no driver chain to attach.
+
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ libibverbs/cmd_qp.c              | 9 +++++----
+ libibverbs/driver.h              | 3 ++-
+ providers/hns/hns_roce_u_verbs.c | 2 +-
+ providers/ionic/ionic_verbs.c    | 2 +-
+ providers/mana/qp.c              | 2 +-
+ providers/mlx4/verbs.c           | 4 ++--
+ providers/mlx5/verbs.c           | 4 ++--
+ providers/rxe/rxe.c              | 2 +-
+ 8 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/libibverbs/cmd_qp.c b/libibverbs/cmd_qp.c
+index 499b241..686222a 100644
+--- a/libibverbs/cmd_qp.c
++++ b/libibverbs/cmd_qp.c
+@@ -425,11 +425,12 @@ int ibv_cmd_create_qp_ex2(struct ibv_context *context,
+ 			  struct ibv_create_qp_ex *cmd,
+ 			  size_t cmd_size,
+ 			  struct ib_uverbs_ex_create_qp_resp *resp,
+-			  size_t resp_size)
++			  size_t resp_size,
++			  struct ibv_command_buffer *driver)
+ {
+-	DECLARE_CMD_BUFFER_COMPAT(cmdb, UVERBS_OBJECT_QP,
+-				  UVERBS_METHOD_QP_CREATE, cmd, cmd_size, resp,
+-				  resp_size);
++	DECLARE_CMD_BUFFER_LINK_COMPAT(cmdb, UVERBS_OBJECT_QP,
++				       UVERBS_METHOD_QP_CREATE,
++				       driver, cmd, cmd_size, resp, resp_size);
+ 
+ 	if (!check_comp_mask(attr_ex->comp_mask,
+ 			     IBV_QP_INIT_ATTR_PD |
+diff --git a/libibverbs/driver.h b/libibverbs/driver.h
+index 1e6f6be..6297d5f 100644
+--- a/libibverbs/driver.h
++++ b/libibverbs/driver.h
+@@ -669,7 +669,8 @@ int ibv_cmd_create_qp_ex2(struct ibv_context *context,
+ 			  struct ibv_create_qp_ex *cmd,
+ 			  size_t cmd_size,
+ 			  struct ib_uverbs_ex_create_qp_resp *resp,
+-			  size_t resp_size);
++			  size_t resp_size,
++			  struct ibv_command_buffer *driver);
+ int ibv_cmd_open_qp(struct ibv_context *context,
+ 		    struct verbs_qp *qp,  int vqp_sz,
+ 		    struct ibv_qp_open_attr *attr,
+diff --git a/providers/hns/hns_roce_u_verbs.c b/providers/hns/hns_roce_u_verbs.c
+index 7a861ba..e19a766 100644
+--- a/providers/hns/hns_roce_u_verbs.c
++++ b/providers/hns/hns_roce_u_verbs.c
+@@ -1446,7 +1446,7 @@ static int qp_exec_create_cmd(struct ibv_qp_init_attr_ex *attr,
+ 
+ 	ret = ibv_cmd_create_qp_ex2(&ctx->ibv_ctx.context, &qp->verbs_qp, attr,
+ 				    &cmd_ex.ibv_cmd, sizeof(cmd_ex),
+-				    &resp_ex.ibv_resp, sizeof(resp_ex));
++				    &resp_ex.ibv_resp, sizeof(resp_ex), NULL);
+ 	if (ret) {
+ 		verbs_err(&ctx->ibv_ctx,
+ 			  "failed to exec create qp cmd, ret = %d.\n", ret);
+diff --git a/providers/ionic/ionic_verbs.c b/providers/ionic/ionic_verbs.c
+index 589024c..ac7ad8a 100644
+--- a/providers/ionic/ionic_verbs.c
++++ b/providers/ionic/ionic_verbs.c
+@@ -1737,7 +1737,7 @@ static struct ibv_qp *ionic_create_qp_ex(struct ibv_context *ibctx,
+ 				   &req.ibv_cmd,
+ 				   sizeof(req),
+ 				   &resp.ibv_resp,
+-				   sizeof(resp));
++				   sizeof(resp), NULL);
+ 	if (rc)
+ 		goto err_cmd;
+ 
+diff --git a/providers/mana/qp.c b/providers/mana/qp.c
+index 1b828ff..b6a9a7e 100644
+--- a/providers/mana/qp.c
++++ b/providers/mana/qp.c
+@@ -526,7 +526,7 @@ static struct ibv_qp *mana_create_qp_ex_raw(struct ibv_context *context,
+ 	cmd_drv->port = port;
+ 
+ 	ret = ibv_cmd_create_qp_ex2(context, &qp->ibqp, attr, &cmd.ibv_cmd,
+-				    sizeof(cmd), &resp.ibv_resp, sizeof(resp));
++				    sizeof(cmd), &resp.ibv_resp, sizeof(resp), NULL);
+ 	if (ret) {
+ 		verbs_err(verbs_get_ctx(context), "Create QP EX failed\n");
+ 		free(qp);
+diff --git a/providers/mlx4/verbs.c b/providers/mlx4/verbs.c
+index 67c47f6..d88c319 100644
+--- a/providers/mlx4/verbs.c
++++ b/providers/mlx4/verbs.c
+@@ -804,7 +804,7 @@ static int mlx4_cmd_create_qp_ex_rss(struct ibv_context *context,
+ 	ret = ibv_cmd_create_qp_ex2(context, &qp->verbs_qp,
+ 				    attr, &cmd_ex.ibv_cmd,
+ 				    sizeof(cmd_ex), &resp.ibv_resp,
+-				    sizeof(resp));
++				    sizeof(resp), NULL);
+ 	return ret;
+ }
+ 
+@@ -863,7 +863,7 @@ static int mlx4_cmd_create_qp_ex(struct ibv_context *context,
+ 	ret = ibv_cmd_create_qp_ex2(context, &qp->verbs_qp,
+ 				    attr, &cmd_ex.ibv_cmd,
+ 				    sizeof(cmd_ex), &resp.ibv_resp,
+-				    sizeof(resp));
++				    sizeof(resp), NULL);
+ 	return ret;
+ }
+ 
+diff --git a/providers/mlx5/verbs.c b/providers/mlx5/verbs.c
+index d2975c4..501ff59 100644
+--- a/providers/mlx5/verbs.c
++++ b/providers/mlx5/verbs.c
+@@ -2160,7 +2160,7 @@ static int mlx5_cmd_create_rss_qp(struct ibv_context *context,
+ 	ret = ibv_cmd_create_qp_ex2(context, &qp->verbs_qp,
+ 				    attr,
+ 				    &cmd_ex_rss.ibv_cmd, sizeof(cmd_ex_rss),
+-				    &resp.ibv_resp, sizeof(resp));
++				    &resp.ibv_resp, sizeof(resp), NULL);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -2193,7 +2193,7 @@ static int mlx5_cmd_create_qp_ex(struct ibv_context *context,
+ 	ret = ibv_cmd_create_qp_ex2(context, &qp->verbs_qp,
+ 				    attr, &cmd_ex.ibv_cmd,
+ 				    sizeof(cmd_ex), &resp->ibv_resp,
+-				    sizeof(*resp));
++				    sizeof(*resp), NULL);
+ 
+ 	return ret;
+ }
+diff --git a/providers/rxe/rxe.c b/providers/rxe/rxe.c
+index 423f834..b3d855e 100644
+--- a/providers/rxe/rxe.c
++++ b/providers/rxe/rxe.c
+@@ -1395,7 +1395,7 @@ static struct ibv_qp *rxe_create_qp_ex(struct ibv_context *context,
+ 
+ 	ret = ibv_cmd_create_qp_ex2(context, &qp->vqp, attr,
+ 				    &cmd, cmd_size,
+-				    &resp.ibv_resp, resp_size);
++				    &resp.ibv_resp, resp_size, NULL);
+ 	if (ret)
+ 		goto err_free;
+ 
+-- 
+2.45.4
+
