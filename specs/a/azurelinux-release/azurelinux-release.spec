@@ -356,6 +356,7 @@ install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
 install -Dm0600 %{SOURCE30} %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
 install -Dm0644 %{SOURCE32} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
 install -Dm0644 %{SOURCE33} -t %{buildroot}%{_sysconfdir}/rsyslog.d/
+install -Dm0644 %{SOURCE31} -t %{buildroot}%{_prefix}/lib/modprobe.d/
 
 install -Dm0644 %{SOURCE25} -t %{buildroot}%{_sysconfdir}/cloud/cloud.cfg.d/
 %endif
@@ -427,8 +428,6 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 
 # Install sysctl configuration
 install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
-# Install CIS network protocol module policy.
-install -Dm0644 %{SOURCE31} -t %{buildroot}%{_prefix}/lib/modprobe.d/
 
 
 
@@ -463,7 +462,6 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %{_sysconfdir}/swid/swidtags.d
 %{_prefix}/share/dnf5/libdnf.conf.d/20-azurelinux-defaults.conf
 %{_sysctldir}/70-azurelinux-hardening.conf
-%{_prefix}/lib/modprobe.d/60-azurelinux-cis-module-denylist.conf
 %attr(0440,root,root) %config(noreplace) %{_sysconfdir}/sudoers.d/10-azurelinux-cis
 %attr(0644,root,root) %{_prefix}/lib/tmpfiles.d/azurelinux-sudo.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/azurelinux-sudo
@@ -483,6 +481,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.d/00-rsyslog_filecreatemode.conf
+%{_prefix}/lib/modprobe.d/60-azurelinux-cis-module-denylist.conf
 
 %files identity-cloud
 %{_prefix}/lib/os-release.cloud
