@@ -1,0 +1,2 @@
+[components.buildah]
+tests.tests = [{ name = "tmt-buildah" }]
