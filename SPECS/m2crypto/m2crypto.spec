@@ -1,16 +1,13 @@
 Summary:        Crypto and SSL toolkit for Python
 Name:           m2crypto
-Version:        0.38.0
-Release:        5%{?dist}
-License:        MIT
+Version:        0.48.0
+Release:        1%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/M2Crypto
-Source0:        https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-%{version}.tar.gz
-Patch0:         0001-skip-test_tls1_nok-which-cant-be-run-in-FIPS.patch
-Patch1:         CVE-2020-25657.patch
-Patch2:         CVE-2019-11358.patch
+Source0:        https://files.pythonhosted.org/packages/89/7a/06ed5c66d63506bc77a7823d56e5e6b4ad3143f3fca2337c46d8b2c191f5/m2crypto-%{version}.tar.gz
 
 %description
 M2Crypto is a crypto and SSL toolkit for Python
@@ -19,15 +16,16 @@ M2Crypto is a crypto and SSL toolkit for Python
 Summary:        Crypto and SSL toolkit for Python
 BuildRequires:  openssl-devel
 BuildRequires:  python3-devel
+BuildRequires:  python3-packaging
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  swig
 Requires:       openssl >= 1.1.1g-6
 Requires:       python3
+Requires:       python3-packaging
 %if 0%{?with_check}
-BuildRequires:  python3-pip
+BuildRequires:  openssl
 BuildRequires:  python3-pytest
-BuildRequires:  python3-six
 %endif
 
 %description -n python3-m2crypto
@@ -41,7 +39,7 @@ server. S/MIME. ZServerSSL: A HTTPS server for Zope. ZSmime: An S/MIME
 messenger for Zope.
 
 %prep
-%autosetup -n M2Crypto-%{version} -p1
+%autosetup -n m2crypto-%{version}
 
 %build
 %py3_build
@@ -50,37 +48,40 @@ messenger for Zope.
 %py3_install
 
 %check
-# M2Crypto 0.38.0 (last released 2021) has two known incompatibilities
-# with Python 3.12 that cannot be fixed at the spec level:
-#
-#  1. The bundled `M2Crypto/six.py` lazy importer for `six.moves` was
-#     broken by importlib changes in 3.12. We replace it with the system
-#     `six` (installed below) to get past this layer.
-#  2. `M2Crypto/SSL/ssl_dispatcher.py` does `import asyncore` at module
-#     load time. `asyncore` was removed from the Python 3.12 stdlib
-#     (PEP 594). Because `M2Crypto/__init__.py` eagerly imports `SSL`,
-#     every `from M2Crypto import ...` fails with
-#     `ModuleNotFoundError: No module named 'asyncore'`, which means
-#     the test suite cannot even collect.
-#
-# Upstream M2Crypto >= 0.40 drops the asyncore-based dispatcher. Until
-# this package can be rebased on 0.40+, the tests cannot pass under
-# Python 3.12 and we tolerate failure with `|| :`. We still run pytest
-# (with the six.py shim so reviewers see the real underlying error) and
-# still install `parameterized`, so the day this package is updated the
-# %check section starts being meaningful with no further work.
-pip3 install parameterized
-cp -f $(%python3 -c "import six; print(six.__file__)") \
-  %{buildroot}%{python3_sitearch}/M2Crypto/six.py
-PYTHONPATH=%{buildroot}%{python3_sitearch} \
-  %python3 -m pytest tests/ -k "not test_tls1_nok" || :
+# setuptools >= 72 removed the 'setup.py test' command, so run the suite
+# directly with pytest. Tests import M2Crypto from the installed buildroot.
+# Azure Linux's OpenSSL 3.x keeps MD5 in the "legacy" provider, which is not
+# loaded by default; enable it for the test run so the HMAC-MD5 assertion in
+# tests/test_evp.py (EVPTestCase.test_hmac) runs and passes unmodified.
+cat > %{_builddir}/openssl-legacy.cnf <<'EOF'
+openssl_conf = openssl_init
+[openssl_init]
+providers = provider_sect
+[provider_sect]
+default = default_sect
+legacy = legacy_sect
+[default_sect]
+activate = 1
+[legacy_sect]
+activate = 1
+EOF
+OPENSSL_CONF=%{_builddir}/openssl-legacy.cnf \
+    PYTHONPATH=%{buildroot}%{python3_sitelib} %python3 -m pytest -v tests/
 
 %files -n python3-m2crypto
 %defattr(-,root,root)
-%license LICENCE
+%license LICENSES/BSD-2-Clause.txt
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jun 30 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0.48.0-1
+- Upgrade to version 0.48.0
+- Drop CVE-2020-25657.patch (fixed upstream) and CVE-2019-11358.patch (bundled jQuery doc no longer shipped)
+- Drop FIPS TLS1 test-skip patch (upstream tests now handle OpenSSL 3.x)
+- Drop the Python 3.12 'six'/'asyncore' workarounds and the network 'pip3 install parameterized'; 0.48.0 no longer needs them, so %%check runs the full suite without tolerating failure
+- Enable the OpenSSL legacy provider during %%check so the HMAC-MD5 test runs unmodified
+- License verified as BSD-2-Clause
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.38.0-5
 - Replace deprecated `setup.py test` with `pytest` and document the
   two real upstream Python-3.12 incompatibilities (vendored
