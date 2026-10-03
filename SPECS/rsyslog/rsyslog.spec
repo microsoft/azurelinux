@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2308.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ Source4:        https://www.rsyslog.com/files/download/rsyslog/%{name}-doc-%{bas
 Source5:        rsyslog.logrotate
 Patch0:         issue5158.patch
 Patch1:         CVE-2026-19654.patch
+Patch2:         CVE-2026-78002.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -204,6 +205,9 @@ fi
 %{_libdir}/rsyslog/omsnmp.so
 
 %changelog
+* Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.2308.0-7
+- Patch for CVE-2026-78002
+
 * Sun Aug 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.2308.0-6
 - Patch for CVE-2026-19654
 
