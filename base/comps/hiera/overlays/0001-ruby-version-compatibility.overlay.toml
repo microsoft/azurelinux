@@ -1,0 +1,14 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Replace the removed File.exists? API so Hiera version reporting works with Ruby 3.2 and newer"
+type = "patch-add"
+source = "../hiera-ruby-file-exist.patch"
+
+[[overlays]]
+description = "Apply the Ruby compatibility patch after the upstream Hiera path patch"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P1 -p1"]
