@@ -3720,6 +3720,14 @@
           "justification": "Align kernel 6.18 with its generated configuration"
         },
         {
+          "name": "CONFIG_PCIE_EDR",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Enable PCIe Error Disconnect Recovery for Downstream Port Containment on AZL4"
+        },
+        {
           "name": "CONFIG_PCI_P2PDMA",
           "values": [
             { "architecture": "arm64", "value": "y" }
