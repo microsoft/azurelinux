@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 1
+%define azl_pkgrelease 2
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.57.04
 
@@ -4283,6 +4283,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Oct 02 2026 Chris Co <chrco@microsoft.com> - 6.18.50-1.2
+- feat(kernel): enable PCIe EDR for DPC
+
 * Thu Sep 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.50-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.50.1
 
