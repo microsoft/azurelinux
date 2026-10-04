@@ -1,0 +1,78 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: ["4.0"]
+    paths:
+      - ".azldev-version"
+      - ".github/workflows/containers/azldev-runner.Dockerfile"
+      - ".github/workflows/copilot-setup-steps.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  copilot-setup-steps:
+    name: "Prepare azldev container"
+    runs-on: ubuntu-latest
+    timeout-minutes: 59
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build azldev runner container
+        run: |
+          set -euo pipefail
+          version="$(tr -d '\n' < .azldev-version)"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9A-Za-z._+-]+$'; then
+            echo "::error::.azldev-version is empty or contains unexpected characters"
+            exit 1
+          fi
+          docker build \
+            --build-arg UID="$(id -u)" \
+            --build-arg AZLDEV_VERSION="$version" \
+            -t localhost/azldev-runner \
+            -f .github/workflows/containers/azldev-runner.Dockerfile \
+            .github/workflows/containers/
+
+      - name: Confirm azldev can load the project
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/workdir" \
+            localhost/azldev-runner \
+            bash -eu -o pipefail -c '
+              azldev --version
+              mock --version
+              mkdir -p base/build/work/scratch/copilot-setup
+              azldev comp list -a -q -O json \
+                > base/build/work/scratch/copilot-setup/component-list.json
+              jq -e "type == \"array\" and length > 0" \
+                base/build/work/scratch/copilot-setup/component-list.json
+            '
+
+      - name: Record the prototype execution path
+        run: |
+          set -euo pipefail
+          {
+            echo '## Azure Linux cloud-session spike'
+            echo
+            echo 'Image: `localhost/azldev-runner` (built from `.azldev-version`).'
+            echo 'Run azldev inside this image; it is not installed on the Ubuntu host.'
+            echo
+            echo 'For builds and mock tests, bind-mount the checkout at `/workdir`,'
+            echo 'preserve stdin with `-i`, and use `--cap-add=SYS_ADMIN`,'
+            echo '`--security-opt seccomp=unconfined`, and'
+            echo '`--security-opt apparmor=unconfined`.'
+            echo
+            echo 'Setup has not built or smoke-tested an RPM.'
+            echo 'The assigned pilot issue must exercise that path in the actual cloud session.'
+          } >> "$GITHUB_STEP_SUMMARY"
