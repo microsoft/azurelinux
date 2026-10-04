@@ -31,7 +31,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.18.48.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -71,9 +71,7 @@ BuildRequires:  sed
 BuildRequires:  slang-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 BuildRequires:  python3-lxml
-%ifarch x86_64
 BuildRequires:  pciutils-devel
-%endif
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
@@ -208,8 +206,10 @@ make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{a
 # Compile perf, python3-perf
 make -C tools/perf PYTHON=%{python3} all
 
+make -C tools cpupower
+
 %ifarch x86_64
-make -C tools turbostat cpupower
+make -C tools turbostat
 %endif
 
 #Compile bpftool
@@ -302,9 +302,12 @@ make -C tools/perf DESTDIR=%{buildroot} prefix=%{_prefix} install-python_ext
 # Install bpftool
 make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} install
 
+# Install cpupower
+make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} cpupower_install
+
 %ifarch x86_64
-# Install turbostat cpupower
-make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
+# Install turbostat
+make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install
 %endif
 
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
@@ -399,8 +402,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
 %ifarch x86_64
-%{_sbindir}/cpufreq-bench
 %{_lib64dir}/libperf-jvmti.so
+%{_mandir}/man8/turbostat*.gz
+%endif
+%ifarch aarch64
+%{_libdir}/libperf-jvmti.so
+%endif
+%{_sbindir}/cpufreq-bench
 %{_libdir}/libcpupower.so*
 %{_sysconfdir}/cpufreq-bench.conf
 %{_sysconfdir}/cpupower-service.conf
@@ -408,13 +416,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/cpufreq.h
 %{_includedir}/powercap.h
 %{_mandir}/man1/cpupower*.gz
-%{_mandir}/man8/turbostat*.gz
 %{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
 %{_datadir}/bash-completion/completions/cpupower
-%endif
-%ifarch aarch64
-%{_libdir}/libperf-jvmti.so
-%endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_docdir}/*
@@ -430,6 +433,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sun Oct 04 2026 Henry Li <lihl@microsoft.com> - 6.18.48.1-2
+- Enable cpupower on aarch64
+
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.48.1-1
 - Auto-upgrade to 6.18.48.1
 
