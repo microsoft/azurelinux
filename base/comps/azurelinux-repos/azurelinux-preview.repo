@@ -1,7 +1,7 @@
 [azurelinux-preview-base]
 name=Azure Linux $releasever - $basearch - Preview - Base
 baseurl=https://packages.microsoft.com/azurelinux/4/preview/base/$basearch
-enabled=1
+enabled=0
 countme=1
 metadata_expire=6h
 repo_gpgcheck=0
