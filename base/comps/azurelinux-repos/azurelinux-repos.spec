@@ -27,9 +27,9 @@ Obsoletes:      %{name}-dev < %{version}-%{release}
 
 %description
 This package provides the production and preview Azure Linux yum/dnf repo
-definitions. Production binary repositories are enabled by default; preview
-repositories are temporarily enabled until production repositories are fully
-populated; source and debuginfo repositories are disabled by default.
+definitions. Production binary repositories are enabled by default; preview,
+source, and debuginfo repositories are disabled by default. Preview repositories
+can be explicitly enabled when needed.
 
 %package -n azurelinux-gpg-keys
 Summary:        Azure Linux RPM keys

@@ -28,6 +28,22 @@ the repositories available in the resulting OS. These runtime repositories are
 independent of the package sources used to build the image. Distroless
 container images strip the package manager and do not ship a repository package.
 
+Production Base, Cloud Native, and Microsoft binary repositories are enabled by
+default. All Preview, source, and debuginfo repositories are disabled. Static
+repository checks enforce these defaults on every image with the
+`runtime-package-management` capability; container runtime checks also exercise
+Production package resolution and transactions.
+
+Preview remains available through explicit opt-in, for example:
+
+```bash
+dnf --enable-repo=azurelinux-preview-base install <package>
+```
+
+This enables Preview for that command only; it does not change the persisted
+defaults. Existing systems with locally modified repo files retain their
+configuration because the package uses `%config(noreplace)`.
+
 `azldev` creates a per-suite Python venv, installs this directory's
 `pyproject.toml`, and invokes pytest with the right `--image-path`,
 `--image-name`, and `--capabilities` arguments.
