@@ -293,6 +293,25 @@ find %{buildroot}/lib/modules/%{KVERREL}/extra/mlnx-ofa_kernel \
     \( -type f -name '*.ko' -o -name '*.ko.gz' -o -name '*.ko.xz' -o -name '*.ko.zst' \) \
     -exec chmod u+x {} \;
 
+# Mirror upstream's depmod.d overrides so depmod resolves OFED modules
+# (ib_core, ib_uverbs, mlx5_core, ...) ahead of the in-tree ones under kernel/;
+# otherwise nvidia-peermem's ib_*_peer_memory_client symbols stay unresolved.
+# AZL: upstream writes one kernel-agnostic ("*") file per module; this package
+# is installonly, so scope the overrides to %{KVERREL} in one per-kernel file.
+_depmod_conf="%{buildroot}%{_sysconfdir}/depmod.d/zz01-mlnx-ofa_kernel-%{KVERREL}.conf"
+install -d "$(dirname "$_depmod_conf")"
+: > "$_depmod_conf"
+find %{buildroot}/lib/modules/%{KVERREL}/extra/mlnx-ofa_kernel \
+    \( -type f -name '*.ko' -o -name '*.ko.gz' -o -name '*.ko.xz' -o -name '*.ko.zst' \) | sort | \
+while read -r module; do
+    ko_name=${module##*/}
+    mod_name=${ko_name/.ko*/}
+    mod_path=${module#%{buildroot}/lib/modules/%{KVERREL}/extra/mlnx-ofa_kernel}
+    mod_path=$(dirname "$mod_path")
+    echo "override ${mod_name} %{KVERREL} weak-updates/mlnx-ofa_kernel${mod_path}" >> "$_depmod_conf"
+    echo "override ${mod_name} %{KVERREL} extra/mlnx-ofa_kernel${mod_path}" >> "$_depmod_conf"
+done
+
 # Strip .BTF sections to avoid runtime validation failures on target VMs
 # ("Invalid name" / BTF: -22).
 if command -v objcopy >/dev/null 2>&1; then
@@ -466,6 +485,7 @@ fi
 %files -n mlnx-ofa_kernel-modules
 %license %{_datadir}/licenses/mlnx-ofa_kernel/COPYING
 /lib/modules/%{KVERREL}/extra/mlnx-ofa_kernel/
+%config(noreplace) %{_sysconfdir}/depmod.d/zz01-mlnx-ofa_kernel-%{KVERREL}.conf
 
 %files -n mlnx-ofa_kernel-devel
 %license %{_datadir}/licenses/mlnx-ofa_kernel/COPYING

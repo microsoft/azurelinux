@@ -192,7 +192,7 @@ source ~/.bashrc
 # (e.g. cublas-function); without it they fail with
 # "numactl: command not found", surfaced as a non-zero return code. The
 # numactl-devel package provides numa.h for the cpu_copy native benchmark.
-sudo dnf install -y python3 python3-devel python3-pip ansible boost-devel rsync git make gcc \
+sudo dnf install -y python3 python3-devel python3-pip python3-setuptools ansible boost-devel rsync git make gcc \
   gcc-c++ cmake ninja-build \
   numactl numactl-devel \
   openmpi-ofed prrte
@@ -226,6 +226,9 @@ python3 -m pip install transformers wheel pybind11
 # python3-devel and a C++ build toolchain are required for the source fallback.
 # Match the AZL3 pipeline's <2.13 compatibility pin, but select the CUDA 13 core
 # explicitly; the unqualified "core" extra installs the CUDA 12 core package.
+# --no-build-isolation skips pip's normal build-dependency bootstrap, so
+# setuptools must already be importable in this environment beforehand.
+python3 -m pip install --upgrade pip setuptools wheel
 NVTE_FRAMEWORK=pytorch NVTE_CUDA_ARCHS=90 MAX_JOBS="$(nproc)" \
   python3 -m pip install --no-build-isolation \
   "transformer_engine[pytorch,core-cu13]<2.13"
