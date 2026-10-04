@@ -1,0 +1,7 @@
+[components.rpm-ostree]
+# Pin to the Fedora 43 dist-git head of 2026-03-20. It carries the upstream fix for
+# coreos/rpm-ostree#5567: `rpm-ostree upgrade` on container-based hosts pulled the new
+# image and returned without staging a deployment (Patch1 and Patch2, from upstream PRs
+# #5569 and #5575). The global Fedora 43 snapshot of 2026-02-24 predates them.
+# Drop this pin when the snapshot moves past 2026-03-20. See microsoft/azurelinux#18802.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "1e217baeafb680550626e8b437e7ab0373feaa70" }
