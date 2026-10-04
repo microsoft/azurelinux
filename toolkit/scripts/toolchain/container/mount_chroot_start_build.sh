@@ -47,4 +47,4 @@ chroot "$LFS" /usr/bin/env -i   \
     /bin/bash --login +h        \
     -c "sh /tools/toolchain_build_in_chroot.sh"
 
-sh /tools/unmount_chroot.sh
+$LFS/tools/unmount_chroot.sh
