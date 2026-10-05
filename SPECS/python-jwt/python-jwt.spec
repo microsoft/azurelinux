@@ -17,14 +17,14 @@ claims to be transferred between two parties encoded as digitally signed and
 encrypted JSON objects.}
 
 Name:           python-jwt
-Version:        2.13.0
+Version:        2.15.1
 Release:        1%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/jpadilla/pyjwt
-Source0:        https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz
+Source0:        https://files.pythonhosted.org/packages/43/ea/5194e52748b0da83d71e082d75496eaec6e58f419f5e184786ded517e6a9/pyjwt-2.15.1.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
@@ -70,6 +70,11 @@ tox
 %endif
 
 %changelog
+* Tue Sep 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.1-1
+- Auto-upgrade to 2.15.1 - for CVE-2026-102267, CVE-2026-101917, CVE-2026-102269, CVE-2026-102270, CVE-2026-102268
+  CVE-2026-101918, CVE-2026-102265, CVE-2026-102266, CVE-2026-102271, CVE-2026-102272, CVE-2026-102273, CVE-2026-102274 
+  CVE-2026-102275
+
 * Mon Jul 27 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.13.0-1
 - Upgrade to 2.13.0 to fix CVE-2026-48524, CVE-2026-32597, CVE-2026-48526, CVE-2026-48522 and CVE-2026-48525
 
