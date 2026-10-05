@@ -12,8 +12,12 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from _common import get_repo_relative_path
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
 
 # Mapping from finding category to (workflow command level, checks API level, checks API title)
 _SEVERITY_MAP = {
@@ -23,7 +27,10 @@ _SEVERITY_MAP = {
 }
 
 
-def _iter_findings(report: dict, repo_root: Path | None = None):
+def _iter_findings(
+    report: dict,
+    repo_root: Path | None = None,
+) -> Iterator[tuple[str, str, dict[str, object]]]:
     """Yield (spec_file, category, finding) for every finding in the report."""
     for review in report.get("spec_reviews", []):
         spec_file = get_repo_relative_path(review.get("spec_file", ""), repo_root)
@@ -32,7 +39,10 @@ def _iter_findings(report: dict, repo_root: Path | None = None):
                 yield spec_file, category, finding
 
 
-def _format_message(finding: dict, escape_fn=None) -> str:
+def _format_message(
+    finding: dict,
+    escape_fn: Callable[[str], str] | None = None,
+) -> str:
     """Build a message string from a finding, optionally escaping it."""
     desc = finding.get("description", "")
     citation = finding.get("citation")
