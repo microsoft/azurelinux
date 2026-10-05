@@ -21373,8 +21373,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.33",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.33.tar.xz"
+          "version": "8.3.35",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.35.tar.xz"
         }
       }
     },
