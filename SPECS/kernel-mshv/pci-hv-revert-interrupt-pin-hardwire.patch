@@ -1,0 +1,31 @@
+From: Saul Paredes <saulparedes@microsoft.com>
+Subject: [PATCH] Revert "Drivers/hv_pci: Hardwire PCI_INTERRUPT_PIN to 0"
+
+This reverts commit 16cd7cbfebf60789f011470f827145c64dba39b1.
+
+Test-only: rule out the PCI_INTERRUPT_PIN change in the lost NIC interrupt
+investigation.
+---
+diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
+index a00e8824adec5..b46fedf7032e2 100644
+--- a/drivers/pci/controller/pci-hyperv.c
++++ b/drivers/pci/controller/pci-hyperv.c
+@@ -1335,18 +1335,7 @@ static void _hv_pcifront_read_config(struct hv_pci_dev *hpdev, int where,
+ 			 */
+ 			mb();
+ 		}
+-
+ 		spin_unlock_irqrestore(&hbus->config_lock, flags);
+-
+-		/*
+-		 * Make sure PCI_INTERRUPT_PIN is hard-wired to 0, since it
+-		 * may be read using a 32bit read, which is skipped by the
+-		 * above emulation.
+-		 */
+-		if ((PCI_INTERRUPT_PIN >= where) &&
+-		    (PCI_INTERRUPT_PIN <= (where + size))) {
+-			*((char *)val + PCI_INTERRUPT_PIN - where) = 0;
+-		}
+ 	} else {
+ 		dev_err(dev, "Attempt to read beyond a function's config space.\n");
+ 	}
