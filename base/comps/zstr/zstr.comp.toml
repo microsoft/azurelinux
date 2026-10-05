@@ -1,0 +1,2 @@
+[components.zstr]
+spec = { type = "upstream", upstream-commit = "a5fcbe0b38575b94772026dc679145afd1904be7" }
