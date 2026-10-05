@@ -5,8 +5,13 @@
 
 Summary:        A high-level scripting language
 Name:           python3
+<<<<<<< HEAD
 Version:        3.12.14
 Release:        3%{?dist}
+=======
+Version:        3.12.15
+Release:        1%{?dist}
+>>>>>>> cf109b0ae8 (Upgrade `python3` to 3.12.15  (#19031))
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,9 +22,12 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 # It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
+<<<<<<< HEAD
 Patch1:         CVE-2026-15806.patch
 Patch2:         CVE-2026-19672.patch
 Patch3:         CVE-2026-17084.patch
+=======
+>>>>>>> cf109b0ae8 (Upgrade `python3` to 3.12.15  (#19031))
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -245,8 +253,14 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+<<<<<<< HEAD
 * Mon Sep 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-3
 - Patch for CVE-2026-17084
+=======
+* Sat Oct 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.15-1
+- Upgrade to 3.12.15 for CVE-2026-15310, CVE-2026-15806, CVE-2026-17084,
+  CVE-2026-19445, CVE-2026-19553, CVE-2026-19672, CVE-2026-82049, CVE-2026-87910 
+>>>>>>> cf109b0ae8 (Upgrade `python3` to 3.12.15  (#19031))
 
 * Sun Aug 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-2
 - Patch for CVE-2026-15806, CVE-2026-19672
