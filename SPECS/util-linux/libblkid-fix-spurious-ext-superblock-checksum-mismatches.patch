@@ -1,0 +1,122 @@
+From 483c9f38e377ff0b009f546a2c4ee91a1d61588c Mon Sep 17 00:00:00 2001
+From: Krister Johansen <kjlx@templeofstupid.com>
+Date: Mon, 18 Nov 2024 12:35:22 -0800
+Subject: [PATCH] libblkid: fix spurious ext superblock checksum mismatches
+
+Reads of ext superblocks can race with updates.  If libblkid observes a
+checksum mismatch, re-read the superblock with O_DIRECT in order to get
+a consistent view of its contents.  Only if the O_DIRECT read fails the
+checksum should it be reported to have failed.
+
+This fixes a problem where devices that were named by filesystem label
+failed to be found when systemd attempted to mount them on boot.  The
+problem was caused by systemd-udevd using libblkid. If a read of a
+superblock resulted in a checksum mismatch, udev will remove the
+by-label links which result in the mount call failing to find the
+device.  The checksum mismatch that was triggering the problem was
+spurious, and when we use O_DIRECT, or even perform a subsequent retry,
+the superblock is correctly read.  This resulted in a failure to mount
+/boot in one out of every 2,000 or so attempts in our environment.
+
+e2fsprogs fixed[1] an identical version of this bug that afflicted
+resize2fs during online grow operations when run from cloud-init.  The
+fix there was also to use O_DIRECT in order to read the superblock.
+This patch uses a similar approach: read the superblock with O_DIRECT in
+the case where a bad checksum is detected.
+
+[1] https://lore.kernel.org/linux-ext4/20230609042239.GA1436857@mit.edu/
+
+Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
+---
+ libblkid/src/blkidP.h          |  5 +++++
+ libblkid/src/probe.c           | 27 +++++++++++++++++++++++++++
+ libblkid/src/superblocks/ext.c | 22 ++++++++++++++++++++--
+ 3 files changed, 52 insertions(+), 2 deletions(-)
+
+diff --git a/libblkid/src/blkidP.h b/libblkid/src/blkidP.h
+index f71e13cb335..fa2379c4df3 100644
+--- a/libblkid/src/blkidP.h
++++ b/libblkid/src/blkidP.h
+@@ -421,6 +421,11 @@ extern const unsigned char *blkid_probe_get_buffer(blkid_probe pr,
+ 			__attribute__((nonnull))
+ 			__attribute__((warn_unused_result));
+ 
++extern const unsigned char *blkid_probe_get_buffer_direct(blkid_probe pr,
++                                uint64_t off, uint64_t len)
++			__attribute__((nonnull))
++			__attribute__((warn_unused_result));
++
+ extern const unsigned char *blkid_probe_get_sector(blkid_probe pr, unsigned int sector)
+ 			__attribute__((nonnull))
+ 			__attribute__((warn_unused_result));
+diff --git a/libblkid/src/probe.c b/libblkid/src/probe.c
+index b24e7769ce6..5a156251caa 100644
+--- a/libblkid/src/probe.c
++++ b/libblkid/src/probe.c
+@@ -791,6 +791,33 @@ const unsigned char *blkid_probe_get_buffer(blkid_probe pr, uint64_t off, uint64
+ 	return real_off ? bf->data + (real_off - bf->off + bias) : bf->data + bias;
+ }
+ 
++/*
++ * This is blkid_probe_get_buffer with the read done as an O_DIRECT operation.
++ * Note that @off is offset within probing area, the probing area is defined by
++ * pr->off and pr->size.
++ */
++const unsigned char *blkid_probe_get_buffer_direct(blkid_probe pr, uint64_t off, uint64_t len)
++{
++	const unsigned char *ret = NULL;
++	int flags, rc, olderrno;
++
++	flags = fcntl(pr->fd, F_GETFL);
++	rc = fcntl(pr->fd, F_SETFL, flags | O_DIRECT);
++	if (rc) {
++		DBG(LOWPROBE, ul_debug("fcntl F_SETFL failed to set O_DIRECT"));
++		errno = 0;
++		return NULL;
++	}
++	ret = blkid_probe_get_buffer(pr, off, len);
++	olderrno = errno;
++	rc = fcntl(pr->fd, F_SETFL, flags);
++	if (rc) {
++		DBG(LOWPROBE, ul_debug("fcntl F_SETFL failed to clear O_DIRECT"));
++		errno = olderrno;
++	}
++	return ret;
++}
++
+ /**
+  * blkid_probe_reset_buffers:
+  * @pr: prober
+diff --git a/libblkid/src/superblocks/ext.c b/libblkid/src/superblocks/ext.c
+index a5f34810f93..7a9f8c9b993 100644
+--- a/libblkid/src/superblocks/ext.c
++++ b/libblkid/src/superblocks/ext.c
+@@ -156,8 +156,26 @@ static struct ext2_super_block *ext_get_super(
+ 		return NULL;
+ 	if (le32_to_cpu(es->s_feature_ro_compat) & EXT4_FEATURE_RO_COMPAT_METADATA_CSUM) {
+ 		uint32_t csum = crc32c(~0, es, offsetof(struct ext2_super_block, s_checksum));
+-		if (!blkid_probe_verify_csum(pr, csum, le32_to_cpu(es->s_checksum)))
+-			return NULL;
++		/*
++		 * A read of the superblock can race with other updates to the
++		 * same superblock.  In the unlikely event that this occurs and
++		 * we see a checksum failure, re-read the superblock with
++		 * O_DIRECT to ensure that it's consistent.  If it _still_ fails
++		 * then declare a checksum mismatch.
++		 */
++		if (!blkid_probe_verify_csum(pr, csum, le32_to_cpu(es->s_checksum))) {
++			if (blkid_probe_reset_buffers(pr))
++				return NULL;
++
++			es = (struct ext2_super_block *)
++			    blkid_probe_get_buffer_direct(pr, EXT_SB_OFF, sizeof(struct ext2_super_block));
++			if (!es)
++				return NULL;
++
++			csum = crc32c(~0, es, offsetof(struct ext2_super_block, s_checksum));
++			if (!blkid_probe_verify_csum(pr, csum, le32_to_cpu(es->s_checksum)))
++				return NULL;
++		}
+ 	}
+ 	if (fc)
+ 		*fc = le32_to_cpu(es->s_feature_compat);
