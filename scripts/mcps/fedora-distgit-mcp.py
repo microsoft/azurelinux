@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Fedora Dist-Git MCP Server — exposes tools for querying Fedora's package
 repositories via the Pagure API and performing git-level searches (pickaxe,
 grep) on cloned repos.

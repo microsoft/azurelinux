@@ -98,6 +98,7 @@ fixable = ["ALL"]
 # These helpers and entry points are likewise used through direct execution
 # with sibling imports rather than as importable packages.
 "scripts/mcps/_mcp_utils.py" = ["INP001"]
+"scripts/mcps/fedora-distgit-mcp.py" = ["INP001"]
 "scripts/repo/_repo_layout.py" = ["INP001"]
 
 [lint.isort]
