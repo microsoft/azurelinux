@@ -1,0 +1,67 @@
+From fe417f35df556aadfee673e2e6e28416717b050c Mon Sep 17 00:00:00 2001
+From: Michel Lind <salimma@fedoraproject.org>
+Date: Wed, 2 Sep 2026 19:22:56 +0100
+Subject: [PATCH] Fix alignment tests on 32-bit architectures
+
+On i686, for instance, 64-bit integers are 32-bit aligned
+
+See
+
+https://koji.fedoraproject.org/koji/taskinfo?taskID=149783770
+https://kojipkgs.fedoraproject.org//work/tasks/4350/149784350/build.log
+
+```
+---- meta::alignment::case_02 stdout ----
+thread 'meta::alignment::case_02' (3516) panicked at tests/integration/meta.rs:91:5:
+assertion `left == right` failed: alignment of `time::signed_duration::SignedDuration` was 8
+  left: 4
+ right: 8
+```
+
+Signed-off-by: Michel Lind <salimma@fedoraproject.org>
+---
+ time/tests/integration/meta.rs | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/time/tests/integration/meta.rs b/time/tests/integration/meta.rs
+index 94cd82e6d..b7efa2167 100644
+--- a/tests/integration/meta.rs
++++ b/tests/integration/meta.rs
+@@ -29,13 +29,13 @@ use time::{
+ 
+ #[rstest]
+ #[case(PhantomData::<Date>, 4)]
+-#[case(PhantomData::<SignedDuration>, 8)]
++#[case(PhantomData::<SignedDuration>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
+ #[case(PhantomData::<OffsetDateTime>, 4)]
+ #[case(PhantomData::<PlainDateTime>, 4)]
+ #[case(PhantomData::<UtcDateTime>, 4)]
+ #[case(PhantomData::<Time>, 4)]
+ #[case(PhantomData::<UtcOffset>, 1)]
+-#[case(PhantomData::<error::ComponentRange>, 8)]
++#[case(PhantomData::<error::ComponentRange>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
+ #[case(PhantomData::<error::ConversionRange>, 1)]
+ #[case(PhantomData::<error::DifferentVariant>, 1)]
+ #[case(PhantomData::<error::IndeterminateOffset>, 1)]
+@@ -69,14 +69,14 @@ use time::{
+ #[case(PhantomData::<Parsed>, align_of::<u128>())]
+ #[case(PhantomData::<Month>, 1)]
+ #[case(PhantomData::<Weekday>, 1)]
+-#[case(PhantomData::<Error>, 8)]
+-#[case(PhantomData::<error::Format>, 8)]
+-#[case(PhantomData::<error::InvalidFormatDescription>, 8)]
+-#[case(PhantomData::<error::Parse>, 8)]
+-#[case(PhantomData::<error::ParseFromDescription>, 8)]
+-#[case(PhantomData::<error::TryFromParsed>, 8)]
++#[case(PhantomData::<Error>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
++#[case(PhantomData::<error::Format>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
++#[case(PhantomData::<error::InvalidFormatDescription>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
++#[case(PhantomData::<error::Parse>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
++#[case(PhantomData::<error::ParseFromDescription>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
++#[case(PhantomData::<error::TryFromParsed>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
+ #[case(PhantomData::<Component>, 2)]
+-#[case(PhantomData::<BorrowedFormatItem<'_>>, 8)]
++#[case(PhantomData::<BorrowedFormatItem<'_>>, if cfg!(target_pointer_width = "64") { 8 } else { 4 })]
+ #[expect(deprecated)]
+ #[case(PhantomData::<modifier::MonthRepr>, 1)]
+ #[case(PhantomData::<modifier::Padding>, 1)]

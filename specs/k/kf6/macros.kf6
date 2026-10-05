@@ -19,7 +19,7 @@
   %undefine __cmake_in_source_build \
   QTDIR="%{_qt6_prefix}" ; export QTDIR ; \
   PATH="%{_qt6_bindir}:$PATH" ; export PATH ; \
-  KDE_DOCS="/usr/share/doc/qt6/kde-qdoc-common" ; export KDE_DOCS ; \
+  KDE_DOCS="%{_datadir}/doc/qt6/kde-qdoc-common" ; export KDE_DOCS ; \
   CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ; \
   CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS ; \
   FFLAGS="${FFLAGS:-%optflags%{?_fmoddir: -I%_fmoddir}}" ; export FFLAGS ; \
@@ -48,6 +48,7 @@
     -DKDE_INSTALL_METAINFODIR:PATH=%{_kf6_metainfodir} \\\
     -DKDE_INSTALL_PLUGINDIR:PATH=%{_qt6_plugindir} \\\
     -DKDE_INSTALL_QMLDIR:PATH=%{_kf6_qmldir} \\\
+    -DKDE_INSTALL_QTMETATYPESDIR:PATH=%{_qt6_metatypesdir} \\\
     -DKDE_INSTALL_QTPLUGINDIR:PATH=%{_qt6_plugindir} \\\
     -DKDE_INSTALL_QTQCHDIR:PATH=%{_qt6_docdir} \\\
     -DKDE_INSTALL_QTQUICKIMPORTSDIR:PATH=%{_qt6_importdir} \\\
@@ -56,6 +57,7 @@
 
 %cmake_build_kf6 \\\
 	%cmake_build \
+	KDE_DOCS="%{_datadir}/doc/qt6/kde-qdoc-common" ; export KDE_DOCS ; \
 	%cmake_build -t prepare_docs \
 	%cmake_build -t generate_docs \
 	%cmake_build -t generate_qch
@@ -63,6 +65,7 @@
 %cmake_install_kf6 \\\
 	%cmake_install \
 	DESTDIR=%{buildroot} ; export DESTDIR ; \
+	KDE_DOCS="%{_datadir}/doc/qt6/kde-qdoc-common" ; export KDE_DOCS ; \
 	%cmake_build -t install_html_docs \
 	%cmake_build -t install_qch_docs 
 

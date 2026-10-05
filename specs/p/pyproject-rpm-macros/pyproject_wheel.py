@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 import subprocess
 
@@ -56,21 +57,29 @@ def build_wheel(*, wheeldir, stdout=None, config_settings=None):
         *get_config_settings_args(config_settings),
         '.',
     )
-    cp = subprocess.run(command, stdout=stdout)
+    env = {'PIP_CONFIG_FILE': '/dev/null', **os.environ}
+    cp = subprocess.run(command, env=env, stdout=stdout)
     return cp.returncode
 
 
-def parse_args(argv=None):
+def argparser():
     parser = argparse.ArgumentParser(prog='%pyproject_wheel')
     parser.add_argument('wheeldir', help=argparse.SUPPRESS)
     parser.add_argument(
-        '-C',
+        '-C', '--config-settings',
         dest='config_settings',
         action='append',
         help='Configuration settings to pass to the PEP 517 backend',
     )
+    parser.add_argument('-d', '--directory', help=argparse.SUPPRESS)  # processed by RPM macro
+    return parser
+
+
+def parse_args(argv=None):
+    parser = argparser()
     args = parser.parse_args(argv)
     args.config_settings = parse_config_settings_args(args.config_settings)
+    del args.directory
     return args
 
 

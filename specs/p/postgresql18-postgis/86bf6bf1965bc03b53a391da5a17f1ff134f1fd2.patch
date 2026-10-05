@@ -1,0 +1,55 @@
+diff -rupN --no-dereference postgis-3.6.4/postgis/flatgeobuf.c postgis-3.6.4-new/postgis/flatgeobuf.c
+--- postgis-3.6.4/postgis/flatgeobuf.c	2026-06-08 20:28:56.000000000 +0200
++++ postgis-3.6.4-new/postgis/flatgeobuf.c	2026-09-16 09:18:18.819821624 +0200
+@@ -360,7 +360,7 @@ static void decode_properties(struct fla
+ 			if (offset + sizeof(uint32_t) > size)
+ 				elog(ERROR, "flatgeobuf: decode_properties: Invalid size for uint value");
+ 			memcpy(&value, data + offset, sizeof(uint32_t));
+-			values[ci] = UInt32GetDatum(value);
++			values[ci] = Int64GetDatum((int64_t)(uint64_t) value);
+ 			offset += sizeof(uint32_t);
+ 			break;
+ 		}
+@@ -387,10 +387,7 @@ static void decode_properties(struct fla
+ 			if (offset + sizeof(float) > size)
+ 				elog(ERROR, "flatgeobuf: decode_properties: Invalid size for float value");
+ 			memcpy(&value, data + offset, sizeof(float));
+-			if (getBaseType(TupleDescAttr(ctx->tupdesc, ci)->atttypid) == FLOAT8OID)
+-				values[ci] = Float8GetDatum((double) value);
+-			else
+-				values[ci] = Float4GetDatum(value);
++			values[ci] = Float4GetDatum(value);
+ 			offset += sizeof(float);
+ 			break;
+ 		}
+diff -rupN --no-dereference postgis-3.6.4/postgis/lwgeom_in_flatgeobuf.c postgis-3.6.4-new/postgis/lwgeom_in_flatgeobuf.c
+--- postgis-3.6.4/postgis/lwgeom_in_flatgeobuf.c	2026-06-08 20:28:56.000000000 +0200
++++ postgis-3.6.4-new/postgis/lwgeom_in_flatgeobuf.c	2026-09-16 09:18:18.820250933 +0200
+@@ -88,24 +88,19 @@ flatgeobuf_type_compatible(uint8_t fgb_t
+ 	{
+ 	case flatgeobuf_column_type_bool:
+ 		return pgtype == BOOLOID;
+-	/* small integer types: allow widening into larger signed ints */
+ 	case flatgeobuf_column_type_byte:
+ 	case flatgeobuf_column_type_ubyte:
+ 	case flatgeobuf_column_type_short:
+ 	case flatgeobuf_column_type_ushort:
+-		return pgtype == INT2OID || pgtype == INT4OID || pgtype == INT8OID;
+-	/* int32: allow widening to bigint */
++		return pgtype == INT2OID;
+ 	case flatgeobuf_column_type_int:
+-		return pgtype == INT4OID || pgtype == INT8OID;
+-	/* uint32 max exceeds INT4, must land in bigint */
++		return pgtype == INT4OID;
+ 	case flatgeobuf_column_type_uint:
+-		return pgtype == INT8OID;
+ 	case flatgeobuf_column_type_long:
+ 	case flatgeobuf_column_type_ulong:
+ 		return pgtype == INT8OID;
+-	/* float: allow widening to double (explicit conversion handled in decode) */
+ 	case flatgeobuf_column_type_float:
+-		return pgtype == FLOAT4OID || pgtype == FLOAT8OID;
++		return pgtype == FLOAT4OID;
+ 	case flatgeobuf_column_type_double:
+ 		return pgtype == FLOAT8OID;
+ 	case flatgeobuf_column_type_string:

@@ -1,0 +1,293 @@
+From 979044a3ce87bd753062e08c62466e2a5599b36b Mon Sep 17 00:00:00 2001
+From: Karan Shukla <karan_shukla@live.com>
+Date: Tue, 28 Jul 2026 07:26:12 -0400
+Subject: [PATCH] config: enable Wildcat Lake in LPMD
+
+---
+ data/Makefile.am                   |   3 +-
+ data/intel_lpmd_config_F6_M213.xml | 246 +++++++++++++++++++++++++++++
+ src/lpmd_cpu.c                     |   1 +
+ 3 files changed, 249 insertions(+), 1 deletion(-)
+ create mode 100644 data/intel_lpmd_config_F6_M213.xml
+
+diff --git a/data/Makefile.am b/data/Makefile.am
+index b9a1366..1ac0910 100644
+--- a/data/Makefile.am
++++ b/data/Makefile.am
+@@ -33,7 +33,8 @@ lpmd_config_DATA = \
+ 	  intel_lpmd_config_F6_M181.xml \
+ 	  intel_lpmd_config_F6_M189.xml \
+ 	  intel_lpmd_config_F6_M197.xml \
+-	  intel_lpmd_config_F6_M204.xml
++	  intel_lpmd_config_F6_M204.xml \
++	  intel_lpmd_config_F6_M213.xml
+ 
+ EXTRA_DIST = \
+ 	intel_lpmd.service.in \
+diff --git a/data/intel_lpmd_config_F6_M213.xml b/data/intel_lpmd_config_F6_M213.xml
+new file mode 100644
+index 0000000..ef39aa0
+--- /dev/null
++++ b/data/intel_lpmd_config_F6_M213.xml
+@@ -0,0 +1,246 @@
++<?xml version="1.0"?>
++
++<!--
++Intel Energy Optimizer (LPMD) configuration for Wildcat Lake
++(family 6, model 0xD5 / 213).
++
++  Performance (PerformanceDef=-1) -> LPMD_OFF  -> all CPUs active (P+L)
++  Balanced    (BalancedDef= 0)    -> LPMD_AUTO -> L-cores only (P-cores parked)
++  Powersaver  (PowersaverDef= 1)  -> LPMD_ON   -> L-cores only (forced)
++
++Design: verified on an Intel Core 5 320 (2 P-cores, 15W TDP) via the
++daemon's own CPUID-based core-type detection (lpmd_cpu.c:detect_cpu_topo,
++which classifies atom-type cores as E vs L by whether their CPUID leaf 4
++reports an L3 slice): "Detected 2 Pcores, 0 Ecores, 4 Lcores, TDP 15W".
++All 4 non-P cores land in the L tier, not E — there is no full E-core
++tier on this sample, only P + L. This does NOT match what /sys/devices
++alone would suggest: /sys/devices/cpu_core/cpus (0-1) and
++/sys/devices/cpu_atom/cpus (2-5) only distinguish big/little, not the
++E-vs-L split the daemon's own cache-topology probe makes, and lscpu -e's
++L2-instance grouping (cores 2-5 sharing one L2 cluster) looks superficially
++like a single Skymont-style E-core module. Trust the daemon's own
++detect_cpu_topo() output over either of those when writing a config for
++this model — an earlier draft of this file used ActiveEcores=ALL, which
++would have resolved to an empty CPU set at runtime and left Balanced/
++Powersaver mode with zero active cores.
++
++Only the idle states park the P-cores. UTIL_IDLE uses ActiveLcores=ALL
++(topology-portable, not hardcoded CPU numbers); UTIL_IDLE_SUSTAIN and
++UTIL_IDLE_BURSTY release the full CPU set, following F6_M181 and F6_M204.
++EPP/EPB additionally vary per WLT state.
++-->
++
++<Configuration>
++	<!--
++		CPU format example: 1,2,4..6,8-10
++		Used by the force-on path (PowersaverDef=1).
++	-->
++	<lp_mode_cpus></lp_mode_cpus>
++
++	<!--
++		EPP to use in Low Power Mode
++		0-255: Valid EPP value to use in Low Power Mode
++		   -1: Don't change EPP in Low Power Mode
++		Left empty: LPMD does not override EPP — it stays under
++		PPD (power-profiles-daemon) control.
++	-->
++	<lp_mode_epp></lp_mode_epp>
++
++	<!--
++		Mode values
++		0: Cgroup v2
++		1: Cgroup v2 isolate
++		2: CPU idle injection
++	-->
++	<Mode>1</Mode>
++
++	<!--
++		Default behavior when Performance power setting is used
++		-1: force off. (Never enter Low Power Mode)
++		 1: force on. (Always stay in Low Power Mode)
++		 0: auto. (opportunistic Low Power Mode enter/exit)
++	-->
++	<PerformanceDef>-1</PerformanceDef>
++
++	<!--
++		Default behavior when Balanced power setting is used
++		-1: force off. (Never enter Low Power Mode)
++		 1: force on. (Always stay in Low Power Mode)
++		 0: auto. (opportunistic Low Power Mode enter/exit)
++	-->
++	<BalancedDef>0</BalancedDef>
++
++	<!--
++		Default behavior when Power saver setting is used
++		-1: force off. (Never enter Low Power Mode)
++		 1: force on. (Always stay in Low Power Mode)
++		 0: auto. (opportunistic Low Power Mode enter/exit)
++	-->
++	<PowersaverDef>1</PowersaverDef>
++
++	<!--
++		Use HFI LPM hints
++		0 : No
++		1 : Yes
++	-->
++	<HfiLpmEnable>0</HfiLpmEnable>
++
++	<!--
++		Use WLT hints
++		0 : No
++		1 : Yes
++	-->
++	<WLTHintEnable>1</WLTHintEnable>
++
++	<!--
++		Use WLT hint Poll enable
++		0 : No
++		1 : Yes
++	-->
++	<WLTHintPollEnable>1</WLTHintPollEnable>
++
++	<!--
++		Use HFI SUV hints
++		0 : No
++		1 : Yes
++		NOTE: SUV mode support was removed from the daemon (May 2025).
++		The parser accepts this element but discards the value.
++		Kept here for forward compatibility if the feature is restored.
++	-->
++	<HfiSuvEnable>0</HfiSuvEnable>
++
++	<!--
++		WLT hint mask: ANDed with the raw hardware WLT hint before
++		matching against each state's WLTType.
++		15 (0x0F) keeps the low 4 bits, which covers the defined
++		WLT classifications (0=Idle, 1=Battery Life, 2=Sustained, 3=Bursty).
++	-->
++	<WLTHintMask>15</WLTHintMask>
++
++	<!--
++		Global utilization thresholds (0-100). Used by the legacy
++		UTIL_POWER fallback path when no per-state <States> config
++		exists. Since this config defines <States>, these globals
++		are not consumed — kept for documentation only.
++
++		Disabled here regardless: every state below defines a WLTType
++		or WLTTypeMask, and per intel_lpmd_config.xml(5) a state with
++		WLTType defined does not use utilization-based entry triggers.
++		LPM entry and exit are driven entirely by the WLT hint.
++
++		<util_entry_threshold>10</util_entry_threshold>
++		<util_exit_threshold>95</util_exit_threshold>
++	-->
++
++	<!--
++		EntryDelayMS / ExitDelayMS / EntryHystMS / ExitHystMS are
++		currently parsed but have no runtime effect. Omitted here.
++	-->
++
++	<!--
++		Ignore ITMT setting during LP-mode enter/exit
++		0: disable ITMT upon LP-mode enter and re-enable ITMT upon LP-mode exit
++		1: do not touch ITMT setting during LP-mode enter/exit
++
++		lpmd parks P-cores via cgroup isolation; ITMT tells the scheduler
++		to *prefer* P-cores, the opposite of what LPM does here. Kept at
++		0 for consistency with upstream configs (F6_M170/189/204/197).
++	-->
++	<IgnoreITMT>0</IgnoreITMT>
++
++	<!--
++		SoC Power Slider (BalancedSliderAC/DC, SliderOffsetAC/DC): omitted.
++		Not yet confirmed present on Wildcat Lake via the int340x thermal
++		driver on this sample; can be added once verified on hardware that
++		exposes the slider mailbox. See F6_M204 (Panther Lake) for the
++		values to model if/when confirmed.
++	-->
++
++	<!--
++		WorkLoad Type hint states for Wildcat Lake.
++
++		The P-cores are parked only in the idle states. This platform's
++		lower tier is the L-core set (see topology note above:
++		detect_cpu_topo() classifies all 4 non-P cores as L, not E), and
++		UTIL_IDLE uses ActiveLcores=ALL, resolved at runtime to the actual
++		L-core mask, so it is topology-portable rather than hardcoded to
++		specific CPU numbers.
++
++		UTIL_IDLE_SUSTAIN and UTIL_IDLE_BURSTY release the full CPU set
++		via ActiveCPUs=*, matching F6_M181 (Lunar Lake) and F6_M204
++		(Panther Lake). Every upstream config that varies the CPU set by
++		WLT state unparks for both 2 and 3; none unparks for one alone.
++		Per the DPTF definitions, WLT 3 has real idle periods between
++		bursts, so finishing a burst on the P-cores returns the SoC to
++		idle sooner, and WLT 2 is by definition already exhausting RAPL
++		PL1/PL2, so the extra cores complete the work inside a power
++		budget that is capped either way.
++
++		An earlier revision of this file parked the P-cores in all three
++		states. The daemon behaved correctly — the WLT hint moves to 2
++		within ~1s of sustained load and UTIL_IDLE_SUSTAIN is entered,
++		observed via EPP 192->64 and EPB 8->4 — but every state it could
++		reach also excluded the P-cores, so cpuset.cpus.isolated never
++		cleared. Adding EntrySystemLoadThres does not fix that: per
++		intel_lpmd_config.xml(5), "if [WLTType] is defined then
++		utilization based entry triggers are not used".
++
++		EPP/EPB are differentiated per WLT state:
++
++		  UTIL_IDLE (WLT 0+1): EPP=192 "balance_power", EPB=8
++		    Idle or light activity. Power-biased, P-cores parked, but
++		    the L-cores can still respond to light interactive tasks.
++
++		  UTIL_IDLE_SUSTAIN (WLT 2): EPP=64, EPB=4
++		    Sustained compute. Full CPU set, performance-biased.
++
++		  UTIL_IDLE_BURSTY (WLT 3): EPP=128 "balance_performance", EPB=6
++		    Bursty spikes. Full CPU set so bursts retire quickly, but
++		    biased more toward power than the sustained state.
++
++		EPP/EPB values for states 2 and 3 are taken from F6_M181, whose
++		WLTTypeMask=3 idle state this config otherwise mirrors.
++
++		WLTTypeMask=3 on UTIL_IDLE merges WLT=0 (WLT_IDLE / deep idle)
++		and WLT=1 (WLT_BATTERY_LIFE / light usage) into one state, since
++		the hardware oscillates between the two rapidly (~2x/sec
++		observed on other hybrid platforms in this family) and splitting
++		them would cause needless sysfs write churn for no real EPP/EPB
++		benefit. See F6_M197 (Arrow Lake-H) for the full rationale.
++
++		Invalid/out-of-range WLT values (e.g. WLT_INVALID=4) match no
++		state; the daemon holds its current state unchanged rather than
++		falling back to a wildcard.
++	-->
++	<States>
++		<CPUFamily> 6 </CPUFamily>
++		<CPUModel> 213 </CPUModel>
++		<CPUConfig> * </CPUConfig>
++		<State>
++			<ID> 1 </ID>
++			<Name> UTIL_IDLE </Name>
++			<WLTTypeMask> 3 </WLTTypeMask>
++			<ActiveLcores>ALL</ActiveLcores>
++			<IRQMigrate>1</IRQMigrate>
++			<EPP>192</EPP>
++			<EPB>8</EPB>
++		</State>
++		<State>
++			<ID> 2 </ID>
++			<Name> UTIL_IDLE_SUSTAIN </Name>
++			<WLTType> 2 </WLTType>
++			<ActiveCPUs> * </ActiveCPUs>
++			<EPP>64</EPP>
++			<EPB>4</EPB>
++		</State>
++		<State>
++			<ID> 3 </ID>
++			<Name> UTIL_IDLE_BURSTY </Name>
++			<WLTType> 3 </WLTType>
++			<ActiveCPUs> * </ActiveCPUs>
++			<EPP>128</EPP>
++			<EPB>6</EPB>
++		</State>
++	</States>
++
++</Configuration>
+diff --git a/src/lpmd_cpu.c b/src/lpmd_cpu.c
+index 04ec4d1..1d8ce60 100644
+--- a/src/lpmd_cpu.c
++++ b/src/lpmd_cpu.c
+@@ -27,6 +27,7 @@ static struct cpu_model_entry id_table[] = {
+ 		{ 6, 0xbd }, // Lunarlake
+ 		{ 6, 0xcc }, // Pantherlake
+ 		{ 6, 0xc5 }, // Arrowlake H
++		{ 6, 0xd5 }, // Wildcatlake
+ 		{ 0, 0 } // Last Invalid entry
+ };
+ 
+-- 
+2.55.0
+

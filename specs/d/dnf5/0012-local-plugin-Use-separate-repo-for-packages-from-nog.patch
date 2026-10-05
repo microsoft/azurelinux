@@ -1,0 +1,450 @@
+From 4fd196ecc4adb543724ff797e627a33e077af5c2 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Fri, 10 Apr 2026 08:06:30 +0000
+Subject: [PATCH 12/12] local plugin: Use separate repo for packages from
+ nogpgcheck repos
+
+Create a second repository _dnf_local_nogpgcheck with pkg_gpgcheck
+disabled for packages originally from repositories with pkg_gpgcheck
+disabled. This avoids signature verification failures when reinstalling
+or upgrading such packages.
+
+The _dnf_local_nogpgcheck repository is stored in a separate directory
+(plugins/local-nogpgcheck) and is only created when there are packages
+to cache from repositories with pkg_gpgcheck disabled.
+
+The _dnf_local repository continues to use its existing directory
+(plugins/local) for backward compatibility.
+
+Also fix metadata_expire being set globally instead of per-repo,
+which was causing unnecessary metadata downloads for all repositories.
+
+Also only create the repo directories when there are packages to put
+in them, avoiding warnings about missing repodata on first use
+(issue #2581).
+
+Resolves: https://github.com/rpm-software-management/dnf5/issues/2580
+Resolves: https://github.com/rpm-software-management/dnf5/issues/2581
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ doc/libdnf5_plugins/local.8.rst  |  32 +++-
+ libdnf5-plugins/local/local.conf |   5 +-
+ libdnf5-plugins/local/local.cpp  | 286 +++++++++++++++++++------------
+ 3 files changed, 202 insertions(+), 121 deletions(-)
+
+diff --git a/doc/libdnf5_plugins/local.8.rst b/doc/libdnf5_plugins/local.8.rst
+index d3c7be64..e00282c8 100644
+--- a/doc/libdnf5_plugins/local.8.rst
++++ b/doc/libdnf5_plugins/local.8.rst
+@@ -11,20 +11,29 @@ Local Plugin
+ Description
+ ===========
+ 
+-After each libdnf5 transaction copy all downloaded packages to a ``_dnf_local`` repository on the local filesystem and generate repository metadata.
++After each libdnf5 transaction copy all downloaded packages to local repositories on the filesystem and generate repository metadata.
+ 
+-The repository is automatically added by the plugin with the following options::
++The plugin creates two repositories:
++
++* ``_dnf_local`` for packages from repositories with ``pkg_gpgcheck`` enabled.
++  The ``pkg_gpgcheck`` setting is inherited from the main configuration.
++  The repository doesn't specify any ``gpgkey``, it assumes all required keys
++  were already imported.
++* ``_dnf_local_nogpgcheck`` for packages from repositories with ``pkg_gpgcheck``
++  disabled. This repository has ``pkg_gpgcheck`` set to ``false``.
++
++Each repository is only created when there are cached packages in it.
++
++Both repositories are configured with the following options::
+ 
+-    [_dnf_local]
+-    name = Local libdnf5 plugin repo
+-    baseurl = <repodir>
+     skip_if_unavailable = true
+-    cost = 500
+     metadata_expire = 0
+ 
+-Note that the repository has ``pkg_gpgcheck`` verification enabled by default but doesn't specify any ``gpgkey``, it assumes all required keys were already imported.
++The ``_dnf_local`` repository has ``cost = 500`` and the ``_dnf_local_nogpgcheck``
++repository has ``cost = 501``, so the gpgcheck-enabled repository is preferred
++when both contain the same package.
+ 
+-To generate the metedata `createrepo_c` is required.
++To generate the metadata `createrepo_c` is required.
+ 
+ Configuration
+ =============
+@@ -53,6 +62,13 @@ It can also contain:
+     Path where the local repository is located.
+     By default it is in :ref:`persistdir <persistdir_options-label>` in ``plugins/local`` subdirectory.
+ 
++``repodir_nogpgcheck``
++    :ref:`string <string-label>`
++
++    Path where the local repository for packages from repos with ``pkg_gpgcheck``
++    disabled is located.
++    By default it is in :ref:`persistdir <persistdir_options-label>` in ``plugins/local-nogpgcheck`` subdirectory.
++
+ 
+ The ``createrepo`` section requires:
+ 
+diff --git a/libdnf5-plugins/local/local.conf b/libdnf5-plugins/local/local.conf
+index 613340a7..a3f83a4d 100644
+--- a/libdnf5-plugins/local/local.conf
++++ b/libdnf5-plugins/local/local.conf
+@@ -2,9 +2,12 @@
+ name = local
+ enabled = host-only
+ 
+-# Path to the local repository.
++# Path to the local repository for packages from repos with pkg_gpgcheck enabled.
+ # repodir = /var/lib/dnf/plugins/local
+ 
++# Path to the local repository for packages from repos with pkg_gpgcheck disabled.
++# repodir_nogpgcheck = /var/lib/dnf/plugins/local-nogpgcheck
++
+ # Createrepo options. See man createrepo_c
+ [createrepo]
+ # This option lets you disable createrepo command. This could be useful
+diff --git a/libdnf5-plugins/local/local.cpp b/libdnf5-plugins/local/local.cpp
+index ab7b46fa..ef74198d 100644
+--- a/libdnf5-plugins/local/local.cpp
++++ b/libdnf5-plugins/local/local.cpp
+@@ -14,8 +14,10 @@
+ #include <sys/wait.h>
+ 
+ 
+-constexpr const char * LOCAL_REPO_NAME{"_dnf_local"};
+-constexpr const char * LOCATION_IN_PERSISTDIR{"plugins/local"};
++constexpr const char * LOCAL_REPO_NAME_GPGCHECK{"_dnf_local"};
++constexpr const char * LOCAL_REPO_NAME_NOGPGCHECK{"_dnf_local_nogpgcheck"};
++constexpr const char * LOCATION_IN_PERSISTDIR_GPGCHECK{"plugins/local"};
++constexpr const char * LOCATION_IN_PERSISTDIR_NOGPGCHECK{"plugins/local-nogpgcheck"};
+ 
+ using namespace libdnf5;
+ 
+@@ -64,150 +66,210 @@ public:
+     void post_base_setup() override {
+         Base & base = get_base();
+         auto repo_sack = base.get_repo_sack();
+-        auto repo = repo_sack->create_repo(LOCAL_REPO_NAME);
+         if (config.has_option("main", "repodir")) {
+             repodir = config.get_value("main", "repodir");
+         } else {
+             // default repo location
+             repodir = base.get_config().get_persistdir_option().get_value();
+-            repodir = repodir / LOCATION_IN_PERSISTDIR;
++            repodir = repodir / LOCATION_IN_PERSISTDIR_GPGCHECK;
++        }
++        if (config.has_option("main", "repodir_nogpgcheck")) {
++            repodir_nogpgcheck = config.get_value("main", "repodir_nogpgcheck");
++        } else {
++            repodir_nogpgcheck = base.get_config().get_persistdir_option().get_value();
++            repodir_nogpgcheck = repodir_nogpgcheck / LOCATION_IN_PERSISTDIR_NOGPGCHECK;
++        }
++
++        // Only create repos if their directories already exist.
++        // Directories are created on first use in post_transaction().
++        // This avoids warnings about missing repodata (see issue #2581).
++        if (std::filesystem::exists(repodir)) {
++            setup_local_repo(repo_sack, LOCAL_REPO_NAME_GPGCHECK, "Local libdnf5 plugin repo", repodir);
++        }
++        if (std::filesystem::exists(repodir_nogpgcheck)) {
++            auto nogpgcheck_repo = setup_local_repo(
++                repo_sack, LOCAL_REPO_NAME_NOGPGCHECK, "Local libdnf5 plugin repo (nogpgcheck)", repodir_nogpgcheck);
++            nogpgcheck_repo->get_config().get_pkg_gpgcheck_option().set(false);
++            // Prefer the gpgcheck repo when both contain the same package
++            nogpgcheck_repo->get_config().get_cost_option().set(501);
+         }
+-        repo->get_config().get_name_option().set("Local libdnf5 plugin repo");
+-        repo->get_config().get_baseurl_option().set("file://" + std::filesystem::absolute(repodir).string());
+-        repo->get_config().get_skip_if_unavailable_option().set(true);
+-        // Make local repo preferred over other repos (which by default have cost 1000)
+-        repo->get_config().get_cost_option().set(500);
+-        // The repo should never be cached:
+-        // - Users expect the packages to be available in it right after running a transaction
+-        // but this transaction would create a cache for the repo.
+-        // - The repo is usually local
+-        base.get_config().get_metadata_expire_option().set(0);
+     }
+ 
+     void post_transaction(const libdnf5::base::Transaction & transaction) override {
+-        std::filesystem::create_directories(repodir);
+-
+-        bool need_rebuild = false;
++        bool need_rebuild_gpgcheck = false;
++        bool need_rebuild_nogpgcheck = false;
+         for (auto & tspkg : transaction.get_transaction_packages()) {
+             if (transaction_item_action_is_inbound(tspkg.get_action())) {
+                 const auto & pkg = tspkg.get_package();
+-                if (pkg.get_repo_id() == LOCAL_REPO_NAME) {
++                if (pkg.get_repo_id() == LOCAL_REPO_NAME_GPGCHECK || pkg.get_repo_id() == LOCAL_REPO_NAME_NOGPGCHECK) {
+                     continue;
+                 }
+-                std::filesystem::copy(
+-                    pkg.get_package_path(), repodir, std::filesystem::copy_options::overwrite_existing);
+-                need_rebuild = true;
++                if (pkg.is_pkg_gpgcheck_enabled()) {
++                    if (!need_rebuild_gpgcheck) {
++                        std::filesystem::create_directories(repodir);
++                    }
++                    std::filesystem::copy(
++                        pkg.get_package_path(), repodir, std::filesystem::copy_options::overwrite_existing);
++                    need_rebuild_gpgcheck = true;
++                } else {
++                    if (!need_rebuild_nogpgcheck) {
++                        std::filesystem::create_directories(repodir_nogpgcheck);
++                    }
++                    std::filesystem::copy(
++                        pkg.get_package_path(), repodir_nogpgcheck, std::filesystem::copy_options::overwrite_existing);
++                    need_rebuild_nogpgcheck = true;
++                }
+             }
+         }
+ 
+         bool createrepo_enabled =
+             OptionBool(false).from_string(config.get_value("createrepo", "enabled")) ? true : false;
+-        if (createrepo_enabled && need_rebuild) {
+-            std::vector<const char *> c_args{"--update", repodir.c_str()};
+-
+-            // --quiet is on by default
+-            OptionBool quiet_option = OptionBool(true);
+-            OptionBool verbose_option = OptionBool(false);
+-
+-            if (config.has_option("createrepo", "verbose")) {
+-                verbose_option.set(verbose_option.from_string(config.get_value("createrepo", "verbose")));
++        if (createrepo_enabled) {
++            if (need_rebuild_gpgcheck) {
++                run_createrepo(repodir);
+             }
+-            if (config.has_option("createrepo", "quiet")) {
+-                quiet_option.set(quiet_option.from_string(config.get_value("createrepo", "quiet")));
++            if (need_rebuild_nogpgcheck) {
++                run_createrepo(repodir_nogpgcheck);
+             }
++        }
++    }
+ 
+-            if (verbose_option.get_value()) {
+-                c_args.push_back("--verbose");
+-            } else if (quiet_option.get_value()) {
+-                c_args.push_back("--quiet");
+-            }
++private:
++    static libdnf5::repo::RepoWeakPtr setup_local_repo(
++        libdnf5::repo::RepoSackWeakPtr & repo_sack,
++        const std::string & id,
++        const std::string & name,
++        const std::filesystem::path & basedir);
+ 
+-            std::filesystem::path cachedir;
+-            if (config.has_option("createrepo", "cachedir")) {
+-                cachedir = config.get_value("createrepo", "cachedir");
+-                if (!cachedir.empty()) {
+-                    c_args.push_back("--cachedir");
+-                    c_args.push_back(cachedir.c_str());
+-                }
+-            }
+-            // execvp expects null terminated array of arguments
+-            c_args.push_back(nullptr);
++    void run_createrepo(const std::filesystem::path & dir);
+ 
+-            int pipefd[2];
+-            if (pipe2(pipefd, O_CLOEXEC) == -1) {
+-                throw SystemError(errno, M_("Local plugin: Cannot create pipe"));
+-            }
++    libdnf5::ConfigParser & config;
++    std::filesystem::path repodir;
++    std::filesystem::path repodir_nogpgcheck;
++};
+ 
+-            pid_t pid = fork();
+-            if (pid == -1) {
+-                throw SystemError(errno, M_("Local plugin: Cannot fork"));
+-            }
+ 
+-            if (pid == 0) {
+-                // This is the child process
+-                // Redirect stdout and stderr to the pipe
+-                dup2(pipefd[1], STDOUT_FILENO);
+-                dup2(pipefd[1], STDERR_FILENO);
+-
+-                // Run program
+-                execvp("createrepo_c", const_cast<char * const *>(c_args.data()));
+-
+-                // execvp should replace this process if it doesn't there was an error
+-                printf("Failed to execvp createrepo_c: %s\n", strerror(errno));
+-                _exit(255);
+-            } else {
+-                // This is the parent process
+-                // Close unused write pipe end
+-                close(pipefd[1]);
+-
+-                char buffer[1024];
+-                ssize_t n;
+-                std::string output;
+-                while ((n = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
+-                    buffer[n] = '\0';
+-                    output += buffer;
+-                }
+-                close(pipefd[0]);
++libdnf5::repo::RepoWeakPtr LocalPlugin::setup_local_repo(
++    libdnf5::repo::RepoSackWeakPtr & repo_sack,
++    const std::string & id,
++    const std::string & name,
++    const std::filesystem::path & basedir) {
++    auto repo = repo_sack->create_repo(id);
++    repo->get_config().get_name_option().set(name);
++    repo->get_config().get_baseurl_option().set("file://" + std::filesystem::absolute(basedir).string());
++    repo->get_config().get_skip_if_unavailable_option().set(true);
++    // Make local repo preferred over other repos (which by default have cost 1000)
++    repo->get_config().get_cost_option().set(500);
++    // The repo should never be cached:
++    // - Users expect the packages to be available in it right after running a transaction
++    //   but this transaction would create a cache for the repo.
++    // - The repo is usually local
++    repo->get_config().get_metadata_expire_option().set(0);
++    return repo;
++}
+ 
+-                if (!output.empty()) {
+-                    auto & base = get_base();
+-                    auto & logger = *base.get_logger();
+ 
+-                    if (output.back() == '\n') {
+-                        output.pop_back();
+-                    }
++void LocalPlugin::run_createrepo(const std::filesystem::path & dir) {
++    std::vector<const char *> c_args{"--update", dir.c_str()};
+ 
+-                    for (const auto & line : libdnf5::utils::string::split(output, "\n")) {
+-                        logger.info("local plugin: createrepo_c: {}", line);
+-                        // This print can interleave with the installation transaction progressbar
+-                        // but I think we are missing an API the could print this correctly.
+-                        printf("local plugin: createrepo_c: %s\n", line.c_str());
+-                    }
+-                }
++    // --quiet is on by default
++    OptionBool quiet_option = OptionBool(true);
++    OptionBool verbose_option = OptionBool(false);
+ 
+-                // Wait for child
+-                int child_exit_status;
+-                int rc = waitpid(pid, &child_exit_status, 0);
+-                if (rc == -1) {
+-                    throw SystemError(errno, M_("Local plugin: Cannot waitpid"));
+-                }
++    if (config.has_option("createrepo", "verbose")) {
++        verbose_option.set(verbose_option.from_string(config.get_value("createrepo", "verbose")));
++    }
++    if (config.has_option("createrepo", "quiet")) {
++        quiet_option.set(quiet_option.from_string(config.get_value("createrepo", "quiet")));
++    }
+ 
+-                if (WIFEXITED(child_exit_status)) {
+-                    // Terminated normally (exit, _exit, returning from main) -> check exit code
+-                    if (const int exit_status = WEXITSTATUS(child_exit_status); exit_status != 0) {
+-                        throw LocalPluginError(M_("Createrepo_c process exited with code {}"), exit_status);
+-                    }
+-                } else if (WIFSIGNALED(child_exit_status)) {
+-                    throw LocalPluginError(M_("Createrepo_c process killed by signal {}"), WTERMSIG(child_exit_status));
+-                }
+-            }
++    if (verbose_option.get_value()) {
++        c_args.push_back("--verbose");
++    } else if (quiet_option.get_value()) {
++        c_args.push_back("--quiet");
++    }
++
++    std::filesystem::path cachedir;
++    if (config.has_option("createrepo", "cachedir")) {
++        cachedir = config.get_value("createrepo", "cachedir");
++        if (!cachedir.empty()) {
++            c_args.push_back("--cachedir");
++            c_args.push_back(cachedir.c_str());
+         }
+     }
++    // execvp expects null terminated array of arguments
++    c_args.push_back(nullptr);
+ 
+-private:
+-    libdnf5::ConfigParser & config;
+-    std::filesystem::path repodir;
+-};
++    // TODO(mblaha): use libdnf5::utils::subprocess::run() instead of manual fork/exec
++    int pipefd[2];
++    if (pipe2(pipefd, O_CLOEXEC) == -1) {
++        throw SystemError(errno, M_("Local plugin: Cannot create pipe"));
++    }
++
++    pid_t pid = fork();
++    if (pid == -1) {
++        throw SystemError(errno, M_("Local plugin: Cannot fork"));
++    }
++
++    if (pid == 0) {
++        // This is the child process
++        // Redirect stdout and stderr to the pipe
++        dup2(pipefd[1], STDOUT_FILENO);
++        dup2(pipefd[1], STDERR_FILENO);
++
++        // Run program
++        execvp("createrepo_c", const_cast<char * const *>(c_args.data()));
++
++        // execvp should replace this process if it doesn't there was an error
++        printf("Failed to execvp createrepo_c: %s\n", strerror(errno));
++        _exit(255);
++    } else {
++        // This is the parent process
++        // Close unused write pipe end
++        close(pipefd[1]);
++
++        char buffer[1024];
++        ssize_t n;
++        std::string output;
++        while ((n = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
++            buffer[n] = '\0';
++            output += buffer;
++        }
++        close(pipefd[0]);
++
++        if (!output.empty()) {
++            auto & base = get_base();
++            auto & logger = *base.get_logger();
++
++            if (output.back() == '\n') {
++                output.pop_back();
++            }
++
++            for (const auto & line : libdnf5::utils::string::split(output, "\n")) {
++                logger.info("local plugin: createrepo_c: {}", line);
++                // This print can interleave with the installation transaction progressbar
++                // but I think we are missing an API the could print this correctly.
++                printf("local plugin: createrepo_c: %s\n", line.c_str());
++            }
++        }
++
++        // Wait for child
++        int child_exit_status;
++        int rc = waitpid(pid, &child_exit_status, 0);
++        if (rc == -1) {
++            throw SystemError(errno, M_("Local plugin: Cannot waitpid"));
++        }
++
++        if (WIFEXITED(child_exit_status)) {
++            // Terminated normally (exit, _exit, returning from main) -> check exit code
++            if (const int exit_status = WEXITSTATUS(child_exit_status); exit_status != 0) {
++                throw LocalPluginError(M_("Createrepo_c process exited with code {}"), exit_status);
++            }
++        } else if (WIFSIGNALED(child_exit_status)) {
++            throw LocalPluginError(M_("Createrepo_c process killed by signal {}"), WTERMSIG(child_exit_status));
++        }
++    }
++}
+ 
+ 
+ std::exception_ptr last_exception;
+-- 
+2.53.0
+

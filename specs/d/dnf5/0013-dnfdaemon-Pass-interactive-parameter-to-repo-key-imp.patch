@@ -1,0 +1,185 @@
+From 36580fbd99bc5e5d5f3e22b4b1dc04027414243f Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Wed, 29 Apr 2026 12:54:16 +0000
+Subject: [PATCH 13/16] dnfdaemon: Pass interactive parameter to repo key
+ import callback
+
+Add an 'interactive' boolean parameter to Session::fill_sack() and
+Session::read_all_repos() that gets passed through to the
+KeyImportRepoCB callback. This allows the callback to know whether
+Polkit is allowed to prompt the user for authentication.
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ dnf5daemon-server/callbacks.hpp                  | 5 ++++-
+ dnf5daemon-server/services/advisory/advisory.cpp | 3 ++-
+ dnf5daemon-server/services/comps/group.cpp       | 3 ++-
+ dnf5daemon-server/services/goal/goal.cpp         | 3 ++-
+ dnf5daemon-server/services/history/history.cpp   | 3 ++-
+ dnf5daemon-server/services/repo/repo.cpp         | 3 ++-
+ dnf5daemon-server/services/rpm/rpm.cpp           | 6 ++++--
+ dnf5daemon-server/session.cpp                    | 8 ++++----
+ dnf5daemon-server/session.hpp                    | 4 ++--
+ 9 files changed, 24 insertions(+), 14 deletions(-)
+
+diff --git a/dnf5daemon-server/callbacks.hpp b/dnf5daemon-server/callbacks.hpp
+index 76cf2efb..fe91aa85 100644
+--- a/dnf5daemon-server/callbacks.hpp
++++ b/dnf5daemon-server/callbacks.hpp
+@@ -84,9 +84,12 @@ private:
+ 
+ class KeyImportRepoCB : public DbusCallback, public libdnf5::repo::RepoCallbacks {
+ public:
+-    KeyImportRepoCB(Session & session) : DbusCallback(session) {}
++    KeyImportRepoCB(Session & session, bool interactive) : DbusCallback(session), interactive(interactive) {}
+ 
+     bool repokey_import(const libdnf5::rpm::KeyInfo & key_info) override;
++
++private:
++    bool interactive;
+ };
+ 
+ 
+diff --git a/dnf5daemon-server/services/advisory/advisory.cpp b/dnf5daemon-server/services/advisory/advisory.cpp
+index bc9a0b5b..1a34ee60 100644
+--- a/dnf5daemon-server/services/advisory/advisory.cpp
++++ b/dnf5daemon-server/services/advisory/advisory.cpp
+@@ -164,7 +164,8 @@ sdbus::MethodReply Advisory::list(sdbus::MethodCall & call) {
+     KeyValueMap options;
+     call >> options;
+ 
+-    session.fill_sack();
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++    session.fill_sack(interactive);
+ 
+     auto base = session.get_base();
+     auto advisory_query = advisory_query_from_options(*base, options);
+diff --git a/dnf5daemon-server/services/comps/group.cpp b/dnf5daemon-server/services/comps/group.cpp
+index b38088d5..31054776 100644
+--- a/dnf5daemon-server/services/comps/group.cpp
++++ b/dnf5daemon-server/services/comps/group.cpp
+@@ -65,7 +65,8 @@ sdbus::MethodReply Group::list(sdbus::MethodCall & call) {
+     dnfdaemon::KeyValueMap options;
+     call >> options;
+ 
+-    session.fill_sack();
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++    session.fill_sack(interactive);
+     auto base = session.get_base();
+ 
+     libdnf5::comps::GroupQuery query(base->get_weak_ptr());
+diff --git a/dnf5daemon-server/services/goal/goal.cpp b/dnf5daemon-server/services/goal/goal.cpp
+index d605b32f..696e822f 100644
+--- a/dnf5daemon-server/services/goal/goal.cpp
++++ b/dnf5daemon-server/services/goal/goal.cpp
+@@ -199,8 +199,9 @@ sdbus::MethodReply Goal::resolve(sdbus::MethodCall & call) {
+     dnfdaemon::KeyValueMap options;
+     call >> options;
+     bool allow_erasing = dnfdaemon::key_value_map_get<bool>(options, "allow_erasing", false);
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
+ 
+-    session.fill_sack();
++    session.fill_sack(interactive);
+ 
+     auto & goal = session.get_goal();
+     goal.set_allow_erasing(allow_erasing);
+diff --git a/dnf5daemon-server/services/history/history.cpp b/dnf5daemon-server/services/history/history.cpp
+index 15237e13..a68b9f2d 100644
+--- a/dnf5daemon-server/services/history/history.cpp
++++ b/dnf5daemon-server/services/history/history.cpp
+@@ -88,7 +88,8 @@ sdbus::MethodReply History::recent_changes(sdbus::MethodCall & call) {
+     dnfdaemon::KeyValueMap options;
+     call >> options;
+     // TODO(mblaha): Automatically add "updateinfo" metadata?
+-    session.fill_sack();
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++    session.fill_sack(interactive);
+ 
+     auto upgraded_requested = dnfdaemon::key_value_map_get<bool>(options, "upgraded_packages", true);
+     auto downgraded_requested = dnfdaemon::key_value_map_get<bool>(options, "downgraded_packages", true);
+diff --git a/dnf5daemon-server/services/repo/repo.cpp b/dnf5daemon-server/services/repo/repo.cpp
+index c0524de5..e293deac 100644
+--- a/dnf5daemon-server/services/repo/repo.cpp
++++ b/dnf5daemon-server/services/repo/repo.cpp
+@@ -466,7 +466,8 @@ sdbus::MethodReply Repo::list(sdbus::MethodCall & call) {
+     // always return repoid
+     repo_attrs.push_back("id");
+     if (fill_sack_needed) {
+-        session.fill_sack();
++        bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++        session.fill_sack(interactive);
+     }
+ 
+     // prepare repository query filtered by options
+diff --git a/dnf5daemon-server/services/rpm/rpm.cpp b/dnf5daemon-server/services/rpm/rpm.cpp
+index dfda6757..e44a744f 100644
+--- a/dnf5daemon-server/services/rpm/rpm.cpp
++++ b/dnf5daemon-server/services/rpm/rpm.cpp
+@@ -592,7 +592,8 @@ sdbus::MethodReply Rpm::list(sdbus::MethodCall & call) {
+     dnfdaemon::KeyValueMap options;
+     call >> options;
+ 
+-    session.fill_sack();
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++    session.fill_sack(interactive);
+ 
+     auto query = filter_packages(options);
+ 
+@@ -620,7 +621,8 @@ void Rpm::list_fd(sdbus::MethodCall & call, const std::string & transfer_id) {
+ 
+     int out_fd = dbus_unix_fd.get();
+ 
+-    session.fill_sack();
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++    session.fill_sack(interactive);
+ 
+     auto query = filter_packages(options);
+ 
+diff --git a/dnf5daemon-server/session.cpp b/dnf5daemon-server/session.cpp
+index 1f1bd506..c66c097d 100644
+--- a/dnf5daemon-server/session.cpp
++++ b/dnf5daemon-server/session.cpp
+@@ -230,13 +230,13 @@ bool Session::wait_for_key_confirmation(const std::string & key_id, sdbus::Signa
+     return confirmation == KeyConfirmationStatus::CONFIRMED;
+ }
+ 
+-void Session::fill_sack() {
+-    if (!read_all_repos()) {
++void Session::fill_sack(bool interactive) {
++    if (!read_all_repos(interactive)) {
+         throw std::runtime_error("Cannot load repositories.");
+     }
+ }
+ 
+-bool Session::read_all_repos() {
++bool Session::read_all_repos(bool interactive) {
+     while (repositories_status == dnfdaemon::RepoStatus::PENDING) {
+         std::this_thread::sleep_for(std::chrono::milliseconds(100));
+     }
+@@ -268,7 +268,7 @@ bool Session::read_all_repos() {
+             auto & user_data = repos_user_data.emplace_back(std::make_unique<dnf5daemon::DownloadUserData>());
+             user_data->download_id = "repo:" + repo->get_id();
+             repo->set_user_data(user_data.get());
+-            repo->set_callbacks(std::make_unique<dnf5daemon::KeyImportRepoCB>(*this));
++            repo->set_callbacks(std::make_unique<dnf5daemon::KeyImportRepoCB>(*this, interactive));
+         }
+ 
+         try {
+diff --git a/dnf5daemon-server/session.hpp b/dnf5daemon-server/session.hpp
+index 1e3ea257..7d5b2047 100644
+--- a/dnf5daemon-server/session.hpp
++++ b/dnf5daemon-server/session.hpp
+@@ -83,8 +83,8 @@ public:
+ 
+     bool check_authorization(
+         const std::string & actionid, const std::string & sender, bool allow_user_interaction = true);
+-    void fill_sack();
+-    bool read_all_repos();
++    void fill_sack(bool interactive = false);
++    bool read_all_repos(bool interactive = false);
+     std::optional<std::string> session_locale;
+     void confirm_key(const std::string & key_id, const bool confirmed);
+     bool wait_for_key_confirmation(const std::string & key_id, sdbus::Signal & signal);
+-- 
+2.54.0
+

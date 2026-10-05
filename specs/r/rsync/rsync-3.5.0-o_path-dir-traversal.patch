@@ -1,0 +1,932 @@
+diff --git a/SECURITY.md b/SECURITY.md
+index 2323bbf..bcc8491 100644
+--- a/SECURITY.md
++++ b/SECURITY.md
+@@ -146,28 +146,29 @@ following symlinks by design.
+ 
+ ### The mechanism
+ 
+-Resolution of attacker-influenceable paths goes through `secure_relative_open()`
+-and the `do_*_at()` wrappers in `syscall.c`, never a raw `open()`/`rename()`/
+-`chmod()` on a full path string. The principle is: **trust the operator-named
+-transfer root, and confine all resolution beneath it**, rejecting escapes via
+-`..` above the anchor, absolute symlinks, or out-of-tree symlinks.
+-`secure_relative_open()` resolves the parent directory by walking it one
+-component at a time on a stack of held directory fds, then operates on the final
+-component with an at-style call on the resulting directory fd.
++Resolution of attacker-influenceable paths goes through `secure_relative_open()`,
++`secure_relative_dirfd()`, and the `do_*_at()` wrappers in `syscall.c`, never a
++raw `open()`/`rename()`/`chmod()` on a full path string. The principle is:
++**trust the operator-named transfer root, and confine all resolution beneath
++it**, rejecting escapes via `..` above the anchor, absolute symlinks, or
++out-of-tree symlinks. `secure_relative_open()` opens the resolved endpoint with
++the caller's requested access. `secure_relative_dirfd()` instead returns
++traversal authority for `fchdir()` or an at-style operation on a known child;
++it does not imply permission to enumerate the directory.
+ 
+ For per-entry work the receiver and generator go one step further and hold the
+ parent directory open: `open_dir_secure()` resolves an entry's directory once
+-(via `secure_relative_open()`), `held_dfd_for()` caches that descriptor for the
+-duration of the entry, and every operation on the entry — `lstat`, the temp-file
+-`mkstemp`, the temp->final `rename`, `chmod`/`chown`/`utimes`, `mkdir`, special-
+-file and symlink creation, the delta-basis open, and the recursive delete — runs
+-through that one held fd via an `*at()` call (`do_*_atfd()`). Because the
+-descriptor is pinned to the directory inode, a parent component flipped to a
+-symlink *after* the open cannot redirect any of those operations. The alternate-
+-destination lookups are confined the same way (`basis_link_stat()` in
+-`generator.c` and `secure_basis_open()` in `receiver.c`), so a peer-chosen
+-`--link-dest`/`--compare-dest`/`--copy-dest` basis index cannot reach an
+-out-of-module file through a symlinked parent.
++as traversal authority, `held_dfd_for()` caches that descriptor for the
++duration of the entry, and every operation on the entry — `lstat`, the
++temp-file `mkstemp`, the temp->final `rename`, `chmod`/`chown`/`utimes`,
++`mkdir`, special-file and symlink creation, the delta-basis open, and the
++recursive delete — runs through that one held fd via an `*at()` call
++(`do_*_atfd()`). Because the descriptor is pinned to the directory inode, a
++parent component flipped to a symlink *after* the open cannot redirect any of
++those operations. The alternate-destination lookups are confined the same way
++(`basis_link_stat()` in `generator.c` and `secure_basis_open()` in
++`receiver.c`), so a peer-chosen `--link-dest`/`--compare-dest`/`--copy-dest`
++basis index cannot reach an out-of-module file through a symlinked parent.
+ 
+ The sender's source-directory *enumeration* is confined the same way as its
+ content open. `send_directory()` opens each scanned directory through
+@@ -190,13 +191,17 @@ symlink would otherwise introduce.
+ ### Path resolution
+ 
+ `secure_relative_open()` resolves a path with a single portable mechanism on
+-every platform: a per-component walk on a stack of held directory fds. Each
+-component is opened relative to the held parent with `openat(parent_fd,
+-"component", O_NOFOLLOW)`; descending into a real subdirectory pushes its fd, a
+-`..` pops back to the already-held parent (a pop at the anchor is refused), and an
+-in-tree directory symlink is followed by reading its target and walking that off
+-the same stack (absolute targets refused, symlink hops bounded). The final
+-component is opened `O_NOFOLLOW`.
++every platform: a per-component walk on a stack of held directory fds. On
++Linux, anchors and traversal components use
++`O_PATH|O_DIRECTORY|O_NOFOLLOW`; other platforms retain the
++`O_RDONLY|O_DIRECTORY` fallback. Descending into a real subdirectory pushes
++its fd, a `..` pops back to the already-held parent (a pop at the anchor is
++refused), and an in-tree directory symlink is followed by reading its target
++and walking that off the same stack (absolute targets refused, symlink hops
++bounded). A final directory endpoint is reopened with the caller's requested
++flags. Thus `secure_opendir()` still receives a readable fd, while known-name
++operations beneath a searchable but unreadable directory do not require
++permission to list it.
+ 
+ Because every component is opened relative to a *pinned* fd under `O_NOFOLLOW`,
+ and `..` is resolved by the held-fd stack rather than by the kernel, the walk is
+@@ -235,8 +240,9 @@ chmod-ing through a raced leaf symlink.
+   influenced by the remote peer or by another local user, use a `do_*_at()`
+   wrapper (or `secure_relative_open()`), not a raw full-path syscall.
+ * When introducing a new operation, add a matching `do_<op>_at()` wrapper that
+-  resolves the parent with `secure_relative_open()` and acts via an at-style call
+-  on the returned dirfd.
++  resolves a parent used only as at-style authority with
++  `secure_relative_dirfd()`. Use `secure_relative_open()` when the returned fd
++  itself must be readable or otherwise support the caller's requested access.
+ * Do not assume a non-daemon transfer is safe; the question is whether rsync has
+   more authority than whoever controls the path components.
+ * On platforms whose API lacks an at-style equivalent (e.g. `setattrlist()`),
+diff --git a/generator.c b/generator.c
+index 7e5ad60..6f28188 100644
+--- a/generator.c
++++ b/generator.c
+@@ -1052,7 +1052,7 @@ static int basis_link_stat(const char *path, STRUCT_STAT *stp)
+ 			if (dlen >= sizeof dir) { errno = ENAMETOOLONG; return -1; }
+ 			memcpy(dir, path, dlen);
+ 			dir[dlen] = '\0';
+-			if ((dfd = secure_relative_open(NULL, dir, O_RDONLY | O_DIRECTORY, 0)) < 0)
++			if ((dfd = secure_relative_dirfd(NULL, dir)) < 0)
+ 				return -1;
+ 			r = link_stat_at(dfd, slash + 1, stp, 0);
+ 			e = errno;
+diff --git a/sender.c b/sender.c
+index bb1b137..ba40b94 100644
+--- a/sender.c
++++ b/sender.c
+@@ -127,8 +127,7 @@ static int secure_sender_parent_fd(struct file_struct *file, const char *fname,
+ #endif
+ 				while (*rel == '/')
+ 					rel++;
+-				return secure_relative_open("/", rel,
+-					O_RDONLY | O_DIRECTORY, 0);
++				return secure_relative_dirfd("/", rel);
+ 			}
+ 			/* held_dir_path_fd returns a cache-OWNED fd; the caller closes
+ 			 * what we return, so hand back an owned dup and leave the cache's
+@@ -141,7 +140,7 @@ static int secure_sender_parent_fd(struct file_struct *file, const char *fname,
+ 				return dup(dfd);
+ 			if (errno != 0)
+ 				return -1;
+-			return secure_relative_open(NULL, dir, O_RDONLY | O_DIRECTORY, 0);
++			return secure_relative_dirfd(NULL, dir);
+ 		}
+ 		errno = 0;	/* top-level file: no parent component to confine */
+ 		return -1;
+@@ -176,9 +175,9 @@ static int secure_sender_parent_fd(struct file_struct *file, const char *fname,
+ 		}
+ 		memcpy(dir, relp, dlen);
+ 		dir[dlen] = '\0';
+-		dfd = secure_relative_open(module_dir, dir, O_RDONLY | O_DIRECTORY, 0);
++		dfd = secure_relative_dirfd(module_dir, dir);
+ 	} else
+-		dfd = secure_relative_open(module_dir, "", O_RDONLY | O_DIRECTORY, 0);
++		dfd = secure_relative_dirfd(module_dir, "");
+ 
+ 	/* The leaf is the same last component either way; take it from the caller's
+ 	 * persistent fname buffer, not the local secure_path. */
+@@ -292,11 +291,9 @@ static int sender_open_copylinks_confined(const char *anchor, const char *relpat
+ 		 * only this branch would hand it to strcmp(). */
+ 		if (am_daemon && module_dirfd >= 0 && module_dir && anchor
+ 		 && strcmp(anchor, module_dir) == 0)
+-			pdfd = secure_relative_open_at_beneath(module_dirfd, dir,
+-					O_RDONLY | O_DIRECTORY, 0);
++			pdfd = secure_relative_dirfd_at_beneath(module_dirfd, dir);
+ 		else
+-			pdfd = secure_relative_open(anchor, dir,
+-					O_RDONLY | O_DIRECTORY, 0);
++			pdfd = secure_relative_dirfd(anchor, dir);
+ 		if (pdfd < 0)
+ 			return -1;
+ 		n = do_readlink_atfd(pdfd, bname, tgt, sizeof tgt - 1);
+diff --git a/syscall.c b/syscall.c
+index 5e92edc..d804f42 100644
+--- a/syscall.c
++++ b/syscall.c
+@@ -74,6 +74,20 @@ extern unsigned int confine_rootlen;
+ extern char curr_dir[MAXPATHLEN];	/* defined below; fwd-declared for the seed */
+ extern int operator_path_resolve;	/* defined below; fwd-declared for the exclude check */
+ 
++/* A directory fd used only for pathname traversal, fchdir(), or as *at()
++ * authority does not need read permission on Linux.  Keep the portable
++ * O_RDONLY fallback for systems without O_PATH. */
++static int directory_traverse_flags(void)
++{
++#if defined O_PATH && defined O_DIRECTORY
++	return O_PATH | O_DIRECTORY;
++#elif defined O_DIRECTORY
++	return O_RDONLY | O_DIRECTORY;
++#else
++	return O_RDONLY;
++#endif
++}
++
+ #if defined AT_FDCWD && defined O_NOFOLLOW && defined O_DIRECTORY
+ /* Open a trusted absolute anchor directory as an owned dirfd.  When the anchor is
+  * the served module root and the daemon pinned it by identity (module_dirfd), dup
+@@ -86,7 +100,7 @@ static int open_anchor_dirfd(const char *path)
+ {
+ 	if (module_dirfd >= 0 && am_daemon && module_dir && strcmp(path, module_dir) == 0)
+ 		return dup(module_dirfd);
+-	return openat(AT_FDCWD, path, O_RDONLY | O_DIRECTORY);
++	return openat(AT_FDCWD, path, directory_traverse_flags());
+ }
+ #endif
+ 
+@@ -285,12 +299,13 @@ static int abspath_step(char *abspath, size_t cap, const char *comp, size_t comp
+  * uses it to filter-check the (otherwise unchecked) leaf basename. */
+ static int ona_open(const char *path, int flags, mode_t mode, char *out_abs, size_t out_cap)
+ {
+-#if defined AT_FDCWD && defined O_NOFOLLOW
++#if defined AT_FDCWD && defined O_NOFOLLOW && defined O_DIRECTORY
+ 	/* O_CLOEXEC predates some still-supported targets; mirror rand_bytes()'s
+ 	 * fallback in syscall.c so a build without it still compiles. */
+ #ifndef O_CLOEXEC
+ #define O_CLOEXEC 0
+ #endif
++	const int dir_traverse_flags = directory_traverse_flags() | O_CLOEXEC;
+ 	if (!path || !*path) {
+ 		errno = EINVAL;
+ 		return -1;
+@@ -348,7 +363,7 @@ static int ona_open(const char *path, int flags, mode_t mode, char *out_abs, siz
+ 
+ 	/* Absolute path: pin "/" as the starting dfd. */
+ 	if (remaining[0] == '/') {
+-		dfd = open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
++		dfd = open("/", dir_traverse_flags);
+ 		if (dfd < 0)
+ 			return -1;
+ 		dfd_owns = 1;
+@@ -435,7 +450,7 @@ static int ona_open(const char *path, int flags, mode_t mode, char *out_abs, siz
+ 
+ 			if (target[0] == '/') {
+ 				if (dfd_owns) close(dfd);
+-				dfd = open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
++				dfd = open("/", dir_traverse_flags);
+ 				if (dfd < 0) {
+ 					saved_errno = errno;
+ 					dfd_owns = 0;
+@@ -490,7 +505,7 @@ static int ona_open(const char *path, int flags, mode_t mode, char *out_abs, siz
+ 			saved_errno = ELOOP;
+ 			goto out;
+ 		}
+-		int next = openat(dfd, comp, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
++		int next = openat(dfd, comp, dir_traverse_flags | O_NOFOLLOW);
+ 		if (next < 0) {
+ 			saved_errno = errno;
+ 			goto out;
+@@ -510,12 +525,12 @@ static int ona_open(const char *path, int flags, mode_t mode, char *out_abs, siz
+ 	}
+ 
+ 	/* Path resolved entirely to a directory (no leaf component left).
+-	 * If the caller wanted O_DIRECTORY we already hold the dirfd we
+-	 * built up; otherwise it's an EISDIR. */
++	 * Reopen the held traversal fd with the caller's requested access mode;
++	 * an O_PATH fd is sufficient for traversal and fchdir but not operations
++	 * such as fchmod. */
+ 	if (flags & O_DIRECTORY) {
+-		retfd = dfd;
+-		dfd_owns = 0;	/* caller now owns it */
+-		saved_errno = 0;
++		retfd = openat(dfd, ".", flags | O_NOFOLLOW, mode);
++		saved_errno = retfd < 0 ? errno : 0;
+ 		if (out_abs && out_cap)
+ 			/* Root-resolved (".." popped abspath empty) tracked daemon walk:
+ 			 * hand back "/" so owner_walk_parent still leaf-checks (path=/ bypass). */
+@@ -540,6 +555,14 @@ int open_no_attacker_symlinks(const char *path, int flags, mode_t mode)
+ 	return ona_open(path, flags, mode, NULL, 0);
+ }
+ 
++/* Open a directory for traversal or as *at()/fchdir() authority.  Unlike an
++ * O_RDONLY directory endpoint, this accepts a searchable but unreadable
++ * directory on Linux. */
++int open_no_attacker_symlinks_dirfd(const char *path)
++{
++	return ona_open(path, directory_traverse_flags(), 0, NULL, 0);
++}
++
+ /* When set, the do_*_at() wrappers resolve their path as an OPERATOR-supplied
+  * directory path (an absolute or relative --backup-dir/--temp-dir/--*-dest)
+  * using the ownership walk -- follow a symlink owned by uid 0 or our euid,
+@@ -565,7 +588,7 @@ int owner_walk_parent(const char *path, const char **bname)
+ 	*bname = slash ? slash + 1 : path;
+ 	pabs[0] = '\0';
+ 	if (!slash)
+-		dfd = ona_open(".", O_RDONLY | O_DIRECTORY, 0, pabs, sizeof pabs);
++		dfd = ona_open(".", directory_traverse_flags(), 0, pabs, sizeof pabs);
+ 	else {
+ 		dlen = slash == path ? 1 : (size_t)(slash - path); /* "/x" -> parent "/" */
+ 		if (dlen >= sizeof dir) {
+@@ -574,7 +597,7 @@ int owner_walk_parent(const char *path, const char **bname)
+ 		}
+ 		memcpy(dir, path, dlen);
+ 		dir[dlen] = '\0';
+-		dfd = ona_open(dir, O_RDONLY | O_DIRECTORY, 0, pabs, sizeof pabs);
++		dfd = ona_open(dir, directory_traverse_flags(), 0, pabs, sizeof pabs);
+ 	}
+ 	if (dfd < 0)
+ 		return -1;
+@@ -703,7 +726,7 @@ int do_unlink_at(const char *path)
+ 	dirpath[dlen] = '\0';
+ 	bname = slash + 1;
+ 
+-	dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++	dfd = secure_relative_dirfd(NULL, dirpath);
+ 	if (dfd < 0)
+ 		return -1;
+ 
+@@ -810,7 +833,7 @@ int do_symlink_at(const char *lnk, const char *path)
+ 			memcpy(dirpath, path, dlen);
+ 			dirpath[dlen] = '\0';
+ 			bname = slash + 1;
+-			dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++			dfd = secure_relative_dirfd(NULL, dirpath);
+ 			if (dfd < 0)
+ 				return -1;
+ 			owns = True;
+@@ -1012,7 +1035,7 @@ int do_link_at(const char *old_path, const char *new_path)
+ 		memcpy(old_dirpath, old_path, old_dlen);
+ 		old_dirpath[old_dlen] = '\0';
+ 		old_bname = old_slash + 1;
+-		old_dfd = secure_relative_open(NULL, old_dirpath, O_RDONLY | O_DIRECTORY, 0);
++		old_dfd = secure_relative_dirfd(NULL, old_dirpath);
+ 		if (old_dfd < 0)
+ 			return -1;
+ 		old_owns = True;
+@@ -1051,7 +1074,7 @@ int do_link_at(const char *old_path, const char *new_path)
+ 		 && memcmp(old_dirpath, new_dirpath, old_dlen) == 0) {
+ 			new_dfd = old_dfd;
+ 		} else {
+-			new_dfd = secure_relative_open(NULL, new_dirpath, O_RDONLY | O_DIRECTORY, 0);
++			new_dfd = secure_relative_dirfd(NULL, new_dirpath);
+ 			if (new_dfd < 0) {
+ 				e = errno;
+ 				if (old_owns) close(old_dfd);
+@@ -1154,7 +1177,7 @@ int do_lchown_at(const char *fname, uid_t owner, gid_t group)
+ 	dirpath[dlen] = '\0';
+ 	bname = slash + 1;
+ 
+-	dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++	dfd = secure_relative_dirfd(NULL, dirpath);
+ 	if (dfd < 0)
+ 		return -1;
+ 
+@@ -1325,7 +1348,7 @@ int do_mknod_at(const char *pathname, mode_t mode, dev_t dev)
+ 		memcpy(dirpath, pathname, dlen);
+ 		dirpath[dlen] = '\0';
+ 		bname = slash + 1;
+-		dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++		dfd = secure_relative_dirfd(NULL, dirpath);
+ 		if (dfd < 0)
+ 			return -1;
+ 		owns = True;
+@@ -1447,7 +1470,7 @@ int do_rmdir_at(const char *pathname)
+ 	dirpath[dlen] = '\0';
+ 	bname = slash + 1;
+ 
+-	dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++	dfd = secure_relative_dirfd(NULL, dirpath);
+ 	if (dfd < 0)
+ 		return -1;
+ 
+@@ -1543,7 +1566,7 @@ int do_open_at(const char *pathname, int flags, mode_t mode)
+ 	dirpath[dlen] = '\0';
+ 	bname = slash + 1;
+ 
+-	dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++	dfd = secure_relative_dirfd(NULL, dirpath);
+ 	if (dfd < 0)
+ 		return -1;
+ 
+@@ -1825,7 +1848,7 @@ int do_chmod_at(const char *fname, mode_t mode)
+ 	dirpath[dlen] = '\0';
+ 	bname = slash + 1;
+ 
+-	dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++	dfd = secure_relative_dirfd(NULL, dirpath);
+ 	if (dfd < 0)
+ 		return -1;
+ 
+@@ -1942,7 +1965,7 @@ int do_rename_at(const char *old_path, const char *new_path)
+ 		memcpy(old_dirpath, old_path, old_dlen);
+ 		old_dirpath[old_dlen] = '\0';
+ 		old_bname = old_slash + 1;
+-		old_dfd = secure_relative_open(NULL, old_dirpath, O_RDONLY | O_DIRECTORY, 0);
++		old_dfd = secure_relative_dirfd(NULL, old_dirpath);
+ 		if (old_dfd < 0)
+ 			return -1;
+ 		old_owns = True;
+@@ -1981,7 +2004,7 @@ int do_rename_at(const char *old_path, const char *new_path)
+ 		 && memcmp(old_dirpath, new_dirpath, old_dlen) == 0) {
+ 			new_dfd = old_dfd;
+ 		} else {
+-			new_dfd = secure_relative_open(NULL, new_dirpath, O_RDONLY | O_DIRECTORY, 0);
++			new_dfd = secure_relative_dirfd(NULL, new_dirpath);
+ 			if (new_dfd < 0) {
+ 				e = errno;
+ 				if (old_owns) close(old_dfd);
+@@ -2112,7 +2135,7 @@ int do_mkdir_at(char *path, mode_t mode)
+ 	dirpath[dlen] = '\0';
+ 	bname = slash + 1;
+ 
+-	dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++	dfd = secure_relative_dirfd(NULL, dirpath);
+ 	if (dfd < 0)
+ 		return -1;
+ 
+@@ -2238,7 +2261,7 @@ static int do_xstat_at(const char *path, STRUCT_STAT *st, int at_flags, int (*fa
+ 	dirpath[dlen] = '\0';
+ 	bname = slash + 1;
+ 
+-	dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++	dfd = secure_relative_dirfd(NULL, dirpath);
+ 	if (dfd < 0)
+ 		return -1;
+ 
+@@ -2490,7 +2513,7 @@ int do_utimensat_at(const char *path, STRUCT_STAT *stp)
+ 	t[1].tv_nsec = 0;
+ #endif
+ 
+-	dfd = secure_relative_open(NULL, dirpath, O_RDONLY | O_DIRECTORY, 0);
++	dfd = secure_relative_dirfd(NULL, dirpath);
+ 	if (dfd < 0)
+ 		return -1;
+ 
+@@ -2871,13 +2894,13 @@ static int ds_push(struct dirstack *ds, int fd)
+ 	return 0;
+ }
+ 
+-/* Detach the current dir as an owned fd the caller must close.  At the anchor
+- * (top 0) the anchor is borrowed, so return a fresh dup of it instead. */
++/* Detach the current traversal dirfd as an owned fd the caller must close.  At
++ * the anchor (top 0) the anchor is borrowed, so open a fresh traversal fd. */
+ static int ds_take(struct dirstack *ds)
+ {
+ 	if (ds->top > 0)
+ 		return ds->fds[ds->top--];
+-	return openat(ds->fds[0], ".", O_RDONLY | O_DIRECTORY);
++	return openat(ds->fds[0], ".", directory_traverse_flags());
+ }
+ 
+ static int ds_walk_path(struct dirstack *ds, char *path, int *hops);
+@@ -2902,7 +2925,7 @@ static int ds_descend(struct dirstack *ds, const char *part, int *hops)
+ 		return 0;
+ 	}
+ 
+-	int fd = openat(ds_cur(ds), part, O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
++	int fd = openat(ds_cur(ds), part, directory_traverse_flags() | O_NOFOLLOW);
+ 	if (fd != -1) {					/* a real subdirectory */
+ 		if (ds_push(ds, fd) < 0)
+ 			return -1;
+@@ -3025,7 +3048,7 @@ static int secure_walk_at(int anchor_fd, const char *anchor_abspath,
+ 				goto cleanup;
+ 			if (is_last) {
+ 				if (flags & O_DIRECTORY)
+-					retfd = ds_take(&ds);
++					retfd = openat(ds_cur(&ds), ".", flags | O_NOFOLLOW, mode);
+ 				else
+ 					errno = EISDIR;
+ 				goto cleanup;
+@@ -3045,7 +3068,8 @@ static int secure_walk_at(int anchor_fd, const char *anchor_abspath,
+ 					goto cleanup;
+ 				}
+ 			}
+-			int next_fd = openat(ds_cur(&ds), part, O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
++			int next_fd = openat(ds_cur(&ds), part,
++					     directory_traverse_flags() | O_NOFOLLOW);
+ 			if (next_fd == -1 && (errno == ENOTDIR || errno == ENOENT)) {
+ 				retfd = openat(ds_cur(&ds), part, flags | O_NOFOLLOW, mode);
+ 				goto cleanup;
+@@ -3059,7 +3083,7 @@ static int secure_walk_at(int anchor_fd, const char *anchor_abspath,
+ 
+ 		/* O_DIRECTORY|O_NOFOLLOW leaf: the caller's O_NOFOLLOW governs the leaf. */
+ 		if (is_last && (flags & O_NOFOLLOW)) {
+-			retfd = openat(ds_cur(&ds), part, O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
++			retfd = openat(ds_cur(&ds), part, flags | O_NOFOLLOW, mode);
+ 			goto cleanup;
+ 		}
+ 
+@@ -3071,17 +3095,17 @@ static int secure_walk_at(int anchor_fd, const char *anchor_abspath,
+ 			goto cleanup;
+ 		}
+ 		if (is_last) {
+-			retfd = ds_take(&ds);
++			retfd = openat(ds_cur(&ds), ".", flags | O_NOFOLLOW, mode);
+ 			goto cleanup;
+ 		}
+ 	}
+ 
+-	/* Empty relpath: hand back a real anchor for an O_DIRECTORY caller (ds_take
+-	 * dups the borrowed anchor), else EISDIR.  An AT_FDCWD anchor is not a
+-	 * resolvable target, so it fails rather than silently returning the cwd. */
++	/* Empty relpath: reopen the anchor with the caller's requested directory
++	 * access, else EISDIR.  An AT_FDCWD anchor is not a resolvable target, so it
++	 * fails rather than silently returning the cwd. */
+ 	if (!saw_component) {
+ 		if ((flags & O_DIRECTORY) && anchor_fd != AT_FDCWD)
+-			retfd = ds_take(&ds);
++			retfd = openat(anchor_fd, ".", flags | O_NOFOLLOW, mode);
+ 		else
+ 			errno = EISDIR;
+ 	}
+@@ -3234,6 +3258,14 @@ int secure_relative_open(const char *basedir, const char *relpath, int flags, mo
+ #endif // O_NOFOLLOW, O_DIRECTORY
+ }
+ 
++/* Resolve a directory for traversal or as *at()/fchdir() authority.  Callers
++ * that read directory entries or need a read-capable fd must continue to use
++ * secure_relative_open(..., O_RDONLY | O_DIRECTORY, ...). */
++int secure_relative_dirfd(const char *basedir, const char *relpath)
++{
++	return secure_relative_open(basedir, relpath, directory_traverse_flags(), 0);
++}
++
+ /* Common fd-anchored resolver.  A caller may explicitly allow literal ".."
+  * components when the fd itself is the confinement boundary: secure_walk_at()
+  * resolves each one by popping its held-dirfd stack and refuses a pop above the
+@@ -3288,6 +3320,12 @@ int secure_relative_open_at_beneath(int anchor_fd, const char *relpath,
+ 	return secure_relative_open_at_internal(anchor_fd, relpath, flags, mode, 1);
+ }
+ 
++int secure_relative_dirfd_at_beneath(int anchor_fd, const char *relpath)
++{
++	return secure_relative_open_at_internal(anchor_fd, relpath,
++						directory_traverse_flags(), 0, 1);
++}
++
+ #if defined O_NOFOLLOW && defined O_DIRECTORY && defined AT_FDCWD
+ /* Fill buf with len random bytes.  Prefers /dev/urandom for cryptographic
+  * quality; falls back to rand() if /dev/urandom cannot be opened or read
+@@ -3424,8 +3462,8 @@ int secure_mkstemp(char *template, mode_t perms, int operator_path)
+ 			dir = dirbuf;
+ 		}
+ 		dirfd = operator_path
+-		      ? open_no_attacker_symlinks(dir, O_RDONLY | O_DIRECTORY, 0)
+-		      : secure_relative_open(dir, ".", O_RDONLY | O_DIRECTORY, 0);
++		      ? open_no_attacker_symlinks_dirfd(dir)
++		      : secure_relative_dirfd(dir, ".");
+ 		if (dirfd < 0)
+ 			return -1;
+ 	}
+@@ -3494,14 +3532,14 @@ int open_dir_secure(const char *dirname)
+ 
+ 	if (!dirname || !*dirname) {
+ 		/* The transfer root itself (file->dirname == NULL): the cwd. */
+-		dfd = openat(AT_FDCWD, ".", O_RDONLY | O_DIRECTORY);
++		dfd = openat(AT_FDCWD, ".", directory_traverse_flags());
+ 	} else if (dirname[0] == '/') {
+ 		/* An absolute dirname is not expected for an in-transfer entry;
+ 		 * leave it to the legacy path. */
+ 		errno = 0;
+ 		return -1;
+ 	} else {
+-		dfd = secure_relative_open(NULL, dirname, O_RDONLY | O_DIRECTORY, 0);
++		dfd = secure_relative_dirfd(NULL, dirname);
+ 	}
+ 
+ 	if (dfd >= 0) {
+diff --git a/testsuite/skiplist/cygwin.txt b/testsuite/skiplist/cygwin.txt
+index ba499cc..347b69b 100644
+--- a/testsuite/skiplist/cygwin.txt
++++ b/testsuite/skiplist/cygwin.txt
+@@ -56,6 +56,7 @@ rename-mixed-parent-transfer
+ rrsync-sender-leaf-flip
+ rrsync-sender-parent-pin
+ rrsync-symlink
++search-only-destination
+ sender-remove-source-root-anchor
+ simd-checksum
+ source-change-size-continues
+diff --git a/testsuite/skiplist/macos.txt b/testsuite/skiplist/macos.txt
+index 3e7653c..ce415be 100644
+--- a/testsuite/skiplist/macos.txt
++++ b/testsuite/skiplist/macos.txt
+@@ -26,6 +26,7 @@ readonly-partial-abort-mode-regression  #
+ rrsync-sender-leaf-flip
+ rrsync-sender-parent-pin
+ rrsync-symlink
++search-only-destination
+ sender-remove-source-root-anchor
+ simd-checksum
+ source-change-size-continues
+diff --git a/util1.c b/util1.c
+index 87ff225..955d204 100644
+--- a/util1.c
++++ b/util1.c
+@@ -1252,7 +1252,7 @@ int change_dir(const char *dir, int set_path_only)
+ 			 * non-daemon receiver can opt back into the legacy plain chdir with
+ 			 * --insecure-links. */
+ 			if (am_daemon && !am_chrooted) {
+-				int dfd = open_no_attacker_symlinks(dir, O_RDONLY | O_DIRECTORY, 0);
++				int dfd = open_no_attacker_symlinks_dirfd(dir);
+ 				if (dfd < 0)
+ 					return 0;
+ 				if (fchdir(dfd) != 0) {
+@@ -1283,7 +1283,7 @@ int change_dir(const char *dir, int set_path_only)
+ 				 * another uid.  A real dir is opened directly.  This closes the
+ 				 * destination chdir TOCTOU; --insecure-links keeps the plain
+ 				 * chdir for an operator whose dest is a foreign-owned symlink. */
+-				dfd = open_no_attacker_symlinks(nf, O_RDONLY | O_DIRECTORY, 0);
++				dfd = open_no_attacker_symlinks_dirfd(nf);
+ 				if (dfd < 0)
+ 					return 0;
+ 				if (fchdir(dfd) != 0) {
+@@ -1344,8 +1344,7 @@ int change_dir(const char *dir, int set_path_only)
+ 					prefix[save_dir_len] = '\0';
+ 					basedir = prefix;
+ 				}
+-				dfd = secure_relative_open(basedir, dir,
+-					O_RDONLY | O_DIRECTORY, 0);
++				dfd = secure_relative_dirfd(basedir, dir);
+ 				if (dfd < 0) {
+ 					chdir_failed = 1;
+ 				} else {
+@@ -1363,8 +1362,7 @@ int change_dir(const char *dir, int set_path_only)
+ 				 * symlink not owned by uid 0 or our euid, closing the
+ 				 * relative-dest chdir TOCTOU while still following the operator's
+ 				 * own symlinks.  --insecure-links keeps the plain chdir. */
+-				int dfd = open_no_attacker_symlinks(curr_dir,
+-					O_RDONLY | O_DIRECTORY, 0);
++				int dfd = open_no_attacker_symlinks_dirfd(curr_dir);
+ 				if (dfd < 0)
+ 					chdir_failed = 1;
+ 				else {
+diff --git a/testsuite/skiplist/cygwin.txt b/testsuite/skiplist/cygwin.txt
+index 347b69b..5a5fc06 100644
+--- a/testsuite/skiplist/cygwin.txt
++++ b/testsuite/skiplist/cygwin.txt
+@@ -57,6 +57,7 @@ rrsync-sender-leaf-flip
+ rrsync-sender-parent-pin
+ rrsync-symlink
+ search-only-destination
++search-only-held-dirfd
+ sender-remove-source-root-anchor
+ simd-checksum
+ source-change-size-continues
+diff --git a/testsuite/skiplist/macos.txt b/testsuite/skiplist/macos.txt
+index ce415be..b1725c4 100644
+--- a/testsuite/skiplist/macos.txt
++++ b/testsuite/skiplist/macos.txt
+@@ -27,6 +27,7 @@ rrsync-sender-leaf-flip
+ rrsync-sender-parent-pin
+ rrsync-symlink
+ search-only-destination
++search-only-held-dirfd
+ sender-remove-source-root-anchor
+ simd-checksum
+ source-change-size-continues
+diff --git a/testsuite/search-only-destination_test.py b/testsuite/search-only-destination_test.py
+new file mode 100644
+index 000000000..46108e2f5
+--- /dev/null
++++ b/testsuite/search-only-destination_test.py
+@@ -0,0 +1,77 @@
++#!/usr/bin/env python3
++"""The receiver must traverse a searchable but unreadable destination parent.
++
++Android exposes /sdcard through such a path, so the race-safe destination walk
++must use directory descriptors that require search permission only.
++"""
++
++import os
++import shutil
++import subprocess
++import sys
++import tempfile
++from pathlib import Path
++
++from rsyncfns import SCRATCHDIR, rmtree, rsync_argv, test_fail, test_skipped
++
++if not sys.platform.startswith('linux'):
++    test_skipped('search-only-destination is Linux-specific')
++
++launcher = []
++if os.geteuid() == 0:
++    setpriv = shutil.which('setpriv')
++    if setpriv is None:
++        test_skipped('setpriv is unavailable for the root-run testsuite')
++    launcher = [setpriv, '--reuid=65534', '--regid=65534', '--clear-groups']
++
++external_base = os.geteuid() == 0
++if external_base:
++    base = Path(tempfile.mkdtemp(prefix='rsync-search-only-'))
++    base.chmod(0o755)
++else:
++    base = SCRATCHDIR / 'search-only-destination'
++src = base / 'src'
++parent = base / 'search-only'
++dest = parent / 'dest'
++rmtree(base)
++src.mkdir(parents=True)
++dest.mkdir(parents=True)
++(src / 'probe').write_text('search-only destination\n')
++
++if os.geteuid() == 0:
++    for path in (src, src / 'probe', dest):
++        os.chown(path, 65534, 65534)
++
++try:
++    parent.chmod(0o111)
++    try:
++        probe = subprocess.run(
++            launcher + ['test', '-r', str(parent)],
++            stdout=subprocess.DEVNULL,
++            stderr=subprocess.DEVNULL,
++        )
++        if probe.returncode == 0:
++            test_skipped('filesystem does not enforce the search-only test mode')
++        if probe.returncode != 1:
++            test_fail(f'search-only permission probe failed with exit {probe.returncode}')
++
++        proc = subprocess.run(
++            launcher + rsync_argv('-a', f'{src}/', f'{dest}/'),
++            stdout=subprocess.PIPE,
++            stderr=subprocess.PIPE,
++            text=True,
++        )
++    finally:
++        parent.chmod(0o755)
++    copied = (dest / 'probe').read_text() if (dest / 'probe').is_file() else None
++finally:
++    if external_base:
++        rmtree(base)
++
++if proc.returncode != 0:
++    test_fail(
++        'receiver could not enter a destination below a searchable, unreadable '
++        f'parent (exit {proc.returncode}): {proc.stderr.strip()}'
++    )
++if copied != 'search-only destination\n':
++    test_fail('receiver did not copy into the search-only destination')
+diff --git a/testsuite/search-only-held-dirfd_test.py b/testsuite/search-only-held-dirfd_test.py
+new file mode 100644
+index 000000000..e4da46fbf
+--- /dev/null
++++ b/testsuite/search-only-held-dirfd_test.py
+@@ -0,0 +1,215 @@
++#!/usr/bin/env python3
++"""Known-name operations must not require permission to list parent dirs.
++
++The confined resolver holds directory descriptors to prevent symlink races.
++On Linux, those traversal and *at() anchor descriptors can use O_PATH: opening
++a known file beneath a searchable directory, or creating one beneath a
++writable/searchable directory, does not require directory read permission.
++"""
++
++import os
++import shutil
++import subprocess
++import sys
++import tempfile
++from pathlib import Path
++
++from rsyncfns import (
++    SCRATCHDIR, forced_protocol, rmtree, rsync_argv, test_fail, test_skipped,
++)
++
++if not sys.platform.startswith('linux'):
++    test_skipped('search-only held-dirfd coverage is Linux-specific')
++
++launcher = []
++if os.geteuid() == 0:
++    setpriv = shutil.which('setpriv')
++    if setpriv is None:
++        test_skipped('setpriv is unavailable for the root-run testsuite')
++    launcher = [setpriv, '--reuid=65534', '--regid=65534', '--clear-groups']
++
++external_base = os.geteuid() == 0
++base = (
++    Path(tempfile.mkdtemp(prefix='rsync-search-only-held-dirfd-'))
++    if external_base
++    else SCRATCHDIR / 'search-only-held-dirfd'
++)
++rmtree(base)
++
++src = base / 'src'
++xonly = src / 'xonly'
++readable = xonly / 'readable'
++nested_src = src / 'nested'
++exact_dest = base / 'exact-dest'
++tree_dest = base / 'tree-dest'
++unreadable_dest = base / 'unreadable-dest'
++write_only_dest = base / 'write-only-dest'
++nested_dest = base / 'nested-dest'
++nested_parent = nested_dest / 'nested'
++for path in (
++    readable,
++    nested_src,
++    exact_dest,
++    tree_dest,
++    unreadable_dest,
++    write_only_dest,
++    nested_parent,
++):
++    path.mkdir(parents=True, exist_ok=True)
++
++(xonly / 'exact').write_text('known file beneath search-only parent\n')
++(readable / 'nested').write_text('enumerated below search-only ancestor\n')
++incoming = src / 'incoming'
++incoming.write_text('created beneath write-search-only destination\n')
++(nested_src / 'known').write_text(
++    'created beneath nested write-search-only parent\n'
++)
++
++if os.geteuid() == 0:
++    for root, dirs, files in os.walk(base):
++        os.chown(root, 65534, 65534)
++        for name in dirs + files:
++            os.chown(Path(root) / name, 65534, 65534)
++
++
++def permission_probe(path, flag, expected, label):
++    proc = subprocess.run(
++        launcher + ['test', flag, str(path)],
++        stdout=subprocess.DEVNULL,
++        stderr=subprocess.DEVNULL,
++    )
++    if proc.returncode != expected:
++        test_skipped(
++            f'filesystem does not enforce {label}: test {flag} returned '
++            f'{proc.returncode}, expected {expected}'
++        )
++
++
++failures = []
++try:
++    xonly.chmod(0o111)
++    write_only_dest.chmod(0o333)
++    nested_parent.chmod(0o333)
++
++    permission_probe(xonly, '-r', 1, 'search-only mode')
++    permission_probe(xonly, '-x', 0, 'search-only mode')
++    permission_probe(write_only_dest, '-r', 1, 'write-search-only mode')
++    permission_probe(write_only_dest, '-w', 0, 'write-search-only mode')
++    permission_probe(write_only_dest, '-x', 0, 'write-search-only mode')
++    permission_probe(nested_parent, '-r', 1, 'nested write-search-only mode')
++    permission_probe(nested_parent, '-w', 0, 'nested write-search-only mode')
++    permission_probe(nested_parent, '-x', 0, 'nested write-search-only mode')
++
++    # Keep received implied dirs usable on systems without a safe fchmodat2.
++    # The source remains mode 0111, so sender traversal coverage is unchanged.
++    exact = subprocess.run(
++        launcher + rsync_argv(
++            '-aR', '--chmod=Du+rw', 'xonly/exact', f'{exact_dest}/',
++        ),
++        cwd=src,
++        stdout=subprocess.PIPE,
++        stderr=subprocess.PIPE,
++        text=True,
++    )
++    exact_path = exact_dest / 'xonly' / 'exact'
++    exact_content = exact_path.read_text() if exact_path.is_file() else None
++    if exact.returncode != 0 or exact_content != (
++        'known file beneath search-only parent\n'
++    ):
++        failures.append(
++            'exact -R source beneath mode 0111 failed: '
++            f'rc={exact.returncode}, stderr={exact.stderr.strip()!r}, '
++            f'content={exact_content!r}'
++        )
++
++    tree = subprocess.run(
++        launcher + rsync_argv(
++            '-aR', '--chmod=Du+rw', 'xonly/readable/', f'{tree_dest}/',
++        ),
++        cwd=src,
++        stdout=subprocess.PIPE,
++        stderr=subprocess.PIPE,
++        text=True,
++    )
++    tree_path = tree_dest / 'xonly' / 'readable' / 'nested'
++    tree_content = tree_path.read_text() if tree_path.is_file() else None
++    if tree.returncode != 0 or tree_content != (
++        'enumerated below search-only ancestor\n'
++    ):
++        failures.append(
++            'readable directory beneath mode 0111 ancestor failed: '
++            f'rc={tree.returncode}, stderr={tree.stderr.strip()!r}, '
++            f'content={tree_content!r}'
++        )
++
++    unreadable = subprocess.run(
++        launcher + rsync_argv(
++            '-a', 'xonly/', f'{unreadable_dest}/',
++        ),
++        cwd=src,
++        stdout=subprocess.PIPE,
++        stderr=subprocess.PIPE,
++        text=True,
++    )
++    if unreadable.returncode == 0:
++        failures.append(
++            'mode 0111 source directory was enumerable without read permission'
++        )
++
++    receiver = subprocess.run(
++        launcher + rsync_argv(
++            '-t', str(incoming), f'{write_only_dest}/',
++        ),
++        stdout=subprocess.PIPE,
++        stderr=subprocess.PIPE,
++        text=True,
++    )
++    received = write_only_dest / 'incoming'
++    received_content = received.read_text() if received.is_file() else None
++    if receiver.returncode != 0 or received_content != (
++        'created beneath write-search-only destination\n'
++    ):
++        failures.append(
++            'known-file creation beneath mode 0333 destination failed: '
++            f'rc={receiver.returncode}, stderr={receiver.stderr.strip()!r}, '
++            f'content={received_content!r}'
++        )
++
++    # Protocol 29 rejects this nested -R shape before the resolver is reached.
++    proto = forced_protocol()
++    if proto is None or proto >= 30:
++        nested_receiver = subprocess.run(
++            launcher + rsync_argv(
++                '-tR', '--no-implied-dirs', 'nested/known', f'{nested_dest}/',
++            ),
++            cwd=src,
++            stdout=subprocess.PIPE,
++            stderr=subprocess.PIPE,
++            text=True,
++        )
++        nested_received = nested_parent / 'known'
++        nested_content = (
++            nested_received.read_text() if nested_received.is_file() else None
++        )
++        if nested_receiver.returncode != 0 or nested_content != (
++            'created beneath nested write-search-only parent\n'
++        ):
++            failures.append(
++                'known-file creation beneath nested mode 0333 destination '
++                f'failed: rc={nested_receiver.returncode}, '
++                f'stderr={nested_receiver.stderr.strip()!r}, '
++                f'content={nested_content!r}'
++            )
++finally:
++    xonly.chmod(0o755)
++    write_only_dest.chmod(0o755)
++    nested_parent.chmod(0o755)
++    for dest in (exact_dest, tree_dest):
++        copied_xonly = dest / 'xonly'
++        if copied_xonly.is_dir():
++            copied_xonly.chmod(0o755)
++    if external_base:
++        rmtree(base)
++
++if failures:
++    test_fail('\n'.join(failures))

@@ -1,0 +1,34 @@
+From c76fe69fbb5d26f590658c804a179aef76e07525 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 23 Sep 2026 15:10:07 +0200
+Subject: [PATCH] reintroduce ripemd160 support for the ossl backend
+
+Partial backport without Cargo.toml / Cargo.lock changes of:
+https://gitlab.com/sequoia-pgp/sequoia/-/commit/28ee4bfd
+---
+ src/crypto/backend/openssl/hash.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/crypto/backend/openssl/hash.rs b/src/crypto/backend/openssl/hash.rs
+index 2259532..e33120c 100644
+--- a/src/crypto/backend/openssl/hash.rs
++++ b/src/crypto/backend/openssl/hash.rs
+@@ -9,6 +9,7 @@ impl TryFrom<HashAlgorithm> for DigestAlg {
+     fn try_from(a: HashAlgorithm) -> std::result::Result<Self, Self::Error> {
+         match a {
+             HashAlgorithm::MD5 => Ok(DigestAlg::Md5),
++            HashAlgorithm::RipeMD => Ok(DigestAlg::RipeMd160),
+             HashAlgorithm::SHA1 => Ok(DigestAlg::Sha1),
+             HashAlgorithm::SHA256 => Ok(DigestAlg::Sha2_256),
+             HashAlgorithm::SHA384 => Ok(DigestAlg::Sha2_384),
+@@ -18,7 +19,6 @@ impl TryFrom<HashAlgorithm> for DigestAlg {
+             HashAlgorithm::SHA3_512 => Ok(DigestAlg::Sha3_512),
+             HashAlgorithm::Private(_)
+                 | HashAlgorithm::Unknown (_)
+-                | HashAlgorithm::RipeMD
+                 => Err(crate::Error::UnsupportedHashAlgorithm(a)),
+         }
+     }
+-- 
+2.55.0
+

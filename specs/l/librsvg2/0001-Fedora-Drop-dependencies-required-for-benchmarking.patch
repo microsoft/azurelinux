@@ -14,24 +14,24 @@ Signed-off-by: Kleis Auke Wolthuizen <fedora@kleisauke.nl>
  2 files changed, 2 deletions(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index f212bdd88..cce134539 100644
+index 0cf66ff..b18ba69 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -44,7 +44,6 @@ cast = "0.3.0"
+@@ -43,7 +43,6 @@ cast = "0.3.0"
  chrono = { version = "0.4.23", default-features = false }
  clap = "4.0.17"
  clap_complete = "4.0.5"
--criterion = "0.6"
- cssparser = "~0.31"
+-criterion = "0.7"
+ cssparser = "0.35.0"
+ cssparser-color = "0.3.0"
  data-url = "0.3.0"
- encoding_rs = "0.8.32"
 diff --git a/rsvg/Cargo.toml b/rsvg/Cargo.toml
-index e6b810122..ad6778597 100644
+index 708cb85..dac11fb 100644
 --- a/rsvg/Cargo.toml
 +++ b/rsvg/Cargo.toml
-@@ -82,7 +82,6 @@ yeslogic-fontconfig-sys = { workspace = true, optional = true }
+@@ -83,7 +83,6 @@ yeslogic-fontconfig-sys = { workspace = true, optional = true }
+
  [dev-dependencies]
- anyhow.workspace = true
  chrono = { workspace = true, features = ["clock", "std"] }
 -criterion.workspace = true
  lopdf.workspace = true

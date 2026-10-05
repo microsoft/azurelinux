@@ -1,16 +1,22 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%global gitcommit a5a72284e09337096d946429d08d32e75c3b6e0d
+%global gitdate 20260721.065046
+%global shortcommit %(c=%{gitcommit}; echo ${c:0:7})
+
 Name:           kde-qdoc-common
-Version:        1.0.0
+Version:        1.0.0^%{gitdate}.%{shortcommit}
 Release: 5%{?dist}
 Summary:        Common files for KDE's API documentation (using QDoc)
 BuildArch:      noarch
 
 License:        GFDL-1.3-no-invariants-only AND BSD-3-Clause AND CC0-1.0
 URL:            https://invent.kde.org/sdk/kde-qdoc-common
-Source0:        https://download.kde.org/stable/%{name}/%{name}-%{version}.tar.xz
-Source1:        https://download.kde.org/stable/%{name}/%{name}-%{version}.tar.xz.sig
+
+Source0:        https://invent.kde.org/sdk/%{name}/-/archive/%{gitcommit}/%{name}-%{gitcommit}.tar.gz
+#Source0:        https://download.kde.org/stable/%%{name}/%%{name}-%%{version}.tar.xz
+#Source1:        https://download.kde.org/stable/%%{name}/%%{name}-%%{version}.tar.xz.sig
 
 BuildRequires:  qt6-rpm-macros
 
@@ -22,7 +28,7 @@ We can modify them at will, however we should periodically
 sync them with upstream to incorporate improvements from there.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{gitcommit}
 
 %build
 # Intentionally left blank
@@ -44,6 +50,15 @@ rm -f LICENSES/LicenseRef-Qt-Commercial.txt
 %{_qt6_docdir}/kde-qdoc-common
 
 %changelog
+* Sat Aug 22 2026 Steve Cossette <farchord@gmail.com> - 1.0.0^20231028.022709.1912c80-1
+- Updated to latest git snapshot
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

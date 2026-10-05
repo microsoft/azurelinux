@@ -1,0 +1,11 @@
+diff -Naur a/build.rs b/build.rs
+--- a/build.rs	2006-07-24 02:21:28.000000000 +0100
++++ b/build.rs	2026-09-17 14:40:39.949565048 +0100
+@@ -5,7 +5,6 @@
+ fn main() {
+     let dst = PathBuf::from(env::var_os("OUT_DIR").unwrap());
+ 
+-    #[cfg(feature = "dynamic")]
+     if pkg_config::Config::new()
+         .print_system_libs(false)
+         .cargo_metadata(true)

@@ -1,0 +1,49 @@
+diff --git jitterentropy-base-user.h jitterentropy-base-user.h
+--- jitterentropy-base-user.h
++++ jitterentropy-base-user.h
+@@ -196,42 +196,14 @@ static inline void jent_get_nstime(uint64_t *out)
+ 	*out = *(uint64_t *)(clk + 1);
+ }
+ 
+-#elif defined(__powerpc)
+-/*
+- * Uncomment this for newer PPC CPUs
+- * Newer PPC CPUs do not support mftbu/mftb
+- * these instructions were obsoleted and replaced by
+- * mfspr.  special processor registers 268 and 269 are the
+- * ones we want.
+- */
+- /* #define POWER_PC_USE_NEW_INSTRUCTIONS */
+-
+-/* taken from http://www.ecrypt.eu.org/ebats/cpucycles.html */
++#elif defined(__powerpc__)
+ 
+ static inline void jent_get_nstime(uint64_t *out)
+ {
+-	unsigned long high;
+-	unsigned long low;
+-	unsigned long newhigh;
+-	uint64_t result;
+-#ifdef POWER_PC_USE_NEW_INSTRUCTIONS /* Newer PPC CPUs do not support mftbu/mftb */
+-	__asm__ __volatile__(
+-		"Lcpucycles:mfspr %0, 269;mfspr %1, 268;mfspr %2, 269;cmpw %0,%2;bne Lcpucycles"
+-		: "=r" (high), "=r" (low), "=r" (newhigh)
+-		);
+-#else
+-	__asm__ __volatile__(
+-		"Lcpucycles:mftbu %0;mftb %1;mftbu %2;cmpw %0,%2;bne Lcpucycles"
+-		: "=r" (high), "=r" (low), "=r" (newhigh)
+-		);
+-#endif
+-	result = high;
+-	result <<= 32;
+-	result |= low;
+-	*out = result;
++	*out = (uint64_t)__builtin_ppc_get_timebase();
+ }
+ 
+-#else /* (__x86_64__) || (__i386__) || (__aarch64__) || (__s390x__) || (__powerpc) */
++#else /* (__x86_64__) || (__i386__) || (__aarch64__) || (__s390x__) || (__powerpc__) */
+ 
+ static inline void jent_get_nstime(uint64_t *out)
+ {

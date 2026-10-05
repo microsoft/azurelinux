@@ -1,0 +1,127 @@
+From f4462032a215bfb444f3875317f53f17efc76e54 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Wed, 29 Apr 2026 12:54:41 +0000
+Subject: [PATCH 15/16] dnfdaemon: Add repo_key_imported informational signal
+
+Add a D-Bus signal to notify clients when a repository GPG key has
+been successfully imported. This allows D-Bus clients to provide
+feedback to users about the key import operation.
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ dnf5daemon-server/callbacks.cpp               | 12 +++++++++++
+ dnf5daemon-server/callbacks.hpp               |  1 +
+ dnf5daemon-server/dbus.hpp                    |  1 +
+ .../dbus/interfaces/org.rpm.dnf.v0.Base.xml   | 20 +++++++++++++++++++
+ dnf5daemon-server/services/base/base.cpp      | 10 ++++++++++
+ 5 files changed, 44 insertions(+)
+
+diff --git a/dnf5daemon-server/callbacks.cpp b/dnf5daemon-server/callbacks.cpp
+index d6b9137f..91c384eb 100644
+--- a/dnf5daemon-server/callbacks.cpp
++++ b/dnf5daemon-server/callbacks.cpp
+@@ -137,6 +137,18 @@ bool KeyImportRepoCB::repokey_import(const libdnf5::rpm::KeyInfo & key_info) {
+     return confirmed;
+ }
+ 
++void KeyImportRepoCB::repokey_imported(const libdnf5::rpm::KeyInfo & key_info) {
++    try {
++        auto signal = create_signal(dnfdaemon::INTERFACE_BASE, dnfdaemon::SIGNAL_REPO_KEY_IMPORTED);
++        signal << key_info.get_short_key_id() << key_info.get_user_ids() << key_info.get_fingerprint()
++               << key_info.get_url() << static_cast<int64_t>(key_info.get_timestamp());
++        dbus_object->emitSignal(signal);
++    } catch (...) {
++        // Ignore errors in informational signal emission
++    }
++}
++
++
+ sdbus::Signal DbusTransactionCB::create_signal_pkg(
+     const SDBUS_INTERFACE_NAME_TYPE & interface,
+     const SDBUS_SIGNAL_NAME_TYPE & signal_name,
+diff --git a/dnf5daemon-server/callbacks.hpp b/dnf5daemon-server/callbacks.hpp
+index fe91aa85..12330ccd 100644
+--- a/dnf5daemon-server/callbacks.hpp
++++ b/dnf5daemon-server/callbacks.hpp
+@@ -87,6 +87,7 @@ public:
+     KeyImportRepoCB(Session & session, bool interactive) : DbusCallback(session), interactive(interactive) {}
+ 
+     bool repokey_import(const libdnf5::rpm::KeyInfo & key_info) override;
++    void repokey_imported(const libdnf5::rpm::KeyInfo & key_info) override;
+ 
+ private:
+     bool interactive;
+diff --git a/dnf5daemon-server/dbus.hpp b/dnf5daemon-server/dbus.hpp
+index fd7dba4d..2fe9bfef 100644
+--- a/dnf5daemon-server/dbus.hpp
++++ b/dnf5daemon-server/dbus.hpp
+@@ -73,6 +73,7 @@ const SDBUS_SIGNAL_NAME_TYPE SIGNAL_DOWNLOAD_END{"download_end"};
+ const SDBUS_SIGNAL_NAME_TYPE SIGNAL_DOWNLOAD_MIRROR_FAILURE{"download_mirror_failure"};
+ 
+ const SDBUS_SIGNAL_NAME_TYPE SIGNAL_REPO_KEY_IMPORT_REQUEST{"repo_key_import_request"};
++const SDBUS_SIGNAL_NAME_TYPE SIGNAL_REPO_KEY_IMPORTED{"repo_key_imported"};
+ 
+ const SDBUS_SIGNAL_NAME_TYPE SIGNAL_TRANSACTION_BEFORE_BEGIN{"transaction_before_begin"};
+ const SDBUS_SIGNAL_NAME_TYPE SIGNAL_TRANSACTION_AFTER_COMPLETE{"transaction_after_complete"};
+diff --git a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Base.xml b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Base.xml
+index a589cfa1..33b22bc5 100644
+--- a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Base.xml
++++ b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Base.xml
+@@ -173,6 +173,26 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+         <arg name="timestamp" type="x" />
+     </signal>
+ 
++    <!--
++        repo_key_imported:
++        @session_object_path: object path of the dnf5daemon session
++        @key_id: OpenPGP key id
++        @user_ids: User id
++        @key_fingerprint: Fingerprint of the OpenPGP key
++        @key_url: URL of the OpenPGP key
++        @timestamp: timestamp when the key was created
++
++        Informational signal emitted after a repository key was successfully imported.
++    -->
++    <signal name="repo_key_imported">
++        <arg name="session_object_path" type="o" />
++        <arg name="key_id" type="s" />
++        <arg name="user_ids" type="as" />
++        <arg name="key_fingerprint" type="s" />
++        <arg name="key_url" type="s" />
++        <arg name="timestamp" type="x" />
++    </signal>
++
+ </interface>
+ 
+ </node>
+diff --git a/dnf5daemon-server/services/base/base.cpp b/dnf5daemon-server/services/base/base.cpp
+index ee1bbcae..01459bf7 100644
+--- a/dnf5daemon-server/services/base/base.cpp
++++ b/dnf5daemon-server/services/base/base.cpp
+@@ -114,6 +114,11 @@ void Base::dbus_register() {
+                 dnfdaemon::SIGNAL_REPO_KEY_IMPORT_REQUEST,
+                 sdbus::Signature{"osasssx"},
+                 {"session_object_path", "key_id", "user_ids", "key_fingerprint", "key_url", "timestamp"},
++                {}},
++            sdbus::SignalVTableItem{
++                dnfdaemon::SIGNAL_REPO_KEY_IMPORTED,
++                sdbus::Signature{"osasssx"},
++                {"session_object_path", "key_id", "user_ids", "key_fingerprint", "key_url", "timestamp"},
+                 {}})
+         .forInterface(dnfdaemon::INTERFACE_BASE);
+ #else
+@@ -177,6 +182,11 @@ void Base::dbus_register() {
+         dnfdaemon::SIGNAL_REPO_KEY_IMPORT_REQUEST,
+         "osasssx",
+         {"session_object_path", "key_id", "user_ids", "key_fingerprint", "key_url", "timestamp"});
++    dbus_object->registerSignal(
++        dnfdaemon::INTERFACE_BASE,
++        dnfdaemon::SIGNAL_REPO_KEY_IMPORTED,
++        "osasssx",
++        {"session_object_path", "key_id", "user_ids", "key_fingerprint", "key_url", "timestamp"});
+ #endif
+ }
+ 
+-- 
+2.54.0
+

@@ -17,24 +17,19 @@ and cloud systems like Xen, KVM, VMware, EC2 and more.
 
 
 Name:           kiwi
-Version:        10.2.37
-Release: 6%{?dist}
+Version:        11.0.2
+Release: 5%{?dist}
 URL:            http://osinside.github.io/kiwi/
 Summary:        Flexible operating system image builder
 License:        GPL-3.0-or-later
 # We must use the version uploaded to pypi, as it contains all the required files.
 Source0:        https://files.pythonhosted.org/packages/source/k/%{name}/%{name}-%{version}.tar.gz
 # qemu-img dependency is not available
-ExcludeArch:    %{ix86}
+ExcludeArch:    %{ix86} %{arm32}
 
 # Backports from upstream
-## Fix unit tests for aarch64 and ppc64le
-Patch0001:      https://github.com/OSInside/kiwi/pull/2937.patch
 
 # Proposed upstream
-## https://github.com/OSInside/kiwi/pull/2944
-## Fix crash when dracut doesn't have --printconfig error
-Patch0500:      0001-initrd-format-detection-make-dracut-printconfig-opti.patch
 
 # Fedora-specific patches
 ## Use buildah instead of umoci by default for OCI image builds
@@ -299,7 +294,6 @@ Requires:       kiwi-systemdeps-bootloaders = %{version}-%{release}
 Requires:       kiwi-systemdeps-iso-media = %{version}-%{release}
 Requires:       gdisk
 Requires:       lvm2
-Requires:       parted
 Requires:       kpartx
 Requires:       cryptsetup
 Requires:       mdadm
@@ -476,12 +470,25 @@ for booting oem images built with KIWI and configured to use an
 embedded verity metadata block via the embed_verity_metadata
 type attribute.
 
+%package selinux
+Summary:        SELinux module for KIWI
+BuildArch:      noarch
+BuildRequires:  selinux-policy
+BuildRequires:  selinux-policy-devel
+BuildRequires:  make
+%{?selinux_requires}
+
+%description selinux
+This package provides the SELinux policy module to ensure kiwi
+runs properly under an environment with SELinux enabled.
+
 %package cli
 Summary:        Flexible operating system appliance image builder
 Provides:       kiwi-schema = 8.2
 # So we can reference it by the source package name while permitting this to be noarch
 Provides:       %{name} = %{version}-%{release}
 Requires:       python3-%{name} = %{version}-%{release}
+Requires:       (%{name}-selinux = %{version}-%{release} if selinux-policy)
 Requires:       bash-completion
 BuildArch:      noarch
 
@@ -490,12 +497,6 @@ BuildArch:      noarch
 
 %prep
 %autosetup -p1
-
-# Temporarily switch things back to docopt for everything but Fedora 41+
-# FIXME: Drop this hack as soon as we can...
-%if ! (0%{?fedora} >= 41 || 0%{?rhel} >= 10)
-sed -e 's/docopt-ng.*/docopt = ">=0.6.2"/' -i pyproject.toml
-%endif
 
 # Drop shebang for kiwi/xml_parse.py, as we don't intend to use it as an independent script
 sed -e "s|#!/usr/bin/env python||" -i kiwi/xml_parse.py
@@ -511,9 +512,11 @@ sed -e "s|#!/usr/bin/env python||" -i kiwi/xml_parse.py
 
 %pyproject_wheel
 
+# Build SELinux module
+make -C selinux SHARE="%{_datadir}" TARGETS="kiwi"
+
 # Build man pages
 make -C doc man
-
 
 %install
 # Required for some parts
@@ -527,8 +530,14 @@ make buildroot=%{buildroot}/ install
 # Install dracut modules (yes, the slash is needed!)
 make buildroot=%{buildroot}/ install_dracut
 
+# Install SELinux module
+install -t %{buildroot}%{_datadir}/selinux/packages -Dpm 0644 selinux/kiwi.pp.bz2
+
 # Get rid of unnecessary doc files
 rm -rf %{buildroot}%{_docdir}/packages
+
+# Create ghost file for kiwi config
+touch %{buildroot}%{_sysconfdir}/kiwi.yml
 
 # Rename unversioned binaries
 mv %{buildroot}%{_bindir}/kiwi-ng %{buildroot}%{_bindir}/kiwi-ng-3
@@ -545,24 +554,21 @@ done
 %fdupes %{buildroot}%{_sharedstatedir}/tftpboot
 %endif
 
+%pre selinux
+%selinux_relabel_pre
 
-%post cli
-if [ -x /usr/sbin/semanage -a -x /usr/sbin/restorecon ]; then
-    # file contexts
-    semanage fcontext --add --type install_exec_t        '%{_bindir}/kiwi'               2> /dev/null || :
-    semanage fcontext --add --type install_exec_t        '%{_bindir}/kiwi-ng(.*)'        2> /dev/null || :
-    restorecon -r %{_bindir}/kiwi %{_bindir}/kiwi-ng* || :
-fi
+%post selinux
+%selinux_modules_install %{_datadir}/selinux/packages/kiwi.pp.bz2
+%selinux_relabel_post
 
-%postun cli
+%posttrans selinux
+%selinux_relabel_post
+
+%postun selinux
+%selinux_modules_uninstall kiwi
 if [ $1 -eq 0 ]; then
-    if [ -x /usr/sbin/semanage ]; then
-        # file contexts
-        semanage fcontext --delete --type install_exec_t        '%{_bindir}/kiwi'               2> /dev/null || :
-        semanage fcontext --delete --type install_exec_t        '%{_bindir}/kiwi-ng(.*)'        2> /dev/null || :
-    fi
+    %selinux_relabel_post
 fi
-
 
 %if %{with check}
 %check
@@ -586,12 +592,20 @@ popd
 %dir %{_datadir}/kiwi
 %{_datadir}/kiwi/xsl_to_v74/
 
+%files selinux
+%doc selinux/README.md
+%license LICENSE
+%{_datadir}/selinux/packages/kiwi.pp.bz2
+
 %files cli
 %{_bindir}/kiwi
 %{_bindir}/kiwi-ng
 %{_datadir}/bash-completion/completions/kiwi-ng
 %{_mandir}/man8/kiwi*
-%config(noreplace) %{_sysconfdir}/kiwi.yml
+%{_datadir}/kiwi/kiwi.yml.example
+%dir %{_datadir}/kiwi/kiwi.yml.d
+%dir %{_sysconfdir}/kiwi.yml.d
+%config(noreplace) %ghost %{_sysconfdir}/kiwi.yml
 
 %ifarch %{ix86} x86_64
 %files pxeboot
@@ -662,6 +676,30 @@ popd
 
 
 %changelog
+* Thu Sep 17 2026 Neal Gompa <ngompa@fedoraproject.org> - 11.0.2-1
+- Rebase to 11.0.2
+
+* Wed Aug 26 2026 Neal Gompa <ngompa@fedoraproject.org> - 10.3.11-1
+- Update to 10.3.11
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 10.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 10.3.0-3
+- Rebuilt for openssl 4.0
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 10.3.0-2
+- Rebuilt for Python 3.15
+
+* Mon Mar 30 2026 Neal Gompa <ngompa@fedoraproject.org> - 10.3.0-1
+- Update to 10.3.0
+
+* Fri Mar 13 2026 Neal Gompa <ngompa@fedoraproject.org> - 10.2.45-1
+- Update to 10.2.45
+
+* Thu Mar 12 2026 Neal Gompa <ngompa@fedoraproject.org> - 10.2.44-1
+- Update to 10.2.44
+
 * Mon Feb 02 2026 Adam Williamson <awilliam@redhat.com> - 10.2.37-3
 - Backport fix for crash when dracut doesn't have --printconfig option
 

@@ -1,0 +1,261 @@
+From 0caae1b210514a4d9058276104c24e351521ba28 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 17 Jun 2026 13:42:12 +0200
+Subject: [PATCH] Add support for computing hashes using OpenSSL >= 3.1.0
+
+It adds WITH_OPENSSL build option, defaulting to OFF.  If it is ON,
+OpenSSL will be used for computing hashes (MD5, SHA1, SHA224, SHA256,
+SHA384, SHA512) instead of the internal implementation.
+
+This patch intentionally uses OpenSSL API which has not been
+deprecated in OpenSSL 3 and 4. It calls these functions added in these
+OpenSSL version:
+
+    EVP_MD_CTX_dup()        since 3.1.0
+    EVP_DigestInit_ex2()    since 3.0.0
+    EVP_MD_CTX_new()        since 1.1.0
+    EVP_sha512()            since 1.1.0
+    EVP_DigestFinal_ex()    since 1.0.0
+
+The EVP_MD_CTX_dup() could be trivialy reimplemented, but since
+3.0.0 users can easily upgrade to 3.1.0, I set a minimal required
+OpenSSL version to 3.1.0.
+
+This patch is based on Jaroslav Rohel <jrohel@redhat.com> and Jonathan
+Wright <jonathan@almalinux.org> work
+<https://github.com/openSUSE/libsolv/pull/598> which used the
+deprecated OpenSSL API.
+---
+ CMakeLists.txt       |   8 ++-
+ libsolv.pc.in        |   1 +
+ src/CMakeLists.txt   |  13 ++++-
+ src/chksum.c         |   4 --
+ src/chksum_openssl.c | 119 +++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 139 insertions(+), 6 deletions(-)
+ create mode 100644 src/chksum_openssl.c
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5ba5ed51..ef377eb0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,6 +42,7 @@ OPTION (ENABLE_ZCHUNK_COMPRESSION "Build with zchunk compression support?" OFF)
+ OPTION (WITH_SYSTEM_ZCHUNK "Use system zchunk library?" OFF)
+ OPTION (WITH_LIBXML2  "Build with libxml2 instead of libexpat?" OFF)
+ OPTION (WITHOUT_COOKIEOPEN "Disable the use of stdio cookie opens?" OFF)
++OPTION (WITH_OPENSSL "Use OpenSSL instead of internal implementation of hashes?" OFF)
+ 
+ OPTION (ENABLE_STATIC_TOOLS "Link the tools against the static version of the libraries?" OFF)
+ OPTION (ENABLE_STATIC_BINDINGS "Link the bindings against the static version of the libraries?" OFF)
+@@ -173,6 +174,11 @@ INCLUDE_DIRECTORIES (${EXPAT_INCLUDE_DIRS})
+ ENDIF (WITH_LIBXML2 )
+ ENDIF (ENABLE_RPMMD OR ENABLE_SUSEREPO OR ENABLE_APPDATA OR ENABLE_COMPS OR ENABLE_HELIXREPO OR ENABLE_MDKREPO)
+ 
++IF (WITH_OPENSSL)
++FIND_PACKAGE (OpenSSL 3.1.0 REQUIRED)
++SET (PKGCONFIG_PRIVATE_DEPS "libcrypto")
++ENDIF(WITH_OPENSSL)
++
+ IF (ENABLE_ZLIB_COMPRESSION)
+ FIND_PACKAGE (ZLIB REQUIRED)
+ INCLUDE_DIRECTORIES (${ZLIB_INCLUDE_DIRS})
+@@ -293,7 +299,7 @@ check_linker_flag("-Wl,--version-script=${CMAKE_SOURCE_DIR}/src/libsolv.ver" HAV
+ # should create config.h with #cmakedefine instead...
+ FOREACH (VAR HAVE_STRCHRNUL HAVE_FOPENCOOKIE HAVE_FUNOPEN WORDS_BIGENDIAN
+   HAVE_RPM_DB_H HAVE_RPMDBNEXTITERATORHEADERBLOB HAVE_RPMDBFSTAT
+-  WITH_LIBXML2 WITHOUT_COOKIEOPEN)
++  WITH_LIBXML2 WITHOUT_COOKIEOPEN WITH_OPENSSL)
+   IF(${VAR})
+     ADD_DEFINITIONS (-D${VAR}=1)
+     SET (SWIG_FLAGS ${SWIG_FLAGS} -D${VAR})
+diff --git a/libsolv.pc.in b/libsolv.pc.in
+index 766146c5..ab6d3248 100644
+--- a/libsolv.pc.in
++++ b/libsolv.pc.in
+@@ -4,5 +4,6 @@ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+ Name: libsolv
+ Description: Library for solving packages
+ Version: @VERSION@
++Requires.private: @PKGCONFIG_PRIVATE_DEPS@
+ Libs: -L${libdir} -lsolv
+ Cflags: -I${includedir}
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 66ff8b5c..c6a12e2c 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -19,7 +19,7 @@ SET (libsolv_SRCS
+     solver.c solverdebug.c repo_solv.c repo_write.c evr.c
+     queue.c repo.c repodata.c repopage.c util.c policy.c solvable.c
+     transaction.c order.c rules.c problems.c linkedpkg.c cplxdeps.c
+-    chksum.c chksum_impl.c md5.c sha1.c sha2.c solvversion.c selection.c
++    chksum.c solvversion.c selection.c
+     fileprovides.c diskusage.c suse.c solver_util.c cleandeps.c
+     userinstalled.c filelistfilter.c decision.c)
+ 
+@@ -35,6 +35,12 @@ IF (ENABLE_CONDA)
+     SET (libsolv_HEADERS ${libsolv_HEADERS} conda.h)
+ ENDIF (ENABLE_CONDA)
+ 
++IF (WITH_OPENSSL)
++    SET (libsolv_SRCS ${libsolv_SRCS} chksum_openssl.c)
++ELSE()
++    SET (libsolv_SRCS ${libsolv_SRCS} chksum_impl.c md5.c sha1.c sha2.c)
++ENDIF (WITH_OPENSSL)
++
+ IF (MULTI_SEMANTICS)
+     SET (libsolv_SRCS ${libsolv_SRCS} apk.c)
+ ENDIF (MULTI_SEMANTICS)
+@@ -58,6 +64,11 @@ ELSE (DISABLE_SHARED)
+     ADD_LIBRARY (libsolv SHARED ${libsolv_SRCS})
+ ENDIF (DISABLE_SHARED)
+ 
++IF (WITH_OPENSSL)
++    TARGET_INCLUDE_DIRECTORIES (libsolv PRIVATE ${OPENSSL_INCLUDE_DIR})
++    TARGET_LINK_LIBRARIES (libsolv PRIVATE ${OPENSSL_CRYPTO_LIBRARY})
++ENDIF (WITH_OPENSSL)
++
+ IF (WIN32)
+     IF (DISABLE_SHARED)
+         TARGET_COMPILE_DEFINITIONS(libsolv PUBLIC SOLV_STATIC_LIB)
+diff --git a/src/chksum.c b/src/chksum.c
+index a7eacdb6..2891b260 100644
+--- a/src/chksum.c
++++ b/src/chksum.c
+@@ -18,10 +18,6 @@
+ #include "util.h"
+ #include "chksum.h"
+ 
+-#include "md5.h"
+-#include "sha1.h"
+-#include "sha2.h"
+-
+ #ifdef _WIN32
+   #include "strfncs.h"
+ #endif
+diff --git a/src/chksum_openssl.c b/src/chksum_openssl.c
+new file mode 100644
+index 00000000..e332e634
+--- /dev/null
++++ b/src/chksum_openssl.c
+@@ -0,0 +1,119 @@
++/*
++ * Copyright (c) 2026, SUSE LLC
++ *
++ * This program is licensed under the BSD license, read LICENSE.BSD
++ * for further information
++ */
++
++#include <stddef.h>
++#include <stdint.h>
++#include <openssl/evp.h>
++
++#include "pool.h"
++#include "util.h"
++#include "chksum.h"
++
++/* keep in sync with chksum.c */
++struct s_Chksum {
++  Id type;
++  void *(*impl)(struct s_Chksum *, int op);
++  unsigned char result[SOLV_CHKSUM_MAXLEN];
++  EVP_MD_CTX *context;
++  int update_failed;
++};
++
++static void *
++solv_chksum_impl(Chksum *chk, int op)
++{
++  if (op == SOLV_CHKSUMP_IMPL_CLONE) {
++    Chksum *clone = solv_memdup(chk, sizeof(*chk));
++    if (!(clone->context = EVP_MD_CTX_dup(chk->context))) {
++      solv_free(clone);
++      return 0;
++    }
++    return clone;
++  }
++  else if (op == SOLV_CHKSUMP_IMPL_FINALIZE)
++  {
++    unsigned int chk_size;
++    chk->update_failed |= !EVP_DigestFinal_ex(chk->context, chk->result, &chk_size);
++    EVP_MD_CTX_free(chk->context);
++    chk->impl = 0;
++    if (chk->update_failed)
++      return 0;
++    else
++      return chk->result + chk_size;
++  }
++  else if (op == SOLV_CHKSUMP_IMPL_FREE)
++  {
++    EVP_MD_CTX_free(chk->context);
++    chk->impl = 0;
++    return 0;
++  }
++  else {
++    return 0;
++  }
++}
++
++Chksum *
++solv_chksum_create(Id type)
++{
++  Chksum *chk;
++  const EVP_MD *evp_type;
++
++  chk = solv_calloc(1, sizeof(*chk));
++  chk->type = type;
++  chk->impl = solv_chksum_impl;
++
++  if (!(chk->context = EVP_MD_CTX_new())) {
++    solv_free(chk);
++    return 0;
++  }
++
++  switch(type)
++    {
++    case REPOKEY_TYPE_MD5:
++      evp_type = EVP_md5();
++      break;
++    case REPOKEY_TYPE_SHA1:
++      evp_type = EVP_sha1();
++      break;
++    case REPOKEY_TYPE_SHA224:
++      evp_type = EVP_sha224();
++      break;
++    case REPOKEY_TYPE_SHA256:
++      evp_type = EVP_sha256();
++      break;
++    case REPOKEY_TYPE_SHA384:
++      evp_type = EVP_sha384();
++      break;
++    case REPOKEY_TYPE_SHA512:
++      evp_type = EVP_sha512();
++      break;
++    default:
++      evp_type = 0;
++      break;
++    }
++  if (evp_type && EVP_DigestInit_ex2(chk->context, evp_type, NULL))
++    return chk;
++
++  EVP_MD_CTX_free(chk->context);
++  solv_free(chk);
++  return 0;
++}
++
++void
++solv_chksum_add(Chksum *chk, const void *data, int len)
++{
++  if (!chk)
++    return;
++  if (!chk->impl)
++    return;
++  if (len < 0 || len > SIZE_MAX) {
++    chk->update_failed = 1;
++    return;
++  }
++  if (!EVP_DigestUpdate(chk->context, data, (size_t)len))
++    chk->update_failed = 1;
++}
++
+-- 
+2.54.0
+

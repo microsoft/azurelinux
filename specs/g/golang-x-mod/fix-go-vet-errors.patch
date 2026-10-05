@@ -1,0 +1,25 @@
+From a1a46cd6044dfeb957c3490c048462aabd3c2081 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C3=81lex=20S=C3=A1ez?= <asm@redhat.com>
+Date: Mon, 28 Sep 2026 12:35:57 +0000
+Subject: [PATCH] Fix go vet errors
+
+---
+ modfile/read.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modfile/read.go b/modfile/read.go
+index 2d74868..ab97705 100644
+--- a/modfile/read.go
++++ b/modfile/read.go
+@@ -600,7 +600,7 @@ func (in *input) readToken() {
+ 
+ 	// Checked all punctuation. Must be identifier token.
+ 	if c := in.peekRune(); !isIdent(c) {
+-		in.Error(fmt.Sprintf("unexpected input character %#q", c))
++		in.Error(fmt.Sprintf("unexpected input character %#q", rune(c)))
+ 	}
+ 
+ 	// Scan over identifier.
+-- 
+2.55.0
+

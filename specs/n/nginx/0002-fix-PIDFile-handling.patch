@@ -1,4 +1,4 @@
-From 03b18ac401de8df804b1cc455ded06359dae2374 Mon Sep 17 00:00:00 2001
+From b0b8c68523df04eae02231a80cc659b30ea60333 Mon Sep 17 00:00:00 2001
 From: Felix Kaechele <felix@kaechele.ca>
 Date: Tue, 20 Apr 2021 21:28:18 -0400
 Subject: [PATCH 2/5] fix PIDFile handling
@@ -104,5 +104,5 @@ index 385c49b6c3d1..3719854c52b0 100644
  
      ngx_parent = ngx_pid;
 -- 
-2.52.0
+2.53.0
 

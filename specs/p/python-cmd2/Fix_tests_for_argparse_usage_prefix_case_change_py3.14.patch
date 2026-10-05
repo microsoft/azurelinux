@@ -1,0 +1,279 @@
+diff -ur a/cmd2/argparse_custom.py b/cmd2/argparse_custom.py
+--- a/cmd2/argparse_custom.py	2026-03-10 22:03:57.327073468 +0100
++++ b/cmd2/argparse_custom.py	2026-03-10 22:31:47.146235474 +0100
+@@ -1031,13 +1031,14 @@
+ class Cmd2HelpFormatter(argparse.RawTextHelpFormatter):
+     """Custom help formatter to configure ordering of help text"""
+ 
+-    def _format_usage(
++    def _format_usage_old(
+         self,
+         usage: Optional[str],
+         actions: Iterable[argparse.Action],
+         groups: Iterable[argparse._ArgumentGroup],
+         prefix: Optional[str] = None,
+     ) -> str:
++        """Unused for Python 3.14.3."""
+         if prefix is None:
+             prefix = gettext('Usage: ')
+ 
+diff -ur a/tests/conftest.py b/tests/conftest.py
+--- a/tests/conftest.py	2026-03-11 01:14:18.182766172 +0100
++++ b/tests/conftest.py	2026-03-11 01:14:28.610678578 +0100
+@@ -54,7 +54,7 @@
+ 
+ 
+ # Help text for the history command
+-HELP_HISTORY = """Usage: history [-h] [-r | -e | -o FILE | -t TRANSCRIPT_FILE | -c] [-s] [-x]
++HELP_HISTORY = """usage: history [-h] [-r | -e | -o FILE | -t TRANSCRIPT_FILE | -c] [-s] [-x]
+                [-v] [-a]
+                [arg]
+ 
+diff -ur a/tests/test_argparse_custom.py b/tests/test_argparse_custom.py
+--- a/tests/test_argparse_custom.py	2026-03-10 23:33:36.232314784 +0100
++++ b/tests/test_argparse_custom.py	2026-03-10 23:37:59.556845494 +0100
+@@ -91,7 +91,7 @@
+ 
+ def test_apcustom_nargs_help_format(cust_app):
+     out, err = run_cmd(cust_app, 'help range')
+-    assert 'Usage: range [-h] [--arg0 ARG0] [--arg1 ARG1{2}] [--arg2 ARG2{3+}]' in out[0]
++    assert 'usage: range [-h] [--arg0 ARG0] [--arg1 ARG1{2}] [--arg2 ARG2{3+}]' in out[0]
+     assert '             [--arg3 ARG3{2..3}] [--arg4 [ARG4 [...]]] [--arg5 ARG5 [...]]' in out[1]
+ 
+ 
+diff -ur a/tests/test_argparse.py b/tests/test_argparse.py
+--- a/tests/test_argparse.py	2026-03-10 23:35:16.073149779 +0100
++++ b/tests/test_argparse.py	2026-03-10 23:38:06.180901818 +0100
+@@ -216,7 +216,7 @@
+ 
+ def test_argparse_help_docstring(argparse_app):
+     out, err = run_cmd(argparse_app, 'help say')
+-    assert out[0].startswith('Usage: say')
++    assert out[0].startswith('usage: say')
+     assert out[1] == ''
+     assert out[2] == 'Repeat what you'
+     assert out[3] == 'tell me to.'
+@@ -226,7 +226,7 @@
+ 
+ def test_argparse_help_description(argparse_app):
+     out, err = run_cmd(argparse_app, 'help tag')
+-    assert out[0].startswith('Usage: tag')
++    assert out[0].startswith('usage: tag')
+     assert out[1] == ''
+     assert out[2] == 'create a html tag'
+ 
+@@ -347,13 +347,13 @@
+ 
+ def test_subcommand_invalid(subcommand_app):
+     out, err = run_cmd(subcommand_app, 'base baz')
+-    assert err[0].startswith('Usage: base')
++    assert err[0].startswith('usage: base')
+     assert err[1].startswith("Error: argument SUBCOMMAND: invalid choice: 'baz'")
+ 
+ 
+ def test_subcommand_base_help(subcommand_app):
+     out, err = run_cmd(subcommand_app, 'help base')
+-    assert out[0].startswith('Usage: base')
++    assert out[0].startswith('usage: base')
+     assert out[1] == ''
+     assert out[2] == 'Base command help'
+ 
+@@ -361,46 +361,46 @@
+ def test_subcommand_help(subcommand_app):
+     # foo has no aliases
+     out, err = run_cmd(subcommand_app, 'help base foo')
+-    assert out[0].startswith('Usage: base foo')
++    assert out[0].startswith('usage: base foo')
+     assert out[1] == ''
+     assert out[2] == 'positional arguments:'
+ 
+     # bar has aliases (usage should never show alias name)
+     out, err = run_cmd(subcommand_app, 'help base bar')
+-    assert out[0].startswith('Usage: base bar')
++    assert out[0].startswith('usage: base bar')
+     assert out[1] == ''
+     assert out[2] == 'positional arguments:'
+ 
+     out, err = run_cmd(subcommand_app, 'help base bar_1')
+-    assert out[0].startswith('Usage: base bar')
++    assert out[0].startswith('usage: base bar')
+     assert out[1] == ''
+     assert out[2] == 'positional arguments:'
+ 
+     out, err = run_cmd(subcommand_app, 'help base bar_2')
+-    assert out[0].startswith('Usage: base bar')
++    assert out[0].startswith('usage: base bar')
+     assert out[1] == ''
+     assert out[2] == 'positional arguments:'
+ 
+     # helpless has aliases and no help text (usage should never show alias name)
+     out, err = run_cmd(subcommand_app, 'help base helpless')
+-    assert out[0].startswith('Usage: base helpless')
++    assert out[0].startswith('usage: base helpless')
+     assert out[1] == ''
+     assert out[2] == 'positional arguments:'
+ 
+     out, err = run_cmd(subcommand_app, 'help base helpless_1')
+-    assert out[0].startswith('Usage: base helpless')
++    assert out[0].startswith('usage: base helpless')
+     assert out[1] == ''
+     assert out[2] == 'positional arguments:'
+ 
+     out, err = run_cmd(subcommand_app, 'help base helpless_2')
+-    assert out[0].startswith('Usage: base helpless')
++    assert out[0].startswith('usage: base helpless')
+     assert out[1] == ''
+     assert out[2] == 'positional arguments:'
+ 
+ 
+ def test_subcommand_invalid_help(subcommand_app):
+     out, err = run_cmd(subcommand_app, 'help base baz')
+-    assert out[0].startswith('Usage: base')
++    assert out[0].startswith('usage: base')
+ 
+ 
+ def test_add_another_subcommand(subcommand_app):
+@@ -423,22 +423,22 @@
+     assert out[0].startswith('Namespace(')
+ 
+     out, err = run_cmd(subcommand_app, 'help test_subcmd_decorator subcmd')
+-    assert out[0] == 'Usage: test_subcmd_decorator subcmd [-h]'
++    assert out[0] == 'usage: test_subcmd_decorator subcmd [-h]'
+ 
+     out, err = run_cmd(subcommand_app, 'test_subcmd_decorator subcmd -h')
+-    assert out[0] == 'Usage: test_subcmd_decorator subcmd [-h]'
++    assert out[0] == 'usage: test_subcmd_decorator subcmd [-h]'
+ 
+     # Test subcommand that has no help option
+     out, err = run_cmd(subcommand_app, 'test_subcmd_decorator helpless_subcmd')
+     assert "'subcommand': 'helpless_subcmd'" in out[0]
+ 
+     out, err = run_cmd(subcommand_app, 'help test_subcmd_decorator helpless_subcmd')
+-    assert out[0] == 'Usage: test_subcmd_decorator helpless_subcmd'
++    assert out[0] == 'usage: test_subcmd_decorator helpless_subcmd'
+     assert not err
+ 
+     out, err = run_cmd(subcommand_app, 'test_subcmd_decorator helpless_subcmd -h')
+     assert not out
+-    assert err[0] == 'Usage: test_subcmd_decorator [-h] SUBCOMMAND ...'
++    assert err[0] == 'usage: test_subcmd_decorator [-h] SUBCOMMAND ...'
+     assert err[1] == 'Error: unrecognized arguments: -h'
+ 
+ 
+diff -ur a/tests/test_cmd2.py b/tests/test_cmd2.py
+--- a/tests/test_cmd2.py	2026-03-10 23:35:16.078149871 +0100
++++ b/tests/test_cmd2.py	2026-03-10 23:38:11.272945114 +0100
+@@ -129,14 +129,14 @@
+     out2, err2 = run_cmd(base_app, 'help set')
+ 
+     assert out1 == out2
+-    assert out1[0].startswith('Usage: set')
++    assert out1[0].startswith('usage: set')
+     assert out1[1] == ''
+     assert out1[2].startswith('Set a settable parameter')
+ 
+ 
+ def test_base_invalid_option(base_app):
+     out, err = run_cmd(base_app, 'set -z')
+-    assert err[0] == 'Usage: set [-h] [param] [value]'
++    assert err[0] == 'usage: set [-h] [param] [value]'
+     assert 'Error: unrecognized arguments: -z' in err[1]
+ 
+ 
+@@ -1577,7 +1577,7 @@
+     assert err == ''
+     assert (
+         out
+-        == """Usage: greet [-h] [-s]
++        == """usage: greet [-h] [-s]
+ 
+ optional arguments:
+   -h, --help   show this help message and exit
+@@ -2070,7 +2070,7 @@
+ 
+ def test_alias_no_subcommand(base_app):
+     out, err = run_cmd(base_app, 'alias')
+-    assert "Usage: alias [-h]" in err[0]
++    assert "usage: alias [-h]" in err[0]
+     assert "Error: the following arguments are required: SUBCOMMAND" in err[1]
+ 
+ 
+@@ -2206,7 +2206,7 @@
+ 
+ def test_macro_no_subcommand(base_app):
+     out, err = run_cmd(base_app, 'macro')
+-    assert "Usage: macro [-h]" in err[0]
++    assert "usage: macro [-h]" in err[0]
+     assert "Error: the following arguments are required: SUBCOMMAND" in err[1]
+ 
+ 
+@@ -2319,7 +2319,7 @@
+ 
+     # Run the macro
+     out, err = run_cmd(base_app, 'fake alias create')
+-    assert "Usage: alias create" in out[0]
++    assert "usage: alias create" in out[0]
+ 
+ 
+ def test_macro_create_with_missing_arg_nums(base_app):
+@@ -2612,7 +2612,7 @@
+     def do_exit(self, arg_list) -> bool:
+         """Exit the application with an optional exit code.
+ 
+-        Usage:  exit [exit_code]
++        usage:  exit [exit_code]
+             Where:
+                 * exit_code - integer exit code to return to the shell"""
+         # If an argument was provided
+diff -ur a/tests/test_history.py b/tests/test_history.py
+--- a/tests/test_history.py	2026-03-10 23:33:36.253315170 +0100
++++ b/tests/test_history.py	2026-03-10 23:38:16.252987459 +0100
+@@ -774,7 +774,7 @@
+         out, err = run_cmd(base_app, 'history -v ' + opt)
+         assert 4 <= len(out) <= 5
+         assert out[0] == '-v cannot be used with any other options'
+-        assert out[1].startswith('Usage:')
++        assert out[1].startswith('usage:')
+         assert base_app.last_result is False
+ 
+ 
+@@ -802,7 +802,7 @@
+         out, err = run_cmd(base_app, 'history -s ' + opt)
+         assert 4 <= len(out) <= 5
+         assert out[0] == '-s and -x cannot be used with -c, -r, -e, -o, or -t'
+-        assert out[1].startswith('Usage:')
++        assert out[1].startswith('usage:')
+         assert base_app.last_result is False
+ 
+ 
+@@ -822,7 +822,7 @@
+         out, err = run_cmd(base_app, 'history -x ' + opt)
+         assert 4 <= len(out) <= 5
+         assert out[0] == '-s and -x cannot be used with -c, -r, -e, -o, or -t'
+-        assert out[1].startswith('Usage:')
++        assert out[1].startswith('usage:')
+         assert base_app.last_result is False
+ 
+ 
+diff -ur a/tests/test_run_pyscript.py b/tests/test_run_pyscript.py
+--- a/tests/test_run_pyscript.py	2026-03-10 23:35:16.080149908 +0100
++++ b/tests/test_run_pyscript.py	2026-03-10 23:38:22.722042467 +0100
+@@ -212,4 +212,4 @@
+     out, err = run_cmd(base_app, 'run_pyscript {}'.format(python_script))
+ 
+     # Only the edit help text should have been echoed to pytest's stdout
+-    assert out[0] == "Usage: edit [-h] [file_path]"
++    assert out[0] == "usage: edit [-h] [file_path]"
+diff -ur a/tests/transcripts/from_cmdloop.txt b/tests/transcripts/from_cmdloop.txt
+--- a/tests/transcripts/from_cmdloop.txt	2026-03-11 01:22:14.961551411 +0100
++++ b/tests/transcripts/from_cmdloop.txt	2026-03-11 01:23:39.092247953 +0100
+@@ -2,7 +2,7 @@
+ # so you can see where they are.
+ 
+ (Cmd) help say
+-Usage: speak [-h] [-p] [-s] [-r REPEAT]/ */
++usage: speak [-h] [-p] [-s] [-r REPEAT]/ */
+ 
+ Repeats what you tell me to./ */
+ 
+

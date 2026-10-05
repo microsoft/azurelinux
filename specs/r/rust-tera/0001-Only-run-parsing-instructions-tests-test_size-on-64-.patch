@@ -1,0 +1,26 @@
+From c92d561b06b9c612c46dc79ca412c83753279c14 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 1 Sep 2026 11:31:51 +0100
+Subject: [PATCH] Only run parsing::instructions::tests::test_size on 64-bit
+ targets
+
+---
+ src/parsing/instructions.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/parsing/instructions.rs b/src/parsing/instructions.rs
+index 2d0cb58..fab245f 100644
+--- a/src/parsing/instructions.rs
++++ b/src/parsing/instructions.rs
+@@ -348,6 +348,8 @@ impl fmt::Debug for Chunk {
+ mod tests {
+     use super::*;
+ 
++    // Expected size is based on a typical 64-bit target
++    #[cfg(target_pointer_width = "64")]
+     #[test]
+     fn test_size() {
+         assert_eq!(std::mem::size_of::<Instruction>(), 32);
+-- 
+2.55.0
+

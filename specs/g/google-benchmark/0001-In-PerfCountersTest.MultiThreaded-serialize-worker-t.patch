@@ -1,0 +1,52 @@
+From d238ec4965eef94896b8984a9764d5e195793864 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 20 Apr 2026 09:51:10 +0100
+Subject: [PATCH] In PerfCountersTest.MultiThreaded, serialize worker threads
+
+---
+ test/perf_counters_gtest.cc | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/test/perf_counters_gtest.cc b/test/perf_counters_gtest.cc
+index 5de262f..bd288ab 100644
+--- a/test/perf_counters_gtest.cc
++++ b/test/perf_counters_gtest.cc
+@@ -1,3 +1,4 @@
++#include <mutex>
+ #include <random>
+ #include <thread>
+ 
+@@ -217,7 +218,16 @@ void measure(size_t threadcount, PerfCounterValues* before,
+   BM_CHECK_NE(before, nullptr);
+   BM_CHECK_NE(after, nullptr);
+   std::vector<std::thread> threads(threadcount);
+-  auto work = [&]() { BM_CHECK(do_work() > 1000); };
++  // Because we do not care whether the threads execute concurrently, but we do
++  // care that they do all of their work between the SnapshotAndCombine calls,
++  // we serialize them with a mutex. See
++  // https://github.com/google/benchmark/issues/2173.
++  std::mutex mutex;
++  auto work = [&mutex]() {
++    mutex.lock();
++    BM_CHECK(do_work() > 1000);
++    mutex.unlock();
++  };
+ 
+   // We need to first set up the counters, then start the threads, so the
+   // threads would inherit the counters. But later, we need to first destroy
+@@ -226,10 +236,12 @@ void measure(size_t threadcount, PerfCounterValues* before,
+   // threadpool.
+   auto counters =
+       PerfCounters::Create({kGenericPerfEvent1, kGenericPerfEvent2});
++  mutex.lock();
+   for (auto& t : threads) {
+     t = std::thread(work);
+   }
+   counters.Snapshot(before);
++  mutex.unlock();
+   for (auto& t : threads) {
+     t.join();
+   }
+-- 
+2.53.0
+

@@ -1,0 +1,647 @@
+From 22761d7be9116d5568e2bfb9dabc41a59448da8a Mon Sep 17 00:00:00 2001
+From: tbordaz <tbordaz@redhat.com>
+Date: Tue, 23 Jun 2026 11:41:01 +0200
+Subject: [PATCH] Issue 7567 - Content Sync plugin unbounded queue growth and
+ race conditions (#7568)
+
+Bug description:
+	Main issue is that the queue of each syncrepl persistent search is not limited.
+	Also fixing some race condition cases
+
+Fix description:
+	Support of two new configuration attributes for the sync repl configuration
+	entry (cn=Content Synchronization,cn=plugins,cn=config)
+	- syncrepl-max-concurrent (default 10)
+          that was previously configured with nsslapd-pluginarg0
+	- syncrepl_queue_max-size (default 10000)
+	  that is the maximum size of the queue of the updated entries
+	Also changing the access to 'thread_count' and 'plugin_closing'
+
+fixes: #7567
+
+Assisted by: Cursor
+
+Reviewed by: Simon Pichugin (Thanks !!)
+---
+ .../suites/syncrepl_plugin/basic_test.py      |  87 +++++++++++++++
+ .../tests/suites/syncrepl_plugin/clu_test.py  | 100 ++++++++++++++++++
+ .../upgrade/upgrade_plugin_attribute.py       |  64 +++++++++++
+ ldap/servers/plugins/sync/sync.h              |  10 +-
+ ldap/servers/plugins/sync/sync_init.c         |   2 +-
+ ldap/servers/plugins/sync/sync_persist.c      |  63 +++++++++--
+ ldap/servers/slapd/upgrade.c                  |  61 +++++++++++
+ .../lib389/cli_conf/plugins/contentsync.py    |  14 +++
+ 8 files changed, 388 insertions(+), 13 deletions(-)
+ create mode 100644 dirsrvtests/tests/suites/syncrepl_plugin/clu_test.py
+ create mode 100644 dirsrvtests/tests/suites/upgrade/upgrade_plugin_attribute.py
+
+diff --git a/dirsrvtests/tests/suites/syncrepl_plugin/basic_test.py b/dirsrvtests/tests/suites/syncrepl_plugin/basic_test.py
+index 664b4c78c..174ac6e21 100644
+--- a/dirsrvtests/tests/suites/syncrepl_plugin/basic_test.py
++++ b/dirsrvtests/tests/suites/syncrepl_plugin/basic_test.py
+@@ -918,3 +918,90 @@ def test_sync_repl_non_root_persist(topology, request):
+             pass
+ 
+     request.addfinalizer(fin)
++
++def test_syncrepl_queue_size(topology):
++    """ Test basic that the setting of the queue size
++    ranges [100-100000]
++
++    :id: 11745605-5d53-4983-82d2-2fe7bdadc745
++
++    :setup: Standalone instance
++
++    :steps:
++        1. Enable Retro Changelog
++        2. Enable Syncrepl
++        3. set 'syncrepl-queue-max-size' to a value less that minimum (100)
++        4. Check that an error message is logged
++        5. set 'syncrepl-queue-max-size' to a value greater that max (100000)
++        6. Check that an error message is logged
++        7. set 'syncrepl-queue-max-size' to a value in the range [100, 100000]
++        8. Check that the new value appears in PLUGIN_LOG
++
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. Success
++        5. Success
++        6. Success
++        7. Success
++        8. Success
++    """
++    st = topology.standalone
++    st.config.loglevel(vals=(ErrorLog.DEFAULT,ErrorLog.PLUGIN))
++
++    # Enable RetroChangelog.
++    rcl = RetroChangelogPlugin(st)
++    rcl.enable()
++    # Enable sync repl
++    csp = ContentSyncPlugin(st)
++    csp.enable()
++
++    # check invalid low value
++    csp.replace('syncrepl-queue-max-size', '10')
++    st.restart()
++    assert st.ds_error_log.match('.*sync_persist_initialize - Queue max size is too small.*')
++
++    # check invalid high value
++    csp.replace('syncrepl-queue-max-size', '200000')
++    st.restart()
++    assert st.ds_error_log.match('.*sync_persist_initialize - Queue max size is too large.*')
++
++    # check valid value
++    csp.replace('syncrepl-queue-max-size', '5000')
++    st.restart()
++    assert st.ds_error_log.match('.*sync_persist_initialize - Queue max size is set to 5000.*')
++
++def test_syncrepl_queue_size_with_legacy_pluginarg(topology):
++    """Verify queue size config is honored when legacy pluginarg0 is present
++
++    :id: 83545ba4-782e-4326-9057-a90496ee82ad
++    :setup: Standalone instance
++    :steps:
++        1. Enable Retro Changelog and Content Sync
++        2. Set legacy nsslapd-pluginarg0 and new syncrepl-queue-max-size
++        3. Restart the server
++        4. Check startup logs for the configured queue size
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. The configured queue size is applied
++    """
++    st = topology.standalone
++    st.config.loglevel(vals=(ErrorLog.DEFAULT, ErrorLog.PLUGIN))
++
++    rcl = RetroChangelogPlugin(st)
++    rcl.enable()
++
++    csp = ContentSyncPlugin(st)
++    csp.enable()
++    csp.replace('nsslapd-pluginarg0', '5')
++    csp.replace('syncrepl-queue-max-size', '5000')
++
++    st.restart()
++
++    assert st.ds_error_log.match(
++        '.*sync_persist_initialize - Queue max size is set to 5000.*',
++        after_pattern='.*starting up.*'
++    )
+diff --git a/dirsrvtests/tests/suites/syncrepl_plugin/clu_test.py b/dirsrvtests/tests/suites/syncrepl_plugin/clu_test.py
+new file mode 100644
+index 000000000..5d1c6f381
+--- /dev/null
++++ b/dirsrvtests/tests/suites/syncrepl_plugin/clu_test.py
+@@ -0,0 +1,100 @@
++# --- BEGIN COPYRIGHT BLOCK ---
++# Copyright (C) 2026 Red Hat, Inc.
++# All rights reserved.
++#
++# License: GPL (version 3 or any later version).
++# See LICENSE for details.
++# --- END COPYRIGHT BLOCK ---
++#
++import logging
++import os
++import pytest
++import subprocess
++import json
++from test389.topologies import topology_st as topo
++from lib389.plugins import RetroChangelogPlugin, ContentSyncPlugin
++from lib389._constants import DN_DM
++
++pytestmark = pytest.mark.tier2
++
++DEBUGGING = os.getenv("DEBUGGING", default=False)
++if DEBUGGING:
++    logging.getLogger(__name__).setLevel(logging.DEBUG)
++else:
++    logging.getLogger(__name__).setLevel(logging.INFO)
++log = logging.getLogger(__name__)
++
++def _dsconf_contentsync(topo, *args):
++    cmd = [
++        '/usr/sbin/dsconf', topo.standalone.serverid,
++        '-j', '-D', DN_DM, '-w', 'password',
++        'plugin', 'contentsync',
++        *args,
++    ]
++    return subprocess.run(cmd, text=True, capture_output=True)
++
++
++def test_contentsync_queue_max_size_cli(topo):
++    """Verify dsconf accepts and stores Content Sync queue max size
++
++    :id: fceca807-bf01-466f-8a36-c65c4d2d18cd
++    :setup: Standalone instance
++    :steps:
++        1. Enable Content Sync
++        2. Set queue max size with dsconf
++        3. Show plugin config
++        4. Try an out-of-range queue size
++    :expectedresults:
++        1. Success
++        2. Success
++        3. syncrepl-queue-max-size is set as a string value
++        4. dsconf rejects the invalid value cleanly
++    """
++    # Enable RetroChangelog.
++    rcl = RetroChangelogPlugin(topo.standalone)
++    rcl.enable()
++    # Enable ContentSync
++    plugin = ContentSyncPlugin(topo.standalone)
++    plugin.enable()
++
++    result = _dsconf_contentsync(topo, 'set', '--queue-max-size', '5000')
++    assert result.returncode == 0, result.stderr
++
++    result = _dsconf_contentsync(topo, 'show')
++    assert result.returncode == 0, result.stderr
++    attrs = json.loads(result.stdout)['attrs']
++    assert attrs['syncrepl-queue-max-size'] == ['5000']
++
++    result = _dsconf_contentsync(topo, 'set', '--queue-max-size', '10')
++    assert result.returncode != 0
++    assert 'Traceback' not in result.stderr
++    assert 'range' in result.stderr.lower()
++
++def test_contentsync_max_concurrent_cli(topo):
++    """Verify dsconf exposes the renamed max-concurrent setting
++
++    :id: 7fbef7bf-3ac8-4925-a5aa-cd873c6f8e81
++    :setup: Standalone instance
++    :steps:
++        1. Enable Content Sync
++        2. Set max concurrent persistent searches with dsconf
++        3. Show plugin config
++    :expectedresults:
++        1. Success
++        2. Success
++        3. syncrepl-max-concurrent is set
++    """
++    # Enable RetroChangelog.
++    rcl = RetroChangelogPlugin(topo.standalone)
++    rcl.enable()
++    # Enable ContentSync
++    plugin = ContentSyncPlugin(topo.standalone)
++    plugin.enable()
++
++    result = _dsconf_contentsync(topo, 'set', '--max-concurrent', '12')
++    assert result.returncode == 0, result.stderr
++
++    result = _dsconf_contentsync(topo, 'show')
++    assert result.returncode == 0, result.stderr
++    attrs = json.loads(result.stdout)['attrs']
++    assert attrs['syncrepl-max-concurrent'] == ['12']
+diff --git a/dirsrvtests/tests/suites/upgrade/upgrade_plugin_attribute.py b/dirsrvtests/tests/suites/upgrade/upgrade_plugin_attribute.py
+new file mode 100644
+index 000000000..040133670
+--- /dev/null
++++ b/dirsrvtests/tests/suites/upgrade/upgrade_plugin_attribute.py
+@@ -0,0 +1,64 @@
++# --- BEGIN COPYRIGHT BLOCK ---
++# Copyright (C) 2026 Red Hat, Inc.
++# All rights reserved.
++#
++# License: GPL (version 3 or any later version).
++# See LICENSE for details.
++# --- END COPYRIGHT BLOCK ---
++#
++import logging
++import pytest
++import os
++from test389.topologies import topology_st as topo
++from lib389.dseldif import DSEldif
++
++log = logging.getLogger(__name__)
++
++
++def test_sync_plugin(topo):
++    """Test that the replication plugin name is updated to the new name at
++    server startup.
++
++    :id: c275f870-aa32-49bf-bfd3-d18b9c3ae250
++    :setup: Standalone Instance
++    :steps:
++        1. Stop Server
++        2. add nsslapd-pluginarg0 in content sync config entry
++        3. Start server
++        4. Verify nsslapd-pluginarg0 is removed
++        5. Verify syncrepl-max-concurrent is added
++    :expectedresults:
++        1. Success
++        2. Success
++        3. Success
++        4. Success
++        5. Success
++    """
++
++    SYNC_PLUGIN_DN = "cn=Content Synchronization,cn=plugins,cn=config"
++    REPL_PLUGIN_NAME = "Multisupplier Replication Plugin"
++    SYNC_ATTR_OLD_NAME = "nsslapd-pluginarg0"
++    SYNC_ATTR_NEW_NAME = "syncrepl-max-concurrent"
++    SYNC_ATTR_VAL = "5"
++
++    # Stop the server
++    topo.standalone.stop()
++
++    # Edit sync plugin in dse.ldif
++    dse_ldif = DSEldif(topo.standalone)
++    dse_ldif.replace(SYNC_PLUGIN_DN, SYNC_ATTR_OLD_NAME, SYNC_ATTR_VAL)
++
++    topo.standalone.restart()
++    dse_ldif = DSEldif(topo.standalone)
++    pluginarg0 = dse_ldif.get(SYNC_PLUGIN_DN, SYNC_ATTR_OLD_NAME, single=True)
++    assert pluginarg0 == None
++    max_concurrent = dse_ldif.get(SYNC_PLUGIN_DN, SYNC_ATTR_NEW_NAME, single=True)
++    assert int(max_concurrent) == int(SYNC_ATTR_VAL)
++
++
++if __name__ == '__main__':
++    # Run isolated
++    # -s for DEBUG mode
++    CURRENT_FILE = os.path.realpath(__file__)
++    pytest.main(["-s", CURRENT_FILE])
++
+diff --git a/ldap/servers/plugins/sync/sync.h b/ldap/servers/plugins/sync/sync.h
+index f9b19f089..f6fd6248b 100644
+--- a/ldap/servers/plugins/sync/sync.h
++++ b/ldap/servers/plugins/sync/sync.h
+@@ -30,6 +30,8 @@
+ #define SYNC_BE_POSTOP_DESC "content-sync-be-post-subplugin"
+ 
+ #define SYNC_ALLOW_OPENLDAP_COMPAT "syncrepl-allow-openldap"
++#define SYNC_CFG_MAX_CONCURRENT "syncrepl-max-concurrent"
++#define SYNC_CFG_QUEUE_MAX_SIZE "syncrepl-queue-max-size"
+ 
+ #define OP_FLAG_SYNC_PERSIST 0x01
+ 
+@@ -156,7 +158,7 @@ int sync_send_entry_from_changelog(Slapi_PBlock *pb, int chg_req, char *uniqueid
+ void sync_send_deleted_entries(Slapi_PBlock *pb, Sync_UpdateNode *upd, int chg_count, Sync_Cookie *session_cookie);
+ void sync_send_modified_entries(Slapi_PBlock *pb, Sync_UpdateNode *upd, int chg_count, Sync_Cookie *session_cookie);
+ 
+-int sync_persist_initialize(int argc, char **argv);
++int sync_persist_initialize(int argc, char **argv, Slapi_Entry *config_entry);
+ PRThread *sync_persist_add(Slapi_PBlock *pb);
+ int sync_persist_startup(PRThread *tid, Sync_Cookie *session_cookie);
+ int sync_persist_terminate_all(void);
+@@ -203,6 +205,8 @@ typedef struct sync_request
+     Sync_Cookie *req_cookie;
+     SyncQueueNode *ps_eq_head;
+     SyncQueueNode *ps_eq_tail;
++    int req_queue_count;    /* number of entries queued for this request */
++    int req_queue_max_size; /* max number of entries in this request's queue */
+     int req_active;
+     struct sync_request *req_next;
+ } SyncRequest;
+@@ -212,7 +216,8 @@ typedef struct sync_request
+  *
+  * will be initialized at plugin initialization
+  */
+-#define SYNC_MAX_CONCURRENT 10
++#define SYNC_DEFAULT_MAX_CONCURRENT 10
++#define SYNC_DEFAULT_QUEUE_MAX_SIZE 10000
+ typedef struct sync_request_list
+ {
+     Slapi_RWLock *sync_req_rwlock; /* R/W lock struct to serialize access */
+@@ -221,6 +226,7 @@ typedef struct sync_request_list
+     pthread_cond_t sync_req_cvar;         /* ps threads sleep on this */
+     int sync_req_max_persist;
+     int sync_req_cur_persist;
++    int sync_req_queue_max_size;  /* default max queue size per persistent search */
+ } SyncRequestList;
+ 
+ #define SYNC_FLAG_ADD_STATE_CTRL    0x01
+diff --git a/ldap/servers/plugins/sync/sync_init.c b/ldap/servers/plugins/sync/sync_init.c
+index b98c4c1ad..5b4425cc7 100644
+--- a/ldap/servers/plugins/sync/sync_init.c
++++ b/ldap/servers/plugins/sync/sync_init.c
+@@ -234,7 +234,7 @@ sync_start(Slapi_PBlock *pb)
+      * in the order that they were applied
+      */
+     PR_NewThreadPrivateIndex(&thread_primary_op, sync_thread_primary_op_destructor);
+-    sync_persist_initialize(argc, argv);
++    sync_persist_initialize(argc, argv, e);
+ 
+     return (0);
+ }
+diff --git a/ldap/servers/plugins/sync/sync_persist.c b/ldap/servers/plugins/sync/sync_persist.c
+index dcc9a9d59..7e12b1b07 100644
+--- a/ldap/servers/plugins/sync/sync_persist.c
++++ b/ldap/servers/plugins/sync/sync_persist.c
+@@ -28,7 +28,7 @@ static SyncRequestList *sync_request_list = NULL;
+  */
+ #define SYNC_IS_INITIALIZED() (sync_request_list != NULL)
+ 
+-static int plugin_closing = 0;
++static PRUint64 plugin_closing = 0;
+ static PRUint64 thread_count = 0;
+ static int sync_add_request(SyncRequest *req);
+ static void sync_remove_request(SyncRequest *req);
+@@ -595,8 +595,16 @@ sync_queue_change(OPERATION_PL_CTX_T *operation)
+             }
+             /* Put it on the end of the list for this sync search */
+             PR_Lock(req->req_lock);
++            /* check if the queue max size is reached */
++            if (req->req_queue_count >= req->req_queue_max_size) {
++                slapi_log_err(SLAPI_LOG_WARNING, SYNC_PLUGIN_SUBSYSTEM, "sync_queue_change - queue max size reached, dropping entry \"%s\"\n", slapi_entry_get_dn_const(node->sync_entry));
++                PR_Unlock(req->req_lock);
++                sync_node_free(&node);
++                continue;
++            }
+             pOldtail = req->ps_eq_tail;
+             req->ps_eq_tail = node;
++            req->req_queue_count++;
+             if (NULL == req->ps_eq_head) {
+                 req->ps_eq_head = req->ps_eq_tail;
+             } else {
+@@ -631,7 +639,7 @@ sync_queue_change(OPERATION_PL_CTX_T *operation)
+  * of established content sync persistent requests
+  */
+ int
+-sync_persist_initialize(int argc, char **argv)
++sync_persist_initialize(int argc, char **argv, Slapi_Entry *config_entry)
+ {
+     if (!SYNC_IS_INITIALIZED()) {
+         pthread_condattr_t sync_req_condAttr; /* cond var attribute */
+@@ -670,14 +678,44 @@ sync_persist_initialize(int argc, char **argv)
+ 
+         sync_request_list->sync_req_head = NULL;
+         sync_request_list->sync_req_cur_persist = 0;
+-        sync_request_list->sync_req_max_persist = SYNC_MAX_CONCURRENT;
++        sync_request_list->sync_req_max_persist = SYNC_DEFAULT_MAX_CONCURRENT;
++        sync_request_list->sync_req_queue_max_size = SYNC_DEFAULT_QUEUE_MAX_SIZE;
++        /* set the max concurrent persistent sync searches */
+         if (argc > 0) {
+             /* for now the only plugin arg is the max concurrent
+              * persistent sync searches
+              */
+             sync_request_list->sync_req_max_persist = sync_number2int(argv[0]);
+             if (sync_request_list->sync_req_max_persist == -1) {
+-                sync_request_list->sync_req_max_persist = SYNC_MAX_CONCURRENT;
++                sync_request_list->sync_req_max_persist = SYNC_DEFAULT_MAX_CONCURRENT;
++            }
++        } else if (NULL != config_entry) {
++            char *value = NULL;
++            if ((value = (char *)slapi_entry_attr_get_ref(config_entry, SYNC_CFG_MAX_CONCURRENT))) {
++                sync_request_list->sync_req_max_persist = sync_number2int(value);
++                if (sync_request_list->sync_req_max_persist == -1) {
++                    sync_request_list->sync_req_max_persist = SYNC_DEFAULT_MAX_CONCURRENT;
++                }
++            }
++        }
++        /* set the max queue size per persistent sync search */
++        if (NULL != config_entry) {
++            char *value = NULL;
++            if ((value = (char *)slapi_entry_attr_get_ref(config_entry, SYNC_CFG_QUEUE_MAX_SIZE))) {
++                sync_request_list->sync_req_queue_max_size = sync_number2int(value);
++                if (sync_request_list->sync_req_queue_max_size < 100) {
++                    /* too small queue max size, set to default */
++                    slapi_log_err(SLAPI_LOG_ERR, SYNC_PLUGIN_SUBSYSTEM, "sync_persist_initialize - Queue max size is too small (<100), setting to default %d\n", SYNC_DEFAULT_QUEUE_MAX_SIZE);
++                    sync_request_list->sync_req_queue_max_size = SYNC_DEFAULT_QUEUE_MAX_SIZE;
++                }
++                if (sync_request_list->sync_req_queue_max_size > 100000) {
++                    /* too large queue max size, set to default */
++                    slapi_log_err(SLAPI_LOG_ERR, SYNC_PLUGIN_SUBSYSTEM, "sync_persist_initialize - Queue max size is too large (>100000), setting to default %d\n", SYNC_DEFAULT_QUEUE_MAX_SIZE);
++                    sync_request_list->sync_req_queue_max_size = SYNC_DEFAULT_QUEUE_MAX_SIZE;
++                }
++                if (sync_request_list->sync_req_queue_max_size != SYNC_DEFAULT_QUEUE_MAX_SIZE) {
++                    slapi_log_err(SLAPI_LOG_PLUGIN, SYNC_PLUGIN_SUBSYSTEM, "sync_persist_initialize - Queue max size is set to %d\n", sync_request_list->sync_req_queue_max_size);
++                }
+             }
+         }
+         plugin_closing = 0;
+@@ -730,7 +768,7 @@ sync_persist_add(Slapi_PBlock *pb)
+                 sync_remove_request(req);
+                 sync_request_free(&req);
+             } else {
+-                thread_count++;
++                slapi_atomic_incr_64(&thread_count, __ATOMIC_RELEASE);
+                 return (req->req_tid);
+             }
+         }
+@@ -799,11 +837,11 @@ sync_persist_terminate_all()
+     SyncRequest *req = NULL, *next;
+     if (SYNC_IS_INITIALIZED()) {
+         /* signal the threads to stop */
+-        plugin_closing = 1;
++        slapi_atomic_store_64(&plugin_closing, 1, __ATOMIC_RELEASE);
+         sync_request_wakeup_all();
+ 
+         /* wait for all the threads to finish */
+-        while (thread_count > 0) {
++        while (slapi_atomic_load_64(&thread_count, __ATOMIC_ACQUIRE) > 0) {
+             PR_Sleep(PR_SecondsToInterval(1));
+         }
+ 
+@@ -842,6 +880,8 @@ sync_request_alloc(void)
+     req->req_complete = 0;
+     req->req_cookie = NULL;
+     req->ps_eq_head = req->ps_eq_tail = (SyncQueueNode *)NULL;
++    req->req_queue_count = 0;
++    req->req_queue_max_size = SYNC_DEFAULT_QUEUE_MAX_SIZE;
+     req->req_next = NULL;
+     req->req_active = PR_FALSE;
+     return req;
+@@ -860,6 +900,8 @@ sync_add_request(SyncRequest *req)
+         SYNC_LOCK_WRITE();
+         if (sync_request_list->sync_req_cur_persist < sync_request_list->sync_req_max_persist) {
+             sync_request_list->sync_req_cur_persist++;
++            req->req_queue_count = 0;
++            req->req_queue_max_size = sync_request_list->sync_req_queue_max_size;
+             req->req_next = sync_request_list->sync_req_head;
+             sync_request_list->sync_req_head = req;
+         } else {
+@@ -1005,7 +1047,7 @@ sync_send_results(void *arg)
+ 
+     pthread_mutex_lock(&(sync_request_list->sync_req_cvarlock));
+ 
+-    while ((conn_acq_flag == 0) && !req->req_complete && !plugin_closing) {
++    while ((conn_acq_flag == 0) && !req->req_complete && !slapi_atomic_load_64(&plugin_closing, __ATOMIC_ACQUIRE)) {
+         /* Check for an abandoned operation */
+         if (op == NULL || slapi_is_operation_abandoned(op)) {
+             slapi_log_err(SLAPI_LOG_PLUGIN, SYNC_PLUGIN_SUBSYSTEM,
+@@ -1037,7 +1079,8 @@ sync_send_results(void *arg)
+             /* dequeue one element */
+             PR_Lock(req->req_lock);
+             qnode = req->ps_eq_head;
+-            slapi_log_err(SLAPI_LOG_PLUGIN, SYNC_PLUGIN_SUBSYSTEM, "sync_queue_change - dequeue  "
++            req->req_queue_count--;
++            slapi_log_err(SLAPI_LOG_PLUGIN, SYNC_PLUGIN_SUBSYSTEM, "sync_send_results - dequeue  "
+                           "\"%s\" \n",
+                           slapi_entry_get_dn_const(qnode->sync_entry));
+             req->ps_eq_head = qnode->sync_next;
+@@ -1117,7 +1160,7 @@ done:
+     /* This client closed the connection or shutdown, free the req */
+     sync_remove_request(req);
+     sync_request_free(&req);
+-    thread_count--;
++    slapi_atomic_decr_64(&thread_count, __ATOMIC_RELEASE);
+ }
+ 
+ 
+diff --git a/ldap/servers/slapd/upgrade.c b/ldap/servers/slapd/upgrade.c
+index 996ff120b..d829eb858 100644
+--- a/ldap/servers/slapd/upgrade.c
++++ b/ldap/servers/slapd/upgrade.c
+@@ -787,6 +787,63 @@ upgrade_pam_pta_default_config(void)
+     return UPGRADE_SUCCESS;
+ }
+ 
++/*
++ * Migrate the Content Synchronization plugin max concurrent persistent
++ * search setting from the legacy nsslapd-pluginarg0 attribute to
++ * syncrepl-max-concurrent.
++ */
++static upgrade_status
++upgrade_contentsync_max_concurrent_config(void)
++{
++    struct slapi_pblock *search_pb = slapi_pblock_new();
++    Slapi_Entry *plugin_entry = NULL;
++    Slapi_DN *sdn = NULL;
++    const char *plugin_dn = "cn=Content Synchronization,cn=plugins,cn=config";
++    const char *old_attr = "nsslapd-pluginarg0";
++    const char *new_attr = "syncrepl-max-concurrent";
++    upgrade_status uresult = UPGRADE_SUCCESS;
++
++    sdn = slapi_sdn_new_dn_byref(plugin_dn);
++    slapi_search_get_entry(&search_pb, sdn, NULL, &plugin_entry, NULL);
++    if (plugin_entry) {
++        const char *old_val = slapi_entry_attr_get_ref(plugin_entry, old_attr);
++
++        if (old_val != NULL) {
++            Slapi_PBlock *mod_pb = slapi_pblock_new();
++            Slapi_Mods smods;
++            int32_t result;
++
++            slapi_mods_init(&smods, 2);
++            slapi_mods_add(&smods, LDAP_MOD_DELETE, old_attr, 0, NULL);
++            if (slapi_entry_attr_get_ref(plugin_entry, new_attr) == NULL) {
++                slapi_mods_add_string(&smods, LDAP_MOD_ADD, new_attr, old_val);
++            }
++
++            slapi_modify_internal_set_pb(mod_pb, plugin_dn,
++                    slapi_mods_get_ldapmods_byref(&smods),
++                    0, 0, (void *)plugin_get_default_component_id(), 0);
++            slapi_modify_internal_pb(mod_pb);
++            slapi_pblock_get(mod_pb, SLAPI_PLUGIN_INTOP_RESULT, &result);
++            if (result != LDAP_SUCCESS) {
++                slapi_log_err(SLAPI_LOG_ERR, "upgrade_contentsync_max_concurrent_config",
++                        "Failed to migrate %s from %s to %s on '%s', error %d\n",
++                        old_val, old_attr, new_attr, plugin_dn, result);
++                uresult = UPGRADE_FAILURE;
++            } else {
++                slapi_log_err(SLAPI_LOG_NOTICE, "upgrade_contentsync_max_concurrent_config",
++                        "Upgrade task: migrated %s (%s) to %s on '%s'\n",
++                        old_attr, old_val, new_attr, plugin_dn);
++            }
++            slapi_mods_done(&smods);
++            slapi_pblock_destroy(mod_pb);
++        }
++    }
++    slapi_search_get_entry_done(&search_pb);
++    slapi_sdn_free(&sdn);
++
++    return uresult;
++}
++
+ 
+ upgrade_status
+ upgrade_server(void)
+@@ -835,6 +892,10 @@ upgrade_server(void)
+         return UPGRADE_FAILURE;
+     }
+ 
++    if (upgrade_contentsync_max_concurrent_config() != UPGRADE_SUCCESS) {
++        return UPGRADE_FAILURE;
++    }
++
+     return UPGRADE_SUCCESS;
+ }
+ 
+diff --git a/src/lib389/lib389/cli_conf/plugins/contentsync.py b/src/lib389/lib389/cli_conf/plugins/contentsync.py
+index 10153a35b..3710b96f3 100644
+--- a/src/lib389/lib389/cli_conf/plugins/contentsync.py
++++ b/src/lib389/lib389/cli_conf/plugins/contentsync.py
+@@ -6,14 +6,24 @@
+ # See LICENSE for details.
+ # --- END COPYRIGHT BLOCK ---
+ 
++from argparse import ArgumentTypeError
+ from lib389.plugins import ContentSyncPlugin
+ from lib389.cli_conf import add_generic_plugin_parsers, generic_object_edit, generic_object_add_attr
+ from lib389.cli_base import CustomHelpFormatter
+ 
+ arg_to_attr = {
+     'allow_openldap': 'syncrepl-allow-openldap',
++    'queue_max_size': 'syncrepl-queue-max-size',
++    'max_concurrent': 'syncrepl-max-concurrent',
+ }
+ 
++def check_queue_size(value):
++    ivalue = int(value)
++    if 100 <= ivalue <= 100000:
++        return str(ivalue)
++    else:
++        raise ArgumentTypeError(f"{value} should be in the range [100, 100000]")
++
+ def contentsync_edit(inst, basedn, log, args):
+     log = log.getChild('contentsync_edit')
+     plugin = ContentSyncPlugin(inst)
+@@ -29,6 +39,10 @@ def contentsync_add(inst, basedn, log, args):
+ def _add_parser_args(parser):
+     parser.add_argument('--allow-openldap', choices=['on', 'off'], type=str.lower,
+                         help='Allows openldap servers to act as read only consumers of this server via syncrepl')
++    parser.add_argument('--queue-max-size', type=check_queue_size,
++                        help='Limits the number of entries not yet processed (range [100, 100000])')
++    parser.add_argument('--max-concurrent', type=str,
++                        help='Limits the number of persistent searches running at the same time')
+ 
+ def create_parser(subparsers):
+     contentsync_parser = subparsers.add_parser('contentsync', help='Manage and configure Content Sync Plugin (aka syncrepl)', formatter_class=CustomHelpFormatter)
+-- 
+2.55.0
+

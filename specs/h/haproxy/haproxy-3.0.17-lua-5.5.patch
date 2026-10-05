@@ -1,0 +1,31 @@
+From 1c0f781994a89b5cbd7b4b893c23e6d2b75b1764 Mon Sep 17 00:00:00 2001
+From: Mike Lothian <mike@fireburn.co.uk>
+Date: Fri, 2 Jan 2026 14:38:10 +0000
+Subject: [PATCH] MINOR: hlua: Add support for lua 5.5
+
+Lua 5.5 adds an extra argument to lua_newstate(). Since there are
+already a few other ifdefs in hlua.c checking for the Lua version,
+and there's a single call place, let's do the same here. This should
+be safe for backporting if needed.
+
+Signed-off-by: Mike Lothian <mike@fireburn.co.uk>
+---
+ src/hlua.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/hlua.c b/src/hlua.c
+index 5109d3c04b33..bb73b377c571 100644
+--- a/src/hlua.c
++++ b/src/hlua.c
+@@ -14027,7 +14027,11 @@ lua_State *hlua_init_state(int thread_num)
+ 	struct prepend_path *pp;
+ 
+ 	/* Init main lua stack. */
++#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 505
++	L = lua_newstate(hlua_alloc, &hlua_global_allocator, luaL_makeseed(0));
++#else
+ 	L = lua_newstate(hlua_alloc, &hlua_global_allocator);
++#endif
+ 
+ 	if (!L) {
+ 		fprintf(stderr,

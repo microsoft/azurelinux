@@ -1,0 +1,119 @@
+From 20fcc2e065cb01c4f47d5be4ab260571241c734c Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Sun, 5 Apr 2026 16:27:35 +0100
+Subject: [PATCH 05/10] stratis: fix pool limit accounting in
+ {create,delete}_snapshot()
+
+Resolves: #971
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ snapm/manager/plugins/stratis.py | 29 ++++++++++++++++++++++++-----
+ tests/test_stratis.py            | 22 ++++++++++++++++++++++
+ 2 files changed, 46 insertions(+), 5 deletions(-)
+
+diff --git a/snapm/manager/plugins/stratis.py b/snapm/manager/plugins/stratis.py
+index 4c6dc8c6..1321a897 100644
+--- a/snapm/manager/plugins/stratis.py
++++ b/snapm/manager/plugins/stratis.py
+@@ -466,7 +466,7 @@ class Stratis(Plugin):
+         if self.priority == PLUGIN_NO_PRIORITY:
+             self.priority = STRATIS_STATIC_PRIORITY
+ 
+-    # pylint: disable=too-many-locals
++    # pylint: disable=too-many-locals,too-many-branches
+     def discover_snapshots(self):
+         """
+         Discover snapshots managed by this plugin class.
+@@ -488,6 +488,12 @@ class Stratis(Plugin):
+             for path, info in pools().search(managed_objects)
+         )
+ 
++        # Initialise pool snapshot counters to 0
++        for pool in path_to_name.values():
++            pool_name = str(pool)
++            if pool_name not in self.pools:
++                self.pools[pool_name] = 0
++
+         filesystems_with_props = [
+             MOFilesystem(info)
+             for objpath, info in filesystems(props=None)
+@@ -532,11 +538,9 @@ class Stratis(Plugin):
+                     )
+                 )
+ 
++        # Set or update pool snapshot counters (limit checking)
+         for snapshot in snapshots:
+-            if snapshot.pool_name not in self.pools:
+-                self.pools[snapshot.pool_name] = 1
+-            else:
+-                self.pools[snapshot.pool_name] += 1
++            self.pools[snapshot.pool_name] += 1
+ 
+         if self.limits.snapshots_per_pool > 0:
+             for pool, count in self.pools.items():
+@@ -713,6 +717,12 @@ class Stratis(Plugin):
+                 f"Stratis daemon reported no change creating snapshot {snapshot_name}"
+             )
+ 
++        # Increment or set pool snapshot counter
++        if pool_name in self.pools:
++            self.pools[pool_name] += 1
++        else:
++            self.pools[pool_name] = 1
++
+         return StratisSnapshot(
+             f"{pool_name}/{snapshot_name}",
+             snapset_name,
+@@ -799,6 +809,15 @@ class Stratis(Plugin):
+                 )
+             )
+ 
++        # Decrement pool snapshot counter
++        if pool_name in self.pools:
++            self.pools[pool_name] -= 1
++        else:
++            # This is harmless but indicates a bug (plugin methods called out-of-sequence).
++            self._log_warn(
++                "Deleted untracked snapshot set member: %s/%s", pool_name, fs_name
++            )
++
+     # pylint: disable=too-many-arguments
+     def rename_snapshot(self, old_name, origin, snapset_name, timestamp, mount_point):
+         """
+diff --git a/tests/test_stratis.py b/tests/test_stratis.py
+index edbb1a0f..89e80f7c 100644
+--- a/tests/test_stratis.py
++++ b/tests/test_stratis.py
+@@ -186,6 +186,28 @@ class StratisTests(unittest.TestCase):
+         snapshots = stratis_plugin.discover_snapshots()
+         self.assertEqual(len(snapshots), 2)
+ 
++    def test_stratis_create_delete_pool_accounting(self):
++        # Verify that pool snapshot counters are properly updated around
++        # create/delete operations.
++
++        # Plugin setup
++        stratis_plugin = stratis.Stratis(log, ConfigParser())
++        snapshots = stratis_plugin.discover_snapshots()
++        pool1_count = stratis_plugin.pools["pool1"]
++
++        # Create snapshot via Plugin.create_snapshot()
++        stratis_plugin.start_transaction()
++        stratis_plugin.check_create_snapshot("pool1/fs1", "test", 1721136677, "/opt", "1%SIZE")
++        stratis_plugin.create_snapshot("pool1/fs1", "test", 1721136677, "/opt", "1%SIZE")
++        stratis_plugin.end_transaction()
++
++        # Verify counter incremented
++        self.assertEqual(stratis_plugin.pools["pool1"], pool1_count + 1)
++
++        # Delete snapshot & verify decrement
++        stratis_plugin.delete_snapshot("pool1/fs1-snapset_test_1721136677_-opt")
++        self.assertEqual(stratis_plugin.pools["pool1"], pool1_count)
++
+     def test_stratis_can_snapshot_no_stratisd(self):
+         systemctl_stop_args = _systemctl_args("stop")
+         run(systemctl_stop_args, check=True)
+-- 
+2.53.0
+

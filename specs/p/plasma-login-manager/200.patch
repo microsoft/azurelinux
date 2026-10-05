@@ -1,0 +1,42 @@
+From 0893ab2b7a30c15aeccd72e499b2ee34030616dd Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@kde.org>
+Date: Wed, 2 Sep 2026 10:15:34 -0400
+Subject: [PATCH] data/pam: fedora: Enable support for oo7 managed wallets
+
+Reference: https://fedoraproject.org/wiki/Changes/oo7_Secrets_Service_Provider
+---
+ data/pam/fedora/plasmalogin           | 2 ++
+ data/pam/fedora/plasmalogin-autologin | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/data/pam/fedora/plasmalogin b/data/pam/fedora/plasmalogin
+index 34c07775..703815e9 100644
+--- a/data/pam/fedora/plasmalogin
++++ b/data/pam/fedora/plasmalogin
+@@ -3,6 +3,7 @@ auth        substack      password-auth
+ -auth        optional      pam_gnome_keyring.so
+ -auth        optional      pam_kwallet5.so
+ -auth        optional      pam_kwallet.so
++-auth        optional      pam_oo7.so
+ auth        include       postlogin
+ 
+ account     required      pam_nologin.so
+@@ -20,4 +21,5 @@ session     include       password-auth
+ -session     optional      pam_gnome_keyring.so auto_start
+ -session     optional      pam_kwallet5.so auto_start
+ -session     optional      pam_kwallet.so auto_start
++-session     optional      pam_oo7.so auto_start
+ session     include       postlogin
+diff --git a/data/pam/fedora/plasmalogin-autologin b/data/pam/fedora/plasmalogin-autologin
+index f62fad0b..0088304e 100644
+--- a/data/pam/fedora/plasmalogin-autologin
++++ b/data/pam/fedora/plasmalogin-autologin
+@@ -17,4 +17,5 @@ session    include     system-auth
+ -session    optional    pam_gnome_keyring.so auto_start
+ -session    optional    pam_kwallet5.so auto_start
+ -session    optional    pam_kwallet.so auto_start
++-session    optional    pam_oo7.so auto_start
+ session    include     postlogin
+-- 
+GitLab
+

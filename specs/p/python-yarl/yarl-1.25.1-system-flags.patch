@@ -1,0 +1,339 @@
+From ebe89305f3e203cc6151cd3900abf6830c4469a7 Mon Sep 17 00:00:00 2001
+From: aiolibsbot <aiolibsbot@koston.org>
+Date: Sat, 16 May 2026 16:58:09 +0000
+Subject: [PATCH 1/4] Add YARL_NO_BUILD_OPTIMIZATION_FLAGS opt-out for distro
+ builds
+
+Downstream packagers (Linux distros, Homebrew, MacPorts, ...) build with
+their own CFLAGS/LDFLAGS conventions (typically -g -O2 plus splitting
+debug symbols into separate packages). Since #1586 the PEP 517 backend
+unconditionally injects -g0 -Ofast -DNDEBUG and -s, stripping debug
+symbols even when the packager supplied -g.
+
+Introduce YARL_NO_BUILD_OPTIMIZATION_FLAGS: when truthy, skip the
+hardcoded release-mode flag injection. The pyproject.toml-derived env
+and the user's CFLAGS/LDFLAGS still apply. Debug/coverage flags for
+the Cython-tracing path are unaffected because they are functionally
+tied to that build mode.
+
+Closes #1592.
+---
+ CHANGES/1592.packaging.rst                    |  8 ++++
+ .../pep517_backend/_cython_configuration.py   | 38 +++++++++++++++++--
+ 2 files changed, 42 insertions(+), 4 deletions(-)
+ create mode 100644 CHANGES/1592.packaging.rst
+
+diff --git a/CHANGES/1592.packaging.rst b/CHANGES/1592.packaging.rst
+new file mode 100644
+index 0000000..54ccbd5
+--- /dev/null
++++ b/CHANGES/1592.packaging.rst
+@@ -0,0 +1,8 @@
++Added an opt-out environment variable
++``YARL_NO_BUILD_OPTIMIZATION_FLAGS`` for the PEP 517 backend. When set to
++a truthy value (``1``, ``true``, ``on``, ``yes``), the build no longer
++injects the hardcoded release-mode flags (``-g0 -Ofast -DNDEBUG`` and
++``-s``), so downstream packagers (Linux distributions, Homebrew,
++MacPorts, ...) can build with their own :envvar:`CFLAGS` and
++:envvar:`LDFLAGS` and keep debug symbols
++-- by :user:`aiolibsbot`.
+diff --git a/packaging/pep517_backend/_cython_configuration.py b/packaging/pep517_backend/_cython_configuration.py
+index 0f084e9..b21fabe 100644
+--- a/packaging/pep517_backend/_cython_configuration.py
++++ b/packaging/pep517_backend/_cython_configuration.py
+@@ -21,6 +21,28 @@ if _t.TYPE_CHECKING:
+     import collections.abc as _c  # noqa: WPS111, WPS301
+ 
+ 
++NO_OPTIMIZATION_FLAGS_ENV_VAR = 'YARL_NO_BUILD_OPTIMIZATION_FLAGS'
++"""
++Environment variable name to opt out of hardcoded release-build flags.
++
++When set to a truthy value (``1``, ``true``, ``on``, ``yes``), the PEP 517
++backend will not inject the default release-mode compiler/linker flags
++(``-g0 -Ofast -DNDEBUG`` and ``-s``). The user's :envvar:`CFLAGS` and
++:envvar:`LDFLAGS` (and any flags from :file:`pyproject.toml`) are still
++applied. Intended for downstream packagers (Linux distributions, Homebrew,
++MacPorts, etc.) that build with their own optimization and debug-symbol
++conventions.
++"""  # noqa: WPS322
++
++
++def _should_inject_release_flags() -> bool:
++    """Return ``True`` unless the user opted out via env var."""
++    truthy_values = {'1', 'true', 'on', 'yes'}
++    return os.environ.get(
++        NO_OPTIMIZATION_FLAGS_ENV_VAR, '',
++    ).lower() not in truthy_values
++
++
+ class Config(_t.TypedDict):
+     """Data structure for the TOML config."""
+ 
+@@ -221,9 +243,14 @@ def patched_env(
+             if cython_line_tracing_requested
+             # Release mode:
+             else (
+-                '-g0',  # no debug symbols
+-                '-Ofast',  # maximum optimization
+-                '-DNDEBUG',  # disable assertions
++                (
++                    '-g0',  # no debug symbols
++                    '-Ofast',  # maximum optimization
++                    '-DNDEBUG',  # disable assertions
++                )
++                if _should_inject_release_flags()
++                # Downstream-packager mode: keep their own CFLAGS as-is.
++                else ()
+             )
+         ),
+         *(
+@@ -253,7 +280,10 @@ def patched_env(
+             if cython_line_tracing_requested
+             # Release mode:
+             else (
+-                '-s',  # remove all symbol table and relocation information
++                ('-s',)  # remove all symbol table and relocation information
++                if _should_inject_release_flags()
++                # Downstream-packager mode: keep their own LDFLAGS as-is.
++                else ()
+             )
+         ),
+         # Finally, append the user-set env var, ensuring its top priority:
+-- 
+2.55.0
+
+
+From 9e4d5810684a29fdf0b5b0949a9d0dbd71b2a8a6 Mon Sep 17 00:00:00 2001
+From: aiolibsbot <aiolibsbot@koston.org>
+Date: Sat, 16 May 2026 20:29:27 +0000
+Subject: [PATCH 2/4] rebase: apply review feedback on #1675
+
+---
+ CHANGES/1592.packaging.rst                    | 16 ++++----
+ packaging/pep517_backend/_backend.py          | 34 +++++++++++++++++
+ .../pep517_backend/_cython_configuration.py   | 37 ++++---------------
+ 3 files changed, 50 insertions(+), 37 deletions(-)
+
+diff --git a/CHANGES/1592.packaging.rst b/CHANGES/1592.packaging.rst
+index 54ccbd5..bc3a055 100644
+--- a/CHANGES/1592.packaging.rst
++++ b/CHANGES/1592.packaging.rst
+@@ -1,8 +1,8 @@
+-Added an opt-out environment variable
+-``YARL_NO_BUILD_OPTIMIZATION_FLAGS`` for the PEP 517 backend. When set to
+-a truthy value (``1``, ``true``, ``on``, ``yes``), the build no longer
+-injects the hardcoded release-mode flags (``-g0 -Ofast -DNDEBUG`` and
+-``-s``), so downstream packagers (Linux distributions, Homebrew,
+-MacPorts, ...) can build with their own :envvar:`CFLAGS` and
+-:envvar:`LDFLAGS` and keep debug symbols
+--- by :user:`aiolibsbot`.
++Added an opt-out toggle for the PEP 517 backend exposed as the
++``no-build-optimization-flags`` config setting and the
++:envvar:`YARL_NO_BUILD_OPTIMIZATION_FLAGS` environment variable. When set
++to a truthy value (``1``, ``true``, ``on``), the build no longer injects
++the hardcoded release-mode flags (``-g0 -Ofast -DNDEBUG`` and ``-s``), so
++downstream packagers (Linux distributions, Homebrew, MacPorts, ...) can
++build with their own :envvar:`CFLAGS` and :envvar:`LDFLAGS` and keep debug
++symbols -- by :user:`aiolibsbot`.
+diff --git a/packaging/pep517_backend/_backend.py b/packaging/pep517_backend/_backend.py
+index 77c85d3..b9e722a 100644
+--- a/packaging/pep517_backend/_backend.py
++++ b/packaging/pep517_backend/_backend.py
+@@ -97,6 +97,23 @@ Environment variable name toggle for building C-exts in-place.
+ PURE_PYTHON_ENV_VAR = 'YARL_NO_EXTENSIONS'
+ """Environment variable name toggle used to opt out of making C-exts."""
+ 
++NO_OPTIMIZATION_FLAGS_CONFIG_SETTING = 'no-build-optimization-flags'  # noqa: WPS462
++"""
++Config setting name toggle used to opt out of hardcoded release-build flags.
++"""  # noqa: WPS322
++
++NO_OPTIMIZATION_FLAGS_ENV_VAR = 'YARL_NO_BUILD_OPTIMIZATION_FLAGS'
++"""
++Environment variable name toggle used to opt out of hardcoded release-build flags.
++
++When truthy, the PEP 517 backend will not inject the default release-mode
++compiler/linker flags (``-g0 -Ofast -DNDEBUG`` and ``-s``). The user's
++:envvar:`CFLAGS` and :envvar:`LDFLAGS` (and any flags from
++:file:`pyproject.toml`) are still applied. Intended for downstream packagers
++(Linux distributions, Homebrew, MacPorts, etc.) that build with their own
++optimization and debug-symbol conventions.
++"""  # noqa: WPS322
++
+ IS_CPYTHON = _system_implementation.name == 'cpython'
+ """A flag meaning that the current interpreter implementation is CPython."""
+ 
+@@ -165,6 +182,17 @@ def _build_inplace(
+     )
+ 
+ 
++def _no_build_optimization_flags(
++    config_settings: _ConfigDict | None = None,
++) -> bool:
++    return _get_setting_value(
++        config_settings,
++        NO_OPTIMIZATION_FLAGS_CONFIG_SETTING,
++        NO_OPTIMIZATION_FLAGS_ENV_VAR,
++        default=False,
++    )
++
++
+ @contextmanager
+ def patched_distutils_cmd_install() -> _c.Iterator[None]:
+     """Make `install_lib` of `install` cmd always use `platlib`.
+@@ -288,6 +316,9 @@ def maybe_prebuild_c_extensions(
+         config_settings,
+         default=line_trace_cython_when_unset,
+     )
++    no_build_optimization_flags_requested = _no_build_optimization_flags(
++        config_settings,
++    )
+     is_pure_python_build = _make_pure_python(config_settings)
+ 
+     if is_pure_python_build:
+@@ -374,6 +405,9 @@ def maybe_prebuild_c_extensions(
+         with _patched_cython_env(
+             config['env'],
+             cython_line_tracing_requested=cython_line_tracing_requested,
++            no_build_optimization_flags_requested=(
++                no_build_optimization_flags_requested
++            ),
+             original_source_directory=original_src_dir,
+             temporary_build_directory=tmp_build_dir,
+         ):
+diff --git a/packaging/pep517_backend/_cython_configuration.py b/packaging/pep517_backend/_cython_configuration.py
+index b21fabe..9945725 100644
+--- a/packaging/pep517_backend/_cython_configuration.py
++++ b/packaging/pep517_backend/_cython_configuration.py
+@@ -21,28 +21,6 @@ if _t.TYPE_CHECKING:
+     import collections.abc as _c  # noqa: WPS111, WPS301
+ 
+ 
+-NO_OPTIMIZATION_FLAGS_ENV_VAR = 'YARL_NO_BUILD_OPTIMIZATION_FLAGS'
+-"""
+-Environment variable name to opt out of hardcoded release-build flags.
+-
+-When set to a truthy value (``1``, ``true``, ``on``, ``yes``), the PEP 517
+-backend will not inject the default release-mode compiler/linker flags
+-(``-g0 -Ofast -DNDEBUG`` and ``-s``). The user's :envvar:`CFLAGS` and
+-:envvar:`LDFLAGS` (and any flags from :file:`pyproject.toml`) are still
+-applied. Intended for downstream packagers (Linux distributions, Homebrew,
+-MacPorts, etc.) that build with their own optimization and debug-symbol
+-conventions.
+-"""  # noqa: WPS322
+-
+-
+-def _should_inject_release_flags() -> bool:
+-    """Return ``True`` unless the user opted out via env var."""
+-    truthy_values = {'1', 'true', 'on', 'yes'}
+-    return os.environ.get(
+-        NO_OPTIMIZATION_FLAGS_ENV_VAR, '',
+-    ).lower() not in truthy_values
+-
+-
+ class Config(_t.TypedDict):
+     """Data structure for the TOML config."""
+ 
+@@ -206,6 +184,7 @@ def patched_env(
+     env: dict[str, str],
+     *,
+     cython_line_tracing_requested: bool,
++    no_build_optimization_flags_requested: bool = False,
+     original_source_directory: Path | None = None,
+     temporary_build_directory: Path | None = None,
+ ) -> _c.Iterator[None]:
+@@ -243,14 +222,14 @@ def patched_env(
+             if cython_line_tracing_requested
+             # Release mode:
+             else (
+-                (
++                ()
++                if no_build_optimization_flags_requested
++                # Downstream-packager mode: keep their own CFLAGS as-is.
++                else (
+                     '-g0',  # no debug symbols
+                     '-Ofast',  # maximum optimization
+                     '-DNDEBUG',  # disable assertions
+                 )
+-                if _should_inject_release_flags()
+-                # Downstream-packager mode: keep their own CFLAGS as-is.
+-                else ()
+             )
+         ),
+         *(
+@@ -280,10 +259,10 @@ def patched_env(
+             if cython_line_tracing_requested
+             # Release mode:
+             else (
+-                ('-s',)  # remove all symbol table and relocation information
+-                if _should_inject_release_flags()
++                ()
++                if no_build_optimization_flags_requested
+                 # Downstream-packager mode: keep their own LDFLAGS as-is.
+-                else ()
++                else ('-s',)  # remove all symbol table and relocation info
+             )
+         ),
+         # Finally, append the user-set env var, ensuring its top priority:
+-- 
+2.55.0
+
+
+From 070573d1ce933910f3843ea0275e16c1f1235646 Mon Sep 17 00:00:00 2001
+From: aiolibsbot <aiolibsbot@koston.org>
+Date: Sat, 16 May 2026 20:32:33 +0000
+Subject: [PATCH 3/4] fix: resolve pre-existing CI failures on #1675
+
+---
+ docs/spelling_wordlist.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/docs/spelling_wordlist.txt b/docs/spelling_wordlist.txt
+index a334cc9..6ae3e79 100644
+--- a/docs/spelling_wordlist.txt
++++ b/docs/spelling_wordlist.txt
+@@ -6,6 +6,7 @@ Codecov
+ Cython
+ Deprecations
+ GPG
++Homebrew
+ IPv
+ PRs
+ PYX
+@@ -72,6 +73,7 @@ subtree
+ svetlov
+ toolchain
+ tox
++truthy
+ uncompiled
+ unencoded
+ unobvious
+-- 
+2.55.0
+
+
+From 68bf4600e3304fbcb2cfc28759d3b3f4acb78c7a Mon Sep 17 00:00:00 2001
+From: aiolibsbot <aiolibsbot@koston.org>
+Date: Sat, 16 May 2026 21:23:38 +0000
+Subject: [PATCH 4/4] fix: resolve CI failures on #1675 (attempt 1)
+
+---
+ docs/conf.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/docs/conf.py b/docs/conf.py
+index c6f9077..474ef17 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -445,6 +445,7 @@ default_role = "any"
+ nitpicky = True
+ nitpick_ignore = [
+     ("envvar", "TMPDIR"),
++    ("envvar", "YARL_NO_BUILD_OPTIMIZATION_FLAGS"),
+ ]
+ 
+ # -- Options for towncrier_draft extension -----------------------------------
+-- 
+2.55.0
+

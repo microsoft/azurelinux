@@ -20,7 +20,7 @@ Summary: OpenPrinting CUPS filters for CUPS 2.X
 Name:    cups-filters
 Epoch:   1
 Version: 2.0.1
-Release: 15%{?dist}
+Release: 21%{?dist}
 
 # the CUPS exception text is the same as LLVM exception, so using that name with
 # agreement from legal team
@@ -47,12 +47,9 @@ Patch003: foomatic-ripdie-error.patch
 Patch004: foomaticrip-reject-unknown-values.patch
 # CVE-2025-64524 fix
 Patch005: 0001-rastertopclx.c-Fix-infinite-loop-caused-by-crafted-f.patch
+# additional reject rule in foomatic-rip
+Patch006: 0001-foomatic-rip-Reject-options-defined-by-FoomaticRIPOp.patch
 
-
-# driverless backend/driver was moved into a separate package to
-# remove avahi dependency for filters
-# remove once C10S is released and F40 is EOL
-Conflicts: cups-filters-driverless < 1:2.0.0-3
 
 # autogen.sh
 BuildRequires: autoconf
@@ -101,11 +98,6 @@ workflow introduced by OpenPrinting.
 Summary: OpenPrinting driverless backends and drivers for CUPS 2.X
 License: Apache-2.0 WITH LLVM-exception
 
-# backends and drivers has been moved from the main package to subpackage
-# to remove the avahi/mdns dependency needed for driverless
-# remove after F40 is EOL and C10S is released
-Conflicts: cups-filters < 1:2.0.0-3
-
 # finding device via driverless depends on running avahi-daemon
 Requires: avahi
 # ippfind is used in driverless backend, not needed classic PPD based print queue
@@ -133,7 +125,7 @@ queues.
 %prep
 %autosetup -S git -N
 
-%if 0%{?fedora} >= 43 || 0%{?rhel} >=9
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 9
 %autopatch
 %else
 %autopatch -M 3
@@ -162,28 +154,31 @@ queues.
 install -p -m 0755 %{SOURCE2} %{buildroot}%{_cups_serverbin}/filter/lftocrlf
 install -p -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/ppd/cupsfilters/lftocrlf.ppd
 
-%if 0%{?fedora} >= 43 || 0%{?rhel} >=9
+# remove this once F44 is EOL and Centos 11 is forked
+# was to be removed in F43, but new corner case - FoomaticRipOption - was found.
+# So remove the code later
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 9
 
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
 
 cat > %{buildroot}%{_libexecdir}/%{name}/posttrans.sh << EOF
 #!/usr/bin/bash
 
-if \$(grep -q -R 'FoomaticRIPCommandLine\|FoomaticRipOptionSetting' %{_sysconfdir}/cups/ppd)
+if grep -q -R 'FoomaticRIPCommandLine\|FoomaticRIPOptionSetting\|FoomaticRIPOption' %{_sysconfdir}/cups/ppd
 then
   tmpfile=\$(mktemp -p /var/tmp foomatic-scan.XXXXXXXX)
 
   for ppd in %{_sysconfdir}/cups/ppd/*.ppd
   do
-    foomatic-hash --ppd \$ppd \$tmpfile %{_sysconfdir}/foomatic/hashes.d/hashes.upgrade || :
+    foomatic-hash --ppd \$ppd \$tmpfile %{_sysconfdir}/foomatic/hashes.d/hashes.foomatic-opt-update || :
   done
 
-  if test -f %{_sysconfdir}/foomatic/hashes.d/hashes.upgrade
+  if test -f %{_sysconfdir}/foomatic/hashes.d/hashes.foomatic-opt-update
   then
     echo "Foomatic-rip values which can inject code found - review findings in \$tmpfile. Read release notes for instructions." || :
   fi
 else
-  touch %{_sysconfdir}/foomatic/hashes.d/hashes.new
+  touch %{_sysconfdir}/foomatic/hashes.d/hashes.foomatic-opt-update
 fi
 
 exit 0
@@ -195,7 +190,7 @@ cat > %{buildroot}%{_unitdir}/foomaticrip-upgrade.service << EOF
 [Unit]
 Description=Allowing already installed printers for foomatic-rip
 ConditionPathIsDirectory=%{_sysconfdir}/foomatic/hashes.d
-ConditionDirectoryNotEmpty=!%{_sysconfdir}/foomatic/hashes.d
+ConditionPathExists=!%{_sysconfdir}/foomatic/hashes.d/hashes.foomatic-opt-update
 
 [Service]
 Type=oneshot
@@ -250,25 +245,25 @@ then
   rm -f /var/cache/cups/ppds.dat || :
 fi
 
-%if 0%{?fedora} >= 43 || 0%{?rhel} >=9
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 9
   %systemd_post foomaticrip-upgrade.service
 %endif
 
 
 %preun
-%if 0%{?fedora} >= 43 || 0%{?rhel} >=9
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 9
   %systemd_preun foomaticrip-upgrade.service
 %endif
 
 
 %postun
-%if 0%{?fedora} >= 43 || 0%{?rhel} >=9
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 9
   %systemd_postun foomaticrip-upgrade.service
 %endif
 
 
 %posttrans
-%if 0%{?fedora} >= 43 || 0%{?rhel} >=9
+%if 0%{?fedora} >= 43 || 0%{?rhel} >= 9
   %systemd_posttrans_with_reload foomaticrip-upgrade.service
 %endif
 
@@ -282,7 +277,7 @@ then
     systemctl restart cups || :
   fi
 
-  %if 0%{?fedora} >= 43 || 0%{?rhel} >=9
+  %if 0%{?fedora} >= 43 || 0%{?rhel} >= 9
     systemctl start foomaticrip-upgrade.service || :
   %endif
 fi
@@ -367,6 +362,21 @@ fi
 
 
 %changelog
+* Tue Sep 01 2026 Zdenek Dohnal <zdohnal@redhat.com> - 1:2.0.1-17
+- reject FoomaticRIPOption in foomatic-rip as well
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.1-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Feb 12 2026 Zdenek Dohnal <zdohnal@redhat.com> - 1:2.0.1-15
+- remove unneeded command substitution in postrans script
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Nov 28 2025 Zdenek Dohnal <zdohnal@redhat.com> - 1:2.0.1-12
 - fix CVE-2025-64524
 

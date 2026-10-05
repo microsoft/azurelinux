@@ -1,0 +1,811 @@
+From 8f33c1304dec167e844074e89fca857fd3a40df0 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Mon, 7 Sep 2026 16:12:33 +0300
+Subject: [PATCH 1/4] Allow fine tuned privilege check
+
+Let users pass through the privilege check if either
+- whole entry read granted ('v' in the GER response)
+- at least one attribute read granted
+
+This is enough to allow LDAPRetrieve to pass, because the rest is
+controlled by the explicit ACIs in LDAP.
+
+Remove permission checks from member-management commands as they apply
+those ACI checks per each individual member (some might fail, some will
+succeed). The partial success is supported and expected by tests.
+
+Related: CVE-2026-79678
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ ipaserver/plugins/baseldap.py  | 98 ++++++++++++++++++++++++++--------
+ ipaserver/plugins/privilege.py | 29 +++++++---
+ 2 files changed, 98 insertions(+), 29 deletions(-)
+
+diff --git a/ipaserver/plugins/baseldap.py b/ipaserver/plugins/baseldap.py
+index d693c7112d5..122a279f2bb 100644
+--- a/ipaserver/plugins/baseldap.py
++++ b/ipaserver/plugins/baseldap.py
+@@ -1001,7 +1001,10 @@ class BaseLDAPCommand(Method):
+     enforce_managed_permission_operations = []
+ 
+     def enforce_managed_permissions(self, *keys, **options):
+-        from ipaserver.plugins.privilege import principal_has_privilege
++        # avoid circular import through explicit plugin reference
++        principal_has_privilege = (
++            self.api.packages[0].privilege.principal_has_privilege
++        )
+         mp = getattr(self.obj, 'managed_permissions', None)
+         if not mp:
+             return
+@@ -1024,23 +1027,31 @@ def has_privilege(priv):
+                     self.api, op_account, priv)
+             return priv_cache[priv]
+ 
+-        # Effective rights, if needed at all, are fetched once in a single
+-        # get-effective-rights round trip shared by every permission below.
+-        # probe['res'] is (entry_rights, {attr: rights}) or None (no entry).
+-        probe = {}
++        # LDAPDelete and other LDAPMultiQuery commands pass the trailing
++        # primary key as a *list* of pkeys and act on each target entry in
++        # turn (see LDAPDelete.execute). get_dn and the effective-rights probes
++        # below operate on a single entry, so expand the operation into its
++        # individual targets and require the right on every one of them.
++        target_keys = self._expand_target_keys(keys)
+ 
+-        def rights_allow(right, perm, touched):
++        # Effective rights, if needed at all, are fetched at most once per
++        # target in a single get-effective-rights round trip shared by every
++        # permission checked for that target. probes[i]['res'] is
++        # (entry_rights, {attr: rights}) or None (no entry).
++        probes = [{} for _ in target_keys]
++
++        def right_allowed_for(right, perm, touched, probe, tkeys):
+             if right == 'add':
+                 # The target does not exist yet and target-scoped/SELFDN add
+                 # ACIs cannot be evaluated through a get-effective-rights
+                 # template probe, so detect the right with a trial add of the
+                 # real target entry (see _can_add_target).
+                 if 'add' not in probe:
+-                    probe['add'] = self._can_add_target(*keys, **options)
++                    probe['add'] = self._can_add_target(*tkeys, **options)
+                 return probe['add']
+             if 'res' not in probe:
+                 probe['res'] = self._probe_effective_rights(
+-                    mp, enforce_mp, *keys, **options)
++                    mp, enforce_mp, *tkeys, **options)
+             res = probe['res']
+             if res is None:
+                 # Entry does not exist; let the operation report it properly.
+@@ -1054,11 +1065,31 @@ def rights_allow(right, perm, touched):
+                 if not attrs:
+                     return True
+                 return any('w' in attr_rights.get(a, '') for a in attrs)
+-            # read / search / compare
+-            attrs = {a.lower() for a in perm.get('ipapermdefaultattr', ())}
+-            if not attrs:
++            # read / search / compare: a read is never denied wholesale by
++            # 389-ds -- it returns the entry and silently filters out the
++            # individual attributes the caller may not see.  Permit the
++            # operation whenever the caller can view the entry (entry-level
++            # 'v') or read *any* of its attributes.  IPA's read ACIs are
++            # attribute-scoped, so an unprivileged caller reading its own entry
++            # gets 'entryLevelRights: none' yet can still read cn/sn/mail/...;
++            # requiring read on this permission's specific attributes would
++            # wrongly turn such a legitimate partial read into a total denial.
++            # Attribute-level confidentiality (e.g. the admin-only Kerberos
++            # login attributes) stays enforced by 389-ds on the read that
++            # follows.  The probe always requests '*' (see
++            # _probe_effective_rights), so attr_rights reflects every attribute.
++            if 'v' in entry_rights:
+                 return True
+-            return any('r' in attr_rights.get(a, '') for a in attrs)
++            return any('r' in r for r in attr_rights.values())
++
++        def rights_allow(right, perm, touched):
++            # Permit only if the caller may perform the operation on *every*
++            # target entry the command names (a batch delete/retrieve must be
++            # authorised for all of its pkeys).
++            return all(
++                right_allowed_for(right, perm, touched, probe, tkeys)
++                for probe, tkeys in zip(probes, target_keys)
++            )
+ 
+         modified_attrs = None  # computed lazily, only for 'write'
+         for m in mp.keys():
+@@ -1106,6 +1137,20 @@ def rights_allow(right, perm, touched):
+                 raise errors.ACIError(
+                     info=_("not allowed to perform this operation"))
+ 
++    def _expand_target_keys(self, keys):
++        """Expand an operation's keys into one key-tuple per target entry.
++
++        LDAPDelete and other LDAPMultiQuery commands pass the trailing primary
++        key as a list of pkeys and iterate over it, calling get_dn once per
++        entry (see LDAPDelete.execute). get_dn and the effective-rights probes
++        expect a single pkey, so mirror that expansion here. For ordinary
++        single-target commands the keys are returned unchanged as one tuple.
++        """
++        if keys and self.obj.primary_key and isinstance(
++                keys[-1], (list, tuple)):
++            return [keys[:-1] + (pkey,) for pkey in keys[-1]]
++        return [tuple(keys)]
++
+     def _modified_attributes(self, **options):
+         """Best-effort set of LDAP attributes an update operation changes.
+ 
+@@ -1214,8 +1259,14 @@ def _probe_effective_rights(self, mp, enforce_mp, *keys, **options):
+                 continue
+             needed.update(a.lower() for a in perm.get('ipapermdefaultattr', ()))
+ 
++        # Always include '*' so the effective rights cover every attribute of
++        # the entry, not only the gated ones.  The read/search/compare check
++        # needs to know whether the caller can read *any* attribute (an
++        # unprivileged caller may read its own entry without holding the
++        # object's read privilege), which cannot be answered from the gated
++        # attributes alone.
+         try:
+-            rights = ldap.get_effective_rights(dn, sorted(needed) or ['*'])
++            rights = ldap.get_effective_rights(dn, sorted(needed | {'*'}))
+         except errors.NotFound:
+             return None
+ 
+@@ -2020,7 +2071,9 @@ class LDAPAddMember(LDAPModMember):
+     member_param_doc = _('%s to add')
+     member_count_out = ('%i member added.', '%i members added.')
+     allow_same = False
+-    enforce_managed_permission_operations = ['write']
++    # Member writes are enforced per-member by 389-ds and reported gracefully
++    # in the command's `failed` output, so no API-level gate is applied here
++    # (an up-front ACIError would abort the whole batch instead).
+ 
+     has_output = (
+         output.Entry('result'),
+@@ -2037,8 +2090,6 @@ class LDAPAddMember(LDAPModMember):
+     has_output_params = global_output_params
+ 
+     def execute(self, *keys, **options):
+-        self.enforce_managed_permissions(*keys, **options)
+-
+         ldap = self.obj.backend
+ 
+         (member_dns, failed) = self.get_member_dns(**options)
+@@ -2121,7 +2172,9 @@ class LDAPRemoveMember(LDAPModMember):
+     """
+     member_param_doc = _('%s to remove')
+     member_count_out = ('%i member removed.', '%i members removed.')
+-    enforce_managed_permission_operations = ['write']
++    # Member writes are enforced per-member by 389-ds and reported gracefully
++    # in the command's `failed` output, so no API-level gate is applied here
++    # (an up-front ACIError would abort the whole batch instead).
+ 
+     has_output = (
+         output.Entry('result'),
+@@ -2138,8 +2191,6 @@ class LDAPRemoveMember(LDAPModMember):
+     has_output_params = global_output_params
+ 
+     def execute(self, *keys, **options):
+-        self.enforce_managed_permissions(*keys, **options)
+-
+         ldap = self.obj.backend
+ 
+         (member_dns, failed) = self.get_member_dns(**options)
+@@ -2715,8 +2766,6 @@ def _update_attrs(self, update, entry_attrs):
+         )
+ 
+     def execute(self, *keys, **options):
+-        self.enforce_managed_permissions(*keys, **options)
+-
+         ldap = self.obj.backend
+         try:
+             index = tuple(self.args).index(self.attribute)
+@@ -2725,6 +2774,13 @@ def execute(self, *keys, **options):
+         else:
+             obj_keys = keys[:index]
+ 
++        # Enforce on the target entry's own keys.  For the arg-based variants
++        # the attribute value is a trailing positional arg that is not part of
++        # the entry's DN (see obj_keys), so it must be excluded here: passing
++        # the full keys would make the effective-rights probe's get_dn target a
++        # bogus DN and silently bypass the check.
++        self.enforce_managed_permissions(*obj_keys, **options)
++
+         dn = self.obj.get_dn(*obj_keys, **options)
+         entry_attrs = ldap.make_entry(dn, self.args_options_2_entry(
+             *keys, **options))
+diff --git a/ipaserver/plugins/privilege.py b/ipaserver/plugins/privilege.py
+index 47f27f12c7d..65199adc0d8 100644
+--- a/ipaserver/plugins/privilege.py
++++ b/ipaserver/plugins/privilege.py
+@@ -92,11 +92,28 @@ def principal_has_privilege(api, principal, privilege):
+     privilege_dn = api.Object.privilege.get_dn(privilege)
+     ldap = api.Backend.ldap2
+     if principal is None:
+-        dn_or_princ = DN(ldap.conn.whoami_s()[4:])
+-        if dn_or_princ == DN('cn=Directory Manager'):
++        # whoami reports the bound identity as an entry DN, not a Kerberos
++        # principal name. Check its privilege membership directly by DN: a
++        # 'krbprincipalname=<DN>' filter can never match and would always
++        # (wrongly) report the caller as lacking the privilege.
++        bound_dn = DN(ldap.conn.whoami_s()[4:])
++        if bound_dn == DN('cn=Directory Manager'):
+             return True
+-    else:
+-        dn_or_princ = principal
++        filter = ldap.make_filter(
++            {'memberof': privilege_dn}, rules=ldap.MATCH_ALL)
++        try:
++            ldap.find_entries(base_dn=bound_dn, scope=ldap.SCOPE_BASE,
++                              filter=filter)
++            return True
++        except errors.ExecutionError:
++            # NotFound is the normal negative result (not a member, or the
++            # bound entry does not exist). Any other execution error (database
++            # error, limits, ...) cannot positively confirm the privilege
++            # either, and there is no Kerberos principal to fall back on for
++            # the ID override check below, so fail closed: not privileged.
++            return False
++
++    dn_or_princ = principal
+ 
+     # First try: Check if there is a principal that has the needed
+     # privilege.
+@@ -110,10 +127,6 @@ def principal_has_privilege(api, principal, privilege):
+     except errors.NotFound:
+         pass
+ 
+-    # Do not run ID override check for the user that has no Kerberos principal
+-    if principal is None:
+-        return False
+-
+     # Second try: Check if there is an idoverride for the principal as
+     # ipaOriginalUid that has the needed privilege.
+     filter = ldap.make_filter(
+
+From b1af1d8bbfad25c59073b6197808d57197c5062b Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Tue, 8 Sep 2026 09:54:57 +0300
+Subject: [PATCH 2/4] ipatests: fix XMLRPC test expecations
+
+Two classes of behavior changes:
+
+ - permission baseline is now 'read', not 'write'
+ - self-service LDAP ACI is slightly different
+
+Related: CVE-2026-79678
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ .../test_xmlrpc/test_permission_plugin.py     | 46 ++++++++++++-------
+ .../test_xmlrpc/test_selfservice_plugin.py    |  8 ++--
+ 2 files changed, 33 insertions(+), 21 deletions(-)
+
+diff --git a/ipatests/test_xmlrpc/test_permission_plugin.py b/ipatests/test_xmlrpc/test_permission_plugin.py
+index dbcd1173d7f..84b88e0c764 100644
+--- a/ipatests/test_xmlrpc/test_permission_plugin.py
++++ b/ipatests/test_xmlrpc/test_permission_plugin.py
+@@ -3182,6 +3182,18 @@ class test_permission_bindtype(Declarative):
+             expected=dict(
+                 value=permission1,
+                 summary=u'Added permission "%s"' % permission1,
++                messages=(
++                    {
++                        'message': ('The permission has read rights but no '
++                                    'attributes are set.'),
++                        'code': 13032,
++                        'type': 'warning',
++                        'name': 'MissingTargetAttributesinPermission',
++                        'data': {
++                            'right': 'read',
++                        }
++                    },
++                ),
+                 result=dict(
+                     dn=permission1_dn,
+                     cn=[permission1],
+@@ -3245,13 +3257,13 @@ class test_permission_bindtype(Declarative):
+                 summary=u'Modified permission "%s"' % permission1,
+                 messages=(
+                     {
+-                        'message': ('The permission has write rights but no '
++                        'message': ('The permission has read rights but no '
+                                     'attributes are set.'),
+                         'code': 13032,
+                         'type': 'warning',
+                         'name': 'MissingTargetAttributesinPermission',
+                         'data': {
+-                            'right': 'write',
++                            'right': 'read',
+                         }
+                     },
+                 ),
+@@ -3260,7 +3272,7 @@ class test_permission_bindtype(Declarative):
+                     cn=[permission1],
+                     objectclass=objectclasses.permission,
+                     type=[u'user'],
+-                    ipapermright=[u'write'],
++                    ipapermright=[u'read'],
+                     ipapermbindruletype=[u'all'],
+                     ipapermissiontype=[u'SYSTEM', u'V2'],
+                     ipapermlocation=[users_dn],
+@@ -3272,7 +3284,7 @@ class test_permission_bindtype(Declarative):
+             permission1, users_dn,
+             '(targetfilter = "(objectclass=posixaccount)")' +
+             '(version 3.0;acl "permission:%s";' % permission1 +
+-            'allow (write) userdn = "ldap:///all";)',
++            'allow (read) userdn = "ldap:///all";)',
+         ),
+ 
+         dict(
+@@ -3301,7 +3313,7 @@ class test_permission_bindtype(Declarative):
+                         dn=permission1_dn,
+                         cn=[permission1],
+                         type=[u'user'],
+-                        ipapermright=[u'write'],
++                        ipapermright=[u'read'],
+                         ipapermbindruletype=[u'all'],
+                         objectclass=objectclasses.permission,
+                         ipapermissiontype=[u'SYSTEM', u'V2'],
+@@ -3348,13 +3360,13 @@ class test_permission_bindtype(Declarative):
+                 summary=u'Modified permission "%s"' % permission1,
+                 messages=(
+                     {
+-                        'message': ('The permission has write rights but no '
++                        'message': ('The permission has read rights but no '
+                                     'attributes are set.'),
+                         'code': 13032,
+                         'type': 'warning',
+                         'name': 'MissingTargetAttributesinPermission',
+                         'data': {
+-                            'right': 'write',
++                            'right': 'read',
+                         }
+                     },
+                 ),
+@@ -3363,7 +3375,7 @@ class test_permission_bindtype(Declarative):
+                     cn=[permission1_renamed],
+                     type=[u'user'],
+                     objectclass=objectclasses.permission,
+-                    ipapermright=[u'write'],
++                    ipapermright=[u'read'],
+                     ipapermbindruletype=[u'all'],
+                     ipapermissiontype=[u'SYSTEM', u'V2'],
+                     ipapermlocation=[users_dn],
+@@ -3375,7 +3387,7 @@ class test_permission_bindtype(Declarative):
+             permission1_renamed, users_dn,
+             '(targetfilter = "(objectclass=posixaccount)")' +
+             '(version 3.0;acl "permission:%s";' % permission1_renamed +
+-            'allow (write) userdn = "ldap:///all";)',
++            'allow (read) userdn = "ldap:///all";)',
+         ),
+ 
+         dict(
+@@ -3391,13 +3403,13 @@ class test_permission_bindtype(Declarative):
+                 summary=u'Modified permission "%s"' % permission1_renamed,
+                 messages=(
+                     {
+-                        'message': ('The permission has write rights but no '
++                        'message': ('The permission has read rights but no '
+                                     'attributes are set.'),
+                         'code': 13032,
+                         'type': 'warning',
+                         'name': 'MissingTargetAttributesinPermission',
+                         'data': {
+-                            'right': 'write',
++                            'right': 'read',
+                         }
+                     },
+                 ),
+@@ -3406,7 +3418,7 @@ class test_permission_bindtype(Declarative):
+                     cn=[permission1_renamed],
+                     objectclass=objectclasses.permission,
+                     type=[u'user'],
+-                    ipapermright=[u'write'],
++                    ipapermright=[u'read'],
+                     ipapermbindruletype=[u'permission'],
+                     ipapermissiontype=[u'SYSTEM', u'V2'],
+                     ipapermlocation=[users_dn],
+@@ -3418,7 +3430,7 @@ class test_permission_bindtype(Declarative):
+             permission1_renamed, users_dn,
+             '(targetfilter = "(objectclass=posixaccount)")' +
+             '(version 3.0;acl "permission:%s";' % permission1_renamed +
+-            'allow (write) groupdn = "ldap:///%s";)' % permission1_renamed_dn,
++            'allow (read) groupdn = "ldap:///%s";)' % permission1_renamed_dn,
+         ),
+ 
+         dict(
+@@ -3432,13 +3444,13 @@ class test_permission_bindtype(Declarative):
+                 summary=u'Modified permission "%s"' % permission1_renamed,
+                 messages=(
+                     {
+-                        'message': ('The permission has write rights but no '
++                        'message': ('The permission has read rights but no '
+                                     'attributes are set.'),
+                         'code': 13032,
+                         'type': 'warning',
+                         'name': 'MissingTargetAttributesinPermission',
+                         'data': {
+-                            'right': 'write',
++                            'right': 'read',
+                         }
+                     },
+                 ),
+@@ -3447,7 +3459,7 @@ class test_permission_bindtype(Declarative):
+                     cn=[permission1],
+                     type=[u'user'],
+                     objectclass=objectclasses.permission,
+-                    ipapermright=[u'write'],
++                    ipapermright=[u'read'],
+                     ipapermbindruletype=[u'permission'],
+                     ipapermissiontype=[u'SYSTEM', u'V2'],
+                     ipapermlocation=[users_dn],
+@@ -3459,7 +3471,7 @@ class test_permission_bindtype(Declarative):
+             permission1, users_dn,
+             '(targetfilter = "(objectclass=posixaccount)")' +
+             '(version 3.0;acl "permission:%s";' % permission1 +
+-            'allow (write) groupdn = "ldap:///%s";)' % permission1_dn,
++            'allow (read) groupdn = "ldap:///%s";)' % permission1_dn,
+         ),
+ 
+         dict(
+diff --git a/ipatests/test_xmlrpc/test_selfservice_plugin.py b/ipatests/test_xmlrpc/test_selfservice_plugin.py
+index 3ce043e46a4..be86c5a6727 100644
+--- a/ipatests/test_xmlrpc/test_selfservice_plugin.py
++++ b/ipatests/test_xmlrpc/test_selfservice_plugin.py
+@@ -803,7 +803,7 @@ class test_selfservice_cli_add_del(Declarative):
+                      r'(version 3.0;acl '
+                      r'\22selfservice:selfservice_add_1002\22;'
+                      r'allow (write) (userdn = \22ldap:///self\22 '
+-                     r'and userdn = \22ldap:///all\22;)',
++                     r'and userdn = \22ldap:///all\22);)',
+             ),
+         ),
+ 
+@@ -881,7 +881,7 @@ class test_selfservice_cli_add_del(Declarative):
+                      r'(version 3.0;acl '
+                      r'\22selfservice:selfservice_add_1005\22;'
+                      r'allow (write) (userdn = \22ldap:///self\22 '
+-                     r'and userdn = \22ldap:///all\22;)',
++                     r'and userdn = \22ldap:///all\22);)',
+             ),
+         ),
+ 
+@@ -1591,7 +1591,7 @@ class test_selfservice_mod_cli(Declarative):
+                     r'(version 3.0;acl '
+                     r'\22selfservice:%s\22;'
+                     r'allow (write) (userdn = \22ldap:///self\22 '
+-                    r'and userdn = \22ldap:///all\22;)'
++                    r'and userdn = \22ldap:///all\22);)'
+                 ) % SS_CLI_MOD,
+             ),
+         ),
+@@ -1658,7 +1658,7 @@ class test_selfservice_mod_cli(Declarative):
+                     r'(version 3.0;acl '
+                     r'\22selfservice:%s\22;'
+                     r'allow (write) (userdn = \22ldap:///self\22 '
+-                    r'and userdn = \22ldap:///all\22;)'
++                    r'and userdn = \22ldap:///all\22);)'
+                 ) % SS_CLI_MOD,
+             ),
+         ),
+
+From 29ec4764e04c2841d001478fd63ba6ea06d3c7aa Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Tue, 8 Sep 2026 12:57:44 +0300
+Subject: [PATCH 3/4] permission enforcement: allow services to define keys to
+ enforce
+
+service_add_smb constructs cifs/hostname out of hostname. We need to
+adjust what the permission check is using for an ADD test per command.
+
+Related: CVE-2026-79678
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ ipaserver/plugins/baseldap.py | 16 ++++++++++++++++
+ ipaserver/plugins/service.py  |  7 +++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/ipaserver/plugins/baseldap.py b/ipaserver/plugins/baseldap.py
+index 122a279f2bb..926afb17ec7 100644
+--- a/ipaserver/plugins/baseldap.py
++++ b/ipaserver/plugins/baseldap.py
+@@ -1027,6 +1027,11 @@ def has_privilege(priv):
+                     self.api, op_account, priv)
+             return priv_cache[priv]
+ 
++        # Some commands construct the real target principal/DN only later (in
++        # pre_callback), so let them supply the keys the probes should target
++        # (e.g. service-add-smb builds cifs/<hostname> from a bare hostname).
++        keys = self._enforcement_keys(*keys, **options)
++
+         # LDAPDelete and other LDAPMultiQuery commands pass the trailing
+         # primary key as a *list* of pkeys and act on each target entry in
+         # turn (see LDAPDelete.execute). get_dn and the effective-rights probes
+@@ -1137,6 +1142,17 @@ def rights_allow(right, perm, touched):
+                 raise errors.ACIError(
+                     info=_("not allowed to perform this operation"))
+ 
++    def _enforcement_keys(self, *keys, **options):
++        """Keys identifying the target entry for permission enforcement.
++
++        Defaults to the command's own keys. Commands whose real target DN is
++        derived only later -- e.g. service-add-smb, which takes a bare hostname
++        and constructs the ``cifs/<hostname>`` principal in pre_callback --
++        override this so the effective-rights/trial-add probes target the
++        actual entry rather than a DN built from the raw key.
++        """
++        return keys
++
+     def _expand_target_keys(self, keys):
+         """Expand an operation's keys into one key-tuple per target entry.
+ 
+diff --git a/ipaserver/plugins/service.py b/ipaserver/plugins/service.py
+index bbe71ddc78d..51ea015f401 100644
+--- a/ipaserver/plugins/service.py
++++ b/ipaserver/plugins/service.py
+@@ -810,6 +810,13 @@ def get_options(self):
+             if check:
+                 yield arg
+ 
++    def _enforcement_keys(self, *keys, **options):
++        # The primary key here is a bare hostname; the real target principal
++        # (cifs/<hostname>) is only built in pre_callback. Enforce the add
++        # against that actual principal so the "Hosts can add own services"
++        # ACI (target krbprincipalname=*/($dn)@$REALM) is matched correctly.
++        return ('cifs/{}'.format(keys[0]),)
++
+     def pre_callback(self, ldap, dn, entry_attrs, attrs_list,
+                      *keys, **options):
+         assert isinstance(dn, DN)
+
+From 6eabd3c675a9d09667d6319ac65a6104a66b5f4f Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Tue, 8 Sep 2026 18:04:52 +0300
+Subject: [PATCH 4/4] ipa-pwd-extop: allow password expiration override on
+ create
+
+Permit to create accounts with a limited principal password expiration
+but not beyond what Kerberos password policy defines for this account.
+
+Additionally, fix timezone-related bugs in setting password expiration.
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ .../ipa-slapi-plugins/ipa-pwd-extop/common.c  |  2 +-
+ .../ipa-slapi-plugins/ipa-pwd-extop/prepost.c | 50 +++++++++++
+ ipapython/ipaldap.py                          | 21 ++++-
+ ipatests/test_integration/test_commands.py    | 86 +++++++++++++++++++
+ 4 files changed, 154 insertions(+), 5 deletions(-)
+
+diff --git a/daemons/ipa-slapi-plugins/ipa-pwd-extop/common.c b/daemons/ipa-slapi-plugins/ipa-pwd-extop/common.c
+index 71642540a20..ebae0465b66 100644
+--- a/daemons/ipa-slapi-plugins/ipa-pwd-extop/common.c
++++ b/daemons/ipa-slapi-plugins/ipa-pwd-extop/common.c
+@@ -799,7 +799,7 @@ int ipapwd_setdate(Slapi_Entry *source, Slapi_Mods *smods, const char *attr,
+     Slapi_Attr *t;
+     bool exists;
+ 
+-    exists = (slapi_entry_attr_find(source, attr, &t) == 0);
++    exists = (source != NULL && slapi_entry_attr_find(source, attr, &t) == 0);
+ 
+     if (remove) {
+         if (exists) {
+diff --git a/daemons/ipa-slapi-plugins/ipa-pwd-extop/prepost.c b/daemons/ipa-slapi-plugins/ipa-pwd-extop/prepost.c
+index 4bfd60e7c3f..71ccc5f0712 100644
+--- a/daemons/ipa-slapi-plugins/ipa-pwd-extop/prepost.c
++++ b/daemons/ipa-slapi-plugins/ipa-pwd-extop/prepost.c
+@@ -400,6 +400,40 @@ static int ipapwd_pre_add(Slapi_PBlock *pb)
+         goto done;
+     }
+ 
++    /* If the entry being added already carries a krbPasswordExpiration, treat
++     * it as an explicit request. An explicit request overrides the default
++     * expiration derived by ipapwd_CheckPolicy (which, for an admin-set
++     * password, force-expires the account), but is still capped at the policy
++     * maximum lifetime -- a password must never outlive policy. A
++     * max_pwd_life of 0 means "never expire".
++     *
++     * This is only meaningful on LDAP ADD, where the attribute value is the
++     * request; on a password change it holds the previous expiration and must
++     * not constrain the new one. */
++    {
++        char *req_exp_str;
++        time_t req_exp;
++
++        req_exp_str = slapi_entry_attr_get_charptr(e, "krbPasswordExpiration");
++        req_exp = ipapwd_gentime_to_time_t(req_exp_str);
++        slapi_ch_free_string(&req_exp_str);
++
++        if (req_exp != 0) {
++            time_t policy_max = 0;
++
++            if (pwdop->pwdata.policy.max_pwd_life > 0) {
++                policy_max = pwdop->pwdata.timeNow +
++                             pwdop->pwdata.policy.max_pwd_life;
++            }
++
++            if (policy_max != 0 && req_exp > policy_max) {
++                pwdop->pwdata.expireTime = policy_max;
++            } else {
++                pwdop->pwdata.expireTime = req_exp;
++            }
++        }
++    }
++
+     if (is_krb || is_smb || is_ipant) {
+ 
+         Slapi_Value **svals = NULL;
+@@ -1150,6 +1184,22 @@ static int ipapwd_post_modadd(Slapi_PBlock *pb)
+         }
+     }
+ 
++    /* The date-setting and grace-time logic below needs the current entry to
++     * detect already-present single-valued attributes (e.g. a client-supplied
++     * krbPasswordExpiration on add) so ipapwd_setdate can REPLACE rather than
++     * append a duplicate value. On add -- and on password changes that skipped
++     * history -- pwdata.target is still NULL, so fetch the just-committed entry
++     * (freed with the mod path's entry at 'done'). */
++    if (pwdop->pwdata.target == NULL) {
++        Slapi_DN *tmp_dn = slapi_sdn_new_dn_byref(pwdop->pwdata.dn);
++        if (tmp_dn) {
++            (void)slapi_search_internal_get_entry(tmp_dn, 0,
++                                                  &pwdop->pwdata.target,
++                                                  ipapwd_plugin_id);
++            slapi_sdn_free(&tmp_dn);
++        }
++    }
++
+     /* we assume that krb attributes are properly updated too if keys were
+      * passed in */
+     if (!pwdop->skip_keys) {
+diff --git a/ipapython/ipaldap.py b/ipapython/ipaldap.py
+index 1e56aad87d8..a3f1319c431 100644
+--- a/ipapython/ipaldap.py
++++ b/ipapython/ipaldap.py
+@@ -23,7 +23,7 @@
+ import errno
+ import logging
+ import time
+-from datetime import datetime
++from datetime import datetime, timezone
+ from decimal import Decimal
+ from copy import deepcopy
+ import contextlib
+@@ -972,6 +972,20 @@ def get_attribute_single_value(self, name_or_oid):
+ 
+         return None
+ 
++    @staticmethod
++    def _encode_datetime(val):
++        """Translate a datetime to an LDAP GeneralizedTime string.
++
++        The GeneralizedTime format used here (``...Z``) denotes UTC, so a
++        timezone-aware value must be converted to UTC first; otherwise its
++        wall-clock components would be emitted verbatim and mislabelled as
++        UTC. A naive datetime is assumed to already be in UTC (the convention
++        used throughout IPA).
++        """
++        if val.tzinfo is not None:
++            val = val.astimezone(timezone.utc)
++        return val.strftime(LDAP_GENERALIZED_TIME_FORMAT)
++
+     def encode(self, val):
+         """
+         Encode attribute value to LDAP representation (str/bytes).
+@@ -999,7 +1013,7 @@ def encode(self, val):
+             dct = dict((k, self.encode(v)) for k, v in val.items())
+             return dct
+         elif isinstance(val, datetime):
+-            return val.strftime(LDAP_GENERALIZED_TIME_FORMAT).encode('utf-8')
++            return self._encode_datetime(val).encode('utf-8')
+         elif isinstance(val, x509.IPACertificate):
+             return val.public_bytes(x509.Encoding.DER)
+         elif val is None:
+@@ -1389,8 +1403,7 @@ def make_filter_from_attr(
+                 value = u'\\'.join(
+                     value[i:i+2] for i in six.moves.range(-2, len(value), 2))
+             elif isinstance(value, datetime):
+-                value = value.strftime(
+-                    LDAP_GENERALIZED_TIME_FORMAT)
++                value = cls._encode_datetime(value)
+                 value = ldap.filter.escape_filter_chars(value)
+             else:
+                 value = str(value)
+diff --git a/ipatests/test_integration/test_commands.py b/ipatests/test_integration/test_commands.py
+index 4d221abc208..d370b49a05b 100644
+--- a/ipatests/test_integration/test_commands.py
++++ b/ipatests/test_integration/test_commands.py
+@@ -471,6 +471,92 @@ def test_change_sysaccount_password_issue7561(self):
+         tasks.ldappasswd_sysaccount_change(sysuser, original_passwd,
+                                            new_passwd, master)
+ 
++    def test_user_add_password_expiration_bounded_by_policy(self):
++        """user-add with --password and an explicit --password-expiration.
++
++        The ipa-pwd-extop DS plugin must:
++          * store a single value of the single-valued krbPasswordExpiration
++            attribute (it used to append a second, policy-derived value on add,
++            failing the operation with a schema violation), and
++          * honor an explicitly requested expiration but bound it by the
++            effective password policy, so a password never outlives policy.
++        """
++        master = self.master
++        tasks.kinit_admin(master)
++        base_dn = str(master.domain.basedn)
++
++        # Effective global policy maximum password lifetime, in seconds
++        # (krbMaxPwdLife is stored in seconds; 0 means "never expire").
++        result = master.run_command(['ipa', 'pwpolicy-show', '--raw'])
++        match = re.search(r'krbmaxpwdlife:\s*(\d+)', result.stdout_text)
++        max_life_secs = int(match.group(1)) if match else 0
++
++        def add_user(user, exp_dt):
++            master.run_command(
++                ['ipa', 'user-add', user, '--first', user, '--last', user,
++                 '--password', '--password-expiration',
++                 exp_dt.strftime('%Y%m%d%H%M%SZ')],
++                stdin_text='Secret123\nSecret123\n')
++
++        def stored_expirations(user):
++            result = tasks.ldapsearch_dm(
++                master,
++                'uid={user},cn=users,cn=accounts,{base_dn}'.format(
++                    user=user, base_dn=base_dn),
++                ['krbpasswordexpiration'],
++                scope='base')
++            values = re.findall(r'krbpasswordexpiration: (\S+)',
++                                result.stdout_text.lower())
++            return [datetime.strptime(v.strip().upper(), '%Y%m%d%H%M%SZ')
++                    for v in values]
++
++        # A request comfortably within policy must be honored verbatim.
++        within_user = 'pwdexpwithin'
++        if max_life_secs:
++            within_delta = timedelta(seconds=min(max_life_secs // 2, 86400))
++        else:
++            within_delta = timedelta(days=1)
++        requested = datetime.utcnow() + within_delta
++        # second precision only: krbPasswordExpiration has no sub-second part
++        requested = requested.replace(microsecond=0)
++        try:
++            add_user(within_user, requested)
++            stored = stored_expirations(within_user)
++            assert len(stored) == 1, (
++                'krbPasswordExpiration must be single-valued, got %r' % stored)
++            assert abs((stored[0] - requested).total_seconds()) < 120, (
++                'within-policy request %s not honored, stored %s'
++                % (requested, stored[0]))
++        finally:
++            master.run_command(['ipa', 'user-del', within_user],
++                               raiseonerr=False)
++
++        # A request far beyond policy must be capped at the policy maximum
++        # (only meaningful when the policy actually sets a maximum lifetime).
++        if max_life_secs:
++            over_user = 'pwdexpover'
++            requested = (datetime.utcnow()
++                         + timedelta(seconds=max_life_secs)
++                         + timedelta(days=3650))
++            requested = requested.replace(microsecond=0)
++            try:
++                add_user(over_user, requested)
++                stored = stored_expirations(over_user)
++                assert len(stored) == 1, (
++                    'krbPasswordExpiration must be single-valued, got %r'
++                    % stored)
++                assert stored[0] < requested - timedelta(days=1), (
++                    'beyond-policy request was not capped, stored %s'
++                    % stored[0])
++                cap = (datetime.utcnow() + timedelta(seconds=max_life_secs)
++                       + timedelta(days=1))
++                assert stored[0] <= cap, (
++                    'stored expiration %s exceeds policy cap %s'
++                    % (stored[0], cap))
++            finally:
++                master.run_command(['ipa', 'user-del', over_user],
++                                   raiseonerr=False)
++
+     def get_krbinfo(self, user):
+         base_dn = str(self.master.domain.basedn)
+         result = tasks.ldapsearch_dm(

@@ -3,8 +3,8 @@
 
 Name:     libpcap
 Epoch:    14
-Version:  1.10.6
-Release: 4%{?dist}
+Version:  1.10.7
+Release: 5%{?dist}
 Summary:  A system-independent interface for user-level packet capture
 License:  ISC AND BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause-UC
 URL:      https://www.tcpdump.org/
@@ -96,6 +96,11 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libpcap.a
 %{_mandir}/man5/pcap*.5*
 
 %changelog
+* Wed Sep 09 2026 Michal Ruprich <mruprich@redhat.com> - 14:1.10.7-1
+- New version 1.10.7
+- Fix for CVE-2026-0799, CVE-2026-6244, CVE-2026-6554, CVE-2026-18238
+- Fix for CVE-2026-18313, CVE-2026-31911, CVE-2026-31912
+
 * Mon Jan 05 2026 Michal Ruprich <mruprich@redhat.com> - 14:1.10.6-1
 - New version 1.10.6
 

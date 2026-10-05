@@ -1,0 +1,27 @@
+commit 3665d94cc925a80e96ab9115965bfaf2b534de0a
+Author: zhangjian <zhangjian496@huawei.com>
+Date:   Tue Jul 21 11:53:32 2026 -0400
+
+    nfsd: fix memory overflow for haddr
+    
+    when hcounter is not 0, haddr memory is not enough.
+    asan report heap-buffer-overflow error in following scene:
+    CFLAGS="-fsanitize=address -g" ./configure && make
+    ./utils/nfsd/nfsd -H 192.168.1.1 -H 192.168.1.2
+    
+    Signed-off-by: zhangjian <zhangjian496@huawei.com>
+    Signed-off-by: Steve Dickson <steved@redhat.com>
+
+diff --git a/utils/nfsd/nfsd.c b/utils/nfsd/nfsd.c
+index c95d32f4..e3fcdde4 100644
+--- a/utils/nfsd/nfsd.c
++++ b/utils/nfsd/nfsd.c
+@@ -185,7 +185,7 @@ main(int argc, char **argv)
+ 				hcounter = 0;
+ 			}
+ 			if (hcounter) {
+-				haddr = realloc(haddr, sizeof(char*) * hcounter+1);
++				haddr = realloc(haddr, sizeof(char*) * (hcounter+1));
+ 				if(!haddr) {
+ 					fprintf(stderr, "%s: unable to allocate "
+ 							"memory.\n", progname);

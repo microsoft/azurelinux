@@ -1,0 +1,38 @@
+From 6450fb311edc28df015c977197bea5da7702ab80 Mon Sep 17 00:00:00 2001
+From: Fan Fan <ffan@redhat.com>
+Date: Thu, 28 Nov 2024 21:35:14 +0800
+Subject: [PATCH] Update sg_rdac.c to accept --help or -h without error ,
+ update the version number.
+
+---
+ src/sg_rdac.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/sg_rdac.c b/src/sg_rdac.c
+index a5476daa..50b4207c 100644
+--- a/src/sg_rdac.c
++++ b/src/sg_rdac.c
+@@ -32,7 +32,7 @@
+ #include "sg_pr2serr.h"
+ 
+ 
+-static const char * version_str = "1.18 20230622";
++static const char * version_str = "1.19 20241128";
+ 
+ static const uint8_t mode6_hdr[] = {
+     0x75, /* Length */
+@@ -405,8 +405,13 @@ int main(int argc, char * argv[])
+ 
+         for (k = 1; k < argc; ++k) {
+                 argptr = argv + k;
+-                if (!strcmp (*argptr, "-v"))
++                if (strcmp(argv[k], "--help") == 0 || strcmp(argv[k], "-h") == 0) {
++                        usage ();
++                        return 0;
++                }
++                else if (!strcmp (*argptr, "-v")) {
+                         ++do_verbose;
++                }
+                 else if (!strncmp(*argptr, "-f=",3)) {
+                         fail_path = true;
+                         lun = strtoul(*argptr + 3, NULL, 0);

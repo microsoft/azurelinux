@@ -1,58 +1,96 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global debug_package %{nil}
-%global pypi_name yarl
+# Enables additional tests in tests/test_pydantic.py
+%bcond pydantic 1
 
-Name:           python-%{pypi_name}
-Version:        1.22.0
-Release: 4%{?dist}
+Name:           python-yarl
+Version:        1.25.1
+Release: 5%{?dist}
 Summary:        Python module to handle URLs
 
 License:        Apache-2.0
 URL:            https://yarl.readthedocs.io
-Source0:        https://github.com/aio-libs/yarl/archive/v%{version}/%{pypi_name}-%{version}.tar.gz
+Source:         https://github.com/aio-libs/yarl/archive/v%{version}/yarl-%{version}.tar.gz
+# Allow downstream packagers to opt out of release build flags
+# https://github.com/aio-libs/yarl/pull/1675
+#
+# Fixes:
+#
+# Cannot build distribution-friendly wheels
+# https://github.com/aio-libs/yarl/issues/1592
+#
+# Rebased on v1.25.1.
+Patch:          yarl-1.25.1-system-flags.patch
 
 BuildRequires:  gcc
-BuildRequires:  python3-devel
 BuildRequires:  python3dist(cython)
+
+# See requirements/test-cibuildwheel.txt and requirements/test.txt, which also
+# contain coverage-analysis tools and some other unnecessary or unwanted
+# dependencies.
 BuildRequires:  python3dist(hypothesis)
+%if %{with pydantic}
+BuildRequires:  python3dist(pydantic)
+%endif
 BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(pytest-xdist)
 
 %description
 The module provides handy URL class for URL parsing and changing.
 
-%package -n python3-%{pypi_name}
+%package -n python3-yarl
 Summary:        %{summary}
 
-%description -n python3-%{pypi_name}
+%description -n python3-yarl
 The module provides handy URL class for URL parsing and changing.
 
 %prep
-%autosetup -n %{pypi_name}-%{version} -p1
+%autosetup -n yarl-%{version} -p1
 # Disable coverage
-sed -r -e 's/(-.*cov.*$)/#\1/g' -i pytest.ini
+sed --regexp-extended --in-place 's/(-.*cov.*$)/#\1/g' pytest.ini
 
 %generate_buildrequires
+export YARL_NO_BUILD_OPTIMIZATION_FLAGS=1
+# Imitates upstream, and doesn’t interfere with respecting distro flags
+export CFLAGS="${CFLAGS} -DNDEBUG"
 %pyproject_buildrequires
 
 %build
+export YARL_NO_BUILD_OPTIMIZATION_FLAGS=1
+# Imitates upstream, and doesn’t interfere with respecting distro flags
+export CFLAGS="${CFLAGS} -DNDEBUG"
 %pyproject_wheel
 
 %install
 %pyproject_install
-%pyproject_save_files -l %{pypi_name}
+%pyproject_save_files --assert-license yarl
 
 %check
 # Ignore the benchmark tests which require pytest_codspeed which is not
 # packaged in Fedora.
-%pytest -v --ignore tests/test_quoting_benchmarks.py --ignore tests/test_url_benchmarks.py tests
+%pytest --ignore-glob='tests/test_*_benchmarks.py' --verbose -rs tests
 
-%files -n python3-%{pypi_name} -f %{pyproject_files}
+%files -n python3-yarl -f %{pyproject_files}
 %doc CHANGES.rst README.rst
 
 %changelog
+* Wed Sep 16 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 1.25.1-1
+- Update to 1.25.1 (close RHBZ#2422940)
+- Fix compiling with distribution compiler flags and generating debuginfo
+
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 1.22.0-5
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 1.22.0-3
+- Rebuilt for Python 3.15
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Oct 10 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 1.22.0-1
 - Update to 1.22.0 (close RHBZ#2357666)
 

@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name: pcs
-Version: 0.12.1
-Release: 9%{?dist}
+Version: 0.12.3
+Release: 5%{?dist}
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/LicensingGuidelines/
 # https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#Good_Licenses
 # GPL-2.0-only: pcs
@@ -19,7 +19,7 @@ BuildArch: noarch
 
 # To build an official pcs release, comment out branch_or_commit
 # Use long commit hash or branch name to build an unreleased version
-# %%global branch_or_commit 1353dfbb3af82d77f4de17a3fa4cbde185bb2b2d
+%global branch_or_commit 0.12.3.1
 %global version_or_commit %{clean_version}
 %if 0%{?branch_or_commit:1}
   %global version_or_commit %{branch_or_commit}
@@ -29,8 +29,8 @@ BuildArch: noarch
 
 # To build an official pcs-web-ui release, comment out ui_branch_or_commit
 # Last tagged version, also used as fallback version for untagged tarballs
-%global ui_version 0.1.23
-%global ui_modules_version 0.1.23
+%global ui_version 0.1.25
+%global ui_modules_version 0.1.25
 # Use long commit hash or branch name to build an unreleased version
 # %%global ui_branch_or_commit 34372d1268f065ed186546f55216aaa2d7e76b54
 %global ui_version_or_commit %{ui_version}
@@ -76,8 +76,7 @@ Source101: https://github.com/ClusterLabs/pcs-web-ui/releases/download/%{ui_vers
 # pcs patches: <= 200
 # Patch1: name.patch
 Patch1: show-info-page-instead-of-webui.patch
-Patch2: fix-pcsd-not-starting-with-older-rack.patch
-Patch3: do-not-require-wheel.patch
+Patch2: swap-rubygem-ethon-for-curb.patch
 
 # ui patches: >200
 # Patch201: name-web-ui.patch
@@ -94,8 +93,6 @@ Obsoletes: pcs < 0.12.0
 Recommends: %{pkg_pcs_web_ui} == %{version}-%{release}
 
 
-# git for patches
-BuildRequires: git-core
 # for building pcs tarballs
 BuildRequires: autoconf
 BuildRequires: automake
@@ -120,23 +117,23 @@ BuildRequires: (python3-wheel if python3-setuptools < 71)
 # ruby and gems for pcsd
 BuildRequires: ruby >= 2.5.0
 BuildRequires: ruby-devel
-BuildRequires: rubygem-backports
-BuildRequires: rubygem-childprocess
-BuildRequires: rubygem-ethon
-BuildRequires: rubygem-ffi
-BuildRequires: rubygem-json
-BuildRequires: rubygem-mustermann
-BuildRequires: rubygem-puma
+BuildRequires: rubygem(backports)
+BuildRequires: rubygem(childprocess)
+BuildRequires: rubygem(curb)
+BuildRequires: rubygem(json)
+BuildRequires: rubygem(logger)
+BuildRequires: rubygem(mustermann)
+BuildRequires: rubygem(puma)
 BuildRequires: (rubygem(rack) < 3 or (rubygem(rack) >= 3 and rubygem(rackup)))
-BuildRequires: rubygem-rack-protection
-BuildRequires: rubygem-rack-test
-BuildRequires: rubygem-sinatra
-BuildRequires: rubygem-tilt
+BuildRequires: rubygem(rack-protection)
+BuildRequires: rubygem(rack-test)
+BuildRequires: rubygem(sinatra)
+BuildRequires: rubygem(tilt)
 %if 0%{?fedora} || 0%{?rhel} >= 9
 BuildRequires: rubygem(rexml)
 %endif
 # ruby libraries for tests
-BuildRequires: rubygem-test-unit
+BuildRequires: rubygem(test-unit)
 # for touching patch files (sanitization function)
 BuildRequires: diffstat
 # for systemd scriptlet macros
@@ -173,17 +170,17 @@ Requires: python3-pyparsing
 Requires: python3-tornado
 # ruby and gems for pcsd
 Requires: ruby >= 3.3.0
-Requires: rubygem-backports
-Requires: rubygem-childprocess
-Requires: rubygem-ethon
-Requires: rubygem-ffi
-Requires: rubygem-json
-Requires: rubygem-mustermann
-Requires: rubygem-puma
+Requires: rubygem(backports)
+Requires: rubygem(childprocess)
+Requires: rubygem(curb)
+Requires: rubygem(json)
+Requires: rubygem(logger)
+Requires: rubygem(mustermann)
+Requires: rubygem(puma)
 Requires: (rubygem(rack) < 3 or (rubygem(rack) >= 3 and rubygem(rackup)))
-Requires: rubygem-rack-protection
-Requires: rubygem-sinatra
-Requires: rubygem-tilt
+Requires: rubygem(rack-protection)
+Requires: rubygem(sinatra)
+Requires: rubygem(tilt)
 %if 0%{?fedora} || 0%{?rhel} >= 9
 Requires: rubygem(rexml)
 %endif
@@ -253,7 +250,7 @@ License: GPL-2.0-only AND CC0-1.0
 URL: https://github.com/ClusterLabs/pcs-web-ui
 
 BuildRequires: make
-BuildRequires: nodejs-npm
+BuildRequires: nodejs-npm, /usr/bin/npm
 
 Requires: pcs = %{version}-%{release}
 Requires: cockpit-bridge
@@ -281,72 +278,39 @@ Pacemaker/Corosync Configuration System (pcs) in the background.
 
 
 %prep
-# -- following is inspired by python-simplejon.el5 --
-# Update timestamps on the files touched by a patch, to avoid non-equal
-# .pyc/.pyo files across the multilib peers within a build
-
-update_times(){
-  # update_times <reference_file> <file_to_touch> ...
-  # set the access and modification times of each file_to_touch to the times
-  # of reference_file
-
-  # put all args to file_list
-  file_list=("$@")
-  # first argument is reference_file: so take it and remove from file_list
-  reference_file=${file_list[0]}
-  unset file_list[0]
-
-  for fname in ${file_list[@]}; do
-    # some files could be deleted by a patch therefore we test file for
-    # existance before touch to avoid exit with error: No such file or
-    # directory
-    # diffstat cannot create list of files without deleted files
-    test -e $fname && touch -r $reference_file $fname
-  done
-}
-
-update_times_patch(){
-  # update_times_patch <patch_file_name>
-  # set the access and modification times of each file in patch to the times
-  # of patch_file_name
-
-  patch_file_name=$1
-
-  # diffstat
-  # -l lists only the filenames. No histogram is generated.
-  # -p override the logic that strips common pathnames,
-  #    simulating the patch "-p" option. (Strip the smallest prefix containing
-  #    num leading slashes from each file name found in the patch file)
-  update_times ${patch_file_name} `diffstat -p1 -l ${patch_file_name}`
-}
-
-# documentation for setup/autosetup/autopatch:
+# Documentation for autosetup/autopatch:
 #   * http://ftp.rpm.org/max-rpm/s1-rpm-inside-macros.html
 #   * https://rpm-software-management.github.io/rpm/manual/autosetup.html
-# patch web-ui sources
-# -n <name> — Set Name of Build Directory
-# -T — Do Not Perform Default Archive Unpacking
-# -b <n> — Unpack The nth Sources Before Changing Directory
-# -a <n> — Unpack The nth Sources After Changing Directory
-# -N — disables automatic patch application, use autopatch to apply patches
 #
-# 1. unpack sources (-b 0)
-# 2. then cd into sources tree (the setup macro itself)
-# 3. then unpack node_modules into sources tree (-a 1).
+# AUTOSETUP
+# -T        - do not perform default archive unpacking
+# -b <n>    - unpack Source<n> into builddir
+# -a <n>    - unpack Source<n> into the previously unpacked source
+# -N        - disables automatic patch application, use autopatch
+# -n <name> - set name of build directory
+#
+# AUTOPATCH (applies patches with finer control than autosetup)
+# -q    - don’t warn if there are no matching patches
+# -p<n> - argument to control patch prefix stripping (pnum in the patch manual)
+# -m<n> - apply patches starting from <n>
+# -M<n> - apply patches up to <n>
+
+# Unpack and patch web-ui sources
+# 1. Unpack web-ui Source100 before changing dir (-b 100)
+# 2. Autosetup calls cd into unpacked web-ui tree
+# 3. Unpack node_modules Source101 after cd into web-ui tree (-a 101).
 %autosetup -T -b 100 -a 101 -N -n %{ui_src_name}
-%autopatch -p1 -m 201
-# update_times_patch %%{PATCH201}
+# Apply infinite amount of patches starting with Patch201
+%autopatch -q -p1 -m 201
 
-# patch pcs sources
-%autosetup -S git -n %{pcs_source_name} -N
-%autopatch -p1 -M 200
-# update_times_patch %%{PATCH1}
-update_times_patch %{PATCH1}
-update_times_patch %{PATCH2}
-update_times_patch %{PATCH3}
+# Unpack and patch pcs sources
+%autosetup -N -n %{pcs_source_name}
+# Apply Patch1-Patch200
+%autopatch -q -p1 -M 200
 
-# generate .tarball-version if building from an untagged commit, not a released version
-# autogen uses git-version-gen which uses .tarball-version for generating version number
+# Generate .tarball-version if building from an untagged commit, not a released
+# version. autogen.sh uses git-version-gen which uses .tarball-version file for
+# setting version number across autotools
 %if 0%{?tarball_version:1}
   echo %{tarball_version} > %{_builddir}/%{pcs_source_name}/.tarball-version
 %endif
@@ -355,7 +319,7 @@ update_times_patch %{PATCH3}
   echo %{ui_tarball_version} > %{_builddir}/%{ui_src_name}/.tarball-version
 %endif
 
-# prepare dirs/files necessary for building python bundles
+# Move bundled python sdists where autotools expect them
 mkdir -p %{pcs_bundled_dir}/src
 cp -f %SOURCE41 rpm/
 cp -f %SOURCE42 rpm/
@@ -464,27 +428,56 @@ run_all_tests(){
 run_all_tests
 
 
-# Mark pcsd and pcs_snmp_agent for restart after upgrade
+
+# Scriptlets documentation:
+#  * https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/
+#  * https://github.com/systemd/systemd/blob/main/src/rpm/macros.systemd.in
+#  * https://github.com/systemd/systemd/blob/main/src/rpm/systemd-update-helper.in
+#  * https://fedoraproject.org/wiki/Changes/Restart_services_at_end_of_rpm_transaction
+
+%post
+# Set systemd preset for pcsd{,-ruby}.service after install
+%systemd_post pcsd.service pcsd-ruby.service
+
+%post -n %{pkg_pcs_snmp}
+# Set systemd preset for pcs_snmp_agent.service after install
+%systemd_post pcs_snmp_agent.service
+
+
+%preun
+# Stop pcsd{,-ruby}.service before pcs uninstall
+%systemd_preun pcsd.service pcsd-ruby.service
+
+%preun -n %{pkg_pcs_snmp}
+# Stop pcs_snmp_agent.service before pcs-snmp uninstall
+%systemd_preun pcs_snmp_agent.service
+
+
 %posttrans
+# Mark pcsd.service for restart after pcs upgrade
 %systemd_posttrans_with_restart pcsd.service
 
 %posttrans -n %{pkg_pcs_snmp}
+# Mark pcs_snmp_agent.service for restart after pcs-snmp upgrade
 %systemd_posttrans_with_restart pcs_snmp_agent.service
+
+%posttrans -n %{pkg_pcs_web_ui}
+# NOTE: Systemd macros cannot be used for pcsd restart from pcs-web-ui because
+# pcs-web-ui does not change unit files and therefore trigger for restart would
+# not happen. Direct call `systemctl try-restart` is used instead.
 
 # Restart pcsd if it is running to reload the Tornado app so it detects
 # presence or absence of the webui backend handler on install/update
 # of pcs-web-ui that contains it
-# Systemd will not pick-up on this change because pcs-web-ui doesn't contain
-# a unit file that would mark it for restart
-# https://fedoraproject.org/wiki/Changes/Restart_services_at_end_of_rpm_transaction
-%posttrans -n %{pkg_pcs_web_ui}
-systemctl try-restart pcsd.service
+if [ $1 -ge 1 ] && [ -d /run/systemd/system ]; then
+  systemctl try-restart pcsd.service || :
+fi
 
-# Runs only on pcs-web-ui uninstall
-# https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/
+
 %postun -n %{pkg_pcs_web_ui}
-if [ $1 -eq 0 ] ; then
-  systemctl try-restart pcsd.service
+# Restart pcsd.service if running on pcs-web-ui uninstall
+if [ $1 -eq 0 ] && [ -d /run/systemd/system ]; then
+  systemctl try-restart pcsd.service || :
 fi
 
 
@@ -557,6 +550,33 @@ fi
 
 
 %changelog
+* Fri Sep 11 2026 Michal Pospíšil <mpospisi@redhat.com> - 0.12.3-1
+- Rebased pcs to the newest major version (see CHANGELOG.md)
+- Updated standalone web UI and HA Cluster Management Cockpit application to pcs-web-ui 0.1.25 (see CHANGELOG_WUI.md)
+- pcs no longer depends on rubygems ethon and ffi, rubygem curb is used instead
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 0.12.2-3
+- Rebuilt for Python 3.15
+
+* Fri May 15 2026 Michal Pospíšil <mpospisi@redhat.com> - 0.12.2-2
+- Updated standalone web UI and HA Cluster Management Cockpit application to pcs-web-ui 0.1.24.3 (see CHANGELOG_WUI.md)
+  Resolves: rhbz#2454042
+- Fixed a crash when running pcs resource|stonith list
+  Resolves: rhbz#2458608
+- Fixed order of resources in sets when listing configuration of constraints
+  Resolves: rhbz#2461143
+
+* Thu Mar 5 2026 Michal Pospíšil <mpospisi@redhat.com> - 0.12.2-1
+- Rebased pcs to the newest major version (see CHANGELOG.md)
+- Updated standalone web UI and HA Cluster Management Cockpit application to pcs-web-ui 0.1.24.2 (see CHANGELOG_WUI.md)
+  Resolves: rhbz#2432985, rhbz#2433035
+- Fixed FTBFS with Python 3.15
+  Resolves: rhbz#2440684
+- Fixed issues with installing pcs on Fedora 43+, upgrade and uninstall
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

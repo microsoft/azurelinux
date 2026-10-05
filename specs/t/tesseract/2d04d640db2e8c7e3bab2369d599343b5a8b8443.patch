@@ -1,0 +1,119 @@
+diff -rupN --no-dereference tesseract-5.5.3/Makefile.am tesseract-5.5.3-new/Makefile.am
+--- tesseract-5.5.3/Makefile.am	2026-09-21 10:28:10.382307312 +0200
++++ tesseract-5.5.3-new/Makefile.am	2026-09-21 10:28:10.387606517 +0200
+@@ -1225,6 +1225,7 @@ check_PROGRAMS += tfile_test
+ if ENABLE_TRAINING
+ check_PROGRAMS += unichar_test
+ check_PROGRAMS += unicharcompress_test
++check_PROGRAMS += unicharset_load_test
+ check_PROGRAMS += unicharset_test
+ check_PROGRAMS += validate_grapheme_test
+ check_PROGRAMS += validate_indic_test
+@@ -1518,6 +1519,10 @@ unicharcompress_test_SOURCES = unittest/
+ unicharcompress_test_CPPFLAGS = $(unittest_CPPFLAGS)
+ unicharcompress_test_LDADD = $(TRAINING_LIBS) $(ICU_UC_LIBS)
+ 
++unicharset_load_test_SOURCES = unittest/unicharset_load_test.cc
++unicharset_load_test_CPPFLAGS = $(unittest_CPPFLAGS)
++unicharset_load_test_LDADD = $(TESS_LIBS)
++
+ unicharset_test_SOURCES = unittest/unicharset_test.cc
+ unicharset_test_CPPFLAGS = $(unittest_CPPFLAGS)
+ unicharset_test_LDADD = $(TRAINING_LIBS) $(ICU_UC_LIBS)
+diff -rupN --no-dereference tesseract-5.5.3/src/ccutil/unicharset.cpp tesseract-5.5.3-new/src/ccutil/unicharset.cpp
+--- tesseract-5.5.3/src/ccutil/unicharset.cpp	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/ccutil/unicharset.cpp	2026-09-21 10:28:10.388227759 +0200
+@@ -791,6 +791,9 @@ bool UNICHARSET::load_via_fgets(
+       sscanf(buffer, "%d", &unicharset_size) != 1) {
+     return false;
+   }
++  if (unicharset_size <= 0) {
++    return false;
++  }
+   for (UNICHAR_ID id = 0; id < unicharset_size; ++id) {
+     char unichar[256];
+     unsigned int properties;
+@@ -884,6 +887,15 @@ bool UNICHARSET::load_via_fgets(
+     } else {
+       this->unichar_insert_backwards_compatible(unichar);
+     }
++    // A duplicate or empty representation makes the insert a no-op,
++    // desynchronizing id from the unichars vector; the set_* calls and
++    // unichars[id] below would then write out of bounds. The file is
++    // malformed, so reject it.
++    if (size() != static_cast<size_t>(id) + 1) {
++      fprintf(stderr, "%s:%d unichar %d has a duplicate or empty representation\n",
++              __FILE__, __LINE__, id);
++      return false;
++    }
+ 
+     this->set_isalpha(id, properties & ISALPHA_MASK);
+     this->set_islower(id, properties & ISLOWER_MASK);
+diff -rupN --no-dereference tesseract-5.5.3/unittest/unicharset_load_test.cc tesseract-5.5.3-new/unittest/unicharset_load_test.cc
+--- tesseract-5.5.3/unittest/unicharset_load_test.cc	1970-01-01 01:00:00.000000000 +0100
++++ tesseract-5.5.3-new/unittest/unicharset_load_test.cc	2026-09-21 10:28:10.388594394 +0200
+@@ -0,0 +1,64 @@
++///////////////////////////////////////////////////////////////////////
++// File:        unicharset_load_test.cc
++// Description: Tests that UNICHARSET::load_via_fgets rejects unicharset
++//              files whose insertions desynchronize the id loop index
++//              from the unichars vector (duplicate or empty
++//              representations), which would make the subsequent set_*
++//              calls write out of bounds, and non-positive size counts.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++// http://www.apache.org/licenses/LICENSE-2.0
++//
++///////////////////////////////////////////////////////////////////////
++
++#include "include_gunit.h"
++
++#include "serialis.h" // for TFile
++#include "unicharset.h"
++
++#include <cstring>
++
++namespace tesseract {
++namespace {
++
++// Loads the given unicharset text via the TFile-based loader.
++bool LoadUnicharset(const char *text, UNICHARSET *unicharset) {
++  TFile fp;
++  if (!fp.Open(text, std::strlen(text))) {
++    return false;
++  }
++  return unicharset->load_from_file(&fp, false);
++}
++
++// A duplicate representation makes the second insert a no-op, so on
++// unpatched code the set_* calls for the remaining lines write past
++// the end of the unichars vector (ASan container-overflow).
++TEST(UnicharsetLoadTest, RejectsDuplicateRepresentation) {
++  const char *text = "3\nA 0 Latin\nA 0 Latin\nB 0 Latin\n";
++  UNICHARSET unicharset;
++  EXPECT_FALSE(LoadUnicharset(text, &unicharset));
++}
++
++// A non-positive size count must be rejected; on unpatched code a
++// zero or negative count loads an empty unicharset successfully.
++TEST(UnicharsetLoadTest, RejectsNonPositiveCount) {
++  const char *texts[] = {"0\n", "-1\n"};
++  for (const char *text : texts) {
++    UNICHARSET unicharset;
++    EXPECT_FALSE(LoadUnicharset(text, &unicharset));
++  }
++}
++
++// A valid unicharset must still be accepted.
++TEST(UnicharsetLoadTest, AcceptsValidUnicharset) {
++  const char *text = "3\nA 0 Latin\nB 0 Latin\nC 0 Latin\n";
++  UNICHARSET unicharset;
++  ASSERT_TRUE(LoadUnicharset(text, &unicharset));
++  EXPECT_EQ(unicharset.size(), 3u);
++  EXPECT_STREQ(unicharset.id_to_unichar(1), "B");
++}
++
++} // namespace
++} // namespace tesseract

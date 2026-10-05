@@ -1,0 +1,120 @@
+Based on upstream patches
+  db19a0c6c6260f18efe441698a55156b41a6dc7f
+  8acf0968c5e19b580b27bdec3367067250ba0c16
+  9985187ac2c21f9a0675a3d23dcc8ddf4c2bf36a
+
+commit db19a0c6c6260f18efe441698a55156b41a6dc7f
+Author: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date:   Thu Sep 18 17:25:02 2025 +0200
+
+    vdef: Retire Tstrcmp() macro
+
+commit 8acf0968c5e19b580b27bdec3367067250ba0c16
+Author: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date:   Thu Sep 18 17:23:17 2025 +0200
+
+    http2_hpack: Check pseudo-header names with Tstreq()
+
+commit 9985187ac2c21f9a0675a3d23dcc8ddf4c2bf36a
+Author: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date:   Wed Jan 22 15:05:08 2025 +0100
+
+    vdef: Test equality between txt and string
+
+diff --git a/bin/varnishd/http2/cache_http2_hpack.c b/bin/varnishd/http2/cache_http2_hpack.c
+index a90e6fde2..cb40b738f 100644
+--- a/bin/varnishd/http2/cache_http2_hpack.c
++++ b/bin/varnishd/http2/cache_http2_hpack.c
+@@ -171,7 +171,7 @@ h2h_addhdr(struct http *hp, struct h2h_decode *d)
+ 
+ 	/* Match H/2 pseudo headers */
+ 	/* XXX: Should probably have some include tbl for pseudo-headers */
+-	if (!Tstrcmp(nm, ":method")) {
++	if (Tstreq(nm, ":method")) {
+ 		hdr.b = val.b;
+ 		n = HTTP_HDR_METHOD;
+ 		disallow_empty = 1;
+@@ -181,13 +181,13 @@ h2h_addhdr(struct http *hp, struct h2h_decode *d)
+ 			if (!vct_istchar(*p))
+ 				return (H2SE_PROTOCOL_ERROR);
+ 		}
+-	} else if (!Tstrcmp(nm, ":path")) {
++	} else if (Tstreq(nm, ":path")) {
+ 		hdr.b = val.b;
+ 		n = HTTP_HDR_URL;
+ 		disallow_empty = 1;
+ 
+ 		// rfc9113,l,2693,2705
+-		if (Tlen(val) > 0 && val.b[0] != '/' && Tstrcmp(val, "*")) {
++		if (Tlen(val) > 0 && val.b[0] != '/' && !Tstreq(val, "*")) {
+ 			VSLb(hp->vsl, SLT_BogoHeader,
+ 			    "Illegal :path pseudo-header %.*s",
+ 			    (int)Tlen(val), val.b);
+@@ -199,7 +199,7 @@ h2h_addhdr(struct http *hp, struct h2h_decode *d)
+ 			if (vct_islws(*p) || vct_isctl(*p))
+ 				return (H2SE_PROTOCOL_ERROR);
+ 		}
+-	} else if (!Tstrcmp(nm, ":scheme")) {
++	} else if (Tstreq(nm, ":scheme")) {
+ 		/* XXX: What to do about this one? (typically
+ 		   "http" or "https"). For now set it as a normal
+ 		   header, stripping the first ':'. */
+@@ -213,7 +213,7 @@ h2h_addhdr(struct http *hp, struct h2h_decode *d)
+ 			if (!vct_istchar(*p))
+ 				return (H2SE_PROTOCOL_ERROR);
+ 		}
+-	} else if (!Tstrcmp(nm, ":authority")) {
++	} else if (Tstreq(nm, ":authority")) {
+ 		/* NB: we inject "host" in place of "rity" for
+ 		 * the ":authority" pseudo-header.
+ 		 */
+diff --git a/bin/varnishtest/tests/f00019.vtc b/bin/varnishtest/tests/f00019.vtc
+new file mode 100644
+index 000000000..e85fb449c
+--- /dev/null
++++ b/bin/varnishtest/tests/f00019.vtc
+@@ -0,0 +1,31 @@
++vtest "Verify pseudo-header parsing"
++
++varnish v1 -cliok "param.set feature +http2"
++varnish v1 -vcl {
++	backend default none;
++	sub vcl_recv {
++		return (synth(200));
++	}
++} -start
++
++client c1 {
++	stream 1 {
++		txreq -noadd \
++			-hdr ":authority" "foo.com" \
++			-hdr ":path" "/foobar" \
++			-hdr ":scheme" "http" \
++			-hdr ":method" "GET"
++		rxresp
++		expect resp.status == 200
++	} -run
++
++	stream 3 {
++		txreq -noadd \
++			-hdr ":a" "foo.com" \
++			-hdr ":p" "/foobar" \
++			-hdr ":s" "http" \
++			-hdr ":m" "GET"
++		rxrst
++		expect rst.err == PROTOCOL_ERROR
++	} -run
++} -run
+diff -u a/include/vdef.h b/include/vdef.h
+--- a/include/vdef.h	2026-06-16 21:12:28.080660988 +0200
++++ b/include/vdef.h	2026-06-16 21:13:10.391582611 +0200
+@@ -276,7 +276,7 @@
+ #define Tcheck(t)	do { (void)pdiff((t).b, (t).e); } while (0)
+ #define Tlen(t)		(pdiff((t).b, (t).e))
+ #define Tstr(s)		(/*lint -e(446)*/ (txt){(s), (s) + strlen(s)})
+-#define Tstrcmp(t, s)	(strncmp((t).b, (s), Tlen(t)))
++#define Tstreq(t, s)   (Tlen(t) == strlen(s) && !strncmp((t).b, (s), Tlen(t)))
+ #define Tforeach(c, t)	for ((c) = (t).b; (c) < (t).e; (c)++)
+ 
+ /* #3020 dummy definitions until PR is merged*/
+

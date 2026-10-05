@@ -1,6 +1,6 @@
---- log-0.4.29/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ log-0.4.29/Cargo.toml	2025-12-16T21:17:49.606440+00:00
-@@ -36,45 +36,10 @@
+--- log-0.4.34/Cargo.toml	2006-07-24T01:21:28+00:00
++++ log-0.4.34/Cargo.toml	2026-08-27T15:05:53.877143+00:00
+@@ -36,46 +36,11 @@
  features = [
      "std",
      "serde",
@@ -10,6 +10,7 @@
  ]
  
  [features]
+ alloc = []
  kv = []
 -kv_serde = [
 -    "kv_std",
@@ -46,7 +47,7 @@
  max_level_debug = []
  max_level_error = []
  max_level_info = []
-@@ -111,22 +76,6 @@
+@@ -112,22 +77,6 @@
  optional = true
  default-features = false
  
@@ -69,7 +70,7 @@
  [dev-dependencies.proc-macro2]
  version = "1.0.63"
  default-features = false
-@@ -140,13 +89,3 @@
+@@ -141,13 +90,3 @@
  
  [dev-dependencies.serde_test]
  version = "1.0"

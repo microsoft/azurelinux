@@ -1,0 +1,96 @@
+From 92497a8874a1a5578564425240371609c940991b Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Mon, 13 Apr 2026 16:22:16 +0100
+Subject: [PATCH 09/10] stratis: refactor filter_stratis_snapshot() to allow
+ logging
+
+Resolves: #987
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ snapm/manager/plugins/stratis.py | 31 ++++++++++++++++---------------
+ tests/test_stratis.py            |  8 ++++++--
+ 2 files changed, 22 insertions(+), 17 deletions(-)
+
+diff --git a/snapm/manager/plugins/stratis.py b/snapm/manager/plugins/stratis.py
+index f408af81..7000ed1b 100644
+--- a/snapm/manager/plugins/stratis.py
++++ b/snapm/manager/plugins/stratis.py
+@@ -324,20 +324,6 @@ class StratisSnapshot(Snapshot):
+         return (self._pool, self._filesystem)
+ 
+ 
+-def filter_stratis_snapshot(filesystem):
+-    """
+-    Filter Stratis snapshots.
+-
+-    Return ``True`` if the filesystem epresented by ``filesystem`` is a stratis
+-    snapshot or ``False`` otherwise. The ``filesystem`` argument must be a
+-    DBus managed object corresponding to a Stratis filesystem.
+-    """
+-    try:
+-        return filesystem.Origin()[0]
+-    except DbusClientMissingPropertyError:
+-        return False
+-
+-
+ def _snapshot_min_size(policy_size):
+     """
+     Return the minimum snapshot size given the space used by the snapshot
+@@ -510,6 +496,21 @@ class Stratis(Plugin):
+         if self.priority == PLUGIN_NO_PRIORITY:
+             self.priority = STRATIS_STATIC_PRIORITY
+ 
++    def _filter_stratis_snapshot(self, filesystem):
++        """
++        Filter Stratis snapshots.
++
++        Return ``True`` if the filesystem epresented by ``filesystem`` is a stratis
++        snapshot or ``False`` otherwise. The ``filesystem`` argument must be a
++        DBus managed object corresponding to a Stratis filesystem.
++        """
++        try:
++            return filesystem.Origin()[0]
++        except DbusClientMissingPropertyError:  # pragma: no cover
++            self._log_warn("Could not access filesystem.Origin() property")
++            return False
++        return False
++
+     # pylint: disable=too-many-locals,too-many-branches
+     def discover_snapshots(self):
+         """
+@@ -546,7 +547,7 @@ class Stratis(Plugin):
+         ]
+ 
+         for filesystem in filesystems_with_props:
+-            if not filter_stratis_snapshot(filesystem):
++            if not self._filter_stratis_snapshot(filesystem):
+                 continue
+ 
+             try:
+diff --git a/tests/test_stratis.py b/tests/test_stratis.py
+index 89e80f7c..16a6a636 100644
+--- a/tests/test_stratis.py
++++ b/tests/test_stratis.py
+@@ -240,12 +240,16 @@ class StratisTests(unittest.TestCase):
+         proxy = get_object(TOP_OBJECT)
+         managed_objects = ObjectManager.Methods.GetManagedObjects(proxy, {})
+ 
++        stratis_plugin = stratis.Stratis(log, ConfigParser())
++
+         (pool, fs) = stratis._get_pool_filesystem(managed_objects, "pool1", "fs1-snapset_test_1721136677_-opt")
+-        self.assertEqual(True, stratis.filter_stratis_snapshot(fs))
++        self.assertEqual(True, stratis_plugin._filter_stratis_snapshot(fs))
+ 
+     def test_filter_stratis_snapshot_nonsnapshot(self):
+         proxy = get_object(TOP_OBJECT)
+         managed_objects = ObjectManager.Methods.GetManagedObjects(proxy, {})
+ 
++        stratis_plugin = stratis.Stratis(log, ConfigParser())
++
+         (pool, fs) = stratis._get_pool_filesystem(managed_objects, "pool1", "fs1")
+-        self.assertEqual(False, stratis.filter_stratis_snapshot(fs))
++        self.assertEqual(False, stratis_plugin._filter_stratis_snapshot(fs))
+-- 
+2.53.0
+

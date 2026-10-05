@@ -1,7 +1,7 @@
---- libcramjam-0.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ libcramjam-0.8.0/Cargo.toml	2025-12-16T11:07:58.443154+00:00
-@@ -35,15 +35,6 @@
- strip_include_path_components = 1
+--- libcramjam-0.9.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libcramjam-0.9.1/Cargo.toml	2026-09-30T14:22:16.474134+00:00
+@@ -39,18 +39,9 @@
+ subdirectory = "cramjam"
  
  [features]
 -blosc2 = ["blosc2-static"]
@@ -15,35 +15,31 @@
 -]
  brotli = ["dep:brotli"]
  bzip2 = ["dep:bzip2"]
+-bzip2-pure = []
++# bzip2-pure = []
  capi = ["dep:libc"]
-@@ -58,87 +49,39 @@
+ default = [
+     "snappy",
+@@ -63,86 +54,53 @@
      "deflate",
      "zlib",
  ]
 -deflate = ["deflate-static"]
-+deflate = ["deflate-shared"]
- deflate-shared = [
-     "dep:libdeflate-sys",
-     "dep:flate2",
-     "libdeflate-sys/dynamic",
- ]
--deflate-static = [
--    "dep:libdeflate-sys",
--    "dep:flate2",
+-deflate-pure = [
+-    "dep:crc32fast",
+-    "dep:simd-adler32",
 -]
++deflate = ["deflate-shared"]
++# deflate-pure = [
++#     "dep:crc32fast",
++#     "dep:simd-adler32",
++# ]
+ deflate-shared = ["dep:flate2"]
+-deflate-static = ["dep:flate2"]
 -gzip = ["gzip-static"]
 +gzip = ["gzip-shared"]
- gzip-shared = [
-     "dep:libdeflate-sys",
-     "dep:flate2",
-     "libdeflate-sys/dynamic",
-     "deflate-shared",
- ]
--gzip-static = [
--    "dep:libdeflate-sys",
--    "dep:flate2",
--    "deflate-static",
--]
+ gzip-shared = ["deflate-shared"]
+-gzip-static = ["deflate-static"]
 -ideflate = ["isal-static"]
 -ideflate-shared = ["isal-shared"]
 -ideflate-static = ["isal-static"]
@@ -62,6 +58,22 @@
 -izlib-shared = ["isal-shared"]
 -izlib-static = ["isal-static"]
  lz4 = ["dep:lz4"]
+-lz4-pure = []
+-pure-rust = [
+-    "zstd-pure",
+-    "lz4-pure",
+-    "bzip2-pure",
+-    "deflate-pure",
+-    "xz-pure",
+-]
++# lz4-pure = []
++# pure-rust = [
++#     "zstd-pure",
++#     "lz4-pure",
++#     "bzip2-pure",
++#     "deflate-pure",
++#     "xz-pure",
++# ]
  snappy = ["dep:snap"]
 -use-system-blosc2 = [
 -    "dep:blosc2-rs",
@@ -73,44 +85,130 @@
 -]
 -wasm32-compat = ["blosc2-rs/deactivate-zlib-optim"]
 -xz = ["xz-static"]
+-xz-pure = [
+-    "dep:crc32fast",
+-    "dep:crc-fast",
+-    "dep:sha2",
+-]
 +xz = ["xz-shared"]
- xz-shared = ["dep:xz2"]
++# xz-pure = [
++#     "dep:crc32fast",
++#     "dep:crc-fast",
++#     "dep:sha2",
++# ]
+ xz-shared = [
+     "dep:xz2",
+     "dep:lzma-sys",
+ ]
 -xz-static = [
 -    "dep:xz2",
+-    "dep:lzma-sys",
 -    "xz2/static",
 -]
 -zlib = ["zlib-static"]
 +zlib = ["zlib-shared"]
- zlib-shared = [
-     "dep:libdeflate-sys",
-     "dep:flate2",
-     "libdeflate-sys/dynamic",
-     "deflate-shared",
- ]
--zlib-static = [
--    "dep:libdeflate-sys",
--    "dep:flate2",
--    "deflate-static",
--]
+ zlib-shared = ["deflate-shared"]
+-zlib-static = ["deflate-static"]
  zstd = ["dep:zstd"]
+-zstd-pure = []
++# zstd-pure = []
  
  [lib]
  name = "libcramjam"
  path = "src/lib.rs"
 -
+-[[example]]
+-name = "lz4fast_check"
+-path = "examples/lz4fast_check.rs"
+-required-features = ["lz4-pure"]
+-
+-[[example]]
+-name = "lz4hc_check"
+-path = "examples/lz4hc_check.rs"
+-required-features = ["lz4-pure"]
++crate-type = ["lib", "cdylib"]
++
++# [[example]]
++# name = "lz4fast_check"
++# path = "examples/lz4fast_check.rs"
++# required-features = ["lz4-pure"]
++# 
++# [[example]]
++# name = "lz4hc_check"
++# path = "examples/lz4hc_check.rs"
++# required-features = ["lz4-pure"]
+ 
+ [[example]]
+ name = "profile_bzip2"
+@@ -172,10 +130,10 @@
+ name = "profile_xz_enc"
+ path = "examples/profile_xz_enc.rs"
+ 
+-[[example]]
+-name = "profile_zstd"
+-path = "examples/profile_zstd.rs"
+-required-features = ["zstd-pure"]
++# [[example]]
++# name = "profile_zstd"
++# path = "examples/profile_zstd.rs"
++# required-features = ["zstd-pure"]
+ 
+ [[example]]
+ name = "profile_zstd_dec"
+@@ -185,36 +143,16 @@
+ name = "zstd_dbg"
+ path = "examples/zstd_dbg.rs"
+ 
+-[[example]]
+-name = "zstd_small_check"
+-path = "examples/zstd_small_check.rs"
+-required-features = ["zstd-pure"]
++# [[example]]
++# name = "zstd_small_check"
++# path = "examples/zstd_small_check.rs"
++# required-features = ["zstd-pure"]
+ 
+ [[test]]
+ name = "backend_contract"
+ path = "tests/backend_contract.rs"
+ 
+ [[test]]
+-name = "corpus_bzip2"
+-path = "tests/corpus_bzip2.rs"
+-
+-[[test]]
+-name = "corpus_deflate"
+-path = "tests/corpus_deflate.rs"
+-
+-[[test]]
+-name = "corpus_lz4"
+-path = "tests/corpus_lz4.rs"
+-
+-[[test]]
+-name = "corpus_xz"
+-path = "tests/corpus_xz.rs"
+-
+-[[test]]
+-name = "corpus_zstd"
+-path = "tests/corpus_zstd.rs"
+-
+-[[test]]
+ name = "cross_impl"
+ path = "tests/cross_impl.rs"
+ 
+@@ -285,11 +223,6 @@
+ path = "benches/zstd_bench.rs"
+ harness = false
+ required-features = ["pure-rust"]
+-
 -[dependencies.blosc2-rs]
 -version = "0.4.0+2.15.2"
 -optional = true
 -default-features = false
-+crate-type = ["lib", "cdylib"]
  
  [dependencies.brotli]
--version = "^7"
-+version = "^8"
- features = [
-     "std",
-     "ffi-api",
-@@ -147,7 +90,7 @@
+ version = "^8"
+@@ -301,7 +234,7 @@
  default-features = false
  
  [dependencies.bzip2]
@@ -118,25 +216,29 @@
 +version = ">=0.4,<0.7"
  optional = true
  
- [dependencies.flate2]
-@@ -159,7 +102,7 @@
+ [dependencies.crc-fast]
+@@ -349,11 +282,7 @@
  optional = true
  
- [dependencies.libdeflate-sys]
--version = "<1.20.0"
-+version = "^1"
- optional = true
+ [dev-dependencies.bzip2]
+-version = ">=0.4,<0.6"
+-
+-[dev-dependencies.criterion]
+-version = "0.5"
+-features = ["html_reports"]
++version = ">=0.4,<0.7"
  
- [dependencies.lz4]
-@@ -178,11 +121,6 @@
+ [dev-dependencies.flate2]
+ version = "^1"
+@@ -369,11 +298,6 @@
+ 
+ [dev-dependencies.zstd]
  version = "^0.13"
- optional = true
- 
+-
 -[target.'cfg(target_pointer_width = "64")'.dependencies.isal-rs]
 -version = "^0.5"
 -optional = true
 -default-features = false
--
- [profile.release]
+ 
+ [profile.profiling]
  opt-level = 3
- lto = "fat"

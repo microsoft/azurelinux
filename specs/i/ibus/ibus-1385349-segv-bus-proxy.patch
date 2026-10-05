@@ -1,6 +1,6 @@
 From 656390df46ba963afe51420ecb9399b6dde9a2bd Mon Sep 17 00:00:00 2001
 From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Fri, 12 Jul 2024 23:30:25 +0900
+Date: Thu, 30 Apr 2026 09:00:00 +0900
 Subject: [PATCH] Fix SEGV in bus_panel_proxy_focus_in()
 
 rhbz#1350291 SEGV in BUS_IS_CONNECTION(skip_connection) in
@@ -39,27 +39,34 @@ rhbz#2239633 SEGV with g_object_unref() in
 ibus_portal_context_handle_destroy()
 Connect "handle-destroy" signal after g_list_prepend().
 
-BUG=rhbz#1350291
-BUG=rhbz#1601577
-BUG=rhbz#1663528
-BUG=rhbz#1795499
-BUG=rhbz#1771238
-BUG=rhbz#1767976
-BUG=rhbz#2151344
-BUG=rhbz#2195895
-BUG=rhbz#2239633
+rhbz#2480408 SEGV with zwp_input_method_context_v1_preedit_string() in
+_context_hide_preedit_text_cb()
+If the `zwp_input_method_context_v1` is deactivate, the `IBusIMContext`
+is should be cleared and the "hide-preedit-text" signal is also
+disconnected.
+
+Closes: rhbz#1350291
+Closes: rhbz#1601577
+Closes: rhbz#1663528
+Closes: rhbz#1795499
+Closes: rhbz#1771238
+Closes: rhbz#1767976
+Closes: rhbz#2151344
+Closes: rhbz#2195895
+Closes: rhbz#2239633
+Closes: rhbz#2480408
 ---
- bus/dbusimpl.c         | 47 ++++++++++++++++++++++++++++++++++++----
- bus/engineproxy.c      | 44 ++++++++++++++++++++++++++++---------
- bus/panelproxy.c       |  9 +++++++-
- client/x11/main.c      | 49 +++++++++++++++++++++++++++++++++++++-----
- portal/portal.c        | 25 ++++++++++++++++-----
- src/ibusbus.c          |  6 ++++++
- ui/gtk3/switcher.vala  | 48 +++++++++++++++++++++++++----------------
- 7 files changed, 188 insertions(+), 44 deletions(-)
+ bus/engineproxy.c              | 44 +++++++++++++++++++++++-------
+ bus/panelproxy.c               |  9 ++++++-
+ client/wayland/ibuswaylandim.c | 20 +++++++++++++-
+ client/x11/main.c              | 49 ++++++++++++++++++++++++++++++----
+ portal/portal.c                | 25 +++++++++++++----
+ src/ibusbus.c                  |  6 +++++
+ ui/gtk3/switcher.vala          | 48 ++++++++++++++++++++-------------
+ 8 files changed, 203 insertions(+), 45 deletions(-)
 
 diff --git a/bus/dbusimpl.c b/bus/dbusimpl.c
-index 70792be8..9c535bf2 100644
+index 70792be..9c535bf 100644
 --- a/bus/dbusimpl.c
 +++ b/bus/dbusimpl.c
 @@ -634,6 +634,7 @@ static void
@@ -147,7 +154,7 @@ index 70792be8..9c535bf2 100644
      if (incoming) {
          /* is incoming message */
 diff --git a/bus/engineproxy.c b/bus/engineproxy.c
-index 37736b69..7f34604c 100644
+index 37736b6..7f34604 100644
 --- a/bus/engineproxy.c
 +++ b/bus/engineproxy.c
 @@ -775,10 +775,12 @@ bus_engine_proxy_g_signal (GDBusProxy  *proxy,
@@ -247,7 +254,7 @@ index 37736b69..7f34604c 100644
      /* FIXME: set destroy callback ? */
      g_task_return_pointer (data->task, engine, NULL);
 diff --git a/bus/panelproxy.c b/bus/panelproxy.c
-index 4c2c8885..a7bec193 100644
+index 4c2c888..a7bec19 100644
 --- a/bus/panelproxy.c
 +++ b/bus/panelproxy.c
 @@ -124,6 +124,8 @@ bus_panel_proxy_new (BusConnection *connection,
@@ -280,8 +287,72 @@ index 4c2c8885..a7bec193 100644
      panel = BUS_PANEL_PROXY (obj);
      panel->panel_type = panel_type;
      return panel;
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index 5762f10..f1e3b9e 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -387,7 +387,7 @@ ibus_wayland_im_commit_text (IBusWaylandIM *wlim,
+                              const char    *str)
+ {
+     IBusWaylandIMPrivate *priv;
+-    g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
++    g_assert (IBUS_IS_WAYLAND_IM (wlim));
+     priv = ibus_wayland_im_get_instance_private (wlim);
+     switch (priv->version) {
+     case INPUT_METHOD_V1:
+@@ -822,6 +822,14 @@ _context_commit_text_cb (IBusInputContext *context,
+                          IBusText         *text,
+                          IBusWaylandIM    *wlim)
+ {
++    IBusWaylandIMPrivate *priv;
++
++    g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
++    priv = ibus_wayland_im_get_instance_private (wlim);
++    /* FIXME: rhbz#2480408 If priv->ibuscontext exists,
++     * priv->context also should exists.
++     */
++    g_assert (priv->ibuscontext);
+     ibus_wayland_im_commit_text (wlim, text->text);
+ }
+ 
+@@ -838,6 +846,8 @@ _context_forward_key_event_cb (IBusInputContext *context,
+ 
+     g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
+     priv = ibus_wayland_im_get_instance_private (wlim);
++    /* FIXME: rhbz#2480408 */
++    g_assert (priv->ibuscontext);
+     if (modifiers & IBUS_RELEASE_MASK)
+         state = WL_KEYBOARD_KEY_STATE_RELEASED;
+     else
+@@ -1055,6 +1065,8 @@ _context_show_preedit_text_cb (IBusInputContext *context,
+     const char *commit = "";
+     g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
+     priv = ibus_wayland_im_get_instance_private (wlim);
++    /* FIXME: rhbz#2480408 */
++    g_assert (priv->ibuscontext);
+     /* CURSOR is byte offset.  */
+     cursor =
+         g_utf8_offset_to_pointer (priv->preedit_text->text,
+@@ -1098,6 +1110,8 @@ _context_hide_preedit_text_cb (IBusInputContext *context,
+     IBusWaylandIMPrivate *priv;
+     g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
+     priv = ibus_wayland_im_get_instance_private (wlim);
++    /* FIXME: rhbz#2480408 */
++    g_assert (priv->ibuscontext);
+     switch (priv->version) {
+     case INPUT_METHOD_V1:
+         zwp_input_method_context_v1_preedit_string (priv->context,
+@@ -1137,6 +1151,8 @@ _context_update_preedit_text_cb (IBusInputContext *context,
+     priv->preedit_cursor_pos = cursor_pos;
+     priv->preedit_mode = mode;
+ 
++    /* FIXME: rhbz#2480408 */
++    g_assert (priv->ibuscontext);
+     if (visible)
+         _context_show_preedit_text_cb (context, wlim);
+     else
 diff --git a/client/x11/main.c b/client/x11/main.c
-index 5fadd43d..26d4a7f1 100644
+index accebde..cac4cd6 100644
 --- a/client/x11/main.c
 +++ b/client/x11/main.c
 @@ -45,6 +45,7 @@
@@ -428,7 +499,7 @@ index 5fadd43d..26d4a7f1 100644
      ibus_input_context_reset (x11ic->context);
  
 diff --git a/portal/portal.c b/portal/portal.c
-index 5cd38779..5110baad 100644
+index 5cd3877..5110baa 100644
 --- a/portal/portal.c
 +++ b/portal/portal.c
 @@ -92,6 +92,11 @@ static void portal_context_g_signal (GDBusProxy        *proxy,
@@ -487,7 +558,7 @@ index 5cd38779..5110baad 100644
                  g_object_unref (portal_context);
              }
 diff --git a/src/ibusbus.c b/src/ibusbus.c
-index 540d1da3..defdb73b 100644
+index 540d1da..defdb73 100644
 --- a/src/ibusbus.c
 +++ b/src/ibusbus.c
 @@ -750,6 +750,12 @@ ibus_bus_destroy (IBusObject *object)
@@ -504,7 +575,7 @@ index 540d1da3..defdb73b 100644
          bus->priv->monitor = NULL;
      }
 diff --git a/ui/gtk3/switcher.vala b/ui/gtk3/switcher.vala
-index d4a5fa11..788eea06 100644
+index d4a5fa1..788eea0 100644
 --- a/ui/gtk3/switcher.vala
 +++ b/ui/gtk3/switcher.vala
 @@ -251,27 +251,37 @@ class Switcher : Gtk.Window {
@@ -565,5 +636,5 @@ index d4a5fa11..788eea06 100644
          seat.ungrab();
  
 -- 
-2.51.0
+2.53.0
 

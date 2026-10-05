@@ -1,4 +1,4 @@
-From 50c46d80a99b6bdbb61733b0eef69649f22701ab Mon Sep 17 00:00:00 2001
+From 9923f41efae1860369827d5938c9cd03de805a2e Mon Sep 17 00:00:00 2001
 From: Sandro Tosi <morph@debian.org>
 Date: Wed, 27 Sep 2017 19:35:59 -0400
 Subject: [PATCH 1/5] matplotlibrc path search fix

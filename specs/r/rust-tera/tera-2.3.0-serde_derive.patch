@@ -1,0 +1,64 @@
+diff --git a/benches/templates.rs b/benches/templates.rs
+index cdcf0c9..0e54a20 100644
+--- a/benches/templates.rs
++++ b/benches/templates.rs
+@@ -2,7 +2,7 @@ use std::hint::black_box;
+ 
+ use criterion::{Criterion, criterion_group, criterion_main};
+ 
+-use serde_derive::Serialize;
++use serde::Serialize;
+ 
+ use tera::{Context, Tera};
+ 
+diff --git a/benches/value.rs b/benches/value.rs
+index 9abb9e0..b55c126 100644
+--- a/benches/value.rs
++++ b/benches/value.rs
+@@ -2,7 +2,7 @@ use std::hint::black_box;
+ use std::path::PathBuf;
+ 
+ use criterion::{Criterion, criterion_group, criterion_main};
+-use serde_derive::Serialize;
++use serde::Serialize;
+ 
+ use tera::value::Value;
+ 
+diff --git a/src/value/de.rs b/src/value/de.rs
+index e6b4b2b..bf8115b 100644
+--- a/src/value/de.rs
++++ b/src/value/de.rs
+@@ -244,7 +244,7 @@ impl<'de> de::Deserializer<'de> for &Value {
+ mod tests {
+     use super::*;
+     use serde::Deserialize;
+-    use serde_derive::Serialize;
++    use serde::Serialize;
+ 
+     #[derive(Debug, Serialize, Deserialize, PartialEq)]
+     enum Kind {
+diff --git a/src/value/ser.rs b/src/value/ser.rs
+index fecc897..efaee38 100644
+--- a/src/value/ser.rs
++++ b/src/value/ser.rs
+@@ -632,7 +632,7 @@ mod tests {
+ 
+     #[test]
+     fn from_serializable_nested_values_are_cloned() {
+-        #[derive(serde_derive::Serialize)]
++        #[derive(serde::Serialize)]
+         struct Section {
+             name: &'static str,
+             children: Vec<Value>,
+diff --git a/tests/undefined.rs b/tests/undefined.rs
+index d22c5e9..b9301a3 100644
+--- a/tests/undefined.rs
++++ b/tests/undefined.rs
+@@ -1,6 +1,6 @@
+ use std::collections::BTreeMap;
+ 
+-use serde_derive::Serialize;
++use serde::Serialize;
+ 
+ use tera::{Context, Tera, Value};
+ 

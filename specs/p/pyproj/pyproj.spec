@@ -5,26 +5,25 @@
 # a compatibility matrix is also provided in docs/installation.rst
 %global minimal_needed_proj_version 9.4.0
 
-# Several dependencies are not yet rebuilt for Python 3.14:
-%bcond xarray 0
+%bcond xarray 1
 
 Name:           pyproj
-Version:        3.7.2
+Version:        3.8.0
 Release: 5%{?dist}
+
 Summary:        Cython wrapper to provide python interfaces to Proj
 # this software uses the "MIT:Modern Style with sublicense" license
 License:        MIT
 URL:            https://github.com/jswhit/%{name}
 Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}.tar.gz
 
-# see: https://github.com/pyproj4/pyproj/issues/1501
 Patch1:         pyproj-proj-9.6.2.patch
 
 BuildRequires:  gcc
 BuildRequires:  proj-devel >= %{minimal_needed_proj_version}
 BuildRequires:  proj >= %{minimal_needed_proj_version}
 
-# these next 4 are no longer needed and taken care of automagically
+# these next 3 lines are no longer needed and taken care of automagically
 #BuildRequires:  make
 #BuildRequires:  python3-cython
 #BuildRequires:  python3-certifi
@@ -67,6 +66,10 @@ Optimized for numpy arrays.
 Summary: %summary
 
 Requires:  proj >= %{minimal_needed_proj_version}
+
+# Add shapely as (optional/weak) dependency.
+# For details see: https://github.com/pyproj4/pyproj/issues/1470
+Recommends: python3-shapely
 
 # ensure python provides are provided when python3 becomes the default runtime
 %{?python_provide:%python_provide python3-%{name}}
@@ -130,6 +133,9 @@ mkdir -p %{buildroot}%{_datadir}/doc/%{name}
 mv %{_builddir}/%{name}-%{version}/docs/_build/html \
    %{buildroot}%{_datadir}/doc/%{name}/html
 
+# remove the hidden .buildinfo file
+rm %{buildroot}%{_datadir}/doc/%{name}/html/.buildinfo
+
 # copy pyproj man page
 mkdir -p %{buildroot}/%{_mandir}/man1
 cp %{_builddir}/%{name}-%{version}/docs/_build/man/pyproj.1 \
@@ -185,6 +191,9 @@ cp ../pyproj-%{version}/pytest.ini .
 
 
 %changelog
+* Sat Sep 26 2026 Jos de Kloe <josdekloe@gmail.com> 3.8.0-1
+- Update to 3.8.0
+
 * Tue Sep 30 2025 Jos de Kloe <josdekloe@gmail.com> 3.7.2-2
 - Rebuild as requested by bz 2396746  (python "magic numer" bump)
 

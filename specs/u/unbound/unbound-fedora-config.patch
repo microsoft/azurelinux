@@ -1,4 +1,4 @@
-From 6e2d042505a006ab5fd703631661e68d1cdc66df Mon Sep 17 00:00:00 2001
+From d4716e5940a6565f3ada3ea886af0ededf4d61f3 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
 Date: Fri, 15 Nov 2024 13:25:34 +0100
 Subject: [PATCH] Customize unbound.conf for Fedora defaults
@@ -11,20 +11,20 @@ update external copy in source RPM.
  1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/doc/example.conf.in b/doc/example.conf.in
-index 59090c6..3a86809 100644
+index 63a8d65..4d37591 100644
 --- a/doc/example.conf.in
 +++ b/doc/example.conf.in
 @@ -8,6 +8,9 @@
  # Use this anywhere in the file to include other text into this file.
  #include: "otherfile.conf"
-
+ 
 +# Default Fedora settings
 +include: "@UNBOUND_SHARE_DIR@/fedora-defaults.conf"
 +
  # Use this anywhere in the file to include other text, that explicitly starts a
  # clause, into this file. Text after this directive needs to start a clause.
  #include-toplevel: "otherfile.conf"
-@@ -51,11 +51,19 @@ server:
+@@ -51,11 +54,19 @@ server:
  	# specify 0.0.0.0 and ::0 to bind to all available interfaces.
  	# specify every interface[@port] on a new 'interface:' labelled line.
  	# The listen interfaces are not changed on reload, only on restart.
@@ -33,7 +33,7 @@ index 59090c6..3a86809 100644
  	# interface: 192.0.2.153
  	# interface: 192.0.2.154
  	# interface: 192.0.2.154@5003
- 	# interface: 2001:DB8::5
+ 	# interface: 2001:db8::5
  	# interface: eth0@5003
 +	#
 +	# for dns over tls and raw dns over port 80
@@ -44,7 +44,7 @@ index 59090c6..3a86809 100644
  
  	# enable this feature to copy the source address of queries to reply.
  	# Socket options are not supported on all platforms. experimental.
-@@ -285,6 +293,8 @@ server:
+@@ -298,6 +309,8 @@ server:
  	# nat64-prefix: 64:ff9b::0/96
  
  	# Enable UDP, "yes" or "no".
@@ -53,7 +53,7 @@ index 59090c6..3a86809 100644
  	# do-udp: yes
  
  	# Enable TCP, "yes" or "no".
-@@ -320,6 +330,9 @@ server:
+@@ -333,6 +346,9 @@ server:
  	# can be dropped. Default is 0, disabled. In seconds, such as 3.
  	# sock-queue-timeout: 0
  
@@ -63,7 +63,7 @@ index 59090c6..3a86809 100644
  	# Use systemd socket activation for UDP, TCP, and control sockets.
  	# use-systemd: no
  
-@@ -906,6 +919,8 @@ server:
+@@ -927,6 +943,8 @@ server:
  	# you need to do the reverse notation yourself.
  	# local-data-ptr: "192.0.2.3 www.example.com"
  
@@ -72,7 +72,7 @@ index 59090c6..3a86809 100644
  	# tag a localzone with a list of tag names (in "" with spaces between)
  	# local-zone-tag: "example.com" "tag2 tag3"
  
-@@ -916,8 +931,8 @@ server:
+@@ -953,8 +971,8 @@ server:
  	# the TLS stream, and over HTTPS using HTTP/2 as specified in RFC8484.
  	# Give the certificate to use and private key.
  	# default is "" (disabled).  requires restart to take effect.
@@ -83,17 +83,17 @@ index 59090c6..3a86809 100644
  	# tls-port: 853
  	# https-port: 443
  	# quic-port: 853
-@@ -1166,6 +1181,9 @@ remote-control:
+@@ -1212,6 +1230,9 @@ remote-control:
  	# unbound-control certificate file.
  	# control-cert-file: "@UNBOUND_RUN_DIR@/unbound_control.pem"
-
+ 
 +# Stub and Forward zones
 +include: "@sysconfdir@/unbound/conf.d/*.conf"
 +
  # Stub zones.
  # Create entries like below, to make all queries for 'example.com' and
  # 'example.org' go to the given list of nameservers. list zero or more
-@@ -1186,6 +1207,10 @@ remote-control:
+@@ -1232,6 +1253,10 @@ remote-control:
  #	name: "example.org"
  #	stub-host: ns.example.com.
  
@@ -104,7 +104,7 @@ index 59090c6..3a86809 100644
  # Forward zones
  # Create entries like below, to make all queries for 'example.com' and
  # 'example.org' go to the given list of servers. These servers have to handle
-@@ -1203,6 +1228,10 @@ remote-control:
+@@ -1249,6 +1274,10 @@ remote-control:
  # forward-zone:
  # 	name: "example.org"
  # 	forward-host: fwd.example.com
@@ -116,5 +116,5 @@ index 59090c6..3a86809 100644
  # Authority zones
  # The data for these zones is kept locally, from a file or downloaded.
 -- 
-2.47.0
+2.54.0
 

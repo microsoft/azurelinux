@@ -1,9 +1,10 @@
---- zerovec-derive-0.11.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ zerovec-derive-0.11.2/Cargo.toml	2025-10-28T23:46:27.079376+00:00
-@@ -46,24 +46,6 @@
+--- zerovec-derive-0.11.6/Cargo.toml	2006-07-24T01:21:28+00:00
++++ zerovec-derive-0.11.6/Cargo.toml	2026-08-21T06:18:14.513832+00:00
+@@ -45,24 +45,6 @@
+ name = "zerovec_derive"
  path = "src/lib.rs"
  proc-macro = true
- 
+-
 -[[example]]
 -name = "derives"
 -path = "examples/derives.rs"
@@ -21,7 +22,6 @@
 -path = "examples/make_var.rs"
 -test = true
 -harness = false
--
- [dependencies.proc-macro2]
- version = "1.0.61"
  
+ [[test]]
+ name = "derive_ule_test"

@@ -1,0 +1,101 @@
+From 4c55bae2467d6754163e72f7b6a1ea42208e5d76 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Fri, 10 Apr 2026 07:05:50 +0000
+Subject: [PATCH 11/12] package: Add is_pkg_gpgcheck_enabled() method
+
+Unify the duplicated signature check decision logic from
+RpmSignature::check_package_signature() and
+Transaction::ts_change_callback() into a single method on the
+Package class.
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ include/libdnf5/rpm/package.hpp |  5 +++++
+ libdnf5/rpm/package.cpp         |  8 ++++++++
+ libdnf5/rpm/rpm_signature.cpp   | 12 ++----------
+ libdnf5/rpm/transaction.cpp     | 11 +----------
+ 4 files changed, 16 insertions(+), 20 deletions(-)
+
+diff --git a/include/libdnf5/rpm/package.hpp b/include/libdnf5/rpm/package.hpp
+index 7b7fa777..fcb33d9f 100644
+--- a/include/libdnf5/rpm/package.hpp
++++ b/include/libdnf5/rpm/package.hpp
+@@ -503,6 +503,11 @@ public:
+     // @replaces libdnf:libdnf/dnf-package.h:function:dnf_package_get_repo(DnfPackage * pkg)
+     libdnf5::repo::RepoWeakPtr get_repo() const;
+ 
++    /// Whether OpenPGP signature verification is required for this package
++    /// based on its repository configuration. Checks localpkg_gpgcheck for
++    /// command-line packages and pkg_gpgcheck for repository packages.
++    bool is_pkg_gpgcheck_enabled() const;
++
+     /// @return Id of the repository the package belongs to.
+     /// @since 5.0
+     /// @note This isn't the repository the package was installed from.
+diff --git a/libdnf5/rpm/package.cpp b/libdnf5/rpm/package.cpp
+index bb5db539..cea61385 100644
+--- a/libdnf5/rpm/package.cpp
++++ b/libdnf5/rpm/package.cpp
+@@ -459,6 +459,14 @@ libdnf5::repo::RepoWeakPtr Package::get_repo() const {
+     return get_rpm_pool(p_impl->base).get_repo(p_impl->id.id).get_weak_ptr();
+ }
+ 
++bool Package::is_pkg_gpgcheck_enabled() const {
++    auto repo = get_repo();
++    if (repo->get_type() == libdnf5::repo::Repo::Type::COMMANDLINE) {
++        return p_impl->base->get_config().get_localpkg_gpgcheck_option().get_value();
++    }
++    return repo->get_config().get_pkg_gpgcheck_option().get_value();
++}
++
+ std::string Package::get_repo_id() const {
+     return get_rpm_pool(p_impl->base).get_repo(p_impl->id.id).get_id();
+ }
+diff --git a/libdnf5/rpm/rpm_signature.cpp b/libdnf5/rpm/rpm_signature.cpp
+index b46f7cea..fa8072a4 100644
+--- a/libdnf5/rpm/rpm_signature.cpp
++++ b/libdnf5/rpm/rpm_signature.cpp
+@@ -257,16 +257,8 @@ RpmSignature::CheckResult RpmSignature::check_package_signature(const std::strin
+ 
+ RpmSignature::CheckResult RpmSignature::check_package_signature(const rpm::Package & pkg) const {
+     // is package OpenPGP check even required?
+-    auto repo = pkg.get_repo();
+-    if (repo->get_type() == libdnf5::repo::Repo::Type::COMMANDLINE) {
+-        if (!p_impl->base->get_config().get_localpkg_gpgcheck_option().get_value()) {
+-            return CheckResult::SKIPPED;
+-        }
+-    } else {
+-        auto & repo_config = repo->get_config();
+-        if (!repo_config.get_pkg_gpgcheck_option().get_value()) {
+-            return CheckResult::SKIPPED;
+-        }
++    if (!pkg.is_pkg_gpgcheck_enabled()) {
++        return CheckResult::SKIPPED;
+     }
+ 
+     return check_package_signature(pkg.get_package_path());
+diff --git a/libdnf5/rpm/transaction.cpp b/libdnf5/rpm/transaction.cpp
+index fd568f84..18a0da42 100644
+--- a/libdnf5/rpm/transaction.cpp
++++ b/libdnf5/rpm/transaction.cpp
+@@ -422,16 +422,7 @@ int Transaction::ts_change_callback(int event, rpmte te, rpmte other, void * dat
+         rpmteSetUserdata(te, transaction->last_added_item);
+         transaction->last_item_added_ts_element = true;
+ #if defined(HAVE_RPMTE_SETVFYLEVEL)
+-        auto repo = transaction->last_added_item->get_package().get_repo();
+-        bool gpgcheck = true;
+-        if (repo->get_type() == libdnf5::repo::Repo::Type::COMMANDLINE) {
+-            // honor localpkg_gpgcheck=0 in rpm's enforcing signature mode
+-            gpgcheck = transaction->get_base()->get_config().get_localpkg_gpgcheck_option().get_value();
+-        } else {
+-            // honor per-repo pkg_gpgcheck=0 in rpm's enforcing signature mode
+-            gpgcheck = repo->get_config().get_pkg_gpgcheck_option().get_value();
+-        }
+-        if (gpgcheck == false) {
++        if (!transaction->last_added_item->get_package().is_pkg_gpgcheck_enabled()) {
+             // When nocrypto tsflag is set, skip digest verification as well
+             auto & tsflags = transaction->base->get_config().get_tsflags_option().get_value();
+             bool nocrypto = std::find(tsflags.begin(), tsflags.end(), "nocrypto") != tsflags.end();
+-- 
+2.53.0
+

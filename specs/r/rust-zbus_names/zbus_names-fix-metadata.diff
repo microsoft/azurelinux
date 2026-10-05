@@ -1,6 +1,6 @@
---- zbus_names-4.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ zbus_names-4.2.0/Cargo.toml	2025-02-14T19:08:42.161825+00:00
-@@ -41,11 +41,6 @@
+--- zbus_names-4.3.4/Cargo.toml	2006-07-24T01:21:28+00:00
++++ zbus_names-4.3.4/Cargo.toml	2026-07-23T19:46:21.600593+00:00
+@@ -48,11 +48,6 @@
  path = "src/lib.rs"
  bench = false
  
@@ -12,12 +12,13 @@
  [dependencies.serde]
  version = "1.0.200"
  features = ["derive"]
-@@ -61,9 +56,6 @@
+@@ -64,10 +59,6 @@
+ version = "5.13.1"
  features = ["enumflags2"]
- default-features = false
  
 -[dev-dependencies.criterion]
--version = "0.5.1"
+-version = "5.0.0"
+-package = "codspeed-criterion-compat"
 -
  [lints.rust.unexpected_cfgs]
  level = "warn"

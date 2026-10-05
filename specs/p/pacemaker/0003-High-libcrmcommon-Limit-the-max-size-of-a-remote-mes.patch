@@ -1,0 +1,91 @@
+From bb37829e00c782071906305d2cf50247179f0fd7 Mon Sep 17 00:00:00 2001
+From: Chris Lumens <clumens@redhat.com>
+Date: Thu, 14 May 2026 13:26:07 -0400
+Subject: [PATCH 3/5] High: libcrmcommon: Limit the max size of a remote
+ message.
+
+Previously, we were just taking the sizes straight from the message
+header and allocating however much memory was asked for without
+checking.  It's possible for a malicious client to ask for a very large
+amount of memory (say, 4 GB since that'll fit in the uint32_t value for
+header->size_total).
+
+In that case, due to the use of pcmk__assert_alloc, we'll crash due to
+an out of memory error and the node could potentially be fenced.
+
+The fix is to simply check that the client isn't asking for too much
+memory.  This does unfortunately impose a size restriction on the
+message.  It's doubly unfortunate given how much work we've recently put
+into removing restrictions on IPC messages allowing for much larger
+clusters.
+
+I think the biggest thing these messages will ever contain is a CIB, so
+for now I'm going with a limit of 20 MB.  It is not my intention that
+this become a tuneable parameter that is exposed to the user.
+---
+ include/crm/common/remote_internal.h |  3 +++
+ lib/common/remote.c                  | 17 +++++++++++++++--
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/include/crm/common/remote_internal.h b/include/crm/common/remote_internal.h
+index 2fad3a79f4..5f200272de 100644
+--- a/include/crm/common/remote_internal.h
++++ b/include/crm/common/remote_internal.h
+@@ -29,6 +29,9 @@
+ extern "C" {
+ #endif
+ 
++// The maximum payload size for a remote message (in bytes)
++#define PCMK__REMOTE_MSG_MAX_SIZE (20 * 1024 * 1024)
++
+ // internal functions from remote.c
+ 
+ typedef struct {
+diff --git a/lib/common/remote.c b/lib/common/remote.c
+index d15f980f62..9f36827c5b 100644
+--- a/lib/common/remote.c
++++ b/lib/common/remote.c
+@@ -319,6 +319,7 @@ pcmk__remote_message_xml(pcmk__remote_t *remote)
+         int rc = 0;
+         unsigned int size_u = 0;
+         char *uncompressed = NULL;
++        size_t buffer_size = 0;
+ 
+ #if (UINT32_MAX < UINT_MAX)
+         if (header->payload_uncompressed >= UINT_MAX) {
+@@ -352,11 +353,17 @@ pcmk__remote_message_xml(pcmk__remote_t *remote)
+             return NULL;
+         }
+ 
++        buffer_size = (size_t) header->payload_offset + size_u;
++        if (buffer_size > PCMK__REMOTE_MSG_MAX_SIZE) {
++            pcmk__err("Message size %zu is larger than max allowed %u bytes",
++                      buffer_size, PCMK__REMOTE_MSG_MAX_SIZE);
++            return NULL;
++        }
++
+         pcmk__trace("Decompressing message data %" PRIu32 " bytes into %u "
+                     "bytes", header->payload_compressed, size_u);
+ 
+-        uncompressed = pcmk__assert_alloc(header->payload_offset + size_u,
+-                                          sizeof(char));
++        uncompressed = pcmk__assert_alloc(buffer_size, sizeof(char));
+ 
+         rc = BZ2_bzBuffToBuffDecompress(uncompressed + header->payload_offset,
+                                         &size_u,
+@@ -510,6 +517,12 @@ pcmk__read_available_remote_data(pcmk__remote_t *remote)
+         read_len = header->size_total;
+     }
+ 
++    if (read_len > PCMK__REMOTE_MSG_MAX_SIZE) {
++        pcmk__err("Message size %zu is larger than max allowed %u bytes",
++                  read_len, PCMK__REMOTE_MSG_MAX_SIZE);
++        return EINVAL;
++    }
++
+     /* automatically grow the buffer when needed */
+     if(remote->buffer_size < read_len) {
+         remote->buffer_size = 2 * read_len;
+-- 
+2.54.0
+

@@ -1,0 +1,137 @@
+From 1caddd4f6edd3342f349c5cbf6b8185bca4d54b5 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Fri, 18 Sep 2026 02:41:03 -0400
+Subject: [PATCH 1/3] Allow building against a system Zlib
+
+Also, don't build vendored Zlib internally if not using vendored blosc,
+as it isn't necessary.
+
+And drop the extra licenses.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ meson.options             |  6 ++--
+ pyproject.toml            |  2 --
+ src/numcodecs/meson.build | 64 +++++++++++++++++++++------------------
+ 3 files changed, 38 insertions(+), 34 deletions(-)
+
+diff --git a/meson.options b/meson.options
+index 26a2414..f055af8 100644
+--- a/meson.options
++++ b/meson.options
+@@ -1,9 +1,11 @@
+ option('system_blosc', type: 'feature', value: 'disabled',
+        description: 'Use system-installed Blosc library')
+-option('system_zstd', type: 'feature', value: 'disabled',
+-       description: 'Use system-installed Zstandard library')
+ option('system_lz4', type: 'feature', value: 'disabled',
+        description: 'Use system-installed LZ4 library')
++option('system_zlib', type: 'feature', value: 'disabled',
++       description: 'Use system-installed Zlib library')
++option('system_zstd', type: 'feature', value: 'disabled',
++       description: 'Use system-installed Zstandard library')
+ option('sse2', type: 'feature', value: 'auto',
+        description: 'Enable SSE2 SIMD optimizations')
+ option('avx2', type: 'feature', value: 'auto',
+diff --git a/pyproject.toml b/pyproject.toml
+index 185ecc3..192df28 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -36,8 +36,6 @@ maintainers = [
+ license = "MIT"
+ license-files = [
+     "LICENSE.txt",
+-    "c-blosc/LICENSE.txt",
+-    "c-blosc/LICENSES/*",
+ ]
+ 
+ [project.urls]
+diff --git a/src/numcodecs/meson.build b/src/numcodecs/meson.build
+index eca2b2c..41a3a7a 100644
+--- a/src/numcodecs/meson.build
++++ b/src/numcodecs/meson.build
+@@ -123,39 +123,43 @@ if not lz4_dep.found()
+   )
+ endif
+ 
+-# --- Vendored zlib (always vendored, used by blosc) ---
+-zlib_sources = files(
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/adler32.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/compress.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/crc32.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/deflate.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/gzclose.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/gzlib.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/gzread.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/gzwrite.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/infback.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/inffast.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/inflate.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/inftrees.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/trees.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/uncompr.c',
+-  '../../c-blosc/internal-complibs/zlib-1.3.1/zutil.c',
+-)
+-zlib_inc = include_directories('../../c-blosc/internal-complibs/zlib-1.3.1')
+-
+-zlib_lib = static_library('zlib_vendored', zlib_sources,
+-  include_directories: zlib_inc,
+-  c_args: c_args,
+-)
+-zlib_dep = declare_dependency(
+-  link_with: zlib_lib,
+-  include_directories: zlib_inc,
+-)
+-
+ # --- Vendored blosc ---
+ blosc_dep = dependency('blosc', required: get_option('system_blosc'))
+ 
+ if not blosc_dep.found()
++  # --- Vendored zlib ---
++  zlib_dep = dependency('zlib', required: get_option('system_zlib'))
++
++  if not zlib_dep.found()
++    zlib_sources = files(
++      '../../c-blosc/internal-complibs/zlib-1.3.1/adler32.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/compress.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/crc32.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/deflate.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/gzclose.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/gzlib.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/gzread.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/gzwrite.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/infback.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/inffast.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/inflate.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/inftrees.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/trees.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/uncompr.c',
++      '../../c-blosc/internal-complibs/zlib-1.3.1/zutil.c',
++    )
++    zlib_inc = include_directories('../../c-blosc/internal-complibs/zlib-1.3.1')
++
++    zlib_lib = static_library('zlib_vendored', zlib_sources,
++      include_directories: zlib_inc,
++      c_args: c_args,
++    )
++    zlib_dep = declare_dependency(
++      link_with: zlib_lib,
++      include_directories: zlib_inc,
++    )
++  endif
++
+   blosc_sources = files(
+     '../../c-blosc/blosc/blosc.c',
+     '../../c-blosc/blosc/blosclz.c',
+@@ -207,7 +211,7 @@ endif
+ # Extensions with C library dependencies
+ py.extension_module('blosc',
+   'blosc.pyx',
+-  dependencies: [blosc_dep, lz4_dep, zlib_dep, zstd_dep],
++  dependencies: [blosc_dep],
+   c_args: c_args,
+   link_args: link_args,
+   install: true,
+-- 
+2.54.0
+

@@ -1,0 +1,22 @@
+--- toml-1.1.6+spec-1.1.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ toml-1.1.6+spec-1.1.0/Cargo.toml	2026-09-16T16:56:26.691256+00:00
+@@ -223,19 +223,6 @@
+ 
+ [dev-dependencies.serde_json]
+ version = "1.0.149"
+-
+-[dev-dependencies.snapbox]
+-version = "1.1.0"
+-
+-[dev-dependencies.toml-test-data]
+-version = "2.14.0"
+-
+-[dev-dependencies.toml-test-harness]
+-version = "1.14.0"
+-features = ["snapshot"]
+-
+-[dev-dependencies.walkdir]
+-version = "2.5.0"
+ 
+ [lints.clippy]
+ bool_assert_comparison = "allow"

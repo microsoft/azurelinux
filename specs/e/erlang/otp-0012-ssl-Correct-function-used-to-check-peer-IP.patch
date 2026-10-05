@@ -1,0 +1,18 @@
+From: Ingela Anderton Andin <ingela@erlang.org>
+Date: Fri, 29 May 2026 15:01:58 +0200
+Subject: [PATCH] ssl: Correct function used to check peer IP
+
+
+diff --git a/lib/ssl/src/inet_tls_dist.erl b/lib/ssl/src/inet_tls_dist.erl
+index 776886e6fe..03fb4d6573 100644
+--- a/lib/ssl/src/inet_tls_dist.erl
++++ b/lib/ssl/src/inet_tls_dist.erl
+@@ -708,7 +708,7 @@ check_ip(Socket) ->
+                       end,
+                 {ok, Ifaddrs} ?= inet:getifaddrs(),
+                 {ok, Netmask} ?= find_netmask(IP, Ifaddrs),
+-                {ok, {PeerIP, _}} ?= inet:sockname(Socket),
++                {ok, {PeerIP, _}} ?= inet:peername(Socket),
+                 ok ?= if is_tuple(PeerIP) -> ok;
+                          true -> {error, {no_ip_address, PeerIP}}
+                       end,

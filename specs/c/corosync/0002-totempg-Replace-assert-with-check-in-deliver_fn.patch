@@ -1,0 +1,46 @@
+From 5148bf07dffa61bcfa92ca2c058e7d0f0a981cf3 Mon Sep 17 00:00:00 2001
+From: Jan Friesse <jfriesse@redhat.com>
+Date: Wed, 2 Sep 2026 15:53:33 +0200
+Subject: [PATCH 2/2] totempg: Replace assert with check in deliver_fn
+
+If assert() is compiled out in release builds, a
+new message could be appended past the end of the assembly buffer,
+resulting in a buffer overflow.
+
+To prevent this, replace the assertion with a standard runtime bounds
+check. If the incoming message exceeds the maximum buffer size, it is
+now safely logged and ignored.
+
+Fixes: CVE-2026-81665
+
+Reported-by: Tristan Madani <tristan@talencesecurity.com>
+Signed-off-by: Jan Friesse <jfriesse@redhat.com>
+Reviewed-by: Tristan Madani <tristan@talencesecurity.com>
+Reviewed-by: Fabio M. Di Nitto <fdinitto@redhat.com>
+---
+ exec/totempg.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/exec/totempg.c b/exec/totempg.c
+index d9beb899..b086bad9 100644
+--- a/exec/totempg.c
++++ b/exec/totempg.c
+@@ -659,7 +659,14 @@ static void totempg_deliver_fn (
+ 		return ;
+ 	}
+ 
+-	assert((assembly->index+msg_len) < sizeof(assembly->data));
++	if (assembly->index + msg_len >= sizeof(assembly->data)) {
++		log_printf(LOG_WARNING,
++		    "Message (totempg_mcast) received from node " CS_PRI_NODE_ID
++		    " would create too long message of %u bytes...  Ignoring.",
++		    nodeid, assembly->index + msg_len);
++
++		return ;
++	}
+ 	memcpy (&assembly->data[assembly->index], &data[datasize],
+ 		msg_len - datasize);
+ 
+-- 
+2.51.1
+

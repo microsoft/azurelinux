@@ -12,66 +12,53 @@
 # Please preserve changelog entries
 #
 
-# enable bootstrap when need to provide a new autoloader
-%global bootstrap 0
-%global github_owner     webmozart
-%global github_name      assert
-%global github_version   2.1.5
-%global github_commit    79155f94852fa27e2f73b459f6503f5e87e2c188
-%global github_short     %(c=%{github_commit}; echo ${c:0:7})
+%bcond_without           tests
+
+%global gh_owner         webmozart
+%global gh_project       assert
 %global major            2
 
 %global composer_vendor  webmozart
 %global composer_project assert
 
 # "php": "^8.2"
-%global php_min_ver 8.2
+%global php_min_ver      8.2
 
 # PHPUnit
-%global phpunit_require phpunit11
-%global phpunit_exec    phpunit11
+%global phpunit_require  phpunit11
+%global phpunit_exec     phpunit11
 
-%if %{bootstrap}
-# Build using "--with tests" to enable tests
-%global with_tests 0%{?_with_tests:1}
-%else
-# Build using "--without tests" to disable tests
-%global with_tests 0%{!?_without_tests:1}
-%endif
+%global phpdir           %{_datadir}/php
 
-%{!?phpdir:  %global phpdir  %{_datadir}/php}
 
 Name:          php-%{composer_vendor}-%{composer_project}%{major}
-Version:       %{github_version}
-Release:       1%{?github_release}%{?dist}
 Summary:       Assertions to validate method input/output with nice error messages
-
 License:       MIT
-URL:           https://github.com/%{github_owner}/%{github_name}
+Version:       2.4.1
+Release:       1%{?dist}
+URL:           https://github.com/%{gh_owner}/%{gh_project}
 
 # GitHub export does not include tests.
-# Run php-webmozart-assert-get-source.sh to create full source.
-Source0:       %{name}-%{github_version}-%{github_short}.tar.gz
-Source1:       %{name}-get-source.sh
+# Run makesrc.sh to create full source.
+Source0:       %{name}-%{version}.tgz
+Source1:       makesrc.sh
 
 BuildArch:     noarch
 # Tests
-%if %{with_tests}
+%if %{with tests}
 ## composer.json
 BuildRequires: php(language) >= %{php_min_ver}
-BuildRequires: php-ctype
 BuildRequires: %{phpunit_require}
-## phpcompatinfo (computed from version 1.7.0)
+## phpcompatinfo (computed from version 2.2.0)
 BuildRequires: php-mbstring
 BuildRequires: php-simplexml
+%endif
 ## Autoloader
 BuildRequires: php-composer(fedora/autoloader)
-%endif
 
 # composer.json
 Requires:      php(language) >= %{php_min_ver}
-Requires:      php-ctype
-# phpcompatinfo (computed from version 1.7.0)
+# phpcompatinfo (computed from version 2.2.0)
 Requires:      php-mbstring
 # Autoloader
 Requires:      php-composer(fedora/autoloader)
@@ -91,7 +78,7 @@ Autoloader: %{phpdir}/Webmozart/Assert%{major}/autoload.php
 
 
 %prep
-%setup -qn %{github_name}-%{github_commit}
+%setup -qn %{gh_project}-%{version}
 
 
 %build
@@ -112,8 +99,8 @@ mkdir -p %{buildroot}%{phpdir}/Webmozart
 cp -rp src %{buildroot}%{phpdir}/Webmozart/Assert%{major}
 
 
+%if %{with tests}
 %check
-%if %{with_tests}
 : Create tests bootstrap
 cat <<'BOOTSTRAP' | tee bootstrap.php
 <?php
@@ -148,6 +135,21 @@ exit $RETURN_CODE
 
 
 %changelog
+* Tue Jun 16 2026 Remi Collet <remi@remirepo.net> - 2.4.1-1
+- update to 2.4.1
+
+* Thu May 21 2026 Remi Collet <remi@remirepo.net> - 2.4.0-1
+- update to 2.4.0
+
+* Tue Apr 14 2026 Remi Collet <remi@remirepo.net> - 2.3.0-1
+- update to 2.3.0
+
+* Fri Apr 10 2026 Remi Collet <remi@remirepo.net> - 2.2.0-1
+- update to 2.2.0
+
+* Fri Feb 27 2026 Remi Collet <remi@remirepo.net> - 2.1.6-1
+- update to 2.1.6
+
 * Thu Feb 19 2026 Remi Collet <remi@remirepo.net> - 2.1.5-1
 - update to 2.1.5
 

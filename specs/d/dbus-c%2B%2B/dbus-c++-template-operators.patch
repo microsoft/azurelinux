@@ -1,0 +1,88 @@
+commit a0b9ef3b469ca23c6a3229d8abb967cbbddcee38
+Author: Peter Williams <peter@newton.cx>
+Date:   Sat Dec 19 21:12:46 2015 -0500
+
+    Fix some weird template/operator issues on OS X.
+    
+    I frankly don't understand at all what's going on here. These fixes
+    derive from:
+    
+    https://chromium.googlesource.com/chromiumos/third_party/dbus-cplusplus/+/c3f69f6be02e31521474dce7eadf6ba4f4a7ce94
+    https://chromium.googlesource.com/chromiumos/third_party/dbus-cplusplus/+/7104857773f790a549d399715482fa23d9b736cd
+    
+    Except I've dropped some changes that break the OS X build for me. Frankly, if
+    it compiles, that's good enough for me.
+
+diff --git a/include/dbus-c++/types.h b/include/dbus-c++/types.h
+index 044e72b..7b3108f 100644
+--- a/include/dbus-c++/types.h
++++ b/include/dbus-c++/types.h
+@@ -89,13 +89,7 @@ public:
+   }
+ 
+   template <typename T>
+-  operator T() const
+-  {
+-    T cast;
+-    MessageIter ri = _msg.reader();
+-    ri >> cast;
+-    return cast;
+-  }
++  operator T() const;
+ 
+ private:
+ 
+@@ -316,7 +310,7 @@ struct type< Struct<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14,
+   }
+ };
+ 
+-} /* namespace DBus */
++extern DXXAPI DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Variant &val);
+ 
+ inline DBus::MessageIter &operator << (DBus::MessageIter &iter, const DBus::Invalid &)
+ {
+@@ -551,6 +545,8 @@ inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Signature
+   return ++iter;
+ }
+ 
++extern DXXAPI DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Variant &val);
++
+ template<typename E>
+ inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, std::vector<E>& val)
+ {
+@@ -644,7 +640,16 @@ inline DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Struct<T1,
+   return ++iter;
+ }
+ 
+-extern DXXAPI DBus::MessageIter &operator >> (DBus::MessageIter &iter, DBus::Variant &val);
++template <typename T>
++inline DBus::Variant::operator T() const
++{
++  T cast;
++  DBus::MessageIter ri = _msg.reader();
++  ri >> cast;
++  return cast;
++}
++
++} /* namespace DBus */
+ 
+ #endif//__DBUSXX_TYPES_H
+ 
+diff --git a/src/types.cpp b/src/types.cpp
+index d414a3e..70f9ac0 100644
+--- a/src/types.cpp
++++ b/src/types.cpp
+@@ -34,7 +34,7 @@
+ #include "message_p.h"
+ #include "internalerror.h"
+ 
+-using namespace DBus;
++namespace DBus {
+ 
+ Variant::Variant()
+   : _msg(CallMessage()) // dummy message used as temporary storage for variant data
+@@ -104,3 +104,4 @@ MessageIter &operator >> (MessageIter &iter, Variant &val)
+   return ++iter;
+ }
+ 
++} /* namespace DBus */

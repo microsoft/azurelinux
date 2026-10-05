@@ -1,0 +1,91 @@
+From 6a931b3080313b7d830a7e1a2e637ac4ef780827 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 20 Apr 2026 11:04:39 +0200
+Subject: [PATCH] Adapt to changes in XML-Parser-2.48
+
+After upgrading XML-Parser from 2.47 to 2.48 t/001-load.t failed like this:
+
+    1..5
+    ok 1 - use XML::Catalog;
+    # Testing XML::Catalog 1.03
+    ok 2 - 'Check ISA' isa 'XML::Catalog'
+    not ok 3 - Reslove PublicID
+    #   Failed test 'Reslove PublicID'
+    #   at t/001-load.t line 20.
+    #          got: undef
+    #     expected: 'file:///home/test/fedora/perl-XML-Catalog/perl-XML-Catalog-1.03-build/XML-Catalog-1.03/t/test.dtd'
+    not ok 4 - Reslove deligated PublicID
+    #   Failed test 'Reslove deligated PublicID'
+    #   at t/001-load.t line 25.
+    #          got: undef
+    #     expected: 'file:///home/test/fedora/perl-XML-Catalog/perl-XML-Catalog-1.03-build/XML-Catalog-1.03/t/test.dtd'
+    not ok 5 - Reslove nextCatalog
+    #   Failed test 'Reslove nextCatalog'
+    #   at t/001-load.t line 30.
+    #          got: undef
+    #     expected: 'file:///home/test/fedora/perl-XML-Catalog/perl-XML-Catalog-1.03-build/XML-Catalog-1.03/t/test2.dtd'
+    # Looks like you failed 3 tests of 5.
+
+It was triggered by this XML-Parser commit:
+
+    commit 45016045691b95067238af981440ef0a5850e724 (HEAD)
+    Author: Toddr Bot <toddbot@rinaldo.us>
+    Date:   Mon Mar 16 21:40:21 2026 +0000
+
+        fix: propagate xpcroak errors in Subs style instead of swallowing them
+
+        The Subs style wrapped handler calls in eval { } to silently skip
+        elements without corresponding subs, but this also swallowed legitimate
+        errors from xpcroak(). Replace eval with defined(&$sub) checks, matching
+        the pattern already used by the Stream style.
+
+        Fixes https://github.com/cpan-authors/XML-Parser/issues/50
+
+        Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+
+That commit basically unwrapped Subs XML::Parser calls for start and
+end elements from an eval block. That unguarded a die call in
+XML::Catalog:::parse(), causing a premature end of parsing catalogs
+when an unretrievable URL was met. Note that propagating exceptions
+was a purpose of the commit.
+
+t/001-load.t test failed because when parsing t/oasis.cat,
+t/delegate.cat is parsed too and it refers to a nonexisting URL in
+/catalog/rewriteSystem/@rewritePrefix attribute.
+
+XML Catalog standard does not specify how to handle errors.
+
+This patch adjusts to the change by putting build() calls in an eval
+block, which calls parse() with die. I chose this solution over
+removing the die call to preserve ability to report an error for
+documents directly supplied to new() and add() public methods.
+
+CPAN RT#176391.
+---
+ lib/XML/Catalog.pm | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/XML/Catalog.pm b/lib/XML/Catalog.pm
+index 686bc07..454ffbf 100644
+--- a/lib/XML/Catalog.pm
++++ b/lib/XML/Catalog.pm
+@@ -191,14 +191,14 @@ sub add_remap {
+ 
+ sub add_delegate {
+     my ( $self, $pubid, $href ) = @_;
+-    my $cat = build( $self, $self->fix_base($href) );
++    my $cat = eval { build( $self, $self->fix_base($href) ) };
+     $self->{delegate}{$pubid} = $cat if defined $cat;
+ }
+ 
+ sub add_extend {
+     my ( $self, $href ) = @_;
+     $href = $self->fix_base($href);
+-    my $cat = build( $self, $href );
++    my $cat = eval { build( $self, $href ) };
+     $self->add_extend_object( $cat, 'extend' ) if defined $cat;
+ }
+ 
+-- 
+2.53.0
+

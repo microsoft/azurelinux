@@ -1,0 +1,13 @@
+--- asn1-rs-derive-0.6.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ asn1-rs-derive-0.6.0/Cargo.toml	2026-09-16T08:24:34.428156+00:00
+@@ -38,8 +38,8 @@
+ version = "1.0"
+ 
+ [dependencies.syn]
+-version = "2.0"
++version = "3.0"
+ features = ["full"]
+ 
+ [dependencies.synstructure]
+-version = "0.13"
++version = "0.14"

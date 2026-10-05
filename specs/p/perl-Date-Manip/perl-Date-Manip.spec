@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           perl-Date-Manip
-Version:        6.98
+Version:        7.00
 Release: 5%{?dist}
 Summary:        Date manipulation routines
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
@@ -126,6 +126,14 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Tue Sep 01 2026 Packit <hello@packit.dev> - 7.00-1
+- Update to version 7.00
+- Resolves: rhbz#2526952
+
+* Mon Mar 02 2026 Packit <hello@packit.dev> - 6.99-1
+- Update to version 6.99
+- Resolves: rhbz#2444008
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.98-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

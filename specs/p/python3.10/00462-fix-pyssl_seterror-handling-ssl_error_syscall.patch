@@ -22,10 +22,10 @@ Co-authored-by: Petr Viktorin <encukou@gmail.com>
  create mode 100644 Misc/NEWS.d/next/Library/2024-02-18-09-50-31.gh-issue-115627.HGchj0.rst
 
 diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
-index 0f1397de73..21d3676c22 100644
+index f4bba8ff03..f772bd6ab6 100644
 --- a/Lib/test/test_ssl.py
 +++ b/Lib/test/test_ssl.py
-@@ -2605,16 +2605,18 @@ def run(self):
+@@ -2607,16 +2607,18 @@ def run(self):
                          self.write(msg.lower())
                  except OSError as e:
                      # handles SSLError and socket errors
@@ -53,7 +53,7 @@ index 0f1397de73..21d3676c22 100644
                      try:
                          self.write(b"ERROR\n")
                      except OSError:
-@@ -3296,23 +3298,16 @@ def test_wrong_cert_tls13(self):
+@@ -3298,23 +3300,16 @@ def test_wrong_cert_tls13(self):
               client_context.wrap_socket(socket.socket(),
                                          server_hostname=hostname,
                                          suppress_ragged_eofs=False) as s:
@@ -82,7 +82,7 @@ index 0f1397de73..21d3676c22 100644
  
      def test_rude_shutdown(self):
          """A brutal shutdown of an SSL server should raise an OSError
-@@ -4558,8 +4553,8 @@ def msg_cb(conn, direction, version, content_type, msg_type, data):
+@@ -4560,8 +4555,8 @@ def msg_cb(conn, direction, version, content_type, msg_type, data):
                  # test sometimes fails with EOF error. Test passes as long as
                  # server aborts connection with an error.
                  with self.assertRaisesRegex(
@@ -102,7 +102,7 @@ index 0000000000..75d926ab59
 +Fix the :mod:`ssl` module error handling of connection terminate by peer.
 +It now throws an OSError with the appropriate error code instead of an EOFError.
 diff --git a/Modules/_ssl.c b/Modules/_ssl.c
-index 6852cc363b..91bf27bfef 100644
+index af770c7f18..7b3cf61474 100644
 --- a/Modules/_ssl.c
 +++ b/Modules/_ssl.c
 @@ -582,7 +582,7 @@ PySSL_ChainExceptions(PySSLSocket *sslsock) {

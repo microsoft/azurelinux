@@ -1,0 +1,43 @@
+From 069915c3ae22ea7fdf4ce640cc0e02062e7044ff Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Fri, 11 Sep 2026 15:21:11 -0700
+Subject: [PATCH 16/17] fdasd: Make sure data set name is positive
+
+Passing a negative value, eg. PART-999, to atoi could result in passing
+a negative value to the setpos call when it writes f1_counter.
+
+This adds an exception check to ensure the result of the atoi is always
+positive, and it preserves the rest of the logic which depends on n being
+1 less than the value.
+
+(cherry picked from commit a5cd8539475f904d6d46bf85998af2535d095555)
+---
+ libparted/labels/fdasd.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libparted/labels/fdasd.c b/libparted/labels/fdasd.c
+index cee4d461..ea00e664 100644
+--- a/libparted/labels/fdasd.c
++++ b/libparted/labels/fdasd.c
+@@ -18,6 +18,7 @@
+ 
+ #include <config.h>
+ #include <arch/linux.h>
++#include <parted/debug.h>
+ #include <parted/vtoc.h>
+ #include <parted/device.h>
+ #include <parted/fdasd.h>
+@@ -697,7 +698,9 @@ fdasd_process_valid_vtoc (fdasd_anchor_t * anc, unsigned long b, int fd)
+ 				if (ch != NULL) {
+ 					strncpy (s, ch + 4, 4);
+ 					s[4] = '\0';
+-					n = atoi (s) - 1;
++					n = atoi (s);
++                                        PED_ASSERT (n >= 0);
++                                        n = n - 1;
+ 				}
+ 
+ 				vtoc_ebcdic_enc (p->f1->DS1DSNAM, p->f1->DS1DSNAM, 44);
+-- 
+2.55.0
+

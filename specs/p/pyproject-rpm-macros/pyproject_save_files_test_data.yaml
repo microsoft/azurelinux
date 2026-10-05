@@ -15557,6 +15557,46 @@ metadata:
       License-File: LICENSE
       License-File: LICENSE.python
       Whatever: False data
+  kerberos:
+    path: /usr/lib64/python3.7/site-packages/kerberos-1.3.0.dist-info/METADATA
+    content: |
+      Name: kerberos
+      Version: 1.3.0
+  tensorflow:
+    path: /usr/lib64/python3.7/site-packages/tensorflow-2.1.0.dist-info/METADATA
+    content: |
+      Name: tensorflow
+      Version: 2.1.0
+  tldr:
+    path: /usr/lib/python3.7/site-packages/tldr-0.5.dist-info/METADATA
+    content: |
+      Name: tldr
+      Version: 0.5
+  mistune:
+    path: /usr/lib64/python3.7/site-packages/mistune-0.8.3.dist-info/METADATA
+    content: |
+      Name: mistune
+      Version: 0.8.3
+  ipykernel:
+    path: /usr/lib/python3.7/site-packages/ipykernel-5.2.1.dist-info/METADATA
+    content: |
+      Name: ipykernel
+      Version: 5.2.1
+  zope:
+    path: /usr/lib/python3.7/site-packages/zope.event-4.4.dist-info/METADATA
+    content: |
+      Name: zope.event
+      Version: 4.4
+  comic2pdf:
+    path: /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/METADATA
+    content: |
+      Name: comic2pdf
+      Version: 3.1.0
+  printrun:
+    path: /usr/lib/python3.7/site-packages/Printrun-2.0.0rc6.dist-info/METADATA
+    content: |
+      Name: Printrun
+      Version: 2.0.0rc6
 
 records:
   kerberos:

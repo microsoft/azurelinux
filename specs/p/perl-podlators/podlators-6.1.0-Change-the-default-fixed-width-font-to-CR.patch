@@ -1,0 +1,540 @@
+From e099fdf3fa07014e3df6a476242e2484b577c3d1 Mon Sep 17 00:00:00 2001
+From: Russ Allbery <rra@cpan.org>
+Date: Mon, 9 Feb 2026 18:46:40 -0800
+Subject: [PATCH] Change the default fixed with font to CR
+
+Change the default fixed-width font from `CW` to `CR`. This avoids
+warnings with groff 1.24.0 or later at the cost of breaking `troff`
+output on Solaris 10. `nroff` output and `troff` output on Solaris
+11 are unaffected. The `pod2man` option `--fixed=CW` will restore
+the previous behavior.
+
+Backported to 6.0.2
+
+---
+ Changes                                  |  6 ++++
+ lib/Pod/Man.pm                           | 11 ++++--
+ t/data/basic.man                         | 38 ++++++++++----------
+ t/data/man/encoding.groff                |  2 +-
+ t/data/man/encoding.roff                 |  2 +-
+ t/data/man/encoding.utf8                 |  2 +-
+ t/data/snippets/man/c-in-header          |  2 +-
+ t/data/snippets/man/dollar-magic         |  4 +--
+ t/data/snippets/man/fixed-font           |  4 +--
+ t/data/snippets/man/fixed-font-in-item   |  4 +--
+ t/data/snippets/man/guesswork            |  2 +-
+ t/data/snippets/man/guesswork-all        |  2 +-
+ t/data/snippets/man/guesswork-no-quoting | 42 +++++++++++-----------
+ t/data/snippets/man/guesswork-partial    |  2 +-
+ t/data/snippets/man/guesswork-quoting    | 46 ++++++++++++------------
+ t/data/snippets/man/item-fonts           |  2 +-
+ t/data/snippets/man/link-quoting         |  2 +-
+ t/data/snippets/man/long-quote           |  4 +--
+ t/data/snippets/man/lquote-and-quote     |  4 +--
+ t/data/snippets/man/lquote-rquote        |  4 +--
+ t/data/snippets/man/name-guesswork       |  2 +-
+ t/data/snippets/man/newlines-in-c        |  2 +-
+ t/data/snippets/man/periods              |  2 +-
+ t/data/snippets/man/quote-escaping       |  2 +-
+ t/data/snippets/man/rquote-none          |  4 +--
+ 25 files changed, 104 insertions(+), 93 deletions(-)
+
+#diff --git a/Changes b/Changes
+#index 4f35232..64ae124 100644
+#--- a/Changes
+#+++ b/Changes
+#@@ -2,6 +2,12 @@
+# 
+# v6.1.0 - Not Released
+# 
+#+- Change the default fixed-width font from CW to CR. This avoids warnings
+#+  with groff 1.24.0 or later at the cost of breaking troff output on
+#+  Solaris 10. nroff output and troff output on Solaris 11 are
+#+  unaffected. The pod2man option --fixed=CW will restore the previous
+#+  behavior. (GitHub #43)
+#+
+# - Move the Pod::Man override of the AD string (needed to request left
+#   justification) after .TH, and also clear the HY register to request no
+#   hyphenation. This positioning also works with groff 1.23.0 and will be
+diff --git a/lib/Pod/Man.pm b/lib/Pod/Man.pm
+index 9020d4a..94df7fb 100644
+--- a/lib/Pod/Man.pm
++++ b/lib/Pod/Man.pm
+@@ -294,7 +294,7 @@ sub init_fonts {
+     # implementations what fixed bold-italic may be called (if it's even
+     # available), so default to just bold.
+     #<<<
+-    $self->{opt_fixed}           ||= 'CW';
++    $self->{opt_fixed}           ||= 'CR';
+     $self->{opt_fixedbold}       ||= 'CB';
+     $self->{opt_fixeditalic}     ||= 'CI';
+     $self->{opt_fixedbolditalic} ||= 'CB';
+@@ -1826,8 +1826,9 @@ The default is C<pod>.
+ 
+ =item fixed
+ 
+-[1.00] The fixed-width font to use for verbatim text and code.  Defaults to
+-C<CW>.  Some systems prefer C<CR> instead.  Only matters for B<troff> output.
++[6.1.0] The fixed-width font to use for verbatim text and code.  Defaults to
++C<CR>.  Solaris systems historically preferred C<CW> instead.  Only matters
++for B<troff> output.
+ 
+ =item fixedbold
+ 
+@@ -2339,6 +2340,10 @@ v6.0.0 and later also unconditionally co
+ accent and apostrophe marks instead of the default *roff behavior of
+ interpreting them as paired quotes.
+ 
++Pod::Man v6.1.0 and later use C<CR> as the default fixed-width font instead of
++C<CW>, as was used in previous versions.  This should only matter for B<troff>
++output. It was backported to 6.0.2.
++
+ =head1 BUGS
+ 
+ There are numerous bugs and language-specific assumptions in the nroff
+diff --git a/t/data/basic.man b/t/data/basic.man
+index 2f5f68c..9fb36f7 100644
+--- a/t/data/basic.man
++++ b/t/data/basic.man
+@@ -5,19 +5,19 @@ basic.pod \- Test of various basic POD features in translators.
+ Try a few different levels of headings, with embedded formatting codes and
+ other interesting bits.
+ .ie n .SH "This ""is"" a ""level 1"" heading"
+-.el .SH "This \f(CWis\fP a ""level 1"" heading"
++.el .SH "This \f(CRis\fP a ""level 1"" heading"
+ .IX Header "This is a ""level 1"" heading"
+ .SS "\`\`Level\*(Aq\*(Aq ""2 \fIheading\fP"
+ .IX Subsection "``Level'' ""2 heading"
+ \fILevel 3 \fR\f(BIheading with \fR\f(CB\*(C`weird stuff "" (double quote)\*(C'\fR
+ .IX Subsection "Level 3 heading with weird stuff """" (double quote)"
+ .PP
+-Level "4 \f(CW\*(C`heading\*(C'\fR
++Level "4 \f(CR\*(C`heading\*(C'\fR
+ .IX Subsection "Level ""4 heading"
+ .PP
+ Now try again with \fBintermixed\fR \fItext\fR.
+ .ie n .SH "This ""is"" a ""level 1"" heading"
+-.el .SH "This \f(CWis\fP a ""level 1"" heading"
++.el .SH "This \f(CRis\fP a ""level 1"" heading"
+ .IX Header "This is a ""level 1"" heading"
+ Text.
+ .SS "\`\`Level\*(Aq\*(Aq 2 \fIheading\fP"
+@@ -29,7 +29,7 @@ Text.
+ .PP
+ Text.
+ .PP
+-Level "4 \f(CW\*(C`heading\*(C'\fR
++Level "4 \f(CR\*(C`heading\*(C'\fR
+ .IX Subsection "Level ""4 heading"
+ .PP
+ Text.
+@@ -89,7 +89,7 @@ Testing \fIitalics\fR
+ .PP
+ "\fIItalic\fR text" in foo
+ .PP
+-"Section \f(CW\*(C`with\*(C'\fR \fR\f(BIother\fR\fI markup\fR" in foo|bar
++"Section \f(CR\*(C`with\*(C'\fR \fR\f(BIother\fR\fI markup\fR" in foo|bar
+ .SH "OVER AND ITEMS"
+ .IX Header "OVER AND ITEMS"
+ Taken from Pod::Parser tests, this is a test to ensure that multiline
+@@ -141,7 +141,7 @@ for one paragraph are properly compacted.
+ .IP \fBbar\fR 4
+ .IX Item "bar"
+ .ie n .IP """baz""" 4
+-.el .IP \f(CWbaz\fR 4
++.el .IP \f(CRbaz\fR 4
+ .IX Item "baz"
+ .PD
+ There shouldn\*(Aqt be any spaces between any of these item tags; this idiom
+@@ -201,33 +201,33 @@ Second item.
+ .IX Header "FORMATTING CODES"
+ Another test taken from Pod::Parser.
+ .PP
+-This is a test to see if I can do not only \f(CW$self\fR and \f(CWmethod()\fR, but
+-also \f(CW\*(C`$self\->method()\*(C'\fR and \f(CW\*(C`$self\->{FIELDNAME}\*(C'\fR and
+-\&\f(CW\*(C`$Foo <=> $Bar\*(C'\fR without resorting to escape sequences. If 
++This is a test to see if I can do not only \f(CR$self\fR and \f(CRmethod()\fR, but
++also \f(CR\*(C`$self\->method()\*(C'\fR and \f(CR\*(C`$self\->{FIELDNAME}\*(C'\fR and
++\&\f(CR\*(C`$Foo <=> $Bar\*(C'\fR without resorting to escape sequences. If 
+ I want to refer to the right\-shift operator I can do something
+-like \f(CW\*(C`$x >> 3\*(C'\fR or even \f(CW\*(C`$y >> 5\*(C'\fR.
++like \f(CR\*(C`$x >> 3\*(C'\fR or even \f(CR\*(C`$y >> 5\*(C'\fR.
+ .PP
+-Now for the grand finale of \f(CW\*(C`$self\->method()\->{FIELDNAME} = {FOO=>BAR}\*(C'\fR.
++Now for the grand finale of \f(CR\*(C`$self\->method()\->{FIELDNAME} = {FOO=>BAR}\*(C'\fR.
+ And I also want to make sure that newlines work like this
+-\&\f(CW\*(C`$self\->{FOOBAR} >> 3 and [$b => $a]\->[$a <=> $b]\*(C'\fR
++\&\f(CR\*(C`$self\->{FOOBAR} >> 3 and [$b => $a]\->[$a <=> $b]\*(C'\fR
+ .PP
+ Of course I should still be able to do all this \fIwith\fR escape sequences
+-too: \f(CW\*(C`$self\->method()\*(C'\fR and \f(CW\*(C`$self\->{FIELDNAME}\*(C'\fR and
+-\&\f(CW\*(C`{FOO=>BAR}\*(C'\fR.
++too: \f(CR\*(C`$self\->method()\*(C'\fR and \f(CR\*(C`$self\->{FIELDNAME}\*(C'\fR and
++\&\f(CR\*(C`{FOO=>BAR}\*(C'\fR.
+ .PP
+-Don\*(Aqt forget \f(CW\*(C`$self\->method()\->{FIELDNAME} = {FOO=>BAR}\*(C'\fR.
++Don\*(Aqt forget \f(CR\*(C`$self\->method()\->{FIELDNAME} = {FOO=>BAR}\*(C'\fR.
+ .PP
+-And make sure that \f(CW0\fR works too!
++And make sure that \f(CR0\fR works too!
+ .PP
+ Now, if I use << or >> as my delimiters, then I have to use whitespace.
+-So things like \f(CW\*(C`<$self\-\*(C'\fR\fBmethod()\fR>> and \f(CW\*(C`<$self\-\*(C'\fR{FIELDNAME}>> won\*(Aqt end
++So things like \f(CR\*(C`<$self\-\*(C'\fR\fBmethod()\fR>> and \f(CR\*(C`<$self\-\*(C'\fR{FIELDNAME}>> won\*(Aqt end
+ up doing what you might expect since the first > will still terminate
+ the first < seen.
+ .PP
+-Lets make sure these work for empty ones too, like \f(CW\*(C`\*(C'\fR and \f(CW\*(C`>>\*(C'\fR
++Lets make sure these work for empty ones too, like \f(CR\*(C`\*(C'\fR and \f(CR\*(C`>>\*(C'\fR
+ (just to be obnoxious)
+ .PP
+-The statement: \f(CW\*(C`This is dog kind\*(Aqs \fR\f(CIfinest\fR\f(CW hour!\*(C'\fR is a parody of a
++The statement: \f(CR\*(C`This is dog kind\*(Aqs \fR\f(CIfinest\fR\f(CR hour!\*(C'\fR is a parody of a
+ quotation from Winston Churchill.
+ .PP
+ The following tests are added to those:
+diff --git a/t/data/man/encoding.groff b/t/data/man/encoding.groff
+index d9e7f0c..b342c43 100644
+--- a/t/data/man/encoding.groff
++++ b/t/data/man/encoding.groff
+@@ -6,7 +6,7 @@
+ .if n .sp
+ ..
+ .de Vb \" Begin verbatim text
+-.ft CW
++.ft CR
+ .nf
+ .ne \\$1
+ ..
+diff --git a/t/data/man/encoding.roff b/t/data/man/encoding.roff
+index 68741e7..9981cd9 100644
+--- a/t/data/man/encoding.roff
++++ b/t/data/man/encoding.roff
+@@ -6,7 +6,7 @@
+ .if n .sp
+ ..
+ .de Vb \" Begin verbatim text
+-.ft CW
++.ft CR
+ .nf
+ .ne \\$1
+ ..
+diff --git a/t/data/man/encoding.utf8 b/t/data/man/encoding.utf8
+index 2bad3d7..6c05fb7 100644
+--- a/t/data/man/encoding.utf8
++++ b/t/data/man/encoding.utf8
+@@ -7,7 +7,7 @@
+ .if n .sp
+ ..
+ .de Vb \" Begin verbatim text
+-.ft CW
++.ft CR
+ .nf
+ .ne \\$1
+ ..
+diff --git a/t/data/snippets/man/c-in-header b/t/data/snippets/man/c-in-header
+index 068363c..021c71a 100644
+--- a/t/data/snippets/man/c-in-header
++++ b/t/data/snippets/man/c-in-header
+@@ -6,5 +6,5 @@ C<> in headers
+ 
+ [output]
+ .ie n .SH """one"" and ""two"""
+-.el .SH "\f(CWone\fP and \f(CWtwo\fP"
++.el .SH "\f(CRone\fP and \f(CRtwo\fP"
+ .IX Header "one and two"
+diff --git a/t/data/snippets/man/dollar-magic b/t/data/snippets/man/dollar-magic
+index d5546ea..0969e80 100644
+--- a/t/data/snippets/man/dollar-magic
++++ b/t/data/snippets/man/dollar-magic
+@@ -18,7 +18,7 @@ price is $100."
+ These should be identical.
+ .PP
+ Bippity boppity boo "The
+-price is \f(CW$100\fR."
++price is \f(CR$100\fR."
+ .PP
+ Bippity boppity boo "The
+-price is \f(CW$100\fR."
++price is \f(CR$100\fR."
+diff --git a/t/data/snippets/man/fixed-font b/t/data/snippets/man/fixed-font
+index 19b8aaf..bbbcf9b 100644
+--- a/t/data/snippets/man/fixed-font
++++ b/t/data/snippets/man/fixed-font
+@@ -2,7 +2,7 @@
+ Options to set fixed fonts
+ 
+ [options]
+-fixed CR
++fixed CW
+ fixedbold CY
+ fixeditalic CW
+ fixedbolditalic CX
+@@ -15,4 +15,4 @@ C<foo B<bar I<baz>> I<bay>>
+ [output]
+ .SH "FIXED FONTS"
+ .IX Header "FIXED FONTS"
+-\&\f(CR\*(C`foo \fR\f(CYbar \fR\f(CXbaz\fR\f(CR \fR\f(CWbay\fR\f(CR\*(C'\fR
++\&\f(CW\*(C`foo \fR\f(CYbar \fR\f(CXbaz\fR\f(CW bay\*(C'\fR
+diff --git a/t/data/snippets/man/fixed-font-in-item b/t/data/snippets/man/fixed-font-in-item
+index 137b897..eac83bd 100644
+--- a/t/data/snippets/man/fixed-font-in-item
++++ b/t/data/snippets/man/fixed-font-in-item
+@@ -21,10 +21,10 @@ didn't properly stop italic.
+ In podlators 4.06 and earlier, italic was terminated with \ef(CW, which
+ didn\*(Aqt properly stop italic.
+ .ie n .IP """tar \fIoption\fR... [\fIname\fR]...""" 2
+-.el .IP "\f(CWtar \fR\f(CIoption\fR\f(CW... [\fR\f(CIname\fR\f(CW]...\fR" 2
++.el .IP "\f(CRtar \fR\f(CIoption\fR\f(CR... [\fR\f(CIname\fR\f(CR]...\fR" 2
+ .IX Item "tar option... [name]..."
+ .PD 0
+ .ie n .IP """tar \fIletter\fR... [\fIargument\fR]... [\fIoption\fR]... [\fIname\fR]...""" 2
+-.el .IP "\f(CWtar \fR\f(CIletter\fR\f(CW... [\fR\f(CIargument\fR\f(CW]... [\fR\f(CIoption\fR\f(CW]... [\fR\f(CIname\fR\f(CW]...\fR" 2
++.el .IP "\f(CRtar \fR\f(CIletter\fR\f(CR... [\fR\f(CIargument\fR\f(CR]... [\fR\f(CIoption\fR\f(CR]... [\fR\f(CIname\fR\f(CR]...\fR" 2
+ .IX Item "tar letter... [argument]... [option]... [name]..."
+ .PD
+diff --git a/t/data/snippets/man/guesswork b/t/data/snippets/man/guesswork
+index 65a5358..25e79cb 100644
+--- a/t/data/snippets/man/guesswork
++++ b/t/data/snippets/man/guesswork
+@@ -21,4 +21,4 @@ Function: \fBfoo()\fR, \fBbar::baz()\fR, \fB_private::_stuff()\fR
+ .PP
+ Manpage: \fBfoo\fR\|(1), \fBPod::Man\fR\|(3perl), \fBgit\-rebase\fR\|(1)
+ .PP
+-Variables: \f(CW$foo\fR, \f(CW@bar::baz\fR, \f(CW%Pod::Blah\fR
++Variables: \f(CR$foo\fR, \f(CR@bar::baz\fR, \f(CR%Pod::Blah\fR
+diff --git a/t/data/snippets/man/guesswork-all b/t/data/snippets/man/guesswork-all
+index 89bfd38..702b23c 100644
+--- a/t/data/snippets/man/guesswork-all
++++ b/t/data/snippets/man/guesswork-all
+@@ -24,4 +24,4 @@ Function: \fBfoo()\fR, \fBbar::baz()\fR, \fB_private::_stuff()\fR
+ .PP
+ Manpage: \fBfoo\fR\|(1), \fBPod::Man\fR\|(3perl), \fBgit\-rebase\fR\|(1)
+ .PP
+-Variables: \f(CW$foo\fR, \f(CW@bar::baz\fR, \f(CW%Pod::Blah\fR
++Variables: \f(CR$foo\fR, \f(CR@bar::baz\fR, \f(CR%Pod::Blah\fR
+diff --git a/t/data/snippets/man/guesswork-no-quoting b/t/data/snippets/man/guesswork-no-quoting
+index b7554f5..d9adb63 100644
+--- a/t/data/snippets/man/guesswork-no-quoting
++++ b/t/data/snippets/man/guesswork-no-quoting
+@@ -34,24 +34,24 @@ C<0xdeadbeef>
+ .SH QUOTING
+ .IX Header "QUOTING"
+ Suppress quotes:
+-\&\f(CW"foo"\fR,
+-\&\f(CW\*(Aqfoo\*(Aq\fR,
+-\&\f(CW\`foo\`\fR,
+-\&\f(CW\`foo\*(Aq\fR,
++\&\f(CR"foo"\fR,
++\&\f(CR\*(Aqfoo\*(Aq\fR,
++\&\f(CR\`foo\`\fR,
++\&\f(CR\`foo\*(Aq\fR,
+ .PP
+ All these should now be quoted:
+-\&\f(CW\*(C`$#f\*(C'\fR,
+-\&\f(CW\*(C`$foo[4]\*(C'\fR,
+-\&\f(CW\*(C`$foo{bar}\*(C'\fR,
+-\&\f(CW\*(C`%foo\*(C'\fR,
+-\&\f(CW\*(C`@foo\*(C'\fR,
+-\&\f(CW\*(C`&foo\*(C'\fR,
+-\&\f(CW\*(C`*foo\*(C'\fR,
+-\&\f(CW\*(C`$foo\->("bar")\*(C'\fR,
+-\&\f(CW\*(C`&foo::baz("bar")\*(C'\fR,
+-\&\f(CW\*(C`&foo()\*(C'\fR,
+-\&\f(CW\*(C`foo( "bar" )\*(C'\fR,
+-\&\f(CW\*(C`\-1000\*(C'\fR,
+-\&\f(CW\*(C`132.123\*(C'\fR,
+-\&\f(CW\*(C`5e\-7\*(C'\fR,
+-\&\f(CW\*(C`0xdeadbeef\*(C'\fR
++\&\f(CR\*(C`$#f\*(C'\fR,
++\&\f(CR\*(C`$foo[4]\*(C'\fR,
++\&\f(CR\*(C`$foo{bar}\*(C'\fR,
++\&\f(CR\*(C`%foo\*(C'\fR,
++\&\f(CR\*(C`@foo\*(C'\fR,
++\&\f(CR\*(C`&foo\*(C'\fR,
++\&\f(CR\*(C`*foo\*(C'\fR,
++\&\f(CR\*(C`$foo\->("bar")\*(C'\fR,
++\&\f(CR\*(C`&foo::baz("bar")\*(C'\fR,
++\&\f(CR\*(C`&foo()\*(C'\fR,
++\&\f(CR\*(C`foo( "bar" )\*(C'\fR,
++\&\f(CR\*(C`\-1000\*(C'\fR,
++\&\f(CR\*(C`132.123\*(C'\fR,
++\&\f(CR\*(C`5e\-7\*(C'\fR,
++\&\f(CR\*(C`0xdeadbeef\*(C'\fR
+diff --git a/t/data/snippets/man/guesswork-partial b/t/data/snippets/man/guesswork-partial
+index c68cfa5..b95b690 100644
+--- a/t/data/snippets/man/guesswork-partial
++++ b/t/data/snippets/man/guesswork-partial
+@@ -24,4 +24,4 @@ Function: \fBfoo()\fR, \fBbar::baz()\fR, \fB_private::_stuff()\fR
+ .PP
+ Manpage: foo(1), Pod::Man(3perl), git\-rebase(1)
+ .PP
+-Variables: \f(CW$foo\fR, \f(CW@bar::baz\fR, \f(CW%Pod::Blah\fR
++Variables: \f(CR$foo\fR, \f(CR@bar::baz\fR, \f(CR%Pod::Blah\fR
+diff --git a/t/data/snippets/man/guesswork-quoting b/t/data/snippets/man/guesswork-quoting
+index c1c592a..efef187 100644
+--- a/t/data/snippets/man/guesswork-quoting
++++ b/t/data/snippets/man/guesswork-quoting
+@@ -31,24 +31,24 @@ C<“foo”>
+ .SH QUOTING
+ .IX Header "QUOTING"
+ Suppress quotes:
+-\&\f(CW"foo"\fR,
+-\&\f(CW\*(Aqfoo\*(Aq\fR,
+-\&\f(CW\`foo\`\fR,
+-\&\f(CW\`foo\*(Aq\fR,
+-\&\f(CW$^F\fR,
+-\&\f(CW$"\fR,
+-\&\f(CW$#f\fR,
+-\&\f(CW$foo[4]\fR,
+-\&\f(CW$foo{bar}\fR,
+-\&\f(CW%foo\fR,
+-\&\f(CW@foo\fR,
+-\&\f(CW&foo\fR,
+-\&\f(CW*foo\fR,
+-\&\f(CW$foo\->("bar")\fR,
+-\&\f(CW&foo::baz("bar")\fR,
+-\&\f(CW&foo()\fR,
+-\&\f(CWfoo( "bar" )\fR,
+-\&\f(CW\-1000\fR,
+-\&\f(CW132.123\fR,
+-\&\f(CW5e\-7\fR,
+-\&\f(CW0xdeadbeef\fR
++\&\f(CR"foo"\fR,
++\&\f(CR\*(Aqfoo\*(Aq\fR,
++\&\f(CR\`foo\`\fR,
++\&\f(CR\`foo\*(Aq\fR,
++\&\f(CR$^F\fR,
++\&\f(CR$"\fR,
++\&\f(CR$#f\fR,
++\&\f(CR$foo[4]\fR,
++\&\f(CR$foo{bar}\fR,
++\&\f(CR%foo\fR,
++\&\f(CR@foo\fR,
++\&\f(CR&foo\fR,
++\&\f(CR*foo\fR,
++\&\f(CR$foo\->("bar")\fR,
++\&\f(CR&foo::baz("bar")\fR,
++\&\f(CR&foo()\fR,
++\&\f(CRfoo( "bar" )\fR,
++\&\f(CR\-1000\fR,
++\&\f(CR132.123\fR,
++\&\f(CR5e\-7\fR,
++\&\f(CR0xdeadbeef\fR
+diff --git a/t/data/snippets/man/item-fonts b/t/data/snippets/man/item-fonts
+index e695cc3..56314a6 100644
+--- a/t/data/snippets/man/item-fonts
++++ b/t/data/snippets/man/item-fonts
+@@ -10,5 +10,5 @@ Fonts in items
+ 
+ [output]
+ .ie n .IP "1. Check fonts in @CARP_NOT test." 4
+-.el .IP "1. Check fonts in \f(CW@CARP_NOT\fR test." 4
++.el .IP "1. Check fonts in \f(CR@CARP_NOT\fR test." 4
+ .IX Item "1. Check fonts in @CARP_NOT test."
+diff --git a/t/data/snippets/man/link-quoting b/t/data/snippets/man/link-quoting
+index 9f9157a..af4bb87 100644
+--- a/t/data/snippets/man/link-quoting
++++ b/t/data/snippets/man/link-quoting
+@@ -9,4 +9,4 @@ There should not be double quotes: L<C<< (?>pattern) >>>.
+ [output]
+ .SH "LINK QUOTING"
+ .IX Header "LINK QUOTING"
+-There should not be double quotes: \f(CW\*(C`(?>pattern)\*(C'\fR.
++There should not be double quotes: \f(CR\*(C`(?>pattern)\*(C'\fR.
+diff --git a/t/data/snippets/man/long-quote b/t/data/snippets/man/long-quote
+index e324ee5..a73fd74 100644
+--- a/t/data/snippets/man/long-quote
++++ b/t/data/snippets/man/long-quote
+@@ -11,6 +11,6 @@ Foo C<bar> baz.
+ 
+ [output]
+ .ie n .SH "FOO ""\(lqBAR\(rq"" BAZ"
+-.el .SH "FOO \f(CWBAR\fP BAZ"
++.el .SH "FOO \f(CRBAR\fP BAZ"
+ .IX Header "FOO BAR BAZ"
+-Foo \f(CW\*(C`bar\*(C'\fR baz.
++Foo \f(CR\*(C`bar\*(C'\fR baz.
+diff --git a/t/data/snippets/man/lquote-and-quote b/t/data/snippets/man/lquote-and-quote
+index def8fe3..5d08e21 100644
+--- a/t/data/snippets/man/lquote-and-quote
++++ b/t/data/snippets/man/lquote-and-quote
+@@ -12,6 +12,6 @@ Foo C<bar> baz.
+ 
+ [output]
+ .ie n .SH "FOO ``BAR"" BAZ"
+-.el .SH "FOO \f(CWBAR\fP BAZ"
++.el .SH "FOO \f(CRBAR\fP BAZ"
+ .IX Header "FOO BAR BAZ"
+-Foo \f(CW\*(C`bar\*(C'\fR baz.
++Foo \f(CR\*(C`bar\*(C'\fR baz.
+diff --git a/t/data/snippets/man/lquote-rquote b/t/data/snippets/man/lquote-rquote
+index 481e545..677ea77 100644
+--- a/t/data/snippets/man/lquote-rquote
++++ b/t/data/snippets/man/lquote-rquote
+@@ -12,6 +12,6 @@ Foo C<bar> baz.
+ 
+ [output]
+ .ie n .SH "FOO ``BAR"" BAZ"
+-.el .SH "FOO \f(CWBAR\fP BAZ"
++.el .SH "FOO \f(CRBAR\fP BAZ"
+ .IX Header "FOO BAR BAZ"
+-Foo \f(CW\*(C`bar\*(C'\fR baz.
++Foo \f(CR\*(C`bar\*(C'\fR baz.
+diff --git a/t/data/snippets/man/name-guesswork b/t/data/snippets/man/name-guesswork
+index 547545d..eb787c6 100644
+--- a/t/data/snippets/man/name-guesswork
++++ b/t/data/snippets/man/name-guesswork
+@@ -15,4 +15,4 @@ function() - man(1) $variable
+ function() \- man(1) $variable
+ .SS THINGS
+ .IX Subsection "THINGS"
+-\&\fBfunction()\fR \- \fBman\fR\|(1) \f(CW$variable\fR
++\&\fBfunction()\fR \- \fBman\fR\|(1) \f(CR$variable\fR
+diff --git a/t/data/snippets/man/newlines-in-c b/t/data/snippets/man/newlines-in-c
+index c053c4b..b55daa2 100644
+--- a/t/data/snippets/man/newlines-in-c
++++ b/t/data/snippets/man/newlines-in-c
+@@ -10,5 +10,5 @@ Blorp C<'
+ [output]
+ .SH "Newline C Quote Weirdness"
+ .IX Header "Newline C Quote Weirdness"
+-Blorp \f(CW\*(Aq
++Blorp \f(CR\*(Aq
+ \&\*(Aq\*(Aq\fR. Yes.
+diff --git a/t/data/snippets/man/periods b/t/data/snippets/man/periods
+index bc841db..d77f86d 100644
+--- a/t/data/snippets/man/periods
++++ b/t/data/snippets/man/periods
+@@ -9,4 +9,4 @@ This C<.> should be quoted.
+ [output]
+ .SH PERIODS
+ .IX Header "PERIODS"
+-This \f(CW\*(C`.\*(C'\fR should be quoted.
++This \f(CR\*(C`.\*(C'\fR should be quoted.
+diff --git a/t/data/snippets/man/quote-escaping b/t/data/snippets/man/quote-escaping
+index 4dad85d..43bf445 100644
+--- a/t/data/snippets/man/quote-escaping
++++ b/t/data/snippets/man/quote-escaping
+@@ -9,4 +9,4 @@ Escape both `this' and C<`this'> (and don't surround it in quotes).
+ [output]
+ .SH "Quote escaping"
+ .IX Header "Quote escaping"
+-Escape both \`this\*(Aq and \f(CW\`this\*(Aq\fR (and don\*(Aqt surround it in quotes).
++Escape both \`this\*(Aq and \f(CR\`this\*(Aq\fR (and don\*(Aqt surround it in quotes).
+diff --git a/t/data/snippets/man/rquote-none b/t/data/snippets/man/rquote-none
+index 3de3829..3add6e5 100644
+--- a/t/data/snippets/man/rquote-none
++++ b/t/data/snippets/man/rquote-none
+@@ -11,6 +11,6 @@ Foo C<bar> baz.
+ 
+ [output]
+ .ie n .SH "FOO ""BAR BAZ"
+-.el .SH "FOO \f(CWBAR\fP BAZ"
++.el .SH "FOO \f(CRBAR\fP BAZ"
+ .IX Header "FOO BAR BAZ"
+-Foo \f(CW\*(C`bar\*(C'\fR baz.
++Foo \f(CR\*(C`bar\*(C'\fR baz.
+-- 
+2.55.0
+

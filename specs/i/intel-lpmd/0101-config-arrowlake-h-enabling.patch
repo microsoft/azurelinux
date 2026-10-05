@@ -1,0 +1,294 @@
+From ed3438a4fa41421c2262ac51ff3f26f485c945da Mon Sep 17 00:00:00 2001
+From: Joy Philip Pilli <joyphilip.p2001@gmail.com>
+Date: Sun, 21 Jun 2026 06:19:59 +0530
+Subject: [PATCH] config: arrowlake-h enabling
+
+Signed-off-by: Joy Philip Pilli <joyphilip.p2001@gmail.com>
+---
+ data/Makefile.am                   |   1 +
+ data/intel_lpmd_config_F6_M197.xml | 244 +++++++++++++++++++++++++++++
+ src/lpmd_cpu.c                     |   3 +-
+ 3 files changed, 247 insertions(+), 1 deletion(-)
+ create mode 100644 data/intel_lpmd_config_F6_M197.xml
+
+diff --git a/data/Makefile.am b/data/Makefile.am
+index a67bfde..b9a1366 100644
+--- a/data/Makefile.am
++++ b/data/Makefile.am
+@@ -32,6 +32,7 @@ lpmd_config_DATA = \
+ 	  intel_lpmd_config_F6_M170.xml \
+ 	  intel_lpmd_config_F6_M181.xml \
+ 	  intel_lpmd_config_F6_M189.xml \
++	  intel_lpmd_config_F6_M197.xml \
+ 	  intel_lpmd_config_F6_M204.xml
+ 
+ EXTRA_DIST = \
+diff --git a/data/intel_lpmd_config_F6_M197.xml b/data/intel_lpmd_config_F6_M197.xml
+new file mode 100644
+index 0000000..5dd5f35
+--- /dev/null
++++ b/data/intel_lpmd_config_F6_M197.xml
+@@ -0,0 +1,244 @@
++<?xml version="1.0"?>
++
++<!--
++Intel Energy Optimizer (LPMD) configuration for Arrow Lake-H
++(family 6, model 0xC5 / 197).
++
++  Performance (PerformanceDef=-1) -> LPMD_OFF  -> all CPUs active
++  Balanced    (BalancedDef= 0)    -> LPMD_AUTO -> E+L cores only (P-cores parked)
++  Powersaver  (PowersaverDef= 1)  -> LPMD_ON   -> L-cores only
++
++Design: P-cores are NEVER used in Balanced mode. All WLT states use
++ActiveLcores=ALL + ActiveEcores=ALL (topology-portable, not hardcoded
++CPU numbers). EPP/EPB vary per WLT state to spread the power-performance
++tradeoff across E+L cores. If the user wants P-cores, they select
++Performance mode or disable LPMD.
++-->
++
++<Configuration>
++	<!--
++		CPU format example: 1,2,4..6,8-10
++		Used by the force-on path (PowersaverDef=1).
++	-->
++	<lp_mode_cpus></lp_mode_cpus>
++
++	<!--
++		EPP to use in Low Power Mode
++		0-255: Valid EPP value to use in Low Power Mode
++		   -1: Don't change EPP in Low Power Mode
++		Left empty: LPMD does not override EPP — it stays under
++		PPD (power-profiles-daemon) control.
++	-->
++	<lp_mode_epp></lp_mode_epp>
++
++	<!--
++		Mode values
++		0: Cgroup v2
++		1: Cgroup v2 isolate
++		2: CPU idle injection
++	-->
++	<Mode>1</Mode>
++
++	<!--
++		Default behavior when Performance power setting is used
++		-1: force off. (Never enter Low Power Mode)
++		 1: force on. (Always stay in Low Power Mode)
++		 0: auto. (opportunistic Low Power Mode enter/exit)
++	-->
++	<PerformanceDef>-1</PerformanceDef>
++
++	<!--
++		Default behavior when Balanced power setting is used
++		-1: force off. (Never enter Low Power Mode)
++		 1: force on. (Always stay in Low Power Mode)
++		 0: auto. (opportunistic Low Power Mode enter/exit)
++	-->
++	<BalancedDef>0</BalancedDef>
++
++	<!--
++		Default behavior when Power saver setting is used
++		-1: force off. (Never enter Low Power Mode)
++		 1: force on. (Always stay in Low Power Mode)
++		 0: auto. (opportunistic Low Power Mode enter/exit)
++	-->
++	<PowersaverDef>1</PowersaverDef>
++
++	<!--
++		Use HFI LPM hints
++		0 : No
++		1 : Yes
++	-->
++	<HfiLpmEnable>0</HfiLpmEnable>
++
++	<!--
++		Use WLT hints
++		0 : No
++		1 : Yes
++	-->
++	<WLTHintEnable>1</WLTHintEnable>
++
++	<!--
++		Use WLT hint Poll enable
++		0 : No
++		1 : Yes
++	-->
++	<WLTHintPollEnable>1</WLTHintPollEnable>
++
++	<!--
++		Use HFI SUV hints
++		0 : No
++		1 : Yes
++		NOTE: SUV mode support was removed from the daemon (May 2025).
++		The parser accepts this element but discards the value.
++		Kept here for forward compatibility if the feature is restored.
++	-->
++	<HfiSuvEnable>0</HfiSuvEnable>
++
++	<!--
++		WLT hint mask: ANDed with the raw hardware WLT hint before
++		matching against each state's WLTType.
++		15 (0x0F) keeps the low 4 bits, which covers the defined
++		WLT classifications (0=Idle, 1=Battery Life, 2=Sustained, 3=Bursty).
++		Arrow Lake currently only produces values 0-3, so mask=15
++		is a no-op today — it serves as a forward-compatibility guard
++		in case future firmware uses upper bits for extended flags.
++		Set to -1 to disable masking entirely.
++	-->
++	<WLTHintMask>15</WLTHintMask>
++
++	<!--
++		Global utilization thresholds (0-100). Used by the legacy
++		UTIL_POWER fallback path when no per-state <States> config
++		exists. Since this config defines <States>, these globals
++		are not consumed — but kept for documentation and in case
++		the <States> block is removed.
++
++		util_entry_threshold: max system-wide load (%) to enter LPM.
++		util_exit_threshold: max busiest-CPU load (%) to stay in LPM
++		  (despite the name, it gates entry matching, not exit).
++		Clearing both disables the util monitor entirely.
++
++		Disabled here: in AUTO mode, all states resolve to E+L cores
++		(P-cores always parked), so load-based exit is unnecessary —
++		the CPU mask never changes, only EPP/EPB varies by WLT state.
++
++		<util_entry_threshold>10</util_entry_threshold>
++		<util_exit_threshold>95</util_exit_threshold>
++	-->
++
++	<!--
++		EntryDelayMS / ExitDelayMS / EntryHystMS / ExitHystMS are
++		currently parsed but have no runtime effect. Omitted here.
++	-->
++
++	<!--
++		Ignore ITMT setting during LP-mode enter/exit
++		0: disable ITMT upon LP-mode enter and re-enable ITMT upon LP-mode exit
++		1: do not touch ITMT setting during LP-mode enter/exit
++
++		Arrow Lake-H supports Turbo Boost Max Technology 3.0, but ITMT
++		is effectively a no-op here for two reasons:
++		1. lpmd parks P-cores via cgroup isolation — ITMT tells the
++		   scheduler to *prefer* P-cores, the opposite of what LPM does.
++		2. On kernel 6.14+, the toggle moved from sysctl to debugfs and
++		   is only created when a driver (intel_pstate / HFI) registers
++		   ITMT priorities. On kernel 6.17 with Arrow Lake-H, the toggle
++		   file is not created, so the daemon logs ERR and continues.
++		Kept at 0 for consistency with upstream configs (F6_M170/189/204).
++	-->
++	<IgnoreITMT>0</IgnoreITMT>
++
++	<!--
++		SoC Power Slider (BalancedSliderAC/DC, SliderOffsetAC/DC): omitted.
++		The slider is a Panther Lake hardware debut — Arrow Lake does not
++		expose the slider mailbox via the int340x thermal driver, so the
++		processor_thermal_soc_slider module loads but does not register a
++		platform-profile device. See F6_M204 config for Panther Lake values.
++	-->
++
++	<!--
++		WorkLoad Type hint states for Arrow Lake-H.
++
++		P-cores are NEVER activated in Balanced/AUTO mode. All states
++		use ActiveLcores=ALL + ActiveEcores=ALL (resolved at runtime to
++		the actual E+L CPU set) so the mask is topology-portable and
++		not hardcoded to specific CPU numbers.
++
++		EPP/EPB are differentiated per WLT state so E-cores and L-cores
++		operate on a power-performance spectrum under Speed Shift /
++		Thread Director control:
++
++		  UTIL_IDLE (WLT 0+1): EPP=192 "balance_power", EPB=8
++		    Idle or unclassified workload. Power-biased but E-cores
++		    can still respond to light interactive tasks.
++
++		  UTIL_IDLE_SUSTAIN (WLT 2): EPP=64, EPB=4
++		    Sustained compute. Lets E-cores boost for real work while
++		    P-cores stay parked.
++
++		  UTIL_IDLE_BURSTY (WLT 3): EPP=128 "balance_performance", EPB=6
++		    Bursty spikes. Moderate — E-cores absorb bursts without
++		    sustaining high power draw.
++
++		WLTTypeMask=3 on UTIL_IDLE merges WLT=0 (WLT_IDLE / deep idle)
++		and WLT=1 (WLT_BATTERY_LIFE / light usage) into one state.
++
++		WARNING: Do NOT split WLT 0 and 1 into separate states with
++		different EPP/EPB values. The hardware oscillates 
++		rapidly between WLT=0 and WLT=1 (~2x/sec observed in logs), and
++		since the EPP/EPB values would genuinely differ between the
++		two states, a value-change guard (like cgroup's "skip if
++		cpumask unchanged") cannot suppress the sysfs writes — each
++		transition would produce ~cpu-cores-count x 2 real writes 
++		(ex. 16 CPUs x EPP+EPB = ~32 sysfs writes). The power cost 
++		of that I/O churn outweighs any benefit from a more aggressive 
++		EPP during brief WLT=0 moments. If deep idle power savings 
++		are needed, Power Saver mode (L-cores only, EPP=255) already 
++		provides that.
++
++		Note on invalid/unexpected WLT values: some platform configs
++		(e.g. F6_M189) use a wildcard state with no WLTType to
++		catch all unmatched WLT values including invalid ones. Here,
++		WLTTypeMask=3 provides targeted handling — WLT 0 and 1 are
++		explicitly matched to UTIL_IDLE, while invalid or out-of-
++		range values (e.g. WLT_INVALID=4 from sysfs read failures)
++		match no state and the daemon holds its current state
++		unchanged (STATE_NONE in choose_next_state).
++	-->
++	<States>
++		<CPUFamily> 6 </CPUFamily>
++		<CPUModel> 197 </CPUModel>
++		<CPUConfig> * </CPUConfig>
++		<State>
++			<ID> 1 </ID>
++			<Name> UTIL_IDLE </Name>
++			<WLTTypeMask> 3 </WLTTypeMask>
++			<ActiveLcores>ALL</ActiveLcores>
++			<ActiveEcores>ALL</ActiveEcores>
++			<IRQMigrate>1</IRQMigrate>
++			<EPP>192</EPP>
++			<EPB>8</EPB>
++		</State>
++		<State>
++			<ID> 2 </ID>
++			<Name> UTIL_IDLE_SUSTAIN </Name>
++			<WLTType> 2 </WLTType>
++			<ActiveLcores>ALL</ActiveLcores>
++			<ActiveEcores>ALL</ActiveEcores>
++			<IRQMigrate>1</IRQMigrate>
++			<EPP>64</EPP>
++			<EPB>4</EPB>
++		</State>
++		<State>
++			<ID> 3 </ID>
++			<Name> UTIL_IDLE_BURSTY </Name>
++			<WLTType> 3 </WLTType>
++			<ActiveLcores>ALL</ActiveLcores>
++			<ActiveEcores>ALL</ActiveEcores>
++			<IRQMigrate>1</IRQMigrate>
++			<EPP>128</EPP>
++			<EPB>6</EPB>
++		</State>
++	</States>
++
++</Configuration>
+diff --git a/src/lpmd_cpu.c b/src/lpmd_cpu.c
+index f4c9cbd..04ec4d1 100644
+--- a/src/lpmd_cpu.c
++++ b/src/lpmd_cpu.c
+@@ -23,9 +23,10 @@ static struct cpu_model_entry id_table[] = {
+ 		{ 6, 0xbf }, // Raptorlake S
+ 		{ 6, 0xaa }, // Meteorlake
+ 		{ 6, 0xac }, // Meteorlake
+-		{ 6, 0xb5 }, // ArrowLake
++		{ 6, 0xb5 }, // Arrowlake U
+ 		{ 6, 0xbd }, // Lunarlake
+ 		{ 6, 0xcc }, // Pantherlake
++		{ 6, 0xc5 }, // Arrowlake H
+ 		{ 0, 0 } // Last Invalid entry
+ };
+ 
+-- 
+2.55.0
+

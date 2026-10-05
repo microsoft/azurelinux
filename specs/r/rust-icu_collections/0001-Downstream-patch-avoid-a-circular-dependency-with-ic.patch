@@ -1,0 +1,26 @@
+From 491f2a21f1680bcf3eb06bf5d9feab00b12231f9 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 13 Apr 2026 07:16:02 +0100
+Subject: [PATCH] Downstream patch: avoid a circular dependency with
+ icu_properties
+
+---
+ src/iterator_utils.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/iterator_utils.rs b/src/iterator_utils.rs
+index 913e3535ee..4cd790f5c7 100644
+--- a/src/iterator_utils.rs
++++ b/src/iterator_utils.rs
+@@ -59,6 +59,8 @@ where
+ }
+ 
+ #[cfg(test)]
++// Downstream patch: avoid a circular dependency with icu_properties
++#[cfg(false)]
+ mod tests {
+     use crate::codepointinvlist::CodePointInversionListBuilder;
+     use core::fmt::Debug;
+-- 
+2.53.0
+

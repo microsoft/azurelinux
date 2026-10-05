@@ -1,0 +1,11 @@
+--- uu_chcon-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_chcon-0.7.0/Cargo.toml	2026-03-13T20:26:51.223998+00:00
+@@ -60,7 +60,7 @@
+ version = "0.2.172"
+ 
+ [target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies.selinux]
+-version = "=0.6.0"
++version = "0.6.0"
+ 
+ [target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies.thiserror]
+ version = "2.0.3"

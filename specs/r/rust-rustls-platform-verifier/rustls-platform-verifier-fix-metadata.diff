@@ -1,5 +1,5 @@
---- rustls-platform-verifier-0.6.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ rustls-platform-verifier-0.6.2/Cargo.toml	2025-11-30T10:09:15.050455+00:00
+--- rustls-platform-verifier-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rustls-platform-verifier-0.7.0/Cargo.toml	2026-08-09T06:43:11.125727+00:00
 @@ -45,10 +45,6 @@
  [features]
  cert-logging = ["base64"]
@@ -24,7 +24,7 @@
  optional = true
  
 -[dependencies.jni]
--version = "0.21"
+-version = "0.22.4"
 -optional = true
 -default-features = false
 -

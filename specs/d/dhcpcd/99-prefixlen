@@ -1,0 +1,26 @@
+# 99-prefixlen - dhcpcd hook to override DHCPv6 IA_NA prefix length
+#
+# dhcpcd assigns DHCPv6 IA_NA addresses with /128 per RFC 8415. This hook
+# overrides the prefix length when DHCPCD_IPV6_PREFIXLEN is set, replacing
+# /128 with the requested prefix on each lease event.
+#
+# Usage: set DHCPCD_IPV6_PREFIXLEN via the env directive in /etc/dhcpcd.conf:
+#
+#   interface eth0
+#       ia_na 1
+#       env DHCPCD_IPV6_PREFIXLEN=64
+#
+# The hook is a no-op when DHCPCD_IPV6_PREFIXLEN is not set.
+
+if [ -n "$DHCPCD_IPV6_PREFIXLEN" ]; then
+    case "$reason" in
+        BOUND6|RENEW6|REBIND6|REBOOT6)
+            if [ -n "$new_dhcp6_ia_na1_ia_addr1" ]; then
+                ip -6 addr del "${new_dhcp6_ia_na1_ia_addr1}/128" dev "$interface" 2>/dev/null
+                ip -6 addr replace "${new_dhcp6_ia_na1_ia_addr1}/${DHCPCD_IPV6_PREFIXLEN}" dev "$interface" \
+                    valid_lft "$new_dhcp6_ia_na1_ia_addr1_vltime" \
+                    preferred_lft "$new_dhcp6_ia_na1_ia_addr1_pltime"
+            fi
+            ;;
+    esac
+fi

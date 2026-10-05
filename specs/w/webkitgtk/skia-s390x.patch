@@ -1,0 +1,82 @@
+diff --git a/Source/ThirdParty/skia/include/core/SkTypes.h b/Source/ThirdParty/skia/include/core/SkTypes.h
+index 79644da049ff..fc0646e21772 100644
+--- a/Source/ThirdParty/skia/include/core/SkTypes.h
++++ b/Source/ThirdParty/skia/include/core/SkTypes.h
+@@ -33,6 +33,8 @@
+ #  undef SK_DIRECT3D
+ #endif
+ 
++#if !defined(SK_R32_SHIFT) || !defined(SK_G32_SHIFT) || !defined(SK_B32_SHIFT) || !defined(SK_A32_SHIFT)
++
+ // If SK_R32_SHIFT is set, we'll use that to choose RGBA or BGRA.
+ // If not, we'll default to RGBA everywhere except BGRA on Windows.
+ #if defined(SK_R32_SHIFT)
+@@ -52,6 +54,8 @@
+ #define SK_G32_SHIFT 8
+ #define SK_A32_SHIFT 24
+ 
++#endif
++
+ /**
+  * SK_PMCOLOR_BYTE_ORDER can be used to query the byte order of SkPMColor at compile time.
+  */
+diff --git a/Source/ThirdParty/skia/src/codec/SkCodecPriv.h b/Source/ThirdParty/skia/src/codec/SkCodecPriv.h
+index c321fb77c0ae..a0a01cccd58a 100644
+--- a/Source/ThirdParty/skia/src/codec/SkCodecPriv.h
++++ b/Source/ThirdParty/skia/src/codec/SkCodecPriv.h
+@@ -14,6 +14,7 @@
+ #include "include/core/SkTypes.h"
+ #include "include/private/SkEncodedInfo.h"
+ #include "modules/skcms/skcms.h"
++#include "src/core/SkEndian.h"
+ #include "src/codec/SkColorPalette.h"
+ #include "src/core/SkColorData.h"
+ 
+diff --git a/Source/ThirdParty/skia/src/core/Sk4px.h b/Source/ThirdParty/skia/src/core/Sk4px.h
+index d5d481e7e300..c7ef0bcd0ed0 100644
+--- a/Source/ThirdParty/skia/src/core/Sk4px.h
++++ b/Source/ThirdParty/skia/src/core/Sk4px.h
+@@ -27,7 +27,9 @@ public:
+ 
+     // RGBA rgba XYZW xyzw -> AAAA aaaa WWWW wwww
+     Sk4px alphas() const {
++#ifdef SK_CPU_LENDIAN
+         static_assert(SK_A32_SHIFT == 24, "This method assumes little-endian.");
++#endif
+         return Sk4px(skvx::shuffle<3,3,3,3, 7,7,7,7, 11,11,11,11, 15,15,15,15>(fV));
+     }
+     Sk4px inv() const { return Sk4px(skvx::byte16(255) - fV); }
+diff --git a/Source/ThirdParty/skia/src/core/SkColorPriv.h b/Source/ThirdParty/skia/src/core/SkColorPriv.h
+index 45471c25529e..319fec78069b 100644
+--- a/Source/ThirdParty/skia/src/core/SkColorPriv.h
++++ b/Source/ThirdParty/skia/src/core/SkColorPriv.h
+@@ -64,6 +64,20 @@ static inline U8CPU SkUnitScalarClampToByte(SkScalar x) {
+  *  Here we enforce this constraint.
+  */
+ 
++#ifdef SK_CPU_BENDIAN
++
++#define SK_RGBA_R32_SHIFT   24
++#define SK_RGBA_G32_SHIFT   16
++#define SK_RGBA_B32_SHIFT   8
++#define SK_RGBA_A32_SHIFT   0
++
++#define SK_BGRA_B32_SHIFT   24
++#define SK_BGRA_G32_SHIFT   16
++#define SK_BGRA_R32_SHIFT   8
++#define SK_BGRA_A32_SHIFT   0
++
++#else
++
+ #define SK_RGBA_R32_SHIFT   0
+ #define SK_RGBA_G32_SHIFT   8
+ #define SK_RGBA_B32_SHIFT   16
+@@ -74,6 +88,8 @@ static inline U8CPU SkUnitScalarClampToByte(SkScalar x) {
+ #define SK_BGRA_R32_SHIFT   16
+ #define SK_BGRA_A32_SHIFT   24
+ 
++#endif
++
+ #if defined(SK_PMCOLOR_IS_RGBA) || defined(SK_PMCOLOR_IS_BGRA)
+     #error "Configure PMCOLOR by setting SK_R32_SHIFT."
+ #endif

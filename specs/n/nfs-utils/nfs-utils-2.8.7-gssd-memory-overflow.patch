@@ -1,0 +1,53 @@
+commit d8752efc0de4a0a48ee716dd4b7b15cf7578cc9d
+Author: zhangjian <zhangjian496@huawei.com>
+Date:   Tue Jul 21 11:51:23 2026 -0400
+
+    gssd: fix memory leak in gssd_free_client
+    
+    clp->servername is always not null, so upcall_* is never free.
+    
+    Signed-off-by: zhangjian <zhangjian496@huawei.com>
+    Signed-off-by: Steve Dickson <steved@redhat.com>
+
+diff --git a/utils/gssd/gssd.c b/utils/gssd/gssd.c
+index 1c901991..bad92321 100644
+--- a/utils/gssd/gssd.c
++++ b/utils/gssd/gssd.c
+@@ -360,6 +360,10 @@ gssd_read_service_info(int dirfd, struct clnt_info *clp)
+ 	clp->prog = program;
+ 	clp->vers = version;
+ 	clp->protocol = protoname;
++	clp->upcall_address = NULL;
++	clp->upcall_port = NULL;
++	clp->upcall_protoname = NULL;
++	clp->upcall_service = NULL;
+ 
+ 	goto out;
+ 
+@@ -414,16 +418,16 @@ gssd_free_client(struct clnt_info *clp)
+ 	free(clp->servicename);
+ 	free(clp->servername);
+ 	free(clp->protocol);
+-	if (!clp->servername) {
+-		if (clp->upcall_address)
+-			free(clp->upcall_address);
+-		if (clp->upcall_port)
+-			free(clp->upcall_port);
+-		if (clp->upcall_protoname)
+-			free(clp->upcall_protoname);
+-		if (clp->upcall_service)
+-			free(clp->upcall_service);
+-	}
++
++	if (clp->upcall_address)
++		free(clp->upcall_address);
++	if (clp->upcall_port)
++		free(clp->upcall_port);
++	if (clp->upcall_protoname)
++		free(clp->upcall_protoname);
++	if (clp->upcall_service)
++		free(clp->upcall_service);
++
+ 	free(clp);
+ }
+ 

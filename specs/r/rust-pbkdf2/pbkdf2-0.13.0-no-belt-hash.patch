@@ -1,0 +1,21 @@
+diff -Naur pbkdf2-0.13.0-original/tests/pbkdf2.rs pbkdf2-0.13.0/tests/pbkdf2.rs
+--- pbkdf2-0.13.0-original/tests/pbkdf2.rs	2006-07-24 02:21:28.000000000 +0100
++++ pbkdf2-0.13.0/tests/pbkdf2.rs	2026-06-08 11:33:09.636156376 +0100
+@@ -3,6 +3,8 @@
+ #![cfg(feature = "hmac")]
+ #![allow(clippy::unwrap_used)]
+ 
++// Downstream-only: avoid packaging the belt-hash crate solely as a dev-dependency
++#[cfg(false)]
+ use belt_hash::BeltHash;
+ use hex_literal::hex;
+ #[cfg(all(feature = "sha2", feature = "phc"))]
+@@ -86,6 +88,8 @@
+ 
+ /// Test vector from STB 34.101.45-2013 (page 33):
+ /// <https://apmi.bsu.by/assets/files/std/bign-spec294.pdf>
++// Downstream-only: avoid packaging the belt-hash crate solely as a dev-dependency
++#[cfg(false)]
+ #[test]
+ fn pbkdf2_belt() {
+     test!(

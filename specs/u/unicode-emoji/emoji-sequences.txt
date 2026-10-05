@@ -1,11 +1,11 @@
 # emoji-sequences.txt
-# Date: 2024-05-01, 21:25:24 GMT
-# © 2024 Unicode®, Inc.
+# Date: 2026-04-30, 22:40:18 GMT
+# © 2026 Unicode®, Inc.
 # Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
 # For terms of use and license, see https://www.unicode.org/terms_of_use.html
 #
 # Emoji Sequence Data for UTS #51
-# Version: 16.0
+# Version: 18.0
 #
 # For documentation and usage, see https://www.unicode.org/reports/tr51
 #
@@ -238,6 +238,8 @@
 1F6D1..1F6D2  ; Basic_Emoji                  ; stop sign..shopping cart                                       # E3.0   [2] (🛑..🛒)
 1F6D5         ; Basic_Emoji                  ; hindu temple                                                   # E12.0  [1] (🛕)
 1F6D6..1F6D7  ; Basic_Emoji                  ; hut..elevator                                                  # E13.0  [2] (🛖..🛗)
+1F6D8         ; Basic_Emoji                  ; landslide                                                      # E17.0  [1] (🛘)
+1F6D9         ; Basic_Emoji                  ; lighthouse                                                     # E18.0  [1] (🛙)
 1F6DC         ; Basic_Emoji                  ; wireless                                                       # E15.0  [1] (🛜)
 1F6DD..1F6DF  ; Basic_Emoji                  ; playground slide..ring buoy                                    # E14.0  [3] (🛝..🛟)
 1F6EB..1F6EC  ; Basic_Emoji                  ; airplane departure..airplane arrival                           # E1.0   [2] (🛫..🛬)
@@ -302,6 +304,9 @@
 1FA83..1FA86  ; Basic_Emoji                  ; boomerang..nesting dolls                                       # E13.0  [4] (🪃..🪆)
 1FA87..1FA88  ; Basic_Emoji                  ; maracas..flute                                                 # E15.0  [2] (🪇..🪈)
 1FA89         ; Basic_Emoji                  ; harp                                                           # E16.0  [1] (🪉)
+1FA8A         ; Basic_Emoji                  ; trombone                                                       # E17.0  [1] (🪊)
+1FA8B..1FA8D  ; Basic_Emoji                  ; meteor..net with handle                                        # E18.0  [3] (🪋..🪍)
+1FA8E         ; Basic_Emoji                  ; treasure chest                                                 # E17.0  [1] (🪎)
 1FA8F         ; Basic_Emoji                  ; shovel                                                         # E16.0  [1] (🪏)
 1FA90..1FA95  ; Basic_Emoji                  ; ringed planet..banjo                                           # E12.0  [6] (🪐..🪕)
 1FA96..1FAA8  ; Basic_Emoji                  ; military helmet..rock                                          # E13.0 [19] (🪖..🪨)
@@ -315,17 +320,25 @@
 1FAC0..1FAC2  ; Basic_Emoji                  ; anatomical heart..people hugging                               # E13.0  [3] (🫀..🫂)
 1FAC3..1FAC5  ; Basic_Emoji                  ; pregnant man..person with crown                                # E14.0  [3] (🫃..🫅)
 1FAC6         ; Basic_Emoji                  ; fingerprint                                                    # E16.0  [1] (🫆)
+1FAC8         ; Basic_Emoji                  ; hairy creature                                                 # E17.0  [1] (🫈)
+1FACC         ; Basic_Emoji                  ; monarch butterfly                                              # E18.0  [1] (🫌)
+1FACD         ; Basic_Emoji                  ; orca                                                           # E17.0  [1] (🫍)
 1FACE..1FACF  ; Basic_Emoji                  ; moose..donkey                                                  # E15.0  [2] (🫎..🫏)
 1FAD0..1FAD6  ; Basic_Emoji                  ; blueberries..teapot                                            # E13.0  [7] (🫐..🫖)
 1FAD7..1FAD9  ; Basic_Emoji                  ; pouring liquid..jar                                            # E14.0  [3] (🫗..🫙)
 1FADA..1FADB  ; Basic_Emoji                  ; ginger root..pea pod                                           # E15.0  [2] (🫚..🫛)
 1FADC         ; Basic_Emoji                  ; root vegetable                                                 # E16.0  [1] (🫜)
+1FADD         ; Basic_Emoji                  ; pickle                                                         # E18.0  [1] (🫝)
 1FADF         ; Basic_Emoji                  ; splatter                                                       # E16.0  [1] (🫟)
 1FAE0..1FAE7  ; Basic_Emoji                  ; melting face..bubbles                                          # E14.0  [8] (🫠..🫧)
 1FAE8         ; Basic_Emoji                  ; shaking face                                                   # E15.0  [1] (🫨)
 1FAE9         ; Basic_Emoji                  ; face with bags under eyes                                      # E16.0  [1] (🫩)
+1FAEA         ; Basic_Emoji                  ; distorted face                                                 # E17.0  [1] (🫪)
+1FAEB         ; Basic_Emoji                  ; cracking face                                                  # E18.0  [1] (🫫)
+1FAEF         ; Basic_Emoji                  ; fight cloud                                                    # E17.0  [1] (🫯)
 1FAF0..1FAF6  ; Basic_Emoji                  ; hand with index finger and thumb crossed..heart hands          # E14.0  [7] (🫰..🫶)
 1FAF7..1FAF8  ; Basic_Emoji                  ; leftwards pushing hand..rightwards pushing hand                # E15.0  [2] (🫷..🫸)
+1FAF9..1FAFA  ; Basic_Emoji                  ; leftwards thumb sign..rightwards thumb sign                    # E18.0  [2] (🫹..🫺)
 00A9 FE0F     ; Basic_Emoji                  ; copyright                                                      # E0.6   [1] (©️)
 00AE FE0F     ; Basic_Emoji                  ; registered                                                     # E0.6   [1] (®️)
 203C FE0F     ; Basic_Emoji                  ; double exclamation mark                                        # E0.6   [1] (‼️)
@@ -534,7 +547,7 @@
 1F6F0 FE0F    ; Basic_Emoji                  ; satellite                                                      # E0.7   [1] (🛰️)
 1F6F3 FE0F    ; Basic_Emoji                  ; passenger ship                                                 # E0.7   [1] (🛳️)
 
-# Total elements: 1393
+# Total elements: 1409
 
 # ================================================
 
@@ -661,7 +674,7 @@
 1F1EC 1F1FC   ; RGI_Emoji_Flag_Sequence      ; flag: Guinea-Bissau                                            # E2.0   [1] (🇬🇼)
 1F1EC 1F1FE   ; RGI_Emoji_Flag_Sequence      ; flag: Guyana                                                   # E2.0   [1] (🇬🇾)
 1F1ED 1F1F0   ; RGI_Emoji_Flag_Sequence      ; flag: Hong Kong SAR China                                      # E2.0   [1] (🇭🇰)
-1F1ED 1F1F2   ; RGI_Emoji_Flag_Sequence      ; flag: Heard & McDonald Islands                                 # E2.0   [1] (🇭🇲)
+1F1ED 1F1F2   ; RGI_Emoji_Flag_Sequence      ; flag: Heard Island & McDonald Islands                          # E2.0   [1] (🇭🇲)
 1F1ED 1F1F3   ; RGI_Emoji_Flag_Sequence      ; flag: Honduras                                                 # E2.0   [1] (🇭🇳)
 1F1ED 1F1F7   ; RGI_Emoji_Flag_Sequence      ; flag: Croatia                                                  # E2.0   [1] (🇭🇷)
 1F1ED 1F1F9   ; RGI_Emoji_Flag_Sequence      ; flag: Haiti                                                    # E2.0   [1] (🇭🇹)
@@ -765,7 +778,7 @@
 1F1F8 1F1E9   ; RGI_Emoji_Flag_Sequence      ; flag: Sudan                                                    # E2.0   [1] (🇸🇩)
 1F1F8 1F1EA   ; RGI_Emoji_Flag_Sequence      ; flag: Sweden                                                   # E2.0   [1] (🇸🇪)
 1F1F8 1F1EC   ; RGI_Emoji_Flag_Sequence      ; flag: Singapore                                                # E2.0   [1] (🇸🇬)
-1F1F8 1F1ED   ; RGI_Emoji_Flag_Sequence      ; flag: St. Helena                                               # E2.0   [1] (🇸🇭)
+1F1F8 1F1ED   ; RGI_Emoji_Flag_Sequence      ; flag: St. Helena, Ascension & Tristan da Cunha                 # E2.0   [1] (🇸🇭)
 1F1F8 1F1EE   ; RGI_Emoji_Flag_Sequence      ; flag: Slovenia                                                 # E2.0   [1] (🇸🇮)
 1F1F8 1F1EF   ; RGI_Emoji_Flag_Sequence      ; flag: Svalbard & Jan Mayen                                     # E2.0   [1] (🇸🇯)
 1F1F8 1F1F0   ; RGI_Emoji_Flag_Sequence      ; flag: Slovakia                                                 # E2.0   [1] (🇸🇰)
@@ -783,7 +796,7 @@
 1F1F9 1F1E6   ; RGI_Emoji_Flag_Sequence      ; flag: Tristan da Cunha                                         # E2.0   [1] (🇹🇦)
 1F1F9 1F1E8   ; RGI_Emoji_Flag_Sequence      ; flag: Turks & Caicos Islands                                   # E2.0   [1] (🇹🇨)
 1F1F9 1F1E9   ; RGI_Emoji_Flag_Sequence      ; flag: Chad                                                     # E2.0   [1] (🇹🇩)
-1F1F9 1F1EB   ; RGI_Emoji_Flag_Sequence      ; flag: French Southern Territories                              # E2.0   [1] (🇹🇫)
+1F1F9 1F1EB   ; RGI_Emoji_Flag_Sequence      ; flag: French Southern and Antarctic Lands                      # E2.0   [1] (🇹🇫)
 1F1F9 1F1EC   ; RGI_Emoji_Flag_Sequence      ; flag: Togo                                                     # E2.0   [1] (🇹🇬)
 1F1F9 1F1ED   ; RGI_Emoji_Flag_Sequence      ; flag: Thailand                                                 # E2.0   [1] (🇹🇭)
 1F1F9 1F1EF   ; RGI_Emoji_Flag_Sequence      ; flag: Tajikistan                                               # E2.0   [1] (🇹🇯)
@@ -1011,6 +1024,11 @@
 1F46E 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; police officer: medium skin tone                               # E1.0   [1] (👮🏽)
 1F46E 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; police officer: medium-dark skin tone                          # E1.0   [1] (👮🏾)
 1F46E 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; police officer: dark skin tone                                 # E1.0   [1] (👮🏿)
+1F46F 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: light skin tone                        # E17.0  [1] (👯🏻)
+1F46F 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: medium-light skin tone                 # E17.0  [1] (👯🏼)
+1F46F 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: medium skin tone                       # E17.0  [1] (👯🏽)
+1F46F 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: medium-dark skin tone                  # E17.0  [1] (👯🏾)
+1F46F 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; people with bunny ears: dark skin tone                         # E17.0  [1] (👯🏿)
 1F470 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; person with veil: light skin tone                              # E1.0   [1] (👰🏻)
 1F470 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; person with veil: medium-light skin tone                       # E1.0   [1] (👰🏼)
 1F470 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; person with veil: medium skin tone                             # E1.0   [1] (👰🏽)
@@ -1311,6 +1329,11 @@
 1F939 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; person juggling: medium skin tone                              # E3.0   [1] (🤹🏽)
 1F939 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; person juggling: medium-dark skin tone                         # E3.0   [1] (🤹🏾)
 1F939 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; person juggling: dark skin tone                                # E3.0   [1] (🤹🏿)
+1F93C 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: light skin tone                              # E17.0  [1] (🤼🏻)
+1F93C 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: medium-light skin tone                       # E17.0  [1] (🤼🏼)
+1F93C 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: medium skin tone                             # E17.0  [1] (🤼🏽)
+1F93C 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: medium-dark skin tone                        # E17.0  [1] (🤼🏾)
+1F93C 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; people wrestling: dark skin tone                               # E17.0  [1] (🤼🏿)
 1F93D 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; person playing water polo: light skin tone                     # E3.0   [1] (🤽🏻)
 1F93D 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; person playing water polo: medium-light skin tone              # E3.0   [1] (🤽🏼)
 1F93D 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; person playing water polo: medium skin tone                    # E3.0   [1] (🤽🏽)
@@ -1491,7 +1514,17 @@
 1FAF8 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; rightwards pushing hand: medium skin tone                      # E15.0  [1] (🫸🏽)
 1FAF8 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; rightwards pushing hand: medium-dark skin tone                 # E15.0  [1] (🫸🏾)
 1FAF8 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; rightwards pushing hand: dark skin tone                        # E15.0  [1] (🫸🏿)
+1FAF9 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; leftwards thumb sign: light skin tone                          # E18.0  [1] (🫹🏻)
+1FAF9 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; leftwards thumb sign: medium-light skin tone                   # E18.0  [1] (🫹🏼)
+1FAF9 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; leftwards thumb sign: medium skin tone                         # E18.0  [1] (🫹🏽)
+1FAF9 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; leftwards thumb sign: medium-dark skin tone                    # E18.0  [1] (🫹🏾)
+1FAF9 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; leftwards thumb sign: dark skin tone                           # E18.0  [1] (🫹🏿)
+1FAFA 1F3FB   ; RGI_Emoji_Modifier_Sequence  ; rightwards thumb sign: light skin tone                         # E18.0  [1] (🫺🏻)
+1FAFA 1F3FC   ; RGI_Emoji_Modifier_Sequence  ; rightwards thumb sign: medium-light skin tone                  # E18.0  [1] (🫺🏼)
+1FAFA 1F3FD   ; RGI_Emoji_Modifier_Sequence  ; rightwards thumb sign: medium skin tone                        # E18.0  [1] (🫺🏽)
+1FAFA 1F3FE   ; RGI_Emoji_Modifier_Sequence  ; rightwards thumb sign: medium-dark skin tone                   # E18.0  [1] (🫺🏾)
+1FAFA 1F3FF   ; RGI_Emoji_Modifier_Sequence  ; rightwards thumb sign: dark skin tone                          # E18.0  [1] (🫺🏿)
 
-# Total elements: 655
+# Total elements: 675
 
 #EOF

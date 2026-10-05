@@ -1,0 +1,63 @@
+From e12e21a65da024365e7a95daf22d2a2ef26851e9 Mon Sep 17 00:00:00 2001
+From: Aaron Merey <amerey@redhat.com>
+Date: Wed, 21 Jan 2026 18:06:14 -0500
+Subject: [PATCH] Remove unused variables
+
+---
+ lib/pfmlib_common.c             | 3 +--
+ perf_examples/self_smpl_multi.c | 5 +----
+ 2 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/lib/pfmlib_common.c b/lib/pfmlib_common.c
+index 44b5de4..1137ed4 100644
+--- a/lib/pfmlib_common.c
++++ b/lib/pfmlib_common.c
+@@ -1906,7 +1906,7 @@ pfmlib_pmu_validate_encoding(pfmlib_pmu_t *pmu, FILE *fp)
+ 	pfmlib_event_attr_info_t ainfo;
+ 	char *buf;
+ 	size_t maxlen = 0, len;
+-	int i, u, n = 0, um;
++	int i, u, um;
+ 	int ret, retval = PFM_SUCCESS;
+ 
+ 	pfmlib_for_each_pmu_event(pmu, i) {
+@@ -1995,7 +1995,6 @@ pfmlib_pmu_validate_encoding(pfmlib_pmu_t *pmu, FILE *fp)
+ 				continue;
+ 			}
+ 		}
+-		n++;
+ 	}
+ 	free(buf);
+ 
+diff --git a/perf_examples/self_smpl_multi.c b/perf_examples/self_smpl_multi.c
+index 391fa61..75b45e0 100644
+--- a/perf_examples/self_smpl_multi.c
++++ b/perf_examples/self_smpl_multi.c
+@@ -141,7 +141,7 @@ void
+ do_cycles(void)
+ {
+ 	struct timeval start, last, now;
+-	unsigned long x, sum;
++	unsigned long x;
+ 
+ 	gettimeofday(&start, NULL);
+ 	last = start;
+@@ -150,15 +150,12 @@ do_cycles(void)
+ 	iter[myid] = 0;
+ 
+ 	do {
+-
+-		sum = 1;
+ 		for (x = 1; x < 250000; x++) {
+ 			/* signal pending to private queue because of
+ 			 * pthread_kill(), i.e., tkill()
+ 			 */
+ 			if ((x % 5000) == 0)
+ 				pthread_kill(pthread_self(), SIGUSR1);
+-			sum += x;
+ 		}
+ 		iter[myid]++;
+ 
+-- 
+2.52.0
+

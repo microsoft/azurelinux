@@ -9,7 +9,7 @@ Subject: 00461: Downstream only: Install wheel in test venvs when setuptools <
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/test/support/__init__.py b/Lib/test/support/__init__.py
-index e49e3668a3..4c42234ccc 100644
+index cab0f49366..26c0af4b13 100644
 --- a/Lib/test/support/__init__.py
 +++ b/Lib/test/support/__init__.py
 @@ -2329,9 +2329,18 @@ def setup_venv_with_pip_setuptools(venv_dir):

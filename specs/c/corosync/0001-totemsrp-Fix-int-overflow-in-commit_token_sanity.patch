@@ -1,0 +1,50 @@
+From 83920f2e36b5f1acd7dcf033c0820043cc29f82a Mon Sep 17 00:00:00 2001
+From: Jan Friesse <jfriesse@redhat.com>
+Date: Wed, 2 Sep 2026 15:08:31 +0200
+Subject: [PATCH 1/2] totemsrp: Fix int overflow in commit_token_sanity
+
+This commit addresses an integer overflow (wraparound) vulnerability
+in the check_memb_commit_token_sanity function.
+
+Previously, on 32-bit systems, a large unsigned network value for
+addr_entries (>= 153391690) could cause an integer overflow when
+multiplied by the sizes of the srp_addr and memb_commit_token_memb_entry
+structures. This wraparound resulted in a required_len that was smaller
+than the actual required memory size, potentially bypassing the
+subsequent message length bounds check.
+
+To fix this, we now reject the message if addr_entries exceeds
+PROCESSOR_COUNT_MAX before any multiplication or addition occurs.
+
+Fixes: CVE-2026-81666
+
+Reported-by: Tristan Madani <tristan@talencesecurity.com>
+Signed-off-by: Jan Friesse <jfriesse@redhat.com>
+Reviewed-by: Tristan Madani <tristan@talencesecurity.com>
+Reviewed-by: Fabio M. Di Nitto <fdinitto@redhat.com>
+---
+ exec/totemsrp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/exec/totemsrp.c b/exec/totemsrp.c
+index 67596911..1802bb34 100644
+--- a/exec/totemsrp.c
++++ b/exec/totemsrp.c
+@@ -3829,6 +3829,14 @@ static int check_memb_commit_token_sanity(
+ 		addr_entries = swab32(addr_entries);
+ 	}
+ 
++	if (addr_entries > PROCESSOR_COUNT_MAX) {
++		log_printf (instance->totemsrp_log_level_security,
++		    "Received commit_token message addr_entries exceeds the maximum "
++		    "allowed value...  ignoring.");
++
++		return (-1);
++	}
++
+ 	required_len = sizeof(struct memb_commit_token) +
+ 	    (addr_entries * (sizeof(struct srp_addr) + sizeof(struct memb_commit_token_memb_entry)));
+ 	if (msg_len < required_len) {
+-- 
+2.51.1
+

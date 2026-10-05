@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 6;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -18,19 +18,28 @@
 %global crate ureq
 
 Name:           rust-ureq
-Version:        2.12.1
+Version:        3.4.2
 Release:        %autorelease
 Summary:        Simple, safe HTTP client
 
 License:        MIT OR Apache-2.0
 URL:            https://crates.io/crates/ureq
 Source:         %{crates_source}
+# Automatically generated patch to strip dependencies and normalize metadata
+Patch:          ureq-fix-metadata-auto.diff
 # Manually created patch for downstream crate metadata changes
-# * temporarily drop brotli feature
-#   until brotli 5+ / brotli-decompressor 4.x is packaged
-# * bump cookie_store dependency from 0.21 to 0.22:
-#   https://github.com/algesten/ureq/commit/a24929b
+# * Drop the rustls/aws-lc-rs feature dependency; we don’t have rust-aws-lc-rs.
+#   Upstream says that this is enabled “for tests so we can demonstrate using
+#   ureq without compiling ring.”
+# * Drop the auto_args dev-dependency since we don’t have rust-auto_args; drop
+#   the cureq example that would have required it.
 Patch:          ureq-fix-metadata.diff
+# * Downstream-only: omit tests that require network access (and are not
+#   practical to skip by name, e.g. anonymous doctests).
+Patch10:        0001-Downstream-only-omit-tests-that-require-network-acce.patch
+# * Downstream-only: omit tests that require rustls/aws-lc-rs to compile
+# * We don’t have aws-lc-rs, and patched out the dependency on this feature
+Patch11:        0002-Downstream-only-omit-tests-that-would-require-rustls.patch
 
 BuildRequires:  cargo-rpm-macros >= 24
 
@@ -51,11 +60,9 @@ use the "%{crate}" crate.
 %files          devel
 %license %{crate_instdir}/LICENSE-APACHE
 %license %{crate_instdir}/LICENSE-MIT
-%license %{crate_instdir}/src/chunked/LICENSE-APACHE
-%license %{crate_instdir}/src/chunked/LICENSE-MIT
 %doc %{crate_instdir}/CHANGELOG.md
 %doc %{crate_instdir}/CONTRIBUTING.md
-%doc %{crate_instdir}/FUTURE.md
+%doc %{crate_instdir}/MIGRATE-2-to-3.md
 %doc %{crate_instdir}/README.md
 %doc %{crate_instdir}/RELEASE.txt
 %{crate_instdir}/
@@ -70,6 +77,66 @@ This package contains library source intended for building other packages which
 use the "default" feature of the "%{crate}" crate.
 
 %files       -n %{name}+default-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+_ring-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+_ring-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "_ring" feature of the "%{crate}" crate.
+
+%files       -n %{name}+_ring-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+_rustls-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+_rustls-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "_rustls" feature of the "%{crate}" crate.
+
+%files       -n %{name}+_rustls-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+_tls-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+_tls-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "_tls" feature of the "%{crate}" crate.
+
+%files       -n %{name}+_tls-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+_url-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+_url-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "_url" feature of the "%{crate}" crate.
+
+%files       -n %{name}+_url-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+brotli-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+brotli-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "brotli" feature of the "%{crate}" crate.
+
+%files       -n %{name}+brotli-devel
 %ghost %{crate_instdir}/Cargo.toml
 
 %package     -n %{name}+charset-devel
@@ -108,30 +175,6 @@ use the "gzip" feature of the "%{crate}" crate.
 %files       -n %{name}+gzip-devel
 %ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+http-crate-devel
-Summary:        %{summary}
-BuildArch:      noarch
-
-%description -n %{name}+http-crate-devel %{_description}
-
-This package contains library source intended for building other packages which
-use the "http-crate" feature of the "%{crate}" crate.
-
-%files       -n %{name}+http-crate-devel
-%ghost %{crate_instdir}/Cargo.toml
-
-%package     -n %{name}+http-interop-devel
-Summary:        %{summary}
-BuildArch:      noarch
-
-%description -n %{name}+http-interop-devel %{_description}
-
-This package contains library source intended for building other packages which
-use the "http-interop" feature of the "%{crate}" crate.
-
-%files       -n %{name}+http-interop-devel
-%ghost %{crate_instdir}/Cargo.toml
-
 %package     -n %{name}+json-devel
 Summary:        %{summary}
 BuildArch:      noarch
@@ -144,16 +187,16 @@ use the "json" feature of the "%{crate}" crate.
 %files       -n %{name}+json-devel
 %ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+native-certs-devel
+%package     -n %{name}+multipart-devel
 Summary:        %{summary}
 BuildArch:      noarch
 
-%description -n %{name}+native-certs-devel %{_description}
+%description -n %{name}+multipart-devel %{_description}
 
 This package contains library source intended for building other packages which
-use the "native-certs" feature of the "%{crate}" crate.
+use the "multipart" feature of the "%{crate}" crate.
 
-%files       -n %{name}+native-certs-devel
+%files       -n %{name}+multipart-devel
 %ghost %{crate_instdir}/Cargo.toml
 
 %package     -n %{name}+native-tls-devel
@@ -168,16 +211,76 @@ use the "native-tls" feature of the "%{crate}" crate.
 %files       -n %{name}+native-tls-devel
 %ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+proxy-from-env-devel
+%package     -n %{name}+native-tls-no-default-devel
 Summary:        %{summary}
 BuildArch:      noarch
 
-%description -n %{name}+proxy-from-env-devel %{_description}
+%description -n %{name}+native-tls-no-default-devel %{_description}
 
 This package contains library source intended for building other packages which
-use the "proxy-from-env" feature of the "%{crate}" crate.
+use the "native-tls-no-default" feature of the "%{crate}" crate.
 
-%files       -n %{name}+proxy-from-env-devel
+%files       -n %{name}+native-tls-no-default-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+native-tls-webpki-roots-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+native-tls-webpki-roots-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "native-tls-webpki-roots" feature of the "%{crate}" crate.
+
+%files       -n %{name}+native-tls-webpki-roots-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+platform-verifier-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+platform-verifier-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "platform-verifier" feature of the "%{crate}" crate.
+
+%files       -n %{name}+platform-verifier-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+rustls-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+rustls-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "rustls" feature of the "%{crate}" crate.
+
+%files       -n %{name}+rustls-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+rustls-no-provider-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+rustls-no-provider-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "rustls-no-provider" feature of the "%{crate}" crate.
+
+%files       -n %{name}+rustls-no-provider-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+rustls-webpki-roots-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+rustls-webpki-roots-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "rustls-webpki-roots" feature of the "%{crate}" crate.
+
+%files       -n %{name}+rustls-webpki-roots-devel
 %ghost %{crate_instdir}/Cargo.toml
 
 %package     -n %{name}+socks-proxy-devel
@@ -192,16 +295,16 @@ use the "socks-proxy" feature of the "%{crate}" crate.
 %files       -n %{name}+socks-proxy-devel
 %ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+tls-devel
+%package     -n %{name}+win-system-proxy-devel
 Summary:        %{summary}
 BuildArch:      noarch
 
-%description -n %{name}+tls-devel %{_description}
+%description -n %{name}+win-system-proxy-devel %{_description}
 
 This package contains library source intended for building other packages which
-use the "tls" feature of the "%{crate}" crate.
+use the "win-system-proxy" feature of the "%{crate}" crate.
 
-%files       -n %{name}+tls-devel
+%files       -n %{name}+win-system-proxy-devel
 %ghost %{crate_instdir}/Cargo.toml
 
 %prep
@@ -219,23 +322,51 @@ use the "tls" feature of the "%{crate}" crate.
 
 %if %{with check}
 %check
-# * skip tests that require internet access
+# * unversioned_rustls_crypto_provider needs aws-lc-rs
+# * other skipped tests require internet access
 %{cargo_test -- -- %{shrink:
-    --skip error::tests::status_code_error_redirect
-    --skip test::range::read_range_rustls
-    --skip tests::connect_http_google
-    --skip tests::connect_https_google_rustls
-    --skip src/agent.rs
-    --skip src/error.rs
-    --skip src/lib.rs
-    --skip src/request.rs
-    --skip src/response.rs
-    --skip ipv6_addr_in_dns_name
+    --skip tls::TlsConfigBuilder::unversioned_rustls_crypto_provider
+    --skip agent::Agent::run
+    --skip body::Body
+    --skip body::BodyReader
+    --skip body::BodyWithConfig
+    --skip middleware::Middleware
+    --skip request::RequestBuilder
+    --skip request_ext::tests::middleware_config
+    --skip response::ResponseExt::get_redirect_history
+    --skip response::ResponseExt::get_uri
+    --skip send_body::AsSendBody
+    --skip test::
+    --skip unversioned::transport::Connector
 }}
 %endif
 
 %changelog
 ## START: Generated by rpmautospec
+* Mon Oct 05 2026 Dan Streetman <ddstreet@ieee.org> - 3.4.2-2
+- chore: update 'lock' files and render changed components
+
+* Tue Sep 15 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.4.2-1
+- Update to version 3.4.2; Fixes RHBZ#2532724
+
+* Mon Sep 07 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.4.1-1
+- Update to version 3.4.1; Fixes RHBZ#2529152
+
+* Sun Aug 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.4.0-1
+- Update to version 3.4.0; Fixes RHBZ#2512818
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sun Jun 28 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.3.0-1
+- Update to version 3.3.0; Fixes RHBZ#2329382
+
+* Sun Jun 28 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2.12.1-8
+- Re-enable the brotli feature
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.12.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2.12.1-6
 - build: mass rebuild auto-bumpable components
 

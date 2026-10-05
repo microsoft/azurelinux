@@ -1,0 +1,78 @@
+commit 7ebd4d910c109e171db13d160c6f03e350f57a83
+Author: Matt Turner <mattst88@gmail.com>
+Date:   Fri Apr 10 11:52:25 2026 -0400
+
+    s390x: check for signal frame before dwarf_step()
+    
+    Check for signal frames before attempting DWARF-based unwinding, as ARM
+    and AArch64 already do. The vDSO provides DWARF unwind info for the
+    signal trampoline (__kernel_sigreturn), but this info doesn't correctly
+    describe how to unwind through the signal frame — apply_reg_state()
+    detects ip and cfa unchanged and returns -UNW_EBADFRAME. By checking
+    first, we ensure the s390x signal frame handler (which correctly parses
+    the sigcontext structure) is always used.
+    
+    This fixes Gtest-resume-sig, Ltest-resume-sig, and Ltest-concurrent
+    failures when running the s390x testsuite under QEMU.
+
+diff --git a/src/s390x/Gstep.c b/src/s390x/Gstep.c
+index 792f5b6014049834..aee9c5aee959a01a 100644
+--- a/src/s390x/Gstep.c
++++ b/src/s390x/Gstep.c
+@@ -104,6 +104,18 @@ unw_step (unw_cursor_t *cursor)
+   Debug (1, "(cursor=%p, ip=0x%016lx, cfa=0x%016lx)\n",
+          c, c->dwarf.ip, c->dwarf.cfa);
+ 
++  /* Check if this is a signal frame before trying DWARF-based unwinding. The
++   * vDSO may provide DWARF info for the signal trampoline that doesn't
++   * correctly describe how to unwind through the signal frame. Checking first
++   * ensures we always use our signal frame handler which correctly parses the
++   * sigcontext.  */
++  sig = unw_is_signal_frame (cursor);
++  if (sig > 0)
++    {
++      c->sigcontext_format = sig;
++      return s390x_handle_signal_frame (cursor);
++    }
++
+   /* Try DWARF-based unwinding... */
+   c->sigcontext_format = S390X_SCF_NONE;
+   ret = dwarf_step (&c->dwarf);
+@@ -114,34 +126,14 @@ unw_step (unw_cursor_t *cursor)
+ 
+   if (unlikely (ret == -UNW_ENOINFO))
+     {
+-      /* GCC doesn't currently emit debug information for signal
+-         trampolines on s390x so we check for them explicitly.
+-
+-         If there isn't debug information available we could also
++      /* If there isn't debug information available we could also
+          try using the backchain (if available).
+ 
+          Other platforms also detect PLT entries here. That's
+          tricky to do reliably on s390x so I've left it out for
+          now.  */
+-
+-      /* Memory accesses here are quite likely to be unsafe. */
+-      c->validate = 1;
+-
+-      /* Check if this is a signal frame. */
+-      sig = unw_is_signal_frame (cursor);
+-      if (sig > 0)
+-        {
+-          c->sigcontext_format = sig;
+-          ret = s390x_handle_signal_frame (cursor);
+-        }
+-      else
+-        {
+-          c->dwarf.ip = 0;
+-          ret = 0;
+-        }
+-
+-      c->validate = val;
+-      return ret;
++      c->dwarf.ip = 0;
++      return 0;
+     }
+ 
+   if (unlikely (ret > 0 && c->dwarf.ip == 0))

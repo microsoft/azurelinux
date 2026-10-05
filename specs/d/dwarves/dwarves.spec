@@ -5,12 +5,13 @@
 %define libver 1
 
 Name: dwarves
-Version: 1.30
+Version: 1.32
 Release: 5%{?dist}
 License: GPL-2.0-only
 Summary: Debugging Information Manipulation Tools (pahole & friends)
 URL: http://acmel.wordpress.com
 Source: http://fedorapeople.org/~acme/dwarves/%{name}-%{version}.tar.xz
+Source: http://fedorapeople.org/~acme/dwarves/%{name}-%{version}.tar.sign
 Requires: %{libname}%{libver} = %{version}-%{release}
 BuildRequires: gcc
 BuildRequires: cmake >= 2.8.12
@@ -18,9 +19,9 @@ BuildRequires: zlib-devel
 BuildRequires: elfutils-devel >= 0.130
 
 %description
-dwarves is a set of tools that use the debugging information inserted in ELF
-binaries by compilers such as GCC, used by well known debuggers such as GDB,
-and more recent ones such as systemtap.
+dwarves is a set of tools that use the debugging information inserted in
+ELF binaries by compilers such as GCC, used by well known debuggers such as
+GDB, and more recent ones such as systemtap.
 
 Utilities in the dwarves suite include pahole, that can be used to find
 alignment holes in structs and classes in languages such as C, C++, but not
@@ -44,8 +45,8 @@ gcc, with the same compiler flags, and then use codiff to make sure the
 original .o file and the new one generated from debug info produces the same
 debug info.
 
-Pahole also can be used to use all this type information to pretty print raw
-data according to command line directions.
+Pahole also can be used to use all this type information to pretty print raw data
+according to command line directions.
 
 Headers can have its data format described from debugging info and offsets from
 it can be used to further format a number of records.
@@ -82,7 +83,7 @@ rm -Rf %{buildroot}
 %files
 %doc README.ctracer
 %doc README.btf
-%doc changes-v1.30
+%doc changes-v1.32
 %doc NEWS
 %{_bindir}/btfdiff
 %{_bindir}/codiff
@@ -102,6 +103,7 @@ rm -Rf %{buildroot}
 %dir %{_datadir}/dwarves/runtime/python/
 %defattr(0644,root,root,0755)
 %{_mandir}/man1/pahole.1*
+%{_mandir}/man1/pfunct.1*
 %{_datadir}/dwarves/runtime/Makefile
 %{_datadir}/dwarves/runtime/linux.blacklist.cu
 %{_datadir}/dwarves/runtime/ctracer_relay.c
@@ -134,6 +136,183 @@ rm -Rf %{buildroot}
 %{_libdir}/%{libname}_reorganize.so
 
 %changelog
+* Sat Sep 12 2026 Arnaldo Carvalho de Melo <acme@redhat.com> - 1.32-1
+- Regression tests: from 6 in v1.31 to 74
+- New coverage work, 16 csets
+- Add pfunct split BTF test to btf_split
+- Verify the downloaded perf tarball checksum before extracting
+- Use a portable high-resolution timestamp
+- Build the test_bin fixture in the per-test tmpdir
+- Use POSIX [ instead of [[ in test_lib.sh
+- btf_type_tag_order.sh: Use gawk for capture-group match()
+- Fix coverage build by respecting build-coverage/ in PATH
+- Add automatic perf building for cross-distro compatibility
+- Check minimum perf metadata records instead of exact counts
+- Fix perf tests for container environments
+- Force DWARF 5 in atomic_types test for _Atomic support
+- Skip tests gracefully on old bpftool versions
+- Skip instead of fail when old toolchains lack feature support
+- Fix gcc_true_signatures.sh compiler detection and awk syntax
+- Add prototype expression parsing and prettify test
+- Add codiff_multi_cu.sh to cover __cus__find_cu_by_name
+- Add BTF vmlinux encoding test
+- Add typedef chain display test
+- Add _Atomic type compile emission test
+- Add pahole scattered option paths coverage test
+- Add pahole --header_type, --range and --seek_bytes prettify test
+- Add codiff member type change and function prototype diff test
+- Add dwarf_loader.c bitfield recode and inlining edge case test
+- Add dwarves.c core API coverage test
+- Add prefcnt type reference counting coverage test
+- Add elf_symtab, gobuffer, dutil and pglobal coverage test
+- Add dwarves_emit and dwarves_reorganize coverage test
+- Add bitfield, cross-boundary and mixed member type test
+- Add BTF encoder coverage test for vars, floats and multi-CU
+- Add codiff terse, verbose and multi-CU diff test
+- Add pfunct CLI option coverage
+- Add pglobal variable and function listing test
+- Add multi-file loading test
+- Add 5 btf_encoder.c targeted coverage tests
+- Add medium-effort coverage tests for 5 uncovered code paths
+- Add CLI display, BTF encoding options and auxiliary tools tests
+- Add enumerator search test, in 2 csets
+- Add type containment and pointer search test, in 2 csets
+- Add coverage-diff.sh workflow and coverage_table.py reporter
+- Add LLVM source-based code coverage support
+- Add split BTF encoding test (vmlinux base + kernel module)
+- Add BTF_KIND_FWD encoding and loading round-trip test
+- Add BTF bitfield encoding/loading round-trip test
+- Add BTF FLOAT and ENUM64 type encoding tests
+- Add BTF VAR and DATASEC encoding test
+- Add expand_pointers, pfunct_stats and class_list_file tests
+- Add BTF arena type tag encoding test
+- Add pdwtags DWARF tag display test
+- Add codiff struct comparison test
+- Add bitfield layout and data member filtering test
+- Add sort output and separator test
+- Add display format options test
+- Add class name filtering test
+- Add compilable output and type filtering test
+- Add type expansion and anonymous struct test
+- Add sizes and holes display test
+- Fix mktemp suffix portability for Alpine Linux
+- Add emit_atomic.sh test and fix pfunct-btf-decl-tags.sh quoting
+- Reduce reproducible_build thread count iterations
+- Add --dump-artifacts to capture DWARF/BTF from binaries
+- Add --jobs/-j option to limit parallel test execution
+- Show referenced log file contents in verbose mode
+- Add --verbose/-v option for better failure diagnosis
+- Add PERF_BIN support and preserve build logs on failure
+- Add test number filtering and waiting status line
+- Add dynamic test timing and reordering to avoid slow tests blocking
+  results
+- Add --vmlinux option to specify vmlinux file for tests
+- Run test scripts in parallel
+- Fix test_lib.sh and test scripts to run from any directory
+- Guard cleanup() against empty outdir to prevent rm /*
+- Add BTF_FUNCTIONS_QUICK mode for fast CI iteration
+- Skip and find vmlinux tests when the running kernel vmlinux is not
+  available
+- Add inter-CU type reference comparison test
+- Add GCC default-BTF optimized parameter coverage
+- Add BTF true_signature encoding tests
+- Add btf_type_tag ordering test
+- Support GCC in pfunct-btf-decl-tags test
+- add gcc true signature test
+- Support DW_FORM_GNU_ref_alt references to dwz alternate debug files
+- Add cu parameter to tag__set_spec() and dwarf_tag__set_attr_type()
+- Fix cus__merging_cu failing to detect DW_FORM_ref_addr
+- Support DW_TAG_imported_unit for same-file partial units
+- Allow forcing the merge of CUs for solving inter CU tag references
+- Initial support for DW_TAG_subprogram in DW_TAG_enumeration
+- Initial support for DW_TAG_variant_part
+- Replace stale FIXME/XXX comments with explanations
+- Fix data race in tag__init() decl_file string cache
+- Skip libdw__lock when elfutils is built thread-safe
+- Fix --fixup_silly_bitfields condition check
+- Fix annotation failure leaks in variable and typedef creation
+- Allocate type_dcu via dwarf_cu__new to fix dangling stack pointer
+- Analyze per-parameter information for true signatures
+- Collect per-parameter information
+- Detect aggregate ABI register usage and signature changes
+- Add support for DW_TAG_GNU_annotation
+- Extract die__add_btf_type_tag() helper [NFC]
+- Detect reordered parameters
+- Handle DW_AT_location attrs containing DW_OP_plus_uconst
+- Fix multi-dimensional array encoding
+- Fall back to objcopy when llvm-objcopy is not available
+- Add elf_strptr NULL checks and fix kfunc bounds
+- Fix early cleanup crashes in btf_encoder__new/delete
+- Use btf_encoder__tag_type() for all type ID computations
+- Fix interior pointer free and missing NULL check
+- Ensure the first same-name function has a non-zero address
+- Add O_TRUNC to btf_encoder__write_raw_file()
+- Only skip optimized parms when ABI changed
+- Emit true function signatures
+- Prefer strong function definitions for BTF generation
+- Add true_signature feature support for "."-suffixed functions
+- Fix a verbose output issue
+- Factor out BPF kfunc emission
+- Refactor btf_encoder__add_func_proto
+- Remove encoder pointer from btf_encoder_func_state
+- Fix -C -T segfault
+- Fix option name in the -m/-C error message
+- Apply the struct-only filters to unions
+- Don't match unions with --with_flexible_array
+- Fix --unions --packable segfault
+- Guard pipe_seek() against negative offsets
+- Use fseek for seekable files in --prettify and --seek_bytes
+- Skip inline expansions during BTF encoding
+- Fix parse_btf_features("all") being a silent no-op
+- Fix --errno typo that decrements instead of negating
+- Fix instance memory leak on early returns in
+  prototype__stdio_fprintf_value
+- Fix BTF function parameter type match check
+- Add "layout" BTF encoding feature
+- Fix discarded-qualifiers for strchr/strstr.
+- Refactor selftests
+- Automate the steps needed to release a new version
+- Add build-check-series.sh for bisectability verification
+- Add tarball targets similar to kernel's perf-tar-src-pkg
+- Add git SHA tracking via --devel_version option
+- Add test, coverage and list-targets make targets
+- Warn loudly when coverage instrumentation is enabled
+- Add vmlinux_comparison.py for DWARF/BTF analysis
+- Update minimum required version from 3.5 to 3.10
+- Remove 11 dead functions found via coverage analysis, in 2 csets
+- Add exec_objcopy() shell-injection-safe helper
+- Fix variable shadowing in __cus__find_struct_by_name()
+- Fix heap buffer overflow in languages__parse realloc
+- Don't search for holes before member byte sizes are cached
+- Fix missing list head initialization in type__clone_members
+- libbpf sync with 1.8
+- Fix NULL dereference in remove_dyn()
+- Improve language and formatting
+- Fix incorrect command line argument in documentation
+- describe layout BTF feature
+- document true_signature btf_feature
+- Update LLVM version to 22
+- Add clang+aarch64 to matrix
+- build/install bpftool from kernel tree
+- Support building kernel with LLVM
+- Add man page
+- Add support for split BTF
+- Mark file-local functions as static
+- build-and-test-cmd.sh: Move build-dir detection to test_lib.sh, fix
+  container PATH
+- build-and-test-cmd.sh: Add CI build+test script
+- Fix -Wsign-compare warnings across the codebase
+- Fix multi-dimensional array loading
+- Handle decl tag component_idx for parameters
+- Fix warnings due to type permutation
+- Remove leftover comment about --flat_arrays usage
+- Remove --flat_arrays now that pahole encodes multi dim arrays in BTF
+- Fix error path resource leaks
+- Fix error handling when opening file
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.30-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.30-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

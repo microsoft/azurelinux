@@ -1,6 +1,6 @@
---- writeable-0.6.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ writeable-0.6.2/Cargo.toml	2025-10-29T07:41:08.630246+00:00
-@@ -53,10 +53,6 @@
+--- writeable-0.6.4/Cargo.toml	2006-07-24T01:21:28+00:00
++++ writeable-0.6.4/Cargo.toml	2026-08-17T16:06:58.826925+00:00
+@@ -59,10 +59,6 @@
  path = "src/lib.rs"
  bench = false
  
@@ -11,10 +11,13 @@
  [[test]]
  name = "writeable"
  path = "tests/writeable.rs"
-@@ -74,6 +70,3 @@
+@@ -80,9 +76,6 @@
  [dev-dependencies.rand]
  version = "0.9"
  features = ["small_rng"]
 -
 -[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
 -version = "0.5.0"
+ 
+ [lints.clippy]
+ alloc_instead_of_core = "warn"

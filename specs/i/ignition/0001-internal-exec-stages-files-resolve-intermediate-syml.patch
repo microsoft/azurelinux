@@ -1,0 +1,63 @@
+From 6dd62cb069f1d7d214a50bebc0677800328986be Mon Sep 17 00:00:00 2001
+From: Rolv Apneseth <rolv.apneseth@gmail.com>
+Date: Tue, 1 Sep 2026 14:53:44 +0100
+Subject: [PATCH] internal/exec/stages/files: resolve intermediate symlinks in
+ relabel paths
+
+Due to a recent libselinux (3.11) update in the next/testing streams of
+FCOS, Software Factory nodes started failing provisioning.
+
+They had a home_dir: /home/zuul-worker defined in their butane config
+and were failing with a relabelling issue. With the 3.11 update
+(including
+https://github.com/SELinuxProject/selinux/commit/67bc978bfaf9e4d00883fbaf1f83f5fb6a0018ce),
+lstat() was replaced with safe_open() using O_NOFOLLOW on intermediate
+path components. This ended up exposing a latent bug in Ignition since
+only the final component was being resolved via ResolveSymlink(), so
+/home/user (where /home -> var/home on ostree) is passed unresolved.
+setfiles no longer resolves for us, leading to the failures.
+
+Avoid this issue by using JoinPath() to resolve intermediate symlinks in
+directory paths before passing them to setfiles for SELinux relabelling.
+
+https://github.com/coreos/ignition/pull/2316
+---
+ docs/release-notes.md                |  1 +
+ internal/exec/stages/files/passwd.go | 17 +++++++++++++----
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/internal/exec/stages/files/passwd.go b/internal/exec/stages/files/passwd.go
+index 737e9cced..85f661945 100644
+--- a/internal/exec/stages/files/passwd.go
++++ b/internal/exec/stages/files/passwd.go
+@@ -80,17 +80,26 @@ func (s *stage) createPasswd(config types.Config) error {
+ 				return err
+ 			}
+ 
++			// Resolve intermediate symlinks in the homedir path.
++			// This is relevant on OSTree-based platforms, where
++			// /home is a symlink to var/home.
++			resolvedPath, err := s.JoinPath(homedir)
++			if err != nil {
++				return err
++			}
++			unprefixed := resolvedPath[len(s.DestDir):]
++
+ 			// Check if the homedir is actually a symlink, and make sure we
+ 			// relabel the target instead in that case. This is relevant on
+ 			// OSTree-based platforms, where /root is a link to /var/roothome.
+-			if resolved, err := s.ResolveSymlink(homedir); err != nil {
++			if target, err := s.ResolveSymlink(unprefixed); err != nil {
+ 				return err
+-			} else if resolved != "" {
++			} else if target != "" {
+ 				// note we don't relabel the symlink itself; we assume it's
+ 				// already properly labeled
+-				s.relabel(resolved)
++				s.relabel(target)
+ 			} else {
+-				s.relabel(homedir)
++				s.relabel(unprefixed)
+ 			}
+ 		}
+ 	}

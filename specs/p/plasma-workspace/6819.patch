@@ -1,0 +1,80 @@
+From 83a439f0bc61811e450bc00ed28d1b964a1e1901 Mon Sep 17 00:00:00 2001
+From: David Edmundson <kde@davidedmundson.co.uk>
+Date: Fri, 3 Jul 2026 11:29:59 +0000
+Subject: [PATCH] libtaskmanager: Limit launching new instances where service
+ files do not exist
+
+Libtaskmanager is full of legacy code to handle applications not
+providing application IDs and having workarounds for them.
+
+This includes providing a "Open a New Window" entry for most
+applications unless explicitly inhibited. Where a matching .desktop is
+found the Exec line from there is used otherwise there is a fallback to
+launch the same binary again.
+
+This latter fallback is not very sandbox aware and could be exploited to
+launch a different binary on the host. It's not especially exploitable,
+it relies on the user clicking an action, but we should close it anyway.
+
+
+(cherry picked from commit 7ff209fa1511df6161466d056d0a8d63930c2b66)
+
+Co-authored-by: David Edmundson <kde@davidedmundson.co.uk>
+---
+ libtaskmanager/tasktools.cpp | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/libtaskmanager/tasktools.cpp b/libtaskmanager/tasktools.cpp
+index 62680bc263..57ca8c4fe4 100644
+--- a/libtaskmanager/tasktools.cpp
++++ b/libtaskmanager/tasktools.cpp
+@@ -631,15 +631,6 @@ void runApp(const AppData &appData, const QList<QUrl> &urls)
+             job->start();
+ 
+             KActivities::ResourceInstance::notifyAccessed(QUrl(QString(u"applications:" + service->storageId())), QStringLiteral("org.kde.libtaskmanager"));
+-        } else {
+-            auto *job = new KIO::OpenUrlJob(appData.url);
+-            job->setUiDelegate(new KNotificationJobUiDelegate(KJobUiDelegate::AutoErrorHandlingEnabled));
+-            job->setRunExecutables(true);
+-            job->start();
+-
+-            if (!appData.id.isEmpty()) {
+-                KActivities::ResourceInstance::notifyAccessed(QUrl(QString(u"applications:" + appData.id)), QStringLiteral("org.kde.libtaskmanager"));
+-            }
+         }
+     }
+ }
+@@ -657,7 +648,21 @@ bool canLauchNewInstance(const AppData &appData)
+         desktopEntry.chop(8);
+     }
+ 
+-    const KService::Ptr service = KService::serviceByDesktopName(desktopEntry);
++    KService::Ptr service;
++
++    // applications: URLs are used to refer to applications by their KService::menuId
++    // (i.e. .desktop file name) rather than the absolute path to a .desktop file.
++    if (appData.url.scheme() == QLatin1String("applications")) {
++        service = KService::serviceByMenuId(appData.url.path());
++    } else if (appData.url.scheme() == QLatin1String("preferred")) {
++        service = KService::serviceByStorageId(defaultApplication(appData.url));
++    } else {
++        service = KService::serviceByDesktopPath(appData.url.toLocalFile());
++    }
++
++    if (!service) {
++        return false;
++    }
+ 
+     if (service) {
+         if (service->noDisplay()) {
+@@ -686,7 +691,6 @@ bool canLauchNewInstance(const AppData &appData)
+             }
+         }
+     }
+-
+     return true;
+ }
+ }
+-- 
+GitLab
+

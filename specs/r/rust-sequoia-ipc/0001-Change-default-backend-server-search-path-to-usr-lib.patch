@@ -1,0 +1,35 @@
+From 9ebd4f204461db65330db59db67764a81369c96b Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 8 Jul 2026 10:32:49 +0200
+Subject: [PATCH] Change default backend server search path to
+ /usr/libexec/sequoia
+
+---
+ src/core.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/core.rs b/src/core.rs
+index bae62f9..3af5a4b 100644
+--- a/src/core.rs
++++ b/src/core.rs
+@@ -84,7 +84,7 @@ impl Drop for Context {
+ /// Returns $PREXIX at compile-time, or a reasonable default prefix.
+ fn prefix() -> PathBuf {
+     /* XXX: Windows support.  */
+-    PathBuf::from(option_env!("PREFIX").unwrap_or("/usr/local"))
++    PathBuf::from(option_env!("PREFIX").unwrap_or("/usr"))
+ }
+ 
+ impl Context {
+@@ -101,7 +101,7 @@ impl Context {
+     pub fn configure() -> Config {
+         Config(Context {
+             home: PathBuf::from(""), // Defer computation of default.
+-            lib: prefix().join("lib").join("sequoia"),
++            lib: prefix().join("libexec").join("sequoia"),
+             ipc_policy: IPCPolicy::Robust,
+             ephemeral: false,
+             cleanup: false,
+-- 
+2.55.0
+

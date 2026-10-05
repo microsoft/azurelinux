@@ -1,0 +1,31 @@
+From 709052ac8ea0fa9dad2705d77f4d9bc1b259fff4 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Wed, 9 Sep 2026 16:47:58 -0700
+Subject: [PATCH 14/17] resize: Make sure 32bit build cannot overflow
+ frag_count
+
+Add a couple of PED_ASSERT checks to fat_op_context_new that make sure
+the frag_count value can be allocated. Does not effect 64bit
+architectures.
+
+(cherry picked from commit f3ff7ede4f3832f6e2876cf0440bdc3f324e85fa)
+---
+ libparted/fs/r/fat/context.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libparted/fs/r/fat/context.c b/libparted/fs/r/fat/context.c
+index c7823236..acae57d0 100644
+--- a/libparted/fs/r/fat/context.c
++++ b/libparted/fs/r/fat/context.c
+@@ -96,6 +96,8 @@ fat_op_context_new (PedFileSystem* new_fs, PedFileSystem* old_fs)
+ 	if (!ctx->buffer_map)
+ 		goto error_free_ctx;
+ 
++        PED_ASSERT (old_fs_info->frag_count > 0);
++        PED_ASSERT ((size_t) old_fs_info->frag_count < SIZE_MAX / sizeof (FatFragment));
+ 	ctx->remap = (FatFragment*) ped_malloc (sizeof (FatFragment)
+ 						   * old_fs_info->frag_count);
+ 	if (!ctx->remap)
+-- 
+2.55.0
+

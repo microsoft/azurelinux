@@ -1,0 +1,38 @@
+From 705c4a5195a9b9dc36ecfe669f1ff880d5559c6d Mon Sep 17 00:00:00 2001
+From: Michel Lind <salimma@fedoraproject.org>
+Date: Wed, 9 Sep 2026 12:14:32 +0100
+Subject: [PATCH] Revert "[5.2.x] Bumped minimum setuptools version to 83."
+
+This reverts commit cd5ad8c81bf221868e3c33d90d6e021d067829b4.
+---
+ docs/intro/reusable-apps.txt | 2 +-
+ pyproject.toml               | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/docs/intro/reusable-apps.txt b/docs/intro/reusable-apps.txt
+index 2c6e962c08..6148b4e94b 100644
+--- a/docs/intro/reusable-apps.txt
++++ b/docs/intro/reusable-apps.txt
+@@ -209,7 +209,7 @@ this. For a small app like polls, this process isn't too difficult.
+        :caption: ``django-polls/pyproject.toml``
+ 
+        [build-system]
+-       requires = ["setuptools>83"]
++       requires = ["setuptools>=77.0.3"]
+        build-backend = "setuptools.build_meta"
+ 
+        [project]
+diff --git a/pyproject.toml b/pyproject.toml
+index 1d127812d0..59b3a52294 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools>=83"]
++requires = ["setuptools>=77.0.3"]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]
+-- 
+2.55.0
+

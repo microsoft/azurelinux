@@ -9,8 +9,8 @@
 %global crate afterburn
 
 Name:           rust-afterburn
-Version:        5.10.0
-Release: 6%{?dist}
+Version:        5.11.0
+Release: 5%{?dist}
 Summary:        Simple cloud provider agent
 
 License:        Apache-2.0
@@ -18,6 +18,7 @@ URL:            https://crates.io/crates/afterburn
 Source0:        %{crates_source}
 # not used on Fedora
 Source1:        https://github.com/coreos/%{crate}/releases/download/v%{version}/%{crate}-%{version}-vendor.tar.gz
+Source2:        90-afterburn-authorized-keys-file.conf
 
 # build(deps): bump mailparse from 0.15.0 to 0.16.1
 # (Only the Cargo.toml portion, not the Cargo.lock portion)
@@ -30,7 +31,7 @@ BuildRequires:  openssl-devel
 # This is needed because the cc crate, which is
 # used for linking final build results of crates,
 # does not work without it.
-BuildRequires:  glibc-devel 
+BuildRequires:  glibc-devel
 %else
 BuildRequires:  rust-packaging >= 23
 %endif
@@ -83,6 +84,9 @@ License:        Apache-2.0 AND 0BSD AND BSD-3-Clause AND MIT AND (Apache-2.0 OR 
 %{_unitdir}/afterburn-firstboot-checkin.service
 %{_unitdir}/afterburn-sshkeys@.service
 %{_unitdir}/afterburn-sshkeys.target
+%if 0%{?fedora} && 0%{?fedora} > 43
+%{_sysconfdir}/ssh/sshd_config.d/90-afterburn-authorized-keys-file.conf
+%endif
 
 %post        -n %{crate}
 %systemd_post afterburn.service
@@ -120,6 +124,7 @@ to run in the initramfs on boot.
 %autosetup -n %{crate}-%{version_no_tilde} -p1 %{?rhel:-a1}
 %if 0%{?rhel}
 %cargo_prep -v vendor
+rm -f Cargo.lock
 # avoid brp-mangle-shebangs error from sources with executable bit
 chmod -x vendor/ipnet/src/*.rs
 %else
@@ -156,12 +161,38 @@ install -Dpm0644 -t %{buildroot}%{_unitdir} \
 mkdir -p %{buildroot}%{dracutmodulesdir}
 cp -a dracut/* %{buildroot}%{dracutmodulesdir}
 
+%if 0%{?fedora} && 0%{?fedora} > 43
+install -d -p %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
+install -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/90-afterburn-authorized-keys-file.conf
+%endif
+
 %if %{with check}
 %check
 %cargo_test
 %endif
 
 %changelog
+* Tue Sep 22 2026 Packit <hello@packit.dev> - 5.11.0-1
+- New upstream release
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.10.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 5.10.0-8
+- Rebuilt for openssl 4.0
+
+* Mon May 11 2026 Fabio Valentini <decathorpe@gmail.com> - 5.10.0-7
+- Rebuild for rust-openssl CVE-2026-{41676,41677,41678,41681,41898,42327,44662}
+
+* Mon Mar 30 2026 Timothée Ravier <tim@siosm.fr> - 5.10.0-6
+- F44+: Ship OpenSSH config file specifying AuthorizedKeysFile
+
+* Tue Mar 10 2026 Joel Capitao <jcapitao@redhat.com> - 5.10.0-5
+- Revert 'Ship OpenSSH config file specifying AuthorizedKeysFile'
+
+* Tue Feb 24 2026 Joel Capitao <jcapitao@redhat.com> - 5.10.0-4
+- Ship OpenSSH config file specifying AuthorizedKeysFile
+
 * Sat Feb 07 2026 Fabio Valentini <decathorpe@gmail.com> - 5.10.0-3
 - Rebuild for RUSTSEC-2026-{0007,0008,0009} and CVE-2026-25537
 

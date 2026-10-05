@@ -1,0 +1,289 @@
+From 7837ba43e4473b9b71a86135b2ddeb3a5cf1cfbc Mon Sep 17 00:00:00 2001
+From: Sandipan Roy <saroy@redhat.com>
+Date: Fri, 25 Sep 2026 16:20:54 +0200
+Subject: [PATCH 1/2] [cleaner] refuse out-of-tree tar members on extract
+
+sos clean used fully_trusted_filter plus a member-name-only path
+guard. That does not stop a symlink whose target is an absolute
+host path followed by a regular file with the same relative name,
+so extraction can write outside the dest directory.
+
+Use PEP-706 data_filter when available and skip FilterError
+members. Keep in-tree relative symlinks. Pre-filter the member
+list as well: Python 3.11.2 (Debian 12) ignores extraction_filter.
+Log skipped members. Non-root skips device nodes that mknod cannot
+create.
+
+Relevant: #4461
+
+Signed-off-by: Sandipan Roy <saroy@redhat.com>
+Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+---
+ sos/cleaner/archives/__init__.py | 100 +++++++++++++++++++-----
+ tests/unittests/cleaner_tests.py | 130 +++++++++++++++++++++++++++++++
+ 2 files changed, 212 insertions(+), 18 deletions(-)
+
+diff --git a/sos/cleaner/archives/__init__.py b/sos/cleaner/archives/__init__.py
+index 32c2957d..2e908f00 100644
+--- a/sos/cleaner/archives/__init__.py
++++ b/sos/cleaner/archives/__init__.py
+@@ -22,36 +22,100 @@ from sos.utilities import (file_is_binary, sos_get_command_output,
+                            file_is_certificate)
+ 
+ 
++def _path_is_within(directory, target):
++    """Return True if *target* is inside (or equal to) *directory*.
++
++    Both arguments must already be absolute paths.
++    """
++    try:
++        return os.path.commonpath([directory, target]) == directory
++    except ValueError:
++        return False
++
++
++def _member_path_ok(abs_dest, member):
++    """Return True when the member resolves inside *abs_dest*."""
++    member_path = os.path.abspath(os.path.join(abs_dest, member.name))
++    if not _path_is_within(abs_dest, member_path):
++        return False
++    if member.issym() or member.islnk():
++        if os.path.isabs(member.linkname):
++            link_target = member.linkname
++        else:
++            link_target = os.path.abspath(
++                os.path.join(os.path.dirname(member_path), member.linkname)
++            )
++        if not _path_is_within(abs_dest, link_target):
++            return False
++    return True
++
++
++def _warn_skip_member(member, reason):
++    logging.getLogger('sos').warning(
++        "[cleaner] skipping tar member %r: %s", member.name, reason)
++
++
++def _make_safer_extract_filter(dest_path):
++    """Build a per-archive extraction filter (closure).
++
++    PEP-706 ``data_filter`` is the primary check.  It rejects special files
++    (block devices, FIFOs) that are legitimate sosreport members, so those
++    are rescued when their path stays inside the destination tree.
++    Out-of-tree symlinks and absolute links are skipped rather than aborting
++    the whole extraction.  ``fully_trusted`` is not used: a member-name-only
++    ``abspath``/``commonprefix`` guard does not stop a symlink-to-absolute-
++    path followed by a regular file of the same relative name.
++    """
++    abs_dest = os.path.abspath(dest_path)
++    data_filter = getattr(tarfile, 'data_filter', None)
++
++    def _filter(member, dest_path):
++        if data_filter is not None:
++            try:
++                return data_filter(member, dest_path)
++            except tarfile.FilterError as err:
++                if (member.isdev() or member.isfifo()) \
++                        and _member_path_ok(abs_dest, member):
++                    return member
++                _warn_skip_member(member, err)
++                return None
++
++        if not _member_path_ok(abs_dest, member):
++            _warn_skip_member(member, "path outside destination")
++            return None
++        return member
++
++    return _filter
++
++
+ # python older than 3.8 will hit a pickling error when we go to spawn a new
+ # process for extraction if this method is a part of the SoSObfuscationArchive
+ # class. So, the simplest solution is to remove it from the class.
+ def extract_archive(archive_path, tmpdir):
+     with tarfile.open(archive_path) as archive:
+         path = os.path.join(tmpdir, 'cleaner')
+-        # set extract filter since python 3.12 (see PEP-706 for more)
+-        # Because python 3.10 and 3.11 raises false alarms as exceptions
+-        # (see #3330 for examples), we can't use data filter but must
+-        # fully trust the archive (legacy behaviour)
+-        archive.extraction_filter = getattr(tarfile, 'fully_trusted_filter',
+-                                            (lambda member, path: member))
+-
+-        # Guard against "Arbitrary file write during tarfile extraction"
+-        # Checks the extracted files don't stray out of the target directory.
++        filt = _make_safer_extract_filter(path)
++        # Honored on 3.12+ (and 3.11.4+). Debian 12 ships 3.11.2, where
++        # this attribute is ignored; members must still be pre-filtered.
++        archive.extraction_filter = filt
++
+         not_root = os.getuid() != 0
+-        members = archive.getmembers()
+-        for member in members:
+-            member_path = os.path.join(path, member.name)
+-            abs_directory = os.path.abspath(path)
+-            abs_target = os.path.abspath(member_path)
+-            prefix = os.path.commonprefix([abs_directory, abs_target])
+-            if prefix != abs_directory:
+-                raise Exception(f"Attempted path traversal in tarfle"
+-                                f"{prefix} != {abs_directory}")
++        members = []
++        for member in archive.getmembers():
++            member = filt(member, path)
++            if member is None:
++                continue
+             # Directories collected from the host may lack u+w or u+x
+             # permissions, preventing child members from being created during
+             # extract
+             if not_root and member.isdir():
+                 member.mode |= stat.S_IWUSR | stat.S_IXUSR
++            # tarfile.makedev() -> os.mknod() needs CAP_MKNOD. Drop device
++            # nodes for non-root rather than aborting the whole extract.
++            if not_root and member.isdev():
++                _warn_skip_member(member, "device node requires root")
++                continue
++            members.append(member)
+         archive.extractall(path, members=members)
+         return os.path.join(path, archive.name.split('/')[-1].split('.tar')[0])
+ 
+diff --git a/tests/unittests/cleaner_tests.py b/tests/unittests/cleaner_tests.py
+index 12f41c7a..0ad10ba1 100644
+--- a/tests/unittests/cleaner_tests.py
++++ b/tests/unittests/cleaner_tests.py
+@@ -723,3 +723,133 @@ class PackedDirTarballTests(unittest.TestCase):
+         with mock.patch.object(self.archive, 'get_file_content',
+                                return_value='{"components": {"report": {}}}'):
+             self.assertEqual(self.archive._load_packed_dirs(), [])
++
++
++class ExtractArchiveSafetyTests(unittest.TestCase):
++    """Out-of-tree symlink members must not write outside dest."""
++
++    def _write_tar(self, members):
++        import io
++        import tarfile
++        import tempfile
++        with tempfile.NamedTemporaryFile(
++                suffix='.tar', delete=False) as handle:
++            tar_path = handle.name
++        with tarfile.open(tar_path, 'w') as tf:
++            for name, kind, extra in members:
++                info = tarfile.TarInfo(name=name)
++                if kind == 'symlink':
++                    info.type = tarfile.SYMTYPE
++                    info.linkname = extra
++                    tf.addfile(info)
++                elif kind == 'chrdev':
++                    info.type = tarfile.CHRTYPE
++                    info.devmajor, info.devminor = extra
++                    tf.addfile(info)
++                else:
++                    payload = extra
++                    info.size = len(payload)
++                    tf.addfile(info, io.BytesIO(payload))
++        return tar_path
++
++    def test_absolute_symlink_does_not_write_outside_dest(self):
++        import os
++        import tempfile
++        from sos.cleaner.archives import extract_archive
++
++        victim_dir = tempfile.mkdtemp()
++        victim = os.path.join(victim_dir, 'pwned')
++        tar_path = self._write_tar([
++            ('sosreport-host/var/log/link', 'symlink', victim_dir),
++            ('sosreport-host/var/log/link/pwned', 'file', b'PWNED\n'),
++        ])
++        dest = tempfile.mkdtemp()
++        with self.assertLogs('sos', level='WARNING') as logcm:
++            extract_archive(tar_path, dest)
++        self.assertFalse(
++            os.path.exists(victim),
++            'extraction followed an out-of-tree symlink',
++        )
++        self.assertTrue(
++            any('skipping tar member' in rec for rec in logcm.output),
++            logcm.output,
++        )
++        os.remove(tar_path)
++
++    def test_absolute_symlink_when_extractall_ignores_filter(self):
++        """Debian 12 / Python 3.11.2 ignores TarFile.extraction_filter."""
++        import os
++        import tarfile
++        import tempfile
++        from sos.cleaner.archives import extract_archive
++
++        orig_extractall = tarfile.TarFile.extractall
++
++        def extractall_ignore_filter(self, *args, **kwargs):
++            self.extraction_filter = (lambda member, path: member)
++            return orig_extractall(self, *args, **kwargs)
++
++        victim_dir = tempfile.mkdtemp()
++        victim = os.path.join(victim_dir, 'pwned')
++        tar_path = self._write_tar([
++            ('sosreport-host/var/log/link', 'symlink', victim_dir),
++            ('sosreport-host/var/log/link/pwned', 'file', b'PWNED\n'),
++        ])
++        dest = tempfile.mkdtemp()
++        with mock.patch.object(tarfile.TarFile, 'extractall',
++                               extractall_ignore_filter):
++            with self.assertLogs('sos', level='WARNING'):
++                extract_archive(tar_path, dest)
++        self.assertFalse(
++            os.path.exists(victim),
++            'extraction followed an out-of-tree symlink',
++        )
++        os.remove(tar_path)
++
++    def test_in_tree_relative_symlink_is_kept(self):
++        import os
++        import tempfile
++        from sos.cleaner.archives import extract_archive
++
++        tar_path = self._write_tar([
++            ('sosreport-host/etc/motd', 'file', b'hello\n'),
++            ('sosreport-host/etc/motd.link', 'symlink', 'motd'),
++        ])
++        dest = tempfile.mkdtemp()
++        extract_archive(tar_path, dest)
++        found_link = None
++        for root, _, files in os.walk(dest):
++            if 'motd.link' in files:
++                found_link = os.path.join(root, 'motd.link')
++                break
++        self.assertTrue(found_link and os.path.islink(found_link))
++        self.assertEqual(os.readlink(found_link), 'motd')
++        os.remove(tar_path)
++
++    def test_non_root_skips_device_and_keeps_later_files(self):
++        import os
++        import tempfile
++        from sos.cleaner.archives import extract_archive
++
++        tar_path = self._write_tar([
++            ('sosreport-host/etc/hostname', 'file', b'testhost\n'),
++            ('sosreport-host/dev/null', 'chrdev', (1, 3)),
++            ('sosreport-host/etc/hosts', 'file', b'127.0.0.1 localhost\n'),
++        ])
++        dest = tempfile.mkdtemp()
++        with mock.patch('sos.cleaner.archives.os.getuid', return_value=1000):
++            with self.assertLogs('sos', level='WARNING'):
++                extract_archive(tar_path, dest)
++
++        found_hostname = found_hosts = found_null = None
++        for root, _, files in os.walk(dest):
++            if 'hostname' in files:
++                found_hostname = os.path.join(root, 'hostname')
++            if 'hosts' in files:
++                found_hosts = os.path.join(root, 'hosts')
++            if 'null' in files and os.path.basename(root) == 'dev':
++                found_null = os.path.join(root, 'null')
++        self.assertTrue(found_hostname)
++        self.assertTrue(found_hosts)
++        self.assertIsNone(found_null)
++        os.remove(tar_path)
+-- 
+2.55.0
+

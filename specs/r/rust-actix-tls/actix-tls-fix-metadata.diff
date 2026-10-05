@@ -1,6 +1,19 @@
---- actix-tls-3.5.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ actix-tls-3.5.0/Cargo.toml	2025-12-11T20:07:50.908685+00:00
-@@ -74,49 +74,6 @@
+--- actix-tls-3.6.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ actix-tls-3.6.0/Cargo.toml	2026-09-19T14:37:19.270756+00:00
+@@ -56,12 +56,6 @@
+     "tokio::*",
+ ]
+ 
+-[package.metadata.cargo-machete]
+-ignored = [
+-    "rustls_021",
+-    "rustls_webpki_0103",
+-]
+-
+ [features]
+ accept = []
+ connect = []
+@@ -74,49 +68,6 @@
      "dep:tls-openssl",
      "dep:tokio-openssl",
  ]
@@ -50,13 +63,28 @@
  uri = [
      "dep:http-0_2",
      "dep:http-1",
-@@ -126,23 +83,11 @@
+@@ -125,14 +76,6 @@
+ [lib]
  name = "actix_tls"
  path = "src/lib.rs"
- 
+-
 -[[example]]
 -name = "accept-rustls"
 -path = "examples/accept-rustls.rs"
+-required-features = [
+-    "accept",
+-    "rustls-0_23",
+-]
+ 
+ [[example]]
+ name = "hot-reload-openssl"
+@@ -142,23 +85,11 @@
+     "openssl",
+ ]
+ 
+-[[example]]
+-name = "hot-reload-rustls"
+-path = "examples/hot-reload-rustls.rs"
 -required-features = [
 -    "accept",
 -    "rustls-0_23",
@@ -74,7 +102,7 @@
  name = "test_connect"
  path = "tests/test_connect.rs"
  
-@@ -181,21 +126,6 @@
+@@ -198,21 +129,6 @@
  [dependencies.pin-project-lite]
  version = "0.2.7"
  
@@ -96,7 +124,7 @@
  [dependencies.tls-openssl]
  version = "0.10.55"
  optional = true
-@@ -211,27 +141,6 @@
+@@ -228,27 +144,6 @@
  [dependencies.tokio-openssl]
  version = "0.6"
  optional = true
@@ -124,10 +152,11 @@
  
  [dependencies.tokio-util]
  version = "0.7"
-@@ -241,21 +150,6 @@
+@@ -257,21 +152,6 @@
+ version = "0.1.30"
  features = ["log"]
  default-features = false
- 
+-
 -[dependencies.webpki-roots-022]
 -version = "0.22"
 -optional = true
@@ -142,24 +171,27 @@
 -version = "0.26"
 -optional = true
 -package = "webpki-roots"
--
+ 
  [dev-dependencies.actix-codec]
  version = "0.5"
+@@ -315,20 +195,6 @@
+     "rt",
+ ]
  
-@@ -291,16 +185,6 @@
- [dev-dependencies.tokio-rustls-026]
- version = "0.26"
- package = "tokio-rustls"
+-[dev-dependencies.tokio-rustls-026]
+-version = "0.26"
+-package = "tokio-rustls"
 -
 -[target."cfg(any())".dependencies.rustls-021]
 -version = "0.21.6"
 -optional = true
 -package = "rustls"
 -
--[target."cfg(any())".dependencies.rustls-webpki-0101]
--version = "0.101.4"
+-[target."cfg(any())".dependencies.rustls-webpki-0103]
+-version = "0.103.10"
 -optional = true
 -package = "rustls-webpki"
+-
+ [lints.cargo]
+ unused_dependencies = "allow"
  
- [lints.clippy]
- disallowed-names = "warn"

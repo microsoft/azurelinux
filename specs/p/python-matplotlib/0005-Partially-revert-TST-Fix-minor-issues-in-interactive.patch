@@ -1,4 +1,4 @@
-From 7a5bbfe3bd5905a7daefac690ebdfd7403c8ef7a Mon Sep 17 00:00:00 2001
+From 30ba8c34f00168385961dd924713b7fe8ef7605c Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 12 Nov 2024 01:05:25 -0500
 Subject: [PATCH 5/5] Partially revert "TST: Fix minor issues in interactive
@@ -12,7 +12,7 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/lib/matplotlib/tests/test_backends_interactive.py b/lib/matplotlib/tests/test_backends_interactive.py
-index 4e3c1bbc2b..903ae87cbb 100644
+index 594681391e..38293e1003 100644
 --- a/lib/matplotlib/tests/test_backends_interactive.py
 +++ b/lib/matplotlib/tests/test_backends_interactive.py
 @@ -232,7 +232,10 @@ def _test_interactive_impl():

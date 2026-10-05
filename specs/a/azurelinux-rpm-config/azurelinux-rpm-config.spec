@@ -17,7 +17,7 @@ Name: azurelinux-rpm-config
 # the older branch. When the branch diverges, bump the Version to the Fedora
 # release number.
 Version: 1004
-Release: 7%{?dist}
+Release: 8%{?dist}
 # config.guess, config.sub are GPL-3.0-or-later WITH Autoconf-exception-generic
 License: GPL-1.0-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic
 URL: https://aka.ms/azurelinux
@@ -97,10 +97,12 @@ BuildRequires: perl-generators
 Requires: coreutils
 
 Requires: efi-srpm-macros
+Requires: cmake-srpm-macros
 Requires: fonts-srpm-macros
 # ↓ Provides macros.forge and forge.lua originally shipped by us
 Requires: forge-srpm-macros
 Requires: gap-srpm-macros
+Requires: gnome-srpm-macros
 Requires: go-srpm-macros
 Requires: java-srpm-macros
 # ↓ Provides kmod.attr originally shipped by us

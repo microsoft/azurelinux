@@ -1,0 +1,116 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jos=C3=A9=20Valim?= <jose.valim@gmail.com>
+Date: Tue, 9 Jun 2026 15:25:57 +0200
+Subject: [PATCH] Limit version numbers to 14 bytes
+
+This avoids parsing too large integers.
+
+CVE-2026-49762
+GHSA-w2h8-8x3g-278p
+
+diff --git a/lib/elixir/lib/version.ex b/lib/elixir/lib/version.ex
+index 36ce18d30..4a025a164 100644
+--- a/lib/elixir/lib/version.ex
++++ b/lib/elixir/lib/version.ex
+@@ -18,12 +18,16 @@ defmodule Version do
+ 
+       MAJOR.MINOR.PATCH
+ 
++  Each numeric component is limited to at most 14 digits.
++
+   Pre-releases are supported by optionally appending a hyphen and a series of
+   period-separated identifiers immediately following the patch version.
+   Identifiers consist of only ASCII alphanumeric characters and hyphens (`[0-9A-Za-z-]`):
+ 
+       "1.0.0-alpha.3"
+ 
++  Numeric pre-release identifiers are also limited to at most 14 digits.
++
+   Build information can be added by appending a plus sign and a series of
+   dot-separated identifiers immediately following the patch or pre-release version.
+   Identifiers consist of only ASCII alphanumeric characters and hyphens (`[0-9A-Za-z-]`):
+@@ -515,6 +519,8 @@ defp pre_to_string(pre) do
+   defmodule Parser do
+     @moduledoc false
+ 
++    @max_numeric_component_digits 14
++
+     operators = [
+       {">=", :>=},
+       {"<=", :<=},
+@@ -616,7 +622,9 @@ def parse_version(string, approximate? \\ false) when is_binary(string) do
+     defp require_digits(nil), do: :error
+ 
+     defp require_digits(string) do
+-      if leading_zero?(string), do: :error, else: parse_digits(string, "")
++      if leading_zero?(string) or byte_size(string) > @max_numeric_component_digits,
++        do: :error,
++        else: parse_digits(string, "")
+     end
+ 
+     defp leading_zero?(<<?0, _, _::binary>>), do: true
+@@ -644,6 +652,11 @@ defp optional_dot_separated(string) do
+       end
+     end
+ 
++    defp convert_parts_to_integer([part | rest], acc)
++         when byte_size(part) > @max_numeric_component_digits do
++      if all_digits?(part), do: :error, else: convert_parts_to_integer(rest, [part | acc])
++    end
++
+     defp convert_parts_to_integer([part | rest], acc) do
+       case parse_digits(part, "") do
+         {:ok, integer} ->
+@@ -662,6 +675,10 @@ defp convert_parts_to_integer([], acc) do
+       {:ok, Enum.reverse(acc)}
+     end
+ 
++    defp all_digits?(<<char, rest::binary>>) when char in ?0..?9, do: all_digits?(rest)
++    defp all_digits?(<<>>), do: true
++    defp all_digits?(_other), do: false
++
+     defp valid_identifier?(<<char, rest::binary>>)
+          when char in ?0..?9
+          when char in ?a..?z
+diff --git a/lib/elixir/test/elixir/version_test.exs b/lib/elixir/test/elixir/version_test.exs
+index 208f625f2..6de54b01e 100644
+--- a/lib/elixir/test/elixir/version_test.exs
++++ b/lib/elixir/test/elixir/version_test.exs
+@@ -84,9 +84,15 @@ test "parse/1" do
+     assert {:ok, %Version{major: 1, minor: 4, patch: 5, pre: [6, 7, "eight"]}} =
+              Version.parse("1.4.5-6.7.eight")
+ 
++    assert {:ok, %Version{major: 99_999_999_999_999, minor: 0, patch: 0}} =
++             Version.parse("99999999999999.0.0")
++
+     assert {:ok, %Version{major: 1, minor: 4, patch: 5, pre: ["6-g3318bd5"]}} =
+              Version.parse("1.4.5-6-g3318bd5+ignore")
+ 
++    assert {:ok, %Version{major: 1, minor: 0, patch: 0, pre: ["100000000000000-alpha"]}} =
++             Version.parse("1.0.0-100000000000000-alpha")
++
+     assert Version.parse("foobar") == :error
+     assert Version.parse("2") == :error
+     assert Version.parse("2.") == :error
+@@ -105,6 +111,13 @@ test "parse/1" do
+     assert Version.parse("02.3.0") == :error
+     assert Version.parse("0. 0.0") == :error
+     assert Version.parse("0.1.0-&&pre") == :error
++    assert Version.parse("100000000000000.0.0") == :error
++    assert Version.parse("1.100000000000000.0") == :error
++    assert Version.parse("1.0.100000000000000") == :error
++    assert Version.parse("1.0.0-100000000000000") == :error
++
++    assert Version.parse("1.0.0+100000000000000") ==
++             {:ok, %Version{major: 1, minor: 0, patch: 0, build: "100000000000000"}}
+   end
+ 
+   test "to_string/1" do
+@@ -338,6 +351,7 @@ test "compile_requirement/1" do
+       assert Version.parse_requirement("1.2.3 and or 4.5.6") == :error
+       assert Version.parse_requirement(">= 1") == :error
+       assert Version.parse_requirement("1.2.3 >=") == :error
++      assert Version.parse_requirement("100000000000000.0.0") == :error
+     end
+ 
+     test "inspect/1" do

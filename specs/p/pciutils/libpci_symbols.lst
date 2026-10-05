@@ -3,11 +3,14 @@ pci_cleanup@LIBPCI_3.0
 pci_fill_info@LIBPCI_3.0
 pci_fill_info@LIBPCI_3.1
 pci_fill_info@LIBPCI_3.13
+pci_fill_info@LIBPCI_3.15
 pci_fill_info@LIBPCI_3.2
 pci_fill_info@LIBPCI_3.3
 pci_fill_info@LIBPCI_3.4
 pci_fill_info@LIBPCI_3.5
 pci_fill_info@LIBPCI_3.8
+pci_filter_has_id@LIBPCI_3.15
+pci_filter_has_slot@LIBPCI_3.15
 pci_filter_init@LIBPCI_3.0
 pci_filter_init@LIBPCI_3.3
 pci_filter_init@LIBPCI_3.8

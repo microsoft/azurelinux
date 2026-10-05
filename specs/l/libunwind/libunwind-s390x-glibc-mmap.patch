@@ -1,0 +1,23 @@
+commit 7cc4c20fbcf65a9c855fb9d950fad8d0e29b092e
+Author: Sankalp <125449768+sankalpjha555@users.noreply.github.com>
+Date:   Wed Aug 21 12:00:41 2024 +0530
+
+    Fixed Gtest-sig-context and Ltest-sig-context
+    
+    The mi_mmap() function bypassed the standard libc mmap() call and directly invoked syscall(). This caused a "bad address" error on s390x due to differences in how parameters are passed and handled to syscalls on s390x. To avoid this issue, it's recommended to fall back to using the libc mmap() implementation for s390x.
+    
+    Signed-off-by: sankalpjha555 <sankalp@ibm.com>
+
+diff --git a/include/libunwind_i.h b/include/libunwind_i.h
+index 1dbcb6a86d0f1bc6..66186611a63378a4 100644
+--- a/include/libunwind_i.h
++++ b/include/libunwind_i.h
+@@ -226,7 +226,7 @@ do {                                            \
+ static ALWAYS_INLINE void *
+ mi_mmap (void *addr, size_t len, int prot, int flags, int fd, off_t offset)
+ {
+-#if defined(SYS_mmap) && !defined(__i386__)
++#if defined(SYS_mmap) && !defined(__i386__) && !defined(__s390x__)
+   /* Where supported, bypass libc and invoke the syscall directly. */
+ # if defined(__FreeBSD__) // prefer over syscall on *BSD
+   long int ret = __syscall (SYS_mmap, addr, len, prot, flags, fd, offset);

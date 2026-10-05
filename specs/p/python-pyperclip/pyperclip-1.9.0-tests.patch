@@ -1,0 +1,37 @@
+diff -Naur a/tests/test_pyperclip.py b/tests/test_pyperclip.py
+--- a/tests/test_pyperclip.py	2024-06-18 19:46:25.000000000 +0100
++++ b/tests/test_pyperclip.py	2026-09-10 10:27:42.140798004 +0100
+@@ -8,7 +8,7 @@
+ #import sys
+ #sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+ 
+-from pyperclip import _executable_exists, HAS_DISPLAY
++from pyperclip import _executable_exists
+ from pyperclip import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
+                                   init_dev_clipboard_clipboard,
+                                   init_qt_clipboard,
+@@ -100,11 +100,11 @@
+         self.assertEqual(self.paste(), 'False')
+ 
+         # All other non-str values raise an exception.
+-        with self.assertRaises(PyperclipException):
+-            self.copy(None)
++        self.copy(None)
++        self.assertEqual(self.paste(), 'None')
+ 
+-        with self.assertRaises(PyperclipException):
+-            self.copy([2, 4, 6, 8])
++        self.copy([2, 4, 6, 8])
++        self.assertEqual(self.paste(), '[2, 4, 6, 8]')
+ 
+ 
+ class TestCygwin(_TestClipboard):
+@@ -135,7 +135,7 @@
+ 
+ 
+ class TestQt(_TestClipboard):
+-    if HAS_DISPLAY:
++    if os.getenv("DISPLAY"):
+         try:
+             import PyQt5.QtWidgets
+         except ImportError:

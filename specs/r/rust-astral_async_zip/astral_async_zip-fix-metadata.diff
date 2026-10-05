@@ -1,0 +1,49 @@
+--- astral_async_zip-0.0.20/Cargo.toml	2006-07-24T01:21:28+00:00
++++ astral_async_zip-0.0.20/Cargo.toml	2026-07-07T05:41:59.020213+00:00
+@@ -80,10 +80,6 @@
+ path = "src/lib.rs"
+ 
+ [[example]]
+-name = "actix_multipart"
+-path = "examples/actix_multipart.rs"
+-
+-[[example]]
+ name = "cli_compress"
+ path = "examples/cli_compress.rs"
+ 
+@@ -135,21 +131,8 @@
+ features = ["compat"]
+ optional = true
+ 
+-[dev-dependencies.actix-multipart]
+-version = "0.7"
+-
+-[dev-dependencies.actix-web]
+-version = "4"
+-
+ [dev-dependencies.anyhow]
+ version = "1"
+-
+-[dev-dependencies.derive_more]
+-version = "2.0"
+-features = [
+-    "display",
+-    "error",
+-]
+ 
+ [dev-dependencies.env_logger]
+ version = "0.11.2"
+@@ -168,13 +151,6 @@
+ version = "0.7"
+ features = ["compat"]
+ 
+-[dev-dependencies.uuid]
+-version = "1"
+-features = [
+-    "v4",
+-    "serde",
+-]
+-
+ [dev-dependencies.zip]
+ version = "8"
+ default-features = false

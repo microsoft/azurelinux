@@ -3,7 +3,7 @@
 
 # Plain package name for cases, where %%{name} differs (e.g. for versioned packages)
 %global majorname mariadb
-%define package_version 10.11.16
+%define package_version 10.11.18
 %define majorversion %(echo %{package_version} | cut -d'.' -f1-2 )
 
 # Set if this package will be the default one in distribution
@@ -18,7 +18,7 @@
 # The last version on which the full testsuite has been run
 # In case of further rebuilds of that version, don't require full testsuite to be run
 # run only "main" suite
-%global last_tested_version 10.11.16
+%global last_tested_version 10.11.18
 # Set to 1 to force run the testsuite even if it was already tested in current version
 %global force_run_testsuite 0
 
@@ -122,7 +122,7 @@
 #   https://mariadb.com/kb/en/pcre/
 %bcond bundled_pcre 0
 %if %{with bundled_pcre}
-%global pcre_bundled_version 10.45
+%global pcre_bundled_version 10.47
 %endif
 
 # To avoid issues with a breaking change in FMT library, bundle it on systems where FMT wasn't fixed yet
@@ -154,6 +154,37 @@
 %global dbdatadir        %{_localstatedir}/lib/mysql
 
 
+# Macros for extra RPM relations for the versioned packages layout
+%define conflict_with_other_streams() %{expand:\
+Provides: %{majorname}%{?1:-%{1}}-any\
+Conflicts: %{majorname}%{?1:-%{1}}-any\
+}
+
+# Add versioned virtual provides, when the RPMs real names are version-less
+# (that is, when this is the "distribution default version")
+%if %?mariadb_default
+%define versioned_virtual_provides() %{expand:\
+Provides: mariadb%{majorversion}%{?1:-%{1}} = %{sameevr}\
+}
+%define versioned_virtual_provides_arched() %{expand:\
+%versioned_virtual_provides %{**}\
+Provides: mariadb%{majorversion}%{?1:-%{1}}%{?_isa} = %{sameevr}\
+}
+%else
+%define versioned_virtual_provides() %{nil}
+%define versioned_virtual_provides_arched() %{nil}
+%endif
+
+%define virtual_conflicts_and_provides() %{expand:\
+%conflict_with_other_streams %{**}\
+%versioned_virtual_provides %{**}\
+}
+
+%define virtual_conflicts_and_provides_arched() %{expand:\
+%conflict_with_other_streams %{**}\
+%versioned_virtual_provides_arched %{**}\
+}
+# End of versioned packages layout macros
 
 # Set explicit conflicts with 'mysql' packages
 %bcond_without conflicts_mysql
@@ -234,8 +265,8 @@ Patch13:          %{majorname}-libfmt.patch
 Patch14:          %{majorname}-mtr.patch
 #   Patch15: mark RISC-V64 as 64-bit architecture
 Patch15:          mark-RISC-V64-as-64-bit-architecture.patch
-#   Patch16: fixup for SISGSEGV while using skip-grant-tables
-Patch16:          upstream_87309d3d4bb8f48910d05b0ca5ee989bcdd6b053.patch
+#   Patch16: fix default Galera configuation file
+Patch16:          upstream_0a66c466f1772945d46b12bd340e1bd9adff4e9b.patch
 
 # This macro is used for package/sub-package names in the entire specfile
 %if %?mariadb_default
@@ -350,27 +381,7 @@ Suggests:         %{pkgname}-server%{?_isa} = %{sameevr}
 %{?with_conflicts_mysql:Conflicts: mysql-server-any}
 %{?with_conflicts_community_mysql:Conflicts: community-mysql-server}
 
-%define conflict_with_other_streams() %{expand:\
-Provides: %{majorname}%{?1:-%{1}}-any\
-Conflicts: %{majorname}%{?1:-%{1}}-any\
-}
-
-# Provide also mariadbXX.XX if default
-%if %?mariadb_default
-%define mariadbXX_if_default() %{expand:\
-Provides: mariadb%{majorversion}%{?1:-%{1}} = %{sameevr}\
-Provides: mariadb%{majorversion}%{?1:-%{1}}%{?_isa} = %{sameevr}\
-}
-%else
-%define mariadbXX_if_default() %{nil}
-%endif
-
-%define virtual_conflicts_and_provides() %{expand:\
-%conflict_with_other_streams %{**}\
-%mariadbXX_if_default %{**}\
-}
-
-%virtual_conflicts_and_provides
+%virtual_conflicts_and_provides_arched
 
 %description
 MariaDB is a community developed fork from MySQL - a multi-user, multi-threaded
@@ -394,9 +405,7 @@ Summary:          Non-essential client utilities for MariaDB/MySQL applications
 Requires:         %{pkgname} = %{sameevr}
 Requires:         perl(DBI)
 
-# Only conflicts, provides would add %%{_isa} provides for noarch,
-# which is not wanted
-%conflict_with_other_streams client-utils
+%virtual_conflicts_and_provides client-utils
 
 %description      -n %{pkgname}-client-utils
 This package contains all non-essential client utilities and scripts for
@@ -410,7 +419,7 @@ subpackage, that depends on Perl.
 Summary:          The shared libraries required for MariaDB/MySQL clients
 Requires:         %{pkgname}-common = %{sameevr}
 
-%virtual_conflicts_and_provides libs
+%virtual_conflicts_and_provides_arched libs
 
 %{?with_conflicts_mysql:Conflicts: mysql-libs-any}
 %{?with_conflicts_community_mysql:Conflicts: community-mysql-libs}
@@ -436,7 +445,7 @@ to a MariaDB/MySQL server.
 %package          -n %{pkgname}-config
 Summary:          The config files required by server and client
 
-%virtual_conflicts_and_provides config
+%virtual_conflicts_and_provides_arched config
 
 %description      -n %{pkgname}-config
 The package provides the config file my.cnf and my.cnf.d directory used by any
@@ -456,9 +465,7 @@ Requires:         mariadb-connector-c-config
 Requires:         %{_sysconfdir}/my.cnf
 %endif
 
-# Only conflicts, provides would add %%{_isa} provides for noarch,
-# which is not wanted
-%conflict_with_other_streams common
+%virtual_conflicts_and_provides common
 
 %description      -n %{pkgname}-common
 The package provides the essential shared files for any MariaDB program.
@@ -472,9 +479,7 @@ Summary:          The error messages files required by server and embedded
 BuildArch:        noarch
 Requires:         %{pkgname}-common = %{sameevr}
 
-# Only conflicts, provides would add %%{_isa} provides for noarch,
-# which is not wanted
-%conflict_with_other_streams errmsg
+%virtual_conflicts_and_provides errmsg
 
 %description      -n %{pkgname}-errmsg
 The package provides error messages files for the MariaDB daemon and the
@@ -499,7 +504,7 @@ Requires:         lsof
 # Default wsrep_sst_method
 Requires:         rsync
 
-%virtual_conflicts_and_provides server-galera
+%virtual_conflicts_and_provides_arched server-galera
 
 %description      -n %{pkgname}-server-galera
 MariaDB is a multi-user, multi-threaded SQL database server. It is a
@@ -542,7 +547,7 @@ Requires:         %{_sysconfdir}/my.cnf
 Requires:         %{_sysconfdir}/my.cnf.d
 %endif
 
-%virtual_conflicts_and_provides server
+%virtual_conflicts_and_provides_arched server
 
 # Additional SELinux rules (common for MariaDB & MySQL) shipped in a separate package
 # For cases, where we want to fix a SELinux issues in MariaDB sooner than patched selinux-policy-targeted package is released
@@ -585,7 +590,7 @@ Requires:         %{pkgname}-server%{?_isa} = %{sameevr}
 BuildRequires:    boost-devel >= 1.40.0
 BuildRequires:    Judy-devel
 
-%virtual_conflicts_and_provides oqgraph-engine
+%virtual_conflicts_and_provides_arched oqgraph-engine
 
 %description      -n %{pkgname}-oqgraph-engine
 The package provides Open Query GRAPH engine (OQGRAPH) as plugin for MariaDB
@@ -604,7 +609,7 @@ Requires:         %{pkgname}-server%{?_isa} = %{sameevr}
 # As per https://jira.mariadb.org/browse/MDEV-21450
 BuildRequires:    libxml2-devel
 
-%virtual_conflicts_and_provides connect-engine
+%virtual_conflicts_and_provides_arched connect-engine
 
 %description      -n %{pkgname}-connect-engine
 The CONNECT storage engine enables MariaDB to access external local or
@@ -621,7 +626,7 @@ Summary:          The mariabackup tool for physical online backups
 Requires:         %{pkgname}-server%{?_isa} = %{sameevr}
 BuildRequires:    libarchive-devel
 
-%virtual_conflicts_and_provides backup
+%virtual_conflicts_and_provides_arched backup
 
 %description      -n %{pkgname}-backup
 MariaDB Backup is an open source tool provided by MariaDB for performing
@@ -646,7 +651,7 @@ Requires:         %{pkgname}-server%{?_isa} = %{sameevr}
 Provides:         bundled(rocksdb)
 Conflicts:        rocksdb-tools
 
-%virtual_conflicts_and_provides rocksdb-engine
+%virtual_conflicts_and_provides_arched rocksdb-engine
 
 %description      -n %{pkgname}-rocksdb-engine
 The RocksDB storage engine is used for high performance servers on SSD drives.
@@ -665,7 +670,7 @@ Requires(post):   (libselinux-utils if selinux-policy-%{selinuxtype})
 Requires(post):   (policycoreutils if selinux-policy-%{selinuxtype})
 Requires(post):   (policycoreutils-python-utils if selinux-policy-%{selinuxtype})
 
-%virtual_conflicts_and_provides cracklib-password-check
+%virtual_conflicts_and_provides_arched cracklib-password-check
 
 %description      -n %{pkgname}-cracklib-password-check
 CrackLib is a password strength checking library. It is installed by default
@@ -682,7 +687,7 @@ Summary:          GSSAPI authentication plugin for server
 Requires:         %{pkgname}-server%{?_isa} = %{sameevr}
 BuildRequires:    krb5-devel
 
-%virtual_conflicts_and_provides gssapi-server
+%virtual_conflicts_and_provides_arched gssapi-server
 
 %description      -n %{pkgname}-gssapi-server
 GSSAPI authentication server-side plugin for MariaDB for passwordless login.
@@ -700,7 +705,7 @@ Requires(pre):    %{pkgname}-server%{?_isa} = %{sameevr}
 
 BuildRequires:    pam-devel
 
-%virtual_conflicts_and_provides pam
+%virtual_conflicts_and_provides_arched pam
 
 %description      -n %{pkgname}-pam
 PAM authentication server-side plugin for MariaDB.
@@ -715,7 +720,7 @@ Requires:         %{pkgname}-server%{?_isa} = %{sameevr}
 BuildRequires:    sphinx libsphinxclient-devel
 Requires:         sphinx libsphinxclient
 
-%virtual_conflicts_and_provides sphinx-engine
+%virtual_conflicts_and_provides_arched sphinx-engine
 
 %description      -n %{pkgname}-sphinx-engine
 The Sphinx storage engine for MariaDB.
@@ -729,7 +734,7 @@ Requires:         %{pkgname}-server%{?_isa} = %{sameevr}
 
 BuildRequires:    curl-devel
 
-%virtual_conflicts_and_provides s3-engine
+%virtual_conflicts_and_provides_arched s3-engine
 
 %description      -n %{pkgname}-s3-engine
 The S3 read only storage engine allows archiving MariaDB tables in Amazon S3,
@@ -745,9 +750,7 @@ Requires:         %{pkgname}-server = %{sameevr}
 # mysqlhotcopy needs DBI/DBD support
 Requires:         perl(DBI) perl(DBD::MariaDB)
 
-# Only conflicts, provides would add %%{_isa} provides for noarch,
-# which is not wanted
-%conflict_with_other_streams server-utils
+%virtual_conflicts_and_provides server-utils
 
 %{?with_conflicts_mysql:Conflicts: mysql-server-any}
 %{?with_conflicts_community_mysql:Conflicts: community-mysql-server}
@@ -768,7 +771,7 @@ Requires:         openssl-devel
 Requires:         mariadb-connector-c-devel >= 3.0
 %endif
 
-%virtual_conflicts_and_provides devel
+%virtual_conflicts_and_provides_arched devel
 
 %{?with_conflicts_mysql:Conflicts: mysql-devel-any}
 %{?with_conflicts_community_mysql:Conflicts: community-mysql-devel}
@@ -793,7 +796,7 @@ Summary:          MariaDB as an embeddable library
 Requires:         %{pkgname}-common = %{sameevr}
 Requires:         %{pkgname}-errmsg = %{sameevr}
 
-%virtual_conflicts_and_provides embedded
+%virtual_conflicts_and_provides_arched embedded
 
 %description      -n %{pkgname}-embedded
 MariaDB is a multi-user, multi-threaded SQL database server. This
@@ -809,7 +812,7 @@ Requires:         %{pkgname}-devel%{?_isa} = %{sameevr}
 # embedded-devel should require libaio-devel (rhbz#1290517)
 Requires:         libaio-devel
 
-%virtual_conflicts_and_provides embedded-devel
+%virtual_conflicts_and_provides_arched embedded-devel
 
 %description      -n %{pkgname}-embedded-devel
 MariaDB is a multi-user, multi-threaded SQL database server.
@@ -838,7 +841,7 @@ Requires:         perl(Sys::Hostname)
 Requires:         perl(Test::More)
 Requires:         perl(Time::HiRes)
 
-%virtual_conflicts_and_provides test
+%virtual_conflicts_and_provides_arched test
 
 %{?with_conflicts_mysql:Conflicts: mysql-test-any}
 %{?with_conflicts_community_mysql:Conflicts: community-mysql-test}
@@ -1512,7 +1515,6 @@ fi
 %if %{with common}
 %files -n %{pkgname}-common
 %doc %{_docdir}/%{majorname}
-%{?with_galera:%exclude %{_docdir}/%{majorname}/MariaDB-server-%{version}/README-wsrep}
 %dir %{_datadir}/%{majorname}
 %{_datadir}/%{majorname}/charsets
 %if %{with clibrary}
@@ -1555,7 +1557,6 @@ fi
 
 %if %{with galera}
 %files -n %{pkgname}-server-galera
-%doc Docs/README-wsrep
 %license LICENSE.clustercheck
 %{_bindir}/clustercheck
 %{_bindir}/galera_new_cluster
@@ -1834,6 +1835,7 @@ fi
 %{_bindir}/{mysql_client_test,mysqltest,mariadb-client-test,mariadb-test}
 %{_bindir}/my_safe_process
 %dir %{_libdir}/%{majorname}/plugin
+%dir %{_libdir}/%{majorname}/plugin/test_pam_modules/
 # shared objects required for testing
 %{_libdir}/%{majorname}/plugin/adt_null.so
 %{_libdir}/%{majorname}/plugin/auth_0x0100.so
@@ -1851,6 +1853,7 @@ fi
 %{_libdir}/%{majorname}/plugin/qa_auth_server.so
 %{_libdir}/%{majorname}/plugin/test_sql_service.so
 %{_libdir}/%{majorname}/plugin/test_versioning.so
+%{_libdir}/%{majorname}/plugin/test_pam_modules/pam_%{majorname}_mtr.so
 %{_libdir}/%{majorname}/plugin/type_mysql_timestamp.so
 %{_libdir}/%{majorname}/plugin/type_test.so
 %{_libdir}/%{majorname}/plugin/daemon_example.ini
@@ -1862,6 +1865,18 @@ fi
 %endif
 
 %changelog
+* Thu Jun 25 2026 František Zatloukal <fzatlouk@redhat.com> - 3:10.11.18-2
+- Rebuilt for fmt/spdlog
+
+* Wed Jun 03 2026 Pavol Sloboda <psloboda@redhat.com> - 3:10.11.18-1
+- Rebase to 10.11.18
+
+* Tue May 26 2026 Pavol Sloboda <psloboda@redhat.com> - 3:10.11.17-1
+- Rebase to 10.11.17
+
+* Thu Mar 19 2026 Michal Schorm <mschorm@redhat.com> - 3:10.11.16-3
+- Bump release for package rebuild
+
 * Mon Feb 16 2026 Pavol Sloboda <psloboda@redhat.com> - 3:10.11.16-2
 - Added a fix for SIGSEGV when using skip-grant-tables
 - Resolves: RHBZ#2438390

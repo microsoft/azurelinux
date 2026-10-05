@@ -22,21 +22,24 @@
 %global        __provides_exclude_from %{_libdir}/pgsql
 
 Name:          postgresql%{pgversion}-postgis
-Version:       3.6.2
-Release: 4%{?dist}
+Version:       3.6.4
+Release: 9%{?dist}
 Summary:       Geographic Information Systems Extensions to PostgreSQL
 License:       GPL-2.0-or-later
 
 URL:           https://www.postgis.net
 Source0:       https://download.osgeo.org/postgis/source/postgis-%{version}.tar.gz
 Source2:       https://download.osgeo.org/postgis/docs/postgis-%{version}-en.pdf
+# Backport fix for CVE-2026-73515
+Patch1:        https://gitea.osgeo.org/postgis/postgis/commit/86bf6bf1965bc03b53a391da5a17f1ff134f1fd2.patch
+Patch2:        https://gitea.osgeo.org/postgis/postgis/commit/767fa40644253281f6d4e8b06811489b0a0f9b0d.patch
+
 %if %upgrade_prev
 Source3:       https://download.osgeo.org/postgis/source/postgis-%{prevversion}.tar.gz
-
 # Add proj8 compatibility to postgis-2.x (needed for upgrade package)
-Patch1:        postgis2-proj8.patch
-Patch2:	       postgis-c99.patch
-Patch3:	       postgis-c99-2.patch
+Patch100:      postgis2-proj8.patch
+Patch101:      postgis-c99.patch
+Patch102:      postgis-c99-2.patch
 %endif
 
 %if %{?postgresql_default}
@@ -210,6 +213,8 @@ The client package provides shp2pgsql, raster2pgsql and pgsql2shp for PostGIS.
 %else
 %setup -q -n postgis-%{version}
 %endif
+%patch -P 1 -p1
+%patch -P 2 -p1
 
 %if %upgrade
 (
@@ -217,9 +222,9 @@ tar xf %{SOURCE0}
 
 %if %upgrade_prev
 cd postgis-%{prevversion}
-%patch -P 1 -p1
-%patch -P 2 -p2
-%patch -P 3 -p1
+%patch -P 100 -p1
+%patch -P 101 -p2
+%patch -P 103 -p1
 ./autogen.sh
 %endif
 )
@@ -507,6 +512,27 @@ fi
 
 
 %changelog
+* Wed Sep 16 2026 Sandro Mani <manisandro@gmail.com> - 3.6.4-5
+- Backport fix for CVE-2026-73515
+
+* Thu Sep 10 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.6.4-4
+- Rebuilt for libxml-2.5.4
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 19 2026 Sandro Mani <manisandro@gmail.com> - 3.6.4-2
+- Rebuild (gdal)
+
+* Tue Jun 09 2026 Sandro Mani <manisandro@gmail.com> - 3.6.4-1
+- Update to 3.6.4
+
+* Tue Jun 09 2026 Sandro Mani <manisandro@gmail.com> - 3.6.2-1
+- Update to 3.6.2
+
+* Fri Apr 17 2026 Sandro Mani <manisandro@gmail.com> - 3.6.3-1
+- Update to 3.6.3
+
 * Tue Feb 17 2026 Sandro Mani <manisandro@gmail.com> - 3.6.2-1
 - Update to 3.6.2
 

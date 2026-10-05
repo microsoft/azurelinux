@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zhangph <zhangph12138@163.com>
+Date: Wed, 13 May 2026 09:20:31 +0200
+Subject: [PATCH] Fix NULL pointer dereference in DIGEST-MD5 parser
+
+https://lists.gnu.org/archive/html/help-gsasl/2026-05/msg00000.html
+
+Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+diff --git a/lib/digest-md5/getsubopt.c b/lib/digest-md5/getsubopt.c
+index 1a67ec8b..b1a4ce35 100644
+--- a/lib/digest-md5/getsubopt.c
++++ b/lib/digest-md5/getsubopt.c
+@@ -74,7 +74,7 @@ digest_md5_getsubopt (char **optionp,
+ 	&& tokens[cnt][vstart - *optionp] == '\0')
+       {
+ 	/* We found the current option in TOKENS.  */
+-	*valuep = vstart != endp ? vstart + 1 : NULL;
++	*valuep = vstart != endp ? vstart + 1 : (char *) "";
+ 
+ 	while (*valuep && (**valuep == ' ' ||
+ 			   **valuep == '\t' ||

@@ -1,0 +1,16 @@
+--- uu_tsort-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_tsort-0.7.0/Cargo.toml	2026-03-16T21:22:05.985989+00:00
+@@ -72,13 +72,8 @@
+ version = "0.7.0"
+ package = "uucore"
+ 
+-[dev-dependencies.divan]
+-version = "4.0.5"
+-package = "codspeed-divan-compat"
+-
+ [dev-dependencies.uucore]
+ version = "0.7.0"
+-features = ["benchmark"]
+ package = "uucore"
+ 
+ [target."cfg(unix)".dependencies.nix]

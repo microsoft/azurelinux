@@ -1,6 +1,6 @@
---- io-lifetimes-2.0.4/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ io-lifetimes-2.0.4/Cargo.toml	2025-01-20T16:54:52.435356+00:00
-@@ -54,8 +54,6 @@
+--- io-lifetimes-3.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ io-lifetimes-3.0.1/Cargo.toml	2026-08-14T07:21:51.418311+00:00
+@@ -48,8 +48,6 @@
  [features]
  close = [
      "libc",
@@ -14,11 +14,11 @@
  optional = true
  
 -[target.'cfg(target_os = "hermit")'.dependencies.hermit-abi]
--version = ">=0.3, <=0.4"
+-version = ">=0.3, <=0.5"
 -optional = true
 -
 -[target."cfg(windows)".dependencies.windows-sys]
--version = ">=0.52, <=0.59"
+-version = ">=0.52, <=0.60"
 -features = [
 -    "Win32_Foundation",
 -    "Win32_Storage_FileSystem",
