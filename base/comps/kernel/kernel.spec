@@ -19,7 +19,7 @@
 # %{specrelease} macro below instead of a hardcoded value.
 %define azl_pkgrelease 3
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
-%define nvidia_open_version 610.57.04
+%define nvidia_open_version 610.43.02
 # AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
 # ofa_bundle_version/ofa_vendor_release name the MLNX_OFED_SRC bundle (Source6100).
 # ofa_release matches the mlnx-ofa_kernel SRPM inside it: NVIDIA re-spun that
@@ -1033,6 +1033,8 @@ Source5002: azurelinux-ca-20230216.pem
 Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
 Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
+# AZL: lets the nvidia-peermem conftest find the in-tree MLNX OFED build.
+Source6003: nvidia-conftest-allow-mlnx-ofed-kernel-dir.patch
 # AZL: MLNX OFED source bundle and kmod include (mlnx-ofa_kernel).
 Source6100: MLNX_OFED_SRC-%{ofa_bundle_version}-%{ofa_vendor_release}.tgz
 Source6101: mlnx-ofa_kernel.inc
@@ -3153,7 +3155,7 @@ find Documentation -type d | xargs chmod u+w
 %{log_msg "end install docs"}
 %endif
 
-# AZL: Build MLNX OFED before the NVIDIA kmod.
+# AZL: Build MLNX OFED before NVIDIA so nvidia-peermem can consume its symbols.
 %global _kmod_phase build
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
@@ -4325,6 +4327,10 @@ fi\
 * Mon Oct 05 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.50-1.3
 - Add mlnx-ofa_kernel
 - Rebuild the initramfs when mlnx-ofa_kernel-modules is installed or removed
+- Build nvidia-peermem against MLNX OFED
+- Ship nvidia-peermem in opt-in kmod-nvidia-open-peermem so the GPU driver
+  does not pull in MLNX OFED
+- Move kmod-nvidia-open to 610.43.02
 
 * Fri Oct 02 2026 Chris Co <chrco@microsoft.com> - 6.18.50-1.2
 - feat(kernel): enable PCIe EDR for DPC
