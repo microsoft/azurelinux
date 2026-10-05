@@ -24,10 +24,10 @@ replace-reason = "The local spec vendors the rendered sources manifest; this dec
 
 # NVIDIA open GPU kernel module source tarball (kmod-nvidia-open subpackage).
 [[components.kernel.source-files]]
-filename = "open-gpu-kernel-modules-610.57.04.tar.gz"
-hash = "08d905b0eff99741cb9fa94109d71d73e477ece2ea888cce206644859ae84b6930ff96cde10c9c6a1dcfaa79d4de7fca2df2a56534b77f3b02c431276365d2c3"
+filename = "open-gpu-kernel-modules-610.43.02.tar.gz"
+hash = "7049f394a7084544fbfea415b5d24c285fe529002cd21fc8b5c81a15468ccf07473b619070997fb04d016d114577d23e69b0a73f8a98e60a1819a07735e50830"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/610.57.04.tar.gz" }
+origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/610.43.02.tar.gz" }
 replace-upstream = true
 replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
 

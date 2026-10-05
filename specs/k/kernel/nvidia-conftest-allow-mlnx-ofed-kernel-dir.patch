@@ -1,0 +1,11 @@
+--- a/kernel-open/conftest.sh
++++ b/kernel-open/conftest.sh
+@@ -3307 +3307 @@ case "$5" in
+-            MLNX_OFED_KERNEL_DIR=/usr/src/ofa_kernel
++            MLNX_OFED_KERNEL_DIR="${MLNX_OFED_KERNEL_DIR:-/usr/src/ofa_kernel}"
+--- a/kernel-open/Makefile
++++ b/kernel-open/Makefile
+@@ -110,0 +111,3 @@
++  ifneq ($(KBUILD_EXTRA_SYMBOLS),)
++    KBUILD_PARAMS += KBUILD_EXTRA_SYMBOLS="$(KBUILD_EXTRA_SYMBOLS)"
++  endif

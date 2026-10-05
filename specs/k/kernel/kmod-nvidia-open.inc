@@ -18,6 +18,7 @@
 %global _azl_krel %{release}
 %package -n kmod-%{_kmod_name}
 Summary:        NVIDIA open GPU kernel modules (driver %{nvidia_open_version})
+License:        MIT OR GPL-2.0-only
 Version:        %{nvidia_open_version}
 Release:        %{_azl_kver}.%{_azl_krel}
 # Restore kernel NVR macros clobbered by the Version/Release tags above.
@@ -26,6 +27,7 @@ Release:        %{_azl_kver}.%{_azl_krel}
 AutoReq:        no
 Provides:       nvidia-open-kmod-version = %{nvidia_open_version}
 Provides:       nvidia-kmod = %{nvidia_open_version}
+Requires:       mlnx-ofa_kernel-modules-uname-r = %{KVERREL}
 Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
@@ -49,6 +51,7 @@ kernel %{KVERREL}.
 pushd %{_builddir}
 tar -xf %{SOURCE6000}
 popd
+patch -p1 -d %{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version} < %{SOURCE6003}
 %endif
 
 %endif
@@ -67,6 +70,8 @@ make %{?_smp_mflags} modules \
     KERNEL_UNAME="%{KVERREL}" \
     SYSSRC="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
     SYSOUT="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
+    MLNX_OFED_KERNEL_DIR="%{_builddir}/mlnx-ofa_kernel-%{ofa_version}/obj" \
+    KBUILD_EXTRA_SYMBOLS="%{_builddir}/mlnx-ofa_kernel-%{ofa_version}/obj/default/Module.symvers" \
     IGNORE_CC_MISMATCH=1 \
     IGNORE_XEN_PRESENCE=1 \
     IGNORE_PREEMPT_RT_PRESENCE=1 \
