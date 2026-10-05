@@ -1,0 +1,228 @@
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler-0.84 texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler-0.84	2021-05-06 18:21:18.379430999 -0400
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc	2021-05-10 11:15:09.572907304 -0400
+@@ -26,6 +26,15 @@ The poppler should be 0.59.0 or newer ve
+ POPPLER_VERSION should be defined.
+ */
+ 
++#ifdef POPPLER_VERSION
++#include <poppler-config.h>
++#define xpdfVersion POPPLER_VERSION
++#define xpdfString "poppler"
++#else
++#include <xpdf/config.h>        /* just to get the xpdf version */
++#define xpdfString "xpdf"
++#endif
++
+ /* Do this early in order to avoid a conflict between
+    MINGW32 <rpcndr.h> defining 'boolean' as 'unsigned char' and
+    <kpathsea/types.h> defining Pascal's boolean as 'int'.
+@@ -286,7 +295,7 @@ static void copyDictEntry(Object * obj,
+     Object obj1;
+     copyName(obj->dictGetKey(i));
+     pdf_puts(" ");
+-    obj1 = obj->dictGetValNF(i);
++    obj1 = obj->dictGetValNF(i).copy();
+     copyObject(&obj1);
+     pdf_puts("\n");
+ }
+@@ -345,7 +354,7 @@ static void copyProcSet(Object * obj)
+                     obj->getTypeName());
+     pdf_puts("/ProcSet [ ");
+     for (i = 0, l = obj->arrayGetLength(); i < l; ++i) {
+-        procset = obj->arrayGetNF(i);
++        procset = obj->arrayGetNF(i).copy();
+         if (!procset.isName())
+             pdftex_fail("PDF inclusion: invalid ProcSet entry type <%s>",
+                         procset.getTypeName());
+@@ -400,7 +409,7 @@ static void copyFont(const char *tag, Ob
+     if (fontdict.isDict()) {
+         subtype = fontdict.dictLookup("Subtype");
+         basefont = fontdict.dictLookup("BaseFont");
+-        fontdescRef = fontdict.dictLookupNF("FontDescriptor");
++        fontdescRef = fontdict.dictLookupNF("FontDescriptor").copy();
+         if (fontdescRef.isRef()) {
+             fontdesc = fontdescRef.fetch(xref);
+         }
+@@ -446,7 +455,7 @@ static void copyFontResources(Object * o
+                     obj->getTypeName());
+     pdf_puts("/Font << ");
+     for (i = 0, l = obj->dictGetLength(); i < l; ++i) {
+-        fontRef = obj->dictGetValNF(i);
++        fontRef = obj->dictGetValNF(i).copy();
+         if (fontRef.isRef())
+             copyFont(obj->dictGetKey(i), &fontRef);
+         else if (fontRef.isDict()) {   // some programs generate pdf with embedded font object
+@@ -589,7 +598,7 @@ static void copyObject(Object * obj)
+     } else if (obj->isArray()) {
+         pdf_puts("[");
+         for (i = 0, l = obj->arrayGetLength(); i < l; ++i) {
+-            obj1 = obj->arrayGetNF(i);
++            obj1 = obj->arrayGetNF(i).copy();
+             if (!obj1.isName())
+                 pdf_puts(" ");
+             copyObject(&obj1);
+@@ -709,7 +718,7 @@ read_pdf_info(char *image_name, char *pa
+     float pdf_version_found, pdf_version_wanted;
+     // initialize
+     if (!isInit) {
+-        globalParams = new GlobalParams();
++        globalParams = std::unique_ptr<GlobalParams>(new GlobalParams());
+         globalParams->setErrQuiet(false);
+         isInit = true;
+     }
+@@ -742,7 +751,7 @@ read_pdf_info(char *image_name, char *pa
+         if (link == 0 || !link->isOk())
+             pdftex_fail("PDF inclusion: invalid destination <%s>", page_name);
+         Ref ref = link->getPageRef();
+-        page_num = pdf_doc->doc->getCatalog()->findPage(ref.num, ref.gen);
++        page_num = pdf_doc->doc->getCatalog()->findPage(ref);
+         if (page_num == 0)
+             pdftex_fail("PDF inclusion: destination is not a page <%s>",
+                         page_name);
+@@ -902,13 +911,13 @@ void write_epdf(void)
+     pdf_puts(stripzeros(s));
+ 
+     // Metadata validity check (as a stream it must be indirect)
+-    dictObj = pageDict->lookupNF("Metadata");
++    dictObj = pageDict->lookupNF("Metadata").copy();
+     if (!dictObj.isNull() && !dictObj.isRef())
+         pdftex_warn("PDF inclusion: /Metadata must be indirect object");
+ 
+     // copy selected items in Page dictionary except Resources & Group
+     for (i = 0; pageDictKeys[i] != NULL; i++) {
+-        dictObj = pageDict->lookupNF(pageDictKeys[i]);
++        dictObj = pageDict->lookupNF(pageDictKeys[i]).copy();
+         if (!dictObj.isNull()) {
+             pdf_newline();
+             pdf_printf("/%s ", pageDictKeys[i]);
+@@ -917,7 +926,7 @@ void write_epdf(void)
+     } 
+ 
+     // handle page group
+-    dictObj = pageDict->lookupNF("Group");
++    dictObj = pageDict->lookupNF("Group").copy();
+     if (!dictObj.isNull()) {
+         if (pdfpagegroupval == 0) { 
+             // another pdf with page group was included earlier on the
+@@ -959,7 +968,7 @@ The changes below seem to work fine.
+             l = dic1.getLength();
+             for (i = 0; i < l; i++) {
+                 groupDict.dictAdd(dic1.getKey(i),
+-                                  dic1.getValNF(i));
++                                  dic1.getValNF(i).copy());
+             }
+ // end modification
+             pdf_printf("/Group %ld 0 R\n", (long)pdfpagegroupval);
+@@ -1089,6 +1098,6 @@ void epdf_check_mem()
+             delete_document(p);
+         }
+         // see above for globalParams
+-        delete globalParams;
++        globalParams.reset();
+     }
+ }
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc.poppler-0.84 texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc.poppler-0.84	2021-05-06 18:21:18.379430999 -0400
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc	2021-05-06 18:21:18.383431058 -0400
+@@ -24,6 +24,15 @@ by Arch Linux. The poppler should be 0.5
+ POPPLER_VERSION should be defined.
+ */
+ 
++#ifdef POPPLER_VERSION
++#include <poppler-config.h>
++#define xpdfVersion POPPLER_VERSION
++#define xpdfString "poppler"
++#else
++#include <xpdf/config.h>        /* just to get the xpdf version */
++#define xpdfString "xpdf"
++#endif
++
+ #include <w2c/config.h>
+ 
+ #include <stdlib.h>
+@@ -73,7 +82,7 @@ int main(int argc, char *argv[])
+         exit(1);
+     }
+     fileName = new GString(argv[1]);
+-    globalParams = new GlobalParams();
++    globalParams = std::unique_ptr<GlobalParams>(new GlobalParams());
+     doc = new PDFDoc(fileName);
+     if (!doc->isOk()) {
+         fprintf(stderr, "Invalid PDF file\n");
+@@ -94,7 +103,7 @@ int main(int argc, char *argv[])
+     if (objnum == 0) {
+         srcStream = catalogDict.dictLookup("SourceObject");
+         static char const_SourceFile[] = "SourceFile";
+-        if (!srcStream.isStream(const_SourceFile)) {
++        if (!(srcStream.isStream() && srcStream.getDict()->is(const_SourceFile))) {
+             fprintf(stderr, "No SourceObject found\n");
+             exit(1);
+         }
+@@ -150,7 +159,6 @@ int main(int argc, char *argv[])
+                         (e->type == xrefEntryFree ? "f" : "n"));
+             else {              // e->offset is the object number of the object stream
+                 Stream *str;
+-                Lexer *lexer;
+                 Parser *parser;
+                 Object objStr, obj1, obj2;
+                 int nObjects, first, n;
+@@ -168,8 +176,7 @@ int main(int argc, char *argv[])
+                 // parse the header: object numbers and offsets
+                 objStr.streamReset();
+                 str = new EmbedStream(objStr.getStream(), Object(objNull), true, first);
+-                lexer = new Lexer(xref, str);
+-                parser = new Parser(xref, lexer, false);
++                parser = new Parser(xref, str, false);
+                 for (n = 0; n < nObjects; ++n) {
+                     obj1 = parser->getObj();
+                     obj2 = parser->getObj();
+@@ -201,5 +208,5 @@ int main(int argc, char *argv[])
+         fprintf(stderr, "Cross-reference table extracted to %s\n", outname);
+     fclose(outfile);
+     delete doc;
+-    delete globalParams;
++    globalParams.reset();
+ }
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/utils.c.poppler-0.84 texlive-base-20210325/source/texk/web2c/pdftexdir/utils.c
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/utils.c.poppler-0.84	2019-12-29 19:37:32.000000000 -0500
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/utils.c	2021-05-06 18:21:18.383431058 -0400
+@@ -32,14 +32,6 @@ with this program.  If not, see <http://
+ #include <zlib.h>
+ #include "ptexlib.h"
+ #include <png.h>
+-#ifdef POPPLER_VERSION
+-/* POPPLER_VERSION should be a proper version string */
+-#define xpdfVersion POPPLER_VERSION
+-#define xpdfString "poppler"
+-#else
+-#include <xpdf/config.h>        /* just to get the xpdf version */
+-#define xpdfString "xpdf"
+-#endif
+ 
+ #define check_nprintf(size_get, size_want) \
+     if ((unsigned)(size_get) >= (unsigned)(size_want)) \
+@@ -977,12 +969,10 @@ void initversionstring(char **versions)
+ {
+     const_string fmt =
+                     "Compiled with libpng %s; using libpng %s\n"
+-                    "Compiled with zlib %s; using zlib %s\n"
+-                    "Compiled with %s version %s\n";
++                    "Compiled with zlib %s; using zlib %s\n";
+     size_t len = strlen(fmt)
+                     + strlen(PNG_LIBPNG_VER_STRING) + strlen(png_libpng_ver)
+                     + strlen(ZLIB_VERSION) + strlen(zlib_version)
+-                    + strlen(xpdfString) + strlen(xpdfVersion)
+                     + 1;
+ 
+     /* len will be more than enough, because of the placeholder chars in fmt
+@@ -990,7 +980,7 @@ void initversionstring(char **versions)
+     *versions = xmalloc(len);
+     sprintf(*versions, fmt,
+                     PNG_LIBPNG_VER_STRING, png_libpng_ver,
+-                    ZLIB_VERSION, zlib_version, xpdfString, xpdfVersion);
++                    ZLIB_VERSION, zlib_version);
+ }
+ 
+ 
+diff -up texlive-base-20210325/source/texk/web2c/xetexdir/XeTeX_ext.c.poppler-0.84 texlive-base-20210325/source/texk/web2c/xetexdir/XeTeX_ext.c

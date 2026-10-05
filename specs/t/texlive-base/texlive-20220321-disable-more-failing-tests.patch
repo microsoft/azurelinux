@@ -1,0 +1,140 @@
+diff -up texlive-base-20220321/source/texk/kpathsea/Makefile.am.dt texlive-base-20220321/source/texk/kpathsea/Makefile.am
+--- texlive-base-20220321/source/texk/kpathsea/Makefile.am.dt	2020-06-22 18:11:50.000000000 -0400
++++ texlive-base-20220321/source/texk/kpathsea/Makefile.am	2022-04-24 15:03:32.852801273 -0400
+@@ -275,7 +275,7 @@ uninstall-local:
+ AM_TESTS_ENVIRONMENT  = LN_S='$(LN_S)'; export LN_S;
+ AM_TESTS_ENVIRONMENT += LT_OBJDIR='$(LT_OBJDIR)'; export LT_OBJDIR;
+ #
+-TESTS  = tests/cnfline.test tests/cnfnewline.test
++TESTS  = tests/cnfnewline.test
+ TESTS += tests/cnfnull.test tests/cnfprog.test
+ TESTS += tests/kpseaccess.test
+ TESTS += tests/kpsereadlink.test tests/kpsestat.test tests/kpsewhich.test
+diff -up texlive-base-20220321/source/texk/kpathsea/Makefile.in.dt texlive-base-20220321/source/texk/kpathsea/Makefile.in
+--- texlive-base-20220321/source/texk/kpathsea/Makefile.in.dt	2021-10-04 11:13:00.000000000 -0400
++++ texlive-base-20220321/source/texk/kpathsea/Makefile.in	2022-04-24 15:03:32.852801273 -0400
+@@ -861,7 +861,7 @@ dist_noinst_DATA = texmf.cnf
+ AM_TESTS_ENVIRONMENT = LN_S='$(LN_S)'; export LN_S; \
+ 	LT_OBJDIR='$(LT_OBJDIR)'; export LT_OBJDIR;
+ #
+-TESTS = tests/cnfline.test tests/cnfnewline.test tests/cnfnull.test \
++TESTS = tests/cnfnewline.test tests/cnfnull.test \
+ 	tests/cnfprog.test tests/kpseaccess.test \
+ 	tests/kpsereadlink.test tests/kpsestat.test \
+ 	tests/kpsewhich.test
+diff -up texlive-base-20220321/source/texk/web2c/am/texmf.am.dt texlive-base-20220321/source/texk/web2c/am/texmf.am
+--- texlive-base-20220321/source/texk/web2c/am/texmf.am.dt	2022-01-11 17:47:10.000000000 -0500
++++ texlive-base-20220321/source/texk/web2c/am/texmf.am	2022-04-24 15:03:32.850801263 -0400
+@@ -77,7 +77,7 @@ DISTCLEANFILES += $(nodist_tex_SOURCES)
+ 
+ # TeX tests
+ #
+-tex_tests = triptest.test tests/write18-quote-test.pl tests/tex-closeout.test
++tex_tests = tests/write18-quote-test.pl tests/tex-closeout.test
+ triptest.log: tex$(EXEEXT) dvitype$(EXEEXT) pltotf$(EXEEXT) tftopl$(EXEEXT)
+ tests/write18-quote-test.log tests/tex-closeout.test: tex$(EXEEXT)
+ EXTRA_DIST += $(tex_tests)
+@@ -205,7 +205,7 @@ DISTCLEANFILES += $(nodist_libmf_a_SOURC
+ 
+ # Metafont tests
+ #
+-mf_tests = mftraptest.test
++mf_tests =
+ mftraptest.log: mf$(EXEEXT) gftype$(EXEEXT) tftopl$(EXEEXT)
+ EXTRA_DIST += $(mf_tests)
+ if MF
+diff -up texlive-base-20220321/source/texk/web2c/eptexdir/am/eptex.am.dt texlive-base-20220321/source/texk/web2c/eptexdir/am/eptex.am
+--- texlive-base-20220321/source/texk/web2c/eptexdir/am/eptex.am.dt	2022-01-11 17:47:10.000000000 -0500
++++ texlive-base-20220321/source/texk/web2c/eptexdir/am/eptex.am	2022-04-24 15:03:32.850801263 -0400
+@@ -89,7 +89,7 @@ EXTRA_DIST += \
+ 
+ # e-pTeX Tests
+ #
+-eptex_tests = eptexdir/eptriptest.test eptexdir/pdfprimitive.test eptexdir/epver.test
++eptex_tests = eptexdir/epver.test
+ eptexdir/eptriptest.log: eptex$(EXEEXT) dvitype$(EXEEXT) pltotf$(EXEEXT) tftopl$(EXEEXT)
+ eptexdir/pdfprimitive.log: eptex$(EXEEXT)
+ eptexdir/epver.log: eptex$(EXEEXT)
+diff -up texlive-base-20220321/source/texk/web2c/euptexdir/am/euptex.am.dt texlive-base-20220321/source/texk/web2c/euptexdir/am/euptex.am
+--- texlive-base-20220321/source/texk/web2c/euptexdir/am/euptex.am.dt	2022-01-11 17:47:10.000000000 -0500
++++ texlive-base-20220321/source/texk/web2c/euptexdir/am/euptex.am	2022-04-24 15:03:32.850801263 -0400
+@@ -90,7 +90,7 @@ EXTRA_DIST += \
+ 
+ # e-upTeX Tests
+ #
+-euptex_tests = euptexdir/euptriptest.test euptexdir/pdfprimitive.test euptexdir/eupver.test
++euptex_tests = euptexdir/eupver.test
+ euptexdir/euptriptest.log: euptex$(EXEEXT) dvitype$(EXEEXT) pltotf$(EXEEXT) tftopl$(EXEEXT)
+ euptexdir/pdfprimitive.log: euptex$(EXEEXT)
+ euptexdir/eupver.log: euptex$(EXEEXT)
+diff -up texlive-base-20220321/source/texk/web2c/mfluadir/am/mflua.am.dt texlive-base-20220321/source/texk/web2c/mfluadir/am/mflua.am
+--- texlive-base-20220321/source/texk/web2c/mfluadir/am/mflua.am.dt	2022-02-18 13:44:19.000000000 -0500
++++ texlive-base-20220321/source/texk/web2c/mfluadir/am/mflua.am	2022-04-24 15:03:32.850801263 -0400
+@@ -110,7 +110,7 @@ EXTRA_DIST += \
+ 
+ # MFLua tests
+ #
+-mflua_tests = mfluadir/mfluatraptest.test
++mflua_tests =
+ mfluadir/mfluatraptest.log: mflua$(EXEEXT) gftype$(EXEEXT) tftopl$(EXEEXT)
+ EXTRA_DIST += $(mflua_tests)
+ 
+diff -up texlive-base-20220321/source/texk/web2c/mfluajitdir/am/mfluajit.am.dt texlive-base-20220321/source/texk/web2c/mfluajitdir/am/mfluajit.am
+--- texlive-base-20220321/source/texk/web2c/mfluajitdir/am/mfluajit.am.dt	2022-02-18 13:44:19.000000000 -0500
++++ texlive-base-20220321/source/texk/web2c/mfluajitdir/am/mfluajit.am	2022-04-24 15:03:32.851801268 -0400
+@@ -106,7 +106,7 @@ EXTRA_DIST += \
+ 
+ # MFLuaJIT tests
+ #
+-mfluajit_tests = mfluajitdir/mfluajittraptest.test
++mfluajit_tests =
+ mfluajitdir/mfluajittraptest.log: mfluajit$(EXEEXT) gftype$(EXEEXT) tftopl$(EXEEXT)
+ EXTRA_DIST += $(mfluajit_tests)
+ 
+diff -up texlive-base-20220321/source/texk/web2c/pdftexdir/am/pdftex.am.dt texlive-base-20220321/source/texk/web2c/pdftexdir/am/pdftex.am
+--- texlive-base-20220321/source/texk/web2c/pdftexdir/am/pdftex.am.dt	2022-04-24 15:03:32.851801268 -0400
++++ texlive-base-20220321/source/texk/web2c/pdftexdir/am/pdftex.am	2022-04-24 15:47:20.351639955 -0400
+@@ -104,7 +104,7 @@ EXTRA_DIST += \
+ # pdfTeX tests
+ #
+ pdftex_tests = pdftexdir/wprob.test pdftexdir/pdftex.test \
+-  pdftexdir/pdfimage.test pdftexdir/expanded.test \
++  pdftexdir/expanded.test \
+   pdftexdir/tests/cnfline.test pdftexdir/tests/partoken.test
+ 
+ pdftexdir/wprob.log pdftexdir/pdftex.log \
+diff -up texlive-base-20220321/source/texk/web2c/ptexdir/am/ptex.am.dt texlive-base-20220321/source/texk/web2c/ptexdir/am/ptex.am
+--- texlive-base-20220321/source/texk/web2c/ptexdir/am/ptex.am.dt	2022-01-11 17:47:10.000000000 -0500
++++ texlive-base-20220321/source/texk/web2c/ptexdir/am/ptex.am	2022-04-24 15:03:32.851801268 -0400
+@@ -171,7 +171,7 @@ EXTRA_DIST += \
+ 
+ # pTeX Tests
+ #
+-ptex_tests = ptexdir/ptriptest.test ptexdir/pver.test
++ptex_tests = ptexdir/pver.test
+ ptexdir/ptriptest.log: ptex$(EXEEXT) dvitype$(EXEEXT) pltotf$(EXEEXT) tftopl$(EXEEXT)
+ ptexdir/pver.log: ptex$(EXEEXT)
+ pweb_tests = \
+diff -up texlive-base-20220321/source/texk/web2c/uptexdir/am/uptex.am.dt texlive-base-20220321/source/texk/web2c/uptexdir/am/uptex.am
+--- texlive-base-20220321/source/texk/web2c/uptexdir/am/uptex.am.dt	2022-01-29 05:40:22.000000000 -0500
++++ texlive-base-20220321/source/texk/web2c/uptexdir/am/uptex.am	2022-04-24 15:03:32.851801268 -0400
+@@ -161,7 +161,7 @@ EXTRA_DIST += \
+ 	uptexdir/ChangeLog
+ 
+ # upTeX Tests
+-uptex_tests = uptexdir/uptriptest.test uptexdir/upver.test
++uptex_tests = uptexdir/upver.test
+ uptexdir/uptriptest.log: uptex$(EXEEXT) dvitype$(EXEEXT) pltotf$(EXEEXT) tftopl$(EXEEXT)
+ uptexdir/upver.log: uptex$(EXEEXT)
+ upweb_tests = \
+diff -up texlive-base-20220321/source/texk/web2c/xetexdir/am/xetex.am.dt texlive-base-20220321/source/texk/web2c/xetexdir/am/xetex.am
+--- texlive-base-20220321/source/texk/web2c/xetexdir/am/xetex.am.dt	2022-01-11 17:47:10.000000000 -0500
++++ texlive-base-20220321/source/texk/web2c/xetexdir/am/xetex.am	2022-04-24 15:03:32.852801273 -0400
+@@ -203,7 +203,6 @@ EXTRA_DIST += \
+ #
+ xetex_tests = \
+ 	xetexdir/xetex-filedump.test \
+-	xetexdir/xetex-bug73.test \
+ 	xetexdir/xetex.test
+ xetexdir/xetex-filedump.log xetexdir/xetex-bug73.log xetexdir/xetex.log: xetex$(EXEEXT)
+ 

@@ -1,0 +1,49 @@
+diff --git a/docs/conf/extra/httpd-autoindex.conf.in b/docs/conf/extra/httpd-autoindex.conf.in
+index 51b02ed..93a2b87 100644
+--- a/docs/conf/extra/httpd-autoindex.conf.in
++++ b/docs/conf/extra/httpd-autoindex.conf.in
+@@ -21,7 +21,7 @@ IndexOptions FancyIndexing HTMLTable VersionSort
+ Alias /icons/ "@exp_iconsdir@/"
+ 
+ <Directory "@exp_iconsdir@">
+-    Options Indexes MultiViews
++    Options Indexes MultiViews FollowSymlinks
+     AllowOverride None
+     Require all granted
+ </Directory>
+@@ -37,6 +37,7 @@ AddIconByType (TXT,/icons/text.gif) text/*
+ AddIconByType (IMG,/icons/image2.gif) image/*
+ AddIconByType (SND,/icons/sound2.gif) audio/*
+ AddIconByType (VID,/icons/movie.gif) video/*
++AddIconByType /icons/bomb.gif application/x-coredump
+ 
+ AddIcon /icons/binary.gif .bin .exe
+ AddIcon /icons/binhex.gif .hqx
+@@ -53,7 +54,6 @@ AddIcon /icons/dvi.gif .dvi
+ AddIcon /icons/uuencoded.gif .uu
+ AddIcon /icons/script.gif .conf .sh .shar .csh .ksh .tcl
+ AddIcon /icons/tex.gif .tex
+-AddIcon /icons/bomb.gif core
+ 
+ AddIcon /icons/back.gif ..
+ AddIcon /icons/hand.right.gif README
+diff --git a/docs/conf/magic b/docs/conf/magic
+index bc891d9..9a41b44 100644
+--- a/docs/conf/magic
++++ b/docs/conf/magic
+@@ -383,3 +383,15 @@
+ 4   string      moov        video/quicktime
+ 4   string      mdat        video/quicktime
+ 
++
++#------------------------------------------------------------------------------
++# application/x-coredump for LE/BE ELF
++#
++0       string          \177ELF
++>5      byte            1
++>16     leshort         4               application/x-coredump
++
++0       string          \177ELF
++>5      byte            2
++>16     beshort         4               application/x-coredump
++

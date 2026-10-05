@@ -1,0 +1,13 @@
+# See httpd.socket(8) for more information on using the httpd service.
+
+[Unit]
+Description=Apache httpd Server Socket
+Documentation=man:httpd.socket(8)
+
+[Socket]
+ListenStream=80
+NoDelay=true
+DeferAcceptSec=30
+
+[Install]
+WantedBy=sockets.target

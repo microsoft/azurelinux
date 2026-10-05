@@ -1,0 +1,59 @@
+diff -up ./web2c/texmfcnf.lua.fedora ./web2c/texmfcnf.lua
+--- ./web2c/texmfcnf.lua.fedora	2023-05-25 10:25:41.195939763 -0400
++++ ./web2c/texmfcnf.lua	2023-05-25 10:33:33.761097942 -0400
+@@ -11,6 +11,7 @@ return {
+     comment = "ConTeXt MkIV and LMTX configuration file",
+     author  = "Hans Hagen, PRAGMA-ADE, Hasselt NL",
+     target  = "texlive",
++    -- modified for Fedora, based on Preining Norbert's work in Debian
+ 
+     content = {
+ 
+@@ -52,7 +53,7 @@ return {
+ 
+             TEXMFVAR        = "home:" .. hiddentexlivepath .. "/texmf-var",
+             TEXMFCONFIG     = "home:" .. hiddentexlivepath .. "/texmf-config",
+-            TEXMFSYSVAR     = "selfautoparent:texmf-var",
++            TEXMFSYSVAR     = "/var/lib/texmf",
+             TEXMFCACHE      = "$TEXMFSYSVAR;$TEXMFVAR",
+ 
+             -- I don't like this texmf under home and texmf-home would make more sense. One never knows
+@@ -62,7 +63,7 @@ return {
+             -- By using prefixes we don't get expanded paths in the cache __path__ entry. This makes the
+             -- tex root relocatable.
+ 
+-            TEXMFOS         = "selfautodir:",
++            -- TEXMFOS         = "selfautodir:",
+ 
+             -- standalone:
+ 
+@@ -73,14 +74,15 @@ return {
+ 
+             -- texlive:
+ 
+-            TEXMFDIST       = "selfautoparent:texmf-dist",
+-            TEXMFSYSCONFIG  = "selfautoparent:texmf-config",
++            TEXMFDIST       = "/usr/share/texlive/texmf-dist",
++            TEXMFFEDORA     = "/usr/share/texmf",
++            TEXMFSYSCONFIG  = "/usr/share/texlive/texmf-config",
+ 
+             -- The texmf-local path is only used for (maybe) some additional configuration file.
+ 
+-            TEXMFLOCAL      = "selfautoparent:texmf-local",
+-            TEXMFFONTS      = "selfautoparent:texmf-fonts",
+-            TEXMFPROJECT    = "selfautoparent:texmf-project",
++            TEXMFLOCAL      = "/usr/share/texlive/texmf-local",
++         -- TEXMFFONTS      = "selfautoparent:texmf-fonts",
++         -- TEXMFPROJECT    = "selfautoparent:texmf-project",
+ 
+             TEXMFHOME       = "home:texmf",
+          -- TEXMFHOME       = os.name == "macosx" and "home:Library/texmf" or "home:texmf",
+@@ -94,7 +96,7 @@ return {
+ 
+             -- texlive:
+ 
+-            TEXMF           = "{$TEXMFCONFIG,$TEXMFHOME,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFPROJECT,!!$TEXMFFONTS,!!$TEXMFLOCAL,!!$TEXMFDIST}",
++            TEXMF           = "{$TEXMFCONFIG,$TEXMFHOME,!!$TEXMFSYSCONFIG,!!$TEXMFSYSVAR,!!$TEXMFLOCAL,!!$TEXMFFEDORA,!!$TEXMFDIST}",
+ 
+             TEXFONTMAPS     = ".;$TEXMF/fonts/data//;$TEXMF/fonts/map/{pdftex,dvips}//",
+             ENCFONTS        = ".;$TEXMF/fonts/data//;$TEXMF/fonts/enc/{dvips,pdftex}//",

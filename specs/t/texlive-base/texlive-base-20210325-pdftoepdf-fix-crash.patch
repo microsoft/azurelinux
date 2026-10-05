@@ -1,0 +1,34 @@
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.debug texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.debug	2022-01-20 10:25:58.454233201 -0500
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc	2022-01-20 12:57:04.241513707 -0500
+@@ -962,21 +962,30 @@ A change
+ does not improve the situation.
+ The changes below seem to work fine. 
+ */
++            if (page->getGroup() != NULL) {
++                groupDict = Object(page->getGroup());
++            } else {
++                pdftex_fail("PDF inclusion: getGroup failed");
++            }
++/*
+ // begin modification
+             groupDict = pageDict->lookup("Group");
+             Dict *dic1 = page->getGroup();
+             Dict *dic2 = groupDict.getDict();
+             // replace dic2 in groupDict with dic1
+             l = dic2->getLength();
++            pdftex_warn("dic2 length is %d", l);
+             for (i = 0; i < l; i++) {
+                 groupDict.dictRemove(dic2->getKey(i));
+             }
+             l = dic1->getLength();
++            pdftex_warn("dic1 length is %d", l);
+             for (i = 0; i < l; i++) {
+                 groupDict.dictAdd(dic1->getKey(i),
+                                   dic1->getValNF(i).copy());
+             }
+ // end modification
++*/
+             pdf_printf("/Group %ld 0 R\n", (long)pdfpagegroupval);
+         }
+     }

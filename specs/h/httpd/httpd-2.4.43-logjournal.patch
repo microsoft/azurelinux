@@ -1,0 +1,87 @@
+diff --git a/modules/loggers/config.m4 b/modules/loggers/config.m4
+index 762e773..0848d2e 100644
+--- a/modules/loggers/config.m4
++++ b/modules/loggers/config.m4
+@@ -5,6 +5,8 @@ dnl APACHE_MODULE(name, helptext[, objects[, structname[, default[, config]]]])
+ APACHE_MODPATH_INIT(loggers)
+ 	
+ APACHE_MODULE(log_config, logging configuration.  You won't be able to log requests to the server without this module., , , yes)
++APR_ADDTO(MOD_LOG_CONFIG_LDADD, [$SYSTEMD_LIBS])
++
+ APACHE_MODULE(log_debug, configurable debug logging, , , most)
+ APACHE_MODULE(log_forensic, forensic logging)
+ 
+diff --git a/modules/loggers/mod_log_config.c b/modules/loggers/mod_log_config.c
+index 996c09c..50a056a 100644
+--- a/modules/loggers/mod_log_config.c
++++ b/modules/loggers/mod_log_config.c
+@@ -172,6 +172,10 @@
+ #include <limits.h>
+ #endif
+ 
++#ifdef HAVE_SYSTEMD
++#include <systemd/sd-journal.h>
++#endif
++
+ #define DEFAULT_LOG_FORMAT "%h %l %u %t \"%r\" %>s %b"
+ 
+ module AP_MODULE_DECLARE_DATA log_config_module;
+@@ -1638,6 +1642,25 @@ static apr_status_t ap_default_log_writer( request_rec *r,
+ 
+     return rv;
+ }
++
++static apr_status_t wrap_journal_stream(apr_pool_t *p, apr_file_t **outfd,
++                                        int priority)
++{
++#ifdef HAVE_SYSTEMD
++    int fd;
++
++    fd = sd_journal_stream_fd("httpd", priority, 0);
++    if (fd < 0) return fd;
++
++    /* This is an AF_UNIX socket fd so is more pipe-like than
++     * file-like (the fd is neither seekable or readable), and use of
++     * apr_os_pipe_put_ex() allows cleanup registration. */
++    return apr_os_pipe_put_ex(outfd, &fd, 1, p);
++#else
++    return APR_ENOTIMPL;
++#endif
++}
++
+ static void *ap_default_log_writer_init(apr_pool_t *p, server_rec *s,
+                                         const char* name)
+ {
+@@ -1650,6 +1673,32 @@ static void *ap_default_log_writer_init(apr_pool_t *p, server_rec *s,
+         }
+         return ap_piped_log_write_fd(pl);
+     }
++    else if (strncasecmp(name, "journald:", 9) == 0) {
++        int priority;
++        const char *err = ap_parse_log_level(name + 9, &priority);
++        apr_status_t rv;
++        apr_file_t *fd;
++
++        if (err == NULL && priority > LOG_DEBUG) {
++            err = "TRACE level debugging not supported with journald";
++        }
++
++        if (err) {
++            ap_log_error(APLOG_MARK, APLOG_ERR, APR_EBADPATH, s, 
++                         "invalid journald log priority name %s: %s",
++                         name, err);
++            return NULL;
++        }
++
++        rv = wrap_journal_stream(p, &fd, priority);
++        if (rv) {
++            ap_log_error(APLOG_MARK, APLOG_ERR, rv, s, 
++                         "could not open journald log stream");
++            return NULL;
++        }
++
++        return fd;
++    }
+     else {
+         const char *fname = ap_server_root_relative(p, name);
+         apr_file_t *fd;

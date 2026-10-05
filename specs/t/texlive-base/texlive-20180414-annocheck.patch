@@ -1,0 +1,11 @@
+--- texlive-20180414/source/libs/luajit/Makefile.in.annocheck	2018-01-10 01:37:05.000000000 +0100
++++ texlive-20180414/source/libs/luajit/Makefile.in	2019-01-11 22:45:34.503080977 +0100
+@@ -680,7 +680,7 @@
+ NEVER_NAMES_LT = -o -name .libs -o -name '*.lo'
+ AM_CPPFLAGS = -I$(srcdir)/$(LUAJIT_TREE)/src $(LUAJIT_DEFINES) -U_FORTIFY_SOURCE
+ AM_CFLAGS = $(LUAJIT_CFLAGS) $(LUAJIT_HAS_NOT_LOG2) -Wall
+-AM_CCASFLAGS = $(LUAJIT_CFLAGS) $(LUAJIT_HAS_NOT_LOG2)
++AM_CCASFLAGS = $(LUAJIT_CFLAGS) $(LUAJIT_HAS_NOT_LOG2) -Wa,--generate-missing-build-notes=yes
+ SUBDIRS = . native include
+ lib_LTLIBRARIES = libtexluajit.la
+ libtexluajit_la_LDFLAGS = -bindir @bindir@ -no-undefined -version-info $(LUAJIT_LT_VERSINFO) $(LIBLUAJIT_LDEXTRA)

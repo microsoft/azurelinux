@@ -1,0 +1,9 @@
+[components.nftables]
+release = { calculation = "manual" }
+
+[[components.nftables.overlays]]
+description = "Bump release"
+type = "spec-set-tag"
+tag = "Release"
+value = "6%{?dist}.2"
+metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }

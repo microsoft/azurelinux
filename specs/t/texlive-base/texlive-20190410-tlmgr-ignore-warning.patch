@@ -1,0 +1,79 @@
+diff -up ./scripts/texlive/tlmgr.pl.ignore-warning ./scripts/texlive/tlmgr.pl
+--- ./scripts/texlive/tlmgr.pl.ignore-warning	2019-05-24 21:35:57.384845754 -0400
++++ ./scripts/texlive/tlmgr.pl	2019-05-24 21:39:32.703577109 -0400
+@@ -231,6 +231,7 @@ my %action_specification = (
+       "dry-run|n" => 1,
+       "file" => 1,
+       "force" => 1,
++      "ignore-warning" => 1,
+       "no-depends"        => 1,
+       "no-depends-at-all" => 1,
+       "reinstall" => 1,
+@@ -331,6 +332,7 @@ my %action_specification = (
+       "dry-run|n" => 1,
+       "exclude" => "=s@",
+       "force" => 1,
++      "ignore-warning" => 1,
+       "list" => 1,
+       "no-auto-install"            => 1,
+       "no-auto-remove"             => 1,
+@@ -2613,6 +2615,15 @@ sub upd_info {
+ }
+ 
+ sub action_update {
++  if (!($opts{"ignore-warning"})) {
++    print("*** WARNING ***: Performing this action will likely destroy the Fedora TeXLive install on your system.\n");
++    print("*** WARNING ***: This is almost NEVER what you want to do.\n");
++    print("*** WARNING ***: Try using dnf install/update instead.\n");
++    print("*** WARNING ***: If performing this action is really what you want to do, pass the \"ignore-warning\" option.\n");
++    print("*** WARNING ***: But please do not file any bugs with the OS Vendor.\n");
++    exit;
++  }
++
+   init_local_db(1);
+   $opts{"no-depends"} = 1 if $opts{"no-depends-at-all"};
+ 
+@@ -3618,6 +3629,15 @@ sub check_announce_format_triggers {
+ # anymore!  That has all to be done by the caller.
+ #
+ sub action_install {
++  if (!($opts{"ignore-warning"})) {
++    print("*** WARNING ***: Performing this action will likely destroy the Fedora TeXLive install on your system.\n");
++    print("*** WARNING ***: This is almost NEVER what you want to do.\n");
++    print("*** WARNING ***: Try using dnf install/update instead.\n");
++    print("*** WARNING ***: If performing this action is really what you want to do, pass the \"ignore-warning\" option.\n");
++    print("*** WARNING ***: But please do not file any bugs with the OS Vendor.\n");
++    exit;
++  } 
++
+   init_local_db(1);
+   my $ret = $F_OK;
+   return ($F_ERROR) if !check_on_writable();
+@@ -8151,6 +8171,13 @@ If updates to C<tlmgr> itself (or other
+ infrastructure) are present, C<tlmgr> will bail out and not perform the
+ installation unless this option is given.  Not recommended.
+ 
++=item B<--ignore-warning>
++
++The tlmgr tool can really ruin a Fedora install of TeXLive.
++We have added a warning check here to try to keep you from
++blindly following a tutorial and doing this. If you still want to
++proceed, just use this option.
++
+ =item B<--no-depends>
+ 
+ Do not install dependencies.  (By default, installing a package ensures
+@@ -8846,6 +8873,13 @@ In short:
+ Nothing is actually installed; instead, the actions to be performed are
+ written to the terminal.  This is a more detailed report than C<--list>.
+ 
++=item B<--ignore-warning>
++
++The tlmgr tool can really ruin a Fedora install of TeXLive.
++We have added a warning check here to try to keep you from
++blindly following a tutorial and doing this. If you still want to
++proceed, just use this option.
++
+ =item B<--list> [I<pkg>]
+ 
+ Concisely list the packages which would be updated, newly installed, or

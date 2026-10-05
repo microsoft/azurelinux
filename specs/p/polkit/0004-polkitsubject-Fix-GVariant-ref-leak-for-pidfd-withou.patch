@@ -1,0 +1,26 @@
+From 4e67dde5e5bd4f0dfe77871d46b220c6249578d0 Mon Sep 17 00:00:00 2001
+From: Vincent Mihalkovic <vmihalko@redhat.com>
+Date: Fri, 27 Feb 2026 08:31:18 +0100
+Subject: [PATCH 4/7] polkitsubject: Fix GVariant ref leak for pidfd without
+ uid
+
+Co-authored-by: Pavel Kohout, Aisle Research, Aisle.com
+---
+ src/polkit/polkitsubject.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/polkit/polkitsubject.c b/src/polkit/polkitsubject.c
+index 4f72315..a8a3849 100644
+--- a/src/polkit/polkitsubject.c
++++ b/src/polkit/polkitsubject.c
+@@ -445,6 +445,7 @@ polkit_subject_new_for_gvariant_invocation (GVariant              *variant,
+                                 POLKIT_ERROR,
+                                 POLKIT_ERROR_FAILED,
+                                 "Error parsing unix-process subject: 'pidfd' specified withtout 'uid'");
++                    g_variant_unref (v);
+                     goto out;
+                   }
+ 
+-- 
+2.53.0
+
