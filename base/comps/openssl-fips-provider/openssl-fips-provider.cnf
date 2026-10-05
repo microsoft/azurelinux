@@ -1,0 +1,7 @@
+.include /etc/pki/tls/openssl.d/fipsmodule.cnf
+.include /etc/crypto-policies/back-ends/openssl_fips.config
+
+[azl_fips_provider]
+provider = fips
+section = fips_sect
+additional_default_properties = fips=yes
