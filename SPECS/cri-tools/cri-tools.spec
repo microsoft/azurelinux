@@ -55,7 +55,8 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 * Thu Sep 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.32.0-9
 - Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445.
 - Remove patches which are fixed in new generated vendor tarball: CVE-2024-45338, CVE-2025-22872, CVE-2025-47911,
-  CVE-2025-58190, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821, CVE-2026-42502, CVE-2026-42506, CVE-2026-56852
+  CVE-2025-58190, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821, CVE-2026-42502, CVE-2026-42506, 
+  CVE-2026-56852
 
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-8
 - Patch for CVE-2026-37236
