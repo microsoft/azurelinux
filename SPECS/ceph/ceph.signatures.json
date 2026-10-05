@@ -1,5 +1,5 @@
 {
-  "Signatures": {
-    "ceph-18.2.2.tar.gz": "e70bb5246b4a5d7aa78eb548677a05cc21d0d47945ba2937fddc7511134ffb57"
-  }
+ "Signatures": {
+   "ceph-18.2.8.tar.gz": "6a7d114f783bf8ae2a453f22d03d45761cf9f42aa146d191804a4980c8d8812c"
+ }
 }
