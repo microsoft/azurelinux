@@ -37,7 +37,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.4
-Release: 13%{?dist}
+Release: 14%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -63,7 +63,6 @@ Patch0014: 0014-RH-Export-two-symbols-for-OPENSSL_str-n-casecmp.patch
 Patch0015: 0015-RH-TMP-KTLS-test-skip.patch
 Patch0016: 0016-RH-Allow-disabling-of-SHA1-signatures.patch
 Patch0017: 0017-FIPS-Red-Hat-s-FIPS-module-name-and-version.patch
-Patch0018: 0018-FIPS-disable-fipsinstall.patch
 Patch0019: 0019-FIPS-Force-fips-provider-on.patch
 Patch0020: 0020-FIPS-INTEG-CHECK-Embed-hmac-in-fips.so-NOTE.patch
 Patch0021: 0021-FIPS-INTEG-CHECK-Add-script-to-hmac-ify-fips.so.patch
@@ -148,6 +147,7 @@ Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Obsoletes: oqsprovider < 0.9.0
 
 Patch80: 0080-azl-load-registered-fips-provider.patch
+Patch81: 0081-azl-adapt-fipsinstall-tests.patch
 %description
 The OpenSSL toolkit provides support for secure communications between
 machines. OpenSSL includes a certificate management tool and shared

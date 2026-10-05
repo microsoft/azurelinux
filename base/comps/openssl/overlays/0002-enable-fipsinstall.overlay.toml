@@ -1,0 +1,40 @@
+# Keep the upstream fipsinstall CLI and documentation by excluding Fedora's
+# downstream disablement patch. Adapt its tests to Azure Linux's static FIPS
+# configuration, which carries the module HMAC embedded in fips.so.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+type = "patch-remove"
+file = "0018-FIPS-disable-fipsinstall.patch"
+description = "Do not apply Fedora's fipsinstall CLI and documentation disablement"
+
+[[overlays]]
+type = "patch-add"
+source = "../0081-azl-adapt-fipsinstall-tests.patch"
+description = "Adapt fipsinstall tests to the embedded module HMAC"
+
+# Because patch 0018 is excluded above, patch 0037's change to the documentation
+# stub created by patch 0018 no longer applies. Remove only that hunk while
+# preserving patch 0037's functional EMS changes.
+[[overlays]]
+type = "file-search-replace"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+regex = '''(?m)^ doc/man5/fips_config\.pod                           \| 13 \+{13}\n'''
+replacement = ""
+description = "Remove fips_config.pod from patch 0037's diffstat"
+
+[[overlays]]
+type = "file-search-replace"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+regex = '''9 files changed, 46 insertions\(\+\), 5 deletions\(-\)'''
+replacement = "8 files changed, 33 insertions(+), 5 deletions(-)"
+description = "Update patch 0037's diffstat after removing the documentation hunk"
+
+[[overlays]]
+type = "file-search-replace"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+regex = '''(?s)diff --git a/doc/man5/fips_config\.pod b/doc/man5/fips_config\.pod\n.*?diff --git a/include/openssl/ssl\.h\.in b/include/openssl/ssl\.h\.in'''
+replacement = "diff --git a/include/openssl/ssl.h.in b/include/openssl/ssl.h.in"
+description = "Remove patch 0037's obsolete fipsinstall documentation hunk"
