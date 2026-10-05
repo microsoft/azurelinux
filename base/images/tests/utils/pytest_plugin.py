@@ -57,7 +57,8 @@ def parse_capabilities(raw: str | None) -> set[str]:
     return {c.strip() for c in raw.split(",") if c.strip()}
 
 
-def pytest_addoption(parser) -> None:  # type: ignore[no-untyped-def]
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Register command-line options for Azure Linux image tests."""
     group = parser.getgroup("image", "Azure Linux image validation")
     group.addoption(
         "--image-path",
@@ -105,7 +106,7 @@ def pytest_addoption(parser) -> None:  # type: ignore[no-untyped-def]
     )
 
 
-def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
+def pytest_configure(config: pytest.Config) -> None:
     """Register markers and fail fast if required native tools are missing."""
     config.addinivalue_line(
         "markers",
@@ -197,7 +198,10 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         pytest.skip(f"test is specific to image family '{expected}' (running: '{image_name}')")
 
 
-def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-untyped-def]
+def pytest_collection_modifyitems(
+    config: pytest.Config,
+    items: list[pytest.Item],
+) -> None:
     """Auto-apply markers based on directory layout under ``cases/``.
 
     Layout convention (after restructure)::

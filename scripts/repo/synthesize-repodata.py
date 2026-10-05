@@ -65,7 +65,7 @@ from _repo_layout import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Sequence
 
 # Repo root: this file lives at <repo>/scripts/repo/<name>.py, so the
 # project root is three parents up.
@@ -421,7 +421,7 @@ class UniverseEntry:
     source_pkg_name: str  # extracted from rpm_sourcerpm (or pkg name for srpms)
 
 
-def _pkg_identity(pkg) -> tuple[str, str, str, str, str]:
+def _pkg_identity(pkg: cr.Package) -> tuple[str, str, str, str, str]:
     """Return the package's NEVRA tuple (name, epoch, version, release, arch).
 
     Epoch is normalised to '0' when missing/empty so two records that differ
@@ -430,7 +430,7 @@ def _pkg_identity(pkg) -> tuple[str, str, str, str, str]:
     return (pkg.name, pkg.epoch or "0", pkg.version, pkg.release, pkg.arch)
 
 
-def _format_nevra(pkg) -> str:
+def _format_nevra(pkg: cr.Package) -> str:
     """Return a human-readable NEVRA string, suitable for log/warn messages."""
     epoch = pkg.epoch or "0"
     epoch_prefix = f"{epoch}:" if epoch != "0" else ""
@@ -494,7 +494,7 @@ def build_package_universe(
         primary = _find_metadata_path(repo_dir, "primary")
         log(f"  scanning {repo.kind}/{repo.arch}: {repo.url}")
 
-        def pkgcb(pkg, *, _repo=repo):
+        def pkgcb(pkg: cr.Package, *, _repo: InputRepo = repo) -> None:
             key: UniverseKey = (_repo.kind, _repo.arch) + _pkg_identity(pkg)
             if _repo.kind == KIND_SRPMS:
                 source_name = pkg.name
@@ -808,7 +808,7 @@ class _RepoWriter:
         ("other", "other_db", cr.OtherXmlFile, cr.OtherSqlite),
     )
 
-    def __init__(self, dest: Destination, output_dir: Path, pkg_count: int):
+    def __init__(self, dest: Destination, output_dir: Path, pkg_count: int) -> None:
         self.dest = dest
         self.repodata_dir = output_dir / dest.relpath() / "repodata"
         if self.repodata_dir.exists():
@@ -1059,7 +1059,13 @@ class _OrderedRepoSourceAction(argparse.Action):
     which input wins for an overlapping NEVRA.
     """
 
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str | Sequence[object] | None,
+        option_string: str | None = None,
+    ) -> None:
         items = getattr(namespace, self.dest, None)
         if items is None:
             items = []

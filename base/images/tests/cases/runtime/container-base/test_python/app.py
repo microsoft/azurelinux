@@ -9,7 +9,8 @@ RESPONSE = Path(__file__).with_name("response.txt").read_bytes()
 
 
 class Handler(BaseHTTPRequestHandler):
-    def do_GET(self):
+    def do_GET(self) -> None:
+        """Serve the fixed runtime-validation response."""
         self.send_response(200)
         self.send_header("Content-Type", "text/plain")
         self.end_headers()
