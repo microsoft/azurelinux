@@ -1,5 +1,5 @@
---- actix-web-4.12.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ actix-web-4.12.1/Cargo.toml	2025-12-11T20:10:44.192074+00:00
+--- actix-web-4.15.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ actix-web-4.15.0/Cargo.toml	2026-09-19T14:51:38.327912+00:00
 @@ -47,11 +47,6 @@
  features = [
      "macros",
@@ -31,15 +31,7 @@
      "compress-gzip",
      "compress-zstd",
      "cookies",
-@@ -112,7 +102,6 @@
-     "compat",
-     "ws",
- ]
--experimental-io-uring = ["actix-server/io-uring"]
- http2 = ["actix-http/http2"]
- macros = [
-     "dep:actix-macros",
-@@ -125,35 +114,6 @@
+@@ -125,35 +115,6 @@
      "actix-tls/accept",
      "actix-tls/openssl",
  ]
@@ -75,7 +67,7 @@
  secure-cookies = [
      "cookies",
      "cookie/secure",
-@@ -200,15 +160,6 @@
+@@ -208,15 +169,6 @@
  path = "examples/worker-cpu-pin.rs"
  
  [[test]]
@@ -88,10 +80,10 @@
 -]
 -
 -[[test]]
- name = "test-macro-import-conflict"
- path = "tests/test-macro-import-conflict.rs"
+ name = "introspection"
+ path = "tests/introspection.rs"
  
-@@ -219,16 +170,6 @@
+@@ -231,16 +183,6 @@
  [[test]]
  name = "test_httpserver"
  path = "tests/test_httpserver.rs"
@@ -108,7 +100,15 @@
  
  [[test]]
  name = "test_streaming_response"
-@@ -406,9 +347,6 @@
+@@ -290,6 +232,7 @@
+ 
+ [dependencies.actix-rt]
+ version = "2.6"
++features = ["net", "signal"]
+ default-features = false
+ 
+ [dependencies.actix-server]
+@@ -418,9 +361,6 @@
  version = "3"
  features = ["openssl"]
  
@@ -116,5 +116,5 @@
 -version = "8"
 -
  [dev-dependencies.const-str]
- version = "0.5"
+ version = "1.1"
  

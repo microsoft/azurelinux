@@ -1,0 +1,46 @@
+From 9a418a006e324803c2bb5ec70dd134e107d634e2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20=C4=8Cern=C3=BD?= <jcerny@redhat.com>
+Date: Thu, 3 Sep 2026 11:52:02 +0200
+Subject: [PATCH] Fix building Ubuntu 26.04 HTML guides
+
+The Ubuntu 26.04 product doesn't have any profile except the virtual
+default profile, therefore, no HTML guide is built, and the builder
+fails when building the index.html index. It manifests only if the
+`lxml` library isn't present and the build system falls back to the
+legacy script `build_all_guides.py`. This problem currently causes
+that the scap-security-guide package doesn't build on Fedora, eg.:
+https://src.fedoraproject.org/rpms/scap-security-guide/pull-request/81
+
+Addressing:
+```
+$ python3 build-scripts/build_all_guides.py --input build/ssg-ubuntu2604-ds.xml --output build/guides build
+Traceback (most recent call last):
+  File "/home/jcerny/work/git/scap-security-guide/build-scripts/build_all_guides.py", line 109, in <module>
+    main()
+    ~~~~^^
+  File "/home/jcerny/work/git/scap-security-guide/build-scripts/build_all_guides.py", line 100, in main
+    index_source = ssg.build_guides.build_index(benchmarks, input_basename,
+                                                index_links, index_options,
+                                                index_initial_src)
+  File "/home/jcerny/work/git/scap-security-guide/ssg/build_guides.py", line 224, in build_index
+    index_select_options += "\n".join(list(index_options.values())[0])
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+```
+---
+ ssg/build_guides.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ssg/build_guides.py b/ssg/build_guides.py
+index c54580df484a..617fb99ab046 100644
+--- a/ssg/build_guides.py
++++ b/ssg/build_guides.py
+@@ -220,7 +220,7 @@ def build_index(benchmarks, input_basename, index_links, index_options,
+                 % (benchmark_id)
+             index_select_options += "\n".join(index_options[benchmark_id])
+             index_select_options += "</optgroup>\n"
+-    else:
++    elif len(index_options.keys()) == 1:
+         index_select_options += "\n".join(list(index_options.values())[0])
+ 
+     return "".join([

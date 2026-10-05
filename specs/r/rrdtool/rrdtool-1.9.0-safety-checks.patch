@@ -1,0 +1,275 @@
+diff --git a/src/rrd_daemon.c b/src/rrd_daemon.c
+index 241a59f..0ebc853 100644
+--- a/src/rrd_daemon.c
++++ b/src/rrd_daemon.c
+@@ -362,7 +362,13 @@ static void do_log(
+         pthread_mutex_lock(&log_lock);
+         time_t    now = time(NULL);
+ 
+-        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmtime(&now));
++        struct tm tm_buf;
++
++        if (gmtime_r(&now, &tm_buf) == NULL) {
++            snprintf(buffer, sizeof(buffer), "(time error)");
++        } else {
++            strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm_buf);
++        }
+         fprintf(log_fh, "%s [%d] ", buffer, priority);
+         vfprintf(log_fh, format, args);
+         fprintf(log_fh, "\n");
+@@ -573,7 +579,7 @@ static int check_pidfile(
+ {
+     int       pid_fd;
+     pid_t     pid;
+-    char      pid_str[16];
++    char      pid_str[16] = {0};
+ 
+     pid_fd = open_pidfile("open", O_RDWR);
+     if (pid_fd < 0) {
+@@ -765,11 +771,7 @@ static int add_response_info(
+         return 0;       /* no extra info returned when in BATCH */
+ 
+     va_start(argp, fmt);
+-#ifdef HAVE_VSNPRINTF
+     len = vsnprintf(buffer, sizeof(buffer), fmt, argp);
+-#else
+-    len = vsprintf(buffer, fmt, argp);
+-#endif
+     va_end(argp);
+     if (len < 0) {
+         RRDD_LOG(LOG_ERR, "add_response_info: vnsprintf failed");
+@@ -858,14 +860,12 @@ static int send_response(
+         rc = RESP_OK;
+     } else {
+         rclen = snprintf(buffer, sizeof buffer, "%d ", lines);
++        if (rclen < 0 || rclen >= (int) sizeof(buffer))
++            return -1;
+     }
+ 
+     va_start(argp, fmt);
+-#ifdef HAVE_VSNPRINTF
+     len = vsnprintf(buffer + rclen, sizeof(buffer) - rclen, fmt, argp);
+-#else
+-    len = vsprintf(buffer + rclen, fmt, argp);
+-#endif
+     va_end(argp);
+     if (len < 0)
+         return -1;
+@@ -1927,7 +1927,7 @@ static int handle_request_tune(
+         goto done;
+     }
+     argc = atoi(i);
+-    if (argc < 0) {
++    if (argc <= 0) {
+         rc = send_response(sock, RESP_ERR, "Invalid argument count specified (%d)\n",
+                            argc);
+         goto done;
+@@ -1940,6 +1940,11 @@ static int handle_request_tune(
+     argc_tmp = 0;
+     while ((status = buffer_get_field(&buffer, &buffer_size, &tok)) == 0
+            && tok) {
++        if (argc_tmp >= argc) {
++            rc = send_response(sock, RESP_ERR,
++                               "Too many arguments (expected %d)\n", argc);
++            goto done;
++        }
+         argv[argc_tmp] = tok;
+         argc_tmp += 1;
+     }
+@@ -2486,7 +2491,8 @@ static int handle_request_create(
+     char     *file_copy = NULL, *dir = NULL, *dir2 = NULL;
+     char     *tok;
+     int       ac = 0;
+-    char     *av[128];
++#define MAX_CREATE_AV 128
++    char     *av[MAX_CREATE_AV];
+     char    **sources = NULL;
+     int       sources_length = 0;
+     char     *template = NULL;
+@@ -2599,10 +2605,22 @@ static int handle_request_create(
+             continue;
+         }
+         if (!strncmp(tok, "DS:", 3)) {
++            if (ac >= MAX_CREATE_AV) {
++                rc = send_response(sock, RESP_ERR,
++                                   "Too many DS/RRA definitions (max %d)\n",
++                                   MAX_CREATE_AV);
++                goto done;
++            }
+             av[ac++] = tok;
+             continue;
+         }
+         if (!strncmp(tok, "RRA:", 4)) {
++            if (ac >= MAX_CREATE_AV) {
++                rc = send_response(sock, RESP_ERR,
++                                   "Too many DS/RRA definitions (max %d)\n",
++                                   MAX_CREATE_AV);
++                goto done;
++            }
+             av[ac++] = tok;
+             continue;
+         }
+diff --git a/src/rrd_graph.c b/src/rrd_graph.c
+index 46511e9..50ee47d 100644
+--- a/src/rrd_graph.c
++++ b/src/rrd_graph.c
+@@ -2516,8 +2516,9 @@ int draw_horizontal_grid(
+                                 }
+                             }
+                         } else {
+-                            sprintf(graph_label, im->primary_axis_format,
+-                                    scaledstep * (double) i, sisym);
++                            snprintf(graph_label, sizeof(graph_label),
++                                     im->primary_axis_format,
++                                     scaledstep * (double) i, sisym);
+                         }
+                     }
+                     break;
+@@ -3859,11 +3860,14 @@ static cairo_status_t cairo_output(
+ {
+     image_desc_t *im = (image_desc_t *) closure;
+ 
+-    im->rendered_image =
+-        (unsigned char *) realloc(im->rendered_image,
+-                                  im->rendered_image_size + length);
+-    if (im->rendered_image == NULL)
+-        return CAIRO_STATUS_WRITE_ERROR;
++    {
++        unsigned char *tmp =
++            (unsigned char *) realloc(im->rendered_image,
++                                      im->rendered_image_size + length);
++        if (tmp == NULL)
++            return CAIRO_STATUS_WRITE_ERROR;
++        im->rendered_image = tmp;
++    }
+     memcpy(im->rendered_image + im->rendered_image_size, data, length);
+     im->rendered_image_size += length;
+     return CAIRO_STATUS_SUCCESS;
+@@ -4154,6 +4158,15 @@ int graph_paint_timestring(
+                         (double *) malloc(sizeof(double) * im->xsize * 2);
+                     int       drawem = 0;
+ 
++                    if (foreY == NULL || foreX == NULL ||
++                        backY == NULL || backX == NULL) {
++                        free(foreY);
++                        free(foreX);
++                        free(backY);
++                        free(backX);
++                        return -1;
++                    }
++
+                     for (ii = 0; ii <= im->xsize; ii++) {
+                         double    ybase, ytop;
+ 
+@@ -5883,6 +5896,12 @@ int vdef_calc(
+         rrd_value_t *array;
+         int       field;
+ 
++        if (steps == 0) {
++            dst->vf.val = DNAN;
++            dst->vf.when = 0;
++            dst->vf.never = 1;
++            break;
++        }
+         if ((array = (rrd_value_t *) malloc(steps * sizeof(double))) == NULL) {
+             rrd_set_error("malloc VDEV_PERCENT");
+             return -1;
+@@ -5916,6 +5935,12 @@ int vdef_calc(
+             }
+         }
+         /* and allocate it */
++        if (nancount == 0) {
++            dst->vf.val = DNAN;
++            dst->vf.when = 0;
++            dst->vf.never = 1;
++            break;
++        }
+         if ((array =
+              (rrd_value_t *) malloc(nancount * sizeof(double))) == NULL) {
+             rrd_set_error("malloc VDEV_PERCENT");
+diff --git a/src/rrd_graph_helper.c b/src/rrd_graph_helper.c
+index ba90e1a..fb1d142 100644
+--- a/src/rrd_graph_helper.c
++++ b/src/rrd_graph_helper.c
+@@ -1186,7 +1186,7 @@ static void legend_shift(
+     if (!legend || !legend[0]) {
+         return;
+     }
+-    memmove(legend + 2, legend, strlen(legend));
++    memmove(legend + 2, legend, strlen(legend) + 1);
+     legend[0] = ' ';
+     legend[1] = ' ';
+ }
+diff --git a/src/rrd_xport.c b/src/rrd_xport.c
+index 93c02f9..a06dd56 100644
+--- a/src/rrd_xport.c
++++ b/src/rrd_xport.c
+@@ -358,6 +358,16 @@ static int rrd_xport_fn(
+     /* printf("step: %lu\n",*step); */
+     free(step_list);
+ 
++    if (*step == 0) {
++        rrd_set_error("xport step is zero");
++        free(ref_list);
++        for (unsigned long k = *col_cnt; k > 0; k--)
++            free(legend_list[k - 1]);
++        *col_cnt = 0;
++        free(legend_list);
++        return (-1);
++    }
++
+     *start = im->start - im->start % (*step);
+ 
+     *end = im->end - im->end % (*step);
+@@ -372,28 +382,30 @@ static int rrd_xport_fn(
+          (rrd_value_t *) malloc((*col_cnt) * row_cnt *
+                                 sizeof(rrd_value_t))) == NULL) {
+         free(ref_list);
+-        while ((*col_cnt)--)
+-            free(legend_list[*col_cnt]);
++        for (unsigned long k = *col_cnt; k > 0; k--)
++            free(legend_list[k - 1]);
++        *col_cnt = 0;
+         free(legend_list);
+         rrd_set_error("malloc xport data area");
+         return (-1);
+     }
+     dstptr = (*data);
+ 
++    long unsigned int chosen_idx  = 0;
+     /* fill data structure */
+-    for (dst_row = 0; (int) dst_row < (int) row_cnt; dst_row++) {
+-        for (i = 0; i < (int) (*col_cnt); i++) {
++    for (dst_row = 0; dst_row < row_cnt; dst_row++) {
++        for (i = 0; (unsigned long) i < *col_cnt; i++) {
+             long      vidx = im->gdes[ref_list[i]].vidx;
+             time_t    now = *start + dst_row * *step;
+ 
+-            (*dstptr++) = im->gdes[vidx].data[(unsigned long)
+-                                              floor((double)
+-                                                    (now -
+-                                                     im->gdes[vidx].start)
+-                                                    / im->gdes[vidx].step)
+-                                              * im->gdes[vidx].ds_cnt +
+-                                              im->gdes[vidx].ds];
++            if (im->gdes[vidx].step > 0 &&
++                now >= im->gdes[vidx].start) {
++                chosen_idx = floor((double) (now - im->gdes[vidx].start) / im->gdes[vidx].step) * im->gdes[vidx].ds_cnt + im->gdes[vidx].ds;
+ 
++                (*dstptr++) = im->gdes[vidx].data[chosen_idx];
++            } else {
++                (*dstptr++) = DNAN;
++            }
+         }
+     }
+ 
+@@ -976,6 +988,9 @@ static void escapeJSON(
+     size_t    l = strlen(txt);
+     size_t    pos = 0;
+ 
++    if (tmp == NULL)
++        return;
++
+     /* now iterate over the chars */
+     for (size_t i = 0; (i < l) && (pos < len); i++, pos++) {
+         switch (txt[i]) {

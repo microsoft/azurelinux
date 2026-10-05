@@ -1,0 +1,11 @@
+--- MyST-NB-1.4.0/pyproject.toml.orig	2026-03-02 14:10:42.000000000 -0700
++++ MyST-NB-1.4.0/pyproject.toml	2026-05-26 15:04:24.900757387 -0600
+@@ -182,7 +182,7 @@ filterwarnings = [
+     # Windows issues, some may need to be fixed in MyST-NB, others are upstream
+     'ignore:Proactor event loop does not implement add_reader:RuntimeWarning:zmq',
+     # We deal with this pending deprecation later
+-    'ignore:Argument "writer_name" will be removed in Docutils 2.0:PendingDeprecationWarning'
++    'ignore:Argument ".*_name" will be removed in Docutils 2.0:PendingDeprecationWarning'
+ ]
+ 
+ markers = [

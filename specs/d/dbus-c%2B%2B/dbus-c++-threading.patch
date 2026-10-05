@@ -1,0 +1,45 @@
+--- libdbus-c++-0.9.0/include/dbus-c++/dispatcher.h.threading	2017-02-15 13:40:53.796004263 +0000
++++ libdbus-c++-0.9.0/include/dbus-c++/dispatcher.h	2017-02-15 13:40:46.907000493 +0000
+@@ -188,6 +188,7 @@
+ /* classes for multithreading support
+ */
+ 
++#if 0
+ class DXXAPI Mutex
+ {
+ public:
+@@ -243,9 +244,11 @@
+ typedef bool (*CondVarWaitTimeoutFn)(CondVar *cv, Mutex *mx, int timeout);
+ typedef void (*CondVarWakeOneFn)(CondVar *cv);
+ typedef void (*CondVarWakeAllFn)(CondVar *cv);
++#endif
+ 
+ void DXXAPI _init_threading();
+ 
++#if 0
+ void DXXAPI _init_threading(
+   MutexNewFn, MutexFreeFn, MutexLockFn, MutexUnlockFn,
+   CondVarNewFn, CondVarFreeFn, CondVarWaitFn, CondVarWaitTimeoutFn, CondVarWakeOneFn, CondVarWakeAllFn
+@@ -312,6 +315,7 @@
+     cv->wake_all();
+   }
+ };
++#endif
+ 
+ } /* namespace DBus */
+ 
+--- libdbus-c++-0.9.0/src/dispatcher.cpp.threading	2017-02-15 13:48:22.627249868 +0000
++++ libdbus-c++-0.9.0/src/dispatcher.cpp	2017-02-15 13:48:29.164253445 +0000
+@@ -253,6 +253,7 @@
+ #endif//DBUS_HAS_THREADS_INIT_DEFAULT
+ }
+ 
++#if 0
+ void DBus::_init_threading(
+   MutexNewFn m1,
+   MutexFreeFn m2,
+@@ -318,3 +319,4 @@
+ #endif//DBUS_HAS_RECURSIVE_MUTEX
+   dbus_threads_init(&functions);
+ }
++#endif

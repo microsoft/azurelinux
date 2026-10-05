@@ -1,8 +1,14 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "From: Jan Safranek" <jsafrane@redhat.com>
+Date: Fri, 26 Nov 2010 14:30:45 +0300
+Subject: [PATCH] Customize 'permission denied' error.
+
+
 diff --git a/capture/capture_sync.c b/capture/capture_sync.c
-index af08b32..2e0fcb7 100644
+index 36a8f3edbe..db8b49b816 100644
 --- a/capture/capture_sync.c
 +++ b/capture/capture_sync.c
-@@ -1825,8 +1832,16 @@ sync_pipe_input_cb(GIOChannel *pipe_io, capture_session *cap_session)
+@@ -2102,8 +2102,16 @@ sync_pipe_input_cb(GIOChannel *pipe_io, capture_session *cap_session)
          if (!ws_strtoi32(buffer, NULL, &exec_errno)) {
              ws_warning("Invalid errno: %s", buffer);
          }

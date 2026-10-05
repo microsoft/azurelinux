@@ -1,0 +1,159 @@
+From 9d8f40c5a05046186972b9224d19e71f9a5e72c0 Mon Sep 17 00:00:00 2001
+From: Miroslav Lisik <mlisik@redhat.com>
+Date: Wed, 1 Jul 2026 10:57:42 +0200
+Subject: [PATCH 2/2] pcsd-ruby: swap rubygem-ethon for rubygem-curb
+
+---
+ README.md       |  2 +-
+ configure.ac    |  3 +--
+ pcsd/pcs.rb     | 41 ++++++++++++++++++++---------------------
+ rpm/pcs.spec.in | 12 +++++-------
+ 4 files changed, 27 insertions(+), 31 deletions(-)
+
+diff --git a/README.md b/README.md
+index 636485be6..eb6ea49d0 100644
+--- a/README.md
++++ b/README.md
+@@ -56,7 +56,7 @@ installation:
+ * pacemaker-libs-devel (or libpacemaker-devel and libpacemaker3-devel)
+ * gcc
+ * gcc-c++
+-* FFI development files (package libffi-devel or libffi-dev)
++* libcurl development files (package libcurl-devel or libcurl-dev)
+ * printf (package coreutils)
+ * redhat-rpm-config (if you are using Fedora)
+ * wget (to download bundled libraries)
+diff --git a/configure.ac b/configure.ac
+index 7c2ee0f73..0393a86a1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -482,8 +482,7 @@ REQUIRE_RACKUP="require 'rackup'"
+ if test "x$tests_only" != "xyes"; then
+ 	PCS_CHECK_GEM([backports])
+ 	PCS_CHECK_GEM([childprocess])
+-	PCS_CHECK_GEM([ethon])
+-	PCS_CHECK_GEM([ffi])
++	PCS_CHECK_GEM([curb])
+ 	PCS_CHECK_GEM([json])
+ 	PCS_CHECK_GEM([ruby2_keywords])
+ 	PCS_CHECK_GEM([mustermann])
+diff --git a/pcsd/pcs.rb b/pcsd/pcs.rb
+index 32373f344..fcbf93ecf 100644
+--- a/pcsd/pcs.rb
++++ b/pcsd/pcs.rb
+@@ -11,7 +11,7 @@ require 'json'
+ require 'fileutils'
+ require 'backports/latest'
+ require 'base64'
+-require 'ethon'
++require 'curb'
+ require 'openssl'
+ require 'stringio'
+ 
+@@ -349,32 +349,31 @@ def send_request(
+ 
+   $logger.info "Connecting to: #{url}"
+ 
+-  req = Ethon::Easy.new()
+-  req.set_attributes({
+-    :url => url,
+-    :timeout_ms => timeout_ms,
+-    :cookie => _get_cookie_list(auth_user, cookies_data).join(';'),
+-    :ssl_verifyhost => 0,
+-    :ssl_verifypeer => 0,
+-    :postfields => (encoded_data) ? encoded_data : nil,
+-    :httpget => (post ? 0 : 1),
+-    :nosignal => 1, # required for multi-threading
+-  })
+-  req.compose_header('Expect', '')
+-  return_code = req.perform
+-  response_code = req.response_code
+-  response_body = req.response_body
+-  req.cleanup
+-  if return_code == :ok
+-    return response_code, response_body
+-  else
++  begin
++    curl = Curl::Easy.new(url)
++    curl.timeout_ms = timeout_ms
++    curl.cookies = _get_cookie_list(auth_user, cookies_data).join(';')
++    curl.ssl_verify_host = false
++    curl.ssl_verify_peer = false
++    curl.nosignal = true # required for multi-threading
++    curl.headers['Expect'] = ''
++
++    if post
++      curl.post_body = encoded_data
++      curl.http_post
++    else
++      curl.http_get
++    end
++
++    return curl.response_code, curl.body_str
++  rescue Curl::Err::CurlError => e
+     if is_proxy_set(ENV)
+       $logger.warn(
+         'Proxy is set in environment variables, try disabling it'
+       )
+     end
+     $logger.info(
+-      "No response from: #{node} request: #{request}, error: #{return_code}"
++      "No response from: #{node} request: #{request}, error: #{e.message}"
+     )
+     return 400,'{"noresponse":true}'
+   end
+diff --git a/rpm/pcs.spec.in b/rpm/pcs.spec.in
+index 0267bfb58..9ab3df335 100644
+--- a/rpm/pcs.spec.in
++++ b/rpm/pcs.spec.in
+@@ -16,18 +16,16 @@ Release: 99+git%{?numcomm:.%{numcomm}}%{?alphatag:.%{alphatag}}%{?dirty:.%{dirty
+ # GPL-2.0-only: pcs
+ # Apache-2.0: dataclasses, tornado
+ # Apache-2.0 OR BSD-3-Clause: dateutil
+-# MIT: backports, childprocess, dacite, ethon, mustermann, rack, rackup,
++# MIT: backports, childprocess, dacite, mustermann, rack, rackup,
+ #      rack-protection, rack-session, rack-test, sinatra, tilt
+ # MIT AND (BSD-2-Clause OR GPL-2.0-or-later): nio4r
+ # BSD-2-Clause: rexml
+ # BSD-2-Clause or Ruby: base64, ruby2_keywords, strscan
+ # BSD 3-Clause: puma
+-# BSD-3-Clause and MIT: ffi
++# Ruby: curb
+ # curl OR LGPL-2.1-or-later: python-pycurl
+ # Some gems we bundle are just dependencies of gems that we use,
+ # here is their dependency tree (we directly require the 1st level only):
+-# ethon:
+-#   ffi
+ # puma:
+ #   nio4r
+ # sinatra:
+@@ -43,7 +41,7 @@ Release: 99+git%{?numcomm:.%{numcomm}}%{?alphatag:.%{alphatag}}%{?dirty:.%{dirty
+ #   base64
+ # rexml:
+ #   strscan (might be included with Ruby)
+-License: GPL-2.0-only AND Apache-2.0 AND MIT AND BSD-2-Clause AND BSD-3-Clause AND (BSD-2-Clause OR GPL-2.0-or-later) AND (Apache-2.0 OR BSD-3-Clause) AND (BSD-2-Clause OR Ruby) AND (curl OR LGPL-2.1-or-later)
++License: GPL-2.0-only AND Apache-2.0 AND MIT AND BSD-2-Clause AND BSD-3-Clause AND Ruby AND (BSD-2-Clause OR GPL-2.0-or-later) AND (Apache-2.0 OR BSD-3-Clause) AND (BSD-2-Clause OR Ruby) AND (curl OR LGPL-2.1-or-later)
+ URL: https://github.com/ClusterLabs/pcs
+ Summary: Pacemaker/Corosync Configuration System
+ 
+@@ -101,7 +99,8 @@ BuildRequires: python%{python3_version}-pyparsing >= 3.0.0
+ # required to pass ./configure
+ BuildRequires: python%{python3_version}-lxml
+ 
+-# pycurl is not distributed in rhel 10
++# pycurl is not distributed in rhel 10, libcurl-devel is also needed for
++# compiling bundled rubygem-curb native extension
+ %if 0%{?rhel} >= 10
+ BuildRequires: libcurl-devel
+ BuildRequires: openssl-devel
+@@ -124,7 +123,6 @@ BuildRequires: findutils
+ # gcc for compiling custom rubygems
+ BuildRequires: gcc
+ BuildRequires: gcc-c++
+-BuildRequires: libffi-devel
+ # ruby and gems for pcsd
+ BuildRequires: ruby >= 3.1
+ BuildRequires: ruby-devel
+-- 
+2.55.0
+

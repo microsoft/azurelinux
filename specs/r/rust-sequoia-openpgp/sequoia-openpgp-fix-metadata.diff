@@ -1,13 +1,22 @@
---- sequoia-openpgp-2.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ sequoia-openpgp-2.2.0/Cargo.toml	2026-02-09T17:41:31.754299+00:00
-@@ -469,10 +469,6 @@
+--- sequoia-openpgp-2.4.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sequoia-openpgp-2.4.1/Cargo.toml	2026-09-23T13:07:42.921078+00:00
+@@ -421,7 +421,7 @@
+ optional = true
+ 
+ [dependencies.ossl]
+-version = "1.5.2"
++version = "1.5.3"
+ features = [
+     "openssl-sys",
+     "rfc9580",
+@@ -521,10 +521,6 @@
+ [dependencies.xxhash-rust]
  version = "0.8"
  features = ["xxh3"]
- 
+-
 -[dev-dependencies.criterion]
 -version = "0.5"
 -features = ["html_reports"]
--
+ 
  [dev-dependencies.quickcheck]
  version = "1"
- default-features = false

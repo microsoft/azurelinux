@@ -1,0 +1,73 @@
+From e995b3930dc574f7cd07318a63eea2ebd4e2cb48 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 18 Feb 2026 15:55:24 +0100
+Subject: [PATCH] Honor localpkg_gpgcheck in RPM transaction per-element policy
+
+If RPM enforces a signature verification ("%_pkgverify_level
+signature" in RPM configuration files), DNF5 did not to obey
+localpkg_gpgcheck DNF5 option and installation of local packages
+failed:
+
+    # dnf5 -y --setopt localpkg_gpgcheck=false reinstall ./python3-scikit-build-core-0.11.6-1.20260217085946639536.pr1219.48.g8dce8a6.fc45.noarch.rpm
+    Updating and loading repositories:
+    Repositories loaded.
+    Package                                Arch   Version                            Repository        Size
+    Reinstalling:
+     python3-scikit-build-core             noarch 0:0.11.6-1.20260217085946639536.pr @commandline   1.5 MiB
+       replacing python3-scikit-build-core noarch 0:0.11.6-1.20260217085946639536.pr @commandline   1.5 MiB
+
+    Transaction Summary:
+     Reinstalling:       1 package
+     Replacing:          1 package
+
+    Total size of inbound packages is 344 KiB. Need to download 0 B.
+    After this operation, 0 B extra will be used (install 1 MiB, remove 1 MiB).
+    Running transaction
+    Transaction failed: Rpm transaction failed.
+    Warning: skipped OpenPGP checks for 1 package from repository: @commandline
+      - package python3-scikit-build-core-0.11.6-1.20260217085946639536.pr1219.48.g8dce8a6.fc45.noarch does not verify: Header OpenPGP V4 RSA/SHA256 signature, key ID e2b551f502810203: NOKEY
+
+The cause was that DNF5 did not set per RPM transaction element policy
+in libdnf5::rpm::Transaction::ts_change_callback() according to
+localpkg_gpgcheck. It only set the policy according to per-repo
+pgp_gpgcheck=0 which does not exist for packages out of repository as
+implemented in commit 4db642138c76474553213b0f9005a78f32fbf932 ("Honor
+per-repo pgp_gpgcheck=0 even in rpm's enforcing signature mode").
+
+This fix enhances libdnf5::rpm::Transaction::ts_change_callback() to
+be on par with logic in
+libdnf5::rpm::RpmSignature::check_package_signature().
+
+Resolve: #2614
+---
+ libdnf5/rpm/transaction.cpp | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/libdnf5/rpm/transaction.cpp b/libdnf5/rpm/transaction.cpp
+index aee53689..e7c9f659 100644
+--- a/libdnf5/rpm/transaction.cpp
++++ b/libdnf5/rpm/transaction.cpp
+@@ -422,10 +422,16 @@ int Transaction::ts_change_callback(int event, rpmte te, rpmte other, void * dat
+         rpmteSetUserdata(te, transaction->last_added_item);
+         transaction->last_item_added_ts_element = true;
+ #if defined(HAVE_RPMTE_SETVFYLEVEL)
+-        // honor per-repo pkg_gpgcheck=0 in rpm's enforcing signature mode
+-        auto pkg = transaction->last_added_item->get_package();
+-        auto gpgcheck = pkg.get_repo()->get_config().get_pkg_gpgcheck_option();
+-        if (gpgcheck.get_value() == false) {
++        auto repo = transaction->last_added_item->get_package().get_repo();
++        bool gpgcheck = true;
++        if (repo->get_type() == libdnf5::repo::Repo::Type::COMMANDLINE) {
++            // honor localpkg_gpgcheck=0 in rpm's enforcing signature mode
++            gpgcheck = transaction->get_base()->get_config().get_localpkg_gpgcheck_option().get_value();
++        } else {
++            // honor per-repo pkg_gpgcheck=0 in rpm's enforcing signature mode
++            gpgcheck = repo->get_config().get_pkg_gpgcheck_option().get_value();
++        }
++        if (gpgcheck == false) {
+             rpmteSetVfyLevel(te, RPMSIG_DIGEST_TYPE);
+         }
+ #endif
+-- 
+2.53.0
+

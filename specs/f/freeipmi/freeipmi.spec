@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 7;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -12,7 +12,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:             freeipmi
-Version:          1.6.15
+Version:          1.6.19
 Release:          %autorelease
 Summary:          IPMI remote console and system management software
 License:          GPL-3.0-or-later
@@ -21,17 +21,14 @@ Source0:          https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:          bmc-watchdog.service
 Source2:          ipmidetectd.service
 Source3:          ipmiseld.service
-BuildRequires:    libgcrypt-devel texinfo systemd 
-%{?systemd_requires}
+Source4:          freeipmi.tmpfiles.conf
+Source5:          freeipmi-ipmiseld.tmpfiles.conf
+BuildRequires:    libgcrypt-devel texinfo systemd-rpm-macros
 BuildRequires:    gcc
 BuildRequires:    make
 BuildRequires:    automake
 BuildRequires:    autoconf
 BuildRequires:    libtool
-
-# https://lists.gnu.org/archive/html/freeipmi-devel/2025-02/msg00000.html
-# https://github.com/chu11/freeipmi-mirror/commit/ececf09d6128cbff65e9048f19d191e87f111059
-Patch0:           c23.patch
 
 %description
 The FreeIPMI project provides "Remote-Console" (out-of-band) and
@@ -90,8 +87,15 @@ find %{buildroot} -name '*.la' -delete -print
 install -m755 -d %{buildroot}%{_unitdir}
 install -pm644 %SOURCE1 %SOURCE2 %SOURCE3 %{buildroot}%{_unitdir}/
 
+# Install tmpfiles configs
+install -m0644 -D %{SOURCE4} %{buildroot}%{_tmpfilesdir}/freeipmi.conf
+install -m0644 -D %{SOURCE5} %{buildroot}%{_tmpfilesdir}/freeipmi-ipmiseld.conf
+
 # Remove initscripts
 rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
+
+# Remove useless generic INSTALL
+rm -frv %{buildroot}%{_pkgdocdir}/INSTALL
 
 %post bmc-watchdog
 %systemd_post bmc-watchdog.service
@@ -120,25 +124,7 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %postun ipmidetectd
 %systemd_postun_with_restart ipmidetectd.service
 
-%triggerun -- freeipmi-bmc-watchdog < 1.1.1-2
-# Save the current service runlevel info
-# User must manually run systemd-sysv-convert --apply httpd
-# to migrate them to systemd targets
-/usr/bin/systemd-sysv-convert --save bmc-watchdog >/dev/null 2>&1 ||:
 
-# Run these because the SysV package being removed won't do them
-/sbin/chkconfig --del bmc-watchdog >/dev/null 2>&1 || :
-/bin/systemctl try-restart bmc-watchdog.service >/dev/null 2>&1 || :
-
-%triggerun -- freeipmi-ipmidetectd < 1.1.1-2
-# Save the current service runlevel info
-# User must manually run systemd-sysv-convert --apply httpd
-# to migrate them to systemd targets
-/usr/bin/systemd-sysv-convert --save ipmidetectd >/dev/null 2>&1 ||:
-
-# Run these because the SysV package being removed won't do them
-/sbin/chkconfig --del ipmidetectd >/dev/null 2>&1 || :
-/bin/systemctl try-restart ipmidetectd.service >/dev/null 2>&1 || :
 
 %files
 %dir %{_sysconfdir}/freeipmi/
@@ -147,58 +133,54 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/freeipmi/freeipmi_interpret_sel.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/freeipmi/freeipmi_interpret_sensor.conf
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/freeipmi/libipmiconsole.conf
-%doc %{_datadir}/doc/%{name}/AUTHORS
-%doc %{_datadir}/doc/%{name}/COPYING
-%doc %{_datadir}/doc/%{name}/ChangeLog
-%doc %{_datadir}/doc/%{name}/ChangeLog.0
-%doc %{_datadir}/doc/%{name}/INSTALL
-%doc %{_datadir}/doc/%{name}/NEWS
-%doc %{_datadir}/doc/%{name}/README
-%doc %{_datadir}/doc/%{name}/README.argp
-%doc %{_datadir}/doc/%{name}/README.build
-%doc %{_datadir}/doc/%{name}/README.openipmi
-%doc %{_datadir}/doc/%{name}/TODO
-%doc %{_infodir}/*
-%doc %{_datadir}/doc/%{name}/COPYING.ipmiping
-%doc %{_datadir}/doc/%{name}/COPYING.ipmipower
-%doc %{_datadir}/doc/%{name}/COPYING.ipmiconsole
-%doc %{_datadir}/doc/%{name}/COPYING.ipmimonitoring
-%doc %{_datadir}/doc/%{name}/COPYING.pstdout
-%doc %{_datadir}/doc/%{name}/COPYING.ipmidetect
-%doc %{_datadir}/doc/%{name}/COPYING.ipmi-fru
-%doc %{_datadir}/doc/%{name}/COPYING.ipmi-dcmi
-%doc %{_datadir}/doc/%{name}/COPYING.sunbmc
-%doc %{_datadir}/doc/%{name}/COPYING.ZRESEARCH
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmiping
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmipower
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmiconsole
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmimonitoring
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.pstdout
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmidetect
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmi-fru
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmi-dcmi
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmiping.UC
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmipower.UC
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmiconsole.UC
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmimonitoring.UC
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.pstdout.UC
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmidetect.UC
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmi-fru.UC
-%doc %{_datadir}/doc/%{name}/freeipmi-coding.txt
-%doc %{_datadir}/doc/%{name}/freeipmi-design.txt
-%doc %{_datadir}/doc/%{name}/freeipmi-hostrange.txt
-%doc %{_datadir}/doc/%{name}/freeipmi-libraries.txt
-%doc %{_datadir}/doc/%{name}/freeipmi-bugs-issues-and-workarounds.txt
-%doc %{_datadir}/doc/%{name}/freeipmi-testing.txt
-%doc %{_datadir}/doc/%{name}/freeipmi-oem-documentation-requirements.txt
-%dir %{_datadir}/doc/%{name}
-%dir %{_datadir}/doc/%{name}/contrib
-%dir %{_datadir}/doc/%{name}/contrib/ganglia
-%doc %{_datadir}/doc/%{name}/contrib/ganglia/*
-%dir %{_datadir}/doc/%{name}/contrib/nagios
-%doc %{_datadir}/doc/%{name}/contrib/nagios/*
-%dir %{_datadir}/doc/%{name}/contrib/pet
-%doc %{_datadir}/doc/%{name}/contrib/pet/*
+%doc %{_pkgdocdir}/AUTHORS
+%doc %{_pkgdocdir}/ChangeLog
+%doc %{_pkgdocdir}/ChangeLog.0
+%doc %{_pkgdocdir}/NEWS
+%doc %{_pkgdocdir}/README
+%doc %{_pkgdocdir}/README.argp
+%doc %{_pkgdocdir}/README.build
+%doc %{_pkgdocdir}/README.openipmi
+%doc %{_pkgdocdir}/TODO
+%doc %{_pkgdocdir}/freeipmi-coding.txt
+%doc %{_pkgdocdir}/freeipmi-design.txt
+%doc %{_pkgdocdir}/freeipmi-hostrange.txt
+%doc %{_pkgdocdir}/freeipmi-libraries.txt
+%doc %{_pkgdocdir}/freeipmi-bugs-issues-and-workarounds.txt
+%doc %{_pkgdocdir}/freeipmi-testing.txt
+%doc %{_pkgdocdir}/freeipmi-oem-documentation-requirements.txt
+%license %{_pkgdocdir}/COPYING
+%license %{_pkgdocdir}/COPYING.ipmiping
+%license %{_pkgdocdir}/COPYING.ipmipower
+%license %{_pkgdocdir}/COPYING.ipmiconsole
+%license %{_pkgdocdir}/COPYING.ipmimonitoring
+%license %{_pkgdocdir}/COPYING.pstdout
+%license %{_pkgdocdir}/COPYING.ipmidetect
+%license %{_pkgdocdir}/COPYING.ipmi-fru
+%license %{_pkgdocdir}/COPYING.ipmi-dcmi
+%license %{_pkgdocdir}/COPYING.sunbmc
+%license %{_pkgdocdir}/COPYING.ZRESEARCH
+%license %{_pkgdocdir}/DISCLAIMER.ipmiping
+%license %{_pkgdocdir}/DISCLAIMER.ipmipower
+%license %{_pkgdocdir}/DISCLAIMER.ipmiconsole
+%license %{_pkgdocdir}/DISCLAIMER.ipmimonitoring
+%license %{_pkgdocdir}/DISCLAIMER.pstdout
+%license %{_pkgdocdir}/DISCLAIMER.ipmidetect
+%license %{_pkgdocdir}/DISCLAIMER.ipmi-fru
+%license %{_pkgdocdir}/DISCLAIMER.ipmi-dcmi
+%license %{_pkgdocdir}/DISCLAIMER.ipmiping.UC
+%license %{_pkgdocdir}/DISCLAIMER.ipmipower.UC
+%license %{_pkgdocdir}/DISCLAIMER.ipmiconsole.UC
+%license %{_pkgdocdir}/DISCLAIMER.ipmimonitoring.UC
+%license %{_pkgdocdir}/DISCLAIMER.pstdout.UC
+%license %{_pkgdocdir}/DISCLAIMER.ipmidetect.UC
+%license %{_pkgdocdir}/DISCLAIMER.ipmi-fru.UC
+%{_infodir}/freeipmi-faq.info*
+%dir %{_pkgdocdir}
+%dir %{_pkgdocdir}/contrib
+%{_pkgdocdir}/contrib/ganglia
+%{_pkgdocdir}/contrib/nagios
+%{_pkgdocdir}/contrib/pet
 %{_libdir}/libipmiconsole*so.*
 %{_libdir}/libfreeipmi*so.*
 %{_libdir}/libipmidetect*so.*
@@ -275,10 +257,10 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %{_mandir}/man5/libipmiconsole.conf.5*
 %{_mandir}/man7/freeipmi.7*
 %dir %{_localstatedir}/cache/ipmimonitoringsdrcache
+%{_tmpfilesdir}/freeipmi.conf
 
 %files devel
-%dir %{_datadir}/doc/%{name}/contrib/libipmimonitoring
-%doc %{_datadir}/doc/%{name}/contrib/libipmimonitoring/*
+%{_pkgdocdir}/contrib/libipmimonitoring
 %{_libdir}/libipmiconsole.so
 %{_libdir}/libfreeipmi.so
 %{_libdir}/libipmidetect.so
@@ -334,9 +316,9 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %{_libdir}/pkgconfig/*
 
 %files bmc-watchdog
-%doc %{_datadir}/doc/%{name}/COPYING.bmc-watchdog
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.bmc-watchdog
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.bmc-watchdog.UC
+%license %{_pkgdocdir}/COPYING.bmc-watchdog
+%license %{_pkgdocdir}/DISCLAIMER.bmc-watchdog
+%license %{_pkgdocdir}/DISCLAIMER.bmc-watchdog.UC
 %config(noreplace) %{_sysconfdir}/sysconfig/bmc-watchdog
 %{_sbindir}/bmc-watchdog
 %{_mandir}/man8/bmc-watchdog.8*
@@ -350,17 +332,37 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %{_unitdir}/ipmidetectd.service
 
 %files ipmiseld
-%doc %{_datadir}/doc/%{name}/COPYING.ipmiseld
-%doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmiseld
+%license %{_pkgdocdir}/COPYING.ipmiseld
+%license %{_pkgdocdir}/DISCLAIMER.ipmiseld
 %{_unitdir}/ipmiseld.service
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/freeipmi/ipmiseld.conf
 %{_sbindir}/ipmiseld
 %{_mandir}/man5/ipmiseld.conf.5*
 %{_mandir}/man8/ipmiseld.8*
 %dir %{_localstatedir}/cache/ipmiseld
+%{_tmpfilesdir}/freeipmi-ipmiseld.conf
 
 %changelog
 ## START: Generated by rpmautospec
+* Mon Oct 05 2026 Dan Streetman <ddstreet@ieee.org> - 1.6.19-2
+- chore: update 'lock' files and render changed components
+
+* Sun Sep 20 2026 Pavel Cahyna <pcahyna@redhat.com> - 1.6.19-1
+- Update to 1.6.19 (rhbz#2395545)
+- also fixes CVE-2026-33554 (rhbz#2450850) CVE-2026-50031 (rhbz#2484319)
+  CVE-2026-85504 (rhbz#2528445) CVE-2026-85505 (rhbz#2528469)
+  CVE-2026-85506 (rhbz#2528405) CVE-2026-85507 (rhbz#2528438)
+  CVE-2026-85508 (rhbz#2528465) CVE-2026-85509 (rhbz#2528423)
+
+* Sun Sep 20 2026 Filipe Rosset <filiperosset@fedoraproject.org> - 1.6.15-10
+- spec cleanup and modernization
+
+* Sun Sep 20 2026 Pavel Cahyna <pcahyna@redhat.com> - 1.6.15-9
+- tag license files
+
+* Sun Sep 20 2026 Lukáš Zaoral <lzaoral@redhat.com> - 1.6.15-8
+- Add tmpfiles configs for image mode
+
 * Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1.6.15-7
 - build: mass rebuild auto-bumpable components
 

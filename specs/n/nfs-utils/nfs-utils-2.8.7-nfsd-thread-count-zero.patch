@@ -1,0 +1,39 @@
+commit f993f1ceb5c5ca68d62cbdc1f040d228d6d9a018
+Author: Scott Mayhew <smayhew@redhat.com>
+Date:   Tue Jun 16 06:57:20 2026 -0400
+
+    nfsd: don't assume service is running when setting thread count to 0
+    
+    Newer kernels return -EIO if you try to write to /proc/fs/nfsd/threads
+    and there are no active listeners.
+    
+    Signed-off-by: Scott Mayhew <smayhew@redhat.com>
+    Signed-off-by: Steve Dickson <steved@redhat.com>
+
+diff --git a/utils/nfsd/nfsd.c b/utils/nfsd/nfsd.c
+index 365e145d..c95d32f4 100644
+--- a/utils/nfsd/nfsd.c
++++ b/utils/nfsd/nfsd.c
+@@ -311,12 +311,16 @@ main(int argc, char **argv)
+ 				argv[0], count);
+ 			count = 1;
+ 		} else if (count == 0) {
+-			/*
+-			 * don't bother setting anything else if the threads
+-			 * are coming down anyway.
+-			 */
+-			socket_up = 1;
+-			goto set_threads;
++			if (nfssvc_inuse()) {
++				/*
++				 * don't bother setting anything else if the threads
++				 * are coming down anyway.
++				 */
++				socket_up = 1;
++				goto set_threads;
++			} else {
++				goto out;
++			}
+ 		}
+ 	}
+ 

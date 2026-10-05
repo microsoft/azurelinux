@@ -1,0 +1,148 @@
+diff -up sblim-cmpi-base-1.6.4/provider-register.sh.secure-tmpfiles sblim-cmpi-base-1.6.4/provider-register.sh
+--- sblim-cmpi-base-1.6.4/provider-register.sh.secure-tmpfiles	2026-09-09 13:56:45.723728008 +0200
++++ sblim-cmpi-base-1.6.4/provider-register.sh	2026-09-09 13:56:45.731039666 +0200
+@@ -200,19 +200,11 @@ pegasus_install()
+       shift
+     done
+   
+-    for _TEMPDIR in /var/tmp /tmp
+-    do
+-      if test -w $_TEMPDIR
+-      then
+-	  _REGFILENAME=$_TEMPDIR/$$.mof
+-	  break
+-      fi
+-    done
++    _REGFILENAME=$(mktemp "${TMPDIR:-/tmp}/provider-register.XXXXXX.mof") || return 1
+ 
+-    
+-    trap "rm -f $_REGFILENAME" EXIT
++    trap 'rm -f "$_REGFILENAME"' EXIT
+ 
+-    if pegasus_transform $_REGFILENAME $myregs
++    if pegasus_transform "$_REGFILENAME" $myregs
+     then
+ 	chatter Registering providers with $state cimserver
+ 	$CIMMOF -uc -I $mofpath -n $namespace $mymofs &&
+@@ -276,16 +268,9 @@ pegasus_uninstall()
+ 	fi
+ 	CLASSES=`cat $myregs 2> /dev/null | grep -v '^[[:space:]]*#.*' | cut -d ' ' -f 1 | grep -v '^CIM_'`
+ 
+-	for _TEMPDIR in /var/tmp /tmp
+-	  do
+-	  if test -w $_TEMPDIR
+-	      then
+-	      _DELETE_NAME=$TEMPDIR/delete-class.mof
+-	      break
+-	  fi
+-	done
++	_DELETE_NAME=$(mktemp "${TMPDIR:-/tmp}/provider-register.XXXXXX.mof") || return 1
+ 
+-	trap "rm -f $_DELETE_NAME" EXIT
++	trap 'rm -f "$_DELETE_NAME"' EXIT
+ 
+ 	for cls in $CLASSES
+ 	do
+@@ -408,18 +393,11 @@ sfcb_install()
+       shift
+     done
+ 
+-    for _TEMPDIR in /var/tmp /tmp
+-    do
+-      if test -w $_TEMPDIR
+-      then
+-	  _REGFILENAME=$_TEMPDIR/$baseregname.reg
+-	  break
+-      fi
+-    done
++    _REGFILENAME=$(mktemp "${TMPDIR:-/tmp}/provider-register.XXXXXX.reg") || return 1
+ 
+-    trap "rm -f $_REGFILENAME" EXIT
++    trap 'rm -f "$_REGFILENAME"' EXIT
+ 
+-    if sfcb_transform $_REGFILENAME $myregs
++    if sfcb_transform "$_REGFILENAME" $myregs
+     then
+ 	chatter "Staging provider registration."
+ 	sfcbstage -n $namespace -r $_REGFILENAME $mymofs
+@@ -467,13 +445,11 @@ openwbem_transform()
+     shift
+     moffiles=$*
+     
+-    if rm -f $OUTFILE
+-    then
+-	for _f in $moffiles
+-	do
+-	  sed "s/Provider *( *\"cmpi:/Provider(\"cmpi::/g" < $_f >> $OUTFILE
+-	done
+-    fi
++    : > "$OUTFILE"
++    for _f in $moffiles
++    do
++      sed "s/Provider *( *\"cmpi:/Provider(\"cmpi::/g" < $_f >> "$OUTFILE"
++    done
+ }
+ 
+ openwbem_repository()
+@@ -511,25 +487,18 @@ openwbem_install()
+ 	state=inactive
+     fi
+ 
+-    for _TEMPDIR in /var/tmp /tmp
+-    do
+-      if test -w $_TEMPDIR
+-      then
+-	  _REGFILENAME=$_TEMPDIR/$$.mof
+-	  break
+-      fi
+-    done
++    _REGFILENAME=$(mktemp "${TMPDIR:-/tmp}/provider-register.XXXXXX.mof") || return 1
+ 
+-    trap "rm -f $_REGFILENAME" EXIT
++    trap 'rm -f "$_REGFILENAME"' EXIT
+ 
+-    if openwbem_transform $_REGFILENAME $*
++    if openwbem_transform "$_REGFILENAME" $*
+     then
+ 	chatter Registering providers with $state owcimomd
+-	$CIMMOF $_REGFILENAME > /dev/null
++	$CIMMOF "$_REGFILENAME" > /dev/null
+     else
+ 	echo "Failed to build OpenWBEM registration MOF." >&2
+ 	return 1
+-    fi       
++    fi
+ }
+ 
+ openwbem_uninstall()
+@@ -554,25 +523,18 @@ openwbem_uninstall()
+ 	state=inactive
+     fi
+ 
+-    for _TEMPDIR in /var/tmp /tmp
+-    do
+-      if test -w $_TEMPDIR
+-      then
+-	  _REGFILENAME=$_TEMPDIR/$$.mof
+-	  break
+-      fi
+-    done
++    _REGFILENAME=$(mktemp "${TMPDIR:-/tmp}/provider-register.XXXXXX.mof") || return 1
+ 
+-    trap "rm -f $_REGFILENAME" EXIT
++    trap 'rm -f "$_REGFILENAME"' EXIT
+ 
+-    if openwbem_transform $_REGFILENAME $*
++    if openwbem_transform "$_REGFILENAME" $*
+     then
+ 	chatter Deregistering providers with $state owcimomd
+-	$CIMMOF -r $_REGFILENAME > /dev/null
++	$CIMMOF -r "$_REGFILENAME" > /dev/null
+     else
+ 	echo "Failed to build OpenWBEM registration MOF." >&2
+ 	return 1
+-    fi       
++    fi
+ }
+ 
+ cim_server()

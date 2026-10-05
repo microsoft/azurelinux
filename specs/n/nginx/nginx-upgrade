@@ -1,19 +1,109 @@
-#!/bin/sh
-[ ! -f /run/nginx.pid ] && exit 1
-echo "Start new nginx master..."
-/bin/systemctl kill --signal=SIGUSR2 nginx.service
-sleep 5
-[ ! -f /run/nginx.pid.oldbin ] && sleep 10
-if [ ! -f /run/nginx.pid.oldbin ]; then
-    echo "Failed to start new nginx master."
-    exit 1
-fi
-echo "Stop old nginx master gracefully..."
-oldpid=`/usr/bin/cat /run/nginx.pid.oldbin 2>/dev/null`
-/bin/kill -s QUIT $oldpid 2>/dev/null
-sleep 5
-[ -f /run/nginx.pid.oldbin ] && sleep 10
-if [ -f /run/nginx.pid.oldbin ]; then
-    echo "Failed to stop old nginx master."
-    exit 1
-fi
+#!/bin/bash
+
+# nginx-upgrade - Upgrade all running nginx instances with zero downtime
+
+# Upgrade all running nginx instances by sending the USR2 signal to the
+# master process of each instance, then gracefully stopping the old master.
+# This allows for zero-downtime upgrades of nginx.
+
+# Last updated: 2026-03-08
+
+TIMEOUT=10
+
+wait_for_file() {
+	# usage: wait_for_file <present|absent> <file> <label>
+	local mode=$1 file=$2 label=$3
+	local i
+
+	for ((i=0; i<TIMEOUT; i++)); do
+		[[ $mode == present && -f $file ]] && return 0
+		[[ $mode == absent  && ! -f $file ]] && return 0
+		sleep 1
+	done
+
+	echo "ERROR: $label - file never ${mode}ed: $file" >&2
+	return 1
+}
+
+upgrade_instance() {
+	# usage: upgrade_instance <service-unit> <pid-file>
+	local unit="$1" pid_file="$2"
+	local old_pid_file="${pid_file}.oldbin"
+
+	if [ ! -f "$pid_file" ]; then
+		echo "[$unit] No PID file at $pid_file - skipping."
+		return 0
+	fi
+
+	echo "[$unit] Starting new master process..."
+	/bin/systemctl kill --signal=SIGUSR2 --kill-who=main "$unit"
+
+	wait_for_file present "$old_pid_file" "$unit - new master start" || return 1
+
+	echo "[$unit] New master is up. Gracefully stopping old master..."
+	local old_pid
+	old_pid=$(cat "$old_pid_file" 2>/dev/null)
+	/bin/kill -s QUIT "$old_pid" 2>/dev/null
+
+	wait_for_file absent "$old_pid_file" "$unit - old master stop" || return 1
+
+	echo "[$unit] Done."
+	return 0
+}
+
+overall_rc=0
+
+# Discover every active nginx instance via systemctl
+instances=$(systemctl list-units --type=service --state=running --no-legend "nginx*" |
+	awk '{print $1}' |
+	grep -E '^nginx(@\w+)?\.service$')
+
+for unit in $instances; do
+	pid_file=$(systemctl show "$unit" -p PIDFile --value)
+
+	if [ -z "$pid_file" ]; then
+		echo "[$unit] Could not determine PID file - skipping." >&2
+		continue
+	fi
+
+	upgrade_instance "$unit" "$pid_file"
+	rc=$?
+	[ $rc -ne 0 ] && overall_rc=$rc
+done
+
+exit $overall_rc
+
+: <<'POD'
+=pod
+
+=head1 NAME
+
+nginx-upgrade - tool to upgrade nginx without any downtime
+
+=head1 SYNOPSIS
+
+nginx-upgrade
+
+=head1 DESCRIPTION
+
+This downstream shell script updates nginx without any downtime. After
+upgrading nginx via the package manager, running this script will create
+a new nginx master. This master takes over all new requests. The old
+masters and workers are then gracefully shutdown without breaking any
+existing connections.
+
+For further information, see: L<http://nginx.org/en/docs/control.html>
+
+=head1 BUGS
+
+If you find any bugs, please send an email to the author.
+
+=head1 AUTHORS
+
+Felix Kaechele E<lt>felix@kaechele.caE<gt>
+
+Originally written by
+Jamie Nguyen E<lt>jamielinux@fedoraproject.orgE<gt>
+
+=cut
+POD

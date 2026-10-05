@@ -1,6 +1,6 @@
---- reqsign-http-send-reqwest-2.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ reqsign-http-send-reqwest-2.0.1/Cargo.toml	2025-11-05T11:46:28.493995+00:00
-@@ -72,9 +72,6 @@
+--- reqsign-http-send-reqwest-4.0.7/Cargo.toml	2006-07-24T01:21:28+00:00
++++ reqsign-http-send-reqwest-4.0.7/Cargo.toml	2026-09-26T06:25:05.378972+00:00
+@@ -68,9 +68,6 @@
  features = ["default-tls"]
  default-features = false
  

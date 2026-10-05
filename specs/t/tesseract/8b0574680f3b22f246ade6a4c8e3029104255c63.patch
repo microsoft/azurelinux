@@ -1,0 +1,760 @@
+diff -rupN --no-dereference tesseract-5.5.3/Makefile.am tesseract-5.5.3-new/Makefile.am
+--- tesseract-5.5.3/Makefile.am	2026-09-21 10:28:10.428681133 +0200
++++ tesseract-5.5.3-new/Makefile.am	2026-09-21 10:28:10.436503509 +0200
+@@ -1165,6 +1165,7 @@ check_PROGRAMS += imagedata_test
+ if !DISABLED_LEGACY_ENGINE
+ check_PROGRAMS += indexmapbidi_test
+ check_PROGRAMS += intfeaturemap_test
++check_PROGRAMS += intproto_test
+ endif # !DISABLED_LEGACY_ENGINE
+ check_PROGRAMS += intsimdmatrix_test
+ check_PROGRAMS += lang_model_test
+@@ -1323,6 +1324,12 @@ intfeaturemap_test_CPPFLAGS = $(unittest
+ intfeaturemap_test_LDADD = $(TRAINING_LIBS)
+ endif # !DISABLED_LEGACY_ENGINE
+ 
++if !DISABLED_LEGACY_ENGINE
++intproto_test_SOURCES = unittest/intproto_test.cc
++intproto_test_CPPFLAGS = $(unittest_CPPFLAGS)
++intproto_test_LDADD = $(TESS_LIBS)
++endif # !DISABLED_LEGACY_ENGINE
++
+ intsimdmatrix_test_SOURCES = unittest/intsimdmatrix_test.cc
+ intsimdmatrix_test_CPPFLAGS = $(unittest_CPPFLAGS)
+ if HAVE_AVX2
+diff -rupN --no-dereference tesseract-5.5.3/src/ccmain/tessedit.cpp tesseract-5.5.3-new/src/ccmain/tessedit.cpp
+--- tesseract-5.5.3/src/ccmain/tessedit.cpp	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/ccmain/tessedit.cpp	2026-09-21 10:28:10.436842574 +0200
+@@ -418,7 +418,9 @@ int Tesseract::init_tesseract_internal(c
+   // If only LSTM will be used, skip loading Tesseract classifier's
+   // pre-trained templates and dictionary.
+   bool init_tesseract = tessedit_ocr_engine_mode != OEM_LSTM_ONLY;
+-  program_editup(textbase, init_tesseract ? mgr : nullptr, init_tesseract ? mgr : nullptr);
++  if (!program_editup(textbase, init_tesseract ? mgr : nullptr, init_tesseract ? mgr : nullptr)) {
++    return -1;
++  }
+   return 0; // Normal exit
+ }
+ 
+diff -rupN --no-dereference tesseract-5.5.3/src/ccstruct/blamer.h tesseract-5.5.3-new/src/ccstruct/blamer.h
+--- tesseract-5.5.3/src/ccstruct/blamer.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/ccstruct/blamer.h	2026-09-21 10:28:10.434500467 +0200
+@@ -232,6 +232,7 @@ struct BlamerBundle {
+       lattice_size_ = other.lattice_size_;
+     } else {
+       lattice_data_ = nullptr;
++      lattice_size_ = 0;
+     }
+   }
+   const char *IncorrectReason() const;
+diff -rupN --no-dereference tesseract-5.5.3/src/ccutil/clst.h tesseract-5.5.3-new/src/ccutil/clst.h
+--- tesseract-5.5.3/src/ccutil/clst.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/ccutil/clst.h	2026-09-21 10:28:10.434932966 +0200
+@@ -146,6 +146,13 @@ public:
+   public:
+     Iterator() { // constructor
+       list = nullptr;
++      prev = nullptr;
++      current = nullptr;
++      next = nullptr;
++      cycle_pt = nullptr; // await explicit set
++      started_cycling = false;
++      ex_current_was_last = false;
++      ex_current_was_cycle_pt = false;
+     } // unassigned list
+ 
+   /***********************************************************************
+diff -rupN --no-dereference tesseract-5.5.3/src/ccutil/elst.h tesseract-5.5.3-new/src/ccutil/elst.h
+--- tesseract-5.5.3/src/ccutil/elst.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/ccutil/elst.h	2026-09-21 10:28:10.435349347 +0200
+@@ -209,6 +209,13 @@ public:
+   public:
+     Iterator() { // constructor
+       list = nullptr;
++      prev = nullptr;
++      current = nullptr;
++      next = nullptr;
++      cycle_pt = nullptr; // await explicit set
++      started_cycling = false;
++      ex_current_was_last = false;
++      ex_current_was_cycle_pt = false;
+     } // unassigned list
+     /***********************************************************************
+    *                          ELIST_ITERATOR::ELIST_ITERATOR
+diff -rupN --no-dereference tesseract-5.5.3/src/ccutil/kdpair.h tesseract-5.5.3-new/src/ccutil/kdpair.h
+--- tesseract-5.5.3/src/ccutil/kdpair.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/ccutil/kdpair.h	2026-09-21 10:28:10.435591532 +0200
+@@ -99,7 +99,7 @@ struct KDPairDec : public KDPair<Key, Da
+ template <typename Key, typename Data>
+ class KDPtrPair {
+ public:
+-  KDPtrPair() : data_(nullptr) {}
++  KDPtrPair() : data_(nullptr), key_{} {}
+   KDPtrPair(Key k, Data *d) : data_(d), key_(k) {}
+   // Copy constructor steals the pointer from src and nulls it in src, thereby
+   // moving the (single) ownership of the data.
+diff -rupN --no-dereference tesseract-5.5.3/src/classify/adaptive.cpp tesseract-5.5.3-new/src/classify/adaptive.cpp
+--- tesseract-5.5.3/src/classify/adaptive.cpp	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/classify/adaptive.cpp	2026-09-21 10:28:10.437111722 +0200
+@@ -67,10 +67,6 @@ ADAPT_CLASS_STRUCT::ADAPT_CLASS_STRUCT()
+   TempProtos(NIL_LIST) {
+   zero_all_bits(PermProtos, WordsInVectorOfSize(MAX_NUM_PROTOS));
+   zero_all_bits(PermConfigs, WordsInVectorOfSize(MAX_NUM_CONFIGS));
+-
+-  for (int i = 0; i < MAX_NUM_CONFIGS; i++) {
+-    TempConfigFor(this, i) = nullptr;
+-  }
+ }
+ 
+ ADAPT_CLASS_STRUCT::~ADAPT_CLASS_STRUCT() {
+@@ -92,25 +88,24 @@ ADAPT_CLASS_STRUCT::~ADAPT_CLASS_STRUCT(
+ 
+ /// Constructor for adapted templates.
+ /// Add an empty class for each char in unicharset to the newly created templates.
+-ADAPT_TEMPLATES_STRUCT::ADAPT_TEMPLATES_STRUCT(UNICHARSET &unicharset) {
+-  Templates = new INT_TEMPLATES_STRUCT;
+-  NumPermClasses = 0;
+-  NumNonEmptyClasses = 0;
+-
+-  /* Insert an empty class for each unichar id in unicharset */
+-  for (unsigned i = 0; i < MAX_NUM_CLASSES; i++) {
+-    Class[i] = nullptr;
+-    if (i < unicharset.size()) {
+-      AddAdaptedClass(this, new ADAPT_CLASS_STRUCT, i);
+-    }
++ADAPT_TEMPLATES_STRUCT::ADAPT_TEMPLATES_STRUCT(UNICHARSET &unicharset) :
++  Templates(new INT_TEMPLATES_STRUCT), NumNonEmptyClasses(0), NumPermClasses(0) {
++  // Insert an empty class for each unichar id in unicharset.
++  // Class is value-initialized to nullptr in-class.
++  for (unsigned i = 0; i < unicharset.size(); i++) {
++    AddAdaptedClass(this, new ADAPT_CLASS_STRUCT, i);
+   }
+ }
+ 
+ ADAPT_TEMPLATES_STRUCT::~ADAPT_TEMPLATES_STRUCT() {
+-  for (unsigned i = 0; i < (Templates)->NumClasses; i++) {
+-    delete Class[i];
++  if (Templates != nullptr) {
++    // NumClasses comes from an untrusted file, so never trust it to bound
++    // the loop over the fixed-size Class[] array.
++    for (unsigned i = 0; i < (Templates)->NumClasses && i < MAX_NUM_CLASSES; i++) {
++      delete Class[i];
++    }
++    delete Templates;
+   }
+-  delete Templates;
+ }
+ 
+ // Returns FontinfoId of the given config of the given adapted class.
+@@ -180,23 +175,32 @@ void Classify::PrintAdaptedTemplates(FIL
+  * @note Globals: none
+  */
+ ADAPT_CLASS_STRUCT *ReadAdaptedClass(TFile *fp) {
+-  int NumTempProtos;
+-  int NumConfigs;
++  int NumTempProtos = 0;
++  int NumConfigs = 0;
+   int i;
+   ADAPT_CLASS_STRUCT *Class;
+ 
+-  /* first read high level adapted class structure */
++  // first read high level adapted class structure
+   Class = new ADAPT_CLASS_STRUCT;
+   fp->FRead(Class, sizeof(ADAPT_CLASS_STRUCT), 1);
+ 
+-  /* then read in the definitions of the permanent protos and configs */
++  // then read in the definitions of the permanent protos and configs
+   Class->PermProtos = NewBitVector(MAX_NUM_PROTOS);
+   Class->PermConfigs = NewBitVector(MAX_NUM_CONFIGS);
+   fp->FRead(Class->PermProtos, sizeof(uint32_t), WordsInVectorOfSize(MAX_NUM_PROTOS));
+   fp->FRead(Class->PermConfigs, sizeof(uint32_t), WordsInVectorOfSize(MAX_NUM_CONFIGS));
+ 
+-  /* then read in the list of temporary protos */
++  // then read in the list of temporary protos
+   fp->FRead(&NumTempProtos, sizeof(int), 1);
++  if (NumTempProtos < 0 || NumTempProtos > MAX_NUM_PROTOS) {
++    tprintf("Bad read of adapted class!\n");
++    // Reset file-sourced pointers so the destructor does not delete them.
++    for (i = 0; i < MAX_NUM_CONFIGS; i++) {
++      Class->Config[i].Temp = nullptr;
++    }
++    delete Class;
++    return nullptr;
++  }
+   Class->TempProtos = NIL_LIST;
+   for (i = 0; i < NumTempProtos; i++) {
+     auto TempProto = new TEMP_PROTO_STRUCT;
+@@ -204,8 +208,20 @@ ADAPT_CLASS_STRUCT *ReadAdaptedClass(TFi
+     Class->TempProtos = push_last(Class->TempProtos, TempProto);
+   }
+ 
+-  /* then read in the adapted configs */
++  // then read in the adapted configs
+   fp->FRead(&NumConfigs, sizeof(int), 1);
++  // NumConfigs is used as a loop bound that writes into the fixed-size
++  // Config[] array, so reject a corrupt or malicious file instead of
++  // writing out of bounds.
++  if (NumConfigs < 0 || NumConfigs > MAX_NUM_CONFIGS) {
++    tprintf("Bad read of adapted class!\n");
++    // Reset file-sourced pointers so the destructor does not delete them.
++    for (i = 0; i < MAX_NUM_CONFIGS; i++) {
++      Class->Config[i].Temp = nullptr;
++    }
++    delete Class;
++    return nullptr;
++  }
+   for (i = 0; i < NumConfigs; i++) {
+     if (test_bit(Class->PermConfigs, i)) {
+       Class->Config[i].Perm = ReadPermConfig(fp);
+@@ -231,18 +247,35 @@ ADAPT_CLASS_STRUCT *ReadAdaptedClass(TFi
+ ADAPT_TEMPLATES_STRUCT *Classify::ReadAdaptedTemplates(TFile *fp) {
+   auto Templates = new ADAPT_TEMPLATES_STRUCT;
+ 
+-  /* first read the high level adaptive template struct */
+-  fp->FRead(Templates, sizeof(ADAPT_TEMPLATES_STRUCT), 1);
++  // first read in the high level adaptive template struct
++  if (fp->FRead(Templates, sizeof(ADAPT_TEMPLATES_STRUCT), 1) != 1) {
++    tprintf("Bad read of adapted templates!\n");
++    delete Templates;
++    return nullptr;
++  }
++  // The Class[] array was just filled with pointers read from the file;
++  // those are not valid allocations, so reset it before storing real ones.
++  for (unsigned i = 0; i < MAX_NUM_CLASSES; i++) {
++    Templates->Class[i] = nullptr;
++  }
+ 
+-  /* then read in the basic integer templates */
++  // then read in the basic integer templates
+   Templates->Templates = ReadIntTemplates(fp);
++  if (Templates->Templates == nullptr) {
++    delete Templates;
++    return nullptr;
++  }
+ 
+-  /* then read in the adaptive info for each class */
++  // then read in the adaptive info for each class
+   for (unsigned i = 0; i < (Templates->Templates)->NumClasses; i++) {
+     Templates->Class[i] = ReadAdaptedClass(fp);
++    if (Templates->Class[i] == nullptr) {
++      tprintf("Bad read of adapted templates (class %u)!\n", i);
++      delete Templates;
++      return nullptr;
++    }
+   }
+   return (Templates);
+-
+ } /* ReadAdaptedTemplates */
+ 
+ /*---------------------------------------------------------------------------*/
+diff -rupN --no-dereference tesseract-5.5.3/src/classify/adaptive.h tesseract-5.5.3-new/src/classify/adaptive.h
+--- tesseract-5.5.3/src/classify/adaptive.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/classify/adaptive.h	2026-09-21 10:28:10.437339390 +0200
+@@ -20,6 +20,7 @@
+ #include "intproto.h"
+ #include "oldlist.h"
+ 
++#include <array>
+ #include <cstdio>
+ 
+ namespace tesseract {
+@@ -61,18 +62,18 @@ struct ADAPT_CLASS_STRUCT {
+   BIT_VECTOR PermProtos;
+   BIT_VECTOR PermConfigs;
+   LIST TempProtos;
+-  ADAPTED_CONFIG Config[MAX_NUM_CONFIGS];
++  std::array<ADAPTED_CONFIG, MAX_NUM_CONFIGS> Config{};
+ };
+ 
+ class ADAPT_TEMPLATES_STRUCT {
+ public:
+-  ADAPT_TEMPLATES_STRUCT() = default;
++  ADAPT_TEMPLATES_STRUCT() : Templates(nullptr), NumNonEmptyClasses(0), NumPermClasses(0) {}
+   ADAPT_TEMPLATES_STRUCT(UNICHARSET &unicharset);
+   ~ADAPT_TEMPLATES_STRUCT();
+   INT_TEMPLATES_STRUCT *Templates;
+   int NumNonEmptyClasses;
+   uint8_t NumPermClasses;
+-  ADAPT_CLASS_STRUCT *Class[MAX_NUM_CLASSES];
++  std::array<ADAPT_CLASS_STRUCT *, MAX_NUM_CLASSES> Class{};
+ };
+ 
+ /*----------------------------------------------------------------------------
+diff -rupN --no-dereference tesseract-5.5.3/src/classify/adaptmatch.cpp tesseract-5.5.3-new/src/classify/adaptmatch.cpp
+--- tesseract-5.5.3/src/classify/adaptmatch.cpp	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/classify/adaptmatch.cpp	2026-09-21 10:28:10.437616318 +0200
+@@ -524,9 +524,9 @@ void Classify::EndAdaptiveClassifier() {
+  *      classify_use_pre_adapted_templates
+  *                            enables use of pre-adapted templates
+  */
+-void Classify::InitAdaptiveClassifier(TessdataManager *mgr) {
++bool Classify::InitAdaptiveClassifier(TessdataManager *mgr) {
+   if (!CLASSIFY_ENABLE_ADAPTIVE_MATCHER_OVERRIDE) {
+-    return;
++    return true;
+   }
+   if (AllProtosOn != nullptr) {
+     EndAdaptiveClassifier(); // Don't leak with multiple inits.
+@@ -538,6 +538,11 @@ void Classify::InitAdaptiveClassifier(Te
+     TFile fp;
+     ASSERT_HOST(mgr->GetComponent(TESSDATA_INTTEMP, &fp));
+     PreTrainedTemplates = ReadIntTemplates(&fp);
++    if (PreTrainedTemplates == nullptr) {
++      tprintf("Error: invalid inttemp component in traineddata, "
++              "cannot initialize the legacy engine.\n");
++      return false;
++    }
+ 
+     if (mgr->GetComponent(TESSDATA_SHAPE_TABLE, &fp)) {
+       shape_table_ = new ShapeTable(unicharset);
+@@ -580,17 +585,23 @@ void Classify::InitAdaptiveClassifier(Te
+       tprintf("\nReading pre-adapted templates from %s ...\n", Filename.c_str());
+       fflush(stdout);
+       AdaptedTemplates = ReadAdaptedTemplates(&fp);
+-      tprintf("\n");
+-      PrintAdaptedTemplates(stdout, AdaptedTemplates);
++      if (AdaptedTemplates == nullptr) {
++        tprintf("Error: invalid pre-adapted templates in %s, ignoring.\n", Filename.c_str());
++        AdaptedTemplates = new ADAPT_TEMPLATES_STRUCT(unicharset);
++      } else {
++        tprintf("\n");
++        PrintAdaptedTemplates(stdout, AdaptedTemplates);
+ 
+-      for (unsigned i = 0; i < AdaptedTemplates->Templates->NumClasses; i++) {
+-        BaselineCutoffs[i] = CharNormCutoffs[i];
++        for (unsigned i = 0; i < AdaptedTemplates->Templates->NumClasses; i++) {
++          BaselineCutoffs[i] = CharNormCutoffs[i];
++        }
+       }
+     }
+   } else {
+     delete AdaptedTemplates;
+     AdaptedTemplates = new ADAPT_TEMPLATES_STRUCT(unicharset);
+   }
++  return true;
+ } /* InitAdaptiveClassifier */
+ 
+ void Classify::ResetAdaptiveClassifierInternal() {
+@@ -1240,8 +1251,8 @@ UNICHAR_ID *Classify::BaselineClassifier
+   }
+ 
+   MasterMatcher(Templates->Templates, int_features.size(), &int_features[0], CharNormArray,
+-                Templates->Class, matcher_debug_flags, 0, Blob->bounding_box(), Results->CPResults,
+-                Results);
++                Templates->Class.data(), matcher_debug_flags, 0, Blob->bounding_box(),
++                Results->CPResults, Results);
+ 
+   delete[] CharNormArray;
+   CLASS_ID ClassId = Results->best_unichar_id;
+diff -rupN --no-dereference tesseract-5.5.3/src/classify/classify.h tesseract-5.5.3-new/src/classify/classify.h
+--- tesseract-5.5.3/src/classify/classify.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/classify/classify.h	2026-09-21 10:28:10.438050462 +0200
+@@ -164,7 +164,7 @@ public:
+   // provided to explicitly clarify the character segmentation.
+   void LearnPieces(const char *fontname, int start, int length, float threshold,
+                    CharSegmentationType segmentation, const char *correct_text, WERD_RES *word);
+-  void InitAdaptiveClassifier(TessdataManager *mgr);
++  bool InitAdaptiveClassifier(TessdataManager *mgr);
+   void InitAdaptedClass(TBLOB *Blob, CLASS_ID ClassId, int FontinfoId, ADAPT_CLASS_STRUCT *Class,
+                         ADAPT_TEMPLATES_STRUCT *Templates);
+   void AmbigClassifier(const std::vector<INT_FEATURE_STRUCT> &int_features,
+diff -rupN --no-dereference tesseract-5.5.3/src/classify/cluster.h tesseract-5.5.3-new/src/classify/cluster.h
+--- tesseract-5.5.3/src/classify/cluster.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/classify/cluster.h	2026-09-21 10:28:10.435765974 +0200
+@@ -32,7 +32,7 @@ constexpr int MAXBUCKETS = 39;
+           Types
+ ----------------------------------------------------------------------*/
+ struct CLUSTER {
+-  CLUSTER(size_t n) : Mean(n) {
++  CLUSTER(size_t n) : Left(nullptr), Right(nullptr), Mean(n) {
+   }
+ 
+   ~CLUSTER() {
+diff -rupN --no-dereference tesseract-5.5.3/src/classify/featdefs.h tesseract-5.5.3-new/src/classify/featdefs.h
+--- tesseract-5.5.3/src/classify/featdefs.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/classify/featdefs.h	2026-09-21 10:28:10.435932039 +0200
+@@ -47,9 +47,8 @@ using FEATURE_DEFS = FEATURE_DEFS_STRUCT
+ struct CHAR_DESC_STRUCT {
+   /// Allocate a new character description, initialize its
+   /// feature sets to be empty, and return it.
+-  CHAR_DESC_STRUCT(const FEATURE_DEFS_STRUCT &FeatureDefs) {
+-    NumFeatureSets = FeatureDefs.NumFeatureTypes;
+-  }
++  CHAR_DESC_STRUCT(const FEATURE_DEFS_STRUCT &FeatureDefs)
++      : NumFeatureSets(FeatureDefs.NumFeatureTypes), FeatureSets{} {}
+ 
+   /// Release the memory consumed by the specified character
+   /// description and all of the features in that description.
+diff -rupN --no-dereference tesseract-5.5.3/src/classify/intproto.cpp tesseract-5.5.3-new/src/classify/intproto.cpp
+--- tesseract-5.5.3/src/classify/intproto.cpp	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/classify/intproto.cpp	2026-09-21 10:28:10.439253621 +0200
+@@ -286,11 +286,10 @@ int AddIntProto(INT_CLASS_STRUCT *Class)
+     Class->ProtoLengths.resize(MaxNumIntProtosIn(Class));
+   }
+ 
+-  /* initialize proto so its length is zero and it isn't in any configs */
++  // initialize proto so its length is zero and it isn't in any configs
+   Class->ProtoLengths[Index] = 0;
+   auto Proto = ProtoForProtoId(Class, Index);
+-  for (uint32_t *Word = Proto->Configs; Word < Proto->Configs + WERDS_PER_CONFIG_VEC; *Word++ = 0) {
+-  }
++  Proto->Configs.fill(0);
+ 
+   return (Index);
+ }
+@@ -583,38 +582,36 @@ INT_CLASS_STRUCT::INT_CLASS_STRUCT(int M
+   assert(NumProtoSets <= MAX_NUM_PROTO_SETS);
+ 
+   for (int i = 0; i < NumProtoSets; i++) {
+-    /* allocate space for a proto set, install in class, and initialize */
++    // allocate space for a proto set, install in class, and initialize
+     auto ProtoSet = new PROTO_SET_STRUCT;
+     memset(ProtoSet, 0, sizeof(*ProtoSet));
+     ProtoSets[i] = ProtoSet;
+ 
+-    /* allocate space for the proto lengths and install in class */
++    // allocate space for the proto lengths and install in class
+   }
+-  memset(ConfigLengths, 0, sizeof(ConfigLengths));
+ }
+ 
+ INT_CLASS_STRUCT::~INT_CLASS_STRUCT() {
+-  for (int i = 0; i < NumProtoSets; i++) {
++  // NumProtoSets comes from an untrusted file, so never trust it to bound
++  // the loop over the fixed-size ProtoSets[] array.
++  for (int i = 0; i < NumProtoSets && i < MAX_NUM_PROTO_SETS; i++) {
+     delete ProtoSets[i];
+   }
+ }
+ 
+ /// This constructor allocates a new set of integer templates
+ /// initialized to hold 0 classes.
+-INT_TEMPLATES_STRUCT::INT_TEMPLATES_STRUCT() {
+-  NumClasses = 0;
+-  NumClassPruners = 0;
+-
+-  for (int i = 0; i < MAX_NUM_CLASSES; i++) {
+-    ClassForClassId(this, i) = nullptr;
+-  }
++INT_TEMPLATES_STRUCT::INT_TEMPLATES_STRUCT() : NumClasses(0), NumClassPruners(0) {
++  // Class and ClassPruners are value-initialized to nullptr in-class.
+ }
+ 
+ INT_TEMPLATES_STRUCT::~INT_TEMPLATES_STRUCT() {
+-  for (unsigned i = 0; i < NumClasses; i++) {
++  // The counts come from an untrusted file, so never trust them to bound
++  // the loops over the fixed-size arrays.
++  for (unsigned i = 0; i < NumClasses && i < MAX_NUM_CLASSES; i++) {
+     delete Class[i];
+   }
+-  for (unsigned i = 0; i < NumClassPruners; i++) {
++  for (unsigned i = 0; i < NumClassPruners && i < MAX_NUM_CLASS_PRUNERS; i++) {
+     delete ClassPruners[i];
+   }
+ }
+@@ -666,6 +663,20 @@ INT_TEMPLATES_STRUCT *Classify::ReadIntT
+     Templates->NumClasses = version_id;
+   }
+ 
++  // The counts read from the file are used as loop bounds that write into
++  // fixed-size arrays (Class[], ClassPruners[], TempClassPruner[] and
++  // IndexFor[]), so reject a corrupt or malicious file instead of writing
++  // out of bounds.
++  if (unicharset_size > MAX_NUM_CLASSES ||
++      Templates->NumClassPruners > MAX_NUM_CLASS_PRUNERS ||
++      Templates->NumClasses > MAX_NUM_CLASSES) {
++    tprintf("Error: invalid counts in inttemp: unicharset_size=%u, NumClassPruners=%u, "
++            "NumClasses=%u\n",
++            unicharset_size, Templates->NumClassPruners, Templates->NumClasses);
++    delete Templates;
++    return nullptr;
++  }
++
+   if (version_id < 3) {
+     MaxNumConfigs = OLD_MAX_NUM_CONFIGS;
+     WerdsPerConfigVec = OLD_WERDS_PER_CONFIG_VEC;
+@@ -705,6 +716,16 @@ INT_TEMPLATES_STRUCT *Classify::ReadIntT
+         max_class_id = ClassIdFor[i];
+       }
+     }
++    // Class ids index Class[] and (divided by CLASSES_PER_CP) ClassPruners[],
++    // so reject a corrupt or malicious file instead of writing out of bounds.
++    if (max_class_id >= MAX_NUM_CLASSES) {
++      tprintf("Error: class id %u in inttemp exceeds MAX_NUM_CLASSES\n", max_class_id);
++      for (unsigned i = 0; i < Templates->NumClassPruners; i++) {
++        delete TempClassPruner[i];
++      }
++      delete Templates;
++      return nullptr;
++    }
+     for (int i = 0; i <= CPrunerIdFor(max_class_id); i++) {
+       Templates->ClassPruners[i] = new CLASS_PRUNER_STRUCT;
+       memset(Templates->ClassPruners[i], 0, sizeof(CLASS_PRUNER_STRUCT));
+@@ -774,8 +795,20 @@ INT_TEMPLATES_STRUCT *Classify::ReadIntT
+       }
+     }
+     unsigned num_configs = version_id < 4 ? MaxNumConfigs : Class->NumConfigs;
+-    ASSERT_HOST(num_configs <= MaxNumConfigs);
+-    if (fp->FReadEndian(Class->ConfigLengths, sizeof(uint16_t), num_configs) != num_configs) {
++    // Class->NumProtoSets is used as a loop bound that writes into the
++    // fixed-size ProtoSets[] array, so reject a corrupt or malicious file
++    // instead of writing out of bounds.
++    if (Class->NumProtos > MAX_NUM_PROTOS || Class->NumProtoSets > MAX_NUM_PROTO_SETS ||
++        num_configs > MaxNumConfigs) {
++      tprintf("Error: invalid counts for class %u in inttemp: NumProtos=%u, NumProtoSets=%u, "
++              "NumConfigs=%u\n",
++              i, Class->NumProtos, Class->NumProtoSets, Class->NumConfigs);
++      Class->NumProtoSets = 0; // no proto sets allocated yet; keep destructor safe
++      delete Class;
++      delete Templates;
++      return nullptr;
++    }
++    if (fp->FReadEndian(Class->ConfigLengths.data(), sizeof(uint16_t), num_configs) != num_configs) {
+       tprintf("Bad read of inttemp!\n");
+     }
+     if (version_id < 2) {
+@@ -809,8 +842,9 @@ INT_TEMPLATES_STRUCT *Classify::ReadIntT
+             fp->FRead(&ProtoSet->Protos[x].Angle, sizeof(ProtoSet->Protos[x].Angle), 1) != 1) {
+           tprintf("Bad read of inttemp!\n");
+         }
+-        if (fp->FReadEndian(&ProtoSet->Protos[x].Configs, sizeof(ProtoSet->Protos[x].Configs[0]),
+-                            WerdsPerConfigVec) != WerdsPerConfigVec) {
++        if (fp->FReadEndian(ProtoSet->Protos[x].Configs.data(),
++                            sizeof(ProtoSet->Protos[x].Configs[0]), WerdsPerConfigVec) !=
++            WerdsPerConfigVec) {
+           tprintf("Bad read of inttemp!\n");
+         }
+       }
+diff -rupN --no-dereference tesseract-5.5.3/src/classify/intproto.h tesseract-5.5.3-new/src/classify/intproto.h
+--- tesseract-5.5.3/src/classify/intproto.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/classify/intproto.h	2026-09-21 10:28:10.439709784 +0200
+@@ -80,14 +80,14 @@ struct INT_PROTO_STRUCT {
+   uint8_t B;
+   int8_t C;
+   uint8_t Angle;
+-  uint32_t Configs[WERDS_PER_CONFIG_VEC];
++  std::array<uint32_t, WERDS_PER_CONFIG_VEC> Configs{};
+ };
+ 
+ typedef uint32_t PROTO_PRUNER[NUM_PP_PARAMS][NUM_PP_BUCKETS][WERDS_PER_PP_VECTOR];
+ 
+ struct PROTO_SET_STRUCT {
+   PROTO_PRUNER ProtoPruner;
+-  INT_PROTO_STRUCT Protos[PROTOS_PER_PROTO_SET];
++  std::array<INT_PROTO_STRUCT, PROTOS_PER_PROTO_SET> Protos{};
+ };
+ 
+ typedef uint32_t CONFIG_PRUNER[NUM_PP_PARAMS][NUM_PP_BUCKETS][4];
+@@ -99,9 +99,9 @@ struct INT_CLASS_STRUCT {
+   uint16_t NumProtos = 0;
+   uint8_t NumProtoSets = 0;
+   uint8_t NumConfigs = 0;
+-  PROTO_SET_STRUCT *ProtoSets[MAX_NUM_PROTO_SETS];
++  std::array<PROTO_SET_STRUCT *, MAX_NUM_PROTO_SETS> ProtoSets{};
+   std::vector<uint8_t> ProtoLengths;
+-  uint16_t ConfigLengths[MAX_NUM_CONFIGS];
++  std::array<uint16_t, MAX_NUM_CONFIGS> ConfigLengths{};
+   int font_set_id = 0; // FontSet id, see above
+ };
+ 
+@@ -110,8 +110,8 @@ struct TESS_API INT_TEMPLATES_STRUCT {
+   ~INT_TEMPLATES_STRUCT();
+   unsigned NumClasses;
+   unsigned NumClassPruners;
+-  INT_CLASS_STRUCT *Class[MAX_NUM_CLASSES];
+-  CLASS_PRUNER_STRUCT *ClassPruners[MAX_NUM_CLASS_PRUNERS];
++  std::array<INT_CLASS_STRUCT *, MAX_NUM_CLASSES> Class{};
++  std::array<CLASS_PRUNER_STRUCT *, MAX_NUM_CLASS_PRUNERS> ClassPruners{};
+ };
+ 
+ /* definitions of integer features*/
+diff -rupN --no-dereference tesseract-5.5.3/src/wordrec/tface.cpp tesseract-5.5.3-new/src/wordrec/tface.cpp
+--- tesseract-5.5.3/src/wordrec/tface.cpp	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/wordrec/tface.cpp	2026-09-21 10:28:10.440019643 +0200
+@@ -36,14 +36,16 @@ namespace tesseract {
+  * init_permute determines whether to initialize the permute functions
+  * and Dawg models.
+  */
+-void Wordrec::program_editup(const std::string &textbase, TessdataManager *init_classifier,
++bool Wordrec::program_editup(const std::string &textbase, TessdataManager *init_classifier,
+                              TessdataManager *init_dict) {
+   if (!textbase.empty()) {
+     imagefile = textbase;
+   }
+ #ifndef DISABLED_LEGACY_ENGINE
+   InitFeatureDefs(&feature_defs_);
+-  InitAdaptiveClassifier(init_classifier);
++  if (!InitAdaptiveClassifier(init_classifier)) {
++    return false;
++  }
+   if (init_dict) {
+     getDict().SetupForLoad(Dict::GlobalDawgCache());
+     getDict().Load(lang, init_dict);
+@@ -51,6 +53,7 @@ void Wordrec::program_editup(const std::
+   }
+   pass2_ok_split = chop_ok_split;
+ #endif // ndef DISABLED_LEGACY_ENGINE
++  return true;
+ }
+ 
+ /**
+diff -rupN --no-dereference tesseract-5.5.3/src/wordrec/wordrec.h tesseract-5.5.3-new/src/wordrec/wordrec.h
+--- tesseract-5.5.3/src/wordrec/wordrec.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/wordrec/wordrec.h	2026-09-21 10:28:10.440242992 +0200
+@@ -50,7 +50,7 @@ public:
+   virtual ~Wordrec() = default;
+ 
+   // tface.cpp
+-  void program_editup(const std::string &textbase, TessdataManager *init_classifier,
++  bool program_editup(const std::string &textbase, TessdataManager *init_classifier,
+                       TessdataManager *init_dict);
+   void program_editdown();
+   int end_recog();
+@@ -243,7 +243,7 @@ public:
+   }
+ 
+   // tface.cpp
+-  void program_editup(const std::string &textbase, TessdataManager *init_classifier,
++  bool program_editup(const std::string &textbase, TessdataManager *init_classifier,
+                       TessdataManager *init_dict);
+   void cc_recog(WERD_RES *word);
+   void program_editdown();
+diff -rupN --no-dereference tesseract-5.5.3/unittest/CMakeLists.txt tesseract-5.5.3-new/unittest/CMakeLists.txt
+--- tesseract-5.5.3/unittest/CMakeLists.txt	2026-09-21 10:28:10.193362629 +0200
++++ tesseract-5.5.3-new/unittest/CMakeLists.txt	2026-09-21 10:28:10.440480523 +0200
+@@ -58,6 +58,7 @@ set(LEGACY_TESTS
+     equationdetect_test.cc
+     indexmapbidi_test.cc
+     intfeaturemap_test.cc
++    intproto_test.cc
+     mastertrainer_test.cc
+     normproto_test.cc
+     osd_test.cc
+diff -rupN --no-dereference tesseract-5.5.3/unittest/intproto_test.cc tesseract-5.5.3-new/unittest/intproto_test.cc
+--- tesseract-5.5.3/unittest/intproto_test.cc	1970-01-01 01:00:00.000000000 +0100
++++ tesseract-5.5.3-new/unittest/intproto_test.cc	2026-09-21 10:28:10.440747501 +0200
+@@ -0,0 +1,124 @@
++///////////////////////////////////////////////////////////////////////
++// File:        intproto_test.cc
++// Description: Tests that a corrupt TESSDATA_INTTEMP component in a
++//              .traineddata file is rejected without memory corruption.
++//              The count fields (NumClassPruners, NumClasses,
++//              NumProtoSets) are read from the untrusted file and used
++//              as loop bounds that write into fixed-size arrays in
++//              Classify::ReadIntTemplates, so they must be validated
++//              before use.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++// http://www.apache.org/licenses/LICENSE-2.0
++//
++///////////////////////////////////////////////////////////////////////
++
++#include "include_gunit.h"
++
++#include <tesseract/baseapi.h>
++
++#include "intproto.h"     // for MAX_NUM_CLASS_PRUNERS, MAX_NUM_CLASSES
++#include "tessdatamanager.h"
++
++#include <cstdint>
++#include <cstdio>
++#include <cstdlib>
++#include <string>
++#include <vector>
++
++namespace tesseract {
++namespace {
++
++// Minimal legacy unicharset component (two characters: space and 'a').
++const char kMinUnicharset[] =
++    "2\n"
++    "NULL 1 0,255,0,255,0,0,0,0,0,0 Latin 2 0 2\n"
++    "a 1 0,255,0,255,0,0,0,0,0,0 Latin 2 0 2\n";
++
++// Builds an inttemp component in the current (version -5) on-disk layout,
++// as written by Classify::WriteIntTemplates:
++//   uint32 unicharset_size, int32 version_id, uint32 NumClassPruners,
++//   uint32 NumClasses, then per class: uint16 NumProtos, uint8 NumProtoSets,
++//   uint8 NumConfigs.
++std::vector<char> MakeInttemp(int32_t version_id, uint32_t num_class_pruners,
++                              uint32_t num_classes, uint32_t unicharset_size,
++                              uint8_t num_proto_sets = 0) {
++  std::vector<char> data;
++  auto append = [&data](const void *p, size_t n) {
++    const char *b = static_cast<const char *>(p);
++    data.insert(data.end(), b, b + n);
++  };
++  append(&unicharset_size, sizeof(unicharset_size));
++  append(&version_id, sizeof(version_id));
++  append(&num_class_pruners, sizeof(num_class_pruners));
++  append(&num_classes, sizeof(num_classes));
++  for (uint32_t c = 0; c < num_classes && c < MAX_NUM_CLASSES; ++c) {
++    uint16_t num_protos = 0;
++    uint8_t num_configs = 0;
++    append(&num_protos, sizeof(num_protos));
++    append(&num_proto_sets, sizeof(num_proto_sets));
++    append(&num_configs, sizeof(num_configs));
++  }
++  return data;
++}
++
++// Writes a traineddata file with a minimal unicharset and the given
++// (corrupt) inttemp component to dir/eng.traineddata.
++bool WriteCorruptTraineddata(const std::string &dir, const std::vector<char> &inttemp) {
++  TessdataManager mgr;
++  mgr.OverwriteEntry(TESSDATA_UNICHARSET, kMinUnicharset, sizeof(kMinUnicharset) - 1);
++  mgr.OverwriteEntry(TESSDATA_INTTEMP, inttemp.data(), static_cast<int>(inttemp.size()));
++  return mgr.SaveFile((dir + "/eng.traineddata").c_str(), nullptr);
++}
++
++class IntprotoTest : public testing::Test {
++protected:
++  void SetUp() override {
++    tmpl_ = "/tmp/tess_intproto_test_XXXXXX";
++    char *dir = mkdtemp(tmpl_.data());
++    ASSERT_NE(dir, nullptr);
++    dir_ = dir;
++  }
++  void TearDown() override {
++    std::remove((dir_ + "/eng.traineddata").c_str());
++    rmdir(dir_.c_str());
++  }
++  // Expects the legacy engine to reject the corrupted traineddata
++  // gracefully (init failure) instead of corrupting memory.
++  void ExpectInitFails(const std::vector<char> &inttemp) {
++    ASSERT_TRUE(WriteCorruptTraineddata(dir_, inttemp));
++    tesseract::TessBaseAPI api;
++    EXPECT_EQ(api.Init(dir_.c_str(), "eng", tesseract::OEM_TESSERACT_ONLY), -1);
++  }
++  std::string dir_;
++  std::string tmpl_;
++};
++
++// NumClassPruners exceeds MAX_NUM_CLASS_PRUNERS: the pruner-read loop would
++// write past the end of INT_TEMPLATES_STRUCT::ClassPruners[].
++TEST_F(IntprotoTest, RejectsTooManyClassPruners) {
++  ExpectInitFails(MakeInttemp(-5, MAX_NUM_CLASS_PRUNERS + 1, 0, 1));
++}
++
++// NumClasses exceeds MAX_NUM_CLASSES: the class-read loop would write past
++// the end of INT_TEMPLATES_STRUCT::Class[].
++TEST_F(IntprotoTest, RejectsTooManyClasses) {
++  ExpectInitFails(MakeInttemp(-5, 0, MAX_NUM_CLASSES + 1, 1));
++}
++
++// A class with NumProtoSets > MAX_NUM_PROTO_SETS: the proto-set loop would
++// write past the end of INT_CLASS_STRUCT::ProtoSets[].
++TEST_F(IntprotoTest, RejectsTooManyProtoSets) {
++  ExpectInitFails(MakeInttemp(-5, 0, 1, 1, MAX_NUM_PROTO_SETS + 1));
++}
++
++// unicharset_size exceeds MAX_NUM_CLASSES: the version < 2 class-id-index
++// read would write past the end of IndexFor[].
++TEST_F(IntprotoTest, RejectsTooLargeUnicharsetSize) {
++  ExpectInitFails(MakeInttemp(-1, 0, 0, MAX_NUM_CLASSES + 1));
++}
++
++} // namespace
++} // namespace tesseract

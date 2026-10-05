@@ -12,8 +12,7 @@
   %undefine _strict_symbol_defs_build \
   cp -a "%{_nginx_srcdir}" "%{_nginx_buildsrcdir}" \
   cd "%{_nginx_buildsrcdir}" \
-  nginx_ldopts="$RPM_LD_FLAGS -Wl,-E" \
-  ./configure --with-compat --with-cc-opt="%{optflags} $(pcre-config --cflags)" --with-ld-opt="$nginx_ldopts" \\\
+  ./configure --with-compat --with-cc-opt="%{optflags}" --with-ld-opt="$RPM_LD_FLAGS" \\\
               --add-dynamic-module=$(realpath %{_nginx_modsrcdir}) --builddir=$(realpath %{_nginx_modbuilddir}) %{**} \
   cd -
 

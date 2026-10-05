@@ -2,3 +2,17 @@
 
 [licensing]
 detector = "trivy"
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.MPL-2.0"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "MPL-2.0"
+
+[[licensing.licenses]]
+path = "vendor/cyphar.com/go-pathrs/COPYING"
+sha256sum = "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+expression = "MPL-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/cyphar/filepath-securejoin/LICENSE.BSD"
+sha256sum = "26be8a79415737dfe8edf1be62e71afeb8c770ed5a5605a06270d5701830f47c"
+expression = "BSD-3-Clause"

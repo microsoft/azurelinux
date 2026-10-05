@@ -23,13 +23,18 @@
 
 
 Name:           SDL3
-Version:        3.4.0
-Release: 6%{?dist}
+Version:        3.4.16
+Release: 5%{?dist}
 Summary:        Cross-platform multimedia library
 License:        Zlib AND MIT AND Apache-2.0 AND (Apache-2.0 OR MIT)
 URL:            http://www.libsdl.org/
+
 Source0:        http://www.libsdl.org/release/%{name}-%{version}.tar.gz
-Source1:        SDL3_revision.h
+Source1:        http://www.libsdl.org/release/%{name}-%{version}.tar.gz.sig
+# Taken from: https://www.libsdl.org/signing-keys.php
+Source2:        SDL3.pgp
+
+Source10:       SDL3_revision.h
 
 # Patches from upstream
 
@@ -141,6 +146,8 @@ Testing libraries for SDL3.
 
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+
 %autosetup -S git_am
 sed -e 's/\r//g' -i README.md WhatsNew.txt BUGS.txt LICENSE.txt CREDITS.md
 
@@ -172,7 +179,7 @@ export LDFLAGS="%{shrink:%{build_ldflags}}"
 # multilib systems and install SDL_revision.h wrapper
 # TODO: Figure out how in the hell the SDL_REVISION changes between architectures on the same SRPM.
 mv %{buildroot}%{_includedir}/SDL3/SDL_revision.h %{buildroot}%{_includedir}/SDL3/SDL_revision-%{_arch}.h
-install -p -m 644 %{SOURCE1} %{buildroot}%{_includedir}/SDL3/SDL_revision.h
+install -p -m 644 %{SOURCE10} %{buildroot}%{_includedir}/SDL3/SDL_revision.h
 
 
 %files
@@ -205,6 +212,25 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_includedir}/SDL3/SDL_revision.h
 
 
 %changelog
+* Thu Sep 03 2026 Artur Frenszek-Iwicki <fedora@svgames.pl> - 3.4.16-1
+- Update to v3.4.16
+- gpgverify the sources
+
+* Tue Aug 04 2026 Artur Frenszek-Iwicki <fedora@svgames.pl> - 3.4.14-1
+- Update to v3.4.14
+
+* Thu Jul 02 2026 Artur Frenszek-Iwicki <fedora@svgames.pl> - 3.4.12-1
+- Update to v3.4.12
+
+* Mon Jun 01 2026 Artur Frenszek-Iwicki <fedora@svgames.pl> - 3.4.10-1
+- Update to v3.4.10
+
+* Sat May 02 2026 Artur Frenszek-Iwicki <fedora@svgames.pl> - 3.4.8-1
+- Update to v3.4.8
+
+* Wed Apr 29 2026 Artur Frenszek-Iwicki <fedora@svgames.pl> - 3.4.4-1
+- Update to v3.4.4
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

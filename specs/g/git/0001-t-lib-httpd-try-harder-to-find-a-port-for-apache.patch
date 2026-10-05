@@ -26,14 +26,14 @@ setting GIT_TEST_START_HTTPD_TRIES to a different value.
 Helped-by: Ondřej Pohořelský <opohorel@redhat.com>
 Signed-off-by: Todd Zullinger <tmz@pobox.com>
 ---
- t/lib-httpd.sh | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+ t/lib-httpd.sh | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
 diff --git a/t/lib-httpd.sh b/t/lib-httpd.sh
-index 2fb1b2ae56..4afdf5a6aa 100644
+index fc646447d5c0..f41176fbfdb8 100644
 --- a/t/lib-httpd.sh
 +++ b/t/lib-httpd.sh
-@@ -206,19 +206,26 @@ enable_cgipassauth () {
+@@ -231,18 +231,26 @@ enable_cgipassauth () {
  }
  
  start_httpd() {
@@ -41,11 +41,10 @@ index 2fb1b2ae56..4afdf5a6aa 100644
 -
  	test_atexit stop_httpd
  
--	"$LIB_HTTPD_PATH" -d "$HTTPD_ROOT_PATH" \
+-	if ! "$LIB_HTTPD_PATH" -d "$HTTPD_ROOT_PATH" \
 -		-f "$TEST_PATH/apache.conf" $HTTPD_PARA \
 -		-c "Listen 127.0.0.1:$LIB_HTTPD_PORT" -k start \
 -		>&3 2>&4
--	if test $? -ne 0
 -	then
 -		cat "$HTTPD_ROOT_PATH"/error.log >&4 2>/dev/null
 -		test_skip_or_die GIT_TEST_HTTPD "web server setup failed"

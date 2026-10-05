@@ -1,0 +1,25 @@
+From da138e7b28a7c5e8ea2bb1ae099245d65e23ec5e Mon Sep 17 00:00:00 2001
+From: Fan <ffan@redhat.com>
+Date: Mon, 3 Nov 2025 19:54:03 +0800
+Subject: [PATCH] Update sg_safte.c  to update short option of version
+
+Update sg_safte.c to update short oprtion of version from -v to -V.
+
+Signed-off-by: Fan Fan <ffan@redhat.com>
+---
+ src/sg_safte.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sg_safte.c b/src/sg_safte.c
+index 26d34169..2319ee83 100644
+--- a/src/sg_safte.c
++++ b/src/sg_safte.c
+@@ -492,7 +492,7 @@ usage()
+             "to stdout\n"
+             "    --usage|-u          output usage statistics\n"
+             "    --verbose|-v        increase verbosity\n"
+-            "    --version|-v        output version then exit\n\n"
++            "    --version|-V        output version then exit\n\n"
+             "Queries a SAF-TE processor device\n");
+ }
+ 

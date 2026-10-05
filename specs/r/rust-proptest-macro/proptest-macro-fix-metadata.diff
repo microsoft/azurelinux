@@ -1,0 +1,11 @@
+--- proptest-macro-0.5.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ proptest-macro-0.5.0/Cargo.toml	2026-03-25T19:36:25.856681+00:00
+@@ -41,7 +41,7 @@
+ proc-macro = true
+ 
+ [dependencies.convert_case]
+-version = "0.11"
++version = ">=0.10,<0.12"
+ 
+ [dependencies.proc-macro2]
+ version = "1.0"

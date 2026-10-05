@@ -1,5 +1,5 @@
---- getrandom-0.2.16/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ getrandom-0.2.16/Cargo.toml	2025-05-01T13:06:37.147769+00:00
+--- getrandom-0.2.17/Cargo.toml	2006-07-24T01:21:28+00:00
++++ getrandom-0.2.17/Cargo.toml	2026-03-20T11:22:55.885239+00:00
 @@ -53,17 +53,9 @@
  
  [features]

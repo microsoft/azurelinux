@@ -1,0 +1,20 @@
+diff --git a/src/openslide-decode-tiff.c b/src/openslide-decode-tiff.c
+index 1988bd7d4879..9364639bf95d 100644
+--- a/src/openslide-decode-tiff.c
++++ b/src/openslide-decode-tiff.c
+@@ -303,9 +303,14 @@ bool _openslide_tiff_read_tile(struct _openslide_tiff_level *tiffl,
+     _openslide_performance_warn_once(&tiffl->warned_read_indirect,
+                                      "Using slow libtiff read path for "
+                                      "directory %d", tiffl->dir);
++    // artificially limit dest height so libtiff 4.7.1 won't unpad the
++    // bottom row of tiles into the bottom pixels of dest
++    // https://gitlab.com/libtiff/libtiff/-/issues/791
++    uint32_t clipped_h =
++      MIN(tiffl->tile_h, MAX(tiffl->image_h - tile_row * tiffl->tile_h, 0));
+     return tiff_read_region(tiff, dest,
+                             tile_col * tiffl->tile_w, tile_row * tiffl->tile_h,
+-                            tiffl->tile_w, tiffl->tile_h, err);
++                            tiffl->tile_w, clipped_h, err);
+   }
+ }
+ 

@@ -1,0 +1,188 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Kevin Buettner <kevinb@redhat.com>
+Date: Wed, 25 Feb 2026 23:34:29 -0700
+Subject: gdb-rhbz2413405-gcore-unreadable-pages.patch
+
+;; Backport of upstream commit c1da013915e from Kevin Buettner
+;; (RHBZ 2413405).
+
+gcore: Handle unreadable pages within readable memory regions
+
+GLIBC 2.42 changed how thread stack guard pages are implemented [2].
+In GLIBC 2.41 and earlier, guard pages were set up using mprotect() to
+mark guard regions with no permissions.  Once configured, guard pages
+were visible as separate entries in /proc/PID/maps with no permissions
+(i.e. they're inaccessible).  In GLIBC 2.42, guard pages are
+installed using the kernel's MADV_GUARD_INSTALL mechanism [1], which
+marks them at the page table entry (PTE) level within the existing
+mapping.
+
+As a consequence, guard pages do not appear as separate entries in
+/proc/PID/maps, but remain as part of the containing mapping.  Moreover,
+thread stacks from multiple mmap() calls may be merged into a single
+virtual memory area (VMA) with read and write permissions since there's
+no guard page VMA to separate them.  These guard pages cannot be
+distinguished by examining VMA listings but do return EIO when read
+from /proc/PID/mem.
+
+GDB's gcore code reads /proc/PID/smaps to discover memory regions and
+creates one BFD section per mapping.  (On linux, this is performed in
+linux_find_memory_regions_full in linux-tdep.c.) With the old layout,
+memory areas with guard pages appeared separately with no permissions,
+which were filtered out.  Each thread stack became its own section
+containing only readable data.  With the new layout, using
+MADV_GUARD_INSTALL instead of the older mechanism, it's often the case
+that thread stacks created with multiple calls to mmap() are exposed
+as a single mapping appearing in /proc/PID/smaps with read and write
+permissions.  Should that happen, GDB's code creates a single section
+covering all thread stacks and their guard pages.  (Even if each
+thread stack appears in its own mapping, the fact remains that there
+will be an inaccessible portion of the mapping.  When one or more
+thread stacks are coalesced into a single mapping, there will be
+several inaccessible "holes" representing the guard pages.)
+
+When gcore_copy_callback copies section contents, it reads memory in
+1MB (MAX_COPY_BYTES) chunks.  If any page in the chunk is a guard page,
+the call to target_read_memory() fails.  The old code responded by
+breaking out of the copy loop, abandoning the entire section.  This
+prevents correct copying of thread stack data, resulting in core files
+with zero-filled thread stacks, resulting in nearly empty backtraces.
+
+Fix this by falling back to page-by-page reading when a 1MB chunk read
+fails.  Individual pages that cannot be read are filled with zeros,
+allowing the remaining readable memory to be captured.
+
+I also considered a simpler change using the value of
+FALLBACK_PAGE_SIZE (4096) as the read size instead of MAX_COPY_BYTES
+(1MB).  This would avoid the fallback logic but would cause up to 256x
+more syscalls.  The proposed approach also allows meaningful warnings:
+we warn only if an entire region is unreadable (indicating a real
+problem), whereas per-page reads would make it harder to distinguish
+guard page failures from actual errors.  Since guard pages are at
+offset 0 for downward-growing stacks, a large target_read_memory()
+fails early at the first unreadable byte anyway.
+
+With this fix, I see 16 failures resolved in the following test cases:
+
+    gdb.ada/task_switch_in_core.exp
+    gdb.arch/i386-tls-regs.exp
+    gdb.threads/threadcrash.exp
+    gdb.threads/tls-core.exp
+
+Looking at just one of these, from gdb.log without the fix, I see:
+
+  thread apply 5 backtrace
+
+  Thread 5 (LWP 3414829):
+  #0  0x00007ffff7d1d982 in __syscall_cancel_arch () from /lib64/libc.so.6
+  #1  0x0000000000000000 in ?? ()
+  (gdb) FAIL: gdb.threads/threadcrash.exp: test_gcore: thread apply 5 backtrace
+
+And this is what it looks like with the fix in place (some paths have
+been shortened):
+
+  thread apply 5 backtrace
+
+  Thread 5 (Thread 0x7fffeffff6c0 (LWP 1282651) "threadcrash"):
+  #0  0x00007ffff7d1d982 in __syscall_cancel_arch () from /lib64/libc.so.6
+  #1  0x00007ffff7d11c3c in __internal_syscall_cancel () from /lib64/libc.so.6
+  #2  0x00007ffff7d61b62 in clock_nanosleep@GLIBC_2.2.5 () from /lib64/libc.so.6
+  #3  0x00007ffff7d6db37 in nanosleep () from /lib64/libc.so.6
+  #4  0x00007ffff7d8008e in sleep () from /lib64/libc.so.6
+  #5  0x00000000004006a8 in do_syscall_task (location=NORMAL) at threadcrash.c:158
+  #6  0x0000000000400885 in thread_function (arg=0x404340) at threadcrash.c:277
+  #7  0x00007ffff7d15464 in start_thread () from /lib64/libc.so.6
+  #8  0x00007ffff7d985ac in __clone3 () from /lib64/libc.so.6
+  (gdb) PASS: gdb.threads/threadcrash.exp: test_live_inferior: thread apply 5 backtrace
+
+Regression testing on Fedora 42 (glibc 2.41) shows no new failures.
+
+The v1 patch used SPARSE_BLOCK_SIZE as the fallback size.  While it
+was the correct size, it's used for an entirely different purpose
+elsewhere in this file.  This v2 commit introduces the constant
+FALLBACK_PAGE_SIZE instead.
+
+References:
+
+[1] Linux commit 662df3e5c376 ("mm: madvise: implement lightweight
+    guard page mechanism")
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=662df3e5c37666d6ed75c88098699e070a4b35b5
+[2] glibc commit a6fbe36b7f31 ("nptl: Add support for setup guard
+    pages with MADV_GUARD_INSTALL")
+    https://sourceware.org/git/?p=glibc.git;a=commit;h=a6fbe36b7f31292981422692236465ab56670ea9
+
+Claude Opus 4.5 and GLM 4.7 assisted with the development of this commit.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=33855
+Approved-By: Tom de Vries <tdevries@suse.de>
+
+diff --git a/gdb/gcore.c b/gdb/gcore.c
+--- a/gdb/gcore.c
++++ b/gdb/gcore.c
+@@ -744,6 +744,12 @@ sparse_bfd_set_section_contents (bfd *obfd, asection *osec,
+   return true;
+ }
+ 
++/* Fallback page size to use when target_read_memory fails when attempting
++   to read MAX_COPY_BYTES in gcore_copy_callback.  4KB is the correct size
++   to use for x86 and most other architectures.  Some may have larger pages,
++   but this size will still work at the cost of more syscalls.  */
++#define FALLBACK_PAGE_SIZE 0x1000
++
+ static void
+ gcore_copy_callback (bfd *obfd, asection *osec)
+ {
+@@ -766,15 +772,45 @@ gcore_copy_callback (bfd *obfd, asection *osec)
+       if (size > total_size)
+ 	size = total_size;
+ 
+-      if (target_read_memory (bfd_section_vma (osec) + offset,
+-			      memhunk.data (), size) != 0)
++      CORE_ADDR vma = bfd_section_vma (osec) + offset;
++
++      if (target_read_memory (vma, memhunk.data (), size) != 0)
+ 	{
+-	  warning (_("Memory read failed for corefile "
+-		     "section, %s bytes at %s."),
+-		   plongest (size),
+-		   paddress (current_inferior ()->arch (),
+-			     bfd_section_vma (osec)));
+-	  break;
++	  /* Large read failed.  This can happen when the memory region
++	     contains unreadable pages (such as guard pages embedded within
++	     a larger mapping).  Fall back to reading page by page, filling
++	     unreadable pages with zeros.  */
++	  gdb_byte *p = memhunk.data ();
++	  bfd_size_type remaining = size;
++	  CORE_ADDR addr = vma;
++	  bool at_least_one_page_read = false;
++
++	  while (remaining > 0)
++	    {
++	      bfd_size_type chunk_size
++		= std::min (remaining, (bfd_size_type) FALLBACK_PAGE_SIZE);
++
++	      if (target_read_memory (addr, p, chunk_size) != 0)
++		{
++		  /* Failed to read this page.  Fill with zeros.  This
++		     handles guard pages and other unreadable regions
++		     that may exist within a larger readable mapping.  */
++		  memset (p, 0, chunk_size);
++		}
++	      else
++		at_least_one_page_read = true;
++
++	      p += chunk_size;
++	      addr += chunk_size;
++	      remaining -= chunk_size;
++	    }
++	  /* Warn only if the entire region was unreadable - this
++	     indicates a real problem, not just embedded guard pages. */
++	  if (!at_least_one_page_read)
++	    warning (_("Memory read failed for corefile "
++		       "section, %s bytes at %s."),
++		     plongest (size),
++		     paddress (current_inferior ()->arch (), vma));
+ 	}
+ 
+       if (!sparse_bfd_set_section_contents (obfd, osec, memhunk.data (),

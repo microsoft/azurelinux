@@ -1,5 +1,5 @@
 --- sha1collisiondetection-0.3.4/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ sha1collisiondetection-0.3.4/Cargo.toml	2025-12-03T20:43:49.130370+00:00
++++ sha1collisiondetection-0.3.4/Cargo.toml	2026-09-07T10:40:41.510005+00:00
 @@ -26,6 +26,7 @@
      "/vs2015/",
      "/compile_commands.json",
@@ -8,6 +8,15 @@
      "/test-sha1sum-protocol.sh",
      "/*.yml",
  ]
+@@ -69,7 +70,7 @@
+ default-features = false
+ 
+ [dependencies.clap_mangen]
+-version = "0.2"
++version = ">=0.2,<0.4"
+ optional = true
+ default-features = false
+ 
 @@ -89,7 +90,7 @@
  version = "0.2"
  
@@ -17,3 +26,12 @@
  
  [dev-dependencies.sha1]
  version = "0.10"
+@@ -104,7 +105,7 @@
+ default-features = false
+ 
+ [build-dependencies.clap_mangen]
+-version = "0.2"
++version = ">=0.2,<0.4"
+ optional = true
+ default-features = false
+ 

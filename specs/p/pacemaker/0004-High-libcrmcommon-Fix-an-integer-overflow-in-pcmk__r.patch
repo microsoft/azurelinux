@@ -1,0 +1,45 @@
+From 6dd7ce8e656b6c629d3268038d6606041460fae7 Mon Sep 17 00:00:00 2001
+From: Chris Lumens <clumens@redhat.com>
+Date: Fri, 15 May 2026 10:19:33 -0400
+Subject: [PATCH 4/5] High: libcrmcommon: Fix an integer overflow in
+ pcmk__remote_send_xml.
+
+iov[0].iov_len is a size_t.  iov[1].iov_len is also a size_t (which
+comes from the length of a GString, which is a gsize, which is also a
+size_t).  We're adding those together and storing them in a uint32_t, so
+make sure the result will fit.
+
+Fixes RHEL-181155
+---
+ lib/common/remote.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/lib/common/remote.c b/lib/common/remote.c
+index 9f36827c5b..cf093b0db1 100644
+--- a/lib/common/remote.c
++++ b/lib/common/remote.c
+@@ -280,6 +280,13 @@ pcmk__remote_send_xml(pcmk__remote_t *remote, const xmlNode *msg)
+     header->version = REMOTE_MSG_VERSION;
+     header->payload_offset = iov[0].iov_len;
+     header->payload_uncompressed = iov[1].iov_len;
++
++    if ((UINT32_MAX - iov[0].iov_len) < iov[1].iov_len) {
++        pcmk__err("Remote message size %zu + %zu exceeds maximum of %" PRIu32,
++                  iov[0].iov_len, iov[1].iov_len, UINT32_MAX);
++        goto done;
++    }
++
+     header->size_total = iov[0].iov_len + iov[1].iov_len;
+ 
+     rc = remote_send_iovs(remote, iov, 2);
+@@ -288,6 +295,7 @@ pcmk__remote_send_xml(pcmk__remote_t *remote, const xmlNode *msg)
+                   pcmk_rc_str(rc), rc);
+     }
+ 
++done:
+     free(iov[0].iov_base);
+     g_free((gchar *) iov[1].iov_base);
+     return rc;
+-- 
+2.54.0
+

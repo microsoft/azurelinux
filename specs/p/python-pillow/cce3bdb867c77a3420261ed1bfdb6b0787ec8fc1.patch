@@ -1,0 +1,45 @@
+diff -rupN --no-dereference Pillow-11.3.0/src/libImaging/Filter.c Pillow-11.3.0-new/src/libImaging/Filter.c
+--- Pillow-11.3.0/src/libImaging/Filter.c	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/src/libImaging/Filter.c	2026-07-19 08:50:48.880125080 +0200
+@@ -59,6 +59,12 @@ ImagingExpand(Imaging imIn, int xmargin,
+     if (xmargin < 0 && ymargin < 0) {
+         return (Imaging)ImagingError_ValueError("bad kernel size");
+     }
++    if (xmargin > INT_MAX / (xmargin * (int)sizeof(FLOAT32))) {
++        return (Imaging)ImagingError_ValueError("filter size too large");
++    }
++    if (ymargin > INT_MAX / (ymargin * (int)sizeof(FLOAT32))) {
++        return (Imaging)ImagingError_ValueError("filter size too large");
++    }
+ 
+     imOut = ImagingNewDirty(
+         imIn->mode, imIn->xsize + 2 * xmargin, imIn->ysize + 2 * ymargin
+diff -rupN --no-dereference Pillow-11.3.0/src/PIL/ImageFilter.py Pillow-11.3.0-new/src/PIL/ImageFilter.py
+--- Pillow-11.3.0/src/PIL/ImageFilter.py	2026-07-19 08:50:48.874193964 +0200
++++ Pillow-11.3.0-new/src/PIL/ImageFilter.py	2026-07-19 08:50:48.879504441 +0200
+@@ -99,6 +99,9 @@ class RankFilter(Filter):
+         if size % 2 == 0:
+             msg = "bad filter size"
+             raise ValueError(msg)
++        if size * size * 4 > (2**31 - 1):
++            msg = "filter size too large"
++            raise ValueError(msg)
+         if rank < 0 or rank >= size * size:
+             msg = "bad rank value"
+             raise ValueError(msg)
+diff -rupN --no-dereference Pillow-11.3.0/Tests/test_image_filter.py Pillow-11.3.0-new/Tests/test_image_filter.py
+--- Pillow-11.3.0/Tests/test_image_filter.py	2026-07-19 08:50:48.875524163 +0200
++++ Pillow-11.3.0-new/Tests/test_image_filter.py	2026-07-19 08:50:48.879776512 +0200
+@@ -150,6 +150,12 @@ def test_rankfilter_properties() -> None
+     with pytest.raises(ValueError, match="bad filter size"):
+         ImageFilter.MinFilter(2)
+ 
++    with pytest.raises(ValueError, match="filter size too large"):
++        ImageFilter.RankFilter(23171, 1)
++    im = Image.new("1", (1, 1))
++    with pytest.raises(ValueError, match="filter size too large"):
++        im.im.expand(23171)
++
+     with pytest.raises(ValueError, match="bad rank value"):
+         ImageFilter.RankFilter(1, 1)
+ 

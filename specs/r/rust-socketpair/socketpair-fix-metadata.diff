@@ -1,0 +1,15 @@
+--- socketpair-0.19.8/Cargo.toml	1970-01-01T00:00:01+00:00
++++ socketpair-0.19.8/Cargo.toml	2026-08-14T07:42:16.266323+00:00
+@@ -57,10 +57,10 @@
+ optional = true
+ 
+ [dependencies.io-extras]
+-version = "0.18.0"
++version = "0.19.0"
+ 
+ [dependencies.io-lifetimes]
+-version = "2.0.0"
++version = "3.0.0"
+ default-features = false
+ 
+ [dependencies.tokio]

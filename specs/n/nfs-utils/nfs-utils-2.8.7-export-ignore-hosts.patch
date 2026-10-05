@@ -1,0 +1,38 @@
+Pass ignore_hosts to export_create() in export_read()
+
+Commit 8f3d12ce ("nfs-server-generator: avoid using external services.")
+added the 'ignore_hosts' flag to export_read() so nfs-server-generator
+can bypass DNS queries when calling it.  If the export doesn't
+already exist, export_read() calls export_create() with the 'canonical'
+argument hard-coded to 0, triggering a DNS query in client_lookup().
+An unresponsive DNS server can cause delays in nfs-server-generator and
+can even lead to 'systemctl daemon-reload' timing out, leading to
+further administrative issues.
+
+nfs-server-generator only cares about *what* is exported, so it can
+create the order-with-mounts.conf config drop-in.  It doesn't need to
+know *who* those filesystems are exported to, so it has no need to
+perform DNS queries.
+
+Pass the 'ignore_hosts' flag from export_read() to export_create() to
+avoid the unnecessary DNS queries.
+
+Fixes: 8f3d12ce ("nfs-server-generator: avoid using external services.")
+Signed-off-by: Scott Mayhew <smayhew@redhat.com>
+---
+ support/export/export.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/support/export/export.c b/support/export/export.c
+index 2c8c3335..3caee043 100644
+--- a/support/export/export.c
++++ b/support/export/export.c
+@@ -122,7 +122,7 @@ export_read(char *fname, int ignore_hosts)
+ 	while ((eep = getexportent(0)) != NULL) {
+ 		exp = export_lookup(eep->e_hostname, eep->e_path, ignore_hosts);
+ 		if (!exp) {
+-			if (export_create(eep, 0))
++			if (export_create(eep, ignore_hosts))
+ 				/* possible complaints already logged */
+ 				volumes++;
+ 		}

@@ -1,0 +1,48 @@
+diff -Naur a/src/assume_role.rs b/src/assume_role.rs
+--- a/src/assume_role.rs	2006-07-24 02:21:28.000000000 +0100
++++ b/src/assume_role.rs	2026-09-05 10:35:52.326839550 +0100
+@@ -215,6 +215,8 @@
+     }
+ }
+ 
++// Downstream-only: avoid dev-dependencies on aws-sigv4 and aws-credential-types
++#[cfg(false)]
+ #[cfg(test)]
+ mod tests {
+     use std::collections::VecDeque;
+diff -Naur a/src/provide_credential/s3_express_session.rs b/src/provide_credential/s3_express_session.rs
+--- a/src/provide_credential/s3_express_session.rs	2006-07-24 02:21:28.000000000 +0100
++++ b/src/provide_credential/s3_express_session.rs	2026-09-05 10:35:57.468920144 +0100
+@@ -1006,6 +1006,8 @@
+     Some(region.to_string())
+ }
+ 
++// Downstream-only: avoid dev-dependencies on aws-sigv4 and aws-credential-types
++#[cfg(false)]
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+diff -Naur a/src/s3_access_grants.rs b/src/s3_access_grants.rs
+--- a/src/s3_access_grants.rs	2006-07-24 02:21:28.000000000 +0100
++++ b/src/s3_access_grants.rs	2026-09-05 10:35:54.574874785 +0100
+@@ -962,6 +962,8 @@
+     error
+ }
+ 
++// Downstream-only: avoid dev-dependencies on aws-sigv4 and aws-credential-types
++#[cfg(false)]
+ #[cfg(test)]
+ mod tests {
+     use std::collections::{BTreeMap, VecDeque};
+diff -Naur a/src/sign_request.rs b/src/sign_request.rs
+--- a/src/sign_request.rs	2006-07-24 02:21:28.000000000 +0100
++++ b/src/sign_request.rs	2026-09-05 10:35:55.999897119 +0100
+@@ -303,6 +303,8 @@
+     hmac_sha256(sign_service.as_slice(), "aws4_request".as_bytes())
+ }
+ 
++// Downstream-only: avoid dev-dependencies on aws-sigv4 and aws-credential-types
++#[cfg(false)]
+ #[cfg(test)]
+ mod tests {
+     use super::*;

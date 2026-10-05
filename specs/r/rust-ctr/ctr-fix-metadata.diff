@@ -1,0 +1,15 @@
+--- ctr-0.10.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ ctr-0.10.1/Cargo.toml	2026-08-28T07:52:45.579646+00:00
+@@ -71,12 +71,6 @@
+ [dev-dependencies.hex-literal]
+ version = "1"
+ 
+-[dev-dependencies.kuznyechik]
+-version = "0.9"
+-
+-[dev-dependencies.magma]
+-version = "0.10"
+-
+ [lints.clippy]
+ borrow_as_ptr = "warn"
+ cast_lossless = "warn"

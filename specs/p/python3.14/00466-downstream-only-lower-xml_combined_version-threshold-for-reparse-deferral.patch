@@ -1,0 +1,133 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Wed, 12 Aug 2026 15:18:39 +0200
+Subject: 00466: Downstream only: Lower XML_COMBINED_VERSION threshold for
+ reparse deferral
+
+RHEL 9 expat 2.5.0 has XML_SetReparseDeferralEnabled backported
+via the CVE-2023-52425 fix, but XML_COMBINED_VERSION remains 20500.
+CPython's #if XML_COMBINED_VERSION >= 20600 guards compile the setter
+as a no-op, so SetReparseDeferralEnabled silently does nothing and
+GetReparseDeferralEnabled always returns False, even though the expat
+library actually supports (and enables) reparse deferral.
+
+Lower the threshold from 20600 to 20500 so that CPython uses the
+backported function. This makes the Python API actually work on RHEL 9
+and fixes test failures (test_reparse_deferral_disabled,
+test_flush_reparse_deferral_disabled, test_simple_xml_chunk_*).
+
+The spec file BuildRequires expat-devel >= 2.5.0-2 to ensure the
+backported function is available.
+---
+ Lib/test/test_pyexpat.py   | 6 +++---
+ Lib/test/test_sax.py       | 4 ++--
+ Lib/test/test_xml_etree.py | 4 ++--
+ Modules/pyexpat.c          | 6 +++---
+ 4 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/Lib/test/test_pyexpat.py b/Lib/test/test_pyexpat.py
+index fd3077063b..34f86e2dbd 100644
+--- a/Lib/test/test_pyexpat.py
++++ b/Lib/test/test_pyexpat.py
+@@ -1005,7 +1005,7 @@ def test_error_path_no_crash(self):
+ class ReparseDeferralTest(unittest.TestCase):
+     def test_getter_setter_round_trip(self):
+         parser = expat.ParserCreate()
+-        enabled = (expat.version_info >= (2, 6, 0))
++        enabled = (expat.version_info >= (2, 5, 0))
+ 
+         self.assertIs(parser.GetReparseDeferralEnabled(), enabled)
+         parser.SetReparseDeferralEnabled(False)
+@@ -1014,7 +1014,7 @@ def test_getter_setter_round_trip(self):
+         self.assertIs(parser.GetReparseDeferralEnabled(), enabled)
+ 
+     def test_reparse_deferral_enabled(self):
+-        if expat.version_info < (2, 6, 0):
++        if expat.version_info < (2, 5, 0):
+             self.skipTest(f'Expat {expat.version_info} does not '
+                           'support reparse deferral')
+ 
+@@ -1045,7 +1045,7 @@ def start_element(name, _):
+ 
+         parser = expat.ParserCreate()
+         parser.StartElementHandler = start_element
+-        if expat.version_info >= (2, 6, 0):
++        if expat.version_info >= (2, 5, 0):
+             parser.SetReparseDeferralEnabled(False)
+         self.assertFalse(parser.GetReparseDeferralEnabled())
+ 
+diff --git a/Lib/test/test_sax.py b/Lib/test/test_sax.py
+index 5c10bcedc6..114f002b0b 100644
+--- a/Lib/test/test_sax.py
++++ b/Lib/test/test_sax.py
+@@ -1216,7 +1216,7 @@ def test_expat_incremental_reset(self):
+ 
+         self.assertEqual(result.getvalue(), start + b"<doc>text</doc>")
+ 
+-    @unittest.skipIf(pyexpat.version_info < (2, 6, 0),
++    @unittest.skipIf(pyexpat.version_info < (2, 5, 0),
+                      f'Expat {pyexpat.version_info} does not '
+                      'support reparse deferral')
+     def test_flush_reparse_deferral_enabled(self):
+@@ -1250,7 +1250,7 @@ def test_flush_reparse_deferral_disabled(self):
+         for chunk in ("<doc", ">"):
+             parser.feed(chunk)
+ 
+-        if pyexpat.version_info >= (2, 6, 0):
++        if pyexpat.version_info >= (2, 5, 0):
+             parser._parser.SetReparseDeferralEnabled(False)
+             self.assertEqual(result.getvalue(), start)  # i.e. no elements started
+ 
+diff --git a/Lib/test/test_xml_etree.py b/Lib/test/test_xml_etree.py
+index 6da7c34dc4..d846ddf4e2 100644
+--- a/Lib/test/test_xml_etree.py
++++ b/Lib/test/test_xml_etree.py
+@@ -1803,7 +1803,7 @@ def test_unknown_event(self):
+         with self.assertRaisesRegex(ValueError, "unknown event 'bogus'"):
+             ET.XMLPullParser(events=(x.decode() for x in (b'start', b'end', b'bogus')))
+ 
+-    @unittest.skipIf(pyexpat.version_info < (2, 6, 0),
++    @unittest.skipIf(pyexpat.version_info < (2, 5, 0),
+                      f'Expat {pyexpat.version_info} does not '
+                      'support reparse deferral')
+     def test_flush_reparse_deferral_enabled(self):
+@@ -1833,7 +1833,7 @@ def test_flush_reparse_deferral_disabled(self):
+         for chunk in ("<doc", ">"):
+             parser.feed(chunk)
+ 
+-        if pyexpat.version_info >= (2, 6, 0):
++        if pyexpat.version_info >= (2, 5, 0):
+             if not ET is pyET:
+                 self.skipTest(f'XMLParser.(Get|Set)ReparseDeferralEnabled '
+                               'methods not available in C')
+diff --git a/Modules/pyexpat.c b/Modules/pyexpat.c
+index f9fd7a7a5b..e88b7f16a8 100644
+--- a/Modules/pyexpat.c
++++ b/Modules/pyexpat.c
+@@ -814,7 +814,7 @@ pyexpat_xmlparser_SetReparseDeferralEnabled_impl(xmlparseobject *self,
+                                                  int enabled)
+ /*[clinic end generated code: output=5ec539e3b63c8c49 input=021eb9e0bafc32c5]*/
+ {
+-#if XML_COMBINED_VERSION >= 20600
++#if XML_COMBINED_VERSION >= 20500
+     XML_SetReparseDeferralEnabled(self->itself, enabled ? XML_TRUE : XML_FALSE);
+     self->reparse_deferral_enabled = (bool)enabled;
+ #endif
+@@ -1478,7 +1478,7 @@ newxmlparseobject(pyexpat_state *state, const char *encoding,
+     self->ns_prefixes = 0;
+     self->handlers = NULL;
+     self->intern = Py_XNewRef(intern);
+-#if XML_COMBINED_VERSION >= 20600
++#if XML_COMBINED_VERSION >= 20500
+     self->reparse_deferral_enabled = true;
+ #else
+     self->reparse_deferral_enabled = false;
+@@ -2396,7 +2396,7 @@ pyexpat_exec(PyObject *mod)
+ #else
+     capi->SetHashSalt16Bytes = NULL;
+ #endif
+-#if XML_COMBINED_VERSION >= 20600
++#if XML_COMBINED_VERSION >= 20500
+     capi->SetReparseDeferralEnabled = XML_SetReparseDeferralEnabled;
+ #else
+     capi->SetReparseDeferralEnabled = NULL;

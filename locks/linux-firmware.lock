@@ -1,7 +1,7 @@
 # Managed by azldev component update. Do not edit manually.
 version = 1
 import-commit = '7847e63951a06567018f191498856e82fe73ff89'
-upstream-commit = '7847e63951a06567018f191498856e82fe73ff89'
+upstream-commit = '26e2554f370358e262b4b9421a3953bf5fead14b'
 manual-bump = 2
-input-fingerprint = 'sha256:246af224018d4d7da9ddeffd16d8b4dbd0e32962135caf92e9c10af20ebfe532'
-resolution-input-hash = 'sha256:466421704711c4fd3c71f0b2ed715a0e61d49e3e26f3a2637fee755795849c8e'
+input-fingerprint = 'sha256:4fb60f18e549479df92830de56de4d38241bec380c3ac0f00e80de5b1b93ff82'
+resolution-input-hash = 'sha256:ee2b4b2a7474232699f7ef1461160019159849dcc0daf2dcff1aabf35416ecec'

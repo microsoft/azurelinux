@@ -4,8 +4,8 @@
 %global framework kwallet
 
 Name:    kf6-%{framework}
-Version: 6.23.0
-Release: 4%{?dist}
+Version: 6.30.0
+Release: 5%{?dist}
 Summary: KDE Frameworks 6 Tier 3 solution for password management
 
 License: BSD-3-Clause AND CC0-1.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later
@@ -24,6 +24,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  libgcrypt-devel
 BuildRequires:  cmake
 BuildRequires:  qt6-qtbase-devel
+BuildRequires:  desktop-file-utils
 
 BuildRequires:  cmake(Qt6Core5Compat)
 
@@ -54,7 +55,7 @@ KWallet is a secure and unified container for user passwords.
 
 %package        libs
 Summary:        KWallet framework libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       (%{name}%{?_isa} = %{version}-%{release} if systemd)
 %description    libs
 Provides API to access KWallet data from applications.
 
@@ -105,7 +106,9 @@ Developer Documentation files for %{name} in HTML format
 %{_kf6_datadir}/knotifications6/ksecretd.notifyrc
 %{_kf6_datadir}/qlogging-categories6/%{framework}*
 %{_kf6_datadir}/xdg-desktop-portal/portals/kwallet.portal
+%{_kf6_datadir}/config.kcfg/kwalletsettings.kcfg
 %{_mandir}/man1/kwallet-query.1*
+%{_kf6_datadir}/applications/org.kde.kwalletd.desktop
 
 %files libs
 %{_kf6_libdir}/libKF6Wallet.so.*
@@ -128,6 +131,33 @@ Developer Documentation files for %{name} in HTML format
 %exclude %{_qt6_docdir}/*/*.index
 
 %changelog
+* Fri Sep 04 2026 Steve Cossette <farchord@gmail.com> - 6.30.0-1
+- 6.30.0
+
+* Fri Aug 07 2026 Steve Cossette <farchord@gmail.com> - 6.29.0-1
+- 6.29.0
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Jul 04 2026 Steve Cossette <farchord@gmail.com> - 6.28.0-1
+- 6.28.0
+
+* Fri Jun 05 2026 Steve Cossette <farchord@gmail.com> - 6.27.0-1
+- 6.27.0
+
+* Fri May 01 2026 Steve Cossette <farchord@gmail.com> - 6.26.0-1
+- 6.26.0
+
+* Thu Apr 09 2026 Steve Cossette <farchord@gmail.com> - 6.25.0-1
+- 6.25.0
+
+* Fri Mar 20 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 6.24.0-2
+- Limit main package dependency to host installations
+
+* Tue Mar 10 2026 Steve Cossette <farchord@gmail.com> - 6.24.0-1
+- 6.24.0
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.23.0-1
 - 6.23.0
 

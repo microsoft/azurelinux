@@ -4,7 +4,7 @@
 Summary: The GNU disk partition manipulation program
 Name:    parted
 Version: 3.6
-Release: 16%{?dist}
+Release: 18%{?dist}
 License: GPL-3.0-or-later
 URL:     http://www.gnu.org/software/parted
 
@@ -25,6 +25,11 @@ Patch0009: 0009-tests-probing-ext4-without-journal-should-still-indi.patch
 Patch0010: 0010-libparted-Do-not-detect-ext4-without-journal-as-ext2.patch
 Patch0011: 0011-nilfs2-Fixed-possible-sigsegv-in-case-of-corrupted-s.patch
 Patch0012: 0012-doc-Fix-some-groff-mandoc-linting-complaints.patch
+Patch0013: 0013-libparted-Catch-FAT-metadata-triggered-errors.patch
+Patch0014: 0014-resize-Make-sure-32bit-build-cannot-overflow-frag_co.patch
+Patch0015: 0015-resize-Make-sure-hfsc_new_cachetable-cannot-overflow.patch
+Patch0016: 0016-fdasd-Make-sure-data-set-name-is-positive.patch
+Patch0017: 0017-parted-Fix-partition-number-allocation-in-do_print.patch
 
 BuildRequires: gcc
 BuildRequires: e2fsprogs-devel
@@ -129,6 +134,15 @@ make check
 
 
 %changelog
+* Mon Sep 14 2026 Brian C. Lane <bcl@redhat.com> - 3.6-14
+- parted: Fix partition number allocation in do_print (bcl)
+- fdasd: Make sure data set name is positive (bcl)
+- resize: Make sure hfsc_new_cachetable cannot overflow on 32bit (bcl)
+- resize: Make sure 32bit build cannot overflow frag_count (bcl)
+- libparted: Catch FAT metadata triggered errors (bcl)
+  Resolves: CVE-2026-89085
+  Resolves: CVE-2026-89088
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.6-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -191,7 +191,7 @@ new file mode 100644
 index 00000000..a91aee94
 --- /dev/null
 +++ b/regress/pkcs11.sh
-@@ -0,0 +1,349 @@
+@@ -0,0 +1,350 @@
 +#
 +#  Copyright (c) 2017 Red Hat
 +#
@@ -260,6 +260,7 @@ index 00000000..a91aee94
 +SSH_ASKPASS=/usr/bin/true
 +export SSH_ASKPASS
 +unset DISPLAY
++unset WAYLAND_DISPLAY
 +# We need interactive access to test PKCS# since it prompts for PIN
 +sed -i 's/.*BatchMode.*//g' $OBJ/ssh_proxy
 +

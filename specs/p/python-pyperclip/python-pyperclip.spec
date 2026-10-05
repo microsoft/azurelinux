@@ -5,41 +5,37 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
 #
 # We can generate PDF documentation as a substitute.
-%bcond_without doc_pdf
+%bcond doc_pdf 1
+# Test with XWayland, instead of X11?
+%bcond wayland %{undefined el9}
 
 Name:           python-pyperclip
-Version:        1.8.2
-Release: 18%{?dist}
+Version:        1.9.0
+Release: 6%{?dist}
 Summary:        A cross-platform clipboard module for Python
 
 License:        BSD-3-Clause
 URL:            https://github.com/asweigart/pyperclip
-Source0:        %{pypi_source pyperclip}
+Source:         %{pypi_source pyperclip}
+
+# Fix test suite for release 1.9.0
+# https://github.com/asweigart/pyperclip/pull/270
+Patch:          pyperclip-1.9.0-tests.patch
+
 BuildArch:      noarch
 
-%global common_description %{expand:
-Pyperclip is a cross-platform Python module for copy and paste clipboard
-functions.}
-
-%description %{common_description}
-
-
-%package -n     python3-pyperclip
-Summary:        %{summary}
-
-BuildRequires:  python3-devel
-BuildRequires:  python3dist(setuptools)
+BuildRequires:  dos2unix
 
 # While upstream runs tests directly with Python/unittest, using pytest as the
 # runner allows us to more easily skip tests.
 BuildRequires:  python3dist(pytest)
 
 # Support graphical tests in non-graphical environment
+%if %{with wayland}
+BuildRequires:  xwayland-run
+%else
 BuildRequires:  xorg-x11-server-Xvfb
-
-# TestGtk (module gtk)
-# (not available; this would be the obsolete PyGTK for GTK2, which never
-# supported Python 3)
+%endif
 
 # TestQt (module PyQt5.QtWidgets)
 BuildRequires:  python3dist(pyqt5)
@@ -52,12 +48,15 @@ BuildRequires:  /usr/bin/xclip
 # figure out why.
 # BuildRequires:  /usr/bin/xsel
 
-# TestWlClipboard (executable wl-copy)
-# These would fail with:
-#   Failed to connect to a Wayland server
-#   error: XDG_RUNTIME_DIR not set in the environment.
-# BuildRequires:  /usr/bin/wl-copy
-# BuildRequires:  /usr/bin/wl-paste
+%if %{with wayland}
+# TestWlClipboard (executables wl-copy/wl-paste)
+# This only works in a Wayland session; otherwise, we get:
+#   error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+#   Failed to connect to a Wayland server: No such file or directory
+#   Note: WAYLAND_DISPLAY is unset (falling back to wayland-0)
+BuildRequires:  /usr/bin/wl-copy
+BuildRequires:  /usr/bin/wl-paste
+%endif
 
 # TestKlipper (executables klipper and qdbus)
 # These would fail with:
@@ -68,6 +67,16 @@ BuildRequires:  /usr/bin/xclip
 # BuildRequires:  /usr/bin/klipper
 # BuildRequires:  /usr/bin/qdbus
 
+%global common_description %{expand:
+Pyperclip is a cross-platform Python module for copy and paste clipboard
+functions.}
+
+%description %{common_description}
+
+
+%package -n     python3-pyperclip
+Summary:        %{summary}
+
 %description -n python3-pyperclip %{common_description}
 
 
@@ -77,38 +86,7 @@ Summary:        Pyperclip documentation
 %if %{with doc_pdf}
 BuildRequires:  make
 BuildRequires:  python3dist(sphinx)
-%if ! 0%{?el8}
 BuildRequires:  python3-sphinx-latex
-%else
-BuildRequires:  tex(amsmath.sty)
-BuildRequires:  tex(amsthm.sty)
-BuildRequires:  tex(anyfontsize.sty)
-BuildRequires:  tex(article.cls)
-BuildRequires:  tex(capt-of.sty)
-BuildRequires:  tex(cmap.sty)
-BuildRequires:  tex(color.sty)
-BuildRequires:  tex(ctablestack.sty)
-BuildRequires:  tex(fancyhdr.sty)
-BuildRequires:  tex(fancyvrb.sty)
-BuildRequires:  tex(fncychap.sty)
-BuildRequires:  tex(framed.sty)
-BuildRequires:  tex(geometry.sty)
-BuildRequires:  tex(hyperref.sty)
-BuildRequires:  tex(kvoptions.sty)
-BuildRequires:  tex(luatex85.sty)
-BuildRequires:  tex(needspace.sty)
-BuildRequires:  tex(parskip.sty)
-BuildRequires:  tex(polyglossia.sty)
-BuildRequires:  tex(tabulary.sty)
-BuildRequires:  tex(titlesec.sty)
-BuildRequires:  tex(upquote.sty)
-BuildRequires:  tex(utf8x.def)
-BuildRequires:  tex(wrapfig.sty)
-BuildRequires:  texlive-collection-fontsrecommended
-BuildRequires:  texlive-collection-latex
-BuildRequires:  texlive-dvipng
-BuildRequires:  texlive-dvisvgm
-%endif
 BuildRequires:  latexmk
 %endif
 
@@ -118,11 +96,15 @@ Documentation for pyperclip
 
 %prep
 %autosetup -p1 -n pyperclip-%{version}
-# Fix ends of line encoding
-sed -i 's/\r$//' README.md docs/*
+dos2unix --keepdate AUTHORS.txt CHANGES.txt README.md docs/*
+
+
+%generate_buildrequires
+%pyproject_buildrequires
+
 
 %build
-%py3_build
+%pyproject_wheel
 
 %if %{with doc_pdf}
 PYTHONPATH="${PWD}/src" %make_build -C docs latex \
@@ -130,26 +112,33 @@ PYTHONPATH="${PWD}/src" %make_build -C docs latex \
 %make_build -C docs/_build/latex LATEXMKOPTS='-quiet'
 %endif
 
+
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files -l pyperclip
+
 
 %check
+%pyproject_check_import
+
+%if %{with wayland}
+%global __pytest /usr/bin/xwfb-run -- pytest
+%else
 %global __pytest /usr/bin/xvfb-run -a %{python3} -m pytest
+%endif
 # Explicitly skip backends that we know will fail in the mock environment if
 # their dependencies happen to be present. See notes in the BuildRequires.
-k="${k-}${k+ and }not TestGtk"
 k="${k-}${k+ and }not TestKlipper"
 k="${k-}${k+ and }not TestWlCLipboard"
 k="${k-}${k+ and }not TestXSel"
 %pytest -k "${k-}" -v
 
-%files -n python3-pyperclip
-%license LICENSE.txt
+
+%files -n python3-pyperclip -f %{pyproject_files}
 %doc AUTHORS.txt
 %doc CHANGES.txt
 %doc README.md
-%{python3_sitelib}/pyperclip
-%{python3_sitelib}/pyperclip-%{version}-py%{python3_version}.egg-info
+
 
 %files -n python-pyperclip-doc
 %license LICENSE.txt
@@ -157,7 +146,26 @@ k="${k-}${k+ and }not TestXSel"
 %doc docs/_build/latex/Pyperclip.pdf
 %endif
 
+
 %changelog
+* Thu Sep 10 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 1.9.0-2
+- Port to pyproject-rpm-macros (fix RHBZ#2378068)
+- Let the EPEL8 branch diverge
+
+* Thu Sep 10 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 1.9.0-1
+- Update to 1.9.0
+- Use xwayland-run for tests where we can
+- Also fix end-of-line encodings in AUTHORS.txt and CHANGES.txt
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 1.8.2-17
+- Rebuilt for Python 3.15
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.8.2-15
 - Rebuilt for Python 3.14.0rc3 bytecode
 

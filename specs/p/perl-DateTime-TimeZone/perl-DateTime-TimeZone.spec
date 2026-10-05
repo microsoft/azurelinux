@@ -5,11 +5,11 @@
 %bcond_without perl_DateTime_TimeZone_enables_optional_test
 
 # Regenerate Perl library code from upstream Olson database of this date
-%global tzversion 2025c
+%global tzversion 2026d
 
 Name:           perl-DateTime-TimeZone
-Version:        2.66
-Release: 4%{?dist}
+Version:        2.70
+Release: 5%{?dist}
 Summary:        Time zone object base class and factory
 # tzdata%%{tzversion}.tar.gz archive:   LicenseRef-Fedora-Public-Domain
 # other files:                          GPL-1.0-or-later OR Artistic-1.0-Perl
@@ -183,6 +183,18 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Sep 23 2026 Jitka Plesnikova <jplesnik@redhat.com> - 2.70-1
+- 2.70 bump (2026d Olson database) - rhbz#2537260
+
+* Thu Jul 09 2026 Jitka Plesnikova <jplesnik@redhat.com> - 2.69-1
+- 2.69 bump (2026c Olson database) - rhbz#2498381
+
+* Tue Apr 28 2026 Jitka Plesnikova <jplesnik@redhat.com> - 2.68-1
+- 2.68 bump (2026b Olson database) - rhbz#2461242
+
+* Fri Mar 13 2026 Jitka Plesnikova <jplesnik@redhat.com> - 2.67-1
+- 2.67 bump (2026a Olson database) - rhbz#2444992
+
 * Thu Dec 11 2025 Jitka Plesnikova <jplesnik@redhat.com> - 2.66-1
 - 2.66 bump (2025c Olson database) - rhbz#2421300
 

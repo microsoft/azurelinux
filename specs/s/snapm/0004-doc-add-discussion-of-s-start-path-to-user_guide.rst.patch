@@ -1,0 +1,66 @@
+From 88d4a0e5f4d7d619d58ecdc47a8a4f0ae74a21eb Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Tue, 31 Mar 2026 16:23:30 +0100
+Subject: [PATCH 04/10] doc: add discussion of -s/--start-path to
+ user_guide.rst
+
+Resolves: #959
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ doc/user_guide.rst | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/doc/user_guide.rst b/doc/user_guide.rst
+index 6acfb943..71fee02b 100644
+--- a/doc/user_guide.rst
++++ b/doc/user_guide.rst
+@@ -219,6 +219,11 @@ changes:
+   ownership (UID/GID), and extended attributes (xattrs).
+ * **Content Comparison**: Performs deep content comparisons for regular
+   files, including generating standard unified diffs for text files.
++* **Start Path Control**: By default difference engine operations proceed from
++  the root directory of snapshot sets (or the system root file system). This
++  can be overridden by specifying one or more start paths for the comparison.
++  This allows the user to focus the operation on areas of interest and lowers
++  run time and memory consumption.
+ 
+ Output Formats and Use Cases
+ ----------------------------
+@@ -294,6 +299,14 @@ resource-intensive. To improve performance, ``snapm`` implements a
+   ``--cache-expires=EXPIRES_SECS`` options. These options are mutually
+   exclusive.
+ 
++By default a ``diff`` or ``diffreport`` command will start at the root mount
++of the respective snapshot set (or the system root file system). This can be
++costly both in terms of time and memory consumption. The comparison can be
++narrowed to specific directories of interest by specifying one or more start
++paths using ``-s|--start-path PATH``. If no start path is given the tools
++will warn about the potential resource use. This warning can be suppressed if
++desired using ``--quiet``.
++
+ Command Reference
+ =================
+ 
+@@ -479,12 +492,18 @@ ignoring file modification times to focus only on content:
+ 
+ Options are available to control the comparison:
+ 
++* ``--start-path PATH`` / ``-s PATH``: Begin comparison at ``PATH``
++  (may be specified zero or more times)
+ * ``--content-only`` / ``-c``: Only check for file content changes
+ * ``--ignore-timestamps`` / ``-t``: Ignore modification times
+ * ``--ignore-permissions`` / ``-p``: Ignore permission changes
+ * ``--ignore-ownership`` / ``-w``: Ignore ownership changes
+ * ``--include-pattern`` / ``--exclude-pattern``: Filter paths using glob patterns
+ 
++The ``PATH`` value given to ``--start-path PATH`` / ``-s PATH`` is evaluated
++relative to the root directory of the snapshot set (or system root file system
++when using ``.``).
++
+ Output Formats
+ ~~~~~~~~~~~~~~
+ 
+-- 
+2.53.0
+

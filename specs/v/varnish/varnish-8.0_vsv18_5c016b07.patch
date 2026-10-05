@@ -1,0 +1,42 @@
+Based on upstream commit 5c016b070e1994fd8a430b45dac7dc3ee63f04d7
+
+commit 5c016b070e1994fd8a430b45dac7dc3ee63f04d7
+Author: Nils Goroll <nils.goroll@uplex.de>
+Date:   Wed Mar 4 09:46:28 2026 +0100
+
+    Fix http/1.1 "absolute form" empty host handling
+    
+    RFC9110 4.2.1:
+    
+            A sender MUST NOT generate an "http" URI with an empty host identifier.
+            A recipient that processes such a URI reference MUST reject it as
+            invalid.
+    
+    4.2.2:
+    
+            A sender MUST NOT generate an "https" URI with an empty host identifier.
+            A recipient that processes such a URI reference MUST reject it as
+            invalid.
+    
+    Pointed out by Walid
+    
+    Related to VSV18
+    
+    Conflicts:
+            both modified:   doc/changes.rst
+
+diff --git a/bin/varnishd/http1/cache_http1_proto.c b/bin/varnishd/http1/cache_http1_proto.c
+index c710c6da5..35ad9260c 100644
+--- a/bin/varnishd/http1/cache_http1_proto.c
++++ b/bin/varnishd/http1/cache_http1_proto.c
+@@ -377,6 +377,10 @@ HTTP1_DissectRequest(struct http_conn *htc, struct http *hp)
+ 		e = strchr(b, '/');
+ 		if (e == NULL)
+ 			e = hp->hd[HTTP_HDR_URL].e;
++		if (e == b) {
++			// rfc9110 4.2.1 4.2.2 reject empty host
++			return (400);
++		}
+ 		http_Unset(hp, H_Host);
+ 		http_PrintfHeader(hp, "Host: %.*s", (int)(e - b), b);
+ 		hp->hd[HTTP_HDR_URL].b = e;

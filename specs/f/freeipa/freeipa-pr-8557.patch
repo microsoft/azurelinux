@@ -1,0 +1,556 @@
+From 58ea09f489406fea624d390cee386d85aa66fd6c Mon Sep 17 00:00:00 2001
+From: Julien Rische <jrische@redhat.com>
+Date: Mon, 7 Sep 2026 11:16:09 +0200
+Subject: [PATCH] kdb: rework cross-realm PAC validation and ID override checks
+
+The cross-realm PAC validation code had several issues:
+
+The ID override check used the POSIX "uid" attribute instead of
+"ipaOriginalUid", and compared it against the ticket cname which is
+the service principal (not the user) in S4U2Self referral TGTs.
+
+The PAC cross-validation compared client_name directly against
+account_name using case-sensitive strcmp, which failed for S4U2Self
+referral TGTs where client_name is qualified ("username@userRealm"
+per MS-SFU 3.2.5.1.1) and for legitimate case differences.
+
+This commit reworks the validation to use PAC_CLIENT_INFO client_name
+as the reference for all name-based checks. MIT krb5 validates
+client_name against the correct non-PAC identity source (ticket cname,
+PA-FOR-USER, or PA-S4U-X509-USER) before the KDB plugin runs, making
+it the value IPA will use to identify the user, and the value we must
+cross-validate against canonical PAC attributes to detect alias-based
+identity fraud.
+
+Comparisons now handle the qualified ("user@REALM") and unqualified
+("user") forms of client_name: when both values are qualified, a full
+comparison including the realm is performed; otherwise only the name
+part is compared.
+
+The ID override check now compares ipaOriginalUid against client_name
+instead of the ticket cname, fixing S4U2Self flows.
+
+All comparisons are now case-insensitive, and all validation failures
+return KRB5KDC_ERR_POLICY as mandated by MS-SFU 3.2.5.1.
+
+Signed-off-by: Julien Rische <jrische@redhat.com>
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+---
+ daemons/ipa-kdb/ipa_kdb.h               |   1 +
+ daemons/ipa-kdb/ipa_kdb_mspac_private.h |   6 +
+ daemons/ipa-kdb/ipa_kdb_mspac_trust.c   | 288 ++++++++++++++----------
+ 3 files changed, 176 insertions(+), 119 deletions(-)
+
+diff --git a/daemons/ipa-kdb/ipa_kdb.h b/daemons/ipa-kdb/ipa_kdb.h
+index cbac54fecc9..1c6647b7d25 100644
+--- a/daemons/ipa-kdb/ipa_kdb.h
++++ b/daemons/ipa-kdb/ipa_kdb.h
+@@ -93,6 +93,7 @@
+ 
+ #define IPA_KRB_AUTHZ_DATA_ATTR "ipaKrbAuthzData"
+ #define IPA_USER_AUTH_TYPE "ipaUserAuthType"
++#define IPA_ORIGINAL_UID_ATTR "ipaOriginalUid"
+ 
+ /* Virtual managed ticket flags like "-allow_tix", are always controlled by the
+  * "nsAccountLock" attribute, such flags should never be set in the database.
+diff --git a/daemons/ipa-kdb/ipa_kdb_mspac_private.h b/daemons/ipa-kdb/ipa_kdb_mspac_private.h
+index c76fb8e59cb..ccdcd6c59dd 100644
+--- a/daemons/ipa-kdb/ipa_kdb_mspac_private.h
++++ b/daemons/ipa-kdb/ipa_kdb_mspac_private.h
+@@ -23,6 +23,12 @@
+ 
+ #pragma once
+ 
++/* This is used as a global maximum length for:
++ *   userPrincipalName: no explicit limit
++ *   samAccountName: 20 for backward compatibility reasons
++ */
++#define MSPAC_ID_NAME_MAX_LENGTH (2048)
++
+ struct ipadb_mspac {
+     char *flat_domain_name;
+     char *flat_server_name;
+diff --git a/daemons/ipa-kdb/ipa_kdb_mspac_trust.c b/daemons/ipa-kdb/ipa_kdb_mspac_trust.c
+index a09dc2dfbda..9dfda66337e 100644
+--- a/daemons/ipa-kdb/ipa_kdb_mspac_trust.c
++++ b/daemons/ipa-kdb/ipa_kdb_mspac_trust.c
+@@ -18,6 +18,60 @@
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ *
++ * THREAT MODEL
++ *
++ * If Active Directory does not enforce uniqueness of principal aliases
++ * (UPN), a regular AD user could set their userPrincipalName to
++ * impersonate another user (e.g. "administrator@AD.TEST"). Since IPA
++ * resolves AD user identity from the ticket client name, a forged alias
++ * could lead to privilege escalation.
++ *
++ * However, other PAC attributes (account_name from PAC_LOGON_INFO, SAM
++ * name and SID from UPN_DNS_INFO extended format) always reflect the
++ * canonical AD identity regardless of aliases. Cross-validating these
++ * against client_name detects the inconsistency.
++ *
++ * PAC_CLIENT_INFO client_name
++ *
++ * Before the KDB plugin runs, MIT krb5 validates PAC_CLIENT_INFO
++ * client_name (MS-PAC 2.7) against the appropriate non-PAC identity
++ * source (tgs_policy.c:check_tgs_s4u2self, check_normal_tgs_pac):
++ *   - ticket cname for regular TGS
++ *   - PA-FOR-USER for S4U2Self
++ *   - PA-S4U-X509-USER for certificate-based S4U2Self
++ * This makes client_name the value that IPA will use to identify the
++ * user, and the value we must cross-validate against canonical PAC
++ * attributes to detect alias-based identity fraud.
++ *
++ * client_name is bare ("username") in regular tickets, or qualified
++ * ("username@userRealm") in S4U2Self referral TGTs (MS-SFU 3.2.5.1.1).
++ * The name part (before '@') is used for cross-validation against bare
++ * attributes. When both client_name and the tested attribute are
++ * qualified, a full comparison including the realm is performed.
++ *
++ * CHECKS PERFORMED
++ *
++ * 1. PAC cross-validation: all PAC name attributes (account_name, UPN,
++ *    SAM name) must match client_name. UPN extended SID must match the
++ *    logon info SID. PAC_REQUESTER_SID is not checked because it may
++ *    legitimately differ in S4U delegation scenarios (MS-PAC 2.12).
++ *    AD is case-insensitive, so all string comparisons use
++ *    case-insensitive functions.
++ *
++ * 2. ID override validation: if a Default Trust View override exists for
++ *    the PAC SID, its ipaOriginalUid must match client_name.
++ *
++ * 3. UPN qualification: for enterprise principals, the UPN must be
++ *    qualified (contain '@') unless constructed (U flag), per MS-KILE
++ *    3.3.5.2.
++ *
++ * ERROR HANDLING
++ *
++ * All validation failures return KRB5KDC_ERR_POLICY (KDC_ERR_POLICY,
++ * error code 12) as mandated by MS-SFU 3.2.5.1. The status string is
++ * included in the KRB-ERROR e-text field.
+  */
+ 
+ #include "ipa_kdb.h"
+@@ -40,7 +94,7 @@ struct crossrealm_tgt_info {
+     /* PAC_LOGON_INFO (Type 1) - mandatory
+      * Present since Windows 2000 */
+     bool logon_info_present;
+-    const char *account_name;
++    const char *account_name;      /* samAccountName, always bare */
+     struct dom_sid logon_info_sid;
+     char *logon_info_sid_string;
+ 
+@@ -48,15 +102,17 @@ struct crossrealm_tgt_info {
+      * Present since Windows 2000 */
+     bool client_info_present;
+     const char *client_name;
++    bool client_name_is_qualified;
++    size_t unqualified_cn_len;     /* length of name part (before '@') */
+ 
+     /* PAC_UPN_DNS_INFO (Type 12) - optional
+      * Present since Windows Server 2008 */
+     bool upn_dns_info_present;
+-    const char *upn;
++    const char *upn;               /* always qualified ("user@REALM") */
+     bool upn_is_qualified;
+-    bool upn_is_constructed;
+-    bool upn_has_sam_and_sid;
+-    const char *upn_sam_name;
++    bool upn_is_constructed;       /* U flag: UPN built from samAccountName */
++    bool upn_has_sam_and_sid;      /* S flag: extended format present */
++    const char *upn_sam_name;      /* samAccountName from extended UPN, bare */
+     struct dom_sid upn_sid;
+ 
+     /* PAC_REQUESTER_SID (Type 18) - optional
+@@ -99,25 +155,25 @@ ipadb_validate_pac_attributes(krb5_context context,
+     /* PAC_LOGON_INFO is mandatory */
+     if (!info->logon_info_present) {
+         *status = "TRUST_PAC_MISSING_LOGON_INFO";
+-        return ENOENT;
++        return KRB5KDC_ERR_POLICY;
+     }
+ 
+     /* Verify account_name was successfully extracted from LOGON_INFO */
+     if (!info->account_name) {
+         *status = "TRUST_PAC_MISSING_ACCOUNT_NAME";
+-        return ENOENT;
++        return KRB5KDC_ERR_POLICY;
+     }
+ 
+     /* PAC_CLIENT_INFO is mandatory */
+     if (!info->client_info_present) {
+         *status = "TRUST_PAC_MISSING_CLIENT_INFO";
+-        return ENOENT;
++        return KRB5KDC_ERR_POLICY;
+     }
+ 
+     /* Verify client_name was successfully extracted from CLIENT_INFO */
+     if (!info->client_name) {
+-        *status = "TRUST_PAC_MISSING_CLIENT_NAME";
+-        return ENOENT;
++        *status = "TRUST_PAC_CLIENT_NAME_MISSING";
++        return KRB5KDC_ERR_POLICY;
+     }
+ 
+     return 0;
+@@ -134,7 +190,7 @@ ipadb_extract_crtgt_info(krb5_context context,
+                          struct crossrealm_tgt_info *info,
+                          const char **status)
+ {
+-    krb5_error_code kerr = EINVAL;
++    krb5_error_code kerr = KRB5KDC_ERR_POLICY;
+     krb5_data linfo_blob = {0}, upn_blob = {0}, cinfo_blob = {0};
+     krb5_data req_sid_blob = {0};
+     DATA_BLOB linfo_data, upn_data, cinfo_data, req_sid_data;
+@@ -170,22 +226,22 @@ ipadb_extract_crtgt_info(krb5_context context,
+ 
+         if (!NDR_ERR_CODE_IS_SUCCESS(ndr_err)) {
+             *status = "TRUST_PAC_CANNOT_PARSE_LOGON_INFO";
+-            kerr = EINVAL;
++            kerr = KRB5KDC_ERR_POLICY;
+             goto end;
+         }
+ 
+         /* Check if logon_info structure is valid */
+         if (!logon_info.info) {
+             *status = "TRUST_PAC_LOGON_INFO_UNDEFINED";
+-            kerr = EINVAL;
++            kerr = KRB5KDC_ERR_POLICY;
+             goto end;
+         }
+ 
+         /* Store pointer to account name */
+         info->account_name = logon_info.info->info3.base.account_name.string;
+         if (!info->account_name) {
+-            *status = "TRUST_PAC_ACCOUNT_NAME_UNDEFINED";
+-            kerr = EINVAL;
++            *status = "TRUST_PAC_ACCOUNT_NAME_MISSING";
++            kerr = KRB5KDC_ERR_POLICY;
+             goto end;
+         }
+ 
+@@ -225,8 +281,18 @@ ipadb_extract_crtgt_info(krb5_context context,
+                                       (ndr_pull_flags_fn_t)ndr_pull_PAC_INFO);
+         krb5_free_data_contents(context, &cinfo_blob);
+ 
+-        if (NDR_ERR_CODE_IS_SUCCESS(ndr_err))
++        if (NDR_ERR_CODE_IS_SUCCESS(ndr_err)) {
++            const char *at_sign;
++
+             info->client_name = client_info.logon_name.account_name;
++            if (info->client_name) {
++                at_sign = strchr(info->client_name, '@');
++                info->client_name_is_qualified = (at_sign != NULL);
++                info->unqualified_cn_len = at_sign ?
++                    (size_t)(at_sign - info->client_name) :
++                    strlen(info->client_name);
++            }
++        }
+     }
+ 
+     /* Extract Type 12 - PRIMARY UPN SOURCE
+@@ -248,14 +314,18 @@ ipadb_extract_crtgt_info(krb5_context context,
+ 
+         if (!NDR_ERR_CODE_IS_SUCCESS(ndr_err)) {
+             *status = "TRUST_PAC_CANNOT_PARSE_UPN_DNS_INFO";
+-            kerr = EINVAL;
++            kerr = KRB5KDC_ERR_POLICY;
+             goto end;
+         }
+ 
+         /* Store pointer to UPN string */
+         info->upn = upn_info.upn_dns_info.upn_name;
+-        if (info->upn)
+-            info->upn_is_qualified = (NULL != strchr(info->upn, '@'));
++        if (!info->upn) {
++            *status = "TRUST_PAC_UPN_MISSING";
++            kerr = KRB5KDC_ERR_POLICY;
++            goto end;
++        }
++        info->upn_is_qualified = (NULL != strchr(info->upn, '@'));
+ 
+         /* Extract U flag - indicates constructed UPN */
+         info->upn_is_constructed =
+@@ -309,119 +379,100 @@ ipadb_extract_crtgt_info(krb5_context context,
+     return kerr;
+ }
+ 
+-/* Cross-validate PAC attributes for consistency
+- * All available attributes must match across different PAC buffers.
+- * LOGON_INFO and CLIENT_INFO must be present (asserted).
+- */
++/* Compare a PAC name attribute against client_name (case-insensitive).
++ * If both are qualified, compare fully. Otherwise compare name parts only,
++ * expecting '@' (qualified) or '\0' (bare) after the matched prefix.
++ * Returns true if the names differ. */
++static bool
++client_name_differs(const struct crossrealm_tgt_info *info,
++                    const char *tested, bool qualified)
++{
++    return (qualified && info->client_name_is_qualified)
++        ? (0 != strcasecmp(info->client_name, tested))
++        : (0 != strncasecmp(info->client_name, tested,
++                            info->unqualified_cn_len)
++           || tested[info->unqualified_cn_len] != (qualified ? '@' : '\0'));
++}
++
++/* Cross-validate PAC name attributes and SIDs against client_name.
++ * See file header for design rationale. */
+ static krb5_error_code
+ ipadb_cross_validate_pac_attributes(krb5_context context,
+                                     const struct crossrealm_tgt_info *info,
+                                     const char **status)
+ {
+-    krb5_error_code kerr = EINVAL;
+-    const char *at_sign = NULL;
+-    char *ticket_cname = NULL;
+-    size_t name_len;
++    krb5_error_code kerr = KRB5KDC_ERR_POLICY;
+ 
+     /* Mandatory PAC attributes must have been validated already */
+     assert(info->logon_info_present);
+     assert(info->client_info_present);
+ 
+-    /* Validate UPN matches ticket cname (for enterprise principals) */
+-    if (info->is_enterprise_princ && info->upn_dns_info_present) {
+-        /* Unparse client principal name (without realm) */
+-        kerr = krb5_unparse_name_flags(context, info->client_princ,
+-                                       KRB5_PRINCIPAL_UNPARSE_NO_REALM,
+-                                       &ticket_cname);
+-        if (kerr) {
+-            *status = "TRUST_CANNOT_UNPARSE_CNAME";
+-            goto end;
+-        }
+-
+-        /* Find the @ sign in UPN */
+-        at_sign = strchr(info->upn, '@');
+-        if (at_sign) {
+-            name_len = at_sign - info->upn;
+-
+-            /* Compare UPN name part with ticket cname */
+-            if (0 != strncmp(info->upn, ticket_cname, name_len) ||
+-                ticket_cname[name_len] != '\0') {
+-                *status = "TRUST_PAC_UPN_CNAME_MISMATCH";
+-                kerr = EINVAL;
+-                goto end;
+-            }
+-        }
+-
+-        krb5_free_unparsed_name(context, ticket_cname);
+-        ticket_cname = NULL;
++    /* account_name (bare) vs client_name */
++    if (client_name_differs(info, info->account_name, false)) {
++        *status = "TRUST_PAC_ACCOUNT_NAME_MISMATCH";
++        kerr = KRB5KDC_ERR_POLICY;
++        goto end;
+     }
+ 
+-    /* Cross-validate account names if extended UPN format is available */
+-    if (info->upn_has_sam_and_sid) {
+-        if (!info->account_name || !info->upn_sam_name ||
+-            0 != strcmp(info->account_name, info->upn_sam_name)) {
+-            *status = "TRUST_PAC_ACCOUNT_NAME_MISMATCH";
+-            kerr = EINVAL;
++    /* UPN (qualified) vs client_name, enterprise principals only.
++     * For enterprise principals, the AD KDC looks up the user by UPN
++     * (MS-KILE 3.3.5.6.1), so a forged UPN alias could produce a
++     * client_name that differs from account_name. For regular principals
++     * the lookup is by samAccountName, and the UPN may legitimately
++     * differ, so this check would cause false positives. */
++    if (info->is_enterprise_princ && info->upn_dns_info_present) {
++        if (client_name_differs(info, info->upn, true)) {
++            *status = "TRUST_PAC_UPN_MISMATCH";
++            kerr = KRB5KDC_ERR_POLICY;
+             goto end;
+         }
+     }
+ 
+-    /* Cross-validate client name matches account name */
+-    if (info->client_info_present) {
+-        if (!info->client_name || !info->account_name ||
+-            0 != strcmp(info->client_name, info->account_name)) {
+-            *status = "TRUST_PAC_CLIENT_NAME_MISMATCH";
+-            kerr = EINVAL;
++    /* UPN SAM name (bare) vs client_name */
++    if (info->upn_has_sam_and_sid) {
++        if (!info->upn_sam_name ||
++            client_name_differs(info, info->upn_sam_name, false)) {
++            *status = "TRUST_PAC_UPN_SAM_NAME_MISMATCH";
++            kerr = KRB5KDC_ERR_POLICY;
+             goto end;
+         }
+     }
+ 
+-    /* Cross-validate SIDs if extended UPN format is available */
++    /* UPN SID vs logon info SID */
+     if (info->upn_has_sam_and_sid) {
+         if (!dom_sid_check(&info->logon_info_sid,
+                            &info->upn_sid, true)) {
+             *status = "TRUST_PAC_UPN_SID_MISMATCH";
+-            kerr = EINVAL;
++            kerr = KRB5KDC_ERR_POLICY;
+             goto end;
+         }
+     }
+ 
+-    /* Cross-validate SID from REQUESTER_SID buffer if present */
+-    if (info->requester_sid_present) {
+-        if (!dom_sid_check(&info->logon_info_sid,
+-                           &info->requester_sid, true)) {
+-            *status = "TRUST_PAC_REQUESTER_SID_MISMATCH";
+-            kerr = EINVAL;
+-            goto end;
+-        }
+-    }
++    /* PAC_REQUESTER_SID is not checked against logon_info_sid because
++     * in S4U delegation scenarios, the requester SID is the service's
++     * SID, not the impersonated user's (MS-PAC 2.12). */
+ 
+     kerr = 0;
+ 
+ end:
+-    if (ticket_cname)
+-        krb5_free_unparsed_name(context, ticket_cname);
+-
+     return kerr;
+ }
+ 
+-/* Check Default Trust View override username consistency
+- * If a user override exists for this SID in the Default Trust View,
+- * verify that the override username matches the ticket cname.
+- * LOGON_INFO and CLIENT_INFO must be present (asserted).
+- */
++/* If a Default Trust View override exists for this SID, verify that
++ * ipaOriginalUid (always qualified) matches client_name. */
+ static krb5_error_code
+ ipadb_check_trust_view_override(krb5_context context,
+                                  const struct crossrealm_tgt_info *info,
+                                  const char **status)
+ {
+     struct ipadb_context *ipactx = NULL;
+-    krb5_error_code kerr = EINVAL;
+-    char *basedn = NULL, *filter = NULL, *attrs[] = {"uid", NULL};
++    krb5_error_code kerr = KRB5KDC_ERR_POLICY;
++    char *basedn = NULL, *filter = NULL;
++    char *attrs[] = {IPA_ORIGINAL_UID_ATTR, NULL};
+     LDAPMessage *res = NULL, *entry = NULL;
+     struct berval **uid_values = NULL;
+-    char *ticket_cname = NULL;
+     int count;
++    bool mismatch;
+ 
+     /* Mandatory PAC attributes must have been validated already */
+     assert(info->logon_info_present);
+@@ -470,35 +521,45 @@ ipadb_check_trust_view_override(krb5_context context,
+         goto end;
+     }
+ 
+-    /* Override exists - verify the username matches the ticket cname */
++    /* Override exists - verify the username matches client_name */
+     entry = ldap_first_entry(ipactx->lcontext, res);
+     if (!entry) {
+         *status = "TRUST_CANNOT_READ_OVERRIDE_ENTRY";
+-        kerr = EINVAL;
++        kerr = KRB5KDC_ERR_POLICY;
+         goto end;
+     }
+ 
+-    uid_values = ldap_get_values_len(ipactx->lcontext, entry, "ipaOriginalUid");
++    uid_values = ldap_get_values_len(ipactx->lcontext, entry,
++                                     IPA_ORIGINAL_UID_ATTR);
+     if (!uid_values || !uid_values[0]) {
+         *status = "TRUST_OVERRIDE_UID_UNDEFINED";
+-        kerr = EINVAL;
++        kerr = KRB5KDC_ERR_POLICY;
+         goto end;
+     }
+ 
+-    /* Unparse client principal name (without realm) */
+-    kerr = krb5_unparse_name_flags(context, info->client_princ,
+-                                   KRB5_PRINCIPAL_UNPARSE_NO_REALM,
+-                                   &ticket_cname);
+-    if (kerr) {
+-        *status = "TRUST_CANNOT_UNPARSE_CNAME";
+-        goto end;
++    /* Compare ipaOriginalUid (always qualified) against client_name.
++     * When client_name is qualified, compare full value including realm.
++     * When bare, compare name part only and verify ipaOriginalUid
++     * continues with '@' at that position. */
++    if (info->client_name_is_qualified) {
++        /* Full comparison: client_name length must match bv_len */
++        mismatch = (strlen(info->client_name) != uid_values[0]->bv_len ||
++                    0 != strncasecmp(info->client_name,
++                                     uid_values[0]->bv_val,
++                                     uid_values[0]->bv_len));
++    } else {
++        /* Name part only: unqualified_cn_len must be less than bv_len,
++         * the name part must match, and bv_val must have '@' at that
++         * position */
++        mismatch = (info->unqualified_cn_len >= uid_values[0]->bv_len ||
++                    0 != strncasecmp(info->client_name,
++                                     uid_values[0]->bv_val,
++                                     info->unqualified_cn_len) ||
++                    uid_values[0]->bv_val[info->unqualified_cn_len] != '@');
+     }
+ 
+-    /* Compare override username with ticket cname */
+-    if (0 != strncmp(uid_values[0]->bv_val, ticket_cname,
+-                     uid_values[0]->bv_len) ||
+-        '\0' != ticket_cname[uid_values[0]->bv_len]) {
+-        *status = "TRUST_OVERRIDE_UID_CNAME_MISMATCH";
++    if (mismatch) {
++        *status = "TRUST_OVERRIDE_UID_MISMATCH";
+         kerr = KRB5KDC_ERR_POLICY;
+         goto end;
+     }
+@@ -508,8 +569,6 @@ ipadb_check_trust_view_override(krb5_context context,
+ end:
+     if (uid_values)
+         ldap_value_free_len(uid_values);
+-    if (ticket_cname)
+-        krb5_free_unparsed_name(context, ticket_cname);
+     if (res)
+         ldap_msgfree(res);
+     if (filter)
+@@ -520,10 +579,8 @@ ipadb_check_trust_view_override(krb5_context context,
+     return kerr;
+ }
+ 
+-/* Check that enterprise principal has qualified UPN in PAC
+- * UPN MUST be qualified if it is NOT constructed (U flag not set).
+- * LOGON_INFO and CLIENT_INFO must be present (asserted).
+- */
++/* For enterprise principals, UPN must be qualified unless constructed
++ * (U flag set), per MS-KILE 3.3.5.2. */
+ static krb5_error_code
+ ipadb_check_upn_qualified(krb5_context context,
+                           const struct crossrealm_tgt_info *info,
+@@ -558,14 +615,7 @@ ipadb_check_upn_qualified(krb5_context context,
+     return 0;
+ }
+ 
+-/* Main function to check trust PAC content
+- *
+- * Performs security checks on trust TGS-REQ:
+- * 1. Cross-validation - verify PAC attributes consistency
+- * 2. User registration - requester SID must exist in Default Trust View
+- * 3. UPN qualification - enterprise principals must have qualified UPN
+- *    (if not constructed)
+- */
++/* Entry point for trust PAC content checks. See file header. */
+ krb5_error_code
+ ipadb_check_trust_pac_content(krb5_context context,
+                               const krb5_kdc_req *request,
+@@ -574,7 +624,7 @@ ipadb_check_trust_pac_content(krb5_context context,
+                               const char **status)
+ {
+     struct crossrealm_tgt_info info;
+-    krb5_error_code kerr = EINVAL;
++    krb5_error_code kerr = KRB5KDC_ERR_POLICY;
+ 
+     /* Initialize PAC check info structure and create talloc context */
+     kerr = ipadb_trust_pac_info_init(&info);

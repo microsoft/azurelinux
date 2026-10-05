@@ -1,0 +1,17 @@
+diff --git a/src/openslide-vendor-ventana.c b/src/openslide-vendor-ventana.c
+index 1297cc3f45a6..0fdf8f783329 100644
+--- a/src/openslide-vendor-ventana.c
++++ b/src/openslide-vendor-ventana.c
+@@ -516,6 +516,12 @@ static struct bif *parse_level0_xml(const char *xml,
+     // get tile counts
+     PARSE_INT_ATTRIBUTE_OR_RETURN(info, ATTR_NUM_COLS, area->tiles_across, NULL);
+     PARSE_INT_ATTRIBUTE_OR_RETURN(info, ATTR_NUM_ROWS, area->tiles_down, NULL);
++    if (area->tiles_across < 1 || area->tiles_down < 1) {
++      g_set_error(err, OPENSLIDE_ERROR, OPENSLIDE_ERROR_FAILED,
++                  "Area has invalid tile count %"PRId64"x%"PRId64,
++                  area->tiles_across, area->tiles_down);
++      return NULL;
++    }
+ 
+     // get position
+     // it seems these are always whole numbers, but they are sometimes

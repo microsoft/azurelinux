@@ -1,4 +1,4 @@
-From 4550b06f9de6c23d7b87a34d2bca1c9aaa594a3e Mon Sep 17 00:00:00 2001
+From 964b447ac115c94ed91edd8066887390d0d0ed60 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Fri, 14 Feb 2020 06:05:42 -0500
 Subject: [PATCH 2/5] Set FreeType version to 2.14.1 and update tolerances
@@ -41,10 +41,10 @@ index 79cccf0892..04d716b54c 100644
      from matplotlib import ft2font
      if (ft2font.__freetype_version__ != LOCAL_FREETYPE_VERSION or
 diff --git a/lib/matplotlib/tests/test_axes.py b/lib/matplotlib/tests/test_axes.py
-index 159fc70282..b304186fc9 100644
+index b9eb145b14..3a93369f22 100644
 --- a/lib/matplotlib/tests/test_axes.py
 +++ b/lib/matplotlib/tests/test_axes.py
-@@ -8084,7 +8084,7 @@ def test_normal_axes():
+@@ -8083,7 +8083,7 @@ def test_normal_axes():
      ]
      for nn, b in enumerate(bbaxis):
          targetbb = mtransforms.Bbox.from_bounds(*target[nn])
@@ -53,7 +53,7 @@ index 159fc70282..b304186fc9 100644
  
      target = [
          [150.0, 119.999, 930.0, 11.111],
-@@ -8102,7 +8102,7 @@ def test_normal_axes():
+@@ -8101,7 +8101,7 @@ def test_normal_axes():
  
      target = [85.5138, 75.88888, 1021.11, 1017.11]
      targetbb = mtransforms.Bbox.from_bounds(*target)

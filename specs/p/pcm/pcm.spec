@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           pcm
-Version:        202509
+Version:        202604
 Release: 4%{?dist}
 Summary:        Intel(r) Performance Counter Monitor
 License:        BSD-3-Clause

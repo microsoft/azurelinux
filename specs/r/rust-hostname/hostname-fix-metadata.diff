@@ -1,16 +1,23 @@
---- hostname-0.3.1/Cargo.toml	2020-02-28T16:58:01+00:00
-+++ hostname-0.3.1/Cargo.toml	2024-09-21T23:41:28.498611+00:00
-@@ -23,10 +23,10 @@
- [package.metadata.docs.rs]
- features = ["set"]
- rustdoc-args = ["--cfg", "docsrs"]
--[dependencies.match_cfg]
--version = "^0.1"
-+[dependencies.cfg-if]
-+version = "^1.0"
- [dev-dependencies.version-sync]
--version = "0.8"
-+version = "0.9"
+--- hostname-0.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ hostname-0.4.2/Cargo.toml	2026-03-19T14:04:36.562507+00:00
+@@ -54,10 +54,6 @@
+ path = "examples/hostname.rs"
  
- [features]
- default = []
+ [[test]]
+-name = "codegen"
+-path = "tests/codegen.rs"
+-
+-[[test]]
+ name = "version"
+ path = "tests/version.rs"
+ 
+@@ -70,9 +66,6 @@
+ [dev-dependencies.version-sync]
+ version = "0.9"
+ 
+-[dev-dependencies.windows-bindgen]
+-version = "0.65"
+-
+ [target.'cfg(any(unix, target_os = "redox"))'.dependencies.libc]
+ version = "0.2"
+ 

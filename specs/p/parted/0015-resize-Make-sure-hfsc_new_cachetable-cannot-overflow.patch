@@ -1,0 +1,30 @@
+From 7d65e00517a8329a44662e3a727311c2d465f974 Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Thu, 10 Sep 2026 13:04:04 -0700
+Subject: [PATCH 15/17] resize: Make sure hfsc_new_cachetable cannot overflow
+ on 32bit
+
+Add a couple of PED_ASSERT checks on size to make sure the ped_malloc
+call doesn't allocate less than expected.
+
+(cherry picked from commit 67f9b5ff586ee9ae6682d86773d1fa6aa41d50b8)
+---
+ libparted/fs/r/hfs/cache.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libparted/fs/r/hfs/cache.c b/libparted/fs/r/hfs/cache.c
+index 255f1fda..17a181e1 100644
+--- a/libparted/fs/r/hfs/cache.c
++++ b/libparted/fs/r/hfs/cache.c
+@@ -49,6 +49,8 @@ hfsc_new_cachetable(unsigned int size)
+ 	ret->table_size = size;
+ 	ret->table_first_free = 0;
+ 
++        PED_ASSERT (size > 0);
++        PED_ASSERT ((size_t) size * sizeof(*ret->table) < SIZE_MAX);
+ 	ret->table = ped_malloc(sizeof(*ret->table)*size);
+ 	if (!ret->table) { free(ret); return NULL; }
+ 	memset(ret->table, 0, sizeof(*ret->table)*size);
+-- 
+2.55.0
+

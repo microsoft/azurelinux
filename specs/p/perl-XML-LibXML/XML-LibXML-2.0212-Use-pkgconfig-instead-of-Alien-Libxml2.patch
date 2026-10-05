@@ -1,0 +1,66 @@
+diff -up XML-LibXML-2.0212/Makefile.PL.orig XML-LibXML-2.0212/Makefile.PL
+--- XML-LibXML-2.0212/Makefile.PL.orig	2026-05-20 16:38:47.845623176 +0200
++++ XML-LibXML-2.0212/Makefile.PL	2026-05-20 16:42:40.797355539 +0200
+@@ -17,15 +17,31 @@ use warnings;
+ 
+ require 5.008001;
+ 
+-use Alien::Base::Wrapper qw( Alien::Libxml2 );
+ use ExtUtils::MakeMaker;
+ use Config;
+ 
+ my $SKIP_SAX_INSTALL = $ENV{SKIP_SAX_INSTALL};
+ 
++my $libs = '';
++my $inc  = '';
++if (`xml2-config --modules 2>/dev/null`) {
++  $libs = `xml2-config --libs 2>/dev/null`;
++  $inc  = `xml2-config --cflags 2>/dev/null`;
++}
++elsif (`pkg-config --modversion libcrypto 2>/dev/null`) {
++  $libs = `pkg-config --libs libxml-2.0 2>/dev/null`;
++  $inc  = `pkg-config --cflags libxml-2.0 2>/dev/null`;
++}
++
++$libs =~ s/[\r\n]+/ /g;
++$inc  =~ s/[\r\n]+/ /g;
++
++die "Could not determine location of libxml2 libs."
++  unless $libs =~ /^-/;
++die "Could not determine location of libxml2 headers."
++  unless $inc =~ /^-/;
++
+ my %ConfigReqs = (
+-  "Alien::Libxml2" => '0.14',
+-  "Alien::Base::Wrapper" => 0,
+   "Config" => 0,
+   "ExtUtils::MakeMaker" => 0,
+ );
+@@ -67,24 +83,12 @@ my %prereqs = (
+   "warnings" => 0,
+ );
+ 
+-my %xsbuild_concat = (
++my %xsbuild = (
+   DEFINE  => '-DHAVE_UTF8',
+   OBJECT  => '$(O_FILES)',
++  LIBS    => $libs,
++  INC     => $inc,
+ );
+-my %xsbuild = Alien::Base::Wrapper->mm_args;  # Might contain a definition of DEFINE, must thus concatenate.
+-while (my ($k, $v) = each %xsbuild_concat) {
+-  my $base_val = $xsbuild{$k};
+-  $xsbuild{$k} = (defined($base_val) ? ($base_val . ' ' . $v) : $v);
+-}
+-
+-# Strip bogus -L/lib entries that Alien::Base::Wrapper sometimes injects
+-# (the directory does not exist on macOS and the linker warns about it).
+-for my $key (qw(LDFLAGS LDDLFLAGS)) {
+-  next if !defined $xsbuild{$key};
+-  $xsbuild{$key} =~ s{(?:^|\s)\K-L/lib(?=\s|$)}{}g;
+-  $xsbuild{$key} =~ s{\s+}{ }g;
+-  $xsbuild{$key} =~ s{^\s+|\s+$}{}g;
+-}
+ 
+ my %WriteMakefileArgs = (
+   "NAME" => "XML::LibXML",

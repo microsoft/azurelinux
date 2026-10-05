@@ -5,8 +5,8 @@
 %bcond_without perl_Syntax_Operator_In_enables_optional_test
 
 Name:           perl-Syntax-Operator-In
-Version:        0.10
-Release: 7%{?dist}
+Version:        0.11
+Release: 5%{?dist}
 Summary:        Infix element-of-list meta-operator
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Syntax-Operator-In
@@ -16,21 +16,21 @@ BuildRequires:  findutils
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(:VERSION) >= 5.14
+BuildRequires:  perl(:VERSION) >= 5.20
 BuildRequires:  perl(ExtUtils::CBuilder)
 BuildRequires:  perl(Module::Build)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-%define xs_parse_infix_minver 0.44
+%define xs_parse_infix_minver 0.51
 BuildRequires:  perl(XS::Parse::Infix::Builder) >= %{xs_parse_infix_minver}
 # Run-time:
 BuildRequires:  perl(Carp)
 %global meta_min_ver 0.003.002
 BuildRequires:  perl(meta) >= %{meta_min_ver}
-BuildRequires:  perl(Test2::V0)
 BuildRequires:  perl(XS::Parse::Infix) >= %{xs_parse_infix_minver}
 BuildRequires:  perl(XSLoader)
 # Tests:
+BuildRequires:  perl(Test2::V0)
 BuildRequires:  perl(utf8)
 %if %{with perl_Syntax_Operator_In_enables_optional_test}
 # Optional tests:
@@ -116,6 +116,9 @@ export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print
 %{_libexecdir}/%{name}
 
 %changelog
+* Fri Sep 25 2026 Petr Pisar <ppisar@redhat.com> - 0.11-1
+- 0.11 bump
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.10-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,0 +1,20 @@
+From: Christos Zoulas <christos@zoulas.com>
+Date: Thu, 27 Aug 2026 17:37:15 +0000
+Subject: PR/785: hexa: Disable execute restrictions for now. On NixOS and Fedora this breaks executing binaries like bzip2
+
+# Backport of upstream commit dcf3495219a0ccae60f10c00e6b16696c6fe3977
+# https://github.com/file/file/commit/dcf3495219a0ccae60f10c00e6b16696c6fe3977
+diff --git a/src/landlock.c b/src/landlock.c
+index 15b01d19..3136724f 100644
+--- a/src/landlock.c
++++ b/src/landlock.c
+@@ -108,7 +108,9 @@ enable_landlock(int flags, int action)
+ 
+ 	(void)memset(&attr, 0, sizeof(attr));
+ 	attr.handled_access_fs =
++#if 0
+ 	    LANDLOCK_ACCESS_FS_EXECUTE |
++#endif
+ 	    LANDLOCK_ACCESS_FS_WRITE_FILE |
+ 	    LANDLOCK_ACCESS_FS_READ_FILE |
+ 	    LANDLOCK_ACCESS_FS_READ_DIR |

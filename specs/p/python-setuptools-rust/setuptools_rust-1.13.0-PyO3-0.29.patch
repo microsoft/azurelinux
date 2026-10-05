@@ -1,0 +1,69 @@
+diff -Naur setuptools_rust-1.13.0-original/examples/generated-files/Cargo.toml setuptools_rust-1.13.0/examples/generated-files/Cargo.toml
+--- setuptools_rust-1.13.0-original/examples/generated-files/Cargo.toml	2026-06-27 22:44:42.000000000 +0100
++++ setuptools_rust-1.13.0/examples/generated-files/Cargo.toml	2026-06-29 13:44:49.483715455 +0100
+@@ -5,7 +5,7 @@
+ build = "build.rs"
+ 
+ [dependencies]
+-pyo3 = "0.27"
++pyo3 = "0.29"
+ 
+ [lib]
+ name = "_lib"  # private module to be nested into Python package
+diff -Naur setuptools_rust-1.13.0-original/examples/hello-world/Cargo.toml setuptools_rust-1.13.0/examples/hello-world/Cargo.toml
+--- setuptools_rust-1.13.0-original/examples/hello-world/Cargo.toml	2026-06-27 22:44:42.000000000 +0100
++++ setuptools_rust-1.13.0/examples/hello-world/Cargo.toml	2026-06-29 13:44:59.091593448 +0100
+@@ -6,7 +6,7 @@
+ # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+ 
+ [dependencies]
+-pyo3 = "0.28"
++pyo3 = "0.29"
+ 
+ [profile.release-lto]
+ inherits = "release"
+diff -Naur setuptools_rust-1.13.0-original/examples/hello-world-setuppy/Cargo.toml setuptools_rust-1.13.0/examples/hello-world-setuppy/Cargo.toml
+--- setuptools_rust-1.13.0-original/examples/hello-world-setuppy/Cargo.toml	2026-06-27 22:44:42.000000000 +0100
++++ setuptools_rust-1.13.0/examples/hello-world-setuppy/Cargo.toml	2026-06-29 13:44:56.458813255 +0100
+@@ -4,7 +4,7 @@
+ edition = "2021"
+ 
+ [dependencies]
+-pyo3 = "0.28"
++pyo3 = "0.29"
+ 
+ [lib]
+ # See https://github.com/PyO3/pyo3 for details
+diff -Naur setuptools_rust-1.13.0-original/examples/html-py-ever/Cargo.toml setuptools_rust-1.13.0/examples/html-py-ever/Cargo.toml
+--- setuptools_rust-1.13.0-original/examples/html-py-ever/Cargo.toml	2026-06-27 22:44:42.000000000 +0100
++++ setuptools_rust-1.13.0/examples/html-py-ever/Cargo.toml	2026-06-29 13:44:46.656675817 +0100
+@@ -6,7 +6,7 @@
+ 
+ [dependencies]
+ scraper = "0.27"
+-pyo3 = "0.28"
++pyo3 = "0.29"
+ 
+ [lib]
+ name = "html_py_ever"
+diff -Naur setuptools_rust-1.13.0-original/examples/namespace_package/Cargo.toml setuptools_rust-1.13.0/examples/namespace_package/Cargo.toml
+--- setuptools_rust-1.13.0-original/examples/namespace_package/Cargo.toml	2026-06-27 22:44:42.000000000 +0100
++++ setuptools_rust-1.13.0/examples/namespace_package/Cargo.toml	2026-06-29 13:44:44.003638622 +0100
+@@ -18,4 +18,4 @@
+ # path = "src/lib.rs"
+ 
+ [dependencies]
+-pyo3 = "0.28"
++pyo3 = "0.29"
+diff -Naur setuptools_rust-1.13.0-original/examples/rust_with_cffi/Cargo.toml setuptools_rust-1.13.0/examples/rust_with_cffi/Cargo.toml
+--- setuptools_rust-1.13.0-original/examples/rust_with_cffi/Cargo.toml	2026-06-27 22:44:42.000000000 +0100
++++ setuptools_rust-1.13.0/examples/rust_with_cffi/Cargo.toml	2026-06-29 13:44:41.476603196 +0100
+@@ -5,7 +5,7 @@
+ edition = "2021"
+ 
+ [dependencies]
+-pyo3 = "0.28"
++pyo3 = "0.29"
+ 
+ [lib]
+ name = "rust_with_cffi"

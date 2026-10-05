@@ -1,16 +1,22 @@
---- uu_tail-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ uu_tail-0.0.27/Cargo.toml	2025-08-05T01:49:02.193084+00:00
-@@ -65,13 +65,3 @@
- [dev-dependencies.rstest]
- version = "0.21.0"
+--- uu_tail-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_tail-0.7.0/Cargo.toml	2026-03-16T20:19:52.925987+00:00
+@@ -84,14 +84,6 @@
+ features = ["fs"]
+ default-features = false
  
--[target."cfg(windows)".dependencies.winapi-util]
--version = "0.1.8"
--
 -[target."cfg(windows)".dependencies.windows-sys]
--version = "0.48.0"
+-version = "0.61.0"
 -features = [
 -    "Win32_System_Threading",
 -    "Win32_Foundation",
 -]
 -default-features = false
+-
+ [lints.clippy]
+ cargo_common_metadata = "allow"
+ cast_lossless = "allow"
+@@ -155,3 +147,4 @@
+     "cfg(fuzzing)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++

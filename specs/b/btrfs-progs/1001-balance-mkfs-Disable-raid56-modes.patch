@@ -1,6 +1,6 @@
-From c840e616c03a1d735c7a6c0ba1c6473da1595ba2 Mon Sep 17 00:00:00 2001
+From f12867c4436b41cc9b55f1e8ce51dfd673d0e82e Mon Sep 17 00:00:00 2001
 From: Neal Gompa <ngompa@centosproject.org>
-Date: Wed, 1 Sep 2021 19:25:55 -0400
+Date: Sat, 23 May 2026 07:56:31 -0400
 Subject: [PATCH] balance, mkfs: Disable raid56 modes
 
 The RAID 5/6 modes in Btrfs are not yet suitable for production use,
@@ -13,19 +13,19 @@ Signed-off-by: Neal Gompa <ngompa@centosproject.org>
  2 files changed, 6 insertions(+), 32 deletions(-)
 
 diff --git a/cmds/balance.c b/cmds/balance.c
-index 4c73273d..fec6a1a3 100644
+index 96ae04d6..19de07f2 100644
 --- a/cmds/balance.c
 +++ b/cmds/balance.c
-@@ -365,7 +365,7 @@ static const char * const cmd_balance_start_usage[] = {
+@@ -384,7 +384,7 @@ static const char * const cmd_balance_start_usage[] = {
  	OPTLINE("-d[filters]", "act on data chunks with optional filters (no space in between)"),
  	OPTLINE("-m[filters]", "act on metadata chunks with optional filters (no space in between)"),
  	OPTLINE("-s[filters]", "act on system chunks (only under -f) with optional filters (no space in between)"),
 -	OPTLINE("-f", "force a reduction of metadata integrity, or skip timeout when converting to RAID56 profiles"),
 +	OPTLINE("-f", "force a reduction of metadata integrity"),
  	OPTLINE("--full-balance", "do not print warning and do not delay start"),
- 	OPTLINE("--background|--bg", "run the balance as a background process"),
+ 	OPTLINE("--background, --bg", "run the balance as a background process"),
  	OPTLINE("--enqueue", "wait if there's another exclusive operation running, otherwise continue"),
-@@ -386,7 +386,6 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
+@@ -444,7 +444,6 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
  	bool background = false;
  	bool enqueue = false;
  	unsigned start_flags = 0;
@@ -33,7 +33,7 @@ index 4c73273d..fec6a1a3 100644
  	bool convert_warned  = false;
  	int i;
  
-@@ -492,8 +491,6 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
+@@ -598,8 +597,6 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
  
  	/* soft makes sense only when convert for corresponding type is set */
  	for (i = 0; ptrs[i]; i++) {
@@ -42,7 +42,7 @@ index 4c73273d..fec6a1a3 100644
  		if ((ptrs[i]->flags & BTRFS_BALANCE_ARGS_SOFT) &&
  		    !(ptrs[i]->flags & BTRFS_BALANCE_ARGS_CONVERT)) {
  			error("'soft' option can be used only when converting profiles");
-@@ -503,33 +500,10 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
+@@ -609,33 +606,10 @@ static int cmd_balance_start(const struct cmd_struct *cmd,
  		if (!(ptrs[i]->flags & BTRFS_BALANCE_ARGS_CONVERT))
  			continue;
  
@@ -80,10 +80,10 @@ index 4c73273d..fec6a1a3 100644
  
  	if (!(start_flags & BALANCE_START_FILTERS) && !(start_flags & BALANCE_START_NOWARN)) {
 diff --git a/mkfs/main.c b/mkfs/main.c
-index c9dbd234..e1a5b190 100644
+index b8b4cb7d..42158c74 100644
 --- a/mkfs/main.c
 +++ b/mkfs/main.c
-@@ -1501,8 +1501,8 @@ int BOX_MAIN(mkfs)(int argc, char **argv)
+@@ -1941,8 +1941,8 @@ int BOX_MAIN(mkfs)(int argc, char **argv)
  
  	if ((data_profile | metadata_profile) & BTRFS_BLOCK_GROUP_RAID56_MASK) {
  		features.incompat_flags |= BTRFS_FEATURE_INCOMPAT_RAID56;
@@ -95,5 +95,5 @@ index c9dbd234..e1a5b190 100644
  
  	if ((data_profile | metadata_profile) &
 -- 
-2.48.0
+2.54.0
 

@@ -1,0 +1,49 @@
+From aac2926f5181bf2a263de7b7ba57b74e884048d8 Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@gnome.org>
+Date: Mon, 21 Sep 2026 14:52:21 -0500
+Subject: [PATCH] Cherry-pick 317619@main (cfcd0f4acc3a).
+ https://bugs.webkit.org/show_bug.cgi?id=322394
+
+REGRESSION(317619@main): RELEASE_ASSERT in initializeMainThread aborts Eclipse/SWT applications
+https://bugs.webkit.org/show_bug.cgi?id=322394
+
+Reviewed by NOBODY (OOPS!).
+
+Revert 317619@main to unbreak Eclipse.
+---
+ Source/WTF/wtf/Threading.cpp            | 4 ++--
+ Source/WTF/wtf/posix/ThreadingPOSIX.cpp | 2 --
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/Source/WTF/wtf/Threading.cpp b/Source/WTF/wtf/Threading.cpp
+index 7249ada7d7b3..5aa27b3566e8 100644
+--- a/Source/WTF/wtf/Threading.cpp
++++ b/Source/WTF/wtf/Threading.cpp
+@@ -133,9 +133,9 @@ static std::optional<size_t> NODELETE stackSize(ThreadType threadType)
+ #endif
+ }
+ 
+-#if PLATFORM(COCOA) || OS(LINUX)
++#if PLATFORM(COCOA)
+ // uid 1 is reserved for the main thread, assigned in Thread::initializeCurrentTLS
+-// when current thread is detected as main thread. ++s_uid yields >= 2 for every non-main thread.
++// when pthread_main_np() returns true. ++s_uid yields >= 2 for every non-main thread.
+ std::atomic<uint32_t> ThreadLike::s_uid { 1 };
+ #else
+ // On platforms without a way to detect the main thread before initializeMainThread()
+diff --git a/Source/WTF/wtf/posix/ThreadingPOSIX.cpp b/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
+index 9ea11e2d270e..792034446d92 100644
+--- a/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
++++ b/Source/WTF/wtf/posix/ThreadingPOSIX.cpp
+@@ -457,8 +457,6 @@ Thread& Thread::initializeCurrentTLS()
+     WTF::initialize();
+ #if PLATFORM(COCOA)
+     Ref thread = adoptRef(*new Thread(SchedulingPolicy::Other, pthread_main_np() ? IsMain::Yes : IsMain::No));
+-#elif OS(LINUX)
+-    Ref thread = adoptRef(*new Thread(SchedulingPolicy::Other, getpid() == static_cast<pid_t>(syscall(SYS_gettid)) ? IsMain::Yes : IsMain::No));
+ #else
+     Ref thread = adoptRef(*new Thread(SchedulingPolicy::Other));
+ #endif
+-- 
+2.55.0
+

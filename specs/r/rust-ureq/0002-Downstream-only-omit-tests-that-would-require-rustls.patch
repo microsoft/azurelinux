@@ -1,0 +1,44 @@
+From c730958c7c9762145c63b0ecd5e2414f7cd2d2ff Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 7 Sep 2026 07:26:20 +0100
+Subject: [PATCH 2/2] Downstream-only: omit tests that would require
+ rustls/aws-lc-rs
+
+---
+ src/tls/mod.rs | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/tls/mod.rs b/src/tls/mod.rs
+index b3dc89b..b44977c 100644
+--- a/src/tls/mod.rs
++++ b/src/tls/mod.rs
+@@ -273,7 +273,7 @@ impl TlsConfigBuilder {
+     ///
+     /// * Agent
+     ///
+-    /// ```
++    /// ```ignore
+     /// use std::sync::Arc;
+     /// use ureq::{Agent};
+     /// use ureq::tls::{TlsConfig, TlsProvider};
+@@ -421,6 +421,8 @@ mod test {
+     }
+ 
+     #[test]
++    // Downstream-only: omit tests that would require rustls/aws-lc-rs
++    #[cfg(false)]
+     #[cfg(feature = "_rustls")]
+     fn crypto_providers_pool_by_identity() {
+         let provider = || Arc::new(::rustls::crypto::aws_lc_rs::default_provider());
+@@ -521,6 +523,8 @@ mod test {
+         }
+ 
+         #[test]
++        // Downstream-only: omit tests that would require rustls/aws-lc-rs
++        #[cfg(false)]
+         #[cfg(feature = "_rustls")]
+         fn rustls_uses_connection_timeout() {
+             let tls_config = TlsConfig::builder()
+-- 
+2.55.0
+

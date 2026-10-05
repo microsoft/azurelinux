@@ -1,0 +1,51 @@
+diff -up sblim-sfcb-1.4.9/providerMgr.c.validate-ipc-msg sblim-sfcb-1.4.9/providerMgr.c
+--- sblim-sfcb-1.4.9/providerMgr.c.validate-ipc-msg	2026-07-29 09:41:36.973038191 +0200
++++ sblim-sfcb-1.4.9/providerMgr.c	2026-07-29 09:47:02.157247192 +0200
+@@ -24,6 +24,7 @@
+ #include <time.h>
+ #include <pthread.h>
+ #include <sys/resource.h>
++#include <stdint.h>
+ 
+ #include "cmpi/cmpidt.h"
+ #include "providerRegister.h"
+@@ -1003,6 +1004,18 @@ static MgrHandler mHandlers[] = {
+   {notSupported}                // OPS_EnumerationCount 43
+ };
+ 
++static int
++segInMsg(unsigned long rl, MsgSegment seg)
++{
++  uintptr_t off = (uintptr_t) seg.data;
++  size_t len = (size_t) seg.length;
++  if (off > rl)
++    return 0;
++  if (len > (size_t)(rl - off))
++    return 0;
++  return 1;
++}
++
+ void
+ processProviderMgrRequests()
+ {
+@@ -1068,6 +1081,20 @@ processProviderMgrRequests()
+          spRecvReq(&sfcbSockets.receive, &requestor, (void **) &req, &rl,
+                    &mqg)) == 0) {
+       if (mqg.rdone) {
++        if (rl < sizeof(OperationHdr) ||
++            !segInMsg(rl, req->nameSpace) ||
++            (req->className.length && !segInMsg(rl, req->className)) ||
++            req->type >= (sizeof(mHandlers) / sizeof(mHandlers[0])) ||
++            mHandlers[req->type].handler == NULL) {
++          mlogf(M_ERROR, M_SHOW,
++                "--- Mgr request rejected: invalid message "
++                "(len=%lu)\n", rl);
++          free(req);
++          if ((options & OH_Internal) == 0)
++            close(requestor);
++          continue;
++        }
++
+         req->nameSpace.data =
+             (void *) ((long) req->nameSpace.data + (char *) req);
+         if (req->className.length)

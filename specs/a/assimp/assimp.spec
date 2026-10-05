@@ -4,8 +4,8 @@
 %define soversion 6
 
 Name:           assimp
-Version:        6.0.4
-Release: 4%{?dist}
+Version:        6.0.5
+Release: 9%{?dist}
 Summary:        Library to import various 3D model formats into applications
 
 # Assimp is BSD
@@ -36,6 +36,16 @@ Patch2:         %{name}-nozlib.patch
 Patch3:         %{name}-docs.patch
 # Enable ctest
 Patch4:         %{name}-tests.patch
+# https://github.com/assimp/assimp/commit/eb84eec580d3f4ba2f0fd87409b7d0744620f11e
+Patch5:         CVE-2026-14610.patch
+# https://github.com/assimp/assimp/commit/c39d8c15dbbe03174af61d8eedbbf90120f4eb9f
+Patch6:         CVE-2026-19968.patch
+# https://github.com/assimp/assimp/commit/50d767984e78d51b53e2020fdf0967fd624bc377
+Patch7:         CVE-2026-19999.patch
+# https://github.com/DerDoktorX/assimp/commit/a07a25d9a348152f2eb7f3359909a2cb9d0b2702
+Patch8:         CVE-2026-14604.patch
+# https://github.com/assimp/assimp/pull/6869
+Patch9:         CVE-2025-15666.patch
 
 
 BuildRequires:  boost-devel
@@ -81,6 +91,7 @@ Summary: Header files and libraries for assimp
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: poly2tri-devel
 Requires: pugixml-devel
+Requires: zlib-devel
 
 %description devel
 This package contains the header files and libraries
@@ -163,7 +174,7 @@ exclude="utMD5Importer.importBoarMan|utMD5Importer.importBob|utMD2Importer.impor
 %doc Readme.md CREDITS
 %{_bindir}/assimp
 %{_libdir}/libassimp.so.6
-%{_libdir}/libassimp.so.6.0.4
+%{_libdir}/libassimp.so.6.0.5
 
 %files devel
 %{_includedir}/assimp/
@@ -180,6 +191,22 @@ exclude="utMD5Importer.importBoarMan|utMD5Importer.importBob|utMD2Importer.impor
 
 
 %changelog
+* Fri Sep 18 2026 Sandro Mani <manisandro@gmail.com> - 6.0.5-5
+- Add fixes for CVE-2026-14610, CVE-2026-19968, CVE-2026-19999, CVE-2026-14604,
+  CVE-2025-15666
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 6.0.5-3
+- Rebuilt for Python 3.15
+
+* Thu May 14 2026 Scott K Logan <logans@cottsay.net> - 6.0.5-2
+- Add missing dependency from assimp-devel on zlib-devel
+
+* Fri May 01 2026 Sandro Mani <manisandro@gmail.com> - 6.0.5-1
+- Update to 6.0.5
+
 * Tue Jan 27 2026 Sandro Mani <manisandro@gmail.com> - 6.0.4-1
 - Update to 6.0.4
 

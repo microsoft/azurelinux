@@ -1,0 +1,55 @@
+diff -up sblim-sfcb-1.4.9/sfcbrepos.sh.in.secure-tmpfile sblim-sfcb-1.4.9/sfcbrepos.sh.in
+--- sblim-sfcb-1.4.9/sfcbrepos.sh.in.secure-tmpfile	2026-07-29 11:58:54.171124696 +0200
++++ sblim-sfcb-1.4.9/sfcbrepos.sh.in	2026-07-29 11:56:15.272018480 +0200
+@@ -170,7 +170,9 @@ then
+     fi
+ 
+     # Compile all staged namespace directories
+-    instmigfile=/tmp/sfcbinst.mof
++    instmigfile="$(mktemp "${TMPDIR:-/tmp}/sfcbinst.XXXXXX.mof")" || exit 1
++    chmod 600 "$instmigfile" || exit 1
++    trap 'rm -f -- "$instmigfile"' EXIT
+     mofsubdirs=`find $stagingdir/mofs/* -type d -print 2> /dev/null`
+     if ls $stagingdir/mofs/*.mof > /dev/null 2>&1
+     then
+@@ -186,21 +188,21 @@ then
+ 	    repositorydir=$registrationdir/repository/
+ 	    [ -d $repositorydir ] || mkdir -p $repositorydir
+ 
+-        #grab all non-mof static instances, output to /tmp/sfcbinst.mof
++        #grab all non-mof static instances, output to temp file
+         if [ -z "$ignore_instances" ]
+         then
+-            rm -f $instmigfile 2> /dev/null
++            : > "$instmigfile"
+             #get class names (from filenames), ignoring specific files, from repos.previous, as it's already been moved
+             if [ -e $registrationdir/repository.previous/$namespace/ ]
+             then
+                 static_inst_files=`ls $registrationdir/repository.previous/$namespace/ -I classSchemas -I qualifiers -I *.idx` > /dev/null 2>&1
+                 for instfile in $static_inst_files
+                 do
+-                    sfcbinst2mof -n $namespace -c $instfile -o $instmigfile -r $registrationdir/repository.previous/ -g ${DESTDIR}@sysconfdir@/sfcb/sfcb.cfg 2> /dev/null
++                    sfcbinst2mof -n "$namespace" -c "$instfile" -o "$instmigfile" -r "$registrationdir/repository.previous/" -g "${DESTDIR}@sysconfdir@/sfcb/sfcb.cfg" 2> /dev/null
+                 done
+             fi
+         fi
+-        if [ -e $instmigfile ]
++        if [ -s "$instmigfile" ]
+         then
+             instmigopt="-m $instmigfile"
+         else
+@@ -208,14 +210,9 @@ then
+         fi
+ 	    if ! sfcbmof -d $repositorydir -n $namespace -o classSchemas -I $cimschemadir -i CIM_Schema.mof $cpformat $backendopt $instmigopt $mofdir/*.mof $globalmofs
+ 	    then
+-            rm -f $instmigfile 2> /dev/null
+ 		    echo Failed compiling the MOF files. >&2
+ 		    exit 1
+ 	    fi
+-        if [ -e $instmigfile ]
+-        then
+-            rm -f $instmigfile 2> /dev/null
+-        fi
+ 
+         if [ "$compress" = "1" ]
+         then

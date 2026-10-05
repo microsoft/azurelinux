@@ -1,0 +1,34 @@
+diff -Naur orjson-3.12.0-original/Cargo.toml orjson-3.12.0/Cargo.toml
+--- orjson-3.12.0-original/Cargo.toml	2026-08-14 16:44:42.000000000 +0100
++++ orjson-3.12.0/Cargo.toml	2026-08-16 15:53:57.319328159 +0100
+@@ -48,7 +48,7 @@
+ itoap = { version = "1", default-features = false, features = ["std", "simd"] }
+ jiff-core = { version = "0.1", default-features = false }
+ once_cell = { version = "1", default-features = false, features = ["alloc", "race"] }
+-pyo3-ffi = { version = "0.28", default-features = false }
++pyo3-ffi = { version = "0.29", default-features = false }
+ simdutf8 = { version = "0.1", default-features = false, features = ["std", "public_imp", "aarch64_neon"] }
+ unwinding = { version = "=0.2.10", default-features = false, features = ["unwinder"], optional = true }
+ xxhash-rust = { version = "^0.8", default-features = false, features = ["xxh3"] }
+@@ -56,7 +56,7 @@
+ 
+ [build-dependencies]
+ cc = { version = "1" }
+-pyo3-build-config = { version = "0.28" }
++pyo3-build-config = { version = "0.29" }
+ 
+ [profile.dev]
+ codegen-units = 1
+diff -Naur orjson-3.12.0-original/src/ffi/pystrref/pyunicode_new.rs orjson-3.12.0/src/ffi/pystrref/pyunicode_new.rs
+--- orjson-3.12.0-original/src/ffi/pystrref/pyunicode_new.rs	2026-08-14 16:44:42.000000000 +0100
++++ orjson-3.12.0/src/ffi/pystrref/pyunicode_new.rs	2026-08-16 15:54:20.495685409 +0100
+@@ -6,6 +6,9 @@
+ 
+ macro_rules! validate_str {
+     ($ptr:expr) => {
++        // Downstream patch: this private FFI definition was removed in PyO3 0.29, and we build
++        // exclusively in release mode anyway.
++        #[cfg(false)]
+         #[cfg(all(CPython, not(Py_LIMITED_ABI)))]
+         debug_assert!(crate::ffi::_PyUnicode_CheckConsistency($ptr.cast::<PyObject>(), 1) == 1)
+     };

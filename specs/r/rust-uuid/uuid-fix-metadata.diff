@@ -1,6 +1,6 @@
---- uuid-1.21.0/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ uuid-1.21.0/Cargo.toml	2026-02-14T14:18:13.953894+00:00
-@@ -63,7 +63,6 @@
+--- uuid-1.26.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uuid-1.26.1/Cargo.toml	2026-09-29T10:34:59.180668+00:00
+@@ -62,7 +62,6 @@
      "serde",
      "arbitrary",
      "slog",
@@ -8,7 +8,7 @@
      "v1",
      "v3",
      "v4",
-@@ -96,18 +95,11 @@
+@@ -95,18 +94,11 @@
  
  [features]
  atomic = ["dep:atomic"]
@@ -27,7 +27,7 @@
  md5 = ["dep:md-5"]
  rng = ["dep:getrandom"]
  rng-getrandom = [
-@@ -143,16 +135,6 @@
+@@ -142,16 +134,6 @@
  optional = true
  default-features = false
  
@@ -42,9 +42,9 @@
 -default-features = false
 -
  [dependencies.bytemuck]
- version = "1.21.0"
+ version = "1.22"
  features = ["derive"]
-@@ -175,11 +157,6 @@
+@@ -174,11 +156,6 @@
  
  [dependencies.slog]
  version = "2"
@@ -56,3 +56,13 @@
  optional = true
  
  [dev-dependencies.rustversion]
+@@ -207,9 +184,6 @@
+ version = "0.10"
+ optional = true
+ 
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.gungraun]
+-version = "=0.19.2"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "allow"
+ priority = 0

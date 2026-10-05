@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 8;
+    release_number = 3;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -19,7 +19,10 @@
 # to eventually need to maintain a compat package to preserve its API/ABI
 # stability. For the time being, we don’t plan to ship a shared library in any
 # EPEL release unless someone specifically asks for it.
-%bcond capi %[ %{undefined fc42} && %{undefined epel} ]
+#
+# Older Fedora releases have the shared library built in a compat package to
+# avoid an incompatible update.
+%bcond capi %[ %{undefined epel} && %{undefined fc43} && %{undefined fc44} && %{undefined fc45} ]
 
 %global crate libcramjam
 
@@ -27,8 +30,8 @@ Name:           rust-libcramjam
 # Even though this is just MAJOR.MINOR from the SemVer version, we repeat it
 # explicitly to help prevent undetected/unannounced SONAME version bumps in the
 # libcramjam/libcramjam-devel subpackages.
-%global soversion 0.8
-Version:        0.8.0
+%global soversion 0.9
+Version:        0.9.1
 Release:        %autorelease
 Summary:        Compression library combining a plethora of algorithms
 
@@ -36,19 +39,20 @@ License:        MIT
 URL:            https://crates.io/crates/libcramjam
 Source:         %{crates_source}
 # Manually created patch for downstream crate metadata changes
+# * Omit unused, benchmark-only criterion dev-dependency
 # * Add crate-type = ["lib", "cdylib"] to the [lib] table to get a better
 #   template from rust2rpm
-# * Do not upper-bound the version of libdeflate-sys (which is only due to CI
-#   limitations)
 # * Patch out all -static features
 # * Patch out features requiring blosc2-rs or isal-rs so we can stop packaging
 #   those crates
-# * Drop unused direct cbindgen build-dependency:
-#   https://github.com/cramjam/libcramjam/pull/23
 # * Relax bzip2 dependency to allow building with both v0.4 and v0.5:
 #   https://github.com/cramjam/libcramjam/pull/24; Allow bzip2 0.6:
 #   https://github.com/cramjam/libcramjam/pull/30
-# * Update brotli from 7 to 8: https://github.com/cramjam/libcramjam/pull/29
+# * Omit “corpus” tests: these require files from benches/data/, which are not
+#   distributed in the crate, and some of which don’t have entirely clear
+#   license status.
+# * Patch out pure-Rust features for now due to test failures on s390x,
+#   https://github.com/cramjam/libcramjam/issues/35.
 Patch:          libcramjam-fix-metadata.diff
 
 # https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
@@ -66,18 +70,20 @@ possible API.}
 %if %{with capi}
 %package     -n %{crate}
 Summary:        %{summary}
+# (MIT OR Apache-2.0) AND Zlib
 # 0BSD OR MIT OR Apache-2.0
-# Apache-2.0
 # BSD-3-Clause
 # BSD-3-Clause AND MIT
 # MIT
 # MIT OR Apache-2.0
 # MIT OR Zlib OR Apache-2.0
+# bzip2-1.0.6
 License:        %{shrink:
-                (0BSD OR MIT OR Apache-2.0) AND
-                Apache-2.0 AND
-                BSD-3-Clause AND
                 MIT AND
+                BSD-3-Clause AND
+                Zlib AND
+                bzip2-1.0.6 AND
+                (0BSD OR MIT OR Apache-2.0) AND
                 (MIT OR Apache-2.0) AND
                 (MIT OR Zlib OR Apache-2.0)
                 }
@@ -173,6 +179,30 @@ use the "capi" feature of the "%{crate}" crate.
 %files       -n %{name}+capi-devel
 %ghost %{crate_instdir}/Cargo.toml
 
+%package     -n %{name}+crc-fast-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+crc-fast-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "crc-fast" feature of the "%{crate}" crate.
+
+%files       -n %{name}+crc-fast-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+crc32fast-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+crc32fast-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "crc32fast" feature of the "%{crate}" crate.
+
+%files       -n %{name}+crc32fast-devel
+%ghost %{crate_instdir}/Cargo.toml
+
 %package     -n %{name}+deflate-devel
 Summary:        %{summary}
 BuildArch:      noarch
@@ -231,6 +261,30 @@ This package contains library source intended for building other packages which
 use the "lz4" feature of the "%{crate}" crate.
 
 %files       -n %{name}+lz4-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+sha2-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+sha2-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "sha2" feature of the "%{crate}" crate.
+
+%files       -n %{name}+sha2-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+simd-adler32-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+simd-adler32-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "simd-adler32" feature of the "%{crate}" crate.
+
+%files       -n %{name}+simd-adler32-devel
 %ghost %{crate_instdir}/Cargo.toml
 
 %package     -n %{name}+snappy-devel
@@ -335,6 +389,27 @@ rm '%{buildroot}%{_libdir}/%{crate}.a'
 
 %changelog
 ## START: Generated by rpmautospec
+* Mon Oct 05 2026 Dan Streetman <ddstreet@ieee.org> - 0.9.1-3
+- chore: update 'lock' files and render changed components
+
+* Wed Sep 30 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.9.1-2
+- Patch out pure-Rust features for now due to test failures on s390x
+
+* Tue Sep 29 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.9.1-1
+- Update to version 0.9.1; Fixes RHBZ#2543158
+
+* Thu Sep 03 2026 Fabio Valentini <decathorpe@gmail.com> - 0.8.0-12
+- Rebuild with latest Rust compiler to enable SHSTK support
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed May 06 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.8.0-10
+- Drop conditionals for Fedora 42, soon reaching end of life
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.8.0-8
 - build: mass rebuild auto-bumpable components
 

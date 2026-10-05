@@ -1,6 +1,6 @@
---- tinyvec-1.10.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ tinyvec-1.10.0/Cargo.toml	2025-08-27T16:00:49.273583+00:00
-@@ -66,13 +66,11 @@
+--- tinyvec-1.11.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tinyvec-1.11.0/Cargo.toml	2026-03-15T20:57:20.307017+00:00
+@@ -67,13 +67,11 @@
  
  [features]
  alloc = ["tinyvec_macros"]
@@ -14,7 +14,7 @@
  rustc_1_40 = []
  rustc_1_55 = []
  rustc_1_57 = []
-@@ -88,12 +86,6 @@
+@@ -90,12 +88,6 @@
  path = "tests/arrayvec.rs"
  
  [[test]]
@@ -27,7 +27,7 @@
  name = "tinyvec"
  path = "tests/tinyvec.rs"
  required-features = [
-@@ -101,34 +93,9 @@
+@@ -103,38 +95,9 @@
      "std",
  ]
  
@@ -55,17 +55,22 @@
 -optional = true
 -default-features = false
 -
+-[dependencies.defmt]
+-version = "1.0"
+-optional = true
+-
 -[dependencies.generic-array]
 -version = "1.1.1"
 -optional = true
 -default-features = false
  
- [dependencies.serde]
+ [dependencies.serde_core]
  version = "1.0"
-@@ -139,15 +106,6 @@
+@@ -144,15 +107,6 @@
+ [dependencies.tinyvec_macros]
  version = "0.1"
  optional = true
- 
+-
 -[dev-dependencies.criterion]
 -version = "0.3.0"
 -
@@ -74,7 +79,6 @@
 -
 -[dev-dependencies.debugger_test_parser]
 -version = "0.1"
--
+ 
  [dev-dependencies.serde_test]
  version = "1.0"
- 

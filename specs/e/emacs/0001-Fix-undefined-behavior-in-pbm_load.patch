@@ -1,0 +1,53 @@
+From b07e634e4cf45162ae0178e32092b040587f2c6c Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Mon, 6 Jul 2026 13:17:17 -0700
+Subject: [PATCH] Fix undefined behavior in pbm_load
+
+int*int problem reported by Tristan Madani in:
+https://bugs.gnu.org/81344
+* src/image.c (pbm_load): Avoid undefined behavior when
+multiplying ints, or when adding pointer to int.
+---
+ src/image.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
+
+diff --git a/src/image.c b/src/image.c
+index 9d0a620188f..e76911c3cd3 100644
+--- a/src/image.c
++++ b/src/image.c
+@@ -7774,19 +7774,22 @@ pbm_load (struct frame *f, struct image *img)
+     }
+   else
+     {
+-      int expected_size = height * width;
+       bool two_byte = 255 < max_color_idx;
+-      if (two_byte)
+-	expected_size *= 2;
+-      if (type == PBM_COLOR)
+-	expected_size *= 3;
+ 
+-      if (raw_p && p + expected_size > end)
++      if (raw_p)
+ 	{
+-	  image_destroy_x_image (ximg);
+-	  image_clear_image (f, img);
+-	  image_error ("Invalid image size in image `%s'", img->spec);
+-	  goto error;
++	  ptrdiff_t expected_size;
++	  bool bad = ckd_mul (&expected_size, height, width);
++	  bad |= ckd_mul (&expected_size, expected_size,
++			  (two_byte ? 2 : 1) * (type == PBM_COLOR ? 3 : 1));
++	  bad |= end - p < expected_size;
++	  if (bad)
++	    {
++	      image_destroy_x_image (ximg);
++	      image_clear_image (f, img);
++	      image_error ("Invalid image size in image `%s'", img->spec);
++	      goto error;
++	    }
+ 	}
+ 
+       for (y = 0; y < height; ++y)
+-- 
+2.55.0
+

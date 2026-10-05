@@ -1,6 +1,6 @@
---- brotli-decompressor-5.0.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ brotli-decompressor-5.0.0/Cargo.toml	2025-09-02T23:23:57.196928+00:00
-@@ -29,7 +29,7 @@
+--- brotli-decompressor-5.0.3/Cargo.toml	2006-07-24T01:21:28+00:00
++++ brotli-decompressor-5.0.3/Cargo.toml	2026-08-31T17:18:07.045521+00:00
+@@ -34,7 +34,7 @@
      "huffman",
      "nostd",
  ]
@@ -8,4 +8,4 @@
 +license = "BSD-3-Clause AND MIT"
  repository = "https://github.com/dropbox/rust-brotli-decompressor"
  
- [profile.release]
+ [features]

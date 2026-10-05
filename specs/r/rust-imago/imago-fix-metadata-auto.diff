@@ -1,6 +1,6 @@
---- imago-0.2.1/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ imago-0.2.1/Cargo.toml	2025-12-17T11:18:03.204081+00:00
-@@ -79,15 +79,6 @@
+--- imago-0.2.4/Cargo.toml	2006-07-24T01:21:28+00:00
++++ imago-0.2.4/Cargo.toml	2026-07-17T12:38:17.679585+00:00
+@@ -108,15 +108,6 @@
  [target."cfg(unix)".dependencies.libc]
  version = "0.2"
  
@@ -16,7 +16,7 @@
  [lints.rust]
  unknown_lints = "allow"
  unsafe_op_in_unsafe_fn = "deny"
-@@ -101,3 +92,4 @@
+@@ -135,3 +126,4 @@
  private_intra_doc_links = "allow"
  redundant_explicit_links = "deny"
  unescaped_backticks = "deny"

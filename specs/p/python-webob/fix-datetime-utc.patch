@@ -1,0 +1,76 @@
+diff -ur webob-1.8.9.orig/src/webob/cookies.py webob-1.8.9/src/webob/cookies.py
+--- webob-1.8.9.orig/src/webob/cookies.py	2024-08-14 07:06:43.000000000 +0200
++++ webob-1.8.9/src/webob/cookies.py	2026-02-21 06:38:53.470499101 +0100
+@@ -7,6 +7,7 @@
+     date,
+     datetime,
+     timedelta,
++    UTC
+     )
+ import re
+ import string
+@@ -235,7 +236,7 @@
+     elif isinstance(v, int):
+         v = timedelta(seconds=v)
+     if isinstance(v, timedelta):
+-        v = datetime.utcnow() + v
++        v = datetime.now(UTC) + v
+     if isinstance(v, (datetime, date)):
+         v = v.timetuple()
+     r = time.strftime('%%s, %d-%%s-%Y %H:%M:%S GMT', v)
+diff -ur webob-1.8.9.orig/src/webob/response.py webob-1.8.9/src/webob/response.py
+--- webob-1.8.9.orig/src/webob/response.py	2024-08-14 07:06:46.000000000 +0200
++++ webob-1.8.9/src/webob/response.py	2026-02-21 19:51:21.692450974 +0100
+@@ -2,7 +2,7 @@
+ import struct
+ import zlib
+ from base64 import b64encode
+-from datetime import datetime, timedelta
++from datetime import datetime, timedelta, UTC
+ from hashlib import md5
+ 
+ from webob.byterange import ContentRange
+@@ -1048,10 +1048,10 @@
+         if not max_age and isinstance(expires, datetime):
+ 
+             # If expires has a timezone attached, convert it to UTC
+-            if expires.tzinfo and expires.utcoffset():
+-                expires = (expires - expires.utcoffset()).replace(tzinfo=None)
++            #if expires.tzinfo and expires.utcoffset():
++            #    expires = (expires - expires.utcoffset()).replace(tzinfo=None)
+ 
+-            max_age = expires - datetime.utcnow()
++            max_age = expires - datetime.now(UTC)
+ 
+         value = bytes_(value, 'utf-8')
+ 
+@@ -1196,14 +1196,14 @@
+             cache_control.max_age = 0
+             cache_control.post_check = 0
+             cache_control.pre_check = 0
+-            self.expires = datetime.utcnow()
++            self.expires = datetime.now(UTC)
+             if 'last-modified' not in self.headers:
+-                self.last_modified = datetime.utcnow()
++                self.last_modified = datetime.now(UTC)
+             self.pragma = 'no-cache'
+         else:
+             cache_control.properties.clear()
+             cache_control.max_age = seconds
+-            self.expires = datetime.utcnow() + timedelta(seconds=seconds)
++            self.expires = datetime.now(UTC) + timedelta(seconds=seconds)
+             self.pragma = None
+         for name, value in kw.items():
+             setattr(cache_control, name, value)
+diff -ur webob-1.8.9.orig/tests/test_response.py webob-1.8.9/tests/test_response.py
+--- webob-1.8.9.orig/tests/test_response.py	2024-08-14 07:06:46.000000000 +0200
++++ webob-1.8.9/tests/test_response.py	2026-02-21 06:38:25.002050236 +0100
+@@ -864,7 +864,7 @@
+ def test_set_cookie_expires_is_datetime_and_max_age_is_None():
+     import datetime
+     res = Response()
+-    then = datetime.datetime.utcnow() + datetime.timedelta(days=1)
++    then = datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1)
+     res.set_cookie('a', '1', expires=then)
+     assert res.headerlist[-1][0] == 'Set-Cookie'
+     val = [x.strip() for x in res.headerlist[-1][1].split(';')]

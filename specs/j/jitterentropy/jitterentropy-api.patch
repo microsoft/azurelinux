@@ -1,0 +1,51 @@
+diff --git jitterentropy.h jitterentropy.h
+--- jitterentropy.h
++++ jitterentropy.h
+@@ -158,6 +158,24 @@ extern "C" {
+ #define JENT_PTHREAD
+ #endif
+ 
++/* an ugly hack to revert an api change --> */
++#define JENT_PTHREAD
++#ifdef JENT_CONF_ENABLE_INTERNAL_TIMER
++#ifdef JENT_PTHREAD
++#include <pthread.h>
++struct jent_notime_ctx {
++	pthread_attr_t notime_pthread_attr;     /* pthreads library */
++	pthread_t notime_thread_id;             /* pthreads thread ID */
++};
++#else
++#include <threads.h>
++struct jent_notime_ctx {
++	thrd_t notime_thread_id;                /* thread ID */
++};
++#endif
++#endif
++/* <-- an ugly hack to revert an api change */
++
+ /* Forward declaration of opaque value */
+ struct rand_data;
+ 
+diff --git src/jitterentropy-timer.c src/jitterentropy-timer.c
+--- src/jitterentropy-timer.c
++++ src/jitterentropy-timer.c
+@@ -24,19 +24,6 @@
+ /* Timer-less entropy source */
+ #ifdef JENT_CONF_ENABLE_INTERNAL_TIMER
+ 
+-#ifdef JENT_PTHREAD
+-#include <pthread.h>
+-struct jent_notime_ctx {
+-	pthread_attr_t notime_pthread_attr;     /* pthreads library */
+-	pthread_t notime_thread_id;             /* pthreads thread ID */
+-};
+-#else
+-#include <threads.h>
+-struct jent_notime_ctx {
+-	thrd_t notime_thread_id;                /* thread ID */
+-};
+-#endif
+-
+ /***************************************************************************
+  * Thread handler
+  ***************************************************************************/

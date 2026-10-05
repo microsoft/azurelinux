@@ -1,0 +1,39 @@
+From 230d78bca6adbb46fe4d00fa52f18547dbd71365 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 27 Aug 2026 16:32:09 +0200
+Subject: [PATCH] tests: skip two tests on 32-bit arches that fail due to
+ integer overflow
+
+The value `1usize << 32` overflows on architectures that are not 64-bit.
+This makes two tests either fail for the wrong reason (integer overflow
+in "debug" mode) or pass unexpectedly (wrapping math in "release" mode
+that does not cause the expected error to happen).
+---
+ src/lib.rs | 1 +
+ src/ops.rs | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 4d0f2af..fadbf73 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -922,6 +922,7 @@ mod tests {
+         let _ = img.sub_image_mut(0,0,1,0);
+     }
+ 
++    #[cfg(target_pointer_width = "64")]
+     #[test]
+     #[should_panic(expected = "Invalid ImgRef params")]
+     fn oversized_dimensions() {
+diff --git a/src/ops.rs b/src/ops.rs
+index cc0708d..55f29a3 100644
+--- a/src/ops.rs
++++ b/src/ops.rs
+@@ -71,6 +71,7 @@ fn index() {
+     assert_eq!(5, img.sub_image_mut(1,1,1,1)[(0usize,0usize)]);
+ }
+ 
++#[cfg(target_pointer_width = "64")]
+ #[test]
+ #[should_panic]
+ fn index_u32_with_huge_stride_does_not_wrap() {

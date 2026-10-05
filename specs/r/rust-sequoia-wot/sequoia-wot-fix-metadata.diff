@@ -1,0 +1,11 @@
+--- sequoia-wot-0.15.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sequoia-wot-0.15.3/Cargo.toml	2026-09-23T13:17:05.624698+00:00
+@@ -78,7 +78,7 @@
+ [target."cfg(not(windows))".dev-dependencies.sequoia-openpgp]
+ version = "2"
+ features = [
+-    "crypto-nettle",
++    "crypto-openssl",
+     "__implicit-crypto-backend-for-tests",
+ ]
+ default-features = false

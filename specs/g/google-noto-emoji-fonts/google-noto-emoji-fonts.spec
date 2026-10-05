@@ -3,7 +3,7 @@
 
 # SPDX-License-Identifier: MIT
 
-%global commit0 b3e3051a088047d19fd4d49b1c3ac42fb8c3aaf8
+%global commit0 06121655d0e82f9cae6e7ba6feed4fa6fdbfc2a4
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global fontname google-noto-emoji
@@ -27,7 +27,7 @@ BuildRequires:  cairo-devel
 %endif
 BuildRequires:  make
 
-Version: 20250623
+Version: 20260921
 Release: 5%{?dist}
 URL:     https://github.com/googlefonts/noto-emoji
 
@@ -84,7 +84,7 @@ export LANG=C.UTF-8
 
 %make_build OPT_CFLAGS="$RPM_OPT_FLAGS" BYPASS_SEQUENCE_CHECK='True'
 %else
-cp -p fonts/Noto-COLRv1.ttf .
+cp -p 2D/fonts/Noto-COLRv1.ttf .
 %endif
 
 %fontbuild -a
@@ -99,6 +99,10 @@ cp -p fonts/Noto-COLRv1.ttf .
 
 
 %changelog
+* Mon Sep 21 2026 Mike FABIAN <mfabian@redhat.com> - 20260921-1
+- Update to 20260921: Color font version v2.057 and monochrome
+  font version 3.006 both with Unicode 18.0.0 support.
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 20250623-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

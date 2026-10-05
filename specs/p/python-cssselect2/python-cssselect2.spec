@@ -4,8 +4,8 @@
 %global srcname cssselect2
 
 Name:           python-%{srcname}
-Version:        0.8.0
-Release: 9%{?dist}
+Version:        0.10.1
+Release: 5%{?dist}
 Summary:        CSS selectors for Python ElementTree
 License:        BSD-3-Clause
 URL:            https://doc.courtbouillon.org/cssselect2/stable/
@@ -60,6 +60,9 @@ sed -i -e "s/, 'flake8'//" -e "s/, 'isort'//" -e "s/, 'ruff'//" pyproject.toml
 
 
 %changelog
+* Thu Sep 22 2026 Felix Schwarz <fschwarz@fedoraproject.org> - 0.10.1-1
+- update to 0.10.1
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.8.0-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -1,5 +1,5 @@
---- object-0.38.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ object-0.38.1/Cargo.toml	2026-02-16T14:12:39.311414+00:00
+--- object-0.39.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ object-0.39.1/Cargo.toml	2026-08-10T12:48:50.309518+00:00
 @@ -53,7 +53,6 @@
      "build",
      "std",
@@ -8,15 +8,7 @@
  ]
  archive = []
  build = [
-@@ -87,7 +86,6 @@
-     "elf",
-     "macho",
-     "pe",
--    "wasm",
-     "xcoff",
- ]
- elf = []
-@@ -116,7 +114,6 @@
+@@ -102,7 +101,6 @@
      "all",
      "unstable",
  ]
@@ -24,15 +16,15 @@
  write = [
      "write_std",
      "coff",
-@@ -187,11 +184,6 @@
- [dependencies.ruzstd]
+@@ -174,11 +172,6 @@
  version = "0.8.1"
  optional = true
--
+ 
 -[dependencies.wasmparser]
--version = "0.243.0"
+-version = "0.247.0"
 -optional = true
 -default-features = false
- 
+-
  [lints.clippy]
  collapsible_else_if = "allow"
+ collapsible_if = "allow"

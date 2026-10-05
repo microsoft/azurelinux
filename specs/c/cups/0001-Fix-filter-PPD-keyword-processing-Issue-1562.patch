@@ -1,0 +1,22 @@
+From 3f2bdc293243bca938c6de23ba50e6d783189629 Mon Sep 17 00:00:00 2001
+From: Michael R Sweet <msweet@msweet.org>
+Date: Tue, 28 Apr 2026 17:42:41 -0400
+Subject: [PATCH] Fix filter PPD keyword processing (Issue #1562)
+
+---
+ scheduler/job.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scheduler/job.c b/scheduler/job.c
+index 7cc7195ef..f09751591 100644
+--- a/scheduler/job.c
++++ b/scheduler/job.c
+@@ -5415,7 +5415,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
+       keywords     = NULL;
+       num_keywords = cupsParseOptions(message, 0, &keywords);
+ 
+-      for (i = 0, keyword = keywords; i < num_keywords; i ++)
++      for (i = 0, keyword = keywords; i < num_keywords; i ++, keyword ++)
+       {
+        /*
+         * Filter out "special" PPD keywords...

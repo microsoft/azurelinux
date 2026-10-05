@@ -1,0 +1,45 @@
+From 417e25897181d3099bd39f85f0a68c1df4a11860 Mon Sep 17 00:00:00 2001
+From: Pavel Moravec <pmoravec@redhat.com>
+Date: Fri, 25 Sep 2026 16:23:12 +0200
+Subject: [PATCH 2/2] [cleaner] refuse out-of-tree tar members for hardlinks
+
+Followup of previous commit to fix a scenario with hardlinks pointing out
+of the tree.
+
+Closes: #4461
+
+Signed-off-by: Pavel Moravec <pmoravec@redhat.com>
+Signed-off-by: Sandro Bonazzola <sbonazzo@redhat.com>
+---
+ sos/cleaner/archives/__init__.py | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/sos/cleaner/archives/__init__.py b/sos/cleaner/archives/__init__.py
+index 2e908f00..24c3d9b4 100644
+--- a/sos/cleaner/archives/__init__.py
++++ b/sos/cleaner/archives/__init__.py
+@@ -40,11 +40,20 @@ def _member_path_ok(abs_dest, member):
+         return False
+     if member.issym() or member.islnk():
+         if os.path.isabs(member.linkname):
++            # Absolute linkname is the same for both types: check it directly.
+             link_target = member.linkname
+-        else:
++        elif member.issym():
++            # Symlink: target is relative to the directory that will contain
++            # the symlink on disk, i.e. dirname(member_path).
+             link_target = os.path.abspath(
+                 os.path.join(os.path.dirname(member_path), member.linkname)
+             )
++        else:
++            # Hardlink: tarfile resolves linkname relative to abs_dest (the
++            # archive root), not relative to the member's directory.
++            link_target = os.path.abspath(
++                os.path.join(abs_dest, member.linkname)
++            )
+         if not _path_is_within(abs_dest, link_target):
+             return False
+     return True
+-- 
+2.55.0
+

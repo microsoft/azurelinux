@@ -1,0 +1,45 @@
+From 006d2e6d6e75c6b21c26d7adfc3c3803ae7f4451 Mon Sep 17 00:00:00 2001
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 10 Aug 2026 13:50:43 +0200
+Subject: [PATCH 1/2] mlxconfig: don't include sqlite3.h via hardcoded ext_libs
+ path
+
+Use <sqlite3.h> instead of <ext_libs/sqlite/sqlite3.h>. The include
+path is already set by SQLITE_CFLAGS, whether it points to the bundled
+copy or comes from pkg-config.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ mlxconfig/mlxcfg_db_manager.cpp | 2 +-
+ mlxconfig/mlxcfg_db_manager.h   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mlxconfig/mlxcfg_db_manager.cpp b/mlxconfig/mlxcfg_db_manager.cpp
+index 5d8561af2dae..2d18bcaf9c99 100644
+--- a/mlxconfig/mlxcfg_db_manager.cpp
++++ b/mlxconfig/mlxcfg_db_manager.cpp
+@@ -44,7 +44,7 @@
+ #include <assert.h>
+ #include <algorithm>
+ 
+-#include <ext_libs/sqlite/sqlite3.h>
++#include <sqlite3.h>
+ #include "mlxcfg_db_manager.h"
+ #include "mlxcfg_utils.h"
+ #include <memory>
+diff --git a/mlxconfig/mlxcfg_db_manager.h b/mlxconfig/mlxcfg_db_manager.h
+index 69eb87c8f516..051685839834 100644
+--- a/mlxconfig/mlxcfg_db_manager.h
++++ b/mlxconfig/mlxcfg_db_manager.h
+@@ -47,7 +47,7 @@
+ #include "mlxcfg_tlv.h"
+ #include "mlxcfg_param.h"
+ #include "mlxcfg_configuration.h"
+-#include <ext_libs/sqlite/sqlite3.h>
++#include <sqlite3.h>
+ 
+ enum SPLITBY
+ {
+-- 
+2.55.0
+

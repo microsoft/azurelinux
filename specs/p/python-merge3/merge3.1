@@ -1,0 +1,39 @@
+.TH MERGE3 "1" "September 2026" "" "User Commands"
+.SH NAME
+.B merge3
+\(en 3-way merge of texts
+.SH SYNOPSIS
+.B merge3
+.RB [ \-h ]
+.RB [ \-\-annotated ]
+.I mine
+.I base
+.I other
+.SH DESCRIPTION
+Given
+.IR base ,
+.IR other ,
+.IR this ,
+tries to produce a combined text
+incorporating the changes from both
+.IR base \[->] other
+and
+.IR base \[->] this .
+.SH OPTIONS
+.SS "POSITIONAL ARGUMENTS"
+.TP
+.I mine
+My text
+.TP
+.I base
+Base text
+.TP
+.I other
+Other text
+.SS "OPTIONAL ARGUMENTS"
+.TP
+.B \-h\fR, \-\-help
+Show a help message and exit.
+.TP
+.B \-\-annotated
+Show annotated view.

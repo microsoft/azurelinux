@@ -1,0 +1,31 @@
+--- nauty2_9_3/nausha.c.orig	2025-12-31 05:56:01.000000000 -0700
++++ nauty2_9_3/nausha.c	2026-09-02 12:37:44.905550503 -0600
+@@ -74,8 +74,8 @@ sha256_transform(SHA256_CTX *ctx, const
+     nsword32 a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
+ 
+     for (i = 0, j = 0; i < 16; ++i, j += 4)
+-            m[i] = (data[j] << 24) | (data[j + 1] << 16)
+-				| (data[j + 2] << 8) | (data[j + 3]);
++            m[i] = ((nsword32)data[j] << 24) | ((nsword32)data[j + 1] << 16)
++				| ((nsword32)data[j + 2] << 8) | ((nsword32)data[j + 3]);
+     for ( ; i < 64; ++i)
+             m[i] = SIG1(m[i - 2]) + m[i - 7] + SIG0(m[i - 15]) + m[i - 16];
+ 
+--- nauty2_9_3/watercluster2.c.orig	2026-09-02 12:32:28.566922114 -0600
++++ nauty2_9_3/watercluster2.c	2026-09-02 13:47:51.245804016 -0600
+@@ -3130,13 +3130,13 @@ int i,start,end, problem, sum, maxsum;
+ int getexpensivequality(graph x,graph y)
+ {
+ int j;
+-int qual=0;
++unsigned int qual=0;
+ 
+  FORALLELEMENTS(x,j) qual+=(saturated[j]<<4)-indeg_free[j];
+  qual = qual<<6;
+  FORALLELEMENTS(y,j) qual+=(saturated[j]<<4)-indeg_free[j];
+ 
+- return qual;
++ return (int)qual;
+ }
+ 
+ int is_canonical_edge(BOOG list[],int last_positie)

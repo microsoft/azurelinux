@@ -1,0 +1,34 @@
+From 2eefbb115ac839d0a64ddc1e5c5f40cd7b556164 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Sun, 12 Apr 2026 22:25:36 +0100
+Subject: [PATCH 08/10] tests: bump stratisd test dependency to stratisd-v3.8.6
+
+Resolves: #985
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ .github/workflows/snapm.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.github/workflows/snapm.yml b/.github/workflows/snapm.yml
+index d425a0b8..e3481701 100644
+--- a/.github/workflows/snapm.yml
++++ b/.github/workflows/snapm.yml
+@@ -1,4 +1,4 @@
+----
++--
+ name: Snapshot Manager CI
+ permissions:
+   contents: read
+@@ -113,7 +113,7 @@ jobs:
+         with:
+           toolchain: 1.85.0  # CURRENT DEVELOPMENT RUST TOOLCHAIN
+       - name: Check out stratisd
+-        run: git clone --depth 1 -b stratisd-v3.8.5 https://github.com/stratis-storage/stratisd
++        run: git clone --depth 1 -b stratisd-v3.8.6 https://github.com/stratis-storage/stratisd
+         working-directory: /var/tmp
+       - name: Build stratisd
+         run: make build-all
+-- 
+2.53.0
+

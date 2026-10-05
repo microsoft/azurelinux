@@ -1,6 +1,34 @@
---- tokio-1.49.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ tokio-1.49.0/Cargo.toml	2026-01-08T17:52:16.088641+00:00
-@@ -186,10 +186,6 @@
+--- tokio-1.53.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ tokio-1.53.1/Cargo.toml	2026-07-21T12:04:06.043586+00:00
+@@ -84,11 +84,6 @@
+     "time",
+ ]
+ io-std = []
+-io-uring = [
+-    "libc",
+-    "mio/os-poll",
+-    "mio/os-ext",
+-]
+ io-util = ["bytes"]
+ macros = ["tokio-macros"]
+ net = [
+@@ -108,7 +103,6 @@
+ ]
+ rt = []
+ rt-multi-thread = ["rt"]
+-schedule-latency = []
+ signal = [
+     "libc",
+     "mio/os-poll",
+@@ -117,7 +111,6 @@
+     "signal-hook-registry",
+ ]
+ sync = []
+-taskdump = []
+ test-util = [
+     "rt",
+     "sync",
+@@ -278,10 +271,6 @@
  path = "tests/io_copy.rs"
  
  [[test]]
@@ -11,7 +39,7 @@
  name = "io_driver"
  path = "tests/io_driver.rs"
  
-@@ -232,22 +228,6 @@
+@@ -324,22 +313,6 @@
  [[test]]
  name = "io_read_exact"
  path = "tests/io_read_exact.rs"
@@ -34,7 +62,7 @@
  
  [[test]]
  name = "io_repeat"
-@@ -732,14 +712,11 @@
+@@ -844,14 +817,11 @@
  version = "0.3.0"
  features = ["async-await"]
  
@@ -50,23 +78,3 @@
  
  [dev-dependencies.tokio-stream]
  version = "0.1"
-@@ -769,11 +746,6 @@
-     "time",
- ]
- io-std = []
--io-uring = [
--    "libc",
--    "mio/os-poll",
--    "mio/os-ext",
--]
- io-util = ["bytes"]
- macros = ["tokio-macros"]
- net = [
-@@ -801,7 +773,6 @@
-     "signal-hook-registry",
- ]
- sync = []
--taskdump = []
- test-util = [
-     "rt",
-     "sync",

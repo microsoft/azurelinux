@@ -1,5 +1,5 @@
---- rust_decimal-1.39.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ rust_decimal-1.39.0/Cargo.toml	2025-10-23T12:01:38.954138+00:00
+--- rust_decimal-1.40.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ rust_decimal-1.40.0/Cargo.toml	2026-03-25T19:51:58.943009+00:00
 @@ -49,10 +49,6 @@
  
  [features]
@@ -11,7 +11,7 @@
  c-repr = []
  db-diesel-mysql = [
      "diesel/mysql_backend",
-@@ -106,7 +102,6 @@
+@@ -107,7 +103,6 @@
  serde-with-str = ["serde"]
  std = [
      "arrayvec/std",
@@ -19,7 +19,7 @@
      "bytes?/std",
      "rand?/std",
      "rkyv?/std",
-@@ -154,15 +149,6 @@
+@@ -155,15 +150,6 @@
  version = "0.7"
  default-features = false
  
@@ -35,7 +35,7 @@
  [dependencies.bytes]
  version = "1.0"
  optional = true
-@@ -247,27 +233,11 @@
+@@ -253,27 +239,11 @@
  version = "1.0"
  default-features = false
  
@@ -63,18 +63,18 @@
  default-features = false
  
  [dev-dependencies.rand]
-@@ -280,10 +250,6 @@
+@@ -286,10 +256,6 @@
  features = ["thread_rng"]
  default-features = false
  package = "rand"
 -
 -[dev-dependencies.rkyv-0_8]
--version = "0.8"
+-version = "0.8.13"
 -package = "rkyv"
  
  [dev-dependencies.serde]
  version = "1.0"
-@@ -300,10 +266,6 @@
+@@ -306,10 +272,6 @@
      "rt-multi-thread",
      "test-util",
  ]

@@ -1,0 +1,20 @@
+From ee319f195c622546bd283f5d6ae095fdff181436 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 3 Sep 2026 18:16:07 +0100
+Subject: [PATCH] tox: allow passing positional arguments through to unittest
+
+example: `tox -- --verbose`
+---
+ tox.ini | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tox.ini b/tox.ini
+index 3609068..3a2db1d 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -2,4 +2,4 @@
+ downloadcache = {toxworkdir}/cache/
+ 
+ [testenv]
+-commands = python3 -m unittest test_merge3
++commands = python3 -m unittest test_merge3 {posargs}

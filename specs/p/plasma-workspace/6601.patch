@@ -1,0 +1,32 @@
+From 04ff1ad223e4efe8f21bd391e81c0f96f6021df9 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@kde.org>
+Date: Sat, 16 May 2026 16:24:55 -0400
+Subject: [PATCH] sddm-wayland-session: Correctly install to
+ /usr/lib/sddm/sddm.conf.d
+
+The previous attempt to install there incorrectly uses the KDE_INSTALL_LIBDIR
+variable from ECM, which nearly never matches the correct base directory for SDDM
+on 64-bit systems. Instead, explicitly set the directory correctly so that it
+always works properly.
+
+Fixes: 8a9fdb7dac6fb06f6d692e53206a6be4ff337a54 ("sddm-wayland-session: install to KDE_INSTALL_LIBDIR")
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8b6de1902c..5d3ff4b79c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -389,7 +389,7 @@ add_subdirectory(login-sessions)
+ add_subdirectory(lookandfeel)
+ 
+ if (INSTALL_SDDM_WAYLAND_SESSION)
+-    install(FILES sddm-wayland-session/plasma-wayland.conf DESTINATION ${KDE_INSTALL_LIBDIR}/sddm/sddm.conf.d)
++    install(FILES sddm-wayland-session/plasma-wayland.conf DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/sddm/sddm.conf.d)
+ else()
+     message(STATUS "INSTALL_SDDM_WAYLAND_SESSION is disabled. As soon as it's installed, SDDM will default to use Wayland and KWin for its greeter session (BETA, do not deploy to final users yet).")
+ endif()
+-- 
+GitLab
+

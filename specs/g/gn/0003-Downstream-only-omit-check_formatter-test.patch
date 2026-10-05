@@ -1,0 +1,35 @@
+From e6ad5a4f7acaefb5ecabd298b0447044d9009417 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 17 Aug 2026 08:18:32 +0100
+Subject: [PATCH 3/3] =?UTF-8?q?Downstream-only:=20omit=20=E2=80=9Ccheck=5F?=
+ =?UTF-8?q?formatter=E2=80=9D=20test?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is only suitable for upstream CI; our version of clang-format may
+not produce identical results.
+---
+ build/gen.py | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/build/gen.py b/build/gen.py
+index cdae2626..086b2940 100755
+--- a/build/gen.py
++++ b/build/gen.py
+@@ -440,12 +440,6 @@ def WriteGenericNinja(path, static_libraries, executables,
+   ninja.Phony(
+       'check_all',
+       inputs=[
+-          ninja.RunBinary(
+-              'check_formatter',
+-              inputs=[ninja.source_file('tools/run_formatter.sh')],
+-              implicit_inputs=ninja.directory(ninja.source_file('src'), ['target']),
+-              args='--diff',
+-          ),
+           ninja.RunBinary(
+               'check_reference',
+               inputs=[ninja.source_file('tools/update_reference.sh')],
+-- 
+2.55.0
+

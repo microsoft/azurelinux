@@ -4,7 +4,7 @@
 Name:           perl-podlators
 Epoch:          1
 Version:        6.0.2
-Release: 523%{?dist}
+Release: 525%{?dist}
 Summary:        Format POD source into various output formats
 # pod/perlpodstyle.pod:     FSFAP
 # other files:              GPL-1.0-or-later OR Artistic-1.0-Perl
@@ -32,6 +32,10 @@ Summary:        Format POD source into various output formats
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND FSFAP
 URL:            https://metacpan.org/release/podlators
 Source0:        https://cpan.metacpan.org/authors/id/R/RR/RRA/podlators-v%{version}.tar.gz
+# Change the default fixed-width font from CW to CR.
+# https://github.com/rra/podlators/issues/43
+# Backported from 6.1.0
+Patch0:         podlators-6.1.0-Change-the-default-fixed-width-font-to-CR.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -111,6 +115,7 @@ with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n podlators-v%{version}
+%patch -P0 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
@@ -150,6 +155,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Sep 30 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1:6.0.2-521
+- Change the default fixed-width font from CW to CR (rhbz#2537126)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:6.0.2-520
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

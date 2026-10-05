@@ -3,8 +3,8 @@
 
 Name: realtime-tests
 Summary: Programs that test various rt-features
-Version: 2.8
-Release: 10%{?dist}
+Version: 2.11
+Release: 5%{?dist}
 License: GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.1-or-later
 URL: https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
 Source0: https://www.kernel.org/pub/linux/utils/rt-tests/rt-tests-%{version}.tar.xz
@@ -18,14 +18,6 @@ Requires: bash
 Requires: bc
 
 #Patches
-Patch1: 0001-rt-tests-Put-variables-in-test-feature-in-quotes.patch
-Patch2: 0002-rt-tests-Handle-lcpupower-flag-outside-LDFLAGS.patch
-Patch3: 0003-rt-tests-Turn-off-Wunused-parameter.patch
-Patch4: 0004-rt-tests-Enable-Werror.patch
-Patch5: 0005-rt-tests-Remove-unused-parameter-annotations.patch
-
-# Fix build with glibc 2.41
-Patch101: 0101-rt-tests-Fix-build-with-glibc-2-41.patch
 
 %description
 realtime-tests is a set of programs that test and measure various components of
@@ -84,6 +76,24 @@ latency. It also tests the functioning of priority-inheritance mutexes.
 %{_mandir}/man8/determine_maximum_mpps.8.*
 
 %changelog
+* Thu Sep 17 2026 John Kacur <jkacur@redhat.com> - 2.11-1
+- Rebase to upstream v2.11
+
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 2.10-4
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 2.10-2
+- Rebuilt for Python 3.15
+
+* Fri Mar 20 2026 John Kacur <jkacur@redhat.com> - 2.10-1
+- Rebase to upstream v2.10
+- Add patch to add timestamp delta to hwlatdetect
+- Add patch to fix growing shm-stat file
+- Add patch to use relative symlinks for Python scripts
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.8-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

@@ -1,0 +1,22 @@
+--- uu_cat-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_cat-0.7.0/Cargo.toml	2026-03-13T20:12:20.750966+00:00
+@@ -77,14 +77,6 @@
+ version = "0.30"
+ default-features = false
+ 
+-[target."cfg(windows)".dependencies.winapi-util]
+-version = "0.1.8"
+-
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "0.61.0"
+-features = ["Win32_Storage_FileSystem"]
+-default-features = false
+-
+ [lints.clippy]
+ cargo_common_metadata = "allow"
+ cast_lossless = "allow"
+@@ -148,3 +140,4 @@
+     "cfg(fuzzing)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++

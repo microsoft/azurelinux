@@ -275,17 +275,18 @@ index e99e0cf2..4c3feae0 100644
  #include <sys/types.h>
  
  #include <openssl/dh.h>
-@@ -115,6 +116,10 @@ input_kex_dh_gex_group(int type, u_int32_t seq, struct ssh *ssh)
- 		r = SSH_ERR_ALLOC_FAIL;
- 		goto out;
+@@ -117,6 +118,11 @@ input_kex_dh_gex_group(int type, u_int32
  	}
+ 	p = g = NULL; /* belong to kex->dh now */
+ 
 +	if (FIPS_mode() && dh_is_known_group(kex->dh) == 0) {
 +		r = SSH_ERR_INVALID_ARGUMENT;
 +		goto out;
 +	}
- 	p = g = NULL; /* belong to kex->dh now */
- 
++
  	/* generate and send 'e', client DH public key */
+ 	if ((r = dh_gen_key(kex->dh, kex->we_need * 8)) != 0)
+ 		goto out;
 diff --git a/myproposal.h b/myproposal.h
 index 8fe9276c..3e0ec682 100644
 --- a/myproposal.h

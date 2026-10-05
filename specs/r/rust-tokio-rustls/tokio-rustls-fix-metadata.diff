@@ -1,7 +1,7 @@
---- tokio-rustls-0.26.4/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ tokio-rustls-0.26.4/Cargo.toml	2025-11-30T08:34:38.326236+00:00
-@@ -38,16 +38,13 @@
- repository = "https://github.com/rustls/tokio-rustls"
+--- tokio-rustls-0.26.6/Cargo.toml	2006-07-24T01:21:28+00:00
++++ tokio-rustls-0.26.6/Cargo.toml	2026-09-28T14:45:07.115092+00:00
+@@ -50,16 +50,13 @@
+ ]
  
  [features]
 -aws-lc-rs = ["aws_lc_rs"]

@@ -1,5 +1,5 @@
---- rayon-1.11.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ rayon-1.11.0/Cargo.toml	2025-08-16T19:24:10.831153+00:00
+--- rayon-1.12.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rayon-1.12.0/Cargo.toml	2026-04-14T15:44:00.822363+00:00
 @@ -37,12 +37,6 @@
  categories = ["concurrency"]
  license = "MIT OR Apache-2.0"

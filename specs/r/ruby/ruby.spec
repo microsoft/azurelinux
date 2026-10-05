@@ -3,7 +3,7 @@
 
 %global major_version 3
 %global minor_version 4
-%global teeny_version 8
+%global teeny_version 10
 %global major_minor_version %{major_version}.%{minor_version}
 
 %global ruby_version %{major_minor_version}.%{teeny_version}
@@ -35,7 +35,7 @@
 %global rubygems_net_http_version 0.6.0
 %global rubygems_net_protocol_version 0.2.2
 %global rubygems_optparse_version 0.6.0
-%global rubygems_resolv_version 0.6.0
+%global rubygems_resolv_version 0.7.2
 %global rubygems_securerandom_version 0.4.1
 %global rubygems_timeout_version 0.4.3
 %global rubygems_tsort_version 0.2.0
@@ -59,7 +59,7 @@
 %global did_you_mean_version 2.0.0
 %global digest_version 3.2.0
 %global english_version 0.8.0
-%global erb_version 4.0.4
+%global erb_version 4.0.4.1
 %global error_highlight_version 0.7.0
 %global etc_version 1.4.6
 %global fcntl_version 1.2.0
@@ -74,18 +74,18 @@
 %global net_http_version 0.6.0
 %global net_protocol_version 0.2.2
 %global open3_version 0.2.1
-%global openssl_version 3.3.1
+%global openssl_version 3.3.3
 %global open_uri_version 0.5.0
 %global optparse_version 0.6.0
 %global ostruct_version 0.6.1
 %global pathname_version 0.4.0
 %global pp_version 0.6.2
 %global prettyprint_version 0.2.0
-%global prism_version 1.5.2
-%global pstore_version 0.1.4
+%global prism_version 1.5.3
+%global pstore_version 0.2.1
 %global readline_version 0.0.4
 %global reline_version 0.6.0
-%global resolv_version 0.6.2
+%global resolv_version 0.7.2
 %global ruby2_keywords_version 0.0.5
 %global securerandom_version 0.4.1
 %global set_version 1.1.1
@@ -93,7 +93,7 @@
 %global singleton_version 0.3.0
 %global stringio_version 3.1.2
 %global strscan_version 3.1.2
-%global syntax_suggest_version 2.0.2
+%global syntax_suggest_version 2.0.3
 %global tempfile_version 0.3.1
 %global time_version 0.4.1
 %global timeout_version 0.4.3
@@ -105,7 +105,7 @@
 %global win32ole_version 1.9.1
 %global win32_registry_version 0.1.0
 %global yaml_version 0.4.0
-%global zlib_version 3.2.1
+%global zlib_version 3.2.3
 
 # Gemified default gems.
 %global io_console_version 0.8.1
@@ -123,7 +123,7 @@
 %global drb_version 2.2.1
 %global getoptlong_version 0.2.1
 %global net_ftp_version 0.3.8
-%global net_imap_version 0.5.8
+%global net_imap_version 0.5.15
 %global net_pop_version 0.1.2
 %global net_smtp_version 0.5.1
 %global nkf_version 0.2.0
@@ -180,7 +180,7 @@
 Summary: An interpreter of object-oriented scripting language
 Name: ruby
 Version: %{ruby_version}%{?development_release}
-Release: 32%{?dist}
+Release: 36%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -284,6 +284,10 @@ Patch9: ruby-3.3.0-Disable-syntax-suggest-test-case.patch
 # Fix the tests using SHA-1 Probabilistic Signature Scheme (PSS) parameters.
 # https://github.com/ruby/openssl/pull/879
 Patch10: ruby-3.4.2-openssl-Fix-SHA-1-PSS-tests.patch
+# Backport from ruby_3_4 branch to update resolv to 0.7.2 (fixes CVE-2026-80212 CVE-2026-80213)
+# https://github.com/ruby/ruby/pull/18529
+# Also copied the patch to apply the fix also for vendored resolv
+Patch11: ruby-3_4-pr18529-update-resolv-0_7_2.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %{?with_rubypick:Suggests: rubypick}
@@ -778,6 +782,7 @@ analysis result in RBS format, a standard type description format for Ruby
 %patch 6 -p1
 %patch 9 -p1
 %patch 10 -p1
+%patch 11 -p1
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
@@ -1537,7 +1542,6 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 %files doc -f .ruby-doc.en -f .ruby-doc.ja
 %doc README.md
-%doc ChangeLog
 %{?with_systemtap:%doc ruby-exercise.stp}
 %{_datadir}/ri
 
@@ -1886,6 +1890,27 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 
 %changelog
+* Fri Sep 04 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.10-32
+- Backport upstream patch to update resolv to 0.7.2
+- Resolves: CVE-2026-80212 (rhbz#2527308)
+- Resolves: CVE-2026-80213 (rhbz#2527310)
+
+* Wed Jul 08 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.10-31
+- Update to Ruby 3.4.10
+- Resolves: CVE-2026-41316 (rhbz#2463216)
+- Resolves: CVE-2026-42245 (rhbz#2484324)
+- Resolves: CVE-2026-42246 (rhbz#2492090)
+- Resolves: CVE-2026-42256
+- Resolves: CVE-2026-42257
+- Resolves: CVE-2026-42258 (rhbz#2487319)
+- Resolves: CVE-2026-47240
+- Resolves: CVE-2026-47241
+- Resolves: CVE-2026-47242
+
+* Mon Jun 29 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.9-30
+- Update to Ruby 3.4.9
+- Resolves: CVE-2026-27820
+
 * Wed Dec 17 2025 Vít Ondruch <vondruch@redhat.com> - 3.4.8-29
 - Update to Ruby 3.4.8.
   Resolves: rhbz#2422963

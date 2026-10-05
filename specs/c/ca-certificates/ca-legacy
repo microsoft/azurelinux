@@ -10,7 +10,7 @@ LDISABLE=/usr/share/pki/ca-trust-legacy/ca-bundle.legacy.disable.crt
 # An absent value, or any unexpected value, is treated as "default".
 is_disabled()
 {
-    grep -i "^legacy *= *disable *$" $LCFILE >/dev/null 2>&1
+    grep -isq "^legacy *= *disable *$" $LCFILE
 }
 
 do_check()

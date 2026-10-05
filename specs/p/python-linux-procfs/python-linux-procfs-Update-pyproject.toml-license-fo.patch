@@ -1,0 +1,40 @@
+From 1e811fe341bf37871e1c12a268179b9fe1728dba Mon Sep 17 00:00:00 2001
+From: John Kacur <jkacur@redhat.com>
+Date: Fri, 15 May 2026 12:02:59 -0400
+Subject: [PATCH] python-linux-procfs: Update pyproject.toml license format
+
+Convert deprecated TOML table license format to simple SPDX string.
+Remove deprecated license classifier from classifiers list.
+
+This addresses setuptools deprecation warnings introduced in setuptools 77+.
+
+Assisted-by: Claude Sonnet 4.5 <noreply@anthropic.com>
+Signed-off-by: John Kacur <jkacur@redhat.com>
+---
+ pyproject.toml | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 0fd6a0294568..05678d346381 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -7,7 +7,7 @@ name = "python-linux-procfs"
+ version = "0.7.4"
+ description = "Linux /proc abstraction classes"
+ readme = "README.md"
+-license = {text = "GPL-2.0-only"}
++license = "GPL-2.0-only"
+ authors = [
+     {name = "Arnaldo Carvalho de Melo", email = "acme@redhat.com"},
+     {name = "John Kacur", email = "jkacur@redhat.com"}
+@@ -20,7 +20,6 @@ dependencies = []
+ classifiers = [
+     "Development Status :: 4 - Beta",
+     "Intended Audience :: Developers",
+-    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+     "Operating System :: POSIX :: Linux",
+     "Programming Language :: Python :: 3",
+     "Programming Language :: Python :: 3.10",
+-- 
+2.54.0
+

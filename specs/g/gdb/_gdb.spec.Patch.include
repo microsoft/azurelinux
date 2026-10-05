@@ -28,7 +28,50 @@ Patch004: gdb-backport-tom-32688-thread-specific-bp-fix.patch
 # when backporting this fix.
 Patch005: gdb-rhbz2403580-misplaced-symtabs.patch
 
-# Backport of upstream commit f08ffbbf2691bad2d5df660ee644647687775f0c
-# Can be dropped on a rebase to gdb 17.2 or 18.1
-Patch006: gdb-rhbz2435950-skip-revert.patch
+# Backport of upstream commit c1da013915e from Kevin Buettner
+# (RHBZ 2413405).
+Patch006: gdb-rhbz2413405-gcore-unreadable-pages.patch
+
+# Backport of upstream commit d2cc16cd7fc from Jan Vrany fixing
+# FAILs in gdb.base/fileio.exp caused by macro expansion of
+# path components in OUTDIR.
+Patch007: gdb-fileio-test-fixes.patch
+
+# Backport upstream commit 8bd08ee92c4 to address rhbz2366461.  This
+# commit will drop out with GDB 18.
+Patch008: gdb-rhbz2366461-missing-thread.patch
+
+# Backport upstream commit cd289df068e to address rhbz2366461.  This
+# commit will drop out with GDB 18.
+Patch009: gdb-rhbz2366461-bad-solib-entry-addr.patch
+
+# Backport the following upstream commits in order to address RHBZ
+# 2467251: d980317c7f1, 958d06262a7, 7d1d7386561, 8915de0883c,
+# 8f65ab7b71f.  These commits will all drop out when we rebase to GDB
+# 18.
+Patch010: gdb-rhbz2467251-computed-location-synthetic-pointers.patch
+
+# Backport of upstream commit e492fb22b70
+# gdb: backport DAP core file support
+Patch011: gdb-backport-dap-core-file-support.patch
+
+# Backport of upstream commit be3a9405ceb4d6d6 to fix RHBZ 2368350, an
+# out of memory issue with the D demangler.
+#
+# The commit being pulled in here is a commit that syncs multiple
+# commits to libiberty from gcc to binutils-gdb.  Most of these commits
+# are spelling and white space fixes, which should have no real impact.
+# The only commit we actually care about is gcc commit bc4d9b6aeb3,
+# which fixes the D demangler issue.
+#
+# This commit will not be needed once we rebase to GDB 18.
+Patch012: gdb-backport-libiberty-sync.patch
+
+# Backport of upstream commit 93f536d813c41527e8c939a5f8a90a4 to fix
+# RHBZ2498034.
+Patch013: gdb-backport-corefile-use-after-free-fix.patch
+
+# Backporting upstream commit f3ce0ce31fb3f0563510b9af0ae49aff96a72057
+# to fix a rebase regression.
+Patch018: gdb-backport-s390x-return-crash.patch
 

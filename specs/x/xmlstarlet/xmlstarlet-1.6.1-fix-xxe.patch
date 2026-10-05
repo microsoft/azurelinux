@@ -1,0 +1,57 @@
+diff -Naur xmlstarlet-1.6.1.orig/examples/tests.mk xmlstarlet-1.6.1/examples/tests.mk
+--- xmlstarlet-1.6.1.orig/examples/tests.mk	2013-06-22 17:36:56.000000000 +0200
++++ xmlstarlet-1.6.1/examples/tests.mk	2026-05-26 13:31:13.886894244 +0200
+@@ -98,7 +98,8 @@
+ 
+ XFAIL_TESTS =\
+ examples/bigxml-dtd\
+-examples/ed-namespace
++examples/ed-namespace\
++examples/external-entity
+ 
+ if !HAVE_EXSLT_XPATH_REGISTER
+ XFAIL_TESTS += examples/exslt-ed
+diff -Naur xmlstarlet-1.6.1.orig/src/trans.c xmlstarlet-1.6.1/src/trans.c
+--- xmlstarlet-1.6.1.orig/src/trans.c	2012-08-12 17:18:59.000000000 +0200
++++ xmlstarlet-1.6.1/src/trans.c	2026-05-26 13:31:20.240064967 +0200
+@@ -174,7 +174,10 @@
+     int i, options = 0;
+ 
+     options = XSLT_PARSE_OPTIONS;
+-     
++    /* Disable entity expansion to prevent XXE attacks */
++    options &= ~XML_PARSE_NOENT;
++    options |= XML_PARSE_NONET;
++
+     /*
+      * Compile XSLT Sylesheet
+      */
+diff -Naur xmlstarlet-1.6.1.orig/src/xml_C14N.c xmlstarlet-1.6.1/src/xml_C14N.c
+--- xmlstarlet-1.6.1.orig/src/xml_C14N.c	2012-08-12 17:18:59.000000000 +0200
++++ xmlstarlet-1.6.1/src/xml_C14N.c	2026-05-26 13:31:20.240173256 +0200
+@@ -62,8 +62,8 @@
+      */
+ 
+     doc = xmlReadFile(xml_filename, NULL,
+-        XML_PARSE_NOENT | XML_PARSE_DTDLOAD |
+-        XML_PARSE_DTDATTR | (nonet? XML_PARSE_NONET:0));
++        XML_PARSE_DTDLOAD |
++        XML_PARSE_DTDATTR | XML_PARSE_NONET);
+     if (doc == NULL) {
+         fprintf(stderr, "Error: unable to parse file \"%s\"\n", xml_filename);
+         return(EXIT_BAD_FILE);
+diff -Naur xmlstarlet-1.6.1.orig/src/xml_select.c xmlstarlet-1.6.1/src/xml_select.c
+--- xmlstarlet-1.6.1.orig/src/xml_select.c	2014-03-03 01:15:08.000000000 +0100
++++ xmlstarlet-1.6.1/src/xml_select.c	2026-05-26 13:31:20.240276580 +0200
+@@ -708,9 +708,9 @@
+     selInitOptions(&ops);
+     xsltInitOptions(&xsltOps);
+     start = selParseOptions(&ops, argc, argv);
+-    xml_options |= XML_PARSE_NOENT; /* substitute entities */
++    /* XML_PARSE_NOENT removed to prevent XXE attacks */
+     xml_options |= XML_PARSE_DTDATTR; /* use default attrib values */
+-    xml_options |= ops.nonet? XML_PARSE_NONET : 0;
++    xml_options |= XML_PARSE_NONET;
+     xsltOps.nonet = ops.nonet;
+     xsltOps.noblanks = ops.noblanks;
+     xsltInitLibXml(&xsltOps);

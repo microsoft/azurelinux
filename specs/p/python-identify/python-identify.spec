@@ -5,7 +5,7 @@
 %global pypi_name identify
 
 Name:           python-%{pypi_name}
-Version:        2.6.16
+Version:        2.6.20
 Release: 5%{?dist}
 Summary:        File identification library for Python
 
@@ -64,6 +64,24 @@ Summary:        %{summary}
 
 
 %changelog
+* Sun Sep 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.6.20-1
+- 2.6.20
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.19-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 2.6.19-2
+- Rebuilt for Python 3.15
+
+* Fri Apr 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.6.19-1
+- 2.6.19
+
+* Mon Mar 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.6.18-1
+- 2.6.18
+
+* Tue Mar 03 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.6.17-1
+- 2.6.17
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.16-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

@@ -1,5 +1,5 @@
 --- warp-0.3.7/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ warp-0.3.7/Cargo.toml	2024-07-03T21:39:37.225862+00:00
++++ warp-0.3.7/Cargo.toml	2026-06-10T15:07:24.475169+00:00
 @@ -123,10 +123,6 @@
  [dependencies.pin-project]
  version = "1.0"
@@ -25,7 +25,17 @@
  optional = true
  
  [dependencies.tokio-util]
-@@ -202,10 +194,8 @@
+@@ -170,9 +162,6 @@
+ ]
+ default-features = false
+ 
+-[dev-dependencies.handlebars]
+-version = "5.0"
+-
+ [dev-dependencies.listenfd]
+ version = "1.0"
+ 
+@@ -202,10 +191,8 @@
  
  [features]
  compression = [
@@ -36,7 +46,7 @@
  compression-gzip = [
      "async-compression/deflate",
      "async-compression/gzip",
-@@ -215,8 +205,4 @@
+@@ -215,8 +202,4 @@
      "websocket",
  ]
  multipart = ["multer"]

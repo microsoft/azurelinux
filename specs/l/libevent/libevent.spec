@@ -4,8 +4,8 @@
 %global develdocdir %{_docdir}/%{name}-devel
 
 Name:           libevent
-Version:        2.1.12
-Release: 19%{?dist}
+Version:        2.1.13
+Release: 5%{?dist}
 Summary:        Abstract asynchronous event notification library
 
 # arc4random.c, which is used in build, is ISC. The rest is BSD-3-Clause.
@@ -148,6 +148,18 @@ mkdir -p $RPM_BUILD_ROOT/%{develdocdir}/sample
 %doc %{develdocdir}/
 
 %changelog
+* Mon Sep 07 2026 Fedor Vorobev <fvorobev@redhat.com> - 2.1.13-1
+- Update to 2.1.13.
+- The following security vulnerabilites are fixed in this update:
+- * GHSA-fj29-64w6-73h6 CVE-2026-63383 https://github.com/libevent/libevent/security/advisories/GHSA-fj29-64w6-73h6
+- * GHSA-45c6-qx49-89m8 CVE-2026-63384 https://github.com/libevent/libevent/security/advisories/GHSA-45c6-qx49-89m8
+- * GHSA-cvq5-vrvr-j338 CVE-2026-63388 https://github.com/libevent/libevent/security/advisories/GHSA-cvq5-vrvr-j338
+- * GHSA-58rx-7448-jw47 CVE-2026-63387 https://github.com/libevent/libevent/security/advisories/GHSA-58rx-7448-jw47
+- * GHSA-2gmv-p5m7-98p6 CVE-2026-63379 https://github.com/libevent/libevent/security/advisories/GHSA-2gmv-p5m7-98p6
+- * GHSA-c2pj-cg4r-88c8 CVE-2026-63381 https://github.com/libevent/libevent/security/advisories/GHSA-c2pj-cg4r-88c8
+- * GHSA-q39v-w2g7-gr8j CVE-2026-63382 https://github.com/libevent/libevent/security/advisories/GHSA-q39v-w2g7-gr8j
+- * GHSA-jcwh-pvf2-73p2 CVE-2026-63385 https://github.com/libevent/libevent/security/advisories/GHSA-jcwh-pvf2-73p2
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.12-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

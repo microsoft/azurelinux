@@ -1,0 +1,25 @@
+From 0e0ad9912e8e230a63bfd1ba5a0dbcc0e6b66569 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 15 Jan 2026 18:15:31 +0000
+Subject: [PATCH] Fix invalid conversion from 'const char8_t*' to 'const char*'
+
+---
+ src/graph/graph_io_binary.hh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/graph/graph_io_binary.hh b/src/graph/graph_io_binary.hh
+index 72b5cd14..616b9c42 100644
+--- a/src/graph/graph_io_binary.hh
++++ b/src/graph/graph_io_binary.hh
+@@ -27,7 +27,7 @@
+ namespace graph_tool
+ {
+ 
+-constexpr const char* _magic = u8"⛾ gt";
++constexpr const char* _magic = "\xe2\x9b\xbe gt";
+ constexpr const size_t _magic_length = 6;
+ constexpr const uint8_t _version = 1;
+ 
+-- 
+GitLab
+

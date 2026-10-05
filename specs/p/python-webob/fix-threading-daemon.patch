@@ -1,0 +1,12 @@
+diff -ur webob-1.8.9.orig/tests/conftest.py webob-1.8.9/tests/conftest.py
+--- webob-1.8.9.orig/tests/conftest.py	2024-08-14 07:06:46.000000000 +0200
++++ webob-1.8.9/tests/conftest.py	2026-02-21 06:36:33.827316965 +0100
+@@ -50,7 +50,7 @@
+         server = _make_test_server(app)
+         try:
+             worker = threading.Thread(target=server.serve_forever)
+-            worker.setDaemon(True)
++            worker.daemon = True
+             worker.start()
+             server.url = "http://localhost:%d" % server.server_port
+             log.debug("server started on %s", server.url)

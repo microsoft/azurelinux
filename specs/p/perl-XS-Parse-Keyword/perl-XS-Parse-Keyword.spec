@@ -5,8 +5,8 @@
 %bcond_without perl_XS_Parse_Keyword_enables_optional_test
 
 Name:           perl-XS-Parse-Keyword
-Version:        0.49
-Release: 4%{?dist}
+Version:        0.51
+Release: 5%{?dist}
 Summary:        XS functions to assist in parsing keyword syntax
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XS-Parse-Keyword
@@ -158,6 +158,12 @@ export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print
 %{_libexecdir}/%{name}
 
 %changelog
+* Fri Sep 25 2026 Petr Pisar <ppisar@redhat.com> - 0.51-1
+- 0.51 bump
+
+* Fri Sep 11 2026 Petr Pisar <ppisar@redhat.com> - 0.50-1
+- 0.50 bump
+
 * Tue Sep 30 2025 Petr Pisar <ppisar@redhat.com> - 0.49-1
 - 0.49 bump
 

@@ -1,0 +1,30 @@
+From 953999966b80168634319109ce5ae3d6cec1839c Mon Sep 17 00:00:00 2001
+From: "Brian C. Lane" <bcl@redhat.com>
+Date: Fri, 11 Sep 2026 16:58:59 -0700
+Subject: [PATCH 17/17] parted: Fix partition number allocation in do_print
+
+GPT can have up to 8192 partitions, but we only allocate 4 bytes (two of
+which are for a space and a \0). Increase this to 6 so that more than 99
+partitions doesn't overflow the temporary variable.
+
+(cherry picked from commit 03c20a91d6960bf1ad817cc28624bbb2d1f91eaa)
+---
+ parted/parted.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/parted/parted.c b/parted/parted.c
+index fc2aeba1..d91a689c 100644
+--- a/parted/parted.c
++++ b/parted/parted.c
+@@ -1414,7 +1414,7 @@ do_print (PedDevice** dev, PedDisk** diskp)
+                         part->type & PED_PARTITION_METADATA)
+                             continue;
+ 
+-                    tmp = ped_malloc (4);
++                    tmp = ped_malloc (6);
+ 
+                     if (part->num >= 0)
+                             sprintf (tmp, "%2d ", part->num);
+-- 
+2.55.0
+

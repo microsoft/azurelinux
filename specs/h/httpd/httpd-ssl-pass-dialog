@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec /bin/systemd-ask-password "Enter TLS private key passphrase for $1 ($2) : "

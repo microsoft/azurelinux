@@ -1,0 +1,158 @@
+diff -rupN --no-dereference tesseract-5.5.3/Makefile.am tesseract-5.5.3-new/Makefile.am
+--- tesseract-5.5.3/Makefile.am	2026-09-21 10:28:10.285204667 +0200
++++ tesseract-5.5.3-new/Makefile.am	2026-09-21 10:28:10.291304984 +0200
+@@ -1203,6 +1203,7 @@ endif # !DISABLED_LEGACY_ENGINE
+ check_PROGRAMS += progress_test
+ check_PROGRAMS += qrsequence_test
+ check_PROGRAMS += recodebeam_test
++check_PROGRAMS += recoder_test
+ check_PROGRAMS += rect_test
+ check_PROGRAMS += resultiterator_test
+ check_PROGRAMS += scanutils_test
+@@ -1439,6 +1440,10 @@ recodebeam_test_SOURCES = unittest/recod
+ recodebeam_test_CPPFLAGS = $(unittest_CPPFLAGS)
+ recodebeam_test_LDADD = $(TRAINING_LIBS) $(ICU_I18N_LIBS) $(ICU_UC_LIBS)
+ 
++recoder_test_SOURCES = unittest/recoder_test.cc
++recoder_test_CPPFLAGS = $(unittest_CPPFLAGS)
++recoder_test_LDADD = $(TESS_LIBS)
++
+ rect_test_SOURCES = unittest/rect_test.cc
+ rect_test_CPPFLAGS = $(unittest_CPPFLAGS)
+ rect_test_LDADD = $(TESS_LIBS)
+diff -rupN --no-dereference tesseract-5.5.3/src/ccutil/unicharcompress.cpp tesseract-5.5.3-new/src/ccutil/unicharcompress.cpp
+--- tesseract-5.5.3/src/ccutil/unicharcompress.cpp	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/ccutil/unicharcompress.cpp	2026-09-21 10:28:10.291889988 +0200
+@@ -400,6 +400,7 @@ void UnicharCompress::SetupDecoder() {
+   for (unsigned c = 0; c < encoder_.size(); ++c) {
+     const RecodedCharID &code = encoder_[c];
+     decoder_[code] = c;
++    ASSERT_HOST(code(0) >= 0 && code(0) < code_range_);
+     is_valid_start_[code(0)] = true;
+     RecodedCharID prefix = code;
+     uint32_t len = code.length();
+diff -rupN --no-dereference tesseract-5.5.3/src/ccutil/unicharcompress.h tesseract-5.5.3-new/src/ccutil/unicharcompress.h
+--- tesseract-5.5.3/src/ccutil/unicharcompress.h	2026-07-24 20:27:02.000000000 +0200
++++ tesseract-5.5.3-new/src/ccutil/unicharcompress.h	2026-09-21 10:28:10.292212478 +0200
+@@ -84,7 +84,17 @@ public:
+     if (length_ > kMaxCodeLen) {
+       return false;
+     }
+-    return fp->DeSerialize(&code_[0], length_);
++    if (!fp->DeSerialize(&code_[0], length_)) {
++      return false;
++    }
++    // Code values index arrays sized from the maximum code; reject values
++    // that are out of the sane range for a recoded alphabet.
++    for (uint32_t i = 0; i < length_; ++i) {
++      if (code_[i] < 0 || code_[i] >= static_cast<int32_t>(UINT16_MAX)) {
++        return false;
++      }
++    }
++    return true;
+   }
+   bool operator==(const RecodedCharID &other) const {
+     if (length_ != other.length_) {
+@@ -190,6 +200,7 @@ public:
+   int DecodeUnichar(const RecodedCharID &code) const;
+   // Returns true if the given code is a valid start or single code.
+   bool IsValidFirstCode(int code) const {
++    ASSERT_HOST(code >= 0 && code < code_range_);
+     return is_valid_start_[code];
+   }
+   // Returns a list of valid non-final next codes for a given prefix code,
+diff -rupN --no-dereference tesseract-5.5.3/unittest/recoder_test.cc tesseract-5.5.3-new/unittest/recoder_test.cc
+--- tesseract-5.5.3/unittest/recoder_test.cc	1970-01-01 01:00:00.000000000 +0100
++++ tesseract-5.5.3-new/unittest/recoder_test.cc	2026-09-21 10:28:10.292492242 +0200
+@@ -0,0 +1,91 @@
++///////////////////////////////////////////////////////////////////////
++// File:        recoder_test.cc
++// Description: Tests that a UnicharCompress (LSTM recoder) with code
++//              values outside the sane range is rejected at load.
++//              Negative code values leave code_range_ at zero, so
++//              SetupDecoder writes is_valid_start_[code(0)] out of
++//              bounds on a size-0 vector<bool>; huge code values wrap
++//              code_range_ and make resize() throw.
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++// http://www.apache.org/licenses/LICENSE-2.0
++//
++///////////////////////////////////////////////////////////////////////
++
++#include "include_gunit.h"
++
++#include "serialis.h" // for TFile
++#include "unicharcompress.h"
++
++#include <cstdint>
++#include <vector>
++
++namespace tesseract {
++namespace {
++
++// Appends raw little-endian values to a byte buffer.
++class ByteWriter {
++public:
++  void PutU8(uint32_t v) { data_.push_back(static_cast<char>(v & 0xFF)); }
++  void PutU32(uint32_t v) {
++    for (int i = 0; i < 4; ++i) {
++      data_.push_back(static_cast<char>((v >> (8 * i)) & 0xFF));
++    }
++  }
++  void PutS32(int32_t v) { PutU32(static_cast<uint32_t>(v)); }
++  const std::vector<char> &data() const { return data_; }
++
++private:
++  std::vector<char> data_;
++};
++
++// A serialized UnicharCompress with one length-1 RecodedCharID per
++// given code value (self-normalizing).
++std::vector<char> MakeRecoder(const std::vector<int32_t> &codes) {
++  ByteWriter w;
++  w.PutU32(codes.size());
++  for (int32_t code : codes) {
++    w.PutU8(1); // self_normalized_
++    w.PutU32(1); // length_
++    w.PutS32(code); // code_[0]
++  }
++  return w.data();
++}
++
++// A recoder code of -1 keeps code_range_ at 0, so on unpatched code
++// SetupDecoder performs an out-of-bounds write into the size-0
++// is_valid_start_ vector<bool>.
++TEST(RecoderTest, RejectsNegativeCode) {
++  std::vector<char> bytes = MakeRecoder({-1});
++  TFile fp;
++  ASSERT_TRUE(fp.Open(bytes.data(), bytes.size()));
++  UnicharCompress recoder;
++  EXPECT_FALSE(recoder.DeSerialize(&fp));
++}
++
++// A recoder code of INT32_MAX wraps code_range_ to a negative value,
++// so on unpatched code SetupDecoder's resize() throws.
++TEST(RecoderTest, RejectsHugeCode) {
++  std::vector<char> bytes = MakeRecoder({INT32_MAX});
++  TFile fp;
++  ASSERT_TRUE(fp.Open(bytes.data(), bytes.size()));
++  UnicharCompress recoder;
++  EXPECT_FALSE(recoder.DeSerialize(&fp));
++}
++
++// A valid recoder must still be accepted and usable.
++TEST(RecoderTest, AcceptsValidCodes) {
++  std::vector<char> bytes = MakeRecoder({0, 1});
++  TFile fp;
++  ASSERT_TRUE(fp.Open(bytes.data(), bytes.size()));
++  UnicharCompress recoder;
++  ASSERT_TRUE(recoder.DeSerialize(&fp));
++  EXPECT_EQ(recoder.code_range(), 2);
++  EXPECT_TRUE(recoder.IsValidFirstCode(0));
++  EXPECT_TRUE(recoder.IsValidFirstCode(1));
++}
++
++} // namespace
++} // namespace tesseract

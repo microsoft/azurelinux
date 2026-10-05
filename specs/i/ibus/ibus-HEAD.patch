@@ -2722,3 +2722,498 @@ index 3acd76ea..7ee54cd3 100644
 -- 
 2.52.0
 
+From aeca3e885b1aec02d9f14a5ab6c83f928eca6c9b Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 7 May 2026 09:35:47 +0900
+Subject: [PATCH 01/10] client/x11: Call setlocale()
+
+To enhance #2547, ibus-x11 replaces gtk_init() with gdk_init().
+Seems gdk_init() does not call setlocale() internally and ibus-x11
+causes some encoding errors when the multi-byte chars are converted
+to the text property of compound text.
+
+BUG=https://github.com/ibus/ibus/issues/2896
+Fixes: https://github.com/ibus/ibus/commit/b185b21
+---
+ client/x11/main.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/client/x11/main.c b/client/x11/main.c
+index 5fadd43d..accebde5 100644
+--- a/client/x11/main.c
++++ b/client/x11/main.c
+@@ -2,7 +2,7 @@
+ /* vim:set et sts=4: */
+ /* ibus
+  * Copyright (C) 2007-2015 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2015-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2015-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (C) 2007-2015 Red Hat, Inc.
+  *
+  * main.c:
+@@ -1368,6 +1368,11 @@ main (int argc, char **argv)
+     gdk_set_allowed_backends ("x11");
+ #endif
+ 
++    /* gdk_init() does not call setlocale() */
++    if (!setlocale (LC_ALL, "")) {
++        g_warning ("Failed to set locale with your environment variables. "
++                   "Some multi-byte characters won't be committed correctly.");
++    }
+     gdk_init (&argc, &argv);
+     XSetErrorHandler (_xerror_handler);
+     XSetIOErrorHandler (_xerror_io_handler);
+-- 
+2.54.0
+
+From 3768387b5c1f72c2c3840ebc4c6a46c3c711c71e Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Fri, 17 Apr 2026 19:54:22 +0900
+Subject: [PATCH 02/10] Disable Unicode input with Ctrl-Shift-u twice
+
+Once the Unicode module receives Ctrl-Shift-u key twice, the pre-edit
+should be disabled as the current IBus engines expect the nest format
+<emoji_preedit <engine_predit /> /> but not the reverse format.
+
+Closes: #2903
+---
+ bus/inputcontext.c        | 17 ++++++++++++-----
+ ui/gtk3/panelbinding.vala |  3 +++
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/bus/inputcontext.c b/bus/inputcontext.c
+index 5adcdf6e..7de594ad 100644
+--- a/bus/inputcontext.c
++++ b/bus/inputcontext.c
+@@ -2,7 +2,7 @@
+ /* vim:set et sts=4: */
+ /* ibus - The Input Bus
+  * Copyright (C) 2008-2014 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2015-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2015-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (C) 2008-2025 Red Hat, Inc.
+  *
+  * This library is free software; you can redistribute it and/or
+@@ -3462,10 +3462,17 @@ bus_input_context_update_preedit_text (BusInputContext *context,
+     context->preedit_text = (IBusText *) g_object_ref_sink (text ? text :
+                                                             text_empty);
+     context->preedit_cursor_pos = cursor_pos;
+-    if (use_extension) {
+-        context->preedit_visible = visible;
+-        context->preedit_mode = mode;
+-    }
++    /* The `visible` flag is set whether use_extension is enabled or not.
++     * I.e. If both an emoji preedit text and an engine preedit exist,
++     * the engine preedit is expected to exist in the emoji preedit like
++     * <emoji_preedit  <engine_preedit /> />, so if the emoji preedit is
++     * hidden, the engine preedit is also hidden in the nested state.
++     * If some engines would need the reverse case like
++     * <engine_preedit  <emoji_preedit /> />, probably another API is needed
++     * like ibus_engine_show_emoji_candidate_in_preedit().
++     */
++    context->preedit_visible = visible;
++    context->preedit_mode = mode;
+     context->ignore_focus_out = FALSE;
+     extension_visible = context->preedit_visible ||
+                         (context->emoji_extension != NULL);
+diff --git a/ui/gtk3/panelbinding.vala b/ui/gtk3/panelbinding.vala
+index 56d7f09c..0f20d973 100644
+--- a/ui/gtk3/panelbinding.vala
++++ b/ui/gtk3/panelbinding.vala
+@@ -885,6 +885,9 @@ class PanelBinding : IBus.PanelService {
+         m_enable_extension = event.is_enabled;
+         if (!m_enable_extension) {
+             hide_emoji_lookup_table();
++            update_preedit_text_received(new IBus.Text.from_string(""),
++                                         0,
++                                         false);
+             return;
+         }
+         if (!m_loaded_emoji)
+-- 
+2.54.0
+
+From a8ff755971509f09e1d0ea52a10be1bfc13af39b Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Wed, 27 May 2026 13:38:47 +0900
+Subject: [PATCH 03/10] client/wayland: Fix serial handling
+
+Closes: #2870
+---
+ client/wayland/ibuswaylandim.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index e1bad27d..cf090e2e 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -2431,13 +2431,14 @@ registry_handle_global (void               *data,
+                  interface, name, version);
+         fflush (priv->log);
+     }
+-    priv->serial = 0;
+     if (!g_strcmp0 (interface, zwp_input_method_manager_v2_interface.name)) {
++        priv->serial = 0;
+         priv->version = INPUT_METHOD_V2;
+         priv->input_method_manager_v2 =
+                 wl_registry_bind (registry, name,
+                                   &zwp_input_method_manager_v2_interface, 1);
+     } else if (!g_strcmp0 (interface, zwp_input_method_v1_interface.name)) {
++        priv->serial = 0;
+         if (version >= 4)
+             version = 4;
+         priv->version = INPUT_METHOD_V1;
+-- 
+2.54.0
+
+From 18d8e37e112a155f3f80d36e4d6a845cc2e23bd8 Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 09:51:11 +0900
+Subject: [PATCH 04/10] client/wayland: Guard against NULL seat in IMv2 code paths
+
+registry_handle_global_remove() sets priv->seat to NULL when the last
+seat is removed.  IBus engine callbacks (commit_text, forward_key_event,
+show/hide_preedit_text, delete_surrounding_text) and the modifier
+handler can fire asynchronously via D-Bus after seat removal, causing
+a NULL pointer dereference.
+
+Add NULL checks for priv->seat in all IMv2 branches that dereference it
+from these callback paths.
+
+Closes: #2877
+---
+ client/wayland/ibuswaylandim.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index cf090e2e..57b0ad21 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -323,6 +323,8 @@ ibus_wayland_im_commit_text (IBusWaylandIM *wlim,
+                                                    str);
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_input_method_v2_commit_string (priv->seat->input_method_v2, str);
+         zwp_input_method_v2_commit (priv->seat->input_method_v2, priv->serial);
+         break;
+@@ -351,6 +353,8 @@ ibus_wayland_im_key (IBusWaylandIM *wlim,
+                                          state);
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_virtual_keyboard_v1_key (priv->seat->virtual_keyboard,
+                                      time, key, state);
+         break;
+@@ -644,6 +648,8 @@ _context_show_preedit_text_cb (IBusInputContext *context,
+                                                     commit);
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_input_method_v2_set_preedit_string  (
+                 priv->seat->input_method_v2,
+                 priv->preedit_text->text,
+@@ -672,6 +678,8 @@ _context_hide_preedit_text_cb (IBusInputContext *context,
+                                                     "");
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_input_method_v2_set_preedit_string  (priv->seat->input_method_v2,
+                                                  "", 0, 0);
+         zwp_input_method_v2_commit (priv->seat->input_method_v2, priv->serial);
+@@ -1011,7 +1019,7 @@ ibus_wayland_im_post_key (IBusWaylandIM *wlim,
+             return FALSE;
+         break;
+     case INPUT_METHOD_V2:
+-        if (!priv->seat->active)
++        if (!priv->seat || !priv->seat->active)
+             return FALSE;
+         break;
+     default:
+@@ -1543,6 +1551,8 @@ input_method_keyboard_modifiers (void
+                                                mods_locked, group);
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_virtual_keyboard_v1_modifiers (priv->seat->virtual_keyboard,
+                                            mods_depressed, mods_latched,
+                                            mods_locked, group);
+-- 
+2.54.0
+
+From 06b073dfef47b83ee4cf4969f7269b75dff387f7 Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 10:24:42 +0900
+Subject: [PATCH 05/10] client/wayland: Fix preedit cursor_end in set_preedit_string
+
+cursor_end was set to strlen(text), making the cursor span from the
+cursor position to the end of the preedit string.  Per the
+zwp_input_method_v2 protocol, cursor_begin == cursor_end means a point
+cursor.  Pass cursor for both begin and end.
+
+Closes: #2880
+---
+ client/wayland/ibuswaylandim.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index 57b0ad21..69d10fe8 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -654,7 +654,7 @@ _context_show_preedit_text_cb (IBusInputContext *context,
+                 priv->seat->input_method_v2,
+                 priv->preedit_text->text,
+                 cursor,
+-                strlen (priv->preedit_text->text));
++                cursor);
+         zwp_input_method_v2_commit (priv->seat->input_method_v2, priv->serial);
+         break;
+     default:
+-- 
+2.54.0
+
+From 72b09de3b4c4c3695eb877a70cbe88c4f5c398cd Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 10:33:09 +0900
+Subject: [PATCH 06/10] client/wayland: Fix typo "waylayd" -> "wayland" in Makefile.am
+
+The misspelled variable name caused the METADATADIRS and VAPIDIRS
+settings to be silently ignored by automake.
+
+Closes: #2881
+---
+ client/wayland/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/client/wayland/Makefile.am b/client/wayland/Makefile.am
+index 25269557..3275d1c5 100644
+--- a/client/wayland/Makefile.am
++++ b/client/wayland/Makefile.am
+@@ -184,8 +184,8 @@ MAINTAINERCLEANFILES += $(VAPIGEN_VAPIS)
+ DISTCLEANFILES += $(VAPIGEN_VAPIS)
+ $(VAPIGEN_VAPIS): $(INTROSPECTION_GIRS)
+ ibus_wayland_im_1_0_vapi_DEPS = glib-2.0 gobject-2.0 gio-2.0 ibus-1.0
+-ibus_waylayd_im_1_0_vapi_METADATADIRS = $(srcdir) $(top_srcdir)/bindings/vala
+-#ibus_waylayd_im_1_0_vapi_VAPIDIRS = $(top_srcdir)/bindings/vala
++ibus_wayland_im_1_0_vapi_METADATADIRS = $(srcdir) $(top_srcdir)/bindings/vala
++#ibus_wayland_im_1_0_vapi_VAPIDIRS = $(top_srcdir)/bindings/vala
+ ibus_wayland_im_1_0_vapi_FILES = \
+     $(INTROSPECTION_GIRS) \
+     $(srcdir)/ibus-wayland-im-custom.vala \
+-- 
+2.54.0
+
+From 614eb098016afe280e860732c60a50aefdb1ed65 Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 10:47:34 +0900
+Subject: [PATCH 07/10] ui/gtk3: Fix display wait timeout from ~5 years to 3 minutes
+
+MAX_DISPLAY_IDLE_TIME included G_USEC_PER_SEC in the multiplication,
+making the iteration count 18 billion instead of the intended 18000.
+Each iteration sleeps 10ms, so the effective timeout was 5.7 years
+instead of the intended 3 minutes.
+
+The sleep duration already uses G_USEC_PER_SEC / SLEEP_DIV_PER_SEC,
+so the iteration count should just be SLEEP_DIV_PER_SEC * 60 * 3.
+
+Closes: #2882
+---
+ ui/gtk3/application.vala | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ui/gtk3/application.vala b/ui/gtk3/application.vala
+index dcabc892..aa331543 100644
+--- a/ui/gtk3/application.vala
++++ b/ui/gtk3/application.vala
+@@ -25,7 +25,7 @@ const string IBUS_WAYLAND_VERSION="1.1";
+ const ulong G_USEC_PER_SEC=1000000L;
+ const ulong SLEEP_DIV_PER_SEC = 100L;
+ const ulong MAX_DISPLAY_IDLE_TIME =
+-        G_USEC_PER_SEC * SLEEP_DIV_PER_SEC * 60 * 3;
++        SLEEP_DIV_PER_SEC * 60 * 3;
+ 
+ static string prgname;
+ static IBus.Bus bus;
+-- 
+2.54.0
+
+From 41f36c09b47daf34accecb5c0b870af63b3ba730 Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 10:59:14 +0900
+Subject: [PATCH 08/10] ui/gtk3: Fix log timestamp losing microsecond precision
+
+get_microsecond() was divided by 1000 (giving milliseconds) then
+formatted with %06d, producing misleading output like "000846".
+Use get_microsecond() directly with %06d, matching the C counterpart
+in ibuswaylandim.c.  Also use '.' separator instead of ':' to
+distinguish sub-second part from the time fields.
+
+Closes: #2884
+---
+ ui/gtk3/application.vala | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ui/gtk3/application.vala b/ui/gtk3/application.vala
+index aa331543..a9962685 100644
+--- a/ui/gtk3/application.vala
++++ b/ui/gtk3/application.vala
+@@ -216,9 +216,9 @@ class Application {
+         if (m_user == null)
+             m_user = "UNKNOW";
+         GLib.DateTime now = new GLib.DateTime.now_local();
+-        var msec = now.get_microsecond() / 1000;
+-        m_log.printf("Start %02d:%02d:%02d:%06d\n",
+-                     now.get_hour(), now.get_minute(), now.get_second(), msec);
++        m_log.printf("Start %02d:%02d:%02d.%06d\n",
++                     now.get_hour(), now.get_minute(), now.get_second(),
++                     now.get_microsecond());
+         m_log.flush();
+         return true;
+     }
+-- 
+2.54.0
+
+From 5bbe88a1936246185a65f76e58cc85871401e59a Mon Sep 17 00:00:00 2001
+From: Tianhao Chai <cth451@gmail.com>
+Date: Wed, 27 May 2026 13:11:28 +0900
+Subject: [PATCH 09/10] src: make an IBusText own an updated IBusAttrList reference
+
+For all usages of IBusAttrList, the list is an owned reference within a
+IBusText struct. `ibus_panel_convert_text()` and
+`ibus_input_context_convert_text()` violate the invarient by assigning a
+**floating** IBusAttrList reference to anIBusText without sinking it.
+
+When GJS attempts to create a JS representation of an existing GObject,
+it unconditionally sinks the incoming reference.[1] For a non-floating
+reference this up-refs the object.
+
+For this floating IBusAttrLit, `g_object_ref_sink` converts it to a
+strong reference in-place leaving ref-count at 1. At this point the
+`IBusAttrList` is referenced by both the enclosing `IBusText` and the
+newly created GJS wrapper. When one of them is ref-downed the object
+is recycled, leaving the other reference dangling.
+
+To fix this we just need to maintain the list as a non-floating ref.
+We already have a `ibus_text_set_attributes()` that does the intended
+ref sinking, so just use that instead of manually assigning pointers.
+
+[1]: https://gitlab.gnome.org/GNOME/gjs/-/blob/db450465ab0161e131a92992c2509507aa6152aa/gi/object.cpp#L3597
+
+Closes: #2889
+---
+ src/ibusinputcontext.c | 12 ++++--------
+ src/ibuspanelservice.c | 12 ++++--------
+ 2 files changed, 8 insertions(+), 16 deletions(-)
+
+diff --git a/src/ibusinputcontext.c b/src/ibusinputcontext.c
+index 68d12fb5..bdfd166d 100644
+--- a/src/ibusinputcontext.c
++++ b/src/ibusinputcontext.c
+@@ -569,10 +569,8 @@ ibus_input_context_convert_text (IBusInputContext *context,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     case IBUS_PREEDIT_FORMAT_HINT:
+         new_attrs = ibus_attr_list_copy_format_to_hint (text->attrs, &error);
+@@ -581,10 +579,8 @@ ibus_input_context_convert_text (IBusInputContext *context,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     default:
+         g_assert_not_reached ();
+diff --git a/src/ibuspanelservice.c b/src/ibuspanelservice.c
+index 16229822..f50cea19 100644
+--- a/src/ibuspanelservice.c
++++ b/src/ibuspanelservice.c
+@@ -1203,10 +1203,8 @@ ibus_panel_convert_text (IBusPanelService *panel,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     case IBUS_PREEDIT_FORMAT_HINT:
+         new_attrs = ibus_attr_list_copy_format_to_hint (text->attrs, &error);
+@@ -1215,10 +1213,8 @@ ibus_panel_convert_text (IBusPanelService *panel,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     default:
+         g_assert_not_reached ();
+-- 
+2.54.0
+
+From 26aaf13bd62b972cfee1f4b58ba168d214e99eca Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Tue, 26 May 2026 21:19:43 +0900
+Subject: [PATCH 10/10] client/wayland: Ignore wrong cursor and anchor in surrounding-text
+
+KDE Plasma could send wrong cursor and anchor with surrounding_text()
+signal in `zwp_input_method_context_v1_listener`.
+I'm not sure if it's caused by the compositor or IBus engines but
+ibus-wayland should ignore them.
+
+Closes: rhbz#2444787
+---
+ client/wayland/ibuswaylandim.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index 37fe4bad..367b07c5 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -724,9 +724,21 @@ handle_surrounding_text (void                                  *data,
+ #if ENABLE_SURROUNDING
+     IBusWaylandIM *wlim = data;
+     IBusWaylandIMPrivate *priv;
++    size_t len;
+ 
+     g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
++    g_return_if_fail (text);
+     priv = ibus_wayland_im_get_instance_private (wlim);
++
++    len = strlen (text);
++    if (G_UNLIKELY (len > G_MAXUINT32 || len < cursor || len < anchor)) {
++        /* Should not show the text as a security reason. */
++        g_warning ("Received a wrong surrounding text length %zu < cursor %u "
++                   "anchor %u",
++                   len, cursor, anchor);
++        return;
++    }
++
+     if (priv->ibuscontext != NULL &&
+         ibus_input_context_needs_surrounding_text (priv->ibuscontext)) {
+         /* CURSOR_POS and ANCHOR_POS are character offset.  */
+-- 
+2.54.0
+

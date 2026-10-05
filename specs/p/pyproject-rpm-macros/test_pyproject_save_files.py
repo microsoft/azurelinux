@@ -6,7 +6,7 @@ from pprint import pprint
 
 from pyproject_preprocess_record import parse_record, read_record, save_parsed_record
 
-from pyproject_save_files import argparser, generate_file_list, BuildrootPath
+from pyproject_save_files import argparser, canonical_name_from_distinfo, generate_file_list, BuildrootPath
 from pyproject_save_files import main as save_files_main
 from pyproject_save_files import module_names_from_path
 
@@ -242,12 +242,12 @@ def test_cli_no_pyproject_record(tmp_path, pyproject_record):
 def test_cli_too_many_RECORDS(tldr_root, output_files, output_modules, pyproject_record):
     # Two calls to simulate how %pyproject_install process more than one RECORD file
     prepare_pyproject_record(tldr_root,
-                             content=("foo/bar/dist-info/RECORD", []))
+                             content=("foo/bar-1.0.dist-info/RECORD", []))
     prepare_pyproject_record(tldr_root,
-                             content=("foo/baz/dist-info/RECORD", []))
+                             content=("foo/baz-2.0.dist-info/RECORD", []))
     cli_args = argparser().parse_args([*default_options(output_files, output_modules, tldr_root, pyproject_record), "tldr*"])
 
-    with pytest.raises(FileExistsError):
+    with pytest.raises(ValueError, match="Use %pyproject_save_files -D"):
         save_files_main(cli_args)
 
 
@@ -277,3 +277,66 @@ def test_cli_bad_namespace(tldr_root, output_files, output_modules, pyproject_re
 
     with pytest.raises(ValueError):
         save_files_main(cli_args)
+
+
+def test_canonical_name_from_distinfo():
+    assert canonical_name_from_distinfo("MarkupSafe-2.0.1.dist-info") == "markupsafe"
+    assert canonical_name_from_distinfo("tldr-0.5.dist-info") == "tldr"
+    assert canonical_name_from_distinfo("my_package-1.0.0.dist-info") == "my-package"
+    assert canonical_name_from_distinfo("zope.event-1.0.dist-info") == "zope-event"
+
+
+def test_cli_with_dist_name(tldr_root, pyproject_record):
+    output_files = tldr_root / "files"
+    output_modules = tldr_root / "modules"
+    cli_args = argparser().parse_args([
+        *default_options(output_files, output_modules, tldr_root, pyproject_record),
+        "-D", "tldr",
+        "tldr*",
+    ])
+    save_files_main(cli_args)
+    assert output_files.exists()
+    assert "tldr" in output_files.read_text()
+    assert output_modules.exists()
+
+
+def test_cli_with_dist_name_case_insensitive(tldr_root, pyproject_record):
+    output_files = tldr_root / "files"
+    output_modules = tldr_root / "modules"
+    cli_args = argparser().parse_args([
+        *default_options(output_files, output_modules, tldr_root, pyproject_record),
+        "-D", "TLDR",
+        "tldr*",
+    ])
+    save_files_main(cli_args)
+    assert output_files.exists()
+
+
+def test_cli_dist_name_not_found(tldr_root, pyproject_record):
+    output_files = tldr_root / "files"
+    output_modules = tldr_root / "modules"
+    cli_args = argparser().parse_args([
+        *default_options(output_files, output_modules, tldr_root, pyproject_record),
+        "-D", "nonexistent",
+        "tldr*",
+    ])
+    with pytest.raises(ValueError, match="No dist-info found matching"):
+        save_files_main(cli_args)
+
+
+def test_cli_single_record_named_output(tldr_root, pyproject_record):
+    output_files = tldr_root / "files"
+    output_modules = tldr_root / "modules"
+    cli_args = argparser().parse_args([
+        *default_options(output_files, output_modules, tldr_root, pyproject_record),
+        "tldr*",
+    ])
+    save_files_main(cli_args)
+    # Without -D, base output should exist
+    assert output_files.exists()
+    # Named output (derived from dist-info) should also exist
+    named_files = tldr_root / "files-tldr"
+    named_modules = tldr_root / "modules-tldr"
+    assert named_files.exists()
+    assert named_modules.exists()
+    assert output_files.read_text() == named_files.read_text()
