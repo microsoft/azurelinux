@@ -26,6 +26,9 @@ container = true
 systemd = false
 runtime-package-management = true
 
+[images.container-base.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.container-distroless-minimal]
 description = "Container Distroless Minimal Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-minimal" }
@@ -37,6 +40,9 @@ machine-bootable = false
 container = true
 systemd = false
 runtime-package-management = false
+
+[images.container-distroless-minimal.properties]
+openssl-fips-provider = "none"
 
 [images.container-distroless-base]
 description = "Container Distroless Base Image"
@@ -50,6 +56,9 @@ container = true
 systemd = false
 runtime-package-management = false
 
+[images.container-distroless-base.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.container-distroless-debug]
 description = "Container Distroless Debug Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-debug" }
@@ -61,6 +70,9 @@ machine-bootable = false
 container = true
 systemd = false
 runtime-package-management = false
+
+[images.container-distroless-debug.properties]
+openssl-fips-provider = "symcrypt"
 
 # ---- single-purpose workload containers ---------------------------------
 #
@@ -84,6 +96,9 @@ container = true
 systemd = false
 runtime-package-management = false
 
+[images.container-busybox.properties]
+openssl-fips-provider = "none"
+
 [images.container-nginx]
 description = "Nginx Container Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "nginx-workload" }
@@ -98,6 +113,9 @@ machine-bootable = false
 container = true
 systemd = false
 runtime-package-management = false
+
+[images.container-nginx.properties]
+openssl-fips-provider = "symcrypt"
 
 [images.container-postgres]
 description = "PostgreSQL Container Image"
@@ -114,6 +132,9 @@ container = true
 systemd = false
 runtime-package-management = false
 
+[images.container-postgres.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.container-telegraf]
 description = "Telegraf Container Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "telegraf-workload" }
@@ -128,6 +149,9 @@ machine-bootable = false
 container = true
 systemd = false
 runtime-package-management = false
+
+[images.container-telegraf.properties]
+openssl-fips-provider = "symcrypt"
 
 [images.container-python]
 description = "Python Container Image"
@@ -144,6 +168,9 @@ container = true
 systemd = false
 runtime-package-management = false
 
+[images.container-python.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.container-nodejs]
 description = "Node.js Container Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "nodejs-workload" }
@@ -158,6 +185,9 @@ machine-bootable = false
 container = true
 systemd = false
 runtime-package-management = false
+
+[images.container-nodejs.properties]
+openssl-fips-provider = "symcrypt"
 
 [images.container-pytorch]
 description = "PyTorch Container Image"
@@ -174,6 +204,9 @@ container = true
 systemd = false
 runtime-package-management = false
 
+[images.container-pytorch.properties]
+openssl-fips-provider = "symcrypt"
+
 # ---- wsl ---------------------------------------------------------------
 
 [images.wsl]
@@ -189,6 +222,9 @@ systemd = true
 runtime-package-management = true
 wsl = true
 
+[images.wsl.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.vm-iso-installer]
 description = "VM ISO Installer"
 definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", profile = "vm-iso-installer" }
@@ -197,6 +233,9 @@ architectures = ["x86_64", "aarch64"]
 
 [images.vm-iso-installer.capabilities]
 installer-media = true
+
+[images.vm-iso-installer.properties]
+openssl-fips-provider = "symcrypt"
 
 [images.minimal-os]
 description = "Minimal OS Image"
@@ -209,6 +248,9 @@ machine-bootable = true
 container = false
 systemd = true
 runtime-package-management = true
+
+[images.minimal-os.properties]
+openssl-fips-provider = "symcrypt"
 
 [images.1p-vm-base-gen1]
 description = "1P VM Base Gen1 Image (BIOS)"
@@ -226,6 +268,9 @@ container = false
 systemd = true
 runtime-package-management = true
 
+[images.1p-vm-base-gen1.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.1p-vm-base-gen2]
 description = "1P VM Base Gen2 Image (UEFI)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2" }
@@ -241,6 +286,9 @@ machine-bootable = true
 container = false
 systemd = true
 runtime-package-management = true
+
+[images.1p-vm-base-gen2.properties]
+openssl-fips-provider = "symcrypt"
 
 [images.1p-vm-base-gen1-fips]
 description = "1P VM Base Gen1 FIPS Image (BIOS)"
@@ -259,6 +307,10 @@ container = false
 systemd = true
 runtime-package-management = true
 fips-enabled = true
+
+[images.1p-vm-base-gen1-fips.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.1p-vm-base-gen2-fips]
 description = "1P VM Base Gen2 FIPS Image (UEFI)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2-fips" }
@@ -276,6 +328,10 @@ container = false
 systemd = true
 runtime-package-management = true
 fips-enabled = true
+
+[images.1p-vm-base-gen2-fips.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.marketplace-gen2]
 description = "Marketplace Gen2 Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "marketplace-gen2" }
@@ -291,6 +347,9 @@ machine-bootable = true
 container = false
 systemd = true
 runtime-package-management = true
+
+[images.marketplace-gen2.properties]
+openssl-fips-provider = "symcrypt"
 
 [images.marketplace-gen2-fips]
 description = "Marketplace Gen2 FIPS Image"
@@ -309,3 +368,6 @@ container = false
 systemd = true
 runtime-package-management = true
 fips-enabled = true
+
+[images.marketplace-gen2-fips.properties]
+openssl-fips-provider = "symcrypt"

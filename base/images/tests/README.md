@@ -65,35 +65,35 @@ uv run pytest cases/static/ \
     --image-path /path/to/image.raw \
     --image-name 1p-vm-base-gen2 \
     --capabilities machine-bootable,systemd,runtime-package-management \
-    --properties '{"release-channel":"preview"}'
+    --properties '{"openssl-fips-provider":"symcrypt","release-channel":"preview"}'
 
 # Static tests — Container image
 uv run pytest cases/static/ \
     --image-path /path/to/image.oci.tar.xz \
     --image-name container-base \
     --capabilities container,runtime-package-management \
-    --properties '{}'
+    --properties '{"openssl-fips-provider":"symcrypt"}'
 
 # Static tests — WSL image (plain rootfs tarball)
 uv run pytest cases/static/ \
     --image-path /path/to/image.wsl \
     --image-name wsl \
     --capabilities systemd,runtime-package-management \
-    --properties '{}'
+    --properties '{"openssl-fips-provider":"symcrypt"}'
 
 # Runtime tests — Container image (requires podman)
 uv run pytest cases/runtime/ \
     --image-path /path/to/image.oci.tar.xz \
     --image-name container-base \
     --capabilities container,runtime-package-management \
-    --properties '{}'
+    --properties '{"openssl-fips-provider":"symcrypt"}'
 
 # Runtime tests — from a registry reference
 uv run pytest cases/runtime/ \
     --image-ref mcr.microsoft.com/azurelinux/base/core:4.0 \
     --image-name container-base \
     --capabilities container,runtime-package-management \
-    --properties '{}'
+    --properties '{"openssl-fips-provider":"symcrypt"}'
 ```
 
 Test selection follows standard pytest positional arguments. Tests
