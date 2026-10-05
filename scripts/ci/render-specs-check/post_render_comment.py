@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Post (or update/delete) a PR comment with rendered-spec drift results.
 
 Reads the JSON report produced by check_rendered_specs.py and posts a

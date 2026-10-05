@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Post (or update/delete) a PR comment with `azldev component update` results.
 
 Reads the JSON output produced by `azldev component update -a -O json` and

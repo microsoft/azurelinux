@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Guard source-origin configuration for rendered-spec checks."""
 
 from __future__ import annotations
