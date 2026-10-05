@@ -2,7 +2,7 @@
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
 Version:        4.6.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Patch0:         bump-version-4-6-1.patch
 Patch1:         create-azure-plugin.patch
 Patch2:         copy-kernel-config.patch
 Patch3:         create-azure-kdump-class.patch
+Patch4:         CVE-2026-79655.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       bzip2
@@ -76,6 +77,9 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
+* Tue Sep 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.6.1-3
+- Patch for CVE-2026-79655
+
 * Wed Apr 24 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.6.1-2
 - Backport a patch that adds an AzurePlugin class
 - Backport a patch to copy the kernel config
