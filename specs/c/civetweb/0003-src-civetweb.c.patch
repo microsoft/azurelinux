@@ -1,0 +1,239 @@
+From 782e18903515f43bafbf2e668994e82bdfa51133 Mon Sep 17 00:00:00 2001
+From: bel2125 <bel2125@gmail.com>
+Date: Tue, 2 Sep 2025 14:08:41 +0200
+Subject: [PATCH] Make parsing of URL encoded forms more robust
+
+Reject requests that obviously violate the URL encoding.
+Fixes #1348
+---
+ src/civetweb.c      |  7 ++++++-
+ src/handle_form.inl | 46 +++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 44 insertions(+), 9 deletions(-)
+
+--- civetweb-1.16/src/civetweb.c.orig	2025-09-29 15:08:02.385060903 -0400
++++ civetweb-1.16/src/civetweb.c	2025-09-29 15:09:30.128628855 -0400
+@@ -7052,6 +7052,7 @@
+               int is_form_url_encoded)
+ {
+ 	int i, j, a, b;
++
+ #define HEXTOI(x) (isdigit(x) ? (x - '0') : (x - 'W'))
+ 
+ 	for (i = j = 0; (i < src_len) && (j < (dst_len - 1)); i++, j++) {
+@@ -7064,11 +7065,15 @@
+ 			i += 2;
+ 		} else if (is_form_url_encoded && (src[i] == '+')) {
+ 			dst[j] = ' ';
++		} else if ((unsigned char)src[i] <= ' ') {
++			return -1; /* invalid character */
+ 		} else {
+ 			dst[j] = src[i];
+ 		}
+ 	}
+ 
++#undef HEXTOI
++
+ 	dst[j] = '\0'; /* Null-terminate the destination */
+ 
+ 	return (i >= src_len) ? j : -1;
+--- ./src/handle_form.inl.orig	2023-04-08 11:38:36.000000000 -0400
++++ ./src/handle_form.inl	2025-09-29 15:09:30.130628822 -0400
+@@ -1,4 +1,4 @@
+-/* Copyright (c) 2016-2021 the Civetweb developers
++/* Copyright (c) 2016-2025 the Civetweb developers
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+@@ -39,7 +39,7 @@
+ 	    mg_url_decode(key, (int)key_len, key_dec, (int)sizeof(key_dec), 1);
+ 
+ 	if (((size_t)key_dec_len >= (size_t)sizeof(key_dec)) || (key_dec_len < 0)) {
+-		return MG_FORM_FIELD_STORAGE_SKIP;
++		return MG_FORM_FIELD_STORAGE_ABORT;
+ 	}
+ 
+ 	if (filename) {
+@@ -53,7 +53,7 @@
+ 		    || (filename_dec_len < 0)) {
+ 			/* Log error message and skip this field. */
+ 			mg_cry_internal(conn, "%s: Cannot decode filename", __func__);
+-			return MG_FORM_FIELD_STORAGE_SKIP;
++			return MG_FORM_FIELD_STORAGE_ABORT;
+ 		}
+ 		remove_dot_segments(filename_dec);
+ 
+@@ -95,6 +95,7 @@
+     struct mg_form_data_handler *fdh)
+ {
+ 	char key_dec[1024];
++	int key_dec_len;
+ 
+ 	char *value_dec = (char *)mg_malloc_ctx(*value_len + 1, conn->phys_ctx);
+ 	int value_dec_len, ret;
+@@ -108,7 +109,8 @@
+ 		return MG_FORM_FIELD_STORAGE_ABORT;
+ 	}
+ 
+-	mg_url_decode(key, (int)key_len, key_dec, (int)sizeof(key_dec), 1);
++	key_dec_len = mg_url_decode(
++	    key, (int)key_len, key_dec, (int)sizeof(key_dec), 1);
+ 
+ 	if (*value_len >= 2 && value[*value_len - 2] == '%')
+ 		*value_len -= 2;
+@@ -117,6 +119,11 @@
+ 	value_dec_len = mg_url_decode(
+ 	    value, (int)*value_len, value_dec, ((int)*value_len) + 1, 1);
+ 
++	if ((key_dec_len < 0) || (value_dec_len < 0)) {
++		mg_free(value_dec);
++		return MG_FORM_FIELD_STORAGE_ABORT;
++	}
++
+ 	ret = fdh->field_get(key_dec,
+ 	                     value_dec,
+ 	                     (size_t)value_dec_len,
+@@ -136,9 +143,13 @@
+                     struct mg_form_data_handler *fdh)
+ {
+ 	char key_dec[1024];
++	int key_dec_len;
+ 	(void)conn;
+ 
+-	mg_url_decode(key, (int)key_len, key_dec, (int)sizeof(key_dec), 1);
++	key_dec_len = mg_url_decode(key, (int)key_len, key_dec, (int)sizeof(key_dec), 1);
++	if (key_dec_len < 0) {
++		return MG_FORM_FIELD_STORAGE_ABORT;
++	}
+ 
+ 	return fdh->field_get(key_dec, value, value_len, fdh->user_data);
+ }
+@@ -188,6 +199,7 @@
+ 	int buf_fill = 0;
+ 	int r;
+ 	int field_count = 0;
++	int abort_read = 0;
+ 	struct mg_file fstore = STRUCT_FILE_INITIALIZER;
+ 	int64_t file_size = 0; /* init here, to a avoid a false positive
+ 	                         "uninitialized variable used" warning */
+@@ -278,6 +290,7 @@
+ 				    conn, data, (size_t)keylen, val, (size_t *)&vallen, fdh);
+ 				if (r == MG_FORM_FIELD_HANDLE_ABORT) {
+ 					/* Stop request handling */
++					abort_read = 1;
+ 					break;
+ 				}
+ 				if (r == MG_FORM_FIELD_HANDLE_NEXT) {
+@@ -320,6 +333,7 @@
+ 							r = field_stored(conn, path, file_size, fdh);
+ 							if (r == MG_FORM_FIELD_HANDLE_ABORT) {
+ 								/* Stop request handling */
++								abort_read = 1;
+ 								break;
+ 							}
+ 
+@@ -358,6 +372,7 @@
+ 			if ((field_storage & MG_FORM_FIELD_STORAGE_ABORT)
+ 			    == MG_FORM_FIELD_STORAGE_ABORT) {
+ 				/* Stop parsing the request */
++				abort_read = 1;
+ 				break;
+ 			}
+ 
+@@ -386,7 +401,7 @@
+ 		 * Here we use "POST", and read the data from the request body.
+ 		 * The data read on the fly, so it is not required to buffer the
+ 		 * entire request in memory before processing it. */
+-		for (;;) {
++		while (!abort_read) {
+ 			const char *val;
+ 			const char *next;
+ 			ptrdiff_t keylen, vallen;
+@@ -440,6 +455,7 @@
+ 			if ((field_storage & MG_FORM_FIELD_STORAGE_ABORT)
+ 			    == MG_FORM_FIELD_STORAGE_ABORT) {
+ 				/* Stop parsing the request */
++				abort_read = 1;
+ 				break;
+ 			}
+ 
+@@ -468,6 +484,15 @@
+ 				} else {
+ 					vallen = (ptrdiff_t)strlen(val);
+ 					end_of_key_value_pair_found = all_data_read;
++					if ((buf + buf_fill) > (val + vallen)) {
++						/* Avoid DoS attacks by having a zero byte in the middle of
++						 * a request that is supposed to be URL encoded. Since this
++						 * request is certainly invalid, according to the protocol
++						 * specification, stop processing it. Fixes #1348 */
++						abort_read = 1;
++						break;
++					}
++
+ 				}
+ 
+ 				if (field_storage == MG_FORM_FIELD_STORAGE_GET) {
+@@ -489,6 +514,7 @@
+ 					get_block++;
+ 					if (r == MG_FORM_FIELD_HANDLE_ABORT) {
+ 						/* Stop request handling */
++						abort_read = 1;
+ 						break;
+ 					}
+ 					if (r == MG_FORM_FIELD_HANDLE_NEXT) {
+@@ -557,7 +583,6 @@
+ 						val = buf;
+ 					}
+ 				}
+-
+ 			} while (!end_of_key_value_pair_found);
+ 
+ #if !defined(NO_FILESYSTEMS)
+@@ -568,6 +593,7 @@
+ 					r = field_stored(conn, path, file_size, fdh);
+ 					if (r == MG_FORM_FIELD_HANDLE_ABORT) {
+ 						/* Stop request handling */
++						abort_read = 1;
+ 						break;
+ 					}
+ 				} else {
+@@ -581,7 +607,7 @@
+ 			}
+ #endif /* NO_FILESYSTEMS */
+ 
+-			if (all_data_read && (buf_fill == 0)) {
++			if ((all_data_read && (buf_fill == 0)) || abort_read) {
+ 				/* nothing more to process */
+ 				break;
+ 			}
+@@ -937,6 +963,7 @@
+ 					get_block++;
+ 					if (r == MG_FORM_FIELD_HANDLE_ABORT) {
+ 						/* Stop request handling */
++						abort_read = 1;
+ 						break;
+ 					}
+ 					if (r == MG_FORM_FIELD_HANDLE_NEXT) {
+@@ -1011,6 +1038,7 @@
+ 				                        fdh);
+ 				if (r == MG_FORM_FIELD_HANDLE_ABORT) {
+ 					/* Stop request handling */
++					abort_read = 1;
+ 					break;
+ 				}
+ 				if (r == MG_FORM_FIELD_HANDLE_NEXT) {
+@@ -1039,6 +1067,7 @@
+ 							r = field_stored(conn, path, file_size, fdh);
+ 							if (r == MG_FORM_FIELD_HANDLE_ABORT) {
+ 								/* Stop request handling */
++								abort_read = 1;
+ 								break;
+ 							}
+ 						} else {
+@@ -1057,6 +1086,7 @@
+ 			if ((field_storage & MG_FORM_FIELD_STORAGE_ABORT)
+ 			    == MG_FORM_FIELD_STORAGE_ABORT) {
+ 				/* Stop parsing the request */
++				abort_read = 1;
+ 				break;
+ 			}
+ 

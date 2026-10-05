@@ -1,0 +1,26 @@
+From aa7de369a47903de2417e2a8bf5be1f3df2acd10 Mon Sep 17 00:00:00 2001
+From: yubiuser <github@yubiuser.dev>
+Date: Mon, 23 Sep 2024 21:27:36 +0200
+Subject: [PATCH] Add linux and macOS test using OpenSSL3.0
+
+Signed-off-by: yubiuser <github@yubiuser.dev>
+---
+ unittest/public_server.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/unittest/public_server.c b/unittest/public_server.c
+index 93641f0d..4983ee8c 100644
+--- a/unittest/public_server.c
++++ b/unittest/public_server.c
+@@ -823,7 +823,7 @@ START_TEST(test_mg_server_and_client_tls)
+ 	 * while Ubuntu Xenial, Ubuntu Trusty and Windows test containers at
+ 	 * Travis CI do not. Maybe it is OpenSSL version specific.
+ 	 */
+-#if defined(OPENSSL_API_1_1)
++#if defined(OPENSSL_API_1_1) || defined(OPENSSL_API_3_0) 
+ 	if (client_conn) {
+ 		/* Connect succeeds, but the connection is unusable. */
+ 		mg_printf(client_conn, "GET / HTTP/1.0\r\n\r\n");
+-- 
+2.55.0
+
