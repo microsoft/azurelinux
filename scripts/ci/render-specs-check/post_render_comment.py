@@ -32,6 +32,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from _common import render_command
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -94,13 +96,6 @@ def _fence_for(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-# NOTE: _render_command is duplicated in check_rendered_specs.py
-def _render_command(components: list[str], use_all: bool = False) -> str:
-    if use_all or len(components) > 30:
-        return "azldev component render -a --clean-stale"
-    return f"azldev component render {' '.join(components)}"
-
-
 def format_comment(
     report: dict,
     artifacts_url: str | None = None,
@@ -120,7 +115,7 @@ def format_comment(
     # need `--clean-stale`, which only works with `-a`. Extras (produced by
     # render but not committed) are handled fine by a per-component render.
     use_all = bool(missing_files)
-    remediation_cmd = _render_command([] if use_all else all_comps, use_all=use_all)
+    remediation_cmd = render_command([] if use_all else all_comps, use_all=use_all)
 
     lines: list[str] = [
         COMMENT_MARKER,

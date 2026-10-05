@@ -26,9 +26,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
+from _common import render_command
 
 # ---------------------------------------------------------------------------
 # Git helpers
@@ -102,7 +100,7 @@ def component_from_path(file_path: str, specs_dir: Path) -> str:
     file_abs = os.path.abspath(file_path)
     specs_abs = str(specs_dir.resolve())
     rel = Path(file_abs).relative_to(specs_abs)
-    if len(rel.parts) >= 2:
+    if len(rel.parts) >= 2:  # noqa: PLR2004 - layout is prefix/component
         return rel.parts[1]
     return rel.parts[0] if rel.parts else ""
 
@@ -290,13 +288,6 @@ def _unique_components(items: list[dict]) -> list[str]:
     return out
 
 
-# NOTE: _unique_components and _render_command are duplicated in post_render_comment.py
-def _render_command(components: list[str], use_all: bool = False) -> str:
-    if use_all or len(components) > 30:
-        return "azldev component render -a --clean-stale"
-    return f"azldev component render {' '.join(components)}"
-
-
 def generate_patch(
     content_diffs: list[dict],
     extra_files: list[str],
@@ -460,9 +451,9 @@ def main() -> int:
     print(f"::error::{len(content_diffs)} content diff(s), {len(extra)} extra file(s), {len(missing)} missing file(s)")
     all_comps = sorted(set(_unique_components(content_diffs) + _unique_components(report.get("extra_files", []))))
     if missing:
-        print(f"Remediation: {_render_command([], use_all=True)}")
+        print(f"Remediation: {render_command([], use_all=True)}")
     elif all_comps:
-        print(f"Remediation: {_render_command(all_comps)}")
+        print(f"Remediation: {render_command(all_comps)}")
 
     return 1
 

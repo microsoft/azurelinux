@@ -43,6 +43,7 @@ import shutil
 import sys
 import urllib.error
 import urllib.request
+from http import HTTPStatus
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -137,11 +138,11 @@ def probe_repo(probe_url: str, *, timeout: float = PROBE_TIMEOUT) -> tuple[str, 
             # has no status attribute -- a successful urlopen there
             # already proved the file exists.
             status = getattr(resp, "status", None)
-            if status is None or 200 <= status < 300:
+            if status is None or HTTPStatus.OK <= status < HTTPStatus.MULTIPLE_CHOICES:
                 return _PROBE_OK, None
             return _PROBE_FAIL, f"HTTP {status}"
     except urllib.error.HTTPError as e:
-        if e.code == 404:
+        if e.code == HTTPStatus.NOT_FOUND:
             return _PROBE_MISSING, None
         return _PROBE_FAIL, f"HTTP {e.code}"
     except urllib.error.URLError as e:

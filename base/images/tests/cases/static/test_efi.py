@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 
     from utils.types import PartitionInfo
 
+MIN_FSTAB_FIELDS = 4
+
 
 @pytest.mark.require_capability("machine-bootable")
 def test_efi_partition_has_restrictive_umask(
@@ -39,7 +41,7 @@ def test_efi_partition_has_restrictive_umask(
     efi_entries = []
     for line in fstab_path.read_text().splitlines():
         fields = line.split()
-        if fields and not fields[0].startswith("#") and len(fields) >= 4:
+        if fields and not fields[0].startswith("#") and len(fields) >= MIN_FSTAB_FIELDS:
             if fields[1] in efi_mountpoints:
                 efi_entries.append(fields)
 
