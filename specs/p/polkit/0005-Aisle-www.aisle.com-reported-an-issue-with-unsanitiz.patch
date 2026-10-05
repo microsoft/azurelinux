@@ -1,0 +1,206 @@
+From 9dca831448474deecb3ba2aaae4f919a6d874a22 Mon Sep 17 00:00:00 2001
+From: Jan Rybar <jrybar@redhat.com>
+Date: Fri, 27 Feb 2026 15:18:16 +0100
+Subject: [PATCH 5/7] Aisle (www.aisle.com) reported an issue with unsanitized
+ logging into syslog.
+
+Authored-by: Pavel Kohout, Aisle Research, Aisle.com
+Signed-off-by: Jan Rybar <jrybar@redhat.com>
+---
+ .../polkitbackendinteractiveauthority.c       | 137 +++++++++++++-----
+ 1 file changed, 100 insertions(+), 37 deletions(-)
+
+diff --git a/src/polkitbackend/polkitbackendinteractiveauthority.c b/src/polkitbackend/polkitbackendinteractiveauthority.c
+index ab20eda..1250ce5 100644
+--- a/src/polkitbackend/polkitbackendinteractiveauthority.c
++++ b/src/polkitbackend/polkitbackendinteractiveauthority.c
+@@ -559,6 +559,26 @@ struct AuthenticationAgent
+   GList *active_sessions;
+ };
+ 
++/*
++ * Sanitize a string for safe inclusion in log output.
++ * Replaces control characters (< 0x20 and 0x7f) to prevent
++ * log injection (CWE-117). Tabs are replaced with spaces;
++ * all other control characters are replaced with '?'.
++ */
++static gchar *
++sanitize_for_log (const gchar *input)
++{
++  gchar *dup = input ? g_strdup (input) : g_strdup ("");
++  gchar *p;
++  for (p = dup; p && *p; p++)
++    {
++      guchar c = (guchar) *p;
++      if (c < 0x20 || c == 0x7f)
++        *p = (c == '\t') ? ' ' : '?';
++    }
++  return dup;
++}
++
+ /* TODO: should probably move to PolkitSubject
+  * (also see copy in src/programs/pkcheck.c)
+  *
+@@ -690,10 +710,22 @@ log_result (PolkitBackendInteractiveAuthority    *authority,
+   subject_cmdline = _polkit_subject_get_cmdline (subject);
+   if (subject_cmdline == NULL)
+     subject_cmdline = g_strdup ("<unknown>");
++  else
++    {
++      gchar *s = sanitize_for_log (subject_cmdline);
++      g_free (subject_cmdline);
++      subject_cmdline = s;
++    }
+ 
+   caller_cmdline = _polkit_subject_get_cmdline (caller);
+   if (caller_cmdline == NULL)
+     caller_cmdline = g_strdup ("<unknown>");
++  else
++    {
++      gchar *s = sanitize_for_log (caller_cmdline);
++      g_free (caller_cmdline);
++      caller_cmdline = s;
++    }
+ 
+   polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+                                 LOG_LEVEL_INFO,
+@@ -753,6 +785,12 @@ check_authorization_challenge_cb (AuthenticationAgent         *agent,
+   subject_cmdline = _polkit_subject_get_cmdline (subject);
+   if (subject_cmdline == NULL)
+     subject_cmdline = g_strdup ("<unknown>");
++  else
++    {
++      gchar *s = sanitize_for_log (subject_cmdline);
++      g_free (subject_cmdline);
++      subject_cmdline = s;
++    }
+ 
+   g_debug ("In check_authorization_challenge_cb\n"
+            "  subject                %s\n"
+@@ -2754,25 +2792,37 @@ polkit_backend_interactive_authority_register_authentication_agent (PolkitBacken
+   caller_cmdline = _polkit_subject_get_cmdline (caller);
+   if (caller_cmdline == NULL)
+     caller_cmdline = g_strdup ("<unknown>");
++  else
++    {
++      gchar *s = sanitize_for_log (caller_cmdline);
++      g_free (caller_cmdline);
++      caller_cmdline = s;
++    }
+ 
+   subject_as_string = polkit_subject_to_string (subject);
+ 
+-  g_debug ("Added authentication agent for %s at name %s [%s], object path %s, locale %s",
+-           subject_as_string,
+-           polkit_system_bus_name_get_name (POLKIT_SYSTEM_BUS_NAME (caller)),
+-           caller_cmdline,
+-           object_path,
+-           locale);
+-
+-  polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                LOG_LEVEL_INFO,
+-                                "Registered Authentication Agent for %s "
+-                                "(system bus name %s [%s], object path %s, locale %s)",
+-                                subject_as_string,
+-                                polkit_system_bus_name_get_name (POLKIT_SYSTEM_BUS_NAME (caller)),
+-                                caller_cmdline,
+-                                object_path,
+-                                locale);
++  {
++    gchar *locale_safe = sanitize_for_log (locale);
++
++    g_debug ("Added authentication agent for %s at name %s [%s], object path %s, locale %s",
++             subject_as_string,
++             polkit_system_bus_name_get_name (POLKIT_SYSTEM_BUS_NAME (caller)),
++             caller_cmdline,
++             object_path,
++             locale_safe);
++
++    polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
++                                  LOG_LEVEL_INFO,
++                                  "Registered Authentication Agent for %s "
++                                  "(system bus name %s [%s], object path %s, locale %s)",
++                                  subject_as_string,
++                                  polkit_system_bus_name_get_name (POLKIT_SYSTEM_BUS_NAME (caller)),
++                                  caller_cmdline,
++                                  object_path,
++                                  locale_safe);
++
++    g_free (locale_safe);
++  }
+ 
+   g_signal_emit_by_name (authority, "changed");
+ 
+@@ -2916,20 +2966,27 @@ polkit_backend_interactive_authority_unregister_authentication_agent (PolkitBack
+     }
+ 
+   scope_str = polkit_subject_to_string (agent->scope);
+-  g_debug ("Removing authentication agent for %s at name %s, object path %s, locale %s",
+-           scope_str,
+-           agent->unique_system_bus_name,
+-           agent->object_path,
+-           agent->locale);
+ 
+-  polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                LOG_LEVEL_INFO,
+-                                "Unregistered Authentication Agent for %s "
+-                                "(system bus name %s, object path %s, locale %s)",
+-                                scope_str,
+-                                agent->unique_system_bus_name,
+-                                agent->object_path,
+-                                agent->locale);
++  {
++    gchar *locale_safe = sanitize_for_log (agent->locale);
++
++    g_debug ("Removing authentication agent for %s at name %s, object path %s, locale %s",
++             scope_str,
++             agent->unique_system_bus_name,
++             agent->object_path,
++             locale_safe);
++
++    polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
++                                  LOG_LEVEL_INFO,
++                                  "Unregistered Authentication Agent for %s "
++                                  "(system bus name %s, object path %s, locale %s)",
++                                  scope_str,
++                                  agent->unique_system_bus_name,
++                                  agent->object_path,
++                                  locale_safe);
++
++    g_free (locale_safe);
++  }
+   g_free (scope_str);
+ 
+   authentication_agent_cancel_all_sessions (agent);
+@@ -3075,14 +3132,20 @@ polkit_backend_interactive_authority_system_bus_name_owner_changed (PolkitBacken
+                    agent->unique_system_bus_name,
+                    agent->object_path);
+ 
+-          polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
+-                                        LOG_LEVEL_INFO,
+-                                        "Unregistered Authentication Agent for %s "
+-                                        "(system bus name %s, object path %s, locale %s) (disconnected from bus)",
+-                                        scope_str,
+-                                        agent->unique_system_bus_name,
+-                                        agent->object_path,
+-                                        agent->locale);
++          {
++            gchar *locale_safe = sanitize_for_log (agent->locale);
++
++            polkit_backend_authority_log (POLKIT_BACKEND_AUTHORITY (authority),
++                                          LOG_LEVEL_INFO,
++                                          "Unregistered Authentication Agent for %s "
++                                          "(system bus name %s, object path %s, locale %s) (disconnected from bus)",
++                                          scope_str,
++                                          agent->unique_system_bus_name,
++                                          agent->object_path,
++                                          locale_safe);
++
++            g_free (locale_safe);
++          }
+           g_free (scope_str);
+ 
+           authentication_agent_cancel_all_sessions (agent);
+-- 
+2.53.0
+

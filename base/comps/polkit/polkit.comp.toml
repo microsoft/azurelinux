@@ -1,0 +1,9 @@
+[components.polkit]
+release = { calculation = "manual" }
+
+[[components.polkit.overlays]]
+description = "Bump release"
+type = "spec-set-tag"
+tag = "Release"
+value = "6%{?dist}.3"
+metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }

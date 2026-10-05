@@ -1,0 +1,9 @@
+[components.texlive-base]
+release = { calculation = "manual" }
+
+[[components.texlive-base.overlays]]
+description = "Bump release"
+type = "spec-set-tag"
+tag = "Release"
+value = "95%{?dist}.2"
+metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }

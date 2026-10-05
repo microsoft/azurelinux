@@ -1,0 +1,20 @@
+--- texlive-base-20230311/source/texk/web2c/pdftexdir/pdftex.ch.orig	2023-05-02 17:26:43.000000000 +0200
++++ texlive-base-20230311/source/texk/web2c/pdftexdir/pdftex.ch	2024-01-20 21:59:58.382906926 +0100
+@@ -179,7 +179,7 @@ pdf_font_type:=xmalloc_array(eight_bits,
+ pdf_font_attr:=xmalloc_array(str_number, font_max);
+ pdf_font_blink:=xmalloc_array(internal_font_number, font_max);
+ pdf_font_elink:=xmalloc_array(internal_font_number, font_max);
+-pdf_font_has_space_char:=xmalloc_array(internal_font_number, font_max);
++pdf_font_has_space_char:=xmalloc_array(boolean, font_max);
+ pdf_font_stretch:=xmalloc_array(integer, font_max);
+ pdf_font_shrink:=xmalloc_array(integer, font_max);
+ pdf_font_step:=xmalloc_array(integer, font_max);
+@@ -298,7 +298,7 @@ pdf_font_type:=xmalloc_array(eight_bits,
+ pdf_font_attr:=xmalloc_array(str_number,font_max);
+ pdf_font_blink:=xmalloc_array(internal_font_number,font_max);
+ pdf_font_elink:=xmalloc_array(internal_font_number,font_max);
+-pdf_font_has_space_char:=xmalloc_array(internal_font_number,font_max);
++pdf_font_has_space_char:=xmalloc_array(boolean,font_max);
+ pdf_font_stretch:=xmalloc_array(integer,font_max);
+ pdf_font_shrink:=xmalloc_array(integer,font_max);
+ pdf_font_step:=xmalloc_array(integer,font_max);

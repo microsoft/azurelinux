@@ -1,0 +1,159 @@
+diff -up texlive-base-20210325/source/configure.poppler-xpdf-fix texlive-base-20210325/source/configure
+--- texlive-base-20210325/source/configure.poppler-xpdf-fix	2021-03-24 17:28:22.000000000 -0400
++++ texlive-base-20210325/source/configure	2021-05-10 15:21:08.254142588 -0400
+@@ -21497,7 +21497,27 @@ if test "x$with_mpfr_libdir" != x && tes
+   MPFR_LIBS="-L$with_mpfr_libdir $MPFR_LIBS"
+ fi
+ 
+-: "kpse_xpdf_system_flags - no-op"
++if $PKG_CONFIG poppler --atleast-version=0.30; then
++  POPPLER_INCLUDES=`$PKG_CONFIG poppler --cflags`
++  POPPLER_LIBS=`$PKG_CONFIG poppler --libs`
++elif test "x$need_poppler:$with_system_poppler" = xyes:yes; then
++  as_fn_error $? "did not find poppler 0.30 or better" "$LINENO" 5
++fi
++
++POPPLER_VERSION='-DPOPPLER_VERSION=\"'`$PKG_CONFIG poppler --modversion`'\"'
++POPPLER_INCLUDES="$POPPLER_VERSION $POPPLER_INCLUDES"
++
++if $PKG_CONFIG poppler --atleast-version=0.12; then
++  XPDF_INCLUDES=`$PKG_CONFIG poppler --cflags`
++  XPDF_LIBS=`$PKG_CONFIG poppler --libs`
++elif test "x$need_xpdf:$with_system_xpdf" = xyes:yes; then
++  as_fn_error $? "did not find poppler 0.12 or better" "$LINENO" 5
++fi
++
++POPPLER_VERSION='-DPOPPLER_VERSION=\"'`$PKG_CONFIG poppler --modversion`'\"'
++XPDF_INCLUDES="$POPPLER_VERSION $XPDF_INCLUDES"
++
++# : "kpse_xpdf_system_flags - no-op"
+ 
+ if $PKG_CONFIG zziplib --atleast-version=0.12; then
+   ZZIPLIB_INCLUDES=`$PKG_CONFIG zziplib --cflags`
+diff -up texlive-base-20210325/source/texk/web2c/configure.poppler-xpdf-fix texlive-base-20210325/source/texk/web2c/configure
+--- texlive-base-20210325/source/texk/web2c/configure.poppler-xpdf-fix	2021-02-16 22:03:54.000000000 -0500
++++ texlive-base-20210325/source/texk/web2c/configure	2021-05-10 15:21:08.256142617 -0400
+@@ -25500,9 +25500,21 @@ fi
+ ##tldbg _KPSE_LIB_FLAGS: Setup xpdf (-lxpdf) flags.
+ echo 'tldbg:_KPSE_LIB_FLAGS called: libdir=xpdf, libname=xpdf, options=, tlincl=-DPDF_PARSER_ONLY -IBLD/libs/xpdf -IBLD/libs/xpdf/goo -IBLD/libs/xpdf/xpdf, tllib=BLD/libs/xpdf/libxpdf.a, tlextra=, rebuildsrcdeps=, rebuildblddeps=${top_builddir}/../../libs/xpdf/xpdf/Stream.h.' >&5
+ ##tldbg _KPSE_LIB_FLAGS_TL: xpdf (xpdf) .
+-: "kpse_xpdf_options - no-op"
++# Check whether --with-system-xpdf was given.
++if test "${with_system_xpdf+set}" = set; then :
++  withval=$with_system_xpdf;
++fi
++
+ if test "x$with_system_xpdf" = xyes; then
+-  : "kpse_xpdf_system_flags - no-op"
++  if $PKG_CONFIG poppler --atleast-version=0.12; then
++   XPDF_INCLUDES=`$PKG_CONFIG poppler --cflags`
++   XPDF_LIBS=`$PKG_CONFIG poppler --libs`
++elif test "x$need_xpdf:$with_system_xpdf" = xyes:yes; then
++  as_fn_error $? "did not find poppler 0.12 or better" "$LINENO" 5
++fi
++
++POPPLER_VERSION='-DPOPPLER_VERSION=\"'`$PKG_CONFIG poppler --modversion`'\"'
++XPDF_INCLUDES="$POPPLER_VERSION $XPDF_INCLUDES"
+ else
+   XPDF_INCLUDES="-DPDF_PARSER_ONLY -I$kpse_BLD/libs/xpdf -I$kpse_BLD/libs/xpdf/goo -I$kpse_BLD/libs/xpdf/xpdf"
+   XPDF_LIBS="$kpse_BLD/libs/xpdf/libxpdf.a"
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler-xpdf-fix texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler-xpdf-fix	2021-05-10 15:56:50.770034767 -0400
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc	2021-05-10 16:05:07.939283063 -0400
+@@ -49,10 +49,16 @@ POPPLER_VERSION should be defined.
+ #include <string.h>
+ #include <ctype.h>
+ 
+-#include <aconf.h>
+-#include <GString.h>
+-#include <gmem.h>
+-#include <gfile.h>
++#ifdef POPPLER_VERSION
++#include <dirent.h>
++#include <poppler-config.h>
++#include <goo/GooString.h>
++#include <goo/gmem.h>
++#include <goo/gfile.h>
++#define GString GooString
++#else
++#error POPPLER_VERSION should be defined.
++#endif
+ #include <assert.h>
+ 
+ #include "Object.h"
+@@ -676,7 +682,7 @@ static void writeEncodings()
+     }
+     for (r = encodingList; r != 0; r = n) {
+         n = r->next;
+-        delete r->font;
++	r->font->decRefCnt();
+         delete r;
+     }
+ }
+@@ -715,7 +721,7 @@ read_pdf_info(char *image_name, char *pa
+     PdfDocument *pdf_doc;
+     Page *page;
+     const PDFRectangle *pagebox;
+-    float pdf_version_found, pdf_version_wanted;
++    int pdf_major_version_found, pdf_minor_version_found;
+     // initialize
+     if (!isInit) {
+         globalParams = std::unique_ptr<GlobalParams>(new GlobalParams());
+@@ -730,17 +736,18 @@ read_pdf_info(char *image_name, char *pa
+     // this works only for PDF 1.x -- but since any versions of PDF newer
+     // than 1.x will not be backwards compatible to PDF 1.x, pdfTeX will
+     // then have to changed drastically anyway.
+-    pdf_version_found = pdf_doc->doc->getPDFVersion();
+-    pdf_version_wanted = major_pdf_version_wanted + (minor_pdf_version_wanted * 0.1);
+-    if (pdf_version_found > pdf_version_wanted + 0.01) {
+-        char msg[] =
+-            "PDF inclusion: found PDF version <%.1f>, but at most version <%.1f> allowed";
++    pdf_major_version_found = pdf_doc->doc->getPDFMajorVersion();
++    pdf_minor_version_found = pdf_doc->doc->getPDFMinorVersion();
++    if ((pdf_major_version_found > major_pdf_version_wanted)
++     || (pdf_minor_version_found > minor_pdf_version_wanted)) {
++        const char *msg =
++            "PDF inclusion: found PDF version <%d.%d>, but at most version <%d.%d> allowed";
+         if (pdf_inclusion_errorlevel > 0) {
+-            pdftex_fail(msg, pdf_version_found, pdf_version_wanted);
++            pdftex_fail(msg, pdf_major_version_found, pdf_minor_version_found, major_pdf_version_wanted, minor_pdf_version_wanted);
+         } else if (pdf_inclusion_errorlevel < 0) {
+             ; /* do nothing */
+         } else { /* = 0, give warning */
+-            pdftex_warn(msg, pdf_version_found, pdf_version_wanted);
++            pdftex_warn(msg, pdf_major_version_found, pdf_minor_version_found, major_pdf_version_wanted, minor_pdf_version_wanted);
+         }
+     }
+     epdf_num_pages = pdf_doc->doc->getCatalog()->getNumPages();
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc.poppler-xpdf-fix texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc.poppler-xpdf-fix	2021-05-10 15:26:43.545060694 -0400
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc	2021-05-10 16:06:58.614896618 -0400
+@@ -41,10 +41,15 @@ POPPLER_VERSION should be defined.
+ #include <string.h>
+ #include <ctype.h>
+ 
+-#include <aconf.h>
+-#include <GString.h>
+-#include <gmem.h>
+-#include <gfile.h>
++#ifdef POPPLER_VERSION
++#define GString GooString
++#include <dirent.h>
++#include <goo/GooString.h>
++#include <goo/gmem.h>
++#include <goo/gfile.h>
++#else
++#error POPPLER_VERSION should be defined.
++#endif
+ #include <assert.h>
+ 
+ #include "Object.h"
+@@ -183,7 +188,7 @@ int main(int argc, char *argv[])
+                     if (n == e->gen)
+                         localOffset = obj2.getInt();
+                 }
+-#if defined(XPDF304)
++#if defined(POPPLER_VERSION) || defined(XPDF304)
+                 while (str->getChar() != EOF) ;
+ #else /* xpdf 4.00 */
+                 lexer->skipToEOF();

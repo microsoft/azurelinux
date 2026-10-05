@@ -1,0 +1,9 @@
+[components.httpd]
+release = { calculation = "manual" }
+
+[[components.httpd.overlays]]
+description = "Bump release"
+type = "spec-set-tag"
+tag = "Release"
+value = "1.2.1%{?dist}"
+metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }

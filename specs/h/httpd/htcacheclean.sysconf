@@ -1,0 +1,16 @@
+#
+# Configuration options for systemd service, htcacheclean.service.
+# See htcacheclean(8) for more information on available options.
+#
+
+# Interval between cache clean runs, in minutes
+INTERVAL=15
+
+# Default cache root.
+CACHE_ROOT=/var/cache/httpd/proxy
+
+# Cache size limit in bytes (K=Kbytes, M=Mbytes)
+LIMIT=100M
+
+# Any other options...
+OPTIONS=

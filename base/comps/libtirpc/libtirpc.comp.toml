@@ -1,0 +1,9 @@
+[components.libtirpc]
+release = { calculation = "manual" }
+
+[[components.libtirpc.overlays]]
+description = "Bump release"
+type = "spec-set-tag"
+tag = "Release"
+value = "1.rc1.1%{?dist}"
+metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }

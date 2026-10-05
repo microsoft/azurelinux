@@ -1,0 +1,26 @@
+# macros to keep trees in texlive consistent
+%_texmf          /usr/share/texlive/texmf-local
+%_texmf_main     /usr/share/texlive/texmf-dist
+%_texmf_vendor   /usr/share/texlive/texmf-dist
+%_texmf_var      /var/lib/texmf
+%_texmf_conf     /usr/share/texlive/texmf-config
+
+%texlive_post \
+mkdir -p /var/run/texlive \
+touch /var/run/texlive/run-texhash \
+touch /var/run/texlive/run-mtxrun \
+:
+
+%texlive_postun \
+if [ $1 == 1 ]; then \
+  mkdir -p /var/run/texlive \
+  touch /var/run/run-texhash \
+else \
+  %{_bindir}/texhash 2> /dev/null \
+fi \
+:
+
+%texlive_posttrans \
+if [ -e /var/run/texlive/run-texhash ] && [ -e %{_bindir}/texhash ]; then %{_bindir}/texhash 2> /dev/null; rm -f /var/run/texlive/run-texhash; fi \
+if [ -e /var/run/texlive/run-mtxrun ]; then export TEXMF=/usr/share/texlive/texmf-dist; export TEXMFCNF=/usr/share/texlive/texmf-dist/web2c; export TEXMFCACHE=/var/lib/texmf; %{_bindir}/mtxrun --generate &> /dev/null; rm -f /var/run/texlive/run-mtxrun; fi \
+:

@@ -1,0 +1,55 @@
+diff --git a/src/libtirpc.map b/src/libtirpc.map
+index 479b4ff..0d0f2f4 100644
+--- a/src/libtirpc.map
++++ b/src/libtirpc.map
+@@ -295,6 +295,11 @@ TIRPC_0.3.3 {
+     svc_max_pollfd;
+ } TIRPC_0.3.2;
+ 
++TIRPC_1.3.7 {
++    authdes_getucred;
++    rpc_gss_getcred;
++} TIRPC_0.3.3;
++
+ TIRPC_PRIVATE {
+   global:
+     __libc_clntudp_bufcreate;
+diff --git a/src/libtirpc.map.in b/src/libtirpc.map.in
+index 6cf563b..6c0b9b2 100644
+--- a/src/libtirpc.map.in
++++ b/src/libtirpc.map.in
+@@ -295,6 +295,11 @@ TIRPC_0.3.3 {
+     svc_max_pollfd;
+ } TIRPC_0.3.2;
+ 
++TIRPC_1.3.7 {
++    authdes_getucred;
++    rpc_gss_getcred;
++} TIRPC_0.3.3;
++
+ TIRPC_PRIVATE {
+   global:
+     __libc_clntudp_bufcreate;
+diff --git a/src/svc_auth_gss.c b/src/svc_auth_gss.c
+index de2993f..dd7db56 100644
+--- a/src/svc_auth_gss.c
++++ b/src/svc_auth_gss.c
+@@ -1117,7 +1117,7 @@ rpc_gss_get_principal_name(rpc_gss_principal_t *principal, char *mechanism,
+ {
+ 	OM_uint32 maj_stat, min_stat;
+ 	rpc_gss_principal_t result;
+-	size_t nodelen, secdomlen;
++	size_t nodelen, secdomlen, alloclen;
+ 	gss_name_t name, mechname;
+ 	gss_buffer_desc namebuf;
+ 	rpc_gss_OID oid;
+@@ -1135,7 +1135,8 @@ rpc_gss_get_principal_name(rpc_gss_principal_t *principal, char *mechanism,
+ 	if (secdomain != NULL)
+ 		secdomlen = strlen(secdomain) + 1;
+ 	namebuf.length = strlen(user_name) + nodelen + secdomlen;
+-	namebuf.value = calloc(1, namebuf.length);
++	alloclen = namebuf.length + 1; /* include terminating NULL for C-string ops */
++	namebuf.value = calloc(1, alloclen);
+ 	if (namebuf.value == NULL)
+ 		return FALSE;
+ 	(void)strcpy(namebuf.value, user_name);

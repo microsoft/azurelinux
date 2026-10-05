@@ -1,0 +1,21 @@
+commit de4ab055040670a08feb587b0c525cffe60bb48c
+Author: Joe Orton <jorton@redhat.com>
+Date:   Mon Jul 6 10:23:33 2026 +0100
+
+    * modules/filters/mod_proxy_html.c (pcomment): Don't dump content
+      when printing a comment. (regression in r1934975)
+    
+    Fixes: 9dc00bf22922b805d780f403132d2e35a99ced93
+
+diff --git a/modules/filters/mod_proxy_html.c b/modules/filters/mod_proxy_html.c
+index 6e33eac46e..a8c29db862 100644
+--- a/modules/filters/mod_proxy_html.c
++++ b/modules/filters/mod_proxy_html.c
+@@ -337,7 +337,6 @@ static void pcomment(void *ctxt, const xmlChar *uchars)
+         ap_fputs(ctx->f->next, ctx->bb, "<!--");
+         AP_fwrite(ctx, chars, strlen(chars), 1);
+         ap_fputs(ctx->f->next, ctx->bb, "-->");
+-        dump_content(ctx);
+     }
+ }
+ static void pendElement(void *ctxt, const xmlChar *uname)

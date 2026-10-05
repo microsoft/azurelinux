@@ -1,0 +1,51 @@
+diff -up texlive-base-20180414/source/texk/dvi2tty/dvi2tty-src/DVI.format texlive-base-20180414/source/texk/dvi2tty/dvi2tty-src/DVI
+diff -up texlive-base-20180414/source/texk/dvidvi/dvidvi.c.format texlive-base-20180414/source/texk/dvidvi/dvidvi.c
+--- texlive-base-20180414/source/texk/dvidvi/dvidvi.c.format	2017-06-23 10:55:46.000000000 -0400
++++ texlive-base-20180414/source/texk/dvidvi/dvidvi.c	2018-04-30 13:07:17.910020544 -0400
+@@ -349,7 +349,7 @@ static void stringdvibuf(integer p, inte
+  *   Print a usage error messsage, and quit.
+  */
+ static void usage(void) {
+-   (void)fprintf(stderr,banner);
++   (void)fprintf(stderr,"%s",banner);
+    (void)fprintf(stderr,"Usage:  dvidvi [options] input[.dvi] [output]\n");
+    (void)fprintf(stderr,"where options are:\n");
+    (void)fprintf(stderr,"    [-f n] first page printed     [-l n] last page printed\n");
+@@ -828,7 +828,7 @@ default:
+       } /* else argument with '-' */
+    }  /* for */
+    if (*iname == 0) {
+-       (void)fprintf(stderr, banner) ;
++       (void)fprintf(stderr, "%s", banner) ;
+        error("! no input file specified");
+    }
+    /* Inserted by djc@dsmail.hmi.de 3.8.1994 */
+@@ -839,7 +839,7 @@ default:
+    }
+ 
+    if (*oname != 0 && !quiet) {
+-       (void)fprintf(stderr, banner) ;
++       (void)fprintf(stderr, "%s", banner) ;
+        (void)fprintf(stderr, "%s -> %s\n",iname,oname);
+        temp = nextstring ;
+    }
+diff -up texlive-base-20180414/source/texk/web2c/tiedir/tie.c.format texlive-base-20180414/source/texk/web2c/tiedir/tie.c
+--- texlive-base-20180414/source/texk/web2c/tiedir/tie.c.format	2016-11-25 13:24:38.000000000 -0500
++++ texlive-base-20180414/source/texk/web2c/tiedir/tie.c	2018-04-30 13:07:27.792787747 -0400
+@@ -27,14 +27,14 @@
+  \
+ 
+ #define term_out stdout
+-#define print(a)fprintf(term_out,a)
++#define print(a)fprintf(term_out,"%s",a)
+ #define print2(a,b)fprintf(term_out,a,b)
+ #define print3(a,b,c)fprintf(term_out,a,b,c)
+ #define print_c(v)fputc(v,term_out);
+ #define new_line(v)fputc('\n',v)
+ #define term_new_line new_line(term_out) \
+ 
+-#define print_ln(v){fprintf(term_out,v);term_new_line;} \
++#define print_ln(v){fprintf(term_out,"%s",v);term_new_line;} \
+ 
+ #define print2_ln(a,b){print2(a,b);term_new_line;}
+ #define print3_ln(a,b,c){print3(a,b,c);term_new_line;} \

@@ -1,0 +1,11 @@
+# Note that logs are not compressed unless "compress" is configured,
+# which can be done either here or globally in /etc/logrotate.conf.
+/var/log/httpd/*log {
+    missingok
+    notifempty
+    sharedscripts
+    delaycompress
+    postrotate
+        /bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
+    endscript
+}

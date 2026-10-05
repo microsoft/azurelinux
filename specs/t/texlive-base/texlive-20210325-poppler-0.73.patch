@@ -1,0 +1,200 @@
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler-0.73 texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc.poppler-0.73	2021-05-06 18:01:35.847959461 -0400
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/pdftoepdf.cc	2021-05-06 18:08:20.143955577 -0400
+@@ -114,7 +114,7 @@ struct UsedEncoding {
+ 
+ static InObj *inObjList;
+ static UsedEncoding *encodingList;
+-static GBool isInit = gFalse;
++static bool isInit = false;
+ 
+ // --------------------------------------------------------------------
+ // Maintain list of open embedded PDF files
+@@ -269,7 +269,7 @@ static int getNewObjectNumber(Ref ref)
+ 
+ static void copyObject(Object *);
+ 
+-static void copyName(char *s)
++static void copyName(const char *s)
+ {
+     pdf_puts("/");
+     for (; *s != 0; s++) {
+@@ -304,7 +304,7 @@ static void copyDict(Object * obj)
+ static void copyFontDict(Object * obj, InObj * r)
+ {
+     int i, l;
+-    char *key;
++    const char *key;
+     if (!obj->isDict())
+         pdftex_fail("PDF inclusion: invalid dict type <%s>",
+                     obj->getTypeName());
+@@ -376,7 +376,7 @@ static bool embeddableFont(Object * font
+     return false;
+ }
+ 
+-static void copyFont(char *tag, Object * fontRef)
++static void copyFont(const char *tag, Object * fontRef)
+ {
+     Object fontdict, subtype, basefont, fontdescRef, fontdesc, charset,
+         stemV;
+@@ -412,7 +412,7 @@ static void copyFont(char *tag, Object *
+         && fontdescRef.isRef()
+         && fontdesc.isDict()
+         && embeddableFont(&fontdesc)
+-        && (fontmap = lookup_fontmap(basefont.getName())) != NULL) {
++        && (fontmap = lookup_fontmap((char *)basefont.getName())) != NULL) {
+         // round /StemV value, since the PDF input is a float
+         // (see Font Descriptors in PDF reference), but we only store an
+         // integer, since we don't want to change the struct.
+@@ -421,7 +421,7 @@ static void copyFont(char *tag, Object *
+         charset = fontdesc.dictLookup("CharSet");
+         if (!charset.isNull() &&
+             charset.isString() && is_subsetable(fontmap))
+-            epdf_mark_glyphs(fd, charset.getString()->getCString());
++            epdf_mark_glyphs(fd, (char *)charset.getString()->c_str());
+         else
+             embed_whole_font(fd);
+         addFontDesc(fontdescRef.getRef(), fd);
+@@ -461,7 +461,7 @@ static void copyFontResources(Object * o
+     pdf_puts(">>\n");
+ }
+ 
+-static void copyOtherResources(Object * obj, char *key)
++static void copyOtherResources(Object * obj, const char *key)
+ {
+     // copies all other resources (write_epdf handles Fonts and ProcSets),
+ 
+@@ -548,8 +548,8 @@ static void copyObject(Object * obj)
+     Object obj1;
+     int i, l, c;
+     Ref ref;
+-    char *p;
+-    GString *s;
++    const char *p;
++    const GString *s;
+     if (obj->isBool()) {
+         pdf_printf("%s", obj->getBool()? "true" : "false");
+     } else if (obj->isInt()) {
+@@ -560,7 +560,7 @@ static void copyObject(Object * obj)
+         pdf_printf("%s", convertNumToPDF(obj->getNum()));
+     } else if (obj->isString()) {
+         s = obj->getString();
+-        p = s->getCString();
++        p = s->c_str();
+         l = s->getLength();
+         if (strlen(p) == (unsigned int) l) {
+             pdf_puts("(");
+@@ -658,7 +658,7 @@ static void writeEncodings()
+                     ("PDF inclusion: CID fonts are not supported"
+                      " (try to disable font replacement to fix this)");
+             }
+-            if ((s = ((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
++            if ((s = (char *) ((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
+                 glyphNames[i] = s;
+             else
+                 glyphNames[i] = notdef;
+@@ -673,7 +673,7 @@ static void writeEncodings()
+ }
+ 
+ // get the pagebox according to the pagebox_spec
+-static PDFRectangle *get_pagebox(Page * page, int pagebox_spec)
++static const PDFRectangle *get_pagebox(Page * page, int pagebox_spec)
+ {
+     if (pagebox_spec == pdfboxspecmedia)
+         return page->getMediaBox();
+@@ -705,13 +705,13 @@ read_pdf_info(char *image_name, char *pa
+ {
+     PdfDocument *pdf_doc;
+     Page *page;
+-    PDFRectangle *pagebox;
++    const PDFRectangle *pagebox;
+     float pdf_version_found, pdf_version_wanted;
+     // initialize
+     if (!isInit) {
+         globalParams = new GlobalParams();
+-        globalParams->setErrQuiet(gFalse);
+-        isInit = gTrue;
++        globalParams->setErrQuiet(false);
++        isInit = true;
+     }
+     // open PDF file
+     pdf_doc = find_add_document(image_name);
+@@ -803,7 +803,7 @@ void write_epdf(void)
+     Object groupDict;
+     bool writeSepGroup = false;
+     Object info;
+-    char *key;
++    const char *key;
+     char s[256];
+     int i, l;
+     int rotate;
+@@ -830,7 +830,7 @@ void write_epdf(void)
+     pageObj = xref->fetch(pageRef->num, pageRef->gen);
+     pageDict = pageObj.getDict();
+     rotate = page->getRotate();
+-    PDFRectangle *pagebox;
++    const PDFRectangle *pagebox;
+     // write the Page header
+     pdf_puts("/Type /XObject\n");
+     pdf_puts("/Subtype /Form\n");
+@@ -958,7 +958,7 @@ The changes below seem to work fine.
+             }
+             l = dic1.getLength();
+             for (i = 0; i < l; i++) {
+-                groupDict.dictAdd(copyString(dic1.getKey(i)),
++                groupDict.dictAdd(dic1.getKey(i),
+                                   dic1.getValNF(i));
+             }
+ // end modification
+diff -up texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc.poppler-0.73 texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc
+--- texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc.poppler-0.73	2021-05-06 18:01:35.847959461 -0400
++++ texlive-base-20210325/source/texk/web2c/pdftexdir/pdftosrc.cc	2021-05-06 18:01:35.854959565 -0400
+@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
+             fprintf(stderr, "No SourceName found\n");
+             exit(1);
+         }
+-        outname = srcName.getString()->getCString();
++        outname = (char *)srcName.getString()->c_str();
+         // We cannot free srcName, as objname shares its string.
+         // srcName.free();
+     } else if (objnum > 0) {
+@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
+             fprintf(stderr, "Not a Stream object\n");
+             exit(1);
+         }
+-        sprintf(buf, "%s", fileName->getCString());
++        sprintf(buf, "%s", fileName->c_str());
+         if ((p = strrchr(buf, '.')) == 0)
+             p = strchr(buf, 0);
+         if (objgen == 0)
+@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
+         outname = buf;
+     } else {                    // objnum < 0 means we are extracting the XRef table
+         extract_xref_table = true;
+-        sprintf(buf, "%s", fileName->getCString());
++        sprintf(buf, "%s", fileName->c_str());
+         if ((p = strrchr(buf, '.')) == 0)
+             p = strchr(buf, 0);
+         sprintf(p, ".xref");
+@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
+                 Object objStr, obj1, obj2;
+                 int nObjects, first, n;
+                 int localOffset = 0;
+-                Guint firstOffset;
++                unsigned int firstOffset;
+ 
+                 objStr = xref->fetch(e->offset, 0);
+                 assert(objStr.isStream());
+@@ -167,9 +167,9 @@ int main(int argc, char *argv[])
+ 
+                 // parse the header: object numbers and offsets
+                 objStr.streamReset();
+-                str = new EmbedStream(objStr.getStream(), Object(objNull), gTrue, first);
++                str = new EmbedStream(objStr.getStream(), Object(objNull), true, first);
+                 lexer = new Lexer(xref, str);
+-                parser = new Parser(xref, lexer, gFalse);
++                parser = new Parser(xref, lexer, false);
+                 for (n = 0; n < nObjects; ++n) {
+                     obj1 = parser->getObj();
+                     obj2 = parser->getObj();
+diff -up texlive-base-20210325/source/texk/web2c/xetexdir/pdfimage.cpp.poppler-0.73 texlive-base-20210325/source/texk/web2c/xetexdir/pdfimage.cpp
