@@ -1,0 +1,158 @@
+--- zstr-1.1.0/CMakeLists.txt.orig	2025-10-20 09:17:37.000000000 -0600
++++ zstr-1.1.0/CMakeLists.txt	2025-10-20 11:45:56.725568759 -0600
+@@ -16,8 +16,8 @@ endif()
+ 
+ # -- locate zlib
+ 
+-find_package(ZLIB 1.2.3 REQUIRED) # defines imported target ZLIB::ZLIB
+-message(STATUS "zstr - found ZLIB (version: ${ZLIB_VERSION_STRING})")
++find_package(zlib-ng 2.1.0 REQUIRED) # defines imported target zlib-ng::zlib
++message(STATUS "zstr - found ZLIB (version: ${zlib-ng_VERSION_STRING})")
+ 
+ # -- add target
+ 
+@@ -27,20 +27,19 @@ add_library(zstr::zstr ALIAS zstr)
+ # -- set target properties
+ 
+ target_include_directories(zstr INTERFACE "${PROJECT_SOURCE_DIR}/src")
+-target_link_libraries(zstr INTERFACE ZLIB::ZLIB)
+-target_compile_features(zstr INTERFACE cxx_std_11) # require c++11 flag
++target_link_libraries(zstr INTERFACE zlib-ng::zlib)
+ 
+ # -- set cache variables
+ 
+ # NOTE: these vars are mostly useful to people using cmake < 3.13
+-set(ZSTR_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src;${ZLIB_INCLUDE_DIRS}" CACHE PATH "" FORCE)
+-set(ZSTR_LIBRARIES "${ZLIB_LIBRARIES}" CACHE PATH "" FORCE)
++set(ZSTR_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src;${zlib-ng_INCLUDE_DIR}" CACHE PATH "" FORCE)
++set(ZSTR_LIBRARIES "z-ng" CACHE PATH "" FORCE)
+ 
+ # -- print target summary
+ 
+ message(STATUS
+   "zstr - added INTERFACE target 'zstr::zstr'
+           includes : ${ZSTR_INCLUDE_DIRS}
+-          libraries: ZLIB::ZLIB
++          libraries: zlib-ng::zlib
+           features : cxx_std_11"
+ )
+--- zstr-1.1.0/src/zstr.hpp.orig	2025-10-20 09:17:37.000000000 -0600
++++ zstr-1.1.0/src/zstr.hpp	2025-10-20 11:49:38.553413378 -0600
+@@ -15,7 +15,7 @@
+ #ifdef MINIZ
+ #include <miniz.h>
+ #else
+-#include <zlib.h>
++#include <zlib-ng.h>
+ #endif
+ #include <memory>
+ #include <iostream>
+@@ -39,7 +39,7 @@ class Exception
+     : public std::ios_base::failure
+ {
+ public:
+-    static std::string error_to_message(z_stream * zstrm_p, int ret)
++    static std::string error_to_message(zng_stream * zstrm_p, int ret)
+     {
+         std::string msg = "zlib: ";
+         switch (ret)
+@@ -81,7 +81,7 @@ public:
+         return msg;
+     }
+ 
+-    Exception(z_stream * zstrm_p, int ret)
++    Exception(zng_stream * zstrm_p, int ret)
+         : std::ios_base::failure(error_to_message(zstrm_p, ret))
+     {
+     }
+@@ -164,7 +164,7 @@ namespace WindowBits {
+ } // namespace WindowBits
+ 
+ class z_stream_wrapper
+-    : public z_stream
++    : public zng_stream
+ {
+ public:
+     z_stream_wrapper(bool _is_input, int _level, int _window_bits)
+@@ -178,11 +178,11 @@ public:
+         {
+             this->avail_in = 0;
+             this->next_in = nullptr;//Z_NULL
+-            ret = inflateInit2(this, _window_bits ? _window_bits : WindowBits::ZLIB_OR_GZIP::MAX);
++            ret = zng_inflateInit2(this, _window_bits ? _window_bits : WindowBits::ZLIB_OR_GZIP::MAX);
+         }
+         else
+         {
+-            ret = deflateInit2(this, _level, Z_DEFLATED, _window_bits ? _window_bits : WindowBits::GZIP::MAX, 8, Z_DEFAULT_STRATEGY);
++            ret = zng_deflateInit2(this, _level, Z_DEFLATED, _window_bits ? _window_bits : WindowBits::GZIP::MAX, 8, Z_DEFAULT_STRATEGY);
+         }
+         if (ret != Z_OK) throw Exception(this, ret);
+     }
+@@ -190,11 +190,11 @@ public:
+     {
+         if (is_input)
+         {
+-            inflateEnd(this);
++            zng_inflateEnd(this);
+         }
+         else
+         {
+-            deflateEnd(this);
++            zng_deflateEnd(this);
+         }
+     }
+ private:
+@@ -323,7 +323,7 @@ public:
+                     // empty input buffer: refill from the start
+                     in_buff_start = in_buff.get();
+                     std::streamsize sz = sbuf_p->sgetn(in_buff.get(), static_cast<std::streamsize>(buff_size));
+-                    in_buff_end = in_buff_start + sz;
++                    in_buff_end = const_cast<char *>(in_buff_start) + sz;
+                     if (in_buff_end == in_buff_start) break; // end of input
+                 }
+                 // auto detect if the stream contains text or deflate data
+@@ -349,7 +349,7 @@ public:
+                     zstrm_p->avail_in = uint32_t(in_buff_end - in_buff_start);
+                     zstrm_p->next_out = reinterpret_cast< decltype(zstrm_p->next_out) >(out_buff_free_start);
+                     zstrm_p->avail_out = uint32_t((out_buff.get() + buff_size) - out_buff_free_start);
+-                    int ret = inflate(zstrm_p.get(), Z_NO_FLUSH);
++                    int ret = zng_inflate(zstrm_p.get(), Z_NO_FLUSH);
+                     // process return code
+                     if (ret != Z_OK && ret != Z_STREAM_END) throw Exception(zstrm_p.get(), ret);
+                     // update in&out pointers following inflate()
+@@ -360,7 +360,7 @@ public:
+                         zstrm_p->next_in
+ #endif
+                     );
+-                    in_buff_end = in_buff_start + zstrm_p->avail_in;
++                    in_buff_end = const_cast<char *>(in_buff_start) + zstrm_p->avail_in;
+                     out_buff_free_start = reinterpret_cast< decltype(out_buff_free_start) >(zstrm_p->next_out);
+                     assert(out_buff_free_start + zstrm_p->avail_out == out_buff.get() + buff_size);
+ 
+@@ -382,7 +382,7 @@ public:
+ private:
+     std::streambuf * sbuf_p;
+     std::unique_ptr<char[]> in_buff;
+-    char * in_buff_start;
++    const char * in_buff_start;
+     char * in_buff_end;
+     std::unique_ptr<char[]> out_buff;
+     std::unique_ptr<detail::z_stream_wrapper> zstrm_p;
+@@ -424,7 +424,7 @@ public:
+         {
+             zstrm_p->next_out = reinterpret_cast< decltype(zstrm_p->next_out) >(out_buff.get());
+             zstrm_p->avail_out = uint32_t(buff_size);
+-            int ret = deflate(zstrm_p.get(), flush);
++            int ret = zng_deflate(zstrm_p.get(), flush);
+             if (ret != Z_OK && ret != Z_STREAM_END && ret != Z_BUF_ERROR) {
+                 failed = true;
+                 throw Exception(zstrm_p.get(), ret);
+@@ -492,7 +492,7 @@ public:
+         zstrm_p->next_in = nullptr;
+         zstrm_p->avail_in = 0;
+         if (deflate_loop(Z_FINISH) != 0) return -1;
+-        deflateReset(zstrm_p.get());
++        zng_deflateReset(zstrm_p.get());
+         return 0;
+     }
+ private:
