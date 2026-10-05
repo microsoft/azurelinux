@@ -4,6 +4,7 @@
         <profile name="MarketplaceBase" description="Marketplace VM packages" import="false">
             <requires profile="PackageManagement" />
             <requires profile="CloudCore" />
+            <requires profile="ThirdPartyOpenSSLProvider" />
         </profile>
         <profile name="marketplace-gen2" description="Azure Linux Marketplace Gen2 Image" import="false">
             <requires profile="UefiBoot" />
@@ -132,8 +133,6 @@
         <package name="coreutils" />
     </packages>
     <packages type="image" profiles="MarketplaceBase">
-        <package name="SymCrypt" />
-        <package name="SymCrypt-OpenSSL" />
         <package name="acl" />
         <package name="acpid" />
         <package name="alternatives" />

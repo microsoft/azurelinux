@@ -6,6 +6,7 @@
         </profile>
         <profile name="vm-base" description="Azure Linux VM Base Image" import="false">
             <requires profile="PackageManagement" />
+            <requires profile="ThirdPartyOpenSSLProvider" />
             <requires profile="UefiBoot" />
             <requires profile="VmBaseCore" />
         </profile>

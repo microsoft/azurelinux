@@ -5,9 +5,11 @@
         <profile name="DistrolessCore" description="Minimal distroless container packages" import="false" />
         <profile name="DistrolessBase" description="Base distroless runtime packages" import="false">
             <requires profile="DistrolessCore" />
+            <requires profile="ThirdPartyOpenSSLProvider" />
         </profile>
         <profile name="core" description="Azure Linux Container Base Image" import="false">
             <requires profile="PackageManagement" />
+            <requires profile="ThirdPartyOpenSSLProvider" />
             <requires profile="ContainerCore" />
         </profile>
         <profile name="distroless-minimal" description="Azure Linux Distroless Minimal Container Image" import="false">

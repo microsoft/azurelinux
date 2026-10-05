@@ -53,6 +53,7 @@ INSTALL_PKGS=(
     systemd-networkd
     systemd-resolved
     dnf5
+    openssl-fips-provider
     grub2
     "$GRUB_EFI_PKG"
     "$GRUB_EFI_MOD_PKG"

@@ -4,6 +4,7 @@
         <profile name="WslCore" description="WSL packages" import="false" />
         <profile name="wsl" description="Azure Linux WSL Image" import="false">
             <requires profile="PackageManagement" />
+            <requires profile="ThirdPartyOpenSSLProvider" />
             <requires profile="WslCore" />
         </profile>
     </profiles>
