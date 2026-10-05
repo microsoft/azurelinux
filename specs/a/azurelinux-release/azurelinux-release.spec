@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        31%{?dist}
+Release:        32%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -67,6 +67,7 @@ Source30:       azurelinux-sshd-cis.conf
 Source31:       60-azurelinux-cis-module-denylist.conf
 Source32:       azurelinux-cis-shell-timeout.sh
 Source33:       00-rsyslog_filecreatemode.conf
+Source34:       azurelinux-cis-umask.sh
 
 BuildArch:      noarch
 
@@ -356,6 +357,7 @@ install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
 install -Dm0600 %{SOURCE30} %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
 install -Dm0644 %{SOURCE32} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
 install -Dm0644 %{SOURCE33} -t %{buildroot}%{_sysconfdir}/rsyslog.d/
+install -Dm0644 %{SOURCE34} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-umask.sh
 
 install -Dm0644 %{SOURCE25} -t %{buildroot}%{_sysconfdir}/cloud/cloud.cfg.d/
 %endif
@@ -437,6 +439,21 @@ install -Dm0440 %{SOURCE26} %{buildroot}%{_sysconfdir}/sudoers.d/10-azurelinux-c
 install -Dm0644 %{SOURCE27} %{buildroot}%{_prefix}/lib/tmpfiles.d/azurelinux-sudo.conf
 install -Dm0644 %{SOURCE28} %{buildroot}%{_sysconfdir}/logrotate.d/azurelinux-sudo
 install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sugroup.conf
+%check
+check_umask() {
+    initial_umask="$1"
+    expected_umask="$2"
+    actual_umask="$(/bin/sh -c "umask $initial_umask; . %{SOURCE34}; umask")"
+    test "$actual_umask" = "$expected_umask"
+}
+
+grep -Fx 'umask g-w,o-rwx' %{SOURCE34}
+check_umask 0002 0027
+check_umask 0022 0027
+check_umask 0077 0077
+test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
+
+
 %files common
 %license licenses/LICENSE
 %{_prefix}/lib/azurelinux-release
@@ -482,6 +499,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %files cloud
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-umask.sh
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.d/00-rsyslog_filecreatemode.conf
 
 %files identity-cloud
@@ -514,6 +532,9 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 
 %changelog
+* Mon Oct 05 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-32
+- Configure secure root and default login-shell umasks for cloud systems
+
 * Thu Sep 24 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-31
 - Configure secure rsyslog log file creation mode for cloud systems
 
