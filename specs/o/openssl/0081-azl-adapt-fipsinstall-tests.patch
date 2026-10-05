@@ -1,0 +1,82 @@
+From 55d7da2bb1b49478ffd57a02d56b66fa5c747f39 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 9 Oct 2026 15:30:35 +0000
+Subject: [PATCH] test(openssl): adapt tests for embedded module HMAC
+
+Preserve the static FIPS configuration used to test the embedded
+module HMAC instead of regenerating it during the suite. Run the
+broader fipsinstall coverage while adapting three expectations to
+the Red Hat provider self-test and integrity model.
+---
+ test/recipes/00-prep_fipsmodule_cnf.t |  4 +---
+ test/recipes/01-test_fipsmodule_cnf.t |  4 +---
+ test/recipes/03-test_fipsinstall.t    | 10 +++++++---
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/test/recipes/00-prep_fipsmodule_cnf.t b/test/recipes/00-prep_fipsmodule_cnf.t
+index 4e3a6d8..55067e3 100644
+--- a/test/recipes/00-prep_fipsmodule_cnf.t
++++ b/test/recipes/00-prep_fipsmodule_cnf.t
+@@ -20,9 +20,7 @@ use lib srctop_dir('Configurations');
+ use lib bldtop_dir('.');
+ use platform;
+ 
+-my $no_check = disabled("fips");
+-plan skip_all => "FIPS module config file only supported in a fips build"
+-    if $no_check;
++plan skip_all => "Azure Linux uses a static FIPS config for its embedded module HMAC";
+ 
+ my $fipsmodule = bldtop_file('providers', platform->dso('fips'));
+ my $fipsmoduleconf = bldtop_file('test', 'fipsmodule.cnf');
+diff --git a/test/recipes/01-test_fipsmodule_cnf.t b/test/recipes/01-test_fipsmodule_cnf.t
+index ce59481..4971d99 100644
+--- a/test/recipes/01-test_fipsmodule_cnf.t
++++ b/test/recipes/01-test_fipsmodule_cnf.t
+@@ -23,9 +23,7 @@ use lib srctop_dir('Configurations');
+ use lib bldtop_dir('.');
+ use platform;
+ 
+-my $no_check = disabled("fips");
+-plan skip_all => "Test only supported in a fips build"
+-    if $no_check;
++plan skip_all => "Azure Linux uses a static FIPS config for its embedded module HMAC";
+ plan tests => 1;
+ 
+ my $fipsmodule = bldtop_file('providers', platform->dso('fips'));
+diff --git a/test/recipes/03-test_fipsinstall.t b/test/recipes/03-test_fipsinstall.t
+index 3dcbe67..ec83451 100644
+--- a/test/recipes/03-test_fipsinstall.t
++++ b/test/recipes/03-test_fipsinstall.t
+@@ -315,6 +315,8 @@ SKIP: {
+ 
+ # corrupt a Signature test - 140-3 requires a known answer test
+ SKIP: {
++    skip "Red Hat FIPS provider does not expose the DSA signature KAT", 1;
++
+     skip "Skipping Signature DSA corruption test because of no dsa in this build", 1
+         if disabled("dsa") || disabled("fips-post");
+ 
+@@ -394,6 +396,8 @@ SKIP: {
+ 
+ # corrupt an Asymmetric cipher test
+ SKIP: {
++    skip "Red Hat FIPS provider does not expose the RSA encryption KAT", 1;
++
+     skip "Skipping Asymmetric RSA corruption test because of no rsa in this build", 1
+         if disabled("rsa") || disabled("fips-post");
+     ok(!run(app(['openssl', 'fipsinstall', '-out', 'fips.cnf', '-module', $infile,
+@@ -411,9 +415,9 @@ ok(replace_parent_line_file('fips.cnf', 'fips_parent.cnf')
+ 
+ ok(replace_parent_line_file('fips_no_module_mac.cnf',
+                             'fips_parent_no_module_mac.cnf')
+-   && !run(app(['openssl', 'fipsinstall',
+-                '-config', 'fips_parent_no_module_mac.cnf'])),
+-   "verify load config fail no module mac");
++   && run(app(['openssl', 'fipsinstall',
++              '-config', 'fips_parent_no_module_mac.cnf'])),
++   "verify load config succeeds with the embedded module MAC");
+ 
+ SKIP: {
+     run(test(["fips_version_test", "-config", $provconf, "<3.1.0"]),
+-- 
+2.53.0

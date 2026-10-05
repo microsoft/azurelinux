@@ -14,7 +14,6 @@ Patch-status: |
 From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
 ---
  doc/man3/SSL_CONF_cmd.pod                          |  3 +++
- doc/man5/fips_config.pod                           | 13 +++++++++++++
  include/openssl/ssl.h.in                           |  1 +
  providers/fips/include/fips_indicator_params.inc   |  2 +-
  ssl/ssl_conf.c                                     |  1 +
@@ -22,7 +21,7 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  ssl/t1_enc.c                                       | 11 +++++++++--
  test/recipes/30-test_evp_data/evpkdf_tls12_prf.txt | 10 ++++++++++
  test/sslapitest.c                                  |  2 +-
- 9 files changed, 46 insertions(+), 5 deletions(-)
+ 8 files changed, 33 insertions(+), 5 deletions(-)
 
 diff --git a/doc/man3/SSL_CONF_cmd.pod b/doc/man3/SSL_CONF_cmd.pod
 index 9338ffc01d..911ea21a68 100644
@@ -38,30 +37,6 @@ index 9338ffc01d..911ea21a68 100644
  B<CANames>: use CA names extension, enabled by
  default. Inverse of B<SSL_OP_DISABLE_TLSEXT_CA_NAMES>: that is,
  B<-CANames> is the same as setting B<SSL_OP_DISABLE_TLSEXT_CA_NAMES>.
-diff --git a/doc/man5/fips_config.pod b/doc/man5/fips_config.pod
-index 2505938c13..3887c54f0e 100644
---- a/doc/man5/fips_config.pod
-+++ b/doc/man5/fips_config.pod
-@@ -11,6 +11,19 @@ automatically loaded when the system is booted in FIPS mode, or when the
- environment variable B<OPENSSL_FORCE_FIPS_MODE> is set. See the documentation
- for more information.
- 
-+Red Hat Enterprise Linux uses a supplementary config for FIPS module located in
-+OpenSSL configuration directory and managed by crypto policies. If present, it
-+should have format
-+
-+ [fips_sect]
-+ tls1-prf-ems-check = 0
-+ activate = 1
-+
-+The B<tls1-prf-ems-check> option specifies whether FIPS module will require the
-+presence of extended master secret or not.
-+
-+The B<activate> option enforces FIPS provider activation.
-+
- =head1 COPYRIGHT
- 
- Copyright 2019-2025 The OpenSSL Project Authors. All Rights Reserved.
 diff --git a/include/openssl/ssl.h.in b/include/openssl/ssl.h.in
 index d1b00e8454..b815f25dae 100644
 --- a/include/openssl/ssl.h.in
