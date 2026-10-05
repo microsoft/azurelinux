@@ -83,8 +83,6 @@ ignore = [
     "SIM108",
     "SIM113",
     "T201",   # These scripts are fine to use `print` for output
-    "TC002",
-    "TC003",
     "TRY003",
     "TRY300",
     "TRY301",
