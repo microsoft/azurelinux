@@ -1,6 +1,6 @@
 Summary:        GitHub official command line tool
 Name:           gh
-Version:        2.101.0
+Version:        2.102.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -59,6 +59,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Sep 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.102.0-1
+- Auto-upgrade to 2.102.0 - for GHSA-39wj-f2f4-978v, GHSA-4mq3-hpgx-9cx8, GHSA-qcwj-mr2r-2cx7, GHSA-wjmr-j3rp-mh2g
+
 * Wed Sep 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.101.0-1
 - Auto-upgrade to 2.101.0 - for CVE-2026-84445, CVE-2026-84304, CVE-2026-56855, CVE-2026-78662, CVE-2026-72924
 
