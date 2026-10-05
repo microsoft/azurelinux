@@ -1,0 +1,40 @@
+From: Saul Paredes <saulparedes@microsoft.com>
+Subject: [PATCH] Revert "Revert "PCI: hv: Forbid IRQ affinity change for nested root partition""
+
+This reverts commit dc9454a268b67a5876903027a5db2bf8b95f2eb0.
+
+On the nested root partition, moving a vPCI MSI-X interrupt to another CPU
+that keeps the same vector number is not applied to the device:
+hv_arch_irq_unmask() returns early when mapped_vector == vec, so the device
+keeps targeting the old (VP, vector) and interrupts are lost once that vector
+is reused (mlx5 NETDEV WATCHDOG TX timeouts). Restore the guard that forbids
+affinity changes until the re-target path handles CPU-only moves.
+---
+diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
+index b46fedf7032e2..e11157dec4b33 100644
+--- a/drivers/pci/controller/pci-hyperv.c
++++ b/drivers/pci/controller/pci-hyperv.c
+@@ -2317,11 +2317,22 @@ static const struct msi_parent_ops hv_pcie_msi_parent_ops = {
+ 	.init_dev_msi_info	= hv_pcie_init_dev_msi_info,
+ };
+ 
++static int hv_irq_set_affinity(struct irq_data *data,
++				const struct cpumask *dest, bool force)
++{
++	if (hv_nested && hv_root_partition()) {
++		printk_once("Hyper-V: IRQ affinity change in nested root partition is currently not available\n");
++		return -EPERM;
++	}
++
++	return irq_chip_set_affinity_parent(data, dest, force);
++}
++
+ /* HW Interrupt Chip Descriptor */
+ static struct irq_chip hv_msi_irq_chip = {
+ 	.name			= "Hyper-V PCIe MSI",
+ 	.irq_compose_msi_msg	= hv_compose_msi_msg,
+-	.irq_set_affinity	= irq_chip_set_affinity_parent,
++	.irq_set_affinity	= hv_irq_set_affinity,
+ 	.irq_ack		= irq_chip_ack_parent,
+ 	.irq_eoi		= irq_chip_eoi_parent,
+ 	.irq_mask		= hv_irq_mask,

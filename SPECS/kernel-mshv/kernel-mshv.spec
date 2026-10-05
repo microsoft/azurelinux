@@ -18,7 +18,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        6.18.34.mshv3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -29,6 +29,7 @@ Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
 Source5:        config_aarch64
+Patch0:         pci-hv-forbid-irq-affinity-nested-root.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -265,6 +266,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Oct 05 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-2
+- Restore guard forbidding vPCI IRQ affinity changes on the nested root partition
+  (revert dc9454a268b67) to fix lost NIC interrupts
+
 * Thu Oct 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.mshv3-1
 - Auto-upgrade to 6.18.34.mshv3
 
