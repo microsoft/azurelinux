@@ -61,7 +61,7 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 - Rebase CVE-2026-56855.patch and CVE-2026-78662.patch to apply cleanly
 - Remove patches which are fixed in new generated vendor tarball: CVE-2024-45337, CVE-2024-45338, CVE-2025-22869,
   CVE-2025-22872, CVE-2025-47911, CVE-2025-47913, CVE-2025-58190, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821,
-  CVE-2026-39827, CVE-2026-39829,CVE-2026-39830, CVE-2026-39832, CVE-2026-39833, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502,
+  CVE-2026-39827, CVE-2026-39829, CVE-2026-39830, CVE-2026-39832, CVE-2026-39833, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502,
   CVE-2026-42506, CVE-2026-46597, CVE-2026-46598, CVE-2026-56852
 
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.14.0-17
