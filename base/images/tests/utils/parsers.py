@@ -38,7 +38,7 @@ def parse_os_release(content: str) -> dict[str, str]:
         key = key.strip()
         value = value.strip()
         # Strip matching quotes
-        if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):  # noqa: PLR2004 - matching quotes require two characters
             value = value[1:-1]
         result[key] = value
     logger.debug("Parsed os-release: %d keys", len(result))
