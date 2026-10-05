@@ -4,10 +4,14 @@
 from __future__ import annotations
 
 import re
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from utils.types import PartitionInfo
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from utils.types import PartitionInfo
 
 
 @pytest.mark.require_capability("machine-bootable")

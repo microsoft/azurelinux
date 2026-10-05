@@ -46,9 +46,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter, defaultdict
-from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import createrepo_c as cr
 
@@ -62,6 +62,9 @@ from _repo_layout import (
     KIND_SRPMS,
     SUBREPOS,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 # Repo root: this file lives at <repo>/scripts/repo/<name>.py, so the
 # project root is three parents up.
