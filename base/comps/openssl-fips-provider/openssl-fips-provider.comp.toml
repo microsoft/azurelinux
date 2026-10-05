@@ -1,0 +1,10 @@
+[components.openssl-fips-provider]
+# Azure Linux owns this spec and builds the FIPS module from an independently
+# versioned OpenSSL source archive.
+spec = { type = "local", path = "openssl-fips-provider.spec" }
+
+[[components.openssl-fips-provider.source-files]]
+filename = "openssl-3.5.8.tar.gz"
+hash = "62a1dbed0fad75245b332e41b85a1f7c2379189525e7628a7cf68947d115e90a47f179e3f87d27641e5b2d357c357292179fc0e64eccecdebc81c083f7a8ebe4"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/openssl/openssl/releases/download/openssl-3.5.8/openssl-3.5.8.tar.gz" }
