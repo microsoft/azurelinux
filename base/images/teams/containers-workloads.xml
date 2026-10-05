@@ -16,6 +16,7 @@
         <profile name="busybox-workload" description="Azure Linux Busybox Container Image" import="false" />
         <profile name="WorkloadCore" description="Shared workload container runtime" import="false">
             <requires profile="ContainerCore" />
+            <requires profile="FirstPartyOpenSSLProvider" />
         </profile>
         <profile name="nginx-workload" description="Azure Linux Nginx Container Image" import="false">
             <requires profile="WorkloadCore" />

@@ -5,6 +5,8 @@
         <profile name="CloudCore" description="Packages shared by Azure guest images" import="false">
             <requires profile="BootableCore" />
         </profile>
+        <profile name="FirstPartyOpenSSLProvider" description="First-party OpenSSL FIPS provider" import="false" />
+        <profile name="ThirdPartyOpenSSLProvider" description="Third-party OpenSSL FIPS provider" import="false" />
         <profile name="PackageManagement" description="Runtime package management configuration" import="false" />
     </profiles>
     <packages type="bootstrap" profiles="BootableCore">
@@ -57,6 +59,12 @@
     </packages>
     <packages type="image" profiles="PackageManagement">
         <package name="azurelinux-repos" />
+    </packages>
+    <packages type="bootstrap" profiles="FirstPartyOpenSSLProvider">
+        <package name="SymCrypt-OpenSSL" />
+    </packages>
+    <packages type="bootstrap" profiles="ThirdPartyOpenSSLProvider">
+        <package name="openssl-fips-provider" />
     </packages>
     <packages type="bootstrap" profiles="PackageManagement">
         <package name="azurelinux-repos" />
