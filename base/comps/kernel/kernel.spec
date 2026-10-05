@@ -17,9 +17,18 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 2
+%define azl_pkgrelease 3
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.57.04
+# AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
+# ofa_bundle_version/ofa_vendor_release name the MLNX_OFED_SRC bundle (Source6100).
+# ofa_release matches the mlnx-ofa_kernel SRPM inside it: NVIDIA re-spun that
+# SRPM as 0.8.5.1 without renaming the 0.8.5.0 bundle.
+%define ofa_version 26.04
+%define ofa_bundle_version 26.04
+%define ofa_vendor_release 0.8.5.0
+%define ofa_srpm_release 0.8.5.1
+%define ofa_release OFED.%{ofa_bundle_version}.%{ofa_srpm_release}
 
 # All Global changes to build and install go here.
 # Per the below section about __spec_install_pre, any rpm
@@ -671,6 +680,8 @@ Provides: installonlypkg(kernel)
 #
 BuildRequires: kmod, bash, coreutils, tar, git-core, which
 BuildRequires: bzip2, xz, findutils, m4, perl-interpreter, perl-Carp, perl-devel, perl-generators, make, diffutils, gawk, %compression
+# AZL: mlnx-ofa_kernel regenerates its compat configure script (autogen.sh).
+BuildRequires: autoconf, automake, libtool
 # Kernel EFI/Compression set by CONFIG_KERNEL_ZSTD
 %ifarch x86_64 aarch64
 BuildRequires: zstd
@@ -1022,6 +1033,9 @@ Source5002: azurelinux-ca-20230216.pem
 Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
 Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
+# AZL: MLNX OFED source bundle and kmod include (mlnx-ofa_kernel).
+Source6100: MLNX_OFED_SRC-%{ofa_bundle_version}-%{ofa_vendor_release}.tgz
+Source6101: mlnx-ofa_kernel.inc
 
 ## Patches needed for building this package
 
@@ -1072,6 +1086,11 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL: kmod subpackage declarations (mlnx-ofa_kernel)
+%global _kmod_phase package
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2053,6 +2072,11 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL: Prepare kmod subpackage sources (mlnx-ofa_kernel)
+%global _kmod_phase prep
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3129,6 +3153,11 @@ find Documentation -type d | xargs chmod u+w
 %{log_msg "end install docs"}
 %endif
 
+# AZL: Build MLNX OFED before the NVIDIA kmod.
+%global _kmod_phase build
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
+
 # AZL: Build kmod subpackage modules (nvidia-open)
 %global _kmod_phase build
 %global _kmod_name nvidia-open
@@ -3636,6 +3665,11 @@ popd
 %global _kmod_phase install
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL: Install kmod subpackage files (mlnx-ofa_kernel)
+%global _kmod_phase install
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4281,8 +4315,17 @@ fi\
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+# AZL: kmod subpackage file lists and scriptlets (mlnx-ofa_kernel)
+%global _kmod_phase files
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Mon Oct 05 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.50-1.3
+- Add mlnx-ofa_kernel
+- Rebuild the initramfs when mlnx-ofa_kernel-modules is installed or removed
+
 * Fri Oct 02 2026 Chris Co <chrco@microsoft.com> - 6.18.50-1.2
 - feat(kernel): enable PCIe EDR for DPC
 
