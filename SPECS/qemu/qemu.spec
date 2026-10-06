@@ -454,13 +454,13 @@ Patch4:   CVE-2025-11234.patch
 Patch5:   CVE-2025-12464.patch
 Patch6:   CVE-2024-8354.patch
 Patch7:   CVE-2025-14876.patch
-Patch27:  kvm-block-Drain-nodes-before-inactivating-them.patch
-Patch31:  CVE-2026-3195.patch
-Patch32:  CVE-2026-48914.patch
-Patch33:  CVE-2026-3196.patch
-Patch34:  CVE-2026-3842.patch
-Patch35:  CVE-2026-81627.patch
-Patch36:  CVE-2026-93834.patch
+Patch8:   kvm-block-Drain-nodes-before-inactivating-them.patch
+Patch9:   CVE-2026-3195.patch
+Patch10:  CVE-2026-48914.patch
+Patch11:  CVE-2026-3196.patch
+Patch12:  CVE-2026-3842.patch
+Patch13:  CVE-2026-81627.patch
+Patch14:  CVE-2026-93834.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
