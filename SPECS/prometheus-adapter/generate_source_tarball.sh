@@ -2,8 +2,12 @@
 
 # The flow of this script is as such:
 # 1. Download prometheus-adapter tarball to a temp working directory and extract it.
-# 2. Then we run go mod vendor.
-# 3. We tar the updated prometheus-adapter
+# 2. Bump the modules carrying CVE fixes (grpc, cel-go and their transitive deps).
+# 3. Then we run go mod vendor.
+# 4. We tar the resulting vendor/ tree only.
+#
+# The upstream Source0 tarball is left untouched; this script produces the
+# companion vendor tarball (Source1) that the spec unpacks over it.
 
 set -e
 
@@ -85,10 +89,23 @@ cd "$TEMPDIR"
 wget -c $ADAPTER_URL -O "prometheus-adapter-$PKG_VERSION.tar.gz"
 tar -xzf "prometheus-adapter-$PKG_VERSION.tar.gz"
 cd "prometheus-adapter-$PKG_VERSION"
+
+# Bump the modules carrying the CVE fixes. grpc v1.83.2 requires go >= 1.25 and
+# x/crypto v0.57.0 requires go >= 1.26, so raise the language level to match.
+# x/crypto must be pinned explicitly; MVS alone only selects v0.55.0.
+go mod edit -go=1.26.0
+go mod edit \
+    -require=google.golang.org/grpc@v1.83.2 \
+    -require=github.com/google/cel-go@v0.31.0 \
+    -require=golang.org/x/crypto@v0.57.0
+
+go mod tidy
 go mod vendor
 
-cd "$TEMPDIR"
-tar -czf "$OUT_FOLDER/prometheus-adapter-$PKG_VERSION.tar.gz" "prometheus-adapter-$PKG_VERSION"
+# Ship only the vendor tree; Source0 stays pristine and the go.mod/go.sum
+# changes are carried by the spec's patches.
+tar -czf "$OUT_FOLDER/prometheus-adapter-$PKG_VERSION-vendor.tar.gz" vendor
+
 cd "$START_DIR"
 rm -rf "$TEMPDIR"
-echo "Source tarball $OUT_FOLDER/prometheus-adapter-$PKG_VERSION.tar.gz successfully created!"
+echo "Vendor tarball $OUT_FOLDER/prometheus-adapter-$PKG_VERSION-vendor.tar.gz successfully created!"
