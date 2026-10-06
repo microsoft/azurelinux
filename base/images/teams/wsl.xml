@@ -8,12 +8,12 @@
         </profile>
     </profiles>
     <preferences profiles="wsl">
-        <version>0.1.0</version>
+        <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
         <timezone>UTC</timezone>
         <release-version>4.0</release-version>
-        <type image="wsl" bundle_format="AzureLinux-4-%A" />
+        <type image="wsl" />
         <rpm-locale-filtering>false</rpm-locale-filtering>
         <rpm-excludedocs>false</rpm-excludedocs>
     </preferences>
