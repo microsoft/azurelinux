@@ -151,6 +151,27 @@ pre-commit run commitizen-branch \
   --to-ref HEAD
 ```
 
+### Copilot review before human review
+
+Before requesting human review, make sure the pull request is a mature change
+that you are willing to stand behind. Opening the pull request as a draft and
+using Copilot review to refine it is encouraged, but not required; contributors
+may perform equivalent review and refinement locally.
+
+If Copilot reviews the pull request, triage every Copilot comment before
+requesting human review:
+
+- If the comment identifies an issue, make the appropriate change and reply with a
+  brief explanation of the resolution before resolving the thread.
+- If no change is appropriate, explain why. Resolve the thread only when the concern
+  has been conclusively addressed.
+- If the comment requires human judgment or warrants additional scrutiny, leave the
+  thread open and explicitly call it out for the human reviewer.
+
+Marking a pull request **ready for review** signals that the author considers the
+change mature. Any remaining unresolved Copilot comments should clearly state what
+human input is needed.
+
 ### Responding to review feedback
 
 You can address review comments however you like *during* review — additional commits
