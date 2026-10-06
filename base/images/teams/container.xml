@@ -21,7 +21,7 @@
         </profile>
     </profiles>
     <preferences profiles="core,distroless-base,distroless-debug,distroless-minimal">
-        <version>0.1</version>
+        <version>0.1.0</version>
         <packagemanager>dnf5</packagemanager>
     </preferences>
     <preferences profiles="core">
