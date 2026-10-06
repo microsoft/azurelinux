@@ -199,3 +199,18 @@ container = false
 systemd = true
 runtime-package-management = true
 fips-enabled = true
+
+# ---- cvm ---------------------------------------------------------------
+
+[images.cvm]
+description = "Unsigned Confidential VM Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "cvm" }
+architectures = ["x86_64"]
+tests.tests = [{ name = "static-image-checks" }]
+
+[images.cvm.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+cvm = true
