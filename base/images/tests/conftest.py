@@ -307,6 +307,32 @@ def partition_table(disk_info: DiskInfo | None, image_type: str) -> list[Partiti
     return disk_info.partitions
 
 
+@pytest.fixture(scope="session")
+def boot_entry_option_lines(rootfs: Path) -> dict[Path, list[str]]:
+    """Raw kernel option lines keyed by BLS boot entry path."""
+    entries_dirs = (
+        rootfs / "boot" / "loader" / "entries",
+        rootfs / "boot" / "efi" / "loader" / "entries",
+    )
+    entries = sorted(
+        {
+            entry
+            for entries_dir in entries_dirs
+            for entry in entries_dir.glob("*.conf")
+        }
+    )
+    option_lines_by_entry: dict[Path, list[str]] = {}
+    for entry in entries:
+        option_lines: list[str] = []
+        relative_entry = entry.relative_to(rootfs).as_posix()
+        for line in read_text_confined(rootfs, relative_entry).splitlines():
+            fields = line.split(maxsplit=1)
+            if fields and fields[0] == "options":
+                option_lines.append(fields[1] if len(fields) > 1 else "")
+        option_lines_by_entry[entry] = option_lines
+    return option_lines_by_entry
+
+
 # ---------------------------------------------------------------------------
 # Container runtime fixtures
 # ---------------------------------------------------------------------------
