@@ -23,7 +23,7 @@
         </profile>
     </profiles>
     <preferences arch="x86_64" profiles="1p-vm-base-gen1">
-        <version>0.1</version>
+        <version>0.1.0</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
         <keytable>us</keytable>
@@ -38,7 +38,7 @@
         </type>
     </preferences>
     <preferences arch="x86_64" profiles="1p-vm-base-gen1-fips">
-        <version>0.1</version>
+        <version>0.1.0</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
         <keytable>us</keytable>
@@ -53,7 +53,7 @@
         </type>
     </preferences>
     <preferences arch="x86_64" profiles="1p-vm-base-gen2-fips">
-        <version>0.1</version>
+        <version>0.1.0</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
         <keytable>us</keytable>
@@ -68,7 +68,7 @@
         </type>
     </preferences>
     <preferences arch="aarch64" profiles="1p-vm-base-gen2-fips">
-        <version>0.1</version>
+        <version>0.1.0</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
         <keytable>us</keytable>
