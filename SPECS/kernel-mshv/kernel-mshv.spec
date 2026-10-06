@@ -29,6 +29,7 @@ Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
 Source5:        config_aarch64
+Patch0:         0001-TEST-restore-mshv1-x86-vPCI-interrupt-implementation.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
