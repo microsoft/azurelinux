@@ -410,8 +410,6 @@
         <package name="xfsprogs" />
         <package name="xxd" />
         <package name="xz" />
-        <package name="zram-generator" />
-        <package name="zram-generator-defaults" />
         <package name="zstd" />
     </packages>
 </image>
