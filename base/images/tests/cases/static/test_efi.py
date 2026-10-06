@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.require_capability("machine-bootable")
-def test_efi_partition_has_restrictive_umask(
+def test_efi_partition_has_restrictive_mount_options(
     partition_table: list[PartitionInfo],
     rootfs: Path,
 ) -> None:
@@ -55,7 +55,7 @@ def test_efi_partition_has_restrictive_umask(
     assert efi_entry[1:] == [
         "/boot/efi",
         "vfat",
-        "defaults,umask=0077",
+        "defaults,umask=0077,noexec,nodev,nosuid,nosymfollow",
         "0",
         "0",
     ], (
