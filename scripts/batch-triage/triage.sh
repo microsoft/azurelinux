@@ -122,6 +122,9 @@ OUTPUT_DIR="${REPO_ROOT}/out/triage"
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
+# Docker requires the host-side path to exist before applying the tmpfs mount.
+mkdir -p "${REPO_ROOT}/base/build"
+
 # Configure mounts and working dir
 DOCKER_ARGS+=( -v "${REPO_ROOT}:/workspace:ro" )
 DOCKER_ARGS+=( -v "${OUTPUT_DIR}:/workspace/out/triage" )
