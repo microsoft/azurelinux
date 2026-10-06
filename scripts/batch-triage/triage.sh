@@ -12,7 +12,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 usage() {
     echo "Usage: $0 [--results /path/to/file.json] [--model <model>] [--debug|--interactive] [--no-cache] [--help|-h] [extra prompt text]" >&2
     echo "  --results <file>   Path to the JSON file with results to triage (default: ./results.json)" >&2
-    echo "  --model <model>    Language model to use for triage (default: claude-opus-4.6)" >&2
+    echo "  --model <model>    Language model to use for triage (default: gpt-6-sol)" >&2
     echo "  --debug, --interactive  Run in interactive debug mode with a bash shell instead of the agent" >&2
     echo "  --no-cache         Rebuild the Docker image without using cache" >&2
     echo "  --help, -h         Show this help message and exit" >&2
@@ -23,7 +23,7 @@ usage() {
 }
 
 RESULTS_FILE="./results.json"
-MODEL="claude-opus-4.6"
+MODEL="gpt-6-sol"
 DO_DEBUG=false
 DOCKER_COMMON_ARGS=()
 while [[ $# -gt 0 ]]; do

@@ -163,7 +163,7 @@ After installing, all skills are available regardless of your current directory.
 
 ### Dockerized Batch Triage
 
-For batch triage of build failures, a containerized wrapper runs the `azl-diagnose` agent inside an Azure Linux 3.0 container. The repo is mounted read-only, the agent analyzes a results JSON file, and writes triage reports to `out/triage/`.
+For batch triage of build failures, a containerized wrapper runs the `azl-diagnose` agent inside an Azure Linux 3.0 container using `gpt-6-sol` by default. The repo is mounted read-only, the agent analyzes a results JSON file, and writes triage reports to `out/triage/`. Override the model with `--model <model>`.
 
 ```bash
 # Default: reads ./results.json
