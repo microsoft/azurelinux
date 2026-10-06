@@ -176,6 +176,7 @@ base/images/
 | `installed_package_sizes` | session | `dict[str, int]` | Installed RPM name → on-disk size in bytes (`rpm --root`, `%{SIZE}`) |
 | `disk_info` | session | `DiskInfo \| None` | VM only |
 | `partition_table` | session | `list[PartitionInfo]` | VM only — auto-skips on containers |
+| `boot_entry_option_lines` | session | `dict[Path, list[str]]` | BLS boot entry path → raw kernel option lines |
 | `podman_client` | session | `DockerClient \| None` | python-on-whales Podman client; None for non-container images |
 | `container_image_ref` | session | `str \| None` | Loaded image ID (cached); None for non-container |
 | `running_container` | function | `ContainerInstance` | Fresh container per test — auto-skips on VMs |

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import logging
+import shlex
 import subprocess
 from typing import TYPE_CHECKING
 
@@ -43,6 +44,38 @@ def parse_os_release(content: str) -> dict[str, str]:
         result[key] = value
     logger.debug("Parsed os-release: %d keys", len(result))
     return result
+
+
+def parse_boot_entry_kernel_options(
+    option_lines_by_entry: dict[Path, list[str]],
+) -> dict[Path, list[str]]:
+    """Parse one literal kernel option line from each BLS boot entry."""
+    if not option_lines_by_entry:
+        raise ValueError("no BLS boot loader entries found")
+
+    options_by_entry: dict[Path, list[str]] = {}
+    for entry, option_lines in option_lines_by_entry.items():
+        if len(option_lines) != 1:
+            raise ValueError(
+                f"expected exactly one options line in {entry}, "
+                f"found {len(option_lines)}"
+            )
+        try:
+            options = shlex.split(option_lines[0])
+        except ValueError as exc:
+            raise ValueError(
+                f"failed to parse boot loader options in {entry}: {exc}"
+            ) from exc
+        if not options:
+            raise ValueError(f"boot loader options are empty in {entry}")
+        indirections = [option for option in options if option.startswith("$")]
+        if indirections:
+            raise ValueError(
+                f"boot loader option indirection is not supported in {entry}: "
+                f"{indirections}. This is likely a test issue."
+            )
+        options_by_entry[entry] = options
+    return options_by_entry
 
 
 def query_rpm_package_sizes(rootfs: Path) -> dict[str, int]:

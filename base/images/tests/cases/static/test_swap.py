@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from utils.extract import read_text_confined
+from utils.parsers import parse_boot_entry_kernel_options
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -40,17 +41,25 @@ ZRAM_GENERATOR_CONFIG_DIRS = (
 # such lines must be dropped before handing the text to it.
 ZRAM_GLOBAL_DIRECTIVE_RE = re.compile(r"^\s*set!\S+\s*=.*$")
 
-# BLS boot entries and the grub2 config both embed the effective kernel
-# command line; zram-generator enables a default zram0 swap device when
-# "systemd.zram" is present with no value, or any value other than "0"/
-# "false" (see zram-generator.conf(5)).
-KERNEL_CMDLINE_GLOB_PATHS = (
-    "boot/loader/entries/*.conf",
-    "boot/efi/loader/entries/*.conf",
-    "boot/grub2/grub.cfg",
-)
+# zram-generator enables a default zram0 swap device when "systemd.zram"
+# is present with no value, or any value other than "0"/"false"
+# (see zram-generator.conf(5)).
+GRUB_CONFIG_PATH = "boot/grub2/grub.cfg"
 SYSTEMD_ZRAM_OPTION_RE = re.compile(r"\bsystemd\.zram(?:=(\S+))?\b")
 SYSTEMD_ZRAM_DISABLED_VALUES = {"0", "false", "no", "off"}
+
+
+def _is_enabling_zram_option(option: str) -> bool:
+    name, separator, value = option.partition("=")
+    return (
+        name == "systemd.zram"
+        and (not separator or value.lower() not in SYSTEMD_ZRAM_DISABLED_VALUES)
+    )
+
+
+def _find_enabling_zram_options(cmdline_text: str) -> list[str]:
+    options = (match.group(0) for match in SYSTEMD_ZRAM_OPTION_RE.finditer(cmdline_text))
+    return [option for option in options if _is_enabling_zram_option(option)]
 
 
 @pytest.mark.require_capability("machine-bootable")
@@ -138,7 +147,10 @@ def test_no_zram_swap_device(rootfs: Path) -> None:
 
 
 @pytest.mark.require_capability("machine-bootable")
-def test_no_zram_swap_kernel_cmdline(rootfs: Path) -> None:
+def test_no_zram_swap_kernel_cmdline(
+    rootfs: Path,
+    boot_entry_option_lines: dict[Path, list[str]],
+) -> None:
     """Bootable images must not enable zram swap via the kernel command line.
 
     zram-generator activates a default ``zram0`` swap device when the
@@ -147,14 +159,23 @@ def test_no_zram_swap_kernel_cmdline(rootfs: Path) -> None:
     on-disk ``zram-generator.conf``.
     """
     enabling_entries: list[str] = []
-    for glob_pattern in KERNEL_CMDLINE_GLOB_PATHS:
-        for conf_path in sorted(rootfs.glob(glob_pattern)):
-            rel_path = str(conf_path.relative_to(rootfs))
-            cmdline_text = read_text_confined(rootfs, rel_path)
-            for match in SYSTEMD_ZRAM_OPTION_RE.finditer(cmdline_text):
-                value = match.group(1)
-                if value is None or value.lower() not in SYSTEMD_ZRAM_DISABLED_VALUES:
-                    enabling_entries.append(f"{rel_path}: {match.group(0)!r}")
+    options_by_entry = parse_boot_entry_kernel_options(boot_entry_option_lines)
+    for entry, options in options_by_entry.items():
+        rel_path = entry.relative_to(rootfs)
+        enabling_entries.extend(
+            f"{rel_path}: {option!r}"
+            for option in options
+            if _is_enabling_zram_option(option)
+        )
+
+    grub_config = rootfs / GRUB_CONFIG_PATH
+    if grub_config.exists():
+        enabling_entries.extend(
+            f"{GRUB_CONFIG_PATH}: {option!r}"
+            for option in _find_enabling_zram_options(
+                read_text_confined(rootfs, GRUB_CONFIG_PATH)
+            )
+        )
 
     assert not enabling_entries, (
         f"Expected no 'systemd.zram' kernel cmdline option enabling swap, found: {enabling_entries}"
