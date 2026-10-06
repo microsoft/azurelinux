@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -355,6 +355,7 @@ install -Dm0600 %{SOURCE30} %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/30-azur
 install -Dm0644 %{SOURCE32} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
 install -Dm0644 %{SOURCE33} -t %{buildroot}%{_sysconfdir}/rsyslog.d/
 install -Dm0644 %{SOURCE34} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-umask.sh
+install -Dm0644 %{SOURCE31} -t %{buildroot}%{_prefix}/lib/modprobe.d/
 
 install -Dm0644 %{SOURCE25} -t %{buildroot}%{_sysconfdir}/cloud/cloud.cfg.d/
 %endif
@@ -426,9 +427,6 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 
 # Install sysctl configuration
 install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
-# Install CIS network protocol module policy.
-install -Dm0644 %{SOURCE31} -t %{buildroot}%{_prefix}/lib/modprobe.d/
-
 
 
 # Install CIS privileged-command policy and audit-log lifecycle files.
@@ -477,7 +475,6 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 %{_sysconfdir}/swid/swidtags.d
 %{_prefix}/share/dnf5/libdnf.conf.d/20-azurelinux-defaults.conf
 %{_sysctldir}/70-azurelinux-hardening.conf
-%{_prefix}/lib/modprobe.d/60-azurelinux-cis-module-denylist.conf
 %attr(0440,root,root) %config(noreplace) %{_sysconfdir}/sudoers.d/10-azurelinux-cis
 %attr(0644,root,root) %{_prefix}/lib/tmpfiles.d/azurelinux-sudo.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/azurelinux-sudo
@@ -498,6 +495,7 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-umask.sh
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.d/00-rsyslog_filecreatemode.conf
+%{_prefix}/lib/modprobe.d/60-azurelinux-cis-module-denylist.conf
 
 %files identity-cloud
 %{_prefix}/lib/os-release.cloud
@@ -529,6 +527,10 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Wed Oct 14 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-33
+- Deny usb-storage in cloud images for CIS GRID NIX-00000009
+- Move the CIS module denylist from common to the cloud package
+
 * Mon Oct 05 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-32
 - Configure secure root and default login-shell umasks for cloud systems
 
