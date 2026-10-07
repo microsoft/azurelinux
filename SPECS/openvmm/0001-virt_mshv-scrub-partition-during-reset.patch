@@ -1,0 +1,95 @@
+From e1e35a891bfb8764db464cbad1e512232747c888 Mon Sep 17 00:00:00 2001
+From: Harshit Gupta <guptaharshit@microsoft.com>
+Date: Tue, 13 Oct 2026 04:30:29 -0700
+Subject: [PATCH] virt_mshv: scrub partition during reset
+
+Use the MSHV_SCRUB_PARTITION ioctl when resetting an MSHV
+partition. This resets partition state in the kernel before the
+remaining device and architecture-specific reset handling.
+
+Remove the explicit VP state reset since partition scrubbing now
+handles that state.
+
+Signed-off-by: Harshit Gupta <guptaharshit@microsoft.com>
+---
+ vmm_core/virt_mshv/src/aarch64/mod.rs |  1 +
+ vmm_core/virt_mshv/src/lib.rs         | 23 ++++++++++++++++-------
+ vmm_core/virt_mshv/src/x86_64/mod.rs  |  2 ++
+ 3 files changed, 19 insertions(+), 7 deletions(-)
+
+diff --git a/vmm_core/virt_mshv/src/aarch64/mod.rs b/vmm_core/virt_mshv/src/aarch64/mod.rs
+index 79f5f5e..8baec65 100644
+--- a/vmm_core/virt_mshv/src/aarch64/mod.rs
++++ b/vmm_core/virt_mshv/src/aarch64/mod.rs
+@@ -266,6 +266,7 @@ impl virt::ResetPartition for MshvPartition {
+     type Error = Error;
+ 
+     fn reset(&self) -> Result<(), Error> {
++        self.inner.scrub_partition()?;
+         self.inner.freeze_time()?;
+         Ok(())
+     }
+diff --git a/vmm_core/virt_mshv/src/lib.rs b/vmm_core/virt_mshv/src/lib.rs
+index f6bbde7..a0aae72 100644
+--- a/vmm_core/virt_mshv/src/lib.rs
++++ b/vmm_core/virt_mshv/src/lib.rs
+@@ -312,6 +312,20 @@ fn vp(&self, vp_index: VpIndex) -> &MshvVpInner {
+         &self.vps[vp_index.index() as usize]
+     }
+ 
++    fn scrub_partition(&self) -> Result<(), Error> {
++        // _IO(MSHV_IOCTL, 0x0b), where MSHV_IOCTL is 0xb8.
++        const MSHV_SCRUB_PARTITION: libc::c_ulong = 0xb80b;
++
++        // SAFETY: `vmfd` is a valid MSHV partition fd, and
++        // MSHV_SCRUB_PARTITION is an argument-less ioctl.
++        let ret = unsafe { libc::ioctl(self.vmfd.as_raw_fd(), MSHV_SCRUB_PARTITION) };
++        if ret < 0 {
++            return Err(ErrorInner::ScrubPartition(io::Error::last_os_error()).into());
++        }
++
++        Ok(())
++    }
++
+     /// Freezes partition time. Time will remain frozen until [`thaw_time`] is
+     /// called (typically on the first VP run after reset).
+     fn freeze_time(&self) -> Result<(), Error> {
+@@ -608,13 +622,6 @@ fn access_state(&mut self, vtl: Vtl) -> Self::StateAccess<'_> {
+     }
+ 
+     fn reset(&mut self) -> Result<(), impl std::error::Error + Send + Sync + 'static> {
+-        use virt::vp::AccessVpState;
+-
+-        let vp_info = self.inner.vp_info;
+-        self.access_state(Vtl::Vtl0)
+-            .reset_all(&vp_info)
+-            .map_err(|e| ErrorInner::ResetState(Box::new(e)))?;
+-
+         self.reset_synic_state();
+ 
+         Ok::<(), Error>(())
+@@ -670,6 +677,8 @@ enum ErrorInner {
+     GetPartitionProperty(#[source] KernelError),
+     #[error("failed to set partition property")]
+     SetPartitionProperty(#[source] KernelError),
++    #[error("failed to scrub partition")]
++    ScrubPartition(#[source] io::Error),
+     #[error("register access error")]
+     Register(#[source] KernelError),
+     #[cfg(guest_arch = "x86_64")]
+diff --git a/vmm_core/virt_mshv/src/x86_64/mod.rs b/vmm_core/virt_mshv/src/x86_64/mod.rs
+index 219a087..3718dd3 100644
+--- a/vmm_core/virt_mshv/src/x86_64/mod.rs
++++ b/vmm_core/virt_mshv/src/x86_64/mod.rs
+@@ -412,6 +412,8 @@ impl virt::ResetPartition for MshvPartition {
+     fn reset(&self) -> Result<(), Error> {
+         use virt::x86::vm::AccessVmState;
+ 
++        self.inner.scrub_partition()?;
++
+         for irq in 0..virt::irqcon::IRQ_LINES as u8 {
+             self.inner.irq_routes.set_irq_route(irq, None);
+         }
+-- 
+2.34.1
+
