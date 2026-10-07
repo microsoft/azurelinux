@@ -845,6 +845,7 @@ ln -s ../boot/grub2/grub.cfg					\\\
 %defattr(-,root,root,-)						\
 %config(noreplace) %{_sysconfdir}/grub2.cfg			\
 %ghost %config(noreplace) %attr(0600,root,root)/boot/grub2/grub.cfg	\
+%ghost %config(noreplace) %verify(not size md5 mtime) %attr(0600,root,root) /boot/grub2/grubenv	\
 %dir %attr(0700,root,root)/boot/loader/entries			\
 %attr(0644,root,root) %config(noreplace) /etc/dnf/protected.d/grub2-%{1}.conf \
 %ifarch ppc64le							\
@@ -882,7 +883,7 @@ ln -s ../boot/grub2/grub.cfg					\\\
 %dir %attr(0700,root,root)/boot/loader/entries			\
 %ghost %config(noreplace) %attr(0600,root,root)/boot/grub2/grub.cfg	\
 %ghost %config(noreplace) %verify(not mtime) %attr(0700,root,root)%{efi_esp_dir}/grub.cfg	\
-%config(noreplace) %verify(not size mode md5 mtime) /boot/grub2/grubenv	\
+%config(noreplace) %verify(not size md5 mtime) %attr(0600,root,root) /boot/grub2/grubenv	\
 %attr(0644,root,root) %config(noreplace) /etc/dnf/protected.d/grub2-%{1}.conf \
 %{expand:%if 0%{?without_efi_modules}				\
 %exclude %{_libdir}/grub/%{6}					\

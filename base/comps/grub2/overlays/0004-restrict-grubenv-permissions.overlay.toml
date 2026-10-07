@@ -1,0 +1,59 @@
+# Restrict grubenv because it can expose boot parameters and is writable by
+# privileged GRUB tooling. Its contents are mutable, but its mode is not.
+# The C patch is suitable for GRUB upstream; the RPM metadata and transaction
+# repairs below are suitable for Fedora dist-git.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "upstreamable"
+bugs = [{ url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22859" }]
+
+[[overlays]]
+description = "Stage the patch that creates grubenv with mode 0600"
+type = "file-add"
+file = "0386-util-create-grubenv-with-restrictive-permissions.patch"
+source = "../0386-util-create-grubenv-with-restrictive-permissions.patch"
+
+[[overlays]]
+description = "Append the restrictive grubenv creation patch after Patch0385 from overlay 0002"
+type = "file-search-replace"
+file = "grub.patches"
+regex = 'Patch0385: 0385-Revert-Revert-templates-Fix-user-facing-typo-with-an\.patch'
+replacement = '''Patch0385: 0385-Revert-Revert-templates-Fix-user-facing-typo-with-an.patch
+Patch0386: 0386-util-create-grubenv-with-restrictive-permissions.patch'''
+
+[[overlays]]
+description = "Package grubenv as root-only in the EFI subpackage"
+type = "file-search-replace"
+file = "grub.macros"
+regex = '%config\(noreplace\) %verify\(not size mode md5 mtime\) /boot/grub2/grubenv'
+replacement = '%config(noreplace) %verify(not size md5 mtime) %attr(0600,root,root) /boot/grub2/grubenv'
+
+[[overlays]]
+description = "Declare grubenv as a verified root-only ghost in legacy packages"
+type = "file-search-replace"
+file = "grub.macros"
+regex = '(?m)^%ghost %config\(noreplace\) %attr\(0600,root,root\)/boot/grub2/grub\.cfg[ \t]+\\$\n^%dir %attr\(0700,root,root\)/boot/loader/entries[ \t]+\\$'
+replacement = '''%ghost %config(noreplace) %attr(0600,root,root)/boot/grub2/grub.cfg	\
+%ghost %config(noreplace) %verify(not size md5 mtime) %attr(0600,root,root) /boot/grub2/grubenv	\
+%dir %attr(0700,root,root)/boot/loader/entries			\'''
+
+[[overlays]]
+description = "Restrict an existing grubenv during package transactions"
+type = "spec-search-replace"
+section = "%posttrans"
+package = "common"
+regex = '^set -eu$'
+replacement = '''set -eu
+
+if test -e /boot/grub2/grubenv; then
+    chmod 0600 /boot/grub2/grubenv
+fi'''
+
+[[overlays]]
+description = "Restrict grubenv after migrating it from the EFI system partition"
+type = "spec-search-replace"
+section = "%posttrans"
+package = "common"
+regex = '^    mv --force \$\{EFI_HOME\}/grubenv \$\{GRUB_HOME\}/grubenv$'
+replacement = '''    mv --force ${EFI_HOME}/grubenv ${GRUB_HOME}/grubenv
+    chmod 0600 ${GRUB_HOME}/grubenv'''

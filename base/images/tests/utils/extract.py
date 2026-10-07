@@ -336,17 +336,16 @@ def _assert_wsl_members_contained(members: list[tarfile.TarInfo], dest: Path) ->
                 )
 
 
-def read_text_confined(root: Path, relative_path: str, *, max_links: int = 40) -> str:
-    """Read a text file under ``root`` without following links out of the tree.
+def resolve_path_confined(root: Path, relative_path: str, *, max_links: int = 40) -> Path:
+    """Resolve a path under ``root`` without following links out of the tree.
 
     An extracted rootfs is inspected through ordinary host paths (there is no
     chroot), so the host resolves symlinks against the *host* root: an absolute
     link such as ``/etc/os-release -> /etc/shadow`` — or a ``../`` chain — would
-    otherwise let a crafted image make a test read a file outside ``root``.
+    otherwise let a crafted image make a test access a file outside ``root``.
     Resolve the path chroot-style instead: absolute link targets restart at
-    ``root`` and ``..`` never climbs above it, so the read is confined to the
-    extraction tree while still honouring the absolute intra-image symlinks a
-    rootfs legitimately uses.
+    ``root`` and ``..`` never climbs above it, so access is confined to the
+    extraction tree while still honouring absolute intra-image symlinks.
 
     Raises:
         RuntimeError: If the path cannot be resolved within ``root`` (e.g. a
@@ -379,7 +378,12 @@ def read_text_confined(root: Path, relative_path: str, *, max_links: int = 40) -
                 pending = [*link_target.parts, *pending]
         else:
             current = candidate
-    return current.read_text()
+    return current
+
+
+def read_text_confined(root: Path, relative_path: str, *, max_links: int = 40) -> str:
+    """Read a text file under ``root`` without following links out of the tree."""
+    return resolve_path_confined(root, relative_path, max_links=max_links).read_text()
 
 
 def mount_wsl_image(image_path: Path, extract_dir: Path) -> Path:
