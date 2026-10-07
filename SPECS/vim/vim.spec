@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.2.0976
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -223,8 +223,8 @@ fi
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
-* Wed Aug 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0976-1
-- Auto-upgrade to 9.2.0976 - for CVE-2026-73073
+* Thu Aug 20 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0976-2
+- bump vim
 
 * Fri Aug 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0957-1
 - Auto-upgrade to 9.2.0957 - for CVE-2026-73078, CVE-2026-73074, CVE-2026-73072, CVE-2026-73077, CVE-2026-73076, CVE-2026-73070, CVE-2026-73075, CVE-2026-73071
