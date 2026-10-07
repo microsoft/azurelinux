@@ -12,13 +12,16 @@
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
 Version:        0.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/microsoft/kubevirt
 Source0:        https://github.com/microsoft/kubevirt/archive/refs/tags/build-%{sha}.tar.gz#/%{name}-%{sha}.tar.gz
+# TODO: Remove the patch below when the following PR is merged:
+# https://github.com/microsoft/kubevirt/pull/36
+Patch0:         0001-Change-openvmm-binary-path-to-usr-bin-openvmm.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -129,7 +132,7 @@ Group:          System/Packages
 The package provides Kubevirt end-to-end tests.
 
 %prep
-%autosetup -n kubevirt-build-%{sha} -N
+%autosetup -p1 -n kubevirt-build-%{sha} -N
 
 %build
 mkdir -p go/src/kubevirt.io go/pkg
@@ -273,5 +276,8 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Tue Oct 06 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-2
+- Add patch to update OpenVMM binary path to what openvmm RPM installs
+
 * Tue Oct 06 2026 Microsoft Corporation <linux@microsoft.com> - 0.1.0-1
 - Original version for Azure Linux
