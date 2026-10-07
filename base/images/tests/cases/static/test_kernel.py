@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+@pytest.mark.require_capability("machine-bootable")
 def test_kernel_modules_present(rootfs: Path) -> None:
     """A bootable VM image must ship at least one kernel's modules."""
     modules_dir = rootfs / "usr" / "lib" / "modules"
@@ -37,6 +38,7 @@ def _parse_config_lsm(rootfs: Path) -> str | None:
     pytest.fail(f"CONFIG_LSM not found in {config_path}")
 
 
+@pytest.mark.require_capability("machine-bootable")
 def test_config_lsm_matches_upstream(rootfs: Path) -> None:
     """CONFIG_LSM must match the Fedora 43 upstream value exactly.
 

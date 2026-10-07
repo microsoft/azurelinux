@@ -104,7 +104,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption(
         "--image-name",
         default=None,
-        help="Image name (e.g. vm-base, container-base). Used for logging "
+        help="Image name (e.g. 1p-vm-base-gen2, container-base). Used for logging "
         "and for filtering tests marked with @pytest.mark.image.",
     )
     group.addoption(
@@ -283,7 +283,7 @@ def pytest_collection_modifyitems(
             item.add_marker(pytest.mark.runtime)
 
         # Auto-apply image() marker if there's an image-family subdir.
-        # e.g. cases/static/vm-base/test_kernel.py → image("vm-base")
+        # e.g. cases/static/container-base/test_container.py → image("container-base")
         #      cases/runtime/container-base/test_foo.py → image("container-base")
         if len(remaining) >= 3:  # noqa: PLR2004 - category + family_dir + file
             image_dir = remaining[1]
