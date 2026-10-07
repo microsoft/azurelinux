@@ -31258,8 +31258,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-server-Xwayland",
-          "version": "24.1.13",
-          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.13.tar.xz"
+          "version": "24.1.14",
+          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.14.tar.xz"
         }
       }
     },
