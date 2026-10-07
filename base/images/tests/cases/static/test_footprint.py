@@ -30,7 +30,7 @@ _BYTES_PER_MB = 1024 * 1024
 # the default. Caps catch gross regressions, not normal growth.
 _INSTALLED_CAP_MB: dict[str, int] = {
     "container-base": 400,
-    "vm-base": 2048,
+    "1p-vm-base-gen2": 2048,
     "wsl": 800,
 }
 _INSTALLED_CAP_DEFAULT_MB = 2048
