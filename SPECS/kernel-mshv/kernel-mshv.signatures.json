@@ -3,8 +3,8 @@
     "50_mariner_mshv.cfg": "12bf23f8857f893549933a20062ad2a69c3c654b87893e8dd3ce42f9329801c7",
     "50_mariner_mshv_menuentry": "5a46bb273be0e829fec4e1f498b1a11b59ded6e14d42a19be7da860c3f4c35be",
     "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
-    "config": "88550212ff077ca9d31e7eafd947b0fad340adac2e600fc023ba21635977a9bf",
-    "config_aarch64": "e704d07ff297cbe50717af2b59a2a0262617ca14f4ea691beafafb721b1e95d0",
+    "config": "8eaac54b1be37146e75b5f6cfbf13d0f59e2f29d8bab8b8889cd703a0acc86f9",
+    "config_aarch64": "0a0605ff01c89bd1bb6bbbabe5e514ae787c416ef2b6da0b450bc13e67ca6b7c",
     "kernel-mshv-6.18.34.mshv3.tar.gz": "6d58baaa4170f75c7a83a93cf3c4b5c06687e4c8992b4c00d15647fb1ea05f9c"
   }
 }
