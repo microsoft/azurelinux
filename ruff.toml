@@ -19,9 +19,6 @@ select = ["ALL"] # Everything
 ignore = [
     # Existing repository debt. Remove codes from this baseline as focused
     # cleanup changes make each rule green.
-    "ARG001",
-    "ARG002",
-    "B007",
     "B904",
     "BLE001",
     "C901",
