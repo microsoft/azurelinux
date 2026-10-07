@@ -716,7 +716,7 @@ def decide_routing(
     """
     decisions: dict[UniverseKey, RoutingDecision] = {}
     tied_components_warned: set[str] = set()
-    for key, entry in universe.items():
+    for key in universe:
         kind = key[0]
         name = key[2]
         # Foreign packages (azldev fell back to project defaults for an
@@ -1066,6 +1066,8 @@ class _OrderedRepoSourceAction(argparse.Action):
         values: str | Sequence[object] | None,
         option_string: str | None = None,
     ) -> None:
+        del parser
+
         items = getattr(namespace, self.dest, None)
         if items is None:
             items = []
