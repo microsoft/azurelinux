@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           openvmm
 Version:        0.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Modular, cross-platform virtual machine monitor
 Group:          Applications/System
 License:        MIT
@@ -14,6 +14,14 @@ Source0:        https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v
 # contains the vendored sources in vendor/ plus the source replacement config
 # 'cargo_config' written by cargo vendor.
 Source1:        https://github.com/microsoft/openvmm/releases/download/openvmm-v%{version}/%{name}-%{version}-vendor.tar.gz
+# Note: the following patch requires the corresponding IOCTL to be available in mshv kernel driver first.
+# PR to add that: https://msazure.visualstudio.com/LSG-linux/_git/LSG-linux-rolling/pullrequest/17383358
+# Note: the following patch should be dropped once proposed functionality is merged into OpenVMM.
+# PR to add that: https://github.com/microsoft/openvmm/pull/4419
+Patch0:         0001-virt_mshv-scrub-partition-during-reset.patch
+# Note: the following patch should be dropped once proposed functionality is merged into OpenVMM.
+# PR to add that: https://github.com/microsoft/openvmm/pull/4478
+Patch1:         0002-Expose-CLI-arg-for-MAC-addr-of-NIC.patch
 
 ExclusiveArch:  x86_64 aarch64
 
@@ -75,6 +83,10 @@ cargo test --release --locked --offline --lib --target %{rust_target} %{test_cra
 %{_bindir}/openvmm
 
 %changelog
+* Wed Oct 7 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.2.0-2
+- Invoke scrub-partition MSHV IOCTL during reset
+- Add CLI option to specify MAC addr for guest interface
+
 * Thu Oct 01 2026 Ben Hillis <benhill@microsoft.com> - 0.2.0-1
 - Update to version 0.2.0
 
