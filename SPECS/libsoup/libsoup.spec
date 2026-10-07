@@ -83,8 +83,8 @@ Patch33:         CVE-2026-2708.patch
 Patch34:         CVE-2026-6324.patch
 Patch35:         CVE-2026-102555.patch
 Patch36:         CVE-2026-102556.patch
-Patch37:         CVE-2026-102557.patch
-Patch38:         CVE-2026-102558.patch
+Patch37:         CVE-2026-102558.patch
+Patch38:         CVE-2026-102557.patch
 Patch39:         CVE-2026-102560.patch
 
 %description
