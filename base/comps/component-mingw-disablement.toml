@@ -21,6 +21,7 @@ components = [
     "flatbuffers",
     "fltk",
     "freexl",
+    "gdal",
     "geos",
     "gnutls",
     "inih",

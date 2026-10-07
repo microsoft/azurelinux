@@ -9,7 +9,7 @@
 
 Name: libabigail
 Version: 2.10
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Set of ABI analysis tools
 
 License: Apache-2.0 WITH LLVM-exception
@@ -41,7 +41,6 @@ BuildRequires: python3-koji
 %endif
 BuildRequires: wget
 
-Patch0: tests-drop-PR30329-fixture-entries.patch
 %description
 The libabigail package comprises seven command line utilities:
 abidiff, kmidiff, abipkgdiff, abicompat, abidw, and abilint.

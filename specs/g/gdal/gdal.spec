@@ -58,7 +58,7 @@
 
 Name:          gdal
 Version:       3.11.5
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:       GIS file format library
 License:       MIT
 URL:           http://www.gdal.org
@@ -478,9 +478,6 @@ done
 
 %if 0%{run_tests}
 %check
-# Check section disabled: gcore tests are causing the build POD to be OOM killed.
-exit 0
-
 %ctest || :
 %endif
 
