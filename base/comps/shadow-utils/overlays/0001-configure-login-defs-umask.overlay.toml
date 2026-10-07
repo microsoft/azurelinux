@@ -1,0 +1,21 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/24149" }]
+
+[[overlays]]
+description = "Document Azure Linux's default login.defs UMASK"
+type = "file-search-replace"
+file = "shadow-utils.login.defs"
+regex = '''(?m)^# 022 is the default value, but 027, or even 077, could be considered
+# for increased privacy\. There is no One True Answer here: each sysadmin
+# must make up their mind\.$'''
+replacement = '''# Azure Linux uses 027 by default. A more restrictive value, such as 077,
+# may be used for increased privacy.'''
+
+[[overlays]]
+description = "Set UMASK to 027 for CIS 'Ensure default user umask is configured in /etc/login.defs'"
+type = "file-search-replace"
+file = "shadow-utils.login.defs"
+regex = '(?m)^UMASK[ \t]+022$'
+replacement = "UMASK\t\t027"
