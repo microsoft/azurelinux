@@ -48,10 +48,13 @@ test-paths  = ["cases/static/"]
 # "machine-bootable,systemd,runtime-package-management"). The pytest
 # plugin parses this into a set; @pytest.mark.require_capability("...")
 # tests that don't match are skipped.
+# {properties} is substituted as a JSON object containing the image's
+# string-valued property bag.
 extra-args = [
     "--image-path", "{image-path}",
     "--image-name", "{image-name}",
     "--capabilities", "{capabilities}",
+    "--properties", "{properties}",
 ]
 
 # Runtime container tests — validate live container behavior via podman.
@@ -69,6 +72,7 @@ extra-args = [
     "--image-path", "{image-path}",
     "--image-name", "{image-name}",
     "--capabilities", "{capabilities}",
+    "--properties", "{properties}",
 ]
 
 # =============================================================================

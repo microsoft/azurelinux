@@ -9,6 +9,8 @@ positional test-path argument.
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 # Map file-extension suffixes to image types for auto-detection.
@@ -57,6 +59,31 @@ def parse_capabilities(raw: str | None) -> set[str]:
     return {c.strip() for c in raw.split(",") if c.strip()}
 
 
+def parse_properties(raw: str | None) -> dict[str, str]:
+    """Parse a JSON image property bag."""
+    if not raw:
+        return {}
+
+    try:
+        parsed: object = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        msg = f"--properties must be a valid JSON object: {exc}"
+        raise pytest.UsageError(msg) from exc
+
+    if not isinstance(parsed, dict):
+        msg = "--properties must be a JSON object"
+        raise pytest.UsageError(msg)
+
+    properties: dict[str, str] = {}
+    for key, value in parsed.items():
+        if not isinstance(key, str) or not isinstance(value, str):
+            msg = "--properties keys and values must be strings"
+            raise pytest.UsageError(msg)
+        properties[key] = value
+
+    return properties
+
+
 def pytest_addoption(parser: pytest.Parser) -> None:
     """Register command-line options for Azure Linux image tests."""
     group = parser.getgroup("image", "Azure Linux image validation")
@@ -100,6 +127,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
+        "--properties",
+        default=None,
+        help='Image properties as a JSON object (e.g. \'{"release-channel":"preview"}\').',
+    )
+    group.addoption(
         "--workdir",
         default=None,
         help=("Working directory for temporary files (mounts, extractions). Defaults to a temporary directory."),
@@ -132,6 +164,9 @@ def pytest_configure(config: pytest.Config) -> None:
     )
 
     from utils.tools import check_tools
+
+    # Validate image properties even when no collected test requests the fixture.
+    parse_properties(config.getoption("--properties", default=None))
 
     # Validate that exactly one of --image-path or --image-ref is provided.
     image_path_raw = config.getoption("--image-path", default=None)

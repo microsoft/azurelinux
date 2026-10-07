@@ -46,7 +46,7 @@ configuration because the package uses `%config(noreplace)`.
 
 `azldev` creates a per-suite Python venv, installs this directory's
 `pyproject.toml`, and invokes pytest with the right `--image-path`,
-`--image-name`, and `--capabilities` arguments.
+`--image-name`, `--capabilities`, and `--properties` arguments.
 
 ## Test suites
 
@@ -64,31 +64,36 @@ cd base/images/tests
 uv run pytest cases/static/ \
     --image-path /path/to/image.raw \
     --image-name vm-base \
-    --capabilities machine-bootable,systemd,runtime-package-management
+    --capabilities machine-bootable,systemd,runtime-package-management \
+    --properties '{"release-channel":"preview"}'
 
 # Static tests — Container image
 uv run pytest cases/static/ \
     --image-path /path/to/image.oci.tar.xz \
     --image-name container-base \
-    --capabilities container,runtime-package-management
+    --capabilities container,runtime-package-management \
+    --properties '{}'
 
 # Static tests — WSL image (plain rootfs tarball)
 uv run pytest cases/static/ \
     --image-path /path/to/image.wsl \
     --image-name wsl \
-    --capabilities systemd,runtime-package-management
+    --capabilities systemd,runtime-package-management \
+    --properties '{}'
 
 # Runtime tests — Container image (requires podman)
 uv run pytest cases/runtime/ \
     --image-path /path/to/image.oci.tar.xz \
     --image-name container-base \
-    --capabilities container,runtime-package-management
+    --capabilities container,runtime-package-management \
+    --properties '{}'
 
 # Runtime tests — from a registry reference
 uv run pytest cases/runtime/ \
     --image-ref mcr.microsoft.com/azurelinux/base/core:4.0 \
     --image-name container-base \
-    --capabilities container,runtime-package-management
+    --capabilities container,runtime-package-management \
+    --properties '{}'
 ```
 
 Test selection follows standard pytest positional arguments. Tests
@@ -168,6 +173,7 @@ base/images/
 | `image_name` | session | `str \| None` | From `--image-name` |
 | `image_type` | session | `str` | `"vm"` or `"container"` (explicit / capabilities / extension) |
 | `capabilities` | session | `set[str]` | Parsed `--capabilities` |
+| `properties` | session | `dict[str, str]` | Parsed JSON object from `--properties` |
 | `workdir` | session | `Path` | Working directory for mounts/extractions |
 | `rootfs` | session | `Path` | Mounted/extracted root filesystem |
 | `oci_image_config` | session | `dict[str, object]` | Parsed `skopeo inspect --config` output (use with `@pytest.mark.require_capability("container")`) |
