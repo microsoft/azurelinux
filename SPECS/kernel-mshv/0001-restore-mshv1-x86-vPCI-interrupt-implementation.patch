@@ -1,7 +1,7 @@
 From 87d12b20f40020ec703868f9c4f9d421adddec6e Mon Sep 17 00:00:00 2001
 From: Allen Pais <apais@linux.microsoft.com>
 Date: Mon, 5 Oct 2026 16:54:08 -0700
-Subject: [PATCH] TEST: restore mshv1 x86 vPCI interrupt implementation
+Subject: [PATCH] restore mshv1 x86 vPCI interrupt implementation
 
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---

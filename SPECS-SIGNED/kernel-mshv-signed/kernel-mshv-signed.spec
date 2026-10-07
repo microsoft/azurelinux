@@ -140,11 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
-* Thu Oct 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.mshv3-1
-- Auto-upgrade to 6.18.34.mshv3
-
-* Tue Sep 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.mshv2-1
-- Auto-upgrade to 6.18.34.mshv2
+* Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
+- Upgrade to 6.18.34.mshv3
+- Enable CONFIG_CHECKPOINT_RESTORE, CONFIG_INET_RAW_DIAG and CONFIG_MSHV_GICV3_MSI
 
 * Mon Jun 13 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.137.mshv2-2
 - Enable CONFIG_EROFS_FS and related features
