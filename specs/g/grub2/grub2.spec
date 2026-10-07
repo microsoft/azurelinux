@@ -22,7 +22,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release: 52%{?dist}
+Release: 53%{?dist}
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/
@@ -392,6 +392,10 @@ fi
 %posttrans common
 set -eu
 
+if test -e /boot/grub2/grubenv; then
+    chmod 0600 /boot/grub2/grubenv
+fi
+
 EFI_HOME=%{efi_esp_dir}
 GRUB_HOME=/boot/grub2
 ESP_PATH=/boot/efi
@@ -424,6 +428,7 @@ gen_grub_cfgstub $GRUB_HOME $EFI_HOME || :
 if test -f ${EFI_HOME}/grubenv; then
     cp -a ${EFI_HOME}/grubenv ${EFI_HOME}/grubenv.rpmsave
     mv --force ${EFI_HOME}/grubenv ${GRUB_HOME}/grubenv
+    chmod 0600 ${GRUB_HOME}/grubenv
 fi
 
 %files common -f grub.lang

@@ -382,3 +382,4 @@ Patch0382: 0382-Set-correctly-the-memory-attributes-for-the-kernel-P.patch
 Patch0383: 0383-Revert-Revert-templates-Disable-the-os-prober-by-default.patch
 Patch0384: 0384-Revert-Revert-templates-Properly-disable-the-os-prober-by-d.patch
 Patch0385: 0385-Revert-Revert-templates-Fix-user-facing-typo-with-an.patch
+Patch0386: 0386-util-create-grubenv-with-restrictive-permissions.patch

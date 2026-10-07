@@ -1,0 +1,66 @@
+From 8f7fa451a977f83a06f49042004d5815ae728e63 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 7 Oct 2026 15:53:00 +0000
+Subject: [PATCH] util: create grubenv with restrictive permissions
+
+grub_util_create_envblk_file() creates a replacement file using the
+caller's umask. With the usual 0022 umask, the resulting grubenv is
+world-readable.
+
+Temporarily restrict the umask while opening the replacement file, then
+enforce its mode in case a file from an interrupted earlier operation already
+exists. This ensures environment blocks are mode 0600 on Unix systems and
+covers grub-install, grub-editenv create, and other callers without relying on
+a later package transaction to repair the mode. Enforce the mode again on the
+final destination because cross-filesystem symlink targets use a copy fallback
+that does not preserve the replacement file's mode.
+---
+ util/editenv.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/util/editenv.c b/util/editenv.c
+--- a/util/editenv.c
++++ b/util/editenv.c
+@@ -30,6 +30,8 @@
+ #include <string.h>
+ #if !defined(_WIN32)
+ #include <libgen.h>
++#include <sys/types.h>
++#include <sys/stat.h>
+ #endif
+ 
+ #define DEFAULT_ENVBLK_SIZE	1024
+@@ -44,12 +46,25 @@ grub_util_create_envblk_file (const char *name)
+   ssize_t size = 1;
+   char *rename_target = xstrdup (name);
+   int rc;
++  mode_t old_umask;
++  int saved_errno;
+ #endif
+ 
+   buf = xmalloc (DEFAULT_ENVBLK_SIZE);
+ 
+   namenew = xasprintf ("%s.new", name);
++#if !defined(_WIN32)
++  old_umask = umask (S_IRWXG | S_IRWXO);
++#endif
+   fp = grub_util_fopen (namenew, "wb");
++#if !defined(_WIN32)
++  saved_errno = errno;
++  umask (old_umask);
++  errno = saved_errno;
++  if (fp && fchmod (fileno (fp), S_IRUSR | S_IWUSR) < 0)
++    grub_util_error (_("cannot set permissions on `%s': %s"), namenew,
++		     strerror (errno));
++#endif
+   if (! fp)
+     grub_util_error (_("cannot open `%s': %s"), namenew,
+ 		     strerror (errno));
+@@ -128 +140,5 @@ grub_util_create_envblk_file (const char *name)
++  if (rc >= 0 && chmod (rename_target, S_IRUSR | S_IWUSR) < 0)
++    grub_util_error (_("cannot set permissions on `%s': %s"), rename_target,
++		     strerror (errno));
++
+   free (rename_target);
+-- 
+2.51.0
