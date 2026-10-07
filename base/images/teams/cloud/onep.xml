@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <image>
     <profiles>
-        <profile name="OnePBase" description="First-party Azure VM packages" import="false">
+        <profile name="OnePPackages" description="Boot-neutral first-party Azure VM packages" import="false">
+            <requires profile="VmBasePackages" />
+        </profile>
+        <profile name="OnePBase" description="Conventional first-party Azure VM composition" import="false">
             <requires profile="VmBaseCore" />
+            <requires profile="OnePPackages" />
         </profile>
         <profile name="1p-vm-base-gen1" description="1P VM Base Gen1 Image (BIOS)" import="false">
             <requires profile="PackageManagement" />
@@ -20,6 +24,14 @@
             <requires profile="Fips" />
             <requires profile="UefiBoot" />
             <requires profile="OnePBase" />
+        </profile>
+        <profile name="CvmCore" description="First-party confidential VM boot packages" import="false">
+            <requires profile="OnePPackages" />
+        </profile>
+        <profile name="1p-vm-base-gen2-cvm" description="First-party Gen2 confidential VM image (shim, systemd-boot, UKI)" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="UefiFstab" />
+            <requires profile="CvmCore" />
         </profile>
     </profiles>
     <preferences arch="x86_64" profiles="1p-vm-base-gen1">
@@ -82,10 +94,36 @@
             </oemconfig>
         </type>
     </preferences>
-    <packages type="bootstrap" profiles="OnePBase">
+    <preferences arch="x86_64" profiles="1p-vm-base-gen2-cvm">
+        <version>0.1.0</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="none"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            firmware="efi"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="512"
+            rootfs_label="azurelinux">
+            <bootloader name="custom" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <packages type="bootstrap" profiles="OnePPackages">
         <package name="azurelinux-release-cloud" />
     </packages>
-    <packages type="image" profiles="OnePBase">
+    <packages type="image" profiles="OnePPackages">
         <package name="SymCrypt" />
         <package name="SymCrypt-OpenSSL" />
         <package name="cpio" />
@@ -116,5 +154,13 @@
         <package name="tdnf" />
         <package name="tzdata" />
         <package name="xz" />
+    </packages>
+    <packages type="image" profiles="CvmCore">
+        <file name="config-cvm.sh" target="/image/config-cvm.sh" permissions="0755" />
+        <package name="findutils" />
+        <package name="kernel-uki-virt" />
+        <package name="shim-unsigned-x64" />
+        <package name="systemd-boot-unsigned" />
+        <package name="tpm2-tools" />
     </packages>
 </image>

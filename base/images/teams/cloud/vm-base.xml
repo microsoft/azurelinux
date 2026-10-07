@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <image>
     <profiles>
-        <profile name="VmBaseCore" description="VM base packages" import="false">
+        <profile name="VmBasePackages" description="Boot-neutral Azure VM base packages" import="false">
+            <requires profile="CloudGuestCore" />
+        </profile>
+        <profile name="VmBaseCore" description="Conventional Azure VM base composition" import="false">
             <requires profile="CloudCore" />
+            <requires profile="VmBasePackages" />
         </profile>
         <profile name="vm-base" description="Azure Linux VM Base Image" import="false">
             <requires profile="PackageManagement" />
@@ -40,11 +44,11 @@
             </oemconfig>
         </type>
     </preferences>
-    <packages type="bootstrap" profiles="VmBaseCore">
+    <packages type="bootstrap" profiles="VmBasePackages">
         <package name="azurelinux-release-cloud" />
         <package name="coreutils" />
     </packages>
-    <packages type="image" profiles="VmBaseCore">
+    <packages type="image" profiles="VmBasePackages">
         <package name="acl" />
         <package name="attr" />
         <package name="audit" />

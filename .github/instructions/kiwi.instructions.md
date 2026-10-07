@@ -21,6 +21,15 @@ definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }
 `components/`, and `teams/`. Includes remain flat in the root description;
 profile requirements express inheritance between fragments.
 
+Azure guest userspace (`CloudGuestCore`) is boot-neutral. `VmBasePackages` and
+`OnePPackages` extend it with reusable VM and first-party payloads; conventional
+VM-base and 1P leaves use `VmBaseCore` / `OnePBase` to add `CloudCore` (kernel,
+GRUB, grubby), plus their BIOS or UEFI boot profile. `MarketplaceBase` requires
+`CloudCore` directly, while `MinimalOsCore` requires `BootableCore`. The 1P
+Gen2 CVM leaf uses the package payloads with `CvmCore` instead, assembling shim,
+systemd-boot, and a packaged UKI through `config-cvm.sh` without conventional
+GRUB boot packages.
+
 Shared KIWI hook scripts and `<file>` sources live directly under
 `base/images/`, because that directory is the shared description root. The root
 `config.sh` dispatches profile-specific behavior using `kiwi_profiles`,

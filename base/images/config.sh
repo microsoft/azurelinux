@@ -3,7 +3,7 @@
 set -euo pipefail
 
 case ",${kiwi_profiles:-}," in
-    *,cvm,*)
+    *,1p-vm-base-gen2-cvm,*)
         exec /image/config-cvm.sh
         ;;
     *,distroless-minimal,*|*,distroless-base,*|*,distroless-debug,*)

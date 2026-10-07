@@ -5,10 +5,10 @@
         <profile name="BootableCore" description="Packages shared by images using the standard kernel and bootloader" import="false">
             <requires profile="SystemCore" />
         </profile>
-        <profile name="CloudGuestCore" description="Packages shared by Azure guest images" import="false">
+        <profile name="CloudGuestCore" description="Boot-neutral Azure guest userspace packages" import="false">
             <requires profile="SystemCore" />
         </profile>
-        <profile name="CloudCore" description="Packages shared by Azure guest images" import="false">
+        <profile name="CloudCore" description="Conventional Azure guest kernel and GRUB packages" import="false">
             <requires profile="BootableCore" />
             <requires profile="CloudGuestCore" />
         </profile>
