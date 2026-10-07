@@ -1133,6 +1133,7 @@ components = [
     "miopen",
     "mkfontscale",
     "mksh",
+    "mlnx-tools",
     "mm-common",
     "moby-engine",
     "mock",
