@@ -1,7 +1,7 @@
 [components.rust]
 # Fedora repo does not host 1.93, which the spec gets pinned to. Fetch
-# spec from a more recent commit to pickup version - 1.94.1.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43"}, upstream-commit = "b431103e3e71d30dda680c95d2f5d4fe50003436" }
+# spec from a more recent commit to pickup version - 1.96.1.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43"}, upstream-commit = "045fc99692a6653c1bd092c0be866a1770dc06da" }
 
 # Brand rustc's --version string as "Azure Linux" instead of "Fedora".
 [[components.rust.overlays]]

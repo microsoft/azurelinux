@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 8;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -12,36 +12,31 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           rust
-Version:        1.94.1
+Version:        1.96.1
 Release:        %autorelease
 Summary:        The Rust Programming Language
 License:        (Apache-2.0 OR MIT) AND (Artistic-2.0 AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0 AND Unicode-3.0)
 # ^ written as: (rust itself) and (bundled libraries)
 URL:            https://www.rust-lang.org
 
-# Only x86_64, i686, and aarch64 are Tier 1 platforms at this time.
-# https://doc.rust-lang.org/nightly/rustc/platform-support.html
-%global rust_arches x86_64 i686 armv7hl aarch64 ppc64le s390x riscv64
-ExclusiveArch:  %{rust_arches}
-
 # To bootstrap from scratch, set the channel and date from src/stage0
 # e.g. 1.89.0 wants rustc: 1.88.0-2025-06-26
 # or nightly wants some beta-YYYY-MM-DD
-%global bootstrap_version 1.93.0
-%global bootstrap_channel 1.93.0
-%global bootstrap_date 2026-01-22
+%global bootstrap_version 1.95.0
+%global bootstrap_channel 1.95.0
+%global bootstrap_date 2026-04-16
 
 # Only the specified arches will use bootstrap binaries.
 # NOTE: Those binaries used to be uploaded with every new release, but that was
 # a waste of lookaside cache space when they're most often unused.
 # Run "spectool -g rust.spec" after changing this and then "fedpkg upload" to
 # add them to sources. Remember to remove them again after the bootstrap build!
-#global bootstrap_arches %%{rust_arches}
+#global bootstrap_arches x86_64 i686 aarch64 ppc64le s390x
 
 # We need CRT files for *-wasi targets, at least as new as the commit in
 # src/ci/docker/host-x86_64/dist-various-2/build-wasi-toolchain.sh
 %global wasi_libc_url https://github.com/WebAssembly/wasi-libc
-%global wasi_libc_ref wasi-sdk-29
+%global wasi_libc_ref wasi-sdk-32
 %global wasi_libc_name wasi-libc-%{wasi_libc_ref}
 %global wasi_libc_source %{wasi_libc_url}/archive/%{wasi_libc_ref}/%{wasi_libc_name}.tar.gz
 %global wasi_libc_dir %{_builddir}/%{wasi_libc_name}
@@ -55,12 +50,12 @@ ExclusiveArch:  %{rust_arches}
 %bcond_with llvm_static
 
 # We can also choose to just use Rust's bundled LLVM, in case the system LLVM
-# is insufficient. Rust currently requires LLVM 19.0+.
+# is insufficient. Rust currently requires LLVM 21.0+.
 # See src/bootstrap/src/core/build_steps/llvm.rs, fn check_llvm_version
 # See src/llvm-project/cmake/Modules/LLVMVersion.cmake for bundled version.
-%global min_llvm_version 20.0.0
-%global bundled_llvm_version 21.1.8
-#global llvm_compat_version 19
+%global min_llvm_version 21.0.0
+%global bundled_llvm_version 22.1.2
+#global llvm_compat_version 21
 %global llvm llvm%{?llvm_compat_version}
 %bcond_with bundled_llvm
 
@@ -77,7 +72,7 @@ ExclusiveArch:  %{rust_arches}
 
 # Cargo uses UPSERTs with omitted conflict targets
 %global min_sqlite3_version 3.35
-%global bundled_sqlite3_version 3.51.1
+%global bundled_sqlite3_version 3.51.3
 %if 0%{?rhel} && 0%{?rhel} < 10
 %bcond_without bundled_sqlite3
 %else
@@ -147,20 +142,14 @@ Patch4:         0001-bootstrap-allow-disabling-target-self-contained.patch
 Patch5:         0002-set-an-external-library-path-for-wasm32-wasi.patch
 
 # We don't want to use the bundled library in libsqlite3-sys
-Patch6:         rustc-1.94.0-unbundle-sqlite.patch
+Patch6:         rustc-1.96.0-unbundle-sqlite.patch
 
 # stage0 tries to copy all of /usr/lib, sometimes unsuccessfully, see #143735
 Patch7:         0001-only-copy-rustlib-into-stage0-sysroot.patch
 
-# bootstrap: always propagate `CARGO_TARGET_{host}_LINKER`
-# https://github.com/rust-lang/rust/pull/152077
-Patch8:         0001-bootstrap-always-propagate-CARGO_TARGET_-host-_LINKE.patch
-
-# Fixes for LLVM 22 compatibility
-# https://github.com/rust-lang/rust/pull/151410
-Patch9:         0001-Update-amdgpu-data-layout.patch
-Patch10:        0002-Avoid-passing-addrspacecast-to-lifetime-intrinsics.patch
-Patch11:        0003-Don-t-use-evex512-with-LLVM-22.patch
+# https://github.com/rust-openssl/rust-openssl/pull/2591/
+# (only the openssl-sys changes, backported for 0.9.112)
+Patch8:         0001-openssl-4-support-2591.patch
 
 ### RHEL-specific patches below ###
 
@@ -171,10 +160,7 @@ Source102:      cargo_vendor.attr
 Source103:      cargo_vendor.prov
 
 # Disable cargo->libgit2->libssh2 on RHEL, as it's not approved for FIPS (rhbz1732949)
-Patch100:       rustc-1.94.1-disable-libssh2.patch
-
-# When building wasi, prevent linking a compiler-rt builtins library we don't have.
-Patch1000:	wasi-no-link-builtins.patch
+Patch100:       rustc-1.96.1-disable-libssh2.patch
 
 # Get the Rust triple for any architecture and ABI.
 %{lua: function rust_triple(arch, abi)
@@ -284,7 +270,11 @@ BuildRequires:  ncurses-devel
 BuildRequires:  curl-devel
 BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  pkgconfig(liblzma)
-BuildRequires:  pkgconfig(openssl)
+
+# Only specific versions of openssl are supported: 1.1.0, 1.1.1, 3.x, or 4.x
+# The openssl-sys crate will also verify the release is supported.
+BuildRequires:  pkgconfig(openssl) < 5~
+
 BuildRequires:  pkgconfig(zlib)
 
 %if %{without bundled_libgit2}
@@ -392,6 +382,7 @@ BuildRequires:  mingw64-winpthreads-static
 %if %defined wasm_targets
 %if %with bundled_wasi_libc
 BuildRequires:  clang%{?llvm_compat_version}
+BuildRequires:  cmake >= 3.26
 %else
 BuildRequires:  wasi-libc-static
 %endif
@@ -504,24 +495,28 @@ Obsoletes:      %{name}-std-static-wasm32-wasi < 1.84.0~
 %if %target_enabled x86_64-unknown-none
 %target_package x86_64-unknown-none
 Requires:       lld
+BuildArch:      noarch
 %target_description x86_64-unknown-none embedded
 %endif
 
 %if %target_enabled aarch64-unknown-uefi
 %target_package aarch64-unknown-uefi
 Requires:       lld
+BuildArch:      noarch
 %target_description aarch64-unknown-uefi embedded
 %endif
 
 %if %target_enabled x86_64-unknown-uefi
 %target_package x86_64-unknown-uefi
 Requires:       lld
+BuildArch:      noarch
 %target_description x86_64-unknown-uefi embedded
 %endif
 
 %if %target_enabled aarch64-unknown-none-softfloat
 %target_package aarch64-unknown-none-softfloat
 Requires:       lld
+BuildArch:      noarch
 %target_description aarch64-unknown-none-softfloat embedded
 %endif
 
@@ -712,12 +707,16 @@ test -f '%{local_rust_root}/bin/rustc'
 
 %if %{defined wasm_targets} && %{with bundled_wasi_libc}
 %setup -q -n %{wasi_libc_name} -T -b 10
-rm -rf %{wasi_libc_dir}/dlmalloc/
-
-%patch -P1000 -p1
+# We want to make sure we use emmalloc instead of CC0 dlmalloc.
+# The cmake files need the sources to exist, so just truncate instead.
+truncate --no-create --size=0 %{wasi_libc_dir}/dlmalloc/src/*.c
 %endif
 
 %setup -q -n %{rustc_package}
+
+# Sanity check that the source version is what we expect,
+# especially for betas where the tarball is unversioned.
+test "$(cut -d' ' -f1 ./version)" = "%{lua: print((rpm.expand('%version'):gsub('~', '-'))) }"
 
 %patch -P1 -p1
 %patch -P2 -p1
@@ -730,10 +729,7 @@ rm -rf %{wasi_libc_dir}/dlmalloc/
 %patch -P6 -p1
 %endif
 %patch -P7 -p1
-%patch -P8 -p1
-%patch -P9 -p1
-%patch -P10 -p1
-%patch -P11 -p1
+%patch -P8 -p2 -d vendor/openssl-sys-0.9.112
 
 %if %with disabled_libssh2
 %patch -P100 -p1
@@ -777,8 +773,11 @@ rm -rf src/tools/rustc-perf/collector/*-benchmarks/
 %clear_dir vendor/libsqlite3-sys*/sqlite3/
 %endif
 
+%clear_dir src/tools/cargo/third-party/libssh2-sys/libssh2/
+
 %if %with disabled_libssh2
 rm -rf vendor/libssh2-sys*/
+rm -rf src/tools/cargo/third-party/libssh2-sys
 %endif
 
 # This only affects the transient rust-installer, but let it use our dynamic xz-libs
@@ -815,7 +814,8 @@ find -name '*.rs' -type f -perm /111 -exec chmod -v -x '{}' '+'
     " RUSTC_TARGET_CPU_X86_64=x86-64" .. ((rhel >= 10) and "-v3" or (rhel == 9) and "-v2" or "")
     .. " RUSTC_TARGET_CPU_PPC64LE=" .. ((rhel >= 9) and "pwr9" or "pwr8")
     .. " RUSTC_TARGET_CPU_S390X=" ..
-        ((rhel >= 9) and "z14" or (rhel == 8 or fedora >= 38) and "z13" or
+        ((rhel >= 11 or fedora >= 45) and "z15" or (rhel >= 9) and "z14" or
+         (rhel == 8 or fedora >= 38) and "z13" or
          (fedora >= 26) and "zEC12" or (rhel == 7) and "z196" or "z10")
   print(env)
 end}
@@ -871,10 +871,19 @@ end}
 
 %if %defined wasm_targets
 %if %with bundled_wasi_libc
-%define wasi_libc_flags MALLOC_IMPL=emmalloc CC=clang AR=llvm-ar NM=llvm-nm
-%make_build --quiet -C %{wasi_libc_dir} %{wasi_libc_flags} TARGET_TRIPLE=wasm32-wasip1
+# Note that we don't want host CFLAGS here!
+env -u CFLAGS %__cmake \
+  -S "%{wasi_libc_dir}" \
+  -B "%{wasi_libc_dir}/%{__cmake_builddir}" \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_C_FLAGS_RELEASE="-O2 -fstack-protector" \
+  -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+  -DBUILD_SHARED=OFF \
+  -DMALLOC=emmalloc \
+  -DTARGET_TRIPLE=wasm32-wasip1
+%__cmake --build "%{wasi_libc_dir}/%{__cmake_builddir}" %{?_smp_mflags}
 %define wasm_target_config %{shrink:
-  --set target.wasm32-wasip1.wasi-root=%{wasi_libc_dir}/sysroot
+  --set target.wasm32-wasip1.wasi-root=%{wasi_libc_dir}/%{__cmake_builddir}/sysroot
 }
 %else
 %define wasm_target_config %{shrink:
@@ -889,14 +898,8 @@ end}
 %define profiler %{compiler_rt_libdir}/libclang_rt.profile.a
 test -r "%{profiler}"
 
-# llvm < 21 does not provide a builtins library for s390x.
-%if "%{_arch}" != "s390x" || 0%{?clang_major_version} >= 21
 %define optimized_builtins %{compiler_rt_libdir}/libclang_rt.builtins.a
 test -r "%{optimized_builtins}"
-%else
-%define optimized_builtins false
-%endif
-
 
 %configure --disable-option-checking \
   --docdir=%{_pkgdocdir} \
@@ -930,6 +933,7 @@ test -r "%{optimized_builtins}"
   --set build.optimized-compiler-builtins=false \
   --set rust.llvm-tools=false \
   --set rust.verify-llvm-ir=true \
+  --set rust.remap-debuginfo=false \
   --enable-extended \
   --tools=cargo,clippy,rust-analyzer,rustdoc,rustfmt,src \
   --enable-vendor \
@@ -1113,6 +1117,10 @@ rm -rf "./build/%{rust_triple}/test/"
 # Requires access to index.crates.io but neither Fedora nor CentOS/RHEL builders
 # have DNS resolution, so the test will always fail.
 %global cargo_test_skip_list %{cargo_test_skip_list} publish_to_crates_io_warns
+
+# Requires DNS resolution to github.com, this test will always fail.
+# Additionally SCP-like directions are essentially ssh which is not available in RHEL
+%global cargo_test_skip_list %{cargo_test_skip_list} dep_with_scp_like_submodule_url
 
 %ifarch aarch64
 # https://github.com/rust-lang/rust/issues/123733
@@ -1299,6 +1307,42 @@ rm -rf "./build/%{rust_triple}/stage2-tools/%{rust_triple}/cit/"
 
 %changelog
 ## START: Generated by rpmautospec
+* Wed Oct 07 2026 azldev <azldev@local> - 1.96.1-2
+- Local changes (uncommitted)
+
+* Tue Jun 30 2026 Paul Murphy <murp@redhat.com> - 1.96.1-1
+- Update to Rust 1.96.1
+
+* Thu Jun 25 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.96.0-5
+- Increase s390x baseline to z15 on RHEL 11 and Fedora 45
+
+* Fri Jun 19 2026 Jesus Checa Hidalgo <jchecahi@redhat.com> - 1.96.0-4
+- Disable `disable-git-dep-with-scp-submodule` cargo test
+
+* Fri Jun 19 2026 Sun Haiyong <sunhaiyong@zdbr.net> - 1.96.0-3
+- remove rust_arches
+
+* Sat Jun 06 2026 Gerd Hoffmann <kraxel@redhat.com> - 1.96.0-2
+- make uefi and none targets noarch
+
+* Mon Jun 01 2026 Josh Stone <jistone@redhat.com> - 1.96.0-1
+- Update to Rust 1.96.0
+
+* Tue May 05 2026 Josh Stone <jistone@redhat.com> - 1.95.0-5
+- Disable remap-debuginfo for the toolchain
+
+* Mon May 04 2026 Josh Stone <jistone@redhat.com> - 1.95.0-4
+- Patch cargo's openssl-sys for openssl 4
+
+* Wed Apr 29 2026 Jesus Checa Hidalgo <jchecahi@redhat.com> - 1.95.0-3
+- rpminspect: (debuginfo) Ignore all i686 files in bin and libexec
+
+* Sat Apr 18 2026 Josh Stone <jistone@redhat.com> - 1.95.0-2
+- [eln] update to wasi-libc-32
+
+* Thu Apr 16 2026 Paul Murphy <murp@redhat.com> - 1.95.0-1
+- Update to Rust 1.95.0
+
 * Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1.94.1-8
 - build: mass rebuild auto-bumpable components
 
