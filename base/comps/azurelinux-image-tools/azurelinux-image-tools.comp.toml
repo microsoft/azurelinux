@@ -1,0 +1,25 @@
+# Azure Linux Image Tools — provides imagecustomizer and osmodifier tools. Forward
+# ported from the azurelinux-image-tools spec on the 3.0 branch. `imagecustomizer`
+# uprevs from 1.5.0 to 1.7.0. This is maintained as a local spec with a manually
+# generated vendor tarball.
+[components.azurelinux-image-tools]
+spec = { type = "local", path = "azurelinux-image-tools.spec" }
+# Local package authored and maintained by AZL: use rpmautospec (%autorelease / %autochangelog).
+
+[[components.azurelinux-image-tools.source-files]]
+filename = "azurelinux-image-tools-1.7.0.tar.gz"
+hash = "cde87cc0137538addb9be79ff1f25f77660861f540f2d74bcd76d1eca0496e481a66bd3d647b09cedb576eddbd40acbb298b632592f6c6accfa8a7bd2427bb63"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.7.0.tar.gz" }
+
+# Go module dependencies are vendored ahead of time via azldev's custom-source
+# workflow using generate_source_tarball.sh. This lets us work on network isolated
+# build environments.
+[[components.azurelinux-image-tools.source-files]]
+filename      = "azurelinux-image-tools-1.7.0-vendor.tar.gz"
+origin.type          = "custom"
+origin.script        = "generate_source_tarball.sh"
+origin.mock-packages = ["golang"]
+origin.inputs        = ["azurelinux-image-tools-1.7.0.tar.gz"]
+hash-type     = "SHA512"
+hash          = "f031186d60b06630884a69c30d0d98b3e74d6bf2fde6cea4c1779ec24f301104b1631b32cd3d613fa4691bcb12b4bae4549463f1a30e650ecee28ae69da8a736"
