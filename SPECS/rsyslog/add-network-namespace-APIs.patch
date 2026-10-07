@@ -1,0 +1,504 @@
+From c78c587cafd4d495f7e2bc3c0df5d8c18db48d51 Mon Sep 17 00:00:00 2001
+From: Billie Alsup <balsup@cisco.com>
+Date: Thu, 11 Sep 2025 08:54:49 -0700
+Subject: [PATCH] net: Add NetworkNamespace APIs
+
+This moves NetworkNamespace functionality into
+the net module. This allows the same code to
+be reused across multiple tools and plugins.
+The first usage is with omfwd, which is changed
+to use the common net implementation.  Note
+the net implementation is based on the original
+omfwd implementation.  Subsequent PRs will be
+opened for integrating this into omuxsock and
+imtcp.
+
+The original test case tcp_forwarding_ns_tpl.sh
+was broken due to use of single quotes rather
+than double quotes, thus preventing the proper
+port number argument to be passed to the
+listener.  Note this test must be run as
+root.
+
+Development has occurred across Fedora41 and
+Fedora42, which uses glibc 2.40 and glibc2.41
+respectively.  The valgrind suppressions are
+updated to handle new glibc issues
+accordingly.
+
+Four new functions are callable through the
+net module. These allow one to save a handle
+to the current namespace, switch to a new
+namespace by name, and restore the namespace
+from the saved handle.  A fourth higher
+level wrapper is used to open a socket in
+a named network namespace, and handles the
+invocation of the lower level functions.
+Ideally this would be the only public
+function, however it simplifies integration
+into imtcp in the future (which doesn't
+directly open sockets).  This may change
+in the future as network namespaces are
+integrated into more modules and plugins.
+
+Signed-off-by: Billie Alsup <balsup@cisco.com>
+
+Upstream Patch reference: https://patch-diff.githubusercontent.com/raw/rsyslog/rsyslog/pull/6121.patch
+---
+ runtime/Makefile.am            |   2 +-
+ runtime/net.c                  |   5 +
+ runtime/net.h                  |  60 +++++++++++-
+ runtime/netns_socket.c         | 166 +++++++++++++++++++++++++++++++++
+ runtime/netns_socket.h         |  40 ++++++++
+ tests/known_issues.supp        |  18 ++++
+ tests/tcp_forwarding_ns_tpl.sh |   2 +-
+ tools/omfwd.c                  |  50 +---------
+ 8 files changed, 293 insertions(+), 50 deletions(-)
+ create mode 100644 runtime/netns_socket.c
+ create mode 100644 runtime/netns_socket.h
+
+diff --git a/runtime/Makefile.am b/runtime/Makefile.am
+index 8a25f21..cc3480c 100644
+--- a/runtime/Makefile.am
++++ b/runtime/Makefile.am
+@@ -164,7 +164,7 @@ endif
+ # basic network support, needed for rsyslog startup (e.g. our own system name)
+ #
+ pkglib_LTLIBRARIES += lmnet.la
+-lmnet_la_SOURCES = net.c net.h
++lmnet_la_SOURCES = net.c net.h netns_socket.c netns_socket.h
+ lmnet_la_CPPFLAGS = $(PTHREADS_CFLAGS) $(RSRT_CFLAGS)
+ lmnet_la_LDFLAGS = -module -avoid-version ../compat/compat_la-getifaddrs.lo
+ lmnet_la_LIBADD =
+diff --git a/runtime/net.c b/runtime/net.c
+index 8611125..758a0c6 100644
+--- a/runtime/net.c
++++ b/runtime/net.c
+@@ -1687,6 +1687,11 @@ CODESTARTobjQueryInterface(net)
+ 	pIf->CmpHost = CmpHost;
+ 	pIf->HasRestrictions = HasRestrictions;
+ 	pIf->GetIFIPAddr = getIFIPAddr;
++
++	pIf->netns_save = netns_save;
++	pIf->netns_restore = netns_restore;
++	pIf->netns_switch = netns_switch;
++	pIf->netns_socket = netns_socket;
+ finalize_it:
+ ENDobjQueryInterface(net)
+ 
+diff --git a/runtime/net.h b/runtime/net.h
+index c2847f6..6de8ef9 100644
+--- a/runtime/net.h
++++ b/runtime/net.h
+@@ -27,6 +27,7 @@
+ #include <arpa/inet.h>
+ #include <netinet/in.h>
+ #include <sys/socket.h> /* this is needed on HP UX -- rgerhards, 2008-03-04 */
++#include "netns_socket.h"
+ 
+ typedef enum _TCPFRAMINGMODE {
+ 		TCP_FRAMING_OCTET_STUFFING = 0, /* traditional LF-delimited */
+@@ -168,8 +169,65 @@ BEGINinterface(net) /* name must also be changed in ENDinterface macro! */
+ 	/* v8 cvthname() signature change -- rgerhards, 2013-01-18 */
+ 	/* v9 create_udp_socket() signature change -- dsahern, 2016-11-11 */
+ 	/* v10 moved data members to rsconf_t -- alakatos, 2021-12-29 */
++
++	/* v11 netns functions -- balsup, 2025-09-11 */
++	/*
++	* @brief Open a socket on the given namespace
++	* @param fdp A place to store the descriptor.  This must not be NULL.
++	*            A failure will store -1 here.
++	* @param domain The communication domain argument to the underlying socket call
++	* @param type The type argument to the underlying socket call
++	* @param protocol The protocol argument to the underlying socket call
++	* @param ns The desired namespace.  This may be NULL or the empty string if
++	*           the current namespace is desired.
++	* @return RS_RET_OK on success, otherwise a failure code.
++	* @details This is a wrapper to socket, allowing one to open a socket in
++	*          a given namespace. For platforms that do not support network
++	*          namespaces, an error will be returned if the ns parameter
++	*          is not NULL or the empty string.
++	*/
++	rsRetVal (*netns_socket)(int *fdp, int domain, int type, int protocol, const char *ns);
++
++	/*
++	* @brief Switch to the given network namespace
++	* @param ns The desired namespace.  If this is NULL or the empty string, then
++	*           this function is a no-op.
++	* @return RS_RET_OK on success, otherwise a failure code.
++	* @details For platforms that do not support network namespaces, an error will
++	*          be returned if the ns parameter is not NULL or the empty string.
++	*/
++	rsRetVal (*netns_switch)(const char *ns);
++
++	/*
++	* @brief Save a descriptor to the current network namespace
++	* @param fd The location to store the descriptor for the current
++	*           namespace.  This must not not be NULL, and the
++	*           descriptor must be pre-initialized to -1, i.e. *fd == -1
++	*           is a precondition.  This style is to prevent inadvertent
++	*           descriptor leaks that might arise by overwriting a valid
++	*           descriptor.
++	* @return RS_RET_OK on success, otherwise a failure code.
++	* @details For platforms that do not support network namespaces, this
++	*          function is a no-op and will always return RS_RET_OK.
++	*/
++	rsRetVal (*netns_save)(int *fd);
++
++	/*
++	* @brief Restore the original network namespace
++	* @param fd A pointer to a descriptor associated with the original
++	*           namespace.  This must not not be NULL.  If the descriptor
++	*           is -1, then this function is a no-op.  A valid descriptor
++	*           is always closed as a side-effect of this function,
++	*           with the descriptor being updated to -1.
++	* @return RS_RET_OK on success, otherwise a failure code.
++	* @details For platforms that do not support network namespaces, this
++	*          function cannot change the network namespace.  However, if
++	*          presented with an fd that is not -1, it will still close
++	*          that fd and reset the value to -1.
++	*/
++	rsRetVal (*netns_restore)(int *fd);
+ ENDinterface(net)
+-#define netCURR_IF_VERSION 10 /* increment whenever you change the interface structure! */
++#define netCURR_IF_VERSION 11 /* increment whenever you change the interface structure! */
+ 
+ /* prototypes */
+ PROTOTYPEObj(net);
+diff --git a/runtime/netns_socket.c b/runtime/netns_socket.c
+new file mode 100644
+index 0000000..14fad27
+--- /dev/null
++++ b/runtime/netns_socket.c
+@@ -0,0 +1,166 @@
++/* Implementation for netns_socket API
++ *
++ * This file is part of rsyslog.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *       http://www.apache.org/licenses/LICENSE-2.0
++ *       -or-
++ *       see COPYING.ASL20 in the source distribution
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++#include "config.h"
++#include <stdio.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <sched.h>
++#include <string.h>
++#include <sys/socket.h>
++#include <sys/types.h>
++
++#include "rsyslog.h"
++#include "debug.h"
++#include "errmsg.h"
++#include "netns_socket.h"
++
++
++/* Change to the given network namespace.
++ * This function based on previous implementation
++ * of tools/omfwd.c function changeToNs.
++ */
++rsRetVal netns_switch(const char *ns) {
++    DEFiRet;
++#ifdef HAVE_SETNS
++    int ns_fd = -1;
++    char *nsPath = NULL;
++
++    if (ns && *ns) {
++        /* Build network namespace path */
++        if (asprintf(&nsPath, "/var/run/netns/%s", ns) == -1) {
++            // Some implementations say nsPath would be undefined on failure
++            nsPath = NULL;
++            LogError(0, RS_RET_OUT_OF_MEMORY, "%s: asprintf failed", __func__);
++            ABORT_FINALIZE(RS_RET_OUT_OF_MEMORY);
++        }
++
++        /* Open file descriptor of destination network namespace */
++        ns_fd = open(nsPath, O_RDONLY);
++        if (ns_fd < 0) {
++            LogError(errno, RS_RET_IO_ERROR, "%s: could not open namespace '%s'", __func__, ns);
++            ABORT_FINALIZE(RS_RET_IO_ERROR);
++        }
++        /* Change to the destination network namespace */
++        if (setns(ns_fd, CLONE_NEWNET) != 0) {
++            LogError(errno, RS_RET_IO_ERROR, "%s: could not change to namespace '%s'", __func__, ns);
++            ABORT_FINALIZE(RS_RET_IO_ERROR);
++        }
++        dbgprintf("%s: changed to network namespace '%s'\n", __func__, ns);
++    }
++finalize_it:
++    free(nsPath);
++    if ((ns_fd >= 0) && (close(ns_fd) != 0)) {
++        LogError(errno, RS_RET_IO_ERROR, "%s: failed to close namespace '%s'", __func__, ns);
++    }
++#else  // ndef HAVE_SETNS
++    if (ns && *ns) {
++        LogError(ENOSYS, RS_RET_VALUE_NOT_SUPPORTED, "%s: could not change to namespace '%s'", __func__, ns);
++        ABORT_FINALIZE(RS_RET_VALUE_NOT_SUPPORTED);
++    }
++finalize_it:
++#endif  // ndef HAVE_SETNS
++    RETiRet;
++}
++
++
++/* Return to the startup network namespace.
++ * This function based on code in tools/omfwd.c
++ */
++rsRetVal ATTR_NONNULL() netns_restore(int *fd) {
++    DEFiRet;
++
++#ifdef HAVE_SETNS
++    if (*fd >= 0) {
++        if (setns(*fd, CLONE_NEWNET) != 0) {
++            LogError(errno, RS_RET_IO_ERROR, "%s: could not return to startup namespace", __func__);
++            ABORT_FINALIZE(RS_RET_IO_ERROR);
++        }
++        dbgprintf("%s: returned to startup network namespace\n", __func__);
++    }
++
++finalize_it:
++#endif  // def HAVE_SETNS
++    if (*fd >= 0 && close(*fd) != 0) {
++        LogError(errno, RS_RET_IO_ERROR, "%s: could not close startup namespace fd", __func__);
++    }
++    *fd = -1;
++    RETiRet;
++}
++
++/* Save the current network namespace fd
++ */
++rsRetVal ATTR_NONNULL() netns_save(int *fd) {
++    DEFiRet;
++
++    /*
++     * The fd must always point to either a valid fd
++     * or to -1.  We expect it to be -1 on entry here.
++     * To avoid bugs, or possible descriptor leaks,
++     * check that it is always -1 on entry.
++     */
++#ifdef HAVE_SETNS
++    if (*fd != -1) {
++        LogError(0, RS_RET_CODE_ERR, "%s: called with uninitialized descriptor", __func__);
++        ABORT_FINALIZE(RS_RET_CODE_ERR);
++    }
++    *fd = open("/proc/self/ns/net", O_RDONLY);
++    if (*fd == -1) {
++        LogError(errno, RS_RET_IO_ERROR, "%s: could not access startup namespace", __func__);
++        ABORT_FINALIZE(RS_RET_IO_ERROR);
++    }
++    dbgprintf("%s: saved startup network namespace\n", __func__);
++finalize_it:
++#endif  // def HAVE_SETNS
++    RETiRet;
++}
++
++rsRetVal netns_socket(int *fdp, int domain, int type, int protocol, const char *ns) {
++    DEFiRet;
++    int fd = -1;
++
++#ifndef HAVE_SETNS
++    if (ns && *ns) {
++        LogError(0, RS_RET_VALUE_NOT_SUPPORTED, "Network namespaces are not supported");
++        ABORT_FINALIZE(RS_RET_VALUE_NOT_SUPPORTED);
++    }
++#else /* def HAVE_SETNS */
++    rsRetVal iRet_restore;
++    int ns_fd = -1;
++
++    if (ns && *ns) {
++        CHKiRet(netns_save(&ns_fd));
++        CHKiRet(netns_switch(ns));
++    }
++#endif /* def HAVE_SETNS */
++    *fdp = fd = socket(domain, type, protocol);
++    if (fd == -1) {
++        LogError(errno, RS_RET_NO_SOCKET, "%s: socket(%d, %d, %d) failed", __func__, domain, type, protocol);
++        ABORT_FINALIZE(RS_RET_NO_SOCKET);
++    }
++finalize_it:
++#ifdef HAVE_SETNS
++    iRet_restore = netns_restore(&ns_fd);
++    if (iRet == RS_RET_OK) iRet = iRet_restore;
++#endif /* def HAVE_SETNS */
++    if (iRet != RS_RET_OK && fd != -1) {
++        (void)close(fd);
++        *fdp = -1;
++    }
++    RETiRet;
++}
+diff --git a/runtime/netns_socket.h b/runtime/netns_socket.h
+new file mode 100644
+index 0000000..223d106
+--- /dev/null
++++ b/runtime/netns_socket.h
+@@ -0,0 +1,40 @@
++/* Definitions for netns_socket API
++ *
++ * This file is part of rsyslog.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *       http://www.apache.org/licenses/LICENSE-2.0
++ *       -or-
++ *       see COPYING.ASL20 in the source distribution
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++#ifndef INCLUDED_NETNS_SOCKET_H
++#define INCLUDED_NETNS_SOCKET_H
++
++#include "rsyslog.h"
++
++/*
++ * Open a socket in the named network namespace
++ */
++rsRetVal netns_socket(int *fdp, int domain, int type, int protocol, const char *ns);
++
++/*
++ * Switch to the named networknamespace
++ */
++rsRetVal netns_switch(const char *ns);
++
++/*
++ * Save and restore our current network namespace
++ */
++rsRetVal ATTR_NONNULL() netns_save(int *fd);
++rsRetVal ATTR_NONNULL() netns_restore(int *fd);
++
++#endif /* #ifndef INCLUDED_NETNS_SOCKET_H */
+diff --git a/tests/known_issues.supp b/tests/known_issues.supp
+index 9bb8fa3..80a6198 100644
+--- a/tests/known_issues.supp
++++ b/tests/known_issues.supp
+@@ -60,3 +60,21 @@
+    fun:exit
+    fun:(below main)
+ }
++{
++   <glibc 2.4[01] failures for fc4[12].aarch64>
++   Memcheck:Leak
++   match-leak-kinds: definite
++   fun:malloc
++   fun:UnknownInlinedFun
++   fun:_dl_map_object_deps
++   fun:dl_open_worker_begin
++   fun:_dl_catch_exception
++   fun:dl_open_worker
++   fun:_dl_catch_exception
++   fun:_dl_open
++   fun:do_dlopen
++   fun:_dl_catch_exception
++   fun:_dl_catch_error
++   fun:dlerror_run
++   fun:__libc_dlopen_mode
++}
+diff --git a/tests/tcp_forwarding_ns_tpl.sh b/tests/tcp_forwarding_ns_tpl.sh
+index 89a45e3..2bf52fe 100755
+--- a/tests/tcp_forwarding_ns_tpl.sh
++++ b/tests/tcp_forwarding_ns_tpl.sh
+@@ -26,7 +26,7 @@ ip netns add rsyslog_test_ns
+ ip netns exec rsyslog_test_ns ip link set dev lo up
+ 
+ # run server in namespace
+-ip netns exec rsyslog_test_ns ./minitcpsrv -t127.0.0.1 -p'$TCPFLOOD_PORT' -f $RSYSLOG_OUT_LOG &
++ip netns exec rsyslog_test_ns ./minitcpsrv -t127.0.0.1 -p"$TCPFLOOD_PORT" -f $RSYSLOG_OUT_LOG &
+ BGPROCESS=$!
+ echo background minitcpsrvr process id is $BGPROCESS
+ 
+diff --git a/tools/omfwd.c b/tools/omfwd.c
+index d1eeeff..4c23ee9 100644
+--- a/tools/omfwd.c
++++ b/tools/omfwd.c
+@@ -869,46 +869,12 @@ static rsRetVal changeToNs(instanceData *const pData __attribute__((unused)))
+ {
+ 	DEFiRet;
+ #ifdef HAVE_SETNS
+-	int iErr;
+-	int destinationNs = -1;
+-	char *nsPath = NULL;
+ 
+ 	if(pData->networkNamespace) {
+-		/* keep file descriptor of original network namespace */
+-		pData->originalNamespace = open("/proc/self/ns/net", O_RDONLY);
+-		if (pData->originalNamespace < 0) {
+-			LogError(0, RS_RET_IO_ERROR, "omfwd: could not read /proc/self/ns/net");
+-			ABORT_FINALIZE(RS_RET_IO_ERROR);
+-		}
+-
+-		/* build network namespace path */
+-		if (asprintf(&nsPath, "/var/run/netns/%s", pData->networkNamespace) == -1) {
+-			LogError(0, RS_RET_OUT_OF_MEMORY, "omfwd: asprintf failed");
+-			ABORT_FINALIZE(RS_RET_OUT_OF_MEMORY);
+-		}
+-
+-		/* keep file descriptor of destination network namespace */
+-		destinationNs = open(nsPath, 0);
+-		if (destinationNs < 0) {
+-			LogError(0, RS_RET_IO_ERROR, "omfwd: could not change to namespace '%s'",
+-					pData->networkNamespace);
+-			ABORT_FINALIZE(RS_RET_IO_ERROR);
+-		}
+-
+-		/* actually change in the destination network namespace */
+-		if((iErr = (setns(destinationNs, CLONE_NEWNET))) != 0) {
+-			LogError(0, RS_RET_IO_ERROR, "could not change to namespace '%s': %s",
+-				  pData->networkNamespace, gai_strerror(iErr));
+-			ABORT_FINALIZE(RS_RET_IO_ERROR);
+-		}
+-		dbgprintf("omfwd: changed to network namespace '%s'\n", pData->networkNamespace);
++		CHKiRet(net.netns_save(&pData->originalNamespace));
++		CHKiRet(net.netns_switch(pData->networkNamespace));
+ 	}
+-
+ finalize_it:
+-	free(nsPath);
+-	if(destinationNs >= 0) {
+-		close(destinationNs);
+-	}
+ #else /* #ifdef HAVE_SETNS */
+ 		dbgprintf("omfwd: OS does not support network namespaces\n");
+ #endif /* #ifdef HAVE_SETNS */
+@@ -923,22 +889,12 @@ static rsRetVal returnToOriginalNs(instanceData *const pData __attribute__((unus
+ {
+ 	DEFiRet;
+ #ifdef HAVE_SETNS
+-	int iErr;
+-
+ 	/* only in case a network namespace is given and a file descriptor to
+ 	 * the original namespace exists */
+ 	if(pData->networkNamespace && pData->originalNamespace >= 0) {
+-		/* actually change to the original network namespace */
+-		if((iErr = (setns(pData->originalNamespace, CLONE_NEWNET))) != 0) {
+-			LogError(0, RS_RET_IO_ERROR, "could not return to original namespace: %s",
+-				  gai_strerror(iErr));
+-			ABORT_FINALIZE(RS_RET_IO_ERROR);
+-		}
+-
+-		close(pData->originalNamespace);
++		CHKiRet(net.netns_restore(&pData->originalNamespace));
+ 		dbgprintf("omfwd: returned to original network namespace\n");
+ 	}
+-
+ finalize_it:
+ #endif /* #ifdef HAVE_SETNS */
+ 	RETiRet;
+-- 
+2.43.0
+
