@@ -1,0 +1,42 @@
+From fcaa345f5d211aef4afde9382c6f930c07c286a7 Mon Sep 17 00:00:00 2001
+From: Harshit Gupta <guptaharshit@microsoft.com>
+Date: Wed, 7 Oct 2026 08:07:11 -0700
+Subject: [PATCH] Change openvmm binary path to /usr/bin/openvmm
+
+Signed-off-by: Harshit Gupta <guptaharshit@microsoft.com>
+---
+ hack/build-openvmm-virt-launcher/Dockerfile-virt-launcher | 4 ++--
+ pkg/virt-launcher/virtwrap/openvmm_manager.go             | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/hack/build-openvmm-virt-launcher/Dockerfile-virt-launcher b/hack/build-openvmm-virt-launcher/Dockerfile-virt-launcher
+index 36dbe82f97..efcf33808c 100644
+--- a/hack/build-openvmm-virt-launcher/Dockerfile-virt-launcher
++++ b/hack/build-openvmm-virt-launcher/Dockerfile-virt-launcher
+@@ -83,8 +83,8 @@ RUN cp /usr/share/kube-virt/virt-launcher/nsswitch.conf /etc/
+ 
+ # Copy OpenVMM executable and UEFI executable from the host
+ RUN mkdir -p /openvmm
+-COPY hack/build-openvmm-virt-launcher/openvmm/openvmm /openvmm/openvmm
+-RUN chmod 0755 /openvmm/openvmm
++COPY hack/build-openvmm-virt-launcher/openvmm/openvmm /usr/bin/openvmm
++RUN chmod 0755 /usr/bin/openvmm
+ COPY hack/build-openvmm-virt-launcher/openvmm/MSVM.fd /openvmm/MSVM.fd
+ COPY hack/build-openvmm-virt-launcher/openvmm/uefi-templates /openvmm/uefi-templates
+ 
+diff --git a/pkg/virt-launcher/virtwrap/openvmm_manager.go b/pkg/virt-launcher/virtwrap/openvmm_manager.go
+index 4c377c25db..50d3175688 100644
+--- a/pkg/virt-launcher/virtwrap/openvmm_manager.go
++++ b/pkg/virt-launcher/virtwrap/openvmm_manager.go
+@@ -59,7 +59,7 @@ import (
+ )
+ 
+ const (
+-	openVMMBinaryPath              = "/openvmm/openvmm"
++	openVMMBinaryPath              = "/usr/bin/openvmm"
+ 	openVMMUEFIFirmwarePath        = "/openvmm/MSVM.fd"
+ 	openVMMX64UEFITemplatePath     = "/openvmm/uefi-templates/x64.json"
+ 	openVMMAArch64UEFITemplatePath = "/openvmm/uefi-templates/aarch64.json"
+-- 
+2.34.1
+
