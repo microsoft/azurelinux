@@ -1,0 +1,36 @@
+From 3bee3092ba2b7f427f0a95dec2360d19301382cb Mon Sep 17 00:00:00 2001
+From: Harshit Gupta <guptaharshit@microsoft.com>
+Date: Fri, 2 Oct 2026 16:29:00 -0700
+Subject: [PATCH 4/4] Update IOCTL number for MSHV_SCRUB_PARTITION
+
+To account for changes in kernel-mshv source code
+
+Signed-off-by: Harshit Gupta <guptaharshit@microsoft.com>
+---
+ vmm_core/virt_mshv/src/lib.rs | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/vmm_core/virt_mshv/src/lib.rs b/vmm_core/virt_mshv/src/lib.rs
+index fbf964d0..a0aae72e 100644
+--- a/vmm_core/virt_mshv/src/lib.rs
++++ b/vmm_core/virt_mshv/src/lib.rs
+@@ -313,11 +313,12 @@ fn vp(&self, vp_index: VpIndex) -> &MshvVpInner {
+     }
+ 
+     fn scrub_partition(&self) -> Result<(), Error> {
+-        const HVCALL_SCRUB_PARTITION: libc::c_ulong = 0x008d;
++        // _IO(MSHV_IOCTL, 0x0b), where MSHV_IOCTL is 0xb8.
++        const MSHV_SCRUB_PARTITION: libc::c_ulong = 0xb80b;
+ 
+-        // SAFETY: `vmfd` is a valid MSHV partition fd. The private MSHV ABI
+-        // exposes HvCallScrubPartition directly as an argument-less ioctl.
+-        let ret = unsafe { libc::ioctl(self.vmfd.as_raw_fd(), HVCALL_SCRUB_PARTITION) };
++        // SAFETY: `vmfd` is a valid MSHV partition fd, and
++        // MSHV_SCRUB_PARTITION is an argument-less ioctl.
++        let ret = unsafe { libc::ioctl(self.vmfd.as_raw_fd(), MSHV_SCRUB_PARTITION) };
+         if ret < 0 {
+             return Err(ErrorInner::ScrubPartition(io::Error::last_os_error()).into());
+         }
+-- 
+2.34.1
+
