@@ -13,11 +13,11 @@ RUN  cd /var && rm -rf run && ln -s ../run . \
    && chown qemu:qemu /var/run \
    && setcap 'cap_net_bind_service=+ep' /usr/bin/virt-launcher-monitor
 
-# OpenVMM also requires /openvmm/MSVM.fd and architecture-specific JSON
-# templates under /openvmm/uefi-templates.
-RUN mkdir -p /openvmm/uefi-templates
-
 #simple smoke test
-RUN ls /usr/bin/virt-launcher /usr/bin/openvmm
+RUN test -x /usr/bin/virt-launcher \
+ && test -x /usr/bin/openvmm \
+ && test -s /openvmm/MSVM.fd \
+ && test -s /openvmm/uefi-templates/x64.json \
+ && test -s /openvmm/uefi-templates/x64-confidential.json
 
 ENTRYPOINT [ "/usr/bin/virt-launcher" ]
