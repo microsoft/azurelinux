@@ -142,7 +142,7 @@ KUBEVIRT_GO_BASE_PKGDIR="${GOPATH}/pkg" \
 KUBEVIRT_VERSION=%{version} \
 KUBEVIRT_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 KUBEVIRT_GIT_COMMIT='%{sha}' \
-KUBEVIRT_GIT_VERSION='build-%{sha}' \
+KUBEVIRT_GIT_VERSION='v%{version}' \
 KUBEVIRT_GIT_TREE_STATE="clean" \
 build_tests="true" \
 ./hack/build-go.sh install \
