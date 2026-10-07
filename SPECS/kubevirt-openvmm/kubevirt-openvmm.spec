@@ -8,17 +8,23 @@
 %define _missing_build_ids_terminate_build 0
 
 %global sha 9f115538e7
+%global msvm_version 26.0.37
 
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
 Version:        0.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/microsoft/kubevirt
 Source0:        https://github.com/microsoft/kubevirt/archive/refs/tags/build-%{sha}.tar.gz#/%{name}-%{sha}.tar.gz
+%ifarch x86_64
+Source1:        https://github.com/microsoft/mu_msvm/releases/download/v%{msvm_version}/firmware-RELEASE-X64-VS2022.tar.gz
+Source2:        x64.json
+Source3:        x64-confidential.json
+%endif
 # TODO: Remove the patch below when the following PR is merged:
 # https://github.com/microsoft/kubevirt/pull/36
 Patch0:         0001-Change-openvmm-binary-path-to-usr-bin-openvmm.patch
@@ -201,6 +207,16 @@ mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-launcher
 install -p -m 0644 cmd/virt-launcher/virtqemud.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher
 install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher
 
+# Temporary OpenVMM firmware and UEFI templates until their long-term
+# packaging design is implemented.
+%ifarch x86_64
+mkdir -p %{buildroot}/openvmm
+tar -xOf %{SOURCE1} ./FV/MSVM.fd > %{buildroot}/openvmm/MSVM.fd
+chmod 0644 %{buildroot}/openvmm/MSVM.fd
+install -D -p -m 0644 %{SOURCE2} %{buildroot}/openvmm/uefi-templates/x64.json
+install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confidential.json
+%endif
+
 %files virtctl
 %license LICENSE
 %doc README.md
@@ -251,6 +267,13 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tail
 %{_bindir}/node-labeller.sh
 %{_datadir}/kube-virt/virt-launcher
+%ifarch x86_64
+%dir /openvmm
+/openvmm/MSVM.fd
+%dir /openvmm/uefi-templates
+/openvmm/uefi-templates/x64.json
+/openvmm/uefi-templates/x64-confidential.json
+%endif
 
 %files virt-operator
 %license LICENSE
@@ -276,6 +299,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Oct 07 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-3
+- Add temporary x86 OpenVMM firmware and UEFI templates
+
 * Tue Oct 06 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-2
 - Add patch to update OpenVMM binary path to what openvmm RPM installs
 
