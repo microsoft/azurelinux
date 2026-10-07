@@ -2,8 +2,8 @@
 """Root conftest — fixtures for image validation.
 
 CLI options (``--image-path``, ``--image-ref``, ``--image-name``,
-``--image-type``, ``--capabilities``, ``--workdir``) are registered
-in :mod:`utils.pytest_plugin` (loaded early via entry point).
+``--image-type``, ``--capabilities``, ``--properties``, ``--workdir``)
+are registered in :mod:`utils.pytest_plugin` (loaded early via entry point).
 """
 
 from __future__ import annotations
@@ -50,6 +50,7 @@ from utils.pytest_plugin import (
     derive_image_type_from_capabilities,
     detect_image_type,
     parse_capabilities,
+    parse_properties,
 )
 
 if TYPE_CHECKING:
@@ -81,6 +82,14 @@ def capabilities(request: pytest.FixtureRequest) -> set[str]:
     caps = parse_capabilities(request.config.getoption("--capabilities"))
     logger.info("Capabilities: %s", sorted(caps) if caps else "(none)")
     return caps
+
+
+@pytest.fixture(scope="session")
+def properties(request: pytest.FixtureRequest) -> dict[str, str]:
+    """Image properties from ``--properties``."""
+    props = parse_properties(request.config.getoption("--properties"))
+    logger.info("Properties: %s", props or "(none)")
+    return props
 
 
 @pytest.fixture(scope="session")
