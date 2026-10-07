@@ -13,7 +13,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
 Version:        0.1.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -138,7 +138,7 @@ Group:          System/Packages
 The package provides Kubevirt end-to-end tests.
 
 %prep
-%autosetup -p1 -n kubevirt-build-%{sha} -N
+%autosetup -p1 -n kubevirt-build-%{sha}
 
 %build
 mkdir -p go/src/kubevirt.io go/pkg
@@ -299,6 +299,9 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Oct 07 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-4
+- Remove -N from autosetup command so that patches can be applied
+
 * Wed Oct 07 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-3
 - Add temporary x86 OpenVMM firmware and UEFI templates
 
