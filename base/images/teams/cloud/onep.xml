@@ -163,4 +163,7 @@
         <package name="systemd-boot-unsigned" />
         <package name="tpm2-tools" />
     </packages>
+    <packages type="image" profiles="1p-vm-base-gen2-cvm">
+        <file name="entry-token-cvm" target="/etc/kernel/entry-token" permissions="0644" />
+    </packages>
 </image>
