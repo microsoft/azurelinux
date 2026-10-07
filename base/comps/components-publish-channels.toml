@@ -674,7 +674,6 @@ components = [
     "jansi",
     "jansson",
     "jasper",
-    "java-25-openjdk",
     "java-rpm-macros",
     "java_cup",
     "javacc",

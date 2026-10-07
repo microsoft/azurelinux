@@ -10,7 +10,7 @@
 
 Name: hdf
 Version: 4.3.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: A general purpose library and file format for storing scientific data
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD
@@ -27,7 +27,7 @@ BuildRequires: flex byacc libjpeg-devel zlib-devel %{!?el6:libaec-devel}
 BuildRequires: libtirpc-devel
 BuildRequires: gcc-gfortran, gcc
 %if %{with java}
-BuildRequires: msopenjdk-25
+BuildRequires: java-devel
 BuildRequires: javapackages-tools
 BuildRequires: hamcrest
 BuildRequires: junit

@@ -223,7 +223,7 @@ BuildRequires: xmlto /usr/share/xmlto/format/fo/pdf
 BuildRequires: emacs-common
 %endif
 %if %{with_java}
-BuildRequires: msopenjdk-25-fedora-compat
+BuildRequires: java-devel
 %endif
 %if %{with_virthost}
 # BuildRequires: libvirt-devel >= 1.0.2
@@ -521,7 +521,7 @@ Conflicts: systemtap-runtime = %{version}-%{release}.x86_64
 %endif
 Requires: byteman > 2.0
 Requires: iproute
-Requires: msopenjdk-25-fedora-compat
+Requires: java-devel
 
 %description runtime-java
 This package includes support files needed to run systemtap scripts

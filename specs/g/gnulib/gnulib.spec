@@ -67,7 +67,7 @@ BuildRequires:		texinfo
 # Java JDK dropped in i686
 # https://fedoraproject.org/wiki/Changes/Drop_i686_JDKs
 %ifnarch %{ix86}
-BuildRequires: msopenjdk-25
+BuildRequires:		java-devel
 Requires:           %{name}-javaversion
 %endif
 

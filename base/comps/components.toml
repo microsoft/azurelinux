@@ -1,4 +1,4 @@
-includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-check-disablement.toml", "component-mingw-disablement.toml", "component-msopenjdk25-adoption.toml", "components-publish-channels.toml"]
+includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-check-disablement.toml", "component-mingw-disablement.toml", "components-publish-channels.toml"]
 
 # Project-wide default: every component automatically discovers per-file overlay
 # documents under its own `overlays/` directory. The glob is resolved relative

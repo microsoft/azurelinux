@@ -28,7 +28,7 @@
 
 Name: %{shortname}-base
 Version: %{source_date}
-Release: 99%{?dist}
+Release: 100%{?dist}
 Epoch: 11
 Summary: TeX formatting system
 # The only files in the base package are directories, cache, and license texts
@@ -7476,7 +7476,7 @@ License: LPPL-1.3c
 Summary: Cross-platform Java application to query OS information
 Requires: texlive-base
 Requires: texlive-kpathsea
-Requires: msopenjdk-25
+Requires: java-headless
 # shell
 BuildArch: noarch
 

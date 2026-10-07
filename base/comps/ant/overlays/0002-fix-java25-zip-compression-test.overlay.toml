@@ -1,0 +1,17 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Fedora's Ant spec carries trailing whitespace on this dependency.
+[[overlays]]
+description = "Normalize the OpenJDK 25 binding build dependency"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+ant-openjdk25\s+$'
+replacement = 'BuildRequires: ant-openjdk25'
+
+# Java 25's default ZIP compression can equal explicit level 9, invalidating
+# comparisons that assume the defaults differ.
+[[overlays]]
+description = "Compare explicit ZIP compression levels because Java 25 default compression can match level 9"
+type = "patch-add"
+source = "ant-1.10.15-explicit-compression-level.patch"
