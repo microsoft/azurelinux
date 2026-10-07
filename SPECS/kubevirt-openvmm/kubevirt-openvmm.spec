@@ -274,4 +274,4 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 
 %changelog
 * Tue Oct 06 2026 Microsoft Corporation <linux@microsoft.com> - 0.1.0-1
-- Initial package
+- Original version for Azure Linux
