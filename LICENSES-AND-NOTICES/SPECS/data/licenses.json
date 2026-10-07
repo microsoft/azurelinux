@@ -2321,6 +2321,7 @@
                 "kpatch",
                 "kube-vip-cloud-provider",
                 "kubernetes",
+                "kubevirt-openvmm",
                 "libacvp",
                 "libconfini",
                 "libconfuse",
