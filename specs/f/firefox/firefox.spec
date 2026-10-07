@@ -58,7 +58,7 @@ ExcludeArch: i686
 # https://bugzilla.redhat.com/show_bug.cgi?id=1951606
 %global enable_mozilla_crashreporter 0
 %ifarch x86_64 %{ix86}
-%global enable_mozilla_crashreporter 0
+%global enable_mozilla_crashreporter 1
 %endif
 %if %{build_with_asan}
 %global enable_mozilla_crashreporter 0
@@ -85,7 +85,7 @@ ExcludeArch: i686
 %else
 %global system_pipewire   0
 %endif
-%global build_tests       0
+%global build_tests       1
 # Bundled cbindgen makes build slow.
 # Enable only if system cbindgen is not available.
 %if 0%{?rhel}
@@ -193,7 +193,7 @@ ExcludeArch: i686
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        156.0.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 URL:            https://www.mozilla.org/firefox/
 # Automatically converted from old format: MPLv1.1 or GPLv2+ or LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-MPLv1.1 OR GPL-2.0-or-later OR LicenseRef-Callaway-LGPLv2+
@@ -261,6 +261,7 @@ Patch242:        0026-Add-KDE-integration-to-Firefox.patch
 
 # Upstream patches
 Patch400:        mozilla-1196777.patch
+Patch401:        mozilla-1667096.patch
 Patch402:        D324870.1789116963.diff
 Patch403:        D324871.1789116972.diff
 Patch404:        D324876.1789116899.diff
@@ -387,6 +388,7 @@ BuildRequires:  libasan
 BuildRequires:  libasan-static
 %endif
 BuildRequires:  perl-interpreter
+BuildRequires:  fdk-aac-free-devel
 %if 0%{?launch_wayland_compositor}
 BuildRequires:  mutter
 BuildRequires:  gsettings-desktop-schemas
@@ -546,7 +548,7 @@ cat %{SOURCE49} | sed -e "s|LIBCLANG_RT_PLACEHOLDER|`pwd`/wasi-sdk-30/build/sysr
 %patch -P231 -p1 -b .fedora-customization
 
 %patch -P400 -p1 -b .1196777
-# AZL: mozilla-1667096.patch (Patch401) skipped — adds fdk-aac support; see firefox.comp.toml
+%patch -P401 -p1 -b .1667096
 
 %patch -P402 -p1 -b .D324870
 %patch -P403 -p1 -b .D324871
