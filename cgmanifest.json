@@ -8730,6 +8730,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kubevirt-openvmm",
+          "version": "0.1.0",
+          "downloadUrl": "https://github.com/microsoft/kubevirt/archive/refs/tags/build-9f115538e7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kured",
           "version": "1.15.0",
           "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.15.0.tar.gz"
