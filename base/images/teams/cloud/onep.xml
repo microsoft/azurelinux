@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <image>
     <profiles>
-        <profile name="OnePBase" description="First-party Azure VM packages" import="false">
+        <profile name="OnePBase" description="Boot-neutral first-party Azure VM packages" import="false">
             <requires profile="VmBaseCore" />
         </profile>
         <profile name="1p-vm-base-gen1" description="1P VM Base Gen1 Image (BIOS)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="LegacyBoot" />
+            <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
         </profile>
         <profile name="1p-vm-base-gen2" description="1P VM Base Gen2 Image (UEFI)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="UefiBoot" />
+            <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
         </profile>
         <profile name="1p-vm-base-gen1-fips" description="1P VM Base Gen1 FIPS Image (BIOS)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="Fips" />
             <requires profile="LegacyBoot" />
+            <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
         </profile>
         <profile name="1p-vm-base-gen2-fips" description="1P VM Base Gen2 FIPS Image (UEFI)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="Fips" />
             <requires profile="UefiBoot" />
+            <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
         </profile>
     </profiles>
@@ -128,7 +132,6 @@
         <package name="curl" />
         <package name="dbus" />
         <package name="dhcpcd" />
-        <package name="dracut" />
         <package name="e2fsprogs" />
         <package name="elfutils-libelf" />
         <package name="expat" />
@@ -151,5 +154,8 @@
         <package name="tdnf" />
         <package name="tzdata" />
         <package name="xz" />
+    </packages>
+    <packages type="image" profiles="1p-vm-base-gen1,1p-vm-base-gen1-fips,1p-vm-base-gen2-fips">
+        <package name="dracut" />
     </packages>
 </image>
