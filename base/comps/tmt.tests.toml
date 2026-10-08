@@ -88,3 +88,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-selinux-tier1.tmt]
 source = { git-url = "https://src.fedoraproject.org/tests/selinux.git", ref = "534e38f96fde1c88ae9881ffea6c9fc592e82c71" }
 plan = "/plans/tier1"
+
+[tests.tmt-memcached-all]
+type = "tmt"
+description = "Memcached upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-memcached-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/memcached.git", ref = "8a62fd6a9a3086fef6573e715c08761c4b9e5a74" }
+plan = "/plans/all"
