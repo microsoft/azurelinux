@@ -882,3 +882,13 @@ plan = "/plans/all"
 [tests.sscg-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/sscg.git"
 ref = "6ef360f9c106a6d7afd0afb0e4af3d956069c02f"
+
+[tests.nftables-fedora-tmt]
+type = "tmt"
+
+[tests.nftables-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.nftables-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/nftables.git"
+ref = "f1323bb67a69f5f8c7e089958fa440de688b0761"
