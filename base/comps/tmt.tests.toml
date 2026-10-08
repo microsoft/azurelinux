@@ -832,3 +832,13 @@ plan = "/plans/tier1"
 [tests.urw-base35-fonts-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/urw-base35-fonts.git"
 ref = "c44124d0eb2eb73fef1befb860fa28cc31edbbd8"
+
+[tests.valgrind-fedora-tmt]
+type = "tmt"
+
+[tests.valgrind-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.valgrind-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/valgrind.git"
+ref = "d071621a56c9a752d1c5941abed193994860a1be"
