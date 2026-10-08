@@ -1,0 +1,2 @@
+[components.i2c-tools]
+tests.tests = [{ name = "i2c-tools-fedora-tmt" }]

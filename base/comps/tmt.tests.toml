@@ -402,3 +402,13 @@ plan = "/plans/all"
 [tests.gzip-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/gzip.git"
 ref = "0b737db0b0c71b973f1f2cd84cbfae316faba320"
+
+[tests.i2c-tools-fedora-tmt]
+type = "tmt"
+
+[tests.i2c-tools-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.i2c-tools-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/i2c-tools.git"
+ref = "d9163f7660b40ec69d23c3ba93a97ece53317572"
