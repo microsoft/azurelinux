@@ -1,0 +1,2 @@
+[components.lzo]
+tests.tests = [{ name = "lzo-fedora-tmt" }]

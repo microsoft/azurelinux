@@ -532,3 +532,13 @@ plan = "/plans/tier1"
 [tests.lockdev-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/lockdev.git"
 ref = "3fe85f9d9654dd097dadda7d3c03a74f32584e5d"
+
+[tests.lzo-fedora-tmt]
+type = "tmt"
+
+[tests.lzo-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.lzo-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/lzo.git"
+ref = "ea84a0c28f290209025fa1fddc72514880508179"
