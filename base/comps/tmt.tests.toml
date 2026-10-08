@@ -16,3 +16,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-bash.tmt]
 source = { git-url = "https://src.fedoraproject.org/tests/shell.git", ref = "50c3a1ba7f9cc753440bf8d3395bfac02448c8ba" }
 plan = "/plans/bash"
+
+[tests.tmt-chrony-all]
+type = "tmt"
+description = "Chrony upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-chrony-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/chrony.git", ref = "0bd03b1f3a32ed28a2743882add69f37b33de8bc" }
+plan = "/plans/all"

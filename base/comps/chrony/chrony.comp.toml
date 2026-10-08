@@ -1,4 +1,5 @@
 [components.chrony]
+tests.tests = [{ name = "tmt-chrony-all" }]
 
 [[components.chrony.overlays]]
 description = "Enable use of confdir at /etc/chrony.d"
