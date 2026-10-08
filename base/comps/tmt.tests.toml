@@ -512,3 +512,13 @@ plan = "/plans/tier1"
 [tests.libshout-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/libshout.git"
 ref = "093a5921a0308060e9b4cbc4bd171473178a2d7e"
+
+[tests.lm_sensors-fedora-tmt]
+type = "tmt"
+
+[tests.lm_sensors-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.lm_sensors-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/lm_sensors.git"
+ref = "750faca3655d1f465dc585b249064fda0ab209bb"
