@@ -1,3 +1,4 @@
 [components.nodejs22]
+tests.tests = [{ name = "tmt-nodejs-all" }]
 # Release: %{nodejs_release}
 release = { calculation = "manual" }

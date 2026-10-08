@@ -106,3 +106,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-net-tools-tier1-public.tmt]
 source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/net-tools.git", ref = "6b2ffd1b36ad50ee900a4a79f8aaac4dd0136e24" }
 plan = "/plans/tier1/public"
+
+[tests.tmt-nodejs-all]
+type = "tmt"
+description = "Node.js upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-nodejs-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/nodejs.git", ref = "ecbe2863fa18304cfad9c9f5b0f35e189bd8887e" }
+plan = "/plans/all"
