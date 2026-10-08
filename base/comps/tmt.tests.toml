@@ -812,3 +812,13 @@ plan = "/plans/main"
 [tests.tomcat-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/tomcat.git"
 ref = "2490409e3d2e76cf5129ef1f2eab2f24475aae8c"
+
+[tests.unzip-fedora-tmt]
+type = "tmt"
+
+[tests.unzip-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.unzip-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/unzip.git"
+ref = "c7bc42ed598affdacc079e34b62bfcb056ddb6e6"
