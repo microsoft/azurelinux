@@ -912,3 +912,13 @@ plan = "/plans/main"
 [tests.ant-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/ant.git"
 ref = "4532f69642b56a23740a368cd60a985f21ee973b"
+
+[tests.cpio-fedora-tmt]
+type = "tmt"
+
+[tests.cpio-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.cpio-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/cpio.git"
+ref = "afbd7ddc70b064dcd56b67cad025d4675a6e9092"
