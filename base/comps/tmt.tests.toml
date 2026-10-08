@@ -762,3 +762,13 @@ plan = "/plans/main"
 [tests.tar-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/tar.git"
 ref = "6ac392b91525a1e865b20ccaa0f343cd78ee1480"
+
+[tests.tbb-fedora-tmt]
+type = "tmt"
+
+[tests.tbb-fedora-tmt.tmt]
+plan = "/plans/all_tests"
+
+[tests.tbb-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tbb.git"
+ref = "311f35e2c3186a210760436ad653c3e833535ed5"
