@@ -1,0 +1,2 @@
+[components.lockdev]
+tests.tests = [{ name = "lockdev-fedora-tmt" }]

@@ -522,3 +522,13 @@ plan = "/plans/tier1"
 [tests.lm_sensors-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/lm_sensors.git"
 ref = "750faca3655d1f465dc585b249064fda0ab209bb"
+
+[tests.lockdev-fedora-tmt]
+type = "tmt"
+
+[tests.lockdev-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.lockdev-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/lockdev.git"
+ref = "3fe85f9d9654dd097dadda7d3c03a74f32584e5d"
