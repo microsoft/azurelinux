@@ -322,3 +322,13 @@ plan = "/plans/all"
 [tests.gawk-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/gawk.git"
 ref = "da3dad143964e4b08f4666ea79108c65813537b4"
+
+[tests.gdbm-fedora-tmt]
+type = "tmt"
+
+[tests.gdbm-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.gdbm-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/gdbm.git"
+ref = "f97210dfda65a977ef5583ea270aeda3336c0f62"
