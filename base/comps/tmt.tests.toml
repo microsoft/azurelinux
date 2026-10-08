@@ -7,6 +7,20 @@
 # pinned here. When the plan lives in the package's own dist-git repo,
 # 'azldev component test --source-dir' runs it directly from the prepared
 # dist-git source, so no catalog entry is needed.
+#
+# All [tests.<name>] definitions live in this file only. A component with a
+# test association always has its own <name>.comp.toml (never inline in
+# components.toml), and that file carries just the association, e.g.
+# `tests.tests = [{ name = "<name>-fedora-tmt" }]` — never duplicate the
+# [tests.<name>] definition block in a component file.
+#
+# The entries below marked "manually maintained" were NOT produced by a
+# checked-in generator. Each `ref` is the target test repo's default-branch
+# HEAD commit at the time the entry was added, resolved by hand with
+# `git ls-remote <git-url> HEAD` and pasted in; `plan` was picked by manually
+# inspecting `tmt plan ls` output for that repo. To refresh a stale ref,
+# re-run `git ls-remote <git-url> HEAD` and update it in place — there is no
+# regeneration command.
 
 [tests.tmt-bash]
 type = "tmt"
