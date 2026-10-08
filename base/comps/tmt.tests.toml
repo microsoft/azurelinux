@@ -142,3 +142,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-skopeo.tmt]
 source = { git-url = "https://github.com/containers/skopeo.git", ref = "23dddaad3d8f86f8c1d3204646b14aa0da86a85e" }
 plan = "/plans"
+
+[tests.tmt-systemd-ci]
+type = "tmt"
+description = "Systemd continuous-integration plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-systemd-ci.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/systemd.git", ref = "531c815646006b8503e547f2da10862426d1d5b4" }
+plan = "/plans/ci"
