@@ -222,3 +222,13 @@ plan = "/plans/tier1"
 [tests.brltty-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/brltty.git"
 ref = "c16a4cddecec76487d6ad106b3e99efb77921744"
+
+[tests.bzip2-fedora-tmt]
+type = "tmt"
+
+[tests.bzip2-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.bzip2-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/bzip2.git"
+ref = "fb0a8b24582b2b4b168d9503f36709aee8d07cd1"
