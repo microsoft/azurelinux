@@ -642,3 +642,13 @@ plan = "/plans/tier1"
 [tests.ppp-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/ppp.git"
 ref = "b6acea76553652178a7f40b6cbb365e6618ab773"
+
+[tests.pptp-fedora-tmt]
+type = "tmt"
+
+[tests.pptp-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.pptp-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/pptp.git"
+ref = "802be74ad518dc947849038f1c7d3a652f399f00"
