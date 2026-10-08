@@ -492,3 +492,13 @@ plan = "/plans/ci"
 [tests.libmpc-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/libmpc.git"
 ref = "bc669faadc36ee5eb17fba98332fd989d0369013"
+
+[tests.libppd-fedora-tmt]
+type = "tmt"
+
+[tests.libppd-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libppd-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libppd.git"
+ref = "d7b7537f37325800a47aa554524f4aeacbf60336"
