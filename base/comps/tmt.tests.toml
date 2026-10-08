@@ -972,3 +972,13 @@ plan = "/plans/main"
 [tests.javapackages-tools-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/javapackages-tools.git"
 ref = "e5fb2470287969b8e9988bfb9c609c681912ca6f"
+
+[tests.llvm-fedora-tmt]
+type = "tmt"
+
+[tests.llvm-fedora-tmt.tmt]
+plan = "/plans/build-gating"
+
+[tests.llvm-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/llvm.git"
+ref = "93dcd9742ede7fc1505e2480e0351b2a2dd86f68"
