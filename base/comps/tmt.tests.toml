@@ -732,3 +732,13 @@ plan = "/plans/tier1"
 [tests.setup-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/setup.git"
 ref = "c71e0d83888b9a5d932a68570e864423bab35a64"
+
+[tests.sqlite-fedora-tmt]
+type = "tmt"
+
+[tests.sqlite-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.sqlite-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/sqlite.git"
+ref = "ef72f58db90f61bdbfe8696bbc08f832916b8230"
