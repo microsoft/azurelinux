@@ -552,3 +552,13 @@ plan = "/plans/main"
 [tests.mariadb-java-client-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/mariadb-java-client.git"
 ref = "805036413154ab2266199352b14c2286a24d934d"
+
+[tests.minicom-fedora-tmt]
+type = "tmt"
+
+[tests.minicom-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.minicom-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/minicom.git"
+ref = "6623da2ce7c7593acf743112458ccbedcb94c507"
