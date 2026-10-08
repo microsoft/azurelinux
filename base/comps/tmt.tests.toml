@@ -632,3 +632,13 @@ plan = "/plans/tier1"
 [tests.powertop-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/powertop.git"
 ref = "ded9c59c6bfca27d375db3b59fe4487e50f8dadc"
+
+[tests.ppp-fedora-tmt]
+type = "tmt"
+
+[tests.ppp-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.ppp-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ppp.git"
+ref = "b6acea76553652178a7f40b6cbb365e6618ab773"
