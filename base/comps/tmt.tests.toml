@@ -752,3 +752,13 @@ plan = "/plans/all"
 [tests.squid-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/squid.git"
 ref = "b2cfc5919d8b48ae7e65c8ddb85d34759c5f2aa0"
+
+[tests.tar-fedora-tmt]
+type = "tmt"
+
+[tests.tar-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.tar-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tar.git"
+ref = "6ac392b91525a1e865b20ccaa0f343cd78ee1480"
