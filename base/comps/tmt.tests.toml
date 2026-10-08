@@ -952,3 +952,13 @@ plan = "/plans/ci"
 [tests.golang-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/golang.git"
 ref = "1dbd7e668c7d371321d67029fe641f4873b218ef"
+
+[tests.grub2-fedora-tmt]
+type = "tmt"
+
+[tests.grub2-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.grub2-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/grub2.git"
+ref = "6fc7971c4b43a13289743eb52dc961b0ab907619"
