@@ -1,0 +1,2 @@
+[components.liblockfile]
+tests.tests = [{ name = "liblockfile-fedora-tmt" }]

@@ -472,3 +472,13 @@ plan = "/plans/tier1"
 [tests.libijs-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/libijs.git"
 ref = "ec6ed3dc728f4c7d92b7f5cfaabdfccac2daba79"
+
+[tests.liblockfile-fedora-tmt]
+type = "tmt"
+
+[tests.liblockfile-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.liblockfile-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/liblockfile.git"
+ref = "5052941eb69971b198e010cbe4f7ef92b495dbef"
