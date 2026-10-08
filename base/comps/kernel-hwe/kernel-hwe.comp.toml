@@ -12,6 +12,12 @@ release = { calculation = "manual" }
 specrpmversion = "6.18.54"
 kernel_source_dir = "CBL-Mariner-Linux-Kernel-rolling-lts-azl4-hwe-6.18.54.1"
 
+# Keep generic user-space tools owned by the regular kernel package for now.
+# Revisit these when common tooling is migrated to a shared kernel component.
+_without_perf = "1"
+_without_libperf = "1"
+_without_tools = "1"
+
 # Preserve the copied kernel source manifest entry while directing lookaside
 # lookup to the original kernel namespace rather than the new component name.
 [[components.kernel-hwe.source-files]]
