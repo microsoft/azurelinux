@@ -502,3 +502,13 @@ plan = "/plans/tier1"
 [tests.libppd-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/libppd.git"
 ref = "d7b7537f37325800a47aa554524f4aeacbf60336"
+
+[tests.libshout-fedora-tmt]
+type = "tmt"
+
+[tests.libshout-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libshout-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libshout.git"
+ref = "093a5921a0308060e9b4cbc4bd171473178a2d7e"

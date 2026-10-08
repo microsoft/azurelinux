@@ -1,0 +1,2 @@
+[components.libshout]
+tests.tests = [{ name = "libshout-fedora-tmt" }]
