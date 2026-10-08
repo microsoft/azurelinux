@@ -162,3 +162,13 @@ plan = "/plans/tier1"
 [tests.acpid-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/acpid.git"
 ref = "22eae2841d62e32741ea66db83e906204c25c500"
+
+[tests.adobe-mappings-cmap-fedora-tmt]
+type = "tmt"
+
+[tests.adobe-mappings-cmap-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.adobe-mappings-cmap-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/adobe-mappings-cmap.git"
+ref = "981ac889cf19c15720a4d084c8bf76170ee2ee76"

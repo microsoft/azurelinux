@@ -1,0 +1,2 @@
+[components.adobe-mappings-cmap]
+tests.tests = [{ name = "adobe-mappings-cmap-fedora-tmt" }]
