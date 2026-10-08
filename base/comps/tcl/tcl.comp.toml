@@ -1,0 +1,2 @@
+[components.tcl]
+tests.tests = [{ name = "tcl-fedora-tmt" }]
