@@ -115,3 +115,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-nodejs-all.tmt]
 source = { git-url = "https://src.fedoraproject.org/tests/nodejs.git", ref = "ecbe2863fa18304cfad9c9f5b0f35e189bd8887e" }
 plan = "/plans/all"
+
+[tests.tmt-php-all]
+type = "tmt"
+description = "PHP upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-php-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/php.git", ref = "16d1ba5dae51781387e52ea79e5a869c12c0a789" }
+plan = "/plans/all"
