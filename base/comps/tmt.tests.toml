@@ -212,3 +212,13 @@ plan = "/plans/build-gating"
 [tests.binutils-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/binutils.git"
 ref = "542e13fc390ee8c8144b83bd97a3dcd16d57c1e8"
+
+[tests.brltty-fedora-tmt]
+type = "tmt"
+
+[tests.brltty-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.brltty-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/brltty.git"
+ref = "c16a4cddecec76487d6ad106b3e99efb77921744"
