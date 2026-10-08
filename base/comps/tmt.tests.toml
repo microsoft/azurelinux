@@ -582,3 +582,13 @@ plan = "/plans/main"
 [tests.mutt-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/mutt.git"
 ref = "36ec41b511798a2609464d186f6f48b91357f83d"
+
+[tests.nasm-fedora-tmt]
+type = "tmt"
+
+[tests.nasm-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.nasm-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/nasm.git"
+ref = "ba3455d13c27d87b03092b5b4a5776546079173b"
