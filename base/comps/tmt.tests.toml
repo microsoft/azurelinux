@@ -432,3 +432,13 @@ plan = "/plans/tier1"
 [tests.irssi-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/irssi.git"
 ref = "17c248bf8a222561903c816692f181f330496b82"
+
+[tests.libcpuid-fedora-tmt]
+type = "tmt"
+
+[tests.libcpuid-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libcpuid-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libcpuid.git"
+ref = "b18acc0ff7a57d37fa8a62a3743d7d1ac5c18ff0"

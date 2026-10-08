@@ -1,0 +1,2 @@
+[components.libcpuid]
+tests.tests = [{ name = "libcpuid-fedora-tmt" }]
