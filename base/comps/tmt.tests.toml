@@ -151,3 +151,14 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-systemd-ci.tmt]
 source = { git-url = "https://src.fedoraproject.org/tests/systemd.git", ref = "531c815646006b8503e547f2da10862426d1d5b4" }
 plan = "/plans/ci"
+
+# --- Fedora upstream tmt test definitions (manually maintained) ---
+[tests.acpid-fedora-tmt]
+type = "tmt"
+
+[tests.acpid-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.acpid-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/acpid.git"
+ref = "22eae2841d62e32741ea66db83e906204c25c500"
