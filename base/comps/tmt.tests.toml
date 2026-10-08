@@ -542,3 +542,13 @@ plan = "/plans/tier1"
 [tests.lzo-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/lzo.git"
 ref = "ea84a0c28f290209025fa1fddc72514880508179"
+
+[tests.mariadb-java-client-fedora-tmt]
+type = "tmt"
+
+[tests.mariadb-java-client-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.mariadb-java-client-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/mariadb-java-client.git"
+ref = "805036413154ab2266199352b14c2286a24d934d"

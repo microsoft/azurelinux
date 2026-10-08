@@ -1,0 +1,2 @@
+[components.mariadb-java-client]
+tests.tests = [{ name = "mariadb-java-client-fedora-tmt" }]
