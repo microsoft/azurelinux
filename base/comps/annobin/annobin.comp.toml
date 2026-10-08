@@ -1,0 +1,2 @@
+[components.annobin]
+tests.tests = [{ name = "annobin-fedora-tmt" }]

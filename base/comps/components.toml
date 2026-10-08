@@ -72,8 +72,6 @@ overlay-files = ["overlays/*.overlay.toml"]
 [components.allegro]
 [components.aml]
 [components.amtterm]
-
-[components.annobin]
 [components.ansible]
 [components.ansible-collection-ansible-posix]
 [components.ansible-collection-community-general]
