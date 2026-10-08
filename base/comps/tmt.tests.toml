@@ -1,0 +1,18 @@
+# TMT package-test catalog. Sources are pinned so reruns use the same upstream
+# metadata revision instead of a moving branch head. Independent test
+# repositories are pinned to their own maintained default branch because they
+# do not carry Fedora release branches.
+#
+# Only tests whose plan lives outside a component's own dist-git repo are
+# pinned here. When the plan lives in the package's own dist-git repo,
+# 'azldev component test --source-dir' runs it directly from the prepared
+# dist-git source, so no catalog entry is needed.
+
+[tests.tmt-bash]
+type = "tmt"
+description = "Bash shell functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-bash.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/shell.git", ref = "50c3a1ba7f9cc753440bf8d3395bfac02448c8ba" }
+plan = "/plans/bash"
