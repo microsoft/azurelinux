@@ -1,0 +1,2 @@
+[components.grafana]
+tests.tests = [{ name = "grafana-fedora-tmt" }]

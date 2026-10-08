@@ -352,3 +352,13 @@ plan = "/plans/ci"
 [tests.go-rpm-macros-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/go-rpm-macros.git"
 ref = "fce89690378a25f6a200615f54b300e6d4e776d7"
+
+[tests.grafana-fedora-tmt]
+type = "tmt"
+
+[tests.grafana-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.grafana-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/grafana.git"
+ref = "3a4e39d9a3126faaca4a5dd0672df713d41594b4"
