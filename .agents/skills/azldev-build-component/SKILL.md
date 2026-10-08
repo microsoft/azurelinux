@@ -45,11 +45,15 @@ Finalize with `azldev comp update -p <name>` before opening a PR (see the
 
 1. **Render error mentioning a non-standard `Release` tag** — a release-calculation
    issue; see the `azldev-comp-toml` skill.
-2. **Overlay did not apply as expected** — `azldev comp diff-sources -p <name>` shows
+2. **Preview error mentioning `rpmdev-bumpspec`, `rpmdev-packager`, `rpm`, `rpmspec`,
+   `python3`, or the Python RPM module** — this applies only when you explicitly use
+   the temporary `--rpmdev-bumpspec` preview. Provision the named prerequisite for
+   that opt-in path. Without the flag, azldev keeps the legacy static Release calculation.
+3. **Overlay did not apply as expected** — `azldev comp diff-sources -p <name>` shows
    what the overlays actually change.
-3. **Inspect the build environment** — `azldev comp build -p <name> --preserve-buildenv
+4. **Inspect the build environment** — `azldev comp build -p <name> --preserve-buildenv
    on-failure` (values `on-failure`, `always`, `never`), then enter a mock shell.
-4. **Failing `%check`** — fix the tests first (root cause, upstream patches, targeted
+5. **Failing `%check`** — fix the tests first (root cause, upstream patches, targeted
    fixes). Only as a last resort, disable with `build.check.skip = true` and a required
    `build.check.skip_reason` explaining what fails, why it cannot be fixed, and whether it
    is temporary. A transient `--no-check` build flag exists for one-off local builds.
