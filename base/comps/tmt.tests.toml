@@ -192,3 +192,13 @@ plan = "/plans/all_tests"
 [tests.annobin-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/annobin.git"
 ref = "8888b3b86a15a7cc3160de817307ad292f891a63"
+
+[tests.ansible-pcp-fedora-tmt]
+type = "tmt"
+
+[tests.ansible-pcp-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.ansible-pcp-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ansible-pcp.git"
+ref = "67d372e211cd20c6ce768d2da62d8650f186370e"
