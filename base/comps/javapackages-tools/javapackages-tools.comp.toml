@@ -1,1 +1,2 @@
 [components.javapackages-tools]
+tests.tests = [{ name = "javapackages-tools-fedora-tmt" }]

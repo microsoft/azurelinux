@@ -962,3 +962,13 @@ plan = "/plans/ci"
 [tests.grub2-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/grub2.git"
 ref = "6fc7971c4b43a13289743eb52dc961b0ab907619"
+
+[tests.javapackages-tools-fedora-tmt]
+type = "tmt"
+
+[tests.javapackages-tools-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.javapackages-tools-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/javapackages-tools.git"
+ref = "e5fb2470287969b8e9988bfb9c609c681912ca6f"
