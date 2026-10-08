@@ -272,3 +272,13 @@ plan = "/plans/tier1"
 [tests.cups-filters-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/cups-filters.git"
 ref = "3aa8e6604901aaade9c417f72b1abf82fc28c024"
+
+[tests.dejagnu-fedora-tmt]
+type = "tmt"
+
+[tests.dejagnu-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.dejagnu-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/dejagnu.git"
+ref = "a2d0fb76edbf77f391198e2f27cf9fdc0f6d2236"
