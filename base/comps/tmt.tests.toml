@@ -202,3 +202,13 @@ plan = "/plans/ci"
 [tests.ansible-pcp-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/ansible-pcp.git"
 ref = "67d372e211cd20c6ce768d2da62d8650f186370e"
+
+[tests.binutils-fedora-tmt]
+type = "tmt"
+
+[tests.binutils-fedora-tmt.tmt]
+plan = "/plans/build-gating"
+
+[tests.binutils-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/binutils.git"
+ref = "542e13fc390ee8c8144b83bd97a3dcd16d57c1e8"
