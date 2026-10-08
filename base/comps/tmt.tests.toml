@@ -592,3 +592,13 @@ plan = "/plans/ci"
 [tests.nasm-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/nasm.git"
 ref = "ba3455d13c27d87b03092b5b4a5776546079173b"
+
+[tests.nginx-fedora-tmt]
+type = "tmt"
+
+[tests.nginx-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.nginx-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/nginx.git"
+ref = "2c2dd401934f2f2daeccf1924f2c8a520b1bc362"
