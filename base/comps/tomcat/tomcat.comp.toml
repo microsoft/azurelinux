@@ -1,0 +1,2 @@
+[components.tomcat]
+tests.tests = [{ name = "tomcat-fedora-tmt" }]

@@ -802,3 +802,13 @@ plan = "/plans/tier1"
 [tests.tk-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/tk.git"
 ref = "08dea588a071ec4206c9b290075dee328a9ffc93"
+
+[tests.tomcat-fedora-tmt]
+type = "tmt"
+
+[tests.tomcat-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.tomcat-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tomcat.git"
+ref = "2490409e3d2e76cf5129ef1f2eab2f24475aae8c"
