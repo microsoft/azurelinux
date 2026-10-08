@@ -1,0 +1,2 @@
+[components.go-rpm-macros]
+tests.tests = [{ name = "go-rpm-macros-fedora-tmt" }]

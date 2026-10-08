@@ -342,3 +342,13 @@ plan = "/plans/tier1"
 [tests.ghostscript-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/ghostscript.git"
 ref = "70f18f79d374396213d54286be9900bd2ff015f7"
+
+[tests.go-rpm-macros-fedora-tmt]
+type = "tmt"
+
+[tests.go-rpm-macros-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.go-rpm-macros-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/go-rpm-macros.git"
+ref = "fce89690378a25f6a200615f54b300e6d4e776d7"
