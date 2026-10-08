@@ -139,9 +139,11 @@ def test_no_zram_swap_device(rootfs: Path) -> None:
             # through undetected.
             parser = configparser.ConfigParser(default_section="")
             parser.read_string(conf_text)
-            for section in parser.sections():
-                if not parser.has_option(section, "mount-point"):
-                    swap_sections.append(f"{rel_path}:[{section}]")
+            swap_sections.extend(
+                f"{rel_path}:[{section}]"
+                for section in parser.sections()
+                if not parser.has_option(section, "mount-point")
+            )
 
     assert not swap_sections, f"Expected no zram swap devices configured, found: {swap_sections}"
 
