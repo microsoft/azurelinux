@@ -392,3 +392,13 @@ plan = "/plans/tier1"
 [tests.gsm-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/gsm.git"
 ref = "3cf7cd4043d81650793a3a3b663ec6b743a82f95"
+
+[tests.gzip-fedora-tmt]
+type = "tmt"
+
+[tests.gzip-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.gzip-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/gzip.git"
+ref = "0b737db0b0c71b973f1f2cd84cbfae316faba320"
