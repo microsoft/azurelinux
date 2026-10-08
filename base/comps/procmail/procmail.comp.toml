@@ -1,0 +1,2 @@
+[components.procmail]
+tests.tests = [{ name = "procmail-fedora-tmt" }]

@@ -652,3 +652,13 @@ plan = "/plans/tier1"
 [tests.pptp-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/pptp.git"
 ref = "802be74ad518dc947849038f1c7d3a652f399f00"
+
+[tests.procmail-fedora-tmt]
+type = "tmt"
+
+[tests.procmail-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.procmail-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/procmail.git"
+ref = "9c3e64417710a09212c1f828f9016e7e3743f7a2"
