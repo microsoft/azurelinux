@@ -792,3 +792,13 @@ plan = "/plans/tier1"
 [tests.tinycdb-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/tinycdb.git"
 ref = "01b38a36b24251f402f36e2d5555cdbf8aaccc0f"
+
+[tests.tk-fedora-tmt]
+type = "tmt"
+
+[tests.tk-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.tk-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tk.git"
+ref = "08dea588a071ec4206c9b290075dee328a9ffc93"

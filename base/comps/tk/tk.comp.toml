@@ -1,0 +1,2 @@
+[components.tk]
+tests.tests = [{ name = "tk-fedora-tmt" }]
