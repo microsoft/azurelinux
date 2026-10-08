@@ -442,3 +442,13 @@ plan = "/plans/tier1"
 [tests.libcpuid-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/libcpuid.git"
 ref = "b18acc0ff7a57d37fa8a62a3743d7d1ac5c18ff0"
+
+[tests.libcupsfilters-fedora-tmt]
+type = "tmt"
+
+[tests.libcupsfilters-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libcupsfilters-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libcupsfilters.git"
+ref = "1620136f673e9c7fe6fc00dcbbd43d713f0684fa"
