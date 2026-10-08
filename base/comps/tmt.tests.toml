@@ -602,3 +602,13 @@ plan = "/plans/all"
 [tests.nginx-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/nginx.git"
 ref = "2c2dd401934f2f2daeccf1924f2c8a520b1bc362"
+
+[tests.postfix-fedora-tmt]
+type = "tmt"
+
+[tests.postfix-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.postfix-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/postfix.git"
+ref = "62f9cdeb146638162fa25d50ad357b07e748de1a"
