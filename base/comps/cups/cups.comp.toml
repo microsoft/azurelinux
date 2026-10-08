@@ -1,0 +1,2 @@
+[components.cups]
+tests.tests = [{ name = "cups-fedora-tmt" }]

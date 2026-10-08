@@ -252,3 +252,13 @@ plan = "/plans/all_tests"
 [tests.chrpath-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/chrpath.git"
 ref = "11be21a8aa1cf46c309bfe6e7feff49ca0ab3052"
+
+[tests.cups-fedora-tmt]
+type = "tmt"
+
+[tests.cups-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.cups-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/cups.git"
+ref = "21a53d0fa88229954bd2cff5cc739c125acfd3f9"
