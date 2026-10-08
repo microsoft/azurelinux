@@ -622,3 +622,13 @@ plan = "/plans/main"
 [tests.postgresql-jdbc-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/postgresql-jdbc.git"
 ref = "022558f40cb0c78b76e470f3b013df95dd47f124"
+
+[tests.powertop-fedora-tmt]
+type = "tmt"
+
+[tests.powertop-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.powertop-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/powertop.git"
+ref = "ded9c59c6bfca27d375db3b59fe4487e50f8dadc"
