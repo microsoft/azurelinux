@@ -1,0 +1,2 @@
+[components.xxhash]
+tests.tests = [{ name = "xxhash-fedora-tmt" }]

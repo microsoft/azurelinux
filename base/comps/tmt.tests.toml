@@ -842,3 +842,13 @@ plan = "/plans/all"
 [tests.valgrind-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/valgrind.git"
 ref = "d071621a56c9a752d1c5941abed193994860a1be"
+
+[tests.xxhash-fedora-tmt]
+type = "tmt"
+
+[tests.xxhash-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.xxhash-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/xxhash.git"
+ref = "369cf008a99cd1434d9d9838b9184cf0a4d5ebb0"
