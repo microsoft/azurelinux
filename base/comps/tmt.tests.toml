@@ -282,3 +282,13 @@ plan = "/plans/ci"
 [tests.dejagnu-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/dejagnu.git"
 ref = "a2d0fb76edbf77f391198e2f27cf9fdc0f6d2236"
+
+[tests.delve-fedora-tmt]
+type = "tmt"
+
+[tests.delve-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.delve-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/delve.git"
+ref = "8f6693ac34f90642731b2d761d7757a54b3da733"
