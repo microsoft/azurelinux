@@ -612,3 +612,13 @@ plan = "/plans/tier1"
 [tests.postfix-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/postfix.git"
 ref = "62f9cdeb146638162fa25d50ad357b07e748de1a"
+
+[tests.postgresql-jdbc-fedora-tmt]
+type = "tmt"
+
+[tests.postgresql-jdbc-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.postgresql-jdbc-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/postgresql-jdbc.git"
+ref = "022558f40cb0c78b76e470f3b013df95dd47f124"

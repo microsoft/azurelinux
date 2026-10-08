@@ -1,0 +1,2 @@
+[components.postgresql-jdbc]
+tests.tests = [{ name = "postgresql-jdbc-fedora-tmt" }]
