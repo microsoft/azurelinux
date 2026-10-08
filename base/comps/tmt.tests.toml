@@ -992,3 +992,13 @@ plan = "/plans/main"
 [tests.maven-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/maven.git"
 ref = "ebc6c773e5f3579d49bf733af5b7cbde892ff311"
+
+[tests.mesa-fedora-tmt]
+type = "tmt"
+
+[tests.mesa-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.mesa-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/mesa.git"
+ref = "72621741630b70bb5586c664b58e93664f7894cd"

@@ -1,4 +1,5 @@
 [components.mesa]
+tests.tests = [{ name = "mesa-fedora-tmt" }]
 
 # Use RHEL-like feature set: disable GPU drivers and features not relevant
 # for a cloud/server distro (teflon, opencl, asahi, d3d12, embedded ARM GPUs,
