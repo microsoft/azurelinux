@@ -232,3 +232,13 @@ plan = "/plans/all"
 [tests.bzip2-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/bzip2.git"
 ref = "fb0a8b24582b2b4b168d9503f36709aee8d07cd1"
+
+[tests.chan-fedora-tmt]
+type = "tmt"
+
+[tests.chan-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.chan-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/chan.git"
+ref = "f7b836da0ba20c32f2e75706eabc869917cbf36b"

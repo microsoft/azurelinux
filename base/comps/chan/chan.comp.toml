@@ -1,0 +1,2 @@
+[components.chan]
+tests.tests = [{ name = "chan-fedora-tmt" }]
