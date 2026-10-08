@@ -1,1 +1,2 @@
 [components.maven]
+tests.tests = [{ name = "maven-fedora-tmt" }]

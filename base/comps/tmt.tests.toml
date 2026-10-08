@@ -982,3 +982,13 @@ plan = "/plans/build-gating"
 [tests.llvm-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/llvm.git"
 ref = "93dcd9742ede7fc1505e2480e0351b2a2dd86f68"
+
+[tests.maven-fedora-tmt]
+type = "tmt"
+
+[tests.maven-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.maven-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/maven.git"
+ref = "ebc6c773e5f3579d49bf733af5b7cbde892ff311"
