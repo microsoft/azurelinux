@@ -32,6 +32,8 @@ strict class inheritance; a leaf can combine several independent profiles.
 - `VmBaseCore`: boot-neutral VM-base packages.
 - `OnePBase`: boot-neutral first-party packages; requires `VmBaseCore`.
 - `MarketplacePackages`: boot-neutral Marketplace payload.
+- `UkiBootCore`: requires `SystemCore` and `UefiFstab`; supplies shim,
+  systemd-boot, and the packaged virt UKI without selecting cloud policy.
 - `UefiFstab`: supplies the UEFI fstab configuration script.
 - `PackageManagement`: supplies the Azure Linux repository configuration for
   bootstrap and image package management; selected by image leaves.
@@ -44,6 +46,7 @@ Arrows mean "requires"; `+` combines requirements of a leaf:
 StandardCloudCore -> CloudCore -> SystemCore
                   \-> StandardBootCore -> SystemCore
 OnePBase -> VmBaseCore
+UkiBootCore -> SystemCore + UefiFstab
 
 conventional 1P leaves -> PackageManagement + OnePBase + StandardCloudCore
                         + LegacyBoot (Gen1) or UefiBoot (Gen2) [+ Fips]
@@ -55,11 +58,6 @@ MarketplaceBase -> PackageManagement + MarketplacePackages + StandardCloudCore
   and add BIOS or UEFI boot packages.
 - Marketplace leaves share `MarketplaceBase`, not `OnePBase`, and select
   conventional UEFI boot (with optional FIPS).
-
-Shared KIWI hook scripts and `<file>` sources live directly under
-`base/images/`, because that directory is the shared description root. The root
-`config.sh` dispatches profile-specific behavior using `kiwi_profiles`;
-`<file>` entries remain scoped to their owning profile.
 
 The ISO installer remains a standalone description under
 `base/images/vm-iso-installer/` because its distinct composition and workflow
@@ -80,6 +78,18 @@ do not fit naturally into the shared image hierarchy.
 | `<packages type="bootstrap">` | Minimal packages for initial chroot setup |
 | `<containerconfig>` | Container-specific: name, tag, user, workdir, entrypoint |
 | `<type>` | Image format, filesystem, bootloader, kernel cmdline |
+
+### KIWI hook payloads
+
+- Keep the root `base/images/config.sh` as the shared dispatcher based on
+  `kiwi_profiles`; existing root-level hooks stay in place. Put
+  profile-specific rootfs payloads under `base/images/<ProfileName>/`,
+  mirroring their destination paths. KIWI overlays that directory onto the
+  image root only when the named profile is selected; do not add `<file>`
+  entries for these payloads.
+- The `UkiBootCore` overlay supplies `image/stage-uki-boot.sh` and
+  `etc/kernel/entry-token`. The hook stages shim, systemd-boot, and the packaged
+  UKI because KIWI's `systemd_boot` cannot do so.
 
 ## azldev commands
 
