@@ -1022,3 +1022,13 @@ plan = "/plans/ci"
 [tests.pcp-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/pcp.git"
 ref = "1f50166ad92c9b1496baafa2648ef1a50530a43b"
+
+[tests.systemtap-fedora-tmt]
+type = "tmt"
+
+[tests.systemtap-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.systemtap-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/systemtap.git"
+ref = "d7a237c35f9ea1deef0c237b11a5c71d6e927500"
