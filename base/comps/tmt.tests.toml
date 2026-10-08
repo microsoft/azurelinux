@@ -692,3 +692,13 @@ plan = "/plans/tier1"
 [tests.rrdtool-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/rrdtool.git"
 ref = "0f348eabdaaf52df5940a726188d5bba5b125186"
+
+[tests.ruby-fedora-tmt]
+type = "tmt"
+
+[tests.ruby-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.ruby-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ruby.git"
+ref = "935a2a0d1ddd5a1bba576781e6b56e66a3db62a0"

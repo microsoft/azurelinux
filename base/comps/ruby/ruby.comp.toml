@@ -1,0 +1,2 @@
+[components.ruby]
+tests.tests = [{ name = "ruby-fedora-tmt" }]
