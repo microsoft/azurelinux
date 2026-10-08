@@ -1,0 +1,2 @@
+[components.rubygem-cucumber]
+tests.tests = [{ name = "rubygem-cucumber-fedora-tmt" }]

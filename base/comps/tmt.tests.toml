@@ -702,3 +702,13 @@ plan = "/plans/main"
 [tests.ruby-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/ruby.git"
 ref = "935a2a0d1ddd5a1bba576781e6b56e66a3db62a0"
+
+[tests.rubygem-cucumber-fedora-tmt]
+type = "tmt"
+
+[tests.rubygem-cucumber-fedora-tmt.tmt]
+plan = "/plans/cucumber_install"
+
+[tests.rubygem-cucumber-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/rubygem-cucumber.git"
+ref = "60cb7d2fe31fde345f9b0b6186078ba4f48ab8ee"
