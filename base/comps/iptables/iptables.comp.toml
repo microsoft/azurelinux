@@ -1,0 +1,2 @@
+[components.iptables]
+tests.tests = [{ name = "iptables-fedora-tmt" }]
