@@ -682,3 +682,13 @@ plan = "/plans/tier1"
 [tests.qpdf-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/qpdf.git"
 ref = "af70595b48af1d14cefce219e309fe321d33f7a7"
+
+[tests.rrdtool-fedora-tmt]
+type = "tmt"
+
+[tests.rrdtool-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.rrdtool-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/rrdtool.git"
+ref = "0f348eabdaaf52df5940a726188d5bba5b125186"

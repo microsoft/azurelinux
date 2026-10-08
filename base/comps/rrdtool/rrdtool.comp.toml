@@ -1,0 +1,2 @@
+[components.rrdtool]
+tests.tests = [{ name = "rrdtool-fedora-tmt" }]
