@@ -922,3 +922,13 @@ plan = "/plans/ci"
 [tests.cpio-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/cpio.git"
 ref = "afbd7ddc70b064dcd56b67cad025d4675a6e9092"
+
+[tests.firewalld-fedora-tmt]
+type = "tmt"
+
+[tests.firewalld-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.firewalld-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/firewalld.git"
+ref = "56806a8830ccab1b6b978299f21095ac5d48ecc1"
