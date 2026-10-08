@@ -302,3 +302,13 @@ plan = "/plans/tier1"
 [tests.dosfstools-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/dosfstools.git"
 ref = "efc6c823361dafdee20bcc54485f01d451252c54"
+
+[tests.dwz-fedora-tmt]
+type = "tmt"
+
+[tests.dwz-fedora-tmt.tmt]
+plan = "/plans/all_tests"
+
+[tests.dwz-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/dwz.git"
+ref = "595a5352a3691487cb6d4d2c600e94440bbe3965"
