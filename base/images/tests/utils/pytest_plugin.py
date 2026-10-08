@@ -153,9 +153,8 @@ def pytest_configure(config: pytest.Config) -> None:
         caps = parse_capabilities(config.getoption("--capabilities", default=None))
         if caps:
             image_type = derive_image_type_from_capabilities(caps)
-    if image_type is None:
-        if config.getoption("--image-ref", default=None):
-            image_type = "container"
+    if image_type is None and config.getoption("--image-ref", default=None):
+        image_type = "container"
     if image_type is None:
         image_path = config.getoption("--image-path", default=None)
         if image_path:

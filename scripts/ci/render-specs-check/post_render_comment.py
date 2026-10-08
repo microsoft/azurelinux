@@ -174,8 +174,7 @@ def format_comment(
     if content_diffs:
         lines.append("### Content diffs")
         lines.append("")
-        shown = 0
-        for item in content_diffs:
+        for shown, item in enumerate(content_diffs):
             if shown >= MAX_INLINE_DIFFS:
                 remaining = n_diff - shown
                 lines.append(f"*… and {remaining} more file(s). Run the remediation command above to see all changes.*")
@@ -200,7 +199,6 @@ def format_comment(
                 break
             lines.append(block)
             body_so_far += len(block)
-            shown += 1
 
     def _append_file_list(
         header: str,
