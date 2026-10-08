@@ -112,9 +112,11 @@ def _cached_repos() -> list[tuple[str, float]]:
             repos.append((entry.path, entry.stat().st_mtime))
         else:
             # Current layout: _repos_dir/<hostname>/<package>/.git
-            for sub in os.scandir(entry.path):
-                if sub.is_dir() and os.path.isdir(os.path.join(sub.path, ".git")):
-                    repos.append((sub.path, sub.stat().st_mtime))
+            repos.extend(
+                (sub.path, sub.stat().st_mtime)
+                for sub in os.scandir(entry.path)
+                if sub.is_dir() and os.path.isdir(os.path.join(sub.path, ".git"))
+            )
     repos.sort(key=lambda x: x[1])
     return repos
 
