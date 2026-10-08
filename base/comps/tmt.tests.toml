@@ -862,3 +862,13 @@ plan = "/plans/all"
 [tests.zip-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/zip.git"
 ref = "d37f791b9b6cbd480e95174f37622d83cf620000"
+
+[tests.zlib-ng-fedora-tmt]
+type = "tmt"
+
+[tests.zlib-ng-fedora-tmt.tmt]
+plan = "/plans/build-gating"
+
+[tests.zlib-ng-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/zlib-ng.git"
+ref = "08c3b3ace263f6b7d91b1e97798b60f99c763f1c"
