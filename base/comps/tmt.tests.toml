@@ -97,3 +97,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-memcached-all.tmt]
 source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/memcached.git", ref = "8a62fd6a9a3086fef6573e715c08761c4b9e5a74" }
 plan = "/plans/all"
+
+[tests.tmt-net-tools-tier1-public]
+type = "tmt"
+description = "Net-tools public tier-one plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-net-tools-tier1-public.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/net-tools.git", ref = "6b2ffd1b36ad50ee900a4a79f8aaac4dd0136e24" }
+plan = "/plans/tier1/public"
