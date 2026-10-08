@@ -1,4 +1,5 @@
 [components.openscap]
+tests.tests = [{ name = "openscap-fedora-tmt" }]
 # Pin past the default snapshot to correct a previously selected
 # non-first-parent commit on the f43 branch.
 spec = { type = "upstream", upstream-commit = "25ae681cc80c81e5c86418198c04593eca68531f" }

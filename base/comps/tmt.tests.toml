@@ -1002,3 +1002,13 @@ plan = "/plans/all"
 [tests.mesa-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/mesa.git"
 ref = "72621741630b70bb5586c664b58e93664f7894cd"
+
+[tests.openscap-fedora-tmt]
+type = "tmt"
+
+[tests.openscap-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.openscap-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/openscap.git"
+ref = "016433b079bd85911cac35529c460a13fbd29b41"
