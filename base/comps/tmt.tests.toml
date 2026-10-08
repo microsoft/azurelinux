@@ -25,3 +25,39 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-chrony-all.tmt]
 source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/chrony.git", ref = "0bd03b1f3a32ed28a2743882add69f37b33de8bc" }
 plan = "/plans/all"
+
+[tests.tmt-conmon-local-root]
+type = "tmt"
+description = "Conmon coverage through Podman local rootful system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-local-root.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/local-root"
+
+[tests.tmt-conmon-local-rootless]
+type = "tmt"
+description = "Conmon coverage through Podman local rootless system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-local-rootless.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/local-rootless"
+
+[tests.tmt-conmon-remote-root]
+type = "tmt"
+description = "Conmon coverage through Podman remote rootful system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-remote-root.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/remote-root"
+
+[tests.tmt-conmon-remote-rootless]
+type = "tmt"
+description = "Conmon coverage through Podman remote rootless system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-remote-rootless.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/remote-rootless"
