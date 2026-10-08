@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <image>
     <profiles>
-        <profile name="VmBaseCore" description="VM base packages" import="false">
-            <requires profile="CloudCore" />
-        </profile>
+        <profile name="VmBaseCore" description="Boot-neutral VM base packages" import="false" />
     </profiles>
     <packages type="bootstrap" profiles="VmBaseCore">
         <package name="azurelinux-release-cloud" />

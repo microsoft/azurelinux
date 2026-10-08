@@ -17,15 +17,49 @@ description = "Container Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }
 ```
 
-`AzureLinux.kiwi` includes reusable fragments from `repositories/`,
-`components/`, and `teams/`. Includes remain flat in the root description;
-profile requirements express inheritance between fragments.
+### Shared profiles
+
+`AzureLinux.kiwi` includes flat fragments from `repositories/`, `components/`,
+and `teams/`. Their `<requires>` edges form a **profile DAG/composition**, not
+strict class inheritance; a leaf can combine several independent profiles.
+
+- `SystemCore`: shared system packages and services.
+- `CloudCore`: Azure cloud guest userspace; requires `SystemCore`, but selects
+  neither a kernel nor a bootloader.
+- `StandardBootCore`: conventional kernel and GRUB packages; requires `SystemCore`.
+- `StandardCloudCore`: requires `CloudCore` and `StandardBootCore`, adding
+  conventional cloud boot packages (including kernel modules and grubby).
+- `VmBaseCore`: boot-neutral VM-base packages.
+- `OnePBase`: boot-neutral first-party packages; requires `VmBaseCore`.
+- `MarketplacePackages`: boot-neutral Marketplace payload.
+- `UefiFstab`: supplies the UEFI fstab configuration script.
+- `PackageManagement`: supplies the Azure Linux repository configuration for
+  bootstrap and image package management; selected by image leaves.
+
+### Image composition
+
+Arrows mean "requires"; `+` combines requirements of a leaf:
+
+```text
+StandardCloudCore -> CloudCore -> SystemCore
+                  \-> StandardBootCore -> SystemCore
+OnePBase -> VmBaseCore
+
+conventional 1P leaves -> PackageManagement + OnePBase + StandardCloudCore
+                        + LegacyBoot (Gen1) or UefiBoot (Gen2) [+ Fips]
+Marketplace leaves -> MarketplaceBase + UefiBoot [+ Fips]
+MarketplaceBase -> PackageManagement + MarketplacePackages + StandardCloudCore
+```
+
+- Conventional 1P leaves use GRUB/the standard kernel via `StandardCloudCore`
+  and add BIOS or UEFI boot packages.
+- Marketplace leaves share `MarketplaceBase`, not `OnePBase`, and select
+  conventional UEFI boot (with optional FIPS).
 
 Shared KIWI hook scripts and `<file>` sources live directly under
 `base/images/`, because that directory is the shared description root. The root
-`config.sh` dispatches profile-specific behavior using `kiwi_profiles`,
-following Fedora's shared-description model. `<file>` entries remain scoped to
-the owning profile so their payloads do not leak into other images.
+`config.sh` dispatches profile-specific behavior using `kiwi_profiles`;
+`<file>` entries remain scoped to their owning profile.
 
 The ISO installer remains a standalone description under
 `base/images/vm-iso-installer/` because its distinct composition and workflow

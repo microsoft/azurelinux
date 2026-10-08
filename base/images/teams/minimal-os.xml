@@ -2,7 +2,7 @@
 <image>
     <profiles>
         <profile name="MinimalOsCore" description="Minimal OS packages" import="false">
-            <requires profile="BootableCore" />
+            <requires profile="StandardBootCore" />
         </profile>
         <profile name="minimal-os" description="Azure Linux Minimal OS Image" import="false">
             <requires profile="PackageManagement" />

@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <image>
     <profiles>
-        <profile name="BootableCore" description="Packages shared by every bootable image" import="false" />
-        <profile name="CloudCore" description="Packages shared by Azure guest images" import="false">
-            <requires profile="BootableCore" />
+        <profile name="SystemCore" description="Shared system packages" import="false" />
+        <profile name="StandardBootCore" description="Standard kernel and GRUB packages" import="false">
+            <requires profile="SystemCore" />
+        </profile>
+        <profile name="CloudCore" description="Boot-neutral Azure cloud guest packages" import="false">
+            <requires profile="SystemCore" />
+        </profile>
+        <profile name="StandardCloudCore" description="Conventional bootable Azure cloud packages" import="false">
+            <requires profile="CloudCore" />
+            <requires profile="StandardBootCore" />
         </profile>
         <profile name="PackageManagement" description="Runtime package management configuration" import="false" />
     </profiles>
-    <packages type="bootstrap" profiles="BootableCore">
+    <packages type="bootstrap" profiles="SystemCore">
         <package name="filesystem" />
     </packages>
-    <packages type="image" profiles="BootableCore">
+    <packages type="image" profiles="SystemCore">
         <package name="bash" />
         <package name="ca-certificates" />
         <package name="dnf5" />
-        <package name="grub2" />
         <package name="iproute" />
-        <package name="kernel" />
         <package name="shadow-utils" />
         <package name="systemd" />
         <package name="systemd-networkd" />
         <package name="systemd-resolved" />
         <package name="util-linux" />
+    </packages>
+    <packages type="image" profiles="StandardBootCore">
+        <package name="grub2" />
+        <package name="kernel" />
     </packages>
     <packages type="image" profiles="CloudCore">
         <package name="WALinuxAgent" />
@@ -35,12 +44,10 @@
         <package name="file" />
         <package name="glibc" />
         <package name="glibc-langpack-en" />
-        <package name="grubby" />
         <package name="gzip" />
         <package name="hyperv-daemons" />
         <package name="iputils" />
         <package name="irqbalance" />
-        <package name="kernel-modules" />
         <package name="lvm2" />
         <package name="lz4" />
         <package name="net-tools" />
@@ -54,6 +61,10 @@
         <package name="wget" />
         <package name="which" />
         <package name="zlib" />
+    </packages>
+    <packages type="image" profiles="StandardCloudCore">
+        <package name="grubby" />
+        <package name="kernel-modules" />
     </packages>
     <packages type="image" profiles="PackageManagement">
         <package name="azurelinux-repos" />
