@@ -722,3 +722,13 @@ plan = "/plans/tier1"
 [tests.sendmail-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/sendmail.git"
 ref = "1801f8629e60e9a6c76d4356f8b1caf9a99d52e7"
+
+[tests.setup-fedora-tmt]
+type = "tmt"
+
+[tests.setup-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.setup-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/setup.git"
+ref = "c71e0d83888b9a5d932a68570e864423bab35a64"

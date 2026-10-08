@@ -1,0 +1,2 @@
+[components.setup]
+tests.tests = [{ name = "setup-fedora-tmt" }]
