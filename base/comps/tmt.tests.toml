@@ -562,3 +562,13 @@ plan = "/plans/tier1"
 [tests.minicom-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/minicom.git"
 ref = "6623da2ce7c7593acf743112458ccbedcb94c507"
+
+[tests.mod_wsgi-fedora-tmt]
+type = "tmt"
+
+[tests.mod_wsgi-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.mod_wsgi-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/mod_wsgi.git"
+ref = "0492619ddb2c4a4548af1c4f53c879a566421b0b"

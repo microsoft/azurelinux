@@ -1,0 +1,2 @@
+[components.mod_wsgi]
+tests.tests = [{ name = "mod_wsgi-fedora-tmt" }]
