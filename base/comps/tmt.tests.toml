@@ -742,3 +742,13 @@ plan = "/plans/main"
 [tests.sqlite-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/sqlite.git"
 ref = "ef72f58db90f61bdbfe8696bbc08f832916b8230"
+
+[tests.squid-fedora-tmt]
+type = "tmt"
+
+[tests.squid-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.squid-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/squid.git"
+ref = "b2cfc5919d8b48ae7e65c8ddb85d34759c5f2aa0"
