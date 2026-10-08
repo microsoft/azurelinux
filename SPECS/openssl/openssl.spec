@@ -67,6 +67,10 @@ Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 # If OpenSSL updates speed to be FIPS-tolerant, remove this patch.
 Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
 Patch83:  Allow-NULL-buffer-with-0-bsize.patch
+Patch84:  0118-Add-a-red-black-tree-implementation.patch
+Patch85:  0119-Add-ossl_list_TYPE_join-function.patch
+Patch86:  0120-Add-value_barrier_bn-constant-time-helper.patch
+Patch87:  0121-quic-move-the-RXE-definition-to-a-local-header.patch
 Patch100: CVE-2026-31791.patch
 Patch101: CVE-2026-34182.patch
 Patch102: CVE-2026-34180.patch

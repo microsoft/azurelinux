@@ -1,0 +1,58 @@
+From aaa1bda7187c8d920cf9e426c2cf8ec7c1c65576 Mon Sep 17 00:00:00 2001
+From: Andrew Golovashevich <tankist.scratch.p@gmail.com>
+Date: Sun, 5 May 2024 14:27:26 +0300
+Subject: [PATCH] Optimizated calculation of shared power of 2 in bn_gcd
+
+Reviewed-by: Paul Dale <ppzgs1@gmail.com>
+Reviewed-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
+Reviewed-by: Tomas Mraz <tomas@openssl.org>
+(Merged from https://github.com/openssl/openssl/pull/24332)
+
+[Azure Linux note] Only the include/internal/constant_time.h portion of the
+upstream commit is carried here. It supplies value_barrier_bn(), which
+CVE-2026-54872.patch needs for bn_set_top_fixed(); openssl-3.3.7 predates it.
+The crypto/bn/bn_gcd.c optimisation from the same commit is unrelated to the
+CVE fixes and is deliberately not backported.
+Signed-off-by: Azure Linux Security Servicing Account <azurelinux-security@microsoft.com>
+Upstream-reference: https://github.com/openssl/openssl/commit/aaa1bda7187c8d920cf9e426c2cf8ec7c1c65576.patch
+---
+ crypto/bn/bn_gcd.c               | 34 +++++++++++++++++++++-----------
+ include/internal/constant_time.h | 18 +++++++++++++++++
+ 2 files changed, 41 insertions(+), 11 deletions(-)
+
+diff --git a/include/internal/constant_time.h b/include/internal/constant_time.h
+index f2572ded51998..9ffa4399a357f 100644
+--- a/include/internal/constant_time.h
++++ b/include/internal/constant_time.h
+@@ -141,6 +141,17 @@ static ossl_inline uint64_t constant_time_lt_64(uint64_t a, uint64_t b)
+ }
+ 
+ #ifdef BN_ULONG
++static ossl_inline BN_ULONG value_barrier_bn(BN_ULONG a)
++{
++#if !defined(OPENSSL_NO_ASM) && defined(__GNUC__)
++    BN_ULONG r;
++    __asm__("" : "=r"(r) : "0"(a));
++#else
++    volatile BN_ULONG r = a;
++#endif
++    return r;
++}
++
+ static ossl_inline BN_ULONG constant_time_msb_bn(BN_ULONG a)
+ {
+     return 0 - (a >> (sizeof(a) * 8 - 1));
+@@ -161,6 +172,13 @@ static ossl_inline BN_ULONG constant_time_eq_bn(BN_ULONG a,
+ {
+     return constant_time_is_zero_bn(a ^ b);
+ }
++
++static ossl_inline BN_ULONG constant_time_select_bn(BN_ULONG mask,
++                                                    BN_ULONG a,
++                                                    BN_ULONG b)
++{
++    return (value_barrier_bn(mask) & a) | (value_barrier_bn(~mask) & b);
++}
+ #endif
+ 
+ static ossl_inline unsigned int constant_time_ge(unsigned int a,
