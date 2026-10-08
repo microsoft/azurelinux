@@ -332,3 +332,13 @@ plan = "/plans/main"
 [tests.gdbm-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/gdbm.git"
 ref = "f97210dfda65a977ef5583ea270aeda3336c0f62"
+
+[tests.ghostscript-fedora-tmt]
+type = "tmt"
+
+[tests.ghostscript-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.ghostscript-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ghostscript.git"
+ref = "70f18f79d374396213d54286be9900bd2ff015f7"
