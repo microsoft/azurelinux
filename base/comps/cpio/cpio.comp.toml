@@ -1,1 +1,2 @@
 [components.cpio]
+tests.tests = [{ name = "cpio-fedora-tmt" }]

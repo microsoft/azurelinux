@@ -1,0 +1,2 @@
+[components.mutt]
+tests.tests = [{ name = "mutt-fedora-tmt" }]

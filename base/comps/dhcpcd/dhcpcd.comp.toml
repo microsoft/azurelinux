@@ -1,0 +1,2 @@
+[components.dhcpcd]
+tests.tests = [{ name = "tmt-dhcpcd-all" }]

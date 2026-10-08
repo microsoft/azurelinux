@@ -1,0 +1,2 @@
+[components.valgrind]
+tests.tests = [{ name = "valgrind-fedora-tmt" }]

@@ -1,0 +1,2 @@
+[components.acpid]
+tests.tests = [{ name = "acpid-fedora-tmt" }]

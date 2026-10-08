@@ -1,0 +1,2 @@
+[components.gsm]
+tests.tests = [{ name = "gsm-fedora-tmt" }]

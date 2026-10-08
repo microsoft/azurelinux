@@ -1,0 +1,2 @@
+[components.libcupsfilters]
+tests.tests = [{ name = "libcupsfilters-fedora-tmt" }]

@@ -1,0 +1,2 @@
+[components.powertop]
+tests.tests = [{ name = "powertop-fedora-tmt" }]

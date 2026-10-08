@@ -1,0 +1,2 @@
+[components.ansible-pcp]
+tests.tests = [{ name = "ansible-pcp-fedora-tmt" }]

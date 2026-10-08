@@ -1,0 +1,1048 @@
+# TMT package-test catalog. Sources are pinned so reruns use the same upstream
+# metadata revision instead of a moving branch head. Independent test
+# repositories are pinned to their own maintained default branch because they
+# do not carry Fedora release branches.
+#
+# Only tests whose plan lives outside a component's own dist-git repo are
+# pinned here. When the plan lives in the package's own dist-git repo,
+# 'azldev component test --source-dir' runs it directly from the prepared
+# dist-git source, so no catalog entry is needed.
+#
+# All [tests.<name>] definitions live in this file only. A component with a
+# test association always has its own <name>.comp.toml (never inline in
+# components.toml), and that file carries just the association, e.g.
+# `tests.tests = [{ name = "<name>-fedora-tmt" }]` — never duplicate the
+# [tests.<name>] definition block in a component file.
+#
+# The entries below marked "manually maintained" were NOT produced by a
+# checked-in generator. Each `ref` is the target test repo's default-branch
+# HEAD commit at the time the entry was added, resolved by hand with
+# `git ls-remote <git-url> HEAD` and pasted in; `plan` was picked by manually
+# inspecting `tmt plan ls` output for that repo. To refresh a stale ref,
+# re-run `git ls-remote <git-url> HEAD` and update it in place — there is no
+# regeneration command.
+
+[tests.tmt-bash]
+type = "tmt"
+description = "Bash shell functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-bash.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/shell.git", ref = "50c3a1ba7f9cc753440bf8d3395bfac02448c8ba" }
+plan = "/plans/bash"
+
+[tests.tmt-chrony-all]
+type = "tmt"
+description = "Chrony upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-chrony-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/chrony.git", ref = "0bd03b1f3a32ed28a2743882add69f37b33de8bc" }
+plan = "/plans/all"
+
+[tests.tmt-conmon-local-root]
+type = "tmt"
+description = "Conmon coverage through Podman local rootful system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-local-root.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/local-root"
+
+[tests.tmt-conmon-local-rootless]
+type = "tmt"
+description = "Conmon coverage through Podman local rootless system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-local-rootless.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/local-rootless"
+
+[tests.tmt-conmon-remote-root]
+type = "tmt"
+description = "Conmon coverage through Podman remote rootful system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-remote-root.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/remote-root"
+
+[tests.tmt-conmon-remote-rootless]
+type = "tmt"
+description = "Conmon coverage through Podman remote rootless system plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-conmon-remote-rootless.tmt]
+source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
+plan = "/plans/system/remote-rootless"
+
+[tests.tmt-dhcpcd-all]
+type = "tmt"
+description = "Dhcpcd upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-dhcpcd-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/dhcpcd.git", ref = "c9d18d35e12e41cf9045416a1cf37fecc4a26c9c" }
+plan = "/plans/all"
+
+[tests.tmt-hostname-all]
+type = "tmt"
+description = "Hostname upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-hostname-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/hostname.git", ref = "4aab6d5718c252dcf6fc7fe975c8caaa10b5acf9" }
+plan = "/plans/all"
+
+[tests.tmt-selinux-tier1]
+type = "tmt"
+description = "SELinux and SELinux policy tier-one functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-selinux-tier1.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/selinux.git", ref = "534e38f96fde1c88ae9881ffea6c9fc592e82c71" }
+plan = "/plans/tier1"
+
+[tests.tmt-memcached-all]
+type = "tmt"
+description = "Memcached upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-memcached-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/memcached.git", ref = "8a62fd6a9a3086fef6573e715c08761c4b9e5a74" }
+plan = "/plans/all"
+
+[tests.tmt-net-tools-tier1-public]
+type = "tmt"
+description = "Net-tools public tier-one plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-net-tools-tier1-public.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/net-tools.git", ref = "6b2ffd1b36ad50ee900a4a79f8aaac4dd0136e24" }
+plan = "/plans/tier1/public"
+
+[tests.tmt-nodejs-all]
+type = "tmt"
+description = "Node.js upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-nodejs-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/nodejs.git", ref = "ecbe2863fa18304cfad9c9f5b0f35e189bd8887e" }
+plan = "/plans/all"
+
+[tests.tmt-php-all]
+type = "tmt"
+description = "PHP upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-php-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/php.git", ref = "16d1ba5dae51781387e52ea79e5a869c12c0a789" }
+plan = "/plans/all"
+
+[tests.tmt-rust-all]
+type = "tmt"
+description = "Rust upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-rust-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/rust.git", ref = "804bb6656719e3084b8a997ae61fb9b91fc96b19" }
+plan = "/plans/all"
+
+[tests.tmt-skopeo]
+type = "tmt"
+description = "Skopeo system test plans"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-skopeo.tmt]
+source = { git-url = "https://github.com/containers/skopeo.git", ref = "23dddaad3d8f86f8c1d3204646b14aa0da86a85e" }
+plan = "/plans"
+
+[tests.tmt-systemd-ci]
+type = "tmt"
+description = "Systemd continuous-integration plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-systemd-ci.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/systemd.git", ref = "531c815646006b8503e547f2da10862426d1d5b4" }
+plan = "/plans/ci"
+
+# --- Fedora upstream tmt test definitions (manually maintained) ---
+[tests.acpid-fedora-tmt]
+type = "tmt"
+
+[tests.acpid-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.acpid-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/acpid.git"
+ref = "22eae2841d62e32741ea66db83e906204c25c500"
+
+[tests.adobe-mappings-cmap-fedora-tmt]
+type = "tmt"
+
+[tests.adobe-mappings-cmap-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.adobe-mappings-cmap-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/adobe-mappings-cmap.git"
+ref = "981ac889cf19c15720a4d084c8bf76170ee2ee76"
+
+[tests.adobe-mappings-pdf-fedora-tmt]
+type = "tmt"
+
+[tests.adobe-mappings-pdf-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.adobe-mappings-pdf-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/adobe-mappings-pdf.git"
+ref = "b88ac1409bc2060515ce30010a29e327c92e87d4"
+
+[tests.annobin-fedora-tmt]
+type = "tmt"
+
+[tests.annobin-fedora-tmt.tmt]
+plan = "/plans/all_tests"
+
+[tests.annobin-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/annobin.git"
+ref = "8888b3b86a15a7cc3160de817307ad292f891a63"
+
+[tests.ansible-pcp-fedora-tmt]
+type = "tmt"
+
+[tests.ansible-pcp-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.ansible-pcp-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ansible-pcp.git"
+ref = "67d372e211cd20c6ce768d2da62d8650f186370e"
+
+[tests.binutils-fedora-tmt]
+type = "tmt"
+
+[tests.binutils-fedora-tmt.tmt]
+plan = "/plans/build-gating"
+
+[tests.binutils-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/binutils.git"
+ref = "542e13fc390ee8c8144b83bd97a3dcd16d57c1e8"
+
+[tests.brltty-fedora-tmt]
+type = "tmt"
+
+[tests.brltty-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.brltty-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/brltty.git"
+ref = "c16a4cddecec76487d6ad106b3e99efb77921744"
+
+[tests.bzip2-fedora-tmt]
+type = "tmt"
+
+[tests.bzip2-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.bzip2-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/bzip2.git"
+ref = "fb0a8b24582b2b4b168d9503f36709aee8d07cd1"
+
+[tests.chan-fedora-tmt]
+type = "tmt"
+
+[tests.chan-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.chan-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/chan.git"
+ref = "f7b836da0ba20c32f2e75706eabc869917cbf36b"
+
+[tests.chrpath-fedora-tmt]
+type = "tmt"
+
+[tests.chrpath-fedora-tmt.tmt]
+plan = "/plans/all_tests"
+
+[tests.chrpath-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/chrpath.git"
+ref = "11be21a8aa1cf46c309bfe6e7feff49ca0ab3052"
+
+[tests.cups-fedora-tmt]
+type = "tmt"
+
+[tests.cups-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.cups-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/cups.git"
+ref = "21a53d0fa88229954bd2cff5cc739c125acfd3f9"
+
+[tests.cups-filters-fedora-tmt]
+type = "tmt"
+
+[tests.cups-filters-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.cups-filters-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/cups-filters.git"
+ref = "3aa8e6604901aaade9c417f72b1abf82fc28c024"
+
+[tests.dejagnu-fedora-tmt]
+type = "tmt"
+
+[tests.dejagnu-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.dejagnu-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/dejagnu.git"
+ref = "a2d0fb76edbf77f391198e2f27cf9fdc0f6d2236"
+
+[tests.delve-fedora-tmt]
+type = "tmt"
+
+[tests.delve-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.delve-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/delve.git"
+ref = "8f6693ac34f90642731b2d761d7757a54b3da733"
+
+[tests.dosfstools-fedora-tmt]
+type = "tmt"
+
+[tests.dosfstools-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.dosfstools-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/dosfstools.git"
+ref = "efc6c823361dafdee20bcc54485f01d451252c54"
+
+[tests.dwz-fedora-tmt]
+type = "tmt"
+
+[tests.dwz-fedora-tmt.tmt]
+plan = "/plans/all_tests"
+
+[tests.dwz-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/dwz.git"
+ref = "595a5352a3691487cb6d4d2c600e94440bbe3965"
+
+[tests.gawk-fedora-tmt]
+type = "tmt"
+
+[tests.gawk-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.gawk-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/gawk.git"
+ref = "da3dad143964e4b08f4666ea79108c65813537b4"
+
+[tests.gdbm-fedora-tmt]
+type = "tmt"
+
+[tests.gdbm-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.gdbm-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/gdbm.git"
+ref = "f97210dfda65a977ef5583ea270aeda3336c0f62"
+
+[tests.ghostscript-fedora-tmt]
+type = "tmt"
+
+[tests.ghostscript-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.ghostscript-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ghostscript.git"
+ref = "70f18f79d374396213d54286be9900bd2ff015f7"
+
+[tests.go-rpm-macros-fedora-tmt]
+type = "tmt"
+
+[tests.go-rpm-macros-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.go-rpm-macros-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/go-rpm-macros.git"
+ref = "fce89690378a25f6a200615f54b300e6d4e776d7"
+
+[tests.grafana-fedora-tmt]
+type = "tmt"
+
+[tests.grafana-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.grafana-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/grafana.git"
+ref = "3a4e39d9a3126faaca4a5dd0672df713d41594b4"
+
+[tests.graphviz-fedora-tmt]
+type = "tmt"
+
+[tests.graphviz-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.graphviz-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/graphviz.git"
+ref = "5d5c1eb9d816086a1d47bb078c6241e61a0f9377"
+
+[tests.grep-fedora-tmt]
+type = "tmt"
+
+[tests.grep-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.grep-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/grep.git"
+ref = "70491a251a59ae18acc11dc434bda650e6027624"
+
+[tests.gsm-fedora-tmt]
+type = "tmt"
+
+[tests.gsm-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.gsm-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/gsm.git"
+ref = "3cf7cd4043d81650793a3a3b663ec6b743a82f95"
+
+[tests.gzip-fedora-tmt]
+type = "tmt"
+
+[tests.gzip-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.gzip-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/gzip.git"
+ref = "0b737db0b0c71b973f1f2cd84cbfae316faba320"
+
+[tests.i2c-tools-fedora-tmt]
+type = "tmt"
+
+[tests.i2c-tools-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.i2c-tools-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/i2c-tools.git"
+ref = "d9163f7660b40ec69d23c3ba93a97ece53317572"
+
+[tests.iptables-fedora-tmt]
+type = "tmt"
+
+[tests.iptables-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.iptables-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/iptables.git"
+ref = "07708c7f965440ac116b148a03a0854814b6069b"
+
+[tests.irssi-fedora-tmt]
+type = "tmt"
+
+[tests.irssi-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.irssi-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/irssi.git"
+ref = "17c248bf8a222561903c816692f181f330496b82"
+
+[tests.libcpuid-fedora-tmt]
+type = "tmt"
+
+[tests.libcpuid-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libcpuid-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libcpuid.git"
+ref = "b18acc0ff7a57d37fa8a62a3743d7d1ac5c18ff0"
+
+[tests.libcupsfilters-fedora-tmt]
+type = "tmt"
+
+[tests.libcupsfilters-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libcupsfilters-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libcupsfilters.git"
+ref = "1620136f673e9c7fe6fc00dcbbd43d713f0684fa"
+
+[tests.libevent-fedora-tmt]
+type = "tmt"
+
+[tests.libevent-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libevent-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libevent.git"
+ref = "f6ed53cac565f95518645f0b5edde1cbfbbe110a"
+
+[tests.libijs-fedora-tmt]
+type = "tmt"
+
+[tests.libijs-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libijs-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libijs.git"
+ref = "ec6ed3dc728f4c7d92b7f5cfaabdfccac2daba79"
+
+[tests.liblockfile-fedora-tmt]
+type = "tmt"
+
+[tests.liblockfile-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.liblockfile-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/liblockfile.git"
+ref = "5052941eb69971b198e010cbe4f7ef92b495dbef"
+
+[tests.libmpc-fedora-tmt]
+type = "tmt"
+
+[tests.libmpc-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.libmpc-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libmpc.git"
+ref = "bc669faadc36ee5eb17fba98332fd989d0369013"
+
+[tests.libppd-fedora-tmt]
+type = "tmt"
+
+[tests.libppd-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libppd-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libppd.git"
+ref = "d7b7537f37325800a47aa554524f4aeacbf60336"
+
+[tests.libshout-fedora-tmt]
+type = "tmt"
+
+[tests.libshout-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libshout-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libshout.git"
+ref = "093a5921a0308060e9b4cbc4bd171473178a2d7e"
+
+[tests.lm_sensors-fedora-tmt]
+type = "tmt"
+
+[tests.lm_sensors-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.lm_sensors-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/lm_sensors.git"
+ref = "750faca3655d1f465dc585b249064fda0ab209bb"
+
+[tests.lockdev-fedora-tmt]
+type = "tmt"
+
+[tests.lockdev-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.lockdev-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/lockdev.git"
+ref = "3fe85f9d9654dd097dadda7d3c03a74f32584e5d"
+
+[tests.lzo-fedora-tmt]
+type = "tmt"
+
+[tests.lzo-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.lzo-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/lzo.git"
+ref = "ea84a0c28f290209025fa1fddc72514880508179"
+
+[tests.mariadb-java-client-fedora-tmt]
+type = "tmt"
+
+[tests.mariadb-java-client-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.mariadb-java-client-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/mariadb-java-client.git"
+ref = "805036413154ab2266199352b14c2286a24d934d"
+
+[tests.minicom-fedora-tmt]
+type = "tmt"
+
+[tests.minicom-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.minicom-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/minicom.git"
+ref = "6623da2ce7c7593acf743112458ccbedcb94c507"
+
+[tests.mod_wsgi-fedora-tmt]
+type = "tmt"
+
+[tests.mod_wsgi-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.mod_wsgi-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/mod_wsgi.git"
+ref = "0492619ddb2c4a4548af1c4f53c879a566421b0b"
+
+[tests.mutt-fedora-tmt]
+type = "tmt"
+
+[tests.mutt-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.mutt-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/mutt.git"
+ref = "36ec41b511798a2609464d186f6f48b91357f83d"
+
+[tests.nasm-fedora-tmt]
+type = "tmt"
+
+[tests.nasm-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.nasm-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/nasm.git"
+ref = "ba3455d13c27d87b03092b5b4a5776546079173b"
+
+[tests.nginx-fedora-tmt]
+type = "tmt"
+
+[tests.nginx-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.nginx-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/nginx.git"
+ref = "2c2dd401934f2f2daeccf1924f2c8a520b1bc362"
+
+[tests.postfix-fedora-tmt]
+type = "tmt"
+
+[tests.postfix-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.postfix-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/postfix.git"
+ref = "62f9cdeb146638162fa25d50ad357b07e748de1a"
+
+[tests.postgresql-jdbc-fedora-tmt]
+type = "tmt"
+
+[tests.postgresql-jdbc-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.postgresql-jdbc-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/postgresql-jdbc.git"
+ref = "022558f40cb0c78b76e470f3b013df95dd47f124"
+
+[tests.powertop-fedora-tmt]
+type = "tmt"
+
+[tests.powertop-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.powertop-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/powertop.git"
+ref = "ded9c59c6bfca27d375db3b59fe4487e50f8dadc"
+
+[tests.ppp-fedora-tmt]
+type = "tmt"
+
+[tests.ppp-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.ppp-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ppp.git"
+ref = "b6acea76553652178a7f40b6cbb365e6618ab773"
+
+[tests.pptp-fedora-tmt]
+type = "tmt"
+
+[tests.pptp-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.pptp-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/pptp.git"
+ref = "802be74ad518dc947849038f1c7d3a652f399f00"
+
+[tests.procmail-fedora-tmt]
+type = "tmt"
+
+[tests.procmail-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.procmail-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/procmail.git"
+ref = "9c3e64417710a09212c1f828f9016e7e3743f7a2"
+
+[tests.python-pyudev-fedora-tmt]
+type = "tmt"
+
+[tests.python-pyudev-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.python-pyudev-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/python-pyudev.git"
+ref = "4188a3fd790832466820377a03c4c21ef56ebadf"
+
+[tests.qpdf-fedora-tmt]
+type = "tmt"
+
+[tests.qpdf-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.qpdf-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/qpdf.git"
+ref = "af70595b48af1d14cefce219e309fe321d33f7a7"
+
+[tests.rrdtool-fedora-tmt]
+type = "tmt"
+
+[tests.rrdtool-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.rrdtool-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/rrdtool.git"
+ref = "0f348eabdaaf52df5940a726188d5bba5b125186"
+
+[tests.ruby-fedora-tmt]
+type = "tmt"
+
+[tests.ruby-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.ruby-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ruby.git"
+ref = "935a2a0d1ddd5a1bba576781e6b56e66a3db62a0"
+
+[tests.rubygem-cucumber-fedora-tmt]
+type = "tmt"
+
+[tests.rubygem-cucumber-fedora-tmt.tmt]
+plan = "/plans/cucumber_install"
+
+[tests.rubygem-cucumber-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/rubygem-cucumber.git"
+ref = "60cb7d2fe31fde345f9b0b6186078ba4f48ab8ee"
+
+[tests.sendmail-fedora-tmt]
+type = "tmt"
+
+[tests.sendmail-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.sendmail-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/sendmail.git"
+ref = "1801f8629e60e9a6c76d4356f8b1caf9a99d52e7"
+
+[tests.setup-fedora-tmt]
+type = "tmt"
+
+[tests.setup-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.setup-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/setup.git"
+ref = "c71e0d83888b9a5d932a68570e864423bab35a64"
+
+[tests.sqlite-fedora-tmt]
+type = "tmt"
+
+[tests.sqlite-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.sqlite-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/sqlite.git"
+ref = "ef72f58db90f61bdbfe8696bbc08f832916b8230"
+
+[tests.squid-fedora-tmt]
+type = "tmt"
+
+[tests.squid-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.squid-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/squid.git"
+ref = "b2cfc5919d8b48ae7e65c8ddb85d34759c5f2aa0"
+
+[tests.tar-fedora-tmt]
+type = "tmt"
+
+[tests.tar-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.tar-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tar.git"
+ref = "6ac392b91525a1e865b20ccaa0f343cd78ee1480"
+
+[tests.tbb-fedora-tmt]
+type = "tmt"
+
+[tests.tbb-fedora-tmt.tmt]
+plan = "/plans/all_tests"
+
+[tests.tbb-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tbb.git"
+ref = "311f35e2c3186a210760436ad653c3e833535ed5"
+
+[tests.tcl-fedora-tmt]
+type = "tmt"
+
+[tests.tcl-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.tcl-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tcl.git"
+ref = "a3855eeb02f99ba201d900e4384caef338502811"
+
+[tests.tinycdb-fedora-tmt]
+type = "tmt"
+
+[tests.tinycdb-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.tinycdb-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tinycdb.git"
+ref = "01b38a36b24251f402f36e2d5555cdbf8aaccc0f"
+
+[tests.tk-fedora-tmt]
+type = "tmt"
+
+[tests.tk-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.tk-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tk.git"
+ref = "08dea588a071ec4206c9b290075dee328a9ffc93"
+
+[tests.tomcat-fedora-tmt]
+type = "tmt"
+
+[tests.tomcat-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.tomcat-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/tomcat.git"
+ref = "2490409e3d2e76cf5129ef1f2eab2f24475aae8c"
+
+[tests.unzip-fedora-tmt]
+type = "tmt"
+
+[tests.unzip-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.unzip-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/unzip.git"
+ref = "c7bc42ed598affdacc079e34b62bfcb056ddb6e6"
+
+[tests.urw-base35-fonts-fedora-tmt]
+type = "tmt"
+
+[tests.urw-base35-fonts-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.urw-base35-fonts-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/urw-base35-fonts.git"
+ref = "c44124d0eb2eb73fef1befb860fa28cc31edbbd8"
+
+[tests.valgrind-fedora-tmt]
+type = "tmt"
+
+[tests.valgrind-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.valgrind-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/valgrind.git"
+ref = "d071621a56c9a752d1c5941abed193994860a1be"
+
+[tests.xxhash-fedora-tmt]
+type = "tmt"
+
+[tests.xxhash-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.xxhash-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/xxhash.git"
+ref = "369cf008a99cd1434d9d9838b9184cf0a4d5ebb0"
+
+[tests.zip-fedora-tmt]
+type = "tmt"
+
+[tests.zip-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.zip-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/zip.git"
+ref = "d37f791b9b6cbd480e95174f37622d83cf620000"
+
+[tests.zlib-ng-fedora-tmt]
+type = "tmt"
+
+[tests.zlib-ng-fedora-tmt.tmt]
+plan = "/plans/build-gating"
+
+[tests.zlib-ng-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/zlib-ng.git"
+ref = "08c3b3ace263f6b7d91b1e97798b60f99c763f1c"
+
+[tests.sscg-fedora-tmt]
+type = "tmt"
+
+[tests.sscg-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.sscg-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/sscg.git"
+ref = "6ef360f9c106a6d7afd0afb0e4af3d956069c02f"
+
+[tests.nftables-fedora-tmt]
+type = "tmt"
+
+[tests.nftables-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.nftables-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/nftables.git"
+ref = "f1323bb67a69f5f8c7e089958fa440de688b0761"
+
+[tests.httpd-fedora-tmt]
+type = "tmt"
+
+[tests.httpd-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.httpd-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/httpd.git"
+ref = "1d1d0fd2d5bfb01725cb065fd4886842d2965439"
+
+[tests.ant-fedora-tmt]
+type = "tmt"
+
+[tests.ant-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.ant-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ant.git"
+ref = "4532f69642b56a23740a368cd60a985f21ee973b"
+
+[tests.cpio-fedora-tmt]
+type = "tmt"
+
+[tests.cpio-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.cpio-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/cpio.git"
+ref = "afbd7ddc70b064dcd56b67cad025d4675a6e9092"
+
+[tests.firewalld-fedora-tmt]
+type = "tmt"
+
+[tests.firewalld-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.firewalld-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/firewalld.git"
+ref = "56806a8830ccab1b6b978299f21095ac5d48ecc1"
+
+[tests.gcc-fedora-tmt]
+type = "tmt"
+
+[tests.gcc-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.gcc-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/gcc.git"
+ref = "f50df6b3649972317dd4697108ed9fc7d83adaf3"
+
+[tests.golang-fedora-tmt]
+type = "tmt"
+
+[tests.golang-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.golang-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/golang.git"
+ref = "1dbd7e668c7d371321d67029fe641f4873b218ef"
+
+[tests.grub2-fedora-tmt]
+type = "tmt"
+
+[tests.grub2-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.grub2-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/grub2.git"
+ref = "6fc7971c4b43a13289743eb52dc961b0ab907619"
+
+[tests.javapackages-tools-fedora-tmt]
+type = "tmt"
+
+[tests.javapackages-tools-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.javapackages-tools-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/javapackages-tools.git"
+ref = "e5fb2470287969b8e9988bfb9c609c681912ca6f"
+
+[tests.llvm-fedora-tmt]
+type = "tmt"
+
+[tests.llvm-fedora-tmt.tmt]
+plan = "/plans/build-gating"
+
+[tests.llvm-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/llvm.git"
+ref = "93dcd9742ede7fc1505e2480e0351b2a2dd86f68"
+
+[tests.maven-fedora-tmt]
+type = "tmt"
+
+[tests.maven-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.maven-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/maven.git"
+ref = "ebc6c773e5f3579d49bf733af5b7cbde892ff311"
+
+[tests.mesa-fedora-tmt]
+type = "tmt"
+
+[tests.mesa-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.mesa-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/mesa.git"
+ref = "72621741630b70bb5586c664b58e93664f7894cd"
+
+[tests.openscap-fedora-tmt]
+type = "tmt"
+
+[tests.openscap-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.openscap-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/openscap.git"
+ref = "016433b079bd85911cac35529c460a13fbd29b41"
+
+[tests.pcp-fedora-tmt]
+type = "tmt"
+
+[tests.pcp-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.pcp-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/pcp.git"
+ref = "1f50166ad92c9b1496baafa2648ef1a50530a43b"
+
+[tests.systemtap-fedora-tmt]
+type = "tmt"
+
+[tests.systemtap-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.systemtap-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/systemtap.git"
+ref = "d7a237c35f9ea1deef0c237b11a5c71d6e927500"

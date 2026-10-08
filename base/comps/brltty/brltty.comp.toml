@@ -1,0 +1,2 @@
+[components.brltty]
+tests.tests = [{ name = "brltty-fedora-tmt" }]

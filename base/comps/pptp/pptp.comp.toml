@@ -1,0 +1,2 @@
+[components.pptp]
+tests.tests = [{ name = "pptp-fedora-tmt" }]

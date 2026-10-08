@@ -1,0 +1,2 @@
+[components.lm_sensors]
+tests.tests = [{ name = "lm_sensors-fedora-tmt" }]

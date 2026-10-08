@@ -1,0 +1,2 @@
+[components.ghostscript]
+tests.tests = [{ name = "ghostscript-fedora-tmt" }]

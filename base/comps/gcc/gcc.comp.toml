@@ -1,3 +1,4 @@
 [components.gcc]
+tests.tests = [{ name = "gcc-fedora-tmt" }]
 # Release: %{gcc_release}%{?dist}
 release = { calculation = "manual" }

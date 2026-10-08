@@ -1,0 +1,2 @@
+[components.graphviz]
+tests.tests = [{ name = "graphviz-fedora-tmt" }]

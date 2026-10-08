@@ -1,0 +1,2 @@
+[components.qpdf]
+tests.tests = [{ name = "qpdf-fedora-tmt" }]

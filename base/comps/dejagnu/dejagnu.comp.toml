@@ -1,0 +1,2 @@
+[components.dejagnu]
+tests.tests = [{ name = "dejagnu-fedora-tmt" }]

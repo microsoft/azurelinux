@@ -1,0 +1,2 @@
+[components.ppp]
+tests.tests = [{ name = "ppp-fedora-tmt" }]

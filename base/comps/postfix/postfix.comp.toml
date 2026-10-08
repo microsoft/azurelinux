@@ -1,0 +1,2 @@
+[components.postfix]
+tests.tests = [{ name = "postfix-fedora-tmt" }]

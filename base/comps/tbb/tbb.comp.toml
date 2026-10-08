@@ -1,0 +1,2 @@
+[components.tbb]
+tests.tests = [{ name = "tbb-fedora-tmt" }]

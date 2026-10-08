@@ -1,0 +1,2 @@
+[components.libevent]
+tests.tests = [{ name = "libevent-fedora-tmt" }]

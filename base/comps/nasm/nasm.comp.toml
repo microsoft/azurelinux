@@ -1,0 +1,2 @@
+[components.nasm]
+tests.tests = [{ name = "nasm-fedora-tmt" }]

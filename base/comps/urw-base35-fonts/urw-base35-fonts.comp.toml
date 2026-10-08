@@ -1,0 +1,2 @@
+[components.urw-base35-fonts]
+tests.tests = [{ name = "urw-base35-fonts-fedora-tmt" }]

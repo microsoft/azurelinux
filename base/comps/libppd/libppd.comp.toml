@@ -1,0 +1,2 @@
+[components.libppd]
+tests.tests = [{ name = "libppd-fedora-tmt" }]

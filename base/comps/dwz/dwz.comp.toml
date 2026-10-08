@@ -1,0 +1,2 @@
+[components.dwz]
+tests.tests = [{ name = "dwz-fedora-tmt" }]

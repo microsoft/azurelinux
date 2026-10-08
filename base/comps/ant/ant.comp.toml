@@ -1,1 +1,2 @@
 [components.ant]
+tests.tests = [{ name = "ant-fedora-tmt" }]

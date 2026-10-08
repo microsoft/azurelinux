@@ -1,0 +1,2 @@
+[components.minicom]
+tests.tests = [{ name = "minicom-fedora-tmt" }]

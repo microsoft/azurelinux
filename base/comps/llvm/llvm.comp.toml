@@ -1,8 +1,8 @@
 [components.llvm]
+tests.tests = [{ name = "llvm-fedora-tmt" }]
 # Workaround: Disable MLIR until python-nanobind (and its dep robin-map)
 # are imported into Azure Linux. MLIR is gated on %{with mlir} in the
 # upstream spec and pulls in python3-nanobind-devel which doesn't exist yet.
 # Workaround: OpenMP tests fail in systemd-nspawn mock (95% failure rate)
 # due to missing /proc/sys/kernel tunables and cgroup support for threads/forks.
 build.without = ["mlir", "check"]
-

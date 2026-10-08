@@ -1,0 +1,2 @@
+[components.libmpc]
+tests.tests = [{ name = "libmpc-fedora-tmt" }]

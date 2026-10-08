@@ -1,0 +1,2 @@
+[components.libijs]
+tests.tests = [{ name = "libijs-fedora-tmt" }]

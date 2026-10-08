@@ -1,0 +1,2 @@
+[components.delve]
+tests.tests = [{ name = "delve-fedora-tmt" }]

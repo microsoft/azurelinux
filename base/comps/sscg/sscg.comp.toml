@@ -1,1 +1,2 @@
 [components.sscg]
+tests.tests = [{ name = "sscg-fedora-tmt" }]

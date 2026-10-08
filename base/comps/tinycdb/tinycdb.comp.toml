@@ -1,0 +1,2 @@
+[components.tinycdb]
+tests.tests = [{ name = "tinycdb-fedora-tmt" }]

@@ -1,0 +1,2 @@
+[components.gzip]
+tests.tests = [{ name = "gzip-fedora-tmt" }]

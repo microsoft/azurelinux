@@ -1,0 +1,2 @@
+[components.bzip2]
+tests.tests = [{ name = "bzip2-fedora-tmt" }]

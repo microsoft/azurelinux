@@ -1,0 +1,2 @@
+[components.sendmail]
+tests.tests = [{ name = "sendmail-fedora-tmt" }]
