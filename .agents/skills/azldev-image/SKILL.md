@@ -43,18 +43,31 @@ architectures = ["x86_64", "aarch64"]
   container = true
   systemd = false
 
+  [images.container-base.properties]
+  openssl-fips-provider = "upstream"
+
   [images.container-base.tests]
   tests = [{ name = "smoke" }]
 ```
 
 - `definition.type` is `kiwi` (the only type today); `path` points at the `.kiwi` file;
   `profile` selects a kiwi profile (optional).
-- `capabilities` are tri-state flags describing the image — `machine-bootable`,
-  `container`, `systemd`, `runtime-package-management`. Set only the ones that apply.
+- Boolean `capabilities` are tri-state flags describing the image — `machine-bootable`,
+  `container`, `systemd`, `runtime-package-management`, `wsl`, `installer-media`,
+  `fips-enabled`, and `cvm`. Set only the ones that apply.
+- `properties` is an extensible string-to-string metadata bag. For example,
+  `openssl-fips-provider = "upstream"` records the image's provider policy without
+  requiring azldev to define that property in its schema.
 - `architectures = ["x86_64", "aarch64"]` is optional; when unset or empty, the
    image is treated as unrestricted (all recognized architectures). Set it to
    restrict which architectures `image build --arch` allows for the image.
-- `tests.tests` lists the tests or test groups `azldev image test` runs.
+- `tests.tests` lists the tests or test groups `azldev image test` runs locally.
+  An image ref may also set `sku-groups = ["<name>", ...]` to fan a test or group
+  out across the VM sizes of one or more `[sku-groups.<name>]` entries; that
+  fan-out is done by external test orchestration, not by local `azldev image test`.
+  Do not map `sku-groups` onto arbitrary LISA tests: LISA tests carry their own
+  requirements and are skipped when the SKU does not meet them, so this is
+  meaningful only for the special case of multi-SKU performance tests.
 - `publish.channels` lists the channels the image publishes to.
 
 ## The kiwi definition

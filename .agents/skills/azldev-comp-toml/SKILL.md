@@ -68,12 +68,13 @@ without = ["plugin_rhsm"]       # disable %bcond_with conditionals
 
 `release.calculation` controls the `Release:` tag. There are four modes:
 
-- `auto` (default) — auto-detect whether the spec uses `%autorelease` or a static
-  release and handle it accordingly. Correct for most packages.
+- `auto` (default) — leave `%autorelease` unchanged; otherwise bump a static
+  integer Release once for each fingerprint-derived synthetic change.
 - `autorelease` — force `%autorelease` handling (use when auto-detection misreads a
   spec that wraps `%autorelease` in a conditional).
-- `static` — force static-integer handling and bump the integer on render (the
-  inverse of `autorelease`).
+- `static` — require a non-`%autorelease` static release. The default legacy
+  calculation supports only an integer, `integer%{?dist}`, or `integer%{dist}`;
+  other forms require `manual` or an overlay.
 - `manual` — you own the `Release:` value. Use this only when render fails with a
   "non-standard Release tag" error. **A `manual` component is not bumped by the
   render/commit/amend cycle, so increment its release yourself in the same change**
@@ -83,6 +84,15 @@ without = ["plugin_rhsm"]       # disable %bcond_with conditionals
 [components.mypackage.release]
 calculation = "manual"
 ```
+
+The temporary `--rpmdev-bumpspec` flag on `comp build`, `comp render`, and
+`comp prepare-sources` opts into transactional host handling while Azure Linux
+migrates. Only that path requires `rpmdev-bumpspec`, `rpmdev-packager`, `rpm`,
+`rpmspec`, and Python with its RPM module. It preserves the fixed team
+identity/comment/datestamp and strict source-EVR transaction checks; locks and
+synthetic history still determine the number and order of bumps. Without the
+flag, no bumpspec runtime discovery occurs and the legacy static calculation is
+used. `%autorelease` behavior is unchanged on either path.
 
 ## Render configuration
 

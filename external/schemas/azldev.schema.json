@@ -355,7 +355,44 @@
       "properties": {
         "tests": {
           "items": {
-            "$ref": "#/$defs/TestRef"
+            "oneOf": [
+              {
+                "not": {
+                  "required": [
+                    "group"
+                  ]
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "not": {
+                  "required": [
+                    "name"
+                  ]
+                },
+                "required": [
+                  "group"
+                ]
+              }
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^\\S",
+                "description": "Name of a test (mutually exclusive with group)"
+              },
+              "group": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^\\S",
+                "description": "Name of a test group (mutually exclusive with name)"
+              }
+            },
+            "additionalProperties": false,
+            "type": "object"
           },
           "type": "array",
           "title": "Tests",
@@ -458,6 +495,22 @@
           "type": "object",
           "title": "Test Groups",
           "description": "Definitions of named bundles of tests"
+        },
+        "sku-groups": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SKUGroup"
+          },
+          "type": "object",
+          "title": "SKU Groups",
+          "description": "Definitions of named Azure VM size lists for test fan-out"
+        },
+        "vm-skus": {
+          "additionalProperties": {
+            "type": "object"
+          },
+          "type": "object",
+          "title": "VM SKUs",
+          "description": "Per-VM-size metadata used for test parameter resolution"
         }
       },
       "additionalProperties": false,
@@ -690,7 +743,7 @@
         "capabilities": {
           "$ref": "#/$defs/ImageCapabilities",
           "title": "Capabilities",
-          "description": "Features and properties of this image"
+          "description": "Features supported by this image"
         },
         "tests": {
           "$ref": "#/$defs/ImageTestsConfig",
@@ -713,6 +766,14 @@
           "type": "array",
           "title": "Architectures",
           "description": "Architectures supported by this image (optional; unset means unrestricted)"
+        },
+        "properties": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object",
+          "title": "Properties",
+          "description": "Extensible string properties describing this image"
         }
       },
       "additionalProperties": false,
@@ -1232,6 +1293,42 @@
         "subrepos"
       ]
     },
+    "SKUGroup": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of this SKU group"
+        },
+        "arch": {
+          "type": "string",
+          "enum": [
+            "amd64",
+            "arm64"
+          ],
+          "title": "Architecture",
+          "description": "CPU architecture of the VM sizes in this group"
+        },
+        "vm-sizes": {
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\S(.*\\S)?$"
+          },
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "title": "VM sizes",
+          "description": "Azure VM sizes in this SKU group"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "arch",
+        "vm-sizes"
+      ]
+    },
     "SourceFileReference": {
       "properties": {
         "filename": {
@@ -1511,11 +1608,6 @@
         },
         "tests": {
           "items": {
-            "not": {
-              "required": [
-                "group"
-              ]
-            },
             "properties": {
               "name": {
                 "type": "string",
@@ -1524,6 +1616,7 @@
                 "description": "Name of a test"
               }
             },
+            "additionalProperties": false,
             "type": "object",
             "required": [
               "name"
@@ -1574,6 +1667,18 @@
           "pattern": "^\\S",
           "title": "Group",
           "description": "Name of a test group (mutually exclusive with name)"
+        },
+        "sku-groups": {
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\S"
+          },
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "title": "SKU groups",
+          "description": "SKU groups used by external test orchestration"
         }
       },
       "additionalProperties": false,
