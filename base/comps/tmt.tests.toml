@@ -902,3 +902,13 @@ plan = "/plans/all"
 [tests.httpd-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/httpd.git"
 ref = "1d1d0fd2d5bfb01725cb065fd4886842d2965439"
+
+[tests.ant-fedora-tmt]
+type = "tmt"
+
+[tests.ant-fedora-tmt.tmt]
+plan = "/plans/main"
+
+[tests.ant-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/ant.git"
+ref = "4532f69642b56a23740a368cd60a985f21ee973b"
