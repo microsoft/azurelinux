@@ -372,3 +372,13 @@ plan = "/plans/tier1"
 [tests.graphviz-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/graphviz.git"
 ref = "5d5c1eb9d816086a1d47bb078c6241e61a0f9377"
+
+[tests.grep-fedora-tmt]
+type = "tmt"
+
+[tests.grep-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.grep-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/grep.git"
+ref = "70491a251a59ae18acc11dc434bda650e6027624"
