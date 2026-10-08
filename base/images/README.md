@@ -13,7 +13,7 @@ The first-party VM base images (`1p-vm-base-*`) select the following implementat
 | Time synchronization | chrony (`chrony`) |
 | DNS command-line tools | BIND utilities (`bind-utils`) |
 
-These selections come from the `VmBaseCore` profile in [vm-base.xml](teams/cloud/vm-base.xml), which inherits `CloudCore` and `BootableCore` from [common.xml](components/common.xml). To check the listed RPMs against those definitions, run this from the repository root:
+These selections come from the `VmBaseCore` profile in [vm-base.xml](teams/cloud/vm-base.xml) and the `SystemCore` and `CloudCore` profiles in [common.xml](components/common.xml), which the 1P VM base leaves select. To check the listed RPMs against those definitions, run this from the repository root:
 
 ```bash
 grep -E 'name="(glibc|coreutils|bash|systemd|systemd-networkd|systemd-resolved|dnf5|sudo|chrony|bind-utils)"' \
