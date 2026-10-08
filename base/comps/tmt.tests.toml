@@ -242,3 +242,13 @@ plan = "/plans/ci"
 [tests.chan-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/chan.git"
 ref = "f7b836da0ba20c32f2e75706eabc869917cbf36b"
+
+[tests.chrpath-fedora-tmt]
+type = "tmt"
+
+[tests.chrpath-fedora-tmt.tmt]
+plan = "/plans/all_tests"
+
+[tests.chrpath-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/chrpath.git"
+ref = "11be21a8aa1cf46c309bfe6e7feff49ca0ab3052"
