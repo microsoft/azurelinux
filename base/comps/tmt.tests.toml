@@ -124,3 +124,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-php-all.tmt]
 source = { git-url = "https://src.fedoraproject.org/tests/php.git", ref = "16d1ba5dae51781387e52ea79e5a869c12c0a789" }
 plan = "/plans/all"
+
+[tests.tmt-rust-all]
+type = "tmt"
+description = "Rust upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-rust-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/rust.git", ref = "804bb6656719e3084b8a997ae61fb9b91fc96b19" }
+plan = "/plans/all"
