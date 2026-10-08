@@ -79,3 +79,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-hostname-all.tmt]
 source = { git-url = "https://src.fedoraproject.org/tests/hostname.git", ref = "4aab6d5718c252dcf6fc7fe975c8caaa10b5acf9" }
 plan = "/plans/all"
+
+[tests.tmt-selinux-tier1]
+type = "tmt"
+description = "SELinux and SELinux policy tier-one functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-selinux-tier1.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/selinux.git", ref = "534e38f96fde1c88ae9881ffea6c9fc592e82c71" }
+plan = "/plans/tier1"
