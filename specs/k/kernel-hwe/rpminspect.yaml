@@ -11,26 +11,26 @@ badfuncs:
 
 emptyrpm:
     expected_empty:
-        - kernel
-        - kernel-debug
-        - kernel-debug-devel-matched
-        - kernel-devel-matched
-        - kernel-modules-extra-matched
-        - kernel-rt
-        - kernel-rt-debug
-        - kernel-rt-debug-devel-matched
-        - kernel-rt-devel-matched
-        - kernel-rt-modules-extra-matched
-        - kernel-64k
-        - kernel-64k-debug
-        - kernel-64k-debug-devel-matched
-        - kernel-64k-devel-matched
-        - kernel-64k-modules-extra-matched
-        - kernel-rt-64k
-        - kernel-rt-64k-debug
-        - kernel-rt-64k-debug-devel-matched
-        - kernel-rt-64k-devel-matched
-        - kernel-rt-64k-modules-extra-matched
+        - kernel-hwe
+        - kernel-hwe-debug
+        - kernel-hwe-debug-devel-matched
+        - kernel-hwe-devel-matched
+        - kernel-hwe-modules-extra-matched
+        - kernel-hwe-rt
+        - kernel-hwe-rt-debug
+        - kernel-hwe-rt-debug-devel-matched
+        - kernel-hwe-rt-devel-matched
+        - kernel-hwe-rt-modules-extra-matched
+        - kernel-hwe-64k
+        - kernel-hwe-64k-debug
+        - kernel-hwe-64k-debug-devel-matched
+        - kernel-hwe-64k-devel-matched
+        - kernel-hwe-64k-modules-extra-matched
+        - kernel-hwe-rt-64k
+        - kernel-hwe-rt-64k-debug
+        - kernel-hwe-rt-64k-debug-devel-matched
+        - kernel-hwe-rt-64k-devel-matched
+        - kernel-hwe-rt-64k-modules-extra-matched
 
 patches:
     ignore_list:
