@@ -133,3 +133,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-rust-all.tmt]
 source = { git-url = "https://src.fedoraproject.org/tests/rust.git", ref = "804bb6656719e3084b8a997ae61fb9b91fc96b19" }
 plan = "/plans/all"
+
+[tests.tmt-skopeo]
+type = "tmt"
+description = "Skopeo system test plans"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-skopeo.tmt]
+source = { git-url = "https://github.com/containers/skopeo.git", ref = "23dddaad3d8f86f8c1d3204646b14aa0da86a85e" }
+plan = "/plans"
