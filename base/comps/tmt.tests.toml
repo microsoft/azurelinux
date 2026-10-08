@@ -822,3 +822,13 @@ plan = "/plans/all"
 [tests.unzip-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/unzip.git"
 ref = "c7bc42ed598affdacc079e34b62bfcb056ddb6e6"
+
+[tests.urw-base35-fonts-fedora-tmt]
+type = "tmt"
+
+[tests.urw-base35-fonts-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.urw-base35-fonts-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/urw-base35-fonts.git"
+ref = "c44124d0eb2eb73fef1befb860fa28cc31edbbd8"
