@@ -8452,7 +8452,7 @@
         "other": {
           "name": "kernel-mshv",
           "version": "6.18.34.mshv3",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-6.18.34.mshv3.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.18.34.mshv3.tar.gz"
         }
       }
     },
@@ -8482,7 +8482,7 @@
         "other": {
           "name": "kernel-uvm",
           "version": "6.18.52.mshv1",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.18.52.mshv1.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.18.52.mshv1.tar.gz"
         }
       }
     },
