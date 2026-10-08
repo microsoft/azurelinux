@@ -312,3 +312,13 @@ plan = "/plans/all_tests"
 [tests.dwz-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/dwz.git"
 ref = "595a5352a3691487cb6d4d2c600e94440bbe3965"
+
+[tests.gawk-fedora-tmt]
+type = "tmt"
+
+[tests.gawk-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.gawk-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/gawk.git"
+ref = "da3dad143964e4b08f4666ea79108c65813537b4"
