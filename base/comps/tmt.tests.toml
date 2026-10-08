@@ -672,3 +672,13 @@ plan = "/plans/tier1"
 [tests.python-pyudev-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/python-pyudev.git"
 ref = "4188a3fd790832466820377a03c4c21ef56ebadf"
+
+[tests.qpdf-fedora-tmt]
+type = "tmt"
+
+[tests.qpdf-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.qpdf-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/qpdf.git"
+ref = "af70595b48af1d14cefce219e309fe321d33f7a7"
