@@ -1,4 +1,5 @@
 [components.httpd]
+tests.tests = [{ name = "httpd-fedora-tmt" }]
 release = { calculation = "manual" }
 
 [[components.httpd.overlays]]

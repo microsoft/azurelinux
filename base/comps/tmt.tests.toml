@@ -892,3 +892,13 @@ plan = "/plans/all"
 [tests.nftables-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/nftables.git"
 ref = "f1323bb67a69f5f8c7e089958fa440de688b0761"
+
+[tests.httpd-fedora-tmt]
+type = "tmt"
+
+[tests.httpd-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.httpd-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/httpd.git"
+ref = "1d1d0fd2d5bfb01725cb065fd4886842d2965439"
