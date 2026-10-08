@@ -1,0 +1,2 @@
+[components.adobe-mappings-pdf]
+tests.tests = [{ name = "adobe-mappings-pdf-fedora-tmt" }]

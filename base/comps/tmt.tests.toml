@@ -172,3 +172,13 @@ plan = "/plans/tier1"
 [tests.adobe-mappings-cmap-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/adobe-mappings-cmap.git"
 ref = "981ac889cf19c15720a4d084c8bf76170ee2ee76"
+
+[tests.adobe-mappings-pdf-fedora-tmt]
+type = "tmt"
+
+[tests.adobe-mappings-pdf-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.adobe-mappings-pdf-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/adobe-mappings-pdf.git"
+ref = "b88ac1409bc2060515ce30010a29e327c92e87d4"
