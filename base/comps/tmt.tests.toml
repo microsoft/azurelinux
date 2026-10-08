@@ -452,3 +452,13 @@ plan = "/plans/tier1"
 [tests.libcupsfilters-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/libcupsfilters.git"
 ref = "1620136f673e9c7fe6fc00dcbbd43d713f0684fa"
+
+[tests.libevent-fedora-tmt]
+type = "tmt"
+
+[tests.libevent-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libevent-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libevent.git"
+ref = "f6ed53cac565f95518645f0b5edde1cbfbbe110a"
