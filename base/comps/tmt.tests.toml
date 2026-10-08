@@ -61,3 +61,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-conmon-remote-rootless.tmt]
 source = { git-url = "https://github.com/containers/podman.git", ref = "fb1cb4fa6ea4003775c5ec0b4e56dbc8a670a173" }
 plan = "/plans/system/remote-rootless"
+
+[tests.tmt-dhcpcd-all]
+type = "tmt"
+description = "Dhcpcd upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-dhcpcd-all.tmt]
+source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/dhcpcd.git", ref = "c9d18d35e12e41cf9045416a1cf37fecc4a26c9c" }
+plan = "/plans/all"
