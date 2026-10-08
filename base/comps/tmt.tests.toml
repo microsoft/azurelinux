@@ -1012,3 +1012,13 @@ plan = "/plans/main"
 [tests.openscap-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/openscap.git"
 ref = "016433b079bd85911cac35529c460a13fbd29b41"
+
+[tests.pcp-fedora-tmt]
+type = "tmt"
+
+[tests.pcp-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.pcp-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/pcp.git"
+ref = "1f50166ad92c9b1496baafa2648ef1a50530a43b"
