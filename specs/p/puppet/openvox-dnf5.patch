@@ -1,0 +1,84 @@
+commit 26d3405df7f35497ec07942c44c292bb25d60210
+Author: Lars Haugan <lars.haugan@sparebank1.no>
+Date:   Mon Dec 23 14:56:21 2024 +0100
+
+    Add fix for package running dnf5 on fedora
+    
+    Fedora 41 introduced dnf5 which has deprecated the use of the flags '-d'
+    and '-e'. This change removes the options
+    
+    Signed-off-by: Lars Haugan <lars.haugan@sparebank1.no>
+
+diff --git a/lib/puppet/provider/package/dnfmodule.rb b/lib/puppet/provider/package/dnfmodule.rb
+index 8d58d2fdd8..de052ad744 100644
+--- a/lib/puppet/provider/package/dnfmodule.rb
++++ b/lib/puppet/provider/package/dnfmodule.rb
+@@ -35,7 +35,7 @@ Puppet::Type.type(:package).provide :dnfmodule, :parent => :dnf do
+ 
+   def self.instances
+     packages = []
+-    cmd = "#{command(:dnf)} module list -y -d 0 -e #{error_level}"
++    cmd = "#{command(:dnf)} module list -y"
+     execute(cmd).each_line do |line|
+       # select only lines with actual packages since DNF clutters the output
+       next unless line =~ /\[[eix]\][, ]/
+@@ -90,7 +90,7 @@ Puppet::Type.type(:package).provide :dnfmodule, :parent => :dnf do
+       enable(args)
+     else
+       begin
+-        execute([command(:dnf), 'module', 'install', '-d', '0', '-e', self.class.error_level, '-y', args])
++        execute([command(:dnf), 'module', 'install', '-y', args])
+       rescue Puppet::ExecutionFailure => e
+         # module has no default profile and no profile was requested, so just enable the stream
+         # DNF versions prior to 4.2.8 do not need this workaround
+@@ -117,20 +117,20 @@ Puppet::Type.type(:package).provide :dnfmodule, :parent => :dnf do
+   end
+ 
+   def enable(args = @resource[:name])
+-    execute([command(:dnf), 'module', 'enable', '-d', '0', '-e', self.class.error_level, '-y', args])
++    execute([command(:dnf), 'module', 'enable', '-y', args])
+   end
+ 
+   def uninstall
+-    execute([command(:dnf), 'module', 'remove', '-d', '0', '-e', self.class.error_level, '-y', @resource[:name]])
++    execute([command(:dnf), 'module', 'remove', '-y', @resource[:name]])
+     reset # reset module to the default stream
+   end
+ 
+   def disable(args = @resource[:name])
+-    execute([command(:dnf), 'module', 'disable', '-d', '0', '-e', self.class.error_level, '-y', args])
++    execute([command(:dnf), 'module', 'disable', '-y', args])
+   end
+ 
+   def reset
+-    execute([command(:dnf), 'module', 'reset', '-d', '0', '-e', self.class.error_level, '-y', @resource[:name]])
++    execute([command(:dnf), 'module', 'reset', '-y', @resource[:name]])
+   end
+ 
+   def flavor
+diff --git a/lib/puppet/provider/package/yum.rb b/lib/puppet/provider/package/yum.rb
+index 15bc372c6b..6c0f85e31b 100644
+--- a/lib/puppet/provider/package/yum.rb
++++ b/lib/puppet/provider/package/yum.rb
+@@ -247,7 +247,7 @@ Puppet::Type.type(:package).provide :yum, :parent => :rpm, :source => :rpm do
+     update_command = self.class.update_command
+     # If not allowing virtual packages, do a query to ensure a real package exists
+     unless @resource.allow_virtual?
+-      execute([command(:cmd), '-d', '0', '-e', error_level, '-y', install_options, :list, wanted].compact)
++      execute([command(:cmd), '-y', install_options, :list, wanted].compact)
+     end
+ 
+     should = @resource.should(:ensure)
+@@ -307,10 +307,7 @@ Puppet::Type.type(:package).provide :yum, :parent => :rpm, :source => :rpm do
+       end
+     end
+ 
+-    # Yum on el-4 and el-5 returns exit status 0 when trying to install a package it doesn't recognize;
+-    # ensure we capture output to check for errors.
+-    no_debug = Puppet.runtime[:facter].value('os.release.major').to_i > 5 ? ["-d", "0"] : []
+-    command = [command(:cmd)] + no_debug + ["-e", error_level, "-y", install_options, operation, wanted].compact
++    command = [command(:cmd)] + ["-y", install_options, operation, wanted].compact
+     output = execute(command)
+ 
+     if output.to_s =~ /^No package #{wanted} available\.$/
+

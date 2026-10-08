@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# This is wrapper script to start puppet which is used to support starting
+# puppet daemon processes with correct SELinux context.
+#
+
+# Call exec rather that spawn sub-process because of signals
+exec /usr/bin/puppet $*
