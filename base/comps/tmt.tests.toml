@@ -662,3 +662,13 @@ plan = "/plans/tier1"
 [tests.procmail-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/procmail.git"
 ref = "9c3e64417710a09212c1f828f9016e7e3743f7a2"
+
+[tests.python-pyudev-fedora-tmt]
+type = "tmt"
+
+[tests.python-pyudev-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.python-pyudev-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/python-pyudev.git"
+ref = "4188a3fd790832466820377a03c4c21ef56ebadf"

@@ -1,0 +1,2 @@
+[components.python-pyudev]
+tests.tests = [{ name = "python-pyudev-fedora-tmt" }]
