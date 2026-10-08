@@ -462,3 +462,13 @@ plan = "/plans/tier1"
 [tests.libevent-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/libevent.git"
 ref = "f6ed53cac565f95518645f0b5edde1cbfbbe110a"
+
+[tests.libijs-fedora-tmt]
+type = "tmt"
+
+[tests.libijs-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.libijs-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libijs.git"
+ref = "ec6ed3dc728f4c7d92b7f5cfaabdfccac2daba79"
