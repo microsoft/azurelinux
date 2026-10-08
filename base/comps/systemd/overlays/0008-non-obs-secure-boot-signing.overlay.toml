@@ -1,0 +1,22 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add pesign as the non-OBS Secure Boot signing dependency, gated on want_bootloader"
+type = "spec-search-replace"
+regex = '^BuildRequires:  pesign-obs-integration$'
+replacement = '''BuildRequires:  pesign-obs-integration
+%elif 0%{?want_bootloader}
+BuildRequires:  pesign'''
+
+[[overlays]]
+description = "Use %pesign for the non-OBS Secure Boot signing path, gated on want_bootloader"
+type = "spec-search-replace"
+regex = '^BRP_PESIGN_FILES=/usr/lib/systemd/boot/efi/systemd-boot%\{efi_arch\}\.efi BRP_PESIGN_PACKAGES=systemd-boot /usr/lib/rpm/brp-suse\.d/brp-99-pesign$'
+replacement = '''BRP_PESIGN_FILES=/usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi BRP_PESIGN_PACKAGES=systemd-boot /usr/lib/rpm/brp-suse.d/brp-99-pesign
+%elif 0%{?want_bootloader}
+SYSTEMD_BOOT_EFI="%{buildroot}/usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi"
+%define __pesign_client_cert systemd-boot-signer
+%pesign -s -i $SYSTEMD_BOOT_EFI -o $SYSTEMD_BOOT_EFI.signed
+mv $SYSTEMD_BOOT_EFI.signed $SYSTEMD_BOOT_EFI'''
