@@ -1,0 +1,2 @@
+[components.irssi]
+tests.tests = [{ name = "irssi-fedora-tmt" }]

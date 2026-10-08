@@ -422,3 +422,13 @@ plan = "/plans/all"
 [tests.iptables-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/iptables.git"
 ref = "07708c7f965440ac116b148a03a0854814b6069b"
+
+[tests.irssi-fedora-tmt]
+type = "tmt"
+
+[tests.irssi-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.irssi-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/irssi.git"
+ref = "17c248bf8a222561903c816692f181f330496b82"
