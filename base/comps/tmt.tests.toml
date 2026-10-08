@@ -852,3 +852,13 @@ plan = "/plans/ci"
 [tests.xxhash-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/xxhash.git"
 ref = "369cf008a99cd1434d9d9838b9184cf0a4d5ebb0"
+
+[tests.zip-fedora-tmt]
+type = "tmt"
+
+[tests.zip-fedora-tmt.tmt]
+plan = "/plans/all"
+
+[tests.zip-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/zip.git"
+ref = "d37f791b9b6cbd480e95174f37622d83cf620000"
