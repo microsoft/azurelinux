@@ -712,3 +712,13 @@ plan = "/plans/cucumber_install"
 [tests.rubygem-cucumber-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/rubygem-cucumber.git"
 ref = "60cb7d2fe31fde345f9b0b6186078ba4f48ab8ee"
+
+[tests.sendmail-fedora-tmt]
+type = "tmt"
+
+[tests.sendmail-fedora-tmt.tmt]
+plan = "/plans/tier1"
+
+[tests.sendmail-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/sendmail.git"
+ref = "1801f8629e60e9a6c76d4356f8b1caf9a99d52e7"
