@@ -70,3 +70,12 @@ required-capabilities = ["machine-bootable"]
 [tests.tmt-dhcpcd-all.tmt]
 source = { git-url = "https://gitlab.com/redhat/centos-stream/tests/dhcpcd.git", ref = "c9d18d35e12e41cf9045416a1cf37fecc4a26c9c" }
 plan = "/plans/all"
+
+[tests.tmt-hostname-all]
+type = "tmt"
+description = "Hostname upstream functional plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+[tests.tmt-hostname-all.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/hostname.git", ref = "4aab6d5718c252dcf6fc7fe975c8caaa10b5acf9" }
+plan = "/plans/all"
