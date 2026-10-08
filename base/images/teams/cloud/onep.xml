@@ -30,6 +30,12 @@
             <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
         </profile>
+        <profile name="1p-vm-base-gen2-cvm" description="1P VM Base Gen2 CVM Image (UKI)" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="CloudCore" />
+            <requires profile="OnePBase" />
+            <requires profile="UkiBootCore" />
+        </profile>
     </profiles>
     <preferences arch="x86_64" profiles="1p-vm-base-gen1">
         <version>0.1.0</version>
@@ -121,6 +127,21 @@
             </oemconfig>
         </type>
     </preferences>
+    <preferences arch="x86_64" profiles="1p-vm-base-gen2-cvm">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="none" filesystem="ext4" fscreateoptions="-m 1" firmware="efi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="512" rootfs_label="azurelinux">
+            <bootloader name="custom" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
     <packages type="bootstrap" profiles="OnePBase">
         <package name="azurelinux-release-cloud" />
     </packages>
@@ -157,5 +178,8 @@
     </packages>
     <packages type="image" profiles="1p-vm-base-gen1,1p-vm-base-gen1-fips,1p-vm-base-gen2-fips">
         <package name="dracut" />
+    </packages>
+    <packages type="image" profiles="1p-vm-base-gen2-cvm">
+        <package name="tpm2-tools" />
     </packages>
 </image>

@@ -50,12 +50,15 @@ UkiBootCore -> SystemCore + UefiFstab
 
 conventional 1P leaves -> PackageManagement + OnePBase + StandardCloudCore
                         + LegacyBoot (Gen1) or UefiBoot (Gen2) [+ Fips]
+1p-vm-base-gen2-cvm -> PackageManagement + OnePBase + CloudCore + UkiBootCore
 Marketplace leaves -> MarketplaceBase + UefiBoot [+ Fips]
 MarketplaceBase -> PackageManagement + MarketplacePackages + StandardCloudCore
 ```
 
 - Conventional 1P leaves use GRUB/the standard kernel via `StandardCloudCore`
   and add BIOS or UEFI boot packages.
+- `1p-vm-base-gen2-cvm` selects boot-neutral cloud/1P layers and `UkiBootCore`,
+  **not** `StandardCloudCore` or conventional GRUB/UEFI boot profiles.
 - Marketplace leaves share `MarketplaceBase`, not `OnePBase`, and select
   conventional UEFI boot (with optional FIPS).
 
