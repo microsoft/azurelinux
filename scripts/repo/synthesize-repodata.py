@@ -728,10 +728,7 @@ def decide_routing(
                 "component is not a legitimate Azure Linux component",
             )
             continue
-        if kind == KIND_SRPMS:
-            row = routing.srpm.get(name)
-        else:
-            row = routing.rpm.get(name)
+        row = routing.srpm.get(name) if kind == KIND_SRPMS else routing.rpm.get(name)
         if row is None:
             decisions[key] = RoutingDecision(None, "no azldev entry for package")
             continue
