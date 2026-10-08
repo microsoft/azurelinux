@@ -7,6 +7,7 @@
         <profile name="minimal-os" description="Azure Linux Minimal OS Image" import="false">
             <requires profile="PackageManagement" />
             <requires profile="UefiFstab" />
+            <requires profile="ThirdPartyOpenSSLProvider" />
             <requires profile="MinimalOsCore" />
         </profile>
     </profiles>

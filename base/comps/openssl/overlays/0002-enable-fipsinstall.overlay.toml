@@ -1,0 +1,30 @@
+# Restore the upstream fipsinstall CLI and documentation while retaining the
+# Fedora test exclusions needed by the main OpenSSL package, which does not
+# ship its own fips.so.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+type = "file-remove"
+file = "0018-FIPS-disable-fipsinstall.patch"
+description = "Remove Fedora's fipsinstall CLI and documentation disablement"
+
+[[overlays]]
+type = "file-add"
+file = "0018-FIPS-disable-fipsinstall.patch"
+source = "../0018-FIPS-disable-fipsinstall.patch"
+description = "Retain only the fipsinstall test exclusions"
+
+# Patch 0037's fips_config.pod note targets the stub documentation removed
+# above. Its functional EMS enforcement remains unchanged.
+[[overlays]]
+type = "file-remove"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+description = "Remove patch 0037 with its obsolete stub-documentation hunk"
+
+[[overlays]]
+type = "file-add"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+source = "../0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+description = "Restore patch 0037 without the obsolete documentation hunk"

@@ -126,6 +126,7 @@
         <package name="dracut-network" />
         <package name="filesystem" />
         <package name="azurelinux-repos" />
+        <package name="openssl-fips-provider" />
         <package name="grub2-efi-x64-modules" arch="x86_64" />
         <package name="grub2-efi-x64" arch="x86_64" />
         <package name="grub2-efi-aa64-modules" arch="aarch64" />

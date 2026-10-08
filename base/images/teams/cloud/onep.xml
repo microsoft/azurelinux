@@ -2,6 +2,7 @@
 <image>
     <profiles>
         <profile name="OnePBase" description="First-party Azure VM packages" import="false">
+            <requires profile="FirstPartyOpenSSLProvider" />
             <requires profile="VmBaseCore" />
         </profile>
         <profile name="1p-vm-base-gen1" description="1P VM Base Gen1 Image (BIOS)" import="false">
@@ -87,7 +88,6 @@
     </packages>
     <packages type="image" profiles="OnePBase">
         <package name="SymCrypt" />
-        <package name="SymCrypt-OpenSSL" />
         <package name="cpio" />
         <package name="cronie-anacron" />
         <package name="curl" />
