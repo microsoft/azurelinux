@@ -482,3 +482,13 @@ plan = "/plans/tier1"
 [tests.liblockfile-fedora-tmt.tmt.source]
 git-url = "https://src.fedoraproject.org/tests/liblockfile.git"
 ref = "5052941eb69971b198e010cbe4f7ef92b495dbef"
+
+[tests.libmpc-fedora-tmt]
+type = "tmt"
+
+[tests.libmpc-fedora-tmt.tmt]
+plan = "/plans/ci"
+
+[tests.libmpc-fedora-tmt.tmt.source]
+git-url = "https://src.fedoraproject.org/tests/libmpc.git"
+ref = "bc669faadc36ee5eb17fba98332fd989d0369013"
