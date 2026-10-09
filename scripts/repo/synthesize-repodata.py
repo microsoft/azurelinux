@@ -49,7 +49,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from http import HTTPStatus
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, cast
 
 import createrepo_c as cr  # pyright: ignore[reportMissingImports]  # Native module is absent from the Pyright environment.
 
@@ -795,6 +795,26 @@ class Destination:
         raise ValueError(f"unknown kind: {self.kind}")
 
 
+class _XmlWriter(Protocol):
+    """XML writer operations used by the repository synthesizer."""
+
+    def set_num_of_pkgs(self, count: int) -> None: ...
+
+    def add_pkg(self, package: cr.Package) -> None: ...
+
+    def close(self) -> None: ...
+
+
+class _SqliteWriter(Protocol):
+    """SQLite writer operations used by the repository synthesizer."""
+
+    def add_pkg(self, package: cr.Package) -> None: ...
+
+    def dbinfo_update(self, checksum: str) -> None: ...
+
+    def close(self) -> None: ...
+
+
 class _RepoWriter:
     """Manages the createrepo_c XML+sqlite triple for one destination."""
 
@@ -812,12 +832,12 @@ class _RepoWriter:
             shutil.rmtree(self.repodata_dir)
         self.repodata_dir.mkdir(parents=True, exist_ok=True)
 
-        self._streams: list[tuple[str, str, str, str, object, object]] = []
+        self._streams: list[tuple[str, str, str, str, _XmlWriter, _SqliteWriter]] = []
         for xml_name, db_name, xml_cls, db_cls in self._STREAMS:
             xml_path = str(self.repodata_dir / f"{xml_name}.xml.gz")
             db_path = str(self.repodata_dir / f"{xml_name}.sqlite")
-            xml = xml_cls(xml_path)
-            db = db_cls(db_path)
+            xml = cast("_XmlWriter", xml_cls(xml_path))
+            db = cast("_SqliteWriter", db_cls(db_path))
             xml.set_num_of_pkgs(pkg_count)
             self._streams.append((xml_name, db_name, xml_path, db_path, xml, db))
         self.added = 0
