@@ -1,7 +1,7 @@
 Summary:        Archiving program
 Name:           tar
 Version:        1.35
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/tar
 Group:          Applications/System
@@ -13,6 +13,7 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # https://web.git.kernel.org/pub/scm/libs/libcap/libcap.git/commit/?id=177cd418031b1acfcf73fe3b1af9f3279828681c
 Patch1:         tar-1.33-fix-capabilities-test.patch
 Patch2:         tar-1.35-add-forgotten-tests-from-upstream.patch
+Patch3:         CVE-2026-5704.patch
 
 %description
 Contains GNU archiving program
@@ -50,6 +51,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Tue Sep 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.35-3
+- Patch for CVE-2026-5704
+
 * Wed Apr 02 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.35-2
 - import patches from fedora (LICENSE:MIT) to fix libcap issue.
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.35-1
