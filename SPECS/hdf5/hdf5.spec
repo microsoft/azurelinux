@@ -12,7 +12,7 @@
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
 Version:        1.14.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,10 @@ Patch19:        CVE-2026-26199.patch
 Patch20:        CVE-2026-17572.patch
 Patch21:        CVE-2026-17573.patch
 Patch22:        CVE-2026-17574.patch
+Patch23:        CVE-2025-2308.patch
+Patch24:        CVE-2025-2309.patch
+Patch25:        CVE-2026-19025.patch
+Patch26:        CVE-2026-19026.patch
 
 # For patches/rpath
 BuildRequires:  automake
@@ -416,6 +420,10 @@ done
 
 
 %changelog
+* Tue Sep 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.6-5
+- Patch for CVE-2026-19026, CVE-2026-19025, CVE-2025-2309, CVE-2025-2308
+- The CVE-2026-19026 patch also addresses CVE-2026-19027 and CVE-2026-19028
+
 * Tue Jul 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.6-4
 - Patch for CVE-2026-26199, CVE-2026-26197, CVE-2026-17574, CVE-2026-17573, CVE-2026-17572
 
