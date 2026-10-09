@@ -12,8 +12,9 @@ upstream-status = "inapplicable"
 type = "spec-search-replace"
 regex = '^Requires: openssl-fips-provider$'
 replacement = '''Requires: openssl(fips-provider)
-Recommends: SymCrypt-OpenSSL >= 1.11.0'''
-description = "Use the Azure Linux FIPS-provider capability"
+Recommends: SymCrypt-OpenSSL >= 1.11.2-8
+Conflicts: SymCrypt-OpenSSL < 1.11.2-8'''
+description = "Use the Azure Linux FIPS-provider capability with registered SymCrypt"
 
 [[overlays]]
 type = "patch-add"

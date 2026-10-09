@@ -37,7 +37,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.4
-Release: 12%{?dist}
+Release: 13%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -161,7 +161,8 @@ Requires: crypto-policies >= 20180730
 Recommends: pkcs11-provider%{?_isa}
 %if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
 Requires: openssl(fips-provider)
-Recommends: SymCrypt-OpenSSL >= 1.11.0
+Recommends: SymCrypt-OpenSSL >= 1.11.2-8
+Conflicts: SymCrypt-OpenSSL < 1.11.2-8
 %endif
 
 %description libs
