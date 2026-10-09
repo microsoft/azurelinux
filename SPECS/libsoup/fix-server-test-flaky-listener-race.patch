@@ -1,0 +1,68 @@
+From 3c0cee2cfddb9ba31b30421f2b3cdd3c5a255e99 Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@redhat.com>
+Date: Wed, 30 Apr 2025 14:13:41 -0500
+Subject: [PATCH] test-utils: fix deadlock in add_listener_in_thread()
+
+The mutex is locked in the wrong place here.
+
+Hopefully fixes #379
+
+Upstream-reference: https://gitlab.gnome.org/GNOME/libsoup/-/merge_requests/454.patch
+---
+ tests/server-test.c | 2 +-
+ tests/test-utils.c  | 8 ++++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/tests/server-test.c b/tests/server-test.c
+index 4d304f8..a3bc3f9 100644
+--- a/tests/server-test.c
++++ b/tests/server-test.c
+@@ -255,7 +255,7 @@ do_invalid_percent_encoding_paths_test (ServerData *sd, gconstpointer test_data)
+ 	SoupMessage *msg;
+ 	GUri *uri;
+ 
+-	g_test_bug ("262");
++	g_test_bug ("https://gitlab.gnome.org/GNOME/libsoup/-/issues/262");
+ 
+ 	session = soup_test_session_new (NULL);
+ 
+diff --git a/tests/test-utils.c b/tests/test-utils.c
+index d29d117..5c1e316 100644
+--- a/tests/test-utils.c
++++ b/tests/test-utils.c
+@@ -143,6 +143,8 @@ debug_printf (int level, const char *format, ...)
+ 	va_start (args, format);
+ 	g_vprintf (format, args);
+ 	va_end (args);
++
++	fflush (stdout);
+ }
+ 
+ gboolean
+@@ -605,9 +607,11 @@ static gboolean
+ add_listener_in_thread (gpointer user_data)
+ {
+ 	AddListenerData *data = user_data;
++	GUri *uri;
+ 
+-	data->uri = add_listener (data->server, data->scheme, data->host);
++	uri = add_listener (data->server, data->scheme, data->host);
+ 	g_mutex_lock (&data->mutex);
++	data->uri = uri;
+ 	g_cond_signal (&data->cond);
+ 	g_mutex_unlock (&data->mutex);
+ 
+@@ -639,9 +643,9 @@ soup_test_server_get_uri (SoupServer    *server,
+ 		data.host = host;
+ 		data.uri = NULL;
+ 
+-		g_mutex_lock (&data.mutex);
+ 		soup_add_completion (context, add_listener_in_thread, &data);
+ 
++		g_mutex_lock (&data.mutex);
+ 		while (!data.uri)
+ 			g_cond_wait (&data.cond, &data.mutex);
+ 
+-- 
+2.45.4
+
