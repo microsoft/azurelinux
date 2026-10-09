@@ -369,7 +369,7 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        with open(args.report, encoding="utf-8") as f:
+        with args.report.open(encoding="utf-8") as f:
             report = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as exc:
         print(f"Error reading report: {exc}", file=sys.stderr)
@@ -399,7 +399,7 @@ def main() -> int:
     if summary_file and body:
         max_summary = 1_000_000  # GH step summary limit is 1024 KiB
         summary = body[:max_summary] if len(body) > max_summary else body
-        with open(summary_file, "a", encoding="utf-8") as sf:
+        with Path(summary_file).open("a", encoding="utf-8") as sf:
             sf.write(summary)
             sf.write("\n")
 

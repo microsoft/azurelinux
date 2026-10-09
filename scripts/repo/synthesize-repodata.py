@@ -279,7 +279,7 @@ def _http_get(
                     timeout=timeout,
                     context=ssl_context,
                 ) as resp,
-                open(dest, "wb") as fh,
+                dest.open("wb") as fh,
             ):
                 shutil.copyfileobj(resp, fh)
             return
