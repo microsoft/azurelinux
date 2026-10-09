@@ -54,9 +54,9 @@ load_env()
 _DEFAULT_BASE_URL = "https://src.fedoraproject.org"
 _base_url: str = _DEFAULT_BASE_URL
 
-_scratch_dir: str = os.path.join(os.environ.get("AZLDEV_WORK_DIR", "base/build/work"), "scratch", "distgit")
-_repos_dir: str = os.path.join(_scratch_dir, "repos")
-_fetch_dir: str = os.path.join(_scratch_dir, "fetched")
+_scratch_dir: str = str(Path(os.environ.get("AZLDEV_WORK_DIR", "base/build/work")) / "scratch" / "distgit")
+_repos_dir: str = str(Path(_scratch_dir) / "repos")
+_fetch_dir: str = str(Path(_scratch_dir) / "fetched")
 
 # Maximum number of cached repos before eviction kicks in
 _MAX_CACHED_REPOS = 5
@@ -82,12 +82,12 @@ def _add_status(result: StatusDict, *, full: bool) -> StatusDict:
 def _repo_path(package: str, base_url: str) -> str:
     """Return the on-disk path for a cached clone, namespaced by origin host."""
     hostname = urlparse(base_url).hostname or "unknown"
-    return os.path.join(_repos_dir, hostname, package)
+    return str(Path(_repos_dir) / hostname / package)
 
 
 def _git_dir(package: str, base_url: str) -> str:
     """Return the .git directory for a cached clone."""
-    return os.path.join(_repo_path(package, base_url), ".git")
+    return str(Path(_repo_path(package, base_url)) / ".git")
 
 
 def _touch_repo(repo_dir: str) -> None:
@@ -102,21 +102,21 @@ def _cached_repos() -> list[tuple[str, float]]:
     ``_repos_dir/<package>`` (legacy layout before host-namespacing) so
     old caches are still visible for eviction and cleanup.
     """
-    if not os.path.isdir(_repos_dir):
+    if not Path(_repos_dir).is_dir():
         return []
     repos: list[tuple[str, float]] = []
     for entry in os.scandir(_repos_dir):
         if not entry.is_dir():
             continue
         # Legacy layout: _repos_dir/<package>/.git
-        if os.path.isdir(os.path.join(entry.path, ".git")):
+        if (Path(entry.path) / ".git").is_dir():
             repos.append((entry.path, entry.stat().st_mtime))
         else:
             # Current layout: _repos_dir/<hostname>/<package>/.git
             repos.extend(
                 (sub.path, sub.stat().st_mtime)
                 for sub in os.scandir(entry.path)
-                if sub.is_dir() and os.path.isdir(os.path.join(sub.path, ".git"))
+                if sub.is_dir() and (Path(sub.path) / ".git").is_dir()
             )
     repos.sort(key=lambda x: x[1])
     return repos
@@ -133,7 +133,7 @@ def _evict_if_needed(auto_clean: bool) -> str | None:
         return None
 
     if not auto_clean:
-        names = [os.path.basename(r) for r, _ in repos]
+        names = [Path(r).name for r, _ in repos]
         return (
             f"WARNING: Repo cache is full ({len(repos)}/{_MAX_CACHED_REPOS}). "
             f"Cached repos: {', '.join(names)}. "
@@ -156,7 +156,7 @@ def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, st
 
     repo_dir = _repo_path(package, base_url)
 
-    if os.path.isdir(os.path.join(repo_dir, ".git")):
+    if (Path(repo_dir) / ".git").is_dir():
         _touch_repo(repo_dir)
         # Fetch latest refs (best-effort)
         with contextlib.suppress(Exception):
@@ -173,7 +173,7 @@ def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, st
     if warn:
         return "", warn
 
-    os.makedirs(os.path.dirname(repo_dir), exist_ok=True)
+    Path(repo_dir).parent.mkdir(parents=True, exist_ok=True)
     clone_url = f"{base_url}/rpms/{package}.git"
     try:
         result = subprocess.run(
@@ -513,7 +513,7 @@ def distgit_cleanup(remove_repos: bool = True) -> StatusDict:
         removed_bytes = 0
 
         # Clean fetched files
-        if os.path.isdir(_fetch_dir):
+        if Path(_fetch_dir).is_dir():
             for entry in os.scandir(_fetch_dir):
                 if entry.is_file():
                     removed_bytes += entry.stat().st_size
@@ -522,7 +522,7 @@ def distgit_cleanup(remove_repos: bool = True) -> StatusDict:
 
         # Clean repos
         removed_repos_count = 0
-        if remove_repos and os.path.isdir(_repos_dir):
+        if remove_repos and Path(_repos_dir).is_dir():
             # Count actual repos (hostname/package) before bulk-removing the tree.
             removed_repos_count = len(_cached_repos())
             for entry in os.scandir(_repos_dir):
