@@ -1,0 +1,10 @@
+[components.libkml]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.libkml.source-files]]
+filename = "libkml-1.3.0.tar.gz"
+hash = "38bf79f2741166ab088a82b4673dcc27da42484f2577940608f1b4d1807ccf83353e640726f392c9fe269218a705a785380feeb7a8f6fb89eae71eb3810605bc"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "The crafted bad-too-large.kmz test fixture trips signing-pipeline scanning; archive overlays remove the fixture and its dependent test."

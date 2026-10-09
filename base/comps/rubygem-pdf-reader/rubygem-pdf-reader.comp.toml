@@ -1,0 +1,10 @@
+[components.rubygem-pdf-reader]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.rubygem-pdf-reader.source-files]]
+filename = "pdf-reader-2.4.2-spec.txz"
+hash = "13d874eed2885e655a0a818e5b2ca4ad8945ab948dc4e92d950e3e7ca2bbc3d0d074f0800ccfa4ffdb0a4b0cec9cbad2583a9048d7876387d23ad61b9225fea6"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Upstream PDF fixtures trip signing-pipeline scanning; archive overlays remove them and make their associated tests skip."
