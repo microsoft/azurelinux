@@ -24,12 +24,21 @@ replace-reason = "The local spec vendors the rendered sources manifest; this dec
 
 # NVIDIA open GPU kernel module source tarball (kmod-nvidia-open subpackage).
 [[components.kernel.source-files]]
-filename = "open-gpu-kernel-modules-610.57.04.tar.gz"
-hash = "08d905b0eff99741cb9fa94109d71d73e477ece2ea888cce206644859ae84b6930ff96cde10c9c6a1dcfaa79d4de7fca2df2a56534b77f3b02c431276365d2c3"
+filename = "open-gpu-kernel-modules-610.43.02.tar.gz"
+hash = "7049f394a7084544fbfea415b5d24c285fe529002cd21fc8b5c81a15468ccf07473b619070997fb04d016d114577d23e69b0a73f8a98e60a1819a07735e50830"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/610.57.04.tar.gz" }
+origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/610.43.02.tar.gz" }
 replace-upstream = true
 replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
+
+# Download the NVIDIA MLNX_OFED source bundle. We don't need the entire bundle
+# — only the mlnx-ofa_kernel SRPM (and its inner tarball) inside it — but NVIDIA
+# does not host mlnx-ofa_kernel as a standalone download.
+[[components.kernel.source-files]]
+filename = "MLNX_OFED_SRC-26.04-0.8.5.0.tgz"
+hash = "0a13d0377cb029f322cd29a3b716a2ef499fa16e6a19764e13c7a185eca8c4ad20cf313fad197659e995d3dc6c516459ff74a184159bd2c7b7386bd8978b7ae4"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://linux.mellanox.com/public/repo/doca/3.4.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.04-0.8.5.0.tgz" }
 
 # kABI reference tarballs (Source300/Source301). kABI checking is disabled in
 # Azure Linux, but the spec still declares these sources, so they must be present
