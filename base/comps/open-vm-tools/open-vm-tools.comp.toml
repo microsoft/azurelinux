@@ -1,1 +1,2 @@
 [components.open-vm-tools]
+spec = { type = "upstream", upstream-commit = "acd17b77b079c1cba2ba37acaace38ed9bd8e9b6" }
