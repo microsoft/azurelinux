@@ -55,8 +55,8 @@ def parse_kernel_config(config_path: Path) -> dict[str, str]:
     """Parse a Linux kernel .config file."""
     config = {}
     with config_path.open(encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if line.startswith("#") and "is not set" in line:
                 config_name = line.split()[1]
                 config[config_name] = "n"

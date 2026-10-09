@@ -29,8 +29,8 @@ def parse_os_release(content: str) -> dict[str, str]:
     Handles quoted and unquoted values per the os-release spec.
     """
     result: dict[str, str] = {}
-    for line in content.splitlines():
-        line = line.strip()
+    for raw_line in content.splitlines():
+        line = raw_line.strip()
         if not line or line.startswith("#"):
             continue
         if "=" not in line:
