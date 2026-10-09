@@ -51,7 +51,7 @@ from http import HTTPStatus
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import createrepo_c as cr
+import createrepo_c as cr  # pyright: ignore[reportMissingImports]  # Native module is absent from the Pyright environment.
 
 # `_repo_layout` is a sibling module in this directory.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
