@@ -7,7 +7,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -468,6 +468,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Tue Sep 29 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 2.06-28
+- Bump SBAT to grub,6 to indicate Feb 2025 CVEs are patched
+
 * Wed Mar 04 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 2.06-27
 - Patch CVE-2025-0622
 - Bump SBAT to grub,5

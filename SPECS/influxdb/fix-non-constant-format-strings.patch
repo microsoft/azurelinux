@@ -1,0 +1,270 @@
+From: Azure Linux Security Servicing Account <azurelinux-security@microsoft.com>
+Date: Tue, 16 Sep 2026 00:00:00 +0000
+Subject: [PATCH] Pass non-constant strings through a %s verb
+
+http/check_test.go
+---
+diff --git a/dbrp/http_server_dbrp_test.go b/dbrp/http_server_dbrp_test.go
+--- a/dbrp/http_server_dbrp_test.go
++++ b/dbrp/http_server_dbrp_test.go
+@@ -307,7 +307,7 @@
+ 			}
+ 
+ 			if !cmp.Equal(tt.ExpectedDBRPs, dbrps.Content) {
+-				t.Fatalf(cmp.Diff(tt.ExpectedDBRPs, dbrps.Content))
++				t.Fatalf("%s", cmp.Diff(tt.ExpectedDBRPs, dbrps.Content))
+ 			}
+ 
+ 		})
+@@ -432,7 +432,7 @@
+ 			}
+ 
+ 			if !cmp.Equal(tt.ExpectedDBRP, dbrpResponse.Content) {
+-				t.Fatalf(cmp.Diff(tt.ExpectedDBRP, dbrpResponse.Content))
++				t.Fatalf("%s", cmp.Diff(tt.ExpectedDBRP, dbrpResponse.Content))
+ 			}
+ 		})
+ 	}
+diff --git a/flux/client.go b/flux/client.go
+--- a/flux/client.go
++++ b/flux/client.go
+@@ -78,7 +78,7 @@
+ 	}
+ 
+ 	if resp.StatusCode != http.StatusNoContent {
+-		var err = fmt.Errorf(string(body))
++		var err = fmt.Errorf("%s", string(body))
+ 		return err
+ 	}
+ 
+diff --git a/http/check_test.go b/http/check_test.go
+--- a/http/check_test.go
++++ b/http/check_test.go
+@@ -635,7 +635,7 @@
+ 			res := w.Result()
+ 			content := res.Header.Get("Content-Type")
+ 			body, _ := io.ReadAll(res.Body)
+-			t.Logf(res.Header.Get("X-Influx-Error"))
++			t.Logf("%s", res.Header.Get("X-Influx-Error"))
+ 
+ 			if res.StatusCode != tt.wants.statusCode {
+ 				t.Errorf("%q. handleGetCheck() = %v, want %v", tt.name, res.StatusCode, tt.wants.statusCode)
+diff --git a/http/notification_endpoint_test.go b/http/notification_endpoint_test.go
+--- a/http/notification_endpoint_test.go
++++ b/http/notification_endpoint_test.go
+@@ -385,7 +385,7 @@
+ 			res := w.Result()
+ 			content := res.Header.Get("Content-Type")
+ 			body, _ := io.ReadAll(res.Body)
+-			t.Logf(res.Header.Get("X-Influx-Error"))
++			t.Logf("%s", res.Header.Get("X-Influx-Error"))
+ 
+ 			if res.StatusCode != tt.wants.statusCode {
+ 				t.Errorf("%q. handleGetNotificationEndpoint() = %v, want %v", tt.name, res.StatusCode, tt.wants.statusCode)
+diff --git a/http/query_handler_test.go b/http/query_handler_test.go
+--- a/http/query_handler_test.go
++++ b/http/query_handler_test.go
+@@ -291,7 +291,7 @@
+ 		Checks:  check.Responses{},
+ 	}
+ 	if !cmp.Equal(want, got) {
+-		t.Errorf("unexpected response -want/+got: " + cmp.Diff(want, got))
++		t.Errorf("unexpected response -want/+got: %s", cmp.Diff(want, got))
+ 	}
+ }
+ 
+@@ -309,7 +309,7 @@
+ 		Checks:  check.Responses{},
+ 	}
+ 	if !cmp.Equal(want, got) {
+-		t.Errorf("unexpected response -want/+got: " + cmp.Diff(want, got))
++		t.Errorf("unexpected response -want/+got: %s", cmp.Diff(want, got))
+ 	}
+ }
+ 
+diff --git a/http/resources_test.go b/http/resources_test.go
+--- a/http/resources_test.go
++++ b/http/resources_test.go
+@@ -51,7 +51,7 @@
+ 	resp := w.Result()
+ 	body, _ := io.ReadAll(resp.Body)
+ 	if resp.StatusCode != http.StatusOK {
+-		t.Logf(string(body))
++		t.Logf("%s", string(body))
+ 		t.Errorf("unexpected status: %s", resp.Status)
+ 	}
+ 
+diff --git a/kit/platform/id_test.go b/kit/platform/id_test.go
+--- a/kit/platform/id_test.go
++++ b/kit/platform/id_test.go
+@@ -78,7 +78,7 @@
+ 	var id platform.ID
+ 	err := id.DecodeFromString("020f755c3c082000")
+ 	if err != nil {
+-		t.Errorf(err.Error())
++		t.Errorf("%s", err.Error())
+ 	}
+ 	want := []byte{48, 50, 48, 102, 55, 53, 53, 99, 51, 99, 48, 56, 50, 48, 48, 48}
+ 	got, _ := id.Encode()
+@@ -164,12 +164,12 @@
+ 	init := "ca55e77eca55e77e"
+ 	id1, err := platform.IDFromString(init)
+ 	if err != nil {
+-		t.Errorf(err.Error())
++		t.Errorf("%s", err.Error())
+ 	}
+ 
+ 	serialized, err := json.Marshal(id1)
+ 	if err != nil {
+-		t.Errorf(err.Error())
++		t.Errorf("%s", err.Error())
+ 	}
+ 
+ 	var id2 platform.ID
+diff --git a/notification/check/threshold.go b/notification/check/threshold.go
+--- a/notification/check/threshold.go
++++ b/notification/check/threshold.go
+@@ -101,7 +101,7 @@
+ 		b.WriteString(err.Error() + "\n")
+ 	}
+ 
+-	return fmt.Errorf(b.String())
++	return fmt.Errorf("%s", b.String())
+ }
+ 
+ // GenerateFlux returns a flux script for the threshold provided. If there
+diff --git a/task/taskmodel/task_test.go b/task/taskmodel/task_test.go
+--- a/task/taskmodel/task_test.go
++++ b/task/taskmodel/task_test.go
+@@ -152,7 +152,7 @@
+ 			t.Fatalf("expected Cron to be \"\" but was %s", op.Cron)
+ 		}
+ 		if !cmp.Equal(*tu.Flux, expscript) {
+-			t.Fatalf(cmp.Diff(*tu.Flux, expscript))
++			t.Fatalf("%s", cmp.Diff(*tu.Flux, expscript))
+ 		}
+ 	})
+ 
+diff --git a/tools/tmpl/main.go b/tools/tmpl/main.go
+--- a/tools/tmpl/main.go
++++ b/tools/tmpl/main.go
+@@ -105,7 +105,7 @@
+ func mustReadAll(path string) []byte {
+ 	data, err := os.ReadFile(path)
+ 	if err != nil {
+-		errExit(err.Error())
++		errExit("%s", err.Error())
+ 	}
+ 
+ 	return data
+@@ -123,7 +123,7 @@
+ func fileMode(path string) os.FileMode {
+ 	stat, err := os.Stat(path)
+ 	if err != nil {
+-		errExit(err.Error())
++		errExit("%s", err.Error())
+ 	}
+ 	return stat.Mode()
+ }
+diff --git a/tsdb/shard_test.go b/tsdb/shard_test.go
+--- a/tsdb/shard_test.go
++++ b/tsdb/shard_test.go
+@@ -64,13 +64,13 @@
+ 
+ 	err := sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	pt.SetTime(time.Unix(2, 3))
+ 	err = sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	validateIndex := func() {
+@@ -96,7 +96,7 @@
+ 	pt.SetTime(time.Unix(2, 6))
+ 	err = sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	sh.Close()
+@@ -127,13 +127,13 @@
+ 
+ 	err := sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	pt.SetTime(time.Unix(2, 3))
+ 	err = sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	indexPath := filepath.Join(tmpShard, "index")
+@@ -158,10 +158,10 @@
+ 	// ensure the index gets rebuilt after its directory is deleted and
+ 	// the shard is reopened.
+ 	if err := sh.Close(); err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 	if err := os.RemoveAll(indexPath); err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	sh = tsdb.NewShard(1, tmpShard, tmpWal, sfile.SeriesFile, opts)
+@@ -175,7 +175,7 @@
+ 	pt.SetTime(time.Unix(2, 6))
+ 	err = sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	sh.Close()
+@@ -214,7 +214,7 @@
+ 
+ 	err := sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	if err := sh.Close(); err != nil {
+@@ -340,7 +340,7 @@
+ 
+ 	err := sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	pt = models.MustNewPoint(
+@@ -352,7 +352,7 @@
+ 
+ 	err = sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	if got, exp := sh.SeriesN(), int64(1); got != exp {
+@@ -627,7 +627,7 @@
+ 
+ 	err := sh.WritePoints(context.Background(), []models.Point{pt})
+ 	if err != nil {
+-		t.Fatalf(err.Error())
++		t.Fatalf("%s", err.Error())
+ 	}
+ 
+ 	if got, exp := sh.SeriesN(), int64(1); got != exp {
