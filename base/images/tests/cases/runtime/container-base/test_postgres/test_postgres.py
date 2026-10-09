@@ -86,7 +86,7 @@ def _run_crud_workflow(exec_shell: ExecShell, host: str) -> None:
     assert insert.exit_code == 0, f"insert failed: {insert.output}"
     assert insert.output.count("INSERT 0 1") == EXPECTED_ROWS, f"expected two inserts: {insert.output}"
 
-    select = exec_shell(f'{psql} -c "SELECT * FROM cities;"')
+    select = exec_shell(f'{psql} -c "SELECT * FROM cities;"')  # noqa: S608 - fixed test query
     assert select.exit_code == 0, f"select failed: {select.output}"
     assert f"{EXPECTED_ROWS} rows" in select.output, f"expected {EXPECTED_ROWS} rows: {select.output}"
 

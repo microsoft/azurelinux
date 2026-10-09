@@ -42,7 +42,10 @@ def test_telegraf_file_output_plugin_writes_metrics(
     config_body = (
         Path(__file__).parent / "configs" / "file_output.conf"
     ).read_text(encoding="utf-8")
-    result = write_file_in_container("/tmp/telegraf-file-output.conf", config_body)
+    result = write_file_in_container(
+        "/tmp/telegraf-file-output.conf",  # noqa: S108 - path is inside an ephemeral test container
+        config_body,
+    )
     assert result.exit_code == 0, f"failed writing file-output config: {result.output}"
 
     result = container_exec_shell(
@@ -54,4 +57,3 @@ def test_telegraf_file_output_plugin_writes_metrics(
         'test -s /tmp/telegraf-metrics.out && grep -q "mem,host" /tmp/telegraf-metrics.out'
     )
     assert result.exit_code == 0, f"telegraf file output validation failed: {result.output}"
-
