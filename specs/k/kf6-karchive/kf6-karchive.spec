@@ -5,12 +5,11 @@
 
 Name:           kf6-%{framework}
 Version:        6.30.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        KDE Frameworks 6 Tier 1 addon with archive functions
 License:        LGPL-2.0-or-later AND BSD-2-Clause
 URL:            https://invent.kde.org/frameworks/%{framework}
 Source0: http://download.kde.org/%{stable_kf6}/frameworks/%{majmin_ver_kf6}/%{framework}-%{version}.tar.xz
-Source1: http://download.kde.org/%{stable_kf6}/frameworks/%{majmin_ver_kf6}/%{framework}-%{version}.tar.xz.sig
 
 # Compile Tools
 BuildRequires:  cmake
