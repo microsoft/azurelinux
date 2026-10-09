@@ -1,0 +1,10 @@
+[components.libabigail]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.libabigail.source-files]]
+filename = "libabigail-2.10.tar.xz"
+hash = "f1e5a831dd9f9a1644f72e53b61246c6cf123e34f6b38330d12539130d609d90a11664e8441d5f7ef169ff1af59d1b9d3267a1a9eda789f83b6fe86282913fce"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "The PR30329 test fixture directory contains debuginfo files flagged by signing-pipeline scanning; the archive overlay removes it and a companion patch removes its tests."

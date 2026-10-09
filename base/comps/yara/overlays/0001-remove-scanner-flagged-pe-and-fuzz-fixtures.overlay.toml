@@ -1,0 +1,60 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+# Strip oss-fuzz seed corpus entries flagged by AV scanner
+[[overlays]]
+type = "file-remove"
+file = "tests/data/05cd06e6a202e12be22a02700ed6f1604e803ca8867277d852e8971efded0650"
+archive = "yara-4.5.7.tar.gz"
+description = "Remove PE fixture flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/data/079a472d22290a94ebb212aa8015cdc8dd28a968c6b4d3b88acdd58ce2d3b885"
+archive = "yara-4.5.7.tar.gz"
+description = "Remove PE fixture flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/data/079a472d22290a94ebb212aa8015cdc8dd28a968c6b4d3b88acdd58ce2d3b885.upx"
+archive = "yara-4.5.7.tar.gz"
+description = "Remove UPX-packed PE fixture flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/data/e3d45a2865818756068757d7e319258fef40dad54532ee4355b86bc129f27345"
+archive = "yara-4.5.7.tar.gz"
+description = "Remove PE fixture flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/oss-fuzz/dex_fuzzer_corpus/27fb31059503773723597edb875c937af971a6c15f91aac8c03c1fbdfa9e918c"
+archive = "yara-4.5.7.tar.gz"
+description = "Remove dex_fuzzer seed corpus entry flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/oss-fuzz/dex_fuzzer_corpus/b343d1058063e6e4b652ccf0589f93d0dbb6b092960e4aebc3c3c58894831359"
+archive = "yara-4.5.7.tar.gz"
+description = "Remove dex_fuzzer seed corpus entry flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/oss-fuzz/dotnet_fuzzer_corpus/buggy_stream_names"
+archive = "yara-4.5.7.tar.gz"
+description = "Remove dotnet_fuzzer seed corpus entry flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/oss-fuzz/dotnet_fuzzer_corpus/obfuscated"
+archive = "yara-4.5.7.tar.gz"
+description = "Remove dotnet_fuzzer seed corpus entry flagged by AZL signing-pipeline AV scanner"
+
+# Retain test-pe and remove only assertions that read the stripped fixtures.
+[[overlays]]
+type = "file-search-replace"
+file = "tests/test-pe.c"
+archive = "yara-4.5.7.tar.gz"
+regex = '(?m)^  assert_true_rule_file\(\n(?:[ \t].*\n)*?      "(?:05cd06e6a202e12be22a02700ed6f1604e803ca8867277d852e8971efded0650|079a472d22290a94ebb212aa8015cdc8dd28a968c6b4d3b88acdd58ce2d3b885(?:\.upx)?|e3d45a2865818756068757d7e319258fef40dad54532ee4355b86bc129f27345)"\);\n'
+description = "Remove only PE assertions that read flagged fixtures, preserving all other test-pe coverage"

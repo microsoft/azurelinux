@@ -1,0 +1,33 @@
+# The upstream libabigail tarball `libabigail-2.10.tar.xz` (Source0) ships an
+# abidiff regression-test fixture set whose two separated-debuginfo files trip
+# anti-malware scanning on the AZL RPM-signing pipeline, which rejects
+# encrypted / unscannable payloads inside SRPMs:
+#
+#   - tests/data/test-abidiff-exit/PR30329/{old,new}-image/usr/lib/debug/
+#     usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6.debug
+#       Stripped DWARF debuginfo for a pre-built upstream sqlite3 shared
+#       library, used (with dwz multifile companions) to exercise abidiff
+#       across separated-debuginfo + dwz layouts. The scanner flags both
+#       .debug files as "packer_high_entropy:eod".
+#
+# Archive overlays strip the entire PR30329/ fixture directory from upstream
+# Source0 so nothing in-tree references the missing files. The two
+# corresponding `InOutSpec in_out_specs[]` entries in
+# tests/test-abidiff-exit.cc are dropped by a companion overlay patch
+# (`tests-drop-PR30329-fixture-entries.patch`, applied below), keeping
+# `make check` green. This avoids a separate modified-source tarball.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/data/test-abidiff-exit/PR30329/**"
+archive = "libabigail-2.10.tar.xz"
+description = "Remove PR30329 fixture directory (two libsqlite3.so.0.8.6.debug files flagged as packer_high_entropy:eod by AZL signing-pipeline AV scanner)"
+
+[[overlays]]
+description = "Drop the two tests/test-abidiff-exit.cc InOutSpec entries that exercise the PR30329 fixture set (removed from the AZL-repacked Source0 because its two libsqlite3.so.0.8.6.debug files are flagged packer_high_entropy:eod by the AZL signing-pipeline AV scanner). Without this patch `make check` fails trying to open the missing fixtures."
+type = "patch-add"
+file = "tests-drop-PR30329-fixture-entries.patch"
+source = "../tests-drop-PR30329-fixture-entries.patch"

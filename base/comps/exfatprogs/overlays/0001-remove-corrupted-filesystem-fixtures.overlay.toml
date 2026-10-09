@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+type = "file-remove"
+file = "tests/**"
+archive = "exfatprogs-1.4.3.tar.xz"
+description = "Remove tests/ directory containing deliberately-corrupted exFAT filesystem images that trip AZL signing-pipeline AV scanner"

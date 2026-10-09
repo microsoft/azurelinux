@@ -1,0 +1,10 @@
+[components.apache-commons-compress]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.apache-commons-compress.source-files]]
+filename = "commons-compress-1.27.1-src.tar.gz"
+hash = "cff58f1c9cb95e96e95230af6523b2e593ac5d1c775110d5845012775920468f8fc9013a0bdba6022cc6dc3391b5d92bd59cf6eacf4c10c82ef9b7792d63601f"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Upstream source tarball contains test fixtures flagged as malware by the AZL RPM signing pipeline. These files are not needed at runtime and are removed to allow SRPM publication."

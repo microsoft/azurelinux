@@ -1,0 +1,10 @@
+[components.exfatprogs]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.exfatprogs.source-files]]
+filename = "exfatprogs-1.4.3.tar.xz"
+hash = "21443aa4a93467d16824b827376b9c8d89fc970b105af50c41aa06251cb4d1cddaad7a13255c2269a2ca5013b2755a2e902cedd36f1fb89df51fb025b4dac3d6"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Upstream tests contain deliberately corrupted exFAT filesystem images that trip signing-pipeline scanning; the archive overlay removes the unused tests tree."

@@ -1,0 +1,48 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+# The upstream Mozilla source tarball ships content flagged by the AZL RPM
+# signing pipeline as obfuscated / malware-like (e.g. an obfuscated Windows
+# binary used only by media-sniffer unit tests, crashtest HTML that trips
+# malware scanners). Such content blocks the SRPM from being published.
+# Archive overlays strip the scanner-flagged fixtures from upstream Source0
+# during source preparation, avoiding a separate modified-source tarball.
+#
+# When bumping the firefox version:
+#   1. Update the overlay paths below if upstream fixture paths change.
+#   2. Re-render and build to verify the archive overlays still apply.
+
+[[overlays]]
+type = "file-remove"
+file = "toolkit/components/mediasniffer/test/unit/data/ff-inst.exe"
+archive = "firefox-156.0.1.source.tar.xz"
+description = "Remove obfuscated Windows executable test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+description = "Drop the removed fixture from the xpcshell support-files list"
+type = "file-search-replace"
+archive = "firefox-156.0.1.source.tar.xz"
+file = "toolkit/components/mediasniffer/test/unit/xpcshell.toml"
+regex = '.*ff-inst\.exe.*\n'
+
+# Remove the descriptive comment with the test entry so it does not label the next case.
+[[overlays]]
+description = "Drop the media-sniffer test case that reads the removed fixture"
+type = "file-search-replace"
+archive = "firefox-156.0.1.source.tar.xz"
+file = "toolkit/components/mediasniffer/test/unit/test_mediasniffer_ext.js"
+regex = '.*(?:bug 875769|ff-inst\.exe).*\n'
+
+[[overlays]]
+type = "file-remove"
+file = "dom/base/crashtests/607222.html"
+archive = "firefox-156.0.1.source.tar.xz"
+description = "Remove crashtest HTML fixture flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+description = "Drop the removed crashtest fixture from its manifest"
+type = "file-search-replace"
+file = "dom/base/crashtests/crashtests.list"
+archive = "firefox-156.0.1.source.tar.xz"
+regex = '(?m)^load 607222\.html\n'

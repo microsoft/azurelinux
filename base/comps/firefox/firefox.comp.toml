@@ -1,0 +1,10 @@
+[components.firefox]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.firefox.source-files]]
+filename = "firefox-156.0.1.source.tar.xz"
+hash = "79bc55832b036510482ff7a87f93a03e60aa85f8c4643a59768825f5b592525c801d91ade1e3c8e78dac4ca00eb5cf18137e7ab1eb9a51b8d0789b0822808a00"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Upstream source tarball contains test fixtures flagged by the signing-pipeline scanner; archive overlays remove them, their manifest registrations, and the dependent media-sniffer test case before SRPM creation."

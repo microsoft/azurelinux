@@ -1,0 +1,14 @@
+[components.gdal]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.gdal.source-files]]
+filename = "gdalautotest-3.11.5.tar.gz"
+hash = "b7943e3e407645150a5d169bb5ff3caff96ac3422ba932e6dd7eec02f799ad78ed3893bc642972738e3bbaa09fbaa72e38b0b0ea382925c113a4e855c13fc7c1"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "The gdalautotest source contains a nested archive that trips signing-pipeline scanning; archive overlays remove this fixture and its two dependent tests while preserving the remaining checks."
+
+[components.gdal.build]
+# Azure Linux does not support MinGW cross-compilation.
+without = ["mingw"]

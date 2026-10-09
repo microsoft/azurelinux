@@ -1,0 +1,10 @@
+[components.yara]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.yara.source-files]]
+filename = "yara-4.5.7.tar.gz"
+hash = "c28ba8f18f9579a4bf2a473332c1ec9134cec91fdc7df676890882f358b78ded94bedc0a703c5baa7b2a860886c7a37dcc2034951da243501c45566ed39d147f"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Upstream PE and oss-fuzz test fixtures trip signing-pipeline scanning; archive overlays remove those fixtures and only their dependent assertions while preserving the remaining test-pe coverage."
