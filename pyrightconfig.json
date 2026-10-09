@@ -12,18 +12,8 @@
     "typeCheckingMode": "standard",
     "pythonVersion": "3.12",
     "pythonPlatform": "Linux",
-    "reportArgumentType": "none",
     "reportAttributeAccessIssue": "none",
-    "reportCallIssue": "none",
     "reportMissingImports": "none",
-    "reportMissingModuleSource": "none",
-    "reportMissingParameterType": "none",
     "reportMissingTypeStubs": "warning",
-    "reportMissingTypeArgument": "none",
-    "reportOptionalIterable": "none",
-    "reportOptionalMemberAccess": "none",
-    "reportPossiblyUnboundVariable": "none",
-    "reportSelfClsParameterName": "none",
-    "reportUnknownParameterType": "none",
     "reportUntypedFunctionDecorator": "error"
 }
