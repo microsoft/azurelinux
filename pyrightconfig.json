@@ -13,7 +13,6 @@
     "pythonVersion": "3.12",
     "pythonPlatform": "Linux",
     "reportAttributeAccessIssue": "none",
-    "reportMissingImports": "none",
     "reportMissingTypeStubs": "warning",
     "reportUntypedFunctionDecorator": "error"
 }
