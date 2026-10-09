@@ -2,7 +2,7 @@
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
 Version:        3.13.7
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,23 @@ Patch18:		CVE-2026-44839.patch
 Patch19:		CVE-2026-59248.patch
 Patch20:		CVE-2026-65624.patch
 Patch21:		CVE-2026-43971.patch
+Patch22:		CVE-2026-66067.patch
+Patch23:		CVE-2026-66068.patch
+Patch24:		CVE-2026-66070.patch
+Patch25:		CVE-2026-66072.patch
+Patch26:		CVE-2026-66074.patch
+Patch27:		CVE-2026-66075.patch
+Patch28:		CVE-2026-66079.patch
+Patch29:		CVE-2026-67219.patch
+Patch30:		CVE-2026-67221.patch
+Patch31:		CVE-2026-67222.patch
+Patch32:		CVE-2026-67225.patch
+Patch33:		CVE-2026-67226.patch
+Patch34:		CVE-2026-67228.patch
+Patch35:		CVE-2026-67229.patch
+Patch36:		CVE-2026-67232.patch
+Patch37:		CVE-2026-67235.patch
+Patch38:		CVE-2026-67239.patch
 
 BuildRequires:  elixir
 BuildRequires:  erlang
@@ -87,6 +104,9 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
+* Thu Oct 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-10
+- Patch for CVE-2026-67239, CVE-2026-67235, CVE-2026-67232, CVE-2026-67229, CVE-2026-67228, CVE-2026-67226, CVE-2026-67225, CVE-2026-67222, CVE-2026-67221, CVE-2026-67219, CVE-2026-66079, CVE-2026-66075, CVE-2026-66074, CVE-2026-66072, CVE-2026-66070, CVE-2026-66068, CVE-2026-66067
+
 * Fri Jul 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-9
 - Patch for CVE-2026-65624, CVE-2026-59248, CVE-2026-43971
 
