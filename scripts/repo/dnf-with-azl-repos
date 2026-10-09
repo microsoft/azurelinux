@@ -222,7 +222,7 @@ def main(argv: list[str] | None = None) -> int:
         die("no repos discovered under any --repo-prefix")
 
     cmd = ["dnf", *dnf_args, *args.dnf_args]
-    os.execvp(cmd[0], cmd)
+    os.execvp(cmd[0], cmd)  # noqa: S606 - replace this wrapper process without a shell
 
 
 if __name__ == "__main__":
