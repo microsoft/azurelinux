@@ -11,8 +11,8 @@ source = "../0001-configure-cis-pam-policy.patch"
 description = "Apply the CIS policy patch in PAM's manually enumerated prep sequence"
 type = "spec-search-replace"
 section = "%prep"
-regex = '^%patch -P 3 -p1 -b \.pam-unix-remove-obsolete-defines$'
+regex = '^%patch -P 4 -p1 -b \.pam-userdb-fix-password-leak$'
 replacement = '''
-%patch -P 3 -p1 -b .pam-unix-remove-obsolete-defines
-%patch -P 4 -p1
+%patch -P 4 -p1 -b .pam-userdb-fix-password-leak
+%patch -P 5 -p1 -b .configure-cis-pam-policy
 '''

@@ -17,7 +17,7 @@
 Summary: An extensible library which provides authentication for applications
 Name: pam
 Version: 1.7.1
-Release: 10%{?dist}
+Release: 11%{?dist}
 # The library is BSD licensed with option to relicense as GPLv2+
 # - this option is redundant as the BSD license allows that anyway.
 # pam_timestamp and pam_loginuid modules are GPLv2+.
@@ -139,9 +139,9 @@ cp %{SOURCE18} .
 %patch -P 1 -p1 -b .redhat-modules
 %patch -P 2 -p1 -b .nomsg
 %patch -P 3 -p1 -b .pam-unix-remove-obsolete-defines
-%patch -P 4 -p1
-
 %patch -P 4 -p1 -b .pam-userdb-fix-password-leak
+%patch -P 5 -p1 -b .configure-cis-pam-policy
+
 
 %build
 %meson \
