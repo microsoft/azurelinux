@@ -356,6 +356,8 @@ components = [
     "gdisk",
     "gdk-pixbuf2",
     "generic-logos",
+    "GeoIP",
+    "GeoIP-GeoLite-data",
     "geolite2",
     "geos",
     "gettext",
