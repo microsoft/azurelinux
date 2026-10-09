@@ -161,7 +161,7 @@ def write_output(
     If the output is small (<= INLINE_THRESHOLD_BYTES), the content is
     included inline so the agent doesn't need a follow-up read_file call.
     """
-    os.makedirs(output_dir, exist_ok=True)
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
     fd, out_path = tempfile.mkstemp(prefix=prefix, dir=output_dir)
     with os.fdopen(fd, "w") as f:
         f.write(text)
