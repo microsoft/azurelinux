@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        8.11.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,10 @@ Patch19:        CVE-2026-10536.patch
 Patch20:        CVE-2026-8286.patch
 Patch21:        CVE-2026-9079.patch
 Patch22:        CVE-2026-11856.patch
+Patch23:        CVE-2026-13608.patch
+Patch24:        CVE-2026-18924.patch
+Patch25:        CVE-2026-19931.patch
+Patch26:        CVE-2026-80230.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
@@ -121,6 +125,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed Oct 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-12
+- Patch for CVE-2026-80230, CVE-2026-19931, CVE-2026-18924, CVE-2026-13608
+
 * Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-11
 - Patch for CVE-2026-11856
 - Regenerate autotools files to include patched tests in make check.
