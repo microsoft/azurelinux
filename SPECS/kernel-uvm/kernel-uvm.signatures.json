@@ -1,7 +1,7 @@
 {
   "Signatures": {
-    "config": "9178df7aaeebb0510da9e8d518f940b560cc99f325a42186030e671885a23249",
-    "kernel-uvm-6.6.137.mshv1.tar.gz": "5dd65745817a26ce13a28a1a37c69d9e3cecae74fc7a89677771d7da6d91e590",
-    "config_aarch64": "38f567793119944b4cfcc210a2a47fc9b27134f016097172af0109b8b55bd4d4"
+    "config": "b18831df6919c5d25f65bd729fbc4f0cd6f720d42f707ccc8261b11bae6b8ab4",
+    "config_aarch64": "640ed11b9f8f032c279642e445335b9b0420e3cda471acd332fecd69c5062b7a",
+    "kernel-uvm-6.18.52.mshv1.tar.gz": "d22801b68d31b305a406bd2cedb07d8622bac7b5fdf9324e60afc96c6bad5bb2"
   }
 }
