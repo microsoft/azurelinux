@@ -12,6 +12,7 @@ components = [
     "erlang-lager",
     "fakeroot",
     "fontconfig",
+    "gdal",
     "ghc",
     "glib2",
     "git",
