@@ -1,0 +1,21 @@
+From: Azure Linux <azl@microsoft.com>
+Date: Tue, 29 Sep 2026 00:00:00 +0000
+Subject: [PATCH] bootstrap: enable annotation processing on JDK 25
+
+JDK 23 stopped implicitly running annotation processors found on the class
+path. Bazel's Starlark bootstrap Java rule relies on AutoValue processors to
+generate classes used by the bootstrap VanillaJavaBuilder.
+
+Pass -proc:full explicitly, matching the behavior of earlier JDK releases.
+
+--- a/tools/build_rules/java_rules_skylark.bzl
++++ b/tools/build_rules/java_rules_skylark.bzl
+@@ -76,7 +76,7 @@ def _java_library_impl(ctx):
+ 
+     if ctx.files.srcs or ctx.files.srcjars:
+         cmd += "%s/bin/javac" % java_runtime.java_home
+-        cmd += " " + " ".join(javac_options)
++        cmd += " -proc:full " + " ".join(javac_options)
+         if compile_time_jars:
+             cmd += " -classpath '" + _join_paths(ctx.configuration.host_path_separator, compile_time_jars_list) + "'"
+         cmd += " -d " + build_output + files + "\n"
