@@ -2317,6 +2317,7 @@ components = [
     "rust-coreutils",
     "rust-eif_build",
     "rust-imagequant-sys",
+    "rust-pathrs",
     "rust-podman-sequoia",
     "rust-prefixdevname",
     "rust-ripgrep",
