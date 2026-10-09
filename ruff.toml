@@ -55,13 +55,11 @@ ignore = [
     "S101",
     "S104",
     "S108",
-    "S110",
     "S310",
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
     "S606",
     "S607",   # Requiring abspath for all binaries used is very restrictive
     "S608",
-    "SIM105",
     "T201",   # These scripts are fine to use `print` for output
     "TRY003",
     "TRY300",
