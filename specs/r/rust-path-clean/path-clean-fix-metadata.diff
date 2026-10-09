@@ -1,0 +1,14 @@
+--- path-clean-1.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ path-clean-1.0.1/Cargo.toml	2024-06-03T14:49:56.917927+00:00
+@@ -20,11 +20,3 @@
+ keywords = ["path", "clean"]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/danreeves/path-clean"
+-
+-[[bench]]
+-name = "clean_benchmark"
+-harness = false
+-
+-[dependencies]
+-[dev-dependencies.criterion]
+-version = "0.2"
