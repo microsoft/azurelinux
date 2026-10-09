@@ -1,0 +1,2 @@
+[components.zimg]
+spec = { type = "upstream", upstream-commit = "44b982729d991372955a68b7a1e3b4e255f4e835" }

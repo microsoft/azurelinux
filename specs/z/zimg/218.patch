@@ -1,4 +1,4 @@
-From b013c7b006e6bee05b7964162f3a00402168e77f Mon Sep 17 00:00:00 2001
+From b4de5f36a6b1e31b891492c466888371afb6ee9b Mon Sep 17 00:00:00 2001
 From: Yaakov Selkowitz <yselkowi@redhat.com>
 Date: Tue, 18 Mar 2025 17:11:00 -0400
 Subject: [PATCH] Fix build with GCC 15
