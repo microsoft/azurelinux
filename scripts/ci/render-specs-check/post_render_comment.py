@@ -1,15 +1,15 @@
-"""Post (or update/delete) a PR comment with rendered-spec drift results.
+r"""Post (or update/delete) a PR comment with rendered-spec drift results.
 
 Reads the JSON report produced by check_rendered_specs.py and posts a
 formatted comment on the PR. Designed to run in a workflow_run context
 where the base repo's GITHUB_TOKEN is available (needed for fork PRs).
 
 Usage:
-    python post_render_comment.py \\
-        --report render-check-report.json \\
-        --repo owner/repo \\
-        --pr 123 \\
-        --artifacts-url https://... \\
+    python post_render_comment.py \
+        --report render-check-report.json \
+        --repo owner/repo \
+        --pr 123 \
+        --artifacts-url https://... \
         --run-id 12345
 
 Exit codes:
