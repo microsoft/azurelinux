@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      21%{?dist}
+Release:      22%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -27,6 +27,11 @@ Patch8:       CVE-2026-50540.patch
 Patch9:       CVE-2026-44210.patch
 Patch10:      rust-fix-unstable-name-collisions.patch
 Patch11:      CVE-2026-84445.patch
+Patch12:      CVE-2026-93599.patch
+Patch13:      CVE-2026-93600.patch
+Patch14:      CVE-2026-42784.patch
+Patch15:      CVE-2026-93602.patch
+Patch16:      CVE-2026-81870.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -166,6 +171,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Sep 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-22
+- Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599, CVE-2026-42784, CVE-2026-81870, CVE-2026-93602
+
 * Thu Sep 17 2026 Akhila <akhila@microsoft.com> - 3.15.0.aks0-21
 - Generate Source2 go vendor tarball by upgrading grpc to v1.83.2 to fix CVE-2026-84445 and CVE-2026-84304
 - Drop CVE-2026-39821, CVE-2026-33814 and CVE-2026-56852 patches, fixed by the new vendor tree
