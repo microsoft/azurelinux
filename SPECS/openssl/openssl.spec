@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.7
-Release: 6%{?dist}
+Release: 7%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -67,6 +67,10 @@ Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 # If OpenSSL updates speed to be FIPS-tolerant, remove this patch.
 Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
 Patch83:  Allow-NULL-buffer-with-0-bsize.patch
+Patch84:  0118-Add-a-red-black-tree-implementation.patch
+Patch85:  0119-Add-ossl_list_TYPE_join-function.patch
+Patch86:  0120-Add-value_barrier_bn-constant-time-helper.patch
+Patch87:  0121-quic-move-the-RXE-definition-to-a-local-header.patch
 Patch100: CVE-2026-31791.patch
 Patch101: CVE-2026-34182.patch
 Patch102: CVE-2026-34180.patch
@@ -90,6 +94,18 @@ Patch119: CVE-2026-63075.patch
 Patch120: CVE-2026-63076.patch
 Patch121: CVE-2026-75803.patch
 Patch122: CVE-2026-14457.patch
+Patch123: CVE-2026-35189.patch
+Patch124: CVE-2026-42772.patch
+Patch125: CVE-2026-54872.patch
+Patch126: CVE-2026-54873.patch
+Patch127: CVE-2026-54875.patch
+Patch128: CVE-2026-72897.patch
+Patch129: CVE-2026-75804.patch
+Patch130: CVE-2026-75805.patch
+Patch131: CVE-2026-75806.patch
+Patch132: CVE-2026-77696.patch
+Patch133: CVE-2026-84782.patch
+Patch134: CVE-2026-84784.patch
 License: Apache-2.0
 URL: http://www.openssl.org/
 
@@ -385,6 +401,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Sat Oct 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-7
+- Patch for CVE-2026-84784, CVE-2026-84782, CVE-2026-77696, CVE-2026-75806, CVE-2026-75805, CVE-2026-75804, CVE-2026-72897, CVE-2026-54875, CVE-2026-54873, CVE-2026-54872, CVE-2026-42772, CVE-2026-35189
+
 * Wed Aug 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-6
 - Patch for CVE-2026-75803, CVE-2026-63076, CVE-2026-63075, CVE-2026-63074, CVE-2026-63073, CVE-2026-63072, CVE-2026-54874
 
