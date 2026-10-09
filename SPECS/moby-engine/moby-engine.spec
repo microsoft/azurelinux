@@ -1,9 +1,9 @@
-%define commit_hash f417435e5f6216828dec57958c490c4f8bae4f98
+%define commit_hash eaa0057b5d603fbd1eb1867246c05ef2a0cf1ed9
 
 Summary: The open-source application container engine
 Name:    moby-engine
-Version: 25.0.3
-Release: 21%{?dist}
+Version: 25.0.18
+Release: 1%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -16,40 +16,17 @@ Source2: docker.socket
 
 Patch0:  CVE-2022-2879.patch
 Patch1:  enable-docker-proxy-libexec-search.patch
-Patch2:  CVE-2024-41110.patch
-Patch3:  CVE-2024-29018.patch
-Patch4:  CVE-2024-24786.patch
-Patch5:  CVE-2024-36621.patch
-Patch6:  CVE-2024-36620.patch
-Patch7:  CVE-2024-36623.patch
-Patch8:  CVE-2024-45337.patch
-Patch9:  CVE-2023-45288.patch
-Patch10: CVE-2025-22868.patch
-Patch11: CVE-2025-22869.patch
-Patch12: CVE-2025-30204.patch
-Patch13: CVE-2024-51744.patch
-Patch14: CVE-2025-58183.patch
-#This can be removed when upgraded to v25.0.15
-Patch15: fix-multiarch-image-push-tag.patch
-Patch16: CVE-2026-39882.patch
-Patch17: CVE-2026-32288.patch
-Patch18: CVE-2026-39821.patch
-Patch19: CVE-2026-39829.patch
-Patch20: CVE-2026-39830.patch
-Patch21: CVE-2026-39834.patch
-Patch22: CVE-2026-46597.patch
-Patch23: CVE-2026-39827.patch
-Patch24: CVE-2026-39835.patch
-Patch25: CVE-2026-56852.patch
-Patch26: CVE-2026-61712.patch
-Patch27: CVE-2026-75593.patch
-Patch28: CVE-2026-61711.patch
-Patch29: CVE-2026-17106.patch
-Patch30: CVE-2026-37236.patch
-Patch31: CVE-2026-56855.patch
-Patch32: CVE-2026-78662.patch
-Patch33: CVE-2026-84304.patch
-Patch34: CVE-2026-84445.patch
+Patch2:  CVE-2025-58183.patch
+Patch3:  CVE-2026-32288.patch
+Patch4:  CVE-2026-61712.patch
+Patch5:  CVE-2026-75593.patch
+Patch6:  CVE-2026-61711.patch
+Patch7:  CVE-2026-17106.patch
+Patch8:  CVE-2026-37236.patch
+Patch9:  CVE-2026-56855.patch
+Patch10: CVE-2026-78662.patch
+Patch11: CVE-2026-84304.patch
+Patch12: CVE-2026-84445.patch
 
 %{?systemd_requires}
 
@@ -145,6 +122,11 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Tue Oct 06 2026 Mitch Zhu <mitchzhu@microsoft.com> - 25.0.18-1
+- Upgrade to version 25.0.18
+- Remove upstreamed patches
+- Backport upstream fix for absolute hardlink targets
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-21
 - Patch for CVE-2026-84304, CVE-2026-78662, CVE-2026-56855, CVE-2026-37236, CVE-2026-84445
 
