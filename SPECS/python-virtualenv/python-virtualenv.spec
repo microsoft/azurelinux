@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,6 +22,8 @@ Patch1009:      CVE-2026-8643v0.patch
 Patch1010:      CVE-2026-8643v1.patch
 Patch1011:      CVE-2026-13346v0.patch
 Patch1012:      CVE-2026-13346v1.patch
+Patch1013:      CVE-2026-102925.patch
+Patch1014:      CVE-2026-102930.patch
 BuildArch:      noarch
 
 %description
@@ -54,6 +56,8 @@ virtualenv is a tool to create isolated Python environment.
 # Adding -N to enable manual patching, needed for CVE-2025-50181
 %autosetup -p1 -n virtualenv-%{version} -N
 %patch -P 0 -p1
+%patch -P 1013 -p1
+%patch -P 1014 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -175,6 +179,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
+- Patch for CVE-2026-102925 and CVE-2026-102930
+
 * Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
 - Patch for CVE-2026-13346
 
