@@ -1,0 +1,177 @@
+From bfa971988ae697423412ce49659223c5fce2223f Mon Sep 17 00:00:00 2001
+From: Harshit Gupta <guptaharshit@microsoft.com>
+Date: Thu, 17 Sep 2026 11:17:39 -0700
+Subject: [PATCH 3/4] Expose CLI arg for MAC addr of NIC
+
+Signed-off-by: Harshit Gupta <guptaharshit@microsoft.com>
+---
+ Guide/src/reference/openvmm/management/cli.md |  5 ++++
+ openvmm/openvmm_entry/src/cli_args.rs         | 24 +++++++++++++++++++
+ openvmm/openvmm_entry/src/lib.rs              | 11 +++++----
+ 3 files changed, 36 insertions(+), 4 deletions(-)
+
+diff --git a/Guide/src/reference/openvmm/management/cli.md b/Guide/src/reference/openvmm/management/cli.md
+index 3a862b49..cbe1a80f 100644
+--- a/Guide/src/reference/openvmm/management/cli.md
++++ b/Guide/src/reference/openvmm/management/cli.md
+@@ -390,11 +390,16 @@ ### Attaching devices to PCIe
+ **NICs** (colon-prefixed): `--net`, `--virtio-net`, `--mana`
+ 
+ ```sh
++--net mac=00-15-5d-12-12-13:consomme
+ --virtio-net pcie_port=rp0:tap:tap0  # TAP is Linux-only
+ --net pcie_port=rp0:consomme
+ --mana pcie_port=rp0:tap:tap0        # TAP is Linux-only
+ ```
+ 
++Use `mac=<XX-XX-XX-XX-XX-XX>:` to set the MAC address exposed to the guest.
++If it is omitted, OpenVMM generates a random MAC address. This prefix can be
++combined with the other NIC prefixes.
++
+ **Filesystems and other virtio devices** (colon-prefixed):
+ `--virtio-fs`, `--virtio-fs-shmem`, `--virtio-9p`, `--virtio-pmem`
+ 
+diff --git a/openvmm/openvmm_entry/src/cli_args.rs b/openvmm/openvmm_entry/src/cli_args.rs
+index 9cab9f1c..9aa2930f 100644
+--- a/openvmm/openvmm_entry/src/cli_args.rs
++++ b/openvmm/openvmm_entry/src/cli_args.rs
+@@ -23,6 +23,7 @@
+ use clap::ValueEnum;
+ use cxl_spec::spec::CfmwsWindowRestrictions;
+ use guid::Guid;
++use net_backend_resources::mac_address::MacAddress;
+ use openvmm_defs::config::DEFAULT_PCAT_BOOT_ORDER;
+ use openvmm_defs::config::DeviceVtl;
+ use openvmm_defs::config::PcatBootDevice;
+@@ -549,6 +550,7 @@ pub struct Options {
+     /// Prefix with `uh:` to add this NIC via Mana emulation through OpenHCL,
+     /// `vtl2:` to assign this NIC to VTL2, or `pcie_port=<port_name>:` to
+     /// expose the NIC over emulated PCIe at the specified port.
++    /// Prefix with `mac=<XX-XX-XX-XX-XX-XX>:` to set the guest MAC address.
+     ///
+     /// For consomme, forward host ports into the guest with `hostfwd=`:
+     ///   --net consomme:hostfwd=tcp::3389-:3389
+@@ -782,6 +784,7 @@ pub struct Options {
+     /// Prefix with `uh:` to add this NIC via Mana emulation through OpenHCL,
+     /// `vtl2:` to assign this NIC to VTL2, or `pcie_port=<port_name>:` to
+     /// expose the NIC over emulated PCIe at the specified port.
++    /// Prefix with `mac=<XX-XX-XX-XX-XX-XX>:` to set the guest MAC address.
+     #[clap(long)]
+     pub virtio_net: Vec<NicConfigCli>,
+ 
+@@ -930,6 +933,7 @@ pub struct Options {
+     ///
+     /// Prefix with `pcie_port=<port_name>:` to expose the nic over emulated PCIe
+     /// at the specified port.
++    /// Prefix with `mac=<XX-XX-XX-XX-XX-XX>:` to set the guest MAC address.
+     #[clap(long)]
+     pub mana: Vec<NicConfigCli>,
+ 
+@@ -2580,6 +2584,8 @@ fn from_str(s: &str) -> Result<Self, Self::Err> {
+ pub struct NicConfigCli {
+     pub vtl: DeviceVtl,
+     pub endpoint: EndpointConfigCli,
++    /// MAC address to expose to the guest. A random address is used if omitted.
++    pub mac_address: Option<MacAddress>,
+     pub max_queues: Option<u16>,
+     pub underhill: bool,
+     pub pcie_port: Option<String>,
+@@ -2590,6 +2596,7 @@ impl FromStr for NicConfigCli {
+ 
+     fn from_str(mut s: &str) -> Result<Self, Self::Err> {
+         let mut vtl = DeviceVtl::Vtl0;
++        let mut mac_address = None;
+         let mut max_queues = None;
+         let mut underhill = false;
+         let mut pcie_port = None;
+@@ -2599,6 +2606,12 @@ fn from_str(mut s: &str) -> Result<Self, Self::Err> {
+                     "queues" => {
+                         max_queues = Some(val.parse().map_err(|_| "failed to parse queue count")?);
+                     }
++                    "mac" => {
++                        mac_address = Some(
++                            val.parse()
++                                .map_err(|_| "failed to parse MAC address")?,
++                        );
++                    }
+                     "pcie_port" => {
+                         if val.is_empty() {
+                             return Err("`pcie_port=` requires port name argument".into());
+@@ -2631,6 +2644,7 @@ fn from_str(mut s: &str) -> Result<Self, Self::Err> {
+         Ok(NicConfigCli {
+             vtl,
+             endpoint,
++            mac_address,
+             max_queues,
+             underhill,
+             pcie_port,
+@@ -3947,6 +3961,7 @@ fn test_nic_config_from_str() {
+         // Test basic endpoint
+         let config = NicConfigCli::from_str("none").unwrap();
+         assert_eq!(config.vtl, DeviceVtl::Vtl0);
++        assert!(config.mac_address.is_none());
+         assert!(config.max_queues.is_none());
+         assert!(!config.underhill);
+         assert!(config.pcie_port.is_none());
+@@ -3964,6 +3979,14 @@ fn test_nic_config_from_str() {
+         assert!(config.pcie_port.is_none());
+         assert!(matches!(config.endpoint, EndpointConfigCli::None));
+ 
++        // Test with explicit MAC address
++        let config = NicConfigCli::from_str("mac=00-15-5d-12-12-13:none").unwrap();
++        assert_eq!(
++            config.mac_address,
++            Some(MacAddress::new([0x00, 0x15, 0x5d, 0x12, 0x12, 0x13]))
++        );
++        assert!(matches!(config.endpoint, EndpointConfigCli::None));
++
+         // Test with underhill
+         let config = NicConfigCli::from_str("uh:none").unwrap();
+         assert!(config.underhill);
+@@ -3977,6 +4000,7 @@ fn test_nic_config_from_str() {
+ 
+         // Test error cases
+         assert!(NicConfigCli::from_str("queues=invalid:none").is_err());
++        assert!(NicConfigCli::from_str("mac=invalid:none").is_err());
+         assert!(NicConfigCli::from_str("uh:vtl2:none").is_err()); // uh incompatible with vtl2
+         assert!(NicConfigCli::from_str("pcie_port=rp0:vtl2:none").is_err());
+         assert!(NicConfigCli::from_str("uh:pcie_port=rp0:none").is_err());
+diff --git a/openvmm/openvmm_entry/src/lib.rs b/openvmm/openvmm_entry/src/lib.rs
+index d79e1e5b..9a6018df 100644
+--- a/openvmm/openvmm_entry/src/lib.rs
++++ b/openvmm/openvmm_entry/src/lib.rs
+@@ -711,6 +711,7 @@ async fn vm_config_from_command_line(
+                     cidr: None,
+                     host_fwd: Vec::new(),
+                 },
++                mac_address: None,
+                 max_queues: None,
+                 underhill: false,
+                 pcie_port: None,
+@@ -2174,9 +2175,11 @@ fn parse_endpoint(
+         }
+     };
+ 
+-    // Pick a random MAC address.
+-    let mut mac_address = [0x00, 0x15, 0x5D, 0, 0, 0];
+-    getrandom::fill(&mut mac_address[3..]).expect("rng failure");
++    let mac_address = cli_cfg.mac_address.unwrap_or_else(|| {
++        let mut mac_address = [0x00, 0x15, 0x5D, 0, 0, 0];
++        getrandom::fill(&mut mac_address[3..]).expect("rng failure");
++        mac_address.into()
++    });
+ 
+     // Pick a fixed instance ID based on the index.
+     const BASE_INSTANCE_ID: Guid = guid::guid!("00000000-da43-11ed-936a-00155d6db52f");
+@@ -2190,7 +2193,7 @@ fn parse_endpoint(
+         vtl: cli_cfg.vtl,
+         instance_id,
+         endpoint,
+-        mac_address: mac_address.into(),
++        mac_address,
+         max_queues: cli_cfg.max_queues,
+         pcie_port: cli_cfg.pcie_port.clone(),
+     })
+-- 
+2.34.1
+

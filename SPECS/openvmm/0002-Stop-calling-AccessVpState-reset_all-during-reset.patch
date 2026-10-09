@@ -1,0 +1,31 @@
+From c4a7063ef67c4bb546f0b133c99e5346f2361035 Mon Sep 17 00:00:00 2001
+From: Harshit Gupta <guptaharshit@microsoft.com>
+Date: Fri, 11 Sep 2026 12:05:22 -0700
+Subject: [PATCH 2/4] Stop calling AccessVpState::reset_all() during reset
+
+Signed-off-by: Harshit Gupta <guptaharshit@microsoft.com>
+---
+ vmm_core/virt_mshv/src/lib.rs | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/vmm_core/virt_mshv/src/lib.rs b/vmm_core/virt_mshv/src/lib.rs
+index a3e02296..fbf964d0 100644
+--- a/vmm_core/virt_mshv/src/lib.rs
++++ b/vmm_core/virt_mshv/src/lib.rs
+@@ -621,13 +621,6 @@ fn access_state(&mut self, vtl: Vtl) -> Self::StateAccess<'_> {
+     }
+ 
+     fn reset(&mut self) -> Result<(), impl std::error::Error + Send + Sync + 'static> {
+-        use virt::vp::AccessVpState;
+-
+-        let vp_info = self.inner.vp_info;
+-        self.access_state(Vtl::Vtl0)
+-            .reset_all(&vp_info)
+-            .map_err(|e| ErrorInner::ResetState(Box::new(e)))?;
+-
+         self.reset_synic_state();
+ 
+         Ok::<(), Error>(())
+-- 
+2.34.1
+

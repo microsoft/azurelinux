@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "firmware-RELEASE-X64-VS2022.tar.gz": "3ba139e4b8d86f0e1edacc58871553851d037708b26569eadf0cd0e963d0ba90",
+  "kubevirt-openvmm-9f115538e7.tar.gz": "b0294b0a8e4a75f0fb050ad8fe1fc0334eda3d18f299d87dee4f75da464b4465",
+  "x64-confidential.json": "a57736108a7dab95bebf6ebf76ac860b319385f6cddcb2a3c04ab5729cbfdcee",
+  "x64.json": "e871ad2663a6c226ef3dc4921b37f920f0eb40903ba5e7dbabcadc96943e8ed9"
+ }
+}
