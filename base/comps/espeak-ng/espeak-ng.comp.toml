@@ -1,0 +1,10 @@
+[components.espeak-ng]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.espeak-ng.source-files]]
+filename = "espeak-ng-1.51.1.tar.gz"
+hash = "5de425918c64f621545f5cf025519bc92a7a2325751894bccf80eeb279e508b135914c1b8dddbe5681d4914639025e9535727fc2b5080d060e10e0b6108323f2"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Upstream source tarball contains the chromium_extension/index.php demo payload, which is removed by the archive overlay to allow SRPM publication."

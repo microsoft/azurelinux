@@ -1,0 +1,19 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+# Remove decompression-bomb test fixture flagged by AV scanner
+[[overlays]]
+type = "file-remove"
+file = "testdata/kmz/bad-too-large.kmz"
+archive = "libkml-1.3.0.tar.gz"
+description = "Remove crafted decompression-bomb KMZ fixture flagged by AZL signing-pipeline AV scanner"
+
+# Remove the regression test that reads the stripped fixture.
+[[overlays]]
+type = "file-search-replace"
+file = "tests/kml/base/zip_file_test.cc"
+archive = "libkml-1.3.0.tar.gz"
+regex = 'TEST_F\(ZipFileTest, TestBadTooLarge\) \{[^}]*\}\n'
+replacement = ''
+description = "Remove TestBadTooLarge test block that references stripped bad-too-large.kmz fixture"
