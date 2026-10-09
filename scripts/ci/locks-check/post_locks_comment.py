@@ -1,4 +1,4 @@
-"""Post (or update/delete) a PR comment with `azldev component update` results.
+r"""Post (or update/delete) a PR comment with `azldev component update` results.
 
 Reads the JSON output produced by `azldev component update -a -O json` and
 posts a formatted comment listing components whose lock files would change.
@@ -12,11 +12,11 @@ Update JSON shape (top-level on stdout):
                                                are reflected in the comment
 
 Usage:
-    python post_locks_comment.py \\
-        --update-output update-output.json \\
-        --repo owner/repo \\
-        --pr 123 \\
-        --artifacts-url https://... \\
+    python post_locks_comment.py \
+        --update-output update-output.json \
+        --repo owner/repo \
+        --pr 123 \
+        --artifacts-url https://... \
         --run-id 12345
 
 Exit codes:
