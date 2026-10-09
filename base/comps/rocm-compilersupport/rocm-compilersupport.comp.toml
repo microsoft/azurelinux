@@ -25,4 +25,4 @@ release = { calculation = "manual" }
 #   3. fix(rocm-compilersupport): introduce azl_release counter
 #   4. fix(rocm-compilersupport): teach rocm-llvm clang to find the AZL GCC toolchain
 #   5. fix(rocm-compilersupport): derive the GCC triple from the build compiler
-azl_release = "5"
+azl_release = "6"
