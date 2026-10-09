@@ -89,6 +89,7 @@ Patch39:         CVE-2026-102560.patch
 Patch40:         CVE-2026-77014.patch
 Patch41:         CVE-2026-85197.patch
 Patch42:         fix-server-test-flaky-listener-race.patch
+Patch43:         fix-chunk-size-oob-read.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -167,6 +168,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Sat Oct 10 2026 Swapnil Sahu <swapsahu@microsoft.com> - 3.4.4-18
 - Patch for CVE-2026-77014, CVE-2026-85197
 - Resolve flaky server-test ptest with upstream test-utils fix
+- Fix OOB read in chunk-size parsing causing flaky streaming-test ptest
 
 * Sat Oct 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-17
 - Patch for CVE-2026-102560, CVE-2026-102558, CVE-2026-102557, CVE-2026-102556, CVE-2026-102555
