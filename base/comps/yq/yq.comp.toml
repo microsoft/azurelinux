@@ -1,0 +1,2 @@
+[components.yq]
+spec = { type = "upstream", upstream-commit = "f2a5285f11f16c469940d9bafd35dc0ee9b5f091" }
