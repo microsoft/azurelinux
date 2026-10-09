@@ -3,7 +3,7 @@ category = "azl-release-management"
 upstream-status = "inapplicable"
 
 [[overlays]]
-description = "Start the RPM release at the Microsoft build of Go revision (upstream v1.26.5-2)"
+description = "Start the RPM release at the Microsoft build of Go revision (upstream v1.26.8-1)"
 type = "spec-search-replace"
 regex = '^Release:\s+%autorelease$'
-replacement = "Release:        %autorelease -b 2"
+replacement = "Release:        %autorelease -b 1"

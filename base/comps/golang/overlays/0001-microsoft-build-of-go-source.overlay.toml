@@ -6,7 +6,7 @@ upstream-status = "inapplicable"
 description = "Build from the Microsoft build of Go release archive while retaining Fedora's local source filename"
 type = "spec-update-tag"
 tag = "Source0"
-value = "https://github.com/microsoft/go/releases/download/v1.26.5-2/go1.26.5-20260709.6.src.tar.gz#/go1.26.5.src.tar.gz"
+value = "https://github.com/microsoft/go/releases/download/v1.26.8-1/go1.26.8-20260901.2.src.tar.gz#/go1.26.8.src.tar.gz"
 
 [[overlays]]
 description = "Point package metadata to Microsoft build of Go"
