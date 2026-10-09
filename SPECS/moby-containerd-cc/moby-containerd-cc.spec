@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 18%{?dist}
+Release: 19%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -14,27 +14,31 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: containerd.service
-Source2: containerd.toml
-Patch0: CVE-2023-47108.patch
-Patch1: CVE-2023-39325.patch
-Patch2: fix_cc_tests_for_golang1.21.patch
-Patch3: CVE-2024-24786.patch
-Patch4: CVE-2024-28180.patch
-Patch5: CVE-2023-45288.patch
-Patch7: CVE-2023-44487.patch
-Patch8: CVE-2025-27144.patch
-Patch9: CVE-2024-40635.patch
-Patch10:CVE-2024-25621.patch
-Patch11:CVE-2025-64329.patch
-Patch12:CVE-2026-39882.patch
-Patch13:CVE-2026-35469.patch
-Patch14:CVE-2026-39821.patch
-Patch15:CVE-2026-46680.patch
-Patch16:CVE-2026-53488.patch
-Patch17:CVE-2026-56852.patch
-Patch18:CVE-2026-37236.patch
-Patch19:CVE-2026-53495.patch
+Source1: %{name}-%{version}-govendor-v2.tar.gz
+Source2: containerd.service
+Source3: containerd.toml
+Patch0: fix_cc_tests_for_golang1.21.patch
+Patch1: CVE-2024-28180.patch
+Patch2: CVE-2023-44487.patch
+Patch3: CVE-2025-27144.patch
+Patch4: CVE-2024-40635.patch
+Patch5: CVE-2024-25621.patch
+Patch6: CVE-2025-64329.patch
+Patch7: CVE-2026-35469.patch
+Patch8: CVE-2026-46680.patch
+Patch9: CVE-2026-53488.patch
+Patch10:CVE-2026-84304.patch
+Patch11:fix-non-constant-format-string.patch
+Patch12:CVE-2026-53493.patch
+Patch13:CVE-2026-78659.patch
+Patch14:CVE-2026-78660.patch
+Patch15:CVE-2026-78663.patch
+Patch16:CVE-2026-78669.patch
+Patch17:CVE-2026-81870.patch
+Patch18:CVE-2026-97032.patch
+Patch19:CVE-2026-95838.patch
+Patch20:CVE-2026-47262.patch
+Patch21:CVE-2026-53495.patch
 
 %{?systemd_requires}
 
@@ -95,9 +99,15 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
-* Thu Sep 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-18
-- Patch for CVE-2026-53495
->>>>>>> f9d39bdbea (Patch moby-containerd-cc for CVE-2026-53495)
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-19
+- Patch for CVE-2026-97032, CVE-2026-81870, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-47262, CVE-2026-95838 and CVE-2026-53495.
+
+* Fri Sep 18 2026 jykanase <v-jykanase@microsoft.com> - 1.7.7-18
+- Patch for CVE-2026-84304
+- Patch for CVE-2026-53493
+- Remove patches which are fixed in new generated vendor tarball: CVE-2023-45288, CVE-2023-47108,
+  CVE-2024-24786, CVE-2026-39821, CVE-2026-39882, CVE-2026-56852, CVE-2023-39325, CVE-2026-37236.
+- Fix non-constant format string vet errors surfaced by the go 1.25 directive
 
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-17
 - Patch for CVE-2026-37236
