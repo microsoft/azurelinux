@@ -54,7 +54,7 @@ def _collect_configs(kernel_configs: list[KernelConfig], architecture: str, sour
 def parse_kernel_config(config_path: Path) -> dict[str, str]:
     """Parse a Linux kernel .config file."""
     config = {}
-    with open(config_path, encoding="utf-8") as f:
+    with config_path.open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line.startswith("#") and "is not set" in line:

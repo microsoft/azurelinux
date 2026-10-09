@@ -429,7 +429,7 @@ def main() -> int:
 
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
-        with open(args.report, "w", encoding="utf-8") as f:
+        with args.report.open("w", encoding="utf-8") as f:
             json.dump(report, f, indent=2)
         print(f"Report written to {args.report}")
 

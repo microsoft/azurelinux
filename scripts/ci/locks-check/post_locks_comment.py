@@ -103,7 +103,7 @@ def parse_update_output(path: Path) -> list[dict]:
     error than miss real drift.
     """
     try:
-        with open(path, encoding="utf-8") as f:
+        with path.open(encoding="utf-8") as f:
             data = json.load(f)
     except FileNotFoundError as exc:
         raise SystemExit(f"Error: update output not found: {exc}")
@@ -363,7 +363,7 @@ def main() -> int:
     if summary_file and body:
         max_summary = 1_000_000  # GH step summary limit is 1024 KiB
         summary = body[:max_summary] if len(body) > max_summary else body
-        with open(summary_file, "a", encoding="utf-8") as sf:
+        with Path(summary_file).open("a", encoding="utf-8") as sf:
             sf.write(summary)
             sf.write("\n")
 

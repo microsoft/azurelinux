@@ -121,7 +121,7 @@ def add_config_interactive(schema_path: Path) -> bool:
         print("❌ Error: Justification is required for auditability")
         return False
 
-    with open(schema_path, encoding="utf-8") as f:
+    with schema_path.open(encoding="utf-8") as f:
         data = json.load(f)
 
     target = input("\nAdd to [d]efault or [o]verride? [d]: ").strip().lower()

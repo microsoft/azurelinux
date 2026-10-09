@@ -114,7 +114,7 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        with open(args.file, encoding="utf-8") as f:
+        with args.file.open(encoding="utf-8") as f:
             report = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Error: {e}", file=sys.stderr)
