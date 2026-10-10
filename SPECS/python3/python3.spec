@@ -2,24 +2,14 @@
 %global __brp_python_bytecompile %{nil}
 %define majmin %(echo %{version} | cut -d. -f1-2)
 %define majmin_nodots %(echo %{majmin} | tr -d .)
-
-Summary:        A high-level scripting language
-Name:           python3
-Version:        3.12.14
-Release:        3%{?dist}
-License:        PSF
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Version:        3.12.15
+Release:        2%{?dist}
 Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 # pathfix.py was provided by the previous Python source bundle (Python-3.9.14.tar.xz)
 # It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
-Patch0:         cgi3.patch
-Patch1:         CVE-2026-15806.patch
-Patch2:         CVE-2026-19672.patch
-Patch3:         CVE-2026-17084.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -245,11 +235,22 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Mon Sep 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-3
+* Mon Oct 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.15-2
 - Patch for CVE-2026-17084
 
+* Sat Oct 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.15-1
+- Upgrade to 3.12.15 for CVE-2026-15310, CVE-2026-15806, CVE-2026-17084,
+  CVE-2026-19445, CVE-2026-19553, CVE-2026-19672, CVE-2026-82049, CVE-2026-87910 
+
 * Sun Aug 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-2
-- Patch for CVE-2026-15806, CVE-2026-19672
+- Patch for CVE-2026-15806, CVE-19672
+- Patch for CVE-2026-4519
+
+* Mon Feb 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-9
+- Patch for CVE-2026-1299
+
+* Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-8
+- Patch for CVE-2026-0865, CVE-2025-11468, CVE-2026-0672
 
 * Thu Aug 13 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.12.14-1
 - Upgrade to 3.12.14 for CVE-2026-18503, CVE-2026-15308, CVE-2026-7210, CVE-2026-4224
