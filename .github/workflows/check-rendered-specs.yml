@@ -77,7 +77,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ inputs.repo }}
-          ref: "4.0"
+          # Use the immutable PR base snapshot supplied by the event. Checking
+          # out the moving 4.0 branch can produce a different commit while the
+          # workflow is running and causes the resolver's freshness guard to
+          # reject an otherwise valid check.
+          ref: ${{ inputs.pr-base-sha }}
           persist-credentials: false
 
       # --- PR head (untrusted data — TOML configs, overlays, locks) ---

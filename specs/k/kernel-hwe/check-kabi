@@ -1,0 +1,166 @@
+#!/usr/bin/python3
+#
+# check-kabi - Red Hat kABI reference checking tool
+#
+# We use this script to check against reference Module.kabi files.
+#
+# Author: Jon Masters <jcm@redhat.com>
+# Copyright (C) 2007-2009 Red Hat, Inc.
+#
+# This software may be freely redistributed under the terms of the GNU
+# General Public License (GPL).
+
+# Changelog:
+#
+# 2018/06/01 - Update for python3 by Petr Oros.
+# 2009/08/15 - Updated for use in RHEL6.
+# 2007/06/13 - Initial rewrite in python by Jon Masters.
+
+__author__ = "Jon Masters <jcm@redhat.com>"
+__version__ = "2.0"
+__date__ = "2009/08/15"
+__copyright__ = "Copyright (C) 2007-2009 Red Hat, Inc"
+__license__ = "GPL"
+
+import getopt
+import string
+import sys
+
+true = 1
+false = 0
+
+
+def load_symvers(symvers, filename):
+    """Load a Module.symvers file."""
+
+    symvers_file = open(filename, "r")
+
+    while true:
+        in_line = symvers_file.readline()
+        if in_line == "":
+            break
+        if in_line == "\n":
+            continue
+        checksum, symbol, directory, type, *ns = in_line.split()
+        ns = ns[0] if ns else None
+
+        symvers[symbol] = in_line[0:-1]
+
+
+def load_kabi(kabi, filename):
+    """Load a Module.kabi file."""
+
+    kabi_file = open(filename, "r")
+
+    while true:
+        in_line = kabi_file.readline()
+        if in_line == "":
+            break
+        if in_line == "\n":
+            continue
+        checksum, symbol, directory, type, *ns = in_line.split()
+        ns = ns[0] if ns else None
+
+        kabi[symbol] = in_line[0:-1]
+
+
+def check_kabi(symvers, kabi):
+    """Check Module.kabi and Module.symvers files."""
+
+    fail = 0
+    warn = 0
+    changed_symbols = []
+    moved_symbols = []
+    ns_symbols = []
+
+    for symbol in kabi:
+        abi_hash, abi_sym, abi_dir, abi_type, *abi_ns = kabi[symbol].split()
+        abi_ns = abi_ns[0] if abi_ns else None
+        if symbol in symvers:
+            sym_hash, sym_sym, sym_dir, sym_type, *sym_ns = symvers[symbol].split()
+            sym_ns = sym_ns[0] if sym_ns else None
+            if abi_hash != sym_hash:
+                fail = 1
+                changed_symbols.append(symbol)
+
+            if abi_dir != sym_dir:
+                warn = 1
+                moved_symbols.append(symbol)
+
+            if abi_ns != sym_ns:
+                warn = 1
+                ns_symbols.append(symbol)
+        else:
+            fail = 1
+            changed_symbols.append(symbol)
+
+    if fail:
+        print("*** ERROR - ABI BREAKAGE WAS DETECTED ***")
+        print("")
+        print("The following symbols have been changed (this will cause an ABI breakage):")
+        print("")
+        for symbol in changed_symbols:
+            print(symbol)
+        print("")
+
+    if warn:
+        print("*** WARNING - ABI SYMBOLS MOVED ***")
+        if moved_symbols:
+            print("")
+            print("The following symbols moved (typically caused by moving a symbol from being")
+            print("provided by the kernel vmlinux out to a loadable module):")
+            print("")
+            for symbol in moved_symbols:
+                print(symbol)
+            print("")
+        if ns_symbols:
+            print("")
+            print("The following symbols changed symbol namespaces:")
+            print("")
+            for symbol in ns_symbols:
+                print(symbol)
+            print("")
+
+    """Halt the build, if we got errors and/or warnings. In either case,
+       double-checkig is required to avoid introducing / concealing
+       KABI inconsistencies."""
+    if fail or warn:
+        sys.exit(1)
+    sys.exit(0)
+
+
+def usage():
+    print("""
+check-kabi: check Module.kabi and Module.symvers files.
+
+    check-kabi [ -k Module.kabi ] [ -s Module.symvers ]
+
+""")
+
+
+if __name__ == "__main__":
+
+    symvers_file = ""
+    kabi_file = ""
+
+    opts, args = getopt.getopt(sys.argv[1:], 'hk:s:')
+
+    for o, v in opts:
+        if o == "-s":
+            symvers_file = v
+        if o == "-h":
+            usage()
+            sys.exit(0)
+        if o == "-k":
+            kabi_file = v
+
+    if (symvers_file == "") or (kabi_file == ""):
+        usage()
+        sys.exit(1)
+
+    symvers = {}
+    kabi = {}
+
+    load_symvers(symvers, symvers_file)
+    load_kabi(kabi, kabi_file)
+    check_kabi(symvers, kabi)
