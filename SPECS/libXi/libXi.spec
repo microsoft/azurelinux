@@ -1,12 +1,20 @@
 Summary:        X.Org X11 libXi runtime library
 Name:           libXi
-Version:        1.8.1
+Version:        1.8.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.gz
+
+Patch0:         CVE-2026-93541.patch
+Patch1:         CVE-2026-93542.patch
+Patch2:         CVE-2026-93543.patch
+Patch3:         CVE-2026-93544.patch
+Patch4:         CVE-2026-93545.patch
+Patch5:         CVE-2026-94281.patch
+Patch6:         CVE-2026-94282.patch
 
 BuildRequires:  asciidoc >= 8.4.5
 BuildRequires:  autoconf
@@ -37,7 +45,7 @@ Requires:       xorg-x11-proto-devel
 X.Org X11 libXi development package
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 autoreconf -v --install || exit 1
@@ -69,6 +77,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*.3*
 
 %changelog
+* Sat Oct 10 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.8.3-1
+- Upgrade to 1.8.3
+- Patch CVE-2026-93541, CVE-2026-93542, CVE-2026-93543, CVE-2026-93544, CVE-2026-93545,
+  CVE-2026-94281, CVE-2026-94282
+
 * Tue Jan 23 2024 Archana Choudhary <archana1@microsoft.com> - 1.8.1-1
 - Upgrade to 1.8.1
 

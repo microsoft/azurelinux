@@ -12181,8 +12181,8 @@
         "type": "other",
         "other": {
           "name": "libXi",
-          "version": "1.8.1",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.8.1.tar.gz"
+          "version": "1.8.3",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.8.3.tar.gz"
         }
       }
     },
