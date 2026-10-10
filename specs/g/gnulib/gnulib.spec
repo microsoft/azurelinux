@@ -54,7 +54,7 @@ It can be used to improve portability and other functionality in your programs.
 
 Name:     gnulib
 Version:  0
-Release:  57.%{gitdate}git%{githead}%{?dist}
+Release: 57.%{gitdate}git%{?dist}
 Summary:  GNU Portability Library
 License:  LicenseRef-Fedora-Public-Domain AND BSD-3-Clause AND GPL-2.0-or-later AND GPL-3.0-only AND GPL-3.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-or-later
 URL:      https://www.gnu.org/software/gnulib
@@ -70,7 +70,7 @@ BuildRequires:		texinfo
 # Java JDK dropped in i686
 # https://fedoraproject.org/wiki/Changes/Drop_i686_JDKs
 %ifnarch %{ix86}
-BuildRequires:		java-devel
+BuildRequires: msopenjdk-25
 Requires:           %{name}-javaversion
 %endif
 

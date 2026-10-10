@@ -1,0 +1,51 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# VTK references Java filesystem macros without requiring the package that
+# defines them. Remove this overlay once msopenjdk-25 supplies those macros
+# directly or pulls in their provider as a build dependency.
+[[overlays]]
+description = "Define Java filesystem macros for VTK packaging"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "javapackages-filesystem"
+
+# The VTK Java launcher uses `/usr/lib/jvm/java`, which is owned by the
+# compatibility package. Remove this overlay once msopenjdk-25 owns that
+# alternative and provides the required runtime capabilities directly.
+[[overlays]]
+description = "Run VTK Java bindings with Microsoft OpenJDK 25"
+type = "spec-add-tag"
+package = "java"
+tag = "Requires"
+value = "msopenjdk-25-fedora-compat"
+
+# The MPICH Java launcher uses the same generic JVM alternative as the base VTK
+# binding. Remove this overlay once msopenjdk-25 owns that alternative and
+# provides the required runtime capabilities directly.
+[[overlays]]
+description = "Run VTK MPICH Java bindings with Microsoft OpenJDK 25"
+type = "spec-add-tag"
+package = "mpich-java"
+tag = "Requires"
+value = "msopenjdk-25-fedora-compat"
+
+# The OpenMPI Java launcher uses the same generic JVM alternative as the base
+# VTK binding. Remove this overlay once msopenjdk-25 owns that alternative and
+# provides the required runtime capabilities directly.
+[[overlays]]
+description = "Run VTK OpenMPI Java bindings with Microsoft OpenJDK 25"
+type = "spec-add-tag"
+package = "openmpi-java"
+tag = "Requires"
+value = "msopenjdk-25-fedora-compat"
+
+# VTK's development package can otherwise resolve generic `java-devel` to
+# Fedora OpenJDK. Remove this overlay once msopenjdk-25 provides that capability
+# directly and is its sole eligible repository provider.
+[[overlays]]
+description = "Develop VTK Java bindings with Microsoft OpenJDK 25"
+type = "spec-search-replace"
+regex = '^Requires: java-devel$'
+replacement = "Requires: msopenjdk-25-fedora-compat"

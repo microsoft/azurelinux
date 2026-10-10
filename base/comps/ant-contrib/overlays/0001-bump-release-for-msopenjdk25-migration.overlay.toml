@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Bump ant-contrib release for the Microsoft OpenJDK 25 migration"
+type = "spec-update-tag"
+tag = "Release"
+value = "0.50.%{beta_number}%{?dist}"

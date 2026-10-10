@@ -1,0 +1,25 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# The Maven OpenJDK 25 binding requires Fedora's development package by name.
+# Remove this overlay once msopenjdk-25 provides `java-25-openjdk-devel` and
+# owns the development paths expected by the binding.
+[[overlays]]
+description = "Back the Maven OpenJDK 25 binding with the Microsoft Fedora compatibility package"
+type = "spec-search-replace"
+section = "%package"
+package = "maven-local-openjdk25"
+regex = '^Requires:\s+java-25-openjdk-devel$'
+replacement = 'Requires:       msopenjdk-25-fedora-compat'
+
+# The javapackages OpenJDK 25 binding has the same Fedora-specific dependency.
+# Remove this overlay once msopenjdk-25 provides `java-25-openjdk-devel` and
+# owns the development paths expected by the binding.
+[[overlays]]
+description = "Back the javapackages OpenJDK 25 binding with the Microsoft Fedora compatibility package"
+type = "spec-search-replace"
+section = "%package"
+package = "javapackages-local-openjdk25"
+regex = '^Requires:\s+java-25-openjdk-devel$'
+replacement = 'Requires:       msopenjdk-25-fedora-compat'

@@ -33,7 +33,7 @@
 
 Name:           bsh
 Version:        2.1.0
-Release: 20%{?dist}
+Release: 21%{?dist}
 Epoch:          0
 Summary:        Lightweight Scripting for Java
 URL:            https://beanshell.github.io/
@@ -64,7 +64,7 @@ BuildRequires:  javapackages-local-openjdk25
 BuildRequires:  junit
 
 Requires:       bsf
-Requires:       java-25-headless
+Requires: msopenjdk-25
 Requires:       jline2
 
 # Explicit javapackages-tools requires since scripts use
