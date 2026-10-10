@@ -91,6 +91,7 @@ components = [
     "automake",
     "avahi",
     "azure-vm-utils",
+    "azurelinux-image-tools",
     "azurelinux-logos",
     "azurelinux-release",
     "azurelinux-repos",
