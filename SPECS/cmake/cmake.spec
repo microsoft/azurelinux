@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.30.3
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,8 @@ Patch2:         CVE-2025-5916.patch
 Patch3:         CVE-2025-5917.patch
 Patch4:         CVE-2025-5918.patch
 Patch5:         CVE-2025-9301.patch
+Patch6:         0002-cmCurl-Avoid-using-undocumented-type-for-CURLOPT_NETRC.patch
+Patch7:         0003-cmCTestCurl-Avoid-using-undocumented-type-for-CURLOPT_PROXYTYPE.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
@@ -104,6 +106,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Wed Sep 16 2026 Vijayender Putta <v-vijputta@microsoft.com> - 3.30.3-16
+- Backport upstream CURLOPT_NETRC and CURLOPT_PROXYTYPE fixes for newer curl releases
+
 * Mon Jul 06 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.30.3-15
 - Use system curl and nghttp2 instead of bundled libraries
 - Add nghttp2-devel build dependency
