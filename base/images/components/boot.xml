@@ -7,6 +7,10 @@
             <requires profile="UefiFstab" />
         </profile>
         <profile name="LegacyBoot" description="Legacy BIOS boot packages" import="false" />
+        <profile name="UkiBootCore" description="Shim, systemd-boot, and packaged UKI boot packages" import="false">
+            <requires profile="SystemCore" />
+            <requires profile="UefiFstab" />
+        </profile>
     </profiles>
     <packages type="image" profiles="Fips">
         <package name="dracut-fips" />
@@ -26,5 +30,11 @@
     <packages type="image" profiles="LegacyBoot">
         <package name="grub2-pc" />
         <package name="grub2-pc-modules" />
+    </packages>
+    <packages type="image" profiles="UkiBootCore">
+        <package name="coreutils" />
+        <package name="kernel-uki-virt" />
+        <package name="shim-unsigned-x64" arch="x86_64" />
+        <package name="systemd-boot-unsigned" />
     </packages>
 </image>

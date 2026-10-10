@@ -19,8 +19,14 @@ REQUIRED_GRUB_FILES = {"grub.cfg", "grubenv"}
 FORBIDDEN_MODE_MASK = 0o7177
 
 
-def test_grub_configuration_files_are_root_only(rootfs: Path) -> None:
+def test_grub_configuration_files_are_root_only(
+    rootfs: Path,
+    capabilities: set[str],
+) -> None:
     """GRUB configuration files must be owned by root and accessible only by root."""
+    if "cvm" in capabilities:
+        pytest.skip("CVM images use systemd-boot instead of GRUB")
+
     grub_dir = resolve_path_confined(rootfs, "boot/grub2")
     assert grub_dir.is_dir(), "/boot/grub2 is missing"
 

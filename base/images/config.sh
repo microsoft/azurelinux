@@ -23,3 +23,9 @@ case ",${kiwi_profiles:-}," in
         exec /image/config-container-base.sh --mode=runtime
         ;;
 esac
+
+case ",${kiwi_profiles:-}," in
+    *,UkiBootCore,*)
+        exec /image/stage-uki-boot.sh
+        ;;
+esac

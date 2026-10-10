@@ -1,30 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <image>
     <profiles>
-        <profile name="OnePBase" description="First-party Azure VM packages" import="false">
+        <profile name="OnePBase" description="Boot-neutral first-party Azure VM packages" import="false">
             <requires profile="VmBaseCore" />
         </profile>
         <profile name="1p-vm-base-gen1" description="1P VM Base Gen1 Image (BIOS)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="LegacyBoot" />
+            <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
         </profile>
         <profile name="1p-vm-base-gen2" description="1P VM Base Gen2 Image (UEFI)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="UefiBoot" />
+            <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
         </profile>
         <profile name="1p-vm-base-gen1-fips" description="1P VM Base Gen1 FIPS Image (BIOS)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="Fips" />
             <requires profile="LegacyBoot" />
+            <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
         </profile>
         <profile name="1p-vm-base-gen2-fips" description="1P VM Base Gen2 FIPS Image (UEFI)" import="false">
             <requires profile="PackageManagement" />
             <requires profile="Fips" />
             <requires profile="UefiBoot" />
+            <requires profile="StandardCloudCore" />
             <requires profile="OnePBase" />
+        </profile>
+        <profile name="1p-vm-base-gen2-cvm" description="1P VM Base Gen2 CVM Image (UKI)" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="CloudCore" />
+            <requires profile="OnePBase" />
+            <requires profile="UkiBootCore" />
         </profile>
     </profiles>
     <preferences arch="x86_64" profiles="1p-vm-base-gen1">
@@ -117,6 +127,21 @@
             </oemconfig>
         </type>
     </preferences>
+    <preferences arch="x86_64" profiles="1p-vm-base-gen2-cvm">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="none" filesystem="ext4" fscreateoptions="-m 1" firmware="efi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="512" rootfs_label="azurelinux">
+            <bootloader name="custom" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
     <packages type="bootstrap" profiles="OnePBase">
         <package name="azurelinux-release-cloud" />
     </packages>
@@ -128,7 +153,6 @@
         <package name="curl" />
         <package name="dbus" />
         <package name="dhcpcd" />
-        <package name="dracut" />
         <package name="e2fsprogs" />
         <package name="elfutils-libelf" />
         <package name="expat" />
@@ -151,5 +175,11 @@
         <package name="tdnf" />
         <package name="tzdata" />
         <package name="xz" />
+    </packages>
+    <packages type="image" profiles="1p-vm-base-gen1,1p-vm-base-gen1-fips,1p-vm-base-gen2-fips">
+        <package name="dracut" />
+    </packages>
+    <packages type="image" profiles="1p-vm-base-gen2-cvm">
+        <package name="tpm2-tools" />
     </packages>
 </image>

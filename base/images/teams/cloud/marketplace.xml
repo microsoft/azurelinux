@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <image>
     <profiles>
-        <profile name="MarketplaceBase" description="Marketplace VM packages" import="false">
+        <profile name="MarketplacePackages" description="Boot-neutral Marketplace payload" import="false" />
+        <profile name="MarketplaceBase" description="Conventional Marketplace VM composition" import="false">
             <requires profile="PackageManagement" />
-            <requires profile="CloudCore" />
+            <requires profile="StandardCloudCore" />
+            <requires profile="MarketplacePackages" />
         </profile>
         <profile name="marketplace-gen2" description="Azure Linux Marketplace Gen2 Image" import="false">
             <requires profile="UefiBoot" />
@@ -127,11 +129,11 @@
             </oemconfig>
         </type>
     </preferences>
-    <packages type="bootstrap" profiles="MarketplaceBase">
+    <packages type="bootstrap" profiles="MarketplacePackages">
         <package name="azurelinux-release-cloud" />
         <package name="coreutils" />
     </packages>
-    <packages type="image" profiles="MarketplaceBase">
+    <packages type="image" profiles="MarketplacePackages">
         <package name="SymCrypt" />
         <package name="SymCrypt-OpenSSL" />
         <package name="acl" />
@@ -165,12 +167,9 @@
         <package name="dnf-plugins-core" />
         <package name="dnf-utils" />
         <package name="dosfstools" />
-        <package name="dracut" />
-        <package name="dracut-config-generic" />
         <package name="dyninst" />
         <package name="e2fsprogs" />
         <package name="ed" />
-        <package name="efivar" />
         <package name="elfutils-debuginfod-client" />
         <package name="ethtool" />
         <package name="expat" />
@@ -187,9 +186,6 @@
         <package name="gpgme" />
         <package name="grep" />
         <package name="groff-base" />
-        <package name="grub2-common" />
-        <package name="grub2-tools" />
-        <package name="grub2-tools-minimal" />
         <package name="gssproxy" />
         <package name="hostname" />
         <package name="hunspell" />
@@ -208,7 +204,6 @@
         <package name="json-c" />
         <package name="kbd" />
         <package name="kbd-misc" />
-        <package name="kernel-tools" />
         <package name="keyutils" />
         <package name="kmod" />
         <package name="less" />
@@ -241,7 +236,6 @@
         <package name="openssh" />
         <package name="openssl" />
         <package name="openssl-pkcs11" />
-        <package name="os-prober" />
         <package name="p11-kit" />
         <package name="p11-kit-trust" />
         <package name="pam" />
@@ -411,5 +405,15 @@
         <package name="xxd" />
         <package name="xz" />
         <package name="zstd" />
+    </packages>
+    <packages type="image" profiles="MarketplaceBase">
+        <package name="dracut" />
+        <package name="dracut-config-generic" />
+        <package name="efivar" />
+        <package name="grub2-common" />
+        <package name="grub2-tools" />
+        <package name="grub2-tools-minimal" />
+        <package name="kernel-tools" />
+        <package name="os-prober" />
     </packages>
 </image>
