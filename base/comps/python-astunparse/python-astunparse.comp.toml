@@ -1,0 +1,22 @@
+[components.python-astunparse]
+# python-astunparse was auto-retired by Fedora's orphan-package process on
+# 2024-08-03 ("Orphaned for 6+ weeks") after sitting without a maintainer —
+# not because it was superseded or broken. Pin to its last good commit
+# (main branch, pre-retirement, F41 mass rebuild) since our default
+# fedora/43 snapshot has no branch for it anymore.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "f936b962ed51351051a7a608c4204288f8603a98" }
+
+[[components.python-astunparse.overlays]]
+description = "setup.py's 'test' subcommand was removed by modern setuptools; run the unparse test suite directly via pytest. Only test_unparse.py (the package's actual functionality) is run: test_dump.py asserts exact ast.dump() string output, which stdlib Python has changed since this package was last touched in 2024, so those assertions are stale rather than indicative of a real bug"
+type = "spec-search-replace"
+section = "%check"
+regex = '^%\{__python3\} setup\.py test$'
+replacement = "%pytest tests/test_unparse.py"
+metadata = { category = "azl-compatibility", upstream-status = "needs-upstream-hook" }
+
+[[components.python-astunparse.overlays]]
+description = "%pytest is needed to run the test suite now that setup.py test is gone"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "python3-pytest"
+metadata = { category = "azl-compatibility", upstream-status = "needs-upstream-hook" }
