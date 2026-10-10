@@ -1,0 +1,38 @@
+# The upstream GDAL autotest tarball `gdalautotest-3.11.5.tar.gz` (Source1)
+# ships a fixture that trips anti-malware scanning on the AZL RPM-signing
+# pipeline, which rejects encrypted / unscannable payloads inside SRPMs:
+#
+#   - gcore/data/zero_5GB_sozip_of_sozip.zip
+#       A SOZip-of-SOZip test fixture: a ZIP containing zero_5GB.bin.zip,
+#       which wraps a sparse 5 GiB all-zero file. AV scanners flag the
+#       nested archive (and the layered re-decompressions of the outer
+#       .tar.gz wrapper) as a Trojan.
+#
+# Remove only the two tests that read this fixture. The remaining checks keep
+# the upstream %ctest invocation and its existing failure-tolerance policy.
+#
+# Archive overlays strip this scanner-flagged fixture from upstream Source1
+# during source preparation, avoiding a separate modified-source tarball.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+type = "file-remove"
+file = "gcore/data/zero_5GB_sozip_of_sozip.zip"
+archive = "gdalautotest-3.11.5.tar.gz"
+description = "Remove nested SOZip fixture flagged by AZL signing-pipeline scanning"
+
+[[overlays]]
+description = "Drop only the vsizip test that depends on the stripped 5 GiB SOZip fixture"
+type = "file-search-replace"
+file = "gcore/vsizip.py"
+archive = "gdalautotest-3.11.5.tar.gz"
+regex = '(?m)^def test_vsizip_sozip_of_file_bigger_than_4GB\(\):\n(?:[ \t].*\n|\n)*'
+
+[[overlays]]
+description = "Drop only the sozip listing test that depends on the stripped 5 GiB SOZip fixture"
+type = "file-search-replace"
+file = "utilities/test_sozip.py"
+archive = "gdalautotest-3.11.5.tar.gz"
+regex = '(?m)^def test_sozip_list\(sozip_path\):\n(?:[ \t].*\n|\n)*'

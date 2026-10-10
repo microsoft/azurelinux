@@ -1,0 +1,42 @@
+# The upstream KDE `karchive-6.30.0.tar.xz` ships several autotest fixtures
+# that trip anti-malware scanning on the AZL RPM-signing pipeline, which
+# rejects encrypted / unscannable payloads inside SRPMs:
+#
+#   - autotests/data/password_protected.7z
+#       Deliberately password-protected 7-Zip archive.
+#   - autotests/data/zip64_extra_zip64_size_first.zip.gz
+#       Gzipped ZIP64 edge-case fixture; the scanner decompresses the .gz
+#       wrapper and the inner .zip trips its detector.
+#
+# karchive's autotests are not built or run in our spec (no %check, and
+# upstream's CMake gates them on BUILD_TESTING=ON, which we don't set), so
+# stripping these test fixtures is functionally inert.
+#
+# Archive overlays strip these scanner-flagged fixtures from upstream Source0
+# during source preparation, avoiding a separate modified-source tarball.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+type = "file-remove"
+file = "autotests/data/password_protected.7z"
+archive = "karchive-6.30.0.tar.xz"
+description = "Remove password-protected 7-Zip test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+type = "file-remove"
+file = "autotests/data/zip64_extra_zip64_size_first.zip.gz"
+archive = "karchive-6.30.0.tar.xz"
+description = "Remove ZIP64 edge-case test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[overlays]]
+description = "Drop the detached upstream signature because it cannot validate the repacked Source0"
+type = "spec-remove-tag"
+tag = "Source1"
+
+[[overlays]]
+description = "Remove the original archive's detached signature from the source inventory"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(karchive-6\.30\.0\.tar\.xz\.sig\) = [0-9a-f]+\n'

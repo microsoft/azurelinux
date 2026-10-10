@@ -1,0 +1,47 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+# The upstream Apache Commons Compress source tarball ships test
+# fixtures flagged by anti-malware scanning on the AZL RPM signing pipeline
+# as suspicious / malware-like content:
+#   - src/test/resources/bla.encrypted.7z
+#   - src/test/resources/password-encrypted.zip
+#     (encrypted archive fixtures — generic malware heuristics)
+#   - src/test/resources/COMPRESS-256.7z
+#   - src/test/resources/zip64support.tar.bz2
+#     (crafted/edge-case archive fixtures — flagged as Trojan by an
+#     AV engine on the 2026-05-15 scan)
+# Such content blocks the SRPM from being published. None of these files
+# are used at runtime — they only feed the project's unit tests
+# (encrypted-archive read/write coverage and pack200 unpacking) — so
+# removing them has no effect on the shipped package. Affected tests
+# will be skipped/excluded at build time if they reference these
+# fixtures.
+#
+# Archive overlays strip the scanner-flagged fixtures from upstream Source0
+# during source preparation, avoiding a separate modified-source tarball.
+
+[[overlays]]
+type = "file-remove"
+file = "src/test/resources/bla.encrypted.7z"
+description = "Remove encrypted 7-Zip test fixture flagged by AZL signing-pipeline AV scanner"
+archive = "commons-compress-1.27.1-src.tar.gz"
+
+[[overlays]]
+type = "file-remove"
+file = "src/test/resources/password-encrypted.zip"
+description = "Remove encrypted ZIP test fixture flagged by AZL signing-pipeline AV scanner"
+archive = "commons-compress-1.27.1-src.tar.gz"
+
+[[overlays]]
+type = "file-remove"
+file = "src/test/resources/COMPRESS-256.7z"
+description = "Remove crafted 7-Zip test fixture flagged by AZL signing-pipeline AV scanner"
+archive = "commons-compress-1.27.1-src.tar.gz"
+
+[[overlays]]
+type = "file-remove"
+file = "src/test/resources/zip64support.tar.bz2"
+description = "Remove crafted tar.bz2 test fixture flagged by AZL signing-pipeline AV scanner"
+archive = "commons-compress-1.27.1-src.tar.gz"

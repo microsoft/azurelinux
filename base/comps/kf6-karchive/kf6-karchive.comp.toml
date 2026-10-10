@@ -1,0 +1,10 @@
+[components.kf6-karchive]
+
+# Archive overlays are auto-loaded from overlays/ by the project-wide glob.
+[[components.kf6-karchive.source-files]]
+filename = "karchive-6.30.0.tar.xz"
+hash = "8b943237217509a997d20520c4cd8ad4c3a523497a01e01711b11ad7c100e3a9bf2dca04fbe0fe1c802f2d3db068fafcb5e926cfb8ac74c1771540ca1d5ce7d0"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Upstream autotest fixtures trigger signing-pipeline scanning and are not built or run; archive overlays remove them before SRPM creation."
