@@ -179,15 +179,30 @@ systemic; (2) failures pack into a short window (0623: 29 in ~78 min) →
 transient; (3) most other builds in that window succeeded (0623: 97%) →
 mirror was up. If all three hold, **retest** — do not inject.
 
-## Gotcha — version float (pin the spec, don't delete)
+## Gotcha — version float (check consumers before pinning)
 
 When old + new both exist (old in frozen base, new in updates/mirror), dnf
-picks the highest and an old-API spec fails (e.g. `rust-uucore` 0.0.27 vs
-0.7.0). Deleting from the mirror is the wrong lever (sync re-adds it, no
-delete tooling, diverges from upstream). **Fix:** pin the spec's
-`crate(uucore) = 0.0.27` (+ lockstep siblings `uucore_procs`,
-`uuhelp_parser`). Since 0.0.27 lives in the frozen live base repo, the pin
-needs zero mirror changes.
+picks the highest permitted version, which can break a consumer with loose
+dependencies and old API usage (e.g. `uucore >= 0.0.19` selecting 0.7.0).
+Deleting from the mirror is the wrong lever (sync re-adds it, no delete
+tooling, diverges from upstream).
+
+**Fix:** inspect the consumer's resolved version, Cargo manifest, and upstream
+status first. Pin only a retained legacy consumer, with compatible dependencies
+available in the build repos. Keep coupled crates such as `uucore` and
+`uucore_procs` compatible; do not infer coupling from similar names.
+Remove a temporary pin once the consumer has migrated to the newer API.
+
+When retiring a compatibility pin after an upstream update, check every affected
+consumer—not just the shared dependency. Verify each consumer's resolved version,
+dependency bounds, and API compatibility. A consumer left on an older version may
+still need protection even when the rest of the stack has migrated.
+
+For any remaining legacy consumer, check whether upstream still maintains it,
+whether a compatible update exists, and whether other packages or supported users
+still need it. Remove obsolete components only when that removal is justified;
+otherwise retain a narrowly scoped pin and ensure compatible dependencies remain
+available.
 
 ## Reference
 
