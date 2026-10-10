@@ -38,7 +38,7 @@ jobs:
     if: github.repository == 'microsoft/azurelinux'
     # Intentionally branch-pinned to our own repo so the
     # reusable workflow picks up prompt/script/agent updates automatically.
-    uses: microsoft/azurelinux/.github/workflows/spec-review.yml@4.0 # zizmor: ignore[unpinned-uses]
+    uses: microsoft/azurelinux/.github/workflows/spec-review.yml@e9d3bd00bb115d6418b9817072284c9d736c3ad4 # zizmor: ignore[unpinned-uses]
     permissions:
       contents: read
       pull-requests: write # Post review comments and inline annotations on PRs
