@@ -1,0 +1,215 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Aditya Singh <v-aditysing@microsoft.com>
+Date: Fri, 18 Sep 2026 00:00:00 +0000
+Subject: [PATCH] Adapt keda to the uplifted dependency APIs
+
+- predicate.And became generic in controller-runtime v0.19 and cannot infer its
+  type parameter from an empty argument list.
+- custom-metrics-apiserver v1.31 AdapterBase.Run takes a context.Context.
+- prometheus/common config round trippers now take SecretReader values.
+- Group vault secrets by PkiData value: the key held a pointer to the range
+  variable, which aliased every element under Go 1.21 loop semantics and becomes
+  a distinct key per element once the go directive reaches 1.22+, causing one
+  Vault PKI issuance per reference instead of one per group.
+- Replace non-constant format strings, which go vet rejects once the go
+  directive reaches 1.24.
+---
+diff --git a/cmd/adapter/main.go b/cmd/adapter/main.go
+index a5b47c2..6dcacee 100644
+--- a/cmd/adapter/main.go
++++ b/cmd/adapter/main.go
+@@ -293,7 +293,7 @@ func main() {
+ 
+ 	RunMetricsServer(ctx, stopCh)
+ 
+-	if err = cmd.Run(stopCh); err != nil {
++	if err = cmd.Run(ctx); err != nil {
+ 		return
+ 	}
+ }
+diff --git a/controllers/keda/scaledjob_controller.go b/controllers/keda/scaledjob_controller.go
+index 845ba5a..0654219 100755
+--- a/controllers/keda/scaledjob_controller.go
++++ b/controllers/keda/scaledjob_controller.go
+@@ -141,7 +141,7 @@ func (r *ScaledJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
+ 	// Check jobTargetRef is specified
+ 	if scaledJob.Spec.JobTargetRef == nil {
+ 		errMsg := "ScaledJob.spec.jobTargetRef not found"
+-		err := fmt.Errorf(errMsg)
++		err := fmt.Errorf("%s", errMsg)
+ 		reqLogger.Error(err, errMsg)
+ 		r.Recorder.Event(scaledJob, corev1.EventTypeWarning, eventreason.ScaledJobCheckFailed, errMsg)
+ 		return ctrl.Result{}, err
+diff --git a/pkg/metricscollector/opentelemetry.go b/pkg/metricscollector/opentelemetry.go
+index f64b05d..70b5818 100644
+--- a/pkg/metricscollector/opentelemetry.go
++++ b/pkg/metricscollector/opentelemetry.go
+@@ -79,7 +79,7 @@ func NewOtelMetrics(options ...metric.Option) *OtelMetrics {
+ 		}
+ 
+ 		if err != nil {
+-			fmt.Printf("Error:" + err.Error())
++			fmt.Printf("Error:%s", err.Error())
+ 			return nil
+ 		}
+ 		options = []metric.Option{metric.WithReader(metric.NewPeriodicReader(exporter))}
+diff --git a/pkg/scalers/authentication/authentication_helpers.go b/pkg/scalers/authentication/authentication_helpers.go
+index 0ffaab0..a8e8255 100644
+--- a/pkg/scalers/authentication/authentication_helpers.go
++++ b/pkg/scalers/authentication/authentication_helpers.go
+@@ -211,16 +211,16 @@ func CreateHTTPRoundTripper(roundTripperType TransportType, auth *AuthMeta, conf
+ 		if auth != nil {
+ 			if auth.EnableBasicAuth {
+ 				rt = pConfig.NewBasicAuthRoundTripper(
+-					auth.Username,
+-					pConfig.Secret(auth.Password),
+-					"", roundTripper,
++					pConfig.NewInlineSecret(auth.Username),
++					pConfig.NewInlineSecret(auth.Password),
++					roundTripper,
+ 				)
+ 			}
+ 
+ 			if auth.EnableBearerAuth {
+ 				rt = pConfig.NewAuthorizationCredentialsRoundTripper(
+ 					"Bearer",
+-					pConfig.Secret(auth.BearerToken),
++					pConfig.NewInlineSecret(auth.BearerToken),
+ 					roundTripper,
+ 				)
+ 			}
+diff --git a/pkg/scalers/kafka_scaler_test.go b/pkg/scalers/kafka_scaler_test.go
+index 57a3f95..eedf50c 100644
+--- a/pkg/scalers/kafka_scaler_test.go
++++ b/pkg/scalers/kafka_scaler_test.go
+@@ -425,13 +425,13 @@ func TestKafkaAuthParamsInTriggerAuthentication(t *testing.T) {
+ 			if testData.authParams["keytab"] != "" {
+ 				err := testFileContents(testData, meta, "keytab")
+ 				if err != nil {
+-					t.Errorf(err.Error())
++					t.Error(err)
+ 				}
+ 			}
+ 			if !testData.isError {
+ 				err := testFileContents(testData, meta, "kerberosConfig")
+ 				if err != nil {
+-					t.Errorf(err.Error())
++					t.Error(err)
+ 				}
+ 			}
+ 			if meta.kerberosServiceName != testData.authParams["kerberosServiceName"] {
+diff --git a/pkg/scalers/openstack/keystone_authentication.go b/pkg/scalers/openstack/keystone_authentication.go
+index b1106bd..68322cc 100644
+--- a/pkg/scalers/openstack/keystone_authentication.go
++++ b/pkg/scalers/openstack/keystone_authentication.go
+@@ -294,7 +294,7 @@ func (keystone *KeystoneAuthRequest) getToken(ctx context.Context) (string, erro
+ 		return "", err
+ 	}
+ 
+-	return "", fmt.Errorf(string(errBody))
++	return "", fmt.Errorf("%s", string(errBody))
+ }
+ 
+ // getCatalog retrives the OpenStack catalog according to the current authorization
+@@ -343,7 +343,7 @@ func (keystone *KeystoneAuthRequest) getCatalog(ctx context.Context, token strin
+ 		return nil, err
+ 	}
+ 
+-	return nil, fmt.Errorf(string(errBody))
++	return nil, fmt.Errorf("%s", string(errBody))
+ }
+ 
+ // getServiceURL retrieves a public URL for an OpenStack project from the OpenStack catalog
+diff --git a/pkg/scalers/openstack_metrics_scaler.go b/pkg/scalers/openstack_metrics_scaler.go
+index da98d2f..65461e5 100644
+--- a/pkg/scalers/openstack_metrics_scaler.go
++++ b/pkg/scalers/openstack_metrics_scaler.go
+@@ -329,7 +329,7 @@ func (s *openstackMetricScaler) readOpenstackMetrics(ctx context.Context) (float
+ 			return defaultValueWhenError, readError
+ 		}
+ 
+-		return defaultValueWhenError, fmt.Errorf(string(bodyError))
++		return defaultValueWhenError, fmt.Errorf("%s", string(bodyError))
+ 	}
+ 
+ 	m := measureResult{}
+diff --git a/pkg/scalers/rabbitmq_scaler.go b/pkg/scalers/rabbitmq_scaler.go
+index 6037aa4..a1d9a23 100644
+--- a/pkg/scalers/rabbitmq_scaler.go
++++ b/pkg/scalers/rabbitmq_scaler.go
+@@ -712,5 +712,5 @@ func getMaximum(q []queueInfo) (int, int, float64) {
+ // Mask host for log purposes
+ func (s *rabbitMQScaler) anonymizeRabbitMQError(err error) error {
+ 	errorMessage := fmt.Sprintf("error inspecting rabbitMQ: %s", err)
+-	return fmt.Errorf(rabbitMQAnonymizePattern.ReplaceAllString(errorMessage, "user:password@"))
++	return fmt.Errorf("%s", rabbitMQAnonymizePattern.ReplaceAllString(errorMessage, "user:password@"))
+ }
+diff --git a/pkg/scaling/resolver/hashicorpvault_handler.go b/pkg/scaling/resolver/hashicorpvault_handler.go
+index 1781a20..e80b730 100644
+--- a/pkg/scaling/resolver/hashicorpvault_handler.go
++++ b/pkg/scaling/resolver/hashicorpvault_handler.go
+@@ -277,7 +277,7 @@ func (vh *HashicorpVaultHandler) getSecretValue(secret *kedav1alpha1.VaultSecret
+ type SecretGroup struct {
+ 	path         string
+ 	secretType   kedav1alpha1.VaultSecretType
+-	vaultPkiData *kedav1alpha1.VaultPkiData
++	vaultPkiData kedav1alpha1.VaultPkiData
+ }
+ 
+ // fetchSecret returns the vaultSecret at a given vault path. If the secret is a pki, then the secret will use the
+@@ -314,7 +314,7 @@ func (vh *HashicorpVaultHandler) ResolveSecrets(secrets []kedav1alpha1.VaultSecr
+ 	grouped := make(map[SecretGroup][]kedav1alpha1.VaultSecret)
+ 	vaultSecrets := make(map[SecretGroup]*vaultapi.Secret)
+ 	for _, e := range secrets {
+-		group := SecretGroup{secretType: e.Type, path: e.Path, vaultPkiData: &e.PkiData}
++		group := SecretGroup{secretType: e.Type, path: e.Path, vaultPkiData: e.PkiData}
+ 		if _, ok := grouped[group]; !ok {
+ 			grouped[group] = make([]kedav1alpha1.VaultSecret, 0)
+ 		}
+@@ -322,7 +322,7 @@ func (vh *HashicorpVaultHandler) ResolveSecrets(secrets []kedav1alpha1.VaultSecr
+ 	}
+ 	// For each group fetch the secret from vault
+ 	for group := range grouped {
+-		vaultSecret, err := vh.fetchSecret(group.secretType, group.path, group.vaultPkiData)
++		vaultSecret, err := vh.fetchSecret(group.secretType, group.path, &group.vaultPkiData)
+ 		if err != nil {
+ 			// could not fetch secret, skipping group
+ 			continue
+diff --git a/pkg/scaling/scale_handler.go b/pkg/scaling/scale_handler.go
+index 5a955e4..a8c50a0 100644
+--- a/pkg/scaling/scale_handler.go
++++ b/pkg/scaling/scale_handler.go
+@@ -580,7 +580,7 @@ func (h *scaleHandler) GetScaledObjectMetrics(ctx context.Context, scaledObjectN
+ 	}
+ 
+ 	if len(matchingMetrics) == 0 {
+-		return nil, fmt.Errorf("no matching metrics found for " + metricsName)
++		return nil, fmt.Errorf("no matching metrics found for %s", metricsName)
+ 	}
+ 
+ 	// handle scalingModifiers here and simply return the matchingMetrics
+diff --git a/pkg/util/watch.go b/pkg/util/watch.go
+index 81baa49..67f55b2 100644
+--- a/pkg/util/watch.go
++++ b/pkg/util/watch.go
+@@ -6,6 +6,7 @@ import (
+ 	"strings"
+ 
+ 	"sigs.k8s.io/controller-runtime/pkg/cache"
++	"sigs.k8s.io/controller-runtime/pkg/client"
+ 	"sigs.k8s.io/controller-runtime/pkg/event"
+ 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+ )
+@@ -35,7 +36,9 @@ func GetWatchNamespaces() (map[string]cache.Config, error) {
+ func IgnoreOtherNamespaces() predicate.Predicate {
+ 	nss, e := GetWatchNamespaces()
+ 	if len(nss) == 0 || e != nil {
+-		return predicate.And() // no-op predicate that returns always true
++		// predicate.And became generic in controller-runtime v0.19 and cannot infer
++		// the object type from an empty argument list.
++		return predicate.And[client.Object]() // no-op predicate that returns always true
+ 	}
+ 	return predicate.Funcs{
+ 		GenericFunc: func(e event.GenericEvent) bool {
+-- 
+2.45.4

@@ -13,7 +13,7 @@
  
 Name:	libarrow
 Version:	15.0.0
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
@@ -245,6 +245,9 @@ popd
 %exclude %{_datadir}/gdb/auto-load%{_libdir}/libarrow.so.*-gdb.py
 
 %changelog
+* Sat Oct 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 15.0.0-10
+- Bump up to build with latest libthrift.
+
 * Sat Aug 22 2026 Kshitiz Godara <kgodara@microsoft.com> - 15.0.0-9
 - Bump up to build with latest libthrift.
 

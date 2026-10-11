@@ -1,0 +1,1567 @@
+From 6b8bef782a03ca01d5c9df10d8deb437f4697f20 Mon Sep 17 00:00:00 2001
+From: Alexandr Nedvedicky <sashan@openssl.org>
+Date: Tue, 21 Jul 2026 00:33:18 +0200
+Subject: [PATCH] Add a red-black tree implementation
+
+The code comes from David Gwynne <david@gwynne.id.au>.
+The same implmentation can be found in OpenBSD.
+
+Several minor adjustments have been done to include the code
+into OpenSSL:
+ * the prefix has been changed to OSSL_RBT_,
+ * the support augment is removed,
+ * _RBT_CHECK()/_RBT_POISON() got removed too,
+ * _RB_REMOVE() resets link pointer to NULL in debug build,
+
+The documentation is based on tree(3) from OpenBSD, originally authored
+by Niels Provos <provos@openbsd.org>.
+
+Co-Authoerd-by: David Gwynne <david@gwynne.id.au>
+Co-Authored-by: Niels Provos <provos@gmail.com>
+Co-Authored-by: Andrew Dinh <andrewd@openssl.org>
+
+Reviewed-by: Eugene Syromiatnikov <esyr@openssl.org>
+Reviewed-by: Bob Beck <beck@openssl.org>
+Reviewed-by: Norbert Pocs <norbertp@openssl.org>
+MergeDate: Tue Aug 11 19:15:59 2026
+Reviewed-by: Tomas Mraz <tomas@openssl.foundation>
+Reviewed-by: Milan Broz <mbroz@openssl.org>
+Merged-from: https://github.com/openssl/openssl/pull/32767
+Signed-off-by: Azure Linux Security Servicing Account <azurelinux-security@microsoft.com>
+Upstream-reference: https://github.com/openssl/openssl/commit/6b8bef782a03ca01d5c9df10d8deb437f4697f20.patch
+---
+ .clang-format                     |   4 +
+ crypto/build.info                 |   2 +-
+ crypto/rbtree/build.info          |   3 +
+ crypto/rbtree/rbtree.c            | 561 ++++++++++++++++++++++++++++++
+ doc/internal/man7/ossl_rbtree.pod | 303 ++++++++++++++++
+ include/internal/ossl_rbtree.h    | 265 ++++++++++++++
+ ssl/build.info                    |   3 +-
+ test/build.info                   |   7 +-
+ test/ossl_rbtree_test.c           | 276 +++++++++++++++
+ test/recipes/02-test_rbtree.t     |  11 +
+ util/missingcrypto-internal.txt   |   1 +
+ 11 files changed, 1433 insertions(+), 3 deletions(-)
+ create mode 100644 crypto/rbtree/build.info
+ create mode 100644 crypto/rbtree/rbtree.c
+ create mode 100644 doc/internal/man7/ossl_rbtree.pod
+ create mode 100644 include/internal/ossl_rbtree.h
+ create mode 100644 test/ossl_rbtree_test.c
+ create mode 100644 test/recipes/02-test_rbtree.t
+
+diff --git a/crypto/build.info b/crypto/build.info
+index f9fbca0603b19..842e012464c63 100644
+--- a/crypto/build.info
++++ b/crypto/build.info
+@@ -6,7 +6,7 @@ SUBDIRS=objects buffer bio stack lhash hashtable rand evp asn1 pem x509 conf \
+         siphash sm3 des aes rc2 rc4 rc5 idea aria bf cast camellia \
+         seed sm4 chacha modes bn ec rsa dsa dh sm2 dso engine \
+         err comp http ocsp cms ts srp cmac ct async ess crmf cmp encode_decode \
+-        ffc hpke thread
++        ffc hpke thread rbtree
+ 
+ LIBS=../libcrypto
+ 
+diff --git a/crypto/rbtree/build.info b/crypto/rbtree/build.info
+new file mode 100644
+index 0000000000000..79f9ff01e6796
+--- /dev/null
++++ b/crypto/rbtree/build.info
+@@ -0,0 +1,3 @@
++LIBS=../../libcrypto
++SOURCE[../../libcrypto]=\
++        rbtree.c
+diff --git a/crypto/rbtree/rbtree.c b/crypto/rbtree/rbtree.c
+new file mode 100644
+index 0000000000000..f1d89166e5603
+--- /dev/null
++++ b/crypto/rbtree/rbtree.c
+@@ -0,0 +1,561 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ * Copyright (c) 2016 David Gwynne <david@gwynne.id.au>
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++/*
++ * The code here comes from David Gwynne <david@gwynne.id.au>. The original
++ * version can be found:
++ *    https://github.com/dgwynne/data-structures/
++ * file bst.h. The same code is also part of OpenBSD OS where it is shipped
++ * under BSD license.
++ *
++ * David Gwynne agrees to include modified version to OpenSSL and ship it
++ * under OpenSSL Apache 2.0 license.
++ */
++
++#include "internal/ossl_rbtree.h"
++
++#ifndef NDEBUG
++#include <assert.h>
++#endif
++
++#define OSSL_RBT_BLACK 0
++#define OSSL_RBT_RED 1
++
++static struct ossl_rbt_entry *
++rbt_n2e(const struct ossl_rbt_type *t, void *node)
++{
++    uintptr_t addr = (uintptr_t)node;
++
++    return (struct ossl_rbt_entry *)(addr + t->t_offset);
++}
++
++static void *
++rbt_e2n(const struct ossl_rbt_type *t, struct ossl_rbt_entry *rbe)
++{
++    uintptr_t addr = (uintptr_t)rbe;
++
++    return (void *)(addr - t->t_offset);
++}
++
++#define OSSL_RBE_LEFT(_rbe) (_rbe)->rb_left
++#define OSSL_RBE_RIGHT(_rbe) (_rbe)->rb_right
++#define OSSL_RBE_PARENT(_rbe) (_rbe)->rb_parent
++#define OSSL_RBE_COLOR(_rbe) (_rbe)->rb_color
++
++#define OSSL_RBH_ROOT(_rbt) (_rbt)->rb_root
++
++static void
++rbe_set(struct ossl_rbt_entry *rbe, struct ossl_rbt_entry *parent)
++{
++    OSSL_RBE_PARENT(rbe) = parent;
++    OSSL_RBE_LEFT(rbe) = OSSL_RBE_RIGHT(rbe) = NULL;
++    OSSL_RBE_COLOR(rbe) = OSSL_RBT_RED;
++}
++
++static void
++rbe_set_blackred(struct ossl_rbt_entry *black, struct ossl_rbt_entry *red)
++{
++    OSSL_RBE_COLOR(black) = OSSL_RBT_BLACK;
++    OSSL_RBE_COLOR(red) = OSSL_RBT_RED;
++}
++
++static void
++rbe_rotate_left(struct ossl_rbt_tree *rbt, struct ossl_rbt_entry *rbe)
++{
++    struct ossl_rbt_entry *parent;
++    struct ossl_rbt_entry *tmp;
++
++    tmp = OSSL_RBE_RIGHT(rbe);
++    OSSL_RBE_RIGHT(rbe) = OSSL_RBE_LEFT(tmp);
++    if (OSSL_RBE_RIGHT(rbe) != NULL)
++        OSSL_RBE_PARENT(OSSL_RBE_LEFT(tmp)) = rbe;
++
++    parent = OSSL_RBE_PARENT(rbe);
++    OSSL_RBE_PARENT(tmp) = parent;
++    if (parent != NULL) {
++        if (rbe == OSSL_RBE_LEFT(parent))
++            OSSL_RBE_LEFT(parent) = tmp;
++        else
++            OSSL_RBE_RIGHT(parent) = tmp;
++    } else
++        OSSL_RBH_ROOT(rbt) = tmp;
++
++    OSSL_RBE_LEFT(tmp) = rbe;
++    OSSL_RBE_PARENT(rbe) = tmp;
++}
++
++static void
++rbe_rotate_right(struct ossl_rbt_tree *rbt, struct ossl_rbt_entry *rbe)
++{
++    struct ossl_rbt_entry *parent;
++    struct ossl_rbt_entry *tmp;
++
++    tmp = OSSL_RBE_LEFT(rbe);
++    OSSL_RBE_LEFT(rbe) = OSSL_RBE_RIGHT(tmp);
++    if (OSSL_RBE_LEFT(rbe) != NULL)
++        OSSL_RBE_PARENT(OSSL_RBE_RIGHT(tmp)) = rbe;
++
++    parent = OSSL_RBE_PARENT(rbe);
++    OSSL_RBE_PARENT(tmp) = parent;
++    if (parent != NULL) {
++        if (rbe == OSSL_RBE_LEFT(parent))
++            OSSL_RBE_LEFT(parent) = tmp;
++        else
++            OSSL_RBE_RIGHT(parent) = tmp;
++    } else
++        OSSL_RBH_ROOT(rbt) = tmp;
++
++    OSSL_RBE_RIGHT(tmp) = rbe;
++    OSSL_RBE_PARENT(rbe) = tmp;
++}
++
++static void
++rbe_insert_color(struct ossl_rbt_tree *rbt, struct ossl_rbt_entry *rbe)
++{
++    struct ossl_rbt_entry *parent, *gparent, *tmp;
++
++    while ((parent = OSSL_RBE_PARENT(rbe)) != NULL && OSSL_RBE_COLOR(parent) == OSSL_RBT_RED) {
++        gparent = OSSL_RBE_PARENT(parent);
++
++        if (parent == OSSL_RBE_LEFT(gparent)) {
++            tmp = OSSL_RBE_RIGHT(gparent);
++            if (tmp != NULL && OSSL_RBE_COLOR(tmp) == OSSL_RBT_RED) {
++                OSSL_RBE_COLOR(tmp) = OSSL_RBT_BLACK;
++                rbe_set_blackred(parent, gparent);
++                rbe = gparent;
++                continue;
++            }
++
++            if (OSSL_RBE_RIGHT(parent) == rbe) {
++                rbe_rotate_left(rbt, parent);
++                tmp = parent;
++                parent = rbe;
++                rbe = tmp;
++            }
++
++            rbe_set_blackred(parent, gparent);
++            rbe_rotate_right(rbt, gparent);
++        } else {
++            tmp = OSSL_RBE_LEFT(gparent);
++            if (tmp != NULL && OSSL_RBE_COLOR(tmp) == OSSL_RBT_RED) {
++                OSSL_RBE_COLOR(tmp) = OSSL_RBT_BLACK;
++                rbe_set_blackred(parent, gparent);
++                rbe = gparent;
++                continue;
++            }
++
++            if (OSSL_RBE_LEFT(parent) == rbe) {
++                rbe_rotate_right(rbt, parent);
++                tmp = parent;
++                parent = rbe;
++                rbe = tmp;
++            }
++
++            rbe_set_blackred(parent, gparent);
++            rbe_rotate_left(rbt, gparent);
++        }
++    }
++
++    OSSL_RBE_COLOR(OSSL_RBH_ROOT(rbt)) = OSSL_RBT_BLACK;
++}
++
++static void
++rbe_remove_color(struct ossl_rbt_tree *rbt,
++    struct ossl_rbt_entry *parent, struct ossl_rbt_entry *rbe)
++{
++    struct ossl_rbt_entry *tmp;
++
++    while ((rbe == NULL || OSSL_RBE_COLOR(rbe) == OSSL_RBT_BLACK) && rbe != OSSL_RBH_ROOT(rbt)) {
++        if (OSSL_RBE_LEFT(parent) == rbe) {
++            tmp = OSSL_RBE_RIGHT(parent);
++            if (OSSL_RBE_COLOR(tmp) == OSSL_RBT_RED) {
++                rbe_set_blackred(tmp, parent);
++                rbe_rotate_left(rbt, parent);
++                tmp = OSSL_RBE_RIGHT(parent);
++            }
++            if ((OSSL_RBE_LEFT(tmp) == NULL || OSSL_RBE_COLOR(OSSL_RBE_LEFT(tmp)) == OSSL_RBT_BLACK) && (OSSL_RBE_RIGHT(tmp) == NULL || OSSL_RBE_COLOR(OSSL_RBE_RIGHT(tmp)) == OSSL_RBT_BLACK)) {
++                OSSL_RBE_COLOR(tmp) = OSSL_RBT_RED;
++                rbe = parent;
++                parent = OSSL_RBE_PARENT(rbe);
++            } else {
++                if (OSSL_RBE_RIGHT(tmp) == NULL || OSSL_RBE_COLOR(OSSL_RBE_RIGHT(tmp)) == OSSL_RBT_BLACK) {
++                    struct ossl_rbt_entry *oleft;
++
++                    oleft = OSSL_RBE_LEFT(tmp);
++                    if (oleft != NULL)
++                        OSSL_RBE_COLOR(oleft) = OSSL_RBT_BLACK;
++
++                    OSSL_RBE_COLOR(tmp) = OSSL_RBT_RED;
++                    rbe_rotate_right(rbt, tmp);
++                    tmp = OSSL_RBE_RIGHT(parent);
++                }
++
++                OSSL_RBE_COLOR(tmp) = OSSL_RBE_COLOR(parent);
++                OSSL_RBE_COLOR(parent) = OSSL_RBT_BLACK;
++                if (OSSL_RBE_RIGHT(tmp))
++                    OSSL_RBE_COLOR(OSSL_RBE_RIGHT(tmp)) = OSSL_RBT_BLACK;
++
++                rbe_rotate_left(rbt, parent);
++                rbe = OSSL_RBH_ROOT(rbt);
++                break;
++            }
++        } else {
++            tmp = OSSL_RBE_LEFT(parent);
++            if (OSSL_RBE_COLOR(tmp) == OSSL_RBT_RED) {
++                rbe_set_blackred(tmp, parent);
++                rbe_rotate_right(rbt, parent);
++                tmp = OSSL_RBE_LEFT(parent);
++            }
++
++            if ((OSSL_RBE_LEFT(tmp) == NULL || OSSL_RBE_COLOR(OSSL_RBE_LEFT(tmp)) == OSSL_RBT_BLACK) && (OSSL_RBE_RIGHT(tmp) == NULL || OSSL_RBE_COLOR(OSSL_RBE_RIGHT(tmp)) == OSSL_RBT_BLACK)) {
++                OSSL_RBE_COLOR(tmp) = OSSL_RBT_RED;
++                rbe = parent;
++                parent = OSSL_RBE_PARENT(rbe);
++            } else {
++                if (OSSL_RBE_LEFT(tmp) == NULL || OSSL_RBE_COLOR(OSSL_RBE_LEFT(tmp)) == OSSL_RBT_BLACK) {
++                    struct ossl_rbt_entry *oright;
++
++                    oright = OSSL_RBE_RIGHT(tmp);
++                    if (oright != NULL)
++                        OSSL_RBE_COLOR(oright) = OSSL_RBT_BLACK;
++
++                    OSSL_RBE_COLOR(tmp) = OSSL_RBT_RED;
++                    rbe_rotate_left(rbt, tmp);
++                    tmp = OSSL_RBE_LEFT(parent);
++                }
++
++                OSSL_RBE_COLOR(tmp) = OSSL_RBE_COLOR(parent);
++                OSSL_RBE_COLOR(parent) = OSSL_RBT_BLACK;
++                if (OSSL_RBE_LEFT(tmp) != NULL)
++                    OSSL_RBE_COLOR(OSSL_RBE_LEFT(tmp)) = OSSL_RBT_BLACK;
++
++                rbe_rotate_right(rbt, parent);
++                rbe = OSSL_RBH_ROOT(rbt);
++                break;
++            }
++        }
++    }
++
++    if (rbe != NULL)
++        OSSL_RBE_COLOR(rbe) = OSSL_RBT_BLACK;
++}
++
++static struct ossl_rbt_entry *
++rbe_remove(struct ossl_rbt_tree *rbt, struct ossl_rbt_entry *rbe)
++{
++    struct ossl_rbt_entry *child, *parent, *old = rbe;
++    unsigned int color;
++
++    if (OSSL_RBE_LEFT(rbe) == NULL)
++        child = OSSL_RBE_RIGHT(rbe);
++    else if (OSSL_RBE_RIGHT(rbe) == NULL)
++        child = OSSL_RBE_LEFT(rbe);
++    else {
++        struct ossl_rbt_entry *tmp;
++
++        rbe = OSSL_RBE_RIGHT(rbe);
++        while ((tmp = OSSL_RBE_LEFT(rbe)) != NULL)
++            rbe = tmp;
++
++        child = OSSL_RBE_RIGHT(rbe);
++        parent = OSSL_RBE_PARENT(rbe);
++        color = OSSL_RBE_COLOR(rbe);
++        if (child != NULL)
++            OSSL_RBE_PARENT(child) = parent;
++        if (parent != NULL) {
++            if (OSSL_RBE_LEFT(parent) == rbe)
++                OSSL_RBE_LEFT(parent) = child;
++            else
++                OSSL_RBE_RIGHT(parent) = child;
++        } else
++            OSSL_RBH_ROOT(rbt) = child;
++        if (OSSL_RBE_PARENT(rbe) == old)
++            parent = rbe;
++        *rbe = *old;
++
++        tmp = OSSL_RBE_PARENT(old);
++        if (tmp != NULL) {
++            if (OSSL_RBE_LEFT(tmp) == old)
++                OSSL_RBE_LEFT(tmp) = rbe;
++            else
++                OSSL_RBE_RIGHT(tmp) = rbe;
++        } else
++            OSSL_RBH_ROOT(rbt) = rbe;
++
++        OSSL_RBE_PARENT(OSSL_RBE_LEFT(old)) = rbe;
++        if (OSSL_RBE_RIGHT(old))
++            OSSL_RBE_PARENT(OSSL_RBE_RIGHT(old)) = rbe;
++        goto color;
++    }
++
++    parent = OSSL_RBE_PARENT(rbe);
++    color = OSSL_RBE_COLOR(rbe);
++
++    if (child != NULL)
++        OSSL_RBE_PARENT(child) = parent;
++    if (parent != NULL) {
++        if (OSSL_RBE_LEFT(parent) == rbe)
++            OSSL_RBE_LEFT(parent) = child;
++        else
++            OSSL_RBE_RIGHT(parent) = child;
++    } else
++        OSSL_RBH_ROOT(rbt) = child;
++color:
++    if (color == OSSL_RBT_BLACK)
++        rbe_remove_color(rbt, parent, child);
++
++#ifndef NDEBUG
++    if (old != NULL) {
++        OSSL_RBE_PARENT(old) = NULL;
++        OSSL_RBE_LEFT(old) = NULL;
++        OSSL_RBE_RIGHT(old) = NULL;
++    }
++#endif
++
++    return old;
++}
++
++void *
++ossl_rbt_remove(const struct ossl_rbt_type *t, struct ossl_rbt_tree *rbt, void *elm)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, elm);
++    struct ossl_rbt_entry *old;
++
++    old = rbe_remove(rbt, rbe);
++
++    return old == NULL ? NULL : rbt_e2n(t, old);
++}
++
++void *
++ossl_rbt_insert(const struct ossl_rbt_type *t, struct ossl_rbt_tree *rbt, void *elm)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, elm);
++    struct ossl_rbt_entry *tmp;
++    struct ossl_rbt_entry *parent = NULL;
++    void *node;
++    int comp = 0;
++
++#ifndef NDEBUG
++    assert(rbe->rb_parent == NULL);
++    assert(rbe->rb_left == NULL);
++    assert(rbe->rb_right == NULL);
++#endif
++
++    tmp = OSSL_RBH_ROOT(rbt);
++    while (tmp != NULL) {
++        parent = tmp;
++
++        node = rbt_e2n(t, tmp);
++        comp = (*t->t_compare)(elm, node);
++        if (comp < 0)
++            tmp = OSSL_RBE_LEFT(tmp);
++        else if (comp > 0)
++            tmp = OSSL_RBE_RIGHT(tmp);
++        else
++            return node;
++    }
++
++    rbe_set(rbe, parent);
++
++    if (parent != NULL) {
++        if (comp < 0)
++            OSSL_RBE_LEFT(parent) = rbe;
++        else
++            OSSL_RBE_RIGHT(parent) = rbe;
++    } else
++        OSSL_RBH_ROOT(rbt) = rbe;
++
++    rbe_insert_color(rbt, rbe);
++
++    return NULL;
++}
++
++/* Finds the node with the same key as elm */
++void *
++ossl_rbt_find(const struct ossl_rbt_type *t, struct ossl_rbt_tree *rbt, const void *key)
++{
++    struct ossl_rbt_entry *tmp = OSSL_RBH_ROOT(rbt);
++    void *node;
++    int comp;
++
++    while (tmp != NULL) {
++        node = rbt_e2n(t, tmp);
++        comp = (*t->t_compare)(key, node);
++        if (comp < 0)
++            tmp = OSSL_RBE_LEFT(tmp);
++        else if (comp > 0)
++            tmp = OSSL_RBE_RIGHT(tmp);
++        else
++            return node;
++    }
++
++    return NULL;
++}
++
++/* Finds the first node greater than or equal to the search key */
++void *
++ossl_rbt_nfind(const struct ossl_rbt_type *t, struct ossl_rbt_tree *rbt, const void *key)
++{
++    struct ossl_rbt_entry *tmp = OSSL_RBH_ROOT(rbt);
++    void *node;
++    void *res = NULL;
++    int comp;
++
++    while (tmp != NULL) {
++        node = rbt_e2n(t, tmp);
++        comp = (*t->t_compare)(key, node);
++        if (comp < 0) {
++            res = node;
++            tmp = OSSL_RBE_LEFT(tmp);
++        } else if (comp > 0)
++            tmp = OSSL_RBE_RIGHT(tmp);
++        else
++            return node;
++    }
++
++    return res;
++}
++
++void *
++ossl_rbt_next(const struct ossl_rbt_type *t, void *elm)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, elm);
++
++    if (OSSL_RBE_RIGHT(rbe) != NULL) {
++        rbe = OSSL_RBE_RIGHT(rbe);
++        while (OSSL_RBE_LEFT(rbe) != NULL)
++            rbe = OSSL_RBE_LEFT(rbe);
++    } else {
++        if (OSSL_RBE_PARENT(rbe) && (rbe == OSSL_RBE_LEFT(OSSL_RBE_PARENT(rbe))))
++            rbe = OSSL_RBE_PARENT(rbe);
++        else {
++            while (OSSL_RBE_PARENT(rbe) && (rbe == OSSL_RBE_RIGHT(OSSL_RBE_PARENT(rbe))))
++                rbe = OSSL_RBE_PARENT(rbe);
++            rbe = OSSL_RBE_PARENT(rbe);
++        }
++    }
++
++    return rbe == NULL ? NULL : rbt_e2n(t, rbe);
++}
++
++void *
++ossl_rbt_prev(const struct ossl_rbt_type *t, void *elm)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, elm);
++
++    if (OSSL_RBE_LEFT(rbe)) {
++        rbe = OSSL_RBE_LEFT(rbe);
++        while (OSSL_RBE_RIGHT(rbe))
++            rbe = OSSL_RBE_RIGHT(rbe);
++    } else {
++        if (OSSL_RBE_PARENT(rbe) && (rbe == OSSL_RBE_RIGHT(OSSL_RBE_PARENT(rbe))))
++            rbe = OSSL_RBE_PARENT(rbe);
++        else {
++            while (OSSL_RBE_PARENT(rbe) && (rbe == OSSL_RBE_LEFT(OSSL_RBE_PARENT(rbe))))
++                rbe = OSSL_RBE_PARENT(rbe);
++            rbe = OSSL_RBE_PARENT(rbe);
++        }
++    }
++
++    return rbe == NULL ? NULL : rbt_e2n(t, rbe);
++}
++
++void *
++ossl_rbt_root(const struct ossl_rbt_type *t, struct ossl_rbt_tree *rbt)
++{
++    struct ossl_rbt_entry *rbe = OSSL_RBH_ROOT(rbt);
++
++    return rbe == NULL ? rbe : rbt_e2n(t, rbe);
++}
++
++void *
++ossl_rbt_min(const struct ossl_rbt_type *t, struct ossl_rbt_tree *rbt)
++{
++    struct ossl_rbt_entry *rbe = OSSL_RBH_ROOT(rbt);
++    struct ossl_rbt_entry *parent = NULL;
++
++    while (rbe != NULL) {
++        parent = rbe;
++        rbe = OSSL_RBE_LEFT(rbe);
++    }
++
++    return parent == NULL ? NULL : rbt_e2n(t, parent);
++}
++
++void *
++ossl_rbt_max(const struct ossl_rbt_type *t, struct ossl_rbt_tree *rbt)
++{
++    struct ossl_rbt_entry *rbe = OSSL_RBH_ROOT(rbt);
++    struct ossl_rbt_entry *parent = NULL;
++
++    while (rbe != NULL) {
++        parent = rbe;
++        rbe = OSSL_RBE_RIGHT(rbe);
++    }
++
++    return parent == NULL ? NULL : rbt_e2n(t, parent);
++}
++
++void *
++ossl_rbt_left(const struct ossl_rbt_type *t, void *node)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, node);
++    rbe = OSSL_RBE_LEFT(rbe);
++    return rbe == NULL ? NULL : rbt_e2n(t, rbe);
++}
++
++void *
++ossl_rbt_right(const struct ossl_rbt_type *t, void *node)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, node);
++    rbe = OSSL_RBE_RIGHT(rbe);
++    return rbe == NULL ? NULL : rbt_e2n(t, rbe);
++}
++
++void *
++ossl_rbt_parent(const struct ossl_rbt_type *t, void *node)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, node);
++    rbe = OSSL_RBE_PARENT(rbe);
++    return rbe == NULL ? NULL : rbt_e2n(t, rbe);
++}
++
++void ossl_rbt_set_left(const struct ossl_rbt_type *t, void *node, void *left)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, node);
++    struct ossl_rbt_entry *rbl = (left == NULL) ? NULL : rbt_n2e(t, left);
++
++    OSSL_RBE_LEFT(rbe) = rbl;
++}
++
++void ossl_rbt_set_right(const struct ossl_rbt_type *t, void *node, void *right)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, node);
++    struct ossl_rbt_entry *rbr = (right == NULL) ? NULL : rbt_n2e(t, right);
++
++    OSSL_RBE_RIGHT(rbe) = rbr;
++}
++
++void ossl_rbt_set_parent(const struct ossl_rbt_type *t, void *node, void *parent)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, node);
++    struct ossl_rbt_entry *rbp = (parent == NULL) ? NULL : rbt_n2e(t, parent);
++
++    OSSL_RBE_PARENT(rbe) = rbp;
++}
++
++void ossl_rbt_init_rbe(const struct ossl_rbt_type *t, void *node)
++{
++    struct ossl_rbt_entry *rbe = rbt_n2e(t, node);
++
++    OSSL_RBE_PARENT(rbe) = NULL;
++    OSSL_RBE_LEFT(rbe) = NULL;
++    OSSL_RBE_RIGHT(rbe) = NULL;
++}
+diff --git a/doc/internal/man7/ossl_rbtree.pod b/doc/internal/man7/ossl_rbtree.pod
+new file mode 100644
+index 0000000000000..ce05729798ed2
+--- /dev/null
++++ b/doc/internal/man7/ossl_rbtree.pod
+@@ -0,0 +1,303 @@
++=pod
++
++=head1 NAME
++
++OSSL_RBT_PROTOTYPE, OSSL_RBT_GENERATE, OSSL_RBT_ENTRY, OSSL_RBT_HEAD,
++OSSL_RBT_INITIALIZER, OSSL_RBT_ROOT, OSSL_RBT_EMPTY, OSSL_RBT_NEXT,
++OSSL_RBT_PREV, OSSL_RBT_MIN, OSSL_RBT_MAX, OSSL_RBT_FIND, OSSL_RBT_NFIND,
++OSSL_RBT_LEFT, OSSL_RBT_RIGHT, OSSL_RBT_PARENT, OSSL_RBT_SET_LEFT,
++OSSL_RBT_SET_RIGHT, OSSL_RBT_SET_PARENT, OSSL_RBT_FOREACH,
++OSSL_RBT_FOREACH_SAFE, OSSL_RBT_FOREACH_REVERSE, OSSL_RBT_FOREACH_REVERSE_SAFE,
++OSSL_RBT_INIT, OSSL_RBT_INSERT, OSSL_RBT_REMOVE,
++ossl_rbtree - implementation of red-black tree
++
++=head1 SYNOPSIS
++
++ #include "internal/ossl_rbtree.h"
++
++ /* int (*CMP)(const NODE_TYPE *, const NODE_TYPE *); */
++
++ OSSL_RBT_PROTOTYPE(NAME, NODE_TYPE, FIELD, CMP)
++
++ OSSL_RBT_GENERATE(NAME, NODE_TYPE, FIELD, CMP);
++
++ OSSL_RBT_ENTRY(NODE_TYPE)
++
++ OSSL_RBT_HEAD(HEADNAME, NODE_TYPE)
++
++ OSSL_RBT_INITIALIZER(OSSL_RBT_HEAD *head);
++
++ struct NODE_TYPE * OSSL_RBT_ROOT(NAME, OSSL_RBT_HEAD *head);
++
++ int OSSL_RBT_EMPTY(NAME, OSSL_RBT_HEAD *head);
++
++ struct NODE_TYPE * OSSL_RBT_NEXT(NAME, struct NODE_TYPE *elm);
++
++ struct NODE_TYPE * OSSL_RBT_PREV(NAME, struct NODE_TYPE *elm);
++
++ struct NODE_TYPE * OSSL_RBT_MIN(NAME, OSSL_RBT_HEAD *head);
++
++ struct NODE_TYPE * OSSL_RBT_MAX(NAME, OSSL_RBT_HEAD *head);
++
++ struct NODE_TYPE * OSSL_RBT_FIND(NAME, OSSL_RBT_HEAD *head, struct NODE_TYPE *elm);
++
++ struct NODE_TYPE * OSSL_RBT_NFIND(NAME, OSSL_RBT_HEAD *head, struct NODE_TYPE *elm);
++
++ struct NODE_TYPE * OSSL_RBT_LEFT(NAME, struct NODE_TYPE *elm);
++
++ struct NODE_TYPE * OSSL_RBT_RIGHT(NAME, struct NODE_TYPE *elm);
++
++ struct NODE_TYPE * OSSL_RBT_PARENT(NAME, struct NODE_TYPE *elm);
++
++ void OSSL_RBT_SET_LEFT(NAME, struct NODE_TYPE *elm, struct NODE_TYPE *left);
++
++ void OSSL_RBT_SET_RIGHT(NAME, struct NODE_TYPE *elm, struct NODE_TYPE *right);
++
++ void OSSL_RBT_SET_PARENT(NAME, struct NODE_TYPE *elm, struct NODE_TYPE *parent);
++
++ OSSL_RBT_FOREACH(VARNAME, NAME, OSSL_RBT_HEAD *head);
++
++ OSSL_RBT_FOREACH_SAFE(VARNAME, NAME, OSSL_RBT_HEAD *head, TEMP_VARNAME);
++
++ OSSL_RBT_FOREACH_REVERSE(VARNAME, NAME, OSSL_RBT_HEAD *head);
++
++ OSSL_RBT_FOREACH_REVERSE_SAFE(VARNAME, NAME, OSSL_RBT_HEAD *head, TEMP_VARNAME);
++
++ void OSSL_RBT_INIT(NAME, OSSL_RBT_HEAD *head);
++
++ struct NODE_TYPE * OSSL_RBT_INSERT(NAME, OSSL_RBT_HEAD *head, struct NODE_TYPE *elm);
++
++ struct NODE_TYPE * OSSL_RBT_REMOVE(NAME, OSSL_RBT_HEAD *head, struct NODE_TYPE *elm);
++
++=head1 DESCRIPTION
++
++These macros define data structures for a red-black tree.
++Every operation on a red-black tree is bounded as O(lg n).  The maximum
++height of a red-black tree is 2lg (n+1).
++
++In the macro definitions, B<NODE_TYPE> is the name tag of a user defined
++structure that must contain a field named B<FIELD>, of type B<OSSL_RBT_ENTRY>.
++The argument B<HEADNAME> is the name tag of a user defined
++structure that must be declared using the macro OSSL_RBT_HEAD().
++The argument B<NAME> has to be a unique name prefix for every
++tree that is defined.
++
++The function prototypes are declared with B<OSSL_RBT_PROTOTYPE>,
++B<OSSL_RBT_GENERATE>.  See the examples below for further
++explanation of how these macros are used.
++
++A red-black tree is a binary search tree with the node color as an extra
++attribute.  It fulfills a set of conditions:
++
++=over 4
++
++=item 1.
++every search path from the root to a leaf consists of the same
++number of black nodes,
++
++=item 2.
++each red node (except for the root) has a black parent,
++
++=item 3.
++each leaf node is black.
++
++=back
++
++A red-black tree is headed by a structure defined by the OSSL_RBT_HEAD macro.
++An OSSL_RBT_HEAD structure is declared as follows:
++
++ OSSL_RBT_HEAD(HEADNAME, NODE_TYPE) head;
++
++where B<HEADNAME> is the name of the structure to be defined, and B<struct
++NODE_TYPE> is the type of the elements to be inserted into the tree.
++
++The OSSL_RBT_ENTRY macro declares a structure that allows elements to be
++connected in the tree.
++
++In order to use the functions that manipulate the tree structure, their
++prototypes need to be declared with the OSSL_RBT_PROTOTYPE() macro,
++where B<NAME> is a unique identifier for this
++particular tree.  The B<NODE_TYPE> argument is the type of the structure that is
++being managed by the tree.  The B<FIELD> argument is the name of the element
++defined by OSSL_RBT_ENTRY().
++
++The function bodies are generated with the OSSL_RBT_GENERATE() macro.
++These macros take the same arguments as the
++OSSL_RBT_PROTOTYPE() macro, but should be used only once.
++
++Finally, the B<CMP> argument is the name of a function used to compare
++trees' nodes with each other.  The function takes two arguments of type
++B<const struct NODE_TYPE *>.  If the first argument is smaller than the second,
++the function returns a value smaller than zero.  If they are equal, the
++function returns zero.  Otherwise, it should return a value greater than
++zero.  The compare function defines the order of the tree elements.
++
++The OSSL_RBT_INIT() macro initializes the tree referenced by B<head>.
++
++The red-black tree can also be initialized statically by using the
++OSSL_RBT_INITIALIZER() macro like this:
++
++ OSSL_RBT_HEAD(HEADNAME, NODE_TYPE) head = OSSL_RBT_INITIALIZER(&head);
++
++The OSSL_RBT_INSERT() macro inserts the new element B<elm> into the tree pointed by B<head>.
++Upon success, NULL is returned.  If a matching element already exists in the
++tree, the insertion is aborted, and a pointer to the existing element is
++returned.
++
++The OSSL_RBT_REMOVE() macro removes the element B<elm> from the tree pointed by
++B<head>.  OSSL_RBT_REMOVE() returns B<elm>.
++
++The OSSL_RBT_LEFT() macro returns a pointer to the left child element of B<elm>
++in a red-black tree of type B<NAME>.
++
++The OSSL_RBT_RIGHT() macro returns a pointer to the right child element
++of B<elm> in a red-black tree of type B<NAME>.
++
++The OSSL_RBT_PARENT() macro returns a pointer to the parent element of B<elm>
++in a red-black tree of type B<NAME>.
++
++The OSSL_RBT_SET_LEFT() macro sets the left child pointer of element B<elm>
++to B<left> in a red-black tree of type B<NAME>.
++
++The OSSL_RBT_SET_RIGHT() macro sets the right child pointer of element B<elm>
++to B<right> in a red-black tree of type B<NAME>.
++
++The OSSL_RBT_SET_PARENT() macro sets the parent pointer of element B<elm>
++to B<parent> in a red-black tree of type B<NAME>.
++
++The OSSL_RBT_FIND() and OSSL_RBT_NFIND() macros can be used to find a particular
++element in the tree.  OSSL_RBT_FIND() finds the node with the same key as B<elm>.
++OSSL_RBT_NFIND() finds the first node greater than or equal to the search key.
++
++ struct NODE_TYPE find, *res;
++ find.key = 30;
++ res = OSSL_RBT_FIND(NAME, &head, &find);
++
++The OSSL_RBT_ROOT(), OSSL_RBT_MIN(), OSSL_RBT_MAX(), OSSL_RBT_NEXT(), and
++OSSL_RBT_PREV() macros can be used to traverse the tree:
++
++ for (np = OSSL_RBT_MIN(NAME, &head); np != NULL; np = OSSL_RBT_NEXT(NAME, &head, np))
++
++Or, for simplicity, one can use the OSSL_RBT_FOREACH() or OSSL_RBT_FOREACH_REVERSE()
++macros:
++
++ OSSL_RBT_FOREACH(np, NAME, &head)
++
++The macros OSSL_RBT_FOREACH_SAFE() and OSSL_RBT_FOREACH_REVERSE_SAFE() traverse the
++tree referenced by head in a forward or reverse direction respectively,
++assigning each element in turn to B<VARNAME>.  However, unlike their unsafe
++counterparts, they permit both the removal of B<VARNAME> as well as freeing it
++from within the loop safely without interfering with the traversal.
++
++The OSSL_RBT_EMPTY() macro should be used to check whether a red-black tree is
++empty.
++
++=head1 EXAMPLES
++
++The following example demonstrates how to declare a red-black tree
++holding integers.  Values are inserted into it and the contents of the
++tree are printed in order.  Lastly, the internal structure of the tree
++is printed.
++
++  #include <err.h>
++  #include <stdio.h>
++  #include <stdlib.h>
++
++  #include "internal/nelem.h"
++  #include "internal/ossl_rbtree.h"
++
++  struct node {
++      OSSL_RBT_ENTRY(node) entry;
++      int i;
++  };
++
++  static int intcmp(const struct node *, const struct node *);
++
++  OSSL_RBT_HEAD(inttree, node) head = OSSL_RBT_INITIALIZER(&head);
++  OSSL_RBT_PROTOTYPE(inttree, node, entry, intcmp)
++  OSSL_RBT_GENERATE(inttree, node, entry, intcmp);
++
++  static const int testdata[] = {
++      20, 16, 17, 13,  3,  6,  1,  8,  2,  4,
++      10, 19,  5,  9, 12, 15, 18,  7, 11, 14
++  };
++
++  static int intcmp(const struct node *e1, const struct node *e2)
++  {
++      return e1->i < e2->i ? -1 : e1->i > e2->i;
++  }
++
++  static void print_tree(struct node *n)
++  {
++      struct node *left, *right;
++
++      if (n == NULL) {
++          printf("nil");
++          return;
++      }
++
++      left = OSSL_RBT_LEFT(inttree, n);
++      right = OSSL_RBT_RIGHT(inttree, n);
++
++      if (left == NULL && right == NULL) {
++          printf("%d", n->i);
++      } else {
++          printf("%d(", n->i);
++          print_tree(left);
++          printf(",");
++          print_tree(right);
++          printf(")");
++      }
++  }
++
++  int main(void)
++  {
++      size_t i;
++      struct node *n;
++
++      for (i = 0; i < OSSL_NELEM(testdata); i++) {
++          if ((n = OPENSSL_malloc(sizeof(struct node))) == NULL)
++              err(1, NULL);
++          n->i = testdata[i];
++          OSSL_RBT_INSERT(inttree, &head, n);
++      }
++
++      OSSL_RBT_FOREACH (n, inttree, &head) {
++          printf("%d\n", n->i);
++      }
++
++      print_tree(OSSL_RBT_ROOT(inttree, &head));
++      printf("\n");
++
++      return 0;
++  }
++
++=head1 HISTORY
++
++The red-black tree implementation comes from David Gwynne.  It can be found
++here: L<https://github.com/dgwynne/data-structures>.  OpenSSL project
++obtained a permission from David Gwynne to license his work under
++Apache License 2.0
++
++Apart from B<OSSL_RBT_> prefix, the API is compatible with implementation
++done by Neils Provos for OpenBSD.
++
++The text in this manual page comes from C<tree(3)> in OpenBSD, the text was
++authored by Neils Provos (according to the commit history)
++
++The red-black tree implementation was added in OpenSSL 4.1.
++
++=head1 COPYRIGHT
++
++Copyright 2002 Niels Provos <provos@citi.umich.edu>
++All rights reserved.
++
++Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++
++
++Licensed under the Apache License 2.0 (the "License").  You may not use
++this file except in compliance with the License.  You can obtain a copy
++in the file LICENSE in the source distribution or at
++L<https://www.openssl.org/source/license.html>.
++
++=cut
+diff --git a/include/internal/ossl_rbtree.h b/include/internal/ossl_rbtree.h
+new file mode 100644
+index 0000000000000..053ed99478bb9
+--- /dev/null
++++ b/include/internal/ossl_rbtree.h
+@@ -0,0 +1,265 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ * Copyright (c) 2016 David Gwynne <david@gwynne.id.au>
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++/*
++ * The code here comes from David Gwynne <david@gwynne.id.au>. The original
++ * version can be found:
++ *    https://github.com/dgwynne/data-structures/
++ * file bst.h. The same code is also part of OpenBSD OS where it is shipped
++ * under BSD license.
++ *
++ * David Gwynne agrees to include modified version to OpenSSL and ship it
++ * under OpenSSL Apache 2.0 license.
++ */
++#ifndef _OSSL_INTERNAL_RBTREE_H_
++#define _OSSL_INTERNAL_RBTREE_H_
++
++#include "internal/e_os.h"
++
++/*
++ * List of changes against upstream version:
++ *   augmentation mechanism is removed in OpenSSL as there is no demand for it
++ *
++ *   prefix changed from rb/rbt to ossl_rbt
++ *
++ *   debug version of OSSL_RBT_REMOVE() sets parent, left, right members
++ *   to NULL
++ *
++ *   cstyle is changed to match OpenSSL.
++ */
++struct ossl_rbt_type {
++    int (*t_compare)(const void *, const void *);
++    uintptr_t t_offset; /* offset of ossl_rbt_entry in type */
++};
++
++struct ossl_rbt_tree {
++    struct ossl_rbt_entry *rb_root;
++};
++
++struct ossl_rbt_entry {
++    struct ossl_rbt_entry *rb_parent;
++    struct ossl_rbt_entry *rb_left;
++    struct ossl_rbt_entry *rb_right;
++    unsigned int rb_color;
++};
++
++#define OSSL_RBT_HEAD(_name, _type)    \
++    struct _name {                     \
++        struct ossl_rbt_tree rbh_root; \
++    }
++
++#define OSSL_RBT_ENTRY(_type) struct ossl_rbt_entry
++
++static ossl_inline void
++ossl_rbt_init(struct ossl_rbt_tree *rb)
++{
++    rb->rb_root = NULL;
++}
++
++static ossl_inline int
++ossl_rbt_empty(struct ossl_rbt_tree *rb)
++{
++    return rb->rb_root == NULL;
++}
++
++void *ossl_rbt_insert(const struct ossl_rbt_type *, struct ossl_rbt_tree *, void *);
++void *ossl_rbt_remove(const struct ossl_rbt_type *, struct ossl_rbt_tree *, void *);
++void *ossl_rbt_find(const struct ossl_rbt_type *, struct ossl_rbt_tree *, const void *);
++void *ossl_rbt_nfind(const struct ossl_rbt_type *, struct ossl_rbt_tree *, const void *);
++void *ossl_rbt_root(const struct ossl_rbt_type *, struct ossl_rbt_tree *);
++void *ossl_rbt_min(const struct ossl_rbt_type *, struct ossl_rbt_tree *);
++void *ossl_rbt_max(const struct ossl_rbt_type *, struct ossl_rbt_tree *);
++void *ossl_rbt_next(const struct ossl_rbt_type *, void *);
++void *ossl_rbt_prev(const struct ossl_rbt_type *, void *);
++void *ossl_rbt_left(const struct ossl_rbt_type *, void *);
++void *ossl_rbt_right(const struct ossl_rbt_type *, void *);
++void *ossl_rbt_parent(const struct ossl_rbt_type *, void *);
++void ossl_rbt_set_left(const struct ossl_rbt_type *, void *, void *);
++void ossl_rbt_set_right(const struct ossl_rbt_type *, void *, void *);
++void ossl_rbt_set_parent(const struct ossl_rbt_type *, void *, void *);
++void ossl_rbt_init_rbe(const struct ossl_rbt_type *, void *);
++
++#define OSSL_RBT_INITIALIZER(_head) \
++    {                               \
++        {                           \
++            NULL                    \
++        }                           \
++    }
++
++#define OSSL_RBT_PROTOTYPE(_name, _type, _field, _cmp)                       \
++    extern const struct ossl_rbt_type *const _name##_OSSL_RBT_TYPE;          \
++                                                                             \
++    ossl_unused static ossl_inline void                                      \
++    _name##_OSSL_RBT_INIT(struct _name *head)                                \
++    {                                                                        \
++        ossl_rbt_init(&head->rbh_root);                                      \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_INSERT(struct _name *head, struct _type *elm)           \
++    {                                                                        \
++        return ossl_rbt_insert(_name##_OSSL_RBT_TYPE, &head->rbh_root, elm); \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_REMOVE(struct _name *head, struct _type *elm)           \
++    {                                                                        \
++        return ossl_rbt_remove(_name##_OSSL_RBT_TYPE, &head->rbh_root, elm); \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_FIND(struct _name *head, const struct _type *key)       \
++    {                                                                        \
++        return ossl_rbt_find(_name##_OSSL_RBT_TYPE, &head->rbh_root, key);   \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_NFIND(struct _name *head, const struct _type *key)      \
++    {                                                                        \
++        return ossl_rbt_nfind(_name##_OSSL_RBT_TYPE, &head->rbh_root, key);  \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_ROOT(struct _name *head)                                \
++    {                                                                        \
++        return ossl_rbt_root(_name##_OSSL_RBT_TYPE, &head->rbh_root);        \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline int                                       \
++    _name##_OSSL_RBT_EMPTY(struct _name *head)                               \
++    {                                                                        \
++        return ossl_rbt_empty(&head->rbh_root);                              \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_MIN(struct _name *head)                                 \
++    {                                                                        \
++        return ossl_rbt_min(_name##_OSSL_RBT_TYPE, &head->rbh_root);         \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_MAX(struct _name *head)                                 \
++    {                                                                        \
++        return ossl_rbt_max(_name##_OSSL_RBT_TYPE, &head->rbh_root);         \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_NEXT(struct _type *elm)                                 \
++    {                                                                        \
++        return ossl_rbt_next(_name##_OSSL_RBT_TYPE, elm);                    \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_PREV(struct _type *elm)                                 \
++    {                                                                        \
++        return ossl_rbt_prev(_name##_OSSL_RBT_TYPE, elm);                    \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_LEFT(struct _type *elm)                                 \
++    {                                                                        \
++        return ossl_rbt_left(_name##_OSSL_RBT_TYPE, elm);                    \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_RIGHT(struct _type *elm)                                \
++    {                                                                        \
++        return ossl_rbt_right(_name##_OSSL_RBT_TYPE, elm);                   \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline struct _type *                            \
++    _name##_OSSL_RBT_PARENT(struct _type *elm)                               \
++    {                                                                        \
++        return ossl_rbt_parent(_name##_OSSL_RBT_TYPE, elm);                  \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline void                                      \
++    _name##_OSSL_RBT_SET_LEFT(struct _type *elm, struct _type *left)         \
++    {                                                                        \
++        ossl_rbt_set_left(_name##_OSSL_RBT_TYPE, elm, left);                 \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline void                                      \
++    _name##_OSSL_RBT_SET_RIGHT(struct _type *elm, struct _type *right)       \
++    {                                                                        \
++        ossl_rbt_set_right(_name##_OSSL_RBT_TYPE, elm, right);               \
++    }                                                                        \
++                                                                             \
++    ossl_unused static ossl_inline void                                      \
++    _name##_OSSL_RBT_SET_PARENT(struct _type *elm, struct _type *parent)     \
++    {                                                                        \
++        ossl_rbt_set_parent(_name##_OSSL_RBT_TYPE, elm, parent);             \
++    }                                                                        \
++    ossl_unused static ossl_inline void                                      \
++    _name##_OSSL_RBT_INIT_RBE(struct _type *elm)                             \
++    {                                                                        \
++        ossl_rbt_init_rbe(_name##_OSSL_RBT_TYPE, elm);                       \
++    }
++
++#define OSSL_RBT_GENERATE_INTERNAL(_name, _type, _field, _cmp)   \
++    static int                                                   \
++    _name##_OSSL_RBT_COMPARE(const void *lptr, const void *rptr) \
++    {                                                            \
++        const struct _type *l = lptr, *r = rptr;                 \
++        return _cmp(l, r);                                       \
++    }                                                            \
++    static const struct ossl_rbt_type _name##_OSSL_RBT_INFO = {  \
++        _name##_OSSL_RBT_COMPARE,                                \
++        offsetof(struct _type, _field),                          \
++    };                                                           \
++    const struct ossl_rbt_type *const _name##_OSSL_RBT_TYPE = &_name##_OSSL_RBT_INFO
++
++#define OSSL_RBT_GENERATE(_name, _type, _field, _cmp) \
++    OSSL_RBT_GENERATE_INTERNAL(_name, _type, _field, _cmp)
++
++#define OSSL_RBT_INIT(_name, _head) _name##_OSSL_RBT_INIT(_head)
++#define OSSL_RBT_INSERT(_name, _head, _elm) _name##_OSSL_RBT_INSERT(_head, _elm)
++#define OSSL_RBT_REMOVE(_name, _head, _elm) _name##_OSSL_RBT_REMOVE(_head, _elm)
++#define OSSL_RBT_FIND(_name, _head, _key) _name##_OSSL_RBT_FIND(_head, _key)
++#define OSSL_RBT_NFIND(_name, _head, _key) _name##_OSSL_RBT_NFIND(_head, _key)
++#define OSSL_RBT_ROOT(_name, _head) _name##_OSSL_RBT_ROOT(_head)
++#define OSSL_RBT_EMPTY(_name, _head) _name##_OSSL_RBT_EMPTY(_head)
++#define OSSL_RBT_MIN(_name, _head) _name##_OSSL_RBT_MIN(_head)
++#define OSSL_RBT_MAX(_name, _head) _name##_OSSL_RBT_MAX(_head)
++#define OSSL_RBT_NEXT(_name, _elm) _name##_OSSL_RBT_NEXT(_elm)
++#define OSSL_RBT_PREV(_name, _elm) _name##_OSSL_RBT_PREV(_elm)
++#define OSSL_RBT_LEFT(_name, _elm) _name##_OSSL_RBT_LEFT(_elm)
++#define OSSL_RBT_RIGHT(_name, _elm) _name##_OSSL_RBT_RIGHT(_elm)
++#define OSSL_RBT_PARENT(_name, _elm) _name##_OSSL_RBT_PARENT(_elm)
++#define OSSL_RBT_SET_LEFT(_name, _elm, _l) _name##_OSSL_RBT_SET_LEFT(_elm, _l)
++#define OSSL_RBT_SET_RIGHT(_name, _elm, _r) _name##_OSSL_RBT_SET_RIGHT(_elm, _r)
++#define OSSL_RBT_SET_PARENT(_name, _elm, _p) _name##_OSSL_RBT_SET_PARENT(_elm, _p)
++#ifndef NDEBUG
++#define OSSL_RBT_INIT_RBE(_name, _elm) _name##_OSSL_RBT_INIT_RBE(_elm)
++#else
++#define OSSL_RBT_INIT_RBE(_name, _elm) (void)(0)
++#endif
++
++#define OSSL_RBT_FOREACH(_e, _name, _head)    \
++    for ((_e) = OSSL_RBT_MIN(_name, (_head)); \
++        (_e) != NULL;                         \
++        (_e) = OSSL_RBT_NEXT(_name, (_e)))
++
++#define OSSL_RBT_FOREACH_SAFE(_e, _name, _head, _n)             \
++    for ((_e) = OSSL_RBT_MIN(_name, (_head));                   \
++        (_e) != NULL && ((_n) = OSSL_RBT_NEXT(_name, (_e)), 1); \
++        (_e) = (_n))
++
++#define OSSL_RBT_FOREACH_REVERSE(_e, _name, _head) \
++    for ((_e) = OSSL_RBT_MAX(_name, (_head));      \
++        (_e) != NULL;                              \
++        (_e) = OSSL_RBT_PREV(_name, (_e)))
++
++#define OSSL_RBT_FOREACH_REVERSE_SAFE(_e, _name, _head, _n)     \
++    for ((_e) = OSSL_RBT_MAX(_name, (_head));                   \
++        (_e) != NULL && ((_n) = OSSL_RBT_PREV(_name, (_e)), 1); \
++        (_e) = (_n))
++
++#endif /* _OSSL_INTERNAL_RBTREE_H_ */
+diff --git a/ssl/build.info b/ssl/build.info
+index 8f41e15dbbf27..8b9fe97c4dd3d 100644
+--- a/ssl/build.info
++++ b/ssl/build.info
+@@ -25,7 +25,8 @@ SOURCE[../libssl]=\
+ # For shared builds we need to include the libcrypto packet.c and quic_vlint.c
+ # in libssl as well.
+ SHARED_SOURCE[../libssl]=\
+-        ../crypto/packet.c ../crypto/quic_vlint.c ../crypto/time.c
++        ../crypto/packet.c ../crypto/quic_vlint.c ../crypto/time.c \
++        ../crypto/rbtree/rbtree.c
+ 
+ IF[{- !$disabled{'deprecated-3.0'} -}]
+   SOURCE[../libssl]=ssl_rsa_legacy.c
+diff --git a/test/build.info b/test/build.info
+index 823c7d55e8217..8886a0bb48fc4 100644
+--- a/test/build.info
++++ b/test/build.info
+@@ -64,7 +64,8 @@ IF[{- !$disabled{tests} -}]
+           ca_internals_test bio_tfo_test membio_test bio_dgram_test list_test \
+           fips_version_test x509_test hpke_test pairwise_fail_test \
+           nodefltctxtest evp_xof_test x509_load_cert_file_test bio_meth_test \
+-          bio_pw_callback_test
++          bio_pw_callback_test \
++          ossl_rbtree_test
+ 
+   IF[{- !$disabled{'rpk'} -}]
+     PROGRAMS{noinst}=rpktest
+@@ -1239,6 +1240,10 @@ ENDIF
+   INCLUDE[bio_pw_callback_test]=../include ../apps/include
+   DEPEND[bio_pw_callback_test]=../libcrypto libtestutil.a
+ 
++  SOURCE[ossl_rbtree_test]=ossl_rbtree_test.c
++  INCLUDE[ossl_rbtree_test]=../include ../apps/include
++  DEPEND[ossl_rbtree_test]=../libcrypto.a libtestutil.a
++
+ {-
+    use File::Spec::Functions;
+    use File::Basename;
+diff --git a/test/ossl_rbtree_test.c b/test/ossl_rbtree_test.c
+new file mode 100644
+index 0000000000000..ef6f1d416380a
+--- /dev/null
++++ b/test/ossl_rbtree_test.c
+@@ -0,0 +1,276 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++#include <string.h>
++
++#include "testutil.h"
++#include "internal/nelem.h"
++#include "internal/ossl_rbtree.h"
++
++static const char *test_data[] = {
++    "alpha",
++    "bravo",
++    "charlie",
++    "delta",
++    "echo",
++    "foxtrot",
++    "golf",
++    "hotel",
++    "india",
++    "juliet",
++    "kilo",
++    "lima",
++    "mike",
++    "november",
++    "oscar",
++    "papa",
++    "quebec",
++    "romeo",
++    "sierra",
++    "tango",
++    "uniform",
++    "victor",
++    "whiskey",
++    "x-ray",
++    "yankey",
++    "zulu",
++};
++
++typedef struct test_rbt {
++    OSSL_RBT_ENTRY(test_rbt)
++    rbt_entry;
++    const char *rbt_data;
++} TEST_RBT_T;
++
++static OSSL_RBT_HEAD(ossl_rbt, test_rbt)
++    rbt_head;
++
++static TEST_RBT_T nodes_rbt[26];
++
++static int cmp(const TEST_RBT_T *a, const TEST_RBT_T *b);
++
++OSSL_RBT_PROTOTYPE(ossl_rbt, test_rbt, rbt_entry, cmp)
++
++OSSL_RBT_GENERATE(ossl_rbt, test_rbt, rbt_entry, cmp);
++
++static int cmp(const TEST_RBT_T *a_rbt, const TEST_RBT_T *b_rbt)
++{
++    return strcmp(a_rbt->rbt_data, b_rbt->rbt_data);
++}
++
++static int test_rbt_insert(void)
++{
++    unsigned int i;
++    TEST_RBT_T *found_rbt, *node_rbt;
++
++    OSSL_RBT_INIT(ossl_rbt, &rbt_head);
++
++    for (i = OSSL_NELEM(test_data); i != 0; i--) {
++        node_rbt = &nodes_rbt[i - 1];
++        OSSL_RBT_INIT_RBE(ossl_rbt, node_rbt);
++        node_rbt->rbt_data = test_data[i - 1];
++        found_rbt = OSSL_RBT_INSERT(ossl_rbt, &rbt_head, node_rbt);
++        if (!TEST_ptr_eq(found_rbt, NULL)) {
++            TEST_info("%s %p(%s) found already %p(%s) @ %u\n", OPENSSL_FUNC,
++                (void *)node_rbt, node_rbt->rbt_data,
++                (void *)found_rbt, found_rbt->rbt_data, i);
++            return 0;
++        }
++    }
++
++    return 1;
++}
++
++static int test_rbt_min(void)
++{
++    unsigned int i;
++    int match;
++    TEST_RBT_T *node_rbt;
++
++    if (test_rbt_insert() == 0)
++        return 0;
++
++    node_rbt = OSSL_RBT_MIN(ossl_rbt, &rbt_head);
++    if (!TEST_ptr(node_rbt)) {
++        TEST_info("%s OSSL_RBT_MIN() returns NULL", OPENSSL_FUNC);
++        return 0;
++    }
++
++    for (i = 0; i < OSSL_NELEM(test_data); i++) {
++        match = strcmp(node_rbt->rbt_data, test_data[i]);
++        if (!TEST_int_eq(match, 0)) {
++            TEST_info("%s %s != %s @ %u", OPENSSL_FUNC,
++                node_rbt->rbt_data, test_data[i], i);
++            return 0;
++        }
++        node_rbt = OSSL_RBT_NEXT(ossl_rbt, node_rbt);
++    }
++
++    if (!TEST_ptr_eq(node_rbt, NULL)) {
++        TEST_info("%s OSSL_RBT_NEXT() is not NULL", OPENSSL_FUNC);
++        return 0;
++    }
++
++    return 1;
++}
++
++static int test_rbt_max(void)
++{
++    unsigned int i;
++    int match;
++    TEST_RBT_T *node_rbt;
++
++    if (test_rbt_insert() == 0)
++        return 0;
++
++    node_rbt = OSSL_RBT_MAX(ossl_rbt, &rbt_head);
++    if (!TEST_ptr(node_rbt)) {
++        TEST_info("%s OSSL_RBT_MIN() returns NULL", OPENSSL_FUNC);
++        return 0;
++    }
++
++    for (i = OSSL_NELEM(test_data); i > 0; i--) {
++        match = strcmp(node_rbt->rbt_data, test_data[i - 1]);
++        if (!TEST_int_eq(match, 0)) {
++            TEST_info("%s %s != %s @ %u", OPENSSL_FUNC,
++                node_rbt->rbt_data, test_data[i - 1], i);
++            return 0;
++        }
++        node_rbt = OSSL_RBT_PREV(ossl_rbt, node_rbt);
++    }
++
++    if (!TEST_ptr_eq(node_rbt, NULL)) {
++        TEST_info("%s OSSL_RBT_PREV() is not NULL", OPENSSL_FUNC);
++        return 0;
++    }
++
++    return 1;
++}
++
++static int test_rbt_find_remove(void)
++{
++    unsigned int i;
++    TEST_RBT_T *node_rbt, *removed_rbt;
++    TEST_RBT_T key_rbt;
++
++    if (test_rbt_insert() == 0)
++        return 0;
++
++    for (i = 0; i < OSSL_NELEM(test_data); i++) {
++        key_rbt.rbt_data = test_data[i];
++        node_rbt = OSSL_RBT_FIND(ossl_rbt, &rbt_head, &key_rbt);
++        if (!TEST_ptr(node_rbt)) {
++            TEST_info("%s %s not found in tree @ %u", OPENSSL_FUNC,
++                key_rbt.rbt_data, i);
++            return 0;
++        }
++        removed_rbt = OSSL_RBT_REMOVE(ossl_rbt, &rbt_head, node_rbt);
++        if (!TEST_ptr_eq(node_rbt, removed_rbt)) {
++            TEST_info("%s node_rbt(%p) != removed_rbt(%p) @ %u",
++                OPENSSL_FUNC, (void *)node_rbt, (void *)removed_rbt, i);
++            return 0;
++        }
++
++        node_rbt = OSSL_RBT_FIND(ossl_rbt, &rbt_head, &key_rbt);
++        if (!TEST_ptr_eq(node_rbt, NULL)) {
++            TEST_info("%s %s(%p) still found after being removed @ %u",
++                OPENSSL_FUNC, node_rbt->rbt_data, (void *)node_rbt, i);
++            return 0;
++        }
++    }
++
++    if (!TEST_int_ne(OSSL_RBT_EMPTY(ossl_rbt, &rbt_head), 0)) {
++        TEST_info("%s rbt is not empty", OPENSSL_FUNC);
++        return 0;
++    }
++
++    return 1;
++}
++
++static int test_rbt_dup_insert(void)
++{
++    unsigned int i;
++    int match;
++    TEST_RBT_T *conflict_rbt;
++    TEST_RBT_T insert_rbt;
++
++    if (test_rbt_insert() == 0)
++        return 0;
++
++    for (i = 0; i < OSSL_NELEM(test_data); i++) {
++        OSSL_RBT_INIT_RBE(ossl_rbt, &insert_rbt);
++        insert_rbt.rbt_data = test_data[i];
++        conflict_rbt = OSSL_RBT_INSERT(ossl_rbt, &rbt_head, &insert_rbt);
++        if (!TEST_ptr(conflict_rbt)) {
++            TEST_info("%s %s not found in tree @ %u", OPENSSL_FUNC,
++                insert_rbt.rbt_data, i);
++            return 0;
++        }
++        match = strcmp(conflict_rbt->rbt_data, insert_rbt.rbt_data);
++        if (!TEST_int_eq(match, 0)) {
++            TEST_info("%s insert(%s) != conflict(%s) @ %u",
++                OPENSSL_FUNC, insert_rbt.rbt_data, conflict_rbt->rbt_data, i);
++            return 0;
++        }
++    }
++
++    return 1;
++}
++
++static int test_rbt_foreach(void)
++{
++    unsigned int i;
++    int match;
++    TEST_RBT_T *walk_rbt, *save_rbt;
++
++    if (test_rbt_insert() == 0)
++        return 0;
++
++    i = 0;
++    OSSL_RBT_FOREACH (walk_rbt, ossl_rbt, &rbt_head) {
++        match = strcmp(walk_rbt->rbt_data, test_data[i]);
++        if (!TEST_int_eq(match, 0)) {
++            TEST_info("%s expected: %s got: %s @ %u",
++                OPENSSL_FUNC, walk_rbt->rbt_data, test_data[i], i);
++            return 0;
++        }
++        i++;
++    }
++
++    i = 0;
++    OSSL_RBT_FOREACH_SAFE (walk_rbt, ossl_rbt, &rbt_head, save_rbt) {
++        match = strcmp(walk_rbt->rbt_data, test_data[i]);
++        if (!TEST_int_eq(match, 0)) {
++            TEST_info("%s expected: %s got: %s @ %u",
++                OPENSSL_FUNC, walk_rbt->rbt_data, test_data[i], i);
++            return 0;
++        }
++        OSSL_RBT_REMOVE(ossl_rbt, &rbt_head, walk_rbt);
++        i++;
++    }
++
++    if (!TEST_int_ne(OSSL_RBT_EMPTY(ossl_rbt, &rbt_head), 0)) {
++        TEST_info("%s rbt is not empty", OPENSSL_FUNC);
++        return 0;
++    }
++
++    return 1;
++}
++
++int setup_tests(void)
++{
++    ADD_TEST(test_rbt_insert);
++    ADD_TEST(test_rbt_min);
++    ADD_TEST(test_rbt_max);
++    ADD_TEST(test_rbt_find_remove);
++    ADD_TEST(test_rbt_dup_insert);
++    ADD_TEST(test_rbt_foreach);
++
++    return 1;
++}
+diff --git a/test/recipes/02-test_rbtree.t b/test/recipes/02-test_rbtree.t
+new file mode 100644
+index 0000000000000..fb92affda138c
+--- /dev/null
++++ b/test/recipes/02-test_rbtree.t
+@@ -0,0 +1,11 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use OpenSSL::Test::Simple;
++
++simple_test("ossl_rbtree_test", "ossl_rbtree_test");
+diff --git a/util/missingcrypto-internal.txt b/util/missingcrypto-internal.txt
+index 54e1bc9ba7dd0..41115bbec3b10 100644
+--- a/util/missingcrypto-internal.txt
++++ b/util/missingcrypto-internal.txt
+@@ -6,3 +6,4 @@ ossl_do_PVK_header(3)
+ ossl_do_blob_header(3)
+ ossl_b2i(3)
+ ossl_b2i_bio(3)
++ossl_rbtree(3)

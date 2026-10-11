@@ -1,7 +1,7 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
 Version:        2.0.7
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,8 @@ Patch4:         CVE-2025-66418.patch
 Patch5:         CVE-2025-66471.patch
 Patch6:         CVE-2026-21441.patch
 Patch7:         CVE-2026-44431.patch
+Patch8:         CVE-2026-97689.patch
+Patch9:         urllib3_test_closed_socket_hostname.patch
 
 %description
 A powerful, sanity-friendly HTTP client for Python.
@@ -87,6 +89,10 @@ skiplist+=" or test_respect_retry_after_header_sleep"
 %{python3_sitelib}/*
 
 %changelog
+* Mon Oct 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.7-7
+- Patch for CVE-2026-97689
+- Added patch to address ptest failure due to python version upgrade.
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.0.7-6
 - Pin pytest<9 in %%check; pytest 9.x rejects non-Collection iterables
   (chain) in parametrize argvalues used by the urllib3 test suite.
