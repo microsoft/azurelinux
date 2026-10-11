@@ -8,10 +8,6 @@
 description = "Retain the existing bootstrap pin until the remaining consumer build waves"
 components = [
     "rust-coreutils",
-    "rust-uu_base64",
-    "rust-uu_basenc",
-    "rust-uu_dir",
-    "rust-uu_vdir",
 ]
 
 [[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
