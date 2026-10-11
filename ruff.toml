@@ -24,8 +24,6 @@ ignore = [
     "C901",
     "COM812", # Conflicts with formatter.
     "CPY001",
-    "D101",
-    "D102",
     "D103",
     "EM101",
     "EM102",
