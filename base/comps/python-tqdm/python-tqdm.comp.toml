@@ -1,0 +1,3 @@
+[components.python-tqdm]
+spec = { type = "upstream", upstream-commit = "0bac86b3c2ee3d32f20f72c2d011a177a35fe9f4" }
+
