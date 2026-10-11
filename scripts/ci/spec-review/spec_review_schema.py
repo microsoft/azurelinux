@@ -18,6 +18,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class Finding(BaseModel):
+    """One actionable issue or suggestion identified in a spec file."""
+
     model_config = ConfigDict(extra="forbid")
 
     description: str = Field(..., min_length=1)
@@ -27,12 +29,15 @@ class Finding(BaseModel):
     @field_validator("citation", mode="before")
     @classmethod
     def normalize_citation(cls, v: str | None) -> str | None:
+        """Normalize empty citation markers to ``None``."""
         if v in (None, "N/A", "n/a", ""):
             return None
         return v
 
 
 class SpecReview(BaseModel):
+    """Validated findings for one reviewed spec file."""
+
     model_config = ConfigDict(extra="forbid")
 
     spec_file: str = Field(..., min_length=1)
@@ -42,33 +47,41 @@ class SpecReview(BaseModel):
 
     @property
     def spec_name(self) -> str:
+        """Return the spec file's base name."""
         return Path(self.spec_file).name
 
 
 class SpecReviewReport(BaseModel):
+    """Validated collection of per-spec review results."""
+
     model_config = ConfigDict(extra="forbid")
 
     spec_reviews: list[SpecReview] = Field(..., min_length=1)
 
     @classmethod
     def from_file(cls, path: str | Path) -> SpecReviewReport:
+        """Load and validate a report from a JSON file."""
         with Path(path).open(encoding="utf-8") as f:
             return cls.model_validate(json.load(f))
 
     @property
     def total_errors(self) -> int:
+        """Return the total number of errors."""
         return sum(len(r.errors) for r in self.spec_reviews)
 
     @property
     def total_warnings(self) -> int:
+        """Return the total number of warnings."""
         return sum(len(r.warnings) for r in self.spec_reviews)
 
     @property
     def total_suggestions(self) -> int:
+        """Return the total number of suggestions."""
         return sum(len(r.suggestions) for r in self.spec_reviews)
 
     @property
     def has_errors(self) -> bool:
+        """Return whether the report contains errors."""
         return self.total_errors > 0
 
     def print_summary(self) -> None:
@@ -111,6 +124,7 @@ class SpecReviewReport(BaseModel):
                         print(f"     {s.citation}")
 
     def to_summary_dict(self) -> dict:
+        """Return aggregate finding counts as a dictionary."""
         return {
             "specs": len(self.spec_reviews),
             "errors": self.total_errors,
