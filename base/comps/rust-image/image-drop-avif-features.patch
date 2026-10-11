@@ -65,7 +65,7 @@ index f9eaeab..2460eb1 100644
      "exr?/rayon",
  ]
  serde = ["dep:serde"]
-@@ -135,10 +125,6 @@ version = "0.1.0"
+@@ -165,10 +155,6 @@ version = "0.1.0"
  version = "1.1"
  optional = true
  
@@ -76,9 +76,9 @@ index f9eaeab..2460eb1 100644
  [dependencies.exr]
  version = "1.74.0"
  optional = true
-@@ -155,10 +141,6 @@ optional = true
+@@ -185,10 +171,6 @@ optional = true
  [dependencies.moxcms]
- version = "0.7.4"
+ version = "0.8.0"
  
 -[dependencies.mp4parse]
 -version = "0.17.0"
@@ -92,7 +92,7 @@ index f9eaeab..2460eb1 100644
  optional = true
  
 -[dependencies.ravif]
--version = "0.12"
+-version = "0.13"
 -optional = true
 -default-features = false
 -
