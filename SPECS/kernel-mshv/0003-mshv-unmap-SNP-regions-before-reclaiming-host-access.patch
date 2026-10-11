@@ -1,0 +1,62 @@
+From 99fa349e826dffd13746e5cb96df143dea8938d9 Mon Sep 17 00:00:00 2001
+From: Chris Oo <cho@microsoft.com>
+Date: Fri, 2 Oct 2026 13:54:01 -0700
+Subject: [PATCH] mshv: unmap SNP regions before reclaiming host access
+
+Unmap a region from the guest before making its SPA pages host-shared.
+Reclaiming pages while they remain mapped can return
+HV_STATUS_OPERATION_DENIED. The failed region cleanup then leaves guest
+mappings behind and blocks the transition to INSECURE_DIRTY during SNP
+partition destruction.
+
+Check the unmap result and retain the pinned pages if unmapping fails.
+Skip the unmap once the partition is no longer initialized: partition
+finalization already removes its GPA mappings, and a redundant unmap
+would fail before the remaining VMSA page is reclaimed and unpinned.
+
+Validated on chris-mshv with four SNP IGVM boots and one SNP direct boot.
+Tracing confirmed RAM and VMSA unpinning, deposited-memory withdrawal,
+and successful partition deletion without teardown warnings.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: 03b4b8d5-26d8-45bf-b042-8c27d0f91e80
+Link: https://github.com/chris-oo/openvmm/blob/801b9f4f401f237b7dfc194152c7954a81100874/mshv-snp-unmap-first.patch
+Copilot-Session: 2fc1b120-e7f9-4eef-8547-9d1813649004
+---
+ drivers/hv/mshv_regions.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/hv/mshv_regions.c b/drivers/hv/mshv_regions.c
+index a129678..5bc3cef 100644
+--- a/drivers/hv/mshv_regions.c
++++ b/drivers/hv/mshv_regions.c
+@@ -357,6 +357,17 @@ static void mshv_region_destroy(struct kref *ref)
+ 	if (region->mreg_type == MSHV_REGION_TYPE_MEM_MOVABLE)
+ 		mshv_region_movable_fini(region);
+ 
++	/* Finalizing the partition already removes its GPA mappings. */
++	if (partition->pt_initialized) {
++		ret = mshv_region_unmap(region);
++		if (ret) {
++			pt_err(partition,
++			       "Failed to unmap memory region (guest_pfn: %llu): %d\n",
++			       region->start_gfn, ret);
++			return;
++		}
++	}
++
+ 	if (mshv_partition_encrypted(partition)) {
+ 		ret = mshv_region_share(region);
+ 		if (ret) {
+@@ -367,8 +378,6 @@ static void mshv_region_destroy(struct kref *ref)
+ 		}
+ 	}
+ 
+-	mshv_region_unmap(region);
+-
+ 	mshv_region_invalidate(region);
+ 
+ 	vfree(region);
+-- 
+2.54.0
+

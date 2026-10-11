@@ -10,7 +10,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        6.18.34.mshv3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -140,6 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Sat Oct 10 2026 Nikola Bojanic <nbojanic@microsoft.com> - 6.18.34.mshv3-2
+- Match kernel-mshv release with SNP injection policy and teardown fixes
+
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
 - Enable CONFIG_CHECKPOINT_RESTORE, CONFIG_INET_RAW_DIAG and CONFIG_MSHV_GICV3_MSI

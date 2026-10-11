@@ -1,0 +1,136 @@
+From f10394f7b07d5a1ee469fc3b85249d3bcdeee193 Mon Sep 17 00:00:00 2001
+From: Chris Oo <cho@microsoft.com>
+Date: Mon, 21 Sep 2026 10:52:15 -0700
+Subject: [PATCH] mshv: add an SNP interrupt injection policy field
+
+Use two partition-creation flag bits to select restricted, normal, or secure AVIC interrupt injection, matching the hypervisor isolation properties. Preserve restricted injection as the default and keep the existing ioctl layout.
+
+Apply the policy to both v1 and v2 arguments. Extract the field with FIELD_GET and reject alternate injection and nonzero policies for non-SNP partitions after copying the final arguments.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: aac50b64-4ffb-4d30-b24a-74258cbb3382
+---
+ drivers/hv/mshv_root_main.c | 25 +++++++++++++++++++++++++
+ include/hyperv/hvhdk.h      |  7 ++++++-
+ include/uapi/linux/mshv.h   | 11 +++++++++++
+ 3 files changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/hv/mshv_root_main.c b/drivers/hv/mshv_root_main.c
+index 4c6baa7..30d3dc4 100644
+--- a/drivers/hv/mshv_root_main.c
++++ b/drivers/hv/mshv_root_main.c
+@@ -8,6 +8,7 @@
+  * Authors: Microsoft Linux virtualization team
+  */
+ 
++#include <linux/bitfield.h>
+ #include <linux/entry-virt.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+@@ -3054,6 +3055,7 @@ static long mshv_ioctl_process_pt_flags(void __user *user_arg, u64 *pt_flags,
+ 					union hv_partition_isolation_properties *isol_props)
+ {
+ 	int i;
++	u64 injection_policy;
+ 	struct mshv_create_partition_v2 args;
+ 	union hv_partition_processor_features *disabled_procs;
+ 	union hv_partition_processor_xsave_features *disabled_xsave;
+@@ -3192,6 +3194,28 @@ static long mshv_ioctl_process_pt_flags(void __user *user_arg, u64 *pt_flags,
+ #endif
+ 	}
+ 
++	injection_policy = FIELD_GET(MSHV_PT_SNP_INJECTION_POLICY_MASK,
++				     args.pt_flags);
++	if (injection_policy != MSHV_PT_SNP_RESTRICTED_INJECTION &&
++	    args.pt_isolation != MSHV_PT_ISOLATION_SNP)
++		return -EINVAL;
++
++	switch (injection_policy) {
++	case MSHV_PT_SNP_RESTRICTED_INJECTION:
++		injection_policy =
++			HV_PARTITION_ISOLATION_SNP_RESTRICTED_INTERRUPT_INJECTION;
++		break;
++	case MSHV_PT_SNP_NORMAL_INJECTION:
++		injection_policy =
++			HV_PARTITION_ISOLATION_SNP_NORMAL_INTERRUPT_INJECTION;
++		break;
++	case MSHV_PT_SNP_SECURE_AVIC_INJECTION:
++		injection_policy = HV_PARTITION_ISOLATION_SNP_SECURE_AVIC_INJECTION;
++		break;
++	default:
++		return -EINVAL;
++	}
++
+ 	/* Only support EXO partitions */
+ 	*pt_flags = HV_PARTITION_CREATION_FLAG_EXO_PARTITION |
+ 		    HV_PARTITION_CREATION_FLAG_INTERCEPT_MESSAGE_PAGE_ENABLED;
+@@ -3215,6 +3239,7 @@ static long mshv_ioctl_process_pt_flags(void __user *user_arg, u64 *pt_flags,
+ 		break;
+ 	case MSHV_PT_ISOLATION_SNP:
+ 		isol_props->isolation_type = HV_PARTITION_ISOLATION_TYPE_SNP;
++		isol_props->interrupt_injection_policy = injection_policy;
+ 		break;
+ 	}
+ 
+diff --git a/include/hyperv/hvhdk.h b/include/hyperv/hvhdk.h
+index d92f05c..16b3b3d 100644
+--- a/include/hyperv/hvhdk.h
++++ b/include/hyperv/hvhdk.h
+@@ -390,7 +390,8 @@ union hv_partition_isolation_properties {
+ 	struct {
+ 		u64 isolation_type: 5;
+ 		u64 isolation_host_type : 2;
+-		u64 rsvd_z: 5;
++		u64 interrupt_injection_policy : 2;
++		u64 rsvd_z: 3;
+ 		u64 shared_gpa_boundary_page_number: 52;
+ 	} __packed;
+ };
+@@ -402,6 +403,10 @@ union hv_partition_isolation_properties {
+ #define HV_PARTITION_ISOLATION_TYPE_SNP             2
+ #define HV_PARTITION_ISOLATION_TYPE_TDX             3
+ 
++#define HV_PARTITION_ISOLATION_SNP_RESTRICTED_INTERRUPT_INJECTION 0x0
++#define HV_PARTITION_ISOLATION_SNP_NORMAL_INTERRUPT_INJECTION     0x1
++#define HV_PARTITION_ISOLATION_SNP_SECURE_AVIC_INJECTION           0x3
++
+ /*
+  * Various host isolation types supported by MSHV.
+  */
+diff --git a/include/uapi/linux/mshv.h b/include/uapi/linux/mshv.h
+index 238cadb..5bb7557 100644
+--- a/include/uapi/linux/mshv.h
++++ b/include/uapi/linux/mshv.h
+@@ -29,11 +29,19 @@ enum {
+ 	MSHV_PT_BIT_CPU_AND_XSAVE_FEATURES,
+ 	MSHV_PT_BIT_NESTED_VIRTUALIZATION,
+ 	MSHV_PT_BIT_SMT_ENABLED_GUEST,
++	MSHV_PT_BIT_SNP_INJECTION_POLICY0,
++	MSHV_PT_BIT_SNP_INJECTION_POLICY1,
+ 	MSHV_PT_BIT_COUNT,
+ };
+ 
+ #define MSHV_PT_FLAGS_MASK ((1 << MSHV_PT_BIT_COUNT) - 1)
+ 
++#define MSHV_PT_SNP_INJECTION_POLICY_MASK (3ULL << MSHV_PT_BIT_SNP_INJECTION_POLICY0)
++
++#define MSHV_PT_SNP_RESTRICTED_INJECTION	0
++#define MSHV_PT_SNP_NORMAL_INJECTION	1
++#define MSHV_PT_SNP_SECURE_AVIC_INJECTION	3
++
+ enum {
+ 	MSHV_PT_ISOLATION_NONE,
+ 	MSHV_PT_ISOLATION_SNP,
+@@ -45,6 +53,9 @@ enum {
+  * @pt_flags: Bitmask of 1 << MSHV_PT_BIT_*
+  * @pt_isolation: MSHV_PT_ISOLATION_*
+  *
++ * Bits covered by MSHV_PT_SNP_INJECTION_POLICY_MASK encode the SNP interrupt
++ * injection policy.
++ *
+  * This is the initial/v1 version for backward compatibility.
+  *
+  * Returns a file descriptor to act as a handle to a guest partition.
+-- 
+2.54.0
+

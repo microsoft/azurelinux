@@ -18,7 +18,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        6.18.34.mshv3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -30,6 +30,8 @@ Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
 Source5:        config_aarch64
 Patch0:         0001-restore-mshv1-x86-vPCI-interrupt-implementation.patch
+Patch1:         0002-mshv-add-an-SNP-interrupt-injection-policy-field.patch
+Patch2:         0003-mshv-unmap-SNP-regions-before-reclaiming-host-access.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -266,6 +268,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Sat Oct 10 2026 Nikola Bojanic <nbojanic@microsoft.com> - 6.18.34.mshv3-2
+- Add SNP interrupt injection policy selection while preserving the restricted default
+- Unmap guest memory before reclaiming host access during partition teardown
+
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
 - Enable CONFIG_CHECKPOINT_RESTORE, CONFIG_INET_RAW_DIAG and CONFIG_MSHV_GICV3_MSI
