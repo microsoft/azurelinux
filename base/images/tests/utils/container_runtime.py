@@ -53,13 +53,17 @@ class ContainerExecResult(NamedTuple):
 class ExecShell(Protocol):
     """Run a shell command string inside a test container."""
 
-    def __call__(self, command: str, *, shell: str = "bash") -> ContainerExecResult: ...
+    def __call__(self, command: str, *, shell: str = "bash") -> ContainerExecResult:
+        """Execute the command with the selected shell."""
+        ...
 
 
 class WriteFile(Protocol):
     """Write file content into a test container (trailing newline normalized)."""
 
-    def __call__(self, path: str, content: str) -> ContainerExecResult: ...
+    def __call__(self, path: str, content: str) -> ContainerExecResult:
+        """Write content to the container path."""
+        ...
 
 
 class WaitForHttp(Protocol):
@@ -73,7 +77,9 @@ class WaitForHttp(Protocol):
         delay: float = 1.0,
         connect_timeout: float = 2.0,
         max_time: float = 5.0,
-    ) -> ContainerExecResult: ...
+    ) -> ContainerExecResult:
+        """Wait for the URL to return a successful response."""
+        ...
 
 
 class AssertHttpServer(Protocol):
@@ -87,7 +93,9 @@ class AssertHttpServer(Protocol):
         *,
         retries: int = 5,
         delay: float = 1.0,
-    ) -> ContainerExecResult: ...
+    ) -> ContainerExecResult:
+        """Start the server and verify its response body."""
+        ...
 
 
 class ContainerInstance(NamedTuple):
