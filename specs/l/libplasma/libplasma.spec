@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:    libplasma
-Version: 6.6.3
-Release: 4%{?dist}
+Version: 6.7.5
+Release: 5%{?dist}
 Summary: Plasma is the foundation of the KDE user interface (v6)
 
 # LicenseRef-QtCommercial is also in the licenses, but is being omitted as it is optional.
@@ -48,6 +48,7 @@ BuildRequires:  cmake(KF6DBusAddons)
 BuildRequires:  cmake(PlasmaActivities)
 
 # Wayland
+BuildRequires:  pkgconfig(wayland-protocols)
 BuildRequires:  cmake(PlasmaWaylandProtocols)
 BuildRequires:  cmake(Qt6WaylandClient)
 BuildRequires:  pkgconfig(wayland-client)
@@ -58,6 +59,16 @@ BuildRequires:  cmake(KF6Archive)
 # examples
 BuildRequires:  cmake(KF6Parts)
 BuildRequires:  cmake(KF6WidgetsAddons)
+
+# QML module dependencies, checked at build time
+BuildRequires:  qt6qml(Qt5Compat.GraphicalEffects)
+BuildRequires:  qt6qml(org.kde.config)
+BuildRequires:  qt6qml(org.kde.kirigami)
+BuildRequires:  qt6qml(org.kde.ksvg)
+Requires:       qt6qml(Qt5Compat.GraphicalEffects)
+Requires:       qt6qml(org.kde.config)
+Requires:       qt6qml(org.kde.kirigami)
+Requires:       qt6qml(org.kde.ksvg)
 
 Requires:       kf6-filesystem
 
@@ -127,12 +138,52 @@ mkdir -p %{buildroot}%{_kf6_qmldir}/org/kde/private
 %{_libdir}/cmake/PlasmaQuick/
 %{_libdir}/libPlasma.so
 %{_libdir}/libPlasmaQuick.so
-%{_qt6_docdir}/*.tags
  
 %files doc
-%{_qt6_docdir}/*.qch
 
 %changelog
+* Tue Sep 08 2026 Steve Cossette <farchord@gmail.com> - 6.7.5-1
+- 6.7.5
+
+* Tue Aug 04 2026 Steve Cossette <farchord@gmail.com> - 6.7.4-1
+- 6.7.4
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 14 2026 Steve Cossette <farchord@gmail.com> - 6.7.3-1
+- 6.7.3
+
+* Wed Jul 01 2026 Steve Cossette <farchord@gmail.com> - 6.7.2-1
+- 6.7.2
+
+* Tue Jun 23 2026 Steve Cossette <farchord@gmail.com> - 6.7.1-1
+- 6.7.1
+
+* Thu Jun 11 2026 Steve Cossette <farchord@gmail.com> - 6.7.0-1
+- 6.7.0
+
+* Fri May 29 2026 Steve Cossette <farchord@gmail.com> - 6.6.91-1
+- 6.6.91
+
+* Tue May 26 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 6.6.90-2
+- Add QML dependencies
+
+* Sat May 16 2026 Steve Cossette <farchord@gmail.com> - 6.6.90-1
+- 6.6.90
+
+* Thu May 14 2026 Steve Cossette <farchord@gmail.com> - 6.6.5-1
+- 6.6.5
+
+* Thu May 14 2026 Jan Grulich <jgrulich@redhat.com> - 6.6.4-3
+- Rebuild (qt6)
+
+* Thu Apr 16 2026 Jan Grulich <jgrulich@redhat.com> - 6.6.4-2
+- Rebuild (qt6)
+
+* Fri Apr 10 2026 Steve Cossette <farchord@gmail.com> - 6.6.4-1
+- 6.6.4
+
 * Tue Mar 17 2026 Steve Cossette <farchord@gmail.com> - 6.6.3-1
 - 6.6.3
 
