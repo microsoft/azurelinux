@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 """Simple kernel config checker script.
+
 Checks a Linux kernel .config file against intentional configuration settings.
 """
 
