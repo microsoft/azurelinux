@@ -2318,6 +2318,7 @@
                 "kernel-signed",
                 "kernel-uki",
                 "kernel-uki-signed",
+                "kernel-uvm-cc",
                 "kpatch",
                 "kube-vip-cloud-provider",
                 "kubernetes",

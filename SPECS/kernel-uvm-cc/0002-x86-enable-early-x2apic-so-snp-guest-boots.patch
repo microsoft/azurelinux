@@ -1,0 +1,26 @@
+From a8b36965a44c36c6c1a5367e80f23ba987bf64a4 Mon Sep 17 00:00:00 2001
+From: Chris Oo <cho@microsoft.com>
+Date: Tue, 15 Sep 2026 10:49:42 -0700
+Subject: [PATCH] x86: enable early x2apic so snp guest boots
+
+---
+ arch/x86/kernel/apic/apic.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
+index aa1b0ef..38eb672 100644
+--- a/arch/x86/kernel/apic/apic.c
++++ b/arch/x86/kernel/apic/apic.c
+@@ -1861,6 +1861,9 @@ static __init void try_to_enable_x2apic(int remap_mode)
+ 
+ void __init check_x2apic(void)
+ {
++	if (boot_cpu_has(X86_FEATURE_X2APIC) && !x2apic_enabled())
++		__x2apic_enable();
++
+ 	if (x2apic_enabled()) {
+ 		pr_info("x2apic: enabled by BIOS, switching to x2apic ops\n");
+ 		x2apic_mode = 1;
+-- 
+2.54.0
+

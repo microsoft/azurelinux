@@ -1,0 +1,46 @@
+From 6e82e92b07ad74d2b1ec86df90193b1db0d07d48 Mon Sep 17 00:00:00 2001
+From: Chris Oo <cho@microsoft.com>
+Date: Tue, 15 Sep 2026 11:31:33 -0700
+Subject: [PATCH] hyperv: allocate output pages for enlightened SNP AP startup
+
+No-paravisor SNP guests use HvCallGetVpIndexFromApicId while starting APs.
+Allocate the per-CPU output state and shared backing pages for these
+guests rather than restricting output buffers to parent and VTL-mode
+partitions. This prevents a NULL per-CPU pointer dereference before the
+lookup hypercall runs.
+
+Validated boot, pinned execution, and timer wakeups with 2, 4, and 8 VPs.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: 309b650d-fb0e-44da-8054-30ece8ab7e01
+---
+ drivers/hv/hv_common.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
+index dba19e9..e72823e 100644
+--- a/drivers/hv/hv_common.c
++++ b/drivers/hv/hv_common.c
+@@ -263,7 +263,9 @@ static void hv_kmsg_dump_register(void)
+ 
+ static inline bool hv_output_page_exists(void)
+ {
+-	return hv_parent_partition() || IS_ENABLED(CONFIG_HYPERV_VTL_MODE);
++	/* Enlightened SNP guests use an output page for APIC-to-VP lookups. */
++	return hv_parent_partition() || IS_ENABLED(CONFIG_HYPERV_VTL_MODE) ||
++		(!ms_hyperv.paravisor_present && hv_isolation_type_snp());
+ }
+ 
+ void __init hv_get_partition_id(void)
+@@ -377,7 +379,7 @@ int __init hv_common_init(void)
+ 	hyperv_pcpu_input_arg = alloc_percpu(void  *);
+ 	BUG_ON(!hyperv_pcpu_input_arg);
+ 
+-	/* Allocate the per-CPU state for output arg for root */
++	/* Allocate per-CPU output state when needed by this partition. */
+ 	if (hv_output_page_exists()) {
+ 		hyperv_pcpu_output_arg = alloc_percpu(void *);
+ 		BUG_ON(!hyperv_pcpu_output_arg);
+-- 
+2.54.0
+

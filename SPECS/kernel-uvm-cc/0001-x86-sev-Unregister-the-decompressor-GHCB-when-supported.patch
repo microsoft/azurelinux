@@ -1,0 +1,87 @@
+From 8e6fbce77670c1b4c8fee378ce500798a18ef79e Mon Sep 17 00:00:00 2001
+From: Chris Oo <cho@microsoft.com>
+Date: Mon, 14 Sep 2026 14:39:03 -0700
+Subject: [PATCH] x86/sev: Unregister the decompressor GHCB when supported
+
+Use the GHCB 2.04 Unregister GHCB GPA MSR protocol (section 2.3.2)
+when the hypervisor advertises feature bit 8. Send request 0x18 with
+zero data and require response 0x19 with the boot GHCB GFN.
+
+The boot GHCB was registered earlier, so a zero response indicating
+no registered GHCB is unexpected here. Halt on zero, a different GFN,
+a failure response, or an unexpected response code before converting
+the page back to private memory.
+
+Keep the original encrypted/non-present cleanup when unregister is
+unavailable.
+---
+ arch/x86/boot/compressed/sev.c    | 22 ++++++++++++++++++++++
+ arch/x86/include/asm/sev-common.h |  5 +++++
+ 2 files changed, 27 insertions(+)
+
+diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+index b688303..cc947c1 100644
+--- a/arch/x86/boot/compressed/sev.c
++++ b/arch/x86/boot/compressed/sev.c
+@@ -107,6 +107,24 @@ void snp_accept_memory(phys_addr_t start, phys_addr_t end)
+ 		__page_state_change(pa, pa, &d);
+ }
+ 
++static void snp_unregister_boot_ghcb(void)
++{
++	unsigned long pfn = __pa(&boot_ghcb_page) >> PAGE_SHIFT;
++	u64 val;
++
++	if (!(get_hv_features() & GHCB_HV_FT_GHCB_UNREGISTER))
++		return;
++
++	/* GHCB specification 2.04, section 2.3.2: request data must be zero. */
++	sev_es_wr_ghcb_msr(GHCB_MSR_UNREG_GPA_REQ);
++	VMGEXIT();
++
++	val = sev_es_rd_ghcb_msr();
++	if (GHCB_RESP_CODE(val) != GHCB_MSR_UNREG_GPA_RESP ||
++	    GHCB_DATA(val) != pfn)
++		error("Can't unregister boot GHCB page");
++}
++
+ void sev_es_shutdown_ghcb(void)
+ {
+ 	if (!boot_ghcb)
+@@ -125,6 +143,10 @@ void sev_es_shutdown_ghcb(void)
+ 	 */
+ 	boot_ghcb = NULL;
+ 
++	/* Release any hypervisor mapping before making the old GHCB private. */
++	if (sev_snp_enabled())
++		snp_unregister_boot_ghcb();
++
+ 	/*
+ 	 * GHCB Page must be flushed from the cache and mapped encrypted again.
+ 	 * Otherwise the running kernel will see strange cache effects when
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index 01a6e4d..5e48f19 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -125,6 +125,10 @@ enum psc_op {
+ 	/* GHCBData[63:32] */				\
+ 	(((u64)(v) & GENMASK_ULL(63, 32)) >> 32)
+ 
++/* GHCB GPA Unregister */
++#define GHCB_MSR_UNREG_GPA_REQ		0x018
++#define GHCB_MSR_UNREG_GPA_RESP		0x019
++
+ /* GHCB Hypervisor Feature Request/Response */
+ #define GHCB_MSR_HV_FT_REQ		0x080
+ #define GHCB_MSR_HV_FT_RESP		0x081
+@@ -137,6 +141,7 @@ enum psc_op {
+ #define GHCB_HV_FT_SNP			BIT_ULL(0)
+ #define GHCB_HV_FT_SNP_AP_CREATION	BIT_ULL(1)
+ #define GHCB_HV_FT_SNP_MULTI_VMPL	BIT_ULL(5)
++#define GHCB_HV_FT_GHCB_UNREGISTER	BIT_ULL(8)
+ 
+ /*
+  * SNP Page State Change NAE event
+-- 
+2.54.0
+
