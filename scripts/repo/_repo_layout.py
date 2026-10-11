@@ -36,12 +36,24 @@ class SubrepoSpec:
 
 
 SUBREPOS: tuple[SubrepoSpec, ...] = (
-    SubrepoSpec("base", "base", KIND_MAIN, True, "base/$basearch"),
-    SubrepoSpec("base-debuginfo", "base", KIND_DEBUGINFO, True, "base/debuginfo/$basearch"),
-    SubrepoSpec("base-srpms", "base", KIND_SRPMS, False, "base/srpms"),
-    SubrepoSpec("sdk", "sdk", KIND_MAIN, True, "sdk/$basearch"),
-    SubrepoSpec("sdk-debuginfo", "sdk", KIND_DEBUGINFO, True, "sdk/debuginfo/$basearch"),
-    SubrepoSpec("sdk-srpms", "sdk", KIND_SRPMS, False, "sdk/srpms"),
+    SubrepoSpec(name="base", channel="base", kind=KIND_MAIN, per_arch=True, subpath="base/$basearch"),
+    SubrepoSpec(
+        name="base-debuginfo",
+        channel="base",
+        kind=KIND_DEBUGINFO,
+        per_arch=True,
+        subpath="base/debuginfo/$basearch",
+    ),
+    SubrepoSpec(name="base-srpms", channel="base", kind=KIND_SRPMS, per_arch=False, subpath="base/srpms"),
+    SubrepoSpec(name="sdk", channel="sdk", kind=KIND_MAIN, per_arch=True, subpath="sdk/$basearch"),
+    SubrepoSpec(
+        name="sdk-debuginfo",
+        channel="sdk",
+        kind=KIND_DEBUGINFO,
+        per_arch=True,
+        subpath="sdk/debuginfo/$basearch",
+    ),
+    SubrepoSpec(name="sdk-srpms", channel="sdk", kind=KIND_SRPMS, per_arch=False, subpath="sdk/srpms"),
 )
 
 
