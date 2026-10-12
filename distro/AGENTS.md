@@ -5,12 +5,10 @@
 ## Structure
 
 - `distro.toml` — includes all `*.distro.toml`
-- `azurelinux.distro.toml` — Azure Linux 4.0 definition (versions, mock configs, build defaults)
+- `azurelinux.distro.toml` — Azure Linux distro definitions and build defaults
 - `fedora.distro.toml` — Fedora definition (dist-git URIs, lookaside, version branches)
 - `mock/` — Mock build environment configs
 
 ## Build Defaults
 
-Default upstream: **Fedora 43** (in `azurelinux.distro.toml`). Inherited by all components unless overridden via `build.defines`:
-
-- `dist = ".azl4"`, `vendor = "Microsoft Corporation"`, `distribution = "Azure Linux"`, `rhel = "10"`
+Default upstream: **Fedora 43** (in `azurelinux.distro.toml`), unless overridden by a component's spec source.
