@@ -1,7 +1,7 @@
 Summary:        software font engine.
 Name:           freetype
 Version:        2.13.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD/GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/freetype/freetype-%{version}.tar.gz
 Source1:        https://download.savannah.gnu.org/releases/freetype/freetype-doc-%{version}.tar.gz
 Patch0:         CVE-2026-23865.patch
+Patch1:         CVE-2026-95512.patch
 BuildRequires:  brotli-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  gcc
@@ -83,6 +84,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man1/*
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.13.2-3
+- Patch for CVE-2026-95512
+
 * Tue Mar 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.13.2-2
 - Patch for CVE-2026-23865
 
