@@ -1,20 +1,6 @@
-%global debug_package %{nil}
-%define upstream_name containerd
 %define commit_hash ee2735368117d2eb259779949d5e75cdafec9761
-
-Summary: Industry-standard container runtime
-Name: %{upstream_name}2
-<<<<<<< HEAD
-Version: 2.3.4
-Release: 2%{?dist}
-=======
 Version: 2.3.6
-Release: 1%{?dist}
->>>>>>> d8043634dd (Upgrade `containerd2` to 2.3.6 for CVE-2026-53493, CVE-2026-53495, CVE-2026-95838 (#19173))
-License: ASL 2.0
-Group: Tools/Container
-URL: https://www.containerd.io
-Vendor: Microsoft Corporation
+Release: 2%{?dist}
 Distribution: Azure Linux
 
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
@@ -104,16 +90,11 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 %dir /opt/containerd
 %dir /opt/containerd/bin
-%dir /opt/containerd/lib
-
-%changelog
-<<<<<<< HEAD
-* Fri Sep 18 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-2
+* Mon Oct 12 2026 Nan Liu <liunan@microsoft.com> - 2.3.6-2
 - Tolerate wrapped ENOTSUP errors from SELinux mount relabeling
-=======
+
 * Sat Oct 10 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.3.6-1
 - Upgrade to 2.3.6 for CVE-2026-53493, CVE-2026-53495, CVE-2026-95838
->>>>>>> d8043634dd (Upgrade `containerd2` to 2.3.6 for CVE-2026-53493, CVE-2026-53495, CVE-2026-95838 (#19173))
 
 * Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
 - Upgrade to 2.3.4
