@@ -1,0 +1,25 @@
+--- fluent-bundle-0.16.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fluent-bundle-0.16.0/Cargo.toml	2025-12-30T14:08:01.216252+00:00
+@@ -96,22 +96,6 @@
+ [dependencies.unic-langid]
+ version = "0.9"
+ 
+-[dev-dependencies.criterion]
+-version = "0.5"
+-
+-[dev-dependencies.iai]
+-version = "0.1"
+-
+-[dev-dependencies.rand]
+-version = "0.9"
+-
+-[dev-dependencies.serde]
+-version = "1.0"
+-features = ["derive"]
+-
+-[dev-dependencies.serde_yaml]
+-version = "0.9"
+-
+ [dev-dependencies.unic-langid]
+ version = "0.9"
+ features = ["macros"]
