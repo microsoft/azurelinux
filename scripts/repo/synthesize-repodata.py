@@ -287,7 +287,6 @@ def _http_get(
                 dest.open("wb") as fh,
             ):
                 shutil.copyfileobj(resp, fh)
-            return
         except urllib.error.HTTPError as e:
             if HTTP_SERVER_ERROR_MIN <= e.code < HTTP_SERVER_ERROR_MAX and attempt < retries - 1:
                 last_exc = e
@@ -311,6 +310,7 @@ def _http_get(
                 time.sleep(HTTP_BACKOFF_BASE * (2**attempt))
                 continue
             raise
+        return
     # Defensive: loop only exits via return/raise above.
     if last_exc is not None:
         raise last_exc
