@@ -1,6 +1,6 @@
 [components.rust]
-# Version 1.95
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43"}, upstream-commit = "04de6d5162d3b91761d706bc820d1e224bc4dafc" }
+# Version 1.96
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43"}, upstream-commit = "045fc99692a6653c1bd092c0be866a1770dc06da" }
 
 # Brand rustc's --version string as "Azure Linux" instead of "Fedora".
 [[components.rust.overlays]]

@@ -1,0 +1,23 @@
+diff -up rustc-beta-src/src/tools/cargo/Cargo.lock.orig rustc-beta-src/src/tools/cargo/Cargo.lock
+--- rustc-beta-src/src/tools/cargo/Cargo.lock.orig	2026-04-19 23:11:26.000000000 -0700
++++ rustc-beta-src/src/tools/cargo/Cargo.lock	2026-04-23 13:19:24.942383499 -0700
+@@ -3152,7 +3152,6 @@ version = "0.37.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "b1f111c8c41e7c61a49cd34e44c7619462967221a6443b0ec299e0ac30cfb9b1"
+ dependencies = [
+- "cc",
+  "pkg-config",
+  "vcpkg",
+ ]
+diff -up rustc-beta-src/src/tools/cargo/Cargo.toml.orig rustc-beta-src/src/tools/cargo/Cargo.toml
+--- rustc-beta-src/src/tools/cargo/Cargo.toml.orig	2026-04-19 23:11:26.000000000 -0700
++++ rustc-beta-src/src/tools/cargo/Cargo.toml	2026-04-23 13:19:13.141462455 -0700
+@@ -89,7 +89,7 @@ proptest = "1.11.0"
+ pulldown-cmark = { version = "0.13.3", default-features = false, features = ["html"] }
+ rand = "0.10.0"
+ regex = "1.12.3"
+-rusqlite = { version = "0.39.0", features = ["bundled"] }
++rusqlite = { version = "0.39.0", features = [] }
+ rustc-hash = "2.1.2"
+ rustc-stable-hash = "0.1.2"
+ rustfix = { version = "0.9.6", path = "crates/rustfix" }
