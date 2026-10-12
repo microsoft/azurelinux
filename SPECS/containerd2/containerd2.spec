@@ -1,6 +1,6 @@
 %define commit_hash ee2735368117d2eb259779949d5e75cdafec9761
 Version: 2.3.6
-Release: 2%{?dist}
+Release: 1%{?dist}
 Distribution: Azure Linux
 
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
@@ -12,7 +12,6 @@ Patch1:	tardev-support.patch
 Patch2:	fix-TestCgroupNamespace-cgroupv1.patch
 Patch3:	CVE-2026-56852.patch
 Patch4:	CVE-2026-37236.patch
-Patch5:	fix-wrapped-enotsup-selinux-relabel.patch
 
 %{?systemd_requires}
 
@@ -90,9 +89,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 %dir /opt/containerd
 %dir /opt/containerd/bin
-* Mon Oct 12 2026 Nan Liu <liunan@microsoft.com> - 2.3.6-2
-- Tolerate wrapped ENOTSUP errors from SELinux mount relabeling
+%dir /opt/containerd/lib
 
+%changelog
 * Sat Oct 10 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.3.6-1
 - Upgrade to 2.3.6 for CVE-2026-53493, CVE-2026-53495, CVE-2026-95838
 
