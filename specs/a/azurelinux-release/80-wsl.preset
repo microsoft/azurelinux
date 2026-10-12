@@ -12,5 +12,4 @@ disable systemd-resolved.service
 disable systemd-resolved-monitor.socket
 disable systemd-resolved-varlink.socket
 
-disable console-getty.service
 disable getty@*.service

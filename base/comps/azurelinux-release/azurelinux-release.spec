@@ -66,6 +66,7 @@ Source31:       60-azurelinux-cis-module-denylist.conf
 Source32:       azurelinux-cis-shell-timeout.sh
 Source33:       00-rsyslog_filecreatemode.conf
 Source34:       azurelinux-cis-umask.sh
+Source35:       wsl-disable.conf
 
 BuildArch:      noarch
 
@@ -379,16 +380,16 @@ echo "VARIANT_ID=wsl" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -i -e "s|(%{release_name}%{?prerelease})|(WSL%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/WSL/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
 
-# WSL systemd policy; see docs/wsl-systemd-policy.md. The preset disables
-# units, and the masks cover units that a preset cannot keep from starting.
+# WSL systemd policy; see docs/wsl-systemd-policy.md. The preset sets the default
+# enablement, and the drop-ins skip units that WSL activates by other means.
 install -Dm0644 %{SOURCE18} -t %{buildroot}%{_prefix}/lib/systemd/system-preset/
-install -d %{buildroot}%{_sysconfdir}/systemd/system
 for unit in console-getty.service \
             systemd-vconsole-setup.service \
             tmp.mount \
             systemd-tmpfiles-setup-dev.service \
             systemd-tmpfiles-setup-dev-early.service; do
-    ln -s /dev/null %{buildroot}%{_sysconfdir}/systemd/system/"${unit}"
+    install -Dm0644 %{SOURCE35} \
+        %{buildroot}%{_prefix}/lib/systemd/system/"${unit}".d/wsl-disable.conf
 done
 %endif
 
@@ -539,18 +540,23 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 %{_prefix}/lib/os-release.wsl
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
 %{_prefix}/lib/systemd/system-preset/80-wsl.preset
-%{_sysconfdir}/systemd/system/console-getty.service
-%{_sysconfdir}/systemd/system/systemd-vconsole-setup.service
-%{_sysconfdir}/systemd/system/tmp.mount
-%{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
-%{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev-early.service
+%dir %{_prefix}/lib/systemd/system/console-getty.service.d
+%dir %{_prefix}/lib/systemd/system/systemd-vconsole-setup.service.d
+%dir %{_prefix}/lib/systemd/system/tmp.mount.d
+%dir %{_prefix}/lib/systemd/system/systemd-tmpfiles-setup-dev.service.d
+%dir %{_prefix}/lib/systemd/system/systemd-tmpfiles-setup-dev-early.service.d
+%{_prefix}/lib/systemd/system/console-getty.service.d/wsl-disable.conf
+%{_prefix}/lib/systemd/system/systemd-vconsole-setup.service.d/wsl-disable.conf
+%{_prefix}/lib/systemd/system/tmp.mount.d/wsl-disable.conf
+%{_prefix}/lib/systemd/system/systemd-tmpfiles-setup-dev.service.d/wsl-disable.conf
+%{_prefix}/lib/systemd/system/systemd-tmpfiles-setup-dev-early.service.d/wsl-disable.conf
 %endif
 
 
 %changelog
 * Sat Oct 10 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-33
-- Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and the console getty units for the WSL variant
-- Mask the generator-activated console getty and static vconsole, /tmp and early device setup units
+- Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and the getty units for the WSL variant
+- Skip the generator-activated console getty and the static vconsole, /tmp and early device setup units with ConditionVirtualization=!wsl drop-ins
 - Pair the WSL identity with the WSL release package rather than the container variant
 
 * Mon Oct 05 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-32

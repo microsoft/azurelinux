@@ -12,7 +12,7 @@ import pytest
 from utils.extract import read_text_confined
 
 _SYSTEM_UNIT_DIRS = ("etc/systemd/system", "run/systemd/system", "usr/lib/systemd/system")
-_MASKED_UNITS = (
+_CONDITIONAL_UNITS = (
     "console-getty.service",
     "systemd-vconsole-setup.service",
     "tmp.mount",
@@ -20,7 +20,6 @@ _MASKED_UNITS = (
     "systemd-tmpfiles-setup-dev-early.service",
 )
 _DISABLED_UNITS = (
-    "console-getty.service",
     "getty@*.service",
     "systemd-networkd.service",
     "systemd-networkd.socket",
@@ -67,12 +66,29 @@ def test_wsl_registration(rootfs: Path) -> None:
             pytest.fail("The WSL icon is not a Windows ICO file")
 
 
-@pytest.mark.parametrize("unit", _MASKED_UNITS)
-def test_wsl_unit_mask(rootfs: Path, unit: str) -> None:
-    """Block static and generator-activated units even without preset support."""
-    mask = rootfs / "etc/systemd/system" / unit
-    if not mask.is_symlink() or mask.readlink() != Path("/dev/null"):
-        pytest.fail(f"{unit} must be masked in the WSL image")
+@pytest.mark.parametrize("unit", _CONDITIONAL_UNITS)
+def test_wsl_unit_condition(rootfs: Path, unit: str) -> None:
+    """Skip static and generator-activated units with a vendor drop-in, not a mask."""
+    relative = f"usr/lib/systemd/system/{unit}.d/wsl-disable.conf"
+    drop_in = rootfs / relative
+    if not drop_in.is_file():
+        pytest.fail(f"{unit} is missing its WSL drop-in at /{relative}")
+    config = configparser.ConfigParser(interpolation=None)
+    config.read_string(read_text_confined(rootfs, relative))
+    if config["Unit"].get("ConditionVirtualization") != "!wsl":
+        pytest.fail(f"{unit} drop-in must set ConditionVirtualization=!wsl")
+
+
+def test_wsl_units_are_not_masked(rootfs: Path) -> None:
+    """Leave /etc/systemd/system to the administrator; the package must not mask there."""
+    etc_units = rootfs / "etc/systemd/system"
+    masked = sorted(
+        str(entry.relative_to(rootfs))
+        for entry in etc_units.rglob("*")
+        if entry.is_symlink() and entry.readlink() == Path("/dev/null")
+    )
+    if masked:
+        pytest.fail(f"Units masked under /etc/systemd/system: {masked}")
 
 
 @pytest.mark.parametrize("pattern", _DISABLED_UNITS)
