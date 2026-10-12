@@ -1,8 +1,10 @@
-# Azure Linux does not ship ignition-validate-redistributable. It only carries
-# cross-compiled Linux/macOS/Windows binaries for Fedora release engineering to sign
-# ("Do not install it") -- out of scope here. Remove the subpackage and turn its
-# Fedora-only %build/%install blocks off by flipping their %if 0%{?fedora} guards to
-# %if 0 (each is the sole %if 0%{?fedora} in its section).
+# Azure Linux does not ship ignition-validate-redistributable or
+# butane-redistributable. These carry cross-compiled Linux/macOS/Windows binaries
+# for Fedora release engineering to sign ("Do not install it").
+# Remove both subpackages and disable their Fedora-only %build/%install blocks
+# by flipping exact %if 0%{?fedora} guards to %if 0. Ignition 2.27.0 shares one
+# cross-compilation block but has separate install blocks for each family.
+# Keep native Ignition, ignition-validate, Butane, and the fcct symlink unchanged.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"
@@ -13,14 +15,19 @@ type = "spec-remove-subpackage"
 package = "validate-redistributable"
 
 [[overlays]]
-description = "Turn off the cross-compilation: flip the %build Fedora guard to %if 0"
+description = "Remove the butane-redistributable subpackage (unused by Azure Linux)"
+type = "spec-remove-subpackage"
+package = "butane-redistributable"
+
+[[overlays]]
+description = "Disable validator and Butane cross-compilation by flipping the shared %build Fedora guard to %if 0"
 type = "spec-search-replace"
 section = "%build"
 regex = '^%if 0%\{\?fedora\}$'
 replacement = "%if 0"
 
 [[overlays]]
-description = "Stop installing the redistributable binaries: flip the %install Fedora guard to %if 0"
+description = "Stop installing validator and Butane redistributable binaries by flipping both %install Fedora guards to %if 0"
 type = "spec-search-replace"
 section = "%install"
 regex = '^%if 0%\{\?fedora\}$'

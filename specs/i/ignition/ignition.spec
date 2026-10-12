@@ -25,7 +25,7 @@ Version:                2.27.0
 %global dracutlibdir %{_prefix}/lib/dracut
 
 Name:           ignition
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        First boot installer and configuration tool
 
 # Upstream license specification: Apache-2.0
@@ -241,23 +241,6 @@ configs for provisioning operating systems that use Ignition.
 ############## butane-redistributable subpackage ##############
 
 %if 0%{?fedora}
-%package -n butane-redistributable
-
-Summary:   Statically built Butane for Linux, macOS and Windows
-License:   Apache-2.0
-BuildArch: noarch
-
-# Upgrade path from standalone butane package
-Obsoletes: butane-redistributable < %{version}
-
-%description -n butane-redistributable
-Butane translates human-readable Butane Configs into machine-readable Ignition
-configs for provisioning operating systems that use Ignition.
-
-This package contains statically linked Linux, macOS and Windows Butane
-binaries built through cross-compilation. Do not install it. It is only
-used for building release binaries to be signed by Fedora release
-engineering and uploaded to the Ignition GitHub releases page.
 %endif
 
 %prep
@@ -430,16 +413,6 @@ install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
 %{_bindir}/fcct
 
 %if 0%{?fedora}
-%files -n butane-redistributable
-%license %{golicenses}
-%dir %{_datadir}/butane
-%{_datadir}/butane/butane-aarch64-apple-darwin
-%{_datadir}/butane/butane-aarch64-unknown-linux-gnu-static
-%{_datadir}/butane/butane-ppc64le-unknown-linux-gnu-static
-%{_datadir}/butane/butane-s390x-unknown-linux-gnu-static
-%{_datadir}/butane/butane-x86_64-apple-darwin
-%{_datadir}/butane/butane-x86_64-pc-windows-gnu.exe
-%{_datadir}/butane/butane-x86_64-unknown-linux-gnu-static
 %endif
 
 %changelog
