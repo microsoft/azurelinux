@@ -246,6 +246,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 - Upgrade to 3.12.15 for CVE-2026-15310, CVE-2026-15806, CVE-2026-17084,
   CVE-2026-19445, CVE-2026-19553, CVE-2026-19672, CVE-2026-82049, CVE-2026-87910 
 
+* Mon Sep 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-3
+- Patch for CVE-2026-17084
+
 * Sun Aug 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-2
 - Patch for CVE-2026-15806, CVE-2026-19672
 
