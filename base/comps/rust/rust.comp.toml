@@ -1,6 +1,10 @@
 [components.rust]
-# Version 1.98
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43"}, upstream-commit = "8fa23f4607c1e1edb262079c7bf00e58dfdb12a9" }
+# Version 1.99
+#
+# This is only pinned because our snapshot date is older, this should
+# be removed once our snapshot is later than:
+#   Thu Oct 1 14:48:54 2026 -0500
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43"}, upstream-commit = "8b7522feb42d806e636d935ca8b51189fd98cfe9" }
 
 # Brand rustc's --version string as "Azure Linux" instead of "Fedora".
 [[components.rust.overlays]]

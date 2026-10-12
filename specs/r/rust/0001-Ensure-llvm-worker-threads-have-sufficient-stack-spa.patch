@@ -1,0 +1,209 @@
+From 2784f1c7779b80950c375b1625d9324aaafea14e Mon Sep 17 00:00:00 2001
+From: Paul Murphy <murp@redhat.com>
+Date: Thu, 24 Sep 2026 14:07:24 -0500
+Subject: [PATCH] Ensure llvm worker threads have sufficient stack space
+
+The rustc driver sets the default stack size to 16MB, however
+worker threads spawned by the backend will use std's default
+stack size (usually 2MB).
+
+Pass through the stack size chosen by the driver to the backend,
+and explicitly request the stack size.
+---
+ compiler/rustc_codegen_ssa/src/back/write.rs | 23 ++++++++++++++++++--
+ compiler/rustc_interface/src/interface.rs    |  3 +++
+ compiler/rustc_interface/src/util.rs         |  2 +-
+ compiler/rustc_session/src/config.rs         |  5 +++++
+ compiler/rustc_session/src/options.rs        |  1 +
+ 5 files changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/compiler/rustc_codegen_ssa/src/back/write.rs b/compiler/rustc_codegen_ssa/src/back/write.rs
+index 2eaceb68a67..9dd53bdf91d 100644
+--- a/compiler/rustc_codegen_ssa/src/back/write.rs
++++ b/compiler/rustc_codegen_ssa/src/back/write.rs
+@@ -1006,6 +1006,7 @@ fn do_thin_lto<B: WriteBackendMethods>(
+     exported_symbols_for_lto: &[String],
+     each_linked_rlib_for_lto: &[PathBuf],
+     needs_thin_lto: Vec<ThinLtoInput<B>>,
++    stack_size: usize,
+ ) -> Vec<CompiledModule> {
+     let _timer = prof.verbose_generic_activity("LLVM_thinlto");
+ 
+@@ -1096,6 +1097,7 @@ fn do_thin_lto<B: WriteBackendMethods>(
+                     Arc::clone(&tm_factory),
+                     coordinator_send.clone(),
+                     item,
++                    stack_size,
+                 );
+                 used_token_count += 1;
+             }
+@@ -1290,6 +1292,8 @@ fn start_executing_work<B: WriteBackendMethods>(
+         None
+     };
+ 
++    let stack_size = sess.opts.recommended_stack_size;
++
+     let cgcx = CodegenContext {
+         crate_types: tcx.crate_types().to_vec(),
+         lto: sess.lto(),
+@@ -1548,6 +1552,7 @@ enum CodegenState {
+                             coordinator_send.clone(),
+                             &mut llvm_start_time,
+                             item,
++                            stack_size,
+                         );
+                     }
+                 }
+@@ -1573,6 +1578,7 @@ enum CodegenState {
+                                 coordinator_send.clone(),
+                                 &mut llvm_start_time,
+                                 item,
++                                stack_size,
+                             );
+                         } else {
+                             // There is no unstarted work, so let the main thread
+@@ -1616,6 +1622,7 @@ enum CodegenState {
+                         coordinator_send.clone(),
+                         &mut llvm_start_time,
+                         item,
++                        stack_size,
+                     );
+                     running_with_own_token += 1;
+                 }
+@@ -1784,6 +1791,7 @@ enum CodegenState {
+                     &exported_symbols_for_lto,
+                     &[],
+                     needs_thin_lto,
++                    stack_size,
+                 ));
+             } else {
+                 if let Some(allocator_module) = allocator_module.take() {
+@@ -1879,6 +1887,7 @@ fn spawn_work<'a, B: WriteBackendMethods>(
+     coordinator_send: Sender<Message<B>>,
+     llvm_start_time: &mut Option<VerboseTimingGuard<'a>>,
+     work: WorkItem<B>,
++    stack_size: usize,
+ ) {
+     if llvm_start_time.is_none() {
+         *llvm_start_time = Some(prof.verbose_generic_activity("LLVM_passes"));
+@@ -1912,7 +1921,11 @@ fn spawn_work<'a, B: WriteBackendMethods>(
+         };
+         drop(coordinator_send.send(msg));
+     };
+-    std::thread::Builder::new().name(name).spawn(f).expect("failed to spawn work thread");
++    std::thread::Builder::new()
++        .name(name)
++        .stack_size(stack_size)
++        .spawn(f)
++        .expect("failed to spawn work thread");
+ }
+ 
+ fn spawn_thin_lto_work<B: WriteBackendMethods>(
+@@ -1922,6 +1935,7 @@ fn spawn_thin_lto_work<B: WriteBackendMethods>(
+     tm_factory: TargetMachineFactoryFn<B>,
+     coordinator_send: Sender<ThinLtoMessage>,
+     work: ThinLtoWorkItem<B>,
++    stack_size: usize,
+ ) {
+     let cgcx = cgcx.clone();
+     let prof = prof.clone();
+@@ -1954,7 +1968,11 @@ fn spawn_thin_lto_work<B: WriteBackendMethods>(
+         };
+         drop(coordinator_send.send(msg));
+     };
+-    std::thread::Builder::new().name(name).spawn(f).expect("failed to spawn work thread");
++    std::thread::Builder::new()
++        .name(name)
++        .stack_size(stack_size)
++        .spawn(f)
++        .expect("failed to spawn work thread");
+ }
+ 
+ enum SharedEmitterMessage {
+@@ -2204,6 +2222,7 @@ pub fn join(
+                         &crate_info.exported_symbols_for_lto,
+                         &crate_info.each_linked_rlib_file_for_lto,
+                         needs_thin_lto,
++                        sess.opts.recommended_stack_size,
+                     ),
+                     allocator_module: None,
+                 }
+diff --git a/compiler/rustc_interface/src/interface.rs b/compiler/rustc_interface/src/interface.rs
+index 2737d2ca854..3167a312a9f 100644
+--- a/compiler/rustc_interface/src/interface.rs
++++ b/compiler/rustc_interface/src/interface.rs
+@@ -442,6 +442,9 @@ pub fn run_compiler<R: Send>(config: Config, f: impl FnOnce(&Compiler) -> R + Se
+             sess.fallback_intrinsics = FxHashSet::from_iter(codegen_backend.fallback_intrinsics());
+             sess.thin_lto_supported = codegen_backend.thin_lto_supported();
+ 
++            // STACK_SIZE is setup in run_in_thread_pool_with_globals, before arriving here.
++            sess.opts.recommended_stack_size = *util::STACK_SIZE.get().unwrap();
++
+             let cfg = parse_cfg(sess.dcx(), config.crate_cfg);
+             let mut cfg = config::build_configuration(&sess, cfg);
+             util::add_configuration(&mut cfg, &mut sess, &*codegen_backend);
+diff --git a/compiler/rustc_interface/src/util.rs b/compiler/rustc_interface/src/util.rs
+index 23b152bd572..8095cae1e85 100644
+--- a/compiler/rustc_interface/src/util.rs
++++ b/compiler/rustc_interface/src/util.rs
+@@ -21,6 +21,7 @@
+ use rustc_middle::dep_graph::WorkProductMap;
+ use rustc_middle::ty::{CurrentGcx, TyCtxt};
+ use rustc_query_impl::{CollectActiveJobsKind, collect_active_query_jobs};
++pub use rustc_session::config::DEFAULT_STACK_SIZE;
+ use rustc_session::config::{
+     Cfg, CrateType, Jobs, OutFileName, OutputFilenames, OutputTypes, Sysroot, host_tuple,
+ };
+@@ -121,7 +122,6 @@ pub(crate) fn check_abi_required_features(sess: &Session) {
+ }
+ 
+ pub static STACK_SIZE: OnceLock<usize> = OnceLock::new();
+-pub const DEFAULT_STACK_SIZE: usize = 16 * 1024 * 1024;
+ 
+ fn init_stack_size(early_dcx: &EarlyDiagCtxt) -> usize {
+     // Obey the environment setting or default
+diff --git a/compiler/rustc_session/src/config.rs b/compiler/rustc_session/src/config.rs
+index efbffa8c0e4..3f3fc1f2c93 100644
+--- a/compiler/rustc_session/src/config.rs
++++ b/compiler/rustc_session/src/config.rs
+@@ -47,6 +47,9 @@
+ mod print_request;
+ pub mod sigpipe;
+ 
++/// A recommended stack size for worker threads spawned within a session.
++pub const DEFAULT_STACK_SIZE: usize = 17 * 1024 * 1024;
++
+ /// Special CPU name requesting the CPU of the current host.
+ pub const NATIVE_CPU: &str = "native";
+ 
+@@ -1491,6 +1494,7 @@ fn default() -> Options {
+             target_modifiers: BTreeMap::default(),
+             mitigation_coverage_map: Default::default(),
+             jobs: Jobs { frontend: None, backend: None, linker: LinkerJobs::Default },
++            recommended_stack_size: DEFAULT_STACK_SIZE,
+         }
+     }
+ }
+@@ -3066,6 +3070,7 @@ pub fn build_session_options(early_dcx: &mut EarlyDiagCtxt, matches: &getopts::M
+         target_modifiers: collected_options.target_modifiers,
+         mitigation_coverage_map: collected_options.mitigations,
+         jobs,
++        recommended_stack_size: DEFAULT_STACK_SIZE,
+     }
+ }
+ 
+diff --git a/compiler/rustc_session/src/options.rs b/compiler/rustc_session/src/options.rs
+index 3c3f1d69fe2..3d99d2bb6db 100644
+--- a/compiler/rustc_session/src/options.rs
++++ b/compiler/rustc_session/src/options.rs
+@@ -436,6 +436,7 @@ pub struct Options {
+         color: ColorConfig [UNTRACKED],
+         verbose: bool [TRACKED_NO_CRATE_HASH],
+         jobs: Jobs [UNTRACKED],
++        recommended_stack_size: usize [UNTRACKED],
+     }
+ );
+ 
+-- 
+2.55.0
+

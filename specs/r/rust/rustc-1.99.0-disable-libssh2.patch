@@ -1,7 +1,6 @@
-diff -up rustc-beta-src/src/tools/cargo/Cargo.lock.orig rustc-beta-src/src/tools/cargo/Cargo.lock
---- rustc-beta-src/src/tools/cargo/Cargo.lock.orig	2026-07-14 04:11:08.000000000 -0700
-+++ rustc-beta-src/src/tools/cargo/Cargo.lock	2026-07-16 16:04:08.643705052 -0700
-@@ -3016,7 +3016,6 @@ checksum = "005d6ae6eac1912906073e069f7d
+--- rustc-beta-src/src/tools/cargo/Cargo.lock.orig	2026-08-31 17:22:58.354582255 -0500
++++ rustc-beta-src/src/tools/cargo/Cargo.lock	2026-08-31 17:23:35.153103977 -0500
+@@ -3017,7 +3017,6 @@ checksum = "23c7391e4b9f4ffab1a624223cc1
  dependencies = [
   "cc",
   "libc",
@@ -30,9 +29,8 @@ diff -up rustc-beta-src/src/tools/cargo/Cargo.lock.orig rustc-beta-src/src/tools
  
  [[package]]
  name = "libz-sys"
-diff -up rustc-beta-src/src/tools/cargo/Cargo.toml.orig rustc-beta-src/src/tools/cargo/Cargo.toml
---- rustc-beta-src/src/tools/cargo/Cargo.toml.orig	2026-07-14 04:11:08.000000000 -0700
-+++ rustc-beta-src/src/tools/cargo/Cargo.toml	2026-07-16 16:05:21.304734301 -0700
+--- rustc-beta-src/src/tools/cargo/Cargo.toml.orig	2026-08-31 17:22:50.666473252 -0500
++++ rustc-beta-src/src/tools/cargo/Cargo.toml	2026-08-31 17:23:14.041192141 -0500
 @@ -51,7 +51,7 @@ filetime = "0.2.27"
  flate2 = { version = "1.1.9", default-features = false, features = ["zlib-rs"] }
  futures = { version = "0.3.32", default-features = false, features = ["std", "executor", "async-await"]}
