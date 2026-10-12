@@ -1,5 +1,0 @@
-[components.rust-nix]
-# Pin past the distro default snapshot (2026-02-24, nix 0.31.1) to Fedora f43
-# HEAD, which carries nix 0.31.3. uv 0.10.12 requires
-# crate(nix/default) >= 0.31.2, < 0.32.0, which 0.31.1 does not satisfy.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a5123770ff162c11cef0401690de0e3faa668a6e" }
