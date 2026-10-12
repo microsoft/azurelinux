@@ -169,6 +169,17 @@ required-capabilities = ["installer-media"]
 [tests.iso-validation.lisa]
 criteria = { testcase-names = ["verify_azurelinux_iso_install", "verify_lkg_iso_docker_container_workflows", "verify_lkg_iso_package_management_dnf", "verify_lkg_iso_dmi_firmware_metadata"] }
 
+# WSL runtime validation: boots the WSL image under WSL2 on a Windows host
+# (nested virtualization) and runs core OS sanity checks.
+[tests.wsl-runtime-validation]
+type                  = "lisa"
+description           = "Validates the Azure Linux WSL image installs and boots under WSL2 with core OS sanity checks"
+kind                  = "functional"
+required-capabilities = ["wsl"]
+
+[tests.wsl-runtime-validation.lisa]
+criteria = { testcase-names = ["verify_azurelinux_wsl_sanity"] }
+
 # ---- VM base test groups -------------------------------------------------
 
 # Functional coverage applicable to a VM-shaped Azure Linux image.
