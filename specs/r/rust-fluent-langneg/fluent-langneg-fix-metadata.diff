@@ -1,0 +1,20 @@
+--- fluent-langneg-0.13.0/Cargo.toml	2020-05-06T21:31:52+00:00
++++ fluent-langneg-0.13.0/Cargo.toml	2023-03-12T21:13:21.158254+00:00
+@@ -15,7 +15,7 @@
+ name = "fluent-langneg"
+ version = "0.13.0"
+ authors = ["Zibi Braniecki <gandalf@mozilla.com>"]
+-include = ["src/**/*", "benches/*.rs", "Cargo.toml", "README.md"]
++include = ["src/**/*", "benches/*.rs", "Cargo.toml", "README.md", "LICENSE"]
+ description = "A library for language and locale negotiation.\n"
+ homepage = "http://projectfluent.org/"
+ readme = "README.md"
+@@ -28,8 +28,6 @@
+ harness = false
+ [dependencies.unic-langid]
+ version = "0.9"
+-[dev-dependencies.criterion]
+-version = "0.3"
+ 
+ [dev-dependencies.serde]
+ version = "1.0"
