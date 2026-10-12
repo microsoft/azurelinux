@@ -1,38 +1,41 @@
-From b719e2d72779dd0493e38c8c71a5916dfd0d99c6 Mon Sep 17 00:00:00 2001
+From c9d8b6663ac62ce52f8e893207b56a02a0585533 Mon Sep 17 00:00:00 2001
 From: Josh Stone <jistone@redhat.com>
 Date: Thu, 30 Apr 2026 13:21:13 -0700
 Subject: [PATCH] Enable SHSTK by default on x86_64-unknown-linux-gnu
 
-(cherry picked from commit ab9f08d9ae374144bd78524a9edec007abcf9a35)
+(cherry picked from commit 1d7707c6d8102e2a0777a3595ac267885f5a5880)
 ---
- compiler/rustc_codegen_llvm/src/context.rs    |  9 ++---
+ compiler/rustc_codegen_llvm/src/context.rs    | 11 +++---
  compiler/rustc_session/src/config.rs          | 24 +++----------
  compiler/rustc_session/src/options.rs         | 35 +++++++++----------
  compiler/rustc_session/src/session.rs         | 10 ++++--
+ compiler/rustc_target/src/spec/json.rs        |  5 ++-
  compiler/rustc_target/src/spec/mod.rs         | 24 +++++++++++++
  .../spec/targets/x86_64_unknown_linux_gnu.rs  |  7 +++-
- 6 files changed, 63 insertions(+), 46 deletions(-)
+ tests/codegen-llvm/cf-protection.rs           |  2 +-
+ 8 files changed, 69 insertions(+), 49 deletions(-)
 
 diff --git a/compiler/rustc_codegen_llvm/src/context.rs b/compiler/rustc_codegen_llvm/src/context.rs
-index 3e575f969afa..f4f08ef2a517 100644
+index 621f2cd3f9fc..30a98ac3e1c3 100644
 --- a/compiler/rustc_codegen_llvm/src/context.rs
 +++ b/compiler/rustc_codegen_llvm/src/context.rs
-@@ -23,12 +23,12 @@
+@@ -22,12 +22,12 @@
  use rustc_middle::{bug, span_bug};
  use rustc_session::Session;
  use rustc_session::config::{
 -    BranchProtection, CFGuard, CFProtection, CrateType, DebugInfo, FunctionReturn, PAuthKey, PacRet,
 +    BranchProtection, CFGuard, CrateType, DebugInfo, FunctionReturn, PAuthKey, PacRet,
  };
- use rustc_span::{DUMMY_SP, Span, Spanned, Symbol};
- use rustc_symbol_mangling::mangle_internal_symbol;
+ use rustc_span::{DUMMY_SP, Span, Spanned, Symbol, sym};
  use rustc_target::spec::{
--    Arch, CfgAbi, Env, HasTargetSpec, Os, RelocModel, SmallDataThresholdSupport, Target, TlsModel,
-+    Arch, CFProtection, CfgAbi, Env, HasTargetSpec, Os, RelocModel, SmallDataThresholdSupport, Target, TlsModel,
+-    Arch, CfgAbi, Env, FramePointer, HasTargetSpec, Os, RelocModel, SmallDataThresholdSupport,
+-    Target, TlsModel,
++    Arch, CFProtection, CfgAbi, Env, FramePointer, HasTargetSpec, Os, RelocModel,
++    SmallDataThresholdSupport, Target, TlsModel,
  };
  use smallvec::SmallVec;
  
-@@ -427,7 +427,8 @@ pub(crate) unsafe fn create_module<'ll>(
+@@ -451,7 +451,8 @@ pub(crate) unsafe fn create_module<'ll>(
      }
  
      // Pass on the control-flow protection flags to LLVM (equivalent to `-fcf-protection` in Clang).
@@ -42,7 +45,7 @@ index 3e575f969afa..f4f08ef2a517 100644
          llvm::add_module_flag_u32(
              llmod,
              llvm::ModuleFlagMergeBehavior::Override,
-@@ -435,7 +436,7 @@ pub(crate) unsafe fn create_module<'ll>(
+@@ -459,7 +460,7 @@ pub(crate) unsafe fn create_module<'ll>(
              1,
          );
      }
@@ -52,7 +55,7 @@ index 3e575f969afa..f4f08ef2a517 100644
              llmod,
              llvm::ModuleFlagMergeBehavior::Override,
 diff --git a/compiler/rustc_session/src/config.rs b/compiler/rustc_session/src/config.rs
-index 2040cd48ec44..4229645f9216 100644
+index 4492cdf2d2f8..51828f4e824b 100644
 --- a/compiler/rustc_session/src/config.rs
 +++ b/compiler/rustc_session/src/config.rs
 @@ -72,22 +72,6 @@ pub enum CFGuard {
@@ -78,7 +81,7 @@ index 2040cd48ec44..4229645f9216 100644
  #[derive(Clone, Copy, Debug, PartialEq, Hash, StableHash, Encodable, Decodable)]
  pub enum OptLevel {
      /// `-Copt-level=0`
-@@ -3042,13 +3026,13 @@ pub(crate) mod dep_tracking {
+@@ -3088,13 +3072,13 @@ pub(crate) mod dep_tracking {
      use rustc_span::edition::Edition;
      use rustc_span::{RealFileName, RemapPathScopeComponents};
      use rustc_target::spec::{
@@ -91,16 +94,16 @@ index 2040cd48ec44..4229645f9216 100644
      };
  
      use super::{
--        AnnotateMoves, AutoDiff, BranchProtection, CFGuard, CFProtection, CoverageOptions,
-+        AnnotateMoves, AutoDiff, BranchProtection, CFGuard, CoverageOptions,
-         CrateType, DebugInfo, DebugInfoCompression, ErrorOutputType, FmtDebug, FunctionReturn,
-         InliningThreshold, InstrumentCoverage, InstrumentXRay, LinkerPluginLto, LocationDetail,
-         LtoCli, MirStripDebugInfo, NextSolverConfig, Offload, OptLevel, OutFileName, OutputType,
+-        AnnotateMoves, AutoDiff, BranchProtection, CFGuard, CFProtection, CodegenRetagOptions,
++        AnnotateMoves, AutoDiff, BranchProtection, CFGuard, CodegenRetagOptions,
+         CoverageOptions, CrateType, DebugInfo, DebugInfoCompression, ErrorOutputType, FmtDebug,
+         FunctionReturn, InliningThreshold, InstrumentCoverage, InstrumentMcount, InstrumentXRay,
+         LinkerPluginLto, LocationDetail, LtoCli, MirStripDebugInfo, NextSolverConfig, Offload,
 diff --git a/compiler/rustc_session/src/options.rs b/compiler/rustc_session/src/options.rs
-index aa9331ee8f65..e1e772e1265d 100644
+index e8e405f4a3df..412722cab01a 100644
 --- a/compiler/rustc_session/src/options.rs
 +++ b/compiler/rustc_session/src/options.rs
-@@ -15,9 +15,9 @@
+@@ -16,9 +16,9 @@
  use rustc_span::edition::Edition;
  use rustc_span::{RealFileName, RemapPathScopeComponents, SourceFileHashAlgorithm};
  use rustc_target::spec::{
@@ -113,7 +116,7 @@ index aa9331ee8f65..e1e772e1265d 100644
  };
  
  use crate::config::*;
-@@ -1286,22 +1286,20 @@ pub(crate) fn parse_cfguard(slot: &mut CFGuard, v: Option<&str>) -> bool {
+@@ -1314,22 +1314,20 @@ pub(crate) fn parse_cfguard(slot: &mut CFGuard, v: Option<&str>) -> bool {
          true
      }
  
@@ -148,7 +151,7 @@ index aa9331ee8f65..e1e772e1265d 100644
          true
      }
  
-@@ -2234,7 +2232,8 @@ pub(crate) fn parse_assert_incr_state(
+@@ -2310,7 +2308,8 @@ pub(crate) fn parse_rust_version(slot: &mut Option<RustcVersion>, v: Option<&str
          "whether the stable interface is being built"),
      cache_proc_macros: bool = (false, parse_bool, [TRACKED],
          "cache the results of derive proc macro invocations (potentially unsound!) (default: no"),
@@ -159,23 +162,23 @@ index aa9331ee8f65..e1e772e1265d 100644
      check_cfg_all_expected: bool = (false, parse_bool, [UNTRACKED],
          "show all expected values in check-cfg diagnostics (default: no)"),
 diff --git a/compiler/rustc_session/src/session.rs b/compiler/rustc_session/src/session.rs
-index 003164e8f905..bd0b9ffdb6c4 100644
+index 986dababf770..7252700d0e96 100644
 --- a/compiler/rustc_session/src/session.rs
 +++ b/compiler/rustc_session/src/session.rs
 @@ -29,9 +29,9 @@
  use rustc_span::{RealFileName, Span, Symbol};
  use rustc_target::asm::InlineAsmArch;
  use rustc_target::spec::{
--    Arch, CodeModel, DebuginfoKind, Os, PanicStrategy, RelocModel, RelroLevel, SanitizerSet,
--    SmallDataThresholdSupport, SplitDebuginfo, StackProtector, SymbolVisibility, Target,
--    TargetTuple, TlsModel, apple,
-+    Arch, CFProtection, CodeModel, DebuginfoKind, Os, PanicStrategy, RelocModel, RelroLevel,
-+    SanitizerSet, SmallDataThresholdSupport, SplitDebuginfo, StackProtector, SymbolVisibility,
-+    Target, TargetTuple, TlsModel, apple,
+-    Arch, CfgAbi, CodeModel, DebuginfoKind, Os, PanicStrategy, RelocModel, RelroLevel,
+-    SanitizerSet, SmallDataThresholdSupport, SplitDebuginfo, StackProtector, SymbolVisibility,
+-    Target, TargetTuple, TlsModel, apple,
++    Arch, CFProtection, CfgAbi, CodeModel, DebuginfoKind, Os, PanicStrategy, RelocModel,
++    RelroLevel, SanitizerSet, SmallDataThresholdSupport, SplitDebuginfo, StackProtector,
++    SymbolVisibility, Target, TargetTuple, TlsModel, apple,
  };
  
  use crate::code_stats::CodeStats;
-@@ -770,6 +770,10 @@ pub fn stack_protector(&self) -> StackProtector {
+@@ -775,6 +775,10 @@ pub fn stack_protector(&self) -> StackProtector {
          }
      }
  
@@ -186,11 +189,48 @@ index 003164e8f905..bd0b9ffdb6c4 100644
      pub fn must_emit_unwind_tables(&self) -> bool {
          // This is used to control the emission of the `uwtable` attribute on
          // LLVM functions. The `uwtable` attribute according to LLVM is:
+diff --git a/compiler/rustc_target/src/spec/json.rs b/compiler/rustc_target/src/spec/json.rs
+index 922b1fb3dff8..da14f40f9189 100644
+--- a/compiler/rustc_target/src/spec/json.rs
++++ b/compiler/rustc_target/src/spec/json.rs
+@@ -12,7 +12,7 @@
+     TargetKind, TargetOptions, TargetWarnings, TlsModel,
+ };
+ use crate::json::{Json, ToJson};
+-use crate::spec::{AbiMap, LlvmAbi};
++use crate::spec::{AbiMap, CFProtection, LlvmAbi};
+ 
+ impl Target {
+     /// Loads a target descriptor from a JSON object.
+@@ -225,6 +225,7 @@ macro_rules! forward_opt {
+         forward!(entry_name);
+         forward!(supports_fentry);
+         forward!(supports_xray);
++        forward!(cf_protection);
+ 
+         // we're going to run `update_from_cli`, but that won't change the target's AbiMap
+         // FIXME: better factor the Target definition so we enforce this on a type level
+@@ -410,6 +411,7 @@ macro_rules! target_option_val {
+         target_option_val!(entry_abi);
+         target_option_val!(supports_fentry);
+         target_option_val!(supports_xray);
++        target_option_val!(cf_protection);
+ 
+         // Serializing `-Clink-self-contained` needs a dynamic key to support the
+         // backwards-compatible variants.
+@@ -631,6 +633,7 @@ struct TargetSpecJson {
+     supports_fentry: Option<bool>,
+     supports_xray: Option<bool>,
+     entry_abi: Option<ExternAbiWrapper>,
++    cf_protection: Option<CFProtection>,
+ }
+ 
+ pub fn json_schema() -> schemars::Schema {
 diff --git a/compiler/rustc_target/src/spec/mod.rs b/compiler/rustc_target/src/spec/mod.rs
-index d6a9e27c4655..eee118962332 100644
+index 5c19b35e1605..87968b47d84a 100644
 --- a/compiler/rustc_target/src/spec/mod.rs
 +++ b/compiler/rustc_target/src/spec/mod.rs
-@@ -1374,6 +1374,26 @@ pub enum StackProtector {
+@@ -1357,6 +1357,26 @@ pub enum StackProtector {
  
  into_diag_arg_using_display!(StackProtector);
  
@@ -217,7 +257,7 @@ index d6a9e27c4655..eee118962332 100644
  crate::target_spec_enum! {
      pub enum BinaryFormat {
          Coff = "coff",
-@@ -2694,6 +2714,9 @@ pub struct TargetOptions {
+@@ -2691,6 +2711,9 @@ pub struct TargetOptions {
      /// since this is most common among tier 1 and tier 2 targets.
      pub supports_stack_protector: bool,
  
@@ -227,16 +267,16 @@ index d6a9e27c4655..eee118962332 100644
      /// The name of entry function.
      /// Default value is "main"
      pub entry_name: StaticCow<str>,
-@@ -2942,6 +2965,7 @@ fn default() -> TargetOptions {
+@@ -2941,6 +2964,7 @@ fn default() -> TargetOptions {
              c_enum_min_bits: None,
              generate_arange_section: true,
              supports_stack_protector: true,
 +            cf_protection: CFProtection::None,
              entry_name: "main".into(),
              entry_abi: CanonAbi::C,
-             supports_xray: false,
+             supports_fentry: false,
 diff --git a/compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs b/compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs
-index defa9f146d79..41c4a19b5270 100644
+index 0d87a7b760c6..03a9d644e1ec 100644
 --- a/compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs
 +++ b/compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs
 @@ -1,5 +1,6 @@
@@ -247,8 +287,8 @@ index defa9f146d79..41c4a19b5270 100644
  };
  
  pub(crate) fn target() -> Target {
-@@ -21,6 +22,10 @@ pub(crate) fn target() -> Target {
-         | SanitizerSet::REALTIME;
+@@ -22,6 +23,10 @@ pub(crate) fn target() -> Target {
+     base.supports_fentry = true;
      base.supports_xray = true;
  
 +    // Shadow Stack doesn't change codegen -- this only enables the SHSTK flag in
@@ -258,9 +298,8 @@ index defa9f146d79..41c4a19b5270 100644
      Target {
          llvm_target: "x86_64-unknown-linux-gnu".into(),
          metadata: TargetMetadata {
--- 
 diff --git a/tests/codegen-llvm/cf-protection.rs b/tests/codegen-llvm/cf-protection.rs
-index a1c902755af..b233b241a01 100644
+index a1c902755afb..b233b241a01f 100644
 --- a/tests/codegen-llvm/cf-protection.rs
 +++ b/tests/codegen-llvm/cf-protection.rs
 @@ -21,7 +21,7 @@
@@ -272,44 +311,6 @@ index a1c902755af..b233b241a01 100644
  
  // none-NOT: !"cf-protection-branch"
  // none-NOT: !"cf-protection-return"
---
-diff --git a/compiler/rustc_target/src/spec/json.rs b/compiler/rustc_target/src/spec/json.rs
-index c8a22205a5f..155dea32443 100644
---- a/compiler/rustc_target/src/spec/json.rs
-+++ b/compiler/rustc_target/src/spec/json.rs
-@@ -12,7 +12,7 @@
-     TargetKind, TargetOptions, TargetWarnings, TlsModel,
- };
- use crate::json::{Json, ToJson};
--use crate::spec::{AbiMap, LlvmAbi};
-+use crate::spec::{AbiMap, CFProtection, LlvmAbi};
- 
- impl Target {
-     /// Loads a target descriptor from a JSON object.
-@@ -224,6 +224,7 @@ macro_rules! forward_opt {
-         forward!(small_data_threshold_support);
-         forward!(entry_name);
-         forward!(supports_xray);
-+        forward!(cf_protection);
- 
-         // we're going to run `update_from_cli`, but that won't change the target's AbiMap
-         // FIXME: better factor the Target definition so we enforce this on a type level
-@@ -408,6 +409,7 @@ macro_rules! target_option_val {
-         target_option_val!(entry_name);
-         target_option_val!(entry_abi);
-         target_option_val!(supports_xray);
-+        target_option_val!(cf_protection);
- 
-         // Serializing `-Clink-self-contained` needs a dynamic key to support the
-         // backwards-compatible variants.
-@@ -630,6 +632,7 @@ struct TargetSpecJson {
-     entry_name: Option<StaticCow<str>>,
-     supports_xray: Option<bool>,
-     entry_abi: Option<ExternAbiWrapper>,
-+    cf_protection: Option<CFProtection>,
- }
- 
- pub fn json_schema() -> schemars::Schema {
---
+-- 
 2.55.0
 
