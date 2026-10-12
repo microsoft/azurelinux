@@ -1,4 +1,4 @@
-From d2fa68624463426e82f2ba19703159a46867384b Mon Sep 17 00:00:00 2001
+From d8b00ced0429722016cd35c2c5f392cd2b19d440 Mon Sep 17 00:00:00 2001
 From: Josh Stone <jistone@redhat.com>
 Date: Fri, 16 Aug 2024 10:12:58 -0700
 Subject: [PATCH] Use lld provided by system
@@ -50,7 +50,7 @@ index e2c1888e408..4869f85d1e6 100644
      Target {
          llvm_target: "aarch64-unknown-windows".into(),
 diff --git a/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs b/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
-index 520a59d6a6f..1606618b683 100644
+index 0afe7a0b68b..4671032a437 100644
 --- a/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
 +++ b/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
 @@ -19,7 +19,7 @@ pub(crate) fn target() -> Target {
@@ -59,11 +59,11 @@ index 520a59d6a6f..1606618b683 100644
          linker_flavor: LinkerFlavor::Gnu(Cc::No, Lld::Yes),
 -        linker: Some("rust-lld".into()),
 +        linker: Some("lld".into()),
-         rustc_abi: Some(RustcAbi::X86Softfloat),
+         rustc_abi: Some(RustcAbi::Softfloat),
          features: "-mmx,-sse,-sse2,-sse3,-ssse3,-sse4.1,-sse4.2,-avx,-avx2,+soft-float".into(),
          supported_sanitizers: SanitizerSet::KCFI | SanitizerSet::KERNELADDRESS,
 diff --git a/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs b/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
-index 8a494d0e56d..d2f4f3f42b4 100644
+index 333e20bd0ac..16bea38887b 100644
 --- a/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
 +++ b/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
 @@ -15,6 +15,7 @@ pub(crate) fn target() -> Target {
@@ -75,5 +75,5 @@ index 8a494d0e56d..d2f4f3f42b4 100644
      // We disable MMX and SSE for now, even though UEFI allows using them. Problem is, you have to
      // enable these CPU features explicitly before their first use, otherwise their instructions
 -- 
-2.51.1
+2.53.0
 

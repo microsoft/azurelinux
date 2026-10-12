@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 8;
+    release_number = 7;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -12,7 +12,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           rust
-Version:        1.94.1
+Version:        1.95.0
 Release:        %autorelease
 Summary:        The Rust Programming Language
 License:        (Apache-2.0 OR MIT) AND (Artistic-2.0 AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0 AND Unicode-3.0)
@@ -27,9 +27,9 @@ ExclusiveArch:  %{rust_arches}
 # To bootstrap from scratch, set the channel and date from src/stage0
 # e.g. 1.89.0 wants rustc: 1.88.0-2025-06-26
 # or nightly wants some beta-YYYY-MM-DD
-%global bootstrap_version 1.93.0
-%global bootstrap_channel 1.93.0
-%global bootstrap_date 2026-01-22
+%global bootstrap_version 1.94.0
+%global bootstrap_channel 1.94.0
+%global bootstrap_date 2026-03-05
 
 # Only the specified arches will use bootstrap binaries.
 # NOTE: Those binaries used to be uploaded with every new release, but that was
@@ -41,7 +41,7 @@ ExclusiveArch:  %{rust_arches}
 # We need CRT files for *-wasi targets, at least as new as the commit in
 # src/ci/docker/host-x86_64/dist-various-2/build-wasi-toolchain.sh
 %global wasi_libc_url https://github.com/WebAssembly/wasi-libc
-%global wasi_libc_ref wasi-sdk-29
+%global wasi_libc_ref wasi-sdk-32
 %global wasi_libc_name wasi-libc-%{wasi_libc_ref}
 %global wasi_libc_source %{wasi_libc_url}/archive/%{wasi_libc_ref}/%{wasi_libc_name}.tar.gz
 %global wasi_libc_dir %{_builddir}/%{wasi_libc_name}
@@ -147,20 +147,14 @@ Patch4:         0001-bootstrap-allow-disabling-target-self-contained.patch
 Patch5:         0002-set-an-external-library-path-for-wasm32-wasi.patch
 
 # We don't want to use the bundled library in libsqlite3-sys
-Patch6:         rustc-1.94.0-unbundle-sqlite.patch
+Patch6:         rustc-1.95.0-unbundle-sqlite.patch
 
 # stage0 tries to copy all of /usr/lib, sometimes unsuccessfully, see #143735
 Patch7:         0001-only-copy-rustlib-into-stage0-sysroot.patch
 
-# bootstrap: always propagate `CARGO_TARGET_{host}_LINKER`
-# https://github.com/rust-lang/rust/pull/152077
-Patch8:         0001-bootstrap-always-propagate-CARGO_TARGET_-host-_LINKE.patch
-
-# Fixes for LLVM 22 compatibility
-# https://github.com/rust-lang/rust/pull/151410
-Patch9:         0001-Update-amdgpu-data-layout.patch
-Patch10:        0002-Avoid-passing-addrspacecast-to-lifetime-intrinsics.patch
-Patch11:        0003-Don-t-use-evex512-with-LLVM-22.patch
+# https://github.com/rust-openssl/rust-openssl/pull/2591/
+# (only the openssl-sys changes, backported for 0.9.111)
+Patch8:         0001-openssl-4-support-2591.patch
 
 ### RHEL-specific patches below ###
 
@@ -171,10 +165,7 @@ Source102:      cargo_vendor.attr
 Source103:      cargo_vendor.prov
 
 # Disable cargo->libgit2->libssh2 on RHEL, as it's not approved for FIPS (rhbz1732949)
-Patch100:       rustc-1.94.1-disable-libssh2.patch
-
-# When building wasi, prevent linking a compiler-rt builtins library we don't have.
-Patch1000:	wasi-no-link-builtins.patch
+Patch100:       rustc-1.95.0-disable-libssh2.patch
 
 # Get the Rust triple for any architecture and ABI.
 %{lua: function rust_triple(arch, abi)
@@ -284,7 +275,11 @@ BuildRequires:  ncurses-devel
 BuildRequires:  curl-devel
 BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  pkgconfig(liblzma)
-BuildRequires:  pkgconfig(openssl)
+
+# Only specific versions of openssl are supported. They are 1.0.2 - 1.1.1, 3, or 4
+# The openssl-sys crate will also verify the release is supported.
+BuildRequires:  pkgconfig(openssl) < 5~
+
 BuildRequires:  pkgconfig(zlib)
 
 %if %{without bundled_libgit2}
@@ -392,6 +387,7 @@ BuildRequires:  mingw64-winpthreads-static
 %if %defined wasm_targets
 %if %with bundled_wasi_libc
 BuildRequires:  clang%{?llvm_compat_version}
+BuildRequires:  cmake >= 3.26
 %else
 BuildRequires:  wasi-libc-static
 %endif
@@ -712,9 +708,9 @@ test -f '%{local_rust_root}/bin/rustc'
 
 %if %{defined wasm_targets} && %{with bundled_wasi_libc}
 %setup -q -n %{wasi_libc_name} -T -b 10
-rm -rf %{wasi_libc_dir}/dlmalloc/
-
-%patch -P1000 -p1
+# We want to make sure we use emmalloc instead of CC0 dlmalloc.
+# The cmake files need the sources to exist, so just truncate instead.
+truncate --no-create --size=0 %{wasi_libc_dir}/dlmalloc/src/*.c
 %endif
 
 %setup -q -n %{rustc_package}
@@ -730,10 +726,7 @@ rm -rf %{wasi_libc_dir}/dlmalloc/
 %patch -P6 -p1
 %endif
 %patch -P7 -p1
-%patch -P8 -p1
-%patch -P9 -p1
-%patch -P10 -p1
-%patch -P11 -p1
+%patch -P8 -p2 -d vendor/openssl-sys-0.9.111
 
 %if %with disabled_libssh2
 %patch -P100 -p1
@@ -871,10 +864,19 @@ end}
 
 %if %defined wasm_targets
 %if %with bundled_wasi_libc
-%define wasi_libc_flags MALLOC_IMPL=emmalloc CC=clang AR=llvm-ar NM=llvm-nm
-%make_build --quiet -C %{wasi_libc_dir} %{wasi_libc_flags} TARGET_TRIPLE=wasm32-wasip1
+# Note that we don't want host CFLAGS here!
+env -u CFLAGS %__cmake \
+  -S "%{wasi_libc_dir}" \
+  -B "%{wasi_libc_dir}/%{__cmake_builddir}" \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_C_FLAGS_RELEASE="-O2 -fstack-protector" \
+  -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+  -DBUILD_SHARED=OFF \
+  -DMALLOC=emmalloc \
+  -DTARGET_TRIPLE=wasm32-wasip1
+%__cmake --build "%{wasi_libc_dir}/%{__cmake_builddir}" %{?_smp_mflags}
 %define wasm_target_config %{shrink:
-  --set target.wasm32-wasip1.wasi-root=%{wasi_libc_dir}/sysroot
+  --set target.wasm32-wasip1.wasi-root=%{wasi_libc_dir}/%{__cmake_builddir}/sysroot
 }
 %else
 %define wasm_target_config %{shrink:
@@ -930,6 +932,7 @@ test -r "%{optimized_builtins}"
   --set build.optimized-compiler-builtins=false \
   --set rust.llvm-tools=false \
   --set rust.verify-llvm-ir=true \
+  --set rust.remap-debuginfo=false \
   --enable-extended \
   --tools=cargo,clippy,rust-analyzer,rustdoc,rustfmt,src \
   --enable-vendor \
@@ -1299,6 +1302,24 @@ rm -rf "./build/%{rust_triple}/stage2-tools/%{rust_triple}/cit/"
 
 %changelog
 ## START: Generated by rpmautospec
+* Mon Oct 12 2026 Dan Streetman <ddstreet@ieee.org> - 1.95.0-7
+- fix(rust): upgrade to 1.95
+
+* Tue May 05 2026 Josh Stone <jistone@redhat.com> - 1.95.0-5
+- Disable remap-debuginfo for the toolchain
+
+* Mon May 04 2026 Josh Stone <jistone@redhat.com> - 1.95.0-4
+- Patch cargo's openssl-sys for openssl 4
+
+* Wed Apr 29 2026 Jesus Checa Hidalgo <jchecahi@redhat.com> - 1.95.0-3
+- rpminspect: (debuginfo) Ignore all i686 files in bin and libexec
+
+* Sat Apr 18 2026 Josh Stone <jistone@redhat.com> - 1.95.0-2
+- [eln] update to wasi-libc-32
+
+* Thu Apr 16 2026 Paul Murphy <murp@redhat.com> - 1.95.0-1
+- Update to Rust 1.95.0
+
 * Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1.94.1-8
 - build: mass rebuild auto-bumpable components
 
