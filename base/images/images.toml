@@ -213,7 +213,10 @@ openssl-fips-provider = "symcrypt"
 description = "WSL Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "wsl" }
 architectures = ["x86_64", "aarch64"]
-tests.tests = [{ name = "static-image-checks" }]
+tests.tests = [
+    { name = "static-image-checks" },
+    { name = "wsl-runtime-validation" },
+]
 
 [images.wsl.capabilities]
 machine-bootable = false
