@@ -1,0 +1,11 @@
+# Bazel is not packaged by Fedora. TensorFlow 2.21.0 pins Bazel 7.7.0, so
+# Azure Linux carries a local spec built from Bazel's self-contained dist archive.
+[components.bazel]
+spec = { type = "local", path = "bazel.spec" }
+release = { calculation = "autorelease" }
+
+[[components.bazel.source-files]]
+filename = "bazel-7.7.0-dist.zip"
+hash-type = "SHA256"
+hash = "277946818c77fff70be442864cecc41faac862b6f2d0d37033e2da0b1fee7e0f"
+origin = { type = "download", uri = "https://github.com/bazelbuild/bazel/releases/download/7.7.0/bazel-7.7.0-dist.zip" }
