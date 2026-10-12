@@ -1,7 +1,7 @@
 Summary:      Qt6 - QtDeclarative component
 Name:         qtdeclarative
 Version:      6.6.1
-Release:      2%{?dist}
+Release:      3%{?dist}
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -11,6 +11,7 @@ Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
 Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdeclarative-everywhere-src-%{version}.tar.xz
 Patch0:  CVE-2025-12385.patch
+Patch1:  CVE-2026-79616.patch
 
 ## upstream patches
 
@@ -220,6 +221,9 @@ popd
 %{_qt_libdir}/libQt6QmlXmlListModel.prl
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.1-3
+- Patch for CVE-2026-79616
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.1-2
 - Patch for CVE-2025-12385
 
@@ -349,7 +353,7 @@ popd
 - Upstream Release Candidate 1
 
 * Sun May 14 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.5.beta3
-- Conflict in qt5-qtdeclarative-devel (#1441343), fix Release: 1%%{?dist}
+- Conflict in qt5-qtdeclarative-devel (#1441343), fix Release: 3%{?dist}
 
 * Mon May 08 2017 Than Ngo <than@redhat.com> - 5.9.0-0.beta.4
 - drop useless qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch,
@@ -462,7 +466,7 @@ popd
 - use %%license
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta3
-- fix Source URL, Release: 1%%{?dist}
+- fix Source URL, Release: 3%{?dist}
 
 * Mon Dec 21 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.4
 - Update to final beta3 release
