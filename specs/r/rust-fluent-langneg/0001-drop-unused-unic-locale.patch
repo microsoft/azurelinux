@@ -1,0 +1,14 @@
+diff --git a/Cargo.toml b/Cargo.toml
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -39,10 +39,6 @@
+ version = "0.9"
+ features = ["macros"]
+ 
+-[dev-dependencies.unic-locale]
+-version = "0.9"
+-features = ["macros"]
+-
+ [features]
+ cldr = ["unic-langid/likelysubtags"]
+ default = []

@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Drop unic-locale dev-dependency unused by the published crate sources and benchmarks, without disabling tests"
+type = "patch-add"
+source = "../0001-drop-unused-unic-locale.patch"
