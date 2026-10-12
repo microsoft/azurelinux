@@ -1,22 +1,18 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/minisign.azl.macros}
-
 %bcond_with bootstrap
 
 %global public_key RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3
 
 Name:           minisign
 Version:        0.12
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        A dead simple tool to sign files and verify digital signatures
 License:        ISC
 URL:            https://github.com/jedisct1/minisign
 Source0:        %{url}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        %{url}/releases/download/%{version}/%{name}-%{version}.tar.gz.minisig
-Source9999: minisign.azl.macros
 
 BuildRequires:  libsodium-devel
 BuildRequires:  cmake
