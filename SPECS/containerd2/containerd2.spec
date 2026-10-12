@@ -1,6 +1,15 @@
+%global debug_package %{nil}
+%define upstream_name containerd
 %define commit_hash ee2735368117d2eb259779949d5e75cdafec9761
+
+Summary: Industry-standard container runtime
+Name: %{upstream_name}2
 Version: 2.3.6
 Release: 1%{?dist}
+License: ASL 2.0
+Group: Tools/Container
+URL: https://www.containerd.io
+Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
