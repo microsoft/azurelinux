@@ -11,8 +11,10 @@ def test_os_release_has_required_keys(os_release: dict[str, str]) -> None:
 
 
 def test_os_release_id(os_release: dict[str, str]) -> None:
+    """Verify os-release identifies Azure Linux."""
     assert os_release.get("ID") == "azurelinux"
 
 
 def test_os_release_version(os_release: dict[str, str]) -> None:
+    """Verify os-release identifies Azure Linux 4.0."""
     assert os_release.get("VERSION_ID") == "4.0"

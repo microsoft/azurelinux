@@ -120,14 +120,17 @@ INHERITANCE_TIE_BREAK_DEFAULT = "base"
 
 
 def log(msg: str) -> None:
+    """Write an informational message to standard error."""
     print(msg, file=sys.stderr, flush=True)
 
 
 def warn(msg: str) -> None:
+    """Write a warning message to standard error."""
     print(f"WARN: {msg}", file=sys.stderr, flush=True)
 
 
 def fatal(msg: str) -> int:
+    """Write an error message and return a failure status."""
     print(f"ERROR: {msg}", file=sys.stderr, flush=True)
     return 1
 
@@ -154,6 +157,7 @@ class InputRepo:
 
 
 def expand_repo_prefix(prefix: str, arches: Iterable[str]) -> list[InputRepo]:
+    """Expand a standard repository prefix into concrete input repos."""
     base = prefix.rstrip("/")
     out: list[InputRepo] = []
     for sub in SUBREPOS:
@@ -581,6 +585,7 @@ def query_azldev(
     scratch_dir: Path,
     known_components: set[str],
 ) -> AzldevRouting:
+    """Resolve package routing through azldev."""
     map_path = scratch_dir / "rpm_source_map.json"
     map_path.write_text(json.dumps(rpm_source_map, indent=2))
 
@@ -992,6 +997,7 @@ def emit_repos(
 
 
 def write_unpublished_report(unpublished: list[dict], output_dir: Path) -> tuple[Path, Path]:
+    """Write JSON and text reports for unpublished packages."""
     json_path = output_dir / "unpublished-packages.json"
     txt_path = output_dir / "unpublished-packages.txt"
     json_path.write_text(json.dumps(unpublished, indent=2))
@@ -1089,6 +1095,7 @@ class _OrderedRepoSourceAction(argparse.Action):
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse repository synthesis command-line arguments."""
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -1166,6 +1173,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Synthesize routed Azure Linux repositories."""
     args = parse_args(argv)
     arches = tuple(args.arch) if args.arch else DEFAULT_ARCHES
 

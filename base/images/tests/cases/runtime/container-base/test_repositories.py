@@ -20,6 +20,7 @@ pytestmark = pytest.mark.require_capability("runtime-package-management")
 
 
 def test_package_operations_use_production(container_exec_shell: ExecShell) -> None:
+    """Verify package operations use only Production repositories by default."""
     result = container_exec_shell("dnf --refresh makecache")
     assert result.exit_code == 0, f"Default repository refresh failed: {result.output}"
 
@@ -36,6 +37,7 @@ def test_package_operations_use_production(container_exec_shell: ExecShell) -> N
 
 
 def test_preview_requires_explicit_opt_in(container_exec_shell: ExecShell) -> None:
+    """Verify Preview repositories require non-persistent explicit opt-in."""
     result = container_exec_shell(
         "dnf --enable-repo=azurelinux-preview-base repolist --enabled",
     )

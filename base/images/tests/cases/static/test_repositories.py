@@ -20,6 +20,7 @@ PRODUCTION_REPOS = {f"azurelinux-{channel}" for channel in CHANNELS}
 
 @pytest.fixture
 def repositories(rootfs: Path) -> ConfigParser:
+    """Load the repository definitions shipped in the image."""
     config = ConfigParser(interpolation=None)
     for path in sorted((rootfs / "etc/yum.repos.d").glob("*.repo")):
         config.read_string(
@@ -40,6 +41,7 @@ def test_repository_defaults(
     preview: bool,
     suffix: str,
 ) -> None:
+    """Verify shipped repository URLs and enabled defaults."""
     repo_id = f"azurelinux-{'preview-' if preview else ''}{channel}{suffix}"
     assert repositories.has_section(repo_id), f"Missing repository definition: {repo_id}"
 
@@ -61,6 +63,7 @@ def test_repository_defaults(
 
 
 def test_only_production_repositories_enabled(repositories: ConfigParser) -> None:
+    """Verify only Production binary repositories are enabled by default."""
     enabled = {
         repo_id
         for repo_id in repositories.sections()

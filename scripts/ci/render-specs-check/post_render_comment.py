@@ -101,6 +101,7 @@ def format_comment(
     run_id: str | None = None,
     repo: str | None = None,
 ) -> str:
+    """Format rendered-spec drift as a GitHub pull request comment."""
     content_diffs = report.get("content_diffs", [])
     extra_files = report.get("extra_files", [])
     missing_files = report.get("missing_files", [])
@@ -294,6 +295,7 @@ def find_existing_comments(repo: str, pr: str) -> list[str]:
 
 
 def post_or_update_comment(repo: str, pr: str, body: str) -> None:
+    """Create or update the bot's rendered-spec drift comment."""
     existing_ids = find_existing_comments(repo, pr)
     fd, body_path = tempfile.mkstemp(prefix="render-check-comment-", suffix=".md")
     try:
@@ -333,6 +335,7 @@ def post_or_update_comment(repo: str, pr: str, body: str) -> None:
 
 
 def delete_comment_if_exists(repo: str, pr: str) -> None:
+    """Delete existing rendered-spec drift comments."""
     for existing_id in find_existing_comments(repo, pr):
         print(f"Deleting stale comment {existing_id}")
         try:
@@ -355,6 +358,7 @@ def delete_comment_if_exists(repo: str, pr: str) -> None:
 
 
 def main() -> int:
+    """Post rendered-spec drift results from command-line arguments."""
     parser = argparse.ArgumentParser(description="Post rendered-spec drift results as a PR comment.")
     parser.add_argument(
         "--report",

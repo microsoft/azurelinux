@@ -26,6 +26,7 @@ BLOCKLISTED_PACKAGES = {
 
 @pytest.mark.require_capability("runtime-package-management")
 def test_required_packages_installed(installed_packages: set[str]) -> None:
+    """Verify every required package is installed."""
     missing = REQUIRED_PACKAGES - installed_packages
     assert not missing, f"Required packages missing: {sorted(missing)}"
 
@@ -33,4 +34,5 @@ def test_required_packages_installed(installed_packages: set[str]) -> None:
 @pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.parametrize("pkg", sorted(BLOCKLISTED_PACKAGES))
 def test_blocklisted_package_absent(pkg: str, installed_packages: set[str]) -> None:
+    """Verify blocklisted packages are not installed."""
     assert pkg not in installed_packages, f"Blocklisted package installed: {pkg}"
