@@ -1,0 +1,315 @@
+From b719e2d72779dd0493e38c8c71a5916dfd0d99c6 Mon Sep 17 00:00:00 2001
+From: Josh Stone <jistone@redhat.com>
+Date: Thu, 30 Apr 2026 13:21:13 -0700
+Subject: [PATCH] Enable SHSTK by default on x86_64-unknown-linux-gnu
+
+(cherry picked from commit ab9f08d9ae374144bd78524a9edec007abcf9a35)
+---
+ compiler/rustc_codegen_llvm/src/context.rs    |  9 ++---
+ compiler/rustc_session/src/config.rs          | 24 +++----------
+ compiler/rustc_session/src/options.rs         | 35 +++++++++----------
+ compiler/rustc_session/src/session.rs         | 10 ++++--
+ compiler/rustc_target/src/spec/mod.rs         | 24 +++++++++++++
+ .../spec/targets/x86_64_unknown_linux_gnu.rs  |  7 +++-
+ 6 files changed, 63 insertions(+), 46 deletions(-)
+
+diff --git a/compiler/rustc_codegen_llvm/src/context.rs b/compiler/rustc_codegen_llvm/src/context.rs
+index 3e575f969afa..f4f08ef2a517 100644
+--- a/compiler/rustc_codegen_llvm/src/context.rs
++++ b/compiler/rustc_codegen_llvm/src/context.rs
+@@ -23,12 +23,12 @@
+ use rustc_middle::{bug, span_bug};
+ use rustc_session::Session;
+ use rustc_session::config::{
+-    BranchProtection, CFGuard, CFProtection, CrateType, DebugInfo, FunctionReturn, PAuthKey, PacRet,
++    BranchProtection, CFGuard, CrateType, DebugInfo, FunctionReturn, PAuthKey, PacRet,
+ };
+ use rustc_span::{DUMMY_SP, Span, Spanned, Symbol};
+ use rustc_symbol_mangling::mangle_internal_symbol;
+ use rustc_target::spec::{
+-    Arch, CfgAbi, Env, HasTargetSpec, Os, RelocModel, SmallDataThresholdSupport, Target, TlsModel,
++    Arch, CFProtection, CfgAbi, Env, HasTargetSpec, Os, RelocModel, SmallDataThresholdSupport, Target, TlsModel,
+ };
+ use smallvec::SmallVec;
+ 
+@@ -427,7 +427,8 @@ pub(crate) unsafe fn create_module<'ll>(
+     }
+ 
+     // Pass on the control-flow protection flags to LLVM (equivalent to `-fcf-protection` in Clang).
+-    if let CFProtection::Branch | CFProtection::Full = sess.opts.unstable_opts.cf_protection {
++    let cf_protection = sess.cf_protection();
++    if let CFProtection::Branch | CFProtection::Full = cf_protection {
+         llvm::add_module_flag_u32(
+             llmod,
+             llvm::ModuleFlagMergeBehavior::Override,
+@@ -435,7 +436,7 @@ pub(crate) unsafe fn create_module<'ll>(
+             1,
+         );
+     }
+-    if let CFProtection::Return | CFProtection::Full = sess.opts.unstable_opts.cf_protection {
++    if let CFProtection::Return | CFProtection::Full = cf_protection {
+         llvm::add_module_flag_u32(
+             llmod,
+             llvm::ModuleFlagMergeBehavior::Override,
+diff --git a/compiler/rustc_session/src/config.rs b/compiler/rustc_session/src/config.rs
+index 2040cd48ec44..4229645f9216 100644
+--- a/compiler/rustc_session/src/config.rs
++++ b/compiler/rustc_session/src/config.rs
+@@ -72,22 +72,6 @@ pub enum CFGuard {
+     Checks,
+ }
+ 
+-/// The different settings that the `-Z cf-protection` flag can have.
+-#[derive(Clone, Copy, PartialEq, Hash, Debug)]
+-pub enum CFProtection {
+-    /// Do not enable control-flow protection
+-    None,
+-
+-    /// Emit control-flow protection for branches (enables indirect branch tracking).
+-    Branch,
+-
+-    /// Emit control-flow protection for returns.
+-    Return,
+-
+-    /// Emit control-flow protection for both branches and returns.
+-    Full,
+-}
+-
+ #[derive(Clone, Copy, Debug, PartialEq, Hash, StableHash, Encodable, Decodable)]
+ pub enum OptLevel {
+     /// `-Copt-level=0`
+@@ -3042,13 +3026,13 @@ pub(crate) mod dep_tracking {
+     use rustc_span::edition::Edition;
+     use rustc_span::{RealFileName, RemapPathScopeComponents};
+     use rustc_target::spec::{
+-        CodeModel, FramePointer, MergeFunctions, OnBrokenPipe, PanicStrategy, RelocModel,
+-        RelroLevel, SanitizerSet, SplitDebuginfo, StackProtector, SymbolVisibility, TargetTuple,
+-        TlsModel,
++        CFProtection, CodeModel, FramePointer, MergeFunctions, OnBrokenPipe, PanicStrategy,
++        RelocModel, RelroLevel, SanitizerSet, SplitDebuginfo, StackProtector, SymbolVisibility,
++        TargetTuple, TlsModel,
+     };
+ 
+     use super::{
+-        AnnotateMoves, AutoDiff, BranchProtection, CFGuard, CFProtection, CoverageOptions,
++        AnnotateMoves, AutoDiff, BranchProtection, CFGuard, CoverageOptions,
+         CrateType, DebugInfo, DebugInfoCompression, ErrorOutputType, FmtDebug, FunctionReturn,
+         InliningThreshold, InstrumentCoverage, InstrumentXRay, LinkerPluginLto, LocationDetail,
+         LtoCli, MirStripDebugInfo, NextSolverConfig, Offload, OptLevel, OutFileName, OutputType,
+diff --git a/compiler/rustc_session/src/options.rs b/compiler/rustc_session/src/options.rs
+index aa9331ee8f65..e1e772e1265d 100644
+--- a/compiler/rustc_session/src/options.rs
++++ b/compiler/rustc_session/src/options.rs
+@@ -15,9 +15,9 @@
+ use rustc_span::edition::Edition;
+ use rustc_span::{RealFileName, RemapPathScopeComponents, SourceFileHashAlgorithm};
+ use rustc_target::spec::{
+-    CodeModel, FramePointer, LinkerFlavorCli, MergeFunctions, OnBrokenPipe, PanicStrategy,
+-    RelocModel, RelroLevel, SanitizerSet, SplitDebuginfo, StackProtector, SymbolVisibility,
+-    TargetTuple, TlsModel,
++    CFProtection, CodeModel, FramePointer, LinkerFlavorCli, MergeFunctions, OnBrokenPipe,
++    PanicStrategy, RelocModel, RelroLevel, SanitizerSet, SplitDebuginfo, StackProtector,
++    SymbolVisibility, TargetTuple, TlsModel,
+ };
+ 
+ use crate::config::*;
+@@ -1286,22 +1286,20 @@ pub(crate) fn parse_cfguard(slot: &mut CFGuard, v: Option<&str>) -> bool {
+         true
+     }
+ 
+-    pub(crate) fn parse_cfprotection(slot: &mut CFProtection, v: Option<&str>) -> bool {
+-        if v.is_some() {
+-            let mut bool_arg = None;
+-            if parse_opt_bool(&mut bool_arg, v) {
+-                *slot = if bool_arg.unwrap() { CFProtection::Full } else { CFProtection::None };
+-                return true;
++    pub(crate) fn parse_cfprotection(slot: &mut Option<CFProtection>, v: Option<&str>) -> bool {
++        let mut bool_arg = None;
++        *slot = Some(match v {
++            Some(_) if parse_opt_bool(&mut bool_arg, v) => {
++                if bool_arg.unwrap() {
++                    CFProtection::Full
++                } else {
++                    CFProtection::None
++                }
+             }
+-        }
+-
+-        *slot = match v {
+-            None | Some("none") => CFProtection::None,
+-            Some("branch") => CFProtection::Branch,
+-            Some("return") => CFProtection::Return,
+-            Some("full") => CFProtection::Full,
++            Some(s) if let Ok(cfp) = CFProtection::from_str(s) => cfp,
+             Some(_) => return false,
+-        };
++            None => CFProtection::None,
++        });
+         true
+     }
+ 
+@@ -2234,7 +2232,8 @@ pub(crate) fn parse_assert_incr_state(
+         "whether the stable interface is being built"),
+     cache_proc_macros: bool = (false, parse_bool, [TRACKED],
+         "cache the results of derive proc macro invocations (potentially unsound!) (default: no"),
+-    cf_protection: CFProtection = (CFProtection::None, parse_cfprotection, [TRACKED],
++    #[rustc_lint_opt_deny_field_access("use `Session::cf_protection` instead of this field")]
++    cf_protection: Option<CFProtection> = (None, parse_cfprotection, [TRACKED],
+         "instrument control-flow architecture protection"),
+     check_cfg_all_expected: bool = (false, parse_bool, [UNTRACKED],
+         "show all expected values in check-cfg diagnostics (default: no)"),
+diff --git a/compiler/rustc_session/src/session.rs b/compiler/rustc_session/src/session.rs
+index 003164e8f905..bd0b9ffdb6c4 100644
+--- a/compiler/rustc_session/src/session.rs
++++ b/compiler/rustc_session/src/session.rs
+@@ -29,9 +29,9 @@
+ use rustc_span::{RealFileName, Span, Symbol};
+ use rustc_target::asm::InlineAsmArch;
+ use rustc_target::spec::{
+-    Arch, CodeModel, DebuginfoKind, Os, PanicStrategy, RelocModel, RelroLevel, SanitizerSet,
+-    SmallDataThresholdSupport, SplitDebuginfo, StackProtector, SymbolVisibility, Target,
+-    TargetTuple, TlsModel, apple,
++    Arch, CFProtection, CodeModel, DebuginfoKind, Os, PanicStrategy, RelocModel, RelroLevel,
++    SanitizerSet, SmallDataThresholdSupport, SplitDebuginfo, StackProtector, SymbolVisibility,
++    Target, TargetTuple, TlsModel, apple,
+ };
+ 
+ use crate::code_stats::CodeStats;
+@@ -770,6 +770,10 @@ pub fn stack_protector(&self) -> StackProtector {
+         }
+     }
+ 
++    pub fn cf_protection(&self) -> CFProtection {
++        self.opts.unstable_opts.cf_protection.unwrap_or(self.target.options.cf_protection)
++    }
++
+     pub fn must_emit_unwind_tables(&self) -> bool {
+         // This is used to control the emission of the `uwtable` attribute on
+         // LLVM functions. The `uwtable` attribute according to LLVM is:
+diff --git a/compiler/rustc_target/src/spec/mod.rs b/compiler/rustc_target/src/spec/mod.rs
+index d6a9e27c4655..eee118962332 100644
+--- a/compiler/rustc_target/src/spec/mod.rs
++++ b/compiler/rustc_target/src/spec/mod.rs
+@@ -1374,6 +1374,26 @@ pub enum StackProtector {
+ 
+ into_diag_arg_using_display!(StackProtector);
+ 
++crate::target_spec_enum! {
++    /// The different settings for control-flow protection for targets,
++    /// which may also be overridden by `-Z cf-protection`.
++    pub enum CFProtection {
++        /// Do not enable control-flow protection
++        None = "none",
++
++        /// Emit control-flow protection for branches (enables indirect branch tracking).
++        Branch = "branch",
++
++        /// Emit control-flow protection for returns.
++        Return = "return",
++
++        /// Emit control-flow protection for both branches and returns.
++        Full = "full",
++    }
++
++    parse_error_type = "control-flow protection";
++}
++
+ crate::target_spec_enum! {
+     pub enum BinaryFormat {
+         Coff = "coff",
+@@ -2694,6 +2714,9 @@ pub struct TargetOptions {
+     /// since this is most common among tier 1 and tier 2 targets.
+     pub supports_stack_protector: bool,
+ 
++    /// The level of control-flow protection enabled for a target -- `None` by default.
++    pub cf_protection: CFProtection,
++
+     /// The name of entry function.
+     /// Default value is "main"
+     pub entry_name: StaticCow<str>,
+@@ -2942,6 +2965,7 @@ fn default() -> TargetOptions {
+             c_enum_min_bits: None,
+             generate_arange_section: true,
+             supports_stack_protector: true,
++            cf_protection: CFProtection::None,
+             entry_name: "main".into(),
+             entry_abi: CanonAbi::C,
+             supports_xray: false,
+diff --git a/compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs b/compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs
+index defa9f146d79..41c4a19b5270 100644
+--- a/compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs
++++ b/compiler/rustc_target/src/spec/targets/x86_64_unknown_linux_gnu.rs
+@@ -1,5 +1,6 @@
+ use crate::spec::{
+-    Arch, Cc, LinkerFlavor, Lld, SanitizerSet, StackProbeType, Target, TargetMetadata, base,
++    Arch, CFProtection, Cc, LinkerFlavor, Lld, SanitizerSet, StackProbeType, Target,
++    TargetMetadata, base,
+ };
+ 
+ pub(crate) fn target() -> Target {
+@@ -21,6 +22,10 @@ pub(crate) fn target() -> Target {
+         | SanitizerSet::REALTIME;
+     base.supports_xray = true;
+ 
++    // Shadow Stack doesn't change codegen -- this only enables the SHSTK flag in
++    // `.note.gnu.property` so glibc will use it when the system is enabled.
++    base.cf_protection = CFProtection::Return;
++
+     Target {
+         llvm_target: "x86_64-unknown-linux-gnu".into(),
+         metadata: TargetMetadata {
+-- 
+diff --git a/tests/codegen-llvm/cf-protection.rs b/tests/codegen-llvm/cf-protection.rs
+index a1c902755af..b233b241a01 100644
+--- a/tests/codegen-llvm/cf-protection.rs
++++ b/tests/codegen-llvm/cf-protection.rs
+@@ -21,7 +21,7 @@
+ pub fn test() {}
+ 
+ // undefined-NOT: !"cf-protection-branch"
+-// undefined-NOT: !"cf-protection-return"
++// undefined: !"cf-protection-return"
+ 
+ // none-NOT: !"cf-protection-branch"
+ // none-NOT: !"cf-protection-return"
+--
+diff --git a/compiler/rustc_target/src/spec/json.rs b/compiler/rustc_target/src/spec/json.rs
+index c8a22205a5f..155dea32443 100644
+--- a/compiler/rustc_target/src/spec/json.rs
++++ b/compiler/rustc_target/src/spec/json.rs
+@@ -12,7 +12,7 @@
+     TargetKind, TargetOptions, TargetWarnings, TlsModel,
+ };
+ use crate::json::{Json, ToJson};
+-use crate::spec::{AbiMap, LlvmAbi};
++use crate::spec::{AbiMap, CFProtection, LlvmAbi};
+ 
+ impl Target {
+     /// Loads a target descriptor from a JSON object.
+@@ -224,6 +224,7 @@ macro_rules! forward_opt {
+         forward!(small_data_threshold_support);
+         forward!(entry_name);
+         forward!(supports_xray);
++        forward!(cf_protection);
+ 
+         // we're going to run `update_from_cli`, but that won't change the target's AbiMap
+         // FIXME: better factor the Target definition so we enforce this on a type level
+@@ -408,6 +409,7 @@ macro_rules! target_option_val {
+         target_option_val!(entry_name);
+         target_option_val!(entry_abi);
+         target_option_val!(supports_xray);
++        target_option_val!(cf_protection);
+ 
+         // Serializing `-Clink-self-contained` needs a dynamic key to support the
+         // backwards-compatible variants.
+@@ -630,6 +632,7 @@ struct TargetSpecJson {
+     entry_name: Option<StaticCow<str>>,
+     supports_xray: Option<bool>,
+     entry_abi: Option<ExternAbiWrapper>,
++    cf_protection: Option<CFProtection>,
+ }
+ 
+ pub fn json_schema() -> schemars::Schema {
+--
+2.55.0
+
