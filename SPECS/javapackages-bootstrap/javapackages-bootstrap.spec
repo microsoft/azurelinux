@@ -19,7 +19,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.14.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -156,6 +156,7 @@ Source1120:     xz-java-1.9.tar.xz
 
 Patch0:       CVE-2024-25710.patch
 Patch1:       CVE-2026-24400.patch
+Patch2:       CVE-2026-102554.patch
 
 Provides:     bundled(ant) = 1.10.14
 Provides:     bundled(aopalliance) = 1.0
@@ -308,6 +309,7 @@ XMvn, allowing JPT to be used before one builds XMvn package.
 
 %prep
 %setup -q
+%patch 2 -p1
 
 # leave out the first source as it has already been extracted
 # leave out licensing breakdown file
@@ -413,6 +415,9 @@ sed -i s/_xmvngen_/_jpbgen_/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
 %doc AUTHORS
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.0-5
+- Patch for CVE-2026-102554
+
 * Fri Jan 30 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.14.0-4
 - Add patch for CVE-2026-24400
 
