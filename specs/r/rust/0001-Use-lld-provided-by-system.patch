@@ -1,4 +1,4 @@
-From d8b00ced0429722016cd35c2c5f392cd2b19d440 Mon Sep 17 00:00:00 2001
+From 2f68bbbaa31cef21b912ec4856e3187528ed9679 Mon Sep 17 00:00:00 2001
 From: Josh Stone <jistone@redhat.com>
 Date: Fri, 16 Aug 2024 10:12:58 -0700
 Subject: [PATCH] Use lld provided by system
@@ -12,10 +12,10 @@ Subject: [PATCH] Use lld provided by system
  5 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/compiler/rustc_target/src/spec/base/wasm.rs b/compiler/rustc_target/src/spec/base/wasm.rs
-index 7ede45766ea..b22362227bb 100644
+index 1f0f564a7790..9173337a1a69 100644
 --- a/compiler/rustc_target/src/spec/base/wasm.rs
 +++ b/compiler/rustc_target/src/spec/base/wasm.rs
-@@ -81,8 +81,7 @@ macro_rules! args {
+@@ -71,8 +71,7 @@ macro_rules! args {
          // threaded model which will legalize atomics to normal operations.
          singlethread: true,
  
@@ -26,19 +26,19 @@ index 7ede45766ea..b22362227bb 100644
  
          pre_link_args,
 diff --git a/compiler/rustc_target/src/spec/targets/aarch64_unknown_none_softfloat.rs b/compiler/rustc_target/src/spec/targets/aarch64_unknown_none_softfloat.rs
-index ad444c139bf..f5f8f18f8b8 100644
+index 05876891ebd7..9f389f9abec7 100644
 --- a/compiler/rustc_target/src/spec/targets/aarch64_unknown_none_softfloat.rs
 +++ b/compiler/rustc_target/src/spec/targets/aarch64_unknown_none_softfloat.rs
-@@ -15,7 +15,6 @@ pub(crate) fn target() -> Target {
-     let opts = TargetOptions {
-         abi: Abi::SoftFloat,
+@@ -16,7 +16,6 @@ pub(crate) fn target() -> Target {
+         cfg_abi: CfgAbi::SoftFloat,
+         rustc_abi: Some(RustcAbi::Softfloat),
          linker_flavor: LinkerFlavor::Gnu(Cc::No, Lld::Yes),
 -        linker: Some("rust-lld".into()),
          features: "+v8a,+strict-align,-neon".into(),
          relocation_model: RelocModel::Static,
          disable_redzone: true,
 diff --git a/compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs b/compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs
-index e2c1888e408..4869f85d1e6 100644
+index e2c1888e4084..4869f85d1e6e 100644
 --- a/compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs
 +++ b/compiler/rustc_target/src/spec/targets/aarch64_unknown_uefi.rs
 @@ -9,6 +9,7 @@ pub(crate) fn target() -> Target {
@@ -50,7 +50,7 @@ index e2c1888e408..4869f85d1e6 100644
      Target {
          llvm_target: "aarch64-unknown-windows".into(),
 diff --git a/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs b/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
-index 0afe7a0b68b..4671032a437 100644
+index 0afe7a0b68b0..4671032a437c 100644
 --- a/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
 +++ b/compiler/rustc_target/src/spec/targets/x86_64_unknown_none.rs
 @@ -19,7 +19,7 @@ pub(crate) fn target() -> Target {
@@ -63,7 +63,7 @@ index 0afe7a0b68b..4671032a437 100644
          features: "-mmx,-sse,-sse2,-sse3,-ssse3,-sse4.1,-sse4.2,-avx,-avx2,+soft-float".into(),
          supported_sanitizers: SanitizerSet::KCFI | SanitizerSet::KERNELADDRESS,
 diff --git a/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs b/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
-index 333e20bd0ac..16bea38887b 100644
+index 333e20bd0ac1..16bea38887be 100644
 --- a/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
 +++ b/compiler/rustc_target/src/spec/targets/x86_64_unknown_uefi.rs
 @@ -15,6 +15,7 @@ pub(crate) fn target() -> Target {
