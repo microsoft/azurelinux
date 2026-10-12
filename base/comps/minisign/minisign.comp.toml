@@ -1,6 +1,0 @@
-[components.minisign]
-# Temporary: use the published libsodium-devel to bootstrap the missing verifier.
-# Upstream bootstrap omits Minisign's self-dependency and its source-signature check;
-# libsodium's signature verification remains enabled. Remove once the bootstrap
-# verifier is tagged and available in the generated AZL build repository.
-build.with = ["bootstrap"]
