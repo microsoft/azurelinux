@@ -19,7 +19,6 @@ select = ["ALL"] # Everything
 ignore = [
     # Existing repository debt. Remove codes from this baseline as focused
     # cleanup changes make each rule green.
-    "B904",
     "BLE001",
     "C901",
     "COM812", # Conflicts with formatter.
@@ -41,8 +40,6 @@ ignore = [
     "S607",   # Requiring abspath for all binaries used is very restrictive
     "T201",   # These scripts are fine to use `print` for output
     "TRY003",
-    "TRY300",
-    "TRY301",
 ]
 
 fixable = ["ALL"]
