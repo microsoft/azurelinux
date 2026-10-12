@@ -43,7 +43,7 @@ config_opts['extra_chroot_dirs'] = ['/run/lock']
 config_opts['releasever'] = '4.0'
 config_opts['package_manager'] = 'dnf5'
 config_opts['update_before_build'] = False
-config_opts['root'] = 'azl-4.0-stage2-prod-{{ target_arch }}'
+config_opts['root'] = 'azl-4.0-prod-{{ target_arch }}'
 
 # When rpmautospec is enabled,
 # the %autorelease and %autochangelog macros can be used in spec files
@@ -76,10 +76,15 @@ module_platform_id=platform:f{{ releasever }}
 protected_packages=
 user_agent={{ user_agent }}
 
-[base]
-name=base
-baseurl=https://52.185.225.133/kojifiles/repos/azl4-build/latest/$basearch
-sslverify=0
+[azurelinux-base]
+name=Azure Linux 4 Base
+baseurl=https://packages.microsoft.com/azurelinux/4/prod/base/$basearch
+enabled=1
+skip_if_unavailable=False
+
+[azurelinux-builddeps]
+name=Azure Linux 4 Build Dependencies
+baseurl=https://packages.microsoft.com/azurelinux/4/prod/builddeps/$basearch
 enabled=1
 skip_if_unavailable=False
 

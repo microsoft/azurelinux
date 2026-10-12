@@ -1,58 +1,22 @@
 [distros.azurelinux]
 description = "Azure Linux"
 
-#
-# Azure Linux 4.0 Stage1
-#
-# This is an initial build of Azure Linux 4.0 that uses a Fedora 43
-# buildroot and Fedora 43 packages as build dependencies. The resulting
-# build outputs are consumed as inputs to Stage 2.
-#
-
-[distros.azurelinux.versions.'4.0-stage1']
-description = "Azure Linux 4.0 Stage1"
+[distros.azurelinux.versions.'4.0']
+description = "Azure Linux 4.0 (prod only)"
 release-ver = "4.0"
-mock-config-x86_64 = "mock/azl4/stage1/azurelinux-4.0-x86_64.cfg"
-mock-config-aarch64 = "mock/azl4/stage1/azurelinux-4.0-aarch64.cfg"
-kiwi-config-override = "kiwi/azl4/stage1/azurelinux-4.0-kiwi-override.yml"
+mock-config-x86_64 = "mock/azl4/azurelinux-4.0-x86_64.cfg"
+mock-config-aarch64 = "mock/azl4/azurelinux-4.0-aarch64.cfg"
+kiwi-config-override = "kiwi/azl4/azurelinux-4.0-kiwi-override.yml"
 
-[distros.azurelinux.versions.'4.0-stage1'.default-component-config]
-# NOTE: Ensure that the snapshot date matches the snapshot date used below for stage2.
+[distros.azurelinux.versions.'4.0'.default-component-config]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-10-01T00:00:00+00:00" } }
 
-#
-# Azure Linux 4.0 Stage2
-#
-# This build of Azure Linux 4.0 consumes the outputs of Stage 1 as inputs,
-# both for buildroot and build dependencies.
-#
-
-[distros.azurelinux.versions.'4.0-stage2']
-description = "Azure Linux 4.0 Stage2"
+[distros.azurelinux.versions.'4.0-preview']
+description = "Azure Linux 4.0 (prod + preview)"
 release-ver = "4.0"
-mock-config-x86_64 = "mock/azl4/stage2/azurelinux-4.0-x86_64.cfg"
-mock-config-aarch64 = "mock/azl4/stage2/azurelinux-4.0-aarch64.cfg"
-kiwi-config-override = "kiwi/azl4/stage2/azurelinux-4.0-kiwi-override.yml"
+mock-config-x86_64 = "mock/azl4/azurelinux-4.0-preview-x86_64.cfg"
+mock-config-aarch64 = "mock/azl4/azurelinux-4.0-preview-aarch64.cfg"
+kiwi-config-override = "kiwi/azl4/azurelinux-4.0-kiwi-override.yml"
 
-[distros.azurelinux.versions.'4.0-stage2'.default-component-config]
-# NOTE: Ensure that the snapshot date matches the snapshot date used above for stage1.
+[distros.azurelinux.versions.'4.0-preview'.default-component-config]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-10-01T00:00:00+00:00" } }
-
-#
-# Azure Linux 4.0 Stage2 (prod/PME)
-#
-# This build of Azure Linux 4.0 consumes the outputs of Stage 1 as inputs,
-# both for buildroot and build dependencies.
-#
-
-[distros.azurelinux.versions.'4.0-stage2-prod']
-description = "Azure Linux 4.0 Stage2 PROD"
-release-ver = "4.0"
-mock-config-x86_64 = "mock/azl4/stage2-prod/azurelinux-4.0-x86_64.cfg"
-mock-config-aarch64 = "mock/azl4/stage2-prod/azurelinux-4.0-aarch64.cfg"
-kiwi-config-override = "kiwi/azl4/stage2-prod/azurelinux-4.0-kiwi-override.yml"
-
-[distros.azurelinux.versions.'4.0-stage2-prod'.default-component-config]
-# NOTE: Ensure that the snapshot date matches the snapshot date used above for stage1.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-10-01T00:00:00+00:00" } }
-
