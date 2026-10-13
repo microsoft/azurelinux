@@ -94,6 +94,11 @@ extends:
     stages:
       - template: /.github/workflows/ado/templates/pr-check-ct-stages.yml@self
         parameters:
+          # PROD Koji currently serves certificates from a private CA with
+          # service-only DNS SANs while this pipeline reaches it through public
+          # IP addresses. Keep the exception explicit until Koji exposes a
+          # verifiable endpoint or CA/hostname pair.
+          allowInsecureKojiTls: true
           artifactBaseName: prcheckct
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           deployments:
@@ -115,6 +120,13 @@ extends:
               continueOnError: false
               serviceConnection: CT-Endpoints-Access-ServiceConnection-PROD
               skipPackageBuilds: false
+          # Overlay fresh scratch outputs onto the current preview
+          # repositories and reject newly introduced closure failures.
+          baseRepoUrl: https://packages.microsoft.com/azurelinux/4/preview/base/x86_64
+          builddepsRepoUrl: https://packages.microsoft.com/azurelinux/4/preview/builddeps/x86_64
+          enableCandidateClosureCheck: true
+          kojiFilesUrl: https://52.185.225.133/kojifiles
+          kojiWebUrl: https://172.202.186.211/koji
           outputDirectory: $(Build.ArtifactStagingDirectory)/output
           # Distro-config RPM build-environment for the 4.0 branch.
           packageEnvironment: "4.0"

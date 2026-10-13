@@ -84,7 +84,7 @@ def submit_and_monitor(
     request: ScenarioRequest,
     poll_timeout_seconds: int,
     wait_for_completion: bool,
-) -> None:
+) -> str:
     """Submit one package-build scenario and monitor its initial status."""
     if poll_timeout_seconds <= 0:
         print("##[error]--poll-timeout-seconds must be a positive integer.")
@@ -153,13 +153,13 @@ def submit_and_monitor(
             f"after {poll_timeout_seconds}s -- build accepted. "
             "Monitor progress in the Control Tower UI."
         )
-        return
+        return job_id
 
     ct.print_final_status(final)
 
     if final.get("status") == ct.SUCCESS_STATUS:
         print(f"Control Tower build job {job_id} completed successfully.")
-        return
+        return job_id
 
     ct.report_failure(final)
     raise SystemExit(1)
