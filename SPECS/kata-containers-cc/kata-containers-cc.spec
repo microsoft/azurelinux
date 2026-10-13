@@ -33,6 +33,14 @@ Patch14:      CVE-2026-93600.patch
 Patch15:      CVE-2026-42784.patch
 Patch16:      CVE-2026-93602.patch
 Patch17:      CVE-2026-81870.patch
+Patch18:      CVE-2026-107324.patch
+Patch19:      CVE-2026-63772.patch
+Patch20:      CVE-2026-78659.patch
+Patch21:      CVE-2026-78660.patch
+Patch22:      CVE-2026-78663.patch
+Patch23:      CVE-2026-78669.patch
+Patch24:      CVE-2026-94637.patch
+Patch25:      CVE-2026-97032.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -173,7 +181,7 @@ fi
 
 %changelog
 * Mon Sep 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-22
-- Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599, CVE-2026-42784, CVE-2026-81870, CVE-2026-93602
+- Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599, CVE-2026-42784, CVE-2026-81870, CVE-2026-93602, CVE-2026-97032, CVE-2026-94637, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-63772, CVE-2026-107324
 
 * Thu Sep 21 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-22                 - Backport upstream rustix#1663 to build with latest rust
 
