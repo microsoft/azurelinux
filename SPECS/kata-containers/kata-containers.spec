@@ -21,6 +21,8 @@ Patch7:         CVE-2026-78660.patch
 Patch8:         CVE-2026-78663.patch
 Patch9:         CVE-2026-78669.patch
 Patch10:        CVE-2026-97032.patch
+Patch11:        CVE-2026-81870.patch
+Patch12:        CVE-2026-107325.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang >= 1.25
 BuildRequires:  protobuf-compiler
@@ -134,7 +136,7 @@ popd
 
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.1.0.kata0-2
-- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107324
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107324, CVE-2026-81870, CVE-2026-107325
 
 * Fri Sep 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata0-1
 - Auto-upgrade to 4.1.0.kata0
