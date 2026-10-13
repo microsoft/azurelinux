@@ -1,0 +1,43 @@
+--- a/ml_dtypes/include/float8.h
++++ b/ml_dtypes/include/float8.h
+@@ -42,6 +42,40 @@
+ 
+ #include "Eigen/Core"
+ 
++// Eigen::numext::get_integer_by_size<> was only added to Eigen after the
++// 3.4.0 release; Azure Linux ships Eigen 3.4.0, which predates it, so
++// provide a compatible fallback definition here when it is missing.
++// See: https://gitlab.com/libeigen/eigen/-/blob/master/Eigen/src/Core/util/Meta.h
++namespace Eigen {
++namespace numext {
++template <size_t Size>
++struct get_integer_by_size {
++  using signed_type = void;
++  using unsigned_type = void;
++};
++template <>
++struct get_integer_by_size<1> {
++  using signed_type = int8_t;
++  using unsigned_type = uint8_t;
++};
++template <>
++struct get_integer_by_size<2> {
++  using signed_type = int16_t;
++  using unsigned_type = uint16_t;
++};
++template <>
++struct get_integer_by_size<4> {
++  using signed_type = int32_t;
++  using unsigned_type = uint32_t;
++};
++template <>
++struct get_integer_by_size<8> {
++  using signed_type = int64_t;
++  using unsigned_type = uint64_t;
++};
++}  // namespace numext
++}  // namespace Eigen
++
+ namespace ml_dtypes {
+ namespace float8_internal {
+ 

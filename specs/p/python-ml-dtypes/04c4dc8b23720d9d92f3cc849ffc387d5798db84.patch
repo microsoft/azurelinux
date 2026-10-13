@@ -1,0 +1,54 @@
+From 04c4dc8b23720d9d92f3cc849ffc387d5798db84 Mon Sep 17 00:00:00 2001
+From: Peter Hawkins <phawkins@google.com>
+Date: Thu, 12 Mar 2026 05:57:07 -0700
+Subject: [PATCH] Fix test cases that test for equality of NaNs of ml_dtypes
+ floats under NumPy 2.4.3.
+
+NumPy 2.4.3 changed its criterion for when numpy.testing.assert_array_equal will use "equal NaN" semantics. Currently ml_dtypes floats don't appear to be numeric types to NumPy, so NaNs no longer compare as equal. This is actually a helpful change in the future since once ml_dtypes migrates to NumPy 2's user dtype APIs we will be able to declare our types as such.
+
+For now, just cast types to float32 before testing for equality in tests.
+
+PiperOrigin-RevId: 882541951
+---
+ ml_dtypes/tests/custom_float_test.py | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/ml_dtypes/tests/custom_float_test.py b/ml_dtypes/tests/custom_float_test.py
+index 33a11592..410fccce 100644
+--- a/ml_dtypes/tests/custom_float_test.py
++++ b/ml_dtypes/tests/custom_float_test.py
+@@ -900,20 +900,28 @@ def testConformNumpyComplex(self, float_type):
+       numpy_assert_allclose(z_np, z_tf, atol=2e-2, float_type=float_type)
+ 
+   def testArange(self, float_type):
++    # TODO(phawkins): remove the casts to float32 once NumPy considers our float
++    # types to be numeric types.
+     np.testing.assert_equal(
+-        np.arange(1, 100, dtype=np.float32).astype(float_type),
+-        np.arange(1, 100, dtype=float_type),
++        np.arange(1, 100, dtype=np.float32)
++        .astype(float_type)
++        .astype(np.float32),
++        np.arange(1, 100, dtype=float_type).astype(np.float32),
+     )
+     if float_type == float8_e8m0fnu:
+       raise self.skipTest("Skip negative ranges for E8M0.")
+ 
+     np.testing.assert_equal(
+-        np.arange(-6, 6, 2, dtype=np.float32).astype(float_type),
+-        np.arange(-6, 6, 2, dtype=float_type),
++        np.arange(-6, 6, 2, dtype=np.float32)
++        .astype(float_type)
++        .astype(np.float32),
++        np.arange(-6, 6, 2, dtype=float_type).astype(np.float32),
+     )
+     np.testing.assert_equal(
+-        np.arange(-0.0, -2.0, -0.5, dtype=np.float32).astype(float_type),
+-        np.arange(-0.0, -2.0, -0.5, dtype=float_type),
++        np.arange(-0.0, -2.0, -0.5, dtype=np.float32)
++        .astype(float_type)
++        .astype(np.float32),
++        np.arange(-0.0, -2.0, -0.5, dtype=float_type).astype(np.float32),
+     )
+ 
+   @ignore_warning(category=RuntimeWarning, message="invalid value encountered")
