@@ -3,7 +3,7 @@
 
 Name:           wayland
 Version:        1.26.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Wayland Compositor Infrastructure
 
 # SPDX
@@ -21,7 +21,6 @@ BuildRequires:  expat-devel
 BuildRequires:  graphviz
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt
-BuildRequires:  mdbook
 BuildRequires:  meson
 BuildRequires:  pkgconfig(libffi)
 BuildRequires:  xmlto
@@ -29,6 +28,7 @@ BuildRequires:  xmlto
 # For origin certification
 BuildRequires:  gnupg2
 
+Patch0: 0001-doc-drop-mdbook-book.patch
 %description
 Wayland is a protocol for a compositor to talk to its clients as well as a C
 library implementation of that protocol. The compositor can be a standalone
@@ -67,9 +67,7 @@ developing applications that use %{name}.
 %package doc
 Summary: Wayland development documentation
 BuildArch: noarch
-# Required for mdbook generated docs
-Requires: adobe-source-code-pro-fonts
-Requires: open-sans-fonts
+
 
 %description doc
 Wayland development documentation

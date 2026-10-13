@@ -1,0 +1,27 @@
+From: Azure Linux <azurelinux@microsoft.com>
+Subject: [PATCH] doc: do not build the mdbook-generated book
+
+mdbook is not available in Azure Linux. Skip the book so the doxygen man
+pages and publican documentation can still be built with
+-Ddocumentation=true.
+
+---
+ doc/meson.build | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/doc/meson.build b/doc/meson.build
+--- a/doc/meson.build
++++ b/doc/meson.build
+@@ -6,7 +6,6 @@
+ doxygen = find_program('doxygen')
+ xsltproc = find_program('xsltproc')
+ xmlto = find_program('xmlto')
+-mdbook = find_program('mdbook')
+ 
+ cmd = run_command(doxygen, '--version', check: true)
+ message('doxygen: ' + cmd.stdout().strip())
+@@ -40,4 +39,3 @@
+ 
+ subdir('doxygen')
+ subdir('publican')
+-subdir('book')
