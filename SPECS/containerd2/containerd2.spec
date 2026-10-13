@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.3.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -21,6 +21,11 @@ Patch1:	tardev-support.patch
 Patch2:	fix-TestCgroupNamespace-cgroupv1.patch
 Patch3:	CVE-2026-56852.patch
 Patch4:	CVE-2026-37236.patch
+Patch5:	CVE-2026-61801.patch
+Patch6:	CVE-2026-78659.patch
+Patch7:	CVE-2026-78660.patch
+Patch8:	CVE-2026-78669.patch
+Patch9:	CVE-2026-97032.patch
 
 %{?systemd_requires}
 
@@ -101,6 +106,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.6-2
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801
+
 * Sat Oct 10 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.3.6-1
 - Upgrade to 2.3.6 for CVE-2026-53493, CVE-2026-53495, CVE-2026-95838
 
