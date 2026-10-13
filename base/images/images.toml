@@ -276,6 +276,20 @@ container = false
 systemd = true
 runtime-package-management = true
 fips-enabled = true
+
+[images.1p-vm-base-gen2-cvm]
+description = "1P VM Base Gen2 CVM Image (UKI)"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2-cvm" }
+architectures = ["x86_64"]
+tests.tests = [{ name = "static-image-checks" }]
+
+[images.1p-vm-base-gen2-cvm.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+cvm = true
+
 [images.marketplace-gen2]
 description = "Marketplace Gen2 Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "marketplace-gen2" }
