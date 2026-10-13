@@ -21,6 +21,8 @@ Patch7:         CVE-2026-78660.patch
 Patch8:         CVE-2026-78663.patch
 Patch9:         CVE-2026-78669.patch
 Patch10:        CVE-2026-97032.patch
+Patch11:        CVE-2026-81870.patch
+Patch12:        CVE-2026-107325.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang >= 1.25
 BuildRequires:  protobuf-compiler
