@@ -1,0 +1,2 @@
+[components.php-sebastian-git-state1]
+build.without = ["tests"]

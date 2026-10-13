@@ -1,0 +1,2 @@
+[components.php-sebastian-recursion-context8]
+build.without = ["tests"]
