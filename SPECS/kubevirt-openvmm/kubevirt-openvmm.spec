@@ -7,13 +7,13 @@
 
 %define _missing_build_ids_terminate_build 0
 
-%global sha 9f115538e7
+%global sha dc700f99f4
 %global msvm_version 26.0.37
 
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
-Version:        0.1.0
-Release:        4%{?dist}
+Version:        1.8.4
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,9 +25,6 @@ Source1:        https://github.com/microsoft/mu_msvm/releases/download/v%{msvm_v
 Source2:        x64.json
 Source3:        x64-confidential.json
 %endif
-# TODO: Remove the patch below when the following PR is merged:
-# https://github.com/microsoft/kubevirt/pull/36
-Patch0:         0001-Change-openvmm-binary-path-to-usr-bin-openvmm.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -299,14 +296,6 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 %{_bindir}/virt-tests
 
 %changelog
-* Wed Oct 07 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-4
-- Remove -N from autosetup command so that patches can be applied
-
-* Wed Oct 07 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-3
+* Tue Oct 13 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.8.4-1
 - Add temporary x86 OpenVMM firmware and UEFI templates
-
-* Tue Oct 06 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-2
-- Add patch to update OpenVMM binary path to what openvmm RPM installs
-
-* Tue Oct 06 2026 Microsoft Corporation <linux@microsoft.com> - 0.1.0-1
 - Original version for Azure Linux
