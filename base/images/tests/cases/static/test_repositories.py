@@ -38,7 +38,7 @@ def repositories(rootfs: Path) -> ConfigParser:
 def test_repository_defaults(
     repositories: ConfigParser,
     channel: str,
-    preview: bool,
+    preview: bool,  # noqa: FBT001 - pytest parametrization defines the signature
     suffix: str,
 ) -> None:
     """Verify shipped repository URLs and enabled defaults."""
