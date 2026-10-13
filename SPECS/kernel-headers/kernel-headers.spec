@@ -10,14 +10,8 @@
     %global build_cross 0
     %define cross_archs %{nil}
 %endif
-
-Summary:        Linux API header files
-Name:           kernel-headers
-Version:        6.6.157.1
+Version:        6.6.158.1
 Release:        2%{?dist}
-License:        GPLv2
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
@@ -72,14 +66,17 @@ done
 %files -n kernel-cross-headers
 %defattr(-,root,root)
 %{_prefix}/*-linux-gnu/*
-%endif
-
-%changelog
-* Thu Oct 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.157.1-2
+* Tue Oct 13 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.158.1-2
 - Bump release to match kernel
+
+* Mon Oct 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.158.1-1
+- Auto-upgrade to 6.6.158.1
 
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.157.1-1
 - Auto-upgrade to 6.6.157.1
+
+* Sat Aug 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.152.1-1
+- Auto-upgrade to 6.6.152.1
 
 * Sat Aug 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.152.1-1
 - Auto-upgrade to 6.6.152.1
