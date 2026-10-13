@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        13.2.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,6 +65,8 @@ URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-4039.patch
 Patch1:         0011-libsanitizer-Remove-crypt-and-crypt_r-interceptors.patch
+Patch2:         CVE-2026-102010.patch
+Patch3:         CVE-2026-95619.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
@@ -477,7 +479,7 @@ $tests_ok
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_libdir}/libcc1.*
+%{_lib64dir}/libcc1.*
 
 %files c++
 %defattr(-,root,root)
@@ -523,6 +525,10 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2.0-8
+- Patch for CVE-2026-95619, CVE-2026-102010
+- Package libcc1 from /usr/lib64 in libgcc-devel
+
 * Fri Jun 21 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-7
 - Re-enable CVE-2023-4039.patch and refresh against 13.2.0 source
 
