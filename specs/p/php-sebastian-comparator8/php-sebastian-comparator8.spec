@@ -13,7 +13,8 @@
 # Please, preserve the changelog entries
 #
 
-%bcond_without       tests
+# Until phpunit 10.3 available
+%bcond_with          tests
 
 %global gh_owner     sebastianbergmann
 %global gh_project   comparator
@@ -27,8 +28,8 @@
 %global ns_project   Comparator
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        8.1.4
-Release: 5%{?dist}
+Version:        8.4.0
+Release: 6%{?dist}
 Summary:        Compare PHP values for equality, version %{major}
 
 License:        BSD-3-Clause
@@ -46,23 +47,23 @@ BuildRequires:  php-mbstring
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^13.0"
-BuildRequires:  phpunit13
-BuildRequires:  (php-composer(%{pk_vendor}/diff)     >= 8.3   with php-composer(%{pk_vendor}/diff)     < 9)
-BuildRequires:  (php-composer(%{pk_vendor}/exporter) >= 8.0   with php-composer(%{pk_vendor}/exporter) < 9)
+#        "phpunit/phpunit": "^13.3"
+BuildRequires:  phpunit13 >= 13.3
+BuildRequires:  (php-composer(%{pk_vendor}/diff)     >= 9.0   with php-composer(%{pk_vendor}/diff)     < 10)
+BuildRequires:  (php-composer(%{pk_vendor}/exporter) >= 8.2   with php-composer(%{pk_vendor}/exporter) < 9)
 %endif
 
 # from composer.json
 #        "php": ">=8.4",
-#        "sebastian/diff": "^8.3",
-#        "sebastian/exporter": "^8.0"
+#        "sebastian/diff": "^9.0",
+#        "sebastian/exporter": "^8.2"
 #        "ext-dom": "*",
 #        "ext-mbstring": "*"
 Requires:       php(language) >= 8.4
 Requires:       php-dom
 Requires:       php-mbstring
-Requires:       (php-composer(%{pk_vendor}/diff)     >= 8.3   with php-composer(%{pk_vendor}/diff)     < 9)
-Requires:       (php-composer(%{pk_vendor}/exporter) >= 8.0   with php-composer(%{pk_vendor}/exporter) < 9)
+Requires:       (php-composer(%{pk_vendor}/diff)     >= 9.0   with php-composer(%{pk_vendor}/diff)     < 10)
+Requires:       (php-composer(%{pk_vendor}/exporter) >= 8.2   with php-composer(%{pk_vendor}/exporter) < 9)
 # from phpcompatinfo report for version 6.3.0
 #   Only core, date, spl (bcmath is optional)
 # Autoloader
@@ -91,7 +92,7 @@ phpab --template fedora --output src/autoload.php src
 cat <<EOF | tee -a src/autoload.php
 
 \Fedora\Autoloader\Dependencies::required([
-    '%{php_home}/%{ns_vendor}/Diff8/autoload.php',
+    '%{php_home}/%{ns_vendor}/Diff9/autoload.php',
     '%{php_home}/%{ns_vendor}/Exporter8/autoload.php',
 ]);
 EOF
@@ -109,7 +110,7 @@ mkdir vendor
 
 : Run upstream test suite
 ret=0
-for cmd in php php84 php85; do
+for cmd in php php84 php85 php86; do
   if which $cmd; then
     $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
       %{_bindir}/phpunit13 --bootstrap vendor/autoload.php --no-coverage || ret=1
@@ -128,6 +129,22 @@ exit $ret
 
 
 %changelog
+* Fri Aug  7 2026 Remi Collet <remi@remirepo.net> - 8.4.0-1
+- update to 8.4.0
+- raise dependency on sebastian/exporter 8.2
+
+* Fri Jun  5 2026 Remi Collet <remi@remirepo.net> - 8.3.0-1
+- update to 8.3.0
+- raise dependency on sebastian/diff 9.0
+- raise dependency on sebastian/exporter 8.1
+
+* Thu May 21 2026 Remi Collet <remi@remirepo.net> - 8.2.1-1
+- update to 8.2.1
+
+* Wed May 20 2026 Remi Collet <remi@remirepo.net> - 8.2.0-1
+- update to 8.2.0
+- raise dependency on sebastian/exporter 8.0.3
+
 * Sat May 16 2026 Remi Collet <remi@remirepo.net> - 8.1.4-1
 - update to 8.1.4
 - raise dependency on sebastian/diff 8.3

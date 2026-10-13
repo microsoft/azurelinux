@@ -1,0 +1,2 @@
+[components.php-phpunit-php-code-coverage14]
+build.without = ["tests"]

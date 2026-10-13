@@ -1,0 +1,2 @@
+[components.php-sebastian-object-enumerator8]
+build.without = ["tests"]

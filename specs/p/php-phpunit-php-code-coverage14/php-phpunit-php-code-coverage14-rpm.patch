@@ -1,0 +1,15 @@
+diff -up php-code-coverage-14.3.0/src/Util/PhpParserVersion.php.rpm php-code-coverage-14.3.0/src/Util/PhpParserVersion.php
+--- php-code-coverage-14.3.0/src/Util/PhpParserVersion.php.rpm	2026-08-07 11:03:54.499835008 +0200
++++ php-code-coverage-14.3.0/src/Util/PhpParserVersion.php	2026-08-07 11:04:04.830348977 +0200
+@@ -96,6 +96,11 @@ final class PhpParserVersion
+      */
+     private static function detect(): string
+     {
++        if (defined("RPM_NIKIC_PHP_PARSER_VERSION")) {
++            self::$exact = self::isExactVersion(RPM_NIKIC_PHP_PARSER_VERSION);
++            return RPM_NIKIC_PHP_PARSER_VERSION;
++       }
++
+         if (Phar::isBundled()) {
+             // @codeCoverageIgnoreStart
+             return self::versionFromPharManifest();

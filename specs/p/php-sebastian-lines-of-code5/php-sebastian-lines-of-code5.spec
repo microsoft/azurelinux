@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/php-sebastian-lines-of-code5.azl.macros}
+
 # remirepo/fedora spec file for php-sebastian-lines-of-code5
 #
 # SPDX-FileCopyrightText:  Copyright 2020-2026 Remi Collet
@@ -26,7 +29,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        5.0.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Counting the lines of code in PHP source code, version %{major}
 
 License:        BSD-3-Clause
@@ -34,6 +37,7 @@ URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
 Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
+Source9999: php-sebastian-lines-of-code5.azl.macros
 
 BuildArch:      noarch
 BuildRequires:  php(language) >= 8.4.1
