@@ -101,7 +101,7 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 * Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.27.0-4
 - Fix CVE-2025-22869, CVE-2024-10846 with an upstream patch
 
-* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.27.0-3
+* Thu Jan 09 2025 Rohit Rawat <rohitrawat@microsoft.com> - 2.27.0-3
 - Add patch for CVE-2024-45338
 
 * Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 2.27.0-2
