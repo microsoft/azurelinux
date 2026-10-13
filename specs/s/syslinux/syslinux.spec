@@ -13,7 +13,7 @@ Summary: Simple kernel loader which boots from a FAT filesystem
 Name: syslinux
 Version: 6.04
 %define tarball_version 6.04-pre1
-Release: 0.34%{?dist}
+Release: 0.35%{?dist}
 License: GPL-2.0-or-later
 URL: http://syslinux.zytor.com/wiki/index.php/The_Syslinux_Project
 Source0: http://www.kernel.org/pub/linux/utils/boot/syslinux/%{name}-%{tarball_version}.tar.xz
@@ -91,7 +91,6 @@ booting in the /tftpboot directory.
 %package extlinux-nonlinux
 Summary: The parts of the EXTLINUX bootloader which aren't run from linux.
 Requires: syslinux
-BuildArch: noarch
 ExclusiveArch: %{ix86} x86_64
 
 %description extlinux-nonlinux
@@ -101,7 +100,6 @@ from a linux host.
 %package nonlinux
 Summary: SYSLINUX modules which aren't run from linux.
 Requires: syslinux
-BuildArch: noarch
 ExclusiveArch: %{ix86} x86_64
 
 %description nonlinux
