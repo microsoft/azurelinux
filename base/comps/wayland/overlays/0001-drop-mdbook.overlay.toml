@@ -1,0 +1,32 @@
+# mdbook is not packaged in Azure Linux. Upstream wayland 1.26.0 builds its
+# mdbook "book" unconditionally when -Ddocumentation=true. Patch the book out
+# of the build and drop the matching dependencies, keeping the doxygen man
+# pages and publican docs.
+
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Skip the mdbook-generated book in doc/meson.build"
+type = "patch-add"
+source = "../0001-doc-drop-mdbook-book.patch"
+
+[[overlays]]
+description = "Remove the mdbook BuildRequires, which is unavailable in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mdbook"
+
+[[overlays]]
+description = "Remove the font Requires of the doc subpackage that were only needed by the mdbook-generated book"
+type = "spec-remove-tag"
+package = "doc"
+tag = "Requires"
+
+[[overlays]]
+description = "Remove the now-stale comment about mdbook-generated docs"
+type = "spec-search-replace"
+section = "%package"
+package = "doc"
+regex = '^# Required for mdbook generated docs$'
