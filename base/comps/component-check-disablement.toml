@@ -171,6 +171,7 @@ components = [
     "rubygem-selenium-webdriver",
     "rubygem-sprockets-rails",
     "rubygem-webmock",
+    "rust-nix",
     "rust-nix0.23",
     "rust-nix0.28",
     "rust-nix0.29",
