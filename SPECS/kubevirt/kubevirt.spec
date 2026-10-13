@@ -41,6 +41,8 @@ Patch9:         CVE-2026-78660.patch
 Patch10:        CVE-2026-78663.patch
 Patch11:        CVE-2026-78669.patch
 Patch12:        CVE-2026-97032.patch
+Patch13:        CVE-2026-13201.patch
+Patch14:        CVE-2026-13622.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -299,7 +301,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 
 %changelog
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.4-4
-- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107325, CVE-2026-107324
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107325, CVE-2026-107324, CVE-2026-13201, CVE-2026-13622
 
 * Thu Sep 17 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.8.4-3
 - Patch for CVE-2026-84445 and CVE-2026-84304, CVE-2026-93450 by generating new go vendor tarball
