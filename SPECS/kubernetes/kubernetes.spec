@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        31%{?dist}
+Release:        32%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,6 +62,11 @@ Patch13:        CVE-2026-84304.patch
 Patch14:        fix-cel-go-otelgrpc-api-migration.patch
 Patch15:        fix-vendor-modules-for-runc-backports.patch
 Patch16:        fix-non-constant-format-strings.patch
+Patch17:        CVE-2026-78659.patch
+Patch18:        CVE-2026-78660.patch
+Patch19:        CVE-2026-78663.patch
+Patch20:        CVE-2026-78669.patch
+Patch21:        CVE-2026-97032.patch
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
@@ -320,6 +325,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-32
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
+
 * Thu Sep 17 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.30.10-31
 - Patch for CVE-2026-84304, CVE-2026-84445, CVE-2026-83530
 - Removed patches CVE-2024-45338, CVE-2025-22868, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911,
