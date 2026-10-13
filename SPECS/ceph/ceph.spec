@@ -4,8 +4,8 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        18.2.2
-Release:        13%{?dist}
+Version:        18.2.8
+Release:        14%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -28,11 +28,14 @@ Patch13:        CVE-2020-10724.patch
 Patch14:        CVE-2025-1744.patch
 Patch15:        CVE-2021-28361.patch
 Patch16:        CVE-2020-14378.patch
-Patch17:        CVE-2025-52555.patch
-Patch18:        CVE-2024-48916.patch
+#Patch17:        CVE-2025-52555.patch
+#Patch18:        CVE-2024-48916.patch
 Patch19:        CVE-2025-9648.patch
 Patch20:        CVE-2024-47866.patch
 Patch21:        CVE-2026-54330.patch
+Patch22:        ceph-volume-importlib-metadata-compat.patch
+Patch23:        mgr-subinterpreter-modules.patch
+Patch24:        rgw-common-link-openssl.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -395,6 +398,7 @@ of cluster membership, configuration, and state.
 %package mgr
 Summary:        Ceph Manager Daemon
 Requires:       ceph-base = %{version}-%{release}
+Requires:       ceph-mgr-modules-core = %{version}-%{release}
 
 %description mgr
 ceph-mgr enables python modules that provide services (such as the REST
@@ -433,6 +437,22 @@ Requires:       python%{python3_pkgversion}-scipy
 ceph-mgr-diskprediction-local is a ceph-mgr module that tries to predict
 disk failures using local algorithms and machine-learning databases.
 %endif
+
+%package mgr-modules-core
+Summary:        Ceph Manager modules which are always enabled
+BuildArch:      noarch
+Requires:       python%{python3_pkgversion}-bcrypt
+Requires:       python%{python3_pkgversion}-pecan
+Requires:       python%{python3_pkgversion}-pyOpenSSL
+Requires:       python%{python3_pkgversion}-requests
+Requires:       python%{python3_pkgversion}-dateutil
+Requires:       python%{python3_pkgversion}-cherrypy
+Requires:       python%{python3_pkgversion}-more-itertools
+Requires:       python%{python3_pkgversion}-PyYAML
+Requires:       python%{python3_pkgversion}-werkzeug
+%description mgr-modules-core
+ceph-mgr-modules-core provides a set of modules which are always
+enabled by ceph-mgr.
 
 %package mgr-k8sevents
 BuildArch:      noarch
@@ -1172,6 +1192,8 @@ install -m 644 -D monitoring/ceph-mixin/prometheus_alerts.yml %{buildroot}/etc/p
 %dir %{_libdir}/ceph
 %dir %{_libdir}/ceph/erasure-code
 %{_libdir}/ceph/erasure-code/libec_*.so*
+%dir %{_libdir}/ceph/extblkdev
+%{_libdir}/ceph/extblkdev/libceph_*.so*
 %dir %{_libdir}/ceph/compressor
 %{_libdir}/ceph/compressor/libceph_*.so*
 %{_unitdir}/ceph-crash.service
@@ -1394,6 +1416,38 @@ fi
 if [ $1 -eq 1 ] ; then
     /usr/bin/systemctl try-restart ceph-mgr.target >/dev/null 2>&1 || :
 fi
+
+%files mgr-modules-core
+%dir %{_datadir}/ceph/mgr
+%{_datadir}/ceph/mgr/alerts
+%{_datadir}/ceph/mgr/balancer
+%{_datadir}/ceph/mgr/crash
+%{_datadir}/ceph/mgr/devicehealth
+%{_datadir}/ceph/mgr/influx
+%{_datadir}/ceph/mgr/insights
+%{_datadir}/ceph/mgr/iostat
+%{_datadir}/ceph/mgr/localpool
+%{_datadir}/ceph/mgr/mds_autoscaler
+%{_datadir}/ceph/mgr/mirroring
+%{_datadir}/ceph/mgr/nfs
+%{_datadir}/ceph/mgr/orchestrator
+%{_datadir}/ceph/mgr/osd_perf_query
+%{_datadir}/ceph/mgr/osd_support
+%{_datadir}/ceph/mgr/pg_autoscaler
+%{_datadir}/ceph/mgr/progress
+%{_datadir}/ceph/mgr/prometheus
+%{_datadir}/ceph/mgr/rbd_support
+# a dependent module of restful is not available and 
+# hence not enabling it at this moment
+%{_datadir}/ceph/mgr/selftest
+%{_datadir}/ceph/mgr/snap_schedule
+%{_datadir}/ceph/mgr/stats
+%{_datadir}/ceph/mgr/status
+%{_datadir}/ceph/mgr/telegraf
+%{_datadir}/ceph/mgr/telemetry
+%{_datadir}/ceph/mgr/test_orchestrator
+%{_datadir}/ceph/mgr/volumes
+%{_datadir}/ceph/mgr/zabbix
 
 %files mgr-k8sevents
 %{_datadir}/ceph/mgr/k8sevents
@@ -2023,6 +2077,16 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Fri Oct 02 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.8-14
+- Upgrade to 18.2.8 and remove patches included upstream.
+- Package extblkdev plugins in ceph-base.
+- Package core manager modules separately and require them from ceph-mgr.
+- Exclude the restful manager module until its dependency is available.
+- Fix ceph-volume compatibility with Python 3.12.
+- Add the missing more-itertools dependency for manager modules.
+- Load manager modules in the main Python interpreter by default.
+- Link rgw_common consumers with OpenSSL SSL.
+
 * Thu Sep 10 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.2.2-13
 - Patch for CVE-2026-54330
 
