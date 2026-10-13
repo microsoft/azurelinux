@@ -1,0 +1,81 @@
+From: Harshit Gupta <guptaharshit@microsoft.com>
+Date: Tue, 13 Oct 2026 04:30:29 -0700
+Subject: [PATCH] virt_mshv: scrub partition during reset (rebased)
+
+Rebased onto openvmm-v0.2.0 at 49742cf0636bdda0dc94757d6185e5e50254873c.
+
+Signed-off-by: Harshit Gupta <guptaharshit@microsoft.com>
+---
+diff --git a/vmm_core/virt_mshv/src/aarch64/mod.rs b/vmm_core/virt_mshv/src/aarch64/mod.rs
+index a53a67bf7bb2ca41014ae34899411e9a309758ef..88df7cc157f2ef01282a33869303a62954623609 100644
+--- a/vmm_core/virt_mshv/src/aarch64/mod.rs
++++ b/vmm_core/virt_mshv/src/aarch64/mod.rs
+@@ -281,6 +281,7 @@ impl virt::ResetPartition for MshvPartition {
+     type Error = Error;
+ 
+     fn reset(&self) -> Result<(), Error> {
++        self.inner.scrub_partition()?;
+         Ok(())
+     }
+ }
+diff --git a/vmm_core/virt_mshv/src/lib.rs b/vmm_core/virt_mshv/src/lib.rs
+index 19c0337a4446426a14765ac7540fff5f24ab1137..1eea521bbdda4ed15b656be86606ca0f848f061b 100644
+--- a/vmm_core/virt_mshv/src/lib.rs
++++ b/vmm_core/virt_mshv/src/lib.rs
+@@ -395,6 +395,20 @@ fn vp(&self, vp_index: VpIndex) -> &MshvVpInner {
+         &self.vps[vp_index.index() as usize]
+     }
+ 
++    fn scrub_partition(&self) -> Result<(), Error> {
++        // _IO(MSHV_IOCTL, 0x0b), where MSHV_IOCTL is 0xb8.
++        const MSHV_SCRUB_PARTITION: libc::c_ulong = 0xb80b;
++
++        // SAFETY: `vmfd` is a valid MSHV partition fd, and
++        // MSHV_SCRUB_PARTITION is an argument-less ioctl.
++        let ret = unsafe { libc::ioctl(self.vmfd.as_raw_fd(), MSHV_SCRUB_PARTITION) };
++        if ret < 0 {
++            return Err(ErrorInner::ScrubPartition(io::Error::last_os_error()).into());
++        }
++
++        Ok(())
++    }
++
+     fn post_message(&self, vp_index: VpIndex, sint: u8, message: &HvMessage) {
+         let vp = self.vp(vp_index);
+         let wake = vp.message_queues.enqueue_message(sint, message);
+@@ -675,13 +689,6 @@ fn access_state(&mut self, vtl: Vtl) -> Self::StateAccess<'_> {
+     }
+ 
+     fn reset(&mut self) -> Result<(), impl std::error::Error + Send + Sync + 'static> {
+-        use virt::vp::AccessVpState;
+-
+-        let vp_info = self.inner.vp_info;
+-        self.access_state(Vtl::Vtl0)
+-            .reset_all(&vp_info)
+-            .map_err(|e| ErrorInner::ResetState(Box::new(e)))?;
+-
+         self.reset_synic_state();
+ 
+         Ok::<(), Error>(())
+@@ -778,6 +785,8 @@ enum ErrorInner {
+     GetPartitionProperty(#[source] KernelError),
+     #[error("failed to set partition property")]
+     SetPartitionProperty(#[source] KernelError),
++    #[error("failed to scrub partition")]
++    ScrubPartition(#[source] io::Error),
+     #[error("register access error")]
+     Register(#[source] KernelError),
+     #[cfg(guest_arch = "x86_64")]
+diff --git a/vmm_core/virt_mshv/src/x86_64/mod.rs b/vmm_core/virt_mshv/src/x86_64/mod.rs
+index 4b954c442f9426a98c790d6dbc80cc5662e57fd8..6be41cfd098ee908d9772bbec00e9ee3f8eb1956 100644
+--- a/vmm_core/virt_mshv/src/x86_64/mod.rs
++++ b/vmm_core/virt_mshv/src/x86_64/mod.rs
+@@ -693,6 +693,8 @@ impl virt::ResetPartition for MshvPartition {
+     fn reset(&self) -> Result<(), Error> {
+         use virt::x86::vm::AccessVmState;
+ 
++        self.inner.scrub_partition()?;
++
+         for irq in 0..virt::irqcon::IRQ_LINES as u8 {
+             self.inner.irq_routes.set_irq_route(irq, None);
+         }
