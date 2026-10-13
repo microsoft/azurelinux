@@ -14,10 +14,8 @@ Source0:        https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v
 # contains the vendored sources in vendor/ plus the source replacement config
 # 'cargo_config' written by cargo vendor.
 Source1:        https://github.com/microsoft/openvmm/releases/download/openvmm-v%{version}/%{name}-%{version}-vendor.tar.gz
-Patch0:         0001-virt_mshv-invoke-HvScrubPartition-during-reset.patch
-Patch1:         0002-Stop-calling-AccessVpState-reset_all-during-reset.patch
-Patch2:         0003-Expose-CLI-arg-for-MAC-addr-of-NIC.patch
-Patch3:         0004-Update-IOCTL-number-for-MSHV_SCRUB_PARTITION.patch
+Patch0:         0001-virt_mshv-scrub-partition-during-reset.patch
+Patch1:         0002-Expose-CLI-arg-for-MAC-addr-of-NIC.patch
 
 ExclusiveArch:  x86_64 aarch64
 
@@ -80,8 +78,8 @@ cargo test --release --locked --offline --lib --target %{rust_target} %{test_cra
 
 %changelog
 * Wed Oct 7 2026 Harshit Gupta <guptaharshit@microsoft.com> - 0.1.0-2
-- Add patches from github.com/harshitgupta1337/openvmm/tree/hg/kubevirt-support
-  to add features needed by KubeVirt's invocation of OpenVMM
+- Invoke scrub-partition MSHV IOCTL during reset
+- Add CLI option to specify MAC addr for guest interface
 
 * Thu Aug 13 2026 Ben Hillis <benhill@microsoft.com> - 0.1.0-1
 - Original version for Azure Linux
