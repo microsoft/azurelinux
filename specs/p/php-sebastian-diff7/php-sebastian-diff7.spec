@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/php-sebastian-diff7.azl.macros}
+
 # remirepo/fedora spec file for php-sebastian-diff7
 #
 # SPDX-FileCopyrightText:  Copyright 2013-2026 Remi Collet
@@ -26,7 +29,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        7.0.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Diff implementation, version %{major}
 
 License:        BSD-3-Clause
@@ -37,6 +40,7 @@ Source1:        makesrc.sh
 # php-symfony* not available, only used for tests
 %global symfony_version 7.4.17
 Source2:        https://github.com/symfony/process/archive/v%{symfony_version}/php-symfony-process-%{symfony_version}.tar.gz
+Source9999: php-sebastian-diff7.azl.macros
 
 BuildArch:      noarch
 BuildRequires:  php-fedora-autoloader-devel

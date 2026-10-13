@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/php-sebastian-type6.azl.macros}
+
 # remirepo/fedora spec file for php-sebastian-type6
 #
 # SPDX-FileCopyrightText:  Copyright 2019-2026 Remi Collet
@@ -26,7 +29,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        6.0.4
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        Collection of value objects that represent the types of the PHP type system, v%{major}
 
 License:        BSD-3-Clause
@@ -34,6 +37,7 @@ URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
 Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
+Source9999: php-sebastian-type6.azl.macros
 
 BuildArch:      noarch
 BuildRequires:  php(language) >= 8.3
@@ -55,7 +59,6 @@ Requires:       php-composer(fedora/autoloader)
 Provides:       php-composer(%{pk_vendor}/%{pk_project}) = %{version}
 
 
-Patch0: type6-fix-php82-test-requirements.patch
 %description
 Collection of value objects that represent the types of the PHP type system.
 
@@ -68,7 +71,6 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 %setup -q -n %{gh_project}-%{version}
 
 
-%patch -P0 -p1
 %build
 # Generate the Autoloader
 phpab --template fedora --output src/autoload.php src
