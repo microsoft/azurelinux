@@ -3,19 +3,8 @@
 %ifarch aarch64
 %global buildarch aarch64
 %endif
-%define uname_r %{version}-%{release}
-Summary:        Signed Linux Kernel for %{buildarch} systems
-Name:           kernel-64k-signed-%{buildarch}
-<<<<<<< HEAD
-Version:        6.6.157.1
-Release:        2%{?dist}
-=======
 Version:        6.6.158.1
-Release:        1%{?dist}
->>>>>>> f87e252ba5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.158.1 - branch fasttrack/3.0 (#19215))
-License:        GPLv2
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Release:        2%{?dist}
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # This package's "version" and "release" must reflect the unsigned version that
@@ -107,19 +96,17 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
-%exclude /module_info.ld
+* Tue Oct 13 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.158.1-2
+- Bump release to match kernel-64k-signed
 
-%changelog
-<<<<<<< HEAD
-* Thu Oct 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.157.1-2
-- Bump release to match kernel-64k
-=======
 * Mon Oct 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.158.1-1
 - Auto-upgrade to 6.6.158.1
->>>>>>> f87e252ba5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.158.1 - branch fasttrack/3.0 (#19215))
 
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.157.1-1
 - Auto-upgrade to 6.6.157.1
+
+* Sat Aug 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.152.1-1
+- Auto-upgrade to 6.6.152.1
 
 * Sat Aug 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.152.1-1
 - Auto-upgrade to 6.6.152.1
