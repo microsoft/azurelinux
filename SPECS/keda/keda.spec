@@ -45,6 +45,7 @@ Patch18:        CVE-2026-78660.patch
 Patch19:        CVE-2026-78663.patch
 Patch20:        CVE-2026-78669.patch
 Patch21:        CVE-2026-97032.patch
+Patch22:        CVE-2026-107325.patch
 
 BuildRequires:  golang >= 1.25
 
@@ -91,7 +92,7 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14.1-22
-- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-107324
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-107324, CVE-2026-107325
 
 * Mon Sep 21 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.14.1-21
 - Patch upgrades "github.com/rabbitmq/amqp091-go" from v1.9.0 to v1.15.0
