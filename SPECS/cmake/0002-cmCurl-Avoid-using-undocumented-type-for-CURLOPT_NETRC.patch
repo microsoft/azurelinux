@@ -1,0 +1,33 @@
+From 1b0c92a3a1b782ff3e1c4499b6ab8db614d45bcd Mon Sep 17 00:00:00 2001
+From: Brad King <brad.king@kitware.com>
+Date: Mon, 10 Mar 2025 11:08:42 -0400
+Subject: [PATCH] cmCurl: Avoid using undocumented type for CURLOPT_NETRC
+ values
+
+Since upstream curl commit `2ec00372a1` (curl.h: change some enums to
+defines with L suffix, 2025-02-25), the `CURL_NETRC_*` constants are
+integer literals instead of `enum CURL_NETRC_OPTION`.  It turns out
+that `curl_easy_setopt` has always expected a `long` anyway, and
+that `CURL_NETRC_OPTION` is not documented for public use.
+
+Fixes: #26754
+Upstream patch reference: https://github.com/Kitware/CMake/commit/1b0c92a3a1b782ff3e1c4499b6ab8db614d45bcd
+---
+ Source/cmCurl.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/cmCurl.cxx b/Source/cmCurl.cxx
+index b9133ed7d47..0cf8a71a72d 100644
+--- a/Source/cmCurl.cxx
++++ b/Source/cmCurl.cxx
+@@ -170,7 +170,7 @@ std::string cmCurlSetNETRCOption(::CURL* curl, const std::string& netrc_level,
+                                  const std::string& netrc_file)
+ {
+   std::string e;
+-  CURL_NETRC_OPTION curl_netrc_level = CURL_NETRC_LAST;
++  long curl_netrc_level = CURL_NETRC_LAST;
+   ::CURLcode res;
+ 
+   if (!netrc_level.empty()) {
+-- 
+2.49.0
