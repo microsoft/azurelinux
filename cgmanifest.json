@@ -3398,8 +3398,8 @@
         "type": "other",
         "other": {
           "name": "environment-modules",
-          "version": "5.3.1",
-          "downloadUrl": "https://downloads.sourceforge.net/modules/modules-5.3.1.tar.gz"
+          "version": "5.3.2",
+          "downloadUrl": "https://downloads.sourceforge.net/modules/modules-5.3.2.tar.gz"
         }
       }
     },
