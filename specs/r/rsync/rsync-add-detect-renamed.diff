@@ -133,12 +133,13 @@ diff --git a/delete.c b/delete.c
 diff --git a/flist.c b/flist.c
 --- a/flist.c
 +++ b/flist.c
-@@ -64,6 +64,7 @@ extern int non_perishable_cnt;
+@@ -70,7 +70,8 @@ extern int non_perishable_cnt;
  extern int prune_empty_dirs;
  extern int copy_links;
  extern int copy_unsafe_links;
 +extern int detect_renamed;
  extern int insecure_links;
+ extern int filesfrom_owner_walk_override;
  extern int protocol_version;
  extern int sanitize_paths;
 @@ -144,6 +145,8 @@ static inline uint32 wire_mtime_nsec_from_stat(const STRUCT_STAT *stp)
@@ -788,7 +789,7 @@ diff -Nurp a/rsync.1 b/rsync.1
 --- a/rsync.1
 +++ b/rsync.1
 @@ -1,5 +1,5 @@
- .TH "rsync" "1" "13 Aug 2026" "rsync 3.5.0" "User Commands"
+ .TH "rsync" "1" "21 Sep 2026" "rsync 3.5.1" "User Commands"
 -.\" prefix=/usr
 +.\" prefix=/usr/local
  .P
@@ -860,7 +861,7 @@ diff -Nurp a/rsyncd.conf.5 b/rsyncd.conf.5
 --- a/rsyncd.conf.5
 +++ b/rsyncd.conf.5
 @@ -1,5 +1,5 @@
- .TH "rsyncd.conf" "5" "13 Aug 2026" "rsyncd.conf from rsync 3.5.0" "User Commands"
+ .TH "rsyncd.conf" "5" "21 Sep 2026" "rsyncd.conf from rsync 3.5.1" "User Commands"
 -.\" prefix=/usr
 +.\" prefix=/usr/local
  .P
@@ -900,7 +901,7 @@ diff -Nurp a/rsync-ssl.1 b/rsync-ssl.1
 --- a/rsync-ssl.1
 +++ b/rsync-ssl.1
 @@ -1,5 +1,5 @@
- .TH "rsync-ssl" "1" "13 Aug 2026" "rsync-ssl from rsync 3.5.0" "User Commands"
+ .TH "rsync-ssl" "1" "21 Sep 2026" "rsync-ssl from rsync 3.5.1" "User Commands"
 -.\" prefix=/usr
 +.\" prefix=/usr/local
  .P

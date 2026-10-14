@@ -1,0 +1,5 @@
+[components.rsync]
+# Pick up newer version that includes fix for a test failure.
+# This can be removed once our snapshot is later than:
+#   Thu Oct 1 13:06:43 2026 +0200
+spec = { type = "upstream", upstream-commit = "1c044dff1200abf8568e325495d420856ff80e54" }

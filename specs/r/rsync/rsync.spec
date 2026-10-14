@@ -5,7 +5,7 @@
 
 Summary: A program for synchronizing files over a network
 Name: rsync
-Version: 3.5.0
+Version: 3.5.1
 Release: 8%{?dist}
 URL: https://rsync.samba.org/
 
@@ -27,6 +27,7 @@ BuildRequires: systemd
 BuildRequires: lz4-devel
 BuildRequires: openssl-devel
 BuildRequires: libzstd-devel
+BuildRequires: libidn2-devel
 BuildRequires: git-core
 BuildRequires: python3-cmarkgfm
 %if %{undefined rhel}
@@ -43,11 +44,6 @@ License: GPL-3.0-or-later
 Patch1: rsync-add-detect-renamed.diff
 Patch2: rsync-add-detect-renamed-lax.diff
 Patch3: rsync-do-not-build-rrsync-manpage.patch
-# This is a regression that denies rsync user access to legit paths like
-# /var/run/ or /var/log/
-# https://github.com/RsyncProject/rsync/commit/3b1eb8dd
-# https://github.com/RsyncProject/rsync/commit/240bd9df
-Patch4: rsync-3.5.0-o_path-dir-traversal.patch
 
 %description
 Rsync uses a reliable algorithm to bring remote and host files into
@@ -88,6 +84,7 @@ may be used to setup a restricted rsync users via ssh logins.
   --enable-zstd \
   --enable-lz4 \
   --enable-ipv6 \
+  --enable-idn \
   --with-rrsync
 
 %{make_build}
@@ -140,6 +137,10 @@ install -D -m644 %{SOURCE6} $RPM_BUILD_ROOT/%{_unitdir}/rsyncd@.service
 %systemd_postun_with_restart rsyncd.service
 
 %changelog
+* Thu Oct 01 2026 Michal Ruprich <mruprich@redhat.com> - 3.5.1-1
+- New version 3.5.1
+- Enabling IDN support
+
 * Tue Sep 08 2026 Michal Ruprich <mruprich@redhat.com> - 3.5.0-2
 - Fixing a path traversal regression
 
