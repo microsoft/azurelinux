@@ -1201,6 +1201,7 @@ components = [
     "nfs4-acl-tools",
     "nftables",
     "nghttp2",
+    "nghttp3",
     "nginx",
     "ngtcp2",
     "ninja-build",
