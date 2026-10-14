@@ -1,12 +1,13 @@
 Summary:        X.Org X11 libXtst runtime library
 Name:           libXtst
 Version:        1.2.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-94286.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -66,6 +67,9 @@ rm -rf %{buildroot}%{_docdir}
 %{_mandir}/man3/XTest*.3*
 
 %changelog
+* Wed Oct 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.4-2
+- Patch for CVE-2026-94286
+
 * Wed Dec 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.4-1
 - Update to v1.2.4
 
