@@ -257,7 +257,7 @@ to CUPS daemon. This solution will substitute printer drivers and raw queues in 
 %patch 13 -p1 -b .dymo-deviceid
 
 # UPSTREAM PATCHES
-
+%patch 14 -p1
 
 # LSPP support.
 %patch 100 -p1 -b .lspp
@@ -2742,7 +2742,6 @@ rm -f %{cups_serverbin}/backend/smb
 
 * Wed Oct  4 2006 Tim Waugh <twaugh@redhat.com> 1:1.2.4-8
 - LSPP patch didn't get updated properly in 1:1.2.4-6.  Use the right
-%patch 14 -p1
   patch this time (bug #208676).  LSPP re-enabled.
 
 * Wed Oct  4 2006 Tim Waugh <twaugh@redhat.com> 1:1.2.4-7
