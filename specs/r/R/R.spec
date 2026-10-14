@@ -38,7 +38,7 @@
 
 Name:           R
 Version:        %{major_version}.%{minor_version}.%{patch_version}
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        A language for data analysis and graphics
 
 License:        GPL-2.0-or-later
