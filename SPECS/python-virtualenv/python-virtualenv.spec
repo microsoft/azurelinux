@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,6 +22,8 @@ Patch1009:      CVE-2026-8643v0.patch
 Patch1010:      CVE-2026-8643v1.patch
 Patch1011:      CVE-2026-13346v0.patch
 Patch1012:      CVE-2026-13346v1.patch
+Patch1013:      CVE-2026-102925.patch
+Patch1014:      CVE-2026-102930.patch
 BuildArch:      noarch
 
 %description
@@ -54,6 +56,8 @@ virtualenv is a tool to create isolated Python environment.
 # Adding -N to enable manual patching, needed for CVE-2025-50181
 %autosetup -p1 -n virtualenv-%{version} -N
 %patch -P 0 -p1
+%patch -P 1013 -p1
+%patch -P 1014 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -163,7 +167,11 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 %pyproject_install
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0'
+# Pin packaging to the RPM-installed version so pip does not try to
+# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
+# rpm-installed copy has no RECORD file, so pip aborts with
+# uninstall-no-record-file and the test tooling is never installed.
+pip3 install packaging==23.2 'tox>=3.27.1,<4.0.0'
 # skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
 sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
 tox -e py
@@ -175,6 +183,13 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-8
+- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
+  ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
+
+* Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
+- Patch for CVE-2026-102925 and CVE-2026-102930
+
 * Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
 - Patch for CVE-2026-13346
 

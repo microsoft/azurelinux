@@ -925,8 +925,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.6.0.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.7.0.tar.gz"
         }
       }
     },
@@ -1127,8 +1127,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.20.26",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.26/bind-9.20.26.tar.xz"
+          "version": "9.20.29",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.29/bind-9.20.29.tar.xz"
         }
       }
     },
@@ -1407,8 +1407,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.30.0",
-          "downloadUrl": "https://github.com/c-ares/c-ares/releases/download/v1.30.0/c-ares-1.30.0.tar.gz"
+          "version": "1.34.8",
+          "downloadUrl": "https://github.com/c-ares/c-ares/releases/download/v1.34.8/c-ares-1.34.8.tar.gz"
         }
       }
     },
@@ -3398,8 +3398,8 @@
         "type": "other",
         "other": {
           "name": "environment-modules",
-          "version": "5.3.1",
-          "downloadUrl": "https://downloads.sourceforge.net/modules/modules-5.3.1.tar.gz"
+          "version": "5.3.2",
+          "downloadUrl": "https://downloads.sourceforge.net/modules/modules-5.3.2.tar.gz"
         }
       }
     },
@@ -3518,8 +3518,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.8.5",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_8_5/expat-2.8.5.tar.bz2"
+          "version": "2.9.0",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-2.9.0.tar.bz2"
         }
       }
     },
@@ -4760,8 +4760,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.8-1/go1.26.8-20260901.2.src.tar.gz"
+          "version": "1.26.9",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.9-1/go1.26.9-20261008.11.src.tar.gz"
         }
       }
     },
@@ -4770,8 +4770,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.27.1",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.1-2/go1.27.1-20260904.9.src.tar.gz"
+          "version": "1.27.2",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.2-1/go1.27.2-20261008.10.src.tar.gz"
         }
       }
     },
@@ -5520,8 +5520,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.68",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.68.tar.bz2"
+          "version": "2.4.69",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.69.tar.bz2"
         }
       }
     },
@@ -8411,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.18.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.48.1.tar.gz"
+          "version": "6.18.54.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.54.1.tar.gz"
         }
       }
     },
@@ -8421,8 +8421,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.18.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.48.1.tar.gz"
+          "version": "6.18.54.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.54.1.tar.gz"
         }
       }
     },
@@ -8451,8 +8451,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.137.mshv2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv2.tar.gz"
+          "version": "6.18.34.mshv3",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.18.34.mshv3.tar.gz"
         }
       }
     },
@@ -8481,8 +8481,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.6.137.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.137.mshv1.tar.gz"
+          "version": "6.18.52.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.18.52.mshv1.tar.gz"
         }
       }
     },
@@ -15803,8 +15803,8 @@
         "type": "other",
         "other": {
           "name": "openvmm",
-          "version": "0.1.0",
-          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.1.0.tar.gz"
+          "version": "0.2.0",
+          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.2.0.tar.gz"
         }
       }
     },
@@ -25983,8 +25983,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.12.14",
-          "downloadUrl": "https://www.python.org/ftp/python/3.12.14/Python-3.12.14.tar.xz"
+          "version": "3.12.15",
+          "downloadUrl": "https://www.python.org/ftp/python/3.12.15/Python-3.12.15.tar.xz"
         }
       }
     },
@@ -29406,8 +29406,8 @@
         "type": "other",
         "other": {
           "name": "thrift",
-          "version": "0.24.0",
-          "downloadUrl": "https://archive.apache.org/dist/thrift/0.24.0/thrift-0.24.0.tar.gz"
+          "version": "0.25.0",
+          "downloadUrl": "https://archive.apache.org/dist/thrift/0.25.0/thrift-0.25.0.tar.gz"
         }
       }
     },
@@ -31258,8 +31258,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-server-Xwayland",
-          "version": "24.1.13",
-          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.13.tar.xz"
+          "version": "24.1.14",
+          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.14.tar.xz"
         }
       }
     },

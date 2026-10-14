@@ -1,7 +1,7 @@
 Summary:        Library for reading and writing sound files
 Name:           libsndfile
 Version:        1.2.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ Patch101:       CVE-2022-33065.patch
 Patch102:       CVE-2024-50612.patch
 Patch103:       CVE-2025-56226.patch
 Patch104:       CVE-2026-37555.patch
+Patch105:       CVE-2026-88386.patch
 
 BuildRequires:  alsa-lib-devel
 BuildRequires:  autogen
@@ -142,6 +143,9 @@ LD_LIBRARY_PATH=$PWD/src/.libs make check
 %{_libdir}/pkgconfig/sndfile.pc
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-6
+- Patch for CVE-2026-88386
+
 * Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-5
 - Patch for CVE-2026-37555
 

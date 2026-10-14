@@ -1,0 +1,164 @@
+From ee72a8e124123e759de95684684ac6f66c2391ef Mon Sep 17 00:00:00 2001
+From: Alexandr Nedvedicky <sashan@openssl.org>
+Date: Mon, 20 Jul 2026 09:44:53 +0200
+Subject: [PATCH] Add ossl_list_TYPE_join(head, tail) function
+
+The function appends list tail to list head. List tail becomes
+empty after the function returns.
+
+Reviewed-by: Eugene Syromiatnikov <esyr@openssl.org>
+Reviewed-by: Nikola Pajkovsky <nikolap@openssl.org>
+Reviewed-by: Norbert Pocs <norbertp@openssl.org>
+MergeDate: Thu Aug  6 11:59:15 2026
+(Merged from https://github.com/openssl/openssl/pull/32031)
+Signed-off-by: Azure Linux Security Servicing Account <azurelinux-security@microsoft.com>
+Upstream-reference: https://github.com/openssl/openssl/commit/ee72a8e124123e759de95684684ac6f66c2391ef.patch
+---
+ doc/internal/man3/DEFINE_LIST_OF.pod | 11 +++++--
+ include/internal/list.h              | 29 ++++++++++++++++++
+ test/list_test.c                     | 46 ++++++++++++++++++++++++++++
+ 3 files changed, 84 insertions(+), 2 deletions(-)
+
+diff --git a/doc/internal/man3/DEFINE_LIST_OF.pod b/doc/internal/man3/DEFINE_LIST_OF.pod
+index d886defc43fb9..6291a2d91062c 100644
+--- a/doc/internal/man3/DEFINE_LIST_OF.pod
++++ b/doc/internal/man3/DEFINE_LIST_OF.pod
+@@ -8,7 +8,7 @@ ossl_list_TYPE_is_empty, ossl_list_TYPE_num,
+ ossl_list_TYPE_head, ossl_list_TYPE_tail,
+ ossl_list_TYPE_next, ossl_list_TYPE_prev,
+ ossl_list_TYPE_remove, ossl_list_TYPE_insert_head, ossl_list_TYPE_insert_tail,
+-ossl_list_TYPE_insert_before, ossl_list_TYPE_after
++ossl_list_TYPE_insert_before, ossl_list_TYPE_after, ossl_list_TYPE_join
+ - doubly linked list
+ 
+ =head1 SYNOPSIS
+@@ -38,6 +38,7 @@ ossl_list_TYPE_insert_before, ossl_list_TYPE_after
+  void ossl_list_TYPE_insert_before(OSSL_LIST(name) *list, type *existing,
+                                    type *elem);
+  void ossl_list_TYPE_insert_after(OSSL_LIST(name) *list, type *existing, type *elem);
++ void ossl_list_TYPE_join(OSSL_LIST(name) *lh, OSSL_LIST(name) *lt);
+ 
+ =head1 DESCRIPTION
+ 
+@@ -90,6 +91,10 @@ B<ossl_list_I<TYPE>_insert_after>() inserts the element I<elem>,
+ which must not be in the list, into the I<list> immediately after the
+ I<existing> element.
+ 
++B<ossl_list_I<TYPE>_join<()> joins list B<lt> with list B<lh>.
++List B<lt> is appended to list B<lh>. The list B<lt> becomes empty,
++as all its members are part of B<lh> after the function returns.
++
+ =head1 RETURN VALUES
+ 
+ B<ossl_list_I<TYPE>_is_empty>() returns nonzero if the list is empty and zero
+@@ -124,7 +129,9 @@ the specified element in the list.
+ 
+ =head1 HISTORY
+ 
+-The functions described here were all added in OpenSSL 3.2.
++ossl_list_TYPE_join() was added in OpenSSL 4.1, 4.0.2, 3.6.4, 3.5.8, and 3.4.7.
++
++The rest of the functions described here was added in OpenSSL 3.2.
+ 
+ =head1 COPYRIGHT
+ 
+diff --git a/include/internal/list.h b/include/internal/list.h
+index 12ac919967b9e..13a8f86fc905e 100644
+--- a/include/internal/list.h
++++ b/include/internal/list.h
+@@ -194,6 +194,35 @@
+             list->omega = elem;                                                               \
+         list->num_elems++;                                                                    \
+     }                                                                                         \
++    static ossl_unused ossl_inline void                                                       \
++    ossl_list_##name##_join(OSSL_LIST(name) * lh, OSSL_LIST(name) * lt)                       \
++    {                                                                                         \
++        OSSL_LIST_DBG(type * _p); /* local variable '_p' when debug */                        \
++        if (lt == NULL || lh == NULL || lt->num_elems == 0 || lh == lt)                       \
++            return;                                                                           \
++        /*                                                                                    \
++         * let's be optimistic about size_t overflow here: it can not happen.                 \
++         */                                                                                   \
++        lh->num_elems += lt->num_elems;                                                       \
++        if (lh->omega == NULL) {                                                              \
++            assert(lh->alpha == NULL);                                                        \
++            lh->omega = lt->omega;                                                            \
++            lh->alpha = lt->alpha;                                                            \
++        } else {                                                                              \
++            if (lt->alpha != NULL)                                                            \
++                ((type *)lt->alpha)->ossl_list_##name.prev = lh->omega;                       \
++            ((type *)lh->omega)->ossl_list_##name.next = lt->alpha;                           \
++        }                                                                                     \
++        OSSL_LIST_DBG(for (_p = (type *)lt->alpha;                                            \
++                          assert(_p == NULL || _p->ossl_list_##name.list == lt), _p != NULL;  \
++                          _p = _p->ossl_list_##name.next)                                     \
++                          _p->ossl_list_##name.list                                           \
++            = lh);                                                                            \
++        lh->omega = lt->omega;                                                                \
++        lt->alpha = NULL;                                                                     \
++        lt->omega = NULL;                                                                     \
++        lt->num_elems = 0;                                                                    \
++    }                                                                                         \
+     struct ossl_list_st_##name
+ 
+ #define DEFINE_LIST_OF(name, type) \
+diff --git a/test/list_test.c b/test/list_test.c
+index 9deb57c4b91a9..7798ea68348ed 100644
+--- a/test/list_test.c
++++ b/test/list_test.c
+@@ -175,9 +175,55 @@ static int test_insert(void)
+     return 1;
+ }
+ 
++static int test_join(void)
++{
++    OSSL_LIST(int)
++    l_h, l_t;
++    INTL elem_h[20];
++    INTL elem_t[20];
++    int i;
++
++    ossl_list_int_init(&l_h);
++    ossl_list_int_init(&l_t);
++    ossl_list_int_join(&l_h, &l_t);
++    if (!TEST_size_t_eq(ossl_list_int_num(&l_t), 0))
++        return 0;
++
++    for (i = 0; i < (int)OSSL_NELEM(elem_h); i++) {
++        ossl_list_int_init_elem(&elem_h[i]);
++        elem_h[i].n = i;
++        ossl_list_int_insert_head(&l_h, &elem_h[i]);
++    }
++
++    for (i = 0; i < (int)OSSL_NELEM(elem_t); i++) {
++        ossl_list_int_init_elem(&elem_t[i]);
++        elem_t[i].n = i + 10;
++        ossl_list_int_insert_head(&l_t, &elem_t[i]);
++    }
++
++    ossl_list_int_join(NULL, NULL);
++
++    ossl_list_int_join(NULL, &l_t);
++    if (!TEST_size_t_eq(ossl_list_int_num(&l_t), OSSL_NELEM(elem_t)))
++        return 0;
++
++    ossl_list_int_join(&l_h, NULL);
++    if (!TEST_size_t_eq(ossl_list_int_num(&l_h), OSSL_NELEM(elem_h)))
++        return 0;
++
++    ossl_list_int_join(&l_h, &l_t);
++    if (!TEST_size_t_eq(ossl_list_int_num(&l_h), OSSL_NELEM(elem_h) + OSSL_NELEM(elem_t)))
++        return 0;
++
++    if (!TEST_true(ossl_list_int_is_empty(&l_t)))
++        return 0;
++
++    return 1;
++}
+ int setup_tests(void)
+ {
+     ADD_TEST(test_fizzbuzz);
+     ADD_TEST(test_insert);
++    ADD_TEST(test_join);
+     return 1;
+ }

@@ -16,7 +16,7 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.6.137.mshv1
+Version:        6.18.52.mshv1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -165,6 +165,10 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.52.mshv1-1
+- Upgrade to 6.18.52.mshv1
+- Disable CONFIG_TEST_HMM and CONFIG_DEVICE_PRIVATE to reduce guest memory usage
+
 * Tue May 05 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.137.mshv1-1
 - Upgrade to 6.6.137.mshv1
 
