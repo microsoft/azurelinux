@@ -10,7 +10,7 @@
 Summary:        CUPS printing system
 Name:           cups
 Version:        2.4.19
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,6 +58,7 @@ Patch11:        cups-web-devices-timeout.patch
 Patch12:        cups-failover-backend.patch
 # add device id for dymo printer
 Patch13:        cups-dymo-deviceid.patch
+Patch14:        CVE-2026-87875.patch
 #### UPSTREAM PATCHES (starts with 1000) ####
 ##### Patches removed because IMHO they aren't no longer needed
 ##### but still I'll leave them in git in case their removal
@@ -642,6 +643,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Wed Oct 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.4.19-2
+- Patch for CVE-2026-87875
+
 * Tue Apr 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.19-1
 - Auto-upgrade to 2.4.19 - CVE-2026-41079
 
@@ -2738,6 +2742,7 @@ rm -f %{cups_serverbin}/backend/smb
 
 * Wed Oct  4 2006 Tim Waugh <twaugh@redhat.com> 1:1.2.4-8
 - LSPP patch didn't get updated properly in 1:1.2.4-6.  Use the right
+%patch 14 -p1
   patch this time (bug #208676).  LSPP re-enabled.
 
 * Wed Oct  4 2006 Tim Waugh <twaugh@redhat.com> 1:1.2.4-7
