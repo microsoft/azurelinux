@@ -1,7 +1,7 @@
 Summary:        An implementation of JSON Schema validation for Python
 Name:           python-jsonschema
 Version:        2.6.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,7 +42,11 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
 
 %check
-pip3 install 'tox<4.0.0'
+# Pin packaging to the RPM-installed version so pip does not try to
+# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
+# rpm-installed copy has no RECORD file, so pip aborts with
+# uninstall-no-record-file and the test tooling is never installed.
+pip3 install packaging==23.2 'tox<4.0.0'
 LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots}
 
 %files -n python3-jsonschema
@@ -53,6 +57,10 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots}
 %{_bindir}/jsonschema3
 
 %changelog
+* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.6.0-8
+- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
+  ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
+
 * Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 2.6.0-7
 - switch to tox test per README, massage test config to work with python3.12
 

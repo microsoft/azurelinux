@@ -1,0 +1,42 @@
+From 9635a82590e254c6426c1adf4c9c293e025eee89 Mon Sep 17 00:00:00 2001
+From: Patrick Griffis <pgriffis@igalia.com>
+Date: Tue, 7 Jul 2026 11:55:42 -0500
+Subject: [PATCH] http1: Fix OOB read when parsing chunk size
+
+metabuf is not NUL-terminated by read_until(), so strstr() could read
+past the received line into stale stack data. A stray ';' there made
+the chunk-size parse fail with "Invalid chunk size", which showed up as
+an intermittent /streaming/skip failure in streaming-test.
+
+Combines upstream commits:
+  72e566d8 soup-body-input-stream: Limit buffer read to the received content
+  9635a825 http1: Fix OOB read when parsing chunk size
+
+Upstream-reference: https://gitlab.gnome.org/GNOME/libsoup/-/commit/72e566d82363ba35cdcf4a8c7b4826029f7190ff
+Upstream-reference: https://gitlab.gnome.org/GNOME/libsoup/-/commit/9635a82590e254c6426c1adf4c9c293e025eee89
+---
+ libsoup/http1/soup-body-input-stream.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/libsoup/http1/soup-body-input-stream.c b/libsoup/http1/soup-body-input-stream.c
+index 691ff42..f44bd60 100644
+--- a/libsoup/http1/soup-body-input-stream.c
++++ b/libsoup/http1/soup-body-input-stream.c
+@@ -193,12 +193,14 @@ again:
+ 			return -1;
+ 		}
+ 
++		/* metabuf is not NUL-terminated by read_until(), so terminate
++		 * it at the trailing CRLF before scanning for chunk extensions. */
++		metabuf[nread - 2] = '\0';
++
+ 		/* ignore extensions */
+-		boundary = strstr (metabuf, ";");
++		boundary = memchr (metabuf, ';', nread);
+ 		if (boundary)
+ 				*boundary = '\0';
+-		else
+-				metabuf[nread - 2] = '\0';
+ 
+ 		chunk_size = g_ascii_strtoull (metabuf, &end, 16);
+ 		if (*end) {

@@ -1,7 +1,7 @@
 Summary:        Library for displaying tabular data in a visually appealing ASCII format
 Name:           python-prettytable
 Version:        3.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,7 +53,11 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 
 %check
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-pip3 install 'tox>=3.27.1,<4.0.0'
+# Pin packaging to the RPM-installed version so pip does not try to
+# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
+# rpm-installed copy has no RECORD file, so pip aborts with
+# uninstall-no-record-file and the test tooling is never installed.
+pip3 install packaging==23.2 'tox>=3.27.1,<4.0.0'
 tox -e py%{python3_version_nodots} --sitepackages
 
 %files -n python3-prettytable
@@ -62,6 +66,10 @@ tox -e py%{python3_version_nodots} --sitepackages
 %{python3_sitelib}/*
 
 %changelog
+* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.10.0-2
+- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
+  ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
+
 * Fri Feb 23 2024 Aditya Dubey <adityadubey@microsoft.com> - 3.10.0-1
 - Updated spec to build version 3.10.0 for Mariner 3.0
 - Added patch to use python3-flit-core as build-backend rather than hatchling (which is not yet supported on Mariner)

@@ -2,7 +2,7 @@
 Summary:        A platform independent file lock
 Name:           python-filelock
 Version:        3.20.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,7 +61,11 @@ the same lock object twice, it will not block.
 sed -i '/asyncio_default_fixture_loop_scope/d' pyproject.toml
 sed -i '/verbosity_assertions/d' pyproject.toml
 pip3 install iniconfig
-pip3 install pytest-virtualenv
+# Pin packaging to the RPM-installed version so pip does not try to
+# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
+# rpm-installed copy has no RECORD file, so pip aborts with
+# uninstall-no-record-file and the test tooling is never installed.
+pip3 install packaging==23.2 pytest-virtualenv
 pip3 install pytest-timeout
 pip3 install pytest-asyncio
 %pytest -k "not test_mtime_zero_exit_branch" -v
@@ -71,6 +75,10 @@ pip3 install pytest-asyncio
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
+* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.20.3-4
+- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
+  ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
+
 * Mon Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.20.3-3
 - Make filelock-tests-isolate-caplog.patch unconditional so it is
   included in the SRPM; the patch is test-only and harmless when
