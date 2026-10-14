@@ -30,7 +30,6 @@ ignore = [
     "PLR0913",
     "PLR0915",
     "PLR0917",
-    "S310",
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
     "S607",   # Requiring abspath for all binaries used is very restrictive
     "T201",   # These scripts are fine to use `print` for output
