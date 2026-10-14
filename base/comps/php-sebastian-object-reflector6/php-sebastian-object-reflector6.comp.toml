@@ -1,2 +1,0 @@
-[components.php-sebastian-object-reflector6]
-build.without = ["tests"]

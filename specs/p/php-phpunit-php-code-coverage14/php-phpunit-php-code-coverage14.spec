@@ -1,9 +1,6 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/php-phpunit-php-code-coverage14.azl.macros}
-
 # remirepo/fedora spec file for php-phpunit-php-code-coverage13
 #
 # SPDX-FileCopyrightText:  Copyright 2013-2026 Remi Collet
@@ -29,7 +26,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{ver_major}
 Version:        14.3.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        PHP code coverage information, version %{ver_major}
 
 # Find nikic/php-parser version 5 from RPM database, using autoloader path
@@ -45,7 +42,6 @@ URL:            https://github.com/%{gh_owner}/%{gh_project}
 Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 Source2:        PhpParserVersionRPMTest.php
-Source9999: php-phpunit-php-code-coverage14.azl.macros
 
 BuildArch:      noarch
 BuildRequires:  php(language) >= 8.4.1

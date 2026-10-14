@@ -1,2 +1,0 @@
-[components.php-sebastian-comparator8]
-build.without = ["tests"]

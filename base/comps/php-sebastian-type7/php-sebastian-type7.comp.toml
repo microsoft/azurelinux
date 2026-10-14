@@ -1,2 +1,0 @@
-[components.php-sebastian-type7]
-build.without = ["tests"]
