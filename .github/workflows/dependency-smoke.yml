@@ -37,6 +37,12 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Kerberos build dependencies
+        if: matrix.dir == 'scripts/ci/control-tower'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y build-essential libkrb5-dev
+
       - name: Install and smoke-test
         env:
           DIR: ${{ matrix.dir }}
