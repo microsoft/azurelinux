@@ -28,12 +28,13 @@ autopart --type=lvm --encrypted
 
 @@PACKAGES@@
 
-%post --nochroot --log=/mnt/sysroot/var/log/anaconda-post.log
+%post --nochroot --erroronfail --log=/mnt/sysroot/var/log/anaconda-post.log
+set -e
 cp /root/post-install.sh /mnt/sysroot/tmp/
 chroot /mnt/sysroot bash /tmp/post-install.sh
 rm -f /mnt/sysroot/tmp/post-install.sh
 %end
 
-%post --nochroot --log=/mnt/sysroot/var/log/anaconda-bootloader.log
+%post --nochroot --erroronfail --log=/mnt/sysroot/var/log/anaconda-bootloader.log
 /root/post-bootloader.sh
 %end
