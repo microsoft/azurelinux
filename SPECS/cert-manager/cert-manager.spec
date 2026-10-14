@@ -40,7 +40,7 @@ Patch23:        CVE-2026-81870.patch
 Patch24:        CVE-2026-92543.patch
 Patch25:        CVE-2026-97032.patch
 
-BuildRequires:  golang
+BuildRequires:  golang >= 1.25
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
 Requires:       %{name}-cmctl
