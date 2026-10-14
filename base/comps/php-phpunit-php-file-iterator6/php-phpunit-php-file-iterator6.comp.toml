@@ -1,3 +1,0 @@
-[components.php-phpunit-php-file-iterator6]
-build.without = ["tests"]
-

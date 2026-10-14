@@ -1,3 +1,0 @@
-[components.php-sebastian-cli-parser4]
-build.without = ["tests"]
-
