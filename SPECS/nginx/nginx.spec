@@ -1,5 +1,5 @@
 %global nginx_user nginx
-%global njs_version 1.0.1
+%global njs_version 1.0.2
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
@@ -175,6 +175,7 @@ rm -rf nginx-tests
 %changelog
 * Wed Oct 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.6-1
 - Auto-upgrade to 1.30.6 - for CVE-2026-15176, CVE-2026-93479, CVE-2026-95101, CVE-2026-97629, CVE-2026-97205
+- Upgrade njs to 1.0.2 for CVE-2026-101025, CVE-2026-101019
 
 * Tue Sep 08 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.30.4-1
 - Upgrade to version 1.30.4 and njs to version 1.0.1
