@@ -128,17 +128,21 @@ def run_command(
     log_path: Path,
     check: bool = True,
 ) -> subprocess.CompletedProcess[str]:
-    """Run one tool, persist combined output, and optionally fail loudly."""
+    """Capture stdout for parsing and log both streams without interleaving."""
     result = subprocess.run(
         command,
         check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        capture_output=True,
         text=True,
         env={**os.environ, "LC_ALL": "C"},
     )
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    log_path.write_text(result.stdout, encoding="utf-8")
+    output = result.stdout
+    if result.stderr:
+        if output and not output.endswith("\n"):
+            output += "\n"
+        output += result.stderr
+    log_path.write_text(output, encoding="utf-8")
     if check and result.returncode != 0:
         rendered = " ".join(command)
         raise RuntimeError(f"Command failed with exit code {result.returncode}: {rendered}")

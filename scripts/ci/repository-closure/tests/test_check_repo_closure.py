@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+import sys
 from pathlib import Path
 
 import check_repo_closure as closure
@@ -213,6 +214,59 @@ def test_assert_candidate_selected_parses_tied_dnf5_rows(
     assert [row["repository"] for row in selected] == ["candidate-base", "baseline-base"]
     assert len(commands) == 1
     assert commands[0][commands[0].index("--qf") + 1].endswith("\\n")
+
+
+@pytest.mark.parametrize(
+    ("first_dependency", "second_dependency"),
+    [
+        (
+            "(crate(lzma-rust2/std) >= 0.16.1 with crate(lzma-rust2/std) < 0.17.0~)",
+            "(crate(lzma-rust2/xz) >= 0.16.1 with crate(lzma-rust2/xz) < 0.17.0~)",
+        ),
+        (
+            "(crate(lzma-rust2/xz) >= 0.16.1 with crate(lzma-rust2/xz) < 0.17.0~)",
+            "(crate(lzma-rust2/std) >= 0.16.1 with crate(lzma-rust2/std) < 0.17.0~)",
+        ),
+    ],
+)
+def test_run_repoclosure_keeps_stderr_out_of_dependency_identity(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    first_dependency: str,
+    second_dependency: str,
+) -> None:
+    """DNF's error summary must not turn existing failures into new ones."""
+    script = f"""
+import sys
+sys.stdout.write("package: rust-zip+lzma-devel-7.2.0-5.azl4.noarch from baseline-sdk\\n")
+sys.stdout.write("  unresolved deps:\\n    {first_dependency}")
+sys.stdout.flush()
+sys.stderr.write("Error: Repoclosure ended with unresolved dependencies.\\n")
+sys.stderr.flush()
+sys.stdout.write("\\n    {second_dependency}\\n")
+sys.exit(1)
+"""
+    monkeypatch.setattr(closure, "dnf_prefix", lambda *_args: [sys.executable, "-c", script])
+    log_path = tmp_path / "repoclosure.log"
+
+    exit_code, issues = closure.run_repoclosure(
+        architecture="x86_64",
+        config_path=tmp_path / "dnf.conf",
+        dnf_major_version=5,
+        log_path=log_path,
+        repositories=["baseline-sdk"],
+    )
+
+    assert exit_code == 1
+    assert issues == {
+        ("rust-zip+lzma-devel.noarch", first_dependency): "rust-zip+lzma-devel-7.2.0-5.azl4.noarch",
+        ("rust-zip+lzma-devel.noarch", second_dependency): "rust-zip+lzma-devel-7.2.0-5.azl4.noarch",
+    }
+    assert log_path.read_text() == (
+        "package: rust-zip+lzma-devel-7.2.0-5.azl4.noarch from baseline-sdk\n"
+        f"  unresolved deps:\n    {first_dependency}\n    {second_dependency}\n"
+        "Error: Repoclosure ended with unresolved dependencies.\n"
+    )
 
 
 def test_parse_repoclosure_issues_ignores_repository_identity() -> None:
