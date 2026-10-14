@@ -1,27 +1,3 @@
-[component-groups.msopenjdk25-direct-consumers]
-description = "Components with generic Java development dependencies that must build with Microsoft OpenJDK 25"
-components = [
-    "capstone",
-    "erlang",
-    "gnulib",
-    "hdf",
-    "hdf5",
-    "libphonenumber",
-    "snowball",
-]
-
-# Generic `java-devel` can select Fedora OpenJDK instead of Microsoft OpenJDK.
-# Remove this overlay once msopenjdk-25 is its sole eligible repository provider.
-[[component-groups.msopenjdk25-direct-consumers.default-component-config.overlays]]
-description = "Require Microsoft OpenJDK 25 for components with generic Java development dependencies"
-type = "spec-search-replace"
-regex = '^BuildRequires:\s+java-devel$'
-replacement = 'BuildRequires: msopenjdk-25'
-
-[component-groups.msopenjdk25-direct-consumers.default-component-config.overlays.metadata]
-category = "azl-compatibility"
-upstream-status = "inapplicable"
-
 [component-groups.msopenjdk25-headless-consumers]
 description = "Components that require Microsoft OpenJDK 25 system trust integration at runtime"
 components = [
@@ -49,7 +25,7 @@ category = "azl-compatibility"
 upstream-status = "inapplicable"
 
 [component-groups.msopenjdk25-generic-jvm-runtime-consumers]
-description = "Components that require generic JVM alternatives at runtime"
+description = "Components that require compatibility-owned JVM paths and system trust at runtime"
 components = [
     "R",
     "byteman",
@@ -58,12 +34,11 @@ components = [
     "tomcat",
 ]
 
-# These components require Fedora-compatible JVM alternatives or development
-# capabilities at runtime, so their provider must remain installed. Remove this
-# overlay for a component once msopenjdk-25 supplies its required capabilities
-# and owns the required alternatives directly.
+# Removing Fedora OpenJDK does not make the provider integrate system trust.
+# Keep compat required until the provider guarantees both the runtime paths
+# and system trust integration across installs and upgrades.
 [[component-groups.msopenjdk25-generic-jvm-runtime-consumers.default-component-config.overlays]]
-description = "Require the Microsoft OpenJDK compatibility paths at runtime"
+description = "Require Microsoft OpenJDK compatibility paths and system trust at runtime"
 type = "spec-search-replace"
 regex = '^Requires:\s+(java(-25)?-headless(\s+>=\s+1:1\.8)?|java-devel|\(java-25-headless\s+or\s+java-25\))$'
 replacement = 'Requires: msopenjdk-25-fedora-compat'
@@ -122,36 +97,23 @@ category = "azl-compatibility"
 upstream-status = "inapplicable"
 
 [component-groups.msopenjdk25-devel-consumers]
-description = "Components whose Java development dependency must resolve to Microsoft OpenJDK 25"
+description = "Components that need compatibility-owned JVM paths while building"
 components = [
     "R",
     "brltty",
-    "byteman",
-    "ecj",
-    "gdal",
     "graphviz",
     "libwebp",
-    "maven-verifier-plugin",
-    "octave",
-    "opencv",
-    "openmpi",
-    "sleuthkit",
-    "sphinx",
     "subversion",
     "systemtap",
-    "tomcat",
     "vtk",
-    "z3",
-    "zbar",
 ]
 
-# Generic and versioned development requirements can select Fedora OpenJDK,
-# while these builds need the Fedora-compatible Microsoft JDK paths. Remove
-# this overlay once the compatibility package is their sole eligible provider.
+# Generic development requirements can select msopenjdk-25, which does not own
+# the Fedora-compatible JVM alternatives these builds reference directly.
 [[component-groups.msopenjdk25-devel-consumers.default-component-config.overlays]]
-description = "Replace Java development requirements with Microsoft OpenJDK 25"
+description = "Require Microsoft OpenJDK compatibility paths while building"
 type = "spec-search-replace"
-regex = '^BuildRequires:\s+java(-25)?-devel(\s+>=\s+1:(1\.6\.0|1\.17|11))?$'
+regex = '^BuildRequires:\s+java-devel$'
 replacement = 'BuildRequires: msopenjdk-25-fedora-compat'
 
 [component-groups.msopenjdk25-devel-consumers.default-component-config.overlays.metadata]
@@ -159,18 +121,17 @@ category = "azl-compatibility"
 upstream-status = "inapplicable"
 
 [component-groups.msopenjdk25-maven-binding-consumers]
-description = "Maven bindings backed by the Microsoft OpenJDK compatibility package"
+description = "Maven bindings that require compatibility-owned JVM paths and system trust"
 components = [
     "maven",
     "maven4",
 ]
 
-# Maven's OpenJDK 25 binding hard-codes Fedora package dependencies while its
-# configuration retains a Fedora-compatible JVM path. Remove this overlay once
-# msopenjdk-25 provides the `java-25-openjdk-headless` and
-# `java-25-openjdk-devel` capabilities and owns the binding's JVM path.
+# Keep compat required until the provider guarantees the binding's JVM paths
+# and system trust integration across installs and upgrades. Removing Fedora
+# OpenJDK from the repository does not satisfy these requirements.
 [[component-groups.msopenjdk25-maven-binding-consumers.default-component-config.overlays]]
-description = "Back the Maven OpenJDK 25 binding with the Microsoft Fedora compatibility package"
+description = "Require Microsoft OpenJDK compatibility paths and system trust for Maven bindings"
 type = "spec-search-replace"
 section = "%install"
 regex = '^%jp_binding --verbose --variant openjdk25 --ghost maven%\{\?maven_version_suffix\}\.conf --target %\{_javaconfdir\}/maven%\{\?maven_version_suffix\}-openjdk25\.conf --provides %\{name\}-jdk-binding --requires java-25-openjdk-headless --recommends java-25-openjdk-devel$'
@@ -187,9 +148,9 @@ components = [
     "xmvn5",
 ]
 
-# The OpenJDK 25 toolchain bindings require Fedora's development package and
-# retain its JVM layout. Remove this overlay once msopenjdk-25 provides the
-# `java-25-openjdk-devel` capability and owns the binding's JVM paths directly.
+# The OpenJDK 25 toolchain bindings need compat's JVM layout and system trust.
+# Remove this overlay once msopenjdk-25 guarantees both across installs and
+# upgrades and provides the `java-25-openjdk-devel` capability directly.
 [[component-groups.msopenjdk25-xmvn-toolchain-consumers.default-component-config.overlays]]
 description = "Back the XMvn OpenJDK 25 toolchain with the Microsoft Fedora compatibility package"
 type = "spec-search-replace"
@@ -210,8 +171,8 @@ components = [
 
 # XMvn launchers retain Fedora JVM paths but do not require the package that
 # owns those alternatives. Remove this overlay once msopenjdk-25 provides the
-# required headless Java capabilities and owns the JVM alternatives used by
-# these launchers directly.
+# required headless Java capabilities, owns the JVM alternatives used by these
+# launchers, and guarantees system trust integration across installs and upgrades.
 [[component-groups.msopenjdk25-explicit-runtime-consumers.default-component-config.overlays]]
 description = "Require the Microsoft OpenJDK compatibility paths at runtime"
 type = "spec-insert-tag"
