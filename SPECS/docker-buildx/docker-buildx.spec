@@ -24,6 +24,8 @@ Patch8:         CVE-2026-78659.patch
 Patch9:         CVE-2026-78660.patch
 Patch10:        CVE-2026-78669.patch
 Patch11:        CVE-2026-97032.patch
+Patch12:        CVE-2026-92543.patch
+Patch13:        CVE-2026-81870.patch
 
 BuildRequires: bash
 BuildRequires: golang >= 1.25
@@ -61,7 +63,7 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.14.0-19
-- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-92543, CVE-2026-81870
 
 * Wed Sep 16 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 0.14.0-18
 - Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445
