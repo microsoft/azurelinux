@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libical.github.io/libical/
 Source:         https://github.com/%{name}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0:          CVE-2026-88383.patch
+Patch0:         CVE-2026-88383.patch
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  cmake
 BuildRequires:  gcc
