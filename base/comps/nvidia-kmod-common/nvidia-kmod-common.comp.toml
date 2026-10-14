@@ -1,0 +1,22 @@
+# Adapted from NVIDIA's Azure driver packaging:
+# https://gitlab.com/nvidia/packages/azure/nvidia-driver/-/tree/610?ref_type=heads
+[components.nvidia-kmod-common]
+spec = { type = "local", path = "nvidia-kmod-common.spec" }
+
+[components.nvidia-kmod-common.release]
+calculation = "autorelease"
+
+# Vendor NVIDIA package; not present upstream. The firmware files are shipped
+# only inside NVIDIA's self-extracting .run installer, so it is used as the
+# source and unpacked in %prep (mirrors nvidia's own nvidia-generate-tarballs.sh).
+[[components.nvidia-kmod-common.source-files]]
+filename = "NVIDIA-Linux-x86_64-610.43.02.run"
+hash = "aa626828964bd9b68dffd07865d2fb05de09b0fe944d6ff8af20412601fc72459186eee580e290c379e1a2b74f8e88c6ee406016814850952cf9330e64ab3032"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://download.nvidia.com/XFree86/Linux-x86_64/610.43.02/NVIDIA-Linux-x86_64-610.43.02.run" }
+
+[[components.nvidia-kmod-common.source-files]]
+filename = "NVIDIA-Linux-aarch64-610.43.02.run"
+hash = "fe44af192ec259793b2f05e53da25481fae5a9fe01131b3b4f7893858c9f788b5d031cd83b7439bf3f1ee1be48c629548d61d8f611153324ba5b46583846a1a4"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://download.nvidia.com/XFree86/Linux-aarch64/610.43.02/NVIDIA-Linux-aarch64-610.43.02.run" }
