@@ -32,7 +32,6 @@ ignore = [
     "PLR0915",
     "PLR0917",
     "PLW0603",
-    "S101",
     "S310",
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
     "S607",   # Requiring abspath for all binaries used is very restrictive
@@ -45,6 +44,9 @@ fixable = ["ALL"]
 [lint.per-file-ignores]
 "**/test_*.py" = ["S101"]
 "**/*_test.py" = ["S101"]
+# Pytest fixtures and helper modules use assertions as the framework's native
+# expectation mechanism, even when their filenames do not match test patterns.
+"**/tests/**/*.py" = ["S101"]
 
 # The image-test cases are a pytest filesystem hierarchy, not importable
 # packages, and use the repository-standard SPDX header without a separate
