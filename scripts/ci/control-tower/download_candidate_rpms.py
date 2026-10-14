@@ -4,56 +4,31 @@
 from __future__ import annotations
 
 import argparse
-import errno
 import hashlib
-import http.client
 import json
 import shutil
-import socket
-import ssl
 import subprocess
 import sys
-import time
-import urllib.error
 import urllib.parse
-import urllib.request
-import xmlrpc.client
-from email.utils import parsedate_to_datetime
 from pathlib import Path, PurePosixPath
-from random import SystemRandom
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import Any, TypedDict
 from xml.parsers.expat import ExpatError
+from xmlrpc.client import Error as XmlRpcError
 
 import client as ct
+import koji
 import package_build
+import requests
 from publication_policy import load_publication_policy
-
-if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
 
 DOWNLOAD_CHUNK_SIZE = 1024 * 1024
 REQUEST_TIMEOUT_SECONDS = 60
-MAX_OPERATION_SECONDS = 600
-MAX_REQUEST_ATTEMPTS = 4
-RETRY_BACKOFF_SECONDS = 2
-MAX_RETRY_DELAY_SECONDS = 30
-RETRY_RANDOM = SystemRandom()
-MAX_RPM_COUNT = 10_000
-MAX_KOJI_RESPONSE_SIZE = 16 * 1024 * 1024
-MAX_RPM_SIZE = 1024 * 1024 * 1024
-MAX_TOTAL_RPM_SIZE = 50 * 1024 * 1024 * 1024
+MAX_REQUEST_RETRIES = 3
+RETRY_INTERVAL_SECONDS = 2
 RPM_MAGIC = b"\xed\xab\xee\xdb"
-KOJI_TASK_CLOSED = 2
 BUILD_ARCH_REQUEST_ARCH_INDEX = 2
 BUILD_REQUEST_OPTIONS_INDEX = 2
-READ_ONLY_KOJI_METHODS = frozenset({
-    "getTaskChildren", "getTaskInfo", "getTaskResult", "listTaskOutput",
-})
-RETRYABLE_HTTP_STATUSES = frozenset({408, 429, 500, 502, 503, 504})
-RETRYABLE_NETWORK_ERRNOS = frozenset({
-    errno.ECONNABORTED, errno.ECONNREFUSED, errno.ECONNRESET,
-    errno.EHOSTUNREACH, errno.ENETUNREACH, errno.EPIPE, errno.ETIMEDOUT,
-})
+RETRYABLE_HTTP_STATUSES = (408, 429, 500, 502, 503, 504)
 
 
 class ArchitectureTask(TypedDict):
@@ -75,7 +50,6 @@ class DownloadedRpm(TypedDict):
 
     architecture: str
     component: str
-    downloadAttempts: int
     filename: str
     name: str
     path: str
@@ -83,177 +57,7 @@ class DownloadedRpm(TypedDict):
     sha256: str
     size: int
     taskId: int
-    transferredBytes: int
     url: str
-
-
-def _remaining_request_timeout(deadline: float) -> float:
-    remaining = deadline - time.monotonic()
-    if remaining <= 0:
-        raise TimeoutError("Koji operation deadline exceeded")
-    return min(REQUEST_TIMEOUT_SECONDS, remaining)
-
-
-def _response_chunks(
-    response: http.client.HTTPResponse, deadline: float,
-) -> Iterator[bytes]:
-    while True:
-        _remaining_request_timeout(deadline)
-        try:
-            chunk = response.read1(DOWNLOAD_CHUNK_SIZE)
-        except http.client.IncompleteRead as exc:
-            if exc.partial:
-                yield exc.partial
-            raise
-        _remaining_request_timeout(deadline)
-        if not chunk:
-            return
-        yield chunk
-
-
-def _is_retryable_transport_error(error: OSError | http.client.HTTPException) -> bool:
-    if isinstance(error, urllib.error.HTTPError):
-        return error.code in RETRYABLE_HTTP_STATUSES
-    if isinstance(error, urllib.error.URLError):
-        reason = error.reason
-        return (
-            isinstance(reason, (OSError, http.client.HTTPException))
-            and _is_retryable_transport_error(reason)
-        )
-    if isinstance(error, ssl.SSLError):
-        return False
-    if isinstance(error, socket.gaierror):
-        return error.errno == socket.EAI_AGAIN
-    if isinstance(error, (TimeoutError, ConnectionError, http.client.IncompleteRead)):
-        return True
-    return isinstance(error, OSError) and error.errno in RETRYABLE_NETWORK_ERRNOS
-
-
-def _retry_after_seconds(value: str | None) -> float | None:
-    if value is None:
-        return None
-    value = value.strip()
-    if value.isascii() and value.isdigit():
-        return float(value)
-    try:
-        when = parsedate_to_datetime(value)
-        if when.tzinfo is not None:
-            return max(0.0, when.timestamp() - time.time())
-    except (OverflowError, TypeError, ValueError):
-        pass
-    print("Ignoring malformed Koji Retry-After header; using bounded backoff.", file=sys.stderr)
-    return None
-
-
-def _retry_koji_read[T](operation: Callable[[float], T], *, label: str) -> T:
-    deadline = time.monotonic() + MAX_OPERATION_SECONDS
-    for attempt in range(1, MAX_REQUEST_ATTEMPTS + 1):
-        try:
-            _remaining_request_timeout(deadline)
-            return operation(deadline)
-        except (OSError, http.client.HTTPException) as exc:
-            retry_after = None
-            if isinstance(exc, urllib.error.HTTPError):
-                if exc.headers is not None:
-                    retry_after = exc.headers.get("Retry-After")
-                exc.close()
-            remaining = deadline - time.monotonic()
-            if (
-                not _is_retryable_transport_error(exc)
-                or attempt == MAX_REQUEST_ATTEMPTS
-                or remaining <= 0
-            ):
-                raise RuntimeError(
-                    f"{label} failed on attempt {attempt}/{MAX_REQUEST_ATTEMPTS} "
-                    f"(remaining retry window: {max(0.0, remaining):.1f}s): {exc}"
-                ) from exc
-            delay = min(
-                MAX_RETRY_DELAY_SECONDS,
-                RETRY_BACKOFF_SECONDS * 2 ** (attempt - 1) + RETRY_RANDOM.uniform(0.0, 1.0),
-            )
-            requested_delay = _retry_after_seconds(retry_after)
-            if requested_delay is not None:
-                if requested_delay > MAX_RETRY_DELAY_SECONDS:
-                    raise RuntimeError(
-                        f"{label} failed on attempt {attempt}/{MAX_REQUEST_ATTEMPTS}: "
-                        f"Retry-After exceeds the {MAX_RETRY_DELAY_SECONDS}s retry-delay limit; {exc}"
-                    ) from exc
-                delay = max(delay, requested_delay)
-            if delay >= remaining:
-                raise RuntimeError(
-                    f"{label} exhausted its retry window after attempt "
-                    f"{attempt}/{MAX_REQUEST_ATTEMPTS}: {exc}"
-                ) from exc
-            print(
-                f"{label}: attempt {attempt}/{MAX_REQUEST_ATTEMPTS} failed: {exc}; "
-                f"retrying in {delay:.1f}s.",
-                file=sys.stderr,
-            )
-            time.sleep(delay)
-        except (RuntimeError, ValueError) as exc:
-            raise RuntimeError(
-                f"{label} failed on attempt {attempt}/{MAX_REQUEST_ATTEMPTS}: {exc}"
-            ) from exc
-    raise AssertionError("Unreachable Koji retry state")
-
-
-class KojiClient:
-    """Read bounded XML-RPC metadata without a separate Koji dependency."""
-
-    def __init__(self, url: str, ssl_context: ssl.SSLContext) -> None:
-        """Use an explicitly configured HTTPS hub and TLS policy."""
-        self.url = validate_https_url("koji-hub-url", url)
-        self.ssl_context = ssl_context
-
-    def call(self, method: str, args: tuple[int | bool, ...]) -> object:
-        """Read one response, surfacing transport, protocol, and hub faults."""
-        if method not in READ_ONLY_KOJI_METHODS:
-            raise ValueError(f"Unsupported Koji metadata method: {method}")
-        request = urllib.request.Request(
-            self.url,
-            data=xmlrpc.client.dumps(args, methodname=method).encode("utf-8"),
-            headers={
-                "Content-Type": "text/xml",
-                "User-Agent": "azurelinux-candidate-rpm-acquisition/1",
-            },
-        )
-        label = f"Koji {method}{args!r} at {self.url}"
-        try:
-            document = _retry_koji_read(
-                lambda deadline: self._read_response(request, deadline),
-                label=label,
-            )
-            values, _ = xmlrpc.client.loads(document)
-            if len(values) != 1:
-                raise RuntimeError(
-                    f"Koji {method}{args!r} response must contain exactly one value at {self.url}"
-                )
-        except (OSError, ValueError, http.client.HTTPException, xmlrpc.client.Error, ExpatError) as exc:
-            raise RuntimeError(
-                f"Koji {method}{args!r} failed at {self.url}: {exc}"
-            ) from exc
-        return values[0]
-
-    def _read_response(self, request: urllib.request.Request, deadline: float) -> bytes:
-        with urllib.request.urlopen(
-            request,
-            context=self.ssl_context,
-            timeout=_remaining_request_timeout(deadline),
-        ) as response:
-            content_length = response.headers.get("Content-Length")
-            expected_size = int(content_length) if content_length is not None else None
-            if expected_size is not None and expected_size < 0:
-                raise ValueError("Koji XML-RPC response has negative Content-Length")
-            if expected_size is not None and expected_size > MAX_KOJI_RESPONSE_SIZE:
-                raise RuntimeError(f"Koji {request.full_url} response exceeds the size limit")
-            document = bytearray()
-            for chunk in _response_chunks(response, deadline):
-                if len(document) + len(chunk) > MAX_KOJI_RESPONSE_SIZE:
-                    raise RuntimeError(f"Koji {request.full_url} response exceeds the size limit")
-                document.extend(chunk)
-            if expected_size is not None and len(document) != expected_size:
-                raise RuntimeError("Koji XML-RPC response does not match Content-Length")
-        return bytes(document)
 
 
 def _parse_args() -> argparse.Namespace:
@@ -294,13 +98,33 @@ def validate_https_url(name: str, value: str) -> str:
     return value.rstrip("/")
 
 
-def make_koji_ssl_context(insecure: bool) -> ssl.SSLContext:
-    """Create the SSL context used for Koji hub and file requests."""
-    context = ssl.create_default_context()
-    if insecure:
-        context.check_hostname = False
-        context.verify_mode = ssl.CERT_NONE
-    return context
+def make_koji_client(url: str, *, insecure: bool) -> koji.ClientSession:
+    """Configure the official client for anonymous metadata reads."""
+    return koji.ClientSession(
+        validate_https_url("koji-hub-url", url),
+        opts={
+            "anon_retry": True,
+            "max_retries": MAX_REQUEST_RETRIES,
+            "no_ssl_verify": insecure,
+            "offline_retry": False,
+            "retry_interval": RETRY_INTERVAL_SECONDS,
+            "timeout": REQUEST_TIMEOUT_SECONDS,
+        },
+    )
+
+
+def make_download_session(*, insecure: bool) -> requests.Session:
+    """Reuse Koji's HTTP retries with explicit artifact TLS verification."""
+    session = requests.Session()
+    session.verify = not insecure
+    session.headers["User-Agent"] = "azurelinux-candidate-rpm-acquisition/1"
+    session.headers["Accept-Encoding"] = "identity"
+    return koji.request_with_retry(
+        retries=MAX_REQUEST_RETRIES,
+        backoff_factor=RETRY_INTERVAL_SECONDS,
+        status_forcelist=RETRYABLE_HTTP_STATUSES,
+        session=session,
+    )
 
 
 def read_job_id(path: Path) -> str:
@@ -326,38 +150,21 @@ def make_task_output_url(koji_files_url: str, task_id: int, filename: str) -> st
     """Construct a Koji work/tasks URL without permitting path traversal."""
     _validate_task_output_filename(filename)
     quoted_filename = urllib.parse.quote(filename, safe="")
-    return f"{koji_files_url}/work/tasks/{task_id % 10000}/{task_id}/{quoted_filename}"
-
-
-def _validate_rpm_size(size: int, filename: str) -> None:
-    if size > MAX_RPM_SIZE:
-        raise RuntimeError(f"Koji RPM exceeds the {MAX_RPM_SIZE}-byte safety limit: {filename}")
-
-
-def _validate_rpm_magic(chunk: bytes, filename: str) -> None:
-    if not chunk.startswith(RPM_MAGIC):
-        raise RuntimeError(f"Koji output is not an RPM: {filename}")
-
-
-def _validate_download_budget(size: int, maximum_size: int, filename: str) -> None:
-    if size > maximum_size:
-        raise RuntimeError(
-            f"Koji RPM exceeds the remaining aggregate download budget: {filename}"
-        )
+    return f"{koji.PathInfo(topdir=koji_files_url).task(task_id)}/{quoted_filename}"
 
 
 def discover_arch_tasks(
-    hub: KojiClient, root_task_id: int, architecture: str,
+    hub: koji.ClientSession, root_task_id: int, architecture: str,
 ) -> list[ArchitectureTask]:
     """Prefer matching tasks, inspecting other arches for shared noarch outputs."""
-    root = hub.call("getTaskInfo", (root_task_id, True, True))
+    root = hub.getTaskInfo(root_task_id, request=True, strict=True)
     if (
         not isinstance(root, dict)
         or type(root.get("id")) is not int
         or root["id"] != root_task_id
         or root.get("method") != "build"
         or type(root.get("state")) is not int
-        or root["state"] != KOJI_TASK_CLOSED
+        or root["state"] != koji.TASK_STATES["CLOSED"]
     ):
         raise RuntimeError(f"Koji root task {root_task_id} is not a closed build")
     request = root.get("request")
@@ -376,7 +183,7 @@ def discover_arch_tasks(
         raise RuntimeError(
             f"Koji root task {root_task_id} has an architecture override excluding {architecture}"
         )
-    children = hub.call("getTaskChildren", (root_task_id, True, True))
+    children = hub.getTaskChildren(root_task_id, request=True, strict=True)
     if not isinstance(children, list):
         raise TypeError(f"Koji task {root_task_id} has malformed child metadata")
     selected: dict[str, int] = {}
@@ -406,7 +213,7 @@ def discover_arch_tasks(
         ):
             raise RuntimeError(f"Koji buildArch task {task_id} has a malformed request")
         requested_arch = request[BUILD_ARCH_REQUEST_ARCH_INDEX]
-        if type(child.get("state")) is not int or child["state"] != KOJI_TASK_CLOSED:
+        if type(child.get("state")) is not int or child["state"] != koji.TASK_STATES["CLOSED"]:
             raise RuntimeError(f"Koji buildArch task {task_id} for {requested_arch} is not closed")
         if requested_arch in selected:
             raise RuntimeError(
@@ -423,9 +230,9 @@ def discover_arch_tasks(
     ]
 
 
-def discover_rpm_outputs(hub: KojiClient, task_id: int, architecture: str) -> list[str]:
+def discover_rpm_outputs(hub: koji.ClientSession, task_id: int, architecture: str) -> list[str]:
     """Cross-check the build result against the complete task output inventory."""
-    result = hub.call("getTaskResult", (task_id,))
+    result = hub.getTaskResult(task_id)
     if not isinstance(result, dict) or not isinstance(result.get("rpms"), list) or not result["rpms"]:
         raise RuntimeError(f"Koji buildArch task {task_id} has no RPM result manifest")
     expected: set[str] = set()
@@ -435,13 +242,13 @@ def discover_rpm_outputs(hub: KojiClient, task_id: int, architecture: str) -> li
         filename = PurePosixPath(path).name
         _validate_task_output_filename(filename)
         if (
-            path != f"tasks/{task_id % 10000}/{task_id}/{filename}"
+            path != f"{koji.PathInfo().taskrelpath(task_id)}/{filename}"
             or not filename.endswith((f".{architecture}.rpm", ".noarch.rpm"))
             or filename in expected
         ):
             raise RuntimeError(f"Koji task {task_id} has an invalid or duplicate RPM result path: {path!r}")
         expected.add(filename)
-    outputs = hub.call("listTaskOutput", (task_id, False, True, True))
+    outputs = hub.listTaskOutput(task_id, all_volumes=True, strict=True)
     if not isinstance(outputs, dict) or any(not isinstance(name, str) for name in outputs):
         raise RuntimeError(f"Koji task {task_id} has a malformed output inventory")
     listed: set[str] = set()
@@ -530,87 +337,50 @@ def download_rpm(
     destination: Path,
     filename: str,
     koji_files_url: str,
-    ssl_context: ssl.SSLContext,
+    session: requests.Session,
     source_component: str,
     task_id: int,
-    maximum_size: int = MAX_RPM_SIZE,
 ) -> DownloadedRpm:
-    """Download one bounded Koji RPM and return its manifest entry."""
+    """Stream one RPM with explicit TLS policy and record its content hash."""
     destination.mkdir(parents=True, exist_ok=True)
     output_path = destination / filename
     url = make_task_output_url(koji_files_url, task_id, filename)
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "azurelinux-candidate-rpm-acquisition/1"},
-    )
-    transferred_bytes = 0
-    attempts = 0
-
-    def attempt_download(deadline: float) -> tuple[int, str]:
-        nonlocal transferred_bytes, attempts
-        attempts += 1
-        digest = hashlib.sha256()
-        size = 0
-        prefix = bytearray()
-        complete = False
-        try:
-            with (
-                urllib.request.urlopen(
-                    request,
-                    context=ssl_context,
-                    timeout=_remaining_request_timeout(deadline),
-                ) as response,
-                output_path.open("wb") as output,
-            ):
-                content_length = response.headers.get("Content-Length")
-                expected_size: int | None = None
-                if content_length is not None:
-                    expected_size = int(content_length)
-                    if expected_size < 0:
-                        raise ValueError(f"Koji output has negative Content-Length: {filename}")
-                    _validate_rpm_size(expected_size, filename)
-                    _validate_download_budget(expected_size, maximum_size - transferred_bytes, filename)
-                for chunk in _response_chunks(response, deadline):
-                    transferred_bytes += len(chunk)
-                    size += len(chunk)
-                    _validate_rpm_size(size, filename)
-                    _validate_download_budget(transferred_bytes, maximum_size, filename)
+    digest = hashlib.sha256()
+    size = 0
+    prefix = bytearray()
+    complete = False
+    try:
+        with session.get(url, stream=True, timeout=REQUEST_TIMEOUT_SECONDS) as response:
+            response.raise_for_status()
+            with output_path.open("wb") as output:
+                for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
                     if len(prefix) < len(RPM_MAGIC):
                         prefix.extend(chunk[:len(RPM_MAGIC) - len(prefix)])
-                        if len(prefix) == len(RPM_MAGIC):
-                            _validate_rpm_magic(bytes(prefix), filename)
+                    size += len(chunk)
                     digest.update(chunk)
                     output.write(chunk)
-            if size < len(RPM_MAGIC):
-                raise RuntimeError(f"Koji output is too short to be an RPM: {filename}")
-            if expected_size is not None and size != expected_size:
-                raise RuntimeError(
-                    f"Koji output size does not match Content-Length for {filename}: "
-                    f"expected {expected_size}, received {size}"
-                )
-            complete = True
-        finally:
-            if not complete:
-                output_path.unlink(missing_ok=True)
-        return size, digest.hexdigest()
-
-    try:
-        size, sha256 = _retry_koji_read(attempt_download, label=f"Download {url}")
-    except (RuntimeError, ValueError) as exc:
-        raise RuntimeError(f"Failed to download {url} after {attempts} attempt(s): {exc}") from exc
+            if bytes(prefix) != RPM_MAGIC:
+                raise RuntimeError(f"Koji output is not an RPM: {filename}")
+            content_length = response.headers.get("Content-Length")
+            if content_length is not None and size != int(content_length):
+                raise RuntimeError(f"Koji output size does not match Content-Length for {filename}")
+        complete = True
+    except requests.RequestException as exc:
+        raise RuntimeError(f"Failed to download {url}: {exc}") from exc
+    finally:
+        if not complete:
+            output_path.unlink(missing_ok=True)
     architecture = filename.removesuffix(".rpm").rsplit(".", maxsplit=1)[-1]
     return {
         "architecture": architecture,
         "component": source_component,
-        "downloadAttempts": attempts,
         "filename": filename,
         "name": "",
         "path": str(output_path),
         "repository": "",
-        "sha256": sha256,
+        "sha256": digest.hexdigest(),
         "size": size,
         "taskId": task_id,
-        "transferredBytes": transferred_bytes,
         "url": url,
     }
 
@@ -720,8 +490,7 @@ def run_acquisition(args: argparse.Namespace) -> dict[str, Any]:
             json.dumps(sorted(replaced_components), indent=2) + "\n", encoding="utf-8"
         )
 
-    koji_context = make_koji_ssl_context(args.insecure_koji_tls)
-    hub = KojiClient(koji_hub_url, koji_context)
+    hub = make_koji_client(koji_hub_url, insecure=args.insecure_koji_tls)
     discovered: list[tuple[str, int, str]] = []
     package_tasks: list[dict[str, Any]] = []
     for component_task in component_tasks:
@@ -767,26 +536,17 @@ def run_acquisition(args: argparse.Namespace) -> dict[str, Any]:
     filenames = [filename for _, _, filename in discovered]
     if len(filenames) != len(set(filenames)):
         raise RuntimeError("Completed Koji package tasks expose duplicate RPM filenames")
-    if len(filenames) > MAX_RPM_COUNT:
-        raise RuntimeError(
-            f"Completed Koji tasks expose {len(filenames)} RPMs, exceeding the "
-            f"{MAX_RPM_COUNT}-file safety limit"
-        )
-
     candidates: list[DownloadedRpm] = []
-    remaining_bytes = MAX_TOTAL_RPM_SIZE
-    for component, task_id, filename in discovered:
-        candidate = download_rpm(
-            destination=args.download_directory,
-            filename=filename,
-            koji_files_url=koji_files_url,
-            maximum_size=remaining_bytes,
-            source_component=component,
-            ssl_context=koji_context,
-            task_id=task_id,
-        )
-        candidates.append(candidate)
-        remaining_bytes -= candidate["transferredBytes"]
+    with make_download_session(insecure=args.insecure_koji_tls) as download_session:
+        for component, task_id, filename in discovered:
+            candidates.append(download_rpm(
+                destination=args.download_directory,
+                filename=filename,
+                koji_files_url=koji_files_url,
+                source_component=component,
+                session=download_session,
+                task_id=task_id,
+            ))
     route_candidates(
         base_directory=args.candidate_base_dir,
         candidates=candidates,
@@ -801,25 +561,20 @@ def run_acquisition(args: argparse.Namespace) -> dict[str, Any]:
             "expectedComponents": sorted(expected_components),
             "kojiDiscovery": "xmlrpc-result-manifest-and-output-inventory",
             "kojiHubUrl": koji_hub_url,
+            "kojiClientVersion": koji.__version__,
             "kojiPackageTasks": package_tasks,
             "kojiTlsCertificateVerification": not args.insecure_koji_tls,
             "retryPolicy": {
-                "maximumAttempts": MAX_REQUEST_ATTEMPTS,
-                "maximumDelaySeconds": MAX_RETRY_DELAY_SECONDS,
-                "operationDeadlineSeconds": MAX_OPERATION_SECONDS,
+                "maximumRetries": MAX_REQUEST_RETRIES,
                 "requestTimeoutSeconds": REQUEST_TIMEOUT_SECONDS,
-            },
-            "safetyLimits": {
-                "maximumRpmBytes": MAX_RPM_SIZE,
-                "maximumRpmCount": MAX_RPM_COUNT,
-                "maximumTotalRpmBytes": MAX_TOTAL_RPM_SIZE,
+                "type": "koji-client-and-http-adapter",
             },
             "type": "control-tower-koji",
         },
         "architecture": args.architecture,
         "candidates": candidates,
         "result": "passed",
-        "schemaVersion": 2,
+        "schemaVersion": 3,
     }
 
 
@@ -841,13 +596,16 @@ def main() -> int:
         )
     try:
         report = run_acquisition(args)
-    except (OSError, RuntimeError, TypeError, ValueError) as exc:
+    except (
+        OSError, RuntimeError, TypeError, ValueError,
+        koji.GenericError, requests.RequestException, ExpatError, XmlRpcError,
+    ) as exc:
         write_report(
             args.report,
             {
                 "error": str(exc),
                 "result": "failed",
-                "schemaVersion": 2,
+                "schemaVersion": 3,
             },
         )
         print(f"##vso[task.logissue type=error]{exc}", file=sys.stderr)

@@ -15,6 +15,7 @@ repos:
         additional_dependencies:
           - azure-devops==7.1.0b4
           - azure-identity==1.26.0
+          - koji==1.36.1
           - mcp==2.2.0
           - pydantic==2.13.5
           - pytest==9.1.1

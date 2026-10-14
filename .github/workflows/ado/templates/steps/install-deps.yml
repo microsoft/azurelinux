@@ -83,6 +83,7 @@ steps:
     - script: |
         set -euo pipefail
         echo "##[group]Python dependencies (Control Tower client)"
+        tdnf install -y gcc krb5-devel python3-devel
         pip install -r scripts/ci/control-tower/requirements.txt
         echo "##[endgroup]"
       displayName: "Install Control Tower Python client"
