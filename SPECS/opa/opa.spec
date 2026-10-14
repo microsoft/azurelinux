@@ -26,7 +26,11 @@ Patch4:         CVE-2025-11065.patch
 Patch5:         CVE-2026-39821.patch
 Patch6:         CVE-2026-56852.patch
 Patch7:         CVE-2026-78659.patch
-Patch8:         CVE-2026-97032.patch
+Patch8:         CVE-2026-78660.patch
+Patch9:         CVE-2026-78669.patch
+Patch10:        CVE-2026-78663.patch
+Patch11:        CVE-2026-97032.patch
+Patch12:        CVE-2026-81869.patch
 # Warn users about WebAssembly missing
 BuildRequires:  golang
 BuildRequires:  make
@@ -61,7 +65,7 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.63.0-6
-- Patch for CVE-2026-97032, CVE-2026-78659
+- Patch for CVE-2026-97032, CVE-2026-78659, CVE-2026-78660, CVE-2026-78669, CVE-2026-78663, CVE-2026-81869
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.63.0-5
 - Patch for CVE-2026-56852
