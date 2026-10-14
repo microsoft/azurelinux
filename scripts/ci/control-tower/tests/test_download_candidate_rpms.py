@@ -91,7 +91,7 @@ def _response(body: bytes, headers: dict[str, str] | None = None) -> Mock:
 
 @pytest.mark.parametrize("insecure", [False, True])
 def test_official_client_sends_metadata_with_tls_policy(
-    monkeypatch: pytest.MonkeyPatch, insecure: bool,
+    monkeypatch: pytest.MonkeyPatch, *, insecure: bool,
 ) -> None:
     """Exercise the upstream client's serialization and TLS request options."""
     body = xmlrpc.client.dumps(({"state": 2},), methodresponse=True).encode()
@@ -126,7 +126,7 @@ def test_official_client_surfaces_hub_fault(monkeypatch: pytest.MonkeyPatch) -> 
 
 
 @pytest.mark.parametrize("insecure", [False, True])
-def test_download_session_reuses_koji_retries_with_tls_policy(insecure: bool) -> None:
+def test_download_session_reuses_koji_retries_with_tls_policy(*, insecure: bool) -> None:
     """Configure artifact requests independently of the hub's TLS option."""
     with acquisition.make_download_session(insecure=insecure) as session:
         assert session.verify is not insecure
@@ -672,7 +672,7 @@ default-package-config.publish.rpm-channel = "rpm-sdk"
 @pytest.mark.parametrize("insecure", [False, True])
 def test_run_acquisition_uses_structured_discovery_before_downloading(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, acquisition_args: argparse.Namespace,
-    architecture: str, missing_output: bool, insecure: bool,
+    architecture: str, *, missing_output: bool, insecure: bool,
 ) -> None:
     """Check each architecture and noarch outputs without mixing native RPMs."""
     args = acquisition_args
@@ -744,7 +744,7 @@ def test_run_acquisition_uses_structured_discovery_before_downloading(
 @pytest.mark.parametrize("missing_output", [False, True])
 def test_run_acquisition_handles_architecture_restricted_components(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, acquisition_args: argparse.Namespace,
-    capsys: pytest.CaptureFixture[str], architecture: str, include_noarch: bool, missing_output: bool,
+    capsys: pytest.CaptureFixture[str], architecture: str, *, include_noarch: bool, missing_output: bool,
 ) -> None:
     """Keep shared outputs and removals without accepting incomplete other-arch data."""
     args = acquisition_args

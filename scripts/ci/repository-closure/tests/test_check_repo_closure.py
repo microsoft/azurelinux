@@ -555,7 +555,7 @@ def test_query_replaced_binary_names_includes_all_former_outputs(
 
 @pytest.mark.parametrize("include_sdk", [False, True])
 def test_negative_deltas_are_excluded_from_candidate_view_only(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, include_sdk: bool,
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, *, include_sdk: bool,
 ) -> None:
     """No candidate may borrow deleted outputs or base-to-SDK moved packages."""
     monkeypatch.setattr(
