@@ -1,0 +1,12 @@
+--- gix-imara-diff-0.2.3/Cargo.toml	2006-07-24T01:21:28+00:00
++++ gix-imara-diff-0.2.3/Cargo.toml	2026-06-26T18:49:33.749732+00:00
+@@ -67,9 +67,6 @@
+ version = "1.4.2"
+ features = ["derive"]
+ 
+-[dev-dependencies.cov-mark]
+-version = "2.1.0"
+-
+ [dev-dependencies.expect-test]
+ version = "1.4.0"
+ 
