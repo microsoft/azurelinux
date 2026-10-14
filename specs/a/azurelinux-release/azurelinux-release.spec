@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -52,6 +52,7 @@ Source14:       distro-template.swidtag
 Source15:       distro-variant-template.swidtag
 Source16:       20-azurelinux-defaults.conf
 Source17:       20-azure.conf
+Source18:       80-wsl.preset
 
 Source20:       chrony-azure.conf
 Source21:       50-azure-cloud.conf
@@ -68,6 +69,7 @@ Source31:       60-azurelinux-cis-module-denylist.conf
 Source32:       azurelinux-cis-shell-timeout.sh
 Source33:       00-rsyslog_filecreatemode.conf
 Source34:       azurelinux-cis-umask.sh
+Source35:       wsl-disable.conf
 
 BuildArch:      noarch
 
@@ -230,7 +232,7 @@ Summary:        Package providing the identity for Azure Linux WSL.
 RemovePathPostfixes: .wsl
 Provides:       azurelinux-release-identity = %{version}-%{release}
 Conflicts:      azurelinux-release-identity
-Requires(meta): azurelinux-release-container = %{version}-%{release}
+Requires(meta): azurelinux-release-wsl = %{version}-%{release}
 
 
 %description identity-wsl
@@ -380,6 +382,18 @@ echo "VARIANT=\"WSL\"" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 echo "VARIANT_ID=wsl" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -i -e "s|(%{release_name}%{?prerelease})|(WSL%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/WSL/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
+
+# WSL systemd policy; see docs/wsl-systemd-policy.md. The preset sets the default
+# enablement, and the drop-ins skip units that WSL activates by other means.
+install -Dm0644 %{SOURCE18} -t %{buildroot}%{_prefix}/lib/systemd/system-preset/
+for unit in console-getty.service \
+            systemd-vconsole-setup.service \
+            tmp.mount \
+            systemd-tmpfiles-setup-dev.service \
+            systemd-tmpfiles-setup-dev-early.service; do
+    install -Dm0644 %{SOURCE35} \
+        %{buildroot}%{_prefix}/lib/systemd/system/"${unit}".d/wsl-disable.conf
+done
 %endif
 
 # Create the symlink for /etc/os-release
@@ -528,10 +542,26 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 %files identity-wsl
 %{_prefix}/lib/os-release.wsl
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
+%{_prefix}/lib/systemd/system-preset/80-wsl.preset
+%dir %{_prefix}/lib/systemd/system/console-getty.service.d
+%dir %{_prefix}/lib/systemd/system/systemd-vconsole-setup.service.d
+%dir %{_prefix}/lib/systemd/system/tmp.mount.d
+%dir %{_prefix}/lib/systemd/system/systemd-tmpfiles-setup-dev.service.d
+%dir %{_prefix}/lib/systemd/system/systemd-tmpfiles-setup-dev-early.service.d
+%{_prefix}/lib/systemd/system/console-getty.service.d/wsl-disable.conf
+%{_prefix}/lib/systemd/system/systemd-vconsole-setup.service.d/wsl-disable.conf
+%{_prefix}/lib/systemd/system/tmp.mount.d/wsl-disable.conf
+%{_prefix}/lib/systemd/system/systemd-tmpfiles-setup-dev.service.d/wsl-disable.conf
+%{_prefix}/lib/systemd/system/systemd-tmpfiles-setup-dev-early.service.d/wsl-disable.conf
 %endif
 
 
 %changelog
+* Sat Oct 10 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-33
+- Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and the getty units for the WSL variant
+- Skip the generator-activated console getty and the static vconsole, /tmp and early device setup units with ConditionVirtualization=!wsl drop-ins
+- Pair the WSL identity with the WSL release package rather than the container variant
+
 * Mon Oct 05 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-32
 - Configure secure root and default login-shell umasks for cloud systems
 
