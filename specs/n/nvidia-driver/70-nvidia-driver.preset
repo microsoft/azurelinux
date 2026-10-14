@@ -1,0 +1,15 @@
+# Enable persistence state. From:
+# file:///usr/share/doc/nvidia-driver/html/nvidia-persistenced.html
+
+enable nvidia-persistenced.service
+
+# Enable Fabric Manager:
+enable nvidia-fabricmanager.service
+
+# Enable IMEX:
+enable nvidia-imex.service
+
+# Enable Dynamic Boost. From:
+# file:///usr/share/doc/nvidia-driver/html/dynamicboost.html
+
+enable nvidia-powerd.service

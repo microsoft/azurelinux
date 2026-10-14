@@ -1,0 +1,7 @@
+# Adapted from NVIDIA's Azure driver packaging:
+# https://gitlab.com/nvidia/packages/azure/nvidia-driver/-/tree/610?ref_type=heads
+[components.nvidia-open]
+spec = { type = "local", path = "nvidia-open.spec" }
+
+[components.nvidia-open.release]
+calculation = "autorelease"
