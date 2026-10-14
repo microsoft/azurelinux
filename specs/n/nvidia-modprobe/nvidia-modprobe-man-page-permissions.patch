@@ -1,0 +1,12 @@
+diff -Naur nvidia-modprobe-525.60.11.old/Makefile nvidia-modprobe-525.60.11/Makefile
+--- nvidia-modprobe-525.60.11.old/Makefile	2022-11-28 20:15:22.000000000 +0100
++++ nvidia-modprobe-525.60.11/Makefile	2022-11-30 07:56:18.751429168 +0100
+@@ -110,7 +110,7 @@
+ .PHONY: MANPAGE_install
+ MANPAGE_install: $(MANPAGE)
+ 	$(MKDIR) $(MANDIR)
+-	$(INSTALL) $(INSTALL_BIN_ARGS) $< $(MANDIR)/$(notdir $<)
++	$(INSTALL) $(INSTALL_DOC_ARGS) $< $(MANDIR)/$(notdir $<)
+ 
+ $(eval $(call DEBUG_INFO_RULES, $(NVIDIA_MODPROBE)))
+ $(NVIDIA_MODPROBE).unstripped: $(OBJS)
