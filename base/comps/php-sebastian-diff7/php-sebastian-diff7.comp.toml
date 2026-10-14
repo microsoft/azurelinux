@@ -1,3 +1,0 @@
-[components.php-sebastian-diff7]
-build.without = ["tests"]
-

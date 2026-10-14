@@ -1,9 +1,6 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/php-phpunit-php-code-coverage12.azl.macros}
-
 # remirepo/fedora spec file for php-phpunit-php-code-coverage12
 #
 # SPDX-FileCopyrightText:  Copyright 2013-2026 Remi Collet
@@ -29,7 +26,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{ver_major}
 Version:        12.5.7
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:        PHP code coverage information, version %{ver_major}
 
 # SPDX: Main license is BSD-3-Clause
@@ -41,7 +38,6 @@ URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
 Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
-Source9999: php-phpunit-php-code-coverage12.azl.macros
 
 BuildArch:      noarch
 BuildRequires:  php(language) >= 8.3

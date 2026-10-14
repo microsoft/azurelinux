@@ -1,3 +1,0 @@
-[components.php-sebastian-exporter7]
-build.without = ["tests"]
-

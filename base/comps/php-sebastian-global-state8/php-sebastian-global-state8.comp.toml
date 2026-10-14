@@ -1,3 +1,0 @@
-[components.php-sebastian-global-state8]
-build.without = ["tests"]
-
