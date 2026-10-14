@@ -10,6 +10,7 @@ URL:            https://github.com/oauthlib/oauthlib
 Source0:        https://github.com/oauthlib/oauthlib/archive/refs/tags/v%{version}.tar.gz#/oauthlib-%{version}.tar.gz
 Patch0:         fix-test_rsa_bad_keys-pyjwt-invalidkeyerror.patch
 Patch1:         CVE-2026-49265.patch
+Patch2:         CVE-2026-49264.patch
 BuildArch:      noarch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
@@ -54,7 +55,7 @@ pip3 install mock wheel
 
 %changelog
 * Wed Oct 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.2.2-4
-- Patch for CVE-2026-49265
+- Patch for CVE-2026-49265, CVE-2026-49264
 
 * Tue Jul 28 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.2.2-3
 - Add patch to fix test_rsa_bad_keys test failure caused by python3-jwt upgrade 2.13.0
