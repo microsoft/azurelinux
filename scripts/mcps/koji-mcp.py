@@ -121,7 +121,7 @@ def set_koji_url(base_url: str) -> StatusDict:
     KOJI_BASE_URL environment variable, but the tool will still
     allow resetting it at runtime.
     """
-    global _base_url
+    global _base_url  # noqa: PLW0603 - lock-protected process-wide MCP configuration
     with _tool_lock:
         old_url = _base_url
         normalized, err = validate_base_url(base_url)
