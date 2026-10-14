@@ -1,0 +1,12 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 2719169..8a0fbed 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -19,6 +19,7 @@ readme = "README.md"
+ keywords = ["utils"]
+ license = "BSD-3-Clause"
+ repository = "https://github.com/rust-vmm/vmm-sys-util"
++exclude = ["rust-vmm-ci/*", "/coverage_config_*"]
+ 
+ [package.metadata.docs.rs]
+ all-features = true
