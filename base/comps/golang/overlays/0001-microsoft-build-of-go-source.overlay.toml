@@ -3,10 +3,10 @@ category = "azl-branding-policy"
 upstream-status = "inapplicable"
 
 [[overlays]]
-description = "Build from the Microsoft build of Go release archive while retaining Fedora's local source filename"
+description = "Build from the Microsoft build of Go 1.26.9 release archive"
 type = "spec-update-tag"
 tag = "Source0"
-value = "https://github.com/microsoft/go/releases/download/v1.26.8-1/go1.26.8-20260901.2.src.tar.gz#/go1.26.8.src.tar.gz"
+value = "https://github.com/microsoft/go/releases/download/v1.26.9-1/go1.26.9-20261008.11.src.tar.gz#/go1.26.9.src.tar.gz"
 
 [[overlays]]
 description = "Point package metadata to Microsoft build of Go"
