@@ -1,3 +1,0 @@
-[components.php-sebastian-environment9]
-build.without = ["tests"]
-

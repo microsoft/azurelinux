@@ -1,9 +1,6 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/php-sebastian-file-filter1.azl.macros}
-
 # remirepo/fedora spec file for php-sebastian-file-filter1
 #
 # SPDX-FileCopyrightText:  Copyright 2026 Remi Collet
@@ -29,7 +26,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        1.0.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Library for filtering files, version %{major}
 
 License:        BSD-3-Clause
@@ -37,7 +34,6 @@ URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
 Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
-Source9999: php-sebastian-file-filter1.azl.macros
 
 
 BuildArch:      noarch

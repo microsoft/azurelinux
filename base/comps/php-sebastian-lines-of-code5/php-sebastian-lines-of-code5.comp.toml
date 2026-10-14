@@ -1,3 +1,0 @@
-[components.php-sebastian-lines-of-code5]
-build.without = ["tests"]
-

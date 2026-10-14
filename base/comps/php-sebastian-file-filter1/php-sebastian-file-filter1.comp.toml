@@ -1,2 +1,0 @@
-[components.php-sebastian-file-filter1]
-build.without = ["tests"]
