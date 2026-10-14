@@ -34,9 +34,10 @@ Patch13:CVE-2026-78659.patch
 Patch14:CVE-2026-78660.patch
 Patch15:CVE-2026-78663.patch
 Patch16:CVE-2026-78669.patch
-Patch17:CVE-2026-81869.patch
-Patch18:CVE-2026-81870.patch
-Patch19:CVE-2026-97032.patch
+Patch17:CVE-2026-81870.patch
+Patch18:CVE-2026-97032.patch
+Patch19:CVE-2026-95838.patch
+Patch20:CVE-2026-47262.patch
 
 %{?systemd_requires}
 
