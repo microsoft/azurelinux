@@ -1,7 +1,7 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.4
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,13 @@ Patch6:         CVE-2025-11065.patch
 Patch7:         CVE-2026-24117.patch
 Patch8:         CVE-2026-32288.patch
 Patch9:         CVE-2026-84445.patch
+Patch10:        CVE-2026-107324.patch
+Patch11:        CVE-2026-107325.patch
+Patch12:        CVE-2026-61801.patch
+Patch13:        CVE-2026-78659.patch
+Patch14:        CVE-2026-78660.patch
+Patch15:        CVE-2026-78669.patch
+Patch16:        CVE-2026-97032.patch
 
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -60,6 +67,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.4-14
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107325, CVE-2026-107324
+
 * Thu Sep 17 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.14.4-13
 - Generate Source1 vendor tarball to fix CVE-2026-84445 and CVE-2026-84304
 - Drop patches for CVE-2023-45288, CVE-2026-39821 and CVE-2026-56852, already fixed by the upgraded golang.org/x/net and golang.org/x/text modules
