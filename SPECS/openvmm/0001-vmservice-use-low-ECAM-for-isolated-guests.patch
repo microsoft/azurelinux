@@ -1,0 +1,30 @@
+From 0eb11d3b98116bf1f8692b1aa298be58e32ecff0 Mon Sep 17 00:00:00 2001
+From: Nikola Bojanic <nbojanic@microsoft.com>
+Date: Fri, 9 Oct 2026 12:47:11 -0700
+Subject: [PATCH] vmservice: place PCI ECAM below 4 GiB for cc guests
+
+In our SNP Linux direct boot scenario guest kernel won't
+use high ecam because it doesn't get SMBIOS. Work around
+it for now.
+
+Signed-off-by: Nikola Bojanic <nbojanic@microsoft.com>
+---
+ openvmm/openvmm_entry/src/ttrpc/mod.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openvmm/openvmm_entry/src/ttrpc/mod.rs b/openvmm/openvmm_entry/src/ttrpc/mod.rs
+index 001427bc..f742532e 100644
+--- a/openvmm/openvmm_entry/src/ttrpc/mod.rs
++++ b/openvmm/openvmm_entry/src/ttrpc/mod.rs
+@@ -1133,7 +1133,7 @@ async fn create_vm(&mut self, request: vmservice::CreateVmRequest) -> anyhow::Re
+             ide_disks: vec![],
+             floppy_disks: vec![],
+             pcie_root_complexes: pcie.root_complexes,
+-            pcie_ecam_below_4gb: false,
++            pcie_ecam_below_4gb: isolation.is_some(),
+             pcie_devices: pcie.devices,
+             pcie_switches: pcie.switches,
+             pcie_generic_initiators: pcie.generic_initiators,
+-- 
+2.54.0
+
