@@ -17,10 +17,8 @@ Patch2:         CVE-2025-11065.patch
 Patch3:         CVE-2026-39821.patch
 Patch4:         CVE-2026-56852.patch
 Patch5:         CVE-2026-17106.patch
-Patch6:         CVE-2026-61801.patch
-Patch7:         CVE-2026-78660.patch
-Patch8:         CVE-2026-78669.patch
-Patch9:         CVE-2026-92543.patch
+Patch6:         CVE-2026-78669.patch
+Patch7:         CVE-2026-92543.patch
 BuildRequires:  git
 BuildRequires:  go-md2man
 BuildRequires:  golang
@@ -89,7 +87,7 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 
 %changelog
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.7-6
-- Patch for CVE-2026-92543, CVE-2026-78669, CVE-2026-78660, CVE-2026-61801
+- Patch for CVE-2026-92543, CVE-2026-78669
 
 * Mon Aug 31 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 25.0.7-5
 - Patch for CVE-2026-17106
