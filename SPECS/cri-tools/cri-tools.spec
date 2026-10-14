@@ -7,7 +7,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.32.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,8 @@ Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         CVE-2026-35469.patch
 Patch1:         CVE-2026-84304.patch
 Patch2:         CVE-2026-37236.patch
+Patch3:         CVE-2026-78660.patch
+Patch4:         CVE-2026-78669.patch
 
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
@@ -52,6 +54,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-10
+- Patch for CVE-2026-78669, CVE-2026-78660
+
 * Thu Sep 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.32.0-9
 - Generate new vendor tarball to fix CVE-2026-84304 and CVE-2026-84445.
 - Remove patches which are fixed in new generated vendor tarball: CVE-2024-45338, CVE-2025-22872, CVE-2025-47911,
