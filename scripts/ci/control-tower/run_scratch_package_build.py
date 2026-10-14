@@ -52,11 +52,16 @@ def _parse_args() -> argparse.Namespace:
         required=True,
         help="Base URL of the Control Tower service",
     )
-    parser.add_argument(
-        "--changed-components-file",
-        required=True,
+    components = parser.add_mutually_exclusive_group(required=True)
+    components.add_argument(
+        "--components-file",
         type=Path,
-        help="Path to the raw JSON output of 'azldev component changed -a -O json'.",
+        help="Path to a JSON array of source and policy-impacted component names.",
+    )
+    components.add_argument(
+        "--changed-components-file",
+        type=Path,
+        help="Path to the original azldev change-set (closure disabled).",
     )
     parser.add_argument(
         "--environment",
@@ -73,6 +78,12 @@ def _parse_args() -> argparse.Namespace:
         "--commit-sha",
         default=None,
         help="Source commit override. The environment branch is used when omitted.",
+    )
+    parser.add_argument(
+        "--job-id-file",
+        default=None,
+        type=Path,
+        help="Write the accepted Control Tower job ID to this file.",
     )
     parser.add_argument(
         "--poll-timeout-seconds",
@@ -92,12 +103,16 @@ def _parse_args() -> argparse.Namespace:
 def main() -> None:
     """Submit a scratch package build for the changed components."""
     args = _parse_args()
-    components = package_build.load_build_components(args.changed_components_file)
+    components = (
+        package_build.load_component_names(args.components_file)
+        if args.components_file is not None
+        else package_build.load_build_components(args.changed_components_file)
+    )
     if not components:
         print("No components need a rebuild -- skipping scratch package-build submission.")
         return
 
-    package_build.submit_and_monitor(
+    job_id = package_build.submit_and_monitor(
         api_audience=args.api_audience,
         api_base_url=args.api_base_url,
         request=build_request(
@@ -109,6 +124,10 @@ def main() -> None:
         poll_timeout_seconds=args.poll_timeout_seconds,
         wait_for_completion=args.wait_for_completion,
     )
+    if args.job_id_file is not None:
+        args.job_id_file.parent.mkdir(parents=True, exist_ok=True)
+        args.job_id_file.write_text(f"{job_id}\n", encoding="utf-8")
+        print(f"Wrote Control Tower job ID to {args.job_id_file}")
 
 
 if __name__ == "__main__":

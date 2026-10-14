@@ -1,0 +1,2 @@
+# Keep aligned with the repository's other Python CI helper tests.
+pytest==9.0.3

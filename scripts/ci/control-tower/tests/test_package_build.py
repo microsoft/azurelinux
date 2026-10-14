@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -31,9 +32,9 @@ def lifecycle_mocks(monkeypatch: pytest.MonkeyPatch) -> tuple[Mock, Mock, Mock, 
     return post_scenario, poll_until_terminal, print_final_status, report_failure
 
 
-def _submit(*, wait_for_completion: bool = False) -> None:
+def _submit(*, wait_for_completion: bool = False) -> str:
     """Call the shared lifecycle with stable test inputs."""
-    package_build.submit_and_monitor(
+    return package_build.submit_and_monitor(
         api_audience="api://control-tower",
         api_base_url="https://control-tower.example/",
         request=package_build.ScenarioRequest(
@@ -104,9 +105,9 @@ class TestPackageBuildLifecycle:
         """Return successfully after Control Tower reports completion."""
         _, _, print_final_status, report_failure = lifecycle_mocks
 
-        _submit()
+        job_id = _submit()
 
-        if print_final_status.call_count != 1 or report_failure.called:
+        if job_id != "job-id" or print_final_status.call_count != 1 or report_failure.called:
             pytest.fail("A successful job must print its status without reporting failure")
 
     def test_terminal_failure_reports_and_exits(self, lifecycle_mocks: tuple[Mock, Mock, Mock, Mock]) -> None:
@@ -139,7 +140,9 @@ class TestPackageBuildLifecycle:
                 pytest.fail(f"Unexpected timeout exit code: {exc_info.value.code!r}")
             return
 
-        _submit(wait_for_completion=wait_for_completion)
+        job_id = _submit(wait_for_completion=wait_for_completion)
+        if job_id != "job-id":
+            pytest.fail(f"Unexpected accepted job ID: {job_id!r}")
 
 
 class TestBuildComponentLoading:
@@ -246,3 +249,23 @@ class TestScratchPackageBuildRequest:
                 branch="users/test/topic",
                 commit_sha="0123456789abcdef0123456789abcdef01234567",
             )
+
+    def test_disabled_closure_uses_original_change_set(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+    ) -> None:
+        """Rollback preserves the original added/changed-only scratch contract."""
+        changes = tmp_path / "changes.json"
+        changes.write_text(json.dumps([
+            {"component": "bash", "changeType": "changed"},
+            {"component": "jq", "changeType": "unchanged"},
+            {"component": "old", "changeType": "deleted"},
+        ]))
+        monkeypatch.setattr(sys, "argv", [
+            "run_scratch_package_build.py", "--api-audience", "api://test",
+            "--api-base-url", "https://example.com", "--environment", "4.0",
+            "--changed-components-file", str(changes),
+        ])
+        submit = Mock(return_value="job-id")
+        monkeypatch.setattr(package_build, "submit_and_monitor", submit)
+        run_scratch_package_build.main()
+        assert submit.call_args.kwargs["request"].payload["packages"] == ["bash"]

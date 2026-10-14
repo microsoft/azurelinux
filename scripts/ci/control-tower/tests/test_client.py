@@ -57,3 +57,29 @@ def test_make_credential_rejects_partial_pipeline_context(monkeypatch: pytest.Mo
 
     with pytest.raises(RuntimeError, match="Missing Azure Pipelines credential variables"):
         client.make_credential()
+
+
+def test_get_koji_package_results_uses_package_endpoint() -> None:
+    """Request the package-specific result shape used by the probe."""
+    response = Mock(ok=True, status_code=200)
+    response.json.return_value = {"buildTasks": []}
+    session = Mock()
+    session.request.return_value = response
+
+    result = client.get_koji_package_results(
+        session,
+        "https://control-tower.example",
+        Mock(),
+        "api://control-tower",
+        client.TokenHolder(token=""),
+        "job-id",
+    )
+
+    assert result == {"buildTasks": []}
+    session.request.assert_called_once()
+    request_args, request_kwargs = session.request.call_args
+    assert request_args == (
+        "GET",
+        "https://control-tower.example/api/Results/jobs/job-id/koji/packages",
+    )
+    assert request_kwargs["timeout"] == (10, 60)

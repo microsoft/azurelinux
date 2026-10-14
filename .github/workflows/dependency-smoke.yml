@@ -27,6 +27,7 @@ jobs:
       matrix:
         dir:
           - scripts/ci/control-tower
+          - scripts/ci/repository-closure
           - scripts/ci/render-specs-check
           - scripts/ci/spec-review
           - scripts/mcps
