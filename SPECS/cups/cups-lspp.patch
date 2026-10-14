@@ -1,3 +1,28 @@
+From 77e64a6804e8477b552c48bc197a124af0f28169 Mon Sep 17 00:00:00 2001
+From: Kanishk Bansal <kanbansal@microsoft.com>
+Date: Mon, 5 Oct 2026 21:52:27 +0000
+Subject: [PATCH] cups-lspp
+
+---
+ Makedefs.in                 |   2 +-
+ config-scripts/cups-lspp.m4 |  36 +++
+ config.h.in                 |   7 +
+ configure.ac                |   2 +
+ filter/common.c             | 143 +++++++++++
+ filter/pstops.c             | 133 ++++++++++
+ scheduler/client.c          | 186 +++++++++++++-
+ scheduler/client.h          |  15 ++
+ scheduler/conf.c            |  53 ++++
+ scheduler/conf.h            |  10 +
+ scheduler/cupsd.h           |  10 +
+ scheduler/ipp.c             | 485 ++++++++++++++++++++++++++++++++++++
+ scheduler/job.c             | 311 +++++++++++++++++++++++
+ scheduler/job.h             |  11 +
+ scheduler/main.c            |  30 +++
+ scheduler/printers.c        |  52 ++++
+ 16 files changed, 1484 insertions(+), 2 deletions(-)
+ create mode 100644 config-scripts/cups-lspp.m4
+
 diff --git a/Makedefs.in b/Makedefs.in
 index 6158e61..9b423a0 100644
 --- a/Makedefs.in
@@ -72,7 +97,7 @@ index 37c2790..abc28c2 100644
   * Building as a snap (snapcraft.io)?
   */
 diff --git a/configure.ac b/configure.ac
-index d83884b..a174b32 100644
+index 1efe5f4..269aef0 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -40,6 +40,8 @@ sinclude(config-scripts/cups-container.m4)
@@ -420,7 +445,7 @@ index 41090c8..585a2aa 100644
  
  /*
 diff --git a/scheduler/client.c b/scheduler/client.c
-index d961c15..bce92cf 100644
+index 9efabeb..02585df 100644
 --- a/scheduler/client.c
 +++ b/scheduler/client.c
 @@ -20,12 +20,20 @@
@@ -607,7 +632,7 @@ index d961c15..bce92cf 100644
  
  	  if (httpGetState(con->http) != HTTP_STATE_POST_SEND)
  	  {
-@@ -3291,6 +3432,49 @@ is_path_absolute(const char *path)	/* I - Input path */
+@@ -3288,6 +3429,49 @@ is_path_absolute(const char *path)	/* I - Input path */
    return (1);
  }
  
@@ -658,7 +683,7 @@ index d961c15..bce92cf 100644
  /*
   * 'pipe_command()' - Pipe the output of a command to the remote client.
 diff --git a/scheduler/client.h b/scheduler/client.h
-index 2939ce9..6749374 100644
+index e25b5eb..a60ddf6 100644
 --- a/scheduler/client.h
 +++ b/scheduler/client.h
 @@ -14,6 +14,13 @@
@@ -698,7 +723,7 @@ index 2939ce9..6749374 100644
  extern int	cupsdEndTLS(cupsd_client_t *con);
  extern int	cupsdStartTLS(cupsd_client_t *con);
 diff --git a/scheduler/conf.c b/scheduler/conf.c
-index 0e7be0e..c7a2062 100644
+index fb259ce..3575e14 100644
 --- a/scheduler/conf.c
 +++ b/scheduler/conf.c
 @@ -38,6 +38,9 @@
@@ -711,7 +736,7 @@ index 0e7be0e..c7a2062 100644
  
  /*
   * Configuration variable structure...
-@@ -130,6 +133,10 @@ static const cupsd_var_t	cupsd_vars[] =
+@@ -131,6 +134,10 @@ static const cupsd_var_t	cupsd_vars[] =
    { "ServerName",		&ServerName,		CUPSD_VARTYPE_STRING },
    { "StrictConformance",	&StrictConformance,	CUPSD_VARTYPE_BOOLEAN },
    { "Timeout",			&Timeout,		CUPSD_VARTYPE_TIME },
@@ -722,7 +747,7 @@ index 0e7be0e..c7a2062 100644
    { "WebInterface",		&WebInterface,		CUPSD_VARTYPE_BOOLEAN }
  };
  static const cupsd_var_t	cupsfiles_vars[] =
-@@ -541,6 +548,9 @@ cupsdReadConfiguration(void)
+@@ -578,6 +585,9 @@ cupsdReadConfiguration(void)
    const char	*tmpdir;		/* TMPDIR environment variable */
    struct stat	tmpinfo;		/* Temporary directory info */
    cupsd_policy_t *p;			/* Policy */
@@ -732,7 +757,7 @@ index 0e7be0e..c7a2062 100644
  
  
   /*
-@@ -876,6 +886,25 @@ cupsdReadConfiguration(void)
+@@ -913,6 +923,25 @@ cupsdReadConfiguration(void)
  
    RunUser = getuid();
  
@@ -758,7 +783,7 @@ index 0e7be0e..c7a2062 100644
    cupsdLogMessage(CUPSD_LOG_INFO, "Remote access is %s.",
                    RemotePort ? "enabled" : "disabled");
  
-@@ -1293,7 +1322,19 @@ cupsdReadConfiguration(void)
+@@ -1330,7 +1359,19 @@ cupsdReadConfiguration(void)
      cupsdClearString(&Classification);
  
    if (Classification)
@@ -778,7 +803,7 @@ index 0e7be0e..c7a2062 100644
  
   /*
    * Check the MaxClients setting, and then allocate memory for it...
-@@ -3939,6 +3980,18 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
+@@ -4008,6 +4049,18 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
    return ((FatalErrors & CUPSD_FATAL_CONFIG) ? 0 : linenum);
  }
  
@@ -798,7 +823,7 @@ index 0e7be0e..c7a2062 100644
  /*
   * 'read_policy()' - Read a <Policy name> definition.
 diff --git a/scheduler/conf.h b/scheduler/conf.h
-index a607bf8..1a4a8ee 100644
+index c1fbe58..299c9c5 100644
 --- a/scheduler/conf.h
 +++ b/scheduler/conf.h
 @@ -244,6 +244,13 @@ VAR char		*ServerKeychain		VALUE(NULL);
@@ -826,7 +851,7 @@ index a607bf8..1a4a8ee 100644
  /*
   * Prototypes...
 diff --git a/scheduler/cupsd.h b/scheduler/cupsd.h
-index 164df6e..2d66464 100644
+index 4d839da..d14f68b 100644
 --- a/scheduler/cupsd.h
 +++ b/scheduler/cupsd.h
 @@ -9,6 +9,8 @@
@@ -854,7 +879,7 @@ index 164df6e..2d66464 100644
  
  #if defined(HAVE_CDSASSL)
 diff --git a/scheduler/ipp.c b/scheduler/ipp.c
-index bedf403..1db5215 100644
+index af8cf12..4cee40e 100644
 --- a/scheduler/ipp.c
 +++ b/scheduler/ipp.c
 @@ -12,6 +12,9 @@
@@ -890,9 +915,9 @@ index bedf403..1db5215 100644
  static int	check_quotas(cupsd_client_t *con, cupsd_printer_t *p);
  static void	close_job(cupsd_client_t *con, ipp_attribute_t *uri);
  static void	copy_attrs(ipp_t *to, ipp_t *from, cups_array_t *ra,
-@@ -1188,6 +1200,21 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
-     "time-at-creation",
-     "time-at-processing"
+@@ -1201,6 +1213,21 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
+     "time-at-processing",
+     "warnings-count",
    };
 +#ifdef WITH_LSPP
 +  char		*audit_message;		/* Audit message string */
@@ -912,7 +937,7 @@ index bedf403..1db5215 100644
  
  
    cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job(%p[%d], %p(%s), %p(%s/%s))",
-@@ -1514,6 +1541,106 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
+@@ -1527,6 +1554,106 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
      ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, "Untitled");
    }
  
@@ -1019,7 +1044,7 @@ index bedf403..1db5215 100644
    if ((job = cupsdAddJob(priority, printer->name)) == NULL)
    {
      send_ipp_status(con, IPP_INTERNAL_ERROR,
-@@ -1534,6 +1661,32 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
+@@ -1547,6 +1674,32 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
        job->print_as_raster = 1;
    }
  
@@ -1052,7 +1077,7 @@ index bedf403..1db5215 100644
    attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
  
    job->dtype   = printer->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE);
-@@ -1723,6 +1876,29 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
+@@ -1736,6 +1889,29 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
        ippSetString(job->attrs, &attr, 0, printer->job_sheets[0]);
        ippSetString(job->attrs, &attr, 1, printer->job_sheets[1]);
      }
@@ -1082,7 +1107,7 @@ index bedf403..1db5215 100644
  
      job->job_sheets = attr;
  
-@@ -1753,6 +1929,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
+@@ -1766,6 +1942,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
  	                		     "job-sheets=\"%s,none\", "
  					     "job-originating-user-name=\"%s\"",
  	              Classification, job->username);
@@ -1092,7 +1117,7 @@ index bedf403..1db5215 100644
  	}
  	else if (attr->num_values == 2 &&
  	         strcmp(attr->values[0].string.text,
-@@ -1771,6 +1950,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
+@@ -1784,6 +1963,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
  					     "job-originating-user-name=\"%s\"",
  		      attr->values[0].string.text,
  		      attr->values[1].string.text, job->username);
@@ -1102,7 +1127,7 @@ index bedf403..1db5215 100644
  	}
  	else if (strcmp(attr->values[0].string.text, Classification) &&
  	         strcmp(attr->values[0].string.text, "none") &&
-@@ -1791,6 +1973,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
+@@ -1804,6 +1986,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
  			"job-originating-user-name=\"%s\"",
  			attr->values[0].string.text,
  			attr->values[1].string.text, job->username);
@@ -1112,7 +1137,7 @@ index bedf403..1db5215 100644
          }
        }
        else if (strcmp(attr->values[0].string.text, Classification) &&
-@@ -1831,9 +2016,55 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
+@@ -1844,9 +2029,55 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
  		      "job-sheets=\"%s\", "
  		      "job-originating-user-name=\"%s\"",
  		      Classification, job->username);
@@ -1168,7 +1193,7 @@ index bedf403..1db5215 100644
     /*
      * See if we need to add the starting sheet...
      */
-@@ -3667,6 +3898,128 @@ check_rss_recipient(
+@@ -3689,6 +3920,128 @@ check_rss_recipient(
  }
  
  
@@ -1297,7 +1322,7 @@ index bedf403..1db5215 100644
  /*
   * 'check_quotas()' - Check quotas for a printer and user.
   */
-@@ -4122,6 +4475,15 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
+@@ -4150,6 +4503,15 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
    char		attrname[255],		/* Name of attribute */
  		*s;			/* Pointer into name */
    ipp_attribute_t *attr;		/* Attribute */
@@ -1313,7 +1338,7 @@ index bedf403..1db5215 100644
  
  
    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-@@ -4157,6 +4519,85 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
+@@ -4185,6 +4547,85 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
  
    fchmod(cupsFileNumber(out), 0640);
    fchown(cupsFileNumber(out), RunUser, Group);
@@ -1399,7 +1424,7 @@ index bedf403..1db5215 100644
  
   /*
    * Try the localized banner file under the subdirectory...
-@@ -4251,6 +4692,24 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
+@@ -4279,6 +4720,24 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
        else
          s = attrname;
  
@@ -1424,7 +1449,7 @@ index bedf403..1db5215 100644
        if (!strcmp(s, "printer-name"))
        {
          cupsFilePuts(out, job->dest);
-@@ -6744,6 +7203,22 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
+@@ -6800,6 +7259,22 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
  
    exclude = cupsdGetPrivateAttrs(policy, con, printer, job->username);
  
@@ -1447,7 +1472,7 @@ index bedf403..1db5215 100644
   /*
    * Copy attributes...
    */
-@@ -7142,6 +7617,11 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
+@@ -7198,6 +7673,11 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
        if (username[0] && _cups_strcasecmp(username, job->username))
  	continue;
  
@@ -1459,7 +1484,7 @@ index bedf403..1db5215 100644
        if (count > 0)
  	ippAddSeparator(con->response);
  
-@@ -11885,6 +12365,11 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
+@@ -11941,6 +12421,11 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
  
    strlcpy(username, get_username(con), userlen);
  
@@ -1472,7 +1497,7 @@ index bedf403..1db5215 100644
    * Check the username against the owner...
    */
 diff --git a/scheduler/job.c b/scheduler/job.c
-index 620a2dd..11b6f57 100644
+index 1104d39..d522a65 100644
 --- a/scheduler/job.c
 +++ b/scheduler/job.c
 @@ -9,6 +9,9 @@
@@ -1498,7 +1523,7 @@ index 620a2dd..11b6f57 100644
  
  /*
   * Design Notes for Job Management
-@@ -540,6 +549,14 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
+@@ -552,6 +561,14 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
  					/* PRINTER env variable */
  			*printer_state_reasons = NULL;
  					/* PRINTER_STATE_REASONS env var */
@@ -1513,7 +1538,7 @@ index 620a2dd..11b6f57 100644
  
  
    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-@@ -1069,6 +1086,67 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
+@@ -1079,6 +1096,67 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
    if (final_content_type[0])
      envp[envc ++] = final_content_type;
  
@@ -1581,7 +1606,7 @@ index 620a2dd..11b6f57 100644
    if (Classification && !banner_page)
    {
      if ((attr = ippFindAttribute(job->attrs, "job-sheets",
-@@ -1403,6 +1481,11 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
+@@ -1417,6 +1495,11 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
  
    cupsdClearString(&job->username);
    cupsdClearString(&job->dest);
@@ -1593,7 +1618,7 @@ index 620a2dd..11b6f57 100644
    for (i = 0;
         i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
         i ++)
-@@ -1855,6 +1938,22 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
+@@ -1868,6 +1951,22 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
      ippSetString(job->attrs, &job->reasons, 0, "job-completed-successfully");
    }
  
@@ -1616,7 +1641,7 @@ index 620a2dd..11b6f57 100644
    job->impressions = ippFindAttribute(job->attrs, "job-impressions-completed", IPP_TAG_INTEGER);
    job->sheets      = ippFindAttribute(job->attrs, "job-media-sheets-completed", IPP_TAG_INTEGER);
    job->job_sheets  = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
-@@ -2267,6 +2366,14 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
+@@ -2280,6 +2379,14 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
  {
    char		filename[1024];		/* Job control filename */
    cups_file_t	*fp;			/* Job file */
@@ -1631,7 +1656,7 @@ index 620a2dd..11b6f57 100644
  
  
    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSaveJob(job=%p(%d)): job->attrs=%p",
-@@ -2289,6 +2396,78 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
+@@ -2302,6 +2409,78 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
  
    fchown(cupsFileNumber(fp), RunUser, Group);
  
@@ -1710,7 +1735,7 @@ index 620a2dd..11b6f57 100644
    job->attrs->state = IPP_IDLE;
  
    if (ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL,
-@@ -4017,6 +4196,19 @@ get_options(cupsd_job_t *job,		/* I - Job */
+@@ -4057,6 +4236,19 @@ get_options(cupsd_job_t *job,		/* I - Job */
  	  banner_page)
          continue;
  
@@ -1730,7 +1755,7 @@ index 620a2dd..11b6f57 100644
       /*
        * Otherwise add them to the list...
        */
-@@ -4832,6 +5024,18 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
+@@ -4888,6 +5080,18 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
            cupsd_printer_t *printer)	/* I - Printer to print job */
  {
    const char	*filename;		/* Support filename */
@@ -1749,7 +1774,7 @@ index 620a2dd..11b6f57 100644
    ipp_attribute_t *cancel_after = ippFindAttribute(job->attrs,
  						   "job-cancel-after",
  						   IPP_TAG_INTEGER);
-@@ -5020,6 +5224,113 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
+@@ -5076,6 +5280,113 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
    fcntl(job->side_pipes[1], F_SETFD,
  	fcntl(job->side_pipes[1], F_GETFD) | FD_CLOEXEC);
  
@@ -1955,7 +1980,7 @@ index a939cda..6361962 100644
  }
  
 diff --git a/scheduler/printers.c b/scheduler/printers.c
-index 2495106..a265fb8 100644
+index 761b338..ac169bf 100644
 --- a/scheduler/printers.c
 +++ b/scheduler/printers.c
 @@ -9,6 +9,8 @@
@@ -1978,7 +2003,7 @@ index 2495106..a265fb8 100644
  
  /*
   * Local functions...
-@@ -2187,6 +2193,13 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
+@@ -2211,6 +2217,13 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
    ipp_attribute_t *attr;		/* Attribute data */
    char		*name,			/* Current user/group name */
  		*filter;		/* Current filter */
@@ -1992,7 +2017,7 @@ index 2495106..a265fb8 100644
  
  
   /*
-@@ -2312,6 +2325,45 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
+@@ -2336,6 +2349,45 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
        attr->values[1].string.text = _cupsStrAlloc(Classification ?
  	                                   Classification : p->job_sheets[1]);
      }
