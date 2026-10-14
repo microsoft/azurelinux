@@ -36,7 +36,7 @@ replacement = "Provides: bundled(golang(golang.org/x/mod)) = 0.30.1.0.2026081321
 description = "Match the bundled x/net version in Microsoft build of Go"
 type = "spec-search-replace"
 regex = '^Provides: bundled\(golang\(golang\.org/x/net\)\) = 0\.55\.1\.0\.20260731170536\.c1d18010be90$'
-replacement = "Provides: bundled(golang(golang.org/x/net)) = 0.47.1.0.20260731170545.cb1d721f7fb3"
+replacement = "Provides: bundled(golang(golang.org/x/net)) = 0.47.1.0.20260925170545.1431957440b7"
 
 [[overlays]]
 description = "Match the bundled x/sync version in Microsoft build of Go"
@@ -78,4 +78,4 @@ replacement = "Provides: bundled(golang(golang.org/x/tools)) = 0.39.1.0.20260527
 description = "Declare the additional modules bundled by Microsoft build of Go"
 type = "spec-search-replace"
 regex = '^Provides: bundled\(golang\(rsc\.io/markdown\)\) = 0\.0\.0\.20240306144322\.0bf8f97ee8ef$'
-replacement = "Provides: bundled(golang(rsc.io/markdown)) = 0.0.0.20240306144322.0bf8f97ee8ef\nProvides: bundled(golang(github.com/microsoft/go.crypto.darwin)) = 0.0.3.0.20260612173401.95c9561b6f25\nProvides: bundled(golang(github.com/microsoft/go.crypto.openssl)) = 0.0.0.20260709090821.4e7f148608fd\nProvides: bundled(golang(github.com/microsoft/go.crypto.winnative)) = 0.0.0.20260821121209.d3f2d4e543ce\nProvides: bundled(golang(github.com/microsoft/go.infra/telemetry)) = 0.0.0.20260128082012.a1498e2b57dd\nProvides: bundled(golang(github.com/microsoft/go.infra/telemetry/config)) = 0.0.0.20260128082012.a1498e2b57dd"
+replacement = "Provides: bundled(golang(rsc.io/markdown)) = 0.0.0.20240306144322.0bf8f97ee8ef\nProvides: bundled(golang(github.com/microsoft/go.crypto.darwin)) = 0.0.3.0.20261008095156.6223ee583f63\nProvides: bundled(golang(github.com/microsoft/go.crypto.openssl)) = 0.0.0.20260709090821.4e7f148608fd\nProvides: bundled(golang(github.com/microsoft/go.crypto.winnative)) = 0.0.0.20260821121209.d3f2d4e543ce\nProvides: bundled(golang(github.com/microsoft/go.infra/telemetry)) = 0.0.0.20260128082012.a1498e2b57dd\nProvides: bundled(golang(github.com/microsoft/go.infra/telemetry/config)) = 0.0.0.20260128082012.a1498e2b57dd"
