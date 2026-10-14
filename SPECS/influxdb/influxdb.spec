@@ -82,11 +82,9 @@ Patch11:        CVE-2026-84304.patch
 Patch12:        fix-non-constant-format-strings.patch
 Patch13:        fix-proto-equality-in-tests.patch
 Patch14:        CVE-2026-78659.patch
-Patch15:        CVE-2026-78660.patch
-Patch16:        CVE-2026-78663.patch
-Patch17:        CVE-2026-78669.patch
-Patch18:        CVE-2026-82458.patch
-Patch19:        CVE-2026-97032.patch
+Patch15:        CVE-2026-78663.patch
+Patch16:        CVE-2026-78669.patch
+Patch17:        CVE-2026-97032.patch
 BuildRequires:  clang
 BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
@@ -177,7 +175,7 @@ go test ./...
 
 %changelog
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-22
-- Patch for CVE-2026-97032, CVE-2026-82458, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78659
 
 * Wed Sep 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.7.5-21
 - Patch for CVE-2026-84304
