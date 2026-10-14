@@ -62,6 +62,7 @@ from _repo_layout import (
     KIND_SRPMS,
     SUBREPOS,
 )
+from _url_utils import build_repository_url_opener, validate_repository_url
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
@@ -158,6 +159,7 @@ class InputRepo:
 
 def expand_repo_prefix(prefix: str, arches: Iterable[str]) -> list[InputRepo]:
     """Expand a standard repository prefix into concrete input repos."""
+    validate_repository_url(prefix, context="--repo-prefix URL")
     base = prefix.rstrip("/")
     out: list[InputRepo] = []
     for sub in SUBREPOS:
@@ -202,6 +204,7 @@ def parse_explicit_repo(spec: str, arches: Iterable[str]) -> list[InputRepo]:
     url = url.strip()
     if kind not in ALL_KINDS:
         raise ValueError(f"--repo {spec!r}: unknown TYPE {kind!r}; expected one of {{{', '.join(ALL_KINDS)}}}")
+    validate_repository_url(url, context=f"--repo {kind} URL")
     if kind == KIND_SRPMS:
         if "$basearch" in url:
             raise ValueError(f"--repo {spec!r}: srpms repos are arch-agnostic; `$basearch` is not allowed in the URL")
@@ -273,17 +276,17 @@ def _http_get(
     URLs that point at a missing file) so the caller can react
     (e.g. silently skip 404 / ENOENT from a prefix-derived sub-repo).
     """
+    validate_repository_url(url)
     dest.parent.mkdir(parents=True, exist_ok=True)
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    req = urllib.request.Request(  # noqa: S310 - repository scheme validated above
+        url, headers={"User-Agent": USER_AGENT}
+    )
+    opener = build_repository_url_opener(ssl_context=ssl_context)
     last_exc: BaseException | None = None
     for attempt in range(retries):
         try:
             with (
-                urllib.request.urlopen(
-                    req,
-                    timeout=timeout,
-                    context=ssl_context,
-                ) as resp,
+                opener.open(req, timeout=timeout) as resp,
                 dest.open("wb") as fh,
             ):
                 shutil.copyfileobj(resp, fh)
@@ -1194,13 +1197,13 @@ def main(argv: list[str] | None = None) -> int:
     log("==> Resolving input repos ...")
     repos: list[InputRepo] = []
     for option, value in repo_sources:
-        if option == "--repo-prefix":
-            repos.extend(expand_repo_prefix(value, arches))
-        else:  # --repo
-            try:
+        try:
+            if option == "--repo-prefix":
+                repos.extend(expand_repo_prefix(value, arches))
+            else:  # --repo
                 repos.extend(parse_explicit_repo(value, arches))
-            except ValueError as e:
-                return fatal(str(e))
+        except ValueError as e:
+            return fatal(str(e))
     repos = dedup_input_repos(repos)
     log(f"    {len(repos)} candidate input repo(s) after dedup")
 
@@ -1212,6 +1215,8 @@ def main(argv: list[str] | None = None) -> int:
             cache_dir = download_repo_metadata(repo, cache_root, ssl_context)
         except urllib.error.HTTPError as e:
             return fatal(f"HTTP {e.code} fetching {repo.url}/repodata/repomd.xml (origin={repo.origin})")
+        except ValueError as e:
+            return fatal(f"{e} while fetching {repo.url} (origin={repo.origin})")
         if cache_dir is not None:
             repo_to_dir[repo] = cache_dir
     log(f"    {len(repo_to_dir)} repo(s) successfully downloaded ({len(repos) - len(repo_to_dir)} skipped)")

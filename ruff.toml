@@ -61,6 +61,8 @@ fixable = ["ALL"]
 "scripts/mcps/_mcp_utils.py" = ["INP001"]
 "scripts/mcps/fedora-distgit-mcp.py" = ["INP001"]
 "scripts/repo/_repo_layout.py" = ["INP001"]
+"scripts/repo/_url_utils.py" = ["INP001"]
+"scripts/repo/tests/**/*.py" = ["INP001"]
 
 [lint.isort]
 # Just force this, its better than dealing with a mishmash of modules that have annotations and those that don't

@@ -221,9 +221,13 @@ def koji_fetch(path: str, override_base_url: str | None = None) -> StatusDict:
             ssl_ctx.check_hostname = False
             ssl_ctx.verify_mode = ssl.CERT_NONE
 
-        req = urllib.request.Request(url, headers={"User-Agent": "koji-mcp/1.0"})
+        req = urllib.request.Request(  # noqa: S310 - base URL is restricted and authority-checked
+            url, headers={"User-Agent": "koji-mcp/1.0"}
+        )
         try:
-            with urllib.request.urlopen(req, context=ssl_ctx, timeout=10) as resp:
+            with urllib.request.urlopen(  # noqa: S310 - base URL is restricted and authority-checked
+                req, context=ssl_ctx, timeout=10
+            ) as resp:
                 data = resp.read()
         except urllib.error.URLError as e:
             # urllib wraps SSL errors inside URLError.reason

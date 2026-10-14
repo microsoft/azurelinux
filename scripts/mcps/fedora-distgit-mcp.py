@@ -262,10 +262,14 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
         if ssrf_err:
             return _add_status({"error": ssrf_err}, full=False)
 
-        req = urllib.request.Request(url, headers={"User-Agent": "fedora-distgit-mcp/1.0"})
+        req = urllib.request.Request(  # noqa: S310 - base URL is restricted and authority-checked
+            url, headers={"User-Agent": "fedora-distgit-mcp/1.0"}
+        )
 
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with urllib.request.urlopen(  # noqa: S310 - base URL is restricted and authority-checked
+                req, timeout=15
+            ) as resp:
                 data = resp.read()
         except urllib.error.HTTPError as e:
             return _add_status({"error": f"HTTP {e.code} fetching {url}: {e.reason}"}, full=False)
