@@ -1,7 +1,7 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
 Version:        0.0.10
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
 Group:          Applications/Text
@@ -22,6 +22,12 @@ Source1: %{name}-%{version}-vendor-v3.tar.gz
 Patch0:       CVE-2026-73500.patch
 Patch1:       CVE-2026-37236.patch
 Patch2:       CVE-2026-84445.patch
+Patch3:       CVE-2026-78659.patch
+Patch4:       CVE-2026-78660.patch
+Patch5:       CVE-2026-78663.patch
+Patch6:       CVE-2026-78669.patch
+Patch7:       CVE-2026-81870.patch
+Patch8:       CVE-2026-97032.patch
 
 BuildRequires: golang >= 1.25
 
@@ -42,6 +48,9 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.10-11
+- Patch for CVE-2026-97032, CVE-2026-81870, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
+
 * Wed Sep 16 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.0.10-10
 - Patch for CVE-2026-84445, CVE-2026-84304, CVE-2026-83530
 - Removed patch for CVE-2024-45338, CVE-2025-22872, CVE-2025-47911, CVE-2025-58190, CVE-2026-39821,
