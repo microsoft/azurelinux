@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -230,7 +230,7 @@ Summary:        Package providing the identity for Azure Linux WSL.
 RemovePathPostfixes: .wsl
 Provides:       azurelinux-release-identity = %{version}-%{release}
 Conflicts:      azurelinux-release-identity
-Requires(meta): azurelinux-release-container = %{version}-%{release}
+Requires(meta): azurelinux-release-wsl = %{version}-%{release}
 
 
 %description identity-wsl
@@ -530,6 +530,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Thu Oct 15 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-34
+- Require azurelinux-release-wsl instead of azurelinux-release-container in identity-wsl
+
 * Wed Oct 14 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-33
 - Deny usb-storage in cloud images for CIS GRID NIX-00000009
 - Move the CIS module denylist from common to the cloud package
