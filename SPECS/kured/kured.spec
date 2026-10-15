@@ -25,7 +25,7 @@
 Summary:        Kubernetes daemonset to perform safe automatic node reboots
 Name:           kured
 Version:        1.15.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,6 +53,10 @@ Patch2:         CVE-2025-11065.patch
 Patch3:         CVE-2026-35469.patch
 Patch4:         CVE-2026-39821.patch
 Patch5:         CVE-2026-56852.patch
+Patch6:         CVE-2026-78659.patch
+Patch7:         CVE-2026-78660.patch
+Patch8:         CVE-2026-78669.patch
+Patch9:         CVE-2026-97032.patch
 BuildRequires:  fdupes
 BuildRequires:  go-go-md2man
 BuildRequires:  golang
@@ -124,6 +128,9 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
 %{_datarootdir}/k8s-yaml/kured/kured.yaml
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.15.0-7
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.15.0-6
 - Patch for CVE-2026-56852
 
