@@ -5,7 +5,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.40.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,6 +23,7 @@ Patch3:         CVE-2026-13595.patch
 Patch4:         CVE-2026-76642.patch
 Patch5:         CVE-2026-78408.patch
 Patch6:         CVE-2026-78410.patch
+Patch7:         libblkid-fix-spurious-ext-superblock-checksum-mismatches.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -178,6 +179,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Tue Sep 22 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.40.2-7
+- Backport upstream fix for spurious ext superblock checksum mismatches.
+
 * Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.40.2-6
 - Patch for CVE-2026-78410, CVE-2026-78408, CVE-2026-76642
 
