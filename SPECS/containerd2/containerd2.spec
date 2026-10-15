@@ -19,14 +19,13 @@ Source2: containerd.toml
 Patch0:  multi-snapshotters-support.patch
 Patch1:  tardev-support.patch
 Patch2:  fix-TestCgroupNamespace-cgroupv1.patch
-Patch3:  CVE-2026-56852.patch
-Patch4:  CVE-2026-37236.patch
-Patch5:  CVE-2026-61801.patch
-Patch6:  CVE-2026-78659.patch
-Patch7:  CVE-2026-78660.patch
-Patch8:  CVE-2026-78669.patch
-Patch9:  CVE-2026-97032.patch
-Patch10: CVE-2026-81870.patch
+Patch3:  CVE-2026-37236.patch
+Patch4:  CVE-2026-61801.patch
+Patch5:  CVE-2026-78659.patch
+Patch6:  CVE-2026-78660.patch
+Patch7:  CVE-2026-78669.patch
+Patch8:  CVE-2026-97032.patch
+Patch9:  CVE-2026-81870.patch
 
 %{?systemd_requires}
 
@@ -108,8 +107,9 @@ fi
 
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.7-1
-- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-81870
 - Upgrade to 2.3.7 for CVE-2026-95839
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-81870
+- Removed patch for CVE-2026-56852.patch as it is fixed by upgrade x/text to v0.41.0
 
 * Sat Oct 10 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.3.6-1
 - Upgrade to 2.3.6 for CVE-2026-53493, CVE-2026-53495, CVE-2026-95838
