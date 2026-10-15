@@ -100,7 +100,8 @@ fi
 
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-19
-- Patch for CVE-2026-97032, CVE-2026-81870, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-47262, CVE-2026-95838 and CVE-2026-53495.
+- Patch for CVE-2026-97032, CVE-2026-81870, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659,
+  CVE-2026-47262, CVE-2026-95838 and CVE-2026-53495.
 
 * Fri Sep 18 2026 jykanase <v-jykanase@microsoft.com> - 1.7.7-18
 - Patch for CVE-2026-84304
