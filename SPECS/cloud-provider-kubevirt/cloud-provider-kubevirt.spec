@@ -1,7 +1,7 @@
 Summary:        Package to create the cloud-provider-kubevirt binary.
 Name:           cloud-provider-kubevirt
 Version:        0.5.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubevirt/cloud-provider-kubevirt/
 Group:          System/Management
@@ -32,6 +32,11 @@ Patch3:         instanceexists-watches-vms-instead-of-vmis.patch
 Patch4:         CVE-2026-73500.patch
 Patch5:         CVE-2026-37236.patch
 Patch6:         CVE-2026-84445.patch
+Patch7:         CVE-2026-78659.patch
+Patch8:         CVE-2026-78660.patch
+Patch9:         CVE-2026-78663.patch
+Patch10:        CVE-2026-78669.patch
+Patch11:        CVE-2026-97032.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.25
 
@@ -72,6 +77,9 @@ make test
 %{_bindir}/kubevirt-cloud-controller-manager
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.5.1-10
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
+
 * Wed Sep 16 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.5.1-9
 - Patch for CVE-2026-83530, CVE-2026-84445, CVE-2026-84304
 - Removed patch for CVE-2025-47911, CVE-2025-58190, CVE-2026-27136, CVE-2026-39821, CVE-2026-42506,
