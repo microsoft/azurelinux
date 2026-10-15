@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
 Version:        2.27.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,13 @@ Patch4:         CVE-2026-37236.patch
 Patch5:         CVE-2026-56855.patch
 Patch6:         CVE-2026-78662.patch
 Patch7:         CVE-2026-84304.patch
+Patch8:         CVE-2026-61801.patch
+Patch9:         CVE-2026-78659.patch
+Patch10:        CVE-2026-78660.patch
+Patch11:        CVE-2026-78669.patch
+Patch12:        CVE-2026-81870.patch
+Patch13:        CVE-2026-92543.patch
+Patch14:        CVE-2026-97032.patch
 
 BuildRequires:  golang >= 1.25
 Requires:       docker-cli
@@ -53,6 +60,9 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-16
+- Patch for CVE-2026-97032, CVE-2026-92543, CVE-2026-81870, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801
+
 * Fri Sep 18 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 2.27.0-15
 - Patch for CVE-2026-84304 and CVE-2026-84445
 - Upgrade vendored google.golang.org/grpc to v1.83.2
@@ -91,7 +101,7 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 * Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.27.0-4
 - Fix CVE-2025-22869, CVE-2024-10846 with an upstream patch
 
-* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.27.0-3
+* Thu Jan 09 2025 Rohit Rawat <rohitrawat@microsoft.com> - 2.27.0-3
 - Add patch for CVE-2024-45338
 
 * Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 2.27.0-2
