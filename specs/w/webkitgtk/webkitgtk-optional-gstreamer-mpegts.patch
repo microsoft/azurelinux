@@ -1,0 +1,29 @@
+From: Azure Linux <azurelinux@microsoft.com>
+Subject: [PATCH] cmake: require GStreamer MPEG-TS only when enabled
+
+USE_GSTREAMER_MPEGTS defaults to OFF, and the MPEG-TS headers, calls, and
+linkage are already guarded by that option. Do not require the helper
+library just because video playback is enabled.
+
+The MPEG-TS helper library has an unstable API and is not needed for core
+rendering, video playback, WebAudio, or Media Source Extensions. Keep it
+required when USE_GSTREAMER_MPEGTS is explicitly enabled.
+
+diff --git a/Source/cmake/GStreamerChecks.cmake b/Source/cmake/GStreamerChecks.cmake
+--- a/Source/cmake/GStreamerChecks.cmake
++++ b/Source/cmake/GStreamerChecks.cmake
+@@ -9,9 +9,13 @@ if (USE_GSTREAMER)
+       else ()
+           set(GSTREAMER_COMPONENTS app pbutils)
+           if (ENABLE_VIDEO)
+-              list(APPEND GSTREAMER_COMPONENTS video mpegts tag gl)
++              list(APPEND GSTREAMER_COMPONENTS video tag gl)
+           endif ()
+ 
++          if (USE_GSTREAMER_MPEGTS)
++              list(APPEND GSTREAMER_COMPONENTS mpegts)
++          endif ()
++
+           if (ENABLE_WEB_AUDIO)
+               list(APPEND GSTREAMER_COMPONENTS audio fft)
+           endif ()

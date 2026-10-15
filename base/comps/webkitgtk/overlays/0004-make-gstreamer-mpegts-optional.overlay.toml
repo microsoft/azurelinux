@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Require the GStreamer MPEG-TS helper library only when its optional integration is enabled, preserving core video and audio support without gst-plugins-bad"
+type = "patch-add"
+source = "webkitgtk-optional-gstreamer-mpegts.patch"
