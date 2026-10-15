@@ -1,0 +1,26 @@
+From 036d562ee630c58e7334d96438c4951da474fca1 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Wed, 9 Jul 2025 23:04:37 +0200
+Subject: [PATCH] Port from is_terminal_polyfill to std::io::IsTerminal
+
+We are not concerned about MSRV issues in downstream builds.
+---
+ src/combinator/debug/internals.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/combinator/debug/internals.rs b/src/combinator/debug/internals.rs
+index 6480faf..b9c40f4 100644
+--- a/src/combinator/debug/internals.rs
++++ b/src/combinator/debug/internals.rs
+@@ -289,7 +289,7 @@ fn term_width() -> usize {
+ }
+ 
+ fn query_width() -> Option<usize> {
+-    use is_terminal_polyfill::IsTerminal;
++    use std::io::IsTerminal;
+     if std::io::stderr().is_terminal() {
+         terminal_size::terminal_size().map(|(w, _h)| w.0.into())
+     } else {
+-- 
+2.50.0
+
