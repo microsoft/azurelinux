@@ -1,5 +1,5 @@
-# Standard debuginfo generation breaks the FIPS self-test, so we disable it.
-%define debug_package %{nil}
+# Split DWARF normally, retaining the symbol table for late FIPS finalization.
+%global _find_debuginfo_opts --g-libs
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
 Version:        103.13.0
@@ -62,7 +62,8 @@ ln -s ../jitterentropy-library-3.3.1 3rdparty/jitterentropy-library
 # bytes diverge from the hashed bytes and the FIPS self-test fails. Combined
 # with -z now, the failure surfaces as a SIGSEGV the instant libsymcrypt.so
 # is mapped (e.g. any LD_PRELOAD or DT_NEEDED user crashes immediately).
-# Remove until process_fips_module.py learns about DT_RELR.
+# Both runtime integrity verification and process_fips_module.py lack RELR
+# support. Keep this exclusion until both support it, not just the finalizer.
 export LDFLAGS="${LDFLAGS//-Wl,-z,pack-relative-relocs/}"
 
 source %{SOURCE3}
@@ -72,10 +73,22 @@ source %{SOURCE3}
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER=%{symcrypt_cc} \
         -DCMAKE_CXX_COMPILER=%{symcrypt_cxx} \
+        -DSYMCRYPT_STRIP_BINARY=OFF \
+        -DSYMCRYPT_FIPS_POSTPROCESS=OFF \
         -DCMAKE_C_FLAGS="%{symcrypt_c_flags}" \
         -DCMAKE_CXX_FLAGS="-Wno-unused-but-set-variable"
 
 %cmake_build
+
+# Finalize once after RPM hooks, then restore 0755 (the finalizer sets 0751).
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}} \
+    %{__arch_install_post} \
+    %{__os_install_post} \
+    mkdir -p "%{__cmake_builddir}/module/generic/processing" \
+    python3 "scripts/process_fips_module.py" "%{buildroot}%{_libdir}/libsymcrypt.so.%{version}" --processing-dir "%{__cmake_builddir}/module/generic/processing" \
+    chmod 755 "%{buildroot}%{_libdir}/libsymcrypt.so.%{version}" \
+%{nil}
 
 %install
 mkdir -p %{buildroot}%{_libdir}
@@ -86,7 +99,9 @@ cp -P %{__cmake_builddir}/module/generic/libsymcrypt.so* %{buildroot}%{_libdir}
 chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 
 %check
-./%{__cmake_builddir}/exe/symcryptunittest
+# Also test the finalized buildroot DSO, not just the statically linked library.
+./%{__cmake_builddir}/exe/symcryptunittest \
+    "dynamic:%{buildroot}%{_libdir}/libsymcrypt.so.%{version}"
 
 %files
 %license LICENSE.txt
