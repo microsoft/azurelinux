@@ -5,7 +5,7 @@
 Summary:        Exporter for machine metrics
 Name:           prometheus-node-exporter
 Version:        1.7.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 # Upstream license specification: Apache-2.0
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
@@ -37,6 +37,11 @@ Patch1:         CVE-2023-45288.patch
 Patch2:         CVE-2025-22870.patch
 Patch3:         CVE-2026-39821.patch
 Patch4:         CVE-2026-56852.patch
+Patch5:         CVE-2026-78659.patch
+Patch6:         CVE-2026-78660.patch
+Patch7:         CVE-2026-78663.patch
+Patch8:         CVE-2026-78669.patch
+Patch9:         CVE-2026-97032.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
@@ -106,6 +111,9 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus/node-exporter
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-6
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-5
 - Patch for CVE-2026-56852
 
