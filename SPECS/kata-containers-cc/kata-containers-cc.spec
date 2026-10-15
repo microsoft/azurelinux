@@ -27,6 +27,7 @@ Patch8:       CVE-2026-50540.patch
 Patch9:       CVE-2026-44210.patch
 Patch10:      rust-fix-unstable-name-collisions.patch
 Patch11:      CVE-2026-84445.patch
+<<<<<<< HEAD
 Patch12:      rustix-remove-rustc-attrs.patch
 Patch13:      CVE-2026-93599.patch
 Patch14:      CVE-2026-93600.patch
@@ -41,6 +42,8 @@ Patch22:      CVE-2026-78663.patch
 Patch23:      CVE-2026-78669.patch
 Patch24:      CVE-2026-94637.patch
 Patch25:      CVE-2026-97032.patch
+Patch26:      CVE-2026-61801.patch
+Patch27:      CVE-2026-107325.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -181,7 +184,7 @@ fi
 
 %changelog
 * Mon Sep 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-22
-- Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599, CVE-2026-42784, CVE-2026-81870, CVE-2026-93602, CVE-2026-97032, CVE-2026-94637, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-63772, CVE-2026-107324
+- Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599, CVE-2026-42784, CVE-2026-81870, CVE-2026-93602, CVE-2026-97032, CVE-2026-94637, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-63772, CVE-2026-107324, CVE-2026-61801, CVE-2026-107325.
 
 * Thu Sep 21 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-22                 - Backport upstream rustix#1663 to build with latest rust
 
