@@ -91,6 +91,13 @@
                 "^/usr/share/doc/docs/html/rustc/platform-support/.*bsd.*\\.html$",
                 "^/usr/share/doc/docs/html/search\\.index/.*\\.js$"
             ]
+        },
+        {
+            "_comment": "openbsd-rc.d trips the fuzzy 'bsd' license-name match; it is an example init script, not a license.",
+            "PackageName": "prometheus-node-exporter",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/prometheus-node-exporter/examples/openbsd-rc\\.d/node_exporter$"
+            ]
         }
     ],
     "GlobalExceptionsRegexList": [
