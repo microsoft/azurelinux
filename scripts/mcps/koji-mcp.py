@@ -17,6 +17,7 @@ as many pages/logs as needed without bothering the user again.
 
 from __future__ import annotations
 
+import http.client
 import os
 import ssl
 import sys
@@ -267,7 +268,7 @@ def koji_fetch(path: str, override_base_url: str | None = None) -> StatusDict:
                 },
                 full=False,
             )
-        except Exception as e:
+        except (http.client.HTTPException, OSError, ValueError) as e:
             return _add_status(
                 {
                     "error": (

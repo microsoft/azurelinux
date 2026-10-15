@@ -187,12 +187,8 @@ def workdir(request: pytest.FixtureRequest) -> Iterator[Path]:
             )
             cleanup_failed = rc.returncode != 0
         if cleanup_failed:
-            # Fall back to plain rm; if that also fails, log and move on
-            # rather than failing the test session at teardown.
-            try:
-                shutil.rmtree(p, ignore_errors=True)
-            except Exception as exc:  # pragma: no cover
-                logger.warning("Failed to remove work dir %s: %s", p, exc)
+            # Fall back to best-effort cleanup without failing test teardown.
+            shutil.rmtree(p, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")

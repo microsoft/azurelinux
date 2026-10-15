@@ -250,7 +250,7 @@ def main() -> int:
         except json.JSONDecodeError as e:
             print(f"Invalid JSON: {e}", file=sys.stderr)
             return 2
-        except Exception as e:
+        except (OSError, ValueError) as e:
             print(f"Validation failed: {e}", file=sys.stderr)
             return 2
 
@@ -281,7 +281,7 @@ def main() -> int:
     except json.JSONDecodeError as e:
         print(f"Invalid JSON: {e}", file=sys.stderr)
         return 2
-    except Exception as e:
+    except (OSError, ValueError) as e:
         print(f"Validation failed: {e}", file=sys.stderr)
         return 2
 
