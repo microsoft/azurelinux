@@ -1,0 +1,43 @@
+# Skip systemd units that conflict with WSL's own networking, DNS, console,
+# and /dev setup when running inside WSL (ConditionVirtualization=!wsl).
+# Temporary until ConditionVirtualization=!wsl is accepted in upstream systemd.
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Add wsl-disable.conf drop-in source file"
+type = "file-add"
+file = "wsl-disable.conf"
+source = "../wsl-disable.conf"
+
+[[overlays]]
+description = "Register wsl-disable.conf as Source27 in systemd.spec"
+type = "spec-insert-tag"
+tag = "Source27"
+value = "wsl-disable.conf"
+
+[[overlays]]
+description = "Install wsl-disable.conf drop-ins for units that conflict with WSL"
+type = "spec-search-replace"
+section = "%install"
+regex = '^install -m 0644 -t %\{buildroot\}%\{_prefix\}/lib/pam\.d/ %\{SOURCE26\}$'
+replacement = '''
+install -m 0644 -t %{buildroot}%{_prefix}/lib/pam.d/ %{SOURCE26}
+
+for unit in \
+    console-getty.service \
+    getty@.service \
+    systemd-vconsole-setup.service \
+    tmp.mount \
+    systemd-tmpfiles-setup-dev.service \
+    systemd-tmpfiles-setup-dev-early.service \
+    systemd-networkd.service \
+    systemd-networkd.socket \
+    systemd-networkd-varlink.socket \
+    systemd-networkd-wait-online.service \
+    systemd-resolved.service \
+    systemd-resolved-monitor.socket \
+    systemd-resolved-varlink.socket; do
+    install -Dm0644 -t %{buildroot}%{system_unit_dir}/${unit}.d/ %{SOURCE27}
+done'''
