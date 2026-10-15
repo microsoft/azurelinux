@@ -20,6 +20,7 @@ auto-approved.
 from __future__ import annotations
 
 import contextlib
+import http.client
 import json
 import os
 import re
@@ -275,7 +276,7 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
             return _add_status({"error": f"HTTP {e.code} fetching {url}: {e.reason}"}, full=False)
         except urllib.error.URLError as e:
             return _add_status({"error": f"can't fetch {url}: {e.reason}"}, full=False)
-        except Exception as e:
+        except (http.client.HTTPException, OSError, ValueError) as e:
             return _add_status({"error": f"can't fetch {url}: {e}"}, full=False)
 
         try:
@@ -338,6 +339,10 @@ def distgit_search(
             return _add_status({"error": f"mode must be one of {valid_modes}, got {mode!r}"}, full=False)
         if not query:
             return _add_status({"error": "query must not be empty."}, full=False)
+        if "\0" in query:
+            return _add_status({"error": "query must not contain NUL characters."}, full=False)
+        if "\0" in ref:
+            return _add_status({"error": "ref must not contain NUL characters."}, full=False)
         if ref != "--all" and ref.startswith("-"):
             return _add_status(
                 {"error": f"ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."},
@@ -405,7 +410,7 @@ def distgit_search(
             )
         except subprocess.TimeoutExpired:
             return _add_status({"error": "Search timed out after 30s."}, full=False)
-        except Exception as e:
+        except (OSError, UnicodeError) as e:
             return _add_status({"error": f"running git: {e}"}, full=False)
 
         output = result.stdout
@@ -486,7 +491,7 @@ def distgit_show(
             )
         except subprocess.TimeoutExpired:
             return _add_status({"error": "git show timed out after 30s."}, full=False)
-        except Exception as e:
+        except (OSError, UnicodeError) as e:
             return _add_status({"error": f"running git: {e}"}, full=False)
 
         if result.returncode != 0:

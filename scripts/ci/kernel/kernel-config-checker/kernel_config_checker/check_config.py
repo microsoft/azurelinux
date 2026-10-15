@@ -192,7 +192,7 @@ def main() -> int | None:
     if args.add_config:
         try:
             ok = add_config_interactive(Path(args.add_config))
-        except Exception as e:
+        except (EOFError, KeyError, OSError, TypeError, ValueError) as e:
             print(f"\u2717 Error adding config: {e}")
             return 1
         return 0 if ok else 1
@@ -203,7 +203,7 @@ def main() -> int | None:
             schema = load_schema(Path(json_file))
             print(f"✓ Loaded intentional config: {json_file}")
             found = check_config_across_all(schema, config_name)
-        except Exception as e:
+        except (KeyError, OSError, TypeError, ValueError) as e:
             print(f"✗ Error checking config: {e}")
             return 1
         return 0 if found else 1
@@ -240,7 +240,7 @@ def main() -> int | None:
             print("✗ Kernel configuration check failed")
             exit_code = 1
 
-    except Exception as e:
+    except (KeyError, OSError, TypeError, ValueError) as e:
         print(f"✗ Error: {e}")
         return 1
     return exit_code
