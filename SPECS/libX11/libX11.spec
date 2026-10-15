@@ -1,13 +1,17 @@
 Summary:        Core X11 protocol client library
 Name:           libX11
 Version:        1.8.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.gz
 Patch2:         dont-forward-keycode-0.patch
+Patch3:         CVE-2026-88806.patch
+Patch4:         CVE-2026-94283.patch
+Patch5:         CVE-2026-94284.patch
+Patch6:         CVE-2026-94285.patch
 
 BuildRequires:  libxcb-devel >= 1.2
 BuildRequires:  make
@@ -115,6 +119,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man5/*.5*
 
 %changelog
+* Wed Oct 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.7-2
+- Patch for CVE-2026-94285, CVE-2026-94284, CVE-2026-94283, CVE-2026-88806
+
 * Wed Oct 18 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.7-1
 - Update to v1.8.7 to fix CVEs 2023-43785, 2023-43786 and 2023-43787
 - Remove patches that don't apply to the new version
