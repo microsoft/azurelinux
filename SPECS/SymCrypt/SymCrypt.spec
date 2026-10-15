@@ -1,6 +1,6 @@
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.8.0
+Version:        103.13.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -88,21 +88,27 @@ cmake --build bin
 %install
 mkdir -p %{buildroot}%{_libdir}
 mkdir -p %{buildroot}%{_includedir}
-install inc/symcrypt* %{buildroot}%{_includedir}
+install inc/symcrypt*.h inc/symcrypt*.inc %{buildroot}%{_includedir}
 # Use cp -P to preserve symbolic links
 cp -P bin/module/generic/libsymcrypt.so* %{buildroot}%{_libdir}
 chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 
 %check
-./bin/exe/symcryptunittest
+# Also test the finalized buildroot DSO, not just the statically linked library.
+./bin/exe/symcryptunittest \
+    "dynamic:%{buildroot}%{_libdir}/libsymcrypt.so.%{version}"
 
 %files
-%license LICENSE
-%license NOTICE
+%license LICENSE.txt
+%license NOTICE.txt
 %{_libdir}/libsymcrypt.so*
 %{_includedir}/*
 
 %changelog
+* Thu Oct 15 2026 Tobias Brick <tobiasb@microsoft.com> - 103.13.0-1
+- Upgrade to 103.13.0
+- Add dynamic tests for the finalized buildroot DSO
+
 * Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 103.8.0-1
 - Add FIPS approved services indicator
 - Add ML-DSA implementation
