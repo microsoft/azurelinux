@@ -5,14 +5,10 @@
 # gstreamer1-plugins-bad-free is not shipped in AZL.  WebKitGTK only
 # soft-recommends it for optional codec support; removing the Recommends
 # prevents package managers from trying to pull in a non-existent package.
-# The hard BuildRequires on pkgconfig(gstreamer-plugins-bad-1.0) in the
-# Fedora spec is vestigial — under default cmake options the WebKitGTK
-# 2.50 sources do not actually #include any gst-plugins-bad headers
-# (gst-bad is only reached via GSTREAMER_MPEGTS / GSTREAMER_WEBRTC /
-# LIBWEBRTC code paths, all of which default OFF for the GTK port).
-# Removing just the BR is therefore sufficient to unblock the build
-# without changing any runtime feature surface (MSE/EME stay at their
-# upstream defaults).
+# Remove the Fedora BuildRequires on pkgconfig(gstreamer-plugins-bad-1.0)
+# and patch the shared GStreamer checks to require MPEG-TS only when
+# USE_GSTREAMER_MPEGTS is enabled (OFF by default). Its unstable helper API
+# is not needed for core rendering, video playback, WebAudio, or MSE.
+# WebRTC remains disabled by the GTK port's upstream defaults.
 
 [components.webkitgtk]
-
