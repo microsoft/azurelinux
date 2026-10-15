@@ -1,0 +1,7 @@
+[components.jq]
+
+[[components.jq.overlays]]
+description = "Clarify the jq package summary and exercise the candidate repository CI build"
+type = "spec-update-tag"
+tag = "Summary"
+value = "Lightweight and flexible command-line JSON processor"

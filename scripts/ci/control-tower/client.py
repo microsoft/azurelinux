@@ -294,6 +294,22 @@ def get_job_status(
     return _parse_json_object(response, "Control Tower job status")
 
 
+def get_koji_package_results(
+    session: requests.Session,
+    base_url: str,
+    credential: TokenCredential,
+    audience: str,
+    token_holder: TokenHolder,
+    job_id: str,
+) -> JsonObject:
+    """GET Koji package-build results for a completed Control Tower job."""
+    url = f"{base_url}/api/Results/jobs/{job_id}/koji/packages"
+    response = _request_with_refresh(session, "GET", url, credential, audience, token_holder)
+    if not response.ok:
+        raise RuntimeError("Control Tower Koji package results request failed.\n" + format_error(response))
+    return _parse_json_object(response, "Control Tower Koji package results")
+
+
 def _summarize_tasks(tasks: object) -> str:
     """Return a compact one-line summary of task statuses (e.g. ``3/5 Completed``)."""
     if not isinstance(tasks, list) or not tasks:

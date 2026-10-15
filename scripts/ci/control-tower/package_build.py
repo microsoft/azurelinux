@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 type ScenarioPayload = ct.JsonObject
+type ChangeEntry = dict[str, object]
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,10 +24,9 @@ class ScenarioRequest:
     payload: ScenarioPayload
 
 
-def load_build_components(path: Path) -> list[str]:
-    """Load components that were added or changed from an azldev change-set."""
+def _load_change_entries(path: Path) -> list[ChangeEntry]:
+    """Load and validate an azldev component change-set."""
     known_change_types = {"added", "changed", "unchanged", "deleted"}
-    build_change_types = {"added", "changed"}
 
     try:
         raw = path.read_text(encoding="utf-8")
@@ -35,27 +35,26 @@ def load_build_components(path: Path) -> list[str]:
         raise SystemExit(1) from exc
 
     try:
-        entries = json.loads(raw)
+        raw_entries = json.loads(raw)
     except json.JSONDecodeError as exc:
         print(f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}")
         raise SystemExit(1) from exc
 
-    if not isinstance(entries, list):
+    if not isinstance(raw_entries, list):
         print(
             f"##[error]--changed-components-file {path!s} top-level value "
-            f"must be a JSON array (got {type(entries).__name__})."
+            f"must be a JSON array (got {type(raw_entries).__name__})."
         )
         raise SystemExit(1)
 
-    components: list[str] = []
-    for index, entry in enumerate(entries):
+    entries: list[ChangeEntry] = []
+    for index, entry in enumerate(raw_entries):
         if not isinstance(entry, dict):
             print(
                 f"##[error]--changed-components-file {path!s} entry {index} "
                 f"must be a JSON object (got {type(entry).__name__})."
             )
             raise SystemExit(1)
-
         change_type = entry.get("changeType")
         if change_type not in known_change_types:
             print(
@@ -64,6 +63,19 @@ def load_build_components(path: Path) -> list[str]:
                 "refusing to guess the build set."
             )
             raise SystemExit(1)
+        entries.append(entry)
+
+    return entries
+
+
+def load_build_components(path: Path) -> list[str]:
+    """Load components that were added or changed from an azldev change-set."""
+    build_change_types = {"added", "changed"}
+    entries = _load_change_entries(path)
+
+    components: list[str] = []
+    for index, entry in enumerate(entries):
+        change_type = entry.get("changeType")
         if change_type in build_change_types:
             component = entry.get("component")
             if not isinstance(component, str) or not component:
@@ -77,6 +89,61 @@ def load_build_components(path: Path) -> list[str]:
     return sorted(set(components))
 
 
+def load_available_components(path: Path) -> set[str]:
+    """Load components present in the candidate source tree."""
+    entries = _load_change_entries(path)
+    available: set[str] = set()
+    for index, entry in enumerate(entries):
+        change_type = entry["changeType"]
+        if change_type == "deleted":
+            continue
+        component = entry.get("component")
+        if not isinstance(component, str) or not component:
+            print(
+                f"##[error]--changed-components-file {path!s} entry {index} "
+                f"must contain a non-empty string 'component' for changeType {change_type!r}."
+            )
+            raise SystemExit(1)
+        available.add(component)
+    return available
+
+
+def load_deleted_components(path: Path) -> set[str]:
+    """Load explicitly deleted components without requesting a rebuild."""
+    deleted: set[str] = set()
+    for index, entry in enumerate(_load_change_entries(path)):
+        if entry["changeType"] != "deleted":
+            continue
+        component = entry.get("component")
+        if not isinstance(component, str) or not component:
+            print(
+                f"##[error]--changed-components-file {path!s} entry {index} "
+                "must contain a non-empty string 'component' for a deletion."
+            )
+            raise SystemExit(1)
+        deleted.add(component)
+    return deleted
+
+
+def load_component_names(path: Path) -> list[str]:
+    """Load a stable JSON array of unique component names."""
+    try:
+        raw = path.read_text(encoding="utf-8")
+        entries = json.loads(raw)
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"##[error]Failed to load component set {path!s}: {exc}")
+        raise SystemExit(1) from exc
+    if not isinstance(entries, list) or not all(
+        isinstance(component, str) and component for component in entries
+    ):
+        print(f"##[error]Component set {path!s} must be a JSON array of non-empty strings.")
+        raise SystemExit(1)
+    if len(entries) != len(set(entries)):
+        print(f"##[error]Component set {path!s} contains duplicate names.")
+        raise SystemExit(1)
+    return sorted(entries)
+
+
 def submit_and_monitor(
     *,
     api_audience: str,
@@ -84,7 +151,7 @@ def submit_and_monitor(
     request: ScenarioRequest,
     poll_timeout_seconds: int,
     wait_for_completion: bool,
-) -> None:
+) -> str:
     """Submit one package-build scenario and monitor its initial status."""
     if poll_timeout_seconds <= 0:
         print("##[error]--poll-timeout-seconds must be a positive integer.")
@@ -153,13 +220,13 @@ def submit_and_monitor(
             f"after {poll_timeout_seconds}s -- build accepted. "
             "Monitor progress in the Control Tower UI."
         )
-        return
+        return job_id
 
     ct.print_final_status(final)
 
     if final.get("status") == ct.SUCCESS_STATUS:
         print(f"Control Tower build job {job_id} completed successfully.")
-        return
+        return job_id
 
     ct.report_failure(final)
     raise SystemExit(1)

@@ -27,6 +27,7 @@ jobs:
       matrix:
         dir:
           - scripts/ci/control-tower
+          - scripts/ci/repository-closure
           - scripts/ci/render-specs-check
           - scripts/ci/spec-review
           - scripts/mcps
@@ -35,6 +36,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Install Kerberos build dependencies
+        if: matrix.dir == 'scripts/ci/control-tower'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y build-essential libkrb5-dev
 
       - name: Install and smoke-test
         env:

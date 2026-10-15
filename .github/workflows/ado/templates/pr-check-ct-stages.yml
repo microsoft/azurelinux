@@ -11,7 +11,9 @@
 # changed-component set), then call Control Tower 'prcheck' (uploads the changed
 # components' missing lookaside sources). When skipPackageBuilds is false, also
 # submit a *scratch* Control Tower build of the PR head for those components and
-# wait for it to finish. Each deployment runs in a separate parallel job.
+# wait for it to finish. The candidate-closure check then downloads the fresh
+# binary RPMs from PROD Koji and checks the base and base+builddeps views for
+# each configured architecture, without submitting another scratch build.
 # Checkout-controlled helpers execute on the CI agent under the
 # deployment-specific service connection; package builds run in Control Tower's
 # sandbox.
@@ -19,13 +21,24 @@
 parameters:
   - name: artifactBaseName
     type: string
+  # Architecture-keyed map of baseRepoUrl and builddepsRepoUrl.
+  - name: closureRepositories
+    type: object
   - name: containerImage
     type: string
   # Named map of deployment identifier to apiAudience, apiBaseAFDUrl,
-  # continueOnError, serviceConnection, and skipPackageBuilds.
+  # continueOnError, serviceConnection, skipPackageBuilds, and
+  # runCandidateClosureCheck.
   # Identifiers must be valid Azure Pipelines job-name suffixes.
   - name: deployments
     type: object
+  - name: enableCandidateClosureCheck
+    type: boolean
+    default: false
+  - name: kojiFilesUrl
+    type: string
+  - name: kojiHubUrl
+    type: string
   - name: outputDirectory
     type: string
   # Distro-config RPM build-environment used by Control Tower.
@@ -84,6 +97,29 @@ stages:
               - template: steps/install-deps.yml
                 parameters:
                   installControlTowerClient: true
+
+              # Source changes are not the complete closure-impact set:
+              # publication-policy-only moves must also produce fresh RPMs.
+              - ${{ if and(eq(parameters.enableCandidateClosureCheck, true), eq(deployment.value.runCandidateClosureCheck, true), ne(deployment.value.skipPackageBuilds, true)) }}:
+                  - script: |
+                      set -euo pipefail
+                      closure_components_file="$CLOSURE_COMPONENTS_FILE"
+                      replaced_components_file="$REPLACED_COMPONENTS_FILE"
+                      python3 scripts/ci/control-tower/prepare_closure_build_set.py \
+                        --base-commit "$BASE_COMMIT" \
+                        --changed-components-file "$CHANGED_COMPONENTS_FILE" \
+                        --output "$closure_components_file" \
+                        --replaced-components-output "$replaced_components_file" \
+                        --source-commit "$SOURCE_COMMIT"
+                      echo "##vso[task.setvariable variable=closureComponentsFile;isreadonly=true]$closure_components_file"
+                    displayName: "Prepare repository closure build set"
+                    continueOnError: ${{ deployment.value.continueOnError }}
+                    env:
+                      BASE_COMMIT: $(baseCommit)
+                      CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+                      CLOSURE_COMPONENTS_FILE: $(ob_outputDirectory)/closure-components.json
+                      REPLACED_COMPONENTS_FILE: $(ob_outputDirectory)/closure-replaced-components.json
+                      SOURCE_COMMIT: $(sourceCommit)
 
               # Call Control Tower 'prcheck' BEFORE the build. Among other
               # things, prcheck uploads the missing lookaside sources for the
@@ -150,22 +186,129 @@ stages:
                       inlineScript: |
                         set -euo pipefail
 
+                        component_args=(--changed-components-file "$CHANGED_COMPONENTS_FILE")
+                        if [[ "${RUN_CANDIDATE_CLOSURE_CHECK,,}" == "true" ]]; then
+                          component_args=(--components-file "$CLOSURE_COMPONENTS_FILE")
+                        fi
                         python3 scripts/ci/control-tower/run_scratch_package_build.py \
                           --api-audience "$API_AUDIENCE" \
                           --api-base-url "$API_BASE_URL" \
-                          --changed-components-file "$CHANGED_COMPONENTS_FILE" \
+                          "${component_args[@]}" \
                           --environment "$PACKAGE_ENVIRONMENT" \
                           --commit-sha "$SOURCE_COMMIT" \
+                          --job-id-file "$CONTROL_TOWER_JOB_ID_FILE" \
                           --wait-for-completion \
                           --poll-timeout-seconds "$POLL_TIMEOUT_SECONDS"
+
+                        if [[ -s "$CONTROL_TOWER_JOB_ID_FILE" ]]; then
+                          echo "##vso[task.setvariable variable=hasScratchPackageBuild]true"
+                        else
+                          echo "##vso[task.setvariable variable=hasScratchPackageBuild]false"
+                        fi
                     env:
                       # See the prcheck step: parameter values are used directly
                       # to avoid cyclical same-named variable references.
                       API_AUDIENCE: ${{ deployment.value.apiAudience }}
                       API_BASE_URL: ${{ deployment.value.apiBaseAFDUrl }}
                       CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+                      CLOSURE_COMPONENTS_FILE: $(closureComponentsFile)
+                      CONTROL_TOWER_JOB_ID_FILE: $(ob_outputDirectory)/control-tower-job-id.txt
                       PACKAGE_ENVIRONMENT: $(packageEnvironment)
                       POLL_TIMEOUT_SECONDS: $(pollTimeoutSeconds)
+                      ${{ if and(eq(parameters.enableCandidateClosureCheck, true), eq(deployment.value.runCandidateClosureCheck, true)) }}:
+                        RUN_CANDIDATE_CLOSURE_CHECK: "true"
+                      ${{ else }}:
+                        RUN_CANDIDATE_CLOSURE_CHECK: "false"
                       SOURCE_COMMIT: $(sourceCommit)
                       # Secret predefined variables are not auto-exposed.
                       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+                  - ${{ if and(eq(deployment.value.runCandidateClosureCheck, true), eq(parameters.enableCandidateClosureCheck, true)) }}:
+                      - script: |
+                          set -euo pipefail
+                          echo "##[group]Candidate repository closure tools"
+                          tdnf install -y createrepo_c dnf dnf-plugins-core rpm
+                          createrepo_c --version
+                          dnf --version
+                          echo "##[endgroup]"
+                          echo "##vso[task.setvariable variable=candidateClosureToolsReady;isreadonly=true]true"
+                        displayName: "Install candidate repository closure tools"
+                        continueOnError: ${{ deployment.value.continueOnError }}
+                        condition: and(succeeded(), eq(variables['hasCandidateClosureChanges'], 'true'))
+
+                      - ${{ each architecture in parameters.closureRepositories }}:
+                          - task: AzureCLI@2
+                            displayName: "Download fresh candidate RPMs (${{ architecture.key }})"
+                            continueOnError: ${{ deployment.value.continueOnError }}
+                            condition: >-
+                              and(succeededOrFailed(),
+                                  eq(variables['candidateClosureToolsReady'], 'true'),
+                                  eq(variables['hasScratchPackageBuild'], 'true'))
+                            inputs:
+                              azureSubscription: ${{ deployment.value.serviceConnection }}
+                              scriptType: bash
+                              scriptLocation: inlineScript
+                              inlineScript: |
+                                set -euo pipefail
+
+                                # Current Koji IP endpoints lack a verifiable CA/hostname pair.
+                                # Remove this TLS exception once verified endpoints are available.
+                                python3 scripts/ci/control-tower/download_candidate_rpms.py \
+                                  --api-audience "$API_AUDIENCE" \
+                                  --api-base-url "$API_BASE_URL" \
+                                  --architecture "$ARCHITECTURE" \
+                                  --candidate-base-dir "$CLOSURE_WORK_DIRECTORY/candidate-inputs/base" \
+                                  --candidate-sdk-dir "$CLOSURE_WORK_DIRECTORY/candidate-inputs/sdk" \
+                                  --download-directory "$CLOSURE_WORK_DIRECTORY/candidate-downloads" \
+                                  --expected-components-file "$CLOSURE_COMPONENTS_FILE" \
+                                  --insecure-koji-tls \
+                                  --job-id-file "$CONTROL_TOWER_JOB_ID_FILE" \
+                                  --koji-files-url "$KOJI_FILES_URL" \
+                                  --koji-hub-url "$KOJI_HUB_URL" \
+                                  --publish-policy base/comps/components-publish-channels.toml \
+                                  --report "$CLOSURE_OUTPUT_DIRECTORY/candidate-acquisition.json" \
+                                  --replaced-components-file "$REPLACED_COMPONENTS_FILE"
+                                echo "##vso[task.setvariable variable=candidateClosureRpmsReady_${{ architecture.key }};isreadonly=true]true"
+                            env:
+                              API_AUDIENCE: ${{ deployment.value.apiAudience }}
+                              API_BASE_URL: ${{ deployment.value.apiBaseAFDUrl }}
+                              ARCHITECTURE: ${{ architecture.key }}
+                              CLOSURE_COMPONENTS_FILE: $(closureComponentsFile)
+                              CLOSURE_OUTPUT_DIRECTORY: $(ob_outputDirectory)/candidate-repository-closure/${{ architecture.key }}
+                              CLOSURE_WORK_DIRECTORY: $(Agent.TempDirectory)/candidate-repository-closure-${{ deployment.key }}/${{ architecture.key }}
+                              CONTROL_TOWER_JOB_ID_FILE: $(ob_outputDirectory)/control-tower-job-id.txt
+                              KOJI_FILES_URL: ${{ parameters.kojiFilesUrl }}
+                              KOJI_HUB_URL: ${{ parameters.kojiHubUrl }}
+                              REPLACED_COMPONENTS_FILE: $(ob_outputDirectory)/closure-replaced-components.json
+                              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+                          - script: |
+                              set -euo pipefail
+
+                              # Deletion-only transactions have no acquisition step.
+                              mkdir -p "$CLOSURE_WORK_DIRECTORY/candidate-inputs/base" \
+                                "$CLOSURE_WORK_DIRECTORY/candidate-inputs/sdk"
+                              python3 scripts/ci/repository-closure/check_repo_closure.py \
+                                --architecture "$ARCHITECTURE" \
+                                --candidate-base-dir "$CLOSURE_WORK_DIRECTORY/candidate-inputs/base" \
+                                --candidate-sdk-dir "$CLOSURE_WORK_DIRECTORY/candidate-inputs/sdk" \
+                                --replaced-source-components-file "$REPLACED_COMPONENTS_FILE" \
+                                --base-repo-url "$BASE_REPO_URL" \
+                                --sdk-repo-url "$BUILDDEPS_REPO_URL" \
+                                --output-directory "$CLOSURE_OUTPUT_DIRECTORY/check" \
+                                --work-directory "$CLOSURE_WORK_DIRECTORY/check"
+                            displayName: "Check candidate repository closure (${{ architecture.key }})"
+                            continueOnError: ${{ deployment.value.continueOnError }}
+                            condition: >-
+                              and(succeededOrFailed(),
+                                  eq(variables['candidateClosureToolsReady'], 'true'),
+                                  eq(variables['hasCandidateClosureChanges'], 'true'),
+                                  or(eq(variables['hasScratchPackageBuild'], 'false'),
+                                     eq(variables['candidateClosureRpmsReady_${{ architecture.key }}'], 'true')))
+                            env:
+                              ARCHITECTURE: ${{ architecture.key }}
+                              BASE_REPO_URL: ${{ architecture.value.baseRepoUrl }}
+                              BUILDDEPS_REPO_URL: ${{ architecture.value.builddepsRepoUrl }}
+                              CLOSURE_OUTPUT_DIRECTORY: $(ob_outputDirectory)/candidate-repository-closure/${{ architecture.key }}
+                              CLOSURE_WORK_DIRECTORY: $(Agent.TempDirectory)/candidate-repository-closure-${{ deployment.key }}/${{ architecture.key }}
+                              REPLACED_COMPONENTS_FILE: $(ob_outputDirectory)/closure-replaced-components.json

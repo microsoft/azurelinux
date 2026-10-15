@@ -1,2 +1,3 @@
 azure-identity==1.26.0
+koji==1.36.1
 requests==2.34.2

@@ -41,6 +41,11 @@ jobs:
       - name: Install pre-commit
         run: python -m pip install -r scripts/ci/pre-commit/requirements.txt
 
+      - name: Install Kerberos build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y build-essential libkrb5-dev
+
       - name: "Validate config (strict)"
         run: azldev config dump > /dev/null
 

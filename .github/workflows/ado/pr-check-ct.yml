@@ -31,6 +31,7 @@
 # - scripts/ci/control-tower/ - (Control Tower client + submit script).
 # - scripts/ci/components/ - cross-pipeline azldev change-set helpers (shared
 #   with the GitHub Actions PR gates and the Control Tower pipelines).
+# - scripts/ci/repository-closure/ - candidate repository closure engine.
 #
 # Prerequisites (ADO / Azure Portal):
 #   1. Entra ID App Registrations with audience URIs
@@ -59,6 +60,17 @@
 trigger: none
 
 pr: none
+
+parameters:
+  - name: enableCandidateClosureCheck
+    type: boolean
+    default: true
+  - name: kojiFilesUrl
+    type: string
+    default: https://52.185.225.133/kojifiles
+  - name: kojiHubUrl
+    type: string
+    default: https://52.185.225.133/kojihub
 
 # Variables extracted from this group: deployment audiences and endpoint URLs.
 variables:
@@ -103,27 +115,43 @@ extends:
               continueOnError: false
               serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
               skipPackageBuilds: true
+              runCandidateClosureCheck: false
             STAGING:
               apiAudience: $(ApiAudienceStaging)
               apiBaseAFDUrl: $(ApiBaseAFDUrlStaging)
               continueOnError: true
               serviceConnection: CT-Endpoints-Access-ServiceConnection-STAGING
               skipPackageBuilds: true
+              runCandidateClosureCheck: false
             PROD:
               apiAudience: $(ApiAudienceProd)
               apiBaseAFDUrl: $(ApiBaseAFDUrlProd)
               continueOnError: false
               serviceConnection: CT-Endpoints-Access-ServiceConnection-PROD
               skipPackageBuilds: false
+              runCandidateClosureCheck: true
+          # Overlay fresh scratch outputs onto the current preview
+          # repositories for both architectures from the same scratch build.
+          closureRepositories:
+            x86_64:
+              baseRepoUrl: https://packages.microsoft.com/azurelinux/4/preview/base/x86_64
+              builddepsRepoUrl: https://packages.microsoft.com/azurelinux/4/preview/builddeps/x86_64
+            aarch64:
+              baseRepoUrl: https://packages.microsoft.com/azurelinux/4/preview/base/aarch64
+              builddepsRepoUrl: https://packages.microsoft.com/azurelinux/4/preview/builddeps/aarch64
+          enableCandidateClosureCheck: ${{ parameters.enableCandidateClosureCheck }}
+          kojiFilesUrl: ${{ parameters.kojiFilesUrl }}
+          kojiHubUrl: ${{ parameters.kojiHubUrl }}
           outputDirectory: $(Build.ArtifactStagingDirectory)/output
           # Distro-config RPM build-environment for the 4.0 branch.
           packageEnvironment: "4.0"
           # This check WAITS for the Control Tower build to finish (pass/fail),
           # so the job must cover the full build. pollTimeoutSeconds caps how
           # long run_scratch_package_build.py waits (21600 = 6h, our worst-case build);
-          # timeoutInMinutes sits above that plus setup headroom, so the
-          # script's own clear failure fires before ADO blunt-kills the job.
+          # timeoutInMinutes also covers the preceding prcheck call plus
+          # acquisition and eight solver passes, so the script's own clear
+          # failure fires before ADO blunt-kills the job.
           # Raise both together if a legitimate build is being killed.
           pollTimeoutSeconds: 21600
           poolType: linux
-          timeoutInMinutes: 420
+          timeoutInMinutes: 540
