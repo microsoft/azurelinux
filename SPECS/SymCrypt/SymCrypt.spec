@@ -1,6 +1,6 @@
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.8.0
+Version:        103.13.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -103,6 +103,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Thu Oct 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 103.13.0-1
+- Auto-upgrade to 103.13.0 - private preview
+
 * Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 103.8.0-1
 - Add FIPS approved services indicator
 - Add ML-DSA implementation
