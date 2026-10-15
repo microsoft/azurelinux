@@ -14,6 +14,15 @@ done
 CUSTOM_KS=""
 if grep -qo 'inst\.ks=[^ ]*' /proc/cmdline 2>/dev/null; then
     CUSTOM_KS=$(grep -o 'inst\.ks=[^ ]*' /proc/cmdline | sed 's/inst\.ks=//')
+
+    if [[ "$CUSTOM_KS" == http* ]]; then
+        if ! curl -sf -o /tmp/ks.cfg "$CUSTOM_KS"; then
+            echo "ERROR: Failed to download kickstart from $CUSTOM_KS" >&2
+            exec /bin/bash
+        fi
+        CUSTOM_KS="/tmp/ks.cfg"
+    fi
+
     echo ""
     echo "========================================"
     echo "  Azure Linux 4.0 Offline Installer"
