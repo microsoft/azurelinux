@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Restrict /etc/rsyslog.conf to root:root 0640"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%config\(noreplace\) %\{_sysconfdir\}/rsyslog\.conf$'
+replacement = '%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.conf'

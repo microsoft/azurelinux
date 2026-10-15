@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -353,7 +353,7 @@ install -Dm0644 %{SOURCE21} -t %{buildroot}%{_prefix}/lib/systemd/networkd.conf.
 install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
 install -Dm0600 %{SOURCE30} %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
 install -Dm0644 %{SOURCE32} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
-install -Dm0644 %{SOURCE33} -t %{buildroot}%{_sysconfdir}/rsyslog.d/
+install -Dm0640 %{SOURCE33} -t %{buildroot}%{_sysconfdir}/rsyslog.d/
 install -Dm0644 %{SOURCE34} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-umask.sh
 install -Dm0644 %{SOURCE31} -t %{buildroot}%{_prefix}/lib/modprobe.d/
 
@@ -494,7 +494,7 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-shell-timeout.sh
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-umask.sh
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.d/00-rsyslog_filecreatemode.conf
+%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.d/00-rsyslog_filecreatemode.conf
 %{_prefix}/lib/modprobe.d/60-azurelinux-cis-module-denylist.conf
 
 %files identity-cloud
@@ -527,6 +527,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Thu Oct 15 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-34
+- Restrict cloud rsyslog drop-in permissions to root:root 0640
+
 * Wed Oct 14 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-33
 - Deny usb-storage in cloud images for CIS GRID NIX-00000009
 - Move the CIS module denylist from common to the cloud package
