@@ -4,7 +4,7 @@ default_install_hook_types:
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: a56c0b927e6465d37cae3e97d35d4d18ab2b96cd # v0.16.9
+    rev: f12be1ebaa5351c1fc76472de98db2c3446c8253 # v0.16.10
     hooks:
       - id: ruff-check
   - repo: https://github.com/RobertCraigie/pyright-python
@@ -15,8 +15,8 @@ repos:
         additional_dependencies:
           - azure-devops==7.1.0b4
           - azure-identity==1.26.0
-          - mcp==2.2.0
-          - pydantic==2.13.5
+          - mcp==2.3.0
+          - pydantic==2.14.0
           - pytest==9.1.1
           - python-dotenv==1.2.4
           - python-on-whales==0.81.0
@@ -26,7 +26,7 @@ repos:
     hooks:
       - id: editorconfig-checker
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: 3f5ccc87b27966d9ed21cf5ea8ec2fba38ca65ce # v4.19.0
+    rev: 57217c394fff5064bedd48421fe4b6f5f73aad47 # v4.19.2
     hooks:
       - id: commitizen
         args:
