@@ -27,7 +27,6 @@ Patch8:       CVE-2026-50540.patch
 Patch9:       CVE-2026-44210.patch
 Patch10:      rust-fix-unstable-name-collisions.patch
 Patch11:      CVE-2026-84445.patch
-<<<<<<< HEAD
 Patch12:      rustix-remove-rustc-attrs.patch
 Patch13:      CVE-2026-93599.patch
 Patch14:      CVE-2026-93600.patch
@@ -183,10 +182,10 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Mon Sep 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-22
+* Mon Sep 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-23
 - Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599, CVE-2026-42784, CVE-2026-81870, CVE-2026-93602, CVE-2026-97032, CVE-2026-94637, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-63772, CVE-2026-107324, CVE-2026-61801, CVE-2026-107325.
 
-* Thu Sep 21 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-22                 - Backport upstream rustix#1663 to build with latest rust
+* Mon Sep 21 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-22                 - Backport upstream rustix#1663 to build with latest rust
 
 * Thu Sep 17 2026 Akhila <akhila@microsoft.com> - 3.15.0.aks0-21
 - Generate Source2 go vendor tarball by upgrading grpc to v1.83.2 to fix CVE-2026-84445 and CVE-2026-84304
