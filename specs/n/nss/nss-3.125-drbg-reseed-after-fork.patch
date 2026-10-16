@@ -1,0 +1,98 @@
+--- a/lib/freebl/drbg.c	2026-07-25 00:09:40.452942615 +0300
++++ b/lib/freebl/drbg.c	2026-07-25 01:11:29.163041842 +0300
+@@ -20,6 +20,10 @@
+ #include "secrng.h" /* for RNG_SystemRNG() */
+ #include "secmpi.h"
+ 
++#ifdef XP_UNIX
++#include <pthread.h>
++#endif
++
+ /* PRNG_SEEDLEN defined in NIST SP 800-90 section 10.1
+  * for SHA-1, SHA-224, and SHA-256 it's 440 bits.
+  * for SHA-384 and SHA-512 it's 888 bits */
+@@ -471,6 +475,45 @@
+  */
+ static const PRCallOnceType pristineCallOnce;
+ static PRCallOnceType coRNGInit;
++
++#ifdef XP_UNIX
++static PRCallOnceType coRNGInitAtFork;
++
++/* fork() gives the child a verbatim copy of the DRBG state, including the
++ * PR_CallOnce flags marking it instantiated, so without this the child
++ * replays the parent's output stream.
++ *
++ * Keep async-signal-safe -- no allocation, locks or I/O -- for callers that
++ * fork from a multithreaded process; the reinstantiate is deferred to the
++ * next RNG use.  Only fork mechanisms that run atfork handlers are covered.
++ * Never run this after vfork(2): that child shares the parent's address
++ * space, so the zeroing below would destroy the live context. */
++static void
++rng_atfork_child(void)
++{
++    /* Zero the storage, not *globalrng: after RNG_RNGShutdown() the pointer
++     * is NULL while the context still holds C and V that prng_freeRNGContext
++     * deliberately preserved.  Discarding them forces a clean reinstantiate
++     * rather than a reseed over inherited state, and clears the stale lock
++     * pointer so rng_init() builds a fresh one.  The inherited PRLock is
++     * leaked on purpose: a thread that did not survive the fork may have held
++     * it, so destroying it would be undefined. */
++    PORT_SafeZero(&theGlobalRng, sizeof(theGlobalRng));
++    globalrng = NULL;
++    /* Reset both: the first otherwise suppresses rng_init() entirely, the
++     * second leaves previousEntropyHash zeroed while claiming it was primed. */
++    coRNGInit = pristineCallOnce;
++    coRNGInitEntropy = pristineCallOnce;
++}
++
++static PRStatus
++rng_registerAtFork(void)
++{
++    pthread_atfork(NULL, NULL, rng_atfork_child);
++    return PR_SUCCESS;
++}
++#endif
++
+ static PRStatus
+ rng_init(void)
+ {
+@@ -478,6 +521,12 @@
+     SECStatus rv = SECSuccess;
+ 
+     if (globalrng == NULL) {
++#ifdef XP_UNIX
++        /* Once per process: the registration survives fork() and
++         * coRNGInitAtFork is never reset, so repeated forks cannot stack
++         * duplicate handlers. */
++        PR_CallOnce(&coRNGInitAtFork, rng_registerAtFork);
++#endif
+         /* bytes needs to have enough space to hold
+          * a SHA256 hash value. Blow up at compile time if this isn't true */
+         PR_STATIC_ASSERT(sizeof(bytes) >= SHA256_LENGTH);
+@@ -617,6 +666,14 @@
+     PR_STATIC_ASSERT(sizeof(size_t) <= 4);
+ #endif
+ 
++    /* Absent before the first RNG_RNGInit(), and in a child until the
++     * inherited state is rebuilt.  prng_GenerateGlobalRandomBytes() makes the
++     * same check; without it the PR_Lock() below dereferences NULL. */
++    if (globalrng == NULL) {
++        PORT_SetError(SEC_ERROR_LIBRARY_FAILURE);
++        return SECFailure;
++    }
++
+     PR_Lock(globalrng->lock);
+     /* if we're passed more than our additionalDataCache, simply
+      * call reseed with that data */
+@@ -736,10 +793,9 @@
+ void
+ RNG_RNGShutdown(void)
+ {
+     /* check for a valid global RNG context */
+-    PORT_Assert(globalrng != NULL);
+     if (globalrng == NULL) {
+         /* Should set a "not initialized" error code. */
+         PORT_SetError(SEC_ERROR_NO_MEMORY);
+         return;
+     }
