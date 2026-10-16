@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Normalize the optional dist macro so azldev can automatically bump the imported Release"
+type = "spec-update-tag"
+tag = "Release"
+value = "1%{?dist}"
