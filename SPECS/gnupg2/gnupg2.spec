@@ -62,8 +62,7 @@ These are the additional language files of gnupg2
 # - https://dev.gnupg.org/T6838
 %configure \
   --enable-gpg-is-gpg2 \
-  --disable-keyboxd \
-  ac_cv_path_YAT2M=./yat2m
+  --disable-keyboxd
 %make_build
 
 %install
