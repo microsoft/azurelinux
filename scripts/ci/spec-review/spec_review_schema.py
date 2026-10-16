@@ -10,6 +10,7 @@ Exit codes:
     0 = Valid report (regardless of findings)
     2 = Invalid JSON, file error, or schema validation failure
 """
+
 from __future__ import annotations
 
 import argparse
@@ -151,6 +152,74 @@ def _findings_set(reviews: list[SpecReview], severity: str) -> dict[tuple[str, s
     return result
 
 
+def _print_comparison_summary(
+    labeled_reports: tuple[tuple[str, SpecReviewReport], ...],
+) -> None:
+    """Print aggregate counts for each report in a comparison."""
+    col_w = max(*(len(label) for label, _report in labeled_reports), 5) + 2
+    print(f"┌─{'─' * col_w}─┬────────┬──────────┬─────────────┐")
+    print(f"│ {'Model':<{col_w}} │ Errors │ Warnings │ Suggestions │")
+    print(f"├─{'─' * col_w}─┼────────┼──────────┼─────────────┤")
+    for label, report in labeled_reports:
+        print(
+            f"│ {label:<{col_w}} │ {report.total_errors:>6} │ "
+            f"{report.total_warnings:>8} │ {report.total_suggestions:>11} │"
+        )
+    print(f"└─{'─' * col_w}─┴────────┴──────────┴─────────────┘")
+    print()
+
+
+def _finding_sources(
+    key: tuple[str, str],
+    findings_a: dict[tuple[str, str], Finding],
+    findings_b: dict[tuple[str, str], Finding],
+) -> str:
+    """Return the reviewer labels that reported one finding."""
+    sources = []
+    if key in findings_a:
+        sources.append("A")
+    if key in findings_b:
+        sources.append("B")
+    return "+".join(sources)
+
+
+def _print_severity_comparison(
+    reports: tuple[SpecReviewReport, SpecReviewReport, SpecReviewReport],
+    severity: str,
+    icon: str,
+) -> None:
+    """Print kept, dropped, and synthesized-only findings for one severity."""
+    report_a, report_b, report_final = reports
+    findings_a = _findings_set(report_a.spec_reviews, severity)
+    findings_b = _findings_set(report_b.spec_reviews, severity)
+    findings_final = _findings_set(report_final.spec_reviews, severity)
+
+    all_keys = set(findings_a) | set(findings_b)
+    kept = all_keys & set(findings_final)
+    dropped = all_keys - set(findings_final)
+    added = set(findings_final) - all_keys
+
+    if not any((kept, dropped, added)):
+        return
+
+    print(f"── {icon} {severity.upper()} ──")
+    if kept:
+        print(f"  Kept ({len(kept)}):")
+        for spec, description in sorted(kept):
+            sources = _finding_sources((spec, description), findings_a, findings_b)
+            print(f"    + [{sources}] {spec}: {description}")
+    if dropped:
+        print(f"  Dropped ({len(dropped)}):")
+        for spec, description in sorted(dropped):
+            sources = _finding_sources((spec, description), findings_a, findings_b)
+            print(f"    - [{sources}] {spec}: {description}")
+    if added:
+        print(f"  Added by synthesizer ({len(added)}):")
+        for spec, description in sorted(added):
+            print(f"    + {spec}: {description}")
+    print()
+
+
 def compare_reports(
     report_a: SpecReviewReport,
     report_b: SpecReviewReport,
@@ -160,68 +229,20 @@ def compare_reports(
     label_final: str = "Synthesized",
 ) -> None:
     """Print a human-readable comparison of two reviewer reports and the synthesis."""
-    severities = ["errors", "warnings", "suggestions"]
-    icons = {"errors": "ERROR", "warnings": "WARNING", "suggestions": "SUGGESTION"}
-
-    # --- Per-model summary table ---
-    col_w = max(len(label_a), len(label_b), len(label_final), 5) + 2
-    print(f"┌─{'─' * col_w}─┬────────┬──────────┬─────────────┐")
-    print(f"│ {'Model':<{col_w}} │ Errors │ Warnings │ Suggestions │")
-    print(f"├─{'─' * col_w}─┼────────┼──────────┼─────────────┤")
-    for label, report in [
-        (label_a, report_a),
-        (label_b, report_b),
-        (label_final, report_final),
-    ]:
-        print(
-            f"│ {label:<{col_w}} │ {report.total_errors:>6} │ "
-            f"{report.total_warnings:>8} │ {report.total_suggestions:>11} │"
+    reports = (report_a, report_b, report_final)
+    _print_comparison_summary(
+        (
+            (label_a, report_a),
+            (label_b, report_b),
+            (label_final, report_final),
         )
-    print(f"└─{'─' * col_w}─┴────────┴──────────┴─────────────┘")
-    print()
-
-    # --- Per-severity diff ---
-    for sev in severities:
-        set_a = _findings_set(report_a.spec_reviews, sev)
-        set_b = _findings_set(report_b.spec_reviews, sev)
-        set_final = _findings_set(report_final.spec_reviews, sev)
-
-        all_keys = set(set_a) | set(set_b)
-        kept = all_keys & set(set_final)
-        dropped = all_keys - set(set_final)
-        added = set(set_final) - all_keys  # synthesizer invented new ones
-
-        if not any([kept, dropped, added]):
-            continue
-
-        print(f"── {icons[sev]} {sev.upper()} ──")
-
-        if kept:
-            print(f"  Kept ({len(kept)}):")
-            for spec, desc in sorted(kept):
-                sources = []
-                if (spec, desc) in set_a:
-                    sources.append("A")
-                if (spec, desc) in set_b:
-                    sources.append("B")
-                print(f"    + [{'+'.join(sources)}] {spec}: {desc}")
-
-        if dropped:
-            print(f"  Dropped ({len(dropped)}):")
-            for spec, desc in sorted(dropped):
-                sources = []
-                if (spec, desc) in set_a:
-                    sources.append("A")
-                if (spec, desc) in set_b:
-                    sources.append("B")
-                print(f"    - [{'+'.join(sources)}] {spec}: {desc}")
-
-        if added:
-            print(f"  Added by synthesizer ({len(added)}):")
-            for spec, desc in sorted(added):
-                print(f"    + {spec}: {desc}")
-
-        print()
+    )
+    for severity, icon in (
+        ("errors", "ERROR"),
+        ("warnings", "WARNING"),
+        ("suggestions", "SUGGESTION"),
+    ):
+        _print_severity_comparison(reports, severity, icon)
 
 
 def _compare_parser() -> argparse.ArgumentParser:

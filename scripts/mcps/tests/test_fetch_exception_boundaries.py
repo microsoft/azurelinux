@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -147,3 +148,45 @@ def test_distgit_search_rejects_nul_arguments(
     )
 
     assert result["error"] == f"{field} must not contain NUL characters."
+
+
+@pytest.mark.parametrize(
+    ("mode", "ref", "expected_tail"),
+    [
+        ("pickaxe", "rawhide", ["log", "--oneline", "-20", "-Sneedle", "rawhide", "--"]),
+        ("pickaxe", "--all", ["log", "--oneline", "-20", "-Sneedle", "--all", "--"]),
+        ("grep", "rawhide", ["grep", "-n", "-i", "-e", "needle", "rawhide", "--"]),
+        ("log-grep", "rawhide", ["log", "--oneline", "-20", "--grep=needle", "rawhide"]),
+        ("log-grep", "--all", ["log", "--oneline", "-20", "--grep=needle", "--all"]),
+    ],
+)
+def test_distgit_search_preserves_git_commands(
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+    ref: str,
+    expected_tail: list[str],
+) -> None:
+    """Build the same git command for every supported search mode."""
+    module = _load_mcp_module(monkeypatch, "fedora-distgit-mcp.py")
+    monkeypatch.setattr(module, "_ensure_repo", lambda *_args, **_kwargs: ("repo/example", None))
+    monkeypatch.setattr(module, "_git_dir", lambda *_args: "repo/example/.git")
+    monkeypatch.setattr(module, "write_output", lambda *_args, **_kwargs: "written-output")
+    commands: list[list[str]] = []
+
+    def run(command: list[str], **_kwargs: object) -> subprocess.CompletedProcess[str]:
+        commands.append(command)
+        return subprocess.CompletedProcess(command, 0, stdout="one match\n", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", run)
+
+    result = module.distgit_search(
+        package="example",
+        query="needle",
+        ref=ref,
+        mode=mode,
+        override_base_url="https://example.test",
+    )
+
+    assert commands == [["git", "--git-dir", "repo/example/.git", *expected_tail]]
+    assert result["output"] == "written-output"
+    assert result["repo_dir"] == "repo/example"

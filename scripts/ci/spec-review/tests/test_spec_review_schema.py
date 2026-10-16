@@ -24,6 +24,7 @@ def _load_module() -> ModuleType:
     if spec is None or spec.loader is None:
         pytest.fail(f"Unable to load module spec for {_SCRIPT}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -53,3 +54,40 @@ def test_oversized_json_integer_is_a_validation_failure(
 
     assert module.main() == _VALIDATION_FAILURE_EXIT_CODE
     assert "Validation failed:" in capsys.readouterr().err
+
+
+def test_compare_reports_preserves_summary_and_finding_categories(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Report kept, dropped, and synthesized-only findings with their sources."""
+    module = _load_module()
+
+    def report(*descriptions: str) -> object:
+        return module.SpecReviewReport.model_validate(
+            {
+                "spec_reviews": [
+                    {
+                        "spec_file": "example.spec",
+                        "errors": [{"description": description} for description in descriptions],
+                    }
+                ]
+            }
+        )
+
+    module.compare_reports(
+        report("shared", "only-a"),
+        report("shared", "only-b"),
+        report("shared", "synthesized"),
+        "Alpha",
+        "Beta",
+        "Final",
+    )
+
+    output = capsys.readouterr().out
+    assert "│ Alpha   │      2 │        0 │           0 │" in output
+    assert "│ Beta    │      2 │        0 │           0 │" in output
+    assert "│ Final   │      2 │        0 │           0 │" in output
+    assert "    + [A+B] example.spec: shared" in output
+    assert "    - [A] example.spec: only-a" in output
+    assert "    - [B] example.spec: only-b" in output
+    assert "    + example.spec: synthesized" in output
