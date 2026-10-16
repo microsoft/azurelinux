@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Shared utilities for rendered-spec checks."""
 
 from __future__ import annotations

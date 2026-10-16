@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: MIT
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Pytest plugin for Azure Linux image validation.
 
 Registered via ``[project.entry-points."pytest11"]`` so that custom CLI

@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: MIT
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Container runtime orchestration using python-on-whales.
 
 Provides utilities for creating running containers with exec access

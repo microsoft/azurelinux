@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Guard source-origin configuration for rendered-spec checks."""
 
 from __future__ import annotations

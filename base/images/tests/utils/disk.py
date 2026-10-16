@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: MIT
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """VM disk inspection via libguestfs CLI tools."""
 
 from __future__ import annotations

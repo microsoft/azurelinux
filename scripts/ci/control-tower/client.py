@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Shared HTTP client for Azure Linux Control Tower scenario calls.
 
 Provides:
