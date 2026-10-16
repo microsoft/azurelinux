@@ -33,7 +33,7 @@
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
 Version:        8.3.35
-Release:        1%{?dist}
+Release:        2%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -80,6 +80,8 @@ Patch45:        php-7.4.0-ldap_r.patch
 Patch47:        php-8.3.14-phpinfo.patch
 # Upstream fixes (100+)
 # Security fixes (200+)
+# Placeholder only; replace before publishing.
+Patch200:       php-embargo-placeholder.patch
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
 Patch300:       php-7.4.0-datetests.patch
@@ -716,6 +718,7 @@ in pure PHP.
 # upstream patches
 
 # security patches
+%patch 200 -p1 -b .embargo-placeholder
 
 # Fixes for tests
 %patch 300 -p1 -b .datetests
@@ -1514,6 +1517,10 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Fri Oct 16 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.3.35-2
+- Add a non-functional placeholder patch for embargoed build validation.
+- Replace the placeholder with the security fix before publishing.
+
 * Thu Sep 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.3.35-1
 - Auto-upgrade to 8.3.35 - for CVE-2026-91768, CVE-2026-92842, CVE-2026-6103, CVE-2025-1218,
   CVE-2026-91769, CVE-2025-14181, CVE-2026-93682, CVE-2026-91766, CVE-2026-91765, CVE-2026-91767
