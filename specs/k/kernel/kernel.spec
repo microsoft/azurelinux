@@ -20,9 +20,10 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 8
+%define azl_pkgrelease 9
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.43.02
+%define gdrcopy_version 2.6
 # AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
 # ofa_bundle_version/ofa_vendor_release name the MLNX_OFED_SRC bundle (Source6100).
 # ofa_release matches the mlnx-ofa_kernel SRPM inside it: NVIDIA re-spun that
@@ -1038,6 +1039,8 @@ Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
 # AZL: lets the nvidia-peermem conftest find the in-tree MLNX OFED build.
 Source6003: nvidia-conftest-allow-mlnx-ofed-kernel-dir.patch
+Source6010: gdrcopy-%{gdrcopy_version}.tar.gz
+Source6011: gdrcopy.inc
 # AZL: MLNX OFED source bundle and kmod include (mlnx-ofa_kernel).
 Source6100: MLNX_OFED_SRC-%{ofa_bundle_version}-%{ofa_vendor_release}.tgz
 Source6101: mlnx-ofa_kernel.inc
@@ -1111,6 +1114,10 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name isert
 %include %{_sourcedir}/kmod-isert.inc
+
+%global _kmod_phase package
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2109,6 +2116,10 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name isert
 %include %{_sourcedir}/kmod-isert.inc
+
+%global _kmod_phase prep
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3209,6 +3220,12 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name isert
 %include %{_sourcedir}/kmod-isert.inc
 
+# AZL: gdrdrv needs the NVIDIA open-gpu-kernel-modules source tree, so build
+# it after nvidia-open.
+%global _kmod_phase build
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
+
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
 
 # Module signing (modsign)
@@ -3728,6 +3745,10 @@ popd
 %global _kmod_phase install
 %global _kmod_name isert
 %include %{_sourcedir}/kmod-isert.inc
+
+%global _kmod_phase install
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4390,8 +4411,15 @@ fi\
 %global _kmod_name isert
 %include %{_sourcedir}/kmod-isert.inc
 
+%global _kmod_phase files
+%global _kmod_name gdrcopy
+%include %{_sourcedir}/gdrcopy.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Nov 12 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.57-1.9
+- Add GDRCopy userspace, development, service, and kernel module packages
+
 * Thu Nov 12 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.57-1.8
 - Add iSER target (iSERT) kernel modules from the MLNX OFED source bundle
 
