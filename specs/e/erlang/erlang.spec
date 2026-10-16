@@ -76,7 +76,7 @@
 
 Name:		erlang
 Version:	26.2.5.21
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary:	General-purpose programming language and runtime environment
 
 License:	Apache-2.0
@@ -451,7 +451,7 @@ A set of services such as a Web server and a HTTP client etc.
 %if %{__with_java}
 %package jinterface
 Summary: A library for accessing Java from Erlang
-BuildRequires: msopenjdk-25
+BuildRequires: java-devel
 BuildRequires: javapackages-common
 BuildRequires: xmvn-tools
 Requires: javapackages-filesystem

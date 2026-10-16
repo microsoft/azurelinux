@@ -3,7 +3,7 @@ category = "azl-release-management"
 upstream-status = "inapplicable"
 
 [[overlays]]
-description = "Bump gnulib release for the Microsoft OpenJDK 25 migration"
+description = "Bump gnulib release after restoring its provider-neutral Java build requirement"
 type = "spec-update-tag"
 tag = "Release"
-value = "58.%{gitdate}git%{githead}%{?dist}"
+value = "59.%{gitdate}git%{githead}%{?dist}"
