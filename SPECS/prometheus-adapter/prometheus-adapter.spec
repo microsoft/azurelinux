@@ -1,17 +1,4 @@
-Summary:        Kubernetes Custom, Resource, and External Metric APIs implemented to work with Prometheus.
-Name:           prometheus-adapter
-Version:        0.12.0
-<<<<<<< HEAD
-Release:        10%{?dist}
-=======
 Release:        12%{?dist}
->>>>>>> d384b803a5 ([AutoPR- Security] Patch prometheus-adapter for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659 [HIGH] (#19250))
-License:        Apache-2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://github.com/kubernetes-sigs/prometheus-adapter
-Source0:        https://github.com/kubernetes-sigs/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-<<<<<<< HEAD
 Patch0:         CVE-2024-45338.patch
 Patch1:         CVE-2025-22872.patch
 Patch2:         CVE-2025-47911.patch
@@ -96,11 +83,7 @@ make test
 
 %files docs
 %doc docs CONTRIBUTING.md OWNERS SECURITY.md SECURITY_CONTACTS VERSION code-of-conduct.md
-%doc README.md RELEASE.md
-
 %changelog
-<<<<<<< HEAD
-=======
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-12
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
 
@@ -110,10 +93,8 @@ make test
   CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-33186, CVE-2026-39821,
   CVE-2026-42502, CVE-2026-42506, CVE-2026-56852
 
->>>>>>> d384b803a5 ([AutoPR- Security] Patch prometheus-adapter for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659 [HIGH] (#19250))
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-10
 - Patch for CVE-2026-37236
-
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-9
 - Patch for CVE-2026-73500
 
