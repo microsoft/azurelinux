@@ -71,12 +71,14 @@
     </packages>
     <packages type="image" profiles="busybox-workload">
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <file name="container-exclude-files.yaml" target="/image/exclude_files.yaml" permissions="0644" />
         <package name="azurelinux-release-container" />
         <package name="filesystem" />
         <package name="busybox" />
     </packages>
 
     <packages type="image" profiles="WorkloadCore">
+        <file name="container-exclude-files.yaml" target="/image/exclude_files.yaml" permissions="0644" />
         <package name="ca-certificates" />
         <package name="coreutils-single" />
     </packages>

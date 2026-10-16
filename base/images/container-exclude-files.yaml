@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: MIT
+exclude:
+  - usr/lib/sysimage/rpm
+  - var/lib/rpm
