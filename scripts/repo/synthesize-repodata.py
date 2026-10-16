@@ -1177,6 +1177,74 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _resolve_input_repos(
+    repo_sources: list[tuple[str, str]],
+    arches: tuple[str, ...],
+) -> tuple[list[InputRepo], str | None]:
+    """Expand, validate, and deduplicate input repository arguments."""
+    repos: list[InputRepo] = []
+    try:
+        for option, value in repo_sources:
+            if option == "--repo-prefix":
+                repos.extend(expand_repo_prefix(value, arches))
+            else:
+                repos.extend(parse_explicit_repo(value, arches))
+    except ValueError as exc:
+        return [], str(exc)
+
+    repos = dedup_input_repos(repos)
+    log(f"    {len(repos)} candidate input repo(s) after dedup")
+    return repos, None
+
+
+def _download_input_repos(
+    repos: list[InputRepo],
+    cache_root: Path,
+    ssl_context: ssl.SSLContext | None,
+) -> tuple[dict[InputRepo, Path], str | None]:
+    """Download usable repository metadata and return any fatal error."""
+    repo_to_dir: dict[InputRepo, Path] = {}
+    for repo in repos:
+        try:
+            cache_dir = download_repo_metadata(repo, cache_root, ssl_context)
+        except urllib.error.HTTPError as exc:
+            return {}, f"HTTP {exc.code} fetching {repo.url}/repodata/repomd.xml (origin={repo.origin})"
+        except ValueError as exc:
+            return {}, f"{exc} while fetching {repo.url} (origin={repo.origin})"
+        if cache_dir is not None:
+            repo_to_dir[repo] = cache_dir
+    log(f"    {len(repo_to_dir)} repo(s) successfully downloaded ({len(repos) - len(repo_to_dir)} skipped)")
+    return repo_to_dir, None
+
+
+def _write_routing_reports(
+    unpublished: list[dict],
+    fallbacks: list[dict],
+    output_dir: Path,
+) -> None:
+    """Write and log unpublished and fallback-channel reports."""
+    log("==> Writing unpublished-packages report ...")
+    json_path, txt_path = write_unpublished_report(unpublished, output_dir)
+    log(f"    -> {json_path.name}, {txt_path.name}")
+
+    log("==> Writing fallback-channel-packages report ...")
+    fallback_json, fallback_txt = write_fallback_report(fallbacks, output_dir)
+    log(f"    -> {fallback_json.name}, {fallback_txt.name}")
+
+
+def _log_output_summary(
+    dest_counts: dict[Destination, int],
+    unpublished: list[dict],
+    fallbacks: list[dict],
+) -> None:
+    """Log emitted package counts by destination."""
+    log("\n==> Summary")
+    for dest in sorted(dest_counts, key=lambda item: (item.channel, item.kind, item.arch)):
+        log(f"    {dest.relpath():35s}  {dest_counts[dest]:6d} pkg(s)")
+    log(f"    {'(unpublished)':35s}  {len(unpublished):6d} pkg(s)")
+    log(f"    {'(fallback-channel)':35s}  {len(fallbacks):6d} pkg(s)")
+
+
 def main(argv: list[str] | None = None) -> int:
     """Synthesize routed Azure Linux repositories."""
     args = parse_args(argv)
@@ -1197,32 +1265,15 @@ def main(argv: list[str] | None = None) -> int:
 
     # ---- Resolve the InputRepo list ------------------------------------
     log("==> Resolving input repos ...")
-    repos: list[InputRepo] = []
-    for option, value in repo_sources:
-        try:
-            if option == "--repo-prefix":
-                repos.extend(expand_repo_prefix(value, arches))
-            else:  # --repo
-                repos.extend(parse_explicit_repo(value, arches))
-        except ValueError as e:
-            return fatal(str(e))
-    repos = dedup_input_repos(repos)
-    log(f"    {len(repos)} candidate input repo(s) after dedup")
+    repos, error = _resolve_input_repos(repo_sources, arches)
+    if error is not None:
+        return fatal(error)
 
     # ---- Phase 1: download repodata ------------------------------------
     log("==> Downloading repodata ...")
-    repo_to_dir: dict[InputRepo, Path] = {}
-    for repo in repos:
-        try:
-            cache_dir = download_repo_metadata(repo, cache_root, ssl_context)
-        except urllib.error.HTTPError as e:
-            return fatal(f"HTTP {e.code} fetching {repo.url}/repodata/repomd.xml (origin={repo.origin})")
-        except ValueError as e:
-            return fatal(f"{e} while fetching {repo.url} (origin={repo.origin})")
-        if cache_dir is not None:
-            repo_to_dir[repo] = cache_dir
-    log(f"    {len(repo_to_dir)} repo(s) successfully downloaded ({len(repos) - len(repo_to_dir)} skipped)")
-
+    repo_to_dir, error = _download_input_repos(repos, cache_root, ssl_context)
+    if error is not None:
+        return fatal(error)
     if not repo_to_dir:
         return fatal("no input repos with usable repodata; nothing to route")
 
@@ -1253,21 +1304,8 @@ def main(argv: list[str] | None = None) -> int:
     log("==> Writing per-destination repos ...")
     dest_counts, unpublished, fallbacks = emit_repos(repo_to_dir, universe, decisions, output_dir)
 
-    # ---- Phase 7: unpublished + fallback reports -----------------------
-    log("==> Writing unpublished-packages report ...")
-    json_path, txt_path = write_unpublished_report(unpublished, output_dir)
-    log(f"    -> {json_path.name}, {txt_path.name}")
-
-    log("==> Writing fallback-channel-packages report ...")
-    fb_json, fb_txt = write_fallback_report(fallbacks, output_dir)
-    log(f"    -> {fb_json.name}, {fb_txt.name}")
-
-    # ---- Summary -------------------------------------------------------
-    log("\n==> Summary")
-    for dest in sorted(dest_counts, key=lambda d: (d.channel, d.kind, d.arch)):
-        log(f"    {dest.relpath():35s}  {dest_counts[dest]:6d} pkg(s)")
-    log(f"    {'(unpublished)':35s}  {len(unpublished):6d} pkg(s)")
-    log(f"    {'(fallback-channel)':35s}  {len(fallbacks):6d} pkg(s)")
+    _write_routing_reports(unpublished, fallbacks, output_dir)
+    _log_output_summary(dest_counts, unpublished, fallbacks)
 
     if not args.keep_cache:
         with contextlib.suppress(FileNotFoundError):

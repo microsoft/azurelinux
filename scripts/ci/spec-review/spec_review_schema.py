@@ -224,47 +224,21 @@ def compare_reports(
         print()
 
 
-def main() -> int:
-    """Validate, summarize, or compare spec-review reports."""
-    # Route to compare subcommand if first arg is "compare"
-    if len(sys.argv) > 1 and sys.argv[1] == "compare":
-        parser = argparse.ArgumentParser(description="Compare multi-model spec review reports")
-        parser.add_argument("_cmd", metavar="compare")
-        parser.add_argument("report_a", type=Path, help="Report from reviewer A")
-        parser.add_argument("report_b", type=Path, help="Report from reviewer B")
-        parser.add_argument("report_final", type=Path, help="Final synthesized report")
-        parser.add_argument("--label-a", default="Reviewer A", help="Display label for reviewer A")
-        parser.add_argument("--label-b", default="Reviewer B", help="Display label for reviewer B")
-        parser.add_argument(
-            "--label-final",
-            default="Synthesized",
-            help="Display label for final report",
-        )
-        args = parser.parse_args()
+def _compare_parser() -> argparse.ArgumentParser:
+    """Build the compare-mode argument parser."""
+    parser = argparse.ArgumentParser(description="Compare multi-model spec review reports")
+    parser.add_argument("_cmd", metavar="compare")
+    parser.add_argument("report_a", type=Path, help="Report from reviewer A")
+    parser.add_argument("report_b", type=Path, help="Report from reviewer B")
+    parser.add_argument("report_final", type=Path, help="Final synthesized report")
+    parser.add_argument("--label-a", default="Reviewer A", help="Display label for reviewer A")
+    parser.add_argument("--label-b", default="Reviewer B", help="Display label for reviewer B")
+    parser.add_argument("--label-final", default="Synthesized", help="Display label for final report")
+    return parser
 
-        try:
-            ra = _load_report(args.report_a)
-            rb = _load_report(args.report_b)
-            rf = _load_report(args.report_final)
-        except FileNotFoundError as e:
-            print(f"File not found: {e}", file=sys.stderr)
-            return 2
-        except json.JSONDecodeError as e:
-            print(f"Invalid JSON: {e}", file=sys.stderr)
-            return 2
-        except (OSError, ValueError) as e:
-            print(f"Validation failed: {e}", file=sys.stderr)
-            return 2
 
-        compare_reports(ra, rb, rf, args.label_a, args.label_b, args.label_final)
-        return 0
-
-    # Handle --schema flag before argparse to avoid positional arg requirement
-    if len(sys.argv) > 1 and sys.argv[1] == "--schema":
-        print(json.dumps(SpecReviewReport.model_json_schema(), indent=2))
-        return 0
-
-    # Original validate behavior
+def _validation_parser() -> argparse.ArgumentParser:
+    """Build the report-validation argument parser."""
     parser = argparse.ArgumentParser(description="Validate spec review report")
     parser.add_argument("file", type=Path, help="Path to report JSON")
     parser.add_argument("--errors", action="store_true", help="Print errors", default=False)
@@ -272,9 +246,31 @@ def main() -> int:
     parser.add_argument("--suggestions", action="store_true", help="Print suggestions", default=False)
     parser.add_argument("--all", action="store_true", help="Print all findings", default=False)
     parser.add_argument("--json", action="store_true", help="Output summary as JSON", default=False)
+    return parser
 
-    args = parser.parse_args()
 
+def _run_compare(args: argparse.Namespace) -> int:
+    """Load and compare three review reports."""
+    try:
+        report_a = _load_report(args.report_a)
+        report_b = _load_report(args.report_b)
+        report_final = _load_report(args.report_final)
+    except FileNotFoundError as e:
+        print(f"File not found: {e}", file=sys.stderr)
+        return 2
+    except json.JSONDecodeError as e:
+        print(f"Invalid JSON: {e}", file=sys.stderr)
+        return 2
+    except (OSError, ValueError) as e:
+        print(f"Validation failed: {e}", file=sys.stderr)
+        return 2
+
+    compare_reports(report_a, report_b, report_final, args.label_a, args.label_b, args.label_final)
+    return 0
+
+
+def _run_validation(args: argparse.Namespace) -> int:
+    """Load and display one review report."""
     try:
         report = SpecReviewReport.from_file(args.file)
     except FileNotFoundError:
@@ -306,6 +302,16 @@ def main() -> int:
 
     # Only return error if there is an issue loading the report
     return 0
+
+
+def main() -> int:
+    """Validate, summarize, or compare spec-review reports."""
+    if len(sys.argv) > 1 and sys.argv[1] == "compare":
+        return _run_compare(_compare_parser().parse_args())
+    if len(sys.argv) > 1 and sys.argv[1] == "--schema":
+        print(json.dumps(SpecReviewReport.model_json_schema(), indent=2))
+        return 0
+    return _run_validation(_validation_parser().parse_args())
 
 
 if __name__ == "__main__":

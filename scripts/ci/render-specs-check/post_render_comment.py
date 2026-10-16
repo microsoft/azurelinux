@@ -97,28 +97,22 @@ def _fence_for(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def format_comment(
+def _comment_intro(
     report: dict,
     artifacts_url: str | None = None,
     run_id: str | None = None,
     repo: str | None = None,
-) -> str:
-    """Format rendered-spec drift as a GitHub pull request comment."""
+) -> list[str]:
+    """Build the remediation instructions and summary table."""
     content_diffs = report.get("content_diffs", [])
     extra_files = report.get("extra_files", [])
     missing_files = report.get("missing_files", [])
-
     n_diff = len(content_diffs)
     n_extra = len(extra_files)
     n_missing = len(missing_files)
-
     all_comps: list[str] = sorted({item["component"] for item in content_diffs + extra_files})
-    # Missing files (in HEAD but not produced by render) are orphans that
-    # need `--clean-stale`, which only works with `-a`. Extras (produced by
-    # render but not committed) are handled fine by a per-component render.
     use_all = bool(missing_files)
     remediation_cmd = render_command([] if use_all else all_comps, use_all=use_all)
-
     lines: list[str] = [
         COMMENT_MARKER,
         "## 📄❌ Rendered specs are out of date",
@@ -163,102 +157,109 @@ def format_comment(
             "",
         ]
     )
+    return lines
 
-    # Running total of comment body size. Every section that appends
-    # PR-controlled content (paths, diff bodies) must check this budget
-    # before appending and bail out with a "... and N more" summary once it
-    # gets close to the GitHub API's 65_536-char comment limit. A comment
-    # rejected for being too large is effectively invisible (the post step
-    # has continue-on-error: true), so a fork PR author could otherwise
-    # suppress the drift warning by spamming long or numerous paths.
-    body_so_far = len("\n".join(lines))
-    budget_cap = MAX_COMMENT_CHARS - COMMENT_BUDGET_MARGIN
 
-    if content_diffs:
-        lines.append("### Content diffs")
-        lines.append("")
-        for shown, item in enumerate(content_diffs):
-            if shown >= MAX_INLINE_DIFFS:
-                remaining = n_diff - shown
-                lines.append(f"*… and {remaining} more file(s). Run the remediation command above to see all changes.*")
-                lines.append("")
-                break
-            path = _safe_path(item["path"])
-            diff_text = item.get("diff", "")
-            fence = _fence_for(diff_text)
-            # Emit fixed raw HTML for the collapsible wrapper (`<details>` and
-            # `<summary>`), but keep attacker-controlled content in markdown
-            # code formatting: the path is rendered as code in the summary, and
-            # the diff body is inside a dynamically chosen fence longer than any
-            # backtick run in the diff text.
-            block = f"<details>\n<summary>`{path}`</summary>\n\n{fence}diff\n{diff_text}\n{fence}\n\n</details>\n"
-            if body_so_far + len(block) > budget_cap:
-                remaining = n_diff - shown
-                lines.append(
-                    f"*… and {remaining} more file(s) — comment size limit reached. "
-                    "Run the remediation command above to see all changes.*"
-                )
-                lines.append("")
-                break
-            lines.append(block)
-            body_so_far += len(block)
-
-    def _append_file_list(
-        header: str,
-        description: str,
-        items: list[dict],
-    ) -> None:
-        """Append a bulleted file list, enforcing the shared comment budget.
-
-        Stops early once the cumulative body size gets near the GitHub
-        limit, so a fork PR can't suppress the warning by producing either
-        very long paths or a huge number of them.
-        """
-        nonlocal body_so_far
-        lines.append(header)
-        lines.append("")
-        lines.append(description)
-        lines.append("")
-        shown = 0
-        truncated_for_size = False
-        for item in items[:MAX_FILE_LIST]:
-            entry = f"- `{_safe_path(item['path'])}`"
-            # +1 for the newline added by the final "\n".join(lines).
-            if body_so_far + len(entry) + 1 > budget_cap:
-                truncated_for_size = True
-                break
-            lines.append(entry)
-            body_so_far += len(entry) + 1
-            shown += 1
-        if truncated_for_size:
+def _append_content_diffs(lines: list[str], items: list[dict], body_size: int, budget_cap: int) -> int:
+    """Append inline diffs while enforcing the shared comment budget."""
+    if not items:
+        return body_size
+    lines.extend(["### Content diffs", ""])
+    for shown, item in enumerate(items):
+        if shown >= MAX_INLINE_DIFFS:
             remaining = len(items) - shown
-            note = (
-                f"\n*… and {remaining} more file(s) — comment size limit reached. "
-                "Run the remediation command above to see all changes.*"
+            lines.extend(
+                [f"*… and {remaining} more file(s). Run the remediation command above to see all changes.*", ""]
             )
-        elif len(items) > MAX_FILE_LIST:
-            remaining = len(items) - MAX_FILE_LIST
-            note = f"\n*… and {remaining} more file(s).*"
-        else:
-            note = None
-        if note is not None:
-            lines.append(note)
-            body_so_far += len(note) + 1
-        lines.append("")
-        body_so_far += 1
+            break
+        path = _safe_path(item["path"])
+        diff_text = item.get("diff", "")
+        fence = _fence_for(diff_text)
+        block = f"<details>\n<summary>`{path}`</summary>\n\n{fence}diff\n{diff_text}\n{fence}\n\n</details>\n"
+        if body_size + len(block) > budget_cap:
+            remaining = len(items) - shown
+            lines.extend(
+                [
+                    (
+                        f"*… and {remaining} more file(s) — comment size limit reached. "
+                        "Run the remediation command above to see all changes.*"
+                    ),
+                    "",
+                ]
+            )
+            break
+        lines.append(block)
+        body_size += len(block)
+    return body_size
 
+
+def _append_file_list(
+    lines: list[str],
+    header: str,
+    description: str,
+    items: list[dict],
+    body_size: int,
+) -> int:
+    """Append a bounded file list and return the updated comment size."""
+    budget_cap = MAX_COMMENT_CHARS - COMMENT_BUDGET_MARGIN
+    lines.extend([header, "", description, ""])
+    shown = 0
+    truncated_for_size = False
+    for item in items[:MAX_FILE_LIST]:
+        entry = f"- `{_safe_path(item['path'])}`"
+        if body_size + len(entry) + 1 > budget_cap:
+            truncated_for_size = True
+            break
+        lines.append(entry)
+        body_size += len(entry) + 1
+        shown += 1
+    if truncated_for_size:
+        remaining = len(items) - shown
+        note = (
+            f"\n*… and {remaining} more file(s) — comment size limit reached. "
+            "Run the remediation command above to see all changes.*"
+        )
+    elif len(items) > MAX_FILE_LIST:
+        remaining = len(items) - MAX_FILE_LIST
+        note = f"\n*… and {remaining} more file(s).*"
+    else:
+        note = None
+    if note is not None:
+        lines.append(note)
+        body_size += len(note) + 1
+    lines.append("")
+    return body_size + 1
+
+
+def format_comment(
+    report: dict,
+    artifacts_url: str | None = None,
+    run_id: str | None = None,
+    repo: str | None = None,
+) -> str:
+    """Format rendered-spec drift as a GitHub pull request comment."""
+    content_diffs = report.get("content_diffs", [])
+    extra_files = report.get("extra_files", [])
+    missing_files = report.get("missing_files", [])
+    lines = _comment_intro(report, artifacts_url, run_id, repo)
+    body_size = len("\n".join(lines))
+    budget_cap = MAX_COMMENT_CHARS - COMMENT_BUDGET_MARGIN
+    body_size = _append_content_diffs(lines, content_diffs, body_size, budget_cap)
     if extra_files:
-        _append_file_list(
+        body_size = _append_file_list(
+            lines,
             "### Files to add",
             "These files are produced by `azldev component render` but are missing from your branch. Add them.",
             extra_files,
+            body_size,
         )
-
     if missing_files:
         _append_file_list(
+            lines,
             "### Files to remove",
             "These files are in your branch but are not produced by render. Remove them.",
             missing_files,
+            body_size,
         )
 
     return "\n".join(lines)

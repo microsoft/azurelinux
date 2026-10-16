@@ -66,6 +66,32 @@ def _load_repodata_synthesizer() -> types.ModuleType:
     )
 
 
+def test_synthesizer_rejects_missing_repositories_before_output_setup(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Reject missing inputs without touching the requested output path."""
+    module = _load_repodata_synthesizer()
+    output_path = tmp_path / "existing-output"
+    original_content = "leave this file untouched"
+    output_path.write_text(original_content, encoding="utf-8")
+    args = types.SimpleNamespace(
+        arch=[],
+        ca_bundle=None,
+        insecure=False,
+        repo_sources=[],
+        output_dir=output_path,
+        repo_root=tmp_path,
+        keep_cache=False,
+    )
+    monkeypatch.setattr(module, "parse_args", lambda _argv: args)
+
+    assert module.main([]) == 1
+    assert capsys.readouterr().err == "ERROR: at least one --repo-prefix or --repo must be provided\n"
+    assert output_path.read_text(encoding="utf-8") == original_content
+
+
 class _FtpRedirectHandler(BaseHTTPRequestHandler):
     """Redirect every request to a disallowed FTP target."""
 
