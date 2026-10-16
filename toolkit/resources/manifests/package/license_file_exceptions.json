@@ -39,6 +39,14 @@
             ]
         },
         {
+            "_comment": "guava-javadoc: JDK-generated javadoc legal/ files (bundled jQuery notices) trigger false-positive license warnings.",
+            "PackageName": "guava-javadoc",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/javadoc/guava/legal/ADDITIONAL_LICENSE_INFO$",
+                "^/usr/share/javadoc/guava/legal/LICENSE$"
+            ]
+        },
+        {
             "_comment1": "OpenSSL has multiple structs, constants and procedures that have the word 'NOTICE' in them, like 'NOTICEREF_free'.",
             "_comment2": "These man pages are for those items, not actual license notices.",
             "PackageName": "openssl-devel",
