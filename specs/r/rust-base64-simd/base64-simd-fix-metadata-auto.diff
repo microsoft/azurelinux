@@ -1,0 +1,12 @@
+--- base64-simd-0.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ base64-simd-0.8.0/Cargo.toml	2026-06-07T21:05:14.137363+00:00
+@@ -63,9 +63,3 @@
+ ]
+ unstable = ["vsimd/unstable"]
+ 
+-[target."cfg(target_arch=\"wasm32\")".dev-dependencies.getrandom]
+-version = "0.2.8"
+-features = ["js"]
+-
+-[target."cfg(target_arch=\"wasm32\")".dev-dependencies.wasm-bindgen-test]
+-version = "0.3.33"
