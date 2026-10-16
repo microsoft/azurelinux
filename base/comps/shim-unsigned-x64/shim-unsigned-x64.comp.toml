@@ -1,7 +1,5 @@
 [components.shim-unsigned-x64]
 release = { calculation = "manual" }
-# Pin shim 16.1 to Fedora dist-git commit d355c62164bd48c6f47774fe04b0d730d892e006.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "d355c62164bd48c6f47774fe04b0d730d892e006" }
 
 # Fedora ships one shim package across multiple Fedora releases. Azure Linux
 # historically signs and ships a distinct shim package for each major release,
