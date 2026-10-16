@@ -1,0 +1,21 @@
+From 954ff649155504ae4ba95cf239e955a04bf4fe26 Mon Sep 17 00:00:00 2001
+From: HalFrgrd <4559349+HalFrgrd@users.noreply.github.com>
+Date: Thu, 15 Oct 2026 00:25:18 +0100
+Subject: [PATCH] Fix Android builds (#1681)
+
+---
+ src/lib.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index b0b643729..51929daa8 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -391,6 +391,7 @@ mod signal;
+ #[cfg(any(
+     feature = "fs",
+     feature = "event",
++    feature = "net",
+     feature = "process",
+     feature = "runtime",
+     feature = "thread",
