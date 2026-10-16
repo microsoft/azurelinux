@@ -11,7 +11,7 @@ Group:          Development/Libraries/Java
 URL:            https://github.com/google/guava
 Source0:        https://github.com/google/guava/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.tar.xz
-Patch1:         CVE-2026-102554.patch
+Patch0:         CVE-2026-102554.patch
 
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
