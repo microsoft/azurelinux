@@ -82,6 +82,7 @@ extends:
         Network: R1
       runOnHost: true
       EnableCDPxPAT: false
+      use1esentry: true
 
     # https://aka.ms/obpipelines/sdl
     globalSdl:
@@ -125,5 +126,6 @@ extends:
           # script's own clear failure fires before ADO blunt-kills the job.
           # Raise both together if a legitimate build is being killed.
           pollTimeoutSeconds: 21600
+          poolName: azldev-1es-mariner3-x64
           poolType: linux
           timeoutInMinutes: 420
