@@ -1,0 +1,35 @@
+From: Remy D. Farley <one-d-wide@protonmail.com>
+Subject: doc/netlink: netlink-raw: Add max check
+Upstream: https://github.com/torvalds/linux/commit/bf5a54bc0e3d8962474fcd611f1266eba036232f
+
+The HWE source uses max checks in rt-link and rt-neigh specifications,
+but its raw netlink schema does not yet accept them.
+
+diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+--- a/Documentation/netlink/netlink-raw.yaml
++++ b/Documentation/netlink/netlink-raw.yaml
+@@ -19,6 +19,12 @@ $defs:
+     type: [ string, integer ]
+     pattern: ^[0-9A-Za-z_-]+( - 1)?$
+     minimum: 0
++  len-or-limit:
++    # literal int, const name, or limit based on fixed-width type
++    # e.g. u8-min, u16-max, etc.
++    type: [ string, integer ]
++    pattern: ^[0-9A-Za-z_-]+$
++    minimum: 0
+ 
+ # Schema for specs
+ title: Protocol
+@@ -270,7 +276,10 @@ properties:
+                     type: string
+                   min:
+                     description: Min value for an integer attribute.
+-                    type: integer
++                    $ref: '#/$defs/len-or-limit'
++                  max:
++                    description: Max value for an integer attribute.
++                    $ref: '#/$defs/len-or-limit'
+                   min-len:
+                     description: Min length for a binary attribute.
+                     $ref: '#/$defs/len-or-define'

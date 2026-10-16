@@ -1,0 +1,48 @@
+{
+    "common": {
+        "crashkernel-1536M.addon": [
+            "crashkernel=1536M\n"
+        ],
+        "crashkernel-192M.addon": [
+            "crashkernel=192M\n"
+        ],
+        "crashkernel-1G.addon": [
+            "crashkernel=1G\n"
+        ],
+        "crashkernel-256M.addon": [
+            "crashkernel=256M\n"
+        ],
+        "crashkernel-2G.addon": [
+            "crashkernel=2G\n"
+        ],
+        "crashkernel-512M.addon": [
+            "crashkernel=512M\n"
+        ],
+        "crashkernel-default.addon": [
+            "crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M\n"
+        ],
+        "debug.addon": [
+            "debug"
+        ],
+        "systemd-volatile-overlay.addon": [
+            "systemd.volatile=overlay"
+        ]
+    },
+    "virt": {
+        "common": {
+            "fips-disable.addon": [
+                "fips=0\n"
+            ],
+            "fips-enable.addon": [
+                "fips=1\n"
+            ]
+        },
+        "rhel": {
+            "aarch64": {
+                "crashkernel-default.addon": [
+                    "crashkernel=1G-4G:256M,4G-64G:320M,64G-:576M\n"
+                ]
+            }
+        }
+    }
+}
