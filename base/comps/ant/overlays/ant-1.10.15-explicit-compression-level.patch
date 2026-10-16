@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nan Liu <liunan@microsoft.com>
+Date: Thu, 17 Sep 2026 21:08:09 +0000
+Subject: [PATCH] tests: compare explicit ZIP compression levels
+
+Microsoft OpenJDK 25 can produce a default-compression archive with the
+same size as a level-9 archive, invalidating the test's strict size
+comparison.
+
+Use level 1 for the baseline archive to preserve the intended comparison.
+
+Signed-off-by: Nan Liu <liunan@microsoft.com>
+---
+ src/etc/testcases/taskdefs/zip.xml | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/etc/testcases/taskdefs/zip.xml b/src/etc/testcases/taskdefs/zip.xml
+index 6eb89c79f..b4f5f180e 100644
+--- a/src/etc/testcases/taskdefs/zip.xml
++++ b/src/etc/testcases/taskdefs/zip.xml
+@@ -55,8 +55,11 @@
+   </target>
+
+   <target name="test6">
+-    <zip destFile="${output}/test6.zip" basedir=".">
++    <!-- Microsoft OpenJDK 25 can make the default-compression archive the same
++         size as the level-9 archive, failing the test's strict size comparison.
++         Fedora OpenJDK's default archive remains larger, so it needs no override. -->
++    <zip destFile="${output}/test6.zip" basedir="." level="1">
+       <include name="*.xml" />
+       <exclude name="zip.*" />
+     </zip>
+   </target>
+--
+2.47.3

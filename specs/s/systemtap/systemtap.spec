@@ -134,7 +134,7 @@ f /var/log/stap-server/log 0644 stap-server stap-server -
 Name: systemtap
 # PRERELEASE
 Version: 5.5
-Release: 1%{?release_override}%{?dist}
+Release: 2%{?release_override}%{?dist}
 # for version, see also configure.ac
 
 
@@ -223,7 +223,7 @@ BuildRequires: xmlto /usr/share/xmlto/format/fo/pdf
 BuildRequires: emacs-common
 %endif
 %if %{with_java}
-BuildRequires: java-devel
+BuildRequires: msopenjdk-25-fedora-compat
 %endif
 %if %{with_virthost}
 # BuildRequires: libvirt-devel >= 1.0.2
@@ -521,7 +521,7 @@ Conflicts: systemtap-runtime = %{version}-%{release}.x86_64
 %endif
 Requires: byteman > 2.0
 Requires: iproute
-Requires: java-devel
+Requires: msopenjdk-25-fedora-compat
 
 %description runtime-java
 This package includes support files needed to run systemtap scripts
