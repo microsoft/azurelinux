@@ -1,0 +1,16 @@
+# Adapted from NVIDIA's Azure driver packaging:
+# https://gitlab.com/nvidia/packages/azure/nvidia-driver/-/tree/610?ref_type=heads
+[Unit]
+Description=NVIDIA Persistence Daemon
+After=syslog.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/nvidia-persistenced/nvidia-persistenced.pid
+Restart=always
+ExecStart=/usr/bin/nvidia-persistenced --user nvidia-persistenced
+ExecStopPost=/bin/rm -rf /var/run/nvidia-persistenced
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target
