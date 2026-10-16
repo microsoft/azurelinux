@@ -4,9 +4,10 @@ Azure Linux workload containers package a single application or runtime with
 an OCI default command. Unlike `container-base`, these images are intended to
 run directly rather than serve as general-purpose build bases.
 
-The workload images run as dedicated non-root users and do not include DNF,
-RPM, or repository configuration. Use `container-base` when runtime package
-installation is required.
+The workload images run as dedicated non-root users and do not include DNF/RPM
+executables or repository configuration. They retain the installed-package
+database so KIWI can generate package inventories and image SBOMs. Use
+`container-base` when runtime package installation is required.
 
 | Image | Default command | Notes |
 | --- | --- | --- |
