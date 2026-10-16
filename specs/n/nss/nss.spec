@@ -1,8 +1,8 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global nspr_version 4.38.2
-%global nss_version 3.123.1
+%global nspr_version 4.39.0
+%global nss_version 3.129.0
 # NOTE: To avoid NVR clashes of nspr* packages:
 # - reset %%{nspr_release} to 1, when updating %%{nspr_version}
 # - increment %%{nspr_version}, when updating the NSS part only
@@ -10,7 +10,7 @@
 %global nss_release %baserelease
 # use "%%global nspr_release %%[%%baserelease+n]" to handle offsets when
 # release number between nss and nspr are different.
-%global nspr_release %[%baserelease+6]
+%global nspr_release %[%baserelease+4]
 # only need to update this as we added new
 # algorithms under nss policy control
 %global crypto_policies_version 20240521
@@ -131,7 +131,7 @@ Source101:        nspr-config.xml
 # Once the buildroot has been bootstrapped the patch may be removed
 # but it doesn't hurt to keep it.
 Patch4:           iquote.patch
-Patch12:          nss-signtool-format.patch
+
 Patch13:          nss-dso-ldflags.patch
 # fedora disabled dbm by default
 Patch40:          nss-no-dbm-man-page.patch
@@ -140,19 +140,21 @@ Patch40:          nss-no-dbm-man-page.patch
 Patch50:          nss-3.110-dissable_test-ssl_policy_pkix_oscp.patch
 
 # ML-DSA support patches that haven't made it to the 3.118.1 release
-Patch60:          nss-3.118-ml-dsa-leancrypto.patch
-Patch61:          nss-3.118-ml-dsa-tls.patch
+
+
 #Patch62:          nss-3.118-prefer-all-hybrid.patch
 
-Patch65:          nss-3.118-ml-dsa-test-for-sign-verify-pkcs12.patch
-Patch66:          nss-3.118-ml-dsa-tls-test.patch
-Patch67:          nss-3.118-ml-dsa-unittests.patch
-Patch68:          nss-3.123-fix-mldsa-import-regeneration.patch
 
-Patch70:          nss-dbtests-sqlite-mangling.patch
+
+
+
+# Reseed the freebl DRBG in the child after fork(), so forked children do not
+# replay the parent's random stream (mozbz#2056509)
+Patch70:          nss-3.125-drbg-reseed-after-fork.patch
 
 Patch100:         nspr-config-pc.patch
 Patch101:         nspr-gcc-atomics.patch
+Patch71:           nss-3.127-disable-dtls13-clientcert-test.patch
 
 %description
 Network Security Services (NSS) is a set of libraries designed to
@@ -635,8 +637,8 @@ pushd nss/tests
 #  don't need to run all the tests when testing packaging
 #  nss_cycles: standard pkix upgradedb sharedb
 #  the full list from all.sh is:
-#  "cipher lowhash libpkix cert dbtests tools fips sdr crmf smime ssl ocsp merge pkits chains ec gtests ssl_gtests"
-%define nss_tests "libpkix cert dbtests tools fips sdr crmf smime ssl ocsp merge pkits chains ec gtests ssl_gtests"
+#  "cipher lowhash libpkix cert dbtests tools fips sdr smime ssl ocsp merge pkits chains ec gtests ssl_gtests"
+%define nss_tests "libpkix cert dbtests tools fips sdr smime ssl ocsp merge pkits chains ec gtests ssl_gtests"
 #  nss_ssl_tests: crl bypass_normal normal_bypass normal_fips fips_normal iopr policy
 #  nss_ssl_run: cov auth stapling stress
 #
@@ -737,7 +739,7 @@ install -p -m 644 %{SOURCE14} $RPM_BUILD_ROOT/%{_sysconfdir}/pki/nssdb/key4.db
 install -p -m 644 %{SOURCE15} $RPM_BUILD_ROOT/%{_sysconfdir}/pki/nssdb/pkcs11.txt
 
 # Copy the development libraries we want
-for file in libcrmf.a libnssb.a libnssckfw.a
+for file in libnssb.a libnssckfw.a
 do
   install -p -m 644 dist/${LOBJDIR}/lib/$file $RPM_BUILD_ROOT/%{_libdir}
 done
@@ -905,7 +907,6 @@ fi
 %doc %{_mandir}/man1/vfyserv.1*
 
 %files devel
-%{_libdir}/libcrmf.a
 %{_libdir}/pkgconfig/nss.pc
 %{_bindir}/nss-config
 %doc %{_mandir}/man1/nss-config.1*
@@ -914,13 +915,9 @@ fi
 %{_includedir}/nss3/cert.h
 %{_includedir}/nss3/certdb.h
 %{_includedir}/nss3/certt.h
-%{_includedir}/nss3/cmmf.h
-%{_includedir}/nss3/cmmft.h
 %{_includedir}/nss3/cms.h
 %{_includedir}/nss3/cmsreclist.h
 %{_includedir}/nss3/cmst.h
-%{_includedir}/nss3/crmf.h
-%{_includedir}/nss3/crmft.h
 %{_includedir}/nss3/cryptohi.h
 %{_includedir}/nss3/cryptoht.h
 %{_includedir}/nss3/sechash.h
@@ -1103,6 +1100,38 @@ fi
 
 
 %changelog
+* Mon Sep 14 2026 Krenželok František <fkrenzel@redhat.com> - 3.129.0-1
+- Update NSS to 3.129.0
+- Removed patch nss-3.118-ml-dsa-leancrypto.patch
+- Removed patch nss-3.118-ml-dsa-test-for-sign-verify-pkcs12.patch
+- Removed patch nss-3.118-ml-dsa-tls-test.patch
+- Removed patch nss-3.118-ml-dsa-tls.patch
+- Removed patch nss-3.118-ml-dsa-unittests.patch
+- Removed patch nss-3.118-prefer-all-hybrid.patch
+- Removed patch nss-3.123-fix-mldsa-import-regeneration.patch
+- Removed patch nss-3.79-dbtool.patch
+- Removed patch nss-3.89-dangling.patch
+- Removed patch nss-signtool-format.patch
+
+* Fri Aug 28 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.127.0-1
+- Update NSS to 3.127.0
+- DisableTlsConnectDatagram13.ClientCertCallbackBeforeServerFinished
+
+* Thu Jul 30 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.126.0-1
+- Update NSS to 3.126.0
+
+* Sat Jul 25 2026 Rostislav Krasny <rostiprodev@gmail.com> - 3.125.0-2
+- Reseed the freebl DRBG after fork() so forked children do not replay the
+  parent's random stream (Firefox fork server duplicate UUIDs / crypto output)
+
+* Thu Jun 18 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.125.0-1
+- Update NSS to 3.125.0
+- Fix NSPR versioning scheme
+
+* Mon Jun  1 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.124.0-1
+- Update NSS to 3.124.0
+- Remove libcrmf as it is being deprecated and we don't use it.
+
 * Thu May  7 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.123.1-1
 - Update NSS to 3.123.1
 

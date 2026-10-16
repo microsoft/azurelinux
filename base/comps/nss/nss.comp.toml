@@ -1,10 +1,8 @@
 [components.nss]
 # Release: %{nss_release}%{?dist}
 release = { calculation = "manual" }
-# Pin to 3.123.1 (commit a2e1a543) — required by 389-ds-base / 389-ds-base-libs
-# 3.1.4 built in the Fedora 43 snapshot, which have a runtime dependency on
-# nss >= 3.123.1. Additive minor bump from 3.121.0 across 3.122.x -> 3.123.1;
-# NSS SONAMEs are unversioned and ABI-stable across the 3.x series, NSPR stays
-# at 4.38.2.
-# https://src.fedoraproject.org/rpms/nss/c/a2e1a543d0c2cb811e939c90d9ebdbf9579468d6
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a2e1a543d0c2cb811e939c90d9ebdbf9579468d6" }
+# Firefox 156 requires NSS >= 3.128. Pin the Fedora 43 update to 3.129.0,
+# including NSPR 4.39.0, without advancing the distro-wide snapshot.
+# This also satisfies 389-ds-base's NSS >= 3.123.1 requirement.
+# https://src.fedoraproject.org/rpms/nss/c/3289b46fb0b96b443c471ae7374704f445341fa6
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "3289b46fb0b96b443c471ae7374704f445341fa6" }
