@@ -1,0 +1,19 @@
+--- base64-simd-0.8.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ base64-simd-0.8.0/Cargo.toml	2026-06-07T21:05:46.719564+00:00
+@@ -42,13 +42,13 @@
+ version = "0.8.0"
+ 
+ [dev-dependencies.base64]
+-version = "0.20.0"
++version = "0.22"
+ 
+ [dev-dependencies.const-str]
+-version = "0.5.3"
++version = ">=0.6, <2.0"
+ 
+ [dev-dependencies.rand]
+-version = "0.8.5"
++version = "0.10"
+ 
+ [features]
+ alloc = ["vsimd/alloc"]

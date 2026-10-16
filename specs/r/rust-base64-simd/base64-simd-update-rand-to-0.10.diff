@@ -1,0 +1,83 @@
+From 4dc5d0169f8927f6b5def1ced2d35fcf9cbff2bf Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 4 Mar 2026 11:22:57 +0000
+Subject: [PATCH 1/3] Update rand dev-dependency to 0.10
+
+---
+ tests/it.rs | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tests/it.rs b/tests/it.rs
+index 5329283..54b7251 100644
+--- a/tests/it.rs
++++ b/tests/it.rs
+@@ -1,10 +1,11 @@
+ use base64_simd::{AsOut, Base64};
+ use base64_simd::{STANDARD, STANDARD_NO_PAD, URL_SAFE, URL_SAFE_NO_PAD};
+ 
++use rand::{Rng, RngExt};
++
+ fn rand_bytes(n: usize) -> Vec<u8> {
+-    use rand::RngCore;
+     let mut bytes = vec![0u8; n];
+-    rand::thread_rng().fill_bytes(&mut bytes);
++    rand::rng().fill_bytes(&mut bytes);
+     bytes
+ }
+ 
+-- 
+2.53.0
+
+
+From 736bc58a7f00b498188cc20f99ec77cd957f2e3a Mon Sep 17 00:00:00 2001
+From: Nugine <nugine@foxmail.com>
+Date: Wed, 4 Mar 2026 22:10:18 +0800
+Subject: [PATCH 2/3] allow RngExt
+
+---
+ tests/it.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/it.rs b/tests/it.rs
+index 54b7251..8c53be4 100644
+--- a/tests/it.rs
++++ b/tests/it.rs
+@@ -1,6 +1,7 @@
+ use base64_simd::{AsOut, Base64};
+ use base64_simd::{STANDARD, STANDARD_NO_PAD, URL_SAFE, URL_SAFE_NO_PAD};
+ 
++#[allow(unused_imports)]
+ use rand::{Rng, RngExt};
+ 
+ fn rand_bytes(n: usize) -> Vec<u8> {
+-- 
+2.53.0
+
+
+From a4bbbfe33213159b8a07c3e49714e74897a184bb Mon Sep 17 00:00:00 2001
+From: Ben Beasley <code@musicinmybrain.net>
+Date: Thu, 5 Mar 2026 07:08:37 +0000
+Subject: [PATCH 3/3] Move `use rand::RngExt` to test routines to avoid unused
+ import (#64)
+
+---
+ tests/it.rs | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/tests/it.rs b/tests/it.rs
+index 8c53be4..e275241 100644
+--- a/tests/it.rs
++++ b/tests/it.rs
+@@ -1,8 +1,7 @@
+ use base64_simd::{AsOut, Base64};
+ use base64_simd::{STANDARD, STANDARD_NO_PAD, URL_SAFE, URL_SAFE_NO_PAD};
+ 
+-#[allow(unused_imports)]
+-use rand::{Rng, RngExt};
++use rand::Rng;
+ 
+ fn rand_bytes(n: usize) -> Vec<u8> {
+     let mut bytes = vec![0u8; n];
+-- 
+2.53.0
+
