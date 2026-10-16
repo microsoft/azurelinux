@@ -1,17 +1,7 @@
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
-Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
-Name:           packer
-Version:        1.9.5
-<<<<<<< HEAD
-Release:        21%{?dist}
-=======
 Release:        23%{?dist}
->>>>>>> 3144cdd226 ([AutoPR- Security] Patch packer for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-19585, CVE-2026-107325, CVE-2026-107324 [HIGH] (#19242))
-License:        MPLv2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/hashicorp/packer
 Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -41,7 +31,6 @@ Patch1:         CVE-2022-3064.patch
 Patch2:         CVE-2024-6104.patch
 Patch3:         CVE-2024-28180.patch
 Patch4:         CVE-2025-27144.patch
-<<<<<<< HEAD
 Patch5:         CVE-2025-22868.patch
 Patch6:         CVE-2025-30204.patch
 Patch7:         CVE-2024-51744.patch
@@ -105,8 +94,7 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-<<<<<<< HEAD
-=======
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-23
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-19585, CVE-2026-107325, CVE-2026-107324
 
@@ -114,10 +102,8 @@ go test -mod=vendor
 - Patch for CVE-2026-84304
 - Removed patches CVE-2025-22868, CVE-2026-56852
 
->>>>>>> 3144cdd226 ([AutoPR- Security] Patch packer for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-19585, CVE-2026-107325, CVE-2026-107324 [HIGH] (#19242))
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-21
 - Patch for CVE-2026-78662, CVE-2026-56855
-
 * Wed Aug 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-20
 - Patch for CVE-2026-19589
 
