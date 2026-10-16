@@ -71,7 +71,7 @@ Patch22:        CVE-2026-61801.patch
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
-BuildRequires:  golang >= 1.26.9
+BuildRequires:  golang >= 1.26
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -327,9 +327,7 @@ fi
 
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-32
-- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
-- Require Go 1.26.9 or later for the corresponding standard library fixes
-- Patch for CVE-2026-61801, including the limited-file helper and group-file wrapper
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801
 
 * Thu Sep 17 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.30.10-31
 - Patch for CVE-2026-84304, CVE-2026-84445, CVE-2026-83530
