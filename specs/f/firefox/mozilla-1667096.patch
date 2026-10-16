@@ -5,7 +5,7 @@ diff -up firefox-127.0/media/ffvpx/libavcodec/codec_list.c.1667096 firefox-127.0
  #if CONFIG_MP3_DECODER
      &ff_mp3_decoder,
  #endif
-+#ifdef CONFIG_LIBFDK_AAC
++#if CONFIG_LIBFDK_AAC
 +    &ff_libfdk_aac_decoder,
 +#endif
  #if CONFIG_LIBDAV1D
