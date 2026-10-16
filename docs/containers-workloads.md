@@ -8,6 +8,9 @@ The workload images run as dedicated non-root users and do not include DNF,
 RPM, or repository configuration. Use `container-base` when runtime package
 installation is required.
 
+The RPM database remains in the build staging root for KIWI package inventories
+and image SBOMs, but is excluded from the shipped OCI filesystem.
+
 | Image | Default command | Notes |
 | --- | --- | --- |
 | `microsoft/azurelinux/workload/busybox:4.0` | `/usr/sbin/busybox sh` | Minimal BusyBox shell environment |
