@@ -1,0 +1,47 @@
+diff -Naur equator-0.4.2-original/tests/test_asm.rs equator-0.4.2/tests/test_asm.rs
+--- equator-0.4.2-original/tests/test_asm.rs	2006-07-23 21:21:28.000000000 -0400
++++ equator-0.4.2/tests/test_asm.rs	2025-02-02 08:36:37.490420305 -0500
+@@ -15,11 +15,6 @@
+     black_box(test_std_asm_2_med as fn(_, _, _, _));
+     black_box(test_std_asm_2_big as fn(_, _, _, _));
+ 
+-    black_box(test_assert2_asm_1_med as fn(_, _));
+-    black_box(test_assert2_asm_2_smol as fn(_, _, _, _));
+-    black_box(test_assert2_asm_2_med as fn(_, _, _, _));
+-    black_box(test_assert2_asm_2_big as fn(_, _, _, _));
+-
+     let x = 3;
+     let y = 2;
+     let z = true;
+@@ -132,31 +127,10 @@
+ }
+ 
+ #[inline(never)]
+-pub fn test_assert2_asm_2_smol(a: u8, b: u8, c: u8, d: u8) {
+-    assert2::assert!([a, c] == [b, d]);
+-}
+-
+-#[inline(never)]
+-pub fn test_assert2_asm_2_med(a: usize, b: usize, c: usize, d: usize) {
+-    assert2::assert!(a == b);
+-    assert2::assert!(c == d);
+-}
+-
+-#[inline(never)]
+-pub fn test_assert2_asm_2_big(a: usize, b: usize, c: usize, d: usize) {
+-    assert2::assert!([a, c] == [b, d]);
+-}
+-
+-#[inline(never)]
+ pub fn test_std_asm_1_med(a: usize, b: usize) {
+     std::assert_eq!(a, b);
+ }
+ 
+-#[inline(never)]
+-pub fn test_assert2_asm_1_med(a: usize, b: usize) {
+-    assert2::assert!(a == b);
+-}
+-
+ #[test]
+ #[should_panic]
+ pub fn test_big_fail() {

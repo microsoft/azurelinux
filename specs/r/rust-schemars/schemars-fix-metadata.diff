@@ -1,5 +1,5 @@
 --- schemars-1.2.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ schemars-1.2.1/Cargo.toml	2026-03-18T18:29:06.386170+00:00
++++ schemars-1.2.1/Cargo.toml	2026-08-30T08:06:17.745680+00:00
 @@ -99,10 +99,6 @@
  path = "examples/validate.rs"
  
@@ -38,11 +38,10 @@
  
  [dev-dependencies.pretty_assertions]
  version = "1.2.1"
-@@ -334,7 +317,3 @@
- features = ["serde"]
- default-features = false
+@@ -336,5 +319,5 @@
  package = "uuid"
--
--[dev-dependencies.validator]
+ 
+ [dev-dependencies.validator]
 -version = "0.20"
--features = ["derive"]
++version = ">=0.20, <0.22"
+ features = ["derive"]

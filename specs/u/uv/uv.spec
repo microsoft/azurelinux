@@ -1,8 +1,8 @@
 ## START: Set by rpmautospec
-## (rpmautospec version 0.8.3)
+## (rpmautospec version 0.8.4)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -12,19 +12,13 @@
 # Do not edit manually; changes may be overwritten.
 
 %bcond check 1
-# Should we run integration tests, many of which require specific Python
-# interpreter versions (major.minor, not major.minor.patch)? This adds a few
-# dozen tests, but adds BuildRequires on more Pythons, and could reduce our
-# confidence that everything works correctly in an environment that only has
-# the main system Python.
-#
-# EPEL10 does not have alternative versions of Python, so we cannot run most of
-# the integration tests there, and manually selecting those we can run would be
-# far too tedious.
-%bcond it %{undefined el10}
+# Should we run tests that require specific Python interpreter versions
+# (major.minor, not major.minor.patch)? This adds a few dozen tests, but adds
+# BuildRequires on more Python interpreters (which aren’t available in EPEL).
+%bcond other_python_versions %{undefined epel}
 
 Name:           uv
-Version:        0.10.12
+Version:        0.12.19
 # The uv package has a permanent exception to the Updates Policy in Fedora, so
 # it can be updated in stable releases across SemVer boundaries (subject to
 # good judgement and actual compatibility of any reverse dependencies). See
@@ -64,6 +58,7 @@ Summary:        An extremely fast Python package installer and resolver, written
 # MIT
 #   - crates/uv-virtualenv/src/activator/ is vendored and forked from
 #     python3dist(virtualenv)
+#   - crates/uv-netrc/ is vendored from crate(rust-netrc)
 #
 # Additionally, the following are bundled/forked but happen to be under the
 # same (Apache-2.0 OR MIT) terms as uv itself:
@@ -84,12 +79,16 @@ Summary:        An extremely fast Python package installer and resolver, written
 # BSD-2-Clause-Patent:
 #   - test/ecosystem/github-wikidata-bot/
 # BSD-3-Clause:
+#   - test/ecosystem/jupyterlab/
+#   - test/ecosystem/pandas/
 #   - test/ecosystem/saleor/
 # MIT:
 #   - crates/uv-python/fetch-download-metadata.py is derived from
 #     https://github.com/mitsuhiko/rye/tree/f9822267a7f00332d15be8551f89a212e7bc9017
 #     which was MIT.
 #   - test/ecosystem/black/
+#   - test/ecosystem/poetry/
+#   - test/ecosystem/semantic-kernel/
 #
 # Rust crates compiled into the executable contribute additional license terms.
 # To obtain the following list of licenses, build the package and note the
@@ -103,6 +102,7 @@ Summary:        An extremely fast Python package installer and resolver, written
 # 0BSD OR MIT OR Apache-2.0
 # Apache-2.0
 # Apache-2.0 AND ISC AND (MIT OR Apache-2.0)
+# Apache-2.0 OR Apache-2.0 WITH LLVM-exception
 # Apache-2.0 OR BSD-2-Clause
 # Apache-2.0 OR BSL-1.0
 # Apache-2.0 OR ISC OR MIT
@@ -116,6 +116,7 @@ Summary:        An extremely fast Python package installer and resolver, written
 # ISC
 # LGPL-3.0-or-later OR MPL-2.0
 # MIT
+# MIT AND (MIT OR Apache-2.0)
 # MIT OR Apache-2.0
 # MIT OR LGPL-3.0-or-later
 # MIT OR Zlib OR Apache-2.0
@@ -125,35 +126,34 @@ Summary:        An extremely fast Python package installer and resolver, written
 # Unicode-3.0
 # Unlicense OR MIT
 # Zlib
-# bzip2-1.0.6
 License:        %{shrink:
-                0BSD AND
-                (0BSD OR Apache-2.0 OR MIT) AND
-                Apache-2.0 AND
-                (Apache-2.0 OR BSD-2-Clause) AND
-                (Apache-2.0 OR BSD-2-Clause OR MIT) AND
-                (Apache-2.0 OR BSL-1.0) AND
-                (Apache-2.0 OR ISC OR MIT) AND
-                (Apache-2.0 OR MIT) AND
-                (Apache-2.0 OR MIT OR Zlib) AND
-                (Apache-2.0 OR MIT-0) AND
-                (Apache-2.0 WITH LLVM-exception) AND
-                (Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT) AND
-                BSD-3-Clause AND
-                CC0-1.0 AND
-                CDLA-Permissive-2.0 AND
-                ISC AND
-                (LGPL-3.0-or-later OR MIT) AND
-                (LGPL-3.0-or-later OR MPL-2.0) AND
-                MIT AND
-                MIT-0 AND
-                (MIT OR Unlicense) AND
-                MPL-2.0 AND
-                Unicode-3.0 AND
-                Unicode-DFS-2016 AND
-                Zlib AND
-                bzip2-1.0.6
-                }
+    0BSD AND
+    (0BSD OR Apache-2.0 OR MIT) AND
+    Apache-2.0 AND
+    (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT) AND
+    (Apache-2.0 OR Apache-2.0 WITH LLVM-exception) AND
+    (Apache-2.0 OR BSD-2-Clause) AND
+    (Apache-2.0 OR BSD-2-Clause OR MIT) AND
+    (Apache-2.0 OR BSL-1.0) AND
+    (Apache-2.0 OR ISC OR MIT) AND
+    (Apache-2.0 OR MIT) AND
+    (Apache-2.0 OR MIT OR Zlib) AND
+    (Apache-2.0 OR MIT-0) AND
+    (Apache-2.0 WITH LLVM-exception) AND
+    BSD-3-Clause AND
+    CC0-1.0 AND
+    CDLA-Permissive-2.0 AND
+    ISC AND
+    (LGPL-3.0-or-later OR MIT) AND
+    (LGPL-3.0-or-later OR MPL-2.0) AND
+    MIT AND
+    MIT-0 AND
+    (MIT OR Unlicense) AND
+    MPL-2.0 AND
+    Unicode-3.0 AND
+    Unicode-DFS-2016 AND
+    Zlib
+    }
 # LICENSE.dependencies contains a full license breakdown
 URL:            https://github.com/astral-sh/uv
 Source0:        %{url}/archive/%{version}/uv-%{version}.tar.gz
@@ -161,11 +161,26 @@ Source0:        %{url}/archive/%{version}/uv-%{version}.tar.gz
 # https://docs.astral.sh/uv/configuration/files
 Source1:        uv.toml
 
-# Downstream-only: Always find the system-wide uv executable
-# See discussion in
-#   Should uv.find_uv_bin() be able to find /usr/bin/uv?
-#   https://github.com/astral-sh/uv/issues/4451
-Patch:          0001-Downstream-patch-always-find-the-system-wide-uv-exec.patch
+# Downstream: Always find the system-wide uv executable
+# See discussion in “Should uv.find_uv_bin() be able to find /usr/bin/uv?”
+# https://github.com/astral-sh/uv/issues/4451
+Patch:          0001-Downstream-Always-find-the-system-wide-uv-executable.patch
+# Downstream: Revert source-code changes for pre-release blake2
+# Revert source changes from “Upgrade BLAKE2 to unify hashing digest versions”,
+# https://github.com/astral-sh/uv/pull/20834. We do not wish to upgrade
+# rust-blake2 to a pre-release.
+Patch:          0002-Downstream-Revert-source-code-changes-for-pre-releas.patch
+# Downstream: Avoid embed-manifest dependency in uv crate build script
+# The embed-manifest dependency only does something useful when (cross-?)
+# compiling for Windows.
+Patch:          0003-Downstream-Avoid-embed-manifest-dependency-in-uv-cra.patch
+
+# Add license texts for new contents of test/ecosystem/ from PR#20068
+# https://github.com/astral-sh/uv/pull/20174
+Patch:          %{url}/pull/20174.patch
+
+BuildSystem:    pyproject
+BuildOption(install): --assert-license uv
 
 # https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
 ExcludeArch:    %{ix86}
@@ -179,24 +194,28 @@ ExcludeArch:    %{ix86}
 # https://doc.rust-lang.org/rustc/codegen-options/index.html#debuginfo
 %global rustflags_debuginfo 1
 
-# As a separate limitation, memory exhaustion can occur on builders with very
-# many CPUs. Typical workspace crates peak out at 2-4 GB per rustc invocation.
-# The uv crate needs much more memory to compile and link, but in practice it
-# is also compiled alone after all the other crates have finished, so it does
-# not need to influence (and does not benefit from) this setting. This setting
-# does not necessarily have to reflect the maximum memory required to compile a
-# workspace crate; keeping it well above the average suffices in practice on
-# many-core systems.  Increase as needed.
-%global _smp_tasksize_proc 4096
+# As a separate limitation, memory exhaustion (OOM) can occur during parallel
+# portions of the build.
+# - Because very many workspace crates can be built in parallel, builders with
+#   a very large number of CPUs may OOM. Typical workspace crates peak out at
+#   roughly 2–4 GB per rustc process.
+# - The uv crate needs much more memory to compile and link, at least 8 GB, and
+#   when building the tests we may be building bin and lib versions at the same
+#   time, along with the it (integration test) crate, which is also rather
+#   large. This is a problem for “low memory” builders (<20 GB or so).
+# Unfortunately, this means that we need to scale the memory per task based on
+# the memory requirements of the top-level uv crate in order to avoid OOM on
+# all kinds of builders.
+%global _smp_tasksize_proc 10240
 
 # Compilation may fail on builders with very many cores (e.g. 192 cores) due to
 # “too many open files.” Try to keep the files/core ratio from getting too low.
-%global _smp_ncpus_max 96
+%global _smp_ncpus_max 48
 
-BuildRequires:  cargo-rpm-macros >= 24
+BuildRequires:  cargo-rpm-macros
 BuildRequires:  rust2rpm-helper
 BuildRequires:  tomcli
-%if %{with check} && %{with it}
+%if %{with check} && %{with other_python_versions}
 # See trove classifiers in pyproject.toml for supported Pythons.
 BuildRequires:  /usr/bin/python3.9
 BuildRequires:  /usr/bin/python3.10
@@ -206,6 +225,8 @@ BuildRequires:  /usr/bin/python3.13
 BuildRequires:  /usr/bin/python3.13t
 BuildRequires:  /usr/bin/python3.14
 BuildRequires:  /usr/bin/python3.14t
+BuildRequires:  /usr/bin/python3.15
+BuildRequires:  /usr/bin/python3.15t
 %endif
 
 # In https://github.com/astral-sh/uv/issues/5588#issuecomment-2257823242,
@@ -275,6 +296,19 @@ Provides:       bundled(crate(r-shquote)) = 0.1.1
 # necessary changes merged upstream. Based on this explanation, there does not
 # appear to be any prospect of unbundling.
 Provides:       bundled(crate(keyring)) = 4.0.0~rc2
+
+# crates/uv-netrc
+# From crates/uv-netrc/README.md, “This crate vendors the rust-netrc parser for
+# use by uv. The source was vendored from gribouille/netrc, as published in
+# rust-netrc 0.1.2[…]”
+#
+# Upstream justifies the bundling in
+# https://github.com/astral-sh/uv/pull/19409: they want unreleased bug fixes,
+# including those pertaining to https://github.com/astral-sh/uv/issues/16083,
+# and to avoid a dependency on thiserror v1. In response to the mandatory
+# query, they report they are open to de-vendoring if a new rust-netrc release
+# with the desired changes appears.
+Provides:       bundled(crate(rust-netrc)) = 0.1.2
 
 # The contents of crates/uv-virtualenv/src/activator/ are a bundled and
 # slightly forked copy of a subset of https://pypi.org/project/virtualenv; see
@@ -361,32 +395,36 @@ Requires:       uv = %{version}-%{release}
 This package provides an importable Python module for uv.
 
 
-%prep
-%autosetup -p1
-
-# Collect license files of vendored dependencies in the main source archive
-install -t LICENSE.bundled/packaging -D -p -m 0644 \
+%prep -a
+# Collect license files of vendored dependencies
+install -D --preserve-timestamps --mode=0644 \
+    --target=LICENSE.bundled/packaging \
     crates/uv-python/python/packaging/LICENSE.*
-install -t LICENSE.bundled/pep440_rs -D -p -m 0644 crates/uv-pep440/License-*
-install -t LICENSE.bundled/pep508_rs -D -p -m 0644 crates/uv-pep508/License-*
-install -t LICENSE.bundled/pipreqs -D -p -m 0644 \
+install -D --preserve-timestamps --mode=0644 \
+    --target=LICENSE.bundled/pep440_rs crates/uv-pep440/License-*
+install -D --preserve-timestamps --mode=0644 \
+    --target=LICENSE.bundled/pep508_rs crates/uv-pep508/License-*
+install -D --preserve-timestamps --mode=0644 \
+    --target=LICENSE.bundled/pipreqs \
     crates/uv-build-frontend/src/pipreqs/LICENSE
-install -t LICENSE.bundled/ripunzip -D -p -m 0644 \
-    crates/uv-extract/src/vendor/LICENSE
+install -D --preserve-timestamps --mode=0644 \
+    --target=LICENSE.bundled/ripunzip crates/uv-extract/src/vendor/LICENSE
+install -D --preserve-timestamps --mode=0644 \
+    --target=LICENSE.bundled/rust-netrc crates/uv-netrc/LICENSE
 # The original license text from rattler_installs_packages is present in a
 # comment, but we want it in a separate file so we can ensure it is present in
 # the binary RPM.
-install -d LICENSE.bundled/rattler_installs_packages
+install --directory LICENSE.bundled/rattler_installs_packages
 awk '$2 == "BSD" { out=1 }; $2 == "```" { out=0 }; out' \
     crates/uv-client/src/remote_metadata.rs |
-  sed -r 's@^///( |$)@@' |
+  sed --regexp-extended 's@^///( |$)@@' |
   tee LICENSE.bundled/rattler_installs_packages/LICENSE
 # Similarly for virtualenv. All files in
 # crates/uv-virtualenv/src/activator/activate/ have the same license text.
-install -d LICENSE.bundled/virtualenv
+install --directory LICENSE.bundled/virtualenv
 awk '$1 == "#" { out=1 }; $1 != "#" { out=0; exit }; out' \
     crates/uv-virtualenv/src/activator/activate |
-  sed -r 's@^#( |$)@@' |
+  sed --regexp-extended 's@^#( |$)@@' |
   tee LICENSE.bundled/virtualenv/LICENSE
 
 # Patch out foreign (e.g. Windows-only) dependencies. Follow symbolic links so
@@ -400,20 +438,18 @@ find -L . -type f -name Cargo.toml -print \
 # the uv-trampoline-builder crate. We must remove them to prove they are not
 # used in the build. Since they are used only on Windows, nothing is lost by
 # doing so.
-rm -v crates/uv-trampoline-builder/trampolines/*.exe
+rm --verbose crates/uv-trampoline-builder/trampolines/*.exe
 # Per Cargo.toml, uv-trampoline is excluded from the workspace and not compiled
 # because it still requires a nightly compiler. For now, we remove it entirely
 # to show that we do not need to document bundling from posy. Note that we
 # *cannot* cleanly remove uv-trampoline-builder, only the precompiled
 # trampolines themselves.
-rm -rv crates/uv-trampoline
+rm --recursive --verbose crates/uv-trampoline
 
 # Remove the dependency on embed-manifest, which applies only when (cross-?)
-# compiling for Windows.
+# compiling for Windows. This requires an accompanying source-code patch for
+# the uv crate’s build script.
 tomcli set Cargo.toml del workspace.dependencies.embed-manifest
-# We may have to do something more sophisticated if this build script ever
-# starts to do anything other than just embedding a manifest on Windows.
-rm -v crates/uv/build.rs
 tomcli set crates/uv/Cargo.toml del build-dependencies.embed-manifest
 # The embed-manifest depenency is also used in uv-trampoline, which we removed.
 
@@ -428,14 +464,6 @@ tomcli set Cargo.toml append workspace.exclude crates/uv-bench
 # The uv-dev crate provides “development utilities for uv,” which should not be
 # needed here. It also brings extra dependencies that we would prefer to avoid.
 tomcli set Cargo.toml append workspace.exclude crates/uv-dev
-
-# Do not request static linking of anything (particularly, liblzma)
-tomcli set Cargo.toml lists delitem \
-    workspace.dependencies.xz2.features 'static'
-tomcli set crates/uv/Cargo.toml lists delitem \
-    features.default 'uv-distribution/static'
-tomcli set crates/uv-distribution/Cargo.toml del features.static
-tomcli set crates/uv-extract/Cargo.toml del features.static
 
 # Disable several default features that control which tests are compiled and
 # executed, and which are not usable in offline builds:
@@ -466,23 +494,41 @@ tomcli set crates/uv/Cargo.toml lists delitem features.test-defaults \
 tomcli set crates/uv-audit/Cargo.toml lists delitem features.default \
     'test-(osv)'
 
-%if %{without it}
-# Integration tests (it crate) nearly all require specific Python interpreter
-# versions (major.minor, not major.minor.patch, unless the python-patch feature
-# is enabled). We might choose to disable this in order to double-check that
-# everything else works well with only the primary system Python in the
-# environment.
+%if %{without other_python_versions}
+# Many of these tests require specific Python versions (major.minor, not
+# major.minor.patch, unless the python-patch feature is enabled). Manually
+# selecting the tests in these modules that would succeed with just the system
+# Python would be far too tedious.
+omit_modules() {
+  set -o nounset
+  set -o errexit
+  main_module="${1}"
+  commented_modules=''
+  comment='Downstream-only: skip, needs specific Python interpreter versions'
+  shift
+  while [ "${#}" != 0 ]
+  do
+    commented_modules="${commented_modules-}${commented_modules+|}${1}"
+    shift
+  done
+  sed --regexp-extended --in-place \
+      "s@mod (${commented_modules});@// ${comment}\n#[cfg(any())]\n&@" \
+      "${main_module}"
+}
+# -p uv --test build
+omit_modules crates/uv/tests/build/main.rs build_backend
 # -p uv --test it:
-mods="${mods-}${mods+|}branching_urls"
-mods="${mods-}${mods+|}build_backend"
-mods="${mods-}${mods+|}pip_(check|list|show|tree|uninstall)"
-mods="${mods-}${mods+|}python_(dir|find|install|list|pin)"
-mods="${mods-}${mods+|}venv"
-mods="${mods-}${mods+|}version"
-mods="${mods-}${mods+|}workspace"
-comment='Downstream-only: skip, needs specific Python interpreter versions'
-sed -r -i "s@mod (${mods});@// ${comment}\n#[cfg(any())]\n&@" \
-    crates/uv/tests/it/main.rs
+omit_modules crates/uv/tests/it/main.rs \
+    auth branching_urls network upgrade version
+# -p uv --test python:
+omit_modules crates/uv/tests/python/main.rs \
+    'python_(dir|find|install|list|pin)' venv
+# -p uv --test workspace:
+omit_modules crates/uv/tests/workspace/main.rs \
+    workspace 'workspace_(dir|list|metadata)'
+# -p uv --test pip:
+omit_modules crates/uv/tests/pip/main.rs \
+    'pip_(debug|list|show|tree|uninstall)'
 %endif
 
 # For unclear reasons, maturin checks for the presence of optional crate
@@ -494,6 +540,13 @@ tomcli set crates/uv/Cargo.toml del features.self-update
 tomcli set crates/uv/Cargo.toml del features.tracing-durations-export
 tomcli set crates/uv/Cargo.toml del dependencies.tracing-durations-export
 
+# Reproduce the patch we carry in the rust-rustls package:
+# - default to the ring crypto backend
+# - drop support for the aws-lc-rs crypto backend
+tomcli set Cargo.toml lists delitem workspace.dependencies.rustls.features \
+    '(aws_lc_rs|prefer-post-quantum)'
+tomcli set Cargo.toml append workspace.dependencies.rustls.features ring
+
 # We retain the following example even when there are currently no dependencies
 # that need to be adjusted.
 #
@@ -503,10 +556,28 @@ tomcli set crates/uv/Cargo.toml del dependencies.tracing-durations-export
 # #   https://bugzilla.redhat.com/show_bug.cgi?id=1234567
 # tomcli set Cargo.toml str workspace.dependencies.foocrate.version 0.1.2
 
+# tikv-jemallocator
+#   wanted: 0.6.0
+#   currently packaged: 0.7.0
+#   https://github.com/astral-sh/uv/pull/19735
+# We use sed instead of tomcli because the target.cfg(…) expression is a
+# *mess*, and we don’t want to have to write it out here.
+sed --regexp-extended --in-place \
+    's/^(tikv-jemallocator\b.*version = ")0\.6\.0"/\1>=0.6.0, <0.8.0"/' \
+    crates/uv-performance-memory-allocator/Cargo.toml
+
+# blake2
+#   wanted: 0.11.0-rc.6
+#   currently packaged: 0.10.6
+# Downstream-only: revert “Upgrade BLAKE2 to unify hashing digest versions”,
+# https://github.com/astral-sh/uv/pull/20834. We do not wish to upgrade
+# rust-blake2 to a pre-release. There is an anccompanying source-code patch.
+tomcli set Cargo.toml str workspace.dependencies.blake2.version 0.10.6
+
 %cargo_prep
 
 
-%generate_buildrequires
+%generate_buildrequires -p
 # For unclear reasons, maturin checks for all crate dependencies when it is
 # invoked as part of %%pyproject_buildrequires – including those corresponding
 # to optional features.
@@ -518,20 +589,14 @@ tomcli set crates/uv/Cargo.toml del dependencies.tracing-durations-export
 # Since maturin always checks for dev-dependencies, we need -t so that they are
 # generated even when the “check” bcond is disabled.
 %cargo_generate_buildrequires -a -t
-%pyproject_buildrequires
 
 
-%build
-%pyproject_wheel
-
+%build -a
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
 
 
-%install
-%pyproject_install
-%pyproject_save_files -L uv
-
+%install -a
 if [ '%{python3_sitearch}' != '%{python3_sitelib}' ]
 then
   # Maturin is really designed to build compiled Python extensions, but (when
@@ -539,9 +604,10 @@ then
   # library is actually pure-Python, and the python3-uv subpackage can be
   # noarch. We can’t tell maturin to install to the appropriate site-packages
   # directory, but we can fix the installation path manually.
-  install -d %{buildroot}%{python3_sitelib}
+  install --directory %{buildroot}%{python3_sitelib}
   mv %{buildroot}%{python3_sitearch}/uv* %{buildroot}%{python3_sitelib}
-  sed -r -i 's@%{python3_sitearch}@%{python3_sitelib}@' %{pyproject_files}
+  sed --regexp-extended --in-place \
+      's@%{python3_sitearch}@%{python3_sitelib}@' %{pyproject_files}
 fi
 
 # generate and install shell completions
@@ -557,10 +623,11 @@ do
 done
 
 # Install a default system-wide configuration file
-install -t '%{buildroot}%{_sysconfdir}/uv' -p -m 0644 -D '%{SOURCE1}'
+install -D --preserve-timestamps --mode=0644 \
+    --target='%{buildroot}%{_sysconfdir}/uv' '%{SOURCE1}'
 
 
-%check
+%check -a
 %if %{with check}
 # These tests rely on debug assertions, and fail when tests are compiled in
 # release mode:
@@ -571,7 +638,7 @@ skip="${skip-} --skip keyring::tests::fetch_url_with_empty_username"
 skip="${skip-} --skip keyring::tests::fetch_url_with_no_username"
 skip="${skip-} --skip keyring::tests::fetch_url_with_password"
 
-%if %{without it}
+%if %{without other_python_versions}
 # These tests require specific Python interpreter versions, which upstream
 # normally downloads, precompiled, into the build area.
 skip="${skip-} --skip version::self_version"
@@ -593,6 +660,25 @@ skip="${skip-} --skip python_list::python_list_with_mirrors"
 # This might be worth reporting upstream, but is not a serious issue.
 skip="${skip-} --skip python_pin::python_pin_resolve"
 %endif
+%ifarch riscv64
+# These expect managed interpreters of the form
+# cpython-3.##-linux-riscv64gc-any, but crates/uv-python/download-metadata.json
+# only has them for cpython-3.##-linux-riscv64-gnu. It’s not weird to find
+# holes in the managed interpreter support matrix for less common
+# architectures.
+skip="${skip-} --skip python_find::python_find"
+skip="${skip-} --skip python_list::python_list"
+skip="${skip-} --skip python_pin::python_pin_resolve"
+%endif
+
+# It’s not clear what causes the trivial discrepancy, but we find that this
+# fails when building in qemu-user-static emulated chroots.
+#    4       │-  Caused by: Failed to query Python interpreter at `[TEMP_DIR]/bar`
+#    5       │-  Caused by: [PERMISSION DENIED]
+#          4 │+  Caused by: Querying Python at `[TEMP_DIR]/bar` failed with
+#                exit status exit status: 127
+skip="${skip-} --skip python_find::python_find_path"
+
 # Test registry_client::tests::test_redirect_to_server_with_credentials is
 # flaky
 # https://github.com/astral-sh/uv/issues/16447
@@ -629,17 +715,55 @@ skip="${skip-} --skip tests::built_by_uv_building"
 # dependency version differing from Cargo.lock.
 skip="${skip-} --skip base_client::tests::retried_status_codes"
 
+# Harmless and trivial discrepancies in error messages:
+#     8       │-  Caused by: error decoding response body for url (http://[LOCALHOST]/tqdm/)
+#           8 │+  Caused by: error decoding response body
+skip="${skip-} --skip network::retry_read_timeout_index"
+#     9       │-  Caused by: error decoding response body for url (http://[LOCALHOST]/)
+#           9 │+  Caused by: error decoding response body
+skip="${skip-} --skip network::retry_read_timeout_python_downloads_json"
+
+# These fail flakily: most frequently on ppc64le, but this seems to be just a
+# matter of luck, since we suspect a race condition. We have also seen failures
+# on aarch64. This is probably a race involving the SSL_CERT_FILE environment
+# variable, which process-isolated testing in “cargo nextest” (used by
+# upstream) should avoid. That suggests there is nothing to report upstream.
+# When this fails, the error looks something like:
+#   Error: failed to build HTTP client
+#   Caused by:
+#       0: certificate in `/tmp/uv/tests/certs/.tmpFF0lkk/ca.pem` (from
+#          `SSL_CERT_FILE`) could not be used as a trust anchor on certificate
+#          `CN=uv-test-ca, O=Astral Software Inc.`
+#       1: ExtensionValueInvalid
+skip="${skip-} --skip user_agent_version::test_user_agent_has_linehaul"
+skip="${skip-} --skip user_agent_version::test_user_agent_has_subcommand"
+skip="${skip-} --skip user_agent_version::test_user_agent_has_version"
+# Similarly, with an error like:
+#   Client::new(): reqwest::Error {
+#     kind: Builder,
+#     source: General("No CA certificates were loaded from the system")
+#   }
+# There are probably more of these.
+skip="${skip-} --skip base_client::tests::test_redirect_no_referer_if_disabled"
+skip="${skip-} --skip base_client::tests::test_redirect_preserves_authorization_header_on_same_origin"
+skip="${skip-} --skip base_client::tests::test_redirect_removes_authorization_header_on_cross_origin"
+skip="${skip-} --skip retry::tests::retried_status_codes"
+skip="${skip-} --skip retry::tests::retry_logs_redact_signed_urls"
+# This has been seen to fail in koji, so far only on x86_64, but so far not in
+# a local mock build. It’s very possible that this is another testing race
+# condition that would be avoided by process isolation in “cargo nextest.” It
+# seems unlikely that it is a real and serious problem, although a proper
+# diagnosis would be welcome.
+skip="${skip-} --skip interpreter::tests::test_cache_eviction_with_unchanged_executable"
+
 %cargo_test -- -- --exact ${skip-}
 %endif
-
-%pyproject_check_import
 
 
 %files
 %license LICENSE-APACHE LICENSE-MIT LICENSE.dependencies LICENSE.bundled/
 %doc CHANGELOG.md
 %doc README.md
-%doc PIP_COMPATIBILITY.md
 
 %{_bindir}/uv
 # Equivalent to “uv tool run”:
@@ -658,6 +782,219 @@ skip="${skip-} --skip base_client::tests::retried_status_codes"
 
 %changelog
 ## START: Generated by rpmautospec
+* Fri Oct 16 2026 Dan Streetman <ddstreet@ieee.org> - 0.12.19-2
+- fix(rust-*): remove commit pins
+
+* Fri Sep 25 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.19-1
+- Update to 0.12.9 (close RHBZ#2540893)
+
+* Wed Sep 23 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.18-1
+- Update to 0.12.18 (close RHBZ#2539073)
+
+* Mon Sep 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.17-2
+- Preserve `PROFILE` env. var. handling in `uv` crate build script
+
+* Mon Sep 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.17-1
+- Update to 0.12.17 (close RHBZ#2536872)
+
+* Wed Sep 16 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.15-2
+- Skip two more flaky/racy tests
+
+* Tue Sep 15 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.15-1
+- Update to 0.12.15 (close RHBZ#2533726)
+
+* Tue Sep 15 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.14-1
+- Update to 0.12.14 (close RHBZ#2533575)
+
+* Sat Sep 12 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.13-3
+- Make Python 3.15 system interpreters available for testing
+
+* Fri Sep 11 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.13-2
+- Skip yet another test that flakes due to CA cert env. var. races
+
+* Thu Sep 10 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.13-1
+- Update to 0.12.13
+
+* Wed Sep 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.12-1
+- Update to 0.12.12 (close RHBZ#2530499)
+
+* Sat Sep 05 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.10-1
+- Update to 0.12.0 (close RHBZ#2528984)
+
+* Fri Sep 04 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.9-2
+- Skip another test that’s flaky due test envvar races
+
+* Thu Sep 03 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.9-1
+- Update to 0.12.9 (close RHBZ#2515847)
+
+* Thu Sep 03 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.8-1
+- Update to 0.12.8
+
+* Thu Sep 03 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.7-3
+- Skip a test observed to fail in koji on x86_64
+
+* Thu Sep 03 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.7-2
+- Improved patch for dirhash tests
+
+* Thu Sep 03 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.7-1
+- Update to 0.12.7
+
+* Thu Sep 03 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.6-1
+- Update to 0.12.6
+
+* Wed Sep 02 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.5-1
+- Update to 0.12.5
+
+* Wed Sep 02 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.4-1
+- Update to 0.12.4
+
+* Sat Aug 08 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.3-1
+- Update to 0.12.3 (close RHBZ#2512634)
+
+* Thu Aug 06 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.2-1
+- Update to 0.12.2 (close RHBZ#2511719)
+
+* Wed Aug 05 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.1-5
+- Skip another test that flakes due to racy env-vars
+
+* Wed Aug 05 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.1-4
+- Ship the license file for the vendored rust-netrc
+
+* Wed Aug 05 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.1-3
+- More spec-file comment improvements
+
+* Tue Aug 04 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.1-2
+- Document bundling of rust-netrc crate
+
+* Sun Aug 02 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.1-1
+- Update to 0.12.1 (close RHBZ#2509887)
+
+* Fri Jul 31 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.0-1
+- Update to 0.12.0
+
+* Fri Jul 31 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.33-1
+- Update to 0.11.33
+
+* Mon Jul 27 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.32-2
+- Skip a test that fails in emulated chroots
+
+* Fri Jul 24 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.32-1
+- Update to 0.11.32 (close RHBZ#2506667)
+
+* Fri Jul 24 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.31-6
+- Skip some tests related to managed interpreters on riscv64
+
+* Wed Jul 22 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.31-5
+- Use the provisional pyproject declarative buildsystem
+
+* Wed Jul 22 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.31-4
+- Assert that the .dist-info directory contains license files
+
+* Wed Jul 22 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.31-3
+- Use pyproject long options
+
+* Wed Jul 22 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.31-1
+- Update to 0.11.31 (close RHBZ#2501168)
+
+* Sat Jul 18 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.28-4
+- Avoid OOM on builders with relatively little total memory
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.28-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jul 08 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.28-1
+- Update to 0.11.28 (close RHBZ#2497922)
+
+* Tue Jul 07 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.27-1
+- Update to 0.11.27 (close RHBZ#2497560)
+
+* Thu Jul 02 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.26-1
+- Update to 0.11.26 (close RHBZ#2495097)
+
+* Sat Jun 27 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.25-1
+- Update to 0.11.25
+
+* Wed Jun 24 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.24-1
+- Update to 0.11.24 (close RHBZ#2492025)
+
+* Sun Jun 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.23-1
+- Update to 0.11.23 (close RHBZ#2490666)
+
+* Sun Jun 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.22-1
+- Update to 0.11.22
+
+* Thu Jun 18 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.21-4
+- Rebuilt with `reflink-copy` 0.1.30
+
+* Thu Jun 18 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.21-3
+- Fix skipping tests that require alternative versions of Python
+
+* Wed Jun 17 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.21-2
+- Rebuilt with webpki-root-certs 1.0.8
+
+* Fri Jun 12 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.21-1
+- Update to 0.11.21 (close RHBZ#2487856)
+
+* Thu Jun 04 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.19-2
+- Allow tikv-jemallocator 0.7
+
+* Thu Jun 04 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.19-1
+- Update to 0.11.19 (close RHBZ#2484591)
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 0.11.18-3
+- Rebuilt for Python 3.15
+
+* Wed Jun 03 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.18-2
+- Backport upstream fix for skipping uv check tests when offline
+
+* Wed Jun 03 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.18-1
+- Update to 0.11.18 (close RHBZ#2483122)
+
+* Sun May 24 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.16-2
+- Use various long options
+
+* Fri May 22 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.16-1
+- Update to 0.11.16 (close RHBZ#2480652)
+
+* Tue May 19 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.15-1
+- Update to 0.11.15 (close RHBZ#2479704)
+
+* Wed May 13 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.14-1
+- Update to 0.11.14 (close RHBZ#2468985)
+
+* Sat May 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.12-1
+- Update to 0.11.12 (close RHBZ#2466908)
+
+* Fri May 08 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.11-1
+- Update to 0.11.11 (close RHBZ#2466908)
+
+* Wed May 06 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.10-1
+- Update to 0.11.10 (close RHBZ#2466908)
+
+* Tue May 05 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.9-1
+- Update to 0.11.9 (close RHBZ#2466654)
+
+* Thu Apr 16 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.7-1
+- Update to 0.11.7 (close RHBZ#2458860)
+
+* Thu Apr 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.6-2
+- Skip user_agent_version:: tests on all architectures
+
+* Thu Apr 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.6-1
+- Update to 0.11.6 (close RHBZ#2454177)
+
+* Thu Apr 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.5-2
+- Skip three tests that fail only on ppc64le
+
+* Thu Apr 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.5-1
+- Update to 0.11.5 (close RHBZ#2454177)
+
+* Wed Apr 08 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.4-1
+- Update to 0.11.4 (close RHBZ#2454177)
+
+* Fri Mar 27 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.11.2-1
+- Update to 0.11.2 (close RHBZ#2450582)
+
 * Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.10.12-4
 - build: mass rebuild auto-bumpable components
 

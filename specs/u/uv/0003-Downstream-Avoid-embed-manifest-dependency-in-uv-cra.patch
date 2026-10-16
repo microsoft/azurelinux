@@ -1,0 +1,35 @@
+From c48f0de2ead89b0728bba4f86f06dcc538e52a1a Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 21 Sep 2026 18:15:18 +0100
+Subject: [PATCH 3/3] Downstream: Avoid embed-manifest dependency in uv crate
+ build script
+
+The embed-manifest dependency only does something useful when (cross-?)
+compiling for Windows.
+---
+ crates/uv/build.rs | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/crates/uv/build.rs b/crates/uv/build.rs
+index 6169bc5cb..6f94392d1 100644
+--- a/crates/uv/build.rs
++++ b/crates/uv/build.rs
+@@ -13,12 +13,15 @@
+ //! - Standard invoker execution levels for CLI applications to disable UAC virtualization.
+ //!
+ //! See <https://learn.microsoft.com/en-us/windows/win32/sbscs/application-manifests>
++#[cfg(false)] // Downstream patch: avoid packaging embed_manifest
+ use embed_manifest::manifest::{ActiveCodePage, ExecutionLevel, Setting, SupportedOS};
++#[cfg(false)] // Downstream patch: avoid packaging embed_manifest
+ use embed_manifest::{embed_manifest, empty_manifest};
+ 
+ use uv_static::EnvVars;
+ 
+ fn main() {
++    #[cfg(false)] // Downstream patch: avoid packaging embed_manifest
+     if std::env::var_os(EnvVars::CARGO_CFG_WINDOWS).is_some() {
+         let [major, minor, patch] = uv_version::version()
+             .splitn(3, '.')
+-- 
+2.55.0
+
