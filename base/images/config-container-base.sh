@@ -291,10 +291,9 @@ dnf autoremove -y \
 # busybox is statically linked so it works without any shared libraries.
 echo "=== Pruning artifacts (post-autoremove) ==="
 
-# Package manager state (rpmdb, libdnf5, dnf config, caches, logs).
+# Keep the final RPM database in staging for KIWI package inventories and SBOMs.
+# Profile-scoped exclude_files.yaml omits it from the shipped OCI filesystem.
 /tmp/busybox rm -rf /usr/lib/sysimage/libdnf5
-/tmp/busybox rm -rf /usr/lib/sysimage/rpm
-/tmp/busybox rm -rf /var/lib/rpm
 /tmp/busybox rm -rf /var/lib/rpm-state
 /tmp/busybox rm -rf /var/lib/dnf
 /tmp/busybox rm -rf /var/cache/dnf
