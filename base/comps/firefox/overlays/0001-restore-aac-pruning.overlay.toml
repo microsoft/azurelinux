@@ -1,0 +1,25 @@
+# Keep the distribution's intentional fdk-aac-free exclusion. Remove Fedora's
+# decoder patch and its configure option together with the build dependency.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://github.com/microsoft/azurelinux/pull/17331" }]
+
+[[overlays]]
+description = "Honor the disabled FDK-AAC flag when registering Fedora's decoder"
+type = "file-search-replace"
+file = "mozilla-1667096.patch"
+regex = '(?m)^\+#ifdef CONFIG_LIBFDK_AAC$'
+replacement = '+#if CONFIG_LIBFDK_AAC'
+
+[[overlays]]
+description = "Remove the system FDK-AAC option introduced by the excluded Fedora patch"
+type = "file-search-replace"
+file = "firefox-mozconfig"
+regex = '(?m)^ac_add_options --with-system-fdk-aac\r?\n'
+
+[[overlays]]
+description = "Remove the build dependency for the excluded FDK-AAC decoder"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "fdk-aac-free-devel"
