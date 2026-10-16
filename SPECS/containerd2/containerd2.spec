@@ -1,52 +1,29 @@
-%global debug_package %{nil}
-%define upstream_name containerd
-<<<<<<< HEAD
-%define commit_hash db8809540e1a7a9da5d518876894933ff55692ab
-
-Summary: Industry-standard container runtime
-Name: %{upstream_name}2
-Version: 2.3.4
-Release: 2%{?dist}
-=======
-%define commit_hash 6f589cf13dc01a5b493911355427e05b2ff005d7
-
-Summary: Industry-standard container runtime
-Name: %{upstream_name}2
-Version: 2.3.7
-Release: 1%{?dist}
->>>>>>> fb72799c9a ([AutoPR- Security] Patch & Upgrade containerd2 for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801 [HIGH] (#19260))
-License: ASL 2.0
-Group: Tools/Container
-URL: https://www.containerd.io
+ %define commit_hash 6f589cf13dc01a5b493911355427e05b2ff005d7
+ 
+ Summary: Industry-standard container runtime
+ Name: %{upstream_name}2
+ Version: 2.3.7
+ Release: 2%{?dist}
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
-Source1: containerd.service
-Source2: containerd.toml
-
-<<<<<<< HEAD
-Patch0:	multi-snapshotters-support.patch
-Patch1:	tardev-support.patch
-Patch2:	fix-TestCgroupNamespace-cgroupv1.patch
-Patch3:	CVE-2026-56852.patch
-Patch4:	CVE-2026-37236.patch
-Patch5:	fix-wrapped-enotsup-selinux-relabel.patch
-=======
-Patch0:  multi-snapshotters-support.patch
-Patch1:  tardev-support.patch
-Patch2:  fix-TestCgroupNamespace-cgroupv1.patch
-Patch3:  CVE-2026-37236.patch
-Patch4:  CVE-2026-61801.patch
-Patch5:  CVE-2026-78659.patch
-Patch6:  CVE-2026-78660.patch
-Patch7:  CVE-2026-78669.patch
-Patch8:  CVE-2026-97032.patch
-Patch9:  CVE-2026-81870.patch
->>>>>>> fb72799c9a ([AutoPR- Security] Patch & Upgrade containerd2 for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801 [HIGH] (#19260))
-
-%{?systemd_requires}
-
+ Source1: containerd.service
+ Source2: containerd.toml
+ 
+ Patch0:  multi-snapshotters-support.patch
+ Patch1:  tardev-support.patch
+ Patch2:  fix-TestCgroupNamespace-cgroupv1.patch
+ Patch3:  CVE-2026-37236.patch
+ Patch4:  CVE-2026-61801.patch
+ Patch5:  CVE-2026-78659.patch
+ Patch6:  CVE-2026-78660.patch
+ Patch7:  CVE-2026-78669.patch
+ Patch8:  CVE-2026-97032.patch
+ Patch9:  CVE-2026-81870.patch
+ Patch10: fix-wrapped-enotsup-selinux-relabel.patch
+ 
+ %{?systemd_requires}
 # Temporarily stay on Go 1.26 until the Go 1.27 ML-KEM backend is fixed.
 BuildRequires: (golang < 1.27 with golang >= 1.26.7)
 BuildRequires: go-md2man
@@ -121,24 +98,20 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 %dir /opt/containerd
 %dir /opt/containerd/bin
-%dir /opt/containerd/lib
+ %changelog
+ * Fri Oct 16 2026 Nan Liu <liunan@microsoft.com> - 2.3.7-2
+ - Tolerate wrapped ENOTSUP errors from SELinux mount relabeling
 
-%changelog
-<<<<<<< HEAD
-* Fri Sep 18 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-2
-- Tolerate wrapped ENOTSUP errors from SELinux mount relabeling
-=======
-* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.7-1
-- Upgrade to 2.3.7 for CVE-2026-95839
-- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-81870
-- Removed patch for CVE-2026-56852.patch as it is fixed by upgrade x/text to v0.41.0
+ * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.7-1
+ - Upgrade to 2.3.7 for CVE-2026-95839
+ - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-81870
+ - Removed patch for CVE-2026-56852.patch as it is fixed by upgrade x/text to v0.41.0
 
-* Sat Oct 10 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.3.6-1
-- Upgrade to 2.3.6 for CVE-2026-53493, CVE-2026-53495, CVE-2026-95838
->>>>>>> fb72799c9a ([AutoPR- Security] Patch & Upgrade containerd2 for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801 [HIGH] (#19260))
+ * Sat Oct 10 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.3.6-1
+ - Upgrade to 2.3.6 for CVE-2026-53493, CVE-2026-53495, CVE-2026-95838
 
-* Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
-- Upgrade to 2.3.4
+ * Wed Sep 09 2026 Nan Liu <liunan@microsoft.com> - 2.3.4-1
+ - Upgrade to 2.3.4
 - Remove CVE patches fixed upstream
 - Rebase multi-snapshotter support and CVE-2026-56852 patches
 
