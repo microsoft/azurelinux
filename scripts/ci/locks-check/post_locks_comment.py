@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 r"""Post (or update/delete) a PR comment with `azldev component update` results.
 
 Reads the JSON output produced by `azldev component update -a -O json` and

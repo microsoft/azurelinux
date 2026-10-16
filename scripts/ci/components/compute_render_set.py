@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Compute the render set for changed components.
 
 Include components flagged by `azldev component changed` and components whose

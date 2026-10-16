@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Microsoft Corporation.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 """Shared repository URL validation."""
 

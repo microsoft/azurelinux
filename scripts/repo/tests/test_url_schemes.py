@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Microsoft Corporation.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 """Tests for repository URL scheme validation."""
 

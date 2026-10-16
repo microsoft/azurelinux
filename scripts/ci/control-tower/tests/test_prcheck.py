@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Contract tests for the Control Tower PR-check entry point."""
 
 from __future__ import annotations

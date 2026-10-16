@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Configure imports for render-specs-check tests."""
 
 from __future__ import annotations

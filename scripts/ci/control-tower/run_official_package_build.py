@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Submit an official package build to Control Tower and confirm acceptance."""
 
 from __future__ import annotations

@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: MIT
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Standard Azure Linux Repo Layout.
 
 Defines the fixed `channel x kind x arch` matrix that every published

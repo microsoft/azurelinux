@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: MIT
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Image mounting/unmounting orchestration.
 
 Uses CLI tools (guestmount, skopeo, umoci) via subprocess to avoid

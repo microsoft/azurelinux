@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Shared utilities for Azure Linux MCP servers.
 
 Provides common helpers for URL validation, SSRF guards, output handling,

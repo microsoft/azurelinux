@@ -1,4 +1,4 @@
-# Copyright 2026 Microsoft Corporation.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 """Pytest-backed kernel config validation checks."""

@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Expose Fedora package repository queries through MCP.
 
 Query repositories through the Pagure API and perform git-level searches

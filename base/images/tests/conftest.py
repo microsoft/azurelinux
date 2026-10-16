@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: MIT
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Root conftest — fixtures for image validation.
 
 CLI options (``--image-path``, ``--image-ref``, ``--image-name``,

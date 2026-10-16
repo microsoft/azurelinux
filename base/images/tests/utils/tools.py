@@ -1,4 +1,5 @@
-# SPDX-License-Identifier: MIT
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 """Native tool dependency registry.
 
 Each :class:`NativeTool` instance registers itself on construction.
