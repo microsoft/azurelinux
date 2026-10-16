@@ -62,7 +62,8 @@ These are the additional language files of gnupg2
 # - https://dev.gnupg.org/T6838
 %configure \
   --enable-gpg-is-gpg2 \
-  --disable-keyboxd
+  --disable-keyboxd \
+  ac_cv_path_YAT2M=./yat2m
 %make_build
 
 %install
@@ -109,6 +110,7 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %changelog
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.4.9-4
 - Patch for CVE-2026-105712
+- Updated OpenPGP tests to extract gpgtar tarballs into an empty directory.
 
 * Mon Jun 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.4.9-3
 - Patch for CVE-2026-57062
