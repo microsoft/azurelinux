@@ -21,7 +21,6 @@ ignore = [
     # cleanup changes make each rule green.
     "C901",
     "COM812", # Conflicts with formatter.
-    "CPY001",
     "EM101",
     "EM102",
     "PLR0911",
@@ -36,6 +35,9 @@ ignore = [
 ]
 
 fixable = ["ALL"]
+
+[lint.flake8-copyright]
+notice-rgx = "(?m)^# Copyright \\(c\\) Microsoft Corporation\\.\\n# Licensed under the MIT License\\.$"
 
 [lint.per-file-ignores]
 "**/test_*.py" = ["S101"]
