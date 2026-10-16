@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Restrict /etc/rsyslog.d/21-cloudinit.conf to root:root 0640"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%config\(noreplace\) %\{_sysconfdir\}/rsyslog\.d/21-cloudinit\.conf$'
+replacement = '%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.d/21-cloudinit.conf'

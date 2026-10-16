@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "upstreamable"
+
+[[overlays]]
+type = "patch-add"
+source = "../0012-fix-rsyslog-module-write-config-files-with-0640-mode.patch"
+description = "Write cloud-init rsyslog-managed config files at mode 0640"
