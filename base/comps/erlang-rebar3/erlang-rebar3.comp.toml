@@ -1,5 +1,1 @@
 [components.erlang-rebar3]
-# Pin to latest f43 commit which updates to 3.27.0, fixes hex_core 0.15+ API
-# incompatibility, and includes %install/%files fixes for bootstrap mode.
-# Our snapshot (2026-02-24) predates the fix (2026-03-21).
-spec = { type = "upstream", upstream-commit = "851a2e917df6169f4e8aa2bc12dd0d69c4ff73a4" }

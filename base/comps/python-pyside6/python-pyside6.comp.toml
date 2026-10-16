@@ -1,2 +1,1 @@
 [components.python-pyside6]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e7532b972758ba041266a2b21fabf357e90dff56" }

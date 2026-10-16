@@ -1,7 +1,0 @@
-[components.qt6-qtwayland]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e96dca235e83bc256548884b980c999c26bc5101" }
-
-# Pinned to the f43 6.10.3 commit, which moves the Wayland client shell-integration
-# and Adwaita-decoration CMake files to cmake/Qt6Gui/ upstream ("Fix %files section").
-# That matches what qtbase 6.10.3 exports, so the previous %files search-replace
-# workarounds (for the 6.10.2 spec vs newer qtbase) are no longer needed.
