@@ -2074,19 +2074,8 @@
     },
     {
       "component": {
-        "type": "other",
-        "other": {
-          "name": "containerd2",
-<<<<<<< HEAD
-          "version": "2.3.4",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.4.tar.gz"
-=======
-          "version": "2.3.7",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.7.tar.gz"
->>>>>>> fb72799c9a ([AutoPR- Security] Patch & Upgrade containerd2 for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801 [HIGH] (#19260))
-        }
-      }
-    },
+           "version": "2.3.7",
+           "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.7.tar.gz"
     {
       "component": {
         "type": "other",
