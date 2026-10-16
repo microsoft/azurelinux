@@ -26,7 +26,6 @@ ignore = [
     "PLR0911",
     "PLR0912",
     "PLR0913",
-    "PLR0915",
     "PLR0917",
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
     "S607",   # Requiring abspath for all binaries used is very restrictive
