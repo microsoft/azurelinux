@@ -1,0 +1,52 @@
+--- base64-0.22.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ base64-0.22.1/Cargo.toml	2026-08-04T08:42:19.532747+00:00
+@@ -28,6 +28,7 @@
+ categories = ["encoding"]
+ license = "MIT OR Apache-2.0"
+ repository = "https://github.com/marshallpierce/rust-base64"
++autoexamples = false
+ 
+ [package.metadata.docs.rs]
+ rustdoc-args = ["--generate-link-to-definition"]
+@@ -37,10 +38,6 @@
+ 
+ [profile.test]
+ opt-level = 3
+-
+-[[example]]
+-name = "base64"
+-required-features = ["std"]
+ 
+ [[test]]
+ name = "tests"
+@@ -55,13 +52,6 @@
+ harness = false
+ required-features = ["std"]
+ 
+-[dev-dependencies.clap]
+-version = "3.2.25"
+-features = ["derive"]
+-
+-[dev-dependencies.criterion]
+-version = "0.4.0"
+-
+ [dev-dependencies.once_cell]
+ version = "1"
+ 
+@@ -70,14 +60,10 @@
+ features = ["small_rng"]
+ 
+ [dev-dependencies.rstest]
+-version = "0.13.0"
++version = "0.26.0"
+ 
+ [dev-dependencies.rstest_reuse]
+-version = "0.6.0"
+-
+-[dev-dependencies.strum]
+-version = "0.25"
+-features = ["derive"]
++version = "0.7.0"
+ 
+ [features]
+ alloc = []
