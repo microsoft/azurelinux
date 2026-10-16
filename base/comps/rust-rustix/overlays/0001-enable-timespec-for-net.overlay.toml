@@ -1,0 +1,15 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [
+    { url = "https://github.com/bytecodealliance/rustix/commit/954ff649155504ae4ba95cf239e955a04bf4fe26" },
+]
+bugs = [
+    { url = "https://github.com/bytecodealliance/rustix/pull/1681" },
+]
+
+# Drop once the imported rustix sources include the net-only timespec fix.
+[[overlays]]
+description = "Enable the internal timespec module for net-only consumers such as socketpair"
+type = "patch-add"
+source = "../0001-enable-timespec-for-net.patch"
