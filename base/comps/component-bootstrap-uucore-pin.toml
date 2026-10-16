@@ -1,15 +1,9 @@
-# Keep deferred consumers pinned until their updated providers are available.
-# Unpin base64/basenc after base32, dir/vdir after ls, and coreutils last.
+# Keep coreutils pinned until all utility providers are available.
+# Utility consumers now use their generated Cargo requirements.
 
 [component-groups.rust-uucore-version-pin]
-description = "Retain bootstrap guards on consumers pending their dependency build wave"
-components = [
-    "rust-coreutils",
-    "rust-uu_base64",
-    "rust-uu_basenc",
-    "rust-uu_dir",
-    "rust-uu_vdir",
-]
+description = "Retain coreutils bootstrap guards until utility providers are available"
+components = ["rust-coreutils"]
 
 [[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
 description = "Pin uucore to 0.0.27 to prevent version skew with Fedora f43-updates repo"
