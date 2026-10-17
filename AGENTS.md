@@ -60,6 +60,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Remove component(s) from the distro | [`azldev-remove-component`](.agents/skills/azldev-remove-component/SKILL.md) |
 | Diagnose and fix overlay issues | [`azldev-overlays`](.agents/skills/azldev-overlays/SKILL.md) |
 | Test and inspect packages in mock chroot | [`azldev-mock`](.agents/skills/azldev-mock/SKILL.md) |
+| Remove a worktree or inspect leftover mock roots/caches | [`azldev-worktree-cleanup`](.agents/skills/azldev-worktree-cleanup/SKILL.md) |
 | Review component for hygiene and best practices | [`azldev-comp-toml` review checklist](.agents/skills/azldev-comp-toml/SKILL.md#review-checklist) |
 | Build, boot, test, or configure images | [`azldev-image`](.agents/skills/azldev-image/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.agents/skills/skill-koji-triage/SKILL.md) |
@@ -76,3 +77,13 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 
 - **Components:** [`base/comps/AGENTS.md`](base/comps/AGENTS.md) — file organization rules
 - **Distro config:** [`distro/AGENTS.md`](distro/AGENTS.md) — build defaults, shared config
+
+## Worktree Cleanup
+
+Before removing an Azure Linux worktree, read
+[`azldev-worktree-cleanup`](.agents/skills/azldev-worktree-cleanup/SKILL.md)
+and check for associated mock roots, bootstrap roots, and caches. Worktree
+removal does not remove those resources. Identify candidates and obtain
+explicit approval before deleting them. Preserve requested diagnostics and
+caller-owned outputs; do not delete shared configuration resources merely
+because one caller worktree is being removed.
