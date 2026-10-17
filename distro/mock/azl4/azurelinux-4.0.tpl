@@ -81,11 +81,13 @@ name=Azure Linux 4 Base
 baseurl=https://packages.microsoft.com/azurelinux/4/prod/base/$basearch
 enabled=1
 skip_if_unavailable=False
+excludepkgs=rpmautospec-0.8.4*
 
 [azurelinux-builddeps]
 name=Azure Linux 4 Build Dependencies
 baseurl=https://packages.microsoft.com/azurelinux/4/prod/builddeps/$basearch
 enabled=1
 skip_if_unavailable=False
+excludepkgs=rpmautospec-0.8.4*
 
 """
