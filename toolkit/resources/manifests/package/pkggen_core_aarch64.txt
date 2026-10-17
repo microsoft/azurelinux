@@ -1,5 +1,9 @@
 filesystem-1.1-21.azl3.aarch64.rpm
+<<<<<<< HEAD
 kernel-headers-6.6.157.1-2.azl3.noarch.rpm
+=======
+kernel-headers-6.6.159.1-1.azl3.noarch.rpm
+>>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
 glibc-2.38-21.azl3.aarch64.rpm
 glibc-devel-2.38-21.azl3.aarch64.rpm
 glibc-i18n-2.38-21.azl3.aarch64.rpm
