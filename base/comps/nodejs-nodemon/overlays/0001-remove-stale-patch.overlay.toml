@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Remove obsolete Patch0 application because the bundled sources no longer declare any patches"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P 0\s*$'
