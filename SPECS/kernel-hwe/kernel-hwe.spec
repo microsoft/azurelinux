@@ -27,14 +27,9 @@
 %define archdir arm64
 %define config_source %{SOURCE2}
 %endif
-
 Summary:        Linux Kernel
 Name:           kernel-hwe
-<<<<<<< HEAD
-Version:        6.18.54.1
-=======
 Version:        6.18.57.1
->>>>>>> bc86b4ea62 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.57.1 - branch fasttrack/3.0 (#19434))
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -434,16 +429,18 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-<<<<<<< HEAD
-* Wed Sep 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.54.1-1
-- Auto-upgrade to 6.18.54.1
-=======
+
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.57.1-1
 - Auto-upgrade to 6.18.57.1
->>>>>>> bc86b4ea62 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.57.1 - branch fasttrack/3.0 (#19434))
 
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.48.1-1
 - Auto-upgrade to 6.18.48.1
+
+* Tue Jul 07 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.38.1-1
+- Auto-upgrade to 6.18.38.1
+
+* Tue Jun 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.36.1-1
+- Auto-upgrade to 6.18.36.1
 
 * Thu Aug 20 2026 Henry Li <lihl@microsoft.com> - 6.18.43.1-2
 - Enable CONFIG_PCI_P2PDMA, CONFIG_VFIO_PCI_DMABUF, CONFIG_IOMMUFD
