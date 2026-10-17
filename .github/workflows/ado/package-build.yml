@@ -31,7 +31,7 @@
 #   2. Federated identity credentials on the app registrations for the ADO
 #      service connections (issuer: https://vstoken.dev.azure.com/<org-id>,
 #      subject: sc://<org>/<project>/<service-connection-name>).
-#   3. DEV and PROD ARM service connections in ADO project settings using
+#   3. PROD ARM service connection in ADO project settings using
 #      Workload Identity Federation (manual).
 #   4. CI trigger configured (in ADO pipeline settings) to fire on pushes to
 #      the target branch.
@@ -39,9 +39,7 @@
 # Variable Group (ADO Pipelines > Library):
 #   Name: "ControlTower-PRCheck"
 #   Required variables:
-#     - ApiAudienceDev     : DEV Entra ID audience URI
 #     - ApiAudienceProd    : PROD Entra ID audience URI
-#     - ApiBaseAFDUrlDev   : DEV Azure Front Door endpoint base URL
 #     - ApiBaseAFDUrlProd  : PROD Azure Front Door endpoint base URL
 
 # Trigger controlled by ADO branch policy — not YAML triggers.
@@ -86,10 +84,6 @@ extends:
           artifactBaseName: packagebuild
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           deployments:
-            DEV:
-              apiAudience: $(ApiAudienceDev)
-              apiBaseAFDUrl: $(ApiBaseAFDUrlDev)
-              serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
             PROD:
               apiAudience: $(ApiAudienceProd)
               apiBaseAFDUrl: $(ApiBaseAFDUrlProd)

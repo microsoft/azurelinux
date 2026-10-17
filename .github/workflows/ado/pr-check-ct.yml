@@ -5,8 +5,8 @@
 # check. For each configured deployment, it calls Control Tower 'prcheck'
 # (which uploads the changed components' missing lookaside sources). PROD then
 # submits a *scratch* Control Tower build of those components and WAITS for it
-# to finish; DEV and STAGING skip package builds. DEV and PROD API failures fail
-# the check, while STAGING prcheck failures are non-blocking. Deployment
+# to finish; STAGING skips package builds. PROD API failures fail the check,
+# while STAGING prcheck failures are non-blocking. Deployment
 # jobs run independently in parallel. Package builds run in Control Tower's own
 # sandbox; checkout-controlled pipeline helpers still run on CI agents under
 # the deployment-specific service connections.
@@ -24,7 +24,7 @@
 # triggers it only after inspecting the diff. See the prerequisite below.
 #
 # Official: this remains reviewer-gated PR validation and produces only scratch
-# builds, but it uses the PROD service connection alongside DEV and STAGING.
+# builds, but it uses the PROD service connection alongside STAGING.
 # OneBranch Official governance is required for production identity use.
 #
 # Helper scripts live under:
@@ -38,7 +38,7 @@
 #   2. Federated identity credentials on the app registrations for the ADO
 #      service connections (issuer: https://vstoken.dev.azure.com/<org-id>,
 #      subject: sc://<org>/<project>/<service-connection-name>).
-#   3. DEV, STAGING, and PROD ARM service connections in ADO project settings
+#   3. STAGING and PROD ARM service connections in ADO project settings
 #      using Workload Identity Federation (manual).
 #   4. REVIEWER-GATED trigger (configured in ADO, not here): wire this pipeline
 #      as a build-validation check that does NOT automatically queue on every
@@ -48,10 +48,8 @@
 # Variable Group (ADO Pipelines > Library):
 #   Name: "ControlTower-PRCheck"
 #   Required variables:
-#     - ApiAudienceDev        : DEV Entra ID audience URI
 #     - ApiAudienceStaging    : STAGING Entra ID audience URI
 #     - ApiAudienceProd       : PROD Entra ID audience URI
-#     - ApiBaseAFDUrlDev      : DEV Azure Front Door endpoint base URL
 #     - ApiBaseAFDUrlStaging  : STAGING Azure Front Door endpoint base URL
 #     - ApiBaseAFDUrlProd     : PROD Azure Front Door endpoint base URL
 
@@ -97,12 +95,6 @@ extends:
           artifactBaseName: prcheckct
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           deployments:
-            DEV:
-              apiAudience: $(ApiAudienceDev)
-              apiBaseAFDUrl: $(ApiBaseAFDUrlDev)
-              continueOnError: false
-              serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
-              skipPackageBuilds: true
             STAGING:
               apiAudience: $(ApiAudienceStaging)
               apiBaseAFDUrl: $(ApiBaseAFDUrlStaging)
