@@ -83,14 +83,9 @@ cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
   `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include/limits.h
 popd
 rm -rf gcc-13.2.0
-
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-<<<<<<< HEAD
-KERNEL_VERSION="6.6.157.1"
-=======
 KERNEL_VERSION="6.6.159.1"
->>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
 echo Linux-${KERNEL_VERSION} API Headers
 tar xf kernel-${KERNEL_VERSION}.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-3-${KERNEL_VERSION}
