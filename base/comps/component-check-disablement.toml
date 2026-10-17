@@ -179,6 +179,7 @@ components = [
     "rust-procfs",
     "rust-selinux-sys",
     "rust-sequoia-wot",
+    "rust-zvariant",
     "satyr",
     "scancode-toolkit",
     "scipy",
