@@ -1,0 +1,13 @@
+--- icu_locale-2.3.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ icu_locale-2.3.1/Cargo.toml	2026-09-23T05:47:00.352747+00:00
+@@ -197,8 +197,8 @@
+ [dev-dependencies.serde_json]
+ version = "1.0.45"
+ 
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.5.0"
++[dev-dependencies.writeable]
++version = "0.6.4"
+ 
+ [lints.clippy]
+ alloc_instead_of_core = "warn"
