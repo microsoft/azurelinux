@@ -882,35 +882,21 @@ class _RepoWriter:
 # ---------------------------------------------------------------------------
 
 
-def emit_repos(
-    repo_to_dir: dict[InputRepo, Path],
+def _collect_emission_plan(
     universe: dict[UniverseKey, UniverseEntry],
     decisions: dict[UniverseKey, RoutingDecision],
-    output_dir: Path,
-) -> tuple[dict[Destination, int], list[dict], list[dict]]:
-    """Route each package from the input repositories to its destination.
-
-    Returns (per_destination_counts, unpublished_records, fallback_records).
-
-    Counts are per NEVRA. The unpublished and fallback reports both dedupe
-    by (kind, arch, name) since the routing reason is name-based and
-    listing every NEVRA of an affected name would just be noise.
-    """
-    # Precompute counts per destination (for XML headers), unpublished
-    # records (excluded from output), and fallback records (routed via
-    # Phase-4 inheritance rather than an explicit publishChannel).
+) -> tuple[Counter[Destination], list[dict], list[dict]]:
+    """Collect destination counts and deduplicated routing reports."""
     dest_counts: Counter[Destination] = Counter()
     unpublished: list[dict] = []
     unpub_seen: set[tuple[str, str, str]] = set()
     fallbacks: list[dict] = []
     fb_seen: set[tuple[str, str, str]] = set()
     for key, decision in decisions.items():
-        kind = key[0]
-        arch = key[1]
-        name = key[2]
+        kind, arch, name = key[:3]
         entry = universe[key]
+        nameslot = (kind, arch, name)
         if decision.dest_channel is None:
-            nameslot = (kind, arch, name)
             if nameslot not in unpub_seen:
                 unpub_seen.add(nameslot)
                 unpublished.append(
@@ -926,73 +912,108 @@ def emit_repos(
             continue
         dest = Destination(decision.dest_channel, kind, arch)
         dest_counts[dest] += 1
-        if decision.inherited:
-            nameslot = (kind, arch, name)
-            if nameslot not in fb_seen:
-                fb_seen.add(nameslot)
-                fallbacks.append(
-                    {
-                        "name": name,
-                        "kind": kind,
-                        "arch": arch,
-                        "source_repo": entry.repo.url,
-                        "source_package": entry.source_pkg_name,
-                        "dest_channel": decision.dest_channel,
-                        "reason": decision.reason,
-                        "tie_break_used": decision.tie_break_used,
-                    }
-                )
+        if decision.inherited and nameslot not in fb_seen:
+            fb_seen.add(nameslot)
+            fallbacks.append(
+                {
+                    "name": name,
+                    "kind": kind,
+                    "arch": arch,
+                    "source_repo": entry.repo.url,
+                    "source_package": entry.source_pkg_name,
+                    "dest_channel": decision.dest_channel,
+                    "reason": decision.reason,
+                    "tie_break_used": decision.tie_break_used,
+                }
+            )
+    return dest_counts, unpublished, fallbacks
 
-    # Open writers up-front with correct counts.
-    writers: dict[Destination, _RepoWriter] = {d: _RepoWriter(d, output_dir, n) for d, n in dest_counts.items()}
 
-    # Iterate each input repo's full metadata and route packages.
-    emitted: set[UniverseKey] = set()
-    for repo, repo_dir in repo_to_dir.items():
-        primary = _find_metadata_path(repo_dir, "primary")
-        filelists = _find_metadata_path(repo_dir, "filelists")
-        other = _find_metadata_path(repo_dir, "other")
+@dataclass
+class _EmissionContext:
+    """Mutable state shared while routing input repository packages."""
 
-        repo_base = repo.url.rstrip("/") + "/"
-        pkg_iter = cr.PackageIterator(
-            primary_path=primary,
-            filelists_path=filelists,
-            other_path=other,
-            warningcb=lambda *_: True,
-        )
-        for pkg in pkg_iter:
-            key: UniverseKey = (repo.kind, repo.arch, *_pkg_identity(pkg))
-            entry = universe.get(key)
-            if entry is None or entry.repo.url != repo.url:
-                # Either filtered out earlier (shouldn't happen) or this is
-                # the cross-repo duplicate copy already warned about during
-                # the first pass; skip silently.
-                continue
-            if key in emitted:
-                # Same NEVRA appearing twice within this repo: already
-                # logged in build_package_universe; skip silently so writer
-                # counts stay consistent with the XML headers.
-                continue
-            decision = decisions[key]
-            if decision.dest_channel is None:
-                continue
-            dest = Destination(decision.dest_channel, repo.kind, repo.arch)
-            # Rewrite location_href to an absolute upstream URL so consumers
-            # download from the source repo. urljoin honors absolute hrefs
-            # in the input (in case the input repo already published one)
-            # and respects any xml:base on the input package.
-            input_base = pkg.location_base or repo_base
-            absolute_href = urllib.parse.urljoin(input_base, pkg.location_href or "")
-            pkg.location_href = absolute_href
-            pkg.location_base = ""
-            writers[dest].add_pkg(pkg)
-            emitted.add(key)
+    universe: dict[UniverseKey, UniverseEntry]
+    decisions: dict[UniverseKey, RoutingDecision]
+    writers: dict[Destination, _RepoWriter]
+    emitted: set[UniverseKey] = field(default_factory=set)
 
+
+def _emit_repo_packages(
+    repo: InputRepo,
+    repo_dir: Path,
+    context: _EmissionContext,
+) -> None:
+    """Route packages from one input repository into destination writers."""
+    primary = _find_metadata_path(repo_dir, "primary")
+    filelists = _find_metadata_path(repo_dir, "filelists")
+    other = _find_metadata_path(repo_dir, "other")
+
+    repo_base = repo.url.rstrip("/") + "/"
+    pkg_iter = cr.PackageIterator(
+        primary_path=primary,
+        filelists_path=filelists,
+        other_path=other,
+        warningcb=lambda *_: True,
+    )
+    for pkg in pkg_iter:
+        key: UniverseKey = (repo.kind, repo.arch, *_pkg_identity(pkg))
+        entry = context.universe.get(key)
+        if entry is None or entry.repo.url != repo.url:
+            # Ignore filtered entries and cross-repo duplicate copies.
+            continue
+        if key in context.emitted:
+            # Ignore duplicate copies within the same repository.
+            continue
+        decision = context.decisions[key]
+        if decision.dest_channel is None:
+            continue
+        dest = Destination(decision.dest_channel, repo.kind, repo.arch)
+        # Preserve absolute input hrefs and resolve relative ones against
+        # xml:base or the source repository URL.
+        input_base = pkg.location_base or repo_base
+        pkg.location_href = urllib.parse.urljoin(input_base, pkg.location_href or "")
+        pkg.location_base = ""
+        context.writers[dest].add_pkg(pkg)
+        context.emitted.add(key)
+
+
+def _finish_writers(
+    writers: dict[Destination, _RepoWriter],
+    dest_counts: Counter[Destination],
+) -> None:
+    """Finish destination writers and report count mismatches."""
     for dest, writer in writers.items():
         writer.finish()
         if writer.added != dest_counts[dest]:
             warn(f"writer for {dest.relpath()} expected {dest_counts[dest]} pkgs but emitted {writer.added}")
 
+
+def emit_repos(
+    repo_to_dir: dict[InputRepo, Path],
+    universe: dict[UniverseKey, UniverseEntry],
+    decisions: dict[UniverseKey, RoutingDecision],
+    output_dir: Path,
+) -> tuple[dict[Destination, int], list[dict], list[dict]]:
+    """Route each package from the input repositories to its destination.
+
+    Returns (per_destination_counts, unpublished_records, fallback_records).
+
+    Counts are per NEVRA. The unpublished and fallback reports both dedupe
+    by (kind, arch, name) since the routing reason is name-based and
+    listing every NEVRA of an affected name would just be noise.
+    """
+    dest_counts, unpublished, fallbacks = _collect_emission_plan(universe, decisions)
+
+    # Open writers up-front with correct counts.
+    writers: dict[Destination, _RepoWriter] = {d: _RepoWriter(d, output_dir, n) for d, n in dest_counts.items()}
+    context = _EmissionContext(universe, decisions, writers)
+
+    # Iterate each input repo's full metadata and route packages.
+    for repo, repo_dir in repo_to_dir.items():
+        _emit_repo_packages(repo, repo_dir, context)
+
+    _finish_writers(writers, dest_counts)
     return dict(dest_counts), unpublished, fallbacks
 
 

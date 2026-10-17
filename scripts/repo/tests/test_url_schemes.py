@@ -92,6 +92,69 @@ def test_synthesizer_rejects_missing_repositories_before_output_setup(
     assert output_path.read_text(encoding="utf-8") == original_content
 
 
+def test_synthesizer_emits_routed_packages(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Route packages, rewrite their URLs, and finish destination writers."""
+    module = _load_repodata_synthesizer()
+    repo = module.InputRepo("main", "x86_64", "https://packages.example.test/base/x86_64", "explicit")
+    destination = module.Destination("base", "main", "x86_64")
+    package = types.SimpleNamespace(
+        name="example",
+        epoch=None,
+        version="1.0",
+        release="1",
+        arch="x86_64",
+        location_base=None,
+        location_href="Packages/e/example.rpm",
+    )
+    key = ("main", "x86_64", "example", "0", "1.0", "1", "x86_64")
+    universe = {key: module.UniverseEntry(repo, "example")}
+    decisions = {key: module.RoutingDecision(dest_channel="base", reason="explicit")}
+    writers: dict[object, object] = {}
+
+    class Writer:
+        def __init__(self, dest: object, _output_dir: Path, _count: int) -> None:
+            self.packages: list[object] = []
+            self.added = 0
+            self.finished = False
+            writers[dest] = self
+
+        def add_pkg(self, emitted_package: object) -> None:
+            self.packages.append(emitted_package)
+            self.added += 1
+
+        def finish(self) -> None:
+            self.finished = True
+
+    monkeypatch.setattr(module, "_RepoWriter", Writer)
+    monkeypatch.setattr(module, "_find_metadata_path", lambda _repo_dir, kind: tmp_path / kind)
+    monkeypatch.setattr(
+        module.cr,
+        "PackageIterator",
+        lambda **_kwargs: iter([package]),
+        raising=False,
+    )
+
+    counts, unpublished, fallbacks = module.emit_repos(
+        {repo: tmp_path},
+        universe,
+        decisions,
+        tmp_path / "output",
+    )
+
+    writer = writers[destination]
+    assert isinstance(writer, Writer)
+    assert counts == {destination: 1}
+    assert unpublished == []
+    assert fallbacks == []
+    assert writer.packages == [package]
+    assert writer.finished is True
+    assert package.location_href == "https://packages.example.test/base/x86_64/Packages/e/example.rpm"
+    assert package.location_base == ""
+
+
 class _FtpRedirectHandler(BaseHTTPRequestHandler):
     """Redirect every request to a disallowed FTP target."""
 
@@ -176,6 +239,46 @@ def test_probe_repo_rejects_redirect_to_ftp() -> None:
     assert status == "fail"
     assert error is not None
     assert "unsupported scheme 'ftp'" in error
+
+
+def test_dnf_repository_discovery_preserves_probe_results(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Build dnf arguments while retaining missing and failed probe handling."""
+    wrapper = _load_dnf_wrapper()
+    monkeypatch.setattr(
+        wrapper,
+        "SUBREPOS",
+        [
+            types.SimpleNamespace(name="main", kind="main", subpath="base/$basearch"),
+            types.SimpleNamespace(name="debug", kind="debuginfo", subpath="base/debuginfo/$basearch"),
+            types.SimpleNamespace(name="source", kind="srpms", subpath="base/srpms"),
+        ],
+    )
+    results = iter(
+        [
+            ("ok", None),
+            ("missing", None),
+            ("fail", "HTTP 500"),
+        ]
+    )
+    monkeypatch.setattr(wrapper, "probe_repo", lambda _url: next(results))
+
+    dnf_args, total_found, failures = wrapper._discover_repositories(  # noqa: SLF001 - focused helper coverage
+        ["https://packages.example.test"],
+        set(),
+        "x86_64",
+    )
+
+    assert dnf_args == [
+        "--disablerepo=*",
+        "--refresh",
+        "--repofrompath",
+        "azl-main,https://packages.example.test/base/$basearch",
+        "--enablerepo=azl-main",
+    ]
+    assert total_found == 1
+    assert failures == ["azl-source <- https://packages.example.test/base/srpms: HTTP 500"]
 
 
 def test_http_get_rejects_redirect_to_ftp(tmp_path: Path) -> None:

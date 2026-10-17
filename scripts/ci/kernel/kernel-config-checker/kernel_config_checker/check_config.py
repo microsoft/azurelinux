@@ -149,6 +149,76 @@ def check_config_across_all(schema: IntentionalKernelConfigSchema, config_name: 
     return True
 
 
+def _normalize_architecture(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
+    """Normalize and validate the requested architecture."""
+    if not args.architecture:
+        return
+    if args.architecture == "aarch64":
+        args.architecture = "arm64"
+    valid_architectures = {"x86_64", "arm64"}
+    if args.architecture not in valid_architectures:
+        parser.error(
+            f"Invalid architecture '{args.architecture}'. Expected one of: {', '.join(sorted(valid_architectures))}"
+        )
+
+
+def _run_add_config(json_file: str) -> int:
+    """Run interactive config insertion mode."""
+    try:
+        ok = add_config_interactive(Path(json_file))
+    except (EOFError, KeyError, OSError, TypeError, ValueError) as e:
+        print(f"\u2717 Error adding config: {e}")
+        return 1
+    return 0 if ok else 1
+
+
+def _run_check_all(json_file: str, config_name: str) -> int:
+    """Run cross-kernel config inspection mode."""
+    try:
+        schema = load_schema(Path(json_file))
+        print(f"✓ Loaded intentional config: {json_file}")
+        found = check_config_across_all(schema, config_name)
+    except (KeyError, OSError, TypeError, ValueError) as e:
+        print(f"✗ Error checking config: {e}")
+        return 1
+    return 0 if found else 1
+
+
+def _run_config_check(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    """Run the standard kernel configuration validation mode."""
+    if not all(
+        [
+            args.kernel_config,
+            args.intentional_config,
+            args.kernel_name,
+            args.architecture,
+        ]
+    ):
+        parser.error(
+            "kernel_config, intentional_config, kernel_name,"
+            " and architecture are required"
+            " when not using --add-config or --check-all"
+        )
+
+    try:
+        kernel_config_path = Path(args.kernel_config)
+        actual_config = parse_kernel_config(kernel_config_path)
+        print(f"✓ Parsed kernel config: {kernel_config_path} ({len(actual_config)} settings)")
+
+        intentional_config_path = Path(args.intentional_config)
+        schema = load_schema(intentional_config_path)
+        print(f"✓ Loaded intentional config: {intentional_config_path}")
+
+        is_valid = check_kernel_config(actual_config, schema, args.kernel_name, args.architecture)
+        if is_valid:
+            print("✓ Kernel configuration check passed")
+            return 0
+        print("✗ Kernel configuration check failed")
+    except (KeyError, OSError, TypeError, ValueError) as e:
+        print(f"✗ Error: {e}")
+    return 1
+
+
 def main() -> int | None:
     """Run kernel configuration validation from command-line arguments."""
     parser = argparse.ArgumentParser(description="Check kernel .config file against intentional configuration")
@@ -177,73 +247,14 @@ def main() -> int | None:
     )
 
     args = parser.parse_args()
-
-    # Normalize and validate architecture early to avoid silent success on typos.
-    if args.architecture:
-        # Normalize common alias to the canonical name used in configs.
-        if args.architecture == "aarch64":
-            args.architecture = "arm64"
-        valid_architectures = {"x86_64", "arm64"}
-        if args.architecture not in valid_architectures:
-            parser.error(
-                f"Invalid architecture '{args.architecture}'. Expected one of: {', '.join(sorted(valid_architectures))}"
-            )
+    _normalize_architecture(args, parser)
 
     if args.add_config:
-        try:
-            ok = add_config_interactive(Path(args.add_config))
-        except (EOFError, KeyError, OSError, TypeError, ValueError) as e:
-            print(f"\u2717 Error adding config: {e}")
-            return 1
-        return 0 if ok else 1
+        return _run_add_config(args.add_config)
 
     if args.check_all:
-        try:
-            json_file, config_name = args.check_all
-            schema = load_schema(Path(json_file))
-            print(f"✓ Loaded intentional config: {json_file}")
-            found = check_config_across_all(schema, config_name)
-        except (KeyError, OSError, TypeError, ValueError) as e:
-            print(f"✗ Error checking config: {e}")
-            return 1
-        return 0 if found else 1
-
-    if not all(
-        [
-            args.kernel_config,
-            args.intentional_config,
-            args.kernel_name,
-            args.architecture,
-        ]
-    ):
-        parser.error(
-            "kernel_config, intentional_config, kernel_name,"
-            " and architecture are required"
-            " when not using --add-config or --check-all"
-        )
-
-    try:
-        kernel_config_path = Path(args.kernel_config)
-        actual_config = parse_kernel_config(kernel_config_path)
-        print(f"✓ Parsed kernel config: {kernel_config_path} ({len(actual_config)} settings)")
-
-        intentional_config_path = Path(args.intentional_config)
-        schema = load_schema(intentional_config_path)
-        print(f"✓ Loaded intentional config: {intentional_config_path}")
-
-        is_valid = check_kernel_config(actual_config, schema, args.kernel_name, args.architecture)
-
-        if is_valid:
-            print("✓ Kernel configuration check passed")
-            exit_code = 0
-        else:
-            print("✗ Kernel configuration check failed")
-            exit_code = 1
-
-    except (KeyError, OSError, TypeError, ValueError) as e:
-        print(f"✗ Error: {e}")
-        return 1
-    return exit_code
+        return _run_check_all(*args.check_all)
+    return _run_config_check(args, parser)
 
 
 if __name__ == "__main__":
