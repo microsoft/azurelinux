@@ -6687,19 +6687,9 @@
     },
     {
       "component": {
-        "type": "other",
-        "other": {
           "name": "hyperv-daemons",
-<<<<<<< HEAD
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
-=======
           "version": "6.6.159.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
->>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
-        }
-      }
-    },
     {
       "component": {
         "type": "other",
@@ -8383,49 +8373,19 @@
     },
     {
       "component": {
-        "type": "other",
-        "other": {
           "name": "kernel",
-<<<<<<< HEAD
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
-=======
           "version": "6.6.159.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
->>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
-        }
-      }
-    },
     {
       "component": {
-        "type": "other",
-        "other": {
           "name": "kernel-64k",
-<<<<<<< HEAD
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
-=======
           "version": "6.6.159.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
->>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
-        }
-      }
-    },
     {
       "component": {
-        "type": "other",
-        "other": {
           "name": "kernel-headers",
-<<<<<<< HEAD
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
-=======
           "version": "6.6.159.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
->>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
-        }
-      }
-    },
     {
       "component": {
         "type": "other",
@@ -8448,19 +8408,9 @@
     },
     {
       "component": {
-        "type": "other",
-        "other": {
           "name": "kernel-ipe",
-<<<<<<< HEAD
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
-=======
           "version": "6.6.159.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
->>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
-        }
-      }
-    },
     {
       "component": {
         "type": "other",
