@@ -33,7 +33,7 @@
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
 Version:        8.3.35
-Release:        2%{?dist}
+Release:        3%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -80,8 +80,8 @@ Patch45:        php-7.4.0-ldap_r.patch
 Patch47:        php-8.3.14-phpinfo.patch
 # Upstream fixes (100+)
 # Security fixes (200+)
-# Placeholder only; replace before publishing.
-Patch200:       php-embargo-placeholder.patch
+# Embargoed candidate; final upstream approval is not confirmed.
+Patch200:       php-8.3.35-oom-candidate.patch
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
 Patch300:       php-7.4.0-datetests.patch
@@ -718,7 +718,7 @@ in pure PHP.
 # upstream patches
 
 # security patches
-%patch 200 -p1 -b .embargo-placeholder
+%patch 200 -p1 -b .oom-candidate
 
 # Fixes for tests
 %patch 300 -p1 -b .datetests
@@ -1517,6 +1517,10 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Sat Oct 17 2026 Jon Slobodzian <joslobo@microsoft.com> - 8.3.35-3
+- Replace the embargoed build placeholder with the candidate OOM remediation.
+- Pin the candidate to upstream revision 07b44b5b3d88; final approval pending.
+
 * Fri Oct 16 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.3.35-2
 - Add a non-functional placeholder patch for embargoed build validation.
 - Replace the placeholder with the security fix before publishing.
