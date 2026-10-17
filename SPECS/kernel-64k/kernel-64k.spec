@@ -23,16 +23,10 @@
 %define archdir arm64
 %define config_source %{SOURCE1}
 %endif
-
 Summary:        Linux Kernel
 Name:           kernel-64k
-<<<<<<< HEAD
-Version:        6.6.157.1
-Release:        2%{?dist}
-=======
 Version:        6.6.159.1
 Release:        1%{?dist}
->>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -385,19 +379,20 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-<<<<<<< HEAD
-* Thu Oct 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.157.1-2
-- Bump release to match kernel
-=======
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.159.1-1
 - Auto-upgrade to 6.6.159.1
 
 * Mon Oct 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.158.1-1
 - Auto-upgrade to 6.6.158.1
->>>>>>> fe959d8c99 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.159.1 - branch fasttrack/3.0 (#19420))
 
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.157.1-1
 - Auto-upgrade to 6.6.157.1
+
+* Sat Aug 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.152.1-1
+- Auto-upgrade to 6.6.152.1
+
+* Fri Aug 07 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.150.1-1
+- Auto-upgrade to 6.6.150.1
 
 * Sat Aug 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.152.1-1
 - Auto-upgrade to 6.6.152.1
