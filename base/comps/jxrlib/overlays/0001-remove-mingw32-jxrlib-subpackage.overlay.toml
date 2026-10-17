@@ -44,6 +44,12 @@ type = "patch-remove"
 file = "jxrlib_mingw.patch"
 
 [[overlays]]
+description = "Remove stale Patch1 application after pruning the mingw patch; retain Patch0 warnings fixes"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P1 -p1$'
+
+[[overlays]]
 description = "Remove mingw cmake build step"
 type = "spec-search-replace"
 section = "%build"

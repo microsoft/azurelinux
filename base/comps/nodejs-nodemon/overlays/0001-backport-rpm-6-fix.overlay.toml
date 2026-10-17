@@ -1,0 +1,15 @@
+# Remove this overlay when the imported Fedora dist-git history includes
+# commit 67795faf5e35a01f5aa25a8c8ffe12f0bca7fe4e.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://src.fedoraproject.org/rpms/nodejs-nodemon/c/67795faf5e35a01f5aa25a8c8ffe12f0bca7fe4e" },
+]
+
+[[overlays]]
+description = "Backport Fedora's escaped stale Patch0 application for RPM 6"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P 0\s*$'
+replacement = '#%%patch -P 0'

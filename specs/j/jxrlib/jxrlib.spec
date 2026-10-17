@@ -3,7 +3,7 @@
 
 Name:           jxrlib
 Version:        1.1
-Release: 36%{?dist}
+Release: 37%{?dist}
 Summary:        Open source implementation of jpegxr
 
 # See JPEGXR_DPK_Spec_1.0.doc. Upstream request for plain text license file at
@@ -54,7 +54,7 @@ for file in `find . -type f -name '*.c' -or -name '*.h' -or -name '*.txt'`; do
 done
 
 %patch -P0 -p1
-%patch -P1 -p1
+
 
 # Remove shipped binaries
 rm -rf bin
