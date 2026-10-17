@@ -1,0 +1,15 @@
+# Remove this overlay when the imported Fedora dist-git history includes
+# commit 858e3e07a6e6faffc142ddab0fbd2d85809edc1c.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://src.fedoraproject.org/rpms/dyninst/c/858e3e07a6e6faffc142ddab0fbd2d85809edc1c" },
+]
+
+[[overlays]]
+description = "Backport Fedora's escaped commented setup line for RPM 6"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^# %setup -q -T -D -a 1$'
+replacement = '# %%setup -q -T -D -a 1'

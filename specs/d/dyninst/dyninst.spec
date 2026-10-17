@@ -5,7 +5,7 @@ Summary: An API for Run-time Code Generation
 License: LGPL-2.1-or-later AND GPL-3.0-or-later WITH Bison-exception-2.2 AND LicenseRef-Fedora-Public-Domain AND BSD-3-Clause
 Name: dyninst
 Group: Development/Libraries
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: https://www.paradyn.org
 Version: 13.0.0
 ExclusiveArch: x86_64 ppc64le aarch64
@@ -67,7 +67,7 @@ that uses Dyninst.
 
 %prep
 %setup -q -n %{name}-%{version} -c
-# %setup -q -T -D -a 1
+# %%setup -q -T -D -a 1
 
 pushd %{dyninst_base}
 %patch -P1 -p1

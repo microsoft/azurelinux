@@ -1,0 +1,21 @@
+# Remove this overlay when the imported Fedora dist-git history includes
+# commit 44a1abbcd1167665754269785506a8edebef0bfa.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://src.fedoraproject.org/rpms/python-rtslib/c/44a1abbcd1167665754269785506a8edebef0bfa" },
+]
+
+[[overlays]]
+description = "Backport Fedora's switch to autosetup so declared patches apply automatically"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%setup -q -n %\{oname\}-%\{version\}$'
+replacement = '%autosetup -p1 -n %{oname}-%{version}'
+
+[[overlays]]
+description = "Remove the explicit patch applications replaced by autosetup"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P[01] -p1$'
