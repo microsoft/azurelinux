@@ -1,5 +1,9 @@
 {
   "Signatures": {
+<<<<<<< HEAD
     "kernel-hwe-6.18.54.1.tar.gz": "e3850d652851cda1c6e5ace4932afd2a4344f82eaf1c91f6b2ebfda116da7b4f"
+=======
+    "kernel-hwe-6.18.57.1.tar.gz": "e50865ead30bd8a69de64a6adf427e00cd8247fd1e6592f38c9861a0fa85cbaf"
+>>>>>>> bc86b4ea62 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.57.1 - branch fasttrack/3.0 (#19434))
   }
 }

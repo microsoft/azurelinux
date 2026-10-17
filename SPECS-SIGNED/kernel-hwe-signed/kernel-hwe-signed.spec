@@ -9,7 +9,11 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
+<<<<<<< HEAD
 Version:        6.18.54.1
+=======
+Version:        6.18.57.1
+>>>>>>> bc86b4ea62 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.57.1 - branch fasttrack/3.0 (#19434))
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -108,8 +112,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+<<<<<<< HEAD
 * Wed Sep 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.54.1-1
 - Auto-upgrade to 6.18.54.1
+=======
+* Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.57.1-1
+- Auto-upgrade to 6.18.57.1
+>>>>>>> bc86b4ea62 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.57.1 - branch fasttrack/3.0 (#19434))
 
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.48.1-1
 - Auto-upgrade to 6.18.48.1
