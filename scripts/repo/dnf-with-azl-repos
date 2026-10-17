@@ -172,19 +172,12 @@ def probe_repo(probe_url: str, *, timeout: float = PROBE_TIMEOUT) -> tuple[str, 
         return _PROBE_FAIL, f"OS error: {e}"
 
 
-def main(argv: list[str] | None = None) -> int:
-    """Discover Azure Linux repositories and execute dnf."""
-    if argv is None:
-        argv = sys.argv[1:]
-    args = parse_args(argv)
-
-    if shutil.which("dnf") is None:
-        die("dnf is required")
-
-    host_arch = platform.machine()
-    prefixes: list[str] = args.repo_prefix
-    excluded_kinds: set[str] = args.excluded_kinds
-
+def _discover_repositories(
+    prefixes: list[str],
+    excluded_kinds: set[str],
+    host_arch: str,
+) -> tuple[list[str], int, list[str]]:
+    """Discover available repositories and build their dnf arguments."""
     dnf_args: list[str] = ["--disablerepo=*", "--refresh"]
     total_found = 0
     failures: list[str] = []
@@ -206,25 +199,40 @@ def main(argv: list[str] | None = None) -> int:
             status, err = probe_repo(probe_full)
             if status == _PROBE_OK:
                 log(f"  + {repo_id} <- {dnf_full}")
-                dnf_args.extend([
-                    "--repofrompath", f"{repo_id},{dnf_full}",
-                    f"--enablerepo={repo_id}",
-                ])
+                dnf_args.extend(
+                    [
+                        "--repofrompath",
+                        f"{repo_id},{dnf_full}",
+                        f"--enablerepo={repo_id}",
+                    ]
+                )
                 found_here += 1
             elif status == _PROBE_MISSING:
-                log(
-                    f"  - {repo_id} (no repodata at "
-                    f"{probe_full}/repodata/repomd.xml)"
-                )
+                log(f"  - {repo_id} (no repodata at {probe_full}/repodata/repomd.xml)")
             else:
-                log(
-                    f"  ! {repo_id} ({err}) at "
-                    f"{probe_full}/repodata/repomd.xml"
-                )
+                log(f"  ! {repo_id} ({err}) at {probe_full}/repodata/repomd.xml")
                 failures.append(f"{repo_id} <- {probe_full}: {err}")
         if found_here == 0 and not failures:
             log(f"{PROG}: warning: no repos discovered under {prefix_trim}")
         total_found += found_here
+
+    return dnf_args, total_found, failures
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Discover Azure Linux repositories and execute dnf."""
+    if argv is None:
+        argv = sys.argv[1:]
+    args = parse_args(argv)
+
+    if shutil.which("dnf") is None:
+        die("dnf is required")
+
+    host_arch = platform.machine()
+    prefixes: list[str] = args.repo_prefix
+    excluded_kinds: set[str] = args.excluded_kinds
+
+    dnf_args, total_found, failures = _discover_repositories(prefixes, excluded_kinds, host_arch)
 
     if failures:
         die(
