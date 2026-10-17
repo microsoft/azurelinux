@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Remove commented setup for missing Source1; RPM expands macros even in comments"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^# %setup -q -T -D -a 1$'

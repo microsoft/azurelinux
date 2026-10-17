@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Remove stale Patch1 application; the only declared patch is already applied as Patch0"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P1 -p1$'
