@@ -109,6 +109,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  perl-interpreter
 BuildRequires:  pkgconfig
+BuildRequires:  re2c
 BuildRequires:  smtpdaemon
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  tzdata
@@ -826,6 +827,15 @@ cat `aclocal --print-ac-dir`/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m
 # Regenerate configure scripts (patches change config.m4's)
 touch configure.ac
 ./buildconf --force
+
+# Regenerate scanner output changed by the candidate patch.
+re2c --no-generation-date -b \
+    -o ext/standard/var_unserializer.c ext/standard/var_unserializer.re
+re2c --no-generation-date -b \
+    -o ext/standard/url_scanner_ex.c ext/standard/url_scanner_ex.re
+re2c --no-generation-date -bci \
+    -t ext/json/php_json_scanner_defs.h \
+    -o ext/json/json_scanner.c ext/json/json_scanner.re
 
 CFLAGS=$(echo %{optflags} -fno-strict-aliasing -Wno-pointer-sign | sed 's/-mstackrealign//')
 export CFLAGS
