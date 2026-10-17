@@ -5,10 +5,12 @@
 
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
 import pytest
 from conftest import _kernel_config_path
+from kernel_config_checker import check_config as check_config_module
 from kernel_config_checker.check_config import check_kernel_config, parse_kernel_config
 
 if TYPE_CHECKING:
@@ -52,3 +54,37 @@ def test_changed_kernel_configs_match_policy(
     if not check_kernel_config(actual_config, intentional_schema, kernel_name, architecture):
         message = f"Kernel config validation failed for {config_path}"
         pytest.fail(message)
+
+
+def test_main_normalizes_aarch64_before_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pass the canonical arm64 architecture to the validation workflow."""
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "check-config",
+            "kernel.config",
+            "intentional.json",
+            "kernel",
+            "aarch64",
+        ],
+    )
+    monkeypatch.setattr(check_config_module, "parse_kernel_config", lambda _path: {})
+    monkeypatch.setattr(check_config_module, "load_schema", lambda _path: object())
+    architectures: list[str] = []
+
+    def check(
+        _actual: object,
+        _schema: object,
+        _kernel_name: str,
+        architecture: str,
+    ) -> bool:
+        architectures.append(architecture)
+        return True
+
+    monkeypatch.setattr(check_config_module, "check_kernel_config", check)
+
+    assert check_config_module.main() == 0
+    assert architectures == ["arm64"]

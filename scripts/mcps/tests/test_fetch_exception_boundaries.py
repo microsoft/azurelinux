@@ -5,7 +5,9 @@
 from __future__ import annotations
 
 import importlib.util
+import ssl
 import subprocess
+import urllib.error
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -76,6 +78,23 @@ def test_fetch_does_not_hide_unexpected_errors(
 
     with pytest.raises(RuntimeError):
         getattr(module, fetch_name)("/path", override_base_url="https://example.test")
+
+
+def test_koji_fetch_records_ssl_verification_failures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Record the affected Koji URL before offering insecure access."""
+    module = _load_mcp_module(monkeypatch, "koji-mcp.py")
+    ssl_error = ssl.SSLError("certificate rejected")
+
+    def raise_ssl_error(*_args: object, **_kwargs: object) -> None:
+        raise urllib.error.URLError(ssl_error)
+
+    monkeypatch.setattr(module.urllib.request, "urlopen", raise_ssl_error)
+    result = module.koji_fetch("/path", override_base_url="https://example.test")
+
+    assert "SSL certificate verification failed" in result["error"]
+    assert module._ssl_errors_seen == {"https://example.test"}  # noqa: SLF001 - verify internal approval gate state
 
 
 @pytest.mark.parametrize(
