@@ -28,7 +28,6 @@ components = [
     "rust-uu_sort",
     "rust-uu_tsort",
     "rust-uu_vdir",
-    "rust-uu_wc",
 ]
 
 [[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
