@@ -1,0 +1,10 @@
+--- icu_locale_fallback-2.3.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ icu_locale_fallback-2.3.0/Cargo.toml	2026-08-18T11:05:42.941869+00:00
+@@ -152,5 +152,5 @@
+ [dev-dependencies.serde_json]
+ version = "1.0.45"
+ 
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.5.0"
++[dev-dependencies.writeable]
++version = "0.6.4"
