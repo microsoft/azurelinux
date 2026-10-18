@@ -8,7 +8,9 @@ import importlib.machinery
 import importlib.util
 import sys
 import types
-from contextlib import contextmanager
+import urllib.error
+from contextlib import contextmanager, nullcontext
+from email.message import Message
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
@@ -239,6 +241,47 @@ def test_probe_repo_rejects_redirect_to_ftp() -> None:
     assert status == "fail"
     assert error is not None
     assert "unsupported scheme 'ftp'" in error
+
+
+@pytest.mark.parametrize(
+    ("outcome", "expected"),
+    [
+        (None, ("ok", None)),
+        (200, ("ok", None)),
+        (300, ("fail", "HTTP 300")),
+        (
+            urllib.error.HTTPError("https://example.test", 404, "missing", Message(), None),
+            ("missing", None),
+        ),
+        (
+            urllib.error.HTTPError("https://example.test", 503, "unavailable", Message(), None),
+            ("fail", "HTTP 503"),
+        ),
+        (urllib.error.URLError(FileNotFoundError()), ("missing", None)),
+        (urllib.error.URLError("connection refused"), ("fail", "URL error: connection refused")),
+        (TimeoutError(), ("fail", "timed out after 7s")),
+        (ValueError("invalid redirect"), ("fail", "invalid redirect")),
+        (OSError("socket failure"), ("fail", "OS error: socket failure")),
+    ],
+)
+def test_probe_repo_preserves_transport_outcomes(
+    monkeypatch: pytest.MonkeyPatch,
+    outcome: int | Exception | None,
+    expected: tuple[str, str | None],
+) -> None:
+    """Preserve every probe outcome while consolidating return paths."""
+    wrapper = _load_dnf_wrapper()
+
+    class Opener:
+        @staticmethod
+        def open(*_args: object, **_kwargs: object) -> object:
+            if isinstance(outcome, Exception):
+                raise outcome
+            return nullcontext(types.SimpleNamespace(status=outcome))
+
+    monkeypatch.setattr(wrapper, "build_repository_url_opener", Opener)
+
+    assert wrapper.probe_repo("https://example.test/repo", timeout=7) == expected
 
 
 def test_dnf_repository_discovery_preserves_probe_results(
