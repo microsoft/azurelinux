@@ -1,0 +1,24 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+bugs = [{ url = "https://github.com/microsoft/azurelinux/pull/19493#discussion_r4309259101" }]
+
+[[overlays]]
+description = "Stage the supplied SensorFu MIT notice so both RPMs can ship it; remove when Fedora packages Source10"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["install -pm 0644 %{SOURCE10} LICENSE-MIT"]
+
+[[overlays]]
+description = "Include the SensorFu copyright and permission notice in the cargo-cyclonedx binary RPM"
+type = "spec-prepend-lines"
+section = "%files"
+package = "%{crate}"
+lines = ["%license LICENSE-MIT"]
+
+[[overlays]]
+description = "Mark the SensorFu MIT notice installed with the crate sources as a license in the devel RPM"
+type = "spec-prepend-lines"
+section = "%files"
+package = "devel"
+lines = ["%license %{crate_instdir}/LICENSE-MIT"]
