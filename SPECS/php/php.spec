@@ -82,6 +82,8 @@ Patch47:        php-8.3.14-phpinfo.patch
 # Security fixes (200+)
 # Embargoed candidate; final upstream approval is not confirmed.
 Patch200:       php-8.3.35-oom-candidate.patch
+# Scanner C output generated with re2c 4.0.2 for the candidate.
+Patch201:       php-8.3.35-oom-generated-scanners.patch
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
 Patch300:       php-7.4.0-datetests.patch
@@ -109,7 +111,6 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  perl-interpreter
 BuildRequires:  pkgconfig
-BuildRequires:  re2c
 BuildRequires:  smtpdaemon
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  tzdata
@@ -720,6 +721,7 @@ in pure PHP.
 
 # security patches
 %patch 200 -p1 -b .oom-candidate
+%patch 201 -p1 -b .oom-generated-scanners
 
 # Fixes for tests
 %patch 300 -p1 -b .datetests
@@ -827,15 +829,6 @@ cat `aclocal --print-ac-dir`/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m
 # Regenerate configure scripts (patches change config.m4's)
 touch configure.ac
 ./buildconf --force
-
-# Regenerate scanner output changed by the candidate patch.
-re2c --no-generation-date -b \
-    -o ext/standard/var_unserializer.c ext/standard/var_unserializer.re
-re2c --no-generation-date -b \
-    -o ext/standard/url_scanner_ex.c ext/standard/url_scanner_ex.re
-re2c --no-generation-date -bci \
-    -t ext/json/php_json_scanner_defs.h \
-    -o ext/json/json_scanner.c ext/json/json_scanner.re
 
 CFLAGS=$(echo %{optflags} -fno-strict-aliasing -Wno-pointer-sign | sed 's/-mstackrealign//')
 export CFLAGS
@@ -1530,6 +1523,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 * Sat Oct 17 2026 Jon Slobodzian <joslobo@microsoft.com> - 8.3.35-3
 - Replace the embargoed build placeholder with the candidate OOM remediation.
 - Pin the candidate to upstream revision 07b44b5b3d88; final approval pending.
+- Include regenerated scanner C sources without a re2c build dependency.
 
 * Fri Oct 16 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.3.35-2
 - Add a non-functional placeholder patch for embargoed build validation.
