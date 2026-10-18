@@ -1,33 +1,22 @@
-Subject: [PATCH] Diagnose and recover a pending test-process exit status
+Subject: [PATCH] Recover a pending test-process exit status
 
-Temporary private validation patch for the PHP 8.3.35 OOM candidate.
+Private test-runner fix for the PHP 8.3.35 OOM candidate.
 Embargoed: Keep this patch private until disclosure.
 
 The test runner checks process status without waiting after pipe EOF.
 Wait using proc_close() before formatting termination status, and use
 its exit code if the initial status still reports a running process.
-For the hard-limit compilation test, log the initial process status and
-final proc_close() result to runner stderr, outside the PHPT output.
-
-The test and its required Termsig=9 expectation are unchanged. The next
-ARM64 run must establish whether this is actually an exit-reporting race.
+The test and its required Termsig=9 expectation are unchanged.
 No production PHP runtime code is changed by this patch.
 
 diff --git a/run-tests.php b/run-tests.php
 --- a/run-tests.php
 +++ b/run-tests.php
-@@ -1259,6 +1259,19 @@
+@@ -1259,6 +1259,12 @@
      }
  
      $stat = proc_get_status($proc);
 +    $finalExitcode = proc_close($proc);
-+
-+    if (str_contains($commandline, 'oom_hard_limit_exceeded_during_complilation.php')) {
-+        fwrite(STDERR, "[php-exit-diag] " . json_encode([
-+            'initial_status' => $stat,
-+            'proc_close_exitcode' => $finalExitcode,
-+        ]) . "\n");
-+    }
 +
 +    // Pipe EOF may precede availability of the child's exit status.
 +    if ($stat['running'] && $finalExitcode >= 0) {
@@ -36,7 +25,7 @@ diff --git a/run-tests.php b/run-tests.php
  
      if ($stat['signaled']) {
          $data .= "\nTermsig=" . $stat['stopsig'] . "\n";
-@@ -1270,7 +1283,6 @@
+@@ -1270,7 +1276,6 @@
          $data .= "\nTermsig=" . $stat["exitcode"] . "\n";
      }
  

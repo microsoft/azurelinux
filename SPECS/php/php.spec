@@ -87,12 +87,14 @@ Patch201:       php-8.3.35-oom-generated-scanners.patch
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
 Patch300:       php-7.4.0-datetests.patch
-# Temporary runner diagnostics and pending-exit-status recovery.
+# Test-runner pending-exit-status recovery.
 Patch301:       php-8.3.35-test-exit-status.patch
+Patch302:       php-8.3.35-ecc-custom-params-skip.patch
 # used for tests
 BuildRequires:  /bin/ps
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  bison
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  gcc
@@ -728,6 +730,7 @@ in pure PHP.
 # Fixes for tests
 %patch 300 -p1 -b .datetests
 %patch 301 -p1 -b .test-exit-status
+%patch 302 -p1 -b .ecc-custom-params
 
 
 # Prevent %%doc confusion over LICENSE files
@@ -1138,7 +1141,7 @@ if ! make test TESTS=-j4; then
     fi
   done
   set -x
-  #exit 1
+  exit 1
 fi
 unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %endif
@@ -1527,7 +1530,10 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Replace the embargoed build placeholder with the candidate OOM remediation.
 - Pin the candidate to upstream revision 07b44b5b3d88; final approval pending.
 - Include regenerated scanner C sources without a re2c build dependency.
-- Diagnose and recover pending process exit status in the PHPT runner.
+- Recover pending process exit status in the PHPT runner.
+- Require bison to regenerate parsers from the patched grammars.
+- Skip the custom EC parameter test when OpenSSL policy rejects the curve.
+- Fail the build when the PHP self-test suite fails.
 
 * Fri Oct 16 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.3.35-2
 - Add a non-functional placeholder patch for embargoed build validation.
