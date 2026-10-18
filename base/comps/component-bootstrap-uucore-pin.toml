@@ -10,7 +10,6 @@ components = [
     "rust-uu_expr",
     "rust-uu_join",
     "rust-uu_shuf",
-    "rust-uu_sort",
     "rust-uu_vdir",
 ]
 
