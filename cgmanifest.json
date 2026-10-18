@@ -3048,8 +3048,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "23.11.3",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-23.11.3.tar.xz"
+          "version": "23.11.8",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-23.11.8.tar.xz"
         }
       }
     },
