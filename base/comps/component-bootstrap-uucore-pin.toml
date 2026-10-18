@@ -1,12 +1,10 @@
 # Keep failing consumers pinned alongside consumers awaiting updated providers.
-# Unpin base64/basenc after base32, dir/vdir after ls, and coreutils last.
+# Unpin dir/vdir after ls, and coreutils last.
 
 [component-groups.rust-uucore-version-pin]
 description = "Retain bootstrap guards on failing consumers and consumers pending their dependency build wave"
 components = [
     "rust-coreutils",
-    "rust-uu_base64",
-    "rust-uu_basenc",
     "rust-uu_cksum",
     "rust-uu_csplit",
     "rust-uu_date",
