@@ -1,6 +1,6 @@
 Summary:        X.Org X11 libXi runtime library
 Name:           libXi
-Version:        1.8.1
+Version:        1.8.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -69,6 +69,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*.3*
 
 %changelog
+* Sun Oct 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.4-1
+- Auto-upgrade to 1.8.4 - for CVE-2026-94282, CVE-2026-93545, CVE-2026-94281, CVE-2026-93542, CVE-2026-93543, CVE-2026-93544, CVE-2026-93541
+
 * Tue Jan 23 2024 Archana Choudhary <archana1@microsoft.com> - 1.8.1-1
 - Upgrade to 1.8.1
 
