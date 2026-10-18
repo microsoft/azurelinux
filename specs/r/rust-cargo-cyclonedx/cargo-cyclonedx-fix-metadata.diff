@@ -1,0 +1,38 @@
+--- cargo-cyclonedx-0.5.9/Cargo.toml	2006-07-24T01:21:28+00:00
++++ cargo-cyclonedx-0.5.9/Cargo.toml	2026-08-30T08:19:55.595094+00:00
+@@ -40,7 +40,7 @@
+     "development-tools",
+     "development-tools::cargo-plugins",
+ ]
+-license = "Apache-2.0"
++license = "Apache-2.0 AND MIT"
+ repository = "https://github.com/CycloneDX/cyclonedx-rust-cargo"
+ 
+ [package.metadata.binstall]
+@@ -62,7 +62,7 @@
+ version = "1.0.75"
+ 
+ [dependencies.cargo-lock]
+-version = "10.0.1"
++version = "11.0.1"
+ 
+ [dependencies.cargo_metadata]
+ version = "0.18.1"
+@@ -75,7 +75,7 @@
+ version = "0.8.1"
+ 
+ [dependencies.env_logger]
+-version = "0.10.0"
++version = "0.11.0"
+ 
+ [dependencies.log]
+ version = "0.4.20"
+@@ -109,7 +109,7 @@
+ version = "0.3.36"
+ 
+ [dependencies.validator]
+-version = "0.19.0"
++version = "0.21.0"
+ 
+ [dev-dependencies.assert_cmd]
+ version = "2.1.2"
