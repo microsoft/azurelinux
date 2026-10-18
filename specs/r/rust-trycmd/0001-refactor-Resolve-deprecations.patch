@@ -1,0 +1,25 @@
+From 5f82c86150f64acd85288333003e388b0c320645 Mon Sep 17 00:00:00 2001
+From: Ed Page <eopage@gmail.com>
+Date: Mon, 3 Aug 2026 11:59:36 -0500
+Subject: [PATCH] refactor: Resolve deprecations
+
+---
+ src/schema.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/schema.rs b/src/schema.rs
+index e1b9205..14dca62 100644
+--- a/src/schema.rs
++++ b/src/schema.rs
+@@ -713,7 +713,7 @@ impl JoinedArgs {
+ 
+     #[allow(clippy::inherent_to_string_shadow_display)]
+     fn to_string(&self) -> String {
+-        shlex::join(self.inner.iter().map(|s| s.as_str()))
++        shlex::try_join(self.inner.iter().map(|s| s.as_str())).unwrap()
+     }
+ }
+ 
+-- 
+2.55.0
+
