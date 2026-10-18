@@ -1,0 +1,11 @@
+--- cargo_metadata-0.18.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cargo_metadata-0.18.1/Cargo.toml	2025-01-23T15:04:54.018650+00:00
+@@ -32,7 +32,7 @@
+ version = "0.1.2"
+ 
+ [dependencies.derive_builder]
+-version = "0.12"
++version = "0.20"
+ optional = true
+ 
+ [dependencies.semver]
