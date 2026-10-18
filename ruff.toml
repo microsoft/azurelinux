@@ -17,15 +17,14 @@ target-version = "py312"
 [lint]
 select = ["ALL"] # Everything
 ignore = [
-    # Existing repository debt. Remove codes from this baseline as focused
-    # cleanup changes make each rule green.
+    # Intentional repository policy exceptions. Do not add cleanup debt here.
     "COM812", # Conflicts with formatter.
-    "EM101",
-    "EM102",
+    "EM101",  # One-use message variables add indirection to short, script-local exceptions.
+    "EM102",  # Inline f-strings keep dynamic exception diagnostics beside their validation logic.
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
     "S607",   # Requiring abspath for all binaries used is very restrictive
     "T201",   # These scripts are fine to use `print` for output
-    "TRY003",
+    "TRY003", # Domain-specific exception classes are excessive for script-local validation errors.
 ]
 
 fixable = ["ALL"]
