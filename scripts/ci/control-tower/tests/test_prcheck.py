@@ -37,11 +37,13 @@ def test_main_uses_pipeline_service_connection(monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.setattr(run_prcheck.ct, "make_credential", make_credential, raising=False)
     monkeypatch.setattr(run_prcheck.ct, "get_token", Mock(return_value="token"))
     monkeypatch.setattr(run_prcheck.ct, "make_session", Mock(return_value=object()))
-    monkeypatch.setattr(run_prcheck.ct, "post_scenario", Mock(return_value={"jobId": "job-id"}))
+    post_scenario = Mock(return_value={"jobId": "job-id"})
+    monkeypatch.setattr(run_prcheck.ct, "post_scenario", post_scenario)
+    poll_until_terminal = Mock(return_value=({"status": run_prcheck.ct.SUCCESS_STATUS}, False))
     monkeypatch.setattr(
         run_prcheck.ct,
         "poll_until_terminal",
-        Mock(return_value=({"status": run_prcheck.ct.SUCCESS_STATUS}, False)),
+        poll_until_terminal,
     )
     monkeypatch.setattr(run_prcheck.ct, "print_final_status", Mock())
     monkeypatch.setattr(run_prcheck.ct, "report_failure", Mock())
@@ -49,3 +51,7 @@ def test_main_uses_pipeline_service_connection(monkeypatch: pytest.MonkeyPatch) 
     run_prcheck.main()
 
     make_credential.assert_called_once_with()
+    request_context = post_scenario.call_args.args[0]
+    assert request_context.base_url == "https://control-tower.example"
+    assert request_context.audience == "api://control-tower"
+    assert poll_until_terminal.call_args.args[0] is request_context

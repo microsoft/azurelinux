@@ -417,12 +417,13 @@ def _run_search_command(
 
 
 @mcp.tool()
-def distgit_search(
+def distgit_search(  # noqa: PLR0913 - flat fields define the external MCP tool schema
     package: str,
     query: str,
+    *,
     ref: str = "rawhide",
     mode: str = "pickaxe",
-    auto_clean: bool = False,  # noqa: FBT001, FBT002 - MCP schema field is named
+    auto_clean: bool = False,
     override_base_url: str | None = None,
 ) -> StatusDict:
     """Search a Fedora package's git history or content.

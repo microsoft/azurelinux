@@ -64,6 +64,30 @@ class TestPackageBuildLifecycle:
 
         make_credential.assert_called_once_with()
 
+    def test_reuses_request_context_for_submission_and_polling(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        lifecycle_mocks: tuple[Mock, Mock, Mock, Mock],
+    ) -> None:
+        """Pass one normalized request context through the full lifecycle."""
+        post_scenario, poll_until_terminal, _, _ = lifecycle_mocks
+        request_context = object()
+        make_request_context = Mock(return_value=request_context)
+        monkeypatch.setattr(
+            package_build.ct,
+            "make_request_context",
+            make_request_context,
+        )
+
+        _submit()
+
+        make_request_context.assert_called_once_with(
+            "https://control-tower.example",
+            "api://control-tower",
+        )
+        assert post_scenario.call_args.args[0] is request_context
+        assert poll_until_terminal.call_args.args[0] is request_context
+
     @pytest.mark.parametrize("job_id", [None, 123])
     def test_missing_or_non_string_job_id_fails(
         self,
