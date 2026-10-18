@@ -12291,8 +12291,8 @@
         "type": "other",
         "other": {
           "name": "libXrender",
-          "version": "0.9.11",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.11.tar.gz"
+          "version": "0.9.13",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.13.tar.gz"
         }
       }
     },
