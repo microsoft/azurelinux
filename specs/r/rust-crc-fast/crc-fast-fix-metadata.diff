@@ -1,0 +1,31 @@
+--- crc-fast-1.10.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ crc-fast-1.10.0/Cargo.toml	2026-01-02T16:05:03.122830+00:00
+@@ -35,7 +35,7 @@
+     "encoding",
+     "hardware-support",
+ ]
+-license = "MIT OR Apache-2.0"
++license = "(MIT OR Apache-2.0) AND Zlib"
+ repository = "https://github.com/awesomized/crc-fast-rust"
+ 
+ [package.metadata.docs.rs]
+@@ -147,9 +147,6 @@
+ [dev-dependencies.crc]
+ version = "3.4"
+ 
+-[dev-dependencies.criterion]
+-version = "0.7"
+-
+ [dev-dependencies.proptest]
+ version = "1.9"
+ 
+@@ -158,9 +155,6 @@
+ 
+ [dev-dependencies.regex]
+ version = "1.12"
+-
+-[dev-dependencies.wasm-bindgen-test]
+-version = "0.3"
+ 
+ [target.'cfg(target_arch = "aarch64")'.dependencies.spin]
+ version = "0.10.0"
