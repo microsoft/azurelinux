@@ -19,7 +19,7 @@ ALLOWED_REPOSITORY_URL_SCHEMES = frozenset({"file", "http", "https"})
 class _RepositoryRedirectHandler(urllib.request.HTTPRedirectHandler):
     """Reject redirects to repository transports outside the allowlist."""
 
-    def redirect_request(
+    def redirect_request(  # noqa: PLR0913, PLR0917 - signature overrides urllib
         self,
         req: urllib.request.Request,
         fp: IO[bytes],

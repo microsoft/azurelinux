@@ -17,6 +17,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import NamedTuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -220,21 +221,30 @@ def _print_severity_comparison(
     print()
 
 
+class ComparisonLabels(NamedTuple):
+    """Display labels for the two input reports and synthesized result."""
+
+    report_a: str = "Reviewer A"
+    report_b: str = "Reviewer B"
+    final: str = "Synthesized"
+
+
+_DEFAULT_COMPARISON_LABELS = ComparisonLabels()
+
+
 def compare_reports(
     report_a: SpecReviewReport,
     report_b: SpecReviewReport,
     report_final: SpecReviewReport,
-    label_a: str = "Reviewer A",
-    label_b: str = "Reviewer B",
-    label_final: str = "Synthesized",
+    labels: ComparisonLabels = _DEFAULT_COMPARISON_LABELS,
 ) -> None:
     """Print a human-readable comparison of two reviewer reports and the synthesis."""
     reports = (report_a, report_b, report_final)
     _print_comparison_summary(
         (
-            (label_a, report_a),
-            (label_b, report_b),
-            (label_final, report_final),
+            (labels.report_a, report_a),
+            (labels.report_b, report_b),
+            (labels.final, report_final),
         )
     )
     for severity, icon in (
@@ -286,7 +296,12 @@ def _run_compare(args: argparse.Namespace) -> int:
         print(f"Validation failed: {e}", file=sys.stderr)
         return 2
 
-    compare_reports(report_a, report_b, report_final, args.label_a, args.label_b, args.label_final)
+    compare_reports(
+        report_a,
+        report_b,
+        report_final,
+        ComparisonLabels(args.label_a, args.label_b, args.label_final),
+    )
     return 0
 
 

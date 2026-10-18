@@ -183,20 +183,13 @@ def main() -> None:
         return
 
     # ── Acquire bearer token ─────────────────────────────────────────
-    credential = ct.make_credential()
-    token_holder = ct.TokenHolder(token=ct.get_token(credential, args.api_audience))
-
-    session = ct.make_session()
+    request_context = ct.make_request_context(base_url, args.api_audience)
 
     # ── Call prcheck API ─────────────────────────────────────────────
     try:
         prcheck_response = ct.post_scenario(
-            session,
-            base_url,
+            request_context,
             "/api/Scenario/prcheck",
-            credential,
-            args.api_audience,
-            token_holder,
             payload,
             context="prcheck",
         )
@@ -216,11 +209,7 @@ def main() -> None:
     print(f"Polling job {job_id} for up to {args.poll_timeout_seconds}s for a terminal status...")
     try:
         final, timed_out = ct.poll_until_terminal(
-            session,
-            base_url,
-            credential,
-            args.api_audience,
-            token_holder,
+            request_context,
             job_id,
             args.poll_timeout_seconds,
         )

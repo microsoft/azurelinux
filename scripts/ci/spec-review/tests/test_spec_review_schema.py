@@ -29,6 +29,19 @@ def _load_module() -> ModuleType:
     return module
 
 
+def test_schema_loads_without_sys_modules_registration() -> None:
+    """Support importlib callers that execute the module without registering it."""
+    module_name = "_test_unregistered_spec_review_schema"
+    spec = importlib.util.spec_from_file_location(module_name, _SCRIPT)
+    if spec is None or spec.loader is None:
+        pytest.fail(f"Unable to load module spec for {_SCRIPT}")
+    module = importlib.util.module_from_spec(spec)
+
+    assert module_name not in sys.modules
+    spec.loader.exec_module(module)
+    assert module.ComparisonLabels().final == "Synthesized"
+
+
 @pytest.mark.parametrize("compare", [False, True])
 def test_oversized_json_integer_is_a_validation_failure(
     monkeypatch: pytest.MonkeyPatch,
@@ -78,9 +91,7 @@ def test_compare_reports_preserves_summary_and_finding_categories(
         report("shared", "only-a"),
         report("shared", "only-b"),
         report("shared", "synthesized"),
-        "Alpha",
-        "Beta",
-        "Final",
+        module.ComparisonLabels("Alpha", "Beta", "Final"),
     )
 
     output = capsys.readouterr().out
