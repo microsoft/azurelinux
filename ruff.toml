@@ -22,7 +22,6 @@ ignore = [
     "COM812", # Conflicts with formatter.
     "EM101",
     "EM102",
-    "PLR0911",
     "PLR0913",
     "PLR0917",
     "S603",   # Check for validation of input to subprocess calls, almost always a false positive
