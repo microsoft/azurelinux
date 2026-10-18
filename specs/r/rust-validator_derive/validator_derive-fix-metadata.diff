@@ -1,0 +1,11 @@
+--- validator_derive-0.20.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ validator_derive-0.20.1/Cargo.toml	2026-08-30T07:41:01.058992+00:00
+@@ -42,7 +42,7 @@
+ proc-macro = true
+ 
+ [dependencies.darling]
+-version = "0.23"
++version = ">=0.21, <0.24"
+ features = ["suggestions"]
+ 
+ [dependencies.proc-macro-error3]
