@@ -1,0 +1,31 @@
+--- fs4-0.13.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fs4-0.13.1/Cargo.toml	2025-09-28T22:00:13.596823+00:00
+@@ -65,7 +65,6 @@
+     "fs-err3",
+     "fs-err3/tokio",
+ ]
+-smol = ["dep:smol"]
+ sync = []
+ tokio = ["dep:tokio"]
+ 
+@@ -86,10 +85,6 @@
+ version = "3"
+ optional = true
+ package = "fs-err"
+-
+-[dependencies.smol]
+-version = "2"
+-optional = true
+ 
+ [dependencies.tokio]
+ version = "1"
+@@ -117,9 +112,6 @@
+ [dev-dependencies.libc]
+ version = "0.2"
+ 
+-[dev-dependencies.smol-potat]
+-version = "1.1"
+-
+ [dev-dependencies.tempfile]
+ version = "3"
+ 
