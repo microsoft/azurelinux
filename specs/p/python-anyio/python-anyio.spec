@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/python-anyio.azl.macros}
+
 %global srcname anyio
 
 %global common_description %{expand:
@@ -10,11 +13,12 @@ on top of asyncio, and works in harmony with the native SC of trio itself.}
 
 Name:           python-%{srcname}
 Version:        4.13.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Compatibility layer for multiple asynchronous event loop implementations
 License:        MIT
 URL:            https://github.com/agronholm/anyio
 Source:         %{pypi_source %{srcname}}
+Source9999: python-anyio.azl.macros
 
 BuildArch:      noarch
 
