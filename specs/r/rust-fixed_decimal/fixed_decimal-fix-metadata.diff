@@ -1,0 +1,36 @@
+--- fixed_decimal-0.7.2/Cargo.toml	2006-07-24T01:21:28+00:00
++++ fixed_decimal-0.7.2/Cargo.toml	2026-04-12T21:10:07.303121+00:00
+@@ -61,10 +61,6 @@
+ path = "src/lib.rs"
+ bench = false
+ 
+-[[example]]
+-name = "permyriad"
+-path = "examples/permyriad.rs"
+-
+ [[test]]
+ name = "rounding"
+ path = "tests/rounding.rs"
+@@ -97,22 +93,6 @@
+ version = "0.6.1"
+ features = ["alloc"]
+ default-features = false
+-
+-[dev-dependencies.getrandom]
+-version = "0.3"
+-features = ["wasm_js"]
+-
+-[dev-dependencies.rand]
+-version = "0.9"
+-
+-[dev-dependencies.rand_distr]
+-version = "0.5"
+-
+-[dev-dependencies.rand_pcg]
+-version = "0.9"
+-
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.5.0"
+ 
+ [lints.clippy]
+ alloc-instead-of-core = "warn"
