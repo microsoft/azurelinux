@@ -1,0 +1,22 @@
+--- spin-0.10.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ spin-0.10.1/Cargo.toml	2026-07-21T14:40:19.069934+00:00
+@@ -76,12 +76,6 @@
+ name = "debug"
+ path = "examples/debug.rs"
+ 
+-[[bench]]
+-name = "mutex"
+-path = "benches/mutex.rs"
+-harness = false
+-required-features = ["ticket_mutex"]
+-
+ [dependencies.lock_api_crate]
+ version = "0.4"
+ optional = true
+@@ -92,6 +86,3 @@
+ features = ["require-cas"]
+ optional = true
+ default-features = false
+-
+-[dev-dependencies.criterion]
+-version = "0.4"
