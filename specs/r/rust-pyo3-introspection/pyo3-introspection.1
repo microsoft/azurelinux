@@ -1,0 +1,20 @@
+.TH PYO3\-INTROSPECTION "1" "July 2026" "" "User Commands"
+.SH NAME
+.B pyo3\-introspection
+\(en introspect a Python cdylib built using PyO3 and generate type stubs
+.SH SYNOPSIS
+.B pyo3\-introspection
+.I binary
+.I python_module
+.I stub_path
+.SH OPTIONS
+.SS "POSITIONAL\ ARGUMENTS"
+.TP
+.I binary
+Path of the binary to introspect.
+.TP
+.I python_module
+Name of the python module to introspect.
+.TP
+.I stub_path
+Path of the directory to write the stub to.
