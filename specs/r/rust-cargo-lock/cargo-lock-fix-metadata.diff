@@ -1,0 +1,31 @@
+--- cargo-lock-11.0.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ cargo-lock-11.0.1/Cargo.toml	2026-03-20T11:11:17.769419+00:00
+@@ -43,28 +43,15 @@
+ ]
+ 
+ [features]
+-cli = [
+-    "gumdrop",
+-    "dependency-tree",
+-]
+ dependency-tree = ["petgraph"]
+ 
+ [lib]
+ name = "cargo_lock"
+ path = "src/lib.rs"
+ 
+-[[bin]]
+-name = "cargo-lock"
+-path = "src/bin/cargo-lock/main.rs"
+-required-features = ["cli"]
+-
+ [[test]]
+ name = "lockfile"
+ path = "tests/lockfile.rs"
+-
+-[dependencies.gumdrop]
+-version = "0.8"
+-optional = true
+ 
+ [dependencies.petgraph]
+ version = "0.8.2"
