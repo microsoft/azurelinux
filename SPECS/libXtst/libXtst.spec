@@ -1,6 +1,6 @@
 Summary:        X.Org X11 libXtst runtime library
 Name:           libXtst
-Version:        1.2.4
+Version:        1.2.6
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -66,6 +66,9 @@ rm -rf %{buildroot}%{_docdir}
 %{_mandir}/man3/XTest*.3*
 
 %changelog
+* Sun Oct 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.6-1
+- Auto-upgrade to 1.2.6 - for CVE-2026-94286, CVE-2026-109088
+
 * Wed Dec 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.4-1
 - Update to v1.2.4
 
