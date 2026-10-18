@@ -1929,6 +1929,7 @@ components = [
     "python-et_xmlfile",
     "python-execnet",
     "python-fabric",
+    "python-fido2",
     "python-filelock",
     "python-fixtures",
     "python-flake8",
