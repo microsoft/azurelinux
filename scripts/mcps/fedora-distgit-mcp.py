@@ -176,8 +176,13 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
     if warn:
         return "", warn
 
-    Path(repo_dir).parent.mkdir(parents=True, exist_ok=True)
     clone_url = f"{base_url}/rpms/{package}.git"
+    return _clone_repo(repo_dir, clone_url)
+
+
+def _clone_repo(repo_dir: str, clone_url: str) -> tuple[str, str | None]:
+    """Clone a dist-git repository and translate expected failures."""
+    Path(repo_dir).parent.mkdir(parents=True, exist_ok=True)
     try:
         result = subprocess.run(
             ["git", "clone", "--quiet", clone_url, repo_dir],
@@ -204,6 +209,36 @@ def _ensure_repo(package: str, base_url: str, *, auto_clean: bool) -> tuple[str,
 # ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
+
+
+def _resolve_base_url(override_base_url: str | None) -> tuple[str, StatusDict | None]:
+    """Resolve an optional per-request base URL override."""
+    if not override_base_url:
+        return _base_url, None
+
+    base, err = validate_base_url(override_base_url)
+    if err:
+        return "", _add_status({"error": err}, full=False)
+    return base, None
+
+
+def _resolve_fetch_url(
+    path: str,
+    override_base_url: str | None,
+) -> tuple[str, StatusDict | None]:
+    """Resolve and validate the URL for a dist-git fetch."""
+    base, error = _resolve_base_url(override_base_url)
+    if error is not None:
+        return "", error
+    if not path.startswith("/"):
+        return "", _add_status({"error": "path must start with '/'"}, full=False)
+
+    url = base + path
+    # Guard against SSRF via URL authority tricks.
+    ssrf_err = check_ssrf(base, url)
+    if ssrf_err:
+        return "", _add_status({"error": ssrf_err}, full=False)
+    return url, None
 
 
 @mcp.tool()
@@ -248,22 +283,9 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
     Response is written to a temp file. Use read_file or grep_search to inspect.
     """
     with _tool_lock:
-        if override_base_url:
-            base, err = validate_base_url(override_base_url)
-            if err:
-                return _add_status({"error": err}, full=False)
-        else:
-            base = _base_url
-
-        if not path.startswith("/"):
-            return _add_status({"error": "path must start with '/'"}, full=False)
-
-        url = base + path
-
-        # Guard against SSRF via URL authority tricks
-        ssrf_err = check_ssrf(base, url)
-        if ssrf_err:
-            return _add_status({"error": ssrf_err}, full=False)
+        url, request_error = _resolve_fetch_url(path, override_base_url)
+        if request_error is not None:
+            return request_error
 
         req = urllib.request.Request(  # noqa: S310 - base URL is restricted and authority-checked
             url, headers={"User-Agent": "fedora-distgit-mcp/1.0"}
@@ -426,16 +448,13 @@ def distgit_search(
     Results are written to a temp file. Use read_file or grep_search to inspect.
     """
     with _tool_lock:
-        if override_base_url:
-            base, err = validate_base_url(override_base_url)
-            if err:
-                return _add_status({"error": err}, full=False)
-        else:
-            base = _base_url
-
-        validation_error = _validate_search_request(query, ref, mode)
-        if validation_error:
-            return _add_status({"error": validation_error}, full=False)
+        base, request_error = _resolve_base_url(override_base_url)
+        if request_error is None:
+            validation_error = _validate_search_request(query, ref, mode)
+            if validation_error:
+                request_error = _add_status({"error": validation_error}, full=False)
+        if request_error is not None:
+            return request_error
 
         repo_dir, err = _ensure_repo(package, base, auto_clean=auto_clean)
         if err:
@@ -489,17 +508,15 @@ def distgit_show(
             instead of the default.
     """
     with _tool_lock:
-        if override_base_url:
-            base, err = validate_base_url(override_base_url)
-            if err:
-                return _add_status({"error": err}, full=False)
-        else:
-            base = _base_url
-
-        # Validate commit is a hex SHA (prevents argument injection when commit
-        # appears before "--" in the arg list)
-        if not re.match(r"^[a-fA-F0-9]{4,40}$", commit):
-            return _add_status({"error": "commit must be a hex SHA hash (4-40 chars)."}, full=False)
+        base, request_error = _resolve_base_url(override_base_url)
+        # A hex-only commit prevents Git option injection before the "--".
+        if request_error is None and not re.match(r"^[a-fA-F0-9]{4,40}$", commit):
+            request_error = _add_status(
+                {"error": "commit must be a hex SHA hash (4-40 chars)."},
+                full=False,
+            )
+        if request_error is not None:
+            return request_error
 
         repo_dir, err = _ensure_repo(package, base, auto_clean=auto_clean)
         if err:
