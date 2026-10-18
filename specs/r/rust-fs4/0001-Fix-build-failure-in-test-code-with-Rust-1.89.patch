@@ -1,0 +1,33 @@
+From 5b89a2f2b4091f54c8a7b5ec119e727a122db754 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Mon, 18 Aug 2025 16:32:51 +0200
+Subject: [PATCH] Fix build failure in test code with Rust 1.89+
+
+---
+ src/file_ext/sync_impl.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/file_ext/sync_impl.rs b/src/file_ext/sync_impl.rs
+index 4cb31b0..6fcdc1f 100644
+--- a/src/file_ext/sync_impl.rs
++++ b/src/file_ext/sync_impl.rs
+@@ -177,7 +177,7 @@ macro_rules! test_mod {
+                     false,
+                 );
+                 assert_eq!(
+-                    file2.try_lock_shared().unwrap(),
++                    FileExt::try_lock_shared(&file2).unwrap(),
+                     false,
+                 );
+ 
+@@ -208,7 +208,7 @@ macro_rules! test_mod {
+ 
+                 file1.lock_exclusive().unwrap();
+                 assert_eq!(
+-                    file2.try_lock_shared().unwrap(),
++                    FileExt::try_lock_shared(&file2).unwrap(),
+                     false,
+                 );
+ 
+-- 
+2.50.1
