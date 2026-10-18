@@ -87,6 +87,8 @@ Patch201:       php-8.3.35-oom-generated-scanners.patch
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
 Patch300:       php-7.4.0-datetests.patch
+# Temporary runner diagnostics and pending-exit-status recovery.
+Patch301:       php-8.3.35-test-exit-status.patch
 # used for tests
 BuildRequires:  /bin/ps
 BuildRequires:  autoconf
@@ -725,6 +727,7 @@ in pure PHP.
 
 # Fixes for tests
 %patch 300 -p1 -b .datetests
+%patch 301 -p1 -b .test-exit-status
 
 
 # Prevent %%doc confusion over LICENSE files
@@ -1524,6 +1527,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Replace the embargoed build placeholder with the candidate OOM remediation.
 - Pin the candidate to upstream revision 07b44b5b3d88; final approval pending.
 - Include regenerated scanner C sources without a re2c build dependency.
+- Diagnose and recover pending process exit status in the PHPT runner.
 
 * Fri Oct 16 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.3.35-2
 - Add a non-functional placeholder patch for embargoed build validation.
