@@ -1,0 +1,11 @@
+--- reqsign-aws-core-3.2.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ reqsign-aws-core-3.2.0/Cargo.toml	2026-09-26T06:56:55.509951+00:00
+@@ -48,7 +48,7 @@
+ version = "2"
+ 
+ [dependencies.quick-xml]
+-version = "0.42.0"
++version = ">=0.41.0, <0.43.0"
+ features = ["serialize"]
+ 
+ [dependencies.reqsign-core]
