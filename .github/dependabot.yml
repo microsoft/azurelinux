@@ -45,6 +45,10 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     target-branch: "4.0"
+    # Our own workflows intentionally follow the release branch.
+    # Leave these references alone until we refactor the workflows.
+    ignore:
+      - dependency-name: "microsoft/azurelinux/.github/workflows/*"
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
