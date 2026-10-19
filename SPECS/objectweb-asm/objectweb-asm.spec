@@ -17,7 +17,7 @@
 %global debug_package %{nil}
 
 Name:           objectweb-asm
-Version:        9.6
+Version:        9.11.1
 Release:        1%{?dist}
 Summary:        Java bytecode manipulation framework
 License:        BSD-3-Clause
@@ -99,6 +99,9 @@ done
 %license LICENSE.txt
 
 %changelog
+* Mon Oct 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.11.1-1
+- Auto-upgrade to 9.11.1 - for CVE-2026-110257, CVE-2026-110258, CVE-2026-110260, CVE-2026-110261, CVE-2026-110262, CVE-2026-110263, CVE-2026-110270, CVE-2026-110591
+
 * Thu Apr 04 2024 Mitch Zhu <mitchzhu@microsoft.com> - 9.6-1
 - Upgrade to version 9.6
 - Import build and install section from Fedora 40 (license: MIT).
