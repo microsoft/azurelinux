@@ -96,6 +96,9 @@ done
  
 %install
 %mvn_install
+# Remove embedded legal files from javadoc; license is covered by top-level %license files
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
 %jpackage_script org.objectweb.asm.xml.Processor "" "" %{name}/asm:%{name}/asm-attrs:%{name}/asm-util %{name}-processor true
  
 %files -f .mfiles
