@@ -1,0 +1,125 @@
+--- ratatui-0.30.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ratatui-0.30.0/Cargo.toml	2026-02-18T23:34:10.823347+00:00
+@@ -63,10 +63,6 @@
+     "std",
+     "dep:ratatui-crossterm",
+ ]
+-crossterm_0_28 = [
+-    "crossterm",
+-    "ratatui-crossterm/crossterm_0_28",
+-]
+ crossterm_0_29 = [
+     "crossterm",
+     "ratatui-crossterm/crossterm_0_29",
+@@ -93,7 +89,6 @@
+     "ratatui-core/scrolling-regions",
+     "ratatui-crossterm?/scrolling-regions",
+     "ratatui-termion?/scrolling-regions",
+-    "ratatui-termwiz?/scrolling-regions",
+ ]
+ serde = [
+     "std",
+@@ -102,7 +97,6 @@
+     "ratatui-widgets/serde",
+     "ratatui-crossterm?/serde",
+     "ratatui-termion?/serde",
+-    "ratatui-termwiz?/serde",
+ ]
+ std = [
+     "ratatui-core/std",
+@@ -112,14 +106,9 @@
+     "std",
+     "dep:ratatui-termion",
+ ]
+-termwiz = [
+-    "std",
+-    "dep:ratatui-termwiz",
+-]
+ underline-color = [
+     "ratatui-core/underline-color",
+     "ratatui-crossterm?/underline-color",
+-    "ratatui-termwiz?/underline-color",
+ ]
+ unstable = [
+     "unstable-rendered-line-info",
+@@ -200,11 +189,6 @@
+ name = "widgets_tabs"
+ path = "tests/widgets_tabs.rs"
+ 
+-[[bench]]
+-name = "main"
+-path = "benches/main.rs"
+-harness = false
+-
+ [dependencies.document-features]
+ version = "0.2"
+ optional = true
+@@ -225,10 +209,6 @@
+ 
+ [dependencies.ratatui-macros]
+ version = "0.7.0"
+-optional = true
+-
+-[dependencies.ratatui-termwiz]
+-version = "0.1.0"
+ optional = true
+ 
+ [dependencies.ratatui-widgets]
+@@ -242,31 +222,12 @@
+ [dev-dependencies.color-eyre]
+ version = "0.6"
+ 
+-[dev-dependencies.criterion]
+-version = "0.8"
+-features = ["html_reports"]
+-
+ [dev-dependencies.crossterm]
+ version = "0.29"
+ features = ["event-stream"]
+ 
+-[dev-dependencies.fakeit]
+-version = "1"
+-
+-[dev-dependencies.futures]
+-version = "0.3"
+-
+-[dev-dependencies.indoc]
+-version = "2"
+-
+ [dev-dependencies.pretty_assertions]
+ version = "1"
+-
+-[dev-dependencies.rand]
+-version = "0.9"
+-
+-[dev-dependencies.rand_chacha]
+-version = "0.9"
+ 
+ [dev-dependencies.rstest]
+ version = "0.26"
+@@ -278,25 +239,6 @@
+ version = "0.3"
+ features = ["local-offset"]
+ default-features = false
+-
+-[dev-dependencies.tokio]
+-version = "1"
+-features = [
+-    "rt",
+-    "macros",
+-    "time",
+-    "rt-multi-thread",
+-]
+-
+-[dev-dependencies.tracing]
+-version = "0.1"
+-
+-[dev-dependencies.tracing-appender]
+-version = "0.2"
+-
+-[dev-dependencies.tracing-subscriber]
+-version = "0.3"
+-features = ["env-filter"]
+ 
+ [target."cfg(not(windows))".dependencies.ratatui-termion]
+ version = "0.1.0"
