@@ -5,7 +5,6 @@
 description = "Retain bootstrap guards on failing consumers and consumers pending their dependency build wave"
 components = [
     "rust-coreutils",
-    "rust-uu_join",
 ]
 
 [[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
