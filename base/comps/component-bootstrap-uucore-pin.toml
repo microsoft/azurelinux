@@ -8,7 +8,6 @@ components = [
     "rust-uu_dir",
     "rust-uu_expr",
     "rust-uu_join",
-    "rust-uu_shuf",
     "rust-uu_vdir",
 ]
 
