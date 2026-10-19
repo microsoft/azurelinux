@@ -48,7 +48,7 @@ These come up often as possible replacements for the components above. They are 
 
 | Alternative | Status |
 |---|---|
-| uutils coreutils | Built as the `uutils-coreutils` subpackage of the [`rust-coreutils`](../specs/r/rust-coreutils/rust-coreutils.spec) component. No image definition selects it, so images use GNU coreutils. |
+| uutils coreutils | Built as the `uutils-coreutils` subpackage of the [`rust-coreutils`](../specs/r/rust-coreutils/rust-coreutils.spec) component. No image definition selects it. The VM base images use GNU coreutils; the busybox and distroless-debug container images ship busybox instead, and the other distroless images ship neither. |
 | mimalloc | Packaged as a regular library (`mimalloc` and `mimalloc-devel`) and used as a build dependency of `mold`. glibc is not patched to use it, and the [rendered `glibc.spec`](../specs/g/glibc/glibc.spec) does not reference it. |
 | sudo-rs, ntpd-rs | Not packaged. There is no source package for them in this repository. |
 | Hickory DNS | Only some Rust library crates are packaged (the `rust-hickory-*` components, which provide `-devel` subpackages and no binaries). No Hickory DNS server or resolver daemon is built. |
