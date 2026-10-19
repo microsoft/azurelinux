@@ -1,6 +1,6 @@
 Summary:        cifs client utils
 Name:           cifs-utils
-Version:        7.7
+Version:        7.9
 Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
@@ -81,6 +81,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Mon Oct 19 2026 Sean Dougherty <sdougherty@microsoft.com> - 7.9-1
+- Upgrade to 7.9.
+
 * Thu Jul 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.7-1
 - Auto-upgrade to 7.7 - for CVE-2026-12505
 
