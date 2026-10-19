@@ -1,0 +1,57 @@
+--- rusqlite-0.38.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rusqlite-0.38.0/Cargo.toml	2026-06-25T11:21:45.842036+00:00
+@@ -73,7 +73,6 @@
+ blob = []
+ buildtime_bindgen = [
+     "libsqlite3-sys/buildtime_bindgen",
+-    "sqlite-wasm-rs/bindgen",
+ ]
+ bundled = [
+     "libsqlite3-sys/bundled",
+@@ -302,45 +301,6 @@
+ version = "1.0"
+ features = ["v4"]
+ 
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.chrono]
+-version = "0.4.38"
+-features = ["wasmbind"]
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.jiff]
+-version = "0.2"
+-features = ["js"]
+-optional = true
+-default-features = false
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.sqlite-wasm-rs]
+-version = "0.5.1"
+-default-features = false
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.time]
+-version = "0.3.36"
+-features = ["wasm-bindgen"]
+-optional = true
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.uuid]
+-version = "1.0"
+-features = ["js"]
+-optional = true
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.getrandom]
+-version = "0.3"
+-features = ["wasm_js"]
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.uuid]
+-version = "1.0"
+-features = ["js"]
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.wasm-bindgen]
+-version = "0.2.104"
+-
+-[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dev-dependencies.wasm-bindgen-test]
+-version = "0.3.54"
+-
+ [target.'cfg(not(all(target_family = "wasm", target_os = "unknown")))'.dependencies.libsqlite3-sys]
+ version = "0.36.0"
++

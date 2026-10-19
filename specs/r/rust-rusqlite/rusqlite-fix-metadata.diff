@@ -1,0 +1,110 @@
+--- rusqlite-0.38.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rusqlite-0.38.0/Cargo.toml	2026-06-25T11:21:58.784509+00:00
+@@ -74,23 +74,6 @@
+ buildtime_bindgen = [
+     "libsqlite3-sys/buildtime_bindgen",
+ ]
+-bundled = [
+-    "libsqlite3-sys/bundled",
+-    "modern_sqlite",
+-]
+-bundled-full = [
+-    "modern-full",
+-    "bundled",
+-]
+-bundled-sqlcipher = [
+-    "libsqlite3-sys/bundled-sqlcipher",
+-    "bundled",
+-]
+-bundled-sqlcipher-vendored-openssl = [
+-    "libsqlite3-sys/bundled-sqlcipher-vendored-openssl",
+-    "bundled-sqlcipher",
+-]
+-bundled-windows = ["libsqlite3-sys/bundled-windows"]
+ cache = ["hashlink"]
+ collation = []
+ column_decltype = []
+@@ -105,13 +88,8 @@
+ functions = []
+ hooks = []
+ i128_blob = []
+-in_gecko = [
+-    "modern_sqlite",
+-    "libsqlite3-sys/in_gecko",
+-]
+ limits = []
+ load_extension = []
+-loadable_extension = ["libsqlite3-sys/loadable_extension"]
+ modern-full = [
+     "array",
+     "backup",
+@@ -140,7 +118,7 @@
+     "vtab",
+     "window",
+ ]
+-modern_sqlite = ["libsqlite3-sys/bundled_bindings"]
++modern_sqlite = []
+ preupdate_hook = [
+     "libsqlite3-sys/preupdate_hook",
+     "hooks",
+@@ -151,13 +129,10 @@
+     "libsqlite3-sys/session",
+     "hooks",
+ ]
+-sqlcipher = ["libsqlite3-sys/sqlcipher"]
+ trace = []
+ unlock_notify = ["libsqlite3-sys/unlock_notify"]
+ vtab = []
+-wasm32-wasi-vfs = ["libsqlite3-sys/wasm32-wasi-vfs"]
+ window = ["functions"]
+-with-asan = ["libsqlite3-sys/with-asan"]
+ 
+ [lib]
+ name = "rusqlite"
+@@ -174,16 +149,6 @@
+ ]
+ 
+ [[example]]
+-name = "loadable_extension"
+-crate-type = ["cdylib"]
+-path = "examples/loadable_extension.rs"
+-required-features = [
+-    "loadable_extension",
+-    "functions",
+-    "trace",
+-]
+-
+-[[example]]
+ name = "owning_rows"
+ path = "examples/owning_rows.rs"
+ 
+@@ -242,7 +207,7 @@
+ version = "0.1"
+ 
+ [dependencies.hashlink]
+-version = "0.11"
++version = ">=0.11, <0.13"
+ optional = true
+ 
+ [dependencies.jiff]
+@@ -250,10 +215,6 @@
+ features = ["std"]
+ optional = true
+ default-features = false
+-
+-[dependencies.rusqlite-macros]
+-version = "0.4.2"
+-optional = true
+ 
+ [dependencies.serde_json]
+ version = "1.0"
+@@ -279,9 +240,6 @@
+ version = "1.0"
+ optional = true
+ 
+-[dev-dependencies.bencher]
+-version = "0.1"
+-
+ [dev-dependencies.doc-comment]
+ version = "0.3"
+ 
