@@ -1,0 +1,95 @@
+diff --git a/cloudinit/config/cc_rsyslog.py b/cloudinit/config/cc_rsyslog.py
+index d7133ba..3ab7e51 100644
+--- a/cloudinit/config/cc_rsyslog.py
++++ b/cloudinit/config/cc_rsyslog.py
+@@ -179,7 +179,7 @@ def apply_rsyslog_changes(configs, def_fname, cfg_dir):
+             endl = ""
+             if not content.endswith("\n"):
+                 endl = "\n"
+-            util.write_file(filename, content + endl, omode=omode)
++            util.write_file(filename, content + endl, mode=0o640, omode=omode)
+         except Exception:
+             util.logexc(LOG, "Failed to write to %s", filename)
+ 
+diff --git a/tests/unittests/config/test_cc_rsyslog.py b/tests/unittests/config/test_cc_rsyslog.py
+index 0fb0813..84ac652 100644
+--- a/tests/unittests/config/test_cc_rsyslog.py
++++ b/tests/unittests/config/test_cc_rsyslog.py
+@@ -3,6 +3,7 @@
+ import os
+ import re
+ import shutil
++import stat
+ import tempfile
+ from functools import partial
+ from typing import Optional
+@@ -116,6 +117,7 @@ class TestApplyChanges(TestCase):
+         fname = os.path.join(self.tmp, "foo.cfg")
+         self.assertEqual([fname], changed)
+         self.assertEqual(util.load_text_file(fname), cfgline + "\n")
++        self.assertEqual(stat.S_IMODE(os.stat(fname).st_mode), 0o640)
+ 
+     def test_multiple_files(self):
+         configs = [
+@@ -147,6 +149,40 @@ class TestApplyChanges(TestCase):
+                 )
+             )
+         self.assertEqual(expected, actual)
++        for fname, _content in expected:
++            self.assertEqual(stat.S_IMODE(os.stat(fname).st_mode), 0o640)
++
++    def test_custom_and_packaged_filenames_use_restrictive_mode(self):
++        packaged_filename = os.path.join(self.tmp, "21-cloudinit.conf")
++        custom_filename = os.path.join(self.tmp, "custom.conf")
++
++        util.write_file(packaged_filename, "stale\n", mode=0o644, omode="wb")
++
++        with mock.patch(
++            "cloudinit.config.cc_rsyslog.util.write_file",
++            wraps=util.write_file,
++        ) as m_write:
++            changed = apply_rsyslog_changes(
++                configs=[
++                    {"content": "line-1", "filename": "21-cloudinit.conf"},
++                    {"content": "line-2", "filename": "21-cloudinit.conf"},
++                    {"content": "custom-line", "filename": "custom.conf"},
++                ],
++                def_fname="20-cloud-config.conf",
++                cfg_dir=self.tmp,
++            )
++
++        self.assertEqual([packaged_filename, custom_filename], changed)
++        self.assertEqual("line-1\nline-2\n", util.load_text_file(packaged_filename))
++        self.assertEqual("custom-line\n", util.load_text_file(custom_filename))
++        self.assertEqual(stat.S_IMODE(os.stat(packaged_filename).st_mode), 0o640)
++        self.assertEqual(stat.S_IMODE(os.stat(custom_filename).st_mode), 0o640)
++        self.assertEqual(3, len(m_write.call_args_list))
++        self.assertEqual("wb", m_write.call_args_list[0].kwargs["omode"])
++        self.assertEqual("ab", m_write.call_args_list[1].kwargs["omode"])
++        self.assertEqual("wb", m_write.call_args_list[2].kwargs["omode"])
++        for call in m_write.call_args_list:
++            self.assertEqual(0o640, call.kwargs["mode"])
+ 
+     def test_repeat_def(self):
+         configs = ["*.* foohost", "*.warn otherhost"]
+@@ -161,6 +197,7 @@ class TestApplyChanges(TestCase):
+         expected_content = "\n".join([c for c in configs]) + "\n"
+         found_content = util.load_text_file(fname)
+         self.assertEqual(expected_content, found_content)
++        self.assertEqual(stat.S_IMODE(os.stat(fname).st_mode), 0o640)
+ 
+     def test_multiline_content(self):
+         configs = ["line1", "line2\nline3\n"]
+@@ -359,3 +396,12 @@ class TestInstallRsyslog(TestCase):
+             handle("rsyslog", {"rsyslog": config}, cloud, [])
+         m_which.assert_called_with(config["check_exe"])
+         m_install.assert_not_called()
++
++    def test_noop_without_rsyslog_input(self):
++        cloud = get_cloud(distro="ubuntu", metadata={})
++        with mock.patch(
++            "cloudinit.config.cc_rsyslog.apply_rsyslog_changes"
++        ) as m_apply:
++            handle("rsyslog", {}, cloud, [])
++
++        m_apply.assert_not_called()
