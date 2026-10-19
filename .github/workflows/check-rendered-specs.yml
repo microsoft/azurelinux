@@ -22,6 +22,7 @@
 # A selected ref can still contain code introduced through the module's fork
 # network; the sandbox and absence of secrets bound that residual trust.
 # Spec/overlay/lock data still comes from PR head, not a materialized merge tree.
+# All trusted checkouts use the caller's workflow commit, not a moving branch.
 name: "Check Rendered Specs"
 
 on:
@@ -40,6 +41,10 @@ on:
         required: true
         type: string
       repo:
+        required: true
+        type: string
+      trusted-code-sha:
+        description: "Caller workflow commit for trusted scripts and container configuration, never PR head"
         required: true
         type: string
 
@@ -72,13 +77,38 @@ jobs:
       azldev-version: ${{ steps.resolve.outputs.azldev-version }}
       render-all: ${{ steps.resolve.outputs.render-all }}
     steps:
-      # --- Trusted base branch (tools, scripts, container config) ---
-      - name: Checkout base (trusted)
+      # --- Trusted workflow snapshot (tools, scripts, container config) ---
+      - name: Checkout workflow snapshot (trusted)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ inputs.repo }}
-          ref: "4.0"
+          ref: ${{ inputs.trusted-code-sha }}
           persist-credentials: false
+
+      # The workflow and the scripts it runs must come from the same commit.
+      # Otherwise, a new commit landing on 4.0 could make us run newer scripts
+      # with an older workflow. Check this before running any of those scripts,
+      # and print the commit IDs so we can see exactly which versions were used.
+      # The PR's files come from a separate commit: they are input to the check,
+      # not scripts we trust to run. The other jobs reuse this same step below.
+      - &verify-trusted-snapshot
+        name: Verify trusted workflow snapshot
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CALLER_WORKFLOW_REF: ${{ github.workflow_ref }}
+          CALLER_WORKFLOW_SHA: ${{ github.workflow_sha }}
+          TRUSTED_CODE_SHA: ${{ inputs.trusted-code-sha }}
+          PR_HEAD_SHA: ${{ inputs.pr-head-sha }}
+        run: |
+          set -euo pipefail
+          checkout_sha="$(git rev-parse HEAD)"
+          printf 'Event: %s\nCaller workflow: %s\nCaller workflow SHA: %s\nTrusted code SHA: %s\nCheckout SHA: %s\nPR data SHA: %s\n' \
+            "$EVENT_NAME" "$CALLER_WORKFLOW_REF" "$CALLER_WORKFLOW_SHA" \
+            "$TRUSTED_CODE_SHA" "$checkout_sha" "$PR_HEAD_SHA"
+          if [[ "$TRUSTED_CODE_SHA" != "$CALLER_WORKFLOW_SHA" || "$checkout_sha" != "$TRUSTED_CODE_SHA" ]]; then
+            echo "::error::Trusted checkout must match the caller workflow commit"
+            exit 1
+          fi
 
       # --- PR head (untrusted data — TOML configs, overlays, locks) ---
       - name: Checkout PR head (data)
@@ -97,8 +127,9 @@ jobs:
           # sandboxed container — so the fork head is never executed with trust.
           allow-unsafe-pr-checkout: true
 
-      # The trusted helper reads PR data but emits only a validated version and
-      # boolean. Equal pins need one freshness check but no mergeability polling.
+      # Keep scripts pinned to the workflow, but read the current PR base and
+      # its version file separately. On a rerun, 4.0 may have moved since the
+      # workflow's commit. The resolver still checks that this PR base stays current.
       - name: Resolve post-merge azldev version
         id: resolve
         env:
@@ -108,12 +139,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          current_base_sha="$(gh api "repos/$REPO/pulls/$PR_NUMBER" --jq '.base.sha')"
+          if ! [[ "$current_base_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::GitHub returned an invalid PR-base SHA"
+            exit 1
+          fi
+          printf 'Current PR base SHA: %s\n' "$current_base_sha"
+          base_version_file="$RUNNER_TEMP/render-check-base-version"
+          gh api "repos/$REPO/contents/.azldev-version?ref=$current_base_sha" \
+            -H "Accept: application/vnd.github.raw" > "$base_version_file"
+
           resolve_output="$(python3 scripts/ci/render-specs-check/resolve_azldev_version.py \
             --repo "$REPO" \
             --pr-number "$PR_NUMBER" \
             --head-sha "$PR_HEAD_SHA" \
-            --base-sha "$(git rev-parse HEAD)" \
-            --base-version-file .azldev-version \
+            --base-sha "$current_base_sha" \
+            --base-version-file "$base_version_file" \
             --head-version-file pr-head/.azldev-version)"
           echo "$resolve_output"
 
@@ -245,7 +286,7 @@ jobs:
 
   # Post the locks PR comment. Same security posture as the `comment` job:
   # `pull-requests: write` is only granted to a job that does NOT execute any
-  # PR-derived code — only the trusted base branch is checked out, and the
+  # PR-derived code — only the trusted workflow snapshot is checked out, and the
   # update-output artifact is consumed in trusted shape.
   update_locks_comment:
     name: Post locks drift comment
@@ -257,12 +298,14 @@ jobs:
       contents: read
       pull-requests: write # Post/update/delete drift comments on PRs
     steps:
-      - name: Checkout base (trusted)
+      - name: Checkout workflow snapshot (trusted)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ inputs.repo }}
-          ref: "4.0"
+          ref: ${{ inputs.trusted-code-sha }}
           persist-credentials: false
+
+      - *verify-trusted-snapshot
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -334,13 +377,15 @@ jobs:
             exit 1
           fi
 
-      # --- Trusted base branch (tools, scripts, container config) ---
-      - name: Checkout base (trusted)
+      # --- Trusted workflow snapshot (tools, scripts, container config) ---
+      - name: Checkout workflow snapshot (trusted)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ inputs.repo }}
-          ref: "4.0"
+          ref: ${{ inputs.trusted-code-sha }}
           persist-credentials: false
+
+      - *verify-trusted-snapshot
 
       # --- PR head (untrusted data — TOML configs, overlays, specs) ---
       - name: Checkout PR head (data)
@@ -546,7 +591,7 @@ jobs:
 
   # Post the PR comment. Runs in a separate job so the `pull-requests: write`
   # token is only granted to a job that does NOT execute any PR-derived code:
-  # it only checks out the trusted base branch (for the poster script) and
+  # it only checks out the trusted workflow snapshot (for the poster script) and
   # consumes the trusted-shape report artifact from the render job.
   comment:
     name: Post drift comment
@@ -565,12 +610,14 @@ jobs:
       contents: read
       pull-requests: write # Post/update/delete drift comments on PRs
     steps:
-      - name: Checkout base (trusted)
+      - name: Checkout workflow snapshot (trusted)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ inputs.repo }}
-          ref: "4.0"
+          ref: ${{ inputs.trusted-code-sha }}
           persist-credentials: false
+
+      - *verify-trusted-snapshot
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0

@@ -108,7 +108,7 @@ def _github_api(endpoint: str, *options: str) -> str:
 
 
 def _validate_pr_snapshot(fields: list[str], pull_request: PullRequest) -> str:
-    """Validate live PR fields against the trusted workflow snapshot."""
+    """Validate live PR fields against the captured PR snapshot."""
     if len(fields) != PR_FIELD_COUNT:
         message = "GitHub returned an invalid PR response"
         raise ResolutionError(message)
@@ -202,8 +202,8 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--repo", required=True, help="GitHub owner/repository")
     parser.add_argument("--pr-number", required=True, type=int, help="pull request number")
     parser.add_argument("--head-sha", required=True, help="expected PR head commit")
-    parser.add_argument("--base-sha", required=True, help="trusted base commit")
-    parser.add_argument("--base-version-file", required=True, type=Path, help="base azldev version file")
+    parser.add_argument("--base-sha", required=True, help="expected current PR-base commit")
+    parser.add_argument("--base-version-file", required=True, type=Path, help="azldev version file at --base-sha")
     parser.add_argument("--head-version-file", required=True, type=Path, help="PR-head azldev version file")
     return parser.parse_args()
 

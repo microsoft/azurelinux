@@ -117,7 +117,7 @@ def test_invalid_inputs_fail_before_github(
 
 
 def test_stale_base_fails_before_equal_pin_result(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Reject a live PR base that differs from the trusted checkout."""
+    """Reject a PR base that advances after its snapshot was captured."""
     github_api = Mock(return_value=f"{'a' * 40}\t{'c' * 40}\ttrue\n")
     monkeypatch.setattr(resolver, "_github_api", github_api)
 
@@ -205,3 +205,55 @@ def test_read_version_rejects_symlink(tmp_path: Path) -> None:
 
     with pytest.raises(resolver.ResolutionError, match="symlink"):
         resolver._read_version(link)  # noqa: SLF001 - test symlink boundary directly
+
+
+@pytest.mark.parametrize(
+    "versions",
+    [
+        ("v1.2.3", "v1.2.3", None, "v1.2.3", False),
+        ("v2.0.0", "v1.2.3", "v2.0.0", "v2.0.0", False),
+        ("v1.2.3", "v2.0.0", "v2.0.0", "v2.0.0", True),
+    ],
+)
+def test_main_uses_current_base_version_not_trusted_checkout(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    versions: tuple[str, str, str | None, str, bool],
+) -> None:
+    """Resolve against the current base even when trusted code has an older pin."""
+    base_version, head_version, merged_version, expected_version, render_all = versions
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / ".azldev-version").write_text("v0.0.0\n", encoding="ascii")
+    base_file = tmp_path / "current-base-version"
+    head_file = tmp_path / "head-version"
+    base_file.write_text(f"{base_version}\n", encoding="ascii")
+    head_file.write_text(f"{head_version}\n", encoding="ascii")
+    responses = [f"{'a' * 40}\t{'c' * 40}\ttrue\n"]
+    if merged_version is not None:
+        responses.append(f"{merged_version}\n")
+    github_api = Mock(side_effect=responses)
+    monkeypatch.setattr(resolver, "_github_api", github_api)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "resolve_azldev_version.py",
+            "--repo",
+            "microsoft/azurelinux",
+            "--pr-number",
+            "1",
+            "--head-sha",
+            "a" * 40,
+            "--base-sha",
+            "c" * 40,
+            "--base-version-file",
+            str(base_file),
+            "--head-version-file",
+            str(head_file),
+        ],
+    )
+
+    assert resolver.main() == 0
+    assert capsys.readouterr().out == f"azldev-version={expected_version}\nrender-all={str(render_all).lower()}\n"
+    assert github_api.call_count == len(responses)
