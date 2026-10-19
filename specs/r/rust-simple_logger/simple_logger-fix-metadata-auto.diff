@@ -1,0 +1,12 @@
+--- simple_logger-5.2.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ simple_logger-5.2.0/Cargo.toml	2026-03-04T22:14:26.062299+00:00
+@@ -124,9 +124,3 @@
+ ]
+ optional = true
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = "^0.61.2"
+-features = [
+-    "Win32_System_Console",
+-    "Win32_Foundation",
+-]
