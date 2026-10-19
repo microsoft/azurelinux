@@ -1,0 +1,11 @@
+--- ratatui-core-0.1.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ ratatui-core-0.1.0/Cargo.toml	2026-02-18T22:34:29.051939+00:00
+@@ -149,7 +149,7 @@
+ default-features = false
+ 
+ [dependencies.unicode-width]
+-version = ">=0.2.0, <=0.2.2"
++version = "0.2"
+ 
+ [dev-dependencies.pretty_assertions]
+ version = "1"
