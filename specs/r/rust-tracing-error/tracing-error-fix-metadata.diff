@@ -1,0 +1,14 @@
+--- tracing-error-0.2.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tracing-error-0.2.1/Cargo.toml	2024-12-01T20:32:21.839640+00:00
+@@ -68,6 +68,11 @@
+ ]
+ default-features = false
+ 
++[dev-dependencies.tracing]
++version = "0.1.12"
++features = ["std", "attributes"]
++default-features = false
++
+ [features]
+ default = ["traced-error"]
+ traced-error = []
