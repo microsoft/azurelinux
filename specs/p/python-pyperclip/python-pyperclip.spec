@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/python-pyperclip.azl.macros}
+
 # Sphinx-generated HTML documentation is not suitable for packaging; see
 # https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
 #
@@ -11,12 +14,13 @@
 
 Name:           python-pyperclip
 Version:        1.9.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        A cross-platform clipboard module for Python
 
 License:        BSD-3-Clause
 URL:            https://github.com/asweigart/pyperclip
 Source:         %{pypi_source pyperclip}
+Source9999: python-pyperclip.azl.macros
 
 # Fix test suite for release 1.9.0
 # https://github.com/asweigart/pyperclip/pull/270

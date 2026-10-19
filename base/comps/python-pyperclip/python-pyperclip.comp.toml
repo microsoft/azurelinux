@@ -1,0 +1,6 @@
+[components.python-pyperclip]
+
+[components.python-pyperclip.build]
+# Use Xvfb for tests instead of requiring wl-clipboard, whose tests upstream
+# explicitly excludes. This does not disable the module's runtime Wayland backend.
+without = ["wayland"]
