@@ -1,0 +1,25 @@
+From 44cc95efd0d2edbdb15d2caaa00cb8392e57677e Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Fri, 6 Mar 2026 07:02:22 +0000
+Subject: [PATCH] Downstream-only: omit a test that would require
+ icu_provider_blob
+
+---
+ src/zone/offset.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/zone/offset.rs b/src/zone/offset.rs
+index 2b32e74537..6e9fae52be 100644
+--- a/src/zone/offset.rs
++++ b/src/zone/offset.rs
+@@ -390,6 +390,7 @@ impl VariantOffsetsCalculatorBorrowed<'_> {
+ )]
+ pub use crate::provider::VariantOffsets;
+ 
++#[cfg(false)]
+ #[test]
+ #[allow(deprecated)]
+ pub fn test_legacy_offsets_data() {
+-- 
+2.53.0
+
