@@ -1168,6 +1168,7 @@ components = [
     "mptcpd",
     "mrtg",
     "msgpack",
+    "msopenjdk-25-fedora-compat",
     "msr-tools",
     "mstflint",
     "msv",
