@@ -33,7 +33,7 @@
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
 Version:        8.3.35
-Release:        4%{?dist}
+Release:        2%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -1523,24 +1523,8 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
-* Mon Oct 19 2026 Jon Slobodzian <joslobo@microsoft.com> - 8.3.35-4
-- Refresh the embargoed candidate to upstream revision d59a20c8f9dc.
-- Use upstream process-status recovery instead of the local runner patch.
-- Retain generated scanners, bison, the EC policy test skip, and strict self-tests.
-- Final upstream approval remains pending.
-
-* Sat Oct 17 2026 Jon Slobodzian <joslobo@microsoft.com> - 8.3.35-3
-- Replace the embargoed build placeholder with the candidate OOM remediation.
-- Pin the candidate to upstream revision 07b44b5b3d88; final approval pending.
-- Include regenerated scanner C sources without a re2c build dependency.
-- Recover pending process exit status in the PHPT runner.
-- Require bison to regenerate parsers from the patched grammars.
-- Skip the custom EC parameter test when OpenSSL policy rejects the curve.
-- Fail the build when the PHP self-test suite fails.
-
-* Fri Oct 16 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.3.35-2
-- Add a non-functional placeholder patch for embargoed build validation.
-- Replace the placeholder with the security fix before publishing.
+* Mon Oct 19 2026 Jon Slobodzian <joslobo@microsoft.com> - 8.3.35-2
+- Fix CVE-2026-109618 and CVE-2026-109619.
 
 * Thu Sep 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.3.35-1
 - Auto-upgrade to 8.3.35 - for CVE-2026-91768, CVE-2026-92842, CVE-2026-6103, CVE-2025-1218,
