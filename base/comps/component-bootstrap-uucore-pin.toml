@@ -5,7 +5,6 @@
 description = "Retain bootstrap guards on failing consumers and consumers pending their dependency build wave"
 components = [
     "rust-coreutils",
-    "rust-uu_date",
     "rust-uu_dir",
     "rust-uu_expr",
     "rust-uu_join",
