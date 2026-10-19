@@ -6,7 +6,7 @@ Embargoed: Keep this patch in private repositories until disclosure.
 Upstream repository: https://github.com/php/php-src-ghsa-w8hw-w9fx-j79w
 Upstream branch: GHSA-h37m-fxqh-w76h-throw-2-fallible-8.3
 Upstream base: cb6116aed4de058e552dd24b60c2f50d7275891c
-Upstream revision: 07b44b5b3d88c8d8383e2e0a55e2148b78ee291e
+Upstream revision: d59a20c8f9dcd3a7ecf2fb815d996c4e00c49348
 
 This is the complete cumulative diff between the pinned upstream base and
 revision, including runtime changes, tests, and test infrastructure. It
@@ -14,21 +14,76 @@ does not include the baseline's development-version updates. The diff
 applies to the checksum-verified PHP 8.3.35 release source with the
 existing Azure Linux patches.
 
+The NEWS entry is backported into the PHP 8.3.35 release section;
+upstream's PHP 8.3.36 development heading is not added to this release.
+
+diff --git a/.github/actions/brew/action.yml b/.github/actions/brew/action.yml
+index b1e3efd088a..9231b5dc795 100644
+--- a/.github/actions/brew/action.yml
++++ b/.github/actions/brew/action.yml
+@@ -6,6 +6,8 @@ runs:
+       run: |
+         set -x
+ 
++        brew update
++
+         # Patch brew to overwrite always
+         formula_installer="$(brew --repo)"/Library/Homebrew/formula_installer.rb
+         code=" keg.link\(verbose: verbose\?"
+@@ -34,4 +36,5 @@ runs:
+           t1lib \
+           libxml2 \
+           libjpeg \
+-          libxslt
++          libxslt \
++          openssl@3
+diff --git a/.github/actions/configure-macos/action.yml b/.github/actions/configure-macos/action.yml
+index b715472a568..d47dc5559f2 100644
+--- a/.github/actions/configure-macos/action.yml
++++ b/.github/actions/configure-macos/action.yml
+@@ -11,7 +11,7 @@ runs:
+         set -x
+         BREW_OPT="$(brew --prefix)"/opt
+         export PATH="$BREW_OPT/bison/bin:$PATH"
+-        export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BREW_OPT/openssl/lib/pkgconfig"
++        export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BREW_OPT/openssl@3/lib/pkgconfig"
+         export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BREW_OPT/curl/lib/pkgconfig"
+         export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BREW_OPT/krb5/lib/pkgconfig"
+         export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BREW_OPT/libffi/lib/pkgconfig"
+diff --git a/.github/actions/freebsd/action.yml b/.github/actions/freebsd/action.yml
+index 588cb1fc013..3cfdae761af 100644
+--- a/.github/actions/freebsd/action.yml
++++ b/.github/actions/freebsd/action.yml
+@@ -12,7 +12,7 @@ runs:
+     - name: FreeBSD
+       uses: vmactions/freebsd-vm@v1
+       with:
+-        release: '13.5'
++        release: '14.4'
+         usesh: true
+         copyback: false
+         disable-cache: true
 diff --git a/.github/matrix.php b/.github/matrix.php
-index 87486791cff..58edba024c9 100644
+index 87486791cff..f3fb1fa7f03 100644
 --- a/.github/matrix.php
 +++ b/.github/matrix.php
-@@ -129,7 +129,7 @@ function select_jobs($repository, $trigger, $nightly, $labels, $php_version, $re
+@@ -125,11 +125,10 @@ function select_jobs($repository, $trigger, $nightly, $labels, $php_version, $re
+             : ['debug' => [true], 'zts' => [true]];
+     }
+     if ($all_jobs || !$no_jobs || $test_macos) {
+-        $test_arm = version_compare($php_version, '8.4', '>=');
          $jobs['MACOS']['matrix'] = $all_variations
-             ? ['arch' => $test_arm ? ['X64', 'ARM64'] : ['X64'], 'debug' => [true, false], 'zts' => [true, false]]
-             : ['include' => [['arch' => $test_arm ? 'ARM64' : 'X64', 'debug' => true, 'zts' => false]]];
+-            ? ['arch' => $test_arm ? ['X64', 'ARM64'] : ['X64'], 'debug' => [true, false], 'zts' => [true, false]]
+-            : ['include' => [['arch' => $test_arm ? 'ARM64' : 'X64', 'debug' => true, 'zts' => false]]];
 -        $jobs['MACOS']['config']['arm64_version'] = version_compare($php_version, '8.4', '>=') ? '15' : '14';
++            ? ['arch' => ['ARM64'], 'debug' => [true, false], 'zts' => [true, false]]
++            : ['include' => [['arch' => 'ARM64', 'debug' => true, 'zts' => false]]];
 +        $jobs['MACOS']['config']['version'] = version_compare($php_version, '8.4', '>=') ? '26' : '15';
      }
      if ($all_jobs || $test_msan) {
          $jobs['MSAN'] = true;
 diff --git a/.github/workflows/test-suite.yml b/.github/workflows/test-suite.yml
-index c9f61e6adfd..89a5cdb0456 100644
+index c9f61e6adfd..a9bb570f921 100644
 --- a/.github/workflows/test-suite.yml
 +++ b/.github/workflows/test-suite.yml
 @@ -312,7 +312,7 @@ jobs:
@@ -36,15 +91,52 @@ index c9f61e6adfd..89a5cdb0456 100644
        matrix: ${{ fromJson(inputs.branch).jobs.MACOS.matrix }}
      name: "MACOS_${{ matrix.arch }}_${{ matrix.debug && 'DEBUG' || 'RELEASE' }}_${{ matrix.zts && 'ZTS' || 'NTS' }}"
 -    runs-on: macos-${{ matrix.arch == 'X64' && '15-intel' || fromJson(inputs.branch).jobs.MACOS.config.arm64_version }}
-+    runs-on: macos-${{ fromJson(inputs.branch).jobs.MACOS.config.version }}${{ matrix.arch == 'X64' && '-intel' || '' }}
++    runs-on: macos-${{ fromJson(inputs.branch).jobs.MACOS.config.version }}
      timeout-minutes: 180
      steps:
        - name: git checkout
+@@ -345,18 +345,18 @@ jobs:
+         if: ${{ inputs.all_variations }}
+         uses: ./.github/actions/test-macos
+       - name: Test Tracing JIT
+-        if: ${{ matrix.arch == 'X64' || !matrix.zts }}
++        if: ${{ !matrix.zts }}
+         uses: ./.github/actions/test-macos
+         with:
+           enableOpcache: true
+           jitType: tracing
+       - name: Test OpCache
+-        if: ${{ inputs.all_variations || (matrix.arch == 'ARM64' && matrix.zts) }}
++        if: ${{ inputs.all_variations || matrix.zts }}
+         uses: ./.github/actions/test-macos
+         with:
+           enableOpcache: true
+       - name: Test Function JIT
+-        if: ${{ inputs.all_variations && (matrix.arch == 'X64' || !matrix.zts) }}
++        if: ${{ inputs.all_variations && !matrix.zts }}
+         uses: ./.github/actions/test-macos
+         with:
+           enableOpcache: true
+diff --git a/NEWS b/NEWS
+--- a/NEWS
++++ b/NEWS
+@@ -1,6 +1,11 @@
+ PHP                                                                        NEWS
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ 24 Sep 2026, PHP 8.3.35
++
++- Core:
++  . Fixed GHSA-w8hw-w9fx-j79w, GHSA-6wmf-4rv5-p3rp (Avoid state corruption via
++    bailout). (CVE-2026-109618, CVE-2026-109619) (Arnaud, ilutov, Jakub Zelenka,
++    ndossche, Nicolas Grekas)
+ 
+ - Filter:
+   . Fixed GHSA-ch8v-r6jh-4vvr (FILTER_SANITIZE_ENCODED does not encode 0xFF).
 diff --git a/Zend/tests/bug40770.phpt b/Zend/tests/bug40770.phpt
 index bdbae4cf8f1..33be8238ed2 100644
 --- a/Zend/tests/bug40770.phpt
 +++ b/Zend/tests/bug40770.phpt
-@@ -16,9 +16,9 @@ if ($zend_mm_enabled === "0") {
+@@ -16,9 +16,9 @@
  <?php
  ini_set('display_errors',true);
  $mb=148;
@@ -80,7 +172,7 @@ index cd837bd8609..49b8df729f1 100644
  --SKIPIF--
  <?php
  $zend_mm_enabled = getenv("USE_ZEND_ALLOC");
-@@ -12,13 +13,18 @@ if ($zend_mm_enabled === "0") {
+@@ -12,13 +13,18 @@
  --FILE--
  <?php
  
@@ -146,7 +238,7 @@ index 04bd464cfab..7d8e146ef8c 100644
  --FILE--
  <?php
  
-@@ -16,13 +9,13 @@ register_shutdown_function(static function (): void {
+@@ -16,13 +9,13 @@
  });
  
  $fiber = new Fiber(static function (): void {
@@ -166,7 +258,7 @@ diff --git a/Zend/tests/gh11189.phpt b/Zend/tests/gh11189.phpt
 index adbc3ce487c..32aa533cbea 100644
 --- a/Zend/tests/gh11189.phpt
 +++ b/Zend/tests/gh11189.phpt
-@@ -8,7 +8,7 @@ if (PHP_OS_FAMILY === 'Windows') {
+@@ -8,7 +8,7 @@
  if (getenv("USE_ZEND_ALLOC") === "0") die("skip ZMM is disabled");
  ?>
  --INI--
@@ -175,7 +267,7 @@ index adbc3ce487c..32aa533cbea 100644
  --FILE--
  <?php
  
-@@ -28,5 +28,4 @@ while (1) {
+@@ -28,5 +28,4 @@
  
  ?>
  --EXPECTF--
@@ -186,7 +278,7 @@ diff --git a/Zend/tests/gh11189_1.phpt b/Zend/tests/gh11189_1.phpt
 index 17b9967bc31..0791ca87d62 100644
 --- a/Zend/tests/gh11189_1.phpt
 +++ b/Zend/tests/gh11189_1.phpt
-@@ -28,5 +28,4 @@ while (1) {
+@@ -28,5 +28,4 @@
  
  ?>
  --EXPECTF--
@@ -5378,7 +5470,7 @@ diff --git a/ext/bcmath/tests/gh17398.phpt b/ext/bcmath/tests/gh17398.phpt
 index 6a0cda09ec7..c7f096706d5 100644
 --- a/ext/bcmath/tests/gh17398.phpt
 +++ b/ext/bcmath/tests/gh17398.phpt
-@@ -7,4 +7,6 @@ bcmath
+@@ -7,4 +7,6 @@
  bcmul('0', '0', 2147483647);
  ?>
  --EXPECTF--
@@ -7160,7 +7252,7 @@ index 00000000000..ac6eb526c79
 +bool(false)
 diff --git a/ext/dom/tests/oom_xpath.phpt b/ext/dom/tests/oom_xpath.phpt
 new file mode 100644
-index 00000000000..61fce07bdb2
+index 00000000000..22466cc87da
 --- /dev/null
 +++ b/ext/dom/tests/oom_xpath.phpt
 @@ -0,0 +1,22 @@
@@ -7173,7 +7265,7 @@ index 00000000000..61fce07bdb2
 +--FILE--
 +<?php
 +$path = __DIR__ . '/oom_xpath.xml';
-+file_put_contents($path, '<r>' . str_repeat('<a/>', 750000) . '</r>');
++file_put_contents($path, '<r>' . str_repeat('<a/>', 1000000) . '</r>');
 +
 +$xml = new DOMDocument;
 +$xml->load($path);
@@ -9671,6 +9763,22 @@ index 00000000000..308c08ec7d6
 +?>
 +--EXPECTF--
 +Fatal error: Allowed memory size of %d bytes exhausted %S(tried to allocate %d bytes) in %s on line %d
+diff --git a/ext/hash/murmur/PMurHash.c b/ext/hash/murmur/PMurHash.c
+index 0716ca13c88..83c7d721fbe 100644
+--- a/ext/hash/murmur/PMurHash.c
++++ b/ext/hash/murmur/PMurHash.c
+@@ -67,6 +67,11 @@ on big endian machines, or a byte-by-byte read if the endianess is unknown.
+   #define UNALIGNED_SAFE
+ #endif
+ 
++/* Avoid miscompiled aligned reads with the v142 ARM64 optimizer. */
++#if defined(_MSC_VER) && _MSC_VER < 1930 && defined(_M_ARM64) && !defined(__clang__)
++  #define UNALIGNED_SAFE
++#endif
++
+ /* Find best way to ROTL */
+ #if defined(_MSC_VER)
+   #define FORCE_INLINE  static __forceinline
 diff --git a/ext/iconv/iconv.c b/ext/iconv/iconv.c
 index ae93e0573e2..cc0bba205b7 100644
 --- a/ext/iconv/iconv.c
@@ -12713,7 +12821,7 @@ diff --git a/ext/session/tests/rfc1867_sid_invalid.phpt b/ext/session/tests/rfc1
 index fe01b5a8ba2..dd77a2ed9ac 100644
 --- a/ext/session/tests/rfc1867_sid_invalid.phpt
 +++ b/ext/session/tests/rfc1867_sid_invalid.phpt
-@@ -44,7 +44,7 @@ session_start();
+@@ -44,7 +44,7 @@
  var_dump(session_id());
  var_dump(basename(__FILE__) == $_POST[ini_get("session.upload_progress.name")]);
  var_dump($_FILES);
@@ -12722,7 +12830,7 @@ index fe01b5a8ba2..dd77a2ed9ac 100644
  session_destroy();
  ?>
  --CLEAN--
-@@ -56,13 +56,9 @@ Warning: PHP Request Startup: Session ID is too long or contains illegal charact
+@@ -56,13 +56,9 @@
  
  Warning: PHP Request Startup: Failed to read session data: files (path: ) in Unknown on line 0
  
@@ -12736,7 +12844,7 @@ index fe01b5a8ba2..dd77a2ed9ac 100644
  string(%d) ""
  bool(true)
  array(2) {
-@@ -97,50 +93,4 @@ array(2) {
+@@ -97,50 +93,4 @@
      int(1)
    }
  }
@@ -13677,6 +13785,54 @@ index 00000000000..e388b9133da
 +--EXPECTF--
 +<?xml version="1.0" encoding="UTF-8"?>
 +<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>SOAP-ENV:Server</faultcode><faultstring>Allowed memory size of 67108864 bytes exhausted %S(tried to allocate %d bytes)</faultstring></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
+diff --git a/ext/sockets/tests/socket_sentto_recvfrom_unix.phpt b/ext/sockets/tests/socket_sentto_recvfrom_unix.phpt
+index 90fcc9724ce..75d318dc6a7 100644
+--- a/ext/sockets/tests/socket_sentto_recvfrom_unix.phpt
++++ b/ext/sockets/tests/socket_sentto_recvfrom_unix.phpt
+@@ -9,7 +9,9 @@
+ }
+ --FILE--
+ <?php
+-    $socket = socket_create(AF_UNIX, SOCK_DGRAM, SOL_UDP); // cause warning
++    // Whether this conflicting combination emits a warning is platform-dependent
++    // (FreeBSD 14 accepts it), so suppress it.
++    @socket_create(AF_UNIX, SOCK_DGRAM, SOL_UDP);
+     $socket = socket_create(AF_UNIX, SOCK_DGRAM, 0);
+     if (!$socket) {
+         die('Unable to create AF_UNIX socket');
+@@ -50,7 +52,6 @@
+     @unlink($address);
+ ?>
+ --EXPECTF--
+-Warning: socket_create(): Unable to create socket [%d]: Protocol not supported in %s on line %d
+ bool(false)
+ bool(false)
+ Received Ping!
+diff --git a/ext/sockets/tests/socket_tcp_congestion.phpt b/ext/sockets/tests/socket_tcp_congestion.phpt
+index 2dade02f3fb..640ecde439b 100644
+--- a/ext/sockets/tests/socket_tcp_congestion.phpt
++++ b/ext/sockets/tests/socket_tcp_congestion.phpt
+@@ -10,15 +10,14 @@
+ --FILE--
+ <?php
+ 
+-if (str_contains(PHP_OS, 'Linux')) {
+-	$algo = 'cubic';
+-} else {
+-	$algo = 'newreno';
+-}
+ $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+ if (!$socket) die ("socket failed");
+ $r = socket_get_option($socket, SOL_TCP, TCP_CONGESTION);
+-echo "current tcp congestion algo " . $r['name'] . "\n";
++/* Use the algorithm currently in effect: it is guaranteed to be available and
++ * allowed for unprivileged accounts, unlike "newreno" which is no longer loaded
++ * by default on FreeBSD 14. */
++$algo = $r['name'];
++echo "current tcp congestion algo " . $algo . "\n";
+ var_dump(socket_set_option($socket, SOL_TCP, TCP_CONGESTION, $algo));
+ $r = socket_get_option($socket, SOL_TCP, TCP_CONGESTION);
+ echo "new tcp congestion algo " . $r['name'];
 diff --git a/ext/spl/spl_fixedarray.c b/ext/spl/spl_fixedarray.c
 index 53dba1b727c..1dc0f6334a7 100644
 --- a/ext/spl/spl_fixedarray.c
@@ -14758,7 +14914,7 @@ diff --git a/ext/standard/tests/GHSA-96wq-48vp-hh57.phpt b/ext/standard/tests/GH
 index cf9a40062f8..8d8364bfb10 100644
 --- a/ext/standard/tests/GHSA-96wq-48vp-hh57.phpt
 +++ b/ext/standard/tests/GHSA-96wq-48vp-hh57.phpt
-@@ -8,7 +8,8 @@ memory_limit=3G
+@@ -8,7 +8,8 @@
  <?php
  if (!getenv('RUN_RESOURCE_HEAVY_TESTS')) die('skip resource-heavy test');
  if (getenv('SKIP_SLOW_TESTS')) die('skip slow test');
@@ -14870,6 +15026,108 @@ index 00000000000..68693107fc4
 +?>
 +--EXPECTF--
 +Fatal error: Allowed memory size of %d bytes exhausted %S(tried to allocate %d bytes) in %s on line %d
+diff --git a/ext/standard/tests/file/lstat_stat_variation18.phpt b/ext/standard/tests/file/lstat_stat_variation18.phpt
+index e3c8386e70f..9291de26939 100644
+--- a/ext/standard/tests/file/lstat_stat_variation18.phpt
++++ b/ext/standard/tests/file/lstat_stat_variation18.phpt
+@@ -62,7 +62,7 @@ public function __construct($name) {
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+@@ -118,7 +118,7 @@ public function __construct($name) {
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+diff --git a/ext/standard/tests/file/lstat_stat_variation19.phpt b/ext/standard/tests/file/lstat_stat_variation19.phpt
+index 18ad03e52d2..24af43599ef 100644
+--- a/ext/standard/tests/file/lstat_stat_variation19.phpt
++++ b/ext/standard/tests/file/lstat_stat_variation19.phpt
+@@ -63,7 +63,7 @@
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+@@ -117,7 +117,7 @@
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+@@ -173,7 +173,7 @@
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+@@ -227,7 +227,7 @@
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+diff --git a/ext/standard/tests/file/lstat_stat_variation20.phpt b/ext/standard/tests/file/lstat_stat_variation20.phpt
+index 5bff0456eba..cfff4571ae1 100644
+--- a/ext/standard/tests/file/lstat_stat_variation20.phpt
++++ b/ext/standard/tests/file/lstat_stat_variation20.phpt
+@@ -72,7 +72,7 @@ public function __construct($name) {
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+@@ -128,7 +128,7 @@ public function __construct($name) {
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+@@ -182,7 +182,7 @@ public function __construct($name) {
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
+@@ -236,7 +236,7 @@ public function __construct($name) {
+   [5]=>
+   int(%d)
+   [6]=>
+-  int(%d)
++  int(%i)
+   [7]=>
+   int(%d)
+   [8]=>
 diff --git a/ext/standard/tests/file/oom_file.phpt b/ext/standard/tests/file/oom_file.phpt
 new file mode 100644
 index 00000000000..b3bc4111e79
@@ -15068,7 +15326,7 @@ diff --git a/ext/standard/tests/streams/bug61115-1.phpt b/ext/standard/tests/str
 index 892b0f80e57..baf847be061 100644
 --- a/ext/standard/tests/streams/bug61115-1.phpt
 +++ b/ext/standard/tests/streams/bug61115-1.phpt
-@@ -5,6 +5,9 @@ Bug #61115: Stream related segfault on fatal error in php_stream_context_del_lin
+@@ -5,6 +5,9 @@
  if (getenv("USE_ZEND_ALLOC") === "0") {
      die("skip Zend MM disabled");
  }
@@ -15471,11 +15729,25 @@ index 00000000000..f44c221a3bd
 +?>
 +--EXPECTF--
 +Fatal error: Allowed memory size of %d bytes exhausted %S(tried to allocate %d bytes) in %s on line %d
+diff --git a/ext/standard/tests/strings/setlocale_variation2.phpt b/ext/standard/tests/strings/setlocale_variation2.phpt
+index 6f62f71ac1f..9c32e5ba82e 100644
+--- a/ext/standard/tests/strings/setlocale_variation2.phpt
++++ b/ext/standard/tests/strings/setlocale_variation2.phpt
+@@ -5,6 +5,9 @@
+ if (substr(PHP_OS, 0, 3) == 'WIN') {
+     die('skip Not valid for windows');
+ }
++if (PHP_OS === 'FreeBSD') {
++    die("skip Some locales listed by locale -a on FreeBSD (e.g. hr_HR.ISO8859-2) are incomplete, cannot test LC_ALL");
++}
+ exec("locale -a", $output, $exit_code);
+ if ($exit_code !== 0) {
+     die("skip locale -a not available");
 diff --git a/ext/standard/tests/strings/str_pad_variation1.phpt b/ext/standard/tests/strings/str_pad_variation1.phpt
 index cb71e61156f..1b075448f2f 100644
 --- a/ext/standard/tests/strings/str_pad_variation1.phpt
 +++ b/ext/standard/tests/strings/str_pad_variation1.phpt
-@@ -33,4 +33,4 @@ var_dump( str_pad($input, $php_int_max_pad_length) );
+@@ -33,4 +33,4 @@
  *** Testing str_pad() function: with large value for for 'pad_length' argument ***
  str_pad(): Argument #2 ($length) must be of type int, float given
  
@@ -17003,7 +17275,7 @@ diff --git a/ext/zend_test/tests/observer_bug81430_2.phpt b/ext/zend_test/tests/
 index 11a9f061b3d..23e66445e90 100644
 --- a/ext/zend_test/tests/observer_bug81430_2.phpt
 +++ b/ext/zend_test/tests/observer_bug81430_2.phpt
-@@ -3,21 +3,16 @@ Bug #81430 (Attribute instantiation leaves dangling execute_data pointer)
+@@ -3,21 +3,16 @@
  --EXTENSIONS--
  zend_test
  --INI--
@@ -17026,7 +17298,7 @@ index 11a9f061b3d..23e66445e90 100644
      }
  }
  
-@@ -40,14 +35,14 @@ call_user_func([$r->getAttributes(A::class)[0], 'newInstance']);
+@@ -40,14 +35,14 @@ function B() {}
    <ReflectionAttribute::newInstance>
      <!-- init A::__construct() -->
      <A::__construct>
@@ -17052,7 +17324,7 @@ diff --git a/ext/zend_test/tests/observer_bug81435.phpt b/ext/zend_test/tests/ob
 index 26224e59ec5..e0c5d5bc80d 100644
 --- a/ext/zend_test/tests/observer_bug81435.phpt
 +++ b/ext/zend_test/tests/observer_bug81435.phpt
-@@ -3,15 +3,10 @@ Bug #81435 (Observer current_observed_frame may point to an old (overwritten) fr
+@@ -3,15 +3,10 @@
  --EXTENSIONS--
  zend_test
  --INI--
@@ -17077,7 +17349,7 @@ index 26224e59ec5..e0c5d5bc80d 100644
  }
  
  function a() { // observed (first_observed_frame)
-@@ -47,8 +42,8 @@ a();
+@@ -47,8 +42,8 @@ function a() { // observed (first_observed_frame)
    <d>
    </d>
    <!-- init bailout() -->
@@ -17093,7 +17365,7 @@ diff --git a/ext/zend_test/tests/observer_error_01.phpt b/ext/zend_test/tests/ob
 index d20a23b00b2..4f8b97bf457 100644
 --- a/ext/zend_test/tests/observer_error_01.phpt
 +++ b/ext/zend_test/tests/observer_error_01.phpt
-@@ -7,16 +7,11 @@ zend_test.observer.enabled=1
+@@ -7,16 +7,11 @@
  zend_test.observer.show_output=1
  zend_test.observer.observe_all=1
  zend_test.observer.show_return_value=1
@@ -17111,7 +17383,7 @@ index d20a23b00b2..4f8b97bf457 100644
  }
  
  foo();
-@@ -28,10 +23,13 @@ echo 'You should not see this.';
+@@ -28,10 +23,13 @@ function foo()
  <file '%s'>
    <!-- init foo() -->
    <foo>
@@ -17133,7 +17405,7 @@ diff --git a/ext/zend_test/tests/observer_fiber_functions_03.phpt b/ext/zend_tes
 index 147e6f7229d..151f50d8b5f 100644
 --- a/ext/zend_test/tests/observer_fiber_functions_03.phpt
 +++ b/ext/zend_test/tests/observer_fiber_functions_03.phpt
-@@ -9,11 +9,6 @@ zend_test.observer.observe_all=1
+@@ -9,11 +9,6 @@
  zend_test.observer.fiber_init=1
  zend_test.observer.fiber_switch=1
  zend_test.observer.fiber_destroy=1
@@ -17145,7 +17417,7 @@ index 147e6f7229d..151f50d8b5f 100644
  --FILE--
  <?php
  
-@@ -27,7 +22,7 @@ $notBailedOutFiber->start();
+@@ -27,7 +22,7 @@
  $fiber = new Fiber(function (): void {
      var_dump(2);
      Fiber::suspend();
@@ -17154,7 +17426,7 @@ index 147e6f7229d..151f50d8b5f 100644
  });
  
  $fiber->start();
-@@ -76,11 +71,13 @@ int(2)
+@@ -76,11 +71,13 @@
  <!-- switching from fiber %s to %s -->
  <resume '%s'>
            </Fiber::suspend>
@@ -18737,6 +19009,31 @@ index ba4ef2f5190..5cab95d148e 100644
  			ptr = ZSTR_VAL(result) + len;
  		} else {
  			ptr += ret;
+diff --git a/run-tests.php b/run-tests.php
+index 266d3522602..a4551713219 100755
+--- a/run-tests.php
++++ b/run-tests.php
+@@ -1258,12 +1258,16 @@ function system_with_timeout(
+         }
+     }
+ 
+-    $stat = proc_get_status($proc);
++    do {
++        $stat = proc_get_status($proc);
++        if ($stat['running']) {
++            usleep(1000);
++        }
++    } while ($stat['running']);
+ 
+     if ($stat['signaled']) {
+-        $data .= "\nTermsig=" . $stat['stopsig'] . "\n";
+-    }
+-    if ($stat["exitcode"] > 128 && $stat["exitcode"] < 160) {
++        $data .= "\nTermsig=" . $stat['termsig'] . "\n";
++    } else if ($stat["exitcode"] > 128 && $stat["exitcode"] < 160) {
+         $data .= "\nTermsig=" . ($stat["exitcode"] - 128) . "\n";
+     } else if (defined('PHP_WINDOWS_VERSION_MAJOR') && (($stat["exitcode"] >> 28) & 0b1111) === 0b1100) {
+         // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/87fba13e-bf06-450e-83b1-9241dc81e781
 diff --git a/sapi/cli/tests/oom_request_parsing_next_request.phpt b/sapi/cli/tests/oom_request_parsing_next_request.phpt
 new file mode 100644
 index 00000000000..edf1f4e9f29
@@ -19710,7 +20007,7 @@ index 00000000000..0dc523666ba
 +Fatal error: Allowed memory size of 8388608 bytes exhausted %S(tried to allocate %d bytes) in Unknown on line 0
 diff --git a/tests/basic/oom_rfc1867_files_registration_full_path.phpt b/tests/basic/oom_rfc1867_files_registration_full_path.phpt
 new file mode 100644
-index 00000000000..0b3457779ec
+index 00000000000..c56c6fb3e44
 --- /dev/null
 +++ b/tests/basic/oom_rfc1867_files_registration_full_path.phpt
 @@ -0,0 +1,26 @@
@@ -19734,7 +20031,7 @@ index 00000000000..0b3457779ec
 +
 +    fwrite($fh, '--' . OOM_RFC1867_BOUNDARY . "\r\n"
 +        . 'Content-Disposition: form-data; name="u"; filename="');
-+    oom_rfc1867_fill($fh, 700 * 1024);
++    oom_rfc1867_fill($fh, 1200 * 1024);
 +    fwrite($fh, "\"\r\nContent-Type: text/plain\r\n\r\nx\r\n");
 +});
 +?>
@@ -20157,7 +20454,7 @@ diff --git a/tests/output/gh15179.phpt b/tests/output/gh15179.phpt
 index 207728446df..11942e268b6 100644
 --- a/tests/output/gh15179.phpt
 +++ b/tests/output/gh15179.phpt
-@@ -15,4 +15,4 @@ $var = str_repeat('a', 20 * 1024 * 1024);
+@@ -15,4 +15,4 @@
  output_add_rewrite_var($var, $var);
  ?>
  --EXPECTF--
@@ -20252,3 +20549,32 @@ index 00000000000..d1856823069
 +bool(false)
 +bool(false)
 +bool(true)
+diff --git a/win32/build/Makefile b/win32/build/Makefile
+index 1b200502119..39e6679ab37 100644
+--- a/win32/build/Makefile
++++ b/win32/build/Makefile
+@@ -25,7 +25,7 @@ PHP_BUILD=$(PHP_BUILD)
+ !if "$(PHP_SIMD_SCALE)" == ""
+ SIMD_SUFFIX=
+ !else
+-!if "$(PHP_SIMD_SCALE)" == "SSE2"
++!if "$(PHP_SIMD_SCALE)" == "SSE2" || "$(PHP_SIMD_SCALE)" == "NEON"
+ SIMD_SUFFIX=
+ !else
+ SIMD_SUFFIX=-$(PHP_SIMD_SCALE)
+diff --git a/win32/build/config.w32.h.in b/win32/build/config.w32.h.in
+index e72e4d6d3eb..bdd9355b196 100644
+--- a/win32/build/config.w32.h.in
++++ b/win32/build/config.w32.h.in
+@@ -27,6 +27,11 @@
+ #define DEFAULT_SHORT_OPEN_TAG "1"
+ 
+ /* Platform-Specific Configuration. Should not be changed. */
++/* Match -ffp-contract=off on toolsets that enable ARM64 contractions by default. */
++#if defined(_MSC_VER) && _MSC_VER < 1930 && defined(_M_ARM64) && !defined(__clang__)
++# pragma fp_contract(off)
++#endif
++
+ /* Alignment for Zend memory allocator */
+ #define ZEND_MM_ALIGNMENT (size_t)8
+ #define ZEND_MM_ALIGNMENT_LOG2 (size_t)3

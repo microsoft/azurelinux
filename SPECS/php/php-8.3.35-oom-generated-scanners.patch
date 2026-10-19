@@ -4,7 +4,7 @@ Status: Candidate for private validation; not confirmed final upstream.
 Embargoed: Keep this patch in private repositories until disclosure.
 
 Companion to php-8.3.35-oom-candidate.patch, pinned to upstream revision
-07b44b5b3d88c8d8383e2e0a55e2148b78ee291e.
+d59a20c8f9dcd3a7ecf2fb815d996c4e00c49348.
 
 Generated locally with re2c 4.0.2, matching the PHP 8.3.35 release tarball,
 using ext/standard/Makefile.frag and ext/json/Makefile.frag:
