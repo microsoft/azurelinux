@@ -1,0 +1,7 @@
+[components.rust-reqsign]
+
+[[components.rust-reqsign.overlays]]
+description = "Drop the aggregate full feature package because Azure Linux does not ship every provider dependency"
+type = "spec-remove-subpackage"
+package = "%{name}+full-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
