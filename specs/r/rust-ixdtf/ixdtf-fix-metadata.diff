@@ -1,0 +1,12 @@
+--- ixdtf-0.6.6/Cargo.toml	2006-07-24T01:21:28+00:00
++++ ixdtf-0.6.6/Cargo.toml	2026-08-17T17:14:47.434055+00:00
+@@ -72,9 +72,6 @@
+ features = ["std"]
+ default-features = false
+ 
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.5.0"
+-
+ [lints.clippy]
+ alloc_instead_of_core = "warn"
+ bool_assert_comparison = "allow"
