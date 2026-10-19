@@ -1,6 +1,7 @@
 # Spec Review: Local Developer Guide
 
-Run the spec-review workflow locally via VS Code, shell scripts, or the Copilot CLI.
+Run on-demand spec reviews locally via VS Code, shell scripts, or the Copilot CLI.
+This tool does not run automatically on GitHub pull requests.
 
 There are three major paths:
 
@@ -26,7 +27,8 @@ The easiest way to get quick, interactive feedback is with [GitHub Copilot](http
 
 ## Run single-model review (spec_review.sh)
 
-`spec_review.sh` orchestrates the Copilot agent, writes report/log/kb, and validates JSON. This is a subset of the multi-model script (`spec_review_multi.sh`) which the pipeline uses, but is faster to run.
+`spec_review.sh` orchestrates the Copilot agent, writes report/log/kb, and validates JSON.
+Use it for a single-model review, or use `spec_review_multi.sh` for a deeper multi-model audit.
 
 ### Prerequisites
 
@@ -69,7 +71,7 @@ The script supports additional options (like selecting a model, or using differe
 ## Run multi-model review (spec_review_multi.sh)
 
 `spec_review_multi.sh` runs two different LLMs sequentially as independent reviewers, then
-uses a third model pass to synthesize their findings into a single high-quality report. This is the flow used in the CI pipeline.
+uses a third model pass to synthesize their findings into a single report.
 
 **Why multi-model?**
 
