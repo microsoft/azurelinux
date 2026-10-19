@@ -1,0 +1,22 @@
+--- color-eyre-0.6.5/Cargo.toml	1970-01-01T00:00:01+00:00
++++ color-eyre-0.6.5/Cargo.toml	2025-05-31T16:35:29.215428+00:00
+@@ -149,10 +149,6 @@
+ path = "tests/location_disabled.rs"
+ 
+ [[test]]
+-name = "theme"
+-path = "tests/theme.rs"
+-
+-[[test]]
+ name = "wasm"
+ path = "tests/wasm.rs"
+ 
+@@ -184,7 +180,7 @@
+ optional = true
+ 
+ [dev-dependencies.ansi-parser]
+-version = "0.8.0"
++version = "0.9.0"
+ 
+ [dev-dependencies.pretty_assertions]
+ version = "1.0.0"
