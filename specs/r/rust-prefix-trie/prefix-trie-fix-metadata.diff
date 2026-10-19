@@ -1,0 +1,29 @@
+--- prefix-trie-0.8.4/Cargo.toml	2006-07-24T01:21:28+00:00
++++ prefix-trie-0.8.4/Cargo.toml	2026-05-26T13:56:22.351280+00:00
+@@ -36,7 +36,6 @@
+ repository = "https://github.com/tiborschneider/prefix-trie"
+ 
+ [features]
+-cidr = ["dep:cidr"]
+ default = ["ipnet"]
+ ipnet = ["dep:ipnet"]
+ ipnetwork = ["dep:ipnetwork"]
+@@ -44,7 +43,6 @@
+     "dep:serde",
+     "ipnet/serde",
+     "ipnetwork/serde",
+-    "cidr/serde",
+ ]
+ 
+ [lib]
+@@ -61,10 +59,6 @@
+ path = "benches/benchmark.rs"
+ harness = false
+ required-features = ["ipnet"]
+-
+-[dependencies.cidr]
+-version = "0.3"
+-optional = true
+ 
+ [dependencies.either]
+ version = "1"
