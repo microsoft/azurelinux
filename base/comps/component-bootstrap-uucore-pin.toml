@@ -1,14 +1,12 @@
 # Keep failing consumers pinned alongside consumers awaiting updated providers.
-# Unpin dir/vdir after ls, and coreutils last.
+# Unpin coreutils last.
 
 [component-groups.rust-uucore-version-pin]
 description = "Retain bootstrap guards on failing consumers and consumers pending their dependency build wave"
 components = [
     "rust-coreutils",
-    "rust-uu_dir",
     "rust-uu_expr",
     "rust-uu_join",
-    "rust-uu_vdir",
 ]
 
 [[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
