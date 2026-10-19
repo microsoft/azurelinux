@@ -16,7 +16,7 @@
 %global _with_static_uwac 1
 
 # Disable unwanted dependencies for RHEL
-%{!?rhel:%global _with_aom 1}
+# AOM support is disabled because Azure Linux does not ship libaom.
 %{!?rhel:%global _with_openh264 1}
 %{!?rhel:%global _with_sdl_client 1}
 %{!?rhel:%global _with_soxr 1}
@@ -30,7 +30,7 @@
 Name:           freerdp
 Epoch:          2
 Version:        3.32.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        Free implementation of the Remote Desktop Protocol (RDP)
 
 # The effective license is Apache-2.0 but:

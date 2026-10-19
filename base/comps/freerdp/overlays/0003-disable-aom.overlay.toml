@@ -1,0 +1,12 @@
+# Azure Linux does not ship libaom. Leave FreeRDP's AV1 graphics support
+# disabled so the build does not require aom or its companion libyuv library.
+
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Disable AOM-backed AV1 graphics support and its build dependencies"
+type = "spec-search-replace"
+regex = '^%\{!\?rhel:%global _with_aom 1\}$'
+replacement = "# AOM support is disabled because Azure Linux does not ship libaom."
