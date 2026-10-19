@@ -1,0 +1,15 @@
+--- char_str-0.0.4/Cargo.toml	2006-07-24T01:21:28+00:00
++++ char_str-0.0.4/Cargo.toml	2026-09-09T17:18:01.832458+00:00
+@@ -202,11 +202,8 @@
+ [dev-dependencies.serde_json]
+ version = "1.0"
+ 
+-[target."cfg(loom)".dependencies.loom]
+-version = "0.7.2"
+-optional = true
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0
+ check-cfg = ["cfg(loom)"]
++
