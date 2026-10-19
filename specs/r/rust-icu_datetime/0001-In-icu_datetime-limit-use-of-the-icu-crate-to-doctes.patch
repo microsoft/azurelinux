@@ -1,0 +1,34 @@
+From ec39b7dd1dcaea093a7c0e406eec0ac6c69f98c0 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 27 Aug 2026 21:04:38 +0100
+Subject: [PATCH] In icu_datetime, limit use of the icu crate to doctests
+
+---
+ src/provider/names.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/provider/names.rs b/src/provider/names.rs
+index c35046b80d..cb32e503cd 100644
+--- a/src/provider/names.rs
++++ b/src/provider/names.rs
+@@ -831,7 +831,7 @@ fn test_dayperiod_names() {
+         DataRequest {
+             id: DataIdentifierBorrowed::for_marker_attributes_and_locale(
+                 DataMarkerAttributes::from_str_or_panic("5"),
+-                &icu::locale::data_locale!("zh"),
++                &icu_locale_core::data_locale!("zh"),
+             ),
+             ..Default::default()
+         },
+@@ -852,7 +852,7 @@ fn test_dayperiod_names() {
+         DataRequest {
+             id: DataIdentifierBorrowed::for_marker_attributes_and_locale(
+                 DataMarkerAttributes::from_str_or_panic("5"),
+-                &icu::locale::data_locale!("zh-Hant"),
++                &icu_locale_core::data_locale!("zh-Hant"),
+             ),
+             ..Default::default()
+         },
+-- 
+2.55.0
+
