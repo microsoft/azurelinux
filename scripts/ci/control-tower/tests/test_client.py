@@ -1,11 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-"""Tests for Control Tower credential selection."""
+"""Tests for Control Tower authentication and job monitoring."""
 
 from __future__ import annotations
 
 from http import HTTPStatus
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 import client
 import pytest
@@ -218,3 +218,223 @@ def test_refreshed_token_is_shared_by_submission_and_polling(
     assert session.request.call_args_list[2].kwargs["headers"]["Authorization"] == (
         f"Bearer {_REFRESHED_AUTH_VALUE}"
     )
+
+
+@pytest.mark.parametrize(
+    ("results", "expected"),
+    [
+        ({}, (set(), False)),
+        ({"buildTasks": []}, (set(), False)),
+        ({"buildTasks": [{"kojiInfo": None}]}, (set(), False)),
+        ({"buildTasks": [{"kojiInfo": {"kojiTaskNumber": 0}}]}, (set(), False)),
+        ({"buildTasks": [{"kojiInfo": {"kojiTaskNumber": True}}]}, (set(), False)),
+        ({"buildTasks": [{"kojiInfo": {"kojiTaskNumber": "12345"}}]}, (set(), False)),
+        ({"buildTasks": [{"kojiInfo": {"kojiTaskNumber": 12345}}]}, ({12345}, True)),
+        (
+            {"buildTasks": [
+                {"kojiInfo": {"kojiTaskNumber": 12345}},
+                {"kojiInfo": {"kojiTaskNumber": 67890}},
+            ]},
+            ({12345, 67890}, True),
+        ),
+        (
+            {"buildTasks": [
+                {"kojiInfo": {"kojiTaskNumber": 12345}},
+                {"kojiInfo": {"kojiTaskNumber": 12345}},
+            ]},
+            ({12345}, True),
+        ),
+        (
+            {"buildTasks": [
+                {"kojiInfo": {"kojiTaskNumber": 12345}},
+                {"kojiInfo": None},
+            ]},
+            ({12345}, False),
+        ),
+        (
+            {"buildTasks": [
+                {"kojiInfo": None},
+                {"kojiInfo": {"kojiTaskNumber": 12345}},
+            ]},
+            ({12345}, False),
+        ),
+        (
+            {"buildTasks": [
+                {"kojiInfo": {"kojiTaskNumber": 12345}},
+                None,
+            ]},
+            ({12345}, False),
+        ),
+    ],
+)
+def test_get_koji_task_numbers(
+    results: client.JsonObject,
+    expected: tuple[set[int], bool],
+) -> None:
+    """Deduplicate available task numbers without losing pending tasks."""
+    response = Mock(ok=True, status_code=HTTPStatus.OK)
+    response.json.return_value = results
+    request_context = client.RequestContext(
+        session=Mock(),
+        base_url="https://control-tower.example",
+        credential=Mock(),
+        audience="api://control-tower",
+        token_holder=client.TokenHolder(token=_INITIAL_AUTH_VALUE),
+    )
+    request_context.session.request = Mock(return_value=response)
+
+    assert client.get_koji_task_numbers(request_context, "job-id") == expected
+    assert request_context.session.request.call_args.args == (
+        "GET",
+        "https://control-tower.example/api/Results/jobs/job-id/koji",
+    )
+
+
+@pytest.mark.parametrize("failure", ["http", "invalid-json", "non-object"])
+def test_get_koji_task_numbers_reports_response_errors(
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+) -> None:
+    """Surface endpoint failures instead of treating them as pending task IDs."""
+    response = Mock(ok=True, status_code=HTTPStatus.OK)
+    if failure == "http":
+        response.ok = False
+        monkeypatch.setattr(client, "format_error", Mock(return_value="request failed"))
+        message = "Control Tower Koji results request failed"
+    elif failure == "invalid-json":
+        response.json.side_effect = ValueError("invalid JSON")
+        message = "body was not valid JSON"
+    else:
+        response.json.return_value = []
+        message = "non-object JSON body"
+    monkeypatch.setattr(client, "_request_with_refresh", Mock(return_value=response))
+
+    with pytest.raises(RuntimeError, match=message):
+        client.get_koji_task_numbers(Mock(), "job-id")
+
+
+@pytest.mark.parametrize("status", ["Completed", "Failed", "Running"])
+def test_poll_logs_koji_task_once_when_available(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    status: str,
+) -> None:
+    """Log a delayed task assignment before terminal or timeout handling."""
+    get_job_status = Mock(
+        side_effect=[{"status": "Running"}, {"status": "Running"}, {"status": status}],
+    )
+    get_koji_task_numbers = Mock(side_effect=[(set(), False), ({12345, 67890}, True)])
+    monkeypatch.setattr(client, "get_job_status", get_job_status)
+    monkeypatch.setattr(client, "get_koji_task_numbers", get_koji_task_numbers)
+    monkeypatch.setattr(client.time, "sleep", Mock())
+    monkeypatch.setattr(client.time, "monotonic", Mock(side_effect=[0, 0, 0, 1, 1, 2, 10, 10]))
+    request_context = Mock()
+
+    final, timed_out = client.poll_until_terminal(request_context, "job-id", 10)
+
+    assert final == {"status": status}
+    assert timed_out is (status == "Running")
+    output = capsys.readouterr().out
+    assert output.count("Job job-id Koji task IDs:") == 1
+    assert "12345" in output
+    assert "67890" in output
+    assert get_koji_task_numbers.call_args_list == [
+        call(request_context, "job-id"),
+        call(request_context, "job-id"),
+    ]
+
+
+def test_poll_logs_koji_tasks_incrementally_until_all_assigned(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Log partial assignments once and stop lookups only after completion."""
+    monkeypatch.setattr(
+        client,
+        "get_job_status",
+        Mock(side_effect=[{"status": "Running"}] * 4 + [{"status": "Completed"}]),
+    )
+    get_koji_task_numbers = Mock(side_effect=[
+        (set(), False),
+        ({12345}, False),
+        ({12345}, False),
+        ({67890, 12345}, True),
+    ])
+    monkeypatch.setattr(client, "get_koji_task_numbers", get_koji_task_numbers)
+    monkeypatch.setattr(client.time, "sleep", Mock())
+    request_context = Mock()
+
+    final, timed_out = client.poll_until_terminal(request_context, "job-id", 10)
+
+    assert final == {"status": "Completed"}
+    assert not timed_out
+    task_lines = [
+        line for line in capsys.readouterr().out.splitlines() if "Koji task IDs:" in line
+    ]
+    assert task_lines == [
+        "Job job-id Koji task IDs: {12345}",
+        "Job job-id Koji task IDs: {67890}",
+    ]
+    assert get_koji_task_numbers.call_args_list == [call(request_context, "job-id")] * 4
+
+
+@pytest.mark.parametrize("result", [(set(), False), ({12345}, False), ({12345, 67890}, True)])
+def test_poll_checks_koji_on_first_terminal_status(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    result: tuple[set[int], bool],
+) -> None:
+    """Handle jobs that finish before the initial status observation."""
+    monkeypatch.setattr(client, "get_job_status", Mock(return_value={"status": "Completed"}))
+    get_koji_task_numbers = Mock(return_value=result)
+    monkeypatch.setattr(client, "get_koji_task_numbers", get_koji_task_numbers)
+    request_context = Mock()
+
+    final, timed_out = client.poll_until_terminal(request_context, "job-id", 10)
+
+    assert final == {"status": "Completed"}
+    assert not timed_out
+    assert ("Koji task IDs:" in capsys.readouterr().out) is bool(result[0])
+    get_koji_task_numbers.assert_called_once_with(request_context, "job-id")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        RuntimeError("Koji results request failed"),
+        client.requests.ConnectionError("connection failed"),
+        client.requests.Timeout("request timed out"),
+        client.AzureError("token refresh failed"),
+    ],
+)
+@pytest.mark.parametrize("partial_assignment", [False, True])
+def test_poll_logs_koji_lookup_errors_without_retrying(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    error: Exception,
+    *,
+    partial_assignment: bool,
+) -> None:
+    """Keep monitoring the build but stop task lookups after an operational error."""
+    monkeypatch.setattr(
+        client,
+        "get_job_status",
+        Mock(side_effect=[{"status": "Running"}] * 2 + [{"status": "Completed"}]),
+    )
+    lookup_results = [({12345}, False), error] if partial_assignment else [error]
+    get_koji_task_numbers = Mock(side_effect=lookup_results)
+    monkeypatch.setattr(client, "get_koji_task_numbers", get_koji_task_numbers)
+    monkeypatch.setattr(client.time, "sleep", Mock())
+
+    request_context = Mock()
+
+    final, timed_out = client.poll_until_terminal(request_context, "job-id", 10)
+
+    assert final == {"status": "Completed"}
+    assert not timed_out
+    output = capsys.readouterr().out
+    assert f"##[error]Failed to get Koji task ID for job job-id: {error}" in output
+    assert ("Job job-id Koji task IDs: {12345}" in output) is partial_assignment
+    assert "Job job-id Koji task IDs: set()" not in output
+    expected_calls = 2 if partial_assignment else 1
+    assert get_koji_task_numbers.call_args_list == [call(request_context, "job-id")] * expected_calls

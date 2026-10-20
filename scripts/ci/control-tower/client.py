@@ -28,6 +28,7 @@ from http import HTTPStatus
 from typing import TYPE_CHECKING, cast
 
 import requests
+from azure.core.exceptions import AzureError
 from azure.identity import AzureCliCredential, AzurePipelinesCredential
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -309,6 +310,37 @@ def get_job_status(
     return _parse_json_object(response, "Control Tower job status")
 
 
+def get_koji_task_numbers(
+    request_context: RequestContext,
+    job_id: str,
+) -> tuple[set[int], bool]:
+    """Return assigned Koji task numbers and whether every build task has one."""
+    url = f"{request_context.base_url}/api/Results/jobs/{job_id}/koji"
+    response = _request_with_refresh(request_context, "GET", url)
+    if not response.ok:
+        raise RuntimeError("Control Tower Koji results request failed.\n" + format_error(response))
+    results = _parse_json_object(response, "Control Tower Koji results")
+    tasks = results.get("buildTasks")
+    if not isinstance(tasks, list) or not tasks:
+        return set(), False
+    numbers: set[int] = set()
+    all_assigned = True
+    for task in tasks:
+        if not isinstance(task, dict):
+            all_assigned = False
+            continue
+        koji_info = task.get("kojiInfo")
+        if not isinstance(koji_info, dict):
+            all_assigned = False
+            continue
+        number = koji_info.get("kojiTaskNumber")
+        if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
+            all_assigned = False
+            continue
+        numbers.add(number)
+    return numbers, all_assigned
+
+
 def _summarize_tasks(tasks: object) -> str:
     """Return a compact one-line summary of task statuses (e.g. ``3/5 Completed``)."""
     if not isinstance(tasks, list) or not tasks:
@@ -351,6 +383,9 @@ def poll_until_terminal(
 ) -> tuple[JsonObject, bool]:
     """Poll the job status until it reaches a terminal state or the timeout expires.
 
+    Print newly assigned Koji task numbers as they become available. Stop looking
+    once every task has a number or a lookup raises an exception.
+
     Returns ``(last_status_dict, timed_out)``:
       - ``timed_out == False``: the job reached a terminal state, last_status_dict
         is that final state.
@@ -362,9 +397,22 @@ def poll_until_terminal(
     deadline = start + poll_timeout_seconds
     previous_status: str | None = None
     job_status_object: JsonObject = {}
+    logged_koji_task_numbers: set[int] = set()
+    koji_task_lookup_complete = False
 
     while True:
         job_status_object = get_job_status(request_context, job_id)
+        if not koji_task_lookup_complete:
+            try:
+                koji_task_numbers, koji_task_lookup_complete = get_koji_task_numbers(request_context, job_id)
+            except (RuntimeError, requests.RequestException, AzureError) as exc:
+                koji_task_lookup_complete = True
+                print(f"##[error]Failed to get Koji task ID for job {job_id}: {exc}", flush=True)
+            else:
+                new_numbers = koji_task_numbers - logged_koji_task_numbers
+                if new_numbers:
+                    print(f"Job {job_id} Koji task IDs: {new_numbers}", flush=True)
+                    logged_koji_task_numbers.update(new_numbers)
         raw_status = job_status_object.get("status")
         current_status = raw_status if isinstance(raw_status, str) else "Unknown"
         elapsed = int(time.monotonic() - start)
