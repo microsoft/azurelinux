@@ -589,8 +589,11 @@ fi
 - Update to 1.26.9 upstream release
 - Resolves: rhbz#2548163
 
-* Sun Oct 11 2026 Tobias Brick <tobiasb@microsoft.com> - 1.26.8-3
-- chore(python): enforce public docstrings
+* Sun Oct 11 2026 Tobias Brick <tobiasb@microsoft.com> - 1.26.8-4
+- feat(golang): depend on OpenSSL FIPS provider capability
+
+* Fri Oct 09 2026 Nan Liu <liunan@microsoft.com> - 1.26.8-3
+- fix(golang): upgrade Microsoft Build of Go to 1.26.8
 
 * Thu Sep 03 2026 Álex Sáez <asm@redhat.com> - 1.26.8-2
 - Remove fix-s390x-mergelocals.patch
