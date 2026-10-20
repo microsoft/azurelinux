@@ -29,7 +29,7 @@ def test_container_package_inventory(image_path: Path | None, image_name: str | 
     if image_path is None:
         pytest.skip("package inventories require a local image artifact")
 
-    stem = image_path.name.removesuffix(".xz").removesuffix(".tar").removesuffix(".oci")
+    stem = image_path.name.removesuffix(".xz").removesuffix(".gz").removesuffix(".tar").removesuffix(".oci")
     inventory = image_path.with_name(f"{stem}.packages")
     assert inventory.is_file(), f"Missing package inventory: {inventory}"
 
