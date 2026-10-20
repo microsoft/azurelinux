@@ -2492,6 +2492,7 @@ components = [
     "tree-pkg",
     "tree-sitter",
     "tree-sitter-srpm-macros",
+    "tree-sitter0.25",
     "trustee-guest-components",
     "tslib",
     "tss2",

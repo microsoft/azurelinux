@@ -1,0 +1,3 @@
+[components."tree-sitter0.25"]
+# Fedora 43 has no compatibility package; Emacs 30 needs tree-sitter < 0.26.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" } }
