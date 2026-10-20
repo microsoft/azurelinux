@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,24 +65,12 @@ Requires:       kata-containers-tools
 %ifarch x86_64
 Requires:       kata-containers-cc-tools
 %endif
-Requires:       kernel-uvm
-Requires:       kernel-uvm-devel
+# Also the guest kernel measured into the kata-cc SNP IGVMs; needs the SNP guest support from mshv2
+Requires:       kernel-uvm >= 6.18.52.mshv2
 Requires:       make
 Requires:       parted
-# Python dependencies for non-packaged IGVM tool
+# kata-cc igvm_manifest.py
 Requires:       python3
-Requires:       python3-pip
-Requires:       python3-frozendict
-Requires:       python3-ecdsa
-Requires:       python3-pyelftools
-Requires:       python3-cached_property
-Requires:       python3-cstruct
-Requires:       python3-devel
-Requires:       python3-libs
-Requires:       python3-setuptools
-Requires:       python3-pytest
-Requires:       python3-libclang
-Requires:       python3-tomli
 Requires:       qemu-img
 Requires:       veritysetup
 
@@ -110,6 +98,10 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Thu Nov 12 2026 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-10
+- Require kernel-uvm >= 6.18.52.mshv2, the guest kernel measured into the kata-cc SNP IGVMs
+- Drop kernel-uvm-devel and the Python dependencies of the igvm-tooling IGVM generator
+
 * Mon Oct 13 2025 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-9
 - Enable build on aarch64
 
