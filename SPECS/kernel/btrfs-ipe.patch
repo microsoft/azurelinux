@@ -1,0 +1,184 @@
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index 36bdfd774d76..1fbc23c4c289 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -2355,6 +2355,46 @@ static int btrfs_show_devname(struct seq_file *m, struct dentry *root)
+ 	return 0;
+ }
+ 
++static struct block_device *btrfs_get_integrity_bdev(struct super_block *sb)
++{
++	struct btrfs_fs_info *fs_info = btrfs_sb(sb);
++	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
++	struct btrfs_device *device;
++	struct block_device *bdev = NULL;
++
++	if (!sb_rdonly(sb))
++		return NULL;
++
++	/* Match the device-list -> replacement lock order in dev-replace.c. */
++	mutex_lock(&fs_devices->device_list_mutex);
++	down_read(&fs_info->dev_replace.rwsem);
++	if (!sb_rdonly(sb) || btrfs_test_opt(fs_info, DEGRADED) ||
++	    fs_devices->seeding || !list_empty(&fs_devices->seed_list) ||
++	    fs_devices->num_devices != 1 || fs_devices->open_devices != 1 ||
++	    fs_devices->total_devices != 1 || fs_devices->missing_devices ||
++	    fs_devices->rw_devices || !list_is_singular(&fs_devices->devices) ||
++	    btrfs_dev_replace_is_ongoing(&fs_info->dev_replace))
++		goto out;
++
++	device = list_first_entry(&fs_devices->devices,
++				  struct btrfs_device, dev_list);
++	if (device->fs_devices != fs_devices || device->fs_info != fs_info ||
++	    !device->bdev || !bdev_read_only(device->bdev) ||
++	    !test_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_MISSING, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_REPLACE_TGT, &device->dev_state) ||
++	    device->devid == BTRFS_DEV_REPLACE_DEVID)
++		goto out;
++
++	if (get_device(&device->bdev->bd_device))
++		bdev = device->bdev;
++out:
++	up_read(&fs_info->dev_replace.rwsem);
++	mutex_unlock(&fs_devices->device_list_mutex);
++	return bdev;
++}
++
+ static const struct super_operations btrfs_super_ops = {
+ 	.drop_inode	= btrfs_drop_inode,
+ 	.evict_inode	= btrfs_evict_inode,
+@@ -2369,6 +2409,7 @@ static const struct super_operations btrfs_super_ops = {
+ 	.remount_fs	= btrfs_remount,
+ 	.freeze_fs	= btrfs_freeze,
+ 	.unfreeze_fs	= btrfs_unfreeze,
++	.get_integrity_bdev = btrfs_get_integrity_bdev,
+ };
+ 
+ static const struct file_operations btrfs_ctl_fops = {
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 12ea9af49a89..950333b67ac2 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2087,6 +2087,14 @@ struct super_operations {
+ 	long (*free_cached_objects)(struct super_block *,
+ 				    struct shrink_control *);
+ 	void (*shutdown)(struct super_block *sb);
++
++	/*
++	 * Optional integrity backing device for filesystems without s_bdev.
++	 * The caller holds an inode reference and may sleep. Return NULL when
++	 * one immutable device cannot represent the complete filesystem.
++	 * A non-NULL result holds a bd_device reference, released by the caller.
++	 */
++	struct block_device *(*get_integrity_bdev)(struct super_block *sb);
+ };
+ 
+ /*
+diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+index 5eae7518bc2e..3c2a5bc88b93 100644
+--- a/security/ipe/eval.c
++++ b/security/ipe/eval.c
+@@ -11,6 +11,7 @@
+ #include <linux/rcupdate.h>
+ #include <linux/moduleparam.h>
+ #include <linux/fsverity.h>
++#include <linux/blkdev.h>
+ 
+ #include "ipe.h"
+ #include "eval.h"
+@@ -21,7 +22,6 @@
+ struct ipe_policy __rcu *ipe_active_policy;
+ bool success_audit;
+ bool enforce = true;
+-#define INO_BLOCK_DEV(ino) ((ino)->i_sb->s_bdev)
+ 
+ #define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
+ 
+@@ -43,13 +43,36 @@ static void build_ipe_sb_ctx(struct ipe_eval_ctx *ctx, const struct file *const
+  */
+ static void build_ipe_bdev_ctx(struct ipe_eval_ctx *ctx, const struct inode *const ino)
+ {
+-	if (INO_BLOCK_DEV(ino))
+-		ctx->ipe_bdev = ipe_bdev(INO_BLOCK_DEV(ino));
++	struct super_block *sb = ino->i_sb;
++	struct block_device *bdev = sb->s_bdev;
++
++	if (bdev) {
++		if (!get_device(&bdev->bd_device))
++			bdev = NULL;
++	} else if (sb->s_op->get_integrity_bdev) {
++		bdev = sb->s_op->get_integrity_bdev(sb);
++	}
++
++	ctx->integrity_bdev = bdev;
++	if (bdev)
++		ctx->ipe_bdev = ipe_bdev(bdev);
++}
++
++static void put_ipe_bdev_ctx(struct ipe_eval_ctx *ctx)
++{
++	if (ctx->integrity_bdev)
++		put_device(&ctx->integrity_bdev->bd_device);
++	ctx->integrity_bdev = NULL;
++	ctx->ipe_bdev = NULL;
+ }
+ #else
+ static void build_ipe_bdev_ctx(struct ipe_eval_ctx *ctx, const struct inode *const ino)
+ {
+ }
++
++static void put_ipe_bdev_ctx(struct ipe_eval_ctx *ctx)
++{
++}
+ #endif /* CONFIG_IPE_PROP_DM_VERITY */
+ 
+ #ifdef CONFIG_IPE_PROP_FS_VERITY
+@@ -312,7 +335,7 @@ static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
+  * * %0		- Success
+  * * %-EACCES	- @ctx did not pass evaluation
+  */
+-int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
++int ipe_evaluate_event(struct ipe_eval_ctx *ctx)
+ {
+ 	const struct ipe_op_table *rules = NULL;
+ 	const struct ipe_rule *rule = NULL;
+@@ -328,7 +351,7 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
+ 	pol = rcu_dereference(ipe_active_policy);
+ 	if (!pol) {
+ 		rcu_read_unlock();
+-		return 0;
++		goto out;
+ 	}
+ 
+ 	if (ctx->op == IPE_OP_INVALID) {
+@@ -378,6 +401,8 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
+ 	if (!READ_ONCE(enforce))
+ 		rc = 0;
+ 
++out:
++	put_ipe_bdev_ctx(ctx);
+ 	return rc;
+ }
+ 
+diff --git a/security/ipe/eval.h b/security/ipe/eval.h
+index fef65a36468c..db4f9e301813 100644
+--- a/security/ipe/eval.h
++++ b/security/ipe/eval.h
+@@ -44,6 +44,7 @@ struct ipe_eval_ctx {
+ 	const struct file *file;
+ 	bool initramfs;
+ #ifdef CONFIG_IPE_PROP_DM_VERITY
++	struct block_device *integrity_bdev;
+ 	const struct ipe_bdev *ipe_bdev;
+ #endif /* CONFIG_IPE_PROP_DM_VERITY */
+ #ifdef CONFIG_IPE_PROP_FS_VERITY
+@@ -65,6 +66,6 @@ void ipe_build_eval_ctx(struct ipe_eval_ctx *ctx,
+ 			const struct file *file,
+ 			enum ipe_op_type op,
+ 			enum ipe_hook_type hook);
+-int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx);
++int ipe_evaluate_event(struct ipe_eval_ctx *ctx);
+ 
+ #endif /* _IPE_EVAL_H */
