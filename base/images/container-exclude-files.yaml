@@ -1,4 +1,6 @@
 # SPDX-License-Identifier: MIT
+# Keep RPM records in staging for KIWI package inventories and SBOMs, but omit
+# the database and its compatibility link from shipped minimal containers.
 exclude:
   - usr/lib/sysimage/rpm
   - var/lib/rpm
