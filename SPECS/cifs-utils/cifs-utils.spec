@@ -1,13 +1,15 @@
 Summary:        cifs client utils
 Name:           cifs-utils
 Version:        7.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Nfs-utils-client
 URL:            https://wiki.samba.org/index.php/LinuxCIFS_utils
 Source0:        https://download.samba.org/pub/linux-cifs/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2026-104715-username-domain.patch
+Patch1:         CVE-2026-104715-passwd-username.patch
 BuildRequires:  keyutils-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libtalloc-devel
@@ -40,7 +42,7 @@ Requires:       cifs-utils = %{version}-%{release}
 Provides header files needed for Cifs-Utils development.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 autoreconf -fiv
@@ -81,6 +83,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Tue Oct 20 2026 Sean Dougherty <sdougherty@microsoft.com> - 7.7-2
+- Backport upstream credential validation fixes for CVE-2026-104715.
+
 * Thu Jul 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.7-1
 - Auto-upgrade to 7.7 - for CVE-2026-12505
 
