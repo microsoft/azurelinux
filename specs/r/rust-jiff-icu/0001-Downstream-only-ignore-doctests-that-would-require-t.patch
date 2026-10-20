@@ -1,0 +1,44 @@
+From 49860403e63405a96c44cf7ef15e32331db448ad Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Wed, 4 Mar 2026 21:13:48 +0000
+Subject: [PATCH] Downstream-only: ignore doctests that would require the icu
+ meta-crate
+
+---
+ src/lib.rs | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index a4b6169..9cbfd56 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -34,7 +34,7 @@ infallible [`ConvertFrom`] trait to convert a [`jiff::Zoned`] into a
+ [`icu::time::ZonedDateTime`](icu_time::ZonedDateTime). In order to get `icu` to
+ emit the time zone information, we need to add a zone marker to our fieldset:
+ 
+-```
++```rust,ignore
+ use icu::{
+     calendar::Iso,
+     time::{ZonedDateTime, TimeZoneInfo, zone::models::AtTime},
+@@ -87,7 +87,7 @@ datetime in a particular locale. This makes use of the infallible
+ [`ConvertFrom`] trait to convert a [`jiff::civil::DateTime`] into a
+ [`icu::time::DateTime`](icu_time::DateTime).
+ 
+-```
++```rust,ignore
+ use icu::{
+     time::DateTime,
+     datetime::{fieldsets, DateTimeFormatter},
+@@ -131,7 +131,7 @@ date. This makes use of the fallible [`ConvertTryFrom`] trait to
+ convert a [`icu::time::DateTime`](icu_time::DateTime) into a
+ [`jiff::civil::DateTime`]:
+ 
+-```
++```rust,ignore
+ use icu::{
+     calendar::Date as IcuDate,
+     time::{DateTime as IcuDateTime, Time as IcuTime},
+-- 
+2.53.0
+

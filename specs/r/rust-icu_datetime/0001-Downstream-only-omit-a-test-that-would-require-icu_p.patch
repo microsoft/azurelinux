@@ -1,0 +1,26 @@
+From 9aebdf7611e248b9bf00a1d5bcbb0249e4013d9f Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 10 Mar 2026 06:20:47 +0000
+Subject: [PATCH] Downstream-only: omit a test that would require
+ icu_provider_blob
+
+---
+ src/provider/time_zones.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/provider/time_zones.rs b/src/provider/time_zones.rs
+index eb88f3a31a..fe8eb446ae 100644
+--- a/src/provider/time_zones.rs
++++ b/src/provider/time_zones.rs
+@@ -383,6 +383,8 @@ pub(crate) mod legacy {
+     }
+ 
+     #[test]
++    // Downstream: omit a test that would require icu_provider_blob
++    #[cfg(false)]
+     fn test_metazone_timezone_compat() {
+         let converted = metazone_timezone_compat(
+             &icu_provider_blob::BlobDataProvider::try_new_from_static_blob(
+-- 
+2.53.0
+

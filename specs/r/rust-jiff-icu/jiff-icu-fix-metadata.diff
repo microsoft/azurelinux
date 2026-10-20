@@ -1,0 +1,12 @@
+--- jiff-icu-0.2.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jiff-icu-0.2.2/Cargo.toml	2026-03-04T21:18:15.117836+00:00
+@@ -88,9 +88,6 @@
+ version = "0.2.11"
+ default-features = false
+ 
+-[dev-dependencies.icu]
+-version = "2.0.0"
+-
+ [dev-dependencies.jiff]
+ version = "0.2.11"
+ default-features = true
