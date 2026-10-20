@@ -1,8 +1,9 @@
 [metadata]
 category = "azl-branding-policy"
 upstream-status = "inapplicable"
+commits = [{ url = "https://github.com/microsoft/go/commit/0fd0ebbd06ef1a7db31cd37f162314ba7de1c0e5" }]
 
 [[overlays]]
-description = "Disable Microsoft build of Go toolchain telemetry by default (opt in with MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1)"
+description = "Disable Microsoft build of Go toolchain telemetry through go.env by default (opt in with go env -w MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1 or the environment)"
 type = "patch-add"
 source = "../0007-Disable-msft-go-telemetry-by-default.patch"
