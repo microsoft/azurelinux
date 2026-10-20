@@ -1,0 +1,16 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://src.fedoraproject.org/rpms/emacs/c/85bd016ff1c1b6c9ccf7333eaae4935a81d0aa10" },
+]
+
+[[overlays]]
+description = "Backport Fedora 44's tree-sitter < 0.26 requirement for Emacs 30, which still calls the API removed in tree-sitter 0.26"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+libtree-sitter-devel$'
+replacement = '''%if v"%{version}" < v"31"
+BuildRequires: pkgconfig(tree-sitter) < 0.26
+%else
+BuildRequires: pkgconfig(tree-sitter)
+%endif'''
