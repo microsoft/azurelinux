@@ -2,7 +2,7 @@
 %define sourceName kata-containers
 
 Name:         kata-containers-cc
-Version:      4.1.0.kata1
+Version:      4.1.0.kata2
 Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
@@ -135,6 +135,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Tue Oct 20 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata2-1
+- Auto-upgrade to 4.1.0.kata2
+
 * Tue Oct 20 2026 Saul Paredes <saulparedes@microsoft.com> - 4.1.0.kata1-1
 - Upgrade to 4.1.0.kata2 and rebuild Kata-CC on OpenVMM SNP with runtime-rs
 - Ship the OpenVMM SNP runtime configs and kata-ctl; drop the CLH SNP configs

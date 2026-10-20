@@ -1,6 +1,6 @@
 {
-    "Signatures": {
-        "kata-containers-4.1.0.kata1-cargo.tar.gz": "TODO-regenerate-with-generate_source_tarball.sh",
-        "kata-containers-4.1.0.kata1.tar.gz": "TODO-sha256-of-the-4.1.0.kata2-tag-tarball"
-    }
+  "Signatures": {
+    "kata-containers-4.1.0.kata2-cargo.tar.gz": "1115bc90dd7fed9e168933fb63c2fe497dd08fca5340f0bc8d5486527f3d6047",
+    "kata-containers-4.1.0.kata2.tar.gz": "38375946372bc6bf501431223eb45301e9003b0da139e8b38d7876f94c653da6"
+  }
 }
