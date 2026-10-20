@@ -3,8 +3,8 @@
 %define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
-Version:        1.17.8
-Release:        2%{?dist}
+Version:        1.20.1
+Release:        1%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,12 +16,13 @@ Source1:        nvidia-modprobe-%{modprobe_version}.tar.gz
 Patch0:         common.mk.patch
 Patch1:         libtirpc.patch
 Patch2:         nvidia-modprobe.patch
+BuildRequires:  libcap-devel
 BuildRequires:  libseccomp-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  make
 BuildRequires:  rpcsvc-proto
 BuildRequires:  which
-BuildRequires:  golang
+BuildRequires:  golang >= 1.25.0
 
 %description
 The nvidia-container library provides an interface to configure GNU/Linux
@@ -39,10 +40,7 @@ tar -C %{mod_probe_dir} --strip-components=1 -xzf %{SOURCE1}
 touch %{mod_probe_dir}/.download_stamp
 
 %build
-sed -i 's/^MAJOR[[:space:]]*:=.*$/MAJOR := 1/' versions.mk
-sed -i 's/^MINOR[[:space:]]*:=.*$/MINOR := 16/' versions.mk
-sed -i 's/^PATCH[[:space:]]*:=.*$/PATCH := 2/' versions.mk
-%make_build WITH_LIBELF=yes
+%make_build WITH_LIBELF=yes LIB_VERSION=%{version}
 
 %install
 DESTDIR=%{buildroot} make install prefix=%{_prefix} \
@@ -51,7 +49,8 @@ DESTDIR=%{buildroot} make install prefix=%{_prefix} \
 	libdir=%{_libdir} \
 	includedir=%{_includedir}\
 	docdir=%{_licensedir} \
-	WITH_LIBELF=yes
+	WITH_LIBELF=yes \
+	LIB_VERSION=%{version}
 
 %package -n %{name}%{_major}
 Summary:        NVIDIA container runtime library
@@ -135,6 +134,10 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Mon Oct 19 2026 Henry Li <lihl@microsoft.com> - 1.20.1-1
+- Upgrade to version 1.20.1 in sync with nvidia-container-toolkit
+- Use upstream LIB_VERSION build configuration
+
 * Fri Jul 10 2026 Henry Li <lihl@microsoft.com> - 1.17.8-2
 - Remove golang version cap
 

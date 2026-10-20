@@ -1,9 +1,9 @@
 %global debug_package %{nil}
-Summary:        NVIDIA container runtime hook
+Summary:        NVIDIA Container Toolkit
 Name:           nvidia-container-toolkit
-Version:        1.17.8
-Release:        4%{?dist}
-License:        ALS2.0
+Version:        1.20.1
+Release:        1%{?dist}
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/NVIDIA/nvidia-container-toolkit
@@ -28,18 +28,21 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2025-22872.patch
-Patch1:         CVE-2026-39830.patch
-Patch2:         CVE-2026-39834.patch
-BuildRequires:  golang
+BuildRequires:  golang >= 1.26.0
+BuildRequires:  systemd-rpm-macros
+
+# Distributions that don't define the udev rules directory macro fall back to
+# the default location.
+%{!?_udevrulesdir: %global _udevrulesdir %{_prefix}/lib/udev/rules.d}
+
 Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
 Provides: nvidia-container-runtime
 Provides: nvidia-container-runtime-hook
-Requires: libnvidia-container-tools >= %{version}, libnvidia-container-tools < 2.0.0
+Requires: libnvidia-container-tools = %{version}
 Requires: nvidia-container-toolkit-base == %{version}-%{release}
 
 %description
-Provides a OCI hook to enable GPU support in containers.
+Provides tools and utilities to enable GPU support in containers.
 
 # The BASE package consists of the NVIDIA Container Runtime and the NVIDIA Container Toolkit CLI.
 # This allows the package to be installed on systems where no NVIDIA Container CLI is available.
@@ -58,26 +61,121 @@ Provides tools such as the NVIDIA Container Runtime and NVIDIA Container Toolkit
 %autosetup -p1 -a1
 
 %build
-go build -ldflags "-s -w " -o "nvidia-container-runtime-hook" ./cmd/nvidia-container-runtime-hook
-go build -ldflags "-s -w " -o "nvidia-container-runtime" ./cmd/nvidia-container-runtime
-go build -ldflags "-s -w " -o "nvidia-ctk" ./cmd/nvidia-ctk
-go build -ldflags "-s -w " -o "nvidia-cdi-hook" ./cmd/nvidia-cdi-hook
+go build -ldflags "-s -w -X github.com/NVIDIA/nvidia-container-toolkit/internal/info.version=%{version}" -o "nvidia-container-runtime-hook" ./cmd/nvidia-container-runtime-hook
+go build -ldflags "-s -w -X github.com/NVIDIA/nvidia-container-toolkit/internal/info.version=%{version}" -o "nvidia-container-runtime" ./cmd/nvidia-container-runtime
+go build -ldflags "-s -w -X github.com/NVIDIA/nvidia-container-toolkit/internal/info.version=%{version}" -o "nvidia-ctk" ./cmd/nvidia-ctk
+go build -ldflags "-s -w -X github.com/NVIDIA/nvidia-container-toolkit/internal/info.version=%{version}" -o "nvidia-cdi-hook" ./cmd/nvidia-cdi-hook
 
 %install
 mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_unitdir}/nvidia-cdi-refresh.service.d
+mkdir -p %{buildroot}%{_presetdir}
+mkdir -p %{buildroot}%{_udevrulesdir}
+mkdir -p %{buildroot}%{_sysconfdir}/nvidia-container-toolkit
 install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime-hook
 install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime
 install -m 755 -t %{buildroot}%{_bindir} nvidia-ctk
 install -m 755 -t %{buildroot}%{_bindir} nvidia-cdi-hook
+install -m 644 -t %{buildroot}%{_unitdir} deployments/systemd/nvidia-cdi-refresh.service
+install -m 644 -t %{buildroot}%{_unitdir} deployments/systemd/nvidia-cdi-refresh.path
+install -m 644 -t %{buildroot}%{_presetdir} deployments/systemd/90-nvidia-container-toolkit.preset
+install -m 644 -t %{buildroot}%{_udevrulesdir} deployments/udev/99-nvidia-cdi-refresh.rules
+install -m 644 -t %{buildroot}%{_unitdir}/nvidia-cdi-refresh.service.d deployments/systemd/10-container-engines.conf
+install -m 644 -t %{buildroot}%{_sysconfdir}/nvidia-container-toolkit deployments/systemd/nvidia-cdi-refresh.env
+cat >> %{buildroot}%{_sysconfdir}/nvidia-container-toolkit/nvidia-cdi-refresh.env << 'EOF'
+
+# Azure Linux: skip libnvidia-sandboxutils when generating the CDI specification.
+# Its initialization fails on Azure Linux's 64-bit-only library layout and prints
+# "ERROR: init 250 result=11"; discovery falls back to NVML either way.
+NVIDIA_CTK_CDI_GENERATE_FEATURE_FLAGS=disable-nvsandboxutils
+EOF
+
+%post
+if [ $1 -gt 1 ]; then  # only on package upgrade
+  mkdir -p %{_localstatedir}/lib/rpm-state/nvidia-container-toolkit
+  cp -af %{_bindir}/nvidia-container-runtime-hook %{_localstatedir}/lib/rpm-state/nvidia-container-toolkit
+fi
 
 %posttrans
+if [ ! -e %{_bindir}/nvidia-container-runtime-hook ]; then
+  # repairing lost file nvidia-container-runtime-hook
+  cp -avf %{_localstatedir}/lib/rpm-state/nvidia-container-toolkit/nvidia-container-runtime-hook %{_bindir}
+fi
+rm -rf %{_localstatedir}/lib/rpm-state/nvidia-container-toolkit
 ln -sf %{_bindir}/nvidia-container-runtime-hook %{_bindir}/nvidia-container-toolkit
 
-# Generate the default config; If this file already exists no changes are made.
-%{_bindir}/nvidia-ctk --quiet config --config-file=%{_sysconfdir}/nvidia-container-runtime/config.toml --in-place
-
 %postun
-rm -f %{_bindir}/nvidia-container-toolkit
+if [ "$1" = 0 ]; then  # package is uninstalled, not upgraded
+  if [ -L %{_bindir}/nvidia-container-toolkit ]; then rm -f %{_bindir}/nvidia-container-toolkit; fi
+fi
+
+%post base
+# Generate the default config; If this file already exists no changes are made,
+# except for the Azure Linux default below.
+#
+# Azure Linux: skip libnvidia-sandboxutils for JIT-CDI unless nvcdi-feature-flags
+# is already set in [nvidia-container-runtime.modes.jit-cdi]. Its initialization
+# fails on Azure Linux's 64-bit-only library layout and writes
+# "ERROR: init 250 result=11" into GPU containers' output; discovery falls back
+# to NVML either way. To opt out, set nvcdi-feature-flags = [] in that table.
+config_file=%{_sysconfdir}/nvidia-container-runtime/config.toml
+# Reads nvidia-ctk's normalized TOML from stdin, so quoted keys, dotted keys, and
+# inline tables are recognized the same way the runtime parses them.
+jit_cdi_feature_flags_set() {
+  table=
+  while read -r line; do
+    case "${line}" in
+      "["*) table="${line}" ;;
+      "nvcdi-feature-flags ="*|"nvcdi-feature-flags="*)
+        [ "${table}" = "[nvidia-container-runtime.modes.jit-cdi]" ] && return 0 ;;
+    esac
+  done
+  return 1
+}
+jit_cdi_default=
+if ! %{_bindir}/nvidia-ctk --quiet config --config-file="${config_file}" 2>/dev/null | jit_cdi_feature_flags_set; then
+  jit_cdi_default="--set nvidia-container-runtime.modes.jit-cdi.nvcdi-feature-flags=disable-nvsandboxutils"
+fi
+%{_bindir}/nvidia-ctk --quiet config --config-file="${config_file}" --in-place ${jit_cdi_default}
+
+%systemd_post nvidia-cdi-refresh.path nvidia-cdi-refresh.service
+
+%preun base
+%systemd_preun nvidia-cdi-refresh.path nvidia-cdi-refresh.service
+
+%postun base
+%systemd_postun nvidia-cdi-refresh.path nvidia-cdi-refresh.service
+
+%posttrans base
+# Remove enablement links left by older packages that installed these units in
+# /etc so systemd can re-enable them from the current unit directory.
+stale_enabled_units_to_reenable=
+for unit in nvidia-cdi-refresh.path nvidia-cdi-refresh.service; do
+	old_unit="%{_sysconfdir}/systemd/system/${unit}"
+	wants_link="%{_sysconfdir}/systemd/system/multi-user.target.wants/${unit}"
+	if [ -L "${wants_link}" ]; then
+		case "$(readlink "${wants_link}")" in
+			"${old_unit}"|"../${unit}")
+				rm -f "${wants_link}"
+				stale_enabled_units_to_reenable="${stale_enabled_units_to_reenable} ${unit}"
+				;;
+		esac
+	fi
+done
+
+# Reload udev rules and generate a CDI specification without requiring the
+# NVIDIA driver or systemd to be active during package installation.
+if command -v udevadm >/dev/null 2>&1; then
+	udevadm control --reload-rules >/dev/null 2>&1 || :
+fi
+if command -v systemctl >/dev/null 2>&1; then
+	systemctl daemon-reload >/dev/null 2>&1 || :
+	if [ -n "${stale_enabled_units_to_reenable}" ]; then
+		systemctl enable ${stale_enabled_units_to_reenable} >/dev/null 2>&1 || :
+	fi
+	systemctl start nvidia-cdi-refresh.path >/dev/null 2>&1 || :
+	systemctl start nvidia-cdi-refresh.service >/dev/null 2>&1 || :
+fi
 
 %files
 %license LICENSE
@@ -88,8 +186,21 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-container-runtime
 %{_bindir}/nvidia-ctk
 %{_bindir}/nvidia-cdi-hook
+%{_unitdir}/nvidia-cdi-refresh.service
+%{_unitdir}/nvidia-cdi-refresh.path
+%{_presetdir}/90-nvidia-container-toolkit.preset
+%{_udevrulesdir}/99-nvidia-cdi-refresh.rules
+%{_unitdir}/nvidia-cdi-refresh.service.d/10-container-engines.conf
+%config(noreplace) %{_sysconfdir}/nvidia-container-toolkit/nvidia-cdi-refresh.env
 
 %changelog
+* Mon Oct 19 2026 Henry Li <lihl@microsoft.com> - 1.20.1-1
+- Upgrade to version 1.20.1
+- Add upstream CDI refresh service, triggers, and configuration
+- Disable libnvidia-sandboxutils by default for JIT-CDI and the CDI refresh service
+- Require libnvidia-container-tools of the same version
+- Remove security patches included upstream
+
 * Fri Jul 10 2026 Henry Li <lihl@microsoft.com> - 1.17.8-4
 - Remove golang version cap
 

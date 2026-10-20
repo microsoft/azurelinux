@@ -10751,8 +10751,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.8",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.8.tar.gz"
+          "version": "1.20.1",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.20.1.tar.gz"
         }
       }
     },
@@ -14812,8 +14812,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.17.8",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.8.tar.gz"
+          "version": "1.20.1",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.20.1.tar.gz"
         }
       }
     },
