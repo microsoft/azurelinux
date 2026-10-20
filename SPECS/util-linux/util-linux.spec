@@ -25,6 +25,7 @@ Patch5:         CVE-2026-78408.patch
 Patch6:         CVE-2026-78410.patch
 Patch7:         CVE-2026-53615.patch
 Patch8:         CVE-2026-53612.patch
+Patch9:         CVE-2026-53613.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -181,7 +182,7 @@ rm -rf %{buildroot}/lib/systemd/system
 
 %changelog
 * Fri Oct 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.40.2-7
-- Patch for CVE-2026-53615, CVE-2026-53612
+- Patch for CVE-2026-53615, CVE-2026-53612, CVE-2026-53613
 
 * Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.40.2-6
 - Patch for CVE-2026-78410, CVE-2026-78408, CVE-2026-76642
