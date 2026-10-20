@@ -1,7 +1,7 @@
 Summary:        Spell checker
 Name:           aspell
 Version:        0.60.8.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 # LGPLv2+ .. common/gettext.h
 # LGPLv2  .. modules/speller/default/phonet.hpp,
 #            modules/speller/default/phonet.cpp,
@@ -15,6 +15,10 @@ URL:            http://aspell.net/
 Source:         https://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch
 Patch1:         aspell-0.60.7-pspell_conf.patch
+Patch2:         CVE-2026-103658.patch
+Patch3:         CVE-2026-75818.patch
+Patch4:         CVE-2026-75819.patch
+Patch5:         CVE-2026-75820.patch
 BuildRequires:  chrpath
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -43,6 +47,10 @@ and header files needed for Aspell development.
 
 %prep
 %setup -q
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
 %patch 0 -p1 -b .fc
 %patch 1 -p1 -b .mlib
 iconv -f iso-8859-2 -t utf-8 < manual/aspell.info > manual/aspell.info.aux
@@ -112,6 +120,9 @@ rm -f %{buildroot}%{_infodir}/dir
 %{_mandir}/man1/pspell-config.1*
 
 %changelog
+* Tue Oct 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.60.8.1-2
+- Patch for CVE-2026-75820, CVE-2026-75819, CVE-2026-75818, CVE-2026-103658
+
 * Mon Jan 22 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.60.8.1-1
 - Upgrade to 0.60.8.1 for Mariner 3.0
 
