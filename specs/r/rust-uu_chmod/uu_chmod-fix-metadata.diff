@@ -1,0 +1,16 @@
+--- uu_chmod-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_chmod-0.7.0/Cargo.toml	2026-03-19T15:57:03.868631+00:00
+@@ -64,12 +64,8 @@
+     "fs",
+     "mode",
+     "perms",
++    "safe-traversal",
+ ]
+-package = "uucore"
+-
+-[target.'cfg(all(unix, not(target_os = "redox")))'.dependencies.uucore]
+-version = "0.7.0"
+-features = ["safe-traversal"]
+ package = "uucore"
+ 
+ [lints.clippy]
