@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.17.8
-Release:        4%{?dist}
+Version:        1.20.1
+Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,10 +28,7 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2025-22872.patch
-Patch1:         CVE-2026-39830.patch
-Patch2:         CVE-2026-39834.patch
-BuildRequires:  golang
+BuildRequires:  golang >= 1.26.0
 Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
 Provides: nvidia-container-runtime
 Provides: nvidia-container-runtime-hook
@@ -58,10 +55,10 @@ Provides tools such as the NVIDIA Container Runtime and NVIDIA Container Toolkit
 %autosetup -p1 -a1
 
 %build
-go build -ldflags "-s -w " -o "nvidia-container-runtime-hook" ./cmd/nvidia-container-runtime-hook
-go build -ldflags "-s -w " -o "nvidia-container-runtime" ./cmd/nvidia-container-runtime
-go build -ldflags "-s -w " -o "nvidia-ctk" ./cmd/nvidia-ctk
-go build -ldflags "-s -w " -o "nvidia-cdi-hook" ./cmd/nvidia-cdi-hook
+go build -ldflags "-s -w -X github.com/NVIDIA/nvidia-container-toolkit/internal/info.version=%{version}" -o "nvidia-container-runtime-hook" ./cmd/nvidia-container-runtime-hook
+go build -ldflags "-s -w -X github.com/NVIDIA/nvidia-container-toolkit/internal/info.version=%{version}" -o "nvidia-container-runtime" ./cmd/nvidia-container-runtime
+go build -ldflags "-s -w -X github.com/NVIDIA/nvidia-container-toolkit/internal/info.version=%{version}" -o "nvidia-ctk" ./cmd/nvidia-ctk
+go build -ldflags "-s -w -X github.com/NVIDIA/nvidia-container-toolkit/internal/info.version=%{version}" -o "nvidia-cdi-hook" ./cmd/nvidia-cdi-hook
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -90,6 +87,10 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
+* Mon Oct 19 2026 Henry Li <lihl@microsoft.com> - 1.20.1-1
+- Upgrade to version 1.20.1
+- Remove security patches included upstream
+
 * Fri Jul 10 2026 Henry Li <lihl@microsoft.com> - 1.17.8-4
 - Remove golang version cap
 
