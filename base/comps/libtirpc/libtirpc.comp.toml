@@ -2,8 +2,8 @@
 release = { calculation = "manual" }
 
 [[components.libtirpc.overlays]]
-description = "Bump release"
+description = "Keep the patched build newer than the published 1.3.7-4.azl4 release"
 type = "spec-set-tag"
 tag = "Release"
-value = "1.rc1.1%{?dist}"
-metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }
+value = "5%{?dist}"
+metadata = { category = "azl-release-management", upstream-status = "inapplicable" }
