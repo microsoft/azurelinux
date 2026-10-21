@@ -5,7 +5,7 @@ Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.30.6
+Version:        1.31.8
 Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
@@ -173,6 +173,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Wed Oct 21 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.31.8-1
+- Auto-upgrade to 1.31.8 - various bug fixes
+
 * Wed Oct 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.6-1
 - Auto-upgrade to 1.30.6 - for CVE-2026-15176, CVE-2026-93479, CVE-2026-95101, CVE-2026-97629, CVE-2026-97205
 - Upgrade njs to 1.0.2 for CVE-2026-101025, CVE-2026-101019
