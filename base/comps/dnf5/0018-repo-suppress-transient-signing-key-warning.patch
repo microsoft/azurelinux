@@ -1,0 +1,494 @@
+From 98b43ff9db829016e61f7aec3c7829df88ce96c6 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Tue, 14 Jul 2026 05:50:58 +0000
+Subject: [PATCH] repo: suppress transient "Signing key not found" error from
+ progress bar
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When a repository has repo_gpgcheck=1 and the signing key hasn't been
+imported yet, the progress bar showed a confusing error message
+"repomd.xml GPG signature verification error: Signing key not found"
+before the user was prompted to import the key. This error is transient
+— it is resolved once the key import succeeds.
+
+Suppress the error from the download callbacks only during the first
+download pass when key import will be attempted (import_keys is true).
+On the second pass (after key import was attempted/refused), the flag is
+false and the error is shown normally.
+
+Extract is_signing_key_not_found_error() helper into repo_pgp to
+share the string matching between the callback suppression and the
+existing handle_repo_exception() check.
+
+Includes two tests:
+- test_load_repo_gpgcheck_no_keyring_error: when the user accepts
+  key import, no "Signing key not found" error is reported via
+  download callbacks (suppressed on the first pass, resolved on
+  the second).
+- test_load_repo_gpgcheck_refused_key_shows_error: when the user
+  refuses key import, the error is reported exactly once (suppressed
+  on the first pass, shown on the second pass when suppression is
+  off).
+
+https://github.com/rpm-software-management/dnf5/issues/2810
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ libdnf5/repo/repo_downloader.cpp              | 11 +++
+ libdnf5/repo/repo_downloader.hpp              |  4 +
+ libdnf5/repo/repo_pgp.cpp                     |  5 +
+ libdnf5/repo/repo_pgp.hpp                     |  6 ++
+ libdnf5/repo/repo_sack.cpp                    |  4 +-
+ test/data/keys/repo-gpg-key.pub               | 28 ++++++
+ .../repomd-repo1-gpg/repodata/primary.xml     | 95 +++++++++++++++++++
+ .../repomd-repo1-gpg/repodata/repomd.xml      | 11 +++
+ .../repomd-repo1-gpg/repodata/repomd.xml.asc  | 16 ++++
+ test/libdnf5/repo/test_repo.cpp               | 79 ++++++++++++++-
+ test/libdnf5/repo/test_repo.hpp               |  4 +
+ 11 files changed, 258 insertions(+), 5 deletions(-)
+ create mode 100644 test/data/keys/repo-gpg-key.pub
+ create mode 100644 test/data/repos-repomd/repomd-repo1-gpg/repodata/primary.xml
+ create mode 100644 test/data/repos-repomd/repomd-repo1-gpg/repodata/repomd.xml
+ create mode 100644 test/data/repos-repomd/repomd-repo1-gpg/repodata/repomd.xml.asc
+
+diff --git a/libdnf5/repo/repo_downloader.cpp b/libdnf5/repo/repo_downloader.cpp
+index 1d13928c9b..63d81ecac7 100644
+--- a/libdnf5/repo/repo_downloader.cpp
++++ b/libdnf5/repo/repo_downloader.cpp
+@@ -19,6 +19,7 @@
+ 
+ #include "repo_downloader.hpp"
+ 
++#include "repo_pgp.hpp"
+ #include "utils/fs/utils.hpp"
+ #include "utils/string.hpp"
+ 
+@@ -83,6 +84,11 @@ int RepoDownloader::end_cb_full_download(void * data, LrTransferStatus status, c
+         }
+     }
+     if (auto * download_callbacks = download_callback_data->repo->get_base()->get_download_callbacks()) {
++        if (cb_status == DownloadCallbacks::TransferStatus::ERROR && download_callback_data->suppress_keyring_errors &&
++            is_signing_key_not_found_error(msg)) {
++            return download_callbacks->end(
++                download_callback_data->user_cb_data, DownloadCallbacks::TransferStatus::SUCCESSFUL, nullptr);
++        }
+         return download_callbacks->end(download_callback_data->user_cb_data, cb_status, msg);
+     }
+     return 0;
+@@ -125,6 +131,10 @@ int RepoDownloader::end_cb_sync_check(void * data, LrTransferStatus status, cons
+         }
+     }
+     if (auto * download_callbacks = cbd->repo->get_base()->get_download_callbacks()) {
++        if (cb_status == DownloadCallbacks::TransferStatus::ERROR && cbd->suppress_keyring_errors &&
++            is_signing_key_not_found_error(msg)) {
++            return download_callbacks->end(cbd->user_cb_data, DownloadCallbacks::TransferStatus::SUCCESSFUL, nullptr);
++        }
+         return download_callbacks->end(cbd->user_cb_data, cb_status, msg);
+     }
+     return 0;
+@@ -221,6 +231,7 @@ void RepoDownloader::add(
+     cbd.repo = repo.get_weak_ptr();
+     cbd.destination = destdir;
+     cbd.load_repo = load_repo;
++    cbd.suppress_keyring_errors = suppress_keyring_errors;
+     std::filesystem::create_directories(cbd.destination);
+     cbd.temp_download_target = libdnf5::utils::fs::TempDir{cbd.destination, "tmpdir"};
+ 
+diff --git a/libdnf5/repo/repo_downloader.hpp b/libdnf5/repo/repo_downloader.hpp
+index 363bf0eeeb..8f90927218 100644
+--- a/libdnf5/repo/repo_downloader.hpp
++++ b/libdnf5/repo/repo_downloader.hpp
+@@ -80,6 +80,8 @@ class RepoDownloader {
+     // Download the previously added repos.
+     std::unordered_map<Repo *, std::vector<std::string>> download();
+ 
++    void set_suppress_keyring_errors(bool suppress) { suppress_keyring_errors = suppress; }
++
+ private:
+     struct CallbackData {
+         std::function<repo_loading_func> load_repo;
+@@ -92,6 +94,7 @@ class RepoDownloader {
+         RepoWeakPtr repo;
+         std::unique_ptr<LrMetadataTarget> lr_target;
+         bool is_in_sync;
++        bool suppress_keyring_errors{false};
+     };
+ 
+     static LibrepoHandle init_local_handle(const DownloadData & download_data);
+@@ -110,6 +113,7 @@ class RepoDownloader {
+     static int mirror_failure_cb(void * data, const char * msg, const char * url, const char * metadata);
+ 
+     std::vector<CallbackData> callback_data;
++    bool suppress_keyring_errors{false};
+ };
+ 
+ }  // namespace libdnf5::repo
+diff --git a/libdnf5/repo/repo_pgp.cpp b/libdnf5/repo/repo_pgp.cpp
+index fa998d55bb..aa14002a4e 100644
+--- a/libdnf5/repo/repo_pgp.cpp
++++ b/libdnf5/repo/repo_pgp.cpp
+@@ -25,9 +25,14 @@
+ #include "libdnf5/utils/fs/temp.hpp"
+ 
+ #include <memory>
++#include <string_view>
+ 
+ namespace libdnf5::repo {
+ 
++bool is_signing_key_not_found_error(const char * msg) {
++    return msg && std::string_view(msg).ends_with("Signing key not found");
++}
++
+ Key::Key(const LrGpgKey * key, const LrGpgSubkey * subkey, const std::string & url, const std::string & path)
+     : KeyInfo(
+           url,
+diff --git a/libdnf5/repo/repo_pgp.hpp b/libdnf5/repo/repo_pgp.hpp
+index e5a1924983..1b0b478d83 100644
+--- a/libdnf5/repo/repo_pgp.hpp
++++ b/libdnf5/repo/repo_pgp.hpp
+@@ -40,6 +40,12 @@ class Key : public libdnf5::rpm::KeyInfo {
+     Key(const LrGpgKey * key, const LrGpgSubkey * subkey, const std::string & url, const std::string & path);
+ };
+ 
++// Check whether an error message from librepo indicates a missing signing
++// key (resolvable by importing the repo's gpgkey).  String-based because
++// librepo currently uses LRE_BADGPG for all GPG errors; replace with a
++// return-code check when librepo gains a distinct code for missing keys.
++bool is_signing_key_not_found_error(const char * msg);
++
+ /// Wraps OpenPGP in a higher-level interface.
+ /// @exception RepoPgpError (public) Thrown on any OpenPGP-related error.
+ class RepoPgp {
+diff --git a/libdnf5/repo/repo_sack.cpp b/libdnf5/repo/repo_sack.cpp
+index 0881108853..d854c41b0e 100644
+--- a/libdnf5/repo/repo_sack.cpp
++++ b/libdnf5/repo/repo_sack.cpp
+@@ -333,8 +333,7 @@ bool RepoSack::Impl::handle_repo_exception(const Repo * repo, std::exception_ptr
+     } catch (const RepoDownloadError & rd_err) {
+         exception = rd_err;
+         if (report_key_err) {
+-            std::string msg = rd_err.what();
+-            if (msg.ends_with("Signing key not found")) {
++            if (is_signing_key_not_found_error(rd_err.what())) {
+                 return true;
+             }
+         }
+@@ -644,6 +643,7 @@ void RepoSack::Impl::update_and_load_repos(libdnf5::repo::RepoQuery & repos, boo
+         }
+ 
+         RepoDownloader repo_downloader{};
++        repo_downloader.set_suppress_keyring_errors(import_keys);
+         for (const auto & repo : repos_for_processing) {
+             repo_downloader.add(*repo, repo->get_config().get_cachedir(), load_downloaded_repo);
+         }
+diff --git a/test/data/keys/repo-gpg-key.pub b/test/data/keys/repo-gpg-key.pub
+new file mode 100644
+index 0000000000..e51be3348b
+--- /dev/null
++++ b/test/data/keys/repo-gpg-key.pub
+@@ -0,0 +1,28 @@
++-----BEGIN PGP PUBLIC KEY BLOCK-----
++
++mQINBGpVzfMBEAC6zi+D4R0rYC72dOWUaJV5iii9LaXOnABl7Lt8QRScze/lnoPM
++0AX6I0xUyLMSl+yONhXlNQNKB24MKEMjmyGMnG4TL9xihnDGjBLdKNFubJHYcCXd
++lWwGVcSqkAVa1VonDKHiX9e8zzFiLu5uzh+0yasxPH6ae680j76bCy6DwO2+6Uvo
++t53Oyevz0ayOc4Lb1E03iAt5Ruxc/yfOh0Mq49Kqmz7Wlx1bbFi1mVTlHT3EjzS3
++1AT4ckhTOS0nEaBkSsgNxSXH8CUeh2Ww20E+LdVv0XlHdudZAO2AQmSZYw8v1RN5
++AW1ut7Qrj5eZ8E6/dHEUOOAYqGh+V8/78hLQGK92qyAFsLqScThyO/vyyOsEQV2m
++QveOBcUloUjE1ZY+07Vbc+7JiFGEXuPF3vpCQ6nCjmP3QSzsa5IzpDGmHBuyIUNM
++XyrFxnILEEccPvb4pIK5PhqGyoiQjqKbff4RTyHK3/SBvTJ8OQ6M1fS4rSU9+fZR
++Zm3/S2ICdQaQBguOgrs6LGdBL4P2g+rsKg4hUZiGalivo1uzSKPxui5kYr6ui/41
++R+EaMx9cELBjD8r12dOP+T8PSyfUDhOKNktQuUHPewKwwV4I2W2yQqdDdDuE3vaG
++ZGA8I60c6JIGkOgw5Be5xPal1OBsEyTxOwiSB0Zy7kvGeMqbFSPJ2JAMEQARAQAB
++tA10ZXN0QHRlc3QuY29tiQJRBBMBCgA7FiEEHCfWsfsIOVgPsnLsAfdtCi7Pr7QF
++AmpVzfMCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQAfdtCi7Pr7Tw
++dA//Sdx6CykRq8jS4eeWWPE0SDkDtMtrw2n5Dw06zASKN5XUa07JW+d8ycPSemkB
++61er9tBV++hGOcWx3JHq+xe8KXjyecl41/zxI7edqVjozld5SAP9XiXjIAWFVJGJ
++hdtqo8tM4v0RFHmdeHkfCbcUJSDN89GYS8XSImkUOtlRETEqrO+k9aRrNuxU1nfx
++mVPbv/Xm/VPHdNFfdc3CX0RWJWjgkwY8QAGOwytkdtKnZCBwMa29sjFgaLLxzYtb
++yqGy1e/558Gl5g0Ekua+Wtielnw+iZOAetVgvcqMhI+Pmi9vyLRJM6MFxrSHB6Vn
++HdCcEAO3tOI8CrOjLmXYkj932JacxX8b3RDg56embfALfe/tkBuVjqOv9mrWgpdk
++XYeY5VX1eIB7WwLsPMLGIqG9qsc8fYBwSbt23UrZklKgp1dkIvi7l2/7fQQ3YPZq
++7hVCfooQG1MWlOw3V/237XpREFrlWrDIU5ilyzVDoj8pd7HGvLBfAJrhk7VoJTzJ
++d57xTBq0+41H1+B9iJ8ZSU3pjeLI4fDefxO4FtYXEEnkz6iGL1b3j6FHxPIPvn6k
++IToEfvqju7XLwC4smZT+bJCzvlc3GMHErQLsLMz3Ic+yAeCRq264Nyufm5UwlHP6
++Kib4zgMO5b/UnLjrHiKtmI7dNfDNE2irsQyh9qhE5lL10H0=
++=fukw
++-----END PGP PUBLIC KEY BLOCK-----
+diff --git a/test/data/repos-repomd/repomd-repo1-gpg/repodata/primary.xml b/test/data/repos-repomd/repomd-repo1-gpg/repodata/primary.xml
+new file mode 100644
+index 0000000000..0508b871e4
+--- /dev/null
++++ b/test/data/repos-repomd/repomd-repo1-gpg/repodata/primary.xml
+@@ -0,0 +1,95 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<metadata xmlns="http://linux.duke.edu/metadata/common" xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="3">
++
++<package type="rpm">
++  <name>pkg</name>
++  <arch>x86_64</arch>
++  <version epoch="0" ver="1.2" rel="3"/>
++  <checksum type="sha256" pkgid="YES">ec57b154a186fdc1f71976fc0fde97d51c744bc88d222828b4cfa42e3b1f855b</checksum>
++  <summary>Summary</summary>
++  <description>Description</description>
++  <packager>Packager</packager>
++  <url>http://example.com/</url>
++  <time file="123" build="456"/>
++  <size package="111" installed="222" archive="333"/>
++  <location href="pkg-1.2-3.x86_64.rpm"/>
++  <format>
++    <rpm:license>License</rpm:license>
++    <rpm:vendor>Vendor</rpm:vendor>
++    <rpm:group>Group</rpm:group>
++    <rpm:buildhost>Buildhost</rpm:buildhost>
++    <rpm:sourcerpm>pkg-1.2-3.src.rpm</rpm:sourcerpm>
++    <rpm:header-range start="11" end="22"/>
++  </format>
++</package>
++
++<package type="rpm">
++  <name>pkg-libs</name>
++  <arch>x86_64</arch>
++  <version epoch="1" ver="1.3" rel="4"/>
++  <checksum type="sha256" pkgid="YES">caa857c48130b4fdea3f7fa498da4324ae2ac00c8900d71c0eef0a90457636bd</checksum>
++  <summary>Summary</summary>
++  <description>Description</description>
++  <packager>Packager</packager>
++  <url>http://example.com/</url>
++  <time file="123" build="456"/>
++  <size package="111" installed="222" archive="333"/>
++  <location href="pkg-libs-1.3-4.x86_64.rpm"/>
++  <format>
++    <rpm:license>License</rpm:license>
++    <rpm:vendor>Vendor</rpm:vendor>
++    <rpm:group>Group</rpm:group>
++    <rpm:buildhost>Buildhost</rpm:buildhost>
++    <rpm:sourcerpm>pkg-1.3-4.src.rpm</rpm:sourcerpm>
++    <rpm:header-range start="11" end="22"/>
++  </format>
++</package>
++
++<package type="rpm">
++  <name>unresolvable</name>
++  <arch>noarch</arch>
++  <version epoch="1" ver="2" rel="3"/>
++  <checksum type="sha256" pkgid="YES">acedd07199eae0111f1306b8b5d794a3358568feb0ccf0fd39bd8d815fd78ece</checksum>
++  <summary>Summary</summary>
++  <description>Description</description>
++  <packager>Packager</packager>
++  <url>http://example.com/</url>
++  <time file="123" build="456"/>
++  <size package="111" installed="222" archive="333"/>
++  <location xml:base="http://example.com/" href="unresolvable-2-3.x86_64.rpm"/>
++  <format>
++    <rpm:license>License</rpm:license>
++    <rpm:vendor>Vendor</rpm:vendor>
++    <rpm:group>Group</rpm:group>
++    <rpm:buildhost>Buildhost</rpm:buildhost>
++    <rpm:sourcerpm>unresolvable-2-3.src.rpm</rpm:sourcerpm>
++    <rpm:header-range start="11" end="22"/>
++    <rpm:provides>
++      <rpm:entry name="prv" flags="EQ" epoch="1" ver="2" rel="3"/>
++    </rpm:provides>
++    <rpm:requires>
++      <rpm:entry name="req" flags="EQ" epoch="1" ver="2" rel="3"/>
++      <rpm:entry name="prereq" pre="1"/>
++    </rpm:requires>
++    <rpm:conflicts>
++      <rpm:entry name="con" flags="LT" epoch="1" ver="2"/>
++    </rpm:conflicts>
++    <rpm:obsoletes>
++      <rpm:entry name="obs" flags="LT" epoch="1" ver="2"/>
++    </rpm:obsoletes>
++    <rpm:recommends>
++      <rpm:entry name="rec"/>
++    </rpm:recommends>
++    <rpm:supplements>
++      <rpm:entry name="sup"/>
++    </rpm:supplements>
++    <rpm:suggests>
++      <rpm:entry name="sug"/>
++    </rpm:suggests>
++    <rpm:enhances>
++      <rpm:entry name="enh"/>
++    </rpm:enhances>
++  </format>
++</package>
++
++</metadata>
+diff --git a/test/data/repos-repomd/repomd-repo1-gpg/repodata/repomd.xml b/test/data/repos-repomd/repomd-repo1-gpg/repodata/repomd.xml
+new file mode 100644
+index 0000000000..a92e1add03
+--- /dev/null
++++ b/test/data/repos-repomd/repomd-repo1-gpg/repodata/repomd.xml
+@@ -0,0 +1,11 @@
++<repomd xmlns="http://linux.duke.edu/metadata/repo">
++  <revision>1550000000</revision>
++  <data type="primary">
++    <checksum type="sha256">56cb6eeb023954ecf09727f06bed53954d219254eeec952cab86e75937d2b64b</checksum>
++    <open-checksum type="sha256">56cb6eeb023954ecf09727f06bed53954d219254eeec952cab86e75937d2b64b</open-checksum>
++    <location href="repodata/primary.xml" />
++    <timestamp>1597222003</timestamp>
++    <size>3268</size>
++    <open-size>3268</open-size>
++  </data>
++</repomd>
+diff --git a/test/data/repos-repomd/repomd-repo1-gpg/repodata/repomd.xml.asc b/test/data/repos-repomd/repomd-repo1-gpg/repodata/repomd.xml.asc
+new file mode 100644
+index 0000000000..102965f2d5
+--- /dev/null
++++ b/test/data/repos-repomd/repomd-repo1-gpg/repodata/repomd.xml.asc
+@@ -0,0 +1,16 @@
++-----BEGIN PGP SIGNATURE-----
++
++iQIzBAABCgAdFiEEHCfWsfsIOVgPsnLsAfdtCi7Pr7QFAmpVzfwACgkQAfdtCi7P
++r7R9cw//Ws57+KGIATdds53KAhKZkcRExCPa7wRtHh2FtJhnOsuRBiKljHZY6JKE
++PtklyYo1jXcetdHyilgbDK/a8/QLe1SHNOdcoaQ75KwThgpolzoWYEDGMzKDjioV
++12UqxpoZeyugbYIQipGe0n64GIJbe/x1CFjxRCItI15uDRQWFIawv8jcmSiy2wRU
++ebsrYHpmForP1OIAqE02xfYJmYg4yArebp7fITA5nXtS772jWQY553VQ6cBUw6Fp
++NgGak4dfM7E9kysBtz2upRQwuDo2jjh6n6VgZya+DF+Wr07LKv+YmJ+p6wTCh5s1
++BHJwDOrffdxnaap42BiJ0Z4gScoQHSFH+qG5ZnFxd5n3oRC3j1ztAV66LVlYD1nk
++teFFvPzEXll+DJjAFoVoaxcoUMM+e1Q+TYQCLYLoB5HR2ucTpQRMW4e7m1OvQbm9
++Yf4Fm72fElNKaqYHTIdRh2UCu18xug9fkV1WPDxvS1t6c/DCTWQvDKRtMrLvdwsf
++AosJBjvrB7phM/mnd/jDrKFY9NmfvAEN8IzOvCnj7VBqyzjiAiNdhDBDD66sBTey
++u+NmGJ3Zc8w66hZl5kmqm6K5frVDtfoSIjHxxPhCoCOSq8t5OHp8LDGraQQh0uqW
++n2/mUznUJfHSL2PuaOKQbbZG/RmM/BqW9Bl/MnthbckYP9h3Pbk=
++=5Hih
++-----END PGP SIGNATURE-----
+diff --git a/test/libdnf5/repo/test_repo.cpp b/test/libdnf5/repo/test_repo.cpp
+index ee4615d9d7..1011248ebb 100644
+--- a/test/libdnf5/repo/test_repo.cpp
++++ b/test/libdnf5/repo/test_repo.cpp
+@@ -46,10 +46,12 @@ class DownloadCallbacks : public libdnf5::repo::DownloadCallbacks {
+         return nullptr;
+     }
+ 
+-    int end([[maybe_unused]] void * user_cb_data, [[maybe_unused]] TransferStatus status, const char * error_message)
+-        override {
++    int end([[maybe_unused]] void * user_cb_data, TransferStatus status, const char * error_message) override {
+         ++end_cnt;
+         end_error_message = libdnf5::utils::string::c_to_str(error_message);
++        if (status == TransferStatus::ERROR) {
++            end_error_messages.push_back(end_error_message);
++        }
+         return 0;
+     }
+ 
+@@ -84,6 +86,7 @@ class DownloadCallbacks : public libdnf5::repo::DownloadCallbacks {
+ 
+     int end_cnt = 0;
+     std::string end_error_message;
++    std::vector<std::string> end_error_messages;
+ 
+     int progress_cnt = 0;
+     int fastest_mirror_cnt = 0;
+@@ -94,9 +97,10 @@ class RepoCallbacks : public libdnf5::repo::RepoCallbacks {
+ public:
+     bool repokey_import([[maybe_unused]] const libdnf5::rpm::KeyInfo & key_info) override {
+         ++repokey_import_cnt;
+-        return true;
++        return accept_key_import;
+     }
+ 
++    bool accept_key_import{true};
+     int repokey_import_cnt = 0;
+ };
+ 
+@@ -206,3 +210,72 @@ void RepoTest::test_load_repos_load_available_system() {
+     CPPUNIT_ASSERT_EQUAL(0, dl_callbacks_ptr->fastest_mirror_cnt);
+     CPPUNIT_ASSERT_EQUAL(0, dl_callbacks_ptr->handle_mirror_failure_cnt);
+ }
++
++void RepoTest::test_load_repo_gpgcheck_no_keyring_error() {
++    std::string repoid("repomd-repo1-gpg");
++    std::filesystem::path repo_path = PROJECT_SOURCE_DIR "/test/data/repos-repomd";
++    repo_path /= repoid;
++    auto repo = repo_sack->create_repo(repoid);
++    repo->get_config().get_baseurl_option().set("file://" + repo_path.string());
++    repo->get_config().get_repo_gpgcheck_option().set(true);
++    repo->get_config().get_gpgkey_option().set(
++        std::vector<std::string>{"file://" + std::string(PROJECT_SOURCE_DIR) + "/test/data/keys/repo-gpg-key.pub"});
++
++    auto dl_callbacks = std::make_unique<DownloadCallbacks>();
++    auto dl_callbacks_ptr = dl_callbacks.get();
++    base.set_download_callbacks(std::move(dl_callbacks));
++
++    auto callbacks = std::make_unique<RepoCallbacks>();
++    auto cbs = callbacks.get();
++    repo->set_callbacks(std::move(callbacks));
++
++    repo_sack->load_repos(libdnf5::repo::Repo::Type::AVAILABLE);
++
++    // The key should have been imported
++    CPPUNIT_ASSERT_EQUAL(1, cbs->repokey_import_cnt);
++
++    // No "Signing key not found" error should be shown in download callbacks
++    for (const auto & msg : dl_callbacks_ptr->end_error_messages) {
++        CPPUNIT_ASSERT_MESSAGE(
++            "Download callback should not report 'Signing key not found' error: " + msg,
++            msg.find("Signing key not found") == std::string::npos);
++    }
++}
++
++void RepoTest::test_load_repo_gpgcheck_refused_key_shows_error() {
++    std::string repoid("repomd-repo1-gpg");
++    std::filesystem::path repo_path = PROJECT_SOURCE_DIR "/test/data/repos-repomd";
++    repo_path /= repoid;
++    auto repo = repo_sack->create_repo(repoid);
++    repo->get_config().get_baseurl_option().set("file://" + repo_path.string());
++    repo->get_config().get_repo_gpgcheck_option().set(true);
++    repo->get_config().get_gpgkey_option().set(
++        std::vector<std::string>{"file://" + std::string(PROJECT_SOURCE_DIR) + "/test/data/keys/repo-gpg-key.pub"});
++    repo->get_config().get_skip_if_unavailable_option().set(true);
++
++    auto dl_callbacks = std::make_unique<DownloadCallbacks>();
++    auto dl_callbacks_ptr = dl_callbacks.get();
++    base.set_download_callbacks(std::move(dl_callbacks));
++
++    auto callbacks = std::make_unique<RepoCallbacks>();
++    auto cbs = callbacks.get();
++    cbs->accept_key_import = false;
++    repo->set_callbacks(std::move(callbacks));
++
++    repo_sack->load_repos(libdnf5::repo::Repo::Type::AVAILABLE);
++
++    // Key import was offered but refused
++    CPPUNIT_ASSERT_EQUAL(1, cbs->repokey_import_cnt);
++
++    // "Signing key not found" error should be shown exactly once (second pass only)
++    int signing_key_error_cnt = 0;
++    for (const auto & msg : dl_callbacks_ptr->end_error_messages) {
++        if (msg.find("Signing key not found") != std::string::npos) {
++            ++signing_key_error_cnt;
++        }
++    }
++    CPPUNIT_ASSERT_EQUAL_MESSAGE(
++        "Download callback should report 'Signing key not found' error exactly once (second pass only)",
++        1,
++        signing_key_error_cnt);
++}
+diff --git a/test/libdnf5/repo/test_repo.hpp b/test/libdnf5/repo/test_repo.hpp
+index 90dec8a9d6..7125b68b81 100644
+--- a/test/libdnf5/repo/test_repo.hpp
++++ b/test/libdnf5/repo/test_repo.hpp
+@@ -34,6 +34,8 @@ class RepoTest : public BaseTestCase {
+     CPPUNIT_TEST(test_load_repos_invalid_type);
+     CPPUNIT_TEST(test_load_repos_load_available);
+     CPPUNIT_TEST(test_load_repos_load_available_system);
++    CPPUNIT_TEST(test_load_repo_gpgcheck_no_keyring_error);
++    CPPUNIT_TEST(test_load_repo_gpgcheck_refused_key_shows_error);
+     CPPUNIT_TEST_SUITE_END();
+ 
+ public:
+@@ -44,6 +46,8 @@ class RepoTest : public BaseTestCase {
+     void test_load_repos_invalid_type();
+     void test_load_repos_load_available();
+     void test_load_repos_load_available_system();
++    void test_load_repo_gpgcheck_no_keyring_error();
++    void test_load_repo_gpgcheck_refused_key_shows_error();
+ };
+ 
+ #endif

@@ -13,7 +13,7 @@
 
 Name:           dnf5
 Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary:        Command-line package manager
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/dnf5
@@ -281,6 +281,7 @@ BuildRequires:  python3-devel
 %endif
 
 Provides: tdnf = %{version}-%{release}
+Patch18: 0018-repo-suppress-transient-signing-key-warning.patch
 %description
 DNF5 is a command-line package manager that automates the process of installing,
 upgrading, configuring, and removing computer programs in a consistent manner.
