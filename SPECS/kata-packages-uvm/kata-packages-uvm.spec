@@ -65,24 +65,12 @@ Requires:       kata-containers-tools
 %ifarch x86_64
 Requires:       kata-containers-cc-tools
 %endif
-Requires:       kernel-uvm
-Requires:       kernel-uvm-devel
+# Also the guest kernel measured into the kata-cc SNP IGVMs; needs the SNP guest support from mshv2
+Requires:       kernel-uvm >= 6.18.52.mshv2
 Requires:       make
 Requires:       parted
-# Python dependencies for non-packaged IGVM tool
+# kata-cc igvm_manifest.py
 Requires:       python3
-Requires:       python3-pip
-Requires:       python3-frozendict
-Requires:       python3-ecdsa
-Requires:       python3-pyelftools
-Requires:       python3-cached_property
-Requires:       python3-cstruct
-Requires:       python3-devel
-Requires:       python3-libs
-Requires:       python3-setuptools
-Requires:       python3-pytest
-Requires:       python3-libclang
-Requires:       python3-tomli
 Requires:       qemu-img
 Requires:       veritysetup
 

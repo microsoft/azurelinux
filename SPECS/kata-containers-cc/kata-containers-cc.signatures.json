@@ -1,7 +1,6 @@
 {
- "Signatures": {
-  "kata-containers-3.15.0.aks0-vendor.tar.gz": "214a34c598dc4d53ac1b7e0f7a3631ae596dbf895942d4bac63fabb5f9de84ef",
-  "kata-containers-3.15.0.aks0.tar.gz": "14a1b95ab695935cc9e7ae326af02378010a04e6cb5735211beebab8e4074b40",
-  "kata-containers-3.15.0.aks1-cargo.tar.gz": "ea67fe757d37681118a3e035f0f520c5ad79c4b036fcf42651046fae40d2fcc3"
- }
+    "Signatures": {
+        "kata-containers-4.1.0.kata1-cargo.tar.gz": "TODO-regenerate-with-generate_source_tarball.sh",
+        "kata-containers-4.1.0.kata1.tar.gz": "TODO-sha256-of-the-4.1.0.kata2-tag-tarball"
+    }
 }
