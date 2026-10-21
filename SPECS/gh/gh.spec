@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
-Version:        2.102.0
-Release:        2%{?dist}
+Version:        2.102.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,10 +14,6 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 Source1:        %{name}-%{version}-vendor.tar.gz
 
 Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
-Patch1:         CVE-2026-78659.patch
-Patch2:         CVE-2026-78660.patch
-Patch3:         CVE-2026-78669.patch
-Patch4:         CVE-2026-97032.patch
 
 BuildRequires:  golang >= 1.26.5
 BuildRequires:  git
@@ -63,6 +59,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed Oct 21 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.102.1-1
+- Upgrade gh to 2.102.1
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.102.0-2
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
 
