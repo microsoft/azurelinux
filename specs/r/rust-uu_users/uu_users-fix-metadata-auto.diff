@@ -1,0 +1,17 @@
+--- uu_users-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_users-0.7.0/Cargo.toml	2026-03-19T17:38:57.956299+00:00
+@@ -62,9 +62,6 @@
+ features = ["utmpx"]
+ package = "uucore"
+ 
+-[target.'cfg(target_os = "openbsd")'.dependencies.utmp-classic]
+-version = "0.1.6"
+-
+ [lints.clippy]
+ cargo_common_metadata = "allow"
+ cast_lossless = "allow"
+@@ -128,3 +125,4 @@
+     "cfg(fuzzing)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++
