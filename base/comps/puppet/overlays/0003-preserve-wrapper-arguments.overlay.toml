@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Preserve argument boundaries and literal glob characters in the SELinux startup wrapper. Drop when Fedora forwards arguments with quoted $@."
+type = "file-search-replace"
+file = "start-puppet-wrapper"
+regex = '(?m)^exec /usr/bin/puppet \$\*$'
+replacement = 'exec /usr/bin/puppet "$@"'
