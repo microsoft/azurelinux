@@ -1,5 +1,6 @@
-# Pin to 0.6.0 — must stay in sync with rust-equator-macro (also pinned to 0.6.0).
-# Remove this pin once Koji builders can see prior completed builds as deps.
+# Fedora 43 ships 0.6.0, but its dist-git branch does not contain that version.
+# Pin the Fedora 44 commit to preserve version parity with Fedora 43 and match
+# rust-equator-macro 0.6.0.
 # https://src.fedoraproject.org/rpms/rust-equator/c/cfa619f43f82ebbfc20756d0308aa8c3a1d3c09e
 [components.rust-equator]
-spec = { type = "upstream", upstream-commit = "cfa619f43f82ebbfc20756d0308aa8c3a1d3c09e" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "cfa619f43f82ebbfc20756d0308aa8c3a1d3c09e" }
