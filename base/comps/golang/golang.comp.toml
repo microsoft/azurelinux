@@ -12,4 +12,4 @@ hash = "42d77b17d643c9b01df22874c77d739d62dc765415f3e4aad6dc9bd112cfd393"
 hash-type = "SHA256"
 origin = { type = "download", uri = "https://github.com/microsoft/go/releases/download/v1.26.10-1/go1.26.10-20261020.3.src.tar.gz" }
 replace-upstream = true
-replace-reason = "Ship Microsoft Go 1.26.10-1 sources instead of Fedora's upstream Go archive"
+replace-reason = "Ship Microsoft build of Go 1.26.10-1 sources instead of Fedora's upstream Go archive"
