@@ -1,0 +1,27 @@
+diff --git a/build.rs b/build.rs
+--- a/build.rs
++++ b/build.rs
+@@ -80,6 +80,14 @@ fn main() {
+     let build_dir = Path::new(&out_dir).join("libstdbuf-build");
+     fs::create_dir_all(&build_dir).expect("Failed to create build directory");
+ 
++    let libstdbuf_workdir = Path::new(&out_dir).join("libstdbuf-src");
++    fs::create_dir_all(libstdbuf_workdir.join("src"))
++        .expect("Failed to create libstdbuf source directory");
++    for file in ["Cargo.toml", "LICENSE", "build.rs", "src/libstdbuf.rs"] {
++        fs::copy(libstdbuf_src.join(file), libstdbuf_workdir.join(file))
++            .expect("Failed to copy libstdbuf source");
++    }
++
+     // Get the cargo executable
+     let cargo = env::var("CARGO").unwrap_or_else(|_| "cargo".to_string());
+ 
+@@ -90,7 +98,7 @@ fn main() {
+     // See the tracking issue: https://github.com/rust-lang/cargo/issues/9096
+     let mut cmd = Command::new(&cargo);
+     cmd.env_clear().envs(env::vars());
+-    cmd.current_dir(libstdbuf_src)
++    cmd.current_dir(&libstdbuf_workdir)
+         .args(["build", "--target-dir", build_dir.to_str().unwrap()]);
+ 
+     // Get the current profile
