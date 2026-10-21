@@ -58,7 +58,7 @@
 
 Name:          gdal
 Version:       3.11.5
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:       GIS file format library
 License:       MIT
 URL:           http://www.gdal.org
@@ -288,6 +288,7 @@ Summary:        Java modules for the GDAL file format library
 Requires:       jpackage-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
+Requires: msopenjdk-25-fedora-compat
 %description java
 The GDAL Java modules provide support to handle multiple GIS file formats.
 

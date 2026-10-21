@@ -1,0 +1,14 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Z3's Java bindings need compat's system trust-store integration at runtime.
+# Remove this overlay once their required provider guarantees system trust
+# integration across installs and upgrades without the compatibility package.
+[[overlays]]
+description = "Require Microsoft OpenJDK compatibility and system trust for java-z3"
+type = "spec-search-replace"
+section = "%package"
+package = "java-z3"
+regex = '^Requires:\s+java$'
+replacement = 'Requires: msopenjdk-25-fedora-compat'

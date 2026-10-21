@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# LuJavRite embeds a JVM and needs compat's runtime paths and system trust.
+# Remove this overlay once its required provider guarantees those paths and
+# system trust integration without the compatibility package.
+[[overlays]]
+description = "Require Microsoft OpenJDK compatibility and system trust for LuJavRite"
+type = "spec-add-tag"
+tag = "Requires"
+value = "msopenjdk-25-fedora-compat"
