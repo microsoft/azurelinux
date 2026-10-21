@@ -58,10 +58,16 @@ Patch418:       CVE-2026-73283.patch
 # The tests fail with the following error:
 #   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
 Patch965:       openssh-8.2p1-visibility.patch
-Patch966:       CVE-2026-110923.patch
-Patch967:       CVE-2026-110924.patch
-Patch968:       CVE-2026-110926.patch
-Patch969:       CVE-2026-110927.patch
+
+# NVD rejected these CVE IDs as duplicates; use the canonical IDs:
+# CVE-2026-110923 -> CVE-2026-106552
+# CVE-2026-110924 -> CVE-2026-106553
+# CVE-2026-110926 -> CVE-2026-106582
+# CVE-2026-110927 -> CVE-2026-106585
+Patch966:       CVE-2026-106552.patch
+Patch967:       CVE-2026-106553.patch
+Patch968:       CVE-2026-106582.patch
+Patch969:       CVE-2026-106585.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
