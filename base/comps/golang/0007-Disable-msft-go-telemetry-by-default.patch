@@ -1,6 +1,6 @@
 Disable Microsoft build of Go toolchain telemetry by default through go.env
 
-Microsoft Go 1.26.10-1 reads MS_GOTOOLCHAIN_TELEMETRY_ENABLED through Go's
+Microsoft build of Go 1.26.10-1 reads MS_GOTOOLCHAIN_TELEMETRY_ENABLED through Go's
 standard configuration. Set the installed default to 0 while preserving
 opt-in through go env -w MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1 or the environment.
 The upstream script harness already enables telemetry for its fake endpoint,
