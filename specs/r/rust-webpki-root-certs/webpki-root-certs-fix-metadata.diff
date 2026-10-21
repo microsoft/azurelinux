@@ -1,0 +1,23 @@
+--- webpki-root-certs-1.0.9/Cargo.toml	2006-07-24T01:21:28+00:00
++++ webpki-root-certs-1.0.9/Cargo.toml	2026-07-21T12:40:45.021405+00:00
+@@ -31,10 +31,6 @@
+ path = "src/lib.rs"
+ 
+ [[test]]
+-name = "codegen"
+-path = "tests/codegen.rs"
+-
+-[[test]]
+ name = "smoketest"
+ path = "tests/smoketest.rs"
+ 
+@@ -42,9 +38,6 @@
+ version = "1.8"
+ default-features = false
+ package = "rustls-pki-types"
+-
+-[dev-dependencies.aws-lc-rs]
+-version = "1.15.2"
+ 
+ [dev-dependencies.hex]
+ version = "0.4.3"

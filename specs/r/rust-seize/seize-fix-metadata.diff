@@ -1,0 +1,27 @@
+--- seize-0.5.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ seize-0.5.1/Cargo.toml	2026-06-19T12:30:35.536320+00:00
+@@ -34,7 +34,7 @@
+     "concurrency",
+     "memory-management",
+ ]
+-license = "MIT"
++license = "MIT AND (MIT OR Apache-2.0)"
+ repository = "https://github.com/ibraheemdev/seize"
+ 
+ [features]
+@@ -65,15 +65,6 @@
+ version = "0.2"
+ optional = true
+ 
+-[dev-dependencies.criterion]
+-version = "0.7.0"
+-
+-[dev-dependencies.crossbeam-epoch]
+-version = "0.9.8"
+-
+-[dev-dependencies.haphazard]
+-version = "0.1.8"
+-
+ [lints.rust.unexpected_cfgs]
+ level = "warn"
+ priority = 0

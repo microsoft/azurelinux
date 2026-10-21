@@ -1,0 +1,12 @@
+--- fs-set-times-0.20.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ fs-set-times-0.20.3/Cargo.toml	2026-08-14T12:34:45.565109+00:00
+@@ -47,9 +47,3 @@
+     "time",
+ ]
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = ">=0.52, <0.60"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Storage_FileSystem",
+-]
