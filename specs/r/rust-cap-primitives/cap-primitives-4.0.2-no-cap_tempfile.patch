@@ -1,0 +1,12 @@
+diff -Naur cap-primitives-4.0.2-original/src/fs/read_link.rs cap-primitives-4.0.2/src/fs/read_link.rs
+--- cap-primitives-4.0.2-original/src/fs/read_link.rs	2006-07-24 02:21:28.000000000 +0100
++++ cap-primitives-4.0.2/src/fs/read_link.rs	2026-08-14 15:29:43.501838281 +0100
+@@ -87,6 +87,8 @@
+     }
+ }
+ 
++// Downstream: ignore this because it would require cap_tempfile
++#[cfg(false)]
+ #[cfg(not(windows))]
+ #[test]
+ fn test_read_link_contents() {
