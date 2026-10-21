@@ -1,19 +1,25 @@
+%global upstream_commit bcc6ea9f1b1e08fba89785d89a3ab1457d80b96f
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           openvmm
 Version:        0.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Modular, cross-platform virtual machine monitor
 Group:          Applications/System
 License:        MIT
 URL:            https://github.com/microsoft/openvmm
 # Upstream tags releases as "openvmm-v<version>". The generated archive unpacks
 # into "openvmm-openvmm-v<version>".
-Source0:        https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+#Source0:        https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Note: the %%{name}-%%{version}-vendor.tar.gz file is published by upstream and
 # contains the vendored sources in vendor/ plus the source replacement config
 # 'cargo_config' written by cargo vendor.
-Source1:        https://github.com/microsoft/openvmm/releases/download/openvmm-v%{version}/%{name}-%{version}-vendor.tar.gz
+#Source1:        https://github.com/microsoft/openvmm/releases/download/openvmm-v%{version}/%{name}-%{version}-vendor.tar.gz
+
+Source0:        https://github.com/microsoft/openvmm/archive/%{upstream_commit}.tar.gz#/%{name}-%{version}-bcc6ea9f1.tar.gz
+# Generated with cargo vendor --locked; contains vendor/ and cargo_config.
+Source1:        %{name}-%{version}-bcc6ea9f1-vendor.tar.gz
 Patch0:         0001-vmservice-use-low-ECAM-for-isolated-guests.patch
 
 ExclusiveArch:  x86_64 aarch64
@@ -48,7 +54,7 @@ virtual machines on Linux via KVM or Microsoft Hypervisor.
 %global test_crates -p acpi -p consomme -p crypto -p loader -p mesh_protobuf -p openvmm_core -p openvmm_entry -p pal -p pci_core -p vhdx -p vm_topology -p vmcore -p vmm_core
 
 %prep
-%autosetup -n %{name}-openvmm-v%{version} -N
+%autosetup -n %{name}-%{upstream_commit} -N
 tar -xf %{SOURCE1}
 %autopatch -p1
 # Append the source replacement, keeping the rustflags upstream ships.
@@ -76,6 +82,9 @@ cargo test --release --locked --offline --lib --target %{rust_target} %{test_cra
 %{_bindir}/openvmm
 
 %changelog
+* Tue Oct 20 2026 Nikola Bojanic <nbojanic@microsoft.com> - 0.2.0-3
+- Build SNP bounce-buffering snapshot bcc6ea9f1 with matching vendored sources
+
 * Sat Oct 10 2026 Roaa Sakr <romoh@microsoft.com> - 0.2.0-2
 - Place PCI ECAM below 4 GiB for confidential guests
 
