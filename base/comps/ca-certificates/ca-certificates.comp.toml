@@ -1,3 +1,5 @@
 [components.ca-certificates]
+# Track the latest Fedora 43 CA trust update beyond the distro snapshot.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e73db0bb0458f65d530ae5901de2be73f7d7fb80" }
 # Release: 1.1%{?dist}
 release = { calculation = "manual" }
