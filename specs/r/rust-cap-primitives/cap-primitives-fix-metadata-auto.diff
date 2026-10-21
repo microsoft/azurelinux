@@ -1,0 +1,21 @@
+--- cap-primitives-4.0.3/Cargo.toml	2006-07-24T01:21:28+00:00
++++ cap-primitives-4.0.3/Cargo.toml	2026-08-25T08:37:10.219953+00:00
+@@ -79,18 +79,3 @@
+     "time",
+ ]
+ 
+-[target."cfg(windows)".dependencies.windows-sys]
+-version = ">=0.60, <0.62"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Security",
+-    "Win32_Storage_FileSystem",
+-    "Win32_System_Kernel",
+-    "Win32_System_WindowsProgramming",
+-    "Win32_System_IO",
+-    "Wdk_Storage_FileSystem",
+-    "Wdk_Foundation",
+-]
+-
+-[target."cfg(windows)".dependencies.winx]
+-version = "0.36.0"
