@@ -1,0 +1,25 @@
+From 2e4973f8d493686ca44bc591b2da73f379fb478c Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 21 Sep 2026 07:05:16 +0100
+Subject: [PATCH 2/3] Downstream: Revert source-code changes for pre-release
+ blake2
+
+---
+ crates/uv-extract/src/hash.rs | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/crates/uv-extract/src/hash.rs b/crates/uv-extract/src/hash.rs
+index fb3b9797a..7b4d13222 100644
+--- a/crates/uv-extract/src/hash.rs
++++ b/crates/uv-extract/src/hash.rs
+@@ -1,4 +1,6 @@
+-use sha2::{Digest as _, digest::consts::U32};
++// BLAKE2 still uses the `digest` 0.10 trait, while MD5 and SHA-2 use 0.11.
++use blake2::digest::{Digest as _, consts::U32};
++use sha2::Digest as _;
+ use std::pin::Pin;
+ use std::task::{Context, Poll};
+ use tokio::io::{AsyncReadExt, ReadBuf};
+-- 
+2.55.0
+
