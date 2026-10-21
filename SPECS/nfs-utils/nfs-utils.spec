@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
 Version:        2.6.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -13,6 +13,7 @@ Source4:        rpc-statd-notify.service
 Source5:        nfs-utils.defaults
 Source6:        nfs-server.service
 Source7:        nfs-mountd.service
+Patch0:         CVE-2026-89098.patch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -70,6 +71,7 @@ Requires:    libnfsidmap = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{version}
+%patch 0 -p1
 #not prevent statd to start
 sed -i "/daemon_init/s:\!::" utils/statd/statd.c
 sed '/unistd.h/a#include <stdint.h>' -i support/nsm/rpc.c
@@ -178,6 +180,9 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
+* Wed Oct 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-5
+- Patch for CVE-2026-89098
+
 * Tue Apr 1 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.6.4-4
 - Build nfs-utils to include idmapd.conf and id_resolver.conf
 
