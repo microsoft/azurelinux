@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Preserve autorelease above the published 0.12.0-6.azl4 after the upstream version revert"
+type = "spec-set-tag"
+tag = "Release"
+value = "%autorelease -b 7"
