@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Restart the packaged puppet.service on NetworkManager events instead of the nonexistent puppetagent.service. Drop when Fedora corrects the dispatcher."
+type = "file-search-replace"
+file = "puppet-nm-dispatcher.systemd"
+regex = 'puppetagent\.service'
+replacement = 'puppet.service'

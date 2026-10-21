@@ -1,0 +1,13 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Stop and disable the Puppet agent before final package removal; the postun restart hook only handles upgrades. Drop when Fedora adds the preun hook."
+type = "spec-append-lines"
+section = "%post"
+lines = [
+    "",
+    "%preun",
+    "%systemd_preun %{name}.service",
+]
