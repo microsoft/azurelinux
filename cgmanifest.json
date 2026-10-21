@@ -29876,8 +29876,8 @@
         "type": "other",
         "other": {
           "name": "unbound",
-          "version": "1.26.1",
-          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.26.1.tar.gz"
+          "version": "1.26.2",
+          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.26.2.tar.gz"
         }
       }
     },
