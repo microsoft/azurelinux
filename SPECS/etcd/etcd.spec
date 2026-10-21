@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.34
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,11 @@ Source1:        etcd.service
 #             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2026-78659.patch
+Patch1:         CVE-2026-78660.patch
+Patch2:         CVE-2026-78663.patch
+Patch3:         CVE-2026-78669.patch
+Patch4:         CVE-2026-97032.patch
 BuildRequires:  golang >= 1.26.8
 
 %description
@@ -69,6 +74,11 @@ mkdir -p %{ETCD_OUT_DIR}
 for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH0}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH1}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH2}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH3}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH4}
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
@@ -82,6 +92,11 @@ mkdir -p %{ETCD_TOOLS_OUT_DIR}
 for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH0}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH1}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH2}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH3}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH4}
     go build \
         -o %{ETCD_TOOLS_OUT_DIR}
     popd
@@ -143,6 +158,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Wed Oct 21 2026 jykanase <v-jykanase@microsoft.com> - 3.5.34-2
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
+
 * Thu Sep 24 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.5.34-1
 - Upgrade to 3.5.34 for CVE-2026-37236, CVE-2026-84304, CVE-2026-84445, CVE-2026-81870
 
