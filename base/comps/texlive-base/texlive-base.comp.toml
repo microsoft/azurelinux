@@ -2,8 +2,8 @@
 release = { calculation = "manual" }
 
 [[components.texlive-base.overlays]]
-description = "Bump release"
+description = "Keep the texdef-fixed build newer than the published 11:20230311-98.azl4 release"
 type = "spec-set-tag"
 tag = "Release"
-value = "95%{?dist}.2"
-metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }
+value = "99%{?dist}"
+metadata = { category = "azl-release-management", upstream-status = "inapplicable" }
