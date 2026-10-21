@@ -46,13 +46,7 @@ The aspell-devel package includes libraries
 and header files needed for Aspell development.
 
 %prep
-%setup -q
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
-%patch 0 -p1 -b .fc
-%patch 1 -p1 -b .mlib
+%autosetup -p1
 iconv -f iso-8859-2 -t utf-8 < manual/aspell.info > manual/aspell.info.aux
 mv manual/aspell.info.aux manual/aspell.info
 
