@@ -7,6 +7,27 @@
 
     "PkgExceptions": [
         {
+            "_comment1": "BPF and process licensing pages explain kernel licensing; they are documentation, not license texts.",
+            "_comment2": "COPYING-logo and LICENSE.FlashPoint are bundled notices for the logo and FlashPoint documentation, not the main package license.",
+            "PackageName": "kernel-docs",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/linux-[^/]+/bpf/bpf_licensing\\.rst$",
+                "^/usr/share/doc/linux-[^/]+/(translations/(it_IT|zh_CN|zh_TW)/)?process/license-rules\\.rst$",
+                "^/usr/share/doc/linux-[^/]+/images/COPYING-logo$",
+                "^/usr/share/doc/linux-[^/]+/scsi/LICENSE\\.FlashPoint$"
+            ]
+        },
+        {
+            "_comment": "kernel-tools also owns the kernel documentation tree; use the same narrow documentation exceptions as kernel-docs.",
+            "PackageName": "kernel-tools",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/linux-[^/]+/bpf/bpf_licensing\\.rst$",
+                "^/usr/share/doc/linux-[^/]+/(translations/(it_IT|zh_CN|zh_TW)/)?process/license-rules\\.rst$",
+                "^/usr/share/doc/linux-[^/]+/images/COPYING-logo$",
+                "^/usr/share/doc/linux-[^/]+/scsi/LICENSE\\.FlashPoint$"
+            ]
+        },
+        {
             "PackageName": "gcc",
             "IgnoredFilesRegexList": [
                 "^/usr/share/man/man7/gpl\\.7\\.gz$"
