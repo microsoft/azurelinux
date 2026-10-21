@@ -2,8 +2,8 @@
 release = { calculation = "manual" }
 
 [[components.polkit.overlays]]
-description = "Bump release"
+description = "Keep the security-fixed build newer than the published 126-9.azl4 release"
 type = "spec-set-tag"
 tag = "Release"
-value = "6%{?dist}.3"
-metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }
+value = "10%{?dist}"
+metadata = { category = "azl-release-management", upstream-status = "inapplicable" }
