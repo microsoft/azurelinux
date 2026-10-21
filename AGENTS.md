@@ -21,6 +21,8 @@ For project context and architecture, see [`.github/copilot-instructions.md`](.g
 - Adding or editing TOML comments
 - Pure documentation or formatting changes
 
+**Isolated latest-only local builds:** Validate local component builds in a clean, task-specific mock root, exposing only the newest available RPM version per package name and architecture across all enabled repositories, including local repositories. Historical RPMs and previously installed dependencies must not mask missing or incompatible prerequisites. `best=1` alone does not enforce this policy. For dependency chains, expose only prerequisites already validated earlier in the chain.
+
 ### Minimum required testing
 
 1. **Build** — `azldev comp build -p <name>` succeeds, RPMs appear in `base/out/`.
