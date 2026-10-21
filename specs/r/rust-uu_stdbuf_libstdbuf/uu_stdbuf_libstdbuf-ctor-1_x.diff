@@ -1,0 +1,11 @@
+--- a/src/libstdbuf.rs
++++ b/src/libstdbuf.rs
+@@ -10,7 +10,7 @@ use std::env;
+ use std::ptr;
+ 
+ // This runs automatically when the library is loaded via LD_PRELOAD
+-#[ctor]
++#[ctor(unsafe)]
+ fn init() {
+     unsafe { __stdbuf() };
+ }

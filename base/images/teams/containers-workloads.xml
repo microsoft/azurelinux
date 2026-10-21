@@ -84,6 +84,7 @@
     </packages>
     <packages type="bootstrap" profiles="WorkloadCore">
         <package name="busybox" />
+        <package name="coreutils-single" />
     </packages>
 
     <!--

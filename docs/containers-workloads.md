@@ -11,6 +11,10 @@ installation is required.
 The RPM database remains in the build staging root for KIWI package inventories
 and image SBOMs, but is excluded from the shipped OCI filesystem.
 
+Images inheriting `WorkloadCore` explicitly select `coreutils-single` during both
+bootstrap and image installation. This avoids conflicts with full `coreutils`
+package if pulled in as a dependency.
+
 | Image | Default command | Notes |
 | --- | --- | --- |
 | `microsoft/azurelinux/workload/busybox:4.0` | `/usr/sbin/busybox sh` | Minimal BusyBox shell environment |
