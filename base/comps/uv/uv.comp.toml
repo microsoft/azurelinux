@@ -1,4 +1,6 @@
-# Pin to 0.10.12 to avoid missing crate(astral-tokio-tar/default) build dependency.
-# https://src.fedoraproject.org/rpms/uv/c/07f74430e59fb84e925e6d7b238f0b334a42c97c
 [components.uv]
-spec = { type = "upstream", upstream-commit = "07f74430e59fb84e925e6d7b238f0b334a42c97c" }
+
+[components.uv.build]
+# Python 3.15 and 3.15t are not packaged in Azure Linux. Use Fedora's supported
+# reduced interpreter test set while retaining the rest of %check.
+without = ["other_python_versions"]
