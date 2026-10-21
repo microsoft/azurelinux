@@ -1,0 +1,16 @@
+--- tar-codec-0.0.14/Cargo.toml	2006-07-24T01:21:28+00:00
++++ tar-codec-0.0.14/Cargo.toml	2026-09-02T11:23:31.583954+00:00
+@@ -79,12 +79,7 @@
+ features = ["io-util"]
+ 
+ [dev-dependencies.astral-tokio-tar]
+-version = "0.6.2"
+-
+-[dev-dependencies.criterion]
+-version = "0.8.2"
+-features = ["async_tokio"]
+-default-features = false
++version = ">=0.6.2, <0.8"
+ 
+ [dev-dependencies.tar]
+ version = "0.4.46"
