@@ -1,2 +1,2 @@
 lychee-bin==0.24.2
-pre-commit==4.6.2
+pre-commit==4.7.0
