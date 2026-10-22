@@ -89,6 +89,14 @@
         "justification": "Enable Aquantia AQtion ethernet driver kernel configs - PR: https://github.com/microsoft/azurelinux/pull/14638"
       },
       {
+        "name": "CONFIG_OBJTOOL_WERROR",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Do not treat objtool warnings as fatal on x86_64 or arm64; warnings from external modules should not fail the kernel build."
+      },
+      {
         "name": "CONFIG_ARCH_HAS_CPU_FINALIZE_INIT",
         "values": [
           {
