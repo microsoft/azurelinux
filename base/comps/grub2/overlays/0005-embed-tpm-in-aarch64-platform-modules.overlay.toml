@@ -1,0 +1,16 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Restore chain and embed tpm in aarch64 EFI images for chainloading and early measured boot"
+type = "file-search-replace"
+file = "grub.macros"
+regex = '(?m)^%ifarch aarch64 %\{arm\} riscv64\n%global platform_modules " "\n%endif$'
+replacement = '''%ifarch aarch64
+%global platform_modules " chain tpm "
+%endif
+
+%ifarch %{arm} riscv64
+%global platform_modules " "
+%endif'''
