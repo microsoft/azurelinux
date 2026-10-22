@@ -28937,7 +28937,7 @@
         "other": {
           "name": "stunnel",
           "version": "5.74",
-          "downloadUrl": "https://www.stunnel.org/downloads/stunnel-5.74.tar.gz"
+          "downloadUrl": "https://www.stunnel.org/downloads/archive/5.x/stunnel-5.74.tar.gz"
         }
       }
     },
