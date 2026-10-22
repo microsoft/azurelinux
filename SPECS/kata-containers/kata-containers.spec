@@ -135,7 +135,7 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.1.0.kata1-2
+* Sat Oct 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.1.0.kata1-2
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107324
 
 * Fri Oct 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata1-1
