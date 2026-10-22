@@ -35,9 +35,7 @@ _PACKAGE_MANAGEMENT_PATHS = (
     "etc/dnf",
     "etc/yum.repos.d",
     "usr/lib/sysimage/libdnf5",
-    "usr/lib/sysimage/rpm",
     "var/lib/dnf",
-    "var/lib/rpm",
 )
 
 

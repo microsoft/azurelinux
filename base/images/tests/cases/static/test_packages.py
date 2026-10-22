@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: MIT
 """Validate installed and excluded packages.
 
-These tests query the RPM database via ``rpm --root``, so they only
-make sense on images that ship one. The ``runtime-package-management``
-capability marker gates them — distroless container variants without
-an rpmdb are automatically skipped.
+These policy checks apply to images with runtime package management.
+Minimal-container inventories and retained package records are checked
+independently in ``test_container_inventory.py``.
 """
 
 from __future__ import annotations
