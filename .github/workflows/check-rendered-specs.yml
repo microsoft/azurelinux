@@ -1,19 +1,18 @@
-# Reusable workflow — renders specs from a PR + resolves lock files, and
+# PR workflow — renders specs from a PR + resolves lock files, and
 # checks both for drift.
 #
-# Called by the stub on the default branch (check-rendered-specs-stub.yml) via
-# pull_request_target. The stub provides the PR details; this workflow runs:
+# The workflow definition is PR-controlled under pull_request; it is not a
+# trusted merge-integrity gate by itself. Helpers and container config still
+# come from a separate trusted-base checkout.
 #
 #   1. update_locks (full distro)
-#        -> update_locks_comment (drift PR comment, always)
 #   2. render (only if update_locks succeeded; PR-scoped via the change-set
 #              computed from pr-base..pr-head)
-#        -> comment (drift PR comment, only when render actually ran)
 #
 # update_locks runs first because `azldev component changed` (used to scope
 # the render set) reads input fingerprints that include lock content; a
 # stale lock would steer it toward the wrong scope. When locks are dirty,
-# render is skipped and only the locks comment is posted.
+# render is skipped and lock drift output carries the fix instructions.
 #
 # Security: the PR checkout is data-only. Trusted base code resolves the
 # post-merge azldev pin and passes only a validated version token to the trusted
@@ -25,30 +24,14 @@
 name: "Check Rendered Specs"
 
 on:
-  workflow_call:
-    inputs:
-      pr-head-sha:
-        required: true
-        type: string
-      pr-head-repo:
-        required: true
-        type: string
-      pr-base-sha:
-        required: true
-        type: string
-      pr-number:
-        required: true
-        type: string
-      repo:
-        required: true
-        type: string
+  pull_request:
+    branches:
+      - "4.0"
 
 permissions: {}
 
-# Belt-and-suspenders: the stub also sets concurrency, but keep it here so the
-# contract survives refactoring / direct invocation.
 concurrency:
-  group: pr-drift-check-${{ inputs.repo }}-${{ inputs.pr-number }}
+  group: render-check-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
@@ -61,13 +44,14 @@ jobs:
   # container so users can `git apply` the result.
   update_locks:
     name: Update locks + drift check
+    # Prevent forks from running a stale/vulnerable copy with Actions enabled.
+    if: github.repository == 'microsoft/azurelinux'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
       contents: read
       pull-requests: read # validate the live PR snapshot and resolve its test-merge version
     outputs:
-      patch-url: ${{ steps.upload-locks-patch.outputs.artifact-url }}
       # Resolve once so lock and render checks use the same binary.
       azldev-version: ${{ steps.resolve.outputs.azldev-version }}
       render-all: ${{ steps.resolve.outputs.render-all }}
@@ -76,7 +60,7 @@ jobs:
       - name: Checkout base (trusted)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ${{ inputs.repo }}
+          repository: ${{ github.repository }}
           ref: "4.0"
           persist-credentials: false
 
@@ -84,27 +68,20 @@ jobs:
       - name: Checkout PR head (data)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ${{ inputs.pr-head-repo }}
-          ref: ${{ inputs.pr-head-sha }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
           path: pr-head
           fetch-depth: 0
           persist-credentials: false
-          # checkout v7 blocks fork-PR-head refs by default under
-          # pull_request_target (this reusable workflow inherits that event
-          # from the stub). Opt out: the PR is checked out as data into
-          # pr-head/, this job holds only `contents: read` (no secrets, no
-          # pull-requests write), and azldev only ever processes it inside the
-          # sandboxed container — so the fork head is never executed with trust.
-          allow-unsafe-pr-checkout: true
 
       # The trusted helper reads PR data but emits only a validated version and
       # boolean. Equal pins need one freshness check but no mergeability polling.
       - name: Resolve post-merge azldev version
         id: resolve
         env:
-          REPO: ${{ inputs.repo }}
-          PR_NUMBER: ${{ inputs.pr-number }}
-          PR_HEAD_SHA: ${{ inputs.pr-head-sha }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
@@ -163,11 +140,7 @@ jobs:
             -v "$WORKSPACE/locks-output:/output" \
             localhost/azldev-runner \
             bash -eu -o pipefail -c '
-              # Pre-create the output file with a parse-able sentinel so the
-              # downstream `update-output` artifact upload (if: always())
-              # never fails just because azldev / the container crashed
-              # before producing the file. The locks-comment script
-              # already treats `null` as "no drift".
+              # Pre-create a parse-able sentinel for downstream lock drift checks.
               echo null > /output/update-output.json
               # Validate the resolved source origins before any fetch/update.
               python3 /scripts-render/source_origin_guard.py
@@ -212,13 +185,6 @@ jobs:
           name: locks-patch
           path: locks-output/locks.patch
 
-      - name: Upload update output
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: update-output
-          path: locks-output/update-output.json
-
       # Fail the job when any component's lock file drifted. Uses the
       # authoritative JSON output rather than the patch file so we catch
       # drift even if patch generation itself regresses.
@@ -234,92 +200,40 @@ jobs:
           # mount failure, etc.) — we'd rather surface that real failure
           # than a misleading `jq: file not found` here.
           if [ ! -f locks-output/update-output.json ]; then
-            echo "::warning::locks-output/update-output.json missing; skipping drift check (see earlier step failure for the real cause)"
+            echo "::warning::locks-output/update-output.json missing; skipping local drift check (inspect earlier failures)"
             exit 0
           fi
-          changed=$(jq '[.[]? | select(.changed == true)] | length' locks-output/update-output.json)
+          changed="$(jq '[.[]? | select(.changed == true)] | length' locks-output/update-output.json)"
           if [ "$changed" -gt 0 ]; then
             echo "::error::${changed} lock file(s) are out of date — run 'azldev component update -a' and commit the result"
             exit 1
           fi
 
-  # Post the locks PR comment. Same security posture as the `comment` job:
-  # `pull-requests: write` is only granted to a job that does NOT execute any
-  # PR-derived code — only the trusted base branch is checked out, and the
-  # update-output artifact is consumed in trusted shape.
-  update_locks_comment:
-    name: Post locks drift comment
-    needs: update_locks
-    if: always() && needs.update_locks.result != 'cancelled'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-      pull-requests: write # Post/update/delete drift comments on PRs
-    steps:
-      - name: Checkout base (trusted)
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ inputs.repo }}
-          ref: "4.0"
-          persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.12"
-
-      - name: Download update output
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: update-output
-          path: update-output
-
-      - name: Post PR comment
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_REPO: ${{ inputs.repo }}
-          PR_NUMBER: ${{ inputs.pr-number }}
-          PATCH_URL: ${{ needs.update_locks.outputs.patch-url }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          python scripts/ci/locks-check/post_locks_comment.py \
-            --repo "$PR_REPO" \
-            --pr "$PR_NUMBER" \
-            --update-output update-output/update-output.json \
-            --artifacts-url "$PATCH_URL" \
-            --run-id "$RUN_ID"
-
   # Render PR's specs + check for drift. Runs PR-derived data through the
   # container; deliberately has NO pull-requests write (and no secrets beyond
   # the default read-only token) so that even if the container somehow leaks
-  # into the host, it can't touch the PR. All output flows to the next job via
-  # artifacts + job outputs only.
+  # into the host, it can't touch the PR. The host consumes local patches;
+  # no privileged follow-on job processes the results.
   render:
     name: Render + drift check
     # Gate render on a clean lock check. `azldev component changed` (used by
     # the render-scope helper) reads input fingerprints that include lock
     # content, so stale locks would steer it toward the wrong scope. Skip
-    # render and let the locks PR comment carry the fix instructions.
+    # render and let the lock drift failure output carry the fix instructions.
     needs: update_locks
     if: needs.update_locks.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
       contents: read
-    outputs:
-      patch-url: ${{ steps.upload-patch.outputs.artifact-url }}
     steps:
-      # Defense-in-depth: validate the SHA and repo inputs before they
-      # reach any `git`/`azldev` invocation inside the container. GitHub
-      # populates these from the pull_request event, but the reusable
-      # workflow is also callable directly so we don't assume the contract.
+      # Defense-in-depth: validate event SHAs and repo before they reach any
+      # `git`/`azldev` invocation inside the container.
       - name: Validate inputs
         env:
-          PR_BASE_SHA: ${{ inputs.pr-base-sha }}
-          PR_HEAD_SHA: ${{ inputs.pr-head-sha }}
-          BASE_REPO: ${{ inputs.repo }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           for v in PR_BASE_SHA PR_HEAD_SHA; do
@@ -338,7 +252,7 @@ jobs:
       - name: Checkout base (trusted)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ${{ inputs.repo }}
+          repository: ${{ github.repository }}
           ref: "4.0"
           persist-credentials: false
 
@@ -346,22 +260,15 @@ jobs:
       - name: Checkout PR head (data)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ${{ inputs.pr-head-repo }}
-          ref: ${{ inputs.pr-head-sha }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
           path: pr-head
           fetch-depth: 0
           persist-credentials: false
-          # checkout v7 blocks fork-PR-head refs by default under
-          # pull_request_target (this reusable workflow inherits that event
-          # from the stub). Opt out: the PR is checked out as data into
-          # pr-head/, this job holds only `contents: read` (no secrets, no
-          # pull-requests write), and azldev only ever processes it inside the
-          # sandboxed container — so the fork head is never executed with trust.
-          allow-unsafe-pr-checkout: true
 
       - name: Build azldev runner container
-        # Reuse the version that update_locks already resolved.
         env:
+          # Reuse the version that update_locks already resolved.
           AZLDEV_VERSION: ${{ needs.update_locks.outputs.azldev-version }}
         run: |
           set -euo pipefail
@@ -374,8 +281,8 @@ jobs:
 
       # Render + drift-check run entirely inside the container. The host never
       # invokes git against PR data: all git operations happen in the sandboxed
-      # environment, and the host only reads trusted-shape outputs
-      # (report.json, rendered-specs.patch) from a dedicated output volume.
+      # environment, and the host only reads patches from a
+      # dedicated output volume.
       # This dodges the whole class of poisoned-.git/config attacks
       # (diff.external, diff drivers, filter drivers, hooks, etc.).
       #
@@ -392,9 +299,9 @@ jobs:
         id: check
         env:
           WORKSPACE: ${{ github.workspace }}
-          PR_BASE_SHA: ${{ inputs.pr-base-sha }}
-          PR_HEAD_SHA: ${{ inputs.pr-head-sha }}
-          BASE_REPO: ${{ inputs.repo }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_REPO: ${{ github.repository }}
           RENDER_ALL: ${{ needs.update_locks.outputs.render-all }}
         run: |
           set -euo pipefail
@@ -431,12 +338,11 @@ jobs:
 
               # A new post-merge azldev binary can affect every component.
               if [ "$RENDER_ALL" = "true" ]; then
+                echo "azldev version changes on merge -- rendering ALL components."
                 # `--clean-stale` prunes orphaned spec dirs globally, which
                 # subsumes the targeted deleted-component cleanup the scoped
                 # branch does below.
-                echo "azldev version changes on merge -- rendering ALL components."
-                azldev component render -q -a --clean-stale -O json \
-                  > /output/render-output.json
+                azldev component render -q -a --clean-stale -O json > /dev/null
               else
                 # Compute the render set (PR-touched components). Safe here
                 # because the locks gate has already run successfully -- input
@@ -487,21 +393,14 @@ jobs:
 
                 if [ ! -s /output/change-set/render-set.txt ]; then
                   echo "No PR-scoped components -- skipping render."
-                  # Synthesize an empty render-output.json so the artifact
-                  # upload (if: always()) and downstream comment job have a
-                  # well-formed payload.
-                  echo "[]" > /output/render-output.json
                 else
-                  # `-x` fails loudly if the arg list would split into multiple
-                  # xargs invocations -- each batch after the first would
-                  # overwrite the previous JSON output to render-output.json.
-                  # Current component counts are well below ARG_MAX, but
-                  # `-n 50000` gives `-x` teeth (without `-n`/`-L`, GNU xargs
-                  # never splits). `--` ends azldev option parsing so component
-                  # names beginning with `-` (none today) are unambiguous.
+                  # Preserve a single render invocation: `-x` with `-n 50000`
+                  # fails rather than splitting an oversized argument list.
+                  # `--` ends azldev option parsing so component names beginning
+                  # with `-` (none today) are unambiguous.
                   xargs -x -n 50000 -d "\n" azldev component render -q -O json -- \
                     < /output/change-set/render-set.txt \
-                    > /output/render-output.json
+                    > /dev/null
                 fi
               fi
 
@@ -510,7 +409,6 @@ jobs:
               # HEAD and produces the user-facing patch.
               python3 /scripts-render/check_rendered_specs.py \
                 --specs-dir "$SPECS_DIR" \
-                --report /output/render-check-report.json \
                 --patch /output/rendered-specs.patch
             '
 
@@ -534,67 +432,3 @@ jobs:
         with:
           name: rendered-specs-patch
           path: render-output/rendered-specs.patch
-
-      - name: Upload render output
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: render-output
-          path: |
-            render-output/render-output.json
-            render-output/render-check-report.json
-
-  # Post the PR comment. Runs in a separate job so the `pull-requests: write`
-  # token is only granted to a job that does NOT execute any PR-derived code:
-  # it only checks out the trusted base branch (for the poster script) and
-  # consumes the trusted-shape report artifact from the render job.
-  comment:
-    name: Post drift comment
-    needs: render
-    # When render is skipped (locks failed), there is no report artifact to
-    # post and the locks PR comment already carries the fix. The
-    # `!cancelled()` status function is required: a job-level `if:` that
-    # only references `needs.render.result` would never run when render
-    # has a non-success conclusion, because GitHub evaluates the implicit
-    # success-of-needs gate BEFORE the `if:` -- the function call is what
-    # tells GitHub to evaluate the `if:` anyway.
-    if: ${{ !cancelled() && needs.render.result != 'skipped' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-      pull-requests: write # Post/update/delete drift comments on PRs
-    steps:
-      - name: Checkout base (trusted)
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ inputs.repo }}
-          ref: "4.0"
-          persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.12"
-
-      - name: Download render report
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: render-output
-          path: render-output
-
-      - name: Post PR comment
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_REPO: ${{ inputs.repo }}
-          PR_NUMBER: ${{ inputs.pr-number }}
-          PATCH_URL: ${{ needs.render.outputs.patch-url }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          python scripts/ci/render-specs-check/post_render_comment.py \
-            --repo "$PR_REPO" \
-            --pr "$PR_NUMBER" \
-            --report render-output/render-check-report.json \
-            --artifacts-url "$PATCH_URL" \
-            --run-id "$RUN_ID"
