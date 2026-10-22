@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Fri, 30 Dec 2022 16:21:06 -0500
+Subject: [PATCH] tests: fix build on legacy 32-bit machines
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+(cherry picked from commit f1b3389a7fc4a1b8594a5dee415c3ecf80b413aa)
+---
+ tests/dumpbase.c | 2 +-
+ tests/escapes.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/dumpbase.c b/tests/dumpbase.c
+index ce74c36..d142d1b 100644
+--- a/tests/dumpbase.c
++++ b/tests/dumpbase.c
+@@ -21,7 +21,7 @@ static void shiba(dson_value *v, char *res) {
+         fprintf(stderr, "Unexpected error: %s\n", err);
+         exit(1);
+     } else if (l != reslen) {
+-        fprintf(stderr, "Length mismatch - expected %ld, got %ld\n",
++        fprintf(stderr, "Length mismatch - expected %zd, got %zd\n",
+                 reslen, l);
+         exit(1);
+     } else if (strcmp(res, prod)) {
+diff --git a/tests/escapes.c b/tests/escapes.c
+index 7942a73..de325c7 100644
+--- a/tests/escapes.c
++++ b/tests/escapes.c
+@@ -25,7 +25,7 @@ static char *wag(char *in) {
+ 
+     if (out_len != in_len) {
+         free(out);
+-        asprintf(&err, "length mismatch: expected %ld, got %ld", in_len,
++        asprintf(&err, "length mismatch: expected %zd, got %zd", in_len,
+                  out_len);
+         return err;
+     } else if (strcmp(in, out)) {
