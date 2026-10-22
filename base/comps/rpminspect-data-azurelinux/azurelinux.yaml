@@ -1,0 +1,19 @@
+# Azure Linux rpminspect configuration.
+#
+# This initial policy uses the engine's generic data for structural RPM
+# inspections. It deliberately does not adopt Fedora license policy.
+---
+common:
+    workdir: /var/tmp/rpminspect
+
+environment:
+    product_release: GENERIC
+
+vendor:
+    vendor_data_dir: /usr/share/rpminspect
+    licensedb:
+        - generic.json
+
+inspections:
+    # Enable this after azurelinux-license-data supplies curated policy.
+    license: off

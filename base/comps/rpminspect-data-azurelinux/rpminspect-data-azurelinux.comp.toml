@@ -1,0 +1,2 @@
+[components.rpminspect-data-azurelinux]
+spec = { type = "local", path = "rpminspect-data-azurelinux.spec" }
