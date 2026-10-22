@@ -70,8 +70,7 @@ Requires:    libnfsidmap = %{version}-%{release}
 %{summary}.
 
 %prep
-%setup -q -n %{name}-%{version}
-%patch 0 -p1
+%autosetup -n %{name}-%{version} -p1
 #not prevent statd to start
 sed -i "/daemon_init/s:\!::" utils/statd/statd.c
 sed '/unistd.h/a#include <stdint.h>' -i support/nsm/rpc.c
