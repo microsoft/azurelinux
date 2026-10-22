@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.157.1
-Release:        1%{?dist}
+Release:        1.btrfsfan1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,7 @@ Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch1:         btrfs-ipe.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -440,6 +441,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Oct 21 2026 Jiri Appl <jiria@microsoft.com> - 6.6.157.1-1.btrfsfan1
+- Expose the backing device for immutable complete single-device Btrfs mounts.
+
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.157.1-1
 - Auto-upgrade to 6.6.157.1
 

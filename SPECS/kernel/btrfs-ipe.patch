@@ -1,0 +1,83 @@
+From: Jiri Appl <jiria@microsoft.com>
+Subject: [PATCH] btrfs: expose the backing device for immutable single-device mounts
+
+Set s_bdev after a successful mount only when one read-only device
+represents the complete read-only filesystem. Leave writable, degraded,
+seed, missing device and replacement configurations unchanged. Existing
+remount and device operation checks keep this layout read-only.
+
+Borrow the device open owned by Btrfs and clear s_bdev before close_ctree()
+releases it. Keep the anonymous superblock identity and teardown, and leave
+IPE sources and interfaces unchanged.
+
+Signed-off-by: Jiri Appl <jiria@microsoft.com>
+---
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -82,6 +82,8 @@ static void btrfs_put_super(struct super_block *sb)
+ 	struct btrfs_fs_info *fs_info = btrfs_sb(sb);
+ 
+ 	btrfs_info(fs_info, "last unmount of filesystem %pU", fs_info->fs_devices->fsid);
++	/* Btrfs owns the device open; stop exposing it before closing it. */
++	sb->s_bdev = NULL;
+ 	close_ctree(fs_info);
+ }
+ 
+@@ -1434,6 +1436,47 @@ out:
+ }
+ 
+ /*
++ * Only an immutable, complete single-device filesystem can be represented by
++ * s_bdev. Borrow the Btrfs device open until btrfs_put_super(). With no writable
++ * devices, the existing remount checks also prevent a transition to read-write.
++ */
++static void btrfs_set_sb_bdev(struct super_block *sb)
++{
++	struct btrfs_fs_info *fs_info = btrfs_sb(sb);
++	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
++	struct btrfs_device *device;
++
++	if (!sb_rdonly(sb))
++		return;
++
++	mutex_lock(&fs_devices->device_list_mutex);
++	down_read(&fs_info->dev_replace.rwsem);
++	if (btrfs_test_opt(fs_info, DEGRADED) ||
++	    fs_devices->seeding || !list_empty(&fs_devices->seed_list) ||
++	    fs_devices->num_devices != 1 || fs_devices->open_devices != 1 ||
++	    fs_devices->total_devices != 1 || fs_devices->missing_devices ||
++	    fs_devices->rw_devices || !list_is_singular(&fs_devices->devices) ||
++	    btrfs_dev_replace_is_ongoing(&fs_info->dev_replace))
++		goto out;
++
++	device = list_first_entry(&fs_devices->devices,
++				  struct btrfs_device, dev_list);
++	if (device->fs_devices != fs_devices || device->fs_info != fs_info ||
++	    !device->bdev || !bdev_read_only(device->bdev) ||
++	    !test_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_MISSING, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_REPLACE_TGT, &device->dev_state) ||
++	    device->devid == BTRFS_DEV_REPLACE_DEVID)
++		goto out;
++
++	sb->s_bdev = device->bdev;
++out:
++	up_read(&fs_info->dev_replace.rwsem);
++	mutex_unlock(&fs_devices->device_list_mutex);
++}
++
++/*
+  * Find a superblock for the given device / mount point.
+  *
+  * Note: This is based on mount_bdev from fs/super.c with a few additions
+@@ -1525,6 +1568,8 @@ static struct dentry *btrfs_mount_root(struct file_system_type *fs_type,
+ 					s->s_id);
+ 		btrfs_sb(s)->bdev_holder = fs_type;
+ 		error = btrfs_fill_super(s, fs_devices, data);
++		if (!error)
++			btrfs_set_sb_bdev(s);
+ 	}
+ 	if (!error)
+ 		error = security_sb_set_mnt_opts(s, new_sec_opts, 0, NULL);
