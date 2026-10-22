@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.157.1
-Release:        1.btrfsipe1%{?dist}
+Release:        1.btrfsipe4.fan1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -441,6 +441,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Oct 21 2026 Jiri Appl <jiria@microsoft.com> - 6.6.157.1-1.btrfsipe4.fan1
+- Replace the IPE callback patch with a mount-time Btrfs backing device.
+- Limit backing-device exposure to complete, read-only single-device filesystems.
+
 * Tue Oct 20 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 6.6.157.1-1.btrfsipe1
 - Resolve IPE backing-device trust for read-only, single-device Btrfs filesystems.
 
