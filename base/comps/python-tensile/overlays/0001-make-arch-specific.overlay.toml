@@ -1,0 +1,29 @@
+# python-tensile is BuildArch: noarch with ExclusiveArch: x86_64, and
+# python3-tensile-devel requires hipcc and rocminfo, which are only built for
+# x86_64. rpm does not record ExclusiveArch in binary RPM headers, and our
+# publishing copies every noarch RPM into every arch repo, so
+# python3-tensile-devel lands in the aarch64 repo and fails repoclosure
+# (https://github.com/microsoft/azurelinux/issues/18985).
+#
+# BuildArch is set on the main package, so the whole build has to become
+# arch-specific. Every consumer is already x86_64-only. The package is pure
+# Python, so disable the debuginfo subpackage, which would otherwise fail on
+# an empty debugsourcefiles.list. Same approach as vmaf-models (see
+# vmaf.comp.toml). Drop this overlay once publishing honors the SRPM's
+# ExclusiveArch for noarch packages.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://github.com/microsoft/azurelinux/issues/18985" }]
+
+[[overlays]]
+description = "Make python-tensile arch-specific so it is not published to aarch64"
+type = "spec-remove-tag"
+tag = "BuildArch"
+value = "noarch"
+
+[[overlays]]
+description = "Disable debuginfo for the now arch-specific, pure-Python package"
+type = "spec-prepend-lines"
+lines = ["%global debug_package %{nil}"]
