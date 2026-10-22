@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "rustc-1.96.1-src-cargo.tar.gz": "c72090016adf686607aa3ea51b539b9faa6fe3536e9111714b49bf42d035493d",
-  "rustc-1.96.1-src.tar.xz": "77a6ff3003a4ad0cb00697b043c879e3e1a15d945b1a1f63818903bfc3fa8b98"
+  "rustc-1.98.1-src-cargo.tar.gz": "6a58bb5c0e06287f51a1b80c29c0d8d6c3022d8abcb4c55263875b6a7050dfd0",
+  "rustc-1.98.1-src.tar.xz": "be1816e7f6c40abb90245ad6e024bed2a7e88d7dda4561e4d5470207df616b9f"
  }
 }
