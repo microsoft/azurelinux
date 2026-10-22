@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import logging
+import shlex
 import sys
 import uuid
 from typing import TYPE_CHECKING
@@ -104,6 +105,26 @@ def test_postgres_default_command_initializes_and_serves(
         )
         assert bad_auth.exit_code != 0, f"wrong password was accepted: {bad_auth.output}"
         assert "authentication failed" in bad_auth.output, f"unexpected authentication error: {bad_auth.output}"
+
+        psql = (
+            f"PGPASSWORD={POSTGRES_PASSWORD} psql "
+            f"--host={server_name} --username=postgres --dbname={POSTGRES_DB} "
+            "--set=ON_ERROR_STOP=1 --tuples-only --no-align"
+        )
+        for statement in (
+            "CREATE TABLE cities (name varchar(80), location point);",
+            "INSERT INTO cities VALUES ('San Francisco', '(-194.0, 53.0)'), ('Seattle', '(-150.0, 86.0)');",
+        ):
+            result = client_exec_shell(f"{psql} --command={shlex.quote(statement)}")
+            assert result.exit_code == 0, f"database write failed: {result.output}"
+
+        statement = "SELECT name, location FROM cities ORDER BY name;"
+        rows = client_exec_shell(f"{psql} --command={shlex.quote(statement)}")
+        assert rows.exit_code == 0, f"reading stored rows failed: {rows.output}"
+        assert rows.stdout.splitlines() == [
+            "San Francisco|(-194,53)",
+            "Seattle|(-150,86)",
+        ], f"unexpected stored rows: {rows.output}"
 
         pid_one = server_exec_shell("cat /proc/1/comm")
         assert pid_one.exit_code == 0, f"failed to inspect PID 1: {pid_one.output}"
