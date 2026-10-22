@@ -1,0 +1,17 @@
+# Adapted from NVIDIA's Azure driver packaging:
+# https://gitlab.com/nvidia/packages/azure/nvidia-driver/-/tree/610?ref_type=heads
+# Enable persistence state. From:
+# file:///usr/share/doc/nvidia-driver/html/nvidia-persistenced.html
+
+enable nvidia-persistenced.service
+
+# Enable Fabric Manager:
+enable nvidia-fabricmanager.service
+
+# Enable IMEX:
+enable nvidia-imex.service
+
+# Enable Dynamic Boost. From:
+# file:///usr/share/doc/nvidia-driver/html/dynamicboost.html
+
+enable nvidia-powerd.service
