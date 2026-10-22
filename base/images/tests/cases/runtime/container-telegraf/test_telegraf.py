@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from python_on_whales import DockerClient
+    from utils.container_runtime import WriteFile
 
 TELEGRAF_CONFIG = "/etc/telegraf/telegraf.conf"
 TELEGRAF_TEST_CONFIG = """\
@@ -43,6 +44,34 @@ def test_telegraf_test_mode_emits_mem_metrics(container_exec_shell: ExecShell) -
     result = container_exec_shell(f"telegraf --config {TELEGRAF_CONFIG} --test")
     assert result.exit_code == 0, f"telegraf --test failed: {result.output}"
     assert "mem,host" in result.output, f"expected mem metrics in telegraf --test output: {result.output}"
+
+
+def test_telegraf_cpu_plugin_usage(container_exec_shell: ExecShell) -> None:
+    """The CPU input plugin must expose its usage information."""
+    result = container_exec_shell("telegraf --usage cpu")
+    assert result.exit_code == 0, f"CPU plugin usage failed: {result.output}"
+    assert "cpu" in result.output.lower(), f"expected CPU plugin usage: {result.output}"
+
+
+def test_telegraf_file_output_plugin_writes_metrics(
+    container_exec_shell: ExecShell,
+    write_file_in_container: WriteFile,
+) -> None:
+    """A one-shot collection must flush memory metrics to a real file."""
+    config = TELEGRAF_TEST_CONFIG.replace('["stdout"]', '["/tmp/telegraf-metrics.out"]')
+    write = write_file_in_container(
+        "/tmp/telegraf-file-output.conf",  # noqa: S108 - inside a fresh test container
+        config,
+    )
+    assert write.exit_code == 0, f"failed writing file-output config: {write.output}"
+
+    result = container_exec_shell("telegraf --config /tmp/telegraf-file-output.conf --once")
+    assert result.exit_code == 0, f"telegraf file output run failed: {result.output}"
+
+    result = container_exec_shell(
+        'test -s /tmp/telegraf-metrics.out && grep -q "mem,host" /tmp/telegraf-metrics.out',
+    )
+    assert result.exit_code == 0, f"telegraf file output validation failed: {result.output}"
 
 
 def test_telegraf_default_command_uses_mounted_config(
