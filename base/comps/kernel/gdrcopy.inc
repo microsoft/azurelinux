@@ -1,0 +1,180 @@
+# gdrcopy.inc — GDRCopy userspace and prebuilt gdrdrv kernel module
+#
+# The kmod RPM NVR encodes GDRCopy and kernel versions:
+# kmod-gdrcopy-<gdrcopy>-<kernel-version>.<kernel-release>
+# Userspace releases also include the kernel version/release to keep RPMs
+# unique across kernel builds in Koji.
+
+# =========================================================================
+# Phase: package — userspace and per-kernel subpackage declarations
+# =========================================================================
+%if "%{_kmod_phase}" == "package" && %{with_up_base}
+
+%ifarch x86_64 aarch64
+%global _azl_kver %{version}
+%global _azl_krel %{release}
+
+%package -n gdrcopy
+Summary:        Low-latency GPU memory copy library
+License:        MIT
+Version:        %{gdrcopy_version}
+Release:        %{_azl_kver}.%{_azl_krel}
+%global version %{_azl_kver}
+%global release %{_azl_krel}
+BuildRequires:  cuda-cudart-devel-%{cuda_version_rpm}
+BuildRequires:  cuda-driver-devel-%{cuda_version_rpm}
+Requires:       nvidia-driver-cuda-libs%{?_isa} = %{nvidia_open_version}
+
+%description -n gdrcopy
+GDRCopy provides low-overhead userspace mappings of NVIDIA GPU memory for
+CPU-driven copies using GPUDirect RDMA facilities.
+
+%package -n gdrcopy-devel
+Summary:        Development files for GDRCopy
+License:        MIT
+Version:        %{gdrcopy_version}
+Release:        %{_azl_kver}.%{_azl_krel}
+%global version %{_azl_kver}
+%global release %{_azl_krel}
+Requires:       gdrcopy%{?_isa} = %{gdrcopy_version}-%{_azl_kver}.%{_azl_krel}
+
+%description -n gdrcopy-devel
+Headers and linker files for applications that use the GDRCopy API.
+
+%package -n kmod-gdrcopy
+Summary:        GDRCopy kernel module for NVIDIA driver %{nvidia_open_version} and kernel %{KVERREL}
+License:        MIT
+Version:        %{gdrcopy_version}
+Release:        %{_azl_kver}.%{_azl_krel}
+%global version %{_azl_kver}
+%global release %{_azl_krel}
+AutoReq:        no
+Provides:       gdrcopy-kmod = %{gdrcopy_version}
+Provides:       kmod-gdrcopy-uname-r = %{KVERREL}
+Requires:       %{name}-core-uname-r = %{KVERREL}
+Requires:       kmod-nvidia-open = %{nvidia_open_version}-%{_azl_kver}.%{_azl_krel}
+Requires:       gdrcopy%{?_isa} = %{gdrcopy_version}-%{_azl_kver}.%{_azl_krel}
+Requires(post): kmod
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): kmod
+Requires(postun): systemd
+
+%description -n kmod-gdrcopy
+The GDRCopy gdrdrv kernel module built for NVIDIA open driver
+%{nvidia_open_version} and kernel %{KVERREL}.
+%endif
+
+%endif
+
+# =========================================================================
+# Phase: prep — extract GDRCopy source
+# =========================================================================
+%if "%{_kmod_phase}" == "prep" && %{with_up_base}
+
+%ifarch x86_64 aarch64
+pushd %{_builddir}
+tar -xf %{SOURCE6010}
+popd
+%endif
+
+%endif
+
+# =========================================================================
+# Phase: build — build libgdrapi and gdrdrv
+# =========================================================================
+%if "%{_kmod_phase}" == "build" && %{with_up_base}
+
+%ifarch x86_64 aarch64
+%{log_msg "Building GDRCopy %{gdrcopy_version} for NVIDIA %{nvidia_open_version} and kernel %{KVERREL}"}
+pushd %{_builddir}/gdrcopy-%{gdrcopy_version}
+%{__make} %{?_smp_mflags} lib
+%ifarch x86_64
+GDRCOPY_CUDA_TARGET=x86_64-linux
+%else
+GDRCOPY_CUDA_TARGET=sbsa-linux
+%endif
+%{__make} %{?_smp_mflags} -C tests \
+    CUDA="/usr/local/cuda-%{cuda_version}/targets/${GDRCOPY_CUDA_TARGET}" \
+    CUDA_LIB="-L /usr/local/cuda-%{cuda_version}/targets/${GDRCOPY_CUDA_TARGET}/lib -L /usr/local/cuda-%{cuda_version}/targets/${GDRCOPY_CUDA_TARGET}/lib/stubs -L /usr/lib64/nvidia -L /usr/lib/nvidia" \
+    GET_CUDA_VERSION="printf %{cuda_version}" \
+    gdrcopy_sanity
+pushd src/gdrdrv
+%{__make} %{?_smp_mflags} \
+    KVER="%{KVERREL}" \
+    KDIR="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
+    NVIDIA_SRC_DIR="%{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version}/kernel-open/nvidia" \
+    NVIDIA_IS_OPENSOURCE=y \
+    HAVE_VM_FLAGS_SET=y \
+    HAVE_PROC_OPS=y \
+    MAKE_PARAMS="CONFIG_OBJTOOL_WERROR="
+popd
+popd
+%endif
+
+%endif
+
+# =========================================================================
+# Phase: install — install userspace and the unsigned module into buildroot
+# =========================================================================
+%if "%{_kmod_phase}" == "install" && %{with_up_base}
+
+%ifarch x86_64 aarch64
+pushd %{_builddir}/gdrcopy-%{gdrcopy_version}
+%{__make} lib_install \
+    DESTDIR=%{buildroot} \
+    prefix=%{_prefix} \
+    libdir=%{_libdir}
+install -D -m 0644 src/gdrdrv/gdrdrv.ko \
+    %{buildroot}/lib/modules/%{KVERREL}/extra/gdrcopy/gdrdrv.ko
+install -D -m 0644 LICENSE \
+    %{buildroot}%{_datadir}/licenses/gdrcopy/LICENSE
+install -D -m 0755 tests/gdrcopy_sanity \
+    %{buildroot}%{_bindir}/gdrcopy_sanity
+install -D -m 0644 LICENSE \
+    %{buildroot}%{_datadir}/licenses/kmod-gdrcopy-%{KVERREL}/LICENSE
+# Upstream's service loads gdrdrv and creates /dev/gdrdrv on boot.
+install -D -m 0644 packages/rhel/gdrcopy.service \
+    %{buildroot}%{_unitdir}/gdrcopy.service
+install -D -m 0755 packages/rhel/init.d/gdrcopy \
+    %{buildroot}%{_libexecdir}/gdrcopy/gdrcopy
+popd
+%endif
+
+%endif
+
+# =========================================================================
+# Phase: files — scriptlets and file lists
+# =========================================================================
+%if "%{_kmod_phase}" == "files" && %{with_up_base}
+
+%ifarch x86_64 aarch64
+%post -n kmod-gdrcopy
+%{_sbindir}/depmod -a %{KVERREL} || :
+%systemd_post gdrcopy.service
+
+%preun -n kmod-gdrcopy
+%systemd_preun gdrcopy.service
+
+%postun -n kmod-gdrcopy
+%{_sbindir}/depmod -a %{KVERREL} || :
+%systemd_postun_with_restart gdrcopy.service
+
+%files -n gdrcopy
+%license %{_datadir}/licenses/gdrcopy/LICENSE
+%{_bindir}/gdrcopy_sanity
+%{_libdir}/libgdrapi.so.*
+
+%files -n gdrcopy-devel
+%{_includedir}/gdrapi.h
+%{_includedir}/gdrconfig.h
+%{_libdir}/libgdrapi.so
+
+%files -n kmod-gdrcopy
+%license %{_datadir}/licenses/kmod-gdrcopy-%{KVERREL}/LICENSE
+/lib/modules/%{KVERREL}/extra/gdrcopy/gdrdrv.ko.%{compext}
+%{_libexecdir}/gdrcopy/gdrcopy
+%{_unitdir}/gdrcopy.service
+%endif
+
+%endif

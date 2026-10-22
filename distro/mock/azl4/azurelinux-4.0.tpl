@@ -90,4 +90,11 @@ enabled=1
 skip_if_unavailable=False
 excludepkgs=rpmautospec-0.8.4*
 
+# NVIDIA's AZL4 repository does not yet publish the CUDA development packages.
+[cuda]
+name=NVIDIA CUDA for Azure Linux 3
+baseurl=https://developer.download.nvidia.com/compute/cuda/repos/azl3/{{ "sbsa" if target_arch == "aarch64" else target_arch }}
+enabled=1
+skip_if_unavailable=False
+
 """
