@@ -23,15 +23,19 @@ if TYPE_CHECKING:
     from python_on_whales import DockerClient
 
 
-def _poll_http_status(exec_shell: ExecShell, retries: int = 5, delay: float = 1.0) -> ContainerExecResult:
+def _poll_http_response(exec_shell: ExecShell, retries: int = 5, delay: float = 1.0) -> ContainerExecResult:
     """Poll for an HTTP response, retrying only on connection failure."""
     result = None
     for _ in range(retries):
-        result = exec_shell(
-            'exec 3<>/dev/tcp/localhost/8080 && printf "GET / HTTP/1.0\\r\\n\\r\\n" >&3 && head -n1 <&3'
-        )
+        result = exec_shell('exec 3<>/dev/tcp/localhost/8080 && printf "GET / HTTP/1.0\\r\\n\\r\\n" >&3 && cat <&3')
         if result.exit_code == 0:
             assert result.stdout.strip(), f"nginx accepted the connection but sent no response: {result.output}"
+            headers, separator, body = result.stdout.replace("\r\n", "\n").partition("\n\n")
+            assert separator, f"incomplete HTTP response: {result.stdout!r}"
+            assert headers.splitlines()[0] in {"HTTP/1.0 200 OK", "HTTP/1.1 200 OK"}, (
+                f"unexpected HTTP status: {headers!r}"
+            )
+            assert body == "Azure Linux nginx workload\n", f"unexpected HTTP body: {body!r}"
             return result
         time.sleep(delay)
     return result if result is not None else pytest.fail("no attempts were made")
@@ -52,9 +56,8 @@ def test_nginx_default_command_serves_requests(container_exec_shell: ExecShell) 
     )
     assert start.exit_code == 0, f"failed to start nginx: {start.output}"
 
-    result = _poll_http_status(container_exec_shell)
+    result = _poll_http_response(container_exec_shell)
     assert result.exit_code == 0, f"HTTP probe to nginx failed: {result.output}"
-    assert "200" in result.stdout, f"expected nginx's default 200 response, got: {result.stdout!r}"
 
 
 def test_nginx_image_config_cmd(podman_client: DockerClient, container_image_ref: str) -> None:
@@ -77,8 +80,7 @@ def test_nginx_runs_as_pid1_without_override(podman_client: DockerClient, contai
         def exec_shell(command: str, shell: str = "bash") -> ContainerExecResult:
             return exec_in_container(podman_client, instance.container_name, [shell, "-c", command])
 
-        result = _poll_http_status(exec_shell)
+        result = _poll_http_response(exec_shell)
         assert result.exit_code == 0, f"HTTP probe to nginx failed: {result.output}"
-        assert "200" in result.stdout, f"expected nginx's default 200 response, got: {result.stdout!r}"
     finally:
         destroy_container(podman_client, instance.container_name)
