@@ -31,7 +31,7 @@
 
 Name: rdma-core
 Version: 2601.0.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: RDMA core userspace libraries and daemons
 Group: System Environment/Libraries
 
@@ -117,7 +117,7 @@ BuildRequires: make
 %if 0%{?rhel} >= 8 || 0%{?fedora} >= 30 || %{with_pyverbs}
 BuildRequires: python3-docutils
 %else
-BuildRequires: python-docutils
+BuildRequires: python3-docutils
 %endif
 %endif
 
@@ -811,6 +811,9 @@ fi
 %endif
 
 %changelog
+* Wed Oct 21 2026 Daniel McIlvaney <damcilva@microsoft.com> - 2601.0.7-2
+- Use python3-docutils instead of its generated alias for documentation builds.
+
 * Mon May 12 2026 Azure Linux Team - 2601.0.7-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
