@@ -1,0 +1,40 @@
+Subject: [PATCH] Skip custom EC parameter test when OpenSSL policy rejects it
+
+Azure Linux OpenSSL rejects custom EC parameters that do not match a
+recognized named curve. Probe the exact WAPIP192v1 parameters in SKIPIF
+and skip only when the OpenSSL error queue reports an unknown EC group.
+Other key-creation failures still reach the original test and fail.
+
+The test body and expected output are unchanged, and the full test still
+runs when custom EC parameters are supported. No runtime code is changed.
+
+diff --git a/ext/openssl/tests/ecc_custom_params.phpt b/ext/openssl/tests/ecc_custom_params.phpt
+--- a/ext/openssl/tests/ecc_custom_params.phpt
++++ b/ext/openssl/tests/ecc_custom_params.phpt
+@@ -5,6 +5,26 @@
+ --SKIPIF--
+ <?php
+ if (!defined("OPENSSL_KEYTYPE_EC")) die("skip EC disabled");
++
++// Some distributions reject explicit parameters for unrecognized curves.
++$ec = openssl_pkey_new([
++    'ec' => [
++        'p' => hex2bin('BDB6F4FE3E8B1D9E0DA8C0D46F4C318CEFE4AFE3B6B8551F'),
++        'a' => hex2bin('BB8E5E8FBC115E139FE6A814FE48AAA6F0ADA1AA5DF91985'),
++        'b' => hex2bin('1854BEBDC31B21B7AEFC80AB0ECD10D5B1B3308E6DBF11C1'),
++        'order' => hex2bin('BDB6F4FE3E8B1D9E0DA8C0D40FC962195DFAE76F56564677'),
++        'g_x' => hex2bin('4AD5F7048DE709AD51236DE65E4D4B482C836DC6E4106640'),
++        'g_y' => hex2bin('02BB3A02D4AAADACAE24817A4CA3A1B014B5270432DB27D2'),
++        'd' => hex2bin('8D0AC65AAEA0D6B96254C65817D4A143A9E7A03876F1A37D'),
++    ],
++]);
++if ($ec === false) {
++    while (($error = openssl_error_string()) !== false) {
++        if (str_contains($error, ':elliptic curve routines::unknown group')) {
++            die("skip Custom EC parameters are disabled by OpenSSL policy");
++        }
++    }
++}
+ ?>
+ --FILE--
+ <?php

@@ -1,7 +1,7 @@
 Summary:        ALSA library
 Name:           alsa-lib
 Version:        1.2.16.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,8 @@ Group:          Applications/Internet
 URL:            https://alsa-project.org
 Source0:        https://www.alsa-project.org/files/pub/lib/%{name}-%{version}.tar.bz2
 Patch0:         CVE-2026-90781.patch
+Patch1:         CVE-2026-96674.patch
+Patch2:         CVE-2026-96675.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 Requires:       python3
@@ -47,6 +49,9 @@ make DESTDIR=%{buildroot} install
 %{_includedir}/*
 
 %changelog
+* Tue Oct 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.16.1-3
+- Patch for CVE-2026-96675, CVE-2026-96674
+
 * Tue Sep 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.16.1-2
 - Patch for CVE-2026-90781
 

@@ -2074,8 +2074,14 @@
     },
     {
       "component": {
-           "version": "2.3.7",
-           "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.7.tar.gz"
+        "type": "other",
+        "other": {
+          "name": "containerd2",
+          "version": "2.3.7",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.7.tar.gz"
+        }
+      }
+    },
     {
       "component": {
         "type": "other",
@@ -4754,8 +4760,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.9",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.9-1/go1.26.9-20261008.11.src.tar.gz"
+          "version": "1.26.10",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.10-1/go1.26.10-20261020.3.src.tar.gz"
         }
       }
     },
@@ -4764,8 +4770,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.27.2",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.2-1/go1.27.2-20261008.10.src.tar.gz"
+          "version": "1.27.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.3-1/go1.27.3-20261020.4.src.tar.gz"
         }
       }
     },
@@ -6684,8 +6690,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -8285,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "4.1.0.kata0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/4.1.0.kata0.tar.gz"
+          "version": "4.1.0.kata1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/4.1.0.kata1.tar.gz"
         }
       }
     },
@@ -8375,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -8385,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -8395,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -8425,8 +8431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.157.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.157.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -14606,8 +14612,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "24.21.0",
-          "downloadUrl": "https://nodejs.org/download/release/v24.21.0/node-v24.21.0.tar.xz"
+          "version": "24.22.0",
+          "downloadUrl": "https://nodejs.org/download/release/v24.22.0/node-v24.22.0.tar.xz"
         }
       }
     },
