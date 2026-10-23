@@ -1,0 +1,54 @@
+From fa0ba5a155ef925bb7547cb4cdc36425a2f5b8f9 Mon Sep 17 00:00:00 2001
+From: Paulo Alcantara <pc@manguebit.org>
+Date: Thu, 17 Sep 2026 14:49:39 -0300
+Subject: [PATCH] mount.cifs: validate username derived from the passwd
+ database
+
+When neither the credentials file nor the USER environment variable
+supplies a username, assemble_mountinfo() falls back to the caller's
+passwd login name via getusername(getuid()) and copies it verbatim into
+the "user=" mount option, just like the other two sources.  Run it
+through check_creds_field() as well so the invariant "the username never
+contains an option delimiter" holds regardless of where the username
+came from.  Unlike the credentials file and USER env, this value is not
+attacker-controlled, so this is defense in depth rather than a fix for
+the injection itself.
+
+While here, guard against getusername() returning NULL (no passwd entry
+for the uid), which was previously passed straight into strlcpy().
+
+Reviewed-by: Bharath SM <bharathsm@microsoft.com>
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+---
+ mount.cifs.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 72beae874209..671d58fc919b 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -2030,8 +2030,18 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+ 			strlcpy(parsed_info->username, getenv("USER"),
+ 				sizeof(parsed_info->username));
+ 		} else {
+-			strlcpy(parsed_info->username, getusername(getuid()),
+-				sizeof(parsed_info->username));
++			char *username = getusername(getuid());
++
++			if (username) {
++				if (check_creds_field(username)) {
++					fprintf(stderr, "Invalid username for uid %u\n",
++						(unsigned int)getuid());
++					rc = EX_USAGE;
++					goto assemble_exit;
++				}
++				strlcpy(parsed_info->username, username,
++					sizeof(parsed_info->username));
++			}
+ 		}
+ 		parsed_info->got_user = 1;
+ 	}
+-- 
+2.56.0
+

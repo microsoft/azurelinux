@@ -1,0 +1,4 @@
+# Pin Fedora 43's CVE-2026-104715 fixes while retaining cifs-utils 7.7.
+# Source: https://src.fedoraproject.org/rpms/cifs-utils/c/9f3749293bd831e1246278b1791ccae36b1e7b8e
+[components.cifs-utils]
+spec = { type = "upstream", upstream-commit = "9f3749293bd831e1246278b1791ccae36b1e7b8e" }
