@@ -342,6 +342,7 @@ architectures = ["x86_64", "aarch64"]
 tests.tests = [
   { name = "static-image-checks" },
   { group = "vm-base-functional" },
+  { group = "vm-extension-tests" },
   { group = "vm-base-performance" },
   { group = "multi-sku-tests", sku-groups = ["multi-sku-amd64", "multi-sku-arm64"] },
   { group = "multi-sku-nvme-tests", sku-groups = ["multi-sku-nvme"] },

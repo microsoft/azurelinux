@@ -253,6 +253,28 @@ required-capabilities = ["machine-bootable"]
 [tests.multi-sku-storage.lisa]
 criteria = { area = "storage", category = "multi_sku" }
 
+[tests.vm-extension-agents]
+type                  = "lisa"
+description           = "AZL4 VM agent checks"
+kind                  = "functional"
+long-running          = true
+required-capabilities = ["machine-bootable", "systemd", "runtime-package-management"]
+
+[tests.vm-extension-agents.lisa]
+criteria = { testcase-names = [
+  "verify_azuremonitoragent_linux",
+  "verify_application_health_extension",
+  "verify_azsecpack",
+  "verify_azure_disk_encryption_provisioned",
+  "verify_key_vault_extension",
+  "verify_existing_script_run",
+  "verify_azure_network_watcher",
+  "verify_vmsnapshot_extension",
+  "verify_exclude_disk_support_restore_point",
+  "verify_vm_agent",
+  "verify_metricsextension",
+] }
+
 [tests.lisa-fips]
 type                  = "lisa"
 description           = "LISA FIPS status and enablement tests"
@@ -307,6 +329,12 @@ tests = [
   { name = "kernel-ltp" },
   { name = "xfs-filesystem" },
   { name = "bvt-metrics" },
+]
+
+[test-groups.vm-extension-tests]
+description = "AZL4 VM agent validation with explicit testcase names"
+tests = [
+  { name = "vm-extension-agents" },
 ]
 
 # Performance-oriented coverage. Kept as a separate group because
