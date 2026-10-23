@@ -1,7 +1,7 @@
 Summary:        Client library for accessing NFS shares over a network
 Name:           libnfs
 Version:        5.0.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 # The library is licensed as LGPLv2+, the protocol definition is BSD
 License:        LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/sahlberg/libnfs
 Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2026-53689.patch
+Patch1:         CVE-2026-108985.patch
 BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  libtool
@@ -74,6 +75,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/nfs-*.1*
 
 %changelog
+* Tue Oct 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.0.2-3
+- Patch for CVE-2026-108985
+
 * Thu Jun 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.0.2-2
 - Patch for CVE-2026-53689
 
