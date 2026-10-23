@@ -5,7 +5,7 @@
 Summary:        A TLS-encrypting socket wrapper
 Name:           stunnel
 Version:        5.74
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,7 +43,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig
 BuildRequires:  systemd
 BuildRequires:  util-linux
-BuildRequires:  python-cryptography
+BuildRequires:  python3-cryptography
 %{?systemd_requires}
 %if %{with libwrap}
 BuildRequires:  tcp_wrappers-devel
@@ -141,6 +141,10 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Wed Oct 21 2026 Daniel McIlvaney <damcilva@microsoft.com> - 5.74-2
+- avoid using python-cryptography package alias to fix a scheduling issue in
+  the build tools
+
 * Mon Apr 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 5.74-1
 - Upgrade to 5.74 and remove unwanted patches
 - Verified License
