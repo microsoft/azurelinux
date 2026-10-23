@@ -1,0 +1,26 @@
+From 25b756f789e7dda8048f69f2ab23f9cdb5d78d6f Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Thu, 30 Apr 2026 10:04:47 +0200
+Subject: [PATCH] cpio.tests: fix false positive
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ testsuite/cpio.tests | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/testsuite/cpio.tests b/testsuite/cpio.tests
+index 2804722e9..ecb947d46 100755
+--- a/testsuite/cpio.tests
++++ b/testsuite/cpio.tests
+@@ -163,8 +163,10 @@ mkdir -p cpio.testdir/prepare/inner
+ echo "file outside of destination was written" > cpio.testdir/prepare/dont_write
+ echo "data" > cpio.testdir/prepare/inner/to_extract
+ mkdir -p cpio.testdir/extract
++# The output of "../dont_write" name by cpio -v can be either "../dont_write" or "dont_write" depending on FEATURE_TAR_LONG_OPTIONS.
++# sed 's:^../dont_write:dont_write:' is used to fix the output to be the same in either case.
+ testing "cpio extract file outside of destination" "\
+-(cd cpio.testdir/prepare/inner && echo -e '../dont_write\nto_extract' | cpio -o -H newc) | (cd cpio.testdir/extract && cpio -vi 2>&1)
++(cd cpio.testdir/prepare/inner && echo -e '../dont_write\nto_extract' | cpio -o -H newc) | (cd cpio.testdir/extract && cpio -vi 2>&1) | sed 's:^../dont_write:dont_write:'
+ echo \$?
+ test -f cpio.testdir/dont_write || echo cpio.testdir/dont_write does not exist" \
+ "\

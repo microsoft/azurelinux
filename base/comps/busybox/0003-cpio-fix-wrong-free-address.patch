@@ -1,0 +1,41 @@
+From 6908229d4f7f9d3f199d831e09cacd48bb08a97b Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Thu, 30 Apr 2026 05:56:58 +0200
+Subject: [PATCH] cpio: fix a bug (wrong free() address) in
+ !FEATURE_TAR_LONG_OPTIONS config
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ archival/libarchive/data_extract_all.c | 4 ++++
+ testsuite/cpio.tests                   | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/archival/libarchive/data_extract_all.c b/archival/libarchive/data_extract_all.c
+index b84b960c49..3e8792b158 100644
+--- a/archival/libarchive/data_extract_all.c
++++ b/archival/libarchive/data_extract_all.c
+@@ -67,7 +67,11 @@ void FAST_FUNC data_extract_all(archive_handle_t *archive_handle)
+ #endif
+ #if ENABLE_FEATURE_PATH_TRAVERSAL_PROTECTION
+ 	/* Skip leading "/" and past last ".." path component */
++# if ENABLE_FEATURE_TAR_LONG_OPTIONS
+ 	dst_name = (char *)skip_unsafe_prefix(dst_name);
++# else /* dst_name is file_header->name, which is free()d by e.g. cpio - must copy, can't just advance the ptr */
++	strip_unsafe_prefix(dst_name);
++# endif
+ #endif
+ // ^^^ This may be a problem if some applets do need to extract absolute names.
+ // (Probably will need to invent ARCHIVE_ALLOW_UNSAFE_NAME flag).
+diff --git a/testsuite/cpio.tests b/testsuite/cpio.tests
+index a4462c53e0..88a778b90f 100755
+--- a/testsuite/cpio.tests
++++ b/testsuite/cpio.tests
+@@ -169,7 +169,7 @@ echo \$?
+ ls cpio.testdir/dont_write 2>&1" \
+ "\
+ cpio: removing leading '../' from member names
+-../dont_write
++dont_write
+ to_extract
+ 1 blocks
+ 0
