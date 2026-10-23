@@ -90,7 +90,8 @@
                 "^/usr/share/doc/(docs|rust)/html/static\\.files/.*LICENSE.*\\.md$",
                 "^/usr/share/doc/(docs|rust)/html/core/.*/fn\\..*absd.*\\.html$",
                 "^/usr/share/doc/(docs|rust)/html/rustc/platform-support/.*bsd.*\\.html$",
-                "^/usr/share/doc/(docs|rust)/html/search\\.index/.*\\.js$"
+                "^/usr/share/doc/(docs|rust)/html/search\\.index/.*\\.js$",
+                "^/usr/share/doc/(docs|rust)/html/rust-by-example/.*/searchindex-[0-9a-f]+\\.js$"
             ]
         },
         {
