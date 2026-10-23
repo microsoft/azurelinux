@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -527,6 +527,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Fri Oct 23 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-35
+- Disable jffs2 in cloud images for CIS 1.1.1.5
+
 * Thu Oct 15 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-34
 - Require azurelinux-release-wsl instead of azurelinux-release-container in identity-wsl
 
