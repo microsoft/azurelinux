@@ -1,0 +1,48 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Install the client configuration drop-in with Azure Linux branding"
+type = "spec-search-replace"
+section = "%install"
+regex = '^install -m644 ssh_config_redhat \$RPM_BUILD_ROOT%\{_sysconfdir\}/ssh/ssh_config\.d/50-redhat\.conf$'
+replacement = 'install -m644 ssh_config_redhat $RPM_BUILD_ROOT%{_sysconfdir}/ssh/ssh_config.d/50-azurelinux.conf'
+
+[[overlays]]
+description = "Install the server crypto-policy drop-in with Azure Linux branding"
+type = "spec-search-replace"
+section = "%install"
+regex = '^install -m644 sshd_config_redhat_cp \$RPM_BUILD_ROOT%\{_sysconfdir\}/ssh/sshd_config\.d/40-redhat-crypto-policies\.conf$'
+replacement = 'install -m644 sshd_config_redhat_cp $RPM_BUILD_ROOT%{_sysconfdir}/ssh/sshd_config.d/40-azurelinux-crypto-policies.conf'
+
+[[overlays]]
+description = "Install the server configuration drop-in with Azure Linux branding"
+type = "spec-search-replace"
+section = "%install"
+regex = '^install -m644 sshd_config_redhat \$RPM_BUILD_ROOT%\{_sysconfdir\}/ssh/sshd_config\.d/50-redhat\.conf$'
+replacement = 'install -m644 sshd_config_redhat $RPM_BUILD_ROOT%{_sysconfdir}/ssh/sshd_config.d/50-azurelinux.conf'
+
+[[overlays]]
+description = "Package the Azure Linux client drop-in with its existing config handling and permissions"
+type = "spec-search-replace"
+section = "%files"
+package = "clients"
+regex = '^%attr\(0644,root,root\) %config\(noreplace\) %\{_sysconfdir\}/ssh/ssh_config\.d/50-redhat\.conf$'
+replacement = '%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/ssh/ssh_config.d/50-azurelinux.conf'
+
+[[overlays]]
+description = "Package the Azure Linux server crypto-policy drop-in with its existing config handling and permissions"
+type = "spec-search-replace"
+section = "%files"
+package = "server"
+regex = '^%attr\(0600,root,root\) %config\(noreplace\) %\{_sysconfdir\}/ssh/sshd_config\.d/40-redhat-crypto-policies\.conf$'
+replacement = '%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/40-azurelinux-crypto-policies.conf'
+
+[[overlays]]
+description = "Package the Azure Linux server drop-in with its existing config handling and permissions"
+type = "spec-search-replace"
+section = "%files"
+package = "server"
+regex = '^%attr\(0600,root,root\) %config\(noreplace\) %\{_sysconfdir\}/ssh/sshd_config\.d/50-redhat\.conf$'
+replacement = '%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/50-azurelinux.conf'
