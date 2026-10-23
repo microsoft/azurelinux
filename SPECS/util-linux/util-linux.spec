@@ -23,10 +23,10 @@ Patch3:         CVE-2026-13595.patch
 Patch4:         CVE-2026-76642.patch
 Patch5:         CVE-2026-78408.patch
 Patch6:         CVE-2026-78410.patch
-Patch7:         CVE-2026-53615.patch
-Patch8:         CVE-2026-53612.patch
-Patch9:         CVE-2026-53613.patch
-Patch10:        CVE-2026-53614.patch
+Patch7:         CVE-2026-53612.patch
+Patch8:         CVE-2026-53613.patch
+Patch9:         CVE-2026-53614.patch
+Patch10:        CVE-2026-53615.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
