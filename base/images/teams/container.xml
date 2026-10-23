@@ -70,6 +70,7 @@
     </packages>
     <packages type="image" profiles="DistrolessCore">
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+        <file name="container-exclude-files.yaml" target="/image/exclude_files.yaml" permissions="0644" />
         <package name="azurelinux-release-container" />
         <package name="filesystem" />
         <package name="tzdata" />

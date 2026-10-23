@@ -8,6 +8,9 @@ The workload images run as dedicated non-root users and do not include DNF,
 RPM, or repository configuration. Use `container-base` when runtime package
 installation is required.
 
+The RPM database remains in the build staging root for KIWI package inventories
+and image SBOMs, but is excluded from the shipped OCI filesystem.
+
 Images inheriting `WorkloadCore` explicitly select `coreutils-single` during both
 bootstrap and image installation. This avoids conflicts with full `coreutils`
 package if pulled in as a dependency.
