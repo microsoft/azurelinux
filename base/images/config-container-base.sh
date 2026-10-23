@@ -70,19 +70,28 @@ done
 # $1: XPath predicate to further filter the <packages> element
 #     (e.g., 'not(@profiles)' or "@profiles='distroless-debug'")
 get_image_packages() {
-    xmllint --xpath \
+    local attributes status
+    if attributes=$(xmllint --xpath \
         "//packages[@type='image' and ${1}]/package/@name" \
-        /image/config.xml 2>/dev/null \
-    | grep -oP 'name="\K[^"]+' \
-    || true  # No matches is not an error — the profile may have no packages.
+        /image/config.xml); then
+        printf '%s\n' "${attributes}" | grep -oP 'name="\K[^"]+'
+    else
+        status=$?
+        # xmllint returns 11 for an empty XPath result, which is valid here.
+        [[ "${status}" -eq 11 ]] && return 0
+        die "xmllint failed to read image packages from /image/config.xml (exit ${status})"
+    fi
 }
 
 # ---------------------------------------------------------------------------
 # 1. Collect declared image packages from the kiwi XML
 # ---------------------------------------------------------------------------
 
+[[ -f /image/config.xml ]] || die "kiwi XML definition not found: /image/config.xml"
+
 # Shared packages (no profiles attribute) apply to all profiles.
-KEEP_PKGS=$(get_image_packages 'not(@profiles)')
+KEEP_PKGS=$(get_image_packages 'not(@profiles)') \
+    || die "failed to collect shared image packages"
 
 # Packages scoped to specific profiles.  kiwi_profiles is a comma-separated
 # list of active profiles, set by kiwi at build time (e.g.,
@@ -92,7 +101,9 @@ KEEP_PKGS=$(get_image_packages 'not(@profiles)')
 # use contains() with comma-wrapping for safe substring matching.
 IFS=',' read -ra PROFILES <<< "${kiwi_profiles:-}"
 for profile in "${PROFILES[@]}"; do
-    KEEP_PKGS+=$'\n'$(get_image_packages "contains(concat(',',@profiles,','), ',${profile},')")
+    PROFILE_PKGS=$(get_image_packages "contains(concat(',',@profiles,','), ',${profile},')") \
+        || die "failed to collect image packages for profile '${profile}'"
+    KEEP_PKGS+=$'\n'"${PROFILE_PKGS}"
 done
 
 # Deduplicate.
