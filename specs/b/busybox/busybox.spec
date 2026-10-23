@@ -57,7 +57,7 @@
 
 Name:		busybox
 Version:	1.37.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Epoch:		1
 Summary:	Statically linked binary providing simplified versions of system commands
 License:	GPL-2.0-only
@@ -116,6 +116,8 @@ Patch7: 0005-cpio-tests-require-archive-creation.patch
 Patch8: 0006-cpio-tests-portable-file-existence-check.patch
 Patch9: 0007-cpio-tests-normalize-verbose-filenames.patch
 Patch10: 0008-archival-reject-bare-parent-directory.patch
+Patch11: 0009-cpio-sanitize-hardlink-targets.patch
+Patch12: 0010-archival-reject-parent-directory-after-prefix-stripping.patch
 %description
 Busybox is a single binary which includes versions of a large number
 of system commands, including a shell. This package can be very
@@ -156,6 +158,8 @@ package is build against shared libraries, most notably glibc.
 %patch -P8 -p1
 %patch -P9 -p1
 %patch -P10 -p1
+%patch -P11 -p1
+%patch -P12 -p1
 %build
 # Fix architecture name maps
 arch=`uname -m | sed -e 's/i.86/i386/' -e 's/armv7l/arm/' -e 's/armv5tel/arm/'`

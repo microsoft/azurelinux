@@ -1,0 +1,18 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+bugs = [
+  { url = "https://github.com/vda-linux/busybox_mirror/pull/55" },
+  { url = "https://github.com/microsoft/azurelinux/pull/19677#discussion_r4350859053" },
+]
+
+[[overlays]]
+description = "Sanitize cpio hardlink targets as well as destination names until upstream fixes both"
+type = "patch-add"
+source = "../0009-cpio-sanitize-hardlink-targets.patch"
+
+[[overlays]]
+description = "Apply the cpio hardlink fix after the upstream security backports"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P11 -p1"]
