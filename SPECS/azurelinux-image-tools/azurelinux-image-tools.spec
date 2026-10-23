@@ -1,23 +1,15 @@
 %define our_gopath %{_topdir}/.gopath
 
-Summary:        Azure Linux Image Tools
-Name:           azurelinux-image-tools
-Version:        1.7.0
-Release:        1%{?dist}
-License:        MIT
-URL:            https://github.com/microsoft/azure-linux-image-tools/
-Group:          Applications/System
+Release:        2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# Use generate_source_tarball.sh script with the package version to build this tarball.
-#
-Source1:        %{name}-%{version}-vendor.tar.gz
-BuildRequires: golang >= 1.25
-BuildRequires: e2fsprogs
-BuildRequires: systemd-udev
+Patch0:         CVE-2026-78659.patch
+Patch1:         CVE-2026-78660.patch
+Patch2:         CVE-2026-78669.patch
+Patch3:         CVE-2026-97032.patch
 Requires: %{name}-imagecustomizer = %{version}-%{release}
 
 %description
@@ -110,9 +102,15 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-2
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
+
 * Thu Oct 01 2026 Chris Gunn <chrisgun@microsoft.com> - 1.7.0-1
 - Upgrade to version 1.7.0
 - Fixes CVE-2026-81870, CVE-2026-81871, CVE-2026-81872
+
+* Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 1.6.0-3
+- Add patch for CVE-2026-84445, CVE-2026-84304
 
 * Thu Sep 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 1.6.0-3
 - Add patch for CVE-2026-84445, CVE-2026-84304
