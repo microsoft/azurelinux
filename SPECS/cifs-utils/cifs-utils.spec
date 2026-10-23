@@ -82,7 +82,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Mon Oct 19 2026 Sean Dougherty <sdougherty@microsoft.com> - 7.9-1
-- Upgrade to 7.9.
+- Upgrade to 7.9 to address CVE-2026-104715.
 
 * Thu Jul 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.7-1
 - Auto-upgrade to 7.7 - for CVE-2026-12505
