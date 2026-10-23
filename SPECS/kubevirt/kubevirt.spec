@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.8.4
-Release:        3%{?dist}
+Release:        4%{?dist}.nc
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,7 +53,7 @@ Patch20:        0005-virt-api-accept-large-identity-header-sets-with-Go-1.27.pat
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
-BuildRequires:  golang >= 1.24
+BuildRequires:  golang = 1.27.3
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
@@ -302,6 +302,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Fri Oct 23 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.8.4-4
+- Build with golang 1.27.3
+
 * Fri Aug 14 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.8.4-3
 - Enable Kubevirt Sidecar
 - Add hotplug volue patches
