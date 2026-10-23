@@ -33,6 +33,8 @@ Source22:       azurelinux-media.vol
 Source30:       azurelinux-watermark.png
 Source31:       azurelinux-charge-logo.png
 
+Source40:       index.html
+
 # Replace generic-logos as the system branding package
 Provides:       system-logos = %{version}-%{release}
 Provides:       redhat-logos = %{version}-%{release}
@@ -58,6 +60,8 @@ Conflicts:      fedora-logos-httpd
 BuildArch:      noarch
 
 %description httpd
+Default welcome page and branding assets for web servers on Azure Linux.
+
 The Azure Linux penguin icon is inspired by the Linux mascot ("Tux"), created
 by Larry Ewing. Microsoft permits the use of the Azure Linux trademark and
 Azure Linux icon only in accordance with its trademark and brand guidelines:
@@ -145,6 +149,8 @@ install -p -m 644 %{SOURCE30} %{buildroot}%{_datadir}/plymouth/themes/spinner/wa
 # httpd expects poweredby.png at /usr/share/pixmaps/poweredby.png
 install -p -m 644 %{SOURCE15} %{buildroot}%{_datadir}/pixmaps/poweredby.png
 
+install -D -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/testpage/index.html
+
 %files
 %license %{_datadir}/licenses/%{name}/LICENSE
 %config(noreplace) %{_sysconfdir}/favicon.png
@@ -166,5 +172,6 @@ install -p -m 644 %{SOURCE15} %{buildroot}%{_datadir}/pixmaps/poweredby.png
 %files httpd
 %license %{_datadir}/licenses/%{name}/LICENSE
 %{_datadir}/pixmaps/poweredby.png
+%{_datadir}/testpage/
 
 %autochangelog
