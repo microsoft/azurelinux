@@ -1,0 +1,95 @@
+From d561eb914a389f6f2f009f13f0d09df0887bae72 Mon Sep 17 00:00:00 2001
+From: Paulo Alcantara <pc@manguebit.org>
+Date: Thu, 17 Sep 2026 14:08:50 -0300
+Subject: [PATCH] mount.cifs: reject option delimiters in username and domain
+
+The username= and domain= values from a credentials file, and the USER
+environment variable, are copied verbatim into the kernel mount option
+string as user=<value>/domain=<value>.  The kernel option parser is
+comma separated and last-write-wins, so a value like
+
+  username=smbuser,uid=0,forceuid,noperm
+
+injects further options past mount.cifs's uid=/gid= sanitizer, yielding
+a root-owned mount with permission checks disabled.  A caller that can
+control the credentials file (e.g. pam_mount) thus gains local root.
+
+Reject username and domain values containing an option delimiter (comma,
+equals, CR or LF) at the two untokenized inputs.  Command-line
+-o user=/domain= is already split on commas, and passwords are left
+alone as they may legitimately contain these characters.
+
+Reported-by: Johnathan Benge <jcbenge@amazon.com>
+Fixes: c610039ef674 ("mount.cifs: add username and domain fields to parsed_mount_info")
+Reviewed-by: Bharath SM <bharathsm@microsoft.com>
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+Tested-by: Johnathan Benge <jcbenge@amazon.com>
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+---
+ mount.cifs.c | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/mount.cifs.c b/mount.cifs.c
+index f0e9bc7beae2..72beae874209 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -588,6 +588,11 @@ parsing_err:
+ 	return CRED_UNPARSEABLE;
+ }
+ 
++static int check_creds_field(const char *v)
++{
++	return strpbrk(v, ",=\r\n") != NULL;
++}
++
+ static int open_cred_file(char *file_name,
+ 			struct parsed_mount_info *parsed_info)
+ {
+@@ -638,6 +643,11 @@ static int open_cred_file(char *file_name,
+ 		/* parse next token */
+ 		switch (parse_cred_line(line_buf + i, &temp_val)) {
+ 		case CRED_USER:
++			if (check_creds_field(temp_val)) {
++				fprintf(stderr, "Invalid username in credentials file\n");
++				i = EX_USAGE;
++				goto return_i;
++			}
+ 			strlcpy(parsed_info->username, temp_val,
+ 				sizeof(parsed_info->username));
+ 			parsed_info->got_user = 1;
+@@ -653,6 +663,11 @@ static int open_cred_file(char *file_name,
+ 				goto return_i;
+ 			break;
+ 		case CRED_DOM:
++			if (check_creds_field(temp_val)) {
++				fprintf(stderr, "Invalid domain in credentials file\n");
++				i = EX_USAGE;
++				goto return_i;
++			}
+ 			strlcpy(parsed_info->domain, temp_val,
+ 				sizeof(parsed_info->domain));
+ 			break;
+@@ -2006,12 +2021,18 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+ 		 * USER env variable (ie user%password form) as there is
+ 		 * already a PASSWD environment varaible
+ 		 */
+-		if (getenv("USER"))
++		if (getenv("USER")) {
++			if (check_creds_field(getenv("USER"))) {
++				fprintf(stderr, "Invalid username in USER environment variable\n");
++				rc = EX_USAGE;
++				goto assemble_exit;
++			}
+ 			strlcpy(parsed_info->username, getenv("USER"),
+ 				sizeof(parsed_info->username));
+-		else
++		} else {
+ 			strlcpy(parsed_info->username, getusername(getuid()),
+ 				sizeof(parsed_info->username));
++		}
+ 		parsed_info->got_user = 1;
+ 	}
+ 
+-- 
+2.56.0
+
