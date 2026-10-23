@@ -1,0 +1,32 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+
+set -eu
+
+case "${1:-}" in
+    0|1)
+        value=$1
+        ;;
+    *)
+        echo "usage: $0 0|1 [go.env]" >&2
+        exit 2
+        ;;
+esac
+
+go_env=${2:-/usr/lib/golang/go.env}
+if [ ! -f "$go_env" ]; then
+    exit 0
+fi
+
+if grep -q '^MS_GOTOOLCHAIN_TELEMETRY_ENABLED=' "$go_env"; then
+    temporary=$(mktemp "${go_env}.XXXXXX")
+    trap 'rm -f "$temporary"' 0 HUP INT TERM
+    sed \
+        "s/^MS_GOTOOLCHAIN_TELEMETRY_ENABLED=.*/MS_GOTOOLCHAIN_TELEMETRY_ENABLED=$value/" \
+        "$go_env" > "$temporary"
+    cat "$temporary" > "$go_env"
+    rm -f "$temporary"
+    trap - 0 HUP INT TERM
+else
+    printf '\nMS_GOTOOLCHAIN_TELEMETRY_ENABLED=%s\n' "$value" >> "$go_env"
+fi

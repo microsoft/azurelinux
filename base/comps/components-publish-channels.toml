@@ -385,6 +385,7 @@ components = [
     "go-rpm-macros",
     "gobject-introspection",
     "golang",
+    "golang-msft-telemetry-policy",
     "golist",
     "google-droid-fonts",
     "google-gson",

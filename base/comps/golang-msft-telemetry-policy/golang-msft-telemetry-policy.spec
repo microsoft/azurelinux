@@ -1,0 +1,94 @@
+Summary:        Enable Microsoft build of Go telemetry in first-party environments
+Name:           golang-msft-telemetry-policy
+Version:        1
+Release:        %autorelease
+License:        MIT
+URL:            https://aka.ms/azurelinux
+
+BuildArch:      noarch
+
+Source1:        set-msft-go-telemetry
+
+BuildRequires:  coreutils
+BuildRequires:  grep
+BuildRequires:  sed
+BuildRequires:  azurelinux-rpm-config
+Requires:       coreutils
+Requires:       grep
+Requires:       sed
+
+%description
+Applies the first-party Microsoft build of Go telemetry policy used by the 1P VM
+base images.
+
+The Azure Linux golang package disables Microsoft telemetry by default.
+Installing this package enables it through /usr/lib/golang/go.env.
+
+This package does not require Go. If Go is installed later, an RPM file
+trigger applies the policy when /usr/lib/golang/go.env is created or updated.
+Environment variables and preferences written with go env -w retain their
+normal precedence over this default. This does not enable upstream Go
+telemetry.
+
+%prep
+
+%build
+
+%install
+install -Dpm 0755 %{SOURCE1} \
+    %{buildroot}%{_libexecdir}/set-msft-go-telemetry
+
+%check
+workdir=$(mktemp -d)
+trap 'rm -rf "$workdir"' EXIT
+go_env="$workdir/go.env"
+
+printf 'GOTOOLCHAIN=local\nMS_GOTOOLCHAIN_TELEMETRY_ENABLED=0\n' > "$go_env"
+chmod 0644 "$go_env"
+%{SOURCE1} 1 "$go_env"
+grep -qx 'MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1' "$go_env"
+grep -qx 'GOTOOLCHAIN=local' "$go_env"
+test "$(stat -c '%a' "$go_env")" = 644
+
+%{SOURCE1} 1 "$go_env"
+test "$(grep -c '^MS_GOTOOLCHAIN_TELEMETRY_ENABLED=' "$go_env")" -eq 1
+
+%{SOURCE1} 0 "$go_env"
+grep -qx 'MS_GOTOOLCHAIN_TELEMETRY_ENABLED=0' "$go_env"
+
+printf 'GOTOOLCHAIN=local\n' > "$go_env"
+%{SOURCE1} 1 "$go_env"
+grep -qx 'MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1' "$go_env"
+test "$(grep -c '^MS_GOTOOLCHAIN_TELEMETRY_ENABLED=' "$go_env")" -eq 1
+
+printf 'GOTOOLCHAIN=local' > "$go_env"
+%{SOURCE1} 1 "$go_env"
+grep -qx 'GOTOOLCHAIN=local' "$go_env"
+grep -qx 'MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1' "$go_env"
+
+%{SOURCE1} 1 "$workdir/not-installed.env"
+test ! -e "$workdir/not-installed.env"
+
+if %{SOURCE1} invalid "$go_env" > "$workdir/invalid.log" 2>&1; then
+    echo "Invalid telemetry values must be rejected" >&2
+    exit 1
+fi
+grep -q '^usage:' "$workdir/invalid.log"
+
+%post
+%{_libexecdir}/set-msft-go-telemetry 1
+
+# Transaction file triggers match RPM directory entries, not individual files.
+%transfiletriggerin -P 2000000 -- /usr/lib/golang/
+%{_libexecdir}/set-msft-go-telemetry 1
+
+%preun
+if [ "$1" -eq 0 ]; then
+    %{_libexecdir}/set-msft-go-telemetry 0
+fi
+
+%files
+%{_libexecdir}/set-msft-go-telemetry
+
+%changelog
+%autochangelog
