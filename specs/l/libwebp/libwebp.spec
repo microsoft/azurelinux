@@ -27,7 +27,7 @@
 
 Name:          libwebp
 Version:       1.6.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL:           http://webmproject.org/
 Summary:       Library and tools for the WebP graphics format
 # Additional IPR is licensed as well. See PATENTS file for details
@@ -52,7 +52,7 @@ BuildRequires: libjpeg-devel
 BuildRequires: libpng-devel
 BuildRequires: libtiff-devel
 %if %{with java}
-BuildRequires: java-devel
+BuildRequires: msopenjdk-25-fedora-compat
 BuildRequires: jpackage-utils
 BuildRequires: swig
 %endif

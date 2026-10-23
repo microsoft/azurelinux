@@ -1,0 +1,2 @@
+[components.xerces-j2]
+overlay-files = ["overlays/*.toml"]

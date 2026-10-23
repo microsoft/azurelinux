@@ -38,7 +38,7 @@
 
 Name:           R
 Version:        %{major_version}.%{minor_version}.%{patch_version}
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        A language for data analysis and graphics
 
 License:        GPL-2.0-or-later
@@ -78,7 +78,7 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  valgrind-devel
 %endif
 %ifarch %{java_arches}
-BuildRequires:  java-devel
+BuildRequires: msopenjdk-25-fedora-compat
 %endif
 BuildRequires:  autoconf
 BuildRequires:  automake

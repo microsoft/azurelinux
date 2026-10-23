@@ -1,0 +1,47 @@
+[component-groups.msopenjdk25-devel-consumers]
+description = "Components that need compatibility-owned JVM paths while building"
+components = [
+    "R",
+    "brltty",
+    "libwebp",
+    "lujavrite",
+    "openmpi",
+    "subversion",
+    "systemtap",
+    "z3",
+]
+
+# java-devel, java-25-devel, and java-25-openjdk-devel can resolve to msopenjdk-25
+# alone, which lacks Fedora-compatible JVM directory aliases. These builds
+# reference those paths directly or rely on JDK/JNI discovery that searches them.
+# Require compat in the build root so the vendor JDK's tools, headers, and
+# libraries are found.
+[[component-groups.msopenjdk25-devel-consumers.default-component-config.overlays]]
+description = "Require Microsoft OpenJDK compatibility paths while building"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+java(?:-25(?:-openjdk)?)?-devel$'
+replacement = 'BuildRequires: msopenjdk-25-fedora-compat'
+
+[component-groups.msopenjdk25-devel-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[component-groups.msopenjdk25-xmvn-toolchain-consumers]
+description = "XMvn toolchain bindings backed by the Microsoft OpenJDK compatibility package"
+components = [
+    "xmvn",
+    "xmvn5",
+]
+
+# The development capability alone can select msopenjdk-25 without compat.
+# Keep compat required for the toolchain's JVM layout and system trust.
+[[component-groups.msopenjdk25-xmvn-toolchain-consumers.default-component-config.overlays]]
+description = "Back the XMvn OpenJDK 25 toolchain with the Microsoft Fedora compatibility package"
+type = "spec-search-replace"
+section = "%install"
+regex = '--requires java-25-openjdk-devel$'
+replacement = '--requires msopenjdk-25-fedora-compat'
+
+[component-groups.msopenjdk25-xmvn-toolchain-consumers.default-component-config.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"

@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Sleuth Kit needs compat's system trust-store integration at runtime. Remove
+# this overlay once its required provider guarantees system trust integration
+# across installs and upgrades without the compatibility package.
+[[overlays]]
+description = "Require Microsoft OpenJDK compatibility and system trust for Sleuth Kit"
+type = "spec-search-replace"
+regex = '^Requires:\s+java\s+>=\s+1:1\.17$'
+replacement = 'Requires: msopenjdk-25-fedora-compat'
