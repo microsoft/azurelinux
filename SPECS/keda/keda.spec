@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.14.1
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,6 +47,7 @@ Patch20:        CVE-2026-78669.patch
 Patch21:        CVE-2026-97032.patch
 Patch22:        CVE-2026-107325.patch
 Patch23:        CVE-2026-53572.patch
+Patch24:        CVE-2026-77524.patch
 
 BuildRequires:  golang >= 1.25
 
@@ -92,6 +93,10 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Wed Oct 21 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.14.1-23
+- Patch CVE-2026-77524 (BREAKING: Vault kubernetes auth requires KEDA_SERVICE_ACCOUNT_TOKEN_AUDIENCES + /var/run/secrets/keda-vault/token,
+  or --service-account-token-mode=legacy)
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14.1-22
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-107324, CVE-2026-107325, CVE-2026-53572
 
