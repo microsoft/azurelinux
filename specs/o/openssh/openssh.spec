@@ -46,7 +46,7 @@
 Summary: An open source implementation of SSH protocol version 2
 Name: openssh
 Version: %{openssh_ver}
-Release: 17%{?dist}
+Release: 18%{?dist}
 URL: http://www.openssh.com/portable.html
 Source0: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
 Source1: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz.asc
@@ -447,9 +447,9 @@ install -d $RPM_BUILD_ROOT%{_libexecdir}/openssh
 install -m644 %{SOURCE2} $RPM_BUILD_ROOT/etc/pam.d/sshd
 install -m644 %{SOURCE6} $RPM_BUILD_ROOT/etc/pam.d/ssh-keycat
 install -m644 %{SOURCE7} $RPM_BUILD_ROOT/etc/sysconfig/sshd
-install -m644 ssh_config_redhat $RPM_BUILD_ROOT%{_sysconfdir}/ssh/ssh_config.d/50-redhat.conf
-install -m644 sshd_config_redhat_cp $RPM_BUILD_ROOT%{_sysconfdir}/ssh/sshd_config.d/40-redhat-crypto-policies.conf
-install -m644 sshd_config_redhat $RPM_BUILD_ROOT%{_sysconfdir}/ssh/sshd_config.d/50-redhat.conf
+install -m644 ssh_config_redhat $RPM_BUILD_ROOT%{_sysconfdir}/ssh/ssh_config.d/50-azurelinux.conf
+install -m644 sshd_config_redhat_cp $RPM_BUILD_ROOT%{_sysconfdir}/ssh/sshd_config.d/40-azurelinux-crypto-policies.conf
+install -m644 sshd_config_redhat $RPM_BUILD_ROOT%{_sysconfdir}/ssh/sshd_config.d/50-azurelinux.conf
 install -d -m755 $RPM_BUILD_ROOT/%{_unitdir}
 install -m644 %{SOURCE9} $RPM_BUILD_ROOT/%{_unitdir}/sshd@.service
 install -m644 %{SOURCE10} $RPM_BUILD_ROOT/%{_unitdir}/sshd.socket
@@ -547,7 +547,7 @@ test -f %{sysconfig_anaconda} && \
 %attr(0644,root,root) %{_mandir}/man1/scp.1*
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/ssh/ssh_config
 %dir %attr(0755,root,root) %{_sysconfdir}/ssh/ssh_config.d/
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/ssh/ssh_config.d/50-redhat.conf
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/ssh/ssh_config.d/50-azurelinux.conf
 %attr(0644,root,root) %{_mandir}/man5/ssh_config.5*
 %attr(0755,root,root) %{_bindir}/ssh-agent
 %attr(0755,root,root) %{_bindir}/ssh-add
@@ -583,8 +583,8 @@ test -f %{sysconfig_anaconda} && \
 %attr(0644,root,root) %{_mandir}/man8/sftp-server.8*
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config
 %dir %attr(0700,root,root) %{_sysconfdir}/ssh/sshd_config.d/
-%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/40-redhat-crypto-policies.conf
-%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/50-redhat.conf
+%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/40-azurelinux-crypto-policies.conf
+%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/50-azurelinux.conf
 %attr(0644,root,root) %config(noreplace) /etc/pam.d/sshd
 %attr(0640,root,root) %config(noreplace) /etc/sysconfig/sshd
 %attr(0644,root,root) %{_unitdir}/sshd.service
