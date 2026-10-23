@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           openvmm
-Version:        0.2.0
-Release:        2%{?dist}
+Version:        0.3.0
+Release:        1%{?dist}
 Summary:        Modular, cross-platform virtual machine monitor
 Group:          Applications/System
 License:        MIT
@@ -76,6 +76,9 @@ cargo test --release --locked --offline --lib --target %{rust_target} %{test_cra
 %{_bindir}/openvmm
 
 %changelog
+* Thu Oct 22 2026 Ben Hillis <benhill@microsoft.com> - 0.3.0-1
+- Update to version 0.3.0
+
 * Sat Oct 10 2026 Roaa Sakr <romoh@microsoft.com> - 0.2.0-2
 - Place PCI ECAM below 4 GiB for confidential guests
 
