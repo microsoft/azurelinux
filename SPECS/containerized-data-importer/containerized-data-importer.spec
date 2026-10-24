@@ -18,30 +18,28 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.62.0
-Release:        7%{?dist}
+Release:        10%{?dist}.nc
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor-v1.tar.gz
 Patch0:         CVE-2022-2879.patch
-Patch1:         CVE-2025-22872.patch
-Patch2:         CVE-2025-58058.patch
-Patch3:         CVE-2025-58183.patch
-Patch4:         CVE-2025-47911.patch
-Patch5:         CVE-2025-58190.patch
-Patch6:         CVE-2026-32288.patch
-Patch7:         CVE-2026-35469.patch
-Patch8:         CVE-2026-39821.patch
-Patch9:         CVE-2026-42506.patch
-Patch10:        CVE-2026-27136.patch
-Patch11:        CVE-2026-25680.patch
-Patch12:        CVE-2026-25681.patch
-Patch13:        CVE-2026-42502.patch
-Patch14:        CVE-2026-33814.patch
-Patch15:        CVE-2026-56852.patch
-BuildRequires:  golang < 1.25
+Patch1:         CVE-2025-58058.patch
+Patch2:         CVE-2025-58183.patch
+Patch3:         CVE-2026-32288.patch
+Patch4:         CVE-2026-35469.patch
+Patch5:         CVE-2026-84445.patch
+Patch6:         CVE-2026-61801.patch
+Patch7:         CVE-2026-78659.patch
+Patch8:         CVE-2026-78660.patch
+Patch9:         CVE-2026-78663.patch
+Patch10:        CVE-2026-78669.patch
+Patch11:        CVE-2026-97032.patch
+# Regenerated vendor tree pulls modules whose go.mod requires go >= 1.25.
+BuildRequires:  golang = 1.27.3
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
 BuildRequires:  pkgconfig
@@ -124,6 +122,8 @@ kubernetes installation with kubectl apply.
 # to be 'physically' placed into the proper location.
 %setup -q -n go/src/kubevirt.io/%{name} -c -T
 tar --strip-components=1 -xf %{SOURCE0}
+rm -rf vendor
+tar -xf %{SOURCE1}
 %autopatch -p1
 
 %build
@@ -148,8 +148,10 @@ GOFLAGS="-buildmode=pie ${GOFLAGS}" ./hack/build/build-go.sh build \
     tools/csv-generator \
     %{nil}
 
-# Disable cgo to build static binaries, so they can run on scratch images
-CGO_ENABLED=0 ./hack/build/build-go.sh build \
+# Disable cgo and systemcrypto to build a static binary, so it can run on scratch images.
+# With Go 1.27+, CGO_ENABLED=0 alone selects the cgo-less OpenSSL backend, which needs
+# the dynamic loader and glibc at runtime.
+CGO_ENABLED=0 MS_GO_NOSYSTEMCRYPTO=1 ./hack/build/build-go.sh build \
     tools/cdi-containerimage-server \
     %{nil}
  
@@ -235,6 +237,23 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Fri Oct 23 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.62.0-10.nc
+- Build with golang 1.27.3
+- Build cdi-containerimage-server with MS_GO_NOSYSTEMCRYPTO=1 so it stays
+  statically linked with Go 1.27 and can run on scratch images
+
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-9
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801
+
+* Wed Sep 16 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.62.0-8
+- Generate new vendor tarball to fix CVE-2026-84445 and CVE-2026-84304
+- Rebase CVE-2026-35469.patch to apply cleanly
+- Remove CVE-2025-22872.patch, CVE-2025-47911.patch, CVE-2025-58190.patch,
+  CVE-2026-25680.patch, CVE-2026-25681.patch, CVE-2026-27136.patch,
+  CVE-2026-33814.patch, CVE-2026-39821.patch, CVE-2026-42502.patch,
+  CVE-2026-42506.patch and CVE-2026-56852.patch - the CVEs are already fixed
+  in the module versions pulled into the regenerated vendor tarball
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-7
 - Patch for CVE-2026-56852
 
