@@ -1,13 +1,14 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/libstorage/libstoragemgmt
 Source0:        https://github.com/libstorage/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch0:         libstoragemgmt-tests-gate-hw-disk-probes.patch
+Patch1:         CVE-2026-93433.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -457,6 +458,9 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Tue Oct 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.8-4
+- Patch for CVE-2026-93433
+
 * Mon Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.9.8-3
 - Make libstoragemgmt-tests-gate-hw-disk-probes.patch unconditional
   so it is included in the SRPM; the patch is test-only and harmless
