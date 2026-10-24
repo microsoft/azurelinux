@@ -1,0 +1,6 @@
+# Pin Fedora rawhide's Pillow 13.0.0 security update until Fedora 43 includes
+# the EPS, JPEG/FPX, TIFF, and other fixes shipped in this upstream release.
+# https://pillow.readthedocs.io/en/stable/releasenotes/13.0.0.html
+# https://src.fedoraproject.org/rpms/python-pillow/c/5cffeafe011c49628ee457a9ddf75bc95da0444b
+[components.python-pillow]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "5cffeafe011c49628ee457a9ddf75bc95da0444b" }
