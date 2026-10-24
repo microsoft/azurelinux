@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.ow2.asm</groupId>
   <artifactId>asm-commons</artifactId>
-  <version>9.6</version>
+  <version>9.11.1</version>
   <name>asm-commons</name>
   <description>Usefull class adapters based on ASM, a very small and fast Java bytecode manipulation framework</description>
   <url>http://asm.ow2.io/</url>
@@ -71,13 +71,13 @@
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
-      <version>9.6</version>
+      <version>9.11.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm-tree</artifactId>
-      <version>9.6</version>
+      <version>9.11.1</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
