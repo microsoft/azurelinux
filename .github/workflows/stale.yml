@@ -1,0 +1,56 @@
+name: "Stale pull requests"
+
+on:
+  schedule:
+    - cron: "30 1 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  stale:
+    name: Mark and close stale pull requests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write # Maintain the stale action's processing-state cache.
+      pull-requests: write # Label, comment on, and close stale pull requests.
+    steps:
+      - name: Sync labels for pull requests targeting 4.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const label = 'targets-4.0';
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              ...context.repo,
+              state: 'open',
+              per_page: 100,
+            });
+            for (const pull of pulls) {
+              const hasLabel = pull.labels.some(item => item.name === label);
+              const params = {...context.repo, issue_number: pull.number};
+              if (pull.base.ref === '4.0' && !hasLabel) {
+                await github.rest.issues.addLabels({...params, labels: [label]});
+              } else if (pull.base.ref !== '4.0' && hasLabel) {
+                await github.rest.issues.removeLabel({...params, name: label});
+              }
+            }
+
+      - name: Mark and close stale pull requests
+        uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11.0.0
+        with:
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+          remove-issue-stale-when-updated: false
+          days-before-pr-stale: 60
+          days-before-pr-close: 7
+          only-pr-labels: targets-4.0
+          stale-pr-label: stale
+          stale-pr-message: >-
+            This pull request has been automatically marked as stale because it
+            has had no activity for 60 days. It will be closed in 7 days if no
+            further activity occurs.
