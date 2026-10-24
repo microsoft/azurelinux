@@ -1,0 +1,25 @@
+--- uu_hostname-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_hostname-0.7.0/Cargo.toml	2026-03-19T09:19:27.039981+00:00
+@@ -83,17 +83,6 @@
+ features = ["benchmark"]
+ package = "uucore"
+ 
+-[target.'cfg(any(target_os = "freebsd", target_os = "openbsd"))'.dependencies.dns-lookup]
+-version = "3.0.0"
+-
+-[target.'cfg(target_os = "windows")'.dependencies.windows-sys]
+-version = "0.61.0"
+-features = [
+-    "Win32_Networking_WinSock",
+-    "Win32_Foundation",
+-]
+-default-features = false
+-
+ [lints.clippy]
+ cargo_common_metadata = "allow"
+ cast_lossless = "allow"
+@@ -157,3 +146,4 @@
+     "cfg(fuzzing)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++

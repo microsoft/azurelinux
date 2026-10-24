@@ -1,0 +1,23 @@
+--- uu_sync-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_sync-0.7.0/Cargo.toml	2026-03-19T18:41:46.367898+00:00
+@@ -61,15 +61,6 @@
+ version = "0.7.0"
+ features = ["wide"]
+ package = "uucore"
+-
+-[target.'cfg(target_os = "windows")'.dependencies.windows-sys]
+-version = "0.61.0"
+-features = [
+-    "Win32_Storage_FileSystem",
+-    "Win32_System_WindowsProgramming",
+-    "Win32_Foundation",
+-]
+-default-features = false
+ 
+ [target."cfg(unix)".dependencies.nix]
+ version = "0.30"
+@@ -138,3 +129,4 @@
+     "cfg(fuzzing)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++

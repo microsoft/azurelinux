@@ -1,0 +1,16 @@
+--- uu_uptime-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_uptime-0.7.0/Cargo.toml	2026-03-19T17:54:17.240063+00:00
+@@ -72,8 +72,6 @@
+ ]
+ package = "uucore"
+ 
+-[target.'cfg(target_os = "openbsd")'.dependencies]
+-
+ [lints.clippy]
+ cargo_common_metadata = "allow"
+ cast_lossless = "allow"
+@@ -137,3 +135,4 @@
+     "cfg(fuzzing)",
+     'cfg(target_os, values("cygwin"))',
+ ]
++
