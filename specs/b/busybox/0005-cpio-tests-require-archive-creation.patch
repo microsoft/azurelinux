@@ -1,0 +1,23 @@
+From 4f11a4b25d5a1093695653d1826ba69eecc9d304 Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Thu, 30 Apr 2026 06:46:44 +0200
+Subject: [PATCH] cpio.tests: fix false positive when -o support is not enabled
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ testsuite/cpio.tests | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testsuite/cpio.tests b/testsuite/cpio.tests
+index 88a778b90..a60eaec72 100755
+--- a/testsuite/cpio.tests
++++ b/testsuite/cpio.tests
+@@ -157,7 +157,7 @@ SKIP=
+ # Create an archive containing a file with "../dont_write" filename.
+ # See that it will not be allowed to unpack.
+ # NB: GNU cpio 2.15 DOES NOT do such checks.
+-optional FEATURE_PATH_TRAVERSAL_PROTECTION
++optional FEATURE_PATH_TRAVERSAL_PROTECTION FEATURE_CPIO_O
+ rm -rf cpio.testdir
+ mkdir -p cpio.testdir/prepare/inner
+ echo "file outside of destination was written" > cpio.testdir/prepare/dont_write
