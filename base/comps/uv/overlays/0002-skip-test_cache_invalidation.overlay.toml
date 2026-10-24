@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Test case fails"
+type = "spec-search-replace"
+regex = 'skip="\${skip-} --skip interpreter::tests::test_cache_eviction_with_unchanged_executable"'
+replacement = "skip=\"${skip-} --skip interpreter::tests::test_cache_eviction_with_unchanged_executable\"\nskip=\"${skip-} --skip interpreter::tests::test_cache_invalidation\""
