@@ -169,7 +169,11 @@
 %global platform_modules " appendedsig tpm ofnet "
 %endif
 
-%ifarch aarch64 %{arm} riscv64
+%ifarch aarch64
+%global platform_modules " chain tpm "
+%endif
+
+%ifarch %{arm} riscv64
 %global platform_modules " "
 %endif
 
