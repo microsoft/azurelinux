@@ -1,5 +1,9 @@
-# Pin to a specific Fedora dist-git commit for stage1 prod bring-up and for
-# compatibility with upstream Fedora 43. Brings expat to version 2.8.1.
-# https://src.fedoraproject.org/rpms/expat/c/e7c4e277fa46ee92ce5bdb1e8c78a573f7304176
+# Pin to Fedora f43 expat-2.9.0 (upstream R_2_9_0) to pick up CVE fixes from
+# expat 2.8.2 through 2.9.0, including CVE-2026-102633, CVE-2026-77214,
+# CVE-2026-93990, CVE-2026-66046, CVE-2026-76641, CVE-2026-76957 and
+# CVE-2026-72522. See https://github.com/libexpat/libexpat/blob/R_2_9_0/expat/Changes
+# https://src.fedoraproject.org/rpms/expat/c/937abbe186778036c4516dc4090f336059105858
+# NOTE: CVE-2026-113351 still affects 2.9.0; the fix is pending upstream in
+# https://github.com/libexpat/libexpat/pull/1431
 [components.expat]
-spec = { type = "upstream", upstream-commit = "e7c4e277fa46ee92ce5bdb1e8c78a573f7304176" }
+spec = { type = "upstream", upstream-commit = "937abbe186778036c4516dc4090f336059105858" }
