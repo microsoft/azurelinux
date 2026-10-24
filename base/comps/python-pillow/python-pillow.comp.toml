@@ -1,0 +1,9 @@
+[components.python-pillow]
+
+# azldev fetches the upstream source manifest before applying the version overlay.
+# Fetch the new archive explicitly, using Fedora's 13.0.0 SHA512 digest.
+[[components.python-pillow.source-files]]
+filename = "Pillow-13.0.0.tar.gz"
+hash-type = "SHA512"
+hash = "eb031278da12ae0a19a974d6efbf3b87b2104585bee2fcfef5e94b434be2782253d03711317a816e66936a3fe22773d92a624d1b7274460ec11002f3a2941ab5"
+origin = { type = "download", uri = "https://github.com/python-pillow/Pillow/archive/13.0.0/Pillow-13.0.0.tar.gz" }
