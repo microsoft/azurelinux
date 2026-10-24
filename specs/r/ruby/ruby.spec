@@ -3,7 +3,7 @@
 
 %global major_version 3
 %global minor_version 4
-%global teeny_version 10
+%global teeny_version 12
 %global major_minor_version %{major_version}.%{minor_version}
 
 %global ruby_version %{major_minor_version}.%{teeny_version}
@@ -180,7 +180,7 @@
 Summary: An interpreter of object-oriented scripting language
 Name: ruby
 Version: %{ruby_version}%{?development_release}
-Release: 36%{?dist}
+Release: 38%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -286,7 +286,8 @@ Patch9: ruby-3.3.0-Disable-syntax-suggest-test-case.patch
 Patch10: ruby-3.4.2-openssl-Fix-SHA-1-PSS-tests.patch
 # Backport from ruby_3_4 branch to update resolv to 0.7.2 (fixes CVE-2026-80212 CVE-2026-80213)
 # https://github.com/ruby/ruby/pull/18529
-# Also copied the patch to apply the fix also for vendored resolv
+# (the above PR itself is applied in 3.4.11
+# Copied the patch to apply the fix also for vendored resolv
 Patch11: ruby-3_4-pr18529-update-resolv-0_7_2.patch
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
@@ -1890,6 +1891,14 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 
 %changelog
+* Fri Oct 23 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.12-33
+- Update to Ruby 3.4.12
+- Fixes the following bugs in Omigumo regexp compilation
+- Resolves: CVE-2026-89078
+- Resolves: CVE-2026-93577
+- Resolves: CVE-2026-97229
+- Resolves: CVE-2026-110264
+
 * Fri Sep 04 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.10-32
 - Backport upstream patch to update resolv to 0.7.2
 - Resolves: CVE-2026-80212 (rhbz#2527308)
