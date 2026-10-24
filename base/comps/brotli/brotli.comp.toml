@@ -1,0 +1,5 @@
+# Pin Fedora's Brotli 1.2.1 security update for CVE-2026-111497 until
+# the default Fedora snapshot includes the fix. Node.js uses system Brotli.
+# https://src.fedoraproject.org/rpms/brotli/c/d6c0b41acf0d83dab2faf2da25e6eda34054045f
+[components.brotli]
+spec = { type = "upstream", upstream-commit = "d6c0b41acf0d83dab2faf2da25e6eda34054045f" }
