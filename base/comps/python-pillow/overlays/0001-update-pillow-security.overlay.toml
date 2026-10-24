@@ -1,0 +1,74 @@
+# Keep the Fedora 43 spec lineage: azldev cannot replay its import history
+# against the divergent rawhide branch containing Fedora's 13.0.0 update.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/python-pillow/c/5cffeafe011c49628ee457a9ddf75bc95da0444b" }]
+bugs = [
+    { url = "https://github.com/python-pillow/Pillow/security/advisories/GHSA-w889-685w-c8fh" },
+    { url = "https://github.com/python-pillow/Pillow/security/advisories/GHSA-5x8w-8jj5-q52h" },
+    { url = "https://github.com/python-pillow/Pillow/security/advisories/GHSA-8g5g-8vmr-9782" },
+    { url = "https://github.com/python-pillow/Pillow/security/advisories/GHSA-332p-7hrc-92wf" },
+]
+
+[[overlays]]
+description = "Update to Pillow 13.0.0 to fix the EPS, JPEG/FPX, TIFF, and other upstream security vulnerabilities"
+type = "spec-update-tag"
+tag = "Version"
+value = "13.0.0"
+
+[[overlays]]
+description = "Drop the obsolete 11.3.0 manifest; source-files regenerates it with the verified 13.0.0 archive"
+type = "file-remove"
+file = "sources"
+
+[[overlays]]
+description = "Pillow 13.0.0 requires pybind11 for its parallel extension build helper"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "python3-pybind11"
+
+[[overlays]]
+description = "Remove the obsolete MinGW patch for Pillow 11; Azure Linux disables MinGW builds"
+type = "patch-remove"
+file = "pillow_mingw.patch"
+
+[[overlays]]
+description = "Remove CVE-2026-25990 backport included in Pillow 13.0.0"
+type = "spec-remove-tag"
+tag = "Patch1"
+
+[[overlays]]
+description = "Remove CVE-2026-40192 backport included in Pillow 13.0.0"
+type = "spec-remove-tag"
+tag = "Patch2"
+
+[[overlays]]
+description = "Remove CVE-2026-55380 backport included in Pillow 13.0.0"
+type = "spec-remove-tag"
+tag = "Patch3"
+
+[[overlays]]
+description = "Remove CVE-2026-54060, CVE-2026-54059, and CVE-2026-55379 backport included in Pillow 13.0.0"
+type = "spec-remove-tag"
+tag = "Patch4"
+
+[[overlays]]
+description = "Remove CVE-2026-55798 backport included in Pillow 13.0.0"
+type = "spec-remove-tag"
+tag = "Patch5"
+
+[[overlays]]
+description = "Remove the CVE-2026-59197 prerequisite backport included in Pillow 13.0.0"
+type = "spec-remove-tag"
+tag = "Patch6"
+
+[[overlays]]
+description = "Remove CVE-2026-59197 backport included in Pillow 13.0.0"
+type = "spec-remove-tag"
+tag = "Patch7"
+
+[[overlays]]
+description = "Remove CVE-2026-54058 backport included in Pillow 13.0.0"
+type = "spec-remove-tag"
+tag = "Patch8"
