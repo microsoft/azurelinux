@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,6 +53,10 @@ Patch415:       CVE-2026-60002.patch
 Patch416:       CVE-2026-73281.patch
 Patch417:       CVE-2026-73282.patch
 Patch418:       CVE-2026-73283.patch
+Patch419:       CVE-2026-106552.patch
+Patch420:       CVE-2026-106553.patch
+Patch421:       CVE-2026-106582.patch
+Patch422:       CVE-2026-106585.patch
 
 # sk-dummy.so built with -fvisibility=hidden does not work
 # The tests fail with the following error:
@@ -152,6 +156,10 @@ popd
 %patch -P 416 -p1 -b .CVE-2026-73281.patch
 %patch -P 417 -p1 -b .CVE-2026-73282.patch
 %patch -P 418 -p1 -b .CVE-2026-73283.patch
+%patch -P 419 -p1 -b .CVE-2026-106552.patch
+%patch -P 420 -p1 -b .CVE-2026-106553.patch
+%patch -P 421 -p1 -b .CVE-2026-106582.patch
+%patch -P 422 -p1 -b .CVE-2026-106585.patch
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
@@ -310,6 +318,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Fri Oct 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-11
+- Patch openssh for CVE-2026-106585, CVE-2026-106582, CVE-2026-106553, CVE-2026-106552
+
 * Mon Aug 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-10
 - Patch CVE-2026-73283, CVE-2026-73282, CVE-2026-73281
 
