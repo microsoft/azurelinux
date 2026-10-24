@@ -1,0 +1,138 @@
+From: Alex Cortelyou <alcortel@microsoft.com>
+Date: Sat, 24 Oct 2026 08:58:15 -0700
+Subject: [PATCH] test: cover failed-link recovery and stopped DHCP clients
+
+Azure Linux regression coverage for the automatic reconfiguration,
+failed-state transition, duplicate STOP notification, and graceful DHCP
+send fixes. Keep downstream coverage separate from the upstream commits.
+
+Verify that failed-link recovery is rate limited, repeated stops notify
+only once, and renew/release/decline are harmless for absent or stopped
+clients and for a running client that has not acquired a lease.
+---
+diff --git a/src/network/test-network.c b/src/network/test-network.c
+--- a/src/network/test-network.c
++++ b/src/network/test-network.c
+@@ -11,6 +11,7 @@
+ #include "hostname-setup.h"
+ #include "network-internal.h"
+ #include "networkd-address.h"
++#include "networkd-link.h"
+ #include "networkd-manager.h"
+ #include "networkd-route-util.h"
+ #include "string-util.h"
+@@ -225,6 +226,34 @@
+ 
+ }
+ 
++static void test_failed_link_reconfiguration(Manager *manager) {
++        Link *link;
++
++        assert_se(link_get_by_name(manager, "lo", &link) >= 0);
++
++        link_set_state(link, LINK_STATE_CONFIGURED);
++        for (unsigned i = 0; i < 5; i++) {
++                link_enter_failed(link);
++                assert_se(link->state == LINK_STATE_INITIALIZED);
++                link_set_state(link, LINK_STATE_CONFIGURED);
++        }
++
++        link_enter_failed(link);
++        assert_se(link->state == LINK_STATE_FAILED);
++        assert_se(link->automatic_reconfigure_ratelimit.num == 6);
++
++        link_enter_failed(link);
++        assert_se(link->automatic_reconfigure_ratelimit.num == 6);
++
++        assert_se(link_reconfigure(link, /* force = */ false) > 0);
++        assert_se(link->state == LINK_STATE_INITIALIZED);
++
++        link_set_state(link, LINK_STATE_LINGER);
++        link_enter_failed(link);
++        assert_se(link->state == LINK_STATE_LINGER);
++        assert_se(link_reconfigure(link, /* force = */ true) == 0);
++}
++
+ int main(void) {
+         _cleanup_(manager_freep) Manager *manager = NULL;
+         int r;
+@@ -247,5 +276,6 @@
+                 assert_se(r == 0);
+ 
+         assert_se(manager_enumerate(manager) >= 0);
++        test_failed_link_reconfiguration(manager);
+         return 0;
+ }
+diff --git a/src/libsystemd-network/test-dhcp-client.c b/src/libsystemd-network/test-dhcp-client.c
+--- a/src/libsystemd-network/test-dhcp-client.c
++++ b/src/libsystemd-network/test-dhcp-client.c
+@@ -276,8 +276,33 @@
+         return 0;
+ }
+ 
++static void test_stopped_client_sends(void) {
++        sd_dhcp_client *client;
++
++        assert_se(sd_dhcp_client_send_renew(NULL) == 0);
++        assert_se(sd_dhcp_client_send_release(NULL) == 0);
++        assert_se(sd_dhcp_client_send_decline(NULL) == 0);
++
++        assert_se(sd_dhcp_client_new(&client, false) >= 0);
++        assert_se(!sd_dhcp_client_is_running(client));
++        assert_se(sd_dhcp_client_send_renew(client) == 0);
++        assert_se(sd_dhcp_client_send_release(client) == 0);
++        assert_se(sd_dhcp_client_send_decline(client) == 0);
++        sd_dhcp_client_unref(client);
++}
++
++static int count_stop_events(sd_dhcp_client *client, int event, void *userdata) {
++        unsigned *stop_events = userdata;
++
++        if (event == SD_DHCP_CLIENT_EVENT_STOP)
++                (*stop_events)++;
++
++        return 0;
++}
++
+ static void test_discover_message(sd_event *e) {
+         sd_dhcp_client *client;
++        unsigned stop_events = 0;
+         int res, r;
+ 
+         if (verbose)
+@@ -294,16 +319,26 @@
+         assert_se(sd_dhcp_client_set_mac(client, hw_addr.bytes, bcast_addr.bytes, hw_addr.length, ARPHRD_ETHER) >= 0);
+ 
+         assert_se(sd_dhcp_client_set_request_option(client, 248) >= 0);
++        assert_se(sd_dhcp_client_set_callback(client, count_stop_events, &stop_events) >= 0);
+ 
+         callback_recv = test_discover_message_verify;
+ 
+         res = sd_dhcp_client_start(client);
+ 
+         assert_se(IN_SET(res, 0, -EINPROGRESS));
++        assert_se(sd_dhcp_client_is_running(client));
++        assert_se(sd_dhcp_client_send_renew(client) == 0);
++        assert_se(sd_dhcp_client_send_release(client) == 0);
++        assert_se(sd_dhcp_client_send_decline(client) == 0);
++        assert_se(sd_dhcp_client_is_running(client));
++        assert_se(stop_events == 0);
+ 
+         sd_event_run(e, UINT64_MAX);
+ 
+-        sd_dhcp_client_stop(client);
++        assert_se(sd_dhcp_client_stop(client) >= 0);
++        assert_se(stop_events == 1);
++        assert_se(sd_dhcp_client_stop(client) >= 0);
++        assert_se(stop_events == 1);
+         sd_dhcp_client_unref(client);
+ 
+         test_fd[1] = safe_close(test_fd[1]);
+@@ -546,6 +581,7 @@
+         test_request_anonymize(e);
+         test_checksum();
+         test_dhcp_identifier_set_iaid();
++        test_stopped_client_sends();
+ 
+         test_discover_message(e);
+         test_addr_acq(e);

@@ -1,0 +1,76 @@
+From c2eb7753dd47ec04ae0d66400e70bc87fbf1adcc Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Mon, 15 Jan 2024 15:40:54 +0900
+Subject: [PATCH] network/link: automatically reconfigure interface on failure
+
+Closes #29246.
+---
+ src/network/networkd-link.c | 20 +++++++++++++++++++-
+ src/network/networkd-link.h |  2 ++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
+index 4e5ad3c035e2..9e69624fd2b5 100644
+--- a/src/network/networkd-link.c
++++ b/src/network/networkd-link.c
+@@ -381,6 +381,8 @@ int link_stop_engines(Link *link, bool may_keep_dhcp) {
+ }
+ 
+ void link_enter_failed(Link *link) {
++        int r;
++
+         assert(link);
+ 
+         if (IN_SET(link->state, LINK_STATE_FAILED, LINK_STATE_LINGER))
+@@ -390,7 +392,22 @@ void link_enter_failed(Link *link) {
+ 
+         link_set_state(link, LINK_STATE_FAILED);
+ 
+-        (void) link_stop_engines(link, false);
++        if (!ratelimit_below(&link->automatic_reconfigure_ratelimit)) {
++                log_link_warning(link, "The interface entered the failed state frequently, refusing to reconfigure it automatically.");
++                goto stop;
++        }
++
++        log_link_info(link, "Trying to reconfigure the interface.");
++        r = link_reconfigure(link, /* force = */ true);
++        if (r < 0) {
++                log_link_warning_errno(link, r, "Failed to reconfigure interface: %m");
++                goto stop;
++        }
++
++        return;
++
++stop:
++        (void) link_stop_engines(link, /* may_keep_dhcp = */ false);
+ }
+ 
+ void link_check_ready(Link *link) {
+@@ -2552,6 +2569,7 @@ static int link_new(Manager *manager, sd_netlink_message *message, Link **ret) {
+                 .n_ref = 1,
+                 .state = LINK_STATE_PENDING,
+                 .online_state = _LINK_ONLINE_STATE_INVALID,
++                .automatic_reconfigure_ratelimit = (const RateLimit) { .interval = 10 * USEC_PER_SEC, .burst = 5 },
+                 .ifindex = ifindex,
+                 .iftype = iftype,
+                 .ifname = TAKE_PTR(ifname),
+diff --git a/src/network/networkd-link.h b/src/network/networkd-link.h
+index cad9fa841068..05b028dff31d 100644
+--- a/src/network/networkd-link.h
++++ b/src/network/networkd-link.h
+@@ -25,6 +25,7 @@
+ #include "networkd-ipv6ll.h"
+ #include "networkd-util.h"
+ #include "ordered-set.h"
++#include "ratelimit.h"
+ #include "resolve-util.h"
+ #include "set.h"
+ 
+@@ -106,6 +107,7 @@ typedef struct Link {
+         LinkAddressState ipv4_address_state;
+         LinkAddressState ipv6_address_state;
+         LinkOnlineState online_state;
++        RateLimit automatic_reconfigure_ratelimit;
+ 
+         unsigned static_address_messages;
+         unsigned static_address_label_messages;
