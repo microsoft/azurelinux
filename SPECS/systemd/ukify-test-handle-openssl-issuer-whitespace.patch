@@ -1,0 +1,38 @@
+From 338ed5bea4fcd0b5b1cdcfb96a789edf6251bbdd Mon Sep 17 00:00:00 2001
+From: Frantisek Sumsal <frantisek@sumsal.cz>
+Date: Sat, 23 Dec 2023 12:20:03 +0100
+Subject: [PATCH] ukify: make the test happy with the latest OpenSSL
+
+Which dropped some whitespaces in the output:
+
+$ openssl version
+OpenSSL 3.2.0 23 Nov 2023 (Library: OpenSSL 3.2.0 23 Nov 2023)
+$ openssl x509 -in cert.pem -text -noout | grep Issuer
+        Issuer: C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+
+$ openssl version
+OpenSSL 3.0.9 30 May 2023 (Library: OpenSSL 3.0.9 30 May 2023)
+$ openssl x509 -in cert.pem -text -noout | grep Issuer
+        Issuer: C = XX, L = Default City, O = Default Company Ltd
+
+Making test-ukify unhappy:
+
+>       assert 'Issuer: CN = SecureBoot signing key on host' in out
+E       AssertionError: assert 'Issuer: CN = SecureBoot signing key on host' in '<...snip...>Issuer: CN=SecureBoot signing key on host archlinux2\n...'
+---
+ src/ukify/test/test_ukify.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ukify/test/test_ukify.py b/src/ukify/test/test_ukify.py
+index 7db7c6ba61a0..0a0a9024e96e 100755
+--- a/src/ukify/test/test_ukify.py
++++ b/src/ukify/test/test_ukify.py
+@@ -859,7 +859,7 @@ def test_key_cert_generation(tmp_path):
+         '-noout',
+     ], text = True)
+     assert 'Certificate' in out
+-    assert 'Issuer: CN = SecureBoot signing key on host' in out
++    assert re.search('Issuer: CN\s?=\s?SecureBoot signing key on host', out)
+ 
+ if __name__ == '__main__':
+     sys.exit(pytest.main(sys.argv))
