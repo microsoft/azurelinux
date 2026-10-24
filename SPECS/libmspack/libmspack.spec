@@ -1,13 +1,14 @@
 Summary:        A library that provides compression and decompression of file formats used by Microsoft
 Name:           libmspack
 Version:        0.11alpha
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.cabextract.org.uk/libmspack/
 Source0:        http://www.cabextract.org.uk/libmspack/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-110602.patch
 
 %description
 A library that provides compression and decompression of file formats used by Microsoft
@@ -21,6 +22,7 @@ It contains the libraries and header files to create applications.
 
 %prep
 %setup -q
+%patch 0 -p1
 
 %build
 %configure
@@ -50,6 +52,9 @@ make -k check
 %{_libdir}/*.so
 
 %changelog
+* Wed Oct 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.11alpha-2
+- Patch for CVE-2026-110602
+
 * Wed Feb 28 2024 Himaja Kesari <himajakesari@microsoft.com> - 0.11alpha-1
 - Upgrade to version 0.11alpha
 
