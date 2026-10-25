@@ -3,7 +3,7 @@
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
 Version:        4.28.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ URL:            https://github.com/Mellanox/%{name}
 Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz
 Patch0:         0001-update-tool-name-in-error-message.patch
 Patch1:         remove-compromised-ca-roots.patch
+Patch2:         add-sslcom-tls-ecc-root-2022.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  boost-devel
@@ -60,6 +61,9 @@ find %{buildroot} -type f -name '*.a' -delete
 %{_mandir}/man1/*
 
 %changelog
+* Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 4.28.0-3
+- Add the trusted SSL.com TLS ECC Root CA 2022 to retain unaffected TLS paths.
+
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 4.28.0-2
 - Remove affected eMudhra and AAA roots from the firmware updater trust store.
 
