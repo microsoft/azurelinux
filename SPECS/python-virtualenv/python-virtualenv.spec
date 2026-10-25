@@ -220,7 +220,8 @@ export PYTHONWARNDEFAULTENCODING=1
 * Sun Oct 25 2026 Sean Dougherty <sdougherty@microsoft.com> - 20.36.1-9
 - Include wheel content hashes in seed-image cache keys.
 - Test successive same-version wheel replacements and unchanged-image reuse.
-- Preserve existing environments and legacy seed images.
+- Bypass legacy seed images for new environments without deleting files referenced by existing environments.
+- Existing environments with affected pip CA bundles require a pip update or recreation.
 
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-8
 - Remove affected eMudhra and AAA roots from both embedded pip wheels.
