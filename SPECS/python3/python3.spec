@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.15
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
 Patch1:         remove-compromised-wheel-ca-roots.patch
+Patch2:         CVE-2026-115557.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -246,6 +247,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.12.15-3
+- Backport upstream SSL rejection of compromised eMudhra intermediate keys.
+
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.12.15-2
 - Remove affected eMudhra and AAA roots from the ensurepip wheel shipped in python3-libs.
 - Regenerate the bundled wheel's RECORD without changing other payload files.
