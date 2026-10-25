@@ -8,7 +8,6 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/aa/a3/4d310fa5f00863544e1d0f4de93bddec248499ccf97d4791bc3122c9d4f3/virtualenv-20.36.1.tar.gz
-Source1:        test-constraints.txt
 Patch0:         0001-replace-to-flit.patch
 Patch1000:      CVE-2025-50181.patch
 Patch1001:      CVE-2026-1703v0.patch
@@ -176,10 +175,33 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 # Keep the test environment outside zipapp's source copy.
 check_env=$(mktemp -d "$PWD/../virtualenv-check.XXXXXX")
 python3 -m venv "$check_env"
+cat > "$check_env/constraints.txt" <<'EOF'
+covdefaults==2.3.0
+coverage==7.10.6
+coverage-enable-subprocess==1.0
+distlib==0.3.8
+filelock==3.20.3
+flaky==3.8.1
+iniconfig==2.1.0
+packaging==25.0
+platformdirs==4.3.8
+pluggy==1.6.0
+pygments==2.19.2
+pytest==8.4.2
+pytest-env==1.1.5
+pytest-mock==3.15.1
+pytest-randomly==3.16.0
+pytest-timeout==2.4.0
+python-dateutil==2.9.0.post0
+setuptools==80.9.0
+six==1.17.0
+time-machine==2.19.0
+typing-extensions==4.13.2
+EOF
 set -- %{_pyproject_wheeldir}/*.whl
 test "$#" -eq 1
 "$check_env/bin/python" -m pip install --disable-pip-version-check \
-    --constraint %{SOURCE1} "$1[test]"
+    --constraint "$check_env/constraints.txt" "$1[test]"
 export PATH="$check_env/bin:$PATH"
 unset COVERAGE_PROCESS_START
 export PYTHONWARNDEFAULTENCODING=1
