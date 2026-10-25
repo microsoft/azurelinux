@@ -1,0 +1,17 @@
+From: Azure Linux package maintainers
+Subject: [PATCH] Propagate the configured coverage plugin to child interpreters
+
+Subprocess coverage uses the same configuration as the parent. Supply
+its covdefaults plugin alongside the copied coverage package.
+
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -252,7 +252,7 @@
+     class EnableCoverage:
+         _COV_FILE: ClassVar[Path] = Path(coverage.__file__)
+         _ROOT_COV_FILES_AND_FOLDERS: ClassVar[list[Path]] = [
+-            i for i in _COV_FILE.parents[1].iterdir() if i.name.startswith("coverage")
++            i for i in _COV_FILE.parents[1].iterdir() if i.name.startswith(("coverage", "covdefaults"))
+         ]
+ 
+         def __init__(self, link) -> None:

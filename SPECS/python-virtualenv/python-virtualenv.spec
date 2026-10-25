@@ -8,6 +8,7 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/aa/a3/4d310fa5f00863544e1d0f4de93bddec248499ccf97d4791bc3122c9d4f3/virtualenv-20.36.1.tar.gz
+Source1:        test-constraints.txt
 Patch0:         0001-replace-to-flit.patch
 Patch1000:      CVE-2025-50181.patch
 Patch1001:      CVE-2026-1703v0.patch
@@ -25,6 +26,7 @@ Patch1012:      CVE-2026-13346v1.patch
 Patch1013:      CVE-2026-102925.patch
 Patch1014:      CVE-2026-102930.patch
 Patch1015:      remove-compromised-wheel-ca-roots.patch
+Patch1016:      coverage-subprocess-plugin.patch
 BuildArch:      noarch
 
 %description
@@ -60,6 +62,7 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 1013 -p1
 %patch -P 1014 -p1
 %patch -P 1015 -p1
+%patch -P 1016 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -172,10 +175,18 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 %pyproject_install
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0'
-# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
-sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
-tox -e py
+# Keep pip installs private, and keep the bootstrap outside zipapp's source copy.
+check_env=$(mktemp -d "$PWD/../virtualenv-check.XXXXXX")
+python3 -m venv "$check_env"
+"$check_env/bin/python" -m pip install --disable-pip-version-check \
+    --constraint %{SOURCE1} 'tox==4.28.0'
+# tox 4.28 only applies overrides to sections that already exist.
+printf '\n[testenv:.pkg]\npass_env = PIP_*\nconstraints = %{SOURCE1}\n' >> tox.ini
+"$check_env/bin/python" -m tox \
+    -x 'testenv.pass_env+=PIP_*' \
+    -x 'testenv.constraints=%{SOURCE1}' \
+    -e py -- --junitxml "$PWD/.tox/junit.py.xml" \
+    tests -k 'not test_can_build_c_extensions' --int
 
 %files -n python3-virtualenv
 %defattr(-,root,root,-)
@@ -187,6 +198,7 @@ tox -e py
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-8
 - Remove affected eMudhra and AAA roots from both embedded pip wheels.
 - Regenerate wheel RECORD entries after the existing security backports.
+- Run pinned tox 4 and test dependencies in private environments using configured pip sources.
 
 * Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
 - Patch for CVE-2026-102925 and CVE-2026-102930
