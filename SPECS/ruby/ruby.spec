@@ -408,7 +408,7 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-* Sat Oct 24 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.13-1
+* Sat Oct 24 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.13-11
 - Upgrade to 3.3.13 to fix CVE-2026-89078, CVE-2026-93577, CVE-2026-97229, CVE-2026-110264
 - Remove patches for CVEs already fixed upstream
 
