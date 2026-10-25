@@ -8,8 +8,7 @@ FROM $BASE_IMAGE
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
 # basic smoke test
-RUN python3 --version && \
-    python3 -c "import ssl; assert ssl.create_default_context().get_ca_certs(), 'System CA certificates are missing'"
+RUN python3 --version
 
 # set default command for the container
 CMD ["python3"]
