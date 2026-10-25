@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -172,10 +172,49 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 %pyproject_install
 
 %check
-<<<<<<< HEAD
-# Pin packaging to the RPM-installed version so pip does not try to
+# Pin packaging to the RPM-installed version so pip does not
 # upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
 # rpm-installed copy has no RECORD file, so pip aborts with
+
+# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
+sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
+tox -e py
+
+# Keep the test environment outside zipapp's source copy.
+check_env=$(mktemp -d "$PWD/../virtualenv-check.XXXXXX")
+python3 -m venv "$check_env"
+cat > "$check_env/constraints.txt" <<'EOF'
+covdefaults==2.3.0
+coverage==7.10.6
+coverage-enable-subprocess==1.0
+distlib==0.3.8
+filelock==3.20.3
+flaky==3.8.1
+iniconfig==2.1.0
+packaging==25.0
+platformdirs==4.3.8
+pluggy==1.6.0
+pygments==2.19.2
+pytest==8.4.2
+pytest-env==1.1.5
+pytest-mock==3.15.1
+pytest-randomly==3.16.0
+pytest-timeout==2.4.0
+python-dateutil==2.9.0.post0
+setuptools==80.9.0
+six==1.17.0
+time-machine==2.19.0
+typing-extensions==4.13.2
+EOF
+set -- %{_pyproject_wheeldir}/*.whl
+test "$#" -eq 1
+"$check_env/bin/python" -m pip install --disable-pip-version-check \
+    --constraint "$check_env/constraints.txt" "$1[test]"
+export PATH="$check_env/bin:$PATH"
+unset COVERAGE_PROCESS_START
+export PYTHONWARNDEFAULTENCODING=1
+"$check_env/bin/python" -m pytest --junitxml junit.py.xml \
+    tests -k 'not test_can_build_c_extensions' --int
 # uninstall-no-record-file and the test tooling is never installed.
 pip3 install packaging==23.2 'tox>=3.27.1,<4.0.0'
 # skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
@@ -226,19 +265,20 @@ export PYTHONWARNDEFAULTENCODING=1
 %{_bindir}/virtualenv
 
 %changelog
-<<<<<<< HEAD
-* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-8
-- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
+* Sun Oct 25 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-9
+- Pin packaging==23.2 when pip-installing test tooling in %check to fix
   ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
-=======
+
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-8
 - Remove affected eMudhra and AAA roots from both embedded pip wheels.
 - Regenerate wheel RECORD entries after the existing security backports.
 - Run pytest directly with pinned test dependencies in a private environment.
->>>>>>> 78a1a1873c (python-virtualenv: remove affected roots from embedded pip wheels (#19710))
 
 * Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
 - Patch for CVE-2026-102925 and CVE-2026-102930
+
+* Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
+- Patch for CVE-2026-13346
 
 * Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
 - Patch for CVE-2026-13346
