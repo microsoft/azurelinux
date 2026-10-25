@@ -4,7 +4,7 @@
 %global gem_dir %{_datadir}/ruby/gems
 
 # Default package version defined separately, because the %%version macro gets overwritten by 'Version' tags of the subpackages.
-%global ruby_version            3.3.5
+%global ruby_version            3.3.13
 %define ruby_version_majmin     %(echo %{ruby_version} | cut -d. -f1-2)
 
 %global rubygems_version        3.5.22
@@ -15,7 +15,7 @@
 %global benchmark_version       0.3.0
 %global bigdecimal_version      3.1.5
 %global bundler_version         2.5.22
-%global cgi_version             0.4.1
+%global cgi_version             0.4.2
 %global csv_version             3.2.8
 %global date_version            3.3.4
 %global delegate_version        0.3.1
@@ -23,7 +23,7 @@
 %global digest_version          3.1.1
 %global drb_version             2.2.0
 %global english_version         0.8.0
-%global erb_version             4.0.3
+%global erb_version             4.0.3.1
 %global error_highlight_version 0.6.0
 %global etc_version             1.4.3
 %global fcntl_version           1.1.0
@@ -32,11 +32,12 @@
 %global find_version            0.2.0
 %global forwardable_version     1.3.3
 %global getoptlong_version      0.2.1
-%global io_console_version      0.7.2
+%global io_console_version      0.7.1
 %global io_nonblock_version     0.3.0
 %global io_wait_version         0.3.1
 %global ipaddr_version          1.2.6
 %global irb_version             1.13.1
+%global json_version            2.7.2
 %global logger_version          1.6.0
 %global mutex_m_version         0.2.0
 %global net_http_version        0.4.1
@@ -44,7 +45,7 @@
 %global nkf_version             0.1.3
 %global observer_version        0.1.2
 %global open3_version           0.2.1
-%global openssl_version         3.2.0
+%global openssl_version         3.2.4
 %global open_uri_version        0.4.1
 %global optparse_version        0.4.0
 %global ostruct_version         0.6.0
@@ -52,12 +53,12 @@
 %global prism_version           0.19.0
 %global pp_version              0.5.0
 %global prettyprint_version     0.2.0
-%global pstore_version          0.1.3
+%global pstore_version          0.2.1
 %global psych_version           5.1.2
 %global rdoc_version            6.6.3.1
 %global readline_version        0.0.4
 %global reline_version          0.5.10
-%global resolv_version          0.3.0
+%global resolv_version          0.3.2
 %global resolv_replace_version  0.1.1
 %global rinda_version           0.2.0
 %global ruby2_keywords_version  0.0.5
@@ -68,18 +69,18 @@
 %global stringio_version        3.1.1
 %global strscan_version         3.0.9
 %global syslog_version          0.1.2
-%global syntax_suggest_version  2.0.1
+%global syntax_suggest_version  2.0.3
 %global tempfile_version        0.2.1
 %global time_version            0.3.0
 %global timeout_version         0.4.1
 %global tmpdir_version          0.2.0
 %global tsort_version           0.2.0
 %global un_version              0.3.0
-%global uri_version             0.13.1
+%global uri_version             0.13.3
 %global weakref_version         0.1.3
 %global win32ole_version        1.8.10
 %global yaml_version            0.3.0
-%global zlib_version            3.1.1
+%global zlib_version            3.1.2
 
 Summary:        Ruby
 Name:           ruby
@@ -87,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -101,22 +102,8 @@ Source4:        rubygems.con
 Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
-Patch0:         CVE-2024-49761.patch
-# patches below taken from https://src.fedoraproject.org/rpms/ruby/c/b7e197fb887200e4faaf8fae663a9df00bdc09d3?branch=rawhide 
-# to remove the lock file for binstubs and avoid race condition
-Patch1:         Avoid-another-race-condition-of-open-mode.patch
-Patch2:         Remove-the-lock-file-for-binstubs.patch
-Patch3:         CVE-2025-25186.patch
-Patch4:         CVE-2025-27219.patch
-Patch5:         CVE-2025-27220.patch
-Patch6:         CVE-2025-27221.patch
-Patch7:         CVE-2025-6442.patch
-Patch8:         CVE-2025-24294.patch
-Patch9:         CVE-2025-61594.patch
-Patch10:        CVE-2026-27820.patch
-Patch11:        CVE-2026-80212.patch
-Patch12:        CVE-2026-80213.patch
-Patch13:        CVE-2026-82455.patch
+Patch0:         CVE-2025-6442.patch
+Patch1:         CVE-2026-82455.patch
 BuildRequires:  openssl-devel
 # Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
 BuildRequires:  pkgconfig(yaml-0.1)
@@ -421,6 +408,10 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Sat Oct 24 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.13-11
+- Upgrade to 3.3.13 to fix CVE-2026-89078, CVE-2026-93577, CVE-2026-97229, CVE-2026-110264
+- Remove patches for CVEs already fixed upstream
+
 * Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.5-10
 - Patch for CVE-2026-82455
 
