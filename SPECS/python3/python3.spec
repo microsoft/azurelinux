@@ -5,8 +5,13 @@
 
 Summary:        A high-level scripting language
 Name:           python3
+<<<<<<< HEAD
 Version:        3.12.16
 Release:        1%{?dist}
+=======
+Version:        3.12.15
+Release:        3%{?dist}
+>>>>>>> 9cc914b65a (python3: block compromised eMudhra keys and remediate ensurepip trust (#19708))
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +23,10 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
 Patch1:         remove-compromised-wheel-ca-roots.patch
+<<<<<<< HEAD
+=======
+Patch2:         CVE-2026-115557.patch
+>>>>>>> 9cc914b65a (python3: block compromised eMudhra keys and remediate ensurepip trust (#19708))
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -246,9 +255,12 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+<<<<<<< HEAD
 * Mon Oct 26 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.16-1
 - Upgrade to 3.12.16 for CVE-2026-12345, CVE-2026-114583, CVE-2024-3220
 
+=======
+>>>>>>> 9cc914b65a (python3: block compromised eMudhra keys and remediate ensurepip trust (#19708))
 * Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.12.15-3
 - Backport upstream SSL rejection of compromised eMudhra intermediate keys.
 
