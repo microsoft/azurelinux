@@ -1,0 +1,179 @@
+Subject: [PATCH] Key seed images by the selected wheel's content
+
+Downstream wheel backports can change contents without changing the wheel
+filename. Include the selected wheel's SHA-256 in the installation-image
+key so successive same-version replacements build separate images while
+byte-identical wheels continue to reuse their images.
+
+Keep the existing installer/Python separation and locking. Leave legacy
+images and images used by existing environments untouched. No date or RPM
+release needs to be maintained in the cache key.
+
+Cover copy and symlink seeding with both embedded pip versions, migration
+from filename-only images, repeated replacements with unchanged size and
+mtime, reuse across locations and rollback, and unreadable-wheel errors.
+
+Related Azure Linux PR: 19710
+Upstream-status: Pending
+
+--- a/src/virtualenv/seed/embed/via_app_data/via_app_data.py
++++ b/src/virtualenv/seed/embed/via_app_data/via_app_data.py
+@@ -6,6 +6,7 @@
+ import sys
+ import traceback
+ from contextlib import contextmanager
++from hashlib import sha256
+ from pathlib import Path
+ from subprocess import CalledProcessError
+ from threading import Lock, Thread
+@@ -49,7 +50,8 @@
+             def _install(name, wheel):
+                 try:
+                     LOGGER.debug("install %s from wheel %s via %s", name, wheel, installer_class.__name__)
+-                    key = Path(installer_class.__name__) / wheel.path.stem
++                    wheel_hash = sha256(wheel.path.read_bytes()).hexdigest()
++                    key = Path(installer_class.__name__) / wheel_hash / wheel.path.stem
+                     wheel_img = self.app_data.wheel_image(creator.interpreter.version_release_str, key)
+                     installer = installer_class(wheel.path, creator, wheel_img)
+                     parent = self.app_data.lock / wheel_img.parent
+--- /dev/null
++++ b/tests/unit/seed/embed/test_wheel_content_cache.py
+@@ -0,0 +1,138 @@
++from __future__ import annotations
++
++import base64
++import csv
++import hashlib
++import io
++import os
++from pathlib import Path
++from shutil import copy2
++from zipfile import ZIP_STORED, ZipFile
++
++import pytest
++
++from virtualenv.app_data import AppDataDiskFolder
++from virtualenv.discovery.py_info import PythonInfo
++from virtualenv.info import fs_supports_symlink
++from virtualenv.run import cli_run
++from virtualenv.seed.embed.via_app_data import via_app_data
++from virtualenv.seed.embed.via_app_data.pip_install.base import PipInstall
++from virtualenv.seed.wheels.embed import BUNDLE_FOLDER
++from virtualenv.seed.wheels.util import Wheel
++
++CERTIFICATE_PATH = Path("pip/_vendor/certifi/cacert.pem")
++
++
++@pytest.fixture(params=["25.0.1", "25.3"])
++def selected_wheel(request, tmp_path, monkeypatch):
++    source = BUNDLE_FOLDER / f"pip-{request.param}-py3-none-any.whl"
++    path = tmp_path / source.name
++    copy2(source, path)
++    wheel = Wheel(path)
++    if not wheel.support_py(PythonInfo.current_system().version_release_str):
++        pytest.skip("wheel does not support this interpreter")
++    monkeypatch.setattr(via_app_data, "get_wheel", lambda **kwargs: wheel)
++    return source, wheel
++
++
++@pytest.fixture(params=[False, True] if fs_supports_symlink() else [False])
++def seed_args(request, tmp_path):
++    args = [
++        "--app-data", str(tmp_path / "cache"), "--no-download",
++        "--no-periodic-update", "--no-setuptools",
++    ]
++    if PythonInfo.current_system().version_info[:2] == (3, 8):
++        args.append("--no-wheel")
++    if request.param:
++        args.append("--symlink-app-data")
++    return args
++
++
++def replace_bundle(source, wheel, marker):
++    with ZipFile(source) as archive:
++        infos = archive.infolist()
++        data = {info.filename: archive.read(info) for info in infos}
++    name = CERTIFICATE_PATH.as_posix()
++    bundle = data[name] + f"\n# cache generation {marker}\n".encode()
++    data[name] = bundle
++    record = next(name for name in data if name.endswith(".dist-info/RECORD"))
++    rows = list(csv.reader(io.StringIO(data[record].decode())))
++    digest = base64.urlsafe_b64encode(hashlib.sha256(bundle).digest()).rstrip(b"=").decode()
++    for row in rows:
++        if row[0] == name:
++            row[1:] = [f"sha256={digest}", str(len(bundle))]
++    output = io.StringIO(newline="")
++    csv.writer(output, lineterminator="\n").writerows(rows)
++    data[record] = output.getvalue().encode()
++    with ZipFile(wheel.path, "w") as archive:
++        for info in infos:
++            archive.writestr(info, data[info.filename], compress_type=ZIP_STORED)
++    timestamp = source.stat().st_mtime_ns
++    os.utime(wheel.path, ns=(timestamp, timestamp))
++    return bundle
++
++
++def test_legacy_seed_image_is_not_reused(selected_wheel, seed_args, tmp_path, monkeypatch, mocker):
++    source, wheel = selected_wheel
++    builds = mocker.spy(PipInstall, "build_image")
++    original_image = AppDataDiskFolder.wheel_image
++
++    def legacy_image(self, version, name):
++        return original_image(self, version, Path(name.parts[0]) / name.name)
++
++    old_bundle = replace_bundle(source, wheel, "A")
++    with monkeypatch.context() as legacy:
++        legacy.setattr(AppDataDiskFolder, "wheel_image", legacy_image)
++        before = cli_run([str(tmp_path / "before"), *seed_args])
++    new_bundle = replace_bundle(source, wheel, "B")
++    after = cli_run([str(tmp_path / "after"), *seed_args])
++    assert (after.creator.purelib / CERTIFICATE_PATH).read_bytes() == new_bundle
++    assert (before.creator.purelib / CERTIFICATE_PATH).read_bytes() == old_bundle
++    assert builds.call_count == 2
++
++
++def test_successive_same_filename_replacements(selected_wheel, seed_args, tmp_path, mocker):
++    source, wheel = selected_wheel
++    builds = mocker.spy(PipInstall, "build_image")
++    environments = []
++    first_bytes = None
++    initial_stat = None
++    for marker in ("A", "B", "C"):
++        bundle = replace_bundle(source, wheel, marker)
++        current_stat = (wheel.path.stat().st_size, wheel.path.stat().st_mtime_ns)
++        if initial_stat is None:
++            initial_stat = current_stat
++            first_bytes = wheel.path.read_bytes()
++        assert current_stat == initial_stat
++        result = cli_run([str(tmp_path / marker), *seed_args])
++        environments.append((result.creator.purelib / CERTIFICATE_PATH, bundle))
++        for path, expected in environments:
++            assert path.read_bytes() == expected
++    assert builds.call_count == 3
++
++    other_folder = tmp_path / "other-location"
++    other_folder.mkdir()
++    wheel.path = Path(copy2(wheel.path, other_folder / wheel.name))
++    reused = cli_run([str(tmp_path / "same-content"), *seed_args])
++    assert (reused.creator.purelib / CERTIFICATE_PATH).read_bytes() == environments[-1][1]
++    assert builds.call_count == 3
++
++    wheel.path.write_bytes(first_bytes)
++    restored = cli_run([str(tmp_path / "restored-content"), *seed_args])
++    assert (restored.creator.purelib / CERTIFICATE_PATH).read_bytes() == environments[0][1]
++    assert builds.call_count == 3
++
++
++def test_unreadable_wheel_does_not_reuse_image(selected_wheel, seed_args, tmp_path, monkeypatch):
++    _, wheel = selected_wheel
++    cli_run([str(tmp_path / "before"), *seed_args])
++    read_bytes = Path.read_bytes
++
++    def unreadable(path):
++        if path == wheel.path:
++            raise OSError("selected wheel is unreadable")
++        return read_bytes(path)
++
++    monkeypatch.setattr(Path, "read_bytes", unreadable)
++    with pytest.raises(RuntimeError, match="selected wheel is unreadable"):
++        cli_run([str(tmp_path / "after"), *seed_args])
