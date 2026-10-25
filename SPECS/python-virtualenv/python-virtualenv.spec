@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,7 @@ Patch1011:      CVE-2026-13346v0.patch
 Patch1012:      CVE-2026-13346v1.patch
 Patch1013:      CVE-2026-102925.patch
 Patch1014:      CVE-2026-102930.patch
+Patch1015:      remove-compromised-wheel-ca-roots.patch
 BuildArch:      noarch
 
 %description
@@ -58,6 +59,7 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 0 -p1
 %patch -P 1013 -p1
 %patch -P 1014 -p1
+%patch -P 1015 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -158,6 +160,9 @@ zip -r ../src/virtualenv/seed/wheels/embed/unpacked_wheel-0.45.1-py3-none-any.wh
 popd
 rm -rf unpacked_wheel-0.45.1-py3-none-any
 
+%{__python3} Tools/remove-untrusted-wheel-roots.py \
+    --expected-removals 3 src/virtualenv/seed/wheels/embed/pip-*.whl
+
 %generate_buildrequires
 
 %build
@@ -167,10 +172,41 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 %pyproject_install
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0'
-# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
-sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
-tox -e py
+# Keep the test environment outside zipapp's source copy.
+check_env=$(mktemp -d "$PWD/../virtualenv-check.XXXXXX")
+python3 -m venv "$check_env"
+cat > "$check_env/constraints.txt" <<'EOF'
+covdefaults==2.3.0
+coverage==7.10.6
+coverage-enable-subprocess==1.0
+distlib==0.3.8
+filelock==3.20.3
+flaky==3.8.1
+iniconfig==2.1.0
+packaging==25.0
+platformdirs==4.3.8
+pluggy==1.6.0
+pygments==2.19.2
+pytest==8.4.2
+pytest-env==1.1.5
+pytest-mock==3.15.1
+pytest-randomly==3.16.0
+pytest-timeout==2.4.0
+python-dateutil==2.9.0.post0
+setuptools==80.9.0
+six==1.17.0
+time-machine==2.19.0
+typing-extensions==4.13.2
+EOF
+set -- %{_pyproject_wheeldir}/*.whl
+test "$#" -eq 1
+"$check_env/bin/python" -m pip install --disable-pip-version-check \
+    --constraint "$check_env/constraints.txt" "$1[test]"
+export PATH="$check_env/bin:$PATH"
+unset COVERAGE_PROCESS_START
+export PYTHONWARNDEFAULTENCODING=1
+"$check_env/bin/python" -m pytest --junitxml junit.py.xml \
+    tests -k 'not test_can_build_c_extensions' --int
 
 %files -n python3-virtualenv
 %defattr(-,root,root,-)
@@ -179,6 +215,11 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-8
+- Remove affected eMudhra and AAA roots from both embedded pip wheels.
+- Regenerate wheel RECORD entries after the existing security backports.
+- Run pytest directly with pinned test dependencies in a private environment.
+
 * Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
 - Patch for CVE-2026-102925 and CVE-2026-102930
 
