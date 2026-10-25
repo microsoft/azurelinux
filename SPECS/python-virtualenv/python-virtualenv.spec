@@ -26,7 +26,6 @@ Patch1012:      CVE-2026-13346v1.patch
 Patch1013:      CVE-2026-102925.patch
 Patch1014:      CVE-2026-102930.patch
 Patch1015:      remove-compromised-wheel-ca-roots.patch
-Patch1016:      coverage-subprocess-plugin.patch
 BuildArch:      noarch
 
 %description
@@ -62,7 +61,6 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 1013 -p1
 %patch -P 1014 -p1
 %patch -P 1015 -p1
-%patch -P 1016 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -175,17 +173,17 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 %pyproject_install
 
 %check
-# Keep pip installs private, and keep the bootstrap outside zipapp's source copy.
+# Keep the test environment outside zipapp's source copy.
 check_env=$(mktemp -d "$PWD/../virtualenv-check.XXXXXX")
 python3 -m venv "$check_env"
+set -- %{_pyproject_wheeldir}/*.whl
+test "$#" -eq 1
 "$check_env/bin/python" -m pip install --disable-pip-version-check \
-    --constraint %{SOURCE1} 'tox==4.28.0'
-# tox 4.28 only applies overrides to sections that already exist.
-printf '\n[testenv:.pkg]\npass_env = PIP_*\nconstraints = %{SOURCE1}\n' >> tox.ini
-"$check_env/bin/python" -m tox \
-    -x 'testenv.pass_env+=PIP_*' \
-    -x 'testenv.constraints=%{SOURCE1}' \
-    -e py -- --junitxml "$PWD/.tox/junit.py.xml" \
+    --constraint %{SOURCE1} "$1[test]"
+export PATH="$check_env/bin:$PATH"
+unset COVERAGE_PROCESS_START
+export PYTHONWARNDEFAULTENCODING=1
+"$check_env/bin/python" -m pytest --junitxml junit.py.xml \
     tests -k 'not test_can_build_c_extensions' --int
 
 %files -n python3-virtualenv
@@ -198,7 +196,7 @@ printf '\n[testenv:.pkg]\npass_env = PIP_*\nconstraints = %{SOURCE1}\n' >> tox.i
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-8
 - Remove affected eMudhra and AAA roots from both embedded pip wheels.
 - Regenerate wheel RECORD entries after the existing security backports.
-- Run pinned tox 4 and test dependencies in private environments using configured pip sources.
+- Run pytest directly with pinned test dependencies in a private environment.
 
 * Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
 - Patch for CVE-2026-102925 and CVE-2026-102930
