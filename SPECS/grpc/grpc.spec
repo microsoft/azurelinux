@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.62.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Patch1:         CVE-2024-11407.patch
 Patch2:         Backport-Fixing-bug-in-GoAway-and-gRPC-Message-Compr.patch
 Patch3:         Backport-Memory-optimization.patch
 Patch4:         remove-compromised-ca-roots.patch
+Patch5:         add-sslcom-tls-ecc-root-2022.patch
 BuildRequires:  abseil-cpp-devel >= 20240116.0-2
 BuildRequires:  build-essential
 BuildRequires:  c-ares-devel
@@ -155,6 +156,9 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.62.3-4
+- Add the trusted SSL.com TLS ECC Root CA 2022 to retain unaffected TLS paths.
+
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.62.3-3
 - Remove affected eMudhra and AAA roots from the C++ and grpcio bundled trust store.
 
