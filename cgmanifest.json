@@ -17344,7 +17344,7 @@
         "other": {
           "name": "perl-DBI",
           "version": "1.656",
-          "downloadUrl": "https://www.cpan.org/authors/id/H/HM/HMBRAND/DBI-1.656.tgz"
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-1.656.tgz"
         }
       }
     },
