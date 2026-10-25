@@ -1,0 +1,101 @@
+Subject: [PATCH] Avoid pre-trust-update Azure Linux seed images
+
+The embedded pip filenames are unchanged by the trust-store backport, so
+the default app-data seeder can otherwise reuse images containing the old
+certificate bundles. Select a new downstream image generation for newly
+created environments without deleting caches used by existing environments.
+
+Test both embedded pip versions with copy and symlink seeders. Preserve a
+legacy cache containing distinguishable stale bundle bytes across the
+upgrade, verify the corrected bundle is installed, and retain normal cache
+reuse after the first corrected image is built. The test is offline.
+
+Reference: https://github.com/microsoft/azurelinux/pull/19710
+Upstream-status: Inappropriate [Azure Linux trust-store cache generation]
+
+--- a/src/virtualenv/app_data/via_disk_folder.py
++++ b/src/virtualenv/app_data/via_disk_folder.py
+@@ -104,7 +104,8 @@
+         return path
+
+     def wheel_image(self, for_py_version, name):
+-        return self.lock.path / "wheel" / for_py_version / "image" / "1" / name
++        # Do not reuse seed images from before the October 2026 trust-store update.
++        return self.lock.path / "wheel" / for_py_version / "image" / "1-azl3-trust-202610" / name
+
+
+ class JSONStoreDisk(ContentStore, ABC):
+--- /dev/null
++++ b/tests/unit/seed/embed/test_azurelinux_seed_cache_upgrade.py
+@@ -0,0 +1,71 @@
++from __future__ import annotations
++
++from pathlib import Path
++from stat import S_IWUSR
++from zipfile import ZipFile
++
++import pytest
++
++from virtualenv.app_data import AppDataDiskFolder
++from virtualenv.discovery.py_info import PythonInfo
++from virtualenv.info import fs_supports_symlink
++from virtualenv.run import cli_run
++from virtualenv.seed.embed.via_app_data.pip_install.base import PipInstall
++from virtualenv.seed.wheels.embed import BUNDLE_FOLDER
++
++
++def legacy_wheel_image(self, for_py_version, name):
++    return self.lock.path / "wheel" / for_py_version / "image" / "1" / name
++
++
++@pytest.mark.parametrize("pip_version", ["25.0.1", "25.3"])
++@pytest.mark.parametrize("symlink", [False, True] if fs_supports_symlink() else [False])
++def test_azurelinux_seed_cache_upgrade(tmp_path, monkeypatch, pip_version, symlink):
++    app_data = tmp_path / "app-data"
++    wheel = BUNDLE_FOLDER / f"pip-{pip_version}-py3-none-any.whl"
++    certificate_path = Path("pip/_vendor/certifi/cacert.pem")
++    with ZipFile(wheel) as archive:
++        corrected_bundle = archive.read(certificate_path.as_posix())
++    stale_bundle = corrected_bundle + b"\n# pre-update cached certificate bundle\n"
++    args = [
++        "--app-data",
++        str(app_data),
++        "--no-periodic-update",
++        "--no-download",
++        "--no-setuptools",
++        "--pip",
++        pip_version,
++        "--extra-search-dir",
++        str(BUNDLE_FOLDER),
++    ]
++    if symlink:
++        args.append("--symlink-app-data")
++
++    with monkeypatch.context() as legacy:
++        legacy.setattr(AppDataDiskFolder, "wheel_image", legacy_wheel_image)
++        cli_run([str(tmp_path / "populate"), *args])
++        installer = "SymlinkPipInstall" if symlink else "CopyPipInstall"
++        image = legacy_wheel_image(
++            AppDataDiskFolder(app_data),
++            PythonInfo.current_system().version_release_str,
++            Path(installer) / wheel.stem,
++        )
++        cached_bundle = image / certificate_path
++        mode = cached_bundle.stat().st_mode
++        cached_bundle.chmod(mode | S_IWUSR)
++        cached_bundle.write_bytes(stale_bundle)
++        cached_bundle.chmod(mode)
++        before = cli_run([str(tmp_path / "before-upgrade"), *args])
++        assert (before.creator.purelib / certificate_path).read_bytes() == stale_bundle
++
++    after = cli_run([str(tmp_path / "after-upgrade"), *args])
++    assert (after.creator.purelib / certificate_path).read_bytes() == corrected_bundle
++    assert cached_bundle.read_bytes() == stale_bundle
++    assert (before.creator.purelib / certificate_path).read_bytes() == stale_bundle
++
++    def unexpected_rebuild(self):
++        pytest.fail("the corrected seed image should be reused")
++
++    monkeypatch.setattr(PipInstall, "build_image", unexpected_rebuild)
++    repeated = cli_run([str(tmp_path / "repeat"), *args])
++    assert (repeated.creator.purelib / certificate_path).read_bytes() == corrected_bundle
