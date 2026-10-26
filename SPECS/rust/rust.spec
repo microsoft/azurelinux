@@ -47,6 +47,8 @@ Patch8:         CVE-2026-109351.patch
 Patch9:         CVE-2026-109349.patch
 Patch10:        CVE-2026-91986.patch
 Patch11:        CVE-2026-55200.patch
+Patch12:        CVE-2026-55199.patch
+Patch13:        CVE-2026-66035.patch
 
 # Note: the stage0 bootstrap toolchain (cargo/rustc/rust-std tarballs) is packaged
 # separately in rust-bootstrap, to keep this SRPM's size down. See SPECS/rust-bootstrap.
@@ -215,8 +217,9 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 %{_libdir}/rustlib/src
 
 %changelog
-* Fri Oct 23 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.98.1-2
-- Add patch for CVE-2026-55200, CVE-2026-109349, CVE-2026-109351 and CVE-2026-91986
+* Mon Oct 26 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.98.1-2
+- Add patch for CVE-2026-55200, CVE-2026-109349, CVE-2026-109351, CVE-2026-91986,
+  CVE-2026-55199, CVE-2026-66035
 
 * Thu Sep 10 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.98.1-1
 - Upgrade to 1.98.1
