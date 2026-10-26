@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Dola builds Java artifacts without naming the Microsoft JDK that must supply
+# its Fedora-compatible toolchain paths. Remove this overlay once msopenjdk-25
+# provides those development capabilities and paths directly.
+[[overlays]]
+description = "Require Microsoft OpenJDK compatibility when building Dola"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "msopenjdk-25-fedora-compat"

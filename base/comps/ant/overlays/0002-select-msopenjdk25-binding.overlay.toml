@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Microsoft Build of OpenJDK 25 can produce a default-compression archive with
+# the same size as a level-9 archive, invalidating the test's strict comparison.
+[[overlays]]
+description = "Compare explicit ZIP compression levels because Java 25 default compression can match level 9"
+type = "patch-add"
+source = "ant-1.10.15-explicit-compression-level.patch"

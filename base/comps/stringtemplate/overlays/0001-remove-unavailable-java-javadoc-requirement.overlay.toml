@@ -1,0 +1,14 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Microsoft OpenJDK does not ship the `java-javadoc` API documentation package,
+# and StringTemplate's generated documentation is self-contained. Remove this
+# overlay if Microsoft OpenJDK ships a Javadoc subpackage that provides
+# the generic java-javadoc capability.
+[[overlays]]
+description = "Remove the unavailable Java API documentation dependency"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "java-javadoc"
+package = "javadoc"
