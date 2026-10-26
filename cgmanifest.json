@@ -8350,16 +8350,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "keda",
-          "version": "2.14.1",
-          "downloadUrl": "https://github.com/kedacore/keda/archive/refs/tags/v2.14.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "keepalived",
           "version": "2.3.1",
           "downloadUrl": "https://www.keepalived.org/software/keepalived-2.3.1.tar.gz"
