@@ -8731,8 +8731,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt-openvmm",
-          "version": "0.1.0",
-          "downloadUrl": "https://github.com/microsoft/kubevirt/archive/refs/tags/build-dc700f99f4.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/microsoft/kubevirt/archive/refs/tags/openvmm-v1.9.0-1.tar.gz"
         }
       }
     },
