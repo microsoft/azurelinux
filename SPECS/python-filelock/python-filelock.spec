@@ -2,7 +2,7 @@
 Summary:        A platform independent file lock
 Name:           python-filelock
 Version:        3.20.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://github.com/toxdev/filelock
 Source0:        https://files.pythonhosted.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         remove-python-3.14-classifier.patch
 Patch1:         filelock-tests-isolate-caplog.patch
+Patch2:         CVE-2026-112909.patch
 BuildArch:      noarch
 
 %description
@@ -75,6 +76,9 @@ pip3 install pytest-asyncio
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
+* Mon Oct 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.20.3-5
+- Patch for CVE-2026-112909
+
 * Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.20.3-4
 - Pin packaging==23.2 when pip-installing test tooling in %%check to fix
   ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
