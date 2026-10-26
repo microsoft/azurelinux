@@ -6,14 +6,14 @@
 
 Name:           rpmlint
 Version:        2.8.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Tool for checking common errors in RPM packages
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/rpmlint
 Source0:        %{url}/archive/%{version}/rpmlint-%{version}.tar.gz
 
 # Taken from https://github.com/rpm-software-management/rpmlint/tree/main/configs/Fedora
-Source1:        fedora.toml
+Source1: azurelinux.toml
 Source3:        scoring.toml
 Source4:        users-groups.toml
 Source5:        warn-on-functions.toml
