@@ -1,0 +1,18 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/rhboot/grub2/commit/86ec48882bd0b06268f93033bce9eea168188fae" }]
+
+[[overlays]]
+description = "Backport the upstream TPM loopback fix to avoid buffering entire disk images for measurement"
+type = "file-add"
+file = "0387-commands-tpm-Skip-loopback-image-measurement.patch"
+source = "../0387-commands-tpm-Skip-loopback-image-measurement.patch"
+
+[[overlays]]
+description = "Apply the upstream loopback measurement fix after the existing grubenv patch"
+type = "file-search-replace"
+file = "grub.patches"
+regex = '(?m)^Patch0386: 0386-util-create-grubenv-with-restrictive-permissions\.patch$'
+replacement = '''Patch0386: 0386-util-create-grubenv-with-restrictive-permissions.patch
+Patch0387: 0387-commands-tpm-Skip-loopback-image-measurement.patch'''
