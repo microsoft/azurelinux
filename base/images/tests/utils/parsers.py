@@ -50,9 +50,9 @@ def parse_os_release(content: str) -> dict[str, str]:
 def parse_boot_entry_kernel_options(
     option_lines_by_entry: dict[Path, list[str]],
 ) -> dict[Path, list[str]]:
-    """Parse one literal kernel option line from each BLS boot entry."""
+    """Parse one literal kernel option line from each Type #1 entry or UKI."""
     if not option_lines_by_entry:
-        raise ValueError("no BLS boot loader entries found")
+        raise ValueError("no boot loader entries (Type #1 or UKI) found")
 
     options_by_entry: dict[Path, list[str]] = {}
     for entry, option_lines in option_lines_by_entry.items():
