@@ -1,0 +1,12 @@
+diff -up firefox-158.0.1/widget/gtk/BufferSurface.h.old firefox-158.0.1/widget/gtk/BufferSurface.h
+--- firefox-158.0.1/widget/gtk/BufferSurface.h.old	2026-10-21 13:01:16.952113195 +0200
++++ firefox-158.0.1/widget/gtk/BufferSurface.h	2026-10-21 12:59:33.845420300 +0200
+@@ -166,7 +166,7 @@ class BufferSurface {
+   // surface without textures/eglimages.
+   RefPtr<mozilla::gl::GLContext> mGL;
+ 
+-  mozilla::gfx::ColorRange mColorRange = mozilla::gfx::ColorRange::LIMITED;
++  mozilla::gfx::ColorRange mColorRange = mozilla::gfx::ColorRange::FULL;
+   mozilla::gfx::YUVColorSpace mColorSpace =
+       mozilla::gfx::YUVColorSpace::Default;
+   mozilla::gfx::ColorSpace2 mColorPrimaries =

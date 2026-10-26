@@ -148,7 +148,7 @@ ExcludeArch: i686
 %if %{?system_nss}
 %global nspr_version 4.38.2
 %global nspr_build_version %{nspr_version}
-%global nss_version 3.128
+%global nss_version 3.130
 %global nss_build_version %{nss_version}
 %endif
 
@@ -192,14 +192,14 @@ ExcludeArch: i686
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        156.0.1
-Release: 13%{?dist}
+Version:        158.0.1
+Release: 14%{?dist}
 URL:            https://www.mozilla.org/firefox/
 # Automatically converted from old format: MPLv1.1 or GPLv2+ or LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-MPLv1.1 OR GPL-2.0-or-later OR LicenseRef-Callaway-LGPLv2+
 Source0:        https://archive.mozilla.org/pub/firefox/releases/%{version}%{?pre_version}/source/firefox-%{version}%{?pre_version}.source.tar.xz
 %if %{with langpacks}
-Source1:        firefox-langpacks-%{version}%{?pre_version}-20260929.tar.xz
+Source1:        firefox-langpacks-%{version}%{?pre_version}-20261021.tar.xz
 %endif
 Source2:        cbindgen-vendor.tar.xz
 Source3:        dump_syms-vendor.tar.xz
@@ -262,10 +262,7 @@ Patch242:        0026-Add-KDE-integration-to-Firefox.patch
 # Upstream patches
 Patch400:        mozilla-1196777.patch
 Patch401:        mozilla-1667096.patch
-Patch402:        D324870.1789116963.diff
-Patch403:        D324871.1789116972.diff
-Patch404:        D324876.1789116899.diff
-Patch405:        D324877.1789117000.diff
+Patch402:        color-range.patch
 
 # PGO/LTO patches
 Patch600:        pgo.patch
@@ -548,16 +545,12 @@ cat %{SOURCE49} | sed -e "s|LIBCLANG_RT_PLACEHOLDER|`pwd`/wasi-sdk-30/build/sysr
 
 %patch -P400 -p1 -b .1196777
 %patch -P401 -p1 -b .1667096
-
-%patch -P402 -p1 -b .D324870
-%patch -P403 -p1 -b .D324871
-%patch -P404 -p1 -b .D324876
-%patch -P405 -p1 -b .D324877
+%patch -P402 -p1 -b .color-range
 
 # PGO patches
 %if %{build_with_pgo}
 %if !%{with build_with_clang}
-%patch -P600 -p1 -b .pgo
+%patch -P600 -p2 -b .pgo
 %patch -P602 -p1 -b .1516803
 %endif
 %endif
@@ -1208,6 +1201,21 @@ fi
 #---------------------------------------------------------------------
 
 %changelog
+* Wed Oct 21 2026 Martin Stransky <stransky@redhat.com> - 158.0.1-2
+- Added fix for mzbz#2084134
+
+* Wed Oct 21 2026 Martin Stransky <stransky@redhat.com> - 158.0.1-1
+- Update to latest upstream (158.0.1)
+
+* Fri Oct 09 2026 Martin Stransky <stransky@redhat.com> - 158.0-1
+- Update to latest upstream (158.0)
+
+* Wed Oct 07 2026 Martin Stransky <stransky@redhat.com> - 157.0.1-1
+- Update to latest upstream (157.0.1)
+
+* Thu Oct 01 2026 Martin Stransky <stransky@redhat.com> - 157.0-1
+- Update to latest upstream (157.0)
+
 * Tue Sep 29 2026 Martin Stransky <stransky@redhat.com> - 156.0.1-2
 - Fixed langpacks.
 
