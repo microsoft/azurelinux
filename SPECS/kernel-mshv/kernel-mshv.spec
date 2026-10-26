@@ -18,7 +18,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        6.18.34.mshv3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -266,6 +266,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Oct 26 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-2
+- Enable CONFIG_NETFILTER_XTABLES_LEGACY and restore legacy iptables/ip6tables/arptables/ebtables
+  table modules dropped in the 6.18 upgrade
+
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
 - Enable CONFIG_CHECKPOINT_RESTORE, CONFIG_INET_RAW_DIAG and CONFIG_MSHV_GICV3_MSI
