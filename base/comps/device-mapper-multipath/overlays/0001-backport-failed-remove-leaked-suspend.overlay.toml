@@ -1,0 +1,40 @@
+# Backport of the dm-devel series "libmultipath: fix leaked device-mapper
+# suspend after a failed remove" (reviewed by Benjamin Marzinski and Martin
+# Wilck). It fixes a leaked device-mapper suspend on the failed-remove path in
+# dm_flush_map__(). A transient dm_is_mpath()
+# query error was misclassified as an external removal (so the map was never
+# resumed), and the recovery resume was fire-and-forget; either could leave the
+# map suspended, wedging later I/O node-wide via sync().
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [
+    { url = "https://lore.kernel.org/dm-devel/20261008043749.23389-1-suresh.thelkar@yahoo.com/" },
+    { url = "https://github.com/suresh-thelkar/multipath-tools/commit/48a1edd647a7f12959ef66b3e5c6ddcff54755e5" },
+    { url = "https://github.com/suresh-thelkar/multipath-tools/commit/8f78da91520e05b74c4ad887ac0bf40d2e279250" },
+]
+
+# file-add + spec-insert-tag (rather than patch-add) keeps Patch0018/0019 next to Patch0017.
+[[overlays]]
+description = "Backport dm-devel patch 1/2: dm_flush_map__ must not treat a dm_is_mpath() query error as external removal (would leave the map suspended)"
+type = "file-add"
+source = "../0018-libmultipath-dm_flush_map__-do-not-treat-query-error.patch"
+file = "0018-libmultipath-dm_flush_map__-do-not-treat-query-error.patch"
+
+[[overlays]]
+description = "Register dm-devel patch 1/2 after the existing Patch0017"
+type = "spec-insert-tag"
+tag = "Patch0018"
+value = "0018-libmultipath-dm_flush_map__-do-not-treat-query-error.patch"
+
+[[overlays]]
+description = "Backport dm-devel patch 2/2: dm_flush_map__ checks the recovery DM_DEVICE_RESUME result, retries the resume once, and logs if the map is still suspended"
+type = "file-add"
+source = "../0019-libmultipath-dm_flush_map__-retry-the-resume-after-a.patch"
+file = "0019-libmultipath-dm_flush_map__-retry-the-resume-after-a.patch"
+
+[[overlays]]
+description = "Register dm-devel patch 2/2 after Patch0018"
+type = "spec-insert-tag"
+tag = "Patch0019"
+value = "0019-libmultipath-dm_flush_map__-retry-the-resume-after-a.patch"

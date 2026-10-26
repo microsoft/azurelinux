@@ -317,7 +317,7 @@ overlay-files = ["overlays/*.overlay.toml"]
 [components.desktop-file-utils]
 [components.dev86]
 [components.devhelp]
-[components.device-mapper-multipath]
+# device-mapper-multipath moved to its own device-mapper-multipath.comp.toml (carries backport overlays)
 [components.devscripts]
 [components.dhcpcd]
 [components.dietlibc]

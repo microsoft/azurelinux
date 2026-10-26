@@ -1,0 +1,62 @@
+From f6f1892c639b3333561b1001fee81b86f9dee948 Mon Sep 17 00:00:00 2001
+From: Suresh Thelkar <suresh.thelkar@yahoo.com>
+Date: Wed, 7 Oct 2026 08:56:33 +0000
+Subject: [PATCH 19/19] libmultipath: dm_flush_map__: retry the resume after a
+ failed remove
+
+After a failed DM_DEVICE_REMOVE the map was suspended earlier in
+dm_flush_map__(), and the recovery path issued a single fire-and-forget
+DM_DEVICE_RESUME whose result was ignored. If that resume failed, the
+map could be left suspended with no trace in the logs, which wedges any
+later task in uninterruptible D state and, because sync() walks every
+block device, hangs I/O node-wide until reboot.
+
+A resume can fail if the map has an inactive table: dm tries to swap to
+it and, if the swap fails, leaves the map suspended with the invalid
+table dropped. An immediate second resume then reactivates it with the
+old table. This is the same scenario dm_addmap_reload() already guards
+against. It is far less likely on the remove path (there should be no
+inactive table here), but retrying is cheap and harmless.
+
+Check the DM_DEVICE_RESUME return value, retry the resume once if it
+fails, and log at condlog(1) if the map is still not resumed so a leaked
+suspend is at least visible in the logs.
+
+Signed-off-by: Suresh Thelkar <suresh.thelkar@yahoo.com>
+Reviewed-by: Martin Wilck <mwilck@suse.com>
+---
+ libmultipath/devmapper.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/libmultipath/devmapper.c b/libmultipath/devmapper.c
+index 32beeae..9db3e3a 100644
+--- a/libmultipath/devmapper.c
++++ b/libmultipath/devmapper.c
+@@ -1062,10 +1062,20 @@ int dm_flush_map__ (const char *mapname, int flags, int retries)
+ 			else
+ 				condlog(2, "failed to remove multipath map %s",
+ 					mapname);
+-			if ((flags & DMFL_SUSPEND) && queue_if_no_path != -1) {
+-				dm_simplecmd_noflush(DM_DEVICE_RESUME,
+-						     mapname, udev_flags);
+-			}
++			/*
++			 * Resume the map suspended above. If it has an inactive
++			 * table, the resume makes dm try to swap to it; if that
++			 * swap fails dm leaves the map suspended with the
++			 * invalid table dropped, and a second resume reactivates
++			 * it with the old table (as dm_addmap_reload() does).
++			 * Retry the resume once, and log if it is still not
++			 * resumed so a leaked suspend is visible.
++			 */
++			if ((flags & DMFL_SUSPEND) && queue_if_no_path != -1 &&
++			    !dm_simplecmd_noflush(DM_DEVICE_RESUME, mapname, udev_flags) &&
++			    !dm_simplecmd_noflush(DM_DEVICE_RESUME, mapname, udev_flags))
++				condlog(1, "%s: failed to resume map after failed remove",
++					mapname);
+ 		}
+ 		if (retries)
+ 			sleep(1);
+-- 
+2.55.0
+
