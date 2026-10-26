@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        35%{?dist}
+Release:        36%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,6 +56,7 @@ Patch39:        CVE-2026-78659.patch
 Patch40:        CVE-2026-78660.patch
 Patch41:        CVE-2026-78669.patch
 Patch42:        CVE-2026-97032.patch
+Patch43:        remove-emudhra-ca-roots.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -120,6 +121,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.31.0-36
+- Remove AAA and emSign ECC G3 from the vendored Snowflake CA bundle.
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-35
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107325, CVE-2026-107324
 
