@@ -1,0 +1,105 @@
+# Azure Linux 4 additions to the rpmlint policy.
+#
+# This fragment is loaded after rpmlint's baseline policy. Keep exceptions
+# here narrowly scoped and documented. Package validation must disable
+# rpmlint's host configuration autoloading and load only this fragment
+# explicitly:
+#
+#   CONFIG_DISABLE_AUTOLOADING=1 rpmlint --config zz-azurelinux.toml <rpm>...
+#
+# `--config` is single-valued (repeating it keeps only the last occurrence)
+# and, when pointed at a directory, globs it unsorted, so passing both this
+# fragment and the Fedora baseline cannot reliably order them; load only this
+# file. rpmlint's own configdefaults.toml always loads regardless of
+# CONFIG_DISABLE_AUTOLOADING, but sets `ReleaseExtension = ""` and
+# `Filters = []`, so it never contends with the settings below. Without
+# CONFIG_DISABLE_AUTOLOADING, a validation host with its own (unpatched)
+# rpmlint installed still autoloads that host's Fedora baseline, whose
+# `not-standard-release-extension` suppression hides invalid releases
+# independent of this fragment.
+
+# Azure Linux package releases use the .azl4 suffix instead of Fedora's .fcNN
+# suffix. The boundary assertion also supports a subsequent packaging suffix.
+ReleaseExtension = '\.azl4(?=[.~+]|$)'
+
+# Azure Linux uses the usr-merged paths below in generated RPM scriptlets.
+# They are equivalent to rpmlint's traditional /bin and /sbin interpreter
+# paths, and are valid even when the target package does not own the command.
+ValidEmptyShells = [
+	"/usr/sbin/ldconfig",
+]
+
+ValidShells = [
+	"/usr/bin/sh",
+	"/usr/bin/bash",
+	"/usr/sbin/ldconfig",
+]
+
+# Azure Linux man pages and other compressible files use gzip, not rpmlint's
+# own default of bz2. Without this, valid gzip-compressed files trigger a
+# false manpage-not-compressed finding when only this fragment is loaded.
+CompressExtension = "gz"
+
+# Historical license texts frequently contain the former FSF postal address.
+# This is informational and cannot be corrected by downstream packagers.
+#
+# rpmlint's own default license allow-list is empty, so every SPDX license
+# token is otherwise flagged invalid-license. Suppress it here too (in
+# addition to the matching fedora.toml overlay, for hosts that load this
+# fragment without fedora.toml) until azurelinux-license-data ships.
+Filters = [
+	".*incorrect-fsf-address.*",
+	".*invalid-license.*",
+	# The deprecated RPM Group tag is optional in Azure Linux packages.
+	".*no-group-tag.*",
+]
+# rpmlint's configdefaults.toml ships no StandardUsers/StandardGroups, and
+# with host autoloading disabled, Fedora's own fedora/users-groups.toml
+# fragment (which this list is based on) is never loaded either. Without
+# this, ordinary Azure Linux packages that install as a system user/group
+# (e.g. apache, dbus) trigger false non-standard-uid/non-standard-gid
+# findings. Carries Fedora's list plus every non-root owner/group named in
+# a %attr() anywhere under specs/ (grep -rhoE '%attr\([0-9]+,[^,)]*,[^,)]*\)'
+# specs --include='*.spec'), so this does not need to grow reactively as
+# individual packages are flagged. Regenerate by re-running that scan.
+StandardUsers = [
+        "abrt", "activemq", "adm", "aeolus", "aesmd", "amandabackup", "apache", "arpwatch", "ats", "avahi",
+        "avahi-autoipd", "bacula", "beagleindex", "bin", "cassandra", "ccache", "ceilometer", "ceph", "cephadm", "chrony",
+        "cimsrvr", "cinder", "clamav", "colord", "condor", "coroqnetd", "cyrus", "daemon", "dbus", "debuginfod",
+        "desktop", "dhcpd", "distcache", "dnsconfd", "dovecot", "elasticsearch", "exim", "fax", "firebird", "frontpage",
+        "frr", "ftp", "games", "ganesha", "gdm", "geoclue", "glance", "gluster", "gopher", "hacluster",
+        "haldaemon", "halt", "haproxy", "heat", "hsqldb", "ident", "jbosson-agent", "jetty", "jonas", "kea",
+        "keylime", "keystone", "ldap", "lighttpd", "lp", "luci", "mail", "mailman", "mailnull", "majordomo",
+        "mongodb", "munge", "munin", "myproxy", "mysql", "named", "netdump", "news", "nobody", "nocpulse",
+        "nova", "nscd", "nslcd", "ntp", "nut", "ods", "openvswitch", "operator", "oprofile", "ovirt",
+        "ovirtagent", "pcp", "pegasus", "pesign", "pkcsslotd", "pkiuser", "piranha", "plasmalogin", "plocate", "polkituser",
+        "postfix", "postgres", "prelude-manager", "privoxy", "pulse", "puppet", "pvm", "qat", "qemu", "qgs",
+        "quagga", "quantum", "rabbitmq", "radiusd", "radvd", "retrace", "rhevm", "ricci", "root", "rpc", "rpcuser", "rpm",
+        "rtkit", "sabayon", "saned", "sanlock", "sddm", "setroubleshoot", "shutdown", "smmsp", "smtpq", "snortd",
+        "squid", "sshd", "sssd", "stap-server", "swift", "sync", "systemd-network", "systemd-resolve", "tcpdump", "tlog",
+        "tomcat", "tss", "unbound", "usbmuxd", "uucp", "uuidd", "valkey", "varnish", "vcsa", "vdsm",
+        "vhostmd", "virtlogin", "wallaby", "webalizer", "wildfly", "wireshark", "wnn", "xfs",
+]
+
+StandardGroups = [
+        "abrt", "activemq", "adm", "aeolus", "aesmd", "apache", "arpwatch", "ats", "audio", "avahi",
+        "avahi-autoipd", "bacula", "beagleindex", "bin", "cassandra", "ccache", "cdrom", "ceilometer", "ceph", "cephadm",
+        "chrony", "cimsrvr", "cinder", "clamav", "colord", "condor", "console", "coroqnetd", "daemon", "dbus",
+        "debuginfod", "desktop", "dhcpd", "dialout", "dip", "disk", "distcache", "dnsconfd", "dnsmasq", "dovecot",
+        "elasticsearch", "exim", "fax", "firebird", "floppy", "frontpage", "frr", "ftp", "games", "ganesha",
+        "gdm", "geoclue", "glance", "gluster", "gopher", "haclient", "haldaemon", "haproxy", "heat", "hsqldb",
+        "ident", "input", "jbosson", "jetty", "jonas", "kea", "keylime", "keystone", "ldap", "libstoragemgmt",
+        "lighttpd", "lock", "lp", "luci", "mail", "mailman", "mailnull", "majordomo", "man", "mem",
+        "mock", "mongodb", "munge", "munin", "myproxy", "mysql", "named", "netdump", "news", "nobody",
+        "nocpulse", "nova", "nscd", "ntp", "nut", "ods", "openvswitch", "oprofile", "ovirt", "ovirtagent",
+        "pcp", "pegasus", "pesign", "pkcs11", "pkiuser", "piranha", "plasmalogin", "plocate", "polkitd", "polkituser",
+        "popusers", "postdrop", "postfix", "postgres", "pppusers", "prelude-manager", "printadmin", "privoxy", "pulse", "puppet",
+        "pvm", "qat", "qemu", "qgs", "quagga", "quaggavt", "quantum", "rabbitmq", "radiusd", "radvd",
+        "realtime", "render", "retrace", "rhevm", "ricci", "root", "rpc", "rpcuser", "rpm", "rtkit",
+        "sabayon", "saned", "sanlock", "saslauth", "screen", "sddm", "setroubleshoot", "sgx", "slipusers", "slocate",
+        "smmsp", "smtpq", "snortd", "squid", "sshd", "sssd", "stap-server", "stapdev", "stapsys", "stapusr",
+        "swift", "sys", "systemd-journal", "systemd-network", "systemd-resolve", "tape", "tcpdump", "telegraf", "tlog", "tomcat",
+        "tss", "tty", "unbound", "usbmuxd", "users", "usershares", "utempter", "utmp", "uucp", "uuidd",
+        "valkey", "varnish", "vcsa", "vhostmd", "video", "virtlogin", "virusgroup", "wallaby", "wbpriv", "webalizer",
+        "wheel", "wildfly", "wine", "wireshark", "wnn", "xfs",
+]
