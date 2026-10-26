@@ -34,6 +34,9 @@ strict class inheritance; a leaf can combine several independent profiles.
   `FirstPartyOpenSSLProvider`.
 - `MarketplacePackages`: boot-neutral Marketplace payload; requires
   `FirstPartyOpenSSLProvider` for the SymCrypt OpenSSL provider.
+- `UkiBootCore`: requires `SystemCore` and `UefiFstab`; selects stock shim,
+  systemd-boot, kernel-uki-virt, and azurelinux-uki-boot packages only. The ESP
+  layout is package-owned, not staged by a KIWI hook.
 - `UefiFstab`: supplies the UEFI fstab configuration script.
 - `PackageManagement`: supplies the Azure Linux repository configuration for
   bootstrap and image package management; selected by image leaves.
@@ -43,6 +46,7 @@ strict class inheritance; a leaf can combine several independent profiles.
 Arrows mean "requires"; `+` combines requirements of a leaf:
 
 ```text
+UkiBootCore -> SystemCore + UefiFstab
 StandardCloudCore -> CloudCore -> SystemCore
                   \-> StandardBootCore -> SystemCore
 OnePBase -> VmBaseCore + FirstPartyOpenSSLProvider
