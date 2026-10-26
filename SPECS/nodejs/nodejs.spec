@@ -1,5 +1,5 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 11.19.0
+%define npm_version 11.19.1
 
 %global nodejs_datadir %{_datarootdir}/nodejs
 
@@ -15,7 +15,7 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        24.21.0
+Version:        24.22.1
 Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
@@ -35,8 +35,8 @@ Patch2:         CVE-2024-22195.patch
 Patch3:         CVE-2020-28493.patch
 Patch4:         CVE-2024-34064.patch
 Patch5:         CVE-2025-27516.patch
-Patch6:         CVE-2026-15157.patch
-BuildRequires:  brotli-devel
+
+BuildRequires:  brotli-devel >= 1.2.1
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
@@ -48,7 +48,7 @@ BuildRequires:  unzip
 BuildRequires:  which
 BuildRequires:  zlib-devel
 BuildRequires:  perl-WWW-Curl
-Requires:       brotli
+Requires:       brotli >= 1.2.1
 Requires:       c-ares
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
@@ -69,7 +69,7 @@ The Node.js package ecosystem, npm, is the largest ecosystem of open source libr
 Summary:        Development files node
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
-Requires:       brotli-devel
+Requires:       brotli-devel >= 1.2.1
 Requires:       openssl-devel >= 1.1.1
 Requires:       zlib-devel
 Provides:       nodejs-devel = %{version}-%{release}
@@ -193,6 +193,15 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Wed Oct 21 2026 Kanishk Bansal <kanbansal@microsoft.com> - 24.22.1-1
+- Upgrade to 24.22.1 for CVE-2026-105481, CVE-2026-105482, CVE-2026-105483,
+  CVE-2026-106069, CVE-2026-106073, CVE-2026-106074, CVE-2026-111497
+- Require Brotli >= 1.2.1 for the fixed decoder and updated headers.
+
+* Wed Oct 14 2026 Kanishk Bansal <kanbansal@microsoft.com> - 24.22.0-1
+- Upgrade to 24.22.0 'Krypton' (LTS) (bundled npm 11.19.1, undici 6.28.0) for CVE-2026-16729
+- Remove patch for CVE-2026-15157
+
 * Wed Sep 09 2026 Kanishk Bansal <kanbansal@microsoft.com> - 24.21.0-1
 - Upgrade to 24.21.0 for CVE-2026-18149 CVE-2026-18540
 

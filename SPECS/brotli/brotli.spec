@@ -1,7 +1,7 @@
 Summary:        Lossless compression algorithm
 Name:           brotli
-Version:        1.1.0
-Release:        2%{?dist}
+Version:        1.2.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -68,16 +68,16 @@ cd build
 
 cd ..
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
-install -dm755 "%{buildroot}%{_mandir}/man3"
-cd docs
-for i in *.3;do
-install -m644 "$i" "%{buildroot}%{_mandir}/man3/${i}brotli"
-done
+
+# Names of C API (section 3) man pages are too generic; rename them from .3 to
+# .3brotli (which is how they were manually installed in the past anyway)
+find %{buildroot}%{_mandir}/man3 -name '*.3' -exec mv -v '{}' '{}brotli' ';'
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %check
+cd build
 %ctest
 
 %files
@@ -85,6 +85,7 @@ done
 %{_libdir}/libbrotlicommon.so.1*
 %{_libdir}/libbrotlidec.so.1*
 %{_libdir}/libbrotlienc.so.1*
+%{_mandir}/man1/brotli.1*
 %license LICENSE
 
 # Note that there is no %%files section for the unversioned python module
@@ -110,6 +111,9 @@ done
 %{_mandir}/man3/constants.h.3brotli*
 
 %changelog
+* Thu Oct 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.1-1
+- Upgrade to 1.2.1 for CVE-2026-111497
+
 * Fri Jun 14 2024 Sam Meluch <sammeluch@microsoft.com> - 1.1.0-2
 - fix package tests
 

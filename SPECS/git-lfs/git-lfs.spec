@@ -2,7 +2,7 @@
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.6.1
-Release:       6%{?dist}
+Release:       7%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,10 @@ Source1:       %{name}-%{version}-vendor.tar.gz
 Patch0:        CVE-2025-22870.patch
 Patch1:        CVE-2026-39821.patch
 Patch2:        CVE-2026-56852.patch
+Patch3:        CVE-2026-78659.patch
+Patch4:        CVE-2026-78660.patch
+Patch5:        CVE-2026-78669.patch
+Patch6:        CVE-2026-97032.patch
 
 BuildRequires: golang
 BuildRequires: which
@@ -80,6 +84,9 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.6.1-7
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
+
 * Wed Sep 02 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 3.6.1-6
 - Drop 'GOEXPERIMENT=ms_nocgo_opensslcrypto', removed in Go 1.27. Systemcrypto is
   now selected automatically and supports CGO_ENABLED=0 on Linux.

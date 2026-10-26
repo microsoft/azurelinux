@@ -1127,8 +1127,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.20.29",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.29/bind-9.20.29.tar.xz"
+          "version": "9.20.30",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.30/bind-9.20.30.tar.xz"
         }
       }
     },
@@ -1297,8 +1297,8 @@
         "type": "other",
         "other": {
           "name": "brotli",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/google/brotli/archive/refs/tags/v1.1.0.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/google/brotli/archive/refs/tags/v1.2.1.tar.gz"
         }
       }
     },
@@ -2077,8 +2077,8 @@
         "type": "other",
         "other": {
           "name": "containerd2",
-          "version": "2.3.6",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.6.tar.gz"
+          "version": "2.3.7",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.7.tar.gz"
         }
       }
     },
@@ -3048,8 +3048,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "23.11.3",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-23.11.3.tar.xz"
+          "version": "23.11.8",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-23.11.8.tar.xz"
         }
       }
     },
@@ -3458,8 +3458,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.34",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.34.tar.gz"
+          "version": "3.5.35",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.35.tar.gz"
         }
       }
     },
@@ -4760,8 +4760,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.9",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.9-1/go1.26.9-20261008.11.src.tar.gz"
+          "version": "1.26.10",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.10-1/go1.26.10-20261020.3.src.tar.gz"
         }
       }
     },
@@ -4770,8 +4770,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.27.2",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.2-1/go1.27.2-20261008.10.src.tar.gz"
+          "version": "1.27.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.3-1/go1.27.3-20261020.4.src.tar.gz"
         }
       }
     },
@@ -6690,8 +6690,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.158.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "4.1.0.kata0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/4.1.0.kata0.tar.gz"
+          "version": "4.1.0.kata1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/4.1.0.kata1.tar.gz"
         }
       }
     },
@@ -8381,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.158.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -8391,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.158.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -8401,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.158.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -8411,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.18.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.48.1.tar.gz"
+          "version": "6.18.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.57.1.tar.gz"
         }
       }
     },
@@ -8421,8 +8421,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.18.48.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.48.1.tar.gz"
+          "version": "6.18.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.57.1.tar.gz"
         }
       }
     },
@@ -8431,8 +8431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.158.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.158.1.tar.gz"
+          "version": "6.6.159.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
         }
       }
     },
@@ -12181,8 +12181,8 @@
         "type": "other",
         "other": {
           "name": "libXi",
-          "version": "1.8.1",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.8.1.tar.gz"
+          "version": "1.8.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.8.4.tar.gz"
         }
       }
     },
@@ -12271,8 +12271,8 @@
         "type": "other",
         "other": {
           "name": "libXpm",
-          "version": "3.5.19",
-          "downloadUrl": "https://www.x.org/archive//individual/lib/libXpm-3.5.19.tar.xz"
+          "version": "3.5.20",
+          "downloadUrl": "https://www.x.org/archive//individual/lib/libXpm-3.5.20.tar.xz"
         }
       }
     },
@@ -12351,8 +12351,8 @@
         "type": "other",
         "other": {
           "name": "libXtst",
-          "version": "1.2.4",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.4.tar.gz"
+          "version": "1.2.6",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.6.tar.gz"
         }
       }
     },
@@ -14612,8 +14612,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "24.21.0",
-          "downloadUrl": "https://nodejs.org/download/release/v24.21.0/node-v24.21.0.tar.xz"
+          "version": "24.22.1",
+          "downloadUrl": "https://nodejs.org/download/release/v24.22.1/node-v24.22.1.tar.xz"
         }
       }
     },
@@ -26774,8 +26774,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.3.5",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.5.tar.gz"
+          "version": "3.3.13",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.13.tar.gz"
         }
       }
     },
@@ -29876,8 +29876,8 @@
         "type": "other",
         "other": {
           "name": "unbound",
-          "version": "1.26.1",
-          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.26.1.tar.gz"
+          "version": "1.26.2",
+          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.26.2.tar.gz"
         }
       }
     },
