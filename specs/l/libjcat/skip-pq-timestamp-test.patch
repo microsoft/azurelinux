@@ -1,0 +1,23 @@
+From: Tobias Brick <tobiasb@microsoft.com>
+Subject: [PATCH] tests: exclude the broken GnuTLS PQ timestamp case in Meson
+
+GnuTLS 3.8.13 rejects SHAKE-256 content hashing when generating signed
+attributes for an ML-DSA-87 PKCS7 signature. Keep the rest of the test
+suite enabled instead of disabling the entire package check section.
+
+Limit the exclusion to Meson's invocation so the installed self-test
+still contains the original case for direct diagnosis. Remove this
+workaround when the original test passes with a corrected GnuTLS.
+
+Upstream: https://gitlab.com/gnutls/gnutls/-/work_items/1982
+Azure Linux: https://dev.azure.com/mariner-org/mariner/_workitems/edit/22607
+
+--- libjcat/meson.build
++++ libjcat/meson.build
+@@ -276,3 +276,5 @@
+   )
+-  test('jcat-self-test', e, env : testdatadirs)
++  test('jcat-self-test', e, env : testdatadirs,
++       args : ['-x', '/jcat/engine{pkcs7-self-signed-pq-gnutls}'],
++  )
+ endif

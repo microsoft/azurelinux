@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+bugs = [
+  { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22607" },
+  { url = "https://gitlab.com/gnutls/gnutls/-/work_items/1982" },
+]
+
+[[overlays]]
+description = "Restore %check while excluding only the PQ timestamp test until GnuTLS signing is fixed"
+type = "patch-add"
+source = "skip-pq-timestamp-test.patch"
