@@ -7,19 +7,20 @@
 
 %define _missing_build_ids_terminate_build 0
 
-%global sha dc700f99f4
+%global srctag v1.9.0-1
+%global sha 0238166fefcc8e22c0a66a67a317f556c34c283d
 %global msvm_version 26.0.37
 
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
-Version:        1.8.4
+Version:        1.9.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/microsoft/kubevirt
-Source0:        https://github.com/microsoft/kubevirt/archive/refs/tags/build-%{sha}.tar.gz#/%{name}-%{sha}.tar.gz
+Source0:        https://github.com/microsoft/kubevirt/archive/refs/tags/openvmm-%{srctag}.tar.gz#/%{name}-%{srctag}.tar.gz
 %ifarch x86_64
 Source1:        https://github.com/microsoft/mu_msvm/releases/download/v%{msvm_version}/firmware-RELEASE-X64-VS2022.tar.gz
 Source2:        x64.json
@@ -135,7 +136,7 @@ Group:          System/Packages
 The package provides Kubevirt end-to-end tests.
 
 %prep
-%autosetup -p1 -n kubevirt-build-%{sha}
+%autosetup -p1 -n kubevirt-openvmm-%{srctag}
 
 %build
 mkdir -p go/src/kubevirt.io go/pkg
@@ -296,6 +297,6 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 %{_bindir}/virt-tests
 
 %changelog
-* Tue Oct 13 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.8.4-1
+* Mon Oct 26 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.9.0-1
 - Add temporary x86 OpenVMM firmware and UEFI templates
 - Original version for Azure Linux
