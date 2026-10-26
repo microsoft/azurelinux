@@ -1,0 +1,31 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Make the matching preload library source available before prep; the published stdbuf crate otherwise embeds an empty placeholder"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "rust-uu_stdbuf_libstdbuf-devel = %{version}"
+
+[[overlays]]
+description = "Restore the omitted nested crate and its cdylib target so upstream build.rs embeds a working libstdbuf instead of its empty crates.io placeholder"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    'cp -pr %{cargo_registry}/uu_stdbuf_libstdbuf-%{version} src/libstdbuf',
+    '''sed -i 's/^crate-type = \["lib"\]$/crate-type = ["cdylib"]/' src/libstdbuf/Cargo.toml''',
+]
+
+[[overlays]]
+description = "Keep the nested preload library in the installed source crate; Cargo's package file list otherwise excludes nested packages needed by downstream builds"
+type = "spec-search-replace"
+regex = '^%cargo_install$'
+replacement = '''%cargo_install
+install -d %{buildroot}%{crate_instdir}/src/libstdbuf
+cp -pr src/libstdbuf/{Cargo.toml,LICENSE,build.rs,src} %{buildroot}%{crate_instdir}/src/libstdbuf/'''
+
+[[overlays]]
+description = "Build the nested library from a writable OUT_DIR copy because installed source crates are read-only to downstream build users"
+type = "patch-add"
+source = "../0001-build-preload-library-from-writable-source.patch"
