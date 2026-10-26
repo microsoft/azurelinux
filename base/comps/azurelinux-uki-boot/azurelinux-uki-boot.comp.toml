@@ -1,0 +1,2 @@
+[components.azurelinux-uki-boot]
+spec = { type = "local", path = "azurelinux-uki-boot.spec" }
