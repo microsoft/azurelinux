@@ -1,0 +1,42 @@
+From 86ec48882bd0b06268f93033bce9eea168188fae Mon Sep 17 00:00:00 2001
+From: Michael Chang <mchang@suse.com>
+Date: Thu, 3 Oct 2024 15:23:22 +0800
+Subject: [PATCH] commands/tpm: Skip loopback image measurement
+
+The loopback image is configured to function as a disk by being mapped
+as a block device. Instead of measuring the entire block device we
+should focus on tracking the individual files accessed from it. For
+example, we do not directly measure block devices like hd0 disk but the
+files opened from it.
+
+This method is important to avoid running out of memory since loopback
+images can be very large. Trying to read and measure the whole image at
+once could cause out of memory errors and disrupt the boot process.
+
+Signed-off-by: Michael Chang <mchang@suse.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/commands/tpm.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/grub-core/commands/tpm.c b/grub-core/commands/tpm.c
+index 324423ef86..dde74ab836 100644
+--- a/grub-core/commands/tpm.c
++++ b/grub-core/commands/tpm.c
+@@ -36,6 +36,16 @@ grub_tpm_verify_init (grub_file_t io,
+ {
+   *context = io->name;
+   *flags |= GRUB_VERIFY_FLAGS_SINGLE_CHUNK;
++
++  /*
++   * The loopback image is mapped as a disk allowing it to function like
++   * a block device. However, we measure files read from the block device
++   * not the device itself. For example, we don't measure block devices like
++   * hd0 disk directly. This process is crucial to prevent out-of-memory
++   * errors as loopback images are inherently large.
++   */
++  if ((type & GRUB_FILE_TYPE_MASK) == GRUB_FILE_TYPE_LOOPBACK)
++    *flags = GRUB_VERIFY_FLAGS_SKIP_VERIFICATION;
+   return GRUB_ERR_NONE;
+ }
+ 
