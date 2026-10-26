@@ -1,7 +1,7 @@
-diff -up firefox-149.0/build/moz.configure/lto-pgo.configure.pgo firefox-149.0/build/moz.configure/lto-pgo.configure
---- firefox-149.0/build/moz.configure/lto-pgo.configure.pgo	2026-03-18 20:22:14.000000000 +0100
-+++ firefox-149.0/build/moz.configure/lto-pgo.configure	2026-03-19 16:01:12.682983612 +0100
-@@ -96,12 +96,16 @@ set_config("PGO_PROFILE_PATH", pgo_profi
+diff -up firefox-158.0-build/firefox-158.0/build/moz.configure/lto-pgo.configure.pgo firefox-158.0-build/firefox-158.0/build/moz.configure/lto-pgo.configure
+--- firefox-158.0-build/firefox-158.0/build/moz.configure/lto-pgo.configure.pgo	2026-10-08 04:24:00.000000000 +0200
++++ firefox-158.0-build/firefox-158.0/build/moz.configure/lto-pgo.configure	2026-10-12 10:49:11.930537361 +0200
+@@ -103,12 +103,16 @@ set_config("PGO_PROFILE_PATH", pgo_profi
  
  @depends(
      "--enable-profile-use",
@@ -19,7 +19,7 @@ diff -up firefox-149.0/build/moz.configure/lto-pgo.configure.pgo firefox-149.0/b
      if not profile_use:
          return None
  
-@@ -145,7 +149,7 @@ def pgo_flags(
+@@ -152,7 +156,7 @@ def pgo_flags(
          return namespace(
              gen_cflags=["-fprofile-generate"],
              gen_ldflags=["-fprofile-generate"],
@@ -28,9 +28,9 @@ diff -up firefox-149.0/build/moz.configure/lto-pgo.configure.pgo firefox-149.0/b
              use_ldflags=["-fprofile-use"],
          )
  
-diff -up firefox-149.0/build/pgo/profileserver.py.pgo firefox-149.0/build/pgo/profileserver.py
---- firefox-149.0/build/pgo/profileserver.py.pgo	2026-03-18 20:22:14.000000000 +0100
-+++ firefox-149.0/build/pgo/profileserver.py	2026-03-19 16:01:12.683616555 +0100
+diff -up firefox-158.0-build/firefox-158.0/build/pgo/profileserver.py.pgo firefox-158.0-build/firefox-158.0/build/pgo/profileserver.py
+--- firefox-158.0-build/firefox-158.0/build/pgo/profileserver.py.pgo	2026-10-08 04:23:59.000000000 +0200
++++ firefox-158.0-build/firefox-158.0/build/pgo/profileserver.py	2026-10-12 10:49:11.930741080 +0200
 @@ -10,7 +10,7 @@ import subprocess
  import sys
  
@@ -40,7 +40,7 @@ diff -up firefox-149.0/build/pgo/profileserver.py.pgo firefox-149.0/build/pgo/pr
  from mozfile import TemporaryDirectory, json
  from mozhttpd import MozHttpd
  from mozprofile import FirefoxProfile, Preferences
-@@ -96,9 +96,22 @@ if __name__ == "__main__":
+@@ -139,9 +139,22 @@ if __name__ == "__main__":
      locations = ServerLocations()
      locations.add_host(host="127.0.0.1", port=PORT, options="primary,privileged")
  
@@ -66,10 +66,10 @@ diff -up firefox-149.0/build/pgo/profileserver.py.pgo firefox-149.0/build/pgo/pr
  
      with TemporaryDirectory() as profilePath:
          # TODO: refactor this into mozprofile
-diff -up firefox-149.0/gfx/2d/moz.build.pgo firefox-149.0/gfx/2d/moz.build
---- firefox-149.0/gfx/2d/moz.build.pgo	2026-03-18 20:22:14.000000000 +0100
-+++ firefox-149.0/gfx/2d/moz.build	2026-03-19 16:01:12.683756212 +0100
-@@ -132,11 +132,11 @@ if CONFIG["INTEL_ARCHITECTURE"]:
+diff -up firefox-158.0-build/firefox-158.0/gfx/2d/moz.build.pgo firefox-158.0-build/firefox-158.0/gfx/2d/moz.build
+--- firefox-158.0-build/firefox-158.0/gfx/2d/moz.build.pgo	2026-10-08 04:24:02.000000000 +0200
++++ firefox-158.0-build/firefox-158.0/gfx/2d/moz.build	2026-10-12 10:49:11.930892880 +0200
+@@ -125,11 +125,11 @@ if CONFIG["INTEL_ARCHITECTURE"]:
      DEFINES["USE_SSE2"] = True
      # The file uses SSE2 intrinsics, so it needs special compile flags on some
      # compilers.
@@ -83,9 +83,9 @@ diff -up firefox-149.0/gfx/2d/moz.build.pgo firefox-149.0/gfx/2d/moz.build
      SOURCES["SwizzleSSE2.cpp"].flags += CONFIG["SSE2_FLAGS"]
      SOURCES["SwizzleSSSE3.cpp"].flags += CONFIG["SSSE3_FLAGS"]
  
-diff -up firefox-149.0/gfx/skia/generate_mozbuild.py.pgo firefox-149.0/gfx/skia/generate_mozbuild.py
---- firefox-149.0/gfx/skia/generate_mozbuild.py.pgo	2026-03-18 20:22:14.000000000 +0100
-+++ firefox-149.0/gfx/skia/generate_mozbuild.py	2026-03-19 16:01:12.683902041 +0100
+diff -up firefox-158.0-build/firefox-158.0/gfx/skia/generate_mozbuild.py.pgo firefox-158.0-build/firefox-158.0/gfx/skia/generate_mozbuild.py
+--- firefox-158.0-build/firefox-158.0/gfx/skia/generate_mozbuild.py.pgo	2026-10-08 04:24:01.000000000 +0200
++++ firefox-158.0-build/firefox-158.0/gfx/skia/generate_mozbuild.py	2026-10-12 10:49:11.931087713 +0200
 @@ -50,8 +50,8 @@ if CONFIG['MOZ_WIDGET_TOOLKIT'] == 'wind
  if CONFIG['INTEL_ARCHITECTURE']:
      SOURCES['skia/modules/skcms/skcms.cc'].flags += ['-DSKCMS_DISABLE_SKX']
@@ -97,10 +97,10 @@ diff -up firefox-149.0/gfx/skia/generate_mozbuild.py.pgo firefox-149.0/gfx/skia/
      SOURCES['skia/src/core/SkBitmapProcState_opts_ssse3.cpp'].flags += skia_ssse3_flags
      SOURCES['skia/src/core/SkBlitMask_opts_ssse3.cpp'].flags += skia_ssse3_flags
      SOURCES['skia/src/core/SkSwizzler_opts_ssse3.cpp'].flags += ['-Dskvx=skvx_ssse3']
-diff -up firefox-149.0/gfx/skia/moz.build.pgo firefox-149.0/gfx/skia/moz.build
---- firefox-149.0/gfx/skia/moz.build.pgo	2026-03-18 20:22:14.000000000 +0100
-+++ firefox-149.0/gfx/skia/moz.build	2026-03-19 16:01:12.684039243 +0100
-@@ -603,8 +603,8 @@ if CONFIG['MOZ_WIDGET_TOOLKIT'] == 'wind
+diff -up firefox-158.0-build/firefox-158.0/gfx/skia/moz.build.pgo firefox-158.0-build/firefox-158.0/gfx/skia/moz.build
+--- firefox-158.0-build/firefox-158.0/gfx/skia/moz.build.pgo	2026-10-08 04:24:02.000000000 +0200
++++ firefox-158.0-build/firefox-158.0/gfx/skia/moz.build	2026-10-12 10:49:11.931233511 +0200
+@@ -602,8 +602,8 @@ if CONFIG['MOZ_WIDGET_TOOLKIT'] == 'wind
  if CONFIG['INTEL_ARCHITECTURE']:
      SOURCES['skia/modules/skcms/skcms.cc'].flags += ['-DSKCMS_DISABLE_SKX']
      skia_ssse3_flags = ['-Dskvx=skvx_ssse3', '-mssse3']
@@ -111,10 +111,10 @@ diff -up firefox-149.0/gfx/skia/moz.build.pgo firefox-149.0/gfx/skia/moz.build
      SOURCES['skia/src/core/SkBitmapProcState_opts_ssse3.cpp'].flags += skia_ssse3_flags
      SOURCES['skia/src/core/SkBlitMask_opts_ssse3.cpp'].flags += skia_ssse3_flags
      SOURCES['skia/src/core/SkSwizzler_opts_ssse3.cpp'].flags += ['-Dskvx=skvx_ssse3']
-diff -up firefox-149.0/toolkit/components/terminator/nsTerminator.cpp.pgo firefox-149.0/toolkit/components/terminator/nsTerminator.cpp
---- firefox-149.0/toolkit/components/terminator/nsTerminator.cpp.pgo	2026-03-18 19:54:05.000000000 +0100
-+++ firefox-149.0/toolkit/components/terminator/nsTerminator.cpp	2026-03-19 16:01:55.737755729 +0100
-@@ -338,6 +338,11 @@ void nsTerminator::StartWatchdog() {
+diff -up firefox-158.0-build/firefox-158.0/toolkit/components/terminator/nsTerminator.cpp.pgo firefox-158.0-build/firefox-158.0/toolkit/components/terminator/nsTerminator.cpp
+--- firefox-158.0-build/firefox-158.0/toolkit/components/terminator/nsTerminator.cpp.pgo	2026-10-08 04:24:22.000000000 +0200
++++ firefox-158.0-build/firefox-158.0/toolkit/components/terminator/nsTerminator.cpp	2026-10-12 10:56:12.360515515 +0200
+@@ -403,6 +403,11 @@ void nsTerminator::StartWatchdog() {
    }
  #endif
  
@@ -123,6 +123,6 @@ diff -up firefox-149.0/toolkit/components/terminator/nsTerminator.cpp.pgo firefo
 +  // silently produce poorly performing binary.
 +  crashAfterMS = INT32_MAX;
 +
-   UniquePtr<Options> options(new Options());
-   // Guarantee that crashAfterTicks is non-zero
-   options->crashAfterTicks = std::max(1, crashAfterMS / HEARTBEAT_INTERVAL_MS);
+   // Guarantee that gCrashAfterTicks is non-zero
+   gCrashAfterTicks = std::max(1, crashAfterMS / HEARTBEAT_INTERVAL_MS);
+ 

@@ -6,7 +6,7 @@ diff -up firefox-134.0.1/toolkit/moz.configure.wasi firefox-134.0.1/toolkit/moz.
          if wasi_sysroot:
              log.info("Using wasi sysroot in %s", wasi_sysroot)
 -            return ["--sysroot=%s" % wasi_sysroot]
-+            return ["--sysroot=%s" % wasi_sysroot, "-nodefaultlibs",  "-lc", "-lwasi-emulated-process-clocks", "-lc++", "-lc++abi", "/raid/CVS/firefox/firefox-156.0.1-build/firefox-156.0.1/wasi-sdk-30/build/sysroot/install/wasi-resource-dir/lib/wasm32-unknown-wasip1/libclang_rt.builtins.a"]
++            return ["--sysroot=%s" % wasi_sysroot, "-nodefaultlibs",  "-lc", "-lwasi-emulated-process-clocks", "-lc++", "-lc++abi", "/raid/CVS/firefox/firefox-158.0.1-build/firefox-158.0.1/wasi-sdk-30/build/sysroot/install/wasi-resource-dir/lib/wasm32-unknown-wasip1/libclang_rt.builtins.a"]
          return []
  
      set_config("WASI_SYSROOT", wasi_sysroot)

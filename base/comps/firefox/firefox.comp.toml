@@ -1,1 +1,4 @@
 [components.firefox]
+# Import the latest Fedora 43 Firefox without advancing the distro-wide snapshot.
+# https://src.fedoraproject.org/rpms/firefox/c/0f5fdec15e04b35d2bc38d7edf5a2f32c3837548
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "0f5fdec15e04b35d2bc38d7edf5a2f32c3837548" }
