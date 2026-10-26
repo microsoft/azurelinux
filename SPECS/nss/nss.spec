@@ -13,7 +13,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.96.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,7 @@ Source1:        nss-util.pc.in
 Source2:        nss-util-config.in
 Source3:        nss.pc.in
 Source4:        nss-config.in
+Patch0:         distrust-compromised-ca-roots.patch
 BuildRequires:  nspr-devel >= %{nspr_version}
 BuildRequires:  sqlite-devel
 Provides:       %{name}-softokn = %{version}-%{release}
@@ -215,6 +216,10 @@ popd
 %{_bindir}/ssltap
 
 %changelog
+* Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.96.1-4
+- Explicitly distrust affected eMudhra and AAA roots in the builtin trust module.
+- Mark the downstream builtin trust-store revision as 2.65.
+
 * Tue Aug 27 2024 Chris Gunn <chrisgun@microsoft.com> - 3.96.1-3
 - Disable building DBM backend.
 

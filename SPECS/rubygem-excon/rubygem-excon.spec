@@ -3,7 +3,7 @@
 Summary:        Extended http(s) Connections
 Name:           rubygem-%{gem_name}
 Version:        0.102.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,8 @@ URL:            https://github.com/excon/excon
 Source0:        https://github.com/excon/excon/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Patch0:         fix-file_list.patch
 Patch1:         CVE-2026-54171.patch
+Patch2:         remove-compromised-ca-roots.patch
+Patch3:         add-sslcom-tls-ecc-root-2022.patch
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
@@ -33,6 +35,12 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Sun Oct 25 2026 Sean Dougherty <sdougherty@microsoft.com> - 0.102.0-4
+- Add the trusted SSL.com TLS ECC Root CA 2022 to retain unaffected TLS paths.
+
+* Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 0.102.0-3
+- Remove affected eMudhra and AAA roots from the additive bundled trust store.
+
 * Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.102.0-2
 - Patch for CVE-2026-54171
 

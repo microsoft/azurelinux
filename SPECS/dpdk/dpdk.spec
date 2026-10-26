@@ -29,7 +29,7 @@
 %bcond_without tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
-Version:        23.11.3
+Version:        23.11.8
 Release:        1%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
@@ -179,6 +179,9 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %endif
 
 %changelog
+* Sun Oct 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 23.11.8-1
+- Auto-upgrade to 23.11.8 - for CVE-2026-100236 CVE-2026-86562 CVE-2026-86564 CVE-2026-86565 CVE-2026-86567
+
 * Fri Dec 20 2024 Jon Slobodzian <joslobo@microsoft.com> - 23.11.3-1
 - Updgrade to 23.11.3 to resolve CVE-2024-11614.
 

@@ -9,7 +9,7 @@
 
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.20.29
+Version:        9.20.30
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
@@ -536,6 +536,9 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
+* Thu Oct 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.30-1
+- Auto-upgrade to 9.20.30 - for CVE-2026-94300
+
 * Sat Sep 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.29-1
 - Auto-upgrade to 9.20.29 - for CVE-2026-19033, CVE-2026-19662, CVE-2026-19666, CVE-2026-19667,
   CVE-2026-19668, CVE-2026-19941, CVE-2026-75029, CVE-2026-76163, CVE-2026-77119, CVE-2026-77692,

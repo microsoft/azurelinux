@@ -2,7 +2,7 @@
 Summary:        The Squid proxy caching server
 Name:           squid
 Version:        6.13
-Release:        5%{?dist}
+Release:        6%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:       GPL-2.0-or-later AND (LGPL-2.0-or-later AND MIT AND BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause AND BSD-4-Clause-UC AND LicenseRef-Fedora-Public-Domain AND Beerware)  
@@ -38,6 +38,7 @@ Patch210: CVE-2026-33515.patch
 Patch211: CVE-2026-33526.patch
 Patch212: CVE-2026-47729.patch
 Patch213: CVE-2026-50012.patch
+Patch214: CVE-2026-61642.patch
 
 # cache_swap.sh
 Requires: bash gawk
@@ -321,6 +322,9 @@ fi
     chgrp squid %{_var}/cache/samba/winbindd_privileged >/dev/null 2>&1 || :
 
 %changelog
+* Mon Oct 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.13-6
+- Patch for CVE-2026-61642
+
 * Fri Jul 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.13-5
 - Patch for CVE-2026-50012, CVE-2026-47729
 
