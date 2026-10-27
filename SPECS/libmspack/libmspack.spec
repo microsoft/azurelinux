@@ -21,8 +21,11 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
+
+# Generate upstream regression fixtures.
+head -c 14 /dev/zero > test/test_files/kwajd/blank.kwj
+: > test/test_files/kwajd/empty.kwj
 
 %build
 %configure
