@@ -125,7 +125,7 @@ def test_multilib_and_duplicate_identities(rpm_root: Path) -> None:
 
 
 def test_document_license_suppliers_and_relationships() -> None:
-    """Resolve CC0 and suppliers, and contain exactly the installed packages."""
+    """Resolve Microsoft-namespaced metadata and contain exactly the installed packages."""
     packages = [
         ("busybox", "1-1", "pkg:rpm/azurelinux/busybox@1-1?arch=x86_64", "Microsoft Corporation"),
         ("external", "1-1", "pkg:rpm/azurelinux/external@1-1?arch=noarch", "Other Vendor"),
@@ -133,6 +133,15 @@ def test_document_license_suppliers_and_relationships() -> None:
     ]
     document = _GENERATOR["create_document"]("image", "1", packages, 0)
     graph = document["@graph"]
+    identifiers = {node.get("spdxId", node.get("@id")) for node in graph}
+    assert document["@context"] == "https://spdx.org/rdf/3.0.1/spdx-context.jsonld"
+    assert all(identifier.startswith("https://azurelinux.microsoft.com/spdxdocs/") for identifier in identifiers)
+    for node in graph:
+        for field in ("creationInfo", "suppliedBy", "dataLicense", "from"):
+            if field in node:
+                assert node[field] in identifiers, f"Unresolved {field}: {node[field]}"
+        for field in ("createdBy", "createdUsing", "rootElement", "to"):
+            assert set(node.get(field, [])) <= identifiers, f"Unresolved {field} references"
     nodes = {node["spdxId"]: node for node in graph if "spdxId" in node}
     spdx_document = next(node for node in graph if node["type"] == "SpdxDocument")
     license_node = nodes[spdx_document["dataLicense"]]

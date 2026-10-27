@@ -144,7 +144,10 @@ def create_document(
     """Construct the same SPDX JSON-LD dialect used by SbomToolkit's 3.0 adapter."""
     source_digest = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     seed = json.dumps([name, version, packages, created_epoch, source_digest])
-    namespace = f"https://spdx.org/spdxdocs/{quote(name, safe='')}-{uuid.uuid5(uuid.NAMESPACE_URL, seed)}"
+    namespace = (
+        f"https://azurelinux.microsoft.com/spdxdocs/{quote(name, safe='')}-"
+        f"{uuid.uuid5(uuid.NAMESPACE_URL, seed)}"
+    )
     creation = namespace + "/CreationInfo/0"
     organization = namespace + "/Organization/0"
     tool = namespace + "/Tool/0"
