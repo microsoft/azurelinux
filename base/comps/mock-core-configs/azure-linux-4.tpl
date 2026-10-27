@@ -11,10 +11,10 @@ config_opts['releasever'] = '4.0'
 config_opts['package_manager'] = 'dnf5'
 config_opts['extra_chroot_dirs'] = [ '/run/lock', ]
 
-# Bootstrap from the published Azure Linux 4.0 base/core container image.
+# Bootstrap from the published Azure Linux 4 core container image.
 config_opts['use_bootstrap'] = True
 config_opts['use_bootstrap_image'] = True
-config_opts['bootstrap_image'] = 'mcr.microsoft.com/azurelinux-beta/base/core:4.0'
+config_opts['bootstrap_image'] = 'mcr.microsoft.com/azurelinux/core:4'
 # The image ships dnf5 but not dnf5-plugins, so mark it as not "ready" and
 # let mock install the rest of the bootstrap packages itself.
 config_opts['bootstrap_image_ready'] = False
@@ -40,16 +40,18 @@ user_agent={{ user_agent }}
 
 [azurelinux-base]
 name=Azure Linux $releasever - $basearch - Base
-baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/base/$basearch
+baseurl=https://packages.microsoft.com/azurelinux/4/prod/base/$basearch
 gpgcheck=1
 gpgkey=file:///usr/share/distribution-gpg-keys/azure-linux/MICROSOFT-RPM-GPG-KEY
 enabled=1
+skip_if_unavailable=False
 
 [azurelinux-build-deps]
-name=Azure Linux $releasever - $basearch - Additional Build Dependencies
-baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/sdk/$basearch
+name=Azure Linux $releasever - $basearch - Build Dependencies
+baseurl=https://packages.microsoft.com/azurelinux/4/prod/builddeps/$basearch
 gpgcheck=1
 gpgkey=file:///usr/share/distribution-gpg-keys/azure-linux/MICROSOFT-RPM-GPG-KEY
 enabled=1
+skip_if_unavailable=False
 
 """
