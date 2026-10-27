@@ -1,0 +1,4 @@
+[components.tzdata]
+# Import Fedora 43's latest timezone rules beyond the distro snapshot.
+# Drop this pin once the default snapshot includes this revision.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "74ae775725ebdaab9d51fe66a91c9293fbf0422e" }
