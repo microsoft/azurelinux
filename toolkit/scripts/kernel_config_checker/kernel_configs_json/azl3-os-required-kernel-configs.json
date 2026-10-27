@@ -3555,6 +3555,34 @@
             }
           ],
           "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IFB",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "Selects NET_REDIRECT so act_mirred clears skb->tstamp on ingress redirects; without it the fq qdisc on Kata's tap0_kata drops packets tcfilter redirects from eth0 (upstream 7236ead1b149, 2c64605b590e)"
+        },
+        {
+          "name": "CONFIG_NET_REDIRECT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Selects NET_REDIRECT so act_mirred clears skb->tstamp on ingress redirects; without it the fq qdisc on Kata's tap0_kata drops packets tcfilter redirects from eth0 (upstream 7236ead1b149, 2c64605b590e)"
         }
       ]
     },
