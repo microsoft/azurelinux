@@ -36,6 +36,10 @@ class GoldenImageTagTests(unittest.TestCase):
         )
 
     def setup_script(self, build_number, arch="amd64", base_version="3.0"):
+        build_number_assignment = (
+            "" if build_number is None
+            else f"RELEASE_BUILD_NUMBER={shlex.quote(build_number)}"
+        )
         return f"""
 set -e
 source {COMMON_SCRIPT}
@@ -45,10 +49,57 @@ ACR=example
 REPO_PREFIX=public/azurelinux
 REPOSITORY=base/python
 PUBLISHING_LEVEL=preview
-RELEASE_BUILD_NUMBER={shlex.quote(build_number)}
+{build_number_assignment}
 initialization
 set_release_image_tag
 """
+
+    def test_recorded_stage6_and_bridge_trigger_inputs(self):
+        cases = (
+            (
+                "stage6",
+                "3.0.20261022-fasttrack-1232578",
+                "cblmarineracr2mcrpreview.azurecr.io/public/azurelinux/base/core",
+                "3.12.15-1",
+                "20261022",
+            ),
+            (
+                "bridge",
+                "3.0.20261025-fasttrack-1236358",
+                "mcr.microsoft.com/azurelinux/base/core",
+                "3.12.15-3",
+                "20261025",
+            ),
+        )
+        for trigger, number, base_name, component_version, expected_date in cases:
+            for arch in ("amd64", "arm64"):
+                with self.subTest(trigger=trigger, arch=arch):
+                    base_image = f"{base_name}:3.0.20261022-{arch}"
+                    setup = self.setup_script(None, arch).replace(
+                        f"mcr.microsoft.com/azurelinux/base/core:3.0.20261022-{arch}",
+                        base_image,
+                    )
+                    result = self.run_bash(
+                        GOLDEN_ARGUMENTS + setup + f"""
+docker() {{
+    case "$1" in
+        run) echo test-container ;;
+        exec) echo {component_version} ;;
+    esac
+}}
+VERSION_EXTRACT_CMD=version
+IS_HCI_IMAGE=false
+set_image_tag
+printf 'RESULT:%s|%s\\n' "$CONTAINER_IMAGE_NAME_FINAL" "$BASE_IMAGE_NAME_FULL"
+""",
+                        env={"BUILD_BUILDNUMBER": number},
+                    )
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn(
+                        "RESULT:example.azurecr.io/public/azurelinux/base/python:"
+                        f"{component_version}-azl3.0.{expected_date}-{arch}|{base_image}",
+                        result.stdout,
+                    )
 
     def test_upstream_date_replaces_only_the_output_date(self):
         for arch in ("amd64", "arm64"):
