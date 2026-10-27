@@ -269,6 +269,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 * Mon Oct 26 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-2
 - Enable CONFIG_NETFILTER_XTABLES_LEGACY and restore legacy iptables/ip6tables/arptables/ebtables
   table modules dropped in the 6.18 upgrade
+- Enable CONFIG_IFB on x86_64 so tc mirred redirects clear the receive timestamp (fixes fq
+  dropping traffic redirected into Kata taps)
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
