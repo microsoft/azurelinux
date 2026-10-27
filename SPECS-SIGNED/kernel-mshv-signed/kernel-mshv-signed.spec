@@ -143,6 +143,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 * Tue Oct 27 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.58.mshv1-1
 - Upgrade to 6.18.58.mshv1, using its Microsoft/configs mshv_defconfig
 - Drop vPCI interrupt patch, replaced by the nested root IRQ re-target fix in this release
+- Refresh configs with olddefconfig for new 6.18.58 Kconfig symbols
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
