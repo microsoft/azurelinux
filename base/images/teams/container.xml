@@ -64,9 +64,11 @@
         <package name="filesystem" />
     </packages>
     <packages type="bootstrap" profiles="DistrolessCore">
+        <file name="generate-package-manifest.py" target="/image/generate-package-manifest.py" permissions="0644" />
         <package name="azurelinux-release-container" />
         <package name="busybox" />
         <package name="filesystem" />
+        <package name="python3" />
     </packages>
     <packages type="image" profiles="DistrolessCore">
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />

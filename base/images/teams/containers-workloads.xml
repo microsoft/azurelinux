@@ -66,8 +66,10 @@
       minimal footprint.
     -->
     <packages type="bootstrap" profiles="busybox-workload">
+        <file name="generate-package-manifest.py" target="/image/generate-package-manifest.py" permissions="0644" />
         <package name="azurelinux-release-container" />
         <package name="filesystem" />
+        <package name="python3" />
     </packages>
     <packages type="image" profiles="busybox-workload">
         <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
@@ -83,8 +85,10 @@
         <package name="coreutils-single" />
     </packages>
     <packages type="bootstrap" profiles="WorkloadCore">
+        <file name="generate-package-manifest.py" target="/image/generate-package-manifest.py" permissions="0644" />
         <package name="busybox" />
         <package name="coreutils-single" />
+        <package name="python3" />
     </packages>
 
     <!--
