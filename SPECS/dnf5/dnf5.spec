@@ -680,8 +680,8 @@ done
 
 %changelog
 * Tue Oct 27 2026 Akhila Guruju <v-guakhila@microsoft.com> - 5.1.11-4
-- Replace `XML_GetCurrentLineNumber` with `XML_GetCurrentLineNumber64` in the repo snapshot patch
-  to fix builds with Expat 2.9.0
+- Fix repo snapshot builds with expat 2.9.0 and newer by using `XML_GetCurrentLineNumber64`,
+  while retaining `XML_GetCurrentLineNumber` for compatibility with older expat versions.
 
 * Tue May 06 2025 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-3
 - Add repo snapshot to dnf5
