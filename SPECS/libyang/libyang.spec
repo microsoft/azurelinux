@@ -1,7 +1,7 @@
 Summary:        YANG data modeling language library
 Name:           libyang
 Version:        2.1.148
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ URL:            https://github.com/CESNET/libyang
 Source:         https://github.com/CESNET/libyang/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2026-44673.patch
 Patch1:         CVE-2026-41401.patch
+Patch2:         CVE-2026-115327.patch
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc
@@ -93,6 +94,9 @@ cp -a doc/html %{buildroot}/%{_docdir}/libyang/html
 %{_docdir}/libyang
 
 %changelog
+* Tue Oct 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.148-4
+- Patch for CVE-2026-115327
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.148-3
 - Patch for CVE-2026-41401
 
