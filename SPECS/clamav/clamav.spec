@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        1.5.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
 
 Source1:        %{name}-%{version}-cargo.tar.gz
+Patch0:         CVE-2026-110602.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
@@ -148,6 +149,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Tue Oct 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.4-3
+- Patch for CVE-2026-110602
+
 * Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.5.4-2
 - Bump release to rebuild with rust
 
