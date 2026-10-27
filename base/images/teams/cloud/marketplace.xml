@@ -174,6 +174,7 @@
         <package name="ethtool" />
         <package name="expat" />
         <package name="findutils" />
+        <package name="firewalld" />
         <package name="fstrm" />
         <package name="fuse-libs" />
         <package name="gawk" />
