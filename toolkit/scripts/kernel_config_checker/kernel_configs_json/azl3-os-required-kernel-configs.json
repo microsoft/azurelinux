@@ -3557,6 +3557,222 @@
           "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
         }
       ]
+    },
+    {
+      "name": "kernel-uvm",
+      "inherit_default": false,
+      "kernel_configs": [
+        {
+          "name": "CONFIG_NETFILTER_XTABLES_LEGACY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_NETFILTER_XT_TARGET_TRACE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_IPTABLES_LEGACY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_FILTER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_NAT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_MASQUERADE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_NETMAP",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_REDIRECT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_MANGLE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_TTL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_RAW",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_SECURITY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARPTABLES",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARPFILTER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARP_MANGLE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        }
+      ]
     }
   ]
 }

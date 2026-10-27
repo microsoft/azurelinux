@@ -17,7 +17,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.18.52.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -165,6 +165,10 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Oct 27 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.52.mshv1-2
+- Re-enable legacy xtables (CONFIG_NETFILTER_XTABLES_LEGACY) and build in the iptables and
+  arptables legacy tables dropped in the 6.18 upgrade (fixes iptables-legacy, e.g. istio-init)
+
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.52.mshv1-1
 - Upgrade to 6.18.52.mshv1
 - Disable CONFIG_TEST_HMM and CONFIG_DEVICE_PRIVATE to reduce guest memory usage
