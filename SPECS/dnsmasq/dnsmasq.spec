@@ -1,7 +1,7 @@
 Summary:        DNS proxy with integrated DHCP server
 Name:           dnsmasq
 Version:        2.93
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 or GPLv3
 Group:          System Environment/Daemons
 URL:            https://www.thekelleys.org.uk/dnsmasq/
@@ -61,11 +61,16 @@ EOF
 %exclude %{_libdir}/debug
 %{_sbindir}/*
 %{_mandir}/*
-%{_sysconfdir}/*
+%config(noreplace) %{_sysconfdir}/dnsmasq.conf
+%dir %{_sysconfdir}/dnsmasq.d
+%{_sysconfdir}/dbus-1/system.d/dnsmasq.conf
 %dir %{_sharedstatedir}
 %config  /usr/share/dnsmasq/trust-anchors.conf
 
 %changelog
+* Wed Jul 22 2026 Muhammad Falak <mwani@microsoft.com> - 2.93-2
+- Tag dnsmasq.conf as %config(noreplace)
+
 * Sat Jun 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.93-1
 - Auto-upgrade to 2.93 - for CVE-2026-12969 & CVE-2026-12725
 
