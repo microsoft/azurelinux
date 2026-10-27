@@ -63,12 +63,12 @@
 %bcond_with      modphp
 %bcond_without   lmdb
 
-%global upver        8.4.26
+%global upver        8.4.27
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
 Version: %{upver}%{?rcver:~%{rcver}}
-Release: 5%{?dist}
+Release: 7%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -1504,6 +1504,12 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 
 %changelog
+* Wed Oct 21 2026 Jitka Plesnikova <jplesnik@redhat.com> - 8.4.27-2
+- Bump release number
+
+* Wed Oct 21 2026 Jitka Plesnikova <jplesnik@redhat.com> - 8.4.27-1
+- Update to 8.4.27 - http://www.php.net/releases/8_4_27.php
+
 * Tue Sep 22 2026 Remi Collet <remi@remirepo.net> - 8.4.26-1
 - Update to 8.4.26 - http://www.php.net/releases/8_4_26.php
 
