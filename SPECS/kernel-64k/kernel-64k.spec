@@ -27,7 +27,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.159.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -380,6 +380,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Oct 27 2026 Andy Zaugg <azaugg@linkedin.com> - 6.6.159.1-2
+- Enable hwlat kernel config
+
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.159.1-1
 - Auto-upgrade to 6.6.159.1
 
