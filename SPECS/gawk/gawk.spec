@@ -1,7 +1,7 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
 Version:        5.2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,9 +11,9 @@ Source0:        https://ftp.gnu.org/gnu/gawk/%{name}-%{version}.tar.xz
 Patch0:         CVE-2026-40467.patch
 Patch1:         CVE-2026-40468.patch
 Patch2:         CVE-2026-40553.patch
-Requires:       gmp
-Requires:       mpfr
-Requires:       readline >= 7.0
+# Runtime dependencies on gmp, mpfr and readline are picked up automatically from
+# the linked sonames. Listing them explicitly creates an unresolvable build graph
+# cycle: gawk -> mpfr -> /sbin/ldconfig (glibc) -> BuildRequires: gawk.
 %if 0%{?with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
@@ -58,9 +58,6 @@ useradd testuser -m
 chown -R testuser:testuser .
 sudo -u testuser make %{?_smp_mflags} check
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
@@ -75,6 +72,10 @@ sudo -u testuser make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+* Fri Aug 21 2026 Kshitiz Godara <kgodara@microsoft.com> - 5.2.2-3
+- Drop redundant gmp, mpfr and readline requires and the ldconfig scriptlets to
+  break the circular dependency with glibc.
+
 * Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.2-2
 - Patch for CVE-2026-40553, CVE-2026-40468, CVE-2026-40467
 - Run the test suite as an unprivileged user so the pma test is exercised.
