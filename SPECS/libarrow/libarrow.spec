@@ -13,7 +13,7 @@
  
 Name:	libarrow
 Version:	15.0.0
-Release:	10%{?dist}
+Release:	11%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
@@ -25,6 +25,7 @@ Source0:       https://github.com/apache/arrow/archive/refs/tags/apache-arrow-%{
 Patch0001: 0001-python-pyproject.toml.patch
 Patch0002: CVE-2024-52338.patch
 Patch0003: CVE-2026-25087.patch
+Patch4: CVE-2026-92287.patch
 
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
@@ -245,6 +246,9 @@ popd
 %exclude %{_datadir}/gdb/auto-load%{_libdir}/libarrow.so.*-gdb.py
 
 %changelog
+* Tue Oct 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 15.0.0-11
+- Patch for CVE-2026-92287
+
 * Sat Oct 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 15.0.0-10
 - Bump up to build with latest libthrift.
 
