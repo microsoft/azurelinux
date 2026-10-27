@@ -153,6 +153,13 @@ echo "=== Packages to KEEP (from kiwi XML) ==="
 echo "${RESOLVED_KEEP_PKGS}"
 echo ""
 
+: "${kiwi_iname:?KIWI image name is required}"
+: "${kiwi_iversion:?KIWI image version is required}"
+SBOM_TOOLS=$(mktemp -d /tmp/package-manifest-tools.XXXXXX) \
+    || die "failed to create temporary manifest helper directory"
+python3 /image/generate-package-manifest.py stage "${SBOM_TOOLS}" \
+    || die "failed to stage package manifest tools"
+
 # ---------------------------------------------------------------------------
 # 3a. Force-remove disallowed packages
 # ---------------------------------------------------------------------------
@@ -367,6 +374,15 @@ if printf '%s\n' "${RESOLVED_KEEP_PKGS}" | /tmp/busybox grep -qxF busybox; then
         /tmp/busybox ln -sf /usr/bin/busybox "/usr/bin/${applet}"
     done
 fi
+
+# Package removals are complete; the temporary helpers are not installed RPMs.
+PYTHONPATH= PYTHONHOME="${SBOM_TOOLS}" PYTHONDONTWRITEBYTECODE=1 \
+    "${SBOM_TOOLS}/loader" --library-path "${SBOM_TOOLS}/lib" \
+    "${SBOM_TOOLS}/bin/python3" -S /image/generate-package-manifest.py generate \
+    --root / --name "${kiwi_iname}" --version "${kiwi_iversion}" \
+    --tools-dir "${SBOM_TOOLS}" \
+    || die "failed to generate the final package manifest"
+/tmp/busybox rm -rf -- "${SBOM_TOOLS}"
 
 # Clean up busybox itself.
 /tmp/busybox rm -f /tmp/busybox
