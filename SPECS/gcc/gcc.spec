@@ -364,6 +364,10 @@ ln -sv gcc %{buildroot}%{_bindir}/cc
 install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
 mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
 chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
+# libcc1 follows the build compiler's multi-os dir: lib (raw toolchain) or lib64 (gcc RPM).
+if [ -e %{buildroot}%{_lib64dir}/libcc1.so ]; then
+    mv -v %{buildroot}%{_lib64dir}/libcc1.* %{buildroot}%{_libdir}/
+fi
 
 # Install libbacktrace-static components
 cp %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
@@ -479,7 +483,7 @@ $tests_ok
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_lib64dir}/libcc1.*
+%{_libdir}/libcc1.*
 
 %files c++
 %defattr(-,root,root)
@@ -527,7 +531,6 @@ $tests_ok
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2.0-8
 - Patch for CVE-2026-95619, CVE-2026-102010
-- Package libcc1 from /usr/lib64 in libgcc-devel
 
 * Fri Jun 21 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-7
 - Re-enable CVE-2023-4039.patch and refresh against 13.2.0 source
