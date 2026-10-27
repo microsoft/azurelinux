@@ -23954,7 +23954,7 @@
         "other": {
           "name": "python-msgpack",
           "version": "1.2.3",
-          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v1.2.3.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/msgpack/msgpack-1.2.3.tar.gz"
         }
       }
     },
