@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.3.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -106,6 +106,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Oct 27 2026 Sean Eagan <seaneagan@microsoft.com> - 2.3.7-2
+- Rebuild with Go 1.26.10 for CVE-2026-111943.
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.7-1
 - Upgrade to 2.3.7 for CVE-2026-95839
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-81870
