@@ -560,7 +560,7 @@ index 54dba3eb..20daac3c 100644
 +        // Direct expat to process the buffer
 +        if (XML_ParseBuffer(pParser, static_cast<int>(bytes_read), bytes_read == 0) == XML_STATUS_ERROR) {
 +            std::cerr   << "Parse error at line "
-+                        << XML_GetCurrentLineNumber(pParser)
++                        << XML_GetCurrentLineNumber64(pParser)
 +                        << "\n"
 +                        << XML_ErrorString(XML_GetErrorCode(pParser));
 +            filterContext.bParseError = true;
