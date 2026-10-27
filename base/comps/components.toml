@@ -1877,6 +1877,8 @@ overlay-files = ["overlays/*.overlay.toml"]
 [components.libtimezonemap]
 [components.libtomcrypt]
 [components.libtommath]
+[components.libtoml]
+release = { calculation = "manual" }
 [components.libtool]
 [components.libtpms]
 [components.libtracecmd]
