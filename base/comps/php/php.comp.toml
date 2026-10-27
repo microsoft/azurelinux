@@ -1,0 +1,4 @@
+[components.php]
+# Pin Fedora 43's PHP security update beyond the distro snapshot.
+# Drop this pin once the default snapshot includes this revision.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "f0dedf413b13485d51273cc7f87cb793cfd98f76" }
