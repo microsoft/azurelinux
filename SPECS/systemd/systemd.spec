@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        34%{?dist}
+Release:        35%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -142,6 +142,9 @@ Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 # ukify: fix insertion of padding in merged sections
 # Backport of upstream commit ec1d031f3de02f84beca89e2b402d085fba62be4
 Patch0492:      ukify-fix-insertion-of-padding-in-merged-sections.patch
+
+# Accept certificate issuer formatting with OpenSSL 3.2 and newer.
+Patch0493:      ukify-make-test-happy-with-latest-openssl.patch
 
 # Patches for Azure Linux
 Patch0900:      do-not-test-openssl-sm3.patch
@@ -1259,6 +1262,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Tue Oct 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-35
+- Backport upstream ukify test fix for OpenSSL certificate issuer formatting.
+
 * Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 255-34
 - Patch for CVE-2026-16742, CVE-2026-15059
 
