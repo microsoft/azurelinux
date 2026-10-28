@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libguestfs.azl.macros}
+
 # OCaml packages not built on i686 since OCaml 5 / Fedora 39.
 ExcludeArch: %{ix86}
 
@@ -38,7 +41,7 @@ Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
 Version:       1.58.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License:       LGPL-2.1-or-later
 
 # Build only for architectures that have a kernel
@@ -71,6 +74,7 @@ Source7:       libguestfs.keyring
 
 # Maintainer script which helps with handling patches.
 Source8:       copy-patches.sh
+Source9999: libguestfs.azl.macros
 
 BuildRequires: autoconf, automake, libtool, gettext-devel
 
@@ -333,6 +337,8 @@ Conflicts:     libguestfs-winsupport < 7.2
 %endif
 
 
+BuildRequires: bash-completion-devel
+BuildRequires: btrfs-progs
 %description
 Libguestfs is a library for accessing and modifying virtual machine
 disk images.  http://libguestfs.org
@@ -710,7 +716,7 @@ fi
 
 %{configure} \
 %if 0%{?rhel}
-  QEMU=%{_libexecdir}/qemu-kvm \
+  QEMU=%{_bindir}/qemu-system-%{_build_arch} \
 %endif
   PYTHON=%{__python3} \
   --with-default-backend=libvirt \
