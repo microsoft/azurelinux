@@ -3681,6 +3681,48 @@
             }
           ],
           "justification": "LIO SCSI target with the TCMU userspace backend and the loopback fabric, used by overlaybd (tcmu-runner) for lazily-pulled container images; enabled in 6.6 at customer request"
+        },
+        {
+          "name": "CONFIG_LWTUNNEL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Lightweight tunnels with BPF encap (ip route ... encap bpf) and the tc flower classifier, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_LWTUNNEL_BPF",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Lightweight tunnels with BPF encap (ip route ... encap bpf) and the tc flower classifier, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_NET_CLS_FLOWER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "Lightweight tunnels with BPF encap (ip route ... encap bpf) and the tc flower classifier, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
         }
       ]
     },

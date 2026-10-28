@@ -152,6 +152,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
   6.18 upgrade, with jitterentropy OSR 3 as in the kernel package
 - Re-enable the LIO TCMU (CONFIG_TCM_USER2) and loopback (CONFIG_LOOPBACK_TARGET) SCSI
   targets on x86_64, dropped in the 6.18 upgrade (needed by overlaybd/tcmu-runner)
+- Re-enable CONFIG_LWTUNNEL, CONFIG_LWTUNNEL_BPF and CONFIG_NET_CLS_FLOWER on x86_64, dropped in
+  the 6.18 upgrade
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
