@@ -3639,6 +3639,48 @@
             }
           ],
           "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
+        },
+        {
+          "name": "CONFIG_TARGET_CORE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "LIO SCSI target with the TCMU userspace backend and the loopback fabric, used by overlaybd (tcmu-runner) for lazily-pulled container images; enabled in 6.6 at customer request"
+        },
+        {
+          "name": "CONFIG_TCM_USER2",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "LIO SCSI target with the TCMU userspace backend and the loopback fabric, used by overlaybd (tcmu-runner) for lazily-pulled container images; enabled in 6.6 at customer request"
+        },
+        {
+          "name": "CONFIG_LOOPBACK_TARGET",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "LIO SCSI target with the TCMU userspace backend and the loopback fabric, used by overlaybd (tcmu-runner) for lazily-pulled container images; enabled in 6.6 at customer request"
         }
       ]
     },

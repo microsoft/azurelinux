@@ -150,6 +150,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
   dropping traffic redirected into Kata taps)
 - Re-enable FIPS mode support (CONFIG_CRYPTO_SELFTESTS, CONFIG_CRYPTO_FIPS) dropped in the
   6.18 upgrade, with jitterentropy OSR 3 as in the kernel package
+- Re-enable the LIO TCMU (CONFIG_TCM_USER2) and loopback (CONFIG_LOOPBACK_TARGET) SCSI
+  targets on x86_64, dropped in the 6.18 upgrade (needed by overlaybd/tcmu-runner)
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
