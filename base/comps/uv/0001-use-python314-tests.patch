@@ -1,0 +1,638 @@
+From cdd567e4449ee69d55e6e82ecf8c2e84700e36e1 Mon Sep 17 00:00:00 2001
+From: reuben olinsky <reubeno@users.noreply.github.com>
+Date: Wed, 28 Oct 2026 20:32:49 +0000
+Subject: [PATCH] tests: run resource-limit and minimum-libc cases on Python
+ 3.14
+
+Origin: Azure Linux (original downstream change, not an upstream backport).
+
+The tests in this source version select Python 3.12. This patch was
+authored for Azure Linux to retain their coverage while retiring
+interpreters older than Python 3.14. It is not present in the uv upstream
+repository or in the Fedora commit referenced below.
+
+Retarget the test interpreters, synthetic wheel ABI tags, and expected
+snapshots together. Advance the next-minor marker split from 3.13 to 3.15
+so both sides of the wheel compatibility boundary remain tested.
+No production code or test assertions are removed.
+
+Base source: uv 0.12.19, selected by the locked Fedora dist-git commit:
+6311776fb745af3f8c6edfb79716c4c459d5197b
+https://src.fedoraproject.org/rpms/uv/c/6311776fb745af3f8c6edfb79716c4c459d5197b
+This reference identifies the input package only; it is not the source
+of this Python 3.14 adaptation.
+
+Upstream-Status: Not submitted
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ crates/uv/tests/it/resource_limits.rs |   8 +-
+ crates/uv/tests/lock/minimum_libc.rs  | 174 +++++++++++++-------------
+ 2 files changed, 91 insertions(+), 91 deletions(-)
+
+diff --git a/crates/uv/tests/it/resource_limits.rs b/crates/uv/tests/it/resource_limits.rs
+index 94f47f6..72c0860 100644
+--- a/crates/uv/tests/it/resource_limits.rs
++++ b/crates/uv/tests/it/resource_limits.rs
+@@ -3,7 +3,7 @@ use uv_test::{get_bin, uv_snapshot};
+ 
+ #[test]
+ fn adjust_open_file_limit() {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let python = &context.python_versions[0].1;
+ 
+     let mut command = context.external_command("sh");
+@@ -29,7 +29,7 @@ fn adjust_open_file_limit() {
+ 
+ #[test]
+ fn run_open_file_limit_override() {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let python = &context.python_versions[0].1;
+ 
+     let mut command = context.run();
+@@ -53,7 +53,7 @@ fn run_open_file_limit_override() {
+ 
+ #[test]
+ fn run_open_file_limit_override_invalid() {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let python = &context.python_versions[0].1;
+ 
+     let mut command = context.run();
+@@ -74,7 +74,7 @@ fn run_open_file_limit_override_invalid() {
+ 
+ #[test]
+ fn run_open_file_limit_override_exceeds_hard_limit() {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let python = &context.python_versions[0].1;
+ 
+     let mut command = context.external_command("sh");
+diff --git a/crates/uv/tests/lock/minimum_libc.rs b/crates/uv/tests/lock/minimum_libc.rs
+index 0daee7c..b9265fd 100644
+--- a/crates/uv/tests/lock/minimum_libc.rs
++++ b/crates/uv/tests/lock/minimum_libc.rs
+@@ -44,7 +44,7 @@ fn minimum_libc_retains_locked_wheels() -> Result<()> {
+         wheel_tags = ["py3-none-manylinux_2_17_x86_64", "py3-none-manylinux_2_34_x86_64", "py3-none-musllinux_1_2_x86_64", "py3-none-macosx_11_0_arm64", "py3-none-win_amd64"]
+     "#})?;
+     let server = PackseServer::from_scenario(&scenario);
+-    let context = uv_test::test_context!("3.12").with_filters(
++    let context = uv_test::test_context!("3.14").with_filters(
+         server
+             .files()
+             .map(|(filename, hash)| (hash.to_owned(), format!("[SHA256:{filename}]"))),
+@@ -56,7 +56,7 @@ fn minimum_libc_retains_locked_wheels() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -73,7 +73,7 @@ fn minimum_libc_retains_locked_wheels() -> Result<()> {
+         assert_snapshot!(context.read("uv.lock"), @r#"
+         version = 1
+         revision = 3
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         required-markers = [
+             "platform_machine == 'x86_64' and sys_platform == 'linux'",
+         ]
+@@ -181,7 +181,7 @@ fn minimum_libc_retains_locked_wheels() -> Result<()> {
+ /// Each configured libc baseline needs coverage; retained wheels for another libc are insufficient.
+ #[test]
+ fn minimum_libc_switch_families() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let filters: Vec<_> = context
+         .filters()
+         .into_iter()
+@@ -191,11 +191,11 @@ fn minimum_libc_switch_families() -> Result<()> {
+         )])
+         .collect();
+     for (version, tag) in [
+-        ("1.0.0", "cp312-cp312-manylinux_2_17_x86_64"),
+-        ("1.0.0", "cp312-cp312-musllinux_1_2_x86_64"),
+-        ("2.0.0", "cp312-cp312-manylinux_2_17_x86_64"),
+-        ("2.0.0", "cp312-cp312-musllinux_1_3_x86_64"),
+-        ("3.0.0", "cp312-cp312-musllinux_1_2_x86_64"),
++        ("1.0.0", "cp314-cp314-manylinux_2_17_x86_64"),
++        ("1.0.0", "cp314-cp314-musllinux_1_2_x86_64"),
++        ("2.0.0", "cp314-cp314-manylinux_2_17_x86_64"),
++        ("2.0.0", "cp314-cp314-musllinux_1_3_x86_64"),
++        ("3.0.0", "cp314-cp314-musllinux_1_2_x86_64"),
+     ] {
+         wheel(&context, "demo", version, tag)?;
+     }
+@@ -205,7 +205,7 @@ fn minimum_libc_switch_families() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -226,7 +226,7 @@ fn minimum_libc_switch_families() -> Result<()> {
+         assert_snapshot!(lock, @r#"
+         version = 1
+         revision = 3
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         resolution-markers = [
+             "platform_machine == 'x86_64' and sys_platform == 'linux'",
+         ]
+@@ -246,8 +246,8 @@ fn minimum_libc_switch_families() -> Result<()> {
+         version = "2.0.0"
+         source = { registry = "links" }
+         wheels = [
+-            { path = "demo-2.0.0-cp312-cp312-manylinux_2_17_x86_64.whl" },
+-            { path = "demo-2.0.0-cp312-cp312-musllinux_1_3_x86_64.whl" },
++            { path = "demo-2.0.0-cp314-cp314-manylinux_2_17_x86_64.whl" },
++            { path = "demo-2.0.0-cp314-cp314-musllinux_1_3_x86_64.whl" },
+         ]
+ 
+         [[package]]
+@@ -267,7 +267,7 @@ fn minimum_libc_switch_families() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -289,7 +289,7 @@ fn minimum_libc_switch_families() -> Result<()> {
+         assert_snapshot!(lock, @r#"
+         version = 1
+         revision = 3
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         resolution-markers = [
+             "platform_machine == 'x86_64' and sys_platform == 'linux'",
+         ]
+@@ -309,8 +309,8 @@ fn minimum_libc_switch_families() -> Result<()> {
+         version = "1.0.0"
+         source = { registry = "links" }
+         wheels = [
+-            { path = "demo-1.0.0-cp312-cp312-manylinux_2_17_x86_64.whl" },
+-            { path = "demo-1.0.0-cp312-cp312-musllinux_1_2_x86_64.whl" },
++            { path = "demo-1.0.0-cp314-cp314-manylinux_2_17_x86_64.whl" },
++            { path = "demo-1.0.0-cp314-cp314-musllinux_1_2_x86_64.whl" },
+         ]
+ 
+         [[package]]
+@@ -330,7 +330,7 @@ fn minimum_libc_switch_families() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo>=2"]
+ 
+         [tool.uv]
+@@ -344,7 +344,7 @@ fn minimum_libc_switch_families() -> Result<()> {
+     exit_code: 1 (failure)
+     ----- stderr -----
+     warning: Setting `minimum-libc-version` is experimental and may change without warning. Pass `--preview-features minimum-libc-version` to disable this warning.
+-    error: No solution found when resolving dependencies for split (markers: python_full_version >= '3.12' and platform_machine == 'x86_64' and sys_platform == 'linux')
++    error: No solution found when resolving dependencies for split (markers: python_full_version >= '3.14' and platform_machine == 'x86_64' and sys_platform == 'linux')
+       cause: Because demo>=2.0.0 has no `platform_machine == 'x86_64' and sys_platform == 'linux'`-compatible wheels and your project depends on demo>=2, we can conclude that your project's requirements are unsatisfiable.
+     ");
+ 
+@@ -369,12 +369,12 @@ fn minimum_libc_switch_families() -> Result<()> {
+ /// Local-version fallback requires coverage at the configured libc baseline.
+ #[test]
+ fn minimum_libc_local_version_fallback() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     for (version, tag) in [
+-        ("1.0.0", "cp312-cp312-manylinux_2_17_x86_64"),
+-        ("1.0.0", "cp312-cp312-manylinux_2_17_aarch64"),
+-        ("1.0.0+cpu", "cp312-cp312-manylinux_2_17_x86_64"),
+-        ("1.0.0+cpu", "cp312-cp312-manylinux_2_34_aarch64"),
++        ("1.0.0", "cp314-cp314-manylinux_2_17_x86_64"),
++        ("1.0.0", "cp314-cp314-manylinux_2_17_aarch64"),
++        ("1.0.0+cpu", "cp314-cp314-manylinux_2_17_x86_64"),
++        ("1.0.0+cpu", "cp314-cp314-manylinux_2_34_aarch64"),
+     ] {
+         wheel(&context, "demo", version, tag)?;
+     }
+@@ -383,7 +383,7 @@ fn minimum_libc_local_version_fallback() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo; sys_platform == 'linux'"]
+ 
+         [tool.uv]
+@@ -402,8 +402,8 @@ fn minimum_libc_local_version_fallback() -> Result<()> {
+     uv_snapshot!(context.filters(), context.export().args(["--frozen", "--no-hashes", "--no-header", "--no-annotate"]), @r"
+         exit_code: 0 (success)
+         ----- stdout -----
+-        demo==1.0.0 ; python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'
+-        demo==1.0.0+cpu ; (python_full_version >= '3.13' and sys_platform == 'linux') or (platform_machine != 'aarch64' and sys_platform == 'linux') or (platform_python_implementation != 'CPython' and sys_platform == 'linux')
++        demo==1.0.0 ; python_full_version < '3.15' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'
++        demo==1.0.0+cpu ; (python_full_version >= '3.15' and sys_platform == 'linux') or (platform_machine != 'aarch64' and sys_platform == 'linux') or (platform_python_implementation != 'CPython' and sys_platform == 'linux')
+     ");
+ 
+     let lock = context.read("uv.lock");
+@@ -411,10 +411,10 @@ fn minimum_libc_local_version_fallback() -> Result<()> {
+         assert_snapshot!(lock, @r#"
+         version = 1
+         revision = 3
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         resolution-markers = [
+-            "python_full_version >= '3.13' or platform_machine != 'aarch64' or platform_python_implementation != 'CPython' or sys_platform != 'linux'",
+-            "python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'",
++            "python_full_version >= '3.15' or platform_machine != 'aarch64' or platform_python_implementation != 'CPython' or sys_platform != 'linux'",
++            "python_full_version < '3.15' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'",
+         ]
+ 
+         [options]
+@@ -426,10 +426,10 @@ fn minimum_libc_local_version_fallback() -> Result<()> {
+         version = "1.0.0"
+         source = { registry = "links" }
+         resolution-markers = [
+-            "python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'",
++            "python_full_version < '3.15' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'",
+         ]
+         wheels = [
+-            { path = "demo-1.0.0-cp312-cp312-manylinux_2_17_aarch64.whl" },
++            { path = "demo-1.0.0-cp314-cp314-manylinux_2_17_aarch64.whl" },
+         ]
+ 
+         [[package]]
+@@ -437,11 +437,11 @@ fn minimum_libc_local_version_fallback() -> Result<()> {
+         version = "1.0.0+cpu"
+         source = { registry = "links" }
+         resolution-markers = [
+-            "python_full_version >= '3.13' or platform_machine != 'aarch64' or platform_python_implementation != 'CPython' or sys_platform != 'linux'",
++            "python_full_version >= '3.15' or platform_machine != 'aarch64' or platform_python_implementation != 'CPython' or sys_platform != 'linux'",
+         ]
+         wheels = [
+-            { path = "demo-1.0.0+cpu-cp312-cp312-manylinux_2_17_x86_64.whl" },
+-            { path = "demo-1.0.0+cpu-cp312-cp312-manylinux_2_34_aarch64.whl" },
++            { path = "demo-1.0.0+cpu-cp314-cp314-manylinux_2_17_x86_64.whl" },
++            { path = "demo-1.0.0+cpu-cp314-cp314-manylinux_2_34_aarch64.whl" },
+         ]
+ 
+         [[package]]
+@@ -449,8 +449,8 @@ fn minimum_libc_local_version_fallback() -> Result<()> {
+         version = "0.1.0"
+         source = { virtual = "." }
+         dependencies = [
+-            { name = "demo", version = "1.0.0", source = { registry = "links" }, marker = "python_full_version < '3.13' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'" },
+-            { name = "demo", version = "1.0.0+cpu", source = { registry = "links" }, marker = "(python_full_version >= '3.13' and sys_platform == 'linux') or (platform_machine != 'aarch64' and sys_platform == 'linux') or (platform_python_implementation != 'CPython' and sys_platform == 'linux')" },
++            { name = "demo", version = "1.0.0", source = { registry = "links" }, marker = "python_full_version < '3.15' and platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'" },
++            { name = "demo", version = "1.0.0+cpu", source = { registry = "links" }, marker = "(python_full_version >= '3.15' and sys_platform == 'linux') or (platform_machine != 'aarch64' and sys_platform == 'linux') or (platform_python_implementation != 'CPython' and sys_platform == 'linux')" },
+         ]
+ 
+         [package.metadata]
+@@ -463,10 +463,10 @@ fn minimum_libc_local_version_fallback() -> Result<()> {
+ /// Tightening the deployment floor changes the selected version and is recorded in the lock.
+ #[test]
+ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     for (version, tag) in [
+-        ("1.0.0", "cp312-cp312-manylinux_2_17_x86_64"),
+-        ("2.0.0", "cp312-cp312-manylinux_2_34_x86_64"),
++        ("1.0.0", "cp314-cp314-manylinux_2_17_x86_64"),
++        ("2.0.0", "cp314-cp314-manylinux_2_34_x86_64"),
+     ] {
+         wheel(&context, "demo", version, tag)?;
+     }
+@@ -476,7 +476,7 @@ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -495,7 +495,7 @@ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -540,7 +540,7 @@ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
+         assert_snapshot!(lock, @r#"
+         version = 1
+         revision = 3
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         required-markers = [
+             "platform_machine == 'x86_64' and sys_platform == 'linux'",
+         ]
+@@ -554,7 +554,7 @@ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
+         version = "1.0.0"
+         source = { registry = "links" }
+         wheels = [
+-            { path = "demo-1.0.0-cp312-cp312-manylinux_2_17_x86_64.whl" },
++            { path = "demo-1.0.0-cp314-cp314-manylinux_2_17_x86_64.whl" },
+         ]
+ 
+         [[package]]
+@@ -582,7 +582,7 @@ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -606,7 +606,7 @@ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -636,7 +636,7 @@ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
+ 
+ #[test]
+ fn minimum_libc_no_compatible_version() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let filters: Vec<_> = context
+         .filters()
+         .into_iter()
+@@ -647,8 +647,8 @@ fn minimum_libc_no_compatible_version() -> Result<()> {
+         )])
+         .collect();
+     for tag in [
+-        "cp312-cp312-manylinux_2_34_x86_64",
+-        "cp312-cp312-musllinux_1_2_x86_64",
++        "cp314-cp314-manylinux_2_34_x86_64",
++        "cp314-cp314-musllinux_1_2_x86_64",
+     ] {
+         wheel(&context, "demo", "2.0.0", tag)?;
+     }
+@@ -657,7 +657,7 @@ fn minimum_libc_no_compatible_version() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -691,7 +691,7 @@ fn minimum_libc_no_compatible_version() -> Result<()> {
+ /// A source distribution remains usable when its wheel requires a newer glibc.
+ #[test]
+ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
+-    let context = uv_test::test_context!("3.12").with_filters([(
++    let context = uv_test::test_context!("3.14").with_filters([(
+         r"\nhint: The resolution failed for an environment that is not the current one[^\n]*"
+             .to_string(),
+         String::new(),
+@@ -700,7 +700,7 @@ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
+         &context,
+         "demo",
+         "2.0.0",
+-        "cp312-cp312-manylinux_2_34_x86_64",
++        "cp314-cp314-manylinux_2_34_x86_64",
+     )?;
+     write_tar_gz(
+         fs_err::File::create(context.temp_dir.child("links/demo-2.0.0.tar.gz").path())?,
+@@ -711,7 +711,7 @@ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
+                     Metadata-Version: 2.3
+                     Name: demo
+                     Version: 2.0.0
+-                    Requires-Python: >=3.12
++                    Requires-Python: >=3.14
+                 "},
+             ),
+             (
+@@ -720,7 +720,7 @@ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
+                     [project]
+                     name = "demo"
+                     version = "2.0.0"
+-                    requires-python = ">=3.12"
++                    requires-python = ">=3.14"
+                     dependencies = []
+                 "#},
+             ),
+@@ -731,7 +731,7 @@ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["demo"]
+ 
+         [tool.uv]
+@@ -752,7 +752,7 @@ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
+         assert_snapshot!(lock, @r#"
+         version = 1
+         revision = 3
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         required-markers = [
+             "platform_machine == 'x86_64' and sys_platform == 'linux'",
+         ]
+@@ -767,7 +767,7 @@ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
+         source = { registry = "links" }
+         sdist = { path = "demo-2.0.0.tar.gz" }
+         wheels = [
+-            { path = "demo-2.0.0-cp312-cp312-manylinux_2_34_x86_64.whl" },
++            { path = "demo-2.0.0-cp314-cp314-manylinux_2_34_x86_64.whl" },
+         ]
+ 
+         [[package]]
+@@ -798,7 +798,7 @@ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
+ 
+ #[test]
+ fn minimum_libc_direct_url() -> Result<()> {
+-    let context = uv_test::test_context!("3.12").with_filters([(
++    let context = uv_test::test_context!("3.14").with_filters([(
+         r"\nhint: The resolution failed for an environment that is not the current one[^\n]*"
+             .to_string(),
+         String::new(),
+@@ -807,7 +807,7 @@ fn minimum_libc_direct_url() -> Result<()> {
+         &context,
+         "demo",
+         "2.0.0",
+-        "cp312-cp312-manylinux_2_34_x86_64",
++        "cp314-cp314-manylinux_2_34_x86_64",
+     )?;
+     let server = FindLinksServer::new(context.temp_dir.child("links").path());
+     let filename = wheel
+@@ -820,7 +820,7 @@ fn minimum_libc_direct_url() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["{dependency}"]
+ 
+         [tool.uv]
+@@ -845,7 +845,7 @@ fn minimum_libc_direct_url() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["{dependency}"]
+ 
+         [tool.uv]
+@@ -865,7 +865,7 @@ fn minimum_libc_direct_url() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = ["{dependency}"]
+ 
+         [tool.uv]
+@@ -887,29 +887,29 @@ fn minimum_libc_direct_url() -> Result<()> {
+ /// Every required architecture needs coverage, while unrelated marker branches remain independent.
+ #[test]
+ fn minimum_libc_architectures_and_markers() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     for (version, tag) in [
+-        ("1.0.0", "cp312-cp312-manylinux2014_x86_64"),
+-        ("1.0.0", "cp312-cp312-manylinux_2_31_aarch64"),
+-        ("1.0.0", "cp312-cp312-musllinux_1_2_x86_64"),
+-        ("1.0.0", "cp312-cp312-musllinux_1_2_aarch64"),
++        ("1.0.0", "cp314-cp314-manylinux2014_x86_64"),
++        ("1.0.0", "cp314-cp314-manylinux_2_31_aarch64"),
++        ("1.0.0", "cp314-cp314-musllinux_1_2_x86_64"),
++        ("1.0.0", "cp314-cp314-musllinux_1_2_aarch64"),
+         (
+             "2.0.0",
+-            "cp312-cp312-manylinux_2_17_x86_64.manylinux_2_34_aarch64",
++            "cp314-cp314-manylinux_2_17_x86_64.manylinux_2_34_aarch64",
+         ),
+-        ("2.0.0", "cp312-cp312-manylinux_2_34_aarch64"),
+-        ("2.0.0", "cp312-cp312-musllinux_1_2_aarch64"),
+-        ("2.0.0", "cp312-cp312-macosx_11_0_arm64"),
++        ("2.0.0", "cp314-cp314-manylinux_2_34_aarch64"),
++        ("2.0.0", "cp314-cp314-musllinux_1_2_aarch64"),
++        ("2.0.0", "cp314-cp314-macosx_11_0_arm64"),
+     ] {
+         wheel(&context, "demo", version, tag)?;
+     }
+-    wheel(&context, "windows-only", "1.0.0", "cp312-cp312-win_amd64")?;
++    wheel(&context, "windows-only", "1.0.0", "cp314-cp314-win_amd64")?;
+     let pyproject_toml = context.temp_dir.child("pyproject.toml");
+     pyproject_toml.write_str(indoc! {r#"
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = [
+             "demo; sys_platform == 'linux'",
+             "demo>=2; sys_platform == 'darwin'",
+@@ -946,7 +946,7 @@ fn minimum_libc_architectures_and_markers() -> Result<()> {
+         assert_snapshot!(lock, @r#"
+         version = 1
+         revision = 3
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         resolution-markers = [
+             "platform_machine == 'x86_64' and sys_platform == 'linux'",
+             "platform_machine != 'x86_64' and sys_platform == 'linux'",
+@@ -970,10 +970,10 @@ fn minimum_libc_architectures_and_markers() -> Result<()> {
+             "platform_machine != 'x86_64' and sys_platform == 'linux'",
+         ]
+         wheels = [
+-            { path = "demo-1.0.0-cp312-cp312-manylinux_2_31_aarch64.whl" },
+-            { path = "demo-1.0.0-cp312-cp312-manylinux2014_x86_64.whl" },
+-            { path = "demo-1.0.0-cp312-cp312-musllinux_1_2_aarch64.whl" },
+-            { path = "demo-1.0.0-cp312-cp312-musllinux_1_2_x86_64.whl" },
++            { path = "demo-1.0.0-cp314-cp314-manylinux_2_31_aarch64.whl" },
++            { path = "demo-1.0.0-cp314-cp314-manylinux2014_x86_64.whl" },
++            { path = "demo-1.0.0-cp314-cp314-musllinux_1_2_aarch64.whl" },
++            { path = "demo-1.0.0-cp314-cp314-musllinux_1_2_x86_64.whl" },
+         ]
+ 
+         [[package]]
+@@ -985,8 +985,8 @@ fn minimum_libc_architectures_and_markers() -> Result<()> {
+             "sys_platform == 'darwin'",
+         ]
+         wheels = [
+-            { path = "demo-2.0.0-cp312-cp312-macosx_11_0_arm64.whl" },
+-            { path = "demo-2.0.0-cp312-cp312-manylinux_2_17_x86_64.manylinux_2_34_aarch64.whl" },
++            { path = "demo-2.0.0-cp314-cp314-macosx_11_0_arm64.whl" },
++            { path = "demo-2.0.0-cp314-cp314-manylinux_2_17_x86_64.manylinux_2_34_aarch64.whl" },
+         ]
+ 
+         [[package]]
+@@ -1011,7 +1011,7 @@ fn minimum_libc_architectures_and_markers() -> Result<()> {
+         version = "1.0.0"
+         source = { registry = "links" }
+         wheels = [
+-            { path = "windows_only-1.0.0-cp312-cp312-win_amd64.whl" },
++            { path = "windows_only-1.0.0-cp314-cp314-win_amd64.whl" },
+         ]
+         "#);
+     });
+@@ -1021,13 +1021,13 @@ fn minimum_libc_architectures_and_markers() -> Result<()> {
+ 
+ #[test]
+ fn minimum_libc_invalid_configuration() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let pyproject_toml = context.temp_dir.child("pyproject.toml");
+     pyproject_toml.write_str(indoc! {r#"
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = []
+ 
+         [tool.uv]
+@@ -1058,7 +1058,7 @@ fn minimum_libc_invalid_configuration() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = []
+ 
+         [tool.uv]
+@@ -1086,7 +1086,7 @@ fn minimum_libc_invalid_configuration() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = []
+ 
+         [tool.uv]
+@@ -1114,7 +1114,7 @@ fn minimum_libc_invalid_configuration() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = []
+ 
+         [tool.uv]
+@@ -1143,7 +1143,7 @@ fn minimum_libc_invalid_configuration() -> Result<()> {
+         [project]
+         name = "project"
+         version = "0.1.0"
+-        requires-python = ">=3.12"
++        requires-python = ">=3.14"
+         dependencies = []
+ 
+         [tool.uv]
