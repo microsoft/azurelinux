@@ -1747,8 +1747,8 @@
         "type": "other",
         "other": {
           "name": "cifs-utils",
-          "version": "7.7",
-          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-7.7.tar.bz2"
+          "version": "7.9",
+          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-7.9.tar.bz2"
         }
       }
     },
@@ -8411,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.18.54.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.54.1.tar.gz"
+          "version": "6.18.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.57.1.tar.gz"
         }
       }
     },
@@ -8421,8 +8421,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.18.54.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.54.1.tar.gz"
+          "version": "6.18.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.57.1.tar.gz"
         }
       }
     },
@@ -11331,8 +11331,8 @@
         "type": "other",
         "other": {
           "name": "libslirp",
-          "version": "4.9.5",
-          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.9.5/libslirp-v4.9.5.tar.gz"
+          "version": "4.9.6",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.9.6/libslirp-v4.9.6.tar.gz"
         }
       }
     },
@@ -12031,8 +12031,8 @@
         "type": "other",
         "other": {
           "name": "libX11",
-          "version": "1.8.7",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.8.7.tar.gz"
+          "version": "1.8.14",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.8.14.tar.gz"
         }
       }
     },
@@ -12291,8 +12291,8 @@
         "type": "other",
         "other": {
           "name": "libXrender",
-          "version": "0.9.11",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.11.tar.gz"
+          "version": "0.9.13",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.13.tar.gz"
         }
       }
     },
@@ -14862,8 +14862,8 @@
         "type": "other",
         "other": {
           "name": "objectweb-asm",
-          "version": "9.6",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/objectweb-asm-9.6.tar.gz"
+          "version": "9.11.1",
+          "downloadUrl": "https://gitlab.ow2.org/asm/asm/-/archive/ASM_9_11_1/asm-ASM_9_11_1.tar.gz"
         }
       }
     },
@@ -17343,8 +17343,8 @@
         "type": "other",
         "other": {
           "name": "perl-DBI",
-          "version": "1.655",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-1.655.tgz"
+          "version": "1.656",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-1.656.tgz"
         }
       }
     },
@@ -29726,8 +29726,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2026c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2026c.tar.gz"
+          "version": "2026e",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2026e.tar.gz"
         }
       }
     },
@@ -30186,8 +30186,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.11",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.11.tar.gz"
+          "version": "8.0.12",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.12.tar.gz"
         }
       }
     },
@@ -30226,8 +30226,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0976",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0976.tar.gz"
+          "version": "9.2.1244",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.1244.tar.gz"
         }
       }
     },
