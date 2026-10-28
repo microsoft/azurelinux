@@ -1,0 +1,6 @@
+[components.marshalparser]
+
+[components.marshalparser.build]
+# Use upstream's RHEL test policy: test the system Python, without the
+# Fedora-only alternate-interpreter matrix or pytest-xdist parallelism.
+defines = { rhel = "10" }
