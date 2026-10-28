@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        35%{?dist}
+Release:        36%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -164,6 +164,18 @@ Patch0913:      network-also-check-ID_NET_MANAGED_BY-property-on-rec.patch
 Patch0914:      Prevent-corruption-from-stale-alias-state-on-daemon-reload.patch
 Patch0915:      CVE-2026-15059.patch
 Patch0916:      CVE-2026-16742.patch
+# Backport systemd/systemd#30936 and #34054 for automatic link recovery.
+# ebf66d0c05cf only refactors an asynchronous reload helper absent from v255.
+Patch0917:      network-link-shorten-code.patch
+Patch0918:      network-link-automatically-reconfigure-on-failure.patch
+Patch0919:      test-network-flip-interface-state-frequently.patch
+Patch0920:      network-link-initialize-before-reconfiguration.patch
+Patch0921:      network-link-handle-reconfiguration-errors.patch
+Patch0922:      dhcp-client-avoid-duplicate-stop-notification.patch
+Patch0923:      dhcp-client-ignore-send-when-stopped.patch
+Patch0924:      dhcp-client-stop-after-release.patch
+Patch0925:      dhcp-client-restart-after-decline.patch
+Patch0926:      network-ipv4acd-adjust-conflict-logging.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -1262,6 +1274,11 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Tue Oct 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-36
+- Backport upstream PRs 30936 and 34054 for automatic networkd recovery
+  after interface failures and correct DHCP stop, release, and decline handling.
+- Backport the upstream interface-flapping regression test.
+
 * Tue Oct 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-35
 - Backport upstream ukify test fix for OpenSSL certificate issuer formatting.
 

@@ -1,0 +1,101 @@
+From 32886ef31a33f2494d013035ceb0a9632355b630 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Wed, 21 Aug 2024 07:07:05 +0900
+Subject: [PATCH] network: log and enter failed state in link_reconfigure()
+
+No functional change, just refactoring.
+
+(cherry picked from commit 021d39d3d19a910e195f8e68e7c86bb6ca1a5554)
+
+Backport notes:
+Omit changes to link_reconfigure_on_bus_method_reload(), which is absent
+from v255. Preserve v255's synchronous manager_reload() error propagation
+instead of ignoring per-link reconfiguration errors.
+---
+ src/network/networkd-link-bus.c |  7 ++-----
+ src/network/networkd-link.c     | 16 ++++++----------
+ src/network/networkd-manager.c  |  9 ++-------
+ 3 files changed, 10 insertions(+), 22 deletions(-)
+
+diff --git a/src/network/networkd-link-bus.c b/src/network/networkd-link-bus.c
+index ba8823797e00..33c6a740f124 100644
+--- a/src/network/networkd-link-bus.c
++++ b/src/network/networkd-link-bus.c
+@@ -639,13 +639,10 @@ int bus_link_method_reconfigure(sd_bus_message *message, void *userdata, sd_bus_
+                 return 1; /* Polkit will call us back */
+ 
+         r = link_reconfigure(l, /* force = */ true);
++        if (r > 0)
++                r = link_save_and_clean_full(l, /* also_save_manager = */ true);
+         if (r < 0)
+                 return r;
+-        if (r > 0) {
+-                r = link_save_and_clean_full(l, /* also_save_manager = */ true);
+-                if (r < 0)
+-                        return r;
+-        }
+ 
+         return sd_bus_reply_method_return(message, NULL);
+ }
+diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
+index e06efacb4679..a0f156b51954 100644
+--- a/src/network/networkd-link.c
++++ b/src/network/networkd-link.c
+@@ -380,8 +380,6 @@ int link_stop_engines(Link *link, bool may_keep_dhcp) {
+ }
+ 
+ void link_enter_failed(Link *link) {
+-        int r;
+-
+         assert(link);
+ 
+         if (IN_SET(link->state, LINK_STATE_FAILED, LINK_STATE_LINGER))
+@@ -397,13 +395,8 @@ void link_enter_failed(Link *link) {
+         }
+ 
+         log_link_info(link, "Trying to reconfigure the interface.");
+-        r = link_reconfigure(link, /* force = */ true);
+-        if (r < 0) {
+-                log_link_warning_errno(link, r, "Failed to reconfigure interface: %m");
+-                goto stop;
+-        }
+-
+-        return;
++        if (link_reconfigure(link, /* force = */ true) > 0)
++                return;
+ 
+ stop:
+         (void) link_stop_engines(link, /* may_keep_dhcp = */ false);
+@@ -1385,8 +1378,11 @@ int link_reconfigure(Link *link, bool force) {
+                 return 0; /* 0 means no-op. */
+ 
+         r = link_call_getlink(link, force ? link_force_reconfigure_handler : link_reconfigure_handler);
+-        if (r < 0)
++        if (r < 0) {
++                log_link_warning_errno(link, r, "Failed to reconfigure interface: %m");
++                link_enter_failed(link);
+                 return r;
++        }
+ 
+         if (force || link->state == LINK_STATE_FAILED)
+                 link_set_state(link, LINK_STATE_INITIALIZED);
+diff --git a/src/network/networkd-manager.c b/src/network/networkd-manager.c
+index 1ca1d7abe5ea..ee3716a3b1ad 100644
+--- a/src/network/networkd-manager.c
++++ b/src/network/networkd-manager.c
+@@ -84,13 +84,8 @@ static int match_prepare_for_sleep(sd_bus_message *message, void *userdata, sd_b
+ 
+         log_debug("Coming back from suspend, reconfiguring all connections...");
+ 
+-        HASHMAP_FOREACH(link, m->links_by_index) {
+-                r = link_reconfigure(link, /* force = */ true);
+-                if (r < 0) {
+-                        log_link_warning_errno(link, r, "Failed to reconfigure interface: %m");
+-                        link_enter_failed(link);
+-                }
+-        }
++        HASHMAP_FOREACH(link, m->links_by_index)
++                (void) link_reconfigure(link, /* force = */ true);
+ 
+         return 0;
+ }
