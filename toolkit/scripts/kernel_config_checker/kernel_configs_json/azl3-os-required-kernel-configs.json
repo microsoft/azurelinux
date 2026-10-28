@@ -4051,6 +4051,86 @@
             }
           ],
           "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_NFS_FS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_NFS_V3",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_NFS_V4",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_NFS_V4_1",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_NFS_V4_2",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_CIFS_XATTR",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_CIFS_UPCALL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_CIFS_DFS_UPCALL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
         }
       ]
     }

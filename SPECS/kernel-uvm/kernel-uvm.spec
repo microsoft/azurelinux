@@ -168,6 +168,8 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 * Tue Oct 27 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.52.mshv1-2
 - Re-enable legacy xtables (CONFIG_NETFILTER_XTABLES_LEGACY) and build in the iptables and
   arptables legacy tables dropped in the 6.18 upgrade (fixes iptables-legacy, e.g. istio-init)
+- Re-enable the NFS client (v3, v4.x, pNFS) and CIFS xattr, upcall and DFS support
+  on x86_64, dropped in the 6.18 upgrade
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.52.mshv1-1
 - Upgrade to 6.18.52.mshv1
