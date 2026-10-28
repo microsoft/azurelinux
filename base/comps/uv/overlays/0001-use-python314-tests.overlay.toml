@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Keep resource-limit and minimum-libc coverage without Python 3.12 by shifting test interpreters, wheel tags, and the next-minor marker split to Python 3.14"
+type = "patch-add"
+source = "../0001-use-python314-tests.patch"

@@ -1,9 +1,0 @@
-[metadata]
-category = "azl-compatibility"
-upstream-status = "upstreamable"
-
-[[overlays]]
-description = "The reduced test set still requires Python 3.12 for resource-limit and minimum-libc tests; Azure Linux uses a newer system Python"
-type = "spec-add-tag"
-tag = "BuildRequires"
-value = "/usr/bin/python3.12"
