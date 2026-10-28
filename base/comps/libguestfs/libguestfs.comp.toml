@@ -1,0 +1,26 @@
+[components.libguestfs]
+
+[components.libguestfs.build]
+defines = { rhel = "10" }
+
+[[components.libguestfs.overlays]]
+description = "Use Azure Linux's native /usr/bin/qemu-system-%{_build_arch} executable instead of RHEL's /usr/libexec/qemu-kvm; Azure Linux provides the qemu-kvm alias only on x86."
+type = "spec-search-replace"
+section = "%build"
+regex = '%\{_libexecdir\}/qemu-kvm'
+replacement = '%{_bindir}/qemu-system-%{_build_arch}'
+metadata = { category = "azl-compatibility", upstream-status = "inapplicable" }
+
+[[components.libguestfs.overlays]]
+description = "RHEL ships bash-completion.pc in bash-completion itself, so upstream omits bash-completion-devel when rhel is set. Azure Linux retains Fedora's split packaging and still needs bash-completion-devel for configure to detect bash-completion and enable generation of the completion files required by the spec."
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "bash-completion-devel"
+metadata = { category = "azl-compatibility", upstream-status = "inapplicable" }
+
+[[components.libguestfs.overlays]]
+description = "Retain btrfs appliance inspection support when using the RHEL profile; btrfs-progs is already available in Azure Linux Base."
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "btrfs-progs"
+metadata = { category = "azl-compatibility", upstream-status = "inapplicable" }
