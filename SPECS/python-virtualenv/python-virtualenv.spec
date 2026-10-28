@@ -39,6 +39,7 @@ Patch1025:      CVE-2026-113720.patch
 Patch1026:      CVE-2026-113719.patch
 Patch1027:      CVE-2026-113721.patch
 Patch1028:      CVE-2026-102938.patch
+Patch1029:      CVE-2026-115586.patch
 BuildArch:      noarch
 
 %description
@@ -87,6 +88,7 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 1026 -p1
 %patch -P 1027 -p1
 %patch -P 1028 -p1
+%patch -P 1029 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -246,8 +248,7 @@ export PYTHONWARNDEFAULTENCODING=1
 - Patch for CVE-2026-102938, CVE-2026-113713, CVE-2026-113715, and CVE-2026-113716.
 - Patch for CVE-2026-113719, CVE-2026-113720, CVE-2026-113721, and CVE-2026-113722.
 - Patch for CVE-2026-113723, CVE-2026-113725, CVE-2026-113726, and CVE-2026-113732.
-- Patch for CVE-2026-113776.
-- Fix missing imports and executable detection in the Fish activation regression test in CVE-2026-113732.
+- Patch for CVE-2026-113776 and CVE-2026-115586.
 
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-8
 - Remove affected eMudhra and AAA roots from both embedded pip wheels.
