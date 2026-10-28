@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,20 @@ Patch1012:      CVE-2026-13346v1.patch
 Patch1013:      CVE-2026-102925.patch
 Patch1014:      CVE-2026-102930.patch
 Patch1015:      remove-compromised-wheel-ca-roots.patch
+# Keep these backports in dependency order rather than CVE-number order.
+Patch1016:      CVE-2026-113732.patch
+Patch1017:      CVE-2026-113716.patch
+Patch1018:      CVE-2026-113723.patch
+Patch1019:      CVE-2026-113726.patch
+Patch1020:      CVE-2026-113713.patch
+Patch1021:      CVE-2026-113776.patch
+Patch1022:      CVE-2026-113715.patch
+Patch1023:      CVE-2026-113722.patch
+Patch1024:      CVE-2026-113725.patch
+Patch1025:      CVE-2026-113720.patch
+Patch1026:      CVE-2026-113719.patch
+Patch1027:      CVE-2026-113721.patch
+Patch1028:      CVE-2026-102938.patch
 BuildArch:      noarch
 
 %description
@@ -60,6 +74,19 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 1013 -p1
 %patch -P 1014 -p1
 %patch -P 1015 -p1
+%patch -P 1016 -p1
+%patch -P 1017 -p1
+%patch -P 1018 -p1
+%patch -P 1019 -p1
+%patch -P 1020 -p1
+%patch -P 1021 -p1
+%patch -P 1022 -p1
+%patch -P 1023 -p1
+%patch -P 1024 -p1
+%patch -P 1025 -p1
+%patch -P 1026 -p1
+%patch -P 1027 -p1
+%patch -P 1028 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -215,6 +242,13 @@ export PYTHONWARNDEFAULTENCODING=1
 %{_bindir}/virtualenv
 
 %changelog
+* Tue Oct 27 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 20.36.1-9
+- Patch for CVE-2026-102938, CVE-2026-113713, CVE-2026-113715, and CVE-2026-113716.
+- Patch for CVE-2026-113719, CVE-2026-113720, CVE-2026-113721, and CVE-2026-113722.
+- Patch for CVE-2026-113723, CVE-2026-113725, CVE-2026-113726, and CVE-2026-113732.
+- Patch for CVE-2026-113776.
+- Fix missing imports and executable detection in the Fish activation regression test in CVE-2026-113732.
+
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-8
 - Remove affected eMudhra and AAA roots from both embedded pip wheels.
 - Regenerate wheel RECORD entries after the existing security backports.
