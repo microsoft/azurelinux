@@ -4131,6 +4131,26 @@
             }
           ],
           "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_CRYPTO_FIPS",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode support in the aarch64 Kata guest, enabled in 6.6 and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_CRYPTO_SELFTESTS",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode support in the aarch64 Kata guest, enabled in 6.6 and dropped in the 6.18 upgrade"
         }
       ]
     }
