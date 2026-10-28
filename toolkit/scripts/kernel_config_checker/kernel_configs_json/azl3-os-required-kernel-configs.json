@@ -3187,6 +3187,11 @@
           "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22300"
         }
       ]
+    },
+    {
+      "name": "kernel-mshv",
+      "inherit_default": false,
+      "kernel_configs": []
     }
   ]
 }
