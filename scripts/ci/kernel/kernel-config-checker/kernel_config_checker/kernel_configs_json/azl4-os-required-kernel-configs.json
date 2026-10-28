@@ -457,6 +457,30 @@
         "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
       },
       {
+        "name": "CONFIG_CRYPTO_AUTHENC",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build authenticated encryption support into both Azure Linux kernel architectures for FIPS."
+      },
+      {
+        "name": "CONFIG_CRYPTO_CCM",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build CCM authenticated encryption into both Azure Linux kernel architectures for FIPS."
+      },
+      {
+        "name": "CONFIG_CRYPTO_CMAC",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build CMAC authentication into both Azure Linux kernel architectures for FIPS."
+      },
+      {
         "name": "CONFIG_CRYPTO_CTR",
         "values": [
           {
@@ -663,6 +687,14 @@
         "justification": "kernel: update to 5.15.2.1 - PR: https://github.com/microsoft/azurelinux/pull/1932"
       },
       {
+        "name": "CONFIG_CRYPTO_ECRDSA",
+        "values": [
+          { "architecture": "x86_64", "value": "n" },
+          { "architecture": "arm64", "value": "n" }
+        ],
+        "justification": "Keep ECRDSA disabled on both Azure Linux kernel architectures for FIPS."
+      },
+      {
         "name": "CONFIG_CRYPTO_RNG_DEFAULT",
         "values": [
           {
@@ -731,6 +763,54 @@
           }
         ],
         "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_CRYPTO_USER",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build the crypto userspace configuration interface into both Azure Linux kernel architectures for FIPS."
+      },
+      {
+        "name": "CONFIG_CRYPTO_USER_API",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build the crypto userspace API into both Azure Linux kernel architectures for FIPS."
+      },
+      {
+        "name": "CONFIG_CRYPTO_USER_API_AEAD",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build the userspace AEAD API into both Azure Linux kernel architectures for FIPS."
+      },
+      {
+        "name": "CONFIG_CRYPTO_USER_API_HASH",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build the userspace hash API into both Azure Linux kernel architectures for FIPS."
+      },
+      {
+        "name": "CONFIG_CRYPTO_USER_API_RNG",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build the userspace random number generation API into both Azure Linux kernel architectures for FIPS."
+      },
+      {
+        "name": "CONFIG_CRYPTO_USER_API_SKCIPHER",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build the userspace symmetric cipher API into both Azure Linux kernel architectures for FIPS."
       },
       {
         "name": "CONFIG_CRYPTO_XXHASH",
@@ -3463,14 +3543,6 @@
           "values": [
             { "architecture": "x86_64", "value": "y" },
             { "architecture": "arm64", "value": "y" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_CRYPTO_ECDSA",
-          "values": [
-            { "architecture": "x86_64", "value": "m" },
-            { "architecture": "arm64", "value": "m" }
           ],
           "justification": "Align kernel 6.18 with its generated configuration"
         },
