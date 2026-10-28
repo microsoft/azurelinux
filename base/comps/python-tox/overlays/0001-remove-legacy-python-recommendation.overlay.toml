@@ -1,0 +1,11 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Do not recommend the retired Python 3.9 interpreter when installing tox; retain support for explicitly configured environments"
+type = "spec-remove-tag"
+section = "%package"
+package = "tox"
+tag = "Recommends"
+value = "python3.9"
