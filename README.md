@@ -94,6 +94,8 @@ Azure Linux 4 is an RPM-based distribution optimized for Azure and modern cloud 
 
 Deviations from upstream are declaratively defined and scoped to avoid unnecessary divergence or forking. This repository contains a mechanically rendered set of RPM package spec files derived from applying this layer to Fedora's upstream packaging sources.
 
+For the implementations selected by the VM base images, see [VM base image userland implementations](base/images/README.md).
+
 ## How Azure Linux is defined
 
 The distro is described almost entirely in TOML-based configuration files. Our open-source development tool, [`azldev`](https://github.com/microsoft/azure-linux-dev-tools), is used to apply this configuration to upstream Fedora spec files and packaging sources.
