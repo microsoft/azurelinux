@@ -193,7 +193,7 @@ ExcludeArch: i686
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        158.0.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 URL:            https://www.mozilla.org/firefox/
 # Automatically converted from old format: MPLv1.1 or GPLv2+ or LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-MPLv1.1 OR GPL-2.0-or-later OR LicenseRef-Callaway-LGPLv2+
@@ -360,7 +360,6 @@ BuildRequires:  pkgconfig(libevent)
 %endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3.11-devel
 %if !0%{?flatpak}
 Requires:       u2f-hidraw-policy
 Requires:       xdg-desktop-portal
@@ -899,8 +898,8 @@ no-index=true
 EOF
 tar xf %{SOURCE37}
 
-#Use python 3.11 for mach
-sed -i -e 's|#!/usr/bin/env python3|#!/usr/bin/env python3.11|' mach
+
+
 
 ./mach build -v 2>&1 | cat - || exit 1
 

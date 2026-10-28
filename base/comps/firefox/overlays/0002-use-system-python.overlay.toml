@@ -1,0 +1,15 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Use the system Python development package rather than requiring the retired Python 3.11 interpreter"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "python3.11-devel"
+
+[[overlays]]
+description = "Keep mach's upstream python3 shebang; this source supports Python 3.14"
+type = "spec-search-replace"
+section = "%build"
+regex = '''^(#Use python 3\.11 for mach|sed -i -e 's\|#!/usr/bin/env python3\|#!/usr/bin/env python3\.11\|' mach)$'''
