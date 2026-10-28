@@ -15,9 +15,10 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 %global debug_package %{nil}
+%global gittag ASM_%(echo %{version} | tr . _)
 
 Name:           objectweb-asm
-Version:        9.6
+Version:        9.11.1
 Release:        1%{?dist}
 Summary:        Java bytecode manipulation framework
 License:        BSD-3-Clause
@@ -25,7 +26,7 @@ Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://asm.ow2.io/
-Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
+Source0:        https://gitlab.ow2.org/asm/asm/-/archive/%{gittag}/asm-%{gittag}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        aggregator.pom
 Source2:        https://repo1.maven.org/maven2/org/ow2/asm/asm/%{version}/asm-%{version}.pom
 Source3:        https://repo1.maven.org/maven2/org/ow2/asm/asm-analysis/%{version}/asm-analysis-%{version}.pom
@@ -58,7 +59,13 @@ Summary:        API documentation for %{name}
 This package provides %{summary}.
  
 %prep
-%setup -q
+%autosetup -n asm-%{gittag}
+
+# Remove prebuilt binaries shipped in the upstream archive; keep asm-test
+# class files, which ship alongside appropriately licensed source.
+find -name '*.jar' -delete
+find asm asm-analysis asm-commons -name '*.class' -delete
+rm -r gradle
  
 # A custom pom to aggregate the build
 cp -p %{SOURCE1} pom.xml
@@ -89,6 +96,9 @@ done
  
 %install
 %mvn_install
+# Remove embedded legal files from javadoc; license is covered by top-level %license files
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
 %jpackage_script org.objectweb.asm.xml.Processor "" "" %{name}/asm:%{name}/asm-attrs:%{name}/asm-util %{name}-processor true
  
 %files -f .mfiles
@@ -99,6 +109,9 @@ done
 %license LICENSE.txt
 
 %changelog
+* Mon Oct 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.11.1-1
+- Auto-upgrade to 9.11.1 - for CVE-2026-110257, CVE-2026-110258, CVE-2026-110260, CVE-2026-110261, CVE-2026-110262, CVE-2026-110263, CVE-2026-110270, CVE-2026-110591
+
 * Thu Apr 04 2024 Mitch Zhu <mitchzhu@microsoft.com> - 9.6-1
 - Upgrade to version 9.6
 - Import build and install section from Fedora 40 (license: MIT).
