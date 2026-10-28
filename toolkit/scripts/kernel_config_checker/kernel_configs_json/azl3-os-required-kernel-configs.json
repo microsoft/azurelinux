@@ -3723,6 +3723,76 @@
             }
           ],
           "justification": "Lightweight tunnels with BPF encap (ip route ... encap bpf) and the tc flower classifier, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_FUNCTION_TRACER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_HIST_TRIGGERS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_SYNTH_EVENTS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_USER_EVENTS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
         }
       ]
     },
