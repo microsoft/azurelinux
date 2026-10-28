@@ -20,7 +20,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 4
+%define azl_pkgrelease 5
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.43.02
 # AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
@@ -1041,6 +1041,7 @@ Source6003: nvidia-conftest-allow-mlnx-ofed-kernel-dir.patch
 # AZL: MLNX OFED source bundle and kmod include (mlnx-ofa_kernel).
 Source6100: MLNX_OFED_SRC-%{ofa_bundle_version}-%{ofa_vendor_release}.tgz
 Source6101: mlnx-ofa_kernel.inc
+Source6102: kmod-iser.inc
 
 ## Patches needed for building this package
 
@@ -1096,6 +1097,10 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase package
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2082,6 +2087,10 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase prep
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3168,6 +3177,10 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+%global _kmod_phase build
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
+
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
 
 # Module signing (modsign)
@@ -3675,6 +3688,10 @@ popd
 %global _kmod_phase install
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase install
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4325,8 +4342,15 @@ fi\
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
 
+%global _kmod_phase files
+%global _kmod_name iser
+%include %{_sourcedir}/kmod-iser.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Tue Oct 27 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.50-1.5
+- Add iSER kernel modules from the MLNX OFED source bundle; add a depmod override so the real ib_iser wins over the OFED dummy and refresh the initramfs on install and removal
+
 * Wed Oct 21 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.50-1.4
 - Disable CONFIG_OBJTOOL_WERROR in the x86_64 config while keeping objtool enabled
 
