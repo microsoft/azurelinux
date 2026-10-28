@@ -281,6 +281,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
   the 6.18 upgrade
 - Re-enable the function tracer (CONFIG_FUNCTION_TRACER, dynamic ftrace) and ftrace hist,
   synthetic and user events on x86_64, dropped in the 6.18 upgrade
+- Re-enable the overlayfs redirect_dir, index and metacopy defaults
+  (CONFIG_OVERLAY_FS_REDIRECT_DIR/INDEX/METACOPY), dropped in the 6.18 upgrade
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3

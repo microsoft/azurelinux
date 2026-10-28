@@ -3793,6 +3793,48 @@
             }
           ],
           "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_OVERLAY_FS_REDIRECT_DIR",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "overlayfs redirect_dir, index and metacopy on by default, enabled in 6.6 at customer request and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_OVERLAY_FS_INDEX",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "overlayfs redirect_dir, index and metacopy on by default, enabled in 6.6 at customer request and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_OVERLAY_FS_METACOPY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "overlayfs redirect_dir, index and metacopy on by default, enabled in 6.6 at customer request and dropped in the 6.18 upgrade"
         }
       ]
     },
