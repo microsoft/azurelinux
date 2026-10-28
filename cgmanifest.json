@@ -14041,6 +14041,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mysql84",
+          "version": "8.4.13",
+          "downloadUrl": "https://cdn.mysql.com/Downloads/MySQL-8.4/mysql-8.4.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mythes",
           "version": "1.2.5",
           "downloadUrl": "https://github.com/hunspell/mythes/releases/download/v1.2.5/mythes-1.2.5.tar.xz"
