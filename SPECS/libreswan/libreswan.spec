@@ -27,7 +27,7 @@
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.15
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +41,8 @@ Patch0:         CVE-2026-12413.patch
 Patch1:         CVE-2026-50721.patch
 Patch2:         CVE-2026-50722.patch
 Patch3:         CVE-2026-14957.patch
+Patch4:         CVE-2026-77207.patch
+Patch5:         CVE-2026-94453.patch
 
 BuildRequires: audit-libs-devel
 BuildRequires: bison
@@ -198,6 +200,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Mon Oct 19 2026 BinduSri Adabala <v-badabala@microsoft.com> - 4.15-4
+- Patch for CVE-2026-77207, CVE-2026-94453
+
 * Fri Sep 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.15-3
 - Patch for CVE-2026-14957
 
