@@ -1,7 +1,7 @@
 Summary:        Gnuplot is a portable command-line driven graphing utility.
 Name:           gnuplot
 Version:        5.4.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Gnuplot
 URL:            http://www.gnuplot.info/
 Group:          Applications
@@ -11,6 +11,8 @@ Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.
 Patch0:         CVE-2025-31176.patch
 Patch1:         CVE-2025-31180.patch
 Patch2:         CVE-2025-31181.patch
+Patch3:         CVE-2025-31177.patch
+Patch4:         CVE-2025-3359.patch
 
 %description
 Gnuplot is a portable command-line driven graphing utility for Linux, OS/2, MS Windows, OSX, VMS, and many other platforms. The source code is copyrighted but freely distributed (i.e., you don't have to pay for it). It was originally created to allow scientists and students to visualize mathematical functions and data interactively, but has grown to support many non-interactive uses such as web scripting. It is also used as a plotting engine by third-party applications like Octave. Gnuplot has been supported and under active development since 1986.
@@ -38,6 +40,9 @@ make DESTDIR=%{buildroot} install
 
 
 %changelog
+* Wed Oct 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.4.8-3
+- Patch for CVE-2025-3359, CVE-2025-31177
+
 * Sat Oct 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.4.8-2
 - Patch for CVE-2025-31181, CVE-2025-31180, CVE-2025-31176
 
