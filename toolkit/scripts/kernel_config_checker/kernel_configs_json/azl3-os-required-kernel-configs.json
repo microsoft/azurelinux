@@ -3583,6 +3583,62 @@
             }
           ],
           "justification": "Selects NET_REDIRECT so act_mirred clears skb->tstamp on ingress redirects; without it the fq qdisc on Kata's tap0_kata drops packets tcfilter redirects from eth0 (upstream 7236ead1b149, 2c64605b590e)"
+        },
+        {
+          "name": "CONFIG_CRYPTO_SELFTESTS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
+        },
+        {
+          "name": "CONFIG_CRYPTO_FIPS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
+        },
+        {
+          "name": "CONFIG_CRYPTO_JITTERENTROPY_OSR",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "3"
+            },
+            {
+              "architecture": "arm64",
+              "value": "3"
+            }
+          ],
+          "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
+        },
+        {
+          "name": "CONFIG_CRYPTO_JITTERENTROPY_MEMSIZE_2",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
         }
       ]
     },

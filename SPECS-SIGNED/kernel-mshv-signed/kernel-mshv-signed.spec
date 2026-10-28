@@ -148,6 +148,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
   arptables and ebtables legacy tables dropped in the 6.18 upgrade (fixes iptables-legacy)
 - Enable CONFIG_IFB on x86_64 so tc mirred redirects clear the receive timestamp (fixes fq
   dropping traffic redirected into Kata taps)
+- Re-enable FIPS mode support (CONFIG_CRYPTO_SELFTESTS, CONFIG_CRYPTO_FIPS) dropped in the
+  6.18 upgrade, with jitterentropy OSR 3 as in the kernel package
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
