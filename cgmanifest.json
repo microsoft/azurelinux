@@ -14862,8 +14862,8 @@
         "type": "other",
         "other": {
           "name": "objectweb-asm",
-          "version": "9.6",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/objectweb-asm-9.6.tar.gz"
+          "version": "9.11.1",
+          "downloadUrl": "https://gitlab.ow2.org/asm/asm/-/archive/ASM_9_11_1/asm-ASM_9_11_1.tar.gz"
         }
       }
     },
