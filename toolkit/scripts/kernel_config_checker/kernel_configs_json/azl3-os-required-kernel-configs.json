@@ -3835,6 +3835,20 @@
             }
           ],
           "justification": "overlayfs redirect_dir, index and metacopy on by default, enabled in 6.6 at customer request and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Hot-added memory is onlined by the kernel, as MEMORY_HOTPLUG_DEFAULT_ONLINE=y did in 6.6; the 6.18 upgrade took the new upstream default (offline)"
         }
       ]
     },
