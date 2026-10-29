@@ -2,3 +2,16 @@
 # Import Fedora 43's latest timezone rules beyond the distro snapshot.
 # Drop this pin once the default snapshot includes this revision.
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "74ae775725ebdaab9d51fe66a91c9293fbf0422e" }
+
+# Remove these downloads together with the 2026f overlay once Fedora catches up.
+[[components.tzdata.source-files]]
+filename = "tzdata2026f.tar.gz"
+hash = "26189803c8b3e903dcc467404e2feefb7d190cb1870249a23577ce31e9dcbf187e4704e0b45c8d1366d1c501bb5b53a2e80f8e2828b2163be15e532f6acab52d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://data.iana.org/time-zones/releases/tzdata2026f.tar.gz" }
+
+[[components.tzdata.source-files]]
+filename = "tzcode2026f.tar.gz"
+hash = "eefcea60c37857214e1eba768d1bbd096de2a8f5afc9a776555552922cc174b32892d7442097b699b77efcba4d85649ed7d13e752ffdbcaad1050749c6c7b5aa"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://data.iana.org/time-zones/releases/tzcode2026f.tar.gz" }
