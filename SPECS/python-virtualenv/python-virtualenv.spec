@@ -24,10 +24,7 @@ Patch1011:      CVE-2026-13346v0.patch
 Patch1012:      CVE-2026-13346v1.patch
 Patch1013:      CVE-2026-102925.patch
 Patch1014:      CVE-2026-102930.patch
-<<<<<<< HEAD
-=======
 Patch1015:      remove-compromised-wheel-ca-roots.patch
-# Keep these backports in dependency order rather than CVE-number order.
 Patch1016:      CVE-2026-113732.patch
 Patch1017:      CVE-2026-113716.patch
 Patch1018:      CVE-2026-113723.patch
@@ -42,10 +39,6 @@ Patch1026:      CVE-2026-113719.patch
 Patch1027:      CVE-2026-113721.patch
 Patch1028:      CVE-2026-102938.patch
 Patch1029:      CVE-2026-115586.patch
->>>>>>> 88b378a0cb ([High] Patch python-virtualenv for CVE-2026-102938, CVE-2026-113713, CVE-2026-113715, CVE-2026-113716, CVE-2026-113719, CVE-2026-113720, CVE-2026-113721, CVE-2026-113722, CVE-2026-113723, CVE-2026-113725, CVE-2026-113726, CVE-2026-113732, CVE-2026-113776 (#19798))
-BuildArch:      noarch
-
-%description
 virtualenv is a tool to create isolated Python environment.
 
 %package -n     python3-virtualenv
@@ -77,8 +70,6 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 0 -p1
 %patch -P 1013 -p1
 %patch -P 1014 -p1
-<<<<<<< HEAD
-=======
 %patch -P 1015 -p1
 %patch -P 1016 -p1
 %patch -P 1017 -p1
@@ -94,10 +85,6 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 1027 -p1
 %patch -P 1028 -p1
 %patch -P 1029 -p1
->>>>>>> 88b378a0cb ([High] Patch python-virtualenv for CVE-2026-102938, CVE-2026-113713, CVE-2026-113715, CVE-2026-113716, CVE-2026-113719, CVE-2026-113720, CVE-2026-113721, CVE-2026-113722, CVE-2026-113723, CVE-2026-113725, CVE-2026-113726, CVE-2026-113732, CVE-2026-113776 (#19798))
-
-# Manual patching for CVE-2025-50181 and CVE-2026-1703v0
-# For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
 # For CVE-2026-1703, unpacking.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
 # Affected files are under src and archived inside a .whl file, so we need to unpack it, apply the patch, and then re-zip it.
 
@@ -220,13 +207,12 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
-<<<<<<< HEAD
-* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-8
+* Thu Oct 29 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-10
 - Pin packaging==23.2 when pip-installing test tooling in %%check to fix
   ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
-=======
+
 * Tue Oct 27 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 20.36.1-9
-- Patch for CVE-2026-102938, CVE-2026-113713, CVE-2026-113715, and CVE-2026-113716.
+- Patch for CVE-2026-102938, CVE-2026-113713, and CVE-2026-113716.
 - Patch for CVE-2026-113719, CVE-2026-113720, CVE-2026-113721, and CVE-2026-113722.
 - Patch for CVE-2026-113723, CVE-2026-113725, CVE-2026-113726, and CVE-2026-113732.
 - Patch for CVE-2026-113776 and CVE-2026-115586.
@@ -235,10 +221,12 @@ tox -e py
 - Remove affected eMudhra and AAA roots from both embedded pip wheels.
 - Regenerate wheel RECORD entries after the existing security backports.
 - Run pytest directly with pinned test dependencies in a private environment.
->>>>>>> 88b378a0cb ([High] Patch python-virtualenv for CVE-2026-102938, CVE-2026-113713, CVE-2026-113715, CVE-2026-113716, CVE-2026-113719, CVE-2026-113720, CVE-2026-113721, CVE-2026-113722, CVE-2026-113723, CVE-2026-113725, CVE-2026-113726, CVE-2026-113732, CVE-2026-113776 (#19798))
 
 * Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
 - Patch for CVE-2026-102925 and CVE-2026-102930
+
+* Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
+- Patch for CVE-2026-13346
 
 * Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
 - Patch for CVE-2026-13346
