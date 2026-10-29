@@ -1,2 +1,2 @@
 [components.pyOpenSSL]
-spec = { type = "upstream", upstream-commit = "8ac54d517e6d9db673dc83b4e2b12b83d1f99724" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "8ac54d517e6d9db673dc83b4e2b12b83d1f99724" }

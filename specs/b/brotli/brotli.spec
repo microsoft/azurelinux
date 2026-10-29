@@ -6,7 +6,7 @@ Name:           brotli
 # perl-Alien-Brotli is rebuilt and included in the update, as it
 # depends on the exact brotli version
 Version:        1.2.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Lossless compression algorithm
 
 License:        MIT

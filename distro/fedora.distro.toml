@@ -29,6 +29,11 @@ description = "Fedora Linux 44"
 release-ver = "43"
 dist-git-branch = "f44"
 
+[distros.fedora.versions.45]
+description = "Fedora Linux 45"
+release-ver = "45"
+dist-git-branch = "f45"
+
 [distros.fedora.versions.rawhide]
 description = "Fedora Linux Rawhide"
 release-ver = "rawhide"

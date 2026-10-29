@@ -5,7 +5,7 @@
 # SONAMEs are unchanged.
 # https://src.fedoraproject.org/rpms/samba/c/7f48f560f98a44a98b0562493e21c018aa66a933
 [components.samba]
-spec = { type = "upstream", upstream-commit = "7f48f560f98a44a98b0562493e21c018aa66a933" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "7f48f560f98a44a98b0562493e21c018aa66a933" }
 
 # Release: %{samba_release}
 release = { calculation = "autorelease" }

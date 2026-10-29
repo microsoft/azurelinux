@@ -4,4 +4,4 @@
 # https://www.ruby-lang.org/en/news/2026/10/23/regexp-fixes-for-gitlab-cves/
 # https://src.fedoraproject.org/rpms/ruby/c/d9d09f6ea1be2c855a99c97acd2286379cbba130
 [components.ruby]
-spec = { type = "upstream", upstream-commit = "d9d09f6ea1be2c855a99c97acd2286379cbba130" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "d9d09f6ea1be2c855a99c97acd2286379cbba130" }

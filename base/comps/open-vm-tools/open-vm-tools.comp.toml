@@ -1,2 +1,2 @@
 [components.open-vm-tools]
-spec = { type = "upstream", upstream-commit = "acd17b77b079c1cba2ba37acaace38ed9bd8e9b6" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "acd17b77b079c1cba2ba37acaace38ed9bd8e9b6" }
