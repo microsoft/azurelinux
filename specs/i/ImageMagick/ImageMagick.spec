@@ -19,8 +19,8 @@
 
 Name:           ImageMagick
 Epoch:          1
-Version:        7.1.1.47
-Release: 10%{?dist}
+Version:        7.1.2.32
+Release: 6%{?dist}
 Summary:        An X application for displaying and manipulating images
 
 %global VER %(foo=%{version}; echo ${foo:0:5})
@@ -30,8 +30,8 @@ Summary:        An X application for displaying and manipulating images
 %global libcxxsover 5
 License:        ImageMagick
 URL:            https://imagemagick.org/
-Source0:        https://imagemagick.org/archive/releases/%{name}-%{VER}-%{Patchlevel}.tar.xz
-Source1:        https://imagemagick.org/archive/releases/%{name}-%{VER}-%{Patchlevel}.tar.xz.asc
+Source0:        https://download.imagemagick.org/archive/%{name}-%{VER}-%{Patchlevel}.tar.xz
+Source1:        https://download.imagemagick.org/archive/%{name}-%{VER}-%{Patchlevel}.tar.xz.asc
 Source2:        ImageMagick.keyring
 Source9999: ImageMagick.azl.macros
 
@@ -75,6 +75,10 @@ BuildRequires:  pkgconfig(raqm)
 BuildRequires:  pkgconfig(lqr-1)
 %endif
 BuildRequires:  pkgconfig(libraw) >= 0.14.8
+# Ultra HDR support available of Fedora 43 and onward
+%if 0%{?fedora} >= 43
+BuildRequires:  pkgconfig(libuhdr) >= 1.3.0
+%endif
 BuildRequires:  pkgconfig(libzstd)
 BuildRequires:  pkgconfig(libzip) >= 1.0.0
 BuildRequires:  pkgconfig(pango) >= 1.28.1
@@ -260,6 +264,9 @@ export CFLAGS="%{optflags} -DIMPNG_SETJMP_IS_THREAD_SAFE"
         --with-raw \
 %if 0%{?fedora} || 0%{?rhel} > 8
         --with-lqr \
+%if 0%{?fedora} >= 43
+        --with-uhdr \
+%endif
 %endif
         --with-gvc \
         --with-raqm \
@@ -423,6 +430,44 @@ rm PerlMagick/demo/Generic.ttf
 %endif
 
 %changelog
+* Mon Sep 28 2026 Luya Tshimbalanga <luya@fedoraproject.org> - 1:7.1.2.32-1
+- Update to version 7.1.2.32
+- Resolves: rhbz#2542068
+
+* Fri Sep 18 2026 Luya Tshimbalanga <luya@fedoraproject.org> - 1:7.1.2.31-1
+- Update to version 7.1.2.31
+- Resolves: rhbz#2521653
+
+* Mon Jul 13 2026 Luya Tshimbalanga <luya@fedoraproject.org> - 1:7.1.2.27-1
+- Update to version 7.1.2.27
+- Resolves: rhbz#2441780
+
+* Sat Jul 11 2026 Luya Tshimbalanga <luya@fedoraproject.org> - 1:7.1.2.23-2
+- Update source URL address
+
+* Thu Jun 04 2026 Packit <hello@packit.dev> - 1:7.1.2.23-1
+- Update to version 7.1.2.23
+- Resolves: rhbz#2441780
+
+* Sat May 30 2026 Richard Shaw <hobbes1069@gmail.com> - 1:7.1.2.13-4
+- Rebuild for OpenColorIO 2.5.2.
+
+* Sun May 24 2026 Richard Shaw <hobbes1069@gmail.com> - 1:7.1.2.13-3
+- Rebuild for OpenEXR 3.4.12.
+
+* Wed Apr 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:7.1.2.13-2
+- Libraw rebuild
+
+* Mon Feb 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:7.1.2.13-1
+- 7.1.2.13
+
+* Mon Feb 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:7.1.1.47-8
+- LibRaw rebuild
+
+* Sat Jan 31 2026 Luya Tshimbalanga <luya@fedoraproject.org> - 1:7.1.1.47-7
+- Enable uhdr (Ultra HDR) support
+- Resolves: rhbz#2343774
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.1.1.47-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
