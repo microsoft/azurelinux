@@ -3869,6 +3869,20 @@
             }
           ],
           "justification": "iptables NOTRACK and TRACE targets, enabled in 6.6 on aarch64 and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_CRYPTO_BENCHMARK",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "tcrypt crypto test module (CRYPTO_TEST=m in 6.6, enabled for FIPS testing), renamed to CRYPTO_BENCHMARK and dropped in the 6.18 upgrade"
         }
       ]
     },

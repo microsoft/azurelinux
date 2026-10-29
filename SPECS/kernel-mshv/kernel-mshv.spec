@@ -287,6 +287,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
   in 6.6; the 6.18 upgrade switched the default to offline
 - Re-enable the iptables NOTRACK and TRACE targets on aarch64 (=m), dropped in the
   6.18 upgrade
+- Re-enable the tcrypt test module (CONFIG_CRYPTO_BENCHMARK=m, CONFIG_CRYPTO_TEST in 6.6),
+  dropped in the 6.18 upgrade
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
