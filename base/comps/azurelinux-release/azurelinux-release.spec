@@ -1,12 +1,15 @@
 %define release_name Four
-# Let's remove this prerelease_name before release, and next time we
-# can use the built-in prerelease logic (based on release number < 1)
-%define prerelease_name Beta
 %define is_evergreen 0
 
 # Define this to 1 for Branched releases prior to RC
 # or 0 for RC and stable releases
-%define is_development 1
+%define is_development 0
+
+%if %{is_development}
+%global release_type development
+%else
+%global release_type stable
+%endif
 
 %define dist_version_major 4
 %define dist_version_minor 0
@@ -29,14 +32,11 @@
 %bcond container 1
 %bcond wsl 1
 
-# TODO(azl): review how this will get resolved
-# ...global dist
-
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        35%{?dist}
+Release:        36%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -260,8 +260,6 @@ ln -s azurelinux-release %{buildroot}%{_sysconfdir}/system-release
 %define starts_with(str,prefix) (%{expand:%%{lua:print(starts_with(%1, %2) and "1" or "0")}})
 %if %{starts_with "a%{release}" "a0"}
   %global prerelease \ Prerelease
-%elif "0%{?prerelease_name}" != "0"
-  %global prerelease \ %{prerelease_name}
 %endif
 
 # -------------------------------------------------------------------------
@@ -295,11 +293,10 @@ ln -s azurelinux-release %{buildroot}%{_sysconfdir}/system-release
 %global dist_debuginfod_url %{nil}
 # -------------------------------------------------------------------------
 
-# TODO(azl): review; dynamically generate RELEASE_TYPE from release_type macro
 cat <<EOF >os-release
 NAME="%{dist_name}"
 VERSION="%{dist_version} (%{release_name}%{?prerelease})"
-RELEASE_TYPE=development
+RELEASE_TYPE=%{release_type}
 ID=azurelinux
 ID_LIKE=fedora
 VERSION_ID=%{dist_version}
@@ -527,6 +524,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Thu Oct 29 2026 Chris Co <chrco@microsoft.com> - 4.0-36
+- Remove Beta branding and identify Azure Linux 4.0 as stable
+
 * Fri Oct 23 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-35
 - Disable jffs2 in cloud images for CIS 1.1.1.5
 
