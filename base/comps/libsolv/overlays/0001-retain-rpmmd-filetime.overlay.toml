@@ -1,0 +1,9 @@
+# Retain publication timestamps from rpm-md primary.xml for optional snapshot consumers.
+[metadata]
+category = "azl-compatibility"
+upstream-status = "unknown"
+
+[[overlays]]
+description = "Retain rpm-md publication time independently of package build time"
+type = "patch-add"
+source = "../0002-Make-file-time-available-for-dnf-plugins.patch"

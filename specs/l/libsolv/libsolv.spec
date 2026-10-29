@@ -32,7 +32,7 @@
 
 Name:           lib%{libname}
 Version:        0.7.40
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        Package dependency solver
 
 # LICENSE.BSD:      BSD-3-Clause text
@@ -96,6 +96,8 @@ BuildRequires:  pkgconfig(zck)
 %endif
 
 Patch4: 0002-Make-file-time-available-for-dnf-plugins.patch
+Provides: libsolv(rpmmd-filetime) = 1
+Provides: libsolv(rpmmd-filetime)%{?_isa} = 1
 %description
 A free package dependency solver using a satisfiability algorithm. The
 library is based on two major, but independent, blocks:
