@@ -164,6 +164,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
   6.18 upgrade
 - Re-enable the tcrypt test module (CONFIG_CRYPTO_BENCHMARK=m, CONFIG_CRYPTO_TEST in 6.6),
   dropped in the 6.18 upgrade
+- Carry "mm: vmscan: throttle memcg reclaim on writeback" from rolling-lts/kata/6.18.34.mshv3,
+  dropped in 6.18.58.mshv1 (fixes memcg OOM kills of cloud-hypervisor in Kata pods)
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
 - Upgrade to 6.18.34.mshv3
