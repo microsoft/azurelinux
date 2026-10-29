@@ -3,10 +3,10 @@
 
 Summary: Timezone data
 Name: tzdata
-Version: 2026e
-%define tzdata_version 2026e
-%define tzcode_version 2026e
-Release: 6%{?dist}
+Version: 2026f
+%define tzdata_version 2026f
+%define tzcode_version 2026f
+Release: 7%{?dist}
 License: LicenseRef-Fedora-Public-Domain AND (GPL-2.0-only WITH ClassPath-exception-2.0)
 URL: https://www.iana.org/time-zones
 Source0: ftp://ftp.iana.org/tz/releases/tzdata%{tzdata_version}.tar.gz

@@ -1,0 +1,25 @@
+# IANA 2026f keeps Cuba on -04 through 2027-11-07 and updates leap-second data.
+# Remove this overlay once the imported Fedora spec packages 2026f or newer.
+# Release notes: https://data.iana.org/time-zones/tzdb-2026f/NEWS
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Use IANA 2026f timezone rules while Fedora still packages 2026e"
+type = "spec-update-tag"
+tag = "Version"
+value = "2026f"
+
+[[overlays]]
+description = "Fetch the IANA 2026f timezone data archive"
+type = "spec-search-replace"
+regex = '^%define tzdata_version 2026e$'
+replacement = "%define tzdata_version 2026f"
+
+[[overlays]]
+description = "Fetch matching IANA 2026f timezone code for data generation and tests"
+type = "spec-search-replace"
+regex = '^%define tzcode_version 2026e$'
+replacement = "%define tzcode_version 2026f"
