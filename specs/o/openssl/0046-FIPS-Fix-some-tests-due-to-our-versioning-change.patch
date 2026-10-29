@@ -1,7 +1,7 @@
-From 552dec327a579572ca17a560bb415d8f407ce990 Mon Sep 17 00:00:00 2001
+From 22e053a57c002563a60603253ea0a13a1401c93f Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Mon, 10 Mar 2025 13:52:50 -0400
-Subject: [PATCH 46/59] FIPS: Fix some tests due to our versioning change
+Subject: [PATCH 46/58] FIPS: Fix some tests due to our versioning change
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
@@ -102,5 +102,5 @@ index af47842fd8..21c75033e8 100644
  
  my @tests_mldsa_tls_1_3 = (
 -- 
-2.51.0
+2.55.0
 

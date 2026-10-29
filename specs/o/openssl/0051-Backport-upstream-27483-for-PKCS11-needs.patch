@@ -1,7 +1,7 @@
-From 5e135e7ceefd5b72cb54a93b13b478af05873318 Mon Sep 17 00:00:00 2001
+From 115b2b8c56f3cde793ea6464682516c9ca1eb04a Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Mon, 12 May 2025 14:34:39 +0200
-Subject: [PATCH 51/59] Backport upstream #27483 for PKCS11 needs
+Subject: [PATCH 51/58] Backport upstream #27483 for PKCS11 needs
 
 ---
  .../implementations/skeymgmt/aes_skmgmt.c     |  2 +
@@ -11,7 +11,7 @@ Subject: [PATCH 51/59] Backport upstream #27483 for PKCS11 needs
  4 files changed, 76 insertions(+)
 
 diff --git a/providers/implementations/skeymgmt/aes_skmgmt.c b/providers/implementations/skeymgmt/aes_skmgmt.c
-index 6d3b5f377f..17be480131 100644
+index 02370b7fb7..48e3b64580 100644
 --- a/providers/implementations/skeymgmt/aes_skmgmt.c
 +++ b/providers/implementations/skeymgmt/aes_skmgmt.c
 @@ -48,5 +48,7 @@ const OSSL_DISPATCH ossl_aes_skeymgmt_functions[] = {
@@ -23,7 +23,7 @@ index 6d3b5f377f..17be480131 100644
      OSSL_DISPATCH_END
  };
 diff --git a/providers/implementations/skeymgmt/generic.c b/providers/implementations/skeymgmt/generic.c
-index b41bf8e12d..5fb3fad7e3 100644
+index 5b8c557f83..faec12374a 100644
 --- a/providers/implementations/skeymgmt/generic.c
 +++ b/providers/implementations/skeymgmt/generic.c
 @@ -65,6 +65,16 @@ end:
@@ -41,7 +41,7 @@ index b41bf8e12d..5fb3fad7e3 100644
 +}
 +
  int generic_export(void *keydata, int selection,
-                    OSSL_CALLBACK *param_callback, void *cbarg)
+     OSSL_CALLBACK *param_callback, void *cbarg)
  {
 @@ -89,5 +99,7 @@ const OSSL_DISPATCH ossl_generic_skeymgmt_functions[] = {
      { OSSL_FUNC_SKEYMGMT_FREE, (void (*)(void))generic_free },
@@ -52,7 +52,7 @@ index b41bf8e12d..5fb3fad7e3 100644
      OSSL_DISPATCH_END
  };
 diff --git a/providers/implementations/skeymgmt/skeymgmt_lcl.h b/providers/implementations/skeymgmt/skeymgmt_lcl.h
-index c180c1d303..a7e7605050 100644
+index c75776cce4..7e35b2cc9e 100644
 --- a/providers/implementations/skeymgmt/skeymgmt_lcl.h
 +++ b/providers/implementations/skeymgmt/skeymgmt_lcl.h
 @@ -15,5 +15,6 @@
@@ -63,10 +63,10 @@ index c180c1d303..a7e7605050 100644
  
  #endif
 diff --git a/test/evp_skey_test.c b/test/evp_skey_test.c
-index b81df9c8f8..e33bbbe003 100644
+index 11b1a4e1cd..37d9c0f578 100644
 --- a/test/evp_skey_test.c
 +++ b/test/evp_skey_test.c
-@@ -92,6 +92,66 @@ end:
+@@ -93,6 +93,66 @@ end:
      return ret;
  }
  
@@ -133,7 +133,7 @@ index b81df9c8f8..e33bbbe003 100644
  #define IV_SIZE 16
  #define DATA_SIZE 32
  static int test_aes_raw_skey(void)
-@@ -252,6 +312,7 @@ int setup_tests(void)
+@@ -253,6 +313,7 @@ int setup_tests(void)
          return 0;
  
      ADD_TEST(test_skey_cipher);
@@ -142,5 +142,5 @@ index b81df9c8f8..e33bbbe003 100644
      ADD_TEST(test_aes_raw_skey);
  #ifndef OPENSSL_NO_DES
 -- 
-2.51.0
+2.55.0
 

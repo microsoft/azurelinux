@@ -1,7 +1,7 @@
-From 1797d7e47f7bd2a16f56b5f32e31700b871ece30 Mon Sep 17 00:00:00 2001
+From 1bbbd8befffcd187de49a679e8cefd9784adb3a9 Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Fri, 7 Mar 2025 18:12:33 -0500
-Subject: [PATCH 17/59] FIPS: Red Hat's FIPS module name and version
+Subject: [PATCH 17/58] FIPS: Red Hat's FIPS module name and version
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
@@ -9,11 +9,11 @@ Signed-off-by: Simo Sorce <simo@redhat.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/providers/fips/fipsprov.c b/providers/fips/fipsprov.c
-index e260b5b665..e5d798fd54 100644
+index 3c749018bc..7928bd0e55 100644
 --- a/providers/fips/fipsprov.c
 +++ b/providers/fips/fipsprov.c
-@@ -201,13 +201,13 @@ static int fips_get_params(void *provctx, OSSL_PARAM params[])
-                                               OSSL_LIB_CTX_FIPS_PROV_INDEX);
+@@ -200,13 +200,13 @@ static int fips_get_params(void *provctx, OSSL_PARAM params[])
+         OSSL_LIB_CTX_FIPS_PROV_INDEX);
  
      p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_NAME);
 -    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, FIPS_VENDOR))
@@ -30,5 +30,5 @@ index e260b5b665..e5d798fd54 100644
      p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_STATUS);
      if (p != NULL && !OSSL_PARAM_set_int(p, ossl_prov_is_running()))
 -- 
-2.51.0
+2.55.0
 

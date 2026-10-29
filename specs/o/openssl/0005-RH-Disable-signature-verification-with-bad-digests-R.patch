@@ -1,7 +1,7 @@
-From c9f17bc73a099735c6e80dd67c93f23175771cb4 Mon Sep 17 00:00:00 2001
+From 18fcf3206adc966012dacc990c915e432028d995 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:14 +0100
-Subject: [PATCH 05/59] RH: Disable signature verification with bad digests -
+Subject: [PATCH 05/58] RH: Disable signature verification with bad digests -
  REVIEW
 
 Patch-name: 0006-Disable-signature-verification-with-totally-unsafe-h.patch
@@ -14,10 +14,10 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  1 file changed, 5 insertions(+)
 
 diff --git a/crypto/asn1/a_verify.c b/crypto/asn1/a_verify.c
-index f6cac80962..fbc6ce6e30 100644
+index 55f86ee83f..95483afc00 100644
 --- a/crypto/asn1/a_verify.c
 +++ b/crypto/asn1/a_verify.c
-@@ -151,6 +151,11 @@ int ASN1_item_verify_ctx(const ASN1_ITEM *it, const X509_ALGOR *alg,
+@@ -152,6 +152,11 @@ int ASN1_item_verify_ctx(const ASN1_ITEM *it, const X509_ALGOR *alg,
              ERR_raise(ERR_LIB_ASN1, ERR_R_EVP_LIB);
          if (ret <= 1)
              goto err;
@@ -30,5 +30,5 @@ index f6cac80962..fbc6ce6e30 100644
          const EVP_MD *type = NULL;
  
 -- 
-2.51.0
+2.55.0
 

@@ -1,7 +1,7 @@
-From 0e03058e3d0a540a330bb42ee8f6dca5604841f9 Mon Sep 17 00:00:00 2001
+From a3a36773408e9a8fe5a21e567d750b72bbff7f0e Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:14 +0100
-Subject: [PATCH 01/59] RH: Aarch64 and ppc64le use lib64
+Subject: [PATCH 01/58] RH: Aarch64 and ppc64le use lib64
 
 Patch-name: 0001-Aarch64-and-ppc64le-use-lib64.patch
 Patch-id: 1
@@ -14,10 +14,10 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  1 file changed, 2 insertions(+)
 
 diff --git a/Configurations/10-main.conf b/Configurations/10-main.conf
-index cba57b4127..3e327017ef 100644
+index 389b4a839a..c05a806aac 100644
 --- a/Configurations/10-main.conf
 +++ b/Configurations/10-main.conf
-@@ -726,6 +726,7 @@ my %targets = (
+@@ -727,6 +727,7 @@ my %targets = (
          lib_cppflags     => add("-DL_ENDIAN"),
          asm_arch         => 'ppc64',
          perlasm_scheme   => "linux64le",
@@ -25,7 +25,7 @@ index cba57b4127..3e327017ef 100644
      },
  
      "linux-armv4" => {
-@@ -768,6 +769,7 @@ my %targets = (
+@@ -769,6 +770,7 @@ my %targets = (
          inherit_from     => [ "linux-generic64" ],
          asm_arch         => 'aarch64',
          perlasm_scheme   => "linux64",
@@ -34,5 +34,5 @@ index cba57b4127..3e327017ef 100644
      "linux-arm64ilp32" => {  # https://wiki.linaro.org/Platform/arm64-ilp32
          inherit_from     => [ "linux-generic32" ],
 -- 
-2.51.0
+2.55.0
 

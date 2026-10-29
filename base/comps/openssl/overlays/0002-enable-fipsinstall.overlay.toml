@@ -28,8 +28,8 @@ description = "Remove fips_config.pod from patch 0037's diffstat"
 [[overlays]]
 type = "file-search-replace"
 file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
-regex = '''9 files changed, 46 insertions\(\+\), 5 deletions\(-\)'''
-replacement = "8 files changed, 33 insertions(+), 5 deletions(-)"
+regex = '''9 files changed, 47 insertions\(\+\), 6 deletions\(-\)'''
+replacement = "8 files changed, 34 insertions(+), 6 deletions(-)"
 description = "Update patch 0037's diffstat after removing the documentation hunk"
 
 [[overlays]]

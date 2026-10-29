@@ -1,7 +1,7 @@
-From 91efb2e81287745f7a2817211d00ca5a41f4e8ba Mon Sep 17 00:00:00 2001
+From 15461b41ff62595df0dfb1d88a3f1750151380da Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:15 +0100
-Subject: [PATCH 19/59] FIPS: Force fips provider on
+Subject: [PATCH 19/58] FIPS: Force fips provider on
 
 Patch-name: 0032-Force-fips.patch
 Patch-id: 32
@@ -13,7 +13,7 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
-index 9649517dd2..1e5053cbce 100644
+index f2e76ac402..d92827d3ba 100644
 --- a/crypto/provider_conf.c
 +++ b/crypto/provider_conf.c
 @@ -10,6 +10,8 @@
@@ -51,6 +51,8 @@ index 9649517dd2..1e5053cbce 100644
 +        OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
 +#  define FIPS_LOCAL_CONF           OPENSSLDIR "/fips_local.cnf"
 +
++        if (EVP_default_properties_enable_fips(libctx, 1) != 1)
++            return 0;
 +        if (access(FIPS_LOCAL_CONF, R_OK) == 0) {
 +            CONF *fips_conf = NCONF_new_ex(libctx, NCONF_default());
 +            if (NCONF_load(fips_conf, FIPS_LOCAL_CONF, NULL) <= 0)
@@ -67,13 +69,11 @@ index 9649517dd2..1e5053cbce 100644
 +        }
 +        if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
 +            return 0;
-+        if (EVP_default_properties_enable_fips(libctx, 1) != 1)
-+            return 0;
 +    }
 +
      return 1;
  }
  
 -- 
-2.51.0
+2.55.0
 

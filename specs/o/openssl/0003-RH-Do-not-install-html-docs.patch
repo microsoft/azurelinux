@@ -1,7 +1,7 @@
-From 2530f17f6a5fe3733beda49954c5c78f423569d5 Mon Sep 17 00:00:00 2001
+From 955201c80e1add99ef6cabd48ba4b74306abe81e Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:14 +0100
-Subject: [PATCH 03/59] RH: Do not install html docs
+Subject: [PATCH 03/58] RH: Do not install html docs
 
 Patch-name: 0003-Do-not-install-html-docs.patch
 Patch-id: 3
@@ -13,10 +13,10 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
-index 81f49926ce..516f8d62dc 100644
+index 5bf397eba0..9a7d51ac1f 100644
 --- a/Configurations/unix-Makefile.tmpl
 +++ b/Configurations/unix-Makefile.tmpl
-@@ -669,7 +669,7 @@ install_sw: install_dev install_engines install_modules install_runtime ## Insta
+@@ -670,7 +670,7 @@ install_sw: install_dev install_engines install_modules install_runtime ## Insta
  
  uninstall_sw: uninstall_runtime uninstall_modules uninstall_engines uninstall_dev ## Uninstall the software and libraries
  
@@ -26,5 +26,5 @@ index 81f49926ce..516f8d62dc 100644
  uninstall_docs: uninstall_man_docs uninstall_html_docs ## Uninstall manpages and HTML documentation
  	$(RM) -r "$(DESTDIR)$(DOCDIR)"
 -- 
-2.51.0
+2.55.0
 

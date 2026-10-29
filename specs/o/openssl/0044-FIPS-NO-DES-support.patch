@@ -1,53 +1,38 @@
-From 7c75c6f52700efbee8d960601c0b1943295b6ae5 Mon Sep 17 00:00:00 2001
+From 6a01c0baf7f661cc79e48418604561054b0d2a3f Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Fri, 7 Mar 2025 18:15:13 -0500
-Subject: [PATCH 44/59] FIPS: NO DES support
+Subject: [PATCH 44/58] FIPS: NO DES support
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
- providers/fips/fipsprov.c                           |  3 ++-
- providers/fips/self_test_data.inc                   |  4 ++++
- test/evp_libctx_test.c                              |  4 +++-
- .../30-test_evp_data/evpciph_des3_common.txt        | 13 ++++---------
- test/recipes/30-test_evp_data/evpmac_cmac_des.txt   | 10 ----------
- test/recipes/80-test_cms.t                          |  2 +-
- 6 files changed, 14 insertions(+), 22 deletions(-)
+ providers/fips/fipsprov.c                     |  4 ---
+ providers/fips/self_test_data.inc             |  2 ++
+ test/evp_libctx_test.c                        |  4 ++-
+ .../30-test_evp_data/evpciph_des3_common.txt  | 13 +++------
+ .../30-test_evp_data/evpmac_cmac_des.txt      | 29 -------------------
+ test/recipes/80-test_cms.t                    |  2 +-
+ 6 files changed, 10 insertions(+), 44 deletions(-)
 
 diff --git a/providers/fips/fipsprov.c b/providers/fips/fipsprov.c
-index a807c76fd8..767073fce4 100644
+index f16960b77b..16ed6a4a0c 100644
 --- a/providers/fips/fipsprov.c
 +++ b/providers/fips/fipsprov.c
-@@ -356,7 +356,8 @@ static const OSSL_ALGORITHM_CAPABLE fips_ciphers[] = {
-          ossl_cipher_capable_aes_cbc_hmac_sha256),
+@@ -354,10 +354,6 @@ static const OSSL_ALGORITHM_CAPABLE fips_ciphers[] = {
+         ossl_cipher_capable_aes_cbc_hmac_sha256),
      ALGC(PROV_NAMES_AES_256_CBC_HMAC_SHA256, ossl_aes256cbc_hmac_sha256_functions,
-          ossl_cipher_capable_aes_cbc_hmac_sha256),
+         ossl_cipher_capable_aes_cbc_hmac_sha256),
 -#ifndef OPENSSL_NO_DES
-+/* We don't certify 3DES in our FIPS provider */
-+#if 0 /* ifndef OPENSSL_NO_DES */
-     ALG(PROV_NAMES_DES_EDE3_ECB, ossl_tdes_ede3_ecb_functions),
-     ALG(PROV_NAMES_DES_EDE3_CBC, ossl_tdes_ede3_cbc_functions),
- #endif  /* OPENSSL_NO_DES */
+-    ALG(PROV_NAMES_DES_EDE3_ECB, ossl_tdes_ede3_ecb_functions),
+-    ALG(PROV_NAMES_DES_EDE3_CBC, ossl_tdes_ede3_cbc_functions),
+-#endif /* OPENSSL_NO_DES */
+     { { NULL, NULL, NULL }, NULL }
+ };
+ static OSSL_ALGORITHM exported_fips_ciphers[OSSL_NELEM(fips_ciphers)];
 diff --git a/providers/fips/self_test_data.inc b/providers/fips/self_test_data.inc
-index a7d7684d96..c9ce8f3340 100644
+index 84b0b1c5c1..c92e8541a9 100644
 --- a/providers/fips/self_test_data.inc
 +++ b/providers/fips/self_test_data.inc
-@@ -262,6 +262,7 @@ static const unsigned char aes_128_ecb_ct[] = {
-     0x4e, 0xaa, 0x6f, 0xb4, 0xdb, 0xf7, 0x84, 0x65
- };
- 
-+#if 0
- #ifndef OPENSSL_NO_DES
- /*
-  * TDES-ECB test data from
-@@ -280,6 +281,7 @@ static const unsigned char tdes_pt[] = {
-     0x4B, 0xAB, 0x3B, 0xE1, 0x50, 0x2E, 0x3B, 0x36
- };
- #endif
-+#endif
- 
- static const ST_KAT_CIPHER st_kat_cipher_tests[] = {
-     {
-@@ -305,6 +307,7 @@ static const ST_KAT_CIPHER st_kat_cipher_tests[] = {
+@@ -305,6 +305,7 @@ static const ST_KAT_CIPHER st_kat_cipher_tests[] = {
          CIPHER_MODE_DECRYPT,
          ITM(aes_128_ecb_key)
      },
@@ -55,7 +40,7 @@ index a7d7684d96..c9ce8f3340 100644
  #ifndef OPENSSL_NO_DES
      {
          {
-@@ -317,6 +320,7 @@ static const ST_KAT_CIPHER st_kat_cipher_tests[] = {
+@@ -317,6 +318,7 @@ static const ST_KAT_CIPHER st_kat_cipher_tests[] = {
          ITM(tdes_key)
      }
  #endif
@@ -64,10 +49,10 @@ index a7d7684d96..c9ce8f3340 100644
  
  static const char hkdf_digest[] = "SHA256";
 diff --git a/test/evp_libctx_test.c b/test/evp_libctx_test.c
-index 2838f343bd..19dd2c6c63 100644
+index 57ca0e07b4..d4da35ae2d 100644
 --- a/test/evp_libctx_test.c
 +++ b/test/evp_libctx_test.c
-@@ -831,7 +831,9 @@ int setup_tests(void)
+@@ -842,7 +842,9 @@ int setup_tests(void)
      ADD_TEST(kem_invalid_keytype);
  #endif
  #ifndef OPENSSL_NO_DES
@@ -138,13 +123,21 @@ index 6c74b65cef..8bcb78cd2d 100644
  Operation = ENCRYPT
  Unapproved = 1
 diff --git a/test/recipes/30-test_evp_data/evpmac_cmac_des.txt b/test/recipes/30-test_evp_data/evpmac_cmac_des.txt
-index a11e5ffe54..e4a7cbe75e 100644
+index a3de7c88e0..8cfc34d9cf 100644
 --- a/test/recipes/30-test_evp_data/evpmac_cmac_des.txt
 +++ b/test/recipes/30-test_evp_data/evpmac_cmac_des.txt
-@@ -35,13 +35,3 @@ Algorithm = DES-EDE3-CBC
+@@ -35,32 +35,3 @@ Algorithm = DES-EDE3-CBC
  Key = 89BCD952A8C8AB371AF48AC7D07085D5EFF702E6D62CDC23
  Input = FA620C1BBE97319E9A0CF0492121F7A20EB08A6A709DCBD00AAF38E4F99E754E
  Result = MAC_INIT_ERROR
+-
+-Availablein = fips
+-FIPSversion = >=3.4.0
+-MAC = CMAC by EVP_PKEY
+-Algorithm = DES-EDE3-CBC
+-Key = 89BCD952A8C8AB371AF48AC7D07085D5EFF702E6D62CDC23
+-Input = FA620C1BBE97319E9A0CF0492121F7A20EB08A6A709DCBD00AAF38E4F99E754E
+-Result = DIGESTSIGNINIT_ERROR
 -
 -Availablein = fips
 -FIPSversion = >=3.4.0
@@ -155,8 +148,19 @@ index a11e5ffe54..e4a7cbe75e 100644
 -Key = 89BCD952A8C8AB371AF48AC7D07085D5EFF702E6D62CDC23
 -Input = FA620C1BBE97319E9A0CF0492121F7A20EB08A6A709DCBD00AAF38E4F99E754E
 -Output = 8F49A1B7D6AA2258
+-
+-# Test that the legacy bridge propagates the unapproved TDES-CMAC indicator
+-Availablein = fips
+-FIPSversion = >=3.5.0
+-MAC = CMAC by EVP_PKEY
+-Unapproved = 1
+-CtrlInit = encrypt-check:0
+-Algorithm = DES-EDE3-CBC
+-Key = 89BCD952A8C8AB371AF48AC7D07085D5EFF702E6D62CDC23
+-Input = FA620C1BBE97319E9A0CF0492121F7A20EB08A6A709DCBD00AAF38E4F99E754E
+-Output = 8F49A1B7D6AA2258
 diff --git a/test/recipes/80-test_cms.t b/test/recipes/80-test_cms.t
-index 7350baa921..740823c61e 100644
+index d1462a75c9..8fd99909a5 100644
 --- a/test/recipes/80-test_cms.t
 +++ b/test/recipes/80-test_cms.t
 @@ -415,7 +415,7 @@ my @smime_cms_tests = (
@@ -169,5 +173,5 @@ index 7350baa921..740823c61e 100644
          "-des3", "-secretkey", "000102030405060708090A0B0C0D0E0F1011121314151617",
          "-stream", "-out", "{output}.cms" ],
 -- 
-2.51.0
+2.55.0
 

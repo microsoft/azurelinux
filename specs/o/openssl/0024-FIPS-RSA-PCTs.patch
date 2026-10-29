@@ -1,7 +1,7 @@
-From e19989c58ad6450428ee68fa4d81e022925872c1 Mon Sep 17 00:00:00 2001
+From a8c8f84618f8becaa0320e2991da7c40cbef038c Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Mon, 24 Mar 2025 10:50:37 -0400
-Subject: [PATCH 24/59] FIPS: RSA: PCTs
+Subject: [PATCH 24/58] FIPS: RSA: PCTs
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
@@ -10,10 +10,10 @@ Signed-off-by: Simo Sorce <simo@redhat.com>
  2 files changed, 61 insertions(+), 4 deletions(-)
 
 diff --git a/providers/implementations/keymgmt/rsa_kmgmt.c b/providers/implementations/keymgmt/rsa_kmgmt.c
-index cd74275d60..52087abff6 100644
+index d9f70149f4..c74f8ad38a 100644
 --- a/providers/implementations/keymgmt/rsa_kmgmt.c
 +++ b/providers/implementations/keymgmt/rsa_kmgmt.c
-@@ -434,6 +434,7 @@ struct rsa_gen_ctx {
+@@ -432,6 +432,7 @@ struct rsa_gen_ctx {
  #if defined(FIPS_MODULE) && !defined(OPENSSL_NO_ACVP_TESTS)
      /* ACVP test parameters */
      OSSL_PARAM *acvp_test_params;
@@ -21,7 +21,7 @@ index cd74275d60..52087abff6 100644
  #endif
  };
  
-@@ -447,6 +448,12 @@ static int rsa_gencb(int p, int n, BN_GENCB *cb)
+@@ -445,6 +446,12 @@ static int rsa_gencb(int p, int n, BN_GENCB *cb)
      return gctx->cb(params, gctx->cbarg);
  }
  
@@ -32,9 +32,9 @@ index cd74275d60..52087abff6 100644
 +#endif
 +
  static void *gen_init(void *provctx, int selection, int rsa_type,
-                       const OSSL_PARAM params[])
+     const OSSL_PARAM params[])
  {
-@@ -474,6 +481,10 @@ static void *gen_init(void *provctx, int selection, int rsa_type,
+@@ -472,6 +479,10 @@ static void *gen_init(void *provctx, int selection, int rsa_type,
  
      if (!rsa_gen_set_params(gctx, params))
          goto err;
@@ -45,7 +45,7 @@ index cd74275d60..52087abff6 100644
      return gctx;
  
  err:
-@@ -630,6 +641,11 @@ static void *rsa_gen(void *genctx, OSSL_CALLBACK *osslcb, void *cbarg)
+@@ -643,6 +654,11 @@ static void *rsa_gen(void *genctx, OSSL_CALLBACK *osslcb, void *cbarg)
  
      rsa = rsa_tmp;
      rsa_tmp = NULL;
@@ -54,10 +54,10 @@ index cd74275d60..52087abff6 100644
 +    if (do_rsa_pct(gctx->prov_rsa_ctx, "sha256", rsa) != 1)
 +        abort();
 +#endif
-  err:
+ err:
      BN_GENCB_free(gencb);
      RSA_free(rsa_tmp);
-@@ -645,6 +661,8 @@ static void rsa_gen_cleanup(void *genctx)
+@@ -658,6 +674,8 @@ static void rsa_gen_cleanup(void *genctx)
  #if defined(FIPS_MODULE) && !defined(OPENSSL_NO_ACVP_TESTS)
      ossl_rsa_acvp_test_gen_params_free(gctx->acvp_test_params);
      gctx->acvp_test_params = NULL;
@@ -67,7 +67,7 @@ index cd74275d60..52087abff6 100644
      BN_clear_free(gctx->pub_exp);
      OPENSSL_free(gctx);
 diff --git a/providers/implementations/signature/rsa_sig.c b/providers/implementations/signature/rsa_sig.c
-index 29be5f5028..670125464e 100644
+index bf34664fba..77975e5578 100644
 --- a/providers/implementations/signature/rsa_sig.c
 +++ b/providers/implementations/signature/rsa_sig.c
 @@ -37,7 +37,7 @@
@@ -97,7 +97,7 @@ index 29be5f5028..670125464e 100644
  {
      PROV_RSA_CTX *prsactx = NULL;
      char *propq_copy = NULL;
-@@ -1316,7 +1316,7 @@ int rsa_digest_verify_final(void *vprsactx, const unsigned char *sig,
+@@ -1334,7 +1334,7 @@ int rsa_digest_verify_final(void *vprsactx, const unsigned char *sig,
      return ok;
  }
  
@@ -106,7 +106,7 @@ index 29be5f5028..670125464e 100644
  {
      PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
  
-@@ -1866,6 +1866,45 @@ static const OSSL_PARAM *rsa_settable_ctx_md_params(void *vprsactx)
+@@ -1887,6 +1887,45 @@ static const OSSL_PARAM *rsa_settable_ctx_md_params(void *vprsactx)
      return EVP_MD_settable_ctx_params(prsactx->md);
  }
  
@@ -153,5 +153,5 @@ index 29be5f5028..670125464e 100644
      { OSSL_FUNC_SIGNATURE_NEWCTX, (void (*)(void))rsa_newctx },
      { OSSL_FUNC_SIGNATURE_SIGN_INIT, (void (*)(void))rsa_sign_init },
 -- 
-2.51.0
+2.55.0
 

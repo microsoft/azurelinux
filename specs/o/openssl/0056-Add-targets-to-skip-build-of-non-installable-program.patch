@@ -1,7 +1,7 @@
-From f320da46f706a8013de532ee1a34703bd814be06 Mon Sep 17 00:00:00 2001
+From 936fda2553ede96ddedc21b3eab7773bdf7391f7 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Pavol=20=C5=BD=C3=A1=C4=8Dik?= <zacik.pa@gmail.com>
 Date: Tue, 19 Aug 2025 14:26:07 +0200
-Subject: [PATCH 58/59] Add targets to skip build of non-installable programs
+Subject: [PATCH 56/58] Add targets to skip build of non-installable programs
 
 These make it possible to split the build into two
 parts, e.g., when tests should be built with different
@@ -60,10 +60,10 @@ index db6a1b1799..bc7fc36b46 100644
          @ ! Install the main program
          - CREATE/DIR ossl_installroot:[EXE.'arch']
 diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
-index 74139ec228..16aab9cd76 100644
+index dc5811f639..f905313d7d 100644
 --- a/Configurations/unix-Makefile.tmpl
 +++ b/Configurations/unix-Makefile.tmpl
-@@ -547,7 +547,9 @@ LANG=C
+@@ -548,7 +548,9 @@ LANG=C
  {- dependmagic('build_sw', 'Build all the software (default target)'); -}: build_libs_nodep build_modules_nodep build_programs_nodep link-utils
  {- dependmagic('build_libs', 'Build the libraries libssl and libcrypto'); -}: build_libs_nodep
  {- dependmagic('build_modules', 'Build the modules (i.e. providers and engines)'); -}: build_modules_nodep
@@ -74,7 +74,7 @@ index 74139ec228..16aab9cd76 100644
  
  all: build_sw {- "build_docs" if !$disabled{docs}; -} ## Build software and documentation
  debuginfo: $(SHLIBS)
-@@ -566,6 +568,7 @@ build_generated: $(GENERATED_MANDATORY)
+@@ -567,6 +569,7 @@ build_generated: $(GENERATED_MANDATORY)
  build_libs_nodep: $(LIBS) {- join(" ",map { platform->sharedlib_simple($_) // platform->sharedlib_import($_) // platform->sharedlib($_) // () } @{$unified_info{libraries}}) -}
  build_modules_nodep: $(MODULES)
  build_programs_nodep: $(PROGRAMS) $(SCRIPTS)
@@ -82,7 +82,7 @@ index 74139ec228..16aab9cd76 100644
  
  # Kept around for backward compatibility
  build_apps build_tests: build_programs
-@@ -680,7 +683,7 @@ uninstall_docs: uninstall_man_docs uninstall_html_docs ## Uninstall manpages and
+@@ -681,7 +684,7 @@ uninstall_docs: uninstall_man_docs uninstall_html_docs ## Uninstall manpages and
  	$(RM) -r "$(DESTDIR)$(DOCDIR)"
  
  {- output_off() if $disabled{fips}; "" -}
@@ -91,7 +91,7 @@ index 74139ec228..16aab9cd76 100644
  	@[ -n "$(INSTALLTOP)" ] || (echo INSTALLTOP should not be empty; exit 1)
  	@$(PERL) $(SRCDIR)/util/mkdir-p.pl "$(DESTDIR)$(MODULESDIR)"
  	@$(PERL) $(SRCDIR)/util/mkdir-p.pl "$(DESTDIR)$(OPENSSLDIR)"
-@@ -965,7 +968,7 @@ install_runtime_libs: build_libs
+@@ -967,7 +970,7 @@ install_runtime_libs: build_libs
  		: {- output_on() if windowsdll(); "" -}; \
  	done
  
@@ -101,10 +101,10 @@ index 74139ec228..16aab9cd76 100644
  	@$(PERL) $(SRCDIR)/util/mkdir-p.pl "$(DESTDIR)$(bindir)"
  	@$(ECHO) "*** Installing runtime programs"
 diff --git a/Configurations/windows-makefile.tmpl b/Configurations/windows-makefile.tmpl
-index 894834cfb7..b5872124de 100644
+index e553e8f9fe..f5ec2a726b 100644
 --- a/Configurations/windows-makefile.tmpl
 +++ b/Configurations/windows-makefile.tmpl
-@@ -418,6 +418,8 @@ PROCESSOR= {- $config{processor} -}
+@@ -419,6 +419,8 @@ PROCESSOR= {- $config{processor} -}
  {- dependmagic('build_libs'); -}: build_libs_nodep
  {- dependmagic('build_modules'); -}: build_modules_nodep
  {- dependmagic('build_programs'); -}: build_programs_nodep
@@ -113,7 +113,7 @@ index 894834cfb7..b5872124de 100644
  
  build_docs: build_html_docs
  build_html_docs: $(HTMLDOCS1) $(HTMLDOCS3) $(HTMLDOCS5) $(HTMLDOCS7)
-@@ -430,6 +432,8 @@ build_modules_nodep: $(MODULES)
+@@ -431,6 +433,8 @@ build_modules_nodep: $(MODULES)
  	@
  build_programs_nodep: $(PROGRAMS) $(SCRIPTS)
  	@
@@ -122,7 +122,7 @@ index 894834cfb7..b5872124de 100644
  
  # Kept around for backward compatibility
  build_apps build_tests: build_programs
-@@ -507,7 +511,7 @@ install_docs: install_html_docs
+@@ -508,7 +512,7 @@ install_docs: install_html_docs
  uninstall_docs: uninstall_html_docs
  
  {- output_off() if $disabled{fips}; "" -}
@@ -131,7 +131,7 @@ index 894834cfb7..b5872124de 100644
  #	@[ -n "$(INSTALLTOP)" ] || (echo INSTALLTOP should not be empty; exit 1)
  	@"$(PERL)" "$(SRCDIR)\util\mkdir-p.pl" "$(MODULESDIR)"
  	@"$(PERL)" "$(SRCDIR)\util\mkdir-p.pl" "$(OPENSSLDIR)"
-@@ -607,7 +611,7 @@ install_runtime_libs: build_libs
+@@ -608,7 +612,7 @@ install_runtime_libs: build_libs
  	 "$(PERL)" "$(SRCDIR)\util\copy.pl" $(INSTALL_SHLIBPDBS) \
                                          "$(INSTALLTOP)\bin"
  
@@ -154,5 +154,5 @@ index a1614fe8a9..e88ff4bae1 100755
      if (/^##@/) {
  	printf "\n\033[1m%s\033[0m\n", substr($Fld[$_], (5)-1);
 -- 
-2.51.0
+2.55.0
 

@@ -1,7 +1,7 @@
-From 3ce272be66d6e8285e0fa0fddc0ae4b3c8c9e6da Mon Sep 17 00:00:00 2001
+From 2ce19d70585a7e767252d800fa687755794825f9 Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Wed, 12 Feb 2025 17:25:47 -0500
-Subject: [PATCH 47/59] Current Rebase status
+Subject: [PATCH 47/58] Current Rebase status
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
@@ -102,5 +102,5 @@ index 2833a383c1..c8f6c992a8 100644
 +./Configure --prefix=$HOME/tmp/openssl-rebase --openssldir=$HOME/tmp/openssl-rebase/etc/pki/tls enable-ec_nistp_64_gcc_128 --system-ciphers-file=$HOME/tmp/openssl-rebase/etc/crypto-policies/back-ends/opensslcnf.config zlib enable-camellia enable-seed enable-rfc3779 enable-sctp enable-cms enable-md2 enable-rc5 enable-ktls enable-fips no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit enable-buildtest-c++ shared linux-x86_64 $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\"" -DOPENSSL_PEDANTIC_ZEROIZATION -DREDHAT_FIPS_VENDOR="\"Red Hat Enterprise Linux OpenSSL FIPS Provider\"" -DREDHAT_FIPS_VERSION="\"3.5.0-4c714d97fd77d1a8\""' -Wl,--allow-multiple-definition
 +
 -- 
-2.51.0
+2.55.0
 

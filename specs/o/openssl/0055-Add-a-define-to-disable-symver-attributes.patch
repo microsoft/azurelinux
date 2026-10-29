@@ -1,7 +1,7 @@
-From 8d2f2f11f3875b58f133729dcb907bb64620649f Mon Sep 17 00:00:00 2001
+From d4d4973c8931fd1b0f39139050734cc835da5731 Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Thu, 17 Jul 2025 09:40:34 -0400
-Subject: [PATCH 55/59] Add a define to disable symver attributes
+Subject: [PATCH 55/58] Add a define to disable symver attributes
 
 Defininig RHEL_NO_SYMVER_ATTRIBUTES for a build now prevents adding
 compatibility symver attributes.
@@ -14,7 +14,7 @@ Signed-off-by: Simo Sorce <simo@redhat.com>
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/crypto/evp/digest.c b/crypto/evp/digest.c
-index 8ee9db73dd..7ed4933934 100644
+index 101f49862c..dbf9bbba7a 100644
 --- a/crypto/evp/digest.c
 +++ b/crypto/evp/digest.c
 @@ -573,7 +573,7 @@ int EVP_DigestSqueeze(EVP_MD_CTX *ctx, unsigned char *md, size_t size)
@@ -27,10 +27,10 @@ index 8ee9db73dd..7ed4933934 100644
                      symver ("EVP_MD_CTX_dup@OPENSSL_3.2.0")))
  #endif
 diff --git a/crypto/evp/evp_enc.c b/crypto/evp/evp_enc.c
-index 619cf4f385..9192898d39 100644
+index 30c2ec56dc..4117fafdfa 100644
 --- a/crypto/evp/evp_enc.c
 +++ b/crypto/evp/evp_enc.c
-@@ -1763,7 +1763,7 @@ int EVP_CIPHER_CTX_rand_key(EVP_CIPHER_CTX *ctx, unsigned char *key)
+@@ -1767,7 +1767,7 @@ int EVP_CIPHER_CTX_rand_key(EVP_CIPHER_CTX *ctx, unsigned char *key)
  }
  
  EVP_CIPHER_CTX
@@ -40,10 +40,10 @@ index 619cf4f385..9192898d39 100644
                      symver ("EVP_CIPHER_CTX_dup@OPENSSL_3.2.0")))
  #endif
 diff --git a/crypto/o_str.c b/crypto/o_str.c
-index 86442a939e..8c33e4dd63 100644
+index b221ba789e..ca583d9ce6 100644
 --- a/crypto/o_str.c
 +++ b/crypto/o_str.c
-@@ -404,7 +404,7 @@ int openssl_strerror_r(int errnum, char *buf, size_t buflen)
+@@ -418,7 +418,7 @@ int openssl_strerror_r(int errnum, char *buf, size_t buflen)
  }
  
  int
@@ -52,7 +52,7 @@ index 86442a939e..8c33e4dd63 100644
  __attribute__ ((symver ("OPENSSL_strcasecmp@@OPENSSL_3.0.3"),
                      symver ("OPENSSL_strcasecmp@OPENSSL_3.0.1")))
  #endif
-@@ -419,7 +419,7 @@ OPENSSL_strcasecmp(const char *s1, const char *s2)
+@@ -433,7 +433,7 @@ OPENSSL_strcasecmp(const char *s1, const char *s2)
  }
  
  int
@@ -62,5 +62,5 @@ index 86442a939e..8c33e4dd63 100644
                      symver ("OPENSSL_strncasecmp@OPENSSL_3.0.1")))
  #endif
 -- 
-2.51.0
+2.55.0
 

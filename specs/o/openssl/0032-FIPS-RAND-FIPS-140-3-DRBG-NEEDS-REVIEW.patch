@@ -1,7 +1,7 @@
-From 0e25cdf0be520bcca8e8673e015f938947217d28 Mon Sep 17 00:00:00 2001
+From efa924558db0986cbd7f800a3eb54434d654ea7f Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:16 +0100
-Subject: [PATCH 32/59] FIPS: RAND: FIPS-140-3 DRBG - NEEDS REVIEW
+Subject: [PATCH 32/58] FIPS: RAND: FIPS-140-3 DRBG - NEEDS REVIEW
 
 providers/implementations/rands/crngt.c is gone
 
@@ -14,11 +14,11 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
 ---
  crypto/rand/prov_seed.c                       |  9 ++-
  providers/implementations/rands/drbg.c        | 11 ++-
- .../implementations/rands/seeding/rand_unix.c | 68 ++-----------------
- 3 files changed, 22 insertions(+), 66 deletions(-)
+ .../implementations/rands/seeding/rand_unix.c | 70 ++-----------------
+ 3 files changed, 23 insertions(+), 67 deletions(-)
 
 diff --git a/crypto/rand/prov_seed.c b/crypto/rand/prov_seed.c
-index 2985c7f2d8..3202a28226 100644
+index 8466ded8ab..24feab20e5 100644
 --- a/crypto/rand/prov_seed.c
 +++ b/crypto/rand/prov_seed.c
 @@ -23,7 +23,14 @@ size_t ossl_rand_get_entropy(ossl_unused OSSL_LIB_CTX *ctx,
@@ -38,10 +38,10 @@ index 2985c7f2d8..3202a28226 100644
          ERR_raise(ERR_LIB_RAND, ERR_R_RAND_LIB);
          return 0;
 diff --git a/providers/implementations/rands/drbg.c b/providers/implementations/rands/drbg.c
-index 4925a3b400..1cdb67b22c 100644
+index f9d90d5d43..6b23d55cf5 100644
 --- a/providers/implementations/rands/drbg.c
 +++ b/providers/implementations/rands/drbg.c
-@@ -559,6 +559,9 @@ static int ossl_prov_drbg_reseed_unlocked(PROV_DRBG *drbg,
+@@ -556,6 +556,9 @@ static int ossl_prov_drbg_reseed_unlocked(PROV_DRBG *drbg,
  #endif
      }
  
@@ -50,13 +50,13 @@ index 4925a3b400..1cdb67b22c 100644
 +#endif
      /* Reseed using our sources in addition */
      entropylen = get_entropy(drbg, &entropy, drbg->strength,
-                              drbg->min_entropylen, drbg->max_entropylen,
-@@ -680,8 +683,14 @@ int ossl_prov_drbg_generate(PROV_DRBG *drbg, unsigned char *out, size_t outlen,
+         drbg->min_entropylen, drbg->max_entropylen,
+@@ -677,8 +680,14 @@ int ossl_prov_drbg_generate(PROV_DRBG *drbg, unsigned char *out, size_t outlen,
              reseed_required = 1;
      }
      if (drbg->parent != NULL
--            && get_parent_reseed_count(drbg) != drbg->parent_reseed_counter)
-+            && get_parent_reseed_count(drbg) != drbg->parent_reseed_counter) {
+-        && get_parent_reseed_count(drbg) != drbg->parent_reseed_counter)
++        && get_parent_reseed_count(drbg) != drbg->parent_reseed_counter) {
 +#ifdef FIPS_MODULE
 +        /* Red Hat patches provide chain reseeding when necessary so just sync counters*/
 +        drbg->parent_reseed_counter = get_parent_reseed_count(drbg);
@@ -68,19 +68,26 @@ index 4925a3b400..1cdb67b22c 100644
      if (reseed_required || prediction_resistance) {
          if (!ossl_prov_drbg_reseed_unlocked(drbg, prediction_resistance, NULL,
 diff --git a/providers/implementations/rands/seeding/rand_unix.c b/providers/implementations/rands/seeding/rand_unix.c
-index c3a5d8b3bf..b7b34a9345 100644
+index 0b8a9ec341..5af3c76d64 100644
 --- a/providers/implementations/rands/seeding/rand_unix.c
 +++ b/providers/implementations/rands/seeding/rand_unix.c
-@@ -53,6 +53,8 @@
- # include <fcntl.h>
- # include <unistd.h>
- # include <sys/time.h>
-+# include <sys/random.h>
-+# include <openssl/evp.h>
+@@ -47,12 +47,14 @@
+ #endif
+ 
+ #if (defined(OPENSSL_SYS_UNIX) && !defined(OPENSSL_SYS_VXWORKS)) \
+-    || defined(__DJGPP__)
++     || defined(__DJGPP__)
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <sys/time.h>
++#include <sys/random.h>
++#include <openssl/evp.h>
  
  static uint64_t get_time_stamp(void);
  
-@@ -339,70 +341,8 @@ static ssize_t syscall_random(void *buf, size_t buflen)
+@@ -338,70 +340,8 @@ static ssize_t syscall_random(void *buf, size_t buflen)
       * which is way below the OSSL_SSIZE_MAX limit. Therefore sign conversion
       * between size_t and ssize_t is safe even without a range check.
       */
@@ -97,8 +104,8 @@ index c3a5d8b3bf..b7b34a9345 100644
 -     * Note: Sometimes getentropy() can be provided but not implemented
 -     * internally. So we need to check errno for ENOSYS
 -     */
--#  if !defined(__DragonFly__) && !defined(__NetBSD__) && !defined(__FreeBSD__)
--#    if defined(__GNUC__) && __GNUC__>=2 && defined(__ELF__) && !defined(__hpux)
+-#if !defined(__DragonFly__) && !defined(__NetBSD__) && !defined(__FreeBSD__)
+-#if defined(__GNUC__) && __GNUC__ >= 2 && defined(__ELF__) && !defined(__hpux)
 -    extern int getentropy(void *buffer, size_t length) __attribute__((weak));
 -
 -    if (getentropy != NULL) {
@@ -107,13 +114,13 @@ index c3a5d8b3bf..b7b34a9345 100644
 -        if (errno != ENOSYS)
 -            return -1;
 -    }
--#    elif defined(OPENSSL_APPLE_CRYPTO_RANDOM)
+-#elif defined(OPENSSL_APPLE_CRYPTO_RANDOM)
 -
 -    if (CCRandomGenerateBytes(buf, buflen) == kCCSuccess)
--	    return (ssize_t)buflen;
+-        return (ssize_t)buflen;
 -
 -    return -1;
--#    else
+-#else
 -    union {
 -        void *p;
 -        int (*f)(void *buffer, size_t length);
@@ -128,31 +135,31 @@ index c3a5d8b3bf..b7b34a9345 100644
 -    ERR_pop_to_mark();
 -    if (p_getentropy.p != NULL)
 -        return p_getentropy.f(buf, buflen) == 0 ? (ssize_t)buflen : -1;
--#    endif
--#  endif /* !__DragonFly__ && !__NetBSD__ && !__FreeBSD__ */
+-#endif
+-#endif /* !__DragonFly__ && !__NetBSD__ && !__FreeBSD__ */
 -
 -    /* Linux supports this since version 3.17 */
--#  if defined(__linux) && defined(__NR_getrandom)
+-#if defined(__linux) && defined(__NR_getrandom)
 -    return syscall(__NR_getrandom, buf, buflen, 0);
--#  elif (defined(__DragonFly__)  && __DragonFly_version >= 500700) \
--     || (defined(__NetBSD__) && __NetBSD_Version >= 1000000000) \
--     || (defined(__FreeBSD__) && __FreeBSD_version >= 1200061)
+-#elif (defined(__DragonFly__) && __DragonFly_version >= 500700) \
+-    || (defined(__NetBSD__) && __NetBSD_Version >= 1000000000)  \
+-    || (defined(__FreeBSD__) && __FreeBSD_version >= 1200061)
 -    return getrandom(buf, buflen, 0);
--#  elif (defined(__FreeBSD__) || defined(__NetBSD__)) && defined(KERN_ARND)
+-#elif (defined(__FreeBSD__) || defined(__NetBSD__)) && defined(KERN_ARND)
 -    return sysctl_random(buf, buflen);
--#  elif defined(__wasi__)
+-#elif defined(__wasi__) || defined(__EMSCRIPTEN__)
 -    if (getentropy(buf, buflen) == 0)
--      return (ssize_t)buflen;
+-        return (ssize_t)buflen;
 -    return -1;
--#  else
+-#else
 -    errno = ENOSYS;
 -    return -1;
--#  endif
+-#endif
 +    /* Red Hat uses downstream patch to always seed from getrandom() */
 +    return EVP_default_properties_is_fips_enabled(NULL) ? getrandom(buf, buflen, GRND_RANDOM) : getrandom(buf, buflen, 0);
  }
- #  endif    /* defined(OPENSSL_RAND_SEED_GETRANDOM) */
+ #endif /* defined(OPENSSL_RAND_SEED_GETRANDOM) */
  
 -- 
-2.51.0
+2.55.0
 

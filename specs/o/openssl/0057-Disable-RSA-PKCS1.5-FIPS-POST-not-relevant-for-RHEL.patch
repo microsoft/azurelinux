@@ -1,19 +1,17 @@
-From 4b91d0604643eff849a480f37b22f3bd7029d897 Mon Sep 17 00:00:00 2001
+From 051b0b4f49d85911bdb7a2f28dc4fa7a90e62ec4 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
-Date: Fri, 17 Oct 2025 17:45:48 +0200
-Subject: [PATCH 59/59] RSA_encrypt/decrypt with padding NONE is not supported
- in
+Date: Wed, 21 Jan 2026 18:13:43 +0100
+Subject: [PATCH 57/58] Disable RSA-PKCS1.5 FIPS POST, not relevant for RHEL
 
-RHEL/CentOS/Fedora FIPS mode
 ---
  providers/fips/self_test_kats.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/providers/fips/self_test_kats.c b/providers/fips/self_test_kats.c
-index acb0b85f73..c69c81bc9c 100644
+index 0559a30cd6..496c5eaa39 100644
 --- a/providers/fips/self_test_kats.c
 +++ b/providers/fips/self_test_kats.c
-@@ -1190,8 +1190,8 @@ int SELF_TEST_kats(OSSL_SELF_TEST *st, OSSL_LIB_CTX *libctx)
+@@ -1197,8 +1197,8 @@ int SELF_TEST_kats(OSSL_SELF_TEST *st, OSSL_LIB_CTX *libctx)
          ret = 0;
      if (!self_test_kems(st, libctx))
          ret = 0;
@@ -25,5 +23,5 @@ index acb0b85f73..c69c81bc9c 100644
      RAND_set0_private(libctx, saved_rand);
      return ret;
 -- 
-2.51.0
+2.55.0
 

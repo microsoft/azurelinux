@@ -1,7 +1,7 @@
-From 5151c5a45d130075860256989b1f69694f840554 Mon Sep 17 00:00:00 2001
+From 54892e1a045ce95de203e320b22b434be3a881d1 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:15 +0100
-Subject: [PATCH 09/59] RH: Drop weak curve definitions - RENAMED/SQUASHED
+Subject: [PATCH 09/58] RH: Drop weak curve definitions - RENAMED/SQUASHED
 
 Patch-name: 0010-Add-changes-to-ectest-and-eccurve.patch
 Patch-id: 10
@@ -17,61 +17,61 @@ Patch-status: |
     # # remove unsupported EC curves
 From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
 ---
- apps/speed.c                                  |   8 +-
- crypto/ec/ec_curve.c                          | 844 ------------------
+ apps/speed.c                                  |   8 -
+ crypto/ec/ec_curve.c                          | 769 ------------------
  crypto/evp/ec_support.c                       |  87 --
  test/acvp_test.inc                            |   9 -
  test/ecdsatest.h                              |  17 -
- test/ectest.c                                 | 174 +---
+ test/ectest.c                                 | 175 +---
  test/recipes/15-test_genec.t                  |  27 -
  test/recipes/30-test_evp_data/evppkey_ecc.txt |   1 +
- 8 files changed, 10 insertions(+), 1157 deletions(-)
+ 8 files changed, 10 insertions(+), 1083 deletions(-)
 
 diff --git a/apps/speed.c b/apps/speed.c
-index 6c1eb59e91..3307a9cb46 100644
+index 6cf9748902..a36faa686d 100644
 --- a/apps/speed.c
 +++ b/apps/speed.c
-@@ -405,7 +405,7 @@ static double ffdh_results[FFDH_NUM][1];  /* 1 op: derivation */
+@@ -458,8 +458,6 @@ static double ffdh_results[FFDH_NUM][1]; /* 1 op: derivation */
  #endif /* OPENSSL_NO_DH */
  
  enum ec_curves_t {
--    R_EC_P160, R_EC_P192, R_EC_P224, R_EC_P256, R_EC_P384, R_EC_P521,
-+    R_EC_P224, R_EC_P256, R_EC_P384, R_EC_P521,
- #ifndef OPENSSL_NO_EC2M
-     R_EC_K163, R_EC_K233, R_EC_K283, R_EC_K409, R_EC_K571,
-     R_EC_B163, R_EC_B233, R_EC_B283, R_EC_B409, R_EC_B571,
-@@ -415,8 +415,6 @@ enum ec_curves_t {
+-    R_EC_P160,
+-    R_EC_P192,
+     R_EC_P224,
+     R_EC_P256,
+     R_EC_P384,
+@@ -486,8 +484,6 @@ enum ec_curves_t {
  };
  /* list of ecdsa curves */
  static const OPT_PAIR ecdsa_choices[ECDSA_NUM] = {
--    {"ecdsap160", R_EC_P160},
--    {"ecdsap192", R_EC_P192},
-     {"ecdsap224", R_EC_P224},
-     {"ecdsap256", R_EC_P256},
-     {"ecdsap384", R_EC_P384},
-@@ -449,8 +447,6 @@ enum {
+-    { "ecdsap160", R_EC_P160 },
+-    { "ecdsap192", R_EC_P192 },
+     { "ecdsap224", R_EC_P224 },
+     { "ecdsap256", R_EC_P256 },
+     { "ecdsap384", R_EC_P384 },
+@@ -522,8 +518,6 @@ enum {
  };
  /* list of ecdh curves, extension of |ecdsa_choices| list above */
  static const OPT_PAIR ecdh_choices[EC_NUM] = {
--    {"ecdhp160", R_EC_P160},
--    {"ecdhp192", R_EC_P192},
-     {"ecdhp224", R_EC_P224},
-     {"ecdhp256", R_EC_P256},
-     {"ecdhp384", R_EC_P384},
-@@ -1966,8 +1962,6 @@ int speed_main(int argc, char **argv)
+-    { "ecdhp160", R_EC_P160 },
+-    { "ecdhp192", R_EC_P192 },
+     { "ecdhp224", R_EC_P224 },
+     { "ecdhp256", R_EC_P256 },
+     { "ecdhp384", R_EC_P384 },
+@@ -2042,8 +2036,6 @@ int speed_main(int argc, char **argv)
       */
      static const EC_CURVE ec_curves[EC_NUM] = {
          /* Prime Curves */
--        {"secp160r1", NID_secp160r1, 160},
--        {"nistp192", NID_X9_62_prime192v1, 192},
-         {"nistp224", NID_secp224r1, 224},
-         {"nistp256", NID_X9_62_prime256v1, 256},
-         {"nistp384", NID_secp384r1, 384},
+-        { "secp160r1", NID_secp160r1, 160 },
+-        { "nistp192", NID_X9_62_prime192v1, 192 },
+         { "nistp224", NID_secp224r1, 224 },
+         { "nistp256", NID_X9_62_prime256v1, 256 },
+         { "nistp384", NID_secp384r1, 384 },
 diff --git a/crypto/ec/ec_curve.c b/crypto/ec/ec_curve.c
-index f46aac5d33..8c5ba5b839 100644
+index c3bc92fd75..28c83df735 100644
 --- a/crypto/ec/ec_curve.c
 +++ b/crypto/ec/ec_curve.c
-@@ -30,38 +30,6 @@ typedef struct {
+@@ -30,34 +30,6 @@ typedef struct {
  } EC_CURVE_DATA;
  
  /* the nist prime curves */
@@ -79,11 +79,8 @@ index f46aac5d33..8c5ba5b839 100644
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 24 * 6];
 -} _EC_NIST_PRIME_192 = {
--    {
--        NID_X9_62_prime_field, 20, 24, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 24, 1 },
+-    { /* seed */
 -        0x30, 0x45, 0xAE, 0x6F, 0xC8, 0x42, 0x2F, 0x64, 0xED, 0x57, 0x95, 0x28,
 -        0xD3, 0x81, 0x20, 0xEA, 0xE1, 0x21, 0x96, 0xD5,
 -        /* p */
@@ -103,28 +100,24 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x6b, 0x24, 0xcd, 0xd5, 0x73, 0xf9, 0x77, 0xa1, 0x1e, 0x79, 0x48, 0x11,
 -        /* order */
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
--        0x99, 0xDE, 0xF8, 0x36, 0x14, 0x6B, 0xC9, 0xB1, 0xB4, 0xD2, 0x28, 0x31
--    }
+-        0x99, 0xDE, 0xF8, 0x36, 0x14, 0x6B, 0xC9, 0xB1, 0xB4, 0xD2, 0x28, 0x31 }
 -};
 -
  static const struct {
      EC_CURVE_DATA h;
      unsigned char data[20 + 28 * 6];
-@@ -200,187 +168,6 @@ static const struct {
-     }
+@@ -184,167 +156,6 @@ static const struct {
+         0xB7, 0x1E, 0x91, 0x38, 0x64, 0x09 }
  };
  
--# ifndef FIPS_MODULE
+-#ifndef FIPS_MODULE
 -/* the x9.62 prime curves (minus the nist prime curves) */
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 24 * 6];
 -} _EC_X9_62_PRIME_192V2 = {
--    {
--        NID_X9_62_prime_field, 20, 24, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 24, 1 },
+-    { /* seed */
 -        0x31, 0xA9, 0x2E, 0xE2, 0x02, 0x9F, 0xD1, 0x0D, 0x90, 0x1B, 0x11, 0x3E,
 -        0x99, 0x07, 0x10, 0xF0, 0xD2, 0x1A, 0xC6, 0xB6,
 -        /* p */
@@ -144,19 +137,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x08, 0x3d, 0xf2, 0xf2, 0xb0, 0x84, 0x7d, 0xe9, 0x70, 0xb2, 0xde, 0x15,
 -        /* order */
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE,
--        0x5F, 0xB1, 0xA7, 0x24, 0xDC, 0x80, 0x41, 0x86, 0x48, 0xD8, 0xDD, 0x31
--    }
+-        0x5F, 0xB1, 0xA7, 0x24, 0xDC, 0x80, 0x41, 0x86, 0x48, 0xD8, 0xDD, 0x31 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 24 * 6];
 -} _EC_X9_62_PRIME_192V3 = {
--    {
--        NID_X9_62_prime_field, 20, 24, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 24, 1 },
+-    { /* seed */
 -        0xC4, 0x69, 0x68, 0x44, 0x35, 0xDE, 0xB3, 0x78, 0xC4, 0xB6, 0x5C, 0xA9,
 -        0x59, 0x1E, 0x2A, 0x57, 0x63, 0x05, 0x9A, 0x2E,
 -        /* p */
@@ -176,19 +165,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x6a, 0x6d, 0xc8, 0xf9, 0x97, 0x8a, 0xca, 0x76, 0x48, 0xa9, 0x43, 0xb0,
 -        /* order */
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
--        0x7A, 0x62, 0xD0, 0x31, 0xC8, 0x3F, 0x42, 0x94, 0xF6, 0x40, 0xEC, 0x13
--    }
+-        0x7A, 0x62, 0xD0, 0x31, 0xC8, 0x3F, 0x42, 0x94, 0xF6, 0x40, 0xEC, 0x13 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 30 * 6];
 -} _EC_X9_62_PRIME_239V1 = {
--    {
--        NID_X9_62_prime_field, 20, 30, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 30, 1 },
+-    { /* seed */
 -        0xE4, 0x3B, 0xB4, 0x60, 0xF0, 0xB8, 0x0C, 0xC0, 0xC0, 0xB0, 0x75, 0x79,
 -        0x8E, 0x94, 0x80, 0x60, 0xF8, 0x32, 0x1B, 0x7D,
 -        /* p */
@@ -214,19 +199,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        /* order */
 -        0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0x7F, 0xFF, 0xFF, 0x9E, 0x5E, 0x9A, 0x9F, 0x5D, 0x90, 0x71, 0xFB, 0xD1,
--        0x52, 0x26, 0x88, 0x90, 0x9D, 0x0B
--    }
+-        0x52, 0x26, 0x88, 0x90, 0x9D, 0x0B }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 30 * 6];
 -} _EC_X9_62_PRIME_239V2 = {
--    {
--        NID_X9_62_prime_field, 20, 30, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 30, 1 },
+-    { /* seed */
 -        0xE8, 0xB4, 0x01, 0x16, 0x04, 0x09, 0x53, 0x03, 0xCA, 0x3B, 0x80, 0x99,
 -        0x98, 0x2B, 0xE0, 0x9F, 0xCB, 0x9A, 0xE6, 0x16,
 -        /* p */
@@ -252,19 +233,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        /* order */
 -        0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0x80, 0x00, 0x00, 0xCF, 0xA7, 0xE8, 0x59, 0x43, 0x77, 0xD4, 0x14, 0xC0,
--        0x38, 0x21, 0xBC, 0x58, 0x20, 0x63
--    }
+-        0x38, 0x21, 0xBC, 0x58, 0x20, 0x63 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 30 * 6];
 -} _EC_X9_62_PRIME_239V3 = {
--    {
--        NID_X9_62_prime_field, 20, 30, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 30, 1 },
+-    { /* seed */
 -        0x7D, 0x73, 0x74, 0x16, 0x8F, 0xFE, 0x34, 0x71, 0xB6, 0x0A, 0x85, 0x76,
 -        0x86, 0xA1, 0x94, 0x75, 0xD3, 0xBF, 0xA2, 0xFF,
 -        /* p */
@@ -290,15 +267,14 @@ index f46aac5d33..8c5ba5b839 100644
 -        /* order */
 -        0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0x7F, 0xFF, 0xFF, 0x97, 0x5D, 0xEB, 0x41, 0xB3, 0xA6, 0x05, 0x7C, 0x3C,
--        0x43, 0x21, 0x46, 0x52, 0x65, 0x51
--    }
+-        0x43, 0x21, 0x46, 0x52, 0x65, 0x51 }
 -};
 -#endif /* FIPS_MODULE */
 -
  static const struct {
      EC_CURVE_DATA h;
      unsigned char data[20 + 32 * 8];
-@@ -429,294 +216,6 @@ static const struct {
+@@ -389,258 +200,6 @@ static const struct {
  
  #ifndef FIPS_MODULE
  /* the secg prime curves (minus the nist and x9.62 prime curves) */
@@ -306,11 +282,8 @@ index f46aac5d33..8c5ba5b839 100644
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 14 * 6];
 -} _EC_SECG_PRIME_112R1 = {
--    {
--        NID_X9_62_prime_field, 20, 14, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 14, 1 },
+-    { /* seed */
 -        0x00, 0xF5, 0x0B, 0x02, 0x8E, 0x4D, 0x69, 0x6E, 0x67, 0x68, 0x75, 0x61,
 -        0x51, 0x75, 0x29, 0x04, 0x72, 0x78, 0x3F, 0xB1,
 -        /* p */
@@ -330,19 +303,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x75, 0x00,
 -        /* order */
 -        0xDB, 0x7C, 0x2A, 0xBF, 0x62, 0xE3, 0x5E, 0x76, 0x28, 0xDF, 0xAC, 0x65,
--        0x61, 0xC5
--    }
+-        0x61, 0xC5 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 14 * 6];
 -} _EC_SECG_PRIME_112R2 = {
--    {
--        NID_X9_62_prime_field, 20, 14, 4
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 14, 4 },
+-    { /* seed */
 -        0x00, 0x27, 0x57, 0xA1, 0x11, 0x4D, 0x69, 0x6E, 0x67, 0x68, 0x75, 0x61,
 -        0x51, 0x75, 0x53, 0x16, 0xC0, 0x5E, 0x0B, 0xD4,
 -        /* p */
@@ -362,19 +331,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x6e, 0x97,
 -        /* order */
 -        0x36, 0xDF, 0x0A, 0xAF, 0xD8, 0xB8, 0xD7, 0x59, 0x7C, 0xA1, 0x05, 0x20,
--        0xD0, 0x4B
--    }
+-        0xD0, 0x4B }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 16 * 6];
 -} _EC_SECG_PRIME_128R1 = {
--    {
--        NID_X9_62_prime_field, 20, 16, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 16, 1 },
+-    { /* seed */
 -        0x00, 0x0E, 0x0D, 0x4D, 0x69, 0x6E, 0x67, 0x68, 0x75, 0x61, 0x51, 0x75,
 -        0x0C, 0xC0, 0x3A, 0x44, 0x73, 0xD0, 0x36, 0x79,
 -        /* p */
@@ -394,19 +359,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0xdd, 0xed, 0x7a, 0x83,
 -        /* order */
 -        0xFF, 0xFF, 0xFF, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x75, 0xA3, 0x0D, 0x1B,
--        0x90, 0x38, 0xA1, 0x15
--    }
+-        0x90, 0x38, 0xA1, 0x15 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 16 * 6];
 -} _EC_SECG_PRIME_128R2 = {
--    {
--        NID_X9_62_prime_field, 20, 16, 4
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 16, 4 },
+-    { /* seed */
 -        0x00, 0x4D, 0x69, 0x6E, 0x67, 0x68, 0x75, 0x61, 0x51, 0x75, 0x12, 0xD8,
 -        0xF0, 0x34, 0x31, 0xFC, 0xE6, 0x3B, 0x88, 0xF4,
 -        /* p */
@@ -426,19 +387,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x5f, 0xc3, 0x4b, 0x44,
 -        /* order */
 -        0x3F, 0xFF, 0xFF, 0xFF, 0x7F, 0xFF, 0xFF, 0xFF, 0xBE, 0x00, 0x24, 0x72,
--        0x06, 0x13, 0xB5, 0xA3
--    }
+-        0x06, 0x13, 0xB5, 0xA3 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 21 * 6];
 -} _EC_SECG_PRIME_160K1 = {
--    {
--        NID_X9_62_prime_field, 0, 21, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 21, 1 },
+-    { /* no seed */
 -        /* p */
 -        0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xFF, 0xFF, 0xAC, 0x73,
@@ -456,19 +413,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x86, 0x53, 0x17, 0x33, 0xc3, 0xf0, 0x3c, 0x4f, 0xee,
 -        /* order */
 -        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xB8,
--        0xFA, 0x16, 0xDF, 0xAB, 0x9A, 0xCA, 0x16, 0xB6, 0xB3
--    }
+-        0xFA, 0x16, 0xDF, 0xAB, 0x9A, 0xCA, 0x16, 0xB6, 0xB3 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 21 * 6];
 -} _EC_SECG_PRIME_160R1 = {
--    {
--        NID_X9_62_prime_field, 20, 21, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 21, 1 },
+-    { /* seed */
 -        0x10, 0x53, 0xCD, 0xE4, 0x2C, 0x14, 0xD6, 0x96, 0xE6, 0x76, 0x87, 0x56,
 -        0x15, 0x17, 0x53, 0x3B, 0xF3, 0xF8, 0x33, 0x45,
 -        /* p */
@@ -488,19 +441,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x12, 0x04, 0x23, 0x51, 0x37, 0x7a, 0xc5, 0xfb, 0x32,
 -        /* order */
 -        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xF4,
--        0xC8, 0xF9, 0x27, 0xAE, 0xD3, 0xCA, 0x75, 0x22, 0x57
--    }
+-        0xC8, 0xF9, 0x27, 0xAE, 0xD3, 0xCA, 0x75, 0x22, 0x57 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[20 + 21 * 6];
 -} _EC_SECG_PRIME_160R2 = {
--    {
--        NID_X9_62_prime_field, 20, 21, 1
--    },
--    {
--        /* seed */
+-    { NID_X9_62_prime_field, 20, 21, 1 },
+-    { /* seed */
 -        0xB9, 0x9B, 0x99, 0xB0, 0x99, 0xB3, 0x23, 0xE0, 0x27, 0x09, 0xA4, 0xD6,
 -        0x96, 0xE6, 0x76, 0x87, 0x56, 0x15, 0x17, 0x51,
 -        /* p */
@@ -520,19 +469,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x0d, 0xf9, 0x98, 0x2c, 0xfe, 0xa7, 0xd4, 0x3f, 0x2e,
 -        /* order */
 -        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x35,
--        0x1E, 0xE7, 0x86, 0xA8, 0x18, 0xF3, 0xA1, 0xA1, 0x6B
--    }
+-        0x1E, 0xE7, 0x86, 0xA8, 0x18, 0xF3, 0xA1, 0xA1, 0x6B }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 24 * 6];
 -} _EC_SECG_PRIME_192K1 = {
--    {
--        NID_X9_62_prime_field, 0, 24, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 24, 1 },
+-    { /* no seed */
 -        /* p */
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xFF, 0xFF, 0xEE, 0x37,
@@ -550,19 +495,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x15, 0xbe, 0x86, 0x34, 0x40, 0x82, 0xaa, 0x88, 0xd9, 0x5e, 0x2f, 0x9d,
 -        /* order */
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE,
--        0x26, 0xF2, 0xFC, 0x17, 0x0F, 0x69, 0x46, 0x6A, 0x74, 0xDE, 0xFD, 0x8D
--    }
+-        0x26, 0xF2, 0xFC, 0x17, 0x0F, 0x69, 0x46, 0x6A, 0x74, 0xDE, 0xFD, 0x8D }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 29 * 6];
 -} _EC_SECG_PRIME_224K1 = {
--    {
--        NID_X9_62_prime_field, 0, 29, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 29, 1 },
+-    { /* no seed */
 -        /* p */
 -        0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -586,15 +527,14 @@ index f46aac5d33..8c5ba5b839 100644
 -        /* order */
 -        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 -        0x00, 0x00, 0x01, 0xDC, 0xE8, 0xD2, 0xEC, 0x61, 0x84, 0xCA, 0xF0, 0xA9,
--        0x71, 0x76, 0x9F, 0xB1, 0xF7
--    }
+-        0x71, 0x76, 0x9F, 0xB1, 0xF7 }
 -};
 -
  static const struct {
      EC_CURVE_DATA h;
      unsigned char data[0 + 32 * 6];
-@@ -753,102 +252,6 @@ static const struct {
-     }
+@@ -673,90 +232,6 @@ static const struct {
+         0xBF, 0xD2, 0x5E, 0x8C, 0xD0, 0x36, 0x41, 0x41 }
  };
  
 -/* some wap/wtls curves */
@@ -602,11 +542,8 @@ index f46aac5d33..8c5ba5b839 100644
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 15 * 6];
 -} _EC_WTLS_8 = {
--    {
--        NID_X9_62_prime_field, 0, 15, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 15, 1 },
+-    { /* no seed */
 -        /* p */
 -        0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0xFF, 0xFD, 0xE7,
@@ -624,19 +561,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x00, 0x00, 0x02,
 -        /* order */
 -        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xEC, 0xEA, 0x55, 0x1A,
--        0xD8, 0x37, 0xE9
--    }
+-        0xD8, 0x37, 0xE9 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 21 * 6];
 -} _EC_WTLS_9 = {
--    {
--        NID_X9_62_prime_field, 0, 21, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 21, 1 },
+-    { /* no seed */
 -        /* p */
 -        0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC, 0x80, 0x8F,
@@ -654,19 +587,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
 -        /* order */
 -        0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xCD,
--        0xC9, 0x8A, 0xE0, 0xE2, 0xDE, 0x57, 0x4A, 0xBF, 0x33
--    }
+-        0xC9, 0x8A, 0xE0, 0xE2, 0xDE, 0x57, 0x4A, 0xBF, 0x33 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 28 * 6];
 -} _EC_WTLS_12 = {
--    {
--        NID_X9_62_prime_field, 0, 28, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 28, 1 },
+-    { /* no seed */
 -        /* p */
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -690,13 +619,12 @@ index f46aac5d33..8c5ba5b839 100644
 -        /* order */
 -        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -        0xFF, 0xFF, 0x16, 0xA2, 0xE0, 0xB8, 0xF0, 0x3E, 0x13, 0xDD, 0x29, 0x45,
--        0x5C, 0x5C, 0x2A, 0x3D
--    }
+-        0x5C, 0x5C, 0x2A, 0x3D }
 -};
  #endif /* FIPS_MODULE */
  
  #ifndef OPENSSL_NO_EC2M
-@@ -2244,198 +1647,6 @@ static const struct {
+@@ -2004,174 +1479,6 @@ static const struct {
   */
  
  #ifndef FIPS_MODULE
@@ -704,11 +632,8 @@ index f46aac5d33..8c5ba5b839 100644
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 20 * 6];
 -} _EC_brainpoolP160r1 = {
--    {
--        NID_X9_62_prime_field, 0, 20, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 20, 1 },
+-    { /* no seed */
 -        /* p */
 -        0xE9, 0x5E, 0x4A, 0x5F, 0x73, 0x70, 0x59, 0xDC, 0x60, 0xDF, 0xC7, 0xAD,
 -        0x95, 0xB3, 0xD8, 0x13, 0x95, 0x15, 0x62, 0x0F,
@@ -726,19 +651,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x66, 0x9C, 0x97, 0x63, 0x16, 0xDA, 0x63, 0x21,
 -        /* order */
 -        0xE9, 0x5E, 0x4A, 0x5F, 0x73, 0x70, 0x59, 0xDC, 0x60, 0xDF, 0x59, 0x91,
--        0xD4, 0x50, 0x29, 0x40, 0x9E, 0x60, 0xFC, 0x09
--    }
+-        0xD4, 0x50, 0x29, 0x40, 0x9E, 0x60, 0xFC, 0x09 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 20 * 6];
 -} _EC_brainpoolP160t1 = {
--    {
--        NID_X9_62_prime_field, 0, 20, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 20, 1 },
+-    { /* no seed */
 -        /* p */
 -        0xE9, 0x5E, 0x4A, 0x5F, 0x73, 0x70, 0x59, 0xDC, 0x60, 0xDF, 0xC7, 0xAD,
 -        0x95, 0xB3, 0xD8, 0x13, 0x95, 0x15, 0x62, 0x0F,
@@ -756,19 +677,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x24, 0x43, 0x77, 0x21, 0x52, 0xC9, 0xE0, 0xAD,
 -        /* order */
 -        0xE9, 0x5E, 0x4A, 0x5F, 0x73, 0x70, 0x59, 0xDC, 0x60, 0xDF, 0x59, 0x91,
--        0xD4, 0x50, 0x29, 0x40, 0x9E, 0x60, 0xFC, 0x09
--    }
+-        0xD4, 0x50, 0x29, 0x40, 0x9E, 0x60, 0xFC, 0x09 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 24 * 6];
 -} _EC_brainpoolP192r1 = {
--    {
--        NID_X9_62_prime_field, 0, 24, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 24, 1 },
+-    { /* no seed */
 -        /* p */
 -        0xC3, 0x02, 0xF4, 0x1D, 0x93, 0x2A, 0x36, 0xCD, 0xA7, 0xA3, 0x46, 0x30,
 -        0x93, 0xD1, 0x8D, 0xB7, 0x8F, 0xCE, 0x47, 0x6D, 0xE1, 0xA8, 0x62, 0x97,
@@ -786,19 +703,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0xC1, 0x49, 0x00, 0x02, 0xE6, 0x77, 0x3F, 0xA2, 0xFA, 0x29, 0x9B, 0x8F,
 -        /* order */
 -        0xC3, 0x02, 0xF4, 0x1D, 0x93, 0x2A, 0x36, 0xCD, 0xA7, 0xA3, 0x46, 0x2F,
--        0x9E, 0x9E, 0x91, 0x6B, 0x5B, 0xE8, 0xF1, 0x02, 0x9A, 0xC4, 0xAC, 0xC1
--    }
+-        0x9E, 0x9E, 0x91, 0x6B, 0x5B, 0xE8, 0xF1, 0x02, 0x9A, 0xC4, 0xAC, 0xC1 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 24 * 6];
 -} _EC_brainpoolP192t1 = {
--    {
--        NID_X9_62_prime_field, 0, 24, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 24, 1 },
+-    { /* no seed */
 -        /* p */
 -        0xC3, 0x02, 0xF4, 0x1D, 0x93, 0x2A, 0x36, 0xCD, 0xA7, 0xA3, 0x46, 0x30,
 -        0x93, 0xD1, 0x8D, 0xB7, 0x8F, 0xCE, 0x47, 0x6D, 0xE1, 0xA8, 0x62, 0x97,
@@ -816,19 +729,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        0x44, 0x9D, 0x00, 0x84, 0xB7, 0xE5, 0xB3, 0xDE, 0x7C, 0xCC, 0x01, 0xC9,
 -        /* order */
 -        0xC3, 0x02, 0xF4, 0x1D, 0x93, 0x2A, 0x36, 0xCD, 0xA7, 0xA3, 0x46, 0x2F,
--        0x9E, 0x9E, 0x91, 0x6B, 0x5B, 0xE8, 0xF1, 0x02, 0x9A, 0xC4, 0xAC, 0xC1
--    }
+-        0x9E, 0x9E, 0x91, 0x6B, 0x5B, 0xE8, 0xF1, 0x02, 0x9A, 0xC4, 0xAC, 0xC1 }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 28 * 6];
 -} _EC_brainpoolP224r1 = {
--    {
--        NID_X9_62_prime_field, 0, 28, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 28, 1 },
+-    { /* no seed */
 -        /* p */
 -        0xD7, 0xC1, 0x34, 0xAA, 0x26, 0x43, 0x66, 0x86, 0x2A, 0x18, 0x30, 0x25,
 -        0x75, 0xD1, 0xD7, 0x87, 0xB0, 0x9F, 0x07, 0x57, 0x97, 0xDA, 0x89, 0xF5,
@@ -852,19 +761,15 @@ index f46aac5d33..8c5ba5b839 100644
 -        /* order */
 -        0xD7, 0xC1, 0x34, 0xAA, 0x26, 0x43, 0x66, 0x86, 0x2A, 0x18, 0x30, 0x25,
 -        0x75, 0xD0, 0xFB, 0x98, 0xD1, 0x16, 0xBC, 0x4B, 0x6D, 0xDE, 0xBC, 0xA3,
--        0xA5, 0xA7, 0x93, 0x9F
--    }
+-        0xA5, 0xA7, 0x93, 0x9F }
 -};
 -
 -static const struct {
 -    EC_CURVE_DATA h;
 -    unsigned char data[0 + 28 * 6];
 -} _EC_brainpoolP224t1 = {
--    {
--        NID_X9_62_prime_field, 0, 28, 1
--    },
--    {
--        /* no seed */
+-    { NID_X9_62_prime_field, 0, 28, 1 },
+-    { /* no seed */
 -        /* p */
 -        0xD7, 0xC1, 0x34, 0xAA, 0x26, 0x43, 0x66, 0x86, 0x2A, 0x18, 0x30, 0x25,
 -        0x75, 0xD1, 0xD7, 0x87, 0xB0, 0x9F, 0x07, 0x57, 0x97, 0xDA, 0x89, 0xF5,
@@ -888,209 +793,223 @@ index f46aac5d33..8c5ba5b839 100644
 -        /* order */
 -        0xD7, 0xC1, 0x34, 0xAA, 0x26, 0x43, 0x66, 0x86, 0x2A, 0x18, 0x30, 0x25,
 -        0x75, 0xD0, 0xFB, 0x98, 0xD1, 0x16, 0xBC, 0x4B, 0x6D, 0xDE, 0xBC, 0xA3,
--        0xA5, 0xA7, 0x93, 0x9F
--    }
+-        0xA5, 0xA7, 0x93, 0x9F }
 -};
 -
  static const struct {
      EC_CURVE_DATA h;
      unsigned char data[0 + 32 * 6];
-@@ -2864,8 +2075,6 @@ static const ec_list_element curve_list[] = {
-      "NIST/SECG curve over a 521 bit prime field"},
+@@ -2570,8 +1877,6 @@ static const ec_list_element curve_list[] = {
+         "NIST/SECG curve over a 521 bit prime field" },
  
      /* X9.62 curves */
--    {NID_X9_62_prime192v1, &_EC_NIST_PRIME_192.h, 0,
--     "NIST/X9.62/SECG curve over a 192 bit prime field"},
-     {NID_X9_62_prime256v1, &_EC_X9_62_PRIME_256V1.h,
- # if defined(ECP_NISTZ256_ASM)
-      EC_GFp_nistz256_method,
-@@ -2909,25 +2118,6 @@ static const ec_list_element curve_list[] = {
+-    { NID_X9_62_prime192v1, &_EC_NIST_PRIME_192.h, 0,
+-        "NIST/X9.62/SECG curve over a 192 bit prime field" },
+     { NID_X9_62_prime256v1, &_EC_X9_62_PRIME_256V1.h,
+ #if defined(ECP_NISTZ256_ASM)
+         EC_GFp_nistz256_method,
+@@ -2614,26 +1919,6 @@ static const ec_list_element curve_list[] = {
+ 
  static const ec_list_element curve_list[] = {
      /* prime field curves */
-     /* secg curves */
--    {NID_secp112r1, &_EC_SECG_PRIME_112R1.h, 0,
--     "SECG/WTLS curve over a 112 bit prime field"},
--    {NID_secp112r2, &_EC_SECG_PRIME_112R2.h, 0,
--     "SECG curve over a 112 bit prime field"},
--    {NID_secp128r1, &_EC_SECG_PRIME_128R1.h, 0,
--     "SECG curve over a 128 bit prime field"},
--    {NID_secp128r2, &_EC_SECG_PRIME_128R2.h, 0,
--     "SECG curve over a 128 bit prime field"},
--    {NID_secp160k1, &_EC_SECG_PRIME_160K1.h, 0,
--     "SECG curve over a 160 bit prime field"},
--    {NID_secp160r1, &_EC_SECG_PRIME_160R1.h, 0,
--     "SECG curve over a 160 bit prime field"},
--    {NID_secp160r2, &_EC_SECG_PRIME_160R2.h, 0,
--     "SECG/WTLS curve over a 160 bit prime field"},
+-    /* secg curves */
+-    { NID_secp112r1, &_EC_SECG_PRIME_112R1.h, 0,
+-        "SECG/WTLS curve over a 112 bit prime field" },
+-    { NID_secp112r2, &_EC_SECG_PRIME_112R2.h, 0,
+-        "SECG curve over a 112 bit prime field" },
+-    { NID_secp128r1, &_EC_SECG_PRIME_128R1.h, 0,
+-        "SECG curve over a 128 bit prime field" },
+-    { NID_secp128r2, &_EC_SECG_PRIME_128R2.h, 0,
+-        "SECG curve over a 128 bit prime field" },
+-    { NID_secp160k1, &_EC_SECG_PRIME_160K1.h, 0,
+-        "SECG curve over a 160 bit prime field" },
+-    { NID_secp160r1, &_EC_SECG_PRIME_160R1.h, 0,
+-        "SECG curve over a 160 bit prime field" },
+-    { NID_secp160r2, &_EC_SECG_PRIME_160R2.h, 0,
+-        "SECG/WTLS curve over a 160 bit prime field" },
 -    /* SECG secp192r1 is the same as X9.62 prime192v1 and hence omitted */
--    {NID_secp192k1, &_EC_SECG_PRIME_192K1.h, 0,
--     "SECG curve over a 192 bit prime field"},
--    {NID_secp224k1, &_EC_SECG_PRIME_224K1.h, 0,
--     "SECG curve over a 224 bit prime field"},
- # ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
-     {NID_secp224r1, &_EC_NIST_PRIME_224.h, EC_GFp_nistp224_method,
-      "NIST/SECG curve over a 224 bit prime field"},
-@@ -2957,18 +2147,6 @@ static const ec_list_element curve_list[] = {
- # endif
-      "NIST/SECG curve over a 521 bit prime field"},
+-    { NID_secp192k1, &_EC_SECG_PRIME_192K1.h, 0,
+-        "SECG curve over a 192 bit prime field" },
+-    { NID_secp224k1, &_EC_SECG_PRIME_224K1.h, 0,
+-        "SECG curve over a 224 bit prime field" },
+ #ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
+     { NID_secp224r1, &_EC_NIST_PRIME_224.h, EC_GFp_nistp224_method,
+         "NIST/SECG curve over a 224 bit prime field" },
+@@ -2663,18 +1948,6 @@ static const ec_list_element curve_list[] = {
+ #endif
+         "NIST/SECG curve over a 521 bit prime field" },
      /* X9.62 curves */
--    {NID_X9_62_prime192v1, &_EC_NIST_PRIME_192.h, 0,
--     "NIST/X9.62/SECG curve over a 192 bit prime field"},
--    {NID_X9_62_prime192v2, &_EC_X9_62_PRIME_192V2.h, 0,
--     "X9.62 curve over a 192 bit prime field"},
--    {NID_X9_62_prime192v3, &_EC_X9_62_PRIME_192V3.h, 0,
--     "X9.62 curve over a 192 bit prime field"},
--    {NID_X9_62_prime239v1, &_EC_X9_62_PRIME_239V1.h, 0,
--     "X9.62 curve over a 239 bit prime field"},
--    {NID_X9_62_prime239v2, &_EC_X9_62_PRIME_239V2.h, 0,
--     "X9.62 curve over a 239 bit prime field"},
--    {NID_X9_62_prime239v3, &_EC_X9_62_PRIME_239V3.h, 0,
--     "X9.62 curve over a 239 bit prime field"},
-     {NID_X9_62_prime256v1, &_EC_X9_62_PRIME_256V1.h,
- # if defined(ECP_NISTZ256_ASM)
-      EC_GFp_nistz256_method,
-@@ -3065,22 +2243,12 @@ static const ec_list_element curve_list[] = {
-     {NID_wap_wsg_idm_ecid_wtls5, &_EC_X9_62_CHAR2_163V1.h, 0,
-      "X9.62 curve over a 163 bit binary field"},
- # endif
--    {NID_wap_wsg_idm_ecid_wtls6, &_EC_SECG_PRIME_112R1.h, 0,
--     "SECG/WTLS curve over a 112 bit prime field"},
--    {NID_wap_wsg_idm_ecid_wtls7, &_EC_SECG_PRIME_160R2.h, 0,
--     "SECG/WTLS curve over a 160 bit prime field"},
--    {NID_wap_wsg_idm_ecid_wtls8, &_EC_WTLS_8.h, 0,
--     "WTLS curve over a 112 bit prime field"},
--    {NID_wap_wsg_idm_ecid_wtls9, &_EC_WTLS_9.h, 0,
--     "WTLS curve over a 160 bit prime field"},
- # ifndef OPENSSL_NO_EC2M
-     {NID_wap_wsg_idm_ecid_wtls10, &_EC_NIST_CHAR2_233K.h, 0,
-      "NIST/SECG/WTLS curve over a 233 bit binary field"},
-     {NID_wap_wsg_idm_ecid_wtls11, &_EC_NIST_CHAR2_233B.h, 0,
-      "NIST/SECG/WTLS curve over a 233 bit binary field"},
- # endif
--    {NID_wap_wsg_idm_ecid_wtls12, &_EC_WTLS_12.h, 0,
--     "WTLS curve over a 224 bit prime field"},
- # ifndef OPENSSL_NO_EC2M
+-    { NID_X9_62_prime192v1, &_EC_NIST_PRIME_192.h, 0,
+-        "NIST/X9.62/SECG curve over a 192 bit prime field" },
+-    { NID_X9_62_prime192v2, &_EC_X9_62_PRIME_192V2.h, 0,
+-        "X9.62 curve over a 192 bit prime field" },
+-    { NID_X9_62_prime192v3, &_EC_X9_62_PRIME_192V3.h, 0,
+-        "X9.62 curve over a 192 bit prime field" },
+-    { NID_X9_62_prime239v1, &_EC_X9_62_PRIME_239V1.h, 0,
+-        "X9.62 curve over a 239 bit prime field" },
+-    { NID_X9_62_prime239v2, &_EC_X9_62_PRIME_239V2.h, 0,
+-        "X9.62 curve over a 239 bit prime field" },
+-    { NID_X9_62_prime239v3, &_EC_X9_62_PRIME_239V3.h, 0,
+-        "X9.62 curve over a 239 bit prime field" },
+     { NID_X9_62_prime256v1, &_EC_X9_62_PRIME_256V1.h,
+ #if defined(ECP_NISTZ256_ASM)
+         EC_GFp_nistz256_method,
+@@ -2758,36 +2031,6 @@ static const ec_list_element curve_list[] = {
+         "X9.62 curve over a 368 bit binary field" },
+     { NID_X9_62_c2tnb431r1, &_EC_X9_62_CHAR2_431R1.h, 0,
+         "X9.62 curve over a 431 bit binary field" },
+-    /*
+-     * the WAP/WTLS curves [unlike SECG, spec has its own OIDs for curves
+-     * from X9.62]
+-     */
+-    { NID_wap_wsg_idm_ecid_wtls1, &_EC_WTLS_1.h, 0,
+-        "WTLS curve over a 113 bit binary field" },
+-    { NID_wap_wsg_idm_ecid_wtls3, &_EC_NIST_CHAR2_163K.h, 0,
+-        "NIST/SECG/WTLS curve over a 163 bit binary field" },
+-    { NID_wap_wsg_idm_ecid_wtls4, &_EC_SECG_CHAR2_113R1.h, 0,
+-        "SECG curve over a 113 bit binary field" },
+-    { NID_wap_wsg_idm_ecid_wtls5, &_EC_X9_62_CHAR2_163V1.h, 0,
+-        "X9.62 curve over a 163 bit binary field" },
+-#endif
+-    { NID_wap_wsg_idm_ecid_wtls6, &_EC_SECG_PRIME_112R1.h, 0,
+-        "SECG/WTLS curve over a 112 bit prime field" },
+-    { NID_wap_wsg_idm_ecid_wtls7, &_EC_SECG_PRIME_160R2.h, 0,
+-        "SECG/WTLS curve over a 160 bit prime field" },
+-    { NID_wap_wsg_idm_ecid_wtls8, &_EC_WTLS_8.h, 0,
+-        "WTLS curve over a 112 bit prime field" },
+-    { NID_wap_wsg_idm_ecid_wtls9, &_EC_WTLS_9.h, 0,
+-        "WTLS curve over a 160 bit prime field" },
+-#ifndef OPENSSL_NO_EC2M
+-    { NID_wap_wsg_idm_ecid_wtls10, &_EC_NIST_CHAR2_233K.h, 0,
+-        "NIST/SECG/WTLS curve over a 233 bit binary field" },
+-    { NID_wap_wsg_idm_ecid_wtls11, &_EC_NIST_CHAR2_233B.h, 0,
+-        "NIST/SECG/WTLS curve over a 233 bit binary field" },
+-#endif
+-    { NID_wap_wsg_idm_ecid_wtls12, &_EC_WTLS_12.h, 0,
+-        "WTLS curve over a 224 bit prime field" },
+-#ifndef OPENSSL_NO_EC2M
      /* IPSec curves */
-     {NID_ipsec3, &_EC_IPSEC_155_ID3.h, 0,
-@@ -3091,18 +2259,6 @@ static const ec_list_element curve_list[] = {
-      "\tNot suitable for ECDSA.\n\tQuestionable extension field!"},
- # endif
+     { NID_ipsec3, &_EC_IPSEC_155_ID3.h, 0,
+         "\n\tIPSec/IKE/Oakley curve #3 over a 155 bit binary field.\n"
+@@ -2797,18 +2040,6 @@ static const ec_list_element curve_list[] = {
+         "\tNot suitable for ECDSA.\n\tQuestionable extension field!" },
+ #endif
      /* brainpool curves */
--    {NID_brainpoolP160r1, &_EC_brainpoolP160r1.h, 0,
--     "RFC 5639 curve over a 160 bit prime field"},
--    {NID_brainpoolP160t1, &_EC_brainpoolP160t1.h, 0,
--     "RFC 5639 curve over a 160 bit prime field"},
--    {NID_brainpoolP192r1, &_EC_brainpoolP192r1.h, 0,
--     "RFC 5639 curve over a 192 bit prime field"},
--    {NID_brainpoolP192t1, &_EC_brainpoolP192t1.h, 0,
--     "RFC 5639 curve over a 192 bit prime field"},
--    {NID_brainpoolP224r1, &_EC_brainpoolP224r1.h, 0,
--     "RFC 5639 curve over a 224 bit prime field"},
--    {NID_brainpoolP224t1, &_EC_brainpoolP224t1.h, 0,
--     "RFC 5639 curve over a 224 bit prime field"},
-     {NID_brainpoolP256r1, &_EC_brainpoolP256r1.h, 0,
-      "RFC 5639 curve over a 256 bit prime field"},
-     {NID_brainpoolP256t1, &_EC_brainpoolP256t1.h, 0,
+-    { NID_brainpoolP160r1, &_EC_brainpoolP160r1.h, 0,
+-        "RFC 5639 curve over a 160 bit prime field" },
+-    { NID_brainpoolP160t1, &_EC_brainpoolP160t1.h, 0,
+-        "RFC 5639 curve over a 160 bit prime field" },
+-    { NID_brainpoolP192r1, &_EC_brainpoolP192r1.h, 0,
+-        "RFC 5639 curve over a 192 bit prime field" },
+-    { NID_brainpoolP192t1, &_EC_brainpoolP192t1.h, 0,
+-        "RFC 5639 curve over a 192 bit prime field" },
+-    { NID_brainpoolP224r1, &_EC_brainpoolP224r1.h, 0,
+-        "RFC 5639 curve over a 224 bit prime field" },
+-    { NID_brainpoolP224t1, &_EC_brainpoolP224t1.h, 0,
+-        "RFC 5639 curve over a 224 bit prime field" },
+     { NID_brainpoolP256r1, &_EC_brainpoolP256r1.h, 0,
+         "RFC 5639 curve over a 256 bit prime field" },
+     { NID_brainpoolP256t1, &_EC_brainpoolP256t1.h, 0,
 diff --git a/crypto/evp/ec_support.c b/crypto/evp/ec_support.c
-index 1ec10143d2..82b95294b4 100644
+index 20883c48f1..9715c6280d 100644
 --- a/crypto/evp/ec_support.c
 +++ b/crypto/evp/ec_support.c
 @@ -20,89 +20,15 @@ typedef struct ec_name2nid_st {
  static const EC_NAME2NID curve_list[] = {
      /* prime field curves */
      /* secg curves */
--    {"secp112r1", NID_secp112r1 },
--    {"secp112r2", NID_secp112r2 },
--    {"secp128r1", NID_secp128r1 },
--    {"secp128r2", NID_secp128r2 },
--    {"secp160k1", NID_secp160k1 },
--    {"secp160r1", NID_secp160r1 },
--    {"secp160r2", NID_secp160r2 },
--    {"secp192k1", NID_secp192k1 },
--    {"secp224k1", NID_secp224k1 },
-     {"secp224r1", NID_secp224r1 },
-     {"secp256k1", NID_secp256k1 },
-     {"secp384r1", NID_secp384r1 },
-     {"secp521r1", NID_secp521r1 },
+-    { "secp112r1", NID_secp112r1 },
+-    { "secp112r2", NID_secp112r2 },
+-    { "secp128r1", NID_secp128r1 },
+-    { "secp128r2", NID_secp128r2 },
+-    { "secp160k1", NID_secp160k1 },
+-    { "secp160r1", NID_secp160r1 },
+-    { "secp160r2", NID_secp160r2 },
+-    { "secp192k1", NID_secp192k1 },
+-    { "secp224k1", NID_secp224k1 },
+     { "secp224r1", NID_secp224r1 },
+     { "secp256k1", NID_secp256k1 },
+     { "secp384r1", NID_secp384r1 },
+     { "secp521r1", NID_secp521r1 },
      /* X9.62 curves */
--    {"prime192v1", NID_X9_62_prime192v1 },
--    {"prime192v2", NID_X9_62_prime192v2 },
--    {"prime192v3", NID_X9_62_prime192v3 },
--    {"prime239v1", NID_X9_62_prime239v1 },
--    {"prime239v2", NID_X9_62_prime239v2 },
--    {"prime239v3", NID_X9_62_prime239v3 },
-     {"prime256v1", NID_X9_62_prime256v1 },
+-    { "prime192v1", NID_X9_62_prime192v1 },
+-    { "prime192v2", NID_X9_62_prime192v2 },
+-    { "prime192v3", NID_X9_62_prime192v3 },
+-    { "prime239v1", NID_X9_62_prime239v1 },
+-    { "prime239v2", NID_X9_62_prime239v2 },
+-    { "prime239v3", NID_X9_62_prime239v3 },
+     { "prime256v1", NID_X9_62_prime256v1 },
      /* characteristic two field curves */
      /* NIST/SECG curves */
--    {"sect113r1", NID_sect113r1 },
--    {"sect113r2", NID_sect113r2 },
--    {"sect131r1", NID_sect131r1 },
--    {"sect131r2", NID_sect131r2 },
--    {"sect163k1", NID_sect163k1 },
--    {"sect163r1", NID_sect163r1 },
--    {"sect163r2", NID_sect163r2 },
--    {"sect193r1", NID_sect193r1 },
--    {"sect193r2", NID_sect193r2 },
--    {"sect233k1", NID_sect233k1 },
--    {"sect233r1", NID_sect233r1 },
--    {"sect239k1", NID_sect239k1 },
--    {"sect283k1", NID_sect283k1 },
--    {"sect283r1", NID_sect283r1 },
--    {"sect409k1", NID_sect409k1 },
--    {"sect409r1", NID_sect409r1 },
--    {"sect571k1", NID_sect571k1 },
--    {"sect571r1", NID_sect571r1 },
+-    { "sect113r1", NID_sect113r1 },
+-    { "sect113r2", NID_sect113r2 },
+-    { "sect131r1", NID_sect131r1 },
+-    { "sect131r2", NID_sect131r2 },
+-    { "sect163k1", NID_sect163k1 },
+-    { "sect163r1", NID_sect163r1 },
+-    { "sect163r2", NID_sect163r2 },
+-    { "sect193r1", NID_sect193r1 },
+-    { "sect193r2", NID_sect193r2 },
+-    { "sect233k1", NID_sect233k1 },
+-    { "sect233r1", NID_sect233r1 },
+-    { "sect239k1", NID_sect239k1 },
+-    { "sect283k1", NID_sect283k1 },
+-    { "sect283r1", NID_sect283r1 },
+-    { "sect409k1", NID_sect409k1 },
+-    { "sect409r1", NID_sect409r1 },
+-    { "sect571k1", NID_sect571k1 },
+-    { "sect571r1", NID_sect571r1 },
 -    /* X9.62 curves */
--    {"c2pnb163v1", NID_X9_62_c2pnb163v1 },
--    {"c2pnb163v2", NID_X9_62_c2pnb163v2 },
--    {"c2pnb163v3", NID_X9_62_c2pnb163v3 },
--    {"c2pnb176v1", NID_X9_62_c2pnb176v1 },
--    {"c2tnb191v1", NID_X9_62_c2tnb191v1 },
--    {"c2tnb191v2", NID_X9_62_c2tnb191v2 },
--    {"c2tnb191v3", NID_X9_62_c2tnb191v3 },
--    {"c2pnb208w1", NID_X9_62_c2pnb208w1 },
--    {"c2tnb239v1", NID_X9_62_c2tnb239v1 },
--    {"c2tnb239v2", NID_X9_62_c2tnb239v2 },
--    {"c2tnb239v3", NID_X9_62_c2tnb239v3 },
--    {"c2pnb272w1", NID_X9_62_c2pnb272w1 },
--    {"c2pnb304w1", NID_X9_62_c2pnb304w1 },
--    {"c2tnb359v1", NID_X9_62_c2tnb359v1 },
--    {"c2pnb368w1", NID_X9_62_c2pnb368w1 },
--    {"c2tnb431r1", NID_X9_62_c2tnb431r1 },
+-    { "c2pnb163v1", NID_X9_62_c2pnb163v1 },
+-    { "c2pnb163v2", NID_X9_62_c2pnb163v2 },
+-    { "c2pnb163v3", NID_X9_62_c2pnb163v3 },
+-    { "c2pnb176v1", NID_X9_62_c2pnb176v1 },
+-    { "c2tnb191v1", NID_X9_62_c2tnb191v1 },
+-    { "c2tnb191v2", NID_X9_62_c2tnb191v2 },
+-    { "c2tnb191v3", NID_X9_62_c2tnb191v3 },
+-    { "c2pnb208w1", NID_X9_62_c2pnb208w1 },
+-    { "c2tnb239v1", NID_X9_62_c2tnb239v1 },
+-    { "c2tnb239v2", NID_X9_62_c2tnb239v2 },
+-    { "c2tnb239v3", NID_X9_62_c2tnb239v3 },
+-    { "c2pnb272w1", NID_X9_62_c2pnb272w1 },
+-    { "c2pnb304w1", NID_X9_62_c2pnb304w1 },
+-    { "c2tnb359v1", NID_X9_62_c2tnb359v1 },
+-    { "c2pnb368w1", NID_X9_62_c2pnb368w1 },
+-    { "c2tnb431r1", NID_X9_62_c2tnb431r1 },
 -    /*
 -     * the WAP/WTLS curves [unlike SECG, spec has its own OIDs for curves
 -     * from X9.62]
 -     */
--    {"wap-wsg-idm-ecid-wtls1", NID_wap_wsg_idm_ecid_wtls1 },
--    {"wap-wsg-idm-ecid-wtls3", NID_wap_wsg_idm_ecid_wtls3 },
--    {"wap-wsg-idm-ecid-wtls4", NID_wap_wsg_idm_ecid_wtls4 },
--    {"wap-wsg-idm-ecid-wtls5", NID_wap_wsg_idm_ecid_wtls5 },
--    {"wap-wsg-idm-ecid-wtls6", NID_wap_wsg_idm_ecid_wtls6 },
--    {"wap-wsg-idm-ecid-wtls7", NID_wap_wsg_idm_ecid_wtls7 },
--    {"wap-wsg-idm-ecid-wtls8", NID_wap_wsg_idm_ecid_wtls8 },
--    {"wap-wsg-idm-ecid-wtls9", NID_wap_wsg_idm_ecid_wtls9 },
--    {"wap-wsg-idm-ecid-wtls10", NID_wap_wsg_idm_ecid_wtls10 },
--    {"wap-wsg-idm-ecid-wtls11", NID_wap_wsg_idm_ecid_wtls11 },
--    {"wap-wsg-idm-ecid-wtls12", NID_wap_wsg_idm_ecid_wtls12 },
+-    { "wap-wsg-idm-ecid-wtls1", NID_wap_wsg_idm_ecid_wtls1 },
+-    { "wap-wsg-idm-ecid-wtls3", NID_wap_wsg_idm_ecid_wtls3 },
+-    { "wap-wsg-idm-ecid-wtls4", NID_wap_wsg_idm_ecid_wtls4 },
+-    { "wap-wsg-idm-ecid-wtls5", NID_wap_wsg_idm_ecid_wtls5 },
+-    { "wap-wsg-idm-ecid-wtls6", NID_wap_wsg_idm_ecid_wtls6 },
+-    { "wap-wsg-idm-ecid-wtls7", NID_wap_wsg_idm_ecid_wtls7 },
+-    { "wap-wsg-idm-ecid-wtls8", NID_wap_wsg_idm_ecid_wtls8 },
+-    { "wap-wsg-idm-ecid-wtls9", NID_wap_wsg_idm_ecid_wtls9 },
+-    { "wap-wsg-idm-ecid-wtls10", NID_wap_wsg_idm_ecid_wtls10 },
+-    { "wap-wsg-idm-ecid-wtls11", NID_wap_wsg_idm_ecid_wtls11 },
+-    { "wap-wsg-idm-ecid-wtls12", NID_wap_wsg_idm_ecid_wtls12 },
 -    /* IPSec curves */
--    {"Oakley-EC2N-3", NID_ipsec3 },
--    {"Oakley-EC2N-4", NID_ipsec4 },
+-    { "Oakley-EC2N-3", NID_ipsec3 },
+-    { "Oakley-EC2N-4", NID_ipsec4 },
      /* brainpool curves */
--    {"brainpoolP160r1", NID_brainpoolP160r1 },
--    {"brainpoolP160t1", NID_brainpoolP160t1 },
--    {"brainpoolP192r1", NID_brainpoolP192r1 },
--    {"brainpoolP192t1", NID_brainpoolP192t1 },
--    {"brainpoolP224r1", NID_brainpoolP224r1 },
--    {"brainpoolP224t1", NID_brainpoolP224t1 },
-     {"brainpoolP256r1", NID_brainpoolP256r1 },
-     {"brainpoolP256t1", NID_brainpoolP256t1 },
-     {"brainpoolP320r1", NID_brainpoolP320r1 },
+-    { "brainpoolP160r1", NID_brainpoolP160r1 },
+-    { "brainpoolP160t1", NID_brainpoolP160t1 },
+-    { "brainpoolP192r1", NID_brainpoolP192r1 },
+-    { "brainpoolP192t1", NID_brainpoolP192t1 },
+-    { "brainpoolP224r1", NID_brainpoolP224r1 },
+-    { "brainpoolP224t1", NID_brainpoolP224t1 },
+     { "brainpoolP256r1", NID_brainpoolP256r1 },
+     { "brainpoolP256t1", NID_brainpoolP256t1 },
+     { "brainpoolP320r1", NID_brainpoolP320r1 },
 @@ -111,8 +37,6 @@ static const EC_NAME2NID curve_list[] = {
-     {"brainpoolP384t1", NID_brainpoolP384t1 },
-     {"brainpoolP512r1", NID_brainpoolP512r1 },
-     {"brainpoolP512t1", NID_brainpoolP512t1 },
+     { "brainpoolP384t1", NID_brainpoolP384t1 },
+     { "brainpoolP512r1", NID_brainpoolP512r1 },
+     { "brainpoolP512t1", NID_brainpoolP512t1 },
 -    /* SM2 curve */
--    {"SM2", NID_sm2 },
+-    { "SM2", NID_sm2 },
  };
  
  const char *OSSL_EC_curve_nid2name(int nid)
@@ -1098,20 +1017,20 @@ index 1ec10143d2..82b95294b4 100644
  /* Functions to translate between common NIST curve names and NIDs */
  
  static const EC_NAME2NID nist_curves[] = {
--    {"B-163", NID_sect163r2},
--    {"B-233", NID_sect233r1},
--    {"B-283", NID_sect283r1},
--    {"B-409", NID_sect409r1},
--    {"B-571", NID_sect571r1},
--    {"K-163", NID_sect163k1},
--    {"K-233", NID_sect233k1},
--    {"K-283", NID_sect283k1},
--    {"K-409", NID_sect409k1},
--    {"K-571", NID_sect571k1},
--    {"P-192", NID_X9_62_prime192v1},
-     {"P-224", NID_secp224r1},
-     {"P-256", NID_X9_62_prime256v1},
-     {"P-384", NID_secp384r1},
+-    { "B-163", NID_sect163r2 },
+-    { "B-233", NID_sect233r1 },
+-    { "B-283", NID_sect283r1 },
+-    { "B-409", NID_sect409r1 },
+-    { "B-571", NID_sect571r1 },
+-    { "K-163", NID_sect163k1 },
+-    { "K-233", NID_sect233k1 },
+-    { "K-283", NID_sect283k1 },
+-    { "K-409", NID_sect409k1 },
+-    { "K-571", NID_sect571k1 },
+-    { "P-192", NID_X9_62_prime192v1 },
+     { "P-224", NID_secp224r1 },
+     { "P-256", NID_X9_62_prime256v1 },
+     { "P-384", NID_secp384r1 },
 diff --git a/test/acvp_test.inc b/test/acvp_test.inc
 index 67787f3740..97ec1ff3e5 100644
 --- a/test/acvp_test.inc
@@ -1133,7 +1052,7 @@ index 67787f3740..97ec1ff3e5 100644
          "SHA2-512",
          "P-521",
 diff --git a/test/ecdsatest.h b/test/ecdsatest.h
-index 63fe319025..06b5c0aac5 100644
+index 700d7b5253..6aa4faa461 100644
 --- a/test/ecdsatest.h
 +++ b/test/ecdsatest.h
 @@ -32,23 +32,6 @@ typedef struct {
@@ -1141,30 +1060,30 @@ index 63fe319025..06b5c0aac5 100644
  
  static const ecdsa_cavs_kat_t ecdsa_cavs_kats[] = {
 -    /* prime KATs from X9.62 */
--    {NID_X9_62_prime192v1, NID_sha1,
--     "616263",                  /* "abc" */
--     "1a8d598fc15bf0fd89030b5cb1111aeb92ae8baf5ea475fb",
--     "0462b12d60690cdcf330babab6e69763b471f994dd702d16a563bf5ec08069705ffff65e"
--     "5ca5c0d69716dfcb3474373902",
--     "fa6de29746bbeb7f8bb1e761f85f7dfb2983169d82fa2f4e",
--     "885052380ff147b734c330c43d39b2c4a89f29b0f749fead",
--     "e9ecc78106def82bf1070cf1d4d804c3cb390046951df686"},
--    {NID_X9_62_prime239v1, NID_sha1,
--     "616263",                  /* "abc" */
--     "7ef7c6fabefffdea864206e80b0b08a9331ed93e698561b64ca0f7777f3d",
--     "045b6dc53bc61a2548ffb0f671472de6c9521a9d2d2534e65abfcbd5fe0c707fd9f1ed2e"
--     "65f09f6ce0893baf5e8e31e6ae82ea8c3592335be906d38dee",
--     "656c7196bf87dcc5d1f1020906df2782360d36b2de7a17ece37d503784af",
--     "2cb7f36803ebb9c427c58d8265f11fc5084747133078fc279de874fbecb0",
--     "2eeae988104e9c2234a3c2beb1f53bfa5dc11ff36a875d1e3ccb1f7e45cf"},
+-    { NID_X9_62_prime192v1, NID_sha1,
+-        "616263", /* "abc" */
+-        "1a8d598fc15bf0fd89030b5cb1111aeb92ae8baf5ea475fb",
+-        "0462b12d60690cdcf330babab6e69763b471f994dd702d16a563bf5ec08069705ffff65e"
+-        "5ca5c0d69716dfcb3474373902",
+-        "fa6de29746bbeb7f8bb1e761f85f7dfb2983169d82fa2f4e",
+-        "885052380ff147b734c330c43d39b2c4a89f29b0f749fead",
+-        "e9ecc78106def82bf1070cf1d4d804c3cb390046951df686" },
+-    { NID_X9_62_prime239v1, NID_sha1,
+-        "616263", /* "abc" */
+-        "7ef7c6fabefffdea864206e80b0b08a9331ed93e698561b64ca0f7777f3d",
+-        "045b6dc53bc61a2548ffb0f671472de6c9521a9d2d2534e65abfcbd5fe0c707fd9f1ed2e"
+-        "65f09f6ce0893baf5e8e31e6ae82ea8c3592335be906d38dee",
+-        "656c7196bf87dcc5d1f1020906df2782360d36b2de7a17ece37d503784af",
+-        "2cb7f36803ebb9c427c58d8265f11fc5084747133078fc279de874fbecb0",
+-        "2eeae988104e9c2234a3c2beb1f53bfa5dc11ff36a875d1e3ccb1f7e45cf" },
      /* prime KATs from NIST CAVP */
-     {NID_secp224r1, NID_sha224,
-      "699325d6fc8fbbb4981a6ded3c3a54ad2e4e3db8a5669201912064c64e700c139248cdc1"
+     { NID_secp224r1, NID_sha224,
+         "699325d6fc8fbbb4981a6ded3c3a54ad2e4e3db8a5669201912064c64e700c139248cdc1"
 diff --git a/test/ectest.c b/test/ectest.c
-index e1cb59d58d..b852381924 100644
+index 1e4ae9c63e..56cfc99421 100644
 --- a/test/ectest.c
 +++ b/test/ectest.c
-@@ -175,184 +175,26 @@ static int prime_field_tests(void)
+@@ -174,183 +174,26 @@ static int prime_field_tests(void)
          || !TEST_ptr(p = BN_new())
          || !TEST_ptr(a = BN_new())
          || !TEST_ptr(b = BN_new())
@@ -1222,7 +1141,7 @@ index e1cb59d58d..b852381924 100644
 -            TEST_note("     point at infinity");
 -        } else {
 -            if (!TEST_true(EC_POINT_get_affine_coordinates(group, P, x, y,
--                                                           ctx)))
+-                    ctx)))
 -                goto err;
 -
 -            test_output_bignum("x", x);
@@ -1239,64 +1158,63 @@ index e1cb59d58d..b852381924 100644
 -        || !TEST_true(EC_POINT_is_at_infinity(group, P)))
 -        goto err;
 -
--    len =
--        EC_POINT_point2oct(group, Q, POINT_CONVERSION_COMPRESSED, buf,
--                           sizeof(buf), ctx);
+-    len = EC_POINT_point2oct(group, Q, POINT_CONVERSION_COMPRESSED, buf,
+-        sizeof(buf), ctx);
 -    if (!TEST_size_t_ne(len, 0)
 -        || !TEST_true(EC_POINT_oct2point(group, P, buf, len, ctx))
 -        || !TEST_int_eq(0, EC_POINT_cmp(group, P, Q, ctx)))
 -        goto err;
 -    test_output_memory("Generator as octet string, compressed form:",
--                       buf, len);
+-        buf, len);
 -
 -    len = EC_POINT_point2oct(group, Q, POINT_CONVERSION_UNCOMPRESSED,
--                             buf, sizeof(buf), ctx);
+-        buf, sizeof(buf), ctx);
 -    if (!TEST_size_t_ne(len, 0)
 -        || !TEST_true(EC_POINT_oct2point(group, P, buf, len, ctx))
 -        || !TEST_int_eq(0, EC_POINT_cmp(group, P, Q, ctx)))
 -        goto err;
 -    test_output_memory("Generator as octet string, uncompressed form:",
--                       buf, len);
+-        buf, len);
 -
 -    len = EC_POINT_point2oct(group, Q, POINT_CONVERSION_HYBRID,
--                             buf, sizeof(buf), ctx);
+-        buf, sizeof(buf), ctx);
 -    if (!TEST_size_t_ne(len, 0)
 -        || !TEST_true(EC_POINT_oct2point(group, P, buf, len, ctx))
 -        || !TEST_int_eq(0, EC_POINT_cmp(group, P, Q, ctx)))
 -        goto err;
 -    test_output_memory("Generator as octet string, hybrid form:",
--                       buf, len);
+-        buf, len);
 -
 -    if (!TEST_true(EC_POINT_invert(group, P, ctx))
 -        || !TEST_int_eq(0, EC_POINT_cmp(group, P, R, ctx))
 -
--    /*
--     * Curve secp160r1 (Certicom Research SEC 2 Version 1.0, section 2.4.2,
--     * 2000) -- not a NIST curve, but commonly used
--     */
+-        /*
+-         * Curve secp160r1 (Certicom Research SEC 2 Version 1.0, section 2.4.2,
+-         * 2000) -- not a NIST curve, but commonly used
+-         */
 -
--        || !TEST_true(BN_hex2bn(&p,                         "FFFFFFFF"
+-        || !TEST_true(BN_hex2bn(&p, "FFFFFFFF"
 -                                    "FFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF"))
 -        || !TEST_int_eq(1, BN_check_prime(p, ctx, NULL))
--        || !TEST_true(BN_hex2bn(&a,                         "FFFFFFFF"
+-        || !TEST_true(BN_hex2bn(&a, "FFFFFFFF"
 -                                    "FFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC"))
--        || !TEST_true(BN_hex2bn(&b,                         "1C97BEFC"
+-        || !TEST_true(BN_hex2bn(&b, "1C97BEFC"
 -                                    "54BD7A8B65ACF89F81D4D4ADC565FA45"))
 -        || !TEST_true(EC_GROUP_set_curve(group, p, a, b, ctx))
--        || !TEST_true(BN_hex2bn(&x,                         "4A96B568"
+-        || !TEST_true(BN_hex2bn(&x, "4A96B568"
 -                                    "8EF573284664698968C38BB913CBFC82"))
--        || !TEST_true(BN_hex2bn(&y,                         "23a62855"
+-        || !TEST_true(BN_hex2bn(&y, "23a62855"
 -                                    "3168947d59dcc912042351377ac5fb32"))
 -        || !TEST_true(BN_add(yplusone, y, BN_value_one()))
--    /*
--     * When (x, y) is on the curve, (x, y + 1) is, as it happens, not,
--     * and therefore setting the coordinates should fail.
--     */
+-        /*
+-         * When (x, y) is on the curve, (x, y + 1) is, as it happens, not,
+-         * and therefore setting the coordinates should fail.
+-         */
 -        || !TEST_false(EC_POINT_set_affine_coordinates(group, P, x, yplusone,
--                                                       ctx))
+-            ctx))
 -        || !TEST_true(EC_POINT_set_affine_coordinates(group, P, x, y, ctx))
 -        || !TEST_int_gt(EC_POINT_is_on_curve(group, P, ctx), 0)
--        || !TEST_true(BN_hex2bn(&z,                       "0100000000"
+-        || !TEST_true(BN_hex2bn(&z, "0100000000"
 -                                    "000000000001F4C8F927AED3CA752257"))
 -        || !TEST_true(EC_GROUP_set_generator(group, P, z, BN_value_one()))
 -        || !TEST_true(EC_POINT_get_affine_coordinates(group, P, x, y, ctx)))
@@ -1305,27 +1223,27 @@ index e1cb59d58d..b852381924 100644
 -    test_output_bignum("x", x);
 -    test_output_bignum("y", y);
 -    /* G_y value taken from the standard: */
--    if (!TEST_true(BN_hex2bn(&z,                         "23a62855"
+-    if (!TEST_true(BN_hex2bn(&z, "23a62855"
 -                                 "3168947d59dcc912042351377ac5fb32"))
 -        || !TEST_BN_eq(y, z)
 -        || !TEST_int_eq(EC_GROUP_get_degree(group), 160)
 -        || !group_order_tests(group)
 -
--    /* Curve P-192 (FIPS PUB 186-2, App. 6) */
+-        /* Curve P-192 (FIPS PUB 186-2, App. 6) */
 -
--        || !TEST_true(BN_hex2bn(&p,                 "FFFFFFFFFFFFFFFF"
+-        || !TEST_true(BN_hex2bn(&p, "FFFFFFFFFFFFFFFF"
 -                                    "FFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF"))
 -        || !TEST_int_eq(1, BN_check_prime(p, ctx, NULL))
--        || !TEST_true(BN_hex2bn(&a,                 "FFFFFFFFFFFFFFFF"
+-        || !TEST_true(BN_hex2bn(&a, "FFFFFFFFFFFFFFFF"
 -                                    "FFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC"))
--        || !TEST_true(BN_hex2bn(&b,                 "64210519E59C80E7"
+-        || !TEST_true(BN_hex2bn(&b, "64210519E59C80E7"
 -                                    "0FA7E9AB72243049FEB8DEECC146B9B1"))
 -        || !TEST_true(EC_GROUP_set_curve(group, p, a, b, ctx))
--        || !TEST_true(BN_hex2bn(&x,                 "188DA80EB03090F6"
+-        || !TEST_true(BN_hex2bn(&x, "188DA80EB03090F6"
 -                                    "7CBF20EB43A18800F4FF0AFD82FF1012"))
 -        || !TEST_true(EC_POINT_set_compressed_coordinates(group, P, x, 1, ctx))
 -        || !TEST_int_gt(EC_POINT_is_on_curve(group, P, ctx), 0)
--        || !TEST_true(BN_hex2bn(&z,                 "FFFFFFFFFFFFFFFF"
+-        || !TEST_true(BN_hex2bn(&z, "FFFFFFFFFFFFFFFF"
 -                                    "FFFFFFFF99DEF836146BC9B1B4D22831"))
 -        || !TEST_true(EC_GROUP_set_generator(group, P, z, BN_value_one()))
 -        || !TEST_true(EC_POINT_get_affine_coordinates(group, P, x, y, ctx)))
@@ -1336,27 +1254,28 @@ index e1cb59d58d..b852381924 100644
 -    test_output_bignum("x", x);
 -    test_output_bignum("y", y);
 -    /* G_y value taken from the standard: */
--    if (!TEST_true(BN_hex2bn(&z,                 "07192B95FFC8DA78"
+-    if (!TEST_true(BN_hex2bn(&z, "07192B95FFC8DA78"
 -                                 "631011ED6B24CDD573F977A11E794811"))
 -        || !TEST_BN_eq(y, z)
 -        || !TEST_true(BN_add(yplusone, y, BN_value_one()))
--    /*
--     * When (x, y) is on the curve, (x, y + 1) is, as it happens, not,
--     * and therefore setting the coordinates should fail.
--     */
+-        /*
+-         * When (x, y) is on the curve, (x, y + 1) is, as it happens, not,
+-         * and therefore setting the coordinates should fail.
+-         */
 -        || !TEST_false(EC_POINT_set_affine_coordinates(group, P, x, yplusone,
--                                                       ctx))
+-            ctx))
 -        || !TEST_int_eq(EC_GROUP_get_degree(group), 192)
 -        || !group_order_tests(group)
 -
-     /* Curve P-224 (FIPS PUB 186-2, App. 6) */
+-        /* Curve P-224 (FIPS PUB 186-2, App. 6) */
++    /* Curve P-224 (FIPS PUB 186-2, App. 6) */
  
--        || !TEST_true(BN_hex2bn(&p,         "FFFFFFFFFFFFFFFFFFFFFFFF"
-+    if (!TEST_true(BN_hex2bn(&p,         "FFFFFFFFFFFFFFFFFFFFFFFF"
+-        || !TEST_true(BN_hex2bn(&p, "FFFFFFFFFFFFFFFFFFFFFFFF"
++    if (!TEST_true(BN_hex2bn(&p,    "FFFFFFFFFFFFFFFFFFFFFFFF"
                                      "FFFFFFFF000000000000000000000001"))
          || !TEST_int_eq(1, BN_check_prime(p, ctx, NULL))
-         || !TEST_true(BN_hex2bn(&a,         "FFFFFFFFFFFFFFFFFFFFFFFF"
-@@ -3130,7 +2972,7 @@ int setup_tests(void)
+         || !TEST_true(BN_hex2bn(&a, "FFFFFFFFFFFFFFFFFFFFFFFF"
+@@ -3107,7 +2950,7 @@ int setup_tests(void)
  
      ADD_TEST(parameter_test);
      ADD_TEST(ossl_parameter_test);
@@ -1425,5 +1344,5 @@ index e6a2c9eb59..861c01e177 100644
  Ctrl = key-check:0
 +Result = KEYGEN_GENERATE_ERROR
 -- 
-2.51.0
+2.55.0
 
