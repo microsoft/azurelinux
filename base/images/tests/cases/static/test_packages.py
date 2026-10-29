@@ -9,18 +9,13 @@ an rpmdb are automatically skipped.
 
 from __future__ import annotations
 
+from fnmatch import fnmatchcase
+
 import pytest
 
 # Packages that must be present in every image with an rpmdb.
 REQUIRED_PACKAGES = {
     "azurelinux-release-common",
-}
-
-# Packages that must NOT be present in any Azure Linux image.
-BLOCKLISTED_PACKAGES = {
-    "fedora-release",
-    "fedora-logos",
-    "redhat-rpm-config",
 }
 
 
@@ -32,7 +27,14 @@ def test_required_packages_installed(installed_packages: set[str]) -> None:
 
 
 @pytest.mark.require_capability("runtime-package-management")
-@pytest.mark.parametrize("pkg", sorted(BLOCKLISTED_PACKAGES))
-def test_blocklisted_package_absent(pkg: str, installed_packages: set[str]) -> None:
-    """Verify blocklisted packages are not installed."""
-    assert pkg not in installed_packages, f"Blocklisted package installed: {pkg}"
+@pytest.mark.parametrize("blocked_package", [
+    "fedora-logos",
+    "fedora-release",
+    "redhat-rpm-config",
+    pytest.param("gnutls", marks=pytest.mark.image("container-base")),
+    pytest.param("gnutls-*", marks=pytest.mark.image("container-base")),
+])
+def test_blocklisted_package_absent(blocked_package: str, installed_packages: set[str]) -> None:
+    """Verify blocked package-name globs match no installed packages."""
+    unexpected = sorted(name for name in installed_packages if fnmatchcase(name, blocked_package))
+    assert not unexpected, f"Blocked packages installed: {unexpected}"
