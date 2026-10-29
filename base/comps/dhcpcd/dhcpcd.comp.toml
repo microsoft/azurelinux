@@ -1,0 +1,6 @@
+[components.dhcpcd]
+# Pin to Fedora rawhide commit that fixes daemonising when RLIMIT_NOFILE is 0
+# (rhbz#2547780), which left cloud-init-provisioned VMs without an IP address.
+# F43 does not carry the fix yet; drop this pin once it lands in the snapshot.
+# Source: https://src.fedoraproject.org/rpms/dhcpcd/c/051387c2a373f65cabd86cafbb38e6140ac70f50
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "051387c2a373f65cabd86cafbb38e6140ac70f50" }

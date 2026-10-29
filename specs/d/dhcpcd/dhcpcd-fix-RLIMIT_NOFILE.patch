@@ -1,0 +1,37 @@
+From 3f44ca223a810815c425accc64949b25261cc96d Mon Sep 17 00:00:00 2001
+From: Jorik Cronenberg <jorik.cronenberg@suse.com>
+Date: Mon, 14 Sep 2026 13:23:07 +0200
+Subject: [PATCH] privsep: Fix daemonising broken by RLIMIT_NOFILE of 0
+
+RLIMIT_NOFILE of 0 makes dup2(2) fail EBADF on linux, so daemonising
+could no longer redirect stdout/stderr to /dev/null and readers of a
+piped stdio never saw EOF.  Cap at STDERR_FILENO + 1; as 0-2 are always
+open, no new fd can be allocated.
+---
+ src/privsep.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/privsep.c b/src/privsep.c
+index f35502e0..1cab3ce9 100644
+--- a/src/privsep.c
++++ b/src/privsep.c
+@@ -159,10 +159,18 @@ ps_dropprivs(struct dhcpcd_ctx *ctx)
+ 	struct rlimit rzero = { .rlim_cur = 0, .rlim_max = 0 };
+ 
+ #ifndef __sun /* RLIMIT_NOFILE and ppoll don't mix */
++#ifdef __linux__
++	/* Linux dup2(2) fails EBADF if RLIMIT_NOFILE is 0 */
++	struct rlimit rnofile = { .rlim_cur = STDERR_FILENO + 1,
++		.rlim_max = STDERR_FILENO + 1 };
++#else
++	struct rlimit rnofile = { .rlim_cur = 0, .rlim_max = 0 };
++#endif
++
+ 	/* Prohibit new files, sockets, etc
+ 	 * The control proxy *does* need to create new fd's via accept(2). */
+ 	if (ctx->ps_ctl == NULL || ctx->ps_ctl->psp_pid != getpid()) {
+-		if (setrlimit(RLIMIT_NOFILE, &rzero) == -1)
++		if (setrlimit(RLIMIT_NOFILE, &rnofile) == -1)
+ 			logerr("setrlimit RLIMIT_NOFILE");
+ 	}
+ #endif
