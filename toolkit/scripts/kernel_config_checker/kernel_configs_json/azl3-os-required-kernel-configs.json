@@ -4233,6 +4233,20 @@
             }
           ],
           "justification": "Guest THP settings from 6.6 (madvise on x86_64, off on aarch64) to limit host memory per sandbox; the 6.18 upgrade switched both to always"
+        },
+        {
+          "name": "CONFIG_IOMMU_DEFAULT_DMA_LAZY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Guest IOMMU default domain from 6.6 (translated, lazy invalidation); the 6.18 upgrade switched it to passthrough"
         }
       ]
     }
