@@ -1,0 +1,167 @@
+From 1e4fe8d17e81d84f715618a6ac6ce886db04cbe8 Mon Sep 17 00:00:00 2001
+From: Thien Trung Vuong <tvuong@microsoft.com>
+Date: Thu, 29 Oct 2026 13:41:57 -0700
+Subject: [PATCH] feat(libdnf5): expose optional rpm-md package file time in
+ C++
+
+Read the retained SOLVABLE_FILETIME directly from the loaded libsolv package metadata. Unlike build time, an absent or nonnumeric file-time key returns nullopt, so consumers can distinguish missing publication time from zero. The public API returns std::optional<unsigned long long>; omit the unsupported optional conversion from the common SWIG interface for Python, Perl and Ruby.
+
+Exercise a present file=123 distinct from build=456 and a missing file attribute in the rpm-md fixture. Update its primary checksum and size and verify the binding remains omitted.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ bindings/libdnf5/rpm.i                                 |  2 ++
+ include/libdnf5/rpm/package.hpp                        |  4 ++++
+ libdnf5/rpm/package.cpp                                | 10 ++++++++++
+ .../repos-repomd/repomd-repo1/repodata/primary.xml     |  2 +-
+ .../data/repos-repomd/repomd-repo1/repodata/repomd.xml |  8 ++++----
+ test/libdnf5/rpm/test_package.cpp                      |  8 ++++++++
+ test/libdnf5/rpm/test_package.hpp                      |  2 ++
+ test/python3/libdnf5/rpm/test_package_query.py         |  5 +++++
+ 8 files changed, 36 insertions(+), 5 deletions(-)
+
+diff --git a/bindings/libdnf5/rpm.i b/bindings/libdnf5/rpm.i
+index fe1e5e9..8b14964 100644
+--- a/bindings/libdnf5/rpm.i
++++ b/bindings/libdnf5/rpm.i
+@@ -86,6 +86,8 @@ add_hash(libdnf5::rpm::Reldep)
+ add_str(libdnf5::rpm::Package)
+ add_repr(libdnf5::rpm::Package)
+ add_hash(libdnf5::rpm::Package)
++// SWIG has no optional<unsigned long long> conversion here; expose the C++ API only.
++%ignore libdnf5::rpm::Package::get_file_time;
+ %include "libdnf5/rpm/package.hpp"
+ 
+ %template(VectorPackage) std::vector<libdnf5::rpm::Package>;
+diff --git a/include/libdnf5/rpm/package.hpp b/include/libdnf5/rpm/package.hpp
+index c240a3d..8018d02 100644
+--- a/include/libdnf5/rpm/package.hpp
++++ b/include/libdnf5/rpm/package.hpp
+@@ -29,6 +29,7 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+ #include "libdnf5/repo/repo_weak.hpp"
+ #include "libdnf5/transaction/transaction_item_reason.hpp"
+ 
++#include <optional>
+ #include <set>
+ #include <string>
+ #include <vector>
+@@ -242,6 +243,9 @@ public:
+     // @replaces libdnf:libdnf/hy-package.h:function:dnf_package_get_buildtime(DnfPackage * pkg)
+     unsigned long long get_build_time() const;
+ 
++    /// @return File timestamp from repository rpm-md metadata, if present.
++    std::optional<unsigned long long> get_file_time() const;
++
+     // TODO not supported by libsolv: https://github.com/openSUSE/libsolv/issues/400
+     //std::string get_build_host();
+ 
+diff --git a/libdnf5/rpm/package.cpp b/libdnf5/rpm/package.cpp
+index bb7a7a3..cdc52a7 100644
+--- a/libdnf5/rpm/package.cpp
++++ b/libdnf5/rpm/package.cpp
+@@ -176,6 +176,16 @@ unsigned long long Package::get_build_time() const {
+     return get_rpm_pool(p_impl->base).lookup_num(p_impl->id.id, SOLVABLE_BUILDTIME);
+ }
+ 
++std::optional<unsigned long long> Package::get_file_time() const {
++    auto & pool = get_rpm_pool(p_impl->base);
++    auto * solvable = pool.id2solvable(p_impl->id.id);
++    libdnf5::solv::get_repo(solvable).internalize();
++    if (solvable_lookup_type(solvable, SOLVABLE_FILETIME) != REPOKEY_TYPE_NUM) {
++        return std::nullopt;
++    }
++    return solvable_lookup_num(solvable, SOLVABLE_FILETIME, 0);
++}
++
+ // TODO not supported by libsolv: https://github.com/openSUSE/libsolv/issues/400
+ //std::string Package::get_build_host() {
+ //    return libdnf5::utils::string::c_to_str(lookup_cstring(get_rpm_pool(base).id2solvable(id.id), SOLVABLE_BUILDHOST));
+diff --git a/test/data/repos-repomd/repomd-repo1/repodata/primary.xml b/test/data/repos-repomd/repomd-repo1/repodata/primary.xml
+index c026d1c..04707a3 100644
+--- a/test/data/repos-repomd/repomd-repo1/repodata/primary.xml
++++ b/test/data/repos-repomd/repomd-repo1/repodata/primary.xml
+@@ -54,7 +54,7 @@
+   <description>Description</description>
+   <packager>Packager</packager>
+   <url>http://example.com/</url>
+-  <time file="123" build="456"/>
++  <time build="456"/>
+   <size package="111" installed="222" archive="333"/>
+   <location xml:base="http://example.com/" href="unresolvable-2-3.x86_64.rpm"/>
+   <format>
+diff --git a/test/data/repos-repomd/repomd-repo1/repodata/repomd.xml b/test/data/repos-repomd/repomd-repo1/repodata/repomd.xml
+index 2d99b0f..7542e4d 100644
+--- a/test/data/repos-repomd/repomd-repo1/repodata/repomd.xml
++++ b/test/data/repos-repomd/repomd-repo1/repodata/repomd.xml
+@@ -1,12 +1,12 @@
+ <repomd xmlns="http://linux.duke.edu/metadata/repo">
+   <revision>1550000000</revision>
+   <data type="primary">
+-    <checksum type="sha256">5689e808317cf753b400c5a203b6cd45ffd340989f725c768721c560ee205dba</checksum>
+-    <open-checksum type="sha256">5689e808317cf753b400c5a203b6cd45ffd340989f725c768721c560ee205dba</open-checksum>
++    <checksum type="sha256">3f63b227893a89609ea2dce686fc01e8ad77af2ef95709b3208d5e804f1ad580</checksum>
++    <open-checksum type="sha256">3f63b227893a89609ea2dce686fc01e8ad77af2ef95709b3208d5e804f1ad580</open-checksum>
+     <location href="repodata/primary.xml" />
+     <timestamp>1597222003</timestamp>
+-    <size>81503</size>
+-    <open-size>864433</open-size>
++    <size>3257</size>
++    <open-size>3257</open-size>
+   </data>
+   <data type="filelists">
+     <checksum type="sha256">35476536de2e46856ee2f0272bac44ef3c366effa37c29322c344bef56168ce6</checksum>
+diff --git a/test/libdnf5/rpm/test_package.cpp b/test/libdnf5/rpm/test_package.cpp
+index a5694f8..3f9baa7 100644
+--- a/test/libdnf5/rpm/test_package.cpp
++++ b/test/libdnf5/rpm/test_package.cpp
+@@ -128,6 +128,14 @@ void RpmPackageTest::test_get_build_time() {
+     CPPUNIT_ASSERT_EQUAL(456LLU, get_pkg("pkg-1.2-3.x86_64").get_build_time());
+ }
+ 
++void RpmPackageTest::test_get_file_time() {
++    auto package = get_pkg("pkg-1.2-3.x86_64");
++    CPPUNIT_ASSERT(package.get_file_time().has_value());
++    CPPUNIT_ASSERT_EQUAL(123LLU, *package.get_file_time());
++    CPPUNIT_ASSERT_EQUAL(456LLU, package.get_build_time());
++    CPPUNIT_ASSERT(!get_pkg("unresolvable-1:2-3.noarch").get_file_time().has_value());
++}
++
+ 
+ // TODO not supported by libsolv: https://github.com/openSUSE/libsolv/issues/400
+ // void RpmPackageTest::test_get_build_host() {
+diff --git a/test/libdnf5/rpm/test_package.hpp b/test/libdnf5/rpm/test_package.hpp
+index b28f098..4f88ec7 100644
+--- a/test/libdnf5/rpm/test_package.hpp
++++ b/test/libdnf5/rpm/test_package.hpp
+@@ -45,6 +45,7 @@ class RpmPackageTest : public BaseTestCase {
+     CPPUNIT_TEST(test_get_license);
+     CPPUNIT_TEST(test_get_sourcerpm);
+     CPPUNIT_TEST(test_get_build_time);
++    CPPUNIT_TEST(test_get_file_time);
+     //CPPUNIT_TEST(test_get_build_host);
+     CPPUNIT_TEST(test_get_packager);
+     CPPUNIT_TEST(test_get_vendor);
+@@ -96,6 +97,7 @@ public:
+     void test_get_license();
+     void test_get_sourcerpm();
+     void test_get_build_time();
++    void test_get_file_time();
+     //void test_get_build_host();
+     void test_get_packager();
+     void test_get_vendor();
+diff --git a/test/python3/libdnf5/rpm/test_package_query.py b/test/python3/libdnf5/rpm/test_package_query.py
+index c7dba62..44656c3 100644
+--- a/test/python3/libdnf5/rpm/test_package_query.py
++++ b/test/python3/libdnf5/rpm/test_package_query.py
+@@ -31,6 +31,11 @@ class TestPackageQuery(base_test_case.BaseTestCase):
+         query = libdnf5.rpm.PackageQuery(self.base)
+         self.assertEqual(query.size(), 3)
+ 
++    def test_file_time_accessor_is_cxx_only(self):
++        self.assertFalse(hasattr(libdnf5.rpm.Package, "get_file_time"))
++        package = next(iter(libdnf5.rpm.PackageQuery(self.base)))
++        self.assertIsInstance(package.get_build_time(), int)
++
+     def test_iterate_package_query(self):
+         query = libdnf5.rpm.PackageQuery(self.base)
+ 
