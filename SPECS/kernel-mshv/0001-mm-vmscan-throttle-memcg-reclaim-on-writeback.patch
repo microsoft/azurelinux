@@ -1,0 +1,40 @@
+From 8b1d0baec63d8f677810bfaab6c6eaa50b1e6d07 Mon Sep 17 00:00:00 2001
+From: Tahera Fahimi <taherafahimi@microsoft.com>
+Date: Thu, 24 Sep 2026 10:49:36 -0700
+Subject: [PATCH] mm: vmscan: throttle memcg reclaim on writeback
+
+Throttle memcg reclaim when all writeback folios are
+congested, allowing pending I/O to complete before
+reclaim retries the batch.
+
+Signed-off-by: Daniel Mihai <Daniel.Mihai@microsoft.com>
+Signed-off-by: Allen Pais <apais@linux.microsoft.com>
+---
+ mm/vmscan.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+index 95b1179a14e78..d21ecb162da24 100644
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -2102,6 +2102,17 @@ static unsigned long shrink_inactive_list(unsigned long nr_to_scan,
+ 			reclaim_throttle(pgdat, VMSCAN_THROTTLE_WRITEBACK);
+ 	}
+ 
++	/*
++	 * Filesystem writeback is no longer submitted from direct reclaim.  If
++	 * memcg reclaim finds that every writeback folio has already cycled
++	 * through reclaim once, let IO completion make progress instead of
++	 * immediately cycling the batch again.
++	 */
++	if (cgroup_reclaim(sc) && writeback_throttling_sane(sc) &&
++	    stat.nr_writeback && stat.nr_congested == stat.nr_writeback &&
++	    current_may_throttle())
++		reclaim_throttle(pgdat, VMSCAN_THROTTLE_WRITEBACK);
++
+ 	sc->nr.dirty += stat.nr_dirty;
+ 	sc->nr.congested += stat.nr_congested;
+ 	sc->nr.unqueued_dirty += stat.nr_unqueued_dirty;
+-- 
+2.34.1
+
