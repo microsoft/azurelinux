@@ -15,10 +15,18 @@
 %bcond_without mlx5
 %bcond_with    efa
 
+%global release_suffix %{nil}
+%if %{with cuda}
+%global release_suffix .cuda12.9
+%global cuda_home /usr/local/cuda-12.9
+# The container host supplies the driver and NVML; retain CUDA runtime dependencies.
+%global __requires_exclude ^(libcuda|libnvidia-ml)\\.so\\.1.*$
+%endif
+
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
 Version:        1.20.0
-Release:        1%{?dist}
+Release:        2%{release_suffix}%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,6 +55,13 @@ BuildRequires: automake
 BuildRequires: autoconf
 BuildRequires: libtool
 BuildRequires: gcc-c++
+
+%if %{with cuda}
+BuildRequires: cuda-cudart-devel-12-9
+BuildRequires: cuda-driver-devel-12-9
+BuildRequires: cuda-nvcc-12-9
+BuildRequires: cuda-nvml-devel-12-9
+%endif
 
 %if %{with cma}
 BuildRequires: glibc-devel >= 2.15
@@ -131,7 +146,7 @@ Provides header files and examples for developing with UCX.
            --without-go \
            --without-java \
            %_enable_arg cma cma \
-           %_with_arg cuda cuda \
+           %{?with_cuda:--with-cuda=%{cuda_home}}%{!?with_cuda:--without-cuda} \
            %_with_arg gdrcopy gdrcopy \
            %_with_arg ib verbs \
            %_with_arg mlx5 mlx5 \
@@ -154,6 +169,23 @@ rm -f %{buildroot}%{_libdir}/*.la
 rm -f %{buildroot}%{_libdir}/libucs_signal.a
 rm -f %{buildroot}%{_libdir}/ucx/*.la
 rm -f %{buildroot}%{_libdir}/ucx/lib*.so
+
+%check
+src/tools/info/ucx_info -v
+src/tools/info/ucx_info -b > ucx-build-config.txt
+%if %{with cuda}
+grep -Eq '^#define HAVE_CUDA[[:space:]]+1$' ucx-build-config.txt
+grep -Eq '^#define uct_MODULES[[:space:]]+.*:cuda' ucx-build-config.txt
+grep -Eq '^#define ucm_MODULES[[:space:]]+.*:cuda' ucx-build-config.txt
+test -s %{buildroot}%{_libdir}/ucx/libuct_cuda.so.0
+test -s %{buildroot}%{_libdir}/ucx/libucm_cuda.so.0
+test -s %{buildroot}%{_libdir}/ucx/libucx_perftest_cuda.so.0
+%else
+if grep -Eq '^#define HAVE_CUDA[[:space:]]+1$' ucx-build-config.txt; then
+    echo "CUDA support unexpectedly enabled in the CPU-only build" >&2
+    exit 1
+fi
+%endif
 
 %files
 %{_libdir}/lib*.so.*
@@ -250,6 +282,8 @@ Group: System Environment/Libraries
 Provide CUDA (NVIDIA GPU) support for UCX. Enables passing GPU memory pointers
 to UCX communication routines, and transports taking advantage of GPU-Direct
 technology for direct data transfer between GPU and RDMA devices.
+A compatible NVIDIA host driver must supply libcuda.so.1 and libnvidia-ml.so.1
+at runtime, including when these libraries are exposed to a GPU container.
 
 %files cuda
 %{_libdir}/ucx/libucx_perftest_cuda.so.*
@@ -459,6 +493,12 @@ with the host CPU.
 
 
 %changelog
+* Wed Oct 28 2026 Mitch Zhu <mitchzhu@microsoft.com> - 1.20.0-2
+- Add explicit CUDA 12.9 build dependencies for the optional CUDA subpackage.
+- Distinguish CUDA builds so plugins require their matching CUDA-capable core.
+- Keep host driver libraries external to the container package dependency set.
+- Check requested CUDA capabilities during the RPM build.
+
 * Mon May 12 2026 Azure Linux Team - 1.20.0-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
