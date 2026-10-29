@@ -1,0 +1,18 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+bugs = [
+  { url = "https://github.com/vda-linux/busybox_mirror/pull/54" },
+  { url = "https://github.com/microsoft/azurelinux/pull/19677#discussion_r4356132557" },
+]
+
+[[overlays]]
+description = "Reject parent-directory names exposed by prefix stripping until upstream fixes the remaining traversal gap"
+type = "patch-add"
+source = "../0010-archival-reject-parent-directory-after-prefix-stripping.patch"
+
+[[overlays]]
+description = "Apply the parent-directory traversal fix after the upstream bare-name check"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P12 -p1"]
