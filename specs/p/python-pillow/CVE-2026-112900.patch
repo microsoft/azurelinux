@@ -1,0 +1,54 @@
+From a2c363141da31a265dd536c945677db4b64f3ec9 Mon Sep 17 00:00:00 2001
+From: Andrew Murray <3112309+radarhere@users.noreply.github.com>
+Date: Thu, 1 Oct 2026 14:44:00 +1000
+Subject: [PATCH] Transform EPS file name to an absolute path before invoking
+ Ghostscript (#10090)
+
+---
+ Tests/test_file_eps.py    | 16 ++++++++++++++++
+ src/PIL/EpsImagePlugin.py |  5 ++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/Tests/test_file_eps.py b/Tests/test_file_eps.py
+index 70eced62ac9..035b2f73232 100644
+--- a/Tests/test_file_eps.py
++++ b/Tests/test_file_eps.py
+@@ -301,6 +301,22 @@ def test_image_mode_not_supported(tmp_path: Path) -> None:
+         im.save(tmpfile)
+ 
+ 
++@pytest.mark.skipif(not HAS_GHOSTSCRIPT, reason="Ghostscript not available")
++def test_filename_not_parsed_as_ghostscript_argument(
++    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
++) -> None:
++    # Check that a filename starting with "-" is not passed to Ghostscript unmodified
++    # If it was, the help functionality would be triggered instead
++    monkeypatch.chdir(tmp_path)
++    name = "-h"
++    with open(name, "wb") as f:
++        f.write(b"\n".join(simple_eps_file))
++
++    with Image.open(name) as im:
++        im.load()
++        assert im.size == (100, 100)
++
++
+ @pytest.mark.skipif(not HAS_GHOSTSCRIPT, reason="Ghostscript not available")
+ @skip_unless_feature("zlib")
+ def test_render_scale1() -> None:
+diff --git a/src/PIL/EpsImagePlugin.py b/src/PIL/EpsImagePlugin.py
+index 5eaefe339a5..a3336894ada 100644
+--- a/src/PIL/EpsImagePlugin.py
++++ b/src/PIL/EpsImagePlugin.py
+@@ -103,7 +103,10 @@ def Ghostscript(
+ 
+     infile_temp = None
+     if hasattr(fp, "name") and os.path.exists(fp.name):
+-        infile = fp.name
++        # Make the path absolute so that a filename beginning with "-" or "@"
++        # can never be interpreted by Ghostscript's argument parser
++        # as an option or an @-file token
++        infile = os.path.abspath(fp.name)
+     else:
+         in_fd, infile_temp = tempfile.mkstemp()
+         os.close(in_fd)

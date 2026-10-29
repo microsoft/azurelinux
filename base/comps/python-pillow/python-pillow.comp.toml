@@ -1,0 +1,5 @@
+# Pin Fedora 44's Pillow 12.3.0-6 to include its October security backports
+# without taking the additional API removals in Pillow 13.
+# https://src.fedoraproject.org/rpms/python-pillow/c/c83fa5dfc49460db212391c372a4b8b0586dcd60
+[components.python-pillow]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "c83fa5dfc49460db212391c372a4b8b0586dcd60" }

@@ -1,0 +1,11 @@
+# Drop when Fedora 44 includes the EPS filename fix from Pillow 13.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/python-pillow/Pillow/commit/a2c363141da31a265dd536c945677db4b64f3ec9" }]
+bugs = [{ url = "https://github.com/python-pillow/Pillow/security/advisories/GHSA-w889-685w-c8fh" }]
+
+[[overlays]]
+description = "Fix CVE-2026-112900 by passing absolute EPS filenames to Ghostscript, including the upstream regression test"
+type = "patch-add"
+source = "../CVE-2026-112900.patch"
