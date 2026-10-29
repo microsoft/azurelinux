@@ -1,0 +1,4 @@
+[components.containerd]
+# Pin Fedora 44's last 2.3 release to reuse its matching source and vendor archives.
+# https://src.fedoraproject.org/rpms/containerd/c/91251c9edc1f8e49c11f9a4ccb872502a933afb7
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "91251c9edc1f8e49c11f9a4ccb872502a933afb7" }
