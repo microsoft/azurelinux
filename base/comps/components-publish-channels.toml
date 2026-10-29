@@ -243,6 +243,7 @@ components = [
     "dnf",
     "dnf-plugins-core",
     "dnf5",
+    "dnf5-plugin-repo-snapshot",
     "dns-root-data",
     "dnsconfd",
     "dnsmasq",
