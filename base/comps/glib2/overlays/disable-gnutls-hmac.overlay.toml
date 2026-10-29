@@ -1,0 +1,30 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+bugs = [
+  { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/24711" },
+]
+
+[[overlays]]
+description = "Use GLib's built-in HMAC instead of the downstream GnuTLS backend; not a FIPS-ready replacement"
+type = "spec-search-replace"
+regex = '-Dgnutls=true'
+replacement = '-Dgnutls=false'
+
+[[overlays]]
+description = "The disabled GnuTLS HMAC backend no longer needs GnuTLS at build time"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "gnutls"
+
+[[overlays]]
+description = "Do not pull GnuTLS into 64-bit consumers when its HMAC backend is disabled"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "libgnutls.so.30()(64bit)"
+
+[[overlays]]
+description = "Do not pull GnuTLS into 32-bit consumers when its HMAC backend is disabled"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "libgnutls.so.30"
