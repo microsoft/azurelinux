@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        35%{?dist}
+Release:        36%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -164,6 +164,7 @@ Patch0913:      network-also-check-ID_NET_MANAGED_BY-property-on-rec.patch
 Patch0914:      Prevent-corruption-from-stale-alias-state-on-daemon-reload.patch
 Patch0915:      CVE-2026-15059.patch
 Patch0916:      CVE-2026-16742.patch
+Patch0917:      sd-event-fix-hang-after-ratelimit-expiry.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -1262,6 +1263,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Tue Oct 27 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 255-36
+- Backport upstream sd-event fix for hang after ratelimit expiry (systemd/systemd#44107, commit 1a60b10)
+
 * Tue Oct 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-35
 - Backport upstream ukify test fix for OpenSSL certificate issuer formatting.
 
