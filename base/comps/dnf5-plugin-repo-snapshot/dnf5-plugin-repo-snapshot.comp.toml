@@ -1,0 +1,2 @@
+[components.dnf5-plugin-repo-snapshot]
+spec = { type = "local", path = "dnf5-plugin-repo-snapshot.spec" }
