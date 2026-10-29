@@ -3187,6 +3187,1068 @@
           "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22300"
         }
       ]
+    },
+    {
+      "name": "kernel-mshv",
+      "inherit_default": false,
+      "kernel_configs": [
+        {
+          "name": "CONFIG_NETFILTER_XTABLES_LEGACY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_IPTABLES_LEGACY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_FILTER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_NAT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_MASQUERADE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_NETMAP",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_REDIRECT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_MANGLE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_TTL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_RAW",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_SECURITY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARPTABLES",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARPFILTER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARP_MANGLE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP6_NF_IPTABLES_LEGACY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP6_NF_TARGET_HL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP6_NF_FILTER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP6_NF_MANGLE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP6_NF_RAW",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP6_NF_SECURITY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP6_NF_NAT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IP6_NF_TARGET_MASQUERADE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_BRIDGE_NF_EBTABLES_LEGACY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_BRIDGE_EBT_BROUTE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_BRIDGE_EBT_T_FILTER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_BRIDGE_EBT_T_NAT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables-legacy, ip6tables-legacy, arptables and ebtables support for container networking and Kata tooling on kernel-mshv hosts; 6.17+ hides the legacy xtables backend behind these options and the 6.18 upgrade dropped it"
+        },
+        {
+          "name": "CONFIG_IFB",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "Selects NET_REDIRECT so act_mirred clears skb->tstamp on ingress redirects; without it the fq qdisc on Kata's tap0_kata drops packets tcfilter redirects from eth0 (upstream 7236ead1b149, 2c64605b590e)"
+        },
+        {
+          "name": "CONFIG_NET_REDIRECT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Selects NET_REDIRECT so act_mirred clears skb->tstamp on ingress redirects; without it the fq qdisc on Kata's tap0_kata drops packets tcfilter redirects from eth0 (upstream 7236ead1b149, 2c64605b590e)"
+        },
+        {
+          "name": "CONFIG_CRYPTO_SELFTESTS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
+        },
+        {
+          "name": "CONFIG_CRYPTO_FIPS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
+        },
+        {
+          "name": "CONFIG_CRYPTO_JITTERENTROPY_OSR",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "3"
+            },
+            {
+              "architecture": "arm64",
+              "value": "3"
+            }
+          ],
+          "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
+        },
+        {
+          "name": "CONFIG_CRYPTO_JITTERENTROPY_MEMSIZE_2",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode (fips=1) support, required for FIPS-enabled Kata node pools. 6.18 makes CRYPTO_FIPS depend on the new opt-in CRYPTO_SELFTESTS, so the 6.18 upgrade silently dropped it; jitterentropy settings match the kernel package"
+        },
+        {
+          "name": "CONFIG_TARGET_CORE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "LIO SCSI target with the TCMU userspace backend and the loopback fabric, used by overlaybd (tcmu-runner) for lazily-pulled container images; enabled in 6.6 at customer request"
+        },
+        {
+          "name": "CONFIG_TCM_USER2",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "LIO SCSI target with the TCMU userspace backend and the loopback fabric, used by overlaybd (tcmu-runner) for lazily-pulled container images; enabled in 6.6 at customer request"
+        },
+        {
+          "name": "CONFIG_LOOPBACK_TARGET",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "LIO SCSI target with the TCMU userspace backend and the loopback fabric, used by overlaybd (tcmu-runner) for lazily-pulled container images; enabled in 6.6 at customer request"
+        },
+        {
+          "name": "CONFIG_LWTUNNEL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Lightweight tunnels with BPF encap (ip route ... encap bpf) and the tc flower classifier, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_LWTUNNEL_BPF",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Lightweight tunnels with BPF encap (ip route ... encap bpf) and the tc flower classifier, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_NET_CLS_FLOWER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "Lightweight tunnels with BPF encap (ip route ... encap bpf) and the tc flower classifier, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_FUNCTION_TRACER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_HIST_TRIGGERS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_SYNTH_EVENTS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_USER_EVENTS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Function tracer and dynamic ftrace (BPF fentry/fexit trampolines need DYNAMIC_FTRACE_WITH_DIRECT_CALLS) plus ftrace hist/synthetic/user events, enabled in 6.6 at customer request and dropped from x86_64 in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_OVERLAY_FS_REDIRECT_DIR",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "overlayfs redirect_dir, index and metacopy on by default, enabled in 6.6 at customer request and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_OVERLAY_FS_INDEX",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "overlayfs redirect_dir, index and metacopy on by default, enabled in 6.6 at customer request and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_OVERLAY_FS_METACOPY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "overlayfs redirect_dir, index and metacopy on by default, enabled in 6.6 at customer request and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Hot-added memory is onlined by the kernel, as MEMORY_HOTPLUG_DEFAULT_ONLINE=y did in 6.6; the 6.18 upgrade took the new upstream default (offline)"
+        },
+        {
+          "name": "CONFIG_NETFILTER_XT_TARGET_NOTRACK",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables NOTRACK and TRACE targets, enabled in 6.6 on aarch64 and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_NETFILTER_XT_TARGET_TRACE",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables NOTRACK and TRACE targets, enabled in 6.6 on aarch64 and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_CRYPTO_BENCHMARK",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            },
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "tcrypt crypto test module (CRYPTO_TEST=m in 6.6, enabled for FIPS testing), renamed to CRYPTO_BENCHMARK and dropped in the 6.18 upgrade"
+        }
+      ]
+    },
+    {
+      "name": "kernel-uvm",
+      "inherit_default": false,
+      "kernel_configs": [
+        {
+          "name": "CONFIG_NETFILTER_XTABLES_LEGACY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_NETFILTER_XT_TARGET_TRACE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_IPTABLES_LEGACY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_FILTER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_NAT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_MASQUERADE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_NETMAP",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_REDIRECT",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_MANGLE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_TARGET_TTL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_RAW",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_SECURITY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARPTABLES",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARPFILTER",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_IP_NF_ARP_MANGLE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Legacy iptables tables inside the Kata guest (e.g. istio-init runs iptables-legacy); 6.17+ hides them behind NETFILTER_XTABLES_LEGACY and the 6.18 upgrade dropped them. Must be built in: kernel-uvm ships no loadable modules"
+        },
+        {
+          "name": "CONFIG_NFS_FS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_NFS_V3",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_NFS_V4",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_NFS_V4_1",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_NFS_V4_2",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_CIFS_XATTR",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_CIFS_UPCALL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_CIFS_DFS_UPCALL",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "In-guest NFS and SMB mounts (xattrs, cifs.upcall, DFS), enabled in 6.6 by #15498 and dropped in the 6.18 upgrade; built in because kernel-uvm ships no modules"
+        },
+        {
+          "name": "CONFIG_CRYPTO_FIPS",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode support in the aarch64 Kata guest, enabled in 6.6 and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_CRYPTO_SELFTESTS",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "FIPS mode support in the aarch64 Kata guest, enabled in 6.6 and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Hot-added memory is onlined by the kernel, as MEMORY_HOTPLUG_DEFAULT_ONLINE=y did in 6.6; the 6.18 upgrade took the new upstream default (offline)"
+        },
+        {
+          "name": "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "Guest THP settings from 6.6 (madvise on x86_64, off on aarch64) to limit host memory per sandbox; the 6.18 upgrade switched both to always"
+        },
+        {
+          "name": "CONFIG_TRANSPARENT_HUGEPAGE",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "Guest THP settings from 6.6 (madvise on x86_64, off on aarch64) to limit host memory per sandbox; the 6.18 upgrade switched both to always"
+        },
+        {
+          "name": "CONFIG_IOMMU_DEFAULT_DMA_LAZY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "Guest IOMMU default domain from 6.6 (translated, lazy invalidation); the 6.18 upgrade switched it to passthrough"
+        }
+      ]
     }
   ]
 }
