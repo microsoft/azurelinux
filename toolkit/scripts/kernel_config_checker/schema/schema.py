@@ -56,6 +56,10 @@ class KernelObject(BaseModel):
     model_config = {"extra": "forbid"}
 
     name: str = Field(description="Name of the kernel")
+    inherit_default: bool = Field(
+        default=True,
+        description="Whether this kernel is also checked against the default section",
+    )
     kernel_configs: List[KernelConfig] = Field(
         default_factory=list, description="List of kernel configuration settings"
     )
@@ -83,4 +87,4 @@ def load_schema(filepath: Path) -> IntentionalKernelConfigSchema:
 def save_schema(schema: IntentionalKernelConfigSchema, filepath: Path) -> None:
     """Save the schema to a JSON file."""
     with open(filepath, "w") as file:
-        json.dump(schema.model_dump(mode="json"), file, indent=2)
+        json.dump(schema.model_dump(mode="json", exclude_defaults=True), file, indent=2)
