@@ -1,0 +1,12 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [{ url = "https://github.com/apache/ant/commit/43974df0efdb9679c180c771b20d91c469a36b52" }]
+bugs = [{ url = "https://github.com/apache/ant/pull/239" }]
+
+# Microsoft Build of OpenJDK 25 can produce a default-compression archive with
+# the same size as a level-9 archive, invalidating the test's strict comparison.
+[[overlays]]
+description = "Compare explicit ZIP compression levels because Java 25 default compression can match level 9"
+type = "patch-add"
+source = "../ant-explicit-compression-level.patch"
