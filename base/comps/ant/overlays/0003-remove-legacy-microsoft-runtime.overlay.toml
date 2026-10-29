@@ -1,0 +1,13 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/apache/ant/commit/616db837d1e05c41f158dc0813cf1b10e481b255" }]
+bugs = [{ url = "https://github.com/apache/ant/pull/230" }]
+
+# Remove this overlay and its patch when importing Ant 1.10.18 or newer,
+# which includes the upstream fix. Microsoft OpenJDK uses a modular runtime,
+# not the obsolete Microsoft JVM's ${java.home}/Packages/*.ZIP layout.
+[[overlays]]
+description = "Backport the Ant 1.10.18 fix for obsolete Microsoft JVM runtime discovery"
+type = "patch-add"
+source = "../ant-remove-obsolete-microsoft-runtime-discovery.patch"
