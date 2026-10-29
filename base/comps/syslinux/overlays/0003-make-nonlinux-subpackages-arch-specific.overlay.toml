@@ -1,0 +1,30 @@
+# The nonlinux and extlinux-nonlinux subpackages are BuildArch: noarch with
+# ExclusiveArch: %{ix86} x86_64, and both require syslinux, which is only built
+# for x86_64. rpm does not record ExclusiveArch in binary RPM headers, and our
+# publishing copies every noarch RPM into every arch repo, so both subpackages
+# land in the aarch64 repo where syslinux does not exist and fail repoclosure
+# (https://github.com/microsoft/azurelinux/issues/18985).
+#
+# Drop BuildArch: noarch so they are built as x86_64 packages and published
+# only next to syslinux. Same approach as vmaf-models (see vmaf.comp.toml).
+# Drop this overlay once publishing honors the SRPM's ExclusiveArch for noarch
+# subpackages.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://github.com/microsoft/azurelinux/issues/18985" }]
+
+[[overlays]]
+description = "Make syslinux-nonlinux arch-specific so it is not published to aarch64"
+type = "spec-remove-tag"
+tag = "BuildArch"
+value = "noarch"
+package = "nonlinux"
+
+[[overlays]]
+description = "Make syslinux-extlinux-nonlinux arch-specific so it is not published to aarch64"
+type = "spec-remove-tag"
+tag = "BuildArch"
+value = "noarch"
+package = "extlinux-nonlinux"

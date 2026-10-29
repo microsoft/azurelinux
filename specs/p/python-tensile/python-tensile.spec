@@ -1,6 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%global debug_package %{nil}
 
 %if 0%{?suse_version}
 %{?!python_module:%define python_module() python3-%{**}}
@@ -23,7 +24,7 @@ Name:           python-tensile-devel
 Name:           python-tensile
 %endif
 Version:        %{rocm_version}
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Tool for creating benchmark-driven backend libraries for GEMMs
 
 URL:            https://github.com/ROCmSoftwarePlatform/Tensile
@@ -57,7 +58,6 @@ BuildRequires:  python3dist(setuptools)
 %endif
 
 # Straight python, but only usable for ROCm which is only on x86_64
-BuildArch:      noarch
 ExclusiveArch:  x86_64
 %python_subpackages
 
