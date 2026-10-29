@@ -1,4 +1,4 @@
 [components.python-fsspec]
 # Pin to Fedora 43's latest stable update; the subsequent 2026.7.0 build failed.
 # https://bodhi.fedoraproject.org/updates/FEDORA-2026-5dd3f26352
-spec = { type = "upstream", upstream-commit = "46bf0a584aa8f47d959324de38d9baf36db8e922" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "46bf0a584aa8f47d959324de38d9baf36db8e922" }

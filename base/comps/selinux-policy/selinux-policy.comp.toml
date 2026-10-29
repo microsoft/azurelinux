@@ -4,7 +4,7 @@
 # built in the Fedora 43 snapshot, which need selinux-policy >= 43.7. Policy
 # modules only (no shared libraries / no ABI); same 43.x base, additive rules.
 # https://src.fedoraproject.org/rpms/selinux-policy/c/f3fd2d04e921f827d6b836c37d608a2e27acf729
-spec = { type = "upstream", upstream-commit = "f3fd2d04e921f827d6b836c37d608a2e27acf729" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "f3fd2d04e921f827d6b836c37d608a2e27acf729" }
 
 [[components.selinux-policy.overlays]]
 description = "Remove tmpfiles write to /sys/fs/selinux/checkreqprot as it was deprecated in the kernel"

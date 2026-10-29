@@ -4,7 +4,7 @@
 [components.golang]
 # Use Fedora's matching Go 1.26.10 packaging, newer than the distro snapshot.
 # https://src.fedoraproject.org/rpms/golang/c/161713c8b927cddf12b3f58f551030dd67e6fef7
-spec = { type = "upstream", upstream-commit = "161713c8b927cddf12b3f58f551030dd67e6fef7" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "161713c8b927cddf12b3f58f551030dd67e6fef7" }
 
 [[components.golang.source-files]]
 filename = "go1.26.10.src.tar.gz"

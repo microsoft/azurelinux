@@ -1,2 +1,2 @@
 [components.yq]
-spec = { type = "upstream", upstream-commit = "f2a5285f11f16c469940d9bafd35dc0ee9b5f091" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "f2a5285f11f16c469940d9bafd35dc0ee9b5f091" }

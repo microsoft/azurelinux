@@ -6,4 +6,4 @@
 # NOTE: CVE-2026-113351 still affects 2.9.0; the fix is pending upstream in
 # https://github.com/libexpat/libexpat/pull/1431
 [components.expat]
-spec = { type = "upstream", upstream-commit = "937abbe186778036c4516dc4090f336059105858" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "937abbe186778036c4516dc4090f336059105858" }

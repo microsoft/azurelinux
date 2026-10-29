@@ -1,2 +1,2 @@
 [components.zstr]
-spec = { type = "upstream", upstream-commit = "a5fcbe0b38575b94772026dc679145afd1904be7" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a5fcbe0b38575b94772026dc679145afd1904be7" }

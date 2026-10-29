@@ -2,4 +2,4 @@
 # Pin Fedora 43's last stable update (24.11.1-7.fc43); the branch tip requires
 # greenlet >= 3.2.2, newer than our 3.1.1.
 # https://bodhi.fedoraproject.org/updates/FEDORA-2025-121eb7d154
-spec = { type = "upstream", upstream-commit = "cdda167e27825e7c9e5e2bab9f2805880bc27415" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "cdda167e27825e7c9e5e2bab9f2805880bc27415" }

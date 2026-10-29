@@ -1,2 +1,2 @@
 [components.grubby]
-spec = { type = "upstream", upstream-commit = "482a2825c47c4fd28a18beb279a3e826461bf878" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "482a2825c47c4fd28a18beb279a3e826461bf878" }

@@ -1,4 +1,4 @@
 [components.python-PyMySQL]
 # Pin to Fedora 43's latest stable build (1.1.2-2.fc43), not the unreleased 1.1.3 branch head.
 # https://bodhi.fedoraproject.org/updates/FEDORA-2025-c52d1744b6
-spec = { type = "upstream", upstream-commit = "ad9a934522bfaf0746542b542fe2c0f7f4a087cf" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "ad9a934522bfaf0746542b542fe2c0f7f4a087cf" }

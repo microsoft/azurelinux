@@ -2,4 +2,4 @@
 # the default Fedora snapshot includes the fix. Node.js uses system Brotli.
 # https://src.fedoraproject.org/rpms/brotli/c/d6c0b41acf0d83dab2faf2da25e6eda34054045f
 [components.brotli]
-spec = { type = "upstream", upstream-commit = "d6c0b41acf0d83dab2faf2da25e6eda34054045f" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "d6c0b41acf0d83dab2faf2da25e6eda34054045f" }

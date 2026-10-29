@@ -1,7 +1,7 @@
 [components.'rust-synstructure0.13']
 # Fedora replaced rust-synstructure 0.13 with 0.14, but ICU4X 2.3 build
 # dependencies still require the 0.13 API. Keep both versions installable.
-spec = { type = "upstream", upstream-name = "rust-synstructure", upstream-commit = "bba5173af52680c9ac4d334abbec4ca0d76624d7" }
+spec = { type = "upstream", upstream-name = "rust-synstructure", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "bba5173af52680c9ac4d334abbec4ca0d76624d7" }
 
 [[components.'rust-synstructure0.13'.overlays]]
 description = "Rename the pinned upstream package so Synstructure 0.13 can be installed alongside 0.14"
