@@ -1,7 +1,7 @@
-From decf5f9abf903fc3609d1aaaf84b9d437afb4072 Mon Sep 17 00:00:00 2001
+From a3fb132264e12164da894d84352c7329d8801aa8 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:15 +0100
-Subject: [PATCH 23/59] FIPS: RSA: encrypt limits - REVIEW
+Subject: [PATCH 23/58] FIPS: RSA: encrypt limits - REVIEW
 
 Patch-name: 0058-FIPS-limit-rsa-encrypt.patch
 Patch-id: 58
@@ -19,10 +19,10 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  mode change 100644 => 100755 test/recipes/80-test_ssl_old.t
 
 diff --git a/providers/common/securitycheck.c b/providers/common/securitycheck.c
-index 79a9c48ce2..0e517542bc 100644
+index 6985be0400..37000c8627 100644
 --- a/providers/common/securitycheck.c
 +++ b/providers/common/securitycheck.c
-@@ -65,6 +65,7 @@ int ossl_rsa_key_op_get_protect(const RSA *rsa, int operation, int *outprotect)
+@@ -66,6 +66,7 @@ int ossl_rsa_key_op_get_protect(const RSA *rsa, int operation, int *outprotect)
   * Set protect = 1 for encryption or signing operations, or 0 otherwise. See
   * https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-131Ar2.pdf.
   */
@@ -44,7 +44,7 @@ index 78f9fc0655..6bd783eb0a 100644
  OSSL_FIPS_PARAM(rsa_sign_x931_disallowed, RSA_SIGN_X931_PAD_DISABLED, 0)
  OSSL_FIPS_PARAM(hkdf_key_check, HKDF_KEY_CHECK, 0)
 diff --git a/providers/implementations/asymciphers/rsa_enc.c b/providers/implementations/asymciphers/rsa_enc.c
-index e6b676d0f8..6d6650bd81 100644
+index 4995b00102..0b14fbc58d 100644
 --- a/providers/implementations/asymciphers/rsa_enc.c
 +++ b/providers/implementations/asymciphers/rsa_enc.c
 @@ -174,6 +174,18 @@ static int rsa_encrypt(void *vprsactx, unsigned char *out, size_t *outlen,
@@ -66,7 +66,7 @@ index e6b676d0f8..6d6650bd81 100644
      if (out == NULL) {
          *outlen = len;
          return 1;
-@@ -235,6 +247,20 @@ static int rsa_decrypt(void *vprsactx, unsigned char *out, size_t *outlen,
+@@ -234,6 +246,20 @@ static int rsa_decrypt(void *vprsactx, unsigned char *out, size_t *outlen,
      if (!ossl_prov_is_running())
          return 0;
  
@@ -88,10 +88,10 @@ index e6b676d0f8..6d6650bd81 100644
          if (out == NULL) {
              *outlen = SSL_MAX_MASTER_KEY_LENGTH;
 diff --git a/test/recipes/30-test_evp_data/evppkey_rsa_common.txt b/test/recipes/30-test_evp_data/evppkey_rsa_common.txt
-index 18e11bdaa9..17ceb59148 100644
+index 81ce317fa7..da79840ca3 100644
 --- a/test/recipes/30-test_evp_data/evppkey_rsa_common.txt
 +++ b/test/recipes/30-test_evp_data/evppkey_rsa_common.txt
-@@ -248,13 +248,13 @@ Input = 64b0e9f9892371110c40ba5739dc0974002aa6e6160b481447c6819947c2d3b537a6e377
+@@ -260,13 +260,13 @@ Input = 64b0e9f9892371110c40ba5739dc0974002aa6e6160b481447c6819947c2d3b537a6e377
  Output = 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
  
  # RSA decrypt
@@ -107,7 +107,7 @@ index 18e11bdaa9..17ceb59148 100644
  # Note: disable the Bleichenbacher workaround to see if it passes
  Decrypt = RSA-2048
  Ctrl = rsa_pkcs1_implicit_rejection:0
-@@ -262,7 +262,7 @@ Input = 550AF55A2904E7B9762352F8FB7FA235A9CB053AACB2D5FCB8CA48453CB2EE3619746C70
+@@ -274,7 +274,7 @@ Input = 550AF55A2904E7B9762352F8FB7FA235A9CB053AACB2D5FCB8CA48453CB2EE3619746C70
  Output = "Hello World"
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -116,7 +116,7 @@ index 18e11bdaa9..17ceb59148 100644
  # Corrupted ciphertext
  # Note: output is generated synthethically by the Bleichenbacher workaround
  Decrypt = RSA-2048
-@@ -270,7 +270,7 @@ Input = 550AF55A2904E7B9762352F8FB7FA235A9CB053AACB2D5FCB8CA48453CB2EE3619746C70
+@@ -282,7 +282,7 @@ Input = 550AF55A2904E7B9762352F8FB7FA235A9CB053AACB2D5FCB8CA48453CB2EE3619746C70
  Output = 4cbb988d6a46228379132b0b5f8c249b3860043848c93632fb982c807c7c82fffc7a9ef83f4908f890373ac181ffea6381e103bcaa27e65638b6ecebef38b59ed4226a9d12af675cfcb634d8c40e7a7aff
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -125,7 +125,7 @@ index 18e11bdaa9..17ceb59148 100644
  # Corrupted ciphertext
  # Note: disable the Bleichenbacher workaround to see if it fails
  Decrypt = RSA-2048
-@@ -296,13 +296,14 @@ Input = 0000000000000000000000000000000000000001
+@@ -308,13 +308,14 @@ Input = 0000000000000000000000000000000000000001
  Result = KEYOP_ERROR
  
  # RSADP Ciphertext = 2 should pass
@@ -141,7 +141,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt = RSA-2048
  Ctrl = rsa_padding_mode:none
  Input = cd0081ea7b2ae1ea06d59f7c73d9ffb94a09615c2e4ba7c636cef08dd3533ec3185525b015c769b99a77d6725bf9c3532a9b6e5f6627d5fb85160768d3dda9cbd35974511717dc3d309d2fc47ee41f97e32adb7f9dd864a1c4767a666ecd71bc1aacf5e7517f4b38594fea9b05e42d5ada9912008013e45316a4d9bb8ed086b88d28758bacaf922d46a868b485d239c9baeb0e2b64592710f42b2d1ea0a4b4802c0becab328f8a68b0073bdb546feea9809d2849912b390c1532bc7e29c7658f8175fae46f34332ff87bcab3e40649b98577869da0ea718353f0722754886913648760d122be676e0fc483dd20ffc31bda96a31966c9aa2e75ad03de47e1c44d
-@@ -317,6 +318,7 @@ Input = cd0081ea7b2ae1ea06d59f7c73d9ffb94a09615c2e4ba7c636cef08dd3533ec3185525b0
+@@ -329,6 +330,7 @@ Input = cd0081ea7b2ae1ea06d59f7c73d9ffb94a09615c2e4ba7c636cef08dd3533ec3185525b0
  Result = KEYOP_ERROR
  
  # RSADP Ciphertext = n should fail
@@ -149,7 +149,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt = RSA-2048
  Ctrl = rsa_padding_mode:none
  Input = cd0081ea7b2ae1ea06d59f7c73d9ffb94a09615c2e4ba7c636cef08dd3533ec3185525b015c769b99a77d6725bf9c3532a9b6e5f6627d5fb85160768d3dda9cbd35974511717dc3d309d2fc47ee41f97e32adb7f9dd864a1c4767a666ecd71bc1aacf5e7517f4b38594fea9b05e42d5ada9912008013e45316a4d9bb8ed086b88d28758bacaf922d46a868b485d239c9baeb0e2b64592710f42b2d1ea0a4b4802c0becab328f8a68b0073bdb546feea9809d2849912b390c1532bc7e29c7658f8175fae46f34332ff87bcab3e40649b98577869da0ea718353f0722754886913648760d122be676e0fc483dd20ffc31bda96a31966c9aa2e75ad03de47e1c44f
-@@ -406,82 +408,90 @@ PrivPubKeyPair = RSA-2048-2:RSA-2048-2-PUBLIC
+@@ -418,82 +420,90 @@ PrivPubKeyPair = RSA-2048-2:RSA-2048-2-PUBLIC
  # RSA decrypt
  
  # a random positive test case
@@ -246,7 +246,7 @@ index 18e11bdaa9..17ceb59148 100644
  # an otherwise correct plaintext, but with wrong first byte
  # (0x01 instead of 0x00), generates a random 11 byte long plaintext
  Decrypt = RSA-2048-2
-@@ -489,7 +499,7 @@ Input = 9b2ec9c0c917c98f1ad3d0119aec6be51ae3106e9af1914d48600ab6a2c0c0c8ae02a2dc
+@@ -501,7 +511,7 @@ Input = 9b2ec9c0c917c98f1ad3d0119aec6be51ae3106e9af1914d48600ab6a2c0c0c8ae02a2dc
  Output = a1f8c9255c35cfba403ccc
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -255,7 +255,7 @@ index 18e11bdaa9..17ceb59148 100644
  # an otherwise correct plaintext, but with wrong second byte
  # (0x01 instead of 0x02), generates a random 11 byte long plaintext
  Decrypt = RSA-2048-2
-@@ -497,7 +507,7 @@ Input = 782c2b59a21a511243820acedd567c136f6d3090c115232a82a5efb0b178285f55b5ec2d
+@@ -509,7 +519,7 @@ Input = 782c2b59a21a511243820acedd567c136f6d3090c115232a82a5efb0b178285f55b5ec2d
  Output = e6d700309ca0ed62452254
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -264,7 +264,7 @@ index 18e11bdaa9..17ceb59148 100644
  # an invalid ciphertext, with a zero byte in first byte of
  # ciphertext, decrypts to a random 11 byte long synthetic
  # plaintext
-@@ -506,7 +516,7 @@ Input = 0096136621faf36d5290b16bd26295de27f895d1faa51c800dafce73d001d60796cd4e2a
+@@ -518,7 +528,7 @@ Input = 0096136621faf36d5290b16bd26295de27f895d1faa51c800dafce73d001d60796cd4e2a
  Output = ba27b1842e7c21c0e7ef6a
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -273,7 +273,7 @@ index 18e11bdaa9..17ceb59148 100644
  # an invalid ciphertext, with a zero byte removed from first byte of
  # ciphertext, decrypts to a random 11 byte long synthetic
  # plaintext
-@@ -515,7 +525,7 @@ Input = 96136621faf36d5290b16bd26295de27f895d1faa51c800dafce73d001d60796cd4e2ac3
+@@ -527,7 +537,7 @@ Input = 96136621faf36d5290b16bd26295de27f895d1faa51c800dafce73d001d60796cd4e2ac3
  Output = ba27b1842e7c21c0e7ef6a
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -282,7 +282,7 @@ index 18e11bdaa9..17ceb59148 100644
  # an invalid ciphertext, with two zero bytes in first bytes of
  # ciphertext, decrypts to a random 11 byte long synthetic
  # plaintext
-@@ -524,7 +534,7 @@ Input = 0000587cccc6b264bdfe0dc2149a988047fa921801f3502ea64624c510c6033d2f427e3f
+@@ -536,7 +546,7 @@ Input = 0000587cccc6b264bdfe0dc2149a988047fa921801f3502ea64624c510c6033d2f427e3f
  Output = d5cf555b1d6151029a429a
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -291,7 +291,7 @@ index 18e11bdaa9..17ceb59148 100644
  # an invalid ciphertext, with two zero bytes removed from first bytes of
  # ciphertext, decrypts to a random 11 byte long synthetic
  # plaintext
-@@ -533,7 +543,7 @@ Input = 587cccc6b264bdfe0dc2149a988047fa921801f3502ea64624c510c6033d2f427e3f136c
+@@ -545,7 +555,7 @@ Input = 587cccc6b264bdfe0dc2149a988047fa921801f3502ea64624c510c6033d2f427e3f136c
  Output = d5cf555b1d6151029a429a
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -300,7 +300,7 @@ index 18e11bdaa9..17ceb59148 100644
  # and invalid ciphertext, otherwise valid but starting with 000002, decrypts
  # to random 11 byte long synthetic plaintext
  Decrypt = RSA-2048-2
-@@ -541,7 +551,7 @@ Input = 1786550ce8d8433052e01ecba8b76d3019f1355b212ac9d0f5191b023325a7e7714b7802
+@@ -553,7 +563,7 @@ Input = 1786550ce8d8433052e01ecba8b76d3019f1355b212ac9d0f5191b023325a7e7714b7802
  Output = 3d4a054d9358209e9cbbb9
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -309,7 +309,7 @@ index 18e11bdaa9..17ceb59148 100644
  # negative test with otherwise valid padding but a zero byte in first byte
  # of padding
  Decrypt = RSA-2048-2
-@@ -549,7 +559,7 @@ Input = 179598823812d2c58a7eb50521150a48bcca8b4eb53414018b6bca19f4801456c5e36a94
+@@ -561,7 +571,7 @@ Input = 179598823812d2c58a7eb50521150a48bcca8b4eb53414018b6bca19f4801456c5e36a94
  Output = 1f037dd717b07d3e7f7359
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -318,7 +318,7 @@ index 18e11bdaa9..17ceb59148 100644
  # negative test with otherwise valid padding but a zero byte at the eighth
  # byte of padding
  Decrypt = RSA-2048-2
-@@ -557,7 +567,7 @@ Input = a7a340675a82c30e22219a55bc07cdf36d47d01834c1834f917f18b517419ce9de2a9646
+@@ -569,7 +579,7 @@ Input = a7a340675a82c30e22219a55bc07cdf36d47d01834c1834f917f18b517419ce9de2a9646
  Output = 63cb0bf65fc8255dd29e17
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -327,7 +327,7 @@ index 18e11bdaa9..17ceb59148 100644
  # negative test with an otherwise valid plaintext but with missing separator
  # byte
  Decrypt = RSA-2048-2
-@@ -612,53 +622,58 @@ PrivPubKeyPair = RSA-2049:RSA-2049-PUBLIC
+@@ -624,53 +634,58 @@ PrivPubKeyPair = RSA-2049:RSA-2049-PUBLIC
  # RSA decrypt
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -390,7 +390,7 @@ index 18e11bdaa9..17ceb59148 100644
  # otherwise correct plaintext, but with wrong second byte (0x01 instead of 0x02)
  Decrypt = RSA-2049
  Input = 00c5d77826c1ab7a34d6390f9d342d5dbe848942e2618287952ba0350d7de6726112e9cebc391a0fae1839e2bf168229e3e0d71d4161801509f1f28f6e1487ca52df05c466b6b0a6fbbe57a3268a970610ec0beac39ec0fa67babce1ef2a86bf77466dc127d7d0d2962c20e66593126f276863cd38dc6351428f884c1384f67cad0a0ffdbc2af16711fb68dc559b96b37b4f04cd133ffc7d79c43c42ca4948fa895b9daeb853150c8a5169849b730cc77d68b0217d6c0e3dbf38d751a1998186633418367e7576530566c23d6d4e0da9b038d0bb5169ce40133ea076472d055001f0135645940fd08ea44269af2604c8b1ba225053d6db9ab43577689401bdc0f3
-@@ -722,14 +737,14 @@ ooCElYcob01/JWzoXl61Z5sdrMH5CVZJty5foHKusAN5AgMBAAE=
+@@ -734,14 +749,14 @@ ooCElYcob01/JWzoXl61Z5sdrMH5CVZJty5foHKusAN5AgMBAAE=
  PrivPubKeyPair = RSA-3072:RSA-3072-PUBLIC
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -407,7 +407,7 @@ index 18e11bdaa9..17ceb59148 100644
  # a random invalid that has PRF output with a length one byte too long
  # in the last value
  Decrypt = RSA-3072
-@@ -737,46 +752,51 @@ Input = 7db0390d75fcf9d4c59cf27b264190d856da9abd11e92334d0e5f71005cfed865a711dfa
+@@ -749,46 +764,51 @@ Input = 7db0390d75fcf9d4c59cf27b264190d856da9abd11e92334d0e5f71005cfed865a711dfa
  Output = 56a3bea054e01338be9b7d7957539c
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -462,7 +462,7 @@ index 18e11bdaa9..17ceb59148 100644
  # a random negative test case that generates a 9 byte long message based on
  # second to last value from PRF
  Decrypt = RSA-3072
-@@ -784,7 +804,7 @@ Input = 758c215aa6acd61248062b88284bf43c13cb3b3d02410be4238607442f1c0216706e21a0
+@@ -796,7 +816,7 @@ Input = 758c215aa6acd61248062b88284bf43c13cb3b3d02410be4238607442f1c0216706e21a0
  Output = 043383c929060374ed
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -471,7 +471,7 @@ index 18e11bdaa9..17ceb59148 100644
  # a random negative test that generates message based on 3rd last value from
  # PRF
  Decrypt = RSA-3072
-@@ -792,35 +812,35 @@ Input = 7b22d5e62d287968c6622171a1f75db4b0fd15cdf3134a1895d235d56f8d8fe619f2bf48
+@@ -804,35 +824,35 @@ Input = 7b22d5e62d287968c6622171a1f75db4b0fd15cdf3134a1895d235d56f8d8fe619f2bf48
  Output = 70263fa6050534b9e0
  
  # The old FIPS provider doesn't include the workaround (#13817)
@@ -512,10 +512,10 @@ index 18e11bdaa9..17ceb59148 100644
  # an otherwise valid plaintext, but with null separator missing
  Decrypt = RSA-3072
  Input = a7a5c99e50da48769ecb779d9abe86ef9ec8c38c6f43f17c7f2d7af608a4a1bd6cf695b47e97c191c61fb5a27318d02f495a176b9fae5a55b5d3fabd1d8aae4957e3879cb0c60f037724e11be5f30f08fc51c033731f14b44b414d11278cd3dba7e1c8bfe208d2b2bb7ec36366dacb6c88b24cd79ab394adf19dbbc21dfa5788bacbadc6a62f79cf54fd8cf585c615b5c0eb94c35aa9de25321c8ffefb8916bbaa2697cb2dd82ee98939df9b6704cee77793edd2b4947d82e00e5749664970736c59a84197bd72b5c71e36aae29cd39af6ac73a368edbc1ca792e1309f442aafcd77c992c88f8e4863149f221695cb7b0236e75b2339a02c4ea114854372c306b9412d8eedb600a31532002f2cea07b4df963a093185e4607732e46d753b540974fb5a5c3f9432df22e85bb17611370966c5522fd23f2ad3484341ba7fd8885fc8e6d379a611d13a2aca784fba2073208faad2137bf1979a0fa146c1880d4337db3274269493bab44a1bcd0681f7227ffdf589c2e925ed9d36302509d1109ba4
-@@ -912,9 +932,9 @@ Output=4DE433D5844043EF08D354DA03CB29068780D52706D7D1E4D50EFB7D58C9D547D83A747DD
- 
- # Verify of above signature
+@@ -926,9 +946,9 @@ Output=4DE433D5844043EF08D354DA03CB29068780D52706D7D1E4D50EFB7D58C9D547D83A747DD
+ FIPSversion = >=3.5.0
  Verify = RSA-2048-PUBLIC
+ Unapproved = 1
 +Ctrl = digest:sha256
  Ctrl = rsa_padding_mode:pss
  Ctrl = rsa_pss_saltlen:0
@@ -523,7 +523,7 @@ index 18e11bdaa9..17ceb59148 100644
  Input="0123456789ABCDEF0123456789ABCDEF"
  Output=4DE433D5844043EF08D354DA03CB29068780D52706D7D1E4D50EFB7D58C9D547D83A747DDD0635A96B28F854E50145518482CB49E963054621B53C60C498D07C16E9C2789C893CF38D4D86900DE71BDE463BD2761D1271E358C7480A1AC0BAB930DDF39602AD1BC165B5D7436B516B7A7858E8EB7AB1C420EEB482F4D207F0E462B1724959320A084E13848D11D10FB593E66BF680BF6D3F345FC3E9C3DE60ABBAC37E1C6EC80A268C8D9FC49626C679097AA690BC1AA662B95EB8DB70390861AA0898229F9349B4B5FDD030D4928C47084708A933144BE23BD3C6E661B85B2C0EF9ED36D498D5B7320E8194D363D4AD478C059BAE804181965E0B81B663158A
  
-@@ -1207,36 +1227,42 @@ vcDtKrdWo6btTWc1Kml9QhbpMhKxJ6Y9VBHOb6mNXb79cyY+NygUJ0OBgWbtfdY2
+@@ -1261,36 +1281,42 @@ vcDtKrdWo6btTWc1Kml9QhbpMhKxJ6Y9VBHOb6mNXb79cyY+NygUJ0OBgWbtfdY2
  h90qjKHS9PvY4Q==
  -----END PRIVATE KEY-----
  
@@ -566,7 +566,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt=RSA-OAEP-1
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
-@@ -1261,36 +1287,42 @@ SwGNdhGLJDiac1Dsg2sAY6IXISNv2O222JtR5+64e2EbcTLLfqc1bCMVHB53UVB8
+@@ -1315,36 +1341,42 @@ SwGNdhGLJDiac1Dsg2sAY6IXISNv2O222JtR5+64e2EbcTLLfqc1bCMVHB53UVB8
  eG2e4XlBcKjI6A==
  -----END PRIVATE KEY-----
  
@@ -609,7 +609,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt=RSA-OAEP-2
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
-@@ -1315,36 +1347,42 @@ iUGx07dw5a0x7jc7KKzaaf+bb0D+V4ufGvuFg2+WJ9N6z/c8J3nmNLsmARwsj38z
+@@ -1369,36 +1401,42 @@ iUGx07dw5a0x7jc7KKzaaf+bb0D+V4ufGvuFg2+WJ9N6z/c8J3nmNLsmARwsj38z
  Ya4qnqZe1onjY5o=
  -----END PRIVATE KEY-----
  
@@ -652,7 +652,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt=RSA-OAEP-3
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
-@@ -1369,36 +1407,42 @@ s/XkIiO6MDAcQabYfLtw4wy308Z9JUc9sfbL8D4/kSbj6XloJ5qGWywrQmUkz8Uq
+@@ -1423,36 +1461,42 @@ s/XkIiO6MDAcQabYfLtw4wy308Z9JUc9sfbL8D4/kSbj6XloJ5qGWywrQmUkz8Uq
  aD0x7TDrmEvkEro=
  -----END PRIVATE KEY-----
  
@@ -695,7 +695,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt=RSA-OAEP-4
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
-@@ -1423,36 +1467,42 @@ OPlAQGLrhaQpJFILOPW7iGoBlvSLuNzqYP2SzAJ/GOeBWKNKXF1fhgoPbAQHGn0B
+@@ -1477,36 +1521,42 @@ OPlAQGLrhaQpJFILOPW7iGoBlvSLuNzqYP2SzAJ/GOeBWKNKXF1fhgoPbAQHGn0B
  MSwGUGLx60i3nRyDyw==
  -----END PRIVATE KEY-----
  
@@ -738,7 +738,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt=RSA-OAEP-5
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
-@@ -1477,36 +1527,42 @@ xT1F29tenZbQ/s9Cdd8JdLxKBza0p0wyaQU++2hqziQG4iyeBY3bSuVAYnri/bCC
+@@ -1531,36 +1581,42 @@ xT1F29tenZbQ/s9Cdd8JdLxKBza0p0wyaQU++2hqziQG4iyeBY3bSuVAYnri/bCC
  Yejn5Ly8mU2q+jBcRQ==
  -----END PRIVATE KEY-----
  
@@ -781,7 +781,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt=RSA-OAEP-6
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
-@@ -1531,36 +1587,42 @@ tu4XIedy0DiaVZw9PN+VUNRXxGsDe3RkGx1SFmr4ohPIOWIGzfukQi8Y1vYdvLXS
+@@ -1585,36 +1641,42 @@ tu4XIedy0DiaVZw9PN+VUNRXxGsDe3RkGx1SFmr4ohPIOWIGzfukQi8Y1vYdvLXS
  FMlxv0gq65dqc3DC
  -----END PRIVATE KEY-----
  
@@ -824,7 +824,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt=RSA-OAEP-7
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
-@@ -1585,36 +1647,42 @@ njraT2MgdSwJ2AX/fR8a4NAXru7pzvoNfdf/d15EtXgyL2QF1iEdoZUZZmqof9xM
+@@ -1639,36 +1701,42 @@ njraT2MgdSwJ2AX/fR8a4NAXru7pzvoNfdf/d15EtXgyL2QF1iEdoZUZZmqof9xM
  2MiPa249Z+lh3Luj0A==
  -----END PRIVATE KEY-----
  
@@ -867,7 +867,7 @@ index 18e11bdaa9..17ceb59148 100644
  Decrypt=RSA-OAEP-8
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
-@@ -1645,36 +1713,42 @@ Z7CDuaemy2HkLbNiuMmJbbcGTgKtWuYVh9oVtGSckFlJCf6zfby2VL63Jo7IAeWo
+@@ -1699,36 +1767,42 @@ Z7CDuaemy2HkLbNiuMmJbbcGTgKtWuYVh9oVtGSckFlJCf6zfby2VL63Jo7IAeWo
  tKo5Eb69iFQvBb4=
  -----END PRIVATE KEY-----
  
@@ -911,7 +911,7 @@ index 18e11bdaa9..17ceb59148 100644
  Ctrl = rsa_padding_mode:oaep
  Ctrl = rsa_mgf1_md:sha1
 diff --git a/test/recipes/80-test_cms.t b/test/recipes/80-test_cms.t
-index 4031dbec77..92a48a09c6 100644
+index b27a03d601..b94f5389c0 100644
 --- a/test/recipes/80-test_cms.t
 +++ b/test/recipes/80-test_cms.t
 @@ -267,7 +267,7 @@ my @smime_pkcs7_tests = (
@@ -923,7 +923,7 @@ index 4031dbec77..92a48a09c6 100644
             [ "{cmd1}", @prov, "-encrypt", "-in", $smcont,
               "-aes256", "-stream", "-out", "{output}.cms",
               $smrsa1,
-@@ -1284,6 +1284,9 @@ sub check_availability {
+@@ -1363,6 +1363,9 @@ sub check_availability {
      return "$tnam: skipped, DSA disabled\n"
          if ($no_dsa && $tnam =~ / DSA/);
  
@@ -981,5 +981,5 @@ index f7be2e1872..568a1ddba4
              }
              next if $protocol eq "-tls1_3";
 -- 
-2.51.0
+2.55.0
 

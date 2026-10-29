@@ -1,7 +1,7 @@
-From 4691661243060cc6ad88902f422f058c547264f6 Mon Sep 17 00:00:00 2001
+From b6eb8263f79a68f24644fae80c91109a46ef7dc8 Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Wed, 5 Mar 2025 13:22:03 -0500
-Subject: [PATCH 40/59] FIPS: Fix encoder/decoder negative test
+Subject: [PATCH 40/58] FIPS: Fix encoder/decoder negative test
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
@@ -31,5 +31,5 @@ index 2acc980e90..660d4e1115
      my $conf2 = srctop_file("test", "default-and-fips.cnf");
      ok(run(test(['decoder_propq_test', '-config', $conf2,
 -- 
-2.51.0
+2.55.0
 

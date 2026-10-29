@@ -1,7 +1,7 @@
-From 9d127bab38d30e2d3ebafc39c3dd874ae55c72de Mon Sep 17 00:00:00 2001
+From e718945263e5944ed001bf8e01bf4b9e403849c0 Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Thu, 6 Mar 2025 08:40:29 -0500
-Subject: [PATCH 02/59] Add a separate config file to use for rpm installs
+Subject: [PATCH 02/58] Add a separate config file to use for rpm installs
 
 In RHEL/Fedora systems we want to use a slightly different set
 of defaults, but we do not want to change the standard config file
@@ -452,5 +452,5 @@ index 0000000000..fe2346eb2b
 +cmd = rr
 +oldcert = $insta::certout # insta.cert.pem
 -- 
-2.51.0
+2.55.0
 

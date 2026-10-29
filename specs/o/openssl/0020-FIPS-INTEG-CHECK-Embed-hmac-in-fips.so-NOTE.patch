@@ -1,7 +1,7 @@
-From f2fc8dd1549cd4662ad073d8d9689eaa0747385a Mon Sep 17 00:00:00 2001
+From b437a70c35315311e1b73751107ce54f4a816e52 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:15 +0100
-Subject: [PATCH 20/59] FIPS: INTEG-CHECK: Embed hmac in fips.so - NOTE
+Subject: [PATCH 20/58] FIPS: INTEG-CHECK: Embed hmac in fips.so - NOTE
 
 Corrected by squashing in:
 0052-Restore-the-correct-verify_integrity-function.patch
@@ -20,10 +20,10 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  create mode 100644 test/fipsmodule.cnf
 
 diff --git a/providers/fips/self_test.c b/providers/fips/self_test.c
-index 456efd139e..c89e91b587 100644
+index aa5a8c7658..34eff75efd 100644
 --- a/providers/fips/self_test.c
 +++ b/providers/fips/self_test.c
-@@ -235,13 +235,137 @@ err:
+@@ -239,13 +239,137 @@ err:
      return ok;
  }
  
@@ -157,12 +157,12 @@ index 456efd139e..c89e91b587 100644
 +}
 +
  static int verify_integrity(OSSL_CORE_BIO *bio, OSSL_FUNC_BIO_read_ex_fn read_ex_cb,
--                            unsigned char *expected, size_t expected_len,
-+                            const unsigned char *expected, size_t expected_len,
-                             OSSL_LIB_CTX *libctx, OSSL_SELF_TEST *ev,
-                             const char *event_type)
+-    unsigned char *expected, size_t expected_len,
++    const unsigned char *expected, size_t expected_len,
+     OSSL_LIB_CTX *libctx, OSSL_SELF_TEST *ev,
+     const char *event_type)
  {
-@@ -253,6 +377,9 @@ static int verify_integrity(OSSL_CORE_BIO *bio, OSSL_FUNC_BIO_read_ex_fn read_ex
+@@ -257,6 +381,9 @@ static int verify_integrity(OSSL_CORE_BIO *bio, OSSL_FUNC_BIO_read_ex_fn read_ex
      EVP_MAC_CTX *ctx = NULL;
      OSSL_PARAM params[2], *p = params;
  
@@ -172,7 +172,7 @@ index 456efd139e..c89e91b587 100644
      if (!integrity_self_test(ev, libctx))
          goto err;
  
-@@ -316,7 +443,8 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+@@ -320,7 +447,8 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
      int ok = 0;
      long checksum_len;
      OSSL_CORE_BIO *bio_module = NULL;
@@ -182,22 +182,22 @@ index 456efd139e..c89e91b587 100644
      OSSL_SELF_TEST *ev = NULL;
      EVP_RAND *testrand = NULL;
      EVP_RAND_CTX *rng;
-@@ -352,8 +480,7 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+@@ -356,8 +484,7 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
          return 0;
      }
  
 -    if (st == NULL
--            || st->module_checksum_data == NULL) {
+-        || st->module_checksum_data == NULL) {
 +    if (st == NULL) {
          ERR_raise(ERR_LIB_PROV, PROV_R_MISSING_CONFIG_DATA);
          goto end;
      }
-@@ -362,8 +489,15 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+@@ -366,8 +493,15 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
      if (ev == NULL)
          goto end;
  
 -    module_checksum = OPENSSL_hexstr2buf(st->module_checksum_data,
--                                         &checksum_len);
+-        &checksum_len);
 +    if (st->module_checksum_data == NULL) {
 +        module_checksum = fips_hmac_container;
 +        checksum_len = sizeof(fips_hmac_container);
@@ -210,14 +210,14 @@ index 456efd139e..c89e91b587 100644
      if (module_checksum == NULL) {
          ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_CONFIG_DATA);
          goto end;
-@@ -371,14 +505,28 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+@@ -375,14 +509,28 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
      bio_module = (*st->bio_new_file_cb)(st->module_filename, "rb");
  
      /* Always check the integrity of the fips module */
 -    if (bio_module == NULL
--            || !verify_integrity(bio_module, st->bio_read_ex_cb,
--                                 module_checksum, checksum_len, st->libctx,
--                                 ev, OSSL_SELF_TEST_TYPE_MODULE_INTEGRITY)) {
+-        || !verify_integrity(bio_module, st->bio_read_ex_cb,
+-            module_checksum, checksum_len, st->libctx,
+-            ev, OSSL_SELF_TEST_TYPE_MODULE_INTEGRITY)) {
 +    if (bio_module == NULL) {
          ERR_raise(ERR_LIB_PROV, PROV_R_MODULE_INTEGRITY_FAILURE);
          goto end;
@@ -243,7 +243,7 @@ index 456efd139e..c89e91b587 100644
      if (!SELF_TEST_kats(ev, st->libctx)) {
          ERR_raise(ERR_LIB_PROV, PROV_R_SELF_TEST_KAT_FAILURE);
          goto end;
-@@ -398,7 +546,7 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+@@ -403,7 +551,7 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
  end:
      EVP_RAND_free(testrand);
      OSSL_SELF_TEST_free(ev);
@@ -261,5 +261,5 @@ index 0000000000..f05d0dedbe
 +[fips_sect]
 +activate = 1
 -- 
-2.51.0
+2.55.0
 

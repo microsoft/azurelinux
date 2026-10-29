@@ -36,8 +36,8 @@ print(string.sub(hash, 0, 16))
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.5.4
-Release: 14%{?dist}
+Version: 3.5.9
+Release: 13%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -102,31 +102,9 @@ Patch0053: 0053-Allow-hybrid-MLKEM-in-FIPS-mode.patch
 %endif
 Patch0054: 0054-Temporarily-disable-SLH-DSA-FIPS-self-tests.patch
 Patch0055: 0055-Add-a-define-to-disable-symver-attributes.patch
-Patch0056: 0056-apps-speed.c-Disable-testing-of-composite-signature-.patch
-Patch0057: 0057-apps-speed.c-Support-more-signature-algorithms.patch
-Patch0058: 0058-Add-targets-to-skip-build-of-non-installable-program.patch
-Patch0059: 0059-RSA_encrypt-decrypt-with-padding-NONE-is-not-support.patch
-Patch0060: 0060-CVE-2025-15467.patch
-Patch0061: 0061-CVE-2025-15468.patch
-Patch0062: 0062-CVE-2025-15469.patch
-Patch0063: 0063-CVE-2025-66199.patch
-Patch0064: 0064-CVE-2025-68160.patch
-Patch0065: 0065-CVE-2025-69418.patch
-Patch0066: 0066-CVE-2025-69420.patch
-Patch0067: 0067-CVE-2025-69421.patch
-Patch0068: 0068-CVE-2025-69419.patch
-Patch0069: 0069-CVE-2026-22795.patch
-Patch0070: 0070-CVE-2025-11187.patch
-Patch0071: 0071-Do-not-make-key-share-choice-in-tls1_set_groups.patch
-Patch0072: 0072-Fix-PPC-register-processing.patch
-Patch0073: 0073-CVE-2026-2673.patch
-Patch0074: 0074-CVE-2026-28387.patch
-Patch0075: 0075-CVE-2026-28388.patch
-Patch0076: 0076-CVE-2026-28389.patch
-Patch0077: 0077-CVE-2026-28390.patch
-Patch0078: 0078-CVE-2026-31789.patch
-Patch0079: 0079-CVE-2026-31790.patch
-
+Patch0056: 0056-Add-targets-to-skip-build-of-non-installable-program.patch
+Patch0057: 0057-Disable-RSA-PKCS1.5-FIPS-POST-not-relevant-for-RHEL.patch
+Patch0058: 0058-Skip-tests-not-matching-Fedora-RHEL-FIPS-changes.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -146,8 +124,8 @@ Requires: coreutils
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Obsoletes: oqsprovider < 0.9.0
 
-Patch80: 0080-azl-load-registered-fips-provider.patch
-Patch81: 0081-azl-adapt-fipsinstall-tests.patch
+Patch59: 0080-azl-load-registered-fips-provider.patch
+Patch60: 0081-azl-adapt-fipsinstall-tests.patch
 %description
 The OpenSSL toolkit provides support for secure communications between
 machines. OpenSSL includes a certificate management tool and shared
@@ -505,6 +483,58 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Wed Sep 30 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.5.9-1
+- Rebase to OpenSSL 3.5.9
+  Resolves: CVE-2026-84782
+  Resolves: CVE-2026-84783
+  Resolves: CVE-2026-35189
+  Resolves: CVE-2026-35191
+  Resolves: CVE-2026-42772
+  Resolves: CVE-2026-54872
+  Resolves: CVE-2026-54873
+  Resolves: CVE-2026-54875
+  Resolves: CVE-2026-72897
+  Resolves: CVE-2026-75804
+  Resolves: CVE-2026-75805
+  Resolves: CVE-2026-75806
+  Resolves: CVE-2026-77696
+  Resolves: CVE-2026-84784
+
+* Fri Aug 28 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.5.8-1
+- Rebase to OpenSSL 3.5.8
+  Resolves: CVE-2026-14456
+  Resolves: CVE-2026-14457
+  Resolves: CVE-2026-18798
+  Resolves: CVE-2026-54874
+  Resolves: CVE-2026-63072
+  Resolves: CVE-2026-63073
+  Resolves: CVE-2026-63074
+  Resolves: CVE-2026-63075
+  Resolves: CVE-2026-63076
+  Resolves: CVE-2026-75803
+
+* Fri Jul 17 2026 Pavol Žáčik <pzacik@redhat.com> - 1:3.5.7-2
+- Don't raise NOT_ENOUGH_DATA on a clean EOF at an object boundary
+  (Backport from https://github.com/openssl/openssl/commit/3687ff7)
+
+* Wed Jun 10 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.5.7-1
+- Rebase to OpenSSL 3.5.7
+  Resolves: CVE-2026-45447
+  Resolves: CVE-2026-34182
+  Resolves: CVE-2026-34183
+  Resolves: CVE-2026-42764
+  Resolves: CVE-2026-45445
+  Resolves: CVE-2026-7383
+  Resolves: CVE-2026-9076
+  Resolves: CVE-2026-34180
+  Resolves: CVE-2026-34181
+  Resolves: CVE-2026-42766
+  Resolves: CVE-2026-42767
+  Resolves: CVE-2026-42768
+  Resolves: CVE-2026-42769
+  Resolves: CVE-2026-42770
+  Resolves: CVE-2026-45446
+
 * Mon Apr 20 2026 Pavol Žáčik <pzacik@redhat.com> - 1:3.5.4-3
 - Backport security patches from OpenSSL 3.5.6
   Resolves: CVE-2026-2673

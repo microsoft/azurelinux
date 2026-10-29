@@ -1,7 +1,7 @@
-From 9c9716b7a631ef8e3087a3ddec967b18d5c46a1f Mon Sep 17 00:00:00 2001
+From b80abc2e67a9b85a86fce7459dc7cfe87da5b9fb Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:17 +0100
-Subject: [PATCH 37/59] FIPS: TLS: Enforce EMS in TLS 1.2 - NOTE
+Subject: [PATCH 37/58] FIPS: TLS: Enforce EMS in TLS 1.2 - NOTE
 
 NOTE: Enforcement of EMS in non-FIPS mode has been dropped due to code
 change the option to enforce it seem to be available only in FIPS build
@@ -18,16 +18,16 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  providers/fips/include/fips_indicator_params.inc   |  2 +-
  ssl/ssl_conf.c                                     |  1 +
  ssl/statem/extensions_srvr.c                       |  8 +++++++-
- ssl/t1_enc.c                                       | 11 +++++++++--
+ ssl/t1_enc.c                                       | 13 ++++++++++---
  test/recipes/30-test_evp_data/evpkdf_tls12_prf.txt | 10 ++++++++++
  test/sslapitest.c                                  |  2 +-
- 8 files changed, 33 insertions(+), 5 deletions(-)
+ 8 files changed, 34 insertions(+), 6 deletions(-)
 
 diff --git a/doc/man3/SSL_CONF_cmd.pod b/doc/man3/SSL_CONF_cmd.pod
-index 9338ffc01d..911ea21a68 100644
+index e78a2231da..60ed79f410 100644
 --- a/doc/man3/SSL_CONF_cmd.pod
 +++ b/doc/man3/SSL_CONF_cmd.pod
-@@ -621,6 +621,9 @@ B<ExtendedMasterSecret>: use extended master secret extension, enabled by
+@@ -624,6 +624,9 @@ B<ExtendedMasterSecret>: use extended master secret extension, enabled by
  default. Inverse of B<SSL_OP_NO_EXTENDED_MASTER_SECRET>: that is,
  B<-ExtendedMasterSecret> is the same as setting B<SSL_OP_NO_EXTENDED_MASTER_SECRET>.
  
@@ -38,17 +38,17 @@ index 9338ffc01d..911ea21a68 100644
  default. Inverse of B<SSL_OP_DISABLE_TLSEXT_CA_NAMES>: that is,
  B<-CANames> is the same as setting B<SSL_OP_DISABLE_TLSEXT_CA_NAMES>.
 diff --git a/include/openssl/ssl.h.in b/include/openssl/ssl.h.in
-index d1b00e8454..b815f25dae 100644
+index 81f6a19ce7..fbe9f1dda3 100644
 --- a/include/openssl/ssl.h.in
 +++ b/include/openssl/ssl.h.in
-@@ -417,6 +417,7 @@ typedef int (*SSL_async_callback_fn)(SSL *s, void *arg);
-      * interoperability with CryptoPro CSP 3.x
-      */
- # define SSL_OP_CRYPTOPRO_TLSEXT_BUG                     SSL_OP_BIT(31)
-+# define SSL_OP_RH_PERMIT_NOEMS_FIPS                     SSL_OP_BIT(48)
+@@ -432,6 +432,7 @@ typedef int (*SSL_async_callback_fn)(SSL *s, void *arg);
+ #define SSL_OP_ENABLE_KTLS_TX_ZEROCOPY_SENDFILE SSL_OP_BIT(34)
+ 
+ #define SSL_OP_PREFER_NO_DHE_KEX SSL_OP_BIT(35)
++#define SSL_OP_RH_PERMIT_NOEMS_FIPS SSL_OP_BIT(48)
+ 
  /*
-  * Disable RFC8879 certificate compression
-  * SSL_OP_NO_TX_CERTIFICATE_COMPRESSION: don't send compressed certificates,
+  * Option "collections."
 diff --git a/providers/fips/include/fips_indicator_params.inc b/providers/fips/include/fips_indicator_params.inc
 index c1b029de86..47d1cf2d01 100644
 --- a/providers/fips/include/fips_indicator_params.inc
@@ -61,19 +61,19 @@ index c1b029de86..47d1cf2d01 100644
  OSSL_FIPS_PARAM(hmac_key_check, HMAC_KEY_CHECK, 0)
  OSSL_FIPS_PARAM(kmac_key_check, KMAC_KEY_CHECK, 0)
 diff --git a/ssl/ssl_conf.c b/ssl/ssl_conf.c
-index 946d20be52..b52c1675fd 100644
+index 0d93593880..4361edfa49 100644
 --- a/ssl/ssl_conf.c
 +++ b/ssl/ssl_conf.c
-@@ -394,6 +394,7 @@ static int cmd_Options(SSL_CONF_CTX *cctx, const char *value)
+@@ -392,6 +392,7 @@ static int cmd_Options(SSL_CONF_CTX *cctx, const char *value)
          SSL_FLAG_TBL("ClientRenegotiation",
-                      SSL_OP_ALLOW_CLIENT_RENEGOTIATION),
+             SSL_OP_ALLOW_CLIENT_RENEGOTIATION),
          SSL_FLAG_TBL_INV("EncryptThenMac", SSL_OP_NO_ENCRYPT_THEN_MAC),
 +        SSL_FLAG_TBL("RHNoEnforceEMSinFIPS", SSL_OP_RH_PERMIT_NOEMS_FIPS),
          SSL_FLAG_TBL("NoRenegotiation", SSL_OP_NO_RENEGOTIATION),
          SSL_FLAG_TBL("AllowNoDHEKEX", SSL_OP_ALLOW_NO_DHE_KEX),
          SSL_FLAG_TBL("PreferNoDHEKEX", SSL_OP_PREFER_NO_DHE_KEX),
 diff --git a/ssl/statem/extensions_srvr.c b/ssl/statem/extensions_srvr.c
-index 1a09913ad6..936be81819 100644
+index 5218547f59..d5c1b39d1f 100644
 --- a/ssl/statem/extensions_srvr.c
 +++ b/ssl/statem/extensions_srvr.c
 @@ -12,6 +12,7 @@
@@ -82,11 +82,11 @@ index 1a09913ad6..936be81819 100644
  #include "internal/ssl_unwrap.h"
 +#include <openssl/fips.h>
  
- #define COOKIE_STATE_FORMAT_VERSION     1
+ #define COOKIE_STATE_FORMAT_VERSION 1
  
-@@ -1886,8 +1887,13 @@ EXT_RETURN tls_construct_stoc_ems(SSL_CONNECTION *s, WPACKET *pkt,
-                                   unsigned int context,
-                                   X509 *x, size_t chainidx)
+@@ -1898,8 +1899,13 @@ EXT_RETURN tls_construct_stoc_ems(SSL_CONNECTION *s, WPACKET *pkt,
+     unsigned int context,
+     X509 *x, size_t chainidx)
  {
 -    if ((s->s3.flags & TLS1_FLAGS_RECEIVED_EXTMS) == 0)
 +    if ((s->s3.flags & TLS1_FLAGS_RECEIVED_EXTMS) == 0) {
@@ -98,9 +98,9 @@ index 1a09913ad6..936be81819 100644
 +    }
  
      if (!WPACKET_put_bytes_u16(pkt, TLSEXT_TYPE_extended_master_secret)
-             || !WPACKET_put_bytes_u16(pkt, 0)) {
+         || !WPACKET_put_bytes_u16(pkt, 0)) {
 diff --git a/ssl/t1_enc.c b/ssl/t1_enc.c
-index 474ea7bf5b..e0e595e989 100644
+index 8978e0c630..85d9df0da6 100644
 --- a/ssl/t1_enc.c
 +++ b/ssl/t1_enc.c
 @@ -21,6 +21,7 @@
@@ -111,12 +111,14 @@ index 474ea7bf5b..e0e595e989 100644
  
  /* seed1 through seed5 are concatenated */
  static int tls1_PRF(SSL_CONNECTION *s,
-@@ -78,8 +79,14 @@ static int tls1_PRF(SSL_CONNECTION *s,
+@@ -77,9 +78,15 @@ static int tls1_PRF(SSL_CONNECTION *s,
+         return 1;
      }
  
-  err:
+-err:
 -    if (fatal)
 -        SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
++ err:
 +    if (fatal) {
 +        /* The calls to this function are local so it's safe to implement the check */
 +        if (FIPS_mode() && seed1_len >= TLS_MD_MASTER_SECRET_CONST_SIZE
@@ -150,10 +152,10 @@ index 50944328cb..edb2e81273 100644
  KDF = TLS1-PRF
  Ctrl.digest = digest:SHA256
 diff --git a/test/sslapitest.c b/test/sslapitest.c
-index 05c5ab256f..4373bc2865 100644
+index 856a46536b..7eddb26b46 100644
 --- a/test/sslapitest.c
 +++ b/test/sslapitest.c
-@@ -585,7 +585,7 @@ static int test_client_cert_verify_cb(void)
+@@ -582,7 +582,7 @@ static int test_client_cert_verify_cb(void)
      STACK_OF(X509) *server_chain;
      SSL_CTX *cctx = NULL, *sctx = NULL;
      SSL *clientssl = NULL, *serverssl = NULL;
@@ -161,7 +163,7 @@ index 05c5ab256f..4373bc2865 100644
 +    int testresult = 0, status;
  
      if (!TEST_true(create_ssl_ctx_pair(libctx, TLS_server_method(),
-                                        TLS_client_method(), TLS1_VERSION, 0,
+             TLS_client_method(), TLS1_VERSION, 0,
 -- 
-2.51.0
+2.55.0
 

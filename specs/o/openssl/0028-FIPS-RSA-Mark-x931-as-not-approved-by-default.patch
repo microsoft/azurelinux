@@ -1,7 +1,7 @@
-From 84323511d9558acb40614ca7cd19436901b02629 Mon Sep 17 00:00:00 2001
+From 0ab45d920a687289a9ca2cbeb06cf4b1f8164354 Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Mon, 24 Mar 2025 11:03:45 -0400
-Subject: [PATCH 28/59] FIPS: RSA: Mark x931 as not approved by default
+Subject: [PATCH 28/58] FIPS: RSA: Mark x931 as not approved by default
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
@@ -22,5 +22,5 @@ index 6bd783eb0a..c1b029de86 100644
  OSSL_FIPS_PARAM(kbkdf_key_check, KBKDF_KEY_CHECK, 0)
  OSSL_FIPS_PARAM(tls13_kdf_key_check, TLS13_KDF_KEY_CHECK, 0)
 -- 
-2.51.0
+2.55.0
 

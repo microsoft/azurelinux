@@ -1,7 +1,7 @@
-From 4a0a6c5cc9560438cab41e65948b6da9e63d1123 Mon Sep 17 00:00:00 2001
+From 6f05fb2be515b2363436376a5ca1ebc8ba2d46c4 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:15 +0100
-Subject: [PATCH 11/59] RH: skipped tests EC curves
+Subject: [PATCH 11/58] RH: skipped tests EC curves
 
 Patch-name: 0013-skipped-tests-EC-curves.patch
 Patch-id: 13
@@ -78,5 +78,5 @@ index f722800e27..26a01786bb 100644
  my @basic_cmd = ("cmp_vfy_test",
                   data_file("server.crt"),     data_file("client.crt"),
 -- 
-2.51.0
+2.55.0
 

@@ -1,7 +1,7 @@
-From be283ef7233549606bd5f2222c94e2bed92c4a6d Mon Sep 17 00:00:00 2001
+From 9358aa6d851128325e9458acd4b943650b8f2ac1 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:16 +0100
-Subject: [PATCH 29/59] FIPS: RSA: Remove X9.31 padding signatures tests
+Subject: [PATCH 29/58] FIPS: RSA: Remove X9.31 padding signatures tests
 
 The current draft of FIPS 186-5 [1] no longer contains specifications
 for X9.31 signature padding. Instead, it contains the following
@@ -278,5 +278,5 @@ index 97ec1ff3e5..31fa0eafc6 100644
          "pss",
          4096,
 -- 
-2.51.0
+2.55.0
 

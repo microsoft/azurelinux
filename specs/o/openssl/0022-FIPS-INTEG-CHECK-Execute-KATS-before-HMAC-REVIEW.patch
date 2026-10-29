@@ -1,7 +1,7 @@
-From 2ec805ecc3c89c4db5dea64b2b1f9be756595347 Mon Sep 17 00:00:00 2001
+From a638dec5beae8c0b6d52badaff5974ac2cca81b3 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:15 +0100
-Subject: [PATCH 22/59] FIPS: INTEG-CHECK: Execute KATS before HMAC - REVIEW
+Subject: [PATCH 22/58] FIPS: INTEG-CHECK: Execute KATS before HMAC - REVIEW
 
 Patch-name: 0047-FIPS-early-KATS.patch
 Patch-id: 47
@@ -13,10 +13,10 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  1 file changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/providers/fips/self_test.c b/providers/fips/self_test.c
-index c89e91b587..98bf6ad203 100644
+index 34eff75efd..2fa1e5fe7e 100644
 --- a/providers/fips/self_test.c
 +++ b/providers/fips/self_test.c
-@@ -489,6 +489,15 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+@@ -493,6 +493,15 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
      if (ev == NULL)
          goto end;
  
@@ -32,7 +32,7 @@ index c89e91b587..98bf6ad203 100644
      if (st->module_checksum_data == NULL) {
          module_checksum = fips_hmac_container;
          checksum_len = sizeof(fips_hmac_container);
-@@ -527,11 +536,6 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
+@@ -531,11 +540,6 @@ int SELF_TEST_post(SELF_TEST_POST_PARAMS *st, int on_demand_test)
          }
      }
  
@@ -45,5 +45,5 @@ index c89e91b587..98bf6ad203 100644
      rng = ossl_rand_get0_private_noncreating(st->libctx);
      if (rng != NULL)
 -- 
-2.51.0
+2.55.0
 

@@ -1,7 +1,7 @@
-From 4fb5c4b21a8052f87e02c941c6e7a0e6f0d9384c Mon Sep 17 00:00:00 2001
+From 7fe14c824191527138ab4e6a6f0bf2fa49e4555d Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:17 +0100
-Subject: [PATCH 13/59] RH: version aliasing
+Subject: [PATCH 13/58] RH: version aliasing
 
 Patch-name: 0116-version-aliasing.patch
 Patch-id: 116
@@ -17,7 +17,7 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  4 files changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/evp/digest.c b/crypto/evp/digest.c
-index 6fc201bcfe..3c80b9dfe1 100644
+index 224f3000ce..7f0d77ab69 100644
 --- a/crypto/evp/digest.c
 +++ b/crypto/evp/digest.c
 @@ -572,7 +572,12 @@ int EVP_DigestSqueeze(EVP_MD_CTX *ctx, unsigned char *md, size_t size)
@@ -35,10 +35,10 @@ index 6fc201bcfe..3c80b9dfe1 100644
      EVP_MD_CTX *out = EVP_MD_CTX_new();
  
 diff --git a/crypto/evp/evp_enc.c b/crypto/evp/evp_enc.c
-index eee00a0780..7c51786515 100644
+index 109412b342..b4cfe2b809 100644
 --- a/crypto/evp/evp_enc.c
 +++ b/crypto/evp/evp_enc.c
-@@ -1762,7 +1762,12 @@ int EVP_CIPHER_CTX_rand_key(EVP_CIPHER_CTX *ctx, unsigned char *key)
+@@ -1766,7 +1766,12 @@ int EVP_CIPHER_CTX_rand_key(EVP_CIPHER_CTX *ctx, unsigned char *key)
  #endif /* FIPS_MODULE */
  }
  
@@ -53,10 +53,10 @@ index eee00a0780..7c51786515 100644
      EVP_CIPHER_CTX *out = EVP_CIPHER_CTX_new();
  
 diff --git a/test/recipes/01-test_symbol_presence.t b/test/recipes/01-test_symbol_presence.t
-index 7e2f65cccb..cc947d4821 100644
+index 46a55c6b99..3a6ef96b91 100644
 --- a/test/recipes/01-test_symbol_presence.t
 +++ b/test/recipes/01-test_symbol_presence.t
-@@ -131,6 +131,7 @@ foreach (sort keys %stlibname) {
+@@ -136,6 +136,7 @@ foreach (sort keys %stlibname) {
                    s| .*||;
                    # Drop OpenSSL dynamic version information if there is any
                    s|\@\@.+$||;
@@ -79,5 +79,5 @@ index ceb4948839..eab3987a6b 100644
  BN_signed_bn2bin                        5568	3_2_0	EXIST::FUNCTION:
  BN_signed_lebin2bn                      5569	3_2_0	EXIST::FUNCTION:
 -- 
-2.51.0
+2.55.0
 

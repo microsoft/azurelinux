@@ -1,7 +1,7 @@
-From 8d7abff29035508b6208b4742bfaaed42f78ac43 Mon Sep 17 00:00:00 2001
+From bad1ecb14cb97e0c9b548b191c66e1ba19cf839a Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:15 +0100
-Subject: [PATCH 08/59] RH: Add Kernel FIPS mode flag support - FIXSTYLE
+Subject: [PATCH 08/58] RH: Add Kernel FIPS mode flag support - FIXSTYLE
 
 Patch-name: 0009-Add-Kernel-FIPS-mode-flag-support.patch
 Patch-id: 9
@@ -10,11 +10,11 @@ Patch-status: |
 From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
 ---
  crypto/context.c            | 35 +++++++++++++++++++++++++++++++++++
- include/internal/provider.h |  3 +++
- 2 files changed, 38 insertions(+)
+ include/internal/provider.h |  5 ++++-
+ 2 files changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/context.c b/crypto/context.c
-index f15bc3d755..614c8a2c88 100644
+index 1ae88e42aa..62e60f3620 100644
 --- a/crypto/context.c
 +++ b/crypto/context.c
 @@ -7,6 +7,7 @@
@@ -64,7 +64,7 @@ index f15bc3d755..614c8a2c88 100644
  struct ossl_lib_ctx_st {
      CRYPTO_RWLOCK *lock;
      OSSL_EX_DATA_GLOBAL global;
-@@ -393,6 +426,8 @@ static int default_context_inited = 0;
+@@ -391,6 +424,8 @@ static int default_context_inited = 0;
  
  DEFINE_RUN_ONCE_STATIC(default_context_do_init)
  {
@@ -74,19 +74,21 @@ index f15bc3d755..614c8a2c88 100644
          goto err;
  
 diff --git a/include/internal/provider.h b/include/internal/provider.h
-index 7d94346155..c0f1d00da9 100644
+index 1b4050a81f..eb7f409af0 100644
 --- a/include/internal/provider.h
 +++ b/include/internal/provider.h
-@@ -114,6 +114,9 @@ int ossl_provider_init_as_child(OSSL_LIB_CTX *ctx,
-                                 const OSSL_DISPATCH *in);
+@@ -114,7 +114,10 @@ int ossl_provider_init_as_child(OSSL_LIB_CTX *ctx,
+     const OSSL_DISPATCH *in);
  void ossl_provider_deinit_child(OSSL_LIB_CTX *ctx);
  
+-#ifdef __cplusplus
 +/* FIPS flag access */
 +int ossl_get_kernel_fips_flag(void);
 +
- # ifdef __cplusplus
++# ifdef __cplusplus
  }
- # endif
+ #endif
+ 
 -- 
-2.51.0
+2.55.0
 

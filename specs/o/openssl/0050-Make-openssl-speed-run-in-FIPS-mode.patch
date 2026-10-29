@@ -1,18 +1,18 @@
-From 4efc206514085c482a0b2a74a98f3ca285c99db9 Mon Sep 17 00:00:00 2001
+From 1d795f62dff5c443cf340823f7ab755b330f5ef9 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Fri, 9 May 2025 15:09:46 +0200
-Subject: [PATCH 50/59] Make `openssl speed` run in FIPS mode
+Subject: [PATCH 50/58] Make `openssl speed` run in FIPS mode
 
 ---
  apps/speed.c | 44 ++++++++++++++++++++++----------------------
  1 file changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/apps/speed.c b/apps/speed.c
-index 3307a9cb46..ae2f166d24 100644
+index a36faa686d..5b2fe33b59 100644
 --- a/apps/speed.c
 +++ b/apps/speed.c
-@@ -3172,18 +3172,18 @@ int speed_main(int argc, char **argv)
-                                                       (void *)key32, 16);
+@@ -3232,18 +3232,18 @@ int speed_main(int argc, char **argv)
+             (void *)key32, 16);
          params[1] = OSSL_PARAM_construct_end();
  
 -        if (mac_setup("KMAC-128", &mac, params, loopargs, loopargs_len) < 1)
@@ -41,8 +41,8 @@ index 3307a9cb46..ae2f166d24 100644
      }
  
      if (doit[D_KMAC256]) {
-@@ -3193,18 +3193,18 @@ int speed_main(int argc, char **argv)
-                                                       (void *)key32, 32);
+@@ -3253,18 +3253,18 @@ int speed_main(int argc, char **argv)
+             (void *)key32, 32);
          params[1] = OSSL_PARAM_construct_end();
  
 -        if (mac_setup("KMAC-256", &mac, params, loopargs, loopargs_len) < 1)
@@ -72,5 +72,5 @@ index 3307a9cb46..ae2f166d24 100644
  
      for (i = 0; i < loopargs_len; i++)
 -- 
-2.51.0
+2.55.0
 

@@ -1,7 +1,7 @@
-From fb2c952f82064d747dbecb6ce66365ae4cc03513 Mon Sep 17 00:00:00 2001
+From de62c49d3ba6f27867113241bffbf265d2fce16c Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:15 +0100
-Subject: [PATCH 07/59] RH: Add FIPS_mode compatibility macro
+Subject: [PATCH 07/58] RH: Add FIPS_mode compatibility macro
 
 Patch-name: 0008-Add-FIPS_mode-compatibility-macro.patch
 Patch-id: 8
@@ -47,10 +47,10 @@ index 0000000000..4162cbf88e
 +# endif
 +#endif
 diff --git a/test/property_test.c b/test/property_test.c
-index e62ff247c4..37489e4694 100644
+index d470731e50..0b044ec853 100644
 --- a/test/property_test.c
 +++ b/test/property_test.c
-@@ -703,6 +703,19 @@ static int test_property_list_to_string_bounds(void)
+@@ -703,6 +703,19 @@ err:
      return ret;
  }
  
@@ -79,5 +79,5 @@ index e62ff247c4..37489e4694 100644
      ADD_TEST(test_property_list_to_string_bounds);
      return 1;
 -- 
-2.51.0
+2.55.0
 

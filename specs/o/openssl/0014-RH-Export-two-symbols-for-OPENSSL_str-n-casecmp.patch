@@ -1,7 +1,7 @@
-From 104697d613232de6a96c2c8323eac721c19dbaa2 Mon Sep 17 00:00:00 2001
+From 99ada5999ec2489a44aff350cd1a091799027fbf Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Thu, 13 Feb 2025 16:09:09 -0500
-Subject: [PATCH 14/59] RH: Export two symbols for OPENSSL_str[n]casecmp
+Subject: [PATCH 14/58] RH: Export two symbols for OPENSSL_str[n]casecmp
 
 We accidentally exported the symbols with the incorrect verison number
 in an early version of RHEL-9 so we need to keep the wrong symbols for
@@ -17,7 +17,7 @@ with upstream.
  mode change 100644 => 100755 test/recipes/01-test_symbol_presence.t
 
 diff --git a/crypto/evp/digest.c b/crypto/evp/digest.c
-index 3c80b9dfe1..8ee9db73dd 100644
+index 7f0d77ab69..101f49862c 100644
 --- a/crypto/evp/digest.c
 +++ b/crypto/evp/digest.c
 @@ -573,7 +573,7 @@ int EVP_DigestSqueeze(EVP_MD_CTX *ctx, unsigned char *md, size_t size)
@@ -30,10 +30,10 @@ index 3c80b9dfe1..8ee9db73dd 100644
                      symver ("EVP_MD_CTX_dup@OPENSSL_3.2.0")))
  #endif
 diff --git a/crypto/evp/evp_enc.c b/crypto/evp/evp_enc.c
-index 7c51786515..619cf4f385 100644
+index b4cfe2b809..30c2ec56dc 100644
 --- a/crypto/evp/evp_enc.c
 +++ b/crypto/evp/evp_enc.c
-@@ -1763,7 +1763,7 @@ int EVP_CIPHER_CTX_rand_key(EVP_CIPHER_CTX *ctx, unsigned char *key)
+@@ -1767,7 +1767,7 @@ int EVP_CIPHER_CTX_rand_key(EVP_CIPHER_CTX *ctx, unsigned char *key)
  }
  
  EVP_CIPHER_CTX
@@ -43,10 +43,10 @@ index 7c51786515..619cf4f385 100644
                      symver ("EVP_CIPHER_CTX_dup@OPENSSL_3.2.0")))
  #endif
 diff --git a/crypto/o_str.c b/crypto/o_str.c
-index 93af73561f..86442a939e 100644
+index 154393c7b3..b221ba789e 100644
 --- a/crypto/o_str.c
 +++ b/crypto/o_str.c
-@@ -403,7 +403,12 @@ int openssl_strerror_r(int errnum, char *buf, size_t buflen)
+@@ -417,7 +417,12 @@ int openssl_strerror_r(int errnum, char *buf, size_t buflen)
  #endif
  }
  
@@ -60,7 +60,7 @@ index 93af73561f..86442a939e 100644
  {
      int t;
  
-@@ -413,7 +418,12 @@ int OPENSSL_strcasecmp(const char *s1, const char *s2)
+@@ -427,7 +432,12 @@ int OPENSSL_strcasecmp(const char *s1, const char *s2)
      return t;
  }
  
@@ -77,10 +77,10 @@ index 93af73561f..86442a939e 100644
 diff --git a/test/recipes/01-test_symbol_presence.t b/test/recipes/01-test_symbol_presence.t
 old mode 100644
 new mode 100755
-index cc947d4821..de2dcd90c2
+index 3a6ef96b91..357f1a0743
 --- a/test/recipes/01-test_symbol_presence.t
 +++ b/test/recipes/01-test_symbol_presence.t
-@@ -186,7 +186,7 @@ foreach (sort keys %stlibname) {
+@@ -191,7 +191,7 @@ foreach (sort keys %stlibname) {
      }
  }
  my @duplicates = sort grep { $symbols{$_} > 1 } keys %symbols;
@@ -104,5 +104,5 @@ index eab3987a6b..d377d542db 100644
  RAND_set0_public                        5559	3_1_0	EXIST::FUNCTION:
  RAND_set0_private                       5560	3_1_0	EXIST::FUNCTION:
 -- 
-2.51.0
+2.55.0
 

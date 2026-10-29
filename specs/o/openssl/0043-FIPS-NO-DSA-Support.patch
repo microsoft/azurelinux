@@ -1,7 +1,7 @@
-From 5679937e93d2f072cf4f56b27dc6bcce251f6def Mon Sep 17 00:00:00 2001
+From 922f94f8f22482d0436ae269410da8da911502f0 Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Fri, 7 Mar 2025 18:10:52 -0500
-Subject: [PATCH 43/59] FIPS: NO DSA Support
+Subject: [PATCH 43/58] FIPS: NO DSA Support
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
@@ -18,10 +18,10 @@ Signed-off-by: Simo Sorce <simo@redhat.com>
  mode change 100644 => 100755 test/recipes/30-test_evp.t
 
 diff --git a/providers/fips/fipsprov.c b/providers/fips/fipsprov.c
-index e5d798fd54..a807c76fd8 100644
+index 7928bd0e55..f16960b77b 100644
 --- a/providers/fips/fipsprov.c
 +++ b/providers/fips/fipsprov.c
-@@ -432,7 +432,8 @@ static const OSSL_ALGORITHM fips_keyexch[] = {
+@@ -430,7 +430,8 @@ static const OSSL_ALGORITHM fips_keyexch[] = {
  };
  
  static const OSSL_ALGORITHM fips_signature[] = {
@@ -31,23 +31,23 @@ index e5d798fd54..a807c76fd8 100644
      { PROV_NAMES_DSA, FIPS_DEFAULT_PROPERTIES, ossl_dsa_signature_functions },
      { PROV_NAMES_DSA_SHA1, FIPS_DEFAULT_PROPERTIES, ossl_dsa_sha1_signature_functions },
      { PROV_NAMES_DSA_SHA224, FIPS_DEFAULT_PROPERTIES, ossl_dsa_sha224_signature_functions },
-@@ -562,8 +563,9 @@ static const OSSL_ALGORITHM fips_keymgmt[] = {
-       PROV_DESCS_DHX },
+@@ -558,8 +559,9 @@ static const OSSL_ALGORITHM fips_keymgmt[] = {
+         PROV_DESCS_DHX },
  #endif
  #ifndef OPENSSL_NO_DSA
 -    { PROV_NAMES_DSA, FIPS_DEFAULT_PROPERTIES, ossl_dsa_keymgmt_functions,
--      PROV_DESCS_DSA },
+-        PROV_DESCS_DSA },
 +    /* We don't certify DSA in our FIPS provider */
 +    /* { PROV_NAMES_DSA, FIPS_DEFAULT_PROPERTIES, ossl_dsa_keymgmt_functions,
-+      PROV_DESCS_DSA }, */
++           PROV_DESCS_DSA }, */
  #endif
      { PROV_NAMES_RSA, FIPS_DEFAULT_PROPERTIES, ossl_rsa_keymgmt_functions,
-       PROV_DESCS_RSA },
+         PROV_DESCS_RSA },
 diff --git a/providers/fips/self_test_data.inc b/providers/fips/self_test_data.inc
-index 6abab0a7a1..a7d7684d96 100644
+index 4a0ce24cbb..84b0b1c5c1 100644
 --- a/providers/fips/self_test_data.inc
 +++ b/providers/fips/self_test_data.inc
-@@ -1547,8 +1547,9 @@ static const unsigned char ed448_expected_sig[] = {
+@@ -1546,8 +1546,9 @@ static const unsigned char ed448_expected_sig[] = {
  # endif /* OPENSSL_NO_ECX */
  #endif /* OPENSSL_NO_EC */
  
@@ -58,7 +58,7 @@ index 6abab0a7a1..a7d7684d96 100644
  static const unsigned char dsa_p[] = {
      0xa2, 0x9b, 0x88, 0x72, 0xce, 0x8b, 0x84, 0x23,
      0xb7, 0xd5, 0xd2, 0x1d, 0x4b, 0x02, 0xf5, 0x7e,
-@@ -1676,6 +1677,7 @@ static const ST_KAT_PARAM dsa_key[] = {
+@@ -1675,6 +1676,7 @@ static const ST_KAT_PARAM dsa_key[] = {
      ST_KAT_PARAM_END()
  };
  #endif /* OPENSSL_NO_DSA */
@@ -66,7 +66,7 @@ index 6abab0a7a1..a7d7684d96 100644
  
  #ifndef OPENSSL_NO_ML_DSA
  static const unsigned char ml_dsa_65_pub_key[] = {
-@@ -3038,6 +3040,7 @@ static const ST_KAT_SIGN st_kat_sign_tests[] = {
+@@ -3037,6 +3039,7 @@ static const ST_KAT_SIGN st_kat_sign_tests[] = {
      },
  # endif /* OPENSSL_NO_ECX */
  #endif /* OPENSSL_NO_EC */
@@ -74,7 +74,7 @@ index 6abab0a7a1..a7d7684d96 100644
  #ifndef OPENSSL_NO_DSA
      {
          OSSL_SELF_TEST_DESC_SIGN_DSA,
-@@ -3050,6 +3053,7 @@ static const ST_KAT_SIGN st_kat_sign_tests[] = {
+@@ -3049,6 +3052,7 @@ static const ST_KAT_SIGN st_kat_sign_tests[] = {
          ITM(dsa_expected_sig)
      },
  #endif /* OPENSSL_NO_DSA */
@@ -83,18 +83,18 @@ index 6abab0a7a1..a7d7684d96 100644
  #ifndef OPENSSL_NO_ML_DSA
      {
 diff --git a/test/acvp_test.c b/test/acvp_test.c
-index 2bcc886fd2..db0282d043 100644
+index 8e6a8b4a5c..1224d5a762 100644
 --- a/test/acvp_test.c
 +++ b/test/acvp_test.c
-@@ -1735,6 +1735,7 @@ int setup_tests(void)
-                   OSSL_NELEM(dh_safe_prime_keyver_data));
+@@ -1808,6 +1808,7 @@ int setup_tests(void)
+         OSSL_NELEM(dh_safe_prime_keyver_data));
  #endif /* OPENSSL_NO_DH */
  
 +#if 0 /* Red Hat FIPS provider doesn't have fips=yes property on DSA */
  #ifndef OPENSSL_NO_DSA
      dsasign_allowed = fips_provider_version_lt(libctx, 3, 4, 0);
      ADD_ALL_TESTS(dsa_keygen_test, OSSL_NELEM(dsa_keygen_data));
-@@ -1743,6 +1744,7 @@ int setup_tests(void)
+@@ -1816,6 +1817,7 @@ int setup_tests(void)
      ADD_ALL_TESTS(dsa_siggen_test, OSSL_NELEM(dsa_siggen_data));
      ADD_ALL_TESTS(dsa_sigver_test, OSSL_NELEM(dsa_sigver_data));
  #endif /* OPENSSL_NO_DSA */
@@ -103,10 +103,10 @@ index 2bcc886fd2..db0282d043 100644
  #ifndef OPENSSL_NO_EC
      ec_cofactors = fips_provider_version_ge(libctx, 3, 4, 0);
 diff --git a/test/endecode_test.c b/test/endecode_test.c
-index d2ff9e6eb6..dfd5e92f7e 100644
+index 3dfb1cb56f..634072de68 100644
 --- a/test/endecode_test.c
 +++ b/test/endecode_test.c
-@@ -1536,6 +1536,7 @@ int setup_tests(void)
+@@ -1952,6 +1952,7 @@ int setup_tests(void)
           * so no legacy tests.
           */
  #endif
@@ -114,9 +114,9 @@ index d2ff9e6eb6..dfd5e92f7e 100644
  #ifndef OPENSSL_NO_DSA
          ADD_TEST_SUITE(DSA);
          ADD_TEST_SUITE_PARAMS(DSA);
-@@ -1546,6 +1547,7 @@ int setup_tests(void)
+@@ -1962,6 +1963,7 @@ int setup_tests(void)
          ADD_TEST_SUITE_PROTECTED_PVK(DSA);
- # endif
+ #endif
  #endif
 +    }
  #ifndef OPENSSL_NO_EC
@@ -136,10 +136,10 @@ index cd331c4cfc..e21d6acda4 100644
  plan tests =>
      ($no_fips ? 0 : 2)          # FIPS related tests
 diff --git a/test/recipes/20-test_cli_fips.t b/test/recipes/20-test_cli_fips.t
-index 2abc4d2434..9a6875b3ec 100644
+index fd8842b867..64935ca824 100644
 --- a/test/recipes/20-test_cli_fips.t
 +++ b/test/recipes/20-test_cli_fips.t
-@@ -283,8 +283,7 @@ SKIP: {
+@@ -321,8 +321,7 @@ SKIP: {
  }
  
  SKIP : {
@@ -152,10 +152,10 @@ index 2abc4d2434..9a6875b3ec 100644
 diff --git a/test/recipes/30-test_evp.t b/test/recipes/30-test_evp.t
 old mode 100644
 new mode 100755
-index a86456157b..05a61c8abe
+index 474a9f83a9..51764cc8e7
 --- a/test/recipes/30-test_evp.t
 +++ b/test/recipes/30-test_evp.t
-@@ -83,10 +83,6 @@ push @files, qw(
+@@ -85,10 +85,6 @@ push @files, qw(
                  evppkey_slh_dsa_siggen.txt
                  evppkey_slh_dsa_sigver.txt
                 ) unless $no_slh_dsa;
@@ -166,7 +166,7 @@ index a86456157b..05a61c8abe
  push @files, qw(
                  evppkey_ecx.txt
                  evppkey_ecx_sigalg.txt
-@@ -166,11 +162,12 @@ my @defltfiles = qw(
+@@ -170,11 +166,12 @@ my @defltfiles = qw(
  push @defltfiles, qw(evppkey_brainpool.txt) unless $no_ec;
  push @defltfiles, qw(evppkey_ecdsa_rfc6979.txt) unless $no_ec;
  push @defltfiles, qw(evppkey_ecx_kem.txt) unless $no_ecx;
@@ -302,7 +302,7 @@ index 5e5315a5b9..660d1db149 100644
  Key = DSA-2048-160
  Input = "Hello"
 diff --git a/test/recipes/80-test_cms.t b/test/recipes/80-test_cms.t
-index cf4541449b..7350baa921 100644
+index 985c08b9ae..d1462a75c9 100644
 --- a/test/recipes/80-test_cms.t
 +++ b/test/recipes/80-test_cms.t
 @@ -116,7 +116,7 @@ my @smime_pkcs7_tests = (
@@ -396,5 +396,5 @@ index cf4541449b..7350baa921 100644
          "-signer", $smrsa1,
          "-signer", catfile($smdir, "smrsa2.pem"),
 -- 
-2.51.0
+2.55.0
 

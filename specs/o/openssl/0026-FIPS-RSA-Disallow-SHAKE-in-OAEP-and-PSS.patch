@@ -1,7 +1,7 @@
-From 4d1abf9cc029a713b4bf433af06d3c6507ae2ebc Mon Sep 17 00:00:00 2001
+From a5ad4cb90a54b1311444a5b88e38e49fd97d493f Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:17 +0100
-Subject: [PATCH 26/59] FIPS: RSA: Disallow SHAKE in OAEP and PSS
+Subject: [PATCH 26/58] FIPS: RSA: Disallow SHAKE in OAEP and PSS
 
 According to FIPS 140-3 IG, section C.C, the SHAKE digest algorithms
 must not be used in higher-level algorithms (such as RSA-OAEP and
@@ -25,7 +25,7 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  2 files changed, 32 insertions(+)
 
 diff --git a/crypto/rsa/rsa_oaep.c b/crypto/rsa/rsa_oaep.c
-index 5a1c080fcd..11cd78618b 100644
+index 453205b56c..e45d4bc278 100644
 --- a/crypto/rsa/rsa_oaep.c
 +++ b/crypto/rsa/rsa_oaep.c
 @@ -76,6 +76,14 @@ int ossl_rsa_padding_add_PKCS1_OAEP_mgf1_ex(OSSL_LIB_CTX *libctx,
@@ -59,7 +59,7 @@ index 5a1c080fcd..11cd78618b 100644
      /* XOF are approved as standalone; Shake256 in Ed448; MGF */
      if (EVP_MD_xof(md)) {
 diff --git a/crypto/rsa/rsa_pss.c b/crypto/rsa/rsa_pss.c
-index a2bc198a89..2833ca50f3 100644
+index 98d6e70346..7fe78b9055 100644
 --- a/crypto/rsa/rsa_pss.c
 +++ b/crypto/rsa/rsa_pss.c
 @@ -61,6 +61,14 @@ int ossl_rsa_verify_PKCS1_PSS_mgf1(RSA *rsa, const unsigned char *mHash,
@@ -93,5 +93,5 @@ index a2bc198a89..2833ca50f3 100644
      if (hLen <= 0)
          goto err;
 -- 
-2.51.0
+2.55.0
 

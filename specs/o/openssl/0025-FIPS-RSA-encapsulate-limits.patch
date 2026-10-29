@@ -1,7 +1,7 @@
-From 178f344c1bad06adc0fe187fb24da2b036cc3628 Mon Sep 17 00:00:00 2001
+From 8ef95d527e4c275c8e86544533141141770de927 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Wed, 6 Mar 2024 19:17:17 +0100
-Subject: [PATCH 25/59] FIPS: RSA: encapsulate limits
+Subject: [PATCH 25/58] FIPS: RSA: encapsulate limits
 
 Patch-name: 0091-FIPS-RSA-encapsulate.patch
 Patch-id: 91
@@ -14,10 +14,10 @@ From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
  2 files changed, 15 insertions(+)
 
 diff --git a/providers/implementations/kem/rsa_kem.c b/providers/implementations/kem/rsa_kem.c
-index 7494dcc010..5d6123e8cb 100644
+index 47f0c80c94..5bfe6896c8 100644
 --- a/providers/implementations/kem/rsa_kem.c
 +++ b/providers/implementations/kem/rsa_kem.c
-@@ -284,6 +284,13 @@ static int rsasve_generate(PROV_RSA_CTX *prsactx,
+@@ -297,6 +297,13 @@ static int rsasve_generate(PROV_RSA_CTX *prsactx,
      /* Step (1): nlen = Ceil(len(n)/8) */
      nlen = RSA_size(prsactx->rsa);
  
@@ -31,7 +31,7 @@ index 7494dcc010..5d6123e8cb 100644
      if (out == NULL) {
          if (nlen == 0) {
              ERR_raise(ERR_LIB_PROV, PROV_R_INVALID_KEY);
-@@ -360,6 +367,13 @@ static int rsasve_recover(PROV_RSA_CTX *prsactx,
+@@ -374,6 +381,13 @@ static int rsasve_recover(PROV_RSA_CTX *prsactx,
      /* Step (1): get the byte length of n */
      nlen = RSA_size(prsactx->rsa);
  
@@ -55,5 +55,5 @@ index ecab1454e7..8e5edd35fe 100644
  Op = RSASVE
 +Result = TEST_ENCAPSULATE_LEN_ERROR
 -- 
-2.51.0
+2.55.0
 

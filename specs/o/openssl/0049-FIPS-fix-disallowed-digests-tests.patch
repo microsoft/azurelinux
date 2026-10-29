@@ -1,7 +1,7 @@
-From 4373bb2644892e1d788ca2bdd37d7281221c0385 Mon Sep 17 00:00:00 2001
+From 91eb7ff42219d8bd517f0d9752df5032ef92cf35 Mon Sep 17 00:00:00 2001
 From: Simo Sorce <simo@redhat.com>
 Date: Tue, 15 Apr 2025 13:41:42 -0400
-Subject: [PATCH 49/59] FIPS: fix disallowed digests tests
+Subject: [PATCH 49/58] FIPS: fix disallowed digests tests
 
 Signed-off-by: Simo Sorce <simo@redhat.com>
 ---
@@ -47,5 +47,5 @@ index 6688c217aa..8347f773e6 100644
  # Test that the key whose length is shorter than 112 bits is reported as
  # unapproved
 -- 
-2.51.0
+2.55.0
 
