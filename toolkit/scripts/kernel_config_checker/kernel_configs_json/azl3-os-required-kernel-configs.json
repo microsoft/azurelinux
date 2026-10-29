@@ -4179,6 +4179,26 @@
             }
           ],
           "justification": "Hot-added memory is onlined by the kernel, as MEMORY_HOTPLUG_DEFAULT_ONLINE=y did in 6.6; the 6.18 upgrade took the new upstream default (offline)"
+        },
+        {
+          "name": "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            }
+          ],
+          "justification": "Guest THP settings from 6.6 (madvise on x86_64, off on aarch64) to limit host memory per sandbox; the 6.18 upgrade switched both to always"
+        },
+        {
+          "name": "CONFIG_TRANSPARENT_HUGEPAGE",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "Guest THP settings from 6.6 (madvise on x86_64, off on aarch64) to limit host memory per sandbox; the 6.18 upgrade switched both to always"
         }
       ]
     }

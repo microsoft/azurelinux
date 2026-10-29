@@ -175,6 +175,8 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
   without module signing
 - Online hot-added memory by default again (CONFIG_MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO), as
   in 6.6; the 6.18 upgrade switched the default to offline
+- Restore the 6.6 transparent hugepage settings: madvise by default on x86_64 and THP off
+  on aarch64; the 6.18 upgrade switched both to always
 
 * Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.52.mshv1-1
 - Upgrade to 6.18.52.mshv1
