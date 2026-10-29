@@ -3849,6 +3849,26 @@
             }
           ],
           "justification": "Hot-added memory is onlined by the kernel, as MEMORY_HOTPLUG_DEFAULT_ONLINE=y did in 6.6; the 6.18 upgrade took the new upstream default (offline)"
+        },
+        {
+          "name": "CONFIG_NETFILTER_XT_TARGET_NOTRACK",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables NOTRACK and TRACE targets, enabled in 6.6 on aarch64 and dropped in the 6.18 upgrade"
+        },
+        {
+          "name": "CONFIG_NETFILTER_XT_TARGET_TRACE",
+          "values": [
+            {
+              "architecture": "arm64",
+              "value": "m"
+            }
+          ],
+          "justification": "iptables NOTRACK and TRACE targets, enabled in 6.6 on aarch64 and dropped in the 6.18 upgrade"
         }
       ]
     },
