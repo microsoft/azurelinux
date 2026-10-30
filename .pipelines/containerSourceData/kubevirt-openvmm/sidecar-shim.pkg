@@ -1,0 +1,4 @@
+ca-certificates
+kubevirt-openvmm-sidecar-shim
+python3
+shadow-utils
