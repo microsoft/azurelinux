@@ -10,7 +10,11 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
+<<<<<<< HEAD
 Release:        30%{?dist}
+=======
+Release:        32%{?dist}
+>>>>>>> 85989df65c ([AutoPR- Security] Patch kubernetes for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659 [HIGH] (#19252))
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +23,7 @@ URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
 Patch0:         CVE-2024-28180.patch
+<<<<<<< HEAD
 Patch1:         CVE-2024-45338.patch
 Patch2:         CVE-2025-27144.patch
 Patch3:         CVE-2025-22868.patch
@@ -53,6 +58,30 @@ Patch31:        CVE-2026-73500.patch
 Patch32:        CVE-2026-37236.patch
 Patch33:        CVE-2026-56855.patch
 Patch34:        CVE-2026-78662.patch
+=======
+Patch1:         CVE-2025-27144.patch
+Patch2:         CVE-2024-51744.patch
+Patch3:         CVE-2025-30204.patch
+Patch4:         CVE-2025-4563.patch
+Patch5:         CVE-2025-31133.patch
+Patch6:         CVE-2025-52565.patch
+Patch7:         CVE-2025-13281.patch
+Patch8:         CVE-2025-52881.patch
+Patch9:         CVE-2026-35469.patch
+Patch10:        CVE-2024-7598.patch
+Patch11:        CVE-2026-73500.patch
+Patch12:        CVE-2026-37236.patch
+Patch13:        CVE-2026-84304.patch
+Patch14:        fix-cel-go-otelgrpc-api-migration.patch
+Patch15:        fix-vendor-modules-for-runc-backports.patch
+Patch16:        fix-non-constant-format-strings.patch
+Patch17:        CVE-2026-78659.patch
+Patch18:        CVE-2026-78660.patch
+Patch19:        CVE-2026-78663.patch
+Patch20:        CVE-2026-78669.patch
+Patch21:        CVE-2026-97032.patch
+Patch22:        CVE-2026-61801.patch
+>>>>>>> 85989df65c ([AutoPR- Security] Patch kubernetes for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659 [HIGH] (#19252))
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
@@ -305,6 +334,19 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+<<<<<<< HEAD
+=======
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-32
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801
+
+* Thu Sep 17 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.30.10-31
+- Patch for CVE-2026-84304, CVE-2026-84445, CVE-2026-83530
+- Removed patches CVE-2024-45338, CVE-2025-22868, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911,
+  CVE-2025-58190, CVE-2025-65637, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821,
+  CVE-2026-39827, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502,
+  CVE-2026-42506, CVE-2026-46597, CVE-2026-56852, CVE-2026-56855, CVE-2026-78662
+
+>>>>>>> 85989df65c ([AutoPR- Security] Patch kubernetes for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659 [HIGH] (#19252))
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-30
 - Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
 
