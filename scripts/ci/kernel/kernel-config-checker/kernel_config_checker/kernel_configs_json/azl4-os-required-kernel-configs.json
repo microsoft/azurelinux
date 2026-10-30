@@ -429,6 +429,20 @@
         "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
       },
       {
+        "name": "CONFIG_CRYPTO_AES_NI_INTEL",
+        "values": [
+          { "architecture": "x86_64", "value": "y" }
+        ],
+        "justification": "Build the x86 AES-NI implementation into the kernel so it is available before /init for FIPS self-tests."
+      },
+      {
+        "name": "CONFIG_CRYPTO_AES_ARM64_CE_BLK",
+        "values": [
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build the ARM64 Crypto Extensions AES implementation into the kernel so it is available before /init for FIPS self-tests."
+      },
+      {
         "name": "CONFIG_CRYPTO_ANSI_CPRNG",
         "values": [
           {
@@ -493,6 +507,14 @@
           }
         ],
         "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_CRYPTO_CRYPTD",
+        "values": [
+          { "architecture": "x86_64", "value": "y" },
+          { "architecture": "arm64", "value": "y" }
+        ],
+        "justification": "Build the cryptd helper into the kernel on both architectures so it is available before /init for FIPS self-tests."
       },
       {
         "name": "CONFIG_CRYPTO_DEV_BCM_SPU",
@@ -573,6 +595,20 @@
             }
           ],
           "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL",
+          "values": [
+            { "architecture": "x86_64", "value": "y" }
+          ],
+          "justification": "Build the x86 CLMUL GHASH implementation into the kernel so it is available before /init for FIPS self-tests."
+        },
+        {
+          "name": "CONFIG_CRYPTO_GHASH_ARM64_CE",
+          "values": [
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Build the ARM64 Crypto Extensions GHASH implementation into the kernel so it is available before /init for FIPS self-tests."
         },
         {
           "name": "CONFIG_CRYPTO_JITTERENTROPY",
