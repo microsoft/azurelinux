@@ -32,8 +32,8 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.3.35
-Release:        2%{?dist}
+Version:        8.3.36
+Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -80,10 +80,6 @@ Patch45:        php-7.4.0-ldap_r.patch
 Patch47:        php-8.3.14-phpinfo.patch
 # Upstream fixes (100+)
 # Security fixes (200+)
-# Embargoed candidate; final upstream approval is not confirmed.
-Patch200:       php-8.3.35-oom-candidate.patch
-# Scanner C output generated with re2c 4.0.2 for the candidate.
-Patch201:       php-8.3.35-oom-generated-scanners.patch
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
 Patch300:       php-7.4.0-datetests.patch
@@ -722,8 +718,6 @@ in pure PHP.
 # upstream patches
 
 # security patches
-%patch 200 -p1 -b .oom-candidate
-%patch 201 -p1 -b .oom-generated-scanners
 
 # Fixes for tests
 %patch 300 -p1 -b .datetests
@@ -1523,6 +1517,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Mon Oct 26 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.3.36-1
+- Upgrade to 8.3.36
+
 * Mon Oct 19 2026 Jon Slobodzian <joslobo@microsoft.com> - 8.3.35-2
 - Fix CVE-2026-109618 and CVE-2026-109619.
 
