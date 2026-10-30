@@ -1,0 +1,17 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use the Azure Linux aarch64 shim-unsigned package version"
+type = "file-search-replace"
+file = "shim.rpmmacros"
+regex = '''(?m)^%global shimveraa64 16\.1-1$'''
+replacement = "%global shimveraa64 16.1-2%{?dist}"
+
+[[overlays]]
+description = "Use the Azure Linux x64 shim-unsigned package version"
+type = "file-search-replace"
+file = "shim.rpmmacros"
+regex = '''(?m)^%global shimverx64 16\.1-1$'''
+replacement = "%global shimverx64 16.1-2%{?dist}"

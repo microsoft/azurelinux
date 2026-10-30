@@ -3,7 +3,7 @@
 %global vendor_token_str %{expand:%%{nil}%%{?vendor_token_name:-t "%{vendor_token_name}"}}
 %global vendor_cert_str %{expand:%%{!?vendor_cert_nickname:-c "Red Hat Test Certificate"}%%{?vendor_cert_nickname:-c "%%{vendor_cert_nickname}"}}
 
-%global grub_version 2.06-63
+%global grub_version 2.12-46
 %global fwupd_version 1.5.8
 
 %define __pesign_client_cert grub2-signer
@@ -18,10 +18,10 @@
 %global shimefiia32 %{expand:%{SOURCE21}}
 %global shimefix64 %{expand:%{SOURCE22}}
 
-%global shimveraa64 15.8-2
+%global shimveraa64 16.1-2%{?dist}
 %global shimverarm 15.4-1.fc34
-%global shimveria32 15.8-2
-%global shimverx64 15.8-2
+%global shimveria32 16.1-1
+%global shimverx64 16.1-2%{?dist}
 
 %global shimdiraa64 %{_datadir}/shim/%{shimveraa64}/aa64
 %global shimdirarm %{_datadir}/shim/%{shimverarm}/arm
@@ -53,7 +53,6 @@ Requires: mokutil >= 1:0.3.0-15						\
 Requires: efi-filesystem						\
 Provides: shim-signed-%{-a*} = %{version}-%{release}			\
 Conflicts: fwupd < %{fwupd_version}					\
-Requires: grub2-efi-%{-a*} >= %{grub_version}				\
 Conflicts: grub2-efi-%{-a*} < %{grub_version}				\
 %{expand:%%if 0%%{-p*}							\
 Provides: shim = %{version}-%{release}					\
@@ -159,7 +158,7 @@ install -m 0700 fb%{-a*}.efi						\\\
 %global provide_legacy_shim 1
 %endif
 %ifarch aarch64
-%global is_signed no
+%global is_signed yes
 %global is_alt_signed no
 %global provide_legacy_shim 1
 %endif

@@ -1,0 +1,18 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove the unbuilt ARM shim from DNF protection"
+type = "file-search-replace"
+file = "shim.conf"
+regex = '''(?m)^shim-arm\n'''
+replacement = ""
+
+
+[[overlays]]
+description = "Remove the unbuilt IA32 shim from DNF protection"
+type = "file-search-replace"
+file = "shim.conf"
+regex = '''(?m)^shim-ia32\n'''
+replacement = ""

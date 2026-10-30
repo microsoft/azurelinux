@@ -1,0 +1,27 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add the Microsoft-signed x64 shim input"
+type = "file-add"
+file = "azurelinux-shimx64.efi"
+source = "../shimx64.efi"
+
+[[overlays]]
+description = "Add the Microsoft-signed aarch64 shim input"
+type = "file-add"
+file = "azurelinux-shimaa64.efi"
+source = "../shimaa64.efi"
+
+[[overlays]]
+description = "Use the Microsoft-signed x64 shim input"
+type = "spec-update-tag"
+tag = "Source22"
+value = "azurelinux-shimx64.efi"
+
+[[overlays]]
+description = "Use the Microsoft-signed aarch64 shim input"
+type = "spec-update-tag"
+tag = "Source20"
+value = "azurelinux-shimaa64.efi"

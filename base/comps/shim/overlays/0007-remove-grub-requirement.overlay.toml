@@ -1,0 +1,20 @@
+# Fedora could add a macro hook for shim's second-stage requirement. Until then,
+# Azure Linux omits the hard GRUB dependency so UKI-only images remain possible.
+
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove shim's hard GRUB dependency"
+type = "file-search-replace"
+file = "shim.rpmmacros"
+regex = '''(?m)^Requires: grub2-efi-%\{-a\*\} >= %\{grub_version\}\t+\\$\n'''
+replacement = ""
+
+[[overlays]]
+description = "Update shim GRUB compatibility floor to the Azure Linux 4 baseline"
+type = "file-search-replace"
+file = "shim.rpmmacros"
+regex = '''(?m)^%global grub_version 2\.06-63$'''
+replacement = "%global grub_version 2.12-46"
