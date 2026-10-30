@@ -1,0 +1,37 @@
+From eaeea5028fa82412392d9325c44624ef8fcd1869 Mon Sep 17 00:00:00 2001
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Date: Wed, 8 Jan 2025 21:03:11 -0800
+Subject: [PATCH] net: mana: Cleanup "mana" debugfs dir after cleanup of all
+ children
+
+In mana_driver_exit(), mana_debugfs_root gets cleanup before any of it's
+children (which happens later in the pci_unregister_driver()).
+Due to this, when mana driver is configured as a module and rmmod is
+invoked, following stack gets printed along with failure in rmmod command.
+
+Fixes: 6607c17c6c5e ("net: mana: Enable debugfs files for MANA device")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Link: https://patch.msgid.link/1736398991-764-1-git-send-email-shradhagupta@linux.microsoft.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/ethernet/microsoft/mana/gdma_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 2dc0c6ad54be22..be95336ce089aa 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -1656,9 +1656,9 @@ static int __init mana_driver_init(void)
+ 
+ static void __exit mana_driver_exit(void)
+ {
+-	debugfs_remove(mana_debugfs_root);
+-
+ 	pci_unregister_driver(&mana_driver);
++
++	debugfs_remove(mana_debugfs_root);
+ }
+ 
+ module_init(mana_driver_init);
