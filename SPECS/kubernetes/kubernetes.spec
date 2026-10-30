@@ -7,7 +7,13 @@
 %endif
 %define host_components 'kubelet kubectl kubeadm'
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
+Summary:        Microsoft Kubernetes
+Name:           kubernetes
+Version:        1.30.10
 Release:        32%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
