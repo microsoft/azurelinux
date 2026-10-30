@@ -31669,8 +31669,8 @@
         "type": "other",
         "other": {
           "name": "zchunk",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/zchunk/zchunk/archive/1.3.2.tar.gz"
+          "version": "1.5.5",
+          "downloadUrl": "https://github.com/zchunk/zchunk/archive/1.5.5.tar.gz"
         }
       }
     },
