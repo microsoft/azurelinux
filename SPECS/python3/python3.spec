@@ -2,16 +2,22 @@
 %global __brp_python_bytecompile %{nil}
 %define majmin %(echo %{version} | cut -d. -f1-2)
 %define majmin_nodots %(echo %{majmin} | tr -d .)
+
+Summary:        A high-level scripting language
+Name:           python3
 Version:        3.12.16
 Release:        1%{?dist}
+License:        PSF
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 # pathfix.py was provided by the previous Python source bundle (Python-3.9.14.tar.xz)
 # It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
-Patch1:         cgi3.patch
-Patch2:         remove-compromised-wheel-ca-roots.patch
+Patch0:         cgi3.patch
+Patch1:         remove-compromised-wheel-ca-roots.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -145,6 +151,9 @@ export OPT="%{extension_cflags} %{openssl_flags}"
     --enable-optimizations
 %make_build
 
+LD_LIBRARY_PATH=$PWD ./python Tools/remove-untrusted-wheel-roots.py \
+    --expected-removals 2 Lib/ensurepip/_bundled/pip-*.whl
+
 %install
 %make_install
 %{_fixperms} %{buildroot}/*
@@ -234,6 +243,8 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %exclude %{_bindir}/idle*
 
 %files test
+%{_libdir}/python%{majmin}/test/*
+
 %changelog
 * Mon Oct 26 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.16-1
 - Upgrade to 3.12.16 for CVE-2026-12345, CVE-2026-114583, CVE-2024-3220
@@ -247,16 +258,7 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 
 * Sat Oct 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.15-1
 - Upgrade to 3.12.15 for CVE-2026-15310, CVE-2026-15806, CVE-2026-17084,
-
-* Sun Aug 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-2
-- Patch for CVE-2026-15806, CVE-2026-19672
-
-* Thu Aug 13 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.12.14-1
-- Upgrade to 3.12.14 for CVE-2026-18503, CVE-2026-15308, CVE-2026-7210, CVE-2026-4224
   CVE-2026-19445, CVE-2026-19553, CVE-2026-19672, CVE-2026-82049, CVE-2026-87910 
-
-* Mon Sep 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-3
-- Patch for CVE-2026-17084
 
 * Sun Aug 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-2
 - Patch for CVE-2026-15806, CVE-2026-19672
