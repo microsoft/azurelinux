@@ -56,7 +56,11 @@ Requires:       %{name} = %{version}-%{release}
 Documentation for prometheus-adapter
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Source0 ships a vendor tree pinned to the old module set; replace it wholesale.
+rm -rf vendor
+tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 make prometheus-adapter
@@ -88,6 +92,7 @@ make test
 
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-10
 - Patch for CVE-2026-37236
+
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-9
 - Patch for CVE-2026-73500
 
