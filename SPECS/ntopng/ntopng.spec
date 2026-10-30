@@ -21,6 +21,7 @@ Patch6:         CVE-2021-43519.patch
 Patch7:         CVE-2021-44964.patch
 Patch8:         CVE-2026-38968.patch
 Patch9:         CVE-2026-86090.patch
+Patch10:        CVE-2026-86098.patch
 BuildRequires:  curl-devel
 BuildRequires:  gcc
 BuildRequires:  glib-devel
@@ -71,7 +72,7 @@ mv nDPI-%{nDPIver} nDPI
 
 %changelog
 * Fri Oct 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.1-8
-- Patch for CVE-2026-86090
+- Patch for CVE-2026-86090, CVE-2026-86098
 
 * Tue Sep 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.1-7
 - Patch for CVE-2026-38968
