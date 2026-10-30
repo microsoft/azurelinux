@@ -18,7 +18,11 @@ Patch101:       CVE-2022-33065.patch
 Patch102:       CVE-2024-50612.patch
 Patch103:       CVE-2025-56226.patch
 Patch104:       CVE-2026-37555.patch
+<<<<<<< HEAD
 Patch105:       CVE-2026-88386.patch
+=======
+Patch105:       CVE-2025-52194.patch
+>>>>>>> 165d6c2516 ([AutoPR- Security] Patch libsndfile for CVE-2025-52194 [HIGH] (#19818))
 
 BuildRequires:  alsa-lib-devel
 BuildRequires:  autogen
@@ -143,8 +147,13 @@ LD_LIBRARY_PATH=$PWD/src/.libs make check
 %{_libdir}/pkgconfig/sndfile.pc
 
 %changelog
+<<<<<<< HEAD
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-6
 - Patch for CVE-2026-88386
+=======
+* Thu Oct 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-6
+- Patch for CVE-2025-52194
+>>>>>>> 165d6c2516 ([AutoPR- Security] Patch libsndfile for CVE-2025-52194 [HIGH] (#19818))
 
 * Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-5
 - Patch for CVE-2026-37555
