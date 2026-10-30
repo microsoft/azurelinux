@@ -298,5 +298,6 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 
 %changelog
 * Mon Oct 26 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.9.0-1
+- License verified
 - Add temporary x86 OpenVMM firmware and UEFI templates
 - Original version for Azure Linux
