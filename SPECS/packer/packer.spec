@@ -1,7 +1,13 @@
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
+Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
+Name:           packer
+Version:        1.9.5
 Release:        23%{?dist}
+License:        MPLv2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/hashicorp/packer
 Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
