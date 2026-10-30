@@ -13,7 +13,7 @@
 
 Name:           dnf5
 Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        Command-line package manager
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/dnf5
@@ -279,9 +279,14 @@ BuildRequires:  rubygem-test-unit
 # required for python3-libdnf5 and python3-libdnf5-cli
 BuildRequires:  python3-devel
 %endif
+BuildRequires: libsolv(rpmmd-filetime) = 1
 
 Provides: tdnf = %{version}-%{release}
+Provides: dnf5(plugin-post-base-setup) = 1
+Provides: dnf5(plugin-post-base-setup)%{?_isa} = 1
 Patch18: 0018-repo-suppress-transient-signing-key-warning.patch
+Patch19: 0019-package-expose-rpmmd-filetime.patch
+Patch20: 0020-app-plugin-post-base-setup.patch
 %description
 DNF5 is a command-line package manager that automates the process of installing,
 upgrading, configuring, and removing computer programs in a consistent manner.
@@ -416,6 +421,9 @@ Requires:       rpm-libs%{?_isa} >= 5.99.90
 Conflicts:      dnf-data < 4.20.0
 %endif
 
+Provides: libdnf5(package-filetime) = 1
+Provides: libdnf5(package-filetime)%{?_isa} = 1
+Requires: libsolv(rpmmd-filetime)%{?_isa} = 1
 %description -n libdnf5
 Package management library.
 

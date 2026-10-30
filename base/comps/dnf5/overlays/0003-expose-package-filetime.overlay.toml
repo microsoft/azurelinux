@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Expose the retained rpm-md file timestamp as an optional C++ Package accessor"
+type = "patch-add"
+source = "../0019-package-expose-rpmmd-filetime.patch"

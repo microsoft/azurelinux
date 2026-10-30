@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Call optional application-plugin entry points after successful Base setup without changing IPlugin"
+type = "patch-add"
+source = "../0020-app-plugin-post-base-setup.patch"
