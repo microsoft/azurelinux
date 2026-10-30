@@ -1,0 +1,424 @@
+From ceea68eba615eacd694ee64ce2490ff27b1a9039 Mon Sep 17 00:00:00 2001
+From: Billie Alsup <balsup@cisco.com>
+Date: Wed, 22 Apr 2026 15:56:03 -0700
+Subject: [PATCH 1/6] omuxsock: fix message loss bug for connected Unix domain
+ sockets
+
+Resolves critical message loss issue where connected sockets (STREAM,
+SEQPACKET) would silently drop all subsequent messages after any
+send error, requiring process restart to recover functionality.
+Discovered during commercial application integration.
+
+Impact: Prevents message loss and enables automatic recovery for
+connected Unix domain socket configurations.
+
+Before: Send errors on connected sockets left socket in bad state
+without suspension, causing all future messages to be lost silently.
+After: Connected socket errors trigger proper cleanup and suspension,
+allowing infrastructure to resume and reconnect automatically.
+
+Technical Overview:
+- Fixed error handling to distinguish connected vs unconnected socket
+  behavior when send()/sendto() operations fail partially or completely
+- Connected sockets now properly close and return RS_RET_SUSPENDED
+  to enable infrastructure-driven reconnection and recovery
+- Unconnected sockets (DGRAM) maintain existing retry-on-next-message
+  behavior without suspension as they are inherently stateless
+- Changed lenSent type from unsigned to ssize_t for proper error
+  detection and safe signed/unsigned comparison handling
+- Enhanced error logging with transmission byte counts for better
+  debugging of partial write scenarios
+- Added comprehensive tests that verify recovery behavior and fail
+  without this fix, confirming the bug reproduction and resolution
+
+Fixes message loss regression affecting STREAM and SEQPACKET Unix
+domain socket configurations under error conditions.
+
+With the help of AI-Agents: GitHub Copilot
+
+Upstream Patch reference: https://patch-diff.githubusercontent.com/raw/rsyslog/rsyslog/pull/6750.patch
+---
+ plugins/omuxsock/omuxsock.c     |  26 ++++++--
+ tests/uxsock_multiple.sh        |  24 ++++++-
+ tests/uxsock_multiple_netns.sh  |  27 +++++++-
+ tests/uxsock_simple.sh          |   6 +-
+ tests/uxsock_simple_abstract.sh |  14 +++-
+ tests/uxsockrcvr.c              | 112 ++++++++++++++++++++++----------
+ 6 files changed, 158 insertions(+), 51 deletions(-)
+
+diff --git a/plugins/omuxsock/omuxsock.c b/plugins/omuxsock/omuxsock.c
+index 54fe257..3f62c55 100644
+--- a/plugins/omuxsock/omuxsock.c
++++ b/plugins/omuxsock/omuxsock.c
+@@ -443,7 +443,7 @@ ENDdbgPrintInstInfo
+ static rsRetVal sendMsg(instanceData *pData, char *msg, size_t len)
+ {
+ 	DEFiRet;
+-	unsigned lenSent = 0;
++	ssize_t lenSent = 0;
+ 
+ 	if(pData->sock == INVLD_SOCK) {
+ 		CHKiRet(doTryResume(pData));
+@@ -460,17 +460,29 @@ static rsRetVal sendMsg(instanceData *pData, char *msg, size_t len)
+ 		} else {
+ 			lenSent = sendto(pData->sock, msg, len, 0, (const struct sockaddr *)&pData->addr, pData->addrLen);
+ 		}
+-		if(lenSent != len) {
++		if ((size_t)lenSent != len) {
+ 			int eno = errno;
+ 			char errStr[1024];
+ 
++			if (lenSent != -1) {
++				eno = 0;
++			}
++
+ 			/*
+-			 * XXX/rgerhards: how is this message correct, in that we are returning OK still?
+-			 * In reality, the remainder of the partially sent message (or never sent message)
+-			 * is simply dropped, and we do not change the state of the socket.
++			 * For connected sockets, we'll let the infrastructure resume us according to its own
++			 * criteria.  For unconnected sockets, we'll simply try again on the next message received.
+ 			 */
+-			DBGPRINTF("omuxsock suspending: send%s(), socket %d, error: %d = %s.\n", pData->bConnected ? "" : "to",
+-					pData->sock, eno, rs_strerror_r(eno, errStr, sizeof(errStr)));
++			if (pData->bConnected) {
++				LogError(eno, RS_RET_SUSPENDED, "omuxsock suspending: send(), socket %d, len %zu, sent %zd",
++						pData->sock, len, lenSent);
++				if (iRet == RS_RET_OK) {
++					iRet = RS_RET_SUSPENDED;
++				}
++			} else {
++				DBGPRINTF("omuxsock: sendto(), socket %d, len %zu, sent %zd, error: %d = %s.\n", pData->sock, len,
++						lenSent, eno, rs_strerror_r(eno, errStr, sizeof(errStr)));
++			}
++			closeSocket(pData);
+ 		}
+ 	}
+ 
+diff --git a/tests/uxsock_multiple.sh b/tests/uxsock_multiple.sh
+index 93ea9e2..2504d85 100755
+--- a/tests/uxsock_multiple.sh
++++ b/tests/uxsock_multiple.sh
+@@ -71,9 +71,16 @@ for name in "${SOCKET_NAMES[@]}"; do
+ done
+ 
+ # now do the usual run
++RS_REDIR="> ${RSYSLOG_DYNNAME}.log 2>&1"
+ startup
+ # 10000 messages should be enough
+ injectmsg 0 10000
++wait_queueempty
++echo resetting uxsockrcvr...
++for pid in ${BGPROCESS[@]}; do
++    kill -HUP $pid
++done
++injectmsg 10000 10000
+ shutdown_when_empty # shut down rsyslogd when done processing messages
+ wait_shutdown
+ 
+@@ -86,10 +93,21 @@ for pid in ${BGPROCESS[@]}; do
+ done
+ echo background processes have terminated, continue test...
+ 
+-# and continue the usual checks
++# and continue the usual checks.
+ BASE=${RSYSLOG_OUT_LOG}
+ for name in "${SOCKET_NAMES[@]}"; do
+-    RSYSLOG_OUT_LOG=${BASE}.${name##*.}
+-    seq_check 0 9999
++    SEQ_CHECK_FILE=${BASE}.${name##*.}
++    case ${name##*.} in
++        STREAM|SEQPACKET)
++            echo 10000 >> ${SEQ_CHECK_FILE}
++            ;;
++    esac
++    seq_check 0 19999
+ done
++
++# Verify that we get messages for when our receiver reset
++# We don't redirect with valgrind
++if [ "${USE_VALGRIND}" != "YES" ]; then
++    content_check "omuxsock suspending: send(), socket " ${RSYSLOG_DYNNAME}.log
++fi
+ exit_test
+diff --git a/tests/uxsock_multiple_netns.sh b/tests/uxsock_multiple_netns.sh
+index d233d30..6aa8700 100755
+--- a/tests/uxsock_multiple_netns.sh
++++ b/tests/uxsock_multiple_netns.sh
+@@ -97,9 +97,16 @@ for name in "${SOCKET_NAMES[@]}"; do
+ done
+ 
+ # now do the usual run
++RS_REDIR="> ${RSYSLOG_DYNNAME}.log 2>&1"
+ startup
+ # 10000 messages should be enough
+ injectmsg 0 10000
++wait_queueempty
++echo resetting uxsockrcvr
++for pid in ${BGPROCESS[@]}; do
++    kill -HUP $pid
++done
++injectmsg 10000 10000
+ shutdown_when_empty # shut down rsyslogd when done processing messages
+ wait_shutdown
+ 
+@@ -119,10 +126,24 @@ for name in "${SOCKET_NAMES[@]}"; do
+     ip netns delete "${NS}" > /dev/null 2>&1
+ done
+ 
+-# and continue the usual checks
++# and continue the usual checks.
++# For connected sockets, we expect a single message loss
++# which causes the SUSPEND state.  Add it back here to
++# simplify the seq_check.
+ BASE=${RSYSLOG_OUT_LOG}
+ for name in "${SOCKET_NAMES[@]}"; do
+-    RSYSLOG_OUT_LOG=${BASE}.${name##*.}
+-    seq_check 0 9999
++    SEQ_CHECK_FILE=${BASE}.${name##*.}
++    case ${name##*.} in
++        STREAM|SEQPACKET)
++            echo 10000 >> ${SEQ_CHECK_FILE}
++            ;;
++    esac
++    seq_check 0 19999
+ done
++
++# Verify that we get messages for when our receiver reset
++# We don't redirect with valgrind
++if [ "${USE_VALGRIND}" != "YES" ]; then
++    content_check "omuxsock suspending: send(), socket " ${RSYSLOG_DYNNAME}.log
++fi
+ exit_test
+diff --git a/tests/uxsock_simple.sh b/tests/uxsock_simple.sh
+index 2cbd7ca..d33de7f 100755
+--- a/tests/uxsock_simple.sh
++++ b/tests/uxsock_simple.sh
+@@ -31,6 +31,10 @@ echo background uxsockrcvr process id is $BGPROCESS
+ startup
+ # 10000 messages should be enough
+ injectmsg 0 10000
++wait_queueempty
++echo resetting uxsockrcvr...
++kill -HUP $BGPROCESS
++injectmsg 10000 10000
+ shutdown_when_empty # shut down rsyslogd when done processing messages
+ wait_shutdown
+ 
+@@ -42,5 +46,5 @@ wait $BGPROCESS
+ echo background process has terminated, continue test...
+ 
+ # and continue the usual checks
+-seq_check 0 9999
++seq_check 0 19999
+ exit_test
+diff --git a/tests/uxsock_simple_abstract.sh b/tests/uxsock_simple_abstract.sh
+index 1a0d09a..2185f15 100755
+--- a/tests/uxsock_simple_abstract.sh
++++ b/tests/uxsock_simple_abstract.sh
+@@ -39,9 +39,14 @@ BGPROCESS=$!
+ echo background uxsockrcvr process id is $BGPROCESS
+ 
+ # now do the usual run
++RS_REDIR="> ${RSYSLOG_DYNNAME}.log 2>&1"
+ startup
+ # 10000 messages should be enough
+ injectmsg 0 10000
++wait_queueempty
++echo resetting uxsockrcvr...
++kill -HUP $BGPROCESS
++injectmsg 10000 10000
+ shutdown_when_empty # shut down rsyslogd when done processing messages
+ wait_shutdown
+ 
+@@ -53,5 +58,12 @@ wait $BGPROCESS
+ echo background process has terminated, continue test...
+ 
+ # and continue the usual checks
+-seq_check 0 9999
++seq_check 0 19999
++
++# Verify that we do NOT get messages for when our receiver reset.
++# We only expect these messages if we have a connected socket.
++# We don't redirect with valgrind
++if [ "${USE_VALGRIND}" != "YES" ]; then
++    check_not_present "omuxsock suspending: send(), socket " ${RSYSLOG_DYNNAME}.log
++fi
+ exit_test
+diff --git a/tests/uxsockrcvr.c b/tests/uxsockrcvr.c
+index 05bbfc6..0ac4f7a 100644
+--- a/tests/uxsockrcvr.c
++++ b/tests/uxsockrcvr.c
+@@ -62,7 +62,7 @@ int abstract;
+ int sockBacklog = MAX_FDS - 1;
+ struct pollfd fds[MAX_FDS];
+ int nfds;
+-
++volatile int need_reset;
+ 
+ /* called to clean up on exit
+  */
+@@ -71,10 +71,17 @@ cleanup(void)
+ {
+ 	int index;
+ 
++	/*
++	* This function is called from a signal handler.  Ensure any
++	* called functions are async-signal-safe as per
++	* signal-safety(7).  close and unlink are safe.
++	*/
+ 	if (!abstract) unlink(sockName);
+ 	for (index = 0; index < nfds; ++index) {
+ 		close(fds[index].fd);
++		fds[index].fd = -1;
+ 	}
++	nfds = 0;
+ }
+ 
+ 
+@@ -84,6 +91,10 @@ doTerm(int __attribute__((unused)) signum)
+ 	exit(1);
+ }
+ 
++void doReset(int __attribute__((unused)) signum) {
++    need_reset = 1;
++}
++
+ 
+ void
+ usage(void)
+@@ -132,6 +143,55 @@ static void _decode_sockType(const char *s) {
+     exit(1);
+ }
+ 
++void initialize_socket(void) {
++    struct sockaddr_un addr; /* address of server */
++
++    /*      Create a UNIX datagram socket for server        */
++    if ((fds[0].fd = socket(AF_UNIX, sockType, 0)) < 0) {
++        perror("server: socket");
++        exit(1);
++    }
++
++    /*      Set up address structure for server socket      */
++    memset(&addr, 0, sizeof(addr));
++    addr.sun_family = AF_UNIX;
++    const size_t sockname_len = strlen(sockName);
++
++    /* Require non-abstract addresses to be terminated. */
++    if (sockname_len >= (sizeof(addr.sun_path) - 1)) {
++        fprintf(stderr, "error: socket path would be truncated\n");
++        exit(1);
++    }
++    memcpy(addr.sun_path + abstract, sockName, sockname_len);
++    /*
++     * Abstract socket addresses do not require termination.
++     */
++    if (!abstract && addr.sun_path[sizeof(addr.sun_path) - 1]) {
++        addr.sun_path[sizeof(addr.sun_path) - 1] = 0;
++    }
++
++    /*
++     * For pathname addresses, the +1 is the terminating \0 character.
++     * For abstract addresses, the +1 is the leading \0 character.
++     * Technically, Linux doesn't care about that terminating \0 for
++     * pathname addresses.
++     */
++    if (bind(fds[0].fd, (struct sockaddr *)&addr, offsetof(struct sockaddr_un, sun_path) + sockname_len + 1) < 0) {
++        perror("server: bind");
++        close(fds[0].fd);
++        exit(1);
++    }
++
++    if (sockConnected && listen(fds[0].fd, sockBacklog) == -1) {
++        perror("server: listen");
++        close(fds[0].fd);
++        exit(1);
++    }
++
++    fds[0].events = POLLIN;
++    nfds = 1;
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -140,7 +200,6 @@ main(int argc, char *argv[])
+ 	int timeout = DFLT_TIMEOUT;
+ 	FILE *fp = stdout;
+ 	unsigned char data[128*1024];
+-	struct  sockaddr_un addr; /* address of server */
+ 	struct  sockaddr from;
+ 	socklen_t fromlen;
+ 	int index;
+@@ -193,52 +252,33 @@ main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
+-	/*      Create a UNIX datagram socket for server        */
+-	if ((fds[0].fd = socket(AF_UNIX, sockType, 0)) < 0) {
+-		perror("server: socket");
++	if (signal(SIGHUP, doReset) == SIG_ERR) {
++		perror("signal(SIGHUP, ...)");
+ 		exit(1);
+ 	}
+ 
+-	atexit(cleanup);
+-
+-	/*      Set up address structure for server socket      */
+-	memset(&addr, 0, sizeof(addr));
+-	addr.sun_family = AF_UNIX;
+-	strncpy(addr.sun_path + abstract, sockName, sizeof(addr.sun_path) - abstract);
+-	/*
+-	 * Abstract socket addresses do not require termination.
+-	 */
+-	if (!abstract && addr.sun_path[sizeof(addr.sun_path) - 1]) {
+-		addr.sun_path[sizeof(addr.sun_path) - 1] = 0;
+-		fprintf(stderr, "warning: socket path truncated: %s\n", addr.sun_path);
+-	}
+-
+-	/*
+-	 * For pathname addresses, the +1 is the terminating \0 character.
+-	 * For abstract addresses, the +1 is the leading \0 character.
+-	 */
+-	if (bind(fds[0].fd, (struct sockaddr *)&addr, offsetof(struct sockaddr_un, sun_path) + strlen(sockName) + 1) < 0) {
+-		perror("server: bind");
+-		close(fds[0].fd);
+-		exit(1);
++	for (index = 0; index < MAX_FDS; ++index) {
++		fds[index].fd = -1;
+ 	}
+-
+-	if (sockConnected && listen(fds[0].fd, sockBacklog) == -1) {
+-		perror("server: listen");
+-		close(fds[0].fd);
+-		exit(1);
+-	}
+-
+-	fds[0].events = POLLIN;
+-	nfds = 1;
++	atexit(cleanup);
+ 
+ 	/* we now run in an endless loop. We do not check who sends us
+ 	 * data. This should be no problem for our testbench use.
+ 	 */
+ 
+ 	while(1) {
++		if (need_reset) {
++			need_reset = 0;
++			cleanup();
++		}
++		if (!nfds) {
++			initialize_socket();
++		}
+ 		rlen = poll(fds, nfds, timeout);
+ 		if(rlen == -1) {
++			if (errno == EINTR) {
++				continue;
++			}
+ 			perror("uxsockrcvr : poll\n");
+ 			exit(1);
+ 		} else if(rlen == 0) {
+-- 
+2.43.0
+
