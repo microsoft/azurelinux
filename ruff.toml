@@ -50,6 +50,12 @@ fixable = ["ALL"]
 "base/images/tests/cases/**/*.py" = ["CPY001", "INP001"]
 "base/images/tests/conftest.py" = ["INP001"]
 
+# Same rationale as base/images/tests above: the component-test cases are a
+# pytest filesystem hierarchy, not an importable package. Only the sibling
+# utils/ tree is packaged by pyproject.toml.
+"base/comps/tests/cases/**/*.py" = ["INP001"]
+"base/comps/tests/conftest.py" = ["INP001"]
+
 # Helpers under scripts/ci/ are executed directly (python3 path/to/script.py)
 # with sibling-module imports, not imported as a package, so they intentionally
 # have no __init__.py. Silence the implicit-namespace-package rule for that tree.
