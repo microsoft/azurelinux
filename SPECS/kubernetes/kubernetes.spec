@@ -7,23 +7,12 @@
 %endif
 %define host_components 'kubelet kubectl kubeadm'
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
-Summary:        Microsoft Kubernetes
-Name:           kubernetes
-Version:        1.30.10
-<<<<<<< HEAD
-Release:        30%{?dist}
-=======
 Release:        32%{?dist}
->>>>>>> 85989df65c ([AutoPR- Security] Patch kubernetes for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659 [HIGH] (#19252))
-License:        ASL 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
 Patch0:         CVE-2024-28180.patch
-<<<<<<< HEAD
 Patch1:         CVE-2024-45338.patch
 Patch2:         CVE-2025-27144.patch
 Patch3:         CVE-2025-22868.patch
@@ -334,22 +323,18 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-<<<<<<< HEAD
-=======
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-32
-- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801
+ - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801
 
 * Thu Sep 17 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.30.10-31
-- Patch for CVE-2026-84304, CVE-2026-84445, CVE-2026-83530
-- Removed patches CVE-2024-45338, CVE-2025-22868, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911,
-  CVE-2025-58190, CVE-2025-65637, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821,
-  CVE-2026-39827, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502,
-  CVE-2026-42506, CVE-2026-46597, CVE-2026-56852, CVE-2026-56855, CVE-2026-78662
+ - Patch for CVE-2026-84304, CVE-2026-84445, CVE-2026-83530
+ - Removed patches CVE-2024-45338, CVE-2025-22868, CVE-2025-22869, CVE-2025-22872, CVE-2025-47911,
+   CVE-2025-58190, CVE-2025-65637, CVE-2026-25680, CVE-2026-25681, CVE-2026-27136, CVE-2026-39821,
+   CVE-2026-39827, CVE-2026-39829, CVE-2026-39830, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502,
+   CVE-2026-42506, CVE-2026-46597, CVE-2026-56852, CVE-2026-56855, CVE-2026-78662
 
->>>>>>> 85989df65c ([AutoPR- Security] Patch kubernetes for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659 [HIGH] (#19252))
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-30
-- Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
-
+ - Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
 * Tue Aug 18 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.30.10-29
  - Bump to rebuild with updated glibc
 
