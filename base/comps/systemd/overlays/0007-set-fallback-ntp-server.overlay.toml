@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use time.windows.com as the only compile-time fallback NTP server"
+type = "spec-search-replace"
+section = "%build"
+regex = '^[[:space:]]*-Dntp-servers=.*$'
+replacement = "        -Dntp-servers=time.windows.com"

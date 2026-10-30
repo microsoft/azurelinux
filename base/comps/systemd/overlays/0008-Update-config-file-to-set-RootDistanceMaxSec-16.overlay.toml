@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Update config file to set RootDistanceMaxSec=16"
+type = "patch-add"
+source = "../Update-config-file-to-set-RootDistanceMaxSec-16.patch"

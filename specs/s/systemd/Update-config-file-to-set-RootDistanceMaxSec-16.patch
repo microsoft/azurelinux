@@ -1,0 +1,28 @@
+From 273d8b25438a8a2caaabf7a3189ab7a16ed88036 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Mon, 2 Nov 2026 11:32:11 -0500
+Subject: [PATCH] Update config file to set RootDistanceMaxSec=16
+
+As we are defaulting to use a Windows NTP server at time.windows.com, the
+recommendation (from chrony) is to need to update the max distance to 16.
+---
+ src/timesync/timesyncd.conf.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/timesync/timesyncd.conf.in b/src/timesync/timesyncd.conf.in
+index 6ef41cf..9ccc3c7 100644
+--- a/src/timesync/timesyncd.conf.in
++++ b/src/timesync/timesyncd.conf.in
+@@ -19,7 +19,8 @@
+ [Time]
+ #NTP=
+ #FallbackNTP={{NTP_SERVERS}}
+-#RootDistanceMaxSec=5
++# https://gitlab.com/chrony/chrony/-/blob/master/doc/faq.adoc?ref_type=heads#user-content-using-a-windows-ntp-server
++RootDistanceMaxSec=16
+ #PollIntervalMinSec=32
+ #PollIntervalMaxSec=2048
+ #ConnectionRetrySec=30
+-- 
+2.51.0
+
