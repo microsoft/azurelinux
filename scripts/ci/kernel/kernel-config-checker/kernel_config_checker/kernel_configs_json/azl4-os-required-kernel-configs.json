@@ -3315,6 +3315,20 @@
       "name": "kernel",
       "kernel_configs": [
         {
+          "name": "CONFIG_DEBUG_VFS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "n"
+            },
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "Keep VFS debugging disabled in the production kernel on both architectures to improve boot performance and reduce unnecessary logging."
+        },
+        {
           "name": "CONFIG_ACPI_APEI_GHES",
           "values": [
             {
