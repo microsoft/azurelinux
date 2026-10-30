@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        1.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -15,6 +15,10 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 # Use generate_source_tarball.sh script with the package version to build this tarball.
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2026-78659.patch
+Patch1:         CVE-2026-78660.patch
+Patch2:         CVE-2026-78669.patch
+Patch3:         CVE-2026-97032.patch
 BuildRequires: golang >= 1.25
 BuildRequires: e2fsprogs
 BuildRequires: systemd-udev
@@ -110,6 +114,9 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-2
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
+
 * Thu Oct 01 2026 Chris Gunn <chrisgun@microsoft.com> - 1.7.0-1
 - Upgrade to version 1.7.0
 - Fixes CVE-2026-81870, CVE-2026-81871, CVE-2026-81872
