@@ -20,7 +20,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 2
+%define azl_pkgrelease 3
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.43.02
 # AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
@@ -4327,6 +4327,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Nov 05 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.3
+- Build x86 and ARM64 AES and GHASH implementations into the kernel for early FIPS self-tests
+
 * Sun Nov 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.2
 - Enable CONFIG_BLK_CGROUP_IOLATENCY=y on both architectures
 - Enable CONFIG_HSA_AMD=y, CONFIG_HSA_AMD_SVM=y, and CONFIG_HSA_AMD_P2P=y
