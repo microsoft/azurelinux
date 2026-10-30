@@ -22,7 +22,7 @@ Patch11:        CVE-2026-33186.patch
 Patch12:        CVE-2026-73500.patch
 Patch13:        CVE-2026-37236.patch
 BuildRequires:  golang < 1.25
-=======
+
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
