@@ -20,6 +20,9 @@ Patch103:       CVE-2025-56226.patch
 Patch104:       CVE-2026-37555.patch
 Patch105:       CVE-2025-52194.patch
 Patch106:       CVE-2026-88386.patch
+
+BuildRequires:  alsa-lib-devel
+BuildRequires:  autogen
 BuildRequires:  gcc
 BuildRequires:  gsm-devel
 BuildRequires:  libtool
@@ -141,7 +144,6 @@ LD_LIBRARY_PATH=$PWD/src/.libs make check
 %{_libdir}/pkgconfig/sndfile.pc
 
 %changelog
-
 * Fri Oct 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-7
 - Patch for CVE-2026-88386
 
@@ -150,9 +152,6 @@ LD_LIBRARY_PATH=$PWD/src/.libs make check
 
 * Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-5
 - Patch for CVE-2026-37555
-
-* Sat Jan 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-4
-- Patch for CVE-2025-56226
 
 * Sat Jan 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-4
 - Patch for CVE-2025-56226
