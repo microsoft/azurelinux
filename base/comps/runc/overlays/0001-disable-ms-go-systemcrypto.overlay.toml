@@ -1,0 +1,27 @@
+# Microsoft build of Go enables its systemcrypto (OpenSSL) backend by default,
+# which dlopens libcrypto.so during Go runtime init. `runc init` joins the
+# container's mount namespace (libcontainer/nsenter) *before* the Go runtime
+# starts, so the dlopen resolves against the container rootfs. Most images
+# (busybox, distroless, scratch) do not ship libcrypto.so, so every exec panics
+# in opensslsetup.init and fails with "procReady not received".
+#
+# runc 1.5.2 makes no security-relevant crypto calls: on Linux the only crypto
+# imports are vendored SHA-1 for eBPF program tags (cilium/ebpf, mirrors the
+# kernel's bpf_prog_calc_tag) and crypto/rand in a go-selinux MCS helper that
+# runc does not call. Build runc with Go standard library crypto instead.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://github.com/opencontainers/runc/issues/4916" }]
+
+[[overlays]]
+description = "Build runc with Go standard library crypto (MS_GO_NOSYSTEMCRYPTO=1): runc init re-execs inside the container mount namespace, where the systemcrypto backend cannot dlopen libcrypto.so and panics, breaking every exec"
+type = "spec-prepend-lines"
+section = "%build"
+lines = ["export MS_GO_NOSYSTEMCRYPTO=1"]
+
+[[overlays]]
+description = "Compile runc's %check tests with the same crypto backend as the shipped binary"
+type = "spec-prepend-lines"
+section = "%check"
+lines = ["export MS_GO_NOSYSTEMCRYPTO=1"]
