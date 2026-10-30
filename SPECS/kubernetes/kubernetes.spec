@@ -12,42 +12,6 @@ Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
-Patch0:         CVE-2024-28180.patch
-Patch1:         CVE-2024-45338.patch
-Patch2:         CVE-2025-27144.patch
-Patch3:         CVE-2025-22868.patch
-Patch4:         CVE-2025-22869.patch
-Patch5:         CVE-2024-51744.patch
-Patch6:         CVE-2025-30204.patch
-Patch7:         CVE-2025-22872.patch
-Patch8:         CVE-2025-4563.patch
-Patch9:         CVE-2025-31133.patch
-Patch10:        CVE-2025-52565.patch
-Patch11:        CVE-2025-13281.patch
-Patch12:        CVE-2025-65637.patch
-Patch13:        CVE-2025-52881.patch
-Patch14:        CVE-2025-47911.patch
-Patch15:        CVE-2025-58190.patch
-Patch16:        CVE-2026-35469.patch
-Patch17:        CVE-2026-39821.patch
-Patch18:        CVE-2026-39829.patch
-Patch19:        CVE-2026-39830.patch
-Patch20:        CVE-2026-39834.patch
-Patch21:        CVE-2026-42506.patch
-Patch22:        CVE-2026-46597.patch
-Patch23:        CVE-2026-27136.patch
-Patch24:        CVE-2026-25680.patch
-Patch25:        CVE-2026-25681.patch
-Patch26:        CVE-2026-39827.patch
-Patch27:        CVE-2026-39835.patch
-Patch28:        CVE-2026-42502.patch
-Patch29:        CVE-2026-56852.patch
-Patch30:        CVE-2024-7598.patch
-Patch31:        CVE-2026-73500.patch
-Patch32:        CVE-2026-37236.patch
-Patch33:        CVE-2026-56855.patch
-Patch34:        CVE-2026-78662.patch
-=======
 Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2024-51744.patch
 Patch3:         CVE-2025-30204.patch
@@ -70,7 +34,6 @@ Patch19:        CVE-2026-78663.patch
 Patch20:        CVE-2026-78669.patch
 Patch21:        CVE-2026-97032.patch
 Patch22:        CVE-2026-61801.patch
->>>>>>> 85989df65c ([AutoPR- Security] Patch kubernetes for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659 [HIGH] (#19252))
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
