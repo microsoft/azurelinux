@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ Patch1012:      CVE-2026-13346v1.patch
 Patch1013:      CVE-2026-102925.patch
 Patch1014:      CVE-2026-102930.patch
 Patch1015:      remove-compromised-wheel-ca-roots.patch
+# Keep these backports in dependency order rather than CVE-number order.
 Patch1016:      CVE-2026-113732.patch
 Patch1017:      CVE-2026-113716.patch
 Patch1018:      CVE-2026-113723.patch
@@ -39,6 +40,9 @@ Patch1026:      CVE-2026-113719.patch
 Patch1027:      CVE-2026-113721.patch
 Patch1028:      CVE-2026-102938.patch
 Patch1029:      CVE-2026-115586.patch
+BuildArch:      noarch
+
+%description
 virtualenv is a tool to create isolated Python environment.
 
 %package -n     python3-virtualenv
@@ -85,6 +89,9 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 1027 -p1
 %patch -P 1028 -p1
 %patch -P 1029 -p1
+
+# Manual patching for CVE-2025-50181 and CVE-2026-1703v0
+# For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
 # For CVE-2026-1703, unpacking.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
 # Affected files are under src and archived inside a .whl file, so we need to unpack it, apply the patch, and then re-zip it.
 
@@ -182,6 +189,9 @@ zip -r ../src/virtualenv/seed/wheels/embed/unpacked_wheel-0.45.1-py3-none-any.wh
 popd
 rm -rf unpacked_wheel-0.45.1-py3-none-any
 
+%{__python3} Tools/remove-untrusted-wheel-roots.py \
+    --expected-removals 3 src/virtualenv/seed/wheels/embed/pip-*.whl
+
 %generate_buildrequires
 
 %build
@@ -191,14 +201,41 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 %pyproject_install
 
 %check
-# Pin packaging to the RPM-installed version so pip does not try to
-# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
-# rpm-installed copy has no RECORD file, so pip aborts with
-# uninstall-no-record-file and the test tooling is never installed.
-pip3 install packaging==23.2 'tox>=3.27.1,<4.0.0'
-# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
-sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
-tox -e py
+# Keep the test environment outside zipapp's source copy.
+check_env=$(mktemp -d "$PWD/../virtualenv-check.XXXXXX")
+python3 -m venv "$check_env"
+cat > "$check_env/constraints.txt" <<'EOF'
+covdefaults==2.3.0
+coverage==7.10.6
+coverage-enable-subprocess==1.0
+distlib==0.3.8
+filelock==3.20.3
+flaky==3.8.1
+iniconfig==2.1.0
+packaging==25.0
+platformdirs==4.3.8
+pluggy==1.6.0
+pygments==2.19.2
+pytest==8.4.2
+pytest-env==1.1.5
+pytest-mock==3.15.1
+pytest-randomly==3.16.0
+pytest-timeout==2.4.0
+python-dateutil==2.9.0.post0
+setuptools==80.9.0
+six==1.17.0
+time-machine==2.19.0
+typing-extensions==4.13.2
+EOF
+set -- %{_pyproject_wheeldir}/*.whl
+test "$#" -eq 1
+"$check_env/bin/python" -m pip install --disable-pip-version-check \
+    --constraint "$check_env/constraints.txt" "$1[test]"
+export PATH="$check_env/bin:$PATH"
+unset COVERAGE_PROCESS_START
+export PYTHONWARNDEFAULTENCODING=1
+"$check_env/bin/python" -m pytest --junitxml junit.py.xml \
+    tests -k 'not test_can_build_c_extensions' --int
 
 %files -n python3-virtualenv
 %defattr(-,root,root,-)
@@ -207,12 +244,13 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
-* Thu Oct 29 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-10
-- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
-  ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
+* Fri Oct 30 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-10
+- Preserve the dev fix for RPM-owned packaging during ptest bootstrap.
+- Use the published private, pinned test environment in place of the
+  system-pip packaging==23.2/tox bootstrap.
 
 * Tue Oct 27 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 20.36.1-9
-- Patch for CVE-2026-102938, CVE-2026-113713, and CVE-2026-113716.
+- Patch for CVE-2026-102938, CVE-2026-113713, CVE-2026-113715, and CVE-2026-113716.
 - Patch for CVE-2026-113719, CVE-2026-113720, CVE-2026-113721, and CVE-2026-113722.
 - Patch for CVE-2026-113723, CVE-2026-113725, CVE-2026-113726, and CVE-2026-113732.
 - Patch for CVE-2026-113776 and CVE-2026-115586.
@@ -224,9 +262,6 @@ tox -e py
 
 * Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
 - Patch for CVE-2026-102925 and CVE-2026-102930
-
-* Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
-- Patch for CVE-2026-13346
 
 * Mon Aug 03 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-6
 - Patch for CVE-2026-13346
