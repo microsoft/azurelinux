@@ -1,0 +1,50 @@
+{
+    "container-base": {
+        "x86_64": {"min_kib": 46168, "max_kib": 56429},
+        "aarch64": {"min_kib": 44314, "max_kib": 54162}
+    },
+    "container-busybox": {
+        "x86_64": {"min_kib": 1875, "max_kib": 2293},
+        "aarch64": {"min_kib": 1897, "max_kib": 2320}
+    },
+    "container-distroless-base": {
+        "x86_64": {"min_kib": 8089, "max_kib": 9888},
+        "aarch64": {"min_kib": 7046, "max_kib": 8613}
+    },
+    "container-distroless-debug": {
+        "x86_64": {"min_kib": 8875, "max_kib": 10848},
+        "aarch64": {"min_kib": 7872, "max_kib": 9623}
+    },
+    "container-distroless-minimal": {
+        "x86_64": {"min_kib": 1490, "max_kib": 1822},
+        "aarch64": {"min_kib": 1490, "max_kib": 1823}
+    },
+    "container-nginx": {
+        "x86_64": {"min_kib": 26393, "max_kib": 32260},
+        "aarch64": {"min_kib": 24749, "max_kib": 30249}
+    },
+    "container-nodejs": {
+        "x86_64": {"min_kib": 41755, "max_kib": 51035},
+        "aarch64": {"min_kib": 39701, "max_kib": 48525}
+    },
+    "container-postgres": {
+        "x86_64": {"min_kib": 52979, "max_kib": 64753},
+        "aarch64": {"min_kib": 51235, "max_kib": 62621}
+    },
+    "container-python": {
+        "x86_64": {"min_kib": 31554, "max_kib": 38567},
+        "aarch64": {"min_kib": 30310, "max_kib": 37047}
+    },
+    "container-pytorch": {
+        "x86_64": {"min_kib": 2925527, "max_kib": 3575645},
+        "aarch64": {"min_kib": 205264, "max_kib": 250880}
+    },
+    "container-telegraf": {
+        "x86_64": {"min_kib": 56458, "max_kib": 69006},
+        "aarch64": {"min_kib": 51408, "max_kib": 62833}
+    },
+    "wsl": {
+        "x86_64": {"min_kib": 155262, "max_kib": 189766},
+        "aarch64": {"min_kib": 152345, "max_kib": 186200}
+    }
+}
