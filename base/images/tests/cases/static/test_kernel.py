@@ -3,12 +3,33 @@
 
 from __future__ import annotations
 
+import shlex
+import subprocess
 from typing import TYPE_CHECKING
 
 import pytest
+from utils.disk import LSINITRD
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+
+@pytest.mark.require_capability("machine-bootable")
+def test_initrds_are_hostonly(rootfs: Path) -> None:
+    """Validate the final disk's initrds, not KIWI's intermediate generic ones."""
+    initrds = list((rootfs / "boot").glob("initramfs-*.img"))
+    assert initrds, "No initramfs images found"
+    for initrd in initrds:
+        result = subprocess.run(
+            [LSINITRD.name, "-f", "usr/lib/dracut/build-parameter.txt", str(initrd)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        arguments = shlex.split(result.stdout)
+        assert "--hostonly" in arguments, f"{initrd.name} was not generated in host-only mode"
+        assert "--no-hostonly" not in arguments, f"{initrd.name} overrides host-only mode"
+        assert "--no-hostonly-cmdline" in arguments, f"{initrd.name} may capture the build host's command line"
 
 
 @pytest.mark.require_capability("machine-bootable")

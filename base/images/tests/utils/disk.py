@@ -17,6 +17,13 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+LSINITRD = NativeTool(
+    name="lsinitrd",
+    package_hint="dracut",
+    reason="verify shipped VM initrds use host-only generation",
+    when="vm",
+)
+
 VIRT_INSPECTOR = NativeTool(
     name="virt-inspector",
     package_hint="guestfs-tools",
