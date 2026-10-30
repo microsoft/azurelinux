@@ -1,3 +1,3 @@
 [components.shim]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "7b08c421ed4dbca88af0cbaabb73332d08944c86" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "deb26f49588fd3e498134fb250b0d21396de49d9" }
 

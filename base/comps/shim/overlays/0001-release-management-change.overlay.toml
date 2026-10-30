@@ -10,21 +10,15 @@ type = "spec-search-replace"
 regex = "%global dist.*"
 replacement = ""
 
-# TEMPORARILY remove release from the dependency on the shim unsigned packages
+# Drop the upstream release-qualified dependency; Azure Linux release numbers differ.
 [[overlays]]
-description = "Pin the x64 unsigned-shim BuildRequires to 15.8 (drop the release-qualified dependency)"
+description = "Require the x64 unsigned-shim 16.1 package without constraining its Azure Linux release"
 type = "spec-search-replace"
 regex = "^BuildRequires:.*unsignedx64.*$"
-replacement = "BuildRequires: %{unsignedx64} = 15.8"
+replacement = "BuildRequires: %{unsignedx64} = 16.1"
 
 [[overlays]]
-description = "Pin the ia32 unsigned-shim BuildRequires to 15.8 (drop the release-qualified dependency)"
-type = "spec-search-replace"
-regex = "^BuildRequires:.*unsignedia32.*$"
-replacement = "BuildRequires: %{unsignedia32} = 15.8"
-
-[[overlays]]
-description = "Pin the aa64 unsigned-shim BuildRequires to 15.8 (drop the release-qualified dependency)"
+description = "Require the aarch64 unsigned-shim 16.1 package without constraining its Azure Linux release"
 type = "spec-search-replace"
 regex = "^BuildRequires:.*unsignedaa64.*$"
-replacement = "BuildRequires: %{unsignedaa64} = 15.8"
+replacement = "BuildRequires: %{unsignedaa64} = 16.1"

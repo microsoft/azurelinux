@@ -4,11 +4,12 @@
 # this is to make us only expand %%{dist} if we're on a modularity build.
 # it's 2 macros make vim's \c not put a brace at the end of the changelog.
 %global _dist %{expand:%{?_module_build:%%{?dist}}}
+%global efi_has_alt_arch 0
 
 
 Name:		shim
-Version:	15.8
-Release: 7%{?dist}
+Version:	16.1
+Release: 8%{?dist}
 Summary:	First-stage UEFI bootloader
 License:	BSD-3-Clause
 URL:		https://github.com/rhboot/shim/
@@ -27,11 +28,9 @@ Source1:	shim.conf
 # keep these two lists of sources synched up arch-wise.  That is 0 and 10
 # match, 1 and 11 match, ...
 Source10:	BOOTAA64.CSV
-Source20:	shimaa64.efi
-Source11:	BOOTIA32.CSV
-Source21:	shimia32.efi
+Source20: azurelinux-shimaa64.efi
 Source12:	BOOTX64.CSV
-Source22:	shimx64.efi
+Source22: azurelinux-shimx64.efi
 #Source13:	BOOTARM.CSV
 #Source23:	shimarm.efi
 
@@ -44,11 +43,10 @@ BuildRequires:	pesign >= 0.112-20.fc27
 # (shim 16+) by making the unsigned packages all provide "shim-unsigned", so
 # we can just BuildRequires that.
 %ifarch x86_64
-BuildRequires: %{unsignedx64} = 15.8
-BuildRequires: %{unsignedia32} = 15.8
+BuildRequires: %{unsignedx64} = 16.1
 %endif
 %ifarch aarch64
-BuildRequires: %{unsignedaa64} = 15.8
+BuildRequires: %{unsignedaa64} = 16.1
 #BuildRequires: %% {unsignedarm} = %% {shimverarm}
 %endif
 
@@ -67,9 +65,6 @@ cd %{_builddir}
 rm -rf shim-%{version}
 mkdir shim-%{version}
 
-test -e %{shimdirx64}/$(basename %{shimefix64}) && cp -vf %{shimdirx64}/$(basename %{shimefix64}) %{shimefix64} ||:
-test -e %{shimdiria32}/$(basename %{shimefiia32}) && cp -vf %{shimdiria32}/$(basename %{shimefiia32}) %{shimefiia32} ||:
-test -e %{shimdiraa64}/$(basename %{shimefiaa64}) && cp -vf %{shimdiraa64}/$(basename %{shimefiaa64}) %{shimefiaa64} ||:
 %build
 
 cd shim-%{version}
@@ -113,6 +108,15 @@ install -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/dnf/protected.d/
 %endif
 
 %changelog
+* Thu Oct 30 2025 Peter Jones <pjones@redhat.com> - 16.1-3
+- Rebuild for newer efi-rpm-macros
+
+* Wed Oct 29 2025 Peter Jones <pjones@redhat.com> - 16.1-2
+- Fix mokmanager and fallback signing on Aarch64
+
+* Mon Oct 27 2025 Peter Jones <pjones@redhat.com> - 16.1-1
+- Update to shim-16.1
+
 * Tue Mar 19 2024 Peter Jones <pjones@redhat.com> - 15.8-3
 - Fix fbx64/mmx64 signing.
   Related: rhbz#2189197

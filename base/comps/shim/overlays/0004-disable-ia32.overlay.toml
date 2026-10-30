@@ -1,0 +1,32 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove the IA32 boot CSV source declaration"
+type = "spec-remove-tag"
+tag = "Source11"
+
+[[overlays]]
+description = "Remove the IA32 shim binary source declaration"
+type = "spec-remove-tag"
+tag = "Source21"
+
+[[overlays]]
+description = "Remove the IA32 unsigned-shim build dependency"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "%{unsignedia32} = %{shimveria32}"
+
+[[overlays]]
+description = "Disable the alternate EFI architecture build"
+type = "spec-search-replace"
+regex = '^%global _dist %\{expand:%\{\?_module_build:%%\{\?dist\}\}\}$'
+replacement = """%global _dist %{expand:%{?_module_build:%%{?dist}}}
+%global efi_has_alt_arch 0"""
+
+[[overlays]]
+description = "Remove the IA32 shim binary source manifest entry"
+type = "file-search-replace"
+file = "sources"
+regex = 'SHA512 \(shimia32\.efi\) = [^\r\n]*\r?\n?'
