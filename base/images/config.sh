@@ -3,6 +3,9 @@
 set -euo pipefail
 
 case ",${kiwi_profiles:-}," in
+    *,core,*)
+        exec /image/config-container-base.sh --mode=locales
+        ;;
     # distroless-* and busybox-workload declare runtime-package-management =
     # false: no package manager (or shell) is meant to survive into the
     # shipped image, so run the full keep-list-driven strip (removes
