@@ -3539,13 +3539,6 @@
           "justification": "Align kernel 6.18 with its generated configuration"
         },
         {
-          "name": "CONFIG_DMI_SYSFS",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
           "name": "CONFIG_DRM",
           "values": [
             { "architecture": "x86_64", "value": "y" },

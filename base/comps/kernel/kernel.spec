@@ -4328,6 +4328,7 @@ fi\
 - Enable CONFIG_BLK_CGROUP_IOLATENCY=y on both architectures
 - Enable CONFIG_HSA_AMD=y, CONFIG_HSA_AMD_SVM=y, and CONFIG_HSA_AMD_P2P=y
   on x86_64
+- Enable CONFIG_DMI_SYSFS=m on x86_64
 
 * Thu Oct 29 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.57.1
