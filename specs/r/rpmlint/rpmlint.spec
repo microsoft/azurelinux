@@ -6,7 +6,7 @@
 
 Name:           rpmlint
 Version:        2.8.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Tool for checking common errors in RPM packages
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/rpmlint
@@ -44,6 +44,7 @@ Requires:       rpm-build
 Requires:       /usr/bin/appstream-util
 Requires:       /usr/bin/desktop-file-validate
 
+Source6: azurelinux.toml
 %description
 rpmlint is a tool for checking common errors in RPM packages. Binary
 and source packages as well as spec files can be checked.
@@ -85,6 +86,7 @@ fi
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/rpmlint/
 cp -a %{SOURCE1} %{SOURCE3} %{SOURCE4} %{SOURCE5} %{buildroot}%{_sysconfdir}/xdg/rpmlint/
 
+cp -a %{SOURCE6} %{buildroot}%{_sysconfdir}/xdg/rpmlint/zz-azurelinux.toml
 %check
 %if %{with tests}
 %pytest %{?rhel:--ignore test/test_erlang.py}

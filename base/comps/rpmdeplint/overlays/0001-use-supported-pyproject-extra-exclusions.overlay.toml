@@ -1,0 +1,28 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Exclude the unavailable test-only rpmfluff dependency from dynamic build requirements."
+type = "spec-search-replace"
+regex = '^%pyproject_buildrequires %\{\?el9:-w\} -x docs -x tests$'
+replacement = "%pyproject_buildrequires %{?el9:-w} -x docs"
+
+[[overlays]]
+description = "Retain pytest for the upstream unit-test suite without requesting the tests extra."
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "python3-pytest"
+
+[[overlays]]
+description = "Require the DNF4 Python binding used to resolve repository variables."
+type = "spec-insert-tag"
+package = "python3-rpmdeplint"
+tag = "Requires"
+value = "python3-dnf"
+
+[[overlays]]
+description = "Run all unit tests except modules that require the unavailable rpmfluff acceptance-test fixture."
+type = "spec-search-replace"
+regex = '^%pytest tests/unit/ -k "not TestDependencyAnalyzer"$'
+replacement = "%pytest tests/unit --ignore=tests/unit/test_dependency_analyzer.py --ignore=tests/unit/test_repodata.py"

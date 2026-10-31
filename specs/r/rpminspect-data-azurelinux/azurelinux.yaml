@@ -1,0 +1,93 @@
+# Azure Linux rpminspect configuration.
+#
+# This initial policy uses the engine's generic data for structural RPM
+# inspections. It deliberately does not adopt Fedora license policy.
+---
+common:
+    workdir: /var/tmp/rpminspect
+
+environment:
+    product_release: AZURELINUX4
+
+vendor:
+    vendor_data_dir: /usr/share/rpminspect
+    licensedb:
+        - generic.json
+
+inspections:
+    # Enable this after azurelinux-license-data supplies curated policy.
+    license: off
+    # Generic policy parses non-manpage documentation and helper scripts as
+    # manual pages. Enable after Azure Linux supplies tailored exceptions.
+    manpage: off
+
+annocheck:
+    jobs:
+        hardened: --ignore-unknown
+
+lto:
+    lto_symbol_name_prefixes:
+        - .gnu.lto_
+        - .gnu.debuglto_
+        - __gnu_lto_v1
+        - __gnu_lto_slim
+
+pathmigration:
+    migrated_paths:
+        /bin: /usr/bin
+        /sbin: /usr/sbin
+        /lib: /usr/lib
+        /lib64: /usr/lib64
+    excluded_paths:
+        - /lib/modules
+
+# rpminspect only loads this file (via the rpminspect.yaml -> azurelinux.yaml
+# symlink), not the generic profile's own data file, so settings consumed by
+# enabled inspections must be carried here explicitly rather than assumed
+# from the rpminspect-data-generic dependency. Without these, badfuncs and
+# unicode run with empty forbidden-function/codepoint lists and silently
+# report OK without checking anything. Carried verbatim from
+# rpminspect-data-generic's generic.yaml.
+badfuncs:
+    forbidden:
+        - gethostbyname
+        - gethostbyname2
+        - gethostbyaddr
+        - inet_addr
+        - inet_aton
+        - inet_nsap_addr
+        - inet_ntoa
+        - inet_nsap_ntoa
+        - inet_makeaddr
+        - inet_netof
+        - inet_network
+        - inet_neta
+        - inet_net_ntop
+        - inet_net_pton
+        - rcmd
+        - rexec
+        - rresvport
+
+unicode:
+    exclude: ^(\.git|\.hg|\.desktop|\.ppd|\.txt|\.directory|ChangeLog|NEWS)$
+    excluded_mime_types:
+        - text/x-po
+        - text/x-tex
+        - text/x-troff
+        - text/html
+    forbidden_codepoints:
+        - '0x202A'
+        - '0x202B'
+        - '0x202C'
+        - '0x202D'
+        - '0x202E'
+        - '0x2066'
+        - '0x2067'
+        - '0x2068'
+        - '0x2069'
+
+# rpminspect requires a mapping even when comparing RPMs without Java bytecode.
+# Azure Linux uses the generic data profile until it publishes a release-specific
+# Java policy.
+javabytecode:
+    default: 43

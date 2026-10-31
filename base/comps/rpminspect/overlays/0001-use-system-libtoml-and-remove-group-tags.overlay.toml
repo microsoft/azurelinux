@@ -1,0 +1,21 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Build with the packaged libtoml instead of the bundled copy."
+type = "spec-search-replace"
+regex = '^%if 0%\{\?fedora\}$'
+replacement = "%if 1"
+
+[[overlays]]
+description = "Enable rpminspect's system libtoml Meson option."
+type = "spec-search-replace"
+regex = '^%meson\s+-D\s+tests=false\s+%\{\?fedora:-D\s+with_system_libtoml=true\}\s*$'
+replacement = "%meson -D tests=false -D with_system_libtoml=true"
+
+[[overlays]]
+description = "Remove deprecated RPM Group tags."
+type = "spec-search-replace"
+regex = '^Group:[[:space:]]+Development/Tools$'
+replacement = ""

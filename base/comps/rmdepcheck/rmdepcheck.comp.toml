@@ -1,0 +1,8 @@
+[components.rmdepcheck]
+spec = { type = "local", path = "rmdepcheck.spec" }
+
+[[components.rmdepcheck.source-files]]
+filename = "rmdepcheck-1.1.0.tar.gz"
+hash = "833cfb81ee20879ace6350bf7f6cf9d71c221142aabf6382c148a076a62dd9beafc63ce952d756faa5f6d7811da669fa512f2dfc258dd0951501e1ac7500cbb4"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://files.pythonhosted.org/packages/source/r/rmdepcheck/rmdepcheck-1.1.0.tar.gz" }

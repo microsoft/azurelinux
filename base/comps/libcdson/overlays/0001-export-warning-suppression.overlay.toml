@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Export the unused-result warning suppression to Meson."
+type = "spec-search-replace"
+regex = '^CFLAGS="%\{build_cflags\} -Wno-error=unused-result"$'
+replacement = 'export CFLAGS="%{build_cflags} -Wno-error=unused-result"'

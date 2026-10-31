@@ -1,0 +1,33 @@
+# Install the Azure Linux policy as an additive rpmlint configuration fragment.
+# It is supplied explicitly by component validation until an AZL4 test image
+# carries the rpmlint package and its installed configuration.
+
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add the Azure Linux rpmlint policy fragment to the component sources."
+type = "file-add"
+file = "azurelinux.toml"
+source = "../azurelinux.toml"
+
+[[overlays]]
+description = "Re-enable release-extension validation so the Azure Linux policy can enforce .azl4 releases."
+type = "file-search-replace"
+file = "fedora.toml"
+regex = "(?m)^    '.*not-standard-release-extension.*',$"
+
+[[overlays]]
+description = "Register the Azure Linux rpmlint policy fragment as a source file."
+type = "spec-add-tag"
+tag = "Source6"
+value = "azurelinux.toml"
+
+[[overlays]]
+description = "Install the Azure Linux rpmlint policy beside the upstream policy fragments."
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "cp -a %{SOURCE6} %{buildroot}%{_sysconfdir}/xdg/rpmlint/zz-azurelinux.toml",
+]

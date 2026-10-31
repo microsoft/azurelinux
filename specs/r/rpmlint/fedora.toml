@@ -70,7 +70,7 @@ Filters = [
 ## Stuff autobuild takes care about
 #    '.*invalid-version.*',
 #    '.*invalid-packager.*',
-    '.*not-standard-release-extension.*',
+
 #    '.*invalid-buildhost.*',
     '.*executable-in-library-package.*',
     '.*non-versioned-file-in-library-package.*',
