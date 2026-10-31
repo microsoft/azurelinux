@@ -3537,14 +3537,6 @@
           "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/60759133"
         },
         {
-          "name": "CONFIG_BLK_CGROUP_IOLATENCY",
-          "values": [
-            { "architecture": "x86_64", "value": "n" },
-            { "architecture": "arm64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
           "name": "CONFIG_CRYPTO_ARC4",
           "values": [
             { "architecture": "x86_64", "value": "n" },
