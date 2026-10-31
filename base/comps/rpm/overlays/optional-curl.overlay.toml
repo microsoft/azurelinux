@@ -1,0 +1,21 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Allow minimal images to omit the curl executable used by RPM's optional URL retrieval"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "curl"
+
+[[overlays]]
+description = "Recommend curl so ordinary installations retain RPM URL retrieval when weak dependencies are enabled"
+type = "spec-add-tag"
+tag = "Recommends"
+value = "curl"
+
+[[overlays]]
+description = "Bump RPM's manually managed release for the optional curl dependency"
+type = "spec-search-replace"
+regex = '^%global baserelease 1$'
+replacement = '%global baserelease 2'

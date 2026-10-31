@@ -27,7 +27,7 @@
 
 %global rpmver 6.0.2
 #global snapver rc1
-%global baserelease 1
+%global baserelease 2
 %global sover 10
 
 %global srcver %{rpmver}%{?snapver:-%{snapver}}
@@ -45,7 +45,6 @@ Source10: rpmdb-rebuild.service
 
 Requires: coreutils
 Requires: popt%{_isa} >= 1.10.2.1
-Requires: curl
 Conflicts: systemd < 253.5-6
 
 # RPM used to require an %%install hack (shipped by redhat-rpm-config) in order
@@ -106,6 +105,7 @@ BuildRequires: ima-evm-utils-devel >= 1.0
 BuildRequires: fsverity-utils-devel
 %endif
 
+Recommends: curl
 %patchlist
 # Set rpmdb path to /usr/lib/sysimage/rpm
 rpm-4.17.x-rpm_dbpath.patch
