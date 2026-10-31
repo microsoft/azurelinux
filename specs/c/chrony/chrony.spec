@@ -12,7 +12,7 @@
 
 Name:           chrony
 Version:        4.8
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        An NTP client/server
 
 License:        GPL-2.0-only
@@ -93,6 +93,11 @@ sed -e 's|^\(pool \)\(pool.ntp.org\)|\12.%{vendorzone}\2|' \
 
 echo -e '\n# Use confdir\nconfdir /etc/chrony.d' >> chrony.conf
 
+sed -i -E \
+    -e '/^[[:space:]#]*(server|pool|peer)[[:space:]]/d' \
+    -e '/^# Use four public NTP servers/,+2c\
+# Use the Microsoft NTP server.\
+server time.windows.com iburst' chrony.conf
 touch -r examples/chrony.conf.example2 chrony.conf
 
 # set selinux context in chronyd-restricted service

@@ -7,6 +7,20 @@ regex = "^touch -r examples/chrony.conf.example2 chrony.conf"
 replacement = "echo -e '\\n# Use confdir\\nconfdir /etc/chrony.d' >> chrony.conf\n\ntouch -r examples/chrony.conf.example2 chrony.conf"
 
 [[components.chrony.overlays]]
+description = "Use time.windows.com instead of upstream NTP sources, including commented examples"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^touch -r examples/chrony\.conf\.example2 chrony\.conf$'
+replacement = '''
+sed -i -E \
+    -e '/^[[:space:]#]*(server|pool|peer)[[:space:]]/d' \
+    -e '/^# Use four public NTP servers/,+2c\
+# Use the Microsoft NTP server.\
+server time.windows.com iburst' chrony.conf
+touch -r examples/chrony.conf.example2 chrony.conf'''
+metadata = { category = "azl-branding-policy", upstream-status = "inapplicable" }
+
+[[components.chrony.overlays]]
 description = "Create /etc/chrony.d dir"
 type = "spec-search-replace"
 regex = '\$RPM_BUILD_ROOT%\{_sysconfdir\}/\{sysconfig,logrotate.d\}'
