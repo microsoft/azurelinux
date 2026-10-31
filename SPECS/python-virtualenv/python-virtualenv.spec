@@ -201,41 +201,14 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 %pyproject_install
 
 %check
-# Keep the test environment outside zipapp's source copy.
-check_env=$(mktemp -d "$PWD/../virtualenv-check.XXXXXX")
-python3 -m venv "$check_env"
-cat > "$check_env/constraints.txt" <<'EOF'
-covdefaults==2.3.0
-coverage==7.10.6
-coverage-enable-subprocess==1.0
-distlib==0.3.8
-filelock==3.20.3
-flaky==3.8.1
-iniconfig==2.1.0
-packaging==25.0
-platformdirs==4.3.8
-pluggy==1.6.0
-pygments==2.19.2
-pytest==8.4.2
-pytest-env==1.1.5
-pytest-mock==3.15.1
-pytest-randomly==3.16.0
-pytest-timeout==2.4.0
-python-dateutil==2.9.0.post0
-setuptools==80.9.0
-six==1.17.0
-time-machine==2.19.0
-typing-extensions==4.13.2
-EOF
-set -- %{_pyproject_wheeldir}/*.whl
-test "$#" -eq 1
-"$check_env/bin/python" -m pip install --disable-pip-version-check \
-    --constraint "$check_env/constraints.txt" "$1[test]"
-export PATH="$check_env/bin:$PATH"
-unset COVERAGE_PROCESS_START
-export PYTHONWARNDEFAULTENCODING=1
-"$check_env/bin/python" -m pytest --junitxml junit.py.xml \
-    tests -k 'not test_can_build_c_extensions' --int
+# Pin packaging to the RPM-installed version so pip does not try to
+# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
+# rpm-installed copy has no RECORD file, so pip aborts with
+# uninstall-no-record-file and the test tooling is never installed.
+pip3 install packaging==23.2 'tox>=3.27.1,<4.0.0'
+# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
+sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
+tox -e py
 
 %files -n python3-virtualenv
 %defattr(-,root,root,-)
@@ -244,10 +217,9 @@ export PYTHONWARNDEFAULTENCODING=1
 %{_bindir}/virtualenv
 
 %changelog
-* Fri Oct 30 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-10
-- Preserve the dev fix for RPM-owned packaging during ptest bootstrap.
-- Use the published private, pinned test environment in place of the
-  system-pip packaging==23.2/tox bootstrap.
+* Sat Oct 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-10
+- Reconcile the published CA cleanup with the existing tox-based ptest bootstrap.
+- Pin packaging==23.2 when installing test tooling to preserve RPM-owned packaging.
 
 * Tue Oct 27 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 20.36.1-9
 - Patch for CVE-2026-102938, CVE-2026-113713, CVE-2026-113715, and CVE-2026-113716.

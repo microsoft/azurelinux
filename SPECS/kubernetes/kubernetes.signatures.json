@@ -1,6 +1,7 @@
 {
   "Signatures": {
     "kubelet.service": "3be41509e18552113367252397cbd7a28e2c481de04ec54f09e232ffabda16d2",
+    "kubernetes-v1.30.10-vendor.tar.gz": "b11dfae45827da7b90c0aec237e2727769431e8f1376c9a8542b98e0fceafb9b",
     "kubernetes-v1.30.10.tar.gz": "b93da8f6c47c9d4ed90df4bd96eae71e1af6e0dadfb60342befc59b2acd57c7a"
   }
 }

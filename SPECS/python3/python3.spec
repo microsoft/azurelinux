@@ -5,8 +5,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.12.15
-Release:        2%{?dist}
+Version:        3.12.16
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 # It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
+Patch1:         remove-compromised-wheel-ca-roots.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -150,6 +151,9 @@ export OPT="%{extension_cflags} %{openssl_flags}"
     --enable-optimizations
 %make_build
 
+LD_LIBRARY_PATH=$PWD ./python Tools/remove-untrusted-wheel-roots.py \
+    --expected-removals 2 Lib/ensurepip/_bundled/pip-*.whl
+
 %install
 %make_install
 %{_fixperms} %{buildroot}/*
@@ -242,15 +246,19 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.15-2
-- Reconcile 3.12.14-3 with 3.12.15-1; CVE-2026-17084 patch removed as it is included in 3.12.15
+* Mon Oct 26 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.16-1
+- Upgrade to 3.12.16 for CVE-2026-12345, CVE-2026-114583, CVE-2024-3220
+
+* Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.12.15-3
+- Backport upstream SSL rejection of compromised eMudhra intermediate keys.
+
+* Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.12.15-2
+- Remove affected eMudhra and AAA roots from the ensurepip wheel shipped in python3-libs.
+- Regenerate the bundled wheel's RECORD without changing other payload files.
 
 * Sat Oct 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.15-1
 - Upgrade to 3.12.15 for CVE-2026-15310, CVE-2026-15806, CVE-2026-17084,
   CVE-2026-19445, CVE-2026-19553, CVE-2026-19672, CVE-2026-82049, CVE-2026-87910 
-
-* Mon Sep 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-3
-- Patch for CVE-2026-17084
 
 * Sun Aug 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-2
 - Patch for CVE-2026-15806, CVE-2026-19672

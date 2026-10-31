@@ -2077,8 +2077,8 @@
         "type": "other",
         "other": {
           "name": "containerd2",
-          "version": "2.3.6",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.6.tar.gz"
+          "version": "2.3.7",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.3.7.tar.gz"
         }
       }
     },
@@ -8713,6 +8713,16 @@
           "name": "kubevirt",
           "version": "1.8.4",
           "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.8.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kubevirt-openvmm",
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/microsoft/kubevirt/archive/refs/tags/openvmm-v1.9.0-1.tar.gz"
         }
       }
     },
@@ -15793,8 +15803,8 @@
         "type": "other",
         "other": {
           "name": "openvmm",
-          "version": "0.2.0",
-          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.2.0.tar.gz"
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v0.4.0.tar.gz"
         }
       }
     },
@@ -21363,8 +21373,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.35",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.35.tar.xz"
+          "version": "8.3.36",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.36.tar.xz"
         }
       }
     },
@@ -23943,8 +23953,8 @@
         "type": "other",
         "other": {
           "name": "python-msgpack",
-          "version": "1.0.5",
-          "downloadUrl": "https://github.com/msgpack/msgpack-python/archive/v1.0.5.tar.gz"
+          "version": "1.2.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/msgpack/msgpack-1.2.3.tar.gz"
         }
       }
     },
@@ -25973,8 +25983,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.12.15",
-          "downloadUrl": "https://www.python.org/ftp/python/3.12.15/Python-3.12.15.tar.xz"
+          "version": "3.12.16",
+          "downloadUrl": "https://www.python.org/ftp/python/3.12.16/Python-3.12.16.tar.xz"
         }
       }
     },
@@ -31659,8 +31669,8 @@
         "type": "other",
         "other": {
           "name": "zchunk",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/zchunk/zchunk/archive/1.3.2.tar.gz"
+          "version": "1.5.5",
+          "downloadUrl": "https://github.com/zchunk/zchunk/archive/1.5.5.tar.gz"
         }
       }
     },
