@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,7 @@ Patch1011:      CVE-2026-13346v0.patch
 Patch1012:      CVE-2026-13346v1.patch
 Patch1013:      CVE-2026-102925.patch
 Patch1014:      CVE-2026-102930.patch
+Patch1015:      remove-compromised-wheel-ca-roots.patch
 BuildArch:      noarch
 
 %description
@@ -58,6 +59,7 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 0 -p1
 %patch -P 1013 -p1
 %patch -P 1014 -p1
+%patch -P 1015 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -158,6 +160,9 @@ zip -r ../src/virtualenv/seed/wheels/embed/unpacked_wheel-0.45.1-py3-none-any.wh
 popd
 rm -rf unpacked_wheel-0.45.1-py3-none-any
 
+%{__python3} Tools/remove-untrusted-wheel-roots.py \
+    --expected-removals 3 src/virtualenv/seed/wheels/embed/pip-*.whl
+
 %generate_buildrequires
 
 %build
@@ -183,9 +188,14 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
-* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-8
-- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
-  ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
+* Sat Oct 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-9
+- Reconcile the published CA cleanup with the existing tox-based ptest bootstrap.
+- Pin packaging==23.2 when installing test tooling to preserve RPM-owned packaging.
+
+* Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-8
+- Remove affected eMudhra and AAA roots from both embedded pip wheels.
+- Regenerate wheel RECORD entries after the existing security backports.
+- Run pytest directly with pinned test dependencies in a private environment.
 
 * Mon Oct 05 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-7
 - Patch for CVE-2026-102925 and CVE-2026-102930
