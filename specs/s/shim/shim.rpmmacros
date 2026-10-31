@@ -53,7 +53,12 @@ Requires: mokutil >= 1:0.3.0-15						\
 Requires: efi-filesystem						\
 Provides: shim-signed-%{-a*} = %{version}-%{release}			\
 Conflicts: fwupd < %{fwupd_version}					\
-Requires: grub2-efi-%{-a*} >= %{grub_version}				\
+%{expand:%%if "%{-a*}" == "x64"					\
+Requires: (grub2-efi-x64 >= %{grub_version} or azurelinux-uki-boot)	\
+Suggests: grub2-efi-x64						\
+%%else								\
+Requires: grub2-efi-%{-a*} >= %{grub_version}			\
+%%endif}								\
 Conflicts: grub2-efi-%{-a*} < %{grub_version}				\
 %{expand:%%if 0%%{-p*}							\
 Provides: shim = %{version}-%{release}					\

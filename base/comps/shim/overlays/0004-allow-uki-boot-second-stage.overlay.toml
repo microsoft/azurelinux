@@ -1,0 +1,18 @@
+# Fedora could add a macro hook for shim's second-stage requirement (defaulting
+# to grub2-efi); then Azure Linux can drop this x64-only regex overlay.
+
+[metadata]
+category = "azl-compatibility"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Keep GRUB as the x64 shim default while allowing an explicit UKI boot chain only for x64"
+type = "file-search-replace"
+file = "shim.rpmmacros"
+regex = '(?m)^Requires: grub2-efi-%\{-a\*\} >= %\{grub_version\}\t+\\$'
+replacement = '''%{expand:%%if "%{-a*}" == "x64"					\
+Requires: (grub2-efi-x64 >= %{grub_version} or azurelinux-uki-boot)	\
+Suggests: grub2-efi-x64						\
+%%else								\
+Requires: grub2-efi-%{-a*} >= %{grub_version}			\
+%%endif}								\'''
