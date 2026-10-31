@@ -16,6 +16,7 @@ repos:
           - azure-devops==7.1.0b4
           - azure-identity==1.26.0
           - mcp==2.3.0
+          - pefile==2024.8.26
           - pydantic==2.14.1
           - pytest==9.1.1
           - python-dotenv==1.2.4

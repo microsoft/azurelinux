@@ -3,6 +3,7 @@ name = "azl-image-tests"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "pefile>=2024.8.26",
     "pytest>=8.0",
     "python-on-whales>=0.81.0",
 ]

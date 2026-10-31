@@ -382,6 +382,11 @@ def resolve_path_confined(root: Path, relative_path: str, *, max_links: int = 40
     return current
 
 
+def read_bytes_confined(root: Path, relative_path: str, *, max_links: int = 40) -> bytes:
+    """Read a binary file under ``root`` without following links out of the tree."""
+    return resolve_path_confined(root, relative_path, max_links=max_links).read_bytes()
+
+
 def read_text_confined(root: Path, relative_path: str, *, max_links: int = 40) -> str:
     """Read a text file under ``root`` without following links out of the tree."""
     return resolve_path_confined(root, relative_path, max_links=max_links).read_text()

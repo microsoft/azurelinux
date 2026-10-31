@@ -17,7 +17,10 @@ def test_kernel_fips_matches_image_variant(
     boot_entry_option_lines: dict[Path, list[str]],
     capabilities: set[str],
 ) -> None:
-    """Verify kernel FIPS options match the image variant."""
+    """Verify kernel FIPS options match the image variant.
+
+    For UKI images, the fixture reads options from the embedded ``.cmdline`` section.
+    """
     expected_fips_options = ["fips=1"] if "fips-enabled" in capabilities else []
     options_by_entry = parse_boot_entry_kernel_options(boot_entry_option_lines)
 
