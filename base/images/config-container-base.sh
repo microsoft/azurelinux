@@ -2,8 +2,11 @@
 # config.sh — Kiwi config.sh hook for container image minimization
 #
 # Invoked by /image/config.sh (see that file for the profile -> mode
-# routing table) with a single --mode argument selecting one of two
+# routing table) with a single --mode argument selecting one of three
 # cleanup strategies:
+#
+#   --mode=locales (container-base): retains English, C, and POSIX locale
+#   files and sets en_US.UTF-8.
 #
 #   --mode=strip (distroless-*, busybox-workload; runtime-package-management
 #   = false profiles): strips the image down to only the packages declared
@@ -61,9 +64,21 @@ for arg in "$@"; do
         *) die "unrecognized argument: ${arg}" ;;
     esac
 done
-[[ -n "${MODE}" ]] || die "missing required --mode=strip|runtime argument"
-[[ "${MODE}" == "strip" || "${MODE}" == "runtime" ]] \
-    || die "unknown --mode value: ${MODE} (expected strip or runtime)"
+[[ -n "${MODE}" ]] || die "missing required --mode=locales|strip|runtime argument"
+[[ "${MODE}" == "locales" || "${MODE}" == "strip" || "${MODE}" == "runtime" ]] \
+    || die "unknown --mode value: ${MODE} (expected locales|strip|runtime)"
+
+if [[ "${MODE}" == "locales" ]]; then
+    echo "config.sh: pruning locale files except C, POSIX, and English locales"
+    find /usr/share/locale -mindepth 1 -maxdepth 1 -type d \
+        ! -name 'C*' ! -name 'POSIX' ! -name 'en*' -exec rm -rf -- {} +
+    find /usr/lib/locale -mindepth 1 -maxdepth 1 \
+        ! -name 'C*' ! -name 'POSIX' ! -name 'en*' ! -name 'locale-archive' \
+        -exec rm -rf -- {} +
+    mkdir -p /etc
+    printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
+    exit 0
+fi
 
 # Extract package names from a <packages type="image"> section of the kiwi
 # XML definition.  Returns one package name per line.

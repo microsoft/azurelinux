@@ -27,8 +27,14 @@
         <packagemanager>dnf5</packagemanager>
     </preferences>
     <preferences profiles="core">
+        <locale>en_US</locale>
+        <rpm-locale-filtering>true</rpm-locale-filtering>
+        <rpm-excludedocs>true</rpm-excludedocs>
         <type image="oci">
             <containerconfig name="microsoft/azurelinux/base/core" tag="4.0" additionalnames=":latest" workingdir="/">
+                <environment>
+                    <env name="LANG" value="en_US.UTF-8" />
+                </environment>
                 <subcommand execute="/bin/bash" />
             </containerconfig>
         </type>
@@ -62,6 +68,10 @@
         <package name="azurelinux-release-container" />
         <package name="bash" />
         <package name="filesystem" />
+        <file name="config-container-base.sh" target="/image/config-container-base.sh" permissions="0755" />
+    </packages>
+    <packages type="image" profiles="core">
+        <package name="glibc-langpack-en" />
     </packages>
     <packages type="bootstrap" profiles="DistrolessCore">
         <file name="generate-package-manifest.py" target="/image/generate-package-manifest.py" permissions="0644" />
