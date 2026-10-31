@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 1
+%define azl_pkgrelease 2
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.43.02
 # AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
@@ -4324,6 +4324,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Sun Nov 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.2
+- Enable CONFIG_BLK_CGROUP_IOLATENCY=y on both architectures
+
 * Thu Oct 29 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.57.1
 
