@@ -1,0 +1,69 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+bugs = [
+  { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/24711" },
+]
+
+[[overlays]]
+description = "Use the provider-based OpenSSL GHmac backend while leaving GnuTLS disabled"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\s*-Dgnutls=true\s*\\$'
+replacement = '    -Dgnutls=false -Dopenssl=true \'
+
+# Preserve the three upstream patches and apply the exported series last.
+# Bare Patch tags use RPM's implicit numbering.
+[[overlays]]
+description = "Stage the unchanged accepted OpenSSL GHmac patch series"
+type = "file-add"
+file = "ghmac-openssl.patch"
+source = "../ghmac-openssl.patch"
+
+[[overlays]]
+description = "Apply the OpenSSL GHmac series after the complete upstream patch baseline"
+type = "spec-insert-tag"
+tag = "Patch"
+value = "ghmac-openssl.patch"
+
+[[overlays]]
+description = "The disabled GnuTLS HMAC backend no longer needs GnuTLS at build time"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "gnutls"
+
+[[overlays]]
+description = "Require the OpenSSL 3 runtime instead of the disabled GnuTLS backend on 64-bit systems"
+type = "spec-search-replace"
+regex = '^Requires:\s+libgnutls\.so\.30\(\)\(64bit\)\s*$'
+replacement = 'Requires: libcrypto.so.3()(64bit)'
+
+[[overlays]]
+description = "Require the OpenSSL 3 runtime instead of the disabled GnuTLS backend on 32-bit systems"
+type = "spec-search-replace"
+regex = '^Requires:\s+libgnutls\.so\.30\s*$'
+replacement = 'Requires: libcrypto.so.3'
+
+[[overlays]]
+description = "Validate OpenSSL 3 declarations against real development headers"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libcrypto) >= 3.0.0"
+
+[[overlays]]
+description = "Explain why the selected GHmac backend needs OpenSSL development headers"
+type = "spec-search-replace"
+regex = '^# For gnutls-hmac\.patch\. We now dlopen libgnutls\.so\.30 so that we can build a$'
+replacement = '# For ghmac-openssl.patch. OpenSSL 3 headers validate the runtime API.'
+
+[[overlays]]
+description = "Document the shared crypto runtime requirement for static GLib consumers"
+type = "spec-search-replace"
+regex = '^# static glib2 without depending on a static build of GnuTLS as well\. This will$'
+replacement = '# GHmac dynamically loads libcrypto.so.3, including for static GLib consumers.'
+
+[[overlays]]
+description = "Avoid implying a static crypto or universal provider-module dependency"
+type = "spec-search-replace"
+regex = '^# ensure we notice if the GnuTLS soname bumps, so that we can update our patch\.$'
+replacement = '# Require shared libcrypto without requiring openssl-static or a specific provider.'
