@@ -1,0 +1,5432 @@
+From f375ba05ff62bf991f6aaecf61bc8387b2383d26 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 30 Oct 2026 19:05:00 +0000
+Subject: [PATCH 1/9] feat(ghmac): add openssl backend selection and
+ implementation
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ glib/ghmac-gnutls.c  |   3 +
+ glib/ghmac-openssl.c | 451 +++++++++++++++++++++++++++++++++++++++++++
+ glib/ghmac.c         | 146 +-------------
+ glib/meson.build     |   8 +-
+ meson.build          | 102 +++++++++-
+ meson.options        |   5 +
+ 6 files changed, 565 insertions(+), 150 deletions(-)
+ create mode 100644 glib/ghmac-openssl.c
+
+diff --git a/glib/ghmac-gnutls.c b/glib/ghmac-gnutls.c
+index 1800fc2e059e63c3691dd576ba315d2841e69406..192836d1a76e6e30643daf3d2a32812d1e3b5adb 100644
+--- a/glib/ghmac-gnutls.c
++++ b/glib/ghmac-gnutls.c
+@@ -38,6 +38,9 @@
+ #ifndef USE_GNUTLS
+ #error "build configuration error"
+ #endif
++#ifdef USE_OPENSSL
++#error "build configuration error"
++#endif
+ 
+ typedef gpointer gnutls_hmac_hd_t;
+ 
+diff --git a/glib/ghmac-openssl.c b/glib/ghmac-openssl.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..9afc0b575729cde00bf8e81e1fd815800339dd4f
+--- /dev/null
++++ b/glib/ghmac-openssl.c
+@@ -0,0 +1,451 @@
++/* ghmac-openssl.c - data hashing functions
++ *
++ * Copyright (C) 2026  Microsoft
++ *
++ * SPDX-License-Identifier: LGPL-2.1-or-later
++ */
++
++#include "config.h"
++
++#include <dlfcn.h>
++#include <openssl/core_names.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/params.h>
++#include <string.h>
++
++#include "ghmac.h"
++
++#include "gatomic.h"
++#include "gchecksumprivate.h"
++#include "gmem.h"
++#include "gslice.h"
++#include "gstrfuncs.h"
++#include "gtestutils.h"
++#include "gthread.h"
++#include "gtypes.h"
++#include "glibintl.h"
++
++#ifndef USE_OPENSSL
++#error "build configuration error"
++#endif
++#ifdef USE_GNUTLS
++#error "build configuration error"
++#endif
++
++typedef EVP_MAC *(*OpenSslEvpMacFetchFunc) (OSSL_LIB_CTX  *libctx,
++                                            const char    *algorithm,
++                                            const char    *properties);
++typedef void (*OpenSslEvpMacFreeFunc) (EVP_MAC *mac);
++typedef EVP_MAC_CTX *(*OpenSslEvpMacCtxNewFunc) (EVP_MAC *mac);
++typedef void (*OpenSslEvpMacCtxFreeFunc) (EVP_MAC_CTX *ctx);
++typedef EVP_MAC_CTX *(*OpenSslEvpMacCtxDupFunc) (const EVP_MAC_CTX *src);
++typedef size_t (*OpenSslEvpMacCtxGetMacSizeFunc) (EVP_MAC_CTX *ctx);
++typedef int (*OpenSslEvpMacInitFunc) (EVP_MAC_CTX         *ctx,
++                                      const unsigned char *key,
++                                      size_t               keylen,
++                                      const OSSL_PARAM     params[]);
++typedef int (*OpenSslEvpMacUpdateFunc) (EVP_MAC_CTX *ctx,
++                                        const unsigned char *data,
++                                        size_t datalen);
++typedef int (*OpenSslEvpMacFinalFunc) (EVP_MAC_CTX    *ctx,
++                                       unsigned char  *out,
++                                       size_t         *outl,
++                                       size_t          outsize);
++typedef int (*OpenSslErrSetMarkFunc) (void);
++typedef int (*OpenSslErrPopToMarkFunc) (void);
++typedef void (*OpenSslErrClearErrorFunc) (void);
++
++typedef struct
++{
++  OpenSslEvpMacFetchFunc loaded_EVP_MAC_fetch;
++  OpenSslEvpMacFreeFunc loaded_EVP_MAC_free;
++  OpenSslEvpMacCtxNewFunc loaded_EVP_MAC_CTX_new;
++  OpenSslEvpMacCtxFreeFunc loaded_EVP_MAC_CTX_free;
++  OpenSslEvpMacCtxDupFunc loaded_EVP_MAC_CTX_dup;
++  OpenSslEvpMacCtxGetMacSizeFunc loaded_EVP_MAC_CTX_get_mac_size;
++  OpenSslEvpMacInitFunc loaded_EVP_MAC_init;
++  OpenSslEvpMacUpdateFunc loaded_EVP_MAC_update;
++  OpenSslEvpMacFinalFunc loaded_EVP_MAC_final;
++  OpenSslErrSetMarkFunc loaded_ERR_set_mark;
++  OpenSslErrPopToMarkFunc loaded_ERR_pop_to_mark;
++  OpenSslErrClearErrorFunc loaded_ERR_clear_error;
++} OpenSslLoaderVtable;
++
++typedef struct
++{
++  gpointer handle;
++  OpenSslLoaderVtable table;
++} OpenSslLoader;
++
++struct _GHmac
++{
++  int ref_count;
++  GChecksumType digest_type;
++  gsize digest_len;
++  EVP_MAC_CTX *ctx;
++  gboolean closed;
++  guint8 digest[64];
++  gchar *digest_str;
++};
++
++static gsize openssl_loader_state = 0;
++static OpenSslLoader openssl_loader = { 0, };
++static gchar *openssl_loader_error = NULL;
++static gint openssl_loader_warned = 0;
++
++static void
++restore_error_queue_scope (gboolean marked)
++{
++  if (marked)
++    openssl_loader.table.loaded_ERR_pop_to_mark ();
++  else
++    openssl_loader.table.loaded_ERR_clear_error ();
++}
++
++static gboolean
++openssl_hmac_load_symbol (gpointer      handle,
++                          const gchar  *name,
++                          gpointer     *target)
++{
++  dlerror ();
++  *target = dlsym (handle, name);
++  if (*target == NULL)
++    {
++      const char *error_message = dlerror ();
++      g_free (openssl_loader_error);
++      openssl_loader_error = g_strdup_printf ("failed to resolve %s: %s",
++                                              name,
++                                              error_message != NULL ? error_message : "unknown error");
++      return FALSE;
++    }
++
++  return TRUE;
++}
++
++static gboolean
++initialize_openssl_loader (void)
++{
++  gpointer handle = NULL;
++  OpenSslLoader loader = { 0, };
++
++  handle = dlopen ("libcrypto.so.3", RTLD_NOW | RTLD_LOCAL);
++  if (handle == NULL)
++    {
++      const char *error_message = dlerror ();
++      g_free (openssl_loader_error);
++      openssl_loader_error = g_strdup_printf ("failed to load libcrypto.so.3: %s",
++                                              error_message != NULL ? error_message : "unknown error");
++      return FALSE;
++    }
++
++  if (!openssl_hmac_load_symbol (handle, "EVP_MAC_fetch", (gpointer *) &loader.table.loaded_EVP_MAC_fetch) ||
++      !openssl_hmac_load_symbol (handle, "EVP_MAC_free", (gpointer *) &loader.table.loaded_EVP_MAC_free) ||
++      !openssl_hmac_load_symbol (handle, "EVP_MAC_CTX_new", (gpointer *) &loader.table.loaded_EVP_MAC_CTX_new) ||
++      !openssl_hmac_load_symbol (handle, "EVP_MAC_CTX_free", (gpointer *) &loader.table.loaded_EVP_MAC_CTX_free) ||
++      !openssl_hmac_load_symbol (handle, "EVP_MAC_CTX_dup", (gpointer *) &loader.table.loaded_EVP_MAC_CTX_dup) ||
++      !openssl_hmac_load_symbol (handle, "EVP_MAC_CTX_get_mac_size", (gpointer *) &loader.table.loaded_EVP_MAC_CTX_get_mac_size) ||
++      !openssl_hmac_load_symbol (handle, "EVP_MAC_init", (gpointer *) &loader.table.loaded_EVP_MAC_init) ||
++      !openssl_hmac_load_symbol (handle, "EVP_MAC_update", (gpointer *) &loader.table.loaded_EVP_MAC_update) ||
++      !openssl_hmac_load_symbol (handle, "EVP_MAC_final", (gpointer *) &loader.table.loaded_EVP_MAC_final) ||
++      !openssl_hmac_load_symbol (handle, "ERR_set_mark", (gpointer *) &loader.table.loaded_ERR_set_mark) ||
++      !openssl_hmac_load_symbol (handle, "ERR_pop_to_mark", (gpointer *) &loader.table.loaded_ERR_pop_to_mark) ||
++      !openssl_hmac_load_symbol (handle, "ERR_clear_error", (gpointer *) &loader.table.loaded_ERR_clear_error))
++    {
++      dlclose (handle);
++      return FALSE;
++    }
++
++  loader.handle = handle;
++  openssl_loader = loader;
++  return TRUE;
++}
++
++static gboolean
++ensure_openssl_loader (void)
++{
++  if (g_once_init_enter (&openssl_loader_state))
++    {
++      gsize state = initialize_openssl_loader () ? 1 : 2;
++      g_once_init_leave (&openssl_loader_state, state);
++    }
++
++  if (openssl_loader_state == 1)
++    return TRUE;
++
++  if (g_atomic_int_compare_and_exchange (&openssl_loader_warned, 0, 1))
++    g_warning ("Cannot use GHmac: %s",
++               openssl_loader_error != NULL ? openssl_loader_error : "OpenSSL backend loader initialization failed");
++
++  return FALSE;
++}
++
++static gboolean
++lookup_digest (GChecksumType  digest_type,
++               const gchar  **digest_name,
++               gsize         *digest_len)
++{
++  switch (digest_type)
++    {
++    case G_CHECKSUM_MD5:
++      *digest_name = "MD5";
++      *digest_len = 16;
++      return TRUE;
++    case G_CHECKSUM_SHA1:
++      *digest_name = "SHA1";
++      *digest_len = 20;
++      return TRUE;
++    case G_CHECKSUM_SHA256:
++      *digest_name = "SHA256";
++      *digest_len = 32;
++      return TRUE;
++    case G_CHECKSUM_SHA384:
++      *digest_name = "SHA384";
++      *digest_len = 48;
++      return TRUE;
++    case G_CHECKSUM_SHA512:
++      *digest_name = "SHA512";
++      *digest_len = 64;
++      return TRUE;
++    default:
++      return FALSE;
++    }
++}
++
++static gboolean
++ensure_closed (GHmac *hmac)
++{
++  gboolean marked;
++  size_t out_len = 0;
++  int final_status;
++
++  if (hmac->closed)
++    return TRUE;
++
++  marked = openssl_loader.table.loaded_ERR_set_mark () == 1;
++  final_status = openssl_loader.table.loaded_EVP_MAC_final (hmac->ctx,
++                                                            hmac->digest,
++                                                            &out_len,
++                                                            sizeof (hmac->digest));
++  openssl_loader.table.loaded_EVP_MAC_CTX_free (hmac->ctx);
++  hmac->ctx = NULL;
++  restore_error_queue_scope (marked);
++
++  if (final_status != 1)
++    return FALSE;
++  if (out_len != hmac->digest_len)
++    return FALSE;
++
++  hmac->closed = TRUE;
++  return TRUE;
++}
++
++GHmac *
++g_hmac_new (GChecksumType  digest_type,
++            const guchar  *key,
++            gsize          key_len)
++{
++  GHmac *hmac;
++  const gchar *digest_name = NULL;
++  gsize digest_len = 0;
++  EVP_MAC *mac = NULL;
++  const guint8 empty_key = 0;
++  const guchar *effective_key = key;
++  int init_result;
++  size_t mac_size;
++  gboolean marked;
++
++  g_return_val_if_fail (key != NULL || key_len == 0, NULL);
++
++  if (!lookup_digest (digest_type, &digest_name, &digest_len))
++    g_return_val_if_reached (NULL);
++
++  if (key_len > G_MAXINT)
++    {
++      g_critical ("g_hmac_new: OpenSSL backend requires key_len <= G_MAXINT");
++      return NULL;
++    }
++
++  if (!ensure_openssl_loader ())
++    return NULL;
++
++  marked = openssl_loader.table.loaded_ERR_set_mark () == 1;
++  mac = openssl_loader.table.loaded_EVP_MAC_fetch (NULL, "HMAC", NULL);
++  if (mac == NULL)
++    {
++      restore_error_queue_scope (marked);
++      return NULL;
++    }
++
++  hmac = g_new0 (GHmac, 1);
++  hmac->ref_count = 1;
++  hmac->digest_type = digest_type;
++  hmac->digest_len = digest_len;
++  hmac->ctx = openssl_loader.table.loaded_EVP_MAC_CTX_new (mac);
++  openssl_loader.table.loaded_EVP_MAC_free (mac);
++
++  if (hmac->ctx == NULL)
++    {
++      restore_error_queue_scope (marked);
++      g_free (hmac);
++      return NULL;
++    }
++
++  if (effective_key == NULL)
++    effective_key = &empty_key;
++
++  {
++    OSSL_PARAM params[] = {
++      OSSL_PARAM_utf8_string (OSSL_MAC_PARAM_DIGEST, (char *) digest_name, 0),
++      OSSL_PARAM_END
++    };
++
++    init_result = openssl_loader.table.loaded_EVP_MAC_init (hmac->ctx, effective_key, key_len, params);
++  }
++  if (init_result != 1)
++    {
++      openssl_loader.table.loaded_EVP_MAC_CTX_free (hmac->ctx);
++      restore_error_queue_scope (marked);
++      g_free (hmac);
++      return NULL;
++    }
++
++  mac_size = openssl_loader.table.loaded_EVP_MAC_CTX_get_mac_size (hmac->ctx);
++  if (mac_size != digest_len)
++    {
++      openssl_loader.table.loaded_EVP_MAC_CTX_free (hmac->ctx);
++      restore_error_queue_scope (marked);
++      g_free (hmac);
++      return NULL;
++    }
++
++  restore_error_queue_scope (marked);
++  return hmac;
++}
++
++GHmac *
++g_hmac_copy (const GHmac *hmac)
++{
++  GHmac *copy;
++
++  g_return_val_if_fail (hmac != NULL, NULL);
++
++  copy = g_new0 (GHmac, 1);
++  copy->ref_count = 1;
++  copy->digest_type = hmac->digest_type;
++  copy->digest_len = hmac->digest_len;
++  copy->closed = hmac->closed;
++
++  if (hmac->closed)
++    {
++      memcpy (copy->digest, hmac->digest, hmac->digest_len);
++      if (hmac->digest_str != NULL)
++        copy->digest_str = g_strdup (hmac->digest_str);
++      return copy;
++    }
++
++  {
++    gboolean marked = openssl_loader.table.loaded_ERR_set_mark () == 1;
++    copy->ctx = openssl_loader.table.loaded_EVP_MAC_CTX_dup (hmac->ctx);
++    restore_error_queue_scope (marked);
++  }
++
++  if (copy->ctx == NULL)
++    g_error ("OpenSSL backend failure in g_hmac_copy: EVP_MAC_CTX_dup");
++
++  return copy;
++}
++
++GHmac *
++g_hmac_ref (GHmac *hmac)
++{
++  g_return_val_if_fail (hmac != NULL, NULL);
++
++  g_atomic_int_inc (&hmac->ref_count);
++
++  return hmac;
++}
++
++void
++g_hmac_unref (GHmac *hmac)
++{
++  g_return_if_fail (hmac != NULL);
++
++  if (g_atomic_int_dec_and_test (&hmac->ref_count))
++    {
++      if (!hmac->closed && hmac->ctx != NULL)
++        {
++          gboolean marked = openssl_loader.table.loaded_ERR_set_mark () == 1;
++          openssl_loader.table.loaded_EVP_MAC_CTX_free (hmac->ctx);
++          restore_error_queue_scope (marked);
++        }
++
++      g_free (hmac->digest_str);
++      g_free (hmac);
++    }
++}
++
++void
++g_hmac_update (GHmac        *hmac,
++               const guchar *data,
++               gssize        length)
++{
++  gboolean marked;
++  int update_status;
++  size_t update_len;
++
++  g_return_if_fail (hmac != NULL);
++  g_return_if_fail (length == 0 || data != NULL);
++
++  if (hmac->closed)
++    {
++      g_warning ("g_hmac_update: HMAC context is already closed");
++      return;
++    }
++
++  if (length < 0)
++    update_len = strlen ((const gchar *) data);
++  else
++    update_len = (size_t) length;
++
++  if (update_len == 0)
++    return;
++
++  marked = openssl_loader.table.loaded_ERR_set_mark () == 1;
++  update_status = openssl_loader.table.loaded_EVP_MAC_update (hmac->ctx, data, update_len);
++  restore_error_queue_scope (marked);
++
++  if (update_status != 1)
++    g_error ("OpenSSL backend failure in g_hmac_update: EVP_MAC_update");
++}
++
++const gchar *
++g_hmac_get_string (GHmac *hmac)
++{
++  g_return_val_if_fail (hmac != NULL, NULL);
++
++  if (!ensure_closed (hmac))
++    g_error ("OpenSSL backend failure in g_hmac_get_string: EVP_MAC_final");
++
++  if (hmac->digest_str == NULL)
++    hmac->digest_str = gchecksum_digest_to_string (hmac->digest, hmac->digest_len);
++
++  return hmac->digest_str;
++}
++
++void
++g_hmac_get_digest (GHmac  *hmac,
++                   guint8 *buffer,
++                   gsize  *digest_len)
++{
++  g_return_if_fail (hmac != NULL);
++  g_return_if_fail (buffer != NULL);
++  g_return_if_fail (digest_len != NULL);
++  g_return_if_fail (*digest_len >= hmac->digest_len);
++
++  if (!ensure_closed (hmac))
++    g_error ("OpenSSL backend failure in g_hmac_get_digest: EVP_MAC_final");
++
++  memcpy (buffer, hmac->digest, hmac->digest_len);
++  *digest_len = hmac->digest_len;
++}
+diff --git a/glib/ghmac.c b/glib/ghmac.c
+index ddb1635578db7c41fdd5dba39ab76d238705ffdd..972412fc12c96cc0bd5a1c127181142b54542a1e 100644
+--- a/glib/ghmac.c
++++ b/glib/ghmac.c
+@@ -35,31 +35,10 @@
+ #include "gtypes.h"
+ #include "glibintl.h"
+ 
+-#ifdef USE_GNUTLS
++#if defined(USE_GNUTLS) || defined(USE_OPENSSL)
+ #error "build configuration error"
+ #endif
+ 
+-/**
+- * GHmac:
+- *
+- * HMACs should be used when producing a cookie or hash based on data
+- * and a key. Simple mechanisms for using SHA1 and other algorithms to
+- * digest a key and data together are vulnerable to various security
+- * issues.
+- * [HMAC](http://en.wikipedia.org/wiki/HMAC)
+- * uses algorithms like SHA1 in a secure way to produce a digest of a
+- * key and data.
+- *
+- * Both the key and data are arbitrary byte arrays of bytes or characters.
+- *
+- * Support for HMAC Digests has been added in GLib 2.30, and support for SHA-512
+- * in GLib 2.42. Support for SHA-384 was added in GLib 2.52.
+- *
+- * To create a new `GHmac`, use [ctor@GLib.Hmac.new]. To free a `GHmac`, use
+- * [method@GLib.Hmac.unref].
+- *
+- * Since: 2.30
+- */
+ 
+ struct _GHmac
+ {
+@@ -69,46 +48,6 @@ struct _GHmac
+   GChecksum *digesto;
+ };
+ 
+-/**
+- * g_hmac_new: (constructor)
+- * @digest_type: the desired type of digest
+- * @key: (array length=key_len): the key for the HMAC
+- * @key_len: the length of the keys
+- *
+- * Creates a new #GHmac, using the digest algorithm @digest_type.
+- * If the @digest_type is not known, %NULL is returned.
+- * A #GHmac can be used to compute the HMAC of a key and an
+- * arbitrary binary blob, using different hashing algorithms.
+- *
+- * A #GHmac works by feeding a binary blob through g_hmac_update()
+- * until the data is complete; the digest can then be extracted
+- * using g_hmac_get_string(), which will return the checksum as a
+- * hexadecimal string; or g_hmac_get_digest(), which will return a
+- * array of raw bytes. Once either g_hmac_get_string() or
+- * g_hmac_get_digest() have been called on a #GHmac, the HMAC
+- * will be closed and it won't be possible to call g_hmac_update()
+- * on it anymore.
+- *
+- * Support for digests of type %G_CHECKSUM_SHA512 has been added in GLib 2.42.
+- * Support for %G_CHECKSUM_SHA384 was added in GLib 2.52.
+- *
+- * Note that #GHmac creation may fail, in which case this function will
+- * return %NULL. Since there is no error parameter, it is not possible
+- * to indicate why.
+- *
+- * In Fedora, CentOS Stream, and Red Hat Enterprise Linux, GLib is
+- * configured to use GnuTLS to implement #GHmac in order to support FIPS
+- * compliance. This introduces additional failure possibilities that are
+- * not present in upstream GLib. For example, the creation of a #GHmac
+- * will fail if @digest_type is %G_CHECKSUM_MD5 and the system is
+- * running in FIPS mode. #GHmac creation may also fail if GLib is unable
+- * to load GnuTLS.
+- *
+- * Returns: (nullable) (transfer full): the newly created #GHmac, or %NULL.
+- *   Use g_hmac_unref() to free the memory allocated by it.
+- *
+- * Since: 2.30
+- */
+ GHmac *
+ g_hmac_new (GChecksumType  digest_type,
+             const guchar  *key,
+@@ -187,19 +126,6 @@ g_hmac_new (GChecksumType  digest_type,
+   return hmac;
+ }
+ 
+-/**
+- * g_hmac_copy:
+- * @hmac: the #GHmac to copy
+- *
+- * Copies a #GHmac. If @hmac has been closed, by calling
+- * g_hmac_get_string() or g_hmac_get_digest(), the copied
+- * HMAC will be closed as well.
+- *
+- * Returns: (transfer full): the copy of the passed #GHmac. Use g_hmac_unref()
+- *   when finished using it.
+- *
+- * Since: 2.30
+- */
+ GHmac *
+ g_hmac_copy (const GHmac *hmac)
+ {
+@@ -216,18 +142,6 @@ g_hmac_copy (const GHmac *hmac)
+   return copy;
+ }
+ 
+-/**
+- * g_hmac_ref:
+- * @hmac: a valid #GHmac
+- *
+- * Atomically increments the reference count of @hmac by one.
+- *
+- * This function is MT-safe and may be called from any thread.
+- *
+- * Returns: (transfer full): the passed in #GHmac.
+- *
+- * Since: 2.30
+- **/
+ GHmac *
+ g_hmac_ref (GHmac *hmac)
+ {
+@@ -238,19 +152,6 @@ g_hmac_ref (GHmac *hmac)
+   return hmac;
+ }
+ 
+-/**
+- * g_hmac_unref:
+- * @hmac: (transfer full): a #GHmac
+- *
+- * Atomically decrements the reference count of @hmac by one.
+- *
+- * If the reference count drops to 0, all keys and values will be
+- * destroyed, and all memory allocated by the hash table is released.
+- * This function is MT-safe and may be called from any thread.
+- * Frees the memory allocated for @hmac.
+- *
+- * Since: 2.30
+- */
+ void
+ g_hmac_unref (GHmac *hmac)
+ {
+@@ -264,19 +165,6 @@ g_hmac_unref (GHmac *hmac)
+     }
+ }
+ 
+-/**
+- * g_hmac_update:
+- * @hmac: a #GHmac
+- * @data: (array length=length): buffer used to compute the checksum
+- * @length: size of the buffer, or -1 if it is a nul-terminated string
+- *
+- * Feeds @data into an existing #GHmac.
+- *
+- * The HMAC must still be open, that is g_hmac_get_string() or
+- * g_hmac_get_digest() must not have been called on @hmac.
+- *
+- * Since: 2.30
+- */
+ void
+ g_hmac_update (GHmac        *hmac,
+                const guchar *data,
+@@ -288,23 +176,6 @@ g_hmac_update (GHmac        *hmac,
+   g_checksum_update (hmac->digesti, data, length);
+ }
+ 
+-/**
+- * g_hmac_get_string:
+- * @hmac: a #GHmac
+- *
+- * Gets the HMAC as a hexadecimal string.
+- *
+- * Once this function has been called the #GHmac can no longer be
+- * updated with g_hmac_update().
+- *
+- * The hexadecimal characters will be lower case.
+- *
+- * Returns: the hexadecimal representation of the HMAC. The
+- *   returned string is owned by the HMAC and should not be modified
+- *   or freed.
+- *
+- * Since: 2.30
+- */
+ const gchar *
+ g_hmac_get_string (GHmac *hmac)
+ {
+@@ -330,21 +201,6 @@ g_hmac_get_string (GHmac *hmac)
+   return g_checksum_get_string (hmac->digesto);
+ }
+ 
+-/**
+- * g_hmac_get_digest:
+- * @hmac: a #GHmac
+- * @buffer: (array length=digest_len): output buffer
+- * @digest_len: (inout): an inout parameter. The caller initializes it to the
+- *   size of @buffer. After the call it contains the length of the digest
+- *
+- * Gets the digest from @checksum as a raw binary array and places it
+- * into @buffer. The size of the digest depends on the type of checksum.
+- *
+- * Once this function has been called, the #GHmac is closed and can
+- * no longer be updated with g_checksum_update().
+- *
+- * Since: 2.30
+- */
+ void
+ g_hmac_get_digest (GHmac  *hmac,
+                    guint8 *buffer,
+diff --git a/glib/meson.build b/glib/meson.build
+index 57a7d3efb7f2693514999f1d5de15d9b1e1173e9..2831ffebc22644b681e2ded99423e2893a054605 100644
+--- a/glib/meson.build
++++ b/glib/meson.build
+@@ -398,8 +398,10 @@ else
+   glib_dtrace_hdr = []
+ endif
+ 
+-if get_option('gnutls')
++if hmac_backend == 'gnutls'
+   glib_sources += files('ghmac-gnutls.c')
++elif hmac_backend == 'openssl'
++  glib_sources += files('ghmac-openssl.c')
+ else
+   glib_sources += files('ghmac.c')
+ endif
+@@ -427,6 +429,7 @@ libglib = library('glib-2.0',
+     gnulib_libm_dependency,
+     libiconv,
+     libintl_deps,
++    hmac_loader_dep,
+     libm,
+     librt,
+     libsysprof_capture_dep,
+@@ -454,6 +457,7 @@ libglib_static_dep = declare_dependency(
+     gnulib_libm_dependency,
+     libiconv,
+     libintl_deps,
++    hmac_loader_dep,
+     libm,
+     librt,
+     libsysprof_capture_dep,
+@@ -468,7 +472,7 @@ libglib_static_dep = declare_dependency(
+ 
+ pkg.generate(libglib,
+   libraries : [libintl_deps],
+-  libraries_private : [win32_ldflags],
++  libraries_private : [win32_ldflags, hmac_loader_dep],
+   subdirs : ['glib-2.0'],
+   extra_cflags : ['-I${libdir}/glib-2.0/include'] + win32_cflags,
+   variables : [
+diff --git a/meson.build b/meson.build
+index 00294e2e941f2f5d37eac8bb021e199126091618..ed0bd3d427b5fb1d0ca2ef2ebf64b5dd477bd2fc 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2370,10 +2370,105 @@ if host_system == 'linux'
+   endif
+ endif
+ 
+-# gnutls is used optionally by GHmac
+- if get_option('gnutls')
++hmac_backend = 'builtin'
++hmac_loader_dep = []
++
++if get_option('gnutls') and get_option('openssl')
++  error('GHmac backends are mutually exclusive: choose openssl or gnutls')
++endif
++
++if get_option('gnutls')
+   glib_conf.set('USE_GNUTLS', 1)
+- endif
++  hmac_backend = 'gnutls'
++  hmac_loader_dep = libdl_dep
++elif get_option('openssl')
++  if host_system != 'linux'
++    error('OpenSSL GHmac backend is only supported on Linux')
++  endif
++  if not have_dlopen_dlsym
++    error('OpenSSL GHmac backend requires dlopen() and dlsym() support')
++  endif
++
++  libcrypto_dep = dependency('libcrypto',
++    method : 'pkg-config',
++    version : ['>=3.0.0', '<4.0.0'],
++    required : true,
++    static : false,
++    allow_fallback : false)
++
++  openssl_decl_check = '''
++    #include <openssl/core_names.h>
++    #include <openssl/err.h>
++    #include <openssl/evp.h>
++    #include <openssl/params.h>
++    #include <openssl/opensslv.h>
++    #if !defined(OPENSSL_VERSION_MAJOR) || OPENSSL_VERSION_MAJOR != 3
++    #error "OpenSSL GHmac backend requires OpenSSL major version 3"
++    #endif
++    typedef EVP_MAC *(*OpenSslEvpMacFetchFunc) (OSSL_LIB_CTX  *libctx,
++                                                const char    *algorithm,
++                                                const char    *properties);
++    typedef void (*OpenSslEvpMacFreeFunc) (EVP_MAC *mac);
++    typedef EVP_MAC_CTX *(*OpenSslEvpMacCtxNewFunc) (EVP_MAC *mac);
++    typedef void (*OpenSslEvpMacCtxFreeFunc) (EVP_MAC_CTX *ctx);
++    typedef EVP_MAC_CTX *(*OpenSslEvpMacCtxDupFunc) (const EVP_MAC_CTX *src);
++    typedef size_t (*OpenSslEvpMacCtxGetMacSizeFunc) (EVP_MAC_CTX *ctx);
++    typedef int (*OpenSslEvpMacInitFunc) (EVP_MAC_CTX         *ctx,
++                                          const unsigned char *key,
++                                          size_t               keylen,
++                                          const OSSL_PARAM     params[]);
++    typedef int (*OpenSslEvpMacUpdateFunc) (EVP_MAC_CTX *ctx,
++                                            const unsigned char *data,
++                                            size_t datalen);
++    typedef int (*OpenSslEvpMacFinalFunc) (EVP_MAC_CTX    *ctx,
++                                           unsigned char  *out,
++                                           size_t         *outl,
++                                           size_t          outsize);
++    typedef int (*OpenSslErrSetMarkFunc) (void);
++    typedef int (*OpenSslErrPopToMarkFunc) (void);
++    typedef void (*OpenSslErrClearErrorFunc) (void);
++    int main (void) {
++      OSSL_PARAM p[] = { OSSL_PARAM_utf8_string(OSSL_MAC_PARAM_DIGEST, NULL, 0), OSSL_PARAM_END };
++      OpenSslEvpMacFetchFunc fetch_f = EVP_MAC_fetch;
++      OpenSslEvpMacFreeFunc free_f = EVP_MAC_free;
++      OpenSslEvpMacCtxNewFunc ctx_new_f = EVP_MAC_CTX_new;
++      OpenSslEvpMacCtxFreeFunc ctx_free_f = EVP_MAC_CTX_free;
++      OpenSslEvpMacCtxDupFunc ctx_dup_f = EVP_MAC_CTX_dup;
++      OpenSslEvpMacCtxGetMacSizeFunc ctx_size_f = EVP_MAC_CTX_get_mac_size;
++      OpenSslEvpMacInitFunc init_f = EVP_MAC_init;
++      OpenSslEvpMacUpdateFunc update_f = EVP_MAC_update;
++      OpenSslEvpMacFinalFunc final_f = EVP_MAC_final;
++      OpenSslErrSetMarkFunc set_mark_f = ERR_set_mark;
++      OpenSslErrPopToMarkFunc pop_mark_f = ERR_pop_to_mark;
++      OpenSslErrClearErrorFunc clear_f = ERR_clear_error;
++      (void) p;
++      (void) fetch_f;
++      (void) free_f;
++      (void) ctx_new_f;
++      (void) ctx_free_f;
++      (void) ctx_dup_f;
++      (void) ctx_size_f;
++      (void) init_f;
++      (void) update_f;
++      (void) final_f;
++      (void) set_mark_f;
++      (void) pop_mark_f;
++      (void) clear_f;
++      return 0;
++    }'''
++  if not cc.compiles(openssl_decl_check, dependencies : libcrypto_dep, name : 'OpenSSL GHmac declarations')
++    error('OpenSSL GHmac backend requires OpenSSL 3 EVP_MAC and ERR mark declarations')
++  endif
++
++  libcrypto_compile_dep = libcrypto_dep.partial_dependency(
++    compile_args : true,
++    includes : true)
++  add_project_dependencies(libcrypto_compile_dep, language : 'c')
++
++  glib_conf.set('USE_OPENSSL', 1)
++  hmac_backend = 'openssl'
++  hmac_loader_dep = libdl_dep
++endif
+ 
+ if host_system == 'windows'
+   winsock2 = cc.find_library('ws2_32')
+@@ -2834,6 +2929,7 @@ endif
+ 
+ summary({
+   'xattr' : xattr_dep.length() > 0,
++  'hmac backend' : hmac_backend,
+   'man-pages' : get_option('man-pages'),
+   'dtrace' : enable_dtrace,
+   'systemtap' : enable_systemtap,
+diff --git a/meson.options b/meson.options
+index b6faedd3f606da8832ea79ea88327aeee51cf6eb..39eb2c0adc71ebba1bf2d93605e108a3691dac05 100644
+--- a/meson.options
++++ b/meson.options
+@@ -42,6 +42,11 @@ option('gnutls',
+        value : false,
+        description : 'build with gnutls support')
+ 
++option('openssl',
++       type : 'boolean',
++       value : false,
++       description : 'build with OpenSSL GHmac backend')
++
+ option('man',
+        type : 'boolean',
+        value : false,
+From 052f5dc80e1fa5fb12ff78a149c6ad288bc22eff Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 30 Oct 2026 19:05:00 +0000
+Subject: [PATCH 2/9] test(glib): add c2 api-state coverage and canonical docs
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ docs/reference/glib/building.md |  25 ++
+ glib/ghmac-utils.c              | 165 +++++++-
+ glib/tests/autoptr.c            |   8 +-
+ glib/tests/hmac.c               | 674 ++++++++++++++++++++++++++++++++
+ 4 files changed, 864 insertions(+), 8 deletions(-)
+
+diff --git a/docs/reference/glib/building.md b/docs/reference/glib/building.md
+index 1a59c69d2603b03fdd58ddcdcfb9276304134535..0eba171a87e988c6f153461c37dcf77dd0a03ec1 100644
+--- a/docs/reference/glib/building.md
++++ b/docs/reference/glib/building.md
+@@ -173,6 +173,31 @@ configuring the GLib library:
+ : This option requires DTrace support. If it is available, then GLib will also
+   check for the presence of SystemTap.
+ 
++`-Dopenssl=false` and `-Dopenssl=true`
++: Enable or disable the OpenSSL-backed `GHmac` implementation.
++  The OpenSSL backend is Linux-only, requires OpenSSL 3.x APIs at build time,
++  and dynamically loads `libcrypto.so.3` at runtime. There is no fallback to
++  another backend if loading or symbol resolution fails. `-Dopenssl=true`
++  cannot be combined with `-Dgnutls=true`. The key length accepted by
++  `g_hmac_new()` is limited to `G_MAXINT` with this backend.
++
++  Backend initialization and digest/key acceptance are governed by the
++  application's active OpenSSL provider and property configuration. A failed
++  provider fetch or policy rejection causes GHmac construction to return `%NULL`.
++  This backend does not force providers, set default properties, or claim FIPS
++  certification.
++
++  This backend keeps GLib itself free of direct `libcrypto` link requirements:
++  static GLib consumers still need a shared `libcrypto.so.3` and provider data
++  at runtime. It is not a hermetic fully static crypto deployment.
++
++  Thread-safety rules are unchanged: reference counting and independent GHmac
++  instances are safe; callers must synchronize concurrent mutation or reads of a
++  single instance.
++
++  GLib does not own the process-wide OpenSSL lifecycle. Applications must avoid
++  using or unreffing GHmac objects after OpenSSL cleanup/teardown.
++
+ `-Db_coverage=true` and `-Db_coverage=false`
+ : Enable the generation of coverage reports for the GLib tests. This requires
+   the lcov frontend to gcov from the Linux Test Project. To generate a
+diff --git a/glib/ghmac-utils.c b/glib/ghmac-utils.c
+index a17359ff1505c3b16ef11dc451432d02129a7159..6da2a1b0ca873eece0c6e553cad7e15d4253f649 100644
+--- a/glib/ghmac-utils.c
++++ b/glib/ghmac-utils.c
+@@ -33,6 +33,155 @@
+ #include "glibintl.h"
+ 
+ /**
++ * GHmac:
++ *
++ * HMACs should be used when producing a cookie or hash based on data
++ * and a key. Simple mechanisms for using SHA1 and other algorithms to
++ * digest a key and data together are vulnerable to various security
++ * issues.
++ * [HMAC](http://en.wikipedia.org/wiki/HMAC)
++ * uses algorithms like SHA1 in a secure way to produce a digest of a
++ * key and data.
++ *
++ * Both the key and data are arbitrary byte arrays of bytes or characters.
++ *
++ * Support for HMAC Digests has been added in GLib 2.30, and support for SHA-512
++ * in GLib 2.42. Support for SHA-384 was added in GLib 2.52.
++ *
++ * To create a new `GHmac`, use [ctor@GLib.Hmac.new]. To free a `GHmac`, use
++ * [method@GLib.Hmac.unref].
++ *
++ * Since: 2.30
++ */
++
++/**
++ * g_hmac_new: (constructor)
++ * @digest_type: the desired type of digest
++ * @key: (array length=key_len): the key for the HMAC
++ * @key_len: the length of the key
++ *
++ * Creates a new #GHmac, using the digest algorithm @digest_type.
++ * If the @digest_type is not known, %NULL is returned.
++ * A #GHmac can be used to compute the HMAC of a key and an
++ * arbitrary binary blob, using different hashing algorithms.
++ *
++ * A #GHmac works by feeding a binary blob through g_hmac_update()
++ * until the data is complete; the digest can then be extracted
++ * using g_hmac_get_string(), which will return the checksum as a
++ * hexadecimal string; or g_hmac_get_digest(), which will return an
++ * array of raw bytes. Once either g_hmac_get_string() or
++ * g_hmac_get_digest() have been called on a #GHmac, the HMAC
++ * will be closed and it won't be possible to call g_hmac_update()
++ * on it anymore.
++ *
++ * Support for digests of type %G_CHECKSUM_SHA512 has been added in GLib 2.42.
++ * Support for %G_CHECKSUM_SHA384 was added in GLib 2.52.
++ *
++ * #GHmac creation may fail, in which case this function returns %NULL.
++ * Since there is no error parameter, it is not possible to indicate why.
++ * Failures include unavailable runtime crypto library/provider support,
++ * unavailable algorithms, and backend policy rejections.
++ *
++ * When GLib is built with the OpenSSL GHmac backend, @key_len must not
++ * exceed %G_MAXINT. A larger value logs a critical diagnostic and returns
++ * %NULL. This limit also applies through convenience wrappers.
++ *
++ * Returns: (nullable) (transfer full): the newly created #GHmac, or %NULL.
++ *   Use g_hmac_unref() to free the memory allocated by it.
++ *
++ * Since: 2.30
++ */
++
++/**
++ * g_hmac_copy:
++ * @hmac: the #GHmac to copy
++ *
++ * Copies a #GHmac. If @hmac has been closed, by calling
++ * g_hmac_get_string() or g_hmac_get_digest(), the copied
++ * HMAC will be closed as well.
++ *
++ * Returns: (transfer full): the copy of the passed #GHmac. Use g_hmac_unref()
++ *   when finished using it.
++ *
++ * Since: 2.30
++ */
++
++/**
++ * g_hmac_ref:
++ * @hmac: a valid #GHmac
++ *
++ * Atomically increments the reference count of @hmac by one.
++ *
++ * This function is MT-safe and may be called from any thread.
++ *
++ * Returns: (transfer full): the passed in #GHmac.
++ *
++ * Since: 2.30
++ **/
++
++/**
++ * g_hmac_unref:
++ * @hmac: (transfer full): a #GHmac
++ *
++ * Atomically decrements the reference count of @hmac by one.
++ * If the reference count drops to 0, all keys and values will be
++ * destroyed, and all memory allocated by the hash table is released.
++ * This function is MT-safe and may be called from any thread.
++ *
++ * Since: 2.30
++ **/
++
++/**
++ * g_hmac_update:
++ * @hmac: a #GHmac
++ * @data: (array length=length): buffer containing the data to add
++ * @length: the length of the data to add. If -1, the data must be
++ *     nul-terminated
++ *
++ * Feeds @data of size @length into an existing #GHmac.
++ *
++ * The HMAC must still be open, that is g_hmac_get_string() or
++ * g_hmac_get_digest() must not have been called on @hmac.
++ *
++ * Since: 2.30
++ */
++
++/**
++ * g_hmac_get_string:
++ * @hmac: a #GHmac
++ *
++ * Gets the HMAC as a hexadecimal string.
++ *
++ * Once this function has been called the #GHmac can no longer be
++ * updated with g_hmac_update().
++ *
++ * The hexadecimal characters will be lower case.
++ *
++ * Returns: the hexadecimal representation of the HMAC. The
++ *   returned string is owned by the HMAC and should not be modified
++ *   or freed.
++ *
++ * Since: 2.30
++ */
++
++/**
++ * g_hmac_get_digest:
++ * @hmac: a #GHmac
++ * @buffer: (array length=digest_len): output buffer
++ * @digest_len: (inout): an inout parameter. The caller initializes it to the
++ *   size of @buffer. After the call it contains the length of the digest
++ *
++ * Gets the digest from @hmac as a raw binary array and places it
++ * into @buffer. The size of the digest depends on the type of digest
++ * used to create the HMAC.
++ *
++ * Once this function has been called, the HMAC can no longer be updated
++ * with g_hmac_update().
++ *
++ * Since: 2.30
++ */
++
++/**
+  * g_compute_hmac_for_data:
+  * @digest_type: a #GChecksumType to use for the HMAC
+  * @key: (array length=key_len): the key to use in the HMAC
+@@ -46,8 +195,9 @@
+  *
+  * The hexadecimal string returned will be in lower case.
+  *
+- * Returns: the HMAC of the binary data as a string in hexadecimal.
+- *   The returned string should be freed with g_free() when done using it.
++ * Returns: (nullable): the HMAC of the binary data as a string in
++ *   hexadecimal, or %NULL on HMAC construction failure. The returned
++ *   string should be freed with g_free() when done using it.
+  *
+  * Since: 2.30
+  */
+@@ -86,8 +236,9 @@ g_compute_hmac_for_data (GChecksumType  digest_type,
+  *
+  * The hexadecimal string returned will be in lower case.
+  *
+- * Returns: the HMAC of the binary data as a string in hexadecimal.
+- *   The returned string should be freed with g_free() when done using it.
++ * Returns: (nullable): the HMAC of the binary data as a string in
++ *   hexadecimal, or %NULL on HMAC construction failure. The returned
++ *   string should be freed with g_free() when done using it.
+  *
+  * Since: 2.50
+  */
+@@ -122,9 +273,9 @@ g_compute_hmac_for_bytes (GChecksumType  digest_type,
+  *
+  * The hexadecimal string returned will be in lower case.
+  *
+- * Returns: the HMAC as a hexadecimal string.
+- *     The returned string should be freed with g_free()
+- *     when done using it.
++ * Returns: (nullable): the HMAC as a hexadecimal string, or %NULL on
++ *     HMAC construction failure. The returned string should be freed
++ *     with g_free() when done using it.
+  *
+  * Since: 2.30
+  */
+diff --git a/glib/tests/autoptr.c b/glib/tests/autoptr.c
+index 4ed27f52b776260c7163f9eb3758d876cfee121e..11987a0beffef682e7c2d6ac65065c3621e05113 100644
+--- a/glib/tests/autoptr.c
++++ b/glib/tests/autoptr.c
+@@ -110,7 +110,13 @@ test_g_hash_table (void)
+ static void
+ test_g_hmac (void)
+ {
+-  g_autoptr(GHmac) val = g_hmac_new (G_CHECKSUM_SHA256, (guint8*)"hello", 5);
++  static const guint8 key[32] = {
++    0x6b, 0x65, 0x79, 0x2d, 0x66, 0x6f, 0x72, 0x2d,
++    0x61, 0x75, 0x74, 0x6f, 0x70, 0x74, 0x72, 0x2d,
++    0x67, 0x68, 0x6d, 0x61, 0x63, 0x2d, 0x74, 0x65,
++    0x73, 0x74, 0x2d, 0x6b, 0x65, 0x79, 0x2d, 0x31,
++  };
++  g_autoptr(GHmac) val = g_hmac_new (G_CHECKSUM_SHA256, key, sizeof (key));
+   g_assert_nonnull (val);
+ }
+ 
+diff --git a/glib/tests/hmac.c b/glib/tests/hmac.c
+index e7f3fdf089b87af95769c0bac927c4096facbdd8..e8e14f8012f52088db787f87e9015d8c7bd373f4 100644
+--- a/glib/tests/hmac.c
++++ b/glib/tests/hmac.c
+@@ -499,6 +499,656 @@ test_hmac_for_bytes (void)
+   g_bytes_unref (data);
+ }
+ 
++typedef struct
++{
++  GChecksumType type;
++  const gchar *name;
++  gsize block_size;
++  const gchar *expected_empty;
++  const gchar *expected_null0_abc;
++  const gchar *expected_embedded_nul;
++  const gchar *expected_split;
++  const gchar *expected_neglen;
++  const gchar *expected_block_below;
++  const gchar *expected_block_at;
++  const gchar *expected_block_above;
++  const gchar *expected_copy_left;
++  const gchar *expected_copy_right;
++} AlgorithmCase;
++
++static const AlgorithmCase algorithm_cases[] = {
++#ifndef USE_GNUTLS
++  {
++    G_CHECKSUM_MD5, "md5", 64,
++    "f666124c4eb6b5fffc96000ae815313f",
++    "dd2701993d29fdd0b032c233cec63403",
++    "50e66a5e7d61ab8dafc9a20af7a458b1",
++    "4339b05cbecd46087b94912db0a6ba06",
++    "40b247c2b4f977def47f3c8a75fd205e",
++    "eb689ad760baa9381a96c98e3e8fdcda",
++    "f4b3edb92112942e6d528c5b5bd8d57d",
++    "5a821fcef205b7f0db5a7816628fb55b",
++    "fcd4b9770caa9d53a7a36444badc0e4a",
++    "c9a310aaf10033b6753922a0adad3668",
++  },
++  {
++    G_CHECKSUM_SHA1, "sha1", 64,
++    "90ebb2f452e90a3ab8cf9dd99ff6646e9c3d6c81",
++    "9b4a918f398d74d3e367970aba3cbe54e4d2b5d9",
++    "6c371ec1e71a08e0243c4bbfae729d540e72cb97",
++    "65f3b0d239a68ecee14aa209a6a4bf878feba051",
++    "18f95825861c5feabeecd7eaef27ababebbb5327",
++    "82d959ae0bd6fd44b85ba29dee932c83fcec260d",
++    "c4535a797b8ceec9f718e7a19798be3d42037720",
++    "5ff78c2de6e605b639227a397b83755cbcc3d3e9",
++    "d5f04c6a6bc3c3d126b2ee2919bf248799a1d3f0",
++    "6b6725ef800f1c7435caa5fb0fa686b17d3fdfbd",
++  },
++#endif
++  {
++    G_CHECKSUM_SHA256, "sha256", 64,
++    "c8ec49a3624de5b14061c778bf8843cf52fbecc9f6c71f950f7fb4322e3d77fb",
++    "fd7adb152c05ef80dccf50a1fa4c05d5a3ec6da95575fc312ae7c5d091836351",
++    "29bd5bd76cad5debae8a862ad156a02ba4f4889795a74bc703687e03ee94b10c",
++    "adc094eaf5e9006db9958708ec2eae9cee29bbd1eb37e179473cae97c3e49990",
++    "4c5277d3e85316d1762c7e219862a9440546171f5ae5f1b29499ff9fbdd4c56a",
++    "b3047abb160643e6e069b4e00acca557a387c9c56b442dff3a2c443ab40b2f1e",
++    "d1bedfb0e272feb2490a8f95bb6a92507c1b4f9b9a5beb393a43e8c89289a37b",
++    "b7d575847cbbfb06ae6f0fc8f1c7239bf182d55aff58f6d65d8956575cc91b03",
++    "e241d8873fb630aa730c7c8f49f2d4c4b72d4b75c1e787c042a37f7510ee365b",
++    "1cedfe2a07f1845daf80a8f7961673cc7d792f2993340a78ee6050ae28af1108",
++  },
++  {
++    G_CHECKSUM_SHA384, "sha384", 128,
++    "bca339efa34e301682f7b0c33683af1f4ae1a8bd3d95a4ddb23adb7c5e265e5311504a2347ea0e955b4ff3f506916cf2",
++    "948f7c5caa500c31d7d4a0f52f3e3da7e33c8a9fe6ef528b8a9ac3e4adc4e24d908e6f40b737510e82354759dc5e9f06",
++    "1c50b56c5aa1e69e3776f6ae3d8966ff4031a8db6200bd34eac5818186c77a07cccc5b0e5e792be4a20e6def81a9885e",
++    "364bf060a898da5d539a09a543a5623070430799dddc3d882becdd05acc2a89e695e13ccc2d2264555aec7b12e1d40f1",
++    "407eaa20457ddd1838e0cb7ee9a93e68cd9808d529adbfcc84a802bf37202ab2b6a1bbab9de9bc9af5c410fa975e2139",
++    "664b994c1c1f1628d8c44243d1f864c3b6a27427c523ca311165f99452711d040adf3f221f9113ea82612a20ca429094",
++    "ca476cb917d7260f39e0bc6c789fecf5f640e0ebd8e71e0ed18b13eb252dd4b8ab48ec24e21cd9c9d502ac2cb8a6186b",
++    "669a3641dce8a16844acd1edd6650fb7757524236d3ed4020ff042cc9744d96a78cf16492cea4c99d69a1c568504e7dd",
++    "63f6bf2f7d43cdab8b26bfc9a45ededf0cb038731d18558a19f54092b9d1bbe7edc6bd3e28fa2ff21f91f8637cee6914",
++    "6ad647f4fc91b21e0cc0a3d89ad2ffeb5a0f62a5b2f883eb8eeccf9aea7d03bc3d2368bb15a492997b7c89b16eb4860b",
++  },
++  {
++    G_CHECKSUM_SHA512, "sha512", 128,
++    "cba66e9eaeaf8425200b08861c2cc418ab8f0a7b3c101e3dcb2e45ade2d6063e9d84d4726c30c771dc950573201a1c94dccac845c126c9334feed7628718e12f",
++    "29689f6b79a8dd686068c2eeae97fd8769ad3ba65cb5381f838358a8045a358ee3ba1739c689c7805e31734fb6072f87261d1256995370d55725cba00d10bdd0",
++    "16df5c2dfc814ebd03cb45e82c17ee4938e2f57c8353e276afbcad110cb0a995acb8f30857766505611f1dfe687f7d72f30c0f9d992a84f5ad64c8e749461019",
++    "a99b3422fc9232585028956cefa655ad1b11a275ce790b40c3a63808c20976636812db474fef938a49593bfae38555744625af921cbdc393e884638934ada208",
++    "e97348dbd79dff60a3c8e89f4e248b230d8c89c6021615f492510270dd82cf8154b28461fb625ff5554649225a0c3709e42f7f5d405a6f5fbaa1184e59976826",
++    "4a2d04d0daa5dc8a022b7c044fa7c5e02245ed8329ed8f410aa21331fe125856e33a50fdfd204e284018daf8d6c4ba15d264fbf097a8f38244f0d2e5b4362e3b",
++    "dad7ea92572b401bba7739c2dbc241351fb498ed3dc0821eec95fa43d987f66f6557b2c4694126468ff68264aea774225720541c813718ce73f62900f98e0079",
++    "c5867adab8c0f87cd01ee5d8b69a068626a26b06405fcb1f5baa8e63e8ba7281b44afc007e4fa5e7207188a03bb0b15186e5f1d75b68eae6ece674555d05f93a",
++    "cc83b88cb9706b6b7aabb2604f199e4a67e08a03be633fae4e34e82fa85c1007888d9e2cd35cfb28178e74fe6052e08010fae83f6e919bdc280a12b474fa741b",
++    "f92d1db42d7c0392b88508a107b5d6612c6166d301a9e3413790ac48b9087d15703dddf5cf1e70172770afec3c47bc904f0603c8718616c1bc15283e4d9d707a",
++  },
++};
++
++static void
++test_hmac_null_zero_key (void)
++{
++  static const guint8 empty_key = 0;
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      GHmac *hmac_null;
++      GHmac *hmac_nonnull;
++      const gchar *with_null;
++      const gchar *with_nonnull;
++
++      hmac_null = g_hmac_new (algo->type, NULL, 0);
++      g_assert_nonnull (hmac_null);
++      g_hmac_update (hmac_null, (const guint8 *) "abc", 3);
++      with_null = g_hmac_get_string (hmac_null);
++      g_assert_cmpstr (with_null, ==, algo->expected_null0_abc);
++
++      hmac_nonnull = g_hmac_new (algo->type, &empty_key, 0);
++      g_assert_nonnull (hmac_nonnull);
++      g_hmac_update (hmac_nonnull, (const guint8 *) "abc", 3);
++      with_nonnull = g_hmac_get_string (hmac_nonnull);
++
++      g_assert_cmpstr (with_null, ==, with_nonnull);
++      g_assert_cmpstr (with_nonnull, ==, algo->expected_null0_abc);
++
++      g_hmac_unref (hmac_nonnull);
++      g_hmac_unref (hmac_null);
++    }
++}
++
++static void
++test_hmac_empty_message_all_algorithms (void)
++{
++  static const guint8 key[] = "alg-key";
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      GHmac *hmac = g_hmac_new (algo->type, key, sizeof (key) - 1);
++      const gchar *digest;
++
++      g_assert_nonnull (hmac);
++      g_hmac_update (hmac, (const guint8 *) "", 0);
++      digest = g_hmac_get_string (hmac);
++      g_assert_cmpstr (digest, ==, algo->expected_empty);
++      g_hmac_unref (hmac);
++    }
++}
++
++static void
++test_hmac_embedded_nul_all_algorithms (void)
++{
++  static const guint8 key[] = "alg-key";
++  static const guint8 payload[] = { 'a', 'b', '\0', 'c' };
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      GHmac *hmac_one = g_hmac_new (algo->type, key, sizeof (key) - 1);
++      GHmac *hmac_two = g_hmac_new (algo->type, key, sizeof (key) - 1);
++      const gchar *one;
++      const gchar *two;
++
++      g_assert_nonnull (hmac_one);
++      g_assert_nonnull (hmac_two);
++      g_hmac_update (hmac_one, payload, sizeof (payload));
++      g_hmac_update (hmac_two, payload, 2);
++      g_hmac_update (hmac_two, payload + 2, 2);
++
++      one = g_hmac_get_string (hmac_one);
++      two = g_hmac_get_string (hmac_two);
++      g_assert_cmpstr (one, ==, two);
++      g_assert_cmpstr (one, ==, algo->expected_embedded_nul);
++
++      g_hmac_unref (hmac_two);
++      g_hmac_unref (hmac_one);
++    }
++}
++
++static void
++test_hmac_split_update_matches_oneshot (void)
++{
++  static const guint8 key[] = "split-key";
++  static const guint8 data[] = { 'a', 'b', '\0', 'c', 'd', 'e' };
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      GHmac *oneshot;
++      GHmac *split;
++      const gchar *digest_oneshot;
++      const gchar *digest_split;
++
++      oneshot = g_hmac_new (algo->type, key, sizeof (key) - 1);
++      split = g_hmac_new (algo->type, key, sizeof (key) - 1);
++      g_assert_nonnull (oneshot);
++      g_assert_nonnull (split);
++
++      g_hmac_update (oneshot, data, sizeof (data));
++
++      g_hmac_update (split, data, 2);
++      g_hmac_update (split, data + 2, 0);
++      g_hmac_update (split, data + 2, sizeof (data) - 2);
++
++      digest_oneshot = g_hmac_get_string (oneshot);
++      digest_split = g_hmac_get_string (split);
++      g_assert_cmpstr (digest_oneshot, ==, digest_split);
++      g_assert_cmpstr (digest_oneshot, ==, algo->expected_split);
++
++      g_hmac_unref (split);
++      g_hmac_unref (oneshot);
++    }
++}
++
++static void
++test_hmac_negative_length_matches_explicit (void)
++{
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      GHmac *implicit_len;
++      GHmac *explicit_len;
++      const gchar *string_implicit;
++      const gchar *string_explicit;
++
++      implicit_len = g_hmac_new (algo->type, (const guint8 *) "key", 3);
++      explicit_len = g_hmac_new (algo->type, (const guint8 *) "key", 3);
++      g_assert_nonnull (implicit_len);
++      g_assert_nonnull (explicit_len);
++
++      g_hmac_update (implicit_len, (const guint8 *) "abcdef", -1);
++      g_hmac_update (explicit_len, (const guint8 *) "abcdef", 6);
++
++      string_implicit = g_hmac_get_string (implicit_len);
++      string_explicit = g_hmac_get_string (explicit_len);
++      g_assert_cmpstr (string_implicit, ==, string_explicit);
++      g_assert_cmpstr (string_implicit, ==, algo->expected_neglen);
++
++      g_hmac_unref (explicit_len);
++      g_hmac_unref (implicit_len);
++    }
++}
++
++static void
++test_hmac_key_block_size_boundaries (void)
++{
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      guint8 *key_below;
++      guint8 *key_at;
++      guint8 *key_above;
++      gchar *hmac_below;
++      gchar *hmac_at;
++      gchar *hmac_above;
++
++      key_below = g_malloc (algo->block_size - 1);
++      key_at = g_malloc (algo->block_size);
++      key_above = g_malloc (algo->block_size + 1);
++      memset (key_below, 0x41, algo->block_size - 1);
++      memset (key_at, 0x42, algo->block_size);
++      memset (key_above, 0x43, algo->block_size + 1);
++
++      hmac_below = g_compute_hmac_for_data (algo->type, key_below, algo->block_size - 1,
++                                            (const guint8 *) "payload", 7);
++      hmac_at = g_compute_hmac_for_data (algo->type, key_at, algo->block_size,
++                                         (const guint8 *) "payload", 7);
++      hmac_above = g_compute_hmac_for_data (algo->type, key_above, algo->block_size + 1,
++                                            (const guint8 *) "payload", 7);
++
++      g_assert_cmpstr (hmac_below, ==, algo->expected_block_below);
++      g_assert_cmpstr (hmac_at, ==, algo->expected_block_at);
++      g_assert_cmpstr (hmac_above, ==, algo->expected_block_above);
++      g_assert_cmpstr (hmac_below, !=, hmac_at);
++      g_assert_cmpstr (hmac_at, !=, hmac_above);
++
++      g_free (hmac_above);
++      g_free (hmac_at);
++      g_free (hmac_below);
++      g_free (key_above);
++      g_free (key_at);
++      g_free (key_below);
++    }
++}
++
++static void
++test_hmac_copy_open_diverges (void)
++{
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      GHmac *source;
++      GHmac *copy;
++      const gchar *source_digest;
++      const gchar *copy_digest;
++
++      source = g_hmac_new (algo->type, (const guint8 *) "key", 3);
++      g_assert_nonnull (source);
++      g_hmac_update (source, (const guint8 *) "prefix-", 7);
++
++      copy = g_hmac_copy (source);
++      g_assert_nonnull (copy);
++
++      g_hmac_update (source, (const guint8 *) "left", 4);
++      g_hmac_update (copy, (const guint8 *) "right", 5);
++
++      source_digest = g_hmac_get_string (source);
++      copy_digest = g_hmac_get_string (copy);
++      g_assert_cmpstr (source_digest, ==, algo->expected_copy_left);
++      g_assert_cmpstr (copy_digest, ==, algo->expected_copy_right);
++      g_assert_cmpstr (source_digest, !=, copy_digest);
++
++      g_hmac_unref (copy);
++      g_hmac_unref (source);
++    }
++}
++
++#ifdef USE_OPENSSL
++static void
++test_hmac_copy_closed_after_source_unref_digest_then_string (void)
++{
++  GHmac *source;
++  GHmac *copy;
++  guint8 source_digest[64];
++  guint8 copy_digest[64];
++  gsize source_len = sizeof (source_digest);
++  gsize copy_len = sizeof (copy_digest);
++  const gchar *copy_hex;
++
++  source = g_hmac_new (G_CHECKSUM_SHA256, (const guint8 *) "key", 3);
++  g_assert_nonnull (source);
++  g_hmac_update (source, (const guint8 *) "abc", 3);
++  g_hmac_get_digest (source, source_digest, &source_len);
++
++  copy = g_hmac_copy (source);
++  g_assert_nonnull (copy);
++  g_hmac_unref (source);
++
++  g_hmac_get_digest (copy, copy_digest, &copy_len);
++  copy_hex = g_hmac_get_string (copy);
++  g_assert_nonnull (copy_hex);
++  g_assert_cmpuint (source_len, ==, copy_len);
++  g_assert_cmpmem (source_digest, source_len, copy_digest, copy_len);
++  g_hmac_unref (copy);
++}
++
++static void
++test_hmac_copy_closed_after_source_unref_string_then_digest (void)
++{
++  GHmac *source;
++  GHmac *copy;
++  guint8 source_digest[64];
++  guint8 copy_digest[64];
++  gsize source_len = sizeof (source_digest);
++  gsize copy_len = sizeof (copy_digest);
++  const gchar *source_hex;
++  gchar *source_hex_owned;
++  const gchar *copy_hex_first;
++  const gchar *copy_hex_second;
++
++  source = g_hmac_new (G_CHECKSUM_SHA256, (const guint8 *) "key", 3);
++  g_assert_nonnull (source);
++  g_hmac_update (source, (const guint8 *) "abc", 3);
++  source_hex = g_hmac_get_string (source);
++  g_assert_nonnull (source_hex);
++  source_hex_owned = g_strdup (source_hex);
++  g_hmac_get_digest (source, source_digest, &source_len);
++
++  copy = g_hmac_copy (source);
++  g_assert_nonnull (copy);
++  g_hmac_unref (source);
++
++  copy_hex_first = g_hmac_get_string (copy);
++  g_hmac_get_digest (copy, copy_digest, &copy_len);
++  copy_hex_second = g_hmac_get_string (copy);
++  g_assert_cmpstr (copy_hex_first, ==, source_hex_owned);
++  g_assert_cmpstr (copy_hex_second, ==, copy_hex_first);
++  g_assert_cmpuint (source_len, ==, copy_len);
++  g_assert_cmpmem (source_digest, source_len, copy_digest, copy_len);
++  g_hmac_unref (copy);
++  g_free (source_hex_owned);
++}
++#endif
++
++typedef struct
++{
++  GHmac *hmac;
++  gint iterations;
++} RefThreadData;
++
++static gpointer
++hmac_ref_thread (gpointer user_data)
++{
++  RefThreadData *data = user_data;
++  gint i;
++
++  for (i = 0; i < data->iterations; i++)
++    {
++      GHmac *tmp = g_hmac_ref (data->hmac);
++      g_hmac_unref (tmp);
++    }
++
++  return NULL;
++}
++
++static void
++test_hmac_quiescent_thread_ref_unref (void)
++{
++  GHmac *hmac;
++  RefThreadData data = { 0, };
++  GThread *threads[4];
++  guint i;
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guint8 *) "key", 3);
++  g_assert_nonnull (hmac);
++  data.hmac = hmac;
++  data.iterations = 1000;
++
++  for (i = 0; i < G_N_ELEMENTS (threads); i++)
++    threads[i] = g_thread_new ("hmac-ref", hmac_ref_thread, &data);
++
++  for (i = 0; i < G_N_ELEMENTS (threads); i++)
++    g_thread_join (threads[i]);
++
++  g_hmac_unref (hmac);
++}
++
++#ifdef USE_OPENSSL
++static void
++test_hmac_closed_update_warns (void)
++{
++  GHmac *hmac;
++  const gchar *before;
++  const gchar *after;
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guint8 *) "key", 3);
++  g_assert_nonnull (hmac);
++  g_hmac_update (hmac, (const guint8 *) "abc", 3);
++
++  before = g_hmac_get_string (hmac);
++  g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
++                         "*g_hmac_update: HMAC context is already closed*");
++  g_hmac_update (hmac, (const guint8 *) "def", 3);
++  g_test_assert_expected_messages ();
++
++  after = g_hmac_get_string (hmac);
++  g_assert_cmpstr (before, ==, after);
++  g_hmac_unref (hmac);
++}
++#endif
++
++typedef struct
++{
++  GMutex lock;
++  GCond ready_cond;
++  GCond start_cond;
++  guint waiting;
++  guint target;
++  gboolean start;
++  gint failures;
++} FirstUseState;
++
++static gpointer
++hmac_first_use_worker (gpointer user_data)
++{
++  FirstUseState *state = user_data;
++  GHmac *hmac;
++  const gchar *digest;
++
++  g_mutex_lock (&state->lock);
++  state->waiting++;
++  if (state->waiting == state->target)
++    g_cond_signal (&state->ready_cond);
++  while (!state->start)
++    g_cond_wait (&state->start_cond, &state->lock);
++  g_mutex_unlock (&state->lock);
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guint8 *) "thread-key", 10);
++  if (hmac == NULL)
++    {
++      g_atomic_int_inc (&state->failures);
++      return NULL;
++    }
++
++  g_hmac_update (hmac, (const guint8 *) "thread-data", 11);
++  digest = g_hmac_get_string (hmac);
++  if (g_strcmp0 (digest, "36fef1ae2ee64705586107697319e2ba7c40fb62f82566568f048418743cc02c") != 0)
++    g_atomic_int_inc (&state->failures);
++  g_hmac_unref (hmac);
++
++  return NULL;
++}
++
++static void
++test_hmac_concurrent_first_use_success_subprocess (void)
++{
++  if (g_test_subprocess ())
++    {
++      FirstUseState state = { 0, };
++      GThread *threads[8];
++      guint n_threads = 0;
++      gint64 start_us;
++      gint64 elapsed_us;
++      gint64 wait_deadline;
++      gboolean all_waiting = TRUE;
++      guint i;
++
++      g_mutex_init (&state.lock);
++      g_cond_init (&state.ready_cond);
++      g_cond_init (&state.start_cond);
++
++      g_mutex_lock (&state.lock);
++      for (i = 0; i < G_N_ELEMENTS (threads); i++)
++        {
++          threads[i] = g_thread_new ("hmac-first-use", hmac_first_use_worker, &state);
++          g_assert_nonnull (threads[i]);
++          n_threads++;
++        }
++
++      state.target = n_threads;
++      wait_deadline = g_get_monotonic_time () + (G_TIME_SPAN_SECOND * 30);
++      while (state.waiting < state.target)
++        {
++          if (!g_cond_wait_until (&state.ready_cond, &state.lock, wait_deadline))
++            {
++              all_waiting = FALSE;
++              break;
++            }
++        }
++      start_us = g_get_monotonic_time ();
++      state.start = TRUE;
++      g_cond_broadcast (&state.start_cond);
++      g_mutex_unlock (&state.lock);
++
++      for (i = 0; i < n_threads; i++)
++        g_thread_join (threads[i]);
++      elapsed_us = g_get_monotonic_time () - start_us;
++
++      g_assert_true (all_waiting);
++      g_assert_cmpint (g_atomic_int_get (&state.failures), ==, 0);
++      g_assert_cmpint (elapsed_us < G_TIME_SPAN_SECOND * 10, ==, TRUE);
++      g_cond_clear (&state.start_cond);
++      g_cond_clear (&state.ready_cond);
++      g_mutex_clear (&state.lock);
++      return;
++    }
++
++  g_test_trap_subprocess ("/hmac/first-use-concurrent-success", G_TIME_SPAN_SECOND * 30, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_passed ();
++}
++
++#ifdef USE_OPENSSL
++static void
++test_hmac_get_digest_small_buffer (void)
++{
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      GHmac *hmac;
++      guint8 buf[128];
++      gsize digest_len = g_checksum_type_get_length (algo->type);
++      gsize len = digest_len - 1;
++
++      hmac = g_hmac_new (algo->type, (const guint8 *) "key", 3);
++      g_assert_nonnull (hmac);
++      g_hmac_update (hmac, (const guint8 *) "abc", 3);
++
++      memset (buf, 0xaa, sizeof (buf));
++      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
++                             "*assertion '*digest_len >=*' failed*");
++      g_hmac_get_digest (hmac, buf, &len);
++      g_test_assert_expected_messages ();
++      g_assert_cmpuint (len, ==, digest_len - 1);
++      {
++        gsize j;
++        for (j = 0; j < sizeof (buf); j++)
++          g_assert_cmpuint (buf[j], ==, 0xaa);
++      }
++
++      g_hmac_update (hmac, (const guint8 *) "def", 3);
++      len = sizeof (buf);
++      g_hmac_get_digest (hmac, buf, &len);
++      g_assert_cmpuint (len, ==, digest_len);
++      g_assert_cmpstr (g_hmac_get_string (hmac), ==, algo->expected_neglen);
++
++      g_hmac_unref (hmac);
++    }
++}
++
++static void
++test_hmac_get_digest_buffer_sizes_and_canaries (void)
++{
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (algorithm_cases); i++)
++    {
++      const AlgorithmCase *algo = &algorithm_cases[i];
++      GHmac *hmac;
++      guint8 exact_buf[128];
++      guint8 larger_buf[160];
++      gsize digest_len = g_checksum_type_get_length (algo->type);
++      gsize len;
++
++      hmac = g_hmac_new (algo->type, (const guint8 *) "key", 3);
++      g_assert_nonnull (hmac);
++      g_hmac_update (hmac, (const guint8 *) "abcdef", 6);
++
++      memset (exact_buf, 0xee, sizeof (exact_buf));
++      len = digest_len;
++      g_hmac_get_digest (hmac, exact_buf, &len);
++      g_assert_cmpuint (len, ==, digest_len);
++      {
++        gsize j;
++        for (j = digest_len; j < sizeof (exact_buf); j++)
++          g_assert_cmpuint (exact_buf[j], ==, 0xee);
++      }
++
++      memset (larger_buf, 0xcc, sizeof (larger_buf));
++      len = sizeof (larger_buf);
++      g_hmac_get_digest (hmac, larger_buf, &len);
++      g_assert_cmpuint (len, ==, digest_len);
++      g_assert_cmpmem (larger_buf, digest_len, exact_buf, digest_len);
++      {
++        gsize j;
++        for (j = digest_len; j < sizeof (larger_buf); j++)
++          g_assert_cmpuint (larger_buf[j], ==, 0xcc);
++      }
++      g_assert_cmpstr (g_hmac_get_string (hmac), ==, algo->expected_neglen);
++      g_hmac_unref (hmac);
++    }
++}
++#endif
++
++#ifdef USE_OPENSSL
++static void
++test_hmac_oversized_key_open_ssl (void)
++{
++  static const guint8 sentinel = 0x5a;
++  GHmac *hmac;
++  gsize key_len = (gsize) G_MAXINT + 1;
++
++  g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
++                         "*g_hmac_new: OpenSSL backend requires key_len <= G_MAXINT*");
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, &sentinel, key_len);
++  g_test_assert_expected_messages ();
++  g_assert_null (hmac);
++}
++#endif
++
+ int
+ main (int argc,
+     char **argv)
+@@ -556,6 +1206,30 @@ main (int argc,
+   g_test_add_func ("/hmac/for-data", test_hmac_for_data);
+   g_test_add_func ("/hmac/for-string", test_hmac_for_string);
+   g_test_add_func ("/hmac/for-bytes", test_hmac_for_bytes);
++  g_test_add_func ("/hmac/null-zero-key", test_hmac_null_zero_key);
++  g_test_add_func ("/hmac/empty-message-all-algorithms", test_hmac_empty_message_all_algorithms);
++  g_test_add_func ("/hmac/embedded-nul-all-algorithms", test_hmac_embedded_nul_all_algorithms);
++  g_test_add_func ("/hmac/split-update", test_hmac_split_update_matches_oneshot);
++  g_test_add_func ("/hmac/negative-length", test_hmac_negative_length_matches_explicit);
++  g_test_add_func ("/hmac/block-size-boundaries", test_hmac_key_block_size_boundaries);
++  g_test_add_func ("/hmac/copy-open-diverges", test_hmac_copy_open_diverges);
++#ifdef USE_OPENSSL
++  g_test_add_func ("/hmac/copy-closed-after-source-unref/digest-then-string",
++                   test_hmac_copy_closed_after_source_unref_digest_then_string);
++  g_test_add_func ("/hmac/copy-closed-after-source-unref/string-then-digest",
++                   test_hmac_copy_closed_after_source_unref_string_then_digest);
++#endif
++  g_test_add_func ("/hmac/ref-unref-threads", test_hmac_quiescent_thread_ref_unref);
++  g_test_add_func ("/hmac/first-use-concurrent-success", test_hmac_concurrent_first_use_success_subprocess);
++#ifdef USE_OPENSSL
++  g_test_add_func ("/hmac/closed-update-warns", test_hmac_closed_update_warns);
++#endif
++#ifdef USE_OPENSSL
++  g_test_add_func ("/hmac/get-digest-small-buffer", test_hmac_get_digest_small_buffer);
++  g_test_add_func ("/hmac/get-digest-buffer-sizes-and-canaries",
++                   test_hmac_get_digest_buffer_sizes_and_canaries);
++  g_test_add_func ("/hmac/openssl/oversized-key", test_hmac_oversized_key_open_ssl);
++#endif
+ 
+   return g_test_run ();
+ }
+From 8b10338482fbf68140e4ec84a3e7c9d9072a2e6f Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 30 Oct 2026 19:05:00 +0000
+Subject: [PATCH 3/9] test(glib): add c3 deterministic openssl failure fixtures
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ glib/tests/fake-crypto-missing-final.c        | 149 ++++
+ glib/tests/fake-crypto-missing-symbols.c      |  19 +
+ glib/tests/fake-crypto-scripted.c             | 216 +++++
+ glib/tests/fake-crypto-unloadable.c           |  23 +
+ glib/tests/hmac-openssl-failures.c            | 752 ++++++++++++++++++
+ glib/tests/hmac-openssl/fixture-api.h         |  57 ++
+ .../hmac-openssl/missing-symbol/crypto.c      | 161 ++++
+ .../hmac-openssl/missing-symbol/meson.build   |   7 +
+ glib/tests/hmac-openssl/scripted/crypto.c     | 404 ++++++++++
+ glib/tests/hmac-openssl/scripted/meson.build  |   7 +
+ glib/tests/hmac-openssl/unloadable/crypto.c   |  22 +
+ .../tests/hmac-openssl/unloadable/meson.build |   8 +
+ glib/tests/meson.build                        |  17 +
+ 13 files changed, 1842 insertions(+)
+ create mode 100644 glib/tests/fake-crypto-missing-final.c
+ create mode 100644 glib/tests/fake-crypto-missing-symbols.c
+ create mode 100644 glib/tests/fake-crypto-scripted.c
+ create mode 100644 glib/tests/fake-crypto-unloadable.c
+ create mode 100644 glib/tests/hmac-openssl-failures.c
+ create mode 100644 glib/tests/hmac-openssl/fixture-api.h
+ create mode 100644 glib/tests/hmac-openssl/missing-symbol/crypto.c
+ create mode 100644 glib/tests/hmac-openssl/missing-symbol/meson.build
+ create mode 100644 glib/tests/hmac-openssl/scripted/crypto.c
+ create mode 100644 glib/tests/hmac-openssl/scripted/meson.build
+ create mode 100644 glib/tests/hmac-openssl/unloadable/crypto.c
+ create mode 100644 glib/tests/hmac-openssl/unloadable/meson.build
+
+diff --git a/glib/tests/fake-crypto-missing-final.c b/glib/tests/fake-crypto-missing-final.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b38c5f6e1a8ee7784e708b3c077d3802a53e7c8
+--- /dev/null
++++ b/glib/tests/fake-crypto-missing-final.c
+@@ -0,0 +1,149 @@
++#include <openssl/core_names.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/params.h>
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <string.h>
++
++typedef struct
++{
++  size_t mac_size;
++} FakeMacCtx;
++
++__attribute__((constructor))
++static void
++fake_crypto_marker_ctor (void)
++{
++  const char *path = getenv ("GLIB_TEST_OPENSSL_MARKER_PATH");
++  FILE *stream;
++
++  if (path == NULL || path[0] == '\0')
++    return;
++
++  stream = fopen (path, "w");
++  if (stream == NULL)
++    return;
++  fputs ("loaded\n", stream);
++  fclose (stream);
++}
++
++EVP_MAC *
++EVP_MAC_fetch (OSSL_LIB_CTX  *libctx,
++               const char    *algorithm,
++               const char    *properties)
++{
++  (void) libctx;
++  (void) algorithm;
++  (void) properties;
++  return (EVP_MAC *) (uintptr_t) 0x1;
++}
++
++void
++EVP_MAC_free (EVP_MAC *mac)
++{
++  (void) mac;
++}
++
++EVP_MAC_CTX *
++EVP_MAC_CTX_new (EVP_MAC *mac)
++{
++  FakeMacCtx *ctx;
++
++  (void) mac;
++  ctx = calloc (1, sizeof (FakeMacCtx));
++  if (ctx == NULL)
++    return NULL;
++  ctx->mac_size = 32;
++  return (EVP_MAC_CTX *) ctx;
++}
++
++void
++EVP_MAC_CTX_free (EVP_MAC_CTX *ctx)
++{
++  free ((FakeMacCtx *) ctx);
++}
++
++EVP_MAC_CTX *
++EVP_MAC_CTX_dup (const EVP_MAC_CTX *src)
++{
++  const FakeMacCtx *in_ctx = (const FakeMacCtx *) src;
++  FakeMacCtx *out_ctx = malloc (sizeof (FakeMacCtx));
++
++  if (out_ctx == NULL)
++    return NULL;
++  *out_ctx = *in_ctx;
++  return (EVP_MAC_CTX *) out_ctx;
++}
++
++size_t
++EVP_MAC_CTX_get_mac_size (EVP_MAC_CTX *ctx)
++{
++  return ((FakeMacCtx *) ctx)->mac_size;
++}
++
++int
++EVP_MAC_init (EVP_MAC_CTX         *ctx,
++              const unsigned char *key,
++              size_t               keylen,
++              const OSSL_PARAM     params[])
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++  const OSSL_PARAM *param;
++  const char *digest_name = "SHA256";
++
++  (void) key;
++  (void) keylen;
++
++  for (param = params; param != NULL && param->key != NULL; param++)
++    {
++      if (strcmp (param->key, OSSL_MAC_PARAM_DIGEST) == 0 && param->data != NULL)
++        {
++          digest_name = (const char *) param->data;
++          break;
++        }
++    }
++
++  if (strcmp (digest_name, "SHA512") == 0)
++    fake_ctx->mac_size = 64;
++  else if (strcmp (digest_name, "SHA384") == 0)
++    fake_ctx->mac_size = 48;
++  else if (strcmp (digest_name, "SHA1") == 0)
++    fake_ctx->mac_size = 20;
++  else if (strcmp (digest_name, "MD5") == 0)
++    fake_ctx->mac_size = 16;
++  else
++    fake_ctx->mac_size = 32;
++
++  return 1;
++}
++
++int
++EVP_MAC_update (EVP_MAC_CTX          *ctx,
++                const unsigned char  *data,
++                size_t                datalen)
++{
++  (void) ctx;
++  (void) data;
++  (void) datalen;
++  return 1;
++}
++
++int
++ERR_set_mark (void)
++{
++  return 1;
++}
++
++int
++ERR_pop_to_mark (void)
++{
++  return 1;
++}
++
++void
++ERR_clear_error (void)
++{
++}
+diff --git a/glib/tests/fake-crypto-missing-symbols.c b/glib/tests/fake-crypto-missing-symbols.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..2773c3cd2ded5bf500d2c2d903a4ce0f15248416
+--- /dev/null
++++ b/glib/tests/fake-crypto-missing-symbols.c
+@@ -0,0 +1,19 @@
++#include <stdio.h>
++#include <stdlib.h>
++
++__attribute__((constructor))
++static void
++fake_crypto_marker_ctor (void)
++{
++  const char *path = getenv ("GLIB_TEST_OPENSSL_MARKER_PATH");
++  FILE *stream;
++
++  if (path == NULL || path[0] == '\0')
++    return;
++
++  stream = fopen (path, "w");
++  if (stream == NULL)
++    return;
++  fputs ("loaded\n", stream);
++  fclose (stream);
++}
+diff --git a/glib/tests/fake-crypto-scripted.c b/glib/tests/fake-crypto-scripted.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..dc4a0b7a257f38866a0a7d0c7314d079daea18a3
+--- /dev/null
++++ b/glib/tests/fake-crypto-scripted.c
+@@ -0,0 +1,216 @@
++#include <openssl/core_names.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/params.h>
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <string.h>
++
++typedef struct
++{
++  size_t mac_size;
++  size_t total_len;
++} FakeMacCtx;
++
++static int
++mode_is (const char *value)
++{
++  const char *mode = getenv ("GLIB_TEST_OPENSSL_MODE");
++  return mode != NULL && strcmp (mode, value) == 0;
++}
++
++static size_t
++digest_size_for_name (const char *digest_name)
++{
++  if (digest_name == NULL)
++    return 32;
++  if (strcmp (digest_name, "MD5") == 0)
++    return 16;
++  if (strcmp (digest_name, "SHA1") == 0)
++    return 20;
++  if (strcmp (digest_name, "SHA256") == 0)
++    return 32;
++  if (strcmp (digest_name, "SHA384") == 0)
++    return 48;
++  if (strcmp (digest_name, "SHA512") == 0)
++    return 64;
++  return 32;
++}
++
++__attribute__((constructor))
++static void
++fake_crypto_marker_ctor (void)
++{
++  const char *path = getenv ("GLIB_TEST_OPENSSL_MARKER_PATH");
++  FILE *stream;
++
++  if (path == NULL || path[0] == '\0')
++    return;
++
++  stream = fopen (path, "w");
++  if (stream == NULL)
++    return;
++  fputs ("loaded\n", stream);
++  fclose (stream);
++}
++
++EVP_MAC *
++EVP_MAC_fetch (OSSL_LIB_CTX  *libctx,
++               const char    *algorithm,
++               const char    *properties)
++{
++  (void) libctx;
++  (void) algorithm;
++  (void) properties;
++
++  if (mode_is ("fetch-null"))
++    return NULL;
++
++  return (EVP_MAC *) (uintptr_t) 0x1;
++}
++
++void
++EVP_MAC_free (EVP_MAC *mac)
++{
++  (void) mac;
++}
++
++EVP_MAC_CTX *
++EVP_MAC_CTX_new (EVP_MAC *mac)
++{
++  FakeMacCtx *ctx;
++
++  (void) mac;
++  if (mode_is ("ctx-new-null"))
++    return NULL;
++
++  ctx = calloc (1, sizeof (FakeMacCtx));
++  if (ctx == NULL)
++    return NULL;
++  ctx->mac_size = 32;
++  return (EVP_MAC_CTX *) ctx;
++}
++
++void
++EVP_MAC_CTX_free (EVP_MAC_CTX *ctx)
++{
++  free ((FakeMacCtx *) ctx);
++}
++
++EVP_MAC_CTX *
++EVP_MAC_CTX_dup (const EVP_MAC_CTX *src)
++{
++  const FakeMacCtx *in_ctx = (const FakeMacCtx *) src;
++  FakeMacCtx *out_ctx;
++
++  if (mode_is ("dup-fail"))
++    return NULL;
++
++  out_ctx = malloc (sizeof (FakeMacCtx));
++  if (out_ctx == NULL)
++    return NULL;
++  *out_ctx = *in_ctx;
++  return (EVP_MAC_CTX *) out_ctx;
++}
++
++size_t
++EVP_MAC_CTX_get_mac_size (EVP_MAC_CTX *ctx)
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++
++  if (mode_is ("size-zero"))
++    return 0;
++  if (mode_is ("size-mismatch"))
++    return fake_ctx->mac_size + 1;
++  return fake_ctx->mac_size;
++}
++
++int
++EVP_MAC_init (EVP_MAC_CTX         *ctx,
++              const unsigned char *key,
++              size_t               keylen,
++              const OSSL_PARAM     params[])
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++  const OSSL_PARAM *param;
++  const char *digest_name = NULL;
++
++  (void) key;
++  (void) keylen;
++
++  if (mode_is ("init-fail"))
++    return 0;
++
++  for (param = params; param != NULL && param->key != NULL; param++)
++    {
++      if (strcmp (param->key, OSSL_MAC_PARAM_DIGEST) == 0 && param->data != NULL)
++        {
++          digest_name = (const char *) param->data;
++          break;
++        }
++    }
++
++  fake_ctx->mac_size = digest_size_for_name (digest_name);
++  fake_ctx->total_len = 0;
++  return 1;
++}
++
++int
++EVP_MAC_update (EVP_MAC_CTX          *ctx,
++                const unsigned char  *data,
++                size_t                datalen)
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++
++  if (mode_is ("update-fail"))
++    return 0;
++
++  if (data != NULL || datalen == 0)
++    fake_ctx->total_len += datalen;
++  return 1;
++}
++
++int
++EVP_MAC_final (EVP_MAC_CTX    *ctx,
++               unsigned char  *out,
++               size_t         *outl,
++               size_t          outsize)
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++  size_t i;
++  size_t result_len = fake_ctx->mac_size;
++
++  if (mode_is ("final-fail"))
++    return 0;
++
++  if (mode_is ("final-size-mismatch") && result_len > 0)
++    result_len--;
++
++  if (outsize < result_len)
++    return 0;
++
++  for (i = 0; i < result_len; i++)
++    out[i] = (unsigned char) ((fake_ctx->total_len + i) & 0xff);
++  if (outl != NULL)
++    *outl = result_len;
++  return 1;
++}
++
++int
++ERR_set_mark (void)
++{
++  return 1;
++}
++
++int
++ERR_pop_to_mark (void)
++{
++  return 1;
++}
++
++void
++ERR_clear_error (void)
++{
++}
+diff --git a/glib/tests/fake-crypto-unloadable.c b/glib/tests/fake-crypto-unloadable.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..deca08910e8ceb7803bf3ae926412e12b3c94ab7
+--- /dev/null
++++ b/glib/tests/fake-crypto-unloadable.c
+@@ -0,0 +1,23 @@
++#include <stdio.h>
++#include <stdlib.h>
++
++extern int glib_test_crypto_missing_dependency (void);
++
++__attribute__((constructor))
++static void
++fake_crypto_marker_ctor (void)
++{
++  const char *path = getenv ("GLIB_TEST_OPENSSL_MARKER_PATH");
++  FILE *stream;
++
++  glib_test_crypto_missing_dependency ();
++
++  if (path == NULL || path[0] == '\0')
++    return;
++
++  stream = fopen (path, "w");
++  if (stream == NULL)
++    return;
++  fputs ("loaded\n", stream);
++  fclose (stream);
++}
+diff --git a/glib/tests/hmac-openssl-failures.c b/glib/tests/hmac-openssl-failures.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..67d6a57a809d394979c8172bf998c15cd4dcf7da
+--- /dev/null
++++ b/glib/tests/hmac-openssl-failures.c
+@@ -0,0 +1,752 @@
++#include <glib.h>
++
++#include "hmac-openssl/fixture-api.h"
++
++#include <dlfcn.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/auxv.h>
++
++typedef const char *(*FixtureIdentityFunc) (void);
++typedef void (*FixtureResetStateFunc) (void);
++typedef void (*FixtureSetModeFunc) (int);
++typedef void (*FixtureSetMarkBehaviorFunc) (int);
++typedef void (*FixtureSeedQueueFunc) (unsigned);
++typedef unsigned (*FixtureGetQueueCountFunc) (void);
++typedef uint64_t (*FixtureGetQueueFingerprintFunc) (void);
++typedef void (*FixtureGetCountersFunc) (GlibTestCryptoCounters *);
++
++typedef struct
++{
++  FixtureIdentityFunc identity;
++  FixtureResetStateFunc reset_state;
++  FixtureSetModeFunc set_mode;
++  FixtureSetMarkBehaviorFunc set_mark_behavior;
++  FixtureSeedQueueFunc seed_queue;
++  FixtureGetQueueCountFunc get_queue_count;
++  FixtureGetQueueFingerprintFunc get_queue_fingerprint;
++  FixtureGetCountersFunc get_counters;
++} ScriptedFixtureApi;
++
++static const gint64 SUBPROCESS_TIMEOUT_US = 30 * G_TIME_SPAN_SECOND;
++
++static gchar **
++build_envp (const gchar *fixture_dir,
++            const gchar *key_limit_case)
++{
++  gchar **envp = g_get_environ ();
++  g_autofree gchar *absolute_fixture_dir = NULL;
++  const gchar *old_path = g_environ_getenv (envp, "LD_LIBRARY_PATH");
++  gchar *new_path;
++
++  if (g_path_is_absolute (fixture_dir))
++    absolute_fixture_dir = g_strdup (fixture_dir);
++  else
++    absolute_fixture_dir = g_canonicalize_filename (fixture_dir, g_get_current_dir ());
++  g_assert_true (g_path_is_absolute (absolute_fixture_dir));
++
++  if (old_path != NULL && old_path[0] != '\0')
++    new_path = g_strconcat (absolute_fixture_dir, ":", old_path, NULL);
++  else
++    new_path = g_strdup (absolute_fixture_dir);
++
++  envp = g_environ_setenv (g_steal_pointer (&envp), "LD_LIBRARY_PATH", new_path, TRUE);
++  g_free (new_path);
++
++  envp = g_environ_unsetenv (g_steal_pointer (&envp), "LD_PRELOAD");
++  envp = g_environ_unsetenv (g_steal_pointer (&envp), "LD_AUDIT");
++
++  if (key_limit_case != NULL)
++    envp = g_environ_setenv (g_steal_pointer (&envp), "GLIB_TEST_KEY_LIMIT_CASE", key_limit_case, TRUE);
++  else
++    envp = g_environ_unsetenv (g_steal_pointer (&envp), "GLIB_TEST_KEY_LIMIT_CASE");
++
++  return envp;
++}
++
++static gchar *
++fixture_dir_for_variant (const gchar *variant)
++{
++  return g_test_build_filename (G_TEST_BUILT, "hmac-openssl", variant, NULL);
++}
++
++static gchar *
++fixture_library_for_variant (const gchar *variant)
++{
++  return g_test_build_filename (G_TEST_BUILT, "hmac-openssl", variant, "libcrypto.so.3", NULL);
++}
++
++static void
++assert_non_secure_execution (void)
++{
++  g_assert_cmpint ((int) getauxval (AT_SECURE), ==, 0);
++}
++
++static void
++assert_wrappers_null (void)
++{
++  gchar *hex;
++  GBytes *key_bytes;
++  GBytes *bytes;
++
++  hex = g_compute_hmac_for_data (G_CHECKSUM_SHA256, (const guchar *) "key", 3,
++                                 (const guchar *) "abc", 3);
++  g_assert_null (hex);
++
++  hex = g_compute_hmac_for_string (G_CHECKSUM_SHA256, (const guchar *) "key", 3, "abc", 3);
++  g_assert_null (hex);
++
++  key_bytes = g_bytes_new_static ("key", 3);
++  bytes = g_bytes_new_static ("abc", 3);
++  hex = g_compute_hmac_for_bytes (G_CHECKSUM_SHA256, key_bytes, bytes);
++  g_assert_null (hex);
++  g_bytes_unref (key_bytes);
++  g_bytes_unref (bytes);
++}
++
++static gboolean
++resolve_scripted_api (void            *handle,
++                      ScriptedFixtureApi *api)
++{
++  memset (api, 0, sizeof (*api));
++  api->identity = (FixtureIdentityFunc) dlsym (handle, "glib_test_crypto_identity");
++  api->reset_state = (FixtureResetStateFunc) dlsym (handle, "glib_test_crypto_reset_state");
++  api->set_mode = (FixtureSetModeFunc) dlsym (handle, "glib_test_crypto_set_mode");
++  api->set_mark_behavior = (FixtureSetMarkBehaviorFunc) dlsym (handle, "glib_test_crypto_set_mark_behavior");
++  api->seed_queue = (FixtureSeedQueueFunc) dlsym (handle, "glib_test_crypto_seed_queue");
++  api->get_queue_count = (FixtureGetQueueCountFunc) dlsym (handle, "glib_test_crypto_get_queue_count");
++  api->get_queue_fingerprint = (FixtureGetQueueFingerprintFunc) dlsym (handle, "glib_test_crypto_get_queue_fingerprint");
++  api->get_counters = (FixtureGetCountersFunc) dlsym (handle, "glib_test_crypto_get_counters");
++
++  return api->identity != NULL &&
++         api->reset_state != NULL &&
++         api->set_mode != NULL &&
++         api->set_mark_behavior != NULL &&
++         api->seed_queue != NULL &&
++         api->get_queue_count != NULL &&
++         api->get_queue_fingerprint != NULL &&
++         api->get_counters != NULL;
++}
++
++static void *
++open_scripted_fixture (ScriptedFixtureApi *api)
++{
++  g_autofree gchar *scripted_library = fixture_library_for_variant ("scripted");
++  Dl_info info;
++  void *handle;
++
++  handle = dlopen (scripted_library, RTLD_NOW | RTLD_LOCAL);
++  g_assert_nonnull (handle);
++  g_assert_true (resolve_scripted_api (handle, api));
++  g_assert_cmpstr (api->identity (), ==, "scripted-fixture");
++  g_assert_true (dladdr ((void *) api->identity, &info) != 0);
++  g_assert_nonnull (info.dli_fname);
++  g_assert_true (g_str_has_suffix (info.dli_fname, "/hmac-openssl/scripted/libcrypto.so.3"));
++
++  return handle;
++}
++
++static void
++assert_loader_failure_cached_and_wrappers_null (const gchar *warning_pattern)
++{
++  GHmac *hmac;
++
++  g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, warning_pattern);
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_test_assert_expected_messages ();
++  g_assert_null (hmac);
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_null (hmac);
++  assert_wrappers_null ();
++}
++
++static void
++test_loader_missing_late_symbol (void)
++{
++  g_autofree gchar *fixture_dir = NULL;
++  gchar **envp;
++
++  if (g_test_subprocess ())
++    {
++      assert_non_secure_execution ();
++      assert_loader_failure_cached_and_wrappers_null ("*failed to resolve EVP_MAC_final*");
++      return;
++    }
++
++  fixture_dir = fixture_dir_for_variant ("missing-symbol");
++  envp = build_envp (fixture_dir, NULL);
++  g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_passed ();
++  g_test_trap_assert_stderr ("*GLIB_TEST_FAKE_CRYPTO_MISSING_SYMBOL_DTOR*");
++  g_strfreev (envp);
++}
++
++static void
++test_loader_unloadable (void)
++{
++  g_autofree gchar *fixture_dir = NULL;
++  gchar **envp;
++
++  if (g_test_subprocess ())
++    {
++      assert_non_secure_execution ();
++      assert_loader_failure_cached_and_wrappers_null ("*failed to load libcrypto.so.3*");
++      return;
++    }
++
++  fixture_dir = fixture_dir_for_variant ("unloadable");
++  envp = build_envp (fixture_dir, NULL);
++  g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_passed ();
++  g_strfreev (envp);
++}
++
++typedef struct
++{
++  GMutex lock;
++  GCond ready_cond;
++  GCond start_cond;
++  gint ready_count;
++  gboolean start;
++  gint null_results;
++  gint thread_failures;
++  gint warning_count;
++  gint reentrant_handler_invoked;
++  gint reentrant_construct_seen_null;
++} ConcurrentWarningContext;
++
++static ConcurrentWarningContext *current_warning_context = NULL;
++
++static gboolean
++is_expected_loader_warning (const gchar    *message,
++                            GLogLevelFlags  log_level)
++{
++  return (log_level & G_LOG_LEVEL_WARNING) != 0 &&
++         message != NULL &&
++         g_str_has_prefix (message, "Cannot use GHmac: failed to resolve EVP_MAC_final");
++}
++
++static gboolean
++reentrant_warning_not_fatal (const gchar    *log_domain,
++                             GLogLevelFlags  log_level,
++                             const gchar    *message,
++                             gpointer        user_data)
++{
++  GHmac *tmp = NULL;
++  (void) log_domain;
++  (void) user_data;
++
++  if (current_warning_context != NULL &&
++      is_expected_loader_warning (message, log_level))
++    {
++      g_atomic_int_inc (&current_warning_context->warning_count);
++      if (g_atomic_int_compare_and_exchange (&current_warning_context->reentrant_handler_invoked, 0, 1))
++        {
++          tmp = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++          if (tmp == NULL)
++            g_atomic_int_set (&current_warning_context->reentrant_construct_seen_null, 1);
++          else
++            {
++              g_atomic_int_set (&current_warning_context->reentrant_construct_seen_null, -1);
++              g_hmac_unref (tmp);
++            }
++        }
++      return FALSE;
++    }
++
++  return TRUE;
++}
++
++typedef struct
++{
++  ConcurrentWarningContext *ctx;
++} ConcurrentWarningWorkerArg;
++
++static gpointer
++concurrent_warning_worker (gpointer data)
++{
++  ConcurrentWarningWorkerArg *arg = data;
++  ConcurrentWarningContext *ctx = arg->ctx;
++  GHmac *hmac;
++
++  g_mutex_lock (&ctx->lock);
++  ctx->ready_count++;
++  g_cond_signal (&ctx->ready_cond);
++  while (!ctx->start)
++    g_cond_wait (&ctx->start_cond, &ctx->lock);
++  g_mutex_unlock (&ctx->lock);
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  if (hmac == NULL)
++    g_atomic_int_inc (&ctx->null_results);
++  else
++    {
++      g_atomic_int_inc (&ctx->thread_failures);
++      g_hmac_unref (hmac);
++    }
++
++  return NULL;
++}
++
++static void
++run_reentrant_concurrent_warning_child (void)
++{
++  static const guint n_threads = 8;
++  ConcurrentWarningContext ctx;
++  ConcurrentWarningWorkerArg args[8];
++  GThread *threads[8] = { 0, };
++  guint i;
++
++  memset (&ctx, 0, sizeof (ctx));
++  g_mutex_init (&ctx.lock);
++  g_cond_init (&ctx.ready_cond);
++  g_cond_init (&ctx.start_cond);
++
++  current_warning_context = &ctx;
++  g_test_log_set_fatal_handler (reentrant_warning_not_fatal, NULL);
++
++  for (i = 0; i < n_threads; i++)
++    {
++      args[i].ctx = &ctx;
++      threads[i] = g_thread_new ("warn-concurrent-loader", concurrent_warning_worker, &args[i]);
++      g_assert_nonnull (threads[i]);
++    }
++
++  g_mutex_lock (&ctx.lock);
++  while (ctx.ready_count < (gint) n_threads)
++    {
++      gint64 deadline = g_get_monotonic_time () + 10 * G_TIME_SPAN_SECOND;
++      g_assert_true (g_cond_wait_until (&ctx.ready_cond, &ctx.lock, deadline));
++    }
++  ctx.start = TRUE;
++  g_cond_broadcast (&ctx.start_cond);
++  g_mutex_unlock (&ctx.lock);
++
++  for (i = 0; i < n_threads; i++)
++    g_thread_join (threads[i]);
++
++  g_assert_cmpint (g_atomic_int_get (&ctx.thread_failures), ==, 0);
++  g_assert_cmpint (g_atomic_int_get (&ctx.null_results), ==, (gint) n_threads);
++  g_assert_cmpint (g_atomic_int_get (&ctx.warning_count), ==, 1);
++  g_assert_cmpint (g_atomic_int_get (&ctx.reentrant_handler_invoked), ==, 1);
++  g_assert_cmpint (g_atomic_int_get (&ctx.reentrant_construct_seen_null), ==, 1);
++  current_warning_context = NULL;
++  current_warning_context = NULL;
++  g_cond_clear (&ctx.start_cond);
++  g_cond_clear (&ctx.ready_cond);
++  g_mutex_clear (&ctx.lock);
++}
++
++static void
++test_reentrant_concurrent_single_warning (void)
++{
++  g_autofree gchar *fixture_dir = NULL;
++  gchar **envp;
++  guint i;
++
++  if (g_test_subprocess ())
++    {
++      assert_non_secure_execution ();
++      run_reentrant_concurrent_warning_child ();
++      return;
++    }
++
++  fixture_dir = fixture_dir_for_variant ("missing-symbol");
++  envp = build_envp (fixture_dir, NULL);
++  for (i = 0; i < 20; i++)
++    {
++      g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++      g_test_trap_assert_passed ();
++    }
++  g_strfreev (envp);
++}
++
++typedef struct
++{
++  int mode;
++  guint64 fetch_failures;
++  guint64 mac_free_calls;
++  guint64 ctx_new_calls;
++  guint64 ctx_new_failures;
++  guint64 ctx_free_calls;
++  guint64 init_calls;
++  guint64 init_failures;
++  guint64 ctx_get_size_calls;
++  guint64 key_bytes_seen;
++  guint64 digest_param_ok;
++} RecoverableModeExpectations;
++
++static const RecoverableModeExpectations recoverable_mode_expectations[] = {
++  { GLIB_TEST_CRYPTO_MODE_FETCH_NULL, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
++  { GLIB_TEST_CRYPTO_MODE_CTX_NEW_NULL, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0 },
++  { GLIB_TEST_CRYPTO_MODE_INIT_FAIL, 0, 1, 1, 0, 1, 1, 1, 0, 3, 1 },
++  { GLIB_TEST_CRYPTO_MODE_INITIAL_SIZE_ZERO, 0, 1, 1, 0, 1, 1, 0, 1, 3, 1 },
++  { GLIB_TEST_CRYPTO_MODE_INITIAL_SIZE_MISMATCH, 0, 1, 1, 0, 1, 1, 0, 1, 3, 1 },
++};
++
++static const RecoverableModeExpectations *
++lookup_recoverable_expectation (int mode)
++{
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (recoverable_mode_expectations); i++)
++    {
++      if (recoverable_mode_expectations[i].mode == mode)
++        return &recoverable_mode_expectations[i];
++    }
++
++  return NULL;
++}
++
++static void
++assert_queue_state (ScriptedFixtureApi *api,
++                    guint               expected_count,
++                    guint64             expected_fingerprint)
++{
++  g_assert_cmpuint (api->get_queue_count (), ==, expected_count);
++  g_assert_cmpuint (api->get_queue_fingerprint (), ==, expected_fingerprint);
++}
++
++static void
++assert_recoverable_constructor_mode (ScriptedFixtureApi *api,
++                                     int                 mode,
++                                     gboolean            seeded_queue)
++{
++  const RecoverableModeExpectations *exp;
++  GHmac *hmac;
++  GlibTestCryptoCounters c = { 0, };
++  guint seeded_count = seeded_queue ? 5u : 0u;
++  guint64 seeded_fp;
++
++  exp = lookup_recoverable_expectation (mode);
++  g_assert_nonnull (exp);
++
++  api->reset_state ();
++  api->set_mark_behavior (1);
++  api->seed_queue (seeded_count);
++  seeded_fp = api->get_queue_fingerprint ();
++
++  api->set_mode (mode);
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_null (hmac);
++  assert_queue_state (api, seeded_count, seeded_fp);
++
++  api->set_mode (GLIB_TEST_CRYPTO_MODE_SUCCESS);
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "", 0);
++  g_assert_nonnull (hmac);
++  assert_queue_state (api, seeded_count, seeded_fp);
++  g_hmac_unref (hmac);
++  assert_queue_state (api, seeded_count, seeded_fp);
++
++  api->get_counters (&c);
++  g_assert_cmpuint (c.fetch_calls, ==, 2);
++  g_assert_cmpuint (c.fetch_failures, ==, exp->fetch_failures);
++  g_assert_cmpuint (c.mac_free_calls, ==, exp->mac_free_calls + 1);
++  g_assert_cmpuint (c.ctx_new_calls, ==, exp->ctx_new_calls + 1);
++  g_assert_cmpuint (c.ctx_new_failures, ==, exp->ctx_new_failures);
++  g_assert_cmpuint (c.init_calls, ==, exp->init_calls + 1);
++  g_assert_cmpuint (c.init_failures, ==, exp->init_failures);
++  g_assert_cmpuint (c.ctx_get_size_calls, ==, exp->ctx_get_size_calls + 1);
++  g_assert_cmpuint (c.ctx_free_calls, ==, exp->ctx_free_calls + 1);
++  g_assert_cmpuint (c.key_bytes_seen, ==, exp->key_bytes_seen);
++  g_assert_cmpuint (c.digest_param_ok, ==, exp->digest_param_ok + 1);
++  g_assert_cmpuint (c.digest_param_bad, ==, 0);
++  g_assert_cmpuint (c.empty_key_nonnull, ==, 1);
++  g_assert_cmpuint (c.empty_key_null, ==, 0);
++  g_assert_cmpuint (c.live_ctx_objects, ==, 0);
++  g_assert_cmpuint (c.live_mac_objects, ==, 0);
++  g_assert_cmpuint (c.err_set_mark_calls, ==, 3);
++  g_assert_cmpuint (c.err_pop_to_mark_calls, ==, seeded_queue ? 3u : 0u);
++  g_assert_cmpuint (c.err_clear_error_calls, ==, seeded_queue ? 0u : 3u);
++}
++
++static void
++assert_copy_lifetimes_and_counters (ScriptedFixtureApi *api)
++{
++  GHmac *source;
++  GHmac *open_copy;
++  GHmac *closed_copy;
++  g_autofree gchar *open_copy_digest = NULL;
++  guint64 queue_fp;
++  GlibTestCryptoCounters c = { 0, };
++
++  api->reset_state ();
++  api->set_mark_behavior (1);
++  api->set_mode (GLIB_TEST_CRYPTO_MODE_SUCCESS);
++  api->seed_queue (9);
++  queue_fp = api->get_queue_fingerprint ();
++
++  source = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (source);
++  g_hmac_update (source, (const guchar *) "abc", 3);
++  open_copy = g_hmac_copy (source);
++  g_assert_nonnull (open_copy);
++  g_hmac_update (open_copy, (const guchar *) "d", 1);
++
++  g_hmac_unref (source);
++  assert_queue_state (api, 9, queue_fp);
++
++  open_copy_digest = g_strdup (g_hmac_get_string (open_copy));
++  g_assert_nonnull (open_copy_digest);
++  closed_copy = g_hmac_copy (open_copy);
++  g_assert_nonnull (closed_copy);
++  g_hmac_unref (open_copy);
++  g_assert_cmpstr (g_hmac_get_string (closed_copy), ==, open_copy_digest);
++
++  g_hmac_unref (closed_copy);
++  assert_queue_state (api, 9, queue_fp);
++
++  api->get_counters (&c);
++  g_assert_cmpuint (c.fetch_calls, ==, 1);
++  g_assert_cmpuint (c.mac_free_calls, ==, 1);
++  g_assert_cmpuint (c.ctx_new_calls, ==, 1);
++  g_assert_cmpuint (c.init_calls, ==, 1);
++  g_assert_cmpuint (c.ctx_get_size_calls, ==, 1);
++  g_assert_cmpuint (c.ctx_dup_calls, ==, 1);
++  g_assert_cmpuint (c.ctx_free_calls, ==, 2);
++  g_assert_cmpuint (c.final_calls, ==, 1);
++  g_assert_cmpuint (c.live_ctx_objects, ==, 0);
++  g_assert_cmpuint (c.live_mac_objects, ==, 0);
++  g_assert_cmpuint (c.err_set_mark_calls, ==, 6);
++  g_assert_cmpuint (c.err_pop_to_mark_calls, ==, 6);
++  g_assert_cmpuint (c.err_clear_error_calls, ==, 0);
++}
++
++static void
++test_recoverable_modes_and_counters (void)
++{
++  g_autofree gchar *fixture_dir = NULL;
++  gchar **envp;
++
++  if (g_test_subprocess ())
++    {
++      ScriptedFixtureApi api;
++      void *handle;
++      guint i;
++
++      assert_non_secure_execution ();
++      handle = open_scripted_fixture (&api);
++
++      for (i = 0; i < G_N_ELEMENTS (recoverable_mode_expectations); i++)
++        {
++          assert_recoverable_constructor_mode (&api, recoverable_mode_expectations[i].mode, TRUE);
++          assert_recoverable_constructor_mode (&api, recoverable_mode_expectations[i].mode, FALSE);
++        }
++
++      assert_copy_lifetimes_and_counters (&api);
++      g_assert_cmpuint (dlclose (handle), ==, 0);
++      return;
++    }
++
++  fixture_dir = fixture_dir_for_variant ("scripted");
++  envp = build_envp (fixture_dir, NULL);
++  g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_passed ();
++  g_strfreev (envp);
++}
++
++static void
++test_error_queue_hygiene (void)
++{
++  g_autofree gchar *fixture_dir = NULL;
++  gchar **envp;
++
++  if (g_test_subprocess ())
++    {
++      ScriptedFixtureApi api;
++      void *handle;
++      guint i;
++
++      assert_non_secure_execution ();
++      handle = open_scripted_fixture (&api);
++
++      for (i = 0; i < G_N_ELEMENTS (recoverable_mode_expectations); i++)
++        {
++          assert_recoverable_constructor_mode (&api, recoverable_mode_expectations[i].mode, TRUE);
++          assert_recoverable_constructor_mode (&api, recoverable_mode_expectations[i].mode, FALSE);
++        }
++
++      assert_copy_lifetimes_and_counters (&api);
++      g_assert_cmpuint (dlclose (handle), ==, 0);
++      return;
++    }
++
++  fixture_dir = fixture_dir_for_variant ("scripted");
++  envp = build_envp (fixture_dir, NULL);
++  g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_passed ();
++  g_strfreev (envp);
++}
++
++static void
++assert_fatal_mode (const gchar *mode_message,
++                   int          mode,
++                   const gchar *failure_message)
++{
++  g_autofree gchar *fixture_dir = fixture_dir_for_variant ("scripted");
++  gchar **envp = build_envp (fixture_dir, NULL);
++  gchar *mode_string = g_strdup_printf ("%d", mode);
++
++  envp = g_environ_setenv (envp, "GLIB_TEST_FATAL_MODE", mode_string, TRUE);
++  g_free (mode_string);
++
++  g_test_trap_subprocess_with_envp (mode_message, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_failed ();
++  g_test_trap_assert_stderr (failure_message);
++  g_strfreev (envp);
++}
++
++static void
++fatal_mode_child (void)
++{
++  ScriptedFixtureApi api;
++  void *handle;
++  GHmac *hmac;
++  int mode;
++  const gchar *mode_env;
++
++  assert_non_secure_execution ();
++  handle = open_scripted_fixture (&api);
++  mode_env = g_getenv ("GLIB_TEST_FATAL_MODE");
++  g_assert_nonnull (mode_env);
++  mode = atoi (mode_env);
++  api.reset_state ();
++  api.set_mode (mode);
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (hmac);
++  if (mode == GLIB_TEST_CRYPTO_MODE_UPDATE_FAIL)
++    g_hmac_update (hmac, (const guchar *) "abc", 3);
++  else if (mode == GLIB_TEST_CRYPTO_MODE_DUP_FAIL)
++    g_hmac_copy (hmac);
++  else
++    {
++      g_hmac_update (hmac, (const guchar *) "abc", 3);
++      g_hmac_get_string (hmac);
++    }
++
++  g_assert_cmpuint (dlclose (handle), ==, 0);
++  g_assert_not_reached ();
++}
++
++static void
++test_fatal_operation_modes (void)
++{
++  if (g_test_subprocess ())
++    fatal_mode_child ();
++
++  assert_fatal_mode ("/hmac/openssl/failures/fatal-dispatch",
++                     GLIB_TEST_CRYPTO_MODE_UPDATE_FAIL,
++                     "*OpenSSL backend failure in g_hmac_update*");
++  assert_fatal_mode ("/hmac/openssl/failures/fatal-dispatch",
++                     GLIB_TEST_CRYPTO_MODE_DUP_FAIL,
++                     "*OpenSSL backend failure in g_hmac_copy*");
++  assert_fatal_mode ("/hmac/openssl/failures/fatal-dispatch",
++                     GLIB_TEST_CRYPTO_MODE_FINAL_FAIL,
++                     "*OpenSSL backend failure in g_hmac_get_string*");
++  assert_fatal_mode ("/hmac/openssl/failures/fatal-dispatch",
++                     GLIB_TEST_CRYPTO_MODE_FINAL_WRONG_SIZE,
++                     "*OpenSSL backend failure in g_hmac_get_string*");
++}
++
++static void
++before_loader_scripted_child (void)
++{
++  ScriptedFixtureApi api;
++  void *handle;
++  GHmac *hmac;
++  static const guint8 sentinel = 0x5a;
++  gsize key_len = (gsize) G_MAXINT + 1;
++  GlibTestCryptoCounters c = { 0, };
++
++  assert_non_secure_execution ();
++  handle = open_scripted_fixture (&api);
++  api.reset_state ();
++  g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
++                         "*g_hmac_new: OpenSSL backend requires key_len <= G_MAXINT*");
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, &sentinel, key_len);
++  g_test_assert_expected_messages ();
++  g_assert_null (hmac);
++
++  api.get_counters (&c);
++  g_assert_cmpuint (c.fetch_calls, ==, 0);
++  g_assert_cmpuint (c.init_calls, ==, 0);
++  g_assert_cmpuint (c.key_bytes_seen, ==, 0);
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (hmac);
++  g_hmac_unref (hmac);
++
++  api.get_counters (&c);
++  g_assert_cmpuint (c.fetch_calls, ==, 1);
++  g_assert_cmpuint (dlclose (handle), ==, 0);
++}
++
++static void
++before_loader_unloadable_child (void)
++{
++  static const guint8 sentinel = 0x5a;
++  gsize key_len = (gsize) G_MAXINT + 1;
++  GHmac *hmac;
++
++  assert_non_secure_execution ();
++  g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
++                         "*g_hmac_new: OpenSSL backend requires key_len <= G_MAXINT*");
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, &sentinel, key_len);
++  g_test_assert_expected_messages ();
++  g_assert_null (hmac);
++
++  g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
++                         "*Cannot use GHmac: failed to load libcrypto.so.3*");
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_test_assert_expected_messages ();
++  g_assert_null (hmac);
++}
++
++static void
++test_key_limit_before_loader (void)
++{
++  g_autofree gchar *fixture_dir = NULL;
++  gchar **envp;
++
++  if (g_test_subprocess ())
++    {
++      const gchar *mode = g_getenv ("GLIB_TEST_KEY_LIMIT_CASE");
++      g_assert_nonnull (mode);
++      if (strcmp (mode, "scripted") == 0)
++        before_loader_scripted_child ();
++      else
++        before_loader_unloadable_child ();
++      return;
++    }
++
++  fixture_dir = fixture_dir_for_variant ("scripted");
++  envp = build_envp (fixture_dir, "scripted");
++  g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_passed ();
++  g_strfreev (envp);
++
++  g_clear_pointer (&fixture_dir, g_free);
++  fixture_dir = fixture_dir_for_variant ("unloadable");
++  envp = build_envp (fixture_dir, "unloadable");
++  g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_passed ();
++  g_strfreev (envp);
++}
++
++int
++main (int argc, char *argv[])
++{
++  g_test_init (&argc, &argv, NULL);
++
++  g_test_add_func ("/hmac/openssl/failures/missing-late-symbol", test_loader_missing_late_symbol);
++  g_test_add_func ("/hmac/openssl/failures/unloadable", test_loader_unloadable);
++  g_test_add_func ("/hmac/openssl/failures/reentrant-concurrent-single-warning", test_reentrant_concurrent_single_warning);
++  g_test_add_func ("/hmac/openssl/failures/recoverable-modes", test_recoverable_modes_and_counters);
++  g_test_add_func ("/hmac/openssl/failures/error-queue-hygiene", test_error_queue_hygiene);
++  g_test_add_func ("/hmac/openssl/failures/fatal-dispatch", test_fatal_operation_modes);
++  g_test_add_func ("/openssl/key-limit/before-loader", test_key_limit_before_loader);
++
++  return g_test_run ();
++}
+diff --git a/glib/tests/hmac-openssl/fixture-api.h b/glib/tests/hmac-openssl/fixture-api.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..85b47c9768831838fe2490d90e4dd51755b8e8c0
+--- /dev/null
++++ b/glib/tests/hmac-openssl/fixture-api.h
+@@ -0,0 +1,57 @@
++#pragma once
++
++#include <stdint.h>
++
++typedef enum
++{
++  GLIB_TEST_CRYPTO_MODE_SUCCESS = 0,
++  GLIB_TEST_CRYPTO_MODE_FETCH_NULL = 1,
++  GLIB_TEST_CRYPTO_MODE_CTX_NEW_NULL = 2,
++  GLIB_TEST_CRYPTO_MODE_INIT_FAIL = 3,
++  GLIB_TEST_CRYPTO_MODE_INITIAL_SIZE_ZERO = 4,
++  GLIB_TEST_CRYPTO_MODE_INITIAL_SIZE_MISMATCH = 5,
++  GLIB_TEST_CRYPTO_MODE_UPDATE_FAIL = 6,
++  GLIB_TEST_CRYPTO_MODE_DUP_FAIL = 7,
++  GLIB_TEST_CRYPTO_MODE_FINAL_FAIL = 8,
++  GLIB_TEST_CRYPTO_MODE_FINAL_WRONG_SIZE = 9,
++} GlibTestCryptoMode;
++
++typedef struct
++{
++  uint64_t fetch_calls;
++  uint64_t fetch_failures;
++  uint64_t mac_free_calls;
++  uint64_t ctx_new_calls;
++  uint64_t ctx_new_failures;
++  uint64_t ctx_free_calls;
++  uint64_t ctx_dup_calls;
++  uint64_t ctx_dup_failures;
++  uint64_t ctx_get_size_calls;
++  uint64_t init_calls;
++  uint64_t init_failures;
++  uint64_t update_calls;
++  uint64_t update_failures;
++  uint64_t final_calls;
++  uint64_t final_failures;
++  uint64_t final_wrong_size_calls;
++  uint64_t digest_param_ok;
++  uint64_t digest_param_bad;
++  uint64_t empty_key_nonnull;
++  uint64_t empty_key_null;
++  uint64_t key_bytes_seen;
++  uint64_t tls_queue_count;
++  uint64_t err_set_mark_calls;
++  uint64_t err_pop_to_mark_calls;
++  uint64_t err_clear_error_calls;
++  uint64_t live_mac_objects;
++  uint64_t live_ctx_objects;
++} GlibTestCryptoCounters;
++
++const char *glib_test_crypto_identity (void);
++void glib_test_crypto_reset_state (void);
++void glib_test_crypto_set_mode (int mode);
++void glib_test_crypto_set_mark_behavior (int enabled);
++void glib_test_crypto_seed_queue (unsigned count);
++unsigned glib_test_crypto_get_queue_count (void);
++uint64_t glib_test_crypto_get_queue_fingerprint (void);
++void glib_test_crypto_get_counters (GlibTestCryptoCounters *out);
+diff --git a/glib/tests/hmac-openssl/missing-symbol/crypto.c b/glib/tests/hmac-openssl/missing-symbol/crypto.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..b544de34a14c1be10d42440fe1d4dd7f55dc7cc5
+--- /dev/null
++++ b/glib/tests/hmac-openssl/missing-symbol/crypto.c
+@@ -0,0 +1,161 @@
++#include "../fixture-api.h"
++
++#include <openssl/core_names.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/params.h>
++
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#define EXPORT __attribute__((visibility("default")))
++
++typedef struct
++{
++  size_t mac_size;
++  uint64_t total_len;
++} FakeMacCtx;
++
++EXPORT const char *
++glib_test_crypto_identity (void)
++{
++  return "missing-symbol-fixture";
++}
++
++__attribute__((destructor))
++static void
++missing_symbol_destructor (void)
++{
++  static const char marker[] = "GLIB_TEST_FAKE_CRYPTO_MISSING_SYMBOL_DTOR\n";
++  size_t remaining = sizeof (marker) - 1;
++  const char *p = marker;
++
++  while (remaining > 0)
++    {
++      ssize_t n = write (2, p, remaining);
++      if (n <= 0)
++        break;
++      p += (size_t) n;
++      remaining -= (size_t) n;
++    }
++}
++
++EXPORT EVP_MAC *
++EVP_MAC_fetch (OSSL_LIB_CTX *libctx, const char *algorithm, const char *properties)
++{
++  (void) libctx;
++  (void) properties;
++  if (algorithm == NULL || strcmp (algorithm, "HMAC") != 0)
++    return NULL;
++  return (EVP_MAC *) (uintptr_t) 0x1;
++}
++
++EXPORT void
++EVP_MAC_free (EVP_MAC *mac)
++{
++  (void) mac;
++}
++
++EXPORT EVP_MAC_CTX *
++EVP_MAC_CTX_new (EVP_MAC *mac)
++{
++  FakeMacCtx *ctx;
++  (void) mac;
++
++  ctx = calloc (1, sizeof (*ctx));
++  if (ctx == NULL)
++    return NULL;
++  ctx->mac_size = 32;
++  return (EVP_MAC_CTX *) ctx;
++}
++
++EXPORT void
++EVP_MAC_CTX_free (EVP_MAC_CTX *ctx)
++{
++  free ((FakeMacCtx *) ctx);
++}
++
++EXPORT EVP_MAC_CTX *
++EVP_MAC_CTX_dup (const EVP_MAC_CTX *src)
++{
++  const FakeMacCtx *src_ctx = (const FakeMacCtx *) src;
++  FakeMacCtx *copy = calloc (1, sizeof (*copy));
++  if (copy == NULL)
++    return NULL;
++  *copy = *src_ctx;
++  return (EVP_MAC_CTX *) copy;
++}
++
++EXPORT size_t
++EVP_MAC_CTX_get_mac_size (EVP_MAC_CTX *ctx)
++{
++  return ((FakeMacCtx *) ctx)->mac_size;
++}
++
++EXPORT int
++EVP_MAC_init (EVP_MAC_CTX         *ctx,
++              const unsigned char *key,
++              size_t               keylen,
++              const OSSL_PARAM     params[])
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++  const OSSL_PARAM *param;
++  const char *digest_name = "SHA256";
++
++  (void) key;
++  (void) keylen;
++
++  for (param = params; param != NULL && param->key != NULL; param++)
++    {
++      if (strcmp (param->key, OSSL_MAC_PARAM_DIGEST) == 0 && param->data != NULL)
++        {
++          digest_name = (const char *) param->data;
++          break;
++        }
++    }
++
++  if (strcmp (digest_name, "SHA512") == 0)
++    fake_ctx->mac_size = 64;
++  else if (strcmp (digest_name, "SHA384") == 0)
++    fake_ctx->mac_size = 48;
++  else if (strcmp (digest_name, "SHA1") == 0)
++    fake_ctx->mac_size = 20;
++  else if (strcmp (digest_name, "MD5") == 0)
++    fake_ctx->mac_size = 16;
++  else
++    fake_ctx->mac_size = 32;
++
++  fake_ctx->total_len = 0;
++  return 1;
++}
++
++EXPORT int
++EVP_MAC_update (EVP_MAC_CTX *ctx, const unsigned char *data, size_t datalen)
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++  if (data != NULL || datalen == 0)
++    fake_ctx->total_len += datalen;
++  return 1;
++}
++
++/* Intentionally omit EVP_MAC_final to force late-symbol resolution failure. */
++
++EXPORT int
++ERR_set_mark (void)
++{
++  return 1;
++}
++
++EXPORT int
++ERR_pop_to_mark (void)
++{
++  return 1;
++}
++
++EXPORT void
++ERR_clear_error (void)
++{
++}
+diff --git a/glib/tests/hmac-openssl/missing-symbol/meson.build b/glib/tests/hmac-openssl/missing-symbol/meson.build
+new file mode 100644
+index 0000000000000000000000000000000000000000..3d159c677c14c3892dfa19bafe507d47d88685b0
+--- /dev/null
++++ b/glib/tests/hmac-openssl/missing-symbol/meson.build
+@@ -0,0 +1,7 @@
++hmac_openssl_missing_symbol_crypto = shared_library(
++  'crypto',
++  'crypto.c',
++  include_directories : [include_directories('..')],
++  soversion : '3',
++  install : false,
++)
+diff --git a/glib/tests/hmac-openssl/scripted/crypto.c b/glib/tests/hmac-openssl/scripted/crypto.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..9f6f0a30efeef9a27b9483aced280a8f98dfc4b8
+--- /dev/null
++++ b/glib/tests/hmac-openssl/scripted/crypto.c
+@@ -0,0 +1,404 @@
++#include "../fixture-api.h"
++
++#include <openssl/core_names.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/params.h>
++
++#include <stdint.h>
++#include <stdlib.h>
++#include <string.h>
++
++#define EXPORT __attribute__((visibility("default")))
++
++typedef struct
++{
++  uint32_t magic;
++  uint32_t _pad;
++} FakeMac;
++
++typedef struct
++{
++  size_t mac_size;
++  uint64_t total_len;
++} FakeMacCtx;
++
++typedef struct
++{
++  unsigned queue_count;
++  uint64_t queue_fingerprint;
++  unsigned mark_snapshot;
++  uint64_t mark_snapshot_fingerprint;
++  int marked;
++  uint64_t next_token;
++} ThreadQueueState;
++
++static GlibTestCryptoMode current_mode = GLIB_TEST_CRYPTO_MODE_SUCCESS;
++static int mark_behavior_enabled = 1;
++static __thread ThreadQueueState tls_queue = { 0, };
++static GlibTestCryptoCounters counters = { 0, };
++
++static size_t
++digest_size_for_name (const char *digest_name)
++{
++  if (digest_name == NULL)
++    return 32;
++  if (strcmp (digest_name, "MD5") == 0)
++    return 16;
++  if (strcmp (digest_name, "SHA1") == 0)
++    return 20;
++  if (strcmp (digest_name, "SHA256") == 0)
++    return 32;
++  if (strcmp (digest_name, "SHA384") == 0)
++    return 48;
++  if (strcmp (digest_name, "SHA512") == 0)
++    return 64;
++  return 0;
++}
++
++static uint64_t
++mix_token (uint64_t state,
++           uint64_t token)
++{
++  state ^= token + 0x9e3779b97f4a7c15ULL + (state << 6) + (state >> 2);
++  return state;
++}
++
++static uint64_t
++seed_fingerprint_for_count (unsigned count)
++{
++  uint64_t fp = 0;
++  unsigned i;
++
++  for (i = 0; i < count; i++)
++    fp = mix_token (fp, (uint64_t) (i + 1));
++
++  return fp;
++}
++
++static void
++inject_queue_error (void)
++{
++  uint64_t token = tls_queue.next_token++;
++  tls_queue.queue_count++;
++  tls_queue.queue_fingerprint = mix_token (tls_queue.queue_fingerprint, token);
++}
++
++EXPORT const char *
++glib_test_crypto_identity (void)
++{
++  return "scripted-fixture";
++}
++
++EXPORT void
++glib_test_crypto_reset_state (void)
++{
++  memset (&counters, 0, sizeof (counters));
++  tls_queue.queue_count = 0;
++  tls_queue.queue_fingerprint = 0;
++  tls_queue.mark_snapshot = 0;
++  tls_queue.mark_snapshot_fingerprint = 0;
++  tls_queue.marked = 0;
++  tls_queue.next_token = 1;
++  current_mode = GLIB_TEST_CRYPTO_MODE_SUCCESS;
++  mark_behavior_enabled = 1;
++}
++
++EXPORT void
++glib_test_crypto_set_mode (int mode)
++{
++  current_mode = (GlibTestCryptoMode) mode;
++}
++
++EXPORT void
++glib_test_crypto_set_mark_behavior (int enabled)
++{
++  mark_behavior_enabled = enabled != 0;
++}
++
++EXPORT void
++glib_test_crypto_seed_queue (unsigned count)
++{
++  tls_queue.queue_count = count;
++  tls_queue.queue_fingerprint = seed_fingerprint_for_count (count);
++  tls_queue.marked = 0;
++  tls_queue.mark_snapshot = 0;
++  tls_queue.mark_snapshot_fingerprint = 0;
++  tls_queue.next_token = ((uint64_t) count) + 1;
++}
++
++EXPORT unsigned
++glib_test_crypto_get_queue_count (void)
++{
++  return tls_queue.queue_count;
++}
++
++EXPORT uint64_t
++glib_test_crypto_get_queue_fingerprint (void)
++{
++  return tls_queue.queue_fingerprint;
++}
++
++EXPORT void
++glib_test_crypto_get_counters (GlibTestCryptoCounters *out)
++{
++  if (out == NULL)
++    return;
++
++  *out = counters;
++  out->tls_queue_count = tls_queue.queue_count;
++}
++
++EXPORT EVP_MAC *
++EVP_MAC_fetch (OSSL_LIB_CTX *libctx, const char *algorithm, const char *properties)
++{
++  FakeMac *mac;
++
++  (void) libctx;
++  (void) properties;
++  counters.fetch_calls++;
++  if (algorithm == NULL || strcmp (algorithm, "HMAC") != 0)
++    return NULL;
++
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_FETCH_NULL)
++    {
++      counters.fetch_failures++;
++      inject_queue_error ();
++      return NULL;
++    }
++
++  mac = calloc (1, sizeof (*mac));
++  if (mac == NULL)
++    return NULL;
++  mac->magic = 0xBEEFCAFEu;
++  counters.live_mac_objects++;
++  return (EVP_MAC *) mac;
++}
++
++EXPORT void
++EVP_MAC_free (EVP_MAC *mac)
++{
++  if (mac != NULL)
++    {
++      counters.live_mac_objects--;
++      free (mac);
++    }
++  counters.mac_free_calls++;
++}
++
++EXPORT EVP_MAC_CTX *
++EVP_MAC_CTX_new (EVP_MAC *mac)
++{
++  FakeMacCtx *ctx;
++  FakeMac *fake_mac = (FakeMac *) mac;
++
++  counters.ctx_new_calls++;
++  if (fake_mac == NULL || fake_mac->magic != 0xBEEFCAFEu)
++    return NULL;
++
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_CTX_NEW_NULL)
++    {
++      counters.ctx_new_failures++;
++      inject_queue_error ();
++      return NULL;
++    }
++
++  ctx = calloc (1, sizeof (*ctx));
++  if (ctx == NULL)
++    return NULL;
++  ctx->mac_size = 32;
++  counters.live_ctx_objects++;
++  return (EVP_MAC_CTX *) ctx;
++}
++
++EXPORT void
++EVP_MAC_CTX_free (EVP_MAC_CTX *ctx)
++{
++  if (ctx != NULL)
++    {
++      counters.live_ctx_objects--;
++      free (ctx);
++    }
++  counters.ctx_free_calls++;
++}
++
++EXPORT EVP_MAC_CTX *
++EVP_MAC_CTX_dup (const EVP_MAC_CTX *src)
++{
++  const FakeMacCtx *src_ctx = (const FakeMacCtx *) src;
++  FakeMacCtx *copy;
++
++  counters.ctx_dup_calls++;
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_DUP_FAIL)
++    {
++      counters.ctx_dup_failures++;
++      inject_queue_error ();
++      return NULL;
++    }
++
++  copy = calloc (1, sizeof (*copy));
++  if (copy == NULL)
++    return NULL;
++  *copy = *src_ctx;
++  counters.live_ctx_objects++;
++  return (EVP_MAC_CTX *) copy;
++}
++
++EXPORT size_t
++EVP_MAC_CTX_get_mac_size (EVP_MAC_CTX *ctx)
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++  counters.ctx_get_size_calls++;
++
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_INITIAL_SIZE_ZERO)
++    return 0;
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_INITIAL_SIZE_MISMATCH)
++    return fake_ctx->mac_size + 1;
++
++  return fake_ctx->mac_size;
++}
++
++EXPORT int
++EVP_MAC_init (EVP_MAC_CTX         *ctx,
++              const unsigned char *key,
++              size_t               keylen,
++              const OSSL_PARAM     params[])
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++  const OSSL_PARAM *param;
++  const char *digest_name = NULL;
++
++  counters.init_calls++;
++  if (keylen == 0)
++    {
++      if (key != NULL)
++        counters.empty_key_nonnull++;
++      else
++        counters.empty_key_null++;
++    }
++  if (keylen > 0 && key != NULL)
++    counters.key_bytes_seen += keylen;
++
++  for (param = params; param != NULL && param->key != NULL; param++)
++    {
++      if (strcmp (param->key, OSSL_MAC_PARAM_DIGEST) == 0 && param->data != NULL)
++        {
++          digest_name = (const char *) param->data;
++          break;
++        }
++    }
++
++  if (digest_name == NULL || digest_size_for_name (digest_name) == 0)
++    {
++      counters.digest_param_bad++;
++      counters.init_failures++;
++      inject_queue_error ();
++      return 0;
++    }
++
++  counters.digest_param_ok++;
++
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_INIT_FAIL)
++    {
++      counters.init_failures++;
++      inject_queue_error ();
++      return 0;
++    }
++
++  fake_ctx->mac_size = digest_size_for_name (digest_name);
++  fake_ctx->total_len = 0;
++  return 1;
++}
++
++EXPORT int
++EVP_MAC_update (EVP_MAC_CTX *ctx, const unsigned char *data, size_t datalen)
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++
++  counters.update_calls++;
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_UPDATE_FAIL)
++    {
++      counters.update_failures++;
++      inject_queue_error ();
++      return 0;
++    }
++
++  if (data != NULL || datalen == 0)
++    fake_ctx->total_len += datalen;
++  return 1;
++}
++
++EXPORT int
++EVP_MAC_final (EVP_MAC_CTX *ctx, unsigned char *out, size_t *outl, size_t outsize)
++{
++  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
++  size_t i;
++  size_t result_len = fake_ctx->mac_size;
++
++  counters.final_calls++;
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_FINAL_FAIL)
++    {
++      counters.final_failures++;
++      inject_queue_error ();
++      return 0;
++    }
++
++  if (outsize < result_len)
++    {
++      counters.final_failures++;
++      inject_queue_error ();
++      return 0;
++    }
++
++  for (i = 0; i < result_len; i++)
++    out[i] = (unsigned char) ((fake_ctx->total_len + i) & 0xff);
++
++  if (current_mode == GLIB_TEST_CRYPTO_MODE_FINAL_WRONG_SIZE && result_len > 0)
++    {
++      counters.final_wrong_size_calls++;
++      if (outl != NULL)
++        *outl = result_len - 1;
++      return 1;
++    }
++
++  if (outl != NULL)
++    *outl = result_len;
++  return 1;
++}
++
++EXPORT int
++ERR_set_mark (void)
++{
++  counters.err_set_mark_calls++;
++  if (!mark_behavior_enabled)
++    return 0;
++  if (tls_queue.queue_count == 0)
++    return 0;
++
++  tls_queue.marked = 1;
++  tls_queue.mark_snapshot = tls_queue.queue_count;
++  tls_queue.mark_snapshot_fingerprint = tls_queue.queue_fingerprint;
++  return 1;
++}
++
++EXPORT int
++ERR_pop_to_mark (void)
++{
++  counters.err_pop_to_mark_calls++;
++  if (!tls_queue.marked)
++    return 0;
++
++  tls_queue.queue_count = tls_queue.mark_snapshot;
++  tls_queue.queue_fingerprint = tls_queue.mark_snapshot_fingerprint;
++  tls_queue.marked = 0;
++  return 1;
++}
++
++EXPORT void
++ERR_clear_error (void)
++{
++  counters.err_clear_error_calls++;
++  tls_queue.queue_count = 0;
++  tls_queue.queue_fingerprint = 0;
++  tls_queue.marked = 0;
++}
+diff --git a/glib/tests/hmac-openssl/scripted/meson.build b/glib/tests/hmac-openssl/scripted/meson.build
+new file mode 100644
+index 0000000000000000000000000000000000000000..9ea89df7d063f529a38a5061e466ec1a759caae2
+--- /dev/null
++++ b/glib/tests/hmac-openssl/scripted/meson.build
+@@ -0,0 +1,7 @@
++hmac_openssl_scripted_crypto = shared_library(
++  'crypto',
++  'crypto.c',
++  include_directories : [include_directories('..')],
++  soversion : '3',
++  install : false,
++)
+diff --git a/glib/tests/hmac-openssl/unloadable/crypto.c b/glib/tests/hmac-openssl/unloadable/crypto.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..951eb55ad9f2262131b8ec59efc854892b56f693
+--- /dev/null
++++ b/glib/tests/hmac-openssl/unloadable/crypto.c
+@@ -0,0 +1,22 @@
++#include "../fixture-api.h"
++
++#include <stddef.h>
++
++#define EXPORT __attribute__((visibility("default")))
++
++extern int glib_test_crypto_unloadable_missing_symbol (void);
++int glib_test_crypto_unloadable_anchor (void);
++
++EXPORT int (*glib_test_crypto_unloadable_reloc) (void) = glib_test_crypto_unloadable_missing_symbol;
++
++EXPORT const char *
++glib_test_crypto_identity (void)
++{
++  return "unloadable-fixture";
++}
++
++EXPORT int
++glib_test_crypto_unloadable_anchor (void)
++{
++  return glib_test_crypto_unloadable_reloc ();
++}
+diff --git a/glib/tests/hmac-openssl/unloadable/meson.build b/glib/tests/hmac-openssl/unloadable/meson.build
+new file mode 100644
+index 0000000000000000000000000000000000000000..007a050b59d1412948bbcb9e70048efc2ed2d3ce
+--- /dev/null
++++ b/glib/tests/hmac-openssl/unloadable/meson.build
+@@ -0,0 +1,8 @@
++hmac_openssl_unloadable_crypto = shared_library(
++  'crypto',
++  'crypto.c',
++  soversion : '3',
++  override_options : ['b_lundef=false'],
++  link_args : ['-Wl,--allow-shlib-undefined'],
++  install : false,
++)
+diff --git a/glib/tests/meson.build b/glib/tests/meson.build
+index 564497c904b33fc8f9debc17da2f696c41bb4596..6a27ec8dd01676d4b1108327b68c7375af0a31fd 100644
+--- a/glib/tests/meson.build
++++ b/glib/tests/meson.build
+@@ -380,6 +380,23 @@ if host_machine.system() == 'windows' or have_dlopen_dlsym
+   }
+ endif
+ 
++if get_option('openssl') and host_machine.system() == 'linux' and have_dlopen_dlsym
++  subdir('hmac-openssl/scripted')
++  subdir('hmac-openssl/missing-symbol')
++  subdir('hmac-openssl/unloadable')
++
++  glib_tests += {
++    'hmac-openssl-failures' : {
++      'install' : false,
++      'depends' : [
++        hmac_openssl_scripted_crypto,
++        hmac_openssl_missing_symbol_crypto,
++        hmac_openssl_unloadable_crypto,
++      ],
++    },
++  }
++endif
++
+ foreach test_name, extra_args : glib_tests
+   foreach std: extra_args.get('c_standards', [])
+     if c_standards.has_key(std)
+From aab9be8edec135fbce58e5a7537f93ee2445d903 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 30 Oct 2026 19:05:00 +0000
+Subject: [PATCH 4/9] test(glib): add c4 real-policy and first-load checks
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ glib/tests/hmac-openssl-first-load.c | 174 +++++++
+ glib/tests/hmac-openssl-policy.c     | 735 +++++++++++++++++++++++++++
+ glib/tests/meson.build               |   7 +
+ 3 files changed, 916 insertions(+)
+ create mode 100644 glib/tests/hmac-openssl-first-load.c
+ create mode 100644 glib/tests/hmac-openssl-policy.c
+
+diff --git a/glib/tests/hmac-openssl-first-load.c b/glib/tests/hmac-openssl-first-load.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..40a9c9c8dccc04860afac63e44d60ef3d8e8c46b
+--- /dev/null
++++ b/glib/tests/hmac-openssl-first-load.c
+@@ -0,0 +1,174 @@
++#include <glib.h>
++
++static const gchar *expected_sha256_abc =
++  "9c196e32dc0175f86f4b1cb89289d6619de6bee699e4c378e68309ed97a1a6ab";
++
++static gboolean
++maps_contains (const gchar *needle)
++{
++  g_autofree gchar *contents = NULL;
++  gsize length = 0;
++
++  if (!g_file_get_contents ("/proc/self/maps", &contents, &length, NULL))
++    g_error ("failed to read /proc/self/maps");
++
++  return strstr (contents, needle) != NULL;
++}
++
++static gchar *
++maps_first_path_containing (const gchar *needle)
++{
++  g_autofree gchar *contents = NULL;
++  g_auto(GStrv) lines = NULL;
++  gsize length = 0;
++  guint i;
++
++  if (!g_file_get_contents ("/proc/self/maps", &contents, &length, NULL))
++    g_error ("failed to read /proc/self/maps");
++
++  lines = g_strsplit (contents, "\n", -1);
++  for (i = 0; lines[i] != NULL; i++)
++    {
++      const gchar *path;
++
++      if (strstr (lines[i], needle) == NULL)
++        continue;
++
++      path = strchr (lines[i], '/');
++      if (path != NULL)
++        return g_strdup (path);
++    }
++
++  return NULL;
++}
++
++static gchar *
++maps_loaded_provider_modules (void)
++{
++  g_autofree gchar *contents = NULL;
++  g_auto(GStrv) lines = NULL;
++  g_autoptr(GString) modules = g_string_new ("");
++  gsize length = 0;
++  guint i;
++
++  if (!g_file_get_contents ("/proc/self/maps", &contents, &length, NULL))
++    g_error ("failed to read /proc/self/maps");
++
++  lines = g_strsplit (contents, "\n", -1);
++  for (i = 0; lines[i] != NULL; i++)
++    {
++      const gchar *path;
++
++      if (strstr (lines[i], ".so") == NULL)
++        continue;
++      if (strstr (lines[i], "ossl-modules") == NULL &&
++          strstr (lines[i], "providers") == NULL)
++        continue;
++
++      path = strchr (lines[i], '/');
++      if (path == NULL)
++        continue;
++
++      if (modules->len > 0)
++        g_string_append (modules, " | ");
++      g_string_append (modules, path);
++    }
++
++  return g_string_free (g_steal_pointer (&modules), FALSE);
++}
++
++static void
++assert_expected_provider_paths_and_hashes (const gchar *provider_modules)
++{
++  const gchar *expected_paths_env = g_getenv ("GLIB_TEST_EXPECTED_PROVIDER_PATHS");
++  const gchar *expected_hash_pairs_env = g_getenv ("GLIB_TEST_EXPECTED_PROVIDER_HASH_PAIRS");
++  g_auto(GStrv) expected_paths = NULL;
++  g_auto(GStrv) expected_hash_pairs = NULL;
++  guint i;
++
++  if (expected_paths_env != NULL && *expected_paths_env != '\0')
++    {
++      g_assert_nonnull (provider_modules);
++      expected_paths = g_strsplit (expected_paths_env, ":", -1);
++
++      for (i = 0; expected_paths[i] != NULL; i++)
++        {
++          if (expected_paths[i][0] == '\0')
++            continue;
++          g_assert_nonnull (strstr (provider_modules, expected_paths[i]));
++        }
++    }
++
++  if (expected_hash_pairs_env == NULL || *expected_hash_pairs_env == '\0')
++    return;
++
++  expected_hash_pairs = g_strsplit (expected_hash_pairs_env, ";", -1);
++  for (i = 0; expected_hash_pairs[i] != NULL; i++)
++    {
++      g_auto(GStrv) parts = NULL;
++      g_autofree gchar *contents = NULL;
++      g_autofree gchar *actual_hash = NULL;
++      g_autoptr(GChecksum) checksum = NULL;
++      gsize len = 0;
++
++      if (expected_hash_pairs[i][0] == '\0')
++        continue;
++
++      parts = g_strsplit (expected_hash_pairs[i], "|", 2);
++      g_assert_nonnull (parts[0]);
++      g_assert_nonnull (parts[1]);
++      g_assert_true (g_file_get_contents (parts[0], &contents, &len, NULL));
++      checksum = g_checksum_new (G_CHECKSUM_SHA256);
++      g_checksum_update (checksum, (const guchar *) contents, len);
++      actual_hash = g_strdup (g_checksum_get_string (checksum));
++      g_assert_cmpstr (actual_hash, ==, parts[1]);
++    }
++}
++
++static void
++test_ghmac_first_load_real_runtime (void)
++{
++  GHmac *hmac;
++  const gchar *digest;
++  g_autofree gchar *libcrypto_path = NULL;
++  g_autofree gchar *provider_modules = NULL;
++  const gchar *openssl_conf = g_getenv ("OPENSSL_CONF");
++  const gchar *openssl_modules = g_getenv ("OPENSSL_MODULES");
++
++  g_assert_false (maps_contains ("libcrypto.so.3"));
++  g_assert_false (maps_contains ("/hmac-openssl/"));
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (hmac);
++  g_hmac_update (hmac, (const guchar *) "abc", 3);
++  digest = g_hmac_get_string (hmac);
++  g_assert_cmpstr (digest, ==, expected_sha256_abc);
++  g_hmac_unref (hmac);
++
++  g_assert_true (maps_contains ("libcrypto.so.3"));
++  libcrypto_path = maps_first_path_containing ("libcrypto.so.3");
++  g_assert_nonnull (libcrypto_path);
++  g_test_message ("GHmac first-load mapped libcrypto: %s", libcrypto_path);
++
++  g_test_message ("OPENSSL_CONF: %s", openssl_conf != NULL ? openssl_conf : "<unset>");
++  g_test_message ("OPENSSL_MODULES: %s", openssl_modules != NULL ? openssl_modules : "<unset>");
++
++  provider_modules = maps_loaded_provider_modules ();
++  if (provider_modules != NULL && *provider_modules != '\0')
++    g_test_message ("loaded provider modules: %s", provider_modules);
++  else
++    g_test_message ("loaded provider modules: <none observed; builtin/default provider path>");
++
++  assert_expected_provider_paths_and_hashes (provider_modules);
++}
++
++int
++main (int argc, char *argv[])
++{
++  g_test_init (&argc, &argv, NULL);
++
++  g_test_add_func ("/hmac/openssl/first-load/rtld-local-runtime",
++                   test_ghmac_first_load_real_runtime);
++
++  return g_test_run ();
++}
+diff --git a/glib/tests/hmac-openssl-policy.c b/glib/tests/hmac-openssl-policy.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..4e6b036aad9f24f77fa6706e1db8f9d492db95d5
+--- /dev/null
++++ b/glib/tests/hmac-openssl-policy.c
+@@ -0,0 +1,735 @@
++#include <glib.h>
++
++#include <dlfcn.h>
++#include <openssl/conf.h>
++#include <openssl/core_names.h>
++#include <openssl/crypto.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/params.h>
++#include <openssl/provider.h>
++#include <string.h>
++
++static const gint64 SUBPROCESS_TIMEOUT_US = 30 * G_TIME_SPAN_SECOND;
++
++typedef struct
++{
++  GChecksumType digest_type;
++  const gchar *name;
++  const guint8 *key;
++  gsize key_len;
++  const guint8 *data;
++  gsize data_len;
++  const gchar *expected_hex;
++} KatCase;
++
++static const guint8 common_key[] = { 'k', 'e', 'y' };
++static const guint8 common_data[] = "The quick brown fox jumps over the lazy dog";
++static const gchar *expected_sha256_abcdef = "4c5277d3e85316d1762c7e219862a9440546171f5ae5f1b29499ff9fbdd4c56a";
++
++static const KatCase kat_cases[] = {
++  { G_CHECKSUM_MD5, "md5", common_key, 3, common_data, sizeof (common_data) - 1,
++    "80070713463e7749b90c2dc24911e275" },
++  { G_CHECKSUM_SHA1, "sha1", common_key, 3, common_data, sizeof (common_data) - 1,
++    "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9" },
++  { G_CHECKSUM_SHA256, "sha256", common_key, 3, common_data, sizeof (common_data) - 1,
++    "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8" },
++  { G_CHECKSUM_SHA384, "sha384", common_key, 3, common_data, sizeof (common_data) - 1,
++    "d7f4727e2c0b39ae0f1e40cc96f60242d5b7801841cea6fc592c5d3e1ae50700"
++    "582a96cf35e1e554995fe4e03381c237" },
++  { G_CHECKSUM_SHA512, "sha512", common_key, 3, common_data, sizeof (common_data) - 1,
++    "b42af09057bac1e2d41708e48a902e09b5ff7f12ab428a4fe86653c73dd248fb"
++    "82f948a549f7b791a5b41915ee4d1ec3935357e4e2317250d0372afa2ebeeb3a" },
++};
++
++typedef struct
++{
++  guint count;
++  unsigned long values[16];
++} ErrorQueueSnapshot;
++
++typedef struct
++{
++  gboolean config_discovered;
++  gboolean config_readable;
++  gboolean config_parsed;
++  gboolean default_properties_established;
++  gboolean fips_enabled;
++  gchar *config_path;
++  gchar *config_sha256;
++  gchar *config_parse_note;
++  gchar *configured_default_properties;
++  gchar *restore_query;
++  gchar *openssl_conf;
++  gchar *openssl_modules;
++  gchar *provider_names;
++} BaselineProfile;
++
++static gchar **
++build_clean_envp (void)
++{
++  gchar **envp = g_get_environ ();
++  const gchar *old_path = g_environ_getenv (envp, "LD_LIBRARY_PATH");
++  g_auto(GStrv) parts = NULL;
++  GString *rebuilt = NULL;
++  guint i;
++
++  envp = g_environ_unsetenv (g_steal_pointer (&envp), "LD_PRELOAD");
++  envp = g_environ_unsetenv (g_steal_pointer (&envp), "LD_AUDIT");
++
++  if (old_path == NULL || old_path[0] == '\0')
++    return envp;
++
++  parts = g_strsplit (old_path, ":", -1);
++  rebuilt = g_string_new ("");
++
++  for (i = 0; parts[i] != NULL; i++)
++    {
++      if (parts[i][0] == '\0')
++        continue;
++      if (strstr (parts[i], "/hmac-openssl/") != NULL)
++        continue;
++
++      if (rebuilt->len > 0)
++        g_string_append_c (rebuilt, ':');
++      g_string_append (rebuilt, parts[i]);
++    }
++
++  if (rebuilt->len > 0)
++    envp = g_environ_setenv (g_steal_pointer (&envp), "LD_LIBRARY_PATH", rebuilt->str, TRUE);
++  else
++    envp = g_environ_unsetenv (g_steal_pointer (&envp), "LD_LIBRARY_PATH");
++
++  g_string_free (g_steal_pointer (&rebuilt), TRUE);
++  return envp;
++}
++
++static void
++snapshot_error_queue (ErrorQueueSnapshot *snapshot)
++{
++  guint i = 0;
++
++  memset (snapshot, 0, sizeof (*snapshot));
++  while (i < G_N_ELEMENTS (snapshot->values))
++    {
++      unsigned long value = ERR_get_error ();
++      if (value == 0)
++        break;
++      snapshot->values[i++] = value;
++    }
++
++  snapshot->count = i;
++}
++
++static void
++assert_error_queue_exact (const ErrorQueueSnapshot *expected)
++{
++  ErrorQueueSnapshot actual;
++  guint i;
++
++  snapshot_error_queue (&actual);
++  g_assert_cmpuint (actual.count, ==, expected->count);
++  for (i = 0; i < expected->count; i++)
++    g_assert_cmphex (actual.values[i], ==, expected->values[i]);
++}
++
++static void
++seed_user_errors (ErrorQueueSnapshot *snapshot)
++{
++  ERR_clear_error ();
++  ERR_raise (ERR_LIB_USER, 0x101);
++  ERR_raise (ERR_LIB_USER, 0x202);
++
++  memset (snapshot, 0, sizeof (*snapshot));
++  snapshot->count = 2;
++  snapshot->values[0] = ERR_peek_error ();
++  snapshot->values[1] = ERR_peek_last_error ();
++  g_assert_cmphex (snapshot->values[0], !=, 0);
++  g_assert_cmphex (snapshot->values[1], !=, 0);
++}
++
++static int
++collect_provider_name (OSSL_PROVIDER *provider,
++                       void          *user_data)
++{
++  GString *names = user_data;
++  const gchar *provider_name = OSSL_PROVIDER_get0_name (provider);
++
++  if (provider_name == NULL)
++    return 1;
++
++  if (names->len > 0)
++    g_string_append (names, ",");
++  g_string_append (names, provider_name);
++  return 1;
++}
++
++static gchar *
++collect_provider_names (OSSL_LIB_CTX *ctx)
++{
++  g_autoptr(GString) names = g_string_new ("");
++
++  OSSL_PROVIDER_do_all (ctx, collect_provider_name, names);
++  return g_string_free (g_steal_pointer (&names), FALSE);
++}
++
++static gchar *
++resolve_config_path (void)
++{
++  char *default_path = NULL;
++  gchar *result = NULL;
++
++  default_path = CONF_get1_default_config_file ();
++  if (default_path != NULL)
++    {
++      result = g_strdup (default_path);
++      OPENSSL_free (default_path);
++    }
++
++  if (g_getenv ("OPENSSL_CONF") != NULL && *g_getenv ("OPENSSL_CONF") != '\0')
++    {
++      g_free (result);
++      result = g_strdup (g_getenv ("OPENSSL_CONF"));
++    }
++
++  return result;
++}
++
++static gchar *
++compute_file_sha256 (const gchar *path)
++{
++  g_autofree gchar *contents = NULL;
++  gsize length = 0;
++  g_autoptr(GChecksum) checksum = NULL;
++
++  if (!g_file_get_contents (path, &contents, &length, NULL))
++    return NULL;
++
++  checksum = g_checksum_new (G_CHECKSUM_SHA256);
++  g_checksum_update (checksum, (const guchar *) contents, length);
++  return g_strdup (g_checksum_get_string (checksum));
++}
++
++static gchar *
++read_config_default_properties (void)
++{
++  CONF *conf = NULL;
++  g_autofree gchar *config_path = NULL;
++  const gchar *openssl_conf;
++  const gchar *alg_section;
++  const gchar *default_properties;
++  long error_line = 0;
++  gboolean marked;
++  gchar *result = NULL;
++
++  marked = ERR_set_mark () == 1;
++  config_path = resolve_config_path ();
++
++  if (config_path == NULL)
++    return NULL;
++
++  if (!g_file_test (config_path, G_FILE_TEST_EXISTS))
++    goto out;
++
++  if (!g_file_test (config_path, G_FILE_TEST_IS_REGULAR))
++    g_error ("OpenSSL config path is not a regular file: %s", config_path);
++
++  {
++    g_autofree gchar *config_sha256 = compute_file_sha256 (config_path);
++    if (config_sha256 == NULL)
++      g_error ("failed to read OpenSSL config file: %s", config_path);
++  }
++
++  conf = NCONF_new (NULL);
++  if (conf == NULL)
++    g_error ("NCONF_new failed while parsing OpenSSL config");
++
++  if (NCONF_load (conf, config_path, &error_line) <= 0)
++    g_error ("NCONF_load failed for %s at line %ld", config_path, error_line);
++
++  openssl_conf = NCONF_get_string (conf, NULL, "openssl_conf");
++  if (openssl_conf == NULL)
++    goto out;
++
++  alg_section = NCONF_get_string (conf, openssl_conf, "alg_section");
++  if (alg_section == NULL)
++    goto out;
++
++  default_properties = NCONF_get_string (conf, alg_section, "default_properties");
++  if (default_properties != NULL)
++    result = g_strdup (default_properties);
++
++out:
++  if (conf != NULL)
++    NCONF_free (conf);
++
++  if (marked)
++    ERR_pop_to_mark ();
++  else
++    ERR_clear_error ();
++
++  return result;
++}
++
++static BaselineProfile
++capture_baseline_profile (OSSL_LIB_CTX *ctx)
++{
++  BaselineProfile profile = { 0 };
++
++  if (ctx == NULL)
++    {
++      profile.config_path = resolve_config_path ();
++      profile.config_discovered = profile.config_path != NULL;
++      if (profile.config_path != NULL)
++        {
++          if (!g_file_test (profile.config_path, G_FILE_TEST_EXISTS))
++            g_error ("OpenSSL config path does not exist: %s", profile.config_path);
++
++          profile.config_sha256 = compute_file_sha256 (profile.config_path);
++          if (profile.config_sha256 == NULL)
++            g_error ("unable to hash OpenSSL config path: %s", profile.config_path);
++
++          profile.config_readable = TRUE;
++          profile.config_parsed = TRUE;
++        }
++
++      profile.configured_default_properties = read_config_default_properties ();
++      profile.default_properties_established = profile.configured_default_properties != NULL;
++      profile.restore_query = g_strdup (profile.configured_default_properties != NULL ?
++                                        profile.configured_default_properties : "");
++      profile.config_parse_note = g_strdup (profile.default_properties_established ?
++                                            "default_properties established from config" :
++                                            "default_properties absent in config");
++    }
++  else
++    {
++      g_assert_cmpint (EVP_set_default_properties (ctx, ""), ==, 1);
++      profile.config_discovered = TRUE;
++      profile.config_readable = TRUE;
++      profile.config_parsed = TRUE;
++      profile.default_properties_established = TRUE;
++      profile.config_path = g_strdup ("<controlled-custom-context>");
++      profile.config_sha256 = g_strdup ("<not-applicable>");
++      profile.config_parse_note = g_strdup ("controlled custom-context baseline with explicit empty query");
++      profile.configured_default_properties = g_strdup ("");
++      profile.restore_query = g_strdup ("");
++    }
++
++  profile.fips_enabled = EVP_default_properties_is_fips_enabled (ctx) == 1;
++  profile.openssl_conf = g_strdup (g_getenv ("OPENSSL_CONF"));
++  profile.openssl_modules = g_strdup (g_getenv ("OPENSSL_MODULES"));
++  profile.provider_names = collect_provider_names (ctx);
++
++  g_test_message ("baseline config path: %s",
++                  profile.config_path != NULL ? profile.config_path : "<none>");
++  g_test_message ("baseline config sha256: %s",
++                  profile.config_sha256 != NULL ? profile.config_sha256 : "<none>");
++  g_test_message ("baseline config note: %s",
++                  profile.config_parse_note != NULL ? profile.config_parse_note : "<none>");
++  g_test_message ("baseline fips-enabled: %d", profile.fips_enabled ? 1 : 0);
++  g_test_message ("baseline configured default_properties: %s",
++                  profile.configured_default_properties != NULL ?
++                  profile.configured_default_properties : "<none>");
++  g_test_message ("baseline restore query: %s", profile.restore_query);
++  g_test_message ("baseline OPENSSL_CONF: %s",
++                  profile.openssl_conf != NULL ? profile.openssl_conf : "<unset>");
++  g_test_message ("baseline OPENSSL_MODULES: %s",
++                  profile.openssl_modules != NULL ? profile.openssl_modules : "<unset>");
++  g_test_message ("baseline providers: %s",
++                  profile.provider_names != NULL && *profile.provider_names != '\0' ?
++                  profile.provider_names : "<none>");
++
++  return profile;
++}
++
++static void
++free_baseline_profile (BaselineProfile *profile)
++{
++  g_clear_pointer (&profile->config_path, g_free);
++  g_clear_pointer (&profile->config_sha256, g_free);
++  g_clear_pointer (&profile->config_parse_note, g_free);
++  g_clear_pointer (&profile->configured_default_properties, g_free);
++  g_clear_pointer (&profile->restore_query, g_free);
++  g_clear_pointer (&profile->openssl_conf, g_free);
++  g_clear_pointer (&profile->openssl_modules, g_free);
++  g_clear_pointer (&profile->provider_names, g_free);
++}
++
++static void
++restore_baseline_profile (OSSL_LIB_CTX              *ctx,
++                          const BaselineProfile     *profile)
++{
++  g_assert_cmpint (EVP_set_default_properties (ctx, profile->restore_query), ==, 1);
++  g_assert_cmpuint ((unsigned) EVP_default_properties_is_fips_enabled (ctx),
++                    ==, (unsigned) (profile->fips_enabled ? 1 : 0));
++}
++
++static void
++assert_all_kats (void)
++{
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (kat_cases); i++)
++    {
++      const KatCase *tc = &kat_cases[i];
++      GHmac *hmac = g_hmac_new (tc->digest_type, tc->key, tc->key_len);
++      const gchar *digest;
++
++      g_assert_nonnull (hmac);
++      g_hmac_update (hmac, tc->data, tc->data_len);
++      digest = g_hmac_get_string (hmac);
++      g_assert_cmpstr (digest, ==, tc->expected_hex);
++      g_hmac_unref (hmac);
++    }
++}
++
++static void
++assert_real_libcrypto_identity (void)
++{
++  Dl_info info;
++  Dl_info info_from_handle;
++  void *no_load_handle;
++  void *fetch_symbol;
++  void *default_fetch_symbol;
++  GHmac *hmac;
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (hmac);
++  g_hmac_unref (hmac);
++
++  default_fetch_symbol = dlsym (RTLD_DEFAULT, "EVP_MAC_fetch");
++  g_assert_nonnull (default_fetch_symbol);
++  g_assert_true (dladdr (default_fetch_symbol, &info) != 0);
++  g_assert_nonnull (info.dli_fname);
++  g_assert_cmpuint ((unsigned) (OpenSSL_version_num () >> 28), ==, 3u);
++  g_test_message ("mapped libcrypto path: %s", info.dli_fname);
++  g_test_message ("openssl version: %s", OpenSSL_version (OPENSSL_VERSION));
++  g_test_message ("openssl build: %s", OpenSSL_version (OPENSSL_BUILT_ON));
++
++#ifdef RTLD_NOLOAD
++  no_load_handle = dlopen ("libcrypto.so.3", RTLD_NOW | RTLD_LOCAL | RTLD_NOLOAD);
++#else
++  no_load_handle = dlopen ("libcrypto.so.3", RTLD_NOW | RTLD_LOCAL);
++#endif
++  g_assert_nonnull (no_load_handle);
++  fetch_symbol = dlsym (no_load_handle, "EVP_MAC_fetch");
++  g_assert_nonnull (fetch_symbol);
++  g_assert_true (dladdr (fetch_symbol, &info_from_handle) != 0);
++  g_assert_nonnull (info_from_handle.dli_fname);
++  g_assert_cmpstr (info_from_handle.dli_fname, ==, info.dli_fname);
++  g_assert_cmpint (dlclose (no_load_handle), ==, 0);
++}
++
++static void
++assert_queue_preserved_across_success_paths (gboolean seeded_queue)
++{
++  ErrorQueueSnapshot seeded;
++  GHmac *source;
++  GHmac *copy;
++  GHmac *closed_copy;
++  const gchar *digest;
++  const gchar *copy_digest;
++
++  if (seeded_queue)
++    {
++      g_test_message ("queue-stage-1: seeding expected queue");
++      seed_user_errors (&seeded);
++    }
++  else
++    g_assert_cmphex (ERR_peek_error (), ==, 0);
++
++  source = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (source);
++  g_hmac_update (source, (const guchar *) "abc", 3);
++  copy = g_hmac_copy (source);
++  g_assert_nonnull (copy);
++  g_hmac_update (copy, (const guchar *) "d", 1);
++  copy_digest = g_hmac_get_string (copy);
++  g_assert_cmpstr (copy_digest, ==, "2a31ec0ee8d878c9eece9fb0df79b3b90b2256240163aa5ee50d176d3d1121f8");
++  closed_copy = g_hmac_copy (copy);
++  g_assert_nonnull (closed_copy);
++  digest = g_hmac_get_string (closed_copy);
++  g_assert_cmpstr (digest, ==, copy_digest);
++  g_hmac_unref (source);
++  g_hmac_unref (copy);
++  g_hmac_unref (closed_copy);
++
++  if (seeded_queue)
++    {
++      g_test_message ("queue-stage-1: asserting seeded queue preserved");
++      assert_error_queue_exact (&seeded);
++      ERR_clear_error ();
++    }
++  else
++    g_assert_cmphex (ERR_peek_error (), ==, 0);
++
++  source = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (source);
++  if (seeded_queue)
++    {
++      g_test_message ("queue-stage-2: reseeding expected queue");
++      seed_user_errors (&seeded);
++    }
++  g_hmac_update (source, (const guchar *) "abc", 3);
++  copy = g_hmac_copy (source);
++  g_assert_nonnull (copy);
++  g_hmac_update (source, (const guchar *) "def", 3);
++  digest = g_hmac_get_string (source);
++  g_assert_cmpstr (digest, ==, expected_sha256_abcdef);
++  g_hmac_unref (copy);
++  g_hmac_unref (source);
++
++  if (seeded_queue)
++    {
++      g_test_message ("queue-stage-2: asserting seeded queue preserved");
++      assert_error_queue_exact (&seeded);
++      ERR_clear_error ();
++    }
++  else
++    g_assert_cmphex (ERR_peek_error (), ==, 0);
++}
++
++static void
++count_warning_handler (const gchar   *log_domain,
++                       GLogLevelFlags log_level,
++                       const gchar   *message,
++                       gpointer       user_data)
++{
++  guint *count = user_data;
++  (void) log_domain;
++  (void) log_level;
++  (void) message;
++  (*count)++;
++}
++
++static void
++assert_unsatisfied_properties_fail_without_fallback (void)
++{
++  GHmac *hmac;
++  gchar *hex;
++  GBytes *key_bytes;
++  GBytes *data_bytes;
++  EVP_MAC *mac;
++  guint warning_count = 0;
++  gulong handler_id;
++  BaselineProfile baseline = { 0 };
++  ErrorQueueSnapshot seeded;
++
++  baseline = capture_baseline_profile (NULL);
++
++  g_assert_cmpint (EVP_set_default_properties (NULL, "provider=glib_test_nonexistent"), ==, 1);
++  mac = EVP_MAC_fetch (NULL, "HMAC", NULL);
++  g_assert_null (mac);
++
++  handler_id = g_log_set_handler (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
++                                  count_warning_handler, &warning_count);
++
++  seed_user_errors (&seeded);
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_null (hmac);
++  hex = g_compute_hmac_for_data (G_CHECKSUM_SHA256, (const guchar *) "key", 3,
++                                 (const guchar *) "abc", 3);
++  g_assert_null (hex);
++  hex = g_compute_hmac_for_string (G_CHECKSUM_SHA256, (const guchar *) "key", 3, "abc", 3);
++  g_assert_null (hex);
++  key_bytes = g_bytes_new_static ("key", 3);
++  data_bytes = g_bytes_new_static ("abc", 3);
++  hex = g_compute_hmac_for_bytes (G_CHECKSUM_SHA256, key_bytes, data_bytes);
++  g_assert_null (hex);
++  g_bytes_unref (key_bytes);
++  g_bytes_unref (data_bytes);
++  assert_error_queue_exact (&seeded);
++  ERR_clear_error ();
++
++  g_assert_cmphex (ERR_peek_error (), ==, 0);
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_null (hmac);
++  hex = g_compute_hmac_for_data (G_CHECKSUM_SHA256, (const guchar *) "key", 3,
++                                 (const guchar *) "abc", 3);
++  g_assert_null (hex);
++  hex = g_compute_hmac_for_string (G_CHECKSUM_SHA256, (const guchar *) "key", 3, "abc", 3);
++  g_assert_null (hex);
++  key_bytes = g_bytes_new_static ("key", 3);
++  data_bytes = g_bytes_new_static ("abc", 3);
++  hex = g_compute_hmac_for_bytes (G_CHECKSUM_SHA256, key_bytes, data_bytes);
++  g_assert_null (hex);
++  g_bytes_unref (key_bytes);
++  g_bytes_unref (data_bytes);
++  g_assert_cmphex (ERR_peek_error (), ==, 0);
++  g_assert_cmpuint (warning_count, ==, 0);
++
++  g_log_remove_handler (G_LOG_DOMAIN, handler_id);
++  restore_baseline_profile (NULL, &baseline);
++  assert_all_kats ();
++  free_baseline_profile (&baseline);
++}
++
++static void
++assert_open_context_survives_policy_flip (void)
++{
++  GHmac *open_hmac;
++  GHmac *new_hmac;
++  const gchar *digest;
++  BaselineProfile baseline = { 0 };
++
++  baseline = capture_baseline_profile (NULL);
++
++  open_hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (open_hmac);
++  g_hmac_update (open_hmac, (const guchar *) "abc", 3);
++
++  g_assert_cmpint (EVP_set_default_properties (NULL, "provider=glib_test_nonexistent"), ==, 1);
++  new_hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_null (new_hmac);
++
++  g_hmac_update (open_hmac, (const guchar *) "def", 3);
++  digest = g_hmac_get_string (open_hmac);
++  g_assert_cmpstr (digest, ==, expected_sha256_abcdef);
++  g_hmac_unref (open_hmac);
++
++  restore_baseline_profile (NULL, &baseline);
++  new_hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (new_hmac);
++  g_hmac_update (new_hmac, (const guchar *) "abcdef", 6);
++  g_assert_cmpstr (g_hmac_get_string (new_hmac), ==, expected_sha256_abcdef);
++  g_hmac_unref (new_hmac);
++  free_baseline_profile (&baseline);
++}
++
++static void
++assert_thread_default_context_behavior (void)
++{
++  OSSL_LIB_CTX *custom_ctx;
++  OSSL_LIB_CTX *previous_ctx;
++  OSSL_PROVIDER *default_provider;
++  GHmac *hmac;
++  EVP_MAC *mac;
++  BaselineProfile baseline = { 0 };
++
++  custom_ctx = OSSL_LIB_CTX_new ();
++  g_assert_nonnull (custom_ctx);
++  default_provider = OSSL_PROVIDER_load (custom_ctx, "default");
++  g_assert_nonnull (default_provider);
++  baseline = capture_baseline_profile (custom_ctx);
++  restore_baseline_profile (custom_ctx, &baseline);
++
++  previous_ctx = OSSL_LIB_CTX_set0_default (custom_ctx);
++  g_assert_true (previous_ctx != custom_ctx);
++
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (hmac);
++  g_hmac_update (hmac, (const guchar *) "abc", 3);
++  g_assert_nonnull (g_hmac_get_string (hmac));
++  g_hmac_unref (hmac);
++
++  g_assert_cmpint (EVP_set_default_properties (custom_ctx, "provider=glib_test_nonexistent"), ==, 1);
++  mac = EVP_MAC_fetch (custom_ctx, "HMAC", NULL);
++  g_assert_null (mac);
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_null (hmac);
++
++  restore_baseline_profile (custom_ctx, &baseline);
++  hmac = g_hmac_new (G_CHECKSUM_SHA256, (const guchar *) "key", 3);
++  g_assert_nonnull (hmac);
++  g_hmac_unref (hmac);
++
++  g_assert_true (OSSL_LIB_CTX_set0_default (previous_ctx) == custom_ctx);
++  OSSL_PROVIDER_unload (default_provider);
++  OSSL_LIB_CTX_free (custom_ctx);
++  free_baseline_profile (&baseline);
++}
++
++static void
++run_policy_case_child (const gchar *case_name)
++{
++  g_assert_nonnull (case_name);
++  g_test_message ("case=%s", case_name);
++
++  if (g_strcmp0 (case_name, "real-instance-and-kats") == 0)
++    {
++      assert_real_libcrypto_identity ();
++      assert_all_kats ();
++      assert_queue_preserved_across_success_paths (TRUE);
++      assert_queue_preserved_across_success_paths (FALSE);
++      return;
++    }
++
++  if (g_strcmp0 (case_name, "unsatisfied-properties") == 0)
++    {
++      assert_unsatisfied_properties_fail_without_fallback ();
++      return;
++    }
++
++  if (g_strcmp0 (case_name, "thread-default-context") == 0)
++    {
++      assert_thread_default_context_behavior ();
++      return;
++    }
++
++  if (g_strcmp0 (case_name, "open-context-survives-policy-flip") == 0)
++    {
++      assert_open_context_survives_policy_flip ();
++      return;
++    }
++
++  g_error ("unknown policy case: %s", case_name);
++}
++
++static void
++run_policy_case_subprocess (const gchar *case_name)
++{
++  g_auto(GStrv) envp = NULL;
++
++  if (g_test_subprocess ())
++    {
++      const gchar *selected = g_getenv ("GLIB_TEST_POLICY_CASE");
++      run_policy_case_child (selected);
++      return;
++    }
++
++  envp = build_clean_envp ();
++  envp = g_environ_setenv (g_steal_pointer (&envp), "GLIB_TEST_POLICY_CASE", case_name, TRUE);
++  g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
++  g_test_trap_assert_passed ();
++}
++
++static void
++test_policy_real_instance_and_kats (void)
++{
++  run_policy_case_subprocess ("real-instance-and-kats");
++}
++
++static void
++test_policy_unsatisfied_properties (void)
++{
++  run_policy_case_subprocess ("unsatisfied-properties");
++}
++
++static void
++test_policy_thread_default_context (void)
++{
++  run_policy_case_subprocess ("thread-default-context");
++}
++
++static void
++test_policy_open_context_survives_policy_flip (void)
++{
++  run_policy_case_subprocess ("open-context-survives-policy-flip");
++}
++
++int
++main (int argc, char *argv[])
++{
++  g_test_init (&argc, &argv, NULL);
++
++  g_test_add_func ("/hmac/openssl/policy/real-instance-and-kats",
++                   test_policy_real_instance_and_kats);
++  g_test_add_func ("/hmac/openssl/policy/unsatisfied-properties",
++                   test_policy_unsatisfied_properties);
++  g_test_add_func ("/hmac/openssl/policy/thread-default-context",
++                   test_policy_thread_default_context);
++  g_test_add_func ("/hmac/openssl/policy/open-context-survives-policy-flip",
++                   test_policy_open_context_survives_policy_flip);
++
++  return g_test_run ();
++}
+diff --git a/glib/tests/meson.build b/glib/tests/meson.build
+index 6a27ec8dd01676d4b1108327b68c7375af0a31fd..4f41c65d34099dbfb16a919fc625406a43079fe1 100644
+--- a/glib/tests/meson.build
++++ b/glib/tests/meson.build
+@@ -386,6 +386,9 @@ if get_option('openssl') and host_machine.system() == 'linux' and have_dlopen_dl
+   subdir('hmac-openssl/unloadable')
+ 
+   glib_tests += {
++    'hmac-openssl-first-load' : {
++      'install' : false,
++    },
+     'hmac-openssl-failures' : {
+       'install' : false,
+       'depends' : [
+@@ -394,6 +397,10 @@ if get_option('openssl') and host_machine.system() == 'linux' and have_dlopen_dl
+         hmac_openssl_unloadable_crypto,
+       ],
+     },
++    'hmac-openssl-policy' : {
++      'install' : false,
++      'dependencies' : [libcrypto_dep, libdl_dep],
++    },
+   }
+ endif
+ 
+From de7abcb30749b9c59aa94c55aad0bdfcfe0cecef Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Sat, 31 Oct 2026 04:33:09 +0000
+Subject: [PATCH 5/9] fix(glib): restrict openssl dummy keys to empty inputs
+
+Avoid substituting a one-byte stack key with a nonzero length when
+argument checks are disabled. Preserve ordinary checked diagnostics and
+valid empty-key behavior, and test both checked and unchecked builds.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ glib/ghmac-openssl.c |  2 +-
+ glib/tests/hmac.c    | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/glib/ghmac-openssl.c b/glib/ghmac-openssl.c
+index 9afc0b575729cde00bf8e81e1fd815800339dd4f..07a482170e6af990073fbbb62991739d7ed7fab5 100644
+--- a/glib/ghmac-openssl.c
++++ b/glib/ghmac-openssl.c
+@@ -291,7 +291,7 @@ g_hmac_new (GChecksumType  digest_type,
+       return NULL;
+     }
+ 
+-  if (effective_key == NULL)
++  if (key_len == 0)
+     effective_key = &empty_key;
+ 
+   {
+diff --git a/glib/tests/hmac.c b/glib/tests/hmac.c
+index e8e14f8012f52088db787f87e9015d8c7bd373f4..b5c1daf80f03b8f51221523573f2c8d27b1f588f 100644
+--- a/glib/tests/hmac.c
++++ b/glib/tests/hmac.c
+@@ -619,6 +619,30 @@ test_hmac_null_zero_key (void)
+     }
+ }
+ 
++#ifdef USE_OPENSSL
++static void
++test_hmac_null_nonzero_key (void)
++{
++  static const gsize key_lengths[] = { 1, 32 };
++  guint i;
++
++  for (i = 0; i < G_N_ELEMENTS (key_lengths); i++)
++    {
++      GHmac *hmac;
++
++#ifndef G_DISABLE_CHECKS
++      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
++                             "*g_hmac_new*key != NULL || key_len == 0*failed*");
++#endif
++      hmac = g_hmac_new (G_CHECKSUM_SHA256, NULL, key_lengths[i]);
++#ifndef G_DISABLE_CHECKS
++      g_test_assert_expected_messages ();
++#endif
++      g_assert_null (hmac);
++    }
++}
++#endif
++
+ static void
+ test_hmac_empty_message_all_algorithms (void)
+ {
+@@ -1214,6 +1238,7 @@ main (int argc,
+   g_test_add_func ("/hmac/block-size-boundaries", test_hmac_key_block_size_boundaries);
+   g_test_add_func ("/hmac/copy-open-diverges", test_hmac_copy_open_diverges);
+ #ifdef USE_OPENSSL
++  g_test_add_func ("/hmac/openssl/null-nonzero-key", test_hmac_null_nonzero_key);
+   g_test_add_func ("/hmac/copy-closed-after-source-unref/digest-then-string",
+                    test_hmac_copy_closed_after_source_unref_digest_then_string);
+   g_test_add_func ("/hmac/copy-closed-after-source-unref/string-then-digest",
+From ef128268a75e18ed594922f7288556a878f2ec13 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Sat, 31 Oct 2026 04:45:38 +0000
+Subject: [PATCH 6/9] test(glib): remove duplicate openssl error-queue case
+
+The recoverable-modes case already checks seeded and empty error queues,
+constructor recovery, copy lifetimes, and cleanup counters. Remove the
+identical second execution without dropping any distinct assertions.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ glib/tests/hmac-openssl-failures.c | 34 ------------------------------
+ 1 file changed, 34 deletions(-)
+
+diff --git a/glib/tests/hmac-openssl-failures.c b/glib/tests/hmac-openssl-failures.c
+index 67d6a57a809d394979c8172bf998c15cd4dcf7da..e0d12a1bfd6f4854bc77dbae7b77087135eb7cfc 100644
+--- a/glib/tests/hmac-openssl-failures.c
++++ b/glib/tests/hmac-openssl-failures.c
+@@ -547,39 +547,6 @@ test_recoverable_modes_and_counters (void)
+ }
+ 
+ static void
+-test_error_queue_hygiene (void)
+-{
+-  g_autofree gchar *fixture_dir = NULL;
+-  gchar **envp;
+-
+-  if (g_test_subprocess ())
+-    {
+-      ScriptedFixtureApi api;
+-      void *handle;
+-      guint i;
+-
+-      assert_non_secure_execution ();
+-      handle = open_scripted_fixture (&api);
+-
+-      for (i = 0; i < G_N_ELEMENTS (recoverable_mode_expectations); i++)
+-        {
+-          assert_recoverable_constructor_mode (&api, recoverable_mode_expectations[i].mode, TRUE);
+-          assert_recoverable_constructor_mode (&api, recoverable_mode_expectations[i].mode, FALSE);
+-        }
+-
+-      assert_copy_lifetimes_and_counters (&api);
+-      g_assert_cmpuint (dlclose (handle), ==, 0);
+-      return;
+-    }
+-
+-  fixture_dir = fixture_dir_for_variant ("scripted");
+-  envp = build_envp (fixture_dir, NULL);
+-  g_test_trap_subprocess_with_envp (NULL, (const gchar * const *) envp, SUBPROCESS_TIMEOUT_US, G_TEST_SUBPROCESS_DEFAULT);
+-  g_test_trap_assert_passed ();
+-  g_strfreev (envp);
+-}
+-
+-static void
+ assert_fatal_mode (const gchar *mode_message,
+                    int          mode,
+                    const gchar *failure_message)
+@@ -744,7 +711,6 @@ main (int argc, char *argv[])
+   g_test_add_func ("/hmac/openssl/failures/unloadable", test_loader_unloadable);
+   g_test_add_func ("/hmac/openssl/failures/reentrant-concurrent-single-warning", test_reentrant_concurrent_single_warning);
+   g_test_add_func ("/hmac/openssl/failures/recoverable-modes", test_recoverable_modes_and_counters);
+-  g_test_add_func ("/hmac/openssl/failures/error-queue-hygiene", test_error_queue_hygiene);
+   g_test_add_func ("/hmac/openssl/failures/fatal-dispatch", test_fatal_operation_modes);
+   g_test_add_func ("/openssl/key-limit/before-loader", test_key_limit_before_loader);
+ 
+From 9e89c96b3110ee5d32db5d48a6668c389b16981e Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Sat, 31 Oct 2026 04:53:55 +0000
+Subject: [PATCH 7/9] test(glib): remove superseded openssl fixture sources
+
+The nested hmac-openssl fixtures replaced these implementations during
+C3 hardening. Remove the four unbuilt sources while preserving all active
+fixture coverage and the original reviewed history.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ glib/tests/fake-crypto-missing-final.c   | 149 ----------------
+ glib/tests/fake-crypto-missing-symbols.c |  19 --
+ glib/tests/fake-crypto-scripted.c        | 216 -----------------------
+ glib/tests/fake-crypto-unloadable.c      |  23 ---
+ 4 files changed, 407 deletions(-)
+ delete mode 100644 glib/tests/fake-crypto-missing-final.c
+ delete mode 100644 glib/tests/fake-crypto-missing-symbols.c
+ delete mode 100644 glib/tests/fake-crypto-scripted.c
+ delete mode 100644 glib/tests/fake-crypto-unloadable.c
+
+diff --git a/glib/tests/fake-crypto-missing-final.c b/glib/tests/fake-crypto-missing-final.c
+deleted file mode 100644
+index 5b38c5f6e1a8ee7784e708b3c077d3802a53e7c8..0000000000000000000000000000000000000000
+--- a/glib/tests/fake-crypto-missing-final.c
++++ /dev/null
+@@ -1,149 +0,0 @@
+-#include <openssl/core_names.h>
+-#include <openssl/err.h>
+-#include <openssl/evp.h>
+-#include <openssl/params.h>
+-
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <stdint.h>
+-#include <string.h>
+-
+-typedef struct
+-{
+-  size_t mac_size;
+-} FakeMacCtx;
+-
+-__attribute__((constructor))
+-static void
+-fake_crypto_marker_ctor (void)
+-{
+-  const char *path = getenv ("GLIB_TEST_OPENSSL_MARKER_PATH");
+-  FILE *stream;
+-
+-  if (path == NULL || path[0] == '\0')
+-    return;
+-
+-  stream = fopen (path, "w");
+-  if (stream == NULL)
+-    return;
+-  fputs ("loaded\n", stream);
+-  fclose (stream);
+-}
+-
+-EVP_MAC *
+-EVP_MAC_fetch (OSSL_LIB_CTX  *libctx,
+-               const char    *algorithm,
+-               const char    *properties)
+-{
+-  (void) libctx;
+-  (void) algorithm;
+-  (void) properties;
+-  return (EVP_MAC *) (uintptr_t) 0x1;
+-}
+-
+-void
+-EVP_MAC_free (EVP_MAC *mac)
+-{
+-  (void) mac;
+-}
+-
+-EVP_MAC_CTX *
+-EVP_MAC_CTX_new (EVP_MAC *mac)
+-{
+-  FakeMacCtx *ctx;
+-
+-  (void) mac;
+-  ctx = calloc (1, sizeof (FakeMacCtx));
+-  if (ctx == NULL)
+-    return NULL;
+-  ctx->mac_size = 32;
+-  return (EVP_MAC_CTX *) ctx;
+-}
+-
+-void
+-EVP_MAC_CTX_free (EVP_MAC_CTX *ctx)
+-{
+-  free ((FakeMacCtx *) ctx);
+-}
+-
+-EVP_MAC_CTX *
+-EVP_MAC_CTX_dup (const EVP_MAC_CTX *src)
+-{
+-  const FakeMacCtx *in_ctx = (const FakeMacCtx *) src;
+-  FakeMacCtx *out_ctx = malloc (sizeof (FakeMacCtx));
+-
+-  if (out_ctx == NULL)
+-    return NULL;
+-  *out_ctx = *in_ctx;
+-  return (EVP_MAC_CTX *) out_ctx;
+-}
+-
+-size_t
+-EVP_MAC_CTX_get_mac_size (EVP_MAC_CTX *ctx)
+-{
+-  return ((FakeMacCtx *) ctx)->mac_size;
+-}
+-
+-int
+-EVP_MAC_init (EVP_MAC_CTX         *ctx,
+-              const unsigned char *key,
+-              size_t               keylen,
+-              const OSSL_PARAM     params[])
+-{
+-  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
+-  const OSSL_PARAM *param;
+-  const char *digest_name = "SHA256";
+-
+-  (void) key;
+-  (void) keylen;
+-
+-  for (param = params; param != NULL && param->key != NULL; param++)
+-    {
+-      if (strcmp (param->key, OSSL_MAC_PARAM_DIGEST) == 0 && param->data != NULL)
+-        {
+-          digest_name = (const char *) param->data;
+-          break;
+-        }
+-    }
+-
+-  if (strcmp (digest_name, "SHA512") == 0)
+-    fake_ctx->mac_size = 64;
+-  else if (strcmp (digest_name, "SHA384") == 0)
+-    fake_ctx->mac_size = 48;
+-  else if (strcmp (digest_name, "SHA1") == 0)
+-    fake_ctx->mac_size = 20;
+-  else if (strcmp (digest_name, "MD5") == 0)
+-    fake_ctx->mac_size = 16;
+-  else
+-    fake_ctx->mac_size = 32;
+-
+-  return 1;
+-}
+-
+-int
+-EVP_MAC_update (EVP_MAC_CTX          *ctx,
+-                const unsigned char  *data,
+-                size_t                datalen)
+-{
+-  (void) ctx;
+-  (void) data;
+-  (void) datalen;
+-  return 1;
+-}
+-
+-int
+-ERR_set_mark (void)
+-{
+-  return 1;
+-}
+-
+-int
+-ERR_pop_to_mark (void)
+-{
+-  return 1;
+-}
+-
+-void
+-ERR_clear_error (void)
+-{
+-}
+diff --git a/glib/tests/fake-crypto-missing-symbols.c b/glib/tests/fake-crypto-missing-symbols.c
+deleted file mode 100644
+index 2773c3cd2ded5bf500d2c2d903a4ce0f15248416..0000000000000000000000000000000000000000
+--- a/glib/tests/fake-crypto-missing-symbols.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include <stdio.h>
+-#include <stdlib.h>
+-
+-__attribute__((constructor))
+-static void
+-fake_crypto_marker_ctor (void)
+-{
+-  const char *path = getenv ("GLIB_TEST_OPENSSL_MARKER_PATH");
+-  FILE *stream;
+-
+-  if (path == NULL || path[0] == '\0')
+-    return;
+-
+-  stream = fopen (path, "w");
+-  if (stream == NULL)
+-    return;
+-  fputs ("loaded\n", stream);
+-  fclose (stream);
+-}
+diff --git a/glib/tests/fake-crypto-scripted.c b/glib/tests/fake-crypto-scripted.c
+deleted file mode 100644
+index dc4a0b7a257f38866a0a7d0c7314d079daea18a3..0000000000000000000000000000000000000000
+--- a/glib/tests/fake-crypto-scripted.c
++++ /dev/null
+@@ -1,216 +0,0 @@
+-#include <openssl/core_names.h>
+-#include <openssl/err.h>
+-#include <openssl/evp.h>
+-#include <openssl/params.h>
+-
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <stdint.h>
+-#include <string.h>
+-
+-typedef struct
+-{
+-  size_t mac_size;
+-  size_t total_len;
+-} FakeMacCtx;
+-
+-static int
+-mode_is (const char *value)
+-{
+-  const char *mode = getenv ("GLIB_TEST_OPENSSL_MODE");
+-  return mode != NULL && strcmp (mode, value) == 0;
+-}
+-
+-static size_t
+-digest_size_for_name (const char *digest_name)
+-{
+-  if (digest_name == NULL)
+-    return 32;
+-  if (strcmp (digest_name, "MD5") == 0)
+-    return 16;
+-  if (strcmp (digest_name, "SHA1") == 0)
+-    return 20;
+-  if (strcmp (digest_name, "SHA256") == 0)
+-    return 32;
+-  if (strcmp (digest_name, "SHA384") == 0)
+-    return 48;
+-  if (strcmp (digest_name, "SHA512") == 0)
+-    return 64;
+-  return 32;
+-}
+-
+-__attribute__((constructor))
+-static void
+-fake_crypto_marker_ctor (void)
+-{
+-  const char *path = getenv ("GLIB_TEST_OPENSSL_MARKER_PATH");
+-  FILE *stream;
+-
+-  if (path == NULL || path[0] == '\0')
+-    return;
+-
+-  stream = fopen (path, "w");
+-  if (stream == NULL)
+-    return;
+-  fputs ("loaded\n", stream);
+-  fclose (stream);
+-}
+-
+-EVP_MAC *
+-EVP_MAC_fetch (OSSL_LIB_CTX  *libctx,
+-               const char    *algorithm,
+-               const char    *properties)
+-{
+-  (void) libctx;
+-  (void) algorithm;
+-  (void) properties;
+-
+-  if (mode_is ("fetch-null"))
+-    return NULL;
+-
+-  return (EVP_MAC *) (uintptr_t) 0x1;
+-}
+-
+-void
+-EVP_MAC_free (EVP_MAC *mac)
+-{
+-  (void) mac;
+-}
+-
+-EVP_MAC_CTX *
+-EVP_MAC_CTX_new (EVP_MAC *mac)
+-{
+-  FakeMacCtx *ctx;
+-
+-  (void) mac;
+-  if (mode_is ("ctx-new-null"))
+-    return NULL;
+-
+-  ctx = calloc (1, sizeof (FakeMacCtx));
+-  if (ctx == NULL)
+-    return NULL;
+-  ctx->mac_size = 32;
+-  return (EVP_MAC_CTX *) ctx;
+-}
+-
+-void
+-EVP_MAC_CTX_free (EVP_MAC_CTX *ctx)
+-{
+-  free ((FakeMacCtx *) ctx);
+-}
+-
+-EVP_MAC_CTX *
+-EVP_MAC_CTX_dup (const EVP_MAC_CTX *src)
+-{
+-  const FakeMacCtx *in_ctx = (const FakeMacCtx *) src;
+-  FakeMacCtx *out_ctx;
+-
+-  if (mode_is ("dup-fail"))
+-    return NULL;
+-
+-  out_ctx = malloc (sizeof (FakeMacCtx));
+-  if (out_ctx == NULL)
+-    return NULL;
+-  *out_ctx = *in_ctx;
+-  return (EVP_MAC_CTX *) out_ctx;
+-}
+-
+-size_t
+-EVP_MAC_CTX_get_mac_size (EVP_MAC_CTX *ctx)
+-{
+-  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
+-
+-  if (mode_is ("size-zero"))
+-    return 0;
+-  if (mode_is ("size-mismatch"))
+-    return fake_ctx->mac_size + 1;
+-  return fake_ctx->mac_size;
+-}
+-
+-int
+-EVP_MAC_init (EVP_MAC_CTX         *ctx,
+-              const unsigned char *key,
+-              size_t               keylen,
+-              const OSSL_PARAM     params[])
+-{
+-  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
+-  const OSSL_PARAM *param;
+-  const char *digest_name = NULL;
+-
+-  (void) key;
+-  (void) keylen;
+-
+-  if (mode_is ("init-fail"))
+-    return 0;
+-
+-  for (param = params; param != NULL && param->key != NULL; param++)
+-    {
+-      if (strcmp (param->key, OSSL_MAC_PARAM_DIGEST) == 0 && param->data != NULL)
+-        {
+-          digest_name = (const char *) param->data;
+-          break;
+-        }
+-    }
+-
+-  fake_ctx->mac_size = digest_size_for_name (digest_name);
+-  fake_ctx->total_len = 0;
+-  return 1;
+-}
+-
+-int
+-EVP_MAC_update (EVP_MAC_CTX          *ctx,
+-                const unsigned char  *data,
+-                size_t                datalen)
+-{
+-  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
+-
+-  if (mode_is ("update-fail"))
+-    return 0;
+-
+-  if (data != NULL || datalen == 0)
+-    fake_ctx->total_len += datalen;
+-  return 1;
+-}
+-
+-int
+-EVP_MAC_final (EVP_MAC_CTX    *ctx,
+-               unsigned char  *out,
+-               size_t         *outl,
+-               size_t          outsize)
+-{
+-  FakeMacCtx *fake_ctx = (FakeMacCtx *) ctx;
+-  size_t i;
+-  size_t result_len = fake_ctx->mac_size;
+-
+-  if (mode_is ("final-fail"))
+-    return 0;
+-
+-  if (mode_is ("final-size-mismatch") && result_len > 0)
+-    result_len--;
+-
+-  if (outsize < result_len)
+-    return 0;
+-
+-  for (i = 0; i < result_len; i++)
+-    out[i] = (unsigned char) ((fake_ctx->total_len + i) & 0xff);
+-  if (outl != NULL)
+-    *outl = result_len;
+-  return 1;
+-}
+-
+-int
+-ERR_set_mark (void)
+-{
+-  return 1;
+-}
+-
+-int
+-ERR_pop_to_mark (void)
+-{
+-  return 1;
+-}
+-
+-void
+-ERR_clear_error (void)
+-{
+-}
+diff --git a/glib/tests/fake-crypto-unloadable.c b/glib/tests/fake-crypto-unloadable.c
+deleted file mode 100644
+index deca08910e8ceb7803bf3ae926412e12b3c94ab7..0000000000000000000000000000000000000000
+--- a/glib/tests/fake-crypto-unloadable.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include <stdio.h>
+-#include <stdlib.h>
+-
+-extern int glib_test_crypto_missing_dependency (void);
+-
+-__attribute__((constructor))
+-static void
+-fake_crypto_marker_ctor (void)
+-{
+-  const char *path = getenv ("GLIB_TEST_OPENSSL_MARKER_PATH");
+-  FILE *stream;
+-
+-  glib_test_crypto_missing_dependency ();
+-
+-  if (path == NULL || path[0] == '\0')
+-    return;
+-
+-  stream = fopen (path, "w");
+-  if (stream == NULL)
+-    return;
+-  fputs ("loaded\n", stream);
+-  fclose (stream);
+-}
+From c759974b1ebd45bcf8aecfadc93630605fc09bdd Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Sat, 31 Oct 2026 05:07:21 +0000
+Subject: [PATCH 8/9] docs(glib): explain openssl loader failure recovery
+
+Document process-lifetime loader and required-symbol failure caching,
+one-time warning and restart after runtime repair. Distinguish recoverable
+provider and property-policy rejection from cached loader failure.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ docs/reference/glib/building.md | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/docs/reference/glib/building.md b/docs/reference/glib/building.md
+index 0eba171a87e988c6f153461c37dcf77dd0a03ec1..0eae6f2362773d48f61523482b6c6fb5a39052c1 100644
+--- a/docs/reference/glib/building.md
++++ b/docs/reference/glib/building.md
+@@ -181,12 +181,21 @@ configuring the GLib library:
+   cannot be combined with `-Dgnutls=true`. The key length accepted by
+   `g_hmac_new()` is limited to `G_MAXINT` with this backend.
+ 
++  Loading or required-symbol resolution failures are cached for the lifetime
++  of the process. Only the first failure emits a warning; subsequent GHmac
++  constructions return `%NULL` without retrying. After repairing the runtime
++  installation, restart the process.
++
+   Backend initialization and digest/key acceptance are governed by the
+   application's active OpenSSL provider and property configuration. A failed
+   provider fetch or policy rejection causes GHmac construction to return `%NULL`.
+   This backend does not force providers, set default properties, or claim FIPS
+   certification.
+ 
++  Unlike loader failures, provider or property-policy rejection does not
++  permanently disable subsequent GHmac construction. Later constructions can
++  succeed if the application's provider and property configuration permits it.
++
+   This backend keeps GLib itself free of direct `libcrypto` link requirements:
+   static GLib consumers still need a shared `libcrypto.so.3` and provider data
+   at runtime. It is not a hermetic fully static crypto deployment.
+From 9653c9da8e39ae799655be17b89774786637ba1d Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Sat, 31 Oct 2026 05:07:21 +0000
+Subject: [PATCH 9/9] build(glib): reject mismatched openssl function
+ declarations
+
+Make incompatible-pointer diagnostics fatal only in the OpenSSL signature
+probe. Require compiler support explicitly rather than silently weakening
+the ABI check; leave project-wide warning policy unchanged.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: ebcf9f4b-5364-45c7-a0a7-6f274f5971c2
+---
+ meson.build | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index ed0bd3d427b5fb1d0ca2ef2ebf64b5dd477bd2fc..172f2caea746ceafddf9743e098828216aa26041 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2396,6 +2396,11 @@ elif get_option('openssl')
+     static : false,
+     allow_fallback : false)
+ 
++  openssl_type_check_arg = '-Werror=incompatible-pointer-types'
++  if not cc.has_argument(openssl_type_check_arg)
++    error('OpenSSL GHmac backend requires compiler support for ' + openssl_type_check_arg)
++  endif
++
+   openssl_decl_check = '''
+     #include <openssl/core_names.h>
+     #include <openssl/err.h>
+@@ -2456,7 +2461,10 @@ elif get_option('openssl')
+       (void) clear_f;
+       return 0;
+     }'''
+-  if not cc.compiles(openssl_decl_check, dependencies : libcrypto_dep, name : 'OpenSSL GHmac declarations')
++  if not cc.compiles(openssl_decl_check,
++      dependencies : libcrypto_dep,
++      args : openssl_type_check_arg,
++      name : 'OpenSSL GHmac declarations')
+     error('OpenSSL GHmac backend requires OpenSSL 3 EVP_MAC and ERR mark declarations')
+   endif
+ 
