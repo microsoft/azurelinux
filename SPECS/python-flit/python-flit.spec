@@ -37,6 +37,7 @@ BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
 BuildRequires:  python3-pygments
+BuildRequires:  python3-pytest
 BuildRequires:  sudo
 BuildRequires:  which
 
@@ -44,8 +45,6 @@ BuildRequires:  which
 BuildRequires:  python3-requests
 BuildRequires:  python3-responses
 
-# Test deps that require flit to build, using 'pip3' instead:
-# BuildRequires:  python3-testpath
 %endif
 
 %description %{_description}
@@ -80,8 +79,7 @@ if [[ ! -f "%{_bindir}/python" ]]
 then
   ln -s "$(which python3)" "%{_bindir}/python"
 fi
-
-pip3 install more-itertools pluggy pytest testpath tomli_w pyyaml
+pip3 install more-itertools pluggy testpath tomli_w pyyaml
 
 # flit attempts to download list of classifiers from PyPI, but not if it's cached
 # test_invalid_classifier fails without the list
@@ -101,6 +99,9 @@ sudo -u test %pytest -k "not test_test_writable_dir_win"
 %{_bindir}/flit
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.9.0-3
+- Use python3-pytest for tests instead of installing pytest with pip
+
 * Wed May 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.9.0-2
 - Add yaml dependency to pip install for check section
 

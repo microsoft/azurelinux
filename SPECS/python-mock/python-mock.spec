@@ -5,7 +5,7 @@
 Summary:        A Python Mocking and Patching Library for Testing
 Name:           python-mock
 Version:        5.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,8 @@ BuildRequires:  python3-setuptools
 BuildArch:      noarch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
 %endif
 
 %description
@@ -48,8 +50,6 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-cov>=2.7.1 \
     six>=1.12.0
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
@@ -65,6 +65,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{mod_name}
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 5.1.0-2
+- Use python3-pytest and python3-pytest-cov from check dependencies instead of pip
+
 * Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.1.0-1
 - Auto-upgrade to 5.1.0 - 3.0 package upgrade
 

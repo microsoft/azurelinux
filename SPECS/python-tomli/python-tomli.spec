@@ -48,7 +48,7 @@ Summary:        %{summary}
 %pyproject_save_files tomli
 
 %check
-pip3 install more_itertools pluggy pytest
+pip3 install more_itertools pluggy
 %py3_check_import tomli
 # assert the properly built package has no runtime requires
 # if it does, we need to change the bootstrap metadata
@@ -62,6 +62,9 @@ test -f %{buildroot}%{python3_sitelib}/tomli-%{version}.dist-info/METADATA
 %license LICENSE
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.0.1-4
+- Do not pip-install pytest; keep other test dependencies on pip
+
 * Mon Apr 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-3
 - Removed BR on "python3-pytest" to break a circular dependency. Replaced with build-time pip3 installation.
 

@@ -34,10 +34,14 @@ BuildRequires:  python3-attrs
 BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-execnet
 BuildRequires:  python3-greenlet >= 1.0
-BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  python3-typing-extensions
+%if 0%{?with_check}
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-xdist
+%endif
 
 %description
 SQLAlchemy is an Object Relational Mapper (ORM) that provides a flexible,
@@ -96,11 +100,7 @@ rm -rf doc/build
 rm -f doc/copyright.html
 
 %check
-# Using pip for 'more-itertools' because Mariner doesn't build it.
-# Mariner's 'pytest' module is below the required version 6.0.0, so we need to use pip as well.
-# The 'apipkg' module should be provided by 'python3-py' pulled in by 'python3-execnet' but the build
-# couldn't find 'apipkg' just by using the BRs.
-pip3 install more-itertools pytest pytest-xdist apipkg typing_extensions mypy
+pip3 install more-itertools apipkg typing_extensions mypy
 # Exclude mypy tests (version-specific mypy output mismatches)
 PYTHONPATH=.:%{buildroot}%{python3_sitelib} python3 -m pytest test --numprocesses=auto --ignore=test/ext/mypy --ignore=test/typing/test_mypy.py
 
@@ -114,6 +114,9 @@ PYTHONPATH=.:%{buildroot}%{python3_sitelib} python3 -m pytest test --numprocesse
 %{python3_sitearch}/*
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.0.27-3
+- Use python3-pytest and python3-pytest-xdist instead of pip
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.0.27-2
 - Patch _concurrency_py3k.py to create a new event loop when none is
   running (Python 3.12 deprecated get_event_loop()).

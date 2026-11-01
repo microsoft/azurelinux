@@ -3,7 +3,7 @@
 Summary:        %{sum}
 Name:           python-%{srcname}
 Version:        7.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,8 @@ BuildRequires:  python3-xml
 BuildArch:      noarch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
 %endif
 
 %description
@@ -63,9 +65,7 @@ sed -i -e '/^#!\//, 1d' cpuinfo/cpuinfo.py
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
-    pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-cov>=2.7.1
+    pluggy>=0.11.0
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v tests
@@ -79,6 +79,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/py_%{srcname}-%{version}-py3.*.egg-info
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 7.0.0-5
+- Use python3-pytest and python3-pytest-cov from check dependencies instead of pip
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 7.0.0-4
 - Update check section to use pytest
 - License verified

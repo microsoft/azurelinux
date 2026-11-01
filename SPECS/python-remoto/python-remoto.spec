@@ -2,7 +2,7 @@
 Summary:        A very simplistic remote-command-executor
 Name:           python-%{pkgname}
 Version:        1.2.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,8 +11,9 @@ Source0:        https://pypi.io/packages/source/r/%{pkgname}/%{pkgname}-%{versio
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
-BuildRequires:  python3-execnet
 BuildRequires:  python3-pip
+BuildRequires:  python3-execnet
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
@@ -46,7 +47,7 @@ sed -i 's/def setup(self)/def setup_method(self)/' remoto/tests/test_process.py 
 %py3_install
 
 %check
-pip3 install pytest mock
+pip3 install mock
 python3 -m pytest -v remoto/tests
 
 %files -n python3-%{pkgname}
@@ -55,6 +56,9 @@ python3 -m pytest -v remoto/tests
 %{python3_sitelib}/*
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.2.1-3
+- Use python3-pytest and python3-mock from check dependencies instead of pip
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.2.1-2
 - Rename `setup(self)` to `setup_method(self)` in tests; newer pytest no
   longer auto-invokes `setup` on plain classes.

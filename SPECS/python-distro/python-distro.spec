@@ -2,7 +2,7 @@
 Summary:        Distro - an OS platform information API
 Name:           python-distro
 Version:        1.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,10 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
 BuildArch:      noarch
+
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
 
 %description
 Distro provides information about the OS distribution it runs on, such as a reliable machine-readable ID, or version information.
@@ -39,7 +43,6 @@ Distro provides information about the OS distribution it runs on, such as a reli
 %pyproject_install
 
 %check
-pip3 install pytest
 export LANG=C.UTF-8
 %pytest
 
@@ -51,6 +54,9 @@ export LANG=C.UTF-8
 %{_bindir}/*
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.9.0-2
+- Use python3-pytest for tests instead of pip
+
 * Mon Feb 12 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.9.0-1
 - Update versions for 3.0 release
 - Update source URL
