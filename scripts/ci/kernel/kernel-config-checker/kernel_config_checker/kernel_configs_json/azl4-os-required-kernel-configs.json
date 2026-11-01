@@ -3377,20 +3377,6 @@
           "justification": "kernel: Enable CONFIG_SQUASHFS_ZSTD and CONFIG_FW_CFG_SYSFS - PR: https://github.com/microsoft/azurelinux/pull/15612"
         },
         {
-          "name": "CONFIG_HSA_AMD_SVM",
-          "values": [
-            {
-              "architecture": "x86_64",
-              "value": "n"
-            },
-            {
-              "architecture": "arm64",
-              "value": "y"
-            }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
           "name": "CONFIG_NUMA_BALANCING",
           "values": [
             {
@@ -3537,14 +3523,6 @@
           "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/60759133"
         },
         {
-          "name": "CONFIG_BLK_CGROUP_IOLATENCY",
-          "values": [
-            { "architecture": "x86_64", "value": "n" },
-            { "architecture": "arm64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
           "name": "CONFIG_CRYPTO_ARC4",
           "values": [
             { "architecture": "x86_64", "value": "n" },
@@ -3557,13 +3535,6 @@
           "values": [
             { "architecture": "x86_64", "value": "y" },
             { "architecture": "arm64", "value": "y" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_DMI_SYSFS",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
           ],
           "justification": "Align kernel 6.18 with its generated configuration"
         },
@@ -3595,20 +3566,6 @@
           "values": [
             { "architecture": "x86_64", "value": "n" },
             { "architecture": "arm64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_HSA_AMD",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_HSA_AMD_P2P",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
           ],
           "justification": "Align kernel 6.18 with its generated configuration"
         },
@@ -3683,33 +3640,9 @@
           "justification": "Align kernel 6.18 with its generated configuration"
         },
         {
-          "name": "CONFIG_ROSE",
-          "values": [
-            { "architecture": "x86_64", "value": "m" },
-            { "architecture": "arm64", "value": "m" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_SECURITY_SMACK",
-          "values": [
-            { "architecture": "x86_64", "value": "y" },
-            { "architecture": "arm64", "value": "y" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
           "name": "CONFIG_SEV_GUEST",
           "values": [
             { "architecture": "x86_64", "value": "m" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_SMB_SERVER",
-          "values": [
-            { "architecture": "x86_64", "value": "m" },
-            { "architecture": "arm64", "value": "m" }
           ],
           "justification": "Align kernel 6.18 with its generated configuration"
         },
@@ -3746,14 +3679,6 @@
           "name": "CONFIG_USB_TMC",
           "values": [
             { "architecture": "x86_64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_XFS_SUPPORT_V4",
-          "values": [
-            { "architecture": "x86_64", "value": "y" },
-            { "architecture": "arm64", "value": "y" }
           ],
           "justification": "Align kernel 6.18 with its generated configuration"
         },
