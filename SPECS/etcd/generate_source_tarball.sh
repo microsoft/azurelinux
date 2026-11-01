@@ -126,16 +126,41 @@ etcd_local_modules=(
     "go.etcd.io/etcd/raft/v3=../../raft"
     "go.etcd.io/etcd/server/v3=../../server"
 )
+
+# 'go mod init' stamps the *host* toolchain version into the generated go.mod
+# (a host running Go 1.27.1 produces 'go 1.27.1'). That go.mod is shipped inside
+# the vendor tarball, while the package is built with the 'golang' from the
+# spec's BuildRequires under GOTOOLCHAIN=local, which cannot fetch a newer Go.
+# Pin the directive to the one etcd's own modules declare so the generated
+# tarball is reproducible and independent of the generating host.
+etcd_go_directive="$(awk '$1 == "go" { print $2; exit }' go.mod)"
+if [ -z "$etcd_go_directive" ]; then
+    echo "Error: could not read the 'go' directive from etcd's root go.mod" >&2
+    exit 1
+fi
+echo "Pinning the dump tools to etcd's 'go $etcd_go_directive' directive"
+
 for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     echo "==================================="
     echo "Get vendored modules for $component"
     go mod init go.etcd.io/etcd/tools/$component/v3
+    go mod edit -go="$etcd_go_directive"
     for replace_rule in "${etcd_local_modules[@]}"; do
         go mod edit -replace "$replace_rule"
     done
     go mod tidy
     go mod vendor
+
+    # 'go mod tidy' raises the directive if a dependency needs a newer language
+    # version. Fail here rather than shipping a tarball the build cannot use.
+    tidied_go_directive="$(awk '$1 == "go" { print $2; exit }' go.mod)"
+    if [ "$tidied_go_directive" != "$etcd_go_directive" ]; then
+        echo "Error: 'go mod tidy' raised $component to 'go $tidied_go_directive'," >&2
+        echo "       but etcd declares 'go $etcd_go_directive'. Update the 'golang'" >&2
+        echo "       BuildRequires in etcd.spec before regenerating this tarball." >&2
+        exit 1
+    fi
 
     echo ""
     echo "Prepare files to tar"

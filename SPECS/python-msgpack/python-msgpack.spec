@@ -1,18 +1,17 @@
 %global debug_package %{nil}
 Summary:        MessagePack (de)serializer.
 Name:           python-msgpack
-Version:        1.0.5
-Release:        3%{?dist}
+Version:        1.2.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://msgpack.org/
-Source0:        https://github.com/msgpack/msgpack-python/archive/v%{version}.tar.gz#/msgpack-python-%{version}.tar.gz
-Patch0:         CVE-2026-57585.patch
+# PyPI sdist ships the pre-generated msgpack/_cmsgpack.c; the .pyx sources need Cython >= 3.1.
+Source0:        https://files.pythonhosted.org/packages/source/m/msgpack/msgpack-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-Cython
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
@@ -29,7 +28,10 @@ Requires:       python3
 MessagePack is a fast, compact binary serialization format, suitable for similar data to JSON. This package provides CPython bindings for reading and writing MessagePack data.
 
 %prep
-%autosetup -p1 -n msgpack-python-%{version}
+%autosetup -p1 -n msgpack-%{version}
+# setuptools < 77 does not support PEP 639 SPDX license strings.
+sed -i 's/^license = "Apache-2.0"$/license = {text = "Apache-2.0"}/' pyproject.toml
+grep -q '^license = {text = "Apache-2.0"}$' pyproject.toml
 
 %build
 %py3_build
@@ -46,6 +48,12 @@ MessagePack is a fast, compact binary serialization format, suitable for similar
 %{python3_sitelib}/*
 
 %changelog
+* Tue Oct 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.3-1
+- Auto-upgrade to 1.2.3 - for CVE-2026-114613
+- Build from the PyPI sdist, which ships the Cython-generated C sources
+- Use the table form of project.license for compatibility with setuptools 69
+- Drop unused python3-Cython BuildRequires
+
 * Fri Jul 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.5-3
 - Patch for CVE-2026-57585
 

@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 Summary:        Provides dynamic modification of a user's environment
 Name:           environment-modules
-Version:        5.3.1
+Version:        5.3.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -169,6 +169,9 @@ fi
 %{_datadir}/Modules/nagelfar/*
 
 %changelog
+* Mon Oct 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.3.2-1
+- Auto-upgrade to 5.3.2 - for CVE-2026-85013
+
 * Mon Jan 22 2024 Andrew Phelps <anphel@microsoft.com> - 5.3.1-1
 - Upgrade to 5.3.1
 

@@ -1,0 +1,14 @@
+ca-certificates
+curl
+dbus
+iproute
+iptables
+kubevirt-openvmm-container-disk
+kubevirt-openvmm-virt-handler
+lsscsi
+nftables
+procps
+qemu-tools
+qemu-user
+tar
+util-linux

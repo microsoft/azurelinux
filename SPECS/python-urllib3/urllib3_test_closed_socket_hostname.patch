@@ -1,0 +1,20 @@
+From: Kshitiz Godara <kgodara@microsoft.com>
+Subject: [PATCH] Supply a hostname in the closed-socket SSLTransport test
+
+The default SSL context enables hostname checking. Python 3.12.15 warns
+when wrap_bio() is called without server_hostname, and the test suite
+treats warnings as errors. Supply a hostname so the test reaches the
+closed-socket OSError it is intended to verify.
+
+diff --git a/test/test_ssltransport.py b/test/test_ssltransport.py
+--- a/test/test_ssltransport.py
++++ b/test/test_ssltransport.py
+@@ -133,7 +133,7 @@ class SingleTLSLayerTestCase(SocketDummyServerTestCase):
+         context = ssl.create_default_context()
+         sock.close()
+         with pytest.raises(OSError):
+-            SSLTransport(sock, context)
++            SSLTransport(sock, context, server_hostname="localhost")
+ 
+     @pytest.mark.timeout(PER_TEST_TIMEOUT)
+     def test_close_after_handshake(self) -> None:

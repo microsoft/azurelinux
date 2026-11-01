@@ -17,8 +17,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.137.mshv2
-Release:        2%{?dist}
+Version:        6.18.58.mshv1
+Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -29,6 +29,7 @@ Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
 Source5:        config_aarch64
+Patch0:         0001-mm-vmscan-throttle-memcg-reclaim-on-writeback.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -261,12 +262,41 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
-%{_datadir}/perf-core/strace/groups/file
-%{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Oct 27 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.58.mshv1-1
+- Upgrade to 6.18.58.mshv1, using its Microsoft/configs mshv_defconfig
+- Drop vPCI interrupt patch, replaced by the nested root IRQ re-target fix in this release
+- Refresh configs with olddefconfig for new 6.18.58 Kconfig symbols
+- Re-enable legacy xtables (CONFIG_NETFILTER_XTABLES_LEGACY) and the iptables, ip6tables,
+  arptables and ebtables legacy tables dropped in the 6.18 upgrade (fixes iptables-legacy)
+- Enable CONFIG_IFB on x86_64 so tc mirred redirects clear the receive timestamp (fixes fq
+  dropping traffic redirected into Kata taps)
+- Re-enable FIPS mode support (CONFIG_CRYPTO_SELFTESTS, CONFIG_CRYPTO_FIPS) dropped in the
+  6.18 upgrade, with jitterentropy OSR 3 as in the kernel package
+- Re-enable the LIO TCMU (CONFIG_TCM_USER2) and loopback (CONFIG_LOOPBACK_TARGET) SCSI
+  targets on x86_64, dropped in the 6.18 upgrade (needed by overlaybd/tcmu-runner)
+- Re-enable CONFIG_LWTUNNEL, CONFIG_LWTUNNEL_BPF and CONFIG_NET_CLS_FLOWER on x86_64, dropped in
+  the 6.18 upgrade
+- Re-enable the function tracer (CONFIG_FUNCTION_TRACER, dynamic ftrace) and ftrace hist,
+  synthetic and user events on x86_64, dropped in the 6.18 upgrade
+- Re-enable the overlayfs redirect_dir, index and metacopy defaults
+  (CONFIG_OVERLAY_FS_REDIRECT_DIR/INDEX/METACOPY), dropped in the 6.18 upgrade
+- Online hot-added memory by default again (CONFIG_MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO), as
+  in 6.6; the 6.18 upgrade switched the default to offline
+- Re-enable the iptables NOTRACK and TRACE targets on aarch64 (=m), dropped in the
+  6.18 upgrade
+- Re-enable the tcrypt test module (CONFIG_CRYPTO_BENCHMARK=m, CONFIG_CRYPTO_TEST in 6.6),
+  dropped in the 6.18 upgrade
+- Carry "mm: vmscan: throttle memcg reclaim on writeback" from rolling-lts/kata/6.18.34.mshv3,
+  dropped in 6.18.58.mshv1 (fixes memcg OOM kills of cloud-hypervisor in Kata pods)
+
+* Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.34.mshv3-1
+- Upgrade to 6.18.34.mshv3
+- Enable CONFIG_CHECKPOINT_RESTORE, CONFIG_INET_RAW_DIAG and CONFIG_MSHV_GICV3_MSI
+
 * Mon Jun 13 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.137.mshv2-2
 - Enable CONFIG_EROFS_FS and related features
 - for confidentiality and snapshot/restore scenarios

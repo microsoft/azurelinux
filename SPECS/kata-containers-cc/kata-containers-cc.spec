@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      21%{?dist}
+Release:      23%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -27,6 +27,22 @@ Patch8:       CVE-2026-50540.patch
 Patch9:       CVE-2026-44210.patch
 Patch10:      rust-fix-unstable-name-collisions.patch
 Patch11:      CVE-2026-84445.patch
+Patch12:      rustix-remove-rustc-attrs.patch
+Patch13:      CVE-2026-93599.patch
+Patch14:      CVE-2026-93600.patch
+Patch15:      CVE-2026-42784.patch
+Patch16:      CVE-2026-93602.patch
+Patch17:      CVE-2026-81870.patch
+Patch18:      CVE-2026-107324.patch
+Patch19:      CVE-2026-63772.patch
+Patch20:      CVE-2026-78659.patch
+Patch21:      CVE-2026-78660.patch
+Patch22:      CVE-2026-78663.patch
+Patch23:      CVE-2026-78669.patch
+Patch24:      CVE-2026-94637.patch
+Patch25:      CVE-2026-97032.patch
+Patch26:      CVE-2026-61801.patch
+Patch27:      CVE-2026-107325.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -166,6 +182,11 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Sep 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-23
+- Patch for CVE-2026-93601, CVE-2026-93600, CVE-2026-93599, CVE-2026-42784, CVE-2026-81870, CVE-2026-93602, CVE-2026-97032, CVE-2026-94637, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-63772, CVE-2026-107324, CVE-2026-61801, CVE-2026-107325.
+
+* Mon Sep 21 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-22                 - Backport upstream rustix#1663 to build with latest rust
+
 * Thu Sep 17 2026 Akhila <akhila@microsoft.com> - 3.15.0.aks0-21
 - Generate Source2 go vendor tarball by upgrading grpc to v1.83.2 to fix CVE-2026-84445 and CVE-2026-84304
 - Drop CVE-2026-39821, CVE-2026-33814 and CVE-2026-56852 patches, fixed by the new vendor tree

@@ -1,0 +1,119 @@
+Subject: [PATCH] Distrust incident-related eMudhra and AAA trust anchors
+
+Remove only the affected trust anchors, including the AAA cross-signing
+path. Preserve the unaffected emSign G1, C1 and C3 anchors.
+Reference: https://emudhra.we-have-a-problem.com/
+Upstream-status: Azure Linux trust-store backport
+
+--- /dev/null
++++ b/Tools/remove-untrusted-wheel-roots.py
+@@ -0,0 +1,109 @@
++"""Remove incident-related trust anchors from bundled wheels and renew RECORD."""
++
++import argparse
++import base64
++import csv
++import hashlib
++import io
++from pathlib import Path
++import re
++import ssl
++import tempfile
++import zipfile
++
++
++UNTRUSTED_SHA256 = {
++    "d7a7a0fb5d7e2731d771e9484ebcdef71d5f0c3e0a2948782bc83ee0ea699ef4",
++    "86a1ecba089c4a8d3bbe2734c612ba341d813e043cf9e8a862cd5c57a36bbe6b",
++}
++CERTIFICATE = re.compile(
++    rb"-----BEGIN CERTIFICATE-----\s+[A-Za-z0-9+/=\s]+?-----END CERTIFICATE-----"
++)
++
++
++def prepare_wheel(path):
++    with zipfile.ZipFile(path) as archive:
++        infos = archive.infolist()
++        if len({info.filename for info in infos}) != len(infos):
++            raise ValueError(f"{path}: duplicate wheel members")
++        records = [
++            info.filename
++            for info in infos
++            if info.filename.endswith(".dist-info/RECORD")
++        ]
++        if len(records) != 1:
++            raise ValueError(f"{path}: expected exactly one wheel RECORD")
++        record = records[0]
++        if any(
++            name in archive.namelist() for name in (record + ".jws", record + ".p7s")
++        ):
++            raise ValueError(f"{path}: cannot rewrite a signed wheel")
++        payload = {info.filename: archive.read(info) for info in infos}
++
++    removed = 0
++
++    def retain_certificate(match):
++        nonlocal removed
++        der = ssl.PEM_cert_to_DER_cert(match.group().decode("ascii"))
++        if hashlib.sha256(der).hexdigest() in UNTRUSTED_SHA256:
++            removed += 1
++            return b""
++        return match.group()
++
++    for name, data in payload.items():
++        if name.endswith((".pem", ".crt")):
++            payload[name] = CERTIFICATE.sub(retain_certificate, data)
++
++    if not removed:
++        return None, 0
++
++    output = io.StringIO(newline="")
++    writer = csv.writer(output, lineterminator="\n")
++    for info in infos:
++        name = info.filename
++        if info.is_dir():
++            continue
++        if name == record:
++            writer.writerow((name, "", ""))
++        else:
++            data = payload[name]
++            digest = base64.urlsafe_b64encode(hashlib.sha256(data).digest())
++            writer.writerow((name, "sha256=" + digest.rstrip(b"=").decode(), len(data)))
++    payload[record] = output.getvalue().encode("utf-8")
++    return (path, infos, payload), removed
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--expected-removals", type=int, required=True)
++    parser.add_argument("wheels", nargs="+", type=Path)
++    args = parser.parse_args()
++    plans = []
++    total = 0
++    for path in args.wheels:
++        plan, removed = prepare_wheel(path)
++        if plan is not None:
++            plans.append(plan)
++        total += removed
++        print(f"{path}: removing {removed} affected trust anchors")
++    if total != args.expected_removals:
++        raise ValueError(
++            f"Expected {args.expected_removals} trust anchors, found {total}; "
++            "review the bundled wheels before changing this expectation"
++        )
++    for path, infos, payload in plans:
++        with tempfile.NamedTemporaryFile(
++            dir=path.parent, prefix=path.name + ".", suffix=".tmp", delete=False
++        ) as temporary:
++            temporary_path = Path(temporary.name)
++        try:
++            with zipfile.ZipFile(temporary_path, "w") as archive:
++                for info in infos:
++                    archive.writestr(info, payload[info.filename])
++            temporary_path.replace(path)
++        finally:
++            temporary_path.unlink(missing_ok=True)
++
++
++if __name__ == "__main__":
++    main()

@@ -32,7 +32,7 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.3.33
+Version:        8.3.36
 Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -83,10 +83,12 @@ Patch47:        php-8.3.14-phpinfo.patch
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
 Patch300:       php-7.4.0-datetests.patch
+Patch302:       php-8.3.35-ecc-custom-params-skip.patch
 # used for tests
 BuildRequires:  /bin/ps
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  bison
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  gcc
@@ -719,6 +721,7 @@ in pure PHP.
 
 # Fixes for tests
 %patch 300 -p1 -b .datetests
+%patch 302 -p1 -b .ecc-custom-params
 
 
 # Prevent %%doc confusion over LICENSE files
@@ -1129,7 +1132,7 @@ if ! make test TESTS=-j4; then
     fi
   done
   set -x
-  #exit 1
+  exit 1
 fi
 unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %endif
@@ -1514,6 +1517,16 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Mon Oct 26 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.3.36-1
+- Upgrade to 8.3.36
+
+* Mon Oct 19 2026 Jon Slobodzian <joslobo@microsoft.com> - 8.3.35-2
+- Fix CVE-2026-109618 and CVE-2026-109619.
+
+* Thu Sep 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.3.35-1
+- Auto-upgrade to 8.3.35 - for CVE-2026-91768, CVE-2026-92842, CVE-2026-6103, CVE-2025-1218,
+  CVE-2026-91769, CVE-2025-14181, CVE-2026-93682, CVE-2026-91766, CVE-2026-91765, CVE-2026-91767
+
 * Fri Jul 31 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.3.33-1
 - Auto-upgrade to 8.3.33 - for CVE-2026-9672, CVE-2026-17543, CVE-2026-7260
 

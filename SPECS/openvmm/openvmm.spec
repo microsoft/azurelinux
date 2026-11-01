@@ -1,7 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           openvmm
-Version:        0.1.0
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        Modular, cross-platform virtual machine monitor
 Group:          Applications/System
@@ -14,6 +14,7 @@ Source0:        https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v
 # contains the vendored sources in vendor/ plus the source replacement config
 # 'cargo_config' written by cargo vendor.
 Source1:        https://github.com/microsoft/openvmm/releases/download/openvmm-v%{version}/%{name}-%{version}-vendor.tar.gz
+Patch0:         0001-vmservice-use-low-ECAM-for-isolated-guests.patch
 
 ExclusiveArch:  x86_64 aarch64
 
@@ -75,6 +76,15 @@ cargo test --release --locked --offline --lib --target %{rust_target} %{test_cra
 %{_bindir}/openvmm
 
 %changelog
+* Wed Oct 28 2026 Ben Hillis <benhill@microsoft.com> - 0.4.0-1
+- Update to version 0.4.0
+
+* Sat Oct 10 2026 Roaa Sakr <romoh@microsoft.com> - 0.2.0-2
+- Place PCI ECAM below 4 GiB for confidential guests
+
+* Thu Oct 01 2026 Ben Hillis <benhill@microsoft.com> - 0.2.0-1
+- Update to version 0.2.0
+
 * Thu Aug 13 2026 Ben Hillis <benhill@microsoft.com> - 0.1.0-1
 - Original version for Azure Linux
 - License verified

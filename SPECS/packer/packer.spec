@@ -4,7 +4,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.9.5
-Release:        21%{?dist}
+Release:        23%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,25 +30,31 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor-v4.tar.gz
+Source1:        %{name}-%{version}-vendor-v5.tar.gz
 # Fixed issue in pTest through below patch
 Patch0:         update-format-function-checks-in-panic-go.patch
 Patch1:         CVE-2022-3064.patch
 Patch2:         CVE-2024-6104.patch
 Patch3:         CVE-2024-28180.patch
 Patch4:         CVE-2025-27144.patch
-Patch5:         CVE-2025-22868.patch
-Patch6:         CVE-2025-30204.patch
-Patch7:         CVE-2024-51744.patch
-Patch8:         CVE-2025-58058.patch
-Patch9:         CVE-2025-11065.patch
-Patch10:        CVE-2026-45571.patch
-Patch11:        CVE-2026-56852.patch
-Patch12:        CVE-2026-71556.patch
-Patch13:        CVE-2026-71557.patch
-Patch14:        CVE-2026-19589.patch
-Patch15:        CVE-2026-56855.patch
-Patch16:        CVE-2026-78662.patch
+Patch5:         CVE-2025-30204.patch
+Patch6:         CVE-2024-51744.patch
+Patch7:         CVE-2025-58058.patch
+Patch8:         CVE-2025-11065.patch
+Patch9:         CVE-2026-45571.patch
+Patch10:        CVE-2026-71556.patch
+Patch11:        CVE-2026-71557.patch
+Patch12:        CVE-2026-19589.patch
+Patch13:        CVE-2026-56855.patch
+Patch14:        CVE-2026-78662.patch
+Patch15:        CVE-2026-84304.patch
+Patch16:        CVE-2026-107324.patch
+Patch17:        CVE-2026-107325.patch
+Patch18:        CVE-2026-19585.patch
+Patch19:        CVE-2026-78659.patch
+Patch20:        CVE-2026-78660.patch
+Patch21:        CVE-2026-78669.patch
+Patch22:        CVE-2026-97032.patch
 
 BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
@@ -80,9 +86,16 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-23
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-19585, CVE-2026-107325, CVE-2026-107324
+
+* Thu Sep 17 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.9.5-22
+- Patch for CVE-2026-84304
+- Removed patches CVE-2025-22868, CVE-2026-56852
+
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-21
 - Patch for CVE-2026-78662, CVE-2026-56855
-
 * Wed Aug 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-20
 - Patch for CVE-2026-19589
 

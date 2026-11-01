@@ -16,8 +16,8 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.6.137.mshv1
-Release:        1%{?dist}
+Version:        6.18.52.mshv1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -165,6 +165,25 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Oct 27 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.52.mshv1-2
+- Re-enable legacy xtables (CONFIG_NETFILTER_XTABLES_LEGACY) and build in the iptables and
+  arptables legacy tables dropped in the 6.18 upgrade (fixes iptables-legacy, e.g. istio-init)
+- Re-enable the NFS client (v3, v4.x, pNFS) and CIFS xattr, upcall and DFS support
+  on x86_64, dropped in the 6.18 upgrade
+- Re-enable FIPS mode support (CONFIG_CRYPTO_FIPS, CONFIG_CRYPTO_SELFTESTS) on aarch64,
+  dropped in the 6.18 upgrade; disable CONFIG_MODULES again as in 6.6, which FIPS requires
+  without module signing
+- Online hot-added memory by default again (CONFIG_MHP_DEFAULT_ONLINE_TYPE_ONLINE_AUTO), as
+  in 6.6; the 6.18 upgrade switched the default to offline
+- Restore the 6.6 transparent hugepage settings: madvise by default on x86_64 and THP off
+  on aarch64; the 6.18 upgrade switched both to always
+- Restore the 6.6 IOMMU default domain (CONFIG_IOMMU_DEFAULT_DMA_LAZY); the 6.18 upgrade
+  switched it to passthrough
+
+* Wed Oct 07 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.52.mshv1-1
+- Upgrade to 6.18.52.mshv1
+- Disable CONFIG_TEST_HMM and CONFIG_DEVICE_PRIVATE to reduce guest memory usage
+
 * Tue May 05 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.137.mshv1-1
 - Upgrade to 6.6.137.mshv1
 
