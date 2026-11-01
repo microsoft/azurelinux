@@ -1,7 +1,7 @@
 Summary:        Python bindings for the cairo library
 Name:           pycairo
 Version:        1.24.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        MPLv1.1 or LGPLv2
@@ -15,6 +15,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 
 %description
@@ -47,7 +48,6 @@ libraries so that they interoperate with py3cairo.
 %py3_install
 
 %check
-pip3 install pytest
 %python3 setup.py test
 
 %files -n python3-cairo
@@ -61,6 +61,9 @@ pip3 install pytest
 %{_libdir}/pkgconfig/py3cairo.pc
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.24.0-2
+- Use python3-pytest for tests instead of pip
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.24.0-1
 - Auto-upgrade to 1.24.0 - Azure Linux 3.0 - package upgrades
 

@@ -8,7 +8,7 @@ itself.
 Summary:        %{sum}
 Name:           python-%{srcname}
 Version:        0.6.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +27,8 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
 %endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -50,9 +52,7 @@ sed -i "s/if '--inplace' in sys.argv:/if True:/" setup.py
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
-    pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-cov>=2.7.1
+    pluggy>=0.11.0
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v
@@ -63,6 +63,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitearch}/*
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.6.4-2
+- Use python3-pytest and python3-pytest-cov from check dependencies instead of pip
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.4-1
 - Auto-upgrade to 0.6.4 - Azure Linux 3.0 - package upgrades
 

@@ -16,7 +16,7 @@ The pytest-xdist plugin extends py.test with some unique test execution modes:
 Summary:        py.test plugin for distributed testing and loop-on-failing modes
 Name:           python-%{pypi_name}
 Version:        3.5.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,9 @@ BuildRequires:  python3-pytest-forked
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
+%if 0%{?with_check}
+BuildRequires:  python3-pytest-cov
+%endif
 
 Patch0:         pytest-xdist-3.5.0-fix-pytest9-parser.patch
 # Backport of upstream PR pytest-dev/pytest-xdist#1318: sort loadscope
@@ -73,8 +76,6 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-cov>=2.7.1 \
     apipkg
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
@@ -87,6 +88,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/xdist/
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.5.0-4
+- Use python3-pytest-cov from check dependencies instead of pip
+
 * Fri Jun 19 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.5.0-3
 - Backport upstream PR pytest-dev/pytest-xdist#1318 as
   pytest-xdist-3.5.0-fix-loadscope-deterministic-985.patch: sort

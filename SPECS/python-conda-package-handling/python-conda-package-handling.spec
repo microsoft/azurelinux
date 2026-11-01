@@ -4,7 +4,7 @@
 Summary:        Create and extract conda packages of various formats
 Name:           python-%{srcname}
 Version:        2.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,9 @@ Requires:       python%{python3_pkgversion}-six
 Requires:       python%{python3_pkgversion}-tqdm
 %if 0%{?with_check}
 BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-pytest-mock
 %endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -51,9 +54,6 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-cov>=2.7.1 \
-    pytest-mock \
 	conda_package_streaming \
 	zstandard
 PATH=%{buildroot}%{_bindir}:${PATH} \
@@ -69,6 +69,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{pkgname}/
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.2.0-3
+- Use RPM test dependencies instead of pip
+
 * Fri Jan 31 2015 Sam Meluch <sammeluch@microsoft.com> - 2.2.0-2
 - add missing pip modules for package tests
 

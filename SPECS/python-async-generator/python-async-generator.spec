@@ -14,7 +14,7 @@ theory that these may well be added to native async generators one day).
 Summary:        Async generators and context managers
 Name:           python-%{pkgname}
 Version:        1.10
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT or ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,8 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
 %endif
 
 %description -n python%{python3_pkgversion}-%{pkgname} %{_description}
@@ -49,9 +51,7 @@ rm -r %{eggname}.egg-info
 pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
-    pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-cov>=2.7.1
+    pluggy>=0.11.0
 python%{python3_version} -m pytest -v
 
 %files -n python%{python3_pkgversion}-%{pkgname}
@@ -61,6 +61,9 @@ python%{python3_version} -m pytest -v
 %{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.10-11
+- Use python3-pytest and python3-pytest-cov from check dependencies instead of pip
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.10-10
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

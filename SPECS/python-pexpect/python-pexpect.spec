@@ -3,7 +3,7 @@
 Summary:        Unicode-aware Pure Python Expect-like module
 Name:           python-%{modname}
 Version:        4.8.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,9 +14,11 @@ Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
 Patch0:         sys_executable.patch
 BuildArch:      noarch
 %if 0%{?with_check}
+BuildRequires:  python3-pip
 BuildRequires:  man-db
 BuildRequires:  openssl
-BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-timeout
 %endif
 
 %description
@@ -74,8 +76,6 @@ export PYTHONIOENCODING=UTF-8
 python3 ./tools/display-sighandlers.py
 python3 ./tools/display-terminalinfo.py
 
-pip3 install pytest pytest-timeout
-
 # Disabling broken "spawn_uses_env" test.
 # See: https://github.com/pexpect/pexpect/issues/669
 # We can remove this once the GitHub issue is fixed and we update
@@ -104,6 +104,9 @@ run_tests || run_tests
 %{python3_sitelib}/%{modname}-*.egg-info
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.8.0-14
+- Use python3-pytest and python3-pytest-timeout from check dependencies instead of pip
+
 * Sat Jun 20 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.8.0-13
 - Install pytest-timeout alongside pytest and cap each test at 180s
   via --timeout=180 --timeout-method=signal.
