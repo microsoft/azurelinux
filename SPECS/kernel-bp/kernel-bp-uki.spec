@@ -1,6 +1,6 @@
 %global debug_package %{nil}
 
-# This should be a subpackage of the kernel package, but due to
+# This should be a subpackage of the kernel-bp package, but due to
 # "circular dependencies" that is not possible, so this is instead a
 # separate source package
 
@@ -11,7 +11,7 @@
 %define cmdline console=ttyS0
 
 Summary:        Unified Kernel Image
-Name:           kernel-uki
+Name:           kernel-bp-uki
 Version:        6.6.121.2
 Release:        1%{?dist}
 License:        GPLv2
@@ -21,7 +21,7 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        kernel-uki-dracut.conf
 
-BuildRequires:  kernel = %{version}-%{release}
+BuildRequires:  kernel-bp = %{version}-%{release}
 BuildRequires:  systemd-ukify
 BuildRequires:  dracut
 BuildRequires:  binutils
@@ -35,7 +35,7 @@ BuildRequires:  kbd
 ExclusiveArch:  x86_64
 
 %description
-The kernel-uki package contains the Linux kernel packaged as a Unified
+The kernel-bp-uki package contains the Linux kernel packaged as a Unified
 Kernel Image (UKI).
 
 %prep
@@ -71,6 +71,7 @@ cp %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/boot/efi/EFI/Linu
 
 %changelog
 * Sun Nov 01 2026 Chris Co <chrco@microsoft.com> - 6.6.121.2-1
+- Rename RPM and kernel dependency for the kernel-bp variant
 - Update source to 6.6.121.2
 
 * Mon Feb 02 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.121.1-1

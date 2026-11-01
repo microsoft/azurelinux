@@ -30,7 +30,7 @@
 %endif
 
 Summary:        Linux Kernel
-Name:           kernel
+Name:           kernel-bp
 Version:        6.6.121.2
 Release:        1%{?dist}
 License:        GPLv2
@@ -100,7 +100,7 @@ Conflicts:      kernel-hwe
 # kernel rpm. The final config file is included in /boot in the rpm.
 
 %description
-The kernel package contains the Linux kernel.
+The kernel-bp package contains the Linux kernel.
 
 %package devel
 Summary:        Kernel Dev
@@ -163,22 +163,20 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf
+%package -n     python3-perf-bp
 Summary:        Python 3 extension for perf tools
-Provides:       python3-perf
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 
-%description -n python3-perf
+%description -n python3-perf-bp
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     bpftool
+%package -n     bpftool-bp
 Summary:        Inspection and simple manipulation of eBPF programs and maps
-Provides:       bpftool
 Requires:       %{name} = %{version}-%{release}
 
 
-%description -n bpftool
+%description -n bpftool-bp
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -432,15 +430,16 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_unitdir}/cpupower.service
 %config(noreplace) %{_sysconfdir}/sysconfig/cpupower
 
-%files -n python3-perf
+%files -n python3-perf-bp
 %{python3_sitearch}/*
 
-%files -n bpftool
+%files -n bpftool-bp
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
 * Sun Nov 01 2026 Chris Co <chrco@microsoft.com> - 6.6.121.2-1
+- Rename RPMs for the kernel-bp variant
 - Update source to 6.6.121.2
 
 * Mon Feb 02 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.121.1-1

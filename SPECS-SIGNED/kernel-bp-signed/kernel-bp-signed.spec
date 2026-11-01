@@ -8,7 +8,7 @@
 %endif
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
-Name:           kernel-signed-%{buildarch}
+Name:           kernel-bp-signed-%{buildarch}
 Version:        6.6.121.2
 Release:        1%{?dist}
 License:        GPLv2
@@ -16,8 +16,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-# This spec purpose is to take an input kernel rpm and input secure-boot-signed
-# kernel binary from the same build and generate a new "kernel" rpm with the
+# This spec purpose is to take an input kernel-bp rpm and input secure-boot-signed
+# kernel binary from the same build and generate a new "kernel-bp" rpm with the
 # signed kernel binary + all of the other original kernel files, triggers,
 # scriptlets, requires, provides, etc.
 #
@@ -37,13 +37,13 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # actively tries to make sure you never do...generally for good reasons).
 #
 # To achive this repackaging, this spec creates a new subpackage named
-# "kernel". To retain all of the initial kernel package behaviors, we make sure
+# "kernel-bp". To retain all of the initial kernel-bp package behaviors, we make sure
 # the subpackage has the same requires, provides, triggers, post steps, and
 # files as the original kernel package.
 #
 # This specific repackaging implementation leaves room for us to enable the
 # more ideal secure-boot signing flow in the future without introducing any
-# sort of breaking change or new packaging. Users still install a "kernel"
+# sort of breaking change or new packaging. Users still install a "kernel-bp"
 # package like they normally would.
 #
 # Maintenance Notes:
@@ -65,7 +65,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   2. Sign the desired binary
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
-Source0:        kernel-%{version}-%{release}.%{buildarch}.rpm
+Source0:        kernel-bp-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
 Source2:        sha512hmac-openssl.sh
 BuildRequires:  cpio
@@ -77,7 +77,7 @@ BuildRequires:  sed
 %description
 This package contains the Linux kernel package with kernel signed with the production key
 
-%package -n     kernel
+%package -n     kernel-bp
 Summary:        Linux Kernel
 Group:          System Environment/Kernel
 Requires:       filesystem
@@ -85,8 +85,8 @@ Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 
-%description -n kernel
-The kernel package contains the signed Linux kernel.
+%description -n kernel-bp
+The kernel-bp package contains the signed Linux kernel.
 
 %prep
 
@@ -112,24 +112,24 @@ popd
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
-%triggerin -n kernel -- initramfs
+%triggerin -n kernel-bp -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
 echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
-%triggerun -n kernel -- initramfs
+%triggerun -n kernel-bp -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
 rm -rf /boot/initramfs-%{uname_r}.img
 echo "initrd of kernel %{uname_r} removed" >&2
 
-%postun -n kernel
+%postun -n kernel-bp
 %grub2_postun
 
-%post -n kernel
+%post -n kernel-bp
 /sbin/depmod -a %{uname_r}
 %grub2_post
 
-%files -n kernel
+%files -n kernel-bp
 %defattr(-,root,root)
 %license COPYING
 /boot/System.map-%{uname_r}
@@ -146,6 +146,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Sun Nov 01 2026 Chris Co <chrco@microsoft.com> - 6.6.121.2-1
+- Rename signed RPMs and unsigned RPM source for the kernel-bp variant
 - Add signed packaging for the kernel-bp source to match kernel 6.6.121.2
 
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.159.1-1
