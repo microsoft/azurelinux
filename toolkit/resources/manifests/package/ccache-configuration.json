@@ -32,7 +32,7 @@
       "name": "kernel",
       "comment": "",
       "enabled": true,
-      "packageNames": [ "kernel", "kernel-mshv", "kernel-uvm" ]
+      "packageNames": [ "kernel", "kernel-mshv", "kernel-uvm", "kernel-uvm-hpc" ]
     },
     {
       "name": "libdb",
