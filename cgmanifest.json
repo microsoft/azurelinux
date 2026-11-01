@@ -8390,6 +8390,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-bp",
+          "version": "6.6.121.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.121.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel-headers",
           "version": "6.6.159.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.159.1.tar.gz"
