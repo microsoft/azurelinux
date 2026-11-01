@@ -31,7 +31,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.121.1
+Version:        6.6.121.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -440,6 +440,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sun Nov 01 2026 Chris Co <chrco@microsoft.com> - 6.6.121.2-1
+- Update source to 6.6.121.2
+
 * Mon Feb 02 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.121.1-1
 - Auto-upgrade to 6.6.121.1
 
