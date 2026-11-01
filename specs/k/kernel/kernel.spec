@@ -4332,6 +4332,8 @@ fi\
 - Enable CONFIG_HSA_AMD=y, CONFIG_HSA_AMD_SVM=y, and CONFIG_HSA_AMD_P2P=y
   on x86_64
 - Enable CONFIG_DMI_SYSFS=m on x86_64
+- Disable CONFIG_SECURITY_SMACK, CONFIG_ROSE, CONFIG_SMB_SERVER, and
+  CONFIG_XFS_SUPPORT_V4 on both architectures
 
 * Thu Oct 29 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.57.1
