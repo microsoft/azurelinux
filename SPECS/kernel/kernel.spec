@@ -31,8 +31,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.159.1
-Release:        2%{?dist}
+Version:        6.6.121.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,7 +46,6 @@ Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
-Patch1:         btrfs-ipe.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -441,72 +440,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Wed Oct 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 6.6.159.1-2
-- Expose immutable single-device Btrfs backing to IPE at mount time.
-
-* Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.159.1-1
-- Auto-upgrade to 6.6.159.1
-
-* Mon Oct 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.158.1-1
-- Auto-upgrade to 6.6.158.1
-
-* Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.157.1-1
-- Auto-upgrade to 6.6.157.1
-
-* Sat Aug 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.152.1-1
-- Auto-upgrade to 6.6.152.1
-
-* Fri Aug 07 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.150.1-1
-- Auto-upgrade to 6.6.150.1
-
-* Thu Jul 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.145.2-1
-- Auto-upgrade to 6.6.145.2
-
-* Tue Jul 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.145.1-1
-- Auto-upgrade to 6.6.145.1
-
-* Tue Jul 14 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.144.1-2
-- Enable fscrypt for booted kernel
-
-* Mon Jul 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.144.1-1
-- Auto-upgrade to 6.6.144.1
-
-* Wed Jun 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.143.1-1
-- Auto-upgrade to 6.6.143.1
-
-* Tue Jun 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.142.1-1
-- Auto-upgrade to 6.6.142.1
-
-* Tue May 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.141.1-1
-- Auto-upgrade to 6.6.141.1
-
-* Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.139.1-1
-- Auto-upgrade to 6.6.139.1
-
-* Fri May 08 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.138.1-1
-- Auto-upgrade to 6.6.138.1
-
-* Fri May 01 2026 Lanze Liu <lanzeliu@microsoft.com> - 6.6.137.1-2
-- Enable CONFIG_IKCONFIG_PROC on arm64 for /proc/config.gz parity with x86_64
-
-* Thu Apr 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.137.1-1
-- Auto-upgrade to 6.6.137.1
-
-* Fri Mar 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.130.1-3
-- Enable lz4, lz4hc, and zstd zram compression
-
-* Fri Mar 27 2026 Andrew Chiang <andrewchiang@microsoft.com> - 6.6.130.1-2
-- Enable CONFIG_TCP_CONG_BBR3=m
-
-* Thu Mar 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.130.1-1
-- Auto-upgrade to 6.6.130.1
-
-* Thu Feb 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.126.1-1
-- Auto-upgrade to 6.6.126.1
-
-* Mon Feb 23 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.121.1-2
-- Enable lwtunnel, lwtunnel-bpf, and sched_core
-
 * Mon Feb 02 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.121.1-1
 - Auto-upgrade to 6.6.121.1
 
