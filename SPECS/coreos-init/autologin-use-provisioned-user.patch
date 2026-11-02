@@ -18,21 +18,18 @@ Ignition or other mechanisms, and silently does nothing when no
 interactive user exists (e.g., cloud-init users created after boot).
 
 Signed-off-by: Mayank Singh <mayansingh@microsoft.com>
-
-Return success when no eligible user is found so the generator's set -e
-does not abort before the explicit skip-autologin check.
 ---
- systemd/system-generators/flatcar-autologin-generator | 46 ++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 42 insertions(+), 4 deletions(-)
+ systemd/system-generators/flatcar-autologin-generator | 45 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 41 insertions(+), 4 deletions(-)
 
 diff --git a/systemd/system-generators/flatcar-autologin-generator b/systemd/system-generators/flatcar-autologin-generator
 index 1234567..abcdefg 100755
 --- a/systemd/system-generators/flatcar-autologin-generator
 +++ b/systemd/system-generators/flatcar-autologin-generator
-@@ -18,22 +18,64 @@
+@@ -18,22 +18,63 @@
      DEST="$1"
  fi
-
+ 
 +# Determine the user to autologin as.
 +# Returns the username on stdout, or nothing if no valid user is found.
 +determine_autologin_user() {
@@ -68,7 +65,6 @@ index 1234567..abcdefg 100755
 +        done
 +        [ -z "$skip" ] && echo "$name" && return
 +    done < /etc/passwd
-+    return 0
 +}
 +
 +AUTOLOGIN_USER=$(determine_autologin_user)
@@ -98,5 +94,6 @@ index 1234567..abcdefg 100755
  EOF
      fi
  }
---
+-- 
 2.39.2
+
