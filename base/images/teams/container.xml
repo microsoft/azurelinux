@@ -58,6 +58,11 @@
         <package name="azurelinux-release-container" />
         <package name="filesystem" />
     </packages>
+    <!-- Select minimal providers before bootstrap dependency resolution. -->
+    <packages type="bootstrap" profiles="core,distroless-minimal,distroless-base,distroless-debug">
+        <package name="coreutils-single" />
+        <package name="libcurl-minimal" />
+    </packages>
     <packages type="image" profiles="ContainerCore">
         <package name="azurelinux-release-container" />
         <package name="bash" />
