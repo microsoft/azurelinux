@@ -12,6 +12,11 @@ debuginfo-channel = "rpm-sdk-debuginfo"
 
 # This group includes packages intentionally included in `base`, along with
 # the transitive closure of their *runtime* dependencies.
+# Membership routes the next build; it does not republish existing RPMs.
+# When adding an otherwise unchanged component, also run
+# `azldev comp update -p <name> --bump` and finalize the rendered specs.
+# CI requires each addition to be selected for a build in the same change.
+# See DEVELOPING.md#package-publishing-channels.
 [component-groups.base-packages]
 description = "base packages"
 default-component-config.publish.srpm-channel = "rpm-base-srpm"

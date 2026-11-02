@@ -46,6 +46,83 @@ The `specs/` directory (as specified by `rendered-specs-dir` config) contains "r
 
 They can be updated at any time by running `azldev component render -a`, or a single component can be rendered with `azldev component render <name>`.
 
+## Package publishing channels
+
+[`base/comps/components-publish-channels.toml`](base/comps/components-publish-channels.toml)
+defines where component build outputs are published. Unless overridden, binary,
+source, and debuginfo RPMs route to `rpm-sdk`, `rpm-sdk-srpm`, and
+`rpm-sdk-debuginfo`. Components listed in
+`[component-groups.base-packages].components` instead inherit `rpm-base`,
+`rpm-base-srpm`, and `rpm-base-debuginfo`.
+
+This list describes the intended Base package set, including runtime dependency
+closure. It does not automatically discover or promote dependencies. Check those
+dependencies when promoting a component. Component-specific settings, package
+groups, and explicit per-package overrides can change the effective destination;
+in particular, `exceptions-packages` keeps selected sibling subpackages in SDK.
+
+### Routing is not publication
+
+**Adding an existing component to the Base list means "publish its next build to
+Base," not "copy its existing RPMs into Base."** Publishing settings are excluded
+from azldev's build fingerprints. The production post-merge pipeline submits only
+components reported as `added` or `changed` by `azldev comp changed`; a routing-only
+edit can leave the component `unchanged`. Plain `azldev comp update` may therefore
+leave its lock unchanged too.
+
+Every newly listed Base component must enter that build set in the same change.
+The separate GitHub Actions **Check Base Promotions** PR check compares committed membership
+from the captured target to the prospective merged tree with the matching
+change-set JSON and rejects additions that would not build. Already-landed
+bumps do not count, even when a stacked parent was squash-merged or rebased.
+Lock freshness and rendered-spec correctness
+remain separate companion checks. A genuinely new
+component or a component already changed by source/config inputs needs no extra
+manual bump. Reordering, comments, and membership removals do not require one.
+
+This promotion policy runs only in the GitHub PR check, not in Azure Pipelines
+or after merge. If a routing-only promotion bypasses the PR gate, submit a
+follow-up bump and verify actual publication.
+
+### Promote an otherwise unchanged component
+
+Add the component to the alphabetically sorted Base list, then explicitly request
+a new release without changing its upstream pin:
+
+```bash
+azldev comp update -p <name> --bump
+azldev comp render -p <name>
+```
+
+`--bump` increments the lock's `manual-bump` counter and recomputes its build
+fingerprint without fetching a newer upstream revision. Include the channel
+configuration, updated lock, and rendered output in the same logical change.
+After committing, re-render and stage the resulting specs for an amend, following
+the [component finalization workflow](.agents/skills/azldev-update-component/SKILL.md).
+For components with manual release calculation, also advance the release in the
+component's source/config. Validate the final rendered release and follow the
+normal build and smoke-test requirements.
+
+Verify the committed result against your PR baseline:
+
+```bash
+azldev comp changed --from <base-ref> --to HEAD -p <name> -q -O json
+```
+
+The component must report `added` or `changed`. A spec-tree diff or
+`sourcesChange: true` alone does not select an official rebuild. Repeat the
+workflow for each otherwise unchanged component being promoted.
+
+### Verify actual publication
+
+The production package-build pipeline submits the selected components and
+confirms acceptance; builds run asynchronously. A green submission check is not
+proof that the build or publication completed. Before reporting the promotion
+done, verify the official build succeeded and the expected RPM versions appeared
+in the intended production Base repository for the supported architectures.
+Build deployment and consumer repository channel are separate concerns; do not
+substitute Preview repository results for production Base verification.
+
 ## AI-Assisted Development (VSCode + GitHub Copilot CLI)
 
 This repo includes [GitHub Copilot](https://docs.github.com/en/copilot) prompt files in `.github/` that automate common workflows. Open VS Code with Copilot Chat in **Agent mode**, attach a prompt (📎), and fill in the inputs.

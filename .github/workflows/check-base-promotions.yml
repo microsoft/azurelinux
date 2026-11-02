@@ -1,0 +1,140 @@
+# Check publishing policy independently of rendered-spec correctness.
+# The companion lock/render gates validate the committed build identities;
+# this check requires each newly Base-routed component to enter the build set.
+# Change-set helpers, container configuration, and the checker come from the
+# trusted base. Only during bootstrap, when the base lacks the checker, use the
+# proposed copy inside the same unprivileged, secret-free container.
+name: "Check Base Promotions"
+
+on:
+  pull_request:
+    branches:
+      - "4.0"
+
+permissions: {}
+
+concurrency:
+  group: base-promotion-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: "Check Base Promotions"
+    if: github.repository == 'microsoft/azurelinux'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      pull-requests: read # resolve the post-merge azldev pin using the trusted helper
+    steps:
+      - name: Validate inputs
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$PR_HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::PR head must be a 40-character lowercase hex SHA"
+            exit 1
+          fi
+
+      - name: Checkout base (trusted)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: "4.0"
+          persist-credentials: false
+
+      - name: Capture trusted base snapshot
+        id: base
+        run: |
+          set -euo pipefail
+          printf 'sha=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout PR head (data)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr-head
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Resolve post-merge azldev version
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TRUSTED_BASE_SHA: ${{ steps.base.outputs.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          resolve_output="$(python3 scripts/ci/render-specs-check/resolve_azldev_version.py \
+            --repo "$REPO" \
+            --pr-number "$PR_NUMBER" \
+            --head-sha "$PR_HEAD_SHA" \
+            --base-sha "$TRUSTED_BASE_SHA" \
+            --base-version-file .azldev-version \
+            --head-version-file pr-head/.azldev-version)"
+          azldev_version="$(sed -n 's/^azldev-version=//p' <<< "$resolve_output")"
+          if ! [[ "$azldev_version" =~ ^[0-9A-Za-z._+-]+$ ]]; then
+            echo "::error::resolver emitted an invalid azldev version"
+            exit 1
+          fi
+          printf 'azldev-version=%s\n' "$azldev_version" >> "$GITHUB_OUTPUT"
+
+      - name: Build azldev runner container
+        env:
+          AZLDEV_VERSION: ${{ steps.resolve.outputs.azldev-version }}
+        run: |
+          set -euo pipefail
+          docker build \
+            --build-arg UID="$(id -u)" \
+            --build-arg AZLDEV_VERSION="$AZLDEV_VERSION" \
+            -t localhost/azldev-runner \
+            -f .github/workflows/containers/azldev-runner.Dockerfile \
+            .github/workflows/containers/
+
+      - name: Check Base Promotions
+        env:
+          TRUSTED_BASE_SHA: ${{ steps.base.outputs.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          WORKSPACE: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$WORKSPACE/base-promotion-output"
+          docker run --rm \
+            -v "$WORKSPACE/pr-head:/workdir" \
+            -v "$WORKSPACE/base-promotion-output:/output" \
+            -v "$WORKSPACE/scripts/ci/components:/scripts-components:ro" \
+            -e TRUSTED_BASE_SHA \
+            -e PR_HEAD_SHA \
+            localhost/azldev-runner \
+            bash -eu -o pipefail -c '
+              git fetch --no-tags https://github.com/microsoft/azurelinux.git "$TRUSTED_BASE_SHA"
+              merge_helper=/scripts-components/prepare_base_promotion_merge.sh
+              if [[ ! -f "$merge_helper" ]]; then
+                echo "Trusted base lacks the promotion merge helper; using the PR copy for bootstrap."
+                merge_helper=/workdir/scripts/ci/components/prepare_base_promotion_merge.sh
+              fi
+              merged_commit=$(bash "$merge_helper" "$TRUSTED_BASE_SHA" "$PR_HEAD_SHA")
+              /scripts-components/compute_change_set.sh \
+                --output-dir /output/change-set \
+                --from-commit "$TRUSTED_BASE_SHA" \
+                --to-commit "$merged_commit"
+              checker=/scripts-components/check_base_promotions.py
+              if [[ ! -f "$checker" ]]; then
+                echo "Trusted base lacks the promotion checker; using the PR copy for bootstrap."
+                checker=/workdir/scripts/ci/components/check_base_promotions.py
+              fi
+              python3 "$checker" \
+                --from-commit "$TRUSTED_BASE_SHA" \
+                --to-commit "$merged_commit" \
+                --changed-components-file /output/change-set/changed-components.json
+            '
+
+      - name: Upload promotion change set
+        if: always() && hashFiles('base-promotion-output/change-set/changed-components.json') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: base-promotion-change-set
+          path: base-promotion-output/change-set/changed-components.json
