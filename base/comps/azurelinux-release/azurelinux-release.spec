@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        36%{?dist}
+Release:        37%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -65,6 +65,7 @@ Source31:       60-azurelinux-cis-module-denylist.conf
 Source32:       azurelinux-cis-shell-timeout.sh
 Source33:       00-rsyslog_filecreatemode.conf
 Source34:       azurelinux-cis-umask.sh
+Source35:       90-azurelinux-vm.conf
 
 BuildArch:      noarch
 
@@ -109,6 +110,14 @@ Provides:       system-release(releasever) = %{releasever}
 
 %description common
 Release files common to all variants of Azure Linux
+
+%package dracut-hostonly
+Summary:        Host-only initrd defaults for Azure Linux virtual machines
+Requires:       dracut
+
+%description dracut-hostonly
+Configure dracut to generate host-only initrds without embedding the build
+host's kernel command line in Azure Linux virtual machine images.
 
 %if %{with basic}
 %package identity-basic
@@ -431,6 +440,7 @@ install -Dm0440 %{SOURCE26} %{buildroot}%{_sysconfdir}/sudoers.d/10-azurelinux-c
 install -Dm0644 %{SOURCE27} %{buildroot}%{_prefix}/lib/tmpfiles.d/azurelinux-sudo.conf
 install -Dm0644 %{SOURCE28} %{buildroot}%{_sysconfdir}/logrotate.d/azurelinux-sudo
 install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sugroup.conf
+install -Dm0644 %{SOURCE35} %{buildroot}%{_sysconfdir}/dracut.conf.d/90-azurelinux-vm.conf
 %check
 check_umask() {
     initial_umask="$1"
@@ -479,6 +489,11 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/50-permit-root-login.conf
 
 
+%files dracut-hostonly
+%license licenses/LICENSE
+%config(noreplace) %{_sysconfdir}/dracut.conf.d/90-azurelinux-vm.conf
+
+
 %if %{with basic}
 %files
 %files identity-basic
@@ -524,6 +539,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Mon Nov 02 2026 Azure Linux <azurelinux@microsoft.com> - 4.0-37
+- Package host-only VM initrd defaults in azurelinux-release-dracut-hostonly
+
 * Thu Oct 29 2026 Chris Co <chrco@microsoft.com> - 4.0-36
 - Remove Beta branding and identify Azure Linux 4.0 as stable
 
