@@ -20,6 +20,9 @@ Patch6:         CVE-2026-119376.patch
 Patch7:         CVE-2026-119377.patch
 Patch8:         CVE-2026-119378.patch
 Patch9:         CVE-2026-119591.patch
+Patch10:        CVE-2026-119371.patch
+Patch11:        CVE-2026-119372.patch
+Patch12:        CVE-2026-119373.patch
 Requires:       sqlite-libs = %{version}-%{release}
 Provides:       sqlite3
 
@@ -91,7 +94,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Mon Nov 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.44.0-5
-- Patch for CVE-2026-119591, CVE-2026-119378, CVE-2026-119377, CVE-2026-119376, CVE-2026-119375, CVE-2026-119374
+- Patch for CVE-2026-119591, CVE-2026-119378, CVE-2026-119377, CVE-2026-119376, CVE-2026-119375, CVE-2026-119374, CVE-2026-119373, CVE-2026-119372, CVE-2026-119371
 
 * Thu Jun 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.44.0-4
 - Patch for CVE-2026-11822
