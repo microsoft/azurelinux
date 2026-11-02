@@ -1,0 +1,32 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/24839" }]
+
+[[overlays]]
+description = "Protect the OpenSSL libraries from removal through DNF and DNF5"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    'mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dnf/protected.d',
+    'echo "openssl-libs" > $RPM_BUILD_ROOT%{_sysconfdir}/dnf/protected.d/openssl-libs.conf',
+    'mkdir -p $RPM_BUILD_ROOT%{_datadir}/dnf5/libdnf.conf.d',
+    'cat > $RPM_BUILD_ROOT%{_datadir}/dnf5/libdnf.conf.d/protect-openssl-libs.conf <<EOF',
+    '[main]',
+    'protected_packages = openssl-libs',
+    'EOF',
+]
+
+[[overlays]]
+description = "Keep removal protection with openssl-libs on library-only installations"
+type = "spec-append-lines"
+section = "%files"
+package = "libs"
+lines = [
+    '%dir %{_sysconfdir}/dnf',
+    '%dir %{_sysconfdir}/dnf/protected.d',
+    '%config(noreplace) %{_sysconfdir}/dnf/protected.d/openssl-libs.conf',
+    '%dir %{_datadir}/dnf5',
+    '%dir %{_datadir}/dnf5/libdnf.conf.d',
+    '%{_datadir}/dnf5/libdnf.conf.d/protect-openssl-libs.conf',
+]

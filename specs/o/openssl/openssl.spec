@@ -37,7 +37,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.9
-Release: 13%{?dist}
+Release: 14%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -420,6 +420,13 @@ install -m644 %{SOURCE9} \
 %endif
 
 
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dnf/protected.d
+echo "openssl-libs" > $RPM_BUILD_ROOT%{_sysconfdir}/dnf/protected.d/openssl-libs.conf
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/dnf5/libdnf.conf.d
+cat > $RPM_BUILD_ROOT%{_datadir}/dnf5/libdnf.conf.d/protect-openssl-libs.conf <<EOF
+[main]
+protected_packages = openssl-libs
+EOF
 %files
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
@@ -450,6 +457,12 @@ install -m644 %{SOURCE9} \
 %attr(0755,root,root) %{_libdir}/engines-%{soversion}
 %attr(0755,root,root) %{_libdir}/ossl-modules
 
+%dir %{_sysconfdir}/dnf
+%dir %{_sysconfdir}/dnf/protected.d
+%config(noreplace) %{_sysconfdir}/dnf/protected.d/openssl-libs.conf
+%dir %{_datadir}/dnf5
+%dir %{_datadir}/dnf5/libdnf.conf.d
+%{_datadir}/dnf5/libdnf.conf.d/protect-openssl-libs.conf
 %files devel
 %doc CHANGES.md doc/dir-locals.example.el doc/openssl-c-indent.el
 %{_prefix}/include/openssl
