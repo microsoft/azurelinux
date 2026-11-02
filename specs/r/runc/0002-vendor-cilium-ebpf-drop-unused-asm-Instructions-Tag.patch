@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Mon, 2 Nov 2026 09:35:08 +0530
+Subject: [PATCH] vendor: cilium/ebpf: drop unused asm.Instructions.Tag
+
+asm.Instructions.Tag is the only importer of crypto/sha1 in runc's
+dependency graph. Nothing in runc or its vendored dependencies calls it
+(opencontainers/cgroups only uses asm to assemble and marshal the
+device-filter program), and the Go linker already discards it from the
+runc binary. Removing it drops crypto/sha1 from the build graph so that
+runc links no Go crypto packages at all.
+
+Azure Linux-specific: Tag is public cilium/ebpf API (deprecated upstream
+by https://github.com/cilium/ebpf/pull/1932 in favour of HasTag, which
+uses both SHA-1 and SHA-256), so this is not suitable for upstream as-is.
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ .../github.com/cilium/ebpf/asm/instruction.go | 21 -------------------
+ 1 file changed, 21 deletions(-)
+
+diff --git a/vendor/github.com/cilium/ebpf/asm/instruction.go b/vendor/github.com/cilium/ebpf/asm/instruction.go
+index 86b384c..c574f81 100644
+--- a/vendor/github.com/cilium/ebpf/asm/instruction.go
++++ b/vendor/github.com/cilium/ebpf/asm/instruction.go
+@@ -1,9 +1,7 @@
+ package asm
+ 
+ import (
+-	"crypto/sha1"
+ 	"encoding/binary"
+-	"encoding/hex"
+ 	"errors"
+ 	"fmt"
+ 	"io"
+@@ -787,25 +785,6 @@ func (insns Instructions) Marshal(w io.Writer, bo binary.ByteOrder) error {
+ 	return nil
+ }
+ 
+-// Tag calculates the kernel tag for a series of instructions.
+-//
+-// It mirrors bpf_prog_calc_tag in the kernel and so can be compared
+-// to ProgramInfo.Tag to figure out whether a loaded program matches
+-// certain instructions.
+-func (insns Instructions) Tag(bo binary.ByteOrder) (string, error) {
+-	h := sha1.New()
+-	for i, ins := range insns {
+-		if ins.IsLoadFromMap() {
+-			ins.Constant = 0
+-		}
+-		_, err := ins.Marshal(h, bo)
+-		if err != nil {
+-			return "", fmt.Errorf("instruction %d: %w", i, err)
+-		}
+-	}
+-	return hex.EncodeToString(h.Sum(nil)[:sys.BPF_TAG_SIZE]), nil
+-}
+-
+ // encodeFunctionReferences populates the Offset (or Constant, depending on
+ // the instruction type) field of instructions with a Reference field to point
+ // to the offset of the corresponding instruction with a matching Symbol field.
