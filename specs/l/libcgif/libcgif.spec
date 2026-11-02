@@ -23,7 +23,7 @@ Name:          %{libname}
 Summary:       A fast and lightweight GIF encoder
 License:       MIT
 Version:       0.5.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 %forgemeta
 URL:            %{forgeurl}
 Source0:        %{forgesource}

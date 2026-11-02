@@ -8,7 +8,7 @@
 
 Name:          enchant2
 Version:       2.8.21
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:       An Enchanting Spell Checking Library
 
 License:       LGPL-2.0-or-later
