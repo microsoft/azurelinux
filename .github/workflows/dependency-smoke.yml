@@ -8,6 +8,7 @@ on:
     paths:
       - "scripts/**/requirements.txt"
       - "scripts/**/*.py"
+      - "scripts/ci/components/prepare_base_promotion_merge.sh"
       - ".github/workflows/dependency-smoke.yml"
 
 # Cancel in-progress runs of this workflow if a new run is triggered.
@@ -26,6 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         dir:
+          - scripts/ci/components
           - scripts/ci/control-tower
           - scripts/ci/render-specs-check
           - scripts/ci/spec-review

@@ -128,6 +128,12 @@ For changes that affect RPM output, build and smoke-test the result. Pure docume
 or metadata changes don't require a rebuild. See the [`README.md`](README.md) for
 `azldev` commands.
 
+**Base promotions are an exception to metadata-only changes:** adding a component
+to the Base publishing list must also select it for an official build. Otherwise
+its existing RPMs are not republished. See
+[Package publishing channels](DEVELOPING.md#package-publishing-channels) for the
+explicit bump workflow and publication verification.
+
 Commit-message and TOML checks are managed by pre-commit. Install it and run the
 file-oriented checks used by CI:
 
