@@ -10,15 +10,15 @@
 # from two vendored helpers that runc never calls:
 #   - go-selinux uniqMcs() uses crypto/rand. Upstream switched it to
 #     math/rand/v2 in v1.14.0; backport that change.
-#   - cilium/ebpf asm.Instructions.Tag() uses crypto/sha1. Nothing calls it, so
-#     drop it.
-# With both gone, runc links no Go crypto at all. It can keep the default
+#   - opencontainers/cgroups uses cilium/ebpf/asm to encode its device filter.
+#     Replace that small, fixed instruction set with a local encoder.
+# With both imports gone, runc links no Go crypto at all. It can keep the default
 # Azure Linux Go toolchain configuration instead of opting out with
 # MS_GO_NOSYSTEMCRYPTO, and a %build check fails the build if crypto creeps
 # back in on a future runc update.
 #
-# Drop this once a runc release vendors go-selinux >= v1.14.0 and no longer
-# pulls cilium/ebpf asm (via opencontainers/cgroups) into the binary.
+# Drop these patches once runc vendors go-selinux >= v1.14.0 and cgroups no
+# longer imports cilium/ebpf/asm at runtime.
 [metadata]
 category = "azl-security-compliance"
 upstream-status = "needs-upstream-hook"
@@ -36,9 +36,9 @@ type = "patch-add"
 source = "../0001-vendor-go-selinux-use-math-rand-v2.patch"
 
 [[overlays]]
-description = "Drop the unused cilium/ebpf asm.Instructions.Tag to remove crypto/sha1 from the vendored cilium/ebpf"
+description = "Encode the cgroups device filter locally to remove the runtime cilium/ebpf/asm crypto dependency"
 type = "patch-add"
-source = "../0002-vendor-cilium-ebpf-drop-unused-asm-Instructions-Tag.patch"
+source = "../0002-vendor-opencontainers-cgroups-encode-device-filter.patch"
 
 [[overlays]]
 description = "Stop %goprep from applying patches before the vendor tarball is unpacked; the patches target vendor/"
