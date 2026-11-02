@@ -21,15 +21,27 @@ definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }
 `components/`, and `teams/`. Includes remain flat in the root description;
 profile requirements express inheritance between fragments.
 
-Shared KIWI hook scripts and `<file>` sources live directly under
-`base/images/`, because that directory is the shared description root. The root
-`config.sh` dispatches profile-specific behavior using `kiwi_profiles`,
-following Fedora's shared-description model. `<file>` entries remain scoped to
-the owning profile so their payloads do not leak into other images.
+Shared KIWI hook scripts live directly under `base/images/`, because that
+directory is the shared description root. The root `config.sh` dispatches
+profile-specific behavior using `kiwi_profiles`, following Fedora's
+shared-description model.
 
 The ISO installer remains a standalone description under
 `base/images/vm-iso-installer/` because its distinct composition and workflow
 do not fit naturally into the shared image hierarchy.
+
+## Package image configuration
+
+KIWI profiles must not inject bare files into the image, including through
+`<file>` entries, unless there is absolutely no alternative. Always build a
+config RPM as a subpackage of `azurelinux-release` or another suitable component
+for configuration overrides, and include that RPM in the owning profile's
+package list. This keeps file ownership, upgrades, and removal managed by RPM.
+
+If there is no alternative to bare-file injection, document why a config RPM
+cannot be used. Keep the `<file>` entry scoped to the owning profile so its
+payload does not leak into other images. For the shared description, place any
+such sources directly under `base/images/`.
 
 ## Image types
 
