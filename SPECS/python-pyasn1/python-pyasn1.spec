@@ -17,7 +17,6 @@ This is an implementation of ASN.1 types and codecs in Python programming langua
 Summary:        Implementation of ASN.1 types and codecs in Python programming language
 BuildRequires:  python3-devel
 BuildRequires:  python3-wheel
-BuildRequires:  python3-pytest
 BuildRequires:  python3-pip
 Requires:       python3
 
@@ -39,7 +38,8 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 
 %check
 # Upstream tests pass under pytest; setup.py test is no longer available.
-%pytest
+# Use the standard-library runner to avoid a pytest -> pyasn1 build cycle.
+%python3 -m unittest discover -q
 
 %files -n python3-pyasn1
 %defattr(-,root,root,-)
@@ -48,7 +48,7 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 
 %changelog
 * Mon Nov 02 2026 BinduSri Adabala <v-badabala@microsoft.com> - 0.6.5-1
-- Upgrade to 0.6.5 for CVE-2026-119195, CVE-2026-119196, CVE-2026-119197
+- Upgrade to 0.6.5 for CVE-2026-119194, CVE-2026-119195, CVE-2026-119196, CVE-2026-119197
 
 * Fri Jul 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.4.8-3
 - Patch for CVE-2026-59886, CVE-2026-59885, CVE-2026-59884
