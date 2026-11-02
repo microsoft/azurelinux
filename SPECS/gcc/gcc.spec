@@ -67,6 +67,10 @@ Patch0:         CVE-2023-4039.patch
 Patch1:         0011-libsanitizer-Remove-crypt-and-crypt_r-interceptors.patch
 Patch2:         CVE-2026-102010.patch
 Patch3:         CVE-2026-95619.patch
+Patch4:         CVE-2026-114690.patch
+Patch5:         CVE-2026-114691.patch
+Patch6:         CVE-2026-115455.patch
+Patch7:         CVE-2026-115456.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
@@ -530,7 +534,7 @@ $tests_ok
 
 %changelog
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2.0-8
-- Patch for CVE-2026-95619, CVE-2026-102010
+- Patch for CVE-2026-95619, CVE-2026-102010, CVE-2026-115456, CVE-2026-115455, CVE-2026-114691, CVE-2026-114690
 
 * Fri Jun 21 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-7
 - Re-enable CVE-2023-4039.patch and refresh against 13.2.0 source
