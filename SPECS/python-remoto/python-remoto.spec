@@ -13,6 +13,7 @@ BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-execnet
+BuildRequires:  python3-mock
 BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
@@ -47,7 +48,6 @@ sed -i 's/def setup(self)/def setup_method(self)/' remoto/tests/test_process.py 
 %py3_install
 
 %check
-pip3 install mock
 python3 -m pytest -v remoto/tests
 
 %files -n python3-%{pkgname}

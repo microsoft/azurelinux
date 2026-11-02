@@ -31,6 +31,9 @@ BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
 BuildRequires:  python3-pytest-mock
+BuildRequires:  python3-coverage
+BuildRequires:  python3-conda-package-streaming
+BuildRequires:  python3-zstandard
 %endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -71,6 +74,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.2.0-3
 - Use RPM test dependencies instead of pip
+- Add coverage and conda test support dependencies
 
 * Fri Jan 31 2015 Sam Meluch <sammeluch@microsoft.com> - 2.2.0-2
 - add missing pip modules for package tests

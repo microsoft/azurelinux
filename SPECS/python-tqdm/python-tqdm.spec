@@ -29,7 +29,6 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-setuptools_scm
 %if 0%{?with_check}
 BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-timeout
 BuildRequires:  python3-pytest-asyncio
 %ifarch x86_64
 BuildRequires:  python3-tensorflow
@@ -108,7 +107,7 @@ run_tests || run_tests
 
 %changelog
 * Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.67.2-4
-- Use python3-pytest-timeout and python3-pytest-asyncio instead of pip
+- Use python3-pytest-asyncio from check dependencies and keep pytest-timeout installed with pip
 
 * Sat Jun 20 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.67.2-3
 - Cap each test at 180s via pytest-timeout (--timeout-method=signal)

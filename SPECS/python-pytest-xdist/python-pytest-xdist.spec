@@ -35,6 +35,8 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
 %if 0%{?with_check}
+BuildRequires:  python3-coverage
+BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
 %endif
 
@@ -89,7 +91,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %changelog
 * Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.5.0-4
-- Use python3-pytest-cov from check dependencies instead of pip
+- Use python3-pytest, python3-pytest-cov, and python3-coverage from check dependencies instead of pip
 
 * Fri Jun 19 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.5.0-3
 - Backport upstream PR pytest-dev/pytest-xdist#1318 as

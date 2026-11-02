@@ -7,7 +7,7 @@ Tomli is fully compatible with TOML v1.0.0.}
 Summary:        A little TOML parser for Python
 Name:           python-%{pypi_name}
 Version:        2.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-dateutil
+BuildRequires:  python3-pytest
 %endif
 
 %description %{_description}

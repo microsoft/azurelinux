@@ -18,6 +18,7 @@ BuildArch:      noarch
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-coverage
 %endif
 
 %description
@@ -67,6 +68,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 5.1.0-2
 - Use python3-pytest and python3-pytest-cov from check dependencies instead of pip
+- Add python3-coverage for pytest-cov tests
 
 * Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.1.0-1
 - Auto-upgrade to 5.1.0 - 3.0 package upgrade

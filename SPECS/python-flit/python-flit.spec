@@ -13,7 +13,7 @@ so long as they can be imported on Python 3.}
 Summary:        Simplified packaging of Python modules
 Name:           python-%{srcname}
 Version:        3.9.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 # ./flit/log.py under ASL 2.0 license
 # ./flit/upload.py under PSF license
 License:        BSD AND ASL 2.0 AND Python
@@ -37,6 +37,7 @@ BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
 BuildRequires:  python3-pygments
+BuildRequires:  python3-PyYAML
 BuildRequires:  python3-pytest
 BuildRequires:  sudo
 BuildRequires:  which
@@ -100,7 +101,7 @@ sudo -u test %pytest -k "not test_test_writable_dir_win"
 
 %changelog
 * Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.9.0-3
-- Use python3-pytest for tests instead of installing pytest with pip
+- Use python3-pytest and python3-PyYAML test dependencies instead of installing them with pip
 
 * Wed May 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.9.0-2
 - Add yaml dependency to pip install for check section

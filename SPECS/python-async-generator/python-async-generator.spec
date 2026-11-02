@@ -33,6 +33,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-coverage
 %endif
 
 %description -n python%{python3_pkgversion}-%{pkgname} %{_description}
@@ -63,6 +64,7 @@ python%{python3_version} -m pytest -v
 %changelog
 * Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.10-11
 - Use python3-pytest and python3-pytest-cov from check dependencies instead of pip
+- Add python3-coverage for pytest-cov tests
 
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.10-10
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
