@@ -165,7 +165,6 @@
         <package name="dnf-utils" />
         <package name="dosfstools" />
         <package name="dracut" />
-        <package name="dracut-config-generic" />
         <package name="dyninst" />
         <package name="e2fsprogs" />
         <package name="ed" />

@@ -3329,6 +3329,126 @@
           "justification": "Keep VFS debugging disabled in the production kernel on both architectures to improve boot performance and reduce unnecessary logging."
         },
         {
+          "name": "CONFIG_HYPERV",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep Azure VM Hyper-V support built-in so host-only initrds do not depend on build-host hardware detection."
+        },
+        {
+          "name": "CONFIG_HYPERV_VMBUS",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep the Azure VM bus built-in for host-only initrds."
+        },
+        {
+          "name": "CONFIG_HYPERV_STORAGE",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep Azure SCSI root disks accessible without storage modules in host-only initrds."
+        },
+        {
+          "name": "CONFIG_HYPERV_NET",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep Hyper-V networking available without relying on host-only detection of the build machine's network hardware."
+        },
+        {
+          "name": "CONFIG_PCI_HYPERV",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep Hyper-V PCI devices available independently of host-only initrd driver selection."
+        },
+        {
+          "name": "CONFIG_SCSI",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep the SCSI stack built-in for Azure root disks with host-only initrds."
+        },
+        {
+          "name": "CONFIG_BLK_DEV_SD",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep SCSI disk support built-in for Azure root disks with host-only initrds."
+        },
+        {
+          "name": "CONFIG_NVME_CORE",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep the NVMe stack built-in so host-only images can boot on Azure NVMe VM sizes."
+        },
+        {
+          "name": "CONFIG_BLK_DEV_NVME",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep NVMe root disks accessible without modules in host-only initrds."
+        },
+        {
+          "name": "CONFIG_VIRTIO_PCI",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep the virtio PCI transport built-in for local VM boot validation with host-only initrds."
+        },
+        {
+          "name": "CONFIG_VIRTIO_MMIO",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep the virtio MMIO transport built-in for local VM boot validation with host-only initrds."
+        },
+        {
+          "name": "CONFIG_VIRTIO_BLK",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep virtio root disks accessible during local boot tests without host-only initrd storage modules."
+        },
+        {
+          "name": "CONFIG_SCSI_VIRTIO",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep virtio SCSI root disks accessible during local boot tests with host-only initrds."
+        },
+        {
+          "name": "CONFIG_EXT4_FS",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep the VM profiles' ext4 root filesystem built-in rather than relying on host-only initrd module selection."
+        },
+        {
+          "name": "CONFIG_VFAT_FS",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Keep VM EFI system partition filesystem support built-in."
+        },
+        {
           "name": "CONFIG_ACPI_APEI_GHES",
           "values": [
             {

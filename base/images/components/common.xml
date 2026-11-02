@@ -13,6 +13,7 @@
         <package name="filesystem" />
     </packages>
     <packages type="image" profiles="BootableCore">
+        <package name="azurelinux-release-dracut-hostonly" />
         <package name="bash" />
         <package name="ca-certificates" />
         <package name="dnf5" />
