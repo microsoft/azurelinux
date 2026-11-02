@@ -1,6 +1,6 @@
 Name:           coreos-init
 Version:        0.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Init scripts for Flatcar (systemd units, scripts, configs)
 
 License:        BSD-3-Clause
@@ -17,6 +17,7 @@ BuildArch:      noarch
 Source0:        https://github.com/flatcar/init/archive/%{commit}/init-%{commit}.tar.gz#/%{name}-%{version}-%{shortcommit}.tar.gz
 Patch0:         support-UKI-mode-by-restoring-firstboot-addon.patch
 Patch1:         Add-noop-sysupdate-transfer-config.patch
+Patch2:         autologin-use-provisioned-user.patch
 # optional tests, analogous to IUSE=test
 %bcond_without tests
 
@@ -99,6 +100,11 @@ find %{buildroot} -type f -o -type l \
 %doc README.md
 
 %changelog
+* Mon Nov 02 2026 Mayank Singh <mayansingh@microsoft.com> - 0.0.1-3
+- Derive the UKI firstboot addon directory from the running kernel version.
+- Use a provisioned login user for autologin when core has a disabled shell.
+- Skip autologin successfully when no eligible login user exists.
+
 * Mon Feb 02 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.0.1-2
 - Cleanup unwanted files
 
