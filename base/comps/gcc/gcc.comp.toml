@@ -1,3 +1,10 @@
 [components.gcc]
 # Release: %{gcc_release}%{?dist}
 release = { calculation = "manual" }
+
+[[components.gcc.overlays]]
+description = "Bump the manually managed GCC release for the branding rebuild"
+type = "spec-search-replace"
+regex = '^%global gcc_release 1$'
+replacement = '%global gcc_release 2'
+metadata = { category = "azl-release-management", upstream-status = "inapplicable" }
