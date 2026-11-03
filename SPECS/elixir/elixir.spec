@@ -2,7 +2,7 @@
 Summary:        elixir
 Name:           elixir
 Version:        1.16.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ URL:            https://elixir-lang.org
 Source0:        https://github.com/elixir-lang/elixir/archive/v%{version}/elixir-%{version}.tar.gz
 Patch0:         CVE-2026-49762.patch
 Patch1:         CVE-2026-75758.patch
+Patch2:         CVE-2026-109821.patch
 BuildRequires:  erlang
 BuildRequires:  glibc-lang
 
@@ -41,6 +42,9 @@ export LANG="en_US.UTF-8"
 
 
 %changelog
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.16.1-4
+- Patch for CVE-2026-109821
+
 * Mon Aug 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.16.1-3
 - Patch for CVE-2026-75758
 
