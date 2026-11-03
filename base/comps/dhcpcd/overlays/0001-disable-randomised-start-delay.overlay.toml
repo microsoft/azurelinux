@@ -8,8 +8,8 @@
 #
 # Measured on Standard_D8s_v6 (AZL 4.0, dhcpcd 10.3.0): the same cached-lease
 # invocation took 1.693s without `nodelay` and 0.104s with it. Azure Linux 3.0
-# shipped dhcpcd 10.0.8, which did not exhibit the delay (0.710s), so this is a
-# regression relative to 3.0 rather than a new tuning choice.
+# (dhcpcd 10.0.8) has the same delay (0.20-2.70s, median 1.10s over 17 boots),
+# so this is a missed optimisation in both releases, not a 4.0 regression.
 #
 # NOTE: this changes the default for every dhcpcd consumer on the system, not
 # just cloud-init. That is intentional for a cloud-targeted distro, but it is a

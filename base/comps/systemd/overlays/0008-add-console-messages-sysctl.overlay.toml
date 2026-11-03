@@ -1,14 +1,16 @@
-# Azure Linux images boot with `console=ttyS0` on an emulated serial console.
-# Kernel console output is synchronous and every write traps to the hypervisor,
-# so the upstream default console loglevel of 7 (KERN_DEBUG) pushes ~630 kernel
-# messages through that console on a typical boot and measurably delays startup.
+# Azure Linux images boot with `console=ttyS0` on an emulated serial console,
+# where every console write is slow. The kernel default console loglevel of 7
+# sends ~630 kernel messages per boot to that console.
 #
 # Ship the same sysctl Azure Linux 3.0 provided (systemd-udev owned
-# /usr/lib/sysctl.d/10-console-messages.conf) so only warnings and above reach
-# the console. Full verbosity is still recorded in the journal and dmesg.
+# /usr/lib/sysctl.d/10-console-messages.conf) so that, once applied, only
+# error-level and more severe messages reach the console. Full verbosity is
+# still recorded in the journal and dmesg.
 #
-# Measured on Standard_D8s_v6: restoring this file plus suppressing systemd
-# status output reduced boot time by ~4.5s (20.9s -> 16.4s) on AZL 4.0.
+# This restores parity with 3.0; it does not measurably shorten boot. The
+# sysctl applies only when systemd-sysctl runs, after the kernel has written
+# most of its boot messages. The boot-time fix is `loglevel=4` on the kernel
+# command line, which belongs in the image definition.
 
 [metadata]
 category = "azl-platform-adaptation"
