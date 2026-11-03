@@ -17,7 +17,7 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.18.58.mshv1
+Version:        6.18.58.mshv2
 Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
@@ -29,7 +29,6 @@ Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
 Source5:        config_aarch64
-Patch0:         0001-mm-vmscan-throttle-memcg-reclaim-on-writeback.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -266,6 +265,11 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Nov 03 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.58.mshv2-1
+- Upgrade to 6.18.58.mshv2, which blocks vPCI IRQ affinity changes on the nested root
+  partition (as in production until migration is validated)
+- Drop the memcg writeback reclaim throttle patch, now included in the release
+
 * Tue Oct 27 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.58.mshv1-1
 - Upgrade to 6.18.58.mshv1, using its Microsoft/configs mshv_defconfig
 - Drop vPCI interrupt patch, replaced by the nested root IRQ re-target fix in this release
