@@ -1,1 +1,17 @@
 [components.glib2]
+
+[[components.glib2.overlays]]
+description = "Fix the idle-thread registration race exposed by deterministic shutdown and wakeup regressions"
+type = "patch-add"
+source = "glib-thread-pool-idle-shutdown.patch"
+
+[components.glib2.overlays.metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [
+    { url = "https://gitlab.gnome.org/tobiasb-ms/glib/-/commit/918fc6f750a127cf3d11db497e703cdc1fc270f6" },
+    { url = "https://gitlab.gnome.org/tobiasb-ms/glib/-/commit/83548f98ff6407164a7aba13a1a2216950f28e78" },
+]
+bugs = [
+    { url = "https://gitlab.gnome.org/GNOME/glib/-/work_items/4010" },
+]
