@@ -155,7 +155,7 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 17
+%global baserelease 18
 Release: %{baserelease}%{?dist}
 
 # Licenses:
@@ -310,12 +310,13 @@ rpm.define("__debug_install_post bash " .. wrapper
 # Variant of %%dist that contains just the distribution release, no affixes.
 %{?fedora:%global sysroot_dist fc%{fedora}}
 %{?rhel:%global sysroot_dist el%{rhel}}
+%{?azurelinux:%global sysroot_dist azl%{azurelinux}}
 %{?!sysroot_dist:%global sysroot_dist root}
 # The name of the sysroot package.
 %global sysroot_package_arch sysroot-%{_arch}-%{sysroot_dist}-%{name}
 # Installed path for the sysroot tree.  Must contain /sys-root/, which
 # triggers filtering.
-%global sysroot_prefix /usr/%{_arch}-redhat-linux/sys-root/%{sysroot_dist}
+%global sysroot_prefix /usr/%{_arch}-%{_vendor}-linux/sys-root/%{sysroot_dist}
 
 # The wrapper script relies on the fact that debugedit does not change
 # build IDs.
@@ -2391,6 +2392,9 @@ update_gconv_modules_cache ()
 %endif
 
 %changelog
+* Tue Nov 03 2026 Dan Streetman <ddstreet@ieee.org> - 2.42-18
+- Use Azure Linux sysroot package names and paths.
+
 * Tue Sep 29 2026 Frédéric Bérat <fberat@redhat.com> - 2.42-17
 - Auto-sync with upstream branch release/2.42/master,
   commit c7169c068453a95f104f47a4eb79a902721712dd:
