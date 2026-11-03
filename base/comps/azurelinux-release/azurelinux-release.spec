@@ -1,4 +1,4 @@
-%define release_name Four
+%define release_name Core
 %define is_evergreen 0
 
 # Define this to 1 for Branched releases prior to RC
@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        36%{?dist}
+Release:        37%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -524,6 +524,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Tue Nov 03 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-37
+- Change the Azure Linux 4.0 release name from Four to Core
+
 * Thu Oct 29 2026 Chris Co <chrco@microsoft.com> - 4.0-36
 - Remove Beta branding and identify Azure Linux 4.0 as stable
 
