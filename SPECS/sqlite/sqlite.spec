@@ -34,7 +34,7 @@ C/C++ interface specs and other miscellaneous documentation.
 %package devel
 Summary:        sqlite3 link library & header files
 Group:          Development/Libraries
-# Requires:       %{name} = %{version}-%{release}
+# Requires:       %%{name} = %%{version}-%%{release}
 %description    devel
 The sqlite devel package include the needed library link and
 header files for development.
@@ -155,7 +155,7 @@ make %{?_smp_mflags} check
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 3.26.0-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Wed Feb 3 2019 Michelle Wang <michellew@vmware.com> - 3.26.0-1
+* Sun Feb 3 2019 Michelle Wang <michellew@vmware.com> - 3.26.0-1
 - Upgrade to 3.26.0 for a critical Vulnerability named 'Magallan'.
 
 * Fri Sep 21 2018 Srinidhi Rao <srinidhir@vmware.com> - 3.25.1-1
