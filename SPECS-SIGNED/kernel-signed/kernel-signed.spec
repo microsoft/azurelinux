@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        6.6.159.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -145,9 +145,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
-* Tue Nov 03 2026 Jon Slobodzian <joslobo@microsoft.com> - 6.6.159.1-3
-- Align with the kernel Btrfs/IPE backport release.
-
 * Wed Oct 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 6.6.159.1-2
 - Bump release number to match kernel release.
 
