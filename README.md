@@ -132,6 +132,56 @@ For a deeper tour of the tooling, the overlay system, and how to get started dev
 
 If you want to build or develop within the distro, start with **[DEVELOPING.md](DEVELOPING.md)**. Don't worry about this if you're primarily looking to *use* the distro.
 
+### Experimental Marketplace Gen2 boot optimization
+
+On this branch, the existing `marketplace-gen2` **x86_64 non-FIPS** image uses
+reduced console output, DHCP `nodelay`, the Azure/NoCloud/None datasource list,
+and disabled IPv6 Duplicate Address Detection on **eth0 only**. IPv6 and the
+normal network-online service remain enabled. The image hook applies the package
+configuration equivalents even when building with remote RPMs.
+
+The default BLS entry boots without an initrd using the built disk's PARTUUID.
+The build checks the ext4/GPT root layout, built-in storage/filesystem drivers,
+and Hyper-V networking modules. The original initrd and recovery entry are
+retained. ARM64, FIPS, and other image definitions are unchanged.
+
+From the repository root:
+
+```bash
+azldev image build marketplace-gen2 --arch x86_64
+azldev image test marketplace-gen2
+azldev image boot marketplace-gen2 --test-password-file /path/to/test-password-file
+```
+
+The focused hook tests use mocked block-device commands and do not mount a disk:
+
+```bash
+cd base/images/tests
+uv run pytest -p no:azl_image unit/test_experimental_noinitrd.py \
+    --basetemp=../../build/work/scratch/boot-opt-pytest
+```
+
+After deploying to Azure, check `systemd-analyze` (no initrd phase),
+`cloud-init status --wait`, `networkctl status eth0`, `ip -6 addr show dev eth0`,
+`sysctl net.ipv6.conf.eth0.accept_dad`, `getenforce`, and `chronyc tracking`.
+Test IPv6 connectivity on a dual-stack deployment; only link-local IPv6 was
+verified in the VM experiment. The measured ~6.61s average is not a guarantee
+for freshly built images, different VM sizes, or first-boot provisioning.
+
+**Experimental only:** disabling DAD can hide IPv6 address conflicts. No-initrd
+boot is not validated for FIPS, ARM64, encrypted/LVM/RAID roots, or kernel updates.
+Before updating/removing kernels, switch back to the ordinary initrd entry:
+
+```bash
+sudo grub2-set-default "$(cat /etc/azurelinux-noinitrd-recovery-entry)"
+sudo reboot
+```
+
+Confirm the initrd-backed boot before updating kernels. Rebuild and revalidate
+the image before re-enabling no-initrd boot with a different kernel. For a boot
+failure, use the GRUB serial menu to select the retained ordinary entry; keep
+Azure Boot Diagnostics enabled and a disk-repair recovery path available.
+
 ## Engagement & support
 
 - **Bugs and feature requests:** file a
