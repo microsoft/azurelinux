@@ -1,5 +1,6 @@
 [components.azurelinux-rpm-config]
 spec = { type = "upstream", upstream-name = "redhat-rpm-config" }
+overlay-files = ["azurelinux-paths.overlay.toml", "rpm-path-transition.overlay.toml"]
 overlays = [
     #
     # Overlays for spec.
@@ -25,20 +26,6 @@ overlays = [
     # (e.g., 343 for Fedora 43).
     { type = "spec-add-tag", tag = "Obsoletes", value = "redhat-rpm-config < 1000" },
     { type = "spec-add-tag", tag = "Conflicts", value = "redhat-rpm-config < 1000" },
-
-    # Create symlink for our own name: /usr/lib/rpm/azurelinux -> /usr/lib/rpm/redhat
-    # Note that we don't do the reverse to avoid conflicts with upstream Fedora
-    # redhat-rpm-config during bootstrapping (replacing a dir with a symlink is
-    # problematic in RPM land).
-    # TODO: remove symlinks after bootstrap
-    { type = "spec-prepend-lines", section = "%install", lines = ["mkdir -p %{buildroot}/usr/lib/rpm", "ln -sf redhat %{buildroot}/usr/lib/rpm/azurelinux"] },
-    { type = "spec-prepend-lines", section = "%files", lines = ["/usr/lib/rpm/azurelinux"] },
-
-    # Create symlink for lua dir: /usr/lib/rpm/lua/azurelinux -> /usr/lib/rpm/lua/fedora
-    # This allows the distro-specific name to be used with minimal required churn to
-    # spread references to the standard path in Fedora.
-    { type = "spec-append-lines", section = "%install", lines = ["ln -sf fedora %{buildroot}%{_rpmluadir}/azurelinux"] },
-    { type = "spec-append-lines", section = "%files", lines = ["%{_rpmluadir}/azurelinux"] },
 
     #
     # Overlays for non-spec files.

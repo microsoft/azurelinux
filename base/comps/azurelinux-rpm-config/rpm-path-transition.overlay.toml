@@ -1,0 +1,25 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+# Keep this migration while upgrades from legacy-directory RPMs are supported.
+[[overlays]]
+description = "Migrate legacy directories with embedded Lua so empty-root installs need no shell"
+type = "spec-append-lines"
+section = "%files"
+lines = [
+    "",
+    "%pretrans -p <lua>",
+    'for _, old in ipairs({"%{_rpmconfigdir}/redhat", "%{_rpmluadir}/fedora"}) do',
+    "    local oldstat = posix.stat(old)",
+    '    if oldstat and oldstat.type == "directory" then',
+    '        local new = old:match("(.*/)") .. "azurelinux"',
+    "        local newstat = posix.stat(new)",
+    '        if newstat and newstat.type == "link" then',
+    "            assert(os.remove(new))",
+    "        end",
+    "        assert(os.rename(old, new))",
+    '        assert(posix.symlink("azurelinux", old))',
+    "    end",
+    "end",
+]

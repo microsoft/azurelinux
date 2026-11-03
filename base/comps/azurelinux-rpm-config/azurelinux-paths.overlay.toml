@@ -1,0 +1,41 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Install RPM configuration files in the Azure Linux directory"
+type = "spec-search-replace"
+regex = '^%global rrcdir /usr/lib/rpm/redhat$'
+replacement = '%global rrcdir %{_rpmconfigdir}/azurelinux'
+
+[[overlays]]
+description = "Install shared Lua modules in the Azure Linux namespace"
+type = "spec-search-replace"
+section = "%install"
+regex = '%\{_rpmluadir\}/fedora'
+replacement = '%{_rpmluadir}/azurelinux'
+
+[[overlays]]
+description = "Own the Azure Linux Lua directories and shared modules"
+type = "spec-search-replace"
+section = "%files"
+regex = '%\{_rpmluadir\}/fedora'
+replacement = '%{_rpmluadir}/azurelinux'
+
+[[overlays]]
+description = "Keep legacy RPM helper and Lua paths working through compatibility symlinks"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "ln -s azurelinux %{buildroot}%{_rpmconfigdir}/redhat",
+    "ln -s azurelinux %{buildroot}%{_rpmluadir}/fedora",
+]
+
+[[overlays]]
+description = "Include the legacy-path compatibility symlinks in the RPM"
+type = "spec-append-lines"
+section = "%files"
+lines = [
+    "%{_rpmconfigdir}/redhat",
+    "%{_rpmluadir}/fedora",
+]
