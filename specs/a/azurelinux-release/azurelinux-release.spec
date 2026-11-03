@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        37%{?dist}
+Release:        38%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -68,6 +68,7 @@ Source31:       60-azurelinux-cis-module-denylist.conf
 Source32:       azurelinux-cis-shell-timeout.sh
 Source33:       00-rsyslog_filecreatemode.conf
 Source34:       azurelinux-cis-umask.sh
+Source35:       90-azurelinux-pwquality.conf
 
 BuildArch:      noarch
 
@@ -356,6 +357,7 @@ install -Dm0644 %{SOURCE32} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-c
 install -Dm0644 %{SOURCE33} -t %{buildroot}%{_sysconfdir}/rsyslog.d/
 install -Dm0644 %{SOURCE34} %{buildroot}%{_sysconfdir}/profile.d/99-azurelinux-cis-umask.sh
 install -Dm0644 %{SOURCE31} -t %{buildroot}%{_prefix}/lib/modprobe.d/
+install -Dm0644 %{SOURCE35} -t %{buildroot}%{_sysconfdir}/security/pwquality.conf.d/
 
 install -Dm0644 %{SOURCE25} -t %{buildroot}%{_sysconfdir}/cloud/cloud.cfg.d/
 %endif
@@ -496,6 +498,7 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/profile.d/99-azurelinux-cis-umask.sh
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/rsyslog.d/00-rsyslog_filecreatemode.conf
 %{_prefix}/lib/modprobe.d/60-azurelinux-cis-module-denylist.conf
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/security/pwquality.conf.d/90-azurelinux-pwquality.conf
 
 %files identity-cloud
 %{_prefix}/lib/os-release.cloud
@@ -527,6 +530,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Tue Nov 03 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-38
+- Configure password complexity for cloud systems
+
 * Tue Nov 03 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-37
 - Change the Azure Linux 4.0 release name from Four to Core
 
