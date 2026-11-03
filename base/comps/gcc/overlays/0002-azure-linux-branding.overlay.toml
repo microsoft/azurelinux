@@ -1,0 +1,11 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/20144" }]
+
+[[overlays]]
+description = "Identify Azure Linux in compiler version output and the __VERSION__ macro"
+type = "spec-search-replace"
+section = "%prep"
+regex = "^echo 'Red Hat %\\{version\\}-%\\{gcc_release\\}' > gcc/DEV-PHASE$"
+replacement = "echo 'Azure Linux %{version}-%{gcc_release}' > gcc/DEV-PHASE"
