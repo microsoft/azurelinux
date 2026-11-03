@@ -7,8 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/tianon/gosu
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Generate with toolkit/scripts/build_go_vendor_cache.sh using Source0,
-# --pkgVersion 1.19 --vendorVersion 1, then rename the output to Source1.
+# Generate with ./generate_source_tarball.sh --srcTarball gosu-1.19.tar.gz
+# --pkgVersion 1.19 --outFolder <existing-output-directory>.
 Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  golang >= 1.20
 
