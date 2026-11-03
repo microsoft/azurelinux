@@ -1,0 +1,32 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Prefer the Azure Linux sysroot suffix when its release macro is defined, preserving upstream distro fallbacks"
+type = "spec-search-replace"
+regex = '^%\{\?!sysroot_dist:%global sysroot_dist root\}$'
+replacement = '''%{?azurelinux:%global sysroot_dist azl%{azurelinux}}
+%{?!sysroot_dist:%global sysroot_dist root}'''
+
+[[overlays]]
+description = "Install the sysroot beneath the Azure Linux vendor triple rather than the hardcoded Red Hat triple"
+type = "spec-search-replace"
+regex = '^%global sysroot_prefix /usr/%\{_arch\}-redhat-linux/sys-root/%\{sysroot_dist\}$'
+replacement = '%global sysroot_prefix /usr/%{_arch}-%{_vendor}-linux/sys-root/%{sysroot_dist}'
+
+[[overlays]]
+description = "Bump the manually managed release for the Azure Linux sysroot naming change"
+type = "spec-search-replace"
+regex = '^%global baserelease 17$'
+replacement = '%global baserelease 18'
+
+[[overlays]]
+description = "Document the Azure Linux sysroot naming change in the package changelog"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Tue Nov 03 2026 Dan Streetman <ddstreet@ieee.org> - 2.42-18",
+    "- Use Azure Linux sysroot package names and paths.",
+    "",
+]
