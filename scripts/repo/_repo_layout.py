@@ -8,7 +8,7 @@ discovers the layout under one or more URL prefixes) and
 ``synthesize-repodata.py`` (which writes the layout from upstream
 inputs) consume :data:`SUBREPOS` directly.
 
-The matrix has six rows that have not changed for years; encoding it
+The matrix is small and rarely changes; encoding it
 as a Python constant keeps the consumers trivial and avoids a JSON
 loader / validator layer that has to be kept in sync with the data.
 """
@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-CHANNELS: tuple[str, ...] = ("base", "sdk")
+CHANNELS: tuple[str, ...] = ("base", "sdk", "nvidia")
 
 KIND_MAIN = "main"
 KIND_DEBUGINFO = "debuginfo"
@@ -55,6 +55,9 @@ SUBREPOS: tuple[SubrepoSpec, ...] = (
         subpath="sdk/debuginfo/$basearch",
     ),
     SubrepoSpec(name="sdk-srpms", channel="sdk", kind=KIND_SRPMS, per_arch=False, subpath="sdk/srpms"),
+    # The nvidia channel publishes binary RPMs only; its SRPMs and debuginfo
+    # use the "none" publish channel.
+    SubrepoSpec(name="nvidia", channel="nvidia", kind=KIND_MAIN, per_arch=True, subpath="nvidia/$basearch"),
 )
 
 
