@@ -1,13 +1,15 @@
 # SPDX-License-Identifier: MIT
-"""Validate ownership and permissions of GRUB configuration files."""
+"""Validate GRUB configuration permissions and Minimal OS console settings."""
 
 from __future__ import annotations
 
+import shlex
 import stat
 from typing import TYPE_CHECKING
 
 import pytest
-from utils.extract import resolve_path_confined
+from utils.extract import read_text_confined, resolve_path_confined
+from utils.parsers import parse_boot_entry_kernel_options
 
 if TYPE_CHECKING:
     import os
@@ -47,3 +49,43 @@ def test_grub_configuration_files_are_root_only(rootfs: Path) -> None:
         "GRUB configuration files must be root:root with mode 0600 or more restrictive; "
         f"found: {insecure}"
     )
+
+
+@pytest.mark.image("minimal-os")
+def test_minimal_os_grub_supports_console_and_serial(rootfs: Path) -> None:
+    """Both GRUB terminals must remain available, including after regeneration."""
+    defaults = read_text_confined(rootfs, "etc/default/grub")
+    assert 'GRUB_TERMINAL="console serial"' in defaults.splitlines()
+
+    config = read_text_confined(rootfs, "boot/grub2/grub.cfg")
+    for command, expected in {
+        "terminal_input": {"console", "serial"},
+        "terminal_output": {"console", "serial"},
+    }.items():
+        settings = [
+            shlex.split(line)
+            for line in config.splitlines()
+            if line.strip().startswith(f"{command} ")
+        ]
+        assert settings, f"GRUB configuration has no {command}"
+        assert set(settings[-1][1:]) == expected, (
+            f"GRUB {command} has incorrect terminals: {settings[-1]}"
+        )
+
+
+@pytest.mark.image("minimal-os")
+def test_minimal_os_kernel_supports_console_and_serial(
+    boot_entry_option_lines: dict[Path, list[str]],
+) -> None:
+    """Every kernel must log to the display and the architecture's serial port."""
+    serial_by_arch = {
+        "x86_64": "console=ttyS0,115200n8",
+        "aarch64": "console=ttyAMA0,115200n8",
+    }
+    for entry, options in parse_boot_entry_kernel_options(boot_entry_option_lines).items():
+        arch = entry.name.rsplit(".", 2)[-2]
+        assert arch in serial_by_arch, f"Unrecognized kernel architecture in {entry}"
+        consoles = [option for option in options if option.startswith("console=")]
+        assert consoles == ["console=tty0", serial_by_arch[arch]], (
+            f"Kernel consoles are incorrect in {entry}: {consoles}"
+        )

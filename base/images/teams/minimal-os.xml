@@ -11,15 +11,30 @@
             <requires profile="MinimalOsCore" />
         </profile>
     </profiles>
-    <preferences profiles="minimal-os">
+    <preferences arch="x86_64" profiles="minimal-os">
         <version>0.1.0</version>
         <packagemanager>dnf5</packagemanager>
         <locale>C</locale>
         <keytable>us</keytable>
         <timezone>UTC</timezone>
         <release-version>4.0</release-version>
-        <type image="oem" format="vhdx" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="32" rootfs_label="azurelinux">
-            <bootloader name="grub2" bls="true" />
+        <type image="oem" format="vhdx" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=tty0 console=ttyS0,115200n8" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="32" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" serial_line="serial --speed=115200" />
+            <size unit="G">1</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="aarch64" profiles="minimal-os">
+        <version>0.1.0</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>C</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhdx" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=tty0 console=ttyAMA0,115200n8" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="32" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" serial_line="serial --speed=115200" />
             <size unit="G">1</size>
             <oemconfig>
                 <oem-resize>false</oem-resize>

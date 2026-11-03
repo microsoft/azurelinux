@@ -3,6 +3,10 @@
 set -euo pipefail
 
 case ",${kiwi_profiles:-}," in
+    *,minimal-os,*)
+        # KIWI's legacy console attribute cannot select multiple output terminals.
+        printf '%s\n' 'GRUB_TERMINAL="console serial"' >> /etc/default/grub
+        ;;
     # distroless-* and busybox-workload declare runtime-package-management =
     # false: no package manager (or shell) is meant to survive into the
     # shipped image, so run the full keep-list-driven strip (removes
