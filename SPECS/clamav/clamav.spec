@@ -58,6 +58,7 @@ tar xf %{SOURCE1} --no-same-owner
 %autopatch -p1 -m 1000 -M 1100
 popd
 %autosetup -N -n clamav-clamav-%{version}
+%autopatch -p1 -M 999
 
 %build
 export CARGO_NET_OFFLINE=true
