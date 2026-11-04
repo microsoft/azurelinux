@@ -43,6 +43,12 @@ Patch31:        CVE-2026-87864.patch
 Patch32:        CVE-2026-92386.patch
 Patch33:        CVE-2026-92387.patch
 Patch34:        CVE-2026-92391.patch
+Patch35:        CVE-2026-107929.patch
+Patch36:        CVE-2026-86409.patch
+Patch37:        CVE-2026-87865.patch
+Patch38:        CVE-2026-92389.patch
+Patch39:        CVE-2026-92390.patch
+Patch40:        CVE-2026-94266.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
@@ -134,7 +140,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Oct 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-13
-- Patch for CVE-2026-92391, CVE-2026-92387, CVE-2026-92386, CVE-2026-87864, CVE-2026-87863, CVE-2026-87862, CVE-2026-86414, CVE-2026-86410
+- Patch for CVE-2026-92391, CVE-2026-92387, CVE-2026-92386, CVE-2026-87864, CVE-2026-87863, CVE-2026-87862, CVE-2026-86414, CVE-2026-86410, CVE-2026-94266, CVE-2026-92390, CVE-2026-92389, CVE-2026-87865, CVE-2026-86409, CVE-2026-107929
 
 * Wed Oct 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-12
 - Patch for CVE-2026-80230, CVE-2026-19931, CVE-2026-18924, CVE-2026-13608
