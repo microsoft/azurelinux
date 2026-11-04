@@ -3560,7 +3560,7 @@
           "values": [
             { "architecture": "x86_64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Retain ISO9660 support as a loadable module. The AZL4 installer's dmsquash-live initramfs build explicitly requests it via the iso9660 alias. Built-in support is not required by the reviewed installer design. See https://dev.azure.com/mariner-org/mariner/_workitems/edit/24903"
         },
         {
           "name": "CONFIG_MCTP",
