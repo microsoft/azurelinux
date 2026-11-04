@@ -3622,14 +3622,14 @@
           "values": [
             { "architecture": "x86_64", "value": "n" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep disabled: no supported server workload requires the legacy HIDDEV interface. Standard USB HID remains modular. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24914."
         },
         {
           "name": "CONFIG_USB_SERIAL_CH341",
           "values": [
             { "architecture": "x86_64", "value": "n" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep disabled: no supported server workload requires CH341 USB-to-serial support; the previous AZL3 requirement no longer applies. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24915."
         },
         {
           "name": "CONFIG_USB_TMC",
