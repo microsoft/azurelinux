@@ -1,6 +1,6 @@
 Summary:        Library to support the Advanced Forensic Format
 Name:           afflib
-Version:        3.7.20
+Version:        3.7.23
 Release:        1%{?dist}
 License:        BSD WITH advertising AND Public Domain
 Vendor:         Microsoft Corporation
@@ -121,6 +121,9 @@ cd pyaff
 %{python3_sitearch}/pyaff*
 
 %changelog
+* Tue Nov 03 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.7.23-1
+- Auto-upgrade to 3.7.23 - for CVE-2026-119601
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.7.20-1
 - Auto-upgrade to 3.7.20 - Azure Linux 3.0 - package upgrades
 
