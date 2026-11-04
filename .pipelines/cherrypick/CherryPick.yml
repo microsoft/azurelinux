@@ -22,7 +22,7 @@ jobs:
       type: linux
       isCustom: true
       name: "$(DEV_AMD64_Ubuntu_Managed)"
-    timeoutInMinutes: 15
+    timeoutInMinutes: 120
     displayName: 'Cherry-pick commit'
 
     steps:
