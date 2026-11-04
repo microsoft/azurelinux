@@ -3615,7 +3615,7 @@
             { "architecture": "x86_64", "value": "y" },
             { "architecture": "arm64", "value": "y" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep CONFIG_TUN=y for built-in TUN/TAP availability. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24913"
         },
         {
           "name": "CONFIG_USB_HIDDEV",
