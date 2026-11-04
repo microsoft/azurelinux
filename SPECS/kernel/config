@@ -6760,7 +6760,6 @@ CONFIG_HTS221_I2C=m
 # CONFIG_ISL29125 is not set
 # CONFIG_JSA1212 is not set
 # CONFIG_ROHM_BU27008 is not set
-# CONFIG_ROHM_BU27034 is not set
 # CONFIG_RPR0521 is not set
 # CONFIG_LTR501 is not set
 # CONFIG_LTRF216A is not set
@@ -6987,14 +6986,7 @@ CONFIG_DEV_DAX_PMEM=m
 CONFIG_DEV_DAX_KMEM=m
 CONFIG_NVMEM=y
 CONFIG_NVMEM_SYSFS=y
-
-#
-# Layout Types
-#
-# CONFIG_NVMEM_LAYOUT_SL28_VPD is not set
-# CONFIG_NVMEM_LAYOUT_ONIE_TLV is not set
-# end of Layout Types
-
+# CONFIG_NVMEM_LAYOUTS is not set
 # CONFIG_NVMEM_RMEM is not set
 
 #
@@ -7122,7 +7114,6 @@ CONFIG_FAT_DEFAULT_CODEPAGE=437
 CONFIG_FAT_DEFAULT_IOCHARSET="ascii"
 # CONFIG_FAT_DEFAULT_UTF8 is not set
 # CONFIG_EXFAT_FS is not set
-# CONFIG_NTFS_FS is not set
 # CONFIG_NTFS3_FS is not set
 # end of DOS/FAT/EXFAT/NT Filesystems
 
