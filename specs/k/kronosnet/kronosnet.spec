@@ -45,7 +45,7 @@
 Name: kronosnet
 Summary: Multipoint-to-Multipoint VPN daemon
 Version: 1.35
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.1-or-later
 URL: https://kronosnet.org
 Source0: https://kronosnet.org/releases/%{name}-%{version}.tar.xz
