@@ -1,1 +1,6 @@
+# Pin to Fedora f43 freerdp-3.33.0 to pick up CVE fixes from FreeRDP 3.32.2 and
+# 3.33.0 (incl. CVE-2026-109256, fixed only in 3.33.0).
+# Release notes: https://github.com/FreeRDP/FreeRDP/blob/3.33.0/ChangeLog
+# https://src.fedoraproject.org/rpms/freerdp/c/f54c6f3a7d63bdc962aa0da4af9539fbefbdaa80
 [components.freerdp]
+spec = { type = "upstream", upstream-commit = "f54c6f3a7d63bdc962aa0da4af9539fbefbdaa80" }

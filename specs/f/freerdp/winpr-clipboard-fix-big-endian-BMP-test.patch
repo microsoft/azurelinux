@@ -1,0 +1,36 @@
+From 3f06a90fec8ed1bede3d2aec9c80e623c4e17f7c Mon Sep 17 00:00:00 2001
+From: Ondrej Holy <oholy@redhat.com>
+Date: Tue, 3 Nov 2026 05:25:07 +0100
+Subject: [PATCH] [winpr,clipboard] fix big-endian BMP test
+
+Currently `test_is_plain_bmp` decodes the little-endian `BITMAPINFOHEADER`
+fields with `memcpy` into host integers, so on big-endian targets it reads
+`biSize`, `biHeight` and `biCompression` byte-swapped and rejects every valid
+BMP. Let's use the endian-aware `winpr_Data_Get_UINT32` and
+`winpr_Data_Get_INT32` helpers instead.
+
+Co-Authored-By: DeepSeek V4.1 Flash <noreply@deepseek.com>
+---
+ winpr/libwinpr/clipboard/test/TestClipboardFormats.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/winpr/libwinpr/clipboard/test/TestClipboardFormats.c b/winpr/libwinpr/clipboard/test/TestClipboardFormats.c
+index e08273a05345..8b117036fb92 100644
+--- a/winpr/libwinpr/clipboard/test/TestClipboardFormats.c
++++ b/winpr/libwinpr/clipboard/test/TestClipboardFormats.c
+@@ -424,12 +424,9 @@ static BOOL test_is_plain_bmp(const BYTE* bmp, size_t size)
+ 	if ((size < 54) || (bmp[0] != 'B') || (bmp[1] != 'M'))
+ 		return FALSE;
+ 
+-	UINT32 biSize = 0;
+-	INT32 biHeight = 0;
+-	UINT32 biCompression = 0;
+-	memcpy(&biSize, &bmp[14], sizeof(biSize));
+-	memcpy(&biHeight, &bmp[22], sizeof(biHeight));
+-	memcpy(&biCompression, &bmp[30], sizeof(biCompression));
++	const UINT32 biSize = winpr_Data_Get_UINT32(&bmp[14]);
++	const INT32 biHeight = winpr_Data_Get_INT32(&bmp[22]);
++	const UINT32 biCompression = winpr_Data_Get_UINT32(&bmp[30]);
+ 	if ((biSize != 40) || (biHeight <= 0) || (biCompression != BI_RGB))
+ 	{
+ 		test_log("not a plain bottom-up BMP: biSize=%" PRIu32 " biHeight=%" PRId32
