@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -85,6 +85,7 @@ Patch14:        CVE-2026-78659.patch
 Patch15:        CVE-2026-78663.patch
 Patch16:        CVE-2026-78669.patch
 Patch17:        CVE-2026-97032.patch
+Patch18:        remove-emudhra-ca-roots.patch
 BuildRequires:  clang
 BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
@@ -174,6 +175,10 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.7.5-23
+- Remove AAA and emSign ECC G3 from the vendored Snowflake CA bundle.
+- Preserve SSL.com trust with its independent TLS ECC Root CA 2022.
+
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-22
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78659
 
