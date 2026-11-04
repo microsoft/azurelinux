@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.96.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -144,7 +144,13 @@ sh ./configure \
     --enable-profiler \
     --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv,rustdoc,src" \
     --release-channel="stable" \
-    --release-description="Azure Linux %{version}-%{release}"
+    --release-description="Azure Linux %{version}-%{release}" \
+%ifarch x86_64
+    --target="x86_64-unknown-linux-gnu,x86_64-unknown-uefi"
+%endif
+%ifarch aarch64
+    --target="aarch64-unknown-linux-gnu,aarch64-unknown-uefi"
+%endif
 
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
@@ -222,6 +228,9 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 %{_libdir}/rustlib/src
 
 %changelog
+* TODO Chris Gunn <chrisgun@microsoft.com> - 1.96.1-3
+- TODO
+
 * Tue Sep 01 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.96.1-2
 - Add patch for CVE-2026-58051, CVE-2026-58050, CVE-2026-66034, CVE-2026-66033,
   CVE-2026-7598, CVE-2026-82251, CVE-2026-82252, CVE-2026-82253
