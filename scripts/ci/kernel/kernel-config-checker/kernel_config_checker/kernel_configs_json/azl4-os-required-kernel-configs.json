@@ -3607,7 +3607,7 @@
           "values": [
             { "architecture": "x86_64", "value": "y" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep the TDX guest attestation driver built-in so its interfaces are available without module loading. Modular operation remains supported; built-in is an AZL4 delivery choice, not a kernel dependency. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24912"
         },
         {
           "name": "CONFIG_TUN",
