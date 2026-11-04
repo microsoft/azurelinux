@@ -1,0 +1,94 @@
+#!/bin/sh
+#
+# omniNames      init file for starting up the OMNI Naming service
+#
+# chkconfig:   - 20 80
+# description: Starts and stops the OMNI Naming service
+#
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+exec="/usr/bin/omniNames"
+prog="omniNames"
+logdir="/var/log/omniORB/"
+logfile="/var/log/omniORB/error.log"
+options=" -start -always -logdir $logdir -errlog $logfile"
+
+#[ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+
+lockfile="/var/lock/subsys/omniORB-nameserver"
+
+start() {
+    [ -x $exec ] || exit 5
+    echo -n $"Starting $prog: "
+    daemon --user omniORB "$exec  $options  2>&1 &"
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && touch $lockfile
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    # run checks to determine if the service is running or use generic status
+    status $prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
+esac
+exit $?
