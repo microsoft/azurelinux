@@ -3600,7 +3600,7 @@
           "values": [
             { "architecture": "x86_64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep SEV-SNP guest attestation support enabled as a module; the original requirement discussion permits modular support. See https://dev.azure.com/mariner-org/mariner/_workitems/edit/24911"
         },
         {
           "name": "CONFIG_TDX_GUEST_DRIVER",
