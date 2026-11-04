@@ -3522,7 +3522,7 @@
             { "architecture": "x86_64", "value": "y" },
             { "architecture": "arm64", "value": "y" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep DH enabled for FIPS support; build it into the kernel to support NVMe authentication and keyring Diffie-Hellman operations - https://dev.azure.com/mariner-org/mariner/_workitems/edit/24897"
         },
         {
           "name": "CONFIG_DRM",
