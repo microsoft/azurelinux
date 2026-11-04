@@ -1,0 +1,12 @@
+[Unit]
+Description=OmniORB Naming Service
+After=syslog.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/omniNames -start -always -logdir /var/log/omniORB/ -errlog /var/log/omniORB/error.log
+User=omniORB
+Group=omniORB
+
+[Install]
+WantedBy=multi-user.target
