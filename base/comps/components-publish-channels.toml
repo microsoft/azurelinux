@@ -2281,6 +2281,7 @@ components = [
     "rocthrust",
     "roctracer",
     "rootfiles",
+    "rootlesskit",
     "rpcbind",
     "rpcsvc-proto",
     "rpm",
