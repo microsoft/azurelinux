@@ -117,6 +117,7 @@ components = [
     "binutils",
     "biosdevname",
     "bison",
+    "blake3",
     "blis",
     "blktrace",
     "blosc",
