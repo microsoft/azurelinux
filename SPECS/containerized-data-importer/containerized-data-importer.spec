@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.62.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -148,8 +148,10 @@ GOFLAGS="-buildmode=pie ${GOFLAGS}" ./hack/build/build-go.sh build \
     tools/csv-generator \
     %{nil}
 
-# Disable cgo to build static binaries, so they can run on scratch images
-CGO_ENABLED=0 ./hack/build/build-go.sh build \
+# Disable cgo and systemcrypto to build a static binary, so it can run on scratch images.
+# With Go 1.27+, CGO_ENABLED=0 alone selects the cgo-less OpenSSL backend, which needs
+# the dynamic loader and glibc at runtime.
+CGO_ENABLED=0 MS_GO_NOSYSTEMCRYPTO=1 ./hack/build/build-go.sh build \
     tools/cdi-containerimage-server \
     %{nil}
  
@@ -235,6 +237,10 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Fri Oct 23 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.62.0-10
+- Build cdi-containerimage-server with MS_GO_NOSYSTEMCRYPTO=1 so it stays
+  statically linked with Go 1.27 and can run on scratch images
+
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-9
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801
 
