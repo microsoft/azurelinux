@@ -3530,7 +3530,7 @@
             { "architecture": "x86_64", "value": "y" },
             { "architecture": "arm64", "value": "y" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "The earlier modularization in https://github.com/microsoft/azurelinux/pull/10612 supported separating in-tree AMDGPU modules to avoid out-of-tree conflicts; revisit this decision before introducing out-of-tree AMDGPU support. See https://dev.azure.com/mariner-org/mariner/_workitems/edit/24898"
         },
         {
           "name": "CONFIG_DRM_KMS_HELPER",
@@ -3538,7 +3538,7 @@
             { "architecture": "x86_64", "value": "y" },
             { "architecture": "arm64", "value": "y" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Built-in simpledrm requires built-in DRM KMS helpers. Retain consistently with the DRM disposition in Task 24898. See https://dev.azure.com/mariner-org/mariner/_workitems/edit/24899"
         },
         {
           "name": "CONFIG_DRM_VGEM",
