@@ -1211,14 +1211,14 @@
         "values": [
           {
             "architecture": "x86_64",
-            "value": "m"
+            "value": "n"
           },
           {
             "architecture": "arm64",
-            "value": "m"
+            "value": "n"
           }
         ],
-        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/56525306"
+        "justification": "Keep CONFIG_DXGKRNL disabled because the current Azure Linux 4.0 kernel source is not yet updated to support enabling it. Long-term retention of para-virtualized GPU support is pending confirmation. Track the decision in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24901"
       },
       {
         "name": "CONFIG_E1000",
@@ -3544,14 +3544,6 @@
           "name": "CONFIG_DRM_VGEM",
           "values": [
             { "architecture": "x86_64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_DXGKRNL",
-          "values": [
-            { "architecture": "x86_64", "value": "n" },
-            { "architecture": "arm64", "value": "n" }
           ],
           "justification": "Align kernel 6.18 with its generated configuration"
         },
