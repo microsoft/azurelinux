@@ -60,6 +60,7 @@ Patch24:        CVE-2026-97045.patch
 Patch25:        CVE-2026-116585.patch
 Patch26:        CVE-2026-116586.patch
 Patch27:        CVE-2026-116591.patch
+Patch28:        CVE-2026-116587.patch
 
 BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
@@ -91,8 +92,8 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-* Thu Nov 05 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.9.5-25
-- Patch for CVE-2026-97045, CVE-2026-116585, CVE-2026-116586, CVE-2026-116591
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-25
+- Patch for CVE-2026-97045, CVE-2026-116591, CVE-2026-116586, CVE-2026-116585, CVE-2026-116587
 
 * Wed Oct 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-24
 - Patch for CVE-2026-88922
