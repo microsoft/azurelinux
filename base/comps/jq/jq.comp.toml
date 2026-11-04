@@ -1,0 +1,4 @@
+[components.jq]
+# Pin Fedora's 1.8.2 update and upstreamed-patch cleanup; Fedora 43 still ships 1.8.1.
+# https://src.fedoraproject.org/rpms/jq/c/5fb34089cd978d7e112154d5501098d668a8efeb
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "5fb34089cd978d7e112154d5501098d668a8efeb" }
