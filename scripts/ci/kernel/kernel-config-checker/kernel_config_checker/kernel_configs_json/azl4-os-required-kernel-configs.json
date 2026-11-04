@@ -1953,20 +1953,6 @@
         "justification": "Needed for HCI scenarios - PR: https://github.com/microsoft/azurelinux/pull/7468"
       },
       {
-        "name": "CONFIG_MCTP",
-        "values": [
-          {
-            "architecture": "x86_64",
-            "value": "n"
-          },
-          {
-            "architecture": "arm64",
-            "value": "n"
-          }
-        ],
-        "justification": "Do not enable mctp unless fix for CVE-2023-3439 is present - PR: https://github.com/torvalds/linux/commit/b561275d633bcd8e0e8055ab86f1a13df75a0269"
-      },
-      {
         "name": "CONFIG_MELLANOX_PLATFORM",
         "values": [
           {
@@ -3561,14 +3547,6 @@
             { "architecture": "x86_64", "value": "m" }
           ],
           "justification": "Retain ISO9660 support as a loadable module. The AZL4 installer's dmsquash-live initramfs build explicitly requests it via the iso9660 alias. Built-in support is not required by the reviewed installer design. See https://dev.azure.com/mariner-org/mariner/_workitems/edit/24903"
-        },
-        {
-          "name": "CONFIG_MCTP",
-          "values": [
-            { "architecture": "x86_64", "value": "y" },
-            { "architecture": "arm64", "value": "y" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
         },
         {
           "name": "CONFIG_NFT_DUP_NETDEV",
