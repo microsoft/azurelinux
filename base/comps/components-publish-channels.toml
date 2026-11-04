@@ -2949,7 +2949,8 @@ packages = [
     # PEP-508 +extras sub-package; optional dep not in base
     "python3-sqlalchemy+aiomysql", # srpm: python-sqlalchemy
     "python3-sqlalchemy+postgresql_pg8000", # srpm: python-sqlalchemy
-    # Demote wireshark dissector plugin: wireshark itself is sdk-tier (dev/network analysis tooling, not a server runtime).
+    # Demote wireshark dissector plugins: wireshark itself is sdk-tier (dev/network analysis tooling, not a server runtime).
+    "kronosnet-wireshark", # srpm: kronosnet
     "libvirt-wireshark", # srpm: libvirt
     # Carve mpg123-plugins-jack to sdk: JACK is sdk-tier (pro-audio routing daemon, not server runtime)
     "mpg123-plugins-jack", # srpm: mpg123
