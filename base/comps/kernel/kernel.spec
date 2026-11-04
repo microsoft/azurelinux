@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 9
+%define azl_pkgrelease 10
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.43.02
 %define gdrcopy_version 2.6
@@ -1043,6 +1043,7 @@ Source6100: MLNX_OFED_SRC-%{ofa_bundle_version}-%{ofa_vendor_release}.tgz
 Source6101: mlnx-ofa_kernel.inc
 Source6102: kmod-iser.inc
 Source6103: kmod-isert.inc
+Source6105: kmod-mlnx-nfsrdma.inc
 Source6106: kmod-srp.inc
 
 ## Patches needed for building this package
@@ -1115,6 +1116,10 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name gdrcopy
 %include %{_sourcedir}/gdrcopy.inc
+
+%global _kmod_phase package
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2117,6 +2122,10 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name gdrcopy
 %include %{_sourcedir}/gdrcopy.inc
+
+%global _kmod_phase prep
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3223,6 +3232,10 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name gdrcopy
 %include %{_sourcedir}/gdrcopy.inc
 
+%global _kmod_phase build
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
+
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
 
 # Module signing (modsign)
@@ -3746,6 +3759,10 @@ popd
 %global _kmod_phase install
 %global _kmod_name gdrcopy
 %include %{_sourcedir}/gdrcopy.inc
+
+%global _kmod_phase install
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4412,8 +4429,15 @@ fi\
 %global _kmod_name gdrcopy
 %include %{_sourcedir}/gdrcopy.inc
 
+%global _kmod_phase files
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Nov 12 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.57-1.10
+- Add Mellanox NFS/RDMA kernel modules from the MLNX OFED source bundle
+
 * Thu Nov 12 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.57-1.9
 - Add GDRCopy userspace, development, service, and kernel module packages
 
