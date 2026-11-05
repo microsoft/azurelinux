@@ -3692,7 +3692,7 @@
           "values": [
             { "architecture": "arm64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Retain modular legacy PATA support, consistent with the reviewed Azure baseline. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24925"
         },
         {
           "name": "CONFIG_PCIE_EDR",
