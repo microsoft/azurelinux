@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python-pyasn1-0.6.5 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python-pyasn1/c/e7952688478c36abaacc8116b25a8ea200baf2cf
+[components.python-pyasn1]
+spec = { type = "upstream", upstream-commit = "e7952688478c36abaacc8116b25a8ea200baf2cf" }
