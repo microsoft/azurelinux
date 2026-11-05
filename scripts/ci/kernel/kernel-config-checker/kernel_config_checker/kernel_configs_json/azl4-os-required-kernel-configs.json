@@ -3643,7 +3643,7 @@
           "values": [
             { "architecture": "x86_64", "value": "y" }
           ],
-          "justification": "Retain current ubuntu baseline pending reassessment of historical DMA-zone memory usage. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24917"
+          "justification": "Retain current baseline pending reassessment of historical DMA-zone memory usage. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24917"
         },
         {
           "name": "CONFIG_ARM_SMMU_QCOM_DEBUG",
@@ -3678,14 +3678,14 @@
           "values": [
             { "architecture": "arm64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep modular on ARM64, consistent with the modular BlueField storage stack. Root-on-MMC images require the complete driver chain in the initramfs. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24923."
         },
         {
           "name": "CONFIG_MMC_DW_PLTFM",
           "values": [
             { "architecture": "arm64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep modular alongside MMC_DW on ARM64. Root-on-MMC images require the complete driver chain in the initramfs. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24924."
         },
         {
           "name": "CONFIG_PATA_LEGACY",
@@ -3728,7 +3728,7 @@
           "values": [
             { "architecture": "arm64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep optional Mellanox switch fan monitoring/control modular on ARM64. The historical disabled setting documented no prohibition; activation requires matching platform devices. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24929."
         },
         {
           "name": "CONFIG_VIRTIO_CONSOLE",
