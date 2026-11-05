@@ -1,7 +1,8 @@
-Author: Bo YU <tsu.yubo@gmail.com>, Sergei Golovan <sgolovan@debian.org>
-Description: Patch increases timeouts in elixir tests.
-Last-Modified: Fri, 31 Jan 2025 16:15:17 +0300
-Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1093147
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sergei Golovan <sgolovan@debian.org>
+Date: Fri, 31 Jan 2025 16:15:17 +0300
+Subject: [PATCH] Patch increases timeouts in elixir tests
+
 
 diff --git a/lib/elixir/test/elixir/base_test.exs b/lib/elixir/test/elixir/base_test.exs
 index aeb5f4b5c..d55d49234 100644
