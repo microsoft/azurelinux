@@ -63,6 +63,8 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Diagnose and fix overlay issues | [`azldev-overlays`](.agents/skills/azldev-overlays/SKILL.md) |
 | Test and inspect packages in mock chroot | [`azldev-mock`](.agents/skills/azldev-mock/SKILL.md) |
 | Review component for hygiene and best practices | [`azldev-comp-toml` review checklist](.agents/skills/azldev-comp-toml/SKILL.md#review-checklist) |
+| Write or review specs idiomatically (Fedora rules per ecosystem, offline) | [`rpm-packaging-idioms`](.agents/skills/rpm-packaging-idioms/SKILL.md) |
+| Review spec/packaging changes (PR or local diff) | [`spec-review`](.agents/skills/spec-review/SKILL.md) |
 | Build, boot, test, or configure images | [`azldev-image`](.agents/skills/azldev-image/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.agents/skills/skill-koji-triage/SKILL.md) |
 | Batch-triage build failures from results file | [`skill-mass-triage`](.agents/skills/skill-mass-triage/SKILL.md) |

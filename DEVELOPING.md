@@ -171,7 +171,7 @@ In addition to prompts, the repo includes **chat agents** that can be selected f
 | Agent | What it does |
 |-------|--------------|
 | `azl-diagnose` | Diagnose build failures — fetch task info/logs, identify root cause, and suggest fixes. Give it a task ID, URL, or package name. |
-| `spec-review` | Review spec files against packaging best practices and produce a structured findings report. |
+| `spec-review` | Review spec/component changes against Fedora packaging idioms and AZL traps, using the `spec-review` and `rpm-packaging-idioms` skills. |
 
 Example: select **azl-diagnose** from the dropdown, then type:
 
