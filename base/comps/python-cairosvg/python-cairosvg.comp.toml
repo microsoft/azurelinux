@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python-cairosvg-2.9.1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python-cairosvg/c/8aa391f9cefc1c73448e5ef4614b3f1f4037da91
+[components.python-cairosvg]
+spec = { type = "upstream", upstream-commit = "8aa391f9cefc1c73448e5ef4614b3f1f4037da91" }
