@@ -3664,7 +3664,7 @@
           "values": [
             { "architecture": "arm64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Retain modular FPGA AFU support; historical CVE report has unresolved reachability concerns. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24921"
         },
         {
           "name": "CONFIG_GPIO_MLXBF2",
