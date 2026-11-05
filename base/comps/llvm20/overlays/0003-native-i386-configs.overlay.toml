@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use native Azure Linux i386 names for the C and C++ driver configurations."
+type = "spec-search-replace"
+regex = 'i386-redhat-linux-gnu-clang'
+replacement = 'i386-azurelinux-linux-gnu-clang'
