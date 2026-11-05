@@ -1,0 +1,4 @@
+# Pin to Fedora f43 unbound-1.26.2 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/unbound/c/b0cab1e9f70ad2679a0f33c700f1a4ea7d6d54fe
+[components.unbound]
+spec = { type = "upstream", upstream-commit = "b0cab1e9f70ad2679a0f33c700f1a4ea7d6d54fe" }
