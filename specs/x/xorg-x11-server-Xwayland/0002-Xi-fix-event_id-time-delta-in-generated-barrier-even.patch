@@ -1,0 +1,60 @@
+From 4623c9680b1332add519ff5b1736f16f57d45233 Mon Sep 17 00:00:00 2001
+From: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date: Thu, 8 Oct 2026 17:53:59 -0700
+Subject: [PATCH xserver 2/2] Xi: fix event_id & time delta in generated
+ barrier events
+
+The fix for CVE-2026-93519 moved the updates of pbd->last_timestamp
+and pbd->barrier_event_id from after they were used to generate the
+data in events to before, causing the event_id to be one too high,
+and the time delta (ms - pbd->last_timestamp) to always be zero.
+
+This fix moves them back to being after they are used to generate
+the event data.
+
+Fixes: 1f42cc1f ("Xi: add bounds check for barrier events in input_constrain_cursor")
+Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+Part-of: <https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/2353>
+(cherry picked from commit 98aed9ddba7b42d2a46fcc1f343f4b392967b838)
+---
+ Xi/xibarriers.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Xi/xibarriers.c b/Xi/xibarriers.c
+index 8cfc67555..52bc6ecc8 100644
+--- a/Xi/xibarriers.c
++++ b/Xi/xibarriers.c
+@@ -417,7 +417,7 @@ input_constrain_cursor(DeviceIntPtr dev, ScreenPtr screen,
+     DeviceIntPtr master;
+ 
+     /* We cannot know how many events are available in *events, but
+-     * we know it all DDX very protbably allocated them with
++     * we know that all DDX very probably allocated them with
+      * GetMaximumEventsNum() and fill_pointer_events() may have added one.
+      *
+      * Let's cap at a maximum of 64 barrier events which is way more than
+@@ -517,10 +517,6 @@ input_constrain_cursor(DeviceIntPtr dev, ScreenPtr screen,
+             continue;
+ 
+         pbd->hit = FALSE;
+-        pbd->last_timestamp = ms;
+-        /* If we've left the hit box, this is the
+-         * start of a new event ID. */
+-        pbd->barrier_event_id++;
+ 
+         if (*nevents < MAX_BARRIER_EVENTS) {
+             ev.type = ET_BarrierLeave;
+@@ -542,6 +538,10 @@ input_constrain_cursor(DeviceIntPtr dev, ScreenPtr screen,
+             *nevents += 1;
+         }
+ 
++        pbd->last_timestamp = ms;
++        /* If we've left the hit box, this is the
++         * start of a new event ID. */
++        pbd->barrier_event_id++;
+     }
+ 
+  out:
+-- 
+2.56.0
+

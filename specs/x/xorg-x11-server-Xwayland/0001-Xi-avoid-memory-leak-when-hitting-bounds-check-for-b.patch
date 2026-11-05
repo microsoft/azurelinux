@@ -1,0 +1,42 @@
+From 59ae14238143dc41a05b5eb399028b167a4a9582 Mon Sep 17 00:00:00 2001
+From: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date: Thu, 8 Oct 2026 17:17:20 -0700
+Subject: [PATCH xserver 1/2] Xi: avoid memory leak when hitting bounds check
+ for barrier events
+
+The fix for CVE-2026-93519 added a bounds check for barrier events in
+CreatePointerBarrierClient() and if it's hit immediately returns
+BadAlloc.  Unfortunately it was added after `ret` was already allocated
+and before *client_out is set to `ret`, so `ret` leaks.
+
+This fix changes it to jump to the same cleanup code to free(ret)
+that the rest of the function already uses.
+
+Fixes: 1f42cc1f0 ("Xi: add bounds check for barrier events in input_constrain_cursor")
+Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+Part-of: <https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/2352>
+(cherry picked from commit 8e901e6013803a94b25020bde384dd17966564eb)
+---
+ Xi/xibarriers.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Xi/xibarriers.c b/Xi/xibarriers.c
+index aad8db752..8cfc67555 100644
+--- a/Xi/xibarriers.c
++++ b/Xi/xibarriers.c
+@@ -602,8 +602,10 @@ CreatePointerBarrierClient(ClientPtr client,
+      * function */
+     xorg_list_for_each_entry(counter, &cs->barriers, entry) {
+         nbarriers++;
+-        if (nbarriers >= 32)
+-            return BadAlloc;
++        if (nbarriers >= 32) {
++            err = BadAlloc;
++            goto error;
++        }
+     }
+ 
+     ret->screen = screen;
+-- 
+2.56.0
+
