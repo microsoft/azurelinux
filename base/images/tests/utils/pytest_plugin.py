@@ -136,6 +136,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help='Image properties as a JSON object (e.g. \'{"release-channel":"preview"}\').',
     )
     group.addoption(
+        "--image-arch",
+        choices=("x86_64", "aarch64"),
+        default=None,
+        help="Target architecture for tarball size bounds. Otherwise read from the artifact filename, not the host.",
+    )
+    group.addoption(
         "--workdir",
         default=None,
         help=("Working directory for temporary files (mounts, extractions). Defaults to a temporary directory."),

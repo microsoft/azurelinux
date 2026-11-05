@@ -1,0 +1,41 @@
+name: "Image test unit tests"
+
+on:
+  pull_request:
+    paths:
+      - "base/images/**"
+      - ".github/workflows/image-tests.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  unit:
+    name: "Image test unit tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    container:
+      image: python:3.12-slim@sha256:12316debbfb86890f6b2d825820612741ba527ad5a44e3902759141d572bfe8f
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install image-test dependencies
+        run: python -m pip install --quiet ./base/images/tests
+
+      - name: Run unit and pytest-integration tests
+        run: |
+          set -euo pipefail
+          mkdir -p base/build/work/scratch
+          python -m pytest -p no:azl_image base/images/tests/unit/ \
+            --basetemp base/build/work/scratch/image-unit-tests

@@ -67,17 +67,19 @@ uv run pytest cases/static/ \
     --capabilities machine-bootable,systemd,runtime-package-management \
     --properties '{"openssl-fips-provider":"symcrypt","release-channel":"preview"}'
 
-# Static tests — Container image
+# Static tests — x86_64 Container image
 uv run pytest cases/static/ \
     --image-path /path/to/image.oci.tar.xz \
     --image-name container-base \
+    --image-arch x86_64 \
     --capabilities container,runtime-package-management \
     --properties '{"openssl-fips-provider":"symcrypt"}'
 
-# Static tests — WSL image (plain rootfs tarball)
+# Static tests — aarch64 WSL image (plain rootfs tarball)
 uv run pytest cases/static/ \
     --image-path /path/to/image.wsl \
     --image-name wsl \
+    --image-arch aarch64 \
     --capabilities systemd,runtime-package-management \
     --properties '{"openssl-fips-provider":"symcrypt"}'
 
@@ -108,6 +110,47 @@ capability isn't in `--capabilities`.
 > Always pass `--image-name` when running manually if you want
 > image-specific tests under `cases/<image-family>/` to run. Without
 > it, every `@pytest.mark.image(...)`-tagged test is skipped.
+
+## Tarball footprint limits
+
+`cases/static/test_footprint.py` reads JSON bounds from
+`image-size-bounds.json` to perform
+a low and high threshold check for each image. The size bounds are +-10% of
+the expected size and defined per image and cpu architecture.
+`min_kib` and `max_kib` are inclusive integer limits in KiB (1 KiB = 1024 bytes).
+For example, the bounds for the x86_64 base container are defined as:
+
+```json
+{
+    "container-base": {
+        "x86_64": {"min_kib": 46168, "max_kib": 56429}
+    }
+}
+```
+
+An unlisted image or architecture is skipped. VM images and registry-reference
+sessions skip before loading the configuration. Other size checks retain their
+existing family-based upper limits.
+
+The target architecture is taken from the artifact filename (e.g.  `.x86_64-`,
+`.aarch64-`, or `-aarch64.wsl`). For renamed artifacts without an architecture
+token or pass pytest's `--image-arch x86_64` or `--image-arch aarch64`. An
+unknown architecture or a conflicting explicit option will fail. The
+configuration lists only container and WSL images as seen by `azldev image
+list`.
+
+Unit and pytest-integration coverage can run without built images or native tools:
+
+```bash
+mkdir -p ../../build/work/scratch
+uv run python -m pytest -p no:azl_image unit/ \
+    --basetemp ../../build/work/scratch/footprint-unit
+```
+
+The `Image test unit tests` GitHub Actions workflow runs this suite on changes
+under `base/images/`, including the image registry and size bounds. Integration
+cases use the real plugin and fixtures with native-tool preflight stubbed out;
+they check file sizes without extracting images.
 
 ## Prerequisites
 
