@@ -33,8 +33,8 @@
 %endif
 
 Name:           perl-DBI
-Version:        1.655
-Release: 5%{?dist}
+Version:        1.656
+Release: 6%{?dist}
 Summary:        A database access API for perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            http://dbi.perl.org/
@@ -272,6 +272,11 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon Oct 19 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1.656-1
+- 1.656 bump (rhbz#2554771)
+- Fix CVE-2026-108518 (dbi_profile crash)
+- Fix CVE-2026-111879 (lock file not removed when DBD::DBM serializer check fails)
+
 * Wed Sep 30 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1.655-1
 - 1.655 bump (rhbz#2543884)
 
