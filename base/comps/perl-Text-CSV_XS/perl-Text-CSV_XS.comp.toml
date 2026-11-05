@@ -1,0 +1,4 @@
+# Pin to Fedora f43 perl-Text-CSV_XS-1.65 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/perl-Text-CSV_XS/c/72c1c3cceae891fa94c41e51075cb49c56c37152
+[components.perl-Text-CSV_XS]
+spec = { type = "upstream", upstream-commit = "72c1c3cceae891fa94c41e51075cb49c56c37152" }
