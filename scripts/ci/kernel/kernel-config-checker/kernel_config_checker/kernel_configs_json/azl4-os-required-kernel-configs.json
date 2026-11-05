@@ -3577,7 +3577,7 @@
           "values": [
             { "architecture": "x86_64", "value": "n" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep the obsolete conntrack procfs listing disabled; connection tracking and the Netlink interface remain enabled. No supported legacy procfs consumer was identified. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24908."
         },
         {
           "name": "CONFIG_NF_CT_NETLINK_HELPER",
