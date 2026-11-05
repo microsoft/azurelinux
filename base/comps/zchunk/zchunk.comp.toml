@@ -1,0 +1,4 @@
+# Pin to Fedora f43 zchunk-1.5.5 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/zchunk/c/bb31b13c88d06898063a533378c497ad3833ebdd
+[components.zchunk]
+spec = { type = "upstream", upstream-commit = "bb31b13c88d06898063a533378c497ad3833ebdd" }

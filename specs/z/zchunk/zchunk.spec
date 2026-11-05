@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           zchunk
-Version:        1.5.4
-Release: 5%{?dist}
+Version:        1.5.5
+Release: 6%{?dist}
 Summary:        Compressed file format that allows easy deltas
 License:        BSD-2-Clause AND MIT
 URL:            https://github.com/zchunk/zchunk
@@ -87,6 +87,10 @@ install contrib/gen_xml_dictionary %{buildroot}%{_libexecdir}/zck_gen_xml_dictio
 %{_includedir}/zck.h
 
 %changelog
+* Mon Oct 26 2026 Jonathan Dieter <jonathan@dieter.ie> - 1.5.5-1
+- Update to 1.5.5
+- Fix a few more bugs
+
 * Sun Aug 02 2026 Jonathan Dieter <jonathan@dieter.ie> - 1.5.4-1
 - Update to 1.5.4
 - Fix a few memory bugs
