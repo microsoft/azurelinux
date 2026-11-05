@@ -1,0 +1,101 @@
+From a3cc4d4d29cfa80fc76b58cf62be370ded07727b Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Wed, 21 Oct 2026 21:21:50 -0700
+Subject: [PATCH] btrfs: expose read-only backing device to IPE
+
+IPE evaluates dm-verity trust through the inode superblock's s_bdev.
+Btrfs leaves this pointer unset, preventing IPE from evaluating the
+backing device's dm-verity signature trust for files on Btrfs.
+
+Publish the backing device only after successfully mounting a complete,
+non-degraded, non-seeding, single-device filesystem with both the
+filesystem and its backing device read-only. Reject missing devices and
+device replacement so the pointer represents the complete filesystem.
+
+Serialize publication with block-device freezing and reject an already
+frozen backing device. Prevent writable remounts while the pointer is
+published, and clear the borrowed pointer before Btrfs device teardown.
+
+Signed-off-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+---
+ fs/btrfs/super.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
+
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index 36bdfd774d76..ee51774b0b0d 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -82,6 +82,7 @@ static void btrfs_put_super(struct super_block *sb)
+ 	struct btrfs_fs_info *fs_info = btrfs_sb(sb);
+ 
+ 	btrfs_info(fs_info, "last unmount of filesystem %pU", fs_info->fs_devices->fsid);
++	sb->s_bdev = NULL;
+ 	close_ctree(fs_info);
+ }
+ 
+@@ -1433,6 +1434,46 @@ static struct dentry *mount_subvol(const char *subvol_name, u64 subvol_objectid,
+ 	return root;
+ }
+ 
++static int btrfs_set_sb_bdev(struct super_block *sb)
++{
++	struct btrfs_fs_info *fs_info = btrfs_sb(sb);
++	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
++	struct btrfs_device *device;
++	struct block_device *bdev;
++
++	/* A single read-only device must represent the complete filesystem. */
++	if (!sb_rdonly(sb) || btrfs_test_opt(fs_info, DEGRADED) ||
++	    fs_devices->seeding || !list_empty(&fs_devices->seed_list) ||
++	    fs_devices->num_devices != 1 || fs_devices->open_devices != 1 ||
++	    fs_devices->total_devices != 1 || fs_devices->missing_devices ||
++	    fs_devices->rw_devices || !list_is_singular(&fs_devices->devices) ||
++	    btrfs_dev_replace_is_ongoing(&fs_info->dev_replace))
++		return 0;
++
++	device = list_first_entry(&fs_devices->devices,
++				  struct btrfs_device, dev_list);
++	bdev = device->bdev;
++	if (device->fs_devices != fs_devices || device->fs_info != fs_info ||
++	    !bdev || !bdev_read_only(bdev) ||
++	    !test_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_MISSING, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_REPLACE_TGT, &device->dev_state) ||
++	    device->devid == BTRFS_DEV_REPLACE_DEVID)
++		return 0;
++
++	/* Serialize with freeze_bdev() before the superblock is published. */
++	mutex_lock(&bdev->bd_fsfreeze_mutex);
++	if (bdev->bd_fsfreeze_count) {
++		mutex_unlock(&bdev->bd_fsfreeze_mutex);
++		btrfs_err(fs_info, "cannot mount a frozen backing device");
++		return -EBUSY;
++	}
++	sb->s_bdev = bdev;
++	mutex_unlock(&bdev->bd_fsfreeze_mutex);
++	return 0;
++}
++
+ /*
+  * Find a superblock for the given device / mount point.
+  *
+@@ -1525,6 +1566,8 @@ static struct dentry *btrfs_mount_root(struct file_system_type *fs_type,
+ 					s->s_id);
+ 		btrfs_sb(s)->bdev_holder = fs_type;
+ 		error = btrfs_fill_super(s, fs_devices, data);
++		if (!error)
++			error = btrfs_set_sb_bdev(s);
+ 	}
+ 	if (!error)
+ 		error = security_sb_set_mnt_opts(s, new_sec_opts, 0, NULL);
+@@ -1812,7 +1855,8 @@ static int btrfs_remount(struct super_block *sb, int *flags, char *data)
+ 			ret = -EINVAL;
+ 			goto restore;
+ 		}
+-		if (fs_info->fs_devices->rw_devices == 0) {
++		/* Preserve the single-device backing for the lifetime of this mount. */
++		if (sb->s_bdev || fs_info->fs_devices->rw_devices == 0) {
+ 			ret = -EACCES;
+ 			goto restore;
+ 		}

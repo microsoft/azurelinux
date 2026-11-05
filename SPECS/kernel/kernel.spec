@@ -31,7 +31,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.159.1
+Version:        6.6.161.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -46,6 +46,7 @@ Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch1:         btrfs-ipe.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -439,6 +440,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Nov 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.161.1-1
+- Auto-upgrade to 6.6.161.1
+
+* Wed Oct 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 6.6.159.1-2
+- Expose immutable single-device Btrfs backing to IPE at mount time.
+
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.159.1-1
 - Auto-upgrade to 6.6.159.1
 
