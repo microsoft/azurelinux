@@ -14,18 +14,17 @@
 %global mpm prefork
 %endif
 
-%if 0%{?fedora} > 35 || 0%{?rhel} > 9
-%bcond_without pcre2
-%bcond_with pcre
-%else
-%bcond_with pcre2
-%bcond_without pcre
-%endif
+%bcond pcre2 %[0%{?fedora} > 35 || 0%{?rhel} > 9]
+%bcond pcre %{without pcre2}
+%bcond engine %[0%{?fedora} < 41 && 0%{?rhel} < 10]
+%bcond worker %[0%{?fedora} < 44 && 0%{?rhel} < 11]
+%bcond wstunnel %[0%{?fedora} < 45 && 0%{?rhel} < 11]
+%bcond libmagic %[0%{?fedora} > 44 || 0%{?rhel} > 10]
 
-%if 0%{?fedora} > 40 || 0%{?rhel} > 9
-%bcond_with engine
+%if %{with worker}
+%global mpms event prefork worker
 %else
-%bcond_without engine
+%global mpms event prefork
 %endif
 
 # Similar issue to https://bugzilla.redhat.com/show_bug.cgi?id=2043092
@@ -33,7 +32,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.68
+Version: 2.4.69
 Release: 1.2.1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -85,7 +84,7 @@ Source47: apachectl.xml
 Source48: apache-poweredby.png
 Source49: httpd.sysusers
 
-# build/scripts patches
+# Build/scripts patches
 Patch2: httpd-2.4.43-apxs.patch
 Patch3: httpd-2.4.43-deplibs.patch
 # Needed for socket activation and mod_systemd patch
@@ -95,18 +94,18 @@ Patch20: httpd-2.4.48-r1842929+.patch
 Patch21: httpd-2.4.64-mod_systemd.patch
 Patch22: httpd-2.4.53-export.patch
 Patch23: httpd-2.4.43-corelimit.patch
-Patch24: httpd-2.4.54-icons.patch
+Patch24: httpd-2.4.66-autoindex.patch
 Patch25: httpd-2.4.43-cachehardmax.patch
 Patch26: httpd-2.4.43-sslciphdefault.patch
 Patch27: httpd-2.4.64-sslprotdefault.patch
 Patch28: httpd-2.4.43-logjournal.patch
-Patch29: httpd-2.4.63-r1912477+.patch
+Patch29: httpd-2.4.69-r1912477+.patch
 Patch30: httpd-2.4.64-separate-systemd-fns.patch
+Patch31: httpd-2.4.69-r1938247+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
-Patch61: httpd-2.4.68-proxyhtml.patch
 
 # Security fixes
 # Patch200: ...
@@ -129,6 +128,9 @@ BuildRequires: pcre2-devel
 %endif
 %if %{with pcre}
 BuildRequires: pcre-devel > 5.0
+%endif
+%if %{with libmagic}
+BuildRequires: file-devel
 %endif
 BuildRequires: gnupg2
 Requires: system-logos(httpd-logo-ng)
@@ -314,10 +316,28 @@ s|@BUG_REPORT_URL@|%{bugurl}|g
    xmlto man ${f}.xml
 done
 
+sed '/^#LoadModule mpm_%{mpm}_module /s/^#//' > 00-mpm.conf < \
+    $RPM_SOURCE_DIR/00-mpm.conf
+# Remove worker MPM LoadModule from 00-mpm.conf if not built
+if echo %{mpms} | grep -q -v worker; then
+    sed -i '/^. worker MPM/,/LoadModule mpm_worker/d' 00-mpm.conf
+fi
+touch -r $RPM_SOURCE_DIR/00-mpm.conf 00-mpm.conf
+
+# Remove mod_proxy_wstunnel if not needed
+cp $RPM_SOURCE_DIR/00-proxy.conf 00-proxy.conf
+%if %{without wstunnel}
+sed -i /proxy_wstunnel_module/d 00-proxy.conf
+%endif
+touch -r $RPM_SOURCE_DIR/00-proxy.conf 00-proxy.conf
+
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa}
-: Default MPM is %{mpm}, vendor string is '%{vstring}'
+: Default MPM is %{mpm}, MPM list: %{mpms}
+: Vendor string is '%{vstring}'
 : Regex Engine: PCRE=%{with pcre} PCRE2=%{with pcre2}
 : mod_ssl ENGINE support: %{with engine}
+: mod_proxy_wstunnel built: %{with wstunnel}
+: mod_mime_libmagic built: %{with libmagic}
 
 %build
 # forcibly prevent use of bundled apr, apr-util, pcre
@@ -346,7 +366,7 @@ autoheader && autoconf || exit 1
         --datadir=%{contentdir} \
         --enable-layout=Fedora \
         --with-installbuilddir=%{_libdir}/httpd/build \
-        --enable-mpms-shared=all \
+        --enable-mpms-shared="%{mpms}" \
         --with-apr=%{_prefix} --with-apr-util=%{_prefix} \
         --enable-suexec --with-suexec \
         --enable-suexec-capabilities \
@@ -377,7 +397,14 @@ autoheader && autoconf || exit 1
         --disable-imagemap --disable-file-cache \
         --disable-http2 \
         --disable-md \
-        $*
+        --disable-dav-lock \
+%if %{without wstunnel}
+        --disable-proxy-wstunnel \
+%endif
+%if %{without libmagic}
+        --disable-mime-libmagic \
+%endif
+            $*
 
 if grep -q ac_cv_have_threadsafe_pollset=no config.log; then
    cat config.log
@@ -408,17 +435,17 @@ install -m 644 $RPM_SOURCE_DIR/README.confd \
 install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
-         00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
+         00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
          01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf \
          00-brotli.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
 
-sed -i '/^#LoadModule mpm_%{mpm}_module /s/^#//' \
-     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
-touch -r $RPM_SOURCE_DIR/00-mpm.conf \
-     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
+for f in 00-mpm.conf 00-proxy.conf; do
+    install -m 644 -p $f \
+            $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
+done
 
 # install systemd override drop directory
 # Web application packages can drop snippets into this location if
@@ -476,8 +503,7 @@ sed 's,@HTTPDBIN@,%{_sbindir}/httpd,g' $RPM_SOURCE_DIR/apachectl.sh \
 
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
-         $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/proxy \
-         $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/ssl
+         $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/proxy
 
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
@@ -673,8 +699,8 @@ for f in $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so; do
     echo PASS: Module $m is configured and loaded.
   fi
 done
-# Ensure every loaded mod_* is actually built
-mods=`grep -h ^LoadModule $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf | sed 's,.*modules/,,'`
+# Ensure every mod_* referenced from a LoadModule is actually built
+mods=`grep -Eh '^.?LoadModule' $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf | sed 's,.*modules/,,'`
 for m in $mods; do
   f=$RPM_BUILD_ROOT%{_libdir}/httpd/modules/${m}
   if ! test -x $f; then
@@ -813,7 +839,6 @@ exit $rv
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
-%attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
 %{_unitdir}/httpd-init.service
 %{_libexecdir}/httpd-ssl-pass-dialog
 %{_libexecdir}/httpd-ssl-gencerts
@@ -849,17 +874,56 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Mon Jul 06 2026 Joe Orton  <jorton@redhat.com> - 2.4.68-1.2
+* Thu Oct 01 2026 Joe Orton  <jorton@redhat.com> - 2.4.69-1
+- update to 2.4.69
+- add mod_mime_libmagic for F45+
+
+* Mon Sep 21 2026 Luboš Uhliarik <luhliari@redhat.com> - 2.4.68-8
+- Remove the ssl directory from /var/cache/httpd
+
+* Thu Sep 10 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.4.68-7
+- Rebuilt for libxml-2.5.4
+
+* Mon Aug 10 2026 Luboš Uhliarik <luhliari@redhat.com> - 2.4.68-6
+- rebuild for apr-util 1.6.5
+
+* Tue Jul 28 2026 David King <dking@redhat.com> - 2.4.68-5
+- Fix man page XML syntax
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.68-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 14 2026 Joe Orton  <jorton@redhat.com> - 2.4.68-3
+- for F45+ remove mod_proxy_wstunnel, deprecated upstream since 2.4.47
 - mod_proxy_html: fix comment handling (#2496888)
 
-* Tue Jun 09 2026 Luboš Uhliarik <luhliari@redhat.com> - 2.4.68-1
-- new version 2.4.68
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 2.4.68-2
+- Rebuilt for openssl 4.0
 
-* Wed May 06 2026 Luboš Uhliarik <luhliari@redhat.com> - 2.4.67-1
-- new version 2.4.67
+* Fri May 01 2026 Joe Orton  <jorton@redhat.com> - 2.4.66-7
+- add OpenSSL 4.0 compatibility fixes
+
+* Fri Mar 20 2026 Joe Orton  <jorton@redhat.com> - 2.4.66-6
+- stop building mod_dav_lock
+
+* Tue Mar 03 2026 Tom Callaway <spot@fedoraproject.org> - 2.4.66-5
+- rebuild for lua 5.5
+
+* Tue Feb 03 2026 Joe Orton  <jorton@redhat.com> - 2.4.66-4
+- autoindex.conf: disable Indexes for /icons/ by default
+
+* Tue Jan 27 2026 Joe Orton  <jorton@redhat.com> - 2.4.66-3
+- disable worker mpm for Fedora > 43
+- autoindex.conf: add Charset=UTF-8 to default IndexOptions
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.66-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Tue Dec 09 2025 Luboš Uhliarik <luhliari@redhat.com> - 2.4.66-1
 - new version 2.4.66
+
+* Thu Nov 27 2025 Luboš Uhliarik <luhliari@redhat.com> - 2.4.65-5
+- Improve default httpd LogFormats for better support diagnostics
 
 * Wed Nov 12 2025 Luboš Uhliarik <luhliari@redhat.com> - 2.4.65-3
 - mod_ssl: SSLVHostSNIPolicy - Fix handling of STRICT mode

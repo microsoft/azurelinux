@@ -1,8 +1,11 @@
+commit e0f4a3f3a4df87f89c04010883a9ed908e07e617
+Author: rpm-build <rpm-build>
+Date:   Thu Oct 1 14:30:24 2026 +0100
 
-Upstream-Status: in trunk, not proposed for 2.4.x
+    Backport state_dir feature.
 
 diff --git a/Makefile.in b/Makefile.in
-index 6747aea..40c7076 100644
+index 72154f7..95de9ef 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -233,6 +233,7 @@ install-cgi:
@@ -14,7 +17,7 @@ index 6747aea..40c7076 100644
  		file=apachecore.$$ext; \
  		if test -f $$file; then \
 diff --git a/acinclude.m4 b/acinclude.m4
-index b6ef442..98f1441 100644
+index 70d6c18..05abe18 100644
 --- a/acinclude.m4
 +++ b/acinclude.m4
 @@ -45,6 +45,7 @@ AC_DEFUN([APACHE_GEN_CONFIG_VARS],[
@@ -25,7 +28,7 @@ index b6ef442..98f1441 100644
    APACHE_SUBST(other_targets)
    APACHE_SUBST(progname)
    APACHE_SUBST(prefix)
-@@ -665,6 +666,7 @@ AC_DEFUN([APACHE_EXPORT_ARGUMENTS],[
+@@ -671,6 +672,7 @@ AC_DEFUN([APACHE_EXPORT_ARGUMENTS],[
    APACHE_SUBST_EXPANDED_ARG(runtimedir)
    APACHE_SUBST_EXPANDED_ARG(logfiledir)
    APACHE_SUBST_EXPANDED_ARG(proxycachedir)
@@ -34,7 +37,7 @@ index b6ef442..98f1441 100644
  
  dnl 
 diff --git a/configure.in b/configure.in
-index 37346b2..f303784 100644
+index b3f2adc..b711352 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -41,7 +41,7 @@ dnl Something seems broken here.
@@ -59,7 +62,7 @@ index 2b4a70c..e076f41 100644
  
  #endif /* AP_CONFIG_LAYOUT_H */
 diff --git a/include/http_config.h b/include/http_config.h
-index 77657ae..384a90f 100644
+index 8359eb1..5351bf3 100644
 --- a/include/http_config.h
 +++ b/include/http_config.h
 @@ -757,6 +757,14 @@ AP_DECLARE(char *) ap_server_root_relative(apr_pool_t *p, const char *fname);
@@ -77,60 +80,11 @@ index 77657ae..384a90f 100644
  /* Finally, the hook for dynamically loading modules in... */
  
  /**
-diff --git a/modules/dav/fs/mod_dav_fs.c b/modules/dav/fs/mod_dav_fs.c
-index addfd7e..2389f8f 100644
---- a/modules/dav/fs/mod_dav_fs.c
-+++ b/modules/dav/fs/mod_dav_fs.c
-@@ -29,6 +29,10 @@ typedef struct {
- 
- extern module AP_MODULE_DECLARE_DATA dav_fs_module;
- 
-+#ifndef DEFAULT_DAV_LOCKDB
-+#define DEFAULT_DAV_LOCKDB "davlockdb"
-+#endif
-+
- const char *dav_get_lockdb_path(const request_rec *r)
- {
-     dav_fs_server_conf *conf;
-@@ -57,6 +61,24 @@ static void *dav_fs_merge_server_config(apr_pool_t *p,
-     return newconf;
- }
- 
-+static apr_status_t dav_fs_post_config(apr_pool_t *p, apr_pool_t *plog,
-+                                       apr_pool_t *ptemp, server_rec *base_server)
-+{
-+    server_rec *s;
-+
-+    for (s = base_server; s; s = s->next) {
-+        dav_fs_server_conf *conf;
-+
-+        conf = ap_get_module_config(s->module_config, &dav_fs_module);
-+
-+        if (!conf->lockdb_path) {
-+            conf->lockdb_path = ap_state_dir_relative(p, DEFAULT_DAV_LOCKDB);
-+        }
-+    }
-+
-+    return OK;
-+}
-+
- /*
-  * Command handler for the DAVLockDB directive, which is TAKE1
-  */
-@@ -87,6 +109,8 @@ static const command_rec dav_fs_cmds[] =
- 
- static void register_hooks(apr_pool_t *p)
- {
-+    ap_hook_post_config(dav_fs_post_config, NULL, NULL, APR_HOOK_MIDDLE);
-+
-     dav_hook_gather_propsets(dav_fs_gather_propsets, NULL, NULL,
-                              APR_HOOK_MIDDLE);
-     dav_hook_find_liveprop(dav_fs_find_liveprop, NULL, NULL, APR_HOOK_MIDDLE);
 diff --git a/server/core.c b/server/core.c
-index d135764..c2176b9 100644
+index df270b0..192e839 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -142,6 +142,8 @@ AP_DECLARE_DATA int ap_main_state = AP_SQ_MS_INITIAL_STARTUP;
+@@ -150,6 +150,8 @@ AP_DECLARE_DATA int ap_main_state = AP_SQ_MS_INITIAL_STARTUP;
  AP_DECLARE_DATA int ap_run_mode = AP_SQ_RM_UNKNOWN;
  AP_DECLARE_DATA int ap_config_generation = 0;
  
@@ -139,7 +93,7 @@ index d135764..c2176b9 100644
  static void *create_core_dir_config(apr_pool_t *a, char *dir)
  {
      core_dir_config *conf;
-@@ -1444,13 +1446,16 @@ AP_DECLARE(const char *) ap_resolve_env(apr_pool_t *p, const char * word)
+@@ -1465,13 +1467,16 @@ AP_DECLARE(const char *) ap_resolve_env(apr_pool_t *p, const char * word)
      return res_buf;
  }
  
@@ -158,7 +112,7 @@ index d135764..c2176b9 100644
  }
  
  /*
-@@ -3220,6 +3225,24 @@ static const char *set_runtime_dir(cmd_parms *cmd, void *dummy, const char *arg)
+@@ -3249,6 +3254,24 @@ static const char *set_runtime_dir(cmd_parms *cmd, void *dummy, const char *arg)
      return NULL;
  }
  
@@ -183,7 +137,7 @@ index d135764..c2176b9 100644
  static const char *set_timeout(cmd_parms *cmd, void *dummy, const char *arg)
  {
      const char *err = ap_check_cmd_context(cmd, NOT_IN_DIR_CONTEXT);
-@@ -4521,6 +4544,8 @@ AP_INIT_TAKE1("ServerRoot", set_server_root, NULL, RSRC_CONF | EXEC_ON_READ,
+@@ -4582,6 +4605,8 @@ AP_INIT_TAKE1("ServerRoot", set_server_root, NULL, RSRC_CONF | EXEC_ON_READ,
    "Common directory of server-related files (logs, confs, etc.)"),
  AP_INIT_TAKE1("DefaultRuntimeDir", set_runtime_dir, NULL, RSRC_CONF | EXEC_ON_READ,
    "Common directory for run-time files (shared memory, locks, etc.)"),
@@ -192,7 +146,7 @@ index d135764..c2176b9 100644
  AP_INIT_TAKE1("ErrorLog", set_server_string_slot,
    (void *)APR_OFFSETOF(server_rec, error_fname), RSRC_CONF,
    "The filename of the error log"),
-@@ -5055,8 +5080,7 @@ static int core_pre_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptem
+@@ -5119,8 +5144,7 @@ static int core_pre_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptem
  
      if (!saved_server_config_defines)
          init_config_defines(pconf);
@@ -202,7 +156,7 @@ index d135764..c2176b9 100644
  
      ap_regcomp_set_default_cflags(AP_REG_DEFAULT);
  
-@@ -5303,6 +5327,27 @@ AP_DECLARE(int) ap_state_query(int query)
+@@ -5397,6 +5421,27 @@ AP_DECLARE(int) ap_state_query(int query)
      }
  }
  
