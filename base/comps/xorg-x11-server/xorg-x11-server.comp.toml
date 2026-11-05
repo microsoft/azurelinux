@@ -1,0 +1,4 @@
+# Pin to Fedora f43 xorg-x11-server-21.1.25 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/xorg-x11-server/c/ea410ca3fd8e942fee979ea556aa2f7e0220c55a
+[components.xorg-x11-server]
+spec = { type = "upstream", upstream-commit = "ea410ca3fd8e942fee979ea556aa2f7e0220c55a" }
