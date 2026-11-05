@@ -14,9 +14,9 @@ diff --git a/pcre2-config.in b/pcre2-config.in
 index 932160e..dbef5e5 100644
 --- a/pcre2-config.in
 +++ b/pcre2-config.in
-@@ -28,19 +28,7 @@ if test $# -eq 0; then
+@@ -28,29 +28,7 @@ if test $# -eq 0; then
  fi
- 
+
  libR=
 -case `uname -s` in
 -  *SunOS*)
@@ -28,12 +28,22 @@ index 932160e..dbef5e5 100644
 -esac
 -
  libS=
--if test @libdir@ != /usr/lib ; then
--  libS=-L@libdir@
--fi
- 
+-case "@libdir@" in
+-  # system locations on Linux, no -L needed
+-  /usr/lib|/usr/lib32|/usr/lib64|/usr/lib/*-gnu*)
+-  ;;
+-  /lib|/lib32|/lib64|/lib/*-gnu*)
+-  ;;
+-  # system locations on AIX and Solaris, no -L needed
+-  /usr/lib/64|/usr/lib/amd*|/usr/lib/sparc*|/usr/lib/ppc*)
+-  ;;
+-  *)
+-  libS="-L@libdir@"
+-  ;;
+-esac
+
  while test $# -gt 0; do
    case "$1" in
--- 
+--
 2.1.0
 
