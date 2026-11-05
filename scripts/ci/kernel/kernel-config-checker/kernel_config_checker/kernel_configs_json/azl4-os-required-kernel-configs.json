@@ -3707,7 +3707,7 @@
           "values": [
             { "architecture": "arm64", "value": "y" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Retain PCI peer-to-peer DMA support, consistent with the reviewed Azure baseline. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24926"
         },
         {
           "name": "CONFIG_PHY_RTK_RTD_USB2PHY",
