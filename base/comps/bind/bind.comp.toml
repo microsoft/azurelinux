@@ -1,0 +1,4 @@
+# Pin to Fedora f43 bind-9.18.51 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/bind/c/eeca975d205f2f753f6939f43a8cfbdef80eba32
+[components.bind]
+spec = { type = "upstream", upstream-commit = "eeca975d205f2f753f6939f43a8cfbdef80eba32" }

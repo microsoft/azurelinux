@@ -48,6 +48,11 @@
 %global        upstream_sources 0 2
 %global        pgp_signature_sources 2
 
+%global        git_commit d0a87358dad598e830664c78349c31cd0eafacbc
+%global        git_short %{sub %git_commit 1 8}
+# git log --format=%ai -1 $COMMIT | tr -d - | cut -d' ' -f1
+%global        git_date 20261003
+
 ## The order of libs is important. See lib/Makefile.in for details
 %define bind_export_libs isc dns isccfg irs
 %{!?_export_dir:%global _export_dir /bind9-export/}
@@ -63,6 +68,10 @@
 
 # Upstream package name
 %global upname bind
+
+# Used on shared libraries, snapshot adds -dev suffix
+%global lib_version 9.18.51
+
 # Epoch is intentionally missing from Provides to be lower than bind package
 %define upname_compat() \
 %if "%{name}" != "%{upname}" \
@@ -90,14 +99,15 @@ License:  MPL-2.0 AND ISC AND MIT AND BSD-3-Clause AND BSD-2-Clause
 #
 # Before rebasing bind, ensure bind-dyndb-ldap is ready to be rebuild and use side-tag with it.
 # Updating just bind will cause freeipa-dns-server package to be uninstallable.
-Version:  9.18.50
-Release: 6%{?dist}
+Version:  %{lib_version}^git%{git_date}.%{git_short}
+Release: 7%{?dist}
 Epoch:    32
 Url:      https://www.isc.org/downloads/bind/
 #
-Source0:  https://downloads.isc.org/isc/bind9/%{version}/%{upname}-%{version}.tar.xz
+%dnl Source0:  https://downloads.isc.org/isc/bind9/%{version}/%{upname}-%{version}.tar.xz
+Source0:  https://gitlab.isc.org/isc-projects/bind9/-/archive/%{git_commit}/bind9-%{git_commit}.tar.bz2
 Source1:  named.sysconfig
-Source2:  https://downloads.isc.org/isc/bind9/%{version}/%{upname}-%{version}.tar.xz.asc
+%dnl Source2:  https://downloads.isc.org/isc/bind9/%{version}/%{upname}-%{version}.tar.xz.asc
 Source3:  named.logrotate
 Source4:  https://www.isc.org/docs/isc-keyblock.asc
 Source16: named.conf
@@ -147,31 +157,8 @@ Patch32: bind-9.18-partial-additional-records.patch
 Patch33: bind-9.18-dig-idn-input-always.patch
 # downstream only too
 Patch34: bind-9.18-dig-idn-input-always-test.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/4fd0755bdd08471f74e6e4c76cd2326f356e0a61
-# https://gitlab.isc.org/isc-projects/bind9/-/work_items/5856
-Patch36: bind-9.18-CVE-2026-11331.patch
-Patch37: bind-9.18-CVE-2026-11331-test.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/c5d2fc706ca3635d9928c1cc68db73bffb35d772
-Patch38: bind-9.18-CVE-2026-10822.patch
-Patch40: bind-9.18-CVE-2026-10822-test.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/5a0cef5bdb077df73fa59504efb8ca4c8b0a84c5
-Patch41: bind-9.18-CVE-2026-12617.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/26437be900c68bbe0974ec9ab804c2894c19c419
-Patch42: bind-9.18-CVE-2026-12617-test.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/14d23a4955c62efe974266a8e96a8c5d7caad040
-Patch43: bind-9.18-CVE-2026-11622.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/58812f64bf14b3930f5bb90a2d0e1f59bc8260b4
-Patch44: bind-9.18-CVE-2026-11721.patch
-Patch45: bind-9.18-CVE-2026-11721-test.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/348fd47f7636f610a39ba98427fcacab8e62389b
-Patch46: bind-9.18-CVE-2026-10723.patch
-Patch47: bind-9.18-CVE-2026-10723-test.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/b9ff2c9a36bb678fd1393d4f932b35a6882cd2a8
-Patch48: bind-9.18-CVE-2026-13204.patch
-Patch49: bind-9.18-CVE-2026-13204-test.patch
-# https://gitlab.isc.org/isc-projects/bind9/commit/36f3d50f9c8ebc8d25ee033e707ca502e20b083f
-Patch50: bind-9.18-CVE-2026-13321.patch
-Patch51: bind-9.18-CVE-2026-13321-test.patch
+# Downstream only, required on very long build paths.
+Patch37: bind-9.18-d-unittest-dnstap-relative.patch
 
 %{?systemd_ordering}
 # https://fedoraproject.org/wiki/Changes/RPMSuportForSystemdSysusers
@@ -364,11 +351,12 @@ in HTML and PDF format.
 %endif
 
 %prep
-%if 0%{?fedora}
+# no signatures for git snapshots
+%if 0%{?fedora} && 0%{?!git_date:1}
 # RHEL does not yet support this verification
 %{gpgverify} --keyring='%{SOURCE4}' --signature='%{SOURCE2}' --data='%{SOURCE0}'
 %endif
-%autosetup -n %{upname}-%{version} -p1
+%autosetup -n bind9-%{git_commit} -p1
 
 # Sparc and s390 arches need to use -fPIE
 %ifarch sparcv9 sparc64 s390 s390x
@@ -852,13 +840,13 @@ fi;
 %dir /run/named
 
 %files libs
-%{_libdir}/libbind9-%{version}*.so
-%{_libdir}/libisccc-%{version}*.so
-%{_libdir}/libns-%{version}*.so
-%{_libdir}/libdns-%{version}*.so
-%{_libdir}/libirs-%{version}*.so
-%{_libdir}/libisc-%{version}*.so
-%{_libdir}/libisccfg-%{version}*.so
+%{_libdir}/libbind9-%{lib_version}*.so
+%{_libdir}/libisccc-%{lib_version}*.so
+%{_libdir}/libns-%{lib_version}*.so
+%{_libdir}/libdns-%{lib_version}*.so
+%{_libdir}/libirs-%{lib_version}*.so
+%{_libdir}/libisc-%{lib_version}*.so
+%{_libdir}/libisccfg-%{lib_version}*.so
 %{!?_licensedir:%global license %%doc}
 %license COPYRIGHT
 

@@ -1,0 +1,29 @@
+From d336eae0a45dc789627495c2e2e66dfd4d4f150a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Thu, 8 Oct 2026 20:22:02 +0200
+Subject: [PATCH] Use relative paths in dnstap socket name
+
+Sockets in sun_path are limited to shorter path. If the used path is too
+long, test will always fail. Use relative path only, do not depend on
+length of the parent directory.
+---
+ tests/dns/dnstap_test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/dns/dnstap_test.c b/tests/dns/dnstap_test.c
+index b153ba7..c01bea7 100644
+--- a/tests/dns/dnstap_test.c
++++ b/tests/dns/dnstap_test.c
+@@ -39,7 +39,8 @@
+ #include <tests/dns.h>
+ 
+ #define TAPFILE TESTS_DIR "/testdata/dnstap/dnstap.file"
+-#define TAPSOCK TESTS_DIR "/testdata/dnstap/dnstap.sock"
++/* Use relative path to work in long directory builds */
++#define TAPSOCK "testdata/dnstap/dnstap.sock"
+ 
+ #define TAPSAVED TESTS_DIR "/testdata/dnstap/dnstap.saved"
+ #define TAPTEXT	 TESTS_DIR "/testdata/dnstap/dnstap.text"
+-- 
+2.56.0
+
