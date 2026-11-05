@@ -1,0 +1,4 @@
+# Pin to Fedora f43 libinstpatch-1.1.8 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libinstpatch/c/d1a941aa3510484030fd633ac2324b42936b3b89
+[components.libinstpatch]
+spec = { type = "upstream", upstream-commit = "d1a941aa3510484030fd633ac2324b42936b3b89" }
