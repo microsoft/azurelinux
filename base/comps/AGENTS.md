@@ -10,6 +10,37 @@
 - Adding a component to `[component-groups.base-packages].components` routes its **next build** to Base; it does not republish existing RPMs or change its build fingerprint. Every addition must enter the build set in the same change. For an otherwise unchanged component, run `azldev comp update -p <name> --bump`, then finalize locks and rendered specs using the update-component workflow. Plain `update` without `--bump` is insufficient. For `release.calculation = "manual"`, also advance the release in the component's source/config and verify the final rendered release. Verify `azldev comp changed --from <base-ref> --to HEAD -p <name> -q -O json` reports `added` or `changed`, not merely `sourcesChange`. See [Package publishing channels](../../DEVELOPING.md#package-publishing-channels).
 - When removing a component, also remove it from `[component-groups.base-packages].components` and remove matching `# srpm: <name>` package exceptions in `components-publish-channels.toml`; then check image definitions, `comps.xml`, and dependants.
 
+## FMF tests
+
+- Put `.fmf/version` at the component root and keep test sources under `<component>/tests/`. Set `render.skip-file-filter = true` in the component config so rendering retains the FMF tree, including `.fmf/version`, plans, scripts, and helpers.
+- Re-render after source edits. Lint and execute from `specs/<first-char>/<component>/`, the rendered FMF root: rendered output is the ground truth, and source-only tests do not count as validation.
+- Run full `tmt tests lint` and `tmt plans lint` against each rendered tree. Do not hide warnings with `--failed-only`.
+- Use `azldev comp test <component>` with `--source-dir` pointing at the rendered FMF root and repeated `--rpm` flags for candidate packages. The repository suite uses `/tests/plans` to discover all tests.
+- Run `--provision local` only inside a disposable Azure Linux 4 container, as a non-root user with container-only passwordless sudo. Tests modify packages, users, services, and system configuration.
+- Mount the checkout and candidate RPMs read-only. Expose only a task-specific writable artifacts directory under `base/build/work/scratch/`. Never use privileged containers, host PID/network namespaces, or host system-directory mounts.
+- Report service, boot, and kernel-policy failures explicitly; containers cannot fully validate those checks. Do not weaken tests or expose host resources to make them pass.
+
+Redirect azldev's project outputs into the container's writable artifacts mount.
+For example, save `/artifacts/container.toml` inside the container:
+
+```toml
+[project]
+log-dir = "/artifacts/logs"
+work-dir = "/artifacts/work"
+output-dir = "/artifacts/out"
+```
+
+Then run from the rendered tree:
+
+```bash
+azldev -C /workspace --config-file /artifacts/container.toml \
+  comp test azurelinux-repos --provision local \
+  --source-dir /workspace/specs/a/azurelinux-repos \
+  --rpm /candidates/azurelinux-repos.rpm \
+  --rpm /candidates/azurelinux-gpg-keys.rpm \
+  --work-dir /artifacts/azurelinux-repos
+```
+
 ## Skills
 
 - Adding a new component → [`azldev-add-component`](../../.agents/skills/azldev-add-component/SKILL.md)

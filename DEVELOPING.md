@@ -46,6 +46,23 @@ The `specs/` directory (as specified by `rendered-specs-dir` config) contains "r
 
 They can be updated at any time by running `azldev component render -a`, or a single component can be rendered with `azldev component render <name>`.
 
+## Component FMF tests
+
+Put `.fmf/version` at `base/comps/<component>/.fmf/version` and keep test sources
+under `base/comps/<component>/tests/`. Re-render before linting or running tests.
+Use `specs/<first-char>/<component>/` as the FMF root; rendered output is the ground truth.
+For example:
+
+```bash
+azldev comp render -p azurelinux-repos
+```
+
+Run tests with `azldev comp test`, pointing `--source-dir` at the rendered component
+root and supplying candidate RPMs with repeated `--rpm` flags.
+Use `--provision local` **only inside a disposable Azure Linux 4 container**,
+never on the development host. See the [component agent guide](base/comps/AGENTS.md#fmf-tests)
+for rendering, linting, and container setup details.
+
 ## Package publishing channels
 
 [`base/comps/components-publish-channels.toml`](base/comps/components-publish-channels.toml)

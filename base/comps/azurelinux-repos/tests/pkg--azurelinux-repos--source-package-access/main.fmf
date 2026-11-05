@@ -1,0 +1,14 @@
+summary: Verify source repository opt-in
+description: >-
+  Opt in to source RPM content without persistently enabling source repositories
+test: ./test.sh
+duration: 5m
+require+:
+- dnf5
+- createrepo_c
+- rpm-build
+- sudo
+- shadow-utils
+- util-linux
+extra-azurelinux-test:
+  scenario: pkg:azurelinux-repos/source-package-access

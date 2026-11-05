@@ -1,0 +1,15 @@
+summary: Verify preview repository opt-in
+description: >-
+  Opt in to a disabled Azure Linux Preview Base repository for one DNF5 operation
+test: ./test.sh
+duration: 5m
+require+:
+- dnf5
+- sudo
+- shadow-utils
+- util-linux
+- gawk
+- grep
+- coreutils
+extra-azurelinux-test:
+  scenario: pkg:azurelinux-repos/preview-package-access

@@ -1,2 +1,11 @@
 [components.azurelinux-repos]
 spec = { type = "local", path = "azurelinux-repos.spec" }
+# Preserve FMF tests as runnable rendered inputs even though the RPM spec does not reference them.
+render.skip-file-filter = true
+tests.tests = [{ name = "azurelinux-repos" }]
+
+[tests.azurelinux-repos]
+type = "tmt"
+description = "Repository configuration and package access tests"
+kind = "functional"
+tmt.plan = "/tests/plans"

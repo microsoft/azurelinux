@@ -1,0 +1,4 @@
+require:
+- dnf5
+- createrepo_c
+- rpm-build

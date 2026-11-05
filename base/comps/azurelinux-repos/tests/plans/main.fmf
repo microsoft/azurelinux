@@ -1,0 +1,7 @@
+"/":
+  inherit: false
+summary: Azure Linux repository configuration tests
+discover:
+  how: fmf
+execute:
+  how: tmt

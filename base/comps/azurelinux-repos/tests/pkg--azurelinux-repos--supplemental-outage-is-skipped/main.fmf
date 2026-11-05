@@ -1,0 +1,11 @@
+summary: Verify supplemental outages are skipped
+description: >-
+  Continue when a supplemental repository is unavailable
+test: ./test.sh
+duration: 5m
+require+:
+- dnf5
+- createrepo_c
+- rpm-build
+extra-azurelinux-test:
+  scenario: pkg:azurelinux-repos/supplemental-outage-is-skipped
