@@ -1,0 +1,4 @@
+# Pin to Fedora rawhide lldpd-1.0.22 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/lldpd/c/b7ac9c5f16bf52e758d2894471a6a493d7d66679
+[components.lldpd]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "b7ac9c5f16bf52e758d2894471a6a493d7d66679" }

@@ -1,0 +1,28 @@
+From 95ee70d0b87dc81430f7b0891f08e5e232012c57 Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Wed, 14 Oct 2026 10:19:30 -0400
+Subject: [PATCH] include: add [us]128 to linux/types.h
+
+This corresponds to kernel commit 224d80c584d3016cb8d83d1c33914fdd3508aa8c.
+---
+ include/linux/types.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/linux/types.h b/include/linux/types.h
+index 999cb0f..b001eef 100644
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -8,6 +8,10 @@
+ 
+ #include <linux/posix_types.h>
+ 
++#ifdef __SIZEOF_INT128__
++typedef __signed__ __int128 __s128 __attribute__((aligned(16)));
++typedef unsigned __int128 __u128 __attribute__((aligned(16)));
++#endif
+ 
+ /*
+  * Below are truly Linux-specific types that should never collide with
+-- 
+2.56.0
+
