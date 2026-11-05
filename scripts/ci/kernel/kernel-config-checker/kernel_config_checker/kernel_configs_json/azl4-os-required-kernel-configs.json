@@ -3650,7 +3650,7 @@
           "values": [
             { "architecture": "arm64", "value": "n" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Qualcomm SMMU support remains enabled; additional fault diagnostics are not currently required. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24918"
         },
         {
           "name": "CONFIG_DMABUF_MOVE_NOTIFY",
