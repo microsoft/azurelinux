@@ -1,0 +1,4 @@
+# Pin to Fedora f43 nginx-1.30.6 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/nginx/c/6ebadb853abcd63dcd144ee6068757317ac0639c
+[components.nginx]
+spec = { type = "upstream", upstream-commit = "6ebadb853abcd63dcd144ee6068757317ac0639c" }
