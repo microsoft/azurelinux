@@ -3714,14 +3714,14 @@
           "values": [
             { "architecture": "arm64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Retain modular Realtek RTD USB PHY support; replacement drivers are available in 6.18. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24927"
         },
         {
           "name": "CONFIG_PHY_RTK_RTD_USB3PHY",
           "values": [
             { "architecture": "arm64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Retain modular Realtek RTD USB PHY support; replacement drivers are available in 6.18. Tracking: https://dev.azure.com/mariner-org/mariner/_workitems/edit/24928"
         },
         {
           "name": "CONFIG_SENSORS_MLXREG_FAN",
