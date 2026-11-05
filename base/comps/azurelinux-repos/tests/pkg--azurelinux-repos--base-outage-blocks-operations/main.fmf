@@ -1,0 +1,9 @@
+summary: Surface an unavailable Base repository
+test: ./test.sh
+duration: 5m
+require+:
+- dnf5
+- createrepo_c
+- rpm-build
+extra-azurelinux-test:
+  scenario: pkg:azurelinux-repos/base-outage-blocks-operations

@@ -1,0 +1,13 @@
+summary: Verify debuginfo repository opt-in
+description: >-
+  Install matching Bash debug symbols through a one-command debuginfo repository
+  opt-in
+test: ./test.sh
+duration: 5m
+require+:
+- dnf5
+- createrepo_c
+- rpm-build
+- sudo
+extra-azurelinux-test:
+  scenario: pkg:azurelinux-repos/debug-symbol-access

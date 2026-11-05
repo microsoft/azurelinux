@@ -1,0 +1,12 @@
+summary: Verify unsigned packages are rejected
+description: >-
+  Reject an unsigned package through the shipped Azure Linux repository configuration
+test: ./test.sh
+duration: 5m
+require+:
+- azurelinux-repos
+- dnf5
+- createrepo_c
+- rpm-build
+extra-azurelinux-test:
+  scenario: pkg:azurelinux-repos/reject-untrusted-packages

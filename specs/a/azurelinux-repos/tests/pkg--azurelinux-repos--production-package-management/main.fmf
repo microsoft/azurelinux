@@ -1,0 +1,11 @@
+summary: Verify production package management
+description: >-
+  Manage signed packages through the three production repositories
+test: ./test.sh
+duration: 10m
+require+:
+- dnf5
+- rpm
+- sudo
+extra-azurelinux-test:
+  scenario: pkg:azurelinux-repos/production-package-management
