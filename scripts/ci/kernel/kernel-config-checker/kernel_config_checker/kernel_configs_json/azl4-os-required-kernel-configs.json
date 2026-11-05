@@ -3671,7 +3671,7 @@
           "values": [
             { "architecture": "arm64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Keep BlueField-2 GPIO support modular; no built-in-only requirement was identified. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24922."
         },
         {
           "name": "CONFIG_MMC_DW",
