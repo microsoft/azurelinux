@@ -1,7 +1,7 @@
-diff -rupN --no-dereference tesseract-5.5.3/CMakeLists.txt tesseract-5.5.3-new/CMakeLists.txt
---- tesseract-5.5.3/CMakeLists.txt	2026-07-24 20:27:02.000000000 +0200
-+++ tesseract-5.5.3-new/CMakeLists.txt	2026-09-21 10:28:10.106430166 +0200
-@@ -379,7 +379,7 @@ elseif(UNIX)
+diff -rupN --no-dereference tesseract-5.5.4/CMakeLists.txt tesseract-5.5.4-new/CMakeLists.txt
+--- tesseract-5.5.4/CMakeLists.txt	2026-10-28 12:14:49.000000000 +0100
++++ tesseract-5.5.4-new/CMakeLists.txt	2026-10-28 17:04:14.387760464 +0100
+@@ -380,7 +380,7 @@ elseif(UNIX)
      set(LIB_pthread pthread)
    endif()
  elseif(WIN32)
@@ -10,7 +10,7 @@ diff -rupN --no-dereference tesseract-5.5.3/CMakeLists.txt tesseract-5.5.3-new/C
  endif()
  
  add_definitions("-DCMAKE_BUILD")
-@@ -827,12 +827,17 @@ set_target_properties(
+@@ -829,12 +829,17 @@ set_target_properties(
    libtesseract PROPERTIES SOVERSION
                            ${VERSION_MAJOR}.${VERSION_MINOR})
  
@@ -34,7 +34,7 @@ diff -rupN --no-dereference tesseract-5.5.3/CMakeLists.txt tesseract-5.5.3-new/C
  
  target_link_libraries(libtesseract PUBLIC ${Leptonica_LIBRARIES})
    export(
-@@ -951,9 +956,9 @@ install(
+@@ -966,9 +971,9 @@ install(
  
  if(INSTALL_CONFIGS)
    install(FILES ${TESSERACT_CONFIGS}
@@ -46,9 +46,9 @@ diff -rupN --no-dereference tesseract-5.5.3/CMakeLists.txt tesseract-5.5.3-new/C
  endif()
  
  # ##############################################################################
-diff -rupN --no-dereference tesseract-5.5.3/src/training/CMakeLists.txt tesseract-5.5.3-new/src/training/CMakeLists.txt
---- tesseract-5.5.3/src/training/CMakeLists.txt	2026-07-24 20:27:02.000000000 +0200
-+++ tesseract-5.5.3-new/src/training/CMakeLists.txt	2026-09-21 10:28:10.106840650 +0200
+diff -rupN --no-dereference tesseract-5.5.4/src/training/CMakeLists.txt tesseract-5.5.4-new/src/training/CMakeLists.txt
+--- tesseract-5.5.4/src/training/CMakeLists.txt	2026-10-28 12:14:49.000000000 +0100
++++ tesseract-5.5.4-new/src/training/CMakeLists.txt	2026-10-28 17:04:14.388264590 +0100
 @@ -107,7 +107,7 @@ if(NOT DISABLED_LEGACY_ENGINE)
      common/trainingsampleset.h)
  endif()
@@ -58,7 +58,7 @@ diff -rupN --no-dereference tesseract-5.5.3/src/training/CMakeLists.txt tesserac
  target_include_directories(common_training PUBLIC common
                                                    ${CMAKE_CURRENT_BINARY_DIR})
  target_link_libraries(common_training PUBLIC libtesseract)
-@@ -273,7 +273,7 @@ if(ICU_FOUND)
+@@ -279,7 +279,7 @@ if(ICU_FOUND)
  
    file(GLOB unicharset_training_src unicharset/*)
  
@@ -67,7 +67,7 @@ diff -rupN --no-dereference tesseract-5.5.3/src/training/CMakeLists.txt tesserac
    if(PKG_CONFIG_FOUND)
      target_link_libraries(unicharset_training PUBLIC common_training PkgConfig::ICU)
    else()
-@@ -409,7 +409,7 @@ if(ICU_FOUND)
+@@ -427,7 +427,7 @@ if(ICU_FOUND)
  
      file(GLOB pango_training_src pango/*)
  

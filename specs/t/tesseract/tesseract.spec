@@ -13,7 +13,7 @@
 %endif
 
 Name:          tesseract
-Version:       5.5.3
+Version:       5.5.4
 Release: 7%{?dist}
 Summary:       Raw OCR Engine
 
@@ -25,22 +25,6 @@ Source9999: tesseract.azl.macros
 # Fix library name case
 # Build training libs statically
 Patch1:        tesseract_cmake.patch
-# Backport fix for CVE-2026-88047
-Patch2:        https://github.com/tesseract-ocr/tesseract/commit/1bda5079b1c8a7e25f523486837426903d29ce84.patch
-# Backport fix for CVE-2026-88048
-Patch3:        https://github.com/tesseract-ocr/tesseract/commit/103dc134eb36411ddc6833ec20aa2c76795bd0ff.patch
-# Backport fix for CVE-2026-88049
-Patch4:        https://github.com/tesseract-ocr/tesseract/commit/b494ac18925f9d9aff9ef5815475de9943ab19bf.patch
-# Backport fix for CVE-2026-88050
-Patch5:        https://github.com/tesseract-ocr/tesseract/commit/c94a5532ee04db5a4919542832fd94caee5ea58f.patch
-# Backport fix for CVE-2026-88051
-Patch6:        https://github.com/tesseract-ocr/tesseract/commit/56e09ca12e751623fe796ce1554ce704bffd2ef0.patch
-# Backport fix for CVE-2026-88052
-Patch7:        https://github.com/tesseract-ocr/tesseract/commit/2d04d640db2e8c7e3bab2369d599343b5a8b8443.patch
-# Backport fix for CVE-2026-88053
-Patch8:        https://github.com/tesseract-ocr/tesseract/commit/8b0574680f3b22f246ade6a4c8e3029104255c63.patch
-# Backport fix for CVE-2026-88054
-Patch9:        https://github.com/tesseract-ocr/tesseract/commit/552771236b0d80cbdb0c7dd856120fa21a4672e5.patch
 
 
 BuildRequires: cmake
@@ -298,6 +282,9 @@ cp -a doc/*.5 %{buildroot}%{_mandir}/man5/
 
 
 %changelog
+* Wed Oct 28 2026 Sandro Mani <manisandro@gmail.com> - 5.5.4-1
+- Update to 5.5.4
+
 * Mon Sep 21 2026 Sandro Mani <manisandro@gmail.com> - 5.5.3-2
 - Backport fixes for CVE-2026-{88047-88054}
 

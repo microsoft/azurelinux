@@ -1,0 +1,4 @@
+# Pin to Fedora f43 tesseract-5.5.4 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/tesseract/c/5aa55c2e1bff6a48704b98b04b2741a91bd9f188
+[components.tesseract]
+spec = { type = "upstream", upstream-commit = "5aa55c2e1bff6a48704b98b04b2741a91bd9f188" }
