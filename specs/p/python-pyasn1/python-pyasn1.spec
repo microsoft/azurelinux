@@ -5,8 +5,8 @@
 %global modules_version 0.4.2
 
 Name:           python-pyasn1
-Version:        0.6.4
-Release: 5%{?dist}
+Version:        0.6.5
+Release: 6%{?dist}
 Summary:        ASN.1 tools for Python
 License:        BSD-2-Clause
 Source0:        https://github.com/pyasn1/pyasn1/archive/v%{version}.tar.gz
@@ -86,6 +86,9 @@ popd
 %doc docs/build/html/*
 
 %changelog
+* Fri Oct 30 2026 Simon Pichugin <spichugi@redhat.com> - 0.6.5-1
+- Update to 0.6.5
+
 * Thu Jul 16 2026 Simon Pichugin <spichugi@redhat.com> - 0.6.4-1
 - Update to 0.6.4
 - Fixed quadratic complexity in OID/RELATIVE-OID decoders (CVE-2026-59885)
