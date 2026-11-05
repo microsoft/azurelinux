@@ -1,0 +1,4 @@
+# Pin to Fedora f43 mutt-2.4.3 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/mutt/c/be1b0f510edc1d5fa28c3a73a6a039910e4424b5
+[components.mutt]
+spec = { type = "upstream", upstream-commit = "be1b0f510edc1d5fa28c3a73a6a039910e4424b5" }
