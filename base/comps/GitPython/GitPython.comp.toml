@@ -1,0 +1,4 @@
+# Pin to Fedora f43 GitPython-3.2.1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/GitPython/c/0a071a42290db7047451ed6b4ac236f3ebd507c6
+[components.GitPython]
+spec = { type = "upstream", upstream-commit = "0a071a42290db7047451ed6b4ac236f3ebd507c6" }
