@@ -1,4 +1,7 @@
+# Pin to Fedora f43 python3.14-3.14.10 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python3.14/c/79cd876daf3447a4f528a96301813b4009bc284f
 [components.'python3.14']
+spec = { type = "upstream", upstream-commit = "79cd876daf3447a4f528a96301813b4009bc284f" }
 
 [components.'python3.14'.build]
 # Disable the experimental JIT compiler (PEP 744).
