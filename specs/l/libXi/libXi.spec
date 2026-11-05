@@ -7,8 +7,8 @@
 
 Summary: X.Org X11 libXi runtime library
 Name: libXi
-Version: 1.8.2
-Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Version: 1.8.4
+Release: 1%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: MIT-open-group AND SMLNJ AND MIT
 URL: http://www.x.org
 
@@ -26,7 +26,6 @@ BuildRequires: xorg-x11-proto-devel
 BuildRequires: pkgconfig(inputproto) >= 2.3.99.1
 BuildRequires: libX11-devel >= 1.5.99.902
 BuildRequires: libXext-devel libXfixes-devel
-BuildRequires: xmlto asciidoc >= 8.4.5
 
 Requires: libX11 >= 1.5.99.902
 
@@ -77,6 +76,21 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Oct 21 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.8.4-1
+- libXi 1.8.4
+  CVE-2026-109090, CVE-2026-109089, CVE-2026-94282, CVE-2026-94281, 
+  CVE-2026-93545, CVE-2026-93544, CVE-2026-93543, CVE-2026-93542, 
+  CVE-2026-93541
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Mon May 18 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.8.3-1
+- libXi 1.8.3
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

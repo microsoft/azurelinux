@@ -1,3 +1,6 @@
+# Pin to Fedora f44 libXi-1.8.4 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libXi/c/1b3c52b15ea14793237fbf44d62ef08a7f674743
 [components.libXi]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "1b3c52b15ea14793237fbf44d62ef08a7f674743" }
 # Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 release = { calculation = "manual" }
