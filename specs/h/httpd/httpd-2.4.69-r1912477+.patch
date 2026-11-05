@@ -1,0 +1,582 @@
+
+From https://github.com/apache/httpd/pull/399 --
+
+1. removing docs changes
+2. removing last commit, use state_dir API unconditionally
+
+From 867fcc34feebe7e4fe94ac818ec48ffa45e09792 Mon Sep 17 00:00:00 2001
+From: Joe Orton <jorton@apache.org>
+Date: Thu, 28 Sep 2023 08:11:30 +0000
+Subject: [PATCH 1/4] * modules/dav/fs/dbm.c (dav_dbm_open_direct): Test
+ against   APR_MAJOR_VERSION, APU_MAJOR_VERSION is not defined for APR trunk  
+ since the #include <apu_version.h> is conditional on APR < 2.
+
+git-svn-id: https://svn.apache.org/repos/asf/httpd/httpd/trunk@1912571 13f79535-47bb-0310-9956-ffa450edef68
+(cherry picked from commit fb0ac6a5ec251dea9e27dfdc75521fe9d053cad9)
+---
+ modules/dav/fs/dbm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/dav/fs/dbm.c b/modules/dav/fs/dbm.c
+index 2db5c48b503..2fd1ac7340c 100644
+--- a/modules/dav/fs/dbm.c
++++ b/modules/dav/fs/dbm.c
+@@ -132,7 +132,7 @@ void dav_fs_ensure_state_dir(apr_pool_t * p, const char *dirname)
+ dav_error * dav_dbm_open_direct(apr_pool_t *p, const char *pathname, int ro,
+                                 dav_db **pdb)
+ {
+-#if APU_MAJOR_VERSION > 1 || (APU_MAJOR_VERSION == 1 && APU_MINOR_VERSION >= 7)
++#if APR_MAJOR_VERSION > 1 || (APU_MAJOR_VERSION == 1 && APU_MINOR_VERSION >= 7)
+     const apr_dbm_driver_t *driver;
+     const apu_err_t *err;
+ #endif
+@@ -141,7 +141,7 @@ dav_error * dav_dbm_open_direct(apr_pool_t *p, const char *pathname, int ro,
+ 
+     *pdb = NULL;
+ 
+-#if APU_MAJOR_VERSION > 1 || (APU_MAJOR_VERSION == 1 && APU_MINOR_VERSION >= 7)
++#if APR_MAJOR_VERSION > 1 || (APU_MAJOR_VERSION == 1 && APU_MINOR_VERSION >= 7)
+     if ((status = apr_dbm_get_driver(&driver, NULL, &err, p)) != APR_SUCCESS) {
+         ap_log_error(APLOG_MARK, APLOG_ERR, status, ap_server_conf, APLOGNO(10289)
+                      "mod_dav_fs: The DBM library '%s' could not be loaded: %s",
+
+From 447c7a5758497c4b5f772061d7833ff2a92a6601 Mon Sep 17 00:00:00 2001
+From: Joe Orton <jorton@apache.org>
+Date: Tue, 3 Oct 2023 12:58:16 +0000
+Subject: [PATCH 2/4] mod_dav_fs: add DAVLockDBType directive.
+
+* modules/dav/fs/dbm.c (dav_dbm_open_direct): Take a dbmtype argument
+  and use it to select the apr_dbm driver type.
+  (dav_dbm_open): Continue to use the "default" propdb type to open
+  the property databases.
+
+* modules/dav/fs/lock.c: Store and pass through the lockdb_type
+  through.
+
+* modules/dav/fs/mod_dav_fs.c (dav_get_lockdb_path): Return the dbm
+  type via an output argument.
+  (dav_fs_cmd_davlockdbtype): New config directive.
+  (dav_fs_merge_server_config): Merge the dbm type.
+  (dav_fs_post_config): Set the default lockdb type.
+
+* modules/dav/fs/repos.h: Update prototypes as above; internal API
+  only so no compat concerns.
+
+git-svn-id: https://svn.apache.org/repos/asf/httpd/httpd/trunk@1912718 13f79535-47bb-0310-9956-ffa450edef68
+(cherry picked from commit afcdbeebbff4b0c50ea26cdd16e178c0d1f24152)
+---
+ changes-entries/davlockdbtype.txt |  1 +
+ docs/manual/mod/mod_dav_fs.xml    | 26 ++++++++++++---
+ modules/dav/fs/dbm.c              | 22 +++++++------
+ modules/dav/fs/lock.c             |  4 ++-
+ modules/dav/fs/mod_dav_fs.c       | 54 +++++++++++++++++++++++++++++--
+ modules/dav/fs/repos.h            |  9 +++---
+ 6 files changed, 96 insertions(+), 20 deletions(-)
+ create mode 100644 changes-entries/davlockdbtype.txt
+
+diff --git a/changes-entries/davlockdbtype.txt b/changes-entries/davlockdbtype.txt
+new file mode 100644
+index 00000000000..d83fd333745
+--- /dev/null
++++ b/changes-entries/davlockdbtype.txt
+@@ -0,0 +1 @@
++  *) mod_dav_fs: Add DavLockDBType directive.  [Joe Orton]
+diff --git a/modules/dav/fs/dbm.c b/modules/dav/fs/dbm.c
+index 2fd1ac7340c..c54b1bcbdfd 100644
+--- a/modules/dav/fs/dbm.c
++++ b/modules/dav/fs/dbm.c
+@@ -47,6 +47,10 @@
+ #include "http_log.h"
+ #include "http_main.h"      /* for ap_server_conf */
+ 
++#ifndef DEFAULT_PROPDB_DBM_TYPE
++#define DEFAULT_PROPDB_DBM_TYPE "default"
++#endif
++
+ APLOG_USE_MODULE(dav_fs);
+ 
+ struct dav_db {
+@@ -129,8 +133,8 @@ void dav_fs_ensure_state_dir(apr_pool_t * p, const char *dirname)
+ /* dav_dbm_open_direct:  Opens a *dbm database specified by path.
+  *    ro = boolean read-only flag.
+  */
+-dav_error * dav_dbm_open_direct(apr_pool_t *p, const char *pathname, int ro,
+-                                dav_db **pdb)
++dav_error * dav_dbm_open_direct(apr_pool_t *p, const char *pathname,
++                                const char *dbmtype, int ro, dav_db **pdb)
+ {
+ #if APR_MAJOR_VERSION > 1 || (APU_MAJOR_VERSION == 1 && APU_MINOR_VERSION >= 7)
+     const apr_dbm_driver_t *driver;
+@@ -142,10 +146,10 @@ dav_error * dav_dbm_open_direct(apr_pool_t *p, const char *pathname, int ro,
+     *pdb = NULL;
+ 
+ #if APR_MAJOR_VERSION > 1 || (APU_MAJOR_VERSION == 1 && APU_MINOR_VERSION >= 7)
+-    if ((status = apr_dbm_get_driver(&driver, NULL, &err, p)) != APR_SUCCESS) {
++    if ((status = apr_dbm_get_driver(&driver, dbmtype, &err, p)) != APR_SUCCESS) {
+         ap_log_error(APLOG_MARK, APLOG_ERR, status, ap_server_conf, APLOGNO(10289)
+-                     "mod_dav_fs: The DBM library '%s' could not be loaded: %s",
+-                             err->reason, err->msg);
++                     "mod_dav_fs: The DBM library '%s' for '%s' could not be loaded: %s",
++                     err->reason, dbmtype, err->msg);
+         return dav_new_error(p, HTTP_INTERNAL_SERVER_ERROR, 1, status,
+                 "Could not load library for database.");
+     }
+@@ -156,9 +160,9 @@ dav_error * dav_dbm_open_direct(apr_pool_t *p, const char *pathname, int ro,
+         return dav_fs_dbm_error(NULL, p, status);
+     }
+ #else
+-    if ((status = apr_dbm_open(&file, pathname,
+-                               ro ? APR_DBM_READONLY : APR_DBM_RWCREATE,
+-                               APR_OS_DEFAULT, p))
++    if ((status = apr_dbm_open_ex(&file, dbmtype, pathname,
++                                  ro ? APR_DBM_READONLY : APR_DBM_RWCREATE,
++                                  APR_OS_DEFAULT, p))
+                 != APR_SUCCESS
+         && !ro) {
+         /* ### do something with 'status' */
+@@ -206,7 +210,7 @@ static dav_error * dav_dbm_open(apr_pool_t * p, const dav_resource *resource,
+ 
+     /* ### do we need to deal with the umask? */
+ 
+-    return dav_dbm_open_direct(p, pathname, ro, pdb);
++    return dav_dbm_open_direct(p, pathname, DEFAULT_PROPDB_DBM_TYPE, ro, pdb);
+ }
+ 
+ void dav_dbm_close(dav_db *db)
+diff --git a/modules/dav/fs/lock.c b/modules/dav/fs/lock.c
+index ef18c4a1384..478bf232fa7 100644
+--- a/modules/dav/fs/lock.c
++++ b/modules/dav/fs/lock.c
+@@ -182,6 +182,7 @@ struct dav_lockdb_private
+     request_rec *r;                  /* for accessing the uuid state */
+     apr_pool_t *pool;                /* a pool to use */
+     const char *lockdb_path;         /* where is the lock database? */
++    const char *lockdb_type;         /* where is the lock database? */
+ 
+     int opened;                      /* we opened the database */
+     dav_db *db;                      /* if non-NULL, the lock database */
+@@ -306,6 +307,7 @@ static dav_error * dav_fs_really_open_lockdb(dav_lockdb *lockdb)
+ 
+     err = dav_dbm_open_direct(lockdb->info->pool,
+                               lockdb->info->lockdb_path,
++                              lockdb->info->lockdb_type,
+                               lockdb->ro,
+                               &lockdb->info->db);
+     if (err != NULL) {
+@@ -342,7 +344,7 @@ static dav_error * dav_fs_open_lockdb(request_rec *r, int ro, int force,
+     comb->priv.r = r;
+     comb->priv.pool = r->pool;
+ 
+-    comb->priv.lockdb_path = dav_get_lockdb_path(r);
++    comb->priv.lockdb_path = dav_get_lockdb_path(r, &comb->priv.lockdb_type);
+     if (comb->priv.lockdb_path == NULL) {
+         return dav_new_error(r->pool, HTTP_INTERNAL_SERVER_ERROR,
+                              DAV_ERR_LOCK_NO_DB, 0,
+diff --git a/modules/dav/fs/mod_dav_fs.c b/modules/dav/fs/mod_dav_fs.c
+index 7afe713bf98..6cd106f432d 100644
+--- a/modules/dav/fs/mod_dav_fs.c
++++ b/modules/dav/fs/mod_dav_fs.c
+@@ -26,16 +26,27 @@
+ /* per-server configuration */
+ typedef struct {
+     const char *lockdb_path;
+-
++    const char *lockdb_type;
+ } dav_fs_server_conf;
+ 
+ extern module AP_MODULE_DECLARE_DATA dav_fs_module;
+ 
+-const char *dav_get_lockdb_path(const request_rec *r)
++#ifndef DEFAULT_DAV_LOCKDB
++#define DEFAULT_DAV_LOCKDB "davlockdb"
++#endif
++#ifndef DEFAULT_DAV_LOCKDB_TYPE
++#define DEFAULT_DAV_LOCKDB_TYPE "default"
++#endif
++
++
++const char *dav_get_lockdb_path(const request_rec *r, const char **dbmtype)
+ {
+     dav_fs_server_conf *conf;
+ 
+     conf = ap_get_module_config(r->server->module_config, &dav_fs_module);
++
++    *dbmtype = conf->lockdb_type;
++
+     return conf->lockdb_path;
+ }
+ 
+@@ -55,10 +66,34 @@ static void *dav_fs_merge_server_config(apr_pool_t *p,
+ 
+     newconf->lockdb_path =
+         child->lockdb_path ? child->lockdb_path : parent->lockdb_path;
++    newconf->lockdb_type =
++        child->lockdb_type ? child->lockdb_type : parent->lockdb_type;
+ 
+     return newconf;
+ }
+ 
++
++static apr_status_t dav_fs_post_config(apr_pool_t *p, apr_pool_t *plog,
++                                       apr_pool_t *ptemp, server_rec *base_server)
++{
++    server_rec *s;
++
++    for (s = base_server; s; s = s->next) {
++        dav_fs_server_conf *conf;
++
++        conf = ap_get_module_config(s->module_config, &dav_fs_module);
++
++        if (!conf->lockdb_path) {
++            conf->lockdb_path = ap_state_dir_relative(p, DEFAULT_DAV_LOCKDB);
++        }
++        if (!conf->lockdb_type) {
++            conf->lockdb_type = DEFAULT_DAV_LOCKDB_TYPE;
++        }
++    }
++
++    return OK;
++}
++
+ /*
+  * Command handler for the DAVLockDB directive, which is TAKE1
+  */
+@@ -78,11 +113,26 @@ static const char *dav_fs_cmd_davlockdb(cmd_parms *cmd, void *config,
+     return NULL;
+ }
+ 
++/*
++ * Command handler for the DAVLockDBType directive, which is TAKE1
++ */
++static const char *dav_fs_cmd_davlockdbtype(cmd_parms *cmd, void *config,
++                                        const char *arg1)
++{
++    dav_fs_server_conf *conf = ap_get_module_config(cmd->server->module_config,
++                                                    &dav_fs_module);
++    conf->lockdb_type = arg1;
++
++    return NULL;
++}
++
+ static const command_rec dav_fs_cmds[] =
+ {
+     /* per server */
+     AP_INIT_TAKE1("DAVLockDB", dav_fs_cmd_davlockdb, NULL, RSRC_CONF,
+                   "specify a lock database"),
++    AP_INIT_TAKE1("DAVLockDBType", dav_fs_cmd_davlockdbtype, NULL, RSRC_CONF,
++                  "specify a lock database DBM type"),
+ 
+     { NULL }
+ };
+diff --git a/modules/dav/fs/repos.h b/modules/dav/fs/repos.h
+index 94e49373627..249cfddf522 100644
+--- a/modules/dav/fs/repos.h
++++ b/modules/dav/fs/repos.h
+@@ -59,8 +59,8 @@ dav_error * dav_fs_get_locknull_members(const dav_resource *resource,
+ /* DBM functions used by the repository and locking providers */
+ extern const dav_hooks_db dav_hooks_db_dbm;
+ 
+-dav_error * dav_dbm_open_direct(apr_pool_t *p, const char *pathname, int ro,
+-                                dav_db **pdb);
++dav_error * dav_dbm_open_direct(apr_pool_t *p, const char *pathname,
++                                const char *dbmtype, int ro, dav_db **pdb);
+ void dav_dbm_get_statefiles(apr_pool_t *p, const char *fname,
+                             const char **state1, const char **state2);
+ dav_error * dav_dbm_delete(dav_db *db, apr_datum_t key);
+@@ -70,8 +70,9 @@ void dav_dbm_freedatum(dav_db *db, apr_datum_t data);
+ int dav_dbm_exists(dav_db *db, apr_datum_t key);
+ void dav_dbm_close(dav_db *db);
+ 
+-/* where is the lock database located? */
+-const char *dav_get_lockdb_path(const request_rec *r);
++/* Returns path to lock database and configured dbm type as
++ * *dbmtype. */
++const char *dav_get_lockdb_path(const request_rec *r, const char **dbmtype);
+ 
+ const dav_hooks_locks *dav_fs_get_lock_hooks(request_rec *r);
+ const dav_hooks_propdb *dav_fs_get_propdb_hooks(request_rec *r);
+
+From 137d1b7a8cdfb91c63915d8b6be7e3b16617e981 Mon Sep 17 00:00:00 2001
+From: Joe Orton <jorton@apache.org>
+Date: Thu, 7 Dec 2023 18:25:35 +0000
+Subject: [PATCH 3/4] mod_dav_fs: Add global mutex around use of lockdb use,
+ since apr_dbm does not provide thread-safe locking:
+
+* modules/dav/fs/mod_dav_fs.c (dav_fs_get_server_conf):
+  Replaces dav_get_lockdb_path.
+  (dav_fs_pre_config, dav_fs_child_init): New hooks.
+  (dav_fs_post_config): Create & store the mutex here.
+  (register_hooks): Register new hooks.
+
+* modules/dav/fs/repos.h: Expose new dav_fs_server_conf struct.
+
+* modules/dav/fs/lock.c (dav_fs_lockdb_cleanup): New cleanup
+  which unlocks and closes the dbm handle.
+  (dav_fs_really_open_lockdb): Lock the mutex here, register a
+  cleanup.
+  (dav_fs_open_lockdb): Adjust to use dav_fs_get_server_conf.
+  (dav_fs_close_lockdb): Run the cleanup here.
+
+git-svn-id: https://svn.apache.org/repos/asf/httpd/httpd/trunk@1914438 13f79535-47bb-0310-9956-ffa450edef68
+(cherry picked from commit 455147a36049efc443921ea523d01aa62e047fa3)
+---
+ modules/dav/fs/lock.c       | 46 +++++++++++++++++++------
+ modules/dav/fs/mod_dav_fs.c | 67 ++++++++++++++++++++++++++++---------
+ modules/dav/fs/repos.h      | 14 ++++++--
+ 3 files changed, 99 insertions(+), 28 deletions(-)
+
+diff --git a/modules/dav/fs/lock.c b/modules/dav/fs/lock.c
+index 478bf232fa7..29d167d9dce 100644
+--- a/modules/dav/fs/lock.c
++++ b/modules/dav/fs/lock.c
+@@ -181,9 +181,7 @@ struct dav_lockdb_private
+ {
+     request_rec *r;                  /* for accessing the uuid state */
+     apr_pool_t *pool;                /* a pool to use */
+-    const char *lockdb_path;         /* where is the lock database? */
+-    const char *lockdb_type;         /* where is the lock database? */
+-
++    const dav_fs_server_conf *conf;  /* lock database config & metadata */
+     int opened;                      /* we opened the database */
+     dav_db *db;                      /* if non-NULL, the lock database */
+ };
+@@ -293,6 +291,19 @@ static int dav_fs_compare_locktoken(
+     return dav_compare_locktoken(lt1, lt2);
+ }
+ 
++static apr_status_t dav_fs_lockdb_cleanup(void *data)
++{
++    dav_lockdb *lockdb = data;
++
++    apr_global_mutex_unlock(lockdb->info->conf->lockdb_mutex);
++
++    if (lockdb->info->db) {
++        dav_dbm_close(lockdb->info->db);
++    }
++    
++    return APR_SUCCESS;
++}
++
+ /*
+ ** dav_fs_really_open_lockdb:
+ **
+@@ -301,16 +312,27 @@ static int dav_fs_compare_locktoken(
+ static dav_error * dav_fs_really_open_lockdb(dav_lockdb *lockdb)
+ {
+     dav_error *err;
++    apr_status_t rv;
+ 
+     if (lockdb->info->opened)
+         return NULL;
+ 
++    rv = apr_global_mutex_lock(lockdb->info->conf->lockdb_mutex);
++    if (rv) {
++        return dav_new_error(lockdb->info->pool,
++                             HTTP_INTERNAL_SERVER_ERROR,
++                             DAV_ERR_LOCK_OPENDB, rv,
++                             "Could not lock mutex for lock database.");
++    }
++    
+     err = dav_dbm_open_direct(lockdb->info->pool,
+-                              lockdb->info->lockdb_path,
+-                              lockdb->info->lockdb_type,
++                              lockdb->info->conf->lockdb_path,
++                              lockdb->info->conf->lockdb_type,
+                               lockdb->ro,
+                               &lockdb->info->db);
+     if (err != NULL) {
++        apr_global_mutex_unlock(lockdb->info->conf->lockdb_mutex);
++        
+         return dav_push_error(lockdb->info->pool,
+                               HTTP_INTERNAL_SERVER_ERROR,
+                               DAV_ERR_LOCK_OPENDB,
+@@ -318,6 +340,10 @@ static dav_error * dav_fs_really_open_lockdb(dav_lockdb *lockdb)
+                               err);
+     }
+ 
++    apr_pool_cleanup_register(lockdb->info->pool, lockdb,
++                              dav_fs_lockdb_cleanup,
++                              dav_fs_lockdb_cleanup);
++
+     /* all right. it is opened now. */
+     lockdb->info->opened = 1;
+ 
+@@ -343,9 +369,9 @@ static dav_error * dav_fs_open_lockdb(request_rec *r, int ro, int force,
+     comb->pub.info = &comb->priv;
+     comb->priv.r = r;
+     comb->priv.pool = r->pool;
+-
+-    comb->priv.lockdb_path = dav_get_lockdb_path(r, &comb->priv.lockdb_type);
+-    if (comb->priv.lockdb_path == NULL) {
++    comb->priv.conf = dav_fs_get_server_conf(r);
++    
++    if (comb->priv.conf == NULL || comb->priv.conf->lockdb_path == NULL) {
+         return dav_new_error(r->pool, HTTP_INTERNAL_SERVER_ERROR,
+                              DAV_ERR_LOCK_NO_DB, 0,
+                              "A lock database was not specified with the "
+@@ -371,8 +397,8 @@ static dav_error * dav_fs_open_lockdb(request_rec *r, int ro, int force,
+ */
+ static void dav_fs_close_lockdb(dav_lockdb *lockdb)
+ {
+-    if (lockdb->info->db != NULL)
+-        dav_dbm_close(lockdb->info->db);
++    apr_pool_cleanup_run(lockdb->info->pool, lockdb,
++                         dav_fs_lockdb_cleanup);
+ }
+ 
+ /*
+diff --git a/modules/dav/fs/mod_dav_fs.c b/modules/dav/fs/mod_dav_fs.c
+index 6cd106f432d..b4ba9c7f906 100644
+--- a/modules/dav/fs/mod_dav_fs.c
++++ b/modules/dav/fs/mod_dav_fs.c
+@@ -14,8 +14,13 @@
+  * limitations under the License.
+  */
+ 
++#if !defined(_MSC_VER) && !defined(NETWARE)
++#include "ap_config_auto.h"
++#endif
++
+ #include "httpd.h"
+ #include "http_config.h"
++#include "http_core.h"
+ #include "http_log.h"
+ #include "http_request.h"
+ #include "apr_strings.h"
+@@ -23,12 +28,6 @@
+ #include "mod_dav.h"
+ #include "repos.h"
+ 
+-/* per-server configuration */
+-typedef struct {
+-    const char *lockdb_path;
+-    const char *lockdb_type;
+-} dav_fs_server_conf;
+-
+ extern module AP_MODULE_DECLARE_DATA dav_fs_module;
+ 
+ #ifndef DEFAULT_DAV_LOCKDB
+@@ -38,16 +37,13 @@ extern module AP_MODULE_DECLARE_DATA dav_fs_module;
+ #define DEFAULT_DAV_LOCKDB_TYPE "default"
+ #endif
+ 
++static const char dav_fs_mutexid[] = "dav_fs-lockdb";
+ 
+-const char *dav_get_lockdb_path(const request_rec *r, const char **dbmtype)
+-{
+-    dav_fs_server_conf *conf;
++static apr_global_mutex_t *dav_fs_lockdb_mutex;
+ 
+-    conf = ap_get_module_config(r->server->module_config, &dav_fs_module);
+-
+-    *dbmtype = conf->lockdb_type;
+-
+-    return conf->lockdb_path;
++const dav_fs_server_conf *dav_fs_get_server_conf(const request_rec *r)
++{
++    return ap_get_module_config(r->server->module_config, &dav_fs_module);
+ }
+ 
+ static void *dav_fs_create_server_config(apr_pool_t *p, server_rec *s)
+@@ -72,12 +68,44 @@ static void *dav_fs_merge_server_config(apr_pool_t *p,
+     return newconf;
+ }
+ 
++static int dav_fs_pre_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *ptemp)
++{
++    if (ap_mutex_register(pconf, dav_fs_mutexid, NULL, APR_LOCK_DEFAULT, 0))
++        return !OK;
++    return OK;
++}
++
++static void dav_fs_child_init(apr_pool_t *p, server_rec *s)
++{
++    apr_status_t rv;
++    
++    rv = apr_global_mutex_child_init(&dav_fs_lockdb_mutex,
++                                     apr_global_mutex_lockfile(dav_fs_lockdb_mutex),
++                                     p);
++    if (rv) {
++        ap_log_error(APLOG_MARK, APLOG_ERR, rv, s,
++                     APLOGNO(10488) "child init failed for mutex");
++    }                     
++}
+ 
+ static apr_status_t dav_fs_post_config(apr_pool_t *p, apr_pool_t *plog,
+                                        apr_pool_t *ptemp, server_rec *base_server)
+ {
+     server_rec *s;
+-
++    apr_status_t rv;
++
++    /* Ignore first pass through the config. */
++    if (ap_state_query(AP_SQ_MAIN_STATE) == AP_SQ_MS_CREATE_PRE_CONFIG)
++        return OK;
++
++    rv = ap_global_mutex_create(&dav_fs_lockdb_mutex, NULL, dav_fs_mutexid, NULL,
++                                base_server, p, 0);
++    if (rv) {
++        ap_log_error(APLOG_MARK, APLOG_ERR, rv, base_server,
++                     APLOGNO(10489) "could not create lock mutex");
++        return !OK;
++    }                     
++    
+     for (s = base_server; s; s = s->next) {
+         dav_fs_server_conf *conf;
+ 
+@@ -89,6 +117,10 @@ static apr_status_t dav_fs_post_config(apr_pool_t *p, apr_pool_t *plog,
+         if (!conf->lockdb_type) {
+             conf->lockdb_type = DEFAULT_DAV_LOCKDB_TYPE;
+         }
++
++        /* Mutex is common across all vhosts, but could have one per
++         * vhost if required. */
++        conf->lockdb_mutex = dav_fs_lockdb_mutex;
+     }
+ 
+     return OK;
+@@ -178,6 +210,11 @@ static void register_hooks(apr_pool_t *p)
+     /* before mod_dav's fixup, which takes over the request */
+     ap_hook_fixups(dav_fs_fixups, NULL, NULL, APR_HOOK_FIRST);
+ 
++
++    ap_hook_pre_config(dav_fs_pre_config, NULL, NULL, APR_HOOK_MIDDLE);
++    ap_hook_post_config(dav_fs_post_config, NULL, NULL, APR_HOOK_MIDDLE);
++    ap_hook_child_init(dav_fs_child_init, NULL, NULL, APR_HOOK_MIDDLE);
++
+     dav_hook_gather_propsets(dav_fs_gather_propsets, NULL, NULL,
+                              APR_HOOK_MIDDLE);
+     dav_hook_find_liveprop(dav_fs_find_liveprop, NULL, NULL, APR_HOOK_MIDDLE);
+diff --git a/modules/dav/fs/repos.h b/modules/dav/fs/repos.h
+index 249cfddf522..750a0f58b78 100644
+--- a/modules/dav/fs/repos.h
++++ b/modules/dav/fs/repos.h
+@@ -25,6 +25,8 @@
+ #ifndef _DAV_FS_REPOS_H_
+ #define _DAV_FS_REPOS_H_
+ 
++#include "util_mutex.h"
++
+ /* the name this repository provider is registered under */
+ #define DAV_FS_PROVIDER_NAME            "filesystem"
+ 
+@@ -70,9 +72,15 @@ void dav_dbm_freedatum(dav_db *db, apr_datum_t data);
+ int dav_dbm_exists(dav_db *db, apr_datum_t key);
+ void dav_dbm_close(dav_db *db);
+ 
+-/* Returns path to lock database and configured dbm type as
+- * *dbmtype. */
+-const char *dav_get_lockdb_path(const request_rec *r, const char **dbmtype);
++/* Per-server configuration. */
++typedef struct {
++    const char *lockdb_path;
++    const char *lockdb_type;
++    apr_global_mutex_t *lockdb_mutex;
++} dav_fs_server_conf;
++
++/* Returns server configuration for the request. */
++const dav_fs_server_conf *dav_fs_get_server_conf(const request_rec *r);
+ 
+ const dav_hooks_locks *dav_fs_get_lock_hooks(request_rec *r);
+ const dav_hooks_propdb *dav_fs_get_propdb_hooks(request_rec *r);
+

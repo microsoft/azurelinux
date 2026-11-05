@@ -1,0 +1,372 @@
+# ./pullrev.sh 1938247 1938308
+http://svn.apache.org/viewvc?view=revision&revision=1938247
+http://svn.apache.org/viewvc?view=revision&revision=1938308
+
+--- httpd-2.4.69/modules/metadata/config.m4
++++ httpd-2.4.69/modules/metadata/config.m4
+@@ -6,6 +6,23 @@
+ 
+ APACHE_MODULE(env, clearing/setting of ENV vars, , , yes)
+ APACHE_MODULE(mime_magic, automagically determining MIME type)
++
++APACHE_MODULE(mime_libmagic, determining MIME type using libmagic, , , most, [
++  ap_libmagic_found=no
++  if test -n "$PKGCONFIG"; then
++    AC_MSG_CHECKING([for libmagic via pkg-config])
++    if $PKGCONFIG --exists libmagic; then
++      ap_libmagic_found=yes
++      APR_ADDTO(MOD_CFLAGS, [`$PKGCONFIG --cflags libmagic`])
++      APR_ADDTO(MOD_MIME_LIBMAGIC_LDADD, [`$PKGCONFIG --libs libmagic`])
++    fi
++    AC_MSG_RESULT($ap_libmagic_found)
++  fi
++  if test "$ap_libmagic_found" = "no"; then
++    AC_MSG_WARN([libmagic not found])
++    enable_mime_libmagic=no
++  fi
++])
+ APACHE_MODULE(cern_meta, CERN-type meta files, , , no)
+ APACHE_MODULE(expires, Expires header control, , , most)
+ APACHE_MODULE(headers, HTTP header control, , , yes)
+diff -wu httpd-2.4.69/modules/metadata/mod_mime_libmagic.c httpd-2.4.69/modules/metadata/mod_mime_libmagic.c
+--- httpd-2.4.69/modules/metadata/mod_mime_libmagic.c
++++ httpd-2.4.69/modules/metadata/mod_mime_libmagic.c
+@@ -0,0 +1,338 @@
++/* Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++/*
++ * mod_mime_libmagic: determine the Content-Type of a file from its
++ * contents using libmagic(3) from the "file" package.  A fallback for
++ * files which mod_mime cannot type by extension, in the style of
++ * mod_mime_magic, but using the system magic database and matching
++ * engine rather than a private copy.
++ *
++ * A magic_t handle is opened, loaded and closed for each request: all
++ * libmagic's mutable state lives in the handle, so this is safe from
++ * any number of threads, and loading a compiled (.mgc) database is an
++ * mmap() of a file already in the page cache.
++ */
++
++#include "apr.h"
++#include "apr_strings.h"
++#include "apr_lib.h"
++
++#include <errno.h>
++
++#include "ap_config.h"
++#include "httpd.h"
++#include "http_config.h"
++#include "http_core.h"
++#include "http_log.h"
++#include "http_protocol.h"
++#include "http_request.h"
++
++#include <magic.h>
++
++module AP_MODULE_DECLARE_DATA mime_libmagic_module;
++
++#define UNSET (-1)
++#define DEFAULT_BYTES 16384
++#define MAX_BYTES 1048576
++
++typedef struct {
++    int enabled;              /* MimeLibmagic On|Off */
++    const char *magicfile;    /* MimeLibmagicFile, or the library default */
++    apr_int64_t bytes;        /* MimeLibmagicBytes */
++    int charset;              /* MimeLibmagicCharset On|Off */
++} libmagic_server_conf;
++
++static void *create_server_conf(apr_pool_t *p, server_rec *s)
++{
++    libmagic_server_conf *conf = apr_pcalloc(p, sizeof *conf);
++
++    conf->enabled = UNSET;
++    conf->magicfile = NULL;
++    conf->bytes = UNSET;
++    conf->charset = UNSET;
++    return conf;
++}
++
++static void *merge_server_conf(apr_pool_t *p, void *basev, void *addv)
++{
++    libmagic_server_conf *base = basev, *add = addv;
++    libmagic_server_conf *conf = apr_palloc(p, sizeof *conf);
++
++    conf->enabled = add->enabled != UNSET ? add->enabled : base->enabled;
++    conf->magicfile = add->magicfile ? add->magicfile : base->magicfile;
++    conf->bytes = add->bytes != UNSET ? add->bytes : base->bytes;
++    conf->charset = add->charset != UNSET ? add->charset : base->charset;
++    return conf;
++}
++
++static const char *set_enabled(cmd_parms *cmd, void *dummy, int flag)
++{
++    libmagic_server_conf *conf =
++        ap_get_module_config(cmd->server->module_config, &mime_libmagic_module);
++
++    conf->enabled = flag;
++    return NULL;
++}
++
++static const char *set_magicfile(cmd_parms *cmd, void *dummy, const char *arg)
++{
++    libmagic_server_conf *conf =
++        ap_get_module_config(cmd->server->module_config, &mime_libmagic_module);
++
++    conf->magicfile = ap_server_root_relative(cmd->pool, arg);
++    if (!conf->magicfile) {
++        return apr_pstrcat(cmd->pool, "Invalid MimeLibmagicFile path ", arg, NULL);
++    }
++    return NULL;
++}
++
++static const char *set_bytes(cmd_parms *cmd, void *dummy, const char *arg)
++{
++    libmagic_server_conf *conf =
++        ap_get_module_config(cmd->server->module_config, &mime_libmagic_module);
++    char *end;
++    apr_int64_t n = apr_strtoi64(arg, &end, 10);
++
++    if (*arg == '\0' || *end != '\0' || n < 1 || n > MAX_BYTES) {
++        return "MimeLibmagicBytes must be between 1 and "
++            APR_STRINGIFY(MAX_BYTES);
++    }
++    conf->bytes = n;
++    return NULL;
++}
++
++static const char *set_charset(cmd_parms *cmd, void *dummy, int flag)
++{
++    libmagic_server_conf *conf =
++        ap_get_module_config(cmd->server->module_config, &mime_libmagic_module);
++
++    conf->charset = flag;
++    return NULL;
++}
++
++/* Open a handle with flags and load the database at path.  Returns
++ * NULL after logging the failure. */
++static magic_t open_magic(request_rec *r, int flags, const char *path)
++{
++    magic_t ms = magic_open(flags);
++
++    if (!ms) {
++        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_FROM_OS_ERROR(errno), r,
++                      APLOGNO(10624) "libmagic: could not open handle");
++        return NULL;
++    }
++
++    if (magic_load(ms, path) != 0) {
++        const char *err = magic_error(ms);
++
++        ap_log_rerror(APLOG_MARK, APLOG_ERR, APR_FROM_OS_ERROR(magic_errno(ms)),
++                      r, APLOGNO(10625) "libmagic: could not load magic "
++                      "database %s: %s", path, err ? err : "unknown error");
++        magic_close(ms);
++        return NULL;
++    }
++
++    return ms;
++}
++
++/* Set the content type from libmagic's result string, either "type"
++ * or "type; charset=encoding".  Returns OK or DECLINED. */
++static int set_type(request_rec *r, const char *result, int charset_on)
++{
++    char *type = apr_pstrdup(r->pool, result);
++    char *charset = NULL;
++    const char *slash, *p;
++    char *sep;
++
++    sep = strchr(type, ';');
++    if (sep) {
++        *sep++ = '\0';
++        while (*sep == ' ') {
++            sep++;
++        }
++        if (strncmp(sep, "charset=", 8) == 0) {
++            charset = sep + 8;
++        }
++    }
++
++    /* Some matchers append a note, e.g. "application/x-executable, no
++     * program header": keep the type. */
++    type[strcspn(type, ", \t")] = '\0';
++
++    /* the type must be of the form token "/" token */
++    slash = ap_scan_http_token(type);
++    if (slash == type || *slash != '/'
++        || (p = ap_scan_http_token(slash + 1)) == slash + 1 || *p != '\0') {
++        ap_log_rerror(APLOG_MARK, APLOG_WARNING, 0, r, APLOGNO(10626)
++                      "libmagic: ignoring invalid type '%s' for %s",
++                      result, r->filename);
++        return DECLINED;
++    }
++    ap_content_type_tolower(type);
++
++    /* Unknown binary content is left untyped, as mod_mime_magic does. */
++    if (strcmp(type, "application/octet-stream") == 0
++        || strcmp(type, "application/x-empty") == 0) {
++        ap_log_rerror(APLOG_MARK, APLOG_TRACE1, 0, r,
++                      "libmagic: no type for %s (%s)", r->filename, result);
++        return DECLINED;
++    }
++
++    if (charset_on && charset && strncmp(type, "text/", 5) == 0
++        && strcmp(charset, "binary") != 0
++        && strcmp(charset, "unknown-8bit") != 0
++        && *charset && *ap_scan_http_token(charset) == '\0') {
++        type = apr_pstrcat(r->pool, type, "; charset=", charset, NULL);
++    }
++
++    ap_log_rerror(APLOG_MARK, APLOG_TRACE1, 0, r,
++                  "libmagic: %s is '%s' (%s)", r->filename, type, result);
++    ap_set_content_type_ex(r, type, 1);
++    return OK;
++}
++
++static int libmagic_find_ct(request_rec *r)
++{
++    const libmagic_server_conf *conf;
++    apr_file_t *fd;
++    apr_status_t rv;
++    apr_size_t nbytes, bytes;
++    magic_t ms;
++    const char *result, *path;
++    char *buf;
++    int ret, flags;
++
++    /* the file has to exist */
++    if (r->finfo.filetype == APR_NOFILE || !r->filename) {
++        return DECLINED;
++    }
++
++    /* was someone else already here? */
++    if (r->content_type) {
++        return DECLINED;
++    }
++
++    conf = ap_get_module_config(r->server->module_config, &mime_libmagic_module);
++    if (conf->enabled != 1) {
++        return DECLINED;
++    }
++
++    switch (r->finfo.filetype) {
++    case APR_DIR:
++        ap_set_content_type_ex(r, DIR_MAGIC_TYPE, 1);
++        return OK;
++    case APR_CHR:
++    case APR_BLK:
++    case APR_PIPE:
++    case APR_SOCK:
++        ap_set_content_type_ex(r, "application/octet-stream", 1);
++        return OK;
++    case APR_REG:
++        break;
++    default:
++        /* a broken symlink, or something exotic: leave it to the handler */
++        return DECLINED;
++    }
++
++    rv = apr_file_open(&fd, r->filename, APR_READ | APR_BINARY,
++                       APR_OS_DEFAULT, r->pool);
++    if (rv != APR_SUCCESS) {
++        ap_log_rerror(APLOG_MARK, APLOG_DEBUG, rv, r,
++                      "libmagic: could not open %s", r->filename);
++        return DECLINED;
++    }
++
++    bytes = conf->bytes != UNSET ? conf->bytes : DEFAULT_BYTES;
++    buf = apr_palloc(r->pool, bytes);
++    rv = apr_file_read_full(fd, buf, bytes, &nbytes);
++    apr_file_close(fd);
++    if (rv != APR_SUCCESS && !APR_STATUS_IS_EOF(rv)) {
++        ap_log_rerror(APLOG_MARK, APLOG_WARNING, rv, r, APLOGNO(10627)
++                      "libmagic: could not read %s", r->filename);
++        return DECLINED;
++    }
++
++    if (nbytes == 0) {
++        ap_set_content_type_ex(r, "text/plain", 1);
++        return OK;
++    }
++
++    /* With no MimeLibmagicFile, the library's default database; action
++     * 1 means the user's ~/.magic is not consulted, unlike
++     * magic_load(ms, NULL). */
++    path = conf->magicfile ? conf->magicfile : magic_getpath(NULL, 1);
++    /* Never look inside compressed files: that path spawns external
++     * decompressors from the calling thread. */
++    flags = MAGIC_MIME_TYPE | MAGIC_NO_CHECK_COMPRESS
++        | (conf->charset == 1 ? MAGIC_MIME_ENCODING : 0);
++    ms = open_magic(r, flags, path);
++    if (!ms) {
++        return DECLINED;
++    }
++
++    result = magic_buffer(ms, buf, nbytes);
++    if (!result) {
++        const char *err = magic_error(ms);
++
++        ap_log_rerror(APLOG_MARK, APLOG_WARNING, APR_FROM_OS_ERROR(magic_errno(ms)),
++                      r, APLOGNO(10628) "libmagic: could not determine type "
++                      "of %s: %s", r->filename, err ? err : "unknown error");
++        ret = DECLINED;
++    }
++    else {
++        /* result points into the handle, so must be used before close */
++        ret = set_type(r, result, conf->charset == 1);
++    }
++
++    magic_close(ms);
++
++    return ret;
++}
++
++static const command_rec libmagic_cmds[] = {
++    AP_INIT_FLAG("MimeLibmagic", set_enabled, NULL, RSRC_CONF,
++                 "Enable content type detection using libmagic"),
++    AP_INIT_TAKE1("MimeLibmagicFile", set_magicfile, NULL, RSRC_CONF,
++                  "Path to the magic database, in place of the library default"),
++    AP_INIT_TAKE1("MimeLibmagicBytes", set_bytes, NULL, RSRC_CONF,
++                  "Number of bytes of a file examined"),
++    AP_INIT_FLAG("MimeLibmagicCharset", set_charset, NULL, RSRC_CONF,
++                 "Add a charset parameter to text types"),
++    {NULL}
++};
++
++static void register_hooks(apr_pool_t *p)
++{
++    static const char *const pre[] = { "mod_mime.c", NULL };
++    static const char *const post[] = { "mod_mime_magic.c", NULL };
++
++    /* Run after mod_mime and before mod_mime_magic, since this module
++     * is default-off and it should win over mod_mime_magic when
++     * enabled. */
++    ap_hook_type_checker(libmagic_find_ct, pre, post, APR_HOOK_MIDDLE);
++}
++
++AP_DECLARE_MODULE(mime_libmagic) =
++{
++    STANDARD20_MODULE_STUFF,
++    NULL,                       /* dir config creator */
++    NULL,                       /* dir merger --- default is to override */
++    create_server_conf,         /* server config */
++    merge_server_conf,          /* merge server config */
++    libmagic_cmds,              /* command apr_table_t */
++    register_hooks              /* register hooks */
++};
