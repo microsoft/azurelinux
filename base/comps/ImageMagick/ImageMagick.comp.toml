@@ -1,4 +1,7 @@
+# Pin to Fedora f43 ImageMagick-7.1.2.35 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/ImageMagick/c/d348b0284a81b6b5ecb10a303c74c08b89cfa63b
 [components.ImageMagick]
+spec = { type = "upstream", upstream-commit = "d348b0284a81b6b5ecb10a303c74c08b89cfa63b" }
 
 # Disable HEIF/HEIC support — libheif is being retired from Azure Linux 4.0.
 # The upstream spec wraps libheif BR, the %package heic stanza, and the heic
