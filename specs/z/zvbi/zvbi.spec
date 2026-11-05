@@ -5,7 +5,7 @@
 %define             catalogue %{_sysconfdir}/X11/fontpath.d
 
 Name:               zvbi
-Version:            0.2.44
+Version:            0.2.46
 Release: 5%{?dist}
 Summary:            Raw VBI, Teletext and Closed Caption decoding library
 License:            GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND BSD-2-Clause AND MIT
@@ -171,6 +171,19 @@ make check
 
 
 %changelog
+* Thu Oct 22 2026 Xavier Bachelot <xavier@bachelot.org> - 0.2.46-1
+- Update to 0.2.46 (RHBZ#2559223)
+  - Fixes CVE-2026-11065 (RHBZ#2552379)
+
+* Wed Aug 12 2026 Xavier Bachelot <xavier@bachelot.org> - 0.2.45-1
+- Update to 0.2.45 (RHBZ#2514825)
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.44-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.44-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.44-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

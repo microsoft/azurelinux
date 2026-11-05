@@ -1,0 +1,4 @@
+# Pin to Fedora f43 zvbi-0.2.46 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/zvbi/c/248fd3065aa8d1657ed23b425d8648d0acefffd4
+[components.zvbi]
+spec = { type = "upstream", upstream-commit = "248fd3065aa8d1657ed23b425d8648d0acefffd4" }
