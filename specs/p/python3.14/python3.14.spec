@@ -51,7 +51,7 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.7
+%global general_version %{pybasever}.10
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
@@ -118,14 +118,14 @@ License: Python-2.0.1
 # This needs to be manually updated when we update Python.
 # Explore the sources tarball (you need the version before %%prep is executed):
 #  $ tar -tf Python-%%{upstream_version}.tar.xz | grep whl
-%global pip_version 26.2.1
+%global pip_version 26.2.2
 %global setuptools_version 79.0.1
 # All of those also include a list of indirect bundled libs:
 # pip
 #  $ %%{_rpmconfigdir}/pythonbundles.py <(unzip -p Lib/ensurepip/_bundled/pip-*.whl pip/_vendor/vendor.txt)
 %global pip_bundled_provides %{expand:
 Provides: bundled(python3dist(cachecontrol)) = 0.14.4
-Provides: bundled(python3dist(certifi)) = 2026.6.17
+Provides: bundled(python3dist(certifi)) = 2026.10.19
 Provides: bundled(python3dist(distlib)) = 0.4.2
 Provides: bundled(python3dist(distro)) = 1.9
 Provides: bundled(python3dist(idna)) = 3.18
@@ -273,7 +273,6 @@ BuildRequires: gcc
 BuildRequires: gdbm-devel
 BuildRequires: git-core
 BuildRequires: glibc-devel
-BuildRequires: gnupg2
 BuildRequires: libX11-devel
 BuildRequires: libffi-devel
 BuildRequires: libuuid-devel
@@ -323,8 +322,7 @@ BuildRequires: libappstream-glib
 # the first compatible version of pip is 23.1.2.
 BuildRequires: %{python_wheel_pkg_prefix}-pip-wheel >= 23.1.2
 %if %{with tests}
-BuildRequires: %{python_wheel_pkg_prefix}-setuptools-wheel
-BuildRequires: (%{python_wheel_pkg_prefix}-wheel-wheel if %{python_wheel_pkg_prefix}-setuptools-wheel < 71)
+BuildRequires: %{python_wheel_pkg_prefix}-setuptools-wheel >= 71
 %endif
 %endif
 
@@ -568,7 +566,7 @@ Summary:        Python runtime libraries
 # Combined manually from https://docs.python.org/3.14/license.html
 # Hash of Doc/license.rst which is compared in %%prep, generated with:
 # $ sha256sum Doc/license.rst | cut -f1 -d" "
-%global license_file_hash cd6f471c0bfdb099efefc25ddff9b3df8bf62e10428987f1f05e6f2f9e35d563
+%global license_file_hash 8a7329b25131f64b2bea284155f0824876b1af9f4a2f970e6335751d97dfa6dd
 # Licenses of incorporated software:
 # Mersenne Twister in _random C extension contains code under BSD-3-Clause
 # socket.getaddrinfo() and socket.getnameinfo() are BSD-3-Clause
@@ -742,12 +740,11 @@ Requires: %{pkgname} = %{version}-%{release}
 Requires: %{pkgname}-libs%{?_isa} = %{version}-%{release}
 
 %if %{with rpmwheels}
-Requires: %{python_wheel_pkg_prefix}-setuptools-wheel
-Requires: (%{python_wheel_pkg_prefix}-wheel-wheel if %{python_wheel_pkg_prefix}-setuptools-wheel < 71)
+Requires: %{python_wheel_pkg_prefix}-setuptools-wheel >= 71
 %else
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 %setuptools_bundled_provides
-# License manually combined from Python + setuptools + wheel
+# License manually combined from Python + setuptools
 License: Python-2.0.1 AND MIT AND Apache-2.0 AND (Apache-2.0 OR BSD-2-Clause)
 %endif
 
@@ -927,8 +924,7 @@ Requires: python%{pybasever}-freethreading = %{version}-%{release}
 Requires: python%{pybasever}-freethreading-libs%{?_isa} = %{version}-%{release}
 
 %if %{with rpmwheels}
-Requires: %{python_wheel_pkg_prefix}-setuptools-wheel
-Requires: (%{python_wheel_pkg_prefix}-wheel-wheel if %{python_wheel_pkg_prefix}-setuptools-wheel < 71)
+Requires: %{python_wheel_pkg_prefix}-setuptools-wheel >= 71
 %else
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 %setuptools_bundled_provides
@@ -2004,6 +2000,24 @@ CheckPython freethreading
 # ======================================================
 
 %changelog
+* Mon Oct 26 2026 Karolina Surma <ksurma@redhat.com> - 3.14.10-1
+- Update to Python 3.14.10
+- CVE-2026-114583: tar filter allows writing outside destination via empty-named symlink
+- CVE-2026-115557: Distrust compromised intermediate certificates in ssl module
+
+* Thu Oct 22 2026 Karolina Surma <ksurma@redhat.com> - 3.14.9-1
+- Update to Python 3.14.9
+
+* Thu Oct 01 2026 Karolina Surma <ksurma@redhat.com> - 3.14.8-1
+- Update to Python 3.14.8
+- Security fix for CVE-2026-15310
+- Security fix for CVE-2026-15806
+- Security fix for CVE-2026-17084
+- Security fix for CVE-2026-19445
+- Security fix for CVE-2026-19553
+- Security fix for CVE-2026-19672
+- Security fix for CVE-2026-82049
+
 * Tue Aug 18 2026 Miro Hrončok <mhroncok@redhat.com> - 3.14.7-2
 - On RHEL 9, also supports reparse deferral in expat
 

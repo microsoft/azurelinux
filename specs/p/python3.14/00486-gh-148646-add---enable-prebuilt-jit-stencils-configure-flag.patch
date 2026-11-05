@@ -70,7 +70,7 @@ index a073300592..5580985974 100644
          )
      jit_stencils_h = args.output_dir / "jit_stencils.h"
 diff --git a/configure b/configure
-index 2cb22a7806..1b396c92b2 100755
+index 2a4b6fc96c..0f412533ac 100755
 --- a/configure
 +++ b/configure
 @@ -1105,6 +1105,7 @@ with_strict_overflow
@@ -91,7 +91,7 @@ index 2cb22a7806..1b396c92b2 100755
    --enable-loadable-sqlite-extensions
                            support loadable extensions in the sqlite3 module,
                            see Doc/library/sqlite3.rst (default is no)
-@@ -11045,6 +11049,28 @@ fi
+@@ -11052,6 +11056,28 @@ fi
  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $tier2_flags $jit_flags" >&5
  printf "%s\n" "$tier2_flags $jit_flags" >&6; }
  
@@ -121,10 +121,10 @@ index 2cb22a7806..1b396c92b2 100755
    # GH-133171: This configuration builds the JIT but never actually uses it,
    # which is surprising (and strictly worse than not building it at all):
 diff --git a/configure.ac b/configure.ac
-index 967d34d47a..51160cafc2 100644
+index f51935d881..b940cffd9f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2873,6 +2873,19 @@ AC_SUBST([REGEN_JIT_COMMAND])
+@@ -2883,6 +2883,19 @@ AC_SUBST([REGEN_JIT_COMMAND])
  AC_SUBST([JIT_STENCILS_H])
  AC_MSG_RESULT([$tier2_flags $jit_flags])
  
