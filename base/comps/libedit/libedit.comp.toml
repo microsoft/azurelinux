@@ -1,3 +1,1 @@
 [components.libedit]
-# Release: 57.%{snap}cvs%{?dist}
-release = { calculation = "manual" }

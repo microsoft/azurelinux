@@ -1,3 +1,1 @@
 [components.dbusmenu-qt]
-# Release: 0.37.%{snapshot}%{?dist}
-release = { calculation = "manual" }

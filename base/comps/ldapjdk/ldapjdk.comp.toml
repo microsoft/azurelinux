@@ -1,3 +1,1 @@
 [components.ldapjdk]
-# Release: %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
-release = { calculation = "manual" }

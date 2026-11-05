@@ -1,3 +1,1 @@
 [components.squashfs-tools]
-# Release: 7%{dist}
-release = { calculation = "manual" }

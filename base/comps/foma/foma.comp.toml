@@ -1,3 +1,1 @@
 [components.foma]
-# Release: 0.14.%{snapshotdate}git%{shortcommit0}%{?dist}
-release = { calculation = "manual" }

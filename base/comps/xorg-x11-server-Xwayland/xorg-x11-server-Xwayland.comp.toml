@@ -1,3 +1,1 @@
 [components.xorg-x11-server-Xwayland]
-# Release: 2%{?gitdate:.%{gitdate}git%{shortcommit}}%{?dist}
-release = { calculation = "manual" }

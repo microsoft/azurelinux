@@ -1,3 +1,1 @@
 [components.rubygem-rspec-core]
-# Release: %{?preminorver:0.}%{baserelease}%{?preminorver:%{rpmminorver}}%{?dist}
-release = { calculation = "manual" }

@@ -1,3 +1,1 @@
 [components.kabi-dw]
-# Release: 0.29%{?dist}
-release = { calculation = "manual" }

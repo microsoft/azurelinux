@@ -1,6 +1,4 @@
 [components.gcc]
-# Release: %{gcc_release}%{?dist}
-release = { calculation = "manual" }
 
 [[components.gcc.overlays]]
 description = "Bump the manually managed GCC release for the branding rebuild"

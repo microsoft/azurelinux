@@ -1,5 +1,4 @@
 [components.libtirpc]
-release = { calculation = "manual" }
 
 [[components.libtirpc.overlays]]
 description = "Keep the patched build newer than the published 1.3.7-4.azl4 release"

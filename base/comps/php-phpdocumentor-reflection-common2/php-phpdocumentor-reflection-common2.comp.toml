@@ -1,3 +1,1 @@
 [components.php-phpdocumentor-reflection-common2]
-# Release: 15%{?github_release}%{?dist}
-release = { calculation = "manual" }

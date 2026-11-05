@@ -1,3 +1,1 @@
 [components.libXi]
-# Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
-release = { calculation = "manual" }

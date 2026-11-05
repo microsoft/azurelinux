@@ -1,3 +1,1 @@
 [components.krb5]
-# Release: %{krb5_release}
-release = { calculation = "manual" }

@@ -1,5 +1,4 @@
 [components.texlive-base]
-release = { calculation = "manual" }
 
 [[components.texlive-base.overlays]]
 description = "Keep the texdef-fixed build newer than the published 11:20230311-98.azl4 release"
