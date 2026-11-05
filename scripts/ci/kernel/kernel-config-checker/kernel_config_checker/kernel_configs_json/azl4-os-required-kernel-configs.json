@@ -1228,6 +1228,10 @@
           {
             "architecture": "x86_64",
             "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
           }
         ],
         "justification": "Needed to enable media acceleration - PR: https://github.com/microsoft/azurelinux/pull/3227"
@@ -3563,13 +3567,6 @@
           "justification": "Built-in simpledrm requires built-in DRM KMS helpers. Retain consistently with the DRM disposition in Task 24898. See https://dev.azure.com/mariner-org/mariner/_workitems/edit/24899"
         },
         {
-          "name": "CONFIG_DRM_VGEM",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
           "name": "CONFIG_IP_VS_DEBUG",
           "values": [
             { "architecture": "x86_64", "value": "n" },
@@ -3666,13 +3663,6 @@
             { "architecture": "x86_64", "value": "n" }
           ],
           "justification": "Keep disabled: no supported server workload requires CH341 USB-to-serial support; the previous AZL3 requirement no longer applies. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24915."
-        },
-        {
-          "name": "CONFIG_USB_TMC",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
         },
         {
           "name": "CONFIG_ZONE_DMA",
