@@ -2310,6 +2310,7 @@
                 "jx",
                 "kata-containers-cc",
                 "kata-packages-uvm",
+                "kata-packages-uvm-hpc",
                 "keras",
                 "kernel-64k-signed",
                 "kernel-hwe-signed",
