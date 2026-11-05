@@ -43,6 +43,10 @@ _ARTIFACT_CAP_MB: dict[str, int] = {
 }
 _ARTIFACT_CAP_DEFAULT_MB = 300
 
+# The PyTorch container is a special case outside image family limits due to
+# GPU drivers.
+_PYTORCH_ARTIFACT_CAP_MB = 4 * 1024
+
 _TARBALL_IMAGE_TYPES = frozenset({"container", "wsl"})
 
 _LARGEST_PACKAGES_TO_LOG = 15
@@ -63,6 +67,8 @@ def _installed_cap_bytes(image_name: str) -> int:
 
 
 def _artifact_cap_bytes(image_name: str) -> int:
+    if image_name == "container-pytorch":
+        return _PYTORCH_ARTIFACT_CAP_MB * _BYTES_PER_MB
     family = _family_of(image_name, _ARTIFACT_CAP_MB)
     cap_mb = _ARTIFACT_CAP_MB.get(family, _ARTIFACT_CAP_DEFAULT_MB) if family else _ARTIFACT_CAP_DEFAULT_MB
     return cap_mb * _BYTES_PER_MB
