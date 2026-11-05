@@ -2,7 +2,6 @@
 # https://src.fedoraproject.org/rpms/httpd/c/d28423f918e5086962eb1ec6d6767b513ef03405
 [components.httpd]
 spec = { type = "upstream", upstream-commit = "d28423f918e5086962eb1ec6d6767b513ef03405" }
-release = { calculation = "manual" }
 
 [[components.httpd.overlays]]
 description = "Bump release"

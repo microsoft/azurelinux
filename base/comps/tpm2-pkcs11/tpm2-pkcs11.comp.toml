@@ -1,3 +1,1 @@
 [components.tpm2-pkcs11]
-# Release: 6%{?candidate:.%{candidate}}%{?dist}
-release = { calculation = "manual" }

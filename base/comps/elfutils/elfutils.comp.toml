@@ -1,6 +1,4 @@
 [components.elfutils]
-# Release: %{baserelease}%{?dist}
-release = { calculation = "manual" }
 
 [components.elfutils.build.defines]
 # Azure Linux-only release delta. Keep the imported Fedora baserelease intact.

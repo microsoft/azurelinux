@@ -1,5 +1,4 @@
 [components.polkit]
-release = { calculation = "manual" }
 
 [[components.polkit.overlays]]
 description = "Keep the security-fixed build newer than the published 126-9.azl4 release"

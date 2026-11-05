@@ -1,3 +1,1 @@
 [components.xmlsec1]
-# Release: 3%{?dist}%{?extra_release}
-release = { calculation = "manual" }

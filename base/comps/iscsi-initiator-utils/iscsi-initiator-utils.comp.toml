@@ -1,3 +1,1 @@
 [components.iscsi-initiator-utils]
-# Release: 0.git%{shortcommit0}%{?dist}.2
-release = { calculation = "manual" }

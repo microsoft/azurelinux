@@ -2,5 +2,3 @@
 # https://src.fedoraproject.org/rpms/xorg-x11-server-Xwayland/c/1aa8f976d07fab943c0536ab9f3aaa6758a81513
 [components.xorg-x11-server-Xwayland]
 spec = { type = "upstream", upstream-commit = "1aa8f976d07fab943c0536ab9f3aaa6758a81513" }
-# Release: 2%{?gitdate:.%{gitdate}git%{shortcommit}}%{?dist}
-release = { calculation = "manual" }

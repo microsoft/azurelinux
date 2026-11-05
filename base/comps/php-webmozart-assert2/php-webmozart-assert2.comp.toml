@@ -1,3 +1,1 @@
 [components.php-webmozart-assert2]
-# Release: 1%{?github_release}%{?dist}
-release = { calculation = "manual" }

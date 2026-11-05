@@ -1,3 +1,1 @@
 [components.man2html]
-# Release: 40.%{posttag}%{?dist}
-release = { calculation = "manual" }

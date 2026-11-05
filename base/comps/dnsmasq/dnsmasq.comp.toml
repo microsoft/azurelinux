@@ -1,3 +1,1 @@
 [components.dnsmasq]
-# Release: 1%{?extraversion:.%{extraversion}}%{?dist}
-release = { calculation = "manual" }

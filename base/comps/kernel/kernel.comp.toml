@@ -5,11 +5,6 @@
 # kernel.spec directly; AZL-specific changes are marked with "AZL:" comments.
 spec = { type = "local", path = "kernel.spec" }
 
-# The spec uses %{specrelease} (kextraversion.azl_pkgrelease.dist) which the
-# auto-calculator cannot parse. Release is managed manually: bump azl_pkgrelease
-# in kernel.spec when rebuilding without a version change. The
-# %changelog is hand-curated inline in the spec.
-release = { calculation = "manual" }
 
 # --- Downloaded source tarballs (not vendored into the component dir) ---
 

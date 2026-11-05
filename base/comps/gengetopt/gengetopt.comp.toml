@@ -1,3 +1,1 @@
 [components.gengetopt]
-# Release: 16%{dist}
-release = { calculation = "manual" }

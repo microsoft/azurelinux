@@ -1,3 +1,1 @@
 [components.cachefilesd]
-# Release: 21%{?dist}%{?buildid}
-release = { calculation = "manual" }

@@ -1,11 +1,4 @@
 [components.rocm-compilersupport]
-# Release is composed in the overlay below as
-#   Release: %[15 + %{azl_release}].rocm%{rocm_version}%{?dist}
-# The "15 +" base anchors the formula at the last hard-coded Release
-# value before the counter was introduced; %{azl_release} then adds the
-# number of AZL-only rebuilds on top of that, ensuring Release stays
-# monotonic across the switchover.
-release = { calculation = "manual" }
 
 [components.rocm-compilersupport.build.defines]
 # AZL-only release counter. Composed with the "15." base via the overlay

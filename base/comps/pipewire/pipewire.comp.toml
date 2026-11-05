@@ -1,6 +1,4 @@
 [components.pipewire]
-# Release: %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
-release = { calculation = "manual" }
 build.without = ["v4l2", "roc"]
 
 [components.pipewire.build.defines]

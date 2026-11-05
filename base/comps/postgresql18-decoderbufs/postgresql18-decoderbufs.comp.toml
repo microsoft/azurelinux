@@ -1,3 +1,1 @@
 [components.postgresql18-decoderbufs]
-# Release: 2%{?pre:.%pre}%{?dist}
-release = { calculation = "manual" }

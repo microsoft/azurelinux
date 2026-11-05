@@ -2,5 +2,3 @@
 # https://src.fedoraproject.org/rpms/pcre2/c/0029ba0f07751d1b11e3429577b08cc65c0cbf88
 [components.pcre2]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "0029ba0f07751d1b11e3429577b08cc65c0cbf88" }
-# Release: %{?rcversion:0.}1%{?rcversion:.%rcversion}%{?dist}
-release = { calculation = "manual" }

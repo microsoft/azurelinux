@@ -1,3 +1,1 @@
 [components.python-d2to1]
-# Release: 40.post1%{?dist}
-release = { calculation = "manual" }

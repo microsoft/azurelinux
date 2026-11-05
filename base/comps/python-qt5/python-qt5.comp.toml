@@ -1,3 +1,1 @@
 [components.python-qt5]
-# Release: 0.1%{?dist}
-release = { calculation = "manual" }

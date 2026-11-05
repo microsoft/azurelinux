@@ -2,8 +2,6 @@
 # riscv64 hosts:
 # https://github.com/openbios/openbios/commit/e5ac46dd24e6216c36aa80462af25457e7029440
 [components.openbios]
-# Release: %[1 + %{azl_release}].git%{hash}%{?dist}
-release = { calculation = "manual" }
 
 [components.openbios.build.defines]
 # AZL-only release counter. Add this to upstream's Release value (1) so future

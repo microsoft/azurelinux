@@ -1,6 +1,4 @@
 [components.'mysql8.4']
-# Release: 1%{?with_debug:.debug}%{?dist}
-release = { calculation = "manual" }
 
 [[components.'mysql8.4'.overlays]]
 description = "Keep dist-git subdirectories visible to Git when tracking component changes"

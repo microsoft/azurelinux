@@ -1,6 +1,4 @@
 [components.mariadb-connector-odbc]
-# Release: 2%{?with_debug:.debug}%{?dist}
-release = { calculation = "manual" }
 
 [[components.mariadb-connector-odbc.overlays]]
 description = "Keep nested dist-git files visible to Git when tracking component changes"

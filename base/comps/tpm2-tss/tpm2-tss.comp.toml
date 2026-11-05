@@ -1,3 +1,1 @@
 [components.tpm2-tss]
-# Release: 8%{?candidate:.%{candidate}}%{?dist}
-release = { calculation = "manual" }
