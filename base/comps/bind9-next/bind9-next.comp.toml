@@ -1,0 +1,4 @@
+# Pin to Fedora f43 bind9-next-9.21.26 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/bind9-next/c/59df9ee0422e6cf70032b6e6fbea0ea8f96a2db3
+[components.bind9-next]
+spec = { type = "upstream", upstream-commit = "59df9ee0422e6cf70032b6e6fbea0ea8f96a2db3" }
