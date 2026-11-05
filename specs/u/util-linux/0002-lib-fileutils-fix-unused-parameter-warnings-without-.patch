@@ -1,0 +1,63 @@
+From 339ff352b7b8b868367d2370ed077675326c3bca Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Thu, 3 Sep 2026 09:45:29 +0200
+Subject: lib/fileutils: fix unused parameter warnings without SYS_openat2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On systems without SYS_openat2 (older kernels), ul_openat_resolve()
+is a stub that returns -ENOSYS, making all parameters unused. With
+-Werror=unused-parameter this breaks the build.
+
+Move the #ifdef around the whole function so each branch has its own
+declaration — the SYS_openat2 branch uses all parameters normally,
+the fallback branch marks them __unused__.
+
+Fixes: fb8e26535 ("libmount: pin source path with openat2() for restricted users")
+Signed-off-by: Karel Zak <kzak@redhat.com>
+(cherry picked from commit a471b62e732a491f1abe42450352fb0f9b5b43ea)
+---
+ lib/fileutils.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/lib/fileutils.c b/lib/fileutils.c
+index c60070855..1142febb0 100644
+--- a/lib/fileutils.c
++++ b/lib/fileutils.c
+@@ -351,10 +351,10 @@ char *ul_basename(char *path)
+ 	return p;
+ }
+ 
++#if defined(SYS_openat2)
+ int ul_openat_resolve(int dirfd, const char *path, int flags,
+ 		      mode_t mode, unsigned long long resolve)
+ {
+-#if defined(SYS_openat2)
+ 	struct open_how how = {
+ 		.flags = (__u64) flags,
+ 		.mode = (__u64) mode,
+@@ -362,11 +362,19 @@ int ul_openat_resolve(int dirfd, const char *path, int flags,
+ 	};
+ 
+ 	return syscall(SYS_openat2, dirfd, path, &how, sizeof(how));
++}
+ #else
++int ul_openat_resolve(
++		int dirfd __attribute__((__unused__)),
++		const char *path __attribute__((__unused__)),
++		int flags __attribute__((__unused__)),
++		mode_t mode __attribute__((__unused__)),
++		unsigned long long resolve __attribute__((__unused__)))
++{
+ 	errno = ENOSYS;
+ 	return -1;
+-#endif
+ }
++#endif
+ 
+ int ul_open_no_symlinks(const char *path, int flags, mode_t mode)
+ {
+-- 
+2.56.0
+

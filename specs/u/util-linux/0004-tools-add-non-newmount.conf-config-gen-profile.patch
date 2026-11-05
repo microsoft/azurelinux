@@ -1,0 +1,28 @@
+From 6438dec3ef477bc0272336e89921b77ebd57cbea Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Thu, 3 Sep 2026 10:15:43 +0200
+Subject: tools: add non-newmount.conf config-gen profile
+
+Add a configuration profile to test builds with
+--disable-libmount-mountfd-support, useful for verifying that libmount
+compiles without the new fd-based mount API.
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+(cherry picked from commit b8159405b99af7af2054f9f8222cf23901368a01)
+---
+ tools/config-gen.d/non-newmount.conf | 3 +++
+ 1 file changed, 3 insertions(+)
+ create mode 100644 tools/config-gen.d/non-newmount.conf
+
+diff --git a/tools/config-gen.d/non-newmount.conf b/tools/config-gen.d/non-newmount.conf
+new file mode 100644
+index 000000000..303b6cbad
+--- /dev/null
++++ b/tools/config-gen.d/non-newmount.conf
+@@ -0,0 +1,3 @@
++include:core.conf
++
++--disable-libmount-mountfd-support
+-- 
+2.56.0
+

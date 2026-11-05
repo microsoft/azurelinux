@@ -1,0 +1,71 @@
+From ba905a1874959c70fd706aa7d49df61076864e0a Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Tue, 8 Sep 2026 10:26:38 +0200
+Subject: lib/fileutils: fix RESOLVE_NO_SYMLINKS fallback value
+
+The fallback #define used 0x02, but that is RESOLVE_NO_MAGICLINKS.
+The correct value, as used by the kernel and glibc, is 0x04.
+
+The fallback is not dead code: no libmount source includes
+<linux/openat2.h>, and glibc provides the RESOLVE_* macros only via
+<bits/openat2.h>, which is a recent addition. On older glibc libmount
+then asks openat2() to block magic-links instead of symlinks. The
+syscall succeeds and follows the symlink, so the protection in
+mnt_context_open_tree(), hook_mount.c and hook_idmap.c is silently
+ineffective.
+
+Move the <linux/openat2.h> include from lib/fileutils.c to
+include/fileutils.h so all users get the kernel values, and correct
+the fallback.
+
+Fixes: b9e07ce6f ("lib/fileutils: add ul_openat_resolve() openat2 wrapper")
+Addresses: https://github.com/util-linux/util-linux/issues/4606
+Signed-off-by: Karel Zak <kzak@redhat.com>
+(cherry picked from commit 20361d66df4d3f32d5e137fe61a55cdf156c91f0)
+---
+ include/fileutils.h | 6 +++++-
+ lib/fileutils.c     | 4 ----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/include/fileutils.h b/include/fileutils.h
+index 09395620a..0b36104be 100644
+--- a/include/fileutils.h
++++ b/include/fileutils.h
+@@ -11,6 +11,10 @@
+ #include <dirent.h>
+ #include <sys/stat.h>
+ 
++#ifdef HAVE_LINUX_OPENAT2_H
++# include <linux/openat2.h>
++#endif
++
+ #include "c.h"
+ 
+ extern int mkstemp_cloexec(char *template);
+@@ -66,7 +70,7 @@ extern int ul_openat_resolve(int dirfd, const char *path, int flags,
+ 			     mode_t mode, unsigned long long resolve);
+ 
+ #ifndef RESOLVE_NO_SYMLINKS
+-# define RESOLVE_NO_SYMLINKS	0x02
++# define RESOLVE_NO_SYMLINKS	0x04
+ #endif
+ #ifndef RESOLVE_BENEATH
+ # define RESOLVE_BENEATH	0x08
+diff --git a/lib/fileutils.c b/lib/fileutils.c
+index 1142febb0..8ca2c0aae 100644
+--- a/lib/fileutils.c
++++ b/lib/fileutils.c
+@@ -16,10 +16,6 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ 
+-#ifdef HAVE_LINUX_OPENAT2_H
+-# include <linux/openat2.h>
+-#endif
+-
+ #include "c.h"
+ #include "all-io.h"
+ #include "fileutils.h"
+-- 
+2.56.0
+

@@ -1,0 +1,36 @@
+From 56e83de535ae1df9228d3b1cbf978b3e36b5d959 Mon Sep 17 00:00:00 2001
+From: gmkbenjamin <3827682+gmkbenjamin@users.noreply.github.com>
+Date: Sun, 27 Sep 2026 18:20:51 +1000
+Subject: wall: fix off-by-one in is_gr_member() group matching
+
+is_gr_member() tested buf->groups[ngroups], one past the valid range
+0..ngroups-1 filled by getgrouplist(). The extra slot (zero-initialized
+GID 0, or stale on reuse) let a non-member pass `wall --group`, and read
+one past the initialized array. Iterate over 0..ngroups-1 instead so only
+actual group members match.
+
+Fixes: https://github.com/util-linux/util-linux/issues/4654
+Signed-off-by: gmkbenjamin <3827682+gmkbenjamin@users.noreply.github.com>
+(cherry picked from commit ac280f2f34588d1a22a699b3e55fc147b27e6a2e)
+---
+ term-utils/wall.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/term-utils/wall.c b/term-utils/wall.c
+index c1c47d531..1891a5049 100644
+--- a/term-utils/wall.c
++++ b/term-utils/wall.c
+@@ -183,8 +183,8 @@ static int is_gr_member(const char *login, const struct group_workspace *buf)
+ 			_("getgrouplist found more groups than sysconf allows"));
+ 	}
+ 
+-	for (; ngroups >= 0; --ngroups) {
+-		if (buf->requested_group == (gid_t) buf->groups[ngroups])
++	for (int i = 0; i < ngroups; i++) {
++		if (buf->requested_group == (gid_t) buf->groups[i])
+ 			return 1;
+ 	}
+ 
+-- 
+2.56.0
+
