@@ -1,1 +1,4 @@
+# Pin to Fedora f43 util-linux-2.41.6 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/util-linux/c/d13495a9ef62ab8196c1627002180a74041dd919
 [components.util-linux]
+spec = { type = "upstream", upstream-commit = "d13495a9ef62ab8196c1627002180a74041dd919" }

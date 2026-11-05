@@ -1,7 +1,7 @@
-From 3b1b56c00b34e1d00349349a8a91d0add72ce97b Mon Sep 17 00:00:00 2001
+From 25e2e7581a6134bdd63207353bb9dd80e0ad555a Mon Sep 17 00:00:00 2001
 From: Karel Zak <kzak@redhat.com>
 Date: Tue, 24 Jun 2025 10:56:58 +0200
-Subject: [PATCH] libmount: disable EROFS backing file support
+Subject: libmount: disable EROFS backing file support
 
 Let's temporarily use the old reliable loop devices rather than directly
 mounting EROFS images. It seems some tools need to adapt to the change.
@@ -14,10 +14,10 @@ Signed-off-by: Karel Zak <kzak@redhat.com>
  2 files changed, 42 deletions(-)
 
 diff --git a/libmount/src/context_mount.c b/libmount/src/context_mount.c
-index fbb200708..4d6d53194 100644
+index 80c45beeb..64b0ab16d 100644
 --- a/libmount/src/context_mount.c
 +++ b/libmount/src/context_mount.c
-@@ -961,24 +961,6 @@ int mnt_context_finalize_mount(struct libmnt_context *cxt)
+@@ -985,24 +985,6 @@ int mnt_context_finalize_mount(struct libmnt_context *cxt)
  	return rc;
  }
  
@@ -42,7 +42,7 @@ index fbb200708..4d6d53194 100644
  /**
   * mnt_context_mount:
   * @cxt: mount context
-@@ -1083,23 +1065,6 @@ again:
+@@ -1107,23 +1089,6 @@ again:
  		}
  	}
  
@@ -63,14 +63,14 @@ index fbb200708..4d6d53194 100644
 -			goto again;
 -	}
 -
- 	if (rc == 0)
+ 	if (rc == 0 && !is_mount_stage_failed(cxt))
  		rc = mnt_context_call_hooks(cxt, MNT_STAGE_POST);
  
 diff --git a/libmount/src/hook_loopdev.c b/libmount/src/hook_loopdev.c
-index 444d69d6f..29e181fe8 100644
+index af9a52227..835c93a20 100644
 --- a/libmount/src/hook_loopdev.c
 +++ b/libmount/src/hook_loopdev.c
-@@ -468,13 +468,6 @@ static int is_loopdev_required(struct libmnt_context *cxt, struct libmnt_optlist
+@@ -478,13 +478,6 @@ static int is_loopdev_required(struct libmnt_context *cxt, struct libmnt_optlist
  		}
  	}
  
@@ -85,5 +85,5 @@ index 444d69d6f..29e181fe8 100644
  	 * prevent a regular file as a mount(2) source argument. A filesystem
  	 * that is able to mount regular files could be implemented. For this
 -- 
-2.49.0
+2.56.0
 
