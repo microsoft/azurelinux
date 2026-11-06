@@ -1,0 +1,97 @@
+From 98be32c431eadbb841718708ae8a308b6061f29c Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Thu, 22 Oct 2026 17:53:47 +0000
+Subject: [PATCH] archival: sanitize hardlink targets with path traversal
+ protection
+
+get_header_cpio() remembers the original names of files with multiple links
+before data_extract_all() sanitizes their extraction destinations. If a
+data-bearing entry is named ../payload, it is extracted as payload, but a
+later alias still attempts to link from ../payload.
+
+If the outside file is absent, the hardlink cannot be created. If it exists,
+the alias links to that outside file instead of the extracted payload.
+
+Apply skip_unsafe_prefix() to the local hard_link pointer under
+FEATURE_PATH_TRAVERSAL_PROTECTION, just like the destination name. Do not
+change the allocation base or symbolic-link targets, and preserve behavior
+when protection is disabled.
+
+Add regression tests for both outside-file conditions, checking the alias
+contents and that it shares the extracted payload's inode.
+
+Fixes: 9a8796436b9b ("archival: disallow path traversals (CVE-2023-39810)")
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: 3b0d08e1-a9f9-431f-b431-362633b09564
+---
+ archival/libarchive/data_extract_all.c |  2 ++
+ testsuite/cpio.tests                   | 39 ++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
+
+diff --git a/archival/libarchive/data_extract_all.c b/archival/libarchive/data_extract_all.c
+index 3e8792b15..24475d6c9 100644
+--- a/archival/libarchive/data_extract_all.c
++++ b/archival/libarchive/data_extract_all.c
+@@ -72,6 +72,8 @@ void FAST_FUNC data_extract_all(archive_handle_t *archive_handle)
+ # else /* dst_name is file_header->name, which is free()d by e.g. cpio - must copy, can't just advance the ptr */
+ 	strip_unsafe_prefix(dst_name);
+ # endif
++	if (hard_link)
++		hard_link = (char *)skip_unsafe_prefix(hard_link);
+ #endif
+ // ^^^ This may be a problem if some applets do need to extract absolute names.
+ // (Probably will need to invent ARCHIVE_ALLOW_UNSAFE_NAME flag).
+diff --git a/testsuite/cpio.tests b/testsuite/cpio.tests
+index ecb947d46..a054da6b3 100755
+--- a/testsuite/cpio.tests
++++ b/testsuite/cpio.tests
+@@ -179,6 +179,45 @@ cpio.testdir/dont_write does not exist
+ " "" ""
+ SKIP=
+ 
++optional FEATURE_PATH_TRAVERSAL_PROTECTION FEATURE_CPIO_O
++rm -rf cpio.testdir
++mkdir -p cpio.testdir/prepare/inner cpio.testdir/extract
++echo "extracted payload" > cpio.testdir/prepare/payload
++ln cpio.testdir/prepare/payload cpio.testdir/prepare/inner/alias
++# BusyBox emits hardlinks in reverse input order, with data in the last entry.
++testing "cpio sanitizes hardlink targets without an outside file" "\
++(cd cpio.testdir/prepare/inner && $ECHO -e '../payload\nalias' | cpio -o -H newc) > cpio.testdir/hardlinks.cpio
++(cd cpio.testdir/extract && cpio -i < ../hardlinks.cpio 2>/dev/null)
++echo \$?
++cat cpio.testdir/extract/alias
++test cpio.testdir/extract/alias -ef cpio.testdir/extract/payload && echo linked
++test ! -e cpio.testdir/payload && echo no-outside" \
++"\
++0
++extracted payload
++linked
++no-outside
++" "" ""
++SKIP=
++
++optional FEATURE_PATH_TRAVERSAL_PROTECTION FEATURE_CPIO_O
++rm -rf cpio.testdir/extract
++mkdir cpio.testdir/extract
++echo "outside payload" > cpio.testdir/payload
++testing "cpio sanitizes hardlink targets with an outside file" "\
++(cd cpio.testdir/extract && cpio -i < ../hardlinks.cpio 2>/dev/null)
++echo \$?
++cat cpio.testdir/extract/alias
++test cpio.testdir/extract/alias -ef cpio.testdir/extract/payload && echo linked
++cat cpio.testdir/payload" \
++"\
++0
++extracted payload
++linked
++outside payload
++" "" ""
++SKIP=
++
+ # Clean up
+ rm -rf cpio.testdir cpio.testdir2 2>/dev/null
+ 
+-- 
+2.56.0
+

@@ -1,0 +1,32 @@
+From 3b3d0fc5352ac036520bac74073b9b205a21b7c3 Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Thu, 30 Apr 2026 08:05:42 +0200
+Subject: [PATCH] cpio.tests: do not use "ls" to detect that file does not
+ exist
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ testsuite/cpio.tests | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/testsuite/cpio.tests b/testsuite/cpio.tests
+index a60eaec72..2804722e9 100755
+--- a/testsuite/cpio.tests
++++ b/testsuite/cpio.tests
+@@ -166,14 +166,14 @@ mkdir -p cpio.testdir/extract
+ testing "cpio extract file outside of destination" "\
+ (cd cpio.testdir/prepare/inner && echo -e '../dont_write\nto_extract' | cpio -o -H newc) | (cd cpio.testdir/extract && cpio -vi 2>&1)
+ echo \$?
+-ls cpio.testdir/dont_write 2>&1" \
++test -f cpio.testdir/dont_write || echo cpio.testdir/dont_write does not exist" \
+ "\
+ cpio: removing leading '../' from member names
+ dont_write
+ to_extract
+ 1 blocks
+ 0
+-ls: cpio.testdir/dont_write: No such file or directory
++cpio.testdir/dont_write does not exist
+ " "" ""
+ SKIP=
+ 

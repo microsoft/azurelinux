@@ -1,0 +1,30 @@
+From 5da20102b5db249c76edddd2cf608394a1ad34dc Mon Sep 17 00:00:00 2001
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Date: Fri, 9 Oct 2026 15:09:26 +0200
+Subject: [PATCH] tar: ".." is also an unsafe filename, treat as such
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+---
+ archival/libarchive/unsafe_prefix.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/archival/libarchive/unsafe_prefix.c b/archival/libarchive/unsafe_prefix.c
+index 89a371a7f..ab70ff816 100644
+--- a/archival/libarchive/unsafe_prefix.c
++++ b/archival/libarchive/unsafe_prefix.c
+@@ -8,6 +8,12 @@
+ const char* FAST_FUNC skip_unsafe_prefix(const char *str)
+ {
+ 	const char *cp = str;
++
++	/* if "..": malicious, return "" */
++	/* (causes harmless errors trying to create or hardlink a file named "") */
++	if (cp[0] == '.' && cp[1] == '.' && cp[2] == '\0')
++		return cp + 2;
++
+ 	while (1) {
+ 		const char *cp2;
+ 		if (*cp == '/') {
+-- 
+2.56.0
+

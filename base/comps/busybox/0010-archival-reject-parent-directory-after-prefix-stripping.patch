@@ -1,0 +1,90 @@
+From db9ce2da80f7543155d1f1651fc86dfb2b07301f Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Fri, 23 Oct 2026 15:24:06 +0000
+Subject: [PATCH] archival: reject ".." after stripping unsafe prefixes
+
+skip_unsafe_prefix() checks for a bare ".." only before stripping unsafe
+prefixes. Names such as "../.." and "prefix/../.." can therefore reduce to
+".." and still escape the extraction directory. A cpio directory entry
+can change the parent directory's mode and ownership during extraction.
+
+Move the check into the stripping loop so it also catches ".." exposed by
+removing leading slashes, leading "../", or internal "/../" components.
+Keep returning an empty name, as for an original bare "..".
+
+Add cpio regressions using raw newc directory entries and verify that the
+parent directory's permissions, uid, and gid remain unchanged. Cover bare,
+absolute, repeated, and internally prefixed parent-directory names.
+
+Fixes: 5da20102b5db ("tar: \"..\" is also an unsafe filename, treat as such")
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: 02b52104-29cb-4eec-99bc-1fdd4a4d9ee1
+---
+ archival/libarchive/unsafe_prefix.c | 10 +++++-----
+ testsuite/cpio.tests                | 26 ++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+), 5 deletions(-)
+
+diff --git a/archival/libarchive/unsafe_prefix.c b/archival/libarchive/unsafe_prefix.c
+index ab70ff816..4fca205f5 100644
+--- a/archival/libarchive/unsafe_prefix.c
++++ b/archival/libarchive/unsafe_prefix.c
+@@ -9,13 +9,13 @@ const char* FAST_FUNC skip_unsafe_prefix(const char *str)
+ {
+ 	const char *cp = str;
+ 
+-	/* if "..": malicious, return "" */
+-	/* (causes harmless errors trying to create or hardlink a file named "") */
+-	if (cp[0] == '.' && cp[1] == '.' && cp[2] == '\0')
+-		return cp + 2;
+-
+ 	while (1) {
+ 		const char *cp2;
++		/* if "..": malicious, return "" */
++		/* (causes harmless errors trying to create or hardlink a file named "") */
++		if (cp[0] == '.' && cp[1] == '.' && cp[2] == '\0')
++			return cp + 2;
++
+ 		if (*cp == '/') {
+ 			cp++;
+ 			continue;
+diff --git a/testsuite/cpio.tests b/testsuite/cpio.tests
+index ecb947d46..758bb1ab4 100755
+--- a/testsuite/cpio.tests
++++ b/testsuite/cpio.tests
+@@ -179,6 +179,32 @@ cpio.testdir/dont_write does not exist
+ " "" ""
+ SKIP=
+ 
++# newc directory entries must not change the extraction parent's metadata.
++for name in .. /.. ../.. /../.. ../../.. prefix/.. prefix/../.. prefix/../../..; do
++	optional FEATURE_PATH_TRAVERSAL_PROTECTION FEATURE_STAT_FORMAT
++	testing "cpio rejects directory member $name" "\
++mkdir -p cpio.testdir/extract
++chmod 700 cpio.testdir
++stat -c '%a %u %g' cpio.testdir > cpio.testdir/before
++for member in '$name' TRAILER!!!; do
++	printf '070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x' \
++		0 040755 $user $group 1 0 0 0 0 0 0 \$((\${#member} + 1)) 0
++	printf '%s\0' \"\$member\"
++	case \$((\${#member} % 4)) in
++		0) printf '\0';;
++		2) printf '\0\0\0';;
++		3) printf '\0\0';;
++	esac
++done > cpio.testdir/parent.cpio
++(cd cpio.testdir/extract && cpio -iu < ../parent.cpio 2>/dev/null)
++stat -c '%a %u %g' cpio.testdir > cpio.testdir/after
++cmp cpio.testdir/before cpio.testdir/after && echo unchanged" \
++"\
++unchanged
++" "" ""
++	SKIP=
++done
++
+ # Clean up
+ rm -rf cpio.testdir cpio.testdir2 2>/dev/null
+ 
+-- 
+2.56.0
+
