@@ -1,0 +1,242 @@
+From 8a2cc748331b18579e763ecb9517f93a1fab803f Mon Sep 17 00:00:00 2001
+From: Stefan Weil <sw@weilnetz.de>
+Date: Mon, 2 Nov 2026 11:31:41 +0100
+Subject: [PATCH] lstm: don't cap legitimate inference buffers in ResizeNoInit
+
+The DoS element-count cap added to GENERIC_2D_ARRAY::ResizeNoInit
+(commit 048e923) is in the wrong place: it also guards the trusted
+runtime callers that size inference and training buffers, and a
+full-width OCR line through a deep Convolve layer legitimately
+requests more than it (e.g. 82,200 timesteps x 1,248 features,
+~102.6M floats). The early return then leaves dim1_/dim2_ stale at
+their previous value and Convolve::Forward trips the
+"offset + num_features <= NumFeatures()" assertion in Randomize()
+while padding the edge, aborting the process.
+
+Remove the cap from ResizeNoInit, keeping the 64-bit overflow math,
+the negative-dimension rejection, and the INT32_MAX bound that keeps
+the int element count from wrapping. Keep the DoS protection where
+untrusted sizes actually come in: DeSerializeSize(TFile*) bounds the
+dimensions and requires the declared element count to be backed by
+the bytes remaining in the stream; the FILE* overload, which has no
+stream position to check against, gets its own 100,000,000 element
+bound (the same figure used for the scale vectors in
+WeightMatrix::DeSerialize), restoring what the removed cap provided
+incidentally.
+
+Update the unit tests: a resize above the former cap must be
+accepted; the negative-size and overflowing-product rejections are
+unchanged; the new FILE* path rejection and acceptance cases are
+covered by tests that write temporary files through the tesseract
+File helper, which requires linking the test against the training
+lib in the Autotools build.
+
+Assisted-by: OpenCode / qwen3.8-27b-thinking (Alibaba Cloud)
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+---
+ Makefile.am                             |  2 +-
+ src/ccstruct/matrix.h                   | 37 ++++++++----
+ unittest/matrix_deserializesize_test.cc | 80 +++++++++++++++++++------
+ 3 files changed, 89 insertions(+), 30 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index d40ba1e..25eba52 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1447,7 +1447,7 @@ endif # !DISABLED_LEGACY_ENGINE
+ 
+ matrix_deserializesize_test_SOURCES = unittest/matrix_deserializesize_test.cc
+ matrix_deserializesize_test_CPPFLAGS = $(unittest_CPPFLAGS)
+-matrix_deserializesize_test_LDADD = $(TESS_LIBS)
++matrix_deserializesize_test_LDADD = $(TRAINING_LIBS)
+ 
+ matrix_test_SOURCES = unittest/matrix_test.cc
+ matrix_test_CPPFLAGS = $(unittest_CPPFLAGS)
+diff --git a/src/ccstruct/matrix.h b/src/ccstruct/matrix.h
+index f53f17c..147634d 100644
+--- a/src/ccstruct/matrix.h
++++ b/src/ccstruct/matrix.h
+@@ -111,25 +111,29 @@ public:
+     }
+   }
+ 
+-  // DoS protection: the maximum number of elements (including the
+-  // padding) a single array may hold. Legitimate matrices in tesseract
+-  // are far smaller than this; the cap is consistent with the
+-  // "unreasonably large" bound applied to the scale vector in
+-  // WeightMatrix::DeSerialize.
+-  static const int64_t kMaxElements = 100000000;
+-
+   // Reallocates the array to the given size. Does not keep old data, but does
+   // not initialize the array either.
+   // The allocated memory is expanded on the end by pad, allowing deliberate
+   // access beyond the bounds of the array.
++  //
++  // Denial-of-service protection against *untrusted* sizes (dimensions read
++  // from a .traineddata file) is done at deserialization time in
++  // DeSerializeSize, which bounds each dimension and the total element
++  // count, and the TFile* overload additionally requires the declared
++  // element count to be backed by the bytes remaining in the stream. This
++  // method is also called by trusted runtime callers to size inference and
++  // training buffers -- e.g. a full-width OCR line through a deep Convolve
++  // layer legitimately exceeds 100,000,000 floats -- so it must not impose an
++  // arbitrary element cap here: an early return would leave dim1_/dim2_
++  // stale and corrupt every later access. It only rejects corrupted values
++  // and keeps the int element count below from wrapping.
+   void ResizeNoInit(int size1, int size2, int pad = 0) {
+     // Compute the total element count in 64 bits so it cannot overflow
+-    // (in particular (-1) * (-1) must not pass as 1), then reject
+-    // corrupted values (a crafted .traineddata file could produce
+-    // negative or oversized dimensions) and bound the allocation against
+-    // denial of service.
++    // (in particular (-1) * (-1) must not pass as 1), then reject corrupted
++    // values: negative dimensions, or a total that would wrap the int cast
++    // below.
+     const int64_t total = static_cast<int64_t>(size1) * size2 + pad;
+-    if (size1 < 0 || size2 < 0 || pad < 0 || total > kMaxElements) {
++    if (size1 < 0 || size2 < 0 || pad < 0 || total > INT32_MAX) {
+       return;
+     }
+     const int new_size = static_cast<int>(total);
+@@ -601,6 +605,15 @@ protected:
+     if (size2 > UINT16_MAX) {
+       return false;
+     }
++    // Unlike the TFile* overload, there is no stream position to check the
++    // declared size against, so bound the total element count as well: a
++    // crafted short file (e.g. 32768 x 65535, ~2.1e9 elements) would
++    // otherwise force a multi-gigabyte allocation before the missing payload
++    // is detected. Legitimate matrices deserialized through this path are
++    // far smaller.
++    if (static_cast<int64_t>(size1) * size2 > 100000000) {
++      return false;
++    }
+     Resize(size1, size2, empty_);
+     return true;
+   }
+diff --git a/unittest/matrix_deserializesize_test.cc b/unittest/matrix_deserializesize_test.cc
+index 8dbab22..eb511d0 100644
+--- a/unittest/matrix_deserializesize_test.cc
++++ b/unittest/matrix_deserializesize_test.cc
+@@ -1,8 +1,8 @@
+ ///////////////////////////////////////////////////////////////////////
+ // File:        matrix_deserializesize_test.cc
+ // Description: Tests that GENERIC_2D_ARRAY::DeSerializeSize rejects
+-//              negative and oversized dimensions read from a TFile
+-//              stream. The dimensions are serialized as little-endian
++//              negative and oversized dimensions read from a TFile or
++//              FILE stream. The dimensions are serialized as little-endian
+ //              int32, so a crafted .traineddata can supply values such
+ //              as -1 (0xFFFFFFFF) or 65535 that the previous signed
+ //              "size > UINT16_MAX" check failed to reject. The -1 case
+@@ -23,6 +23,8 @@
+ #include "serialis.h"  // for TFile
+ 
+ #include <cstdint>
++#include <cstdio>
++#include <string>
+ #include <vector>
+ 
+ namespace tesseract {
+@@ -65,7 +67,25 @@ bool DeSerializeMatrix(const std::vector<char> &blob, GENERIC_2D_ARRAY<int8_t> *
+   return m->DeSerialize(&fp);
+ }
+ 
++// Writes the given blob to a temporary file and returns its path, so the
++// FILE* deserialization path can be exercised like the TFile* one. Uses the
++// project File helper to create the file.
++std::string WriteBlobToTmpFile(const std::string &name, const std::vector<char> &blob) {
++  const std::string path = file::JoinPath(FLAGS_test_tmpdir, name);
++  FILE *fp = file::Open(path, "wb");
++  EXPECT_TRUE(fp != nullptr);
++  if (fp != nullptr) {
++    EXPECT_TRUE(fwrite(blob.data(), 1, blob.size(), fp) == blob.size());
++    fclose(fp);
++  }
++  return path;
++}
++
+ class MatrixDeserializeSizeTest : public testing::Test {
++ protected:
++  void SetUp() override {
++    file::MakeTmpdir();
++  }
+ };
+ 
+ // A valid small matrix must still deserialize successfully.
+@@ -124,25 +144,17 @@ TEST_F(MatrixDeserializeSizeTest, AcceptsLargeFullyBackedMatrix) {
+   EXPECT_EQ(1, m.dim2());
+ }
+ 
+-// ResizeNoInit itself must bound the element count, for callers that
+-// have no stream to check against. The maximum allowed size must
+-// still be accepted.
+-TEST_F(MatrixDeserializeSizeTest, ResizeNoInitAcceptsMaxSize) {
++// A size above the former 100,000,000 element DoS cap must still be
++// accepted: trusted runtime callers (e.g. a full-width OCR line buffer
++// in a Convolve layer) legitimately request more than that, and the
++// deserialization-time checks in DeSerializeSize are the DoS guard.
++TEST_F(MatrixDeserializeSizeTest, ResizeNoInitAcceptsSizeAboveFormerDoSCap) {
+   GENERIC_2D_ARRAY<int8_t> m;
+-  m.ResizeNoInit(10000, 10000); // exactly kMaxElements
+-  EXPECT_EQ(10000, m.dim1());
++  m.ResizeNoInit(10001, 10000); // 100010000 elements, > 100000000
++  EXPECT_EQ(10001, m.dim1());
+   EXPECT_EQ(10000, m.dim2());
+ }
+ 
+-// A size above the DoS cap must be rejected even though the product
+-// fits in a 32-bit int (10001 * 10000 = 100010000).
+-TEST_F(MatrixDeserializeSizeTest, ResizeNoInitRejectsOverCap) {
+-  GENERIC_2D_ARRAY<int8_t> m;
+-  m.ResizeNoInit(10001, 10000);
+-  EXPECT_EQ(0, m.dim1());
+-  EXPECT_EQ(0, m.dim2());
+-}
+-
+ // A negative size must be rejected (no allocation, no state change).
+ TEST_F(MatrixDeserializeSizeTest, ResizeNoInitRejectsNegative) {
+   GENERIC_2D_ARRAY<int8_t> m;
+@@ -159,5 +171,39 @@ TEST_F(MatrixDeserializeSizeTest, ResizeNoInitRejectsOverflowingProduct) {
+   EXPECT_EQ(0, m.dim2());
+ }
+ 
++// Deserializes a matrix from the given FILE*, like the TFile* helper above.
++bool DeSerializeMatrixFile(FILE *fp, GENERIC_2D_ARRAY<int8_t> *m) {
++  return m->DeSerialize(false, fp);
++}
++
++// The FILE* overload has no stream position to check the declared size
++// against, so it must bound the total element count itself: a crafted short
++// file declaring 32768 x 65535 (~2.1e9 elements) would otherwise force a
++// multi-gigabyte allocation before the missing payload is detected.
++TEST_F(MatrixDeserializeSizeTest, FileDeSerializeRejectsOversizedProduct) {
++  const std::string path =
++      WriteBlobToTmpFile("file_oversized", MakeMatrixBlob(32768, 65535, 0));
++  FILE *fp = file::Open(path, "rb");
++  ASSERT_TRUE(fp != nullptr);
++  GENERIC_2D_ARRAY<int8_t> m;
++  EXPECT_FALSE(DeSerializeMatrixFile(fp, &m));
++  fclose(fp);
++}
++
++// A large matrix whose product fits the FILE* element-count bound and is
++// fully present in the file must still deserialize successfully, so the new
++// bound does not reject legitimate matrices.
++TEST_F(MatrixDeserializeSizeTest, FileDeSerializeAcceptsLargeMatrix) {
++  const std::string path =
++      WriteBlobToTmpFile("file_large", MakeMatrixBlob(65535, 1, 65535));
++  FILE *fp = file::Open(path, "rb");
++  ASSERT_TRUE(fp != nullptr);
++  GENERIC_2D_ARRAY<int8_t> m;
++  ASSERT_TRUE(DeSerializeMatrixFile(fp, &m));
++  EXPECT_EQ(65535, m.dim1());
++  EXPECT_EQ(1, m.dim2());
++  fclose(fp);
++}
++
+ } // namespace
+ } // namespace tesseract
+-- 
+2.45.4
+
