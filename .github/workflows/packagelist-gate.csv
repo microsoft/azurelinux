@@ -1,4 +1,5 @@
 fdk-aac-free,,
+libdb,,
 opus,,
 opus-file,,
 packer,>=,1.10.0
