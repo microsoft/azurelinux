@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        38%{?dist}
+Release:        39%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -69,6 +69,7 @@ Source32:       azurelinux-cis-shell-timeout.sh
 Source33:       00-rsyslog_filecreatemode.conf
 Source34:       azurelinux-cis-umask.sh
 Source35:       90-azurelinux-pwquality.conf
+Source36:       macros.container-languages
 
 BuildArch:      noarch
 
@@ -186,6 +187,13 @@ Recommends:     azurelinux-release-identity-container
 %description container
 Provides a base package for Azure Linux container specific configuration files to
 depend on as well as container system defaults.
+
+%package locale-minimal
+Summary:        Temporary RPM language policy for container image builds
+
+%description locale-minimal
+Limit RPM language payloads to C, POSIX, and English during container image
+construction. This bootstrap-only package is removed before the image is shipped.
 
 
 %package identity-container
@@ -372,6 +380,7 @@ sed -i -e "s|(%{release_name}%{?prerelease})|(Container Image%{?prerelease})|g" 
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/Container/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.container
 install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
 install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
+install -Dm0644 %{SOURCE36} %{buildroot}%{_sysconfdir}/rpm/macros.container-languages
 %endif
 
 %if %{with wsl}
@@ -450,6 +459,10 @@ check_umask 0022 0027
 check_umask 0077 0077
 test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
+%if %{with container}
+grep -Fx '%%_install_langs C:C.UTF-8:POSIX:en:en_US' %{buildroot}%{_sysconfdir}/rpm/macros.container-languages
+%endif
+
 
 %files common
 %license licenses/LICENSE
@@ -513,6 +526,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 %if %{with container}
 %files container
+%files locale-minimal
+%{_sysconfdir}/rpm/macros.container-languages
+
 %files identity-container
 %{_prefix}/lib/os-release.container
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.container
@@ -530,6 +546,9 @@ test "$(/bin/sh -c 'umask 0022; . %{SOURCE34}; umask 0077; umask')" = 0077
 
 
 %changelog
+* Thu Nov 05 2026 Azure Linux Team <azurelinux-packages@microsoft.com> - 4.0-39
+- Package the bootstrap-only container RPM language policy
+
 * Tue Nov 03 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-38
 - Configure password complexity for cloud systems
 

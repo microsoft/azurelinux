@@ -1,9 +1,8 @@
 #!/bin/bash
 # config.sh — Kiwi config.sh hook for container image minimization
 #
-# Invoked by /image/config.sh (see that file for the profile -> mode
-# routing table) with a single --mode argument selecting one of two
-# cleanup strategies:
+# Invoked by /image/config.sh (see that file for profile -> mode routing).
+# Non-base profiles select one of two cleanup strategies with --mode:
 #
 #   --mode=strip (distroless-*, busybox-workload; runtime-package-management
 #   = false profiles): strips the image down to only the packages declared
@@ -50,6 +49,35 @@ die() {
     echo "ERROR: $*" >&2
     exit 1
 }
+
+case ",${kiwi_profiles:-}," in
+    *,core,*|*,distroless-minimal,*)
+        echo "=== Checking bootstrap language filtering ==="
+        [[ "$(rpm --eval '%_install_langs')" == "C:C.UTF-8:POSIX:en:en_US" ]] \
+            || die "bootstrap language policy is not active"
+        # Check RPM state before pruning can hide a missed bootstrap reinstall.
+        bootstrap_bash_files=$(rpm -q bash --qf '[%{FILENAMES}|%{FILELANGS}|%{FILESTATES}\n]') \
+            || die "failed to query bootstrap Bash file states"
+        grep -Fxq '/usr/share/locale/fr/LC_MESSAGES/bash.mo|fr|2' <<< "${bootstrap_bash_files}" \
+            || die "bootstrap French Bash catalog was not excluded by RPM"
+        [[ ! -e /usr/share/locale/fr/LC_MESSAGES/bash.mo ]] \
+            || die "bootstrap French Bash catalog is still present"
+        grep -Fxq '/usr/bin/bash||0' <<< "${bootstrap_bash_files}" \
+            || die "bootstrap Bash executable is not recorded as installed"
+        [[ -x /usr/bin/bash ]] || die "bootstrap Bash executable is missing"
+
+        echo "=== Removing bootstrap language policy ==="
+        rpm -e azurelinux-release-locale-minimal \
+            || die "failed to remove the bootstrap language-policy package"
+        [[ "$(rpm --eval '%_install_langs')" == "all" ]] \
+            || die "default RPM language policy was not restored"
+        ;;
+esac
+
+# The base image retains its package manager and runtime contents.
+case ",${kiwi_profiles:-}," in
+    *,core,*) exit 0 ;;
+esac
 
 # ---------------------------------------------------------------------------
 # Mode selection
