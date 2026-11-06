@@ -1,0 +1,4 @@
+# Pin to Fedora rawhide python-jwt-2.15.1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python-jwt/c/4fae085b4eb6931b7f86d802d762788b75e471ba
+[components.python-jwt]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "4fae085b4eb6931b7f86d802d762788b75e471ba" }
