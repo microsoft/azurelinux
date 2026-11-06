@@ -1,7 +1,7 @@
 Summary:        Modern C++ library for realtime consumption of LTTNG events
 Name:           lttng-consume
 Version:        0.2.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,9 @@ mkdir build && cd build
 %{_includedir}/lttng-consume
 
 %changelog
+* Tue Aug 25 2026 Ankita Pareek <ankitapareek@microsoft.com> - 0.2.1-3
+- Rebuild against lttng-ust 2.14.0 (liblttng-ust-ctl soname bump).
+
 * Mon Jan 24 2022 Muhammad Falak <mwani@microsoft.com> - 0.2.1-2
 - Diasable tests which break ARM64 build
 

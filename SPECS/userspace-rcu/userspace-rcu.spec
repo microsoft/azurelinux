@@ -1,7 +1,7 @@
 Summary:        user space RCU (read-copy-update)
 Name:           userspace-rcu
-Version:        0.14.0
-Release:        2%{?dist}
+Version:        0.14.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,6 +58,10 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
+* Tue Aug 25 2026 Ankita Pareek <ankitapareek@microsoft.com> - 0.14.1-1
+- Upgrade to 0.14.1, which includes the upstream URCU_FORCE_CAST typename fix
+  needed by C++ consumers such as lttng-tools 2.14.
+
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.14.0-2
 - Sanitize license files
 
