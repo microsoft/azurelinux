@@ -1,0 +1,4 @@
+# Pin to Fedora f44 python-werkzeug-3.1.8 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python-werkzeug/c/191760f1c2cce2c69c07a17423607d472bfc184d
+[components.python-werkzeug]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "191760f1c2cce2c69c07a17423607d472bfc184d" }
