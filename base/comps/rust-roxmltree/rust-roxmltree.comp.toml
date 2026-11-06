@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-roxmltree-0.21.2 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/rust-roxmltree/c/1063aa98bde67366d0b3d57f673dda5f54a634ff
+[components.rust-roxmltree]
+spec = { type = "upstream", upstream-commit = "1063aa98bde67366d0b3d57f673dda5f54a634ff" }
