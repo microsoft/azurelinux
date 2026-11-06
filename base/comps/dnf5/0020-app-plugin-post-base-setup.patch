@@ -1,0 +1,142 @@
+From 1f2605016ebaa72fc943e384b66aa3f6f72bf537 Mon Sep 17 00:00:00 2001
+From: Thien Trung Vuong <tvuong@microsoft.com>
+Date: Thu, 29 Oct 2026 13:41:57 -0700
+Subject: [PATCH] feat(dnf5): call optional app plugin after Base setup
+
+The existing post_base_setup belongs to libdnf5 library plugins, not DNF5 application plugins. A missing or disabled backend cannot attest its own absence. Add a generic, optional C export for application plugins, dispatched by the CLI after successful Base::setup() and before repository activity, so a CLI guard can verify loaded backend state. Accepted snapshot flags must not silently proceed unfiltered; the actual policy remains external to DNF5.
+
+Resolve the export per module without changing the IPlugin layout or vtable; legacy modules with no export keep working. Translate ordinary callback exceptions into handled, plugin-named runtime errors rather than terminating the process.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ dnf5/include/dnf5/iplugin.hpp |  5 +++++
+ dnf5/main.cpp                 |  1 +
+ dnf5/plugins.cpp              | 28 ++++++++++++++++++++++++++++
+ dnf5/plugins.hpp              |  6 ++++++
+ 4 files changed, 40 insertions(+)
+
+diff --git a/dnf5/include/dnf5/iplugin.hpp b/dnf5/include/dnf5/iplugin.hpp
+index 44d8bc2..6f0c540 100644
+--- a/dnf5/include/dnf5/iplugin.hpp
++++ b/dnf5/include/dnf5/iplugin.hpp
+@@ -115,6 +115,11 @@ DNF_PLUGIN_API dnf5::IPlugin * dnf5_plugin_new_instance(
+ /// @param plugin_instance Plugin instance to delete.
+ DNF_PLUGIN_API void dnf5_plugin_delete_instance(dnf5::IPlugin * plugin_instance);
+ 
++/// Optional application-plugin entry point, called once after successful Base::setup()
++/// and before the selected command's configure() call. Throw to abort the command.
++/// Plugins without this symbol retain the original IPlugin ABI and lifecycle.
++DNF_PLUGIN_API void dnf5_plugin_post_base_setup(dnf5::IPlugin * plugin_instance);
++
+ /// Returns a pointer to `std::exception_ptr` containing the last caught exception.
+ /// If no exception has occurred yet, returns a pointer to an empty `std::exception_ptr`.
+ ///
+diff --git a/dnf5/main.cpp b/dnf5/main.cpp
+index 78ebde9..21860d5 100644
+--- a/dnf5/main.cpp
++++ b/dnf5/main.cpp
+@@ -1429,6 +1429,7 @@ int main(int argc, char * argv[]) try {
+             }
+ 
+             base.setup();
++            context.get_plugins().post_base_setup();
+ 
+             auto & coloring = base.get_config().get_color_option().get_value();
+             if (coloring == "always") {
+diff --git a/dnf5/plugins.cpp b/dnf5/plugins.cpp
+index a27968d..cfe4daa 100644
+--- a/dnf5/plugins.cpp
++++ b/dnf5/plugins.cpp
+@@ -36,6 +36,7 @@ public:
+     explicit PluginLibrary(Context & context, const std::string & library_path);
+ 
+     ~PluginLibrary();
++    void post_base_setup() override;
+ 
+ private:
+     using TGetApiVersionFunc = decltype(&dnf5_plugin_get_api_version);
+@@ -44,12 +45,14 @@ private:
+     using TNewInstanceFunc = decltype(&dnf5_plugin_new_instance);
+     using TDeleteInstanceFunc = decltype(&dnf5_plugin_delete_instance);
+     using TGetLastException = decltype(&dnf5_plugin_get_last_exception);
++    using TPostBaseSetup = decltype(&dnf5_plugin_post_base_setup);
+     TGetApiVersionFunc get_api_version{nullptr};
+     TGetNameFunc get_name{nullptr};
+     TGetVersionFunc get_version{nullptr};
+     TNewInstanceFunc new_instance{nullptr};
+     TDeleteInstanceFunc delete_instance{nullptr};
+     TGetLastException get_last_exception{nullptr};
++    TPostBaseSetup post_base_setup_func{nullptr};
+     utils::Library library;
+ };
+ 
+@@ -76,6 +79,12 @@ PluginLibrary::PluginLibrary(Context & context, const std::string & library_path
+     new_instance = reinterpret_cast<TNewInstanceFunc>(library.get_address("dnf5_plugin_new_instance"));
+     delete_instance = reinterpret_cast<TDeleteInstanceFunc>(library.get_address("dnf5_plugin_delete_instance"));
+ 
++    try {
++        post_base_setup_func = reinterpret_cast<TPostBaseSetup>(library.get_address("dnf5_plugin_post_base_setup"));
++    } catch (const std::runtime_error &) {
++        // Older application plugins do not export this optional hook.
++    }
++
+     try {
+         get_last_exception = reinterpret_cast<TGetLastException>(library.get_address("dnf5_plugin_get_last_exception"));
+     } catch (const std::runtime_error &) {
+@@ -107,6 +116,17 @@ PluginLibrary::PluginLibrary(Context & context, const std::string & library_path
+     }
+ }
+ 
++void PluginLibrary::post_base_setup() {
++    if (post_base_setup_func) {
++        try {
++            post_base_setup_func(iplugin_instance);
++        } catch (const std::exception & ex) {
++            std::throw_with_nested(std::runtime_error(
++                fmt::format("DNF5 plugin \"{}\" post-base-setup failed: {}", get_name(), ex.what())));
++        }
++    }
++}
++
+ PluginLibrary::~PluginLibrary() {
+     finish();
+     delete_instance(iplugin_instance);
+@@ -181,6 +201,14 @@ bool Plugins::init() {
+     return true;
+ }
+ 
++void Plugins::post_base_setup() {
++    for (auto & plugin : plugins) {
++        if (plugin->get_enabled()) {
++            plugin->post_base_setup();
++        }
++    }
++}
++
+ void Plugins::finish() noexcept {
+     for (auto plugin = plugins.rbegin(), stop = plugins.rend(); plugin != stop; ++plugin) {
+         if ((*plugin)->get_enabled()) {
+diff --git a/dnf5/plugins.hpp b/dnf5/plugins.hpp
+index 068ff4f..96a4692 100644
+--- a/dnf5/plugins.hpp
++++ b/dnf5/plugins.hpp
+@@ -50,6 +50,9 @@ public:
+         }
+     }
+ 
++    /// Optional application-plugin lifecycle hook (no IPlugin vtable change).
++    virtual void post_base_setup() {}
++
+     /*bool hook(HookId hook_id) {
+         if (iplugin_instance) {
+             return iplugin_instance->hook(hook_id);
+@@ -93,6 +96,9 @@ public:
+     /// Call init of all allowed plugins.
+     bool init();
+ 
++    /// Call optional post-setup hooks of all enabled application plugins.
++    void post_base_setup();
++
+     /// Call hook of all allowed plugins.
+     //bool hook(HookId id);
+ 
