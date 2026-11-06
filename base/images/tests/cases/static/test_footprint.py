@@ -38,6 +38,7 @@ _INSTALLED_CAP_DEFAULT_MB = 2048
 # Max size (MB) of the shipped rootfs tarball per family; smaller than the
 # installed-size cap since the artifact is compressed.
 _ARTIFACT_CAP_MB: dict[str, int] = {
+    "bootc-base": 400,  # carries a kernel, its initramfs and the bootloader payload
     "container-base": 200,
     "wsl": 300,
 }

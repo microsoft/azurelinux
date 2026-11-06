@@ -3,6 +3,11 @@
 set -euo pipefail
 
 case ",${kiwi_profiles:-}," in
+    # The bootc base image is a container that carries a kernel and a
+    # bootloader payload; it needs the layout bootc expects, not a strip.
+    *,bootc-base,*)
+        exec /image/config-bootc.sh
+        ;;
     # distroless-* and busybox-workload declare runtime-package-management =
     # false: no package manager (or shell) is meant to survive into the
     # shipped image, so run the full keep-list-driven strip (removes

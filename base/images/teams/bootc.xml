@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="BootcCore" description="bootc base image packages" import="false">
+            <requires profile="BootableCore" />
+        </profile>
+        <profile name="bootc-base" description="Azure Linux bootc Base Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="FirstPartyOpenSSLProvider" />
+            <requires profile="BootcCore" />
+        </profile>
+    </profiles>
+    <preferences profiles="bootc-base">
+        <version>0.1.0</version>
+        <packagemanager>dnf5</packagemanager>
+        <type image="oci">
+            <containerconfig name="microsoft/azurelinux/base/bootc" tag="4.0" additionalnames=":latest" workingdir="/">
+                <subcommand execute="/sbin/init" />
+                <labels>
+                    <label name="containers.bootc" value="1" />
+                </labels>
+            </containerconfig>
+        </type>
+    </preferences>
+    <packages type="bootstrap" profiles="BootcCore">
+        <package name="azurelinux-release" />
+        <package name="coreutils" />
+    </packages>
+    <packages type="image" profiles="BootcCore">
+        <file name="config-bootc.sh" target="/image/config-bootc.sh" permissions="0755" />
+        <package name="azurelinux-release" />
+        <package name="bootc" />
+        <package name="bootupd" />
+        <package name="composefs" />
+        <package name="dosfstools" />
+        <package name="dracut" />
+        <package name="e2fsprogs" />
+        <package name="efibootmgr" />
+        <package name="grub2-efi-aa64" arch="aarch64" />
+        <package name="grub2-efi-aa64-modules" arch="aarch64" />
+        <package name="grub2-efi-x64" arch="x86_64" />
+        <package name="grub2-efi-x64-modules" arch="x86_64" />
+        <package name="grub2-pc-modules" arch="x86_64" />
+        <package name="kernel-modules" />
+        <package name="openssh-server" />
+        <package name="ostree" />
+        <package name="selinux-policy-targeted" />
+        <package name="shim" arch="aarch64" />
+        <package name="shim" arch="x86_64" />
+        <package name="sudo" />
+        <package name="systemd-udev" />
+        <package name="xfsprogs" />
+    </packages>
+</image>
