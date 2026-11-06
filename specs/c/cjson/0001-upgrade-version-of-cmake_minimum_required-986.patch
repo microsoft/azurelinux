@@ -1,0 +1,23 @@
+From 40675943213e55d153b0411ce95915cfb69e5a7d Mon Sep 17 00:00:00 2001
+From: Lee <peteralfredlee@gmail.com>
+Date: Sat, 7 Feb 2026 17:13:51 +0800
+Subject: [PATCH] upgrade version of cmake_minimum_required (#986)
+
+github actions fix
+
+(cherry picked from commit a29814f285cc531c00223743ad3c55cd38c0dc56)
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c7ca27f..59e4af5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,5 @@
+ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
+ 
+ project(cJSON
+     VERSION 1.7.19
