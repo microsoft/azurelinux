@@ -1,0 +1,4 @@
+# Pin to Fedora f44 squid-7.7 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/squid/c/47a5888b0b10c149ce64e4895cf3f4f970a0bb29
+[components.squid]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "47a5888b0b10c149ce64e4895cf3f4f970a0bb29" }
