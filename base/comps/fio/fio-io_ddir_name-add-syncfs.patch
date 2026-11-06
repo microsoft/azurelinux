@@ -1,0 +1,49 @@
+From 62b7000971cb58781827b5cb18e05fb309391b85 Mon Sep 17 00:00:00 2001
+From: Bart Van Assche <bvanassche@acm.org>
+Date: Sat, 4 Jul 2026 15:38:28 -0700
+Subject: [PATCH] io_ddir: add "syncfs" to io_ddir_name() array
+
+Update the `name` array in `io_ddir_name()` to include `"syncfs"`,
+corresponding to `DDIR_SYNCFS`.
+
+Previously, `DDIR_SYNCFS` was missing from the lookup table, causing
+string conversions for `DDIR_WAIT` to return the wrong name due to an
+off-by-one index mismatch.
+
+Fixes: 4d3aaa40f6a8 ("fio: introduce the end_syncfs option")
+Reported-by: Gemini LLM
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ io_ddir.h | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/io_ddir.h b/io_ddir.h
+index 203b6898..c2b6266a 100644
+--- a/io_ddir.h
++++ b/io_ddir.h
+@@ -22,11 +22,18 @@ enum fio_ddir {
+ 
+ static inline const char *io_ddir_name(enum fio_ddir ddir)
+ {
+-	static const char *name[] = { "read", "write", "trim", "sync",
+-					"datasync", "sync_file_range",
+-					"wait", };
++	static const char *name[] = {
++		[DDIR_READ] = "read",
++		[DDIR_WRITE] = "write",
++		[DDIR_TRIM] = "trim",
++		[DDIR_SYNC] = "sync",
++		[DDIR_DATASYNC] = "datasync",
++		[DDIR_SYNC_FILE_RANGE] = "sync_file_range",
++		[DDIR_SYNCFS] = "syncfs",
++		[DDIR_WAIT] = "wait",
++	};
+ 
+-	if (ddir >= 0 && ddir < DDIR_LAST)
++	if (ddir >= 0 && ddir < sizeof(name) / sizeof(name[0]) && name[ddir])
+ 		return name[ddir];
+ 
+ 	return "invalid";
+-- 
+2.45.4
+
