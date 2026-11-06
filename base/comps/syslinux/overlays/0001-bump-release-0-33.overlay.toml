@@ -7,13 +7,15 @@
 # 0002-remove-mingw32-gcc-buildrequires.overlay.toml. Without this, the
 # previously-published SRPM (built before the overlays landed) would continue
 # to advertise mingw BuildRequires and break build-dep closure for the AZL
-# repo. Drop this overlay the next time the upstream Release bumps past 0.33.
+# repo. Bumped again to 0.35 for the arch-specific nonlinux subpackages in
+# 0003-make-nonlinux-subpackages-arch-specific.overlay.toml. Drop this overlay
+# the next time the upstream Release bumps past 0.35.
 
 [metadata]
 category = "azl-release-management"
 upstream-status = "inapplicable"
 [[overlays]]
-description = "Bump Release 0.33 → 0.34 to force a rebuild that drops stale mingw BRs"
+description = "Bump Release 0.33 → 0.35 to force rebuilds that pick up AZL overlays"
 type = "spec-search-replace"
 regex = "^Release: 0\\.33%\\{\\?dist\\}$"
-replacement = "Release: 0.34%{?dist}"
+replacement = "Release: 0.35%{?dist}"
