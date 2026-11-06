@@ -3013,14 +3013,14 @@
         "values": [
           {
             "architecture": "x86_64",
-            "value": "y"
+            "value": "n"
           },
           {
             "architecture": "arm64",
-            "value": "y"
+            "value": "n"
           }
         ],
-        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+        "justification": "Keep disabled: legacy hiddev userspace interface with no supported server workload; hidraw covers modern HID access."
       },
       {
         "name": "CONFIG_USB_NET_AX88179_178A",
@@ -3055,14 +3055,14 @@
         "values": [
           {
             "architecture": "x86_64",
-            "value": "m"
+            "value": "n"
           },
           {
             "architecture": "arm64",
-            "value": "m"
+            "value": "n"
           }
         ],
-        "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
+        "justification": "Keep disabled: hobbyist CH341 USB-serial driver"
       },
       {
         "name": "CONFIG_USB_STORAGE",
@@ -3649,20 +3649,6 @@
             { "architecture": "arm64", "value": "y" }
           ],
           "justification": "Keep CONFIG_TUN=y for built-in TUN/TAP availability. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24913"
-        },
-        {
-          "name": "CONFIG_USB_HIDDEV",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
-          ],
-          "justification": "Keep disabled: no supported server workload requires the legacy HIDDEV interface. Standard USB HID remains modular. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24914."
-        },
-        {
-          "name": "CONFIG_USB_SERIAL_CH341",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
-          ],
-          "justification": "Keep disabled: no supported server workload requires CH341 USB-to-serial support; the previous AZL3 requirement no longer applies. Reviewed in https://dev.azure.com/mariner-org/mariner/_workitems/edit/24915."
         },
         {
           "name": "CONFIG_ZONE_DMA",

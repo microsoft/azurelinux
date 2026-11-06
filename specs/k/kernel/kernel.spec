@@ -4329,6 +4329,7 @@ fi\
 %changelog
 * Fri Nov 06 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.4
 - Enable CONFIG_DRM_VGEM=m and CONFIG_USB_TMC=m on x86_64
+- Disable CONFIG_USB_HIDDEV and CONFIG_USB_SERIAL_CH341 on aarch64 to match x86_64
 
 * Thu Nov 05 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.3
 - Build x86 and ARM64 AES and GHASH implementations into the kernel for early FIPS self-tests
