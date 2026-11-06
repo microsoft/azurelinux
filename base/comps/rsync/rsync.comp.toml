@@ -1,5 +1,4 @@
+# Pin to Fedora f43 rsync-3.5.2 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/rsync/c/be6186fab0f7c813fc025a38c60afb22a858bf71
 [components.rsync]
-# Pick up newer version that includes fix for a test failure.
-# This can be removed once our snapshot is later than:
-#   Thu Oct 1 13:06:43 2026 +0200
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "1c044dff1200abf8568e325495d420856ff80e54" }
+spec = { type = "upstream", upstream-commit = "be6186fab0f7c813fc025a38c60afb22a858bf71" }

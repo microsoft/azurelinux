@@ -5,8 +5,8 @@
 
 Summary: A program for synchronizing files over a network
 Name: rsync
-Version: 3.5.1
-Release: 8%{?dist}
+Version: 3.5.2
+Release: 10%{?dist}
 URL: https://rsync.samba.org/
 
 Source0: https://download.samba.org/pub/rsync/src/rsync-%{version}.tar.gz
@@ -44,6 +44,10 @@ License: GPL-3.0-or-later
 Patch1: rsync-add-detect-renamed.diff
 Patch2: rsync-add-detect-renamed-lax.diff
 Patch3: rsync-do-not-build-rrsync-manpage.patch
+# https://github.com/RsyncProject/rsync/commit/ea645201
+# Regression addressed in the following PR:
+# https://github.com/RsyncProject/rsync/pull/1148
+Patch4: skip-unsupported-symlink-chmod.patch
 
 %description
 Rsync uses a reliable algorithm to bring remote and host files into
@@ -137,6 +141,12 @@ install -D -m644 %{SOURCE6} $RPM_BUILD_ROOT/%{_unitdir}/rsyncd@.service
 %systemd_postun_with_restart rsyncd.service
 
 %changelog
+* Fri Nov 06 2026 Michal Ruprich <mruprich@redhat.com> - 3.5.2-2
+- Adding a fix for a regression in 3.5.2
+
+* Thu Nov 05 2026 Michal Ruprich <mruprich@redhat.com> - 3.5.2-1
+- New version 3.5.2
+
 * Thu Oct 01 2026 Michal Ruprich <mruprich@redhat.com> - 3.5.1-1
 - New version 3.5.1
 - Enabling IDN support

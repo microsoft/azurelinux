@@ -68,7 +68,7 @@ diff --git a/compat.c b/compat.c
  	else if (!am_sender
  	 && (delete_before || delete_after
 +	  || detect_renamed
- 	  || delay_updates || prune_empty_dirs))
+ 	  || delay_updates || delay_symlinks || prune_empty_dirs))
  		allow_inc_recurse = 0;
  	else if (am_server && strchr(client_info, 'i') == NULL)
 diff --git a/delete.c b/delete.c
@@ -349,7 +349,7 @@ index 7e5ad60..2058a33 100644
  	flist_free(dirlist);
  }
  
-@@ -391,14 +421,125 @@ static void do_delete_pass(void)
+@@ -391,16 +421,127 @@ static void do_delete_pass(void)
  		 || !S_ISDIR(st.st_mode))
  			continue;
  
@@ -359,8 +359,10 @@ index 7e5ad60..2058a33 100644
 -	delete_in_dir(NULL, NULL, dev_zero);
 +	delete_in_dir(NULL, NULL, dev_zero, 0);
  
- 	if (INFO_GTE(FLIST, 2) && !am_server)
- 		rprintf(FINFO, "                    \r");
+ 	if (INFO_GTE(FLIST, 2) && !am_server) {
+ 		rprintf(FINFO, "                    ");
+ 		rput_progress();
+ 	}
  }
  
 +/* Search for a regular file that matches either (1) the size & modified
@@ -638,13 +640,13 @@ diff --git a/options.c b/options.c
  			goto cleanup;
  		}
 @@ -2835,6 +2838,8 @@ void server_options(char **args, int *argc_p)
- 			args[ac++] = "--super";
+ 			ADD_SERVER_ARG("--super");
  		if (size_only)
- 			args[ac++] = "--size-only";
+ 			ADD_SERVER_ARG("--size-only");
 +		if (detect_renamed)
-+			args[ac++] = "--detect-renamed";
++			ADD_SERVER_ARG("--detect-renamed");
  		if (do_stats)
- 			args[ac++] = "--stats";
+ 			ADD_SERVER_ARG("--stats");
  	} else {
 diff --git a/receiver.c b/receiver.c
 --- a/receiver.c
@@ -789,7 +791,7 @@ diff -Nurp a/rsync.1 b/rsync.1
 --- a/rsync.1
 +++ b/rsync.1
 @@ -1,5 +1,5 @@
- .TH "rsync" "1" "21 Sep 2026" "rsync 3.5.1" "User Commands"
+ .TH "rsync" "1" "4 Nov 2026" "rsync 3.5.2" "User Commands"
 -.\" prefix=/usr
 +.\" prefix=/usr/local
  .P
@@ -861,7 +863,7 @@ diff -Nurp a/rsyncd.conf.5 b/rsyncd.conf.5
 --- a/rsyncd.conf.5
 +++ b/rsyncd.conf.5
 @@ -1,5 +1,5 @@
- .TH "rsyncd.conf" "5" "21 Sep 2026" "rsyncd.conf from rsync 3.5.1" "User Commands"
+ .TH "rsyncd.conf" "5" "4 Nov 2026" "rsyncd.conf from rsync 3.5.2" "User Commands"
 -.\" prefix=/usr
 +.\" prefix=/usr/local
  .P
@@ -901,7 +903,7 @@ diff -Nurp a/rsync-ssl.1 b/rsync-ssl.1
 --- a/rsync-ssl.1
 +++ b/rsync-ssl.1
 @@ -1,5 +1,5 @@
- .TH "rsync-ssl" "1" "21 Sep 2026" "rsync-ssl from rsync 3.5.1" "User Commands"
+ .TH "rsync-ssl" "1" "4 Nov 2026" "rsync-ssl from rsync 3.5.2" "User Commands"
 -.\" prefix=/usr
 +.\" prefix=/usr/local
  .P
