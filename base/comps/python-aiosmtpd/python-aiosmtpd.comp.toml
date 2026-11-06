@@ -1,0 +1,4 @@
+# Pin to Fedora f44 python-aiosmtpd-1.4.6 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python-aiosmtpd/c/caf592f7f7be94e7462288dc97c6485aaff20cd1
+[components.python-aiosmtpd]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "caf592f7f7be94e7462288dc97c6485aaff20cd1" }
