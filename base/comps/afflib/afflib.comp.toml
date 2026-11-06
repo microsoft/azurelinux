@@ -1,0 +1,4 @@
+# Pin to Fedora f43 afflib-3.7.23 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/afflib/c/b832ce45e39288c94662fb39dbfb75095b4ef7b6
+[components.afflib]
+spec = { type = "upstream", upstream-commit = "b832ce45e39288c94662fb39dbfb75095b4ef7b6" }
