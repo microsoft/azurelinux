@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: MIT
-"""Check production package resolution and non-persistent Preview opt-in."""
+"""Check build release consistency, production resolution, and Preview opt-in."""
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING
 
 import pytest
@@ -17,6 +18,22 @@ PRODUCTION_REPOS = {
 }
 
 pytestmark = pytest.mark.require_capability("runtime-package-management")
+
+
+@pytest.mark.image("container-base")
+def test_build_transactions_use_image_release(
+    container_exec_shell: ExecShell,
+    os_release: dict[str, str],
+) -> None:
+    """Keep bootstrap and locale-reinstall repository substitutions consistent."""
+    result = container_exec_shell("LC_ALL=C dnf5 history info '1..last'")
+    assert result.exit_code == 0, f"Transaction history query failed: {result.output}"
+
+    release_versions = re.findall(r"^Releasever\s*:\s*(\S+)\s*$", result.stdout, re.MULTILINE)
+    assert len(release_versions) > 1, f"Missing bootstrap or reinstall history: {result.output}"
+    assert set(release_versions) == {os_release["VERSION_ID"]}, (
+        f"Build transactions used inconsistent releases: {release_versions}"
+    )
 
 
 def test_package_operations_use_production(container_exec_shell: ExecShell) -> None:
