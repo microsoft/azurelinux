@@ -1,0 +1,21 @@
+# Remove this overlay file and its patch when upgrading to PAM >= 1.7.3,
+# which includes upstream commit dd74fc113a9ba1f94d5469f6f7857a1884b3f550.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [{ url = "https://github.com/linux-pam/linux-pam/commit/dd74fc113a9ba1f94d5469f6f7857a1884b3f550" }]
+
+[[overlays]]
+description = "Avoid DES for new passwords when neither login.defs nor module options select a hash"
+type = "patch-add"
+source = "../0002-pam-unix-sha512-fallback.patch"
+
+[[overlays]]
+description = "Apply the SHA-512 fallback backport in PAM's manually enumerated prep sequence"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P 5 -p1 -b \.configure-cis-pam-policy$'
+replacement = '''
+%patch -P 5 -p1 -b .configure-cis-pam-policy
+%patch -P 6 -p1 -b .pam-unix-sha512-fallback
+'''

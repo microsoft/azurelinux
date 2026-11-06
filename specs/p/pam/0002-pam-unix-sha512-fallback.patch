@@ -1,0 +1,62 @@
+From dd74fc113a9ba1f94d5469f6f7857a1884b3f550 Mon Sep 17 00:00:00 2001
+From: Thorsten Kukuk <kukuk@suse.com>
+Date: Tue, 28 Jul 2026 09:58:32 +0200
+Subject: [PATCH] pam_unix: make SHA512 the default
+
+If no hash is specified as option and ENCRYPT_METHOD is not specified
+in login.defs, pam_unix.so fails back to DES. Change this to a modern,
+secure hash algorithm (SHA512).
+
+Backport to 1.7.1: refresh support.h context because UNIX_EXPIRED_ONLY
+is not present in this release. No functional changes to the upstream fix.
+---
+ modules/pam_unix/pam_unix.8.xml | 6 ++++--
+ modules/pam_unix/support.h      | 7 +++++--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/modules/pam_unix/pam_unix.8.xml b/modules/pam_unix/pam_unix.8.xml
+index d2cd198fb..fca466620 100644
+--- a/modules/pam_unix/pam_unix.8.xml
++++ b/modules/pam_unix/pam_unix.8.xml
+@@ -87,7 +87,9 @@
+       The password component of this module performs the task of updating
+       the user's password. The default encryption hash is taken from the
+       <emphasis remap="B">ENCRYPT_METHOD</emphasis> variable from
+-      <emphasis>/etc/login.defs</emphasis>
++      <emphasis>login.defs</emphasis>. If that variable is absent
++      and no hash algorithm option is passed to the module, SHA512 is
++      used as the built-in default.
+     </para>
+ 
+     <para>
+@@ -495,4 +497,4 @@ session    required   pam_unix.so
+       </para>
+   </refsect1>
+ 
+-</refentry>
+\ No newline at end of file
++</refentry>
+diff --git a/modules/pam_unix/support.h b/modules/pam_unix/support.h
+--- a/modules/pam_unix/support.h
++++ b/modules/pam_unix/support.h
+@@ -97,7 +97,7 @@ typedef struct {
+ #define UNIX_MIN_PASS_LEN        27	/* min length for password */
+ #define UNIX_QUIET		 28	/* Don't print informational messages */
+ #define UNIX_NO_PASS_EXPIRY      29     /* Don't check for password expiration if not used for authentication */
+-#define UNIX_DES                 30     /* DES, default */
++#define UNIX_DES                 30     /* DES, deprecated */
+ #define UNIX_GOST_YESCRYPT_PASS  31     /* new password hashes will use gost-yescrypt */
+ #define UNIX_YESCRYPT_PASS       32     /* new password hashes will use yescrypt */
+ #define UNIX_NULLRESETOK         33     /* allow empty password if password reset is enforced */
+@@ -147,7 +147,10 @@ static const UNIX_Ctrls unix_args[UNIX_CTRLS_] =
+ /* UNIX_NULLRESETOK */         {"nullresetok",      _ALL_ON_,                    020000000000, 0},
+ };
+ 
+-#define UNIX_DEFAULTS  (unix_args[UNIX__NONULL].flag)
++/* Change this to switch the built-in default hash for new passwords. */
++#define UNIX_DEFAULT_HASH_ALGO  UNIX_SHA512_PASS
++
++#define UNIX_DEFAULTS  (unix_args[UNIX__NONULL].flag | unix_args[UNIX_DEFAULT_HASH_ALGO].flag)
+ 
+ /* use this to free strings. ESPECIALLY password strings */
+ 
