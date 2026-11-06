@@ -1,0 +1,4 @@
+# Pin to Fedora rawhide libslirp-4.9.7 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libslirp/c/842747952c1b96eb5376c5d44f52728f9fd8b5f8
+[components.libslirp]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "842747952c1b96eb5376c5d44f52728f9fd8b5f8" }
