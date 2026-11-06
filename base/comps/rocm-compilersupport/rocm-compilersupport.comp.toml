@@ -1,9 +1,1 @@
 [components.rocm-compilersupport]
-
-[[components.rocm-compilersupport.overlays]]
-description = "Restore correct Release"
-type = "spec-set-tag"
-tag = "Release"
-value = "21.rocm%{rocm_version}%{?dist}"
-metadata.category = "azl-temp-workaround"
-metadata.upstream-status = "inapplicable"

@@ -4,12 +4,6 @@
 [components.openbios]
 
 [[components.openbios.overlays]]
-description = "Restore correct Release:"
-type = "spec-set-tag"
-tag = "Release"
-value = "2.git%{hash}%{?dist}"
-
-[[components.openbios.overlays]]
 description = "Backport upstream host bit-width detection for aarch64 and riscv64 to prevent forthstrap pointer truncation"
 type = "patch-add"
 source = "0001-config-scripts-switch-arch-fix-build-on-aarch64-and-riscv64.patch"
