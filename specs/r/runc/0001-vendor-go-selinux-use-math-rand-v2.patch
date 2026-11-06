@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Edoardo Spadolini <edoardo.spadolini@gmail.com>
+Date: Wed, 22 Apr 2026 13:03:55 +0000
+Subject: [PATCH] vendor: go-selinux: use math/rand/v2 rather than crypto/rand
+
+Since consumers of the library might want to completely avoid using
+crypto/... to ensure compliance with FIPS 140-3, and since using
+slightly more predictable MCS labels shouldn't have any effect on
+security, this commit replaces the one use of crypto/rand in the
+codebase with its equivalent in math/rand/v2.
+
+Closes #252
+
+Signed-off-by: Edoardo Spadolini <edoardo.spadolini@gmail.com>
+
+[Backport of opencontainers/selinux commit 9a2bcdd5c41a (released in
+v1.14.0) to the go-selinux v1.13.1 vendored by runc 1.5.2. Only the
+go-selinux/selinux_linux.go hunk applies to the vendored tree.]
+Upstream: https://github.com/opencontainers/selinux/commit/9a2bcdd5c41a92fe17cd95a15befcef90ddd4f80
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ .../selinux/go-selinux/selinux_linux.go             | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/vendor/github.com/opencontainers/selinux/go-selinux/selinux_linux.go b/vendor/github.com/opencontainers/selinux/go-selinux/selinux_linux.go
+index 6d7f8e2..7b000eb 100644
+--- a/vendor/github.com/opencontainers/selinux/go-selinux/selinux_linux.go
++++ b/vendor/github.com/opencontainers/selinux/go-selinux/selinux_linux.go
+@@ -3,13 +3,12 @@ package selinux
+ import (
+ 	"bufio"
+ 	"bytes"
+-	"crypto/rand"
+-	"encoding/binary"
+ 	"errors"
+ 	"fmt"
+ 	"io"
+ 	"io/fs"
+ 	"math/big"
++	"math/rand/v2"
+ 	"os"
+ 	"os/user"
+ 	"path/filepath"
+@@ -976,16 +975,16 @@ func intToMcs(id int, catRange uint32) string {
+ 
+ func uniqMcs(catRange uint32) string {
+ 	var (
+-		n      uint32
+ 		c1, c2 uint32
+ 		mcs    string
+ 	)
+ 
+ 	for {
+-		_ = binary.Read(rand.Reader, binary.LittleEndian, &n)
+-		c1 = n % catRange
+-		_ = binary.Read(rand.Reader, binary.LittleEndian, &n)
+-		c2 = n % catRange
++		//#nosec G404 -- using slightly more predictable MCS labels won't affect security, so it's fine to use math/rand/v2 here.
++		{
++			c1 = rand.Uint32N(catRange)
++			c2 = rand.Uint32N(catRange)
++		}
+ 		if c1 == c2 {
+ 			continue
+ 		} else if c1 > c2 {
