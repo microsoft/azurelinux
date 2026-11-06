@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python-django5-5.2.18 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python-django5/c/f82ef395b9f689b9028e9271e77e5f5e235f892d
+[components.python-django5]
+spec = { type = "upstream", upstream-commit = "f82ef395b9f689b9028e9271e77e5f5e235f892d" }
