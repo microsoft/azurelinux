@@ -1,12 +1,17 @@
 [components.rubygem-rake]
 
-[components.rubygem-rake.build.defines]
-# AZL-only release counter added to upstream's %{baserelease}. Bump for an AZL
-# rebuild, since manual release calculation can't auto-bump the Release.
-azl_release = "1"
-
 [[components.rubygem-rake.overlays]]
-description = "Fold azl_release into %{baserelease} so we can bump the Release independently of upstream (manual release calculation can't auto-bump)"
+description = "Restore correct Release"
 type = "spec-set-tag"
 tag = "Release"
-value = "%{?preminorver:0.}%[%{baserelease} + %{azl_release}]%{?preminorver:%{rpmminorver}}%{?dist}"
+value = "%{?preminorver:0.}%{baserelease}%{?preminorver:%{rpmminorver}}%{?dist}"
+metadata.category = "azl-temp-workaround"
+metadata.upstream-status = "inapplicable"
+
+[[components.rubygem-rake.overlays]]
+description = "Set correct baserelease"
+type = "spec-search-replace"
+regex = '%global\s+baserelease\s+101'
+replacement = "%global	baserelease	102"
+metadata.category = "azl-temp-workaround"
+metadata.upstream-status = "inapplicable"

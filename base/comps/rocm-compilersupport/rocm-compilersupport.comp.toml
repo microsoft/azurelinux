@@ -1,21 +1,9 @@
 [components.rocm-compilersupport]
 
-[components.rocm-compilersupport.build.defines]
-# AZL-only release counter. Composed with the "15." base via the overlay
-# below (Release: %[15 + %{azl_release}].rocm...), keeping a monotonically
-# increasing single-number Release schema. Bump whenever an AZL-only
-# change requires a new RPM (new overlay, build-flag change, rebuild
-# against new dependency) WITHOUT moving the upstream pin.
-#
-# Current value matches the number of times the lock file's
-# input-fingerprint has changed. Each commit that touches a tracked
-# input (overlay edit, build-define change, lock pin refresh, etc.)
-# advances the counter by one in the same PR.
-#
-# Commits that have bumped this counter (newest last):
-#   1. feat: introduce deterministic commit resolution via Azure Linux lock file
-#   2. fix(rocm-compilersupport): set manual release calculation
-#   3. fix(rocm-compilersupport): introduce azl_release counter
-#   4. fix(rocm-compilersupport): teach rocm-llvm clang to find the AZL GCC toolchain
-#   5. fix(rocm-compilersupport): derive the GCC triple from the build compiler
-azl_release = "6"
+[[components.rocm-compilersupport.overlays]]
+description = "Restore correct Release"
+type = "spec-set-tag"
+tag = "Release"
+value = "21.rocm%{rocm_version}%{?dist}"
+metadata.category = "azl-temp-workaround"
+metadata.upstream-status = "inapplicable"

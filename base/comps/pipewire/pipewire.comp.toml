@@ -1,17 +1,18 @@
 [components.pipewire]
 build.without = ["v4l2", "roc"]
 
-[components.pipewire.build.defines]
-# AZL-only release counter. Added to upstream's %{baserelease} so the final
-# Release tag is a single number (Fedora-style schema) that bumps independently
-# of upstream. Increment when shipping new AZL-only changes on top of the
-# pinned upstream commit.
-#   1 - 5d461a2449 feat: introduce deterministic commit resolution via Azure Linux lock file
-#   2 - introduce azl_release for pipewire
-#   3 - disable opus codec support
-#   4 - drop webrtc-audio-processing BR
-#   5 - disable v4l2 support
-#   6 - disable roc support
-#   7 - drop AAC bluetooth codec
-azl_release = "7"
+[[components.pipewire.overlays]]
+description = "Restore correct Release"
+type = "spec-set-tag"
+tag = "Release"
+value = "%{baserelease}%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}"
+metadata.category = "azl-temp-workaround"
+metadata.upstream-status = "inapplicable"
 
+[[components.pipewire.overlays]]
+description = "Set correct baserelease"
+type = "spec-search-replace"
+regex = "%global baserelease 1"
+replacement = "%global baserelease 8"
+metadata.category = "azl-temp-workaround"
+metadata.upstream-status = "inapplicable"

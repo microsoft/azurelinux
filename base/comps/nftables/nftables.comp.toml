@@ -1,8 +1,0 @@
-[components.nftables]
-
-[[components.nftables.overlays]]
-description = "Keep the crash-fixed build newer than the published 1:1.1.3-9.azl4 release"
-type = "spec-set-tag"
-tag = "Release"
-value = "10%{?dist}"
-metadata = { category = "azl-release-management", upstream-status = "inapplicable" }

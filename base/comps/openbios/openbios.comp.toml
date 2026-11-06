@@ -3,16 +3,11 @@
 # https://github.com/openbios/openbios/commit/e5ac46dd24e6216c36aa80462af25457e7029440
 [components.openbios]
 
-[components.openbios.build.defines]
-# AZL-only release counter. Add this to upstream's Release value (1) so future
-# Azure Linux rebuilds only need to increment this define.
-azl_release = "1"
-
 [[components.openbios.overlays]]
-description = "Compose azl_release with upstream Release so Azure Linux rebuilds can be bumped independently"
+description = "Restore correct Release:"
 type = "spec-set-tag"
 tag = "Release"
-value = "%[1 + %{azl_release}].git%{hash}%{?dist}"
+value = "2.git%{hash}%{?dist}"
 
 [[components.openbios.overlays]]
 description = "Backport upstream host bit-width detection for aarch64 and riscv64 to prevent forthstrap pointer truncation"
