@@ -1,0 +1,5 @@
+# Pin to Fedora f43 mtools-4.0.50 to pick up CVE fixes:
+# CVE-2026-118384
+# https://src.fedoraproject.org/rpms/mtools/c/bb461956a91183f6e89c7d5bb97f716453cb3311
+[components.mtools]
+spec = { type = "upstream", upstream-commit = "bb461956a91183f6e89c7d5bb97f716453cb3311" }
