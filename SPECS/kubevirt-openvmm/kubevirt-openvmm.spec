@@ -7,14 +7,14 @@
 
 %define _missing_build_ids_terminate_build 0
 
-%global srctag v1.9.0-1
-%global sha 0238166fefcc8e22c0a66a67a317f556c34c283d
+%global srctag v1.9.0-2
+%global sha d09137339d024e2406a9014aed2896c102e9671e
 %global msvm_version 26.0.37
 
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
 Version:        1.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -297,6 +297,9 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 %{_bindir}/virt-tests
 
 %changelog
+* Fri Nov 06 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.9.0-2
+- Bump to source tag openvmm-v1.9.0-2 to add reliable guest console log capture
+
 * Mon Oct 26 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.9.0-1
 - License verified
 - Add temporary x86 OpenVMM firmware and UEFI templates
