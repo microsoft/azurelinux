@@ -1,0 +1,4 @@
+# Pin to Fedora f45 fio-3.42 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/fio/c/39fa4cbb53f0e12c5fb84e8c3b1cc9e771cd74f6
+[components.fio]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "45" }, upstream-commit = "39fa4cbb53f0e12c5fb84e8c3b1cc9e771cd74f6" }
