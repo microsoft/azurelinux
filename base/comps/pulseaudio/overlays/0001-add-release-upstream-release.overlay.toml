@@ -1,9 +1,0 @@
-[metadata]
-category = "azl-temp-workaround"
-upstream-status = "inapplicable"
-
-[[overlays]]
-description = "Restore correct Release"
-type = "spec-set-tag"
-tag = "Release"
-value = "14%{?snap:.%{snap}git%{shortcommit}}%{?dist}"

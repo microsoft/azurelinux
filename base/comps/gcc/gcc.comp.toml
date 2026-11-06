@@ -1,8 +1,8 @@
 [components.gcc]
 
 [[components.gcc.overlays]]
-description = "Bump the manually managed GCC release for the branding rebuild"
+description = "DO NOT MODIFY THIS! As soon as the gcc version is bumped, or the gcc_release from upstream is bumped, REMOVE THIS OVERLAY"
 type = "spec-search-replace"
 regex = '^%global gcc_release 1$'
 replacement = '%global gcc_release 2'
-metadata = { category = "azl-release-management", upstream-status = "inapplicable" }
+metadata = { category = "azl-temp-workaround", upstream-status = "inapplicable" }
