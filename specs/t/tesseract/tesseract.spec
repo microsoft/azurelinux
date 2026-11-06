@@ -14,7 +14,7 @@
 
 Name:          tesseract
 Version:       5.5.4
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:       Raw OCR Engine
 
 License:       Apache-2.0
@@ -77,6 +77,7 @@ A commercial quality OCR engine originally developed at HP between 1985 and
 1995. In 1995, this engine was among the top 3 evaluated by UNLV. It was
 open-sourced by HP and UNLV in 2005.}
 
+Patch2: tesseract-lstm-dont-cap-inference-buffers.patch
 %description %_description
 
 

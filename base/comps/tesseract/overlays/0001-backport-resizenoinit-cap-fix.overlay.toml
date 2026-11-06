@@ -1,0 +1,15 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/tesseract-ocr/tesseract/commit/8a2cc748331b18579e763ecb9517f93a1fab803f" }]
+bugs = [{ url = "https://github.com/tesseract-ocr/tesseract/pull/4674" }]
+
+# 5.5.4 includes 048e923 (#4649), which caps GENERIC_2D_ARRAY::ResizeNoInit at
+# 100,000,000 elements. That helper also sizes trusted LSTM inference buffers,
+# so a wide text line can exceed the cap, leave stale dimensions and abort OCR.
+# Upstream moved the cap to deserialization in 8a2cc748, which is not in a
+# tagged release yet. Drop this overlay once we move to a release that has it.
+[[overlays]]
+description = "Backport upstream 8a2cc748 so LSTM inference buffers above the 5.5.4 element cap no longer abort OCR"
+type = "patch-add"
+source = "../tesseract-lstm-dont-cap-inference-buffers.patch"
