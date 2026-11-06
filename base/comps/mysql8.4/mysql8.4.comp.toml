@@ -1,3 +1,10 @@
 [components.'mysql8.4']
 # Release: 1%{?with_debug:.debug}%{?dist}
 release = { calculation = "manual" }
+
+[[components.'mysql8.4'.overlays]]
+description = "Keep dist-git subdirectories visible to Git when tracking component changes"
+type = "file-search-replace"
+file = ".gitignore"
+regex = '(?m)^/\*/(?:\r?\n|$)'
+metadata = { category = "azl-temp-workaround", upstream-status = "upstreamable" }
