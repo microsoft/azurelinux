@@ -1,0 +1,4 @@
+# AZL: azurelinux-release's 99-default-disable.preset disables all units
+# unless an earlier preset enables them; this overrides that for gdrcopy so
+# gdrdrv loads and /dev/gdrdrv is created on boot.
+enable gdrcopy.service
