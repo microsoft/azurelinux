@@ -1,0 +1,4 @@
+# Pin to Fedora f45 libXpm-3.5.19 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libXpm/c/3a020942bdc7acc7d0bf0612b7e982413c790a9b
+[components.libXpm]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "45" }, upstream-commit = "3a020942bdc7acc7d0bf0612b7e982413c790a9b" }
