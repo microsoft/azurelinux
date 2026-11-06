@@ -1,0 +1,18 @@
+# With Python 3.14, an asyncio server transport left over from one test can be
+# garbage collected while a later test runs: _SelectorTransport.__del__ ->
+# Server._detach -> Server._wakeup iterates self._waiters after it was already
+# set to None. pytest reports that unraisable TypeError against whichever test
+# happens to be running (test_getlocalhost_6yes, test_getlocalhost_6inuse, ...),
+# so deselecting individual tests does not help. The Server._wakeup code is the
+# same in CPython 3.14.7 and 3.14.10; aiosmtpd's server code is unchanged since
+# 1.4.4. Only unraisable-exception warnings are ignored; all tests still run.
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Do not fail %check on unraisable exceptions from Python 3.14 asyncio transport cleanup that land on unrelated tests"
+type = "spec-search-replace"
+section = "%check"
+regex = '^%\{__python3\} -m pytest -v '
+replacement = '%{__python3} -m pytest -v -W "ignore::pytest.PytestUnraisableExceptionWarning" '
