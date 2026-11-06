@@ -27,6 +27,11 @@
         <packagemanager>dnf5</packagemanager>
     </preferences>
     <preferences profiles="core">
+        <!-- post-bootstrap re-install needs release version -->
+        <release-version>4.0</release-version>
+        <rpm-locale-filtering>true</rpm-locale-filtering>
+        <rpm-excludedocs>true</rpm-excludedocs>
+        <locale>C,en_US</locale>
         <type image="oci">
             <containerconfig name="microsoft/azurelinux/base/core" tag="4.0" additionalnames=":latest" workingdir="/">
                 <subcommand execute="/bin/bash" />
