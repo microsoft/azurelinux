@@ -72,21 +72,21 @@ diff --git a/options.c b/options.c
    {"no-fuzzy",         0,  POPT_ARG_VAL,    &fuzzy_basis, 0, 0, 0 },
    {"no-y",             0,  POPT_ARG_VAL,    &fuzzy_basis, 0, 0, 0 },
 @@ -2838,8 +2840,14 @@ void server_options(char **args, int *argc_p)
- 			args[ac++] = "--super";
+ 			ADD_SERVER_ARG("--super");
  		if (size_only)
- 			args[ac++] = "--size-only";
+ 			ADD_SERVER_ARG("--size-only");
 -		if (detect_renamed)
--			args[ac++] = "--detect-renamed";
+-			ADD_SERVER_ARG("--detect-renamed");
 +		if (detect_renamed) {
 +			if (detect_renamed == 1)
-+				args[ac++] = "--detect-renamed";
++				ADD_SERVER_ARG("--detect-renamed");
 +			else if (detect_renamed == 2)
-+				args[ac++] = "--detect-renamed-lax";
++				ADD_SERVER_ARG("--detect-renamed-lax");
 +			else
-+				args[ac++] = "--detect-moved";
++				ADD_SERVER_ARG("--detect-moved");
 +		}
  		if (do_stats)
- 			args[ac++] = "--stats";
+ 			ADD_SERVER_ARG("--stats");
  	} else {
 diff --git a/rsync.1.md b/rsync.1.md
 --- a/rsync.1.md
