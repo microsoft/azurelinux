@@ -38,6 +38,9 @@ parameters:
   - name: pollTimeoutSeconds
     type: number
     default: 21600
+  - name: poolName
+    type: string
+    default: ""
   - name: poolType
     type: string
     default: linux
@@ -60,6 +63,9 @@ stages:
             # FULL build: it must exceed pollTimeoutSeconds (6h default).
             timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
             pool:
+              ${{ if ne(parameters.poolName, '') }}:
+                name: ${{ parameters.poolName }}
+                isCustom: true
               type: ${{ parameters.poolType }}
             variables:
               - name: LinuxContainerImage
