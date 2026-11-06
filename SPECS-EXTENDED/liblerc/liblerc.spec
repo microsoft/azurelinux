@@ -1,7 +1,7 @@
 Summary:        Library for Limited Error Raster Compression
 Name:           liblerc
 Version:        4.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,11 +44,12 @@ sed -i 's/\r$//' NOTICE README.md doc/MORE.md
 %check
 # Run your C++ program
 g++ -o test src/LercTest/main.cpp -L. -lLerc
+export LD_LIBRARY_PATH=.
 ./test
 
 %files
-%license LICENSE
-%doc README.md CHANGELOG.md NOTICE
+%license LICENSE NOTICE
+%doc README.md CHANGELOG.md
 %{_libdir}/libLerc.so.4
 
 %files devel
@@ -59,6 +60,9 @@ g++ -o test src/LercTest/main.cpp -L. -lLerc
 %{_libdir}/pkgconfig/Lerc.pc
 
 %changelog
+* Mon Jan 19 2026 Aditya Singh <v-aditysing@microsoft.com> - 4.0.0-4
+- Resolved test failure and license issue.
+
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 4.0.0-3
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Remove mingw execution blocks
