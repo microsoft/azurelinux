@@ -28,6 +28,14 @@ the repositories available in the resulting OS. These runtime repositories are
 independent of the package sources used to build the image. Distroless
 container images strip the package manager and do not ship a repository package.
 
+First-party `1p-vm-base-*` images include `golang-msft-telemetry-policy`.
+The policy does not install Go, but enables Microsoft build of Go telemetry by default
+when Go is installed, including later installations and upgrades. Environment
+variables and `go env -w` preferences can still override that default. Other
+image families retain the general Azure Linux default of disabled Microsoft build of Go
+telemetry. The first-party static tests check the policy package and, when Go
+is present, its installed default.
+
 Production Base, Cloud Native, and Microsoft binary repositories are enabled by
 default. All Preview, source, and debuginfo repositories are disabled. Static
 repository checks enforce these defaults on every image with the
