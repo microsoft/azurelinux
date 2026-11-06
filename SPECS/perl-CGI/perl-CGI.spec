@@ -2,7 +2,7 @@
 
 Summary:        Handle Common Gateway Interface requests and responses
 Name:           perl-CGI
-Version:        4.60
+Version:        5.02
 Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -93,6 +93,9 @@ PERL5LIB=/root/perl5/lib/perl5 make %{?_smp_mflags} test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Fri Nov 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.02-1
+- Auto-upgrade to 5.02 - for CVE-2026-120645, CVE-2026-120635, CVE-2026-120636, CVE-2026-120639, CVE-2026-120642, CVE-2026-120644, CVE-2026-120641, CVE-2026-120647, CVE-2026-120648, CVE-2026-120650, CVE-2026-120651, CVE-2026-120634, CVE-2026-120632, CVE-2026-120633, CVE-2026-120637, CVE-2026-120638, CVE-2026-120640
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.60-1
 - Auto-upgrade to 4.60 - Azure Linux 3.0 - package upgrades
 
