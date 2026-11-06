@@ -33,18 +33,18 @@ diff --git a/configure b/configure
 index 8a6e697..995a3df 100755
 --- a/configure
 +++ b/configure
-@@ -18732,7 +18732,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+@@ -18746,7 +18746,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
  #                                                                 #
  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
  
--ac_config_files="$ac_config_files Makefile gen/Makefile common/Makefile lib/Makefile data/Makefile auto/Makefile modules/Makefile modules/tokenizer/Makefile modules/speller/Makefile modules/speller/default/Makefile interfaces/Makefile interfaces/cc/Makefile scripts/Makefile examples/Makefile prog/Makefile manual/Makefile po/Makefile.in m4/Makefile modules/filter/Makefile myspell/Makefile lib5/Makefile"
-+ac_config_files="$ac_config_files Makefile gen/Makefile common/Makefile lib/Makefile data/Makefile auto/Makefile modules/Makefile modules/tokenizer/Makefile modules/speller/Makefile modules/speller/default/Makefile interfaces/Makefile interfaces/cc/Makefile aspell.pc scripts/Makefile examples/Makefile prog/Makefile manual/Makefile po/Makefile.in m4/Makefile modules/filter/Makefile myspell/Makefile lib5/Makefile"
+-ac_config_files="$ac_config_files Makefile gen/Makefile common/Makefile lib/Makefile data/Makefile auto/Makefile modules/Makefile modules/tokenizer/Makefile modules/speller/Makefile modules/speller/default/Makefile interfaces/Makefile interfaces/cc/Makefile scripts/Makefile examples/Makefile prog/Makefile manual/Makefile po/Makefile.in m4/Makefile modules/filter/Makefile lib5/Makefile"
++ac_config_files="$ac_config_files Makefile gen/Makefile common/Makefile lib/Makefile data/Makefile auto/Makefile modules/Makefile modules/tokenizer/Makefile modules/speller/Makefile modules/speller/default/Makefile interfaces/Makefile interfaces/cc/Makefile scripts/Makefile examples/Makefile prog/Makefile manual/Makefile po/Makefile.in m4/Makefile modules/filter/Makefile lib5/Makefile aspell.pc"
  
  cat >confcache <<\_ACEOF
  # This file is a shell script that caches the results of configure
-@@ -19887,6 +19887,7 @@ do
+@@ -19904,6 +19904,7 @@ do
+     "m4/Makefile") CONFIG_FILES="$CONFIG_FILES m4/Makefile" ;;
      "modules/filter/Makefile") CONFIG_FILES="$CONFIG_FILES modules/filter/Makefile" ;;
-     "myspell/Makefile") CONFIG_FILES="$CONFIG_FILES myspell/Makefile" ;;
      "lib5/Makefile") CONFIG_FILES="$CONFIG_FILES lib5/Makefile" ;;
 +    "aspell.pc") CONFIG_FILES="$CONFIG_FILES aspell.pc" ;;
  

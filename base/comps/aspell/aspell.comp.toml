@@ -1,0 +1,4 @@
+# Pin to Fedora rawhide aspell-0.60.8.3 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/aspell/c/8038cab276fa2faba71419ef4a7151d9afe04db5
+[components.aspell]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "8038cab276fa2faba71419ef4a7151d9afe04db5" }
