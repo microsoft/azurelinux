@@ -1,0 +1,4 @@
+# Pin to Fedora f44 cjson-1.7.19 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/cjson/c/c142fcfa02d47c97dd864de58f437319266b1b12
+[components.cjson]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "c142fcfa02d47c97dd864de58f437319266b1b12" }
