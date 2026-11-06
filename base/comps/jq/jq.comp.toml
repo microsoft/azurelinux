@@ -1,0 +1,4 @@
+# Pin to Fedora f45 jq-1.8.2 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/jq/c/a555ef019efc33c9b3d242d2475fe8079ac9302a
+[components.jq]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "45" }, upstream-commit = "a555ef019efc33c9b3d242d2475fe8079ac9302a" }
