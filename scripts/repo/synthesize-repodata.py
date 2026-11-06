@@ -14,6 +14,7 @@ under the Standard Azure Linux Repo Layout:
     <out>/sdk/<arch>/                 # main binary RPMs, sdk channel
     <out>/sdk/debuginfo/<arch>/       # debuginfo/debugsource, sdk channel
     <out>/sdk/srpms/                  # source RPMs, sdk channel
+    <out>/nvidia/<arch>/              # main binary RPMs, nvidia channel
 
 Each emitted repo's `<location href>` references the original upstream RPM
 URL (so consumers download from the source repos).
@@ -75,7 +76,7 @@ DEFAULT_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_ARCHES = ("x86_64", "aarch64")
 SRPM_ARCH = "src"
 CHANNEL_PREFIX = "rpm-"
-# The fixed Standard Azure Linux Repo Layout has exactly two output channels.
+# Only the fixed Standard Azure Linux Repo Layout channels are output channels.
 # Anything else returned by azldev is treated as unpublished (and reported).
 ALLOWED_OUTPUT_CHANNELS = frozenset(CHANNELS)
 
@@ -645,7 +646,7 @@ def query_azldev(
 class RoutingDecision:
     """Record where a package should land or why it was excluded."""
 
-    dest_channel: str | None = None  # 'base' | 'sdk' | None (=excluded)
+    dest_channel: str | None = None  # one of CHANNELS | None (=excluded)
     reason: str = ""  # human-readable provenance
     inherited: bool = False  # was Phase-4 inheritance used?
     tie_break_used: bool = False  # did inheritance pick via tie-break?
@@ -787,7 +788,7 @@ def decide_routing(
 class Destination:
     """One channel, package kind, and architecture output repository."""
 
-    channel: str  # 'base' | 'sdk'
+    channel: str  # one of CHANNELS
     kind: str  # main | debuginfo | srpms
     arch: str  # x86_64 | aarch64 | src
 

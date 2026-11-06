@@ -1235,11 +1235,6 @@ components = [
     "numpy",
     "nuspell",
     "nvidia-container-toolkit",
-    "nvidia-driver",
-    "nvidia-kmod-common",
-    "nvidia-modprobe",
-    "nvidia-open",
-    "nvidia-persistenced",
     "nvme-cli",
     "nvmetcli",
     "nvml",
@@ -2651,6 +2646,23 @@ components = [
     "zvbi",
     "zxing-cpp",
     "zziplib",
+]
+
+# NVIDIA user-space driver packages are published to their own namespaced
+# channel (packages.microsoft.com/azurelinux/<ver>/<stage>/nvidia/$basearch)
+# rather than base, so the proprietary GPU stack is opt-in. Only binary RPMs
+# are published there; SRPMs and debuginfo are not published (none).
+[component-groups.nvidia-packages]
+description = "NVIDIA user-space driver packages"
+default-component-config.publish.srpm-channel = "none"
+default-component-config.publish.rpm-channel = "rpm-nvidia"
+default-component-config.publish.debuginfo-channel = "none"
+components = [
+    "nvidia-driver",
+    "nvidia-kmod-common",
+    "nvidia-modprobe",
+    "nvidia-open",
+    "nvidia-persistenced",
 ]
 
 # This group is the *single, curated* escape hatch from the
