@@ -14,19 +14,3 @@ description = "Install the sysroot beneath the Azure Linux vendor triple rather 
 type = "spec-search-replace"
 regex = '^%global sysroot_prefix /usr/%\{_arch\}-redhat-linux/sys-root/%\{sysroot_dist\}$'
 replacement = '%global sysroot_prefix /usr/%{_arch}-%{_vendor}-linux/sys-root/%{sysroot_dist}'
-
-[[overlays]]
-description = "Bump the manually managed release for the Azure Linux sysroot naming change"
-type = "spec-search-replace"
-regex = '^%global baserelease 17$'
-replacement = '%global baserelease 18'
-
-[[overlays]]
-description = "Document the Azure Linux sysroot naming change in the package changelog"
-type = "spec-prepend-lines"
-section = "%changelog"
-lines = [
-    "* Tue Nov 03 2026 Dan Streetman <ddstreet@ieee.org> - 2.42-18",
-    "- Use Azure Linux sysroot package names and paths.",
-    "",
-]

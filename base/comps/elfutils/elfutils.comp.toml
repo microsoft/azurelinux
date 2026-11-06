@@ -1,5 +1,17 @@
 [components.elfutils]
 
-[components.elfutils.build.defines]
-# Azure Linux-only release delta. Keep the imported Fedora baserelease intact.
-azl_release = "1"
+[[components.elfutils.overlays]]
+description = "Restore correct Release"
+type = "spec-set-tag"
+tag = "Release"
+value = "%{baserelease}%{?dist}"
+metadata.category = "azl-temp-workaround"
+metadata.upstream-status = "inapplicable"
+
+[[components.elfutils.overlays]]
+description = "Set correct baserelease"
+type = "spec-search-replace"
+regex = "%global baserelease 1"
+replacement = "%global baserelease 2"
+metadata.category = "azl-temp-workaround"
+metadata.upstream-status = "inapplicable"

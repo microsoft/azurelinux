@@ -1,13 +1,1 @@
 [components.pulseaudio]
-
-[components.pulseaudio.build.defines]
-# AZL-only release counter. Added to upstream's hardcoded Release number (9)
-# so the final Release tag is a single number (Fedora-style schema) that
-# bumps independently of upstream. Increment when shipping new AZL-only
-# changes on top of the pinned upstream commit.
-#   1 - 5d461a2449 feat: introduce deterministic commit resolution via Azure Linux lock file
-#   2 - 7c5a4c7e86 fix(pulseaudio): set manual release calculation
-#   3 - f9e776358e fix(pulseaudio): disable gdm-hooks subpackage
-#   4 - introduce azl_release for pulseaudio
-#   5 - disable WebRTC AEC backend
-azl_release = "5"
