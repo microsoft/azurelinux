@@ -1,0 +1,20 @@
+# Fedora's nginx spec switched source-signature verification to openpgpverify
+# for Fedora > 42, but Azure Linux 4.0 does not ship openpgpverify. Keep using
+# gnupg2 + %gpgverify (what the previous nginx build used) by flipping both
+# Fedora version guards to %if 0.
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Verify the source signature with %gpgverify (gnupg2) since openpgpverify is not available in Azure Linux"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%if 0%\{\?fedora\} > 42$'
+replacement = "%if 0"
+
+[[overlays]]
+description = "BuildRequire gnupg2 instead of openpgpverify, which is not available in Azure Linux"
+type = "spec-search-replace"
+regex = '^%if 0%\{\?fedora\} > 42$'
+replacement = "%if 0"
