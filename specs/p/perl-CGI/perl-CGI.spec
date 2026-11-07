@@ -3,8 +3,8 @@
 
 Name:           perl-CGI
 Summary:        Handle Common Gateway Interface requests and responses
-Version:        4.72
-Release: 5%{?dist}
+Version:        5.02
+Release: 6%{?dist}
 License:        Artistic-2.0
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-%{version}.tar.gz
 URL:            https://metacpan.org/release/CGI
@@ -33,6 +33,8 @@ BuildRequires:  perl(warnings)
 # Tests:
 BuildRequires:  perl(Config)
 BuildRequires:  perl(Cwd)
+BuildRequires:  perl(HTML::Parser)
+BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(File::Find)
 BuildRequires:  perl(FileHandle)
@@ -127,6 +129,29 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Nov 04 2026 Jitka Plesnikova <jplesnik@redhat.com> - 5.02-1
+- 5.02 bump (rhbz#2565802)
+- Fix CVE-2026-120631 (CGI::Cookie->parse backtracking DoS via cookie expires regex)
+- Fix CVE-2026-120632 (cubic regex backtracking via crafted multipart/related Content-Type)
+- Fix CVE-2026-120650 (missing/unenforced request size, param and upload limits)
+- Fix CVE-2026-120651 (infinite loop reading short PUT/POST/PATCH body with DISABLE_UPLOADS)
+- Fix CVE-2026-120645 (scrolling_list used submitted values as regex for optgroups)
+- Fix CVE-2026-120646 (uploadInfo() dereferenced plain strings as symbolic references)
+- Fix CVE-2026-120639 (header injection via HTML entity decoding in header() extra values)
+- Fix CVE-2026-120644 (CGI::Cookie path/domain/expires not checked; ";" injected attributes)
+- Fix CVE-2026-120647 (header() -attachment filename did not escape quotes)
+- Fix CVE-2026-120633 (url()/virtual_host() trusted client-supplied X-Forwarded-Host)
+- Fix CVE-2026-120638 (redirect() HTML-decoded URL after app checked it)
+- Fix CVE-2026-120636 (REQUEST_URI could produce protocol-relative or javascript: URLs)
+- Fix CVE-2026-120643 (url()/self_url() could contain raw single quote via URI->canonical)
+- Fix CVE-2026-120648 (comment() text could end HTML comment)
+- Fix CVE-2026-120634 (CGI::Carp warnings leaked between requests in persistent envs)
+- Fix CVE-2026-120635 (multipart parsing differentials; boundary smuggling)
+- Fix CVE-2026-120641 (upload filenames could contain path; path traversal risk)
+- Fix CVE-2026-120640 (POSTDATA/PUTDATA settable via query string/form field)
+- Fix CVE-2026-120642 (taint mode bypass for upload filename and other values)
+- Fix CVE-2026-120637 (unrecognised REQUEST_METHOD made argv the request params)
+
 * Tue May 12 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4.72-1
 - 4.72 bump (rhbz#2466681)
 

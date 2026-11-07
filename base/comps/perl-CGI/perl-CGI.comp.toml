@@ -1,0 +1,4 @@
+# Pin to Fedora f43 perl-CGI-5.02 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/perl-CGI/c/c54ba92ddc1b7e4c2623b923716d4394a310bfb4
+[components.perl-CGI]
+spec = { type = "upstream", upstream-commit = "c54ba92ddc1b7e4c2623b923716d4394a310bfb4" }
