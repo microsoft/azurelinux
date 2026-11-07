@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        36%{?dist}
+Release:        37%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -104,6 +104,7 @@ Source23:       sysusers.prov
 Source24:       sysusers.generate-pre.sh
 
 Source25:       98-default-mac-none.link
+Source26:       10-netlink-timeout.conf
 
 %if 0
 GIT_DIR=../../src/systemd/.git git format-patch-ab --no-signature -M -N v235..v235-stable
@@ -914,6 +915,8 @@ install -m 0755 -D -t %{buildroot}%{_rpmconfigdir}/ %{SOURCE24}
 # https://bugzilla.redhat.com/show_bug.cgi?id=2107754
 install -Dm0644 -t %{buildroot}%{_prefix}/lib/systemd/network/ %{SOURCE25}
 
+install -Dm0644 -t %{buildroot}%{system_unit_dir}/systemd-networkd.service.d/ %{SOURCE26}
+
 ln -s --relative %{buildroot}%{_bindir}/kernel-install %{buildroot}%{_sbindir}/installkernel
 
 %find_lang %{name}
@@ -1263,6 +1266,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Fri Oct 30 2026 Alex Cortelyou <alcortel@microsoft.com> - 255-37
+- Increase networkd's default netlink timeout to 100 seconds.
+
 * Tue Oct 27 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 255-36
 - Backport upstream sd-event fix for hang after ratelimit expiry (systemd/systemd#44107, commit 1a60b10)
 
