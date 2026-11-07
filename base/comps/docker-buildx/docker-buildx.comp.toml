@@ -1,0 +1,4 @@
+# Pin to Fedora f43 docker-buildx-None to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/docker-buildx/c/087edd8c3efc082b07f5afc7a4632ba0ea64e902
+[components.docker-buildx]
+spec = { type = "upstream", upstream-commit = "087edd8c3efc082b07f5afc7a4632ba0ea64e902" }
