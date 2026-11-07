@@ -7,7 +7,7 @@ replacement for dictionaries where immutability is desired.}
 Summary:        An immutable dictionary
 Name:           python-%{srcname}
 Version:        2.3.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 
 %description %{_description}
@@ -39,7 +40,6 @@ Requires:       python3
 %py3_install
 
 %check
-pip3 install pytest
 cd test
 PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest
 
@@ -50,6 +50,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest
 %{python3_sitelib}/%{srcname}/
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.3.8-3
+- Use python3-pytest for tests instead of pip
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.3.8-2
 - Disable debuginfo package
 
