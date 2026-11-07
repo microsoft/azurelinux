@@ -1,0 +1,204 @@
+From 1a60b10de9e4a3fe59a2efa3c6a58fd72c305807 Mon Sep 17 00:00:00 2001
+From: xinlongchen <xinlongchen@tencent.com>
+Date: Fri, 9 Oct 2026 23:18:35 +0800
+Subject: [PATCH] sd-event: fix hang after ratelimit expiry
+
+If sources are already pending, sd_event_prepare() calls
+sd_event_wait(e, 0). Since fd69f2247520 this returns 0 when a ratelimit
+expiry callback was invoked, so that sources re-enabled by the callback
+are evaluated in the next iteration. However, sd_event_prepare() then
+returned 0 ("nothing pending"), so sd_event_run() blocked in epoll_wait()
+forever, as the pending sources never make the epoll fd readable.
+
+PID 1 can hit this via the ratelimited mount event source, which hangs
+the boot, e.g. in the initrd after sysroot.mount.
+
+Fix this by remembering in the sd_event object that a ratelimit expiry
+callback was invoked in this iteration. In that case sd_event_wait()
+reports the loop as pending, and sd_event_dispatch() returns right away
+without dispatching anything, so that the caller goes directly for
+sd_event_prepare() again, and no other callback is dispatched in the
+same iteration.
+
+Add a test that reproduces the issue.
+
+Follow-up for fd69f2247520b0be3190ded96d646a415edc97b7.
+Fixes #44107
+
+(cherry picked from commit 1a60b10de9e4a3fe59a2efa3c6a58fd72c305807)
+[Azure Linux: adapted to systemd v258.11. struct sd_event has no
+exit_on_idle member, so the new ratelimit_expired bit follows
+profile_delays and is reset right after PROTECT_EVENT() in
+sd_event_prepare(). The test additionally includes io-util.h for
+flush_fd() and defines a local expire_defer_handler() as v258.11 lacks
+defer_post_handler().]
+---
+ src/libsystemd/sd-event/sd-event.c   | 25 ++++++----
+ src/libsystemd/sd-event/test-event.c | 69 ++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+), 8 deletions(-)
+
+diff --git a/src/libsystemd/sd-event/sd-event.c b/src/libsystemd/sd-event/sd-event.c
+index 917aa15..7b62e2b 100644
+--- a/src/libsystemd/sd-event/sd-event.c
++++ b/src/libsystemd/sd-event/sd-event.c
+@@ -157,6 +157,7 @@ struct sd_event {
+         bool need_process_child:1;
+         bool watchdog:1;
+         bool profile_delays:1;
++        bool ratelimit_expired:1;
+ 
+         int exit_code;
+ 
+@@ -4440,6 +4441,8 @@ _public_ int sd_event_prepare(sd_event *e) {
+         /* Make sure that none of the preparation callbacks ends up freeing the event source under our feet */
+         PROTECT_EVENT(e);
+ 
++        e->ratelimit_expired = false;
++
+         if (e->exit_requested)
+                 goto pending;
+ 
+@@ -4664,7 +4667,6 @@ static int process_epoll(sd_event *e, usec_t timeout, int64_t threshold, int64_t
+ }
+ 
+ _public_ int sd_event_wait(sd_event *e, uint64_t timeout) {
+-        bool ratelimit_expired = false;
+         int r;
+ 
+         assert_return(e, -EINVAL);
+@@ -4730,7 +4732,7 @@ _public_ int sd_event_wait(sd_event *e, uint64_t timeout) {
+         if (r < 0)
+                 goto finish;
+         else if (r == 1)
+-                ratelimit_expired = true;
++                e->ratelimit_expired = true;
+ 
+         r = process_timer(e, e->timestamp.realtime, &e->realtime_alarm);
+         if (r < 0)
+@@ -4744,10 +4746,11 @@ _public_ int sd_event_wait(sd_event *e, uint64_t timeout) {
+         if (r < 0)
+                 goto finish;
+ 
+-        if (ratelimit_expired) {
+-                /* Ratelimit expiry callback was called. Let's postpone processing pending sources and put
+-                 * the loop in the initial state in order to evaluate (in the next iteration) also sources
+-                 * that were potentially re-enabled by the callback.
++        if (e->ratelimit_expired) {
++                /* Ratelimit expiry callback was called. Let's postpone processing pending sources in order
++                 * to evaluate (in the next iteration) also sources that were potentially re-enabled by the
++                 * callback. Report this as pending rather than returning 0, as the caller would block
++                 * otherwise. sd_event_dispatch() then returns right away.
+                  *
+                  * Wondering why we treat only the CLOCK_BOOTTIME invocation of process_timer() differently?
+                  * Once event source is ratelimited we essentially transform it into a CLOCK_BOOTTIME timer
+@@ -4756,8 +4759,8 @@ _public_ int sd_event_wait(sd_event *e, uint64_t timeout) {
+                  * Note that we don't short-circuit earlier because all timer prioqs must be fully processed
+                  * as their timerfds may have already been flushed by process_epoll(), so skipping them would
+                  * leave those sources unprocessed and the timerfds un-rearmed. */
+-                r = 0;
+-                goto finish;
++                e->state = SD_EVENT_PENDING;
++                return 1;
+         }
+ 
+         if (event_next_pending(e)) {
+@@ -4783,6 +4786,12 @@ _public_ int sd_event_dispatch(sd_event *e) {
+         assert_return(e->state != SD_EVENT_FINISHED, -ESTALE);
+         assert_return(e->state == SD_EVENT_PENDING, -EBUSY);
+ 
++        if (e->ratelimit_expired) {
++                /* A ratelimit expiry callback was called in this iteration, don't dispatch anything else. */
++                e->state = SD_EVENT_INITIAL;
++                return 1;
++        }
++
+         if (e->exit_requested)
+                 return dispatch_exit(e);
+ 
+diff --git a/src/libsystemd/sd-event/test-event.c b/src/libsystemd/sd-event/test-event.c
+index a61b64a..b668cac 100644
+--- a/src/libsystemd/sd-event/test-event.c
++++ b/src/libsystemd/sd-event/test-event.c
+@@ -8,6 +8,7 @@
+ #include "alloc-util.h"
+ #include "fd-util.h"
+ #include "fs-util.h"
++#include "io-util.h"
+ #include "log.h"
+ #include "parse-util.h"
+ #include "path-util.h"
+@@ -840,6 +841,74 @@ TEST(inotify_issue_38265) {
+         }
+ }
+ 
++static unsigned expire_drain_count = 0;
++static int expire_drain_callback(sd_event_source *s, void *userdata) {
++        expire_drain_count++;
++
++        /* Consume the readiness, so that leaving the ratelimit doesn't generate a new epoll event */
++        ASSERT_OK(flush_fd(sd_event_source_get_io_fd(s)));
++
++        return 0;
++}
++
++static int expire_defer_handler(sd_event_source *s, void *userdata) {
++        bool *b = ASSERT_PTR(userdata);
++
++        *b = true;
++        return 0;
++}
++
++TEST(ratelimit_expire_with_pending) {
++        _cleanup_close_pair_ int p[2] = EBADF_PAIR;
++        _cleanup_(sd_event_unrefp) sd_event *e = NULL;
++        _cleanup_(sd_event_source_unrefp) sd_event_source *io = NULL, *defer = NULL;
++        unsigned count = 0;
++        bool dispatched = false;
++
++        ASSERT_OK(sd_event_default(&e));
++        ASSERT_OK_ERRNO(pipe2(p, O_CLOEXEC|O_NONBLOCK));
++
++        ASSERT_OK(sd_event_add_io(e, &io, p[0], EPOLLIN, ratelimit_io_handler, &count));
++        ASSERT_OK(sd_event_source_set_ratelimit(io, 1 * USEC_PER_SEC, 1));
++        ASSERT_OK(sd_event_source_set_ratelimit_expire_callback(io, expire_drain_callback));
++
++        ASSERT_OK_EQ_ERRNO(write(p[1], "x", 1), 1);
++
++        /* The first dispatch opens the ratelimit window, the second one hits the burst limit. */
++        ASSERT_OK_POSITIVE(sd_event_run(e, 0));
++        ASSERT_OK_POSITIVE(sd_event_run(e, 0));
++        ASSERT_OK_POSITIVE(sd_event_source_is_ratelimited(io));
++
++        /* Arm the CLOCK_BOOTTIME timer for the end of the ratelimit window, and let it elapse. */
++        ASSERT_OK_ZERO(sd_event_run(e, 0));
++        ASSERT_OK(usleep_safe(1100 * USEC_PER_MSEC));
++
++        /* Now have an event source pending only in userspace, which never makes the epoll fd readable. */
++        ASSERT_OK(sd_event_add_defer(e, &defer, expire_defer_handler, &dispatched));
++
++        /* sd_event_prepare() will see the pending defer source, and its sd_event_wait() call will run the
++         * ratelimit expiry callback. It must not report "nothing pending" afterwards, as otherwise callers
++         * like sd_event_run() would block indefinitely in epoll_wait(). */
++        ASSERT_OK_POSITIVE(sd_event_prepare(e));
++        ASSERT_EQ(expire_drain_count, 1U);
++        ASSERT_EQ(count, 1U);
++        ASSERT_OK_ZERO(sd_event_source_is_ratelimited(io));
++
++        /* No other callback is dispatched in the same iteration as the ratelimit expiry callback. */
++        ASSERT_OK_POSITIVE(sd_event_dispatch(e));
++        ASSERT_EQ(count, 1U);
++        ASSERT_FALSE(dispatched);
++
++        /* The IO event that hit the ratelimit stayed pending and is delivered first, then the defer source. */
++        ASSERT_OK_POSITIVE(sd_event_run(e, 0));
++        ASSERT_EQ(count, 2U);
++        ASSERT_FALSE(dispatched);
++
++        ASSERT_OK_POSITIVE(sd_event_run(e, 0));
++        ASSERT_TRUE(dispatched);
++        ASSERT_EQ(expire_drain_count, 1U);
++}
++
+ TEST(fork) {
+         _cleanup_(sd_event_unrefp) sd_event *e = NULL;
+         int r;
