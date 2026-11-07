@@ -13,8 +13,8 @@
 %bcond_with tests
 
 Name:              valkey
-Version:           8.1.10
-Release: 5%{?dist}
+Version:           8.1.11
+Release: 6%{?dist}
 Summary:           A persistent key-value database
 # valkey: BSD-3-Clause
 # hiredis: BSD-3-Clause
@@ -445,6 +445,11 @@ fi
 
 
 %changelog
+* Tue Oct 27 2026 Remi Collet <remi@remirepo.net> - 8.1.11-1
+- Valkey 8.1.11 - Released Mon 26 October 2026
+- Upgrade urgency SECURITY: This release includes security fixes we recommend
+  you apply as soon as possible.
+
 * Tue Sep  1 2026 Remi Collet <remi@remirepo.net> - 8.1.10-1
 - Valkey 8.1.10 - Released Mon 31 August 2026
 - Upgrade urgency SECURITY: This release includes security fixes
