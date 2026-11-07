@@ -1,0 +1,23 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# Setup permissions and capabilities for non-root VMIs. KubeVirt sets
+# XDG_* directories to /var/run.
+RUN  cd /var && rm -rf run && ln -s ../run . \
+   && chown qemu:qemu /var/run \
+   && setcap 'cap_net_bind_service=+ep' /usr/bin/virt-launcher-monitor
+
+#simple smoke test
+RUN test -x /usr/bin/virt-launcher \
+ && test -x /usr/bin/openvmm \
+ && test -s /openvmm/MSVM.fd \
+ && test -s /openvmm/uefi-templates/x64.json \
+ && test -s /openvmm/uefi-templates/x64-confidential.json
+
+ENTRYPOINT [ "/usr/bin/virt-launcher" ]
