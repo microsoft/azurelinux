@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 3
+%define azl_pkgrelease 4
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.43.02
 # AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
@@ -2654,9 +2654,11 @@ BuildKernel() {
            --logfile=$(mktemp) \
 	   $KernelUnifiedInitrd
 
+	# AZL: the generic initrd has a passwordless root account and Secure Boot
+	# locks this command line, so disable dracut's emergency shell here.
 	ukify build --linux $(realpath $KernelImage) --initrd $KernelUnifiedInitrd \
 	   --sbat @uki.sbat --os-release @/etc/os-release --uname $KernelVer \
-	   --cmdline 'console=tty0 console=ttyS0' --output $KernelUnifiedImage
+	   --cmdline 'console=tty0 console=ttyS0 rd.shell=0' --output $KernelUnifiedImage
 
 	rm -f $KernelUnifiedInitrd
 
@@ -4324,6 +4326,10 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Nov 06 2026 Thien Trung Vuong <tvuong@microsoft.com> - 6.18.57-1.4
+- Add rd.shell=0 to the kernel-uki-virt command line to disable the
+  unauthenticated dracut emergency shell
+
 * Thu Nov 05 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.3
 - Build x86 and ARM64 AES and GHASH implementations into the kernel for early FIPS self-tests
 

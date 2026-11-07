@@ -100,6 +100,7 @@ components = [
     "azurelinux-release",
     "azurelinux-repos",
     "azurelinux-rpm-config",
+    "azurelinux-uki-boot",
     "babel",
     "babeltrace",
     "bash",
