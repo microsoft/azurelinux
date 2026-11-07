@@ -1,3 +1,6 @@
+# Pin to Fedora f45 dnsmasq-2.93 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/dnsmasq/c/70811d36816183016738eb6d463ecab49c2c4244
 [components.dnsmasq]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "45" }, upstream-commit = "70811d36816183016738eb6d463ecab49c2c4244" }
 # Release: 1%{?extraversion:.%{extraversion}}%{?dist}
 release = { calculation = "manual" }
