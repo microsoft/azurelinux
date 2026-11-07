@@ -1,0 +1,172 @@
+From ab1673e67f05dfce7af03bf7ba625055defcea8f Mon Sep 17 00:00:00 2001
+From: lazerg <lazerg2@gmail.com>
+Date: Wed, 21 Oct 2026 16:42:03 +0500
+Subject: [PATCH 1/3] src: fix build with `--shared-brotli`
+
+Assisted-by: Claude Code
+Signed-off-by: lazerg <lazerg2@gmail.com>
+---
+ node.gypi                                | 2 ++
+ src/node_zlib.cc                         | 2 ++
+ test/parallel/test-zlib-invalid-input.js | 2 +-
+ unofficial.gni                           | 3 +++
+ 4 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/node.gypi b/node.gypi
+index 9eb972adc47f..c07082d49048 100644
+--- a/node.gypi
++++ b/node.gypi
+@@ -252,6 +252,8 @@
+ 
+     [ 'node_shared_brotli=="false"', {
+       'dependencies': [ 'deps/brotli/brotli.gyp:brotli' ],
++    }, {
++      'defines': [ 'NODE_SHARED_BROTLI' ],
+     }],
+ 
+     [ 'node_use_sqlite=="true" and node_shared_sqlite=="false"', {
+diff --git a/src/node_zlib.cc b/src/node_zlib.cc
+index d25662bdb983..6c7753da33db 100644
+--- a/src/node_zlib.cc
++++ b/src/node_zlib.cc
+@@ -2302,7 +2302,9 @@ void DefineZlibConstants(Local<Object> target) {
+   NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_PADDING_1);
+   NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_PADDING_2);
+   NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_DISTANCE);
++#ifndef NODE_SHARED_BROTLI
+   NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_BLOCK_SWITCH);
++#endif
+   NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_DICTIONARY_NOT_SET);
+   NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_INVALID_ARGUMENTS);
+   NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_ALLOC_CONTEXT_MODES);
+diff --git a/test/parallel/test-zlib-invalid-input.js b/test/parallel/test-zlib-invalid-input.js
+index 40958b074445..6b2c9b564de1 100644
+--- a/test/parallel/test-zlib-invalid-input.js
++++ b/test/parallel/test-zlib-invalid-input.js
+@@ -89,7 +89,7 @@ Object.defineProperty(spoofedLength, 'byteLength', { get: () => 5000 });
+   deflate.close();
+ }
+ 
+-{
++if (!process.config.variables.node_shared_brotli) {
+   // A block switch is invalid when the stream declares only one block type.
+   const invalidBlockSwitch = Buffer.from(
+     '200010414141fcffff07002228f00b60f7f41f000000',
+diff --git a/unofficial.gni b/unofficial.gni
+index 5878f079d94e..d88fadd1212f 100644
+--- a/unofficial.gni
++++ b/unofficial.gni
+@@ -58,6 +58,9 @@ template("node_gn_build") {
+     if (v8_enable_i18n_support) {
+       defines += [ "NODE_HAVE_I18N_SUPPORT=1" ]
+     }
++    if (node_shared_brotli) {
++      defines += [ "NODE_SHARED_BROTLI" ]
++    }
+   }
+ 
+   config("node_external_config") {
+
+From 67111ab20c74d6011c1b9272bff21764637d3f58 Mon Sep 17 00:00:00 2001
+From: lazerg <lazerg2@gmail.com>
+Date: Thu, 22 Oct 2026 08:05:37 +0500
+Subject: [PATCH 2/3] src: derive brotli decoder constants from header
+
+Assisted-by: Claude Code
+Signed-off-by: lazerg <lazerg2@gmail.com>
+---
+ node.gypi                                |  2 --
+ src/node_zlib.cc                         | 38 +++---------------------
+ test/parallel/test-zlib-invalid-input.js |  2 +-
+ unofficial.gni                           |  3 --
+ 4 files changed, 5 insertions(+), 40 deletions(-)
+
+diff --git a/node.gypi b/node.gypi
+index c07082d49048..9eb972adc47f 100644
+--- a/node.gypi
++++ b/node.gypi
+@@ -252,8 +252,6 @@
+ 
+     [ 'node_shared_brotli=="false"', {
+       'dependencies': [ 'deps/brotli/brotli.gyp:brotli' ],
+-    }, {
+-      'defines': [ 'NODE_SHARED_BROTLI' ],
+     }],
+ 
+     [ 'node_use_sqlite=="true" and node_shared_sqlite=="false"', {
+diff --git a/src/node_zlib.cc b/src/node_zlib.cc
+index 6c7753da33db..a34905c3e3a8 100644
+--- a/src/node_zlib.cc
++++ b/src/node_zlib.cc
+@@ -2280,40 +2280,10 @@ void DefineZlibConstants(Local<Object> target) {
+   NODE_DEFINE_CONSTANT(target,
+       BROTLI_DECODER_PARAM_DISABLE_RING_BUFFER_REALLOCATION);
+   NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_PARAM_LARGE_WINDOW);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_NO_ERROR);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_SUCCESS);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_NEEDS_MORE_INPUT);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_NEEDS_MORE_OUTPUT);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_EXUBERANT_NIBBLE);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_RESERVED);
+-  NODE_DEFINE_CONSTANT(target,
+-      BROTLI_DECODER_ERROR_FORMAT_EXUBERANT_META_NIBBLE);
+-  NODE_DEFINE_CONSTANT(target,
+-      BROTLI_DECODER_ERROR_FORMAT_SIMPLE_HUFFMAN_ALPHABET);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_SIMPLE_HUFFMAN_SAME);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_CL_SPACE);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_HUFFMAN_SPACE);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_CONTEXT_MAP_REPEAT);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_BLOCK_LENGTH_1);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_BLOCK_LENGTH_2);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_TRANSFORM);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_DICTIONARY);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_WINDOW_BITS);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_PADDING_1);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_PADDING_2);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_DISTANCE);
+-#ifndef NODE_SHARED_BROTLI
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_FORMAT_BLOCK_SWITCH);
+-#endif
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_DICTIONARY_NOT_SET);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_INVALID_ARGUMENTS);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_ALLOC_CONTEXT_MODES);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_ALLOC_TREE_GROUPS);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_ALLOC_CONTEXT_MAP);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_ALLOC_RING_BUFFER_1);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_ALLOC_RING_BUFFER_2);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_ALLOC_BLOCK_TYPE_TREES);
+-  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER_ERROR_UNREACHABLE);
++#define V(PREFIX, NAME, CODE)                                                  \
++  NODE_DEFINE_CONSTANT(target, BROTLI_DECODER##PREFIX##NAME);
++  BROTLI_DECODER_ERROR_CODES_LIST(V, )
++#undef V
+ 
+   // Zstd constants
+   NODE_DEFINE_CONSTANT(target, ZSTD_e_continue);
+diff --git a/test/parallel/test-zlib-invalid-input.js b/test/parallel/test-zlib-invalid-input.js
+index 6b2c9b564de1..c27668c0c9cd 100644
+--- a/test/parallel/test-zlib-invalid-input.js
++++ b/test/parallel/test-zlib-invalid-input.js
+@@ -89,7 +89,7 @@ Object.defineProperty(spoofedLength, 'byteLength', { get: () => 5000 });
+   deflate.close();
+ }
+ 
+-if (!process.config.variables.node_shared_brotli) {
++if (zlib.constants.BROTLI_DECODER_ERROR_FORMAT_BLOCK_SWITCH) {
+   // A block switch is invalid when the stream declares only one block type.
+   const invalidBlockSwitch = Buffer.from(
+     '200010414141fcffff07002228f00b60f7f41f000000',
+diff --git a/unofficial.gni b/unofficial.gni
+index d88fadd1212f..5878f079d94e 100644
+--- a/unofficial.gni
++++ b/unofficial.gni
+@@ -58,9 +58,6 @@ template("node_gn_build") {
+     if (v8_enable_i18n_support) {
+       defines += [ "NODE_HAVE_I18N_SUPPORT=1" ]
+     }
+-    if (node_shared_brotli) {
+-      defines += [ "NODE_SHARED_BROTLI" ]
+-    }
+   }
+ 
+   config("node_external_config") {
