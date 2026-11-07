@@ -1,10 +1,13 @@
 [licensing]
 detector = "trivy"
 exclude_files = [
+    "vendor/github.com/petermattis/goid/goid_go1.3.c",
+    "vendor/github.com/prometheus/client_golang/prometheus/process_collector_mem_cgo_darwin.c",
     "vendor/go.opentelemetry.io/otel/get_main_pkgs.sh",
     "vendor/go.opentelemetry.io/otel/verify_examples.sh",
     "vendor/google.golang.org/grpc/regenerate.sh",
     "LICENSE.macros",
+    "vendor/github.com/grpc-ecosystem/go-grpc-middleware/v2/COPYRIGHT",
 ]
 
 [[licensing.licenses]]

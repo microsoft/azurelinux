@@ -1,0 +1,28 @@
+From c9947dc65a1f931f3a74a3059b6d493ee45af39e Mon Sep 17 00:00:00 2001
+From: Bradley G Smith <bradley.g.smith@gmail.com>
+Date: Sat, 3 Oct 2026 15:23:46 -0700
+Subject: [PATCH] Fix bash completion file
+
+- Replace bash shebang with completion text
+---
+ contrib/completion/bash/docker | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/contrib/completion/bash/docker b/contrib/completion/bash/docker
+index a78b08a6e4..4a18fa037e 100644
+--- a/contrib/completion/bash/docker
++++ b/contrib/completion/bash/docker
+@@ -1,9 +1,9 @@
+-#!/usr/bin/env bash
++# docker completion                                        -*- shell-script -*-
+ # shellcheck disable=SC2016,SC2119,SC2155,SC2206,SC2207,SC2254
+ #
+ # Shellcheck ignore list:
+ #  - SC2016: Expressions don't expand in single quotes, use double quotes for that.
+ #  - SC2119: Use foo "$@" if function's $1 should mean script's $1.
+ #  - SC2155: Declare and assign separately to avoid masking return values.
+ #  - SC2206: Quote to prevent word splitting, or split robustly with mapfile or read -a.
+ #  - SC2207: Prefer mapfile or read -a to split command output (or quote to avoid splitting).
+-- 
+2.55.0
+
