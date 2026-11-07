@@ -1,4 +1,7 @@
+# Pin to Fedora f43 wget2-2.3.0 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/wget2/c/2db76881da043ce2106d10693f5151d6ce5620f6
 [components.wget2]
+spec = { type = "upstream", upstream-commit = "2db76881da043ce2106d10693f5151d6ce5620f6" }
 
 [components.wget2.build]
 # Supply the wget compatibility package.

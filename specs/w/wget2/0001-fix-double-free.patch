@@ -1,0 +1,27 @@
+From 8d7b977a7dff86e7056fc93b7c73d61779d28cdc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tim=20R=C3=BChsen?= <tim.ruehsen@gmx.de>
+Date: Tue, 20 Oct 2026 20:18:51 +0200
+Subject: [PATCH] * src/wget.c (http_send_request): Fix double free
+
+Fixes https://gitlab.com/gnuwget/wget2/-/work_items/729
+---
+ src/wget.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/wget.c b/src/wget.c
+index fe00c9014..4e2d2e620 100644
+--- a/src/wget.c
++++ b/src/wget.c
+@@ -4512,8 +4512,7 @@ int http_send_request(const wget_iri *iri, const wget_iri *original_url, DOWNLOA
+ 	wget_http_request_set_free_user_data_cb(req, free_user_data);
+ 
+ 	if ((rc = wget_http_send_request(conn, &req)) != WGET_E_SUCCESS) {
+-		wget_buffer_free(&context->body);
+-		xfree(context);
++		// context has already been freed by free_user_data
+ 		wget_http_free_request(&req);
+ 	}
+ 
+-- 
+GitLab
+

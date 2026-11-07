@@ -1,0 +1,87 @@
+From acf7f4ecd35e9d353bfb5d3ad216dd5368f1b3d4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tim=20R=C3=BChsen?= <tim.ruehsen@gmx.de>
+Date: Fri, 25 Sep 2026 10:04:47 +0200
+Subject: [PATCH] Fix -P/--directory-prefix for absolute paths
+
+* src/options.c (init): Use absolute directory prefix as-is.
+* tests/test-directory-prefix.c: Add test using an absolute directory prefix.
+
+Fixes https://gitlab.com/gnuwget/wget2/-/work_items/723
+---
+ src/options.c                 | 24 ++++++++++++++++--------
+ tests/test-directory-prefix.c | 21 +++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 8 deletions(-)
+
+diff --git a/src/options.c b/src/options.c
+index dc001f795..8eb85a7e0 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -3569,14 +3569,22 @@ int init(int argc, const char **argv)
+ 	debug_printf("Input URI encoding = '%s'\n", config.input_encoding);
+ 
+ 	if (config.directory_prefix) {
+-		char *cwd = getcwd(NULL, 0);
+-		if (!cwd) {
+-			error_printf_exit(_("Failed to get current directory\n"));
+-		}
+-		char *unresolved_path = wget_aprintf("%s/%s", cwd, config.directory_prefix);
+-		xfree(cwd);
+-		char *resolved_path = wget_path_sanitize(unresolved_path);
+-		xfree(unresolved_path);
++		char *resolved_path = NULL;
++
++		// If directory_prefix is an absolute path, don't prepend cwd
++		if (config.directory_prefix[0] == '/') {
++			resolved_path = wget_path_sanitize(config.directory_prefix);
++		} else {
++			char *cwd = getcwd(NULL, 0);
++			if (!cwd) {
++				error_printf_exit(_("Failed to get current directory\n"));
++			}
++			char *unresolved_path = wget_aprintf("%s/%s", cwd, config.directory_prefix);
++			xfree(cwd);
++			resolved_path = wget_path_sanitize(unresolved_path);
++			xfree(unresolved_path);
++		}
++
+ 		if (resolved_path) {
+ 			xfree(config.directory_prefix);
+ 			config.directory_prefix = resolved_path;
+diff --git a/tests/test-directory-prefix.c b/tests/test-directory-prefix.c
+index b1b271736..57c52cbb5 100644
+--- a/tests/test-directory-prefix.c
++++ b/tests/test-directory-prefix.c
+@@ -23,6 +23,7 @@
+ #include <config.h>
+ 
+ #include <stdlib.h> // exit()
++#include <unistd.h> // getcwd()
+ #include "libtest.h"
+ 
+ #define PREFIX "prefix"
+@@ -98,5 +99,25 @@ int main(void)
+ 			{	NULL } },
+ 		0);
+ 
++	// Test absolute directory-prefix path
++	{
++		char cwd[4096];
++		if (!getcwd(cwd, sizeof(cwd))) {
++			wget_error_printf_exit("Failed to get cwd\n");
++		}
++
++		char abs_opt[4096];
++		wget_snprintf(abs_opt, sizeof(abs_opt), "--directory-prefix=%s/abs_prefix -nH", cwd);
++
++		wget_test(
++			WGET_TEST_OPTIONS, abs_opt,
++			WGET_TEST_REQUEST_URL, "index.html",
++			WGET_TEST_EXPECTED_ERROR_CODE, 0,
++			WGET_TEST_EXPECTED_FILES, &(wget_test_file_t []) {
++				{ "abs_prefix/index.html", urls[0].body },
++				{	NULL } },
++			0);
++	}
++
+ 	exit(EXIT_SUCCESS);
+ }
