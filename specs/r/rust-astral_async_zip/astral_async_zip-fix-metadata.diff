@@ -1,5 +1,14 @@
---- astral_async_zip-0.0.20/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ astral_async_zip-0.0.20/Cargo.toml	2026-07-07T05:41:59.020213+00:00
+--- astral_async_zip-0.0.21/Cargo.toml	2006-07-24T01:21:28+00:00
++++ astral_async_zip-0.0.21/Cargo.toml	2026-09-05T07:56:19.497028+00:00
+@@ -15,7 +15,7 @@
+ version = "0.0.21"
+ authors = ["Harry [hello@majored.pw]"]
+ build = false
+-exclude = ["rustfmt.toml"]
++exclude = ["rustfmt.toml", "/scripts/"]
+ autolib = false
+ autobins = false
+ autoexamples = false
 @@ -80,10 +80,6 @@
  path = "src/lib.rs"
  

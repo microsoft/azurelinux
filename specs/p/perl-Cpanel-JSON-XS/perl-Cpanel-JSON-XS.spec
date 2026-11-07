@@ -10,8 +10,8 @@
 
 Name:		perl-Cpanel-JSON-XS
 Summary:	JSON::XS for Cpanel, fast and correct serializing
-Version:	4.41
-Release: 5%{?dist}
+Version:	4.53
+Release: 6%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Cpanel-JSON-XS
 Source0:	https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
@@ -50,6 +50,7 @@ BuildRequires:	perl(constant)
 BuildRequires:	perl(Data::Dumper)
 BuildRequires:	perl(Devel::Peek)
 BuildRequires:	perl(Encode) >= 1.9081
+BuildRequires:	perl(File::Temp)
 BuildRequires:	perl(lib)
 BuildRequires:	perl(POSIX)
 BuildRequires:	perl(Test)
@@ -167,6 +168,98 @@ make test
 %{_mandir}/man3/Cpanel::JSON::XS::Type.3*
 
 %changelog
+* Mon Sep 28 2026 Paul Howarth <paul@city-fan.org> - 4.53-1
+- Update to 4.53
+  - Fix C90 violations with arm neon (GH#258)
+  - Added a native arm64 test runner
+
+* Tue Sep 15 2026 Paul Howarth <paul@city-fan.org> - 4.52-1
+- Update to 4.52
+  - OSX 10.9 fix for SIMD UTF-8
+  - Change maintainer email to reini.urban@gmail.com
+
+* Sat Sep 12 2026 Paul Howarth <paul@city-fan.org> - 4.51-1
+- Update to 4.51
+  - Add $json->encode_to($fh, $data, [$type]) to stream encoded JSON directly
+    to a filehandle instead of building the whole result in memory (GH#250,
+    GH#58); internally flushes a bounded 8k chunk buffer as it fills, keeping
+    peak memory bounded for large data structures
+  - Encoder performance improvements suggested in GH#237:
+    - Large-integer encoding now uses a 100-digit lookup table instead of
+      snprintf, roughly 2x faster for integers outside the existing branchless
+      small-integer fast path (|value| > 59000)
+    - encode_str now bulk-copies runs of consecutive bytes that need no
+      escaping instead of a need()+store per byte, notably faster for strings
+      with few or no characters to escape
+    - Added eg/bench_large.pl with results
+  - Add faster SIMD UTF-8 validation
+    (GH#213, https://github.com/cyb70289/utf8, MIT)
+  - Fix tests for yath (GH#255): the test files now work with Test2::Harness
+    instead of only Test::Harness, and a yath run is added to 'make xtest' when
+    yath is installed
+  - Skip one t/117_numbers.t test on Perls with 32-bit IVs (GH#254)
+
+* Wed Sep  2 2026 Paul Howarth <paul@city-fan.org> - 4.44-1
+- Update to 4.44
+  - Fix canonical sort infinite loop (GH#252): malformed UTF-8 keys (e.g.
+    Latin-1 byte strings mixed with Unicode) made utf16_cmp treat the decoder's
+    (STRLEN)-1 malformed sentinel as a length, wrapping the buffer pointer: now
+    checked as 0 or > remaining length
+
+* Thu Jul 23 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4.43-3
+- Perl 5.44 re-rebuild of bootstrapped packages
+
+* Wed Jul 22 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4.43-2
+- Perl 5.44 rebuild
+
+* Sun Jul 19 2026 Paul Howarth <paul@city-fan.org> - 4.43-1
+- Update to 4.43
+  - Fix canonical sort: Compare by UTF-16 code units per RFC 8785 (GH#248)
+  - Fix canonical sort on Perl 5.8-5.18: utf16_cmp now always attempts UTF-8
+    decoding instead of checking SvUTF8 flag, since older Perls may store valid
+    UTF-8 hash keys without the flag set
+  - Fix quadmath encode dropping ".0" for large floats (GH #246)
+    - The .0 guard condition that suppressed appending for NV values > UV_MAX
+      was incorrect on high-precision FP (quadmath, 128-bit long double on
+      arm64) where %%g uses fixed-point notation for values like 1.01e30
+    - Guarded with #if NV_DIG < 31 to skip only on double/80-bit-ld where %%g
+      naturally uses %%e for large values
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.42-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sun Jun  7 2026 Paul Howarth <paul@city-fan.org> - 4.42-1
+- Update to 4.42
+  - Ensure encode with a type spec hashref does not change the hashref argument
+    (GH#240)
+  - Fix -e docs: "written" → "read" (GH#239)
+  - Fix Boolean eq overload matching undef (GH#207); Cpanel::JSON::XS::Boolean
+    overloaded eq would match undef as equal to false because undef stringifies
+    to "" - added defined() guard
+  - Fix error messages showing overloaded stringification for blessed objects
+    (GH#191); error messages now use ClassName=TYPE(addr) format, bypassing any
+    "" overload
+  - Fix type_all_string overriding allow_blessed/convert_blessed (GH#175); with
+    type_all_string + allow_blessed, blessed objects are now encoded as null
+    (not stringified as HASH address)
+  - Fix infinite recursion when encode is called from a "" overload (GH#128);
+    the recursion guard temporarily clears convert_blessed and allow_stringify
+    flags on the JSON object before calling the overload, preventing re-entrant
+    encode loops
+  - Fix $obj->new creating a broken object (GH#93); when new() is called on an
+    existing object (e.g. $json->new->new), the class name is now extracted
+    from the object's stash rather than using the stringified reference
+  - Change allow_nonref default to true (GH#241, matching JSON::PP and
+    JSON::XS 4.0+ and the insecure RFC 7159); encode and decode now accept
+    non-reference values by default; decode_json() with an explicit 0/1 second
+    argument still works; allow_nonref(0) to disable scalars-only for secure
+    JSON
+  - Fix minor t/12_blessed.t typo
+  - Fix GH#112: encode large whole-number NV values without .0 on 32-bit Perl
+    (values exceeding UV_MAX that Perl stores as float)
+  - Fix GH#197: prefer IOK over pNOK when encoding values where IV is accurate
+    but NV is imprecise (SvNOK not set)
+
 * Thu May 28 2026 Paul Howarth <paul@city-fan.org> - 4.41-1
 - Update to 4.41
   - Fix BOM-shift PV-corruption SIGABRT (CVE-2026-9516)

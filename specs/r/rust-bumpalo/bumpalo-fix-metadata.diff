@@ -1,6 +1,6 @@
---- bumpalo-3.20.2/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ bumpalo-3.20.2/Cargo.toml	2026-03-24T15:54:50.151306+00:00
-@@ -44,10 +44,6 @@
+--- bumpalo-3.20.3/Cargo.toml	2006-07-24T01:21:28+00:00
++++ bumpalo-3.20.3/Cargo.toml	2026-05-26T15:17:59.773184+00:00
+@@ -49,10 +49,6 @@
  
  [features]
  allocator_api = []
@@ -11,7 +11,7 @@
  boxed = []
  collections = []
  default = []
-@@ -68,23 +64,17 @@
+@@ -73,23 +69,17 @@
  version = "1.0.171"
  optional = true
  

@@ -1,0 +1,256 @@
+From 21e96bb9df1771d8caeea18f16362655db4f9f4c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Edgar=20Ram=C3=ADrez=20Mondrag=C3=B3n?=
+ <16805946+edgarrmondragon@users.noreply.github.com>
+Date: Fri, 3 Jul 2026 01:02:25 -0600
+Subject: [PATCH] Fix a crash when calling ``copy()`` on a flushed compress
+ object on Python 3.15 (#80)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* Fix a crash when calling `copy()` on a flushed compress object on Python 3.15
+
+Signed-off-by: Edgar Ramírez Mondragón <edgarrm358@gmail.com>
+
+* test: Address Pytest 9.1 warnings
+
+Signed-off-by: Edgar Ramírez Mondragón <edgarrm358@gmail.com>
+
+* chore: Allow usage of ` tox -e 3.15 -- <some pytest params>`
+
+Signed-off-by: Edgar Ramírez Mondragón <edgarrm358@gmail.com>
+
+* ci: Add Python 3.15 and 3.15t to CI matrix
+
+Signed-off-by: Edgar Ramírez Mondragón <edgarrm358@gmail.com>
+
+* ci: Replace `macos-13` runner with `macos-15-intel`
+
+Signed-off-by: Edgar Ramírez Mondragón <edgarrm358@gmail.com>
+
+---------
+
+Signed-off-by: Edgar Ramírez Mondragón <edgarrm358@gmail.com>
+---
+ .github/workflows/ci.yml       |  8 +++++---
+ src/zlib_ng/zlib_ngmodule.c    |  3 ++-
+ tests/test_compat.py           | 24 ++++++++++++------------
+ tests/test_gzip_ng.py          |  2 +-
+ tests/test_gzip_ng_threaded.py |  4 ++--
+ tox.ini                        |  2 +-
+ 6 files changed, 23 insertions(+), 20 deletions(-)
+
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index e2bc13d..cf45278 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -59,13 +59,15 @@ jobs:
+           - "3.13"
+           - "3.14"
+           - "3.14t"
++          - "3.15"
++          - "3.15t"
+           - "pypy-3.10"
+           - "pypy-3.11"
+         os: ["ubuntu-latest"]
+         include:
+           - os: "macos-latest"  # For m1 macos
+             python-version: "3.12"
+-          - os: "macos-13"  # for x86 macos
++          - os: "macos-15-intel"  # for x86 macos
+             python-version: "3.10"
+           - os: "windows-latest"
+             python-version: "3.10"
+@@ -129,7 +131,7 @@ jobs:
+       matrix:
+         os:
+           - "ubuntu-latest"
+-          - "macos-13"
++          - "macos-15-intel"
+           - "macos-latest"
+           - "windows-latest"
+         python_version: [ "python" ]
+@@ -167,7 +169,7 @@ jobs:
+       matrix:
+         os:
+           - ubuntu-latest
+-          - macos-13
++          - macos-15-intel
+           - macos-latest
+           - windows-latest
+         cibw_archs_linux: ["x86_64"]
+diff --git a/src/zlib_ng/zlib_ngmodule.c b/src/zlib_ng/zlib_ngmodule.c
+index ea71d53..c8c2a32 100644
+--- a/src/zlib_ng/zlib_ngmodule.c
++++ b/src/zlib_ng/zlib_ngmodule.c
+@@ -801,7 +801,8 @@ zlib_Compress_copy(compobject *self, PyObject *Py_UNUSED(ignored))
+ 
+     if (!self->is_initialised) {
+         PyErr_SetString(PyExc_ValueError, "Cannot copy flushed objects.");
+-        goto error;
++        Py_DECREF(return_value);
++        return NULL;
+     }
+ 
+     /* Copy the zstream state
+diff --git a/tests/test_compat.py b/tests/test_compat.py
+index 12dda97..871bf84 100644
+--- a/tests/test_compat.py
++++ b/tests/test_compat.py
+@@ -64,21 +64,21 @@ def limited_zlib_tests(strategies=ZLIB_STRATEGIES):
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "value"],
+-                         itertools.product(DATA_SIZES, SEEDS))
++                         list(itertools.product(DATA_SIZES, SEEDS)))
+ def test_crc32(data_size, value):
+     data = DATA[:data_size]
+     assert zlib.crc32(data, value) == zlib_ng.crc32(data, value)
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "value"],
+-                         itertools.product(DATA_SIZES, SEEDS))
++                         list(itertools.product(DATA_SIZES, SEEDS)))
+ def test_adler32(data_size, value):
+     data = DATA[:data_size]
+     assert zlib.adler32(data, value) == zlib_ng.adler32(data, value)
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level", "wbits"],
+-                         itertools.product(DATA_SIZES, range(10), WBITS_RANGE))
++                         list(itertools.product(DATA_SIZES, range(10), WBITS_RANGE)))
+ def test_compress(data_size, level, wbits):
+     data = DATA[:data_size]
+     compressed = zlib_ng.compress(data, level=level, wbits=wbits)
+@@ -87,7 +87,7 @@ def test_compress(data_size, level, wbits):
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level"],
+-                         itertools.product(DATA_SIZES, range(10)))
++                         list(itertools.product(DATA_SIZES, range(10))))
+ def test_decompress_zlib(data_size, level):
+     data = DATA[:data_size]
+     compressed = zlib.compress(data, level=level)
+@@ -96,7 +96,7 @@ def test_decompress_zlib(data_size, level):
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level", "wbits", "memLevel", "strategy"],
+-                         limited_zlib_tests(ZLIB_STRATEGIES))
++                         list(limited_zlib_tests(ZLIB_STRATEGIES)))
+ def test_decompress_wbits(data_size, level, wbits, memLevel, strategy):
+     data = DATA[:data_size]
+     compressobj = zlib.compressobj(level=level, wbits=wbits, memLevel=memLevel,
+@@ -107,7 +107,7 @@ def test_decompress_wbits(data_size, level, wbits, memLevel, strategy):
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level", "wbits"],
+-                         itertools.product([128 * 1024], range(10), WBITS_RANGE),)
++                         list(itertools.product([128 * 1024], range(10), WBITS_RANGE),))
+ def test_decompress_zlib_ng(data_size, level, wbits):
+     data = DATA[:data_size]
+     compressed = zlib_ng.compress(data, level=level, wbits=wbits)
+@@ -116,7 +116,7 @@ def test_decompress_zlib_ng(data_size, level, wbits):
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level", "wbits", "memLevel", "strategy"],
+-                         limited_zlib_tests(ZLIBNG_STRATEGIES))
++                         list(limited_zlib_tests(ZLIBNG_STRATEGIES)))
+ def test_compress_compressobj(data_size, level, wbits, memLevel, strategy):
+     data = DATA[:data_size]
+     compressobj = zlib_ng.compressobj(level=level,
+@@ -129,7 +129,7 @@ def test_compress_compressobj(data_size, level, wbits, memLevel, strategy):
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level", "wbits", "memLevel", "strategy"],
+-                         limited_zlib_tests(ZLIB_STRATEGIES))
++                         list(limited_zlib_tests(ZLIB_STRATEGIES)))
+ def test_decompress_decompressobj(data_size, level, wbits, memLevel, strategy):
+     data = DATA[:data_size]
+     compressobj = zlib.compressobj(level=level, wbits=wbits, memLevel=memLevel,
+@@ -151,7 +151,7 @@ def test_decompressobj_unconsumed_tail():
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level"],
+-                         itertools.product(DATA_SIZES, range(10)))
++                         list(itertools.product(DATA_SIZES, range(10))))
+ def test_gzip_ng_compress(data_size, level):
+     data = DATA[:data_size]
+     compressed = gzip_ng.compress(data, compresslevel=level)
+@@ -159,7 +159,7 @@ def test_gzip_ng_compress(data_size, level):
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level"],
+-                         itertools.product(DATA_SIZES, range(10)))
++                         list(itertools.product(DATA_SIZES, range(10))))
+ def test_decompress_gzip(data_size, level):
+     data = DATA[:data_size]
+     compressed = gzip.compress(data, compresslevel=level)
+@@ -168,7 +168,7 @@ def test_decompress_gzip(data_size, level):
+ 
+ 
+ @pytest.mark.parametrize(["data_size", "level"],
+-                         itertools.product(DATA_SIZES, range(10)))
++                         list(itertools.product(DATA_SIZES, range(10))))
+ def test_decompress_gzip_ng(data_size, level):
+     data = DATA[:data_size]
+     compressed = gzip_ng.compress(data, compresslevel=level)
+@@ -177,7 +177,7 @@ def test_decompress_gzip_ng(data_size, level):
+ 
+ 
+ @pytest.mark.parametrize(["unused_size", "wbits"],
+-                         itertools.product([26], [-15, 15, 31]))
++                         list(itertools.product([26], [-15, 15, 31])))
+ def test_unused_data(unused_size, wbits):
+     unused_data = b"abcdefghijklmnopqrstuvwxyz"[:unused_size]
+     compressor = zlib.compressobj(wbits=wbits)
+diff --git a/tests/test_gzip_ng.py b/tests/test_gzip_ng.py
+index abfd283..6c9d3c6 100644
+--- a/tests/test_gzip_ng.py
++++ b/tests/test_gzip_ng.py
+@@ -65,7 +65,7 @@ def test_GzipNGFile_read_truncated():
+                 "reached")
+ 
+ 
+-@pytest.mark.parametrize("level", range(1, 10))
++@pytest.mark.parametrize("level", list(range(1, 10)))
+ def test_decompress_stdin_stdout(capsysbinary, level):
+     """Test if the command line can decompress data that has been compressed
+     by gzip at all levels."""
+diff --git a/tests/test_gzip_ng_threaded.py b/tests/test_gzip_ng_threaded.py
+index b976419..a587193 100644
+--- a/tests/test_gzip_ng_threaded.py
++++ b/tests/test_gzip_ng_threaded.py
+@@ -31,7 +31,7 @@ def test_threaded_read():
+ 
+ 
+ @pytest.mark.parametrize(["mode", "threads"],
+-                         itertools.product(["wb", "wt"], [1, 3, -1]))
++                         list(itertools.product(["wb", "wt"], [1, 3, -1])))
+ def test_threaded_write(mode, threads):
+     with tempfile.NamedTemporaryFile("wb", delete=False) as tmp:
+         # Use a small block size to simulate many writes.
+@@ -216,7 +216,7 @@ def test_threaded_writer_does_not_close_stream():
+ 
+ @pytest.mark.timeout(5)
+ @pytest.mark.parametrize(
+-    ["mode", "threads"], itertools.product(["rb", "wb"], [1, 2]))
++    ["mode", "threads"], list(itertools.product(["rb", "wb"], [1, 2])))
+ def test_threaded_program_can_exit_on_error(tmp_path, mode, threads):
+     program = tmp_path / "no_context_manager.py"
+     test_file = tmp_path / "output.gz"
+diff --git a/tox.ini b/tox.ini
+index 14409e4..dfefd90 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -15,7 +15,7 @@ setenv=
+     PYTHONDEVMODE=1
+ commands =
+     # Create HTML coverage report for humans and xml coverage report for external services.
+-    coverage run --branch --source=zlib_ng -m pytest tests
++    coverage run --branch --source=zlib_ng -m pytest {posargs:tests}
+     # Ignore errors during report generation. Pypy does not generate proper coverage reports.
+     coverage html -i
+     coverage xml -i
+-- 
+2.54.0
+

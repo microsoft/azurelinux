@@ -12,7 +12,7 @@
 
 Name:		libpfm
 Version:	4.13.0
-Release: 24%{?dist}
+Release: 28%{?dist}
 
 Summary:	Library to encode performance events for use by perf tool
 
@@ -143,6 +143,15 @@ rm $RPM_BUILD_ROOT%{_libdir}/lib*.a
 %endif
 
 %changelog
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 4.13.0-23
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 4.13.0-21
+- Rebuilt for Python 3.15
+
 * Wed May 13 2026 Aaron Merey <amerey@redhat.com> - 4.13.0-20
 - Install COPYING license file in all subpackages
 

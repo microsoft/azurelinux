@@ -6,8 +6,8 @@
 S3transfer is a Python library for managing Amazon S3 transfers.
 
 Name:           python-%{srcname}
-Version:        0.19.1
-Release: 6%{?dist}
+Version:        0.19.2
+Release: 7%{?dist}
 Summary:        Amazon S3 Transfer Manager
 
 License:        Apache-2.0
@@ -53,6 +53,12 @@ Python 3 version.
 
 
 %changelog
+* Thu Jul 23 2026 Gwyn Ciesla <gwync@protonmail.com> - 0.19.2-1
+- 0.19.2
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
 * Mon Jul 13 2026 Gwyn Ciesla <gwync@protonmail.com> - 0.19.1-1
 - 0.19.1
 
