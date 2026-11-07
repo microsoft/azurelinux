@@ -4,7 +4,7 @@
 # All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
 %{load:%{_sourcedir}/perl.azl.macros}
 
-%global perl_version    5.42.2
+%global perl_version    5.42.3
 %global perl_epoch      4
 %global perl_arch_stem -thread-multi
 %global perl_archname %{_arch}-%{_os}%{perl_arch_stem}
@@ -123,7 +123,7 @@ License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release: 528%{?dist}
+Release: 529%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
@@ -253,7 +253,7 @@ BuildRequires:  rsyslog
 
 
 # compat macro needed for rebuild
-%global perl_compat perl(:MODULE_COMPAT_5.42.2)
+%global perl_compat perl(:MODULE_COMPAT_5.42.3)
 
 Requires:       %perl_compat
 Requires:       perl-interpreter%{?_isa} = %{perl_epoch}:%{perl_version}-%{release}
@@ -436,6 +436,7 @@ Summary:        The libraries for the perl run-time
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND Martin-Birgmeier AND Spencer-86 AND MIT AND Unicode-3.0 AND LicenseRef-Fedora-Public-Domain
 # Compat provides
 Provides:       %perl_compat
+Provides:       perl(:MODULE_COMPAT_5.42.2)
 Provides:       perl(:MODULE_COMPAT_5.42.1)
 Provides:       perl(:MODULE_COMPAT_5.42.0)
 # Interpreter version to fulfil required genersted from "require 5.006;"
@@ -575,7 +576,7 @@ packages like perldoc by perl-Pod-Perldoc and splain by perl-diagnostics.
 Summary:        A module for Perl manipulation of .tar files
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          0
-Version:        3.04
+Version:        3.12
 BuildArch:      noarch
 Requires:       perl(IO::Zlib) >= 1.01
 # Optional run-time:
@@ -843,7 +844,7 @@ Perl 5 class that implements a struct-like data structure.
 Summary:        Low-Level Interface to bzip2 compression library
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          0
-Version:        2.213
+Version:        2.218
 Requires:       perl(Exporter), perl(File::Temp)
 %if %{defined perl_bootstrap}
 %gendep_perl_Compress_Raw_Bzip2
@@ -2272,7 +2273,7 @@ This is a collection of Perl input/output modules.
 Summary:        IO::Compress wrapper for modules
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          0
-Version:        2.213
+Version:        2.223
 Obsoletes:      perl-Compress-Zlib <= 2.020
 Provides:       perl(IO::Uncompress::Bunzip2)
 %if %{defined perl_bootstrap}
@@ -2450,7 +2451,7 @@ as they are needed in a variety of protocols and applications.
 Summary:        A small, simple, correct HTTP/1.1 client
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          0
-Version:        0.090
+Version:        0.096
 Requires:       perl(bytes)
 Requires:       perl(Carp)
 Requires:       perl(IO::Socket)
@@ -2747,7 +2748,7 @@ encoder/decoder. These encoding methods are specified in RFC 2045 - MIME
 Summary:        What modules are shipped with versions of perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          1
-Version:        5.20260329
+Version:        5.20260802
 Requires:       perl(List::Util)
 Requires:       perl(version) >= 0.88
 %if %{defined perl_bootstrap}
@@ -2764,7 +2765,7 @@ are shipped with each version of perl.
 Summary:        Tool for listing modules shipped with perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          1
-Version:        5.20260329
+Version:        5.20260802
 Requires:       perl(feature)
 Requires:       perl(version) >= 0.88
 Requires:       perl-Module-CoreList = %{epoch}:%{version}-%{release}
@@ -3482,7 +3483,7 @@ The sigtrap pragma is a simple interface for installing signal handlers.
 Summary:        C socket.h defines and structure manipulators
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          4
-Version:        2.038
+Version:        2.041
 %if %{defined perl_bootstrap}
 Requires:       %perl_compat
 %gendep_perl_Socket
@@ -7294,17 +7295,17 @@ ln -s /app/bin/perl %{buildroot}/usr/bin/perl
 
 # Old changelog entries are preserved in CVS.
 %changelog
-* Mon Mar 30 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.42.2-524
+* Mon Aug 03 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.42.3-524
+- 5.42.3 bump (see <https://metacpan.org/release/SHAY/perl-5.42.3/view/pod/perldelta.pod>)
+
+* Mon Mar 30 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.42.2-523
 - 5.42.2 bump (see <https://metacpan.org/release/SHAY/perl-5.42.2/view/pod/perldelta.pod>)
 
-* Mon Mar 09 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.42.1-523
+* Mon Mar 09 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.42.1-522
 - 5.42.1 bump (see <https://metacpan.org/release/SHAY/perl-5.42.1/view/pod/perldelta.pod>)
 
-* Tue Feb 10 2026 Petr Pisar <ppisar@redhat.com> - 4:5.42.0-522
+* Tue Feb 10 2026 Petr Pisar <ppisar@redhat.com> - 4:5.42.0-521
 - Fix handling daylight savings in strftime() (bug #2384501)
-
-* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4:5.42.0-521
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 4:5.42.0-520
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

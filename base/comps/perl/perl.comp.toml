@@ -1,6 +1,7 @@
+# Pin to Fedora f43 perl-5.42.3 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/perl/c/3bda3d7668e3e12322c1d0417e9a0e8409b43ff9
 [components.perl]
-# Pin to the commit which upgrades perl to 5.42.2
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "45" }, upstream-commit = "a6fb59f96e92d928431d9892e22dfc22bd006809" }
+spec = { type = "upstream", upstream-commit = "3bda3d7668e3e12322c1d0417e9a0e8409b43ff9" }
 
 [components.perl.build]
 # Workaround: disable SystemTap/DTrace during initial distro bringup to avoid a
