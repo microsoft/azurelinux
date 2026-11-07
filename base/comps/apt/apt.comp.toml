@@ -1,0 +1,4 @@
+# Pin to Fedora f43 apt-3.3.7 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/apt/c/c844ca91154b9fb1f0d5084bc1071e543cac72b7
+[components.apt]
+spec = { type = "upstream", upstream-commit = "c844ca91154b9fb1f0d5084bc1071e543cac72b7" }

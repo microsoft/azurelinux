@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fd3a561..e84ef6e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,7 +2,7 @@
+ # Licensed under the same terms as APT; i.e. GPL 2 or later.
+ 
+ # set minimum version
+-cmake_minimum_required(VERSION 4.2)
++cmake_minimum_required(VERSION 3.13)
+ project(apt)
+ # Generic header locations
+ include_directories(${PROJECT_BINARY_DIR}/include)
