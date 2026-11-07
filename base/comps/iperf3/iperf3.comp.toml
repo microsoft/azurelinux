@@ -1,0 +1,5 @@
+# Pin to Fedora f43 iperf3-3.22 to pick up CVE fixes:
+# CVE-2026-102253, CVE-2026-101276, CVE-2026-71217
+# https://src.fedoraproject.org/rpms/iperf3/c/cfc7721ad775283f052d4843f1df337c8c4854bf
+[components.iperf3]
+spec = { type = "upstream", upstream-commit = "cfc7721ad775283f052d4843f1df337c8c4854bf" }
