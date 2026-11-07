@@ -1,4 +1,7 @@
+# Pin to Fedora f43 gvisor-tap-vsock-0.9.0 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/gvisor-tap-vsock/c/dbc01223bedbf4b0806ed5d26c1e05386783ccec
 [components.gvisor-tap-vsock]
+spec = { type = "upstream", upstream-commit = "dbc01223bedbf4b0806ed5d26c1e05386783ccec" }
 # Upstream spec uses conditional %autorelease (%if %{defined autorelease}), which
 # auto-detection misidentifies. Force autorelease mode to preserve %autorelease in render.
 [components.gvisor-tap-vsock.release]
