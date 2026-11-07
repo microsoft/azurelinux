@@ -1,0 +1,9 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/systemd/systemd/commit/1a60b10de9e4a3fe59a2efa3c6a58fd72c305807" }]
+
+[[overlays]]
+description = "Backport sd-event fix for hang after ratelimit expiry"
+type = "patch-add"
+source = "../sd-event-fix-hang-after-ratelimit-expiry.patch"
