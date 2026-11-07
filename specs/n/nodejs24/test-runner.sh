@@ -9,7 +9,7 @@ TIMEOUT_DURATION=600
 # Exit code
 FINAL_RESULT=0
 ARCH=$(uname -m)
-PARARALLEL_TEST_RERUN=""
+PARALLEL_TEST_RERUN=""
 echo "Started test run:"
 # Run the list of test
 while IFS= read -r test_line; do
@@ -45,7 +45,7 @@ while IFS= read -r test_line; do
   # Handle test result
   if [ $TEST_RESULT -ne 0 ]; then
     if [[ "$TEST_PATH" == */parallel/* ]]; then
-      PARARALLEL_TEST_RERUN+="$TEST_SCRIPT"
+      PARALLEL_TEST_RERUN+="$TEST_SCRIPT"
       echo "Parallel test failed, marking for rerun: $TEST_SCRIPT"
       continue
     elif [ $TEST_RESULT -eq 124 ]; then
@@ -81,6 +81,6 @@ if [ -n "$PARALLEL_TEST_RERUN" ]; then
 fi
 
 if [ $FINAL_RESULT -eq 0 ]; then
-    echo "All tests succesfully passed."
+    echo "All tests successfully passed."
 fi
 exit $FINAL_RESULT

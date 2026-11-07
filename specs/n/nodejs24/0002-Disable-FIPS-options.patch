@@ -1,4 +1,4 @@
-From 7eafec8b074f31845ee898f954e378f70f5b1c2c Mon Sep 17 00:00:00 2001
+From bfdd2d2d6433c8abb8b05e6ac616f748a500f2ee Mon Sep 17 00:00:00 2001
 From: Michael Dawson <midawson@redhat.com>
 Date: Fri, 23 Feb 2024 13:43:56 +0100
 Subject: [PATCH] Disable FIPS options
@@ -18,11 +18,11 @@ Signed-off-by: rpm-build <rpm-build>
 ---
  lib/crypto.js             | 10 ++++++++++
  lib/internal/errors.js    |  6 ++++++
- src/crypto/crypto_util.cc |  2 ++
- 3 files changed, 18 insertions(+)
+ src/crypto/crypto_util.cc |  4 ++++
+ 3 files changed, 20 insertions(+)
 
 diff --git a/lib/crypto.js b/lib/crypto.js
-index 4290989..1e647a9 100644
+index ac4b0a3..74f3034 100644
 --- a/lib/crypto.js
 +++ b/lib/crypto.js
 @@ -36,6 +36,9 @@ const {
@@ -35,7 +35,7 @@ index 4290989..1e647a9 100644
    ERR_CRYPTO_FIPS_FORCED,
    ERR_WORKER_UNSUPPORTED_OPERATION,
  } = require('internal/errors').codes;
-@@ -253,6 +256,13 @@ function getFips() {
+@@ -255,6 +258,13 @@ function getFips() {
  }
  
  function setFips(val) {
@@ -50,10 +50,10 @@ index 4290989..1e647a9 100644
      if (val) return;
      throw new ERR_CRYPTO_FIPS_FORCED();
 diff --git a/lib/internal/errors.js b/lib/internal/errors.js
-index e6dfbc2..73f3f5a 100644
+index 01f05a5..2a8f8b7 100644
 --- a/lib/internal/errors.js
 +++ b/lib/internal/errors.js
-@@ -1113,6 +1113,12 @@ module.exports = {
+@@ -1114,6 +1114,12 @@ module.exports = {
  //
  // Note: Node.js specific errors must begin with the prefix ERR_
  
@@ -67,18 +67,20 @@ index e6dfbc2..73f3f5a 100644
    function(msg, permission = '', resource = '') {
      this.permission = permission;
 diff --git a/src/crypto/crypto_util.cc b/src/crypto/crypto_util.cc
-index 205e248..dcf2bf3 100644
+index 3f5f70b..1d09aeb 100644
 --- a/src/crypto/crypto_util.cc
 +++ b/src/crypto/crypto_util.cc
-@@ -86,6 +86,8 @@ bool ProcessFipsOptions() {
-   /* Override FIPS settings in configuration file, if needed. */
-   if (per_process::cli_options->enable_fips_crypto ||
-       per_process::cli_options->force_fips_crypto) {
-+      fprintf(stderr, "ERROR: Using options related to FIPS is not recommended, configure FIPS in openssl instead. See https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/security_hardening/assembly_installing-the-system-in-fips-mode_security-hardening for more details.\n");
-+      return false;
- #if OPENSSL_VERSION_MAJOR >= 3
-     if (!ncrypto::testFipsEnabled()) return false;
-     return ncrypto::setFipsEnabled(true, nullptr);
+@@ -117,6 +117,10 @@ std::optional<std::string> ProcessFipsOptions() {
+   }
+ #endif
+ 
++  // Fedora: we do not support using these options at all
++  // If we get here, just error out.
++  return "Using options related to FIPS is not recommended, configure FIPS in openssl instead. See https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/security_hardening/assembly_installing-the-system-in-fips-mode_security-hardening for more details.";
++
+   CryptoErrorList errors{CryptoErrorList::Option::NONE};
+   if (!ncrypto::setFipsEnabled(true, &errors)) {
+     std::string error = "OpenSSL error when trying to enable FIPS";
 -- 
-2.53.0
+2.55.0
 

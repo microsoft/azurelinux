@@ -7,7 +7,6 @@
 # Each exception should be explained with a comment
 # containing date and a short description of the problem
 #
-wasm-allocation/test-wasm-allocation.js
 node-api/test_threadsafe_function/uncaught_exception.js
 pummel/test-heapsnapshot-near-heap-limit-by-api.js
 pummel/test-heapdump-fs-promise.js
@@ -452,7 +451,9 @@ wpt/test-blob.js
 wpt/test-console.js
 wpt/test-timers.js
 v8-updates/test-trace-gc-flag.js
-v8-updates/test-linux-perf-logger.js
+# 2026.10.14: V8's perf map on riscv64 only contains Builtin entries and does not
+# emit JS function or RegExp entries, causing this test to fail.
+v8-updates/test-linux-perf-logger.js riscv64
 v8-updates/test-linux-perf.js
 common/globals.js
 common/hijackstdio.js
@@ -765,7 +766,6 @@ parallel/test-child-process-spawnsync-timeout.js
 parallel/test-console-tty-colors.js
 parallel/test-timers-promises.js
 parallel/test-http-set-header-chain.js
-parallel/test-tls-client-getephemeralkeyinfo.js
 parallel/test-http-server-capture-rejections.js
 parallel/test-timers-unenroll-unref-interval.js
 parallel/test-fs-symlink-dir-junction.js
