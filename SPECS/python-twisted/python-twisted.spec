@@ -2,7 +2,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        22.10.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,12 @@ Patch2:         CVE-2024-41810.patch
 Patch3:         CVE-2023-46137.patch
 Patch4:         CVE-2026-42304.patch
 Patch5:         CVE-2026-106454.patch
+Patch6:         CVE-2026-115774.patch
+Patch7:         CVE-2026-115775.patch
+Patch8:         CVE-2026-115776.patch
+Patch9:         CVE-2026-115778.patch
+Patch10:        CVE-2026-115877.patch
+Patch11:        CVE-2026-83813.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-incremental
 BuildRequires:  python3-pyOpenSSL
@@ -113,6 +119,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/cftp3
 
 %changelog
+* Thu Oct 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 22.10.0-8
+- Patch for CVE-2026-83813, CVE-2026-115877, CVE-2026-115778, CVE-2026-115776, CVE-2026-115775, CVE-2026-115774
+
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 22.10.0-7
 - Patch for CVE-2026-106454
 
