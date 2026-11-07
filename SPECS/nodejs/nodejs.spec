@@ -15,7 +15,7 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        24.22.1
+Version:        24.22.2
 Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
@@ -193,6 +193,9 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Wed Nov 04 2026 Kanishk Bansal <kanbansal@microsoft.com> - 24.22.2-1
+- Upgrade to 24.22.2
+
 * Wed Oct 21 2026 Kanishk Bansal <kanbansal@microsoft.com> - 24.22.1-1
 - Upgrade to 24.22.1 for CVE-2026-105481, CVE-2026-105482, CVE-2026-105483,
   CVE-2026-106069, CVE-2026-106073, CVE-2026-106074, CVE-2026-111497
