@@ -1,0 +1,4 @@
+# Pin to Fedora f43 golang-x-sys-None to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/golang-x-sys/c/9b2ff4942faa3922327e08002af46c88d92736c0
+[components.golang-x-sys]
+spec = { type = "upstream", upstream-commit = "9b2ff4942faa3922327e08002af46c88d92736c0" }
