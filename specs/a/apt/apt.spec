@@ -16,15 +16,16 @@
 %bcond_with check_integration
 
 Name:           apt
-Version:        3.3.3
-Release: 5%{?dist}
+Version:        3.3.7
+Release: 6%{?dist}
 Summary:        Command-line package manager for Debian packages
 
 License:        GPL-2.0-or-later
 URL:            https://tracker.debian.org/pkg/apt
 Source0:        https://salsa.debian.org/apt-team/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz
-Patch1:         apt_include_cstdint.patch
-Patch2:         apt-2.9.27-cstdint.patch
+Patch:          apt_include_cstdint.patch
+Patch:          apt-2.9.27-cstdint.patch
+Patch:          apt-3.3.5-cmake3.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -185,7 +186,7 @@ EOF
 
 %build
 %{?el9:source /opt/rh/gcc-toolset-15/enable}
-%cmake -GNinja
+%cmake -GNinja -DWITH_HEGEL_TESTS=0
 %cmake_build
 
 %install
@@ -332,6 +333,21 @@ exit 0
 %doc %{_docdir}/%{name}-utils
 
 %changelog
+* Sat Nov 07 2026 Terje Røsten <terjeros@gmail.com> - 3.3.7-1
+- 3.3.7
+
+* Wed Nov 04 2026 Terje Røsten <terjeros@gmail.com> - 3.3.6-1
+- 3.3.6
+
+* Thu Oct 29 2026 Terje Røsten <terjeros@gmail.com> - 3.3.5-2
+- Revert to cmake 3
+
+* Wed Oct 28 2026 Terje Røsten <terjeros@gmail.com> - 3.3.5-1
+- 3.3.5
+
+* Tue Oct 20 2026 Terje Røsten <terjeros@gmail.com> - 3.3.4-1
+- 3.3.4
+
 * Sun Aug 16 2026 Terje Røsten <terjeros@gmail.com> - 3.3.3-1
 - Update to 3.3.3
 
