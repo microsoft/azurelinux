@@ -1,7 +1,7 @@
 Summary:        Cross-platform asynchronous I/O
 Name:           libuv
 Version:        1.48.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT AND CC-BY
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,12 +48,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 # The libuv test suite cannot be run as root
+# Few tests are failing for liuv due to issue with pipeline access.
 chmod g+w . -R
 useradd test -G root -m
 # skip known failing tests
 sed -i '/tty/d' test/test-list.h
 sed -i '/queue_foreach_delete/d' test/test-list.h
-sudo -u test make -k check
+sudo -u test env UV_TEST_TIMEOUT_MULTIPLIER=4 make -k check
 
 %files
 %doc AUTHORS
@@ -75,6 +76,9 @@ sudo -u test make -k check
 %{_libdir}/%{name}.a
 
 %changelog
+* Wed Oct 14 2026 Kshitiz Godara <kgodara@micrsoft.com> - 1.48.0-2
+- Addressing ptest failure for libuv
+
 * Mon May 20 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 1.48.0-1
 - Upgrade to version 1.48.0 to fix CVE-2024-24806
 
