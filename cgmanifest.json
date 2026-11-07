@@ -3427,6 +3427,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "erlang27",
+          "version": "27.3.4.18",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-27.3.4.18/otp-OTP-27.3.4.18.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "erofs-utils",
           "version": "1.8.5",
           "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/snapshot/erofs-utils-1.8.5.tar.gz"
