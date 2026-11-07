@@ -3,14 +3,20 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.18
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
-Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Source0 contains a regenerated vendor/ directory; the upstream archive is not sufficient.
+# To rebuild: extract the original 25.0.18 Source0, apply CVE-2026-78660.patch and
+# remove-deprecated-otelgrpc-usage.patch, then run:
+#   GO111MODULE=on hack/with-go-mod.sh go mod vendor -modfile=vendor.mod
+# Copy only vendor/ into a fresh extraction of the original Source0 and archive
+# moby-25.0.18/ as moby-engine-25.0.18.tar.gz. Do not bake the spec patches into it.
+Source0: %{name}-%{version}.tar.gz
 Source1: docker.service
 Source2: docker.socket
 
@@ -22,12 +28,10 @@ Patch4:  CVE-2026-61712.patch
 Patch5:  CVE-2026-75593.patch
 Patch6:  CVE-2026-61711.patch
 Patch7:  CVE-2026-17106.patch
-Patch8:  CVE-2026-37236.patch
-Patch9:  CVE-2026-56855.patch
-Patch10: CVE-2026-78662.patch
-Patch11: CVE-2026-84304.patch
-Patch12: CVE-2026-84445.patch
-Patch13: CVE-2026-56852.patch
+Patch8:  CVE-2026-78660.patch
+Patch9:  remove-deprecated-otelgrpc-usage.patch
+Patch10: CVE-2026-92542.patch
+Patch11: CVE-2026-92543.patch
 
 %{?systemd_requires}
 
@@ -123,6 +127,12 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Thu Oct 15 2026 Aditya Singh <v-aditysing@microsoft.com> - 25.0.18-2
+- Patch for CVE-2026-78660, CVE-2026-78669, CVE-2026-78663, CVE-2026-78659, CVE-2026-97032,
+  CVE-2026-81870, CVE-2026-92542 and CVE-2026-92543
+- Removed patch for CVE-2026-37236, CVE-2026-56855, CVE-2026-78662, CVE-2026-84304,
+  CVE-2026-84445, CVE-2026-56852
+
 * Tue Oct 06 2026 Mitch Zhu <mitchzhu@microsoft.com> - 25.0.18-1
 - Upgrade to version 25.0.18
 - Remove upstreamed patches and retain remaining security fixes
