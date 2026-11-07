@@ -1,6 +1,6 @@
-diff -pruN fribidi-1.0.14.orig/bin/Makefile.am fribidi-1.0.14/bin/Makefile.am
---- fribidi-1.0.14.orig/bin/Makefile.am	2020-07-06 04:17:23.000000000 +0900
-+++ fribidi-1.0.14/bin/Makefile.am	2024-05-07 21:40:04.500166714 +0900
+diff -pruN fribidi-1.0.17.orig/bin/Makefile.am fribidi-1.0.17/bin/Makefile.am
+--- fribidi-1.0.17.orig/bin/Makefile.am	2026-09-20 03:45:00.000000000 +0900
++++ fribidi-1.0.17/bin/Makefile.am	2026-09-29 11:48:25.463157633 +0900
 @@ -2,11 +2,9 @@ bin_PROGRAMS = fribidi
  
  noinst_PROGRAMS = fribidi-benchmark fribidi-bidi-types fribidi-caprtl2utf8
@@ -15,10 +15,10 @@ diff -pruN fribidi-1.0.14.orig/bin/Makefile.am fribidi-1.0.14/bin/Makefile.am
  
  AM_CPPFLAGS = \
  		@FRIBIDI_CPPFLAGS@ \
-diff -pruN fribidi-1.0.14.orig/bin/getopt.c fribidi-1.0.14/bin/getopt.c
---- fribidi-1.0.14.orig/bin/getopt.c	2015-08-05 03:49:07.000000000 +0900
-+++ fribidi-1.0.14/bin/getopt.c	1970-01-01 09:00:00.000000000 +0900
-@@ -1,1268 +0,0 @@
+diff -pruN fribidi-1.0.17.orig/bin/getopt.c fribidi-1.0.17/bin/getopt.c
+--- fribidi-1.0.17.orig/bin/getopt.c	2026-09-20 03:45:00.000000000 +0900
++++ fribidi-1.0.17/bin/getopt.c	1970-01-01 09:00:00.000000000 +0900
+@@ -1,1256 +0,0 @@
 -/* Getopt for GNU.
 -   NOTE: getopt is now part of the C library, so if you don't know what
 -   "Keep this file name-space clean" means, talk to drepper@gnu.org
@@ -71,13 +71,13 @@ diff -pruN fribidi-1.0.14.orig/bin/getopt.c fribidi-1.0.14/bin/getopt.c
 -
 -#ifndef ELIDE_CODE
 -
+-#include <stdlib.h>
 -
 -/* This needs to come after some library #include
 -   to get __GNU_LIBRARY__ defined.  */
 -#ifdef	__GNU_LIBRARY__
--/* Don't include stdlib.h for non-GNU C libraries because some of them
+-/* Don't include unistd.h for non-GNU C libraries because some of them
 -   contain conflicting prototypes for getopt.  */
--# include <stdlib.h>
 -# include <unistd.h>
 -#endif /* GNU C library.  */
 -
@@ -158,18 +158,6 @@ diff -pruN fribidi-1.0.14.orig/bin/getopt.c fribidi-1.0.14/bin/getopt.c
 -static struct _getopt_data getopt_data;
 -
 -
--#ifndef __GNU_LIBRARY__
--
--/* Avoid depending on library functions or files
--   whose names are inconsistent.  */
--
--#ifndef getenv
--extern char *getenv (
--);
--#endif
--
--#endif /* not __GNU_LIBRARY__ */
--
 -#ifdef _LIBC
 -/* Stored original parameters.
 -   XXX This is no good solution.  We should rather copy the args so
@@ -1287,10 +1275,10 @@ diff -pruN fribidi-1.0.14.orig/bin/getopt.c fribidi-1.0.14/bin/getopt.c
 -}
 -
 -#endif /* TEST */
-diff -pruN fribidi-1.0.14.orig/bin/getopt.h fribidi-1.0.14/bin/getopt.h
---- fribidi-1.0.14.orig/bin/getopt.h	2015-08-05 03:49:07.000000000 +0900
-+++ fribidi-1.0.14/bin/getopt.h	1970-01-01 09:00:00.000000000 +0900
-@@ -1,187 +0,0 @@
+diff -pruN fribidi-1.0.17.orig/bin/getopt.h fribidi-1.0.17/bin/getopt.h
+--- fribidi-1.0.17.orig/bin/getopt.h	2026-09-20 03:45:00.000000000 +0900
++++ fribidi-1.0.17/bin/getopt.h	1970-01-01 09:00:00.000000000 +0900
+@@ -1,173 +0,0 @@
 -/* Declarations for getopt.
 -   Copyright (C) 1989-1994,1996-1999,2001,2003,2004
 -   Free Software Foundation, Inc.
@@ -1438,20 +1426,6 @@ diff -pruN fribidi-1.0.14.orig/bin/getopt.h fribidi-1.0.14/bin/getopt.h
 -   arguments to the option '\0'.  This behavior is specific to the GNU
 -   `getopt'.  */
 -
--#ifdef __GNU_LIBRARY__
--/* Many other libraries have conflicting prototypes for getopt, with
--   differences in the consts, in stdlib.h.  To avoid compilation
--   errors, only prototype getopt for the GNU C library.  */
--  extern int getopt (
--  int ___argc,
--  char *const *___argv,
--  const char *__shortopts
--  ) __THROW;
--#else				/* not __GNU_LIBRARY__ */
--  extern int getopt (
--  );
--#endif				/* __GNU_LIBRARY__ */
--
 -#ifndef __need_getopt
 -  extern int getopt_long (
 -  int ___argc,
@@ -1478,9 +1452,9 @@ diff -pruN fribidi-1.0.14.orig/bin/getopt.h fribidi-1.0.14/bin/getopt.h
 -#undef __need_getopt
 -
 -#endif				/* getopt.h */
-diff -pruN fribidi-1.0.14.orig/bin/getopt1.c fribidi-1.0.14/bin/getopt1.c
---- fribidi-1.0.14.orig/bin/getopt1.c	2015-08-05 03:49:07.000000000 +0900
-+++ fribidi-1.0.14/bin/getopt1.c	1970-01-01 09:00:00.000000000 +0900
+diff -pruN fribidi-1.0.17.orig/bin/getopt1.c fribidi-1.0.17/bin/getopt1.c
+--- fribidi-1.0.17.orig/bin/getopt1.c	2015-08-05 03:49:07.000000000 +0900
++++ fribidi-1.0.17/bin/getopt1.c	1970-01-01 09:00:00.000000000 +0900
 @@ -1,213 +0,0 @@
 -/* getopt_long and getopt_long_only entry points for GNU getopt.
 -   Copyright (C) 1987,88,89,90,91,92,93,94,96,97,98,2004
@@ -1695,9 +1669,9 @@ diff -pruN fribidi-1.0.14.orig/bin/getopt1.c fribidi-1.0.14/bin/getopt1.c
 -}
 -
 -#endif /* TEST */
-diff -pruN fribidi-1.0.14.orig/bin/getopt_int.h fribidi-1.0.14/bin/getopt_int.h
---- fribidi-1.0.14.orig/bin/getopt_int.h	2015-08-05 03:49:07.000000000 +0900
-+++ fribidi-1.0.14/bin/getopt_int.h	1970-01-01 09:00:00.000000000 +0900
+diff -pruN fribidi-1.0.17.orig/bin/getopt_int.h fribidi-1.0.17/bin/getopt_int.h
+--- fribidi-1.0.17.orig/bin/getopt_int.h	2015-08-05 03:49:07.000000000 +0900
++++ fribidi-1.0.17/bin/getopt_int.h	1970-01-01 09:00:00.000000000 +0900
 @@ -1,145 +0,0 @@
 -/* Internal declarations for getopt.
 -   Copyright (C) 1989-1994,1996-1999,2001,2003,2004
@@ -1844,25 +1818,25 @@ diff -pruN fribidi-1.0.14.orig/bin/getopt_int.h fribidi-1.0.14/bin/getopt_int.h
 -);
 -
 -#endif /* getopt_int.h */
-diff -pruN fribidi-1.0.14.orig/bin/gettext.h fribidi-1.0.14/bin/gettext.h
---- fribidi-1.0.14.orig/bin/gettext.h	2015-08-05 03:49:07.000000000 +0900
-+++ fribidi-1.0.14/bin/gettext.h	1970-01-01 09:00:00.000000000 +0900
+diff -pruN fribidi-1.0.17.orig/bin/gettext.h fribidi-1.0.17/bin/gettext.h
+--- fribidi-1.0.17.orig/bin/gettext.h	2015-08-05 03:49:07.000000000 +0900
++++ fribidi-1.0.17/bin/gettext.h	1970-01-01 09:00:00.000000000 +0900
 @@ -1,2 +0,0 @@
 -#undef gettext
 -#define gettext
-diff -pruN fribidi-1.0.14.orig/bin/meson.build fribidi-1.0.14/bin/meson.build
---- fribidi-1.0.14.orig/bin/meson.build	2024-03-18 03:10:09.000000000 +0900
-+++ fribidi-1.0.14/bin/meson.build	2024-05-07 21:40:55.573086578 +0900
-@@ -1,7 +1,7 @@
- # The fribidi binary is used by the test setup, so if bin=false we still
+diff -pruN fribidi-1.0.17.orig/bin/meson.build fribidi-1.0.17/bin/meson.build
+--- fribidi-1.0.17.orig/bin/meson.build	2026-09-20 03:45:00.000000000 +0900
++++ fribidi-1.0.17/bin/meson.build	2026-09-29 11:48:44.224522234 +0900
+@@ -2,7 +2,7 @@
  # need to build it for internal usage, we just won't install it.
+ gen_man_pages = 'fribidi.1'
  fribidi = executable('fribidi',
 -  'fribidi-main.c', 'getopt.c', 'getopt1.c', fribidi_unicode_version_h,
 +  'fribidi-main.c', fribidi_unicode_version_h,
    c_args: ['-DHAVE_CONFIG_H'] + fribidi_static_cargs,
    include_directories: incs,
    link_with: libfribidi,
-@@ -12,7 +12,7 @@ if not get_option('bin')
+@@ -14,7 +14,7 @@ if not get_option('bin')
  endif
  
  executable('fribidi-benchmark',

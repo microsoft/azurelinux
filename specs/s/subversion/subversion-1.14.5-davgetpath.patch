@@ -1,0 +1,30 @@
+Merged upstream https://github.com/apache/subversion/commit/1a7310fe38e049d228731d17690dc3c4455ea28b
+
+--- a/subversion/mod_dav_svn/mod_dav_svn.c
++++ b/subversion/mod_dav_svn/mod_dav_svn.c
+@@ -781,6 +781,15 @@ const char *
+ dav_svn__get_root_dir(request_rec *r)
+ {
+   dir_conf_t *conf;
++#if AP_MODULE_MAGIC_AT_LEAST(20120211, 139)
++  const char *base;
++
++  /* Inherit the root path from mod_dav's DavBasePath iff configured
++     where e.g. LocationMatch is used for the repos. */
++  base = dav_get_base_path(r);
++  if (base)
++    return base;
++#endif
+ 
+   conf = ap_get_module_config(r->per_dir_config, &dav_svn_module);
+   return conf->root_dir;
+@@ -1225,7 +1234,7 @@ static int dav_svn__translate_name(request_rec *r)
+   else
+     {
+       /* Retrieve path to repo and within repo for the request */
+-      dav_error *err = dav_svn_split_uri(r, r->uri, conf->root_dir,
++      dav_error *err = dav_svn_split_uri(r, r->uri, dav_svn__get_root_dir(r),
+                                          &ignore_cleaned_uri,
+                                          &ignore_had_slash, &repos_basename,
+                                          &ignore_relative_path, &repos_path);
+

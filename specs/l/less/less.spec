@@ -3,8 +3,8 @@
 
 Summary: A text file browser similar to more, but better
 Name: less
-Version: 704
-Release: 9%{?dist}
+Version: 710
+Release: 6%{?dist}
 # less dual license GPL-3.0-only OR BSD-2-Clause
 # lesspipe GPL-2.0-or-later
 License: (GPL-3.0-only OR BSD-2-Clause) AND GPL-2.0-or-later
@@ -18,7 +18,6 @@ Patch5: less-475-fsync.patch
 Patch6: less-436-manpage-add-old-bot-option.patch
 Patch8: less-458-lessecho-usage.patch
 Patch9: less-458-less-filters-man.patch
-Patch10: less-458-lesskey-usage.patch
 Patch11: less-458-old-bot-in-help.patch
 Patch13: less-436-help.patch
 URL: https://www.greenwoodsoftware.com/less/
@@ -65,7 +64,6 @@ mv lesspipe-%{lesspipe_version} lesspipe-src
 %patch -P 6 -p1 -b .manpage-add-old-bot-option
 %patch -P 8 -p1 -b .lessecho-usage
 %patch -P 9 -p1 -b .less-filters-man
-%patch -P 10 -p1 -b .lesskey-usage
 %patch -P 11 -p1 -b .old-bot
 %patch -P 13 -p1 -b .help
 
@@ -106,17 +104,20 @@ popd
 %license LICENSE COPYING
 /etc/profile.d/*
 %{_bindir}/less
-%{_bindir}/lesskey
 %{_bindir}/lesspipe.sh
 %{_libexecdir}/%{name}/lesscomplete
 %{_libexecdir}/%{name}/lessecho
 %{_libexecdir}/%{name}/less-osc8-open
 %{_mandir}/man1/*
+%{_mandir}/man5/*
 
 %files color
 %{_bindir}/archive_color
 
 %changelog
+* Wed Sep 23 2026 Michal Hlavinka <mhlavink@redhat.com> - 710-1
+- updated to 710 (#2536583)
+
 * Wed Sep 16 2026 Michal Hlavinka <mhlavink@redhat.com> - 704-5
 - update lesspipe to 2.28
 

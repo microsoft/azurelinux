@@ -1,0 +1,32 @@
+From fb114020a353ee0d61931d7a04e160d41c8d889f Mon Sep 17 00:00:00 2001
+Message-ID: <fb114020a353ee0d61931d7a04e160d41c8d889f.1785422567.git.mjg@fedoraproject.org>
+From: Michael J Gruber <mjg@fedoraproject.org>
+Date: Thu, 30 Jul 2026 16:40:24 +0200
+Subject: [PATCH] Replace removed Python 2 C API macros for SWIG 4.5.0
+ compatibility
+
+SWIG was carrying thus macros before version 4.5.0, but they were never
+necessary in Python 3. Stop using for compatibility with upcoming SWIG
+4.5.0.
+
+Suggested-by: Jitka Plesnikova <jplesnik@redhat.com>
+---
+ scripts/wrap/swig.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/wrap/swig.py b/scripts/wrap/swig.py
+index 0c421d3b3..8c9029a53 100644
+--- a/scripts/wrap/swig.py
++++ b/scripts/wrap/swig.py
+@@ -740,7 +740,7 @@ def build_swig(
+                 {
+                     message += "Traceback (from traceback.format_tb()):\\n";
+                     PyObject* traceback_dict = PyModule_GetDict(traceback);
+-                    PyObject* format_tb = PyDict_GetItem(traceback_dict, PyString_FromString("format_tb"));
++                    PyObject* format_tb = PyDict_GetItem(traceback_dict, PyUnicode_FromString("format_tb"));
+                     PyObject* ret = PyObject_CallFunctionObjArgs(format_tb, trace, NULL);
+                     PyObject* iter = PyObject_GetIter(ret);
+                     for(;;)
+-- 
+2.55.0.607.ge54b5b6513
+

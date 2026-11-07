@@ -5,6 +5,8 @@ versioning information to libtool *without* changing the soname
 for compatibility with upstream, so on-disk filenames are
 unique across different releases.
 
+Merged upstream https://github.com/apache/subversion/commit/d62023db7f5a9bc2c581f6acd40ee9ae98e082c4
+
 --- subversion-1.14.2/configure.ac.soversion
 +++ subversion-1.14.2/configure.ac
 @@ -112,7 +112,12 @@
