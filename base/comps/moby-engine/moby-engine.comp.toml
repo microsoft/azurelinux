@@ -1,0 +1,4 @@
+# Pin to Fedora f43 moby-engine-None to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/moby-engine/c/c19a336590d593dca9fb9d61e8398833298c719f
+[components.moby-engine]
+spec = { type = "upstream", upstream-commit = "c19a336590d593dca9fb9d61e8398833298c719f" }

@@ -1,6 +1,7 @@
 [licensing]
 detector = "trivy"
 exclude_files = [
+    "vendor/github.com/prometheus/client_golang/prometheus/process_collector_mem_cgo_darwin.c",
     "vendor/go.opentelemetry.io/otel/get_main_pkgs.sh",
     "vendor/go.opentelemetry.io/otel/verify_examples.sh",
     "vendor/google.golang.org/grpc/regenerate.sh",
@@ -26,3 +27,8 @@ pre_commands = [
     ["cp", "-p", "vendor.mod", "go.mod"],
     ["cp", "-p", "vendor.sum", "go.sum"],
 ]
+
+# temporary to allow patch 0 to apply
+[archive.dependency_overrides]
+"golang.org/x/sys" = "v0.49.0"
+
