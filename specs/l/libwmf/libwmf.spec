@@ -4,7 +4,7 @@
 Summary: Windows MetaFile Library
 Name: libwmf
 Version: 0.2.16
-Release: 5%{?dist}
+Release: 7%{?dist}
 #libwmf is under the LGPLv2+, however...
 #1. The tarball contains an old version of the urw-fonts under GPL+.
 #   Those fonts are not installed
@@ -97,6 +97,9 @@ sed -i $RPM_BUILD_ROOT%{_datadir}/libwmf/fonts/fontmap -e 's#libwmf/fonts#fonts/
 
 
 %changelog
+* Thu Sep 10 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.2.16-2
+- Rebuilt for libxml-2.5.4
+
 * Fri Sep 04 2026 Gwyn Ciesla <gwync@protonmail.com> - 0.2.16-1
 - 0.2.16
 

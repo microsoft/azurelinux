@@ -3,8 +3,8 @@
 
 Summary:	Modules for parsing and creating MIME entities in Perl
 Name:		perl-MIME-tools
-Version:	5.515
-Release: 7%{?dist}
+Version:	5.519
+Release: 5%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/MIME-tools
 Source0:	https://cpan.metacpan.org/modules/by-module/MIME/MIME-tools-%{version}.tar.gz
@@ -138,6 +138,39 @@ TEST_POD_COVERAGE=0 make test
 %{_mandir}/man3/MIME::Words.3*
 
 %changelog
+* Wed Sep 23 2026 Paul Howarth <paul@city-fan.org> - 5.519-1
+- Update to 5.519
+  - Some (buggy) software creates base64-encoded parts as a concatenation of
+    multiple base64-encoded streams, and some client software decodes each
+    stream separately and concatenates the results; duplicate this behavior in
+    MIME::tools to prevent it from being used as a mechanism to sneak
+    dangerous content past a security scanner
+
+* Thu Aug 27 2026 Paul Howarth <paul@city-fan.org> - 5.518-1
+- Update to 5.518
+  - Add tests for encoded "boundary=XXX" parameters and set the ambiguous-parse
+    flag if any are found
+  - MIME::tools chooses to decode encoded boundary parameters, whilst MUA
+    behaviors differ; Claws-Mail decodes them while Thunderbird does not
+  - Don't ignore invalid whitespace after "boundary=XXX" parameter
+  - Ignore comments between tokens; a header parameter can be written
+    foo(comment)=bar and it's the same as foo=bar
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.517-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Feb 11 2026 Paul Howarth <paul@city-fan.org> - 5.517-1
+- Update to 5.517
+  - Handle MIME parameters of the form param= better (i.e. a parameter with no
+    value at all); it's treated the same as param="" rather than aborting the
+    parse
+  - Diagnose additional types of malformed MIME as ambiguous; specifically, an
+    empty boundary parameter like boundary= or boundary="" is treated as
+    ambiguous
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.515-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.515-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -18,7 +18,7 @@ License:        MIT
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.23.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # Macro files
 Source:         macros.pyproject
