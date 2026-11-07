@@ -1,0 +1,4 @@
+[components.rust-bitfield-macros]
+# The initial Fedora import postdates the distro snapshot; rust-bitfield needs 0.19.5.
+# https://src.fedoraproject.org/rpms/rust-bitfield-macros/c/cc0cad272727b3047a6170ba11394baed491b598
+spec = { type = "upstream", upstream-commit = "cc0cad272727b3047a6170ba11394baed491b598" }
