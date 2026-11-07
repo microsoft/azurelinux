@@ -1,0 +1,5 @@
+# Pin to Fedora f43 valkey-8.1.11 to pick up CVE fixes:
+# CVE-2026-81934, CVE-2026-66373
+# https://src.fedoraproject.org/rpms/valkey/c/34189e2be4ae49ea046771ca0149cd1acccc6cae
+[components.valkey]
+spec = { type = "upstream", upstream-commit = "34189e2be4ae49ea046771ca0149cd1acccc6cae" }
