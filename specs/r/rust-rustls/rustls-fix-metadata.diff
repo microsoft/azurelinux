@@ -1,5 +1,5 @@
---- rustls-0.23.45/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ rustls-0.23.45/Cargo.toml	2026-09-14T16:14:30.159862+00:00
+--- rustls-0.23.46/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rustls-0.23.46/Cargo.toml	2026-10-14T19:15:02.740575+00:00
 @@ -54,13 +54,6 @@
  enum_no_repr_variant_discriminant_changed = "warn"
  
