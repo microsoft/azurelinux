@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python3-docs-3.14.10 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python3-docs/c/77adf16393de5f264f2550a4f14a681bd48d71d4
+[components.python3-docs]
+spec = { type = "upstream", upstream-commit = "77adf16393de5f264f2550a4f14a681bd48d71d4" }
