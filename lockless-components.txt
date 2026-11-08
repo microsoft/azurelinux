@@ -1,4 +1,6 @@
 SLOF
+SymCrypt
+SymCrypt-OpenSSL
 aalib
 alsa-lib
 ansible-packaging
@@ -7,7 +9,9 @@ antlr3
 arpack
 augeas
 automoc
+azurelinux-logos
 azurelinux-release
+azurelinux-repos
 ca-certificates
 cachefilesd
 chkrootkit
@@ -77,6 +81,7 @@ libldm
 libmspack
 libnsl2
 libntirpc
+libnvidia-container
 libreplaygain
 libspf2
 libtirpc
@@ -92,6 +97,7 @@ matchbox-window-manager
 mecab
 memkind
 microcode_ctl
+mlnx-tools-ofed
 mod_proxy_cluster
 mtdev
 mysql8.4
@@ -104,8 +110,15 @@ nodejs22
 nodejs24
 nss
 numad
+nvidia-container-toolkit
+nvidia-driver
+nvidia-kmod-common
+nvidia-modprobe
+nvidia-open
+nvidia-persistenced
 oniguruma
 openbios
+openssl-fips-provider
 osbs-client
 pacemaker
 paktype-naskh-basic-fonts
@@ -149,6 +162,7 @@ spandsp
 squashfs-tools
 syslinux
 systemtap
+telegraf
 tesseract-tessdata
 texlive-base
 tpm2-openssl
