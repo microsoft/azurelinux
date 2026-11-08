@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-rustls-0.23.46 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/rust-rustls/c/777f2bb48450dde90dd31b5ba7606652daafffbd
+[components.rust-rustls]
+spec = { type = "upstream", upstream-commit = "777f2bb48450dde90dd31b5ba7606652daafffbd" }
