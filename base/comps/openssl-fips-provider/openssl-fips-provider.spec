@@ -1,7 +1,8 @@
 Summary: OpenSSL FIPS provider
 Name: openssl-fips-provider
 Version: 3.5.8
-Release: %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release: %autorelease -b 2
 Epoch: 1
 License: Apache-2.0
 URL: https://www.openssl.org/

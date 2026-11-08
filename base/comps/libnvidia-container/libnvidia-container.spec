@@ -1,6 +1,7 @@
 Name:           libnvidia-container
 Version:        1.20.0
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 2
 Summary:        NVIDIA container runtime library
 License:        BSD-3-Clause AND Apache-2.0 AND GPL-3.0-or-later AND LGPL-3.0-or-later AND MIT AND GPL-2.0-only
 URL:            https://github.com/NVIDIA/libnvidia-container

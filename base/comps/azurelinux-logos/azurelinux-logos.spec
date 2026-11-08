@@ -1,7 +1,8 @@
 Name:           azurelinux-logos
 Summary:        Azure Linux brand icons, logos, and boot graphics
 Version:        4.0.0
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 3
 License:        LicenseRef-Microsoft-Brand-Guidelines
 URL:            https://github.com/microsoft/azurelinux
 

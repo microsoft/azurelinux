@@ -2,7 +2,8 @@
 # https://gitlab.com/nvidia/packages/azure/nvidia-driver/-/tree/610?ref_type=heads
 Name:           nvidia-persistenced
 Version:        610.43.02
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 2
 Summary:        A daemon to maintain persistent software state in the NVIDIA driver
 License:        MIT
 URL:            http://www.nvidia.com/object/unix.html

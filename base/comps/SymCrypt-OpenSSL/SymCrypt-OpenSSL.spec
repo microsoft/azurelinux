@@ -1,7 +1,8 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
 Version:        1.11.2
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 7
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
