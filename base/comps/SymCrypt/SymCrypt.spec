@@ -3,7 +3,8 @@
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
 Version:        103.13.0
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 6
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

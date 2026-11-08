@@ -1,7 +1,8 @@
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        %autorelease -b 10
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 9
 License:        MIT
 URL:            https://aka.ms/azurelinux
 

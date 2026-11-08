@@ -8,7 +8,8 @@
 
 Name:           nvidia-kmod-common
 Version:        610.43.02
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 2
 Summary:        Common file for NVIDIA's proprietary driver kernel modules
 License:        NVIDIA License
 URL:            http://www.nvidia.com/object/unix.html

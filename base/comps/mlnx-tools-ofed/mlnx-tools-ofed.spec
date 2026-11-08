@@ -32,7 +32,8 @@
 Summary:        Mellanox userland tools and scripts
 Name:           mlnx-tools-ofed
 Version:        2604.0.13
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 2
 License:        CPL-1.0 OR BSD-2-Clause OR GPL-2.0-only
 URL:            https://github.com/Mellanox/mlnx-tools
 Source6000:     MLNX_OFED_SRC-26.04-0.8.5.0.tgz

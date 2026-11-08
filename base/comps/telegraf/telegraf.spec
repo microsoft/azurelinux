@@ -22,7 +22,8 @@ Version:                1.38.2
 
 
 Name:           telegraf
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 3
 Summary:        Agent for collecting, processing, aggregating, and writing metrics, logs, and other arbitrary data
 
 # AzL: go2rpm emits `License: TODO`. This cumulative SPDX expression was generated with

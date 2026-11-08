@@ -1,6 +1,7 @@
 Name:           nvidia-container-toolkit
 Version:        1.20.0
-Release:        %autorelease
+# On next Version update, reset Release to plain autorelease and remove this comment
+Release:        %autorelease -b 2
 Summary:        NVIDIA Container Toolkit
 License:        Apache-2.0
 URL:            https://github.com/NVIDIA/nvidia-container-toolkit
