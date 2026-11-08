@@ -1,3 +1,4 @@
+# Pin to Fedora f43 fluidsynth-2.6.1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/fluidsynth/c/d401246cd202ab9fc9005cf7e0efd20354584ad9
 [components.fluidsynth]
-# Pin to pre-Fedora 44 mass rebuild commit to avoid lock drift.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "6e57eee6e9aee283c1775e877dc0989055c95a91" }
+spec = { type = "upstream", upstream-commit = "d401246cd202ab9fc9005cf7e0efd20354584ad9" }
