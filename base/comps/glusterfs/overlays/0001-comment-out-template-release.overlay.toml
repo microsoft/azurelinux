@@ -1,0 +1,14 @@
+# Comment out the source-tree template Release tag. The spec sets
+# '_for_fedora_koji_builds' to 1, so only the Fedora Release tag is used.
+# Keeping both Release tags in the main package confuses release tooling. The
+# surrounding '%if ( 0%{_for_fedora_koji_builds} )' conditional, including
+# its template Name and Version tags, is left in place.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the unused source-tree template Release tag"
+type = "spec-search-replace"
+regex = '^Release:\s*0\.@PACKAGE_RELEASE@%\{\?dist\}\.29\s*$'
+replacement = "# Commented out to avoid tooling confusion caused by multiple Release: lines\n#Release:          0.@PACKAGE_RELEASE@%%{?dist}.29"

@@ -1,0 +1,13 @@
+# Comment out the pre-release Release tag. The spec leaves 'rcver'
+# undefined, so only the plain '%autorelease' Release tag is used. Keeping
+# both Release tags in the main package confuses release tooling. The
+# surrounding '%if 0%{?rcver:1}' conditional is left in place.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the unused pre-release Release tag, leaving only '%autorelease'"
+type = "spec-search-replace"
+regex = '^Release:\s*%autorelease -p -e %\{rcver\}\s*$'
+replacement = "# Commented out to avoid tooling confusion caused by multiple Release: lines\n#Release: %%autorelease -p -e %%{rcver}"

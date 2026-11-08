@@ -1,0 +1,14 @@
+# Comment out a 'Release:' line quoted in a previous %changelog entry.
+# rpmdev-bumpspec treats every line starting with 'Release:' as a Release tag,
+# including changelog text, so release bumps would otherwise rewrite this
+# historical changelog example.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the 'Release:' line quoted in the %changelog"
+type = "spec-search-replace"
+section = "%changelog"
+regex = '^Release: %%\{release_string\}\.2\s*$'
+replacement = "#Release: %%{release_string}.2"

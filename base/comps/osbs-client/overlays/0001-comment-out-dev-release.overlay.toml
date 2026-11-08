@@ -1,0 +1,14 @@
+# Comment out the development-snapshot Release tag. The spec sets
+# 'dev_release' to 0, so 'postrelease' is "0" and only the plain
+# '%{release}%{?dist}' Release tag is used. Keeping both Release tags in the
+# main package confuses release tooling. The surrounding
+# '%if "x%{postrelease}" != "x0"' conditional is left in place.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the unused development-snapshot Release tag"
+type = "spec-search-replace"
+regex = '^Release:\s*%\{release\}\.%\{postrelease\}\.git\.%\{shortcommit\}%\{\?dist\}\s*$'
+replacement = "# Commented out to avoid tooling confusion caused by multiple Release: lines\n#Release:        %%{release}.%%{postrelease}.git.%%{shortcommit}%%{?dist}"

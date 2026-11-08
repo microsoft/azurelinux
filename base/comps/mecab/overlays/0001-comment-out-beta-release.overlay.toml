@@ -1,0 +1,13 @@
+# Comment out the beta Release tag. The spec leaves 'betaver' undefined, so
+# only the '%{baserelease}%{?dist}' Release tag is used. Keeping both Release
+# tags in the main package confuses release tooling. The surrounding
+# '%if %{?betaver:0}%{!?betaver:1}' conditional is left in place.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the unused beta Release tag"
+type = "spec-search-replace"
+regex = '^Release:\s*0\.%\{baserelease\}\.%\{betaver\}%\{\?dist\}\s*$'
+replacement = "# Commented out to avoid tooling confusion caused by multiple Release: lines\n#Release:\t0.%%{baserelease}.%%{betaver}%%{?dist}"

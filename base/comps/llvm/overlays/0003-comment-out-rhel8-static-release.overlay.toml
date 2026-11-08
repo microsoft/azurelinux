@@ -1,0 +1,13 @@
+# Comment out the RHEL 8-only static Release tag. Azure Linux never builds
+# the RHEL 8 branch, and keeping both a static and an '%autorelease' Release
+# tag in the main package prevents rendering this component without a lock
+# file. The surrounding '%if 0%{?rhel} == 8' conditional is left in place.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the RHEL 8-only static Release tag, leaving only '%autorelease'"
+type = "spec-search-replace"
+regex = '^Release:\s*1%\{\?dist\}\s*$'
+replacement = "# Commented out to avoid tooling confusion caused by multiple Release: lines\n#Release:\t1%%{?dist}"

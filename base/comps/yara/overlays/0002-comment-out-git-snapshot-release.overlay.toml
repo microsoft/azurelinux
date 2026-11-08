@@ -1,0 +1,14 @@
+# Comment out the git-snapshot Release tag. The spec enables 'release' by
+# default ('%bcond_without release'), so only the plain '%autorelease'
+# Release tag is used. Keeping both Release tags in the main package confuses
+# release tooling. The surrounding '%if %{with release}' conditional is left
+# in place.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the unused git-snapshot Release tag, leaving only '%autorelease'"
+type = "spec-search-replace"
+regex = '^Release:\s*%autorelease -s %\{gitdate\}git%\{shortcommit\}\s*$'
+replacement = "# Commented out to avoid tooling confusion caused by multiple Release: lines\n#Release:       %%autorelease -s %%{gitdate}git%%{shortcommit}"

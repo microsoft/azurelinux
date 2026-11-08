@@ -1,0 +1,14 @@
+# Comment out the static fallback Release tag used only when '%autorelease'
+# is not defined. Azure Linux always defines '%autorelease', and keeping both
+# a static and an '%autorelease' Release tag in the main package prevents
+# rendering this component without a lock file. The surrounding
+# '%if %{defined autorelease}' conditional is left in place.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the static fallback Release tag, leaving only '%autorelease'"
+type = "spec-search-replace"
+regex = '^Release:\s*1\s*$'
+replacement = "# Commented out to avoid tooling confusion caused by multiple Release: lines\n#Release: 1"

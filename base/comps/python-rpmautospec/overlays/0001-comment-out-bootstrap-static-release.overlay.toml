@@ -1,0 +1,14 @@
+# Comment out the static Release tag used only when bootstrapping. Azure
+# Linux builds this component with bootstrap disabled (the spec default), and
+# keeping both a static and an '%autorelease' Release tag in the main package
+# prevents rendering this component without a lock file. The surrounding
+# '%if %{with bootstrap}' conditional is left in place.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Comment out the bootstrap-only static Release tag, leaving only '%autorelease'"
+type = "spec-search-replace"
+regex = '^Release:\s*0%\{\?dist\}\s*$'
+replacement = "# Commented out to avoid tooling confusion caused by multiple Release: lines\n#Release: 0%%{?dist}"
