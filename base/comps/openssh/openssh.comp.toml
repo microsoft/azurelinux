@@ -1,1 +1,4 @@
+# Pin to Fedora f43 openssh-10.0p1-14 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/openssh/c/509595f83ff268ae6069666e013e7c026e94ddf7
 [components.openssh]
+spec = { type = "upstream", upstream-commit = "509595f83ff268ae6069666e013e7c026e94ddf7" }
