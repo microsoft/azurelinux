@@ -60,7 +60,7 @@
 Name:    qt5-qtbase
 Summary: Qt5 - QtBase components
 Version: 5.15.18
-Release: 4%{?dist}
+Release: 6%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, for exception details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
@@ -193,6 +193,8 @@ Patch168: 0019-Fix-tooltip-palette-issue-in-gtk3-theme.patch
 Patch169: 0020-QGtk3Theme-define-light-midlight-mid-dark-shadow-colors.patch
 
 # Security
+# CVE-2026-19248, Unbounded recursion vulnerability in the QDomNode destructor of Qt XML impacts Qt
+Patch180: qt5-qtbase-CVE-2026-19248.patch
 
 # Latest QGnomePlatform needs to be specified to be used
 Patch200: qtbase-use-qgnomeplatform-as-default-platform-theme-on-gnome.patch
@@ -510,7 +512,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch -P168 -p1
 %patch -P169 -p1
 %endif
-
+%patch -P180 -p1
 %if 0%{?fedora} < 39
 # Use QGnomePlatform by default
 %patch -P200 -p1
@@ -1180,6 +1182,9 @@ fi
 
 
 %changelog
+* Tue Oct 13 2026 Than Ngo <than@redhat.com> - 5.15.18-2
+- Fix CVE-2026-19248, denial of Service vulnerability in XML parsing
+
 * Tue Nov 04 2025 Jan Grulich <jgrulich@redhat.com> - 5.15.18-1
 - 5.15.18
 

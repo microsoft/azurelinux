@@ -1,0 +1,4 @@
+# Pin to Fedora f43 qt5-qtbase-5.15.18-2 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/qt5-qtbase/c/2f0d7f7897fce3db674dffd21c9cc8d5332dd735
+[components.qt5-qtbase]
+spec = { type = "upstream", upstream-commit = "2f0d7f7897fce3db674dffd21c9cc8d5332dd735" }
