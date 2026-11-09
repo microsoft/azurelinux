@@ -46,7 +46,7 @@
 Summary: An open source implementation of SSH protocol version 2
 Name: openssh
 Version: %{openssh_ver}
-Release: 18%{?dist}
+Release: 20%{?dist}
 URL: http://www.openssh.com/portable.html
 Source0: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
 Source1: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz.asc
@@ -209,6 +209,10 @@ Patch0062: 0062-openssh-10.4p1-CVE-2026-59995.patch
 Patch0063: 0063-openssh-10.4p1-CVE-2026-59999.patch
 # upstream 9910d5ef53124ce1157d57bc11e222658aa41299
 Patch0064: 0064-openssh-10.5p1-CVE-2026-73282.patch
+# upstream e0f85d8
+Patch0065: 0065-openssh-10.6p1-CVE-2026-106585.patch
+# upstream c07ea21
+Patch0066: 0066-openssh-10.6p1-CVE-2026-106552.patch
 
 #https://bugzilla.mindrot.org/show_bug.cgi?id=2581
 Patch1000: 1000-openssh-coverity.patch
@@ -613,6 +617,10 @@ test -f %{sysconfig_anaconda} && \
 %attr(0755,root,root) %{_libdir}/sshtest/sk-dummy.so
 
 %changelog
+* Thu Oct 22 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 10.2p1-14
+- Fix CVE-2026-106585: Denial of service via oversized decompressed packets
+  Fix CVE-2026-106552: Arbitrary file write via directory traversal during sftp recursive copy
+
 * Thu Sep 24 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 10.0p1-13
 - Make PKCS#11 tests on build passing in GNOME environment
 
