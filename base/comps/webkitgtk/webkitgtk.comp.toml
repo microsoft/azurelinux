@@ -12,3 +12,6 @@
 # WebRTC remains disabled by the GTK port's upstream defaults.
 
 [components.webkitgtk]
+# Pin beyond the distro snapshot to Fedora 43's latest stable release (2.54.2).
+# https://bodhi.fedoraproject.org/updates/FEDORA-2026-8222d28aa0
+spec = { type = "upstream", upstream-commit = "bfb70d5db5c40dec0b1963dfcab28ba4e58e97ef" }
