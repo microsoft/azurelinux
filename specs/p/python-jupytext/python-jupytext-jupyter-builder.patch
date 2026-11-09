@@ -1,0 +1,118 @@
+--- jupytext-1.19.6/jupyterlab/packages/jupyterlab-jupytext-extension/package.json.orig	2026-10-04 14:53:45.000000000 -0600
++++ jupytext-1.19.6/jupyterlab/packages/jupyterlab-jupytext-extension/package.json	2026-10-05 12:04:28.948730501 -0600
+@@ -29,8 +29,8 @@
+   ],
+   "scripts": {
+     "build": "jlpm run build:lib && jlpm run build:labextension:dev && jlpm run copy:extensioncfgfile",
+-    "build:labextension": "jupyter-builder build .",
+-    "build:labextension:dev": "jupyter-builder build --development True .",
++    "build:labextension": "jupyter labextension build .",
++    "build:labextension:dev": "jupyter labextension build --development True .",
+     "build:lib": "tsc",
+     "build:prod": "jlpm run build:lib && jlpm run build:labextension && jlpm run copy:extensioncfgfile",
+     "copy:extensioncfgfile": "cp ../../install.json ../../jupyterlab_jupytext/labextension",
+@@ -40,7 +40,7 @@
+     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+     "install:extension": "python ../../scripts/install_extension.py",
+     "watch": "run-p watch:src watch:labextension",
+-    "watch:labextension": "jupyter-builder watch .",
++    "watch:labextension": "jupyter labextension watch .",
+     "watch:src": "tsc -w"
+   },
+   "jupyterlab": {
+@@ -84,8 +84,7 @@
+     "jupyterlab-rise": "^0.43.1"
+   },
+   "devDependencies": {
+-    "@jupyter/builder": "^1.0.0",
+-    "@types/node": "^26.1.0",
++    "@jupyterlab/builder": "^4.4.9",
+     "npm-run-all": "^4.1.5",
+     "rimraf": "^6.0.1",
+     "typescript": "~6.0.3"
+--- jupytext-1.19.6/jupyterlab/packages/jupyterlab-jupytext-extension/tsconfig.json.orig	2026-10-04 14:53:45.000000000 -0600
++++ jupytext-1.19.6/jupyterlab/packages/jupyterlab-jupytext-extension/tsconfig.json	2026-10-05 11:41:44.234314202 -0600
+@@ -1,7 +1,7 @@
+ {
+   "compilerOptions": {
+     "declaration": true,
+-    "lib": ["es2019", "dom"],
++    "lib": ["es2018", "dom"],
+     "module": "Node16",
+     "moduleResolution": "Node16",
+     "noEmitOnError": true,
+@@ -10,7 +10,7 @@
+     "rootDir": "src",
+     "strict": true,
+     "strictNullChecks": true,
+-    "target": "es2019",
++    "target": "es2018",
+     "types": ["node"],
+     "esModuleInterop": true,
+     "skipLibCheck": true
+--- jupytext-1.19.6/jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests/package.json.orig	2026-10-04 14:53:45.000000000 -0600
++++ jupytext-1.19.6/jupyterlab/packages/jupyterlab-jupytext-extension/ui-tests/package.json	2026-10-05 11:40:02.619306505 -0600
+@@ -9,7 +9,7 @@
+         "test:update": "jlpm playwright test --update-snapshots"
+     },
+     "devDependencies": {
+-        "@jupyterlab/galata": "^5.6.1",
+-        "@playwright/test": "^1.61.1"
++        "@jupyterlab/galata": "^5.5.2",
++        "@playwright/test": "^1.55.1"
+     }
+ }
+--- jupytext-1.19.6/jupyterlab/scripts/install_extension.py.orig	2026-10-04 14:53:45.000000000 -0600
++++ jupytext-1.19.6/jupyterlab/scripts/install_extension.py	2026-10-05 11:42:08.866014771 -0600
+@@ -12,7 +12,7 @@
+ import os
+ 
+ import jupyterlab_jupytext
+-from jupyter_builder.federated_extensions import build_labextension, develop_labextension
++from jupyterlab.federated_labextensions import build_labextension, develop_labextension
+ 
+ 
+ def main():
+--- jupytext-1.19.6/pyproject.toml.orig	2026-10-04 14:53:45.000000000 -0600
++++ jupytext-1.19.6/pyproject.toml	2026-10-05 11:53:11.082752147 -0600
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["hatchling>=1.5.0", "hatch-jupyter-builder>=0.5", "jupyter-builder>=1.0.0"]
++requires = ["hatchling>=1.5.0", "hatch-jupyter-builder>=0.5", "jupyterlab>=4"]
+ build-backend = "hatchling.build"
+ 
+ [project]
+@@ -145,7 +145,7 @@ enable-by-default = false
+ # extension. To install the extension, it is required to run
+ # `HATCH_BUILD_HOOKS_ENABLE=true pip install .`
+ # Runtime dependency for this build hook
+-# We need jupyter-builder as build time depdendency to get jlpm (wrapper around yarn)
++# We need jupyterlab as build time depdendency to get jlpm (wrapper around yarn)
+ # UPDATE 20260118: Based on https://github.com/jupyterlab/hatch-jupyter-builder/issues/146
+ # we moved all the dependencies to build system dependencies
+ # We use npm_builder to build the jupyterlab extension
+@@ -286,13 +286,12 @@ platforms = ["linux-64", "osx-64", "osx-
+ 
+ [tool.pixi.dependencies]
+ python = "3.13.13.*" # One test involving Black fails on the CI
+-jupyterlab = ">=4.6.1,<5"
++jupyterlab = ">=4.0"
+ nbformat = ">=5.1.2"
+ pre-commit = ">=4.3"
+ nodejs = ">=20"
+ hatch = "*"
+ pip = "*"
+-jupyter-builder = ">=1.1.0,<2"
+ 
+ [tool.pixi.feature.docs.dependencies]
+ sphinx = "*"
+@@ -308,8 +307,7 @@ pandoc = ">=3.0,<3.10"  # 1545
+ [tool.pixi.feature.build.dependencies]
+ python = "3.13.*"
+ nodejs = ">=20"
+-jupyterlab = ">=4.6.1,<5"
+-jupyter-builder = ">=1.1.0,<2"
++jupyterlab = ">=4.0"
+ 
+ [tool.pixi.feature.build.tasks]
+ build-labextension = { cmd = "jlpm install && jlpm run build:prod", cwd = "jupyterlab" }

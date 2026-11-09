@@ -1,0 +1,48 @@
+--- jupytext-1.19.6/jupyterlab/yarn.lock.orig	2026-10-04 14:53:45.000000000 -0600
++++ jupytext-1.19.6/jupyterlab/yarn.lock	2026-10-05 10:53:46.007373205 -0600
+@@ -3388,9 +3388,9 @@ __metadata:
+   linkType: hard
+ 
+ "@tootallnate/once@npm:2":
+-  version: 2.0.1
+-  resolution: "@tootallnate/once@npm:2.0.1"
+-  checksum: 487b59b5adb8458dc13394a5aae997bf9705c51fa1e2396c50cd967019d06b273faba3c4d9e7895a996b9e9b055f1c55e53d822e54b3e9c298bcb4f6967cd0d5
++  version: 3.0.1
++  resolution: "@tootallnate/once@npm:3.0.1"
++  checksum: 1ec82a3ff0dd2270eb09631789bd63a34445f62dd3031f0d620f4b1c81c5916d5cdb312ae651c4e390ecf62115279165421024efa75b2bb708d0699dc80c4a42
+   languageName: node
+   linkType: hard
+ 
+@@ -6308,9 +6308,9 @@ __metadata:
+   linkType: hard
+ 
+ "fast-uri@npm:^3.0.1":
+-  version: 3.1.7
+-  resolution: "fast-uri@npm:3.1.7"
+-  checksum: 2095554c1e48b5a772529175dfa8d3c2ca33a1db6c84abe1584f9c4c3337b62d8e4807ed60a806f85bb7635cb7acca6c66c0c642b867efc3ea4e20a0d6c40cbe
++  version: 3.1.8
++  resolution: "fast-uri@npm:3.1.8"
++  checksum: 3319c50163d6d1265d1fd06f677e0d24a4cc4312c48c7222a0dc6641b90463c4476cb83f3c7444e0d1d0cd123d330d300ea46c48386f6924f35c34f6dd865416
+   languageName: node
+   linkType: hard
+ 
+@@ -10583,8 +10583,8 @@ __metadata:
+   linkType: hard
+ 
+ "sanitize-html@npm:~2.12.1":
+-  version: 2.12.1
+-  resolution: "sanitize-html@npm:2.12.1"
++  version: 2.18.0
++  resolution: "sanitize-html@npm:2.18.0"
+   dependencies:
+     deepmerge: ^4.2.2
+     escape-string-regexp: ^4.0.0
+@@ -10592,7 +10592,7 @@ __metadata:
+     is-plain-object: ^5.0.0
+     parse-srcset: ^1.0.2
+     postcss: ^8.3.11
+-  checksum: fb96ea7170d51b5af2607f5cfd84464c78fc6f47e339407f55783e781c6a0288a8d40bbf97ea6a8758924ba9b2d33dcc4846bb94caacacd90d7f2de10ed8541a
++  checksum: 6a4e57f8c9714699a6e67bc9694e5a326d250f41dddda75e954f244cfaec5e25e3f89f11df7635228d542c8970b24b9eada56f2d5b9c2879a1ec282b6c0c6e33
+   languageName: node
+   linkType: hard
+ 

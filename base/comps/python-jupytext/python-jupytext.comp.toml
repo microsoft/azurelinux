@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python-jupytext-1.19.6-1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python-jupytext/c/981eb3fdb0fc2af002c15f2646e165975620aeb7
+[components.python-jupytext]
+spec = { type = "upstream", upstream-commit = "981eb3fdb0fc2af002c15f2646e165975620aeb7" }
