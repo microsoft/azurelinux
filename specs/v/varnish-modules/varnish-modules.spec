@@ -13,7 +13,7 @@
 
 Name:    varnish-modules
 Version: 0.26.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: A collection of modules ("vmods") extending Varnish VCL
 
 License: BSD-2-Clause
