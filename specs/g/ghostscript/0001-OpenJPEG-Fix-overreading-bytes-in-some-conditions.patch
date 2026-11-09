@@ -1,0 +1,35 @@
+diff --git a/base/sjpx_openjpeg.c b/base/sjpx_openjpeg.c
+index a4e3644..16e5e6c 100644
+--- a/base/sjpx_openjpeg.c
++++ b/base/sjpx_openjpeg.c
+@@ -490,6 +490,9 @@ static int decode_image(stream_jpxd_state * const state)
+     if (state->bpp == 12)
+         state->bpp = 16;
+ 
++    if (state->bpp != 1 && state->bpp != 2 && state->bpp != 4 && state->bpp != 8 && state->bpp != 16)
++        return ERRC;
++
+     /* calculate  total data */
+     rowbytes =  (state->width*state->bpp*state->out_numcomps+7)/8;
+     state->totalbytes = (ulong)rowbytes*state->height;
+@@ -654,16 +657,17 @@ static int process_one_trunk(stream_jpxd_state * const state, stream_cursor_writ
+                 int ppbyte1 = 8/state->bpp;
+                 /* sampling required */
+                 /* only grayscale can have such bit-depth, also shift_bit = 0, bpp < 8 */
+-                for (i = 0; i < state->width; i++)
++                for (i = 0; i < state->width; )
+                 {
+-                    for (b=0; b<ppbyte1; b++)
++                    for (b=0; b<ppbyte1; b++, i++)
+                     {
+                         int dx = state->image->comps[compno].dx;
+                         int dy = state->image->comps[compno].dy;
+                         int w = state->image->comps[compno].w;
+                         int in_offset_scaled = (y_offset/dy * w) + i / dx;
+                         bt = bt<<state->bpp;
+-                        bt += state->image->comps[compno].data[in_offset_scaled] + state->sign_comps[compno];
++                        if (i < state->width)
++                            bt += state->image->comps[compno].data[in_offset_scaled] + state->sign_comps[compno];
+                     }
+                     *row++ = bt;
+                 }

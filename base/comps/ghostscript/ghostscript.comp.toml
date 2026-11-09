@@ -1,0 +1,4 @@
+# Pin to Fedora f43 ghostscript-10.05.1-7 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/ghostscript/c/31f07c88b4ab0174cb40005ce6d1a424ce251b10
+[components.ghostscript]
+spec = { type = "upstream", upstream-commit = "31f07c88b4ab0174cb40005ce6d1a424ce251b10" }

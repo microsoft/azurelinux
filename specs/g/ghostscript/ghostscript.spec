@@ -50,7 +50,7 @@
 Name:             ghostscript
 Summary:          Interpreter for PostScript language & PDF
 Version:          10.05.1
-Release: 9%{?dist}
+Release: 11%{?dist}
 
 License:          AGPL-3.0-or-later
 
@@ -128,6 +128,11 @@ Patch002: 0001-pdfwrite-avoid-buffer-overrun.patch
 Patch003: 0001-pdfwrite-bounds-check-some-strings.patch
 # https://cgit.ghostscript.com/cgi-bin/cgit.cgi/ghostpdl.git/commit/?id=176cf0188a22
 Patch004: 0001-PDF-OCR-8-bit-device-avoid-overflow.patch
+Patch005: 0001-OpenJPEG-Fix-overreading-bytes-in-some-conditions.patch
+Patch006: 0001-PostScript-interpreter-don-t-permit-local-inside-glo.patch
+Patch007: 0001-graphics-library-Shadings-with-arrays-of-Functions-v.patch
+Patch008: 0001-PostScript-interpreter-procedural-data-sink-filter-d.patch
+Patch009: 0001-pdfwrite-bound-check-control-stack-in-type-1-2-font-.patch
 
 
 # Downstream patches -- these should be always included when doing rebase:
@@ -266,7 +271,9 @@ git add --all --force .
 git commit --all --amend --no-edit > /dev/null
 
 %if %{with pdf2dsc}
-%patch -p1 1
+%autopatch
+%else
+%autopatch -m 2
 %endif
 # ---------------
 
@@ -493,6 +500,13 @@ done
 # =============================================================================
 
 %changelog
+* Fri Oct 16 2026 Zdenek Dohnal <zdohnal@redhat.com> - 10.05.0-7
+- CVE-2026-39919 ghostscript: Heap buffer overflow in JPEG 2000 JPXDecode output adapter
+- CVE-2026-101258 ghostscript: ghostscript: -dSAFER sandbox bypass via Type 5 shading OOB write and procedure-stream use-after-free
+  bypass via Type 5 shading OOB write and procedure-stream use-after-free
+- CVE-2026-103226 ghostscript: ghostscript: stack-based buffer overflow
+  in pdfwrite via crafted font data
+
 * Wed Jan 21 2026 Zdenek Dohnal <zdohnal@redhat.com> - 10.05.1-6
 - security fix for CVE-2025-59798, CVE-2025-59799, CVE-2025-59800 (fedora#2431544, fedora#2431548, fedora#2431546)
 

@@ -1,0 +1,66 @@
+From 79a4f05f48f2f4149bab0cd9e8b48836a832a9fd Mon Sep 17 00:00:00 2001
+From: Ken Sharp <Ken.Sharp@artifex.com>
+Date: Thu, 25 Jun 2026 13:51:51 +0100
+Subject: [PATCH] graphics library - Shadings with arrays of Functions,
+ validate 1-out
+
+Bug #709462 "Ghostscript: Heap buffer overflow (OOB write) via array-wrapped shading `/Function` (`base/gsfunc3.c`)"
+
+The basic problem is that the shading checks for arrays of functions are
+only checking to see if the number of functions in the array matches
+the number of colour space ocmponents. If the functions are not 1-in,
+1 out (or for type 1 shadings only; 2-in, 1 out) then the evaluation
+of the function could overrun the output buffer.
+
+We don't actually need to check the total number of output components,
+because the only valid values are 'n' 1-in, 1-out (or 2-in, 1 out)
+functions; the 1-in (or 2-in) n-out case is always a single function.
+
+We already check (in effect) that the number of functions in the array
+matches the colour space so all we need to add is a check that the
+number of input components matches (1 or 2) and the number of output
+components is always 1, for each function.
+
+This bug was reported by 'Rick de Jager <rick@v12.sh>'
+---
+ base/gsshade.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/base/gsshade.c b/base/gsshade.c
+index b4379f96b..436dc627d 100644
+--- a/base/gsshade.c
++++ b/base/gsshade.c
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2001-2023 Artifex Software, Inc.
++/* Copyright (C) 2001-2026 Artifex Software, Inc.
+    All Rights Reserved.
+ 
+    This software is provided AS-IS with no warranty, either express or
+@@ -31,6 +31,7 @@
+ #include "gxshade4.h"
+ #include "gzpath.h"
+ #include "gzcpath.h"
++#include "gsfunc3.h"
+ 
+ /* ================ Initialize shadings ================ */
+ 
+@@ -78,6 +79,19 @@ check_CBFD(const gs_shading_params_t * params,
+     if (function != 0) {
+         if (function->params.m != m || function->params.n != ncomp)
+             return_error(gs_error_rangecheck);
++        if (function->head.type == function_type_ArrayedOutput) {
++            /* If the Function member is an array it must contain either n 1-in, 1-out function dictionaries
++             * or (type 1, function-based shadings) n 2-in, 1-out function dictionaries. Either way all the
++             * functions have to have a single output, so we need to check that.
++             */
++            int i = 0;
++            gs_function_AdOt_params_t *a_params = (gs_function_AdOt_params_t *)&function->params;
++
++            for (i = 0; i < a_params->n;i++) {
++                if (a_params->Functions[i]->params.m != m || a_params->Functions[i]->params.n != 1)
++                    return_error(gs_error_rangecheck);
++            }
++        }
+         /*
+          * The Adobe documentation says that the function's domain must
+          * be a superset of the domain defined in the shading dictionary.
