@@ -13,7 +13,7 @@
 %global gh_project   mongo-c-driver
 %global libname      libmongoc
 %global libver       1.0
-%global up_version   1.30.11
+%global up_version   1.30.15
 #global up_prever    rc0
 # disabled as require a MongoDB server
 %bcond_with          tests
@@ -33,7 +33,7 @@
 Name:      mongo-c-driver
 Summary:   Client library written in C for MongoDB
 Version:   %{up_version}%{?up_prever:~%{up_prever}}
-Release: 5%{?dist}
+Release: 6%{?dist}
 # See THIRD_PARTY_NOTICES
 License:   Apache-2.0 AND ISC AND MIT AND Zlib
 URL:       https://github.com/%{gh_owner}/%{gh_project}
@@ -278,6 +278,18 @@ exit $ret
 
 
 %changelog
+* Wed Nov  4 2026 Remi Collet <remi@remirepo.net> - 1.30.15-1
+- update to 1.30.15
+
+* Tue Oct 27 2026 Remi Collet <remi@remirepo.net> - 1.30.14-1
+- update to 1.30.14
+
+* Fri Oct  9 2026 Remi Collet <remi@remirepo.net> - 1.30.13-1
+- update to 1.30.13
+
+* Thu Oct  1 2026 Remi Collet <remi@remirepo.net> - 1.30.12-1
+- update to 1.30.12
+
 * Fri Sep 18 2026 Remi Collet <remi@remirepo.net> - 1.30.11-1
 - update to 1.30.11
 
