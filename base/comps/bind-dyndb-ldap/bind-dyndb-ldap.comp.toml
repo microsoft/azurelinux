@@ -1,0 +1,5 @@
+# Pin the Fedora 43 stable rebuild for the BIND 9.18.51 snapshot.
+# https://bodhi.fedoraproject.org/updates/FEDORA-2026-aba85b9a89
+# https://src.fedoraproject.org/rpms/bind-dyndb-ldap/c/b1fbe7dce9b891abfd863e89fda88872eb18ce8e
+[components.bind-dyndb-ldap]
+spec = { type = "upstream", upstream-commit = "b1fbe7dce9b891abfd863e89fda88872eb18ce8e" }
