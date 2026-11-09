@@ -41,7 +41,7 @@ Name: ca-certificates
 Version: 2026.2.92_v9.0.319
 # for Rawhide, please always use release >= 2
 # for Fedora release branches, please use release < 2 (1.0, 1.1, ...)
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: MIT AND GPL-2.0-or-later
 
 URL: https://fedoraproject.org/wiki/CA-Certificates
@@ -68,6 +68,7 @@ Source19: README.etcssl
 
 Patch0: remove-aaa-certificate-services.patch
 Patch1: remove-emsign-ecc-root-ca-g3.patch
+Patch2: remove-emsign-root-cs-ca-g3.patch
 
 BuildArch: noarch
 
@@ -106,6 +107,7 @@ mkdir %{name}/java
 cp %{SOURCE0} %{name}/certs/certdata.txt
 %patch -P 0 -p0 -d %{name}/certs
 %patch -P 1 -p0 -d %{name}/certs
+%patch -P 2 -p0 -d %{name}/certs
 
 %build
 pushd %{name}/certs
@@ -466,6 +468,9 @@ fi
 %ghost %{catrustdir}/extracted/edk2/cacerts.bin
 
 %changelog
+*Thu Oct 22 2026 Krenželok František <fkrenzel@redhat.com> - 2026.2.92_v9.0.319-2
+- Removing: emSign Root CS CA - G3 from Microsoft Code Signing certificates
+
 *Wed Oct 21 2026 Krenželok František <fkrenzel@redhat.com> - 2026.2.92_v9.0.319-1
 - Update to CKBI 2.92_v9.0.319 from NSS 3.131.1
   Removing:
