@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.11.1.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +27,8 @@ Patch2:         fix-argument-to-goalstate.patch
 # removed in the next 2.12 release/
 Patch3:         update-setup.patch
 Patch4:         acl-support.patch
+# Backport https://github.com/Azure/WALinuxAgent/pull/3591.
+Patch5:         fix-ipoib-setup-without-legacy-rdma-attributes.patch
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -113,6 +115,9 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Mon Nov 09 2026 Zhichun <zhichunwan@microsoft.com> - 2.11.1.4-6
+- Backport upstream PR #3591 to configure IPoIB when legacy RDMA attributes are absent.
+
 * Thu Jun 04 2026 Mayank Singh <mayansingh@microsoft.com> - 2.11.1.4-5
 - Fix waagent-network-setup.service failure and update to teardown the specific interface.
 
