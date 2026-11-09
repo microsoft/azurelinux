@@ -41,7 +41,8 @@ tar -xf $PKG_TARBALL -C $PKG_TMPDIR
 cd $PKG_PATH
 
 echo ">>>>>> Apply patches"
-patch -p2 < $PKG_DIR/CVE-2026-3449.patch
+patch -p2 < $PKG_DIR/python-jupytext-CVEs.patch
+patch -p2 -t < $PKG_DIR/python-jupytext-jupyter-builder.patch
 
 export HATCH_BUILD_HOOKS_ENABLE=true
 export YARN_CACHE_FOLDER="$PWD/.package-cache"
@@ -61,13 +62,11 @@ if [ $? -ne 0 ]; then
 fi
 
 echo ">>>>>> Find licenses"
-jlpm add license-checker
-jlpm license-checker --summary | sed "s#$PKG_PATH#/tmp/#g" > $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-vendor-licenses.txt
+jlpm add license-checker-rseidelsohn
+jlpm license-checker-rseidelsohn --summary | sed "s#$PKG_PATH#/tmp/#g" > $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-vendor-licenses.txt
 
 cd -
 
 rm -rf .package-cache node_modules
-
-echo ">>>>>> Remember to run this script on both x86_64 AND aarch64 and merge"
 
 cleanup_and_exit 0
