@@ -1,4 +1,6 @@
 # Verifying Pre-Built WSL Distribution Package
+These steps are for a `.wsl` package that you download yourself and install with `wsl --install --from-file`. When you install with `wsl --install AzureLinux-4`, WSL downloads the package itself and checks it against the SHA-256 checksum in the WSL distribution manifest before installing it.
+
 It is strongly recommended that the integrity of the `.wsl` distribution package is verified after downloading it. This is a two-step process:
 1. Ensure that the checksum file has not been tampered with by verifying the signature against Azure Linux's RPM signing public key.
 1. Check that the `.wsl` package was not corrupted during the download.
