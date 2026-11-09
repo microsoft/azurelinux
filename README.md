@@ -58,18 +58,13 @@ _Note: Support for the ISO is community based. Before filing a new bug or featur
 <details>
 <summary><b>🐧 Windows Subsystem for Linux (WSL)</b></summary>
 
-To try Azure Linux on the Windows Subsystem for Linux, please download the `.wsl` distribution package for your architecture:
-
-- [x86_64](https://aka.ms/azurelinux-4.0-x86_64.wsl)
-- [ARM64](https://aka.ms/azurelinux-4.0-aarch64.wsl)
-
-Before installing a downloaded package, [verify the checksum and signature of the `.wsl` package](./docs/verify-wsl-signature-and-checksum.md).
-
-Install the distribution using `wsl`:
+To try Azure Linux on the Windows Subsystem for Linux, install it from the WSL distribution list:
 
 ```powershell
-wsl --install --from-file "C:\Path\To\AzureLinux-4.0-ARCH.wsl"
+wsl --install AzureLinux-4
 ```
+
+`wsl --install` downloads the package for your architecture (x86_64 or ARM64) and checks it against the SHA-256 checksum in the WSL distribution manifest before installing it. `wsl --list --online` shows Azure Linux 4 among the available distributions.
 
 To list all the installed distributions:
 
@@ -81,6 +76,17 @@ To use the distro:
 
 ```powershell
 wsl -d AzureLinux-4
+```
+
+To install from a downloaded `.wsl` package instead, download the package for your architecture:
+
+- [x86_64](https://aka.ms/azurelinux-4.0-x86_64.wsl)
+- [ARM64](https://aka.ms/azurelinux-4.0-aarch64.wsl)
+
+Before installing a downloaded package, [verify the checksum and signature of the `.wsl` package](./docs/verify-wsl-signature-and-checksum.md). Then install it using `wsl`:
+
+```powershell
+wsl --install --from-file "C:\Path\To\AzureLinux-4.0-ARCH.wsl"
 ```
 
 See [Systemd defaults in WSL images](./docs/wsl-systemd-policy.md) for the
