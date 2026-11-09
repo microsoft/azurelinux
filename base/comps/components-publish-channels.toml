@@ -2322,7 +2322,6 @@ components = [
     "rubygem-rack-session",
     "rubygem-rackup",
     "rubygem-rake",
-    "rubygem-rdoc",
     "rubygem-rspec",
     "rubygem-rspec-core",
     "rubygem-rspec-expectations",

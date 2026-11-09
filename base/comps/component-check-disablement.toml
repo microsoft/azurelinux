@@ -166,7 +166,6 @@ components = [
     "rubygem-faraday",
     "rubygem-mini_magick",
     "rubygem-puma",
-    "rubygem-rdoc",
     "rubygem-ruby-vips",
     "rubygem-selenium-webdriver",
     "rubygem-sprockets-rails",
