@@ -1,0 +1,206 @@
+From 8a8a62700517b0f20e95d9399b88e4d4dd7a41e8 Mon Sep 17 00:00:00 2001
+From: Ken Sharp <Ken.Sharp@artifex.com>
+Date: Tue, 4 Aug 2026 09:03:51 +0100
+Subject: [PATCH] PostScript interpreter - procedural data sink filter, detect
+ restore
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Bug #709605 "Procedure-stream buffer survives restore: heap- use-after-free write in s_proc_write_process — Ghostscript PostScript interpreter (procedure streams)"
+
+When a filter writes to a procedural target, the PostScript returns
+a string to continue writing to. If the string is restored away before
+the end of data then we were continuing to write to it.
+
+The PLRM states "If the string returned by the procedure is reclaimed by
+a restore operation before the filter becomes closed, the results are
+unpredictable. Typically, an ioerror occurs."
+
+So we need to detect that a restore has reclaimed our string, we do this
+by noting the meory allocator, and save ID of the current state when the
+PostScript program returns a string to use.
+
+Whenever we need to write tothe string we first check to see if the
+save is still in existence. If it is (or there was no save, or the
+string was allocated in memory other than local VM) then we can safely
+write to the string.
+
+This issue was reported by 'zachlanley@gmail.com', and a patch was
+provided, the commit here is similar to that patch but differs in a few
+ares; only local VM is subject to save and restore so we don't need to
+consider global VM as the original commit did. The original commit did
+not check the return from s_proc_data_valid() I've chosen to do that and
+to raise an ioerror if the string is restored away, to match the PLRM.
+
+Also added some required header files and update the makefile to apply
+the new dependencies.
+
+Finally the supplied patch had a chunk of code change which was not
+relevant to this commit and was therefore not used.
+---
+ psi/ifilter.h |  4 ++-
+ psi/int.mak   |  2 +-
+ psi/zfproc.c  | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 72 insertions(+), 3 deletions(-)
+
+diff --git a/psi/ifilter.h b/psi/ifilter.h
+index 645a118d8..444bcc76f 100644
+--- a/psi/ifilter.h
++++ b/psi/ifilter.h
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2001-2023 Artifex Software, Inc.
++/* Copyright (C) 2001-2026 Artifex Software, Inc.
+    All Rights Reserved.
+ 
+    This software is provided AS-IS with no warranty, either express or
+@@ -80,6 +80,8 @@ typedef struct stream_proc_state_s {
+     uint index;			/* current index within data */
+     ref proc;
+     ref data;
++    gs_ref_memory_t *data_memory;	/* memory allocator 'data' belongs to, */
++    ulong data_save_id;		/* innermost save id when 'data' was stored */
+ } stream_proc_state;
+ 
+ #define private_st_stream_proc_state() /* in zfproc.c */\
+diff --git a/psi/int.mak b/psi/int.mak
+index 43535bd6e..325c6b852 100644
+--- a/psi/int.mak
++++ b/psi/int.mak
+@@ -363,7 +363,7 @@ $(PSOBJ)zfilter.$(OBJ) : $(PSSRC)zfilter.c $(OP) $(memory__h)\
+ $(PSOBJ)zfproc.$(OBJ) : $(PSSRC)zfproc.c $(GH) $(memory__h) $(stat__h)\
+  $(oper_h)\
+  $(estack_h) $(files_h) $(gsstruct_h) $(ialloc_h) $(ifilter_h) $(istruct_h)\
+- $(store_h) $(stream_h) $(strimpl_h)\
++ $(store_h) $(stream_h) $(strimpl_h) $(isave_h) $(isstate_h)\
+  $(INT_MAK) $(MAKEDIRS)
+ 	$(PSCC) $(PSO_)zfproc.$(OBJ) $(C_) $(PSSRC)zfproc.c
+ 
+diff --git a/psi/zfproc.c b/psi/zfproc.c
+index 259c1aa7e..d95ec9ac4 100644
+--- a/psi/zfproc.c
++++ b/psi/zfproc.c
+@@ -29,6 +29,8 @@
+ #include "files.h"
+ #include "store.h"
+ 
++#include "isave.h"
++#include "isstate.h"
+ /* ---------------- Generic ---------------- */
+ 
+ /* GC procedures */
+@@ -81,12 +83,67 @@ s_proc_init(ref * sop, stream ** psstrm, uint mode,
+     state->eof = 0;
+     state->proc = *sop;
+     make_empty_string(&state->data, a_all);
++    state->data_memory = NULL;
++    state->data_save_id = 0;
+     state->index = 0;
+     sstrm->state = (stream_state *) state;
+     *psstrm = sstrm;
+     return 0;
+ }
+ 
++/*
++ * Note where the data string just stored in ss->data was allocated, and
++ * which save was innermost at that time (if the space the string was created
++ * in was local VM). The procedure may hand us a string allocated after an
++ *  enclosing 'save' while the stream state itself predates that save;
++ * if that save is restored, the string is freed but the stream survives,
++ * so we must be able to detect this before using the string again.
++ * The PLRM is explicit that PostScript program should not do this, and the
++ * result is 'unpredictable'.
++ */
++static void
++s_proc_record_data(i_ctx_t *i_ctx_p, stream_proc_state *ss, const ref *pdata)
++{
++    int space_index = r_space_index(pdata);
++    gs_ref_memory_t *mem;
++
++    ss->data_memory = NULL;
++    ss->data_save_id = 0;
++    if (space_index != i_vm_local)
++        return;			/* global, foreign or system VM: not restorable */
++    mem = idmemory->spaces_indexed[space_index];
++    if (mem == NULL || mem->saved == NULL)
++        return;			/* no save active: string cannot be restored away */
++    ss->data_memory = mem;
++    /* Save ids are unique and never reused; 0 means 'invisible' save. */
++    ss->data_save_id = (mem->saved->id != 0 ? mem->saved->id : (ulong)-1);
++}
++
++/*
++ * Check that the string in ss->data has not been freed by a restore,
++ * i.e. that the save that was innermost when it was stored is still
++ * active.  If it is not, the string may no longer exist: replace the
++ * dangling reference with an empty string so it cannot be used.
++ * Returns true if ss->data is safe to use.
++ */
++static bool
++s_proc_data_valid(stream_proc_state *ss)
++{
++    const alloc_save_t *save;
++
++    if (ss->data_memory == NULL)
++        return true;
++    for (save = ss->data_memory->saved; save != NULL;
++        save = save->state.saved)
++        if (save->id == ss->data_save_id)
++            return true;
++    make_empty_string(&ss->data, a_all);
++    ss->index = 0;
++    ss->data_memory = NULL;
++    ss->data_save_id = 0;
++    return false;
++}
++
+ /* Handle an interrupt during a stream operation. */
+ /* This is logically unrelated to procedure streams, */
+ /* but it is also associated with the interpreter stream machinery. */
+@@ -187,7 +244,11 @@ s_proc_read_process(stream_state * st, stream_cursor_read * ignore_pr,
+     /* Move data from the string returned by the procedure */
+     /* into the stream buffer, or ask for a callback. */
+     stream_proc_state *const ss = (stream_proc_state *) st;
+-    uint count = r_size(&ss->data) - ss->index;
++    uint count;
++
++    if (!s_proc_data_valid(ss))
++        return_error(gs_error_ioerror);
++    count = r_size(&ss->data) - ss->index;
+ 
+     if (count > 0) {
+         uint wcount = pw->limit - pw->ptr;
+@@ -263,6 +324,7 @@ s_proc_read_continue(i_ctx_t *i_ctx_p)
+     }
+     ss = (stream_proc_state *) ps->state;
+     ss->data = *opbuf;
++    s_proc_record_data(i_ctx_p, ss, opbuf);
+     ss->index = 0;
+     if (r_size(opbuf) == 0)
+         ss->eof = true;
+@@ -306,6 +368,8 @@ s_proc_write_process(stream_state * st, stream_cursor_read * pr,
+     stream_proc_state *const ss = (stream_proc_state *) st;
+     uint rcount = pr->limit - pr->ptr;
+ 
++    if (!s_proc_data_valid(ss))
++        return_error(gs_error_ioerror);
+     /* if 'last' return CALLC even when rcount == 0. ss->eof terminates */
+     if (rcount > 0 || (last && !ss->eof)) {
+         uint wcount = r_size(&ss->data) - ss->index;
+@@ -357,6 +421,8 @@ s_handle_write_exception(i_ctx_t *i_ctx_p, int status, const ref * fop,
+     for (ps = fptr(fop); ps->strm != 0;)
+         ps = ps->strm;
+     psst = (stream_proc_state *) ps->state;
++    if (!s_proc_data_valid(psst))
++        return_error(gs_error_ioerror);
+     {
+         int npush = nstate + 6;
+ 
+@@ -406,6 +472,7 @@ s_proc_write_continue(i_ctx_t *i_ctx_p)
+     }
+     ss = (stream_proc_state *) ps->state;
+     ss->data = *opbuf;
++    s_proc_record_data(i_ctx_p, ss, opbuf);
+     ss->index = 0;
+     pop(2);
+     return 0;

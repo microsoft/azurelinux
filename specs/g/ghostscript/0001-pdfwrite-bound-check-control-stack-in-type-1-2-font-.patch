@@ -1,0 +1,13 @@
+diff --git a/devices/vector/gdevpsfx.c b/devices/vector/gdevpsfx.c
+index 8aaa3df..cc78554 100644
+--- a/devices/vector/gdevpsfx.c
++++ b/devices/vector/gdevpsfx.c
+@@ -237,6 +237,8 @@ type1_next(gs_type1_state *pcis)
+         case c_callsubr:
+             if (csp + 1 - &pcis->ostack[0] < 1)
+                 return_error(gs_error_invalidfont);
++            /* Check there is space available on the control stack */
++            CS_CHECK_IPSTACK(ipsp + 1, pcis->ipstack);
+             code = type1_callsubr(pcis, fixed2int_var(*csp) +
+                                   pcis->pfont->data.subroutineNumberBias);
+             if (code < 0)

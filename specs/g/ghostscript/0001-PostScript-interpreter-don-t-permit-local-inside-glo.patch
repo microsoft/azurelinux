@@ -1,0 +1,109 @@
+From 5894dca6f875d327c425e80c10025adbb4211ef7 Mon Sep 17 00:00:00 2001
+From: Ken Sharp <Ken.Sharp@artifex.com>
+Date: Wed, 24 Jun 2026 09:28:01 +0100
+Subject: [PATCH] PostScript interpreter - don't permit local inside global
+ storage
+
+Bug #709461 "Use-after-free in procedure-source filter state across `restore` (`psi/zfproc.c`)"
+
+The problem is that the C code stores a reference to a PostScript
+string object, but does not check the allocation space. If the owner of
+the C structure is allocated in global VM, and the string is allocated
+in local VM, then the string can be restored away while the structure
+stil holds a pointer to it. When we reclaim memory this causes a crash.
+
+From a spec perspective there's no reason to retain a pointer to a local
+object in a global object, its just an implementation detail. Just to
+be sure I ran the file on Distiller and that has no problems.
+
+So in this commit; if the 'file' object (which owns the structure) is
+not in local VM, and the string returned by the procedural data source
+is in local VM, then make a copy of the string in global VM. This
+avoids any potential problems at the cost of using extra memory.
+
+This issue was reported by 'Rick de Jager <rick@v12.sh>'.
+---
+ psi/zfproc.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 46 insertions(+), 1 deletion(-)
+
+diff --git a/psi/zfproc.c b/psi/zfproc.c
+index 4917236a5..259c1aa7e 100644
+--- a/psi/zfproc.c
++++ b/psi/zfproc.c
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 2001-2023 Artifex Software, Inc.
++/* Copyright (C) 2001-2026 Artifex Software, Inc.
+    All Rights Reserved.
+ 
+    This software is provided AS-IS with no warranty, either express or
+@@ -124,6 +124,30 @@ s_proc_set_defaults(stream_state * st)
+     make_null(&ss->data);
+ }
+ 
++static int s_proc_copy_string(i_ctx_t * i_ctx_p, ref *dest, ref *src, uint mem)
++{
++    int code = 0;
++    uint saved_space = avm_local;
++
++    saved_space = imemory_space(iimemory);
++
++    if (imemory_space(iimemory) != mem)
++        ialloc_set_space(idmemory, mem);
++
++    code = gs_alloc_string_ref(iimemory, dest, 0, r_size(src), "copy_cspace_string");
++
++    if (imemory_space(iimemory) != saved_space)
++        ialloc_set_space(idmemory, saved_space);
++
++    if (code < 0)
++        return code;
++
++    r_copy_attrs(dest, a_all, src);
++
++    memcpy(dest->value.bytes, src->value.bytes, r_size(src));
++    return 0;
++}
++
+ /* ---------------- Read streams ---------------- */
+ 
+ /* Forward references */
+@@ -220,11 +244,23 @@ s_proc_read_continue(i_ctx_t *i_ctx_p)
+     os_ptr opbuf = op - 1;
+     stream *ps;
+     stream_proc_state *ss;
++    uint s1, s2;
+ 
+     check_file(ps, op);
+     check_read_type(*opbuf, t_string);
+     while ((ps->end_status = 0, ps->strm) != 0)
+         ps = ps->strm;
++    s1 = r_space(op);
++    s2 = r_space(opbuf);
++    if (!r_is_local(op) && r_is_local(opbuf)) {
++        ref copy;
++        int code = 0;
++
++        code = s_proc_copy_string(i_ctx_p, &copy, opbuf, r_space(op));
++        if (code < 0)
++            return code;
++        *opbuf = copy;
++    }
+     ss = (stream_proc_state *) ps->state;
+     ss->data = *opbuf;
+     ss->index = 0;
+@@ -359,6 +395,15 @@ s_proc_write_continue(i_ctx_t *i_ctx_p)
+         ps = ps->strm;
+     }
+     ps->end_status = 0;
++    if (!r_is_local(op) && r_is_local(opbuf)) {
++        ref copy;
++        int code = 0;
++
++        code = s_proc_copy_string(i_ctx_p, &copy, opbuf, r_space(op));
++        if (code < 0)
++            return code;
++        *opbuf = copy;
++    }
+     ss = (stream_proc_state *) ps->state;
+     ss->data = *opbuf;
+     ss->index = 0;
