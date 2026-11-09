@@ -1,7 +1,7 @@
 Summary:        Python 2 and 3 compatibility utilities
 Name:           python-six
 Version:        1.16.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/six/
@@ -11,9 +11,10 @@ Source0:        https://pypi.python.org/packages/source/s/six/six-%{version}.tar
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
+BuildRequires:  python3-pip
 BuildRequires:  openssl-devel
 BuildRequires:  curl-devel
-BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
@@ -39,7 +40,6 @@ Python 3 version.
 
 %check
 export LANG=C.UTF-8
-pip3 install pytest
 %pytest test_six.py
 
 %files -n python3-six
@@ -47,6 +47,9 @@ pip3 install pytest
 %{python3_sitelib}/*
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.16.0-4
+- Use python3-pytest for tests instead of pip
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.16.0-3
 - Add missing Vendor and Distribution tags.
 
