@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 4
+%define azl_pkgrelease 5
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 610.43.02
 # AZL: MLNX OFED kernel modules (mlnx-ofa_kernel), built as kmod subpackages.
@@ -1038,6 +1038,7 @@ Source6003: nvidia-conftest-allow-mlnx-ofed-kernel-dir.patch
 # AZL: MLNX OFED source bundle and kmod include (mlnx-ofa_kernel).
 Source6100: MLNX_OFED_SRC-%{ofa_bundle_version}-%{ofa_vendor_release}.tgz
 Source6101: mlnx-ofa_kernel.inc
+Source6106: kmod-srp.inc
 
 ## Patches needed for building this package
 
@@ -1093,6 +1094,10 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase package
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2079,6 +2084,10 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase prep
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3165,6 +3174,10 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+%global _kmod_phase build
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
+
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
 
 # Module signing (modsign)
@@ -3672,6 +3685,10 @@ popd
 %global _kmod_phase install
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
+
+%global _kmod_phase install
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4322,8 +4339,15 @@ fi\
 %global _kmod_name mlnx-ofa_kernel
 %include %{_sourcedir}/mlnx-ofa_kernel.inc
 
+%global _kmod_phase files
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Mon Nov 09 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.57-1.5
+- Add Mellanox SRP kernel modules from the MLNX OFED source bundle
+
 * Fri Nov 06 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.4
 - Enable CONFIG_DRM_VGEM=m and CONFIG_USB_TMC=m on x86_64
 - Disable CONFIG_USB_HIDDEV and CONFIG_USB_SERIAL_CH341 on aarch64 to match x86_64
