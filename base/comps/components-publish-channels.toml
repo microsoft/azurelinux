@@ -2299,6 +2299,7 @@ components = [
     "rubygem-backports",
     "rubygem-childprocess",
     "rubygem-concurrent-ruby",
+    "rubygem-curb",
     "rubygem-deep_merge",
     "rubygem-diff-lcs",
     "rubygem-ethon",
