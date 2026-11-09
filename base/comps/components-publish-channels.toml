@@ -45,6 +45,7 @@ components = [
     "ansible",
     "ansible-collection-ansible-posix",
     "ansible-collection-community-general",
+    "ansible-collection-containers-podman",
     "ansible-collection-microsoft-sql",
     "ansible-core",
     "ansible-freeipa",
