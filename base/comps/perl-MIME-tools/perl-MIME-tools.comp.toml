@@ -1,0 +1,9 @@
+[components.perl-MIME-tools]
+
+[[components.perl-MIME-tools.source-files]]
+filename = "MIME-tools-5.519.tar.gz"
+hash = "7573b591449a3e235508442ea23f85f6840eb853ba05fe7d58b351949e97e6926e177d19da3e59f6cef094ff297c08494434cfdf661f9e0de8f2880b96795117"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Remove the EICAR message fixture and its manifest entry, dropping only the four fixture-dependent assertions while retaining the four decoder regression tests."
