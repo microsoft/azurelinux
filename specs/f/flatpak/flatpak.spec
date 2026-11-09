@@ -15,7 +15,7 @@
 
 Name:           flatpak
 Version:        1.16.6
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary:        Application deployment framework for desktop apps
 
 License:        LGPL-2.1-or-later
@@ -26,6 +26,9 @@ Source0:        https://github.com/flatpak/flatpak/releases/download/%{version}/
 # Add Fedora flatpak repositories
 Source1:        flatpak-add-fedora-repos.service
 %endif
+
+Patch0:         CVE-2026-96808.patch
+Patch1:         CVE-2026-96807.patch
 
 # ostree not on i686 for RHEL 10
 # https://github.com/containers/composefs/pull/229#issuecomment-1838735764
@@ -293,6 +296,10 @@ fi
 
 
 %changelog
+* Fri Oct 23 2026 Adrian Vovk <avovk@redhat.com> - 1.16.6-2
+- Fix CVE-2026-96808
+- Fix CVE-2026-96807
+
 * Fri Apr 10 2026 Michael Catanzaro <mcatanzaro@redhat.com> - 1.16.6-1
 - Update to 1.16.6
 

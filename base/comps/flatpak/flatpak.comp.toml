@@ -1,0 +1,4 @@
+# Pin to Fedora f43 flatpak-1.16.6-2 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/flatpak/c/ce872dcc3331cceb03937b23f66b8b753c570bd1
+[components.flatpak]
+spec = { type = "upstream", upstream-commit = "ce872dcc3331cceb03937b23f66b8b753c570bd1" }
