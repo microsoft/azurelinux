@@ -1,7 +1,7 @@
 Summary:      Qt6 - QtDeclarative component
 Name:         qtdeclarative
 Version:      6.6.1
-Release:      2%{?dist}
+Release:      3%{?dist}
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -11,6 +11,7 @@ Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
 Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdeclarative-everywhere-src-%{version}.tar.xz
 Patch0:  CVE-2025-12385.patch
+Patch1:  CVE-2026-79616.patch
 
 ## upstream patches
 
@@ -220,6 +221,9 @@ popd
 %{_qt_libdir}/libQt6QmlXmlListModel.prl
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.1-3
+- Patch for CVE-2026-79616
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.1-2
 - Patch for CVE-2025-12385
 

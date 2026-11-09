@@ -1,7 +1,7 @@
 Summary:        Python package with an object-oriented approach to text processing
 Name:           pyparsing
 Version:        3.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,11 @@ definitions for any number of text parsing applications.
 %{pyproject_install}
 
 %check
-pip3 install -r tests/requirements.txt
+# Pin packaging to the RPM-installed version so pip does not try to
+# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
+# rpm-installed copy has no RECORD file, so pip aborts with
+# uninstall-no-record-file and the test tooling is never installed.
+pip3 install packaging==23.2 -r tests/requirements.txt
 tox -e py%{python3_version_nodots}
 
 %files -n python3-pyparsing
@@ -46,6 +50,10 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.1-2
+- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
+  ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
+
 * Tue Feb 06 2024 Mitch Zhu <mitchzhu@microsoft.com> - 3.1.1-1
 - Upgrade to 3.1.1
 

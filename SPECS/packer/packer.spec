@@ -18,25 +18,18 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. Apply all patches affecting "go.mod" and "go.sum" files. Example: CVE-2026-45571.patch.
-#   5. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
-#   6. go mod tidy
-#   7. go mod vendor
-#   8. tar  --sort=name \
+#   5. go mod vendor
+#   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -czf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-#       - Step 5 must follow step 4: bumping the module before the "go.mod" patches land would
-#         produce a vendor tree that disagrees with the "go.mod" generated at build time.
-#       - Steps 2-8 are also automated by generate_source_tarball.sh:
-#           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
-#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 5
 Source1:        %{name}-%{version}-vendor-v5.tar.gz
 # Fixed issue in pTest through below patch
 Patch0:         update-format-function-checks-in-panic-go.patch
@@ -93,6 +86,7 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-23
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-19585, CVE-2026-107325, CVE-2026-107324
 
@@ -102,7 +96,6 @@ go test -mod=vendor
 
 * Tue Sep 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-21
 - Patch for CVE-2026-78662, CVE-2026-56855
-
 * Wed Aug 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-20
 - Patch for CVE-2026-19589
 

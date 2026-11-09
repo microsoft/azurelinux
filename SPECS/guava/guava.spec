@@ -3,7 +3,7 @@
 Summary:        Google Core Libraries for Java
 Name:           guava
 Version:        33.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0 AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,8 @@ Group:          Development/Libraries/Java
 URL:            https://github.com/google/guava
 Source0:        https://github.com/google/guava/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.tar.xz
+Patch0:         CVE-2026-102554.patch
+
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 Provides:       mvn(com.google.guava:guava) = %{version}-%{release}
@@ -42,7 +44,7 @@ Requires:       mvn(junit:junit)
 guava-testlib provides additional functionality for conveninent unit testing
 
 %prep
-%setup -q
+%autosetup -p1
 
 find . -name '*.jar' -delete
 
@@ -140,6 +142,9 @@ done
 %files testlib -f .mfiles-guava-testlib
 
 %changelog
+* Fri Oct 16 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 33.0.0-2
+- Patch for CVE-2026-102554
+
 * Mon Feb 05 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 33.0.0-1
 - Auto-upgrade to 33.0.0 - 3.0
 - Move from ant to mvn, using Fedora's spec file instead of OpenSUSE
