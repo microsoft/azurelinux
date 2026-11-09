@@ -1,5 +1,6 @@
 [components.ca-certificates]
 # Track the latest Fedora 43 CA trust update beyond the distro snapshot.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e73db0bb0458f65d530ae5901de2be73f7d7fb80" }
-# Release: 1.1%{?dist}
+# https://bodhi.fedoraproject.org/updates/FEDORA-2026-3ee4dad1c6
+spec = { type = "upstream", upstream-commit = "b4d9c2bbbddef29041afa8158a7b47a27740c6a2" }
+# Release: 2%{?dist}
 release = { calculation = "manual" }
