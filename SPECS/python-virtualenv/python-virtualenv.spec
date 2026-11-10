@@ -64,7 +64,7 @@ Requires:       python3
 Requires:       python3-platformdirs
 Requires:       python3-distlib < 1
 Requires:       python3-filelock
-Requires:	python3-packaging >= 23.1
+Requires:       python3-packaging >= 23.1
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description -n python3-virtualenv
