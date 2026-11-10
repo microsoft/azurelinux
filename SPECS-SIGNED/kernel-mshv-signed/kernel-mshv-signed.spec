@@ -10,7 +10,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        6.18.58.mshv2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -140,6 +140,11 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Mon Nov 09 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 6.18.58.mshv2-3
+- Enable IPE and stock-equivalent dm-verity signature trust on x86_64
+- Backport the dedicated dm-verity verification keyring
+- Expose eligible read-only Btrfs backing devices to IPE
+
 * Wed Nov 04 2026 Jocelyn Berrendonner <jocelynb@microsoft.com> - 6.18.58.mshv2-2
 - Bump release to match kernel-mshv
 

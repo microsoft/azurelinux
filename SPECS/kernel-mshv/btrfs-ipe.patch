@@ -1,0 +1,94 @@
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Mon, 9 Nov 2026 17:52:00 -0800
+Subject: [PATCH] btrfs: expose read-only backing device to IPE
+
+Port the stock Azure Linux Btrfs/IPE fix to 6.18.58.mshv2:
+https://github.com/microsoft/azurelinux/commit/a6bee423dc3405ca9a70bbbaa6818a1733afa3e6
+
+Expose s_bdev only for a complete, non-degraded, non-seeding,
+single-device filesystem mounted read-only on a read-only device.
+Reject writable remounts while the pointer is published and clear it
+before device teardown.
+
+Adapt to the fs_context mount API and btrfs_remount_rw(). Follow
+setup_bdev_super() for the 6.18 freeze protocol: test the atomic freeze
+count without taking bd_fsfreeze_mutex, since the holder freeze callback
+waits for SB_BORN while holding that mutex.
+
+Signed-off-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+---
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index 6cc4fe2cc..3792258bc 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -71,6 +71,7 @@ static void btrfs_put_super(struct super_block *sb)
+ 	struct btrfs_fs_info *fs_info = btrfs_sb(sb);
+ 
+ 	btrfs_info(fs_info, "last unmount of filesystem %pU", fs_info->fs_devices->fsid);
++	sb->s_bdev = NULL;
+ 	close_ctree(fs_info);
+ }
+ 
+@@ -1305,7 +1306,8 @@ static int btrfs_remount_rw(struct btrfs_fs_info *fs_info)
+ 		return -EINVAL;
+ 	}
+ 
+-	if (fs_info->fs_devices->rw_devices == 0)
++	/* Preserve the single-device backing for the lifetime of this mount. */
++	if (fs_info->sb->s_bdev || fs_info->fs_devices->rw_devices == 0)
+ 		return -EACCES;
+ 
+ 	if (!btrfs_check_rw_degradable(fs_info, NULL)) {
+@@ -1841,6 +1843,43 @@ static int btrfs_fc_test_super(struct super_block *sb, struct fs_context *fc)
+ 	return fs_info->fs_devices == p->fs_devices;
+ }
+ 
++static int btrfs_set_sb_bdev(struct super_block *sb)
++{
++	struct btrfs_fs_info *fs_info = btrfs_sb(sb);
++	struct btrfs_fs_devices *fs_devices = fs_info->fs_devices;
++	struct btrfs_device *device;
++	struct block_device *bdev;
++
++	/* A single read-only device must represent the complete filesystem. */
++	if (!sb_rdonly(sb) || btrfs_test_opt(fs_info, DEGRADED) ||
++	    fs_devices->seeding || !list_empty(&fs_devices->seed_list) ||
++	    fs_devices->num_devices != 1 || fs_devices->open_devices != 1 ||
++	    fs_devices->total_devices != 1 || fs_devices->missing_devices ||
++	    fs_devices->rw_devices || !list_is_singular(&fs_devices->devices) ||
++	    btrfs_dev_replace_is_ongoing(&fs_info->dev_replace))
++		return 0;
++
++	device = list_first_entry(&fs_devices->devices,
++				  struct btrfs_device, dev_list);
++	bdev = device->bdev;
++	if (device->fs_devices != fs_devices || device->fs_info != fs_info ||
++	    !bdev || !bdev_read_only(bdev) ||
++	    !test_bit(BTRFS_DEV_STATE_IN_FS_METADATA, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_MISSING, &device->dev_state) ||
++	    test_bit(BTRFS_DEV_STATE_REPLACE_TGT, &device->dev_state) ||
++	    device->devid == BTRFS_DEV_REPLACE_DEVID)
++		return 0;
++
++	/* As in setup_bdev_super(), a concurrent freeze waits for SB_BORN. */
++	if (atomic_read(&bdev->bd_fsfreeze_count) > 0) {
++		btrfs_err(fs_info, "cannot mount a frozen backing device");
++		return -EBUSY;
++	}
++	sb->s_bdev = bdev;
++	return 0;
++}
++
+ static int btrfs_get_tree_super(struct fs_context *fc)
+ {
+ 	struct btrfs_fs_info *fs_info = fc->s_fs_info;
+@@ -1946,6 +1985,8 @@ static int btrfs_get_tree_super(struct fs_context *fc)
+ 		snprintf(sb->s_id, sizeof(sb->s_id), "%pg", bdev);
+ 		shrinker_debugfs_rename(sb->s_shrink, "sb-btrfs:%s", sb->s_id);
+ 		ret = btrfs_fill_super(sb, fs_devices);
++		if (!ret)
++			ret = btrfs_set_sb_bdev(sb);
+ 		if (ret) {
+ 			deactivate_locked_super(sb);
+ 			return ret;
