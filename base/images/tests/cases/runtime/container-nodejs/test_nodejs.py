@@ -13,6 +13,8 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING
 
+import pytest
+
 if TYPE_CHECKING:
     from python_on_whales import DockerClient
     from utils.container_runtime import ExecShell, WriteFile
@@ -33,11 +35,12 @@ def test_node_image_config_cmd(podman_client: DockerClient, container_image_ref:
     assert cmd == ["/usr/bin/node"], f"unexpected Config.Cmd: {cmd!r}"
 
 
-def test_node_version(container_exec_shell: ExecShell) -> None:
-    """Node must report a version."""
-    result = container_exec_shell("node --version")
-    assert result.exit_code == 0, f"node --version failed: {result.output}"
-    assert result.stdout.strip().startswith("v"), f"unexpected node --version output: {result.output}"
+@pytest.mark.parametrize("command", ["node", "nodejs", "node-24"])
+def test_node_version(container_exec_shell: ExecShell, command: str) -> None:
+    """The selected commands and versioned runtime must report Node.js v24."""
+    result = container_exec_shell(f"{command} --version")
+    assert result.exit_code == 0, f"{command} --version failed: {result.output}"
+    assert result.stdout.strip().startswith("v24."), f"expected Node.js v24, got: {result.output}"
 
 
 def test_node_executes_code(container_exec_shell: ExecShell) -> None:
