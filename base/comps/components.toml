@@ -6971,6 +6971,7 @@ overlay-files = ["overlays/*.overlay.toml"]
 [components.transfig]
 [components.tre]
 [components.tree-pkg]
+publish = { rpm-channel = "rpm-sdk", srpm-channel = "rpm-sdk-srpm", debuginfo-channel = "rpm-sdk-debuginfo" }
 [components.tree-sitter]
 [components.tree-sitter-srpm-macros]
 [components.treelayout]
