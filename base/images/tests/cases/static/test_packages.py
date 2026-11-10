@@ -9,9 +9,16 @@ an rpmdb are automatically skipped.
 
 from __future__ import annotations
 
+import sqlite3
+from contextlib import closing
 from fnmatch import fnmatchcase
+from typing import TYPE_CHECKING
 
 import pytest
+from utils.extract import resolve_path_confined
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # Packages that must be present in every image with an rpmdb.
 REQUIRED_PACKAGES = {
@@ -24,6 +31,19 @@ def test_required_packages_installed(installed_packages: set[str]) -> None:
     """Verify every required package is installed."""
     missing = REQUIRED_PACKAGES - installed_packages
     assert not missing, f"Required packages missing: {sorted(missing)}"
+
+
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
+def test_container_rpm_database_compacted(rootfs: Path) -> None:
+    """Container RPM databases must not retain reusable SQLite pages."""
+    database = resolve_path_confined(rootfs, "usr/lib/sysimage/rpm/rpmdb.sqlite")
+    assert database.is_file(), f"Missing RPM database: {database}"
+    wal = resolve_path_confined(rootfs, "usr/lib/sysimage/rpm/rpmdb.sqlite-wal")
+    assert not wal.exists() or wal.stat().st_size == 0, f"RPM database has an uncheckpointed WAL: {wal}"
+    with closing(sqlite3.connect(f"{database.as_uri()}?mode=ro&immutable=1", uri=True)) as connection:
+        free_pages = connection.execute("PRAGMA freelist_count").fetchone()[0]
+    assert free_pages == 0, f"RPM database retains {free_pages} unused pages"
 
 
 @pytest.mark.require_capability("runtime-package-management")
