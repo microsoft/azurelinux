@@ -1,0 +1,4 @@
+# Pin to Fedora f43 freetype-2.13.3-4 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/freetype/c/9e58156b946a6225d064098416814abc98a37b88
+[components.freetype]
+spec = { type = "upstream", upstream-commit = "9e58156b946a6225d064098416814abc98a37b88" }
