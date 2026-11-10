@@ -1,5 +1,5 @@
---- rustls-webpki-0.103.15/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ rustls-webpki-0.103.15/Cargo.toml	2026-08-27T15:09:16.317294+00:00
+--- rustls-webpki-0.103.16/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rustls-webpki-0.103.16/Cargo.toml	2026-10-20T19:40:45.225338+00:00
 @@ -83,16 +83,6 @@
      "ring?/alloc",
      "pki-types/alloc",
