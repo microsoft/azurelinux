@@ -2,7 +2,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        22.10.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ Patch1:         CVE-2024-41671.patch
 Patch2:         CVE-2024-41810.patch
 Patch3:         CVE-2023-46137.patch
 Patch4:         CVE-2026-42304.patch
+Patch5:         CVE-2026-106454.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-incremental
 BuildRequires:  python3-pyOpenSSL
@@ -112,6 +113,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/cftp3
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 22.10.0-7
+- Patch for CVE-2026-106454
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 22.10.0-6
 - Replace the full tox 'nocov-posix-alldeps' suite (which hangs for >5h
   in CI on conch/dns/process/multicast tests) with a curated smoke-test

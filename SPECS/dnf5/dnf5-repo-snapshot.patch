@@ -12,12 +12,12 @@ Subject: [PATCH] dnf5 repo snapshot
  libdnf5/CMakeLists.txt                        |   2 +-
  libdnf5/conf/config_main.cpp                  |  13 +
  libdnf5/repo/config_repo.cpp                  |  13 +
- libdnf5/repo/solv_repo.cpp                    | 387 +++++++++++++++++-
+ libdnf5/repo/solv_repo.cpp                    | 391 +++++++++++++++++-
  libdnf5/repo/solv_repo.hpp                    |  23 +-
- 10 files changed, 484 insertions(+), 9 deletions(-)
+ 10 files changed, 488 insertions(+), 9 deletions(-)
 
 diff --git a/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf b/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf
-index e0776f29..e746efb8 100644
+index e0776f2..e746efb 100644
 --- a/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf
 +++ b/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf
 @@ -20,6 +20,18 @@ long_name = 'nodocs'
@@ -40,7 +40,7 @@ index e0776f29..e746efb8 100644
  type = 'cloned_named_arg'
  long_name = 'enablerepo'
 diff --git a/dnf5/main.cpp b/dnf5/main.cpp
-index ab1b8702..2abd7069 100644
+index ab1b870..2abd706 100644
 --- a/dnf5/main.cpp
 +++ b/dnf5/main.cpp
 @@ -340,6 +340,35 @@ void RootCommand::set_argument_parser() {
@@ -80,7 +80,7 @@ index ab1b8702..2abd7069 100644
      enable_repo_ids->set_long_name("enable-repo");
      enable_repo_ids->set_has_value(true);
 diff --git a/doc/dnf5.8.rst b/doc/dnf5.8.rst
-index 005a5cdc..f7d9d5f3 100644
+index 005a5cd..f7d9d5f 100644
 --- a/doc/dnf5.8.rst
 +++ b/doc/dnf5.8.rst
 @@ -272,6 +272,12 @@ Following options are applicable in the general context for any ``dnf5`` command
@@ -97,7 +97,7 @@ index 005a5cdc..f7d9d5f3 100644
      | Automatically answer yes for all questions.
  
 diff --git a/include/libdnf5/conf/config_main.hpp b/include/libdnf5/conf/config_main.hpp
-index 0b4f9150..9d3942c6 100644
+index 0b4f915..9d3942c 100644
 --- a/include/libdnf5/conf/config_main.hpp
 +++ b/include/libdnf5/conf/config_main.hpp
 @@ -215,6 +215,10 @@ public:
@@ -112,7 +112,7 @@ index 0b4f9150..9d3942c6 100644
      OptionNumber<std::uint32_t> & get_retries_option();
      const OptionNumber<std::uint32_t> & get_retries_option() const;
 diff --git a/include/libdnf5/repo/config_repo.hpp b/include/libdnf5/repo/config_repo.hpp
-index 1582c4bc..c6506b28 100644
+index 1582c4b..c6506b2 100644
 --- a/include/libdnf5/repo/config_repo.hpp
 +++ b/include/libdnf5/repo/config_repo.hpp
 @@ -136,6 +136,10 @@ public:
@@ -127,7 +127,7 @@ index 1582c4bc..c6506b28 100644
      const OptionChild<OptionString> & get_user_agent_option() const;
      OptionChild<OptionBool> & get_countme_option();
 diff --git a/libdnf5/CMakeLists.txt b/libdnf5/CMakeLists.txt
-index ddcee4fa..7eaeb83b 100644
+index ddcee4f..7eaeb83 100644
 --- a/libdnf5/CMakeLists.txt
 +++ b/libdnf5/CMakeLists.txt
 @@ -53,7 +53,7 @@ target_link_libraries(libdnf5 PRIVATE ${LIBMODULEMD_LIBRARIES})
@@ -140,7 +140,7 @@ index ddcee4fa..7eaeb83b 100644
  pkg_check_modules(LIBSOLVEXT REQUIRED libsolvext>=0.7.7)
  list(APPEND LIBDNF5_PC_REQUIRES_PRIVATE "${LIBSOLVEXT_MODULE_NAME}")
 diff --git a/libdnf5/conf/config_main.cpp b/libdnf5/conf/config_main.cpp
-index 379cfe27..f9b2fee1 100644
+index 379cfe2..f9b2fee 100644
 --- a/libdnf5/conf/config_main.cpp
 +++ b/libdnf5/conf/config_main.cpp
 @@ -220,6 +220,8 @@ class ConfigMain::Impl {
@@ -178,7 +178,7 @@ index 379cfe27..f9b2fee1 100644
  OptionNumber<std::uint32_t> & ConfigMain::get_retries_option() {
      return p_impl->retries;
 diff --git a/libdnf5/repo/config_repo.cpp b/libdnf5/repo/config_repo.cpp
-index 94c1b8c4..5f1396eb 100644
+index 94c1b8c..5f1396e 100644
 --- a/libdnf5/repo/config_repo.cpp
 +++ b/libdnf5/repo/config_repo.cpp
 @@ -39,6 +39,9 @@ class ConfigRepo::Impl {
@@ -216,7 +216,7 @@ index 94c1b8c4..5f1396eb 100644
  std::string ConfigRepo::get_unique_id() const {
      std::string tmp;
 diff --git a/libdnf5/repo/solv_repo.cpp b/libdnf5/repo/solv_repo.cpp
-index 54dba3eb..20daac3c 100644
+index 54dba3e..90d7ca6 100644
 --- a/libdnf5/repo/solv_repo.cpp
 +++ b/libdnf5/repo/solv_repo.cpp
 @@ -30,6 +30,7 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
@@ -235,7 +235,7 @@ index 54dba3eb..20daac3c 100644
  }
  
  
-@@ -167,6 +169,354 @@ void checksum_calc(unsigned char * out, fs::File & file) {
+@@ -167,6 +169,358 @@ void checksum_calc(unsigned char * out, fs::File & file) {
  }
  
  
@@ -560,7 +560,11 @@ index 54dba3eb..20daac3c 100644
 +        // Direct expat to process the buffer
 +        if (XML_ParseBuffer(pParser, static_cast<int>(bytes_read), bytes_read == 0) == XML_STATUS_ERROR) {
 +            std::cerr   << "Parse error at line "
++#if XML_MAJOR_VERSION > 2 || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 9)
++                        << XML_GetCurrentLineNumber64(pParser)
++#else
 +                        << XML_GetCurrentLineNumber(pParser)
++#endif
 +                        << "\n"
 +                        << XML_ErrorString(XML_GetErrorCode(pParser));
 +            filterContext.bParseError = true;
@@ -590,7 +594,7 @@ index 54dba3eb..20daac3c 100644
  static const char * repodata_type_to_name(RepodataType type) {
      switch (type) {
          case RepodataType::FILELISTS:
-@@ -236,6 +586,11 @@ SolvRepo::~SolvRepo() {
+@@ -236,6 +590,11 @@ SolvRepo::~SolvRepo() {
  void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string & primary_fn) {
      auto & logger = *base->get_logger();
      auto & pool = get_rpm_pool(base);
@@ -602,7 +606,7 @@ index 54dba3eb..20daac3c 100644
  
      fs::File repomd_file(repomd_fn, "r");
  
-@@ -243,14 +598,25 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
+@@ -243,14 +602,25 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
  
      int solvables_start = pool->nsolvables;
  
@@ -633,7 +637,7 @@ index 54dba3eb..20daac3c 100644
  
      logger.debug("Loading repomd and primary for repo \"{}\"", config.get_id());
      if (repo_add_repomdxml(repo, repomd_file.get(), 0) != 0) {
-@@ -265,14 +631,14 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
+@@ -265,14 +635,14 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
          throw SolvError(
              M_("Failed to load primary for repo \"{}\" from \"{}\": {}."),
              config.get_id(),
@@ -650,7 +654,7 @@ index 54dba3eb..20daac3c 100644
          write_main(true);
      }
  }
-@@ -533,6 +899,13 @@ void SolvRepo::write_main(bool load_after_write) {
+@@ -533,6 +903,13 @@ void SolvRepo::write_main(bool load_after_write) {
      auto & logger = *base->get_logger();
      auto & pool = get_rpm_pool(base);
  
@@ -665,7 +669,7 @@ index 54dba3eb..20daac3c 100644
  
      const auto solvfile_path = solv_file_path();
 diff --git a/libdnf5/repo/solv_repo.hpp b/libdnf5/repo/solv_repo.hpp
-index f3f9b822..1501bab4 100644
+index f3f9b82..1501bab 100644
 --- a/libdnf5/repo/solv_repo.hpp
 +++ b/libdnf5/repo/solv_repo.hpp
 @@ -29,7 +29,9 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
@@ -706,5 +710,5 @@ index f3f9b822..1501bab4 100644
  class SolvError : public Error {
      using Error::Error;
 -- 
-2.34.1
+2.53.0
 
