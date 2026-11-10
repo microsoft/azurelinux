@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-webpki-roots-1.0.11-1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/rust-webpki-roots/c/d74c166163dd356988e899b64b7d0f2d8da625a2
+[components.rust-webpki-roots]
+spec = { type = "upstream", upstream-commit = "d74c166163dd356988e899b64b7d0f2d8da625a2" }
