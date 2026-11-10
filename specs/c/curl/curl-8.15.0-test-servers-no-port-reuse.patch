@@ -1,0 +1,112 @@
+From 9be300cb5eadc16a432e321a76c8efc5250d53c4 Mon Sep 17 00:00:00 2001
+Subject: [PATCH] test/servers.pm: restrict h2/3 port reuse
+
+Tracked down spurious HTTP/2 and HTTP/3 test failures where nghttpx refuses
+to start because the cleartext and TLS listeners are assigned the same port.
+Disallow port reuse when reserving ports for the HTTP/2 and HTTP/3 servers.
+
+Upstream commit 9be300cb5eadc16a432e321a76c8efc5250d53c4.
+---
+ tests/servers.pm | 24 ++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/tests/servers.pm b/tests/servers.pm
+--- a/tests/servers.pm
++++ b/tests/servers.pm
+@@ -179,11 +179,12 @@
+ # return the port number
+ #
+ sub getfreeport {
+-    my ($ipnum) = @_;
++    my ($ipnum, $reuse) = @_;
++    $reuse = 1 unless defined $reuse;
+     my $server = IO::Socket->new(LocalPort => 0,
+                                  Domain => $ipnum == 6 ? AF_INET6 : AF_INET,
+                                  Type      => SOCK_STREAM,
+-                                 Reuse     => 1,
++                                 Reuse     => $reuse,
+                                  Listen    => 10 )
+         or die "Couldn't create tcp server socket: $@\n";
+ 
+@@ -1210,8 +1210,8 @@
+     $flags .= "--connect $HOSTIP:" . protoport("http") . " ";
+     $flags .= $verbose_flag if($debugprotocol);
+ 
+-    my $port = getfreeport($ipvnum);
+-    my $port2 = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 0);
++    my $port2 = getfreeport($ipvnum, 0);
+     my $aflags = "--port $port --port2 $port2 $flags";
+     my $cmd = "$exe $aflags";
+     my ($http2pid, $pid2) = startnew($cmd, $pidfile, 15, 0);
+@@ -1272,7 +1272,7 @@
+     $flags .= "--cert \"$cert\" " if($cert);
+     $flags .= $verbose_flag if($debugprotocol);
+ 
+-    my $port = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 0);
+     my $aflags = "--port $port $flags";
+     my $cmd = "$exe $aflags";
+     my ($http3pid, $pid3) = startnew($cmd, $pidfile, 15, 0);
+@@ -1353,7 +1353,7 @@
+         $flags .= "--connect " . protoport("httpproxy");
+     }
+ 
+-    my $port = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 1);
+     my $options = "$flags --accept $port";
+     my $cmd = "$perl " . shell_quote("$srcdir/secureserver.pl") . " " . $options;
+     my ($httpspid, $pid2) = startnew($cmd, $pidfile, 15, 0);
+@@ -1418,7 +1418,7 @@
+     $flags .= "--srppasswd $srcdir/certs/srp-verifier-db ";
+     $flags .= "--srppasswdconf $srcdir/certs/srp-verifier-conf";
+ 
+-    my $port = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 1);
+     my $allflags = "--port $port $flags";
+     my $cmd = "$httptlssrv $allflags > $logfile 2>&1";
+     my ($httptlspid, $pid2) = startnew($cmd, $pidfile, 10, 1);
+@@ -1556,7 +1556,7 @@
+     $flags .= "--stunnel \"$stunnel\" --srcdir \"$srcdir\" ";
+     $flags .= "--connect $clearport";
+ 
+-    my $port = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 1);
+     my $options = "$flags --accept $port";
+ 
+     my $cmd = "$perl " . shell_quote("$srcdir/secureserver.pl") . " " . $options;
+@@ -1846,7 +1846,7 @@
+     $flags .= "--user \"$USER\"";
+ 
+     my @tports;
+-    my $port = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 1);
+ 
+     push @tports, $port;
+ 
+@@ -2100,6 +2100,6 @@
+     $flags .= "--host $HOSTIP";
+ 
+-    my $port = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 1);
+     my $aflags = "--port $port $flags";
+     my $cmd = "$srcdir/dictserver.py $aflags";
+     my ($dictpid, $pid2) = startnew($cmd, $pidfile, 15, 0);
+@@ -2161,6 +2161,6 @@
+     $flags .= "--host $HOSTIP";
+ 
+-    my $port = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 1);
+     my $aflags = "--port $port $flags";
+     my $cmd = "$srcdir/smbserver.py $aflags";
+     my ($smbpid, $pid2) = startnew($cmd, $pidfile, 15, 0);
+@@ -2221,6 +2221,6 @@
+     $flags .= "--srcdir \"$srcdir\"";
+ 
+-    my $port = getfreeport($ipvnum);
++    my $port = getfreeport($ipvnum, 1);
+     my $aflags = "--port $port $flags";
+     my $cmd = "$srcdir/negtelnetserver.py $aflags";
+     my ($ntelpid, $pid2) = startnew($cmd, $pidfile, 15, 0);
+-- 
+2.51.0

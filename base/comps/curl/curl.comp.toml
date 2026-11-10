@@ -1,2 +1,4 @@
+# Pin to Fedora f43 curl-8.15.0-12 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/curl/c/0955812ec0dbb93c7a75efea94248f4274c58a94
 [components.curl]
-
+spec = { type = "upstream", upstream-commit = "0955812ec0dbb93c7a75efea94248f4274c58a94" }

@@ -10,7 +10,7 @@
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
 Version: 8.15.0
-Release: 15%{?dist}
+Release: 18%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
 Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
@@ -82,11 +82,32 @@ Patch020: 0020-curl-8.15.0-CVE-2026-9079.patch
 # fix wrong reuse for different services (CVE-2026-8458)
 Patch021: 0021-curl-8.15.0-CVE-2026-8458.patch
 
+# fix secure cookie attribute bypass with tab (CVE-2026-80255)
+Patch022: 0022-curl-8.15.0-CVE-2026-80255.patch
+
+# fix OpenSSL provider use-after-free (CVE-2026-80229)
+Patch023: 0023-curl-8.15.0-CVE-2026-80229.patch
+
+# fix incomplete mTLS config matching in conn reuse (CVE-2026-8932)
+Patch024: 0024-curl-8.15.0-CVE-2026-8932.patch
+
+# fix OpenLDAP SASL authentication bypass (CVE-2026-13608)
+Patch025: 0025-curl-8.15.0-CVE-2026-13608.patch
+
+# fix OpenSSL pinning bypass (CVE-2026-80230)
+Patch026: 0026-curl-8.15.0-CVE-2026-80230.patch
+
+# fix to pass on systems with >=128-bit pointers
+Patch027: 0027-curl-8.15.0-unit3214-fix-to-pass-on-systems-with-128-bit-pointer.patch
+
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
 
 # test616: disable valgrind
 Patch105: 0105-curl-8.11.1-test616.patch
+
+# test1501: mark as flaky (timing-sensitive, fails under valgrind on i686)
+Patch106: 0106-curl-8.15.0-test1501-flaky.patch
 
 Provides: curl-full = %{version}-%{release}
 # do not fail when trying to install curl-minimal after drop
@@ -222,6 +243,8 @@ Requires: libcurl%{?_isa} >= %{version}-%{release}
 # (we need to translate 3.0.0-alpha16 -> 3.0.0-0.alpha16 and 3.0.0-beta1 -> 3.0.0-0.beta1 though)
 %global openssl_version %({ pkg-config --modversion openssl 2>/dev/null || echo 0;} | sed 's|-|-0.|')
 
+Patch107: curl-8.15.0-vtls_scache-free-srp-username.patch
+Patch108: curl-8.15.0-test-servers-no-port-reuse.patch
 %description
 curl is a command line tool for transferring data with URL syntax, supporting
 FTP, FTPS, HTTP, HTTPS, SCP, SFTP, TFTP, TELNET, DICT, LDAP, LDAPS, FILE, IMAP,
@@ -483,6 +506,22 @@ rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/wcurl.1*
 %{_libdir}/libcurl.so.4.[0-9].[0-9].minimal
 
 %changelog
+* Tue Nov 10 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 8.15.0-18
+- Bump Fedora pin to 8.15.0-12 to address CVE-2026-13608, CVE-2026-80229,
+  CVE-2026-80230, CVE-2026-80255 and CVE-2026-8932
+- Free TLS-SRP username dropped by the CVE-2026-8932 backport
+- Backport upstream fix restricting HTTP/2 and HTTP/3 test server port reuse
+
+* Tue Oct 13 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-12
+- fix incomplete mTLS config matching in conn reuse (CVE-2026-8932)
+- fix OpenLDAP SASL authentication bypass (CVE-2026-13608)
+- fix OpenSSL pinning bypass (CVE-2026-80230)
+- fix test3214 to pass on systems with >=128-bit pointers
+
+* Tue Oct 06 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-11
+- fix secure cookie attribute bypass with tab (CVE-2026-80255)
+- fix OpenSSL provider use-after-free (CVE-2026-80229)
+
 * Tue Sep 08 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-10
 - fix HTTP/2 stream-dependency tree UAF (CVE-2026-10536)
 - fix stale proxy password leak (CVE-2026-9079)
