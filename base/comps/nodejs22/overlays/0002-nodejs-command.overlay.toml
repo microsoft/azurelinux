@@ -1,0 +1,16 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Expose the nodejs command as an alias of the selected Node.js runtime"
+type = "spec-append-lines"
+section = "%install"
+lines = ['ln -s node "%{buildroot}%{_bindir}/nodejs"']
+
+[[overlays]]
+description = "Keep the nodejs alias in the mutually exclusive command selector"
+type = "spec-append-lines"
+section = "%files"
+package = "bin"
+lines = ['%{_bindir}/nodejs']

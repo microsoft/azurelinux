@@ -1,3 +1,5 @@
 [components.nodejs22]
-# Release: %{nodejs_release}
-release = { calculation = "manual" }
+# Fedora 44 provides versioned runtimes and mutually exclusive command selectors.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "d140752371e8a02cd2fc59100e4ec88a24129b74" }
+# %autorelease is expanded through nodejs_define_version rather than the Release tag.
+release = { calculation = "autorelease" }

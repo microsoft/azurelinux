@@ -1,0 +1,7 @@
+# This is the distribution-level configuration file for npm.
+# To configure npm on a system level, use the globalconfig below (defaults to @SYSCONFDIR@/npmrc).
+# vim:set filetype=dosini:
+
+globalconfig=@SYSCONFDIR@/npmrc
+prefix=/usr/local
+update-notifier=false

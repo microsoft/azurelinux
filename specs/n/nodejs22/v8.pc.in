@@ -2,7 +2,7 @@ prefix=@PREFIX@
 includedir=@INCLUDEDIR@
 libdir=@LIBDIR@
 
-Name: v8-@PKGCONFVERSION@
+Name: @PKGCONFNAME@
 Description: JavaScript Runtime
 Version: @V8_VERSION@
 Libs: -L${libdir} -lv8

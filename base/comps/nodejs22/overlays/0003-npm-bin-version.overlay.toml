@@ -1,0 +1,27 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Version the npm command selector with npm so its dependency recommendation can match"
+type = "spec-set-tag"
+section = "%package"
+package = "npm-bin"
+tag = "Epoch"
+value = "%{npm_epoch}"
+
+[[overlays]]
+description = "Use the npm version for the npm command selector rather than the runtime version"
+type = "spec-set-tag"
+section = "%package"
+package = "npm-bin"
+tag = "Version"
+value = "%{npm_version}"
+
+[[overlays]]
+description = "Keep the npm selector release synchronized with the matching npm package"
+type = "spec-set-tag"
+section = "%package"
+package = "npm-bin"
+tag = "Release"
+value = "%{npm_release}"

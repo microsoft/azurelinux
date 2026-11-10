@@ -1,0 +1,36 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Replace unversioned Azure Linux RPMs shipped beyond Fedora's migration cutoff"
+type = "spec-search-replace"
+regex = '^Obsoletes: nodejs%\{\?1:-%\{1\}\} < .*$'
+replacement = 'Obsoletes: nodejs%{?1:-%{1}} < %{?2}%{!?2:%{node_evr}}'
+
+[[overlays]]
+description = "Replace the unversioned npm RPM shipped beyond Fedora's migration cutoff"
+type = "spec-set-tag"
+section = "%package"
+package = "npm"
+tag = "Obsoletes"
+value = "nodejs-npm < %{npm_evr}"
+
+[[overlays]]
+description = "Keep the shipped system npm configuration when migrating to versioned packages"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    'mkdir -p "%{buildroot}%{_sysconfdir}"',
+    'mkconfig <%{SOURCE5} >"%{buildroot}%{_sysconfdir}/npmrc"',
+]
+
+[[overlays]]
+description = "Preserve customer npm configuration and its RPM ownership during upgrades"
+type = "spec-prepend-lines"
+section = "%files"
+package = "npm"
+lines = [
+    '%config(noreplace) %{_sysconfdir}/npmrc',
+    '%ghost %{_sysconfdir}/npmignore',
+]
