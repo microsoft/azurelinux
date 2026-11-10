@@ -1,0 +1,36 @@
+From dbe1e198b9fc15727599d9ac1409ef00240e98be Mon Sep 17 00:00:00 2001
+From: David Hanina <dhanina@redhat.com>
+Date: Mon, 31 Aug 2026 14:43:16 +0200
+Subject: [PATCH] ipa-kdb: fix NULL pointer dereference when freeing credential
+ type values
+
+Guard the loop that frees individual `cvals` entries with a NULL check
+before dereferencing the array.
+
+Fixes: https://codeberg.org/freeipa/freeipa/issues/10045
+Signed-off-by: David Hanina <dhanina@redhat.com>
+Reviewed-By: Sudhir Menon <sumenon@redhat.com>
+---
+ daemons/ipa-kdb/ipa_kdb.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/daemons/ipa-kdb/ipa_kdb.c b/daemons/ipa-kdb/ipa_kdb.c
+index 531ee223e..36be5e5a2 100644
+--- a/daemons/ipa-kdb/ipa_kdb.c
++++ b/daemons/ipa-kdb/ipa_kdb.c
+@@ -437,8 +437,10 @@ int ipadb_get_enc_salt_types(struct ipadb_context *ipactx,
+ 
+ done:
+     ldap_value_free_len(vals);
+-    for (i = 0; i < c && cvals[i]; i++) {
+-        free(cvals[i]);
++    if (cvals) {
++        for (i = 0; i < c && cvals[i]; i++) {
++            free(cvals[i]);
++        }
+     }
+     free(cvals);
+     return ret;
+-- 
+2.55.0
+

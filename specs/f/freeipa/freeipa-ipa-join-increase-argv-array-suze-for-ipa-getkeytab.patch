@@ -1,0 +1,31 @@
+From 8ef907327b569b3cc9c782881ee95de8ef7b180c Mon Sep 17 00:00:00 2001
+From: David Hanina <dhanina@redhat.com>
+Date: Mon, 31 Aug 2026 14:43:32 +0200
+Subject: [PATCH] ipa-join: increase argv array size for ipa-getkeytab
+
+Make room for an additional argument by enlarging the argv array
+from 12 to 13 elements.
+
+Fixes: https://codeberg.org/freeipa/freeipa/issues/10044
+Signed-off-by: David Hanina <dhanina@redhat.com>
+Reviewed-By: Sudhir Menon <sumenon@redhat.com>
+---
+ client/ipa-join.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/ipa-join.c b/client/ipa-join.c
+index a8d4a82cc..7c16919a4 100644
+--- a/client/ipa-join.c
++++ b/client/ipa-join.c
+@@ -1196,7 +1196,7 @@ join(const char *server, const char *hostname, const char *bindpw, const char *b
+     }
+ 
+     if (childpid == 0) {
+-        char *argv[12];
++        char *argv[13];
+         char *path = "/usr/sbin/ipa-getkeytab";
+         int arg = 0;
+         int err;
+-- 
+2.55.0
+
