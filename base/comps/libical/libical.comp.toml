@@ -1,0 +1,4 @@
+# Pin to Fedora f43 libical-3.0.20-6 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libical/c/9e915e660b3007692d913b00c8ba1dbbfae74354
+[components.libical]
+spec = { type = "upstream", upstream-commit = "9e915e660b3007692d913b00c8ba1dbbfae74354" }
