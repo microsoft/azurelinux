@@ -1,6 +1,3 @@
-# Pin to Fedora f43 nodejs24-None to pick up upstream CVE fixes.
-# https://src.fedoraproject.org/rpms/nodejs24/c/685165daff45a65879f63e3340b2effe9779ce01
 [components.nodejs24]
-spec = { type = "upstream", upstream-commit = "685165daff45a65879f63e3340b2effe9779ce01" }
-# Release: %{node_release}
-release = { calculation = "manual" }
+# Fedora 44 provides versioned runtimes and mutually exclusive command selectors.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "88b3f6e310735576ffe16dd9e0bf813aa719642b" }

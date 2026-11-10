@@ -14,7 +14,7 @@
 Name:           nodejs24
 Epoch:          1
 Version:        24.22.1
-Release:        %{autorelease}
+Release: %autorelease -b 2
 
 Summary:        JavaScript runtime
 License:        Apache-2.0 AND Artistic-2.0 AND BSD-2-Clause AND BSD-3-Clause AND BlueOak-1.0.0 AND CC-BY-3.0 AND CC0-1.0 AND ISC AND MIT
@@ -84,10 +84,8 @@ URL:            https://nodejs.org
 # Use all vendored dependencies when bootstrapping
 %bcond all_deps_bundled %{with bootstrap}
 
-# === Distro-wide build configuration adjustments ===
-# v8 cannot be built with LTO enabled;
-# the rest of the build should be LTO enabled via the configure script
-%global _lto_cflags %{nil}
+# Generate unversioned names; TODO: figure out the condition
+%bcond rolling_stream 0
 
 # === Additional definitions ===
 # Architecture-dependent suffix for requiring/providing .so names
@@ -136,8 +134,15 @@ BuildRequires:  pkgconfig(openssl) >= 3.0.2
 %nodejs_declare_bundled -a  zlib        -p
 # Run-time dependencies of the main package
 Requires:   ca-certificates
+# We want any nodejs installed to gurantee the node command is present.
+# When multiple nodejs verisons are installed, we don't influence which command this is,
+# but the Recommedns bellow should make it so the "native" one is installed
+# by default when only one nodejs version is installed.
+# We deliberately use %%{_bindir} here as the file comes from this very build.
+Requires:   %{_bindir}/node
 # Required and/or recommended sub-packages
 Requires:   %{name}-libs%{?_isa}      = %{node_evr}
+Recommends: %{name}-bin               = %{node_evr}
 Recommends: %{name}-docs              = %{node_evr}
 Recommends: %{name}-full-i18n%{?_isa} = %{node_evr}
 Recommends: %{name}-npm              >= %{npm_evr}
@@ -187,8 +192,8 @@ Node.js uses an event-driven, non-blocking I/O model that
 makes it lightweight and efficient, perfect for data-intensive
 real-time applications that run across distributed devices.
 
-%package        devel
-Summary:        JavaScript runtime – development headers
+
+%global devel_metadata %{expand:\
 Requires:       nodejs%{node_version_major}%{?_isa} = %{node_evr}
 Requires:       nodejs%{node_version_major}-libs%{?_isa} = %{node_evr}
 Requires:       nodejs-packaging
@@ -196,16 +201,16 @@ Requires:       openssl-devel%{?_isa}
 %{!?with_bundled_brotli:Requires: brotli-devel%{?_isa}}
 %{!?with_bundled_libuv:Requires: libuv-devel%{?_isa}}
 %{!?with_bundled_zlib:Requires: zlib-devel%{?_isa}}
-# Note: -devel sub-packages of the various streams conflict with each other,
-# as the headers cannot be easily namespaced (would break at lease node-gyp search path).
-# Hence the Provides: in place of metapackage.
-Provides:       nodejs-devel = %{node_evr}
 
 Provides: alternative-for(nodejs-devel) = %{node_evr}
 Conflicts: alternative-for(nodejs-devel)
+# previously VP used for the same reason as alternative-for() above
 Conflicts: nodejs-devel-pkg
- # previously VP used for the same reason as alternative-for() above
+}
 
+%package        devel
+Summary:        JavaScript runtime – development headers
+%devel_metadata
 
 %description    devel
 Development headers for the Node.js JavaScript runtime.
@@ -262,12 +267,87 @@ Release:        %{npm_release}
 BuildArch:      noarch
 Requires:       nodejs%{node_version_major}         = %{node_evr}
 Recommends:     nodejs%{node_version_major}-docs    = %{node_evr}
+Provides:       npm = %{npm_evr}
 Provides:       npm(npm) = %{npm_version}
+
+# Similarily to the node command, we want a guranteed npm command here.
+Requires:       %{_bindir}/npm
+Recommends:     %{name}-npm-bin >= %{npm_evr}
 
 %description    npm
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
 
+%package        bin
+Summary:        Node.js JavaScript runtime – unversioned symlinks
+BuildArch:      noarch
+Requires:       nodejs%{node_version_major} = %{node_evr}
+Provides:       alternative-for(nodejs-bin) = %{node_evr}
+Conflicts:      alternative-for(nodejs-bin)
+
+%description    bin
+Binary symlinks for Node.js JavaScript runtime.
+
+%package        npm-bin
+Summary:        Node.js Package Manager – binary symlinks
+Epoch:          %{npm_epoch}
+Version:        %{npm_version}
+Release:        %{npm_release}
+BuildArch:      noarch
+Requires:       nodejs%{node_version_major}-npm = %{npm_evr}
+Requires(meta): nodejs%{node_version_major}-bin = %{node_evr}
+Provides:       alternative-for(nodejs-npm-bin) = %{npm_evr}
+Conflicts:      alternative-for(nodejs-npm-bin)
+
+%description    npm-bin
+Binary symlinks for Node.js Package Manager.
+
+# === Rolling stream metadata ===
+%if %{with rolling_stream}
+
+%package -n     nodejs
+Summary:        Node.js JavaScript runtime – rolling stream
+Requires:       nodejs%{node_version_major} = %{node_evr}
+Recommends:     nodejs-npm = %{npm_evr}
+# For rolling stream, the -bin packages are merged into the main packages,
+# as that was determined to be a better user experience
+Provides:       nodejs-bin = %{node_evr}
+Provides:       alternative-for(nodejs-bin) = %{node_evr}
+Conflicts:      alternative-for(nodejs-bin)
+
+%description -n nodejs
+This is a meta-package that installs the recommended version of Node.js
+JavaScript runtime. It relies on nodejs%{version} to provide all necessary dependencies.
+
+%package -n     nodejs-devel
+Summary:        Node.js development headers – rolling stream
+%devel_metadata
+
+%description -n nodejs-devel
+Meta-package that installs the nodejs%{version}-devel package, which contains
+development headers for the appropriate Node.js JavaScript runtime.
+
+%package -n     nodejs-npm
+Summary:        Node.js Package Manager meta-package
+Epoch:          %{npm_epoch}
+Version:        %{npm_version}
+Release:        %{npm_release}
+
+Requires:       nodejs = %{node_evr}
+Requires:       nodejs%{node_version_major}-npm = %{npm_evr}
+Provides:       npm = %{npm_evr}
+# Similarly to main nodejs package, the nodejs-npm-bin is merged to this one.
+Provides:       nodejs-npm-bin = %{npm_evr}
+Requires(meta): nodejs = %{node_evr}
+Provides:       alternative-for(nodejs-npm-bin) = %{npm_evr}
+Conflicts:      alternative-for(nodejs-npm-bin)
+
+%description -n nodejs-npm
+Meta-package that installs the nodejs%{version}-npm package,
+which contains the appropriate version of Node.js Package Manager.
+
+%endif
+# ↪ %%{with rolling_stream}
 
 %prep
 %autosetup -n node-v%{node_version} -S git_am
@@ -479,10 +559,7 @@ mv "${RPM_BUILD_ROOT}%{_bindir}/node" "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_v
 
 # Make the sitelib into a private one; but keep providing (empty) common one
 mv "${RPM_BUILD_ROOT}%{nodejs_common_sitelib}" "${RPM_BUILD_ROOT}%{nodejs_private_sitelib}"
-# 2025-05-20 FIXME: Turning a symlink into a directory needs to be coordinated across all the active streams.
-# In order to not block this new packaging approach on the WASM unbundling effort,
-# do not provide the common sitelib for now.
-#mkdir "${RPM_BUILD_ROOT}%%{nodejs_common_sitelib}"
+mkdir "${RPM_BUILD_ROOT}%{nodejs_common_sitelib}"
 declare NPM_DIR="${RPM_BUILD_ROOT}%{nodejs_private_sitelib}/npm"
 
 # Adjust npm scripts to use the renamed interpreter
@@ -523,13 +600,31 @@ readonly MAN_INFO_COMPRESS="%{?_man_info_compress}%{!?_man_info_compress:gzip -9
 find "${VERSIONED_MANDIR}" -type f -name '*.[123456789]' -execdir ${MAN_INFO_COMPRESS} '{}' +
 # – update npm man symlink
 ln -srfn "${VERSIONED_MANDIR}" "${NPM_DIR}/man"
-# - create symlinks for the versioned binaries
+
+# === stuff related to -bin packages
+# Create versioned man pages symlinks for base package (when no -bins present)
 mkdir -p "${RPM_BUILD_ROOT}%{_mandir}/man1"
 ln -srf  "${VERSIONED_MANDIR}/man1/node.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/node-%{node_version_major}.1.gz"
 ln -srf  "${VERSIONED_MANDIR}/man1/npm.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/npm-%{node_version_major}.1.gz"
 ln -srf  "${VERSIONED_MANDIR}/man1/npx.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/npx-%{node_version_major}.1.gz"
 
+# Create symlinks to the versioned binaries
+pushd '%{buildroot}%{_bindir}'
+for binname in node npm npx; do
+    ln -srfL "${binname}-%{node_version_major}" "${binname}"
+done
+popd
 
+# Create unversioned man page symlinks
+# Iterating through versioned manpages location, creating symlinks in standard location
+
+find "${VERSIONED_MANDIR}" -type d -name 'man[123456789]' -printf "${RPM_BUILD_ROOT}%{_mandir}/%%P\0" | xargs -0 mkdir -p
+# link all the individual manpages
+find "${VERSIONED_MANDIR}" -type f -name '*.[123456789]*' -printf '%%P\n' | while read -r man_stem; do
+    ln -srfL "${VERSIONED_MANDIR}/${man_stem}" "${RPM_BUILD_ROOT}%{_mandir}/${man_stem}"
+done
+
+ln -s node "%{buildroot}%{_bindir}/nodejs"
 %check
 # === Common test environment
 export LD_LIBRARY_PATH="${RPM_BUILD_ROOT}%{_libdir}:${LD_LIBRARY_PATH}"
@@ -573,18 +668,37 @@ npm config list --json | jq --exit-status '.["update-notifier"] == false'
 bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test/ '%{SOURCE11}'
 
 
+%pretrans -p <lua>
+-- /usr/lib/node_modules was a symlink in F43 and lower. Can be removed once F43 is EOL.
+path = "%{nodejs_common_sitelib}"
+stat = posix.stat(path)
+if stat and stat.type == "link" then
+    os.remove(path)
+end
+
+
 %files
 %doc        README.md CHANGELOG.md GOVERNANCE.md onboarding.md
 %license    LICENSE
 %dir        %{nodejs_datadir}/
 %dir        %{nodejs_datadir}/man/
 %dir        %{nodejs_datadir}/man/man1/
-#%%dir        %%{nodejs_common_sitelib}/
+%dir        %{nodejs_common_sitelib}/
 %dir        %{nodejs_private_sitelib}/
+# Symlink to versioned binary
 %{_bindir}/node-%{node_version_major}
 %{nodejs_datadir}/man/man1/node.1*
+# Versioned man page when -bin is not installed
 %{_mandir}/man1/node-%{node_version_major}.1*
 
+%global     files_bin %{expand:
+%license    LICENSE
+%{_bindir}/node
+%{_mandir}/man1/node.1*
+}
+%files      bin %{files_bin}
+
+%{_bindir}/nodejs
 %files      libs
 %license    LICENSE
 %{_libdir}/libnode.so.%{node_soversion}
@@ -592,7 +706,7 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %{_libdir}/libv8_libbase.so.%{v8_version_major}.%{v8_version_minor}
 %{_libdir}/libv8_libplatform.so.%{v8_version_major}.%{v8_version_minor}
 
-%files      devel
+%global     files_devel %{expand:
 %license    LICENSE
 %dir        %{nodejs_datadir}/
 %{_includedir}/node/
@@ -603,6 +717,8 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %{_rpmconfigdir}/fileattrs/nodejs%{node_version_major}_abi.attr
 %{_rpmconfigdir}/nodejs%{node_version_major}_abi.req
 %{nodejs_datadir}/common.gypi
+}
+%files      devel %{files_devel}
 
 %files -n   v8-%{v8_version_major}.%{v8_version_minor}-devel
 %license    LICENSE
@@ -625,13 +741,28 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %license    deps/npm/LICENSE
 %dir        %{nodejs_datadir}/
 %dir        %{nodejs_private_sitelib}/
+# Symlinks to binaries
 %{_bindir}/npm-%{node_version_major}
 %{_bindir}/npx-%{node_version_major}
+# Versioned man pages for case when -bins are not installed
 %{_mandir}/man1/npm-%{node_version_major}.1*
 %{_mandir}/man1/npx-%{node_version_major}.1*
+# No %dir means recursive (own files)
 %{nodejs_datadir}/man
 %{nodejs_private_sitelib}/npm/
 %exclude    %{nodejs_datadir}/man/man1/node*.1*
+
+%global     files_npm_bin %{expand:
+%license    deps/npm/LICENSE
+%{_bindir}/npm
+%{_bindir}/npx
+%{_mandir}/
+%exclude %{_mandir}/man1/node.1*
+%exclude %{_mandir}/man1/node-%{node_version_major}.1*
+%exclude %{_mandir}/man1/npm-%{node_version_major}.1*
+%exclude %{_mandir}/man1/npx-%{node_version_major}.1*
+}
+%files      npm-bin %{files_npm_bin}
 
 %files      docs
 %doc        doc/README.md
@@ -640,95 +771,113 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %{_pkgdocdir}/html/
 %{_pkgdocdir}/npm/
 
+%if %{with rolling_stream}
+%files -n   nodejs %{files_bin}
+%files -n   nodejs-npm %{files_npm_bin}
+%files -n   nodejs-devel %{files_devel}
+%endif
+
 %changelog
 ## START: Generated by rpmautospec
-* Sat Nov 07 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1:24.22.1-5
-- fix(nodejs24): upgrade to 24.22.1 to address CVEs
+* Tue Nov 10 2026 Binu Jose Philip <binujp@gmail.com> - 1:24.22.1-6
+- feat(nodejs24): adopt Fedora 44 parallel runtime packaging
 
 * Tue Nov 03 2026 Jan Staněk <jstanek@redhat.com> - 1:24.22.1-4
 - Patch undici bundled in npm
 
-* Tue Nov 03 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-3
+* Fri Oct 30 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-3
 - Update bundled ip-address to 10.7.4
 
-* Tue Nov 03 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-2
+* Fri Oct 30 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-2
 - Update bundled brace-expansion to 5.0.12 (both copies)
 
-* Tue Nov 03 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-1
+* Fri Oct 30 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-1
 - Update to version 24.22.1
 
-* Tue Nov 03 2026 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 1:24.21.0-3
+* Fri Oct 16 2026 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 1:24.21.0-3
 - Fix build on the RISC-V architecture
 
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.21.0-2
+* Fri Oct 16 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.21.0-2
 - Fix typos in test-runner.sh
 
-* Tue Nov 03 2026 Jan Staněk <jstanek@redhat.com> - 1:24.21.0-1
+* Thu Sep 10 2026 Jan Staněk <jstanek@redhat.com> - 1:24.21.0-1
 - Update to version 24.21.0 (rhbz#2531008)
 - Remove upstreamed npm patches
 - Use system c-ares again
 
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.19.0-1
+* Mon Aug 31 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.19.0-1
 - update to version 24.19.0 (rhbz#2510683)
 
-* Tue Nov 03 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.18.1-1
+* Fri Jul 31 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.18.1-1
 - Rebase to 24.18.1
 
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-3
+* Thu Jul 30 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-6
 - Fix CVE-2026-13149 (brace-expansion)
 
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-2
+* Thu Jul 30 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-5
 - Fix CVE-2026-59873 and CVE-2026-59874 (nodejs-tar)
 
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-1
+* Wed Jul 29 2026 Jan Staněk <jstanek@redhat.com> - 1:24.18.0-4
+- Adjust test plan to avoid rolling-stream conflicts
+
+* Wed Jul 29 2026 Jan Staněk <jstanek@redhat.com> - 1:24.18.0-3
+- Add rolling-stream option
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:24.18.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jul 09 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-1
 - Update to version 24.18.0 (rhbz#2480530)
 
-* Mon Oct 05 2026 Dan Streetman <ddstreet@ieee.org> - 1:24.15.0-3
-- chore: update 'lock' files and render changed components
-
-* Mon May 04 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.15.0-2
-- test plan: diverge from f44
-- bin packages were introduced in f44 onwards
-
-* Tue Apr 28 2026 Jan Staněk <jstanek@redhat.com> - 1:24.15.0-1
+* Mon Apr 20 2026 Jan Staněk <jstanek@redhat.com> - 1:24.15.0-1
 - Update to version 24.15.0 (rhbz#2458897)
 - Start reporting version of bundled nodejs-minimatch.
 
-* Thu Mar 26 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.1-3
+* Wed Mar 25 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.1-3
 - Update bundled nghttp2 to 1.68.1
 
-* Thu Mar 26 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.1-2
+* Wed Mar 25 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.1-2
 - cleanup: remove unused patches
 
-* Thu Mar 26 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.14.1-1
+* Wed Mar 25 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.14.1-1
 - Update to version 24.14.1 (rhbz#2442366)
 
-* Thu Mar 26 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.0-2
+* Mon Mar 23 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.14.0-4
+- Remove disablement of LTO from specfile
+
+* Mon Mar 23 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.0-3
 - Swap definition order for metadata fields
 
-* Thu Mar 26 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.14.0-1
+* Fri Mar 20 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.14.0-2
+- test: add sub-plan covering -bin packages
+- make metadata shared between sub-plans
+
+* Fri Mar 06 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.14.0-1
 - Update to version 24.14.0 (rhbz#2442366).
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:24.13.1-4
-- build: mass rebuild auto-bumpable components
-
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:24.13.1-3
-- build: mass rebuild auto-bumpable components
-
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 1:24.13.1-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
-
-* Thu Feb 19 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.13.1-1
+* Wed Feb 18 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.13.1-1
 - Update to version 24.13.1 (rhbz#2438455)
 
-* Thu Jan 22 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.13.0-4
+* Tue Feb 17 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.13.0-8
+- spec: remove obsolete requires
+
+* Mon Feb 16 2026 Jan Staněk <jstanek@redhat.com> - 1:24.13.0-7
+- Own /usr/lib/node_modules again (rhbz#2438831)
+
+* Thu Feb 12 2026 Miro Hrončok <miro@hroncok.cz> - 1:24.13.0-6
+- Ensure /usr/bin/node is installed with nodejs, /usr/bin/npm with npm
+
+* Mon Jan 19 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.13.0-5
+- Introducing bin packages
+
+* Mon Jan 19 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.13.0-4
 - Replace usage of man_info_compress to be funcional across all branches.
 
-* Thu Jan 22 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.13.0-3
+* Mon Jan 19 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.13.0-3
 - build: expose libplatform symbols in shared libnode
 
-* Mon Jan 19 2026 Jan Staněk <jstanek@redhat.com> - 1:24.13.0-2
-- Diverge from rawhide
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:24.13.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Tue Jan 13 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.13.0-1
 - Update to version 24.13.0 (rhbz#2421027)

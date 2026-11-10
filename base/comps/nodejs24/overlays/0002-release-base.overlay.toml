@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Keep the f44 branch migration newer than the shipped nodejs24-24.22.1-5 RPMs"
+type = "spec-update-tag"
+tag = "Release"
+value = "%autorelease -b 2"
