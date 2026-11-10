@@ -68,6 +68,9 @@
         <package name="coreutils-single" />
         <package name="libcurl-minimal" />
     </packages>
+    <packages type="image" profiles="core">
+        <file name="compact-rpmdb.sh" target="/image/images.sh" permissions="0755" />
+    </packages>
     <packages type="image" profiles="ContainerCore">
         <package name="azurelinux-release-container" />
         <package name="bash" />
