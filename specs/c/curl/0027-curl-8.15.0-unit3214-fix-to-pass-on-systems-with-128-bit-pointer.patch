@@ -1,0 +1,59 @@
+From 268679ddd77cd25f8f1868804a89191ff115ba17 Mon Sep 17 00:00:00 2001
+From: Collin Funk <collin.funk1@gmail.com>
+Date: Sat, 11 Jul 2026 00:47:16 -0700
+Subject: [PATCH] unit3214: fix to pass on systems with >=128-bit pointers
+ and bump MAX_CONNECTDATA
+
+E.g. on CHERI pointers are 128 bits [1]. This causes the unit3214 test
+to fail, which was written with more traditional platforms in mind.
+
+Multiply the allowed size on systems with larger than 64-bit pointers.
+
+[1] https://www.cl.cam.ac.uk/research/security/ctsrd/pdfs/20171017a-cheri-poster.pdf
+
+Closes #22299
+
+(cherry picked from commit dfa444f1e59c52b56fb0d16152e610e4c29c7115)
+
+Additionally, bump MAX_CONNECTDATA from 1300 to 1400.
+
+The CVE-2026-8932 fix (incomplete mTLS config matching in conn reuse)
+promoted cert_type, key, key_type, key_passwd and key_blob from
+ssl_config_data into ssl_primary_config, which is embedded inside
+struct connectdata. This grew the struct by 28 bytes to 1328 on
+64-bit systems, exceeding the previous limit of 1300.
+---
+ tests/unit/unit3214.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/tests/unit/unit3214.c b/tests/unit/unit3214.c
+index fa65b06c58..130e585193 100644
+--- a/tests/unit/unit3214.c
++++ b/tests/unit/unit3214.c
+@@ -27,6 +27,11 @@
+ 
+ static void checksize(const char *name, size_t size, size_t allowed)
+ {
++  /* Some platforms, e.g., CHERI, have 128-bit pointers. Allow structs to be
++     double the size of what we would typically expect. */
++  if(sizeof(void *) > 8)
++    allowed *= sizeof(void *) / 8;
++
+   if(size > allowed) {
+     fprintf(stderr, "BAD: struct %s is %d bytes, allowed to be %d",
+             name, (int)size, (int)allowed);
+@@ -39,9 +44,10 @@ static void checksize(const char *name, size_t size, size_t allowed)
+   }
+ }
+ 
+-/* the maximum sizes we allow specific structs to grow to */
++/* The maximum sizes we allow specific structs to grow to.
++   These sizes were chosen with platforms with 64-bit pointers in mind. */
+ #define MAX_CURL_EASY           5800
+-#define MAX_CONNECTDATA         1300
++#define MAX_CONNECTDATA         1400
+ #define MAX_CURL_MULTI          750
+ #define MAX_CURL_HTTPPOST       112
+ #define MAX_CURL_SLIST          16
+-- 
+2.56.0

@@ -1,0 +1,11 @@
+# Backport curl/curl@9be300cb5eadc16a432e321a76c8efc5250d53c4: reserve
+# distinct ports for the HTTP/2 and HTTP/3 test servers.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [{ url = "https://github.com/curl/curl/commit/9be300cb5eadc16a432e321a76c8efc5250d53c4" }]
+
+[[overlays]]
+description = "Prevent HTTP/2 and HTTP/3 test servers from reusing the same cleartext and TLS listener port"
+type = "patch-add"
+source = "../curl-8.15.0-test-servers-no-port-reuse.patch"

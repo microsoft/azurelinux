@@ -1,0 +1,33 @@
+From bcab7cf0278ca4167bffe30501ca0447ff57ba66 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Mon, 9 Nov 2026 11:06:00 +0530
+Subject: [PATCH] vtls_scache: free the SRP username when clearing a peer
+
+Fedora's curl-8.15.0 backport of upstream commit 7541ae569d82 ("tls: fix
+incomplete mTLS config in conn reuse and session cache", CVE-2026-8932)
+dropped Curl_safefree(peer->srp_username) from cf_ssl_scache_clear_peer()
+while adding the new key_passwd free. cf_ssl_scache_peer_init() still
+strdup()s the TLS-SRP username, so the allocation leaks whenever a
+session cache peer created with CURLOPT_TLSAUTH_USERNAME is evicted,
+removed or destroyed.
+
+Upstream 7541ae569d82 and Fedora's curl-8.18.0 backport keep this free;
+restore it to match.
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ lib/vtls/vtls_scache.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/vtls/vtls_scache.c b/lib/vtls/vtls_scache.c
+index 6adab68..3e95c10 100644
+--- a/lib/vtls/vtls_scache.c
++++ b/lib/vtls/vtls_scache.c
+@@ -192,6 +192,7 @@ static void cf_ssl_scache_clear_peer(struct Curl_ssl_scache_peer *peer)
+   Curl_safefree(peer->clientcert);
+   Curl_safefree(peer->key_passwd);
+ #ifdef USE_TLS_SRP
++  Curl_safefree(peer->srp_username);
+   Curl_safefree(peer->srp_password);
+ #endif
+   Curl_safefree(peer->ssl_peer_key);

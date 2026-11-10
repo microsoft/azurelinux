@@ -1,0 +1,16 @@
+# Fedora's curl-8.15.0 backport of CVE-2026-8932 (0024-curl-8.15.0-CVE-2026-8932.patch,
+# f43 commit 29bdf5eade) drops Curl_safefree(peer->srp_username) from
+# cf_ssl_scache_clear_peer(), so the TLS-SRP username that cf_ssl_scache_peer_init()
+# strdup()s leaks whenever a session cache peer is evicted, removed or destroyed.
+# Upstream 7541ae569d82 and Fedora's curl-8.18.0 backport (f44) keep the free.
+# Drop this overlay once the pinned Fedora curl frees srp_username again.
+
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [{ url = "https://github.com/curl/curl/commit/7541ae569d82fb308a5e2d94916027da4fa3ba3e" }]
+
+[[overlays]]
+description = "Restore the TLS-SRP username free that Fedora's curl-8.15.0 CVE-2026-8932 backport dropped"
+type = "patch-add"
+source = "../curl-8.15.0-vtls_scache-free-srp-username.patch"

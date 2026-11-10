@@ -1,0 +1,24 @@
+From: Jan Macku <jamacku@redhat.com>
+Date: Tue, 7 Oct 2026 08:00:00 +0200
+Subject: [PATCH] tests: mark test 1501 as flaky
+
+Test 1501 checks that curl_multi_perform() never blocks for more than
+500ms. Under valgrind on i686, this threshold is regularly exceeded due
+to instrumentation overhead, causing spurious failures.
+
+Mark the test as flaky so it is skipped when running with '!flaky'.
+---
+ tests/data/test1501 | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/data/test1501 b/tests/data/test1501
+--- a/tests/data/test1501
++++ b/tests/data/test1501
+@@ -3,6 +3,7 @@
+ <keywords>
+ FTP
+ RETR
++flaky
+ multi
+ LIST
+ DELAY
