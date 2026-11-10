@@ -11,7 +11,7 @@ Upstream-status: Azure Linux trust-store backport
 
 --- a/mlxfwupdate/certificate/ca-bundle.crt
 +++ b/mlxfwupdate/certificate/ca-bundle.crt
-@@ -3140,3 +3140,20 @@
+@@ -3078,3 +3078,20 @@
  OPQD8rv7gmsHINFSH5pkAnuYZttcTVoP0ISVoDwUQwbKytu4QTbaakRnh6+v40URFWkIsr4WOZck
  bxJF0WddCajJFdr60qZfE2Efv4WstK2tBZQIgx51F9NxO5NQI1mg7TyRVJ12AMXDuDjb
  -----END CERTIFICATE-----
