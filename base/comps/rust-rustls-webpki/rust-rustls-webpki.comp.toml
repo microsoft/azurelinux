@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-rustls-webpki-0.103.16-1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/rust-rustls-webpki/c/501d9c2c6446d0fdf3635b6759c3c93148d96a75
+[components.rust-rustls-webpki]
+spec = { type = "upstream", upstream-commit = "501d9c2c6446d0fdf3635b6759c3c93148d96a75" }
