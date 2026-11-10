@@ -1,0 +1,62 @@
+From 4697eeb37b7c3c30b0492e344f6b89f7139cef26 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+Date: Sat, 14 Dec 2024 19:13:06 +0100
+Subject: [PATCH] Don't crash on multi-line config values
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The parsing of the output of `git config --list` fails if any of the
+config values contain newlines. Fix this by using the --null parameter
+to `git config`, which is designed for this purpose.
+
+Add a simple test that causes the crash pre-patch.
+
+Signed-off-by: Toke Høiland-Jørgensen <toke@toke.dk>
+---
+ git-filter-repo               |  6 +++---
+ t/t9390-filter-repo-basics.sh | 11 +++++++++++
+ 2 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/git-filter-repo b/git-filter-repo
+index a40bce54..3b75eadd 100755
+--- a/git-filter-repo
++++ b/git-filter-repo
+@@ -1683,14 +1683,14 @@ class GitUtils(object):
+   def get_config_settings(repo_working_dir):
+     output = ''
+     try:
+-      output = subproc.check_output('git config --list'.split(),
++      output = subproc.check_output('git config --list --null'.split(),
+                                     cwd=repo_working_dir)
+     except subprocess.CalledProcessError as e: # pragma: no cover
+       raise SystemExit('fatal: {}'.format(e))
+ 
+     # FIXME: Ignores multi-valued keys, just let them overwrite for now
+-    return dict(line.split(b'=', maxsplit=1)
+-                for line in output.strip().split(b"\n"))
++    return dict(item.split(b'\n', maxsplit=1)
++                for item in output.strip().split(b"\0") if item)
+ 
+   @staticmethod
+   def get_blob_sizes(quiet = False):
+diff --git a/t/t9390-filter-repo-basics.sh b/t/t9390-filter-repo-basics.sh
+index c129799f..1dc2dca7 100755
+--- a/t/t9390-filter-repo-basics.sh
++++ b/t/t9390-filter-repo-basics.sh
+@@ -895,4 +895,15 @@ test_expect_success 'origin refs without origin remote does not die' '
+ 	)
+ '
+ 
++test_expect_success 'multi-line config value' '
++	test_create_repo multiline_config &&
++	(
++		cd multiline_config &&
++
++		git config set test.test "test
++test" &&
++		git filter-repo --force
++	)
++'
++
+ test_done

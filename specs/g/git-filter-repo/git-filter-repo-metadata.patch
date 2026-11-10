@@ -1,0 +1,19 @@
+Index: git-filter-repo-2.47.0/pyproject.toml
+===================================================================
+--- git-filter-repo-2.47.0.orig/pyproject.toml	2025-04-22 18:03:39.197041269 +0200
++++ git-filter-repo-2.47.0/pyproject.toml	2025-04-22 18:04:21.721820007 +0200
+@@ -1,5 +1,6 @@
+ [project]
+ name = "git-filter-repo"
++version = "2.47.0"
+ description = "Quickly rewrite git repository history"
+ authors = [
+     {name = "Elijah Newren", email = "newren@gmail.com"}
+@@ -23,7 +24,6 @@ classifiers = [
+ ]
+ license.text = "MIT"
+ requires-python = ">= 3.6"
+-dynamic = ["version"]
+ 
+ [project.urls]
+ Homepage = "https://github.com/newren/git-filter-repo"
