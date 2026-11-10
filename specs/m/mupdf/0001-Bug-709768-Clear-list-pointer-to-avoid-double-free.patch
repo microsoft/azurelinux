@@ -1,0 +1,42 @@
+From 594a8f1774dd6838fbbc7c5ba19c8e60b212bbff Mon Sep 17 00:00:00 2001
+Message-ID: <594a8f1774dd6838fbbc7c5ba19c8e60b212bbff.1792587545.git.mjg@fedoraproject.org>
+From: Sebastian Rasmussen <sebras@gmail.com>
+Date: Wed, 30 Sep 2026 13:16:29 +0200
+Subject: [PATCH] Bug 709768: Clear list pointer to avoid double free.
+
+The bug shows up when signing a crafted PDF-file where a signature
+object has two reference dictionaries that specify which field
+objects should be included in the digest: one references a
+specific field, and the other one specifies /All implying that
+all fields should be included.
+
+When encountering /All MuPDF drops the list of field names that
+created when parsing the first signature reference dictionary.
+While doing so, all names in that list are freed, as is the list
+itself, but crucially the pointer to the list is not reset to
+NULL.
+
+Later on when the code for freeing the list is called again,
+MuPDF attempts to free the stale list pointer.
+
+As mentioned in the report by Suyuan Wang the fix is to set the
+list pointer to NULL when the list of field names is freed.
+---
+ source/pdf/pdf-xref.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/source/pdf/pdf-xref.c b/source/pdf/pdf-xref.c
+index ca25fea42..db21647ee 100644
+--- a/source/pdf/pdf-xref.c
++++ b/source/pdf/pdf-xref.c
+@@ -4176,6 +4176,7 @@ free_char_list(fz_context *ctx, char_list *c)
+ 	for (i = c->len-1; i >= 0; i--)
+ 		fz_free(ctx, c->list[i]);
+ 	fz_free(ctx, c->list);
++	c->list = NULL;
+ 	c->len = 0;
+ 	c->max = 0;
+ }
+-- 
+2.56.0.317.g652edc0b5e
+

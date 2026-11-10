@@ -1,0 +1,4 @@
+# Pin to Fedora f43 mupdf-1.27.2-5 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/mupdf/c/61c416e6cd6c35e8331a4680a8f045be97f9e52e
+[components.mupdf]
+spec = { type = "upstream", upstream-commit = "61c416e6cd6c35e8331a4680a8f045be97f9e52e" }
