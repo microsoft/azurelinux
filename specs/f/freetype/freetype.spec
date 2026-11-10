@@ -6,7 +6,7 @@
 
 Name: freetype
 Version: 2.13.3
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary: A free and portable font rendering engine
 License: (FTL OR GPL-2.0-or-later) AND BSD-3-Clause AND MIT AND MIT-Modern-Variant AND LicenseRef-Fedora-Public-Domain AND Zlib
 URL: http://www.freetype.org
@@ -27,6 +27,8 @@ Patch3:  freetype-2.6.5-libtool.patch
 Patch4:  freetype-2.8-multilib.patch
 
 Patch5:  freetype-2.10.0-internal-outline.patch
+
+Patch6:  freetype-2.13.3-ttcolr-overflow.patch
 
 BuildRequires: gcc
 BuildRequires: libX11-devel
@@ -89,6 +91,7 @@ popd
 %patch 3 -p1 -b .libtool
 %patch 4 -p1 -b .multilib
 %patch 5 -p1 -b .internal-outline
+%patch 6 -p1 -b .ttcolr-overflow
 
 %build
 
@@ -230,6 +233,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
 %{_mandir}/man1/*
 
 %changelog
+* Wed Oct 21 2026 Marek Kasik <mkasik@redhat.com> - 2.13.3-4
+- Fix overflow in tt_face_colr_blend_layer()
+- Resolves: #2545198
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.13.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

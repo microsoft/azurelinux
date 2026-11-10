@@ -1,0 +1,199 @@
+From be8e126ae0275ad181616f4dd66855908e1f7a75 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Fri, 20 Feb 2026 22:50:50 -0500
+Subject: [PATCH 2/2] [base] Clean up bitmap allocations.
+
+* src/base/src/base/ftobjs.c (ft_glyphslot_alloc_bitmap): Use preset
+dimensions and call FT_MEM_ALLOC_MULT.
+* include/freetype/internal/ftobjs.h (ft_glyphslot_alloc_bitmap):
+Updated signature...
+* src/*: ... and all callers.
+---
+ include/freetype/internal/ftobjs.h |  4 ++--
+ src/base/ftobjs.c                  |  8 +++++---
+ src/pcf/pcfdrivr.c                 |  2 +-
+ src/pfr/pfrsbit.c                  | 11 +++--------
+ src/sfnt/pngshim.c                 |  5 +----
+ src/sfnt/ttcolr.c                  |  7 +------
+ src/sfnt/ttsbit.c                  | 11 ++---------
+ 7 files changed, 15 insertions(+), 33 deletions(-)
+
+diff --git a/include/freetype/internal/ftobjs.h b/include/freetype/internal/ftobjs.h
+index 041929652..d4d7bc00f 100644
+--- a/include/freetype/internal/ftobjs.h
++++ b/include/freetype/internal/ftobjs.h
+@@ -714,9 +714,9 @@ FT_BEGIN_HEADER
+                               const FT_Vector*  origin );
+ 
+   /* Allocate a new bitmap buffer in a glyph slot. */
++  /* Dimensions must be preset in advance.         */
+   FT_BASE( FT_Error )
+-  ft_glyphslot_alloc_bitmap( FT_GlyphSlot  slot,
+-                             FT_ULong      size );
++  ft_glyphslot_alloc_bitmap( FT_GlyphSlot  slot );
+ 
+ 
+   /* Set the bitmap buffer in a glyph slot to a given pointer.  The buffer */
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index 5b6d5d171..323dd5efa 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -565,8 +565,7 @@
+ 
+ 
+   FT_BASE_DEF( FT_Error )
+-  ft_glyphslot_alloc_bitmap( FT_GlyphSlot  slot,
+-                             FT_ULong      size )
++  ft_glyphslot_alloc_bitmap( FT_GlyphSlot  slot )
+   {
+     FT_Memory  memory = FT_FACE_MEMORY( slot->face );
+     FT_Error   error;
+@@ -577,7 +576,10 @@
+     else
+       slot->internal->flags |= FT_GLYPH_OWN_BITMAP;
+ 
+-    FT_MEM_ALLOC( slot->bitmap.buffer, size );
++    /* dimensions must be preset */
++    FT_MEM_ALLOC_MULT( slot->bitmap.buffer,
++                       slot->bitmap.rows,
++                       slot->bitmap.pitch );
+     return error;
+   }
+ 
+diff --git a/src/pcf/pcfdrivr.c b/src/pcf/pcfdrivr.c
+index 39745610b..6d65c6909 100644
+--- a/src/pcf/pcfdrivr.c
++++ b/src/pcf/pcfdrivr.c
+@@ -531,7 +531,7 @@ THE SOFTWARE.
+     /* XXX: to do: are there cases that need repadding the bitmap? */
+     bytes = (FT_ULong)bitmap->pitch * bitmap->rows;
+ 
+-    error = ft_glyphslot_alloc_bitmap( slot, (FT_ULong)bytes );
++    error = ft_glyphslot_alloc_bitmap( slot );
+     if ( error )
+       goto Exit;
+ 
+diff --git a/src/pfr/pfrsbit.c b/src/pfr/pfrsbit.c
+index 08db4c459..ecea71d4f 100644
+--- a/src/pfr/pfrsbit.c
++++ b/src/pfr/pfrsbit.c
+@@ -785,20 +785,15 @@
+           goto Exit1;
+ 
+         /* Allocate and read bitmap data */
+-        {
+-          FT_ULong  len = (FT_ULong)glyph->root.bitmap.pitch * ysize;
+-
+-
+-          error = ft_glyphslot_alloc_bitmap( &glyph->root, len );
+-          if ( !error )
+-            error = pfr_load_bitmap_bits(
++        error = ft_glyphslot_alloc_bitmap( &glyph->root );
++        if ( !error )
++          error = pfr_load_bitmap_bits(
+                       p,
+                       stream->limit,
+                       format,
+                       FT_BOOL( face->header.color_flags &
+                                PFR_FLAG_INVERT_BITMAP   ),
+                       &glyph->root.bitmap );
+-        }
+       }
+ 
+     Exit1:
+diff --git a/src/sfnt/pngshim.c b/src/sfnt/pngshim.c
+index 9df75dc3a..24fb34555 100644
+--- a/src/sfnt/pngshim.c
++++ b/src/sfnt/pngshim.c
+@@ -420,10 +420,7 @@
+     if ( populate_map_and_metrics )
+     {
+       /* this doesn't overflow: 0x7FFF * 0x7FFF * 4 < 2^32 */
+-      FT_ULong  size = map->rows * (FT_ULong)map->pitch;
+-
+-
+-      error = ft_glyphslot_alloc_bitmap( slot, size );
++      error = ft_glyphslot_alloc_bitmap( slot );
+       if ( error )
+         goto DestroyExit;
+     }
+diff --git a/src/sfnt/ttcolr.c b/src/sfnt/ttcolr.c
+index 8bae5f7b9..7929b7aaf 100644
+--- a/src/sfnt/ttcolr.c
++++ b/src/sfnt/ttcolr.c
+@@ -1749,7 +1749,6 @@
+     FT_UInt  x, y;
+     FT_Byte  b, g, r, alpha;
+ 
+-    FT_ULong  size;
+     FT_Byte*  src;
+     FT_Byte*  dst;
+ 
+@@ -1767,13 +1766,9 @@
+       dstSlot->bitmap.pitch      = (int)dstSlot->bitmap.width * 4;
+       dstSlot->bitmap.num_grays  = 256;
+ 
+-      size = dstSlot->bitmap.rows * (unsigned int)dstSlot->bitmap.pitch;
+-
+-      error = ft_glyphslot_alloc_bitmap( dstSlot, size );
++      error = ft_glyphslot_alloc_bitmap( dstSlot );
+       if ( error )
+         return error;
+-
+-      FT_MEM_ZERO( dstSlot->bitmap.buffer, size );
+     }
+     else
+     {
+diff --git a/src/sfnt/ttsbit.c b/src/sfnt/ttsbit.c
+index 9f9013bf3..34e456198 100644
+--- a/src/sfnt/ttsbit.c
++++ b/src/sfnt/ttsbit.c
+@@ -547,7 +547,6 @@
+     FT_Error    error = FT_Err_Ok;
+     FT_UInt     width, height;
+     FT_Bitmap*  map = decoder->bitmap;
+-    FT_ULong    size;
+ 
+ 
+     if ( !decoder->metrics_loaded )
+@@ -599,17 +598,11 @@
+       goto Exit;
+     }
+ 
+-    size = map->rows * (FT_ULong)map->pitch;
+-
+-    /* check that there is no empty image */
+-    if ( size == 0 )
+-      goto Exit;     /* exit successfully! */
+-
+     if ( metrics_only )
+       goto Exit;     /* only metrics are requested */
+ 
+-    error = ft_glyphslot_alloc_bitmap( decoder->face->root.glyph, size );
+-    if ( error )
++    error = ft_glyphslot_alloc_bitmap( decoder->face->root.glyph );
++    if ( error || !map->buffer )
+       goto Exit;
+ 
+     decoder->bitmap_allocated = 1;
+From 156c7ea38f99de0d3827d0340fe6399325ef8cc7 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Fri, 20 Feb 2026 07:55:43 -0500
+Subject: * src/sfnt/ttcolr.c (tt_face_colr_blend_layer): Use FT_ALLOC_MULT.
+
+Fixes #1389. The overflow is detected in ft_mem_qrealloc.
+
+diff --git a/src/sfnt/ttcolr.c b/src/sfnt/ttcolr.c
+index ad9ad6f27..8bae5f7b9 100644
+--- a/src/sfnt/ttcolr.c
++++ b/src/sfnt/ttcolr.c
+@@ -1805,8 +1805,7 @@
+         FT_Byte*  q;
+ 
+ 
+-        size  = rows * pitch;
+-        if ( FT_ALLOC( buf, size ) )
++        if ( FT_ALLOC_MULT( buf, rows, pitch ) )
+           return error;
+ 
+         p = dstSlot->bitmap.buffer;
