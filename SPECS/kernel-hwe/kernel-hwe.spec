@@ -433,6 +433,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.57.1-1
 - Auto-upgrade to 6.18.57.1
 
+* Wed Sep 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.54.1-1
+- Auto-upgrade to 6.18.54.1
+
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.48.1-1
 - Auto-upgrade to 6.18.48.1
 

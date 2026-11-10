@@ -3,13 +3,14 @@ Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
 Version:        1.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Tools/Container
 URL:            https://github.com/opencontainers/runc
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-61801.patch
 BuildRequires:  git
 BuildRequires:  go-md2man
 BuildRequires:  golang < 1.25
@@ -51,6 +52,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.3-2
+- Patch for CVE-2026-61801
+
 * Thu Sep 03 2026 Nan Liu <liunan@microsoft.com> - 1.4.3-1
 - Upgrade to 1.4.3
 

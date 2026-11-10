@@ -51,6 +51,9 @@ developing applications that use %{name}.
 * Fri Nov 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.7-1
 - Auto-upgrade to 4.9.7 - for CVE-2026-120830, CVE-2026-120831
 
+* Mon Oct 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.6-1
+- Auto-upgrade to 4.9.6 - for CVE-2026-115449
+
 * Thu Sep 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.5-1
 - Auto-upgrade to 4.9.5 - for CVE-2026-95508
 

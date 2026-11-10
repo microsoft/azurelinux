@@ -6,8 +6,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-64k-signed-%{buildarch}
-Version:        6.6.159.1
-Release:        2%{?dist}
+Version:        6.6.161.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,14 +105,20 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Wed Nov 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.161.1-1
+- Auto-upgrade to 6.6.161.1
+
 * Wed Oct 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 6.6.159.1-2
 - Bump release number to match kernel release.
 
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.159.1-1
 - Auto-upgrade to 6.6.159.1
 
-* Mon Oct 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.158.1-1
+* Sat Oct 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.158.1-1
 - Auto-upgrade to 6.6.158.1
+
+* Thu Oct 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.157.1-2
+- Bump release to match kernel-64k
 
 * Tue Sep 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.157.1-1
 - Auto-upgrade to 6.6.157.1

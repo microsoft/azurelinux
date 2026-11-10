@@ -35,7 +35,7 @@
 Name:         qtbase
 Summary:      Qt6 - QtBase components
 Version:      6.6.3
-Release:      6%{?dist}
+Release:      7%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -101,6 +101,7 @@ Patch66: CVE-2025-30348.patch
 Patch67: CVE-2025-5455.patch
 Patch68: CVE-2026-15037.patch
 Patch69: CVE-2026-11573.patch
+Patch70: CVE-2026-78253.patch
 
 # Do not check any files in %%{_qt_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -705,6 +706,9 @@ fi
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.3-7
+- Patch for CVE-2026-78253
+
 * Mon Sep 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.3-6
 - Patch for CVE-2026-11573
 

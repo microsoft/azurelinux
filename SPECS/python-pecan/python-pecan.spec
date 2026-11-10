@@ -6,7 +6,7 @@
 Summary:        A lean and fast WSGI object-dispatching web framework
 Name:           python-%{pkgname}
 Version:        1.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Url:            https://www.pecanpy.org/
 Vendor:         Microsoft Corporation
@@ -55,7 +55,11 @@ python3 setup.py install --root=%{buildroot}
 
 %if %{with check}
 %check
-pip3 install tox==3.4.0
+# Pin packaging to the RPM-installed version so pip does not try to
+# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
+# rpm-installed copy has no RECORD file, so pip aborts with
+# uninstall-no-record-file and the test tooling is never installed.
+pip3 install packaging==23.2 tox==3.4.0
 tox
 %endif
 
@@ -66,6 +70,10 @@ tox
 %{_bindir}/gunicorn_pecan
 
 %changelog
+* Mon Oct 12 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.5.1-2
+- Pin packaging==23.2 when pip-installing test tooling in %%check to fix
+  ptest failure (uninstall-no-record-file) caused by virtualenv 21.14.6.
+
 * Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> 1.5.1-1
 - Upgrade to version 1.5.1
 
