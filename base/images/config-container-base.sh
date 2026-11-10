@@ -359,20 +359,20 @@ if [[ ",${kiwi_profiles:-}," == *,pytorch-workload,* ]]; then
 fi
 
 # ---------------------------------------------------------------------------
-# 3e. busybox-workload only: install applet symlinks
+# 3e. Retained busybox: install applet symlinks
 # ---------------------------------------------------------------------------
-# When the "busybox" package itself is on the keep list (busybox-workload),
-# the shared runtime test harness still needs a `sh`/`sleep`/`echo` on PATH
-# to start and exec into the container (it runs `sleep infinity` as the
-# keep-alive command and `echo`/a shell for exec calls) -- busybox does not
-# install applet symlinks itself. Wire up the minimum set the harness
-# needs; busybox dispatches on argv[0], so these are just symlinks, not
-# separate binaries.
 if printf '%s\n' "${RESOLVED_KEEP_PKGS}" | /tmp/busybox grep -qxF busybox; then
-    echo "=== Installing busybox applet symlinks (sh, sleep, echo) ==="
-    for applet in sh sleep echo; do
-        /tmp/busybox ln -sf /usr/bin/busybox "/usr/bin/${applet}"
-    done
+    if [[ ",${kiwi_profiles:-}," == *,busybox-workload,* ]]; then
+        # Use the retained binary, not /tmp/busybox, which is removed below.
+        echo "=== Installing all busybox applet symlinks ==="
+        /bin/busybox --install -s /bin \
+            || die "failed to install busybox applet symlinks"
+    else
+        echo "=== Installing busybox applet symlinks (sh, sleep, echo) ==="
+        for applet in sh sleep echo; do
+            /tmp/busybox ln -sf /usr/bin/busybox "/usr/bin/${applet}"
+        done
+    fi
 fi
 
 # Package removals are complete; the temporary helpers are not installed RPMs.

@@ -78,9 +78,50 @@ def test_workload_package_management_removed(
     if image_name not in _WORKLOAD_USERS:
         pytest.skip("package-management removal is specific to workload images")
 
-    retained = [
-        path
-        for relative_path in _PACKAGE_MANAGEMENT_PATHS
-        if (path := rootfs / relative_path).exists() or path.is_symlink()
-    ]
+    retained = []
+    for relative_path in _PACKAGE_MANAGEMENT_PATHS:
+        path = rootfs / relative_path
+        # Installing all BusyBox applets exposes rpm without retaining the RPM package.
+        if (
+            image_name == "container-busybox"
+            and relative_path == "usr/bin/rpm"
+            and path.is_symlink()
+            and path.readlink().as_posix() == "/bin/busybox"
+        ):
+            continue
+        if path.exists() or path.is_symlink():
+            retained.append(path)
     assert not retained, f"workload image retained package-management paths: {retained!r}"
+
+
+@pytest.mark.parametrize(
+    ("image_name", "relative_path", "symlink_target", "allowed"),
+    [
+        ("container-busybox", "usr/bin/rpm", "/bin/busybox", True),
+        ("container-busybox", "usr/bin/rpm", "/usr/bin/other", False),
+        ("container-busybox", "usr/bin/rpm", None, False),
+        ("container-nginx", "usr/bin/rpm", "/bin/busybox", False),
+        ("container-busybox", "usr/lib/sysimage/rpm", None, False),
+    ],
+)
+def test_workload_package_management_busybox_exception(
+    tmp_path: Path,
+    image_name: str,
+    relative_path: str,
+    symlink_target: str | None,
+    *,
+    allowed: bool,
+) -> None:
+    """Only the BusyBox image's rpm applet symlink is exempt from the tooling ban."""
+    path = tmp_path / relative_path
+    path.parent.mkdir(parents=True)
+    if symlink_target is None:
+        path.touch()
+    else:
+        path.symlink_to(symlink_target)
+
+    if allowed:
+        test_workload_package_management_removed(tmp_path, image_name)
+    else:
+        with pytest.raises(AssertionError, match="retained package-management paths"):
+            test_workload_package_management_removed(tmp_path, image_name)
