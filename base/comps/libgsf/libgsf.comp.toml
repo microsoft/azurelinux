@@ -1,1 +1,4 @@
+# Pin to Fedora f43 libgsf-1.14.60-1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libgsf/c/c2a22b36101b63d94dc2737405b7a2fcebeabeba
 [components.libgsf]
+spec = { type = "upstream", upstream-commit = "c2a22b36101b63d94dc2737405b7a2fcebeabeba" }
