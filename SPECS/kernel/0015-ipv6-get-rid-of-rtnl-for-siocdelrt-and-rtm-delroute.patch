@@ -1,0 +1,159 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Thu, 17 Apr 2025 17:03:43 -0700
+Subject: [PATCH] ipv6: Get rid of RTNL for SIOCDELRT and RTM_DELROUTE.
+
+Link: https://github.com/torvalds/linux/commit/bd11ff421d36abdb585b9104fa70057bf01b3110
+
+Basically, removing an IPv6 route does not require RTNL because
+the IPv6 routing tables are protected by per table lock.
+
+inet6_rtm_delroute() calls nexthop_find_by_id() to check if the
+nexthop specified by RTA_NH_ID exists.  nexthop uses rbtree and
+the top-down walk can be safely performed under RCU.
+
+ip6_route_del() already relies on RCU and the table lock, but we
+need to extend the RCU critical section a bit more to cover
+__ip6_del_rt().  For example, nexthop_for_each_fib6_nh() and
+inet6_rt_notify() needs RCU.
+
+Let's call nexthop_find_by_id() and __ip6_del_rt() under RCU and
+get rid of RTNL from inet6_rtm_delroute() and SIOCDELRT.
+
+Even if the nexthop is removed after rcu_read_unlock() in
+inet6_rtm_delroute(), __remove_nexthop_fib() cleans up the routes
+tied to the nexthop, and ip6_route_del() returns -ESRCH.  So the
+request was at least valid as of nexthop_find_by_id(), and it's just
+a matter of timing.
+
+Note that we need to pass false to lwtunnel_valid_encap_type_attr().
+The following patches also use the newroute bool.
+
+Note also that fib6_get_table() does not require RCU because once
+allocated fib6_table is not freed until netns dismantle.  I will
+post a follow-up series to convert such callers to RCU-lockless
+version.  [0]
+
+Link: https://lore.kernel.org/netdev/20250417174557.65721-1-kuniyu@amazon.com/ #[0]
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Link: https://patch.msgid.link/20250418000443.43734-3-kuniyu@amazon.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+Backport to Azure Linux 6.6.161.1: Use the 6.6 rtnl_register_module() API
+and existing multipath parser. Route addition is already RTNL-free, so both
+IPv6 tunnel-validation calls pass false and their now-unused local newroute
+selector is removed. Preserve upstream f130a0cc1b4f lock-state API for the
+unchanged IPv4 and nexthop callers; no new locking API or abstraction is
+introduced.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv6/route.c | 38 ++++++++++++++++++++------------------
+ 1 file changed, 20 insertions(+), 18 deletions(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index aabd9ae..fc59476 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4149,9 +4149,9 @@ static int ip6_route_del(struct fib6_config *cfg,
+ 			if (rt->nh) {
+ 				if (!fib6_info_hold_safe(rt))
+ 					continue;
+-				rcu_read_unlock();
+ 
+-				return __ip6_del_rt(rt, &cfg->fc_nlinfo);
++				err = __ip6_del_rt(rt, &cfg->fc_nlinfo);
++				break;
+ 			}
+ 			if (cfg->fc_nh_id)
+ 				continue;
+@@ -4166,13 +4166,13 @@ static int ip6_route_del(struct fib6_config *cfg,
+ 				continue;
+ 			if (!fib6_info_hold_safe(rt))
+ 				continue;
+-			rcu_read_unlock();
+ 
+ 			/* if gateway was specified only delete the one hop */
+ 			if (cfg->fc_flags & RTF_GATEWAY)
+-				return __ip6_del_rt(rt, &cfg->fc_nlinfo);
+-
+-			return __ip6_del_rt_siblings(rt, cfg);
++				err = __ip6_del_rt(rt, &cfg->fc_nlinfo);
++			else
++				err = __ip6_del_rt_siblings(rt, cfg);
++			break;
+ 		}
+ 	}
+ 	rcu_read_unlock();
+@@ -4546,9 +4546,7 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
+ 		err = ip6_route_add(&cfg, GFP_KERNEL, NULL);
+ 		break;
+ 	case SIOCDELRT:
+-		rtnl_lock();
+ 		err = ip6_route_del(&cfg, NULL);
+-		rtnl_unlock();
+ 		break;
+ 	}
+ 	return err;
+@@ -5080,7 +5078,6 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			      struct fib6_config *cfg,
+ 			      struct netlink_ext_ack *extack)
+ {
+-	bool newroute = nlh->nlmsg_type == RTM_NEWROUTE;
+ 	struct rtmsg *rtm;
+ 	struct nlattr *tb[RTA_MAX+1];
+ 	unsigned int pref;
+@@ -5187,7 +5184,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 
+ 		err = lwtunnel_valid_encap_type_attr(cfg->fc_mp,
+ 						     cfg->fc_mp_len,
+-						     extack, !newroute);
++						     extack, false);
+ 		if (err < 0)
+ 			goto errout;
+ 	}
+@@ -5207,7 +5204,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		cfg->fc_encap_type = nla_get_u16(tb[RTA_ENCAP_TYPE]);
+ 
+ 		err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
+-						extack, !newroute);
++						extack, false);
+ 		if (err < 0)
+ 			goto errout;
+ 	}
+@@ -5569,15 +5566,20 @@ static int inet6_rtm_delroute(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (err < 0)
+ 		return err;
+ 
+-	if (cfg.fc_nh_id &&
+-	    !nexthop_find_by_id(sock_net(skb->sk), cfg.fc_nh_id)) {
+-		NL_SET_ERR_MSG(extack, "Nexthop id does not exist");
+-		return -EINVAL;
++	if (cfg.fc_nh_id) {
++		rcu_read_lock();
++		err = !nexthop_find_by_id(sock_net(skb->sk), cfg.fc_nh_id);
++		rcu_read_unlock();
++
++		if (err) {
++			NL_SET_ERR_MSG(extack, "Nexthop id does not exist");
++			return -EINVAL;
++		}
+ 	}
+ 
+-	if (cfg.fc_mp)
++	if (cfg.fc_mp) {
+ 		return ip6_route_multipath_del(&cfg, extack);
+-	else {
++	} else {
+ 		cfg.fc_delete_all_nh = 1;
+ 		return ip6_route_del(&cfg, extack);
+ 	}
+@@ -6847,7 +6849,7 @@ int __init ip6_route_init(void)
+ 		goto out_register_late_subsys;
+ 
+ 	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_DELROUTE,
+-				   inet6_rtm_delroute, NULL, 0);
++				   inet6_rtm_delroute, NULL, RTNL_FLAG_DOIT_UNLOCKED);
+ 	if (ret < 0)
+ 		goto out_register_late_subsys;
+ 
