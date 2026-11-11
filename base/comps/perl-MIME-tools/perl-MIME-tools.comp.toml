@@ -1,8 +1,11 @@
+# Pin to Fedora f43 perl-MIME-tools-5.522 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/perl-MIME-tools/c/413993fe726c71d9ee0fda065c1e7354b6520f2d
 [components.perl-MIME-tools]
+spec = { type = "upstream", upstream-commit = "413993fe726c71d9ee0fda065c1e7354b6520f2d" }
 
 [[components.perl-MIME-tools.source-files]]
-filename = "MIME-tools-5.519.tar.gz"
-hash = "7573b591449a3e235508442ea23f85f6840eb853ba05fe7d58b351949e97e6926e177d19da3e59f6cef094ff297c08494434cfdf661f9e0de8f2880b96795117"
+filename = "MIME-tools-5.522.tar.gz"
+hash = "b9d6ea2f3663f1212f8dcefc450afa1db7fc4c1013b99b8d3c4de8cc021af07481844f7986b402bf52d29556f05997354eddc1713f7c5762bbae648da476b0c2"
 hash-type = "SHA512"
 origin = { type = "overlay" }
 replace-upstream = true

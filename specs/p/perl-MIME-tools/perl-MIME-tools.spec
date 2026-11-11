@@ -3,8 +3,8 @@
 
 Summary:	Modules for parsing and creating MIME entities in Perl
 Name:		perl-MIME-tools
-Version:	5.519
-Release: 6%{?dist}
+Version:	5.522
+Release: 7%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/MIME-tools
 Source0:	https://cpan.metacpan.org/modules/by-module/MIME/MIME-tools-%{version}.tar.gz
@@ -43,10 +43,12 @@ BuildRequires:	perl(Digest::MD5)
 BuildRequires:	perl(Exporter)
 BuildRequires:	perl(IO::Socket::INET)
 BuildRequires:	perl(lib)
+BuildRequires:	perl(strict)
 BuildRequires:	perl(Test::Deep)
 BuildRequires:	perl(Test::More)
 BuildRequires:	perl(Test::Pod)
 BuildRequires:	perl(Test::Pod::Coverage)
+BuildRequires:	perl(warnings)
 # ================ Dependencies ======================
 Requires:	perl(Convert::BinHex)
 
@@ -138,6 +140,68 @@ TEST_POD_COVERAGE=0 make test
 %{_mandir}/man3/MIME::Words.3*
 
 %changelog
+* Wed Oct 28 2026 Paul Howarth <paul@city-fan.org> - 5.522-1
+- Update to 5.522
+  - parse_params: Flag a parameter list that could not be parsed
+    - Detect additional ambiguous parse situations when parameter names contain
+      illegal characters
+    - Fixes: CVE-2026-116264 invalid parameter hides boundary/filename
+  - parse_params: Check the boundary after RFC 2231 reassembly
+    - Another ambiguous-parse case was missed (trailing space after boundary
+      was not detected for RFC-2231-encoded boundaries)
+    - Fixes: CVE-2026-116265 RFC 2231 boundary skips ambiguity checks
+  - parse_params: Stricter checking for encoded boundaries; earlier versions
+    would miss some cases
+    - Fixes: CVE-2026-116266 boundary changed by decoding not flagged
+  - Cap the indentation levels in the Results: structure; otherwise,
+    specially-crafted messages could consume large amounts of memory
+    - Fixes: CVE-2026-116267 indent stored per message per level
+  - parse_params: Stop a comment match at the next parenthesis; otherwise,
+    specially-crafted messages could cause the regex back-tracker to consume
+    large amounts of CPU time
+    - Note that MIME::Parser does not correctly parse ((nested comments)) and
+      has never done so
+    - Fixes: CVE-2026-116268 unclosed "(" comments backtrack CPU exhaustion
+  - parse_params: Re-encode filename* values without charset tricks
+    - Specially-crafted messages could trick recommended_filename() into
+      returning an empty string instead of a plausible filename
+    - Fixes: CVE-2026-116269 RFC 2231 language tag empties filename
+  - decode_mimewords: Do not copy the input into each error; otherwise,
+    specially-crafted messages could consume large amounts of memory
+    - Fixes: CVE-2026-116270 each bad "=?" copies the input into $@
+  - FileUnder: Do not reuse an existing generated directory; otherwise,
+    attackers might be able to use symbolic links to get files created in
+    unexpected locations
+    - Fixes: CVE-2026-116271 FileUnder reuses a pre-created directory
+  - parse_params: Flag comments other readers do not skip
+    - Specially-crafted messages could create ambiguous messages without
+      setting the ambiguous_parse flag
+    - Fixes: CVE-2026-116272  comment hides a duplicate boundary
+  - Call whine() rather than error() if max_parts or max_depth is exceeded
+    during a parse; this lets us return undef rather than throwing an exception
+    if ignore_errors() is set to 0
+  - Change to defaults: max_parts is now set to 1000 and max_depth to 64 rather
+    than being unlimited; this should not affect most real-world uses of
+    MIME::tools, but you may need to increase these values or set them to -1
+    (unlimited) if you run into trouble (* NOTE INCOMPATIBILITY *)
+    - Fixes: CVE-2026-116273 max_parts and max_depth unlimited
+  - Do not signal an ambiguous parse if we have filename="" or name=""
+  - Update author names in META.yml
+  - Add git repo to META.yml
+
+* Thu Oct 22 2026 Paul Howarth <paul@city-fan.org> - 5.520-1
+- Update to 5.520
+  - MIME::Parser used O(N^2) CPU time and memory parsing a MIME message nested
+    N levels deep, and a smallish specially-crafted message could DOS the
+    computer by making it consume enormous amounts of memory and CPU time
+    - The parser was modified to use O(N) time and memory in this case
+    - Additionally, a new MIME::Parser::max_depth() function was added to limit
+      the nesting depth before declaring a parse failure
+  - MIME::Parser would ignore multiple blank lines in a message preamble when
+    parsing it; this could break DKIM
+  - If a MIME boundary includes trailing whitespace, we mark the parse as
+    ambiguous
+
 * Wed Sep 23 2026 Paul Howarth <paul@city-fan.org> - 5.519-1
 - Update to 5.519
   - Some (buggy) software creates base64-encoded parts as a concatenation of
