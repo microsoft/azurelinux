@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Run the default-groups lockfile tests that are new since uv 0.12.19 on Python 3.14 instead of 3.12, which Azure Linux does not ship"
+type = "patch-add"
+source = "../0003-use-python314-project-lock-tests.patch"
