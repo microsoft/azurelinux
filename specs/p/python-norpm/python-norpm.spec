@@ -3,7 +3,7 @@
 
 Name:           python-norpm
 Version:        1.11
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        RPM Macro Expansion in Python
 
 License:        LGPL-2.1-or-later
