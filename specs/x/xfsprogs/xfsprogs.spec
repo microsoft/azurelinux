@@ -4,7 +4,7 @@
 Summary:	Utilities for managing the XFS filesystem
 Name:		xfsprogs
 Version:	6.15.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 License:	GPL-1.0-or-later AND LGPL-2.1-or-later
 URL:		https://xfs.wiki.kernel.org
 Source0:	http://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/%{name}-%{version}.tar.xz
@@ -34,6 +34,7 @@ Provides:       /usr/sbin/fsck.xfs
 Provides:       /usr/sbin/mkfs.xfs
 %endif
 
+Patch0: 0001-align-conventional-realtime-zones.patch
 %description
 A set of commands to use the XFS filesystem, including mkfs.xfs.
 

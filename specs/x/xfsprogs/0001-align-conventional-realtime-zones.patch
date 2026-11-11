@@ -1,0 +1,59 @@
+From b5d372d96db1adb316c91a058dddffb38ef6d166 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Thu, 18 Dec 2025 17:09:32 +0100
+Subject: [PATCH] mkfs: adjust_nr_zones for zoned file system on conventional devices
+
+When creating zoned file systems on conventional devices, mkfs doesn't
+currently align the RT device size to the zone size, which can create
+unmountable file systems.  Fix this by moving the rgcount modification
+to account for reserved zoned and then calling adjust_nr_zones
+unconditionally, and thus ensuring that the rtblocks and rtextents values
+are guaranteed to always be a multiple of the zone size.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+
+Backport to xfsprogs 6.15.0: retain the separate libxfs_init argument
+to adjust_nr_zones. Only warn about a reduced requested size when a
+size was actually supplied, avoiding a null cli->rtsize on the newly
+covered implicit-size path.
+---
+ mkfs/xfs_mkfs.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/mkfs/xfs_mkfs.c b/mkfs/xfs_mkfs.c
+--- a/mkfs/xfs_mkfs.c
++++ b/mkfs/xfs_mkfs.c
+@@ -4457,14 +4457,13 @@ adjust_nr_zones(
+ 	else
+ 		max_zones = DTOBT(xi->rt.size, cfg->blocklog) / cfg->rgsize;
+ 
+-	if (!cli->rgcount)
+-		cfg->rgcount += XFS_RESERVED_ZONES;
+ 	if (cfg->rgcount > max_zones) {
+ 		cfg->rgcount = max_zones;
+-		fprintf(stderr,
+-_("Warning: not enough zones for backing requested rt size due to\n"
+-  "over-provisioning needs, writable size will be less than %s\n"),
+-			cli->rtsize);
++		if (cli->rtsize)
++			fprintf(stderr,
++_("Warning: not enough zones for backing requested rt size due to\n"
++  "over-provisioning needs, writable size will be less than %s\n"),
++				cli->rtsize);
+ 	}
+ 	new_rtblocks = (cfg->rgcount * cfg->rgsize);
+ 	slack = (new_rtblocks - cfg->rtblocks) % cfg->rgsize;
+@@ -4552,9 +4551,9 @@ calculate_zone_geometry(
+ 		}
+ 	}
+ 
+-	if (cli->rtsize || cli->rgcount)
+-		adjust_nr_zones(cfg, cli, xi, zt);
+-
++	if (cli->rtsize)
++		cfg->rgcount += XFS_RESERVED_ZONES;
++	adjust_nr_zones(cfg, cli, xi, zt);
+ 	if (cfg->rgcount < XFS_MIN_ZONES)  {
+ 		fprintf(stderr,
+ _("realtime group count (%llu) must be greater than the minimum zone count (%u)\n"),
