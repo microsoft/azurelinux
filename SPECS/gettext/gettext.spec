@@ -1,13 +1,14 @@
 Summary:        Utilities for internationalization and localization
 Name:           gettext
 Version:        0.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/gettext
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/gettext/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-84243.patch
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}-libs = %{version}-%{release}
 Provides:       %{name}-common-devel = %{version}-%{release}
@@ -19,6 +20,7 @@ messages in the user's native language.
 
 %prep
 %setup -q
+%patch 0 -p1
 
 %build
 export CFLAGS=" %{build_cflags} -Wno-error=format-security "
@@ -58,6 +60,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
+* Wed Nov 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.22-2
+- Patch for CVE-2026-84243
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.22-1
 - Auto-upgrade to 0.22 - Azure Linux 3.0 - package upgrades
 
