@@ -1,0 +1,4 @@
+# Pin to Fedora f43 perl-Cpanel-JSON-XS-4.80 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/perl-Cpanel-JSON-XS/c/2fd25b11ccc176a33d3c31d5ed6e598803500f9d
+[components.perl-Cpanel-JSON-XS]
+spec = { type = "upstream", upstream-commit = "2fd25b11ccc176a33d3c31d5ed6e598803500f9d" }
