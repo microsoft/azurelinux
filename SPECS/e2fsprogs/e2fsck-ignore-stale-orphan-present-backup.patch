@@ -11,7 +11,7 @@ that the file system can be mounted on older kernels.
 
 When a file system with an orphan_file feature is mounted, the
 orphan_present feature is set, and it is cleared when the file system
-is cleanly unmounted.  IF the sytstem crashes when there are no inodes
+is cleanly unmounted.  If the system crashes when there are no inodes
 in the orphan file, e2fsck should just silently clear the flag in
 preen mode.
 

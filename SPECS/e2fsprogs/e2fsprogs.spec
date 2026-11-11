@@ -150,7 +150,7 @@ done
 %defattr(-,root,root)
 
 %changelog
-* Wed Nov 11 2026 Sean Dougherty <22079170+SeanDougherty@users.noreply.github.com> - 1.47.0-4
+* Wed Nov 11 2026 Sean Dougherty <sdougherty@microsoft.com> - 1.47.0-4
 - Backport upstream fix for stale orphan_present in backup superblocks
 - Upstream commit: 24a11cc371a46ca9e68aed8f2cf4aabd22ea81eb
 
