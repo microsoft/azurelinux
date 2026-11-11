@@ -1,6 +1,6 @@
-From 99718d6768b9c0d907d22818255dc987e0ade0ca Mon Sep 17 00:00:00 2001
-From: Jeremy Cline <jeremycline@linux.microsoft.com>
-Date: Wed, 22 Jan 2025 21:09:19 +0000
+From 0fbc0ecf76861a29b33502bd499e600e6f06a42c Mon Sep 17 00:00:00 2001
+From: Jeremy Cline <jeremycline@microsoft.com>
+Date: Wed, 18 Mar 2026 11:04:21 -0400
 Subject: [PATCH] Limit list of elliptic curves tested to those in Fedora
 
 The test currently fails on SECP192R1 and several other curves which
@@ -11,13 +11,13 @@ don't appear to be available in Fedora. Limit the test to the output of
  1 file changed, 18 insertions(+)
 
 diff --git a/tests/test_ssl.py b/tests/test_ssl.py
-index 7127477..e16aa2f 100644
+index 4123377..2ed3cb9 100644
 --- a/tests/test_ssl.py
 +++ b/tests/test_ssl.py
-@@ -1762,9 +1762,27 @@ class TestContext:
-             with pytest.deprecated_call():
-                 context.set_tmp_ecdh(curve)
- 
+@@ -1892,11 +1892,29 @@ class TestContext:
+             "SECT571K1",
+             "SECT571R1",
+         }
 +        # Based on the output of openssl ecparam -list_curves
 +        # compared to dir(ec.EllipticCurveOID).
 +        unavailable_in_fedora = [
@@ -37,11 +37,13 @@ index 7127477..e16aa2f 100644
          for name in dir(ec.EllipticCurveOID):
              if name.startswith("_"):
                  continue
+             if conftest.is_awslc and name in awslc_unsupported_curves:
+                 continue
 +            if name in unavailable_in_fedora:
 +                continue
              oid = getattr(ec.EllipticCurveOID, name)
              cryptography_curve = ec.get_curve_for_oid(oid)
              context.set_tmp_ecdh(cryptography_curve())
 -- 
-2.48.1
+2.53.0
 
