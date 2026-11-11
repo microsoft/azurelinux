@@ -10,8 +10,8 @@
 
 Name:		perl-Cpanel-JSON-XS
 Summary:	JSON::XS for Cpanel, fast and correct serializing
-Version:	4.53
-Release: 6%{?dist}
+Version:	4.80
+Release: 7%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Cpanel-JSON-XS
 Source0:	https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
@@ -168,6 +168,72 @@ make test
 %{_mandir}/man3/Cpanel::JSON::XS::Type.3*
 
 %changelog
+* Thu Oct 15 2026 Paul Howarth <paul@city-fan.org> - 4.80-1
+- Update to 4.80
+  - Security fixes:
+    - CVE-2026-110672 decode: free the hash key on "Duplicate keys not allowed"
+      and on a missing ':' (leak)
+    - CVE-2026-110673 decode: charge allow_tags "(" nesting against max_depth
+      (stack overflow)
+    - CVE-2026-110674 decode: look bare keys up as UTF-8, so the duplicate
+      check no longer misses or crashes on non-ASCII keys
+    - CVE-2026-110675 decode: validate bare hash keys as UTF-8 like quoted keys
+      (malformed keys)
+    - CVE-2026-110676 encode: compact allow_bignum Math::BigFloat values with
+      huge exponents (30MB from 12 bytes)
+    - CVE-2026-110677 decode: fix the dupkeys_as_arrayref reference counts
+      (leaked every array)
+    - CVE-2026-110678 incr_parse: apply max_size to the buffered text in every
+      context
+    - CVE-2026-110680 encode: bound the canonical key snapshot for growing tied
+      or shared hashes (overflow)
+    - CVE-2026-110681 new: clone the callbacks and buffer SVs on ithread clone
+      instead of sharing the parent's pointers
+    - CVE-2026-110682 incr_parse: reject a top-level number, true, false or
+      null unless allow_nonref was set explicitly, as chunking changes their
+      value; strings, arrays and objects are unchanged
+    - CVE-2026-110684 encode: release the temporary references when
+      stringifying overloaded objects (leak)
+    - CVE-2026-110685 decode_tag: free the tag and its arguments when THAW dies
+      (leak)
+    - CVE-2026-110686 decode: keep the filter callbacks alive while they run
+      (use-after-free when a filter removes itself)
+    - CVE-2026-110687 canonical: sort byte-string keys as Latin-1
+    - CVE-2026-110688 incr_parse: validate UTF-8 only up to the end of the
+      decoded text (quadratic CPU)
+  - Add version markers to all module files (GH#260)
+  - Use utf8n_to_uvchr on Perl 5.32 and later to avoid the deprecated
+    utf8n_to_uvuni API (GH#260)
+  - Add schema-based validation for decoded JSON (GH#238):
+    - Cpanel::JSON::XS::Type now provides
+      check_type($data, $schema[, $found_type]), which validates an
+      already-decoded perl structure against a type spec built from the existing
+      encoder building blocks (JSON_TYPE_* / json_type_arrayof /
+      json_type_hashof / json_type_anyof), plus the new json_type_optional()
+      for hash keys that may be absent, and short scalar type name sugar
+      ('Str', 'Int', 'Float', 'Bool', 'Null', 'Any', and nullable 'Str?' etc.)
+      so a schema reads as "just a hash of keys and types", as requested;
+      unlike the encoder's hash type spec, a plain hashref schema is closed:
+      unknown keys and missing required keys are reported
+    - New $json->decode_and_validate($json_text, $schema) method decodes and
+      croaks with all mismatches if validation fails, using decode()'s own type
+      introspection as ground truth to avoid perl's usual
+      dual-var/stringified-number ambiguity
+    - json_type_optional() and the nullable '?' type-name suffixes ('Str?',
+      'Int?', 'Float?', 'Bool?') give schemas an explicit way to declare a
+      key/value as optional instead of demanding a complete type specification
+      for every key
+    - The encoder now also understands json_type_optional() directly (it
+      unwraps to the wrapped type, since encode() only ever sees keys that are
+      actually present): the exact same type spec built for check_type()/
+      decode_and_validate() can now be handed to encode() as-is, instead of
+      croaking with "no type was specified for hash key '...'" for every
+      optional key; encoding stays strict by default otherwise: a hash key with
+      no entry at all in the type spec still croaks (GH#242)
+    - eg/bench_large.pl:
+      old encode: 20.5–22.9/s decode: 16.2–16.5/s for 4.53
+      new encode: 21.1–22.5/s decode: 15.7–16.3/s for 4.80
+
 * Mon Sep 28 2026 Paul Howarth <paul@city-fan.org> - 4.53-1
 - Update to 4.53
   - Fix C90 violations with arm neon (GH#258)
