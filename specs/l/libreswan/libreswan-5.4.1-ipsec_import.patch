@@ -1,0 +1,28 @@
+commit 1437a2158a96a91bc606578e504ae20fa3757485
+Author: Paul Wouters <paul.wouters@aiven.io>
+Date:   Wed Oct 28 17:03:48 2026 -0400
+
+    ipsec import: fix automated passwordless pkcs12 import
+    
+    If the nss db has no password and the pkcs12 file has no passwd,
+    import it without prompting or needing a tty.
+
+diff --git a/programs/ipsec/ipsec.in b/programs/ipsec/ipsec.in
+index ca5ce0ca05..5eb67e2239 100755
+--- a/programs/ipsec/ipsec.in
++++ b/programs/ipsec/ipsec.in
+@@ -755,7 +755,13 @@ ipsec_import() {
+ 	    exit 1
+ 	fi
+ 
+-	@@PK12UTIL@@ -i "${pkcs12bundle}" -d "${IPSEC_NSSDIR_SQL}"
++	# First try blanc password to avoid uselessly prompting interactively
++	@@PK12UTIL@@ -i "${pkcs12bundle}" -d "${IPSEC_NSSDIR_SQL}" -W '' -K '' 2>/dev/null
++	if [ $? -gt 0 ]; then
++	    # Not the empty password for either nss db or pkcs12 file, so prompt user
++	    @@PK12UTIL@@ -i "${pkcs12bundle}" -d "${IPSEC_NSSDIR_SQL}"
++	fi
++
+ 	# check and correct trust bits
+ 	set_nss_db_trusts
+ 	exit 0
