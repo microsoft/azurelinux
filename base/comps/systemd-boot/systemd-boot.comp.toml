@@ -1,0 +1,2 @@
+[components.systemd-boot]
+spec = { type = "local", path = "systemd-boot.spec" }

@@ -1,0 +1,42 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Align the systemd-boot package version with the Azure Linux systemd build"
+type = "spec-search-replace"
+regex = '^Version:\s+.*$'
+replacement = 'Version:        258.11'
+
+[[overlays]]
+description = "Drop the no-longer-needed alt stub copy step from the systemd-boot install"
+type = "spec-search-replace"
+regex = '^cp -a %\{_prefix\}/lib/systemd/boot/efi/linux%\{efi_arch\}\.efi\.stub %\{buildroot\}%\{_prefix\}/lib/systemd/boot/efi/linux%\{efi_arch\}\.efi\.stub\.alt$'
+replacement = ''
+
+[[overlays]]
+description = "Drop the alternate ELF stub copy step from the systemd-boot install"
+type = "spec-search-replace"
+regex = '^cp -a %\{_prefix\}/lib/systemd/boot/efi/linux%\{efi_arch\}\.elf\.stub %\{buildroot\}%\{_prefix\}/lib/systemd/boot/efi/linux%\{efi_arch\}\.elf\.stub\.alt$'
+replacement = ''
+
+[[overlays]]
+description = "Remove the EFI stub alt file from the packaged files list"
+type = "spec-search-replace"
+regex = '^%\{_prefix\}/lib/systemd/boot/efi/linux%\{efi_arch\}\.efi\.stub\.alt$'
+replacement = ''
+
+[[overlays]]
+description = "Remove the ELF stub alt file from the packaged files list"
+type = "spec-search-replace"
+regex = '^%\{_prefix\}/lib/systemd/boot/efi/linux%\{efi_arch\}\.elf\.stub\.alt$'
+replacement = ''
+
+[[overlays]]
+description = "Sign the built systemd-boot EFI binary with the boot signer cert"
+type = "spec-search-replace"
+regex = '^%pesign -s -i %\{_prefix\}/lib/systemd/boot/efi/systemd-boot%\{efi_arch\}\.efi -o %\{buildroot\}%\{_prefix\}/lib/systemd/boot/efi/systemd-boot%\{efi_arch\}\.efi\.signed$'
+replacement = '''SYSTEMD_BOOT_EFI="%{buildroot}%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi"
+%define __pesign_client_cert systemd-boot-signer
+%pesign -s -i $SYSTEMD_BOOT_EFI -o $SYSTEMD_BOOT_EFI.signed
+mv $SYSTEMD_BOOT_EFI.signed $SYSTEMD_BOOT_EFI'''
