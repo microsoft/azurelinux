@@ -1,6 +1,0 @@
-[components.rust-ctutils]
-
-# %check-only dep on proptest >= 1.11.0, unavailable in azl4-build today; the
-# library itself does not need proptest to build.
-[components.rust-ctutils.build]
-without = ["check"]
