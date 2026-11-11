@@ -5,20 +5,20 @@ upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove the EICAR message fixture from the source archive to unblock signing"
 type = "file-remove"
-archive = "MIME-tools-5.519.tar.gz"
+archive = "MIME-tools-5.522.tar.gz"
 file = "testmsgs/concatenated-base64.msg"
 
 [[overlays]]
 description = "Remove the pruned EICAR fixture from the source manifest"
 type = "file-search-replace"
-archive = "MIME-tools-5.519.tar.gz"
+archive = "MIME-tools-5.522.tar.gz"
 file = "MANIFEST"
 regex = '(?m)^testmsgs/concatenated-base64\.msg\n'
 
 [[overlays]]
 description = "Keep the four decoder regression tests that do not require the EICAR fixture"
 type = "file-search-replace"
-archive = "MIME-tools-5.519.tar.gz"
+archive = "MIME-tools-5.522.tar.gz"
 file = "t/concatenated-base64.t"
 regex = '(?m)^use Test::More tests => 8;$'
 replacement = "use Test::More tests => 4;"
@@ -26,13 +26,13 @@ replacement = "use Test::More tests => 4;"
 [[overlays]]
 description = "Remove the EICAR fixture description and imports used only by its test"
 type = "file-search-replace"
-archive = "MIME-tools-5.519.tar.gz"
+archive = "MIME-tools-5.522.tar.gz"
 file = "t/concatenated-base64.t"
 regex = '  testmsgs/concatenated-base64\.msg is\n# such a message: a ZIP holding the EICAR test file, cut into one base64\n# stream every two bytes\.|(?m:^use (?:MIME::Parser|IO::File);\n)'
 
 [[overlays]]
 description = "Remove only the four parser assertions that read the pruned EICAR fixture"
 type = "file-search-replace"
-archive = "MIME-tools-5.519.tar.gz"
+archive = "MIME-tools-5.522.tar.gz"
 file = "t/concatenated-base64.t"
 regex = '(?ms)^my \$parser = MIME::Parser->new\(\);\n.*?^like\(\$zip,.*?\n\n'
