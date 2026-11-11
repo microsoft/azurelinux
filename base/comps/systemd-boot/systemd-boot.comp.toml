@@ -1,0 +1,4 @@
+[components.systemd-boot]
+# This package is imported from Fedora 45 as a local spec and then customized via overlays.
+spec = { type = "local", path = "systemd-boot.spec" }
+overlay-files = ["overlays/*.overlay.toml"]
