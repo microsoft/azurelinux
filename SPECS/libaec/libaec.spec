@@ -38,14 +38,12 @@ Devel files for libaec (Adaptive Entropy Coding library).
 %build
 mkdir build
 pushd build
-%{cmake3} ..
+%{cmake3} -DBUILD_STATIC_LIBS=OFF ..
 %make_build
 popd
 
 %install
 %make_install -C build
-rm %{buildroot}/%{_libdir}/lib*.a
-mv %{buildroot}/%{_prefix}/cmake %{buildroot}/%{_libdir}
 
 %check
 make -C build test CTEST_OUTPUT_ON_FAILURE=1
@@ -53,18 +51,21 @@ make -C build test CTEST_OUTPUT_ON_FAILURE=1
 %ldconfig_scriptlets
 
 %files
-%doc README.md README.SZIP CHANGELOG.md
-%license LICENSE.txt doc/patent.txt
+%doc README.md CHANGELOG.md
+%license LICENSE.txt
 %{_libdir}/lib*.so.*
 
 %files devel
 %{_includedir}/*.h
 %{_libdir}/lib*.so
-%{_libdir}/cmake/%{name}-*.cmake
+%{_libdir}/cmake/%{name}/
 
 %changelog
 * Wed Nov 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.8-1
 - Auto-upgrade to 1.1.8 - for CVE-2026-120457
+- Build without static libraries instead of deleting the installed archives
+- Package the CMake config from its new location, %%{_libdir}/cmake/libaec
+- Drop README.SZIP and doc/patent.txt, merged upstream into README.md
 
 * Mon Apr 15 2024 Sindhu Karri <lakarri@microsoft.com> - 1.1.3-1
 - Version bump to 1.1.3
