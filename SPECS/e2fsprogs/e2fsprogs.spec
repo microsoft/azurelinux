@@ -1,7 +1,7 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
 Version:        1.47.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          System Environment/Base
 URL:            http://e2fsprogs.sourceforge.net
 Source0:        https://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-e2fsck-orphan-file-skip-check.patch
+Patch1:         e2fsck-ignore-stale-orphan-present-backup.patch
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -149,6 +150,10 @@ done
 %defattr(-,root,root)
 
 %changelog
+* Wed Nov 11 2026 Sean Dougherty <22079170+SeanDougherty@users.noreply.github.com> - 1.47.0-4
+- Backport upstream fix for stale orphan_present in backup superblocks
+- Upstream commit: 24a11cc371a46ca9e68aed8f2cf4aabd22ea81eb
+
 * Wed Aug 06 2025 Ankita Pareek <ankitapareek@microsoft.com> - 1.47.0-3
 - Backport upstream fix for e2fsck skipping checks when orphan file is present
 - Resolves: emergency mode after unclean reboot on filesystems with orphan_file feature
