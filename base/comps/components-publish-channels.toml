@@ -1222,7 +1222,6 @@ components = [
     "nmstate",
     "nodejs-nodemon",
     "nodejs-packaging",
-    "nodejs22",
     "nodejs24",
     "noopenh264",
     "npth",
