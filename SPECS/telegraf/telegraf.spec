@@ -64,6 +64,7 @@ Patch47:        CVE-2026-116591.patch
 Patch48:        CVE-2026-78661.patch
 Patch49:        CVE-2026-97045.patch
 Patch50:        CVE-2026-114456.patch
+Patch51:        CVE-2026-119299.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -129,7 +130,7 @@ fi
 
 %changelog
 * Wed Nov 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-39
-- Patch for CVE-2026-114456
+- Patch for CVE-2026-114456, CVE-2026-119299
 
 * Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.31.0-38
 - Remove additional emSign G1, C1 and ECC C3 roots from the vendored CA bundle.
