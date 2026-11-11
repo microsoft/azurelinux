@@ -52,6 +52,9 @@ Patch26:        CVE-2026-19025.patch
 Patch27:        CVE-2026-19026.patch
 Patch28:        CVE-2026-19029.patch
 Patch29:        CVE-2026-120689.patch
+Patch30:        CVE-2026-120754.patch
+Patch31:        CVE-2026-120757.patch
+Patch32:        CVE-2026-120758.patch
 
 # For patches/rpath
 BuildRequires:  automake
@@ -424,7 +427,7 @@ done
 
 %changelog
 * Tue Oct 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.6-7
-- Patch for CVE-2026-19029, CVE-2026-120689
+- Patch for CVE-2026-19029, CVE-2026-120689, CVE-2026-120758, CVE-2026-120757, CVE-2026-120754
 
 * Fri Oct 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.6-6
 - Patch for CVE-2026-19026, CVE-2026-19025, CVE-2025-2309, CVE-2025-2308
