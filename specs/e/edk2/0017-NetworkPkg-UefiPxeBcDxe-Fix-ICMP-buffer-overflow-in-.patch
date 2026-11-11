@@ -1,0 +1,127 @@
+From 91557c178a59b41ea36a28e119a1192f0aa1c19c Mon Sep 17 00:00:00 2001
+From: santhoshkumarv <santhoshkumarv@ami.com>
+Date: Mon, 28 Sep 2026 06:06:24 -0700
+Subject: [PATCH 17/17] NetworkPkg/UefiPxeBcDxe: Fix ICMP buffer overflow in
+ IPv4/IPv6 handlers (CVE-2026-97631)
+
+Root Cause:
+Incorrect buffer copy logic in ICMP error handling allowed large packets
+to write beyond the allocated buffer. This could overwrite adjacent memory
+with attacker-controlled data, causing memory corruption.
+
+Resolution:
+Added proper boundary checks and corrected buffer offset calculations
+in IPv4 and IPv6 ICMP error handlers. Over sized ICMP error packets are now
+safely truncated when the buffer is full, preventing memory corruption.
+
+Signed-off-by: santhoshkumarV <santhoshkumarv@ami.com>
+(cherry picked from commit 560ed9b5b146ed622d7eb7c40254a9099bd65b84)
+---
+ NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c | 68 ++++++++++----------------
+ 1 file changed, 26 insertions(+), 42 deletions(-)
+
+diff --git a/NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c b/NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c
+index 887ea3e7d7d8..9e97ba4904c7 100644
+--- a/NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c
++++ b/NetworkPkg/UefiPxeBcDxe/PxeBcSupport.c
+@@ -252,6 +252,7 @@ PxeBcIcmpErrorDpcHandle (
+   UINTN                   Index;
+   UINT32                  CopiedLen;
+   UINT8                   *IcmpError;
++  UINT32                  FragmentLen;
+ 
+   Private = (PXEBC_PRIVATE_DATA *)Context;
+   Mode    = &Private->Mode;
+@@ -317,28 +318,19 @@ PxeBcIcmpErrorDpcHandle (
+   }
+ 
+   //
+-  // Copy the right ICMP error message into mode data.
++  // Copy ICMP error fragments into Mode->IcmpError in order. The maximum
++  // buffer size is sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR); truncate any excess.
+   //
+-  CopiedLen = 0;
+-  IcmpError = (UINT8 *)&Mode->IcmpError;
+-
+-  for (Index = 0; Index < RxData->FragmentCount; Index++) {
+-    CopiedLen += RxData->FragmentTable[Index].FragmentLength;
+-    if (CopiedLen <= sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR)) {
+-      CopyMem (
+-        IcmpError,
+-        RxData->FragmentTable[Index].FragmentBuffer,
+-        RxData->FragmentTable[Index].FragmentLength
+-        );
+-    } else {
+-      CopyMem (
+-        IcmpError,
+-        RxData->FragmentTable[Index].FragmentBuffer,
+-        CopiedLen - sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR)
+-        );
+-    }
+-
+-    IcmpError += CopiedLen;
++  for (Index = 0, IcmpError = (UINT8 *)&Mode->IcmpError, CopiedLen = 0;
++       (Index < RxData->FragmentCount) &&
++       (CopiedLen < sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
++       Index++, IcmpError += FragmentLen, CopiedLen += FragmentLen)
++  {
++    FragmentLen = MIN (
++                    RxData->FragmentTable[Index].FragmentLength,
++                    (UINT32)(sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR) - CopiedLen)
++                    );
++    CopyMem (IcmpError, RxData->FragmentTable[Index].FragmentBuffer, FragmentLen);
+   }
+ 
+ ON_RECYCLE:
+@@ -387,6 +379,7 @@ PxeBcIcmp6ErrorDpcHandle (
+   UINT8                   Type;
+   UINT32                  CopiedLen;
+   UINT8                   *Icmp6Error;
++  UINT32                  FragmentLen;
+ 
+   Private = (PXEBC_PRIVATE_DATA *)Context;
+   Mode    = &Private->Mode;
+@@ -449,28 +442,19 @@ PxeBcIcmp6ErrorDpcHandle (
+   }
+ 
+   //
+-  // Copy the right ICMP6 error message into mode data.
++  // Copy ICMP error fragments into Mode->IcmpError in order. The maximum
++  // buffer size is sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR); truncate any excess.
+   //
+-  CopiedLen  = 0;
+-  Icmp6Error = (UINT8 *)&Mode->IcmpError;
+-
+-  for (Index = 0; Index < RxData->FragmentCount; Index++) {
+-    CopiedLen += RxData->FragmentTable[Index].FragmentLength;
+-    if (CopiedLen <= sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR)) {
+-      CopyMem (
+-        Icmp6Error,
+-        RxData->FragmentTable[Index].FragmentBuffer,
+-        RxData->FragmentTable[Index].FragmentLength
+-        );
+-    } else {
+-      CopyMem (
+-        Icmp6Error,
+-        RxData->FragmentTable[Index].FragmentBuffer,
+-        CopiedLen - sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR)
+-        );
+-    }
+-
+-    Icmp6Error += CopiedLen;
++  for (Index = 0, Icmp6Error = (UINT8 *)&Mode->IcmpError, CopiedLen = 0;
++       (Index < RxData->FragmentCount) &&
++       (CopiedLen < sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR));
++       Index++, Icmp6Error += FragmentLen, CopiedLen += FragmentLen)
++  {
++    FragmentLen = MIN (
++                    RxData->FragmentTable[Index].FragmentLength,
++                    (UINT32)(sizeof (EFI_PXE_BASE_CODE_ICMP_ERROR) - CopiedLen)
++                    );
++    CopyMem (Icmp6Error, RxData->FragmentTable[Index].FragmentBuffer, FragmentLen);
+   }
+ 
+ ON_RECYCLE:
+-- 
+2.56.0
+
