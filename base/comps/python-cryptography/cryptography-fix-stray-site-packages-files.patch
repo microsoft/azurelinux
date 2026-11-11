@@ -1,0 +1,48 @@
+From 43eb178ee3aae8d0060221118437b03c23570a41 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micha=C5=82=20G=C3=B3rny?= <mgorny@gentoo.org>
+Date: Sun, 15 Feb 2026 18:01:37 +0100
+Subject: [PATCH] Fix installing stray files into site-packages (#14319)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix the `include` pattern in `pyproject.toml` not to install stray files
+such as `CHANGELOG.rst`, `CONTRIBUTING.rst`, `docs` and `tests` straight
+into site-packages.  Apparently Maturin did not install them before due
+to a bug, but it was fixed in maturin 1.12.0, leading to the files being
+suddenly installed.
+
+Originally reported as https://bugs.gentoo.org/970090.
+
+Signed-off-by: Michał Górny <mgorny@gentoo.org>
+---
+ pyproject.toml | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index e26b386280a5..8640cb6e5951 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -106,10 +106,10 @@ module-name = "cryptography.hazmat.bindings._rust"
+ locked = true
+ sdist-generator = "git"
+ include = [
+-    "CHANGELOG.rst",
+-    "CONTRIBUTING.rst",
++    { path = "CHANGELOG.rst", format = "sdist" },
++    { path = "CONTRIBUTING.rst", format = "sdist" },
+ 
+-    "docs/**/*",
++    { path = "docs/**/*", format = "sdist" },
+ 
+     { path = "src/_cffi_src/**/*.py", format = "sdist" },
+     { path = "src/_cffi_src/**/*.c", format = "sdist" },
+@@ -121,7 +121,7 @@ include = [
+     { path = "src/rust/**/Cargo.lock", format = "sdist" },
+     { path = "src/rust/**/*.rs", format = "sdist" },
+ 
+-    "tests/**/*.py",
++    { path = "tests/**/*.py", format = "sdist" },
+ ]
+ exclude = [
+     "vectors/**/*",
