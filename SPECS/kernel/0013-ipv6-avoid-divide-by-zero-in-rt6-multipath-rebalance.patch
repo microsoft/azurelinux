@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>
+Date: Sun, 16 Aug 2026 21:32:37 -0400
+Subject: [PATCH] ipv6: avoid divide by zero in rt6_multipath_rebalance
+
+Link: https://github.com/torvalds/linux/commit/d2c26c2911dd1a363c488add4fb63eb5f0f28f87
+
+rt6_multipath_rebalance() calculates the total eligible nexthop weight
+in one pass and programs upper bounds in a second pass. Since
+RTM_NEWROUTE is RTNL-free, a concurrent
+ignore_routes_with_linkdown update can make the first pass return zero
+while the second sees an eligible nexthop, causing
+rt6_upper_bound_set() to divide by zero.
+
+UBSAN: division-overflow in net/ipv6/route.c:4845:17
+Oops: divide error: 0000 [#1] SMP KASAN NOPTI
+  rt6_upper_bound_set() net/ipv6/route.c:4845
+  rt6_multipath_rebalance()
+  fib6_add_rt2node()
+  ip6_route_multipath_add()
+  inet6_rtm_newroute()
+
+Skip upper-bound calculation when the first pass reports a zero total.
+This respects the lock-free performance considerations here and solves
+insecure scenarios.
+
+Fixes: bd11ff421d36 ("ipv6: Get rid of RTNL for SIOCDELRT and RTM_DELROUTE.")
+Reported-by: AutonomousCodeSecurity@microsoft.com
+Reported-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
+Reported-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
+Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20260817013237.2797-1-blbllhy@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Backport to Azure Linux 6.6.161.1: No functional changes from upstream;
+refresh context only. Although the Fixes tag names route deletion, the
+reported race explicitly depends on RTNL-free RTM_NEWROUTE and therefore
+applies here.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv6/route.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 9e3af8f..9a6e77d 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4782,7 +4782,7 @@ static void rt6_upper_bound_set(struct fib6_info *rt, int *weight, int total)
+ {
+ 	int upper_bound = -1;
+ 
+-	if (!rt6_is_dead(rt)) {
++	if (total && !rt6_is_dead(rt)) {
+ 		*weight += rt->fib6_nh->fib_nh_weight;
+ 		upper_bound = DIV_ROUND_CLOSEST_ULL((u64) (*weight) << 31,
+ 						    total) - 1;
