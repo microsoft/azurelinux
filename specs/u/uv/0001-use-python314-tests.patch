@@ -1,4 +1,4 @@
-From cdd567e4449ee69d55e6e82ecf8c2e84700e36e1 Mon Sep 17 00:00:00 2001
+From d82aa8e14946af690f671e4cfb927fad73f34dff Mon Sep 17 00:00:00 2001
 From: reuben olinsky <reubeno@users.noreply.github.com>
 Date: Wed, 28 Oct 2026 20:32:49 +0000
 Subject: [PATCH] tests: run resource-limit and minimum-libc cases on Python
@@ -16,15 +16,20 @@ snapshots together. Advance the next-minor marker split from 3.13 to 3.15
 so both sides of the wheel compatibility boundary remain tested.
 No production code or test assertions are removed.
 
-Base source: uv 0.12.19, selected by the locked Fedora dist-git commit:
-6311776fb745af3f8c6edfb79716c4c459d5197b
-https://src.fedoraproject.org/rpms/uv/c/6311776fb745af3f8c6edfb79716c4c459d5197b
+Base source: uv 0.12.24, selected by the locked Fedora dist-git commit:
+f174be201fff3ae5543dc62526e570154b933dea
+https://src.fedoraproject.org/rpms/uv/c/f174be201fff3ae5543dc62526e570154b933dea
 This reference identifies the input package only; it is not the source
 of this Python 3.14 adaptation.
+
+Refreshed from uv 0.12.19: upstream changed only the lockfile revision
+(3 to 5) in the surrounding expected snapshots, so the Python 3.14
+changes are the same as before.
 
 Upstream-Status: Not submitted
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
 ---
  crates/uv/tests/it/resource_limits.rs |   8 +-
  crates/uv/tests/lock/minimum_libc.rs  | 174 +++++++++++++-------------
@@ -71,7 +76,7 @@ index 94f47f6..72c0860 100644
  
      let mut command = context.external_command("sh");
 diff --git a/crates/uv/tests/lock/minimum_libc.rs b/crates/uv/tests/lock/minimum_libc.rs
-index 0daee7c..b9265fd 100644
+index 68e3116..9ac0293 100644
 --- a/crates/uv/tests/lock/minimum_libc.rs
 +++ b/crates/uv/tests/lock/minimum_libc.rs
 @@ -44,7 +44,7 @@ fn minimum_libc_retains_locked_wheels() -> Result<()> {
@@ -95,7 +100,7 @@ index 0daee7c..b9265fd 100644
 @@ -73,7 +73,7 @@ fn minimum_libc_retains_locked_wheels() -> Result<()> {
          assert_snapshot!(context.read("uv.lock"), @r#"
          version = 1
-         revision = 3
+         revision = 5
 -        requires-python = ">=3.12"
 +        requires-python = ">=3.14"
          required-markers = [
@@ -139,7 +144,7 @@ index 0daee7c..b9265fd 100644
 @@ -226,7 +226,7 @@ fn minimum_libc_switch_families() -> Result<()> {
          assert_snapshot!(lock, @r#"
          version = 1
-         revision = 3
+         revision = 5
 -        requires-python = ">=3.12"
 +        requires-python = ">=3.14"
          resolution-markers = [
@@ -168,7 +173,7 @@ index 0daee7c..b9265fd 100644
 @@ -289,7 +289,7 @@ fn minimum_libc_switch_families() -> Result<()> {
          assert_snapshot!(lock, @r#"
          version = 1
-         revision = 3
+         revision = 5
 -        requires-python = ">=3.12"
 +        requires-python = ">=3.14"
          resolution-markers = [
@@ -244,7 +249,7 @@ index 0daee7c..b9265fd 100644
 @@ -411,10 +411,10 @@ fn minimum_libc_local_version_fallback() -> Result<()> {
          assert_snapshot!(lock, @r#"
          version = 1
-         revision = 3
+         revision = 5
 -        requires-python = ">=3.12"
 +        requires-python = ">=3.14"
          resolution-markers = [
@@ -329,7 +334,7 @@ index 0daee7c..b9265fd 100644
 @@ -540,7 +540,7 @@ fn minimum_libc_backtracks_and_invalidates_lock() -> Result<()> {
          assert_snapshot!(lock, @r#"
          version = 1
-         revision = 3
+         revision = 5
 -        requires-python = ">=3.12"
 +        requires-python = ">=3.14"
          required-markers = [
@@ -439,7 +444,7 @@ index 0daee7c..b9265fd 100644
 @@ -752,7 +752,7 @@ fn minimum_libc_allows_sdist_fallback() -> Result<()> {
          assert_snapshot!(lock, @r#"
          version = 1
-         revision = 3
+         revision = 5
 -        requires-python = ">=3.12"
 +        requires-python = ">=3.14"
          required-markers = [
@@ -543,7 +548,7 @@ index 0daee7c..b9265fd 100644
 @@ -946,7 +946,7 @@ fn minimum_libc_architectures_and_markers() -> Result<()> {
          assert_snapshot!(lock, @r#"
          version = 1
-         revision = 3
+         revision = 5
 -        requires-python = ">=3.12"
 +        requires-python = ">=3.14"
          resolution-markers = [
