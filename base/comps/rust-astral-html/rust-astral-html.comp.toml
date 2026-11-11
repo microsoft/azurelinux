@@ -1,0 +1,4 @@
+# Newer than the Fedora 43 snapshot; pin the f43 build that uv 0.12.24 needs.
+# https://src.fedoraproject.org/rpms/rust-astral-html/c/069ad040063a06e25e938ee93ef0f2c35c845196
+[components.rust-astral-html]
+spec = { type = "upstream", upstream-commit = "069ad040063a06e25e938ee93ef0f2c35c845196" }
