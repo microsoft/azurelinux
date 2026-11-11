@@ -1,5 +1,5 @@
 Name:           systemd-boot
-Version:        258
+Version:        258.11
 Release:        %autorelease
 Summary:        UEFI boot manager
 
