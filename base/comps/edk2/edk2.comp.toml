@@ -1,1 +1,4 @@
+# Pin to Fedora f43 edk2-20260812-6 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/edk2/c/a041f6a3b6dfeb61d1cbb30e5765029f7dfdbca3
 [components.edk2]
+spec = { type = "upstream", upstream-commit = "a041f6a3b6dfeb61d1cbb30e5765029f7dfdbca3" }
