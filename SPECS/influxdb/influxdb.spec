@@ -92,6 +92,7 @@ Patch21:        CVE-2026-116587.patch
 Patch22:        CVE-2026-116591.patch
 Patch23:        CVE-2026-78661.patch
 Patch24:        CVE-2026-97045.patch
+Patch25:        CVE-2026-114456.patch
 BuildRequires:  clang
 BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
@@ -182,7 +183,7 @@ go test ./...
 
 %changelog
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-24
-- Patch for CVE-2026-97045, CVE-2026-78661, CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
+- Patch for CVE-2026-97045, CVE-2026-78661, CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585, CVE-2026-114456
 
 * Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.7.5-23
 - Remove AAA and emSign ECC G3 from the vendored Snowflake CA bundle.
