@@ -60,6 +60,8 @@ Patch11:        0011-ipv6-protect-multiple-routes-insertion-by-table-lock.patch
 Patch12:        0012-ipv6-get-rid-of-rtnl-for-siocaddrt-and-rtm-newroute.patch
 Patch13:        0013-ipv6-avoid-divide-by-zero-in-rt6-multipath-rebalance.patch
 Patch14:        0014-ipv6-null-check-fib6-node-before-accessing-in-ip6-del-rt-siblings.patch
+Patch15:        0015-ipv6-get-rid-of-rtnl-for-siocdelrt-and-rtm-delroute.patch
+Patch16:        0016-ipv6-change-allocation-flags-to-match-rcu-read-lock-section-requirements.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -454,8 +456,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Wed Nov 11 2026 Alex Cortelyou <alcortel@microsoft.com> - 6.6.161.1-2
-- Backport RTNL-free IPv6 route addition with prerequisites and concurrency fixes.
-- Keep IPv6 route deletion serialized by RTNL.
+- Backport RTNL-free IPv6 route addition and deletion.
+- Include prerequisite lifetime/locking changes and concurrency fixes.
 
 * Wed Nov 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.161.1-1
 - Auto-upgrade to 6.6.161.1
