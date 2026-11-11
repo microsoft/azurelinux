@@ -1,0 +1,11 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/commit/?id=b5d372d96db1adb316c91a058dddffb38ef6d166" }]
+bugs = [{ url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/24949" }]
+
+# Remove this overlay when updating xfsprogs to v6.18.0 or later.
+[[overlays]]
+description = "Align conventional-device realtime zones even without an explicit size; remove when xfsprogs includes b5d372d (v6.18.0)"
+type = "patch-add"
+source = "../0001-align-conventional-realtime-zones.patch"
