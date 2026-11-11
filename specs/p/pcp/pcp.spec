@@ -3,7 +3,7 @@
 
 Name:    pcp
 Version: 7.2.2
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: System-level performance monitoring and performance management
 License: GPL-2.0-or-later AND LGPL-2.1-or-later AND CC-BY-3.0
 URL:     https://pcp.io
@@ -1786,6 +1786,7 @@ Summary: Performance Co-Pilot (PCP) metrics for Reliable Datagram Sockets (RDS) 
 URL: https://pcp.io
 Requires: pcp = %{version}-%{release} pcp-libs = %{version}-%{release}
 Requires: python3-pcp
+Requires: python3-psutil
 %description pmda-rds
 This package contains the PCP Performance Metrics Domain Agent (PMDA) for
 collecting statistics for RDS connections.
@@ -2197,6 +2198,7 @@ URL: https://pcp.io
 Requires: pcp-libs = %{version}-%{release}
 Conflicts: atop
 
+Conflicts: pcp-doc < 7.2.0
 %description atop
 PCP version of the atop system and process monitor, providing detailed
 analysis of system resources and process activity using PCP metrics.
@@ -2218,6 +2220,7 @@ Provides: /usr/bin/dstat
 Obsoletes: dstat <= 0.8
 %endif
 
+Conflicts: pcp-doc < 7.2.0
 %description dstat
 PCP version of the dstat versatile resource statistics tool,
 providing real-time system resource statistics using PCP metrics.
@@ -2232,6 +2235,7 @@ Summary: Performance Co-Pilot (PCP) interactive process viewer
 URL: https://pcp.io
 Requires: pcp-libs = %{version}-%{release}
 
+Conflicts: pcp-doc < 7.2.0
 %description htop
 PCP version of the htop interactive process viewer, providing
 real-time process monitoring using PCP metrics.
@@ -3206,6 +3210,26 @@ PCP_LOG_DIR=%{_logsdir}
     /sbin/service pmproxy condrestart
 %endif
 %{rebuild_pmns "$PCP_PMNS_DIR" .NeedRebuild}
+
+%triggerun -- pcp-pmda-cifs < 7.1.6
+# Note whether the CIFS agent is registered before pcp-pmda-cifs's %%preun removes it.
+if grep -q '^[[:space:]]*cifs[[:space:]]' %{_confdir}/pmcd/pmcd.conf 2>/dev/null
+then
+    mkdir -p %{_localstatedir}/lib/rpm-state/pcp &&
+    touch %{_localstatedir}/lib/rpm-state/pcp/cifs-registered
+fi
+:
+
+%triggerpostun -- pcp-pmda-cifs < 7.1.6
+# pcp now ships the CIFS agent; have pmcd install it again at its next start.
+if [ -f %{_localstatedir}/lib/rpm-state/pcp/cifs-registered ]
+then
+    PCP_PMDAS_DIR=%{_pmdasdir}
+    %{install_file "$PCP_PMDAS_DIR/cifs" .NeedInstall}
+    rm -f %{_localstatedir}/lib/rpm-state/pcp/cifs-registered
+    rmdir %{_localstatedir}/lib/rpm-state/pcp 2>/dev/null
+fi
+:
 
 %if 0%{?fedora} >= 26 || 0%{?rhel} > 7
 %ldconfig_scriptlets libs

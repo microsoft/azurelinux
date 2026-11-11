@@ -1,0 +1,33 @@
+# pcp 7.2.0 split pcp-atop, pcp-dstat and pcp-htop out of pcp-system-tools and moved
+# their man pages out of pcp-doc. pcp-doc does not require a matching pcp, so it can stay
+# at 7.1.0 when one of the new packages is installed, and pcp-atop and pcp-htop then fail
+# on file conflicts (pcp-atop.1, pcp-atopsar.1, pcp-htop.1, pcp-htop.5 differ between the
+# two). pcp-dstat's man pages happen to be identical today; it gets the same Conflicts so
+# that the next change to them does not break it the same way. This is the versioned
+# Conflicts that Fedora's packaging guidelines allow for split-out packages.
+# Not fixed in Fedora rawhide or upstream PCP as of 2026-11-11.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "pcp-atop: conflict with the pcp-doc that still shipped its man pages"
+type = "spec-add-tag"
+package = "atop"
+tag = "Conflicts"
+value = "pcp-doc < 7.2.0"
+
+[[overlays]]
+description = "pcp-dstat: conflict with the pcp-doc that still shipped its man pages"
+type = "spec-add-tag"
+package = "dstat"
+tag = "Conflicts"
+value = "pcp-doc < 7.2.0"
+
+[[overlays]]
+description = "pcp-htop: conflict with the pcp-doc that still shipped its man pages"
+type = "spec-add-tag"
+package = "htop"
+tag = "Conflicts"
+value = "pcp-doc < 7.2.0"
