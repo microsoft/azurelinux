@@ -1,0 +1,4 @@
+# Pin to Fedora f43 libaec-1.1.8 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libaec/c/b9366ad3a267394648f797f069a223abc79d068c
+[components.libaec]
+spec = { type = "upstream", upstream-commit = "b9366ad3a267394648f797f069a223abc79d068c" }
