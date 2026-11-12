@@ -1,6 +1,6 @@
-# Pin to Fedora f43 xorg-x11-server-Xwayland-24.1.14 to pick up upstream CVE fixes.
-# https://src.fedoraproject.org/rpms/xorg-x11-server-Xwayland/c/1aa8f976d07fab943c0536ab9f3aaa6758a81513
+# Pin to Fedora f43 xorg-x11-server-Xwayland-24.1.15 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/xorg-x11-server-Xwayland/c/0e98c8c19a9e7cc9ac9a8d661661a3715ac71872
 [components.xorg-x11-server-Xwayland]
-spec = { type = "upstream", upstream-commit = "1aa8f976d07fab943c0536ab9f3aaa6758a81513" }
+spec = { type = "upstream", upstream-commit = "0e98c8c19a9e7cc9ac9a8d661661a3715ac71872" }
 # Release: 2%{?gitdate:.%{gitdate}git%{shortcommit}}%{?dist}
 release = { calculation = "manual" }
