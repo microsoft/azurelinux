@@ -1,1 +1,4 @@
+# Pin to Fedora f43 libsoup3-3.6.6-6 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libsoup3/c/869bc38988d24de6e17fd66c00c3630882e7ce70
 [components.libsoup3]
+spec = { type = "upstream", upstream-commit = "869bc38988d24de6e17fd66c00c3630882e7ce70" }
