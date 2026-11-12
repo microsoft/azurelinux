@@ -1,0 +1,23 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Subject: [PATCH] Test the built hex_tarball in peer nodes
+
+peer_call/4 appends the directory of the hex_tarball under test to the
+code path of the peer node with code:add_path/1. If another hex_core
+is already in the code path, e.g. installed system-wide in
+/usr/share/erlang/lib, the peer loads that one instead, so
+latin1_filename_encoding_test and printable_range_test test the wrong
+code. Prepend the directory with code:add_patha/1.
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+--- a/test/hex_tarball_SUITE.erl
++++ b/test/hex_tarball_SUITE.erl
+@@ -2150,7 +2150,7 @@
+             {ok, Pid, _Node} -> Pid
+         end,
+     try
+-        true = peer:call(Peer, code, add_path, [filename:dirname(code:which(hex_tarball))]),
++        true = peer:call(Peer, code, add_patha, [filename:dirname(code:which(hex_tarball))]),
+         peer:call(Peer, Module, Function, Arguments, 30000)
+     after
+         peer:stop(Peer)
