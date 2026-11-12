@@ -1,0 +1,2 @@
+[components.dosfstools]
+tests.tests = [{ name = "dosfstools-fedora-tmt" }]

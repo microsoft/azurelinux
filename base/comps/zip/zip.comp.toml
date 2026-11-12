@@ -1,0 +1,2 @@
+[components.zip]
+tests.tests = [{ name = "zip-fedora-tmt" }]

@@ -1,4 +1,5 @@
 [components.nftables]
+tests.tests = [{ name = "nftables-fedora-tmt" }]
 release = { calculation = "manual" }
 
 [[components.nftables.overlays]]

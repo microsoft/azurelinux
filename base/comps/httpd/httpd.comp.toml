@@ -2,6 +2,7 @@
 # f43 is still on 2.4.69; the f44 commit only bumps the version from it.
 # https://src.fedoraproject.org/rpms/httpd/c/dd036578128f894e8d7a7c95a5968cee9be4bbb7
 [components.httpd]
+tests.tests = [{ name = "httpd-fedora-tmt" }]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "dd036578128f894e8d7a7c95a5968cee9be4bbb7" }
 release = { calculation = "manual" }
 

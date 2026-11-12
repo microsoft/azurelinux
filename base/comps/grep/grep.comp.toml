@@ -1,0 +1,2 @@
+[components.grep]
+tests.tests = [{ name = "grep-fedora-tmt" }]

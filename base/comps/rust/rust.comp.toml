@@ -1,4 +1,5 @@
 [components.rust]
+tests.tests = [{ name = "tmt-rust-all" }]
 # Version 1.99
 #
 # This is only pinned because our snapshot date is older, this should

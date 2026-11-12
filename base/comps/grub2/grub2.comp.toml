@@ -1,1 +1,2 @@
 [components.grub2]
+tests.tests = [{ name = "grub2-fedora-tmt" }]

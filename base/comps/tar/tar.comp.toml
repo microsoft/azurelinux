@@ -1,0 +1,2 @@
+[components.tar]
+tests.tests = [{ name = "tar-fedora-tmt" }]

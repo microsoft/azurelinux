@@ -1,0 +1,2 @@
+[components.sqlite]
+tests.tests = [{ name = "sqlite-fedora-tmt" }]
