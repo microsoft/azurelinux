@@ -1,0 +1,5 @@
+# Pin to Fedora f43 grafana-10.2.6-23 (rebuild with Go 1.26.10). The published 4.0 build
+# was linked with Go 1.26.5; rebuilding picks up the Go standard library fixes.
+# https://src.fedoraproject.org/rpms/grafana/c/0e8202ecb9139978fb3be4de9ae7950d7c9a7e55
+[components.grafana]
+spec = { type = "upstream", upstream-commit = "0e8202ecb9139978fb3be4de9ae7950d7c9a7e55" }
