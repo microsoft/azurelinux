@@ -116,12 +116,9 @@ stages:
                   patterns: "**/$(toolchainTarballName)"
                   targetPath: $(inputArtifactsLocation)
 
-              # Making sure all pip installations are using the authorized feed.
-              - task: PipAuthenticate@1
-                displayName: Enable internal pip feed
-                inputs:
-                  onlyAddExtraIndex: false
-                  artifactFeeds: "MarinerFeed"
+              # Package tests run pip inside the build chroots; use the feed-only identity so
+              # the credential forwarded to them cannot reach anything but the feed.
+              - template: PipAuthenticateCheckFeed.yml@self
 
               - template: PackageBuild.yml@self
                 parameters:
@@ -178,12 +175,9 @@ stages:
                   patterns: "**/$(toolchainTarballName)"
                   targetPath: $(inputArtifactsLocation)
 
-              # Making sure all pip installations are using the authorized feed.
-              - task: PipAuthenticate@1
-                displayName: Enable internal pip feed
-                inputs:
-                  onlyAddExtraIndex: false
-                  artifactFeeds: "MarinerFeed"
+              # Package tests run pip inside the build chroots; use the feed-only identity so
+              # the credential forwarded to them cannot reach anything but the feed.
+              - template: PipAuthenticateCheckFeed.yml@self
 
               - template: PackageBuild.yml@self
                 parameters:

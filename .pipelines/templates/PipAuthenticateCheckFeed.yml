@@ -1,0 +1,35 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Authenticates pip for package builds that run %check, using a dedicated feed-only identity
+# instead of the job access token. PIP_INDEX_URL is forwarded into check chroots (see
+# PackageBuild.yml's checkEnvPassthrough), so it must carry only the narrowly scoped credential.
+# Run this as the last PipAuthenticate before PackageBuild.yml: each run replaces earlier credentials.
+
+parameters:
+  # "Azure DevOps" (workload identity federation) service connection backed by an identity
+  # with only the Feed and Upstream Reader (Collaborator) role on the feed below.
+  - name: serviceConnection
+    type: string
+    default: "azl-pkgcheck-feed"
+
+  - name: feedUrl
+    type: string
+    default: "https://pkgs.dev.azure.com/mariner-org/_packaging/MarinerFeed/pypi/simple/"
+
+steps:
+  - task: PipAuthenticate@1
+    displayName: "Authenticate package-check pip feed"
+    inputs:
+      azureDevOpsServiceConnection: ${{ parameters.serviceConnection }}
+      feedUrl: ${{ parameters.feedUrl }}
+
+  # In service-connection mode PipAuthenticate sets PIP_INDEX_URL as a plain variable.
+  # Re-register it as a secret so pipeline logs mask it; consumers must then map it explicitly.
+  - bash: |
+      if [[ -z "${PIP_INDEX_URL:-}" ]]; then
+        echo "##[error]PipAuthenticate did not set PIP_INDEX_URL." >&2
+        exit 1
+      fi
+      echo "##vso[task.setvariable variable=PIP_INDEX_URL;issecret=true]${PIP_INDEX_URL}"
+    displayName: "Mask package-check pip feed credential"
