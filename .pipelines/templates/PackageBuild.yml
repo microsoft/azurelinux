@@ -268,7 +268,8 @@ steps:
         extra_macros_files_arg="EXTRA_MACROS_FILES='${extra_macros_files[*]}'"
       fi
 
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
+      run_package_make() {
+        sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "$@" -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
         MAX_CPU="${{ parameters.maxCPU }}" \
@@ -290,7 +291,54 @@ steps:
         $run_check_arg \
         $toolchain_archive_arg \
         $use_ccache_arg
+      }
+
+      refresh_worker_args=()
+      if [[ "${{ parameters.isCheckBuild }}" == "true" ]]; then
+        # Prepare before injecting credentials: graph generation can recreate
+        # the worker. Host PipAuthenticate variables do not survive safechroot.
+        if ! run_package_make graph; then
+          echo "##[error]Failed to prepare the package-test graph." >&2
+          exit 1
+        fi
+        helper="${{ parameters.buildRepoRoot }}/.pipelines/utilities/configure_chroot_pip_feed.py"
+        worker_root="${{ parameters.buildRepoRoot }}/build/worker/worker_chroot"
+        cleanup_worker_pip_feed() {
+          local status=$?
+          trap - EXIT
+          if ! sudo python3 "$helper" "$worker_root" --cleanup; then
+            echo "##[error]Failed to remove package-test pip credentials." >&2
+            exit 1
+          fi
+          exit "$status"
+        }
+        trap cleanup_worker_pip_feed EXIT
+        if ! sudo --preserve-env=PIP_INDEX_URL python3 "$helper" "$worker_root"; then
+          echo "##[error]Failed to configure the package-test Python feed." >&2
+          exit 1
+        fi
+        # Package workers inherit these files from the root-only archive.
+        if ! sudo chmod 600 "${{ parameters.buildRepoRoot }}/build/worker/worker_chroot.tar.gz" ||
+            ! sudo tar -czf "${{ parameters.buildRepoRoot }}/build/worker/worker_chroot.tar.gz" -C "$worker_root" .; then
+          echo "##[error]Failed to package the feed-configured worker." >&2
+          exit 1
+        fi
+        refresh_worker_args=(REFRESH_WORKER_CHROOT=n)
+      fi
+
+      run_package_make build-packages "${refresh_worker_args[@]}"
     displayName: "Build packages"
+    env:
+      PIP_INDEX_URL: $(PIP_INDEX_URL)
+
+  - ${{ if eq(parameters.isCheckBuild, 'true') }}:
+      # Defense in depth if the build step cannot finish its EXIT cleanup.
+      # Agent loss can prevent even an always-run step from executing.
+      - script: |
+          sudo python3 "${{ parameters.buildRepoRoot }}/.pipelines/utilities/configure_chroot_pip_feed.py" \
+            "${{ parameters.buildRepoRoot }}/build/worker/worker_chroot" --cleanup
+        condition: always()
+        displayName: "Remove job-local worker pip credentials"
 
   - ${{ if parameters.outputArtifactsFolder }}:
       - ${{ if parameters.outputRPMsCacheTarballName }}:
