@@ -4,7 +4,7 @@
 Name:           libxslt
 Summary:        Library providing the Gnome XSLT engine
 Version:        1.1.43
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 License:        MIT
 URL:            https://gitlab.gnome.org/GNOME/libxslt
@@ -25,6 +25,8 @@ Patch0:         multilib.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1467435
 Patch1:         multilib2.patch
 
+Patch2: libxslt-1.1.43-CVE-2025-11731.patch
+Patch3: libxslt-1.1.43-CVE-2025-7424.patch
 %description
 This C library allows to transform XML files into other XML files
 (or HTML, text, ...) using the standard XSLT stylesheet transformation
