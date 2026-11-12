@@ -343,6 +343,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(rel_versions_macro_file) $(no_repo_acl) $
 		--check-attempts="$$(($(CHECK_BUILD_RETRIES)+1))" \
 		$(if $(MAX_CASCADING_REBUILDS),--max-cascading-rebuilds="$(MAX_CASCADING_REBUILDS)") \
 		--extra-layers="$(EXTRA_BUILD_LAYERS)" \
+		$(foreach name,$(CHECK_ENV_PASSTHROUGH),--check-env-passthrough="$(name)") \
 		--build-agent="chroot-agent" \
 		--build-agent-program="$(go-pkgworker)" \
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
