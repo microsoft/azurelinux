@@ -62,6 +62,7 @@ Patch13:        0013-ipv6-avoid-divide-by-zero-in-rt6-multipath-rebalance.patch
 Patch14:        0014-ipv6-null-check-fib6-node-before-accessing-in-ip6-del-rt-siblings.patch
 Patch15:        0015-ipv6-get-rid-of-rtnl-for-siocdelrt-and-rtm-delroute.patch
 Patch16:        0016-ipv6-change-allocation-flags-to-match-rcu-read-lock-section-requirements.patch
+Patch17:        0017-nexthop-allow-nexthop-mpath-fill-node-to-be-called-without-rtnl.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
