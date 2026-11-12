@@ -1,0 +1,21 @@
+From 3924f2bff45690230c1a7b1e4927ac69af2c0c48 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <aacid@kde.org>
+Date: Wed, 4 Nov 2026 23:23:27 +0100
+Subject: Fix infinite loop in broken files
+
+
+diff --git a/poppler/SplashOutputDev.cc b/poppler/SplashOutputDev.cc
+index 667b69244..8ace8092b 100644
+--- a/poppler/SplashOutputDev.cc
++++ b/poppler/SplashOutputDev.cc
+@@ -4290,6 +4290,10 @@ bool SplashOutputDev::tilingPatternFill(...)
+         surface_height = (int)ceil(fabs(ky));
+         repeatX = x1 - x0;
+         repeatY = y1 - y0;
++        if (repeatX < 0 || repeatY < 0) {
++            state->setCTM(savedCTM[0], savedCTM[1], savedCTM[2], savedCTM[3], savedCTM[4], savedCTM[5]);
++            return false;
++        }
+         while ((unsigned long)repeatX * repeatY > 0x800000L) {
+             // try to avoid bogus memory allocation size
+             if (repeatX > 1) {

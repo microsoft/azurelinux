@@ -1,0 +1,4 @@
+# Pin to Fedora f43 poppler-25.07.0 to pick up Fedora's CVE backport patches.
+# https://src.fedoraproject.org/rpms/poppler/c/23ed9b995412f5e93261407e1bf19679e104bb88
+[components.poppler]
+spec = { type = "upstream", upstream-commit = "23ed9b995412f5e93261407e1bf19679e104bb88" }

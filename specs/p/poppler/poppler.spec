@@ -20,7 +20,7 @@
 Summary: PDF rendering library
 Name:    poppler
 Version: 25.07.0
-Release: 9%{?dist}
+Release: 11%{?dist}
 License: (GPL-2.0-only OR GPL-3.0-only) AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:     https://poppler.freedesktop.org/
 Source0: https://poppler.freedesktop.org/poppler-%{version}.tar.xz
@@ -38,6 +38,15 @@ Patch4:  poppler-25.07.0-cert-db.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=2403486
 Patch5:  poppler-25.07.0-duplicate-entries.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=2543972 - CVE-2026-102621
+Patch6:  poppler-25.07.0-clipToPath-integer-overflow.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=2544506 - CVE-2026-102620
+Patch7:  poppler-25.07.0-cvtSfnts-integer-overflow.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=2537011 - CVE-2026-93653
+Patch8:  poppler-25.07.0-splash-infinite-loop.patch
 
 BuildRequires: make
 BuildRequires: cmake
@@ -296,6 +305,11 @@ test "$(pkg-config --modversion poppler-qt6)" = "%{version}"
 %{_mandir}/man1/*
 
 %changelog
+* Tue Nov 10 2026 Marek Kasik <mkasik@redhat.com> - 25.07.0-6
+- Backport fixes for several CVEs
+- Fixes CVE-2026-102621, CVE-2026-102620 and CVE-2026-93653
+- Resolves: #2543972, #2544506, #2537011
+
 * Mon May 11 2026 Marek Kasik <mkasik@redhat.com> - 25.07.0-5
 - Fix CVE-2025-52885
 - Resolves: #2403486
