@@ -1,0 +1,13 @@
+# Fedora moved the port-compiler runtime dependency on erlang-erl_interface to a
+# new erlang-rebar3-pc package. Azure Linux does not ship erlang-rebar3-pc, so
+# keep the requirement on rebar3 itself to avoid dropping it for existing users.
+
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Keep Requires: erlang-erl_interface (moved to erlang-rebar3-pc in Fedora)"
+type = "spec-add-tag"
+tag = "Requires"
+value = "erlang-erl_interface"

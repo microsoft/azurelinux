@@ -1,1 +1,5 @@
+# Pin to Fedora f44 erlang-rebar3-3.28.0 to pick up upstream CVE fixes. It builds
+# against the system erlang-hex_core, which must be 0.21.1 or newer.
+# https://src.fedoraproject.org/rpms/erlang-rebar3/c/3b4cd6c88eabc58e19a22fbce3f0bc8360ea2e31
 [components.erlang-rebar3]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "3b4cd6c88eabc58e19a22fbce3f0bc8360ea2e31" }
