@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Align systemd-boot package version with the Azure Linux supported 258.11 baseline"
+type = "spec-search-replace"
+regex = '^Version:\s+262\s*$'
+replacement = "Version:        258.11"
