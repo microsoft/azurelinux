@@ -32,7 +32,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.69
+Version: 2.4.71
 Release: 1.2.1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -874,6 +874,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Nov 11 2026 Luboš Uhliarik <luhliari@redhat.com> - 2.4.71-1
+- new version 2.4.71
+
 * Thu Oct 01 2026 Joe Orton  <jorton@redhat.com> - 2.4.69-1
 - update to 2.4.69
 - add mod_mime_libmagic for F45+
