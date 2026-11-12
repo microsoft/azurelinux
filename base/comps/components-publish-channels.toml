@@ -2669,6 +2669,8 @@ description = "curated per-SRPM channel-consistency exceptions"
 default-package-config.publish.rpm-channel = "rpm-sdk"
 default-package-config.publish.debuginfo-channel = "rpm-sdk-debuginfo"
 packages = [
+    # Optional Bash documentation; the shell remains in Base.
+    "bash-doc", # srpm: bash
     # Qt5 GUI for editing doxygen configs; pulls full Qt5 stack.
     "doxygen-doxywizard", # srpm: doxygen
     # LaTeX/PDF output backend; pulls full TeXLive (~6500 pkgs).
@@ -2798,7 +2800,6 @@ packages = [
     # vala-doc requires devhelp (sdk-only, GUI doc browser); CLI vala compiler stays in base.
     "vala-doc", # srpm: vala
     # rubygem -doc sub-packages ship generated rdoc/ri plus bundled upstream docs; runtime gem stays in base.
-    "rubygem-minitest-doc", # srpm: rubygem-minitest
     "rubygem-power_assert-doc", # srpm: rubygem-power_assert
     "rubygem-test-unit-doc", # srpm: rubygem-test-unit
     # ----------------------------------------------------------------
