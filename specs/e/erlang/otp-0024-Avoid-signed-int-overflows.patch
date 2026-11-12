@@ -1,0 +1,51 @@
+From: Raimo Niskanen <raimo@erlang.org>
+Date: Fri, 21 Aug 2026 17:22:41 +0200
+Subject: [PATCH] Avoid signed int overflows
+
+(cherry picked from commit 08e8efdba8500d2d6f54c6b1de1492b228017c9b)
+
+diff --git a/erts/emulator/beam/packet_parser.c b/erts/emulator/beam/packet_parser.c
+index a349c3ff84..8e3430b8ed 100644
+--- a/erts/emulator/beam/packet_parser.c
++++ b/erts/emulator/beam/packet_parser.c
+@@ -481,14 +481,14 @@ more:
+     return 0;
+ 
+ remain:
+-    {
+-        int tlen = hlen + plen;
+-	if ((max_plen != 0 && plen > max_plen)
+-	    || tlen < (int)hlen) { /* wrap-around protection */
+-	    return -1;
+-	}
+-	return tlen;
+-    }		
++    ASSERT(INT_MAX >= hlen);
++    if (max_plen == 0) {
++        max_plen = INT_MAX - hlen;
++    }
++    if (plen > max_plen) {
++        return -1;
++    }
++    return hlen + plen;
+ 
+ done:
+     return plen;
+diff --git a/erts/emulator/drivers/common/inet_drv.c b/erts/emulator/drivers/common/inet_drv.c
+index c7c3b73ff8..d5e5567e06 100644
+--- a/erts/emulator/drivers/common/inet_drv.c
++++ b/erts/emulator/drivers/common/inet_drv.c
+@@ -11425,7 +11425,12 @@ static int tcp_expand_buffer(tcp_descriptor* desc, int len)
+     int offs1;
+     int offs2;
+     int used = desc->i_ptr_start - desc->i_buf->orig_bytes;
+-    int ulen = used + len;
++    int ulen;
++
++    if (len > INT_MAX - used) {
++        return -1;
++    }
++    ulen = used + len;
+ 
+     if (desc->i_bufsz >= ulen) /* packet will fit */
+ 	return 0;
