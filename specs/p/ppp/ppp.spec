@@ -21,7 +21,7 @@ Name:    ppp
 # These all need to be patched (if necessary) and rebuilt for new
 # versions of ppp.
 Version: 2.5.1
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: The Point-to-Point Protocol daemon
 License: bsd-3-clause AND zlib AND licenseref-fedora-public-domain AND bsd-attribution-hpnd-disclaimer AND bsd-4.3tahoe AND bsd-4-clause-uc AND apache-2.0 AND lgpl-2.0-or-later AND (gpl-2.0-or-later OR bsd-2-clause OR bsd-3-clause OR bsd-4-clause) AND gpl-2.0-or-later AND xlock AND gpl-1.0-or-later AND mackerras-3-clause-acknowledgment AND mackerras-3-clause AND hpnd-fenneberg-Livingston AND sun-ppp AND hpnd-inria-imag AND sun-ppp-2000
 URL:     http://www.samba.org/ppp
@@ -71,6 +71,7 @@ Requires: systemd
 # Subpackage removed and obsoleted in F40
 Obsoletes: network-scripts-ppp < %{version}-%{release}
 
+Patch2: ppp-2.5.1-CVE-2024-58250.patch
 %description
 The ppp package contains the PPP (Point-to-Point Protocol) daemon and
 documentation for PPP support. The PPP protocol provides a method for
