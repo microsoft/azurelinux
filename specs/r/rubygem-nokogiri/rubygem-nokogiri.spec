@@ -1,10 +1,10 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global	mainver		1.19.4
+%global	mainver		1.19.7
 #%%global	prever		.rc4
 
-%global	baserelease		5
+%global	baserelease		1
 %global	prerpmver		%(echo "%{?prever}" | sed -e 's|\\.||g')
 
 %global	gem_name	nokogiri
@@ -301,6 +301,12 @@ popd
 %doc	%{gem_dir}/doc/%{gem_name}-%{mainver}%{?prever}/
 
 %changelog
+* Tue Nov 03 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.7-1
+- 1.19.7
+- Fixes GHSA-3w22-6jfg-527w
+- Fixes GHSA-v995-44v6-5fqm
+- Fixes GHSA-4p39-36wj-23h4
+
 * Thu Sep 10 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1.19.4-5
 - Rebuilt for libxml-2.5.4
 
