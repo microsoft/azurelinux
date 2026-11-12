@@ -1,0 +1,28 @@
+From e8546aa52df4b699666b03ba0be5ee521c5fad72 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Mon, 15 Jan 2024 15:40:07 +0900
+Subject: [PATCH] network/link: shorten code a bit
+
+(cherry picked from commit 24b9c341ce60f6a8512b2e9162d1b50187f2a053)
+---
+ src/network/networkd-link.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
+index 830e5ffae2df..508e2f1da0d3 100644
+--- a/src/network/networkd-link.c
++++ b/src/network/networkd-link.c
+@@ -415,11 +415,9 @@ void link_check_ready(Link *link) {
+         if (!link->activated)
+                 return (void) log_link_debug(link, "%s(): link is not activated.", __func__);
+ 
+-        if (link->iftype == ARPHRD_CAN) {
++        if (link->iftype == ARPHRD_CAN)
+                 /* let's shortcut things for CAN which doesn't need most of checks below. */
+-                link_set_state(link, LINK_STATE_CONFIGURED);
+-                return;
+-        }
++                goto ready;
+ 
+         if (!link->stacked_netdevs_created)
+                 return (void) log_link_debug(link, "%s(): stacked netdevs are not created.", __func__);
