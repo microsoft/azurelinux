@@ -29,7 +29,7 @@ end}
 
 Name:             grafana
 Version:          10.2.6
-Release: 25%{?dist}
+Release: 27%{?dist}
 Summary:          Metrics dashboard and graph editor
 License:          AGPL-3.0-only
 URL:              https://grafana.org
@@ -96,7 +96,9 @@ ExclusiveArch:    %{grafana_arches}
 
 BuildRequires:    systemd
 BuildRequires:    systemd-rpm-macros
-BuildRequires:    golang
+# golang-1.26.10 contains the fixes for the Go standard library issues
+# present in binaries built with go1.25.4 (see the changelog below)
+BuildRequires:    golang >= 1.26.10
 BuildRequires:    go-srpm-macros
 BuildRequires:    go-rpm-macros
 
@@ -1029,6 +1031,22 @@ done
 %ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/*/active/modules/200/grafana
 
 %changelog
+* Sat Oct 31 2026 Jan Kurik <jkurik@redhat.com> - 10.2.6-23
+- Rebuild with Go 1.26.10 to fix Go standard library vulnerabilities
+  present in the go1.25.4 build:
+  CVE-2025-61726, CVE-2025-61727, CVE-2025-61728, CVE-2025-61729,
+  CVE-2025-61730, CVE-2025-68121, CVE-2026-111943, CVE-2026-25679,
+  CVE-2026-27139, CVE-2026-27142, CVE-2026-27145, CVE-2026-32280,
+  CVE-2026-32281, CVE-2026-32282, CVE-2026-32283, CVE-2026-32288,
+  CVE-2026-32289, CVE-2026-33811, CVE-2026-33814, CVE-2026-33818,
+  CVE-2026-39820, CVE-2026-39821, CVE-2026-39822, CVE-2026-39823,
+  CVE-2026-39825, CVE-2026-39826, CVE-2026-39836, CVE-2026-42499,
+  CVE-2026-42504, CVE-2026-42505, CVE-2026-42507, CVE-2026-56853,
+  CVE-2026-56858, CVE-2026-56859, CVE-2026-56860, CVE-2026-56862,
+  CVE-2026-56866, CVE-2026-78659, CVE-2026-78660, CVE-2026-78663,
+  CVE-2026-78667, CVE-2026-78669, CVE-2026-94439, CVE-2026-94440,
+  CVE-2026-94448, CVE-2026-97030, CVE-2026-97031, CVE-2026-97032
+
 * Wed Dec 3 2025 Sam Feifer <sfeifer@redhat.com> - 10.2.6-22
 - Fix recursive macro definition causing rpminspect failure
 
