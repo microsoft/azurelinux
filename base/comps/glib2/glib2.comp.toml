@@ -1,1 +1,13 @@
 [components.glib2]
+
+[[components.glib2.overlays]]
+description = "Synchronize idle registration with wakeups and add the public shutdown regression from GNOME/glib!5484"
+type = "patch-add"
+source = "glib-thread-pool-idle-wakeup.patch"
+
+[components.glib2.overlays.metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [
+    { url = "https://gitlab.gnome.org/GNOME/glib/-/commit/28656adb8a969dc816f3eb573d1b048d986cee91" },
+]

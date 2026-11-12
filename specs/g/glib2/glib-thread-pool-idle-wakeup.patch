@@ -1,0 +1,212 @@
+From 28656adb8a969dc816f3eb573d1b048d986cee91 Mon Sep 17 00:00:00 2001
+From: Christian Hergert <christian@sourceandstack.com>
+Date: Tue, 10 Nov 2026 15:15:25 +0100
+Subject: [PATCH] gthreadpool: synchronize idle registration with wakeups
+
+A worker is counted as unused before it cleans up its old pool. If a
+stop request arrives during cleanup, reading the wakeup serial afterwards
+makes the worker treat that request as already handled.
+
+It could then wait forever for another pool.
+
+This reads the serial while counting the worker as unused using the
+queues lock. We also hold that lock while counting threads and queuing
+wakeups so another worker cant be added between the two.
+
+We still check the count before taking the lock because the queue may
+not have been created yet.
+
+Some of this is based upon !5467 from Tobias Brick.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/5484]
+---
+ glib/gthreadpool.c       | 29 ++++++++++----------
+ glib/tests/thread-pool.c | 58 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+), 14 deletions(-)
+
+diff --git a/glib/gthreadpool.c b/glib/gthreadpool.c
+index 813ab2cfe..ca658d048 100644
+--- a/glib/gthreadpool.c
++++ b/glib/gthreadpool.c
+@@ -123,7 +123,7 @@ static gpointer         g_thread_pool_thread_proxy        (gpointer          dat
+ static gboolean         g_thread_pool_start_thread        (GRealThreadPool  *pool,
+                                                            GError          **error);
+ static void             g_thread_pool_wakeup_and_stop_all (GRealThreadPool  *pool);
+-static GRealThreadPool* g_thread_pool_wait_for_new_pool   (void);
++static GRealThreadPool *g_thread_pool_wait_for_new_pool   (int               last_wakeup_thread_serial);
+ static gpointer         g_thread_pool_wait_for_new_task   (GRealThreadPool  *pool);
+ 
+ static void
+@@ -139,19 +139,17 @@ g_thread_pool_queue_push_unlocked (GRealThreadPool *pool,
+     g_async_queue_push_unlocked (pool->queue, data);
+ }
+ 
+-static GRealThreadPool*
+-g_thread_pool_wait_for_new_pool (void)
++static GRealThreadPool *
++g_thread_pool_wait_for_new_pool (int last_wakeup_thread_serial)
+ {
+   GRealThreadPool *pool;
+   gint local_wakeup_thread_serial;
+   guint local_max_unused_threads;
+   gint local_max_idle_time;
+-  gint last_wakeup_thread_serial;
+   gboolean have_relayed_thread_marker = FALSE;
+ 
+   local_max_unused_threads = (guint) g_atomic_int_get (&max_unused_threads);
+   local_max_idle_time = g_atomic_int_get (&max_idle_time);
+-  last_wakeup_thread_serial = g_atomic_int_get (&wakeup_thread_serial);
+ 
+   do
+     {
+@@ -341,6 +339,7 @@ g_thread_pool_thread_proxy (gpointer data)
+         {
+           /* No task was received, so this thread goes to the global pool. */
+           gboolean free_pool = FALSE;
++          int last_wakeup_thread_serial;
+ 
+           DEBUG_MSG (("thread %p leaving pool %p for global pool.",
+                       g_thread_self (), pool));
+@@ -385,13 +384,16 @@ g_thread_pool_thread_proxy (gpointer data)
+                 }
+             }
+ 
++          g_async_queue_lock (unused_thread_queue);
++          last_wakeup_thread_serial = g_atomic_int_get (&wakeup_thread_serial);
+           g_atomic_int_inc (&unused_threads);
++          g_async_queue_unlock (unused_thread_queue);
+           g_async_queue_unlock (pool->queue);
+ 
+           if (free_pool)
+             g_thread_pool_free_internal (pool);
+ 
+-          pool = g_thread_pool_wait_for_new_pool ();
++          pool = g_thread_pool_wait_for_new_pool (last_wakeup_thread_serial);
+           g_atomic_int_add (&unused_threads, -1);
+ 
+           if (pool == NULL)
+@@ -1015,25 +1017,25 @@ g_thread_pool_set_max_unused_threads (gint max_threads)
+ 
+   g_atomic_int_set (&max_unused_threads, max_threads);
+ 
+-  if (max_threads != -1)
++  if (max_threads != -1 && g_atomic_int_get (&unused_threads) > max_threads)
+     {
++      g_async_queue_lock (unused_thread_queue);
++
+       max_threads -= g_atomic_int_get (&unused_threads);
+       if (max_threads < 0)
+         {
+           g_atomic_int_set (&kill_unused_threads, -max_threads);
+           g_atomic_int_inc (&wakeup_thread_serial);
+ 
+-          g_async_queue_lock (unused_thread_queue);
+-
+           do
+             {
+               g_async_queue_push_unlocked (unused_thread_queue,
+                                            wakeup_thread_marker);
+             }
+           while (++max_threads);
+-
+-          g_async_queue_unlock (unused_thread_queue);
+         }
++
++      g_async_queue_unlock (unused_thread_queue);
+     }
+ }
+ 
+@@ -1186,15 +1188,14 @@ g_thread_pool_set_max_idle_time (guint interval)
+   i = (guint) g_atomic_int_get (&unused_threads);
+   if (i > 0)
+     {
+-      g_atomic_int_inc (&wakeup_thread_serial);
+       g_async_queue_lock (unused_thread_queue);
++      g_atomic_int_inc (&wakeup_thread_serial);
+ 
+-      do
++      for (i = (guint) g_atomic_int_get (&unused_threads); i > 0; i--)
+         {
+           g_async_queue_push_unlocked (unused_thread_queue,
+                                        wakeup_thread_marker);
+         }
+-      while (--i);
+ 
+       g_async_queue_unlock (unused_thread_queue);
+     }
+diff --git a/glib/tests/thread-pool.c b/glib/tests/thread-pool.c
+index 7161078e6..6c3fb8864 100644
+--- a/glib/tests/thread-pool.c
++++ b/glib/tests/thread-pool.c
+@@ -333,6 +333,63 @@ test_thread_pool_full (gconstpointer shared_first)
+     }
+ }
+ 
++static void
++stop_unused_thread_func (gpointer data,
++                         gpointer user_data)
++{
++  g_async_queue_push (user_data, g_thread_ref (g_thread_self ()));
++  g_async_queue_pop (data);
++}
++
++static void
++stop_unused_free_func (gpointer data)
++{
++  g_thread_pool_stop_unused_threads ();
++}
++
++static void
++test_stop_unused_during_free (void)
++{
++  GAsyncQueue *started;
++  GAsyncQueue *release;
++  GThreadPool *pool;
++  GThread *thread;
++  GError *error = NULL;
++
++  g_test_summary ("Stopping unused threads during queued-item cleanup stops the worker.");
++
++  if (!g_test_subprocess ())
++    {
++      g_test_trap_subprocess (NULL, 5 * G_USEC_PER_SEC, G_TEST_SUBPROCESS_DEFAULT);
++      g_test_trap_assert_passed ();
++      return;
++    }
++
++  g_thread_pool_set_max_unused_threads (-1);
++  g_thread_pool_set_max_idle_time (0);
++  started = g_async_queue_new ();
++  release = g_async_queue_new ();
++
++  pool = g_thread_pool_new_full (stop_unused_thread_func, started,
++                                 stop_unused_free_func, 1, FALSE, &error);
++  g_assert_no_error (error);
++  g_assert_nonnull (pool);
++  g_assert_true (g_thread_pool_push (pool, release, &error));
++  g_assert_no_error (error);
++  thread = g_async_queue_pop (started);
++  g_assert_true (g_thread_pool_push (pool, release, &error));
++  g_assert_no_error (error);
++
++  g_thread_pool_free (pool, TRUE, FALSE);
++  g_async_queue_push (release, GINT_TO_POINTER (1));
++  g_thread_join (thread);
++
++  g_assert_cmpuint (g_thread_pool_get_num_unused_threads (), ==, 0);
++  g_assert_cmpint (g_thread_pool_get_max_unused_threads (), ==, -1);
++  g_async_queue_unref (started);
++  g_async_queue_unref (release);
++}
++
+ int
+ main (int argc, char *argv[])
+ {
+@@ -348,6 +405,7 @@ main (int argc, char *argv[])
+   g_test_add_data_func ("/thread_pool/create_shared_after_exclusive", GINT_TO_POINTER (FALSE), test_create_first_pool);
+   g_test_add_data_func ("/thread_pool/create_full", NULL, test_thread_pool_full);
+   g_test_add_data_func ("/thread_pool/create_exclusive_after_shared", GINT_TO_POINTER (TRUE), test_create_first_pool);
++  g_test_add_func ("/thread_pool/stop_unused_during_free", test_stop_unused_during_free);
+ 
+   return g_test_run ();
+ }
