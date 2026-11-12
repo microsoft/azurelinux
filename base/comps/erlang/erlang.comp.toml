@@ -1,6 +1,10 @@
 # fop (Apache FOP) is not packaged in Azure Linux. It's only needed to build
 # the erlang-doc subpackage (PDF documentation). Disable doc generation.
+
+# Pin to Fedora f43 erlang-26.2.5.21-11, which backports the upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/erlang/c/64b7a3e0d535a215460afe729a0929865ab4458f
 [components.erlang]
+spec = { type = "upstream", upstream-commit = "64b7a3e0d535a215460afe729a0929865ab4458f" }
 
 [components.erlang.build]
 without = ["doc"]
