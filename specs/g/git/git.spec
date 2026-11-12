@@ -89,8 +89,8 @@
 %global _package_note_file  %{_builddir}/%{name}-%{real_version}/.package_note-%{name}-%{version}-%{release}.%{_arch}.ld
 
 Name:           git
-Version:        2.55.0
-Release: 5%{?dist}
+Version:        2.56.1
+Release: 6%{?dist}
 Summary:        Fast Version Control System
 License:        BSD-3-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:            https://git-scm.com/
@@ -141,7 +141,7 @@ Patch3:         0003-t-lib-git-svn-try-harder-to-find-a-port.patch
 
 # Configurates Apache test server to use `DavLockDBType sdbm`
 # Prevents t5540 failures on i686, s390x and ppc64le
-Patch5:         git-test-apache-davlockdbtype-config.patch
+Patch4:         git-test-apache-davlockdbtype-config.patch
 
 %if %{with docs}
 # pod2man is needed to build Git.3pm
@@ -262,6 +262,7 @@ BuildRequires:  perl(CGI::Carp)
 BuildRequires:  perl(CGI::Util)
 BuildRequires:  perl(DBD::SQLite)
 BuildRequires:  perl(Digest::MD5)
+BuildRequires:  perl(Digest::SHA)
 BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Copy)
@@ -1063,6 +1064,12 @@ rmdir --ignore-fail-on-non-empty "$testdir"
 %{?with_docs:%{_pkgdocdir}/git-svn.html}
 
 %changelog
+* Tue Nov 10 2026 Ondřej Pohořelský <opohorel@redhat.com> - 2.56.1-1
+- update to 2.56.1
+
+* Mon Oct 05 2026 Ondřej Pohořelský <opohorel@redhat.com> - 2.56.0-1
+- update to 2.56.0
+
 * Tue Jun 30 2026 Ondřej Pohořelský <opohorel@redhat.com> - 2.55.0-1
 - update to 2.55.0
 - enable Rust support for Fedora >= 45 and EL >= 11
