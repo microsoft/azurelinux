@@ -151,7 +151,7 @@ func TestRunWithEnvironment(t *testing.T) {
 	const indexURL = "https://build:dummy-token@example.invalid/simple/"
 	originalEnv := shell.CurrentEnvironment()
 	t.Cleanup(func() { shell.SetEnvironment(originalEnv) })
-	shell.SetEnvironment(append(append([]string{}, originalEnv...), "PIP_INDEX_URL=host-only", "UNRELATED_SECRET=host-only"))
+	shell.SetEnvironment([]string{"PIP_INDEX_URL=host-only", "UNRELATED_SECRET=host-only"})
 
 	chroot := &Chroot{rootDir: t.TempDir()}
 
@@ -185,6 +185,9 @@ func TestRunWithEnvironment(t *testing.T) {
 
 func TestRunWithEnvironmentRestoresEnvironmentOnChrootFailure(t *testing.T) {
 	originalEnv := shell.CurrentEnvironment()
+	t.Cleanup(func() { shell.SetEnvironment(originalEnv) })
+	expectedEnv := []string{"UNRELATED_SECRET=host-only"}
+	shell.SetEnvironment(expectedEnv)
 	chroot := &Chroot{rootDir: filepath.Join(t.TempDir(), "missing")}
 	called := false
 	err := chroot.RunWithEnvironment(func() error {
@@ -193,7 +196,7 @@ func TestRunWithEnvironmentRestoresEnvironmentOnChrootFailure(t *testing.T) {
 	}, []string{"PIP_INDEX_URL=https://example.invalid/simple/"})
 	assert.Error(t, err)
 	assert.False(t, called)
-	assert.Equal(t, originalEnv, shell.CurrentEnvironment())
+	assert.Equal(t, expectedEnv, shell.CurrentEnvironment())
 }
 
 func TestRunShouldChangeCWD(t *testing.T) {
