@@ -11,6 +11,7 @@ import (
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -144,6 +145,55 @@ func TestRunShouldReturnCorrectError(t *testing.T) {
 	})
 
 	assert.Equal(t, expectedErr, actualErr)
+}
+
+func TestRunWithEnvironment(t *testing.T) {
+	const indexURL = "https://build:dummy-token@example.invalid/simple/"
+	originalEnv := shell.CurrentEnvironment()
+	t.Cleanup(func() { shell.SetEnvironment(originalEnv) })
+	shell.SetEnvironment(append(append([]string{}, originalEnv...), "PIP_INDEX_URL=host-only", "UNRELATED_SECRET=host-only"))
+
+	chroot := &Chroot{rootDir: t.TempDir()}
+
+	for _, tc := range []struct {
+		name        string
+		extraEnv    []string
+		callbackErr error
+	}{
+		{name: "default isolation"},
+		{name: "explicit feed", extraEnv: []string{"PIP_INDEX_URL=" + indexURL}},
+		{name: "callback failure", extraEnv: []string{"PIP_INDEX_URL=" + indexURL}, callbackErr: fmt.Errorf("expected callback failure")},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			hostEnv := append([]string{}, shell.CurrentEnvironment()...)
+			callback := func() error {
+				expectedEnv := append(append([]string{}, defaultChrootEnv...), tc.extraEnv...)
+				assert.Equal(t, expectedEnv, shell.CurrentEnvironment())
+				return tc.callbackErr
+			}
+			var err error
+			if tc.extraEnv == nil {
+				err = chroot.Run(callback)
+			} else {
+				err = chroot.RunWithEnvironment(callback, tc.extraEnv)
+			}
+			assert.Equal(t, tc.callbackErr, err)
+			assert.Equal(t, hostEnv, shell.CurrentEnvironment())
+		})
+	}
+}
+
+func TestRunWithEnvironmentRestoresEnvironmentOnChrootFailure(t *testing.T) {
+	originalEnv := shell.CurrentEnvironment()
+	chroot := &Chroot{rootDir: filepath.Join(t.TempDir(), "missing")}
+	called := false
+	err := chroot.RunWithEnvironment(func() error {
+		called = true
+		return nil
+	}, []string{"PIP_INDEX_URL=https://example.invalid/simple/"})
+	assert.Error(t, err)
+	assert.False(t, called)
+	assert.Equal(t, originalEnv, shell.CurrentEnvironment())
 }
 
 func TestRunShouldChangeCWD(t *testing.T) {
