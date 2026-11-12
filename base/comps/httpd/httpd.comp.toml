@@ -1,7 +1,8 @@
-# Pin to Fedora f43 httpd-2.4.69 to pick up upstream CVE fixes.
-# https://src.fedoraproject.org/rpms/httpd/c/d28423f918e5086962eb1ec6d6767b513ef03405
+# Pin to Fedora f44 httpd-2.4.71 to pick up upstream CVE fixes.
+# f43 is still on 2.4.69; the f44 commit only bumps the version from it.
+# https://src.fedoraproject.org/rpms/httpd/c/dd036578128f894e8d7a7c95a5968cee9be4bbb7
 [components.httpd]
-spec = { type = "upstream", upstream-commit = "d28423f918e5086962eb1ec6d6767b513ef03405" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "dd036578128f894e8d7a7c95a5968cee9be4bbb7" }
 release = { calculation = "manual" }
 
 [[components.httpd.overlays]]
