@@ -1,0 +1,32 @@
+From 380b2f4e74c0648534545694723727252d13fe9d Mon Sep 17 00:00:00 2001
+From: Matthew Gaudet <mgaudet@mozilla.com>
+Date: Mon, 26 Oct 2026 09:22:17 -0600
+Subject: [PATCH] Bug 2085342 - Hash the little endian ICU data in
+ icu_data_hashed.S on big endian targets. r?ahochheiden
+
+On ESR153 the big endian data file is generated in the misc tier, so it isn't
+available when icu_data_hashed.S is generated during pre-compile. Main doesn't
+need this since bug 2038789 moved generated .dat files to pre-compile.
+---
+ config/external/icu/data/moz.build | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/config/external/icu/data/moz.build b/config/external/icu/data/moz.build
+index 16ec62046c1fd..8710738a18f98 100644
+--- a/config/external/icu/data/moz.build
++++ b/config/external/icu/data/moz.build
+@@ -32,8 +32,10 @@ SOURCES += [
+ GeneratedFile(
+     "icu_data_hashed.S",
+     script="icu_data_hash.py",
++    # The big endian data is generated from the little endian data in the misc
++    # tier, so hash the latter, which is available during pre-compile.
+     inputs=[
+-        "!" + data_file["big"] if endianness == "big" else data_file["little"],
++        data_file["little"],
+         "icu_data.S",
+     ],
+ )
+-- 
+2.50.1 (Apple Git-155)
+

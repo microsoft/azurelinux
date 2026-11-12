@@ -1,9 +1,9 @@
-diff -up firefox-158.0.1/widget/gtk/BufferSurface.h.old firefox-158.0.1/widget/gtk/BufferSurface.h
---- firefox-158.0.1/widget/gtk/BufferSurface.h.old	2026-10-21 13:01:16.952113195 +0200
-+++ firefox-158.0.1/widget/gtk/BufferSurface.h	2026-10-21 12:59:33.845420300 +0200
-@@ -166,7 +166,7 @@ class BufferSurface {
-   // surface without textures/eglimages.
-   RefPtr<mozilla::gl::GLContext> mGL;
+diff -up firefox-159.0/widget/gtk/BufferSurface.h.color-range firefox-159.0/widget/gtk/BufferSurface.h
+--- firefox-159.0/widget/gtk/BufferSurface.h.color-range	2026-10-22 19:49:29.000000000 +0200
++++ firefox-159.0/widget/gtk/BufferSurface.h	2026-10-26 09:49:44.573548425 +0100
+@@ -252,7 +252,7 @@ class BufferSurface {
+   // Set when underlying surface memory was changed.
+   bool mTextureIsDirty = false;
  
 -  mozilla::gfx::ColorRange mColorRange = mozilla::gfx::ColorRange::LIMITED;
 +  mozilla::gfx::ColorRange mColorRange = mozilla::gfx::ColorRange::FULL;
