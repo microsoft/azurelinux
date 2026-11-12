@@ -1,4 +1,5 @@
 [components.dhcpcd]
+tests.tests = [{ name = "tmt-dhcpcd-all" }]
 # Pin to Fedora rawhide commit that fixes daemonising when RLIMIT_NOFILE is 0
 # (rhbz#2547780), which left cloud-init-provisioned VMs without an IP address.
 # F43 does not carry the fix yet; drop this pin once it lands in the snapshot.

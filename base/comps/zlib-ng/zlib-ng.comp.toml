@@ -1,0 +1,2 @@
+[components.zlib-ng]
+tests.tests = [{ name = "zlib-ng-fedora-tmt" }]

@@ -1,6 +1,7 @@
 # Pin to Fedora f43 openscap-1.4.6-1 to pick up upstream CVE fixes.
 # https://src.fedoraproject.org/rpms/openscap/c/a7322448ce56dbdaa3c557bfdb7264daf04e503c
 [components.openscap]
+tests.tests = [{ name = "openscap-fedora-tmt" }]
 spec = { type = "upstream", upstream-commit = "a7322448ce56dbdaa3c557bfdb7264daf04e503c" }
 
 [components.openscap.build]

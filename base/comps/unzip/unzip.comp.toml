@@ -1,0 +1,2 @@
+[components.unzip]
+tests.tests = [{ name = "unzip-fedora-tmt" }]

@@ -1,0 +1,2 @@
+[components.nginx]
+tests.tests = [{ name = "nginx-fedora-tmt" }]

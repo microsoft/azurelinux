@@ -1,6 +1,7 @@
 # Pin to Fedora f43 nodejs24-None to pick up upstream CVE fixes.
 # https://src.fedoraproject.org/rpms/nodejs24/c/685165daff45a65879f63e3340b2effe9779ce01
 [components.nodejs24]
+tests.tests = [{ name = "tmt-nodejs-all" }]
 spec = { type = "upstream", upstream-commit = "685165daff45a65879f63e3340b2effe9779ce01" }
 # Release: %{node_release}
 release = { calculation = "manual" }

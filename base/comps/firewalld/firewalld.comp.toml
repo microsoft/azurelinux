@@ -1,4 +1,5 @@
 [components.firewalld]
+tests.tests = [{ name = "firewalld-fedora-tmt" }]
 
 [[components.firewalld.overlays]]
 type = "spec-remove-tag"
