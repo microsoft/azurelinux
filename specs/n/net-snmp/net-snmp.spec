@@ -13,7 +13,7 @@
 Summary:    A collection of SNMP protocol tools and libraries
 Name:       net-snmp
 Version:    5.9.4
-Release: 22%{?dist}
+Release: 23%{?dist}
 Epoch:      1
 
 License:    MIT-CMU AND BSD-3-Clause AND MIT
@@ -102,6 +102,10 @@ BuildRequires:   lm_sensors-devel >= 3
 %endif
 BuildRequires:   autoconf, automake
 
+Patch104: net-snmp-5.9.4-CVE-2025-68615-1-check-trap-variable-type-to-ensure-it-s-an-oid.patch
+Patch105: net-snmp-5.9.4-CVE-2025-68615-2-snmptrapd-do-not-write-outside-the-bounds-of-trapo.patch
+Patch106: net-snmp-5.9.4-CVE-2025-68615-3-snmptrapd-fix-out-of-bounds-trapoid-accesses.patch
+Patch107: net-snmp-5.9.4-CVE-2025-68615-4-snmptrapd-fix-an-integer-overflow.patch
 %description
 SNMP (Simple Network Management Protocol) is a protocol used for
 network management. The NET-SNMP project includes various SNMP tools:
@@ -257,6 +261,10 @@ cp %{SOURCE10} .
 
 %patch 101 -p1 -b .modern-rpm-api
 %patch 102 -p1
+%patch 104 -p1 -b .CVE-2025-68615-1
+%patch 105 -p1 -b .CVE-2025-68615-2
+%patch 106 -p1 -b .CVE-2025-68615-3
+%patch 107 -p1 -b .CVE-2025-68615-4
 %if 0%{?rhel}
 %patch 103 -p1
 %endif
