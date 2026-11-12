@@ -1,3 +1,6 @@
+# Pin to Fedora f43 rubygem-nokogiri-1.19.7 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/rubygem-nokogiri/c/1c0b84887c97555d86039adad7e9984c4c74d5f8
 [components.rubygem-nokogiri]
+spec = { type = "upstream", upstream-commit = "1c0b84887c97555d86039adad7e9984c4c74d5f8" }
 # Release: %{?prever:0.}%{baserelease}%{?prever:.%{prerpmver}}%{?dist}
 release = { calculation = "manual" }
