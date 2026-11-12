@@ -1,0 +1,78 @@
+From dc2ddb7dd92ea1bc4ceec8fcfc3f1362e60c4756 Mon Sep 17 00:00:00 2001
+From: Louis Scalbert <louis.scalbert@6wind.com>
+Date: Tue, 6 Jan 2026 15:32:32 +0100
+Subject: [PATCH] ospfd: skip subsequent tlvs after invalid length
+
+Do not attempt to read subsequent TLVs after an TLV invalid length is
+detected.
+
+Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+(cherry picked from commit 33dfc7e7be1ac8b66abbf47c30a709215fbc1926)
+---
+ ospfd/ospf_ext.c | 6 +++---
+ ospfd/ospf_ri.c  | 6 +++---
+ ospfd/ospf_te.c  | 6 +++---
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/ospfd/ospf_ext.c b/ospfd/ospf_ext.c
+index 89eea3f116..c1fcd632e0 100644
+--- a/ospfd/ospf_ext.c
++++ b/ospfd/ospf_ext.c
+@@ -1710,11 +1710,11 @@ static void ospf_ext_lsa_schedule(struct ext_itf *exti, enum lsa_opcode op)
+ 	do {                                                                   \
+ 		if (ntohs(tlvh->length) != size) {                             \
+ 			if (vty != NULL)                         \
+-				vty_out(vty, "  Wrong %s TLV size: %d(%d). Abort!\n",  \
++				vty_out(vty, "  Wrong %s TLV size: %d(expected %d). Skip subsequent TLVs!\n",  \
+ 					msg, ntohs(tlvh->length), size);               \
+ 			else                                              \
+-				zlog_debug("    Wrong %s TLV size: %d(%d). Abort!", msg, ntohs(tlvh->length), size);    \
+-			return size + TLV_HDR_SIZE;                            \
++				zlog_debug("    Wrong %s TLV size: %d(expected %d). Skip subsequent TLVs!", msg, ntohs(tlvh->length), size);    \
++			return OSPF_MAX_LSA_SIZE + 1;                            \
+ 		}                                                              \
+ 	} while (0)
+ 
+diff --git a/ospfd/ospf_ri.c b/ospfd/ospf_ri.c
+index 76e6efeb83..7934b25451 100644
+--- a/ospfd/ospf_ri.c
++++ b/ospfd/ospf_ri.c
+@@ -1208,12 +1208,12 @@ static int ospf_router_info_lsa_update(struct ospf_lsa *lsa)
+ 	do {                                                                   \
+ 		if (ntohs(tlvh->length) > size) {                              \
+ 			if (vty != NULL)                                       \
+-				vty_out(vty, "  Wrong %s TLV size: %d(%d)\n",  \
++				vty_out(vty, "  Wrong %s TLV size: %d(expected %d). Skip subsequent TLVs!\n",  \
+ 					msg, ntohs(tlvh->length), size);       \
+ 			else                                                   \
+-				zlog_debug("    Wrong %s TLV size: %d(%d)",    \
++				zlog_debug("    Wrong %s TLV size: %d(expected %d). Skip subsequent TLVs!",    \
+ 					   msg, ntohs(tlvh->length), size);    \
+-			return size + TLV_HDR_SIZE;                            \
++			return OSPF_MAX_LSA_SIZE + 1;                            \
+ 		}                                                              \
+ 	} while (0)
+ 
+diff --git a/ospfd/ospf_te.c b/ospfd/ospf_te.c
+index 189fcc70a4..a537830b20 100644
+--- a/ospfd/ospf_te.c
++++ b/ospfd/ospf_te.c
+@@ -3421,12 +3421,12 @@ static void ospf_te_init_ted(struct ls_ted *ted, struct ospf *ospf)
+ 	do {                                                                   \
+ 		if (ntohs(tlvh->length) > size) {                              \
+ 			if (vty != NULL)                                       \
+-				vty_out(vty, "  Wrong %s TLV size: %d(%d)\n",  \
++				vty_out(vty, "  Wrong %s TLV size: %d(expected %d). Skip subsequent TLVs!\n",  \
+ 					msg, ntohs(tlvh->length), size);       \
+ 			else                                                   \
+-				zlog_debug("    Wrong %s TLV size: %d(%d)",    \
++				zlog_debug("    Wrong %s TLV size: %d(expected %d). Skip subsequent TLVs!",    \
+ 					   msg, ntohs(tlvh->length), size);    \
+-			return size + TLV_HDR_SIZE;                            \
++			return OSPF_MAX_LSA_SIZE + 1;                            \
+ 		}                                                              \
+ 	} while (0)
+ 
+-- 
+2.45.4
+

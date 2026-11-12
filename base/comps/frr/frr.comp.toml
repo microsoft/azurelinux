@@ -1,0 +1,5 @@
+# Pin to Fedora f43 frr-10.4.5 (latest 10.4 stable). The ospfd CVE fixes from
+# FRRouting/frr#19983 are backported by overlays/0001.
+# https://src.fedoraproject.org/rpms/frr/c/53c962a8b481204b825b6d19ffd49a484afc6ddf
+[components.frr]
+spec = { type = "upstream", upstream-commit = "53c962a8b481204b825b6d19ffd49a484afc6ddf" }
