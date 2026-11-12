@@ -33,10 +33,17 @@ regex = '^%\{_prefix\}/lib/systemd/boot/efi/linux%\{efi_arch\}\.elf\.stub\.alt$'
 replacement = ''
 
 [[overlays]]
-description = "Rewrite the signing step to use the systemd-boot signing flow"
+description = "Copy the installed unsigned EFI binary into the signing path, sign it in place, and rename the signed output to .efi"
 type = "spec-search-replace"
 regex = '^%pesign -s -i %\{_prefix\}/lib/systemd/boot/efi/systemd-boot%\{efi_arch\}\.efi -o %\{buildroot\}%\{_prefix\}/lib/systemd/boot/efi/systemd-boot%\{efi_arch\}\.efi\.signed$'
 replacement = '''SYSTEMD_BOOT_EFI="%{buildroot}%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi"
+cp -a %{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi $SYSTEMD_BOOT_EFI
 %define __pesign_client_cert systemd-boot-signer
 %pesign -s -i $SYSTEMD_BOOT_EFI -o $SYSTEMD_BOOT_EFI.signed
 mv $SYSTEMD_BOOT_EFI.signed $SYSTEMD_BOOT_EFI'''
+
+[[overlays]]
+description = "Package the final signed EFI binary path rather than the temporary .efi.signed file"
+type = "spec-search-replace"
+regex = '^%\{_prefix\}/lib/systemd/boot/efi/systemd-boot%\{efi_arch\}\.efi\.signed$'
+replacement = '%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi'
