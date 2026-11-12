@@ -1,0 +1,4 @@
+# Pin to Fedora f43 mod_http2-2.0.42 (with the CVE-2026-119618 fix) to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/mod_http2/c/abbfe3047b64bc1bac3f77836440e0391a37f79e
+[components.mod_http2]
+spec = { type = "upstream", upstream-commit = "abbfe3047b64bc1bac3f77836440e0391a37f79e" }
