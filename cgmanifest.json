@@ -14612,8 +14612,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "24.22.2",
-          "downloadUrl": "https://nodejs.org/download/release/v24.22.2/node-v24.22.2.tar.xz"
+          "version": "24.22.3",
+          "downloadUrl": "https://nodejs.org/download/release/v24.22.3/node-v24.22.3.tar.xz"
         }
       }
     },
