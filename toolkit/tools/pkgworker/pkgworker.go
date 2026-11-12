@@ -155,6 +155,17 @@ func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
+func checkBuildEnvironment(runCheck bool) []string {
+	// Pass pip authentication only to test workers, without logging it or writing
+	// credentials into reusable chroots. Other host variables remain excluded.
+	if runCheck {
+		if indexURL := os.Getenv("PIP_INDEX_URL"); indexURL != "" {
+			return []string{"PIP_INDEX_URL=" + indexURL}
+		}
+	}
+	return nil
+}
+
 func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, releaseVersionMacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
 
 	const (
@@ -239,7 +250,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	// `unmount /path/to/chroot/dev` will fail since our root is currently `/path/to/chroot`,
 	// and `/path/to/chroot/path/to/chroot/dev` is not a real path.
 	results := make(chan error)
-	err = chroot.Run(func() (err error) {
+	err = chroot.RunWithEnvironment(func() (err error) {
 		go func() {
 			results <- buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, isCCacheEnabled(ccacheManager))
 		}()
@@ -254,7 +265,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 			chrootErr = fmt.Errorf("build timed out after %s", timeout)
 		}
 		return chrootErr // Internal error is returned via the channel
-	})
+	}, checkBuildEnvironment(runCheck))
 
 	if err != nil {
 		err = fmt.Errorf("failed to build RPM from SRPM in chroot:\n%w", err)
