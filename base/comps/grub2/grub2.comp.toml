@@ -1,1 +1,7 @@
 [components.grub2]
+
+[[components.grub2.overlays]]
+description = "Bump the static release value from 55 to 56"
+type = "spec-set-tag"
+tag = "Release"
+value = "56%{?dist}"

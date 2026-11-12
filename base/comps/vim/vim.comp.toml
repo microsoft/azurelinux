@@ -3,3 +3,9 @@
 # (default ON when fedora is set); flip it off via build.without.
 [components.vim]
 build.without = ["gpm"]
+
+[[components.vim.overlays]]
+description = "Bump the static release value from 6 to 7"
+type = "spec-set-tag"
+tag = "Release"
+value = "7%{?dist}"

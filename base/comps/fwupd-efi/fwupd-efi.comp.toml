@@ -1,5 +1,11 @@
 [components.fwupd-efi]
 
+[[components.fwupd-efi.overlays]]
+description = "Set a fixed release value of 99 instead of autorelease"
+type = "spec-set-tag"
+tag = "Release"
+value = "99"
+
 # SBAT (AB#20493): add an Azure Linux vendor line to the fwupd EFI binary.
 #
 # fwupd-efi has no sbat.csv.in; its .sbat section is generated at build time by

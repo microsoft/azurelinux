@@ -1,6 +1,6 @@
 # Azure Linux — Agent Guide
 
-For project context and architecture, see [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
+For *the* project context and architecture, see [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 
 ## Mandatory Testing
 
