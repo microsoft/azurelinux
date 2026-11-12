@@ -216,8 +216,15 @@ steps:
         allow_toolchain_rebuilds_arg="ALLOW_TOOLCHAIN_REBUILDS=n"
       fi
 
+      sudo_env_args=()
       if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
         run_check_arg="RUN_CHECK=y"
+        if [[ ! -v PIP_INDEX_URL || ${#PIP_INDEX_URL} -eq 0 ]]; then
+          echo "##[error]PIP_INDEX_URL is required for package checks; run PipAuthenticate first." >&2
+          exit 1
+        fi
+        # Preserve only the variable name; never put the credential URL in command arguments.
+        sudo_env_args+=(--preserve-env=PIP_INDEX_URL)
       elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
         run_check_arg="RUN_CHECK=n"
       fi
@@ -268,7 +275,7 @@ steps:
         extra_macros_files_arg="EXTRA_MACROS_FILES='${extra_macros_files[*]}'"
       fi
 
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
+      sudo "${sudo_env_args[@]}" make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
         MAX_CPU="${{ parameters.maxCPU }}" \
@@ -291,6 +298,9 @@ steps:
         $toolchain_archive_arg \
         $use_ccache_arg
     displayName: "Build packages"
+    env:
+      ${{ if eq(parameters.isCheckBuild, 'true') }}:
+        PIP_INDEX_URL: $(PIP_INDEX_URL)
 
   - ${{ if parameters.outputArtifactsFolder }}:
       - ${{ if parameters.outputRPMsCacheTarballName }}:
