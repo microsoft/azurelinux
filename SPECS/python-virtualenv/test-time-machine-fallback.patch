@@ -1,0 +1,31 @@
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -370,5 +370,26 @@
+ else:
+ 
+     @pytest.fixture
+-    def time_freeze(time_machine):
+-        return lambda s: time_machine.move_to(s, tick=False)
++    def time_freeze(monkeypatch):
++        def move_to(value, tick=False):
++            from datetime import datetime
++            from virtualenv.seed.wheels import periodic_update as periodic_update_module
++
++            frozen = value
++
++            class FrozenDatetime(datetime):
++                @classmethod
++                def now(cls, tz=None):
++                    if tz is None:
++                        return frozen.replace(tzinfo=None)
++                    return frozen.astimezone(tz)
++
++            monkeypatch.setattr(periodic_update_module, "datetime", FrozenDatetime)
++
++            import sys
++            for module_name in ("test_acquire", "tests.unit.seed.wheels.test_acquire"):
++                module = sys.modules.get(module_name)
++                if module is not None:
++                    monkeypatch.setattr(module, "datetime", FrozenDatetime, raising=False)
++
++        return move_to

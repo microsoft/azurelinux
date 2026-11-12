@@ -1,0 +1,33 @@
+--- a/tests/unit/activation/conftest.py
++++ b/tests/unit/activation/conftest.py
+@@ -141,7 +141,7 @@
+         assert out[5] == self._creator.env_name
+         # Some attempts to test the prompt output print more than 1 line.
+         # So we need to check if the prompt exists on any of them.
+-        prompt_text = f"({self._creator.env_name}) "
++        prompt_text = self.expected_prompt()
+         assert any(prompt_text in line for line in out[6:-4]), raw
+ 
+         assert out[-4] == "wrote pydoc_test.html", raw
+@@ -168,6 +168,9 @@
+     def print_prompt(self):
+         return NotImplemented
+ 
++    def expected_prompt(self):
++        return f"({self._creator.env_name}) "
++
+     def activate_call(self, script):
+         cmd = self.quote(str(self.activate_cmd))
+         scr = self.quote(str(script))
+--- a/tests/unit/activation/test_bash.py
++++ b/tests/unit/activation/test_bash.py
+@@ -85,4 +85,9 @@
+         def print_prompt(self):
+             return self.print_os_env_var("PS1")
+ 
++        def expected_prompt(self):
++            name = self._creator.env_name
++            name = name.replace("\\", "\\\\").replace("$", "\\$").replace("`", "\\`")
++            return f"({name}) "
++
+     activation_tester(Bash)

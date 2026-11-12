@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,17 +29,19 @@ Patch1015:      remove-compromised-wheel-ca-roots.patch
 Patch1016:      CVE-2026-113732.patch
 Patch1017:      CVE-2026-113716.patch
 Patch1018:      CVE-2026-113723.patch
-Patch1019:      CVE-2026-113726.patch
+## Patch1019 test-only coverage; production fix is supplied by Patch1018.
 Patch1020:      CVE-2026-113713.patch
 Patch1021:      CVE-2026-113776.patch
 Patch1022:      CVE-2026-113715.patch
 Patch1023:      CVE-2026-113722.patch
-Patch1024:      CVE-2026-113725.patch
+## Patch1024 test-only coverage; production fix is supplied by Patch1029.
 Patch1025:      CVE-2026-113720.patch
 Patch1026:      CVE-2026-113719.patch
 Patch1027:      CVE-2026-113721.patch
 Patch1028:      CVE-2026-102938.patch
 Patch1029:      CVE-2026-115586.patch
+Patch1030:      test-prompt-expected.patch
+Patch1031:      test-time-machine-fallback.patch
 BuildArch:      noarch
 
 %description
@@ -54,7 +56,14 @@ BuildRequires:  python3-wheel
 BuildRequires:  zip
 
 %if 0%{?with_check}
-BuildRequires:  python3-pip
+BuildRequires:  python3-coverage
+BuildRequires:  python3-distlib
+BuildRequires:  python3-filelock
+BuildRequires:  python3-packaging
+BuildRequires:  python3-platformdirs
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-pytest-mock
 %endif
 BuildRequires:  python3-flit
 BuildRequires:  python3-flit-core >= 3.8.0
@@ -78,17 +87,19 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 1016 -p1
 %patch -P 1017 -p1
 %patch -P 1018 -p1
-%patch -P 1019 -p1
+## Patch1019 test-only coverage disabled.
 %patch -P 1020 -p1
 %patch -P 1021 -p1
 %patch -P 1022 -p1
 %patch -P 1023 -p1
-%patch -P 1024 -p1
+## Patch1024 test-only coverage disabled.
 %patch -P 1025 -p1
 %patch -P 1026 -p1
 %patch -P 1027 -p1
 %patch -P 1028 -p1
 %patch -P 1029 -p1
+%patch -P 1030 -p1
+%patch -P 1031 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -201,14 +212,10 @@ rm -rf unpacked_wheel-0.45.1-py3-none-any
 %pyproject_install
 
 %check
-# Pin packaging to the RPM-installed version so pip does not try to
-# upgrade it for virtualenv >= 21.14.6 (requires packaging >= 26.3); the
-# rpm-installed copy has no RECORD file, so pip aborts with
-# uninstall-no-record-file and the test tooling is never installed.
-pip3 install packaging==23.2 'tox>=3.27.1,<4.0.0'
-# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
-sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
-tox -e py
+sed -i 's/ --no-success-flaky-report//' pyproject.toml
+PATH=%{buildroot}%{_bindir}:${PATH} \
+PYTHONPATH=%{buildroot}%{python3_sitelib} \
+    python3 -m pytest tests --int -k "not test_can_build_c_extensions"
 
 %files -n python3-virtualenv
 %defattr(-,root,root,-)
@@ -217,6 +224,10 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Mon Nov 09 2026 Kshitiz Godara <kgodara@microsoft.com> - 20.36.1-11
+- Replace pip/tox test bootstrap with direct pytest and RPM test dependencies.
+- Add explicit check-time dependencies for distlib, filelock, and platformdirs.
+
 * Sat Oct 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-10
 - Reconcile the published CA cleanup with the existing tox-based ptest bootstrap.
 - Pin packaging==23.2 when installing test tooling to preserve RPM-owned packaging.
