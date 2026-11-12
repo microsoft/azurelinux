@@ -1,8 +1,8 @@
 [components.nss]
 # Release: %{nss_release}%{?dist}
 release = { calculation = "manual" }
-# Firefox 158 requires NSS >= 3.130. Pin the Fedora 43 update to 3.130.0,
+# Firefox 159 requires NSS >= 3.131. Pin the Fedora 43 update to 3.133.0,
 # including NSPR 4.39.0, without advancing the distro-wide snapshot.
 # This also satisfies 389-ds-base's NSS >= 3.123.1 requirement.
-# https://src.fedoraproject.org/rpms/nss/c/8d3b0f00d56ad85dd5f7effc7cf453a23d12ca4c
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "8d3b0f00d56ad85dd5f7effc7cf453a23d12ca4c" }
+# https://src.fedoraproject.org/rpms/nss/c/b27a9292014d46befceb7e20b4ecf1608c6c0fdf
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "b27a9292014d46befceb7e20b4ecf1608c6c0fdf" }
