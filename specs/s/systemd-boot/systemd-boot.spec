@@ -12,11 +12,11 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           systemd-boot
-Version: 258.11
+Version:        258.11
 Release:        %autorelease
 Summary:        UEFI boot manager
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://systemd.io
 
 %global source_rpm_name systemd-boot-unsigned
@@ -41,7 +41,7 @@ systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
 graphical menu to select the entry to boot and an editor for the kernel command
 line. systemd-boot supports systems with UEFI firmware only.
 
-This package contains the signed version that that works with SecureBoot.}
+This package contains the signed version that works with SecureBoot.}
 
 %description %_description
 
@@ -71,16 +71,20 @@ fi
 
 %install
 mkdir -p %{buildroot}%{_prefix}/lib/systemd/boot/efi
-SYSTEMD_BOOT_EFI="%{buildroot}%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi"
-cp -a %{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi $SYSTEMD_BOOT_EFI
-%define __pesign_client_cert systemd-boot-signer
-%pesign -s -i $SYSTEMD_BOOT_EFI -o $SYSTEMD_BOOT_EFI.signed
-mv $SYSTEMD_BOOT_EFI.signed $SYSTEMD_BOOT_EFI
+%pesign -s -i %{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi -o %{buildroot}%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi.signed
 
 # Copy files over so they become available on other architectures.
 # They are renamed to avoid a file conflict between packages.
+cp -a %{_prefix}/lib/systemd/boot/efi/linux%{efi_arch}.efi.stub \
+   %{buildroot}%{_prefix}/lib/systemd/boot/efi/linux%{efi_arch}.efi.stub.alt
+cp -a %{_prefix}/lib/systemd/boot/efi/addon%{efi_arch}.efi.stub \
+   %{buildroot}%{_prefix}/lib/systemd/boot/efi/addon%{efi_arch}.efi.stub.alt
 
-
+# Create efi binary hardlink for bootupd discovery
+# Note: systemd-boot is hardlinked to the grub%%{efi_arch}.efi filename for shim compatibility
+install -dm 0755 %{buildroot}%{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI/%{efi_vendor}
+ln %{buildroot}%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi.signed \
+   %{buildroot}%{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI/%{efi_vendor}/grub%{efi_arch}.efi
 
 install -m0644 -Dt %{buildroot}%{_licensedir}/%{name}/ %{_datadir}/licenses/systemd/LICENSE.LGPL2.1
 
@@ -96,9 +100,15 @@ fi
 %dir %{_prefix}/lib/systemd
 %dir %{_prefix}/lib/systemd/boot
 %dir %{_prefix}/lib/systemd/boot/efi
-%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi
-
-
+%attr(0644,-,-) %{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi.signed
+%{_prefix}/lib/systemd/boot/efi/linux%{efi_arch}.efi.stub.alt
+%{_prefix}/lib/systemd/boot/efi/addon%{efi_arch}.efi.stub.alt
+%dir %{_prefix}/lib/efi
+%dir %{_prefix}/lib/efi/systemd-boot
+%dir %{_prefix}/lib/efi/systemd-boot/%{version}-%{release}
+%dir %{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI
+%dir %{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI/%{efi_vendor}
+%{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI/%{efi_vendor}/grub%{efi_arch}.efi
 
 # Man pages are provided by systemd-udev subpackage.
 # If we copied them to this package, we'd need to either rename them
