@@ -1,0 +1,38 @@
+From 7c5ce5cdb3a65936c0b2fc577cac3cbe70620a43 Mon Sep 17 00:00:00 2001
+From: s1awwhy <seawwhy@163.com>
+Date: Sun, 24 Aug 2025 21:17:55 +0800
+Subject: [PATCH] ospfd: Add null check for vty_out in check_tlv_size
+
+Add security check for vty_out. Specifically,  Check NULL for vty. If vty is not available, dump info via zlog.
+
+Signed-off-by: s1awwhy <seawwhy@163.com>
+(cherry picked from commit b7d9b7aa47627b31e4b50795284408ab6de98660)
+---
+ ospfd/ospf_ext.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/ospfd/ospf_ext.c b/ospfd/ospf_ext.c
+index df0b3b9081..8ca0df3200 100644
+--- a/ospfd/ospf_ext.c
++++ b/ospfd/ospf_ext.c
+@@ -1705,11 +1705,15 @@ static void ospf_ext_lsa_schedule(struct ext_itf *exti, enum lsa_opcode op)
+  * ------------------------------------
+  */
+ 
++/* Check NULL for vty. If vty is not available, dump info via zlog */
+ #define check_tlv_size(size, msg)                                              \
+ 	do {                                                                   \
+ 		if (ntohs(tlvh->length) != size) {                             \
+-			vty_out(vty, "  Wrong %s TLV size: %d(%d). Abort!\n",  \
+-				msg, ntohs(tlvh->length), size);               \
++			if (vty != NULL)                         \
++				vty_out(vty, "  Wrong %s TLV size: %d(%d). Abort!\n",  \
++					msg, ntohs(tlvh->length), size);               \
++			else                                              \
++				zlog_debug("    Wrong %s TLV size: %d(%d). Abort!", msg, ntohs(tlvh->length), size);    \
+ 			return size + TLV_HDR_SIZE;                            \
+ 		}                                                              \
+ 	} while (0)
+-- 
+2.45.4
+

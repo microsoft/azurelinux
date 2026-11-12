@@ -1,0 +1,29 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+  { url = "https://github.com/FRRouting/frr/commit/b7d9b7aa47627b31e4b50795284408ab6de98660" },
+  { url = "https://github.com/FRRouting/frr/commit/034e6fe67078810b952630055614ee5710d1196e" },
+  { url = "https://github.com/FRRouting/frr/commit/33dfc7e7be1ac8b66abbf47c30a709215fbc1926" },
+]
+
+# Fixes for NULL pointer dereferences when ospfd dumps opaque LSAs with debug
+# logging on (CVE-2025-61099 to CVE-2025-61107). Upstream fixed these in
+# FRRouting/frr#19983, which first shipped in 10.6 and is not on the 10.4
+# stable branch, so 10.4.5 still needs them. The three functional commits from
+# that PR are taken unmodified; the fourth (4e596582) only reformats a macro and
+# is left out. Drop these once we move to 10.6 or later.
+[[overlays]]
+description = "Backport upstream b7d9b7aa ('ospfd: Add null check for vty_out in check_tlv_size')"
+type = "patch-add"
+source = "../frr-0001-ospfd-Add-null-check-for-vty_out-in-check_tlv_size.patch"
+
+[[overlays]]
+description = "Backport upstream 034e6fe6 ('ospfd: Fix NULL Pointer Deference when dumping link info')"
+type = "patch-add"
+source = "../frr-0002-ospfd-Fix-NULL-Pointer-Deference-when-dumping-link.patch"
+
+[[overlays]]
+description = "Backport upstream 33dfc7e7 ('ospfd: skip subsequent tlvs after invalid length')"
+type = "patch-add"
+source = "../frr-0003-ospfd-skip-subsequent-tlvs-after-invalid-length.patch"
