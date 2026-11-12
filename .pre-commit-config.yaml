@@ -16,7 +16,7 @@ repos:
           - azure-devops==7.1.0b4
           - azure-identity==1.27.0
           - mcp==2.3.0
-          - pydantic==2.14.1
+          - pydantic==2.14.3
           - pytest==9.2.0
           - python-dotenv==1.2.4
           - python-on-whales==0.81.0
