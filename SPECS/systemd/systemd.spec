@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        37%{?dist}
+Release:        38%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -104,6 +104,7 @@ Source23:       sysusers.prov
 Source24:       sysusers.generate-pre.sh
 
 Source25:       98-default-mac-none.link
+Source26:       10-netlink-timeout.conf
 
 %if 0
 GIT_DIR=../../src/systemd/.git git format-patch-ab --no-signature -M -N v235..v235-stable
@@ -926,6 +927,8 @@ install -m 0755 -D -t %{buildroot}%{_rpmconfigdir}/ %{SOURCE24}
 # https://bugzilla.redhat.com/show_bug.cgi?id=2107754
 install -Dm0644 -t %{buildroot}%{_prefix}/lib/systemd/network/ %{SOURCE25}
 
+install -Dm0644 -t %{buildroot}%{system_unit_dir}/systemd-networkd.service.d/ %{SOURCE26}
+
 ln -s --relative %{buildroot}%{_bindir}/kernel-install %{buildroot}%{_sbindir}/installkernel
 
 %find_lang %{name}
@@ -1275,6 +1278,10 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Thu Nov 12 2026 Alex Cortelyou <alcortel@microsoft.com> - 255-38
+- Increase systemd-networkd's default netlink timeout from 25 to 250 seconds.
+- Allow more time for route requests delayed by VF teardown during live migration.
+
 * Wed Nov 11 2026 Dan Streetman <ddstreet@ieee.org> - 255-37
 - Backport upstream PRs 30936 and 34054 for automatic networkd recovery
   after interface failures and correct DHCP stop, release, and decline handling.
