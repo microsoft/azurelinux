@@ -1827,8 +1827,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "52.0.152",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v52.0.152.tar.gz"
+          "version": "52.0.187",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v52.0.187.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "4.1.0.kata1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/4.1.0.kata1.tar.gz"
+          "version": "4.1.0.kata2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/4.1.0.kata2.tar.gz"
         }
       }
     },
