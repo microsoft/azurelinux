@@ -10,6 +10,14 @@ parameters:
     type: string
     default: ""
 
+  # Names of pipeline variables forwarded into package builds that run %check when isCheckBuild is "true".
+  # Each must be set and non-empty. Values are redacted from build logs before they are published.
+  - name: checkEnvPassthrough
+    type: object
+    default: []
+    # Sample:
+    #   - PIP_INDEX_URL
+
   - name: concurrentPackageBuilds
     type: number
     default: 12
@@ -217,14 +225,21 @@ steps:
       fi
 
       sudo_env_args=()
+      check_env_args=()
       if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
         run_check_arg="RUN_CHECK=y"
-        if [[ ! -v PIP_INDEX_URL || ${#PIP_INDEX_URL} -eq 0 ]]; then
-          echo "##[error]PIP_INDEX_URL is required for package checks; run PipAuthenticate first." >&2
-          exit 1
+        check_env_names="${{ join(' ', parameters.checkEnvPassthrough) }}"
+        if [[ -n "$check_env_names" ]]; then
+          for check_env_name in $check_env_names; do
+            if [[ -z "$(printenv "$check_env_name")" ]]; then
+              echo "##[error]Check environment variable '$check_env_name' is not set or is empty." >&2
+              exit 1
+            fi
+          done
+          # Preserve only the listed names; values never appear in command arguments.
+          sudo_env_args+=("--preserve-env=${check_env_names// /,}")
+          check_env_args+=("CHECK_ENV_PASSTHROUGH=$check_env_names")
         fi
-        # Preserve only the variable name; never put the credential URL in command arguments.
-        sudo_env_args+=(--preserve-env=PIP_INDEX_URL)
       elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
         run_check_arg="RUN_CHECK=n"
       fi
@@ -296,11 +311,59 @@ steps:
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
-        $use_ccache_arg
+        $use_ccache_arg \
+        "${check_env_args[@]}"
     displayName: "Build packages"
     env:
       ${{ if eq(parameters.isCheckBuild, 'true') }}:
-        PIP_INDEX_URL: $(PIP_INDEX_URL)
+        ${{ each checkEnvName in parameters.checkEnvPassthrough }}:
+          ${{ checkEnvName }}: $(${{ checkEnvName }})
+
+  # Package tests can print forwarded values (for example credentials embedded in a feed URL),
+  # and file logs are not covered by pipeline secret masking.
+  - ${{ if and(eq(parameters.isCheckBuild, 'true'), gt(length(parameters.checkEnvPassthrough), 0)) }}:
+      - bash: |
+          check_env_names="${{ join(' ', parameters.checkEnvPassthrough) }}"
+          sudo --preserve-env="${check_env_names// /,}" python3 - "$check_env_names" \
+            "${{ parameters.buildRepoRoot }}/build/logs" \
+            "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" <<'EOF'
+          import os
+          import sys
+          import urllib.parse
+          from pathlib import Path
+
+          secrets = set()
+          for name in sys.argv[1].split():
+              value = os.environ.get(name, "")
+              secrets.add(value)
+              try:
+                  password = urllib.parse.urlsplit(value).password
+              except ValueError:
+                  password = None
+              if password:
+                  secrets.update({password, urllib.parse.unquote(password)})
+          # Longest first, so a full URL is replaced before the credential inside it.
+          patterns = sorted((secret.encode() for secret in secrets if len(secret) >= 8), key=len, reverse=True)
+
+          redacted = 0
+          for root in sys.argv[2:]:
+              for path in Path(root).rglob("*"):
+                  if path.is_symlink() or not path.is_file():
+                      continue
+                  original = path.read_bytes()
+                  content = original
+                  for pattern in patterns:
+                      content = content.replace(pattern, b"***")
+                  if content != original:
+                      path.write_bytes(content)
+                      redacted += 1
+          print(f"Redacted forwarded check variables from {redacted} file(s).")
+          EOF
+        condition: always()
+        displayName: "Redact forwarded check variables from logs"
+        env:
+          ${{ each checkEnvName in parameters.checkEnvPassthrough }}:
+            ${{ checkEnvName }}: $(${{ checkEnvName }})
 
   - ${{ if parameters.outputArtifactsFolder }}:
       - ${{ if parameters.outputRPMsCacheTarballName }}:
