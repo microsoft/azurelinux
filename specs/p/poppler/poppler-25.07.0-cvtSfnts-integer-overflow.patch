@@ -1,0 +1,25 @@
+From 245d3c6823377755f2c1d5fdddd010279c6ed94d Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <aacid@kde.org>
+Date: Sat, 8 Aug 2026 15:47:43 +0200
+Subject: Fix integer overflow in FoFiTrueType::cvtSfnts
+
+Issue #1762
+
+diff --git a/fofi/FoFiTrueType.cc b/fofi/FoFiTrueType.cc
+index e15cfc576..9e280fe89 100644
+--- a/fofi/FoFiTrueType.cc
++++ b/fofi/FoFiTrueType.cc
+@@ -1204,7 +1204,11 @@ void FoFiTrueType::cvtSfnts(FoFiOutputFunc outputFunc, void *outputStream, const
+             checksum = 0;
+             glyfPos = tables[seekTable("glyf")].offset;
+             for (j = 0; j < nGlyphs; ++j) {
+-                length += locaTable[j].len;
++                if (unlikely(checkedAdd(length, locaTable[j].len, &length))) {
++                    error(errSyntaxError, -1, "Integer overflow in glyph table length calculation");
++                    ok = false;
++                    break;
++                }
+                 if (length & 3) {
+                     length += 4 - (length & 3);
+                 }
+                 }

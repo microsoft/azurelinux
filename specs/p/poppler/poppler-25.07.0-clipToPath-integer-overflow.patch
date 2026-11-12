@@ -1,0 +1,31 @@
+From 323c91036d99926a8b90dc14329f7b40aece22f8 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <aacid@kde.org>
+Date: Sat, 8 Aug 2026 15:02:27 +0200
+Subject: Fix integer overflow in SplashClip::clipToPath
+
+Issue #1763
+
+diff --git a/splash/SplashClip.cc b/splash/SplashClip.cc
+index 78249652c..b096beebd 100644
+--- a/splash/SplashClip.cc
++++ b/splash/SplashClip.cc
+@@ -23,6 +23,8 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include "goo/gmem.h"
++#include "goo/GooCheckedOps.h"
++#include "goo/GooLikely.h"
+ #include "SplashErrorCodes.h"
+ #include "SplashMath.h"
+ #include "SplashPath.h"
+@@ -211,7 +213,9 @@ SplashError SplashClip::clipToPath(const SplashPath &path, const std::array<doub
+         xPath.sort();
+         flags[length] = eo ? splashClipEO : 0;
+         if (antialias) {
+-            yMinAA = yMinI * splashAASize;
++            if (unlikely(checkedMultiply(yMinI, splashAASize, &yMinAA))) {
++                return splashErrGeneric;
++            }
+             yMaxAA = (yMaxI + 1) * splashAASize - 1;
+         } else {
+             yMinAA = yMinI;
