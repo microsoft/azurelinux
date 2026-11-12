@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,6 +40,7 @@ Patch1026:      CVE-2026-113719.patch
 Patch1027:      CVE-2026-113721.patch
 Patch1028:      CVE-2026-102938.patch
 Patch1029:      CVE-2026-115586.patch
+Patch1030:      CVE-2026-113714.patch
 BuildArch:      noarch
 
 %description
@@ -63,6 +64,7 @@ Requires:       python3
 Requires:       python3-platformdirs
 Requires:       python3-distlib < 1
 Requires:       python3-filelock
+Requires:       python3-packaging >= 23.1
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description -n python3-virtualenv
@@ -89,6 +91,7 @@ virtualenv is a tool to create isolated Python environment.
 %patch -P 1027 -p1
 %patch -P 1028 -p1
 %patch -P 1029 -p1
+%patch -P 1030 -p1
 
 # Manual patching for CVE-2025-50181 and CVE-2026-1703v0
 # For CVE-2025-50181, poolmanager.py file is located in 2 different places and each is of different version so the same patch cannot be applied to all of them.
@@ -217,6 +220,10 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Tue Nov 10 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 20.36.1-11
+- Patch for CVE-2026-113714 and CVE-2026-113717.
+- Add python3-packaging runtime dependency for wheel verification.
+
 * Sat Oct 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-10
 - Reconcile the published CA cleanup with the existing tox-based ptest bootstrap.
 - Pin packaging==23.2 when installing test tooling to preserve RPM-owned packaging.
