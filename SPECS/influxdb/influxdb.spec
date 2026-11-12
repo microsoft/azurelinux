@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -175,6 +175,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.7.5-24
+- Remove additional emSign G1, C1 and ECC C3 roots from the Snowflake CA bundle.
+
 * Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.7.5-23
 - Remove AAA and emSign ECC G3 from the vendored Snowflake CA bundle.
 - Preserve SSL.com trust with its independent TLS ECC Root CA 2022.

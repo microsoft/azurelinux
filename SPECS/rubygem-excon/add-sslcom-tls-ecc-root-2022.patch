@@ -11,7 +11,7 @@ Upstream-status: Azure Linux trust-store backport
 
 --- a/data/cacert.pem
 +++ b/data/cacert.pem
-@@ -3329,3 +3329,20 @@
+@@ -3267,3 +3267,20 @@
  W9f+qdJUDkpd0m2xQNz0Q9XSSpkZElaA94M04TVOSG0ED1cxMDAtsaqdAzjbBgIxAMvMh1PLet8g
  UXOQwKhbYdDFUDn9hf7B43j4ptZLvZuHjw/l1lOWqzzIQNph91Oj9w==
  -----END CERTIFICATE-----
