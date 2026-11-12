@@ -1,0 +1,4 @@
+# Pin to Fedora f43 podman-5.8.10 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/podman/c/859e850bc894afff155f327759132ccff49a010d
+[components.podman]
+spec = { type = "upstream", upstream-commit = "859e850bc894afff155f327759132ccff49a010d" }
