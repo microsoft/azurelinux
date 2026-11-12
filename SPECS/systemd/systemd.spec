@@ -1266,8 +1266,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
-* Fri Oct 30 2026 Alex Cortelyou <alcortel@microsoft.com> - 255-37
-- Increase networkd's default netlink timeout to 100 seconds.
+* Wed Nov 11 2026 Alex Cortelyou <alcortel@microsoft.com> - 255-37
+- Increase systemd-networkd's default netlink timeout from 25 to 250 seconds.
+- Allow more time for route requests delayed by VF teardown during live migration.
 
 * Tue Oct 27 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 255-36
 - Backport upstream sd-event fix for hang after ratelimit expiry (systemd/systemd#44107, commit 1a60b10)
