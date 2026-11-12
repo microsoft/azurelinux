@@ -2,8 +2,8 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.4.3
-Release:        2%{?dist}
+Version:        1.4.4
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,6 +52,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Thu Nov 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.4-1
+- Auto-upgrade to 1.4.4 - for CVE-2026-119101
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.3-2
 - Patch for CVE-2026-61801
 
