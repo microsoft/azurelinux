@@ -1,1 +1,5 @@
+# Pin to Fedora f44 gstreamer1-plugins-base-1.28.9. Part of the stacked GStreamer 1.28.9 update;
+# plugins-base and plugins-good build-require the core at the same version or newer.
+# https://src.fedoraproject.org/rpms/gstreamer1-plugins-base/c/5ea199b1fe05d55c0af57662d0843dafa7ddf2c6
 [components.gstreamer1-plugins-base]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "5ea199b1fe05d55c0af57662d0843dafa7ddf2c6" }
