@@ -1,0 +1,8 @@
+[components.golang-github-eclipse-paho-mqtt]
+
+# Sources for the 1.5.1 update overlay; drop together with it once Fedora ships 1.5.1 or newer.
+[[components.golang-github-eclipse-paho-mqtt.source-files]]
+filename = "paho.mqtt.golang-1.5.1.tar.gz"
+hash = "b6a0d75ce3e6998706c31256145977c9110c42a214c594536fc81b7620d68d75b2fb6b33f09d3fa0e2e0de11e03292711a21c303c897fc9d494653c5d514532c"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/eclipse/paho.mqtt.golang/archive/v1.5.1/paho.mqtt.golang-1.5.1.tar.gz" }
