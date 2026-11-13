@@ -14,13 +14,21 @@
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
 Version:        1.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/microsoft/kubevirt
 Source0:        https://github.com/microsoft/kubevirt/archive/refs/tags/openvmm-%{srctag}.tar.gz#/%{name}-%{srctag}.tar.gz
+Patch0:         CVE-2026-13622.patch
+Patch1:         CVE-2026-33814.patch
+Patch2:         CVE-2026-39821.patch
+Patch3:         CVE-2026-56852.patch
+Patch4:         CVE-2026-78659.patch
+Patch5:         CVE-2026-78660.patch
+Patch6:         CVE-2026-78663.patch
+Patch7:         CVE-2026-97032.patch
 %ifarch x86_64
 Source1:        https://github.com/microsoft/mu_msvm/releases/download/v%{msvm_version}/firmware-RELEASE-X64-VS2022.tar.gz
 Source2:        x64.json
@@ -297,6 +305,9 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 %{_bindir}/virt-tests
 
 %changelog
+* Sat Nov 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.0-2
+- Patch for CVE-2026-97032, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-56852, CVE-2026-39821, CVE-2026-33814, CVE-2026-13622
+
 * Mon Oct 26 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.9.0-1
 - License verified
 - Add temporary x86 OpenVMM firmware and UEFI templates
