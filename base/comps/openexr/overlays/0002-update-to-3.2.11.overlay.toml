@@ -1,0 +1,25 @@
+# Fedora does not package openexr 3.2.11 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2025-64182, CVE-2025-64183, CVE-2026-27622, CVE-2026-34379, CVE-2026-34380,
+# CVE-2026-34588, CVE-2026-34589, CVE-2026-40244, CVE-2026-40250, CVE-2026-41142,
+# CVE-2026-42216, CVE-2026-42217, CVE-2026-54920, CVE-2026-55059, CVE-2026-55373,
+# CVE-2026-59183, CVE-2026-59184, CVE-2026-59186, CVE-2026-59189, CVE-2026-59981,
+# CVE-2026-59982, CVE-2026-59983, CVE-2026-59984, CVE-2026-59985, CVE-2026-61555,
+# CVE-2026-68515
+# Remove this overlay once the imported Fedora spec packages 3.2.11 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.2.11"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.2.11"
+
+[[overlays]]
+description = "Remove the obsolete openexr-3.2.4.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(openexr-3\.2\.4\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

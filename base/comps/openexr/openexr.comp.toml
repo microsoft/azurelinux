@@ -1,2 +1,8 @@
 [components.openexr]
 
+# Sources for the 3.2.11 update overlay; drop together with it once Fedora ships 3.2.11 or newer.
+[[components.openexr.source-files]]
+filename = "openexr-3.2.11.tar.gz"
+hash = "5281262c1cff61f4848a1f1825b8bfa55a64c8fa1743a18476f9fb4b8cf1049bd3fe639bb6efb9a543afa0eca9e2db77b2bcc2b5d8d215e87cc1b411faf36f6c"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/AcademySoftwareFoundation/openexr/archive/v3.2.11/openexr-3.2.11.tar.gz" }
