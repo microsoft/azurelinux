@@ -1,7 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           openvmm
-Version:        0.4.0
+Version:        0.5.0
 Release:        1%{?dist}
 Summary:        Modular, cross-platform virtual machine monitor
 Group:          Applications/System
@@ -19,8 +19,8 @@ Patch0:         0001-vmservice-use-low-ECAM-for-isolated-guests.patch
 ExclusiveArch:  x86_64 aarch64
 
 # Cargo enforces the workspace's rust-version.
-BuildRequires:  rust >= 1.95.0
-BuildRequires:  cargo >= 1.95.0
+BuildRequires:  rust >= 1.97.0
+BuildRequires:  cargo >= 1.97.0
 BuildRequires:  binutils
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
@@ -76,6 +76,10 @@ cargo test --release --locked --offline --lib --target %{rust_target} %{test_cra
 %{_bindir}/openvmm
 
 %changelog
+* Thu Nov 12 2026 Ben Hillis <benhill@microsoft.com> - 0.5.0-1
+- Update to version 0.5.0
+- Require Rust and Cargo 1.97 or newer
+
 * Wed Oct 28 2026 Ben Hillis <benhill@microsoft.com> - 0.4.0-1
 - Update to version 0.4.0
 
