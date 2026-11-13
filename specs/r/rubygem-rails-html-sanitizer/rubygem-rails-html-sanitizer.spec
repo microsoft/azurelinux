@@ -5,12 +5,15 @@
 %global gem_name rails-html-sanitizer
 
 Name: rubygem-%{gem_name}
-Version: 1.6.0
-Release: 8%{?dist}
+Version: 1.7.2
+Release: 9%{?dist}
 Summary: This gem is responsible to sanitize HTML fragments in Rails applications
 License: MIT
 URL: https://github.com/rails/rails-html-sanitizer
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+# git clone https://github.com/rails/rails-html-sanitizer.git && cd rails-html-sanitizer
+# git archive -v -o rails-html-sanitizer-%{version}-tests.tar.gz v%{version} test/
+Source1: %{gem_name}-%{version}-tests.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -37,7 +40,7 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%setup -q -n %{gem_name}-%{version} -b1
 
 %build
 gem build ../%{gem_name}-%{version}.gemspec
@@ -51,6 +54,7 @@ cp -a .%{gem_dir}/* \
 
 %check
 pushd .%{gem_instdir}
+cp -a %{_builddir}/test .
 ruby -Ilib -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 popd
 
@@ -65,7 +69,7 @@ popd
 %doc %{gem_docdir}
 %doc %{gem_instdir}/CHANGELOG.md
 %doc %{gem_instdir}/README.md
-%{gem_instdir}/test
+
 
 %changelog
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-5

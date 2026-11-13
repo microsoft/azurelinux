@@ -1,0 +1,28 @@
+# Fedora does not package loofah 2.25.3 on f43/f44 yet. Update to the upstream
+# release. rails-html-sanitizer 1.7.2 (needed by Rails 8.0.5.2) requires loofah
+# 2.25.3 or newer.
+# CVE fixes:
+# CVE-2026-73490
+# Remove this overlay once the imported Fedora spec packages 2.25.3 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.25.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.25.3"
+
+[[overlays]]
+description = "Remove the obsolete loofah-2.22.0-test.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(loofah-2\.22\.0-test\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete loofah-2.22.0.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(loofah-2\.22\.0\.gem\) = [0-9a-f]+(?:\r?\n|$)'

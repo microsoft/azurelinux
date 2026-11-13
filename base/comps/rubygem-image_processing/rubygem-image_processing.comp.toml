@@ -1,0 +1,6 @@
+# Pin to Fedora f44 rubygem-image_processing-1.14.0. 1.12.2 requires mini_magick
+# below 5; 1.14.0 accepts mini_magick 5, which Active Storage 8.0.5.2 needs for its
+# ImageMagick security policy.
+# https://src.fedoraproject.org/rpms/rubygem-image_processing/c/b2f3b50076081db41c06e5d3202a1615a94d51e8
+[components.rubygem-image_processing]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "b2f3b50076081db41c06e5d3202a1615a94d51e8" }

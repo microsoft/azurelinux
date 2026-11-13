@@ -1,0 +1,6 @@
+# Pin to Fedora f44 rubygem-ruby-vips-2.2.5. Active Storage 8.0.5.2 refuses to load
+# with ruby-vips older than 2.2.1, which it needs to block libvips's unfuzzed loaders
+# (CVE-2026-66066).
+# https://src.fedoraproject.org/rpms/rubygem-ruby-vips/c/b21be5f8a434076ee9a98523e92f3577c3db9f41
+[components.rubygem-ruby-vips]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "b21be5f8a434076ee9a98523e92f3577c3db9f41" }
