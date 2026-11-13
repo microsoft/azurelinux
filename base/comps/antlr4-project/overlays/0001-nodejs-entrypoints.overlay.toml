@@ -1,0 +1,37 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Build JavaScript bundles offline from GitHub sources and resolve the versioned Node.js installation path"
+type = "spec-append-lines"
+section = "%package"
+package = "nodejs-antlr4"
+lines = ["BuildRequires: /usr/bin/esbuild", "BuildRequires: nodejs"]
+
+[[overlays]]
+description = "Preserve upstream package exports by building Node and browser entrypoints offline"
+type = "spec-append-lines"
+section = "%build"
+lines = [
+    '%ifarch %nodejs_arches',
+    'pushd runtime/JavaScript',
+    'esbuild src/antlr4/index.node.js --bundle --platform=node --format=cjs --target=node16 --sourcemap --outfile=dist/antlr4.node.cjs',
+    'esbuild src/antlr4/index.node.js --bundle --platform=node --format=esm --target=node16 --sourcemap --outfile=dist/antlr4.node.mjs',
+    '# Match the browser-only fs fallback in upstream webpack.config.js.',
+    'printf "export default {};\n" > fs-empty.mjs',
+    'esbuild src/antlr4/index.web.js --bundle --platform=browser --format=cjs --target=es2015 --alias:fs=./fs-empty.mjs --sourcemap --outfile=dist/antlr4.web.cjs',
+    'esbuild src/antlr4/index.web.js --bundle --platform=browser --format=esm --target=es2015 --alias:fs=./fs-empty.mjs --sourcemap --outfile=dist/antlr4.web.mjs',
+    'popd',
+    '%endif',
+]
+
+[[overlays]]
+description = "Install upstream package metadata, sources and declarations alongside the locally built bundles"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    '%ifarch %nodejs_arches',
+    'cp -a runtime/JavaScript/package.json runtime/JavaScript/src runtime/JavaScript/dist "%{buildroot}%{nodejs_sitelib}/antlr4/"',
+    '%endif',
+]
