@@ -1,0 +1,7 @@
+[components.fluent-bit]
+
+[[components.fluent-bit.source-files]]
+filename = "fluent-bit-4.2.8.tar.gz"
+hash = "76aa6fefe1e72ee2ae96b74b134446a085c8ed10f8500b58ffac042b6a5c1bd00d01708d4e781211a583d3af7e8239216e40f9bb5942f09f21734d5090a6d534"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/fluent/fluent-bit/archive/v4.2.8/fluent-bit-4.2.8.tar.gz" }
