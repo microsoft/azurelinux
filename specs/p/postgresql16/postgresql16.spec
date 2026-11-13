@@ -50,8 +50,8 @@
 
 Summary: PostgreSQL client programs
 Name: %{majorname}%{majorversion}
-Version: %{majorversion}.15
-Release: 5%{?dist}
+Version: %{majorversion}.16
+Release: 6%{?dist}
 
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
@@ -63,7 +63,7 @@ Url: http://www.postgresql.org/
 # that this be kept up with the latest minor release of the previous series;
 # but update when bugs affecting pg_dump output are fixed.
 %global prevmajorversion 15
-%global prevversion %{prevmajorversion}.19
+%global prevversion %{prevmajorversion}.20
 %global prev_prefix %{_libdir}/pgsql/postgresql-%{prevmajorversion}
 %global precise_version %{?epoch:%epoch:}%version-%release
 
