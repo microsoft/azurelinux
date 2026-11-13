@@ -2,14 +2,15 @@
 # spec. This replaces the Fedora upstream golang entirely, so the distro ships a
 # single golang toolchain sourced from Microsoft build of Go (systemcrypto / OpenSSL backend).
 [components.golang]
-# Use Fedora's matching Go 1.26.10 packaging, newer than the distro snapshot.
+# Use Fedora's Go 1.26.10 packaging (Fedora has no 1.26.11 build yet; overlay 0001
+# moves go_patch to 11 to match the Microsoft build of Go source).
 # https://src.fedoraproject.org/rpms/golang/c/161713c8b927cddf12b3f58f551030dd67e6fef7
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "161713c8b927cddf12b3f58f551030dd67e6fef7" }
 
+# Microsoft build of Go 1.26.11-1 source archive. Fedora's 1.26.10 sources file has no
+# go1.26.11 entry to replace, so this is added alongside it; Source0 points here.
 [[components.golang.source-files]]
-filename = "go1.26.10.src.tar.gz"
-hash = "42d77b17d643c9b01df22874c77d739d62dc765415f3e4aad6dc9bd112cfd393"
+filename = "go1.26.11.src.tar.gz"
+hash = "0e67e247a14420f223b9081d0d9416ae94f1e7eaa162bfec8c116b2c21f33675"
 hash-type = "SHA256"
-origin = { type = "download", uri = "https://github.com/microsoft/go/releases/download/v1.26.10-1/go1.26.10-20261020.3.src.tar.gz" }
-replace-upstream = true
-replace-reason = "Ship Microsoft build of Go 1.26.10-1 sources instead of Fedora's upstream Go archive"
+origin = { type = "download", uri = "https://github.com/microsoft/go/releases/download/v1.26.11-1/go1.26.11-20261110.4.src.tar.gz" }
