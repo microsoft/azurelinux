@@ -4,8 +4,8 @@
 %global gem_name rdiscount
 
 Name: rubygem-%{gem_name}
-Version: 2.2.7.1
-Release: 11%{?dist}
+Version: 2.2.7.4
+Release: 12%{?dist}
 Summary: Fast Implementation of Gruber's Markdown in C
 License: BSD-3-Clause
 URL: http://dafoster.net/projects/rdiscount/
@@ -95,6 +95,7 @@ popd
 %doc %{gem_docdir}
 %doc %{gem_instdir}/BUILDING
 %doc %{gem_instdir}/README.markdown
+%doc %{gem_instdir}/CHANGELOG.md
 %{gem_instdir}/Rakefile
 %{gem_instdir}/man
 %{gem_instdir}/rdiscount.gemspec
