@@ -1,0 +1,17 @@
+[components.rubygem-concurrent-ruby]
+
+# Sources for the 1.3.7 update overlay; drop together with it once Fedora ships 1.3.7 or newer.
+[[components.rubygem-concurrent-ruby.source-files]]
+filename = "concurrent-ruby-1.3.7.gem"
+hash = "52995ff0b9559b2715e08d77a148fed58b66a93612e55cf99c4cf9409770954c1bbed8dba8992df99a42f4fa31418e2692b893530b869ff30ff6e517b0882da0"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/concurrent-ruby-1.3.7.gem" }
+
+# Generated: upstream ships the test suite only in git (see the Source1 comment in the spec).
+[[components.rubygem-concurrent-ruby.source-files]]
+filename = "concurrent-ruby-1.3.7-specs.tar.gz"
+hash = "ceb161897d02d397495230b62f64b76a1a7bf2109cd9f6a5d7bfb94c3a8e3b5039723f965b26edec6e7c5e3a18c8c88e141a362c71a2bfb45ee4eda0759e02b2"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-spec-tarball.sh"
+origin.mock-packages = ["git"]
