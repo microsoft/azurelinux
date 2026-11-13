@@ -148,7 +148,7 @@ ExcludeArch: i686
 %if %{?system_nss}
 %global nspr_version 4.38.2
 %global nspr_build_version %{nspr_version}
-%global nss_version 3.130
+%global nss_version 3.131
 %global nss_build_version %{nss_version}
 %endif
 
@@ -192,14 +192,14 @@ ExcludeArch: i686
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        158.0.1
-Release: 15%{?dist}
+Version:        159.0
+Release: 16%{?dist}
 URL:            https://www.mozilla.org/firefox/
 # Automatically converted from old format: MPLv1.1 or GPLv2+ or LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-MPLv1.1 OR GPL-2.0-or-later OR LicenseRef-Callaway-LGPLv2+
 Source0:        https://archive.mozilla.org/pub/firefox/releases/%{version}%{?pre_version}/source/firefox-%{version}%{?pre_version}.source.tar.xz
 %if %{with langpacks}
-Source1:        firefox-langpacks-%{version}%{?pre_version}-20261021.tar.xz
+Source1:        firefox-langpacks-%{version}%{?pre_version}-20261026.tar.xz
 %endif
 Source2:        cbindgen-vendor.tar.xz
 Source3:        dump_syms-vendor.tar.xz
@@ -268,6 +268,7 @@ Patch402:        color-range.patch
 Patch600:        pgo.patch
 Patch602:        mozilla-1516803.patch
 Patch603:        firefox-gcc-always-inline.patch
+Patch604:        0001-Bug-2085342-Hash-the-little-endian-ICU-data-in-icu_d.patch
 
 %if %{?system_nss}
 BuildRequires:  pkgconfig(nspr) >= %{nspr_version}
@@ -554,6 +555,7 @@ cat %{SOURCE49} | sed -e "s|LIBCLANG_RT_PLACEHOLDER|`pwd`/wasi-sdk-30/build/sysr
 %endif
 %endif
 %patch -P603 -p1 -b .inline
+%patch -P604 -p1 -b .0001-Bug-2085342-Hash-the-little-endian-ICU-data-in-icu-d
 
 rm -f .mozconfig
 cp %{SOURCE10} .mozconfig
@@ -1200,6 +1202,13 @@ fi
 #---------------------------------------------------------------------
 
 %changelog
+* Tue Oct 27 2026 Martin Stransky <stransky@redhat.com> - 159.0-2
+- Added s390x ICU fix
+
+* Mon Oct 26 2026 Martin Stransky <stransky@redhat.com> - 159.0-1
+- Update to latest upstream (159.0)
+- Temporary disabled s390x due to build error
+
 * Wed Oct 21 2026 Martin Stransky <stransky@redhat.com> - 158.0.1-2
 - Added fix for mzbz#2084134
 
