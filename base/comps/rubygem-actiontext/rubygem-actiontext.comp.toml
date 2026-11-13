@@ -20,3 +20,28 @@ replacement = """mv test/javascript_package_test.rb{,.disable}
 # Azure Linux: no headless_chrome available, so skip Selenium-driven system tests.
 mv test/system/rich_text_editor_test.rb{,.disable}
 mv test/system/system_test_helper_test.rb{,.disable}"""
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-actiontext.source-files]]
+filename = "actiontext-8.0.5.2.gem"
+hash = "2a707613ecdef1e316583c9304a64d092fbe1aae1f183e65741df238e838bd4135696be6eca08fd2423b076ed5acfbae64faabd27328c3b1c59300ff54326e26"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/actiontext-8.0.5.2.gem" }
+
+# Generated: the actiontext/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-actiontext.source-files]]
+filename = "actiontext-8.0.5.2-tests.tar.gz"
+hash = "727b3901f10100f357c3bcd4f631c1d6ad8c6b756c6d3f75ec5d43250a0db6a89db8e83ff1b09aa28e2cf583561d1f36efc4680d6306d74c2039dc7b90d37245"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]
+
+# Generated: the actiontext JavaScript sources of the upstream v8.0.5.2 tag (see the Source2 comment in the spec).
+[[components.rubygem-actiontext.source-files]]
+filename = "actiontext-8.0.5.2-js.tar.gz"
+hash = "193bab68095388f8b6855fa50d4796d0be854716c81c363b189e1c1d653f6426265487a794efa79dc50f8791ba68349c12653ad759f2564a3119de93dfa55a0e"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-js-tarball.sh"
+origin.mock-packages = ["git"]

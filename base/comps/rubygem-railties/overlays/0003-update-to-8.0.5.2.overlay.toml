@@ -1,0 +1,60 @@
+# Fedora does not package railties 8.0.5.2 on f43/f44 yet. Update to the upstream
+# release. The Rails gems require each other at the exact same version, so the
+# whole stack moves to 8.0.5.2 together.
+# Remove this overlay once the imported Fedora spec packages 8.0.5.2 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 8.0.5.2"
+type = "spec-update-tag"
+tag = "Version"
+value = "8.0.5.2"
+
+[[overlays]]
+description = "Drop the polymorphic_url/polymorphic_path fix; it is upstream since 8.0.3 (rails/rails#54904)"
+type = "patch-remove"
+file = "**/rubygem-railties-8.0.2-Fix-polymorphic-url-and-polymorphic-path.patch"
+
+[[overlays]]
+description = "Drop the matching test fix; it is upstream since 8.0.3 (rails/rails#54904)"
+type = "patch-remove"
+file = "**/rubygem-railties-8.0.2-Fix-polymorphic-url-and-polymorphic-path-tests.patch"
+
+[[overlays]]
+description = "Drop the %patch lines for the two removed patches"
+type = "spec-search-replace"
+regex = '^%patch [01] -p2$'
+replacement = ""
+
+[[overlays]]
+description = "The 8.0.5.2 Active Storage engine tests boot an app that requires mini_magick 5.1 or later"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "rubygem(mini_magick) >= 5.1"
+
+[[overlays]]
+description = "8.0.5.2 middleware tests expect Propshaft::Server (propshaft 1.2 or later); 4.0 ships propshaft 1.1.0, so use the 8.0.2 expectations"
+type = "spec-search-replace"
+regex = '^sed -i -r .s/\\\[bundle install\\\]/\[bundle install --local\]/. test/plugin_helpers\.rb$'
+replacement = '''
+sed -i -r 's/\[bundle install\]/[bundle install --local]/' test/plugin_helpers.rb
+sed -i -e '/^      "Propshaft::Server",$/d' \
+  -e 's/^\(    assert_equal "Rack::Runtime", middleware\)\[5\]$/\1[4]/' \
+  -e 's/^\(    assert_equal "ActiveSupport::Cache::Strategy::LocalCache", middleware\)\[5\]$/\1[4]/' \
+  -e 's/^\(    assert_equal "Rack::Runtime", middleware\)\[6\]$/\1[5]/' \
+  test/commands/middleware_test.rb'''
+
+[[overlays]]
+description = "Remove the obsolete railties-8.0.2-tests.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(railties-8\.0\.2-tests\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete railties-8.0.2.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(railties-8\.0\.2\.gem\) = [0-9a-f]+(?:\r?\n|$)'

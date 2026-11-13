@@ -1,0 +1,17 @@
+[components.rubygem-activejob]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-activejob.source-files]]
+filename = "activejob-8.0.5.2.gem"
+hash = "9e334fb732ab7cdeab3a9248c8f320564a720241f1e7bdc2aa217f2a47188c1c2a0a0a7ea53137424bb991016b3d41a11eca0ed6d9a8e7b64ea9ade2a248054a"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/activejob-8.0.5.2.gem" }
+
+# Generated: the activejob/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-activejob.source-files]]
+filename = "activejob-8.0.5.2-tests.tar.gz"
+hash = "899826eaa98066fc2e2d67599a22eeff94d9102f617b89c4b68e8cd5409f3aa082604dffd5f76e1e949ce38b92a91138f3cd9f81581bf5537da7cbae7f0e2fe7"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]

@@ -5,3 +5,27 @@
 # video previews would have had to install ffmpeg explicitly anyway.
 [components.rubygem-activestorage]
 
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-activestorage.source-files]]
+filename = "activestorage-8.0.5.2.gem"
+hash = "5193c0b5fe9074dbeccb961edbdc3b41674b32fedae574c4dde9631e4e6f41be81c20560fd93cfb71f92b184741923d332c3aa1f140badde3de3a8a8b1ced2de"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/activestorage-8.0.5.2.gem" }
+
+# Generated: the activestorage/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-activestorage.source-files]]
+filename = "activestorage-8.0.5.2-tests.tar.gz"
+hash = "d7008f885df347aa7927a38ea6c5e74424303bf122f7b0a2388fe021ebc99703aa8111b91726f9af777600ac4cb8ac7d3360baab97e47941f8a95f34fde8330d"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]
+
+# Generated: the activestorage JavaScript sources of the upstream v8.0.5.2 tag (see the Source2 comment in the spec).
+[[components.rubygem-activestorage.source-files]]
+filename = "activestorage-8.0.5.2-js.tar.gz"
+hash = "e1378ff1eb117ab728a79a25095034001d002661546e39bed783924e33ee4eba1e6c89bea3d224550cd77bdc38a9acc70ebccff8919577c4426d549d8be168ec"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-js-tarball.sh"
+origin.mock-packages = ["git"]

@@ -6,8 +6,8 @@
 
 Name: rubygem-%{gem_name}
 Epoch: 1
-Version: 8.0.2
-Release: 5%{?dist}
+Version: 8.0.5.2
+Release: 6%{?dist}
 Summary: Full-stack web application framework
 License: MIT
 URL: https://rubyonrails.org
