@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -190,7 +190,7 @@ popd
 rm -rf unpacked_wheel-0.45.1-py3-none-any
 
 %{__python3} Tools/remove-untrusted-wheel-roots.py \
-    --expected-removals 3 src/virtualenv/seed/wheels/embed/pip-*.whl
+    --expected-removals 9 src/virtualenv/seed/wheels/embed/pip-*.whl
 
 %generate_buildrequires
 
@@ -217,6 +217,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 20.36.1-11
+- Extend embedded pip wheel cleanup to the additional emSign certificate fingerprints.
+
 * Sat Oct 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 20.36.1-10
 - Reconcile the published CA cleanup with the existing tox-based ptest bootstrap.
 - Pin packaging==23.2 when installing test tooling to preserve RPM-owned packaging.
