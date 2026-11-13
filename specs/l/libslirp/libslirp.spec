@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           libslirp
-Version:        4.9.1
+Version:        4.9.7
 Release: 5%{?dist}
 Summary:        A general purpose TCP-IP emulator
 
@@ -43,7 +43,7 @@ developing applications that use %{name}.
 
 
 %files
-%license COPYRIGHT
+%license COPYRIGHT LICENSE
 %doc README.md CHANGELOG.md
 %{_libdir}/%{name}.so.0*
 
@@ -55,6 +55,38 @@ developing applications that use %{name}.
 
 
 %changelog
+* Fri Oct 30 2026 Marc-André Lureau <marcandre.lureau@redhat.com> - 4.9.7-1
+- new version, rhbz#2563742
+- Fix memory leak on IPv6 ping
+- Fix out-of-bounds heap read and information disclosure in ICMP error forwarding
+- Fix queue pointer corruption and crash in if_output
+- Avoid adding ARP/NDP records for multicast and own addresses
+- Fix build with llvm
+- Fix endianness of addition in bootp
+
+* Sun Oct 25 2026 Marc-André Lureau <marcandre.lureau@redhat.com> - 4.9.6-1
+- new version, rhbz#2560335
+- Fix buffer underflow in TFTP RRQ handling with an empty filename
+- Fix ICMP/ICMPv6 echo reply length desynchronization and protocol type mismatch
+- Fix several memory and socket descriptor leaks
+
+* Tue Sep 22 2026 Marc-André Lureau <marcandre.lureau@redhat.com> - 4.9.5-1
+- new version, rhbz#2524215
+- Fix CVE-2026-95508: heap buffer overflow in DHCPv6/TFTP response builders on small interface MTU
+- Fix CVE-2026-95507: out-of-bounds read in NC-SI OEM response handler discloses host memory to guest
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue May 26 2026 Marc-André Lureau <marcandre.lureau@redhat.com> - 4.9.3-1
+- new version
+
+* Sun May 24 2026 Marc-André Lureau <marcandre.lureau@redhat.com> - 4.9.2-1
+- new version, rhbz#2480978
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
