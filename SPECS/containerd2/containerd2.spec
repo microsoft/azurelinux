@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.3.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -26,6 +26,10 @@ Patch6:  CVE-2026-78660.patch
 Patch7:  CVE-2026-78669.patch
 Patch8:  CVE-2026-97032.patch
 Patch9:  CVE-2026-81870.patch
+Patch10: CVE-2026-116585.patch
+Patch11: CVE-2026-116586.patch
+Patch12: CVE-2026-116587.patch
+Patch13: CVE-2026-116591.patch
 
 %{?systemd_requires}
 
@@ -106,6 +110,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.7-2
+- Patch for CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.7-1
 - Upgrade to 2.3.7 for CVE-2026-95839
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-81870
