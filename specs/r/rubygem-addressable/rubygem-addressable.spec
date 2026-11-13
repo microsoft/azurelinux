@@ -5,12 +5,13 @@
 %global gem_name addressable
 
 Name: rubygem-%{gem_name}
-Version: 2.8.6
-Release: 9%{?dist}
+Version: 2.9.2
+Release: 10%{?dist}
 Summary: URI Implementation
 License: Apache-2.0
 URL: https://github.com/sporkmonger/addressable
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+Source1: https://github.com/sporkmonger/%{gem_name}/archive/%{gem_name}-%{version}/%{gem_name}-%{gem_name}-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: rubygem(bigdecimal)
@@ -35,6 +36,7 @@ Documentation for %{name}.
 %prep
 %setup -q -n %{gem_name}-%{version}
 
+tar zxf %{SOURCE1} %{gem_name}-%{gem_name}-%{version}/spec --strip-components 1
 %build
 gem build ../%{gem_name}-%{version}.gemspec
 %gem_install
@@ -45,7 +47,7 @@ cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
 %check
-pushd .%{gem_instdir}
+
 # Drop Bundler dependency.
 sed -i "/require 'bundler\/setup'/ s/^/#/" spec/spec_helper.rb
 
@@ -53,25 +55,25 @@ sed -i "/require 'bundler\/setup'/ s/^/#/" spec/spec_helper.rb
 mv spec/addressable/net_http_compat_spec.rb{,.disabled}
 
 LC_ALL=C.UTF-8 rspec spec/
-popd
+
 
 %files
 %dir %{gem_instdir}
 %license %{gem_instdir}/LICENSE.txt
-%{gem_instdir}/data
+
 %{gem_libdir}
-%{gem_instdir}/tasks
+
 %exclude %{gem_cache}
 %{gem_spec}
 
 %files doc
 %doc %{gem_docdir}
 %doc %{gem_instdir}/CHANGELOG.md
-%{gem_instdir}/Gemfile
-%{gem_instdir}/%{gem_name}.gemspec
+
+
 %doc %{gem_instdir}/README.md
-%{gem_instdir}/Rakefile
-%{gem_instdir}/spec
+
+
 
 %changelog
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.6-6
