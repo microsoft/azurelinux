@@ -2,13 +2,14 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.15.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-120749.patch
 BuildRequires:  autoconf-archive
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
@@ -94,6 +95,9 @@ make %{?_smp_mflags} check
 %dir %{_libdir}/dbus-1.0
 
 %changelog
+* Fri Nov 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.15.8-4
+- Patch for CVE-2026-120749
+
 * Tue Mar 20 2024 Sam Meluch <sammeluch@microsfot.com> - 1.15.8-3
 - fix attributes on dbus-daemon-launch-helper
 - sort files list
