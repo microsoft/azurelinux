@@ -1,0 +1,14 @@
+[components.xz]
+
+# Sources for the 5.8.3 update overlay; drop together with it once Fedora ships 5.8.3 or newer.
+[[components.xz.source-files]]
+filename = "xz-5.8.3.tar.gz"
+hash = "bd77164795b5cbfbe864f64021e67e37f39cb9aba9abdd894d53fbb6857abe074923808918d1dc3bb0706253e726b2b9704cd0c3bc744d70e220c7356fa4995e"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz" }
+
+[[components.xz.source-files]]
+filename = "xz-5.8.3.tar.gz.sig"
+hash = "83fc4f00564134a15b7368d566042cea2992c94639ffdc19b8addab144c6413a1d59b1d9dee31c947368b5779537b2a9539bfa59cd6d40ea3fb487a18c0b5bc9"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz.sig" }
