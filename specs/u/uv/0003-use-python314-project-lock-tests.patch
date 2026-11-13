@@ -1,0 +1,136 @@
+From 728de59cc796565f9a36b4f4a8c84e83b767630b Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Wed, 11 Nov 2026 16:30:00 +0000
+Subject: [PATCH] tests: run the default-groups lockfile tests on Python 3.14
+
+Origin: Azure Linux (downstream change, not an upstream backport).
+
+crates/uv/tests/project/lock.rs is new since uv 0.12.19, and each of its
+12 tests selects Python 3.12, which Azure Linux does not ship. The tests
+only run `uv lock` and `uv export` offline on projects that declare
+requires-python = ">=3.12", and the lockfile is universal, so any
+interpreter that satisfies that bound works. Select Python 3.14 instead;
+the expected snapshots are unchanged.
+
+Base source: uv 0.12.24, selected by the locked Fedora dist-git commit:
+f174be201fff3ae5543dc62526e570154b933dea
+https://src.fedoraproject.org/rpms/uv/c/f174be201fff3ae5543dc62526e570154b933dea
+
+Upstream-Status: Not submitted
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ crates/uv/tests/project/lock.rs | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/crates/uv/tests/project/lock.rs b/crates/uv/tests/project/lock.rs
+index b7cbb90..81fa447 100644
+--- a/crates/uv/tests/project/lock.rs
++++ b/crates/uv/tests/project/lock.rs
+@@ -12,7 +12,7 @@ use uv_test::uv_snapshot;
+ /// Record nonstandard workspace member defaults and update them when the selection changes.
+ #[test]
+ fn member_default_groups_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     context
+         .temp_dir
+         .child("pyproject.toml")
+@@ -260,7 +260,7 @@ fn member_default_groups_in_lockfile() -> Result<()> {
+ /// Record effective group Python requirements, including those inherited from other groups.
+ #[test]
+ fn member_group_python_requirements_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+ 
+     // Give the root an included group and the member its own Python requirement.
+     let pyproject = context.temp_dir.child("pyproject.toml");
+@@ -415,7 +415,7 @@ fn member_group_python_requirements_in_lockfile() -> Result<()> {
+ /// Record root group bounds independently of the resolved dependency markers.
+ #[test]
+ fn non_project_group_python_requirements_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let pyproject = context.temp_dir.child("pyproject.toml");
+     pyproject.write_str(indoc! {r#"
+         [tool.uv.workspace]
+@@ -622,7 +622,7 @@ fn non_project_group_python_requirements_in_lockfile() -> Result<()> {
+ /// Record canonical root defaults and retain support for older locks without them.
+ #[test]
+ fn non_project_default_groups_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let pyproject = context.temp_dir.child("pyproject.toml");
+     pyproject.write_str(indoc! {r#"
+         [tool.uv.workspace]
+@@ -855,7 +855,7 @@ fn non_project_default_groups_in_lockfile() -> Result<()> {
+ /// A metadata-free lock records group requirements without an explicit manifest parent table.
+ #[test]
+ fn metadata_free_group_python_requirements_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     context
+         .temp_dir
+         .child("pyproject.toml")
+@@ -929,7 +929,7 @@ fn metadata_free_group_python_requirements_in_lockfile() -> Result<()> {
+ /// Existing revision 3 lockfiles remain valid until a new resolution is needed.
+ #[test]
+ fn legacy_default_groups_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     context
+         .temp_dir
+         .child("pyproject.toml")
+@@ -990,7 +990,7 @@ fn legacy_default_groups_in_lockfile() -> Result<()> {
+ /// Metadata-free locks do not require a particular revision.
+ #[test]
+ fn legacy_metadata_free_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     context
+         .temp_dir
+         .child("pyproject.toml")
+@@ -1076,7 +1076,7 @@ fn legacy_metadata_free_lockfile() -> Result<()> {
+ /// Revision 4 preview locks do not record member defaults or group Python requirements.
+ #[test]
+ fn metadata_free_default_groups_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     context
+         .temp_dir
+         .child("pyproject.toml")
+@@ -1202,7 +1202,7 @@ fn metadata_free_default_groups_in_lockfile() -> Result<()> {
+ /// Compare recorded default groups without depending on their order or duplicate entries.
+ #[test]
+ fn unordered_default_groups_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     let pyproject = context.temp_dir.child("pyproject.toml");
+     pyproject.write_str(indoc! {r#"
+         [project]
+@@ -1301,7 +1301,7 @@ fn unordered_default_groups_in_lockfile() -> Result<()> {
+ /// A lockfile without a workspace member list still records its root project's defaults.
+ #[test]
+ fn single_project_default_groups_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     context
+         .temp_dir
+         .child("pyproject.toml")
+@@ -1350,7 +1350,7 @@ fn single_project_default_groups_in_lockfile() -> Result<()> {
+ /// Member defaults coexist with non-project workspace groups.
+ #[test]
+ fn non_project_workspace_default_groups_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     context
+         .temp_dir
+         .child("pyproject.toml")
+@@ -1399,7 +1399,7 @@ fn non_project_workspace_default_groups_in_lockfile() -> Result<()> {
+ /// Explicit defaults must name declared groups, even when they match the implicit default.
+ #[test]
+ fn invalid_default_groups_in_lockfile() -> Result<()> {
+-    let context = uv_test::test_context!("3.12");
++    let context = uv_test::test_context!("3.14");
+     context
+         .temp_dir
+         .child("pyproject.toml")
