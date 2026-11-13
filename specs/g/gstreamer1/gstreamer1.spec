@@ -12,15 +12,11 @@
 %global         _gobject_introspection  1.31.1
 %global 	__python %{__python3}
 
-%if 0%{?fedora}
-%bcond_without unwind
-%else
 %bcond_with unwind
-%endif
 
 Name:           gstreamer1
-Version:        1.26.11
-Release: 5%{?dist}
+Version:        1.28.9
+Release: 6%{?dist}
 Summary:        GStreamer streaming media framework runtime
 
 License:        LGPL-2.1-or-later
@@ -122,7 +118,7 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 
 %files -f gstreamer-%{majorminor}.lang
 %license COPYING
-%doc AUTHORS NEWS README.md README.static-linking RELEASE
+%doc README.md README.static-linking RELEASE
 %{_libdir}/libgstreamer-%{majorminor}.so.*
 %{_libdir}/libgstbase-%{majorminor}.so.*
 %{_libdir}/libgstcheck-%{majorminor}.so.*
@@ -212,8 +208,44 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 
 
 %changelog
-* Mon Mar 30 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.26.11-1
-- 1.26.11
+* Fri Nov 06 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.9-1
+- 1.28.9
+
+* Thu Oct 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.8-1
+- 1.28.8
+
+* Tue Sep 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.7-1
+- 1.28.7
+
+* Fri Aug 21 2026 Arjun Shankar <arjun@redhat.com> - 1.28.6-2
+- Build without libunwind by default
+
+* Wed Aug 05 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.6-1
+- 1.28.6
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.28.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jul 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.5-1
+- 1.28.5
+
+* Fri Jun 12 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.4-1
+- 1.28.4
+
+* Tue May 12 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.3-1
+- 1.28.3
+
+* Wed Apr 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.2-1
+- 1.28.2
+
+* Thu Feb 26 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.1-1
+- 1.28.1
+
+* Tue Jan 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.0-1
+- 1.28.0
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Tue Jan 06 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.26.10-1
 - 1.26.10
