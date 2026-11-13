@@ -3,13 +3,25 @@ category = "azl-branding-policy"
 upstream-status = "inapplicable"
 
 [[overlays]]
-description = "Build from the Microsoft build of Go 1.26.10-1 release archive"
+description = "Build from the Microsoft build of Go 1.26.11-1 release archive"
 type = "spec-update-tag"
 tag = "Source0"
-value = "https://github.com/microsoft/go/releases/download/v1.26.10-1/go1.26.10-20261020.3.src.tar.gz#/go1.26.10.src.tar.gz"
+value = "https://github.com/microsoft/go/releases/download/v1.26.11-1/go1.26.11-20261110.4.src.tar.gz#/go1.26.11.src.tar.gz"
 
 [[overlays]]
 description = "Point package metadata to Microsoft build of Go"
 type = "spec-update-tag"
 tag = "URL"
 value = "https://github.com/microsoft/go"
+
+[[overlays]]
+description = "Match the Microsoft build of Go 1.26.11 patch level; Fedora's golang spec is still at 1.26.10"
+type = "spec-search-replace"
+regex = '^%global go_patch 10$'
+replacement = "%global go_patch 11"
+
+[[overlays]]
+description = "Remove the obsolete go1.26.10.src.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(go1\.26\.10\.src\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
