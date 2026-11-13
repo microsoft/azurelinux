@@ -1,0 +1,4 @@
+# Pin to Fedora f43 perl-Net-IDN-Encode-2.600-1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/perl-Net-IDN-Encode/c/10f23b9e56f91858b2b36ee4543ba623e9db8c89
+[components.perl-Net-IDN-Encode]
+spec = { type = "upstream", upstream-commit = "10f23b9e56f91858b2b36ee4543ba623e9db8c89" }
