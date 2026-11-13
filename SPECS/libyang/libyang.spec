@@ -60,7 +60,7 @@ pushd build
 make doc
 
 %check
-ctest --output-on-failure -V %{?_smp_mflags}
+ctest --test-dir build --no-tests=error --output-on-failure -V %{?_smp_mflags}
 
 %install
 pushd build
