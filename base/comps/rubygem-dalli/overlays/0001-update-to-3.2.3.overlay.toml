@@ -1,0 +1,32 @@
+# Fedora does not package rubygem-dalli 3.2.3 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2022-4064
+# Remove this overlay once the imported Fedora spec packages 3.2.3 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.2.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.2.3"
+
+[[overlays]]
+description = "3.2.3 renames History.md to CHANGELOG.md"
+type = "spec-search-replace"
+regex = '^%doc %\{gem_instdir\}/History\.md$'
+replacement = "%doc %{gem_instdir}/CHANGELOG.md"
+
+[[overlays]]
+description = "Remove the obsolete dalli-3.2.0.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(dalli-3\.2\.0\.gem\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete dalli-3.2.0-tests.txz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(dalli-3\.2\.0-tests\.txz\) = [0-9a-f]+(?:\r?\n|$)'
