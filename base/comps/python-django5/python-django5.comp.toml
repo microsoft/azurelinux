@@ -2,3 +2,10 @@
 # https://src.fedoraproject.org/rpms/python-django5/c/f82ef395b9f689b9028e9271e77e5f5e235f892d
 [components.python-django5]
 spec = { type = "upstream", upstream-commit = "f82ef395b9f689b9028e9271e77e5f5e235f892d" }
+
+# Sources for the 5.2.19 update overlay; drop together with it once Fedora ships 5.2.19 or newer.
+[[components.python-django5.source-files]]
+filename = "django-5.2.19.tar.gz"
+hash = "988a8640d51260a254ee08c0fb69eda548d57000025360b55ee577891bf64ffb29d8d3093e2da676ce07eb921d44a52c23aba820da3176fccb72acc597f2b394"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://files.pythonhosted.org/packages/source/d/django/django-5.2.19.tar.gz" }
