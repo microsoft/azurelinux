@@ -1,0 +1,8 @@
+[components.golang-filippo-edwards25519]
+
+# Sources for the 1.1.1 update overlay; drop together with it once Fedora ships 1.1.1 or newer.
+[[components.golang-filippo-edwards25519.source-files]]
+filename = "edwards25519-1.1.1.tar.gz"
+hash = "b71d71eaf48f2be6d8b2e567ffd29a72d120467ccc90f0b6ed6a319ae618a775fbb1a1311771f82428bfe637ae1ba077924344e8397d191dd3e71abce548fc20"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/FiloSottile/edwards25519/archive/v1.1.1/edwards25519-1.1.1.tar.gz" }
