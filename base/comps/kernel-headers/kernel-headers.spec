@@ -26,8 +26,8 @@
 %define azl_pkgrelease 1
 
 # define buildid .local
-%define specversion 6.18.57
-%define tarfile_release 6.18.57
+%define specversion 6.18.62
+%define tarfile_release 6.18.62
 # This is needed to do merge window version magic
 # This allows pkg_release to have configurable %%{?dist} tag
 %define specrelease %{kextraversion}.%{azl_pkgrelease}%{?buildid}%{?dist}
@@ -119,6 +119,9 @@ done
 %{_prefix}/*-linux-gnu/*
 
 %changelog
+* Thu Nov 12 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.62-1.1
+- feat(kernel): update kernel and kernel-headers to 6.18.62.1
+
 * Thu Oct 29 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.57-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.57.1
 
