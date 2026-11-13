@@ -1,0 +1,8 @@
+[components.postgresql-jdbc]
+
+# Sources for the 42.7.14 update overlay; drop together with it once Fedora ships 42.7.14 or newer.
+[[components.postgresql-jdbc.source-files]]
+filename = "postgresql-42.7.14-jdbc-src.tar.gz"
+hash = "73b2f2c79759494cd5801a3f7cb2acb6e6524e0cf2e980d7a81708c0d1101be11c57f84aaaef71711695d5c1d10fbc2f050e2029a5e7e028f016faae95d37081"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.14/postgresql-42.7.14-jdbc-src.tar.gz" }
