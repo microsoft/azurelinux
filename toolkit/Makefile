@@ -49,6 +49,8 @@ REBUILD_PACKAGES                     ?= y
 DOWNLOAD_SRPMS                       ?= n
 ALLOW_SRPM_DOWNLOAD_FAIL             ?= n
 RUN_CHECK                            ?= n
+##help:var:CHECK_ENV_PASSTHROUGH:<names>=Space separated names of environment variables forwarded into package builds that run %check. Example: CHECK_ENV_PASSTHROUGH="PIP_INDEX_URL".
+CHECK_ENV_PASSTHROUGH                ?=
 USE_PREVIEW_REPO                     ?= n
 DISABLE_UPSTREAM_REPOS               ?= n
 DISABLE_DEFAULT_REPOS                ?= n
