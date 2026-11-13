@@ -1,4 +1,8 @@
+# Pin to Fedora f43 mozjs140-140.17.0 to pick up the SpiderMonkey security
+# fixes shipped in Firefox ESR 140.14 through 140.17.
+# https://src.fedoraproject.org/rpms/mozjs140/c/8f05b06cb68315ed3936319f08792195cdc6b1f3
 [components.mozjs140]
+spec = { type = "upstream", upstream-commit = "8f05b06cb68315ed3936319f08792195cdc6b1f3" }
 
 # One file-remove plus two file-search-replace overlays make up this change; they are one
 # logical unit and live in overlays/0001-remove-packed-windows-test-fixture.overlay.toml,
@@ -6,8 +10,8 @@
 
 # Pin the post-overlay (repacked) tarball, replacing the upstream sources entry.
 [[components.mozjs140.source-files]]
-filename = "firefox-140.13.0esr.source.tar.xz"
-hash = "f0f0b3f57cc2bcac5c5e94b352cc087dc6ae64553bd36095695845228ab5b7b31d9acb454fd462f35d365af55dd18c8905520bb229c9b7eec560d11509de7c01"
+filename = "firefox-140.17.0esr.source.tar.xz"
+hash = "feeaacceaad9d54ccf15ba9facae0a26ffd25eafe707b6e56243ca8ea572bfd00247251a318f46666d29c757cf43729f784c3d7f5d939acb918ac7aab5ac7b2a"
 hash-type = "SHA512"
 origin = { type = "overlay" }
 replace-upstream = true

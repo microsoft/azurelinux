@@ -1,0 +1,22 @@
+diff --git a/build/moz.configure/rust.configure b/build/moz.configure/rust.configure
+--- a/build/moz.configure/rust.configure
++++ b/build/moz.configure/rust.configure
+@@ -300,13 +300,15 @@
+         if len(candidates) == 1:
+             return candidates[0].rust_target
+         elif not candidates:
+             return None
+
+-        # config.guess uses the "pc" vendor for x86/x86_64 where rust uses its
+-        # generic "unknown" vendor; normalize so we correlate on the right one.
+-        vendor = "unknown" if host_or_target.vendor == "pc" else host_or_target.vendor
++        vendor = (
++            host_or_target.vendor
++            if any(c.target.vendor == host_or_target.vendor for c in candidates)
++            else "unknown"
++        )
+
+         # We have multiple candidates. There are two cases where we can try to
+         # narrow further down using extra information from the build system.
+         # - For windows targets, correlate with the C compiler type
+         if host_or_target.kernel == "WINNT":
