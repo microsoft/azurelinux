@@ -1,0 +1,4 @@
+# Pin to Fedora f44 jackson-bom-2.18.12 (jackson-base 2.18.12 is required by jackson-core and jackson-databind 2.18.12).
+# https://src.fedoraproject.org/rpms/jackson-bom/c/5bb3bbb5e53b8827f4bbe1098b08626e0d7d93a5
+[components.jackson-bom]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "5bb3bbb5e53b8827f4bbe1098b08626e0d7d93a5" }

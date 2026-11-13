@@ -1,0 +1,4 @@
+# Pin to Fedora f44 jackson-annotations-2.18.12 (required by jackson-databind 2.18.12).
+# https://src.fedoraproject.org/rpms/jackson-annotations/c/65b771d9845a5e1a9a0bd908561ecee2a649cd90
+[components.jackson-annotations]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "65b771d9845a5e1a9a0bd908561ecee2a649cd90" }
