@@ -1,20 +1,16 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global base_version 3.25
+%global base_version 3.41
 Name:           perl-Storable
 Epoch:          1
-Version:        3.37
-Release: 524%{?dist}
+Version:        3.41
+Release: 531%{?dist}
 Summary:        Persistence for Perl data structures
 # Storable.pm:  GPL+ or Artistic
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Storable
-Source0:        https://cpan.metacpan.org/authors/id/N/NW/NWCLARK/Storable-%{base_version}.tar.gz
-# Unbundled from perl 5.37.12
-Patch0:         Storable-3.25-Upgrade-to-3.32.patch
-# Unbundled from perl 5.42.0
-Patch1:         Storable-3.32-Upgrade-to-3.37.patch
+Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Storable-%{base_version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  gcc
 BuildRequires:  make
@@ -148,6 +144,18 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jul 22 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.41-527
+- Increase release to favour standalone package
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.41-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Mon Jun 08 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1:3.41-1
+- 3.41 bump (rhbz#2485665)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.37-522
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.37-521
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
