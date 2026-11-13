@@ -3,7 +3,7 @@ Name:           prebuilt-ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
 Epoch:          1
 Version:        %{azl}.0.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,7 +22,7 @@ Conflicts:      prebuilt-ca-certificates-base
 %description
 Prebuilt version of the ca-certificates package with no runtime dependencies.
 
-%prep -q
+%prep
 
 # Remove 'ca-certificates-base', if present. We don't want them
 # to get mixed into the bundle provided by 'ca-certificates'.
@@ -49,6 +49,9 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Fri Nov 13 2026 Kshitiz Godara <kgodara@microsoft.com> - 1:3.0.0-20
+- Making 'Release' match with 'ca-certificates'
+
 * Thu Oct 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1:3.0.0-19
 - Making 'Release' match with 'ca-certificates'
 

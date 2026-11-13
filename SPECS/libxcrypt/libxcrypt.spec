@@ -99,7 +99,7 @@
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
 Version:        4.4.36
-Release:        2%{?dist}
+Release:        3%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -338,8 +338,8 @@ done
 %postun -p /sbin/ldconfig
 
 %if %{with compat_pkg}
-%post -n compat -p /sbin/ldconfig
-%postun -n compat -p /sbin/ldconfig
+%post -p /sbin/ldconfig compat
+%postun -p /sbin/ldconfig compat
 %endif
 
 
@@ -416,6 +416,9 @@ done
 
 
 %changelog
+* Fri Nov 13 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.4.36-3
+- correct ldconfig format
+
 * Tue Jun 04 2024 Chris Co <chrco@microsoft.com> - 4.4.36-2
 - Remove override_glibc logic so libxcrypt can supply libcrypt correctly to glibc
 

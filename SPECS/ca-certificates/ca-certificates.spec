@@ -47,7 +47,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        %{azl}.0.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -142,7 +142,7 @@ Requires:       %{name}-shared = %{epoch}:%{version}-%{release}
 Provides a legacy version of ca-bundle.crt in the format of "[hash].0 -> [hash].pem"
 pairs under %{pkidir}/tls/certs.
 
-%prep -q
+%prep
 mkdir %{name}
 
 %build
@@ -340,6 +340,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Fri Nov 13 2026 Kshitiz Godara <kgodara@microsoft.com> - 1:3.0.0-20
+- Correct prep section as newer rpm doesn't ignore -q
+
 * Thu Oct 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1:3.0.0-19
 - Updating Microsoft trusted root CAs.
 
