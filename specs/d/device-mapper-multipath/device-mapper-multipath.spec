@@ -3,7 +3,7 @@
 
 Name:    device-mapper-multipath
 Version: 0.11.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Tools to manage multipath devices using device-mapper
 # readline uses GPL-3.0-only
 License: GPL-2.0-only AND GPL-3.0-only
@@ -31,6 +31,8 @@ Patch0014: 0014-RH-make-parse_vpd_pg83-match-scsi_id-output.patch
 Patch0015: 0015-RH-add-scsi-device-handlers-to-modules-load.d.patch
 Patch0016: 0016-RH-compile-with-libreadline-support.patch
 Patch0017: 0017-RH-Add-mpathcleanup.patch
+Patch0018: 0018-libmultipath-dm_flush_map__-do-not-treat-query-error.patch
+Patch0019: 0019-libmultipath-dm_flush_map__-retry-the-resume-after-a.patch
 
 # runtime
 Requires: %{name}-libs = %{version}-%{release}
