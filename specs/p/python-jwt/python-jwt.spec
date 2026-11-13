@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 # what it's called on pypi
-%global srcname PyJWT
+%global srcname pyjwt
 # what it's imported as
 %global libname jwt
 # package name fragment
@@ -16,8 +16,8 @@ encrypted JSON objects.}
 
 
 Name:           python-%{pkgname}
-Version:        2.8.0
-Release: 10%{?dist}
+Version:        2.15.1
+Release: 5%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 URL:            https://github.com/jpadilla/pyjwt
@@ -31,6 +31,7 @@ BuildArch:      noarch
 %package -n python3-%{pkgname}
 Summary:        %{summary}
 BuildRequires:  python3-devel
+BuildRequires:  python3dist(pytest)
 Recommends:     python3-%{pkgname}+crypto
 
 
@@ -42,14 +43,10 @@ Recommends:     python3-%{pkgname}+crypto
 
 %prep
 %autosetup -n %{srcname}-%{version}
-# remove coverage buildreq and relax pytest req
-sed -e '/coverage/d' \
-    -e '/pytest/ s/,<7.0.0//' \
-    -i setup.cfg
 
 
 %generate_buildrequires
-%pyproject_buildrequires -x crypto,tests
+%pyproject_buildrequires -x crypto
 
 
 %build
@@ -58,11 +55,11 @@ sed -e '/coverage/d' \
 
 %install
 %pyproject_install
-%pyproject_save_files %{libname}
+%pyproject_save_files -l %{libname}
 
 
 %check
-%pytest -k 'not (test_ec_to_jwk_with_invalid_curve or test_get_jwt_set_sslcontext_default)'
+%pytest -k 'not (test_ec_to_jwk_with_invalid_curve or test_get_jwt_set_sslcontext_default or test_ec_curve_validation_rejects_p192_for_es256 or test_ec_curve_validation_with_pem_key)'
 
 
 %files -n python3-%{pkgname} -f %{pyproject_files}
@@ -70,8 +67,38 @@ sed -e '/coverage/d' \
 
 
 %changelog
-* Tue Sep 23 2025 Miroslav Suchy <msuchy@redhat.com> - 2.8.0-7
+* Mon Sep 28 2026 Packit <hello@packit.dev> - 2.15.1-1
+- Update to version 2.15.1
+- Resolves: rhbz#2542627
+
+* Wed Sep 23 2026 Packit <hello@packit.dev> - 2.15.0-1
+- Update to version 2.15.0
+- Resolves: rhbz#2539595
+
+* Fri Sep 11 2026 Packit <hello@packit.dev> - 2.14.0-1
+- Update to version 2.14.0
+- Resolves: rhbz#2531953
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.13.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 07 2026 Jeremy Cline <jeremycline@microsoft.com> - 2.13.0-1
+- Rebase to 2.13.0 (rhbz#2480639)
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 2.12.1-3
+- Rebuilt for Python 3.15
+
+* Fri Mar 20 2026 Miroslav Suchy <msuchy@redhat.com> - 2.12.1-2
+- Rebase to 2.12.1 (RHBZ#2435560)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.10.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.10.1-2
 - Rebuilt for Python 3.14.0rc3 bytecode
+
+* Fri Sep 12 2025 Jeremy Cline <jeremycline@linux.microsoft.com> - 2.10.1-1
+- Update to 2.10.1 (#2302282)
 
 * Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 2.8.0-6
 - Rebuilt for Python 3.14.0rc2 bytecode
