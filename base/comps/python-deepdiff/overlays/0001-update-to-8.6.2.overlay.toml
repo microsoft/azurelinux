@@ -1,0 +1,20 @@
+# Fedora does not package python-deepdiff 8.6.2 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-33155
+# Remove this overlay once the imported Fedora spec packages 8.6.2 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 8.6.2"
+type = "spec-update-tag"
+tag = "Version"
+value = "8.6.2"
+
+[[overlays]]
+description = "Remove the obsolete python-deepdiff-v8.6.1.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(python-deepdiff-v8\.6\.1\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

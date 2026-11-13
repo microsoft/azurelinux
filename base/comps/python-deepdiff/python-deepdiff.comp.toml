@@ -1,0 +1,8 @@
+[components.python-deepdiff]
+
+# Sources for the 8.6.2 update overlay; drop together with it once Fedora ships 8.6.2 or newer.
+[[components.python-deepdiff.source-files]]
+filename = "python-deepdiff-v8.6.2.tar.gz"
+hash = "46cec28e3cc90790fa86669e488171307d67d13eb4fc39b286f771b33cd7d14242acbac76293118347fcf211bb14826f8d38f643828ba7b5b9f3986089abf9a6"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/seperman/deepdiff/archive/8.6.2/python-deepdiff-v8.6.2.tar.gz" }
