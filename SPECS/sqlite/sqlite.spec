@@ -2,7 +2,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
 Version:        3.44.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,15 @@ Patch0:         CVE-2015-3717.nopatch
 Patch1:         CVE-2025-6965.patch
 Patch2:         CVE-2025-70873.patch
 Patch3:         CVE-2026-11822.patch
+Patch4:         CVE-2026-119374.patch
+Patch5:         CVE-2026-119375.patch
+Patch6:         CVE-2026-119376.patch
+Patch7:         CVE-2026-119377.patch
+Patch8:         CVE-2026-119378.patch
+Patch9:         CVE-2026-119591.patch
+Patch10:        CVE-2026-119371.patch
+Patch11:        CVE-2026-119372.patch
+Patch12:        CVE-2026-119373.patch
 Requires:       sqlite-libs = %{version}-%{release}
 Provides:       sqlite3
 
@@ -25,7 +34,7 @@ C/C++ interface specs and other miscellaneous documentation.
 %package devel
 Summary:        sqlite3 link library & header files
 Group:          Development/Libraries
-# Requires:       %{name} = %{version}-%{release}
+# Requires:       %%{name} = %%{version}-%%{release}
 %description    devel
 The sqlite devel package include the needed library link and
 header files for development.
@@ -84,6 +93,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Mon Nov 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.44.0-5
+- Patch for CVE-2026-119591, CVE-2026-119378, CVE-2026-119377, CVE-2026-119376, CVE-2026-119375, CVE-2026-119374, CVE-2026-119373, CVE-2026-119372, CVE-2026-119371
+
 * Thu Jun 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.44.0-4
 - Patch for CVE-2026-11822
 
@@ -143,7 +155,7 @@ make %{?_smp_mflags} check
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 3.26.0-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
 
-* Wed Feb 3 2019 Michelle Wang <michellew@vmware.com> - 3.26.0-1
+* Sun Feb 3 2019 Michelle Wang <michellew@vmware.com> - 3.26.0-1
 - Upgrade to 3.26.0 for a critical Vulnerability named 'Magallan'.
 
 * Fri Sep 21 2018 Srinidhi Rao <srinidhir@vmware.com> - 3.25.1-1
