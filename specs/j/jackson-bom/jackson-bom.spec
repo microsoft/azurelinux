@@ -2,16 +2,21 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           jackson-bom
-Version:        2.18.2
-Release: 7%{?dist}
+Version:        2.18.12
+Release: 5%{?dist}
 Summary:        Bill of materials POM for Jackson projects
 License:        Apache-2.0
 
 URL:            https://github.com/FasterXML/jackson-bom
 Source0:        %{url}/archive/%{name}-%{version}.tar.gz
 
+%if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} <= 42
+BuildRequires:  maven-local
+%else
 BuildRequires:  maven-local-openjdk25
-BuildRequires:  mvn(com.fasterxml.jackson:jackson-parent:pom:) >= 2.17
+%endif
+
+BuildRequires:  mvn(com.fasterxml.jackson:jackson-parent:pom:) >= 2.18
 BuildRequires:  mvn(junit:junit)
 
 BuildArch:      noarch
@@ -27,7 +32,7 @@ A "bill of materials" POM for Jackson dependencies.
 
 # Disable plugins not needed during RPM builds
 %pom_remove_plugin ":maven-enforcer-plugin" base
-%pom_remove_plugin ":nexus-staging-maven-plugin" base
+%pom_remove_plugin "org.sonatype.central:central-publishing-maven-plugin" base
 
 # New EE coords
 %pom_change_dep "javax.activation:javax.activation-api" "jakarta.activation:jakarta.activation-api" base
@@ -46,6 +51,15 @@ A "bill of materials" POM for Jackson dependencies.
 %license LICENSE
 
 %changelog
+* Fri Oct 30 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.18.12-1
+- Rebase to 2.18.12
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.18.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 3 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> - 2.18.2-5
+- Restore support for RHEL and older Fedora
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 2.18.2-4
 - Rebuilt for java-25-openjdk as preffered jdk
 
