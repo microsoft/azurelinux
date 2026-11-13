@@ -1,0 +1,22 @@
+# Link the system c-ares instead of the copy bundled in lib/c-ares.
+# fluent-bit 4.2.8 still bundles c-ares 1.34.6, which is affected by
+# CVE-2026-33630, CVE-2026-69184 and CVE-2026-69186 (fixed in 1.34.7).
+# Azure Linux 4.0 ships a fixed c-ares, and using it means future c-ares
+# fixes reach fluent-bit through a normal c-ares update.
+
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "BuildRequire the system c-ares"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libcares)"
+
+[[overlays]]
+description = "Prefer the system c-ares library"
+type = "spec-search-replace"
+section = "%build"
+regex = '-DFLB_PREFER_SYSTEM_LIB_ZSTD=On'
+replacement = '-DFLB_PREFER_SYSTEM_LIB_CARES=On -DFLB_PREFER_SYSTEM_LIB_ZSTD=On'

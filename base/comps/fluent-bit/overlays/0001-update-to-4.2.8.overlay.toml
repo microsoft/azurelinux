@@ -1,0 +1,21 @@
+# Fedora does not package fluent-bit 4.2.8 on f43/f44 yet. Update to the
+# upstream release, which bundles monkey 1.8.8 with fixes for:
+# CVE-2025-63649, CVE-2025-63650, CVE-2025-63652, CVE-2025-63655,
+# CVE-2025-63656, CVE-2025-63657, CVE-2025-63658
+# Remove this overlay once the imported Fedora spec packages 4.2.8 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 4.2.8"
+type = "spec-update-tag"
+tag = "Version"
+value = "4.2.8"
+
+[[overlays]]
+description = "Remove the obsolete 4.2.2 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(fluent-bit-4\.2\.2\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
