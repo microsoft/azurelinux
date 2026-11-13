@@ -1,0 +1,20 @@
+# Fedora does not package GraphicsMagick 1.3.48 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2025-27795, CVE-2025-27796
+# Remove this overlay once the imported Fedora spec packages 1.3.48 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.3.48"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.3.48"
+
+[[overlays]]
+description = "Remove the obsolete GraphicsMagick-1.3.45.tar.xz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(GraphicsMagick-1\.3\.45\.tar\.xz\) = [0-9a-f]+(?:\r?\n|$)'

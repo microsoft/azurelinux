@@ -22,8 +22,8 @@
 %global __provides_exclude_from ^%{_libdir}/GraphicsMagick-%{version}/.*\\.(la|so)$
 
 Name: GraphicsMagick
-Version: 1.3.45
-Release: 9%{?dist}
+Version: 1.3.48
+Release: 10%{?dist}
 Summary: An ImageMagick fork, offering faster image generation and better quality
 Url: http://www.graphicsmagick.org/
 License: MIT
