@@ -2,3 +2,10 @@
 # https://src.fedoraproject.org/rpms/python-werkzeug/c/191760f1c2cce2c69c07a17423607d472bfc184d
 [components.python-werkzeug]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "191760f1c2cce2c69c07a17423607d472bfc184d" }
+
+# Sources for the 3.1.9 update overlay; drop together with it once Fedora ships 3.1.9 or newer.
+[[components.python-werkzeug.source-files]]
+filename = "werkzeug-3.1.9.tar.gz"
+hash = "668991c145512cba51a37af78ed3e34dfa6edbeda3e1c9c1d9451a561679827f30b1bc996563da436607590926220f0b778f16cd33228bd6d5f9fb34d43d4b61"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://files.pythonhosted.org/packages/source/w/werkzeug/werkzeug-3.1.9.tar.gz" }
