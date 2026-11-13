@@ -1,0 +1,108 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Make Node.js 24 satisfy generic runtime dependencies"
+type = "spec-add-tag"
+tag = "Provides"
+value = "nodejs = %{node_evr}, nodejs%{?_isa} = %{node_evr}"
+
+[[overlays]]
+description = "Replace retired default and versioned runtimes during upgrades"
+type = "spec-add-tag"
+tag = "Obsoletes"
+value = "nodejs < %{node_evr}, nodejs22 < %{node_evr}"
+
+[[overlays]]
+description = "Keep generic library dependencies on the default stream"
+type = "spec-append-lines"
+section = "%package"
+package = "libs"
+lines = [
+    'Provides: nodejs-libs = %{node_evr}, nodejs-libs%{?_isa} = %{node_evr}',
+    'Obsoletes: nodejs-libs < %{node_evr}, nodejs22-libs < %{node_evr}',
+]
+
+[[overlays]]
+description = "Replace development headers from the retired runtime"
+type = "spec-append-lines"
+section = "%package"
+package = "devel"
+lines = [
+    'Provides: nodejs-devel%{?_isa} = %{node_evr}',
+    'Obsoletes: nodejs-devel < %{node_evr}, nodejs22-devel < %{node_evr}',
+]
+
+[[overlays]]
+description = "Replace retired V8 development headers alongside the Node.js runtime"
+type = "spec-append-lines"
+section = "%package"
+package = "v8-%{v8_version_major}.%{v8_version_minor}-devel"
+lines = ['Obsoletes: v8-12.4-devel < %{v8_evr}']
+
+[[overlays]]
+description = "Keep generic locale data dependencies on the default stream"
+type = "spec-append-lines"
+section = "%package"
+package = "full-i18n"
+lines = [
+    'Provides: nodejs-full-i18n = %{node_evr}, nodejs-full-i18n%{?_isa} = %{node_evr}',
+    'Obsoletes: nodejs-full-i18n < %{node_evr}, nodejs22-full-i18n < %{node_evr}',
+]
+
+[[overlays]]
+description = "Keep generic documentation dependencies on the default stream"
+type = "spec-append-lines"
+section = "%package"
+package = "docs"
+lines = [
+    'Provides: nodejs-docs = %{node_evr}',
+    'Obsoletes: nodejs-docs < %{node_evr}, nodejs22-docs < %{node_evr}',
+]
+
+[[overlays]]
+description = "Replace the retired npm package and satisfy generic npm dependencies"
+type = "spec-append-lines"
+section = "%package"
+package = "npm"
+lines = [
+    'Provides: npm = %{npm_evr}, nodejs-npm = %{npm_evr}',
+    'Obsoletes: npm < %{npm_evr}, nodejs-npm < %{npm_evr}, nodejs22-npm < %{npm_evr}',
+]
+
+[[overlays]]
+description = "Expose the default nodejs, node, npm, and npx commands without changing versioned executables"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    'ln -s node-%{node_version_major} "%{buildroot}%{_bindir}/node"',
+    'ln -s node-%{node_version_major} "%{buildroot}%{_bindir}/nodejs"',
+    'ln -s npm-%{node_version_major} "%{buildroot}%{_bindir}/npm"',
+    'ln -s npx-%{node_version_major} "%{buildroot}%{_bindir}/npx"',
+    'ln -s node-%{node_version_major}.1.gz "%{buildroot}%{_mandir}/man1/node.1.gz"',
+    'ln -s npm-%{node_version_major}.1.gz "%{buildroot}%{_mandir}/man1/npm.1.gz"',
+    'ln -s npx-%{node_version_major}.1.gz "%{buildroot}%{_mandir}/man1/npx.1.gz"',
+]
+
+[[overlays]]
+description = "Ship generic interpreter commands and their manual page in the runtime package"
+type = "spec-append-lines"
+section = "%files"
+lines = [
+    '%{_bindir}/node',
+    '%{_bindir}/nodejs',
+    '%{_mandir}/man1/node.1*',
+]
+
+[[overlays]]
+description = "Ship generic npm commands and their manual pages with npm"
+type = "spec-append-lines"
+section = "%files"
+package = "npm"
+lines = [
+    '%{_bindir}/npm',
+    '%{_bindir}/npx',
+    '%{_mandir}/man1/npm.1*',
+    '%{_mandir}/man1/npx.1*',
+]

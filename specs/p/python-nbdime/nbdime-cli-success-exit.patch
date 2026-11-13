@@ -1,0 +1,21 @@
+From: Azure Linux <azl-maintainers@microsoft.com>
+Subject: [PATCH] cli: return success for informational options
+
+Passing a string to sys.exit writes it to stderr and exits with status 1.
+Print explicitly and return success only for help and version requests.
+
+diff --git a/nbdime/__main__.py b/nbdime/__main__.py
+--- a/nbdime/__main__.py
++++ b/nbdime/__main__.py
+@@ -121,7 +121,9 @@ def main_dispatch(args=None):
+     else:
+         if cmd == '--version':
+-            sys.exit(__version__)
++            print(__version__)
++            return 0
+         if cmd == '-h' or cmd == '--help':
+-            sys.exit(HELP_MESSAGE_VERBOSE)
++            print(HELP_MESSAGE_VERBOSE)
++            return 0
+         if cmd == '--config':
+             # List all possible config options:

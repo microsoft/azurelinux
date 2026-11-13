@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Return success and stdout for requested help and version without masking command errors"
+type = "patch-add"
+source = "../nbdime-cli-success-exit.patch"

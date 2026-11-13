@@ -1,0 +1,48 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Keep system npm policy independent of the runtime stream"
+type = "spec-append-lines"
+section = "%description"
+package = "npm"
+lines = [
+    '',
+    '%package -n nodejs-npm-config',
+    'Summary: Shared system configuration for npm',
+    'BuildArch: noarch',
+    'Conflicts: nodejs-npm < %{npm_evr}',
+    '',
+    '%description -n nodejs-npm-config',
+    'System npm configuration for the default nodejs runtime.',
+]
+
+[[overlays]]
+description = "Require system npm configuration even when weak dependencies are disabled"
+type = "spec-append-lines"
+section = "%package"
+package = "npm"
+lines = ['Requires: nodejs-npm-config']
+
+[[overlays]]
+description = "Install global npm configuration with the distribution prefix and update policy"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    'mkdir -p "%{buildroot}%{_sysconfdir}"',
+    'mkconfig <%{SOURCE5} >"%{buildroot}%{_sysconfdir}/npmrc"',
+]
+
+[[overlays]]
+description = "Preserve customer npm configuration while transferring ownership"
+type = "spec-append-lines"
+section = "%files"
+package = "docs"
+lines = [
+    '',
+    '%files -n nodejs-npm-config',
+    '%license deps/npm/LICENSE',
+    '%config(noreplace) %{_sysconfdir}/npmrc',
+    '%ghost %{_sysconfdir}/npmignore',
+]
