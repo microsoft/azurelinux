@@ -1,0 +1,33 @@
+# Fedora does not package python-tornado 6.6.1 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-103261, CVE-2026-103262, CVE-2026-103263, CVE-2026-115927,
+# CVE-2026-116577, CVE-2026-116578, CVE-2026-123534, CVE-2026-123535,
+# CVE-2026-82397, CVE-2026-91990, CVE-2026-91991
+# Remove this overlay once the imported Fedora spec packages 6.6.1 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 6.6.1"
+type = "spec-update-tag"
+tag = "Version"
+value = "6.6.1"
+
+[[overlays]]
+description = "Drop the test_multi_process skip; 6.6 runs that test in a fresh interpreter (tornadoweb/tornado#3623)"
+type = "spec-search-replace"
+regex = '^Patch:\s+Temporarily-disable-test-multi-process\.patch$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the dropped patch file Temporarily-disable-test-multi-process.patch"
+type = "file-remove"
+file = "Temporarily-disable-test-multi-process.patch"
+
+[[overlays]]
+description = "Remove the obsolete tornado-6.5.7.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(tornado-6\.5\.7\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
