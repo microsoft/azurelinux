@@ -1,0 +1,20 @@
+# The "applies loader options" test expects libjpeg to scale the image to exactly
+# 150x200 for a jpeg:size hint. With ImageMagick 7.1.2 and mini_magick 5 the decoder
+# picks a smaller scale (75x100). Upstream relaxed this assertion to "smaller than the
+# original" in a later release; apply the same check here. Drop this overlay once
+# 4.0 moves to image_processing 2.0 or newer.
+
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://github.com/janko/image_processing/commit/eafaf0abf24e2e7ab5dfd6e23089ca4c76d39b51" },
+]
+
+[[overlays]]
+description = "Relax the jpeg:size loader test like upstream eafaf0abf2"
+type = "spec-search-replace"
+regex = '^ruby -Ilib:test -e '
+replacement = '''
+sed -i 's/assert_dimensions \[150, 200\], result unless ENV\["GM"\]/assert_operator MiniMagick::Image.new(result.path).width, :<, 600 unless ENV["GM"]/' test/mini_magick_test.rb
+ruby -Ilib:test -e '''

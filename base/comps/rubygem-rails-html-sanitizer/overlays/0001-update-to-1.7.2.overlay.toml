@@ -1,0 +1,53 @@
+# Fedora does not package rails-html-sanitizer 1.7.2 on f43/f44 yet. Update to the upstream
+# release. Rails 8.0.5.2 (actionview) requires rails-html-sanitizer 1.7.2 or
+# newer.
+# CVE fixes:
+# CVE-2024-53986, CVE-2024-53987, CVE-2024-53988, CVE-2024-53989,
+# CVE-2026-73648
+# Remove this overlay once the imported Fedora spec packages 1.7.2 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.7.2"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.7.2"
+
+[[overlays]]
+description = "1.7.x no longer ships test/ in the gem; add the upstream test suite as Source1"
+type = "spec-search-replace"
+regex = '^Source0: https://rubygems\.org/gems/%\{gem_name\}-%\{version\}\.gem$'
+replacement = '''
+Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+# git clone https://github.com/rails/rails-html-sanitizer.git && cd rails-html-sanitizer
+# git archive -v -o rails-html-sanitizer-%{version}-tests.tar.gz v%{version} test/
+Source1: %{gem_name}-%{version}-tests.tar.gz'''
+
+[[overlays]]
+description = "Unpack the test tarball next to the gem"
+type = "spec-search-replace"
+regex = '^%setup -q -n %\{gem_name\}-%\{version\}$'
+replacement = "%setup -q -n %{gem_name}-%{version} -b1"
+
+[[overlays]]
+description = "Run the test suite from the unpacked tarball"
+type = "spec-search-replace"
+regex = '^ruby -Ilib -e '
+replacement = '''
+cp -a %{_builddir}/test .
+ruby -Ilib -e '''
+
+[[overlays]]
+description = "test/ is no longer installed with the gem"
+type = "spec-search-replace"
+regex = '^%\{gem_instdir\}/test$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the obsolete rails-html-sanitizer-1.6.0.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(rails-html-sanitizer-1\.6\.0\.gem\) = [0-9a-f]+(?:\r?\n|$)'

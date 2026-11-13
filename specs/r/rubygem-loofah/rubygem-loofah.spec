@@ -4,8 +4,8 @@
 %global gem_name loofah
 
 Name: rubygem-%{gem_name}
-Version: 2.22.0
-Release: 9%{?dist}
+Version: 2.25.3
+Release: 10%{?dist}
 Summary: Manipulate and transform HTML/XML documents and fragments
 License: MIT
 URL: https://github.com/flavorjones/loofah
