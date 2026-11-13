@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           jackson-core
-Version:        2.18.2
-Release: 7%{?dist}
+Version:        2.18.12
+Release: 5%{?dist}
 Summary:        Core part of Jackson
 License:        Apache-2.0
 
@@ -11,7 +11,12 @@ URL:            https://github.com/FasterXML/jackson-core
 Source0:        %{url}/archive/%{name}-%{version}.tar.gz
 Patch1:         0001-Remove-ch.randelshofer.fastdoubleparser.patch
 
+%if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} <= 42
+BuildRequires:  maven-local
+%else
 BuildRequires:  maven-local-openjdk25
+%endif
+
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
 BuildRequires:  mvn(com.google.code.maven-replacer-plugin:replacer)
 Buildrequires:  mvn(junit:junit)
@@ -56,6 +61,18 @@ sed -i 's/\r//' LICENSE jackson-core-NOTICE
 %license LICENSE jackson-core-NOTICE
 
 %changelog
+* Fri Oct 30 2026 Dogtag PKI Team <devel@lists.dogtagpki.org> - 2.18.12-1
+- Rebase to 2.18.12
+- Fix CVE-2026-89407: Denial of Service via regular expression backtracking (rhbz#2542920)
+- Fix CVE-2026-89425: Denial of Service via unbounded StringBuilder growth during malformed token processing (rhbz#2539286)
+- Fix CVE-2026-68498: Denial of Service via excessively long JSON property names (rhbz#2558516)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.18.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 3 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> - 2.18.2-5
+- Restore support for RHEL and older Fedora
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 2.18.2-4
 - Rebuilt for java-25-openjdk as preffered jdk
 

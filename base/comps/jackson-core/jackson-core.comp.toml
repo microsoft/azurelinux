@@ -1,0 +1,4 @@
+# Pin to Fedora f44 jackson-core-2.18.12 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/jackson-core/c/fe4de37850a36e2d10378603ec9f2f291195d49b
+[components.jackson-core]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "fe4de37850a36e2d10378603ec9f2f291195d49b" }
