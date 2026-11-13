@@ -1,0 +1,20 @@
+# Fedora does not package mod_auth_openidc 2.4.19.4 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-54789
+# Remove this overlay once the imported Fedora spec packages 2.4.19.4 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.4.19.4"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.4.19.4"
+
+[[overlays]]
+description = "Remove the obsolete mod_auth_openidc-2.4.19.2.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(mod_auth_openidc-2\.4\.19\.2\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

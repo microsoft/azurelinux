@@ -1,0 +1,8 @@
+[components.mod_auth_openidc]
+
+# Sources for the 2.4.19.4 update overlay; drop together with it once Fedora ships 2.4.19.4 or newer.
+[[components.mod_auth_openidc.source-files]]
+filename = "mod_auth_openidc-2.4.19.4.tar.gz"
+hash = "31872a569debb4ef78df730d942c816ef4f33801454f35bb1f6205dd5d56cce55459096acebc3a82800b7e849bbc43197b55be39df7b0af4e38848126b61bc42"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/OpenIDC/mod_auth_openidc/releases/download/v2.4.19.4/mod_auth_openidc-2.4.19.4.tar.gz" }
