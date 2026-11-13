@@ -37,8 +37,8 @@
 #global shortcommit %(c=%{gitcommit}; echo ${c:0:5})
 
 Name:           gstreamer1-plugins-good
-Version:        1.26.11
-Release: 6%{?dist}
+Version:        1.28.9
+Release: 7%{?dist}
 Summary:        GStreamer plugins with good code and licensing
 
 License:        CC0-1.0 AND GPL-2.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND xlock AND MIT AND BSD-3-Clause AND CC-BY-3.0 
@@ -76,6 +76,7 @@ BuildRequires:  libX11-devel
 BuildRequires:  libXext-devel
 BuildRequires:  libXdamage-devel
 BuildRequires:  libXfixes-devel
+BuildRequires:  pkgconfig(openssl)
 BuildRequires:  orc-devel
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  speex-devel
@@ -224,6 +225,7 @@ to be installed.
   -D v4l2=disabled \
   -D package-name='Fedora GStreamer-plugins-good package' \
   -D package-origin='http://download.fedoraproject.org' \
+  -D hls-crypto=openssl \
   -D doc=disabled \
   -D asm=%{?with_nasm:enabled}%{!?with_nasm:disabled} \
   -D doc=disabled \
@@ -261,7 +263,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -fv {} ';'
 
 %files -f gst-plugins-good-%{majorminor}.lang
 %license COPYING
-%doc AUTHORS NEWS README.md README.static-linking RELEASE REQUIREMENTS
+%doc README.md README.static-linking RELEASE
 %{_metainfodir}/gstreamer-good.appdata.xml
 %if 0
 %doc %{_datadir}/gtk-doc/html/gst-plugins-good-plugins-%{majorminor}
@@ -322,7 +324,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -fv {} ';'
 %{_libdir}/gstreamer-%{majorminor}/libgstwavparse.so
 %{_libdir}/gstreamer-%{majorminor}/libgstximagesrc.so
 %{_libdir}/gstreamer-%{majorminor}/libgstxingmux.so
-%{_libdir}/gstreamer-%{majorminor}/libgsty4menc.so
+%{_libdir}/gstreamer-%{majorminor}/libgsty4m.so
 
 # gstreamer-plugins with external dependencies but in the main package
 %{_libdir}/gstreamer-%{majorminor}/libgstcairo.so
@@ -376,8 +378,65 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -fv {} ';'
 
 
 %changelog
-* Mon Mar 30 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.26.11-1
-- 1.26.11
+* Fri Nov 06 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.9-1
+- 1.28.9
+
+* Fri Oct 23 2026 Jan Grulich <jgrulich@redhat.com> - 1.28.8-2
+- Rebuild (qt6)
+
+* Thu Oct 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.8-1
+- 1.28.8
+
+* Thu Sep 10 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1.28.7-2
+- Rebuilt for libxml-2.5.4
+
+* Tue Sep 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.7-1
+- 1.28.7
+
+* Thu Aug 27 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.28.6-2
+- Use openssl for adaptivedemux2/hls crypto
+
+* Wed Aug 05 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.6-1
+- 1.28.6
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.28.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jul 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.5-1
+- 1.28.5
+
+* Fri Jun 12 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.4-1
+- 1.28.4
+
+* Thu May 14 2026 Jan Grulich <jgrulich@redhat.com> - 1.28.3-2
+- Rebuild (qt6)
+
+* Tue May 12 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.3-1
+- 1.28.3
+
+* Thu Apr 16 2026 Jan Grulich <jgrulich@redhat.com> - 1.28.2-2
+- Rebuild (qt6)
+
+* Wed Apr 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.2-1
+- 1.28.2
+
+* Sat Mar 21 2026 Nicolas Chauvet <kwizart@gmail.com> - 1.28.1-3
+- Rebuilt for libvpx-1.16.0
+
+* Fri Mar 06 2026 Wim Taymans <wtaymans@redhat.com> - 1.28.1-2
+- Rebuild for libvpx
+
+* Thu Feb 26 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.1-1
+- 1.28.1
+
+* Tue Jan 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.28.0-1
+- 1.28.0
+
+* Sun Jan 25 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.26.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Changes/TagLib2
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Tue Jan 06 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.26.10-1
 - 1.26.10
