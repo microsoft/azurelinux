@@ -1,0 +1,21 @@
+# Fedora does not package python-django5 5.2.19 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-108147, CVE-2026-111211, CVE-2026-111362, CVE-2026-113593,
+# CVE-2026-114582
+# Remove this overlay once the imported Fedora spec packages 5.2.19 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 5.2.19"
+type = "spec-update-tag"
+tag = "Version"
+value = "5.2.19"
+
+[[overlays]]
+description = "Remove the obsolete django-5.2.18.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(django-5\.2\.18\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
