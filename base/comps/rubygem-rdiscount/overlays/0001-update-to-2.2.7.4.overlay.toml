@@ -1,0 +1,28 @@
+# Fedora does not package rubygem-rdiscount 2.2.7.4 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-35201
+# Remove this overlay once the imported Fedora spec packages 2.2.7.4 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.2.7.4"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.2.7.4"
+
+[[overlays]]
+description = "Package the CHANGELOG.md added in 2.2.7.x"
+type = "spec-search-replace"
+regex = '^%doc %\{gem_instdir\}/README\.markdown$'
+replacement = '''
+%doc %{gem_instdir}/README.markdown
+%doc %{gem_instdir}/CHANGELOG.md'''
+
+[[overlays]]
+description = "Remove the obsolete rdiscount-2.2.7.1.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(rdiscount-2\.2\.7\.1\.gem\) = [0-9a-f]+(?:\r?\n|$)'

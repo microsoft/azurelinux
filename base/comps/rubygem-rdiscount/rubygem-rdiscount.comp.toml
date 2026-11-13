@@ -1,0 +1,8 @@
+[components.rubygem-rdiscount]
+
+# Sources for the 2.2.7.4 update overlay; drop together with it once Fedora ships 2.2.7.4 or newer.
+[[components.rubygem-rdiscount.source-files]]
+filename = "rdiscount-2.2.7.4.gem"
+hash = "83108dad15cca3bad30fe40442aaadd4cdfc9bc9872309be3ce0c6cdc8efd9d73617bfcf66abac12218772c633bee38761aed631f9c45b6115a31a3f75070e51"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/rdiscount-2.2.7.4.gem" }
