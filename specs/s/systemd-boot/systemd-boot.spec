@@ -1,0 +1,185 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+# This spec file has been modified by azldev to include build configuration overlays.
+# Do not edit manually; changes may be overwritten.
+
+Name:           systemd-boot
+Version:        258.11
+Release:        %autorelease
+Summary:        UEFI boot manager
+
+License:        LGPL-2.1-or-later
+URL:            https://systemd.io
+
+%global source_rpm_name systemd-boot-unsigned
+%global source_rpm_version %(rpm -q --qf '%%{VERSION}-%%{RELEASE}' %{source_rpm_name} | sed 's/.*not installed/unknown/')
+
+%global _binaries_in_noarch_packages_terminate_build 0
+
+# Note: this package just signs an existing binary that was provided by
+# %%source_rpm_name. This package should be rebuilt whenever %%source_rpm_name
+# is updated or rebuilt in a way that is relevant for the boot loader.
+#
+# This way we don't need to duplicate the build dependencies and logic
+# that is provided by the main systemd package.
+
+BuildRequires:  version(%{source_rpm_name})%{_isa} = %{version}
+BuildRequires:  systemd-libs
+BuildRequires:  pesign
+
+ExclusiveArch:  %efi
+
+%global _description %{expand:
+systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
+graphical menu to select the entry to boot and an editor for the kernel command
+line. systemd-boot supports systems with UEFI firmware only.
+
+This package contains the signed version that works with SecureBoot.}
+
+%description %_description
+
+%package -n systemd-boot-%{efi_arch}
+Summary:        %{summary}
+Version:        %(echo %{source_rpm_version} | sed 's/-.*//')
+
+Provides: systemd-boot-signed-%{efi_arch} = %version-%release
+Provides: bundled(%{source_rpm_name}) = %{source_rpm_version}
+
+# Obsolete the package with the version before the split to install all
+# obsoleting packages on upgrades (i.e. systemd-udev, systemd-boot-unsigned,
+# systemd-boot).
+Obsoletes:      systemd-udev < 252.2-2
+
+BuildArch:      noarch
+
+%description -n systemd-boot-%{efi_arch} %_description
+
+Built from %{source_rpm_name}-%{source_rpm_version}.
+
+%build
+if [[ "%{source_rpm_version}" = "unknown" ]]; then
+   echo "%{source_rpm_version} is not installed, refusing build"
+   exit 1
+fi
+
+%install
+mkdir -p %{buildroot}%{_prefix}/lib/systemd/boot/efi
+%pesign -s -i %{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi -o %{buildroot}%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi.signed
+
+# Copy files over so they become available on other architectures.
+# They are renamed to avoid a file conflict between packages.
+cp -a %{_prefix}/lib/systemd/boot/efi/linux%{efi_arch}.efi.stub \
+   %{buildroot}%{_prefix}/lib/systemd/boot/efi/linux%{efi_arch}.efi.stub.alt
+cp -a %{_prefix}/lib/systemd/boot/efi/addon%{efi_arch}.efi.stub \
+   %{buildroot}%{_prefix}/lib/systemd/boot/efi/addon%{efi_arch}.efi.stub.alt
+
+# Create efi binary hardlink for bootupd discovery
+# Note: systemd-boot is hardlinked to the grub%%{efi_arch}.efi filename for shim compatibility
+install -dm 0755 %{buildroot}%{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI/%{efi_vendor}
+ln %{buildroot}%{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi.signed \
+   %{buildroot}%{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI/%{efi_vendor}/grub%{efi_arch}.efi
+
+install -m0644 -Dt %{buildroot}%{_licensedir}/%{name}/ %{_datadir}/licenses/systemd/LICENSE.LGPL2.1
+
+%postun -n systemd-boot-%{efi_arch}
+# This part will need to be updated in bootctl first, and then here.
+if [ $1 -ge 1 ] && bootctl is-installed &>/dev/null; then
+  echo "Updating systemd-boot…"
+  bootctl update || :
+fi
+
+%files -n systemd-boot-%{efi_arch}
+%license %{_licensedir}/%{name}/LICENSE.LGPL2.1
+%dir %{_prefix}/lib/systemd
+%dir %{_prefix}/lib/systemd/boot
+%dir %{_prefix}/lib/systemd/boot/efi
+%attr(0644,-,-) %{_prefix}/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi.signed
+%{_prefix}/lib/systemd/boot/efi/linux%{efi_arch}.efi.stub.alt
+%{_prefix}/lib/systemd/boot/efi/addon%{efi_arch}.efi.stub.alt
+%dir %{_prefix}/lib/efi
+%dir %{_prefix}/lib/efi/systemd-boot
+%dir %{_prefix}/lib/efi/systemd-boot/%{version}-%{release}
+%dir %{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI
+%dir %{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI/%{efi_vendor}
+%{_prefix}/lib/efi/systemd-boot/%{version}-%{release}/EFI/%{efi_vendor}/grub%{efi_arch}.efi
+
+# Man pages are provided by systemd-udev subpackage.
+# If we copied them to this package, we'd need to either rename them
+# or worry about file conflicts. Since it is very very unlikely that
+# somebody will have this package installed but not the systemd-udev,
+# let's not duplicate the page.
+
+%changelog
+## START: Generated by rpmautospec
+* Fri Nov 13 2026 George Mileka <gmileka@microsoft.com> - 258.11-1
+- Handle postun
+
+* Fri Nov 13 2026 George Mileka <gmileka@microsoft.com> - 262-3
+- Add correct lock file
+
+* Fri Nov 13 2026 George Mileka <gmileka@microsoft.com> - 262-2
+- Address copilot feedback
+
+* Sat Sep 26 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 262-1
+- Version 262
+
+* Wed Aug 26 2026 Christian Glombek <c.glombek@cosa.systems> - 261.2-5
+- Fix efi binary hardlink for bootupd discovery
+
+* Tue Aug 11 2026 Pragyan Poudyal <pragyanpoudyal41999@gmail.com> - 261.2-4
+- Hardlink binary as /usr/lib/efi/systemd-boot/<evr>/EFI/fedora/grub<efi-
+  arch>.efi
+
+* Tue Aug 11 2026 Leonhard Bromoloron <lenobr@gmx.net> - 261.2-3
+- Update systemd-boot.spec
+
+* Wed Aug 05 2026 Pragyan Poudyal <pragyanpoudyal41999@gmail.com> - 261.2-2
+- spec: Use SPDX license identifier to fix license-validate
+
+* Wed Aug 05 2026 Pragyan Poudyal <pragyanpoudyal41999@gmail.com> - 261.2-1
+- spec: Match systemd version in rawhide
+
+* Sat Jun 13 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 261~rc3-2
+- Restore read permissions on systemd-boot.efi.signed
+
+* Sat Jun 13 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 261~rc3-1
+- Version 261~rc3
+- This is the first signed version. C.f.
+  https://forge.fedoraproject.org/releng/tickets/issues/10765,
+  https://forge.fedoraproject.org/infra/ansible/pulls/3387.
+
+* Sat Apr 11 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 260.1-1
+- Version 260.1
+
+* Fri Aug 04 2023 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 253~rc1-4
+- Add noautobuild file
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 253~rc1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 27 2023 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 253~rc1-2
+- Also build ia32, relax version requirement, ship stub
+
+* Thu Jan 26 2023 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 253~rc1-1
+- Version 253~rc1
+- Do archful noarch builds. The approach is copied from rEFInd: the source
+  package is "archful" and is build on all EFI architectures, but on each
+  of those architectures then provides a single noarch package that
+  contains the binaries for that EFI architecture. This allows two
+  important usecases: running qemu for the non-native architecture and
+  building kernel images for a foreign architecture.
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 251~rc2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec 02 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 251~rc2-1
+- Initial version
+## END: Generated by rpmautospec

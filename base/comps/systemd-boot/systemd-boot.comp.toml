@@ -1,0 +1,2 @@
+[components.systemd-boot]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "45" } }
