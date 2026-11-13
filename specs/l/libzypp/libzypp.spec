@@ -20,8 +20,8 @@ Requires:       %{_bindir}/%{1}
 # End macro
 
 Name:           libzypp
-Version:        17.38.1
-Release: 5%{?dist}
+Version: 17.38.13
+Release: 6%{?dist}
 Summary:        A package management library
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

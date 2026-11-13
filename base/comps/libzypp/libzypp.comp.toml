@@ -4,3 +4,9 @@
 # removing ffmpeg/libav* (and notcurses itself) from the distro.
 [components.libzypp]
 
+# Sources for the 17.38.13 update overlay; drop together with it once Fedora ships 17.38.13 or newer.
+[[components.libzypp.source-files]]
+filename = "libzypp-17.38.13.tar.gz"
+hash = "c6cb460c746682ac96432b7388147262be24fd1dc4a553680a84b3d42209c75213c2b7ea0d7524569b09d78005b623076dfc1de0951b08ac20c1ce0a624aff92"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/openSUSE/libzypp/archive/17.38.13/libzypp-17.38.13.tar.gz" }
