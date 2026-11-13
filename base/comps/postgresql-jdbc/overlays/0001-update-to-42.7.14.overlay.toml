@@ -1,0 +1,59 @@
+# Fedora does not package postgresql-jdbc 42.7.14 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-107315, CVE-2026-54291
+# Remove this overlay once the imported Fedora spec packages 42.7.14 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 42.7.14"
+type = "spec-update-tag"
+tag = "Version"
+value = "42.7.14"
+
+[[overlays]]
+description = "Drop the JUnit 5.13 port; upstream tests use JUnit Jupiter since 42.7.8"
+type = "spec-search-replace"
+regex = '^Patch:\s+0001-Port-to-junit-5\.13\.patch$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the dropped patch file 0001-Port-to-junit-5.13.patch"
+type = "file-remove"
+file = "0001-Port-to-junit-5.13.patch"
+
+[[overlays]]
+description = "junit:junit is gone from the upstream POM; declare hamcrest, which the tests import but the POM does not list"
+type = "spec-search-replace"
+regex = '^%pom_remove_dep junit:junit$'
+replacement = "%pom_add_dep org.hamcrest:hamcrest::test"
+
+[[overlays]]
+description = "Build-require hamcrest for the test sources"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "mvn(org.hamcrest:hamcrest)"
+
+[[overlays]]
+description = "Keep the upstream test suite building against JUnit 5.13 and the local test cluster"
+type = "spec-search-replace"
+regex = '^%mvn_package org\.postgresql:postgresql::tests: tests$'
+replacement = '''
+# JUnit 5.13 rejects @Isolated on classes with parameterized tests (upstream
+# builds with JUnit 5.14). The suite does not run tests in parallel, so the
+# annotation has no effect here; drop it and keep running these tests.
+sed -i '/^@Isolated(/d' \
+    src/test/java/org/postgresql/test/jdbc2/{BatchDeadlockTest,DateTest,TimestampTest}.java \
+    src/test/java/org/postgresql/test/jdbc42/{GetObject310Test,SetObject310Test}.java
+# RequireAuthTest needs a server whose pg_hba.conf assigns a different auth
+# method to each test user; the local test cluster does not set that up.
+rm -v src/test/java/org/postgresql/test/core/RequireAuthTest.java
+%mvn_package org.postgresql:postgresql::tests: tests'''
+
+[[overlays]]
+description = "Remove the obsolete postgresql-42.7.7-jdbc-src.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(postgresql-42\.7\.7-jdbc-src\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
