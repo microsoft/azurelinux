@@ -6,8 +6,8 @@
 %bcond_without tests
 
 Name:           python-deepdiff
-Version:        8.6.1
-Release: 5%{?dist}
+Version: 8.6.2
+Release: 6%{?dist}
 Summary:        Deep Difference and search of any Python object/data
 
 License:        MIT
