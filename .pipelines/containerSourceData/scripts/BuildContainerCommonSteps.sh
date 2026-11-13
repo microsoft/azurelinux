@@ -14,6 +14,7 @@ function initialization {
 
     BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}  # # mcr.microsoft.com/azurelinux/base/core
     BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}   # 3.0
+    CONTAINER_IMAGE_TAG=$BASE_IMAGE_TAG
     AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%.*}    # 3.0
     DISTRO_IDENTIFIER="azl"
     END_OF_LIFE_1_YEAR=$(date -d "+1 year" "+%Y-%m-%dT%H:%M:%SZ")
@@ -87,7 +88,7 @@ function generate_image_sbom {
         "$CONTAINER_IMAGE_NAME_FINAL" \
         "$SBOM_TOOL_PATH" \
         "$BASE_IMAGE_NAME-$COMPONENT" \
-        "$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
+        "$COMPONENT_VERSION-$DISTRO_IDENTIFIER$CONTAINER_IMAGE_TAG"
 
     SBOM_IMAGES_DIR="$OUTPUT_DIR/SBOM_IMAGES"
     mkdir -p "$SBOM_IMAGES_DIR"

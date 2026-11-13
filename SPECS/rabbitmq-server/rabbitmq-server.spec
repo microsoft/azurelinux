@@ -2,7 +2,7 @@
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
 Version:        3.13.7
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,41 @@ Patch18:		CVE-2026-44839.patch
 Patch19:		CVE-2026-59248.patch
 Patch20:		CVE-2026-65624.patch
 Patch21:		CVE-2026-43971.patch
+Patch22:		CVE-2026-43969.patch
+Patch23:		CVE-2026-66071.patch
+Patch24:		CVE-2026-67223.patch
+Patch25:		CVE-2026-67224.patch
+Patch26:		CVE-2026-67230.patch
+Patch27:		CVE-2026-67231.patch
+Patch28:		CVE-2026-67411.patch
+Patch29:		CVE-2026-67412.patch
+Patch30:		CVE-2026-67419.patch
+Patch31:		CVE-2026-67420.patch
+Patch32:		CVE-2026-67421.patch
+Patch33:		CVE-2026-66067.patch
+Patch34:		CVE-2026-66068.patch
+Patch35:		CVE-2026-66070.patch
+Patch36:		CVE-2026-66072.patch
+Patch37:		CVE-2026-66074.patch
+Patch38:		CVE-2026-66075.patch
+Patch39:		CVE-2026-66079.patch
+Patch40:		CVE-2026-67219.patch
+Patch41:		CVE-2026-67221.patch
+Patch42:		CVE-2026-67222.patch
+Patch43:		CVE-2026-67225.patch
+Patch44:		CVE-2026-67226.patch
+Patch45:		CVE-2026-67228.patch
+Patch46:		CVE-2026-67229.patch
+Patch47:		CVE-2026-67232.patch
+Patch48:		CVE-2026-67235.patch
+Patch49:		CVE-2026-67239.patch
+Patch50:		CVE-2026-67227.patch
+Patch51:		CVE-2026-66073.patch
+Patch52:		CVE-2026-67413.patch
+Patch53:		CVE-2026-66076.patch
+Patch54:		CVE-2026-67404.patch
+Patch55:		CVE-2026-67409.patch
+Patch56:		CVE-2026-67418.patch
 
 BuildRequires:  elixir
 BuildRequires:  erlang
@@ -87,6 +122,16 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
+* Tue Oct 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-11
+- Patch for CVE-2026-67418, CVE-2026-67409, CVE-2026-67404, CVE-2026-66076
+
+* Fri Oct 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-10
+- Patch for CVE-2026-67421, CVE-2026-67420, CVE-2026-67419, CVE-2026-67412, CVE-2026-67411, CVE-2026-67231, CVE-2026-67227,
+  CVE-2026-67230, CVE-2026-67224, CVE-2026-67223, CVE-2026-66071, CVE-2026-43969, CVE-2026-67239, CVE-2026-67235,
+  CVE-2026-67232, CVE-2026-67229, CVE-2026-67228, CVE-2026-67226, CVE-2026-67225, CVE-2026-67222,
+  CVE-2026-67221, CVE-2026-67219, CVE-2026-66079, CVE-2026-66075, CVE-2026-66074, CVE-2026-66072, CVE-2026-66070,
+  CVE-2026-66068, CVE-2026-66067, CVE-2026-66073, CVE-2026-67413, CVE-2026-67233
+
 * Fri Jul 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-9
 - Patch for CVE-2026-65624, CVE-2026-59248, CVE-2026-43971
 

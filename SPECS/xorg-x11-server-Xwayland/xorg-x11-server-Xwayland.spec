@@ -10,7 +10,7 @@ Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 Summary:       Xwayland
 Name:          xorg-x11-server-Xwayland
-Version:       24.1.13
+Version:       24.1.14
 Release:       1%{?dist}
  
 License:       MIT
@@ -138,6 +138,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_libdir}/pkgconfig/xwayland.pc
  
 %changelog
+* Wed Oct 07 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.1.14-1
+- Auto-upgrade to 24.1.14 - for CVE-2026-88812, CVE-2026-93515, CVE-2026-93516, CVE-2026-93517, CVE-2026-93518, CVE-2026-93519, CVE-2026-93520, CVE-2026-93521, CVE-2026-93522, CVE-2026-93523, CVE-2026-93524, CVE-2026-93536
+
 * Sat Jul 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.1.13-1
 - Auto-upgrade to 24.1.13 - for CVE-2026-55999 & CVE-2026-56000
 

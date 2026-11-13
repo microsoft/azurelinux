@@ -1,6 +1,6 @@
 Name:           opensc
 Version:        0.27.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Smart card library and applications
 
 License:        LGPL-2.1-or-later AND BSD-3-Clause
@@ -13,6 +13,7 @@ Patch0:         opensc-0.19.0-pinpad.patch
 # File caching by default (#2000626)
 Patch1:         %{name}-0.22.0-file-cache.patch
 Patch2:         CVE-2026-10275.patch
+Patch3:         CVE-2026-103531.patch
 
 BuildRequires:  make
 BuildRequires:  pcsc-lite-devel
@@ -203,6 +204,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.27.1-3
+- Patch for CVE-2026-103531
+
 * Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.27.1-2
 - Patch for CVE-2026-10275
 

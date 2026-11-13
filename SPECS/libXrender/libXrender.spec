@@ -1,6 +1,6 @@
 Summary:        X.Org X11 libXrender runtime library
 Name:           libXrender
-Version:        0.9.11
+Version:        0.9.13
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -61,6 +61,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/xrender.pc
 
 %changelog
+* Sun Oct 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.13-1
+- Auto-upgrade to 0.9.13 - for CVE-2026-88807
+
 * Tue Dec 19 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 0.9.11-1
 - Update to v0.9.11
 

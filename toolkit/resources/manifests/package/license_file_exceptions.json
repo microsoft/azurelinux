@@ -39,6 +39,14 @@
             ]
         },
         {
+            "_comment": "guava-javadoc: JDK-generated javadoc legal/ files (bundled jQuery notices) trigger false-positive license warnings.",
+            "PackageName": "guava-javadoc",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/javadoc/guava/legal/ADDITIONAL_LICENSE_INFO$",
+                "^/usr/share/javadoc/guava/legal/LICENSE$"
+            ]
+        },
+        {
             "_comment1": "OpenSSL has multiple structs, constants and procedures that have the word 'NOTICE' in them, like 'NOTICEREF_free'.",
             "_comment2": "These man pages are for those items, not actual license notices.",
             "PackageName": "openssl-devel",
@@ -89,7 +97,15 @@
                 "^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.md$",
                 "^/usr/share/doc/docs/html/core/.*/fn\\..*absd.*\\.html$",
                 "^/usr/share/doc/docs/html/rustc/platform-support/.*bsd.*\\.html$",
-                "^/usr/share/doc/docs/html/search\\.index/.*\\.js$"
+                "^/usr/share/doc/docs/html/search\\.index/.*\\.js$",
+		        "^/usr/share/doc/docs/html/rust-by-example/.*/searchindex-[0-9a-f]+\\.js$"
+            ]
+        },
+        {
+            "_comment": "openbsd-rc.d trips the fuzzy 'bsd' license-name match; it is an example init script, not a license.",
+            "PackageName": "prometheus-node-exporter",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/prometheus-node-exporter/examples/openbsd-rc\\.d/node_exporter$"
             ]
         }
     ],

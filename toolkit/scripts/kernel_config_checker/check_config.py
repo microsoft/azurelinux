@@ -76,21 +76,25 @@ def check_kernel_config(
     """Check if actual kernel config matches intentional config."""
     print(f"Checking kernel config for: {kernel_name} ({architecture})")
 
-    all_configs = _collect_configs(
-        schema.default.kernel_configs, architecture, "default"
-    )
+    override = next((o for o in schema.overrides if o.name == kernel_name), None)
 
-    for override in schema.overrides:
-        if override.name == kernel_name:
-            print(f"✓ Found kernel-specific overrides for '{kernel_name}'")
-            all_configs.update(
-                _collect_configs(
-                    override.kernel_configs,
-                    architecture,
-                    f"override ({kernel_name})",
-                )
+    all_configs = {}
+    if override is None or override.inherit_default:
+        all_configs = _collect_configs(
+            schema.default.kernel_configs, architecture, "default"
+        )
+    else:
+        print(f"✓ '{kernel_name}' does not inherit the default section")
+
+    if override is not None:
+        print(f"✓ Found kernel-specific overrides for '{kernel_name}'")
+        all_configs.update(
+            _collect_configs(
+                override.kernel_configs,
+                architecture,
+                f"override ({kernel_name})",
             )
-            break
+        )
 
     print(
         f"✓ Checking {len(all_configs)} configurations (default + overrides)"

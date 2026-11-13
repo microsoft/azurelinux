@@ -26,7 +26,7 @@
 
 Summary:        Optional junit tasks for ant
 Name:           ant-junit
-Version:        1.10.14
+Version:        1.10.18
 Release:        1%{?dist}
 License:        ASL 2.0 AND W3C
 Group:          Development/Tools/Building
@@ -730,6 +730,10 @@ popd
 %endif
 
 %changelog
+* Mon Sep 22 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.10.18-1
+- Auto-upgrade to 1.10.18 to match sibling `ant` SPEC (unblocks apache-commons-lang3,
+  apache-commons-logging, jna which BuildRequire `ant-junit = %%{version}` -> `ant = %%{version}`)
+
 * Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.14-1
 - Auto-upgrade to 1.10.14 - Azure Linux 3.0 - package upgrades
 

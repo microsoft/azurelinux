@@ -1,6 +1,6 @@
 Name:          libdwarf
 Version:       0.9.2
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Library to access the DWARF Debugging file format
 
 License:       LGPL-2.1-only AND BSD-2-Clause-FreeBSD
@@ -9,6 +9,7 @@ Distribution:   Azure Linux
 URL:           https://www.prevanders.net/dwarf.html
 Source0:       https://www.prevanders.net/%{name}-%{version}.tar.xz
 Patch0:        libdwarf_skip_test.patch
+Patch1:        CVE-2026-116732.patch
 
 BuildRequires: gcc make python3
 
@@ -89,6 +90,9 @@ TZ=:America/Los_Angeles %__make check
 
 
 %changelog
+* Tue Oct 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.9.2-2
+- Patch for CVE-2026-116732
+
 * Fri Mar 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.2-1
 - Auto-upgrade to 0.9.2 - for CVE-2024-2002
 

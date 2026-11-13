@@ -2,8 +2,8 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        10.5.4
-Release:        2%{?dist}
+Version:        10.5.5
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -197,6 +197,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Fri Sep 25 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.5.5-1
+- Auto-upgrade to 10.5.5 - follow-up complete fix for CVE-2016-4049
+
 * Wed Sep 02 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 10.5.4-2
 - Pass bison output file names via -o to build with hardened bison
 

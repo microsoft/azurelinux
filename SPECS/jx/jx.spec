@@ -1,7 +1,7 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.10.182
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,10 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2025-58058.patch
 Patch1:         CVE-2026-39821.patch
 Patch2:         CVE-2026-56852.patch
+Patch3:         CVE-2026-78659.patch
+Patch4:         CVE-2026-78660.patch
+Patch5:         CVE-2026-78669.patch
+Patch6:         CVE-2026-97032.patch
 
 BuildRequires:  golang < 1.25
 %global debug_package %{nil}
@@ -65,6 +69,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.10.182-6
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.10.182-5
 - Patch for CVE-2026-56852
 

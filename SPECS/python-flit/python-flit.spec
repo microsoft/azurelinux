@@ -13,7 +13,7 @@ so long as they can be imported on Python 3.}
 Summary:        Simplified packaging of Python modules
 Name:           python-%{srcname}
 Version:        3.9.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 # ./flit/log.py under ASL 2.0 license
 # ./flit/upload.py under PSF license
 License:        BSD AND ASL 2.0 AND Python
@@ -37,6 +37,8 @@ BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
 BuildRequires:  python3-pygments
+BuildRequires:  python3-PyYAML
+BuildRequires:  python3-pytest
 BuildRequires:  sudo
 BuildRequires:  which
 
@@ -44,8 +46,6 @@ BuildRequires:  which
 BuildRequires:  python3-requests
 BuildRequires:  python3-responses
 
-# Test deps that require flit to build, using 'pip3' instead:
-# BuildRequires:  python3-testpath
 %endif
 
 %description %{_description}
@@ -80,8 +80,7 @@ if [[ ! -f "%{_bindir}/python" ]]
 then
   ln -s "$(which python3)" "%{_bindir}/python"
 fi
-
-pip3 install more-itertools pluggy pytest testpath tomli_w pyyaml
+pip3 install more-itertools pluggy testpath tomli_w pyyaml
 
 # flit attempts to download list of classifiers from PyPI, but not if it's cached
 # test_invalid_classifier fails without the list
@@ -101,6 +100,9 @@ sudo -u test %pytest -k "not test_test_writable_dir_win"
 %{_bindir}/flit
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.9.0-3
+- Use python3-pytest and python3-PyYAML test dependencies instead of installing them with pip
+
 * Wed May 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.9.0-2
 - Add yaml dependency to pip install for check section
 

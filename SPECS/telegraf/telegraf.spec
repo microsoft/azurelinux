@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        32%{?dist}
+Release:        38%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,72 +9,60 @@ Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarbbal.sh script to get the vendored sources.
-Source1:        %{name}-%{version}-v1-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 
 Patch0:         CVE-2024-35255.patch
 Patch1:         CVE-2024-37298.patch
-Patch2:         CVE-2024-45337.patch
-Patch3:         CVE-2024-45338.patch
-Patch4:         CVE-2025-22868.patch
-Patch5:         CVE-2025-22869.patch
-Patch6:         CVE-2025-22870.patch
-Patch7:         CVE-2024-51744.patch
-Patch8:         CVE-2025-30204.patch
-Patch9:         CVE-2025-27144.patch
-Patch10:        CVE-2025-30215.patch
-Patch11:        CVE-2025-22872.patch
-Patch12:        CVE-2025-47913.patch
-Patch13:        CVE-2025-10543.patch
-Patch14:        CVE-2026-27571.patch
-Patch15:        CVE-2025-11065.patch
-Patch16:        CVE-2025-47911.patch
-Patch17:        CVE-2025-58190.patch
-Patch18:        CVE-2026-2303.patch
-Patch19:        CVE-2026-26014.patch
-Patch20:        CVE-2026-4645.patch
-# Patch added based on customer request https://microsoft.visualstudio.com/OS/_workitems/edit/61041768
-# Fix was introduced 1.37.2, this patch can be removed once we update to 1.37.2 or later
-Patch21:        cisco_telegraf_bug61041768.patch
-Patch22:        CVE-2026-29785.patch
-Patch23:        CVE-2026-33216.patch
-Patch24:        CVE-2026-5160.patch
-Patch25:        CVE-2026-41602.patch
-Patch26:        CVE-2026-42154.patch
-Patch27:        CVE-2026-39821.patch
-Patch28:        CVE-2026-39829.patch
-Patch29:        CVE-2026-39830.patch
-Patch30:        CVE-2026-39832.patch
-Patch31:        CVE-2026-39834.patch
-Patch32:        CVE-2026-42506.patch
-Patch33:        CVE-2026-42508.patch
-Patch34:        CVE-2026-46597.patch
-Patch35:        CVE-2026-27136.patch
-Patch36:        CVE-2026-41889.patch
-Patch37:        CVE-2026-42151.patch
-Patch38:        CVE-2026-25680.patch
-Patch39:        CVE-2026-25681.patch
-Patch40:        CVE-2026-39827.patch
-Patch41:        CVE-2026-39828.patch
-Patch43:        CVE-2026-39835.patch
-Patch44:        CVE-2026-42502.patch
-Patch45:        CVE-2026-46598.patch
-Patch46:        CVE-2026-58207.patch
-Patch47:        CVE-2026-58208.patch
-Patch48:        CVE-2026-58209.patch
-Patch49:        CVE-2026-58250.patch
-Patch50:        CVE-2026-58251.patch
-Patch51:        CVE-2026-58252.patch
-Patch52:        CVE-2026-58253.patch
-Patch53:        CVE-2026-56852.patch
-Patch54:        CVE-2025-29923.patch
-Patch55:        CVE-2025-46327.patch
-Patch56:        CVE-2026-54908.patch
-Patch57:        CVE-2026-54332.patch
-Patch58:        CVE-2026-65819.patch
-Patch59:        CVE-2026-79921.patch
-Patch60:        CVE-2026-37236.patch
-Patch61:        CVE-2026-56855.patch
-Patch62:        CVE-2026-78662.patch
+Patch2:         CVE-2024-51744.patch
+Patch3:         CVE-2025-30204.patch
+Patch4:         CVE-2025-30215.patch
+Patch5:         CVE-2025-10543.patch
+Patch6:         CVE-2026-27571.patch
+Patch7:         CVE-2025-11065.patch
+Patch8:         CVE-2026-2303.patch
+Patch9:         CVE-2026-26014.patch
+Patch10:        CVE-2026-4645.patch
+## Patch added based on customer request https://microsoft.visualstudio.com/OS/_workitems/edit/61041768
+## Fix was introduced 1.37.2, this patch can be removed once we update to 1.37.2 or later
+Patch11:        cisco_telegraf_bug61041768.patch
+Patch12:        CVE-2026-29785.patch
+Patch13:        CVE-2026-33216.patch
+Patch14:        CVE-2026-5160.patch
+Patch15:        CVE-2026-42154.patch
+Patch16:        CVE-2026-41889.patch
+Patch17:        CVE-2026-42151.patch
+Patch18:        CVE-2026-58207.patch
+Patch19:        CVE-2026-58208.patch
+Patch20:        CVE-2026-58209.patch
+Patch21:        CVE-2026-58250.patch
+Patch22:        CVE-2026-58251.patch
+Patch23:        CVE-2026-58252.patch
+Patch24:        CVE-2026-58253.patch
+Patch25:        CVE-2025-29923.patch
+Patch26:        CVE-2025-46327.patch
+Patch27:        CVE-2026-54908.patch
+Patch28:        CVE-2026-54332.patch
+Patch29:        CVE-2026-65819.patch
+Patch30:        CVE-2026-37236.patch
+Patch31:        CVE-2026-56855.patch
+Patch32:        CVE-2026-78662.patch
+Patch33:        CVE-2026-84445.patch
+Patch34:        CVE-2026-77411.patch
+Patch35:        CVE-2026-66055.patch
+Patch36:        CVE-2026-107324.patch
+Patch37:        CVE-2026-107325.patch
+Patch38:        CVE-2026-61801.patch
+Patch39:        CVE-2026-78659.patch
+Patch40:        CVE-2026-78660.patch
+Patch41:        CVE-2026-78669.patch
+Patch42:        CVE-2026-97032.patch
+Patch43:        remove-emudhra-ca-roots.patch
+Patch44:        CVE-2026-116585.patch
+Patch45:        CVE-2026-116586.patch
+Patch46:        CVE-2026-116587.patch
+Patch47:        CVE-2026-116591.patch
+Patch48:        CVE-2026-78661.patch
+Patch49:        CVE-2026-97045.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -139,6 +127,33 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.31.0-38
+- Remove additional emSign G1, C1 and ECC C3 roots from the vendored CA bundle.
+
+* Wed Nov 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-37
+- Patch for CVE-2026-97045, CVE-2026-78661, CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
+
+* Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.31.0-36
+- Remove AAA and emSign ECC G3 from the vendored Snowflake CA bundle.
+
+* Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-35
+- Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107325, CVE-2026-107324
+
+* Thu Sep 17 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.31.0-34
+- Patch upgrades "github.com/rabbitmq/amqp091-go" from v1.9.0 to v1.15.0 to fix CVE-2026-77403,
+  CVE-2026-77405, CVE-2026-77406, CVE-2026-77407, CVE-2026-77408, CVE-2026-77409, CVE-2026-77410,
+  CVE-2026-77411, CVE-2026-77412. Removed patch for CVE-2026-79921 which is fixed by this upgrade.
+- Patch upgrades "github.com/apache/thrift" from v0.24.0 to v0.25.0 to fix CVE-2026-66055, CVE-2026-63772,
+  CVE-2026-83663, CVE-2026-82458, CVE-2026-94637. Removed patch for CVE-2026-41602 which is fixed by this upgrade.
+
+* Thu Sep 17 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.31.0-33
+- Patch for CVE-2026-84445, CVE-2026-84304, CVE-2026-83530
+- Removed patch for CVE-2024-45337, CVE-2024-45338, CVE-2025-22868, CVE-2025-22869, CVE-2025-22870,
+  CVE-2025-22872, CVE-2025-27144, CVE-2025-47911, CVE-2025-47913, CVE-2025-58190, CVE-2026-25680,
+  CVE-2026-25681, CVE-2026-27136, CVE-2026-39821, CVE-2026-39827, CVE-2026-39828, CVE-2026-39829,
+  CVE-2026-39830, CVE-2026-39832, CVE-2026-39834, CVE-2026-39835, CVE-2026-42502, CVE-2026-42506,
+  CVE-2026-42508, CVE-2026-46597, CVE-2026-46598, CVE-2026-56852
+
 * Wed Sep 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-32
 - Patch for CVE-2026-78662, CVE-2026-56855, CVE-2026-37236
 

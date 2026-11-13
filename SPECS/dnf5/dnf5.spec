@@ -38,7 +38,7 @@
 Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -679,6 +679,10 @@ done
 
 
 %changelog
+* Tue Oct 27 2026 Akhila Guruju <v-guakhila@microsoft.com> - 5.1.11-4
+- Fix repo snapshot builds with expat 2.9.0 and newer by using `XML_GetCurrentLineNumber64`,
+  while retaining `XML_GetCurrentLineNumber` for compatibility with older expat versions.
+
 * Tue May 06 2025 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-3
 - Add repo snapshot to dnf5
 - fixup merge conflict

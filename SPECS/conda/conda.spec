@@ -1,7 +1,7 @@
 Summary:        Cross-platform, Python-agnostic binary package manager
 Name:           conda
 Version:        24.3.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD-3-Clause AND Apache-2.0
 # The conda code is BSD-3-Clause
 # adapters/ftp.py is Apache-2.0
@@ -20,6 +20,7 @@ Patch3:         conda-cpuinfo.patch
 Patch10004:     0004-Do-not-try-to-run-usr-bin-python.patch
 Patch10005:     0005-Fix-failing-tests-in-test_api.py.patch
 Patch10006:     0006-shell-assume-shell-plugins-are-in-etc.patch
+Patch10007:     CVE-2026-53940.patch
 
 BuildArch:      noarch
 
@@ -402,6 +403,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %{_datadir}/conda/condarc.d/
 
 %changelog
+* Wed Sep 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.3.0-5
+- Patch for CVE-2026-53940
+
 * Thu Aug 07 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-4
 - Add missing conda.xsh file to /etc/profile.d
 - also move conda.fish to /etc/fish/conf.d/
@@ -409,7 +413,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 * Thu May 01 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-3
 - Skip some test cases that are failing in the current version of conda using Fedora (License: MIT)
 
-* Fri April 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-2
+* Fri Apr 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-2
 - Add missing python3-pluggy package
 
 * Wed Feb 26 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-1

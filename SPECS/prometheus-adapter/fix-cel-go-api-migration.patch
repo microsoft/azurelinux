@@ -1,0 +1,57 @@
+Port the cel-go API migration required by the module bump in CVE-2026-84304.patch.
+
+cel-go dropped the protobuf-backed expression accessors in favour of the "common/ast" API:
+"AstNode.Expr()" now returns "ast.Expr" and constants are read through "AsLiteral()". The
+affected file is the vendored copy of k8s.io/apiserver v0.30.0, and this is the same change
+kubernetes made upstream in release-1.31.
+
+Bumping k8s.io/apiserver instead (as some sibling packages did) is not an option here:
+v0.34 drops an API that sigs.k8s.io/custom-metrics-apiserver still uses, and v0.31 changes the
+"cmd.Run" signature that prometheus-adapter itself calls.
+
+Signed-off-by: Sumit Jena <v-sumitjena@microsoft.com>
+--- a/vendor/k8s.io/apiserver/pkg/cel/library/cost.go
++++ b/vendor/k8s.io/apiserver/pkg/cel/library/cost.go
+@@ -21,10 +21,10 @@
+ 
+ 	"github.com/google/cel-go/checker"
+ 	"github.com/google/cel-go/common"
++	"github.com/google/cel-go/common/ast"
+ 	"github.com/google/cel-go/common/types"
+ 	"github.com/google/cel-go/common/types/ref"
+ 	"github.com/google/cel-go/common/types/traits"
+-	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
+ )
+ 
+ // CostEstimator implements CEL's interpretable.ActualCostEstimator and checker.CostEstimator.
+@@ -255,8 +255,10 @@
+ 			// Worst case size is where is that a separator of "" is used, and each char is returned as a list element.
+ 			max := sz.Max
+ 			if len(args) > 1 {
+-				if c := args[1].Expr().GetConstExpr(); c != nil {
+-					max = uint64(c.GetInt64Value())
++				if v := args[1].Expr().AsLiteral(); v != nil {
++					if i, ok := v.Value().(int64); ok {
++						max = uint64(i)
++					}
+ 				}
+ 			}
+ 			// Cost is the traversal plus the construction of the result.
+@@ -425,7 +427,7 @@
+ type itemsNode struct {
+ 	path []string
+ 	t    *types.Type
+-	expr *exprpb.Expr
++	expr ast.Expr
+ }
+ 
+ func (i *itemsNode) Path() []string {
+@@ -436,7 +438,7 @@
+ 	return i.t
+ }
+ 
+-func (i *itemsNode) Expr() *exprpb.Expr {
++func (i *itemsNode) Expr() ast.Expr {
+ 	return i.expr
+ }
+ 

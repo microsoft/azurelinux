@@ -1,0 +1,132 @@
+From 701899a6ef3ad9e0dbd6167c76ea9bdae071cce3 Mon Sep 17 00:00:00 2001
+From: jykanase <v-jykanase@microsoft.com>
+Date: Fri, 18 Sep 2026 07:43:25 +0000
+Subject: [PATCH] fix-non-constant-format-string.patch
+
+The CVE-2026-84304 dependency update raises the go directive to 1.25, which
+enables the printf analyzer check for non-constant format strings (added in
+Go 1.24). "go test" runs this analyzer by default, breaking %check.
+---
+ errdefs/grpc.go                                 | 16 ++++++++--------
+ filters/parser.go                               |  6 +++---
+ remotes/docker/fetcher_test.go                  |  4 ++--
+ services/content/contentserver/contentserver.go |  2 +-
+ services/introspection/local.go                 |  2 +-
+ 5 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/errdefs/grpc.go b/errdefs/grpc.go
+index 7a9b33e..11091b1 100644
+--- a/errdefs/grpc.go
++++ b/errdefs/grpc.go
+@@ -45,21 +45,21 @@ func ToGRPC(err error) error {
+ 
+ 	switch {
+ 	case IsInvalidArgument(err):
+-		return status.Errorf(codes.InvalidArgument, err.Error())
++		return status.Error(codes.InvalidArgument, err.Error())
+ 	case IsNotFound(err):
+-		return status.Errorf(codes.NotFound, err.Error())
++		return status.Error(codes.NotFound, err.Error())
+ 	case IsAlreadyExists(err):
+-		return status.Errorf(codes.AlreadyExists, err.Error())
++		return status.Error(codes.AlreadyExists, err.Error())
+ 	case IsFailedPrecondition(err):
+-		return status.Errorf(codes.FailedPrecondition, err.Error())
++		return status.Error(codes.FailedPrecondition, err.Error())
+ 	case IsUnavailable(err):
+-		return status.Errorf(codes.Unavailable, err.Error())
++		return status.Error(codes.Unavailable, err.Error())
+ 	case IsNotImplemented(err):
+-		return status.Errorf(codes.Unimplemented, err.Error())
++		return status.Error(codes.Unimplemented, err.Error())
+ 	case IsCanceled(err):
+-		return status.Errorf(codes.Canceled, err.Error())
++		return status.Error(codes.Canceled, err.Error())
+ 	case IsDeadlineExceeded(err):
+-		return status.Errorf(codes.DeadlineExceeded, err.Error())
++		return status.Error(codes.DeadlineExceeded, err.Error())
+ 	}
+ 
+ 	return err
+diff --git a/filters/parser.go b/filters/parser.go
+index 3276790..7f5224a 100644
+--- a/filters/parser.go
++++ b/filters/parser.go
+@@ -208,7 +208,7 @@ func (p *parser) field() (string, error) {
+ 	case tokenQuoted:
+ 		return p.unquote(pos, s, false)
+ 	case tokenIllegal:
+-		return "", p.mkerr(pos, p.scanner.err)
++		return "", p.mkerr(pos, "%s", p.scanner.err)
+ 	}
+ 
+ 	return "", p.mkerr(pos, "expected field or quoted")
+@@ -229,7 +229,7 @@ func (p *parser) operator() (operator, error) {
+ 			return 0, p.mkerr(pos, "unsupported operator %q", s)
+ 		}
+ 	case tokenIllegal:
+-		return 0, p.mkerr(pos, p.scanner.err)
++		return 0, p.mkerr(pos, "%s", p.scanner.err)
+ 	}
+ 
+ 	return 0, p.mkerr(pos, `expected an operator ("=="|"!="|"~=")`)
+@@ -244,7 +244,7 @@ func (p *parser) value(allowAltQuotes bool) (string, error) {
+ 	case tokenQuoted:
+ 		return p.unquote(pos, s, allowAltQuotes)
+ 	case tokenIllegal:
+-		return "", p.mkerr(pos, p.scanner.err)
++		return "", p.mkerr(pos, "%s", p.scanner.err)
+ 	}
+ 
+ 	return "", p.mkerr(pos, "expected value or quoted")
+diff --git a/remotes/docker/fetcher_test.go b/remotes/docker/fetcher_test.go
+index 07cc90a..579c122 100644
+--- a/remotes/docker/fetcher_test.go
++++ b/remotes/docker/fetcher_test.go
+@@ -146,7 +146,7 @@ func TestDockerFetcherOpen(t *testing.T) {
+ 		}, {
+ 			name:           "should return StatusRequestTimeout after 5 retries",
+ 			mockedStatus:   http.StatusRequestTimeout,
+-			mockedErr:      fmt.Errorf(http.StatusText(http.StatusRequestTimeout)),
++			mockedErr:      fmt.Errorf("%s", http.StatusText(http.StatusRequestTimeout)),
+ 			want:           nil,
+ 			wantErr:        true,
+ 			wantPlainError: true,
+@@ -154,7 +154,7 @@ func TestDockerFetcherOpen(t *testing.T) {
+ 		}, {
+ 			name:           "should return StatusTooManyRequests after 5 retries",
+ 			mockedStatus:   http.StatusTooManyRequests,
+-			mockedErr:      fmt.Errorf(http.StatusText(http.StatusTooManyRequests)),
++			mockedErr:      fmt.Errorf("%s", http.StatusText(http.StatusTooManyRequests)),
+ 			want:           nil,
+ 			wantErr:        true,
+ 			wantPlainError: true,
+diff --git a/services/content/contentserver/contentserver.go b/services/content/contentserver/contentserver.go
+index 76a9e6e..ec1eb17 100644
+--- a/services/content/contentserver/contentserver.go
++++ b/services/content/contentserver/contentserver.go
+@@ -135,7 +135,7 @@ func (s *service) Delete(ctx context.Context, req *api.DeleteContentRequest) (*p
+ 	log.G(ctx).WithField("digest", req.Digest).Debugf("delete content")
+ 	dg, err := digest.Parse(req.Digest)
+ 	if err != nil {
+-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
++		return nil, status.Error(codes.InvalidArgument, err.Error())
+ 	}
+ 
+ 	if err := s.store.Delete(ctx, dg); err != nil {
+diff --git a/services/introspection/local.go b/services/introspection/local.go
+index 7aa291b..4351b85 100644
+--- a/services/introspection/local.go
++++ b/services/introspection/local.go
+@@ -73,7 +73,7 @@ func (l *Local) UpdateLocal(root string) {
+ func (l *Local) Plugins(ctx context.Context, req *api.PluginsRequest, _ ...grpc.CallOption) (*api.PluginsResponse, error) {
+ 	filter, err := filters.ParseAll(req.Filters...)
+ 	if err != nil {
+-		return nil, errdefs.ToGRPCf(errdefs.ErrInvalidArgument, err.Error())
++		return nil, errdefs.ToGRPCf(errdefs.ErrInvalidArgument, "%s", err.Error())
+ 	}
+ 
+ 	var plugins []*api.Plugin
+-- 
+2.45.4
+

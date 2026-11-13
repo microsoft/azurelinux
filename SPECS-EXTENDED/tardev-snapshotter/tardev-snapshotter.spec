@@ -3,7 +3,7 @@
 Summary: Tardev Snapshotter for containerd
 Name: tardev-snapshotter
 Version: 3.2.0.tardev1
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 Vendor: Microsoft Corporation
@@ -13,6 +13,8 @@ Source0:https://github.com/microsoft/kata-containers/archive/refs/tags/%{version
 # Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run regenerate-archives.sh
 Source1:  %{_distro_sources_url}/%{name}-%{version}-cargo.tar.gz
+# Backports upstream bytecodealliance/rustix#1663 to the cached rustix 0.37.27 sources (Source1); applied manually below since it's outside the main source tree.
+Patch0: rustix-remove-rustc-attrs.patch
 
 %{?systemd_requires}
 
@@ -36,7 +38,10 @@ pushd $HOME
 tar xf %{SOURCE1} --no-same-owner
 popd
 
-%autosetup -p1
+%autosetup -p1 -N
+
+# Apply Patch0 to the cached rustix sources (not part of the main source tree, so %%autosetup can't apply it).
+patch -p1 -d "$HOME/.cargo" < %{PATCH0}
 
 %build
 export CARGO_NET_OFFLINE=true
@@ -67,6 +72,9 @@ fi
 %config(noreplace) %{_unitdir}/%{name}.service
 
 %changelog
+* Thu Sep 10 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.0.tardev1-11
+- Backport upstream bytecodealliance/rustix#1663 to rebuild with rust
+
 * Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.0.tardev1-10
 - Bump release to rebuild with rust
 

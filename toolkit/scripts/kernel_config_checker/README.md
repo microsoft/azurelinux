@@ -127,6 +127,10 @@ The system uses a structured JSON schema with default and override sections:
 - `n` - Disabled ("is not set" or missing)
 - Custom values supported for specific configs
 
+### Specialized Kernels
+
+Listing a kernel under `overrides` makes CI check its configs. By default an override is checked against the `default` section plus its own entries. Set `"inherit_default": false` for kernels that are not general-purpose OS kernels (e.g. `kernel-mshv`), so only the override's own entries are enforced.
+
 ## Project Structure
 
 ```text

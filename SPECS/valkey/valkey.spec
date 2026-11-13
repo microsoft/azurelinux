@@ -1,6 +1,6 @@
 Summary:        advanced key-value store
 Name:           valkey
-Version:        8.0.11
+Version:        8.0.12
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -84,6 +84,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/valkey.conf
 
 %changelog
+* Tue Oct 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.12-1
+- Auto-upgrade to 8.0.12 - for GHSA-f4q9-j22m-xqq9
+
 * Tue Sep 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.11-1
 - Auto-upgrade to 8.0.11 - for GHSA-jcj7-v34w-v9vv
 

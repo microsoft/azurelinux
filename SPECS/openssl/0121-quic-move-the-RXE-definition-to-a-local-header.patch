@@ -1,0 +1,194 @@
+From 6ecf983308b6df88743045c6a9a794e55da30154 Mon Sep 17 00:00:00 2001
+From: Jakub Zelenka <jakub.zelenka@openssl.foundation>
+Date: Wed, 26 Aug 2026 14:55:57 +0200
+Subject: [PATCH] quic: move the RXE definition to a local header
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The RXE structure carries the reference count of a received packet and
+embeds the OSSL_QRX_PKT handed out to the users of the QRX as its first
+member. It is defined in quic_record_rx.c, so a test that wants to build
+a packet without a QRX behind it cannot allocate one or look at its
+reference count, and would have to guess the size of the structure and
+the offset of the fields it needs.
+
+Move the definition to a local header, following the other local headers
+in ssl/quic, so that a test can include it and construct a packet of its
+own rather than the library having to provide a constructor for it.
+
+Assisted-by: Claude:claude-opus-5
+
+Reviewed-by: Tomas Mraz <tomas@openssl.foundation>
+Reviewed-by: Saša Nedvědický <sashan@openssl.org>
+MergeDate: Fri Aug 28 14:03:45 2026
+Reviewed-by: Milan Broz <mbroz@openssl.org>
+Merged-from: https://github.com/openssl/openssl/pull/32767
+Signed-off-by: Azure Linux Security Servicing Account <azurelinux-security@microsoft.com>
+Upstream-reference: https://github.com/openssl/openssl/commit/6ecf983308b6df88743045c6a9a794e55da30154.patch
+---
+ ssl/quic/quic_record_rx.c       | 56 +----------------------
+ ssl/quic/quic_record_rx_local.h | 80 +++++++++++++++++++++++++++++++++
+ 2 files changed, 81 insertions(+), 55 deletions(-)
+ create mode 100644 ssl/quic/quic_record_rx_local.h
+
+diff --git a/ssl/quic/quic_record_rx.c b/ssl/quic/quic_record_rx.c
+index b2a1b257638ea..e2dadd38d1be3 100644
+--- a/ssl/quic/quic_record_rx.c
++++ b/ssl/quic/quic_record_rx.c
+@@ -10,6 +10,7 @@
+ #include <openssl/ssl.h>
+ #include "internal/quic_record_rx.h"
+ #include "quic_record_shared.h"
++#include "quic_record_rx_local.h"
+ #include "internal/common.h"
+ #include "internal/list.h"
+ #include "../ssl_local.h"
+@@ -32,61 +33,6 @@ static ossl_inline int pkt_is_marked(const uint64_t *bitf, size_t pkt_idx)
+     return (*bitf & (((uint64_t)1) << pkt_idx)) != 0;
+ }
+ 
+-/*
+- * RXE
+- * ===
+- *
+- * RX Entries (RXEs) store processed (i.e., decrypted) data received from the
+- * network. One RXE is used per received QUIC packet.
+- */
+-typedef struct rxe_st RXE;
+-
+-struct rxe_st {
+-    OSSL_QRX_PKT pkt;
+-    OSSL_LIST_MEMBER(rxe, RXE);
+-    size_t data_len, alloc_len, refcount;
+-
+-    /* Extra fields for per-packet information. */
+-    QUIC_PKT_HDR hdr; /* data/len are decrypted payload */
+-
+-    /* Decoded packet number. */
+-    QUIC_PN pn;
+-
+-    /* Addresses copied from URXE. */
+-    BIO_ADDR peer, local;
+-
+-    /* Time we received the packet (not when we processed it). */
+-    OSSL_TIME time;
+-
+-    /* Total length of the datagram which contained this packet. */
+-    size_t datagram_len;
+-
+-    /*
+-     * The key epoch the packet was received with. Always 0 for non-1-RTT
+-     * packets.
+-     */
+-    uint64_t key_epoch;
+-
+-    /*
+-     * Monotonically increases with each datagram received.
+-     * For diagnostic use only.
+-     */
+-    uint64_t datagram_id;
+-
+-    /*
+-     * alloc_len allocated bytes (of which data_len bytes are valid) follow this
+-     * structure.
+-     */
+-};
+-
+-DEFINE_LIST_OF(rxe, RXE);
+-typedef OSSL_LIST(rxe) RXE_LIST;
+-
+-static ossl_inline unsigned char *rxe_data(const RXE *e)
+-{
+-    return (unsigned char *)(e + 1);
+-}
+-
+ /*
+  * QRL
+  * ===
+diff --git a/ssl/quic/quic_record_rx_local.h b/ssl/quic/quic_record_rx_local.h
+new file mode 100644
+index 0000000000000..4a2fd8c0e1b8a
+--- /dev/null
++++ b/ssl/quic/quic_record_rx_local.h
+@@ -0,0 +1,80 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++#ifndef OSSL_QUIC_RECORD_RX_LOCAL_H
++#define OSSL_QUIC_RECORD_RX_LOCAL_H
++
++#include "internal/quic_record_rx.h"
++#include "internal/list.h"
++
++#ifndef OPENSSL_NO_QUIC
++
++/*
++ * RXE
++ * ===
++ *
++ * RX Entries (RXEs) store processed (i.e., decrypted) data received from the
++ * network. One RXE is used per received QUIC packet.
++ *
++ * The OSSL_QRX_PKT handed out to users of the QRX is the first member, so a
++ * packet pointer can be cast back to its RXE. It is intended that only the
++ * QRX implementation access this structure directly, tests which need to
++ * construct a packet without a QRX being the exception.
++ */
++typedef struct rxe_st RXE;
++
++struct rxe_st {
++    OSSL_QRX_PKT pkt;
++    OSSL_LIST_MEMBER(rxe, RXE);
++    size_t data_len, alloc_len, refcount;
++
++    /* Extra fields for per-packet information. */
++    QUIC_PKT_HDR hdr; /* data/len are decrypted payload */
++
++    /* Decoded packet number. */
++    QUIC_PN pn;
++
++    /* Addresses copied from URXE. */
++    BIO_ADDR peer, local;
++
++    /* Time we received the packet (not when we processed it). */
++    OSSL_TIME time;
++
++    /* Total length of the datagram which contained this packet. */
++    size_t datagram_len;
++
++    /*
++     * The key epoch the packet was received with. Always 0 for non-1-RTT
++     * packets.
++     */
++    uint64_t key_epoch;
++
++    /*
++     * Monotonically increases with each datagram received.
++     * For diagnostic use only.
++     */
++    uint64_t datagram_id;
++
++    /*
++     * alloc_len allocated bytes (of which data_len bytes are valid) follow this
++     * structure.
++     */
++};
++
++DEFINE_LIST_OF(rxe, RXE);
++typedef OSSL_LIST(rxe) RXE_LIST;
++
++static ossl_inline unsigned char *rxe_data(const RXE *e)
++{
++    return (unsigned char *)(e + 1);
++}
++
++#endif
++
++#endif

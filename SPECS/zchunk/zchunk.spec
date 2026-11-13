@@ -1,6 +1,6 @@
 Summary:        Compressed file format
 Name:           zchunk
-Version:        1.3.2
+Version:        1.5.5
 Release:        1%{?dist}
 License:        BSD 2-Clause AND MIT
 Vendor:         Microsoft Corporation
@@ -87,6 +87,9 @@ DESTDIR=%{buildroot}/ ninja install
 %{_includedir}/zck.h
 
 %changelog
+* Thu Oct 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.5-1
+- Auto-upgrade to 1.5.5 - for CVE-2026-117556
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-1
 - Auto-upgrade to 1.3.2 - Azure Linux 3.0 - package upgrades
 

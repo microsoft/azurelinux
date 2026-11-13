@@ -6,7 +6,7 @@ set -e
 
 # This script is used to build a golden container image for a given component.
 # The script takes the following inputs:
-# - a) Base container image name (e.g. mcr.microsoft.com/azurelinux/base/core:3.0)
+# - a) Base container image name (e.g. mcr.microsoft.com/azurelinux/base/core:3.0.20261022-amd64)
 # - b) ACR name (e.g. azurelinepreview, acrafoimages, etc.)
 # - c) Container repository name (e.g. base/nodejs, base/postgres, base/kubevirt/cdi-apiserver, etc.)
 # - d) Image name (e.g. nodejs, postgres, cdi, etc.)
@@ -28,6 +28,10 @@ set -e
 # - t) Script to create SBOM for the container image.
 # - u) Create Distroless container (e.g. true, false. If true, the script will also create a distroless container)
 # - v) Version extract command (e.g. 'busybox | head -1 | cut -c 10-15')
+# - w) Toolchain RPMs tarball file path.
+# - x) Upstream release build number (e.g. 3.0.20261025-fasttrack-1236358).
+#      Defaults to BUILD_BUILDNUMBER, set from the upstream build by Stage 7 validation.
+#      Golden tags and SBOM versions use this date, not the selected base image's date.
 
 # Assuming you are in your current working directory. Below should be the directory structure:
 #   │   rpms.tar.gz
@@ -53,12 +57,15 @@ set -e
 
 # Example usage:
 # /bin/bash ~/azurelinux/.pipelines/containerSourceData/scripts/BuildGoldenContainer.sh \
-#     -a "mcr.microsoft.com/azurelinux/base/core:3.0" -b azurelinuxlocal \
+#     -a "mcr.microsoft.com/azurelinux/base/core:3.0.20261022-amd64" -b azurelinuxlocal \
 #     -c "base/nodejs" -d "nodejs" -e "nodejs18" -f nodejs18.pkg -g Dockerfile-Nodejs \
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/azurelinux/.pipelines/containerSourceData \
-#     -m "false" -n "false" -p development -q "false" -u "true"
+#     -m "false" -n "false" -p development -q "false" -u "true" \
+#     -w ./toolchain_built_rpms_all.tar.gz -x "3.0.20261025-fasttrack-1236358"
 
-while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:" OPTIONS; do
+RELEASE_BUILD_NUMBER=${BUILD_BUILDNUMBER:-}
+
+while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:" OPTIONS; do
     case ${OPTIONS} in
     a ) BASE_IMAGE_NAME_FULL=$OPTARG;;
     b ) ACR=$OPTARG;;
@@ -83,6 +90,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:" OPTIONS; do
     u ) DISTROLESS=$OPTARG;;
     v ) VERSION_EXTRACT_CMD=$OPTARG;;
     w ) TOOLCHAIN_RPMS_TARBALL=$OPTARG;;
+    x ) RELEASE_BUILD_NUMBER=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -105,6 +113,7 @@ trap cleanup EXIT
 
 function print_inputs {
     echo "BASE_IMAGE_NAME_FULL          -> $BASE_IMAGE_NAME_FULL"
+    echo "RELEASE_BUILD_NUMBER          -> $RELEASE_BUILD_NUMBER"
     echo "ACR                           -> $ACR"
     echo "REPOSITORY                    -> $REPOSITORY"
     echo "IMAGE                         -> $IMAGE"
@@ -286,6 +295,34 @@ function docker_build {
     popd > /dev/null
 }
 
+function set_release_image_tag {
+    if [[ ! "$RELEASE_BUILD_NUMBER" =~ ^([0-9]+\.[0-9]+)\.([0-9]{8})([-.].+)?$ ]]; then
+        echo "Error - Upstream release build number must start with <major>.<minor>.YYYYMMDD; set BUILD_BUILDNUMBER or pass -x." >&2
+        return 1
+    fi
+
+    local release_version=${BASH_REMATCH[1]}
+    local build_date=${BASH_REMATCH[2]}
+    local validated_date
+    if ! validated_date=$(date -d "${build_date:0:4}-${build_date:4:2}-${build_date:6:2}" +%Y%m%d) ||
+        [[ "$validated_date" != "$build_date" ]]; then
+        echo "Error - Invalid upstream release build date: $build_date." >&2
+        return 1
+    fi
+
+    if [[ ! "$BASE_IMAGE_TAG" =~ ^([0-9]+\.[0-9]+)\.[0-9]{8}-(amd64|arm64)$ ]]; then
+        echo "Error - Base image tag must have the form <major>.<minor>.YYYYMMDD-<amd64|arm64>: $BASE_IMAGE_TAG." >&2
+        return 1
+    fi
+    if [[ "$release_version" != "${BASH_REMATCH[1]}" ]]; then
+        echo "Error - Upstream release version $release_version does not match base image tag $BASE_IMAGE_TAG." >&2
+        return 1
+    fi
+
+    CONTAINER_IMAGE_TAG="$release_version.$build_date-${BASH_REMATCH[2]}"
+    echo "Container Build Tag           -> $CONTAINER_IMAGE_TAG"
+}
+
 function set_image_tag {
     echo "+++ Get version of the installed package in the container."
     local containerId
@@ -318,10 +355,10 @@ function set_image_tag {
     # For HCI Images, do not include "-$DISTRO_IDENTIFIER" in the image tag; Instead use a "."
     if [ "$IS_HCI_IMAGE" = true ]; then
         # Example: acrafoimages.azurecr.io/base/kubevirt/virt-operator:0.59.0-2.2.0.20230607-amd64
-        CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$COMPONENT_VERSION.$BASE_IMAGE_TAG"
+        CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$COMPONENT_VERSION.$CONTAINER_IMAGE_TAG"
     else
         # Example: azurelinuxpreview.azurecr.io/base/nodejs:16.19.1-2-$DISTRO_IDENTIFIER2.0.20230607-amd64
-        CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
+        CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$COMPONENT_VERSION-$DISTRO_IDENTIFIER$CONTAINER_IMAGE_TAG"
     fi
 }
 
@@ -340,6 +377,7 @@ source "$CONTAINER_SRC_DIR/scripts/BuildContainerCommonSteps.sh"
 print_inputs
 validate_inputs
 initialization
+set_release_image_tag
 get_packages_to_install
 get_component_name
 prepare_dockerfile
