@@ -1,0 +1,65 @@
+From a31e6b73469cb2bf7eb8f70b5ff21f710fd2e23c Mon Sep 17 00:00:00 2001
+From: David Lord <davidism@gmail.com>
+Date: Sun, 5 Apr 2026 12:31:01 -0700
+Subject: [PATCH] remove werkzeug host tests
+
+---
+ tests/test_reqctx.py | 48 --------------------------------------------
+ 1 file changed, 48 deletions(-)
+
+diff --git a/tests/test_reqctx.py b/tests/test_reqctx.py
+index 6c38b66186..a5fe305cd3 100644
+--- a/tests/test_reqctx.py
++++ b/tests/test_reqctx.py
+@@ -275,51 +275,3 @@ def get_dynamic_cookie():
+     # cookies are being used for the urls that end with "dynamic cookie"
+     assert test_client.get("/get").data == b"42"
+     assert test_client.get("/get_dynamic_cookie").data == b"616"
+-
+-
+-def test_bad_environ_raises_bad_request():
+-    app = flask.Flask(__name__)
+-
+-    from flask.testing import EnvironBuilder
+-
+-    builder = EnvironBuilder(app)
+-    environ = builder.get_environ()
+-
+-    # use a non-printable character in the Host - this is key to this test
+-    environ["HTTP_HOST"] = "\x8a"
+-
+-    with app.request_context(environ):
+-        response = app.full_dispatch_request()
+-    assert response.status_code == 400
+-
+-
+-def test_environ_for_valid_idna_completes():
+-    app = flask.Flask(__name__)
+-
+-    @app.route("/")
+-    def index():
+-        return "Hello World!"
+-
+-    from flask.testing import EnvironBuilder
+-
+-    builder = EnvironBuilder(app)
+-    environ = builder.get_environ()
+-
+-    # these characters are all IDNA-compatible
+-    environ["HTTP_HOST"] = "ąśźäüжŠßя.com"
+-
+-    with app.request_context(environ):
+-        response = app.full_dispatch_request()
+-
+-    assert response.status_code == 200
+-
+-
+-def test_normal_environ_completes():
+-    app = flask.Flask(__name__)
+-
+-    @app.route("/")
+-    def index():
+-        return "Hello World!"
+-
+-    response = app.test_client().get("/", headers={"host": "xn--on-0ia.com"})
+-    assert response.status_code == 200

@@ -1,0 +1,19 @@
+# Werkzeug 3.1.8 changed Request.host / get_host to return an empty string for
+# missing or invalid Host headers (pallets/werkzeug#3142), so this test now sees
+# a 404 instead of a 400. Flask removed the test upstream after 3.1.3.
+
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/pallets/flask/commit/a31e6b73469cb2bf7eb8f70b5ff21f710fd2e23c" }]
+
+[[overlays]]
+description = "Remove the Werkzeug host tests that no longer apply with Werkzeug 3.1.8"
+type = "patch-add"
+source = "../flask-remove-werkzeug-host-tests.patch"
+
+[[overlays]]
+description = "Apply the backported patch with -p1"
+type = "spec-search-replace"
+regex = '^%autosetup -n %\{srcname\}-%\{version\}$'
+replacement = "%autosetup -p1 -n %{srcname}-%{version}"
