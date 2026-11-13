@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 5;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -16,7 +16,7 @@
 %global nodejs_pkg_major 22
 
 %if (0%{?fedora} >= 41 && 0%{?fedora} <= 44) || 0%{?rhel} == 11
-%global nodejs_default %{nodejs_pkg_major}
+%global nodejs_default 0
 %endif
 
 %global nodejs_default_sitelib %{_prefix}/lib/node_modules
@@ -252,7 +252,10 @@ Obsoletes: nodejs%{nodejs_pkg_major}%{?1:-%{1}} < %{nodejs_envr}\
 Provides: nodejs%{nodejs_pkg_major}%{?1:-%{1}} = %{nodejs_envr}\
 }
 %else
-%define unversioned_obsoletes_of_nodejsXX_if_default() %{nil}
+%define unversioned_obsoletes_of_nodejsXX_if_default() %{expand:\
+Obsoletes: nodejs%{?1:-%{1}} < %{nodejs_envr}\
+Provides: nodejs%{?1:-%{1}} = %{nodejs_envr}\
+}
 %endif
 
 %if %{with bundled}
@@ -299,6 +302,8 @@ BuildRequires: openssl-devel >= %{openssl11_minimum}
 
 # we need the system certificate store
 Requires: ca-certificates
+Requires: %{_bindir}/node
+Recommends: %{pkgname}-bin = %{nodejs_envr}
 
 Requires: %{pkgname}-libs%{?_isa} = %{nodejs_envr}
 
@@ -383,6 +388,7 @@ Requires: nodejs-undici
 
 
 %unversioned_obsoletes_of_nodejsXX_if_default
+Provides: nodejs%{?_isa} = %{nodejs_envr}
 
 
 %description
@@ -431,6 +437,7 @@ Conflicts: nodejs-devel-pkg
 
 
 
+Provides: nodejs-devel%{?_isa} = %{nodejs_envr}
 %description -n %{pkgname}-devel
 Development headers for the Node.js JavaScript runtime.
 
@@ -457,6 +464,7 @@ Obsoletes: v8 < 1:6.7.17-10
 Provides: nodejs-libs = %{nodejs_envr}
 %unversioned_obsoletes_of_nodejsXX_if_default libs
 
+Provides: nodejs-libs%{?_isa} = %{nodejs_envr}
 %description -n %{pkgname}-libs
 Libraries to support Node.js and provide stable v8 interfaces.
 
@@ -468,6 +476,7 @@ Requires: %{pkgname}%{?_isa} = %{nodejs_envr}
 %unversioned_obsoletes_of_nodejsXX_if_default full-i18n
 
 
+Provides: nodejs-full-i18n%{?_isa} = %{nodejs_envr}
 %description -n %{pkgname}-full-i18n
 Optional data files to provide full-icu support for Node.js. Remove this
 package to save space if non-English locales are not needed.
@@ -522,6 +531,12 @@ Provides: nodejs%{nodejs_pkg_major}-npm = %{npm_envr}
 %endif
 
 
+Requires: %{_bindir}/npm
+Recommends: %{pkgname}-npm-bin = %{npm_envr}
+Obsoletes: nodejs-npm < %{npm_envr}
+Provides: nodejs-npm = %{npm_envr}
+Provides: npm = %{npm_envr}
+Provides: nodejs-npm%{?_isa} = %{npm_envr}
 %description -n %{pkgname}-npm
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
@@ -540,6 +555,30 @@ Provides: nodejs-docs = %{nodejs_envr}
 %description -n %{pkgname}-docs
 The API documentation for the Node.js JavaScript runtime.
 
+
+%package bin
+Summary: Node.js JavaScript runtime - unversioned symlinks
+BuildArch: noarch
+Requires: %{name} = %{nodejs_envr}
+Provides: alternative-for(nodejs-bin) = %{nodejs_envr}
+Conflicts: alternative-for(nodejs-bin)
+
+%description bin
+Binary symlinks for Node.js JavaScript runtime.
+
+%package npm-bin
+Summary: Node.js Package Manager - binary symlinks
+Epoch: %{npm_epoch}
+Version: %{npm_version}
+Release: %{npm_release}
+BuildArch: noarch
+Requires: %{name}-npm = %{npm_envr}
+Requires(meta): %{name}-bin = %{nodejs_envr}
+Provides: alternative-for(nodejs-npm-bin) = %{npm_envr}
+Conflicts: alternative-for(nodejs-npm-bin)
+
+%description npm-bin
+Binary symlinks for Node.js Package Manager.
 
 %prep
 %autosetup -p1 -n node-v%{nodejs_version}
@@ -838,6 +877,23 @@ sed -e 's#@PREFIX@#%{_prefix}#g' \
     %{SOURCE203} > %{buildroot}%{_libdir}/pkgconfig/v8-%{v8_major}.%{v8_minor}.pc
 
 
+pushd '%{buildroot}%{_bindir}'
+for binname in node npm npx; do
+    ln -srfL "${binname}-%{nodejs_pkg_major}" "${binname}"
+done
+popd
+
+readonly VERSIONED_MANDIR="%{buildroot}%{_mandir}/nodejs-%{nodejs_pkg_major}"
+find "${VERSIONED_MANDIR}" -type d -name 'man[123456789]' -printf "%{buildroot}%{_mandir}/%%P\0" | xargs -0 mkdir -p
+find "${VERSIONED_MANDIR}" -type f -name '*.[123456789]*' -printf '%%P\n' | while read -r man_stem; do
+    ln -srfL "${VERSIONED_MANDIR}/${man_stem}" "%{buildroot}%{_mandir}/${man_stem}"
+done
+
+for soname in libv8 libv8_libbase libv8_libplatform; do
+    ln -srf %{buildroot}%{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
+done
+mkdir -p %{buildroot}%{_sysconfdir}
+cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
 %check
 #run unit test that should pass from list
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
@@ -875,6 +931,7 @@ if st and st.type == "link" then
 end
 
 %files -n %{pkgname}
+%dir %{nodejs_default_sitelib}
 %doc CHANGELOG.md onboarding.md GOVERNANCE.md README.md
 
 %if 0%{?nodejs_default}
@@ -906,6 +963,9 @@ end
 
 
 %files -n %{pkgname}-libs
+%{_libdir}/libv8.so.%{v8_major}
+%{_libdir}/libv8_libbase.so.%{v8_major}
+%{_libdir}/libv8_libplatform.so.%{v8_major}
 %license LICENSE
 %{_libdir}/libnode.so.%{nodejs_soversion}
 %{_libdir}/libv8.so.%{v8_major}.%{v8_minor}
@@ -929,6 +989,8 @@ end
 
 
 %files -n %{pkgname}-npm
+%config(noreplace) %{_sysconfdir}/npmrc
+%ghost %{_sysconfdir}/npmignore
 %if 0%{?nodejs_default}
 %{_bindir}/npm
 %{_bindir}/npx
@@ -954,8 +1016,23 @@ end
 %{_pkgdocdir}/npm/docs
 
 
+%files bin
+%license LICENSE
+%{_bindir}/node
+%{_mandir}/man1/node.1*
+
+%files npm-bin
+%license deps/npm/LICENSE
+%{_bindir}/npm
+%{_bindir}/npx
+%{_mandir}/man*/*
+%exclude %{_mandir}/man1/node.1*
+
 %changelog
 ## START: Generated by rpmautospec
+* Tue Nov 10 2026 Binu Jose Philip <binujp@gmail.com> - 1:22.22.2-5
+- feat(nodejs22): migrate existing nodejs packages to parallel streams
+
 * Mon Oct 05 2026 Dan Streetman <ddstreet@ieee.org> - 1:22.22.2-4
 - chore: update 'lock' files and render changed components
 
