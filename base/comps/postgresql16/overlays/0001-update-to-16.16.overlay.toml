@@ -1,0 +1,45 @@
+# Fedora does not package PostgreSQL 16.16 on f43/f44 yet (both are on 16.15). Update to
+# the upstream 16.16 release, and the bundled previous-major server used by the
+# -upgrade subpackage from 15.19 to 15.20, for the CVE fixes in the
+# PostgreSQL 16.16 release. Remove this overlay once the imported Fedora spec
+# packages 16.16 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 16.16"
+type = "spec-update-tag"
+tag = "Version"
+value = "%{majorversion}.16"
+
+[[overlays]]
+description = "Update the bundled previous-major release to 15.20"
+type = "spec-search-replace"
+regex = '^%global prevversion %\{prevmajorversion\}\.19$'
+replacement = "%global prevversion %{prevmajorversion}.20"
+
+[[overlays]]
+description = "Remove the obsolete postgresql-16.15.tar.bz2 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(postgresql-16\.15\.tar\.bz2\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete postgresql-15.19.tar.bz2 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(postgresql-15\.19\.tar\.bz2\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete postgresql-16.15.tar.bz2.sha256 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(postgresql-16\.15\.tar\.bz2\.sha256\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete postgresql-15.19.tar.bz2.sha256 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(postgresql-15\.19\.tar\.bz2\.sha256\) = [0-9a-f]+(?:\r?\n|$)'
