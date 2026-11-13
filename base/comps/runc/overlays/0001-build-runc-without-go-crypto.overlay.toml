@@ -1,0 +1,72 @@
+# runc must not link any Go crypto package. The Microsoft build of Go routes
+# Go crypto through OpenSSL (systemcrypto), loading libcrypto.so with dlopen
+# when the Go runtime starts. `runc init` enters the container's mount
+# namespace (libcontainer/nsenter) before the Go runtime starts, so that
+# dlopen looks inside the container rootfs. Images without libcrypto.so
+# (busybox, distroless, scratch, ...) then make every exec panic with
+# "procReady not received".
+#
+# runc performs no cryptography. In runc 1.5.2 the only Go crypto imports come
+# from two vendored helpers that runc never calls:
+#   - go-selinux uniqMcs() uses crypto/rand. Upstream switched it to
+#     math/rand/v2 in v1.14.0; backport that change.
+#   - opencontainers/cgroups uses cilium/ebpf/asm to encode its device filter.
+#     Replace that small, fixed instruction set with a local encoder.
+# With both imports gone, runc links no Go crypto at all. It can keep the default
+# Azure Linux Go toolchain configuration instead of opting out with
+# MS_GO_NOSYSTEMCRYPTO, and a %build check fails the build if crypto creeps
+# back in on a future runc update.
+#
+# Drop these patches once runc vendors go-selinux >= v1.14.0 and cgroups no
+# longer imports cilium/ebpf/asm at runtime.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "needs-upstream-hook"
+commits = [
+    { url = "https://github.com/opencontainers/selinux/commit/9a2bcdd5c41a92fe17cd95a15befcef90ddd4f80" },
+]
+bugs = [
+    { url = "https://github.com/opencontainers/runc/issues/4916" },
+    { url = "https://github.com/opencontainers/selinux/issues/252" },
+]
+
+[[overlays]]
+description = "Backport go-selinux math/rand/v2 MCS label generation to drop crypto/rand from the vendored go-selinux"
+type = "patch-add"
+source = "../0001-vendor-go-selinux-use-math-rand-v2.patch"
+
+[[overlays]]
+description = "Encode the cgroups device filter locally to remove the runtime cilium/ebpf/asm crypto dependency"
+type = "patch-add"
+source = "../0002-vendor-opencontainers-cgroups-encode-device-filter.patch"
+
+[[overlays]]
+description = "Stop %goprep from applying patches before the vendor tarball is unpacked; the patches target vendor/"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%goprep -p1$'
+replacement = "%goprep -A"
+
+[[overlays]]
+description = "Apply the vendor patches once the vendor tarball has been unpacked"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "",
+    "# Apply vendor patches after the vendor tarball (Source1) is unpacked",
+    "%autopatch -p1",
+]
+
+[[overlays]]
+description = "Fail the build if runc links any Go crypto package, which would make runc init dlopen libcrypto.so inside containers"
+type = "spec-append-lines"
+section = "%build"
+lines = [
+    "",
+    "# runc init runs inside the container rootfs, so runc must link no Go crypto",
+    "go tool nm %{gobuilddir}/bin/runc > %{gobuilddir}/runc.nm",
+    "if grep -m 20 -E ' (vendor/)?(crypto[./]|golang\\.org/x/crypto/|github\\.com/golang-fips/|github\\.com/microsoft/go-crypto)' %{gobuilddir}/runc.nm; then",
+    "  echo 'error: runc links Go crypto packages; runc init would dlopen libcrypto.so inside containers' >&2",
+    "  exit 1",
+    "fi",
+]
