@@ -1,0 +1,4 @@
+# Pin to Fedora f44 jackson-databind-2.18.12 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/jackson-databind/c/27a31d7def37e607df8ca8093af6db3f66661e3f
+[components.jackson-databind]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "27a31d7def37e607df8ca8093af6db3f66661e3f" }
