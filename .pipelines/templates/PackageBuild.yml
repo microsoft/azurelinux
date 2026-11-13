@@ -10,6 +10,17 @@ parameters:
     type: string
     default: ""
 
+  # Names of pipeline variables forwarded into package builds that run %check when isCheckBuild is "true".
+  # Package code can read these values, so forward only narrowly scoped credentials: for pip, authenticate
+  # with PipAuthenticateCheckFeed.yml as the last PipAuthenticate before this template, never the job token.
+  # Each value must be set, defined, and at least 8 characters (shorter values cannot be redacted safely).
+  # Values are redacted from build logs on a best-effort basis; logs are published even if redaction fails.
+  - name: checkEnvPassthrough
+    type: object
+    default: []
+    # Sample:
+    #   - PIP_INDEX_URL
+
   - name: concurrentPackageBuilds
     type: number
     default: 12
@@ -216,8 +227,28 @@ steps:
         allow_toolchain_rebuilds_arg="ALLOW_TOOLCHAIN_REBUILDS=n"
       fi
 
+      sudo_env_args=()
+      check_env_args=()
       if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
         run_check_arg="RUN_CHECK=y"
+        check_env_names="${{ join(' ', parameters.checkEnvPassthrough) }}"
+        if [[ -n "$check_env_names" ]]; then
+          for check_env_name in $check_env_names; do
+            check_env_value="$(printenv "$check_env_name" || true)"
+            # An undefined pipeline variable maps to its unexpanded macro text. The comparison string is
+            # built at runtime because Azure Pipelines would expand a literal macro in this script.
+            if [[ -z "$check_env_value" || "$check_env_value" == "\$($check_env_name)" ]]; then
+              echo "##[error]Check environment variable '$check_env_name' is not set, is empty, or is undefined." >&2
+              exit 1
+            fi
+          done
+          unset check_env_value
+          # Reject values too short to redact before any package runs.
+          python3 "${{ parameters.buildRepoRoot }}/toolkit/scripts/redact_env_values.py" "$check_env_names" || exit 1
+          # Preserve only the listed names; values never appear in command arguments.
+          sudo_env_args+=("--preserve-env=${check_env_names// /,}")
+          check_env_args+=("CHECK_ENV_PASSTHROUGH=$check_env_names")
+        fi
       elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
         run_check_arg="RUN_CHECK=n"
       fi
@@ -268,7 +299,7 @@ steps:
         extra_macros_files_arg="EXTRA_MACROS_FILES='${extra_macros_files[*]}'"
       fi
 
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
+      sudo "${sudo_env_args[@]}" make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
         MAX_CPU="${{ parameters.maxCPU }}" \
@@ -289,8 +320,30 @@ steps:
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
-        $use_ccache_arg
+        $use_ccache_arg \
+        "${check_env_args[@]}"
     displayName: "Build packages"
+    env:
+      ${{ if eq(parameters.isCheckBuild, 'true') }}:
+        ${{ each checkEnvName in parameters.checkEnvPassthrough }}:
+          ${{ checkEnvName }}: $(${{ checkEnvName }})
+
+  # Package tests can print forwarded values (for example credentials embedded in a feed URL),
+  # and file logs are not covered by pipeline secret masking.
+  - ${{ if and(eq(parameters.isCheckBuild, 'true'), gt(length(parameters.checkEnvPassthrough), 0)) }}:
+      - bash: |
+          check_env_names="${{ join(' ', parameters.checkEnvPassthrough) }}"
+          # Best effort: debug logs are worth more than hiding a short-lived, feed-scoped credential.
+          if ! sudo --preserve-env="${check_env_names// /,}" \
+            python3 "${{ parameters.buildRepoRoot }}/toolkit/scripts/redact_env_values.py" "$check_env_names" \
+            "${{ parameters.buildRepoRoot }}/build/logs" "${{ parameters.buildRepoRoot }}/build/pkg_artifacts"; then
+            echo "##[warning]Redacting forwarded check variables from build logs failed; published logs may contain them."
+          fi
+        condition: always()
+        displayName: "Redact forwarded check variables from logs"
+        env:
+          ${{ each checkEnvName in parameters.checkEnvPassthrough }}:
+            ${{ checkEnvName }}: $(${{ checkEnvName }})
 
   - ${{ if parameters.outputArtifactsFolder }}:
       - ${{ if parameters.outputRPMsCacheTarballName }}:
