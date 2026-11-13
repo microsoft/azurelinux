@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.2.2
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,8 @@ Patch18:        CVE-2026-34446.patch
 Patch19:        CVE-2025-51480.patch
 Patch20:        CVE-2026-14647.patch
 Patch21:        CVE-2026-63632.patch
+Patch22:        CVE-2026-115919.patch
+Patch23:        CVE-2026-115920.patch
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -104,6 +106,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-18
+- Patch for CVE-2026-115920, CVE-2026-115919
+
 * Sun Aug 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-17
 - Patch for CVE-2026-63632
 
