@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 22 Feb 2024 10:50:18 +0000
+Subject: [PATCH] nexthop: allow nexthop_mpath_fill_node() to be called without
+ RTNL
+
+Link: https://github.com/torvalds/linux/commit/0ac3fa0c3b365f97c3969f391edf7b44d3bb210d
+
+nexthop_mpath_fill_node() will be potentially called
+from contexts holding rcu_lock instead of RTNL.
+
+Suggested-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://lore.kernel.org/all/ZdZDWVdjMaQkXBgW@shredder/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+
+Backport to Azure Linux 6.6.161.1: No functional changes from upstream;
+refresh context only. Required for IPv6 nexthop-group route notifications
+emitted under RCU after removal of RTNL. The existing nexthop-group
+selftest exposes the stale RTNL-only lockdep assertion.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ include/net/nexthop.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/nexthop.h b/include/net/nexthop.h
+index 80e8803..6f4a57f 100644
+--- a/include/net/nexthop.h
++++ b/include/net/nexthop.h
+@@ -318,7 +318,7 @@ static inline
+ int nexthop_mpath_fill_node(struct sk_buff *skb, struct nexthop *nh,
+ 			    u8 rt_family)
+ {
+-	struct nh_group *nhg = rtnl_dereference(nh->nh_grp);
++	struct nh_group *nhg = rcu_dereference_rtnl(nh->nh_grp);
+ 	int i;
+ 
+ 	for (i = 0; i < nhg->num_nh; i++) {

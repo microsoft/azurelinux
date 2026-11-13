@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.161.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,6 +47,22 @@ Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         btrfs-ipe.patch
+Patch2:         0002-inet-fix-lwtunnel-valid-encap-type-lock-imbalance.patch
+Patch3:         0003-ipv6-move-nexthop-find-by-id-after-fib6-info-alloc.patch
+Patch4:         0004-ipv6-protect-fib6-link-table-with-spinlock.patch
+Patch5:         0005-ipv6-defer-fib6-purge-rt-in-fib6-add-rt2node-to-fib6-add.patch
+Patch6:         0006-ipv6-protect-nh-f6i-list-with-spinlock-and-flag.patch
+Patch7:         0007-nexthop-take-nh-lock-for-f6i-list-walks-in-replace-check-and-notify.patch
+Patch8:         0008-nexthop-avoid-unlocked-f6i-list-walk-in-nh-rt-cache-flush.patch
+Patch9:         0009-ipv6-narrow-down-rcu-critical-section-in-inet6-rtm-newroute.patch
+Patch10:        0010-ipv6-add-a-retry-logic-in-net6-rt-notify.patch
+Patch11:        0011-ipv6-protect-multiple-routes-insertion-by-table-lock.patch
+Patch12:        0012-ipv6-get-rid-of-rtnl-for-siocaddrt-and-rtm-newroute.patch
+Patch13:        0013-ipv6-avoid-divide-by-zero-in-rt6-multipath-rebalance.patch
+Patch14:        0014-ipv6-null-check-fib6-node-before-accessing-in-ip6-del-rt-siblings.patch
+Patch15:        0015-ipv6-get-rid-of-rtnl-for-siocdelrt-and-rtm-delroute.patch
+Patch16:        0016-ipv6-change-allocation-flags-to-match-rcu-read-lock-section-requirements.patch
+Patch17:        0017-nexthop-allow-nexthop-mpath-fill-node-to-be-called-without-rtnl.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -440,6 +456,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Nov 11 2026 Alex Cortelyou <alcortel@microsoft.com> - 6.6.161.1-2
+- Backport RTNL-free IPv6 route addition and deletion.
+- Include prerequisite lifetime/locking changes and concurrency fixes.
+
 * Wed Nov 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.161.1-1
 - Auto-upgrade to 6.6.161.1
 

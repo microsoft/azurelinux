@@ -1,0 +1,107 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Thu, 17 Apr 2025 17:03:46 -0700
+Subject: [PATCH] ipv6: Move nexthop_find_by_id() after fib6_info_alloc().
+
+Link: https://github.com/torvalds/linux/commit/c9cabe05e450b4a23072b248db33e6d97c986933
+
+We will get rid of RTNL from RTM_NEWROUTE and SIOCADDRT.
+
+Then, we must perform two lookups for nexthop and dev under RCU
+to guarantee their lifetime.
+
+ip6_route_info_create() calls nexthop_find_by_id() first if
+RTA_NH_ID is specified, and then allocates struct fib6_info.
+
+nexthop_find_by_id() must be called under RCU, but we do not want
+to use GFP_ATOMIC for memory allocation here, which will be likely
+to fail in ip6_route_multipath_add().
+
+Let's move nexthop_find_by_id() after the memory allocation so
+that we can later split ip6_route_info_create() into two parts:
+the sleepable part and the RCU part.
+
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Link: https://patch.msgid.link/20250418000443.43734-6-kuniyu@amazon.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+Backport to Azure Linux 6.6.161.1: Keep validation in
+ip6_route_info_create(), including the existing source-route check. Only
+move nexthop lookup after the sleepable allocations; do not import
+validation or allocation refactors.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv6/route.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 341de9b..a2ec1b6 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -3741,7 +3741,6 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
+ {
+ 	struct net *net = cfg->fc_nlinfo.nl_net;
+ 	struct fib6_info *rt = NULL;
+-	struct nexthop *nh = NULL;
+ 	struct fib6_table *table;
+ 	struct fib6_nh *fib6_nh;
+ 	int err = -EINVAL;
+@@ -3779,17 +3778,6 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
+ 		goto out;
+ 	}
+ #endif
+-	if (cfg->fc_nh_id) {
+-		nh = nexthop_find_by_id(net, cfg->fc_nh_id);
+-		if (!nh) {
+-			NL_SET_ERR_MSG(extack, "Nexthop id does not exist");
+-			goto out;
+-		}
+-		err = fib6_check_nexthop(nh, cfg, extack);
+-		if (err)
+-			goto out;
+-	}
+-
+ 	err = -ENOBUFS;
+ 	if (cfg->fc_nlinfo.nlh &&
+ 	    !(cfg->fc_nlinfo.nlh->nlmsg_flags & NLM_F_CREATE)) {
+@@ -3806,7 +3794,7 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
+ 		goto out;
+ 
+ 	err = -ENOMEM;
+-	rt = fib6_info_alloc(gfp_flags, !nh);
++	rt = fib6_info_alloc(gfp_flags, !cfg->fc_nh_id);
+ 	if (!rt)
+ 		goto out;
+ 
+@@ -3844,7 +3832,20 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
+ 	ipv6_addr_prefix(&rt->fib6_src.addr, &cfg->fc_src, cfg->fc_src_len);
+ 	rt->fib6_src.plen = cfg->fc_src_len;
+ #endif
+-	if (nh) {
++	if (cfg->fc_nh_id) {
++		struct nexthop *nh;
++
++		nh = nexthop_find_by_id(net, cfg->fc_nh_id);
++		if (!nh) {
++			err = -EINVAL;
++			NL_SET_ERR_MSG(extack, "Nexthop id does not exist");
++			goto out_free;
++		}
++
++		err = fib6_check_nexthop(nh, cfg, extack);
++		if (err)
++			goto out_free;
++
+ 		if (rt->fib6_src.plen) {
+ 			NL_SET_ERR_MSG(extack, "Nexthops can not be used with source routing");
+ 			err = -EINVAL;
+@@ -3855,6 +3856,7 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
+ 			err = -ENOENT;
+ 			goto out_free;
+ 		}
++
+ 		rt->nh = nh;
+ 		fib6_nh = nexthop_fib6_nh(rt->nh);
+ 	} else {

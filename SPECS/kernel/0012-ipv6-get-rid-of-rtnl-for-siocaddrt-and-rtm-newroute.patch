@@ -1,0 +1,136 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Thu, 17 Apr 2025 17:03:56 -0700
+Subject: [PATCH] ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
+
+Link: https://github.com/torvalds/linux/commit/169fd62799e8acabbfb4760799be11138ced949c
+
+Now we are ready to remove RTNL from SIOCADDRT and RTM_NEWROUTE.
+
+The remaining things to do are
+
+  1. pass false to lwtunnel_valid_encap_type_attr()
+  2. use rcu_dereference_rtnl() in fib6_check_nexthop()
+  3. place rcu_read_lock() before ip6_route_info_create_nh().
+
+Let's complete the RTNL-free conversion.
+
+When each CPU-X adds 100000 routes on table-X in a batch
+concurrently on c7a.metal-48xl EC2 instance with 192 CPUs,
+
+without this series:
+
+  $ sudo ./route_test.sh
+  ...
+  added 19200000 routes (100000 routes * 192 tables).
+  time elapsed: 191577 milliseconds.
+
+with this series:
+
+  $ sudo ./route_test.sh
+  ...
+  added 19200000 routes (100000 routes * 192 tables).
+  time elapsed: 62854 milliseconds.
+
+I changed the number of routes in each table (1000 ~ 100000)
+and consistently saw it finish 3x faster with this series.
+
+Note that now every caller of lwtunnel_valid_encap_type() passes
+false as the last argument, and this can be removed later.
+
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Link: https://patch.msgid.link/20250418000443.43734-16-kuniyu@amazon.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+Backport to Azure Linux 6.6.161.1: Use the 6.6 rtnl_register_module() API.
+Keep IPv6 deletion handlers and SIOCDELRT under RTNL; only
+NEWROUTE/SIOCADDRT are unlocked. Pass the corresponding lock state to
+tunnel validation. The RCU lifetime fix 8e5f1bb81274 is applied first, so
+omit the broad RCU sections it removes and avoid importing transient
+allocation changes.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv4/nexthop.c |  4 ++--
+ net/ipv6/route.c   | 11 ++++++-----
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index 9a503bf..6779cff 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -1315,12 +1315,12 @@ int fib6_check_nexthop(struct nexthop *nh, struct fib6_config *cfg,
+ 	if (nh->is_group) {
+ 		struct nh_group *nhg;
+ 
+-		nhg = rtnl_dereference(nh->nh_grp);
++		nhg = rcu_dereference_rtnl(nh->nh_grp);
+ 		if (nhg->has_v4)
+ 			goto no_v4_nh;
+ 		is_fdb_nh = nhg->fdb_nh;
+ 	} else {
+-		nhi = rtnl_dereference(nh->nh_info);
++		nhi = rcu_dereference_rtnl(nh->nh_info);
+ 		if (nhi->family == AF_INET)
+ 			goto no_v4_nh;
+ 		is_fdb_nh = nhi->fdb_nh;
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index ae0ef2f..9e3af8f 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4535,7 +4535,6 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
+ 
+ 	rtmsg_to_fib6_config(net, rtmsg, &cfg);
+ 
+-	rtnl_lock();
+ 	switch (cmd) {
+ 	case SIOCADDRT:
+ 		/* Only do the default setting of fc_metric in route adding */
+@@ -4544,10 +4543,11 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
+ 		err = ip6_route_add(&cfg, GFP_KERNEL, NULL);
+ 		break;
+ 	case SIOCDELRT:
++		rtnl_lock();
+ 		err = ip6_route_del(&cfg, NULL);
++		rtnl_unlock();
+ 		break;
+ 	}
+-	rtnl_unlock();
+ 	return err;
+ }
+ 
+@@ -5077,6 +5077,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			      struct fib6_config *cfg,
+ 			      struct netlink_ext_ack *extack)
+ {
++	bool newroute = nlh->nlmsg_type == RTM_NEWROUTE;
+ 	struct rtmsg *rtm;
+ 	struct nlattr *tb[RTA_MAX+1];
+ 	unsigned int pref;
+@@ -5183,7 +5184,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 
+ 		err = lwtunnel_valid_encap_type_attr(cfg->fc_mp,
+ 						     cfg->fc_mp_len,
+-						     extack, true);
++						     extack, !newroute);
+ 		if (err < 0)
+ 			goto errout;
+ 	}
+@@ -5203,7 +5204,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		cfg->fc_encap_type = nla_get_u16(tb[RTA_ENCAP_TYPE]);
+ 
+ 		err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
+-						extack, true);
++						extack, !newroute);
+ 		if (err < 0)
+ 			goto errout;
+ 	}
+@@ -6838,7 +6839,7 @@ int __init ip6_route_init(void)
+ 		goto fib6_rules_init;
+ 
+ 	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_NEWROUTE,
+-				   inet6_rtm_newroute, NULL, 0);
++				   inet6_rtm_newroute, NULL, RTNL_FLAG_DOIT_UNLOCKED);
+ 	if (ret < 0)
+ 		goto out_register_late_subsys;
+ 

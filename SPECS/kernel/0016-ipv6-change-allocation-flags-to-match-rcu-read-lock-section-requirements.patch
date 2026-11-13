@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
+Date: Sun, 19 Jul 2026 13:57:59 +0300
+Subject: [PATCH] ipv6: Change allocation flags to match rcu_read_lock section
+ requirements
+
+Link: https://github.com/torvalds/linux/commit/313a123e1fca8827bb463db1f4bb211309764563
+
+Since the call to __ip6_del_rt_siblings has been converted under
+rcu read lock and it only has one call point
+we should no longer block or yield.
+
+Our stack trace from the syzbot reproducer looks as follows:
+
+__ip6_del_rt_siblings
+  rtnl_notify (Here we pass gfp_any() -> GFP_KERNEL)
+    nlmsg_notify
+      nlmsg_multicast
+        nlmsg_multicast_filtered
+          netlink_broadcast_filtered (GFP_KERNEL passed from earlier)
+
+netlink_broadcast_filtered can yield if GFP_KERNEL
+is passed, which we do not want to happen.
+
+Fix this by changing the allocation flag of rtnl_notify.
+
+Also change the flag passed to nlmsg_new. Even though it
+is not related to the syzbot generated bug it still falls
+under the same requirements.
+
+Reported-by: syzbot+84d4a405ed798b40c96d@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=84d4a405ed798b40c96d
+Fixes: bd11ff421d36 ("ipv6: Get rid of RTNL for SIOCDELRT and RTM_DELROUTE.")
+Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20260719105759.558050-1-zlatistiv@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Backport to Azure Linux 6.6.161.1: No functional changes from upstream;
+refresh context around the existing null-node deletion fix. Use the
+upstream GFP_ATOMIC flags for both sibling-deletion notification allocation
+and delivery inside the RCU section.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv6/route.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index fc59476..ccbbde0 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -3978,7 +3978,7 @@ static int __ip6_del_rt_siblings(struct fib6_info *rt, struct fib6_config *cfg)
+ 		struct fib6_info *sibling, *next_sibling;
+ 
+ 		/* prefer to send a single notification with all hops */
+-		skb = nlmsg_new(rt6_nlmsg_size(rt), gfp_any());
++		skb = nlmsg_new(rt6_nlmsg_size(rt), GFP_ATOMIC);
+ 		if (skb) {
+ 			u32 seq = info->nlh ? info->nlh->nlmsg_seq : 0;
+ 
+@@ -4032,7 +4032,7 @@ out_put:
+ 
+ 	if (skb) {
+ 		rtnl_notify(skb, net, info->portid, RTNLGRP_IPV6_ROUTE,
+-			    info->nlh, gfp_any());
++			    info->nlh, GFP_ATOMIC);
+ 	}
+ 	return err;
+ }
