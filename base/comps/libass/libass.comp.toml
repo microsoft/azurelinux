@@ -1,0 +1,8 @@
+[components.libass]
+
+# Sources for the 0.17.5 update overlay; drop together with it once Fedora ships 0.17.5 or newer.
+[[components.libass.source-files]]
+filename = "libass-0.17.5.tar.xz"
+hash = "b9e06023e9f5760ba1946f8dbcd8c411908bc6c77030099098f8252edabd31c98a6523cffb7cccf7b62e12bb374d136600a98e29a7916ccc218100ff694bfb7c"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/libass/libass/releases/download/0.17.5/libass-0.17.5.tar.xz" }
