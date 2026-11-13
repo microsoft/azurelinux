@@ -1,0 +1,69 @@
+From 3c4ea756b090f04f83001f46e78095d299471a8c Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Wed, 21 Aug 2024 11:24:14 +0900
+Subject: [PATCH] sd-dhcp-client: do not call callback with
+ SD_DHCP_CLIENT_EVENT_STOP if already stopped
+
+When an interface enters the failed state, even if the DHCP client is
+stopped, the acquired DHCP lease is not unreferenced, as the callback
+dhcp4_handler() do nothing in that case. When the failed interface is
+being reconfigured after that, the DHCP client is stopped again
+(though it is already stopped), and SD_DHCP_CLIENT_EVENT_STOP event is
+triggered and sd_dhcp_client_send_release() is called, and the
+assertion in the function is triggered.
+
+E.g.
+===
+systemd-networkd[98588]: wlp59s0: DHCPv4 address 192.168.86.250/24, gateway 192.168.86.1 acquired from 192.168.86.1
+systemd-networkd[98588]: wlp59s0: Could not set DHCPv4 route: Nexthop has invalid gateway. Network is unreachable
+systemd-networkd[98588]: wlp59s0: Failed
+systemd-networkd[98588]: wlp59s0: State changed: configuring -> failed
+systemd-networkd[98588]: wlp59s0: The interface entered the failed state frequently, refusing to reconfigure it automatically.
+systemd-networkd[98588]: wlp59s0: DHCPv4 client: STOPPED
+systemd-networkd[98588]: wlp59s0: DHCPv4 client: State changed: bound -> stopped
+systemd-networkd[98588]: Got message type=method_call sender=:1.449 destination=org.freedesktop.network1 path=/org/freedesktop/network1 interface=org.freedesktop.network1.Manager member=ReconfigureLink ...
+systemd-networkd[98588]: wlp59s0: State changed: failed -> initialized
+systemd-networkd[98588]: wlp59s0: found matching network '/etc/systemd/network/50-wifi.network'.
+systemd-networkd[98588]: wlp59s0: Configuring with /etc/systemd/network/50-wifi.network.
+systemd-networkd[98588]: wlp59s0: DHCPv4 client: STOPPED
+systemd-networkd[98588]: Assertion 'sd_dhcp_client_is_running(client)' failed at src/libsystemd-network/sd-dhcp-client.c:2197, function sd_dhcp_client_send_release(). Aborting.
+===
+
+(cherry picked from commit e5b19cbed2032db214eec9a6191866f6f96355ef)
+---
+ src/libsystemd-network/sd-dhcp-client.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/src/libsystemd-network/sd-dhcp-client.c b/src/libsystemd-network/sd-dhcp-client.c
+index 67911a2b93ae..1b0295dd7d34 100644
+--- a/src/libsystemd-network/sd-dhcp-client.c
++++ b/src/libsystemd-network/sd-dhcp-client.c
+@@ -810,15 +810,21 @@ static int client_initialize(sd_dhcp_client *client) {
+ 
+ static void client_stop(sd_dhcp_client *client, int error) {
+         assert(client);
++        DHCP_CLIENT_DONT_DESTROY(client);
+ 
+-        if (error < 0)
+-                log_dhcp_client_errno(client, error, "STOPPED: %m");
+-        else if (error == SD_DHCP_CLIENT_EVENT_STOP)
+-                log_dhcp_client(client, "STOPPED");
+-        else
+-                log_dhcp_client(client, "STOPPED: Unknown event");
++        if (sd_dhcp_client_is_running(client)) {
++                if (error < 0)
++                        log_dhcp_client_errno(client, error, "STOPPED: %m");
++                else if (error == SD_DHCP_CLIENT_EVENT_STOP)
++                        log_dhcp_client(client, "STOPPED");
++                else
++                        log_dhcp_client(client, "STOPPED: Unknown event");
+ 
+-        client_notify(client, error);
++                client_notify(client, error);
++        } else if (error < 0) {
++                log_dhcp_client_errno(client, error, "FAILED: %m");
++                client_notify(client, error);
++        }
+ 
+         client_initialize(client);
+ }

@@ -13,7 +13,7 @@
 Summary:        Security client
 Name:           nss
 Version:        3.96.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -216,6 +216,10 @@ popd
 %{_bindir}/ssltap
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.96.1-5
+- Explicitly distrust additional emSign G1, C1 and ECC C3 builtin roots.
+- Mark the downstream builtin trust-store revision as 2.67.
+
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.96.1-4
 - Explicitly distrust affected eMudhra and AAA roots in the builtin trust module.
 - Mark the downstream builtin trust-store revision as 2.65.

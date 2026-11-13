@@ -1,7 +1,7 @@
 Summary:        The command line for DC/OS
 Name:           dcos-cli
 Version:        1.2.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ Patch3:         CVE-2024-51744.patch
 Patch4:         CVE-2025-65637.patch
 Patch5:         CVE-2025-30204.patch
 Patch6:         CVE-2026-56852.patch
+Patch7:         CVE-2026-116586.patch
 
 BuildRequires:  golang < 1.25
 BuildRequires:  git
@@ -52,6 +53,9 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
+* Wed Nov 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-23
+- Patch for CVE-2026-116586
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-22
 - Patch for CVE-2026-56852
 

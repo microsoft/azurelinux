@@ -1,0 +1,40 @@
+From c685fc0aab6dad2ed868c79e96e4ecc3c4e6da96 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Wed, 21 Aug 2024 10:31:34 +0900
+Subject: [PATCH] sd-dhcp-client: actually restart daemon after sending DECLINE
+ message
+
+client_stop() sets DHCP_STATE_STOPPED to client->state, thus the server
+never restarted.
+
+(cherry picked from commit 22c864d88556186a82b525b009c6dc5599a87e9b)
+---
+ src/libsystemd-network/sd-dhcp-client.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/src/libsystemd-network/sd-dhcp-client.c b/src/libsystemd-network/sd-dhcp-client.c
+index 5fe506bcbfeb..a6a9983504df 100644
+--- a/src/libsystemd-network/sd-dhcp-client.c
++++ b/src/libsystemd-network/sd-dhcp-client.c
+@@ -2370,15 +2370,13 @@ int sd_dhcp_client_send_decline(sd_dhcp_client *client) {
+ 
+         log_dhcp_client(client, "DECLINE");
+ 
+-        client_stop(client, SD_DHCP_CLIENT_EVENT_STOP);
+-
+-        if (client->state != DHCP_STATE_STOPPED) {
+-                r = sd_dhcp_client_start(client);
+-                if (r < 0)
+-                        return r;
+-        }
++        /* This function is mostly called when the acquired address conflicts with another host.
++         * Restarting the daemon to acquire another address. */
++        r = client_restart(client);
++        if (r < 0)
++                return r;
+ 
+-        return 0;
++        return 1; /* sent and restarted. */
+ }
+ 
+ int sd_dhcp_client_stop(sd_dhcp_client *client) {

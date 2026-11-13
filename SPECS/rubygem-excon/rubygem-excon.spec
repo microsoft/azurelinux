@@ -3,7 +3,7 @@
 Summary:        Extended http(s) Connections
 Name:           rubygem-%{gem_name}
 Version:        0.102.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 0.102.0-5
+- Remove additional emSign G1, C1 and ECC C3 roots from the bundled trust store.
+
 * Sun Oct 25 2026 Sean Dougherty <sdougherty@microsoft.com> - 0.102.0-4
 - Add the trusted SSL.com TLS ECC Root CA 2022 to retain unaffected TLS paths.
 

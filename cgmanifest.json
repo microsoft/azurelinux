@@ -1827,8 +1827,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "52.0.152",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v52.0.152.tar.gz"
+          "version": "52.0.187",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v52.0.187.tar.gz"
         }
       }
     },
@@ -4760,8 +4760,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.10",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.10-1/go1.26.10-20261020.3.src.tar.gz"
+          "version": "1.26.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.11-1/go1.26.11-20261110.4.src.tar.gz"
         }
       }
     },
@@ -4770,8 +4770,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.27.3",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.3-1/go1.27.3-20261020.4.src.tar.gz"
+          "version": "1.27.4",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.4-1/go1.27.4-20261110.2.src.tar.gz"
         }
       }
     },
@@ -5520,8 +5520,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.69",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.69.tar.bz2"
+          "version": "2.4.71",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.71.tar.bz2"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "4.1.0.kata1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/4.1.0.kata1.tar.gz"
+          "version": "4.1.0.kata2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/4.1.0.kata2.tar.gz"
         }
       }
     },
@@ -8471,8 +8471,18 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.18.52.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.18.52.mshv1.tar.gz"
+          "version": "6.18.58.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.18.58.mshv1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kernel-uvm-hpc",
+          "version": "6.18.58.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.18.58.mshv1.tar.gz"
         }
       }
     },
@@ -10491,8 +10501,8 @@
         "type": "other",
         "other": {
           "name": "libmodulemd",
-          "version": "2.15.0",
-          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.15.0/modulemd-2.15.0.tar.xz"
+          "version": "2.15.4",
+          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.15.4/modulemd-2.15.4.tar.xz"
         }
       }
     },
@@ -11331,8 +11341,8 @@
         "type": "other",
         "other": {
           "name": "libslirp",
-          "version": "4.9.6",
-          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.9.6/libslirp-v4.9.6.tar.gz"
+          "version": "4.9.7",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.9.7/libslirp-v4.9.7.tar.gz"
         }
       }
     },
@@ -14612,8 +14622,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "24.22.1",
-          "downloadUrl": "https://nodejs.org/download/release/v24.22.1/node-v24.22.1.tar.xz"
+          "version": "24.22.3",
+          "downloadUrl": "https://nodejs.org/download/release/v24.22.3/node-v24.22.3.tar.xz"
         }
       }
     },

@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        4.1.0.kata1
-Release:        2%{?dist}
+Version:        4.1.0.kata2
+Release:        1%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -23,6 +23,8 @@ Patch9:         CVE-2026-78669.patch
 Patch10:        CVE-2026-97032.patch
 Patch11:        CVE-2026-81870.patch
 Patch12:        CVE-2026-107325.patch
+Patch13:        CVE-2026-116591.patch
+Patch14:        CVE-2026-95838.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang >= 1.25
 BuildRequires:  protobuf-compiler
@@ -135,6 +137,12 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Thu Nov 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata2-1
+- Auto-upgrade to 4.1.0.kata2
+
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.1.0.kata1-3
+- Patch for CVE-2026-95838, CVE-2026-116591
+
 * Sat Oct 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.1.0.kata1-2
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-61801, CVE-2026-107324
 

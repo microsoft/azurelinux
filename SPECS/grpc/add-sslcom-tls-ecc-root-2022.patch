@@ -11,7 +11,7 @@ Upstream-status: Azure Linux trust-store backport
 
 --- a/etc/roots.pem
 +++ b/etc/roots.pem
-@@ -4297,3 +4297,20 @@
+@@ -4207,3 +4207,20 @@
  SaSS6sUUiHCm0w2wqsosQJz76YJumgIwK0eaB8bRwoF8yguWGEEbo/QwCZ61IygN
  nxS2PFOiTAZpffpskcYqSUXm7LcT4Tps
  -----END CERTIFICATE-----
