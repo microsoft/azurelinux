@@ -1,0 +1,96 @@
+# Fedora f43/f44 still package objectweb-asm 9.7.1. Update to the upstream 9.11.1
+# security release for these CVE fixes:
+# CVE-2026-110257
+# CVE-2026-110258
+# CVE-2026-110259
+# CVE-2026-110260
+# CVE-2026-110261
+# CVE-2026-110262
+# CVE-2026-110263
+# CVE-2026-110270
+# CVE-2026-110591
+# Remove this overlay once the imported Fedora spec packages 9.11.1 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 9.11.1"
+type = "spec-update-tag"
+tag = "Version"
+value = "9.11.1"
+
+[[overlays]]
+description = "Drop the Java 25 support patch, included upstream since 9.8"
+type = "spec-remove-tag"
+tag = "Patch"
+value = "0001-Add-support-of-Java-25.patch"
+
+[[overlays]]
+description = "Drop the Java 25 support patch file"
+type = "file-remove"
+file = "0001-Add-support-of-Java-25.patch"
+
+[[overlays]]
+description = "Strip bundled binaries like Fedora's generate-tarball.sh, and build the retrofitter tool for Java 11 as Fedora rawhide does since 9.10"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "",
+    "# Remove bundled jars, prebuilt class files and the gradle wrapper",
+    "find -name '*.jar' -delete",
+    "find asm asm-analysis asm-commons -name '*.class' -delete",
+    "rm -r gradle",
+    "",
+    "%pom_add_plugin org.apache.maven.plugins:maven-compiler-plugin tools/retrofitter '<configuration><release>11</release></configuration>'",
+]
+
+[[overlays]]
+description = "Keep the retrofitter's system ASM dependency out of the module builds, so modules compile against the in-tree 9.11.1 classes (asm-analysis needs the new LimitExceededException)"
+type = "file-search-replace"
+file = "tools-retrofitter.pom"
+regex = '(?m)^      <version>any</version>\r?\n    </dependency>'
+replacement = "      <version>any</version>\n      <optional>true</optional>\n    </dependency>"
+
+[[overlays]]
+description = "Remove the obsolete objectweb-asm-9.7.1.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(objectweb-asm-9\.7\.1\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete asm-9.7.1.pom source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(asm-9\.7\.1\.pom\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete asm-analysis-9.7.1.pom source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(asm-analysis-9\.7\.1\.pom\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete asm-commons-9.7.1.pom source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(asm-commons-9\.7\.1\.pom\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete asm-test-9.7.1.pom source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(asm-test-9\.7\.1\.pom\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete asm-tree-9.7.1.pom source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(asm-tree-9\.7\.1\.pom\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete asm-util-9.7.1.pom source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(asm-util-9\.7\.1\.pom\) = [0-9a-f]+(?:\r?\n|$)'
