@@ -1,0 +1,4 @@
+# Pin to Fedora f43 libpng-1.6.59 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libpng/c/421e78dba50b74091805726bd40217c66f0368de
+[components.libpng]
+spec = { type = "upstream", upstream-commit = "421e78dba50b74091805726bd40217c66f0368de" }
