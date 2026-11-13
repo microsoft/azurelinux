@@ -1,0 +1,17 @@
+[components.rubygem-actionmailer]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-actionmailer.source-files]]
+filename = "actionmailer-8.0.5.2.gem"
+hash = "df6f6b4afa383f41c392df30aa2e5d3bcda9458bdb9bb70bf8d52a02103ba398f32e84db240cd24d315bb2168a332edafacf1a7d9bcff0dca57bd5d330e29000"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/actionmailer-8.0.5.2.gem" }
+
+# Generated: the actionmailer/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-actionmailer.source-files]]
+filename = "actionmailer-8.0.5.2-tests.tar.gz"
+hash = "d1a4de43c3694ccf0fe87ce5cd61164463210a07492637c748c7cbd9ca6091e321d265970b03ececb04390c139a34ac6fdb0f4028e7ae58a2391f25842b1f5e4"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]

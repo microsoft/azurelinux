@@ -1,0 +1,26 @@
+[components.rubygem-actioncable]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-actioncable.source-files]]
+filename = "actioncable-8.0.5.2.gem"
+hash = "6be955c4036d57f757409c960f94ecf6e13deb07a2a6e006cd5cc1343f0eaeb54f1f53a09af42ac1cc2783aff6eac88834381c83099b91a4941449a70623f145"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/actioncable-8.0.5.2.gem" }
+
+# Generated: the actioncable/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-actioncable.source-files]]
+filename = "actioncable-8.0.5.2-tests.tar.gz"
+hash = "3bbad12a0f629ebd16a1a32a058ad08b99623b4c67f6756f6c8ea1367b3cf58d5037bee867290a421e4ead75d6210d900ed7e0c34d93421e4a7c922768fe7a1e"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]
+
+# Generated: the actioncable JavaScript sources of the upstream v8.0.5.2 tag (see the Source2 comment in the spec).
+[[components.rubygem-actioncable.source-files]]
+filename = "actioncable-8.0.5.2-js.tar.gz"
+hash = "70e7a9f78142407b73fc2066183bf8e6c76cebc63a24e69fb14c7e04ac271d96ceb9f5442aa05c6db6ec298d81ca95d288a7eec723739b6f483d599c2c81716c"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-js-tarball.sh"
+origin.mock-packages = ["git"]

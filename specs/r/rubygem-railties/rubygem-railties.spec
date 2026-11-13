@@ -5,11 +5,11 @@
 %global gem_name railties
 
 # Circular dependency with rubygem-{rails,jquery-rails,uglifier}.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 Name: rubygem-%{gem_name}
-Version: 8.0.2
-Release: 6%{?dist}
+Version: 8.0.5.2
+Release: 7%{?dist}
 Summary: Tools for creating, working with, and running Rails applications
 License: MIT
 URL: https://rubyonrails.org
@@ -19,8 +19,6 @@ Source0: https://rubygems.org/gems/%{gem_name}-%{version}%{?prerelease}.gem
 Source1: %{gem_name}-%{version}%{?prerelease}-tests.tar.gz
 # Fix flaky "ActiveStorage::ImageTagTest#test_blob" test in Active Storage
 # https://github.com/rails/rails/pull/54904
-Patch0: rubygem-railties-8.0.2-Fix-polymorphic-url-and-polymorphic-path.patch
-Patch1: rubygem-railties-8.0.2-Fix-polymorphic-url-and-polymorphic-path-tests.patch
 
 # dbconsole requires the executable.
 Suggests: %{_bindir}/sqlite3
@@ -70,6 +68,7 @@ BuildRequires: %{_bindir}/sqlite3
 %endif
 BuildArch: noarch
 
+BuildRequires: rubygem(mini_magick) >= 5.1
 %description
 Rails internals: application bootup, plugins, generators, and rake tasks.
 Railties is responsible to glue all frameworks together. Overall, it:
@@ -88,10 +87,10 @@ Documentation for %{name}.
 %prep
 %setup -q -n %{gem_name}-%{version}%{?prerelease} -b1
 
-%patch 0 -p2
+
 
 ( cd %{builddir}
-%patch 1 -p2
+
 )
 
 %build
@@ -197,6 +196,11 @@ sed -i -r '/require\s.solid_(cable|queue)./i\    skip' test/commands/devcontaine
 
 # Do not connect to the internet.
 sed -i -r 's/\[bundle install\]/[bundle install --local]/' test/plugin_helpers.rb
+sed -i -e '/^      "Propshaft::Server",$/d' \
+  -e 's/^\(    assert_equal "Rack::Runtime", middleware\)\[5\]$/\1[4]/' \
+  -e 's/^\(    assert_equal "ActiveSupport::Cache::Strategy::LocalCache", middleware\)\[5\]$/\1[4]/' \
+  -e 's/^\(    assert_equal "Rack::Runtime", middleware\)\[6\]$/\1[5]/' \
+  test/commands/middleware_test.rb
 
 # Skip `rubocop-rails-omakase` dependency.
 sed -i -r 's/"--mountable"/"--mountable", "--skip-rubocop"/' test/engine/commands_test.rb

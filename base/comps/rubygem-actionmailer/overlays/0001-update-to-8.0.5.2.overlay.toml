@@ -1,0 +1,26 @@
+# Fedora does not package actionmailer 8.0.5.2 on f43/f44 yet. Update to the upstream
+# release. The Rails gems require each other at the exact same version, so the
+# whole stack moves to 8.0.5.2 together.
+# Remove this overlay once the imported Fedora spec packages 8.0.5.2 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 8.0.5.2"
+type = "spec-update-tag"
+tag = "Version"
+value = "8.0.5.2"
+
+[[overlays]]
+description = "Remove the obsolete actionmailer-8.0.2-tests.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(actionmailer-8\.0\.2-tests\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete actionmailer-8.0.2.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(actionmailer-8\.0\.2\.gem\) = [0-9a-f]+(?:\r?\n|$)'

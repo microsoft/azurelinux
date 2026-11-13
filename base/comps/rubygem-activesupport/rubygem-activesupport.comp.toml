@@ -1,0 +1,17 @@
+[components.rubygem-activesupport]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-activesupport.source-files]]
+filename = "activesupport-8.0.5.2.gem"
+hash = "19c35700a0a38c226758df8316ee365a7d47e41ffbe215550deff966486f7720427153e09a0beeb08a668f24e9edf5100f7776ade3010b06db37cc427bdbd895"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/activesupport-8.0.5.2.gem" }
+
+# Generated: the activesupport/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-activesupport.source-files]]
+filename = "activesupport-8.0.5.2-tests.tar.gz"
+hash = "8710f4ead69606fb25090838a2cc1598b3b52a8f4775d97ec42194495fc5bb84ab743d5f7c36297eafeeef91fdca85e2250b96d4e030eed92b42a97ace4ebba0"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]

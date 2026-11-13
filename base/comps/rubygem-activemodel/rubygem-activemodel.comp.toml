@@ -1,0 +1,17 @@
+[components.rubygem-activemodel]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-activemodel.source-files]]
+filename = "activemodel-8.0.5.2.gem"
+hash = "4880cbb14a41579e3fca87b825c9693b74dae52ac35eaccebad0e3643a062d0197a98fd9190f18e988a9aab70358dc78092456b498c417b40886d01185cd29e0"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/activemodel-8.0.5.2.gem" }
+
+# Generated: the activemodel/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-activemodel.source-files]]
+filename = "activemodel-8.0.5.2-tests.tar.gz"
+hash = "126a575724061d8cffcd50926517e925b1e647fe140ad27156557e649b316a5d3557accb200667380a9b792e41a3d273643b207ebd2a4f8e6f12d26709f129c6"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]

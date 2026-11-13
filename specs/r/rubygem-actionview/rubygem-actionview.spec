@@ -4,11 +4,11 @@
 %global gem_name actionview
 
 # Circular dependency with rubygem-railties.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 Name: rubygem-%{gem_name}
-Version: 8.0.2
-Release: 5%{?dist}
+Version: 8.0.5.2
+Release: 6%{?dist}
 Summary: Rendering framework putting the V in MVC (part of Rails)
 License: MIT
 URL: https://rubyonrails.org

@@ -1,0 +1,15 @@
+# The Rails gems build-require each other at the exact same version for their
+# test suites, and actionpack, actionview and railties form a cycle (railties
+# also requires actionpack at runtime). Build those three in bootstrap mode
+# (Fedora's switch, which only skips %check) so the 8.0.5.2 stack can be built
+# in order. Remove this overlay once the 8.0.5.2 stack is published for 4.0.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build in bootstrap mode (skips %check) until the 8.0.5.2 stack is published"
+type = "spec-search-replace"
+regex = '^%bcond_with bootstrap$'
+replacement = "%bcond_without bootstrap"
