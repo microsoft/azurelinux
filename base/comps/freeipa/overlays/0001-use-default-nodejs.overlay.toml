@@ -1,0 +1,21 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build the web UI with the supported Node.js 24 runtime instead of the retired ABI"
+type = "spec-search-replace"
+regex = '^BuildRequires: nodejs\(abi\) == 127, /usr/bin/node, /usr/bin/npm$'
+replacement = 'BuildRequires: nodejs24, /usr/bin/node, /usr/bin/npm'
+
+[[overlays]]
+description = "Describe the default nodejs runtime rather than the retired stream"
+type = "spec-search-replace"
+regex = '^# Do not use nodejs22 on fedora < 41,.*$'
+replacement = '# Use the default nodejs runtime for Azure Linux.'
+
+[[overlays]]
+description = "Advance the manually managed release for the web UI build dependency change"
+type = "spec-update-tag"
+tag = "Release"
+value = '4%{?rc_version:.%rc_version}%{?dist}'

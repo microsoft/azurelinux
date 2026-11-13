@@ -2,5 +2,5 @@
 # https://src.fedoraproject.org/rpms/freeipa/c/8b26507d56f1dc2ecada24a8b698386b9df7764a
 [components.freeipa]
 spec = { type = "upstream", upstream-commit = "8b26507d56f1dc2ecada24a8b698386b9df7764a" }
-# Release: 5%{?rc_version:.%rc_version}%{?dist}
+# Release is advanced by the Node.js build dependency overlay.
 release = { calculation = "manual" }
