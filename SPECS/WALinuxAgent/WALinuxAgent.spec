@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
-Version:        2.11.1.4
-Release:        5%{?dist}
+Version:        2.16.0.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,21 +12,6 @@ Source1:        ephemeral-disk-warning.service
 Source2:        ephemeral-disk-warning.conf
 Source3:        ephemeral-disk-warning
 Source4:        module-setup.sh
-# This patch adds azurelinux support into WALinuxAgent. The patch should be
-# removed in the next 2.12 update of WALinuxAgent.
-Patch0:         0001-add-azurelinux-support.patch
-# This patch modifies the version of the WALinuxAgent so it does not take any
-# 2.11 updates pushed live to the system through the normal agent upgrade
-# mechanism, which would end up removing azurelinux support. This patch
-# should also be removed in the next 2.12 update to this package.
-Patch1:         0002-fix-bump-version-to-2.11.8.8.patch
-# This patch fixes a failure to assign IP address for infiband interfaces.
-# It should be removed in an upcoming release.
-Patch2:         fix-argument-to-goalstate.patch
-# This patch adds azurelinux support into the setup.py. This patch should be
-# removed in the next 2.12 release/
-Patch3:         update-setup.patch
-Patch4:         acl-support.patch
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -113,6 +98,10 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Tue Oct 27 2026 Henry Li <lihl@microsoft.com> - 2.16.0.2-1
+- Upgrade to 2.16.0.2, including the IPoIB setup fix for ICG M2 VMs.
+- Remove patches superseded by upstream Azure Linux, ACL, and RDMA support.
+
 * Thu Jun 04 2026 Mayank Singh <mayansingh@microsoft.com> - 2.11.1.4-5
 - Fix waagent-network-setup.service failure and update to teardown the specific interface.
 
