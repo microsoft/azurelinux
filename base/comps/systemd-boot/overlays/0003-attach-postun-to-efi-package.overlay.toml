@@ -3,7 +3,20 @@ category = "azl-compatibility"
 upstream-status = "inapplicable"
 
 [[overlays]]
-description = "Attach the bootctl update scriptlet to the systemd-boot EFI package"
-type = "spec-search-replace"
-regex = '^%postun$'
-replacement = "%postun -n systemd-boot-%{efi_arch}"
+description = "Remove the main-package scriptlet so it can be reattached without editing a section header"
+type = "spec-remove-section"
+section = "%postun"
+
+[[overlays]]
+description = "Reinsert the bootctl update scriptlet on the systemd-boot EFI package"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "%postun -n systemd-boot-%{efi_arch}",
+    "# This part will need to be updated in bootctl first, and then here.",
+    "if [ $1 -ge 1 ] && bootctl is-installed &>/dev/null; then",
+    '  echo "Updating systemd-boot…"',
+    "  bootctl update || :",
+    "fi",
+    "",
+]
