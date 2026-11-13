@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Attach the bootctl update scriptlet to the systemd-boot EFI package"
+type = "spec-search-replace"
+regex = '^%postun$'
+replacement = "%postun -n systemd-boot-%{efi_arch}"
