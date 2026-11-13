@@ -7,8 +7,8 @@
 %bcond_with tests
 
 Name: rubygem-%{gem_name}
-Version: 3.2.0
-Release: 13%{?dist}
+Version: 3.2.3
+Release: 14%{?dist}
 Summary: High performance memcached client for Ruby
 License: MIT
 URL: https://github.com/petergoldstein/dalli
@@ -74,7 +74,7 @@ popd
 %files doc
 %doc %{gem_docdir}
 %doc %{gem_instdir}/README.md
-%doc %{gem_instdir}/History.md
+%doc %{gem_instdir}/CHANGELOG.md
 %{gem_instdir}/Gemfile
 
 %changelog

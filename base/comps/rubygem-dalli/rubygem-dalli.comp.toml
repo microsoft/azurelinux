@@ -1,0 +1,17 @@
+[components.rubygem-dalli]
+
+# Sources for the 3.2.3 update overlay; drop together with it once Fedora ships 3.2.3 or newer.
+[[components.rubygem-dalli.source-files]]
+filename = "dalli-3.2.3.gem"
+hash = "cc5633f9a71b532b982f3cee6f2ea4fef8edff35cc57f2737dcd566786829132ca2f450528d1a1ed5e4c00cf7efd0569f3cf5c1bae4f35b5d276b2198399204f"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/dalli-3.2.3.gem" }
+
+# Generated: upstream ships the test suite only in git (see the Source1 comment in the spec).
+[[components.rubygem-dalli.source-files]]
+filename = "dalli-3.2.3-tests.txz"
+hash = "9f7dc4d904de49d0d9c7777ec2da008bb35b871d1a5c0276955c6a263688771fd63cc097052fa9d4c8ac1afec21f58de5f15552affbab616c7b220a138ac3b38"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-test-tarball.sh"
+origin.mock-packages = ["git"]
