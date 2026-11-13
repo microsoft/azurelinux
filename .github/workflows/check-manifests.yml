@@ -16,17 +16,17 @@ jobs:
   build:
     name: Check Manifests
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/azurelinux/base/core:3.0
+    defaults:
+      run:
+        shell: bash
     steps:
+
+    - name: Install checkout and manifest-check dependencies
+      run: GNUPGHOME=/root/.gnupg tdnf install -y ca-certificates git make rpm-build diffutils
 
     - name: Check out code
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-
-    # This PR runner uses an older Ubuntu with rpm version 4.17, which doesn't understand some newer macros like %bcond
-    - name: Define missing rpm macros
-      run: |
-        if [[ -n $(rpm --eval '%bcond test 1') ]]; then
-          echo '%bcond() %[ (%{2}) ? "%{expand:%%bcond_without %{1}}" : "%{expand:%%bcond_with %{1}}" ]' > ~/.rpmmacros
-        fi
 
     - name: Check x86_64 manifests
       run: |
