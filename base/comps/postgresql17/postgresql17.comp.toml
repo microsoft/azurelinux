@@ -1,0 +1,26 @@
+[components.postgresql17]
+
+# Sources for the 17.12 update overlay; drop together with it once Fedora ships 17.12 or newer.
+[[components.postgresql17.source-files]]
+filename = "postgresql-17.12.tar.bz2"
+hash = "aefdcfea8f4aa38b487aa30996c10620322a156af85acf1510f71d7d264b38183e2af11669c5b508ff4871243a95fa0e2022ce3182dd0db192eda61f6a29276b"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://ftp.postgresql.org/pub/source/v17.12/postgresql-17.12.tar.bz2" }
+
+[[components.postgresql17.source-files]]
+filename = "postgresql-17.12.tar.bz2.sha256"
+hash = "f30f03034359af445f3a32169545cc50c92e5633a972005655385240d5088e0a626d6128cdf41b50750f238a755bb129087b4f42bbe5e2437379d84f0e8fdfbe"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://ftp.postgresql.org/pub/source/v17.12/postgresql-17.12.tar.bz2.sha256" }
+
+[[components.postgresql17.source-files]]
+filename = "postgresql-16.16.tar.bz2"
+hash = "92427850b0099dcd42d18804c05e1f080f4293b7a1920f2366229a40742b56d0da4cfaf705e0c456c494dab8f82f7bc1763ad393a676941e9fbf31b45ba41b31"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://ftp.postgresql.org/pub/source/v16.16/postgresql-16.16.tar.bz2" }
+
+[[components.postgresql17.source-files]]
+filename = "postgresql-16.16.tar.bz2.sha256"
+hash = "657cb1b7268f53150e39f733e56aeffd513ea96ddfe82e39b2c764c7b59f7fe9d743f5384efd5e63bcf616284b73c1376e4ffc005f2703f119df5f32231dbcd7"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://ftp.postgresql.org/pub/source/v16.16/postgresql-16.16.tar.bz2.sha256" }
