@@ -1,0 +1,20 @@
+# Fedora does not package python-werkzeug 3.1.9 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-102598
+# Remove this overlay once the imported Fedora spec packages 3.1.9 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.1.9"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.1.9"
+
+[[overlays]]
+description = "Remove the obsolete werkzeug-3.1.8.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(werkzeug-3\.1\.8\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
