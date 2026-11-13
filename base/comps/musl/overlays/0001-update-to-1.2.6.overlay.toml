@@ -1,0 +1,31 @@
+# Fedora does not package musl 1.2.6 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2025-26519
+# Remove this overlay once the imported Fedora spec packages 1.2.6 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.2.6"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.2.6"
+
+[[overlays]]
+description = "Drop the stdio iovec backport; it is included in 1.2.6"
+type = "patch-remove"
+file = "**/musl-1.2.5-stdio-skip-empty-iovec-when-buffering-is-disabled.patch"
+
+[[overlays]]
+description = "Remove the obsolete musl-1.2.5.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(musl-1\.2\.5\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete musl-1.2.5.tar.gz.asc source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(musl-1\.2\.5\.tar\.gz\.asc\) = [0-9a-f]+(?:\r?\n|$)'
