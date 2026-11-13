@@ -1,0 +1,20 @@
+# Fedora does not package libXrender 0.9.13 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-88807
+# Remove this overlay once the imported Fedora spec packages 0.9.13 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 0.9.13"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.9.13"
+
+[[overlays]]
+description = "Remove the obsolete libXrender-0.9.12.tar.xz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libXrender-0\.9\.12\.tar\.xz\) = [0-9a-f]+(?:\r?\n|$)'
