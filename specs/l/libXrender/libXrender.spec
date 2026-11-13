@@ -7,7 +7,7 @@
 
 Summary: X.Org X11 libXrender runtime library
 Name: libXrender
-Version: 0.9.12
+Version: 0.9.13
 Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: HPND-sell-variant
 URL: http://www.x.org
