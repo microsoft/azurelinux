@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Replace bundled development metadata with the RPM release version without network access or lifecycle scripts"
+type = "spec-append-lines"
+section = "%prep"
+lines = ['npm --offline --ignore-scripts pkg set version="%{version}"']
