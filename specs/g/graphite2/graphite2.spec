@@ -2,20 +2,19 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           graphite2
-Version:        1.3.14
-Release: 22%{?dist}
+Version: 1.3.15
+Release: 23%{?dist}
 Summary:        Font rendering capabilities for complex non-Roman writing systems
 
 # As per COPYING file this library is tri-licensed
 License:        LGPL-2.1-or-later OR MPL-2.0 OR GPL-2.0-or-later
 
 URL:            https://sourceforge.net/projects/silgraphite/
-Source0:        https://downloads.sourceforge.net/project/silgraphite/graphite2//%{name}-%{version}.tgz
+Source0:        https://github.com/silnrsi/graphite/releases/download/%{version}/%{name}-%{version}.tgz
 
 Patch0:         graphite-arm-nodefaultlibs.patch
 Patch1:         graphite2-1.2.0-cmakepath.patch
-# This fixes compilation with gcc15
-Patch2:         graphite2-1.3.14-gcc15.patch
+
 
 BuildRequires:  cmake
 BuildRequires:  gcc
