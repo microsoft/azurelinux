@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 5;
+    release_number = 6;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -167,6 +167,8 @@ Source100:      packaging-scripts.tar.gz
 # - Additional SRPM macros
 Source101:      nodejs.srpm.macros
 
+Provides: nodejs = %{node_evr}, nodejs%{?_isa} = %{node_evr}
+Obsoletes: nodejs < %{node_evr}, nodejs22 < %{node_evr}
 %patchlist
 0001-Remove-unused-OpenSSL-config.patch
 0002-Disable-FIPS-options.patch
@@ -207,6 +209,8 @@ Conflicts: nodejs-devel-pkg
  # previously VP used for the same reason as alternative-for() above
 
 
+Provides: nodejs-devel%{?_isa} = %{node_evr}
+Obsoletes: nodejs-devel < %{node_evr}, nodejs22-devel < %{node_evr}
 %description    devel
 Development headers for the Node.js JavaScript runtime.
 
@@ -221,6 +225,7 @@ Requires:       nodejs%{node_version_major}-libs%{?_isa}  = %{node_evr}
 Provides:       v8-devel = %{v8_evr}
 Obsoletes:      v8-devel <= 2:10.2.154, v8-314-devel <= 2:3.14
 
+Obsoletes: v8-12.4-devel < %{v8_evr}
 %description -n v8-%{v8_version_major}.%{v8_version_minor}-devel
 Development headers for the v8 runtime.
 
@@ -234,6 +239,8 @@ Provides:       libv8.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{
 Provides:       libv8_libbase.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
 Provides:       libv8_libplatform.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
 
+Provides: nodejs-libs = %{node_evr}, nodejs-libs%{?_isa} = %{node_evr}
+Obsoletes: nodejs-libs < %{node_evr}, nodejs22-libs < %{node_evr}
 %description    libs
 Libraries to support Node.js and provide stable v8 interfaces.
 
@@ -241,6 +248,8 @@ Libraries to support Node.js and provide stable v8 interfaces.
 Summary:        Non-English locale data for Node.js
 Requires:       nodejs%{node_version_major}%{?_isa} = %{node_evr}
 
+Provides: nodejs-full-i18n = %{node_evr}, nodejs-full-i18n%{?_isa} = %{node_evr}
+Obsoletes: nodejs-full-i18n < %{node_evr}, nodejs22-full-i18n < %{node_evr}
 %description    full-i18n
 Optional data files to provide full ICU support for Node.js.
 Remove this package to save space if non-English locales are not needed.
@@ -250,6 +259,8 @@ Summary:        Node.js API documentation
 BuildArch:      noarch
 Requires(meta): nodejs%{node_version_major} = %{node_evr}
 
+Provides: nodejs-docs = %{node_evr}
+Obsoletes: nodejs-docs < %{node_evr}, nodejs22-docs < %{node_evr}
 %description    docs
 The API documentation for the Node.js JavaScript runtime.
 
@@ -264,11 +275,22 @@ Requires:       nodejs%{node_version_major}         = %{node_evr}
 Recommends:     nodejs%{node_version_major}-docs    = %{node_evr}
 Provides:       npm(npm) = %{npm_version}
 
+Requires: nodejs-npm-config
+Provides: npm = %{npm_evr}, nodejs-npm = %{npm_evr}
+Obsoletes: npm < %{npm_evr}, nodejs-npm < %{npm_evr}, nodejs22-npm < %{npm_evr}
 %description    npm
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
 
 
+
+%package -n nodejs-npm-config
+Summary: Shared system configuration for npm
+BuildArch: noarch
+Conflicts: nodejs-npm < %{npm_evr}
+
+%description -n nodejs-npm-config
+System npm configuration for the default nodejs runtime.
 %prep
 %autosetup -n node-v%{node_version} -S git_am
 # clean the archive of the de-vendored dependencies, ensuring they are not used
@@ -530,6 +552,15 @@ ln -srf  "${VERSIONED_MANDIR}/man1/npm.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/n
 ln -srf  "${VERSIONED_MANDIR}/man1/npx.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/npx-%{node_version_major}.1.gz"
 
 
+mkdir -p "%{buildroot}%{_sysconfdir}"
+mkconfig <%{SOURCE5} >"%{buildroot}%{_sysconfdir}/npmrc"
+ln -s node-%{node_version_major} "%{buildroot}%{_bindir}/node"
+ln -s node-%{node_version_major} "%{buildroot}%{_bindir}/nodejs"
+ln -s npm-%{node_version_major} "%{buildroot}%{_bindir}/npm"
+ln -s npx-%{node_version_major} "%{buildroot}%{_bindir}/npx"
+ln -s node-%{node_version_major}.1.gz "%{buildroot}%{_mandir}/man1/node.1.gz"
+ln -s npm-%{node_version_major}.1.gz "%{buildroot}%{_mandir}/man1/npm.1.gz"
+ln -s npx-%{node_version_major}.1.gz "%{buildroot}%{_mandir}/man1/npx.1.gz"
 %check
 # === Common test environment
 export LD_LIBRARY_PATH="${RPM_BUILD_ROOT}%{_libdir}:${LD_LIBRARY_PATH}"
@@ -585,6 +616,9 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %{nodejs_datadir}/man/man1/node.1*
 %{_mandir}/man1/node-%{node_version_major}.1*
 
+%{_bindir}/node
+%{_bindir}/nodejs
+%{_mandir}/man1/node.1*
 %files      libs
 %license    LICENSE
 %{_libdir}/libnode.so.%{node_soversion}
@@ -633,6 +667,10 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %{nodejs_private_sitelib}/npm/
 %exclude    %{nodejs_datadir}/man/man1/node*.1*
 
+%{_bindir}/npm
+%{_bindir}/npx
+%{_mandir}/man1/npm.1*
+%{_mandir}/man1/npx.1*
 %files      docs
 %doc        doc/README.md
 %license    LICENSE
@@ -640,8 +678,16 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %{_pkgdocdir}/html/
 %{_pkgdocdir}/npm/
 
+
+%files -n nodejs-npm-config
+%license deps/npm/LICENSE
+%config(noreplace) %{_sysconfdir}/npmrc
+%ghost %{_sysconfdir}/npmignore
 %changelog
 ## START: Generated by rpmautospec
+* Fri Nov 13 2026 Binu Jose Philip <binujp@gmail.com> - 1:24.22.1-6
+- fix(nodejs24): make Node.js 24 the default runtime
+
 * Sat Nov 07 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1:24.22.1-5
 - fix(nodejs24): upgrade to 24.22.1 to address CVEs
 
