@@ -3,12 +3,12 @@
 
 %global majorversion 18
 %global obsoletes_version %( echo $(( %majorversion + 1 )) )
-%global betaversion 18beta1
+
 
 Summary: PostgreSQL client library
 Name: libpq
-Version: %{majorversion}.0
-Release: 6%{?dist}
+Version: %{majorversion}.7
+Release: 7%{?dist}
 
 License: PostgreSQL
 Url: http://www.postgresql.org/
@@ -17,8 +17,8 @@ Url: http://www.postgresql.org/
 # Source0: https://ftp.postgresql.org/pub/source/v%%{version}/postgresql-%%{version}.tar.bz2
 # Source1: https://ftp.postgresql.org/pub/source/v%%{version}/postgresql-%%{version}.tar.bz2.sha256
 
-Source0: https://ftp.postgresql.org/pub/source/v%{betaversion}/postgresql-%{betaversion}.tar.bz2
-Source1: https://ftp.postgresql.org/pub/source/v%{betaversion}/postgresql-%{betaversion}.tar.bz2.sha256
+Source0: https://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
+Source1: https://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2.sha256
 
 
 # Comments for these patches are in the patch files.
@@ -67,7 +67,7 @@ package or any clients that need to connect to a PostgreSQL server.
 
 %prep
 ( cd "$(dirname "%SOURCE1")" ; sha256sum -c "%SOURCE1" )
-%autosetup -n postgresql-%{betaversion} -p1
+%autosetup -n postgresql-%{version} -p1
 
 # remove .gitignore files to ensure none get into the RPMs (bug #642210)
 find . -type f -name .gitignore | xargs rm
