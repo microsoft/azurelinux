@@ -1,0 +1,8 @@
+[components.golang-github-yuin-goldmark]
+
+# Sources for the 1.7.17 update overlay; drop together with it once Fedora ships 1.7.17 or newer.
+[[components.golang-github-yuin-goldmark.source-files]]
+filename = "goldmark-1.7.17.tar.gz"
+hash = "c90e236372f76f0c0541643569b5e38cce3f72e15fb199de99a86540bd1a30657254a2d567ba5543a678a01915aea75f79b0e4fa3fd932d8dc36c8e54adea3d9"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/yuin/goldmark/archive/v1.7.17/goldmark-1.7.17.tar.gz" }
