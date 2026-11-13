@@ -7,8 +7,8 @@
 Summary:	LZMA compression utilities
 Name:		xz
 Epoch:		1
-Version:	5.8.1
-Release: 7%{?dist}
+Version: 5.8.3
+Release: 8%{?dist}
 
 # liblzma - 0BSD
 # xz{,dec}, lzma{dec,info} - 0BSD
@@ -30,10 +30,10 @@ Source101:	colorxzgrep.csh
 # https://github.com/tukaani-project/xz/issues/199
 # https://issues.redhat.com/browse/RHEL-125143
 # Upstream in > 5.8.1
-Patch:          0001-Landlock-Cache-the-ABI-version.patch
-Patch:          0002-Landlock-Workaround-a-bug-in-RHEL-9-kernel.patch
+
+
 #Patch:          0003-Update-THANKS.patch
-Patch:          0004-Landlock-Add-missing-ifdefs.patch
+
 
 URL:		https://tukaani.org/%{name}/
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
@@ -155,6 +155,8 @@ LD_LIBRARY_PATH=$PWD/src/liblzma/.libs make check
 %lang(it) %{_mandir}/it/man1/*xz*
 %lang(sr) %{_mandir}/sr/man1/*xz*
 %lang(pt_BR) %{_mandir}/pt_BR/man1/*xz*
+%lang(ar) %{_mandir}/ar/man1/*xz*
+%lang(sv) %{_mandir}/sv/man1/*xz*
 %{profiledir}/*
 
 
@@ -188,6 +190,8 @@ LD_LIBRARY_PATH=$PWD/src/liblzma/.libs make check
 %lang(it) %{_mandir}/it/man1/*lz*
 %lang(sr) %{_mandir}/sr/man1/*lz*
 %lang(pt_BR) %{_mandir}/pt_BR/man1/*lz*
+%lang(ar) %{_mandir}/ar/man1/*lz*
+%lang(sv) %{_mandir}/sv/man1/*lz*
 
 
 %changelog

@@ -1,0 +1,77 @@
+# Fedora does not package xz 5.8.3 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-34743
+# Remove this overlay once the imported Fedora spec packages 5.8.3 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 5.8.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "5.8.3"
+
+[[overlays]]
+description = "Drop Landlock ABI caching backport; included upstream since 5.8.2"
+type = "spec-search-replace"
+regex = '^Patch:\s+0001-Landlock-Cache-the-ABI-version\.patch$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the dropped patch file 0001-Landlock-Cache-the-ABI-version.patch"
+type = "file-remove"
+file = "0001-Landlock-Cache-the-ABI-version.patch"
+
+[[overlays]]
+description = "Drop Landlock RHEL 9 workaround backport; included upstream since 5.8.2"
+type = "spec-search-replace"
+regex = '^Patch:\s+0002-Landlock-Workaround-a-bug-in-RHEL-9-kernel\.patch$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the dropped patch file 0002-Landlock-Workaround-a-bug-in-RHEL-9-kernel.patch"
+type = "file-remove"
+file = "0002-Landlock-Workaround-a-bug-in-RHEL-9-kernel.patch"
+
+[[overlays]]
+description = "Drop Landlock ifdef backport; included upstream since 5.8.2"
+type = "spec-search-replace"
+regex = '^Patch:\s+0004-Landlock-Add-missing-ifdefs\.patch$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the dropped patch file 0004-Landlock-Add-missing-ifdefs.patch"
+type = "file-remove"
+file = "0004-Landlock-Add-missing-ifdefs.patch"
+
+[[overlays]]
+description = "Package the Arabic and Swedish xz man pages added in 5.8.3 (as Fedora does for 5.8.3)"
+type = "spec-search-replace"
+regex = '^%lang\(pt_BR\) %\{_mandir\}/pt_BR/man1/\*xz\*$'
+replacement = '''
+%lang(pt_BR) %{_mandir}/pt_BR/man1/*xz*
+%lang(ar) %{_mandir}/ar/man1/*xz*
+%lang(sv) %{_mandir}/sv/man1/*xz*'''
+
+[[overlays]]
+description = "Package the Arabic and Swedish lzma man pages added in 5.8.3 (as Fedora does for 5.8.3)"
+type = "spec-search-replace"
+regex = '^%lang\(pt_BR\) %\{_mandir\}/pt_BR/man1/\*lz\*$'
+replacement = '''
+%lang(pt_BR) %{_mandir}/pt_BR/man1/*lz*
+%lang(ar) %{_mandir}/ar/man1/*lz*
+%lang(sv) %{_mandir}/sv/man1/*lz*'''
+
+[[overlays]]
+description = "Remove the obsolete xz-5.8.1.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(xz-5\.8\.1\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete xz-5.8.1.tar.gz.sig source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(xz-5\.8\.1\.tar\.gz\.sig\) = [0-9a-f]+(?:\r?\n|$)'
