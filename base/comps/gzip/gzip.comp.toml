@@ -1,0 +1,4 @@
+# Pin to Fedora rawhide gzip-1.15 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/gzip/c/484fc32523629f031b34b673c45ffa64970d757a
+[components.gzip]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "484fc32523629f031b34b673c45ffa64970d757a" }

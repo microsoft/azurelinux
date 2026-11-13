@@ -3,8 +3,8 @@
 
 Summary: GNU data compression program
 Name: gzip
-Version: 1.13
-Release: 7%{?dist}
+Version: 1.15
+Release: 5%{?dist}
 # info pages are under GFDL license
 License: GPL-3.0-or-later AND GFDL-1.3-only
 Source0: https://ftp.gnu.org/gnu/gzip/gzip-%{version}.tar.xz
@@ -14,7 +14,7 @@ Source1: https://www.gnu.org/licenses/fdl-1.3.txt
 Source100: colorzgrep.csh
 Source101: colorzgrep.sh
 
-
+Patch1: gzip-1.15_arm.patch
 # Fixed in upstream code.
 # http://thread.gmane.org/gmane.comp.gnu.gzip.bugs/378
 URL: https://www.gzip.org/
@@ -41,6 +41,7 @@ very commonly used data compression program.
 
 %prep
 %setup -q
+%patch 1 -p 1
 cp %{SOURCE1} .
 autoreconf
 
@@ -51,9 +52,13 @@ export CC="%{__cc}"
 export CPP="%{__cpp}"
 export CXX="%{__cxx}"
 %ifarch s390x
-export CFLAGS="$RPM_OPT_FLAGS -Dalignas=_Alignas -DDFLTCC_LEVEL_MASK=0x7e"
+
+#When the otpimizations are enabled, the huft test fails as of F44/gzip1.14
+#export CFLAGS="$RPM_OPT_FLAGS -Dalignas=_Alignas -DDFLTCC_LEVEL_MASK=0x7e"
 #use this in the next realease after gzip 1.13 export CFLAGS="$RPM_OPT_FLAGS -DDFLTCC_LEVEL_MASK=0x7e"
-%configure --enable-dfltcc
+#%configure --enable-dfltcc
+
+%configure
 %else
 %configure
 %endif
@@ -87,6 +92,23 @@ install -p -m 644 %{SOURCE101} %{buildroot}%{profiledir}
 %{profiledir}/*
 
 %changelog
+* Wed Oct 07 2026 Jakub Martisko <jamartis@redhat.com> - 1.15-1
+- Rebase to gzip 1.15
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.14-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Mon Jul 13 2026 Jakub Martisko <jamartis@redhat.com> - 1.14-3
+- Fix CVE-2026-41911
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Aug 14 2025 Jakub Martisko <jamartis@redhat.com> - 1.14-1
+- Rebase to gzip 1.14
+- There are some issues when the s390x optimizations are turned on - the hufts test fails
+- This will need some further investigation, for the time, I've disabled the optimizations
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.13-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
