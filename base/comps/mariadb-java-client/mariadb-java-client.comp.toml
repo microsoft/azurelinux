@@ -1,0 +1,8 @@
+[components.mariadb-java-client]
+
+# Sources for the 3.5.11 update overlay; drop together with it once Fedora ships 3.5.11 or newer.
+[[components.mariadb-java-client.source-files]]
+filename = "mariadb-connector-j-3.5.11.tar.gz"
+hash = "1e222efbda2d79542059d8bf58da2825ad95f5c59cbeecb6e99b39c7e86082c3ef91aedbf6b332a8907c4ac53c7ab79c7835290a591a5a5e13b2bc928796c428"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/mariadb-corporation/mariadb-connector-j/archive/refs/tags/3.5.11.tar.gz" }

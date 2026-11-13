@@ -1,0 +1,60 @@
+# Fedora does not package mariadb-java-client 3.5.11 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-119210, CVE-2026-119276, CVE-2026-119277, CVE-2026-119279,
+# CVE-2026-119280, CVE-2026-119281, CVE-2026-55856, CVE-2026-55857,
+# CVE-2026-55858, CVE-2026-61700
+# Remove this overlay once the imported Fedora spec packages 3.5.11 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.5.11"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.5.11"
+
+[[overlays]]
+description = "Drop the Java version parsing patch; it is included in 3.5.11"
+type = "spec-search-replace"
+regex = '^Patch:\s+0003-Fix-Java-version-parsing-for-non-standard-versions\.patch$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the dropped patch file 0003-Fix-Java-version-parsing-for-non-standard-versions.patch"
+type = "file-remove"
+file = "0003-Fix-Java-version-parsing-for-non-standard-versions.patch"
+
+[[overlays]]
+description = "Drop the bouncycastle dependency removal; 3.5.11 no longer depends on bouncycastle (CONJ-1356)"
+type = "spec-search-replace"
+regex = '^%pom_remove_dep org\.bouncycastle:bcpkix-jdk18on$'
+replacement = ""
+
+[[overlays]]
+description = "Drop the move of the Java 15 Parsec helper; 3.5.11 has no src/main/java15 tree"
+type = "spec-search-replace"
+regex = '^mv src/main/java15/\S+ \S+$'
+replacement = ""
+
+[[overlays]]
+description = "Drop the OSGi dependency renames; 3.5.11 no longer declares OSGi dependencies"
+type = "spec-search-replace"
+regex = '^(# use the latest OSGi implementation|%pom_change_dep -r :org\.osgi\.(core|compendium) \S+)$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the CycloneDX SBOM plugins added in 3.5.11 (SBOM generation and Groovy enrichment); release tooling, not packaged"
+type = "spec-search-replace"
+regex = '^%pom_remove_plugin org\.sonatype\.central:central-publishing-maven-plugin$'
+replacement = '''
+%pom_remove_plugin org.sonatype.central:central-publishing-maven-plugin
+%pom_remove_plugin org.cyclonedx:cyclonedx-maven-plugin
+%pom_remove_plugin org.codehaus.gmavenplus:gmavenplus-plugin'''
+
+[[overlays]]
+description = "Remove the obsolete mariadb-connector-j-3.5.5.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(mariadb-connector-j-3\.5\.5\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
