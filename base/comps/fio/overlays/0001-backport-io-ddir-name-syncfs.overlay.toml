@@ -1,0 +1,13 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/axboe/fio/commit/62b7000971cb58781827b5cb18e05fb309391b85" }]
+
+# fio 3.42 added DDIR_SYNCFS (4d3aaa40, "fio: introduce the end_syncfs option")
+# without adding it to the io_ddir_name() lookup table, so DDIR_WAIT maps to the
+# wrong name and indexes one past the end of the array. Fixed upstream in
+# 62b70009, first released in fio 3.43. Drop this once we move to 3.43 or later.
+[[overlays]]
+description = "Backport upstream 62b70009 so io_ddir_name() covers DDIR_SYNCFS and no longer reads past its name table"
+type = "patch-add"
+source = "../fio-io_ddir_name-add-syncfs.patch"
