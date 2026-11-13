@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Resolve esbuild's RPM-installed platform binary through a package-local dependency link"
+type = "spec-prepend-lines"
+section = "%install"
+lines = [
+    'mkdir -p "%{buildroot}%{nodejs_sitelib}/esbuild/node_modules"',
+    'ln -s ../../@esbuild "%{buildroot}%{nodejs_sitelib}/esbuild/node_modules/@esbuild"',
+]
