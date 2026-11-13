@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        517%{?dist}
+Release:        518%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -202,6 +202,8 @@ Patch213:       CVE-2026-57433.patch
 Patch214:       CVE-2026-15534.patch
 Patch215:       CVE-2026-19487.patch
 Patch216:       CVE-2026-82560.patch
+Patch217:       CVE-2026-7010.patch
+Patch218:       CVE-2026-7017.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -6857,6 +6859,9 @@ popd
 %{_mandir}/man3/vmsish.*
 # Old changelog entries are preserved in CVS.
 %changelog
+* Mon Nov 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4:5.38.2-518
+- Patch for CVE-2026-7017, CVE-2026-7010
+
 * Mon Sep 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4:5.38.2-517
 - Patch for CVE-2026-82560
 
