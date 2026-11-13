@@ -1,0 +1,136 @@
+From c72a4b465767dec254a148ff74b2cf4473e6ec23 Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Fri, 24 Apr 2026 12:09:21 -0500
+Subject: [PATCH] Downstream only: make telemetry sending opt-in
+
+---
+ internal/telemetry/telemetry.go      | 27 ++++++++++++++++-----------
+ internal/telemetry/telemetry_test.go |  2 +-
+ pkg/cmd/root/help_topic.go           |  9 +++++++--
+ 3 files changed, 24 insertions(+), 14 deletions(-)
+
+diff --git a/internal/telemetry/telemetry.go b/internal/telemetry/telemetry.go
+index e5dcbad..c3221bd 100644
+--- a/internal/telemetry/telemetry.go
++++ b/internal/telemetry/telemetry.go
+@@ -86,7 +86,10 @@ func getOrCreateDeviceID() (string, error) {
+ 	return id, nil
+ }
+ 
+-var falseyValues = []string{"", "0", "false", "no", "disabled", "off"}
++var truthyValues = []string{"1", "true", "yes", "enabled", "on"}
++
++// NOTE(downstream): This is unused since we patch the code to make telemetry opt-in.
++// var falseyValues = []string{"", "0", "false", "no", "disabled", "off"}
+ 
+ // lookupEnvFunc wraps os.LookupEnv. Can be replaced in tests.
+ var lookupEnvFunc = os.LookupEnv
+@@ -99,17 +102,19 @@ const (
+ 	Logged   TelemetryState = "log"
+ )
+ 
++// NOTE(downstream): This function is modified to make telemetry sending opt in rather than opt out.
++//
+ // ParseTelemetryState determines the telemetry state based on environment variables and configuration values.
+ // The GH_TELEMETRY environment variable takes precedence, followed by DO_NOT_TRACK, then the configuration value.
+-// Recognized values for GH_TELEMETRY and config are "enabled", "disabled", "log", or any falsey value (e.g. "0", "false", "no") to disable telemetry.
++// Recognized values for GH_TELEMETRY and config are "enabled", "disabled", "log", or any truthy value (e.g. "1", "true", "yes") to opt in to telemetry.
+ func ParseTelemetryState(configValue string) TelemetryState {
+ 	// GH_TELEMETRY env var takes highest precedence
+ 	if envVal, ok := lookupEnvFunc("GH_TELEMETRY"); ok {
+ 		envVal = strings.TrimSpace(strings.ToLower(envVal))
+ 
+-		// If falsey, telemetry is disabled.
+-		if slices.Contains(falseyValues, envVal) {
+-			return Disabled
++		// If truthey, telemetry is enabled.
++		if slices.Contains(truthyValues, envVal) {
++			return Enabled
+ 		}
+ 
+ 		// If logged, telemetry is logged instead of sent.
+@@ -117,8 +122,8 @@ func ParseTelemetryState(configValue string) TelemetryState {
+ 			return Logged
+ 		}
+ 
+-		// Any other value (including "enabled") is treated as enabled.
+-		return Enabled
++		// Any other value is treated as disabled.
++		return Disabled
+ 	}
+ 
+ 	// DO_NOT_TRACK takes precedence over config
+@@ -132,15 +137,15 @@ func ParseTelemetryState(configValue string) TelemetryState {
+ 	// Then check the config values with the same rules.
+ 	configValue = strings.TrimSpace(strings.ToLower(configValue))
+ 
+-	if slices.Contains(falseyValues, configValue) {
+-		return Disabled
++	if slices.Contains(truthyValues, configValue) {
++		return Enabled
+ 	}
+ 
+ 	if configValue == "log" {
+ 		return Logged
+ 	}
+ 
+-	return Enabled
++	return Disabled
+ }
+ 
+ type telemetryServiceOpts struct {
+@@ -224,7 +229,7 @@ func NewService(flusher func(SendTelemetryPayload), opts ...telemetryServiceOpti
+ 
+ 	invocationID := uuid.NewString()
+ 
+-	var commonDimensions = ghtelemetry.Dimensions{
++	commonDimensions := ghtelemetry.Dimensions{
+ 		"device_id":     deviceID,
+ 		"invocation_id": invocationID,
+ 		"os":            runtime.GOOS,
+diff --git a/internal/telemetry/telemetry_test.go b/internal/telemetry/telemetry_test.go
+index a796afd..78a65c5 100644
+--- a/internal/telemetry/telemetry_test.go
++++ b/internal/telemetry/telemetry_test.go
+@@ -207,7 +207,7 @@ func TestParseTelemetryState(t *testing.T) {
+ 		{
+ 			name:        "env unset, config any truthy value",
+ 			lookupEnv:   envUnset,
+-			configValue: "anything",
++			configValue: "true",
+ 			want:        Enabled,
+ 		},
+ 		{
+diff --git a/pkg/cmd/root/help_topic.go b/pkg/cmd/root/help_topic.go
+index 0becbf5..2da7a75 100644
+--- a/pkg/cmd/root/help_topic.go
++++ b/pkg/cmd/root/help_topic.go
+@@ -117,11 +117,12 @@ var HelpTopics = []helpTopic{
+ 			%[1]sGH_ACCESSIBLE_PROMPTER%[1]s (preview): set to a truthy value to enable prompts that are
+ 			more compatible with speech synthesis and braille screen readers.
+ 
+-			%[1]sGH_TELEMETRY%[1]s: set to %[1]slog%[1]s to print telemetry data to standard error instead of sending it.
+-			Set to %[1]sfalse%[1]s or %[1]s0%[1]s to disable telemetry. Takes precedence over %[1]sDO_NOT_TRACK%[1]s.
++			%[1]sGH_TELEMETRY%[1]s: set to %[1]strue%[1]s or %[1]s1%[1]s to opt in to telemetry. Takes precedence over %[1]sDO_NOT_TRACK%[1]s.
++			Set to %[1]slog%[1]s to print telemetry data to standard error without sending it.
+ 
+ 			%[1]sDO_NOT_TRACK%[1]s: set to %[1]strue%[1]s or %[1]s1%[1]s to disable telemetry. Ignored when
+ 			%[1]sGH_TELEMETRY%[1]s is set, which takes precedence.
++			Note that, in this downstream gh build, this variable is effectively a noop since telemetry is disabled by default.
+ 
+ 			%[1]sGH_SPINNER_DISABLED%[1]s: set to a truthy value to replace the spinner animation with
+ 			a textual progress indicator.
+@@ -135,6 +136,10 @@ var HelpTopics = []helpTopic{
+ 
+ 			To learn more about what data is collected, how it is used, and how to opt out, see:
+ 			<https://cli.github.com/telemetry>
++
++			Note that, in this downstream gh build, telemetry is disabled by default,
++			so no user action is needed unless you wish to explicitly opt in to sending telemetry
++			which can be done by setting the $GH_TELEMETRY environment variable (see gh help environemnt).
+ 		`),
+ 	},
+ 	{
+-- 
+2.53.0
+

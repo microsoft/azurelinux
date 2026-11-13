@@ -1,0 +1,37 @@
+[licensing]
+detector = "askalono"
+exclude_files = [
+    "vendor/google.golang.org/grpc/regenerate.sh",
+]
+exclude_directories = [
+    "third-party",
+]
+
+
+[[licensing.licenses]]
+path = "vendor/github.com/alecthomas/chroma/v2/COPYING"
+sha256sum = "e7bf754e7153012a3a8ff697d21acd6c12e590d6a55f2aef8ee83616aa9a795f"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/github.com/google/shlex/COPYING"
+sha256sum = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/shibumi/go-pathspec/GO-LICENSE"
+sha256sum = "dd26a7abddd02e2d0aba97805b31f248ef7835d9e10da289b22e3b8ab78b324d"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+[archive.dependency_overrides]
+"github.com/mattn/go-localereader" = "2491eb6c1c75"
