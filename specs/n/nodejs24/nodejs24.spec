@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 5;
+    release_number = 6;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -11,6 +11,17 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%{!?nodejs_default:%global nodejs_default 24}
+%if 0%{?nodejs_default}
+%global pkgname nodejs
+%define unversioned_obsoletes_of_nodejsXX_if_default() %{expand:\
+Obsoletes: nodejs%{node_version_major}%{?1:-%{1}} <= %{node_evr}\
+Provides: nodejs%{node_version_major}%{?1:-%{1}} = %{node_evr}\
+}
+%else
+%global pkgname nodejs24
+%define unversioned_obsoletes_of_nodejsXX_if_default() %{nil}
+%endif
 Name:           nodejs24
 Epoch:          1
 Version:        24.22.1
@@ -106,7 +117,12 @@ ExclusiveArch:  %{nodejs_arches}
 ExcludeArch:    %{ix86}
 
 # SPEC tools – additiona macros, dependency generators, and utilities
-BuildRequires:  chrpath
+%if 0%{?nodejs_default}
+%package -n %{pkgname}
+Summary: JavaScript runtime
+%endif
+%unversioned_obsoletes_of_nodejsXX_if_default
+BuildRequires: chrpath
 BuildRequires:  git-core
 BuildRequires:  jq
 BuildRequires:  nodejs-packaging
@@ -137,10 +153,10 @@ BuildRequires:  pkgconfig(openssl) >= 3.0.2
 # Run-time dependencies of the main package
 Requires:   ca-certificates
 # Required and/or recommended sub-packages
-Requires:   %{name}-libs%{?_isa}      = %{node_evr}
-Recommends: %{name}-docs              = %{node_evr}
-Recommends: %{name}-full-i18n%{?_isa} = %{node_evr}
-Recommends: %{name}-npm              >= %{npm_evr}
+Requires: %{pkgname}-libs%{?_isa} = %{node_evr}
+Recommends: %{pkgname}-docs = %{node_evr}
+Recommends: %{pkgname}-full-i18n%{?_isa} = %{node_evr}
+Recommends: %{pkgname}-npm >= %{npm_evr}
 # Virtual provides
 Provides:   nodejs(abi) = %{node_soversion}, nodejs(abi%{node_version_major}) = %{node_soversion}
 Provides:   nodejs(engine) = %{node_version}
@@ -187,28 +203,83 @@ Node.js uses an event-driven, non-blocking I/O model that
 makes it lightweight and efficient, perfect for data-intensive
 real-time applications that run across distributed devices.
 
-%package        devel
+%if 0%{?nodejs_default}
+%description -n %{pkgname}
+Node.js is a platform built on Chrome's JavaScript runtime
+for easily building fast, scalable network applications.
+Node.js uses an event-driven, non-blocking I/O model that
+makes it lightweight and efficient, perfect for data-intensive
+real-time applications that run across distributed devices.
+%endif
+
+%package -n %{pkgname}-devel
 Summary:        JavaScript runtime – development headers
-Requires:       nodejs%{node_version_major}%{?_isa} = %{node_evr}
-Requires:       nodejs%{node_version_major}-libs%{?_isa} = %{node_evr}
+Requires:       %{pkgname}%{?_isa} = %{node_evr}
+Requires:       %{pkgname}-libs%{?_isa} = %{node_evr}
 Requires:       nodejs-packaging
 Requires:       openssl-devel%{?_isa}
 %{!?with_bundled_brotli:Requires: brotli-devel%{?_isa}}
 %{!?with_bundled_libuv:Requires: libuv-devel%{?_isa}}
 %{!?with_bundled_zlib:Requires: zlib-devel%{?_isa}}
-# Note: -devel sub-packages of the various streams conflict with each other,
-# as the headers cannot be easily namespaced (would break at lease node-gyp search path).
-# Hence the Provides: in place of metapackage.
 Provides:       nodejs-devel = %{node_evr}
+Provides:       alternative-for(nodejs-devel) = %{node_evr}
+Conflicts:      alternative-for(nodejs-devel)
+Conflicts:      nodejs-devel-pkg
+%unversioned_obsoletes_of_nodejsXX_if_default devel
 
-Provides: alternative-for(nodejs-devel) = %{node_evr}
-Conflicts: alternative-for(nodejs-devel)
-Conflicts: nodejs-devel-pkg
- # previously VP used for the same reason as alternative-for() above
-
-
-%description    devel
+%description -n %{pkgname}-devel
 Development headers for the Node.js JavaScript runtime.
+
+%package -n %{pkgname}-libs
+Summary:        Node.js and v8 libraries
+Provides:       v8 = %{v8_evr}
+Provides:       v8%{?_isa} = %{v8_evr}
+Obsoletes:      v8 < 1:6.7.17-10
+Provides:       libv8.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+Provides:       libv8_libbase.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+Provides:       libv8_libplatform.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+%unversioned_obsoletes_of_nodejsXX_if_default libs
+
+%description -n %{pkgname}-libs
+Libraries to support Node.js and provide stable v8 interfaces.
+
+%package -n %{pkgname}-full-i18n
+Summary:        Non-English locale data for Node.js
+Requires:       %{pkgname}%{?_isa} = %{node_evr}
+%unversioned_obsoletes_of_nodejsXX_if_default full-i18n
+
+%description -n %{pkgname}-full-i18n
+Optional data files to provide full ICU support for Node.js.
+Remove this package to save space if non-English locales are not needed.
+
+%package -n %{pkgname}-docs
+Summary:        Node.js API documentation
+BuildArch:      noarch
+Requires(meta): %{pkgname} = %{node_evr}
+%unversioned_obsoletes_of_nodejsXX_if_default docs
+
+%description -n %{pkgname}-docs
+The API documentation for the Node.js JavaScript runtime.
+
+%package -n %{pkgname}-npm
+Summary:        Node.js Package Manager
+Epoch:          %{npm_epoch}
+Version:        %{npm_version}
+Release:        %{npm_release}
+BuildArch:      noarch
+Requires:       %{pkgname} = %{node_evr}
+Recommends:     %{pkgname}-docs = %{node_evr}
+Provides:       npm(npm) = %{npm_version}
+%if 0%{?nodejs_default}
+Provides:       npm = %{npm_evr}
+Obsoletes:      npm < 1:9
+Obsoletes:      nodejs%{node_version_major}-npm <= %{npm_evr}
+Provides:       nodejs%{node_version_major}-npm = %{npm_evr}
+%endif
+
+%description -n %{pkgname}-npm
+npm is a package manager for node.js. You can use it to install and publish
+your node programs. It manages dependencies and does other cool stuff.
 
 %package -n     v8-%{v8_version_major}.%{v8_version_minor}-devel
 Summary:        v8 – development headers
@@ -216,58 +287,14 @@ Epoch:          %{v8_epoch}
 Version:        %{v8_version}
 Release:        %{v8_release}
 
-Requires:       nodejs%{node_version_major}-devel%{?_isa} = %{node_evr}
-Requires:       nodejs%{node_version_major}-libs%{?_isa}  = %{node_evr}
+Requires: %{pkgname}-devel%{?_isa} = %{node_evr}
+Requires: %{pkgname}-libs%{?_isa} = %{node_evr}
 Provides:       v8-devel = %{v8_evr}
 Obsoletes:      v8-devel <= 2:10.2.154, v8-314-devel <= 2:3.14
 
+Obsoletes: v8-12.4-devel < %{v8_evr}
 %description -n v8-%{v8_version_major}.%{v8_version_minor}-devel
 Development headers for the v8 runtime.
-
-%package        libs
-Summary:        Node.js and v8 libraries
-# v8 used to be a separate package; keep providing it virtually
-Provides:       v8 = %{v8_evr}
-Provides:       v8%{?_isa} = %{v8_evr}
-Obsoletes:      v8 < 1:6.7.17-10
-Provides:       libv8.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
-Provides:       libv8_libbase.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
-Provides:       libv8_libplatform.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
-
-%description    libs
-Libraries to support Node.js and provide stable v8 interfaces.
-
-%package        full-i18n
-Summary:        Non-English locale data for Node.js
-Requires:       nodejs%{node_version_major}%{?_isa} = %{node_evr}
-
-%description    full-i18n
-Optional data files to provide full ICU support for Node.js.
-Remove this package to save space if non-English locales are not needed.
-
-%package        docs
-Summary:        Node.js API documentation
-BuildArch:      noarch
-Requires(meta): nodejs%{node_version_major} = %{node_evr}
-
-%description    docs
-The API documentation for the Node.js JavaScript runtime.
-
-%package        npm
-Summary:        Node.js Package Manager
-Epoch:          %{npm_epoch}
-Version:        %{npm_version}
-Release:        %{npm_release}
-
-BuildArch:      noarch
-Requires:       nodejs%{node_version_major}         = %{node_evr}
-Recommends:     nodejs%{node_version_major}-docs    = %{node_evr}
-Provides:       npm(npm) = %{npm_version}
-
-%description    npm
-npm is a package manager for node.js. You can use it to install and publish
-your node programs. It manages dependencies and does other cool stuff.
-
 
 %prep
 %autosetup -n node-v%{node_version} -S git_am
@@ -530,6 +557,20 @@ ln -srf  "${VERSIONED_MANDIR}/man1/npm.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/n
 ln -srf  "${VERSIONED_MANDIR}/man1/npx.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/npx-%{node_version_major}.1.gz"
 
 
+%if 0%{?nodejs_default}
+for bin in node npm npx; do
+    ln -srf "%{buildroot}%{_bindir}/${bin}-%{node_version_major}" "%{buildroot}%{_bindir}/${bin}"
+done
+for section in 1 5 7; do
+    mkdir -p "%{buildroot}%{_mandir}/man${section}"
+    for manpage in "${VERSIONED_MANDIR}/man${section}/"*; do
+        ln -srf "${manpage}" "%{buildroot}%{_mandir}/man${section}/"
+    done
+done
+mkdir -p "%{buildroot}%{nodejs_common_sitelib}" "%{buildroot}%{_sysconfdir}"
+mkconfig <%{SOURCE5} >"%{buildroot}%{_sysconfdir}/npmrc"
+%endif
+
 %check
 # === Common test environment
 export LD_LIBRARY_PATH="${RPM_BUILD_ROOT}%{_libdir}:${LD_LIBRARY_PATH}"
@@ -573,26 +614,40 @@ npm config list --json | jq --exit-status '.["update-notifier"] == false'
 bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test/ '%{SOURCE11}'
 
 
-%files
+%files -n   v8-%{v8_version_major}.%{v8_version_minor}-devel
+%license    LICENSE
+%{_includedir}/cppgc
+%{_includedir}/libplatform
+%{_includedir}/v8*.h
+%{_libdir}/libv8.so
+%{_libdir}/libv8_libbase.so
+%{_libdir}/libv8_libplatform.so
+%{_libdir}/pkgconfig/v8-%{v8_version_major}.%{v8_version_minor}.pc
+
+%files -n %{pkgname}
 %doc        README.md CHANGELOG.md GOVERNANCE.md onboarding.md
 %license    LICENSE
 %dir        %{nodejs_datadir}/
 %dir        %{nodejs_datadir}/man/
 %dir        %{nodejs_datadir}/man/man1/
-#%%dir        %%{nodejs_common_sitelib}/
 %dir        %{nodejs_private_sitelib}/
 %{_bindir}/node-%{node_version_major}
 %{nodejs_datadir}/man/man1/node.1*
 %{_mandir}/man1/node-%{node_version_major}.1*
+%if 0%{?nodejs_default}
+%dir        %{nodejs_common_sitelib}/
+%{_bindir}/node
+%{_mandir}/man1/node.1*
+%endif
 
-%files      libs
+%files -n %{pkgname}-libs
 %license    LICENSE
 %{_libdir}/libnode.so.%{node_soversion}
 %{_libdir}/libv8.so.%{v8_version_major}.%{v8_version_minor}
 %{_libdir}/libv8_libbase.so.%{v8_version_major}.%{v8_version_minor}
 %{_libdir}/libv8_libplatform.so.%{v8_version_major}.%{v8_version_minor}
 
-%files      devel
+%files -n %{pkgname}-devel
 %license    LICENSE
 %dir        %{nodejs_datadir}/
 %{_includedir}/node/
@@ -604,36 +659,35 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %{_rpmconfigdir}/nodejs%{node_version_major}_abi.req
 %{nodejs_datadir}/common.gypi
 
-%files -n   v8-%{v8_version_major}.%{v8_version_minor}-devel
-%license    LICENSE
-%{_includedir}/cppgc
-%{_includedir}/libplatform
-%{_includedir}/v8*.h
-%{_libdir}/libv8.so
-%{_libdir}/libv8_libbase.so
-%{_libdir}/libv8_libplatform.so
-%{_libdir}/pkgconfig/v8-%{v8_version_major}.%{v8_version_minor}.pc
-
-%files      full-i18n
+%files -n %{pkgname}-full-i18n
 %doc        full-icu/icu4c-%{icu_version_major}.%{icu_version_minor}-data-bin-?-README.md
 %license    full-icu/LICENSE
 %dir        %{nodejs_datadir}/
 %{nodejs_datadir}/icudata/
 
-%files      npm
+%files -n %{pkgname}-npm
 %doc        deps/npm/README.md
 %license    deps/npm/LICENSE
 %dir        %{nodejs_datadir}/
 %dir        %{nodejs_private_sitelib}/
 %{_bindir}/npm-%{node_version_major}
 %{_bindir}/npx-%{node_version_major}
+%if 0%{?nodejs_default}
+%{_bindir}/npm
+%{_bindir}/npx
+%{_mandir}/man[157]/*
+%exclude    %{_mandir}/man1/node*.1*
+%config(noreplace) %{_sysconfdir}/npmrc
+%ghost      %{_sysconfdir}/npmignore
+%else
 %{_mandir}/man1/npm-%{node_version_major}.1*
 %{_mandir}/man1/npx-%{node_version_major}.1*
+%endif
 %{nodejs_datadir}/man
 %{nodejs_private_sitelib}/npm/
 %exclude    %{nodejs_datadir}/man/man1/node*.1*
 
-%files      docs
+%files -n %{pkgname}-docs
 %doc        doc/README.md
 %license    LICENSE
 %dir        %{_pkgdocdir}
@@ -642,6 +696,9 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 
 %changelog
 ## START: Generated by rpmautospec
+* Fri Nov 13 2026 Binu Jose Philip <binujp@gmail.com> - 1:24.22.1-6
+- fix(nodejs24): make Node.js 24 the default runtime
+
 * Sat Nov 07 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1:24.22.1-5
 - fix(nodejs24): upgrade to 24.22.1 to address CVEs
 
