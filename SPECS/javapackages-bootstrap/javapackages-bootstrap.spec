@@ -19,7 +19,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.14.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -418,6 +418,9 @@ sed -i s/_xmvngen_/_jpbgen_/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
 %doc AUTHORS
 
 %changelog
+* Fri Oct 30 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.14.0-6
+- Updated patch for CVE-2026-24400 with upstream XML hardening and regression tests.
+
 * Fri Aug 14 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 1.14.0-5
 - Add patch for CVE-2026-71497
 

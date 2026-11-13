@@ -13,7 +13,8 @@ After Ignition completes, ignition-quench.service must remove this
 addon in addition to the legacy /boot/flatcar/first_boot marker file,
 so that subsequent boots do not re-trigger Ignition.
 
-The addon path is fixed: /boot/EFI/Linux/acl.efi.extra.d/firstboot.addon.efi
+Use a glob pattern (*.efi.extra.d) so the removal works regardless of
+the UKI filename (e.g. acl.efi or vmlinuz-<version>.efi per UAPI).
 ---
  dracut/30ignition/ignition-quench.service | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
@@ -23,7 +24,7 @@ index 6460917..f56f2a3 100644
 --- a/dracut/30ignition/ignition-quench.service
 +++ b/dracut/30ignition/ignition-quench.service
 @@ -14,6 +14,8 @@ After=sysroot-boot.service
- 
+
  [Service]
  Type=oneshot
 -# We will only run if GRUB detected this file. Fail if we are unable to
@@ -33,7 +34,7 @@ index 6460917..f56f2a3 100644
 +# firstboot addon exists. Fail if we cannot find either, rather than risking
 +# rerunning Ignition at next boot.  In UKI mode, also remove the firstboot
 +# addon so systemd-boot stops appending first-boot cmdline args.
-+ExecStart=/bin/sh -c 'if [ ! -e /sysroot/boot/flatcar/first_boot ] && [ ! -e /sysroot/boot/coreos/first_boot ] && [ ! -e /sysroot/boot/EFI/Linux/acl.efi.extra.d/firstboot.addon.efi ]; then echo "error: no first-boot marker or addon found"; exit 1; else rm -f /sysroot/boot/flatcar/first_boot /sysroot/boot/coreos/first_boot /sysroot/boot/EFI/Linux/acl.efi.extra.d/firstboot.addon.efi; fi'
--- 
++ExecStart=/bin/sh -c 'fb_marker=false; for f in /sysroot/boot/flatcar/first_boot /sysroot/boot/coreos/first_boot; do [ -e "$f" ] && fb_marker=true && rm -f "$f"; done; for addon in /sysroot/boot/EFI/Linux/*.efi.extra.d/firstboot.addon.efi; do [ -e "$addon" ] && fb_marker=true && rm -f "$addon"; done; if [ "$fb_marker" = false ]; then echo "error: no first-boot marker or addon found"; exit 1; fi'
+--
 2.45.4
 

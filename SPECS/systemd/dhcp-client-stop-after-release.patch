@@ -1,0 +1,32 @@
+From 6740db08923bdffb838ea72277a73b5d8119a368 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Wed, 21 Aug 2024 10:24:44 +0900
+Subject: [PATCH] sd-dhcp-client: stop client without calling notification
+ after sending RELEASE
+
+Otherwise, even the acquired lease is released, the client may be in
+e.g. BOUND state or so, and may send renew or rebind after timeout
+later.
+
+(cherry picked from commit 2bb7559ade518bb0f27ec6d0212ddb8bcc470677)
+---
+ src/libsystemd-network/sd-dhcp-client.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/libsystemd-network/sd-dhcp-client.c b/src/libsystemd-network/sd-dhcp-client.c
+index 4a4fac967564..5fe506bcbfeb 100644
+--- a/src/libsystemd-network/sd-dhcp-client.c
++++ b/src/libsystemd-network/sd-dhcp-client.c
+@@ -2333,7 +2333,11 @@ int sd_dhcp_client_send_release(sd_dhcp_client *client) {
+ 
+         log_dhcp_client(client, "RELEASE");
+ 
+-        return 0;
++        /* This function is mostly called when stopping daemon. Hence, do not call client_stop() or
++         * client_restart(). Otherwise, the notification callback will be called again and we may easily
++         * enter an infinite loop. */
++        client_initialize(client);
++        return 1; /* sent and stopped. */
+ }
+ 
+ int sd_dhcp_client_send_decline(sd_dhcp_client *client) {

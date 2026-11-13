@@ -1,7 +1,7 @@
 %bcond_with docs
 Summary:        Module manipulating metadata files
 Name:           libmodulemd
-Version:        2.15.0
+Version:        2.15.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -74,6 +74,9 @@ export LC_CTYPE=C.utf8
 %{_includedir}/modulemd-2.0/*
 
 %changelog
+* Fri Nov 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.4-1
+- Auto-upgrade to 2.15.4 - for CVE-2026-92823, CVE-2026-92824
+
 * Thu Feb 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.0-1
 - Auto-upgrade to 2.15.0 - 3.0 package upgrade
 

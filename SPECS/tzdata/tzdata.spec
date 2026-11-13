@@ -1,6 +1,6 @@
 Summary:        Time zone data
 Name:           tzdata
-Version:        2026e
+Version:        2026f
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
@@ -49,6 +49,9 @@ install -vpDm 644 tzdata.zi %{buildroot}%{_datadir}/zoneinfo/tzdata.zi
 %{_datadir}/*
 
 %changelog
+* Thu Oct 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2026f-1
+- Auto-upgrade to 2026f - upgrade to version 2026f
+
 * Wed Sep 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2026e-1
 - Auto-upgrade to 2026e - upgrade to version 2026e
 
