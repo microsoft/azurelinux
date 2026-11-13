@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.12.15
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,6 +39,12 @@ Patch22:        CVE-2026-78669.patch
 Patch23:        CVE-2026-81870.patch
 Patch24:        CVE-2026-92543.patch
 Patch25:        CVE-2026-97032.patch
+Patch26:        CVE-2026-116585.patch
+Patch27:        CVE-2026-116586.patch
+Patch28:        CVE-2026-116587.patch
+Patch29:        CVE-2026-116591.patch
+Patch30:        CVE-2026-78661.patch
+Patch31:        CVE-2026-97045.patch
 
 BuildRequires:  golang >= 1.25
 Requires:       %{name}-acmesolver
@@ -130,6 +136,9 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-16
+- Patch for CVE-2026-97045, CVE-2026-78661, CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
+
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-15
 - Patch for CVE-2026-97032, CVE-2026-92543, CVE-2026-81870, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
 
