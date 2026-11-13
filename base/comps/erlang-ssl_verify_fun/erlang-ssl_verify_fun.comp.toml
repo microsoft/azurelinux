@@ -1,0 +1,8 @@
+[components.erlang-ssl_verify_fun]
+
+# Sources for the 1.1.9 update overlay; drop together with it once Fedora ships 1.1.9 or newer.
+[[components.erlang-ssl_verify_fun.source-files]]
+filename = "ssl_verify_fun-1.1.9.tar.gz"
+hash = "0892995cd8d17010999d3521092fd4bae742535c355c0acf1b23c7244b02b0185797d37b7adb741efcfdb815f2be52c7e02bc30e9c072eaf80ed474db4051fdf"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/deadtrickster/ssl_verify_fun.erl/archive/1.1.9/ssl_verify_fun-1.1.9.tar.gz" }
