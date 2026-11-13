@@ -13,6 +13,7 @@
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
       <version>any</version>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>
