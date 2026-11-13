@@ -1,0 +1,4 @@
+# Pin to Fedora f45 libkcapi-1.5.1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libkcapi/c/af20f4943914f131f03b8b26e864d929976690b5
+[components.libkcapi]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "45" }, upstream-commit = "af20f4943914f131f03b8b26e864d929976690b5" }

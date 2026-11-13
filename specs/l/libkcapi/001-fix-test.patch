@@ -1,0 +1,36 @@
+From 780d6fd0d94ba921724d6db64fc1aedb32d7cf46 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ondrej=20Mosn=C3=A1=C4=8Dek?= <omosnacek@gmail.com>
+Date: Wed, 19 Aug 2026 16:07:21 +0200
+Subject: [PATCH] test/kcapi-main: adjust the RNG tests for kernels 7.2+
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The following 7.2 kernel commits:
+- 89cfd38c788e ("crypto: drbg - Remove support for HMAC-SHA256 and HMAC-SHA384")
+- 6f88f41eeb7d ("crypto: drbg - Remove support for CTR_DRBG")
+removed support for the currently tested drbg_nopr_hmac_sha256 and
+drbg_nopr_ctr_aes256. The only ones left are drbg_nopr_hmac_sha256 and
+stdrng, so test those two instead.
+
+Signed-off-by: Ondrej Mosnáček <omosnacek@gmail.com>
+---
+ test/kcapi-main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test/kcapi-main.c b/test/kcapi-main.c
+index a01140f..53824a1 100644
+--- a/test/kcapi-main.c
++++ b/test/kcapi-main.c
+@@ -690,9 +690,9 @@ static int auxiliary_tests(void)
+ 	kcapi_md_destroy(handle);
+ 
+ 
+-	if (aux_test_rng("drbg_nopr_hmac_sha256", NULL, 0))
++	if (aux_test_rng("drbg_nopr_hmac_sha512", NULL, 0))
+ 		ret++;
+-	if (aux_test_rng("drbg_nopr_ctr_aes256", NULL, 0))
++	if (aux_test_rng("stdrng", NULL, 0))
+ 		ret++;
+ 
+ 	return ret;
