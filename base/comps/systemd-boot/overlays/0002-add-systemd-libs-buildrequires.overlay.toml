@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add systemd-libs BuildRequires so the package can access LICENSE.LGPL2.1"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+pesign$'
+replacement = "BuildRequires:  systemd-libs\nBuildRequires:  pesign"
