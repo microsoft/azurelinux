@@ -9,7 +9,7 @@
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
 Version:        6.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,7 @@ BuildRequires:  xmlto
 BuildRequires:  lua
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 Requires:       coreutils
 Requires:       findutils
@@ -165,6 +166,9 @@ pip3 install -r test-requirements.txt
 %license LICENSE
 
 %changelog
+* Mon Nov 02 2026 Kshitiz Godara <kgodara@microsoft.com> - 6.1.0-2
+- Add python3-pytest as a test dependency
+
 * Thu Feb 15 2024 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.0-1
 - Update to upstream version 6.1.0
 - Add javapackages-extra

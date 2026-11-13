@@ -1,13 +1,12 @@
-Subject: [PATCH] Distrust incident-related eMudhra and AAA trust anchors
+Subject: [PATCH] Extend eMudhra root distrust without restoring AAA
 
-Remove only the affected trust anchors, including the AAA cross-signing
-path. Preserve the unaffected emSign G1, C1 and C3 anchors.
-Reference: https://emudhra.we-have-a-problem.com/
+Remove the additional emSign trust anchors and retain the existing AAA
+and emSign ECC G3 exclusions. Preserve unrelated certificate bytes.
 Upstream-status: Azure Linux trust-store backport
 
 --- /dev/null
 +++ b/Tools/remove-untrusted-wheel-roots.py
-@@ -0,0 +1,109 @@
+@@ -0,0 +1,140 @@
 +"""Remove incident-related trust anchors from bundled wheels and renew RECORD."""
 +
 +import argparse
@@ -22,7 +21,35 @@ Upstream-status: Azure Linux trust-store backport
 +import zipfile
 +
 +
++UNTRUSTED_SHA1 = {
++    "1e3897900af0a482f1134acdc4202364fe55553f",
++    "1e6577b9cf70d017cae1bda1351d4725a973c06d",
++    "8ac7ad8f73ac4ec1b5754da540f4fccf7cb58e8c",
++    "a670cbde482554129cad3e1c4b1372f669f75cad",
++    "ad4eb39a75b72a4eb1e3224fcd4053504d0d8ef6",
++    "aecc6124a6cb7f7c1bc0d63623723e8a09cf587e",
++    "b6af43c29b81537df6ef6bc31f1f60150cee4866",
++    "bca2188074c3147e16f4c48c5910a89ef752f479",
++    "e72ef1dffcb20928cf5dd4d56737b151cb864f01",
++    "ef00428c8bd55bf387dc3bd5599218eae0954b07",
++}
 +UNTRUSTED_SHA256 = {
++    "fd9d5c2dbbd4995ab69b8d50c439d9527b00529199c2fd01b2174eb58f07021f",
++    "e7568fe6e12331f4fd7de61da4c7559d0f8eb192a218d4741a3ba75184333838",
++    "cb6e15165ac802e9b3f993f16c25d41f4e81c21ebde71ae1b012ac00bf9c7c3f",
++    "a496e23ac0cab8155fc9b117b97eae368efcbb9041aec8804d5a308d2d01c2d8",
++    "9e39de2881273acc225a149c72ba3e0f51424963669ab633ee1dc7df5db067b4",
++    "98b896625c0c230adeec3eb2cf6aad5001ecf9156a68644e82374ce5833bc25b",
++    "84112972b8e59d14560ae7e7119654474aad119990cf3722bfc1e3b91615e1fd",
++    "7485b51c0ed192878fa1d2f948fb529ae1842cc5086c4b67f7be5b2039de9489",
++    "62b7f9868263f72f6911fc78ceaf72c1979158b7368bf648683bb2aa39b02e72",
++    "5f1ded4dd590af74631290cf073b122a2aac6a1fa479778a0bd43579bd832699",
++    "579480aea166290bd3c643589e795fc0d0e54e86505d180f1dff99efd3199512",
++    "4b2460a466f95fd40113bcdcca2ceb29b3b093921de45474da7df48874c630b1",
++    "45a883f349aedfd5f3a649b5498ffb121712ba8b448f3f2a91dbc5a766fcddbe",
++    "432ec25f0d28de9006d97bf752f17bbb2cd41f669933fcb072d9a1148d0261f3",
++    "42c4accd12c4f59597925e1a08a7a90102608543809308d50ec427e118ba1493",
++    "0164d7ceae5bb909c272af151ff44b1177ae9b47d9424b94f1d9558c30934d19",
 +    "d7a7a0fb5d7e2731d771e9484ebcdef71d5f0c3e0a2948782bc83ee0ea699ef4",
 +    "86a1ecba089c4a8d3bbe2734c612ba341d813e043cf9e8a862cd5c57a36bbe6b",
 +}
@@ -55,7 +82,10 @@ Upstream-status: Azure Linux trust-store backport
 +    def retain_certificate(match):
 +        nonlocal removed
 +        der = ssl.PEM_cert_to_DER_cert(match.group().decode("ascii"))
-+        if hashlib.sha256(der).hexdigest() in UNTRUSTED_SHA256:
++        if (
++            hashlib.sha1(der, usedforsecurity=False).hexdigest() in UNTRUSTED_SHA1
++            or hashlib.sha256(der).hexdigest() in UNTRUSTED_SHA256
++        ):
 +            removed += 1
 +            return b""
 +        return match.group()

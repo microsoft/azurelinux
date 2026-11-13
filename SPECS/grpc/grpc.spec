@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.62.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -156,6 +156,9 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.62.3-5
+- Remove additional emSign G1, C1 and ECC C3 roots from the bundled trust store.
+
 * Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.62.3-4
 - Add the trusted SSL.com TLS ECC Root CA 2022 to retain unaffected TLS paths.
 
