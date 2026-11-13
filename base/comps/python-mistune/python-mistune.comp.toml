@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python-mistune-3.3.4 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/python-mistune/c/6b611c1e0fd4c4f7c96f152939a2b2c37793c378
+[components.python-mistune]
+spec = { type = "upstream", upstream-commit = "6b611c1e0fd4c4f7c96f152939a2b2c37793c378" }
