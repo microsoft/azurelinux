@@ -21,10 +21,6 @@ Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/microsoft/kubevirt
 Source0:        https://github.com/microsoft/kubevirt/archive/refs/tags/openvmm-%{srctag}.tar.gz#/%{name}-%{srctag}.tar.gz
-%ifarch x86_64
-Source1:        https://github.com/microsoft/mu_msvm/releases/download/v%{msvm_version}/firmware-RELEASE-X64-VS2022.tar.gz
-Source2:        x64.json
-Source3:        x64-confidential.json
 Patch0:         CVE-2026-13622.patch
 Patch1:         CVE-2026-33814.patch
 Patch2:         CVE-2026-39821.patch
@@ -33,6 +29,10 @@ Patch4:         CVE-2026-78659.patch
 Patch5:         CVE-2026-78660.patch
 Patch6:         CVE-2026-78663.patch
 Patch7:         CVE-2026-97032.patch
+%ifarch x86_64
+Source1:        https://github.com/microsoft/mu_msvm/releases/download/v%{msvm_version}/firmware-RELEASE-X64-VS2022.tar.gz
+Source2:        x64.json
+Source3:        x64-confidential.json
 %endif
 
 %global debug_package %{nil}
