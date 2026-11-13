@@ -715,7 +715,6 @@ components = [
     "jomolhari-fonts",
     "jose",
     "jpegxl",
-    "jq",
     "js-d3-flame-graph",
     "jsch",
     "json-c",
@@ -2520,6 +2519,7 @@ components = [
     "tree-sitter",
     "tree-sitter-srpm-macros",
     "tree-sitter0.25",
+    "treelayout",
     "trustee-guest-components",
     "tslib",
     "tss2",
@@ -2667,7 +2667,6 @@ components = [
 [package-groups.exceptions-packages]
 description = "curated per-SRPM channel-consistency exceptions"
 default-package-config.publish.rpm-channel = "rpm-sdk"
-default-package-config.publish.debuginfo-channel = "rpm-sdk-debuginfo"
 packages = [
     # Qt5 GUI for editing doxygen configs; pulls full Qt5 stack.
     "doxygen-doxywizard", # srpm: doxygen
