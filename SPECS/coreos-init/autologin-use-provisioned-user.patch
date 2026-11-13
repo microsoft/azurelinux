@@ -1,0 +1,99 @@
+From cab67cef19a249da57133a0e651ee1f2ddd4b211 Mon Sep 17 00:00:00 2001
+From: Mayank Singh <mayansingh@microsoft.com>
+Date: Tue, 06 May 2026 05:44:13 +0000
+Subject: [PATCH] flatcar-autologin-generator: use provisioned user instead of
+ hardcoded core
+
+On ACL Phase 2, the core user has /sbin/nologin as its shell, which
+causes gettys to fail when flatcar.autologin triggers auto-login as
+core. Instead of hardcoding "core", determine the autologin user
+dynamically:
+
+1. If core has a valid login shell, use core (backward compatible).
+2. Otherwise, find the first UID >= 1000 user with a valid shell.
+3. If no valid user is found, skip autologin entirely.
+
+This ensures autologin works correctly when a user is provisioned via
+Ignition or other mechanisms, and silently does nothing when no
+interactive user exists (e.g., cloud-init users created after boot).
+
+Signed-off-by: Mayank Singh <mayansingh@microsoft.com>
+---
+ systemd/system-generators/flatcar-autologin-generator | 45 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 41 insertions(+), 4 deletions(-)
+
+diff --git a/systemd/system-generators/flatcar-autologin-generator b/systemd/system-generators/flatcar-autologin-generator
+index 1234567..abcdefg 100755
+--- a/systemd/system-generators/flatcar-autologin-generator
++++ b/systemd/system-generators/flatcar-autologin-generator
+@@ -18,22 +18,63 @@
+     DEST="$1"
+ fi
+ 
++# Determine the user to autologin as.
++# Returns the username on stdout, or nothing if no valid user is found.
++determine_autologin_user() {
++    local invalid_shells="/sbin/nologin /usr/sbin/nologin /bin/false /usr/bin/false"
++    local shell
++
++    # First, check if core has a valid shell (backward compatibility).
++    shell=$(getent passwd core 2>/dev/null | cut -d: -f7)
++    if [ -n "$shell" ]; then
++        local is_invalid=""
++        for s in $invalid_shells; do
++            if [ "$shell" = "$s" ]; then
++                is_invalid=1
++                break
++            fi
++        done
++        if [ -z "$is_invalid" ]; then
++            echo "core"
++            return
++        fi
++    fi
++
++    # Core is invalid or missing. Find the first UID >= 1000 user with a valid shell.
++    while IFS=: read -r name _ uid _ _ _ user_shell; do
++        [ "$uid" -ge 1000 ] 2>/dev/null || continue
++        [ "$name" = "nobody" ] && continue
++        local skip=""
++        for s in $invalid_shells; do
++            if [ "$user_shell" = "$s" ]; then
++                skip=1
++                break
++            fi
++        done
++        [ -z "$skip" ] && echo "$name" && return
++    done < /etc/passwd
++}
++
++AUTOLOGIN_USER=$(determine_autologin_user)
++# If no valid user found, skip autologin entirely.
++[ -z "$AUTOLOGIN_USER" ] && exit 0
++
+ overlay_unit() {
+     overlay_conf=$1
+     out_dir="${DEST}/${overlay_conf}.d"
+     out_file="${out_dir}/10-autologin.conf"
+     mkdir -p "${out_dir}"
+     if [[ "${overlay_conf}" == *serial* ]]; then
+-	cat << 'EOF' > "${out_file}"
++	cat << EOF > "${out_file}"
+ [Service]
+ ExecStart=
+-ExecStart=-/sbin/agetty --autologin core --keep-baud %I 115200,38400,9600 $TERM
++ExecStart=-/sbin/agetty --autologin ${AUTOLOGIN_USER} --keep-baud %I 115200,38400,9600 \$TERM
+ EOF
+     else
+-	cat << 'EOF' > "${out_file}"
++	cat << EOF > "${out_file}"
+ [Service]
+ ExecStart=
+-ExecStart=-/sbin/agetty --autologin core --noclear %I $TERM
++ExecStart=-/sbin/agetty --autologin ${AUTOLOGIN_USER} --noclear %I \$TERM
+ EOF
+     fi
+ }
+-- 
+2.39.2
+
