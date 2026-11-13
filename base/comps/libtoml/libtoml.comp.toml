@@ -1,0 +1,3 @@
+[components.libtoml]
+# Release: 37.20161213git%{shortcommit}%{?dist}
+release = { calculation = "manual" }
