@@ -1,0 +1,32 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Advertise the optional application-plugin post-setup callback on dnf5"
+type = "spec-insert-tag"
+tag = "Provides"
+value = "dnf5(plugin-post-base-setup) = 1"
+
+[[overlays]]
+description = "Advertise the architecture-qualified application-plugin callback on dnf5"
+type = "spec-insert-tag"
+tag = "Provides"
+value = "dnf5(plugin-post-base-setup)%{?_isa} = 1"
+
+[[overlays]]
+description = "Build the accessor against a libsolv retaining rpm-md file timestamps"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "libsolv(rpmmd-filetime) = 1"
+
+[[overlays]]
+description = "Advertise the C++ accessor and require the matching libsolv capability on libdnf5"
+type = "spec-append-lines"
+section = "%package"
+package = "libdnf5"
+lines = [
+    "Provides: libdnf5(package-filetime) = 1",
+    "Provides: libdnf5(package-filetime)%{?_isa} = 1",
+    "Requires: libsolv(rpmmd-filetime)%{?_isa} = 1",
+]

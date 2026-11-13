@@ -1,0 +1,16 @@
+# Feature version 1 selects a compatible libsolv runtime and installed SDK.
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Advertise rpm-md file-time support independently of the libsolv version"
+type = "spec-insert-tag"
+tag = "Provides"
+value = "libsolv(rpmmd-filetime) = 1"
+
+[[overlays]]
+description = "Allow architecture-qualified requirements for runtime file-time support"
+type = "spec-insert-tag"
+tag = "Provides"
+value = "libsolv(rpmmd-filetime)%{?_isa} = 1"
