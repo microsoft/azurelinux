@@ -14,7 +14,7 @@
 
 Name:           wget2
 Version:        2.3.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:        An advanced file and recursive website downloader
 
 # Documentation is GFDL
@@ -80,6 +80,7 @@ BuildRequires:  lzip
 
 # For gpg signature verification
 BuildRequires:  gnupg2
+BuildRequires: pkgconfig(openssl)
 
 Provides:       webclient
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -135,7 +136,7 @@ the system provider of wget.
 
 
 %build
-%configure --disable-static
+%configure --disable-static --with-ssl=openssl
 %if ! 0%{?rhel}
 # Remove RPATH, rely on default -Wl,--enable-new-dtags in Fedora.
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool

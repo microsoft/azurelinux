@@ -1,0 +1,16 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Build the TLS backend against OpenSSL; retain GnuTLS for the HTTPS test server"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "pkgconfig(openssl)"
+
+[[overlays]]
+description = "Use OpenSSL instead of the default GnuTLS backend"
+type = "spec-search-replace"
+section = "%build"
+regex = '--disable-static'
+replacement = "--disable-static --with-ssl=openssl"
