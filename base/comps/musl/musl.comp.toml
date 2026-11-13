@@ -1,0 +1,14 @@
+[components.musl]
+
+# Sources for the 1.2.6 update overlay; drop together with it once Fedora ships 1.2.6 or newer.
+[[components.musl.source-files]]
+filename = "musl-1.2.6.tar.gz"
+hash = "1adad96eddb3a2eb0cacb3e363b0046568925fcdd75cf8b0503f2139df1f693d64730779ca0ce8131b7624ab2d37f4247bb1d3393c523de6e30d2b1d7732555c"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://musl.libc.org/releases/musl-1.2.6.tar.gz" }
+
+[[components.musl.source-files]]
+filename = "musl-1.2.6.tar.gz.asc"
+hash = "59f15ffb206bd25b99cccc49a9dfe8fcd0f8ad78b9f769cc650c113f6fff35f9c5b6a431e5a9952f2fab5da20ce1586f1429d40947cf68164712ebbfc2b637fe"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://musl.libc.org/releases/musl-1.2.6.tar.gz.asc" }
