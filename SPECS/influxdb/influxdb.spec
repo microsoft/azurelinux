@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -86,6 +86,13 @@ Patch15:        CVE-2026-78663.patch
 Patch16:        CVE-2026-78669.patch
 Patch17:        CVE-2026-97032.patch
 Patch18:        remove-emudhra-ca-roots.patch
+Patch19:        CVE-2026-116585.patch
+Patch20:        CVE-2026-116586.patch
+Patch21:        CVE-2026-116587.patch
+Patch22:        CVE-2026-116591.patch
+Patch23:        CVE-2026-78661.patch
+Patch24:        CVE-2026-97045.patch
+Patch25:        CVE-2026-114456.patch
 BuildRequires:  clang
 BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
@@ -175,6 +182,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-25
+- Patch for CVE-2026-97045, CVE-2026-78661, CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585, CVE-2026-114456
+
 * Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.7.5-24
 - Remove additional emSign G1, C1 and ECC C3 roots from the Snowflake CA bundle.
 
