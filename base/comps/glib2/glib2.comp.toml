@@ -1,1 +1,15 @@
 [components.glib2]
+
+# Remove the exclusion once the upstream idle-thread fix is merged and adopted:
+# https://gitlab.gnome.org/GNOME/glib/-/merge_requests/5484
+[[components.glib2.overlays]]
+description = "Temporarily exclude thread-pool-slow while the upstream idle-thread shutdown fix is pending"
+type = "patch-add"
+source = "glib-skip-thread-pool-slow.patch"
+
+[components.glib2.overlays.metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+bugs = [
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/24867" },
+]
