@@ -1,0 +1,20 @@
+# Fedora packages libva 2.24.1 only on f45/rawhide; f43 and f44 are older.
+# Update to the upstream release for this CVE fix:
+# CVE-2026-56438
+# Remove this overlay once the imported Fedora spec packages 2.24.1 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.24.1"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.24.1"
+
+[[overlays]]
+description = "Remove the obsolete 2.22.0 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libva-2\.22\.0\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
