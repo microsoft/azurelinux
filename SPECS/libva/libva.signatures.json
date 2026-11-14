@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "baselibs.conf": "b5ce25db68a982e876b09aed5b6cb7646f2ef39a29b982d4eee29835cff4f69c",
-  "libva-2.20.0.tar.gz": "117f8d658a5fc9ea406ca80a3eb4ae1d70b15a54807c9ed77199c812bed73b60"
- }
+  "Signatures": {
+    "baselibs.conf": "b5ce25db68a982e876b09aed5b6cb7646f2ef39a29b982d4eee29835cff4f69c",
+    "libva-2.24.1.tar.gz": "0b4a3649ee8d683b9cce2ef094df4fb039d276c0cef7e49337c43d3b297b9f42"
+  }
 }
