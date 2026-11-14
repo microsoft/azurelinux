@@ -1,0 +1,7 @@
+[components.libva]
+
+[[components.libva.source-files]]
+filename = "libva-2.24.1.tar.gz"
+hash = "368bca5a0d3f0989a51d663e20027f7ab7c705d6204ec54a65a1457236c5930fd816b3d7618078f3495d73e944341b71a48f0fbdca4d036de0a54cee77438515"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/intel/libva/archive/2.24.1/libva-2.24.1.tar.gz" }
