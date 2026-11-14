@@ -41,7 +41,7 @@ Name: ca-certificates
 Version: 2026.2.92_v9.0.319
 # for Rawhide, please always use release >= 2
 # for Fedora release branches, please use release < 2 (1.0, 1.1, ...)
-Release: 2%{?dist}
+Release: 4%{?dist}
 License: MIT AND GPL-2.0-or-later
 
 URL: https://fedoraproject.org/wiki/CA-Certificates
@@ -65,6 +65,8 @@ Source16: README.pem
 Source17: README.edk2
 Source18: README.src
 Source19: README.etcssl
+Source20: check_certificate_exclusions.py
+Source21: excluded-certificates.json
 
 Patch0: remove-aaa-certificate-services.patch
 Patch1: remove-emsign-ecc-root-ca-g3.patch
@@ -93,6 +95,7 @@ BuildRequires: openssl
 BuildRequires: asciidoc
 BuildRequires: xmlto
 
+Patch3: remove-emsign-roots.patch
 %description
 This package contains the set of CA certificates chosen by the
 Mozilla Foundation for use with the Internet PKI.
@@ -109,6 +112,7 @@ cp %{SOURCE0} %{name}/certs/certdata.txt
 %patch -P 1 -p0 -d %{name}/certs
 %patch -P 2 -p0 -d %{name}/certs
 
+%patch -P 3 -p1 -d %{name}/certs
 %build
 pushd %{name}/certs
  pwd
@@ -325,6 +329,13 @@ ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
     $RPM_BUILD_ROOT%{pkidir}/tls/certs/ca-certificates.crt
 ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
     $RPM_BUILD_ROOT%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
+
+%check
+# Self-check: intentionally excluded certificates must not be present in the generated stores.
+python3 %{SOURCE20} --policy %{SOURCE21} \
+    %{buildroot}%{_datadir}/pki/ca-trust-source/%{p11_format_bundle} \
+    %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{legacy_default_bundle} \
+    %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_bundle}
 
 %clean
 /usr/bin/chmod u+w $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/directory-hash

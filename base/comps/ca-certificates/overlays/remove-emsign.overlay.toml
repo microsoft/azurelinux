@@ -1,0 +1,52 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove the five remaining emSign roots and their NSS trust records under Azure Linux's eMudhra policy"
+type = "patch-add"
+source = "../remove-emsign-roots.patch"
+
+[[overlays]]
+description = "Apply Azure Linux's eMudhra certificate removals after Fedora's existing patches"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P 3 -p1 -d %{name}/certs"]
+
+[[overlays]]
+description = "Provide a build-time regression check for prohibited CAs in the generated stores"
+type = "file-add"
+file = "check_certificate_exclusions.py"
+source = "../check_certificate_exclusions.py"
+
+[[overlays]]
+description = "Register the CA store policy checker as an RPM source"
+type = "spec-insert-tag"
+tag = "Source20"
+value = "check_certificate_exclusions.py"
+
+[[overlays]]
+description = "Provide the component-local eMudhra policy, including the AAA Certificate Services exclusion"
+type = "file-add"
+file = "excluded-certificates.json"
+source = "../excluded-certificates.json"
+
+[[overlays]]
+description = "Register the certificate exclusion policy without adding a Python YAML dependency"
+type = "spec-insert-tag"
+tag = "Source21"
+value = "excluded-certificates.json"
+
+[[overlays]]
+description = "Enforce the eMudhra certificate removal policy against the generated CA stores"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    '%check',
+    '# Self-check: intentionally excluded certificates must not be present in the generated stores.',
+    'python3 %{SOURCE20} --policy %{SOURCE21} \',
+    '    %{buildroot}%{_datadir}/pki/ca-trust-source/%{p11_format_bundle} \',
+    '    %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{legacy_default_bundle} \',
+    '    %{buildroot}%{_datadir}/pki/ca-trust-legacy/%{legacy_disable_bundle}',
+    '',
+]
