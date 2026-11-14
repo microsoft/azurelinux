@@ -1,0 +1,11 @@
+# Pin to Fedora f43 dpkg-1.23.11, then update to upstream 1.23.12 with an
+# overlay (see overlays/0001-update-to-1.23.12.overlay.toml).
+# https://src.fedoraproject.org/rpms/dpkg/c/e6278d14e4abda3f96451df3c44de9945beff02b
+[components.dpkg]
+spec = { type = "upstream", upstream-commit = "e6278d14e4abda3f96451df3c44de9945beff02b" }
+
+[[components.dpkg.source-files]]
+filename = "dpkg_1.23.12.tar.xz"
+hash = "e38e4003b1d0cacacdd73d6d8f69e1c1a1b93697ef9bb39ea3e8b9ee37f310b797f369b4b0b75675bf344a886a19dcc0c0f79ab88dae7b15d34c54987b025c6a"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://deb.debian.org/debian/pool/main/d/dpkg/dpkg_1.23.12.tar.xz" }

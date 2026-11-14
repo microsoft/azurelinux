@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 1;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -11,25 +11,29 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# Remove bad dependencies added by perl-generators
-%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(at|extra|file\\)$
-
 %global pkgconfdir %{_sysconfdir}/dpkg
 %global pkgdatadir %{_datadir}/dpkg
 
+# bash-completion < 2.18 ships its own completions for dpkg, dpkg-deb,
+# dpkg-query, dpkg-source and dselect. Starting with 2.18 (Fedora 45) they are
+# only used as a fallback when the dpkg ones are not installed.
+%if (0%{?fedora} && 0%{?fedora} < 45) || 0%{?rhel} == 10
+%bcond bash_completion 0
+%else
+%bcond bash_completion 1
+%endif
+
 Name:           dpkg
-Version:        1.23.7
+Version: 1.23.12
 Release:        %autorelease
 Summary:        Package maintenance system for Debian Linux
 License:        GPL-2.0-only AND GPL-2.0-or-later AND FSFAP AND FSFULLR
-URL:            https://tracker.debian.org/pkg/dpkg
-Source0:        http://ftp.debian.org/debian/pool/main/d/dpkg/%{name}_%{version}.tar.xz
+URL:            https://wiki.debian.org/Teams/Dpkg
+Source0:        https://deb.debian.org/debian/pool/main/d/dpkg/%{name}_%{version}.tar.xz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bzip2-devel
-BuildRequires:  dotconf-devel
-BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
 BuildRequires:  gettext-devel
@@ -96,7 +100,6 @@ Requires:   binutils
 Requires:   bzip2
 Requires:   dpkg-perl = %{version}-%{release}
 Requires:   gcc
-Requires:   lzma
 Requires:   make
 Requires:   patch
 Requires:   xz
@@ -114,10 +117,8 @@ Summary:    Dpkg perl modules
 BuildArch:  noarch
 
 Requires:   dpkg = %{version}-%{release}
-Requires:   perl-TimeDate
 Requires:   perl(Digest::MD5)
 Requires:   perl(Digest::SHA)
-Requires:   perl(Digest::SHA1)
 
 %description perl
 This package provides the perl modules used by the scripts in dpkg-dev. They
@@ -189,11 +190,13 @@ autoreconf -vif
     --disable-update-alternatives \
     --runstatedir=/run \
     --with-admindir=%{_localstatedir}/lib/dpkg \
+    --with-bashcompletionsdir=%{bash_completions_dir} \
     --with-libbz2 \
     --with-liblzma \
     --with-libselinux \
     --with-libz-ng \
-    --with-libzstd
+    --with-libzstd \
+    --with-zshcompletionsdir=%{zsh_completions_dir}
 
 %make_build
 
@@ -205,14 +208,15 @@ mkdir -p %{buildroot}/%{pkgconfdir}/origins
 # Prepare "vendor" files for dpkg-vendor
 cat <<EOF > %{buildroot}/%{pkgconfdir}/origins/fedora
 Vendor: Fedora
-Vendor-URL: http://www.fedoraproject.org/
+Vendor-URL: https://fedoraproject.org/
 Bugs: https://bugzilla.redhat.com
 EOF
 %if 0%{?fedora}
 ln -sf fedora %{buildroot}/%{pkgconfdir}/origins/default
 %endif
 
-# from debian/dpkg.install
+# from debian/dpkg.install and debian/dpkg-dev.install
+install -pm0644 debian/buildpackage.conf %{buildroot}/%{pkgconfdir}
 install -pm0644 debian/dpkg.cfg %{buildroot}/%{pkgconfdir}
 install -pm0644 debian/dselect.cfg %{buildroot}/%{pkgconfdir}
 install -pm0644 debian/shlibs.default %{buildroot}/%{pkgconfdir}
@@ -234,10 +238,33 @@ touch %{buildroot}%{_localstatedir}/log/dpkg.log
 %find_lang dpkg-dev
 %find_lang dselect
 
+# Translated man pages come and go with the po4a completeness threshold, so
+# add whatever has been generated to the language file lists.
+find %{buildroot}%{_mandir} -mindepth 3 -type f | sort | while read -r page; do
+    page=${page#%{buildroot}}
+    lang=$(echo "${page#%{_mandir}/}" | cut -d/ -f1)
+    case $(basename "$page") in
+    dselect.*)
+        list=dselect.lang ;;
+    dpkg.[0-9]*|dpkg.cfg.*|dpkg-deb.*|dpkg-divert.*|dpkg-maintscript-helper.*|\
+    dpkg-query.*|dpkg-realpath.*|dpkg-split.*|dpkg-statoverride.*|\
+    dpkg-trigger.*|start-stop-daemon.*)
+        list=dpkg.lang ;;
+    *)
+        list=dpkg-dev.lang ;;
+    esac
+    echo "%%lang($lang) $page*" >> $list
+done
+
 rm %{buildroot}%{_libdir}/libdpkg.la
 
+%if %{without bash_completion}
+# Conflicts with the files provided by bash-completion
+rm %{buildroot}%{bash_completions_dir}/{dpkg,dpkg-deb,dpkg-query,dpkg-source,dselect}
+%endif
+
 %check
-make TEST_PARALLEL=4 check
+make TEST_PARALLEL=%{_smp_build_ncpus} check
 
 %files -f dpkg.lang
 %license debian/copyright
@@ -249,12 +276,13 @@ make TEST_PARALLEL=4 check
 %config(noreplace) %{pkgconfdir}/dpkg.cfg
 %config(noreplace) %{pkgconfdir}/origins/*
 %config(noreplace) %{_sysconfdir}/logrotate.d/dpkg
-%config(noreplace) %{_localstatedir}/log/%{name}.log
+%ghost %{_localstatedir}/log/%{name}.log
 %dir %{_localstatedir}/lib/dpkg
-%config(noreplace) %{_localstatedir}/lib/dpkg/diversions
-%config(noreplace) %{_localstatedir}/lib/dpkg/statoverride
-%config(noreplace) %{_localstatedir}/lib/dpkg/status
+%verify(not md5 size mtime) %config(noreplace) %{_localstatedir}/lib/dpkg/diversions
+%verify(not md5 size mtime) %config(noreplace) %{_localstatedir}/lib/dpkg/statoverride
+%verify(not md5 size mtime) %config(noreplace) %{_localstatedir}/lib/dpkg/status
 %{_datadir}/doc/dpkg/*
+%dir %{_datadir}/dpkg/sh
 %{_datadir}/dpkg/sh/dpkg-error.sh
 %{_bindir}/dpkg
 %{_bindir}/dpkg-deb
@@ -266,30 +294,26 @@ make TEST_PARALLEL=4 check
 %{_bindir}/dpkg-statoverride
 %{_bindir}/dpkg-realpath
 %{_sbindir}/start-stop-daemon
+%dir %{_libexecdir}/dpkg
 %{_libexecdir}/dpkg/dpkg-db-backup
 %{_libexecdir}/dpkg/dpkg-db-keeper
-%{_mandir}/man1/dpkg.1.gz
-%{_mandir}/man1/dpkg-deb.1.gz
-%{_mandir}/man1/dpkg-divert.1.gz
-%{_mandir}/man1/dpkg-maintscript-helper.1.gz
-%{_mandir}/man1/dpkg-query.1.gz
-%{_mandir}/man1/dpkg-realpath.1.gz
-%{_mandir}/man1/dpkg-split.1.gz
-%{_mandir}/man1/dpkg-statoverride.1.gz
-%{_mandir}/man1/dpkg-trigger.1.gz
-%{_mandir}/man5/dpkg.cfg.5.gz
-%{_mandir}/man8/start-stop-daemon.8.gz
-%{_mandir}/*/man1/dpkg.1.gz
-%{_mandir}/*/man1/dpkg-deb.1.gz
-%{_mandir}/*/man1/dpkg-divert.1.gz
-%{_mandir}/*/man1/dpkg-maintscript-helper.1.gz
-%{_mandir}/*/man1/dpkg-query.1.gz
-%{_mandir}/*/man1/dpkg-realpath.1.gz
-%{_mandir}/*/man1/dpkg-split.1.gz
-%{_mandir}/*/man1/dpkg-statoverride.1.gz
-%{_mandir}/*/man1/dpkg-trigger.1.gz
-%{_mandir}/*/man5/dpkg.cfg.5.gz
-%{_mandir}/*/man8/start-stop-daemon.8.gz
+%if %{with bash_completion}
+%{bash_completions_dir}/dpkg
+%{bash_completions_dir}/dpkg-deb
+%{bash_completions_dir}/dpkg-query
+%endif
+%{bash_completions_dir}/start-stop-daemon
+%{_mandir}/man1/dpkg.1*
+%{_mandir}/man1/dpkg-deb.1*
+%{_mandir}/man1/dpkg-divert.1*
+%{_mandir}/man1/dpkg-maintscript-helper.1*
+%{_mandir}/man1/dpkg-query.1*
+%{_mandir}/man1/dpkg-realpath.1*
+%{_mandir}/man1/dpkg-split.1*
+%{_mandir}/man1/dpkg-statoverride.1*
+%{_mandir}/man1/dpkg-trigger.1*
+%{_mandir}/man5/dpkg.cfg.5*
+%{_mandir}/man8/start-stop-daemon.8*
 %dir %{pkgdatadir}
 %{pkgdatadir}/abitable
 %{pkgdatadir}/cputable
@@ -298,13 +322,14 @@ make TEST_PARALLEL=4 check
 
 %files devel
 %{_datadir}/aclocal/dpkg-*.m4
-%{_includedir}/dpkg/*.h
+%{_includedir}/dpkg/
 %{_libdir}/libdpkg.a
 %{_libdir}/pkgconfig/libdpkg.pc
-%{_mandir}/man7/libdpkg.7.gz
+%{_mandir}/man7/libdpkg.7*
 
 %files dev -f dpkg-dev.lang
 %doc doc/README.feature-removal-schedule doc/README.api doc/spec
+%config(noreplace) %{pkgconfdir}/buildpackage.conf
 %config(noreplace) %{pkgconfdir}/shlibs.default
 %config(noreplace) %{pkgconfdir}/shlibs.override
 %{_bindir}/dpkg-architecture
@@ -326,101 +351,58 @@ make TEST_PARALLEL=4 check
 %{_bindir}/dpkg-shlibdeps
 %{_bindir}/dpkg-source
 %{_bindir}/dpkg-vendor
-%{_datadir}/zsh/vendor-completions/_dpkg-parsechangelog
-%{_mandir}/man1/dpkg-architecture.1.gz
-%{_mandir}/man1/dpkg-buildapi.1.gz
-%{_mandir}/man1/dpkg-buildflags.1.gz
-%{_mandir}/man1/dpkg-buildpackage.1.gz
-%{_mandir}/man1/dpkg-buildtree.1.gz
-%{_mandir}/man1/dpkg-checkbuilddeps.1.gz
-%{_mandir}/man1/dpkg-distaddfile.1.gz
-%{_mandir}/man1/dpkg-genbuildinfo.1.gz
-%{_mandir}/man1/dpkg-genchanges.1.gz
-%{_mandir}/man1/dpkg-gencontrol.1.gz
-%{_mandir}/man1/dpkg-gensymbols.1.gz
-%{_mandir}/man1/dpkg-mergechangelogs.1.gz
-%{_mandir}/man1/dpkg-name.1.gz
-%{_mandir}/man1/dpkg-parsechangelog.1.gz
-%{_mandir}/man1/dpkg-scanpackages.1.gz
-%{_mandir}/man1/dpkg-scansources.1.gz
-%{_mandir}/man1/dpkg-shlibdeps.1.gz
-%{_mandir}/man1/dpkg-source.1.gz
-%{_mandir}/man1/dpkg-vendor.1.gz
-%{_mandir}/man5/deb.5.gz
-%{_mandir}/man5/deb822.5.gz
-%{_mandir}/man5/deb-buildinfo.5.gz
-%{_mandir}/man5/deb-changelog.5.gz
-%{_mandir}/man5/deb-changes.5.gz
-%{_mandir}/man5/deb-conffiles.5.gz
-%{_mandir}/man5/deb-control.5.gz
-%{_mandir}/man5/deb-extra-override.5.gz
-%{_mandir}/man5/deb-md5sums.5.gz
-%{_mandir}/man5/deb-old.5.gz
-%{_mandir}/man5/deb-origin.5.gz
-%{_mandir}/man5/deb-override.5.gz
-%{_mandir}/man5/deb-postinst.5.gz
-%{_mandir}/man5/deb-postrm.5.gz
-%{_mandir}/man5/deb-preinst.5.gz
-%{_mandir}/man5/deb-prerm.5.gz
-%{_mandir}/man5/deb-shlibs.5.gz
-%{_mandir}/man5/deb-split.5.gz
-%{_mandir}/man5/deb-src-control.5.gz
-%{_mandir}/man5/deb-src-files.5.gz
-%{_mandir}/man5/deb-src-rules.5.gz
-%{_mandir}/man5/deb-src-symbols.5.gz
-%{_mandir}/man5/deb-substvars.5.gz
-%{_mandir}/man5/deb-symbols.5.gz
-%{_mandir}/man5/deb-triggers.5.gz
-%{_mandir}/man5/dsc.5.gz
-%{_mandir}/man7/deb-version.7.gz
-%{_mandir}/man7/dpkg-build-api.7.gz
-%{_mandir}/*/man1/dpkg-architecture.1.gz
-%{_mandir}/*/man1/dpkg-buildapi.1.gz
-%{_mandir}/*/man1/dpkg-buildflags.1.gz
-%{_mandir}/*/man1/dpkg-buildpackage.1.gz
-%{_mandir}/*/man1/dpkg-buildtree.1.gz
-%{_mandir}/*/man1/dpkg-checkbuilddeps.1.gz
-%{_mandir}/*/man1/dpkg-distaddfile.1.gz
-%{_mandir}/*/man1/dpkg-genbuildinfo.1.gz
-%{_mandir}/*/man1/dpkg-genchanges.1.gz
-%{_mandir}/*/man1/dpkg-gencontrol.1.gz
-%{_mandir}/*/man1/dpkg-gensymbols.1.gz
-%{_mandir}/*/man1/dpkg-mergechangelogs.1.gz
-%{_mandir}/*/man1/dpkg-name.1.gz
-%{_mandir}/*/man1/dpkg-parsechangelog.1.gz
-%{_mandir}/*/man1/dpkg-scanpackages.1.gz
-%{_mandir}/*/man1/dpkg-scansources.1.gz
-%{_mandir}/*/man1/dpkg-shlibdeps.1.gz
-%{_mandir}/*/man1/dpkg-source.1.gz
-%{_mandir}/*/man1/dpkg-vendor.1.gz
-%{_mandir}/*/man5/deb.5.gz
-%{_mandir}/*/man5/deb822.5.gz
-%{_mandir}/*/man5/deb-buildinfo.5.gz
-%{_mandir}/*/man5/deb-changelog.5.gz
-%{_mandir}/*/man5/deb-changes.5.gz
-%{_mandir}/*/man5/deb-conffiles.5.gz
-%{_mandir}/*/man5/deb-control.5.gz
-%{_mandir}/*/man5/deb-extra-override.5.gz
-%{_mandir}/*/man5/deb-md5sums.5.gz
-%{_mandir}/*/man5/deb-old.5.gz
-%{_mandir}/*/man5/deb-origin.5.gz
-%{_mandir}/*/man5/deb-override.5.gz
-%{_mandir}/*/man5/deb-postinst.5.gz
-%{_mandir}/*/man5/deb-postrm.5.gz
-%{_mandir}/*/man5/deb-preinst.5.gz
-%{_mandir}/*/man5/deb-prerm.5.gz
-%{_mandir}/*/man5/deb-shlibs.5.gz
-%{_mandir}/*/man5/deb-split.5.gz
-%{_mandir}/*/man5/deb-src-control.5.gz
-%{_mandir}/*/man5/deb-src-files.5.gz
-%{_mandir}/*/man5/deb-src-rules.5.gz
-%{_mandir}/*/man5/deb-src-symbols.5.gz
-%{_mandir}/*/man5/deb-substvars.5.gz
-%{_mandir}/*/man5/deb-symbols.5.gz
-%{_mandir}/*/man5/deb-triggers.5.gz
-%{_mandir}/*/man5/dsc.5.gz
-%{_mandir}/*/man7/deb-version.7.gz
-%{_mandir}/*/man7/dpkg-build-api.7.gz
+%if %{with bash_completion}
+%{bash_completions_dir}/dpkg-source
+%endif
+%{zsh_completions_dir}/_dpkg-parsechangelog
+%{_mandir}/man1/dpkg-architecture.1*
+%{_mandir}/man1/dpkg-buildapi.1*
+%{_mandir}/man1/dpkg-buildflags.1*
+%{_mandir}/man1/dpkg-buildpackage.1*
+%{_mandir}/man1/dpkg-buildtree.1*
+%{_mandir}/man1/dpkg-checkbuilddeps.1*
+%{_mandir}/man1/dpkg-distaddfile.1*
+%{_mandir}/man1/dpkg-genbuildinfo.1*
+%{_mandir}/man1/dpkg-genchanges.1*
+%{_mandir}/man1/dpkg-gencontrol.1*
+%{_mandir}/man1/dpkg-gensymbols.1*
+%{_mandir}/man1/dpkg-mergechangelogs.1*
+%{_mandir}/man1/dpkg-name.1*
+%{_mandir}/man1/dpkg-parsechangelog.1*
+%{_mandir}/man1/dpkg-scanpackages.1*
+%{_mandir}/man1/dpkg-scansources.1*
+%{_mandir}/man1/dpkg-shlibdeps.1*
+%{_mandir}/man1/dpkg-source.1*
+%{_mandir}/man1/dpkg-vendor.1*
+%{_mandir}/man5/deb.5*
+%{_mandir}/man5/deb822.5*
+%{_mandir}/man5/deb-buildinfo.5*
+%{_mandir}/man5/deb-changelog.5*
+%{_mandir}/man5/deb-changes.5*
+%{_mandir}/man5/deb-conffiles.5*
+%{_mandir}/man5/deb-control.5*
+%{_mandir}/man5/deb-extra-override.5*
+%{_mandir}/man5/deb-md5sums.5*
+%{_mandir}/man5/deb-old.5*
+%{_mandir}/man5/deb-origin.5*
+%{_mandir}/man5/deb-override.5*
+%{_mandir}/man5/deb-postinst.5*
+%{_mandir}/man5/deb-postrm.5*
+%{_mandir}/man5/deb-preinst.5*
+%{_mandir}/man5/deb-prerm.5*
+%{_mandir}/man5/deb-shlibs.5*
+%{_mandir}/man5/deb-split.5*
+%{_mandir}/man5/deb-src-control.5*
+%{_mandir}/man5/deb-src-files.5*
+%{_mandir}/man5/deb-src-rules.5*
+%{_mandir}/man5/deb-src-symbols.5*
+%{_mandir}/man5/deb-substvars.5*
+%{_mandir}/man5/deb-symbols.5*
+%{_mandir}/man5/deb-triggers.5*
+%{_mandir}/man5/dsc.5*
+%{_mandir}/man7/deb-email.7*
+%{_mandir}/man7/deb-version.7*
+%{_mandir}/man7/dpkg-build-api.7*
 %{pkgdatadir}/*.mk
 
 %files perl
@@ -431,17 +413,27 @@ make TEST_PARALLEL=4 check
 %files -n dselect -f dselect.lang
 %config(noreplace) %{pkgconfdir}/dselect.cfg
 %{_bindir}/dselect
+%if %{with bash_completion}
+%{bash_completions_dir}/dselect
+%endif
 %{perl_vendorlib}/Dselect
 %{_libexecdir}/dpkg/methods
 %{_localstatedir}/lib/dpkg/methods
-%{_mandir}/man1/dselect.1.gz
-%{_mandir}/man5/dselect.cfg.5.gz
-%{_mandir}/*/man1/dselect.1.gz
-%{_mandir}/*/man5/dselect.cfg.5.gz
+%{_mandir}/man1/dselect.1*
+%{_mandir}/man5/dselect.cfg.5*
 %dir %{pkgconfdir}/dselect.cfg.d
 
 %changelog
 ## START: Generated by rpmautospec
+* Sat Nov 14 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.23.12-1
+- fix(dpkg): upgrade to 1.23.12 to address CVE-2026-91094
+
+* Mon Nov 02 2026 Simone Caronni <negativo17@gmail.com> - 1.23.11-2
+- Do not ship bash completions provided by bash-completion < 2.18
+
+* Sat Oct 31 2026 Simone Caronni <negativo17@gmail.com> - 1.23.11-1
+- Update to 1.23.11 and cleanup
+
 * Sat Nov 07 2026 Dan Streetman <ddstreet@ieee.org> - 1.23.7-4
 - fix(locks): force-update stale upstream commits in lock files
 
