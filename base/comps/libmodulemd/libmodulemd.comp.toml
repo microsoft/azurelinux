@@ -1,0 +1,4 @@
+# Pin to Fedora f43 libmodulemd-2.15.4-1.fc43 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/libmodulemd/c/84b36bf188b6e986117b19adeaad73401eb2ccb1
+[components.libmodulemd]
+spec = { type = "upstream", upstream-commit = "84b36bf188b6e986117b19adeaad73401eb2ccb1" }
