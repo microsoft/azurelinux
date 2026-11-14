@@ -1,3 +1,6 @@
+# kpipewire pulls in libavcodec/libavformat/libavfilter/libavutil, which AZL
+# does not ship. Kpipewire-dependent media integrations may be unavailable
+# without it.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"

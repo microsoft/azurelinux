@@ -1,3 +1,5 @@
+# Fedora conditionally requires this legacy Intel TrueScale PSM dependency on
+# x86_64 when %{fedora} is set, which is also true for the AZL build.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"

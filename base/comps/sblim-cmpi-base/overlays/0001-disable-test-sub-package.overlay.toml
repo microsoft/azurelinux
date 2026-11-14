@@ -1,3 +1,6 @@
+# The optional sblim-cmpi-base-test harness hard-requires sblim-testsuite.
+# Its package and dependency are both gated by with_test_subpackage, so
+# disabling that macro keeps the base provider without the sdk-tier harness.
 [metadata]
 category = "azl-pruning"
 upstream-status = "needs-upstream-hook"

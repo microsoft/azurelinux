@@ -1,5 +1,0 @@
-# AZL does not ship faad2 (AAC requires CELA review). Remove the faad2
-# BuildRequires and the lqt_faad2.so plugin from %files. The autotools
-# build system auto-detects that faad2 is absent and skips the AAC plugin.
-[components.libquicktime]
-

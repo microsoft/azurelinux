@@ -1,3 +1,5 @@
+# CMake marks find_package(FFmpeg) OPTIONAL, so missing headers disable the
+# ffmpegextractor plugin rather than the other taglib/poppler/exiv2 extractors.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"

@@ -1,3 +1,5 @@
+# There is no avif bcond, so dropping the dependency must also disable avif
+# support rather than merely disabling shared linking.
 [metadata]
 category = "azl-pruning"
 upstream-status = "needs-upstream-hook"

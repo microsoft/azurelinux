@@ -1,6 +1,0 @@
-# AZL does not ship libavif — disable avif image loading support.
-# SDL2_image has no bcond for avif; remove the BR and change configure
-# flag from --disable-avif-shared to --disable-avif.
-
-[components.SDL2_image]
-
