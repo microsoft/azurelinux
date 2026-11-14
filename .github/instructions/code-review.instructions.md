@@ -5,6 +5,31 @@ excludeAgent: "cloud-agent"
 
 # Code review guidance
 
+## Component version changes
+
+- Compare each affected component's effective upstream version before and after
+  the PR, including changes caused indirectly by upstream pins, lock files,
+  overlays, or shared defaults. Use rendered specs and component configuration
+  as evidence; do not rely solely on the PR title or a literal version edit.
+- A change to a new **major version** (for example, `1.9.4` to `2.0.0`) requires
+  a **high-severity** review comment stating that maintainer approval is required
+  before merging.
+- A change to a new **minor version** within the same major version (for example,
+  `1.9.4` to `1.10.0`) requires a **medium-severity** review comment stating that
+  maintainer approval is required before merging.
+- Start the finding's title with "Maintainer approval required:" and identify
+  the component and old/new versions. Report only the major-version finding
+  when both major and minor numbers change.
+- Report each version-change approval requirement as an inline review comment
+  on the changed line responsible for the update, not solely in the review
+  summary. Include the component and old/new versions.
+- Apply these checkpoints even when the version change is intentional. They
+  request maintainer sign-off, not a revert or a claim that the update is broken.
+  Report independently demonstrated defects separately.
+- Patch-only updates (for example, `1.9.4` to `1.9.5`) and RPM release-only
+  changes do not trigger this rule. Follow the upstream project's versioning
+  scheme; do not invent major/minor classifications for ambiguous versions.
+
 ## Publication channels
 
 - Flag any addition or removal of publication channels as requiring maintainer
