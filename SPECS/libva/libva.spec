@@ -23,8 +23,8 @@
 
 Name:           libva
 %define _name   libva
-Version:        2.20.0
-Release:        2%{?dist}
+Version:        2.24.1
+Release:        1%{?dist}
 Summary:        Video Acceleration (VA) API
 License:        MIT
 Group:          Development/Libraries/C and C++
@@ -205,6 +205,9 @@ rm -rf `find %{buildroot}%{_libdir}/pkgconfig/libva*.pc | grep -v "glx"`
 %endif
 
 %changelog
+* Sat Nov 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.24.1-1
+- Auto-upgrade to 2.24.1 - for CVE-2026-56438
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.20.0-2
 - Add missing Vendor and Distribution tags.
 
