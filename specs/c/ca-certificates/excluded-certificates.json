@@ -1,0 +1,142 @@
+{
+  "prohibited_names": [
+    "emsign",
+    "em dv",
+    "em ov",
+    "em ev"
+  ],
+  "certificates": [
+    {
+      "name": "emSign ECC Root CA - G3",
+      "sha256": "86a1ecba089c4a8d3bbe2734c612ba341d813e043cf9e8a862cd5c57a36bbe6b"
+    },
+    {
+      "name": "emSign Root Client Auth CA - G3",
+      "sha256": "bbd8b3d745efb79198d93b9c482b9d934537325729ea2f02c129261f91be2e3d"
+    },
+    {
+      "name": "emSign Root CS CA - G3",
+      "sha256": "f2edaaff3d9b701fb4d14c9f285f8c0bad90fc3bcc1fa07d47f4718edaba34a5"
+    },
+    {
+      "name": "emSign Root SMIME CA - G3",
+      "sha256": "f76a0d440c418dc5b362be8e11e0a5d06023f4396093e4f455827bf55153d8a4"
+    },
+    {
+      "name": "emSign Root TLS CA - G3",
+      "sha256": "7dd78d5f4f13459a83dff9abbba62edbaf6f2d102bf257fd712f4d9f2746ed8d"
+    },
+    {
+      "name": "emSign Root TSA CA - G3",
+      "sha256": "75d2ce75979cf2a43b172c9f89f733dda2136031db4bbf3698b053714c077155"
+    },
+    {
+      "name": "AAA Certificate Services",
+      "sha256": "d7a7a0fb5d7e2731d771e9484ebcdef71d5f0c3e0a2948782bc83ee0ea699ef4"
+    },
+    {
+      "name": "emSign ECC Root CA - C3",
+      "sha1": "b6af43c29b81537df6ef6bc31f1f60150cee4866"
+    },
+    {
+      "name": "emSign Root CA - C1",
+      "sha1": "e72ef1dffcb20928cf5dd4d56737b151cb864f01"
+    },
+    {
+      "name": "emSign Root CA - C2",
+      "sha1": "bca2188074c3147e16f4c48c5910a89ef752f479"
+    },
+    {
+      "name": "emSign Root CA - G1",
+      "sha1": "8ac7ad8f73ac4ec1b5754da540f4fccf7cb58e8c"
+    },
+    {
+      "name": "emSign Root CA - G2",
+      "sha1": "1e6577b9cf70d017cae1bda1351d4725a973c06d"
+    },
+    {
+      "name": "emSign Root Client Auth CA - G1",
+      "sha1": "ef00428c8bd55bf387dc3bd5599218eae0954b07"
+    },
+    {
+      "name": "emSign Root CS CA - G2",
+      "sha1": "1e3897900af0a482f1134acdc4202364fe55553f"
+    },
+    {
+      "name": "emSign Root SMIME CA - G1",
+      "sha1": "ad4eb39a75b72a4eb1e3224fcd4053504d0d8ef6"
+    },
+    {
+      "name": "emSign Root TLS CA - G1",
+      "sha1": "a670cbde482554129cad3e1c4b1372f669f75cad"
+    },
+    {
+      "name": "emSign Root TSA CA - G2",
+      "sha1": "aecc6124a6cb7f7c1bc0d63623723e8a09cf587e"
+    },
+    {
+      "name": "EM DV TLS CA - G3B",
+      "sha256": "42c4accd12c4f59597925e1a08a7a90102608543809308d50ec427e118ba1493"
+    },
+    {
+      "name": "EM DV TLS CA - G3B",
+      "sha256": "45a883f349aedfd5f3a649b5498ffb121712ba8b448f3f2a91dbc5a766fcddbe"
+    },
+    {
+      "name": "EM OV TLS CA - G3B",
+      "sha256": "98b896625c0c230adeec3eb2cf6aad5001ecf9156a68644e82374ce5833bc25b"
+    },
+    {
+      "name": "EM OV TLS CA - G3B",
+      "sha256": "5f1ded4dd590af74631290cf073b122a2aac6a1fa479778a0bd43579bd832699"
+    },
+    {
+      "name": "EM EV TLS CA - G3B",
+      "sha256": "e7568fe6e12331f4fd7de61da4c7559d0f8eb192a218d4741a3ba75184333838"
+    },
+    {
+      "name": "EM EV TLS CA - G3B",
+      "sha256": "579480aea166290bd3c643589e795fc0d0e54e86505d180f1dff99efd3199512"
+    },
+    {
+      "name": "EM DV TLS CA - G3C",
+      "sha256": "0164d7ceae5bb909c272af151ff44b1177ae9b47d9424b94f1d9558c30934d19"
+    },
+    {
+      "name": "EM DV TLS CA - G3C",
+      "sha256": "62b7f9868263f72f6911fc78ceaf72c1979158b7368bf648683bb2aa39b02e72"
+    },
+    {
+      "name": "EM OV TLS CA - G3C",
+      "sha256": "cb6e15165ac802e9b3f993f16c25d41f4e81c21ebde71ae1b012ac00bf9c7c3f"
+    },
+    {
+      "name": "EM OV TLS CA - G3C",
+      "sha256": "7485b51c0ed192878fa1d2f948fb529ae1842cc5086c4b67f7be5b2039de9489"
+    },
+    {
+      "name": "EM EV TLS CA - G3C",
+      "sha256": "432ec25f0d28de9006d97bf752f17bbb2cd41f669933fcb072d9a1148d0261f3"
+    },
+    {
+      "name": "EM EV TLS CA - G3C",
+      "sha256": "fd9d5c2dbbd4995ab69b8d50c439d9527b00529199c2fd01b2174eb58f07021f"
+    },
+    {
+      "name": "EM OV CS CA - G3B",
+      "sha256": "9e39de2881273acc225a149c72ba3e0f51424963669ab633ee1dc7df5db067b4"
+    },
+    {
+      "name": "EM OV CS CA - G3B",
+      "sha256": "a496e23ac0cab8155fc9b117b97eae368efcbb9041aec8804d5a308d2d01c2d8"
+    },
+    {
+      "name": "EM OV CS CA - G3C",
+      "sha256": "4b2460a466f95fd40113bcdcca2ceb29b3b093921de45474da7df48874c630b1"
+    },
+    {
+      "name": "EM OV CS CA - G3C",
+      "sha256": "84112972b8e59d14560ae7e7119654474aad119990cf3722bfc1e3b91615e1fd"
+    }
+  ]
+}
