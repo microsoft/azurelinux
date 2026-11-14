@@ -1,7 +1,7 @@
 Summary:        Netfilter Tables userspace utillites
 Name:           nftables
 Version:        1.0.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source3:        main.nft
 Source4:        router.nft
 Source5:        nat.nft
 Patch0:         fix_crash_when_ops_dont_support_udata.patch
+Patch1:         evaluate_skip_byteorder_conversion_for_short_selectors.patch
 
 BuildRequires:  asciidoc
 BuildRequires:  bison
@@ -135,6 +136,11 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 %{python3_sitelib}/nftables/
 
 %changelog
+* Sat Nov 14 2026 Rachel Menge <rachelmenge@microsoft.com> - 1.0.9-3
+- Backport upstream fix to skip byteorder conversion for selector lengths
+  smaller than two bytes, restoring kernel 6.18 compatibility for interval
+  concatenations using one-byte selectors.
+
 * Thu Jun 18 2026 Sumedh Sharma <sumsharma@microsoft.com> - 1.0.9-2
 - Fix segmentation fault when listing ruleset containing unsupported
   udata in expression.
