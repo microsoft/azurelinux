@@ -2,7 +2,7 @@
 %global gem_name addressable
 Summary:        an alternative implementation to the URI implementation that is part of Ruby's standard library
 Name:           rubygem-%{gem_name}
-Version:        2.9.0
+Version:        2.9.2
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Sat Nov 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.9.2-1
+- Auto-upgrade to 2.9.2 - for CVE-2026-126351
+
 * Fri Apr 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.9.0-1
 - Auto-upgrade to 2.9.0 - for CVE-2026-35611
 

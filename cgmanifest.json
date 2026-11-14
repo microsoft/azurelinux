@@ -26794,8 +26794,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-addressable",
-          "version": "2.9.0",
-          "downloadUrl": "https://github.com/sporkmonger/addressable/archive/refs/tags/addressable-2.9.0.tar.gz"
+          "version": "2.9.2",
+          "downloadUrl": "https://github.com/sporkmonger/addressable/archive/refs/tags/addressable-2.9.2.tar.gz"
         }
       }
     },
