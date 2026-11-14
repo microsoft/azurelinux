@@ -1,7 +1,0 @@
-# AZL does not ship the sox component, so drop both the BuildRequires that
-# guards the runtime dep and the weak Recommends. festival-freebsoft-utils
-# loses some optional audio-processing features without sox, but the core
-# functionality consumed by speech-dispatcher's festival output module still
-# works.
-[components.festival-freebsoft-utils]
-

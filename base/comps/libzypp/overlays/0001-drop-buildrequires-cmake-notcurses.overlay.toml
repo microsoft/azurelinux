@@ -1,3 +1,5 @@
+# The disabled ENABLE_DEVTOOL_REPOMIRROR feature is the only notcurses user.
+# notcurses also pulls in ffmpeg-free-devel, which AZL does not ship.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"
