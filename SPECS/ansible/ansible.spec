@@ -29,8 +29,7 @@ BuildArch:      noarch
 Ansible is a radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 python3 setup.py build
