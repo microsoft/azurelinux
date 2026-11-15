@@ -1,0 +1,62 @@
+# Fedora f43 and f44 package aspell 0.60.8.1. Update to the upstream
+# 0.60.8.3 patch release on the same spec for these CVE fixes:
+# CVE-2026-75818, CVE-2026-75819, CVE-2026-75820, CVE-2026-103658
+# Remove this overlay once the imported Fedora spec packages 0.60.8.3 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 0.60.8.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.60.8.3"
+
+[[overlays]]
+description = "Drop the gcc 15 build fix, upstream since 0.60.8.2 (ee6cbb1)"
+type = "patch-remove"
+file = "aspell-0.60.8-gcc15.patch"
+
+[[overlays]]
+description = "Drop the application of the removed gcc 15 patch"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P3 -p1 -b \.gcc15$'
+replacement = ''
+
+[[overlays]]
+description = "Drop the comment pointing at the removed gcc 15 patch"
+type = "spec-search-replace"
+regex = '^# https://github\.com/GNUAspell/aspell/commit/ee6cbb1\.patch$'
+replacement = ''
+
+# 0.60.8.3 removed the MySpell example code, so configure no longer lists
+# myspell/Makefile. Rebase the pkg-config patch by dropping it from the
+# patch context; the change the patch makes stays the same.
+[[overlays]]
+description = "pspell_conf patch: drop myspell/Makefile from the ac_config_files lines"
+type = "file-search-replace"
+file = "aspell-0.60.7-pspell_conf.patch"
+regex = ' myspell/Makefile lib5/Makefile"'
+replacement = ' lib5/Makefile"'
+
+[[overlays]]
+description = "pspell_conf patch: drop the myspell/Makefile context line"
+type = "file-search-replace"
+file = "aspell-0.60.7-pspell_conf.patch"
+regex = '(?m)^     "myspell/Makefile"\) CONFIG_FILES="\$CONFIG_FILES myspell/Makefile" ;;\r?\n'
+replacement = ''
+
+[[overlays]]
+description = "pspell_conf patch: adjust the hunk header for the removed context line"
+type = "file-search-replace"
+file = "aspell-0.60.7-pspell_conf.patch"
+regex = '@@ -19887,6 \+19887,7 @@'
+replacement = '@@ -19887,5 +19887,6 @@'
+
+[[overlays]]
+description = "Remove the obsolete 0.60.8.1 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(aspell-0\.60\.8\.1\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
