@@ -1,0 +1,7 @@
+[components.aspell]
+
+[[components.aspell.source-files]]
+filename = "aspell-0.60.8.3.tar.gz"
+hash = "708aaec8c177ae05b72bbe64d74f4bcb1834eb07ad4ca5912918dfa017f99eba3ae95b29837df6df1f71d547a7f02acc3dd253ca2a93aa068b13e1fc542e2ec8"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://ftp.gnu.org/gnu/aspell/aspell-0.60.8.3.tar.gz" }
