@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove eMudhra's emSign G1 DER root from the crate's certificate set"
+type = "patch-add"
+source = "../remove-emudhra-certificates.patch"
