@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        0.22.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        Comprehensive HTTP client library
 License:        MIT
 URL:            https://pypi.python.org/pypi/httplib2
@@ -21,6 +21,7 @@ BuildArch:      noarch
 A comprehensive HTTP client library that supports many features left out of\
 other HTTP libraries.
 
+Patch2: remove-aaa-certificate-services.patch
 %description %{_description}
 
 %package -n python3-%{srcname}
