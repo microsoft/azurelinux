@@ -1,3 +1,6 @@
+# ffmpeg/ffprobe provide optional video preview and analysis functionality.
+# Applications needing those features still need the external tools; removing
+# the package dependencies does not make those features work without them.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"

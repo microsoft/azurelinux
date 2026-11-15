@@ -1,9 +1,0 @@
-# Drop the BuildRequires on neatvnc and disable the meson backend-vnc
-# option. neatvnc BuildRequires libavcodec/libavfilter/libavutil; Azure
-# Linux is removing ffmpeg/libav* (and neatvnc itself) from the distro.
-#
-# Practical impact: weston's vnc-backend.so (VNC remote screensharing
-# compositor) is no longer built; other weston backends (drm, wayland,
-# x11, headless, pipewire, rdp) are unaffected.
-[components.weston]
-

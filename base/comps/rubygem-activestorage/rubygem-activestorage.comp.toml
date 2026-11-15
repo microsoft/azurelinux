@@ -1,7 +1,0 @@
-# Drop the ffmpeg / ffprobe BuildRequires and Suggests. Azure Linux is
-# removing ffmpeg/libav* from the distro; the rails ActiveStorage gem
-# uses these binaries only for optional video previews/analysis. The
-# gem builds, installs, and runs without them — applications that need
-# video previews would have had to install ffmpeg explicitly anyway.
-[components.rubygem-activestorage]
-

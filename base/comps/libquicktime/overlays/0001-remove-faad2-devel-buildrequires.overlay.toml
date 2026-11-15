@@ -1,3 +1,5 @@
+# Autotools detects that faad2 is absent and skips the AAC plugin, so its
+# unbuilt lqt_faad2.so must also be removed from the package file list.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"

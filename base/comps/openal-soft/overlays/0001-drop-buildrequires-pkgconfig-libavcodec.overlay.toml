@@ -1,3 +1,5 @@
+# CMake gates the unshipped alffplay example on find_package(FFmpeg), so removing
+# this dependency skips that example rather than a shipped subpackage.
 [metadata]
 category = "azl-pruning"
 upstream-status = "needs-upstream-hook"

@@ -2,7 +2,7 @@
 
 ## Rules
 
-- Non-trivial components (overlays, build config) SHOULD have their own `<name>/<name>.comp.toml`. Simple imports stay inline in `components.toml`.
+- Keep declaration-only imports in `components.toml`, including components with per-file overlays under `<name>/overlays/`; the shared `{component}` pattern attaches those overlays to declared components. Retain `<name>/<name>.comp.toml` for component-specific settings, including explicit `overlay-files` lists, inline overlays, and build configuration.
 - `components.toml` uses `includes` to pull in all `**/*.comp.toml` — no manual wiring needed.
 - Canonical example: [`rpm/rpm.comp.toml`](rpm/rpm.comp.toml) — uses modern `[[...overlays]]` syntax with `description` fields. For a larger overlay example (legacy inline syntax, not to be copied for new work), see [`azurelinux-rpm-config/azurelinux-rpm-config.comp.toml`](azurelinux-rpm-config/azurelinux-rpm-config.comp.toml).
 - Schema: [`azldev.schema.json`](../../external/schemas/azldev.schema.json)

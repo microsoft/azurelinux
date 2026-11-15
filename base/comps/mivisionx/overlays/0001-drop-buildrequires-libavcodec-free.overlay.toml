@@ -1,3 +1,5 @@
+# The amd_media OpenVX extension is gated on find_package(FFmpeg); CMake skips
+# its subdirectory when FFmpeg is absent. Its libvx_amd_media.so is not packaged.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"

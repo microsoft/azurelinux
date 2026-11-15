@@ -1,3 +1,6 @@
+# neatvnc pulls in libavcodec/libavfilter/libavutil, which AZL does not ship.
+# Disabling the VNC backend removes that remote-screen-sharing path and its
+# backend-specific files without disabling the other Weston backends.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"

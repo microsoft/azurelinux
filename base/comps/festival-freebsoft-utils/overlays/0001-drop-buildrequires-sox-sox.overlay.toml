@@ -1,3 +1,5 @@
+# Without sox, optional audio-processing features are unavailable; the core
+# functionality used by speech-dispatcher's festival output module is retained.
 [metadata]
 category = "azl-pruning"
 upstream-status = "inapplicable"
