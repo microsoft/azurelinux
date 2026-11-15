@@ -15,7 +15,7 @@
 Summary:        HTTP Client interface for ruby
 Name:           rubygem-%{gem_name}
 Version:        2.8.3
-Release: 19%{?dist}
+Release: 20%{?dist}
 # httpclient is licensed under Ruby license from 2003 or later.
 License:        Ruby
 URL:            https://github.com/nahi/httpclient
@@ -30,6 +30,7 @@ BuildRequires:  rubygem(webrick)
 %endif
 BuildArch:      noarch
 
+Patch0: remove-aaa-certificate-services.patch
 %description
 an interface to HTTP Client for the ruby language
 
@@ -44,6 +45,7 @@ Documentation for %{name}
 %prep
 %setup -q -n  %{gem_name}-%{version}
 
+%autopatch -p1
 %build
 gem build ../%{gem_name}-%{version}.gemspec
 
