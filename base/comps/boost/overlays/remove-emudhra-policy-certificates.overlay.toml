@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove eMudhra emSign and AAA roots from Beast examples under Azure Linux's exclusion policy"
+type = "patch-add"
+source = "../remove-emudhra-and-aaa-certificates.patch"

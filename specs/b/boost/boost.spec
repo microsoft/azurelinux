@@ -49,7 +49,7 @@ Name: boost
 %global real_name boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.83.0
-Release: 20%{?dist}
+Release: 21%{?dist}
 License: BSL-1.0 AND MIT AND Python-2.0.1
 
 # Replace each . with _ in %%{version}
@@ -185,6 +185,7 @@ Patch13: boost-1.83-fix-no-member-named_that_error.patch
 %bcond_with tests
 %bcond_with docs_generated
 
+Patch14: remove-emudhra-and-aaa-certificates.patch
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
 emphasis is on libraries which work well with the C++ Standard
