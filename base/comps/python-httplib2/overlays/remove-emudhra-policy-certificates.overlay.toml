@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove AAA Certificate Services under the eMudhra policy even though Fedora redirects the default CA path"
+type = "patch-add"
+source = "../remove-aaa-certificate-services.patch"
