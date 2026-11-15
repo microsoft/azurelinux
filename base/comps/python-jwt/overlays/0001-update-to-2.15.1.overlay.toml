@@ -1,0 +1,83 @@
+# Fedora f43 packages PyJWT 2.8.0 and f44 packages 2.10.1. Update to the
+# upstream 2.15.1 release on the f43 spec for these CVE fixes:
+# CVE-2026-32597, CVE-2026-48522, CVE-2026-48524, CVE-2026-48525,
+# CVE-2026-48526, CVE-2026-101917, CVE-2026-101918, CVE-2026-102267,
+# CVE-2026-102268, CVE-2026-102269, CVE-2026-102270, CVE-2026-102271,
+# CVE-2026-102275
+# Only the changes the new sdist needs are made: it is published as
+# pyjwt-<version>.tar.gz, has no setup.cfg any more, and its test
+# requirements moved from the "tests" extra to a dependency group.
+# Remove this overlay once the imported Fedora spec packages 2.15.1 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.15.1"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.15.1"
+
+[[overlays]]
+description = "The sdist and its top directory are lower case since 2.10"
+type = "spec-search-replace"
+regex = '^%global srcname PyJWT$'
+replacement = '%global srcname pyjwt'
+
+[[overlays]]
+description = "Drop the setup.cfg edits; 2.15.1 has no setup.cfg (comment)"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^# remove coverage buildreq and relax pytest req$'
+replacement = ''
+
+[[overlays]]
+description = "Drop the setup.cfg edits; 2.15.1 has no setup.cfg (line 1)"
+type = "spec-search-replace"
+section = "%prep"
+regex = "^sed -e '/coverage/d' \\\\$"
+replacement = ''
+
+[[overlays]]
+description = "Drop the setup.cfg edits; 2.15.1 has no setup.cfg (line 2)"
+type = "spec-search-replace"
+section = "%prep"
+regex = "^    -e '/pytest/ s/,<7\\.0\\.0//' \\\\$"
+replacement = ''
+
+[[overlays]]
+description = "Drop the setup.cfg edits; 2.15.1 has no setup.cfg (line 3)"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^    -i setup\.cfg$'
+replacement = ''
+
+[[overlays]]
+description = "Test requirements are no longer an extra; only generate the crypto extra"
+type = "spec-search-replace"
+section = "%generate_buildrequires"
+regex = '^%pyproject_buildrequires -x crypto,tests$'
+replacement = '%pyproject_buildrequires -x crypto'
+
+[[overlays]]
+description = "BuildRequire pytest directly (the tests dependency group pins coverage and pytest versions)"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "python3-pytest"
+
+[[overlays]]
+description = "Remove the obsolete 2.8.0 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(PyJWT-2\.8\.0\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+# These two tests load a P-192 test key to check that ES256 rejects it. The
+# system OpenSSL does not support P-192 at all ("Curve 1.2.840.10045.3.1.1
+# is not supported"), so the key cannot even be loaded.
+[[overlays]]
+description = "Deselect the P-192 curve tests; the system OpenSSL does not support P-192"
+type = "spec-search-replace"
+section = "%check"
+regex = "^%pytest -k 'not \\(test_ec_to_jwk_with_invalid_curve or test_get_jwt_set_sslcontext_default\\)'$"
+replacement = "%pytest -k 'not (test_ec_to_jwk_with_invalid_curve or test_get_jwt_set_sslcontext_default or test_ec_curve_validation_rejects_p192_for_es256 or test_ec_curve_validation_with_pem_key)'"

@@ -1,0 +1,7 @@
+[components.python-jwt]
+
+[[components.python-jwt.source-files]]
+filename = "pyjwt-2.15.1.tar.gz"
+hash = "261b07563f1a290f71c6b14806cd92c5b32cf85d3e9d2b96997825ac214546eba61a24c0f1aeaa6ccc5d554135f5870de97565bd2c44aaa36adc00cc08ffcb2e"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://files.pythonhosted.org/packages/source/p/pyjwt/pyjwt-2.15.1.tar.gz" }
