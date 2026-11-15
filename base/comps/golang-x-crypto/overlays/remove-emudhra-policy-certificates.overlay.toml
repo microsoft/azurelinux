@@ -1,0 +1,23 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove eMudhra emSign and AAA fallback records, including their constraints"
+type = "patch-add"
+source = "../remove-emudhra-and-aaa-certificates.patch"
+
+[[overlays]]
+description = "Apply the eMudhra policy certificate removals after goprep unpacks the source"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%autopatch -p1"]
+
+[[overlays]]
+description = "Exclude the NSS parser's AAA fixture under the eMudhra removal policy without disabling upstream tests"
+type = "spec-search-replace"
+regex = '^%gopkgfiles$'
+replacement = '''
+%gopkgfiles
+%exclude %{gopath}/src/%{goipath}/x509roots/nss/parser_test.go
+'''
