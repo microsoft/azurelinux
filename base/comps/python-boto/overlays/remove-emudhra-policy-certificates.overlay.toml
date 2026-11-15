@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove AAA Certificate Services from boto's CA store as part of the eMudhra exclusion policy"
+type = "patch-add"
+source = "../remove-aaa-certificate-services.patch"

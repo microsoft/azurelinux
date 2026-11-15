@@ -4,7 +4,7 @@
 Summary:        A simple, lightweight interface to Amazon Web Services
 Name:           python-boto
 Version:        2.49.0
-Release: 32%{?dist}
+Release: 33%{?dist}
 License:        MIT
 URL:            https://github.com/boto/boto
 Source0:        https://pypi.io/packages/source/b/boto/boto-%{version}.tar.gz
@@ -68,6 +68,7 @@ BuildRequires:  (python3-zombie-imp if python3 >= 3.12)
 BuildArch:      noarch
 
 
+Patch12: remove-aaa-certificate-services.patch
 %description
 Boto is a Python package that provides interfaces to Amazon Web Services.
 It supports over thirty services, such as S3 (Simple Storage Service),
