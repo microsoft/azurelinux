@@ -7,7 +7,7 @@ with "tqdm(iterable)", and you are done!
 Summary:        Fast, Extensible Progress Meter
 Name:           python-%{srcname}
 Version:        4.67.2
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,9 +28,13 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-setuptools_scm
 %if 0%{?with_check}
+BuildRequires:  python3-iniconfig
+BuildRequires:  python3-numpy
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-asyncio
+BuildRequires:  python3-rich
 %ifarch x86_64
+BuildRequires:  python3-keras
 BuildRequires:  python3-tensorflow
 %endif
 %endif
@@ -69,13 +73,8 @@ install -Dpm0644 \
 
 %check
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-pip3 install --upgrade pip
-pip3 install iniconfig \
-  numpy \
-  dask \
-  rich \
-  pandas \
-  keras
+sed -i '/asyncio_default_fixture_loop_scope/d' pyproject.toml
+pip3 install 'pytest-timeout==2.4.0'
 # tests/tests_synchronisation.py::test_imap creates a multiprocessing.Pool
 # but never calls pool.join() or pool.terminate(), so its non-daemon
 # helper threads (_handle_workers / _handle_tasks / _handle_results) can
@@ -106,6 +105,11 @@ run_tests || run_tests
 
 
 %changelog
+* Mon Nov 16 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.67.2-5
+- Use RPM BuildRequires for pytest, pytest-asyncio, iniconfig,
+  numpy and rich; install pytest-timeout separately with pip.
+- Pin pip test dependencies to preserve RPM-provided typing-extensions and numpy.
+
 * Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.67.2-4
 - Use python3-pytest-asyncio from check dependencies and keep pytest-timeout installed with pip
 
