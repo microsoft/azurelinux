@@ -1,0 +1,4 @@
+# Pin to Fedora f43 sos-4.12.1-1 (FEDORA-2026-5890109c03).
+# https://src.fedoraproject.org/rpms/sos/c/d2a2828fc0fc8f1c6f5b74db87f6be3809c4c5e5
+[components.sos]
+spec = { type = "upstream", upstream-commit = "d2a2828fc0fc8f1c6f5b74db87f6be3809c4c5e5" }
