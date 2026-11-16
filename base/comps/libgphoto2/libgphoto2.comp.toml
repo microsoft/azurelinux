@@ -1,0 +1,8 @@
+[components.libgphoto2]
+
+# Upstream release tarball; same SHA512 as the v2.5.34 GitHub release asset.
+[[components.libgphoto2.source-files]]
+filename = "libgphoto2-2.5.34.tar.bz2"
+hash = "a47add752c283343ae73abf99b663c032dba9a27b2f69e767cf87f32f04f752eff02b61a167fe36404af51cff944dc2b0a2b8ab24a8483cecef096a46b25c17a"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://downloads.sourceforge.net/project/gphoto/libgphoto/2.5.34/libgphoto2-2.5.34.tar.bz2" }
