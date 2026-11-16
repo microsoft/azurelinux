@@ -1,0 +1,4 @@
+# Pin to Fedora f43 perl-IO-Compress-Brotli-0.023000-1 (FEDORA-2026-f2bd82803a).
+# https://src.fedoraproject.org/rpms/perl-IO-Compress-Brotli/c/ef86940d30d06398b345ae5611d8cb87df6d35d2
+[components.perl-IO-Compress-Brotli]
+spec = { type = "upstream", upstream-commit = "ef86940d30d06398b345ae5611d8cb87df6d35d2" }
