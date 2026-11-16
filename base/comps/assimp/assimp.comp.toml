@@ -1,0 +1,4 @@
+# Pin to Fedora f44 assimp-6.0.6 to pick up the upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/assimp/c/649294e08793dbe1193b53bcbfc9729815d4b024
+[components.assimp]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "649294e08793dbe1193b53bcbfc9729815d4b024" }

@@ -1,7 +1,7 @@
-diff -rupN --no-dereference assimp-6.0.5/CMakeLists.txt assimp-6.0.5-new/CMakeLists.txt
---- assimp-6.0.5/CMakeLists.txt	2026-04-30 11:15:09.000000000 +0200
-+++ assimp-6.0.5-new/CMakeLists.txt	2026-09-18 23:26:06.905806878 +0200
-@@ -823,6 +823,7 @@ IF ( ASSIMP_BUILD_SAMPLES )
+diff -rupN --no-dereference assimp-6.0.6/CMakeLists.txt assimp-6.0.6-new/CMakeLists.txt
+--- assimp-6.0.6/CMakeLists.txt	2026-11-09 21:32:25.000000000 +0100
++++ assimp-6.0.6-new/CMakeLists.txt	2026-11-13 12:13:13.985933379 +0100
+@@ -843,6 +843,7 @@ IF ( ASSIMP_BUILD_SAMPLES )
  ENDIF ()
  
  IF ( ASSIMP_BUILD_TESTS )
@@ -9,9 +9,9 @@ diff -rupN --no-dereference assimp-6.0.5/CMakeLists.txt assimp-6.0.5-new/CMakeLi
    ADD_SUBDIRECTORY( test/ )
  ENDIF ()
  
-diff -rupN --no-dereference assimp-6.0.5/test/CMakeLists.txt assimp-6.0.5-new/test/CMakeLists.txt
---- assimp-6.0.5/test/CMakeLists.txt	2026-09-18 23:26:05.775095451 +0200
-+++ assimp-6.0.5-new/test/CMakeLists.txt	2026-09-18 23:26:06.906991748 +0200
+diff -rupN --no-dereference assimp-6.0.6/test/CMakeLists.txt assimp-6.0.6-new/test/CMakeLists.txt
+--- assimp-6.0.6/test/CMakeLists.txt	2026-11-13 12:13:13.061727070 +0100
++++ assimp-6.0.6-new/test/CMakeLists.txt	2026-11-13 12:13:13.986406690 +0100
 @@ -36,6 +36,7 @@
  #
  #----------------------------------------------------------------------
@@ -20,9 +20,20 @@ diff -rupN --no-dereference assimp-6.0.5/test/CMakeLists.txt assimp-6.0.5-new/te
  
  INCLUDE_DIRECTORIES(
      ${Assimp_SOURCE_DIR}/test/unit
-@@ -283,4 +284,4 @@ target_link_libraries( unit assimp ${pla
- 
- add_subdirectory(headercheck)
+@@ -296,4 +297,4 @@ if(ASSIMP_INSTALL_TESTS)
+   install(DIRECTORY models-nonbsd/ DESTINATION ${CMAKE_INSTALL_DATADIR}/assimp/models-nonbsd)
+ endif()
  
 -add_test( unittests unit )
 +gtest_discover_tests(unit)
+diff -rupN assimp-6.0.6/test/CMakeLists.txt assimp-6.0.6-new/test/CMakeLists.txt
+--- assimp-6.0.6/test/CMakeLists.txt	2026-11-13 12:13:14.339459430 +0100
++++ assimp-6.0.6-new/test/CMakeLists.txt	2026-11-13 12:16:21.622940517 +0100
+@@ -247,6 +247,7 @@ target_link_libraries(unit GTest::gtest_
+ 
+ # RapidJSON
+ find_package(RapidJSON CONFIG REQUIRED)
++ADD_DEFINITIONS( -DRAPIDJSON_HAS_STDSTRING=1)
+ 
+ IF (ASSIMP_BUILD_DRACO)
+   ADD_DEFINITIONS( -DASSIMP_ENABLE_DRACO )
