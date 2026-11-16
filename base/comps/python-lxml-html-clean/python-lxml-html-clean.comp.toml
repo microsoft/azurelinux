@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python-lxml-html-clean-0.4.6-1 (FEDORA-2026-768edcd81d).
+# https://src.fedoraproject.org/rpms/python-lxml-html-clean/c/12c8bf89fe3ee4f7c80ef9295ff0aabac3f8a998
+[components.python-lxml-html-clean]
+spec = { type = "upstream", upstream-commit = "12c8bf89fe3ee4f7c80ef9295ff0aabac3f8a998" }
