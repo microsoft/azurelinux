@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.10.2
+Version:        1.10.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -8,14 +8,14 @@ Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  openssl-devel
-BuildRequires:  SymCrypt >= 103.8.0
+BuildRequires:  openssl-devel >= 3.5
+BuildRequires:  SymCrypt >= 103.12.0
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
 
-Requires:       SymCrypt >= 103.8.0
-Requires:       openssl
+Requires:       SymCrypt >= 103.12.0
+Requires:       openssl >= 3.5
 
 Conflicts: openssl-fips-provider
 
@@ -66,8 +66,8 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 # The test is run twice: once with the default provider and once with the SymCrypt provider.
 (
         set -e
-        ./bin/SslPlay/SslPlay
-        ./bin/SslPlay/SslPlay --provider-path ./bin/SymCryptProvider/ --provider symcryptprovider --no-engine
+        ./bin/test/SslPlay/SslPlay
+        ./bin/test/SslPlay/SslPlay --provider-path ./bin/SymCryptProvider/ --provider symcryptprovider --no-engine
 )
 
 %files
@@ -89,6 +89,9 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
 
 %changelog
+* Mon Nov 16 2026 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.10.3-1
+- Upgrade SymCrypt-OpenSSL to 1.10.3
+
 * Fri Sep 18 2026 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.10.2-1
 - Bugfixes in DH and ML-KEM key export
 
