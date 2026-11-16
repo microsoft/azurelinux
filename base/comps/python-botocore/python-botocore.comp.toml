@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python-botocore-1.43.122-1 for upstream AAA root removal.
+# https://src.fedoraproject.org/rpms/python-botocore/c/92b8bf7ab60b4e159d5ce40486f0ad176af6e4a8
+[components.python-botocore]
+spec = { type = "upstream", upstream-commit = "92b8bf7ab60b4e159d5ce40486f0ad176af6e4a8" }

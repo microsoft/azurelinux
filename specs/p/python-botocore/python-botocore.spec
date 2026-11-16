@@ -6,8 +6,8 @@
 
 Name:           python-%{pypi_name}
 # NOTICE - Updating this package requires updating python-boto3
-Version:        1.43.105
-Release: 6%{?dist}
+Version:        1.43.122
+Release: 7%{?dist}
 Summary:        Low-level, data-driven core of boto 3
 
 License:        Apache-2.0
@@ -71,6 +71,57 @@ rm -vr tests/functional/leak
 %license LICENSE.txt
 
 %changelog
+* Thu Oct 29 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.122-1
+- 1.43.122
+
+* Wed Oct 28 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.121-1
+- 1.43.121
+
+* Tue Oct 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.120-1
+- 1.43.120
+
+* Mon Oct 26 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.119-1
+- 1.43.119
+
+* Thu Oct 22 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.118-1
+- 1.43.118
+
+* Wed Oct 21 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.117-1
+- 1.43.117
+
+* Tue Oct 20 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.116-1
+- 1.43.116
+
+* Mon Oct 19 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.115-1
+- 1.43.115
+
+* Wed Oct 14 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.114-1
+- 1.43.114
+
+* Tue Oct 13 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.113-1
+- 1.43.113
+
+* Mon Oct 12 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.112-1
+- 1.43.112
+
+* Fri Oct 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.111-1
+- 1.43.111
+
+* Thu Oct 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.110-1
+- 1.43.110
+
+* Wed Oct 07 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.109-1
+- 1.43.109
+
+* Tue Oct 06 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.108-1
+- 1.43.108
+
+* Thu Oct 01 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.107-1
+- 1.43.107
+
+* Thu Oct 01 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.106-1
+- 1.43.106
+
 * Wed Sep 30 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.43.105-1
 - 1.43.105
 
