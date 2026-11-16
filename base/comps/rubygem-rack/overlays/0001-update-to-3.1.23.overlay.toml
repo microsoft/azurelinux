@@ -1,0 +1,27 @@
+# Fedora f43 packages rubygem-rack 3.1.19 and f44 moved to the 3.2 series. Update to
+# the upstream 3.1.23 patch release on the same f43 spec for these CVE fixes:
+# CVE-2026-22860, CVE-2026-25500, CVE-2026-125108, CVE-2026-125109,
+# CVE-2026-125110, CVE-2026-125111
+# Remove this overlay once the imported Fedora spec packages 3.1.23 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.1.23"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.1.23"
+
+[[overlays]]
+description = "Remove the obsolete rack-3.1.19.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(rack-3\.1\.19\.gem\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete rack-3.1.19-tests.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(rack-3\.1\.19-tests\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

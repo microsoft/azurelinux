@@ -1,0 +1,17 @@
+[components.rubygem-rack]
+
+# Sources for the 3.1.23 update overlay; drop together with it once Fedora ships 3.1.23 or newer.
+[[components.rubygem-rack.source-files]]
+filename = "rack-3.1.23.gem"
+hash = "e759bd83aa003c042193bb0cc48719660aa12c66a491059a5a4b0767156c0d94af1659d16a7fd54774bce93d42d1a6292b58cfa94763af4f275d29f09f12991f"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/rack-3.1.23.gem" }
+
+# Generated: upstream ships the test suite only in git (see the Source1 comment in the spec).
+[[components.rubygem-rack.source-files]]
+filename = "rack-3.1.23-tests.tar.gz"
+hash = "ce416d34f370f111b8566179ca64f80de6d2f5fe0a4327e29fcbda9358a3ef3da4a49f40200562fe92b897318cb8b174f575f7f338953a24840597caa021a591"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-test-tarball.sh"
+origin.mock-packages = ["git"]
