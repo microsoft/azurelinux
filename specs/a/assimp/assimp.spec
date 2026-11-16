@@ -4,8 +4,8 @@
 %define soversion 6
 
 Name:           assimp
-Version:        6.0.5
-Release: 9%{?dist}
+Version:        6.0.6
+Release: 6%{?dist}
 Summary:        Library to import various 3D model formats into applications
 
 # Assimp is BSD
@@ -34,18 +34,10 @@ Patch2:         %{name}-nozlib.patch
 # Fix HTML_OUTPUT dir in doxyfile
 # Fix installing images from doc/architecture
 Patch3:         %{name}-docs.patch
-# Enable ctest
+# Enable ctest and fix test build
 Patch4:         %{name}-tests.patch
-# https://github.com/assimp/assimp/commit/eb84eec580d3f4ba2f0fd87409b7d0744620f11e
-Patch5:         CVE-2026-14610.patch
-# https://github.com/assimp/assimp/commit/c39d8c15dbbe03174af61d8eedbbf90120f4eb9f
-Patch6:         CVE-2026-19968.patch
-# https://github.com/assimp/assimp/commit/50d767984e78d51b53e2020fdf0967fd624bc377
-Patch7:         CVE-2026-19999.patch
-# https://github.com/DerDoktorX/assimp/commit/a07a25d9a348152f2eb7f3359909a2cb9d0b2702
-Patch8:         CVE-2026-14604.patch
-# https://github.com/assimp/assimp/pull/6869
-Patch9:         CVE-2025-15666.patch
+# https://github.com/assimp/assimp/pull/6885
+Patch5:        CVE-2026-19967.patch
 
 
 BuildRequires:  boost-devel
@@ -174,7 +166,7 @@ exclude="utMD5Importer.importBoarMan|utMD5Importer.importBob|utMD2Importer.impor
 %doc Readme.md CREDITS
 %{_bindir}/assimp
 %{_libdir}/libassimp.so.6
-%{_libdir}/libassimp.so.6.0.5
+%{_libdir}/libassimp.so.6.0.6
 
 %files devel
 %{_includedir}/assimp/
@@ -191,6 +183,12 @@ exclude="utMD5Importer.importBoarMan|utMD5Importer.importBob|utMD2Importer.impor
 
 
 %changelog
+* Tue Nov 10 2026 Sandro Mani <manisandro@gmail.com> - 6.0.6-1
+- Update to 6.0.6
+
+* Sun Oct 18 2026 Sandro Mani <manisandro@gmail.com> - 6.0.5-6
+- Backport fixes for CVE-2026-19967,  CVE-2026-19969
+
 * Fri Sep 18 2026 Sandro Mani <manisandro@gmail.com> - 6.0.5-5
 - Add fixes for CVE-2026-14610, CVE-2026-19968, CVE-2026-19999, CVE-2026-14604,
   CVE-2025-15666
