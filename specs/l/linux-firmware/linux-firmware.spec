@@ -7,8 +7,8 @@
 %define _binaries_in_noarch_packages_terminate_build 0
 
 Name:		linux-firmware
-Version:	20260916
-Release: 5%{?dist}
+Version:	20261019
+Release: 6%{?dist}
 Summary:	Firmware files used by the Linux kernel
 License:	GPL-1.0-or-later AND GPL-2.0-or-later AND MIT AND LicenseRef-Fedora-Firmware
 URL:		http://www.kernel.org/
@@ -765,6 +765,86 @@ end
 %{_firmwarepath}/v4l-cx2*
 
 %changelog
+* Mon Oct 19 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 20261019-1
+- Update to 20261019
+- rockchip: add PCIe3 PHY firmware for snps-pcie3
+- Update ADSP firmware for Qualcomm qcs615 platform.
+- Revert "amdgpu: update GC 11.0.0 firmware"
+- amdgpu: a LOT of updates for various ASICs
+- amdgpu: DMCUB updates for various ASICs
+- rtw89: init board_elm.bin with stuffs for board ID 1
+- rtw89: 8922d: update fw 0.35.119.3 with format suffix -1
+- rtw89: 8922d: update fw 0.35.115.2
+- wfx: update to firmware 3.18
+- nvidia: Update and add missing firmware files for Tegra SoCs
+- qcom:Update qdsp6sw firmware for shikra platform
+- aic: Add AIC8800D80 Bluetooth and Wi-Fi firmware
+- qcom: update HPASS firmware for nord platform
+- amdgpu: DMCUB updates for various ASICs
+- amdgpu: update gc 11.0.1 and 11.0.4 firmware
+- qcom: update LPAICP firmware for shikra platform
+- ath12k: WCN7850 hw2.0: update board-2.bin
+- panthor: Add initial firmware for Architecture 14.8 Arm Mali GPU
+- qcom: update ADSP firmware for glymur platform
+- cirrus: cs35l41: Add firmware and tuning for Lenovo Thinkbook laptops
+- cirrus: cs35l63: Add firmware for Cirrus CS35L63 for various Dell laptops
+- cirrus: cs42l45: Add CS42L49 SDCA codec firmware for Dell laptops
+- qcom: fix qcs8300 gpdspr.jsn symlink target
+- qcom: update ADSP firmware for x1e80100 platform
+- Update firmware for Intel Solar/Magnetar/Blazar*/Scorpius/ScorpiusGfp core
+- cirrus: cs35l57 cs35l63: Add firmware for some Dell laptops
+- WHENCE: add SPDX license references for non-standard license texts
+- WHENCE: add initial SPDX identifiers
+- cirrus: cs42l45: Add CS42L45 SDCA codec firmware for a Dell laptop
+- cirrus: cs35l41: Add support for Lenovo Yoga Slim 7 Carbon 14ACN6
+- Add ISH firmware files for Intel Nova Lake-H/S platforms
+- qcom: add ADSP firmware for eliza platform
+- qcom: update ADSP firmware for hawi platform
+- QCA: Add QCA2066 Bluetooth firmware hpnv21g.30c
+- QCA: Update Bluetooth QCA2066 firmware to 2.1.0-00653
+- Revert "qcom: update ADSP firmware for qcs615 platform"
+- qcom: Add gpu firmwares for Hawi and Maili chipsets
+- qcom: update Rubik Pi 3 ADSP firmware
+- cirrus: cs35l56: Correct firmware instances for 103c8c52 and 103c8c53
+- qcom: vpu: add Gen2 firmware binary for Hawi/Maili
+- Update AMD cpu microcode
+- iwlwifi: add Bz/Sc FW for core24.80-41 release
+- iwlwifi: Update Bz/Fm firmware for core24.80-41 release
+- iwlwifi: Add Hr/Gf firmware for core24.80-41 release
+- iwlwifi: update ty/So/Ma firmwares for core24.80-41 release
+- iwlwifi: Add cc/Qu/QuZ firmwares for core24.80-41 release
+- mwifiex: add IW416 firmware
+- ath12k: WCN7850 hw2.0: update board-2.bin
+- ath12k: QCC2072 hw1.0: update board-2.bin
+- ci: add Qualcomm firmware version diff MR comment job
+- qcom: sdx61: add missing firmware version
+- qcom: sdx35: add missing firmware version
+- qcom: aic100: add missing firmware versions
+- qcom: qdu100: add missing firmware versions
+- qcom: sdm845: add missing modem firmware version
+- qcom: x1e80100: add missing Dell XPS 13 9345 DSP versions
+- qcom: add missing Adreno ZAP shader versions
+- qcom: use the WHENCE version format for the x1e80100 video firmware
+- qca: separate the WCN685x uart firmware revisions
+- qca: group the QCA61x4 USB firmware files
+- qca: drop duplicate version lines
+- qca: fix the version of the QCA6698 Bluetooth firmware
+- qca: fix the version of the WCN785x USB firmware
+- qcom: fix the version of the a660 GMU firmware
+- qcom: fix the version of the Eliza SQE microcode
+- qcom: fix the version of the QCS615 ZAP shader
+- qcom/shikra: link WiFi firmware from the ath10k subdir
+- Revert "amdgpu: update GC 11.0.0 firmware"
+- Revert "amdgpu: update GC 11.0.0 firmware"
+- amdgpu: DMCUB updates for various ASICs
+- intel: Update ibt-00a0-01a1-pci.ddc for BE211 - Whale Peak2 (WhP2)
+- ath11k: WCN6855 hw2.0: update board-2.bin
+- cirrus: cs42l45: Add CS42L45 SDCA codec firmware for Dell laptops
+- qcom: add CDSP firmware for hawi platform
+- cirrus: cs42l45: Add CS42L45 SDCA codec firmware for Dell laptops
+- cirrus: cs35l63: Add Cirrus CS35L63 firmware mappings for some Dell laptops
+- QCA: Update Bluetooth firmware for QCC2072 UART interface: 1.1.0-00340 to 1.1.0-00355
+
 * Wed Sep 16 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 20260916-1
 - Update to 20260916
 - Update to license field for current redist license string
