@@ -4,10 +4,10 @@
 %global gem_name rack
 
 Name: rubygem-%{gem_name}
-Version: 3.1.19
+Version: 3.1.23
 # Introduce Epoch (related to bug 552972)
 Epoch:  1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: A modular Ruby webserver interface
 # lib/rack/show_{status,exceptions}.rb contains snippets from Django under BSD license.
 License: MIT AND BSD-3-Clause
