@@ -4,4 +4,7 @@
 # set). Flip to OFF; spec is well-gated (the libmimx-anthy.so file
 # is rm'd from %install when --without anthy is used).
 [components.m17n-lib]
+# Pin to Fedora f43 m17n-lib-1.8.7 to pick up the upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/m17n-lib/c/07786d9ede994ceaed86bed730667940ce5245b0
+spec = { type = "upstream", upstream-commit = "07786d9ede994ceaed86bed730667940ce5245b0" }
 build.without = ["anthy"]
