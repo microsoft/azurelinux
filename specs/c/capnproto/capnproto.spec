@@ -7,8 +7,8 @@
 %global modulename %{name}-c++
 
 Name:           capnproto
-Version:        1.0.1
-Release: 9%{?dist}
+Version: 1.0.2
+Release: 10%{?dist}
 Summary:        A data interchange format and capability-based RPC system
 
 License:        MIT
