@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -43,6 +43,10 @@ Patch13:        CVE-2026-78669.patch
 Patch14:        CVE-2026-94637.patch
 Patch15:        CVE-2026-97032.patch
 Patch16:        CVE-2026-104252.patch
+Patch17:        CVE-2026-116585.patch
+Patch18:        CVE-2026-116586.patch
+Patch19:        CVE-2026-116587.patch
+Patch20:        CVE-2026-116591.patch
 BuildRequires: golang >= 1.25
 BuildRequires: golang < 1.28
 BuildRequires: hostname
@@ -173,6 +177,9 @@ go test -mod=vendor \
 %{_bindir}/*
 
 %changelog
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-17
+- Patch for CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
+
 * Thu Oct 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 19.0.4-16
 - Patch for CVE-2026-104252
 
