@@ -1,0 +1,9 @@
+[components.postgresql18-pgvector]
+
+# GitHub tag archive (same name as the spec's Source0). Downloaded twice with a
+# stable SHA512, and its contents match the v0.8.7 git tag.
+[[components.postgresql18-pgvector.source-files]]
+filename = "v0.8.7.tar.gz"
+hash = "85e8df30c467ff0c2e9b2873f4b6a57f7444a434b5125e5dd36f62e61fea1fcc863d9ee04152535424d06693f07afa6f7dd421b3d50dadc94f075fba4c203a97"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/pgvector/pgvector/archive/refs/tags/v0.8.7.tar.gz" }

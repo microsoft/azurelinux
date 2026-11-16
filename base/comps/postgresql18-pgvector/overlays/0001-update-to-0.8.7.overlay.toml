@@ -1,0 +1,36 @@
+# Fedora f43 and f44 package pgvector 0.8.0. Update to the upstream 0.8.7
+# bugfix release on the same f43 spec for these CVE fixes:
+# CVE-2026-3172, CVE-2026-18022, CVE-2026-103484
+# Remove this overlay once the imported Fedora spec packages 0.8.7 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 0.8.7"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.8.7"
+
+[[overlays]]
+description = "Drop the Postgres 18 build fix 78ed8f1, upstream since 0.8.1"
+type = "patch-remove"
+file = "78ed8f1.patch"
+
+[[overlays]]
+description = "Drop the Postgres 18 build fix 2c53c30, upstream since 0.8.1"
+type = "patch-remove"
+file = "2c53c30.patch"
+
+[[overlays]]
+description = "Drop the comment for the removed Postgres 18 patches"
+type = "spec-search-replace"
+regex = '^# (Upstream commits for compatiblity with PG18 present on master branch|not yet included in any tag or release)$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the obsolete 0.8.0 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(v0\.8\.0\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
