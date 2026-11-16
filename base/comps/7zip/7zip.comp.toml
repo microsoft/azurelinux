@@ -1,0 +1,4 @@
+# Pin to Fedora f43 7zip-26.04-1 (FEDORA-2026-626a028878).
+# https://src.fedoraproject.org/rpms/7zip/c/7ad1b3b49aa83f6d6314cb295e8c8b18a98fddaa
+[components.7zip]
+spec = { type = "upstream", upstream-commit = "7ad1b3b49aa83f6d6314cb295e8c8b18a98fddaa" }
