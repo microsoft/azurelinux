@@ -1,0 +1,4 @@
+# Pin to Fedora f43 linux-firmware-20261019-1 (FEDORA-2026-bd021461a8).
+# https://src.fedoraproject.org/rpms/linux-firmware/c/9c42bf04aa9fab91d6404533b4cbd5ab2bce7310
+[components.linux-firmware]
+spec = { type = "upstream", upstream-commit = "9c42bf04aa9fab91d6404533b4cbd5ab2bce7310" }
