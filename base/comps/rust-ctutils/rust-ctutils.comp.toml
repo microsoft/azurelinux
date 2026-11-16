@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-ctutils-0.4.8-1 (FEDORA-2026-49adf7234d).
+# https://src.fedoraproject.org/rpms/rust-ctutils/c/d433d4e461138c5e0ef37cc620ceec148ad1c58b
+[components.rust-ctutils]
+spec = { type = "upstream", upstream-commit = "d433d4e461138c5e0ef37cc620ceec148ad1c58b" }
