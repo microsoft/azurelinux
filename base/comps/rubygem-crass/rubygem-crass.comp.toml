@@ -1,0 +1,17 @@
+[components.rubygem-crass]
+
+# Sources for the 1.0.8 update overlay; drop together with it once Fedora ships 1.0.8 or newer.
+[[components.rubygem-crass.source-files]]
+filename = "crass-1.0.8.gem"
+hash = "61b0a21da1d4621cea6388838be1491273ac8b0d76823a5b34b78f10814f11c009d8a1d545d4dae5905cad2ac2c23197abeda3df0b3423dc440ed0798917d33e"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/crass-1.0.8.gem" }
+
+# Generated: the gem stopped shipping the test suite in 1.0.5, so take test/ from the git tag.
+[[components.rubygem-crass.source-files]]
+filename = "crass-1.0.8-tests.tar.gz"
+hash = "f8e4331360e934256eda7ebd63c12c7dc33fa5fc82977724d8a3c069dfd53ac3d78ad34853d0b2a97a32c2822ae2d6b5a22595d9aa90864a9ab24cee61ad7c6e"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-test-tarball.sh"
+origin.mock-packages = ["git"]

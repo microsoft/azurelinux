@@ -5,15 +5,15 @@
 %global gem_name crass
 
 Name: rubygem-%{gem_name}
-Version: 1.0.4
-Release: 21%{?dist}
+Version: 1.0.8
+Release: 22%{?dist}
 Summary: CSS parser based on the CSS Syntax Level 3 spec
 License: MIT
 URL: https://github.com/rgrove/crass/
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# Fix compatibility with Minitest 5.19+
-# https://github.com/rgrove/crass/pull/13
-Patch0: rubygem-crass-1.0.6-Fix-compatibility-with-Minitest-5.19.patch
+Source1: %{gem_name}-%{version}-tests.tar.gz
+
+
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby >= 1.9.2
@@ -33,9 +33,9 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%setup -q -n %{gem_name}-%{version} -b 1
 
-%patch 0 -p1
+
 
 %build
 gem build ../%{gem_name}-%{version}.gemspec
@@ -48,6 +48,7 @@ cp -a .%{gem_dir}/* \
 
 
 %check
+cp -a %{builddir}/test .%{gem_instdir}/
 pushd .%{gem_instdir}
 ruby -e 'Dir.glob "./test/**/test_*.rb", &method(:require)'
 popd
@@ -59,7 +60,7 @@ popd
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}
-%exclude %{gem_instdir}/test
+
 
 %files doc
 %doc %{gem_docdir}
@@ -69,6 +70,7 @@ popd
 %{gem_instdir}/Rakefile
 %{gem_instdir}/%{gem_name}.gemspec
 
+%doc %{gem_instdir}/SECURITY.md
 %changelog
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.4-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

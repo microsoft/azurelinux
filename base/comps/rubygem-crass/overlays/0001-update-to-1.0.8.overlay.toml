@@ -1,0 +1,77 @@
+# Fedora does not package rubygem-crass 1.0.8 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2026-61845, CVE-2026-61846, CVE-2026-61847, CVE-2026-61848, CVE-2026-116695
+# Remove this overlay once the imported Fedora spec packages 1.0.8 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.0.8"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.0.8"
+
+[[overlays]]
+description = "Drop the Minitest 5.19 compatibility patch, upstream since 1.0.7"
+type = "patch-remove"
+file = "rubygem-crass-1.0.6-Fix-compatibility-with-Minitest-5.19.patch"
+
+[[overlays]]
+description = "Drop the explicit application of the removed patch"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch 0 -p1$'
+replacement = ""
+
+[[overlays]]
+description = "Drop the comment of the removed patch"
+type = "spec-search-replace"
+regex = '^# Fix compatibility with Minitest 5\.19\+$'
+replacement = ""
+
+[[overlays]]
+description = "Drop the upstream link of the removed patch"
+type = "spec-search-replace"
+regex = '^# https://github\.com/rgrove/crass/pull/13$'
+replacement = ""
+
+[[overlays]]
+description = "Register the tests tarball; the gem stopped shipping test/ in 1.0.5"
+type = "spec-insert-tag"
+tag = "Source1"
+value = "%{gem_name}-%{version}-tests.tar.gz"
+
+[[overlays]]
+description = "Unpack the tests tarball next to the gem"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%setup -q -n %\{gem_name\}-%\{version\}$'
+replacement = "%setup -q -n %{gem_name}-%{version} -b 1"
+
+[[overlays]]
+description = "Copy the test suite into the installed gem tree before running it"
+type = "spec-prepend-lines"
+section = "%check"
+lines = ["cp -a %{builddir}/test .%{gem_instdir}/"]
+
+[[overlays]]
+description = "The gem no longer contains test/, so there is nothing to exclude"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%exclude %\{gem_instdir\}/test$'
+replacement = ""
+
+[[overlays]]
+description = "Package SECURITY.md, new in 1.0.7"
+type = "spec-append-lines"
+section = "%files"
+package = "doc"
+lines = ["%doc %{gem_instdir}/SECURITY.md"]
+
+[[overlays]]
+description = "Remove the obsolete crass-1.0.4.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(crass-1\.0\.4\.gem\) = [0-9a-f]+(?:\r?\n|$)'
