@@ -1,0 +1,4 @@
+# Pin to Fedora f43 perl-libnet-3.16-1 (FEDORA-2026-9fb6c92cfb).
+# https://src.fedoraproject.org/rpms/perl-libnet/c/36960b0013365233936bf604c8ec140982d0a17d
+[components.perl-libnet]
+spec = { type = "upstream", upstream-commit = "36960b0013365233936bf604c8ec140982d0a17d" }
