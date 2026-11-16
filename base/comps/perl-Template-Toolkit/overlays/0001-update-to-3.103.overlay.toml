@@ -1,0 +1,20 @@
+# Fedora f43/f44 package perl-Template-Toolkit 3.102. Update to the upstream 3.103
+# bugfix release on the same f43 spec for this CVE fix:
+# CVE-2026-5090
+# Remove this overlay once the imported Fedora spec packages 3.103 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.103"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.103"
+
+[[overlays]]
+description = "Remove the obsolete 3.102 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(Template-Toolkit-3\.102\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

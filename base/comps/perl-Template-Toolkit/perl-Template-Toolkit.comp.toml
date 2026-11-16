@@ -1,0 +1,9 @@
+[components.perl-Template-Toolkit]
+
+# Source for the 3.103 update overlay; drop together with it once Fedora ships 3.103 or newer.
+# SHA256 matches the CPAN CHECKSUMS file for TODDR/Template-Toolkit-3.103.tar.gz.
+[[components.perl-Template-Toolkit.source-files]]
+filename = "Template-Toolkit-3.103.tar.gz"
+hash = "50413fbe962a0063f24a7118e397471b2c0a73add9677921d924573e3746279c8d7f078b1a7d96af24d507b99682d4d84d0b27c047d34b93c0f901fde6c2c98c"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://cpan.metacpan.org/authors/id/T/TO/TODDR/Template-Toolkit-3.103.tar.gz" }
