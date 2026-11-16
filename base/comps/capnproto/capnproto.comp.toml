@@ -1,0 +1,9 @@
+[components.capnproto]
+
+# Upstream release tarball; the SHA256 and size match the FreeBSD ports
+# distinfo for capnproto-c++-1.0.2.tar.gz.
+[[components.capnproto.source-files]]
+filename = "capnproto-c++-1.0.2.tar.gz"
+hash = "f1388059e01163d053ffbede3ad56c78c4e2ad587284275697b193750b70ab9949ff3315aa5b8784cbe669f35fc85cd5d1d02dd2eb5cd1c1d79c9a4d775ade01"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://capnproto.org/capnproto-c++-1.0.2.tar.gz" }
