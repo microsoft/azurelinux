@@ -8,5 +8,7 @@
 # SDL3_image uses cmake with explicit AVIF flags; remove the BR and
 # turn the flags OFF.
 
+# Bumped to Fedora f43 SDL3_image-3.4.8-1 (FEDORA-2026-764f630497).
+# https://src.fedoraproject.org/rpms/SDL3_image/c/4670185aac5f054ade16f8c44c820ac843b9e64b
 [components.SDL3_image]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "6b9cdf9cf3e3798c9443bf425017b152d78b9d65" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "4670185aac5f054ade16f8c44c820ac843b9e64b" }
