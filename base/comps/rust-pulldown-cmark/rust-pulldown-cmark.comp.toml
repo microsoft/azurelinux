@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-pulldown-cmark-0.13.6-1 (FEDORA-2026-99900f26c7).
+# https://src.fedoraproject.org/rpms/rust-pulldown-cmark/c/e04ce091e5ccf5d495871338a3f94828a5dd910c
+[components.rust-pulldown-cmark]
+spec = { type = "upstream", upstream-commit = "e04ce091e5ccf5d495871338a3f94828a5dd910c" }
