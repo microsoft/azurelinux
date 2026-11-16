@@ -1,0 +1,9 @@
+[components.plexus-utils4]
+
+# GitHub tag archive (the spec's Source0). Downloaded twice with a stable
+# SHA512; the same URL pattern for 4.0.2 still matches Fedora's sources hash.
+[[components.plexus-utils4.source-files]]
+filename = "plexus-utils-4.0.3.tar.gz"
+hash = "954b14a710fd117f86e1538febea280225079081c5e6450531e4923ab7ca0aa0ecc8523b10c9457199e772368cfd8a2b77f31ff82adf22b61e2b565118bb9d1c"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/codehaus-plexus/plexus-utils/archive/plexus-utils-4.0.3.tar.gz" }
