@@ -1,0 +1,44 @@
+# Fedora f43 and f44 package mariadb-connector-c 3.4.9. Update to the upstream
+# 3.4.11 release on the same f43 spec for this CVE fix:
+# CVE-2026-107819
+# Remove this overlay once the imported Fedora spec packages 3.4.11 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.4.11"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.4.11"
+
+# The component uses a manual release, so restart it for the new version.
+[[overlays]]
+description = "Reset Release for 3.4.11"
+type = "spec-update-tag"
+tag = "Release"
+value = "1%{?with_debug:.debug}%{?dist}"
+
+[[overlays]]
+description = "Drop the downstream CONC-821 patch; 3.4.11 has the upstream CONC-821 fix"
+type = "patch-remove"
+file = "conc-821-fix-bind-result-length.patch"
+
+[[overlays]]
+description = "Drop the stale comment for the removed CONC-821 patch"
+type = "spec-search-replace"
+regex = '^# Downstream fix attempt for https://jira\.mariadb\.org/browse/CONC-821$'
+replacement = ""
+
+[[overlays]]
+description = "Drop the stale comment for the removed CONC-821 patch"
+type = "spec-search-replace"
+regex = '^# No upstream fix as of 2026-06-28 \(checked 3\.4 branch and PRs\)$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the obsolete 3.4.9 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(mariadb-connector-c-3\.4\.9-src\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

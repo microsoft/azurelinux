@@ -1,3 +1,11 @@
 [components.mariadb-connector-c]
 # Release: 3%{?with_debug:.debug}%{?dist}
 release = { calculation = "manual" }
+
+# Upstream release tarball; same SHA512 as the upstream sha512sums.txt and the
+# Fedora rawhide sources file.
+[[components.mariadb-connector-c.source-files]]
+filename = "mariadb-connector-c-3.4.11-src.tar.gz"
+hash = "1892499af42f03d1202a2ebd9f415d3281210c6552ea95740f0de132db5a4f2aa9aa12d6cf7400b55fec17d1f0c64f78c2b0540190c0bdc3521dd26ca52d769b"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://archive.mariadb.org/connector-c-3.4.11/mariadb-connector-c-3.4.11-src.tar.gz" }
