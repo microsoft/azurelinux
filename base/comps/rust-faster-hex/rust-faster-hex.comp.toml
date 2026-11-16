@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-faster-hex-0.10.1-1 (FEDORA-2026-120aeecae1).
+# https://src.fedoraproject.org/rpms/rust-faster-hex/c/a012b48a1e4f75625125a75c830624fc630155c9
+[components.rust-faster-hex]
+spec = { type = "upstream", upstream-commit = "a012b48a1e4f75625125a75c830624fc630155c9" }
