@@ -1,5 +1,5 @@
 --- zip-2.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ zip-2.4.2/Cargo.toml	2026-01-09T22:17:36.640416+00:00
++++ zip-2.4.2/Cargo.toml	2026-10-28T23:39:26.810383+00:00
 @@ -98,7 +98,6 @@
      "_deflate-any",
  ]
@@ -22,7 +22,7 @@
  
  [dependencies.constant_time_eq]
 -version = "0.3"
-+version = "0.4"
++version = ">=0.4, <0.7"
  optional = true
  
  [dependencies.crc32fast]

@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-typed-path-0.13.0-1 (FEDORA-2026-a011e63a06).
+# https://src.fedoraproject.org/rpms/rust-typed-path/c/0f421bc73ab8a49e482648c01e48608ba8b2dded
+[components.rust-typed-path]
+spec = { type = "upstream", upstream-commit = "0f421bc73ab8a49e482648c01e48608ba8b2dded" }

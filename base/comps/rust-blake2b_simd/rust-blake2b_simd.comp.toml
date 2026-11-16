@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-blake2b_simd-1.0.5-2 (FEDORA-2026-a011e63a06).
+# https://src.fedoraproject.org/rpms/rust-blake2b_simd/c/72148f358d528c368aabdba689a66f6ea22d14eb
+[components.rust-blake2b_simd]
+spec = { type = "upstream", upstream-commit = "72148f358d528c368aabdba689a66f6ea22d14eb" }

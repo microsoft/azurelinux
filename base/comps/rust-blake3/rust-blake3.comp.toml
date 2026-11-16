@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-blake3-1.8.7-2 (FEDORA-2026-a011e63a06).
+# https://src.fedoraproject.org/rpms/rust-blake3/c/c521f3f3f81f92a2cd2324d89a5b3affdef36106
+[components.rust-blake3]
+spec = { type = "upstream", upstream-commit = "c521f3f3f81f92a2cd2324d89a5b3affdef36106" }

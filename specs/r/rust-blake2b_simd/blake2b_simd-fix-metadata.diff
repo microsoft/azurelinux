@@ -1,0 +1,9 @@
+--- blake2b_simd-1.0.5/Cargo.toml	2006-07-24T01:21:28+00:00
++++ blake2b_simd-1.0.5/Cargo.toml	2026-10-28T22:44:13.559814+00:00
+@@ -45,5 +45,5 @@
+ default-features = false
+ 
+ [dependencies.constant_time_eq]
+-version = "0.4.2"
++version = ">=0.4.2, <0.7.0"
+ default-features = false
