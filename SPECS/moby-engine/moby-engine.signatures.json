@@ -2,6 +2,6 @@
  "Signatures": {
   "docker.service": "b150b3ce0947a65c655ed09dfe4e48b7464c60542f9f9902330288bbf87af38e",
   "docker.socket": "51a06786cae46bc63b7314c25d0bd5bb2e676120d80874b99e35bf60d0b0ffa8",
-  "moby-engine-25.0.18.tar.gz": "5ca139c4a740f8dc644179781bf9554e11de439211165f346d2c8c1f9bd81021"
+  "moby-engine-25.0.18.tar.gz": "3535239630a4a408495e3cdc696a00c3d1c69aa07d304297a984311e30e8b601"
  }
 }
