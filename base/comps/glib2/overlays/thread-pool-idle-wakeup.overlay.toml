@@ -1,0 +1,13 @@
+# Merged into GLib main by GNOME/glib!5484; drop when updating past the fix.
+# upstreamable denotes an OSS upstream fix not yet inherited from Fedora.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [
+    { url = "https://gitlab.gnome.org/GNOME/glib/-/commit/28656adb8a969dc816f3eb573d1b048d986cee91" },
+]
+
+[[overlays]]
+description = "Backport the merged upstream idle-thread shutdown fix and public regression from GNOME/glib!5484"
+type = "patch-add"
+source = "../glib-thread-pool-idle-wakeup.patch"
