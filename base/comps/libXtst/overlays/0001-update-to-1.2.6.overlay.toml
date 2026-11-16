@@ -1,0 +1,28 @@
+# Fedora f43 and f44 package libXtst 1.2.5. Update to the upstream 1.2.6
+# security release on the same f43 spec for these CVE fixes:
+# CVE-2026-94286, CVE-2026-109088
+# Remove this overlay once the imported Fedora spec packages 1.2.6 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.2.6"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.2.6"
+
+# The component uses manual release calculation, so restart Release at 1 for
+# the new version, as Fedora will.
+[[overlays]]
+description = "Reset Release for 1.2.6"
+type = "spec-update-tag"
+tag = "Release"
+value = "1%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}"
+
+[[overlays]]
+description = "Remove the obsolete 1.2.5 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libXtst-1\.2\.5\.tar\.xz\) = [0-9a-f]+(?:\r?\n|$)'

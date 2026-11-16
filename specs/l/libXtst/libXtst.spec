@@ -7,8 +7,8 @@
 
 Summary: X.Org X11 libXtst runtime library
 Name: libXtst
-Version: 1.2.5
-Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Version: 1.2.6
+Release: 1%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: MIT-open-group AND HPND-sell-variant AND X11 AND HPND-doc AND HPND-doc-sell
 URL: http://www.x.org
 
