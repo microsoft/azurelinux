@@ -1,0 +1,4 @@
+# New crate in Fedora FEDORA-2026-eda423298c: rust-sequoia-sq 1.5.0 depends on the new sqz crate.
+# https://src.fedoraproject.org/rpms/rust-sqz/c/302e4b12f6b1d1ec07be33b5f0cf2e1fd2678869
+[components.rust-sqz]
+spec = { type = "upstream", upstream-commit = "302e4b12f6b1d1ec07be33b5f0cf2e1fd2678869" }
