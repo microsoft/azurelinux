@@ -6,7 +6,7 @@
 Summary: A GNU stream text editor
 Name: sed
 Version: 4.9
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL-3.0-or-later
 URL: http://sed.sourceforge.net/
 Source0: ftp://ftp.gnu.org/pub/gnu/sed/sed-%{version}.tar.xz
@@ -34,6 +34,7 @@ Provides: /bin/sed
 #copylib
 Provides: bundled(gnulib)
 
+Patch3: CVE-2026-5958.patch
 %description
 The sed (Stream EDitor) editor is a stream or batch (non-interactive)
 editor.  Sed takes text as input, performs an operation or set of
