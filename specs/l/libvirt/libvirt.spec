@@ -297,7 +297,7 @@
 Summary: Library providing a simple virtualization API
 Name: libvirt
 Version: 11.6.0
-Release: 7%{?dist}
+Release: 9%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 URL: https://libvirt.org/
 
@@ -315,6 +315,8 @@ Patch: 0005-wireshark-Don-t-special-case-retval-of-get_program_d.patch
 Patch: 0006-wireshark-Introduce-and-use-vir_val_to_str.patch
 Patch: 0007-wireshark-Don-t-leak-column-strings.patch
 Patch: 0008-wireshark-Adapt-to-wireshark-4.6.0.patch
+# CVE-2026-18917 (bz #2520165)
+Patch: 0001-remote-Fix-integer-overflow-in-RPC-handler-for-virNo.patch
 
 
 Requires: libvirt-daemon = %{version}-%{release}
@@ -2712,6 +2714,9 @@ exit 0
 
 
 %changelog
+* Mon Oct 26 2026 Cole Robinson <crobinso@redhat.com> - 11.6.0-4
+- CVE-2026-18917 (bz #2520165)
+
 * Mon Feb 16 2026 Daniel P. Berrangé <berrange@redhat.com> - 11.6.0-3
 - Re-enable ZFS (rhbz#2407005)
 

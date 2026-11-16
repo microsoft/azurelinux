@@ -1,4 +1,7 @@
+# Pin to Fedora f43 libvirt-11.6.0-4 (FEDORA-2026-46b48b717f).
+# https://src.fedoraproject.org/rpms/libvirt/c/f7d94978f39392a107c96d259a66e6c149bc2f0c
 [components.libvirt]
+spec = { type = "upstream", upstream-commit = "f7d94978f39392a107c96d259a66e6c149bc2f0c" }
 
 # Disable Xen/libxl driver — not applicable to Azure Linux's Hyper-V/KVM environment.
 # The upstream spec enables libxl by default on x86_64/aarch64 when %fedora is set.
