@@ -11,13 +11,14 @@
 Summary:        IPSEC cryptography library optimized for Intel Architecture
 Name:           %{githubname}
 Version:        %{fullversion}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/intel/%{githubname}
 Source0:        https://github.com/intel/%{githubname}/archive/v%{githubver}/%{githubfull}.tar.gz
+Patch0:         CVE-2026-35683.patch
 BuildRequires:  cmake
 BuildRequires:  gcc >= 4.8.3
 BuildRequires:  gcc-c++
@@ -69,6 +70,9 @@ sed -i 's|man/man7|share/man/man7|g' lib/cmake/unix.cmake
 %{_mandir}/man7/libipsec-mb-dev.*
 
 %changelog
+* Mon Nov 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.0-2
+- Patch for CVE-2026-35683
+
 * Thu Feb 01 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.5.0-1
 - Upgrade to version 1.5
 
