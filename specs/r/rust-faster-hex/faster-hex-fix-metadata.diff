@@ -1,6 +1,31 @@
---- faster-hex-0.10.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ faster-hex-0.10.0/Cargo.toml	2025-08-10T18:06:05.406530+00:00
-@@ -48,16 +48,10 @@
+--- faster-hex-0.10.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ faster-hex-0.10.1/Cargo.toml	2026-10-17T20:00:48.803061+00:00
+@@ -39,12 +39,11 @@
+ repository = "https://github.com/NervosFoundation/faster-hex"
+ 
+ [features]
+-alloc = ["defmt?/alloc"]
++alloc = []
+ default = [
+     "std",
+     "serde",
+ ]
+-defmt-03 = ["dep:defmt"]
+ serde = [
+     "dep:serde",
+     "alloc",
+@@ -58,10 +57,6 @@
+ name = "faster_hex"
+ path = "src/lib.rs"
+ 
+-[dependencies.defmt]
+-version = "0.3"
+-optional = true
+-
+ [dependencies.serde]
+ version = "1.0"
+ optional = true
+@@ -70,16 +65,10 @@
  [dev-dependencies.bytes]
  version = "1.4.0"
  
