@@ -1,0 +1,4 @@
+# Pin to Fedora f43 mstflint-4.37.0_1.1-4 (FEDORA-2026-8c39ba6bab).
+# https://src.fedoraproject.org/rpms/mstflint/c/176fa8a7d96044249b455f4b4a9ec169b2769af8
+[components.mstflint]
+spec = { type = "upstream", upstream-commit = "176fa8a7d96044249b455f4b4a9ec169b2769af8" }

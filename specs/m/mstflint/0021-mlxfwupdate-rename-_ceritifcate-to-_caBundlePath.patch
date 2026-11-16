@@ -1,0 +1,92 @@
+From 928cb31a457e0d98ae544be8aac3582b806cb3b6 Mon Sep 17 00:00:00 2001
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 2 Nov 2026 18:40:31 +0100
+Subject: [PATCH 2/2] mlxfwupdate: rename _ceritifcate to _caBundlePath
+
+The ServerRequest member holds the path to a CA bundle file that is
+passed to libcurl as CURLOPT_CAINFO for TLS peer verification. The old
+name was misspelled and also inaccurate - it is not a certificate, but
+a path to a bundle of CA certificates. Rename it, and the constructor
+parameter it is initialized from, accordingly.
+
+Assisted-by: OpenCode:rits/zai-org/glm-5-3
+---
+ mlxfwupdate/server_request.cpp | 12 ++++++------
+ mlxfwupdate/server_request.h   |  4 ++--
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/mlxfwupdate/server_request.cpp b/mlxfwupdate/server_request.cpp
+index 66ca601a1418..23d2ebb5e09b 100644
+--- a/mlxfwupdate/server_request.cpp
++++ b/mlxfwupdate/server_request.cpp
+@@ -55,7 +55,7 @@ ServerRequest::ServerRequest(const char* url,
+                              int compare_ffv,
+                              bool show_progress,
+                              string key,
+-                             string certificate,
++                             string caBundlePath,
+                              unsigned int numberOfRetrials) :
+     _LastErrorNo(0)
+ {
+@@ -64,7 +64,7 @@ ServerRequest::ServerRequest(const char* url,
+     _WebService = _Url + "/downloads/firmware/mlx_fw_online_query.php";
+     _compare_ffv = compare_ffv;
+     _show_progress = show_progress;
+-    _ceritifcate = certificate;
++    _caBundlePath = caBundlePath;
+     _numberOfRetrials = numberOfRetrials;
+     _headers = NULL;
+     if (proxy != NULL)
+@@ -494,11 +494,11 @@ int ServerRequest::curl_request(const char* url, const char* data, const char* d
+     curl_easy_setopt(_curl, CURLOPT_URL, url);
+     curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, write_data);
+     curl_easy_setopt(_curl, CURLOPT_WRITEDATA, fp);
+-    if (!_ceritifcate.empty())
++    if (!_caBundlePath.empty())
+     {
+         // Use the CA bundle given via --ssl-certificate. Otherwise fall back
+         // to libcurl's default CA bundle (the system trust store).
+-        curl_easy_setopt(_curl, CURLOPT_CAINFO, _ceritifcate.c_str());
++        curl_easy_setopt(_curl, CURLOPT_CAINFO, _caBundlePath.c_str());
+     }
+     if (_show_progress)
+     {
+@@ -597,11 +597,11 @@ int ServerRequest::curl_request_str(const char* url, const char* data, string& r
+     curl_easy_setopt(_curl, CURLOPT_URL, url);
+     curl_easy_setopt(_curl, CURLOPT_WRITEDATA, &response);
+     curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, writebuf_data);
+-    if (!_ceritifcate.empty())
++    if (!_caBundlePath.empty())
+     {
+         // Use the CA bundle given via --ssl-certificate. Otherwise fall back
+         // to libcurl's default CA bundle (the system trust store).
+-        curl_easy_setopt(_curl, CURLOPT_CAINFO, _ceritifcate.c_str());
++        curl_easy_setopt(_curl, CURLOPT_CAINFO, _caBundlePath.c_str());
+     }
+ 
+     _headers = curl_slist_append(_headers, "Accept: application/json");
+diff --git a/mlxfwupdate/server_request.h b/mlxfwupdate/server_request.h
+index 3b443e31855f..970345a70e40 100644
+--- a/mlxfwupdate/server_request.h
++++ b/mlxfwupdate/server_request.h
+@@ -76,7 +76,7 @@ public:
+                   int compare_ffv,
+                   bool show_progress,
+                   string key,
+-                  string certificate,
++                  string caBundlePath,
+                   unsigned int numberOfRetrials);
+     ~ServerRequest();
+     int updateMFAsRequest(vector<string>& psid_list,
+@@ -112,7 +112,7 @@ private:
+     int _compare_ffv;
+     bool _show_progress;
+     string _key;
+-    string _ceritifcate;
++    string _caBundlePath;
+     unsigned int _numberOfRetrials;
+ #ifdef USE_CURL
+     static CURL* _curl;
+-- 
+2.56.0
+
