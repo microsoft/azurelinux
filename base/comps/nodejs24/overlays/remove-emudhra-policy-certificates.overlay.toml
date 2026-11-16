@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove eMudhra emSign compiled-in roots rather than changing only runtime trust configuration"
+type = "patch-add"
+source = "../remove-emudhra-certificates.patch"
