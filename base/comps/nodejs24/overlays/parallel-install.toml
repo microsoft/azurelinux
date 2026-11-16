@@ -1,0 +1,92 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://src.fedoraproject.org/rpms/nodejs24/c/1ff084a44cb053e8f5a63871962f8082babb864f" },
+    { url = "https://src.fedoraproject.org/rpms/nodejs24/c/f7f29396d8a65b4ba4d9cdfeced87dcc1828bc9b" },
+]
+
+[[overlays]]
+description = "Guarantee an unversioned node command while preferring this stream's bin package"
+type = "spec-search-replace"
+regex = '^Requires:\s+ca-certificates$'
+replacement = '''Requires: ca-certificates
+Requires: %{_bindir}/node
+Recommends: %{name}-bin = %{node_evr}'''
+
+[[overlays]]
+description = "Guarantee the npm command while preferring this stream's npm-bin package"
+type = "spec-append-lines"
+section = "%package"
+package = "npm"
+lines = ['''Requires: %{_bindir}/npm
+Recommends: %{name}-npm-bin >= %{npm_evr}
+Provides: npm = %{npm_evr}''']
+
+[[overlays]]
+description = "Split default node and npm commands into Fedora's mutually exclusive stream selectors"
+type = "spec-append-lines"
+section = "%description"
+package = "npm"
+lines = ['''%package bin
+Summary: Node.js JavaScript runtime - unversioned symlinks
+BuildArch: noarch
+Requires: %{name} = %{node_evr}
+Provides: alternative-for(nodejs-bin) = %{node_evr}
+Conflicts: alternative-for(nodejs-bin)
+
+%description bin
+Binary symlinks for Node.js JavaScript runtime.
+
+%package npm-bin
+Summary: Node.js Package Manager - binary symlinks
+Epoch: %{npm_epoch}
+Version: %{npm_version}
+Release: %{npm_release}
+BuildArch: noarch
+Requires: %{name}-npm = %{npm_evr}
+Requires(meta): %{name}-bin = %{node_evr}
+Provides: alternative-for(nodejs-npm-bin) = %{npm_evr}
+Conflicts: alternative-for(nodejs-npm-bin)
+
+%description npm-bin
+Binary symlinks for Node.js Package Manager.
+''']
+
+[[overlays]]
+description = "Create the unversioned command and manual symlinks owned by the selector RPMs"
+type = "spec-append-lines"
+section = "%install"
+lines = ['''
+pushd '%{buildroot}%{_bindir}'
+for binname in node npm npx; do
+    ln -srfL "${binname}-%{node_version_major}" "${binname}"
+done
+popd
+
+find "${VERSIONED_MANDIR}" -type d -name 'man[123456789]' -printf "${RPM_BUILD_ROOT}%{_mandir}/%%P\0" | xargs -0 mkdir -p
+find "${VERSIONED_MANDIR}" -type f -name '*.[123456789]*' -printf '%%P\n' | while read -r man_stem; do
+    ln -srfL "${VERSIONED_MANDIR}/${man_stem}" "${RPM_BUILD_ROOT}%{_mandir}/${man_stem}"
+done
+''']
+
+[[overlays]]
+description = "Assign the unversioned commands and manuals exclusively to their selector RPMs"
+type = "spec-append-lines"
+section = "%files"
+package = "docs"
+lines = ['''%files bin
+%license LICENSE
+%{_bindir}/node
+%{_mandir}/man1/node.1*
+
+%files npm-bin
+%license deps/npm/LICENSE
+%{_bindir}/npm
+%{_bindir}/npx
+%{_mandir}/man*/*
+%exclude %{_mandir}/man1/node.1*
+%exclude %{_mandir}/man1/node-%{node_version_major}.1*
+%exclude %{_mandir}/man1/npm-%{node_version_major}.1*
+%exclude %{_mandir}/man1/npx-%{node_version_major}.1*
+''']

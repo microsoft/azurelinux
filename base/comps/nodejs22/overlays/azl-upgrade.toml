@@ -1,0 +1,90 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Replace unversioned Node.js RPMs already shipped beyond Fedora's migration cutoff"
+type = "spec-search-replace"
+regex = '^Obsoletes: nodejs%\{\?1:-%\{1\}\} < .*$'
+replacement = 'Obsoletes: nodejs%{?1:-%{1}} < %{nodejs_envr}\'
+
+[[overlays]]
+description = "Replace the unversioned npm RPM already shipped beyond Fedora's migration cutoff"
+type = "spec-search-replace"
+regex = '^Obsoletes: nodejs-npm < .*$'
+replacement = 'Obsoletes: nodejs-npm < %{npm_envr}'
+
+[[overlays]]
+description = "Preserve architecture-qualified dependencies on the formerly unversioned runtime"
+type = "spec-search-replace"
+regex = '^%unversioned_obsoletes_of_nodejsXX_if_default$'
+replacement = '''%unversioned_obsoletes_of_nodejsXX_if_default
+Provides: nodejs%{?_isa} = %{nodejs_envr}'''
+
+[[overlays]]
+description = "Preserve architecture-qualified dependencies on the formerly unversioned development package"
+type = "spec-append-lines"
+section = "%package"
+package = "%{pkgname}-devel"
+lines = ['Provides: nodejs-devel%{?_isa} = %{nodejs_envr}']
+
+[[overlays]]
+description = "Preserve architecture-qualified dependencies on the formerly unversioned libraries"
+type = "spec-append-lines"
+section = "%package"
+package = "%{pkgname}-libs"
+lines = ['Provides: nodejs-libs%{?_isa} = %{nodejs_envr}']
+
+[[overlays]]
+description = "Preserve architecture-qualified dependencies on the formerly unversioned locale data package"
+type = "spec-append-lines"
+section = "%package"
+package = "%{pkgname}-full-i18n"
+lines = ['Provides: nodejs-full-i18n%{?_isa} = %{nodejs_envr}']
+
+[[overlays]]
+description = "Preserve architecture-qualified dependencies on the formerly unversioned npm package"
+type = "spec-append-lines"
+section = "%package"
+package = "%{pkgname}-npm"
+lines = ['Provides: nodejs-npm%{?_isa} = %{npm_envr}']
+
+[[overlays]]
+description = "Keep the shipped major-only V8 library entry points independent of default command selection"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    'for soname in libv8 libv8_libbase libv8_libplatform; do',
+    '    ln -srf %{buildroot}%{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}',
+    'done',
+]
+
+[[overlays]]
+description = "Retain the formerly default stream's major-only V8 compatibility links in its libraries package"
+type = "spec-prepend-lines"
+section = "%files"
+package = "%{pkgname}-libs"
+lines = [
+    '%{_libdir}/libv8.so.%{v8_major}',
+    '%{_libdir}/libv8_libbase.so.%{v8_major}',
+    '%{_libdir}/libv8_libplatform.so.%{v8_major}',
+]
+
+[[overlays]]
+description = "Preserve the shipped global npm configuration when retiring default-stream packaging"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    'mkdir -p %{buildroot}%{_sysconfdir}',
+    'cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc',
+]
+
+[[overlays]]
+description = "Retain ownership and noreplace handling of existing customer npm configuration"
+type = "spec-prepend-lines"
+section = "%files"
+package = "%{pkgname}-npm"
+lines = [
+    '%config(noreplace) %{_sysconfdir}/npmrc',
+    '%ghost %{_sysconfdir}/npmignore',
+]

@@ -23,7 +23,7 @@ _MAIN_PACKAGES = {
     "container-postgres": "postgresql-server",
     "container-telegraf": "telegraf",
     "container-python": "python3",
-    "container-nodejs": "nodejs",
+    "container-nodejs": "nodejs24",
     "container-pytorch": "python3-torch",
 }
 

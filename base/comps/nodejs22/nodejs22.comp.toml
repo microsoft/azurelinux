@@ -1,3 +1,4 @@
 [components.nodejs22]
-# Release: %{nodejs_release}
-release = { calculation = "manual" }
+# %autorelease is expanded through baserelease rather than the Release tag.
+release = { calculation = "autorelease" }
+overlay-files = ["overlays/parallel-install.toml", "overlays/azl-upgrade.toml"]
