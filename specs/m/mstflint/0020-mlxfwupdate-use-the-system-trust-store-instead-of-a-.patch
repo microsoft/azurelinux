@@ -1,0 +1,162 @@
+From 36558cedb727fc89f2405696df170b727e775bcf Mon Sep 17 00:00:00 2001
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 2 Nov 2026 17:59:15 +0100
+Subject: [PATCH 1/2] mlxfwupdate: use the system trust store instead of a
+ private CA bundle
+
+mstfwmanager verified the TLS peers of the online firmware
+query/download service (www.mellanox.com) against a private CA bundle
+installed to /etc/mstflint/ca-bundle.crt - a copy of the Mozilla root
+store that only changes when someone manually refreshes it as part of
+an mstflint release. It goes stale in between: the previous snapshot
+was from July 2021 and still trusted roots that have since been
+removed or distrusted, including the roots involved in the eMudhra
+intermediate CA compromise (Mellanox/mstflint#2075).
+
+The bundle has recently been refreshed on master_devel (df328a2759e0,
+"Refresh ca-bundle.crt to current Mozilla roots"), which addresses the
+currently known distrust issues. But this is only the third bundle
+update since 2017 (2017, 2021, 2026) - the copy inevitably goes stale
+for years at a time and every CA distrust event would require a new
+mstflint release to catch up.
+
+Rely on libcurl's default CA bundle, the system trust store maintained
+by the distribution (e.g. the ca-certificates package), which is
+updated independently of mstflint releases. --ssl-certificate can still
+be used to pass a custom CA bundle. On Windows the lookup of
+ca-bundle.crt next to the executable is unchanged.
+
+This also fixes the online features on FreeBSD, where the bundle is not
+packaged at all: it installs to the absolute path /etc/mstflint, which
+is outside the ports PREFIX, so mstfwmanager failed with "Can't find
+Certificate" unless --ssl-certificate was given. libcurl's default CA
+path there (/etc/ssl/certs, populated by certctl(8) and the ca_root_nss
+package) works out of the box. The FreeBSD behavior was deduced from
+the ports collection sources, not tested.
+
+Stop installing the bundle (the /etc/mstflint directory contained
+nothing else). No new runtime dependency is needed on distributions
+whose OpenSSL library already requires the CA certificates package
+(such as Fedora and RHEL); other distributions may want to add an
+explicit Requires for their CA certificates package instead.
+
+Assisted-by: OpenCode:rits/zai-org/glm-5-3
+---
+ man/mstfwmanager.md             |  2 +-
+ mlxfwupdate/Makefile.am         |  7 +++++--
+ mlxfwupdate/cmd_line_params.cpp |  5 ++++-
+ mlxfwupdate/mlxfwmanager.cpp    |  5 ++++-
+ mlxfwupdate/server_request.cpp  | 14 ++++++++++++--
+ mstflint.spec.in                |  1 -
+ 6 files changed, 26 insertions(+), 8 deletions(-)
+
+diff --git a/man/mstfwmanager.md b/man/mstfwmanager.md
+index c64fc26287c6..b0c35de9d408 100644
+--- a/man/mstfwmanager.md
++++ b/man/mstfwmanager.md
+@@ -127,7 +127,7 @@ OPTIONS
+     : MFA | self\_extractor - default All
+ 
+   - **-\-ssl-certificate** Certificate  
+-    : SSL certificate For secure connection
++    : CA bundle for TLS peer verification, overriding the default system trust store
+ 
+ # EXAMPLES
+ 
+diff --git a/mlxfwupdate/Makefile.am b/mlxfwupdate/Makefile.am
+index a86a58afd1d7..43ee02e86e8e 100755
+--- a/mlxfwupdate/Makefile.am
++++ b/mlxfwupdate/Makefile.am
+@@ -30,8 +30,11 @@
+ 
+ # Makefile.am -- Process this file with automake to produce Makefile.in
+ 
+-docdir = $(INSTALL_BASEDIR)/etc/mstflint
+-dist_doc_DATA = certificate/ca-bundle.crt
++# Note: certificate/ca-bundle.crt is not installed anymore. mstfwmanager uses
++# libcurl's default CA bundle (the system trust store) unless --ssl-certificate
++# is given. The file is kept for Windows builds, which look for it next to the
++# executable.
++EXTRA_DIST = certificate/ca-bundle.crt
+ 
+ AM_CPPFLAGS = \
+     -I$(srcdir) \
+diff --git a/mlxfwupdate/cmd_line_params.cpp b/mlxfwupdate/cmd_line_params.cpp
+index d5bf37d05ade..b98a2f189ade 100644
+--- a/mlxfwupdate/cmd_line_params.cpp
++++ b/mlxfwupdate/cmd_line_params.cpp
+@@ -94,7 +94,10 @@ CmdLineParams::CmdLineParams()
+ 
+ #else
+ #ifdef MSTFLINT
+-    certificate = (string)ROOT_PATH + "etc/mstflint/ca-bundle.crt";
++    // An empty certificate makes libcurl use its default CA bundle, which
++    // is the system trust store maintained by the distribution (e.g. the
++    // ca-certificates package). It can be overridden with --ssl-certificate.
++    certificate = "";
+ #else
+     certificate = (string)ROOT_PATH + "etc/mft/ca-bundle.crt";
+ #endif
+diff --git a/mlxfwupdate/mlxfwmanager.cpp b/mlxfwupdate/mlxfwmanager.cpp
+index 2de01b216148..da92ad38348b 100644
+--- a/mlxfwupdate/mlxfwmanager.cpp
++++ b/mlxfwupdate/mlxfwmanager.cpp
+@@ -1371,7 +1371,10 @@ bool checkCmdParams(CmdLineParams& cmd_params, config_t& config)
+             return false;
+         }
+     }
+-    if (cmd_params.onlineQueryPsids.length() || cmd_params.download || cmd_params.update_online)
++    // An empty certificate means libcurl's default CA bundle (the system
++    // trust store) is used - there is nothing to validate then.
++    if (!cmd_params.certificate.empty() &&
++        (cmd_params.onlineQueryPsids.length() || cmd_params.download || cmd_params.update_online))
+     {
+         cmd_params.certificate = adjustRelPath(cmd_params.certificate, config.adjuster_path);
+         Filesystem::path p(cmd_params.certificate);
+diff --git a/mlxfwupdate/server_request.cpp b/mlxfwupdate/server_request.cpp
+index 9ab439053894..66ca601a1418 100644
+--- a/mlxfwupdate/server_request.cpp
++++ b/mlxfwupdate/server_request.cpp
+@@ -494,7 +494,12 @@ int ServerRequest::curl_request(const char* url, const char* data, const char* d
+     curl_easy_setopt(_curl, CURLOPT_URL, url);
+     curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, write_data);
+     curl_easy_setopt(_curl, CURLOPT_WRITEDATA, fp);
+-    curl_easy_setopt(_curl, CURLOPT_CAINFO, _ceritifcate.c_str());
++    if (!_ceritifcate.empty())
++    {
++        // Use the CA bundle given via --ssl-certificate. Otherwise fall back
++        // to libcurl's default CA bundle (the system trust store).
++        curl_easy_setopt(_curl, CURLOPT_CAINFO, _ceritifcate.c_str());
++    }
+     if (_show_progress)
+     {
+         // Internal CURL progressmeter must be disabled if we provide our own callback
+@@ -592,7 +597,12 @@ int ServerRequest::curl_request_str(const char* url, const char* data, string& r
+     curl_easy_setopt(_curl, CURLOPT_URL, url);
+     curl_easy_setopt(_curl, CURLOPT_WRITEDATA, &response);
+     curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, writebuf_data);
+-    curl_easy_setopt(_curl, CURLOPT_CAINFO, _ceritifcate.c_str());
++    if (!_ceritifcate.empty())
++    {
++        // Use the CA bundle given via --ssl-certificate. Otherwise fall back
++        // to libcurl's default CA bundle (the system trust store).
++        curl_easy_setopt(_curl, CURLOPT_CAINFO, _ceritifcate.c_str());
++    }
+ 
+     _headers = curl_slist_append(_headers, "Accept: application/json");
+     _headers = curl_slist_append(_headers, "Content-Type: application/json");
+diff --git a/mstflint.spec.in b/mstflint.spec.in
+index 7c173a07b1cc..0d290caccae0 100644
+--- a/mstflint.spec.in
++++ b/mstflint.spec.in
+@@ -203,7 +203,6 @@ rm -rf $RPM_BUILD_ROOT
+ %if %{enablefwmgr}
+  %{_bindir}/mstfwmanager
+  %{_bindir}/mstarchive
+-%{CONF_DIR}/ca-bundle.crt
+ %endif
+ %if %{enabledpa}
+  %{_bindir}/mstdpa
+-- 
+2.56.0
+
