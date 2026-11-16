@@ -1,0 +1,4 @@
+# Pin to Fedora f43 glib-networking-2.80.1-4 (FEDORA-2026-7ac02f7c9b).
+# https://src.fedoraproject.org/rpms/glib-networking/c/c7ba6bd337bd57067092f155c8fad1f2d09d122d
+[components.glib-networking]
+spec = { type = "upstream", upstream-commit = "c7ba6bd337bd57067092f155c8fad1f2d09d122d" }
