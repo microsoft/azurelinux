@@ -24,7 +24,7 @@
 
 Name:           python-%{srcname}
 Version:        12.3.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -110,6 +110,41 @@ Requires:       ghostscript
 %global __provides_exclude_from ^%{python3_sitearch}/PIL/.*\\.so$
 
 Patch4: CVE-2026-112900.patch
+Patch5: CVE-2026-96641.patch
+Patch6: CVE-2026-96636.patch
+Patch7: CVE-2026-96642.patch
+Patch8: CVE-2026-96638.patch
+Patch9: CVE-2026-112397.patch
+Patch10: CVE-2026-112893.patch
+Patch11: CVE-2026-112405.patch
+Patch12: CVE-2026-96643.patch
+Patch13: CVE-2026-96637.patch
+Patch14: CVE-2026-112402.patch
+Patch15: CVE-2026-96640.patch
+Patch16: CVE-2026-96639.patch
+Patch17: CVE-2026-112901.patch
+Patch18: CVE-2026-112899.patch
+Patch19: CVE-2026-112400.patch
+Patch20: CVE-2026-112396.patch
+Patch21: CVE-2026-96644.patch
+Patch22: CVE-2026-112399.patch
+Patch23: CVE-2026-96778.patch
+Patch24: CVE-2026-112406.patch
+Patch25: CVE-2026-112391.patch
+Patch26: CVE-2026-112898.patch
+Patch27: CVE-2026-112392.patch
+Patch28: CVE-2026-112894.patch
+Patch29: CVE-2026-112896.patch
+Patch30: CVE-2026-112390.patch
+Patch31: CVE-2026-112401.patch
+Patch32: CVE-2026-112404.patch
+Patch33: CVE-2026-112895.patch
+Patch34: CVE-2026-114501.patch
+Patch35: CVE-2026-112395.patch
+Patch36: CVE-2026-112394.patch
+Patch37: CVE-2026-128066.patch
+Patch38: CVE-2026-128067.patch
+Patch39: CVE-2026-112902.patch
 %description
 Python image processing library, fork of the Python Imaging Library (PIL)
 

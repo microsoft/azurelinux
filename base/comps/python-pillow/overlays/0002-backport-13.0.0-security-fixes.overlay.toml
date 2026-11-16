@@ -1,0 +1,239 @@
+# Backport the Pillow 13.0.0 security fixes onto Fedora 44's Pillow 12.3.0.
+# Pillow 13.0.0 also removes and changes APIs, and there is no 12.3.x release,
+# so the upstream commits are applied as patches like the EPS fix in 0001.
+# Patches are in upstream merge order and apply on top of the Fedora patches.
+# Patches marked "Azure Linux backport" in their message were rebased onto 12.3.0.
+# CVE-2026-112398 needs no patch: Fedora's CVE-2026-112403.patch is the same
+# upstream commit (242a059aedc1).
+# Drop when the imported Fedora spec packages Pillow 13.0.0 or newer.
+
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+  { url = "https://github.com/python-pillow/Pillow/commit/80de4be9e38d3a6148dd4d8491eb80cd12b760a4" },
+  { url = "https://github.com/python-pillow/Pillow/commit/f1acfc54c53502948d0d14121872061df931db48" },
+  { url = "https://github.com/python-pillow/Pillow/commit/fb2c298ac69d2204d56030b7a38e118381213a06" },
+  { url = "https://github.com/python-pillow/Pillow/commit/19b695fdcc5eddc37374e2b1645fc4185edaf71d" },
+  { url = "https://github.com/python-pillow/Pillow/commit/4c1ed27a580147c6a7fa05dac4799b78edaa50b1" },
+  { url = "https://github.com/python-pillow/Pillow/commit/e7794835e323ff2691d9b3a974cade1a44301b9a" },
+  { url = "https://github.com/python-pillow/Pillow/commit/18f7c0dfee93063c51db6ed0ca8c4da2999dcb64" },
+  { url = "https://github.com/python-pillow/Pillow/commit/a7416de7f3a43128179d2cf68df3240ea8dafe13" },
+  { url = "https://github.com/python-pillow/Pillow/commit/b6ee66e8b2c2c0932bdf65f963268d9f2927ef86" },
+  { url = "https://github.com/python-pillow/Pillow/commit/806e38381c781f32bbd22f4cd026678acd40fd6c" },
+  { url = "https://github.com/python-pillow/Pillow/commit/7cb0e02389d8aac2a60896a490f572db0b07b841" },
+  { url = "https://github.com/python-pillow/Pillow/commit/5c1e5991d44462055f39dd0d5f5b807bd2fc1d28" },
+  { url = "https://github.com/python-pillow/Pillow/commit/aafa6c75f7cdabb9f409a8aac7c780bea31d08d9" },
+  { url = "https://github.com/python-pillow/Pillow/commit/167e64be4616a76b4554774948205e7533a0e361" },
+  { url = "https://github.com/python-pillow/Pillow/commit/3220acae3f820e81c619a75dfb9104ddfa529cb6" },
+  { url = "https://github.com/python-pillow/Pillow/commit/6f0e7ee1f9c2fe227906f8a4b926e6622b702bc7" },
+  { url = "https://github.com/python-pillow/Pillow/commit/78d97d994579aef81aafe123773d525f40f2522a" },
+  { url = "https://github.com/python-pillow/Pillow/commit/2852a3e3d568997ddec745fc800991f138878f4b" },
+  { url = "https://github.com/python-pillow/Pillow/commit/cb77e1bfaa02449b2a61486ce02f509438c801a5" },
+  { url = "https://github.com/python-pillow/Pillow/commit/3e8cc105588d1dfe062fcada0b6058c1b5f14b65" },
+  { url = "https://github.com/python-pillow/Pillow/commit/6faed707cfb760a4cbd726ddc8406f576cf35bf7" },
+  { url = "https://github.com/python-pillow/Pillow/commit/dc95da20207827a062cfbf551ee9f6031465a8bb" },
+  { url = "https://github.com/python-pillow/Pillow/commit/4cf46bee338304c5c8968fd7f132ba0d40c428b7" },
+  { url = "https://github.com/python-pillow/Pillow/commit/b564ea660bb3d56fcadaa7f29b4fc93a8f9e5c91" },
+  { url = "https://github.com/python-pillow/Pillow/commit/942f338175aa744ac90ebc7229ac5264ae84d73b" },
+  { url = "https://github.com/python-pillow/Pillow/commit/02561b8dc6117d5670d4b469fecdd02c70854f9b" },
+  { url = "https://github.com/python-pillow/Pillow/commit/b3ebf20c694f2f12537a629c30229a1d5a53f777" },
+  { url = "https://github.com/python-pillow/Pillow/commit/94cb11c44ff7345414da17ebfea1598a529ad9cd" },
+  { url = "https://github.com/python-pillow/Pillow/commit/13943c8f857b22f073d30f0ef9b725a0d255f1a4" },
+  { url = "https://github.com/python-pillow/Pillow/commit/89ef6b1a173edc6fd877291e1f9111292e915049" },
+  { url = "https://github.com/python-pillow/Pillow/commit/dfe04d5ee3b25f75adb67d9c2d2ff00e7e1e6257" },
+  { url = "https://github.com/python-pillow/Pillow/commit/9f7010dada2aca8457dc8b8a16df82084d3493d6" },
+  { url = "https://github.com/python-pillow/Pillow/commit/443e3130a8c11594fd0e296afad497e11e678961" },
+  { url = "https://github.com/python-pillow/Pillow/commit/f6a852555f1a1bdff7781abf25f1a3b8bd6ce6cb" },
+  { url = "https://github.com/python-pillow/Pillow/commit/d03dc3c587a9b0bdc9e4304d70d59a635a87b742" },
+  { url = "https://github.com/python-pillow/Pillow/commit/0e546950c3d00cb7bcb033e18d49c6ee48c08988" },
+  { url = "https://github.com/python-pillow/Pillow/commit/26cb3ed061173b817b9ee4b6f507cb0e1e293218" },
+  { url = "https://github.com/python-pillow/Pillow/commit/68a3fe957d8a4d552e8c69d96066d749f0614c7e" },
+  { url = "https://github.com/python-pillow/Pillow/commit/1d4773e6cea0c4a2814e6d4cdc099bbcf56da6ce" },
+  { url = "https://github.com/python-pillow/Pillow/commit/852d834491c7ecd252b5072f5d8d18d3bba3f72b" },
+  { url = "https://github.com/python-pillow/Pillow/commit/e2ae7eacad6de68c37eb28b633a97bebacf2c5bf" },
+  { url = "https://github.com/python-pillow/Pillow/commit/19f64946eb247b973dd4560be7dea3bf979d2e6a" },
+  { url = "https://github.com/python-pillow/Pillow/commit/d01e2fe0f02a0293018c27eb3288b3511675bd89" },
+  { url = "https://github.com/python-pillow/Pillow/commit/76869efdbbf2ad7dccd7536520fb61b7a00ab61e" },
+  { url = "https://github.com/python-pillow/Pillow/commit/392ee6f0d19a4adb766a63e9a99f3c28193b8d31" },
+  { url = "https://github.com/python-pillow/Pillow/commit/4908edaf7f416616784c7c03d8c1a60153710ffb" },
+  { url = "https://github.com/python-pillow/Pillow/commit/4b63dffd8a6d980fa0e21b40832fa6cbf033eacf" },
+  { url = "https://github.com/python-pillow/Pillow/commit/ec5f1cbcf67275641abaad5c065ffb64a0a804a9" },
+  { url = "https://github.com/python-pillow/Pillow/commit/8501adcb81088f1def8f59ff3f4b6837dd211c5f" },
+  { url = "https://github.com/python-pillow/Pillow/commit/570df030c0d30c2bf5336b2ab59f3902d8ab0b6d" },
+]
+
+[[overlays]]
+description = "Fix CVE-2026-96641 (integer underflow in PILfont text width) by backporting Pillow 80de4be9e3"
+type = "patch-add"
+source = "../CVE-2026-96641.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96636 (decompression bomb check after MPO, DCX and MIC seek(), with the test follow-up that only imports olefile inside the new test) by backporting Pillow f1acfc54c5, fb2c298ac6"
+type = "patch-add"
+source = "../CVE-2026-96636.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96642 (TarIO negative size infinite loop, with the follow-up that allows zero-length members again) by backporting Pillow 19b695fdcc, 4c1ed27a58"
+type = "patch-add"
+source = "../CVE-2026-96642.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96638 (BMP RLE decoder memory amplification) by backporting Pillow e7794835e3"
+type = "patch-add"
+source = "../CVE-2026-96638.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112397 (ImageMorph out-of-bounds access on zero-width images) by backporting Pillow 18f7c0dfee"
+type = "patch-add"
+source = "../CVE-2026-112397.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112893 (invalid free of the FreeType glyph when a stroker is active) by backporting Pillow a7416de7f3"
+type = "patch-add"
+source = "../CVE-2026-112893.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112405 (Image.merge() with 32-bit bands) by backporting Pillow b6ee66e8b2"
+type = "patch-add"
+source = "../CVE-2026-112405.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96643 (quadratic EXIF header replacement for PNG eXIf) by backporting Pillow 806e38381c"
+type = "patch-add"
+source = "../CVE-2026-96643.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96637 (decompression bomb check after SPIDER seek()) by backporting Pillow 7cb0e02389"
+type = "patch-add"
+source = "../CVE-2026-96637.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112402 (double free in Image.transform() after an allocation failure (upstream PR #10075)) by backporting Pillow 5c1e5991d4, aafa6c75f7, 167e64be46"
+type = "patch-add"
+source = "../CVE-2026-112402.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96640 (PDF append page tree loops, with the linearize_page_tree() test it extends) by backporting Pillow 3220acae3f, 6f0e7ee1f9"
+type = "patch-add"
+source = "../CVE-2026-96640.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96639 (stale core image reused after a mode or size change in seek()) by backporting Pillow 78d97d9945"
+type = "patch-add"
+source = "../CVE-2026-96639.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112901 (XBM header regular expression DoS, with the follow-up that keeps non-XBM files unidentified) by backporting Pillow 2852a3e3d5, cb77e1bfaa"
+type = "patch-add"
+source = "../CVE-2026-112901.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112899 (EPS Ghostscript rendering past the decompression bomb limit) by backporting Pillow 3e8cc10558"
+type = "patch-add"
+source = "../CVE-2026-112899.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112400 (GIF size kept after a failed decompression bomb check) by backporting Pillow 6faed707cf"
+type = "patch-add"
+source = "../CVE-2026-112400.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112396 (use-after-free after a libtiff encode error) by backporting Pillow dc95da2020"
+type = "patch-add"
+source = "../CVE-2026-112396.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96644 (WMF dimensions limited to 0-65535 (the native renderer is Windows-only)) by backporting Pillow 4cf46bee33"
+type = "patch-add"
+source = "../CVE-2026-96644.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112399 (APNG disposal frame allocated before the decompression bomb check, with the OP_PREVIOUS regression fix) by backporting Pillow b564ea660b, 942f338175"
+type = "patch-add"
+source = "../CVE-2026-112399.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-96778 (JPEG COM marker written past the encoder buffer) by backporting Pillow 02561b8dc6"
+type = "patch-add"
+source = "../CVE-2026-96778.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112406 (infinite loop rewriting PDF pages with a Parent cycle) by backporting Pillow b3ebf20c69"
+type = "patch-add"
+source = "../CVE-2026-112406.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112391 (PdfParser unbounded recursion in get_value()) by backporting Pillow 94cb11c44f"
+type = "patch-add"
+source = "../CVE-2026-112391.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112898 (quantize() with an empty palette) by backporting Pillow 13943c8f85"
+type = "patch-add"
+source = "../CVE-2026-112898.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112392 (rank filters on zero-size images, with the kernel size 1 divide-by-zero fix (upstream PR #9755) that its test needs) by backporting Pillow 89ef6b1a17, dfe04d5ee3, 9f7010dada, 443e3130a8"
+type = "patch-add"
+source = "../CVE-2026-112392.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112894 (quadratic PDF object ID assignment) by backporting Pillow f6a852555f"
+type = "patch-add"
+source = "../CVE-2026-112894.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112896 (TIFF ColorMap length, with the follow-up that fixes the saved ColorMap planes) by backporting Pillow d03dc3c587, 0e546950c3"
+type = "patch-add"
+source = "../CVE-2026-112896.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112390 (infinite loop in MIC n_frames) by backporting Pillow 26cb3ed061"
+type = "patch-add"
+source = "../CVE-2026-112390.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112401 and CVE-2026-112891 (quadratic GIF comment handling on open and save) by backporting Pillow 68a3fe957d"
+type = "patch-add"
+source = "../CVE-2026-112401.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112404 and CVE-2026-112897 (TIFF strip and tile buffer cleared beyond the decoded data) by backporting Pillow 1d4773e6ce"
+type = "patch-add"
+source = "../CVE-2026-112404.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112895 (recursion on long PDF trailer chains and deep or cyclic page trees) by backporting Pillow 852d834491, e2ae7eacad"
+type = "patch-add"
+source = "../CVE-2026-112895.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-114501 (Arrow export of non-contiguous images) by backporting Pillow 19f64946eb"
+type = "patch-add"
+source = "../CVE-2026-114501.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112395 (TIFF tile and RGBA unpacker reading past the libtiff row buffer, with the tile size prerequisite) by backporting Pillow d01e2fe0f0, 76869efdbb"
+type = "patch-add"
+source = "../CVE-2026-112395.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112394 (P;2L and P;4L decoders reading past the input) by backporting Pillow 392ee6f0d1"
+type = "patch-add"
+source = "../CVE-2026-112394.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-128066 (retained TIFF and EXIF tag data bounded by the stream size, shared across frames) by backporting Pillow 4908edaf7f, 4b63dffd8a"
+type = "patch-add"
+source = "../CVE-2026-128066.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-128067 (libtiff scanline geometry larger than the encoder row buffer) by backporting Pillow ec5f1cbcf6, 8501adcb81"
+type = "patch-add"
+source = "../CVE-2026-128067.patch"
+
+[[overlays]]
+description = "Fix CVE-2026-112902 (TIFF tag values validated against libtiff field definitions) by backporting Pillow 570df030c0"
+type = "patch-add"
+source = "../CVE-2026-112902.patch"
