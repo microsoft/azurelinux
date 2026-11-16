@@ -490,6 +490,14 @@ export CFLAGS CXXFLAGS FCFLAGS
 %install
 %{__make} install DESTDIR=$RPM_BUILD_ROOT %{?mflags_install}
 
+# Keep the canonical %license file instead of generated license documentation.
+rm -f %{buildroot}%{_pkgdocdir}/html/_sources/license/index.rst.txt \
+      %{buildroot}%{_pkgdocdir}/html/license/index.html
+%if 0%{?azl}
+rm %{buildroot}%{_docdir}/prrte/html/_sources/license.rst.txt \
+   %{buildroot}%{_docdir}/prrte/html/license.html
+%endif
+
 # We've had cases of config.log being left in the installation tree.
 # We don't need that in an RPM.
 find $RPM_BUILD_ROOT -name config.log -exec rm -f {} \;

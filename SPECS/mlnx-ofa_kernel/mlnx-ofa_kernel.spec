@@ -376,9 +376,6 @@ for flavor in %flavors_to_build; do
 	cp -ar include/ %{_builddir}/src/$NAME/$flavor
 	cp -ar config* %{_builddir}/src/$NAME/$flavor
 	cp -ar compat*  %{_builddir}/src/$NAME/$flavor
-	find %{_builddir}/src/$NAME/$flavor -name \*.o -o -name \*.ko | xargs -r rm -f
-	rm -rf %{_builddir}/src/$NAME/$flavor/compat/modtest
-
 	cp -ar ofed_scripts %{_builddir}/src/$NAME/$flavor
 
 	modsyms=`find . -name Module.symvers -o -name Modules.symvers`

@@ -37,6 +37,7 @@ fi
 
 %install
 %make_install
+rm %{buildroot}%{_docdir}/%{name}/copying
 
 
 %files
@@ -46,7 +47,6 @@ fi
 %doc /usr/share/doc/sockperf/authors
 %doc /usr/share/doc/sockperf/news
 %doc /usr/share/doc/sockperf/version
-%doc /usr/share/doc/sockperf/copying
 %license copying
 
 %changelog
