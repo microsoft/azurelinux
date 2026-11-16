@@ -1,0 +1,16 @@
+# Since 1.4.7 the public jxrgluelib/JXRGlue.h does #include <JXRVersion.h>,
+# but Fedora's CMakeLists.txt (Source1, written for 1.1) does not install that
+# header, so every jxrlib-devel consumer (kf6-kimageformats) fails to compile.
+# Install it next to JXRGlue.h.
+# Remove once Fedora's jxrlib installs JXRVersion.h.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Install the JXRVersion.h header included by JXRGlue.h"
+type = "file-search-replace"
+file = "CMakeLists.txt"
+regex = 'install\(FILES jxrgluelib/JXRGlue\.h jxrgluelib/JXRMeta\.h '
+replacement = 'install(FILES jxrgluelib/JXRGlue.h jxrgluelib/JXRMeta.h jxrgluelib/JXRVersion.h '

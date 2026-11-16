@@ -2,16 +2,13 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           jxrlib
-Version:        1.1
-Release: 37%{?dist}
+Version:        1.4.7
+Release: 7%{?dist}
 Summary:        Open source implementation of jpegxr
 
-# See JPEGXR_DPK_Spec_1.0.doc. Upstream request for plain text license file at
-# https://jxrlib.codeplex.com/workitem/13
-# Automatically converted from old format: BSD - review is highly recommended.
-License:        LicenseRef-Callaway-BSD
-URL:            https://jxrlib.codeplex.com/
-Source0:        http://jxrlib.codeplex.com/downloads/get/685249#/jxrlib_%(echo %{version} | tr . _).tar.gz
+License:        BSD-2-Clause
+URL:            https://github.com/mircomir/jxrlib
+Source0:        https://github.com/mircomir/jxrlib/archive/%{version}/%{name}-%{version}.tar.gz
 # Use CMake to build to facilitate creation of shared libraries
 # See https://jxrlib.codeplex.com/workitem/13
 Source1:        CMakeLists.txt
@@ -19,9 +16,6 @@ Source1:        CMakeLists.txt
 # libreoffice --headless --convert-to pdf doc/JPEGXR_DPK_Spec_1.0.doc
 Source2:        JPEGXR_DPK_Spec_1.0.pdf
 
-# Fix various warnings, upstreamable
-# See https://jxrlib.codeplex.com/workitem/13
-Patch0:         jxrlib_warnings.patch
 # Mingw build fixes
 
 BuildRequires:  cmake
@@ -44,7 +38,7 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q -n %{name}
+%autosetup -p1 -n %{name}-%{version}
 
 # Sanitize charset and line endings
 for file in `find . -type f -name '*.c' -or -name '*.h' -or -name '*.txt'`; do
@@ -52,9 +46,6 @@ for file in `find . -type f -name '*.c' -or -name '*.h' -or -name '*.txt'`; do
   sed -i 's|\r||g' $file.new && \
   touch -r $file $file.new && mv $file.new $file
 done
-
-%patch -P0 -p1
-
 
 # Remove shipped binaries
 rm -rf bin
@@ -98,6 +89,18 @@ cp -a %{SOURCE2} doc
 %{_libdir}/libjxrglue.so
 
 %changelog
+* Mon Nov 16 2026 Sandro Mani <manisandro@gmail.com> - 1.4.7-1
+- Update to 1.4.7
+
+* Tue Nov 10 2026 Sandro Mani <manisandro@gmail.com> - 1.4.6-1
+- Update to 1.4.6
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-34
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-32
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
