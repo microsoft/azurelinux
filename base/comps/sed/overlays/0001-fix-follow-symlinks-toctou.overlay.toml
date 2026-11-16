@@ -1,0 +1,11 @@
+# Drop when the imported Fedora spec packages sed 4.10 or newer.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://git.savannah.gnu.org/cgit/sed.git/commit/?id=6b9b43c55ccd3beadbc0094b983c82bdb389f33b" }]
+bugs = [{ url = "https://cert.pl/en/posts/2026/04/CVE-2026-5958" }]
+
+[[overlays]]
+description = "Fix CVE-2026-5958 by opening the resolved path for sed -i --follow-symlinks (TOCTOU race)"
+type = "patch-add"
+source = "../CVE-2026-5958.patch"
