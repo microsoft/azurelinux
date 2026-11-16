@@ -1,15 +1,19 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
 Version:        1.47.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            http://e2fsprogs.sourceforge.net
 Source0:        https://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz
+# Upstream tests/f_clear_orphan_file/image.gz at db87cf4cdd9960a270ae7df80204dc93016664bc
+Source1:        orphan-file-recovery-image.gz
+Source2:        orphan-file-recovery-test.sh
 Patch0:         CVE-2024-e2fsck-orphan-file-skip-check.patch
 Patch1:         e2fsck-ignore-stale-orphan-present-backup.patch
+Patch2:         e2fsck-clear-orphan-file-recovery.patch
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -83,8 +87,8 @@ EOF
     cat $failed_test
 done
 
-# Last command's status is how we determine if the tests failed or not.
-[[ $test_status -eq 0 ]]
+[[ $test_status -eq 0 ]] || exit "$test_status"
+bash %{SOURCE2} %{SOURCE1}
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -150,6 +154,10 @@ done
 %defattr(-,root,root)
 
 %changelog
+* Mon Nov 16 2026 Sean Dougherty <sdougherty@microsoft.com> - 1.47.0-5
+- Backport orphan-file recovery fix for normal and journal-only checks
+- Upstream commit: db87cf4cdd9960a270ae7df80204dc93016664bc
+
 * Wed Nov 11 2026 Sean Dougherty <sdougherty@microsoft.com> - 1.47.0-4
 - Backport upstream fix for stale orphan_present in backup superblocks
 - Upstream commit: 24a11cc371a46ca9e68aed8f2cf4aabd22ea81eb
