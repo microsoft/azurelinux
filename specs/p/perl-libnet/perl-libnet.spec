@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global base_version 3.15
+%global base_version 3.16
 
 # Run optional test
 %if ! (0%{?rhel})
@@ -15,8 +15,8 @@
 %bcond_without perl_libnet_enables_ssl
 
 Name:           perl-libnet
-Version:        3.15
-Release: 524%{?dist}
+Version:        3.16
+Release: 5%{?dist}
 Summary:        Perl clients for various network protocols
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/libnet
@@ -121,10 +121,24 @@ make test
 %files
 %license Artistic Copying LICENCE
 %doc Changes README
-%{perl_vendorlib}/*
-%{_mandir}/man3/*
+%dir %{perl_vendorlib}/Net
+%{perl_vendorlib}/Net/Cmd.pm
+%{perl_vendorlib}/Net/Config.pm
+%{perl_vendorlib}/Net/Domain.pm
+%{perl_vendorlib}/Net/FTP*
+%{perl_vendorlib}/Net/NNTP.pm
+%{perl_vendorlib}/Net/Netrc.pm
+%{perl_vendorlib}/Net/POP3.pm
+%{perl_vendorlib}/Net/SMTP.pm
+%{perl_vendorlib}/Net/Time.pm
+%{perl_vendorlib}/Net/libnetFAQ.pod
+%{_mandir}/man3/Net::*
 
 %changelog
+* Tue Oct 27 2026 Jitka Plesnikova <jplesnik@redhat.com> - 3.16-1
+- 3.16 bump (rhbz#2560316)
+- Fix CVE-2026-93469 (unbounded response buffering in Net::Cmd)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-521
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
