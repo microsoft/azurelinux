@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 6;
+    release_number = 1;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -11,21 +11,14 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%{!?nodejs_default:%global nodejs_default 24}
-%if 0%{?nodejs_default}
-%global pkgname nodejs
-%define unversioned_obsoletes_of_nodejsXX_if_default() %{expand:\
+%define nodejs_versioned_compat() %{expand:\
 Obsoletes: nodejs%{node_version_major}%{?1:-%{1}} <= %{node_evr}\
 Provides: nodejs%{node_version_major}%{?1:-%{1}} = %{node_evr}\
 }
-%else
-%global pkgname nodejs24
-%define unversioned_obsoletes_of_nodejsXX_if_default() %{nil}
-%endif
-Name:           nodejs24
+Name: nodejs
 Epoch:          1
 Version:        24.22.1
-Release:        %{autorelease}
+Release: %autorelease -b 7
 
 Summary:        JavaScript runtime
 License:        Apache-2.0 AND Artistic-2.0 AND BSD-2-Clause AND BSD-3-Clause AND BlueOak-1.0.0 AND CC-BY-3.0 AND CC0-1.0 AND ISC AND MIT
@@ -106,7 +99,7 @@ URL:            https://nodejs.org
 %global _so_arch_suffix ()(64bit)
 %endif
 # place for data files
-%global nodejs_datadir  %{_datarootdir}/node-%{node_version_major}
+%global nodejs_datadir %{_datarootdir}/nodejs
 # place for (npm) packages used by multiple streams and/or that are stream-agnostic (do not care)
 %global nodejs_common_sitelib %{_prefix}/lib/node_modules
 # place for (npm) packages specific to this stream
@@ -117,11 +110,7 @@ ExclusiveArch:  %{nodejs_arches}
 ExcludeArch:    %{ix86}
 
 # SPEC tools – additiona macros, dependency generators, and utilities
-%if 0%{?nodejs_default}
-%package -n %{pkgname}
-Summary: JavaScript runtime
-%endif
-%unversioned_obsoletes_of_nodejsXX_if_default
+%nodejs_versioned_compat
 BuildRequires: chrpath
 BuildRequires:  git-core
 BuildRequires:  jq
@@ -153,10 +142,10 @@ BuildRequires:  pkgconfig(openssl) >= 3.0.2
 # Run-time dependencies of the main package
 Requires:   ca-certificates
 # Required and/or recommended sub-packages
-Requires: %{pkgname}-libs%{?_isa} = %{node_evr}
-Recommends: %{pkgname}-docs = %{node_evr}
-Recommends: %{pkgname}-full-i18n%{?_isa} = %{node_evr}
-Recommends: %{pkgname}-npm >= %{npm_evr}
+Requires:   %{name}-libs%{?_isa}      = %{node_evr}
+Recommends: %{name}-docs              = %{node_evr}
+Recommends: %{name}-full-i18n%{?_isa} = %{node_evr}
+Recommends: %{name}-npm              >= %{npm_evr}
 # Virtual provides
 Provides:   nodejs(abi) = %{node_soversion}, nodejs(abi%{node_version_major}) = %{node_soversion}
 Provides:   nodejs(engine) = %{node_version}
@@ -203,83 +192,29 @@ Node.js uses an event-driven, non-blocking I/O model that
 makes it lightweight and efficient, perfect for data-intensive
 real-time applications that run across distributed devices.
 
-%if 0%{?nodejs_default}
-%description -n %{pkgname}
-Node.js is a platform built on Chrome's JavaScript runtime
-for easily building fast, scalable network applications.
-Node.js uses an event-driven, non-blocking I/O model that
-makes it lightweight and efficient, perfect for data-intensive
-real-time applications that run across distributed devices.
-%endif
-
-%package -n %{pkgname}-devel
+%package        devel
 Summary:        JavaScript runtime – development headers
-Requires:       %{pkgname}%{?_isa} = %{node_evr}
-Requires:       %{pkgname}-libs%{?_isa} = %{node_evr}
-Requires:       nodejs-packaging
+Requires:       %{name}%{?_isa} = %{node_evr}
+Requires:       %{name}-libs%{?_isa} = %{node_evr}
+Requires: nodejs-packaging >= 2023.10-24
 Requires:       openssl-devel%{?_isa}
 %{!?with_bundled_brotli:Requires: brotli-devel%{?_isa}}
 %{!?with_bundled_libuv:Requires: libuv-devel%{?_isa}}
 %{!?with_bundled_zlib:Requires: zlib-devel%{?_isa}}
+# Note: -devel sub-packages of the various streams conflict with each other,
+# as the headers cannot be easily namespaced (would break at lease node-gyp search path).
+# Hence the Provides: in place of metapackage.
 Provides:       nodejs-devel = %{node_evr}
-Provides:       alternative-for(nodejs-devel) = %{node_evr}
-Conflicts:      alternative-for(nodejs-devel)
-Conflicts:      nodejs-devel-pkg
-%unversioned_obsoletes_of_nodejsXX_if_default devel
 
-%description -n %{pkgname}-devel
+Provides: alternative-for(nodejs-devel) = %{node_evr}
+Conflicts: alternative-for(nodejs-devel)
+Conflicts: nodejs-devel-pkg
+ # previously VP used for the same reason as alternative-for() above
+
+
+%nodejs_versioned_compat devel
+%description    devel
 Development headers for the Node.js JavaScript runtime.
-
-%package -n %{pkgname}-libs
-Summary:        Node.js and v8 libraries
-Provides:       v8 = %{v8_evr}
-Provides:       v8%{?_isa} = %{v8_evr}
-Obsoletes:      v8 < 1:6.7.17-10
-Provides:       libv8.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
-Provides:       libv8_libbase.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
-Provides:       libv8_libplatform.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
-%unversioned_obsoletes_of_nodejsXX_if_default libs
-
-%description -n %{pkgname}-libs
-Libraries to support Node.js and provide stable v8 interfaces.
-
-%package -n %{pkgname}-full-i18n
-Summary:        Non-English locale data for Node.js
-Requires:       %{pkgname}%{?_isa} = %{node_evr}
-%unversioned_obsoletes_of_nodejsXX_if_default full-i18n
-
-%description -n %{pkgname}-full-i18n
-Optional data files to provide full ICU support for Node.js.
-Remove this package to save space if non-English locales are not needed.
-
-%package -n %{pkgname}-docs
-Summary:        Node.js API documentation
-BuildArch:      noarch
-Requires(meta): %{pkgname} = %{node_evr}
-%unversioned_obsoletes_of_nodejsXX_if_default docs
-
-%description -n %{pkgname}-docs
-The API documentation for the Node.js JavaScript runtime.
-
-%package -n %{pkgname}-npm
-Summary:        Node.js Package Manager
-Epoch:          %{npm_epoch}
-Version:        %{npm_version}
-Release:        %{npm_release}
-BuildArch:      noarch
-Requires:       %{pkgname} = %{node_evr}
-Recommends:     %{pkgname}-docs = %{node_evr}
-Provides:       npm(npm) = %{npm_version}
-%if 0%{?nodejs_default}
-Provides:       npm = %{npm_evr}
-Obsoletes:      npm < 1:9
-Obsoletes:      nodejs%{node_version_major}-npm <= %{npm_evr}
-Provides:       nodejs%{node_version_major}-npm = %{npm_evr}
-%endif
-
-%description -n %{pkgname}-npm
-npm is a package manager for node.js. You can use it to install and publish
-your node programs. It manages dependencies and does other cool stuff.
 
 %package -n     v8-%{v8_version_major}.%{v8_version_minor}-devel
 Summary:        v8 – development headers
@@ -287,14 +222,66 @@ Epoch:          %{v8_epoch}
 Version:        %{v8_version}
 Release:        %{v8_release}
 
-Requires: %{pkgname}-devel%{?_isa} = %{node_evr}
-Requires: %{pkgname}-libs%{?_isa} = %{node_evr}
+Requires:       %{name}-devel%{?_isa} = %{node_evr}
+Requires:       %{name}-libs%{?_isa}  = %{node_evr}
 Provides:       v8-devel = %{v8_evr}
 Obsoletes:      v8-devel <= 2:10.2.154, v8-314-devel <= 2:3.14
 
 Obsoletes: v8-12.4-devel < %{v8_evr}
 %description -n v8-%{v8_version_major}.%{v8_version_minor}-devel
 Development headers for the v8 runtime.
+
+%package        libs
+Summary:        Node.js and v8 libraries
+# v8 used to be a separate package; keep providing it virtually
+Provides:       v8 = %{v8_evr}
+Provides:       v8%{?_isa} = %{v8_evr}
+Obsoletes:      v8 < 1:6.7.17-10
+Provides:       libv8.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+Provides:       libv8_libbase.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+Provides:       libv8_libplatform.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+
+%nodejs_versioned_compat libs
+%description    libs
+Libraries to support Node.js and provide stable v8 interfaces.
+
+%package        full-i18n
+Summary:        Non-English locale data for Node.js
+Requires:       %{name}%{?_isa} = %{node_evr}
+
+%nodejs_versioned_compat full-i18n
+%description    full-i18n
+Optional data files to provide full ICU support for Node.js.
+Remove this package to save space if non-English locales are not needed.
+
+%package        docs
+Summary:        Node.js API documentation
+BuildArch:      noarch
+Requires(meta): %{name} = %{node_evr}
+
+%nodejs_versioned_compat docs
+%description    docs
+The API documentation for the Node.js JavaScript runtime.
+
+%package        npm
+Summary:        Node.js Package Manager
+Epoch:          %{npm_epoch}
+Version:        %{npm_version}
+Release:        %{npm_release}
+
+BuildArch:      noarch
+Requires:       %{name}         = %{node_evr}
+Recommends:     %{name}-docs    = %{node_evr}
+Provides:       npm(npm) = %{npm_version}
+
+Provides: npm = %{npm_evr}
+Obsoletes: npm < 1:9
+Obsoletes: nodejs%{node_version_major}-npm <= %{npm_evr}
+Provides: nodejs%{node_version_major}-npm = %{npm_evr}
+%description    npm
+npm is a package manager for node.js. You can use it to install and publish
+your node programs. It manages dependencies and does other cool stuff.
+
 
 %prep
 %autosetup -n node-v%{node_version} -S git_am
@@ -426,17 +413,17 @@ install -p -Dt "${RPM_BUILD_ROOT}%{nodejs_datadir}" common.gypi
 # Create pkg-config files
 readonly PKGCONFDIR="${RPM_BUILD_ROOT}%{_libdir}/pkgconfig"
 mkdir -p "${PKGCONFDIR}"
-mkconfig -e 's;@PKGCONFNAME@;nodejs-%{node_version_major};g' \
-    <%{SOURCE3} >"${PKGCONFDIR}/nodejs-%{node_version_major}.pc"
+mkconfig -e 's;@PKGCONFNAME@;%{name};g' \
+    <%{SOURCE3} >"${PKGCONFDIR}/%{name}.pc"
 mkconfig -e 's;@PKGCONFNAME@;v8-%{v8_version_major}.%{v8_version_minor};g' \
     <%{SOURCE4} >"${PKGCONFDIR}/v8-%{v8_version_major}.%{v8_version_minor}.pc"
 
 # Create automatic RPM requires generator for this stream
 mkdir -p "${RPM_BUILD_ROOT}%{_rpmconfigdir}/fileattrs"
 sed -e 's;@NODEJS_VERSION_MAJOR@;%{node_version_major};g' \
-    <%{SOURCE6} >"${RPM_BUILD_ROOT}%{_rpmconfigdir}/fileattrs/nodejs%{node_version_major}_abi.attr"
+    <%{SOURCE6} >"${RPM_BUILD_ROOT}%{_rpmconfigdir}/fileattrs/%{name}_abi.attr"
 sed -e 's;@NODEJS_VERSION_MAJOR@;%{node_version_major};g' \
-    <%{SOURCE7} >"${RPM_BUILD_ROOT}%{_rpmconfigdir}/nodejs%{node_version_major}_abi.req"
+    <%{SOURCE7} >"${RPM_BUILD_ROOT}%{_rpmconfigdir}/%{name}_abi.req"
 
 # Install documentation
 mkdir -p "${RPM_BUILD_ROOT}%{_pkgdocdir}/html"
@@ -493,7 +480,7 @@ cp -prt  "${RPM_BUILD_ROOT}%{_mandir}" deps/npm/man/*
 rm -rf  "${NPM_DIR}/man"
 ln -srf "${RPM_BUILD_ROOT}%{_mandir}" "${NPM_DIR}/man"
 
-# === Adjustments to avoid conflict between parallel streams
+%if 0
 # Note: some of the actions here make some of the previous ones redundant
 # (for example, replacing a symlink made few lines above).
 # This is by design; it should allow us to drop this entire section if we want
@@ -557,20 +544,9 @@ ln -srf  "${VERSIONED_MANDIR}/man1/npm.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/n
 ln -srf  "${VERSIONED_MANDIR}/man1/npx.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/npx-%{node_version_major}.1.gz"
 
 
-%if 0%{?nodejs_default}
-for bin in node npm npx; do
-    ln -srf "%{buildroot}%{_bindir}/${bin}-%{node_version_major}" "%{buildroot}%{_bindir}/${bin}"
-done
-for section in 1 5 7; do
-    mkdir -p "%{buildroot}%{_mandir}/man${section}"
-    for manpage in "${VERSIONED_MANDIR}/man${section}/"*; do
-        ln -srf "${manpage}" "%{buildroot}%{_mandir}/man${section}/"
-    done
-done
-mkdir -p "%{buildroot}%{nodejs_common_sitelib}" "%{buildroot}%{_sysconfdir}"
-mkconfig <%{SOURCE5} >"%{buildroot}%{_sysconfdir}/npmrc"
 %endif
-
+mkdir -p "%{buildroot}%{_sysconfdir}"
+mkconfig <%{SOURCE5} >"%{buildroot}%{_sysconfdir}/npmrc"
 %check
 # === Common test environment
 export LD_LIBRARY_PATH="${RPM_BUILD_ROOT}%{_libdir}:${LD_LIBRARY_PATH}"
@@ -584,12 +560,12 @@ export UNDICI_NO_WASM_SIMD=1
 
 # "aliases" to the just-build binaries
 node() {
-    "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" \
+    "${RPM_BUILD_ROOT}%{_bindir}/node" \
         --icu-data-dir="${RPM_BUILD_ROOT}%{nodejs_datadir}/icudata" \
     "$@"
 }
 npm() {
-    node "${RPM_BUILD_ROOT}%{_bindir}/npm-%{node_version_major}" "$@"
+    node "${RPM_BUILD_ROOT}%{_bindir}/npm" "$@"
 }
 
 # === Sanity check for important versions
@@ -611,8 +587,27 @@ node '%{SOURCE20}'
 npm config list --json | jq --exit-status '.["update-notifier"] == false'
 
 # === Upstream test suite
-bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test/ '%{SOURCE11}'
+bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node" test/ '%{SOURCE11}'
 
+
+%files      libs
+%license    LICENSE
+%{_libdir}/libnode.so.%{node_soversion}
+%{_libdir}/libv8.so.%{v8_version_major}.%{v8_version_minor}
+%{_libdir}/libv8_libbase.so.%{v8_version_major}.%{v8_version_minor}
+%{_libdir}/libv8_libplatform.so.%{v8_version_major}.%{v8_version_minor}
+
+%files      devel
+%license    LICENSE
+%dir        %{nodejs_datadir}/
+%{_includedir}/node/
+%{_libdir}/libnode.so
+%{_libdir}/pkgconfig/%{name}.pc
+%{_pkgdocdir}/gdbinit
+%{_pkgdocdir}/lldb_commands.py
+%{_rpmconfigdir}/fileattrs/%{name}_abi.attr
+%{_rpmconfigdir}/%{name}_abi.req
+%{nodejs_datadir}/common.gypi
 
 %files -n   v8-%{v8_version_major}.%{v8_version_minor}-devel
 %license    LICENSE
@@ -624,238 +619,41 @@ bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test
 %{_libdir}/libv8_libplatform.so
 %{_libdir}/pkgconfig/v8-%{v8_version_major}.%{v8_version_minor}.pc
 
-%files -n %{pkgname}
-%doc        README.md CHANGELOG.md GOVERNANCE.md onboarding.md
-%license    LICENSE
-%dir        %{nodejs_datadir}/
-%dir        %{nodejs_datadir}/man/
-%dir        %{nodejs_datadir}/man/man1/
-%dir        %{nodejs_private_sitelib}/
-%{_bindir}/node-%{node_version_major}
-%{nodejs_datadir}/man/man1/node.1*
-%{_mandir}/man1/node-%{node_version_major}.1*
-%if 0%{?nodejs_default}
-%dir        %{nodejs_common_sitelib}/
-%{_bindir}/node
-%{_mandir}/man1/node.1*
-%endif
-
-%files -n %{pkgname}-libs
-%license    LICENSE
-%{_libdir}/libnode.so.%{node_soversion}
-%{_libdir}/libv8.so.%{v8_version_major}.%{v8_version_minor}
-%{_libdir}/libv8_libbase.so.%{v8_version_major}.%{v8_version_minor}
-%{_libdir}/libv8_libplatform.so.%{v8_version_major}.%{v8_version_minor}
-
-%files -n %{pkgname}-devel
-%license    LICENSE
-%dir        %{nodejs_datadir}/
-%{_includedir}/node/
-%{_libdir}/libnode.so
-%{_libdir}/pkgconfig/nodejs-%{node_version_major}.pc
-%{_pkgdocdir}/gdbinit
-%{_pkgdocdir}/lldb_commands.py
-%{_rpmconfigdir}/fileattrs/nodejs%{node_version_major}_abi.attr
-%{_rpmconfigdir}/nodejs%{node_version_major}_abi.req
-%{nodejs_datadir}/common.gypi
-
-%files -n %{pkgname}-full-i18n
+%files      full-i18n
 %doc        full-icu/icu4c-%{icu_version_major}.%{icu_version_minor}-data-bin-?-README.md
 %license    full-icu/LICENSE
 %dir        %{nodejs_datadir}/
 %{nodejs_datadir}/icudata/
 
-%files -n %{pkgname}-npm
-%doc        deps/npm/README.md
-%license    deps/npm/LICENSE
-%dir        %{nodejs_datadir}/
-%dir        %{nodejs_private_sitelib}/
-%{_bindir}/npm-%{node_version_major}
-%{_bindir}/npx-%{node_version_major}
-%if 0%{?nodejs_default}
-%{_bindir}/npm
-%{_bindir}/npx
-%{_mandir}/man[157]/*
-%exclude    %{_mandir}/man1/node*.1*
-%config(noreplace) %{_sysconfdir}/npmrc
-%ghost      %{_sysconfdir}/npmignore
-%else
-%{_mandir}/man1/npm-%{node_version_major}.1*
-%{_mandir}/man1/npx-%{node_version_major}.1*
-%endif
-%{nodejs_datadir}/man
-%{nodejs_private_sitelib}/npm/
-%exclude    %{nodejs_datadir}/man/man1/node*.1*
-
-%files -n %{pkgname}-docs
+%files      docs
 %doc        doc/README.md
 %license    LICENSE
 %dir        %{_pkgdocdir}
 %{_pkgdocdir}/html/
 %{_pkgdocdir}/npm/
 
+%files
+%doc        README.md CHANGELOG.md GOVERNANCE.md onboarding.md
+%license    LICENSE
+%dir        %{nodejs_datadir}/
+%dir        %{nodejs_common_sitelib}/
+%{_bindir}/node
+%{_mandir}/man1/node.1*
+
+%files npm
+%doc        deps/npm/README.md
+%license    deps/npm/LICENSE
+%dir        %{nodejs_common_sitelib}/
+%{_bindir}/npm
+%{_bindir}/npx
+%{_mandir}/man[157]/*
+%exclude    %{_mandir}/man1/node*.1*
+%{nodejs_common_sitelib}/npm/
+%config(noreplace) %{_sysconfdir}/npmrc
+%ghost      %{_sysconfdir}/npmignore
+
 %changelog
 ## START: Generated by rpmautospec
-* Fri Nov 13 2026 Binu Jose Philip <binujp@gmail.com> - 1:24.22.1-6
-- fix(nodejs24): make Node.js 24 the default runtime
-
-* Sat Nov 07 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1:24.22.1-5
-- fix(nodejs24): upgrade to 24.22.1 to address CVEs
-
-* Tue Nov 03 2026 Jan Staněk <jstanek@redhat.com> - 1:24.22.1-4
-- Patch undici bundled in npm
-
-* Tue Nov 03 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-3
-- Update bundled ip-address to 10.7.4
-
-* Tue Nov 03 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-2
-- Update bundled brace-expansion to 5.0.12 (both copies)
-
-* Tue Nov 03 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.22.1-1
-- Update to version 24.22.1
-
-* Tue Nov 03 2026 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 1:24.21.0-3
-- Fix build on the RISC-V architecture
-
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.21.0-2
-- Fix typos in test-runner.sh
-
-* Tue Nov 03 2026 Jan Staněk <jstanek@redhat.com> - 1:24.21.0-1
-- Update to version 24.21.0 (rhbz#2531008)
-- Remove upstreamed npm patches
-- Use system c-ares again
-
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.19.0-1
-- update to version 24.19.0 (rhbz#2510683)
-
-* Tue Nov 03 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.18.1-1
-- Rebase to 24.18.1
-
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-3
-- Fix CVE-2026-13149 (brace-expansion)
-
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-2
-- Fix CVE-2026-59873 and CVE-2026-59874 (nodejs-tar)
-
-* Tue Nov 03 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.18.0-1
-- Update to version 24.18.0 (rhbz#2480530)
-
-* Mon Oct 05 2026 Dan Streetman <ddstreet@ieee.org> - 1:24.15.0-3
-- chore: update 'lock' files and render changed components
-
-* Mon May 04 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.15.0-2
-- test plan: diverge from f44
-- bin packages were introduced in f44 onwards
-
-* Tue Apr 28 2026 Jan Staněk <jstanek@redhat.com> - 1:24.15.0-1
-- Update to version 24.15.0 (rhbz#2458897)
-- Start reporting version of bundled nodejs-minimatch.
-
-* Thu Mar 26 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.1-3
-- Update bundled nghttp2 to 1.68.1
-
-* Thu Mar 26 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.1-2
-- cleanup: remove unused patches
-
-* Thu Mar 26 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.14.1-1
-- Update to version 24.14.1 (rhbz#2442366)
-
-* Thu Mar 26 2026 Jan Staněk <jstanek@redhat.com> - 1:24.14.0-2
-- Swap definition order for metadata fields
-
-* Thu Mar 26 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.14.0-1
-- Update to version 24.14.0 (rhbz#2442366).
-
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:24.13.1-4
-- build: mass rebuild auto-bumpable components
-
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:24.13.1-3
-- build: mass rebuild auto-bumpable components
-
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 1:24.13.1-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
-
-* Thu Feb 19 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.13.1-1
-- Update to version 24.13.1 (rhbz#2438455)
-
-* Thu Jan 22 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.13.0-4
-- Replace usage of man_info_compress to be funcional across all branches.
-
-* Thu Jan 22 2026 Andrei Radchenko <aradchen@redhat.com> - 1:24.13.0-3
-- build: expose libplatform symbols in shared libnode
-
-* Mon Jan 19 2026 Jan Staněk <jstanek@redhat.com> - 1:24.13.0-2
-- Diverge from rawhide
-
-* Tue Jan 13 2026 tjuhasz <tjuhasz@redhat.com> - 1:24.13.0-1
-- Update to version 24.13.0 (rhbz#2421027)
-
-* Mon Jan 12 2026 Jan Staněk <jstanek@redhat.com> - 1:24.11.1-3
-- Run version checks only on bundled components
-
-* Tue Dec 02 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.11.1-2
-- Fix name collision of the COMPRESS variable in spec file.
-
-* Wed Nov 12 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.11.1-1
-- Update to version 24.11.1 (rhbz#2414318)
-
-* Wed Nov 12 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.11.0-2
-- Rebuild for nodejs-packaging
-
-* Wed Oct 29 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.11.0-1
-- Update to version 24.11.0 (rhbz#2402617)
-
-* Wed Oct 01 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.9.0-1
-- Update to version 24.9.0 (rhbz#2399683)
-
-* Thu Sep 11 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.8.0-1
-- Update to version 24.8.0 (rhbz#2394460)
-
-* Mon Sep 01 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.7.0-1
-- Update to version 24.7.0 (rhbz#2391378)
-
-* Mon Sep 01 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.6.0-5
-- Adjust test-runner to prevent race-condition failures
-
-* Wed Aug 27 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.6.0-4
-- Add back fips prevention patch (rhbz#2389184)
-
-* Mon Aug 25 2025 Jan Staněk <jstanek@redhat.com> - 1:24.6.0-3
-- Import nodejs_abi requirement generator from packaging
-
-* Mon Aug 18 2025 Andrei Radchenko <aradchen@redhat.com> - 1:24.6.0-2
-- test-suite: add public test plan and gating file
-
-* Fri Aug 15 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.6.0-1
-- Update to version 24.6.0 (rhbz#2388711)
-
-* Tue Aug 12 2025 Andrei Radchenko <aradchen@redhat.com> - 1:24.5.0-2
-- spec: fix node binary calls to use versioned node-24 binary
-
-* Fri Aug 01 2025 Andrei Radchenko <aradchen@redhat.com> - 1:24.5.0-1
-- Update to version 24.5.0 (rhbz#2385880)
-
-* Wed Jul 30 2025 Andrei Radchenko <aradchen@redhat.com> - 1:24.4.1-6
-- spec: devel packages explicitly conflicts
-
-* Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:24.4.1-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
-
-* Mon Jul 21 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.4.1-3
-- Remove tests from list which are not present in nodejs24
-
-* Thu Jul 17 2025 Jan Staněk <jstanek@redhat.com> - 1:24.4.1-2
-- Use local headers for building native addons when available
-
-* Thu Jul 17 2025 tjuhasz <tjuhasz@redhat.com> - 1:24.4.1-1
-- Update to version 24.4.1
-
-* Wed Jul 16 2025 Jan Staněk <jstanek@redhat.com> - 1:24.4.0-3
-- Remove arch-specific dependency from npm
-
-* Mon Jul 14 2025 Jan Staněk <jstanek@redhat.com> - 1:24.4.0-1
-- Update to version 24.4.0
-
-* Thu Jul 10 2025 Jan Staněk <jstanek@redhat.com> - 1:24.0.1-1
-- Initial package import (rhbz#2369466)
+* Mon Nov 16 2026 Binu Jose Philip <binujp@gmail.com> - 1:24.22.1-7
+- fix(nodejs): simplify default runtime packaging
 ## END: Generated by rpmautospec
