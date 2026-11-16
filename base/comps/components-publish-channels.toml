@@ -2475,6 +2475,7 @@ components = [
     "sysprof",
     "sysstat",
     "systemd",
+    "systemd-boot",
     "systemtap",
     "tang",
     "tar",
