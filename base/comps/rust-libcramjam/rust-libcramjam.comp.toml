@@ -1,0 +1,12 @@
+# Pin to Fedora f43 rust-libcramjam-0.9.3-1 (FEDORA-2026-80f771b8bf).
+# https://src.fedoraproject.org/rpms/rust-libcramjam/c/1245c5efa6b275e6f197139c9a0ac7ef72e97aed
+[components.rust-libcramjam]
+spec = { type = "upstream", upstream-commit = "1245c5efa6b275e6f197139c9a0ac7ef72e97aed" }
+
+# Build without the C API library, as Fedora 43 does: the spec enables the
+# capi bcond only when fc43, fc44, fc45 and epel are all undefined, and Azure
+# Linux defines none of them. Nothing in Azure Linux uses libcramjam.so, and
+# with 0.9.3's pure-Rust features enabled it would switch to the pure-Rust
+# codec backends.
+[components.rust-libcramjam.build]
+without = ["capi"]

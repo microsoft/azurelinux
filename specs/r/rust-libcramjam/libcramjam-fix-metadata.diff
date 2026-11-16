@@ -1,6 +1,6 @@
---- libcramjam-0.9.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ libcramjam-0.9.1/Cargo.toml	2026-09-30T14:22:16.474134+00:00
-@@ -39,18 +39,9 @@
+--- libcramjam-0.9.3/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libcramjam-0.9.3/Cargo.toml	2026-10-03T05:52:13.252721+00:00
+@@ -40,15 +40,6 @@
  subdirectory = "cramjam"
  
  [features]
@@ -15,25 +15,17 @@
 -]
  brotli = ["dep:brotli"]
  bzip2 = ["dep:bzip2"]
--bzip2-pure = []
-+# bzip2-pure = []
- capi = ["dep:libc"]
- default = [
-     "snappy",
-@@ -63,86 +54,53 @@
+ bzip2-pure = []
+@@ -64,33 +55,14 @@
      "deflate",
      "zlib",
  ]
 -deflate = ["deflate-static"]
--deflate-pure = [
--    "dep:crc32fast",
--    "dep:simd-adler32",
--]
 +deflate = ["deflate-shared"]
-+# deflate-pure = [
-+#     "dep:crc32fast",
-+#     "dep:simd-adler32",
-+# ]
+ deflate-pure = [
+     "dep:crc32fast",
+     "dep:simd-adler32",
+ ]
  deflate-shared = ["dep:flate2"]
 -deflate-static = ["dep:flate2"]
 -gzip = ["gzip-static"]
@@ -58,22 +50,11 @@
 -izlib-shared = ["isal-shared"]
 -izlib-static = ["isal-static"]
  lz4 = ["dep:lz4"]
--lz4-pure = []
--pure-rust = [
--    "zstd-pure",
--    "lz4-pure",
--    "bzip2-pure",
--    "deflate-pure",
--    "xz-pure",
--]
-+# lz4-pure = []
-+# pure-rust = [
-+#     "zstd-pure",
-+#     "lz4-pure",
-+#     "bzip2-pure",
-+#     "deflate-pure",
-+#     "xz-pure",
-+# ]
+ lz4-pure = []
+ pure-rust = [
+@@ -101,16 +73,7 @@
+     "xz-pure",
+ ]
  snappy = ["dep:snap"]
 -use-system-blosc2 = [
 -    "dep:blosc2-rs",
@@ -85,18 +66,11 @@
 -]
 -wasm32-compat = ["blosc2-rs/deactivate-zlib-optim"]
 -xz = ["xz-static"]
--xz-pure = [
--    "dep:crc32fast",
--    "dep:crc-fast",
--    "dep:sha2",
--]
 +xz = ["xz-shared"]
-+# xz-pure = [
-+#     "dep:crc32fast",
-+#     "dep:crc-fast",
-+#     "dep:sha2",
-+# ]
- xz-shared = [
+ xz-pure = [
+     "dep:crc32fast",
+     "dep:crc-fast",
+@@ -120,20 +83,15 @@
      "dep:xz2",
      "dep:lzma-sys",
  ]
@@ -110,66 +84,16 @@
  zlib-shared = ["deflate-shared"]
 -zlib-static = ["deflate-static"]
  zstd = ["dep:zstd"]
--zstd-pure = []
-+# zstd-pure = []
+ zstd-pure = []
  
  [lib]
  name = "libcramjam"
  path = "src/lib.rs"
--
--[[example]]
--name = "lz4fast_check"
--path = "examples/lz4fast_check.rs"
--required-features = ["lz4-pure"]
--
--[[example]]
--name = "lz4hc_check"
--path = "examples/lz4hc_check.rs"
--required-features = ["lz4-pure"]
 +crate-type = ["lib", "cdylib"]
-+
-+# [[example]]
-+# name = "lz4fast_check"
-+# path = "examples/lz4fast_check.rs"
-+# required-features = ["lz4-pure"]
-+# 
-+# [[example]]
-+# name = "lz4hc_check"
-+# path = "examples/lz4hc_check.rs"
-+# required-features = ["lz4-pure"]
  
  [[example]]
- name = "profile_bzip2"
-@@ -172,10 +130,10 @@
- name = "profile_xz_enc"
- path = "examples/profile_xz_enc.rs"
- 
--[[example]]
--name = "profile_zstd"
--path = "examples/profile_zstd.rs"
--required-features = ["zstd-pure"]
-+# [[example]]
-+# name = "profile_zstd"
-+# path = "examples/profile_zstd.rs"
-+# required-features = ["zstd-pure"]
- 
- [[example]]
- name = "profile_zstd_dec"
-@@ -185,36 +143,16 @@
- name = "zstd_dbg"
- path = "examples/zstd_dbg.rs"
- 
--[[example]]
--name = "zstd_small_check"
--path = "examples/zstd_small_check.rs"
--required-features = ["zstd-pure"]
-+# [[example]]
-+# name = "zstd_small_check"
-+# path = "examples/zstd_small_check.rs"
-+# required-features = ["zstd-pure"]
- 
- [[test]]
- name = "backend_contract"
+ name = "lz4fast_check"
+@@ -196,26 +154,6 @@
  path = "tests/backend_contract.rs"
  
  [[test]]
@@ -196,7 +120,7 @@
  name = "cross_impl"
  path = "tests/cross_impl.rs"
  
-@@ -285,11 +223,6 @@
+@@ -286,11 +224,6 @@
  path = "benches/zstd_bench.rs"
  harness = false
  required-features = ["pure-rust"]
@@ -208,16 +132,7 @@
  
  [dependencies.brotli]
  version = "^8"
-@@ -301,7 +234,7 @@
- default-features = false
- 
- [dependencies.bzip2]
--version = ">=0.4,<0.6"
-+version = ">=0.4,<0.7"
- optional = true
- 
- [dependencies.crc-fast]
-@@ -349,11 +282,7 @@
+@@ -350,11 +283,7 @@
  optional = true
  
  [dev-dependencies.bzip2]
@@ -230,7 +145,7 @@
  
  [dev-dependencies.flate2]
  version = "^1"
-@@ -369,11 +298,6 @@
+@@ -370,11 +299,6 @@
  
  [dev-dependencies.zstd]
  version = "^0.13"
