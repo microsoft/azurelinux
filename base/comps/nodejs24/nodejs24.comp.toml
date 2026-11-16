@@ -2,5 +2,12 @@
 # https://src.fedoraproject.org/rpms/nodejs24/c/685165daff45a65879f63e3340b2effe9779ce01
 [components.nodejs24]
 spec = { type = "upstream", upstream-commit = "685165daff45a65879f63e3340b2effe9779ce01" }
-# Release: %{node_release}
+# Release: 6%{?dist}
 release = { calculation = "manual" }
+
+[[components.nodejs24.overlays]]
+description = "Set the component-wide manually managed release"
+type = "spec-update-tag"
+tag = "Release"
+value = "6%{?dist}"
+metadata = { category = "azl-release-management", upstream-status = "inapplicable" }

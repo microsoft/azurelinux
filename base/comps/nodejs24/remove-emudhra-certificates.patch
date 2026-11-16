@@ -1,0 +1,45 @@
+From 57fb25199016ca79863ec792b54f12f2c4c27d79 Mon Sep 17 00:00:00 2001
+From: reuben olinsky <reubeno@users.noreply.github.com>
+Date: Sun, 15 Nov 2026 22:06:35 +0000
+Subject: [PATCH] Remove the eMudhra emSign G1 root from Node.js 24
+
+Remove eMudhra's emSign Root CA - G1 and its comment from Node.js 24's compiled-in trust store.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ src/node_root_certs.h | 22 ----------------------
+ 1 file changed, 22 deletions(-)
+
+diff --git a/src/node_root_certs.h b/src/node_root_certs.h
+index bad9cb8..d48a4cb 100644
+--- a/src/node_root_certs.h
++++ b/src/node_root_certs.h
+@@ -1478,28 +1478,6 @@
+ "2k+KYTlerj1KjL0=\n"
+ "-----END CERTIFICATE-----",
+ 
+-/* emSign Root CA - G1 */
+-"-----BEGIN CERTIFICATE-----\n"
+-"MIIDlDCCAnygAwIBAgIKMfXkYgxsWO3W2DANBgkqhkiG9w0BAQsFADBnMQswCQYDVQQGEwJJ\n"
+-"TjETMBEGA1UECxMKZW1TaWduIFBLSTElMCMGA1UEChMcZU11ZGhyYSBUZWNobm9sb2dpZXMg\n"
+-"TGltaXRlZDEcMBoGA1UEAxMTZW1TaWduIFJvb3QgQ0EgLSBHMTAeFw0xODAyMTgxODMwMDBa\n"
+-"Fw00MzAyMTgxODMwMDBaMGcxCzAJBgNVBAYTAklOMRMwEQYDVQQLEwplbVNpZ24gUEtJMSUw\n"
+-"IwYDVQQKExxlTXVkaHJhIFRlY2hub2xvZ2llcyBMaW1pdGVkMRwwGgYDVQQDExNlbVNpZ24g\n"
+-"Um9vdCBDQSAtIEcxMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk0u76WaK7p1b\n"
+-"1TST0Bsew+eeuGQzf2N4aLTNLnF115sgxk0pvLZoYIr3IZpWNVrzdr3YzZr/k1ZLpVkGoZM0\n"
+-"Kd0WNHVO8oG0x5ZOrRkVUkr+PHB1cM2vK6sVmjM8qrOLqs1D/fXqcP/tzxE7lM5OMhbTI0Aq\n"
+-"d7OvPAEsbO2ZLIvZTmmYsvePQbAyeGHWDV/D+qJAkh1cF+ZwPjXnorfCYuKrpDhMtTk1b+oD\n"
+-"afo6VGiFbdbyL0NVHpENDtjVaqSW0RM8LHhQ6DqS0hdW5TUaQBw+jSztOd9C4INBdN+jzcKG\n"
+-"YEho42kLVACL5HZpIQ15TjQIXhTCzLG3rdd8cIrHhQIDAQABo0IwQDAdBgNVHQ4EFgQU++8N\n"
+-"hp6w492pufEhF38+/PB3KxowDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wDQYJ\n"
+-"KoZIhvcNAQELBQADggEBAFn/8oz1h31xPaOfG1vR2vjTnGs2vZupYeveFix0PZ7mddrXuqe8\n"
+-"QhfnPZHr5X3dPpzxz5KsbEjMwiI/aTvFthUvozXGaCocV685743QNcMYDHsAVhzNixl03r4P\n"
+-"EuDQqqE/AjSxcM6dGNYIAwlG7mDgfrbESQRRfXBgvKqy/3lyeqYdPV8q+Mri/Tm3R7nrft8E\n"
+-"I6/6nAYH6ftjk4BAtcZsCjEozgyfz7MjNYBBjWzEN3uBL4ChQEKF6dk4jeihU80Bv2noWgby\n"
+-"RQuQ+q7hv53yrlc8pa6yVvSLZUDp/TGBLPQ5Cdjua6e0ph0VpZj3AYHYhX3zUVxxiN66zB+A\n"
+-"fko=\n"
+-"-----END CERTIFICATE-----",
+-
+ /* Hongkong Post Root CA 3 */
+ "-----BEGIN CERTIFICATE-----\n"
+ "MIIFzzCCA7egAwIBAgIUCBZfikyl7ADJk0DfxMauI7gcWqQwDQYJKoZIhvcNAQELBQAwbzEL\n"
