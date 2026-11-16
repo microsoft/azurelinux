@@ -19,8 +19,7 @@ These allow programs to be compiled with NLS
 messages in the user's native language.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 export CFLAGS=" %{build_cflags} -Wno-error=format-security "
