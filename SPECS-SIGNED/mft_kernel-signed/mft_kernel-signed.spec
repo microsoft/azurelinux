@@ -13,7 +13,7 @@
 
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
-Version:         4.35.0
+Version:         4.37.0
 Release:         1%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
@@ -81,6 +81,9 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 4.37.0-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 4.35.0-1
 - Bump to match upgrade to DOCA 3.3.0 (mft 4.35.0).
 

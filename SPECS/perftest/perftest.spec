@@ -1,9 +1,7 @@
-%global         extended_release 1
-%global         MLNX_OFED_VERSION 26.01-1.0.0.0
+%global         MLNX_OFED_VERSION 26.07.0.7.7.0
 Summary:        IB Performance tests
 Name:           perftest
-# Update extended_release with version updates
-Version:        26.01.5
+Version:        26.07.7
 Release:        1%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
@@ -12,8 +10,8 @@ Group:          Productivity/Networking/Diagnostic
 URL:            https://www.openfabrics.org
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:        %{_distro_sources_url}/%{name}-%{version}-%{extended_release}.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:        %{_distro_sources_url}/perftest-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc-c++
@@ -23,12 +21,13 @@ BuildRequires:  librdmacm-devel
 BuildRequires:  libtool
 BuildRequires:  pciutils-devel
 
+%global __requires_exclude_from ^%{_libdir}/libperftest_kernels\.so$
+
 %description
-gen3 uverbs microbenchmarks release: %extended_release
+gen3 uverbs microbenchmarks
 
 %prep
 %autosetup -p1
-./autogen.sh
 
 %build
 %configure
@@ -36,16 +35,30 @@ gen3 uverbs microbenchmarks release: %extended_release
 chmod -x runme
 
 %install
-%make_install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=%{buildroot} install
+echo "" > perftest-cuda.files
+if [ -f libperftest_kernels.so ]; then
+    install -d %{buildroot}%{_libdir}
+    install -m 755 libperftest_kernels.so %{buildroot}%{_libdir}/
+    echo "%{_libdir}/libperftest_kernels.so" > perftest-cuda.files
+fi
 
-%files
+%clean
+rm -rf ${RPM_BUILD_ROOT}
+
+%files -f perftest-cuda.files
 %defattr(-, root, root)
 %doc README runme
 %license COPYING
 %_bindir/*
 %_mandir/man1/*.1*
+%_libexecdir/perftest/cluster_mode/*.py
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 26.07.7-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team <azurelinux@microsoft.com> - 26.01.5-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

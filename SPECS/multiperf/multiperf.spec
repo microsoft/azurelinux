@@ -1,13 +1,13 @@
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/OFED-internal-26.01-1.0.0.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
 Name:		 multiperf
 Summary:	 IB Performance tests
 Version:	 3.0
-Release:	 3%{?dist}
+Release:	 4%{?dist}
 License:	 BSD 3-Clause, GPL v2 or later
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 Group:		 Productivity/Networking/Diagnostic
-Source0:         %{_distro_sources_url}/%{name}-%{version}_doca-3.3.0.tar.gz
+Source0:         %{_distro_sources_url}/multiperf-%{version}_doca-3.5.0.tar.gz
 Url:		 ""
 BuildRoot:      /var/tmp/%{name}-%{version}-build
 
@@ -37,6 +37,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %_bindir/*
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 3.0-4
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 3.0-3
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 * Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 3.0-2

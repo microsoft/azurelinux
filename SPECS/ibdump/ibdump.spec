@@ -1,4 +1,4 @@
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/OFED-internal-26.01-1.0.0.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
 %bcond_with mlnx_libs
 %if %{with mlnx_libs}
 %define libs_exp_arg LIBS_EXP=yes
@@ -22,13 +22,13 @@
 Summary: Mellanox InfiniBand sniffing application
 Name: ibdump
 Version: 6.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD2+GPL2
 Group: System Environment/Base
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}
-Source0: %{_distro_sources_url}/%{name}-%{version}_doca-3.3.0.tar.gz
+Source0: %{_distro_sources_url}/ibdump-%{version}_doca-3.5.0.tar.gz
 BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: make
@@ -53,12 +53,15 @@ rm -rf $RPM_BUILD_ROOT
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-,root,root)
 %license LICENSE
+%defattr(-,root,root)
 %{_bindir}/ibdump
 %{_bindir}/vpi_tcpdump
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 6.0.0-2
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 6.0.0-1
 - Initial Azure Linux import from NVIDIA (license: BSD)
 - License verified

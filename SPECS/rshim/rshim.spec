@@ -3,7 +3,7 @@
 #
 
 Name:		 rshim
-Version:	 2.6.6
+Version:	 2.8.5
 Release:	 1%{?dist}
 Summary:	 User-space driver for Mellanox BlueField SoC
 License:	 GPLv2
@@ -12,8 +12,8 @@ Distribution:    Azure Linux
 URL:		 https://github.com/mellanox/rshim-user-space
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/rshim-%{version}.tar.gz
 BuildRequires:	 gcc, autoconf, automake, pkgconfig, make
 BuildRequires:	 pkgconfig(libpci), pkgconfig(libusb-1.0)
 BuildRequires:	 fuse3-devel
@@ -28,14 +28,15 @@ interface. It provides ways to push boot stream, debug the target or login
 via the virtual console or network interface.
 
 %prep
-rm -fr %{name}-%{version}
-mkdir %{name}-%{version}
-tar -axf %{SOURCE0} -C %{name}-%{version} --strip-components 1
-%setup -q -D -T
+%setup -q
 
 %build
 ./bootstrap.sh
+%if "%{with_systemd}" == "1"
+%configure --docdir=%{_datadir}/doc/%{name} --with-systemdsystemunitdir=%{_unitdir}
+%else
 %configure --docdir=%{_datadir}/doc/%{name}
+%endif
 %if %{?make_build:1}%{!?make_build:0}
 %make_build
 %else
@@ -89,14 +90,17 @@ fi
 %{_sbindir}/bf-reg
 %{_sbindir}/bf-pldm-ver
 %{_sbindir}/fwpkg_unpack.py
-%{_mandir}/man1/mlx-mkbfb.1.gz
-%{_mandir}/man8/rshim.8.gz
-%{_mandir}/man8/bfb-install.8.gz
-%{_mandir}/man8/bfb-tool.8.gz
-%{_mandir}/man8/bf-reg.8.gz
-%{_mandir}/man8/bf-pldm-ver.8.gz
+%{_mandir}/man1/mlx-mkbfb.1*
+%{_mandir}/man8/rshim.8*
+%{_mandir}/man8/bfb-install.8*
+%{_mandir}/man8/bfb-tool.8*
+%{_mandir}/man8/bf-reg.8*
+%{_mandir}/man8/bf-pldm-ver.8*
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2.8.5-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team <azurelinux@microsoft.com> - 2.6.6-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

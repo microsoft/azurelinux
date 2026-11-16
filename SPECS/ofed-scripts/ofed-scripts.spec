@@ -28,11 +28,11 @@
 #  $Id: ofed-scripts.spec 8402 2006-07-06 06:35:57Z vlad $
 #
 
-%global         MLNX_OFED_VERSION 26.01.1.0.0.1
+%global         MLNX_OFED_VERSION 26.07.0.7.7.0
 
 Summary:        OFED scripts
 Name:           ofed-scripts
-Version:        26.01
+Version:        26.07
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -41,16 +41,12 @@ Group:          System Environment/Base
 URL:            https://www.openfabrics.org
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/ofed-scripts-%{version}.tar.gz
 
 BuildRoot:      %{?build_root:%{build_root}}%{!?build_root:/var/tmp/%{name}-%{version}-root}
 
 %global CUSTOM_PREFIX %(if ( echo %{_prefix} | grep -E "^/usr$|^/usr/$" > /dev/null ); then echo -n '0'; else echo -n '1'; fi)
-%global RHEL8 0%{?rhel} >= 8
-%global FEDORA3X 0%{?fedora} >= 30
-%global SLES15 0%{?suse_version} >= 1500
-%global PYTHON3 %{RHEL8} || %{FEDORA3X} || %{SLES15}
 %global debug_package %{nil}
 
 # Packages that are no longer in MLNX_OFED and break package manager
@@ -79,10 +75,6 @@ install -m 0755 vendor_pre_uninstall.sh $RPM_BUILD_ROOT%{_prefix}/sbin
 install -m 0755 vendor_post_uninstall.sh $RPM_BUILD_ROOT%{_prefix}/sbin
 install -m 0755 ofed_info $RPM_BUILD_ROOT%{_prefix}/bin
 install -m 0755 ofed_rpm_info $RPM_BUILD_ROOT%{_prefix}/bin
-
-%if ! (%{PYTHON3})
-sed -s -i -e '1s|python3\>|python|' $RPM_BUILD_ROOT%{_prefix}/sbin/sysinfo-snapshot.py
-%endif
 
 %if "%{CUSTOM_PREFIX}" == "1"
 install -d $RPM_BUILD_ROOT/etc/profile.d
@@ -143,12 +135,15 @@ echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
 %else
 %files
 %endif
-%defattr(-,root,root)
 %license debian/copyright
+%defattr(-,root,root)
 %{_prefix}/bin/*
 %{_prefix}/sbin/*
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 26.07-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 26.01-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

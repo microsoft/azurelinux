@@ -5,14 +5,14 @@
 Summary:	 InfiniBand fabric simulator for management
 Name:		 ibsim
 Version:	 0.12.1
-Release:	 2%{?dist}
+Release:	 3%{?dist}
 License:	 GPLv2 or BSD
 Group:		 System Environment/Libraries
 BuildRoot:	 %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/ibsim-%{version}_doca-3.3.0.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/ibsim-%{version}_doca-3.5.0.tar.gz
 Url:		 https://github.com/linux-rdma/ibsim
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -50,6 +50,9 @@ rm -rf $RPM_BUILD_ROOT
 %license COPYING
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 0.12.1-3
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 0.12.1-2
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

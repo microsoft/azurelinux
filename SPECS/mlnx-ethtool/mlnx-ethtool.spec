@@ -1,5 +1,5 @@
 Name:            mlnx-ethtool
-Version:         2601.0.2
+Version:         2607.0.2
 Release:         1%{?dist}
 Group:           Utilities
 Summary:         Settings tool for Ethernet and other network devices
@@ -10,8 +10,8 @@ URL:             https://ftp.kernel.org/pub/software/network/ethtool/
 Buildroot:       /var/tmp/%{name}-%{version}-build
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/mlnx-ethtool-%{version}.tar.gz
 Patch1:          0001-package-rename-configure.patch
 
 BuildRequires:   autoconf
@@ -44,15 +44,21 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 %files
 %defattr(-,root,root)
-%{_sbindir}/ethtool
+# Use a literal sbin path, not %{_sbindir}: on Fedora 42+ the /usr/sbin->/usr/bin
+# merge redefines %{_sbindir} to %{_bindir}, but autotools `make install` still
+# installs ethtool to %{_prefix}/sbin -> "File not found .../bin/ethtool" on fc44.
+# %{_prefix}/sbin resolves to the same path on all other distros (backward compatible).
+%{_prefix}/sbin/ethtool
 %{_mandir}/man8/ethtool.8*
 %{_datadir}/bash-completion/completions/ethtool
 %{_datadir}/metainfo/org.kernel.software.network.ethtool.metainfo.xml
 %doc AUTHORS NEWS README
 %license COPYING
 
-
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.2-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 2601.0.2-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

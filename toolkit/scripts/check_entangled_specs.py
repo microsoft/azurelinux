@@ -96,6 +96,10 @@ version_release_matching_groups = [
         "SPECS/mlnx-nfsrdma-hwe/mlnx-nfsrdma-hwe.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/virtiofs-signed/virtiofs-signed.spec",
+        "SPECS/virtiofs/virtiofs.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/mlnx-ofa_kernel-modules-signed/mlnx-ofa_kernel-modules-signed.spec",
         "SPECS/mlnx-ofa_kernel/mlnx-ofa_kernel.spec"
     ]),

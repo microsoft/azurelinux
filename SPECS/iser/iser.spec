@@ -42,7 +42,7 @@
 
 %{!?_name: %global _name iser}
 %{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
-%{!?_release: %global _release OFED.26.01.1.0.0.1}
+%{!?_release: %global _release 1}
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
@@ -66,15 +66,15 @@
 
 Summary:	 %{_name} Driver
 Name:		 iser
-Version:	 26.01
+Version:	 2607.0.100
 Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/iser-%{target_mlnx_ofa_kernel_version}.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/iser-%{version}.tar.gz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -95,6 +95,8 @@ Requires:       mlnx-ofa_kernel-modules  = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
+%global modules_dir /lib/modules
+
 %description
 %{name} kernel modules
 
@@ -104,7 +106,7 @@ Requires:       kmod
 BuildRequires: %kernel_module_package_buildreqs
 %(mkdir -p %{buildroot})
 %(echo '%defattr (-,root,root)' > %{buildroot}/file_list)
-%(echo '/lib/modules/%2-%1' >> %{buildroot}/file_list)
+%(echo '%{modules_dir}/%2-%1' >> %{buildroot}/file_list)
 %(echo '%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*-%1.conf' >> %{buildroot}/file_list)
 %{kernel_module_package -f %{buildroot}/file_list -x xen -r %{_kmp_rel} }
 %else
@@ -125,7 +127,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %if "%{WITH_MOD_SIGN}" == "1"
 # call module sign script
 %global __modsign_install_post \
-    %{_builddir}/%{name}-%{version}/source/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
+    %{_builddir}/%{name}-%{version}/source/tools/sign-modules %{buildroot}%{modules_dir}/ %{kernel_source default} || exit 1 \
 %{nil}
 
 %global __debug_package 1
@@ -145,11 +147,9 @@ BuildRequires: %kernel_module_package_buildreqs
 #
 
 %if "%{_vendor}" == "suse"
+%if %{suse_version} < 1600
 %debug_package
 %endif
-
-%if 0%{?anolis} == 8
-%global __find_requires %{nil}
 %endif
 
 # set modules dir
@@ -168,7 +168,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %{!?install_mod_dir: %global install_mod_dir updates/%{name}}
 
 %prep
-%setup
+%setup -q -n iser-%{version}
 set -- *
 mkdir source
 mv "$@" source/
@@ -181,7 +181,7 @@ export CONF_OPTIONS="%{configure_options}"
 for flavor in %{flavors_to_build}; do
 	export K_BUILD=%{kernel_source $flavor}
 	export KVER=%{kernel_release $K_BUILD}
-	export LIB_MOD_DIR=/lib/modules/$KVER/$INSTALL_MOD_DIR
+	export LIB_MOD_DIR=%{modules_dir}/$KVER/$INSTALL_MOD_DIR
 	rm -rf obj/$flavor
 	cp -r source obj/$flavor
 	cd $PWD/obj/$flavor
@@ -199,10 +199,9 @@ for flavor in %flavors_to_build; do
 	cd $PWD/obj/$flavor
 	make install KERNELRELEASE=$KVER
 	# Cleanup unnecessary kernel-generated module dependency files.
-	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
+	find $INSTALL_MOD_PATH%{modules_dir} -iname 'modules.*' -exec rm {} \;
 	cd -
 done
-
 # Set the module(s) to be executable, so that they will be stripped when packaged.
 find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__chmod} u+x \{\} \;
 
@@ -246,13 +245,16 @@ fi # 1 : closed
 
 %if "%{KMP}" != "1"
 %files
-%defattr(-,root,root,-)
 %license source/debian/copyright
-/lib/modules/%{KVERSION}/%{install_mod_dir}/
+%defattr(-,root,root,-)
+%{modules_dir}/%{KVERSION}/%{install_mod_dir}/
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
 %endif
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.100-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 26.01-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

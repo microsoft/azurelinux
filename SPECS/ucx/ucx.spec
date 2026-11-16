@@ -1,8 +1,8 @@
 %{!?configure_options: %global configure_options %{nil}}
+%global __requires_exclude ^libgdrapi\.so.*$
 %bcond_without cma
 %bcond_with    cuda
 %bcond_with    gdrcopy
-%bcond_with    gda
 %bcond_without ib
 %bcond_with    knem
 %bcond_without rdmacm
@@ -14,10 +14,11 @@
 %bcond_with    ze
 %bcond_without mlx5
 %bcond_with    efa
+%bcond_with    gda
 
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
-Version:        1.20.0
+Version:        1.22.0.2608140153
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -26,14 +27,12 @@ Group:          System Environment/Security
 URL:            http://www.openucx.org
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:        %{_distro_sources_url}/ucx-%{version}_doca-3.3.0.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:        %{_distro_sources_url}/ucx-%{version}-1.8a6b06fb8.tar.gz
 
 
 # UCX currently supports only the following architectures
-ExclusiveArch: aarch64
-ExclusiveArch: ppc64le
-ExclusiveArch: x86_64
+ExclusiveArch: aarch64 ppc64le x86_64
 
 %if %{defined extra_deps}
 Requires: %{?extra_deps}
@@ -43,11 +42,7 @@ Requires: %{?extra_deps}
 Conflicts: ucx-knem < %{version}-%{release}
 Obsoletes: ucx-knem < %{version}-%{release}
 
-BuildRequires: automake
-BuildRequires: autoconf
-BuildRequires: libtool
-BuildRequires: gcc-c++
-
+BuildRequires: automake autoconf libtool gcc-c++
 %if %{with cma}
 BuildRequires: glibc-devel >= 2.15
 %endif
@@ -87,9 +82,6 @@ BuildRequires: valgrind-devel
 %if %{with mad}
 BuildRequires: libibmad-devel libibumad-devel
 %endif
-%if %{with gda}
-BuildRequires: doca-sdk-gpunetio-devel
-%endif
 
 %description
 UCX is an optimized communication framework for high-performance distributed
@@ -101,7 +93,8 @@ addition, UCX provides efficient intra-node communication, by leveraging the
 following shared memory mechanisms: posix, sysv, cma, knem, and xpmem.
 The acronym UCX stands for "Unified Communication X".
 
-This package was built from '' branch, commit d9a4f35.
+This package was built from '' branch, commit 8a6b06f.
+
 
 %package devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -135,6 +128,7 @@ Provides header files and examples for developing with UCX.
            %_with_arg gdrcopy gdrcopy \
            %_with_arg ib verbs \
            %_with_arg mlx5 mlx5 \
+           %_with_arg gda gda \
            %_with_arg efa efa \
            %_with_arg knem knem \
            %_with_arg rdmacm rdmacm \
@@ -144,7 +138,6 @@ Provides header files and examples for developing with UCX.
            %_with_arg ugni ugni \
            %_with_arg mad mad \
            %_with_arg ze ze \
-           %_with_arg gda gda \
            %{?configure_options}
 make %{?_smp_mflags} V=1
 
@@ -156,6 +149,7 @@ rm -f %{buildroot}%{_libdir}/ucx/*.la
 rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 
 %files
+%license LICENSE
 %{_libdir}/lib*.so.*
 %{_bindir}/ucx_info
 %{_bindir}/ucx_perftest
@@ -173,7 +167,10 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %{_sysconfdir}/ucx/ucx.conf
 
 %files devel
-%{_includedir}/uc*
+%{_includedir}/ucs
+%{_includedir}/ucm/api
+%{_includedir}/ucp/api
+%{_includedir}/uct/api
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/ucx.pc
 %{_libdir}/pkgconfig/ucx-uct.pc
@@ -255,6 +252,7 @@ technology for direct data transfer between GPU and RDMA devices.
 %{_libdir}/ucx/libucx_perftest_cuda.so.*
 %{_libdir}/ucx/libucm_cuda.so.*
 %{_libdir}/ucx/libuct_cuda.so.*
+%{_includedir}/uct/cuda/*
 %endif
 
 %if %{with gdrcopy}
@@ -336,7 +334,7 @@ Group: System Environment/Libraries
 
 %description knem
 Provides KNEM (fast inter-process copy) transport for UCX. KNEM is a Linux
-Kernel module that enables high-performance intra-node MPI communication
+kernel module that enables high-performance intra-node MPI communication
 for large messages.
 
 %files knem
@@ -402,6 +400,7 @@ Provides Gemini/Aries transport for UCX.
 %package xpmem
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Summary: UCX XPMEM transport support.
+Group: System Environment/Libraries
 
 %description xpmem
 Provides XPMEM transport for UCX. XPMEM is a Linux kernel module that enables a
@@ -429,7 +428,7 @@ library internals, protocol objects, transports status, and more.
 %if %{with ze}
 %package ze
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Summary: UCX ZE GPU support.
+Summary: UCX ZE GPU support
 Group: System Environment/Libraries
 
 %description ze
@@ -444,7 +443,6 @@ Provides oneAPI Level Zero (ZE) Runtime support for UCX.
 %package ib-mlx5-gda
 Requires: %{name}-cuda%{?_isa} = %{version}-%{release}
 Requires: %{name}-ib%{?_isa} = %{version}-%{release}
-Requires: doca-sdk-gpunetio-devel
 Summary: UCX GPU Direct Async support
 Group: System Environment/Libraries
 
@@ -454,11 +452,14 @@ to initiate network communications directly without explicit synchronization
 with the host CPU.
 
 %files ib-mlx5-gda
-%{_libdir}/ucx/libuct_ib_mlx5_gda.so.*
+%{_libdir}/ucx/libuct_ib_mlx5_gda.*
+%{_includedir}/uct/ib/mlx5/gdaki/*
 %endif
 
-
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 1.22.0.2608140153-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 12 2026 Azure Linux Team - 1.20.0-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

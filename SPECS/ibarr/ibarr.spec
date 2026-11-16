@@ -1,13 +1,13 @@
 Name:           ibarr
-Version:        2601.0.0
+Version:        2607.0.0
 Release:        1%{?dist}
 Summary:        Nvidia address and route userspace resolution services for Infiniband
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:        %{_distro_sources_url}/ibarr-%{version}.tar.gz
 Group:		Applications/System
 License:	(GPL-2.0 WITH Linux-syscall-note) OR BSD-2-Clause
 BuildRequires:	cmake
@@ -49,13 +49,16 @@ subsystem and provides 2 services: ip2gid (address resolution) and gid2lid
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%doc README.md
 %license COPYING.BSD_MIT
+%doc README.md
 %{_bindir}/ibarr
 # FIXME: should be in the standard directory, under _prefix.
 /lib/systemd/system/%{name}.service
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.0-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 2601.0.0-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

@@ -26,11 +26,11 @@
 #
 #
 
-%global         MLNX_OFED_VERSION 26.01.1.0.0.0
+%global         MLNX_OFED_VERSION 26.07.0.7.7.0
 
 Summary:        Mellanox userland tools and scripts
 Name:           mlnx-tools
-Version:        2601.0.2
+Version:        2607.0.6
 Release:        1%{?dist}
 License:        GPLv2 or BSD
 Vendor:         Microsoft Corporation
@@ -39,18 +39,18 @@ Group:          Applications/System
 URL:            https://github.com/Mellanox/mlnx-tools
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:        %{_distro_sources_url}/mlnx-tools-%{version}.tar.gz
 Obsoletes:      mlnx-ofa_kernel < 5.4
 Obsoletes:      mlnx_en-utils < 5.4
 
+BuildArch:      noarch
 BuildRoot: %{?build_root:%{build_root}}%{!?build_root:/var/tmp/%{name}}
 
 %description
 Mellanox userland tools and scripts
 
 %global python_dir %{_datadir}/%{name}/python
-
 %prep
 %setup -n %{name}-%{version}
 
@@ -73,7 +73,7 @@ EOF
 
 touch mlnx-tools-files
 export PKG_VERSION="%{version}"
-%make_install
+%make_install SBIN_DIR=%{_sbindir}
 
 %if "%{_prefix}" != "/usr"
 	conf_env=/etc/profile.d/mlnx-tools.sh
@@ -98,15 +98,35 @@ rm -rf %{buildroot}
 /sbin/mlnx_bf_configure
 /sbin/mlnx-sf
 /sbin/doca-hugepages
-%{_sbindir}/*
-%{_bindir}/*
+%{_bindir}/mlnx_dump_parser
+%{_bindir}/mlnx_perf
+%{_bindir}/mlnx_qos
+%{_bindir}/mlx_fs_dump
+%{_bindir}/tc_wrap.py
+%{_sbindir}/cma_roce_mode
+%{_sbindir}/cma_roce_tos
+%{_sbindir}/common_irq_affinity.sh
+%{_sbindir}/compat_gid_gen
+%{_sbindir}/mlnx_affinity
+%{_sbindir}/mlnxofedctl
+%{_sbindir}/set_irq_affinity_bynode.sh
+%{_sbindir}/set_irq_affinity_cpulist.sh
+%{_sbindir}/set_irq_affinity.sh
+%{_sbindir}/show_counters
+%{_sbindir}/show_gids
+%{_sbindir}/show_irq_affinity_hints.sh
+%{_sbindir}/show_irq_affinity.sh
+%{_sbindir}/ib2ib_setup
+%{_sbindir}/mlnx_tune
 %{_mandir}/man8/*.8*
 %{python_dir}/dcbnetlink.py*
 %{python_dir}/netlink.py*
-%exclude %{python_dir}/__pycache__/*.pyc
 /lib/udev/mlnx_bf_udev
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.6-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 2601.0.2-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

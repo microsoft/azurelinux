@@ -1,14 +1,14 @@
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
 Summary:        Network Benchmarking Utility for high-performance systems
 Name:           sockperf
-Version:        3.1
+Version:        3.10
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/Mellanox/sockperf
-Source0:        %{_distro_sources_url}/%{name}-%{version}_doca-3.3.0.tar.gz
+Source0:        %{_distro_sources_url}/sockperf-%{version}_doca-3.5.0.tar.gz
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  automake
@@ -38,17 +38,21 @@ fi
 %install
 %make_install
 
+
 %files
 %defattr(-,root,root)
-%license copying
 %{_bindir}/sockperf
 %doc /usr/share/doc/sockperf/README.md
 %doc /usr/share/doc/sockperf/authors
 %doc /usr/share/doc/sockperf/news
 %doc /usr/share/doc/sockperf/version
 %doc /usr/share/doc/sockperf/copying
+%license copying
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 3.10-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 3.1-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

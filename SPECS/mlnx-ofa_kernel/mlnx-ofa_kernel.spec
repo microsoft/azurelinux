@@ -49,12 +49,16 @@
 %global MADEYE %(if ( echo %{configure_options} | grep "with-madeye-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
 
 %global WINDRIVER %(if (grep -qiE "Wind River" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global POWERKVM %(if (grep -qiE "powerkvm" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
 %global BLUENIX %(if (grep -qiE "Bluenix" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global XENSERVER65 %(if (grep -qiE "XenServer.*6\.5" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
 
 %global IS_RHEL_VENDOR "%{_vendor}" == "redhat" || ("%{_vendor}" == "bclinux") || ("%{_vendor}" == "openEuler")
 %global KMOD_PREAMBLE "%{_vendor}" != "openEuler"
+
+%if 0%{?suse_version} >= 1600
+%global modules_dir /usr/lib/modules
+%else
+%global modules_dir /lib/modules
+%endif
 
 # MarinerOS 1.0 sets -fPIE in the hardening cflags
 # (in the gcc specs file).
@@ -105,9 +109,9 @@
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
 
 %{!?_name: %global _name mlnx-ofa_kernel}
-%{!?_release: %global _release OFED.26.01.1.0.0.1}
+%{!?_release: %global _release 1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
-%global MLNX_OFA_DRV_SRC 26.01-1.0.0
+%global MLNX_OFA_DRV_SRC 2607.0.100-doca-3.5-host
 
 %global utils_pname %{_name}
 %global devel_pname %{_name}-devel
@@ -120,15 +124,15 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
-Version:	 26.01
+Version:	 2607.0.100
 Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/%{_name}-%{version}.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/mlnx-ofa_kernel-%{version}.tar.gz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
@@ -181,19 +185,22 @@ BuildRequires: /usr/bin/perl
 Requires: systemd-sysvcompat
 %endif
 %endif
+BuildRequires:  automake
+%global __requires_exclude ^/usr/bin/dh-exec$
+
 %description
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-2607.0.100-doca-3.5-host.tar.gz
 
 
 # build KMP rpms?
 %if "%{KMP}" == "1"
 %global kernel_release() $(make -s -C %{1} kernelrelease M=$PWD)
 # prep file list for kmp rpm
-%(cat > %{_builddir}/kmp.files << EOF
+%(mkdir -p %{_builddir}; cat > %{_builddir}/kmp.files << EOF
 %defattr(644,root,root,755)
-/lib/modules/%2-%1
+%{modules_dir}/%2-%1
 %if %{IS_RHEL_VENDOR}
 %config(noreplace) %{_sysconfdir}/depmod.d/zz01-%{_name}-*.conf
 %endif
@@ -204,53 +211,49 @@ EOF)
 %else
 %kernel_module_package -f %{_builddir}/kmp.files -r %{_kmp_rel}
 %endif
-%else # not KMP
+%else
+# not KMP:
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
-# We create the module package only for the x86_64 kernel
 %ifarch x86_64
 %package -n %{non_kmp_pname}
-Obsoletes: kernel-ib
-Obsoletes: mlnx-en
-Obsoletes: mlnx_en
-Obsoletes: mlnx-en-utils
-Obsoletes: kmod-mlnx-en
-Obsoletes: mlnx-en-kmp-default
-Obsoletes: mlnx-en-kmp-xen
-Obsoletes: mlnx-en-kmp-trace
-Obsoletes: mlnx-en-doc
-Obsoletes: mlnx-en-debuginfo
-Obsoletes: mlnx-en-sources
-Obsoletes: mlnx-rdma-rxe
+Requires: kernel = %{target_kernel_version_full}
+Obsoletes: mlnx-en < %{version}
+Obsoletes: mlnx_en < %{version}
+Obsoletes: mlnx-en-utils < %{version}
+Obsoletes: kmod-mlnx-en < %{version}
+Obsoletes: mlnx-en-kmp-default < %{version}
+Obsoletes: mlnx-en-kmp-xen < %{version}
+Obsoletes: mlnx-en-kmp-trace < %{version}
+Obsoletes: mlnx-en-doc < %{version}
+Obsoletes: mlnx-en-debuginfo < %{version}
+Obsoletes: mlnx-en-sources < %{version}
+Obsoletes: mlnx-rdma-rxe < %{version}
 Obsoletes: fwctl <= 24.10
 Provides:  fwctl = %{version}-%{release}
-
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
-
-Requires: kernel = %{target_kernel_version_full}
-
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-2607.0.100-doca-3.5-host.tar.gz
 %endif
-%endif #end if "%{KMP}" == "1"
+#end if "%{KMP}" == "1":
+%endif
 
 %package -n %{devel_pname}
-Obsoletes: kernel-ib-devel
-Obsoletes: kernel-ib
-Obsoletes: mlnx-en
-Obsoletes: mlnx_en
-Obsoletes: mlnx-en-utils
-Obsoletes: kmod-mlnx-en
-Obsoletes: mlnx-en-kmp-default
-Obsoletes: mlnx-en-kmp-xen
-Obsoletes: mlnx-en-kmp-trace
-Obsoletes: mlnx-en-doc
-Obsoletes: mlnx-en-debuginfo
-Obsoletes: mlnx-en-sources
+Obsoletes: mlnx-en < %{version}
+Obsoletes: mlnx_en < %{version}
+Obsoletes: mlnx-en-utils < %{version}
+Obsoletes: kmod-mlnx-en < %{version}
+Obsoletes: mlnx-en-kmp-default < %{version}
+Obsoletes: mlnx-en-kmp-xen < %{version}
+Obsoletes: mlnx-en-kmp-trace < %{version}
+Obsoletes: mlnx-en-doc < %{version}
+Obsoletes: mlnx-en-debuginfo < %{version}
+Obsoletes: mlnx-en-sources < %{version}
+Obsoletes: kmod-mellanox < %{version}
 Requires: coreutils
 Requires: pciutils
 Requires(post): %{_sbindir}/update-alternatives
@@ -259,7 +262,7 @@ Summary: Infiniband Driver and ULPs kernel modules sources
 Group: System Environment/Libraries
 %description -n %{devel_pname}
 Core, HW and ULPs kernel modules sources
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-2607.0.100-doca-3.5-host.tar.gz
 
 %package source
 Summary: Source of the MLNX_OFED main kernel driver
@@ -283,7 +286,7 @@ drivers against it.
 %if "%{WITH_MOD_SIGN}" == "1"
 # call module sign script
 %global __modsign_install_post \
-    %{_builddir}/$NAME-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
+    %{_builddir}/$NAME-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}%{modules_dir} %{kernel_source default} || exit 1 \
 %{nil}
 
 %global __debug_package 1
@@ -299,14 +302,13 @@ drivers against it.
   %{__modsign_install_post} \
 %{nil}
 
-%endif # end of setup module sign scripts
+# end of setup module sign scripts
+%endif
 #
 %if "%{_vendor}" == "suse"
+%if %{suse_version} < 1600
 %debug_package
 %endif
-
-%if %{IS_RHEL_VENDOR}
-%global __find_requires %{nil}
 %endif
 
 # set modules dir
@@ -326,25 +328,23 @@ drivers against it.
 
 %prep
 %setup -n %{_name}-%{version}
-ofed_scripts/ofed_patch.sh
+ofed_scripts/ofed_patch.sh --kernel-version=%{target_kernel_version_full}
+if [ ! -f compat/configure ]; then (cd compat && ./autogen.sh); fi
 set -- *
 mkdir source
 mv "$@" source/
 mkdir obj
 
 %build
+export CFLAGS="$CFLAGS -fno-exceptions"
 EXTRA_CFLAGS='-DVERSION=\"%version\"'
-%if (0%{?rhel} >= 10)
-EXTRA_CFLAGS+=' -fno-exceptions'
-%endif
 export EXTRA_CFLAGS
-export CFLAGS="$CFLAGS  -fno-exceptions "
 export INSTALL_MOD_DIR=%{install_mod_dir}
 export CONF_OPTIONS="%{configure_options}"
 for flavor in %flavors_to_build; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
-	export LIB_MOD_DIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
+	export LIB_MOD_DIR=%{modules_dir}/$KVERSION/$INSTALL_MOD_DIR
 	rm -rf obj/$flavor
 	cp -a source obj/$flavor
 	cd $PWD/obj/$flavor
@@ -367,19 +367,18 @@ for flavor in %flavors_to_build; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor
-# For the default kernel, we create the module package only for the x86_64 kernel.
-# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
-# We keep the user space packages like the module configs built only in this spec, though,
-# and re-use them for kernel modules built for other kernel flavours and architectures.
 %ifarch x86_64
 	make install_modules KERNELRELEASE=$KVERSION
 %endif
 	# install script and configuration files
-	make install_scripts
+	make install_scripts sbindir=%{_sbindir}
 	mkdir -p %{_builddir}/src/$NAME/$flavor
 	cp -ar include/ %{_builddir}/src/$NAME/$flavor
 	cp -ar config* %{_builddir}/src/$NAME/$flavor
 	cp -ar compat*  %{_builddir}/src/$NAME/$flavor
+	find %{_builddir}/src/$NAME/$flavor -name \*.o -o -name \*.ko | xargs -r rm -f
+	rm -rf %{_builddir}/src/$NAME/$flavor/compat/modtest
+
 	cp -ar ofed_scripts %{_builddir}/src/$NAME/$flavor
 
 	modsyms=`find . -name Module.symvers -o -name Modules.symvers`
@@ -393,13 +392,12 @@ for flavor in %flavors_to_build; do
 		cp ./Module.symvers %{_builddir}/src/$NAME/$flavor/Module.symvers
 	fi
 	cp -a %{_builddir}/src/$NAME/$flavor %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/$KVERSION
+	# Cleanup unnecessary kernel-generated module dependency files.
+%ifarch x86_64
+	find $INSTALL_MOD_PATH%{modules_dir} -iname 'modules.*' -exec rm {} \;
+%endif
 	cd -
 done
-
-%ifarch x86_64
-	# Cleanup unnecessary kernel-generated module dependency files.
-	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
-%endif
 
 # Set the module(s) to be executable, so that they will be stripped when packaged.
 find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__chmod} u+x \{\} \;
@@ -419,10 +417,14 @@ done
 %endif
 %endif
 
+
 # copy sources
 mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}
 cp -a %{_builddir}/%{name}-%{version}/source %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}/source
 ln -s ofa_kernel-%{version}/source %{buildroot}/%{_prefix}/src/mlnx-ofa_kernel-%{version}
+# dh-exec "scripts" (config files) may create a false dependency on
+# /usr/bin/dh-exec , and are only needed with deb at build time:
+grep -lZr '^#! \?/usr/bin/dh-exec' %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}/source/ | xargs -0 rm -f
 # Fix path of BACKPORT_INCLUDES
 sed -i -e "s@=-I.*backport_includes@=-I/usr/src/ofa_kernel-$VERSION/backport_includes@" %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}/configure.mk.kernel || true
 rm -rf %{_builddir}/src
@@ -580,10 +582,6 @@ fi
 /usr/sbin/update-rc.d openibd defaults || true
 %endif
 
-%if "%{POWERKVM}" == "1"
-/usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-/usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
 
 %if "%{WITH_SYSTEMD}" == "1"
 /usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
@@ -621,18 +619,6 @@ if [ ! -e "/.dockerenv" ] && ! (grep -q docker /proc/self/cgroup 2>/dev/null); t
 	fi
 fi
 
-# Make IPoIB interfaces be unmanaged on XenServer
-if (grep -qi xenserver /etc/issue /etc/*-release 2>/dev/null); then
-	IPOIB_PNUM=$(lspci -d 15b3: 2>/dev/null | wc -l 2>/dev/null)
-	IPOIB_PNUM=$(($IPOIB_PNUM * 2))
-	for i in $(seq 1 $IPOIB_PNUM)
-	do
-		uuid=$(xe pif-list 2>/dev/null | grep -B2 ib${i} | grep uuid | cut -d : -f 2 | sed -e 's/ //g')
-		if [ "X${uuid}" != "X" ]; then
-			xe pif-forget uuid=${uuid} >/dev/null 2>&1 || true
-		fi
-	done
-fi
 
 fi # 1 : closed
 # END of post
@@ -660,9 +646,6 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 /usr/sbin/update-rc.d -f openibd remove || true
 %endif
 
-%if "%{POWERKVM}" == "1"
-/usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-%endif
 fi
 
 %postun -n %{utils_pname}
@@ -725,13 +708,9 @@ update-alternatives --remove \
 	%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION} \
 
 %files -n %{utils_pname}
-%defattr(-,root,root,-)
 %license source/debian/copyright
+%defattr(-,root,root,-)
 %doc source/ofed_scripts/82-net-setup-link.rules source/ofed_scripts/vf-net-link-name.sh
-%if "%{KMP}" == "1"
-%if %{IS_RHEL_VENDOR}
-%endif # end rh
-%endif # end KMP=1
 %dir /etc/infiniband
 %config(noreplace) /etc/infiniband/openib.conf
 %config(noreplace) /etc/infiniband/mlx5.conf
@@ -743,13 +722,12 @@ update-alternatives --remove \
 %endif
 /lib/udev/sf-rep-netdev-rename
 /lib/udev/auxdev-sf-netdev-rename
-/usr/sbin/setup_mr_cache.sh
+%_sbindir/setup_mr_cache.sh
 %_datadir/mlnx_ofed/mlnx_bf_assign_ct_cores.sh
 %_datadir/mlnx_ofed/mlnx_drv_ctl
 %_datadir/mlnx_ofed/mod_load_funcs
 %config(noreplace) /etc/modprobe.d/mlnx.conf
 %config(noreplace) /etc/modprobe.d/mlnx-bf.conf
-%{_sbindir}/*
 /lib/udev/rules.d/83-mlnx-sf-name.rules
 /lib/udev/rules.d/90-ib.rules
 /bin/mlnx_interface_mgr.sh
@@ -765,31 +743,36 @@ update-alternatives --remove \
 %endif
 
 %if "%{KMP}" != "1"
-# We create the module package only for the x86_64 kernel
 %ifarch x86_64
 %files -n %{non_kmp_pname}
 %license source/debian/copyright
-/lib/modules/%{KVERSION}/%{install_mod_dir}/
+%{modules_dir}/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}
 %config(noreplace) %{_sysconfdir}/depmod.d/zz01-%{_name}-*.conf
 %endif
 %endif
 %endif
-%endif
 
+%endif
 %files -n %{devel_pname}
-%defattr(-,root,root,-)
 %license source/debian/copyright
+%defattr(-,root,root,-)
+%dir %{_prefix}/src/ofa_kernel
+%dir %{_prefix}/src/ofa_kernel/%{_arch}
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %files source
-%defattr(-,root,root,-)
 %license source/debian/copyright
-%{_prefix}/src/ofa_kernel-%version/source
-%{_prefix}/src/mlnx-ofa_kernel-%version
+%defattr(-,root,root,-)
+%dir %{_prefix}/src/ofa_kernel-%{version}
+%{_prefix}/src/ofa_kernel-%{version}/source
+%{_prefix}/src/mlnx-ofa_kernel-%{version}
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.100-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 26.01-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

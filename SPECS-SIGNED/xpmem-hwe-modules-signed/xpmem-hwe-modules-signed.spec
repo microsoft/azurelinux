@@ -22,7 +22,7 @@
 
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
-Version:	 2601.0.9
+Version:	 2607.0.7
 Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
@@ -95,6 +95,9 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 fi
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.7-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 2601.0.9-1_6.18.31.1.1
 - Bump to match upgrade to DOCA 3.3.0 (xpmem 2601.0.9).
 

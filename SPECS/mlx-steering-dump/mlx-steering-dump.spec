@@ -26,16 +26,16 @@
 #
 #
 
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/OFED-internal-26.01-1.0.0.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
 
 Summary:	 Mellanox steering dump parser
 Name:		 mlx-steering-dump
-Version:	 1.0.0
-Release:	 2%{?dist}
+Version:	 2604.0.2
+Release:	 1%{?dist}
 License:	 GPLv2
 Url:		 https://github.com/Mellanox/mlx_steering_dump
 Group:		 Applications/System
-Source0:         %{_distro_sources_url}/%{name}-%{version}_doca-3.3.0.tar.gz
+Source0:         %{_distro_sources_url}/mlx-steering-dump-%{version}.tar.gz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -75,6 +75,9 @@ install -m 755 hws/mlx_hw_steering_dump %{buildroot}/usr/bin/
 /usr/bin/mlx_hw_steering_dump
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2604.0.2-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 1.0.0-2
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

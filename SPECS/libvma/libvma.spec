@@ -9,7 +9,7 @@
 
 Name:           libvma
 Version:        9.8.84
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A library for boosting TCP and UDP traffic (over RDMA hardware)
 Group:          System Environment/Libraries
 License:        GPLv2 or BSD
@@ -18,8 +18,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:        %{_distro_sources_url}/libvma-%{version}_doca-3.5.0.tar.gz
 
 # libvma currently supports only the following architectures
 ExclusiveArch: x86_64 ppc64le ppc64 aarch64
@@ -68,9 +68,7 @@ This package contains the tool for collecting and analyzing libvma statistic.
 %setup -q
 
 %build
-
 export CFLAGS="$CFLAGS -Werror=discarded-qualifiers"
-
 if [ ! -e configure ] && [ -e autogen.sh ]; then
     PRJ_RELEASE=%{use_rel} ./autogen.sh
 fi
@@ -109,7 +107,6 @@ install -m 755 ./%{name}-debug.so $RPM_BUILD_ROOT/%{_libdir}/%{name}-debug.so
 %systemd_postun_with_restart vma.service
 
 %files
-%license LICENSE
 %{_libdir}/%{name}.so*
 %dir %{_pkgdocdir}
 %doc %{_pkgdocdir}/README
@@ -121,6 +118,7 @@ install -m 755 ./%{name}-debug.so $RPM_BUILD_ROOT/%{_libdir}/%{name}-debug.so
 %endif
 %{_mandir}/man7/vma.*
 %{_mandir}/man8/vmad.*
+%license LICENSE
 
 %files devel
 %dir %{_includedir}/mellanox
@@ -134,6 +132,9 @@ install -m 755 ./%{name}-debug.so $RPM_BUILD_ROOT/%{_libdir}/%{name}-debug.so
 %{_mandir}/man8/vma_stats.*
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 9.8.84-2
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 9.8.84-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

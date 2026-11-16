@@ -9,7 +9,7 @@
 %global _prefix /opt/mellanox/iproute2
 %global _exec_prefix %{_prefix}
 %global package_name mlnx-iproute2
-%global package_version 6.18.0
+%global package_version 7.0.0
 %global configs_under_prefix 1
 %global netns_package_name netns-mlnx
 
@@ -34,7 +34,7 @@
 
 Summary:        Advanced IP routing and network device configuration tools
 Name:           mlnx-iproute2
-Version:        2601.0.6
+Version:        2607.0.3
 Release:        1%{?dist}
 License:        GPLv2
 Group:          Networking/Admin
@@ -42,8 +42,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/mlnx-iproute2-%{version}.tar.gz
 URL:		http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2
 
 BuildRequires:	bison
@@ -61,7 +61,6 @@ Group:		Development/Libraries
 
 %description -n libnetlink-devel
 This library provides an interface for kernel-user netlink interface.
-
 # The dependency on libdb-5.3 comes from arpd. This tool is not really
 # used in our package. In some platforms libdb-5.3 is not available by
 # default even though we include the devel package on the build system.
@@ -104,8 +103,8 @@ install -m 644 include/libnetlink.h $RPM_BUILD_ROOT%{_includedir}
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(-,root,root,-)
 %license COPYING
+%defattr(-,root,root,-)
 %doc README README.devel
 %config(noreplace) %verify(not md5 mtime size) %{config_dir}/*
 %{_prefix}/include/*
@@ -114,6 +113,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/*
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.3-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 2601.0.6-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

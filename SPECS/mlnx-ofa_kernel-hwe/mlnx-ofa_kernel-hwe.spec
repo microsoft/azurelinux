@@ -48,12 +48,16 @@
 %global MADEYE %(if ( echo %{configure_options} | grep "with-madeye-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
 
 %global WINDRIVER %(if (grep -qiE "Wind River" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global POWERKVM %(if (grep -qiE "powerkvm" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
 %global BLUENIX %(if (grep -qiE "Bluenix" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global XENSERVER65 %(if (grep -qiE "XenServer.*6\.5" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
 
 %global IS_RHEL_VENDOR "%{_vendor}" == "redhat" || ("%{_vendor}" == "bclinux") || ("%{_vendor}" == "openEuler")
 %global KMOD_PREAMBLE "%{_vendor}" != "openEuler"
+
+%if 0%{?suse_version} >= 1600
+%global modules_dir /usr/lib/modules
+%else
+%global modules_dir /lib/modules
+%endif
 
 # MarinerOS 1.0 sets -fPIE in the hardening cflags
 # (in the gcc specs file).
@@ -100,10 +104,9 @@
 
 %global base_name mlnx-ofa_kernel
 %{!?_name: %global _name %{base_name}-hwe}
-%{!?_version: %global _version 26.01}
-%{!?_release: %global _release OFED.26.01.1.0.0.1}
+%{!?_release: %global _release 1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
-%global MLNX_OFA_DRV_SRC 26.01-1.0.0
+%global MLNX_OFA_DRV_SRC 2607.0.100-doca-3.5-host
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
@@ -116,15 +119,15 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
-Version:	 26.01
-Release:	 2%{release_suffix}%{?dist}
+Version:	 2607.0.100
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/mlnx-ofa_kernel-%{_version}.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/mlnx-ofa_kernel-%{version}.tar.gz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
@@ -153,10 +156,13 @@ BuildRequires:  pkgconfig
 BuildRequires: %kernel_module_package_buildreqs
 BuildRequires: /usr/bin/perl
 %endif
+BuildRequires:  automake
+%global __requires_exclude ^/usr/bin/dh-exec$
+
 %description
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tar.gz
 
 
 # build KMP rpms?
@@ -215,7 +221,7 @@ Conflicts: mlnx-ofa_kernel-modules
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tar.gz
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
@@ -295,26 +301,24 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/
 %{!?install_mod_dir: %global install_mod_dir updates}
 
 %prep
-%setup -n mlnx-ofa_kernel-%{_version}
-ofed_scripts/ofed_patch.sh
+%setup -n mlnx-ofa_kernel-%{version}
+ofed_scripts/ofed_patch.sh --kernel-version=%{target_kernel_version_full}
+if [ ! -f compat/configure ]; then (cd compat && ./autogen.sh); fi
 set -- *
 mkdir source
 mv "$@" source/
 mkdir obj
 
 %build
+export CFLAGS="$CFLAGS -fno-exceptions"
 EXTRA_CFLAGS='-DVERSION=\"%version\"'
-%if (0%{?rhel} >= 10)
-EXTRA_CFLAGS+=' -fno-exceptions'
-%endif
 export EXTRA_CFLAGS
-export CFLAGS="$CFLAGS  -fno-exceptions "
 export INSTALL_MOD_DIR=%{install_mod_dir}
 export CONF_OPTIONS="%{configure_options}"
 for flavor in %flavors_to_build; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
-	export LIB_MOD_DIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
+	export LIB_MOD_DIR=%{modules_dir}/$KVERSION/$INSTALL_MOD_DIR
 	rm -rf obj/$flavor
 	cp -a source obj/$flavor
 	cd $PWD/obj/$flavor
@@ -328,7 +332,7 @@ done
 export RECORD_PY_FILES=1
 export INSTALL_MOD_PATH=%{buildroot}
 export INSTALL_MOD_DIR=%{install_mod_dir}
-export NAME=%{_name}
+export NAME=%{name}
 export VERSION=%{version}
 export PREFIX=%{_prefix}
 mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}
@@ -337,10 +341,14 @@ for flavor in %flavors_to_build; do
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor
 	make install_modules KERNELRELEASE=$KVERSION
+	# install script and configuration files
 	mkdir -p %{_builddir}/src/$NAME/$flavor
 	cp -ar include/ %{_builddir}/src/$NAME/$flavor
 	cp -ar config* %{_builddir}/src/$NAME/$flavor
 	cp -ar compat*  %{_builddir}/src/$NAME/$flavor
+	find %{_builddir}/src/$NAME/$flavor -name \*.o -o -name \*.ko | xargs -r rm -f
+	rm -rf %{_builddir}/src/$NAME/$flavor/compat/modtest
+
 	cp -ar ofed_scripts %{_builddir}/src/$NAME/$flavor
 
 	modsyms=`find . -name Module.symvers -o -name Modules.symvers`
@@ -355,7 +363,7 @@ for flavor in %flavors_to_build; do
 	fi
 	cp -a %{_builddir}/src/$NAME/$flavor %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/$KVERSION
 	# Cleanup unnecessary kernel-generated module dependency files.
-	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
+	find $INSTALL_MOD_PATH%{modules_dir} -iname 'modules.*' -exec rm {} \;
 	cd -
 done
 
@@ -376,6 +384,7 @@ echo "override ${mod_name} * extra/%{_name}${mod_path}" >> %{buildroot}%{_syscon
 done
 %endif
 %endif
+
 
 # Fix path of BACKPORT_INCLUDES
 sed -i -e "s@=-I.*backport_includes@=-I/usr/src/ofa_kernel-$VERSION/backport_includes@" %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}/configure.mk.kernel || true
@@ -462,6 +471,9 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.100-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Fri Jun 27 2026 Jon Slobodzian <joslobo@microsoft.com> - 26.01-2_6.18.31.1.1
 - Bump release to stay entangled with the signed sibling, which dropped
   fwctl.ko (no longer produced by HWE OFED after the DOCA 3.3.0 bump).

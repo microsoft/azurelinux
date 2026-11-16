@@ -1,5 +1,6 @@
 %{!?cmake: %global cmake cmake}
 %{!?make_jobs: %global make_jobs make VERBOSE=1 %{?_smp_mflags}}
+%{!?cmake_build: %global cmake_build %{make_jobs}}
 %{!?cmake_install: %global cmake_install DESTDIR=%{buildroot} make install}
 %{!?_udevrulesdir: %global _udevrulesdir /etc/udev/rules.d}
 
@@ -22,7 +23,6 @@
 %endif
 
 %define rst2man_exist %(test -f /usr/bin/rst2man; echo $?)
-%define __cmake_in_source_build 0
 
 %define python38_exist %(test -f /usr/bin/python3.8; echo $?)
 %if 0%{?alinux} == 3 && %{python38_exist} == 0
@@ -30,7 +30,7 @@
 %endif
 
 Name: rdma-core
-Version: 2601.0.7
+Version: 2607.0.8
 Release: 1%{?dist}
 Summary: RDMA core userspace libraries and daemons
 Group: System Environment/Libraries
@@ -41,7 +41,7 @@ Group: System Environment/Libraries
 #  providers/hfi1verbs Uses the 3 Clause BSD license
 License: GPLv2 or BSD
 Url: https://github.com/linux-rdma/rdma-core
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 Source0: %{_distro_sources_url}/rdma-core-%{version}.tar.gz
@@ -71,8 +71,7 @@ BuildRequires: systemd-devel
 %else
 %define with_pyverbs 1
 %endif
-# Disable pyverbs for azl, as pyverbs cannot build with cython > 3
-%if 0%{azl}
+%if 0%{?azl}
 %define with_pyverbs 0
 %endif
 %if %{with_pyverbs}
@@ -99,7 +98,7 @@ BuildRequires: python
 %endif
 %endif
 
-# AzureLinux fix to include missing asm/socket.h
+# Mariner specific fix to include missing asm/socket.h
 %if 0%{?azl}
 BuildRequires: kernel-headers
 %endif
@@ -262,6 +261,8 @@ Provides: libhfi1 = %{version}-%{release}
 Obsoletes: libhfi1 < %{version}-%{release}
 Provides: libhns = %{version}-%{release}
 Obsoletes: libhns < %{version}-%{release}
+Provides: libhns1 = %{version}-%{release}
+Obsoletes: libhns1 < %{version}-%{release}
 Provides: libionic = %{version}-%{release}
 Obsoletes: libionic < %{version}-%{release}
 Provides: libipathverbs = %{version}-%{release}
@@ -403,9 +404,22 @@ easy, object-oriented access to IB verbs.
 
 %{!?EXTRA_CMAKE_FLAGS: %global EXTRA_CMAKE_FLAGS %{nil}}
 
+# On distros where the cmake macro is old-style (no -B/-S) but cmake_build and
+# cmake_install are new-style and use _vpath_builddir, redefine the cmake macro
+# to use cmake_conf so all three agree on the build directory.
+# On RHEL 7 (no cmake_conf) both the cmake and make-based cmake_build fallback
+# are in-source -- no fix needed there.
+# On RHEL 9/Fedora the cmake macro already calls cmake_conf -- a no-op.
+%if 0%{?cmake_conf:1}
+%global cmake %cmake_conf
+%endif
+
 # Pass all of the rpm paths directly to GNUInstallDirs and our other defines.
 %cmake %{CMAKE_FLAGS} \
          -DCMAKE_BUILD_TYPE=Release \
+%if 0%{?azl}
+         -DNO_MAN_PAGES=1 \
+%endif
          -DCMAKE_INSTALL_BINDIR:PATH=%{_bindir} \
          -DCMAKE_INSTALL_SBINDIR:PATH=%{_sbindir} \
          -DCMAKE_INSTALL_LIBDIR:PATH=%{_lib} \
@@ -442,7 +456,7 @@ easy, object-oriented access to IB verbs.
 %else
 	 -DNO_PYVERBS=1
 %endif
-%make_jobs
+%cmake_build
 
 %install
 %cmake_install
@@ -455,8 +469,6 @@ mkdir -p %{buildroot}/%{_sysconfdir}/rdma
 # Red Hat specific glue
 %global dracutlibdir %{_prefix}/lib/dracut
 %global sysmodprobedir %{_prefix}/lib/modprobe.d
- %define _ver 2601.0.7 
- %define _rel 1 
 mkdir -p %{buildroot}%{_libexecdir}
 mkdir -p %{buildroot}%{_udevrulesdir}
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/50rdma
@@ -473,7 +485,9 @@ IB_ACME=bin/ib_acme
 [ -e build/bin/ib_acme ] && IB_ACME=build/bin/ib_acme
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} ${IB_ACME} -D . -O
 # multi-lib conflict resolution hacks (bug 1429362)
+%if !0%{?azl}
 sed -i -e 's|%{_libdir}|/usr/lib|' %{buildroot}%{_mandir}/man7/ibacm_prov.7
+%endif
 sed -i -e 's|%{_libdir}|/usr/lib|' ibacm_opts.cfg
  install -D -m0644 ibacm_opts.cfg %{buildroot}%{_sysconfdir}/rdma/)
 
@@ -564,7 +578,9 @@ fi
 %{_unitdir}/rdma-ndd.service
 %endif
 %{_sbindir}/rdma_topo
+%if !0%{?azl}
 %{_mandir}/man8/rdma-ndd.*
+%endif
 %license COPYING.*
 
 %files devel
@@ -578,6 +594,7 @@ fi
 %endif
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
+%if !0%{?azl}
 %{_mandir}/man3/ibv_*
 %{_mandir}/man3/rdma*
 %{_mandir}/man3/umad*
@@ -590,47 +607,84 @@ fi
 %{_mandir}/man7/mlx5dv*
 %endif
 %{_mandir}/man3/ibnd_*
+%endif
 
 %files -n infiniband-diags-compat
 %{_sbindir}/ibcheckerrs
+%if !0%{?azl}
 %{_mandir}/man8/ibcheckerrs*
+%endif
 %{_sbindir}/ibchecknet
+%if !0%{?azl}
 %{_mandir}/man8/ibchecknet*
+%endif
 %{_sbindir}/ibchecknode
+%if !0%{?azl}
 %{_mandir}/man8/ibchecknode*
+%endif
 %{_sbindir}/ibcheckport
+%if !0%{?azl}
 %{_mandir}/man8/ibcheckport.*
+%endif
 %{_sbindir}/ibcheckportwidth
+%if !0%{?azl}
 %{_mandir}/man8/ibcheckportwidth*
+%endif
 %{_sbindir}/ibcheckportstate
+%if !0%{?azl}
 %{_mandir}/man8/ibcheckportstate*
+%endif
 %{_sbindir}/ibcheckwidth
+%if !0%{?azl}
 %{_mandir}/man8/ibcheckwidth*
+%endif
 %{_sbindir}/ibcheckstate
+%if !0%{?azl}
 %{_mandir}/man8/ibcheckstate*
+%endif
 %{_sbindir}/ibcheckerrors
+%if !0%{?azl}
 %{_mandir}/man8/ibcheckerrors*
+%endif
 %{_sbindir}/ibdatacounts
+%if !0%{?azl}
 %{_mandir}/man8/ibdatacounts*
+%endif
 %{_sbindir}/ibdatacounters
+%if !0%{?azl}
 %{_mandir}/man8/ibdatacounters*
+%endif
 %{_sbindir}/ibdiscover.pl
+%if !0%{?azl}
 %{_mandir}/man8/ibdiscover*
+%endif
 %{_sbindir}/ibswportwatch.pl
+%if !0%{?azl}
 %{_mandir}/man8/ibswportwatch*
+%endif
 %{_sbindir}/ibqueryerrors.pl
 %{_sbindir}/iblinkinfo.pl
 %{_sbindir}/ibprintca.pl
+%if !0%{?azl}
 %{_mandir}/man8/ibprintca*
+%endif
 %{_sbindir}/ibprintswitch.pl
+%if !0%{?azl}
 %{_mandir}/man8/ibprintswitch*
+%endif
 %{_sbindir}/ibprintrt.pl
+%if !0%{?azl}
 %{_mandir}/man8/ibprintrt*
+%endif
 %{_sbindir}/set_nodedesc.sh
 %{_sbindir}/ibclearerrors
+%if !0%{?azl}
 %{_mandir}/man8/ibclearerrors*
+%endif
 %{_sbindir}/ibclearcounters
+%if !0%{?azl}
 %{_mandir}/man8/ibclearcounters*
+%endif
 
 %files -n infiniband-diags
 %{_sbindir}/ibaddr
@@ -661,20 +715,23 @@ fi
 %{_sbindir}/ibidsverify.pl
 %{_sbindir}/check_lft_balance.pl
 %{_sbindir}/dump_lfts.sh
+%if !0%{?azl}
 %{_mandir}/man8/dump_lfts*
+%endif
 %{_sbindir}/dump_mfts.sh
+%if !0%{?azl}
 %{_mandir}/man8/dump_mfts*
+%endif
 %{_sbindir}/ibstatus
 %{_libdir}/libibmad*.so.*
 %{_libdir}/libibnetdisc*.so.*
-%if %{rst2man_exist} == 0
+%if %{rst2man_exist} == 0 && !0%{?azl}
 %{_mandir}/man8/infiniband-diags*
 %{_mandir}/man8/ibstatus*
 %{_mandir}/man8/check_lft_balance*
 %{_mandir}/man8/ibidsverify*
 %{_mandir}/man8/ibfindnodesusing*
 %{_mandir}/man8/ibrouters*
-%{_mandir}/man8/ibnodes*
 %{_mandir}/man8/ibnodes*
 %{_mandir}/man8/ibswitches*
 %{_mandir}/man8/ibhosts*
@@ -715,19 +772,24 @@ fi
 %endif
 %config(noreplace) %{_sysconfdir}/libibverbs.d/mlx5.driver
 %doc installed_docs/libibverbs.md
+%{_prefix}/lib/sysusers.d/rdma.conf
 
 %files -n libibverbs-utils
 %{_bindir}/ibv_*
+%if !0%{?azl}
 %{_mandir}/man1/ibv_*
+%endif
 
 %files -n ibacm
 %config(noreplace) %{_sysconfdir}/rdma/ibacm_opts.cfg
 %{_bindir}/ib_acme
 %{_sbindir}/ibacm
+%if !0%{?azl}
 %{_mandir}/man1/ib_acme.*
 %{_mandir}/man7/ibacm.*
 %{_mandir}/man7/ibacm_prov.*
 %{_mandir}/man8/ibacm.*
+%endif
 %{_unitdir}/ibacm.service
 %{_unitdir}/ibacm.socket
 %dir %{_libdir}/ibacm
@@ -753,7 +815,9 @@ fi
 %dir %{_libdir}/rsocket
 %{_libdir}/rsocket/*.so*
 %doc installed_docs/librdmacm.md
+%if !0%{?azl}
 %{_mandir}/man7/rsocket.*
+%endif
 
 %files -n librdmacm-utils
 %{_bindir}/cmtime
@@ -769,6 +833,7 @@ fi
 %{_bindir}/ucmatose
 %{_bindir}/udaddy
 %{_bindir}/udpong
+%if !0%{?azl}
 %{_mandir}/man1/cmtime.*
 %{_mandir}/man1/mckey.*
 %{_mandir}/man1/rcopy.*
@@ -782,6 +847,7 @@ fi
 %{_mandir}/man1/ucmatose.*
 %{_mandir}/man1/udaddy.*
 %{_mandir}/man1/udpong.*
+%endif
 
 %files -n srp_daemon
 %config(noreplace) %{_sysconfdir}/srp_daemon.conf
@@ -798,10 +864,12 @@ fi
 %{_sbindir}/srp_daemon
 %{_sbindir}/run_srp_daemon
 %{_udevrulesdir}/60-srp_daemon.rules
+%if !0%{?azl}
 %{_mandir}/man5/srp_daemon.service.5*
 %{_mandir}/man5/srp_daemon_port@.service.5*
 %{_mandir}/man8/ibsrpdm.8*
 %{_mandir}/man8/srp_daemon.8*
+%endif
 %doc installed_docs/ibsrpdm.md
 
 %if %{with_pyverbs}
@@ -811,6 +879,10 @@ fi
 %endif
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.8-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+- Disable man pages on Azure Linux because the source lacks prebuilt pages
+
 * Mon May 12 2026 Azure Linux Team - 2601.0.7-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

@@ -16,8 +16,6 @@
 
 # take cpu arch from uname -m
 %global _cpu_arch %(uname -m)
-%global docdir /etc/mft
-%global mlxfwreset_ko_path %{docdir}/mlxfwreset/
 
 
 # take kernel version or default to uname -r
@@ -28,21 +26,21 @@
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
-%{!?version: %global version 4.35.0}
-%{!?_release: %global _release 159}
+%{!?version: %global version 4.37.0}
+%{!?_release: %global _release 154}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 Name:		 mft_kernel-hwe
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
-Version:	 4.35.0
+Version:	 4.37.0
 Release:	 1%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0:         %{_distro_sources_url}/kernel-mft-4.35.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0:         %{_distro_sources_url}/kernel-mft-%{version}.tgz
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 
@@ -64,20 +62,28 @@ Conflicts:      kernel-mft
 Provides:       kernel-hwe-mft = %{version}-%{release}
 
 %description
-This package provides a %{name} kernel module for kernel.
+mft kernel module(s)
 
 %global debug_package %{nil}
 
 %global IS_RHEL_VENDOR "%{_vendor}" == "redhat" || "%{_vendor}" == "bclinux" || "%{_vendor}" == "openEuler"
+
+%if "%{_vendor}" == "suse"
+# /usr-merged SUSE (SLE16+): /lib == /usr/lib, weak-modules2 find_kmps only
+# matches ^/usr/lib/modules. Non-merged SLES resolves modules under /lib/modules.
+%global mft_moduleroot %([ /lib -ef /usr/lib ] && echo /usr/lib/modules || echo /lib/modules)
+%else
+%global mft_moduleroot /lib/modules
+%endif
 
 # build KMP rpms?
 %if "%{KMP}" == "1"
 %global kernel_release() $(make -C %{1} M=$PWD kernelrelease | grep -v make | tail -1)
 BuildRequires: %kernel_module_package_buildreqs
 # prep file list for kmp rpm
-%(cat > %{_builddir}/kmp.files << EOF
+%(mkdir -p %{_builddir}; cat > %{_builddir}/kmp.files << EOF
 %defattr(644,root,root,755)
-/lib/modules/%2-%1
+%{mft_moduleroot}/%2-%1
 %if %{IS_RHEL_VENDOR}
 %config(noreplace) %{_sysconfdir}/depmod.d/kernel-mft-*.conf
 %endif
@@ -87,6 +93,14 @@ EOF)
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
+%endif
+%if "%{KMP}" == "1"
+%package utils
+Summary: KO utils for MFT
+Group: System Environment/Kernel
+Vendor: Microsoft Corporation
+%description utils
+mft utils kernel module(s)
 %endif
 #
 # setup module sign scripts if paths to the keys are given
@@ -100,7 +114,7 @@ EOF)
 %if "%{WITH_MOD_SIGN}" == "1"
 # call module sign script
 %global __modsign_install_post \
-    $RPM_BUILD_DIR/kernel-mft-%{version}/source/tools/sign-modules $RPM_BUILD_ROOT/lib/modules/ %{kernel_source default} || exit 1 \
+    $RPM_BUILD_DIR/kernel-mft-%{version}/source/tools/sign-modules $RPM_BUILD_ROOT%{mft_moduleroot}/ %{kernel_source default} || exit 1 \
 %{nil}
 
 # Disgusting hack alert! We need to ensure we sign modules *after* all
@@ -117,6 +131,7 @@ EOF)
 %endif # end of setup module sign scripts
 
 %if %{IS_RHEL_VENDOR}
+%global __requires_exclude ^kernel.*
 %global __find_requires %{nil}
 %endif
 
@@ -162,15 +177,14 @@ mkdir -p %{install_mod_dir}
 for flavor in %{flavors_to_build}; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
-	install -d $INSTALL_MOD_PATH/lib/modules/$KVERSION/%{install_mod_dir}
-	cp $PWD/obj/$flavor/mst_backward_compatibility/mst_pci/mst_pci.ko $INSTALL_MOD_PATH/lib/modules/$KVERSION/%{install_mod_dir}
-	cp $PWD/obj/$flavor/mst_backward_compatibility/mst_pciconf/mst_pciconf.ko $INSTALL_MOD_PATH/lib/modules/$KVERSION/%{install_mod_dir}
+	install -d $INSTALL_MOD_PATH%{mft_moduleroot}/$KVERSION/%{install_mod_dir}
+	cp $PWD/obj/$flavor/mst_backward_compatibility/mst_pci/mst_pci.ko $INSTALL_MOD_PATH%{mft_moduleroot}/$KVERSION/%{install_mod_dir}
+	cp $PWD/obj/$flavor/mst_backward_compatibility/mst_pciconf/mst_pciconf.ko $INSTALL_MOD_PATH%{mft_moduleroot}/$KVERSION/%{install_mod_dir}
     %if "%{_cpu_arch}" == "ppc64" || "%{_cpu_arch}" == "ppc64le"
-        install -d $INSTALL_MOD_PATH/%{mlxfwreset_ko_path}/$KVERSION
-        install $PWD/obj/$flavor/mst_backward_compatibility/mst_ppc/mst_ppc_pci_reset.ko $INSTALL_MOD_PATH/%{mlxfwreset_ko_path}/$KVERSION/
+        cp $PWD/obj/$flavor/mst_backward_compatibility/mst_ppc/mst_ppc_pci_reset.ko $INSTALL_MOD_PATH%{mft_moduleroot}/$KVERSION/%{install_mod_dir}
     %endif
     %if "%{_cpu_arch}" == "aarch64"
-        cp $PWD/obj/$flavor/misc_drivers/bf3_livefish/bf3_livefish.ko $INSTALL_MOD_PATH/lib/modules/$KVERSION/%{install_mod_dir}
+        cp $PWD/obj/$flavor/misc_drivers/bf3_livefish/bf3_livefish.ko $INSTALL_MOD_PATH%{mft_moduleroot}/$KVERSION/%{install_mod_dir}
     %endif
 done
 
@@ -180,7 +194,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__chmod} u+x \{\} \;
 
 %if ! 0%{?fedora}
 %{__install} -d %{buildroot}%{_sysconfdir}/depmod.d/
-for module in `find %{buildroot}/ -name '*.ko*' | grep -v "%{mlxfwreset_ko_path}" | sort`
+for module in `find %{buildroot}/ -name '*.ko*' | sort`
 do
 ko_name=${module##*/}
 mod_name=${ko_name/.ko*/}
@@ -194,25 +208,40 @@ done
 find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discard-locals -R .comment -R .note \{\} \;
 %endif
 
+# KMP=1: %%kernel_module_package adds kmp-* scriptlets (weak-modules2 / initrd hooks); avoid duplicate %%post depmod here.
+# KMP=0: packaged .ko only - refresh modules.dep for this kernel.
+%if "%{KMP}" != "1"
 %post
 /sbin/depmod %{KVERSION}
 
 %postun
 /sbin/depmod %{KVERSION}
+%endif
+
 
 %if "%{KMP}" != "1"
 %files
-%defattr(-,root,root,-)
 %license source/COPYING
-/lib/modules/%{KVERSION}/%{install_mod_dir}/
+%defattr(-,root,root,-)
+%{mft_moduleroot}/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}
 %config(noreplace) %{_sysconfdir}/depmod.d/kernel-mft-*.conf
 %endif
 %endif
 %endif
+%if "%{_cpu_arch}" == "ppc64" || "%{_cpu_arch}" == "ppc64le"
+%if "%{KMP}" == "1"
+%files utils
+%license source/COPYING
+%defattr(-,root,root,-)
+%endif
+%endif
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 4.37.0-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Mon May 11 2026 Azure Linux Team - 4.35.0-1_6.18.31.1.1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 

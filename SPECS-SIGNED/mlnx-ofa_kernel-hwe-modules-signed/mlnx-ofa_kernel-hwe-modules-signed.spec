@@ -45,8 +45,8 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
-Version:	 26.01
-Release:	 2%{release_suffix}%{?dist}
+Version:	 2607.0.100
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -235,6 +235,9 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 2607.0.100-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+
 * Fri Jun 27 2026 Jon Slobodzian <joslobo@microsoft.com> - 26.01-2_6.18.31.1.1
 - Drop fwctl.ko: it is no longer produced by the HWE OFED build
   after the upgrade to DOCA 3.3.0 / kernel-hwe 6.18 (PR #17447). The

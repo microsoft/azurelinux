@@ -9,7 +9,7 @@
 #                         University of Stuttgart.  All rights reserved.
 # Copyright (c) 2004-2005 The Regents of the University of California.
 #                         All rights reserved.
-# Copyright (c) 2006-2019 Cisco Systems, Inc.  All rights reserved.
+# Copyright (c) 2006-2022 Cisco Systems, Inc.  All rights reserved.
 # Copyright (c) 2013      Mellanox Technologies, Inc.
 #                         All rights reserved.
 # Copyright (c) 2015      Research Organization for Information Science
@@ -43,11 +43,6 @@
 #
 # shell$ rpmbuild ... --define 'install_in_opt 1' ...
 #
-# Or (a multi-token example):
-#
-# shell$ rpmbuild ... \
-#    --define 'configure_options CFLAGS=-g --with-openib=/usr/local/ofed' ...
-#
 #############################################################################
 
 # Define this if you want to make this SRPM build in
@@ -57,6 +52,22 @@
 # modulefile_path, below.
 # type: bool (0/1)
 %{!?install_in_opt: %define install_in_opt 0}
+
+# Keep Azure Linux's system installation prefix.
+%{!?mofed_prefix: %define mofed_prefix 0}
+
+# This specfile expects to find all required 3rd party packages
+# (Libevent, Hwloc, PMIx, PRRTE) externally, and will not use the
+# internal/embedded copies of these packages.  This behavior is
+# strongly recommended for packagers.  However, if you want to override
+# this behavior, change the definition below to 0.
+#
+# NOTE: This option will cause "--with-libevent=external
+# --with-hwloc=external --with-pmix=external --with-prrte=external" to
+# be added to the arguments to configure. If you wish to use different
+# CLI options, set this value to 0 and set configure_options to the
+# CLI options you want.
+%{!?all_external_3rd_party: %define all_external_3rd_party 0}
 
 # Define this if you want this RPM to install environment setup
 # shell scripts.
@@ -97,12 +108,16 @@
 %{!?mpi_selector_rpm_name: %define mpi_selector_rpm_name mpi-selector}
 # The location of the mpi-selector executable (can be a relative path
 # name if "mpi-selector" can be found in the path)
-# type: string (path to mpi-selector exectuable)
+# type: string (path to mpi-selector executable)
 %{!?mpi_selector: %define mpi_selector mpi-selector}
 
 # Should we build a debuginfo RPM or not?
 # type: bool (0/1)
 %{!?build_debuginfo_rpm: %define build_debuginfo_rpm 0}
+
+# Should we build an all-in-one RPM, or several sub-package RPMs?
+# type: bool (0/1)
+%{!?build_all_in_one_rpm: %define build_all_in_one_rpm 0}
 
 # Should we use the default "check_files" RPM step (i.e., check for
 # unpackaged files)?  It is discouraged to disable this, but some
@@ -134,13 +149,18 @@
 
 # On some platforms, Open MPI/SHMEM just flat-out doesn't work with
 # -D_FORTIFY_SOURCE (e.g., some users have reported that there are
-# problems on ioa64 platforms).  In this case, just turn it off
+# problems on ia64 platforms).  In this case, just turn it off
 # (meaning: this specfile will strip out that flag from the
 # OS-provided compiler flags).  We already strip out _FORTIFY_SOURCE
 # for non-GCC compilers; setting this option to 0 will *always* strip
 # it out, even if you're using GCC.
 # type: bool (0/1)
 %{!?allow_fortify_source: %define allow_fortify_source 1}
+
+# Define this to 1 if you want to keep libtool archive files
+# Default is 0 (remove *.la files)
+# type: bool (0/1)
+%{!?install_libtool_archive: %define install_libtool_archive 0}
 
 #############################################################################
 #
@@ -165,13 +185,36 @@
 # Per advice from Doug Ledford at Red Hat, docdir is supposed to be in
 # a fixed location.  But if you're installing a package in /opt, all
 # bets are off.  So feel free to install it anywhere in your tree.  He
-# suggests $prefix/doc.
-%define _defaultdocdir /opt/%{name}/%{version}/doc
+# suggests $prefix/doc, but the GNU Autotools these days default to
+# $prefix/share/doc.
+%define _defaultdocdir /opt/%{name}/%{version}/share/doc
 
 # Also put the modulefile in /opt (unless the user already specified
 # where they want it to go -- the modulefile is a bit different in
 # that the user may want it outside of /opt).
 %{!?modulefile_path: %define modulefile_path /opt/%{name}/%{version}/share/openmpi/modulefiles}
+%endif
+
+# Mellanox/HPC-X fork: when mofed_prefix=1 (the default in this fork)
+# and install_in_opt is not also set, install everything under
+# /usr/mpi/gcc/<name>-<version>/ (the MLNX_OFED / DOCA convention).
+%if %{mofed_prefix}
+%if !%{install_in_opt}
+%define _prefix /usr/mpi/gcc/%{name}-%{version}
+%define _sysconfdir %{_prefix}/etc
+%define _libdir %{_prefix}/lib
+%define _includedir %{_prefix}/include
+%define _mandir %{_prefix}/share/man
+%define _pkgdatadir %{_prefix}/share/openmpi
+%define _defaultdocdir %{_prefix}/share/doc
+%{!?modulefile_path: %define modulefile_path %{_prefix}/share/openmpi/modulefiles}
+%endif
+%endif
+
+%if %{all_external_3rd_party}
+%define _configure_3rd_party --with-libevent=external --with-hwloc=external --with-pmix=external --with-prrte=external
+%else
+%define _configure_3rd_party --with-libevent=external --with-hwloc=external --with-pmix=external --with-prrte=internal
 %endif
 
 # Now that we have processed install_in_opt, we can see if
@@ -200,6 +243,7 @@
 %define __check_files %{nil}
 %endif
 
+# Set this to any options you want to pass in to configure.
 %{!?configure_options: %define configure_options %{nil}}
 
 %if !%{use_default_rpm_opt_flags}
@@ -219,12 +263,12 @@
 Summary: A powerful implementation of MPI/SHMEM
 Name: openmpi
 Epoch: 3
-Version: 4.1.9a1
-Release: 3%{?dist}
+Version: 5.0.10rc2.2608140153
+Release: 1%{?dist}
 License: BSD
 Group: Development/Libraries
-# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
-Source0: %{_distro_sources_url}/openmpi-%{version}.tar.bz2
+# https://linux.mellanox.com/public/repo/doca/3.5.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.07-0.7.7.0.tgz
+Source0: %{_distro_sources_url}/openmpi-5.0.10rc2.2608140153-1.3c5e09e178.tar.gz
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 Prefix: %{_prefix}
@@ -234,23 +278,32 @@ BuildRoot: /var/tmp/%{name}-%{version}-%{release}-root
 %if %{disable_auto_requires}
 AutoReq: no
 %endif
+%if %{all_external_3rd_party}
+# If we require all external 3rd party packages, then assume the use
+# of the OS Libevent and Hwloc packages.
+BuildRequires: libevent-devel hwloc-devel
+Requires: libevent hwloc
+%endif
 %if %{install_modulefile}
 Requires: %{modules_rpm_name}
 %endif
 %if %{use_mpi_selector}
 Requires: %{mpi_selector_rpm_name}
 %endif
-Requires: openssh-clients
 Requires: ucx
+Requires: openssh-clients
+BuildRequires: libevent-devel
+BuildRequires: hwloc-devel
+BuildRequires: pmix-devel
 
 %description
 Open MPI is an open source implementation of the Message Passing
-Interface specification (http://www.mpi-forum.org/) developed and
+Interface specification (https://www.mpi-forum.org/) developed and
 maintained by a consortium of research, academic, and industry
 partners.
 
 Open MPI also includes an implementation of the OpenSHMEM parallel
-programming API (http://www.openshmem.org/).  OpenSHMEM is a
+programming API (https://www.openshmem.org/).  OpenSHMEM is a
 Partitioned Global Address Space (PGAS) abstraction layer, which
 provides fast inter-process communication using one-sided
 communication techniques.
@@ -258,8 +311,14 @@ communication techniques.
 This RPM contains all the tools necessary to compile, link, and run
 Open MPI and OpenSHMEM jobs.
 
+
 #############################################################################
 #
+# Preamble Section (runtime)
+#
+#############################################################################
+
+
 # Preamble Section (devel)
 #
 #############################################################################
@@ -271,17 +330,17 @@ Group: Development/Libraries
 AutoReq: no
 %endif
 Provides: openmpi-devel = %{version}
-Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Requires: gcc-gfortran
+Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description devel
 Open MPI is an open source implementation of the Message Passing
-Interface specification (http://www.mpi-forum.org/) developed and
+Interface specification (https://www.mpi-forum.org/) developed and
 maintained by a consortium of research, academic, and industry
 partners.
 
 Open MPI also includes an implementation of the OpenSHMEM parallel
-programming API (http://www.openshmem.org/).  OpenSHMEM is a
+programming API (https://www.openshmem.org/).  OpenSHMEM is a
 Partitioned Global Address Space (PGAS) abstraction layer, which
 provides fast inter-process communication using one-sided
 communication techniques.
@@ -307,12 +366,12 @@ Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description docs
 Open MPI is an open source implementation of the Message Passing
-Interface specification (http://www.mpi-forum.org/) developed and
+Interface specification (https://www.mpi-forum.org/) developed and
 maintained by a consortium of research, academic, and industry
 partners.
 
 Open MPI also includes an implementation of the OpenSHMEM parallel
-programming API (http://www.openshmem.org/).  OpenSHMEM is a
+programming API (https://www.openshmem.org/).  OpenSHMEM is a
 Partitioned Global Address Space (PGAS) abstraction layer, which
 provides fast inter-process communication using one-sided
 communication techniques.
@@ -321,7 +380,7 @@ This subpackage provides the documentation for Open MPI/OpenSHMEM.
 
 #############################################################################
 #
-# Prepatory Section
+# Preparatory Section
 #
 #############################################################################
 %prep
@@ -418,7 +477,7 @@ CXXFLAGS="%{?cxxflags:%{cxxflags}}%{!?cxxflags:$RPM_OPT_FLAGS}"
 FCFLAGS="%{?fcflags:%{fcflags}}%{!?fcflags:$RPM_OPT_FLAGS}"
 export CFLAGS CXXFLAGS FCFLAGS
 
-%configure %{configure_options}
+%configure %{configure_options} %{_configure_3rd_party}
 %{__make} %{?mflags}
 
 
@@ -434,6 +493,18 @@ export CFLAGS CXXFLAGS FCFLAGS
 # We've had cases of config.log being left in the installation tree.
 # We don't need that in an RPM.
 find $RPM_BUILD_ROOT -name config.log -exec rm -f {} \;
+
+%if !%{install_libtool_archive}
+# Libtool archive files (.la files) create an unnecessary dependency
+# between linked applications and the development versions of packages
+# upon which Open MPI depends. For example, when building an application
+# which uses Libtool, Open MPI would create a dependency not just on
+# the HWLOC libs package, but the HWLOC devel package
+# (to get the .so.1 -> .so symlink). Best practice in package builders
+# appears to be to skip shipping .la files because of this issue.
+find $RPM_BUILD_ROOT/%{_libdir} -name \*.la -exec rm -f {} \;
+%endif
+# End of libotool_archive if
 
 # First, the [optional] modulefile
 
@@ -452,7 +523,7 @@ proc ModulesHelp { } {
    puts stderr "This module adds Open MPI/SHMEM v%{version} to various paths"
 }
 
-module-whatis   "Sets up Open MPI/SHMEM v%{version} in your enviornment"
+module-whatis   "Sets up Open MPI/SHMEM v%{version} in your environment"
 
 prepend-path PATH "%{_bindir}"
 prepend-path LD_LIBRARY_PATH %{_libdir}
@@ -535,6 +606,7 @@ EOF
 %endif
 # End of shell_scripts if
 
+
 # Build lists of files that are specific to each package that are not
 # easily identifiable by a single directory (e.g., the different
 # libraries).  In a somewhat lame move, we can't just pipe everything
@@ -545,7 +617,7 @@ EOF
 # always gives a 0 exit status.
 
 # First, find all the files
-rm -f all.files runtime.files remaining.files devel.files docs.files
+rm -f all.files runtime.files remaining.files devel.files
 find $RPM_BUILD_ROOT -type f -o -type l | \
    sed -e "s@$RPM_BUILD_ROOT@@" \
    > all.files | /bin/true
@@ -553,52 +625,25 @@ find $RPM_BUILD_ROOT -type f -o -type l | \
 # Runtime files.  This should generally be library files and some
 # executables (no man pages, no doc files, no header files).  Do *not*
 # include wrapper compilers.
-cat all.files | egrep '/lib/|/lib64/|/lib32/|/bin/|/etc/|/help-' > tmp.files | /bin/true
+cat all.files | \
+    egrep '/lib/|/lib64/|/lib32/|/bin/|/etc/|/help-' \
+    > tmp.files | /bin/true
 # Snip out a bunch of executables (e.g., wrapper compilers, pkgconfig
-# files, .la and .a files)
-egrep -vi 'mpic|mpif|ortec|f77|f90|pkgconfig|\.la$|\.a$' tmp.files > runtime.files | /bin/true
+# files, .la and .a files) and docs
+egrep -vi 'bin/mpic|bin/mpif|bin/mpif77|bin/mpif90|pkgconfig|wrapper|\.mod$|\.la$|\.a$' tmp.files > runtime.files | /bin/true
+
 rm -f tmp.files
 
 # Now take the runtime files out of all.files so that we don't get
 # duplicates.
 grep -v -f runtime.files all.files > remaining.files
 
-# Devel files, potentially including VT files.  Basically -- just
-# exclude the man pages and doc files.
+# Devel files.  Basically -- just exclude the man pages and doc files.
 cat remaining.files | \
    egrep -v '/man/|/doc/' \
    > devel.files | /bin/true
 
-# Now take those files out of reaming.files so that we don't get
-# duplicates.
-grep -v -f devel.files remaining.files > docs.files
-
-#################################################
-
-# Now that we have a final list of files for each of the runtime,
-# devel, and docs RPMs, snip even a few more files out of those lists
-# because for directories that are wholly in only one RPM, we just
-# list that directory in the file lists below, and RPM will pick up
-# all files in that tree.  We therefore don't want to list any files
-# in those trees in our *.files file lists.  Additionally, the man
-# pages may get compressed by rpmbuild after this "install" step, so we
-# might not even have their final filenames, anyway.
-
-# runtime sub package
-%if !%{sysconfdir_in_prefix}
-grep -v %{_sysconfdir} runtime.files > tmp.files | /bin/true
-mv tmp.files runtime.files
-%endif
-grep -v %{_pkgdatadir} runtime.files > tmp.files | /bin/true
-mv tmp.files runtime.files
-
-# devel sub package
-grep -v %{_includedir} devel.files > tmp.files | /bin/true
-mv tmp.files devel.files
-
-# docs sub package
-grep -v %{_mandir} docs.files > tmp.files | /bin/true
-mv tmp.files docs.files
+# End of !build_all_in_one_rpm
 
 #############################################################################
 #
@@ -645,29 +690,27 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 #
 #############################################################################
 
+
 #
 # Sub-package RPMs
 #
-# Harder than all-in-one.  We list the directories specifically so
-# that if the RPM creates directories when it is installed, we will
-# remove them when the RPM is uninstalled.  We also have to use
-# specific file lists.
-#
+# Harder than all-in-one.  Explicitly list all the files we want by
+# the various *.files we generated above.  Only list directories if
+# they are not /usr (or assumedly any other location that does not
+# already exist).
 
 %files -f runtime.files
 %defattr(-, root, root, -)
-%if %(test "%{_prefix}" = "/usr" && echo 1 || echo 0)
-%{_bindir}/*
-%{_libdir}/*
-%{_datadir}
-%else
-%{_prefix}
-%endif
+%if %(test "%{_prefix}" != "/usr" && echo 1 || echo 0)
+%dir %{_prefix}
+%dir %{_pkgdatadir}
 # If the sysconfdir is not under the prefix, then list it explicitly.
 %if !%{sysconfdir_in_prefix}
-%{_sysconfdir}
+%dir %{_sysconfdir}
 %endif
-# If %{install_in_opt}, then we're instaling OMPI to
+%endif
+
+# If install_in_opt, then we're installing OMPI to
 # /opt/openmpi/<version>.  But be sure to also explicitly mention
 # /opt/openmpi so that it can be removed by RPM when everything under
 # there is also removed.  Also list /opt/openmpi/<version>/share so
@@ -685,21 +728,29 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 %{shell_scripts_path}/%{shell_scripts_basename}.sh
 %{shell_scripts_path}/%{shell_scripts_basename}.csh
 %endif
-%doc README INSTALL
+%doc README.md
 %license LICENSE
-%{_pkgdatadir}
 
 %files devel -f devel.files
+%license LICENSE
 %defattr(-, root, root, -)
-%{_includedir}
 
+%files docs
+%license LICENSE
+%defattr(-, root, root, -)
 # Note that we list the mandir specifically here, because we want all
 # files found in that tree, because rpmbuild may have compressed them
-# (e.g., foo.1.gz or foo.1.bz2) -- and we therefore don't know the
-# exact filenames.
-%files docs
-%defattr(-, root, root, -)
+# after we installed them (e.g., foo.1.gz or foo.1.bz2), and we
+# therefore don't know the exact filenames.
 %{_mandir}
+
+# Explicitly list the pkgdocdir so that it will be removed when the
+# RPM is removed.
+%{_pkgdocdir}
+%if 0%{?azl}
+%{_docdir}/prrte
+%endif
+
 
 
 #############################################################################
@@ -707,7 +758,12 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 # Changelog
 #
 #############################################################################
+
 %changelog
+* Sat Nov 14 2026 Azure Linux Team - 5.0.10rc2.2608140153-1
+- Upgrade to DOCA 3.5.0 (OFED 26.07-0.7.7.0)
+- Package bundled PRRTE documentation in openmpi-docs
+
 * Thu Jul 02 2026 Mitch Zhu <mitchzhu@microsoft.com> - 3:4.1.9a1-3
 - Restore Open MPI SSH and devel compiler dependencies
 
