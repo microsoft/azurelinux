@@ -1,0 +1,32 @@
+# Fedora does not package python-nltk 3.9.4 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2025-14009, CVE-2025-71408, CVE-2026-0848, CVE-2026-12199, CVE-2026-12259,
+# CVE-2026-33230, CVE-2026-33231
+# Remove this overlay once the imported Fedora spec packages 3.9.4 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.9.4"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.9.4"
+
+[[overlays]]
+description = "Drop the WordNetLemmatizer import fix, upstream since 3.9.2"
+type = "patch-remove"
+file = "fix-import-WordNetLemmatizer.patch"
+
+[[overlays]]
+description = "Drop the upstream link of the removed patch"
+type = "spec-search-replace"
+regex = '^# https://github\.com/nltk/nltk/pull/3309$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the obsolete nltk-3.9.1.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(nltk-3\.9\.1\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

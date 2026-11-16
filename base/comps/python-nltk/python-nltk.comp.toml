@@ -1,0 +1,9 @@
+[components.python-nltk]
+
+# Source for the 3.9.4 update overlay; drop together with it once Fedora ships 3.9.4 or newer.
+# GitHub tag archive; downloaded twice with the same SHA512 and the content matches the 3.9.4 tag.
+[[components.python-nltk.source-files]]
+filename = "nltk-3.9.4.tar.gz"
+hash = "d70849f86b35b7633f47fe99c583591c6852a57f60a38eeb4abfd52eb0f87e3d915eae770733369e13993df37ff64b8f6bdfd4c4845289c450c7ab05bbe0ca84"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/nltk/nltk/archive/3.9.4.tar.gz" }
