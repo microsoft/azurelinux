@@ -155,12 +155,10 @@ bash %{SOURCE2} %{SOURCE1}
 
 %changelog
 * Mon Nov 16 2026 Sean Dougherty <sdougherty@microsoft.com> - 1.47.0-5
-- Backport orphan-file recovery fix for normal and journal-only checks
-- Upstream commit: db87cf4cdd9960a270ae7df80204dc93016664bc
-
-* Wed Nov 11 2026 Sean Dougherty <sdougherty@microsoft.com> - 1.47.0-4
 - Backport upstream fix for stale orphan_present in backup superblocks
 - Upstream commit: 24a11cc371a46ca9e68aed8f2cf4aabd22ea81eb
+- Backport orphan-file recovery fix for normal and journal-only checks
+- Upstream commit: db87cf4cdd9960a270ae7df80204dc93016664bc
 
 * Wed Aug 06 2025 Ankita Pareek <ankitapareek@microsoft.com> - 1.47.0-3
 - Backport upstream fix for e2fsck skipping checks when orphan file is present
