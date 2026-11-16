@@ -1,0 +1,22 @@
+--- sqz-0.1.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sqz-0.1.0/Cargo.toml	2026-10-08T13:02:22.821973+00:00
+@@ -207,14 +207,6 @@
+ ]
+ default-features = false
+ 
+-[target."cfg(windows)".dev-dependencies.sequoia-openpgp]
+-version = "2.4"
+-features = [
+-    "crypto-cng",
+-    "__implicit-crypto-backend-for-tests",
+-]
+-default-features = false
+-
+ [lints.clippy.complexity]
+ level = "allow"
+ priority = -1
+@@ -226,3 +218,4 @@
+ [lints.clippy.suspicious]
+ level = "deny"
+ priority = -1
++
