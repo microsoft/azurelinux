@@ -8,14 +8,14 @@ Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  openssl-devel >= 3.5
-BuildRequires:  SymCrypt >= 103.12.0
+BuildRequires:  openssl-devel
+BuildRequires:  SymCrypt >= 103.8.0
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
 
-Requires:       SymCrypt >= 103.12.0
-Requires:       openssl >= 3.5
+Requires:       SymCrypt >= 103.8.0
+Requires:       openssl
 
 Conflicts: openssl-fips-provider
 
@@ -66,8 +66,8 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 # The test is run twice: once with the default provider and once with the SymCrypt provider.
 (
         set -e
-        ./bin/test/SslPlay/SslPlay
-        ./bin/test/SslPlay/SslPlay --provider-path ./bin/SymCryptProvider/ --provider symcryptprovider --no-engine
+        ./bin/SslPlay/SslPlay
+        ./bin/SslPlay/SslPlay --provider-path ./bin/SymCryptProvider/ --provider symcryptprovider --no-engine
 )
 
 %files
