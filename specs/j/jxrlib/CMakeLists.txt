@@ -61,7 +61,7 @@ target_link_libraries(JxrDecApp jxrglue)
 install(TARGETS JxrDecApp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Headers
-install(FILES jxrgluelib/JXRGlue.h jxrgluelib/JXRMeta.h jxrtestlib/JXRTest.h image/sys/windowsmediaphoto.h
+install(FILES jxrgluelib/JXRGlue.h jxrgluelib/JXRMeta.h jxrgluelib/JXRVersion.h jxrtestlib/JXRTest.h image/sys/windowsmediaphoto.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/jxrlib
 )
 install(DIRECTORY common/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/jxrlib

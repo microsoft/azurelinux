@@ -1,1 +1,4 @@
+# Pin to Fedora f44 jxrlib-1.4.7 (maintained mircomir fork) to pick up the upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/jxrlib/c/9f7713449dfc11407ec24d77c31aec661f34600f
 [components.jxrlib]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "9f7713449dfc11407ec24d77c31aec661f34600f" }
