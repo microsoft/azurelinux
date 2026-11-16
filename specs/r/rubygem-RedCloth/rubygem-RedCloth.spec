@@ -5,8 +5,8 @@
 %global gem_name RedCloth
 
 Name: rubygem-%{gem_name}
-Version: 4.3.2
-Release: 34%{?dist}
+Version: 4.3.3
+Release: 35%{?dist}
 Summary: Textile parser for Ruby
 License: MIT
 URL: http://redcloth.org
@@ -14,9 +14,8 @@ Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 # Fixes failing tests on ARM which defaults to use unsigned char
 # http://jgarber.lighthouseapp.com/projects/13054-redcloth/tickets/236-test-failure-on-armelpowerpc
 Patch0: rubygem-redcloth-4.2.9-unsigned-char-fix.patch
-# Fix Ruby 2.5 compatibility.
-# https://github.com/jgarber/redcloth/pull/38/commits/00b55ace17ed408b1b6129e1ba6c90fd4f0a6d2c
-Patch1: rubygem-RedCloth-4.3.2-Replace-deprecated-YAML-load_documents.patch
+
+
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: rubygem(rspec)
@@ -47,7 +46,7 @@ gem unpack %{SOURCE0}
 gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
 
 %patch 0 -p1
-%patch 1 -p1
+
 
 %build
 gem build %{gem_name}.gemspec
