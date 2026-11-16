@@ -7,8 +7,8 @@
 %global port_version 0.12.2
 
 Name:           libgphoto2
-Version:        2.5.33
-Release: 4%{?dist}
+Version: 2.5.34
+Release: 5%{?dist}
 Summary:        Library for accessing digital cameras
 License:        GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND BSD-3-Clause AND IJG-short AND (MIT OR Unlicense)
 URL:            http://www.gphoto.org/
@@ -17,7 +17,6 @@ Source0:        http://downloads.sourceforge.net/gphoto/%{name}-%{version}.tar.b
 Patch1:         gphoto2-pkgcfg.patch
 Patch2:         gphoto2-device-return.patch
 # https://github.com/gphoto/libgphoto2/commit/7c5e5f66bb1a113123e289c221728a2eaee2411f
-Patch3:         0001-merge-music-players.h-from-libmtp.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++

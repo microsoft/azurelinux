@@ -1,0 +1,26 @@
+# Fedora f43 and f44 package libgphoto2 2.5.33. Update to the upstream 2.5.34
+# release on the same f43 spec for these CVE fixes:
+# CVE-2026-40333, CVE-2026-40334, CVE-2026-40335, CVE-2026-40336,
+# CVE-2026-40338, CVE-2026-40339, CVE-2026-40340, CVE-2026-40341
+# Remove this overlay once the imported Fedora spec packages 2.5.34 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.5.34"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.5.34"
+
+[[overlays]]
+description = "Remove the obsolete 2.5.33 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libgphoto2-2\.5\.33\.tar\.bz2\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Drop the music-players.h sync patch, already in 2.5.34"
+type = "patch-remove"
+file = "0001-merge-music-players.h-from-libmtp.patch"
