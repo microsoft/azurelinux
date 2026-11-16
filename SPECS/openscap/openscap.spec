@@ -1,13 +1,14 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.open-scap.org
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-122056.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -117,6 +118,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Sat Nov 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.9-2
+- Patch for CVE-2026-122056
+
 * Fri Mar 08 2024 Betty Lakes <bettylakes@microsoft.com> - 1.3.9-1
 - Upgrade to 1.3.9
 
