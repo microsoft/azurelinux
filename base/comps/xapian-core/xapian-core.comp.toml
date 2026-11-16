@@ -1,0 +1,8 @@
+[components.xapian-core]
+
+# Upstream release tarball; same SHA512 as the Fedora rawhide sources file.
+[[components.xapian-core.source-files]]
+filename = "xapian-core-1.4.32.tar.xz"
+hash = "1559bac2e1ee92684a4841f610be6f6e779e5bf335738b472d19c4df176f8a49bf887bb144c03a068bc651ed448554f108cb501cdfa556e829426d3ea290259d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://www.oligarchy.co.uk/xapian/1.4.32/xapian-core-1.4.32.tar.xz" }
