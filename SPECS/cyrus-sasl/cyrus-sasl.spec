@@ -4,13 +4,14 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.28
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.cyrusimap.org/sasl/
 Source0:        https://github.com/cyrusimap/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-129483.patch
 
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
@@ -311,6 +312,9 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Mon Nov 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.28-9
+- Patch for CVE-2026-129483
+
 * Wed Jul 31 2024 Andrew Phelps <anphel@microsoft.com> - 2.1.28-8
 - Update file listings to remove duplicate files
 
