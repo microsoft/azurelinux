@@ -7,8 +7,8 @@
 %endif
 
 Name:          tpm2-tss
-Version:       4.1.3
-Release:       9%{?candidate:.%{candidate}}%{?dist}
+Version:       4.1.5
+Release:       1%{?candidate:.%{candidate}}%{?dist}
 Summary:       TPM2.0 Software Stack
 
 License:       BSD-2-Clause
@@ -156,6 +156,9 @@ use tpm2-tss.
 %{_mandir}/man7/tss2*.7.gz
 
 %changelog
+* Fri Oct 30 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 4.1.5-1
+- Update to 4.1.5
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.3-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

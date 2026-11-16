@@ -1,3 +1,6 @@
+# Pin to Fedora f43 tpm2-tss-4.1.5-1 (FEDORA-2026-3941b8db92).
+# https://src.fedoraproject.org/rpms/tpm2-tss/c/740dd806e908da9404b805e50415e5d0b24d7c0b
 [components.tpm2-tss]
+spec = { type = "upstream", upstream-commit = "740dd806e908da9404b805e50415e5d0b24d7c0b" }
 # Release: 8%{?candidate:.%{candidate}}%{?dist}
 release = { calculation = "manual" }
