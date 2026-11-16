@@ -1,3 +1,11 @@
 [components.libXtst]
 # Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 release = { calculation = "manual" }
+
+# Upstream release tarball; the detached signature verifies with Alan
+# Coopersmith's key 3AB285232C46AE43D8E192F4DAB0F78EA6E7E2D2.
+[[components.libXtst.source-files]]
+filename = "libXtst-1.2.6.tar.xz"
+hash = "c1ce90e1274d91c0c7e18b9f004a583bc4104d461cb85642cc01a104cab854f14fc2960a578af56c9ae8d307a20d5efe2a40062cc0c4352765ea8db540d5f34e"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.6.tar.xz" }
