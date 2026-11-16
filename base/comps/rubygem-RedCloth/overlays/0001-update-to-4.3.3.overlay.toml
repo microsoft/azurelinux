@@ -1,0 +1,44 @@
+# Fedora does not package rubygem-RedCloth 4.3.3 on f43/f44 yet. Update to the upstream
+# release for this CVE fix:
+# CVE-2023-31606
+# Remove this overlay once the imported Fedora spec packages 4.3.3 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 4.3.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "4.3.3"
+
+[[overlays]]
+description = "Drop the YAML.load_documents patch, upstream since 4.3.3"
+type = "patch-remove"
+file = "rubygem-RedCloth-4.3.2-Replace-deprecated-YAML-load_documents.patch"
+
+[[overlays]]
+description = "Drop the explicit application of the removed patch"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch 1 -p1$'
+replacement = ""
+
+[[overlays]]
+description = "Drop the comment of the removed patch"
+type = "spec-search-replace"
+regex = '^# Fix Ruby 2\.5 compatibility\.$'
+replacement = ""
+
+[[overlays]]
+description = "Drop the upstream link of the removed patch"
+type = "spec-search-replace"
+regex = '^# https://github\.com/jgarber/redcloth/pull/38/commits/00b55ace17ed408b1b6129e1ba6c90fd4f0a6d2c$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the obsolete RedCloth-4.3.2.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(RedCloth-4\.3\.2\.gem\) = [0-9a-f]+(?:\r?\n|$)'

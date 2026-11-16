@@ -1,0 +1,8 @@
+[components.rubygem-RedCloth]
+
+# Source for the 4.3.3 update overlay; drop together with it once Fedora ships 4.3.3 or newer.
+[[components.rubygem-RedCloth.source-files]]
+filename = "RedCloth-4.3.3.gem"
+hash = "12c8ff86aa0d7272acd265deb3ad51ace3a1f92060e34a270fcc9f5942042ccc5100d1cc9438b061aca8d4fa8c023c48a8b8f723de8408025f3f934d5c084865"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/RedCloth-4.3.3.gem" }
