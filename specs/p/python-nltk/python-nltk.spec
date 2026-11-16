@@ -4,8 +4,8 @@
 %global mod_name nltk
 Name:           python-nltk
 Epoch:          1
-Version:        3.9.1
-Release: 9%{?dist}
+Version: 3.9.4
+Release: 10%{?dist}
 Summary:        Natural Language Toolkit
 
 # The entire source code is ASL 2.0 except nltk/stem/porter.py is
@@ -16,8 +16,7 @@ URL:            http://www.nltk.org/
 Source0:        https://github.com/nltk/nltk/archive/%{version}.tar.gz#/%{mod_name}-%{version}.tar.gz
 BuildArch:      noarch
 
-# https://github.com/nltk/nltk/pull/3309
-Patch1: fix-import-WordNetLemmatizer.patch
+
 
 %global _description\
 NLTK is a Python package that simplifies the construction of programs\
