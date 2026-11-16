@@ -1,0 +1,4 @@
+# Pin to Fedora f43 librabbitmq-0.18.1-1 (FEDORA-2026-291af8cc7a).
+# https://src.fedoraproject.org/rpms/librabbitmq/c/c6e48cf2a240a5df93c97a15d7f35d299c83fe86
+[components.librabbitmq]
+spec = { type = "upstream", upstream-commit = "c6e48cf2a240a5df93c97a15d7f35d299c83fe86" }
