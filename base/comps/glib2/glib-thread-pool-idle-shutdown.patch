@@ -1,0 +1,595 @@
+From: Tobias Brick <tobiasb@microsoft.com>
+Subject: [PATCH] gthreadpool: synchronize idle registration with wakeups
+
+Sample the wakeup serial and register idle workers under a mutex shared
+with wakeup producers. Stop unused workers directly without temporarily
+changing their configured limit.
+
+Include the public shutdown regression and private scheduling tests from
+the reviewed two-commit series:
+https://gitlab.gnome.org/tobiasb-ms/glib/-/commit/918fc6f750a127cf3d11db497e703cdc1fc270f6
+https://gitlab.gnome.org/tobiasb-ms/glib/-/commit/83548f98ff6407164a7aba13a1a2216950f28e78
+
+Adjust only the Meson registration context for GLib 2.86.5.
+
+While this demonstrates the race, it does not prove that it caused the
+original intermittent test failures.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/5467]
+Related: https://gitlab.gnome.org/GNOME/glib/-/work_items/4010
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Signed-off-by: Tobias Brick <tobiasb@microsoft.com>
+---
+diff --git a/glib/gthreadpool.c b/glib/gthreadpool.c
+index 8441b9d1f9eb90e8f2bde2419ce0ddc8f5c02f87..c49f95e261683883e9d82e90b446cc98f9976e08 100644
+--- a/glib/gthreadpool.c
++++ b/glib/gthreadpool.c
+@@ -102,6 +102,7 @@ static gint unused_threads = 0;
+ static gint max_unused_threads = 8;
+ static gint kill_unused_threads = 0;
+ static guint max_idle_time = 15 * 1000;
++static GMutex unused_thread_mutex;
+ 
+ static int thread_counter = 0;
+ 
+@@ -123,9 +124,23 @@ static gpointer         g_thread_pool_thread_proxy        (gpointer          dat
+ static gboolean         g_thread_pool_start_thread        (GRealThreadPool  *pool,
+                                                            GError          **error);
+ static void             g_thread_pool_wakeup_and_stop_all (GRealThreadPool  *pool);
+-static GRealThreadPool* g_thread_pool_wait_for_new_pool   (void);
++static GRealThreadPool *g_thread_pool_wait_for_new_pool (gint last_wakeup_thread_serial);
+ static gpointer         g_thread_pool_wait_for_new_task   (GRealThreadPool  *pool);
+ 
++/* Called with unused_thread_mutex held, including the count/serial update. */
++static void
++g_thread_pool_wakeup_unused_threads (guint n_threads)
++{
++  if (n_threads == 0)
++    return;
++
++  g_atomic_int_inc (&wakeup_thread_serial);
++  g_async_queue_lock (unused_thread_queue);
++  for (guint i = 0; i < n_threads; i++)
++    g_async_queue_push_unlocked (unused_thread_queue, wakeup_thread_marker);
++  g_async_queue_unlock (unused_thread_queue);
++}
++
+ static void
+ g_thread_pool_queue_push_unlocked (GRealThreadPool *pool,
+                                    gpointer         data)
+@@ -139,19 +154,17 @@ g_thread_pool_queue_push_unlocked (GRealThreadPool *pool,
+     g_async_queue_push_unlocked (pool->queue, data);
+ }
+ 
+-static GRealThreadPool*
+-g_thread_pool_wait_for_new_pool (void)
++static GRealThreadPool *
++g_thread_pool_wait_for_new_pool (gint last_wakeup_thread_serial)
+ {
+   GRealThreadPool *pool;
+   gint local_wakeup_thread_serial;
+   guint local_max_unused_threads;
+   gint local_max_idle_time;
+-  gint last_wakeup_thread_serial;
+   gboolean have_relayed_thread_marker = FALSE;
+ 
+   local_max_unused_threads = (guint) g_atomic_int_get (&max_unused_threads);
+   local_max_idle_time = g_atomic_int_get (&max_idle_time);
+-  last_wakeup_thread_serial = g_atomic_int_get (&wakeup_thread_serial);
+ 
+   do
+     {
+@@ -341,6 +354,7 @@ g_thread_pool_thread_proxy (gpointer data)
+         {
+           /* No task was received, so this thread goes to the global pool. */
+           gboolean free_pool = FALSE;
++          gint last_wakeup_thread_serial;
+ 
+           DEBUG_MSG (("thread %p leaving pool %p for global pool.",
+                       g_thread_self (), pool));
+@@ -385,13 +399,17 @@ g_thread_pool_thread_proxy (gpointer data)
+                 }
+             }
+ 
++          /* Publish the serial and idle registration as one generation. */
++          g_mutex_lock (&unused_thread_mutex);
++          last_wakeup_thread_serial = g_atomic_int_get (&wakeup_thread_serial);
+           g_atomic_int_inc (&unused_threads);
++          g_mutex_unlock (&unused_thread_mutex);
+           g_async_queue_unlock (pool->queue);
+ 
+           if (free_pool)
+             g_thread_pool_free_internal (pool);
+ 
+-          pool = g_thread_pool_wait_for_new_pool ();
++          pool = g_thread_pool_wait_for_new_pool (last_wakeup_thread_serial);
+           g_atomic_int_add (&unused_threads, -1);
+ 
+           if (pool == NULL)
+@@ -1013,6 +1031,7 @@ g_thread_pool_set_max_unused_threads (gint max_threads)
+ {
+   g_return_if_fail (max_threads >= -1);
+ 
++  g_mutex_lock (&unused_thread_mutex);
+   g_atomic_int_set (&max_unused_threads, max_threads);
+ 
+   if (max_threads != -1)
+@@ -1021,20 +1040,10 @@ g_thread_pool_set_max_unused_threads (gint max_threads)
+       if (max_threads < 0)
+         {
+           g_atomic_int_set (&kill_unused_threads, -max_threads);
+-          g_atomic_int_inc (&wakeup_thread_serial);
+-
+-          g_async_queue_lock (unused_thread_queue);
+-
+-          do
+-            {
+-              g_async_queue_push_unlocked (unused_thread_queue,
+-                                           wakeup_thread_marker);
+-            }
+-          while (++max_threads);
+-
+-          g_async_queue_unlock (unused_thread_queue);
++          g_thread_pool_wakeup_unused_threads (-max_threads);
+         }
+     }
++  g_mutex_unlock (&unused_thread_mutex);
+ }
+ 
+ /**
+@@ -1073,12 +1082,13 @@ g_thread_pool_get_num_unused_threads (void)
+ void
+ g_thread_pool_stop_unused_threads (void)
+ {
+-  guint oldval;
+-
+-  oldval = g_thread_pool_get_max_unused_threads ();
++  guint n_threads;
+ 
+-  g_thread_pool_set_max_unused_threads (0);
+-  g_thread_pool_set_max_unused_threads (oldval);
++  g_mutex_lock (&unused_thread_mutex);
++  n_threads = g_atomic_int_get (&unused_threads);
++  g_atomic_int_set (&kill_unused_threads, n_threads);
++  g_thread_pool_wakeup_unused_threads (n_threads);
++  g_mutex_unlock (&unused_thread_mutex);
+ }
+ 
+ /**
+@@ -1179,25 +1189,10 @@ g_thread_pool_move_to_front (GThreadPool *pool,
+ void
+ g_thread_pool_set_max_idle_time (guint interval)
+ {
+-  guint i;
+-
++  g_mutex_lock (&unused_thread_mutex);
+   g_atomic_int_set (&max_idle_time, interval);
+-
+-  i = (guint) g_atomic_int_get (&unused_threads);
+-  if (i > 0)
+-    {
+-      g_atomic_int_inc (&wakeup_thread_serial);
+-      g_async_queue_lock (unused_thread_queue);
+-
+-      do
+-        {
+-          g_async_queue_push_unlocked (unused_thread_queue,
+-                                       wakeup_thread_marker);
+-        }
+-      while (--i);
+-
+-      g_async_queue_unlock (unused_thread_queue);
+-    }
++  g_thread_pool_wakeup_unused_threads (g_atomic_int_get (&unused_threads));
++  g_mutex_unlock (&unused_thread_mutex);
+ }
+ 
+ /**
+diff --git a/glib/tests/meson.build b/glib/tests/meson.build
+--- a/glib/tests/meson.build
++++ b/glib/tests/meson.build
+@@ -169,6 +169,10 @@ glib_tests = {
+   'thread' : {},
+   'thread-deprecated' : {},
+   'thread-pool' : {},
++  'thread-pool-private' : {
++    'c_args' : ['-DGLIB_COMPILATION'],
++    'install' : false,
++  },
+   'thread-pool-slow' : {'suite' : ['slow']},
+   'timeout' : {},
+   'timer' : {},
+diff --git a/glib/tests/thread-pool-private.c b/glib/tests/thread-pool-private.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..737fbbfb791b4402b2440f7d1a31555e1213702b
+--- /dev/null
++++ b/glib/tests/thread-pool-private.c
+@@ -0,0 +1,291 @@
++/* Copyright 2026 Tobias Brick <tobiasb@microsoft.com>
++ * SPDX-License-Identifier: LGPL-2.1-or-later
++ */
++
++#include <config.h>
++
++/* Compile the real implementation with test-only scheduling gates. Rename its
++ * public entry points to avoid colliding with the statically linked GLib. */
++#define g_thread_pool_new private_thread_pool_new
++#define g_thread_pool_new_full private_thread_pool_new_full
++#define g_thread_pool_free private_thread_pool_free
++#define g_thread_pool_push private_thread_pool_push
++#define g_thread_pool_unprocessed private_thread_pool_unprocessed
++#define g_thread_pool_set_max_threads private_thread_pool_set_max_threads
++#define g_thread_pool_get_max_threads private_thread_pool_get_max_threads
++#define g_thread_pool_get_num_threads private_thread_pool_get_num_threads
++#define g_thread_pool_set_max_unused_threads private_thread_pool_set_max_unused_threads
++#define g_thread_pool_get_max_unused_threads private_thread_pool_get_max_unused_threads
++#define g_thread_pool_get_num_unused_threads private_thread_pool_get_num_unused_threads
++#define g_thread_pool_stop_unused_threads private_thread_pool_stop_unused_threads
++#define g_thread_pool_set_sort_function private_thread_pool_set_sort_function
++#define g_thread_pool_move_to_front private_thread_pool_move_to_front
++#define g_thread_pool_set_max_idle_time private_thread_pool_set_max_idle_time
++#define g_thread_pool_get_max_idle_time private_thread_pool_get_max_idle_time
++
++#include <glib.h>
++
++typedef enum
++{
++  A_STARTED = 1,
++  B_STARTED,
++  A_WAITING,
++  B_SNAPSHOT,
++  UPDATE_BLOCKED,
++  UPDATE_DONE,
++  B_MARKER,
++  A_MARKER,
++  A_EXITED,
++  B_EXITED
++} Event;
++
++typedef struct
++{
++  GAsyncQueue *events;
++  GAsyncQueue *release_a;
++  GAsyncQueue *release_b;
++  GAsyncQueue *update_finished;
++  gboolean a_waiting;
++  gboolean b_snapshot;
++  gboolean b_marker;
++  gboolean b_waiting;
++} RaceData;
++
++static RaceData *race;
++static gint wakeup_thread_serial;
++static GAsyncQueue *unused_thread_queue;
++
++static void
++thread_exited (gpointer data)
++{
++  guint id = GPOINTER_TO_UINT (data);
++
++  if (id == 1 || id == 2)
++    g_async_queue_push (race->events, GUINT_TO_POINTER (id == 1 ? A_EXITED : B_EXITED));
++}
++
++static GPrivate identity = G_PRIVATE_INIT (thread_exited);
++
++static guint
++thread_identity (void)
++{
++  return GPOINTER_TO_UINT (g_private_get (&identity));
++}
++
++static gint
++race_atomic_get (const volatile gint *atomic)
++{
++  gint value = (g_atomic_int_get) (atomic);
++
++  if (race != NULL && atomic == &wakeup_thread_serial &&
++      thread_identity () == 2 && !race->b_snapshot)
++    {
++      race->b_snapshot = TRUE;
++      g_async_queue_push (race->events, GUINT_TO_POINTER (B_SNAPSHOT));
++      g_async_queue_pop (race->release_b);
++    }
++
++  return value;
++}
++
++static void
++race_mutex_lock (GMutex *mutex)
++{
++  if (race != NULL && thread_identity () == 3)
++    {
++      if (g_mutex_trylock (mutex))
++        return;
++
++      g_async_queue_push (race->events, GUINT_TO_POINTER (UPDATE_BLOCKED));
++    }
++
++  g_mutex_lock (mutex);
++}
++
++static gpointer
++race_queue_pop (GAsyncQueue *queue,
++                guint64 timeout,
++                gboolean timed)
++{
++  gpointer item;
++  guint id = thread_identity ();
++
++  if (race != NULL && queue == unused_thread_queue && id == 1 && !race->a_waiting)
++    {
++      race->a_waiting = TRUE;
++      g_async_queue_push (race->events, GUINT_TO_POINTER (A_WAITING));
++      g_async_queue_pop (race->release_a);
++    }
++  else if (race != NULL && queue == unused_thread_queue && id == 2 &&
++           race->b_marker && !race->b_waiting)
++    {
++      race->b_waiting = TRUE;
++      g_async_queue_push (race->events, GUINT_TO_POINTER (B_MARKER));
++      g_async_queue_pop (race->release_b);
++    }
++
++  /* Do not start B's timeout while its markers are still being published. */
++  if (race != NULL && queue == unused_thread_queue && id == 2 &&
++      timed && !race->b_marker)
++    g_async_queue_pop (race->update_finished);
++
++  item = timed ? g_async_queue_timeout_pop (queue, timeout) : g_async_queue_pop (queue);
++
++  if (race != NULL && queue == unused_thread_queue && item != NULL)
++    {
++      if (id == 2 && !race->b_marker)
++        race->b_marker = TRUE;
++      else if (id == 1)
++        g_async_queue_push (race->events, GUINT_TO_POINTER (A_MARKER));
++    }
++
++  return item;
++}
++
++#undef g_atomic_int_get
++#define g_atomic_int_get(atomic) race_atomic_get ((const volatile gint *) (atomic))
++#define g_mutex_lock(mutex) race_mutex_lock (mutex)
++#define g_async_queue_pop(queue) race_queue_pop (queue, 0, FALSE)
++#define g_async_queue_timeout_pop(queue, timeout) race_queue_pop (queue, timeout, TRUE)
++#include "../gthreadpool.c"
++#undef g_atomic_int_get
++#undef g_mutex_lock
++#undef g_async_queue_pop
++#undef g_async_queue_timeout_pop
++
++static void
++worker (gpointer data,
++        gpointer user_data)
++{
++  guint id = GPOINTER_TO_UINT (data);
++
++  g_private_set (&identity, data);
++  g_async_queue_push (race->events, GUINT_TO_POINTER (id == 1 ? A_STARTED : B_STARTED));
++  g_async_queue_pop (id == 1 ? race->release_a : race->release_b);
++}
++
++static gpointer
++update (gpointer data)
++{
++  g_private_set (&identity, GUINT_TO_POINTER (3));
++  if (GPOINTER_TO_UINT (data) == 2)
++    g_thread_pool_set_max_unused_threads (0);
++  else if (GPOINTER_TO_UINT (data) == 1)
++    g_thread_pool_stop_unused_threads ();
++  else
++    g_thread_pool_set_max_idle_time (20);
++  g_async_queue_push (race->update_finished, GUINT_TO_POINTER (1));
++  g_async_queue_push (race->events, GUINT_TO_POINTER (UPDATE_DONE));
++  return NULL;
++}
++
++static Event
++next_event (void)
++{
++  return GPOINTER_TO_UINT (g_async_queue_pop (race->events));
++}
++
++static void
++test_registration (gconstpointer operation)
++{
++  RaceData data = { 0 };
++  GThreadPool *a;
++  GThreadPool *b;
++  GThread *updater;
++  GError *error = NULL;
++  Event event;
++  gboolean update_done;
++  gboolean b_marker = FALSE;
++  gboolean b_exited = FALSE;
++  guint unused;
++
++  g_test_summary ("A worker registering during a generation update cannot "
++                  "steal an older idle worker's notification.");
++  if (!g_test_subprocess ())
++    {
++      g_test_trap_subprocess (NULL, 5 * G_USEC_PER_SEC, G_TEST_SUBPROCESS_DEFAULT);
++      g_test_trap_assert_passed ();
++      return;
++    }
++
++  race = &data;
++  data.events = g_async_queue_new ();
++  data.release_a = g_async_queue_new ();
++  data.release_b = g_async_queue_new ();
++  data.update_finished = g_async_queue_new ();
++  g_thread_pool_set_max_unused_threads (-1);
++  g_thread_pool_set_max_idle_time (0);
++
++  a = g_thread_pool_new (worker, NULL, 1, FALSE, &error);
++  g_assert_no_error (error);
++  g_assert_nonnull (a);
++  g_assert_true (g_thread_pool_push (a, GUINT_TO_POINTER (1), &error));
++  g_assert_no_error (error);
++  g_assert_cmpint (next_event (), ==, A_STARTED);
++  b = g_thread_pool_new (worker, NULL, 1, TRUE, &error);
++  g_assert_no_error (error);
++  g_assert_nonnull (b);
++  g_assert_true (g_thread_pool_push (b, GUINT_TO_POINTER (2), &error));
++  g_assert_no_error (error);
++  g_assert_cmpint (next_event (), ==, B_STARTED);
++
++  g_thread_pool_free (a, TRUE, FALSE);
++  g_async_queue_push (data.release_a, GUINT_TO_POINTER (1));
++  g_assert_cmpint (next_event (), ==, A_WAITING);
++  g_thread_pool_free (b, TRUE, FALSE);
++  g_async_queue_push (data.release_b, GUINT_TO_POINTER (1));
++  g_assert_cmpint (next_event (), ==, B_SNAPSHOT);
++  /* Upstream samples inside the wait helper, after registration; a fix may
++   * sample before registration. Both placements must preserve A's marker. */
++  unused = g_thread_pool_get_num_unused_threads ();
++  g_assert_true (unused == 1 || unused == 2);
++
++  updater = g_thread_new ("update", update, (gpointer) operation);
++  event = next_event ();
++  g_assert_true (event == UPDATE_BLOCKED || event == UPDATE_DONE);
++  update_done = event == UPDATE_DONE;
++  g_test_message ("Generation update %s while newcomer is parked",
++                  update_done ? "completed" : "blocked");
++  g_async_queue_push (data.release_b, GUINT_TO_POINTER (1));
++  while (!update_done || !b_marker)
++    {
++      event = next_event ();
++      g_assert_true (event == UPDATE_DONE || event == B_MARKER || event == B_EXITED);
++      update_done |= event == UPDATE_DONE;
++      b_marker |= event == B_MARKER || event == B_EXITED;
++      b_exited |= event == B_EXITED;
++    }
++
++  /* B has handled its first marker, including any necessary relay, but cannot
++   * steal a second one before A gets its notification. */
++  g_async_queue_push (data.release_a, GUINT_TO_POINTER (1));
++  g_test_message ("Waiting for counted worker's notification");
++  g_assert_cmpint (next_event (), ==, A_MARKER);
++  if (b_exited)
++    g_assert_cmpint (next_event (), ==, A_EXITED);
++  else
++    {
++      g_async_queue_push (data.release_b, GUINT_TO_POINTER (1));
++      event = next_event ();
++      g_assert_true (event == A_EXITED || event == B_EXITED);
++      g_assert_cmpint (next_event (), ==, event == A_EXITED ? B_EXITED : A_EXITED);
++    }
++  g_thread_join (updater);
++  g_assert_cmpuint (g_thread_pool_get_num_unused_threads (), ==, 0);
++
++  g_async_queue_unref (data.release_a);
++  g_async_queue_unref (data.release_b);
++  g_async_queue_unref (data.update_finished);
++  g_async_queue_unref (data.events);
++  race = NULL;
++}
++
++int
++main (int argc, char **argv)
++{
++  g_test_init (&argc, &argv, NULL);
++  g_test_add_data_func ("/thread_pool/registration/stop", GUINT_TO_POINTER (1), test_registration);
++  g_test_add_data_func ("/thread_pool/registration/idle_time", NULL, test_registration);
++  g_test_add_data_func ("/thread_pool/registration/max_unused", GUINT_TO_POINTER (2), test_registration);
++  return g_test_run ();
++}
+diff --git a/glib/tests/thread-pool.c b/glib/tests/thread-pool.c
+index 7161078e6be6ace0b5efd281d94fcfb72e589d50..f456d7a06dd0894f2b54dc955b5b9bc8863e98e0 100644
+--- a/glib/tests/thread-pool.c
++++ b/glib/tests/thread-pool.c
+@@ -333,6 +333,84 @@ test_thread_pool_full (gconstpointer shared_first)
+     }
+ }
+ 
++typedef struct
++{
++  GAsyncQueue *started;
++  GAsyncQueue *release;
++} StopUnusedData;
++
++static void
++stop_unused_thread_func (gpointer data,
++                         gpointer user_data)
++{
++  StopUnusedData *test_data = data;
++
++  g_async_queue_push (test_data->started, GUINT_TO_POINTER (1));
++  g_async_queue_pop (test_data->release);
++}
++
++static void
++stop_unused_free_func (gpointer data)
++{
++  StopUnusedData *test_data = data;
++
++  g_async_queue_push (test_data->started, GUINT_TO_POINTER (2));
++  g_async_queue_pop (test_data->release);
++}
++
++static void
++test_stop_unused_during_free (void)
++{
++  StopUnusedData test_data;
++  GThreadPool *pool;
++  GError *local_error = NULL;
++
++  g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/work_items/4010");
++  g_test_summary ("Stopping unused threads during pool cleanup does not "
++                  "leave a worker waiting for new work.");
++
++  if (!g_test_subprocess ())
++    {
++      g_test_trap_subprocess (NULL, 5 * G_USEC_PER_SEC,
++                              G_TEST_SUBPROCESS_DEFAULT);
++      g_test_trap_assert_passed ();
++      return;
++    }
++
++  g_thread_pool_set_max_unused_threads (-1);
++  g_thread_pool_set_max_idle_time (0);
++  test_data.started = g_async_queue_new ();
++  test_data.release = g_async_queue_new ();
++
++  pool = g_thread_pool_new_full (stop_unused_thread_func, NULL,
++                                 stop_unused_free_func, 1, FALSE,
++                                 &local_error);
++  g_assert_no_error (local_error);
++  g_assert_nonnull (pool);
++  g_assert_true (g_thread_pool_push (pool, &test_data, &local_error));
++  g_assert_no_error (local_error);
++  g_assert_true (g_thread_pool_push (pool, &test_data, &local_error));
++  g_assert_no_error (local_error);
++
++  g_assert_true (g_async_queue_pop (test_data.started) == GUINT_TO_POINTER (1));
++  g_thread_pool_free (pool, TRUE, FALSE);
++  g_async_queue_push (test_data.release, GUINT_TO_POINTER (1));
++
++  /* Queued-item cleanup runs after idle registration but before the worker
++   * starts waiting for a new pool. Hold it there while requesting shutdown. */
++  g_assert_true (g_async_queue_pop (test_data.started) == GUINT_TO_POINTER (2));
++  g_assert_cmpuint (g_thread_pool_get_num_unused_threads (), ==, 1);
++  g_thread_pool_stop_unused_threads ();
++  g_assert_cmpint (g_thread_pool_get_max_unused_threads (), ==, -1);
++  g_async_queue_push (test_data.release, GUINT_TO_POINTER (1));
++
++  while (g_thread_pool_get_num_unused_threads () != 0)
++    g_usleep (100);
++
++  g_async_queue_unref (test_data.release);
++  g_async_queue_unref (test_data.started);
++}
++
+ int
+ main (int argc, char *argv[])
+ {
+@@ -348,6 +426,7 @@ main (int argc, char *argv[])
+   g_test_add_data_func ("/thread_pool/create_shared_after_exclusive", GINT_TO_POINTER (FALSE), test_create_first_pool);
+   g_test_add_data_func ("/thread_pool/create_full", NULL, test_thread_pool_full);
+   g_test_add_data_func ("/thread_pool/create_exclusive_after_shared", GINT_TO_POINTER (TRUE), test_create_first_pool);
++  g_test_add_func ("/thread_pool/stop_unused_during_free", test_stop_unused_during_free);
+ 
+   return g_test_run ();
+ }
