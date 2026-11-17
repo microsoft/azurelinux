@@ -25,7 +25,7 @@ Patch2:         0002-fix-PIDFile-handling.patch
 Patch3:         0003-Add-SSL-passphrase-dialog.patch
 Patch4:         0004-Disable-ENGINE-support.patch
 Patch5:         0005-Compile-perl-module-with-O2.patch
-Patch6:         0006-backport-1.31.9-fixes.patch
+Patch6:         0006-upstream-fixes.patch
 
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
@@ -175,7 +175,7 @@ rm -rf nginx-tests
 
 %changelog
 * Mon Nov 16 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.30.6-2
-- Backport applicable fixes from nginx 1.31.9.
+- Apply upstream fixes for nginx 1.30.6.
 - Retain RFC 7540 HTTP/2 priorities and nginx 1.30.6.
 
 * Wed Oct 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.6-1
