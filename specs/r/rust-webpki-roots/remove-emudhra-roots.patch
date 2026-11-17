@@ -1,0 +1,55 @@
+From 9266fcf54b06d85a83f50978d3af52fb6557b1c4 Mon Sep 17 00:00:00 2001
+From: reuben olinsky <reubeno@users.noreply.github.com>
+Date: Tue, 17 Nov 2026 19:21:37 +0000
+Subject: [PATCH] Remove the eMudhra emSign G1 root from webpki-roots
+
+Remove emSign Root CA - G1's comment and TrustAnchor record from the crate's root certificate set to enforce Azure Linux's eMudhra certificate exclusion policy.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ src/lib.rs |   34 ----------------------------------
+ 1 file changed, 34 deletions(-)
+
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1084,40 +1084,6 @@
+     name_constraints: None
+   },
+ 
+-  /*
+-   * Issuer: CN=emSign Root CA - G1 O=eMudhra Technologies Limited OU=emSign PKI
+-   * Subject: CN=emSign Root CA - G1 O=eMudhra Technologies Limited OU=emSign PKI
+-   * Label: "emSign Root CA - G1"
+-   * Serial: 235931866688319308814040
+-   * SHA256 Fingerprint: 40:f6:af:03:46:a9:9a:a1:cd:1d:55:5a:4e:9c:ce:62:c7:f9:63:46:03:ee:40:66:15:83:3d:c8:c8:d0:03:67
+-   * -----BEGIN CERTIFICATE-----
+-   * MIIDlDCCAnygAwIBAgIKMfXkYgxsWO3W2DANBgkqhkiG9w0BAQsFADBnMQswCQYD
+-   * VQQGEwJJTjETMBEGA1UECxMKZW1TaWduIFBLSTElMCMGA1UEChMcZU11ZGhyYSBU
+-   * ZWNobm9sb2dpZXMgTGltaXRlZDEcMBoGA1UEAxMTZW1TaWduIFJvb3QgQ0EgLSBH
+-   * MTAeFw0xODAyMTgxODMwMDBaFw00MzAyMTgxODMwMDBaMGcxCzAJBgNVBAYTAklO
+-   * MRMwEQYDVQQLEwplbVNpZ24gUEtJMSUwIwYDVQQKExxlTXVkaHJhIFRlY2hub2xv
+-   * Z2llcyBMaW1pdGVkMRwwGgYDVQQDExNlbVNpZ24gUm9vdCBDQSAtIEcxMIIBIjAN
+-   * BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk0u76WaK7p1b1TST0Bsew+eeuGQz
+-   * f2N4aLTNLnF115sgxk0pvLZoYIr3IZpWNVrzdr3YzZr/k1ZLpVkGoZM0Kd0WNHVO
+-   * 8oG0x5ZOrRkVUkr+PHB1cM2vK6sVmjM8qrOLqs1D/fXqcP/tzxE7lM5OMhbTI0Aq
+-   * d7OvPAEsbO2ZLIvZTmmYsvePQbAyeGHWDV/D+qJAkh1cF+ZwPjXnorfCYuKrpDhM
+-   * tTk1b+oDafo6VGiFbdbyL0NVHpENDtjVaqSW0RM8LHhQ6DqS0hdW5TUaQBw+jSzt
+-   * Od9C4INBdN+jzcKGYEho42kLVACL5HZpIQ15TjQIXhTCzLG3rdd8cIrHhQIDAQAB
+-   * o0IwQDAdBgNVHQ4EFgQU++8Nhp6w492pufEhF38+/PB3KxowDgYDVR0PAQH/BAQD
+-   * AgEGMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAFn/8oz1h31x
+-   * PaOfG1vR2vjTnGs2vZupYeveFix0PZ7mddrXuqe8QhfnPZHr5X3dPpzxz5KsbEjM
+-   * wiI/aTvFthUvozXGaCocV685743QNcMYDHsAVhzNixl03r4PEuDQqqE/AjSxcM6d
+-   * GNYIAwlG7mDgfrbESQRRfXBgvKqy/3lyeqYdPV8q+Mri/Tm3R7nrft8EI6/6nAYH
+-   * 6ftjk4BAtcZsCjEozgyfz7MjNYBBjWzEN3uBL4ChQEKF6dk4jeihU80Bv2noWgby
+-   * RQuQ+q7hv53yrlc8pa6yVvSLZUDp/TGBLPQ5Cdjua6e0ph0VpZj3AYHYhX3zUVxx
+-   * iN66zB+Afko=
+-   * -----END CERTIFICATE-----
+-   */
+-  TrustAnchor {
+-    subject: Der::from_slice(b"1\x0b0\t\x06\x03U\x04\x06\x13\x02IN1\x130\x11\x06\x03U\x04\x0b\x13\nemSign PKI1%0#\x06\x03U\x04\n\x13\x1ceMudhra Technologies Limited1\x1c0\x1a\x06\x03U\x04\x03\x13\x13emSign Root CA - G1"),
+-    subject_public_key_info: Der::from_slice(b"0\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00\x03\x82\x01\x0f\x000\x82\x01\n\x02\x82\x01\x01\x00\x93K\xbb\xe9f\x8a\xee\x9d[\xd54\x93\xd0\x1b\x1e\xc3\xe7\x9e\xb8d3\x7fcxh\xb4\xcd.qu\xd7\x9b \xc6M)\xbc\xb6h`\x8a\xf7!\x9aV5Z\xf3v\xbd\xd8\xcd\x9a\xff\x93VK\xa5Y\x06\xa1\x934)\xdd\x164uN\xf2\x81\xb4\xc7\x96N\xad\x19\x15RJ\xfe<pup\xcd\xaf+\xab\x15\x9a3<\xaa\xb3\x8b\xaa\xcdC\xfd\xf5\xeap\xff\xed\xcf\x11;\x94\xceN2\x16\xd3#@*w\xb3\xaf<\x01,l\xed\x99,\x8b\xd9Ni\x98\xb2\xf7\x8fA\xb02xa\xd6\r_\xc3\xfa\xa2@\x92\x1d\\\x17\xe6p>5\xe7\xa2\xb7\xc2b\xe2\xab\xa48L\xb595o\xea\x03i\xfa:Th\x85m\xd6\xf2/CU\x1e\x91\r\x0e\xd8\xd5j\xa4\x96\xd1\x13<,xP\xe8:\x92\xd2\x17V\xe55\x1a@\x1c>\x8d,\xed9\xdfB\xe0\x83At\xdf\xa3\xcd\xc2\x86`Hh\xe3i\x0bT\x00\x8b\xe4vi!\ryN4\x08^\x14\xc2\xcc\xb1\xb7\xad\xd7|p\x8a\xc7\x85\x02\x03\x01\x00\x01"),
+-    name_constraints: None
+-  },
+ 
+   /*
+    * Issuer: CN=Hellenic Academic and Research Institutions ECC RootCA 2015 O=Hellenic Academic and Research Institutions Cert. Authority

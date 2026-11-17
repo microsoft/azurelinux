@@ -1,0 +1,162 @@
+From 7345fc78710a6712ae169842f8c2b598af2bbfa9 Mon Sep 17 00:00:00 2001
+From: reuben olinsky <reubeno@users.noreply.github.com>
+Date: Tue, 17 Nov 2026 19:21:37 +0000
+Subject: [PATCH] Remove eMudhra emSign roots from webpki-roots 0.25
+
+Remove the emSign Root CA - C1, emSign Root CA - G1, emSign ECC Root CA - G3, and emSign ECC Root CA - C3 comments and TrustAnchor records from the crate's root certificate set to enforce Azure Linux's eMudhra certificate exclusion policy.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ src/lib.rs |  120 ------------------------------------------------------------
+ 1 file changed, 120 deletions(-)
+
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -287,39 +287,6 @@
+     name_constraints: None
+   },
+ 
+-  /*
+-   * Issuer: CN=emSign Root CA - C1 O=eMudhra Inc OU=emSign PKI
+-   * Subject: CN=emSign Root CA - C1 O=eMudhra Inc OU=emSign PKI
+-   * Label: "emSign Root CA - C1"
+-   * Serial: 825510296613316004955058
+-   * SHA256 Fingerprint: 12:56:09:aa:30:1d:a0:a2:49:b9:7a:82:39:cb:6a:34:21:6f:44:dc:ac:9f:39:54:b1:42:92:f2:e8:c8:60:8f
+-   * -----BEGIN CERTIFICATE-----
+-   * MIIDczCCAlugAwIBAgILAK7PALrEzzL4Q7IwDQYJKoZIhvcNAQELBQAwVjELMAkG
+-   * A1UEBhMCVVMxEzARBgNVBAsTCmVtU2lnbiBQS0kxFDASBgNVBAoTC2VNdWRocmEg
+-   * SW5jMRwwGgYDVQQDExNlbVNpZ24gUm9vdCBDQSAtIEMxMB4XDTE4MDIxODE4MzAw
+-   * MFoXDTQzMDIxODE4MzAwMFowVjELMAkGA1UEBhMCVVMxEzARBgNVBAsTCmVtU2ln
+-   * biBQS0kxFDASBgNVBAoTC2VNdWRocmEgSW5jMRwwGgYDVQQDExNlbVNpZ24gUm9v
+-   * dCBDQSAtIEMxMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz+upufGZ
+-   * BczYKCFK83M0UYRWEPWgTywS4/oTmifQz/l5GnRfHXk5/Fv4cI7gklL35CX5VIPZ
+-   * HdPIWoU/Xse2B+4+wM6ar6xWQio5JXDWv7V7Nq2s9nPczdcdioOl+yuQFTdrHCZH
+-   * 3DspVpNqs8FqOp099cGXOFgFixwR4+S0uF2FHYP+eF8LRWgYSKVGczQ7/g/IdrvH
+-   * GPMF0Ybzhe3nudkyrVWIzqa2kbBPrH4VI5b2P/AgNBbeCsbEBEV5f6f9vtKppa+c
+-   * xSMq9zwhbL2vj07FOrLzNBL834AaSaTUqZX3noleoomslMuoaJuvimUnzYnu3Yy1
+-   * aylwQ6BpC+S5DwIDAQABo0IwQDAdBgNVHQ4EFgQU/qHgcB4qAzlSWkK+XJGFehiq
+-   * TbUwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEL
+-   * BQADggEBAMJKVvoVIXsoounlHfv4LcQ5lkFMOycsxGwYFYDGrK9HWS8mC+M2sO87
+-   * /kOXSTKZEhVb3xEp/6tT+LvBeA+snFOvV71ojD1pM/CjoCNjO2RnIkSt1XHLVip4
+-   * kqNPEjE2NuLe/gDEo2APJ62gsIq1NnpSob0n9CAnYuhNlCQT5AoE6TyrLshDCUrG
+-   * YQTlSTR+08TI9Q/Aqum6VF7zYytPT1DU/rl7mYw9wC68AivTxEDkigcxHpvOJpkT
+-   * +xHqmiIMERnHXhuBUDDIlhJu58tBf5E7oke3VIAb3ADMmpDqw8NQBmIMMMAVSKeo
+-   * WXzhriKi4gp6D/piq1JM4fHfyr6DDUI=
+-   * -----END CERTIFICATE-----
+-   */
+-  TrustAnchor {
+-    subject: b"1\x0b0\t\x06\x03U\x04\x06\x13\x02US1\x130\x11\x06\x03U\x04\x0b\x13\nemSign PKI1\x140\x12\x06\x03U\x04\n\x13\x0beMudhra Inc1\x1c0\x1a\x06\x03U\x04\x03\x13\x13emSign Root CA - C1",
+-    spki: b"0\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00\x03\x82\x01\x0f\x000\x82\x01\n\x02\x82\x01\x01\x00\xcf\xeb\xa9\xb9\xf1\x99\x05\xcc\xd8(!J\xf3s4Q\x84V\x10\xf5\xa0O,\x12\xe3\xfa\x13\x9a\'\xd0\xcf\xf9y\x1at_\x1dy9\xfc[\xf8p\x8e\xe0\x92R\xf7\xe4%\xf9T\x83\xd9\x1d\xd3\xc8Z\x85?^\xc7\xb6\x07\xee>\xc0\xce\x9a\xaf\xacVB*9%p\xd6\xbf\xb5{6\xad\xac\xf6s\xdc\xcd\xd7\x1d\x8a\x83\xa5\xfb+\x90\x157k\x1c&G\xdc;)V\x93j\xb3\xc1j:\x9d=\xf5\xc1\x978X\x05\x8b\x1c\x11\xe3\xe4\xb4\xb8]\x85\x1d\x83\xfex_\x0bEh\x18H\xa5Fs4;\xfe\x0f\xc8v\xbb\xc7\x18\xf3\x05\xd1\x86\xf3\x85\xed\xe7\xb9\xd92\xadU\x88\xce\xa6\xb6\x91\xb0O\xac~\x15#\x96\xf6?\xf0 4\x16\xde\n\xc6\xc4\x04Ey\x7f\xa7\xfd\xbe\xd2\xa9\xa5\xaf\x9c\xc5#*\xf7<!l\xbd\xaf\x8fN\xc5:\xb2\xf34\x12\xfc\xdf\x80\x1aI\xa4\xd4\xa9\x95\xf7\x9e\x89^\xa2\x89\xac\x94\xcb\xa8h\x9b\xaf\x8ae\'\xcd\x89\xee\xdd\x8c\xb5k)pC\xa0i\x0b\xe4\xb9\x0f\x02\x03\x01\x00\x01",
+-    name_constraints: None
+-  },
+ 
+   /*
+    * Issuer: O=Starfield Technologies, Inc. OU=Starfield Class 2 Certification Authority
+@@ -1287,40 +1254,6 @@
+     name_constraints: None
+   },
+ 
+-  /*
+-   * Issuer: CN=emSign Root CA - G1 O=eMudhra Technologies Limited OU=emSign PKI
+-   * Subject: CN=emSign Root CA - G1 O=eMudhra Technologies Limited OU=emSign PKI
+-   * Label: "emSign Root CA - G1"
+-   * Serial: 235931866688319308814040
+-   * SHA256 Fingerprint: 40:f6:af:03:46:a9:9a:a1:cd:1d:55:5a:4e:9c:ce:62:c7:f9:63:46:03:ee:40:66:15:83:3d:c8:c8:d0:03:67
+-   * -----BEGIN CERTIFICATE-----
+-   * MIIDlDCCAnygAwIBAgIKMfXkYgxsWO3W2DANBgkqhkiG9w0BAQsFADBnMQswCQYD
+-   * VQQGEwJJTjETMBEGA1UECxMKZW1TaWduIFBLSTElMCMGA1UEChMcZU11ZGhyYSBU
+-   * ZWNobm9sb2dpZXMgTGltaXRlZDEcMBoGA1UEAxMTZW1TaWduIFJvb3QgQ0EgLSBH
+-   * MTAeFw0xODAyMTgxODMwMDBaFw00MzAyMTgxODMwMDBaMGcxCzAJBgNVBAYTAklO
+-   * MRMwEQYDVQQLEwplbVNpZ24gUEtJMSUwIwYDVQQKExxlTXVkaHJhIFRlY2hub2xv
+-   * Z2llcyBMaW1pdGVkMRwwGgYDVQQDExNlbVNpZ24gUm9vdCBDQSAtIEcxMIIBIjAN
+-   * BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk0u76WaK7p1b1TST0Bsew+eeuGQz
+-   * f2N4aLTNLnF115sgxk0pvLZoYIr3IZpWNVrzdr3YzZr/k1ZLpVkGoZM0Kd0WNHVO
+-   * 8oG0x5ZOrRkVUkr+PHB1cM2vK6sVmjM8qrOLqs1D/fXqcP/tzxE7lM5OMhbTI0Aq
+-   * d7OvPAEsbO2ZLIvZTmmYsvePQbAyeGHWDV/D+qJAkh1cF+ZwPjXnorfCYuKrpDhM
+-   * tTk1b+oDafo6VGiFbdbyL0NVHpENDtjVaqSW0RM8LHhQ6DqS0hdW5TUaQBw+jSzt
+-   * Od9C4INBdN+jzcKGYEho42kLVACL5HZpIQ15TjQIXhTCzLG3rdd8cIrHhQIDAQAB
+-   * o0IwQDAdBgNVHQ4EFgQU++8Nhp6w492pufEhF38+/PB3KxowDgYDVR0PAQH/BAQD
+-   * AgEGMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAFn/8oz1h31x
+-   * PaOfG1vR2vjTnGs2vZupYeveFix0PZ7mddrXuqe8QhfnPZHr5X3dPpzxz5KsbEjM
+-   * wiI/aTvFthUvozXGaCocV685743QNcMYDHsAVhzNixl03r4PEuDQqqE/AjSxcM6d
+-   * GNYIAwlG7mDgfrbESQRRfXBgvKqy/3lyeqYdPV8q+Mri/Tm3R7nrft8EI6/6nAYH
+-   * 6ftjk4BAtcZsCjEozgyfz7MjNYBBjWzEN3uBL4ChQEKF6dk4jeihU80Bv2noWgby
+-   * RQuQ+q7hv53yrlc8pa6yVvSLZUDp/TGBLPQ5Cdjua6e0ph0VpZj3AYHYhX3zUVxx
+-   * iN66zB+Afko=
+-   * -----END CERTIFICATE-----
+-   */
+-  TrustAnchor {
+-    subject: b"1\x0b0\t\x06\x03U\x04\x06\x13\x02IN1\x130\x11\x06\x03U\x04\x0b\x13\nemSign PKI1%0#\x06\x03U\x04\n\x13\x1ceMudhra Technologies Limited1\x1c0\x1a\x06\x03U\x04\x03\x13\x13emSign Root CA - G1",
+-    spki: b"0\r\x06\t*\x86H\x86\xf7\r\x01\x01\x01\x05\x00\x03\x82\x01\x0f\x000\x82\x01\n\x02\x82\x01\x01\x00\x93K\xbb\xe9f\x8a\xee\x9d[\xd54\x93\xd0\x1b\x1e\xc3\xe7\x9e\xb8d3\x7fcxh\xb4\xcd.qu\xd7\x9b \xc6M)\xbc\xb6h`\x8a\xf7!\x9aV5Z\xf3v\xbd\xd8\xcd\x9a\xff\x93VK\xa5Y\x06\xa1\x934)\xdd\x164uN\xf2\x81\xb4\xc7\x96N\xad\x19\x15RJ\xfe<pup\xcd\xaf+\xab\x15\x9a3<\xaa\xb3\x8b\xaa\xcdC\xfd\xf5\xeap\xff\xed\xcf\x11;\x94\xceN2\x16\xd3#@*w\xb3\xaf<\x01,l\xed\x99,\x8b\xd9Ni\x98\xb2\xf7\x8fA\xb02xa\xd6\r_\xc3\xfa\xa2@\x92\x1d\\\x17\xe6p>5\xe7\xa2\xb7\xc2b\xe2\xab\xa48L\xb595o\xea\x03i\xfa:Th\x85m\xd6\xf2/CU\x1e\x91\r\x0e\xd8\xd5j\xa4\x96\xd1\x13<,xP\xe8:\x92\xd2\x17V\xe55\x1a@\x1c>\x8d,\xed9\xdfB\xe0\x83At\xdf\xa3\xcd\xc2\x86`Hh\xe3i\x0bT\x00\x8b\xe4vi!\ryN4\x08^\x14\xc2\xcc\xb1\xb7\xad\xd7|p\x8a\xc7\x85\x02\x03\x01\x00\x01",
+-    name_constraints: None
+-  },
+ 
+   /*
+    * Issuer: CN=Secure Global CA O=SecureTrust Corporation
+@@ -2924,33 +2857,6 @@
+     name_constraints: None
+   },
+ 
+-  /*
+-   * Issuer: CN=emSign ECC Root CA - G3 O=eMudhra Technologies Limited OU=emSign PKI
+-   * Subject: CN=emSign ECC Root CA - G3 O=eMudhra Technologies Limited OU=emSign PKI
+-   * Label: "emSign ECC Root CA - G3"
+-   * Serial: 287880440101571086945156
+-   * SHA256 Fingerprint: 86:a1:ec:ba:08:9c:4a:8d:3b:be:27:34:c6:12:ba:34:1d:81:3e:04:3c:f9:e8:a8:62:cd:5c:57:a3:6b:be:6b
+-   * -----BEGIN CERTIFICATE-----
+-   * MIICTjCCAdOgAwIBAgIKPPYHqWhwDtqLhDAKBggqhkjOPQQDAzBrMQswCQYDVQQG
+-   * EwJJTjETMBEGA1UECxMKZW1TaWduIFBLSTElMCMGA1UEChMcZU11ZGhyYSBUZWNo
+-   * bm9sb2dpZXMgTGltaXRlZDEgMB4GA1UEAxMXZW1TaWduIEVDQyBSb290IENBIC0g
+-   * RzMwHhcNMTgwMjE4MTgzMDAwWhcNNDMwMjE4MTgzMDAwWjBrMQswCQYDVQQGEwJJ
+-   * TjETMBEGA1UECxMKZW1TaWduIFBLSTElMCMGA1UEChMcZU11ZGhyYSBUZWNobm9s
+-   * b2dpZXMgTGltaXRlZDEgMB4GA1UEAxMXZW1TaWduIEVDQyBSb290IENBIC0gRzMw
+-   * djAQBgcqhkjOPQIBBgUrgQQAIgNiAAQjpQy4LRL1KPOxst3iAhKAnjlfSU2fySU0
+-   * WXTsuwYc58Byr+iuL+FBVIcUqEqy6HyC5ltqtdyzdc6LBtCGI79G1Y4PPwT01xyS
+-   * fvalY8L1X44uT6EYGQIrMgqCZH0Wk9GjQjBAMB0GA1UdDgQWBBR8XQKEE9TMipuB
+-   * zhccLikenEhjQjAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAKBggq
+-   * hkjOPQQDAwNpADBmAjEAvvNhzwIQHWSVB7gYboiFBS+DCBeQyh+KTOgNG3qxrdWB
+-   * CUfvO6wIBHxcmbHtRwfSAjEAnbpV/KlK6O3t5nYBQnvI+GDZjVGLVTv7jHvrZQnD
+-   * +JbNR6iC8hZVdyR+EhCVBCyj
+-   * -----END CERTIFICATE-----
+-   */
+-  TrustAnchor {
+-    subject: b"1\x0b0\t\x06\x03U\x04\x06\x13\x02IN1\x130\x11\x06\x03U\x04\x0b\x13\nemSign PKI1%0#\x06\x03U\x04\n\x13\x1ceMudhra Technologies Limited1 0\x1e\x06\x03U\x04\x03\x13\x17emSign ECC Root CA - G3",
+-    spki: b"0\x10\x06\x07*\x86H\xce=\x02\x01\x06\x05+\x81\x04\x00\"\x03b\x00\x04#\xa5\x0c\xb8-\x12\xf5(\xf3\xb1\xb2\xdd\xe2\x02\x12\x80\x9e9_IM\x9f\xc9%4Yt\xec\xbb\x06\x1c\xe7\xc0r\xaf\xe8\xae/\xe1AT\x87\x14\xa8J\xb2\xe8|\x82\xe6[j\xb5\xdc\xb3u\xce\x8b\x06\xd0\x86#\xbfF\xd5\x8e\x0f?\x04\xf4\xd7\x1c\x92~\xf6\xa5c\xc2\xf5_\x8e.O\xa1\x18\x19\x02+2\n\x82d}\x16\x93\xd1",
+-    name_constraints: None
+-  },
+ 
+   /*
+    * Issuer: CN=QuoVadis Root CA 3 G3 O=QuoVadis Limited
+@@ -3848,32 +3754,6 @@
+     name_constraints: None
+   },
+ 
+-  /*
+-   * Issuer: CN=emSign ECC Root CA - C3 O=eMudhra Inc OU=emSign PKI
+-   * Subject: CN=emSign ECC Root CA - C3 O=eMudhra Inc OU=emSign PKI
+-   * Label: "emSign ECC Root CA - C3"
+-   * Serial: 582948710642506000014504
+-   * SHA256 Fingerprint: bc:4d:80:9b:15:18:9d:78:db:3e:1d:8c:f4:f9:72:6a:79:5d:a1:64:3c:a5:f1:35:8e:1d:db:0e:dc:0d:7e:b3
+-   * -----BEGIN CERTIFICATE-----
+-   * MIICKzCCAbGgAwIBAgIKe3G2gla4EnycqDAKBggqhkjOPQQDAzBaMQswCQYDVQQG
+-   * EwJVUzETMBEGA1UECxMKZW1TaWduIFBLSTEUMBIGA1UEChMLZU11ZGhyYSBJbmMx
+-   * IDAeBgNVBAMTF2VtU2lnbiBFQ0MgUm9vdCBDQSAtIEMzMB4XDTE4MDIxODE4MzAw
+-   * MFoXDTQzMDIxODE4MzAwMFowWjELMAkGA1UEBhMCVVMxEzARBgNVBAsTCmVtU2ln
+-   * biBQS0kxFDASBgNVBAoTC2VNdWRocmEgSW5jMSAwHgYDVQQDExdlbVNpZ24gRUND
+-   * IFJvb3QgQ0EgLSBDMzB2MBAGByqGSM49AgEGBSuBBAAiA2IABP2lYa57JhAd6bci
+-   * MK4G9IGzsUJxlTm801Ljr6/58pc1kjZGDoeVjbk5Wum739D+yAdBPLtVb4Ojavti
+-   * sIGJAnB9SMVK4+kiVCJNk7tCDK93nCOmfddhEc5lx/h//vXyqaNCMEAwHQYDVR0O
+-   * BBYEFPtaSNCAIEDyqOkAB2kZd6fmw/TPMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMB
+-   * Af8EBTADAQH/MAoGCCqGSM49BAMDA2gAMGUCMQC02C8Cif22TGK6Q04ThHK1rt0c
+-   * 3ta13FaPWEBaLd4gTCKDypOofu4SQMfWh0/434UCMBwUZOR8loMRnLDRWmFLpg9J
+-   * 0wD8ofzkpf9/rdcw0Md3f76BB1UwUCAU9Vc4CqgxUQ==
+-   * -----END CERTIFICATE-----
+-   */
+-  TrustAnchor {
+-    subject: b"1\x0b0\t\x06\x03U\x04\x06\x13\x02US1\x130\x11\x06\x03U\x04\x0b\x13\nemSign PKI1\x140\x12\x06\x03U\x04\n\x13\x0beMudhra Inc1 0\x1e\x06\x03U\x04\x03\x13\x17emSign ECC Root CA - C3",
+-    spki: b"0\x10\x06\x07*\x86H\xce=\x02\x01\x06\x05+\x81\x04\x00\"\x03b\x00\x04\xfd\xa5a\xae{&\x10\x1d\xe9\xb7\"0\xae\x06\xf4\x81\xb3\xb1Bq\x959\xbc\xd3R\xe3\xaf\xaf\xf9\xf2\x975\x926F\x0e\x87\x95\x8d\xb99Z\xe9\xbb\xdf\xd0\xfe\xc8\x07A<\xbbUo\x83\xa3j\xfbb\xb0\x81\x89\x02p}H\xc5J\xe3\xe9\"T\"M\x93\xbbB\x0c\xafw\x9c#\xa6}\xd7a\x11\xcee\xc7\xf8\x7f\xfe\xf5\xf2\xa9",
+-    name_constraints: None
+-  },
+ 
+   /*
+    * Issuer: CN=AffirmTrust Premium ECC O=AffirmTrust
