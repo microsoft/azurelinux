@@ -1,7 +1,7 @@
 Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
 Version:        1.7.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Patch1:         CVE-2026-53584.patch
 Patch2:         CVE-2026-53585.patch
 Patch3:         CVE-2026-53586.patch
 Patch4:         CVE-2026-53587.patch
+Patch5:         CVE-2026-105437.patch
 
 BuildRequires:  cmake >= 3.5.1
 BuildRequires:  gcc
@@ -89,6 +90,9 @@ popd
 %{_bindir}/git2
 
 %changelog
+* Tue Nov 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.2-4
+- Patch for CVE-2026-105437
+
 * Tue Aug 25 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.7.2-3
  - Fix %%check: the sed disabling online tests targeted tests/CMakeLists.txt, but
    upstream moved the clar registrations to tests/libgit2/CMakeLists.txt, so it
