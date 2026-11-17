@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.30.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ Patch2:         0002-fix-PIDFile-handling.patch
 Patch3:         0003-Add-SSL-passphrase-dialog.patch
 Patch4:         0004-Disable-ENGINE-support.patch
 Patch5:         0005-Compile-perl-module-with-O2.patch
+Patch6:         0006-backport-1.31.9-fixes.patch
 
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
@@ -173,6 +174,10 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Nov 16 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.30.6-2
+- Backport applicable fixes from nginx 1.31.9.
+- Retain RFC 7540 HTTP/2 priorities and nginx 1.30.6.
+
 * Wed Oct 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.6-1
 - Auto-upgrade to 1.30.6 - for CVE-2026-15176, CVE-2026-93479, CVE-2026-95101, CVE-2026-97629, CVE-2026-97205
 - Upgrade njs to 1.0.2 for CVE-2026-101025, CVE-2026-101019
