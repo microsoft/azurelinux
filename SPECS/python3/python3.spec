@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
 Patch1:         remove-compromised-wheel-ca-roots.patch
+Patch2:         CVE-2026-19553.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -246,6 +247,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Nov 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.12.16-2
+- Patch for CVE-2026-19553
+
 * Mon Oct 26 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.16-1
 - Upgrade to 3.12.16 for CVE-2026-12345, CVE-2026-114583, CVE-2024-3220
 
