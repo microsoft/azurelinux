@@ -1,0 +1,26 @@
+From: Tobias Brick <tobiasb@microsoft.com>
+Subject: [PATCH] tests: temporarily omit thread-pool-slow
+
+The slow thread-pool test intermittently hangs in Azure Linux builds.
+Enable the rest of the suite while the proposed idle-thread shutdown fix
+awaits upstream acceptance. Remove this exclusion when the fix is adopted.
+
+https://gitlab.gnome.org/GNOME/glib/-/merge_requests/5484
+https://dev.azure.com/mariner-org/mariner/_workitems/edit/24867
+
+Upstream-Status: Inappropriate [temporary downstream test exclusion]
+---
+ glib/tests/meson.build | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/glib/tests/meson.build b/glib/tests/meson.build
+--- a/glib/tests/meson.build
++++ b/glib/tests/meson.build
+@@ -169,7 +169,6 @@
+   'thread' : {},
+   'thread-deprecated' : {},
+   'thread-pool' : {},
+-  'thread-pool-slow' : {'suite' : ['slow']},
+   'timeout' : {},
+   'timer' : {},
+   'tree' : {},
