@@ -16,7 +16,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        24.22.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -151,9 +151,12 @@ for FILE in .gitmodules .gitignore .npmignore .travis.yml \*.py[co]; do
 done
 
 # Install the full-icu data files
+# Use the copy shipped in the Node.js tarball rather than the stock ICU
+# release: Node refreshes its tz data between ICU releases, and the stock
+# file would override the newer tz data built into the node binary.
 mkdir -p %{buildroot}%{icudatadir}
 %if 0%{?little_endian}
-unzip -d %{buildroot}%{icudatadir} %{SOURCE2} icudt%{icu_major}l.dat
+bzip2 -dc deps/icu-small/source/data/in/icudt%{icu_major}l.dat.bz2 > %{buildroot}%{icudatadir}/icudt%{icu_major}l.dat
 %else
 unzip -d %{buildroot}%{icudatadir} %{SOURCE1} icudt%{icu_major}b.dat
 %endif
@@ -193,6 +196,10 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Tue Nov 17 2026 Kanishk Bansal <kanbansal@microsoft.com> - 24.22.3-2
+- Ship the ICU data file bundled in the Node.js tarball in full-i18n instead of
+  the stock ICU 78.3 one, so installing full-i18n no longer rolls tz back to 2026a
+
 * Wed Nov 11 2026 Kanishk Bansal <kanbansal@microsoft.com> - 24.22.3-1
 - Upgrade to 24.22.3 for CVE-2026-123863, CVE-2026-123864, CVE-2026-123865, 
   CVE-2026-123866, CVE-2026-123872, CVE-2026-123874, CVE-2026-126051,
