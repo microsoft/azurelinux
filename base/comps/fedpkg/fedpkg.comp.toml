@@ -1,0 +1,7 @@
+[components.fedpkg]
+
+[[components.fedpkg.overlays]]
+description = "Use Azure Linux's RPM macros instead of Fedora's macro package."
+type = "spec-search-replace"
+regex = '^Requires:\s+redhat-rpm-config$'
+replacement = 'Requires:       azurelinux-rpm-config'
