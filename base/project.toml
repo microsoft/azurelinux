@@ -1,5 +1,5 @@
 #
-# Base project
+# Base project configuration
 #
 
 includes = ["upstream-commits/*.toml", "comps/components.toml", "images/images.toml", "images/images.tests.toml"]
