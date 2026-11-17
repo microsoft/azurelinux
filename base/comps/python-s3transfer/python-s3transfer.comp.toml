@@ -1,0 +1,4 @@
+# Pin to Fedora f43 python-s3transfer-0.19.3-1 (FEDORA-2026-1f40f6b868).
+# https://src.fedoraproject.org/rpms/python-s3transfer/c/1f34774e9b5ee2b736a4e46dcbe71ace610b3eb6
+[components.python-s3transfer]
+spec = { type = "upstream", upstream-commit = "1f34774e9b5ee2b736a4e46dcbe71ace610b3eb6" }
