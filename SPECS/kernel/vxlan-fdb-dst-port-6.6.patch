@@ -1,0 +1,625 @@
+From: Jack Ma <jack4it@gmail.com>
+Subject: [PATCH] Backport VXLAN FDB nexthop UDP destination ports to 6.6
+
+Allow VXLAN FDB nexthops sharing an underlay IP to select different UDP
+destination ports. Nexthops without an explicit port retain the device default.
+
+Upstream series:
+https://lore.kernel.org/r/20260724-b4-vxlan-fdb-port-v5-0-cd1c6aeee058@gmail.com/
+
+Upstream: 53531e6a644a48c2d5a9423f084ae4e91ec6019a
+Upstream: 951085f82873dc53a62181499a7a7f77b70f9343
+Upstream: 992965451db727a15988931655a825c5e0312edb
+Upstream: 2c9fb925c2ccc6ee475134840cff6c6b73851730
+
+The 6.6 adaptation reserves upstream attribute IDs 14-17 to keep NHA_DST_PORT
+at 18, accepts zero-valued operation flags on legacy GET requests, and uses
+TC counters for the selftests without backporting nexthop statistics.
+Includes IPv4/IPv6 destination-port, ECMP, fallback, learning and proxy coverage.
+
+Original feature author: Jack Ma <jack4it@gmail.com>
+Original VXLAN selftest foundation author: Ido Schimmel <idosch@nvidia.com>
+Original feature backport: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+
+--- a/include/net/nexthop.h
++++ b/include/net/nexthop.h
+@@ -28,6 +28,7 @@
+ 	u8		nh_protocol;
+ 	u8		nh_blackhole;
+ 	u8		nh_fdb;
++	__be16		nh_dst_port;
+ 	u32		nh_flags;
+ 
+ 	int		nh_ifindex;
+@@ -61,6 +62,7 @@
+ 	u8			family;
+ 	bool			reject_nh;
+ 	bool			fdb_nh;
++	__be16			dst_port;
+ 
+ 	union {
+ 		struct fib_nh_common	fib_nhc;
+@@ -542,7 +544,8 @@
+ }
+ 
+ static inline struct fib_nh_common *nexthop_path_fdb_result(struct nexthop *nh,
+-							    int hash)
++							    int hash,
++							    __be16 *dst_port)
+ {
+ 	struct nh_info *nhi;
+ 	struct nexthop *nhp;
+@@ -551,6 +554,7 @@
+ 	if (unlikely(!nhp))
+ 		return NULL;
+ 	nhi = rcu_dereference(nhp->nh_info);
++	*dst_port = nhi->dst_port;
+ 	return &nhi->fib_nhc;
+ }
+ #endif
+--- a/include/net/vxlan.h
++++ b/include/net/vxlan.h
+@@ -560,8 +560,9 @@
+ 					    struct vxlan_rdst *rdst)
+ {
+ 	struct fib_nh_common *nhc;
+-
+-	nhc = nexthop_path_fdb_result(nh, hash >> 1);
++	__be16 dst_port = 0;
++
++	nhc = nexthop_path_fdb_result(nh, hash >> 1, &dst_port);
+ 	if (unlikely(!nhc))
+ 		return false;
+ 
+@@ -576,6 +577,8 @@
+ 		break;
+ 	}
+ 
++	rdst->remote_port = dst_port;
++
+ 	return true;
+ }
+ 
+--- a/include/uapi/linux/nexthop.h
++++ b/include/uapi/linux/nexthop.h
+@@ -65,6 +65,15 @@
+ 	/* nested; nexthop bucket attributes */
+ 	NHA_RES_BUCKET,
+ 
++	/* Reserve upstream IDs; these features are not backported. */
++	NHA_OP_FLAGS,
++	NHA_GROUP_STATS,
++	NHA_HW_STATS_ENABLE,
++	NHA_HW_STATS_USED,
++
++	/* be16; UDP destination port for an fdb nexthop (e.g. VXLAN) */
++	NHA_DST_PORT,
++
+ 	__NHA_MAX,
+ };
+ 
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -36,11 +36,13 @@
+ 	[NHA_ENCAP_TYPE]	= { .type = NLA_U16 },
+ 	[NHA_ENCAP]		= { .type = NLA_NESTED },
+ 	[NHA_FDB]		= { .type = NLA_FLAG },
++	[NHA_DST_PORT]		= NLA_POLICY_MIN(NLA_BE16, 1),
+ 	[NHA_RES_GROUP]		= { .type = NLA_NESTED },
+ };
+ 
+ static const struct nla_policy rtm_nh_policy_get[] = {
+ 	[NHA_ID]		= { .type = NLA_U32 },
++	[NHA_OP_FLAGS]		= NLA_POLICY_MAX(NLA_U32, 0),
+ };
+ 
+ static const struct nla_policy rtm_nh_policy_dump[] = {
+@@ -737,6 +739,9 @@
+ 	} else if (nhi->fdb_nh) {
+ 		if (nla_put_flag(skb, NHA_FDB))
+ 			goto nla_put_failure;
++		if (nhi->dst_port &&
++		    nla_put_be16(skb, NHA_DST_PORT, nhi->dst_port))
++			goto nla_put_failure;
+ 	} else {
+ 		const struct net_device *dev;
+ 
+@@ -821,6 +826,9 @@
+ 			sz += nla_total_size(sizeof(const struct in6_addr));
+ 		break;
+ 	}
++
++	if (nhi->dst_port)
++		sz += nla_total_size(2);	/* NHA_DST_PORT */
+ 
+ 	if (nhi->fib_nhc.nhc_lwtstate) {
+ 		sz += lwtunnel_get_encap_size(nhi->fib_nhc.nhc_lwtstate);
+@@ -2648,8 +2656,10 @@
+ 	nhi->family = cfg->nh_family;
+ 	nhi->fib_nhc.nhc_scope = RT_SCOPE_LINK;
+ 
+-	if (cfg->nh_fdb)
++	if (cfg->nh_fdb) {
+ 		nhi->fdb_nh = 1;
++		nhi->dst_port = cfg->nh_dst_port;
++	}
+ 
+ 	if (cfg->nh_blackhole) {
+ 		nhi->reject_nh = 1;
+@@ -2848,6 +2858,15 @@
+ 			goto out;
+ 		}
+ 		cfg->nh_fdb = nla_get_flag(tb[NHA_FDB]);
++	}
++
++	if (tb[NHA_DST_PORT]) {
++		if (!tb[NHA_FDB] || !tb[NHA_GATEWAY]) {
++			NL_SET_ERR_MSG(extack,
++				       "Destination port can only be set on fdb nexthops that have a gateway");
++			goto out;
++		}
++		cfg->nh_dst_port = nla_get_be16(tb[NHA_DST_PORT]);
+ 	}
+ 
+ 	if (tb[NHA_GROUP]) {
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -89,6 +89,7 @@
+ TEST_GEN_PROGS += bind_timewait
+ TEST_PROGS += test_vxlan_mdb.sh
+ TEST_PROGS += test_bridge_neigh_suppress.sh
++TEST_PROGS += test_vxlan_nh.sh
+ TEST_PROGS += test_vxlan_nolocalbypass.sh
+ TEST_PROGS += test_bridge_backup_port.sh
+ TEST_PROGS += ipv6_route_update_soft_lockup.sh
+--- a/tools/testing/selftests/net/fib_nexthops.sh
++++ b/tools/testing/selftests/net/fib_nexthops.sh
+@@ -29,6 +29,7 @@
+ 	ipv4_large_res_grp
+ 	ipv4_compat_mode
+ 	ipv4_fdb_grp_fcnal
++	ipv4_fdb_port_fcnal
+ 	ipv4_mpath_select
+ 	ipv4_torture
+ 	ipv4_res_torture
+@@ -43,6 +44,7 @@
+ 	ipv6_large_res_grp
+ 	ipv6_compat_mode
+ 	ipv6_fdb_grp_fcnal
++	ipv6_fdb_port_fcnal
+ 	ipv6_mpath_select
+ 	ipv6_torture
+ 	ipv6_res_torture
+@@ -429,6 +431,15 @@
+ 	fi
+ }
+ 
++check_nexthop_fdb_port_support()
++{
++	$IP nexthop help 2>&1 | grep -q "dst_port"
++	if [ $? -ne 0 ]; then
++		echo "SKIP: iproute2 too old, missing nexthop dst_port support"
++		return $ksft_skip
++	fi
++}
++
+ check_nexthop_res_support()
+ {
+ 	$IP nexthop help 2>&1 | grep -q resilient
+@@ -532,6 +543,48 @@
+ 	$IP link del dev vx10
+ }
+ 
++ipv6_fdb_port_fcnal()
++{
++	echo
++	echo "IPv6 fdb nexthop dst_port functional"
++	echo "------------------------------------"
++
++	check_nexthop_fdb_port_support
++	if [ $? -eq $ksft_skip ]; then
++		return $ksft_skip
++	fi
++
++	# NHA_DST_PORT: optional per-nexthop VXLAN destination UDP port,
++	# letting an fdb nexthop group balance a flow across legs that share
++	# an underlay IP but listen on different UDP ports.
++	run_cmd "$IP nexthop add id 80 via 2001:db8:91::2 fdb dst_port 4790"
++	check_nexthop "id 80" \
++		"id 80 via 2001:db8:91::2 scope link fdb dst_port 4790"
++	log_test $? 0 "Fdb nexthop with dst_port"
++
++	run_cmd "$IP -s nexthop get id 80"
++	log_test $? 2 "Fdb nexthop statistics remain unsupported"
++
++	run_cmd "$IP nexthop add id 81 via 2001:db8:91::2 dev veth1 dst_port 4790"
++	log_test $? 2 "Non-Fdb nexthop with dst_port"
++
++	run_cmd "$IP nexthop add id 81 fdb dst_port 4790"
++	log_test $? 2 "Fdb nexthop with dst_port but no gateway"
++
++	run_cmd "$IP nexthop add id 81 via 2001:db8:91::2 fdb dst_port 0"
++	log_test $? 2 "Fdb nexthop with dst_port 0"
++
++	run_cmd "$IP nexthop add id 82 via 2001:db8:91::2 fdb dst_port 4789"
++	run_cmd "$IP nexthop add id 83 via 2001:db8:91::2 fdb dst_port 5789"
++	run_cmd "$IP nexthop add id 106 group 82/83 fdb"
++	check_nexthop "id 106" "id 106 group 82/83 fdb"
++	log_test $? 0 "Fdb nexthop group with legs differing in dst_port"
++
++	run_cmd "$IP nexthop add id 84 via 2001:db8:91::2 fdb"
++	check_nexthop "id 84" "id 84 via 2001:db8:91::2 scope link fdb"
++	log_test $? 0 "Fdb nexthop without dst_port omits dst_port"
++}
++
+ ipv4_fdb_grp_fcnal()
+ {
+ 	local rc
+@@ -624,6 +677,48 @@
+ 	log_test $? 254 "Fdb entry after deleting a nexthop group"
+ 
+ 	$IP link del dev vx10
++}
++
++ipv4_fdb_port_fcnal()
++{
++	echo
++	echo "IPv4 fdb nexthop dst_port functional"
++	echo "------------------------------------"
++
++	check_nexthop_fdb_port_support
++	if [ $? -eq $ksft_skip ]; then
++		return $ksft_skip
++	fi
++
++	# NHA_DST_PORT: optional per-nexthop VXLAN destination UDP port,
++	# letting an fdb nexthop group balance a flow across legs that share
++	# an underlay IP but listen on different UDP ports.
++	run_cmd "$IP nexthop add id 30 via 172.16.1.2 fdb dst_port 4790"
++	check_nexthop "id 30" \
++		"id 30 via 172.16.1.2 scope link fdb dst_port 4790"
++	log_test $? 0 "Fdb nexthop with dst_port"
++
++	run_cmd "$IP -s nexthop get id 30"
++	log_test $? 2 "Fdb nexthop statistics remain unsupported"
++
++	run_cmd "$IP nexthop add id 31 via 172.16.1.2 dev veth1 dst_port 4790"
++	log_test $? 2 "Non-Fdb nexthop with dst_port"
++
++	run_cmd "$IP nexthop add id 31 fdb dst_port 4790"
++	log_test $? 2 "Fdb nexthop with dst_port but no gateway"
++
++	run_cmd "$IP nexthop add id 31 via 172.16.1.2 fdb dst_port 0"
++	log_test $? 2 "Fdb nexthop with dst_port 0"
++
++	run_cmd "$IP nexthop add id 32 via 172.16.1.2 fdb dst_port 4789"
++	run_cmd "$IP nexthop add id 33 via 172.16.1.2 fdb dst_port 5789"
++	run_cmd "$IP nexthop add id 105 group 32/33 fdb"
++	check_nexthop "id 105" "id 105 group 32/33 fdb"
++	log_test $? 0 "Fdb nexthop group with legs differing in dst_port"
++
++	run_cmd "$IP nexthop add id 34 via 172.16.1.2 fdb"
++	check_nexthop "id 34" "id 34 via 172.16.1.2 scope link fdb"
++	log_test $? 0 "Fdb nexthop without dst_port omits dst_port"
+ }
+ 
+ ipv4_mpath_select()
+diff --git a/tools/testing/selftests/net/test_vxlan_nh.sh b/tools/testing/selftests/net/test_vxlan_nh.sh
+new file mode 100755
+--- /dev/null
++++ b/tools/testing/selftests/net/test_vxlan_nh.sh
+@@ -0,0 +1,314 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++source lib.sh
++TESTS="
++	basic_tx_ipv4
++	basic_tx_ipv6
++	learning
++	proxy_ipv4
++	proxy_ipv6
++"
++VERBOSE=0
++PAUSE_ON_FAIL=no
++ret=0
++
++################################################################################
++# Utilities
++
++check_err()
++{
++	if [ "$1" -ne 0 ]; then
++		RET=1
++		echo "ERROR: $2"
++	fi
++}
++
++log_test()
++{
++	if [ "$RET" -eq 0 ]; then
++		printf "TEST: %-60s  [ OK ]\n" "$1"
++	else
++		ret=1
++		printf "TEST: %-60s  [FAIL]\n" "$1"
++		if [ "$PAUSE_ON_FAIL" = yes ]; then
++			read -r -p "Hit enter to continue, 'q' to quit: " answer
++			[ "$answer" = q ] && exit 1
++		fi
++	fi
++}
++
++run_cmd()
++{
++	local cmd="$1"
++	local out
++	local rc
++
++	if [ "$VERBOSE" = "1" ]; then
++		echo "COMMAND: $cmd"
++	fi
++
++	out=$(eval "$cmd" 2>&1)
++	rc=$?
++	if { [ "$VERBOSE" -eq 1 ] || [ "$rc" -ne 0 ]; } &&
++	   [ -n "$out" ]; then
++		echo "    $out"
++	fi
++	check_err "$rc" "Command failed: $cmd"
++
++	return $rc
++}
++
++################################################################################
++# Tests
++
++tc_packets_get()
++{
++	tc -n "$ns1" -j -s filter show dev dummy1 egress |
++		jq -er --argjson handle "$1" \
++			'.[] | select(.options.handle == $handle) |
++			 .options.actions[0].stats.packets'
++}
++
++tc_check_packets()
++{
++	local packets
++
++	packets=$(tc_packets_get "$1") || return 1
++	case "$2" in
++	-eq) [ "$packets" -eq "$3" ];;
++	-gt) [ "$packets" -gt "$3" ];;
++	*) echo "ERROR: Invalid packet-counter comparison: $2"; return 1;;
++	esac
++}
++
++basic_tx_common()
++{
++	local af_str=$1; shift
++	local proto=$1; shift
++	local local_addr=$1; shift
++	local plen=$1; shift
++	local remote_addr=$1; shift
++	local port
++	local default_packets
++	local override_packets
++
++	RET=0
++
++	# Verify outer UDP ports without requiring nexthop group statistics.
++
++	run_cmd "ip -n $ns1 link add name dummy1 up type dummy"
++	run_cmd "ip -n $ns1 route add $remote_addr/$plen dev dummy1"
++	run_cmd "tc -n $ns1 qdisc add dev dummy1 clsact"
++	run_cmd "tc -n $ns1 filter add dev dummy1 egress proto $proto pref 1 handle 101 flower ip_proto udp dst_ip $remote_addr dst_port 4789 action pass"
++
++	run_cmd "ip -n $ns1 address add $local_addr/$plen dev lo"
++
++	run_cmd "ip -n $ns1 nexthop add id 1 via $remote_addr fdb"
++	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
++
++	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local $local_addr dstport 4789"
++	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10"
++
++	run_cmd "ip netns exec $ns1 mausezahn vx0 -a own -b 00:11:22:33:44:55 -c 1 -q"
++
++	busywait "$BUSYWAIT_TIMEOUT" tc_check_packets 101 -eq 1
++	check_err $? "tc filter stats did not increase"
++
++	# Add a second FDB nexthop group whose nexthop carries a per-nexthop
++	# destination port (NHA_DST_PORT) that differs from the VXLAN device
++	# default. Matching outer traffic must egress with that port, so a
++	# separate flower filter keyed on the new port catches it.
++	run_cmd "tc -n $ns1 filter add dev dummy1 egress proto $proto \
++		pref 1 handle 102 flower ip_proto udp dst_ip $remote_addr \
++		dst_port 4790 action pass"
++
++	run_cmd "ip -n $ns1 nexthop add id 2 via $remote_addr fdb dst_port 4790"
++	run_cmd "ip -n $ns1 nexthop add id 20 group 2 fdb"
++
++	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:66 dev vx0 \
++		self static nhid 20"
++
++	run_cmd "ip netns exec $ns1 mausezahn vx0 -a own \
++		-b 00:11:22:33:44:66 -c 1 -q"
++
++	busywait "$BUSYWAIT_TIMEOUT" tc_check_packets 102 -eq 1
++	check_err $? "tc filter stats did not increase (with port)"
++
++	# Both members share the underlay IP and VNI. Vary the inner flow.
++	run_cmd "ip -n $ns1 nexthop add id 30 group 1/2 fdb"
++	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:77 dev vx0 self static nhid 30"
++	for port in $(seq 1024 1087); do
++		run_cmd "ip netns exec $ns1 mausezahn vx0 -a own \
++			-b 00:11:22:33:44:77 -A 198.51.100.1 -B 198.51.100.2 \
++			-t udp 'sp=$port,dp=9' -c 1 -q"
++	done
++	busywait "$BUSYWAIT_TIMEOUT" tc_check_packets 101 -gt 1
++	check_err $? "ECMP did not use the device-default port"
++	busywait "$BUSYWAIT_TIMEOUT" tc_check_packets 102 -gt 1
++	check_err $? "ECMP did not use the per-nexthop port"
++
++	default_packets=$(tc_packets_get 101)
++	check_err $? "Could not read device-default port counter"
++	override_packets=$(tc_packets_get 102)
++	check_err $? "Could not read per-nexthop port counter"
++
++	run_cmd "tc -n $ns1 filter add dev dummy1 egress proto $proto \
++		pref 1 handle 103 flower ip_proto udp dst_ip $remote_addr \
++		dst_port 5790 action pass"
++	run_cmd "ip -n $ns1 nexthop replace id 2 via $remote_addr fdb dst_port 5790"
++	run_cmd "ip netns exec $ns1 mausezahn vx0 -a own \
++		-b 00:11:22:33:44:66 -c 1 -q"
++	busywait "$BUSYWAIT_TIMEOUT" tc_check_packets 103 -eq 1
++	check_err $? "Nexthop replacement did not change the outer UDP port"
++	tc_check_packets 102 -eq "$override_packets"
++	check_err $? "Traffic still used the old per-nexthop port"
++
++	run_cmd "ip -n $ns1 nexthop replace id 2 via $remote_addr fdb"
++	run_cmd "ip netns exec $ns1 mausezahn vx0 -a own \
++		-b 00:11:22:33:44:66 -c 1 -q"
++	busywait "$BUSYWAIT_TIMEOUT" tc_check_packets 101 -eq "$((default_packets + 1))"
++	check_err $? "Removing dst_port did not restore the device-default port"
++
++	log_test "VXLAN FDB nexthop: $af_str basic Tx"
++}
++
++basic_tx_ipv4()
++{
++	basic_tx_common "IPv4" ipv4 192.0.2.1 32 192.0.2.2
++}
++
++basic_tx_ipv6()
++{
++	basic_tx_common "IPv6" ipv6 2001:db8:1::1 128 2001:db8:1::2
++}
++
++learning()
++{
++	RET=0
++
++	# When learning is enabled on the VXLAN device, an incoming packet
++	# might try to refresh an FDB entry that points to an FDB nexthop group
++	# instead of an ordinary remote destination. Check that the kernel does
++	# not crash in this situation.
++
++	run_cmd "ip -n $ns1 address add 192.0.2.1/32 dev lo"
++	run_cmd "ip -n $ns1 address add 192.0.2.2/32 dev lo"
++
++	run_cmd "ip -n $ns1 nexthop add id 1 via 192.0.2.3 fdb"
++	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
++
++	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local 192.0.2.1 dstport 12345 localbypass"
++	run_cmd "ip -n $ns1 link add name vx1 up type vxlan id 10020 local 192.0.2.2 dstport 54321 learning"
++
++	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static dst 192.0.2.2 port 54321 vni 10020"
++	run_cmd "bridge -n $ns1 fdb add 00:aa:bb:cc:dd:ee dev vx1 self static nhid 10"
++
++	run_cmd "ip netns exec $ns1 mausezahn vx0 -a 00:aa:bb:cc:dd:ee -b 00:11:22:33:44:55 -c 1 -q"
++
++	log_test "VXLAN FDB nexthop: learning"
++}
++
++proxy_common()
++{
++	local af_str=$1; shift
++	local local_addr=$1; shift
++	local plen=$1; shift
++	local remote_addr=$1; shift
++	local neigh_addr=$1; shift
++	local ping_cmd=$1; shift
++
++	RET=0
++
++	# When the "proxy" option is enabled on the VXLAN device, the device
++	# will suppress ARP requests and IPv6 Neighbor Solicitation messages if
++	# it is able to reply on behalf of the remote host. That is, if a
++	# matching and valid neighbor entry is configured on the VXLAN device
++	# whose MAC address is not behind the "any" remote (0.0.0.0 / ::). The
++	# FDB entry for the neighbor's MAC address might point to an FDB
++	# nexthop group instead of an ordinary remote destination. Check that
++	# the kernel does not crash in this situation.
++
++	run_cmd "ip -n $ns1 address add $local_addr/$plen dev lo"
++
++	run_cmd "ip -n $ns1 nexthop add id 1 via $remote_addr fdb"
++	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
++
++	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local $local_addr dstport 4789 proxy"
++
++	run_cmd "ip -n $ns1 neigh add $neigh_addr lladdr 00:11:22:33:44:55 nud perm dev vx0"
++
++	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10"
++
++	run_cmd "ip netns exec $ns1 $ping_cmd"
++
++	log_test "VXLAN FDB nexthop: $af_str proxy"
++}
++
++proxy_ipv4()
++{
++	proxy_common "IPv4" 192.0.2.1 32 192.0.2.2 192.0.2.3 \
++		"arping -b -c 1 -s 192.0.2.1 -I vx0 192.0.2.3"
++}
++
++proxy_ipv6()
++{
++	proxy_common "IPv6" 2001:db8:1::1 128 2001:db8:1::2 2001:db8:1::3 \
++		"ndisc6 -r 1 -s 2001:db8:1::1 -w 1 2001:db8:1::3 vx0"
++}
++
++################################################################################
++# Usage
++
++usage()
++{
++	cat <<EOF
++usage: ${0##*/} OPTS
++
++        -t <test>   Test(s) to run (default: all)
++                    (options: $TESTS)
++        -p          Pause on fail
++        -v          Verbose mode (show commands and output)
++EOF
++}
++
++################################################################################
++# Main
++
++while getopts ":t:pvh" opt; do
++	case $opt in
++		t) TESTS=$OPTARG;;
++		p) PAUSE_ON_FAIL=yes;;
++		v) VERBOSE=$((VERBOSE + 1));;
++		h) usage; exit 0;;
++		*) usage; exit 1;;
++	esac
++done
++
++if [ "$(id -u)" -ne 0 ]; then
++	echo "SKIP: Need root privileges"
++	exit "$ksft_skip"
++fi
++
++for cmd in ip bridge tc mausezahn arping ndisc6 jq; do
++	if ! command -v "$cmd" > /dev/null 2>&1; then
++		echo "SKIP: Missing command: $cmd"
++		exit "$ksft_skip"
++	fi
++done
++
++if ! ip nexthop help 2>&1 | grep -q "dst_port"; then
++	echo "SKIP: iproute2 ip too old, missing nexthop dst_port support"
++	exit "$ksft_skip"
++fi
++
++trap cleanup_all_ns EXIT
++
++for t in $TESTS
++do
++	setup_ns ns1 || exit "$ksft_skip"
++	$t
++	cleanup_all_ns
++done
++
++exit "$ret"

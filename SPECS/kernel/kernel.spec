@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.161.1
-Release:        1%{?dist}
+Release:        1.vxlan1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,6 +47,7 @@ Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         btrfs-ipe.patch
+Patch2:         vxlan-fdb-dst-port-6.6.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -440,6 +441,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Nov 17 2026 Rachel Menge <10325590+rlmenge@users.noreply.github.com> - 6.6.161.1-1.vxlan1
+- Test backport of VXLAN FDB nexthop UDP destination-port support.
+
 * Wed Nov 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.161.1-1
 - Auto-upgrade to 6.6.161.1
 
