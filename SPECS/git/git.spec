@@ -16,6 +16,8 @@ Source0:        https://github.com/git/git/archive/refs/tags/v%{version}.tar.gz#
 # Below patch not needed for Git 2.46.0, already includes this fix.
 Patch0:         Ptest-fix-git-config-syntax.patch
 Patch1:         CVE-2026-105437.patch
+Patch2:         CVE-2026-111760.patch
+Patch3:         CVE-2026-114466.patch
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
@@ -178,7 +180,7 @@ fi
 
 %changelog
 * Wed Nov 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.45.4-4
-- Patch for CVE-2026-105437
+- Patch for CVE-2026-105437, CVE-2026-114466, CVE-2026-111760
 
 * Wed Jul 23 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.4-3
 - Fix subtree subpackage
