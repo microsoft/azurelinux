@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Advance the manual release for the explicit Java filesystem build dependency"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?release_override}%{?dist}"
