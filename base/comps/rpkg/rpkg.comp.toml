@@ -1,0 +1,7 @@
+[components.rpkg]
+
+[[components.rpkg.overlays]]
+description = "Use Azure Linux's RPM macros for both Python subpackages."
+type = "spec-search-replace"
+regex = '^Requires:\s+redhat-rpm-config$'
+replacement = 'Requires:       azurelinux-rpm-config'
