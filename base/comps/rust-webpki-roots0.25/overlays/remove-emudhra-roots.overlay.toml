@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove eMudhra emSign roots from the crate's root certificate set"
+type = "patch-add"
+source = "../remove-emudhra-roots.patch"
