@@ -1,0 +1,30 @@
+From e8e30dd6fbe38b3a36a90f9d306a4689efefe694 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 16 Jun 2022 15:57:58 -0700
+Subject: [PATCH] feat: really support not receiving refresh token
+
+The previous attempt would still crash if the key was not in the
+dict at all (as seems to be the case with recent mediawiki), so
+we need to handle that too.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ openidc_client/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openidc_client/__init__.py b/openidc_client/__init__.py
+index d8ff31d..ff8e817 100644
+--- a/openidc_client/__init__.py
++++ b/openidc_client/__init__.py
+@@ -405,7 +405,7 @@ class OpenIDCClient(object):
+         :returns: True if the token was succesfully refreshed, False otherwise
+         """
+         oldtoken = self._cache[uuid]
+-        if not oldtoken['refresh_token']:
++        if not oldtoken.get('refresh_token'):
+             self.debug("Unable to refresh: no refresh token present")
+             return False
+         self.debug('Refreshing token %s', uuid)
+-- 
+2.36.1
+
