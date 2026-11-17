@@ -1,7 +1,7 @@
 Summary:        DNS proxy with integrated DHCP server
 Name:           dnsmasq
 Version:        2.93
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 or GPLv3
 Group:          System Environment/Daemons
 URL:            https://www.thekelleys.org.uk/dnsmasq/
@@ -9,6 +9,9 @@ Source0:        https://www.thekelleys.org.uk/%{name}/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Patch0:         fix-missing-ioctl-SIOCGSTAMP-add-sockios-header-linux-5.2.patch
+Patch1:         CVE-2026-93006.patch
+Patch2:         CVE-2026-93008.patch
+Patch3:         CVE-2026-93009.patch
 
 BuildRequires:  kernel-headers
 
@@ -66,6 +69,9 @@ EOF
 %config  /usr/share/dnsmasq/trust-anchors.conf
 
 %changelog
+* Tue Nov 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.93-2
+- Patch for CVE-2026-93009, CVE-2026-93008, CVE-2026-93006
+
 * Sat Jun 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.93-1
 - Auto-upgrade to 2.93 - for CVE-2026-12969 & CVE-2026-12725
 
