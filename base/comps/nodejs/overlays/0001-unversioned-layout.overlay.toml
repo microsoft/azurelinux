@@ -1,0 +1,200 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Use nodejs for the source and binary package names"
+type = "spec-update-tag"
+tag = "Name"
+value = "nodejs"
+
+[[overlays]]
+description = "Continue the packaging release sequence after renaming the source package"
+type = "spec-update-tag"
+tag = "Release"
+value = "%autorelease -b 7"
+
+[[overlays]]
+description = "Use the standard Node.js data directory"
+type = "spec-search-replace"
+regex = '^%global nodejs_datadir\s+.*$'
+replacement = '%global nodejs_datadir %{_datarootdir}/nodejs'
+
+# Normalize upstream package references and ABI helper filenames before adding
+# the versioned compatibility aliases below.
+[[overlays]]
+description = "Use the package name for internal dependencies and ABI helpers"
+type = "spec-search-replace"
+regex = 'nodejs%\{node_version_major\}'
+replacement = '%{name}'
+
+[[overlays]]
+description = "Use the standard nodejs pkg-config name"
+type = "spec-search-replace"
+regex = 'nodejs-%\{node_version_major\}'
+replacement = '%{name}'
+
+[[overlays]]
+description = "Use the native node executable in checks"
+type = "spec-search-replace"
+section = "%check"
+regex = 'node-%\{node_version_major\}'
+replacement = 'node'
+
+[[overlays]]
+description = "Use the native npm executable in checks"
+type = "spec-search-replace"
+section = "%check"
+regex = 'npm-%\{node_version_major\}'
+replacement = 'npm'
+
+[[overlays]]
+description = "Leave native commands, modules, and manual pages in their standard locations"
+type = "spec-search-replace"
+section = "%install"
+regex = '^# === Adjustments to avoid conflict between parallel streams$'
+replacement = '%if 0'
+
+# No directory migration: upgrades from an installed nodejs24 layout may conflict.
+[[overlays]]
+description = "Keep the versioned module directory as an alias and install shared npm configuration"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    '%endif',
+    'ln -s node_modules "%{buildroot}%{nodejs_common_sitelib}_%{node_version_major}"',
+    'mkdir -p "%{buildroot}%{_sysconfdir}"',
+    'mkconfig <%{SOURCE5} >"%{buildroot}%{_sysconfdir}/npmrc"',
+]
+
+[[overlays]]
+description = "Keep compatibility with current and older versioned Node.js packages"
+type = "spec-prepend-lines"
+lines = [
+    '%define nodejs_versioned_compat() %{expand:\',
+    'Obsoletes: nodejs%{node_version_major}%{?1:-%{1}} <= %{node_evr}\',
+    'Provides: nodejs%{node_version_major}%{?1:-%{1}} = %{node_evr}\',
+    '}',
+]
+
+[[overlays]]
+description = "Replace the versioned runtime package"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+chrpath$'
+replacement = '''
+%nodejs_versioned_compat
+BuildRequires: chrpath'''
+
+[[overlays]]
+description = "Replace the versioned development package"
+type = "spec-append-lines"
+section = "%package"
+package = "devel"
+lines = ['%nodejs_versioned_compat devel']
+
+[[overlays]]
+description = "Replace the versioned library package"
+type = "spec-append-lines"
+section = "%package"
+package = "libs"
+lines = ['%nodejs_versioned_compat libs']
+
+[[overlays]]
+description = "Replace the versioned locale package"
+type = "spec-append-lines"
+section = "%package"
+package = "full-i18n"
+lines = ['%nodejs_versioned_compat full-i18n']
+
+[[overlays]]
+description = "Replace the versioned documentation package"
+type = "spec-append-lines"
+section = "%package"
+package = "docs"
+lines = ['%nodejs_versioned_compat docs']
+
+[[overlays]]
+description = "Keep npm capabilities and replace the versioned npm package"
+type = "spec-append-lines"
+section = "%package"
+package = "npm"
+lines = [
+    'Provides: npm = %{npm_evr}',
+    'Obsoletes: npm < 1:9',
+    'Obsoletes: nodejs%{node_version_major}-npm <= %{npm_evr}',
+    'Provides: nodejs%{node_version_major}-npm = %{npm_evr}',
+]
+
+[[overlays]]
+description = "Replace retired V8 development headers"
+type = "spec-append-lines"
+section = "%package"
+package = "v8-%{v8_version_major}.%{v8_version_minor}-devel"
+lines = ['Obsoletes: v8-12.4-devel < %{v8_evr}']
+
+[[overlays]]
+description = "Replace the stream-specific runtime manifest with native paths"
+type = "spec-remove-section"
+section = "%files"
+
+[[overlays]]
+description = "Replace the stream-specific npm manifest with native paths"
+type = "spec-remove-section"
+section = "%files"
+package = "npm"
+
+[[overlays]]
+description = "Own the native runtime, npm, manuals, and shared configuration"
+type = "spec-append-lines"
+section = "%files"
+package = "docs"
+lines = ['''
+%files
+%doc        README.md CHANGELOG.md GOVERNANCE.md onboarding.md
+%license    LICENSE
+%dir        %{nodejs_datadir}/
+%dir        %{nodejs_common_sitelib}/
+%{nodejs_common_sitelib}_%{node_version_major}
+%{_bindir}/node
+%{_mandir}/man1/node.1*
+
+%files npm
+%doc        deps/npm/README.md
+%license    deps/npm/LICENSE
+%dir        %{nodejs_common_sitelib}/
+%{_bindir}/npm
+%{_bindir}/npx
+%{_mandir}/man[157]/*
+%exclude    %{_mandir}/man1/node*.1*
+%{nodejs_common_sitelib}/npm/
+%config(noreplace) %{_sysconfdir}/npmrc
+%ghost      %{_sysconfdir}/npmignore
+''']
+
+[[overlays]]
+description = "Match the native ABI attribute macros to the unversioned attribute filename"
+type = "file-search-replace"
+file = "nodejs_abi.attr.in"
+regex = 'nodejs@NODEJS_VERSION_MAJOR@_native'
+replacement = 'nodejs_abi'
+
+[[overlays]]
+description = "Use the unversioned ABI helper name"
+type = "file-search-replace"
+file = "nodejs_abi.attr.in"
+regex = 'nodejs@NODEJS_VERSION_MAJOR@'
+replacement = 'nodejs'
+
+[[overlays]]
+description = "Generate native ABI requirements for common and compatibility module paths"
+type = "file-search-replace"
+file = "nodejs_abi.attr.in"
+regex = 'node_modules_@NODEJS_VERSION_MAJOR@'
+replacement = 'node_modules(_@NODEJS_VERSION_MAJOR@)?'
+
+[[overlays]]
+description = "Query the default runtime for its native module ABI"
+type = "file-search-replace"
+file = "nodejs_abi.req.in"
+regex = 'node-@NODEJS_VERSION_MAJOR@ -p process\.version\.modules'
+replacement = 'node -p process.versions.modules'

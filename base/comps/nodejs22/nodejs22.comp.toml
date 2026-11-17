@@ -1,3 +1,0 @@
-[components.nodejs22]
-# Release: %{nodejs_release}
-release = { calculation = "manual" }
