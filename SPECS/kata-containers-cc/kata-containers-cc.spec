@@ -47,6 +47,7 @@ Patch28:      CVE-2026-116591.patch
 Patch29:      CVE-2026-95838.patch
 Patch30:      CVE-2026-123609.patch
 Patch31:      CVE-2026-123613.patch
+Patch32:      CVE-2026-123611.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -187,7 +188,7 @@ fi
 
 %changelog
 * Fri Nov 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-25
-- Patch for CVE-2026-123613, CVE-2026-123609
+- Patch for CVE-2026-123613, CVE-2026-123609, CVE-2026-123611
 
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-24
 - Patch for CVE-2026-95838, CVE-2026-116591
