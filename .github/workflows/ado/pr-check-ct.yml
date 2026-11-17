@@ -38,9 +38,8 @@
 #   2. Federated identity credentials on the app registrations for the ADO
 #      service connections (issuer: https://vstoken.dev.azure.com/<org-id>,
 #      subject: sc://<org>/<project>/<service-connection-name>).
-#   3. DEV, STAGING, and PROD ARM service connections in ADO project settings
-#      using Workload Identity Federation (manual). DEVCS reuses the DEV
-#      service connection because DevCS shares the DEV Entra API app.
+#   3. DEVCS, STAGING, and PROD ARM service connections in ADO project settings
+#      using Workload Identity Federation (manual).
 #   4. REVIEWER-GATED trigger (configured in ADO, not here): wire this pipeline
 #      as a build-validation check that does NOT automatically queue on every
 #      PR push (e.g. an optional/manual build-validation policy, or a manual
@@ -99,13 +98,12 @@ extends:
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           deployments:
             # DevCS (Dev Corp-Staging) uploads sources only and is non-blocking
-            # while the environment settles. It intentionally reuses the DEV
-            # service connection: DevCS shares the DEV Entra API app.
+            # while the environment settles.
             DEVCS:
               apiAudience: $(ApiAudienceDevCS)
               apiBaseAFDUrl: $(ApiBaseAFDUrlDevCS)
               continueOnError: true
-              serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
+              serviceConnection: CT-Endpoints-Access-ServiceConnection-DEVCS
               skipPackageBuilds: true
             STAGING:
               apiAudience: $(ApiAudienceStaging)
