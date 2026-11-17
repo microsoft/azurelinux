@@ -214,7 +214,7 @@
 
 Name:           %{package_name}
 Version:        %{IPA_VERSION}
-Release:        3%{?rc_version:.%rc_version}%{?dist}
+Release: 4%{?rc_version:.%rc_version}%{?dist}
 Summary:        The Identity, Policy and Audit system
 
 License:        GPL-3.0-or-later
@@ -311,7 +311,7 @@ BuildRequires:  libsss_certmap-devel
 BuildRequires:  libsss_nss_idmap-devel >= %{sssd_version}
 %if 0%{?fedora} >= 41 || 0%{?rhel} >= 10
 # Do not use nodejs22 on fedora < 41, https://pagure.io/freeipa/issue/9643
-BuildRequires: nodejs(abi) == 127, /usr/bin/node, /usr/bin/npm
+BuildRequires: nodejs(abi) == 137, /usr/bin/node, /usr/bin/npm
 %elif 0%{?fedora} >= 39
 # Do not use nodejs20 on fedora < 39, https://pagure.io/freeipa/issue/9374
 BuildRequires:  nodejs(abi) < 127

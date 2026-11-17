@@ -1,0 +1,15 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Build the web UI with ABI 137 from Azure Linux's default Node.js 24 runtime"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+nodejs\(abi\) == 127, /usr/bin/node, /usr/bin/npm$'
+replacement = "BuildRequires: nodejs(abi) == 137, /usr/bin/node, /usr/bin/npm"
+
+[[overlays]]
+description = "Advance the manually managed release for the Node.js 24 rebuild"
+type = "spec-update-tag"
+tag = "Release"
+value = "4%{?rc_version:.%rc_version}%{?dist}"
