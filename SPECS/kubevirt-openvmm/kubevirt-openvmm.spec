@@ -29,6 +29,8 @@ Patch4:         CVE-2026-78659.patch
 Patch5:         CVE-2026-78660.patch
 Patch6:         CVE-2026-78663.patch
 Patch7:         CVE-2026-97032.patch
+Patch8:         CVE-2026-78669.patch
+Patch9:         CVE-2026-83530.patch
 %ifarch x86_64
 Source1:        https://github.com/microsoft/mu_msvm/releases/download/v%{msvm_version}/firmware-RELEASE-X64-VS2022.tar.gz
 Source2:        x64.json
@@ -306,7 +308,7 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 
 %changelog
 * Sat Nov 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.0-2
-- Patch for CVE-2026-97032, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-56852, CVE-2026-39821, CVE-2026-33814, CVE-2026-13622
+- Patch for CVE-2026-97032, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-56852, CVE-2026-39821, CVE-2026-33814, CVE-2026-13622, CVE-2026-83530, CVE-2026-78669
 
 * Mon Oct 26 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.9.0-1
 - License verified
