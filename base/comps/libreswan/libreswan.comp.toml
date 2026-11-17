@@ -1,4 +1,4 @@
-# Pin to Fedora f43 libreswan-5.4.1 to pick up upstream CVE fixes.
-# https://src.fedoraproject.org/rpms/libreswan/c/9974970026924959749ee409f4036c1b8668afac
+# Pin to Fedora f43 libreswan-5.4.2 for CVE-2026-110339 and CVE-2026-115846.
+# https://src.fedoraproject.org/rpms/libreswan/c/e1e00cd282574a0fd355b26a8c7f1cd701ca43e2
 [components.libreswan]
-spec = { type = "upstream", upstream-commit = "9974970026924959749ee409f4036c1b8668afac" }
+spec = { type = "upstream", upstream-commit = "e1e00cd282574a0fd355b26a8c7f1cd701ca43e2" }
