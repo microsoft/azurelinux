@@ -2957,6 +2957,7 @@
                 "mpfr",
                 "msr-tools",
                 "mysql",
+                "mysql84",
                 "nano",
                 "nasm",
                 "ncurses",
