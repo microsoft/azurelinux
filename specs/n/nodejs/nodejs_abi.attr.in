@@ -1,2 +1,2 @@
 %__nodejs_abi_requires %{_rpmconfigdir}/nodejs_abi.req
-%__nodejs_abi_path     ^/usr/lib.*/node_modules/.*\\.node$
+%__nodejs_abi_path     ^/usr/lib.*/node_modules(_@NODEJS_VERSION_MAJOR@)?/.*\\.node$

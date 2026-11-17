@@ -55,12 +55,14 @@ section = "%install"
 regex = '^# === Adjustments to avoid conflict between parallel streams$'
 replacement = '%if 0'
 
+# No directory migration: upgrades from an installed nodejs24 layout may conflict.
 [[overlays]]
-description = "End the excluded parallel-stream adjustments and install shared npm configuration"
+description = "Keep the versioned module directory as an alias and install shared npm configuration"
 type = "spec-append-lines"
 section = "%install"
 lines = [
     '%endif',
+    'ln -s node_modules "%{buildroot}%{nodejs_common_sitelib}_%{node_version_major}"',
     'mkdir -p "%{buildroot}%{_sysconfdir}"',
     'mkconfig <%{SOURCE5} >"%{buildroot}%{_sysconfdir}/npmrc"',
 ]
@@ -89,14 +91,6 @@ type = "spec-append-lines"
 section = "%package"
 package = "devel"
 lines = ['%nodejs_versioned_compat devel']
-
-[[overlays]]
-description = "Require module-building macros that use the unversioned module directory"
-type = "spec-search-replace"
-section = "%package"
-package = "devel"
-regex = '^Requires:\s+nodejs-packaging$'
-replacement = 'Requires: nodejs-packaging >= 2023.10-24'
 
 [[overlays]]
 description = "Replace the versioned library package"
@@ -160,6 +154,7 @@ lines = ['''
 %license    LICENSE
 %dir        %{nodejs_datadir}/
 %dir        %{nodejs_common_sitelib}/
+%{nodejs_common_sitelib}_%{node_version_major}
 %{_bindir}/node
 %{_mandir}/man1/node.1*
 
@@ -191,11 +186,11 @@ regex = 'nodejs@NODEJS_VERSION_MAJOR@'
 replacement = 'nodejs'
 
 [[overlays]]
-description = "Generate native ABI requirements for the common module directory"
+description = "Generate native ABI requirements for common and compatibility module paths"
 type = "file-search-replace"
 file = "nodejs_abi.attr.in"
 regex = 'node_modules_@NODEJS_VERSION_MAJOR@'
-replacement = 'node_modules'
+replacement = 'node_modules(_@NODEJS_VERSION_MAJOR@)?'
 
 [[overlays]]
 description = "Query the default runtime for its native module ABI"
