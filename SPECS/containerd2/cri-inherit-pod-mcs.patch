@@ -1,0 +1,362 @@
+Subject: [PATCH] cri: preserve pod MCS categories for container type-only overrides
+
+When a nonprivileged container specifies only a SELinux type, use the pod
+sandbox's recorded level instead of allocating independent categories.
+Explicit levels, privileged containers, and user/role overrides retain
+their existing behavior.
+
+Use the shared label store for temporary container-creation references and
+persist the sandbox process label so recovery preserves category ownership.
+Include option-resolution and shared-reservation regression tests.
+
+diff --git a/internal/cri/server/container_create.go b/internal/cri/server/container_create.go
+index 376628afe..4ff7490b0 100644
+--- a/internal/cri/server/container_create.go
++++ b/internal/cri/server/container_create.go
+@@ -31,7 +31,6 @@ import (
+ 	"github.com/davecgh/go-spew/spew"
+ 	imagespec "github.com/opencontainers/image-spec/specs-go/v1"
+ 	runtimespec "github.com/opencontainers/runtime-spec/specs-go"
+-	"github.com/opencontainers/selinux/go-selinux"
+ 	"github.com/opencontainers/selinux/go-selinux/label"
+ 	runtime "k8s.io/cri-api/pkg/apis/runtime/v1"
+ 
+@@ -342,6 +341,9 @@ func (c *criService) createContainer(r *createContainerRequest) (_ string, retEr
+ 	}
+ 
+ 	r.meta.ProcessLabel = spec.Process.SelinuxLabel
++	// Retain the temporary reference until containerStore.Add takes ownership,
++	// or creation fails. Capture the label before privileged/KVM adjustments.
++	defer c.labels.Release(r.meta.ProcessLabel)
+ 
+ 	// handle any KVM based runtime
+ 	if err := modifyProcessLabel(ociRuntime.Type, spec); err != nil {
+@@ -353,12 +355,6 @@ func (c *criService) createContainer(r *createContainerRequest) (_ string, retEr
+ 		// the unused MCS label can be release later
+ 		spec.Process.SelinuxLabel = ""
+ 	}
+-	defer func() {
+-		if retErr != nil {
+-			selinux.ReleaseLabel(spec.Process.SelinuxLabel)
+-		}
+-	}()
+-
+ 	log.G(r.ctx).Debugf("Container %q spec: %#+v", r.containerID, spew.NewFormatter(spec))
+ 
+ 	// Grab any platform specific snapshotter opts.
+@@ -653,7 +649,8 @@ func (c *criService) platformSpecOpts(
+ 	return specOpts, nil
+ }
+ 
+-// buildContainerSpec build container's OCI spec depending on controller's target platform OS.
++// buildContainerSpec builds the OCI spec and holds a temporary label reference.
++// On success the caller must release spec.Process.SelinuxLabel through c.labels.
+ func (c *criService) buildContainerSpec(
+ 	platform imagespec.Platform,
+ 	id string,
+@@ -681,6 +678,28 @@ func (c *criService) buildContainerSpec(
+ 
+ 	switch {
+ 	case isLinux:
++		securityContext := config.GetLinux().GetSecurityContext()
++		var sandboxLabel string
++		if sandbox, err := c.sandboxStore.Get(sandboxID); err == nil {
++			sandboxLabel = sandbox.ProcessLabel
++		}
++		labelOptions, labelErr := containerSELinuxLabelOptions(securityContext, sandboxLabel)
++		if labelErr != nil {
++			return nil, labelErr
++		}
++		processLabel, mountLabel, labelErr := label.InitLabels(labelOptions)
++		if labelErr != nil {
++			return nil, fmt.Errorf("failed to init selinux options %+v: %w", securityContext.GetSelinuxOptions(), labelErr)
++		}
++		if err := c.labels.Reserve(processLabel); err != nil {
++			return nil, fmt.Errorf("failed to reserve selinux label %q: %w", processLabel, err)
++		}
++		defer func() {
++			if retErr != nil {
++				c.labels.Release(processLabel)
++			}
++		}()
++
+ 		// Generate container mounts.
+ 		// No mounts are passed for other platforms.
+ 		linuxMounts := c.linuxContainerMounts(sandboxID, config)
+@@ -697,6 +716,8 @@ func (c *criService) buildContainerSpec(
+ 			append(linuxMounts, extraMounts...),
+ 			ociRuntime,
+ 			runtimeHandler,
++			processLabel,
++			mountLabel,
+ 		)
+ 	case isWindows:
+ 		specOpts, err = c.buildWindowsSpec(
+@@ -744,7 +765,8 @@ func (c *criService) buildLinuxSpec(
+ 	extraMounts []*runtime.Mount,
+ 	ociRuntime criconfig.Runtime,
+ 	runtimeHandler *runtime.RuntimeHandler,
+-) (_ []oci.SpecOpts, retErr error) {
++	processLabel, mountLabel string,
++) ([]oci.SpecOpts, error) {
+ 	specOpts := []oci.SpecOpts{
+ 		oci.WithoutRunMount,
+ 	}
+@@ -794,30 +816,6 @@ func (c *criService) buildLinuxSpec(
+ 	specOpts = append(specOpts, oci.WithEnv(env))
+ 
+ 	securityContext := config.GetLinux().GetSecurityContext()
+-	labelOptions, err := toLabel(securityContext.GetSelinuxOptions())
+-	if err != nil {
+-		return nil, err
+-	}
+-	if len(labelOptions) == 0 {
+-		// Use pod level SELinux config
+-		if sandbox, err := c.sandboxStore.Get(sandboxID); err == nil {
+-			labelOptions, err = selinux.DupSecOpt(sandbox.ProcessLabel)
+-			if err != nil {
+-				return nil, err
+-			}
+-		}
+-	}
+-
+-	processLabel, mountLabel, err := label.InitLabels(labelOptions)
+-	if err != nil {
+-		return nil, fmt.Errorf("failed to init selinux options %+v: %w", securityContext.GetSelinuxOptions(), err)
+-	}
+-	defer func() {
+-		if retErr != nil {
+-			selinux.ReleaseLabel(processLabel)
+-		}
+-	}()
+-
+ 	// cgroupns is used for hiding /sys/fs/cgroup from containers.
+ 	// For compatibility, cgroupns is not used when running in cgroup v1 mode or in privileged.
+ 	// https://github.com/containers/libpod/issues/4363
+diff --git a/internal/cri/server/helpers.go b/internal/cri/server/helpers.go
+index e0e83e6f5..173e6ae11 100644
+--- a/internal/cri/server/helpers.go
++++ b/internal/cri/server/helpers.go
+@@ -29,6 +29,7 @@ import (
+ 
+ 	"github.com/containerd/typeurl/v2"
+ 	runtimespec "github.com/opencontainers/runtime-spec/specs-go"
++	"github.com/opencontainers/selinux/go-selinux"
+ 	runtime "k8s.io/cri-api/pkg/apis/runtime/v1"
+ 
+ 	containerd "github.com/containerd/containerd/v2/client"
+@@ -454,6 +455,33 @@ func getCgroupsPath(cgroupsParent, id string) string {
+ 	return filepath.Join(cgroupsParent, id)
+ }
+ 
++func containerSELinuxLabelOptions(securityContext *runtime.LinuxContainerSecurityContext, sandboxLabel string) ([]string, error) {
++	selinuxOptions := securityContext.GetSelinuxOptions()
++	options, err := toLabel(selinuxOptions)
++	if err != nil {
++		return nil, err
++	}
++	if len(options) == 0 {
++		return selinux.DupSecOpt(sandboxLabel)
++	}
++	if securityContext.GetPrivileged() || selinuxOptions.GetType() == "" ||
++		selinuxOptions.GetUser() != "" || selinuxOptions.GetRole() != "" ||
++		selinuxOptions.GetLevel() != "" {
++		return options, nil
++	}
++
++	// A type-only override must not allocate a different MCS level from the
++	// sandbox whose shared files the container needs to access.
++	context, err := selinux.NewContext(sandboxLabel)
++	if err != nil {
++		return nil, fmt.Errorf("failed to parse sandbox SELinux label %q: %w", sandboxLabel, err)
++	}
++	if level := context["level"]; level != "" {
++		options = append(options, "level:"+level)
++	}
++	return options, nil
++}
++
+ func toLabel(selinuxOptions *runtime.SELinuxOption) ([]string, error) {
+ 	var labels []string
+ 
+diff --git a/internal/cri/server/helpers_mcs_linux_test.go b/internal/cri/server/helpers_mcs_linux_test.go
+new file mode 100644
+index 000000000..941a2d8fe
+--- /dev/null
++++ b/internal/cri/server/helpers_mcs_linux_test.go
+@@ -0,0 +1,104 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package server
++
++import (
++	"testing"
++
++	containerstore "github.com/containerd/containerd/v2/internal/cri/store/container"
++	sandboxstore "github.com/containerd/containerd/v2/internal/cri/store/sandbox"
++	"github.com/opencontainers/selinux/go-selinux"
++	"github.com/stretchr/testify/assert"
++	"github.com/stretchr/testify/require"
++	runtime "k8s.io/cri-api/pkg/apis/runtime/v1"
++)
++
++func TestContainerMCSInheritance(t *testing.T) {
++	const podLabel = "system_u:system_r:container_t:s0:c347,c891"
++	for _, test := range []struct {
++		name       string
++		options    *runtime.SELinuxOption
++		privileged bool
++		expected   []string
++	}{
++		{name: "default", expected: []string{"user:system_u", "role:system_r", "type:container_t", "level:s0:c347,c891"}},
++		{name: "type only", options: &runtime.SELinuxOption{Type: "container_logreader_t"},
++			expected: []string{"type:container_logreader_t", "level:s0:c347,c891"}},
++		{name: "explicit level", options: &runtime.SELinuxOption{Type: "container_logreader_t", Level: "s0:c12,c34"},
++			expected: []string{"type:container_logreader_t", "level:s0:c12,c34"}},
++		{name: "explicit s0", options: &runtime.SELinuxOption{Type: "container_t", Level: "s0"},
++			expected: []string{"type:container_t", "level:s0"}},
++		{name: "privileged", privileged: true, options: &runtime.SELinuxOption{Type: "container_t"},
++			expected: []string{"type:container_t"}},
++		{name: "user override", options: &runtime.SELinuxOption{Type: "container_t", User: "user_u"},
++			expected: []string{"user:user_u", "type:container_t"}},
++		{name: "role override", options: &runtime.SELinuxOption{Role: "user_r"},
++			expected: []string{"role:user_r"}},
++	} {
++		t.Run(test.name, func(t *testing.T) {
++			got, err := containerSELinuxLabelOptions(&runtime.LinuxContainerSecurityContext{
++				SelinuxOptions: test.options, Privileged: test.privileged,
++			}, podLabel)
++			require.NoError(t, err)
++			assert.Equal(t, test.expected, got)
++			if test.options != nil && test.name == "type only" {
++				assert.Empty(t, test.options.Level, "request must not be mutated")
++			}
++		})
++	}
++	context := &runtime.LinuxContainerSecurityContext{
++		SelinuxOptions: &runtime.SELinuxOption{Type: "container_logreader_t"},
++	}
++	options, err := containerSELinuxLabelOptions(context, "")
++	require.NoError(t, err)
++	assert.Equal(t, []string{"type:container_logreader_t"}, options)
++	options, err = containerSELinuxLabelOptions(context, "system_u:system_r:container_t:s0:c12,c34")
++	require.NoError(t, err)
++	assert.Contains(t, options, "level:s0:c12,c34")
++	_, err = containerSELinuxLabelOptions(context, "invalid")
++	require.Error(t, err)
++}
++
++func TestContainerMCSSharedLifetime(t *testing.T) {
++	c := newTestCRIService()
++	levels := map[string]bool{}
++	c.labels.Reserver = func(label string) {
++		context, err := selinux.NewContext(label)
++		require.NoError(t, err)
++		levels[context["level"]] = true
++	}
++	c.labels.Releaser = func(label string) {
++		context, err := selinux.NewContext(label)
++		require.NoError(t, err)
++		require.True(t, levels[context["level"]])
++		levels[context["level"]] = false
++	}
++	const podLabel = "system_u:system_r:container_t:s0:c347,c891"
++	const sidecarLabel = "system_u:system_r:container_logreader_t:s0:c347,c891"
++	require.NoError(t, c.sandboxStore.Add(sandboxstore.NewSandbox(
++		sandboxstore.Metadata{ID: "pod", ProcessLabel: podLabel}, sandboxstore.Status{})))
++	require.NoError(t, c.containerStore.Add(containerstore.Container{
++		Metadata: containerstore.Metadata{ID: "sidecar", SandboxID: "pod", ProcessLabel: sidecarLabel},
++	}))
++	require.NoError(t, c.labels.Reserve(sidecarLabel))
++	c.labels.Release(sidecarLabel)
++	assert.True(t, levels["s0:c347,c891"], "failed creation must not release the shared level")
++	c.containerStore.Delete("sidecar")
++	assert.True(t, levels["s0:c347,c891"], "sandbox still owns the level")
++	c.sandboxStore.Delete("pod")
++	assert.False(t, levels["s0:c347,c891"])
++}
+diff --git a/internal/cri/server/sandbox_run.go b/internal/cri/server/sandbox_run.go
+index 9d81a79db..3db20f80b 100644
+--- a/internal/cri/server/sandbox_run.go
++++ b/internal/cri/server/sandbox_run.go
+@@ -331,18 +331,17 @@ func (c *criService) RunPodSandbox(ctx context.Context, r *runtime.RunPodSandbox
+ 
+ 	sandboxInfo.Labels = ctrl.Labels
+ 	sandboxInfo.Spec = ctrl.Spec
++	// Persist the allocated level so recovered sandboxes retain the same
++	// label that newly created type-only containers must inherit.
++	sandbox.ProcessLabel = ctrl.Labels["selinux_label"]
++	if err := sandboxInfo.AddExtension(podsandbox.MetadataKey, &sandbox.Metadata); err != nil {
++		return nil, fmt.Errorf("unable to update SELinux metadata for sandbox %q: %w", id, err)
++	}
+ 
+ 	if sandboxInfo, err = c.client.SandboxStore().Update(ctx, sandboxInfo, "extensions", "spec", "labels"); err != nil {
+ 		return nil, fmt.Errorf("unable to save sandbox %q to sandbox store: %w", id, err)
+ 	}
+ 
+-	labels := ctrl.Labels
+-	if labels == nil {
+-		labels = map[string]string{}
+-	}
+-
+-	sandbox.ProcessLabel = labels["selinux_label"]
+-
+ 	if err := sandbox.Status.Update(func(status sandboxstore.Status) (sandboxstore.Status, error) {
+ 		status.Pid = ctrl.Pid // NRI reads the pid from status during RunPodSandbox hook
+ 		status.CreatedAt = ctrl.CreatedAt
+@@ -401,7 +400,7 @@ func (c *criService) RunPodSandbox(ctx context.Context, r *runtime.RunPodSandbox
+ 	// Send CONTAINER_STARTED event with ContainerId equal to SandboxId.
+ 	c.generateAndSendContainerEvent(ctx, id, id, runtime.ContainerEventType_CONTAINER_STARTED_EVENT)
+ 
+-	sandboxRuntimeCreateTimer.WithValues(labels["oci_runtime_type"]).UpdateSince(runtimeStart)
++	sandboxRuntimeCreateTimer.WithValues(ctrl.Labels["oci_runtime_type"]).UpdateSince(runtimeStart)
+ 
+ 	return &runtime.RunPodSandboxResponse{PodSandboxId: id}, nil
+ }
+diff --git a/internal/cri/server/service.go b/internal/cri/server/service.go
+index f1ad1276e..8744db086 100644
+--- a/internal/cri/server/service.go
++++ b/internal/cri/server/service.go
+@@ -131,6 +131,8 @@ type criService struct {
+ 	imageFSPaths map[string]string
+ 	// os is an interface for all required os operations.
+ 	os osinterface.OS
++	// labels tracks shared sandbox/container MCS reservations.
++	labels *label.Store
+ 	// sandboxStore stores all resources associated with sandboxes.
+ 	sandboxStore *sandboxstore.Store
+ 	// sandboxNameIndex stores all sandbox names and make sure each name
+@@ -221,6 +223,7 @@ func NewCRIService(options *CRIServiceOptions) (CRIService, runtime.RuntimeServi
+ 		client:             options.Client,
+ 		imageFSPaths:       options.ImageService.ImageFSPaths(),
+ 		os:                 osinterface.RealOS{},
++		labels:             labels,
+ 		sandboxStore:       sandboxstore.NewStore(labels, statsCollector),
+ 		containerStore:     containerstore.NewStore(labels, statsCollector),
+ 		sandboxNameIndex:   registrar.NewRegistrar(),
+diff --git a/internal/cri/server/service_test.go b/internal/cri/server/service_test.go
+index 21efe3c7a..fd6ef0363 100644
+--- a/internal/cri/server/service_test.go
++++ b/internal/cri/server/service_test.go
+@@ -147,6 +147,7 @@ func newTestCRIService(opts ...testOpt) *criService {
+ 	service := &criService{
+ 		config:             testConfig,
+ 		os:                 ostesting.NewFakeOS(),
++		labels:             labels,
+ 		sandboxStore:       sandboxstore.NewStore(labels, nil),
+ 		sandboxNameIndex:   registrar.NewRegistrar(),
+ 		containerStore:     containerstore.NewStore(labels, nil),
