@@ -41,7 +41,7 @@ For additional information please refer to:
 https://github.com/intel/%{githubname}
 
 %prep
-%autosetup -n %{githubfull}
+%autosetup -p1 -n %{githubfull}
 sed -i 's|man/man7|share/man/man7|g' lib/cmake/unix.cmake
 
 %build
