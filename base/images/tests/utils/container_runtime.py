@@ -330,7 +330,7 @@ def exec_in_container(
         ContainerExecResult with exit_code, per-stream stdout/stderr, and a
         combined ``output`` for convenience.
     """
-    logger.debug("Container exec [%s]: %s", container_name, command)
+    logger.debug("Container exec [%s]", container_name)
     stdout_parts: list[str] = []
     stderr_parts: list[str] = []
 
@@ -385,15 +385,13 @@ def wait_until_service_ready(
     delay: float = 1.0,
 ) -> ContainerExecResult:
     """Poll ``command`` until it exits 0 and its output contains ``contains``."""
-    output = ""
     for attempt in range(attempts):
         if attempt:
             time.sleep(delay)
         result = exec_shell(command)
         if result.exit_code == 0 and contains in result.output:
             return result
-        output = result.output
-    raise AssertionError(f"{command!r} never became ready: {output}")
+    raise AssertionError("Service never became ready")
 
 
 def destroy_container(client: DockerClient, container_name: str) -> None:
