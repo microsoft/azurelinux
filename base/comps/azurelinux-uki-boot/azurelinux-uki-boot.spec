@@ -15,7 +15,7 @@ Source3:        loader.conf
 Source4:        azurelinux-uki-boot.conf
 
 Requires:       shim-%{efi_arch}
-Requires:       systemd-boot
+Requires:       systemd-boot-%{efi_arch}
 Requires:       kernel-uki-virt
 Requires:       coreutils
 Conflicts:      grub2-efi-%{efi_arch}
@@ -23,10 +23,9 @@ Conflicts:      uki-direct
 
 %description
 Configure Azure Linux UKI booting through shim and systemd-boot. The stock
-shim, systemd-boot, and kernel-uki-virt packages are used unmodified; this
-package supplies the kernel-install and ESP configuration and copies
-systemd-boot to shim's second-stage path. Secure Boot requires the installed
-systemd-boot binary to be signed by a key that shim trusts.
+signed shim, systemd-boot, and kernel-uki-virt packages are used unmodified;
+this package supplies the kernel-install and ESP configuration and copies the
+signed systemd-boot to shim's second-stage path.
 
 This package is intended for fresh x86_64 UKI boot layouts and their later
 package updates. Installing it over an existing boot layout is not supported.
@@ -46,16 +45,19 @@ install -d -m 0755 %{buildroot}%{_sysconfdir}/dnf/protected.d
 install -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/dnf/protected.d/%{name}.conf
 
 # Firmware reads EFI programs from the ESP; shim loads grub<arch>.efi from its
-# vendor directory. The signing pipeline signs the canonical systemd-boot binary
-# under /usr/lib/systemd/boot/efi, not an ESP copy: keep those bytes identical.
+# vendor directory. systemd-boot-%{efi_arch} ships the signed binary as
+# systemd-boot%{efi_arch}.efi.signed; copy it, not the unsigned .efi that
+# systemd-boot-unsigned may also install, and keep the ESP copy identical.
 # This runs at the end of transactions installing/updating/reinstalling that tree
 # (including the initial image transaction), or when installed after systemd-boot.
 # bootctl update does not manage this copy. After fixing an ESP error, restore it
-# with "dnf reinstall systemd-boot" and verify it with
-# "cmp /usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi %{efi_esp_dir}/grub%{efi_arch}.efi".
+# with "dnf reinstall systemd-boot-%{efi_arch}" and verify it with
+# "cmp /usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi.signed %{efi_esp_dir}/grub%{efi_arch}.efi".
 %transfiletriggerin -- /usr/lib/systemd/boot/efi
 set -eu
-src=/usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi
+# Like bootctl, prefer the signed binary and fall back to the unsigned one.
+src=/usr/lib/systemd/boot/efi/systemd-boot%{efi_arch}.efi.signed
+if [ ! -e "$src" ] && [ ! -L "$src" ]; then src=${src%.signed}; fi
 dir=%{efi_esp_dir}
 dest="$dir/grub%{efi_arch}.efi"
 tmp="$dest.new"
