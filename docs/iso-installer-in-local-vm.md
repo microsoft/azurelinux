@@ -4,8 +4,6 @@ The Azure Linux ISO may work in some bare-metal scenarios, but is generally inte
 
 The ISO boots the [Anaconda](https://anaconda-installer.readthedocs.io/) installer (run in text mode). Follow its prompts to partition disks, set a root password, create a user, and complete the installation. A serial console is preconfigured at `ttyS0/115200`.
 
-> _Note: Azure Linux 4.0 ISOs are currently in Preview and not Secure Boot signed. Disable Secure Boot in your VM's firmware settings before booting the installer._
-
 This guide covers two local virtualization options:
 
 - [Using ISO Installer in Hyper-V VM](#using-iso-installer-in-hyper-v-vm) (Windows host)
@@ -27,10 +25,9 @@ From a Windows PC:
 
 **Adjust VM Settings**
 
-1. Right click your virtual machine from Hyper-V Manager.
-1. Select _Settings..._
-1. Select Security and uncheck _Enable Secure Boot_.
-   - _Note: Secure Boot will be supported in a future release of Azure Linux._
+1. Right click your virtual machine from Hyper-V Manager and select _Settings..._.
+1. Select _Security_ and keep _Enable Secure Boot_ checked.
+1. Change _Template_ to _Microsoft UEFI Certificate Authority_.
 1. Select _Apply_ to apply all changes.
 
 **Boot ISO Installer**

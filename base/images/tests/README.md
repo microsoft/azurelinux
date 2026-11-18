@@ -90,7 +90,7 @@ uv run pytest cases/runtime/ \
 
 # Runtime tests — from a registry reference
 uv run pytest cases/runtime/ \
-    --image-ref mcr.microsoft.com/azurelinux/base/core:4.0 \
+    --image-ref mcr.microsoft.com/azurelinux/core:4 \
     --image-name container-base \
     --capabilities container,runtime-package-management \
     --properties '{"openssl-fips-provider":"symcrypt"}'
