@@ -2,7 +2,7 @@
 spec = { type = "local", path = "SymCrypt-OpenSSL.spec" }
 
 [[components.SymCrypt-OpenSSL.source-files]]
-filename = "SymCrypt-OpenSSL-1.11.2.tar.gz"
-hash = "26ba76e1e1c88a67468b54e3a493f2cd12e3505ea871a6caeba4b6c632a5bef4"
+filename = "SymCrypt-OpenSSL-1.11.3.tar.gz"
+hash = "e34fdf8318c7d755c387077689a1426fa69e745b80f29fc87228476cb26ed6ca"
 hash-type = "SHA256"
-origin = { type = "download", uri = "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.11.2.tar.gz" }
+origin = { type = "download", uri = "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.11.3.tar.gz" }
