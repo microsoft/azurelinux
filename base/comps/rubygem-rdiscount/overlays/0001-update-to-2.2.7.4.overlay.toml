@@ -15,11 +15,10 @@ value = "2.2.7.4"
 
 [[overlays]]
 description = "Package the CHANGELOG.md added in 2.2.7.x"
-type = "spec-search-replace"
-regex = '^%doc %\{gem_instdir\}/README\.markdown$'
-replacement = '''
-%doc %{gem_instdir}/README.markdown
-%doc %{gem_instdir}/CHANGELOG.md'''
+type = "spec-append-lines"
+section = "%files"
+package = "doc"
+lines = ["%doc %{gem_instdir}/CHANGELOG.md", ""]
 
 [[overlays]]
 description = "Remove the obsolete rdiscount-2.2.7.1.gem source checksum"
