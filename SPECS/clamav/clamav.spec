@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        1.5.4
-Release:        3%{?dist}
+Version:        1.5.5
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -150,6 +150,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Wed Nov 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.5-1
+- Auto-upgrade to 1.5.5 - for CVE-2026-76422, CVE-2026-76411, CVE-2026-76415, CVE-2026-76414, CVE-2026-76416, CVE-2026-76417, CVE-2026-76421, CVE-2026-76430, CVE-2026-76516, CVE-2026-76515
+
 * Tue Oct 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.4-3
 - Patch for CVE-2026-110602
 
