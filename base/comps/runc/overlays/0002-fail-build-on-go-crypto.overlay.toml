@@ -1,0 +1,31 @@
+# The Microsoft build of Go routes Go crypto through OpenSSL (systemcrypto),
+# loading libcrypto.so with dlopen when the Go runtime starts. `runc init`
+# enters the container's mount namespace (libcontainer/nsenter) before the Go
+# runtime starts, so that dlopen looks inside the container rootfs. Images
+# without libcrypto.so (busybox, distroless, scratch, ...) then make every exec
+# fail with "procReady not received".
+#
+# runc performs no cryptography. With the backports in
+# 0001-backport-upstream-no-crypto.overlay.toml it links no Go crypto at all,
+# so it builds with the default Azure Linux Go configuration instead of opting
+# out with MS_GO_NOSYSTEMCRYPTO. Fail the build if a future runc update links
+# Go crypto again.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://github.com/opencontainers/runc/issues/4916" }]
+
+[[overlays]]
+description = "Fail the build if runc links any Go crypto package, which would make runc init dlopen libcrypto.so inside containers"
+type = "spec-append-lines"
+section = "%build"
+lines = [
+    "",
+    "# runc init runs inside the container rootfs, so runc must link no Go crypto",
+    "go tool nm %{gobuilddir}/bin/runc > %{gobuilddir}/runc.nm",
+    "if grep -m 20 -E ' (vendor/)?(crypto[./]|golang\\.org/x/crypto/|github\\.com/golang-fips/|github\\.com/microsoft/go-crypto)' %{gobuilddir}/runc.nm; then",
+    "  echo 'error: runc links Go crypto packages; runc init would dlopen libcrypto.so inside containers' >&2",
+    "  exit 1",
+    "fi",
+    "",
+]
