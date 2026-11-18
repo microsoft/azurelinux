@@ -1,0 +1,25 @@
+# Fedora f43/f44 lack 1.30.7; update the f43 spec to upstream 1.30.7 for:
+# CVE-2026-113425, CVE-2026-118899, CVE-2026-120967, CVE-2026-121810, CVE-2026-123007,
+# CVE-2026-123633, CVE-2026-123634, CVE-2026-123640, CVE-2026-125283
+# Remove this overlay once the imported Fedora spec packages 1.30.7 or newer.
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.30.7"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.30.7"
+
+[[overlays]]
+description = "Remove the obsolete 1.30.6 tarball checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(nginx-1\.30\.6\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete 1.30.6 signature checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(nginx-1\.30\.6\.tar\.gz\.asc\) = [0-9a-f]+(?:\r?\n|$)'
