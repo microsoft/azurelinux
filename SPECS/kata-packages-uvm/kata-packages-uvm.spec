@@ -65,7 +65,7 @@ Requires:       kata-containers-tools
 %ifarch x86_64
 Requires:       kata-containers-cc-tools
 %endif
-# Also the guest kernel measured into the kata-cc SNP IGVMs; needs the SNP guest support from mshv2
+# >= 6.18.52.mshv2 enables kata-cc guest boot on OpenVMM
 Requires:       kernel-uvm >= 6.18.52.mshv2
 Requires:       make
 Requires:       parted
@@ -99,7 +99,7 @@ Requires:       golang
 
 %changelog
 * Thu Nov 12 2026 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-10
-- Require kernel-uvm >= 6.18.52.mshv2, the guest kernel measured into the kata-cc SNP IGVMs
+- Require kernel-uvm >= 6.18.52.mshv2, which enables kata-cc guest boot on OpenVMM
 - Drop kernel-uvm-devel and the Python dependencies of the igvm-tooling IGVM generator
 
 * Mon Oct 13 2025 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-9
