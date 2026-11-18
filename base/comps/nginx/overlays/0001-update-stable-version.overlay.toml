@@ -1,0 +1,15 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to nginx 1.30.7 for upstream security fixes until Fedora updates its stable package; see https://nginx.org/en/CHANGES-1.30"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.30.7"
+
+[[overlays]]
+description = "Remove obsolete nginx 1.30.6 source and signature checksums"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(nginx-1\.30\.6\.tar\.gz(?:\.asc)?\) = [0-9a-f]+(?:\r?\n|$)'

@@ -1,4 +1,17 @@
-# Pin to Fedora f43 nginx-1.30.6 to pick up upstream CVE fixes.
+# Retain Fedora f43 packaging while the version overlay picks up upstream CVE fixes.
 # https://src.fedoraproject.org/rpms/nginx/c/6ebadb853abcd63dcd144ee6068757317ac0639c
 [components.nginx]
 spec = { type = "upstream", upstream-commit = "6ebadb853abcd63dcd144ee6068757317ac0639c" }
+
+# Remove these downloads together with the version overlay once Fedora catches up.
+[[components.nginx.source-files]]
+filename = "nginx-1.30.7.tar.gz"
+hash = "2565b5c837050e958f70fb0f73c48e2bca4542ad349fd356f46fb0c72610bc6e"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://nginx.org/download/nginx-1.30.7.tar.gz" }
+
+[[components.nginx.source-files]]
+filename = "nginx-1.30.7.tar.gz.asc"
+hash = "444f746ca0b38553b154d8f4b8b02a2272ba60c1541d5d8d5d9cab61efb1e99d"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://nginx.org/download/nginx-1.30.7.tar.gz.asc" }
