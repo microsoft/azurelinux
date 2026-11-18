@@ -8,7 +8,7 @@ Azure Linux is built on a robust open-source foundation from the Fedora ecosyste
 
 Key features of Azure Linux include: hardened security posture, an Azure-optimized kernel, supply chain security, native Azure integration, and a predictable lifecycle.
 
-> **This branch holds the in-development sources for Azure Linux 4.** For Azure Linux 3, see the [`3.0` branch](https://github.com/microsoft/azurelinux/tree/3.0).
+> **This branch holds the sources for Azure Linux 4.** For Azure Linux 3, see the [`3.0` branch](https://github.com/microsoft/azurelinux/tree/3.0).
 
 ## Getting started
 
@@ -26,8 +26,6 @@ The links below will help you get started with Azure Linux:
 
 ## Using Azure Linux
 
-*Note: Azure Linux 4 is still in development*
-
 <details open>
 <summary><b>🖥️ Azure VM</b></summary>
 
@@ -38,7 +36,7 @@ To try Azure Linux in an Azure VM, please visit [our Azure Linux 4.0 page](https
 <details open>
 <summary><b>📦 Container</b></summary>
 
-To try Azure Linux base container, please use the following image reference: `mcr.microsoft.com/azurelinux-beta/base/core:4.0`
+To try Azure Linux base container, please use the following image reference: `mcr.microsoft.com/azurelinux/core:4`
 
 </details>
 
