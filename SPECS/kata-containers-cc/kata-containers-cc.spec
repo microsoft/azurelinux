@@ -147,7 +147,12 @@ popd
 
 %changelog
 * Wed Nov 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata3-1
-- Auto-upgrade to 4.1.0.kata3
+- Upgrade to 4.1.0.kata3 and rebuild Kata-CC on OpenVMM SNP with runtime-rs
+- Ship the OpenVMM SNP runtime configs and kata-ctl; drop the CLH SNP configs
+- Drop tardev-snapshotter, kata-overlay, mount.tar and the tarfs sources
+- Ship the OpenVMM IGVM builder in -tools
+- Replace the kernel-uvm and virtiofsd dependencies with openvmm and erofs-utils
+- Use the kata-containers 4.1.0 patches; drop the 3.15.0.aks0 patches
 
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-24
 - Patch for CVE-2026-95838, CVE-2026-116591
