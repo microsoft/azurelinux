@@ -1,7 +1,7 @@
 Summary:        provides a pure-Python implementation of immutable URLs
 Name:           python-hyperlink
 Version:        21.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,10 +21,11 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
 %if 0%{?with_check}
+BuildRequires:  python3-pip
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-idna
-BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 
 %description -n python3-hyperlink
@@ -40,7 +41,6 @@ Hyperlink provides a pure-Python implementation of immutable URLs. Based on RFC 
 %py3_install
 
 %check
-pip3 install pytest
 pytest
 
 %files -n python3-hyperlink
@@ -49,6 +49,9 @@ pytest
 %{python3_sitelib}/*
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 21.0.0-2
+- Use python3-pytest for tests instead of pip
+
 * Mon Feb 14 2022 Nick Samson <nisamson@microsoft.com> - 21.0.0-1
 - Updated to 21.0.0
 - Updated URL and Source0 to reflect github change.

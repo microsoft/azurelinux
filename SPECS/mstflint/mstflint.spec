@@ -3,7 +3,7 @@
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
 Version:        4.28.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,6 +61,9 @@ find %{buildroot} -type f -name '*.a' -delete
 %{_mandir}/man1/*
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 4.28.0-4
+- Remove additional emSign G1, C1 and ECC C3 roots from the firmware updater bundle.
+
 * Sun Oct 25 2026 Jon Slobodzian <joslobo@microsoft.com> - 4.28.0-3
 - Add the trusted SSL.com TLS ECC Root CA 2022 to retain unaffected TLS paths.
 

@@ -1,0 +1,49 @@
+From 853813c7cf3fded03e1d254dcd319534d6e6e04a Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Wed, 21 Aug 2024 07:01:47 +0900
+Subject: [PATCH] network: enter initialized state when the interface will be
+ reconfigured
+
+When the interface is in the failed state, link_getlink_handler_internal()
+will do nothing and return zero, thus the interface will not be
+reconfigured, especially when the reconfiguration is triggered in
+link_enter_failed().
+
+Follow-up for c2eb7753dd47ec04ae0d66400e70bc87fbf1adcc.
+
+(cherry picked from commit 685fd0d729718aab45a19567a889c8baa2e6cc65)
+
+Backport notes:
+Omit the state transition in link_reconfigure_on_bus_method_reload(),
+which is absent from v255.
+---
+ src/network/networkd-link-bus.c | 1 -
+ src/network/networkd-link.c     | 3 +++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/network/networkd-link-bus.c b/src/network/networkd-link-bus.c
+index 58d487570a7c..ba8823797e00 100644
+--- a/src/network/networkd-link-bus.c
++++ b/src/network/networkd-link-bus.c
+@@ -642,7 +642,6 @@ int bus_link_method_reconfigure(sd_bus_message *message, void *userdata, sd_bus_
+         if (r < 0)
+                 return r;
+         if (r > 0) {
+-                link_set_state(l, LINK_STATE_INITIALIZED);
+                 r = link_save_and_clean_full(l, /* also_save_manager = */ true);
+                 if (r < 0)
+                         return r;
+diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
+index 9c969c5ac10c..e06efacb4679 100644
+--- a/src/network/networkd-link.c
++++ b/src/network/networkd-link.c
+@@ -1388,6 +1388,9 @@ int link_reconfigure(Link *link, bool force) {
+         if (r < 0)
+                 return r;
+ 
++        if (force || link->state == LINK_STATE_FAILED)
++                link_set_state(link, LINK_STATE_INITIALIZED);
++
+         return 1; /* 1 means the interface will be reconfigured. */
+ }
+ 

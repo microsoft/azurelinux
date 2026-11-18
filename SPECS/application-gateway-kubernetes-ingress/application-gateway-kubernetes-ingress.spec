@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.7.7
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,8 @@ Patch11:       CVE-2026-78659.patch
 Patch12:       CVE-2026-78660.patch
 Patch13:       CVE-2026-78669.patch
 Patch14:       CVE-2026-97032.patch
+Patch15:       CVE-2026-78661.patch
+Patch16:       CVE-2026-97045.patch
 
 BuildRequires:  golang >= 1.23
 
@@ -55,6 +57,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Wed Nov 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-8
+- Patch for CVE-2026-97045, CVE-2026-78661
+
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-7
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
 

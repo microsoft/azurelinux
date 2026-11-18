@@ -3,7 +3,7 @@
 Summary:        Cython implementation of the toolz package
 Name:           python-%{srcname}
 Version:        0.12.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,9 @@ Requires:       python%{python3_pkgversion}-toolz >= 0.9.0
 %if 0%{?with_check}
 BuildRequires:  build-essential
 BuildRequires:  python3-pip
+BuildRequires:  python3-coverage
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
 %endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -88,14 +91,14 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-cov>=2.7.1 \
     toolz>=0.9.0 \
     Cython
-python3 setup.py test
 PATH=%{buildroot}%{_bindir}:${PATH} \
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -v cytoolz/tests/*
+srcdir=$PWD
+pushd /tmp
+PYTHONPATH=%{buildroot}%{python3_sitearch} \
+    python%{python3_version} -m pytest -v "$srcdir/cytoolz/tests"
+popd
 
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -105,6 +108,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %exclude %{python3_sitearch}/.pytest_cache/
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.12.2-4
+- Use python3-pytest, python3-pytest-cov, and python3-coverage from check dependencies instead of pip
+- Run the pytest suite without the redundant setup.py test runner
+
 * Mon Feb 02 2025 Sam Meluch <sammeluch@microsoft.com> - 0.12.2-3
 - Add patch to fix a test failure in test_inspect_wrapped_property
 

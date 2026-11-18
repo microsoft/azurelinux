@@ -1,0 +1,76 @@
+From c7aba3369c711fc921b641fda42a5c753da1b1c4 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Wed, 21 Aug 2024 10:23:06 +0900
+Subject: [PATCH] sd-dhcp-client: refuse to send RELEASE or friends gracefully
+ when the daemon is stopped or so
+
+We can easily hit the assertions without checking the internal states of
+the DHCP client before calling these functions. That's annoying.
+Let's do more gracefully.
+
+(cherry picked from commit f8cdd37d0aed8423d6744dd6637955760346939a)
+
+Backport notes:
+Keep v255's client->attempt counter and client_message_init() argument
+order.
+---
+ src/libsystemd-network/sd-dhcp-client.c | 24 ++++++++----------------
+ 1 file changed, 8 insertions(+), 16 deletions(-)
+
+diff --git a/src/libsystemd-network/sd-dhcp-client.c b/src/libsystemd-network/sd-dhcp-client.c
+index 1b0295dd7d34..4a4fac967564 100644
+--- a/src/libsystemd-network/sd-dhcp-client.c
++++ b/src/libsystemd-network/sd-dhcp-client.c
+@@ -2249,14 +2249,8 @@ static int client_receive_message_raw(
+ }
+ 
+ int sd_dhcp_client_send_renew(sd_dhcp_client *client) {
+-        assert_return(client, -EINVAL);
+-        assert_return(sd_dhcp_client_is_running(client), -ESTALE);
+-        assert_return(client->fd >= 0, -EINVAL);
+-
+-        if (client->state != DHCP_STATE_BOUND)
+-                return 0;
+-
+-        assert(client->lease);
++        if (!sd_dhcp_client_is_running(client) || client->state != DHCP_STATE_BOUND)
++                return 0; /* do nothing */
+ 
+         client->start_delay = 0;
+         client->attempt = 1;
+@@ -2309,14 +2303,13 @@ int sd_dhcp_client_start(sd_dhcp_client *client) {
+ }
+ 
+ int sd_dhcp_client_send_release(sd_dhcp_client *client) {
+-        assert_return(client, -EINVAL);
+-        assert_return(sd_dhcp_client_is_running(client), -ESTALE);
+-        assert_return(client->lease, -EUNATCH);
+-
+         _cleanup_free_ DHCPPacket *release = NULL;
+         size_t optoffset, optlen;
+         int r;
+ 
++        if (!sd_dhcp_client_is_running(client) || !client->lease)
++                return 0; /* do nothing */
++
+         r = client_message_init(client, &release, DHCP_RELEASE, &optlen, &optoffset);
+         if (r < 0)
+                 return r;
+@@ -2344,14 +2337,13 @@ int sd_dhcp_client_send_release(sd_dhcp_client *client) {
+ }
+ 
+ int sd_dhcp_client_send_decline(sd_dhcp_client *client) {
+-        assert_return(client, -EINVAL);
+-        assert_return(sd_dhcp_client_is_running(client), -ESTALE);
+-        assert_return(client->lease, -EUNATCH);
+-
+         _cleanup_free_ DHCPPacket *release = NULL;
+         size_t optoffset, optlen;
+         int r;
+ 
++        if (!sd_dhcp_client_is_running(client) || !client->lease)
++                return 0; /* do nothing */
++
+         r = client_message_init(client, &release, DHCP_DECLINE, &optlen, &optoffset);
+         if (r < 0)
+                 return r;
