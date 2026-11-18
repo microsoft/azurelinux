@@ -14,7 +14,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
 Version:        1.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,7 +30,7 @@ Source3:        x64-confidential.json
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-21%{?dist}
+BuildRequires:  glibc-static >= 2.38-22%{?dist}
 BuildRequires:  golang >= 1.26
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -297,6 +297,9 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Nov 18 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.9.0-2
+- Bump to rebuild with updated glibc
+
 * Mon Oct 26 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.9.0-1
 - License verified
 - Add temporary x86 OpenVMM firmware and UEFI templates
