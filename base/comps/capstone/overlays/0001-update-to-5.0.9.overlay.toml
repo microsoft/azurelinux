@@ -1,0 +1,20 @@
+# Fedora f43 packages capstone 5.0.5 and f44 packages 5.0.6. Update to the
+# upstream 5.0.9 patch release on the same f43 spec for these CVE fixes:
+# CVE-2025-67873, CVE-2025-68114, CVE-2026-47143, CVE-2026-49263
+# Remove this overlay once the imported Fedora spec packages 5.0.9 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 5.0.9"
+type = "spec-update-tag"
+tag = "Version"
+value = "5.0.9"
+
+[[overlays]]
+description = "Remove the obsolete 5.0.5 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(capstone-5\.0\.5\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

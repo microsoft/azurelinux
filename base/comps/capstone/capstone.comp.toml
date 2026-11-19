@@ -1,0 +1,10 @@
+[components.capstone]
+
+# GitHub tag archive for 5.0.9 (the same URL as the spec's Source0). Fedora
+# does not package 5.0.9, so there is no lookaside copy; the archive was
+# downloaded three times (two URLs) and the SHA512 was identical each time.
+[[components.capstone.source-files]]
+filename = "capstone-5.0.9.tar.gz"
+hash = "e4fe24002aed02cdbc0626dafee5211646e5da6a208c8ef99cd2d4f08beb0022999684af55cd80214aea4067fad427abb5ed5b1f5433b42a1f9047092481c039"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/capstone-engine/capstone/archive/5.0.9.tar.gz" }
