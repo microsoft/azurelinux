@@ -1,0 +1,65 @@
+From a349bb8501ba4103dbc378c0bea7ea269d3a4a16 Mon Sep 17 00:00:00 2001
+From: Vladislav Vaintroub <vvaintroub@gmail.com>
+Date: Mon, 31 Aug 2026 18:28:49 +0200
+Subject: [PATCH] MDEV-40955  mysql_client_test needs a resolvable DNS on
+ Linux.
+
+The tests test_proxy_header_connect_errors_reset() and
+test_proxy_header_host_denied_not_counted() rely on their client IPs
+(192.0.2.x test IPs, per RFC 5737) failing reverse DNS lookup permanently,
+which is what a real, working resolver reports for them. Linux's resolver
+isn't so RFC-compliant, when it has no route to any nameserver at all: it
+reports EAI_AGAIN (temporary) instead, which is deliberately excluded from
+connect-error accounting to avoid blocking hosts during a DNS outage.
+That silently defeats the max_connect_errors check these tests exercise.
+
+Fix by forcing the deterministic "permanent failure" outcome via the
+existing getnameinfo_error_noname debug instrumentation, same as its
+sibling tests. Debug-only, like those siblings, since the workaround
+needs DBUG_EXECUTE_IF.
+
+Assisted-By: Claude Sonnet 5 <noreply@anthropic.com>
+
+[Azure Linux: backported to 10.11.19 with only the
+test_proxy_header_connect_errors_reset() hunks; the other test,
+test_proxy_header_host_denied_not_counted(), is not in 10.11.19.]
+---
+ tests/mysql_client_test.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/tests/mysql_client_test.c b/tests/mysql_client_test.c
+index 5880b23559156..115b5b7f3584a 100644
+--- a/tests/mysql_client_test.c
++++ b/tests/mysql_client_test.c
+@@ -20958,6 +20958,7 @@ static MYSQL *proxy_connect_as(const char *client_ip, const char *user,
+ */
+ static void test_proxy_header_connect_errors_reset()
+ {
++#ifndef DBUG_OFF
+   const char *client_ip= "192.0.2.50";
+   char query[256];
+   unsigned int conn_errno= 0;
+@@ -20966,6 +20967,13 @@ static void test_proxy_header_connect_errors_reset()
+ 
+   myheader("test_proxy_header_connect_errors_reset");
+ 
++  /* Force a deterministic "unresolvable" outcome; see hostname.cc. */
++  rc= mysql_query(mysql, "SET @save_debug_dbug= @@global.debug_dbug");
++  myquery(rc);
++  rc= mysql_query(mysql,
++                  "SET GLOBAL debug_dbug='+d,getnameinfo_error_noname'");
++  myquery(rc);
++
+   rc= mysql_query(mysql,
+                   "SET @saved_max_connect_errors= @@global.max_connect_errors");
+   myquery(rc);
+@@ -21014,6 +21022,9 @@ static void test_proxy_header_connect_errors_reset()
+   myquery(rc);
+   rc= mysql_query(mysql, "FLUSH HOSTS");
+   myquery(rc);
++  rc= mysql_query(mysql, "SET GLOBAL debug_dbug= @save_debug_dbug");
++  myquery(rc);
++#endif /* !DBUG_OFF */
+ }
+ 
+ /*

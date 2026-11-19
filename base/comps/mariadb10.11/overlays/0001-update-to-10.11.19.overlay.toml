@@ -1,0 +1,63 @@
+# Fedora f43 and f44 package mariadb10.11 10.11.18. Update to the upstream
+# 10.11.19 maintenance release on the same f43 spec for these CVE fixes:
+# CVE-2026-85745, CVE-2026-85746, CVE-2026-85985, CVE-2026-86047,
+# CVE-2026-92262, CVE-2026-97380, CVE-2026-102523, CVE-2026-107815,
+# CVE-2026-107816, CVE-2026-107817, CVE-2026-107818, CVE-2026-107821,
+# CVE-2026-107822, CVE-2026-107823
+# Remove this overlay once the imported Fedora spec packages 10.11.19 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 10.11.19 (Version is derived from package_version)"
+type = "spec-search-replace"
+regex = '^%define package_version 10\.11\.18$'
+replacement = "%define package_version 10.11.19"
+
+[[overlays]]
+description = "Mark 10.11.19 as the tested version, as Fedora does on each rebase, so %check runs the main suite"
+type = "spec-search-replace"
+regex = '^%global last_tested_version 10\.11\.18$'
+replacement = "%global last_tested_version 10.11.19"
+
+[[overlays]]
+description = "Remove the obsolete 10.11.18 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(mariadb-10\.11\.18\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+# 10.11.19 changed the documentation URLs in support-files/mariadb.logrotate.sh,
+# so rebase the logrotate patch by updating its two context lines.
+[[overlays]]
+description = "Rebase the logrotate patch on 10.11.19: error-log documentation URL"
+type = "file-search-replace"
+file = "mariadb-logrotate.patch"
+regex = '(?m)^ # Read https://mariadb\.com/kb/en/error-log/ to learn more about logging and$'
+replacement = " # Read https://mariadb.com/docs/server/server-management/server-monitoring-logs/error-log to learn more about logging and"
+
+[[overlays]]
+description = "Rebase the logrotate patch on 10.11.19: log rotation documentation URL"
+type = "file-search-replace"
+file = "mariadb-logrotate.patch"
+regex = '(?m)^ # https://mariadb\.com/kb/en/rotating-logs-on-unix-and-linux/ about rotating logs\.$'
+replacement = " # https://mariadb.com/docs/server/server-management/server-monitoring-logs/rotating-logs-on-unix-and-linux about rotating logs."
+
+[[overlays]]
+description = "Drop the MDEV-39691 wsrep.cnf patch, included in 10.11.19"
+type = "patch-remove"
+file = "upstream_0a66c466f1772945d46b12bd340e1bd9adff4e9b.patch"
+
+[[overlays]]
+description = "Drop the comment for the removed MDEV-39691 patch"
+type = "spec-search-replace"
+regex = '^#   Patch16: fix default Galera configuation file$'
+replacement = ""
+
+[[overlays]]
+description = "Stop applying the removed MDEV-39691 patch"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P16 -p1$'
+replacement = ""
