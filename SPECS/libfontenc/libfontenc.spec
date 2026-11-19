@@ -2,7 +2,7 @@
 %define _x11fontdir		%{_datadir}/X11/fonts
 Summary:        X.Org X11 libfontenc runtime library
 Name:           libfontenc
-Version:        1.1.7
+Version:        1.1.10
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -55,6 +55,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/fontenc.pc
 
 %changelog
+* Wed Nov 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.10-1
+- Auto-upgrade to 1.1.10 - for CVE-2026-109908
+
 * Tue Jan 23 2024 Archana Choudhary <archana1@microsoft.com> - 1.1.7-1
 - Update to 1.1.7
 - Update README filename to README.md
