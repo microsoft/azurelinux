@@ -5,15 +5,15 @@
 %global gem_name concurrent-ruby
 
 Name: rubygem-%{gem_name}
-Version: 1.3.5
-Release: 5%{?dist}
+Version: 1.3.7
+Release: 6%{?dist}
 Summary: Modern concurrency tools for Ruby
 License: MIT
 URL: http://www.concurrent-ruby.com
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 # git clone https://github.com/ruby-concurrency/concurrent-ruby.git && cd concurrent-ruby
 # git archive -v -o concurrent-ruby-1.3.5-specs.tar.gz v1.3.5 spec/
-Source1: %{gem_name}-%{version}-specs.tar.gz
+Source1: https://github.com/ruby-concurrency/concurrent-ruby/archive/v%{version}/%{gem_name}-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby >= 1.9.3
@@ -38,10 +38,13 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version} -b 1
+%setup -q -n %{gem_name}-%{version}
 
 # Remove bundled .jar
 %gemspec_remove_file 'lib/concurrent-ruby/concurrent/concurrent_ruby.jar'
+
+# Test suite from the upstream tag archive
+tar -xzf %{SOURCE1} -C %{builddir} --strip-components=1 %{gem_name}-%{version}/spec
 
 %build
 # Create the gem as gem install only works on a gem file
