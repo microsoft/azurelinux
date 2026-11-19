@@ -4,7 +4,7 @@
 Summary:        Correct, reproducible, and fast builds for everyone.
 Name:           bazel
 Version:        6.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,19 @@ A fast, scalable, multi-language and extensible build system.
 %prep
 %autosetup -p1 -c -n %{name}-%{version}
 
+# The prebuilt Google API client embeds its own trust store in the Bazel server.
+pushd third_party/api_client
+unzip -q google-api-client-1.22.0.jar com/google/api/client/googleapis/google.jks -d google-api-client-truststore
+pushd google-api-client-truststore
+# Alias 31 must be the exact AAA Certificate Services root removed by our CA policy.
+keytool -exportcert -alias 31 -keystore com/google/api/client/googleapis/google.jks -storetype JKS -storepass notasecret -file aaa.der
+echo "d7a7a0fb5d7e2731d771e9484ebcdef71d5f0c3e0a2948782bc83ee0ea699ef4  aaa.der" | sha256sum -c -
+keytool -delete -alias 31 -keystore com/google/api/client/googleapis/google.jks -storetype JKS -storepass notasecret
+zip -q ../google-api-client-1.22.0.jar com/google/api/client/googleapis/google.jks
+popd
+rm -r google-api-client-truststore
+popd
+
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 ln -s %{_bindir}/python3 %{_bindir}/python
@@ -48,6 +61,9 @@ cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
+* Mon Nov 16 2026 Jon Slobodzian <joslobo@microsoft.com> - 6.5.0-2
+- Remove distrusted AAA Certificate Services root from the bundled Google API client trust store.
+
 * Tue Mar 05 2024 Riken Maharjan <rmaharjan@microsoft.com> - 6.5.0-1
 - Upgrade to 6.5.0
 - Added msopenjdk-17 patch
