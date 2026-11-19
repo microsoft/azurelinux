@@ -5,30 +5,22 @@
 %global gem_name mini_magick
 
 Name: rubygem-%{gem_name}
-Version: 4.11.0
-Release: 16%{?dist}
-Summary: Manipulate images with minimal use of memory via ImageMagick / GraphicsMagick
+Version: 5.3.1
+Release: 7%{?dist}
+Summary: Manipulate images with minimal use of memory via ImageMagick
 License: MIT
 URL: https://github.com/minimagick/minimagick
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-
-# The mini_magick gem doesn't ship with the test suite.
-# You may check it out like so:
-# git clone http://github.com/minimagick/minimagick.git --no-checkout
-# cd minimagick && git archive -v -o mini_magick-4.11.0-tests.txz v4.11.0 spec/
-Source1: %{gem_name}-%{version}-tests.txz
-
-# https://github.com/minimagick/minimagick/pull/550
-# File.exists? is deprecated since ruby 2.1.0 and will be removed on ruby 3.2
-Patch0:  rubygem-mini_magick-4.11.0-File_exists-removal.patch
+# git clone http://github.com/minimagick/minimagick.git --no-checkout && cd minimagick
+# git archive -v -o mini_magick-5.3.1-tests.tar.gz v5.3.1 spec/
+Source1: %{gem_name}-%{version}-tests.tar.gz
 
 Requires: ImageMagick
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
-BuildRequires: rubygem(rexml)
 BuildRequires: ruby
+BuildRequires: rubygem(logger)
 BuildRequires: rubygem(rspec)
-BuildRequires: rubygem(webmock)
 BuildRequires: ImageMagick
 BuildArch: noarch
 
@@ -50,10 +42,6 @@ Documentation for %{name}.
 %prep
 %setup -q -n %{gem_name}-%{version} -b1
 
-( cd %{_builddir}/spec
-%patch -P0 -p2
-)
-
 %build
 gem build ../%{gem_name}-%{version}.gemspec
 %gem_install
@@ -67,35 +55,18 @@ cp -a .%{gem_dir}/* \
 # Check section disabled: Disabling checks for initial set of failures.
 exit 0
 
-pushd .%{gem_instdir}
-ln -s %{_builddir}/spec .
+( cd .%{gem_instdir}
+ln -s %{builddir}/spec .
 
-# Remove unneeded pry dependency.
-# https://github.com/minimagick/minimagick/pull/453
-# Also remove bundler.
-sed -i -e '/require "pry"/ s/^/#/g' \
-       -e '/require "bundler/ s/^/#/g' \
+# avoid Bundler dependency.
+sed -i -e '/require "bundler/ s/^/#/' \
   spec/spec_helper.rb
 
-# We do not use GraphicsMagic or posix-spawn
-sed -i -e '/^  \[:imagemagick, :graphicsmagick\].each do |cli|$/ s/, :graphicsmagick//g' \
-       -e '/^  \["open3", "posix-spawn"\].each do |shell_api|$/ s/, "posix-spawn"//g' \
-  spec/spec_helper.rb
-sed -i '/^    it "identifies when gm exists" do$/,/    end/ s/^/#/g' \
-  spec/lib/mini_magick/utilities_spec.rb
-sed -i "/^    it \"returns GraphicsMagick's version\" do$/,/    end/ s/^/#/g" \
-  spec/lib/mini_magick_spec.rb
-sed -i -e 's|, "GraphicsMagick"||' \
-	spec/lib/mini_magick/image_spec.rb
-
-# ImageMagick version incompatibility
-sed -i "/ have_key(\"date:create\")/ s/^/#/" \
-  spec/lib/mini_magick/image_spec.rb
-sed -i "/^\s*it \"does not hang when parsing verbose data\" do$/ a \ skip" \
-  spec/lib/mini_magick/image_spec.rb
-
-rspec spec
-popd
+# ImageMagick does not respect MAGICK_TIME_LIMIT when SOURCE_DATE_EPOCH is in
+# play
+# https://github.com/ImageMagick/ImageMagick/issues/8301
+env -u SOURCE_DATE_EPOCH rspec spec
+)
 
 %files
 %dir %{gem_instdir}
@@ -106,9 +77,22 @@ popd
 
 %files doc
 %doc %{gem_docdir}
+%doc %{gem_instdir}/README.md
 %{gem_instdir}/Rakefile
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.3.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Nov 27 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 5.3.1-2
+- Add BuildRequires: rubygem(logger) dep for ruby4_0 explicitly
+
+* Fri Aug 29 2025 Vít Ondruch <vondruch@redhat.com> - 5.3.1-1
+- Update to MiniMagick 5.3.1.
+  Resolves: rhbz#2389591
+- Fix FTBFS in Fedora rawhide/f43
+  Resolves: rhbz#2385590
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

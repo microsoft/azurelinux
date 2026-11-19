@@ -1,0 +1,5 @@
+# Pin to Fedora f44 rubygem-mini_magick-5.3.1. Active Storage 8.0.5.2 ships an
+# ImageMagick security policy (CVE-2026-126082) that needs mini_magick 5.1 or later.
+# https://src.fedoraproject.org/rpms/rubygem-mini_magick/c/4891018f20b4ecc119b5ccf2da69a3ae627b5ef6
+[components.rubygem-mini_magick]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "4891018f20b4ecc119b5ccf2da69a3ae627b5ef6" }
