@@ -1,0 +1,2 @@
+# Default Fedora f43 import; this file exists only so the CVE backport overlays load.
+[components.libva]
