@@ -43,7 +43,7 @@ To try Azure Linux base container, please use the following image reference: `mc
 <details>
 <summary><b>💿 ISO Installer</b></summary>
 
-To try Azure Linux in a local VM, please download the ISO Installer: [x86_64](https://aka.ms/azurelinux-4.0-x86_64.iso) / [ARM64](https://aka.ms/azurelinux-4.0-aarch64.iso)
+To try Azure Linux in a local VM, please download the ISO Installer: [x86_64](https://aka.ms/azurelinux-4-x86_64-iso) / [ARM64](https://aka.ms/azurelinux-4-aarch64-iso)
 
 Before using a downloaded ISO, [verify the checksum and signature of the ISO](./docs/verify-iso-signature-and-checksum.md).
 
