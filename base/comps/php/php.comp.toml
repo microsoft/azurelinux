@@ -1,4 +1,5 @@
 [components.php]
-# Pin Fedora 43's PHP security update beyond the distro snapshot.
+# Pin Fedora 43's PHP 8.4.28 security update (php-8.4.28-2.fc43) beyond the distro snapshot:
+# https://src.fedoraproject.org/rpms/php/c/8c509db1a004b3426fd9c6fce44981e6d39e4f44
 # Drop this pin once the default snapshot includes this revision.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "f0dedf413b13485d51273cc7f87cb793cfd98f76" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "8c509db1a004b3426fd9c6fce44981e6d39e4f44" }
