@@ -1,0 +1,8 @@
+[components.python-tornado]
+
+# Sources for the 6.6.1 update overlay; drop together with it once Fedora ships 6.6.1 or newer.
+[[components.python-tornado.source-files]]
+filename = "tornado-6.6.1.tar.gz"
+hash = "3642296ba92022d87380765708a38839ec55c4042ee2b362afe685561a30f8af26cb30ce7d77a4d8bddba8bb3cee8f25c378c69a8ac133fc1a26c1c4605d45a5"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/tornadoweb/tornado/archive/v6.6.1/tornado-6.6.1.tar.gz" }
