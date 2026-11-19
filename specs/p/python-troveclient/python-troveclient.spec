@@ -22,7 +22,7 @@ implements 100% (or less ;) ) of the Trove API.
 
 Name:           python-troveclient
 Version:        8.6.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        Client library for OpenStack DBaaS API
 
 License:        Apache-2.0
@@ -113,9 +113,6 @@ rm -rf doc/build/html/.{doctrees,buildinfo}
 %endif
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %tox -e %{default_toxenv}
 
 

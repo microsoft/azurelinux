@@ -47,7 +47,7 @@
 Summary:    Scientific Tools for Python
 Name:       scipy
 Version:    1.16.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # BSD-3-Clause -- whole package except:
 # BSD-2-Clause -- scipy/_lib/_pep440.py
@@ -208,9 +208,6 @@ done
 %py3_shebang_fix %{buildroot}%{python3_sitearch}
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if %{with tests}
 # check against the reference BLAS/LAPACK
 export FLEXIBLAS=netlib

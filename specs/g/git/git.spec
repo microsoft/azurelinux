@@ -90,7 +90,7 @@
 
 Name:           git
 Version:        2.56.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        Fast Version Control System
 License:        BSD-3-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:            https://git-scm.com/
@@ -823,9 +823,6 @@ find %{buildroot}%{_pkgdocdir}/{howto,technical} -type f \
 ##### #DOC
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if %{without tests}
 echo "*** Skipping tests"
 exit 0

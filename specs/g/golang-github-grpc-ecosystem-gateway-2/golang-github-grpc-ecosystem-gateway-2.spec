@@ -17,7 +17,7 @@ GRPC to JSON proxy generator following the gRPC HTTP spec.}
 %global godocs          docs examples ADOPTERS.md CONTRIBUTING.md README.md
 
 Name:           %{goname}
-Release: 20%{?dist}
+Release: 21%{?dist}
 Summary:        GRPC to JSON proxy generator following the gRPC HTTP spec
 
 # Upstream license specification: BSD-3-Clause
@@ -56,9 +56,6 @@ install -m 0755 -vp %{gobuilddir}/src/github.com/grpc-ecosystem/grpc-gateway/v2/
 
 %if %{with check}
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if 0%{?__isa_bits} == 64
 %gocheck
 %else

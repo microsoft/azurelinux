@@ -18,7 +18,7 @@ and cloud systems like Xen, KVM, VMware, EC2 and more.
 
 Name:           kiwi
 Version:        11.0.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL:            http://osinside.github.io/kiwi/
 Summary:        Flexible operating system image builder
 License:        GPL-3.0-or-later
@@ -572,9 +572,6 @@ fi
 
 %if %{with check}
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 pushd test/unit
 # skipped tests require anymarkup which was retired from Fedora
 # we patch the code of default ISO tagging method, hence skip test_config_sections_* too

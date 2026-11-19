@@ -58,7 +58,7 @@
 
 Name:          gdal
 Version:       3.11.5
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:       GIS file format library
 License:       MIT
 URL:           http://www.gdal.org
@@ -478,9 +478,6 @@ done
 
 %if 0%{run_tests}
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %ctest || :
 %endif
 

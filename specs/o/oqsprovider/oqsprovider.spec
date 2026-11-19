@@ -5,7 +5,7 @@
 %global liboqs_min_version 0.12.0-1
 Name:       oqsprovider
 Version:    %{oqs_version}
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:    oqsprovider is an OpenSSL provider for quantum-safe algorithms based on liboqs
 
 License:    Apache-2.0 AND MIT
@@ -43,9 +43,6 @@ provided via the encode/decode mechanism and X.509 data structures.
 %cmake_build
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %ifnarch i686
 cd "%{_vpath_builddir}"
 OPENSSL_CONF=/dev/null ctest -V

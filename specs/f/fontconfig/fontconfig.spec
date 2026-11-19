@@ -8,7 +8,7 @@
 Summary:	Font configuration and customization library
 Name:		fontconfig
 Version:	2.17.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 # src/ftglue.[ch] is in Public Domain
 # src/fccache.c contains Public Domain code
 ## https://gitlab.com/fedora/legal/fedora-license-data/-/issues/177
@@ -133,9 +133,6 @@ install -p -m 0755 %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}/fc-cache
 cat %{name}-conf.lang >> %{name}.lang
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %meson_test
 
 %post

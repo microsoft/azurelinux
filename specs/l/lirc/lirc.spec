@@ -12,7 +12,7 @@
 
 Name:           lirc
 Version:        0.10.2
-Release:        4%{?tag:.}%{?tag}%{?dist}
+Release: 5%{?tag:.}%{?tag}%{?dist}
 Summary:        The Linux Infrared Remote Control package
 
 %global repo    http://downloads.sourceforge.net/lirc/LIRC/%{version}
@@ -252,9 +252,6 @@ export PYTHON=/usr/bin/python3
 make LANG=C.utf8 V=0 %{?_smp_mflags}
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 if test -d python-pkg/tests; then
     cd python-pkg/tests; python3 -m unittest discover || exit 1
     cd $OLDPWD

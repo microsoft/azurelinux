@@ -8,7 +8,7 @@
 Summary: Gives a fake root environment
 Name: fakeroot
 Version: 1.37.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 # setenv.c: LGPLv2+
 # contrib/Fakeroot-Stat-1.8.8: Perl (GPL+ or Artistic)
 # the rest: GPLv3+
@@ -116,9 +116,6 @@ rename -- -tcp '' %{buildroot}%{_mandir}{,/*}/man1/fake{d,root}-tcp.1
 sed -e 's/-tcp//g' fake{d,root}-tcp.lang > fakeroot.lang
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 for type in sysv tcp; do
 %ifarch ppc64le
 %if 0%{?rhel}

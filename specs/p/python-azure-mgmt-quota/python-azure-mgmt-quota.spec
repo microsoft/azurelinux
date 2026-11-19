@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        1.0.0~b2
-Release: 17%{?dist}
+Release: 18%{?dist}
 Summary:        Microsoft Azure Quota Management Client Library for Python
 License:        MIT
 URL:            https://pypi.org/project/%{srcname}/
@@ -43,9 +43,6 @@ Summary:        %{summary}
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %pyproject_check_import
 
 

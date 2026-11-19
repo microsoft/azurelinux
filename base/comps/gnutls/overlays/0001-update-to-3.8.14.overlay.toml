@@ -14,6 +14,12 @@ tag = "Version"
 value = "3.8.14"
 
 [[overlays]]
+description = "Advance the 3.8.14 release after restoring package checks; the version overlay resets autorelease"
+type = "spec-update-tag"
+tag = "Release"
+value = "%{?autorelease:%{autorelease -b 2}}%{!?autorelease:2%{?dist}}"
+
+[[overlays]]
 description = "Make the read-only m4/pkg.m4 and m4/gtk-doc.m4 from the 3.8.14 tarball writable so autoreconf in %build can replace them (gnutls#2029)"
 type = "spec-append-lines"
 section = "%prep"

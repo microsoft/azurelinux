@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.11.0
-Release: 16%{?dist}
+Release: 17%{?dist}
 Summary: Manipulate images with minimal use of memory via ImageMagick / GraphicsMagick
 License: MIT
 URL: https://github.com/minimagick/minimagick
@@ -64,9 +64,6 @@ cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 pushd .%{gem_instdir}
 ln -s %{_builddir}/spec .
 

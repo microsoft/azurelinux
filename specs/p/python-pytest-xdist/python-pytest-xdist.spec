@@ -5,7 +5,7 @@
 
 Name:           python-pytest-xdist
 Version:        3.7.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        pytest plugin for distributed testing and loop-on-failing modes
 
 License:        MIT
@@ -48,9 +48,6 @@ Summary:        %{summary}
 %pyproject_save_files -l xdist
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %tox
 
 

@@ -5,7 +5,7 @@
 
 Name:           srt
 Version:        1.5.7
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Secure Reliable Transport protocol tools
 
 License:        MPL-2.0
@@ -65,9 +65,6 @@ rm -f %{buildroot}/%{_libdir}/pkgconfig/haisrt.pc
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 # tests do not work in parallel as of 1.5.4 rc0
 # - TestIPv6 are known broken due to v4_v6 mapping differnces between platforms
 #   https://github.com/Haivision/srt/issues/1972#

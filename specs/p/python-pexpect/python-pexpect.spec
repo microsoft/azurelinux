@@ -8,7 +8,7 @@
 Name:           python-%{modname}
 Summary:        Unicode-aware Pure Python Expect-like module
 Version:        4.9.0
-Release: 19%{?dist}
+Release: 20%{?dist}
 
 # All the files have ISC license except the
 # following two that have BSD license:
@@ -85,9 +85,6 @@ rm -rf %{buildroot}%{python3_sitelib}/pexpect/tests
 
 %if %{with check}
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 export PYTHONIOENCODING=UTF-8
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1914843
 # upstream: https://github.com/pexpect/pexpect/issues/669

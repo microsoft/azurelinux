@@ -12,7 +12,7 @@ Version:        1.4.0^%{commitdate}git%{shortcommit}
 %forgemeta
 
 Name:           python-%{srcname}
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        Python extensions for Inkscape core
 
 License:        GPL-2.0-or-later
@@ -117,9 +117,6 @@ sed -i 's/call("python"/call("python3"/' tests/test_inkex_command.py
 sed -i /env\ python/d %{buildroot}%{python3_sitelib}/inkex/tester/inx.py
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %pyproject_check_import
 %pytest -k "not test_inkex_gui"
 

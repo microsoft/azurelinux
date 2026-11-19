@@ -1,9 +1,8 @@
 # Chromium and chromedriver are not packaged in Azure Linux. They are only
 # referenced from the spec_integration test suite (gated by `%bcond_without
 # spec_integration`) and as runtime `Recommends:` (weak deps, harmless if
-# absent). The %check section is already disabled distro-wide via
-# component-check-disablement.toml, so dropping these BuildRequires is purely a
-# dependency-resolution change with no behavioral impact.
+# absent). Removing these BuildRequires does not disable integration tests
+# that require those executables.
 
 [metadata]
 category = "azl-pruning"

@@ -6,7 +6,7 @@
 
 Name:           kyua
 Version:        0.13
-Release: 22%{?dist}
+Release: 23%{?dist}
 Summary:        Testing framework for infrastructure software
 
 # Automatically converted from old format: BSD - review is highly recommended.
@@ -71,9 +71,6 @@ sed -e 's/name="stacktrace_test"/&,required_configs="enable_stacktrace"/' -i uti
 %make_install %{_make_args} doc_DATA=
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 # Tests expect dumping core to file which is different from machine to machine
 HOME=$(pwd)/check %make_build check %{_make_args}
 
