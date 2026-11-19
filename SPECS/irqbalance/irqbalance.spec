@@ -1,7 +1,7 @@
 Summary:        Irqbalance daemon
 Name:           irqbalance
 Version:        1.9.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://github.com/Irqbalance/irqbalance
 Group:          System Environment/Services
@@ -11,6 +11,7 @@ Source0:        https://github.com/Irqbalance/%{name}/archive/v%{version}.tar.gz
 Patch0:         0001-Backport-irqbalance-ENOSPC-slot-aware-placement-and-fallback.patch
 BuildRequires:  systemd-devel
 BuildRequires:  glib-devel
+BuildRequires:  libnuma-devel
 Requires:       systemd
 Requires:       glib
 
@@ -72,6 +73,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/*
 
 %changelog
+* Mon Nov 16 2026 Stephen Peters <stpete@microsoft.com> - 1.9.5-2
+- Add libnuma-devel BuildRequires to enable NUMA-aware IRQ placement
+
 * Wed Apr 15 2026 Suresh Thelkar <sthelkar@microsoft.com> - 1.9.5-1
 - Upgrade to version 1.9.5
 - Remove IRQBALANCE_ARGS patch (now upstream)
