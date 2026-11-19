@@ -41,6 +41,7 @@ def test_postgres_rejects_unsafe_pgdata(container_exec_shell: ExecShell) -> None
     """The entrypoint must reject paths that could corrupt the container."""
     result = container_exec_shell(
         "PGDATA=/ POSTGRES_PASSWORD=test /usr/local/bin/postgres-entrypoint.sh",
+        command_for_log="PGDATA=/ POSTGRES_PASSWORD=<redacted> /usr/local/bin/postgres-entrypoint.sh",
     )
     assert result.exit_code != 0, "entrypoint accepted PGDATA=/"
     assert "refusing unsafe PGDATA path: /" in result.output, f"unexpected error: {result.output}"
@@ -80,46 +81,58 @@ def test_postgres_default_command_initializes_and_serves(
             networks=[network_name],
         )
 
-        def server_exec_shell(command: str, *, shell: str = "bash") -> ContainerExecResult:
-            return exec_in_container(podman_client, server_name, [shell, "-c", command])
+        def server_exec_shell(
+            command: str, *, shell: str = "bash", command_for_log: str | None = None,
+        ) -> ContainerExecResult:
+            return exec_in_container(
+                podman_client, server_name, [shell, "-c", command],
+                command_for_log=[shell, "-c", command_for_log] if command_for_log is not None else None,
+            )
 
-        def client_exec_shell(command: str, *, shell: str = "bash") -> ContainerExecResult:
-            return exec_in_container(podman_client, client_name, [shell, "-c", command])
+        def client_exec_shell(
+            command: str, *, shell: str = "bash", command_for_log: str | None = None,
+        ) -> ContainerExecResult:
+            return exec_in_container(
+                podman_client, client_name, [shell, "-c", command],
+                command_for_log=[shell, "-c", command_for_log] if command_for_log is not None else None,
+            )
 
+        psql_args = f"psql --host={server_name} --username=postgres --dbname={POSTGRES_DB}"
+        probe_args = f"{psql_args} --tuples-only --no-align --command='SELECT 1;'"
         query = wait_until_service_ready(
             client_exec_shell,
-            (
-                f"PGPASSWORD={POSTGRES_PASSWORD} psql "
-                f"--host={server_name} --username=postgres --dbname={POSTGRES_DB} "
-                "--tuples-only --no-align --command='SELECT 1;'"
-            ),
+            f"PGPASSWORD={shlex.quote(POSTGRES_PASSWORD)} {probe_args}",
             contains="1",
             attempts=30,
+            command_for_log=f"PGPASSWORD=<redacted> {probe_args}",
         )
         assert query.stdout.strip() == "1", f"unexpected psql output: {query.output}"
 
         bad_auth = client_exec_shell(
-            f"PGPASSWORD=wrong psql "
-            f"--host={server_name} --username=postgres --dbname={POSTGRES_DB} "
-            "--command='SELECT 1;'",
+            f"PGPASSWORD=wrong {psql_args} --command='SELECT 1;'",
+            command_for_log=f"PGPASSWORD=<redacted> {psql_args} --command='SELECT 1;'",
         )
         assert bad_auth.exit_code != 0, f"wrong password was accepted: {bad_auth.output}"
         assert "authentication failed" in bad_auth.output, f"unexpected authentication error: {bad_auth.output}"
 
-        psql = (
-            f"PGPASSWORD={POSTGRES_PASSWORD} psql "
-            f"--host={server_name} --username=postgres --dbname={POSTGRES_DB} "
-            "--set=ON_ERROR_STOP=1 --tuples-only --no-align"
-        )
+        crud_args = f"{psql_args} --set=ON_ERROR_STOP=1 --tuples-only --no-align"
+        psql = f"PGPASSWORD={shlex.quote(POSTGRES_PASSWORD)} {crud_args}"
+        psql_for_log = f"PGPASSWORD=<redacted> {crud_args}"
         for statement in (
             "CREATE TABLE cities (name varchar(80), location point);",
             "INSERT INTO cities VALUES ('San Francisco', '(-194.0, 53.0)'), ('Seattle', '(-150.0, 86.0)');",
         ):
-            result = client_exec_shell(f"{psql} --command={shlex.quote(statement)}")
+            result = client_exec_shell(
+                f"{psql} --command={shlex.quote(statement)}",
+                command_for_log=f"{psql_for_log} --command={shlex.quote(statement)}",
+            )
             assert result.exit_code == 0, f"database write failed: {result.output}"
 
         statement = "SELECT name, location FROM cities ORDER BY name;"
-        rows = client_exec_shell(f"{psql} --command={shlex.quote(statement)}")
+        rows = client_exec_shell(
+            f"{psql} --command={shlex.quote(statement)}",
+            command_for_log=f"{psql_for_log} --command={shlex.quote(statement)}",
+        )
         assert rows.exit_code == 0, f"reading stored rows failed: {rows.output}"
         assert rows.stdout.splitlines() == [
             "San Francisco|(-194,53)",

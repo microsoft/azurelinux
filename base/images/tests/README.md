@@ -109,6 +109,37 @@ capability isn't in `--capabilities`.
 > image-specific tests under `cases/<image-family>/` to run. Without
 > it, every `@pytest.mark.image(...)`-tagged test is skipped.
 
+## Container command diagnostics
+
+Execution helpers and fixtures accept an optional `command_for_log`: a list
+for `exec_in_container()` / `container_exec`, or a string for shell helpers.
+Only this display version is logged; the original command is executed
+unchanged. Without it, logs show `<command omitted>`.
+
+Build the real and display commands separately from shared non-sensitive
+arguments. Insert credentials only into the real command and a fixed
+`<redacted>` placeholder into the display version. Do not construct display
+commands by replacing secrets in the real command. The helpers trust the
+caller to supply a credential-free display; they do not detect secrets.
+
+`wait_until_service_ready()` forwards `command_for_log` to its executor and
+includes it, the attempt count, and last exit code in timeout errors.
+Captured output is never included in those errors. Returned results remain
+unchanged and may contain sensitive data; other test assertions and runtime
+output are outside this diagnostic boundary.
+
+### Helper unit tests
+
+Run the diagnostic regression tests without an image or native tools:
+
+```bash
+cd base/images/tests
+uv run python -m pytest cases/unit/ -p no:azl_image --confcutdir=cases/unit
+```
+
+Disabling the image plugin and excluding parent image fixtures isolates these
+unit tests from image validation and native-tool preflight checks.
+
 ## Prerequisites
 
 System packages (not pip-installable):
@@ -185,8 +216,8 @@ base/images/
 | `podman_client` | session | `DockerClient \| None` | python-on-whales Podman client; None for non-container images |
 | `container_image_ref` | session | `str \| None` | Loaded image ID (cached); None for non-container |
 | `running_container` | function | `ContainerInstance` | Fresh container per test — auto-skips on VMs |
-| `container_exec_shell` | function | callable | `(cmd, shell="bash") → ContainerExecResult` |
-| `container_exec` | function | callable | `(args) → ContainerExecResult` |
+| `container_exec_shell` | function | callable | `(cmd, *, shell="bash", command_for_log=None) → ContainerExecResult` |
+| `container_exec` | function | callable | `(args, *, command_for_log=None) → ContainerExecResult` |
 | `wait_for_http` | function | callable | `(url, *, retries=5, delay=1.0, connect_timeout=2.0, max_time=5.0) → ContainerExecResult` — polls an in-container HTTP endpoint with `curl`; raises after retries |
 | `assert_http_server` | function | callable | `(start_command, url, expected, *, retries=5, delay=1.0) → ContainerExecResult` — starts a server, waits for `url`, asserts `expected` in body |
 | `client_server_exec_shell` | function | tuple | Networked server and client containers for cross-container tests |

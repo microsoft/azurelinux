@@ -51,11 +51,30 @@ class ContainerExecResult(NamedTuple):
     output: str
 
 
+class ExecCommand(Protocol):
+    """Run command arguments inside a test container."""
+
+    def __call__(
+        self,
+        command: list[str],
+        *,
+        command_for_log: list[str] | None = None,
+    ) -> ContainerExecResult:
+        """Execute the original arguments, logging only the supplied display copy."""
+        ...
+
+
 class ExecShell(Protocol):
     """Run a shell command string inside a test container."""
 
-    def __call__(self, command: str, *, shell: str = "bash") -> ContainerExecResult:
-        """Execute the command with the selected shell."""
+    def __call__(
+        self,
+        command: str,
+        *,
+        shell: str = "bash",
+        command_for_log: str | None = None,
+    ) -> ContainerExecResult:
+        """Execute the original shell command, logging only the supplied display copy."""
         ...
 
 
@@ -318,6 +337,8 @@ def exec_in_container(
     client: DockerClient,
     container_name: str,
     command: list[str],
+    *,
+    command_for_log: list[str] | None = None,
 ) -> ContainerExecResult:
     """Execute a command inside a running container.
 
@@ -325,12 +346,19 @@ def exec_in_container(
         client: Active python-on-whales Podman client.
         container_name: Name of the running container.
         command: Command argv to execute.
+        command_for_log: Optional credential-free display arguments, built
+            independently of secrets. Never derive them by sanitizing the
+            executed command. None omits command text from diagnostics.
 
     Returns:
         ContainerExecResult with exit_code, per-stream stdout/stderr, and a
         combined ``output`` for convenience.
     """
-    logger.debug("Container exec [%s]", container_name)
+    logger.debug(
+        "Container exec [%s]: %s",
+        container_name,
+        command_for_log if command_for_log is not None else "<command omitted>",
+    )
     stdout_parts: list[str] = []
     stderr_parts: list[str] = []
 
@@ -376,22 +404,37 @@ def _make_exec_result(
     )
 
 
-def wait_until_service_ready(
+def wait_until_service_ready(  # noqa: PLR0913 - explicit keyword-only options define the test API
     exec_shell: ExecShell,
     command: str,
     *,
     contains: str = "",
     attempts: int = 10,
     delay: float = 1.0,
+    command_for_log: str | None = None,
 ) -> ContainerExecResult:
-    """Poll ``command`` until it exits 0 and its output contains ``contains``."""
+    """Poll ``command`` until it exits 0 and its output contains ``contains``.
+
+    Forward an optional credential-free ``command_for_log`` to the executor
+    and include it in timeout errors. Build it independently of secrets.
+    Raw commands and captured output are never included in timeout errors.
+    """
+    last_exit_code: int | None = None
     for attempt in range(attempts):
         if attempt:
             time.sleep(delay)
-        result = exec_shell(command)
+        result = (
+            exec_shell(command)
+            if command_for_log is None
+            else exec_shell(command, command_for_log=command_for_log)
+        )
         if result.exit_code == 0 and contains in result.output:
             return result
-    raise AssertionError("Service never became ready")
+        last_exit_code = result.exit_code
+    raise AssertionError(
+        f"Service never became ready (attempts={attempts}, last_exit_code={last_exit_code}): "
+        f"{command_for_log if command_for_log is not None else '<command omitted>'}"
+    )
 
 
 def destroy_container(client: DockerClient, container_name: str) -> None:
