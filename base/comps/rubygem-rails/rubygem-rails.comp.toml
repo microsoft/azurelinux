@@ -1,0 +1,8 @@
+[components.rubygem-rails]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-rails.source-files]]
+filename = "rails-8.0.5.2.gem"
+hash = "4bf4a9490724f6d3b083953488750649a41258fc1e28f7824a8d0ab234359d5a3e85d6368698c3b853269e6353816c9a267736426202eecb09b7b31dea263e34"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/rails-8.0.5.2.gem" }

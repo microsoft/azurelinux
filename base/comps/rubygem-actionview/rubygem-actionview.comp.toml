@@ -1,0 +1,17 @@
+[components.rubygem-actionview]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-actionview.source-files]]
+filename = "actionview-8.0.5.2.gem"
+hash = "bc6a82571612ec7bebaa566c8bf62a6ffeda2d6e0e88b8361d61d04c16e5c818a3b2bccafc740d9ea812f653be5a226bd064f119f94e5e1607ad8da5c0022d92"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/actionview-8.0.5.2.gem" }
+
+# Generated: the actionview/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-actionview.source-files]]
+filename = "actionview-8.0.5.2-tests.tar.gz"
+hash = "d774cb0c7ab8889a2d0a05266211e809079247a6a45483ae1b1baa5d4223334bf618512f729b2a610d5f7c1a08649837bc4a267dab033a86654d52963c5d24bd"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]
