@@ -1,0 +1,17 @@
+[components.gnutls]
+
+# Sources for the 3.8.14 update overlay; drop together with it once Fedora ships 3.8.14 or newer.
+# Release tarball and signature from gnupg.org; the signature verifies against the GnuTLS release
+# keyring the spec already ships (Alexander Sosedkin, A6AB53A01D237A94F9EEC4D0412748A40AFCC2FB),
+# and %prep checks it again with %gpgverify.
+[[components.gnutls.source-files]]
+filename = "gnutls-3.8.14.tar.xz"
+hash = "d28911cb6176ada9d90e5611f065d8a56744cc63771ca73a0544f4cf07eb4e33c6c07debd3ef471ffe8fa0fbf327ff8393a998c95c64ddae788514adc5d8f266"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.14.tar.xz" }
+
+[[components.gnutls.source-files]]
+filename = "gnutls-3.8.14.tar.xz.sig"
+hash = "0b3610239548c57ecc28d80e183fbcc90b209dddf70a131e284b79c930056afcc62475bc471272811f925d5cec79d8dcc4f6625f46cb0b63e6ea436ffcfe5545"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.14.tar.xz.sig" }
