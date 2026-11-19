@@ -5,8 +5,8 @@
 
 Summary: ECPG - Embedded SQL in C
 Name: libecpg
-Version: %majorversion.4
-Release: 6%{?dist}
+Version: %majorversion.16
+Release: 7%{?dist}
 
 License: PostgreSQL
 Url: http://www.postgresql.org/
