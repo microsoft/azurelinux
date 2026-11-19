@@ -8,7 +8,6 @@ Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
-Patch0:         CVE-2025-13151.patch
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  libtasn1-devel
