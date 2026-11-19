@@ -1,0 +1,25 @@
+# Fedora does not package clamav 1.4.7 on f43/f44 yet. Update the f43 spec to the upstream 1.4.7
+# patch release for these CVE fixes:
+# CVE-2026-76411, CVE-2026-76414, CVE-2026-76415, CVE-2026-76416, CVE-2026-76417,
+# CVE-2026-76421, CVE-2026-76422, CVE-2026-76430, CVE-2026-76515, CVE-2026-76516
+# Fedora builds from clamav-<ver>-norar.tar.xz, the upstream release with libclamunrar/* removed,
+# because the bundled unRAR licence is not allowed in Fedora. We do the same: gen-norar-tarball.sh
+# generates the norar tarball from the signed upstream release with Fedora's exact removal, so the
+# spec's Source0 and %prep stay as in Fedora.
+# Remove this overlay once the imported Fedora spec packages 1.4.7 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.4.7"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.4.7"
+
+[[overlays]]
+description = "Remove the obsolete clamav-1.4.6-norar.tar.xz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(clamav-1\.4\.6-norar\.tar\.xz\) = [0-9a-f]+(?:\r?\n|$)'

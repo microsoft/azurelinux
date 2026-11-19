@@ -1,0 +1,13 @@
+[components.clamav]
+
+# Fedora's clamav-<ver>-norar.tar.xz for the 1.4.7 update overlay; drop together with it once Fedora
+# ships 1.4.7 or newer. gen-norar-tarball.sh downloads the upstream 1.4.7 release, checks its pinned
+# SHA512 and Talos signature (fingerprint 5BADCA2665EF59DCF8A23D8B707F0DB480836771) and removes
+# libclamunrar/* exactly as Fedora's update_clamav.sh does.
+[[components.clamav.source-files]]
+filename = "clamav-1.4.7-norar.tar.xz"
+hash = "388fc8f4ca5755a2e61a9c75141afad389e8382eb3db39fdb401e88d0763a9f8b959d0a316549e73f34e4b4a7fcbd0942c8302a349cf7d8014679bb3d5dc15a0"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-norar-tarball.sh"
+origin.mock-packages = ["curl", "gnupg2", "gzip", "tar"]
