@@ -26,6 +26,11 @@ Patch11:      CVE-2026-81870.patch
 Patch12:      CVE-2026-107325.patch
 Patch13:      CVE-2026-116591.patch
 Patch14:      CVE-2026-95838.patch
+Patch15:      CVE-2026-43871.patch
+Patch16:      CVE-2026-48586.patch
+Patch17:      CVE-2026-55969.patch
+Patch18:      CVE-2026-63772.patch
+Patch19:      CVE-2026-94637.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -153,6 +158,8 @@ popd
 - Ship the OpenVMM IGVM builder in -tools
 - Replace the kernel-uvm and virtiofsd dependencies with openvmm and erofs-utils
 - Use the kata-containers 4.1.0 patches; drop the 3.15.0.aks0 patches
+- Keep the patches for CVE-2026-43871, CVE-2026-48586, CVE-2026-55969, CVE-2026-63772 and
+  CVE-2026-94637 in the Thrift copy of the vendored jaeger exporter, still pinned at v1.0.0
 
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-24
 - Patch for CVE-2026-95838, CVE-2026-116591
