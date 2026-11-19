@@ -1,0 +1,17 @@
+[components.rubygem-concurrent-ruby]
+
+# Sources for the 1.3.7 update overlay; drop together with it once Fedora ships 1.3.7 or newer.
+[[components.rubygem-concurrent-ruby.source-files]]
+filename = "concurrent-ruby-1.3.7.gem"
+hash = "52995ff0b9559b2715e08d77a148fed58b66a93612e55cf99c4cf9409770954c1bbed8dba8992df99a42f4fa31418e2692b893530b869ff30ff6e517b0882da0"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/concurrent-ruby-1.3.7.gem" }
+
+# The gem does not ship the test suite; take spec/ from upstream's v1.3.7 tag archive on GitHub
+# (no release assets are published). Its SHA512 was the same when downloaded from
+# archive/v1.3.7/concurrent-ruby-1.3.7.tar.gz and archive/refs/tags/v1.3.7.tar.gz.
+[[components.rubygem-concurrent-ruby.source-files]]
+filename = "concurrent-ruby-1.3.7.tar.gz"
+hash = "5f74f68a922d44f749e76d3574cd077f001c14b1b6074c2d7ab7b87c7079917a07a3bb9afc35a90bfbfd4c7a4b37f2f40505caa8fce827eec3d96105856b919b"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/ruby-concurrency/concurrent-ruby/archive/v1.3.7/concurrent-ruby-1.3.7.tar.gz" }
