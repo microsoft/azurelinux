@@ -1,0 +1,34 @@
+diff --git a/Makefile.am b/Makefile.am
+index 8144c12..cee45ba 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,6 +1,10 @@
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS = include libjwt examples tests dist
++SUBDIRS = include libjwt
++if BUILD_EXAMPLES
++SUBDIRS += examples
++endif
++SUBDIRS += tests dist
+ 
+ include $(top_srcdir)/doxygen.mk
+ 
+diff --git a/configure.ac b/configure.ac
+index 4aa1de8..e0e9008 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -20,6 +20,13 @@ AS_IF([test "x$with_openssl" != "xno"], [
+ 	AM_CONDITIONAL([HAVE_OPENSSL], [false])
+ ])
+ 
++AC_ARG_WITH([examples],
++	AS_HELP_STRING([--without-examples], [do not build example programs]),
++	[],
++	[with_examples=yes])
++
++AM_CONDITIONAL([BUILD_EXAMPLES], [test "x$with_examples" != "xno"])
++
+ PKG_CHECK_MODULES([JANSSON], [jansson >= 2.0])
+ PKG_CHECK_MODULES([CHECK], [check >= 0.9.4], [true], [true])
+ 
