@@ -1,0 +1,30 @@
+# Fedora f43/f44 package libkcapi 1.5.0. Update the f43 spec in-line to the upstream 1.5.1
+# release (same 1.5 series, ABI compatible) for:
+# CVE-2026-71225, CVE-2026-71226, CVE-2026-71227
+# The -doc subpackage stays enabled as in the f43 spec.
+# Remove this overlay once the imported Fedora spec packages 1.5.1 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+# The f43 spec builds Version from %{vmajor}.%{vminor}.%{vpatch}. No structured overlay can edit a
+# %global, and vpatch feeds nothing but the Version tag, so set the tag itself; vmajor and vminor
+# (used for the SONAME and .hmac file names) are unchanged in 1.5.1.
+[[overlays]]
+description = "Update to upstream 1.5.1"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.5.1"
+
+[[overlays]]
+description = "Remove the obsolete libkcapi-1.5.0.tar.xz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libkcapi-1\.5\.0\.tar\.xz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete libkcapi-1.5.0.tar.xz.asc source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libkcapi-1\.5\.0\.tar\.xz\.asc\) = [0-9a-f]+(?:\r?\n|$)'

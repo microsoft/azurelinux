@@ -1,0 +1,16 @@
+# Sources for the 1.5.1 update overlay; drop together with it once the imported Fedora spec
+# packages 1.5.1 or newer. Upstream release files from chronox.de; the tarball verifies against
+# the .asc with Stephan Mueller's key 342C4E3A39EA5F19909BE38AAE5D0DA3FD092353.
+[components.libkcapi]
+
+[[components.libkcapi.source-files]]
+filename = "libkcapi-1.5.1.tar.xz"
+hash = "5d9941fa6b10cd4edcc64d88590551df8df3d1753bbd579e3b1834ce63301fb8758ef453934634e6902afa7fcc57b679275d1f6eab92e3b9ef7a0227b90e4897"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://www.chronox.de/libkcapi/releases/1.5.1/libkcapi-1.5.1.tar.xz" }
+
+[[components.libkcapi.source-files]]
+filename = "libkcapi-1.5.1.tar.xz.asc"
+hash = "6c845fd76df7a0f65107b0f1ab7e9b48f1b329ee0b9a7725dbc848aa56ba0e27514ae4fae3e74c44180cfbe82e8575598c3bba84ed5f9d2f345704264c3c4046"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://www.chronox.de/libkcapi/releases/1.5.1/libkcapi-1.5.1.tar.xz.asc" }
