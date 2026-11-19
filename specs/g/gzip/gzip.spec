@@ -4,7 +4,7 @@
 Summary: GNU data compression program
 Name: gzip
 Version: 1.13
-Release: 7%{?dist}
+Release: 8%{?dist}
 # info pages are under GFDL license
 License: GPL-3.0-or-later AND GFDL-1.3-only
 Source0: https://ftp.gnu.org/gnu/gzip/gzip-%{version}.tar.xz
@@ -32,6 +32,9 @@ Provides: /bin/zcat
 # exception https://fedorahosted.org/fpc/ticket/174
 Provides: bundled(gnulib)
 
+Patch0: gzip-1.13-CVE-2026-41992-1-lzh-after-Z.patch
+Patch1: gzip-1.13-CVE-2026-41992-2-lzh-after-Z-better-fix.patch
+Patch2: gzip-1.13-CVE-2026-41991-gzexe-tmpfile.patch
 %description
 The gzip package contains the popular GNU gzip data compression
 program. Gzipped files have a .gz extension.
@@ -43,6 +46,10 @@ very commonly used data compression program.
 %setup -q
 cp %{SOURCE1} .
 autoreconf
+
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
 
 %build
 export DEFS="NO_ASM"
