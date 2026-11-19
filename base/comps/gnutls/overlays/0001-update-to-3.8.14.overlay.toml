@@ -1,0 +1,36 @@
+# Fedora f43/f44 still package gnutls 3.8.13. Update the f43 spec in-line to the upstream 3.8.14
+# release for these CVE fixes:
+# CVE-2026-127039, CVE-2026-127040, CVE-2026-127231
+# Remove this overlay once the imported Fedora spec packages 3.8.14 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.8.14"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.8.14"
+
+[[overlays]]
+description = "Make the read-only m4/pkg.m4 and m4/gtk-doc.m4 from the 3.8.14 tarball writable so autoreconf in %build can replace them (gnutls#2029)"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+  "# The 3.8.14 tarball ships these two macros with mode 0444, which breaks",
+  "# aclocal --install during autoreconf (https://gitlab.com/gnutls/gnutls/-/issues/2029).",
+  "chmod u+w m4/pkg.m4 m4/gtk-doc.m4",
+]
+
+[[overlays]]
+description = "Remove the obsolete gnutls-3.8.13.tar.xz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(gnutls-3\.8\.13\.tar\.xz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete gnutls-3.8.13.tar.xz.sig source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(gnutls-3\.8\.13\.tar\.xz\.sig\) = [0-9a-f]+(?:\r?\n|$)'
