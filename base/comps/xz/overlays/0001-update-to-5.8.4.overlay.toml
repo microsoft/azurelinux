@@ -1,0 +1,38 @@
+# Fedora f44 packages xz 5.8.2. Update to the upstream 5.8.4 release for:
+# CVE-2026-34743 (fixed in 5.8.3) and GHSA-5qpq-xqfv-j9pg (fixed in 5.8.4, CVE ID pending).
+# Remove this overlay once the imported Fedora spec packages 5.8.4 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 5.8.4"
+type = "spec-update-tag"
+tag = "Version"
+value = "5.8.4"
+
+[[overlays]]
+description = "Package the Arabic xz man pages added in 5.8.3"
+type = "spec-prepend-lines"
+section = "%files"
+lines = ["%lang(ar) %{_mandir}/ar/man1/*xz*"]
+
+[[overlays]]
+description = "Package the Arabic lzma man pages added in 5.8.3"
+type = "spec-prepend-lines"
+section = "%files"
+package = "lzma-compat"
+lines = ["%lang(ar) %{_mandir}/ar/man1/*lz*"]
+
+[[overlays]]
+description = "Remove the obsolete xz-5.8.2.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(xz-5\.8\.2\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete xz-5.8.2.tar.gz.sig source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(xz-5\.8\.2\.tar\.gz\.sig\) = [0-9a-f]+(?:\r?\n|$)'

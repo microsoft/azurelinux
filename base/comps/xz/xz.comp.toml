@@ -1,0 +1,19 @@
+# Pin to Fedora f44 xz-5.8.2-2, which already drops the Landlock backports that
+# f43 carries: https://src.fedoraproject.org/rpms/xz/c/dd57cef80faf39d6a0251dda21db596d806a6cc0
+[components.xz]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "dd57cef80faf39d6a0251dda21db596d806a6cc0" }
+
+# Sources for the 5.8.4 update overlay; drop together with it once Fedora ships 5.8.4 or newer.
+# Upstream release assets; the tarball verifies against the .sig with the key the spec ships
+# (Lasse Collin, 3690C240CE51B4670D30AD1C38EE757D69184620).
+[[components.xz.source-files]]
+filename = "xz-5.8.4.tar.gz"
+hash = "94db303688511a2d34f81ba994d834b28b0145a1ecd75ec2c61416b26c9cc24ab3e4d902808cc3d785c5894793d57af569728be7bc8ef6624bb3fc90c04f97fa"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.gz" }
+
+[[components.xz.source-files]]
+filename = "xz-5.8.4.tar.gz.sig"
+hash = "8d58525a6ccf1d041d43681296b0be96ee9576570f536081ca5996c898c84b9cf5e354bba8ebf97f207f4abc2150fe76d4c3e238465342fd8acaf8d73ace28d4"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.gz.sig" }
