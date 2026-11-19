@@ -30196,8 +30196,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.12",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.12.tar.gz"
+          "version": "8.0.13",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.13.tar.gz"
         }
       }
     },
