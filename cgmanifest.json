@@ -21383,8 +21383,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.36",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.36.tar.xz"
+          "version": "8.3.37",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.37.tar.xz"
         }
       }
     },
