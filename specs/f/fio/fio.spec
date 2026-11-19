@@ -3,7 +3,7 @@
 
 Name:		fio
 Version:	3.40
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:	Multithreaded IO generation tool
 
 License:	GPL-2.0-only
@@ -107,6 +107,8 @@ Recommends:     %{name}-engine-cuda
 Recommends:     %{name}-engine-rdma
 %endif
 
+Patch0: fio-3.40-CVE-2025-10823.patch
+Patch1: fio-3.40-CVE-2026-30656.patch
 %description
 fio is an I/O tool that will spawn a number of threads or processes doing
 a particular type of io action as specified by the user.  fio takes a
