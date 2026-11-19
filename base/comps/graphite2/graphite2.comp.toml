@@ -1,0 +1,8 @@
+[components.graphite2]
+
+# Sources for the 1.3.15 update overlay; drop together with it once Fedora ships 1.3.15 or newer.
+[[components.graphite2.source-files]]
+filename = "graphite2-1.3.15.tgz"
+hash = "855262e7c9fb54a64c54282abea96ef68ce760c6b9b108df6c706ed28e1ad03cf9c2fd88470622c1138e5eaa3f2a9539911415c3d313795f4b06b2d9d70b34e1"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/silnrsi/graphite/releases/download/1.3.15/graphite2-1.3.15.tgz" }
