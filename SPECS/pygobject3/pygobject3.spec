@@ -2,7 +2,7 @@
 Summary:        Python bindings for GObject Introspection
 Name:           pygobject3
 Version:        3.46.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,11 +18,12 @@ BuildRequires:  python3-cairo-devel
 BuildRequires:  glib-schemas
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
+BuildRequires:  python3-pip
 BuildRequires:  curl-devel
 BuildRequires:  dbus
 BuildRequires:  openssl-devel
 BuildRequires:  python3-gobject-introspection
-BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 
 
@@ -37,8 +38,8 @@ Requires:       python3-gobject-base = %{version}-%{release}
 Requires:       python3-cairo
 
 %description -n python3-gobject
-The python3-gobject package provides a convenient wrapper for the GObject 
-library and and other libraries that are compatible with GObject Introspection, 
+The python3-gobject package provides a convenient wrapper for the GObject
+library and and other libraries that are compatible with GObject Introspection,
 for use in Python 3 programs.
 
 %package     -n python3-gobject-base
@@ -70,7 +71,6 @@ This package contains files required to embed PyGObject
 %meson_install
 
 %check
-pip3 install pytest
 python3 setup.py test
 
 %files -n python3-gobject
@@ -91,6 +91,9 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.46.0-2
+- Use python3-pytest for tests instead of pip
+
 * Wed Feb 21 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.46.0-1
 - Upgrade to 3.46.0
 - Add patch to make tests work without gtk
@@ -579,7 +582,7 @@ python3 setup.py test
 
 * Fri Aug 19 2011 John (J5) Palmieri <johnp@redhat.com> - 2.90.2-2
 - fix up issues uncovered during package review
-- disable docs because they still reference the static bindings 
+- disable docs because they still reference the static bindings
   and upstream is working on new documentation
 
 * Thu Aug 18 2011 John (J5) Palmieri <johnp@redhat.com> - 2.90.2-1

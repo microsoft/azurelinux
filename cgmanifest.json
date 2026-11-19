@@ -4760,8 +4760,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.10",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.10-1/go1.26.10-20261020.3.src.tar.gz"
+          "version": "1.26.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.11-1/go1.26.11-20261110.4.src.tar.gz"
         }
       }
     },
@@ -4770,8 +4770,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.27.3",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.3-1/go1.27.3-20261020.4.src.tar.gz"
+          "version": "1.27.4",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.4-1/go1.27.4-20261110.2.src.tar.gz"
         }
       }
     },
@@ -8480,6 +8480,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-uvm-hpc",
+          "version": "6.18.58.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.18.58.mshv1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel-uvm-micro",
           "version": "6.6.96.mshv1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.96.mshv1.tar.gz"
@@ -9691,8 +9701,8 @@
         "type": "other",
         "other": {
           "name": "libfontenc",
-          "version": "1.1.7",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libfontenc-1.1.7.tar.gz"
+          "version": "1.1.10",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libfontenc-1.1.10.tar.gz"
         }
       }
     },
@@ -12161,8 +12171,8 @@
         "type": "other",
         "other": {
           "name": "libXfont2",
-          "version": "2.0.9",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.9.tar.xz"
+          "version": "2.0.10",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.10.tar.xz"
         }
       }
     },
@@ -21753,8 +21763,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.15",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.15/postgresql-16.15.tar.bz2"
+          "version": "16.16",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.16/postgresql-16.16.tar.bz2"
         }
       }
     },
@@ -26794,8 +26804,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-addressable",
-          "version": "2.9.0",
-          "downloadUrl": "https://github.com/sporkmonger/addressable/archive/refs/tags/addressable-2.9.0.tar.gz"
+          "version": "2.9.2",
+          "downloadUrl": "https://github.com/sporkmonger/addressable/archive/refs/tags/addressable-2.9.2.tar.gz"
         }
       }
     },
@@ -27254,8 +27264,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-msgpack",
-          "version": "1.8.4",
-          "downloadUrl": "https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v1.8.4.tar.gz"
+          "version": "1.8.7",
+          "downloadUrl": "https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v1.8.7.tar.gz"
         }
       }
     },
@@ -27324,8 +27334,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-nokogiri",
-          "version": "1.19.4",
-          "downloadUrl": "https://github.com/sparklemotion/nokogiri/archive/refs/tags/v1.19.4.tar.gz"
+          "version": "1.19.7",
+          "downloadUrl": "https://github.com/sparklemotion/nokogiri/archive/refs/tags/v1.19.7.tar.gz"
         }
       }
     },

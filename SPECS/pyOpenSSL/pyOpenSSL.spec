@@ -3,7 +3,7 @@
 Summary:        Python wrapper module around the OpenSSL library
 Name:           pyOpenSSL
 Version:        24.2.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,7 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-pyasn1
 BuildRequires:  python3-pycparser
+BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 %endif
 
@@ -52,7 +53,7 @@ High-level wrapper around a subset of the OpenSSL library.
 %py3_install
 
 %check
-pip3 install pretend pytest-rerunfailures pytest
+pip3 install pretend==1.0.9 pytest-rerunfailures==12.0.0
 PATH=%{buildroot}%{_bindir}:${PATH} \
 LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
     pytest
@@ -63,6 +64,9 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
+* Mon Nov 02 2026 Kshitiz Godara <kgodara@microsoft.com> - 24.2.1-3
+- Use python3-pytest from check dependencies instead of pip
+
 * Thu Mar 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.2.1-2
 - Patch for CVE-2026-27459, CVE-2026-27448
 

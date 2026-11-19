@@ -5,7 +5,7 @@ A tool for installing and managing Python packages}
 Summary:        A tool for installing and managing Python packages
 Name:           python-pip
 Version:        24.2
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        MIT AND Python-2.0.1 AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND LGPL-2.1-only AND MPL-2.0 AND (Apache-2.0 OR BSD-2-Clause)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,9 @@ BuildRequires:  python3-wheel
 %{python3_sitelib}/pip*
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 24.2-12
+- Remove additional emSign G1, C1 and ECC C3 roots from vendored certifi.
+
 * Fri Oct 23 2026 Jon Slobodzian <joslobo@microsoft.com> - 24.2-11
 - Remove affected eMudhra and AAA roots from pip's vendored certifi bundle.
 

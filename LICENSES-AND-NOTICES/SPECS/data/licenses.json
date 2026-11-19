@@ -2317,6 +2317,7 @@
                 "kernel-signed",
                 "kernel-uki",
                 "kernel-uki-signed",
+                "kernel-uvm-hpc",
                 "kpatch",
                 "kube-vip-cloud-provider",
                 "kubernetes",
