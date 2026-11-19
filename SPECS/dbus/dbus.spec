@@ -10,6 +10,7 @@ Group:          Applications/File
 URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2026-120749.patch
+Patch1:         CVE-2026-128987.patch
 BuildRequires:  autoconf-archive
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
@@ -96,7 +97,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Fri Nov 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.15.8-4
-- Patch for CVE-2026-120749
+- Patch for CVE-2026-120749, CVE-2026-128987
 
 * Tue Mar 20 2024 Sam Meluch <sammeluch@microsfot.com> - 1.15.8-3
 - fix attributes on dbus-daemon-launch-helper
