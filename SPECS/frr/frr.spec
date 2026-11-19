@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        10.5.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,8 @@ Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
 Patch5:         0001-Fix-frr-c90-complaint-error.patch
 Patch6:         0006-fix-bison-output-file-directives.patch
+Patch7:         CVE-2026-120033.patch
+Patch8:         CVE-2026-120221.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -197,6 +199,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Thu Nov 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.5.5-2
+- Patch for CVE-2026-120221, CVE-2026-120033
+
 * Fri Sep 25 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.5.5-1
 - Auto-upgrade to 10.5.5 - follow-up complete fix for CVE-2016-4049
 
