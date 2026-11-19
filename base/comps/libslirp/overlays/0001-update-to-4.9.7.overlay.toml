@@ -1,0 +1,20 @@
+# Fedora f43 and f44 package libslirp 4.9.1. Update to the upstream 4.9.7
+# patch release on the same spec for these CVE fixes:
+# CVE-2026-9539, CVE-2026-95508, CVE-2026-115449, CVE-2026-120830, CVE-2026-120831
+# Remove this overlay once the imported Fedora spec packages 4.9.7 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 4.9.7"
+type = "spec-update-tag"
+tag = "Version"
+value = "4.9.7"
+
+[[overlays]]
+description = "Remove the obsolete 4.9.1 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libslirp-4\.9\.1\.tar\.xz\) = [0-9a-f]+(?:\r?\n|$)'
