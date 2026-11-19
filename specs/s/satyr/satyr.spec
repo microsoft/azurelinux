@@ -20,7 +20,7 @@
 
 Name: satyr
 Version: 0.43
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Tools to create anonymous, machine-friendly problem reports
 License: GPL-2.0-or-later
 URL: https://github.com/abrt/satyr
@@ -102,9 +102,6 @@ autoreconf
 find %{buildroot} -name "*.la" -delete
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 make check|| {
     # find and print the logs of failed test
     # do not cat tests/testsuite.log because it contains a lot of bloat

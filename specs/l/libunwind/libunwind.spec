@@ -49,7 +49,7 @@
 Summary: An unwinding library
 Name: libunwind
 Version: 1.8.3
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: MIT
 URL: http://savannah.nongnu.org/projects/libunwind
 Source: https://github.com/libunwind/libunwind/releases/download/v%{version}/%{name}-%{version}.tar.gz
@@ -129,9 +129,6 @@ mv -f $RPM_BUILD_ROOT%{_libdir}/libunwind-ptrace.a-save $RPM_BUILD_ROOT%{_libdir
 touch -r NEWS $RPM_BUILD_ROOT%{_includedir}/libunwind.h
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 echo ====================TESTING=========================
 if ! make check ; then
     echo ====================FAILED TESTS=====================

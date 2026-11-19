@@ -180,7 +180,7 @@
 Summary: An interpreter of object-oriented scripting language
 Name: ruby
 Version: %{ruby_version}%{?development_release}
-Release: 38%{?dist}
+Release: 39%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -995,9 +995,6 @@ sed -i 's/^/%doc /' .ruby-doc.*
 sed -i 's/^/%lang(ja) /' .ruby-doc.ja
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if 0%{?with_hardening_test}
 # Check Ruby hardening.
 %define fortification_x86_64  fortified="12" fortify-able="29"

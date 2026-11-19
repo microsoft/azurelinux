@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.15.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: Libcurl wrapper
 License: MIT
 URL: https://github.com/typhoeus/ethon
@@ -54,9 +54,6 @@ cp -a .%{gem_dir}/* \
 sed -i "/#!\/usr\/bin\/env/d" %{buildroot}/%{gem_instdir}/spec/support/server.rb
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 pushd .%{gem_instdir}
 # Don't use Bundler.
 sed -i -e "/require 'bundler'/ s/^/#/" \

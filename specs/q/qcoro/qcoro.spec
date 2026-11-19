@@ -18,7 +18,7 @@ application remains responsive.}
 
 Name: qcoro
 Version: 0.12.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 License: MIT
 Summary: C++ Coroutines for Qt
@@ -145,9 +145,6 @@ popd
 %endif
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if 0%{?use_qt5}
 pushd %{qt5_build_dir}
 %ctest --timeout 3600

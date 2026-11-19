@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.0.17
-Release: 18%{?dist}
+Release: 19%{?dist}
 Summary: Ruby extension for the vips image processing library
 License: MIT
 URL: http://github.com/libvips/ruby-vips
@@ -69,9 +69,6 @@ cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 pushd .%{gem_instdir}
 ln -s %{_builddir}/spec .
 rspec spec

@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.1.0
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary: A gem for controlling external programs running in the background
 License: MIT
 URL: http://github.com/enkessler/childprocess
@@ -48,9 +48,6 @@ cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 pushd .%{gem_instdir}
 # We don't care about code coverage.
 sed -i '/[cC]overalls/ s/^/#/' spec/spec_helper.rb

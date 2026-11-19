@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.0.1
-Release: 20%{?dist}
+Release: 21%{?dist}
 Summary: HTTP/REST API client library
 License: MIT
 URL: https://lostisland.github.io/faraday
@@ -83,9 +83,6 @@ cp -a .%{gem_dir}/* \
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 pushd .%{gem_instdir}
 # We don't care about code coverage.
 sed -i "/simplecov/ s/^/#/" spec/spec_helper.rb

@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Advance the manually managed release after restoring package checks"
+type = "spec-update-tag"
+tag = "Release"
+value = "0.42%{?dist}"

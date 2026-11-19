@@ -7,7 +7,7 @@ URL:          http://www.kornshell.com/
 License:      EPL-2.0
 Epoch:        3
 Version:      1.0.10
-Release: 9%{?dist}
+Release: 10%{?dist}
 Source0:      https://github.com/ksh93/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:      kshcomp.conf
 Source2:      kshrc.rhs
@@ -75,9 +75,6 @@ touch %{buildroot}%{_bindir}/rksh
 touch %{buildroot}%{_mandir}/man1/rksh.1.gz
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 # script is needed for pty tests in mock
 script -q -e -c "bin/package test"
 

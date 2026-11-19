@@ -18,7 +18,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.23.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Library for stubbing HTTP requests in Ruby
 License: MIT
 URL: https://github.com/bblimke/webmock
@@ -98,9 +98,6 @@ cp -a .%{gem_dir}/* \
 
 # Run the test suite
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 pushd .%{gem_instdir}
 
 ln -s %{builddir}/minitest minitest

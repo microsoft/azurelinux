@@ -7,7 +7,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.34.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Selenium is a browser automation tool for automated testing of webapps and more
 License: Apache-2.0
 URL: https://selenium.dev
@@ -93,9 +93,6 @@ ln -sf %{_bindir}/selenium-manager %{buildroot}%{gem_instdir}/bin/linux/
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 ( cd .%{gem_instdir}
 cp -a %{builddir}/rb/spec .
 cp -a %{builddir}/common ..

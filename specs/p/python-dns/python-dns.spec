@@ -16,7 +16,7 @@
 
 Name:           python-dns
 Version:        2.8.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        DNS toolkit for Python
 
 # The entire package is licensed with both licenses, see LICENSE file
@@ -79,9 +79,6 @@ sed -i 's/requests-toolbelt = {version=">=0.9.1,<0.11.0"/requests-toolbelt = {ve
 %pyproject_save_files dns
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 export OPENSSL_ENABLE_SHA1_SIGNATURES=yes
 %pytest
 

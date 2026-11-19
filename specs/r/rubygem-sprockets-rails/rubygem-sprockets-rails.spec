@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.5.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Sprockets Rails integration
 License: MIT
 URL: https://github.com/rails/sprockets-rails
@@ -49,9 +49,6 @@ cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 ( cd .%{gem_instdir}
 ln -s %{builddir}/test .
 

@@ -15,7 +15,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 6.4.2
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary: A simple, fast, threaded, and highly concurrent HTTP 1.1 server
 # MIT: lib/puma/sd_notify.rb
 # https://github.com/puma/puma/issues/3311
@@ -151,9 +151,6 @@ help2man --no-discard-stderr -N -s1 -o %{buildroot}%{_mandir}/man1/%{gem_name}.1
 
 # Run the test suite
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 pushd .%{gem_instdir}
 cp -a %{_builddir}/test .
 ln -s %{_builddir}/examples .

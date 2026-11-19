@@ -3,7 +3,7 @@
 
 Name:           perl-XML-DOM
 Version:        1.46
-Release: 30%{?dist}
+Release: 31%{?dist}
 Summary:        DOM extension to XML::Parser
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
@@ -59,9 +59,6 @@ description of the DOM (Document Object Model), see
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 make test
 
 

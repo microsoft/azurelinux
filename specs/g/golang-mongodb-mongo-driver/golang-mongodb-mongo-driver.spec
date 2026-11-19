@@ -20,7 +20,7 @@ The Go driver for MongoDB.}
 %global godocs          examples CONTRIBUTING.md README.md
 
 Name:           %{goname}
-Release: 21%{?dist}
+Release: 22%{?dist}
 Summary:        Go driver for MongoDB
 
 # Upstream license specification: Apache-2.0
@@ -77,9 +77,6 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 
 %if %{with check}
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 # Disabled tests need a mongo client or network access
 %gocheck -d mongo \
          -d mongo/gridfs \

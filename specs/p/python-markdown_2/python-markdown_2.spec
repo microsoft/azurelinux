@@ -6,7 +6,7 @@
 
 Name:           python-%{modname}_2
 Version:        3.4.4
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary:        Python implementation of Markdown
 
 License:        BSD-3-Clause
@@ -47,9 +47,6 @@ sed -i -e '/unittest/d' tests/test_syntax/extensions/test_md_in_html.py
 %pyproject_wheel
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %pytest -v
 
 %install
