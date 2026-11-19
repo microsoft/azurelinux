@@ -69,8 +69,6 @@ Requires:       kata-containers-cc-tools
 Requires:       kernel-uvm >= 6.18.52.mshv2
 Requires:       make
 Requires:       parted
-# kata-cc igvm_manifest.py
-Requires:       python3
 Requires:       qemu-img
 Requires:       veritysetup
 
