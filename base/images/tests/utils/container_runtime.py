@@ -10,6 +10,7 @@ Podman CLI directly.
 from __future__ import annotations
 
 import logging
+import re
 import time
 import uuid
 from typing import TYPE_CHECKING, NamedTuple, Protocol, cast
@@ -314,10 +315,26 @@ def create_container(  # noqa: PLR0913 - explicit keyword-only options define th
     )
 
 
+def _safe_diagnostic(text: str, sensitive_values: tuple[str, ...] | None) -> str:
+    """Mask supplied literal values, or omit text unless the caller opts in."""
+    if sensitive_values is None:
+        return "<omitted>"
+    if any(not value for value in sensitive_values):
+        raise ValueError("Sensitive values must not be empty")
+    if not sensitive_values:
+        return text
+
+    pattern = "|".join(re.escape(value) for value in sorted(set(sensitive_values), key=len, reverse=True))
+    # Replace in one pass so another value cannot alter an inserted mask.
+    return re.sub(pattern, "<redacted>", text)
+
+
 def exec_in_container(
     client: DockerClient,
     container_name: str,
     command: list[str],
+    *,
+    sensitive_values: tuple[str, ...] | None = None,
 ) -> ContainerExecResult:
     """Execute a command inside a running container.
 
@@ -325,12 +342,20 @@ def exec_in_container(
         client: Active python-on-whales Podman client.
         container_name: Name of the running container.
         command: Command argv to execute.
+        sensitive_values: Literal values to mask in command diagnostics.
+            None omits the command; an empty tuple declares it non-sensitive.
+            The executed command and returned output are not modified.
 
     Returns:
         ContainerExecResult with exit_code, per-stream stdout/stderr, and a
         combined ``output`` for convenience.
     """
-    logger.debug("Container exec [%s]", container_name)
+    safe_command = (
+        [_safe_diagnostic(arg, sensitive_values) for arg in command]
+        if sensitive_values is not None
+        else "<omitted>"
+    )
+    logger.debug("Container exec [%s]: %s", container_name, safe_command)
     stdout_parts: list[str] = []
     stderr_parts: list[str] = []
 
@@ -376,22 +401,36 @@ def _make_exec_result(
     )
 
 
-def wait_until_service_ready(
+def wait_until_service_ready(  # noqa: PLR0913 - explicit keyword-only options define the test API
     exec_shell: ExecShell,
     command: str,
     *,
     contains: str = "",
     attempts: int = 10,
     delay: float = 1.0,
+    sensitive_values: tuple[str, ...] | None = None,
 ) -> ContainerExecResult:
-    """Poll ``command`` until it exits 0 and its output contains ``contains``."""
+    """Poll ``command`` until it exits 0 and its output contains ``contains``.
+
+    Timeout diagnostics omit command/output text unless ``sensitive_values``
+    is supplied. A tuple masks those literal values; an empty tuple declares
+    the text non-sensitive. Execution and returned results are unchanged.
+    """
+    safe_command = _safe_diagnostic(command, sensitive_values)
+    output = ""
+    last_exit_code: int | None = None
     for attempt in range(attempts):
         if attempt:
             time.sleep(delay)
         result = exec_shell(command)
         if result.exit_code == 0 and contains in result.output:
             return result
-    raise AssertionError("Service never became ready")
+        last_exit_code = result.exit_code
+        output = result.output
+    raise AssertionError(
+        f"Service never became ready (attempts={attempts}, last_exit_code={last_exit_code}): "
+        f"command={safe_command!r}, output={_safe_diagnostic(output, sensitive_values)!r}"
+    )
 
 
 def destroy_container(client: DockerClient, container_name: str) -> None:

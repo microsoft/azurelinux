@@ -109,6 +109,35 @@ capability isn't in `--capabilities`.
 > image-specific tests under `cases/<image-family>/` to run. Without
 > it, every `@pytest.mark.image(...)`-tagged test is skipped.
 
+## Container command diagnostics
+
+`exec_in_container()` omits command arguments from DEBUG logs by default.
+`wait_until_service_ready()` reports the attempt count and last exit code on
+timeout, but omits command and output text by default.
+
+Callers can opt into diagnostics by passing `sensitive_values=(password, token)`
+to each helper that emits them. These must be the actual string values, not
+variable or field names. Supplied values are replaced with `<redacted>` in
+diagnostic copies only; executed commands and returned results are unchanged.
+An empty tuple explicitly declares the diagnostic text non-sensitive, while
+`None` keeps it omitted. Empty string values are rejected.
+
+Masking covers registered literal values only, not encoded or shell-escaped
+variants, unknown secrets, or other runtime/test output. Keep omission enabled
+when sensitive values cannot be enumerated.
+
+### Helper unit tests
+
+Run the diagnostic regression tests without a container image or native tools:
+
+```bash
+cd base/images/tests
+uv run python -m pytest cases/unit/ -p no:azl_image --confcutdir=cases/unit
+```
+
+Disabling the image plugin and excluding parent image fixtures isolates these
+unit tests from image validation and native-tool preflight checks.
+
 ## Prerequisites
 
 System packages (not pip-installable):

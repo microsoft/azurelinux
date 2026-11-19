@@ -59,6 +59,7 @@ def test_postgres_default_command_initializes_and_serves(
     network_name = f"azl-test-net-{suffix}"
     server_name = f"azl-test-server-{suffix}"
     client_name = f"azl-test-client-{suffix}"
+    sensitive_values = (POSTGRES_PASSWORD, "wrong")
     podman_client.network.create(network_name)
     try:
         create_container(
@@ -81,10 +82,14 @@ def test_postgres_default_command_initializes_and_serves(
         )
 
         def server_exec_shell(command: str, *, shell: str = "bash") -> ContainerExecResult:
-            return exec_in_container(podman_client, server_name, [shell, "-c", command])
+            return exec_in_container(
+                podman_client, server_name, [shell, "-c", command], sensitive_values=sensitive_values,
+            )
 
         def client_exec_shell(command: str, *, shell: str = "bash") -> ContainerExecResult:
-            return exec_in_container(podman_client, client_name, [shell, "-c", command])
+            return exec_in_container(
+                podman_client, client_name, [shell, "-c", command], sensitive_values=sensitive_values,
+            )
 
         query = wait_until_service_ready(
             client_exec_shell,
@@ -95,6 +100,7 @@ def test_postgres_default_command_initializes_and_serves(
             ),
             contains="1",
             attempts=30,
+            sensitive_values=sensitive_values,
         )
         assert query.stdout.strip() == "1", f"unexpected psql output: {query.output}"
 
