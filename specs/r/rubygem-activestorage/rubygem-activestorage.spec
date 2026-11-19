@@ -15,8 +15,8 @@
 %bcond_with js_recompilation
 
 Name: rubygem-%{gem_name}
-Version: 8.0.2
-Release: 6%{?dist}
+Version: 8.0.5.2
+Release: 7%{?dist}
 Summary: Local and cloud file storage framework
 License: MIT
 URL: https://rubyonrails.org
@@ -108,7 +108,7 @@ cp -a %{builddir}/test .
 mkdir ../tools
 # Fake test_common.rb. It does not provide any functionality besides
 # `force_skip` alias.
-touch ../tools/test_common.rb
+echo 'ActiveSupport::TestCase.alias_method :force_skip, :skip' > ../tools/test_common.rb
 # Netiher strict_warnings.rb appears to be useful.
 touch ../tools/strict_warnings.rb
 
@@ -131,6 +131,9 @@ sed -i '/test "azure service is deprecated" do/a\    skip' \
 # OTOH, if we had it, we would recomplie the sources and the test would have
 # less value.
 mv test/javascript_package_test.rb{,.disable}
+# Azure Linux: google-cloud-storage is not packaged. The other GCS tests in this
+# file already skip without a GCS configuration; the 8.0.5.2 signature tests do not.
+mv test/service/gcs_service_test.rb{,.disable}
 
 # The `ffprobe` output does not containe `display_aspect_ratio` for some
 # reason. Is it missing codec or error?

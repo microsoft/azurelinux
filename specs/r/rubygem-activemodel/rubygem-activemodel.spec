@@ -7,8 +7,8 @@
 %bcond_with bootstrap
 
 Name: rubygem-%{gem_name}
-Version: 8.0.2
-Release: 5%{?dist}
+Version: 8.0.5.2
+Release: 6%{?dist}
 Summary: A toolkit for building modeling frameworks (part of Rails)
 License: MIT
 URL: https://rubyonrails.org
