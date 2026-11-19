@@ -1,0 +1,17 @@
+[components.rubygem-rails-html-sanitizer]
+
+# Sources for the 1.7.2 update overlay; drop together with it once Fedora ships 1.7.2 or newer.
+[[components.rubygem-rails-html-sanitizer.source-files]]
+filename = "rails-html-sanitizer-1.7.2.gem"
+hash = "7ba518daf07bde5c0ee82e5d876cfd2160355511cdd546ec33ef190789ee45ad7290fbd33a26df66585b11fa4457341171d68a6a6ce72314e29e49b63865a676"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/rails-html-sanitizer-1.7.2.gem" }
+
+# Generated: the test/ directory of the upstream v1.7.2 tag; 1.7.x stopped shipping it in the gem.
+[[components.rubygem-rails-html-sanitizer.source-files]]
+filename = "rails-html-sanitizer-1.7.2-tests.tar.gz"
+hash = "425f259d422cfc964198ccf91bb6255c69d1d843a549b4a8c40eef8c2f0ae303e33d235fb42b2b870e91c87081b0d7b58a67c7ce309bd629d11cd47f5c4e318b"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-test-tarball.sh"
+origin.mock-packages = ["git"]
