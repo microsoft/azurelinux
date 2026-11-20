@@ -1,0 +1,4 @@
+# Compat package Fedora ships in FEDORA-2026-49adf7234d, so dependents of this series keep building.
+# https://src.fedoraproject.org/rpms/rust-num-bigint0.4/c/6bf16af84da2fc64ac0b2b19f23c3300b9cf0d38
+[components.'rust-num-bigint0.4']
+spec = { type = "upstream", upstream-commit = "6bf16af84da2fc64ac0b2b19f23c3300b9cf0d38" }

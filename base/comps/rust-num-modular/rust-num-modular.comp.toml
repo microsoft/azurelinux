@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-num-modular-0.7.0-1 (FEDORA-2026-49adf7234d).
+# https://src.fedoraproject.org/rpms/rust-num-modular/c/b0326cfa61c998de2a50cbd56f233b6370b16925
+[components.rust-num-modular]
+spec = { type = "upstream", upstream-commit = "b0326cfa61c998de2a50cbd56f233b6370b16925" }
