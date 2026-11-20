@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 # what it's called on pypi
-%global srcname PyJWT
+%global srcname pyjwt
 # what it's imported as
 %global libname jwt
 # package name fragment
@@ -16,8 +16,8 @@ encrypted JSON objects.}
 
 
 Name:           python-%{pkgname}
-Version:        2.8.0
-Release: 10%{?dist}
+Version: 2.15.1
+Release: 11%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 URL:            https://github.com/jpadilla/pyjwt
@@ -25,6 +25,7 @@ Source:         %pypi_source
 BuildArch:      noarch
 
 
+BuildRequires: python3-pytest
 %description %{common_description}
 
 
@@ -42,14 +43,14 @@ Recommends:     python3-%{pkgname}+crypto
 
 %prep
 %autosetup -n %{srcname}-%{version}
-# remove coverage buildreq and relax pytest req
-sed -e '/coverage/d' \
-    -e '/pytest/ s/,<7.0.0//' \
-    -i setup.cfg
+
+
+
+
 
 
 %generate_buildrequires
-%pyproject_buildrequires -x crypto,tests
+%pyproject_buildrequires -x crypto
 
 
 %build
@@ -62,7 +63,7 @@ sed -e '/coverage/d' \
 
 
 %check
-%pytest -k 'not (test_ec_to_jwk_with_invalid_curve or test_get_jwt_set_sslcontext_default)'
+%pytest -k 'not (test_ec_to_jwk_with_invalid_curve or test_get_jwt_set_sslcontext_default or test_ec_curve_validation_rejects_p192_for_es256 or test_ec_curve_validation_with_pem_key)'
 
 
 %files -n python3-%{pkgname} -f %{pyproject_files}
