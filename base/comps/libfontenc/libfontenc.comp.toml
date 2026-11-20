@@ -1,0 +1,3 @@
+# Pin to Fedora f43 libfontenc-1.1.10-1 for CVE-2026-109908: https://src.fedoraproject.org/rpms/libfontenc/c/174fe3f868fe543ffd09068c23d854fed9129df3
+[components.libfontenc]
+spec = { type = "upstream", upstream-commit = "174fe3f868fe543ffd09068c23d854fed9129df3" }
