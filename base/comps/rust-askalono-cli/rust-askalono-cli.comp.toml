@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-askalono-cli-0.5.0-6 (FEDORA-2026-d4c59fe6d3).
+# https://src.fedoraproject.org/rpms/rust-askalono-cli/c/663dff827f86a46180112392c4553760b5067e79
+[components.rust-askalono-cli]
+spec = { type = "upstream", upstream-commit = "663dff827f86a46180112392c4553760b5067e79" }
