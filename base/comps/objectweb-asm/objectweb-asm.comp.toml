@@ -1,0 +1,46 @@
+[components.objectweb-asm]
+
+# Sources for the 9.11.1 update overlay; drop together with it once Fedora ships 9.11.1 or newer.
+# The tarball is the upstream GitLab tag archive; the bundled jars, class files and gradle
+# wrapper that Fedora's generate-tarball.sh strips are removed in %prep instead.
+[[components.objectweb-asm.source-files]]
+filename = "objectweb-asm-9.11.1.tar.gz"
+hash = "c3beec48018735409bff295c177f4debaab972be3a08ef14557c3d2f8da0cfa2c01dc61d8b52d9ad051e9bff59c5bf9348a4e159c2d82dd0dc66ef9498470609"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://gitlab.ow2.org/asm/asm/-/archive/ASM_9_11_1/asm-ASM_9_11_1.tar.gz" }
+
+[[components.objectweb-asm.source-files]]
+filename = "asm-9.11.1.pom"
+hash = "647497bf909d83a1283b2e5576287a604a5662412a458fefdb451e92b9ae3e18108fc61e34a16e6282301e112d09841511001926ef5f6e12ff77926cf24842d6"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://repo1.maven.org/maven2/org/ow2/asm/asm/9.11.1/asm-9.11.1.pom" }
+
+[[components.objectweb-asm.source-files]]
+filename = "asm-analysis-9.11.1.pom"
+hash = "abb84cd271b24b2b5bfc30dab5a3dd4a6aa32c7fef5c7933d1897b9aefbb049110a11e831bd46994a5abd7860f2e98ca382fa5beb22e448a2aa4f7e2ff210302"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://repo1.maven.org/maven2/org/ow2/asm/asm-analysis/9.11.1/asm-analysis-9.11.1.pom" }
+
+[[components.objectweb-asm.source-files]]
+filename = "asm-commons-9.11.1.pom"
+hash = "e0de3320d565b548ea3ab0fc36086a406a90999438ae014fb1378931b014f5d0c953904bab25abff0dbf29bc260fd57bc771a0add24c3271ac5fdf9dbb6098e5"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://repo1.maven.org/maven2/org/ow2/asm/asm-commons/9.11.1/asm-commons-9.11.1.pom" }
+
+[[components.objectweb-asm.source-files]]
+filename = "asm-test-9.11.1.pom"
+hash = "27ce5c4f97adfb926ee83a791ca7b860ecce8c5e97c83e11db8f8042b654d9962981f770e313602038e1de0bd9fa0d48456cbd831306f2885f9ac7455f8a8a8f"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://repo1.maven.org/maven2/org/ow2/asm/asm-test/9.11.1/asm-test-9.11.1.pom" }
+
+[[components.objectweb-asm.source-files]]
+filename = "asm-tree-9.11.1.pom"
+hash = "55c1d73321e827f40894cc849d65fb44c3c0dc867b774a613110be707666546fa5d3d492584a07ea47994ba2a6d961a1f6f0632014716a565e9f46c4c31f4b12"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://repo1.maven.org/maven2/org/ow2/asm/asm-tree/9.11.1/asm-tree-9.11.1.pom" }
+
+[[components.objectweb-asm.source-files]]
+filename = "asm-util-9.11.1.pom"
+hash = "1db37d31a3095f3358da1e5c57d865c480ae3d14c1879bd3421b3dacaf6c3ce4eed0862eb92e76cd66d3754a12230e5f920f44271cd2ccce66c9bd23e86f745d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://repo1.maven.org/maven2/org/ow2/asm/asm-util/9.11.1/asm-util-9.11.1.pom" }
