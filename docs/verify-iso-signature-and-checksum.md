@@ -8,14 +8,14 @@ The following bash script shows the commands necessary to download the iso image
 ## x86_64 ISO Verification
 ```bash
 # Download the necessary files
-wget https://aka.ms/azurelinux-4.0-x86_64.iso -O AzureLinux-4.0-x86_64.iso
-wget https://aka.ms/azurelinux-4.0-x86_64-iso-checksum
-wget https://aka.ms/azurelinux-4.0-x86_64-iso-checksum-signature
+wget https://aka.ms/azurelinux-4-x86_64-iso -O AzureLinux-4-x86_64.iso
+wget https://aka.ms/azurelinux-4-x86_64-iso-checksum
+wget https://aka.ms/azurelinux-4-x86_64-iso-checksum-signature
 wget https://raw.githubusercontent.com/microsoft/azurelinux/refs/heads/4.0/base/comps/azurelinux-repos/RPM-GPG-KEY-azurelinux-4.0-primary
 
 # Set Variables for the checksum and signature file names
-CHECKSUM_FILE="azurelinux-4.0-x86_64-iso-checksum"
-SIGNATURE_FILE="azurelinux-4.0-x86_64-iso-checksum-signature"
+CHECKSUM_FILE="azurelinux-4-x86_64-iso-checksum"
+SIGNATURE_FILE="azurelinux-4-x86_64-iso-checksum-signature"
 
 # Import the RPM signing public key into the local GPG keystore
 gpg --import RPM-GPG-KEY-azurelinux-4.0-primary
@@ -33,14 +33,14 @@ tr -d '\r' < "$CHECKSUM_FILE" | sha256sum --check -
 ## aarch64 ISO Verification
 ```bash
 # Download the necessary files
-wget https://aka.ms/azurelinux-4.0-aarch64.iso -O AzureLinux-4.0-aarch64.iso
-wget https://aka.ms/azurelinux-4.0-aarch64-iso-checksum
-wget https://aka.ms/azurelinux-4.0-aarch64-iso-checksum-signature
+wget https://aka.ms/azurelinux-4-aarch64-iso -O AzureLinux-4-aarch64.iso
+wget https://aka.ms/azurelinux-4-aarch64-iso-checksum
+wget https://aka.ms/azurelinux-4-aarch64-iso-checksum-signature
 wget https://raw.githubusercontent.com/microsoft/azurelinux/refs/heads/4.0/base/comps/azurelinux-repos/RPM-GPG-KEY-azurelinux-4.0-primary
 
 # Set Variables for the checksum and signature file names
-CHECKSUM_FILE="azurelinux-4.0-aarch64-iso-checksum"
-SIGNATURE_FILE="azurelinux-4.0-aarch64-iso-checksum-signature"
+CHECKSUM_FILE="azurelinux-4-aarch64-iso-checksum"
+SIGNATURE_FILE="azurelinux-4-aarch64-iso-checksum-signature"
 
 # Import the RPM signing public key into the local GPG keystore
 gpg --import RPM-GPG-KEY-azurelinux-4.0-primary
