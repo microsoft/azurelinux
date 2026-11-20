@@ -134,7 +134,7 @@ f /var/log/stap-server/log 0644 stap-server stap-server -
 Name: systemtap
 # PRERELEASE
 Version: 5.5
-Release: 1%{?release_override}%{?dist}
+Release: 2%{?release_override}%{?dist}
 # for version, see also configure.ac
 
 
@@ -224,6 +224,7 @@ BuildRequires: emacs-common
 %endif
 %if %{with_java}
 BuildRequires: java-devel
+BuildRequires: javapackages-filesystem
 %endif
 %if %{with_virthost}
 # BuildRequires: libvirt-devel >= 1.0.2
