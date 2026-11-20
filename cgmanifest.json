@@ -4700,8 +4700,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.8.13",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz"
+          "version": "3.8.14",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.14.tar.xz"
         }
       }
     },
