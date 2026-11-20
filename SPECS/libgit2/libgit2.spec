@@ -73,6 +73,7 @@ popd
 
 %install
 %ninja_install -C %{_target_platform}
+mv examples/COPYING COPYING.examples
 
 %check
 %ninja_test -C %{_target_platform}
@@ -83,6 +84,7 @@ popd
 
 %files devel
 %doc AUTHORS docs examples README.md
+%license COPYING COPYING.examples
 %{_libdir}/libgit2.so
 %{_libdir}/pkgconfig/libgit2.pc
 %{_includedir}/git2.h
@@ -92,6 +94,7 @@ popd
 %changelog
 * Tue Nov 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.2-4
 - Patch for CVE-2026-105437
+- Fixed the license issue
 
 * Tue Aug 25 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.7.2-3
  - Fix %%check: the sed disabling online tests targeted tests/CMakeLists.txt, but
