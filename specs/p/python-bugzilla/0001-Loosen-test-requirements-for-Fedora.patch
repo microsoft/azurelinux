@@ -1,0 +1,25 @@
+From 8b374226a4e5e31eb9aa7a67954e2bdaad003f65 Mon Sep 17 00:00:00 2001
+Message-ID: <8b374226a4e5e31eb9aa7a67954e2bdaad003f65.1727114968.git.crobinso@redhat.com>
+From: Cole Robinson <crobinso@redhat.com>
+Date: Mon, 23 Sep 2024 14:09:18 -0400
+Subject: [PATCH] Loosen test requirements for Fedora
+Content-type: text/plain
+
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+---
+ test-requirements.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/test-requirements.txt b/test-requirements.txt
+index 6e80f2c..77d9b4e 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -1,5 +1,3 @@
+ # additional packages needed for testing
+ pytest
+-pylint<3.1
+-pycodestyle<2.12
+ responses
+-- 
+2.46.0
+
