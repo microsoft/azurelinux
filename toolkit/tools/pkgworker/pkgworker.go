@@ -61,6 +61,7 @@ var (
 	ccachConfig              = app.Flag("ccache-config", "The configuration file for ccache.").String()
 	maxCPU                   = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 	timeout                  = app.Flag("timeout", "Timeout for package building").Required().Duration()
+	checkEnvPassthrough      = app.Flag("check-env-passthrough", "Name of an environment variable to forward into the chroot when running %check. May be repeated.").Strings()
 
 	logFlags = exe.SetupLogFlags(app)
 )
@@ -118,7 +119,7 @@ func main() {
 		defines[rpm.MaxCPUDefine] = *maxCPU
 	}
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *releaseVersionMacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *releaseVersionMacrosFile, *outArch, defines, *noCleanup, *runCheck, checkBuildEnvironment(*runCheck, *checkEnvPassthrough), *packagesToInstall, ccacheManager, *timeout)
 	logger.FatalOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
 
 	// For regular (non-test) package builds:
@@ -155,7 +156,27 @@ func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, releaseVersionMacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+// checkBuildEnvironment returns NAME=value entries for the named variables that are set and
+// non-empty, or nil when %check will not run. Only explicitly named variables are forwarded,
+// and values are never logged.
+func checkBuildEnvironment(runCheck bool, names []string) (extraEnv []string) {
+	if !runCheck {
+		return nil
+	}
+
+	for _, name := range names {
+		value, found := os.LookupEnv(name)
+		if !found || value == "" {
+			logger.Log.Warnf("Environment variable '%s' is not set; not forwarding it to the check build.", name)
+			continue
+		}
+		extraEnv = append(extraEnv, name+"="+value)
+	}
+
+	return extraEnv
+}
+
+func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, releaseVersionMacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, checkEnv []string, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
 
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -239,7 +260,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	// `unmount /path/to/chroot/dev` will fail since our root is currently `/path/to/chroot`,
 	// and `/path/to/chroot/path/to/chroot/dev` is not a real path.
 	results := make(chan error)
-	err = chroot.Run(func() (err error) {
+	err = chroot.RunWithEnvironment(func() (err error) {
 		go func() {
 			results <- buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, isCCacheEnabled(ccacheManager))
 		}()
@@ -254,7 +275,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 			chrootErr = fmt.Errorf("build timed out after %s", timeout)
 		}
 		return chrootErr // Internal error is returned via the channel
-	})
+	}, checkEnv)
 
 	if err != nil {
 		err = fmt.Errorf("failed to build RPM from SRPM in chroot:\n%w", err)
