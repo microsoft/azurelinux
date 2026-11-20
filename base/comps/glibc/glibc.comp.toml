@@ -1,3 +1,4 @@
 [components.glibc]
+tests.tests = [{ name = "tmt-glibc-ci" }]
 # Release: %{baserelease}%{?dist}
 release = { calculation = "manual" }

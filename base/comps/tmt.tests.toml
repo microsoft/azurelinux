@@ -1,0 +1,52 @@
+# Test sources track the upstream-commit in locks/<package>.lock, not branch heads.
+# Dist-git plans may themselves discover tests from Fedora's shared test repositories.
+
+[tests.tmt-systemd-upstream]
+type = "tmt"
+description = "Systemd package-owned upstream integration plan (no gating.yaml at the pinned revision)"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+tmt.source = { git-url = "https://src.fedoraproject.org/rpms/systemd.git", ref = "bdd1b37e16bd4fe10fd1140d5e1c400cc9ddfb86" }
+tmt.plan = "/plans/upstream"
+
+[tests.tmt-bash]
+type = "tmt"
+description = "Bash package-owned shell plan (no gating.yaml at the pinned revision)"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+tmt.source = { git-url = "https://src.fedoraproject.org/rpms/bash.git", ref = "a6bcc6767229199f4f02b781d1d39df0835d894b" }
+tmt.plan = "/plans/shell"
+
+[tests.tmt-glibc-ci]
+type = "tmt"
+description = "glibc Fedora tier0.functional CI gating plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+tmt.source = { git-url = "https://src.fedoraproject.org/rpms/glibc.git", ref = "1e776c73d919c0769e50486d3540dd9bafac7ef6" }
+tmt.plan = "/plans/ci"
+
+[tests.tmt-hostname-all]
+type = "tmt"
+description = "Hostname Fedora tier0.functional gating plan"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+tmt.source = { git-url = "https://src.fedoraproject.org/rpms/hostname.git", ref = "743fda931ab667f384da6684b4c495099d7a1c70" }
+tmt.plan = "/plans/all"
+
+# Both duration partitions are needed for the complete package-owned tier-one suite.
+# Neither partition has a gating.yaml requirement at this pinned revision.
+[tests.tmt-selinux-policy]
+type = "tmt"
+description = "SELinux policy package-owned tier-one plan excluding ten-minute tests"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+tmt.source = { git-url = "https://src.fedoraproject.org/rpms/selinux-policy.git", ref = "a8445bd93c7ad4d63a88e4623905918a433e538b" }
+tmt.plan = "/plans/tests"
+
+[tests.tmt-selinux-policy-10m]
+type = "tmt"
+description = "SELinux policy package-owned tier-one plan for ten-minute tests"
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+tmt.source = { git-url = "https://src.fedoraproject.org/rpms/selinux-policy.git", ref = "a8445bd93c7ad4d63a88e4623905918a433e538b" }
+tmt.plan = "/plans/tests-10m"
