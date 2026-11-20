@@ -1,0 +1,52 @@
+# Backport two upstream changes that remove the only Go crypto imports from
+# runc 1.5.2. Both come from vendored helpers that runc never calls:
+#   - go-selinux uniqMcs() used crypto/rand. Upstream switched it to
+#     math/rand/v2 in v1.14.0; runc 1.5.2 vendors v1.13.1.
+#   - opencontainers/cgroups encoded its device filter with cilium/ebpf/asm,
+#     which imports crypto/sha1 for Instructions.Tag. cgroups#94 encodes the
+#     few instructions directly. It was merged on 2026-11-18 and is not in a
+#     cgroups release yet; runc 1.5.2 vendors cgroups v0.1.0.
+# With both backported, runc links no Go crypto at all; see
+# 0002-fail-build-on-go-crypto.overlay.toml for why that matters.
+#
+# Drop this overlay once runc vendors go-selinux >= v1.14.0 and a cgroups
+# release that includes opencontainers/cgroups@d652a099305c.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [
+    { url = "https://github.com/opencontainers/selinux/commit/9a2bcdd5c41a92fe17cd95a15befcef90ddd4f80" },
+    { url = "https://github.com/opencontainers/cgroups/commit/d652a099305c8da763c55b42c1112c5d363307c8" },
+]
+bugs = [
+    { url = "https://github.com/opencontainers/selinux/issues/252" },
+    { url = "https://github.com/opencontainers/runc/issues/5612" },
+]
+
+[[overlays]]
+description = "Backport opencontainers/selinux 9a2bcdd5c41a (math/rand/v2 instead of crypto/rand) to the vendored go-selinux"
+type = "patch-add"
+source = "../0001-vendor-go-selinux-use-math-rand-v2.patch"
+
+[[overlays]]
+description = "Backport opencontainers/cgroups d652a099305c (drop the cilium/ebpf/asm dependency) to the vendored cgroups"
+type = "patch-add"
+source = "../0002-vendor-cgroups-devices-drop-cilium-ebpf-asm-dependency.patch"
+
+[[overlays]]
+description = "Stop %goprep from applying patches before the vendor tarball is unpacked; the patches target vendor/"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%goprep -p1$'
+replacement = "%goprep -A"
+
+[[overlays]]
+description = "Apply the vendor patches once the vendor tarball has been unpacked"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "",
+    "# Apply vendor patches after the vendor tarball (Source1) is unpacked",
+    "%autopatch -p1",
+    "",
+]
