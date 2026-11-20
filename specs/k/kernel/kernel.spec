@@ -210,7 +210,7 @@ Summary: The Linux kernel
 #  the --with-release option overrides this setting.)
 %define debugbuildsenabled 1
 # define buildid .local
-%define specrpmversion 6.18.62
+%define specrpmversion 6.18.64
 %define specversion %{specrpmversion}
 %define patchversion 6.18
 %define pkgrelease %{azl_pkgrelease}
@@ -4480,6 +4480,11 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Nov 20 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.64-1.1
+- Update kernel and kernel-headers to 6.18.64.1.
+- Refresh Azure Linux configs for removed SATA and renamed Lenovo WMI symbols.
+- Build ARM64 ACPI TAD in to preserve built-in EFI RTC and boot-time clock initialization.
+
 * Tue Nov 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.62-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.62.1
 
