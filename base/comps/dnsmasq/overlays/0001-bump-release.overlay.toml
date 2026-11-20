@@ -1,0 +1,11 @@
+# The component uses manual release calculation, so advance the spec's Release
+# past the published 2.92rel2-2 for the CVE backports in the overlays that follow.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Advance the manually managed release for the CVE backports"
+type = "spec-update-tag"
+tag = "Release"
+value = "3%{?extraversion:.%{extraversion}}%{?dist}"

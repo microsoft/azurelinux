@@ -28,7 +28,7 @@
 
 Name:           dnsmasq
 Version:        2.92rel2
-Release:        2%{?extraversion:.%{extraversion}}%{?dist}
+Release: 3%{?extraversion:.%{extraversion}}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
 # SPDX identifiers already
@@ -81,6 +81,12 @@ BuildRequires: gettext
 BuildRequires: annobin-annocheck
 %endif
 
+Patch9: dnsmasq-2.93-CVE-2026-6507.patch
+Patch10: dnsmasq-2.93-CVE-2026-12725.patch
+Patch11: dnsmasq-2.93-CVE-2026-12969.patch
+Patch12: dnsmasq-CVE-2026-93007.patch
+Patch13: dnsmasq-CVE-2026-93006.patch
+Patch14: dnsmasq-CVE-2026-93009.patch
 %description
 Dnsmasq is lightweight, easy to configure DNS forwarder and DHCP server.
 It is designed to provide DNS and, optionally, DHCP, to a small network.
