@@ -46,7 +46,7 @@ Summary: Qt toolkit
 Name:    qt
 Epoch:   1
 Version: 4.8.7
-Release: 84%{?dist}
+Release: 85%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 # Automatically converted from old format: (LGPLv2 with exceptions or GPLv3 with exceptions) and ASL 2.0 and BSD and FTL and MIT - review is highly recommended.
@@ -423,6 +423,26 @@ Requires(postun): %{_sbindir}/update-alternatives
 %endif
 Recommends: (ibus-qt if ibus)
 
+Patch506: qt-4.8.7-CVE-2014-0190.patch
+Patch507: qt-4.8.7-CVE-2018-19869.patch
+Patch508: qt-4.8.7-CVE-2018-19870.patch
+Patch509: qt-4.8.7-CVE-2018-19871.patch
+Patch510: qt-4.8.7-CVE-2018-19873.patch
+Patch511: qt-4.8.7-CVE-2023-32763.patch
+Patch512: qt-4.8.7-CVE-2023-37369.patch
+Patch513: qt-4.8.7-CVE-2023-38197.patch
+Patch514: qt-4.8.7-CVE-2025-5455.patch
+Patch515: qt-4.8.7-CVE-2025-30348.patch
+Patch516: qt-4.8.7-CVE-2026-105946.patch
+Patch517: qt-4.8.7-CVE-2026-107472.patch
+Patch518: qt-4.8.7-CVE-2026-107590.patch
+Patch519: qt-4.8.7-CVE-2026-9499.patch
+Patch520: qt-4.8.7-CVE-2026-19248.patch
+Patch521: qt-4.8.7-CVE-2026-11573.patch
+Patch522: qt-4.8.7-CVE-2026-82292.patch
+Patch523: qt-4.8.7-CVE-2026-16762.patch
+Patch524: qt-4.8.7-CVE-2026-116337.patch
+Patch525: qt-4.8.7-CVE-2026-8168.patch
 %description 
 Qt is a software toolkit for developing applications.
 
@@ -754,6 +774,26 @@ for f in translations/*.ts ; do
 done
 
 
+%patch -P506 -p1
+%patch -P507 -p1
+%patch -P508 -p1
+%patch -P509 -p1
+%patch -P510 -p1
+%patch -P511 -p1
+%patch -P512 -p1
+%patch -P513 -p1
+%patch -P514 -p1
+%patch -P515 -p1
+%patch -P516 -p1
+%patch -P517 -p1
+%patch -P518 -p1
+%patch -P519 -p1
+%patch -P520 -p1
+%patch -P521 -p1
+%patch -P522 -p1
+%patch -P523 -p1
+%patch -P524 -p1
+%patch -P525 -p1
 %build
 # QT is known not to work properly with LTO at this point.  Some of the issues
 # are being worked on upstream and disabling LTO should be re-evaluated as
