@@ -1,0 +1,17 @@
+--- a/meson.build
++++ b/meson.build
+@@ -53,3 +53,14 @@
+     install_dir : get_option('bindir'),
+     install_mode : 'rwxr-xr-x'
+ )
++
++# Azure Linux: install our policy as the default-loaded rpminspect.yaml.
++install_data(
++    sources : 'azurelinux.yaml',
++    install_dir : get_option('datadir') + '/rpminspect'
++)
++install_data(
++    sources : 'azurelinux.yaml',
++    rename : 'rpminspect.yaml',
++    install_dir : get_option('datadir') + '/rpminspect'
++)

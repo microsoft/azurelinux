@@ -1,0 +1,89 @@
+--- a/azurelinux.yaml
++++ b/azurelinux.yaml
+@@ -1,5 +1,10 @@
+ #
+-# rpminspect configuration file
++# Azure Linux rpminspect configuration.  This file starts as a build-time
++# copy of Fedora's own fedora.yaml (see %prep) so AZL inherits Fedora's
++# full baseline -- badfuncs, unicode, runpath, files, patches,
++# security_path_prefix, shellsyntax, etc. -- and automatically picks up
++# upstream policy fixes when this pin is bumped; this patch applies only
++# the deltas that genuinely differ for Azure Linux.
+ #
+ # SPDX-License-Identifier: CC-BY-SA-4.0
+ #
+@@ -24,6 +29,13 @@
+     # particular finding by rpminspect.
+     remedyfile: /usr/share/rpminspect/remedy/fedora.toml
+ 
++environment:
++    # Force exact matching against files literally named
++    # AZURELINUX4 under vendor_data_dir, rather than relying on automatic
++    # dist-tag-derived product-release detection (our .azl4 release suffix
++    # does not follow Fedora's fcNN numbering convention).
++    product_release: AZURELINUX4
++
+ koji:
+     # The root URL of the XMLRPC API provided by the Koji hub
+     hub: https://koji.fedoraproject.org/kojihub
+@@ -77,8 +89,11 @@
+     # subdirectory in the vendor_data_dir or a full path to a license
+     # database file to use.  This file is used by the 'license'
+     # inspection.
++    # Azure Linux has no curated license allow-list yet (license
++    # inspection is disabled below); generic.json is rpminspect's own
++    # placeholder license database, shipped by rpminspect-data-generic.
+     licensedb:
+-        - /usr/share/fedora-license-data/licenses/fedora-licenses.json
++        - generic.json
+ 
+     # Which product release string to favor.  By default, rpminspect
+     # favors the newest product release string.  You can change this
+@@ -134,6 +149,12 @@
+     # Fedora does not guarantee a kernel ABI
+     kmidiff: off
+ 
++    # Enable after azurelinux-license-data supplies curated policy.
++    license: off
++    # Generic policy parses non-manpage documentation and helper scripts as
++    # manual pages. Enable after Azure Linux supplies tailored exceptions.
++    manpage: off
++
+     #kmod: off
+     #license: off
+     #lostpayload: off
+@@ -274,17 +295,15 @@
+ 
+ metadata:
+     # Required Vendor string.  This is part of the RPM header and is
+-    # the value expected in packages checked by rpminspect.
+-    vendor: Fedora Project
+-
+-    # Allowed build host subdomain.  The RPM header contains information about
+-    # where the package was built.  rpminspect verifies the hostnames are in
+-    # the expected subdomain listed below.
+-    #
+-    # This is an array of allowed subdomains.
+-    buildhost_subdomain:
+-        - .fedoraproject.org
+-        - .bos.redhat.com
++    # the value expected in packages checked by rpminspect.  Azure Linux
++    # mock configs set %vendor to this value (see
++    # base/comps/mock-core-configs/azure-linux-4.tpl).
++    vendor: Microsoft Corporation
++
++    # Azure Linux's approved build host domain(s) are not yet defined, so
++    # buildhost_subdomain is omitted entirely (rather than keeping
++    # Fedora/Red Hat's domains) -- rpminspect only enforces this check
++    # when the key is present.
+ 
+ elf:
+     # File paths to include in or exclude from specific tests. Each
+@@ -448,7 +467,6 @@
+         - zsh
+         - csh
+         - tcsh
+-        - rc
+         - bash
+ 
+     # Optional list of glob(7) specifications to match files to ignore
