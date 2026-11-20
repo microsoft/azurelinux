@@ -10,7 +10,7 @@
 
 Name:           fedpkg
 Version:        1.48
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Fedora utility for working with dist-git
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
@@ -26,7 +26,7 @@ BuildRequires:  bash-completion
 BuildRequires:  git
 
 Requires:       koji
-Requires:       azurelinux-rpm-config
+Requires:       redhat-rpm-config
 
 # This package redefines __python and can use the python_ macros
 %global __python %{__python3}

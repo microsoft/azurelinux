@@ -3,7 +3,7 @@
 
 Name:           rpkg
 Version:        1.70
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 Summary:        Python library for interacting with rpm+git
 # Automatically converted from old format: GPLv2+ and LGPLv2 - reviewed
@@ -79,7 +79,7 @@ BuildRequires:  python2-nose
 BuildRequires:  python2-setuptools
 
 Requires:       mock
-Requires:       azurelinux-rpm-config
+Requires:       redhat-rpm-config
 Requires:       rpm-build
 Requires:       rpmlint
 Requires:       rpmdevtools
@@ -150,7 +150,7 @@ BuildRequires:  python3-setuptools
 %endif
 
 Requires:       mock
-Requires:       azurelinux-rpm-config
+Requires:       redhat-rpm-config
 Requires:       rpm-build
 Requires:       rpmlint
 Requires:       rpmdevtools
