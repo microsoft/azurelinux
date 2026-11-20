@@ -1,0 +1,2 @@
+[components.golang-msft-telemetry-policy]
+spec = { type = "local", path = "golang-msft-telemetry-policy.spec" }
