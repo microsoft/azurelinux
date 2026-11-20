@@ -25,7 +25,7 @@ For project context and architecture, see [`.github/copilot-instructions.md`](.g
 
 ### Minimum required testing
 
-1. **Build** — `azldev comp build -p <name>` succeeds, RPMs appear in `base/out/`.
+1. **Build** — `azldev comp build -p <name> --spec-editor experimental` succeeds, RPMs appear in `base/out/`.
 2. **Inspect** — Use `mock --copyin` to copy the RPM into the chroot and inspect with `rpm -qlp` without installing. See [`azldev-mock`](.agents/skills/azldev-mock/SKILL.md).
 3. **Smoke-test** — Use a mock chroot (`azldev adv mock shell --add-package /path/to/rpm`) to install and validate basic functionality (e.g., `<binary> --version`, service starts, library loads). See [`azldev-mock`](.agents/skills/azldev-mock/SKILL.md).
 
@@ -33,13 +33,14 @@ Do NOT skip testing for changes that affect RPM output. Do NOT tell the user "th
 
 ## Conventions
 
+- **Spec editor:** Include `--spec-editor experimental` on `comp render`, `comp build`, `comp prep-sources`, and `comp diff-sources`, including commands copied from generated skills. The choice is per invocation, not a TOML setting. See [Select the spec editor](DEVELOPING.md#select-the-spec-editor).
 - Always run `azldev comp list -p <name> -q -O json` before modifying a component.
 - Prefer overlays over forking/local specs when customizing upstream packages.
-- After modifying overlays or component config, re-render with `azldev comp render -p <name>` and inspect `specs/<first-char>/<name>/` to verify the result. This is the fastest verification path.
-  - Note: Changing a global snapshot time may affect all components that depend on it, potentially causing widespread rebuilds. Full re-render is time-consuming, but may be done by `azldev comp render -a --clean-stale`.
+- After modifying overlays or component config, re-render with `azldev comp render -p <name> --spec-editor experimental` and inspect `specs/<first-char>/<name>/` to verify the result. This is the fastest verification path.
+  - Note: Changing a global snapshot time may affect all components that depend on it, potentially causing widespread rebuilds. Full re-render is time-consuming, but may be done by `azldev comp render -a --clean-stale --spec-editor experimental`.
 - **Always re-run `azldev comp update -p <name>` before opening a PR**, even for minor edits — lock fingerprints are computed from the full component config, and the `Update Locks` CI check runs against the committed state. See [`azldev-update-component`](.agents/skills/azldev-update-component/SKILL.md).
 - **Every commit that touches a component bumps `%changelog` / `Release:` on the next render** (rpmautospec walks `git log` for the spec). After committing, re-render and amend so the spec tracks your commit, otherwise `Check Rendered Specs` will fail. See [`azldev-update-component`](.agents/skills/azldev-update-component/SKILL.md) for the finalize-and-amend pattern, plus the pin-bump variant.
-- Use `prep-sources` for deeper debugging: `azldev comp prep-sources -p <name> --skip-overlays --force -o <pre-dir> -q` and `azldev comp prep-sources -p <name> --force -o <post-dir> -q` to diff pre/post overlay output when you need to understand what upstream provides vs. what overlays change. Always use `--force` to overwrite an existing output dir, `rm -rf` requires user confirmation which is disruptive.
+- Use `prep-sources` for deeper debugging: `azldev comp prep-sources -p <name> --spec-editor experimental --skip-overlays --force -o <pre-dir> -q` and `azldev comp prep-sources -p <name> --spec-editor experimental --force -o <post-dir> -q` to diff pre/post overlay output when you need to understand what upstream provides vs. what overlays change. Always use `--force` to overwrite an existing output dir, `rm -rf` requires user confirmation which is disruptive.
 - Follow the inner loop cycle: investigate → modify → render → build → test → inspect. See [`azldev-build-component`](.agents/skills/azldev-build-component/SKILL.md).
   - Note: Use your best judgement, some packages are VERY slow to build (e.g., `kernel`), in those cases you may want to do multiple iterations of investigate → modify → verify with `render` before doing a full build + test.
 - `prep-sources -o <dir>` output is ad-hoc (user-chosen dir). `comp build` output goes to project-configured dirs (`base/out/`, `base/build/`). Don't conflate them.

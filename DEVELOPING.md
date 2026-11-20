@@ -44,7 +44,33 @@ See the [azldev user guide](https://github.com/microsoft/azure-linux-dev-tools/t
 
 The `specs/` directory (as specified by `rendered-specs-dir` config) contains "rendered" spec files created by `azldev`. They are a read-only snapshot of the final spec files after all overlays and modifications have been applied. They are the canonical source for what will be built and packaged.
 
-They can be updated at any time by running `azldev component render -a`, or a single component can be rendered with `azldev component render <name>`.
+They can be updated at any time by running
+`azldev component render -a --spec-editor experimental`, or a single component
+can be rendered with `azldev component render <name> --spec-editor experimental`.
+
+### Select the spec editor
+
+Azure Linux uses azldev's experimental structural spec editor. The pinned azldev
+still defaults to the legacy editor and has no TOML field or environment variable
+for selecting an editor. Pass `--spec-editor experimental` on every invocation
+that prepares or edits specs, including local builds:
+
+```bash
+azldev comp render -p <name> --spec-editor experimental
+azldev comp render -a --clean-stale --spec-editor experimental --fail-on-error
+azldev comp build -p <name> --spec-editor experimental
+azldev comp prep-sources -p <name> --spec-editor experimental --force -o <dir>
+azldev comp diff-sources -p <name> --spec-editor experimental
+```
+
+The selection is not persisted by rendering; subsequent commands need the flag
+again. Lock updates (`azldev comp update`) and config inspection do not need it.
+CI render checks use the same explicit flag. When following generated azldev
+skills or older examples, add this flag to the spec-processing commands above.
+
+The structural editor does not yet preserve referenced macros automatically when
+removing a subpackage. Keep existing macro-hoisting overlays, such as QEMU's
+`testsdir` overlay.
 
 ## Component FMF tests
 
@@ -54,7 +80,7 @@ Use `specs/<first-char>/<component>/` as the FMF root; rendered output is the gr
 For example:
 
 ```bash
-azldev comp render -p azurelinux-repos
+azldev comp render -p azurelinux-repos --spec-editor experimental
 ```
 
 Run tests with `azldev comp test`, pointing `--source-dir` at the rendered component
@@ -108,7 +134,7 @@ a new release without changing its upstream pin:
 
 ```bash
 azldev comp update -p <name> --bump
-azldev comp render -p <name>
+azldev comp render -p <name> --spec-editor experimental
 ```
 
 `--bump` increments the lock's `manual-bump` counter and recomputes its build

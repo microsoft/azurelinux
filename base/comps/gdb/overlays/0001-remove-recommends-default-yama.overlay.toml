@@ -4,6 +4,6 @@ upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove recommends: default-yama-scope"
 type = "spec-remove-tag"
-package = "headless"
+# After the conditional %package headless block, the structural editor uses the outer context.
 tag = "Recommends"
 value = "default-yama-scope"

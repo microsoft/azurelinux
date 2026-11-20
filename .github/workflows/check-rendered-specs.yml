@@ -342,7 +342,7 @@ jobs:
                 # `--clean-stale` prunes orphaned spec dirs globally, which
                 # subsumes the targeted deleted-component cleanup the scoped
                 # branch does below.
-                azldev component render -q -a --clean-stale -O json > /dev/null
+                azldev component render --spec-editor experimental -q -a --clean-stale -O json > /dev/null
               else
                 # Compute the render set (PR-touched components). Safe here
                 # because the locks gate has already run successfully -- input
@@ -398,7 +398,7 @@ jobs:
                   # fails rather than splitting an oversized argument list.
                   # `--` ends azldev option parsing so component names beginning
                   # with `-` (none today) are unambiguous.
-                  xargs -x -n 50000 -d "\n" azldev component render -q -O json -- \
+                  xargs -x -n 50000 -d "\n" azldev component render --spec-editor experimental -q -O json -- \
                     < /output/change-set/render-set.txt \
                     > /dev/null
                 fi
