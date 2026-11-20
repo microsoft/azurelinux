@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-ppmd-rust-1.5.2-1 (FEDORA-2026-a011e63a06).
+# https://src.fedoraproject.org/rpms/rust-ppmd-rust/c/0463adde949c07402950be096e266570302b8b87
+[components.rust-ppmd-rust]
+spec = { type = "upstream", upstream-commit = "0463adde949c07402950be096e266570302b8b87" }

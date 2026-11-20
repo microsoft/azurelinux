@@ -1,5 +1,5 @@
 --- zip-0.6.6/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ zip-0.6.6/Cargo.toml	2026-01-09T22:20:30.992492+00:00
++++ zip-0.6.6/Cargo.toml	2026-10-28T23:44:22.307608+00:00
 @@ -46,11 +46,11 @@
  version = "1.4.3"
  
@@ -10,7 +10,7 @@
  
  [dependencies.constant_time_eq]
 -version = "0.1.5"
-+version = "0.4"
++version = ">=0.4, <0.7"
  optional = true
  
  [dependencies.crc32fast]

@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-lzma-rust2-0.23.0-1 (FEDORA-2026-a011e63a06).
+# https://src.fedoraproject.org/rpms/rust-lzma-rust2/c/9c7deccb4b2b54b96c89f3a90768c874e34caa25
+[components.rust-lzma-rust2]
+spec = { type = "upstream", upstream-commit = "9c7deccb4b2b54b96c89f3a90768c874e34caa25" }

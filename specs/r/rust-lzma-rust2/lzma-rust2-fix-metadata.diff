@@ -1,6 +1,6 @@
---- lzma-rust2-0.20.1/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ lzma-rust2-0.20.1/Cargo.toml	2026-09-01T05:52:54.248021+00:00
-@@ -193,11 +193,3 @@
+--- lzma-rust2-0.23.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ lzma-rust2-0.23.0/Cargo.toml	2026-10-18T06:31:20.298690+00:00
+@@ -217,11 +217,3 @@
  [dependencies.sha2]
  version = "0.11"
  optional = true
