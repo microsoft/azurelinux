@@ -29,7 +29,7 @@ The links below will help you get started with Azure Linux:
 <details open>
 <summary><b>🖥️ Azure VM</b></summary>
 
-To try Azure Linux in an Azure VM, please visit [our Azure Linux 4.0 page](https://aka.ms/azure-linux-4-marketplace) on the Microsoft Marketplace.
+To try Azure Linux in an Azure VM, please visit [our Azure Linux 4 page](https://aka.ms/azure-linux-4-marketplace) on the Microsoft Marketplace.
 
 </details>
 
