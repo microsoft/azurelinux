@@ -1,0 +1,17 @@
+[components.rubygem-dalli]
+
+# Sources for the 3.2.3 update overlay; drop together with it once Fedora ships 3.2.3 or newer.
+[[components.rubygem-dalli.source-files]]
+filename = "dalli-3.2.3.gem"
+hash = "cc5633f9a71b532b982f3cee6f2ea4fef8edff35cc57f2737dcd566786829132ca2f450528d1a1ed5e4c00cf7efd0569f3cf5c1bae4f35b5d276b2198399204f"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/dalli-3.2.3.gem" }
+
+# The gem does not ship the test suite; take test/ from upstream's v3.2.3 tag archive on GitHub
+# (no release assets are published). Its SHA512 was the same when downloaded from
+# archive/v3.2.3/dalli-3.2.3.tar.gz and archive/refs/tags/v3.2.3.tar.gz.
+[[components.rubygem-dalli.source-files]]
+filename = "dalli-3.2.3.tar.gz"
+hash = "43729fa6f7ee92d886e113c6c04f1334c74bcb189e5c75205cc955a94fe1e0d834f94b69d1e9408609f4039018417da74f9b80fc8851ed33ee3fd60fb77df224"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/petergoldstein/dalli/archive/v3.2.3/dalli-3.2.3.tar.gz" }

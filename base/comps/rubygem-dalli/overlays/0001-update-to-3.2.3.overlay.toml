@@ -1,0 +1,59 @@
+# Fedora does not package rubygem-dalli 3.2.3 on f43/f44 yet. Update to the upstream
+# release for these CVE fixes:
+# CVE-2022-4064
+# Remove this overlay once the imported Fedora spec packages 3.2.3 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.2.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.2.3"
+
+[[overlays]]
+description = "3.2.3 renames History.md to CHANGELOG.md"
+type = "spec-search-replace"
+regex = '^%doc %\{gem_instdir\}/History\.md$'
+replacement = "%doc %{gem_instdir}/CHANGELOG.md"
+
+[[overlays]]
+description = "Remove the obsolete dalli-3.2.0.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(dalli-3\.2\.0\.gem\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete dalli-3.2.0-tests.txz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(dalli-3\.2\.0-tests\.txz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Take the test suite from the upstream v3.2.3 tag archive instead of a generated test/ tarball"
+type = "spec-update-tag"
+tag = "Source1"
+value = "https://github.com/petergoldstein/dalli/archive/v%{version}/%{gem_name}-%{version}.tar.gz"
+
+# The tag archive unpacks to the same %{gem_name}-%{version}/ directory as the gem, so it can't
+# be unpacked by %setup -b1. No structured overlay edits %setup options, hence the anchored
+# whole-line replacement.
+[[overlays]]
+description = "Stop unpacking Source1 with %setup"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%setup -q -n %\{gem_name\}-%\{version\} -b1$'
+replacement = "%setup -q -n %{gem_name}-%{version}"
+
+# Prepended so test/ sits in %{builddir}, where %setup -b1 put it and %check symlinks it from.
+[[overlays]]
+description = "Extract only test/ from the tag archive to %{builddir}"
+type = "spec-prepend-lines"
+section = "%prep"
+lines = [
+  "# Test suite from the upstream tag archive",
+  "tar -xzf %{SOURCE1} -C %{builddir} --strip-components=1 %{gem_name}-%{version}/test",
+  "",
+]
