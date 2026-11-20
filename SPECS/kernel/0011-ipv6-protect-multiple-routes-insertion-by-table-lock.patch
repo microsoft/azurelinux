@@ -1,0 +1,187 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 27 Oct 2026 06:52:45 +0000
+Subject: [PATCH] ipv6: Protect multiple routes insertion by table lock.
+
+Link: https://github.com/torvalds/linux/commit/4c6fbb1fbafa85029fa789b5b01f39ebcb459d1a
+
+syzbot reported the warning below. [0]
+
+While call_fib6_multipath_entry_notifiers() is called locklessly,
+fib6_siblings could be changed concurrently, leading to the
+warning (and later null-ptr-deref).
+
+Let's protect multiple routes insertion with tb6_lock.
+
+Along with that, __ip6_ins_rt() and ip6_route_del() are changed
+to fib6_add() and fib6_del().
+
+Note that fib6_del() finally calls rt6_multipath_rebalance(),
+which requires rcu_read_lock().
+
+[0]:
+i != fen6_info->nsiblings
+WARNING: drivers/net/netdevsim/fib.c:831 at nsim_fib6_event_init drivers/net/netdevsim/fib.c:831 [inline], CPU#0: syz.0.157/6279
+WARNING: drivers/net/netdevsim/fib.c:831 at nsim_fib6_prepare_event drivers/net/netdevsim/fib.c:947 [inline], CPU#0: syz.0.157/6279
+WARNING: drivers/net/netdevsim/fib.c:831 at nsim_fib_event_schedule_work drivers/net/netdevsim/fib.c:1003 [inline], CPU#0: syz.0.157/6279
+WARNING: drivers/net/netdevsim/fib.c:831 at nsim_fib_event_nb+0x1029/0x11d0 drivers/net/netdevsim/fib.c:1043, CPU#0: syz.0.157/6279
+Modules linked in:
+CPU: 0 UID: 0 PID: 6279 Comm: syz.0.157 Not tainted syzkaller #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/24/2026
+RIP: 0010:nsim_fib6_event_init drivers/net/netdevsim/fib.c:831 [inline]
+RIP: 0010:nsim_fib6_prepare_event drivers/net/netdevsim/fib.c:947 [inline]
+RIP: 0010:nsim_fib_event_schedule_work drivers/net/netdevsim/fib.c:1003 [inline]
+RIP: 0010:nsim_fib_event_nb+0x1029/0x11d0 drivers/net/netdevsim/fib.c:1043
+Code: eb 0d 4d 89 fd e8 b7 c5 6c fa be 01 00 00 00 48 89 df e8 5a 38 85 fd 4d 89 ef 4c 8b 6c 24 20 e9 4a f3 ff ff e8 98 c5 6c fa 90 <0f> 0b 90 e9 db fa ff ff 89 e9 80 e1 07 80 c1 03 38 c1 0f 8c df f0
+RSP: 0018:ffffc900047bef10 EFLAGS: 00010293
+RAX: ffffffff875b59a8 RBX: 0000000000000002 RCX: ffff888079770000
+RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000001
+RBP: ffffc900047bf0a0 R08: ffff88805c0bb02f R09: 1ffff1100b817605
+R10: dffffc0000000000 R11: ffffed100b817606 R12: dffffc0000000000
+R13: 0000000000000000 R14: 0000000000000001 R15: ffff88802c792000
+FS:  00007f334ba076c0(0000) GS:ffff888123ad0000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f334ba06ff8 CR3: 000000007a5b2000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ notifier_call_chain+0x1a5/0x3d0 kernel/notifier.c:85
+ atomic_notifier_call_chain+0xda/0x180 kernel/notifier.c:223
+ call_fib_notifiers+0x31/0x60 net/core/fib_notifier.c:36
+ call_fib6_multipath_entry_notifiers+0xf5/0x160 net/ipv6/ip6_fib.c:428
+ ip6_route_multipath_add net/ipv6/route.c:5542 [inline]
+ inet6_rtm_newroute+0x14f5/0x1a30 net/ipv6/route.c:5664
+ rtnetlink_rcv_msg+0x802/0xc00 net/core/rtnetlink.c:7163
+ netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2572
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7bd/0x940 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1916
+ sock_sendmsg_nosec+0x14e/0x190 net/socket.c:800
+ __sock_sendmsg net/socket.c:818 [inline]
+ ____sys_sendmsg+0x54e/0x850 net/socket.c:2715
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2769
+ __sys_sendmmsg+0x273/0x4d0 net/socket.c:2858
+ __do_sys_sendmmsg net/socket.c:2885 [inline]
+ __se_sys_sendmmsg net/socket.c:2882 [inline]
+ __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2882
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f334ab9e1d9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f334ba07028 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007f334ae26090 RCX: 00007f334ab9e1d9
+RDX: 04000000000001f2 RSI: 0000200000000000 RDI: 0000000000000004
+RBP: 00007f334ac35888 R08: 0000000000000000 R09: 0000000000000000
+R10: 00000000000000fc R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f334ae26128 R14: 00007f334ae26090 R15: 00007ffd96688aa8
+ </TASK>
+
+Fixes: 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.")
+Reported-by: syzbot+751b587577d0ebca10f2@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6adbaed6.67317f00.38c4bc.001b.GAE@google.com/T/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Reviewed-by: Eric Dumazet <edumazet@kernel.org>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Link: https://patch.msgid.link/20261027065247.2871134-1-kuniyu@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Backport to Azure Linux 6.6.161.1: Retain the 6.6 rt6_nh.next list member
+instead of importing a rename. Use the existing two-argument fib6_del(),
+which predates route-deletion reasons. Locking, notification and rollback
+behavior match upstream.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv6/ip6_fib.c |  4 ----
+ net/ipv6/route.c   | 16 ++++++++++++----
+ 2 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index c5aeb9c..1e83789 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -1237,9 +1237,7 @@ next_iter:
+ 			fib6_nsiblings++;
+ 		}
+ 		BUG_ON(fib6_nsiblings != rt->fib6_nsiblings);
+-		rcu_read_lock();
+ 		rt6_multipath_rebalance(temp_sibling);
+-		rcu_read_unlock();
+ 	}
+ 
+ 	/*
+@@ -1283,9 +1281,7 @@ add:
+ 						   sibling->fib6_nsiblings - 1);
+ 				WRITE_ONCE(rt->fib6_nsiblings, 0);
+ 				list_del_rcu(&rt->fib6_siblings);
+-				rcu_read_lock();
+ 				rt6_multipath_rebalance(next_sibling);
+-				rcu_read_unlock();
+ 				return err;
+ 			}
+ 		}
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 0d3e775..ae0ef2f 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4821,8 +4821,10 @@ void rt6_multipath_rebalance(struct fib6_info *rt)
+ 	if (WARN_ON_ONCE(!first))
+ 		return;
+ 
++	rcu_read_lock();
+ 	total = rt6_multipath_total_weight(first);
+ 	rt6_multipath_upper_bound_set(first, total);
++	rcu_read_unlock();
+ }
+ 
+ static int fib6_ifup(struct fib6_info *rt, void *p_arg)
+@@ -5320,6 +5322,7 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
+ {
+ 	struct fib6_info *rt_notif = NULL, *rt_last = NULL;
+ 	struct nl_info *info = &cfg->fc_nlinfo;
++	struct fib6_table *table;
+ 	struct fib6_config r_cfg;
+ 	struct rtnexthop *rtnh;
+ 	struct fib6_info *rt;
+@@ -5416,10 +5419,12 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
+ 	 */
+ 	info->skip_notify_kernel = 1;
+ 
++	table = rt->fib6_table;
++	spin_lock_bh(&table->tb6_lock);
++
+ 	err_nh = NULL;
+ 	list_for_each_entry(nh, &rt6_nh_list, next) {
+-		err = __ip6_ins_rt(nh->fib6_info, info, extack);
+-
++		err = fib6_add(&table->tb6_root, nh->fib6_info, info, extack);
+ 		if (err) {
+ 			if (replace && nhn)
+ 				NL_SET_ERR_MSG_MOD(extack,
+@@ -5474,11 +5479,13 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
+ 
+ 	/* success ... tell user about new route */
+ 	ip6_route_mpath_notify(rt_notif, rt_last, info, nlflags);
++
++	spin_unlock_bh(&table->tb6_lock);
+ 	goto cleanup;
+ 
+ add_errout:
+ 	/* send notification for routes that were added so that
+-	 * the delete notifications sent by ip6_route_del are
++	 * the delete notifications sent by fib6_del() are
+ 	 * coherent
+ 	 */
+ 	if (rt_notif)
+@@ -5488,9 +5495,10 @@ add_errout:
+ 	list_for_each_entry(nh, &rt6_nh_list, next) {
+ 		if (err_nh == nh)
+ 			break;
+-		ip6_route_del(&nh->r_cfg, extack);
++		fib6_del(nh->fib6_info, &nh->r_cfg.fc_nlinfo);
+ 	}
+ 
++	spin_unlock_bh(&table->tb6_lock);
+ cleanup:
+ 	list_for_each_entry_safe(nh, nh_safe, &rt6_nh_list, next) {
+ 		fib6_info_release(nh->fib6_info);

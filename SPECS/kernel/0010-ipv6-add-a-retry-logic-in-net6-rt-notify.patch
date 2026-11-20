@@ -1,0 +1,100 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 25 Jul 2025 14:07:22 +0000
+Subject: [PATCH] ipv6: add a retry logic in net6_rt_notify()
+
+Link: https://github.com/torvalds/linux/commit/ea2f921db7a483a526058c5b5b8162edd88dabe5
+
+inet6_rt_notify() can be called under RCU protection only.
+This means the route could be changed concurrently
+and rt6_fill_node() could return -EMSGSIZE.
+
+Re-size the skb when this happens and retry, removing
+one WARN_ON() that syzbot was able to trigger:
+
+WARNING: CPU: 3 PID: 6291 at net/ipv6/route.c:6342 inet6_rt_notify+0x475/0x4b0 net/ipv6/route.c:6342
+Modules linked in:
+CPU: 3 UID: 0 PID: 6291 Comm: syz.0.77 Not tainted 6.16.0-rc7-syzkaller #0 PREEMPT(full)
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+ RIP: 0010:inet6_rt_notify+0x475/0x4b0 net/ipv6/route.c:6342
+Code: fc ff ff e8 6d 52 ea f7 e9 47 fc ff ff 48 8b 7c 24 08 4c 89 04 24 e8 5a 52 ea f7 4c 8b 04 24 e9 94 fd ff ff e8 9c fe 84 f7 90 <0f> 0b 90 e9 bd fd ff ff e8 6e 52 ea f7 e9 bb fb ff ff 48 89 df e8
+RSP: 0018:ffffc900035cf1d8 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffffc900035cf540 RCX: ffffffff8a36e790
+RDX: ffff88802f7e8000 RSI: ffffffff8a36e9d4 RDI: 0000000000000005
+RBP: ffff88803c230f00 R08: 0000000000000005 R09: 00000000ffffffa6
+R10: 00000000ffffffa6 R11: 0000000000000001 R12: 00000000ffffffa6
+R13: 0000000000000900 R14: ffff888032ea4100 R15: 0000000000000000
+FS:  00007fac7b89a6c0(0000) GS:ffff8880d6a20000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fac7b899f98 CR3: 0000000034b3f000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+  ip6_route_mpath_notify+0xde/0x280 net/ipv6/route.c:5356
+  ip6_route_multipath_add+0x1181/0x1bd0 net/ipv6/route.c:5536
+  inet6_rtm_newroute+0xe4/0x1a0 net/ipv6/route.c:5647
+  rtnetlink_rcv_msg+0x95e/0xe90 net/core/rtnetlink.c:6944
+  netlink_rcv_skb+0x155/0x420 net/netlink/af_netlink.c:2552
+  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+  netlink_unicast+0x58d/0x850 net/netlink/af_netlink.c:1346
+  netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
+  sock_sendmsg_nosec net/socket.c:712 [inline]
+  __sock_sendmsg net/socket.c:727 [inline]
+  ____sys_sendmsg+0xa95/0xc70 net/socket.c:2566
+  ___sys_sendmsg+0x134/0x1d0 net/socket.c:2620
+
+Fixes: 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Link: https://patch.msgid.link/20250725140725.3626540-2-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Backport to Azure Linux 6.6.161.1: No functional changes from upstream;
+refresh context only. Required for notifications that race concurrent route
+updates after RTNL removal.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv6/route.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index f747dbb..0d3e775 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -6260,8 +6260,9 @@ errout:
+ void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
+ 		     unsigned int nlm_flags)
+ {
+-	struct sk_buff *skb;
+ 	struct net *net = info->nl_net;
++	struct sk_buff *skb;
++	size_t sz;
+ 	u32 seq;
+ 	int err;
+ 
+@@ -6269,17 +6270,21 @@ void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
+ 	seq = info->nlh ? info->nlh->nlmsg_seq : 0;
+ 
+ 	rcu_read_lock();
+-
+-	skb = nlmsg_new(rt6_nlmsg_size(rt), GFP_ATOMIC);
++	sz = rt6_nlmsg_size(rt);
++retry:
++	skb = nlmsg_new(sz, GFP_ATOMIC);
+ 	if (!skb)
+ 		goto errout;
+ 
+ 	err = rt6_fill_node(net, skb, rt, NULL, NULL, NULL, 0,
+ 			    event, info->portid, seq, nlm_flags);
+ 	if (err < 0) {
+-		/* -EMSGSIZE implies BUG in rt6_nlmsg_size() */
+-		WARN_ON(err == -EMSGSIZE);
+ 		kfree_skb(skb);
++		/* -EMSGSIZE implies needed space grew under us. */
++		if (err == -EMSGSIZE) {
++			sz = max(rt6_nlmsg_size(rt), sz << 1);
++			goto retry;
++		}
+ 		goto errout;
+ 	}
+ 

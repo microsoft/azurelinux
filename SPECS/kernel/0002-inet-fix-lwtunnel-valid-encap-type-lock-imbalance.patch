@@ -1,0 +1,231 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 4 Mar 2025 12:59:18 +0000
+Subject: [PATCH] inet: fix lwtunnel_valid_encap_type() lock imbalance
+
+Link: https://github.com/torvalds/linux/commit/f130a0cc1b4ff1ef28a307428d40436032e2b66e
+
+After blamed commit rtm_to_fib_config() now calls
+lwtunnel_valid_encap_type{_attr}() without RTNL held,
+triggering an unlock balance in __rtnl_unlock,
+as reported by syzbot [1]
+
+IPv6 and rtm_to_nh_config() are not yet converted.
+
+Add a temporary @rtnl_is_held parameter to lwtunnel_valid_encap_type()
+and lwtunnel_valid_encap_type_attr().
+
+While we are at it replace the two rcu_dereference()
+in lwtunnel_valid_encap_type() with more appropriate
+rcu_access_pointer().
+
+[1]
+syz-executor245/5836 is trying to release lock (rtnl_mutex) at:
+ [<ffffffff89d0e38c>] __rtnl_unlock+0x6c/0xf0 net/core/rtnetlink.c:142
+but there are no more locks to release!
+
+other info that might help us debug this:
+no locks held by syz-executor245/5836.
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5836 Comm: syz-executor245 Not tainted 6.14.0-rc4-syzkaller-00873-g3424291dd242 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Call Trace:
+ <TASK>
+  __dump_stack lib/dump_stack.c:94 [inline]
+  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+  print_unlock_imbalance_bug+0x25b/0x2d0 kernel/locking/lockdep.c:5289
+  __lock_release kernel/locking/lockdep.c:5518 [inline]
+  lock_release+0x47e/0xa30 kernel/locking/lockdep.c:5872
+  __mutex_unlock_slowpath+0xec/0x800 kernel/locking/mutex.c:891
+  __rtnl_unlock+0x6c/0xf0 net/core/rtnetlink.c:142
+  lwtunnel_valid_encap_type+0x38a/0x5f0 net/core/lwtunnel.c:169
+  lwtunnel_valid_encap_type_attr+0x113/0x270 net/core/lwtunnel.c:209
+  rtm_to_fib_config+0x949/0x14e0 net/ipv4/fib_frontend.c:808
+  inet_rtm_newroute+0xf6/0x2a0 net/ipv4/fib_frontend.c:917
+  rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6919
+  netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
+  netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
+  netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
+  sock_sendmsg_nosec net/socket.c:709 [inline]
+
+Fixes: 1dd2af7963e9 ("ipv4: fib: Convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.")
+Reported-by: syzbot+3f18ef0f7df107a3f6a0@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/67c6f87a.050a0220.38b91b.0147.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Link: https://patch.msgid.link/20250304125918.2763514-1-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Backport to Azure Linux 6.6.161.1: Retain true for IPv4 callers: their
+handlers still hold the global RTNL in 6.6. Keep the explicit argument
+because IPv4, IPv6 deletion and nexthop operations are not being converted.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ include/net/lwtunnel.h  | 12 ++++++++----
+ net/core/lwtunnel.c     | 23 ++++++++++++-----------
+ net/ipv4/fib_frontend.c |  4 ++--
+ net/ipv4/nexthop.c      |  3 ++-
+ net/ipv6/route.c        |  6 ++++--
+ 5 files changed, 28 insertions(+), 20 deletions(-)
+
+diff --git a/include/net/lwtunnel.h b/include/net/lwtunnel.h
+index 09791f5..eabe80d 100644
+--- a/include/net/lwtunnel.h
++++ b/include/net/lwtunnel.h
+@@ -116,9 +116,11 @@ int lwtunnel_encap_add_ops(const struct lwtunnel_encap_ops *op,
+ int lwtunnel_encap_del_ops(const struct lwtunnel_encap_ops *op,
+ 			   unsigned int num);
+ int lwtunnel_valid_encap_type(u16 encap_type,
+-			      struct netlink_ext_ack *extack);
++			      struct netlink_ext_ack *extack,
++			      bool rtnl_is_held);
+ int lwtunnel_valid_encap_type_attr(struct nlattr *attr, int len,
+-				   struct netlink_ext_ack *extack);
++				   struct netlink_ext_ack *extack,
++				   bool rtnl_is_held);
+ int lwtunnel_build_state(struct net *net, u16 encap_type,
+ 			 struct nlattr *encap,
+ 			 unsigned int family, const void *cfg,
+@@ -201,13 +203,15 @@ static inline int lwtunnel_encap_del_ops(const struct lwtunnel_encap_ops *op,
+ }
+ 
+ static inline int lwtunnel_valid_encap_type(u16 encap_type,
+-					    struct netlink_ext_ack *extack)
++					    struct netlink_ext_ack *extack,
++					    bool rtnl_is_held)
+ {
+ 	NL_SET_ERR_MSG(extack, "CONFIG_LWTUNNEL is not enabled in this kernel");
+ 	return -EOPNOTSUPP;
+ }
+ static inline int lwtunnel_valid_encap_type_attr(struct nlattr *attr, int len,
+-						 struct netlink_ext_ack *extack)
++						 struct netlink_ext_ack *extack,
++						 bool rtnl_is_held)
+ {
+ 	/* return 0 since we are not walking attr looking for
+ 	 * RTA_ENCAP_TYPE attribute on nexthops.
+diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
+index f63586c..60f27cb 100644
+--- a/net/core/lwtunnel.c
++++ b/net/core/lwtunnel.c
+@@ -149,7 +149,8 @@ int lwtunnel_build_state(struct net *net, u16 encap_type,
+ }
+ EXPORT_SYMBOL_GPL(lwtunnel_build_state);
+ 
+-int lwtunnel_valid_encap_type(u16 encap_type, struct netlink_ext_ack *extack)
++int lwtunnel_valid_encap_type(u16 encap_type, struct netlink_ext_ack *extack,
++			      bool rtnl_is_held)
+ {
+ 	const struct lwtunnel_encap_ops *ops;
+ 	int ret = -EINVAL;
+@@ -160,21 +161,19 @@ int lwtunnel_valid_encap_type(u16 encap_type, struct netlink_ext_ack *extack)
+ 		return ret;
+ 	}
+ 
+-	rcu_read_lock();
+-	ops = rcu_dereference(lwtun_encaps[encap_type]);
+-	rcu_read_unlock();
++	ops = rcu_access_pointer(lwtun_encaps[encap_type]);
+ #ifdef CONFIG_MODULES
+ 	if (!ops) {
+ 		const char *encap_type_str = lwtunnel_encap_str(encap_type);
+ 
+ 		if (encap_type_str) {
+-			__rtnl_unlock();
++			if (rtnl_is_held)
++				__rtnl_unlock();
+ 			request_module("rtnl-lwt-%s", encap_type_str);
+-			rtnl_lock();
++			if (rtnl_is_held)
++				rtnl_lock();
+ 
+-			rcu_read_lock();
+-			ops = rcu_dereference(lwtun_encaps[encap_type]);
+-			rcu_read_unlock();
++			ops = rcu_access_pointer(lwtun_encaps[encap_type]);
+ 		}
+ 	}
+ #endif
+@@ -187,7 +186,8 @@ int lwtunnel_valid_encap_type(u16 encap_type, struct netlink_ext_ack *extack)
+ EXPORT_SYMBOL_GPL(lwtunnel_valid_encap_type);
+ 
+ int lwtunnel_valid_encap_type_attr(struct nlattr *attr, int remaining,
+-				   struct netlink_ext_ack *extack)
++				   struct netlink_ext_ack *extack,
++				   bool rtnl_is_held)
+ {
+ 	struct rtnexthop *rtnh = (struct rtnexthop *)attr;
+ 	struct nlattr *nla_entype;
+@@ -209,7 +209,8 @@ int lwtunnel_valid_encap_type_attr(struct nlattr *attr, int remaining,
+ 				encap_type = nla_get_u16(nla_entype);
+ 
+ 				if (lwtunnel_valid_encap_type(encap_type,
+-							      extack) != 0)
++							      extack,
++							      rtnl_is_held) != 0)
+ 					return -EOPNOTSUPP;
+ 			}
+ 		}
+diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+index 7993ff4..b87b663 100644
+--- a/net/ipv4/fib_frontend.c
++++ b/net/ipv4/fib_frontend.c
+@@ -801,7 +801,7 @@ static int rtm_to_fib_config(struct net *net, struct sk_buff *skb,
+ 		case RTA_MULTIPATH:
+ 			err = lwtunnel_valid_encap_type_attr(nla_data(attr),
+ 							     nla_len(attr),
+-							     extack);
++							     extack, true);
+ 			if (err < 0)
+ 				goto errout;
+ 			cfg->fc_mp = nla_data(attr);
+@@ -819,7 +819,7 @@ static int rtm_to_fib_config(struct net *net, struct sk_buff *skb,
+ 		case RTA_ENCAP_TYPE:
+ 			cfg->fc_encap_type = nla_get_u16(attr);
+ 			err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
+-							extack);
++							extack, true);
+ 			if (err < 0)
+ 				goto errout;
+ 			break;
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index 16a90d8..c03376b 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -2956,7 +2956,8 @@ static int rtm_to_nh_config(struct net *net, struct sk_buff *skb,
+ 		}
+ 
+ 		cfg->nh_encap_type = nla_get_u16(tb[NHA_ENCAP_TYPE]);
+-		err = lwtunnel_valid_encap_type(cfg->nh_encap_type, extack);
++		err = lwtunnel_valid_encap_type(cfg->nh_encap_type,
++						extack, true);
+ 		if (err < 0)
+ 			goto out;
+ 
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index baa43c7..341de9b 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -5168,7 +5168,8 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		cfg->fc_mp_len = nla_len(tb[RTA_MULTIPATH]);
+ 
+ 		err = lwtunnel_valid_encap_type_attr(cfg->fc_mp,
+-						     cfg->fc_mp_len, extack);
++						     cfg->fc_mp_len,
++						     extack, true);
+ 		if (err < 0)
+ 			goto errout;
+ 	}
+@@ -5187,7 +5188,8 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (tb[RTA_ENCAP_TYPE]) {
+ 		cfg->fc_encap_type = nla_get_u16(tb[RTA_ENCAP_TYPE]);
+ 
+-		err = lwtunnel_valid_encap_type(cfg->fc_encap_type, extack);
++		err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
++						extack, true);
+ 		if (err < 0)
+ 			goto errout;
+ 	}

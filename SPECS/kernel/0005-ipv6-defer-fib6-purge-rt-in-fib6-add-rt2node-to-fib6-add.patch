@@ -1,0 +1,110 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Thu, 17 Apr 2025 17:03:54 -0700
+Subject: [PATCH] ipv6: Defer fib6_purge_rt() in fib6_add_rt2node() to
+ fib6_add().
+
+Link: https://github.com/torvalds/linux/commit/accb46b56bc3bc99ee69ba18b06ca60266ad6fca
+
+The next patch adds per-nexthop spinlock which protects nh->f6i_list.
+
+When rt->nh is not NULL, fib6_add_rt2node() will be called under the lock.
+fib6_add_rt2node() could call fib6_purge_rt() for another route, which
+could holds another nexthop lock.
+
+Then, deadlock could happen between two nexthops.
+
+Let's defer fib6_purge_rt() after fib6_add_rt2node().
+
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Link: https://patch.msgid.link/20250418000443.43734-14-kuniyu@amazon.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+Backport to Azure Linux 6.6.161.1: No functional changes from upstream;
+refresh context only. Required to avoid nested nexthop locks in the
+following per-nexthop locking change.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ include/net/ip6_fib.h |  1 +
+ net/ipv6/ip6_fib.c    | 21 ++++++++++++++-------
+ 2 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 0548955..1d63697 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -204,6 +204,7 @@ struct fib6_info {
+ 					fib6_destroying:1,
+ 					unused:4;
+ 
++	struct list_head		purge_link;
+ 	struct rcu_head			rcu;
+ 	struct nexthop			*nh;
+ 	struct fib6_nh			fib6_nh[];
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index 9e4109c..575e06c 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -1089,8 +1089,8 @@ static void fib6_purge_rt(struct fib6_info *rt, struct fib6_node *fn,
+  */
+ 
+ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+-			    struct nl_info *info,
+-			    struct netlink_ext_ack *extack)
++			    struct nl_info *info, struct netlink_ext_ack *extack,
++			    struct list_head *purge_list)
+ {
+ 	struct fib6_info *leaf = rcu_dereference_protected(fn->leaf,
+ 				    lockdep_is_held(&rt->fib6_table->tb6_lock));
+@@ -1322,10 +1322,9 @@ add:
+ 		}
+ 		nsiblings = iter->fib6_nsiblings;
+ 		iter->fib6_node = NULL;
+-		fib6_purge_rt(iter, fn, info->nl_net);
++		list_add(&iter->purge_link, purge_list);
+ 		if (rcu_access_pointer(fn->rr_ptr) == iter)
+ 			fn->rr_ptr = NULL;
+-		fib6_info_release(iter);
+ 
+ 		if (nsiblings) {
+ 			/* Replacing an ECMP route, remove all siblings */
+@@ -1338,10 +1337,9 @@ add:
+ 				if (rt6_qualify_for_ecmp(iter)) {
+ 					*ins = iter->fib6_next;
+ 					iter->fib6_node = NULL;
+-					fib6_purge_rt(iter, fn, info->nl_net);
++					list_add(&iter->purge_link, purge_list);
+ 					if (rcu_access_pointer(fn->rr_ptr) == iter)
+ 						fn->rr_ptr = NULL;
+-					fib6_info_release(iter);
+ 					nsiblings--;
+ 					info->nl_net->ipv6.rt6_stats->fib_rt_entries--;
+ 				} else {
+@@ -1411,6 +1409,7 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
+ 	     struct nl_info *info, struct netlink_ext_ack *extack)
+ {
+ 	struct fib6_table *table = rt->fib6_table;
++	LIST_HEAD(purge_list);
+ 	struct fib6_node *fn;
+ #ifdef CONFIG_IPV6_SUBTREES
+ 	struct fib6_node *pn = NULL;
+@@ -1513,8 +1512,16 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
+ 	}
+ #endif
+ 
+-	err = fib6_add_rt2node(fn, rt, info, extack);
++	err = fib6_add_rt2node(fn, rt, info, extack, &purge_list);
+ 	if (!err) {
++		struct fib6_info *iter, *next;
++
++		list_for_each_entry_safe(iter, next, &purge_list, purge_link) {
++			list_del(&iter->purge_link);
++			fib6_purge_rt(iter, fn, info->nl_net);
++			fib6_info_release(iter);
++		}
++
+ 		if (rt->nh)
+ 			list_add(&rt->nh_list, &rt->nh->f6i_list);
+ 		__fib6_update_sernum_upto_root(rt, fib6_new_sernum(info->nl_net));

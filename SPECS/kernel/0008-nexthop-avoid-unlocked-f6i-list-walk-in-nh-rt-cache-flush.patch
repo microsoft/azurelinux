@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
+Date: Wed, 22 Jul 2026 00:29:51 +0000
+Subject: [PATCH] nexthop: avoid unlocked f6i_list walk in nh_rt_cache_flush
+
+Link: https://github.com/torvalds/linux/commit/4787a6d2629b4e8c0b6bacab1f75c1660eca44d9
+
+nh_rt_cache_flush() walks nh->f6i_list during an RTNL-serialized nexthop
+replace without holding nh->lock, racing the unlocked IPv6 route
+add/delete that mutate the list under nh->lock and free fib6_info
+entries (nh_rt_cache_flush() is inlined into rtm_new_nexthop()):
+
+  BUG: KASAN: slab-use-after-free in nh_rt_cache_flush (net/ipv4/nexthop.c:2243)
+  Read of size 8 at addr ffff888012953e18 by task exploit/146
+   nh_rt_cache_flush (net/ipv4/nexthop.c:2243)
+   replace_nexthop (net/ipv4/nexthop.c:2610)
+   rtm_new_nexthop (net/ipv4/nexthop.c:3323)
+   rtnetlink_rcv_msg (net/core/rtnetlink.c:7076)
+
+Unlike the other f6i_list walks, this one bumps each route's sernum via
+fib6_update_sernum_upto_root(), which needs tb6_lock; taking nh->lock
+around it would invert the established tb6_lock -> nh->lock order and
+deadlock. As the only purpose is to invalidate cached dsts, bump the
+IPv6 sernum for the whole netns with rt_genid_bump_ipv6() instead,
+mirroring the rt_cache_flush() already done for IPv4 just above.
+
+Fixes: 081efd18326e ("ipv6: Protect nh->f6i_list with spinlock and flag.")
+Reported-by: AutonomousCodeSecurity@microsoft.com
+Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20260722002951.2614721-2-xmei5@asu.edu
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Backport to Azure Linux 6.6.161.1: Replace the 6.6
+ipv6_stub->fib6_update_sernum() list walk with the same locked emptiness
+check and netns generation bump used upstream.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv4/nexthop.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index 8ed0e73..9a503bf 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -1961,15 +1961,18 @@ static void remove_nexthop(struct net *net, struct nexthop *nh,
+ static void nh_rt_cache_flush(struct net *net, struct nexthop *nh,
+ 			      struct nexthop *replaced_nh)
+ {
+-	struct fib6_info *f6i;
+ 	struct nh_group *nhg;
++	bool have_f6i;
+ 	int i;
+ 
+ 	if (!list_empty(&nh->fi_list))
+ 		rt_cache_flush(net);
+ 
+-	list_for_each_entry(f6i, &nh->f6i_list, nh_list)
+-		ipv6_stub->fib6_update_sernum(net, f6i);
++	spin_lock_bh(&nh->lock);
++	have_f6i = !list_empty(&nh->f6i_list);
++	spin_unlock_bh(&nh->lock);
++	if (have_f6i)
++		rt_genid_bump_ipv6(net);
+ 
+ 	/* if an IPv6 group was replaced, we have to release all old
+ 	 * dsts to make sure all refcounts are released

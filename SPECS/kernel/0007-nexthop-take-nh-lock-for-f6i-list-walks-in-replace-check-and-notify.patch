@@ -1,0 +1,86 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
+Date: Wed, 22 Jul 2026 00:29:50 +0000
+Subject: [PATCH] nexthop: take nh->lock for f6i_list walks in replace check
+ and notify
+
+Link: https://github.com/torvalds/linux/commit/072cd1f21819dedd2252e704d255de3b0cfc61a7
+
+fib6_check_nh_list() and __nexthop_replace_notify() walk nh->f6i_list
+during an RTNL-serialized nexthop replace without holding nh->lock. IPv6
+RTM_NEWROUTE/RTM_DELROUTE run without RTNL and mutate that list under
+nh->lock (fib6_add_rt2node_nh(), fib6_purge_rt()), so both walks race a
+concurrent route delete that unlinks and frees a fib6_info:
+
+  BUG: KASAN: slab-use-after-free in rt6_fill_node.isra.0 (net/ipv6/route.c:5799)
+  Read of size 4 at addr ffff888014607e64 by task exploit/143
+   rt6_fill_node.isra.0 (net/ipv6/route.c:5799)
+   fib6_rt_update (net/ipv6/route.c:6412)
+   __nexthop_replace_notify (net/ipv4/nexthop.c:2542)
+   rtm_new_nexthop (net/ipv4/nexthop.c:2554)
+   rtnetlink_rcv_msg (net/core/rtnetlink.c:7076)
+
+  BUG: KASAN: slab-use-after-free in fib6_check_nh_list (net/ipv4/nexthop.c:1605)
+  Read of size 8 at addr ffff888014a7d068 by task exploit/142
+   fib6_check_nh_list (net/ipv4/nexthop.c:1605)
+   rtm_new_nexthop (net/ipv4/nexthop.c:2575)
+   rtnetlink_rcv_msg (net/core/rtnetlink.c:7076)
+
+Both walks only read the entries and take no tb6_lock, so protect them
+with nh->lock; fib6_rt_update() uses gfp_any(), which returns GFP_ATOMIC
+under the lock.
+
+Fixes: 081efd18326e ("ipv6: Protect nh->f6i_list with spinlock and flag.")
+Reported-by: AutonomousCodeSecurity@microsoft.com
+Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20260722002951.2614721-1-xmei5@asu.edu
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Backport to Azure Linux 6.6.161.1: Retain the 6.6 ipv6_stub indirection for
+fib6_rt_update(); locking and error handling are unchanged from upstream.
+
+Signed-off-by: Alex Cortelyou <alcortel@microsoft.com>
+---
+ net/ipv4/nexthop.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index 96f2fb8..8ed0e73 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -1345,14 +1345,21 @@ static int fib6_check_nh_list(struct nexthop *old, struct nexthop *new,
+ 			      struct netlink_ext_ack *extack)
+ {
+ 	struct fib6_info *f6i;
++	int err = 0;
+ 
+ 	if (list_empty(&old->f6i_list))
+ 		return 0;
+ 
++	spin_lock_bh(&old->lock);
+ 	list_for_each_entry(f6i, &old->f6i_list, nh_list) {
+-		if (check_src_addr(&f6i->fib6_src.addr, extack) < 0)
+-			return -EINVAL;
++		err = check_src_addr(&f6i->fib6_src.addr, extack);
++		if (err)
++			break;
+ 	}
++	spin_unlock_bh(&old->lock);
++
++	if (err)
++		return err;
+ 
+ 	return fib6_check_nexthop(new, NULL, extack);
+ }
+@@ -2256,8 +2263,10 @@ static void __nexthop_replace_notify(struct net *net, struct nexthop *nh,
+ 			fi->nh_updated = false;
+ 	}
+ 
++	spin_lock_bh(&nh->lock);
+ 	list_for_each_entry(f6i, &nh->f6i_list, nh_list)
+ 		ipv6_stub->fib6_rt_update(net, f6i, info);
++	spin_unlock_bh(&nh->lock);
+ }
+ 
+ /* send RTM_NEWROUTE with REPLACE flag set for all FIB entries
