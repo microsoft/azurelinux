@@ -1,0 +1,97 @@
+# MariaDB 10.11.19 fixed CVE-2026-107818 (MDEV-40629, upstream commit
+# e3d62d4e78fd) by moving the galera_new_cluster environment file out of the
+# mysql-writable runtime directory into /run and dropping the
+# wsrep-start-position file. That commit replaced the INSTALL_RUNDATADIR CMake
+# variable with INSTALL_RUNDIR, so Fedora's own mysql.service.in and
+# mysql@.service.in (which still use @INSTALL_RUNDATADIR@) would render with an
+# empty path and fail to start. Port the upstream support-files/mariadb.service.in
+# change to both downstream unit files.
+# Remove this overlay once the imported Fedora spec packages 10.11.19 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Read the new-cluster flag from the root-only file galera_new_cluster now writes, drop the start-position file in mysql.service.in"
+type = "file-search-replace"
+file = "mysql.service.in"
+regex = '(?m)^# Use an environment file to pass variable _WSREP_NEW_CLUSTER\nEnvironmentFile=-@INSTALL_RUNDATADIR@/wsrep-new-cluster\n# Use an environment file to pass variable _WSREP_START_POSITION\nEnvironmentFile=-@INSTALL_RUNDATADIR@/wsrep-start-position\n'
+replacement = '''# Use an environment file to pass variable _WSREP_NEW_CLUSTER.
+# Must not be writable by mysql user.
+EnvironmentFile=-@INSTALL_RUNDIR@/mariadb-wsrep-new-cluster
+'''
+
+[[overlays]]
+description = "Drop the ExecStartPre that wrote the start position as mysql in mysql.service.in"
+type = "file-search-replace"
+file = "mysql.service.in"
+regex = '(?s)# Perform automatic wsrep recovery\. When server is started without wsrep,\n.*?/wsrep-start-position \|\| exit 1"\n\n'
+replacement = ""
+
+[[overlays]]
+description = "Run galera_recovery inside ExecStart and pass its result directly in mysql.service.in"
+type = "file-search-replace"
+file = "mysql.service.in"
+regex = '(?m)^ExecStart=@libexecdir@/mariadbd --basedir=@prefix@ \$MYSQLD_OPTS \$_WSREP_NEW_CLUSTER \$_WSREP_START_POSITION\nExecStartPost=@libexecdir@/mariadb-check-upgrade\n'
+replacement = '''# Perform automatic wsrep recovery. When server is started without wsrep,
+# galera_recovery simply returns an empty string. In any case, however, it is
+# not expected to return a non-zero status.
+# Do not panic if galera_recovery script is not available. (MDEV-10538)
+ExecStart=/bin/sh -c "set -f; [ ! -e @bindir@/galera_recovery ] && VAR= || \
+ VAR=`@bindir@/galera_recovery`; [ $? -eq 0 ] || exit 1; \
+ exec @libexecdir@/mariadbd --basedir=@prefix@ $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $VAR"
+ExecStartPost=@libexecdir@/mariadb-check-upgrade
+
+# Set the name explicitly, otherwise it would be the first name from ExecStart
+SyslogIdentifier=mariadbd
+'''
+
+[[overlays]]
+description = "Drop the start-position cleanup in mysql.service.in"
+type = "file-search-replace"
+file = "mysql.service.in"
+regex = '(?m)^# Unset _WSREP_START_POSITION environment variable\.\nExecStartPost=/bin/rm -f @INSTALL_RUNDATADIR@/wsrep-start-position\n\n'
+replacement = ""
+
+[[overlays]]
+description = "Read the new-cluster flag from the root-only file galera_new_cluster now writes, drop the start-position file in mysql@.service.in"
+type = "file-search-replace"
+file = "mysql@.service.in"
+regex = '(?m)^# Use an environment file to pass variable _WSREP_NEW_CLUSTER\nEnvironmentFile=-@INSTALL_RUNDATADIR@/wsrep-new-cluster\n# Use an environment file to pass variable _WSREP_START_POSITION\nEnvironmentFile=-@INSTALL_RUNDATADIR@/wsrep-start-position\n'
+replacement = '''# Use an environment file to pass variable _WSREP_NEW_CLUSTER.
+# Must not be writable by mysql user.
+EnvironmentFile=-@INSTALL_RUNDIR@/mariadb-wsrep-new-cluster
+'''
+
+[[overlays]]
+description = "Drop the ExecStartPre that wrote the start position as mysql in mysql@.service.in"
+type = "file-search-replace"
+file = "mysql@.service.in"
+regex = '(?s)# Perform automatic wsrep recovery\. When server is started without wsrep,\n.*?/wsrep-start-position \|\| exit 1"\n\n'
+replacement = ""
+
+[[overlays]]
+description = "Run galera_recovery inside ExecStart and pass its result directly in mysql@.service.in"
+type = "file-search-replace"
+file = "mysql@.service.in"
+regex = '(?m)^ExecStart=@libexecdir@/mariadbd --defaults-group-suffix=\.%I --basedir=@prefix@ \$MYSQLD_OPTS \$_WSREP_NEW_CLUSTER \$_WSREP_START_POSITION\nExecStartPost=@libexecdir@/mariadb-check-upgrade --defaults-group-suffix=\.%I\n'
+replacement = '''# Perform automatic wsrep recovery. When server is started without wsrep,
+# galera_recovery simply returns an empty string. In any case, however, it is
+# not expected to return a non-zero status.
+# Do not panic if galera_recovery script is not available. (MDEV-10538)
+ExecStart=/bin/sh -c "set -f; [ ! -e @bindir@/galera_recovery ] && VAR= || \
+ VAR=`@bindir@/galera_recovery`; [ $? -eq 0 ] || exit 1; \
+ exec @libexecdir@/mariadbd --defaults-group-suffix=.%I --basedir=@prefix@ $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $VAR"
+ExecStartPost=@libexecdir@/mariadb-check-upgrade --defaults-group-suffix=.%I
+
+# Set the name explicitly, otherwise it would be the first name from ExecStart
+SyslogIdentifier=mariadbd
+'''
+
+[[overlays]]
+description = "Drop the start-position cleanup in mysql@.service.in"
+type = "file-search-replace"
+file = "mysql@.service.in"
+regex = '(?m)^# Unset _WSREP_START_POSITION environment variable\.\nExecStartPost=/bin/rm -f @INSTALL_RUNDATADIR@/wsrep-start-position\n\n'
+replacement = ""

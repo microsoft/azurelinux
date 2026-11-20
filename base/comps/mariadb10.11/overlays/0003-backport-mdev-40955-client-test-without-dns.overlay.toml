@@ -1,0 +1,37 @@
+# 10.11.19 added the mysql_client_test case test_proxy_header_connect_errors_reset
+# (MDEV-25817). It relies on reverse DNS for 192.0.2.50 failing permanently, but
+# in a build root without a nameserver glibc returns EAI_AGAIN, which the server
+# does not count as a connect error, so main.mysql_client_test and
+# main.mysql_client_test_comp fail in %check. Upstream fixed the test after
+# 10.11.19 (MDEV-40955); backport the hunks for this test.
+# Remove this overlay once the imported Fedora spec packages a release that
+# contains MariaDB/server a349bb8501.
+
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/MariaDB/server/commit/a349bb8501ba4103dbc378c0bea7ea269d3a4a16" }]
+
+# patch-add would append its PatchN tag at the end of the main preamble, which
+# here is inside the `%if %?mariadb_default` block that opens the main package,
+# so add the file and insert Patch16 next to Patch15 instead. Patch16 is the
+# slot freed by the dropped MDEV-39691 patch.
+[[overlays]]
+description = "Add the MariaDB/server a349bb8501 (MDEV-40955) backport so mysql_client_test does not need a resolvable DNS"
+type = "file-add"
+file = "mariadb-MDEV-40955-mysql_client_test-no-dns.patch"
+source = "../mariadb-MDEV-40955-mysql_client_test-no-dns.patch"
+
+[[overlays]]
+description = "Register the MDEV-40955 backport as Patch16, unconditionally next to Patch15"
+type = "spec-insert-tag"
+tag = "Patch16"
+value = "mariadb-MDEV-40955-mysql_client_test-no-dns.patch"
+
+# The spec applies patches with explicit %patch lines.
+[[overlays]]
+description = "Apply the MDEV-40955 backport in %prep"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P15 -p1$'
+replacement = "%patch -P15 -p1\n%patch -P16 -p1"
