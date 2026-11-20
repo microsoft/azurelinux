@@ -92,6 +92,7 @@ var (
 	allowToolchainRebuilds     = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
 	maxCPU                     = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 	timeout                    = app.Flag("timeout", "Max duration for any individual package build/test").Default(defaultTimeout).Duration()
+	checkEnvPassthrough        = app.Flag("check-env-passthrough", "Name of an environment variable to forward into package builds that run %check. May be repeated.").Strings()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -136,6 +137,10 @@ func main() {
 
 	if *buildAttempts <= 0 {
 		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found %d.", *buildAttempts)
+	}
+
+	if err := buildagents.ValidateEnvVarNames(*checkEnvPassthrough); err != nil {
+		logger.Log.Fatalf("Invalid --check-env-passthrough value: %s", err)
 	}
 
 	var licenseCheckerConfig = schedulerutils.PackageLicenseCheckerConfig{Mode: licensecheck.LicenseCheckModeNone}
@@ -203,6 +208,8 @@ func main() {
 		CCacheConfig: *ccacheConfig,
 		MaxCpu:       *maxCPU,
 		Timeout:      *timeout,
+
+		CheckEnvPassthrough: *checkEnvPassthrough,
 
 		LogDir:   *buildLogsDir,
 		LogLevel: *logFlags.LogLevel,

@@ -111,6 +111,9 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 
 	if runCheck {
 		serializedArgs = append(serializedArgs, "--run-check")
+		for _, name := range config.CheckEnvPassthrough {
+			serializedArgs = append(serializedArgs, fmt.Sprintf("--check-env-passthrough=%s", name))
+		}
 	}
 
 	if config.UseCcache {
