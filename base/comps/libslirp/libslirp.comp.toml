@@ -1,0 +1,10 @@
+[components.libslirp]
+
+# Release tarball uploaded by upstream to the v4.9.7 GitLab release (a stored asset, not a
+# generated archive). Its SHA512 was stable over two downloads and its SHA256 matches the
+# libslirp-4.9.7.tar.xz.sha256sum file published with the release.
+[[components.libslirp.source-files]]
+filename = "libslirp-4.9.7.tar.xz"
+hash = "da51a25beb3ed478f226e8d545f2562ae25755a46607a72cfcb151dd75e39499cbc86536b587d4bb51a594b0c456a58cf484bb522373d263b61bd279fd1bbe0b"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://gitlab.freedesktop.org/-/project/2767/uploads/128da958c5bca62a4b7eae695abff645/libslirp-4.9.7.tar.xz" }
