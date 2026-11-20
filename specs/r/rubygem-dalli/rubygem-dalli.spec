@@ -7,8 +7,8 @@
 %bcond_with tests
 
 Name: rubygem-%{gem_name}
-Version: 3.2.0
-Release: 13%{?dist}
+Version: 3.2.3
+Release: 14%{?dist}
 Summary: High performance memcached client for Ruby
 License: MIT
 URL: https://github.com/petergoldstein/dalli
@@ -16,7 +16,7 @@ Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 # Tests are not shipped with the gem, you may get them like so
 # git clone https://github.com/petergoldstein/dalli.git --no-checkout
 # git -C dalli archive -v -o dalli-3.2.0-tests.txz v3.2.0 test/
-Source1: %{gem_name}-%{version}-tests.txz
+Source1: https://github.com/petergoldstein/dalli/archive/v%{version}/%{gem_name}-%{version}.tar.gz
 
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
@@ -42,7 +42,10 @@ BuildArch: noarch
 Documentation for %{name}
 
 %prep
-%setup -q -n %{gem_name}-%{version} -b1
+# Test suite from the upstream tag archive
+tar -xzf %{SOURCE1} -C %{builddir} --strip-components=1 %{gem_name}-%{version}/test
+
+%setup -q -n %{gem_name}-%{version}
 
 %build
 gem build ../%{gem_name}-%{version}.gemspec
@@ -74,7 +77,7 @@ popd
 %files doc
 %doc %{gem_docdir}
 %doc %{gem_instdir}/README.md
-%doc %{gem_instdir}/History.md
+%doc %{gem_instdir}/CHANGELOG.md
 %{gem_instdir}/Gemfile
 
 %changelog
