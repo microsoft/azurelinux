@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libssh
 Version:        0.10.6
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
 URL:            http://www.libssh.org
@@ -165,6 +165,9 @@ cd obj
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
+* Mon Nov 16 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.10.6-10
+- Updated patch for CVE-2026-59843 as earlier it was partially fixed.
+
 * Tue Jul 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-9
 - Patch for CVE-2026-59850, CVE-2026-59847, CVE-2026-59845, CVE-2026-59844, CVE-2026-59843, CVE-2026-59848
 
