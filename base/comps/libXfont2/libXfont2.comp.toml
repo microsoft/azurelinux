@@ -1,0 +1,3 @@
+# Pin to Fedora f43 libXfont2-2.0.10-1 for CVE-2026-109909 and CVE-2026-109920: https://src.fedoraproject.org/rpms/libXfont2/c/00cd58ee6bc77c073369e1ad77906f8ceb34cf94
+[components.libXfont2]
+spec = { type = "upstream", upstream-commit = "00cd58ee6bc77c073369e1ad77906f8ceb34cf94" }
