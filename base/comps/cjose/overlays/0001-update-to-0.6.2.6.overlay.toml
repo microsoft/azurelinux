@@ -1,0 +1,20 @@
+# Fedora f43 and f44 package cjose 0.6.2.2. Update to the upstream 0.6.2.6
+# release on the same f43 spec for these CVE fixes:
+# CVE-2026-53938, CVE-2026-53939
+# Remove this overlay once the imported Fedora spec packages 0.6.2.6 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 0.6.2.6"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.6.2.6"
+
+[[overlays]]
+description = "Remove the obsolete 0.6.2.2 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(cjose-0\.6\.2\.2\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           cjose
-Version:        0.6.2.2
-Release: 11%{?dist}
+Version: 0.6.2.6
+Release: 12%{?dist}
 Summary:        C library implementing the Javascript Object Signing and Encryption (JOSE)
 
 License:        MIT
@@ -17,6 +17,7 @@ BuildRequires:  jansson-devel
 BuildRequires:  check-devel
 BuildRequires: make
 
+Patch0: cjose-0.6.2.6-jwk-init-buflen.patch
 %description
 Implementation of JOSE for C/C++
 
