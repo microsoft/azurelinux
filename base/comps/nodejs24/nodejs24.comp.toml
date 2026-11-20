@@ -1,4 +1,10 @@
-# Pin to Fedora f43 nodejs24-None to pick up upstream CVE fixes.
+# Keep the Fedora f43 spec and existing default-stream packaging.
 # https://src.fedoraproject.org/rpms/nodejs24/c/685165daff45a65879f63e3340b2effe9779ce01
 [components.nodejs24]
 spec = { type = "upstream", upstream-commit = "685165daff45a65879f63e3340b2effe9779ce01" }
+
+[[components.nodejs24.source-files]]
+filename = "node-v24.22.3-stripped.tar.gz"
+hash = "a876c0a206ad831f2a2d48c246870974e51d46428fede412d43249c9fbf38a2f2ba89b23b25665f2b34bdd58d52014d570ff5a90e4d8fc7f855474922efe5043"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://src.fedoraproject.org/repo/pkgs/nodejs24/node-v24.22.3-stripped.tar.gz/sha512/a876c0a206ad831f2a2d48c246870974e51d46428fede412d43249c9fbf38a2f2ba89b23b25665f2b34bdd58d52014d570ff5a90e4d8fc7f855474922efe5043/node-v24.22.3-stripped.tar.gz" }
