@@ -1,0 +1,14 @@
+# pcp-pmda-rds (new in pcp 7.2) loads modules/rds_info.python, which imports psutil,
+# but the spec only requires python3-pcp: the agent cannot start unless python3-psutil
+# happens to be installed. Not fixed in Fedora rawhide or upstream PCP as of 2026-11-11.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "pcp-pmda-rds: require python3-psutil, which its rds_info module imports"
+type = "spec-add-tag"
+package = "pmda-rds"
+tag = "Requires"
+value = "python3-psutil"

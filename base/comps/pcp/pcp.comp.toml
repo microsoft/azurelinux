@@ -1,4 +1,4 @@
 [components.pcp]
-# Pin past the default snapshot to correct a previously selected
-# non-first-parent commit on the f43 branch.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "ca70e01ed8f01b26cf221bfcdd816d2ae71cb87e" }
+# Pin to Fedora f43 pcp-7.2.2-2 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/pcp/c/e038adcf1c13ef474ac466e93e047a4a605ac331
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e038adcf1c13ef474ac466e93e047a4a605ac331" }
