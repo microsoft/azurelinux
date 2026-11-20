@@ -1,0 +1,99 @@
+# Fedora f43/f44 still package addressable 2.8.6. Update to the upstream 2.9.2
+# release for these CVE fixes:
+# CVE-2026-35611
+# CVE-2026-126351
+# The packaging changes follow the Fedora rawhide update to 2.9.2
+# (https://src.fedoraproject.org/rpms/rubygem-addressable/c/059daf7): the 2.9.x gem
+# no longer ships spec/, data/, tasks/, Gemfile, the gemspec or Rakefile, so the test
+# suite comes from the upstream tag tarball.
+# Remove this overlay once the imported Fedora spec packages 2.9.2 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.9.2"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.9.2"
+
+[[overlays]]
+description = "Add the upstream tag tarball for the test suite"
+type = "spec-insert-tag"
+tag = "Source1"
+value = "https://github.com/sporkmonger/%{gem_name}/archive/%{gem_name}-%{version}/%{gem_name}-%{gem_name}-%{version}.tar.gz"
+
+[[overlays]]
+description = "Unpack the test suite from the tag tarball"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "tar zxf %{SOURCE1} %{gem_name}-%{gem_name}-%{version}/spec --strip-components 1",
+]
+
+[[overlays]]
+description = "Run the tests from the unpacked tree, not the installed gem"
+type = "spec-search-replace"
+section = "%check"
+regex = '^pushd \.%\{gem_instdir\}$'
+replacement = ""
+
+[[overlays]]
+description = "Run the tests from the unpacked tree, not the installed gem (popd)"
+type = "spec-search-replace"
+section = "%check"
+regex = '^popd$'
+replacement = ""
+
+[[overlays]]
+description = "Drop data, no longer shipped in the 2.9.x gem"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%\{gem_instdir\}/data$'
+replacement = ""
+
+[[overlays]]
+description = "Drop tasks, no longer shipped in the 2.9.x gem"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%\{gem_instdir\}/tasks$'
+replacement = ""
+
+[[overlays]]
+description = "Drop Gemfile, no longer shipped in the 2.9.x gem"
+type = "spec-search-replace"
+section = "%files"
+package = "doc"
+regex = '^%\{gem_instdir\}/Gemfile$'
+replacement = ""
+
+[[overlays]]
+description = "Drop %{gem_name}.gemspec, no longer shipped in the 2.9.x gem"
+type = "spec-search-replace"
+section = "%files"
+package = "doc"
+regex = '^%\{gem_instdir\}/\%\{gem_name\}\.gemspec$'
+replacement = ""
+
+[[overlays]]
+description = "Drop Rakefile, no longer shipped in the 2.9.x gem"
+type = "spec-search-replace"
+section = "%files"
+package = "doc"
+regex = '^%\{gem_instdir\}/Rakefile$'
+replacement = ""
+
+[[overlays]]
+description = "Drop spec, no longer shipped in the 2.9.x gem"
+type = "spec-search-replace"
+section = "%files"
+package = "doc"
+regex = '^%\{gem_instdir\}/spec$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the obsolete addressable-2.8.6.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(addressable-2\.8\.6\.gem\) = [0-9a-f]+(?:\r?\n|$)'

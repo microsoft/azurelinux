@@ -1,0 +1,14 @@
+[components.rubygem-addressable]
+
+# Sources for the 2.9.2 update overlay; drop together with it once Fedora ships 2.9.2 or newer.
+[[components.rubygem-addressable.source-files]]
+filename = "addressable-2.9.2.gem"
+hash = "ab8d57959f22f40f53cc702950b4fa0338511b7f89121203b2efbdc7df17a47bb38c6549bbfc6ab95ed5e2fa8ec2658dfe25325e6ae71444c0ebf3c2df9ef1f4"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/addressable-2.9.2.gem" }
+
+[[components.rubygem-addressable.source-files]]
+filename = "addressable-addressable-2.9.2.tar.gz"
+hash = "fc4981f7adf47688cbd33426f9a53e3ba4513135b2d19faa91e2c6b953b8eab9bad00ea6156e3ed56e27dac8dbe3f145d80a6f6f78f999f798b1e78d9498de2d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/sporkmonger/addressable/archive/addressable-2.9.2/addressable-addressable-2.9.2.tar.gz" }
