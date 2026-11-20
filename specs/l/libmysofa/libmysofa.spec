@@ -3,7 +3,7 @@
 
 Name:           libmysofa
 Version:        1.3.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        C functions for reading HRTFs
 
 License:        BSD-3-Clause
@@ -59,9 +59,6 @@ Tools for %{name}.
 
 %{?!_without_tests:
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 export MYSOFA2JSON=%{_builddir}/%{buildsubdir}/%{_vpath_builddir}/src/mysofa2json
 %ctest
 }

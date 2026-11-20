@@ -19,7 +19,7 @@
 
 Name:           python-pandas
 Version:        2.3.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Python library providing high-performance data analysis tools
 
 # Drop support for i686 in preparation for `libarrow`
@@ -503,9 +503,6 @@ sed -i 's/Cython~=3.0.5/Cython>=3.0.5/' pyproject.toml
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if %{with tests}
 m="${m-}${m+ and }not network"
 m="${m-}${m+ and }not db"

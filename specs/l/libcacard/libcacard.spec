@@ -3,7 +3,7 @@
 
 Name:           libcacard
 Version:        2.8.1
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary:        CAC (Common Access Card) library
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+
@@ -56,9 +56,6 @@ cp %{SOURCE3} tests/
 %meson_build
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 # Do not run the tests on s390x, which fails
 %ifnarch s390x
 %meson_test

@@ -61,7 +61,7 @@ Version: 9.8.4
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 152%{?dist}
+Release: 153%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD-3-Clause AND HaskellReport
@@ -645,9 +645,6 @@ cp -p utils/completion/ghc.bash %{buildroot}%{_datadir}/bash-completion/completi
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 export LANG=C.utf8
 # stolen from ghc6/debian/rules:
 export LD_LIBRARY_PATH=%{buildroot}%{ghclibplatform}:

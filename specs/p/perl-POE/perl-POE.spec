@@ -8,7 +8,7 @@
 
 Name:       perl-POE
 Version:    1.370
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary:    Portable multitasking and networking framework for event loops
 License:    GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:        https://metacpan.org/release/POE
@@ -121,9 +121,6 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 --default
 %{_fixperms} %{buildroot}/*
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if !%{with perl_POE_enables_network_test}
 rm run_network_tests
 %endif

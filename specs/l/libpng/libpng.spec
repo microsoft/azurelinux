@@ -5,7 +5,7 @@ Summary:       A library of functions for manipulating PNG image format files
 Name:          libpng
 Epoch:         2
 Version:       1.6.59
-Release: 7%{?dist}
+Release: 8%{?dist}
 License:       zlib
 URL:           http://www.libpng.org/pub/png/
 
@@ -75,9 +75,6 @@ cp -p %{SOURCE1} .
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %ctest
 
 %ldconfig_scriptlets
