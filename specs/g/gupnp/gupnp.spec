@@ -7,7 +7,7 @@
 
 Name:          gupnp
 Version:       1.6.10
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:       A framework for creating UPnP devices & control points
 
 License:       LGPL-2.1-or-later
@@ -63,9 +63,6 @@ This package contains developer documentation for %{name}.
 %meson_install
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %meson_test --timeout-multiplier 2
 
 %files

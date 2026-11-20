@@ -123,7 +123,7 @@ License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release: 529%{?dist}
+Release: 530%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
@@ -5315,9 +5315,6 @@ rm %{buildroot}%{_mandir}/man3/version::Internals.3*
 #
 # lib/perl5db.t will fail if Term::ReadLine::Gnu is available
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if %{with test}
 %{new_perl} -I/lib regen/lib_cleanup.pl
 pushd t

@@ -55,7 +55,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Python-2.0.1
 
 
@@ -1436,9 +1436,6 @@ done
 # ======================================================
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 
 # first of all, check timestamps of bytecode files
 find %{buildroot} -type f -a -name "*.py" -print0 | \

@@ -3,7 +3,7 @@
 
 Name:       perl-SOAP-Lite
 Version:    1.27
-Release: 30%{?dist}
+Release: 31%{?dist}
 Summary:    Client and server side SOAP implementation
 License:    GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:        https://metacpan.org/release/SOAP-Lite
@@ -127,9 +127,6 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{_fixperms} -c %{buildroot}
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 make test
 
 %files

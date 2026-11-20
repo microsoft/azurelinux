@@ -17,7 +17,7 @@
 Name:           go-vendor-tools
 Version:        0.12.0
 %forgemeta
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Tools for handling Go library vendoring in Fedora
 
 # BSD-3-Clause: src/go_vendor_tools/archive.py
@@ -117,9 +117,6 @@ install -Dpm 0644 zsh_completions/* -t %{buildroot}%{zsh_completions_dir}/
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %if %{defined rhel} && %{undefined epel}
 export GVTT_FORCE_LICENSE_CHECK_ENABLE=1
 %endif
