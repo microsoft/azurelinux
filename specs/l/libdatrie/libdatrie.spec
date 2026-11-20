@@ -3,7 +3,7 @@
 
 Name:           libdatrie
 Version:        0.2.13
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary:        Implementation of Double-Array structure for representing trie
 License:        LGPL-2.1-or-later
 URL:            http://linux.thai.net/projects/datrie
@@ -49,9 +49,6 @@ rm -frv %{buildroot}%{_pkgdocdir}
 find %{buildroot} -name '*.*a' -delete -print
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 LD_LIBRARY_PATH=../datrie/.libs %make_build check
 
 %files

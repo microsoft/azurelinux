@@ -7,7 +7,7 @@
 Name: rubygem-%{gem_name}
 Epoch: 1
 Version: 8.0.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Object-relational mapper framework (part of Rails)
 License: MIT
 URL: https://rubyonrails.org
@@ -66,9 +66,6 @@ cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 ( cd .%{gem_instdir}
 cp -a %{builddir}/test .
 

@@ -9,7 +9,7 @@
 
 Name: guile22
 Version: 2.2.7
-Release: 21%{?dist}
+Release: 22%{?dist}
 Summary: A GNU implementation of Scheme for application extensibility
 Source: ftp://ftp.gnu.org/pub/gnu/guile/guile-%{version}.tar.xz
 URL: http://www.gnu.org/software/guile/
@@ -105,9 +105,6 @@ find $RPM_BUILD_ROOT%{_libdir} -name '*.go' -exec touch -r "%{_specdir}/guile22.
 rm $RPM_BUILD_ROOT%{_libdir}/guile/%{mver}/extensions/guile-readline.la
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 make %{?_smp_mflags} check
 
 

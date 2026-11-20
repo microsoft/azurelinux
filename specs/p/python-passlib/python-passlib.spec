@@ -3,7 +3,7 @@
 
 Name:           python-passlib
 Version:        1.7.4
-Release: 28%{?dist}
+Release: 29%{?dist}
 Summary:        Comprehensive password hashing framework supporting over 20 schemes
 
 # license breakdown is described in LICENSE file
@@ -67,9 +67,6 @@ export PASSLIB_SETUP_TAG_RELEASE="no"
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 # We can safely ignore this failing test https://foss.heptapod.net/python-libs/passlib/-/issues/120
 %pytest -k 'not test_82_crypt_support'
 
