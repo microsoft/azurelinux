@@ -1,0 +1,95 @@
+%global upstream_name mlnx-ethtool
+
+%global _prefix /opt/mellanox/ethtool
+
+Name: mlnx-ethtool
+Version: 2604.0.0
+Release: %autorelease
+Group		: Utilities
+
+Summary		: Settings tool for Ethernet and other network devices
+
+# Sources are a mix of GPL-2.0-only and GPL-2.0-or-later files; the dual
+# GPL-2.0/BSD files are used under GPL-2.0. Matches Fedora's ethtool.
+License		: GPL-2.0-only AND GPL-2.0-or-later
+URL		: https://ftp.kernel.org/pub/software/network/ethtool/
+
+BuildRequires: autoconf
+BuildRequires: automake
+# AZL: the vendor spec lists gcc-c++, but this is a C-only project; the
+# remaining tools are used by %%prep/%%build and were implicit upstream.
+BuildRequires: gcc
+BuildRequires: libmnl-devel
+BuildRequires: make
+BuildRequires: pkgconfig
+BuildRequires: cpio
+BuildRequires: patch
+Buildroot	: %{_tmppath}/%{name}-%{version}
+# AZL: NVIDIA's MLNX_OFED source bundle (origin URL and hash are pinned in
+# mlnx-ethtool.comp.toml); %%prep extracts the nested mlnx-ethtool SRPM.
+Source6000: MLNX_OFED_SRC-26.04-0.8.5.0.tgz
+
+
+%description
+This utility allows querying and changing settings such as speed,
+port, auto-negotiation, PCI locations and checksum offload on many
+network devices, especially Ethernet devices.
+
+%prep
+tar -xf %{SOURCE6000}
+_mlnx_ethtool_srpm=$(find MLNX_OFED_SRC-* -path '*/SRPMS/mlnx-ethtool-%{version}-*.src.rpm' -print -quit)
+if [ -z "$_mlnx_ethtool_srpm" ]; then
+	echo "ERROR: mlnx-ethtool source RPM not found inside %{SOURCE6000}" >&2
+	exit 1
+fi
+rpm2cpio "$_mlnx_ethtool_srpm" | cpio -idm './mlnx-ethtool-%{version}.tar.gz' './0001-package-rename-configure.patch'
+rm -rf MLNX_OFED_SRC-*
+tar -xf mlnx-ethtool-%{version}.tar.gz
+%setup -q -T -D -n %{upstream_name}-%{version}
+# AZL: apply the vendor SRPM's patch so the tool identifies as mlnx-ethtool.
+%{__patch} -p1 --fuzz=0 < ../0001-package-rename-configure.patch
+
+
+%build
+./autogen.sh
+CFLAGS="${RPM_OPT_FLAGS}" ./configure --prefix=%{_prefix} --mandir=%{_mandir}
+%make_build
+
+
+%install
+%make_install
+# AZL: pre-create the private doc/license parents so they can be owned below.
+install -d ${RPM_BUILD_ROOT}%{_datadir}/doc ${RPM_BUILD_ROOT}%{_datadir}/licenses
+
+
+%check
+%make_build check
+
+
+%files
+%defattr(-,root,root)
+%license COPYING LICENSE
+%doc AUTHORS NEWS README
+# AZL: own the private prefix hierarchy; /opt/mellanox is shared with other
+# MLNX OFED packages.
+%dir /opt/mellanox
+%dir %{_prefix}
+%dir %{_prefix}/sbin
+%dir %{_datadir}
+%dir %{_datadir}/bash-completion
+%dir %{_datadir}/bash-completion/completions
+%dir %{_datadir}/doc
+%dir %{_datadir}/licenses
+%dir %{_datadir}/metainfo
+%dir %{_mandir}
+%dir %{_mandir}/man8
+# AZL: upstream's autotools build always installs to a literal sbin/
+# subdirectory; %%{_sbindir} on this distro maps to .../bin instead.
+%{_prefix}/sbin/ethtool
+%{_mandir}/man8/ethtool.8*
+%{_datadir}/bash-completion/completions/ethtool
+%{_datadir}/metainfo/org.kernel.software.network.ethtool.metainfo.xml
+
+
+%changelog
+%autochangelog
