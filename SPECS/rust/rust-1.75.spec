@@ -60,6 +60,7 @@ Patch15:        CVE-2026-40034_1.75.patch
 Patch16:        CVE-2026-109351_1.75.patch
 Patch17:        CVE-2026-109349_1.75.patch
 Patch18:        CVE-2026-91986_1.75.patch
+Patch19:        CVE-2026-123533_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -194,8 +195,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Fri Oct 23 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-32
-- Add patch for CVE-2026-109349, CVE-2026-109351 and CVE-2026-91986
+* Mon Nov 23 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 1.75.0-32
+- Add patch for CVE-2026-109349, CVE-2026-109351, CVE-2026-91986 and
+  CVE-2026-123533
 
 * Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.75.0-31
 - Bump to rebuild with updated glibc
