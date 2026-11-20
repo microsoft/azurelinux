@@ -1,0 +1,3 @@
+[components.python-joserfc]
+# Authlib requires joserfc >= 1.6.8; it is not packaged in Fedora 43.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "3b23323a10b351b69d430c291fdba45089677dba" }
