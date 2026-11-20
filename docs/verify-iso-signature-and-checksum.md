@@ -1,4 +1,4 @@
-# Verifying Pre-Built ISO Image
+# Verifying Azure Linux 4 ISO Image
 It is strongly recommended that the integrity of the image is verified after downloading it. This is a two-step process:
 1. Ensure that the checksum file has not been tampered with by verifying the signature against Azure Linux's RPM signing public key.
 1. Check that the ISO image was not corrupted during the download.
