@@ -2,15 +2,20 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           jackson-databind
-Version:        2.18.2
-Release: 7%{?dist}
+Version:        2.18.12
+Release: 5%{?dist}
 Summary:        General data-binding package for Jackson (2.x)
 License:        Apache-2.0 and LGPL-2.0-or-later
 
 URL:            https://github.com/FasterXML/jackson-databind
 Source0:        %{url}/archive/%{name}-%{version}.tar.gz
 
+%if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} <= 42
+BuildRequires:  maven-local
+%else
 BuildRequires:  maven-local-openjdk25
+%endif
+
 BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-annotations) >= %{version}
 BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-core) >= %{version}
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
@@ -67,6 +72,19 @@ rm src/test/java/com/fasterxml/jackson/databind/introspect/NoClassDefFoundWorkar
 %license LICENSE NOTICE
 
 %changelog
+* Fri Oct 30 2026 Dogtag PKI Team <devel@lists.dogtagpki.org> - 2.18.12-1
+- Rebase to 2.18.12
+- Fix CVE-2026-68497: CPU Denial of Service via unbounded numeric parsing (rhbz#2533058)
+- Fix CVE-2026-83557: Path traversal via incomplete type validation (rhbz#2530869)
+- Fix CVE-2026-19032: Uncontrolled URI scheme resolution in Path deserialization (rhbz#2527984)
+- Fix CVE-2026-91777: Denial of Service via quadratic forward-reference completion (rhbz#2553614) 
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.18.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 3 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> - 2.18.2-5
+- Restore support for RHEL and older Fedora
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 2.18.2-4
 - Rebuilt for java-25-openjdk as preffered jdk
 
