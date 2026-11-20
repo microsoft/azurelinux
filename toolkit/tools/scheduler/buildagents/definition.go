@@ -5,8 +5,11 @@ package buildagents
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 )
+
+var envVarNameRegex = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 
 // BuildAgentConfig represents configuration options a BuildAgent would need to successfully build a given package.
 type BuildAgentConfig struct {
@@ -32,6 +35,10 @@ type BuildAgentConfig struct {
 	UseCcache bool
 	MaxCpu    string
 	Timeout   time.Duration
+
+	// CheckEnvPassthrough names environment variables forwarded into builds that run %check.
+	// Only names are serialized; values are read from the worker's environment.
+	CheckEnvPassthrough []string
 
 	LogDir   string
 	LogLevel string
@@ -71,4 +78,15 @@ func BuildAgentFactory(buildAgent string) (agent BuildAgent, err error) {
 	}
 
 	return
+}
+
+// ValidateEnvVarNames returns an error if any entry is not a plain environment variable name.
+func ValidateEnvVarNames(names []string) error {
+	for _, name := range names {
+		if !envVarNameRegex.MatchString(name) {
+			return fmt.Errorf("'%s' is not a valid environment variable name", name)
+		}
+	}
+
+	return nil
 }

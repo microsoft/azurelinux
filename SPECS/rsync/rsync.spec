@@ -1,6 +1,6 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
-Version:        3.5.1
+Version:        3.5.2
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ EOF
 %{_sysconfdir}/rsyncd.conf
 
 %changelog
+* Wed Nov 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.2-1
+- Auto-upgrade to 3.5.2 - for CVE-2026-119741
+
 * Wed Sep 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.5.1-1
 - Upgrade to 3.5.1
 - Add libidn2-devel build dependency to enable IDN support required by configure

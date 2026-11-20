@@ -2,7 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.21
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -86,6 +86,9 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+* Mon Nov 09 2026 Akhila Guruju <v-guakhila@microsoft.com> - 26.2.5.21-9
+- Fix CVE-2026-42792.patch to preserve errno during epmd error logging
+
 * Fri Oct 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-8
 - Patch for CVE-2026-94200, CVE-2026-105236
 

@@ -4,7 +4,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.21.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,6 +23,10 @@ Patch7:         CVE-2026-112318.patch
 Patch8:         CVE-2026-112320.patch
 Patch9:         CVE-2026-112323.patch
 Patch10:        CVE-2026-119079.patch
+Patch11:        CVE-2026-112319.patch
+Patch12:        CVE-2026-112321.patch
+Patch13:        CVE-2026-112315.patch
+Patch14:        CVE-2026-112316.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
@@ -136,6 +140,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Wed Nov 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.21.3-8
+- Patch for CVE-2026-112321, CVE-2026-112319, CVE-2026-112315, CVE-2026-112316
+
 * Fri Nov 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.21.3-7
 - Patch for CVE-2026-119079, CVE-2026-112323, CVE-2026-112320, CVE-2026-112318, CVE-2026-112317, CVE-2026-112314
 

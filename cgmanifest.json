@@ -1797,8 +1797,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "1.5.4",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.5.4.tar.gz"
+          "version": "1.5.5",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.5.5.tar.gz"
         }
       }
     },
@@ -3518,8 +3518,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.9.0",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-2.9.0.tar.bz2"
+          "version": "2.10.0",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-2.10.0.tar.bz2"
         }
       }
     },
@@ -8951,8 +8951,8 @@
         "type": "other",
         "other": {
           "name": "libaec",
-          "version": "1.1.3",
-          "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.1.3/libaec-v1.1.3.tar.gz"
+          "version": "1.1.8",
+          "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.1.8/libaec-v1.1.8.tar.gz"
         }
       }
     },
@@ -21383,8 +21383,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.36",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.36.tar.xz"
+          "version": "8.3.37",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.37.tar.xz"
         }
       }
     },
@@ -26714,8 +26714,8 @@
         "type": "other",
         "other": {
           "name": "rsync",
-          "version": "3.5.1",
-          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.5.1.tar.gz"
+          "version": "3.5.2",
+          "downloadUrl": "https://download.samba.org/pub/rsync/src/rsync-3.5.2.tar.gz"
         }
       }
     },
@@ -26784,8 +26784,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.3.13",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.13.tar.gz"
+          "version": "3.3.14",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.14.tar.gz"
         }
       }
     },
@@ -27784,8 +27784,8 @@
         "type": "other",
         "other": {
           "name": "runc",
-          "version": "1.4.3",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.4.3.tar.gz"
+          "version": "1.4.4",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.4.4.tar.gz"
         }
       }
     },
@@ -30196,8 +30196,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.12",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.12.tar.gz"
+          "version": "8.0.13",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.13.tar.gz"
         }
       }
     },
@@ -31268,8 +31268,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-server-Xwayland",
-          "version": "24.1.14",
-          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.14.tar.xz"
+          "version": "24.1.15",
+          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.15.tar.xz"
         }
       }
     },
