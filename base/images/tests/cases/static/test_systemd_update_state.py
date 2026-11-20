@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Validate that cloud VM images ship with finalized systemd update state."""
+"""Validate that machine-bootable images ship with finalized systemd update state."""
 
 from __future__ import annotations
 
@@ -18,11 +18,8 @@ GENERATED_STATE_PATHS = (
 )
 
 
-def test_systemd_update_state_is_finalized(rootfs: Path, image_name: str | None) -> None:
+def test_systemd_update_state_is_finalized(rootfs: Path) -> None:
     """Prevent first boot from rebuilding state already generated in the image."""
-    if image_name != "marketplace-gen2":
-        pytest.skip("systemd update state is finalized only for marketplace-gen2")
-
     usr_mtime_ns = (rootfs / "usr").stat().st_mtime_ns
     for relative_path in ("etc/.updated", "var/.updated"):
         marker = rootfs / relative_path
