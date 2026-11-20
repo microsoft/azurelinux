@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,7 +75,7 @@ Patch26:        CVE-2026-97045.patch
 Patch27:        CVE-2026-116587.patch
 
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-21%{?dist}
+BuildRequires:  glibc-static >= 2.38-22%{?dist}
 BuildRequires:  golang >= 1.26
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -331,6 +331,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Wed Nov 18 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.30.10-35
+- Bump to rebuild with updated glibc
+
 * Thu Nov 05 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.30.10-34
 - Patch for CVE-2026-116587
 
