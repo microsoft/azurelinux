@@ -1,0 +1,38 @@
+# Fedora f43 packages objenesis 3.4 and f44 packages 3.5. Update to the
+# upstream 3.6 release on the same f43 spec for this CVE fix:
+# CVE-2026-116486
+# Remove this overlay once the imported Fedora spec packages 3.6 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.6"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.6"
+
+[[overlays]]
+description = "Remove the obsolete 3.4 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(3\.4\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+# Since 3.5 upstream publishes with central-publishing-maven-plugin and no
+# longer has nexus-staging-maven-plugin or the root build/extensions node.
+# The f43 %prep edits for them fail with "not found", so retarget the plugin
+# removal and drop the obsolete extensions removal.
+[[overlays]]
+description = "Remove central-publishing-maven-plugin instead of nexus-staging-maven-plugin"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%pom_remove_plugin -r org\.sonatype\.plugins:nexus-staging-maven-plugin$'
+replacement = "%pom_remove_plugin org.sonatype.central:central-publishing-maven-plugin"
+
+[[overlays]]
+description = "Drop the obsolete build/extensions removal"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%pom_xpath_remove pom:build/pom:extensions$'
+replacement = ""
