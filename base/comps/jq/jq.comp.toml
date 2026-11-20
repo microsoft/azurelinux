@@ -1,0 +1,10 @@
+# Source for the 1.8.2 update overlay; drop together with it once the imported Fedora spec
+# packages 1.8.2 or newer. Upstream release asset: its SHA256 matches the release's
+# sha256sum.txt and `gh attestation verify` passes (built by jqlang/jq ci.yml at tag jq-1.8.2).
+[components.jq]
+
+[[components.jq.source-files]]
+filename = "jq-1.8.2.tar.gz"
+hash = "d4058940cff1cd9946d7f2a9057316bf05915679385386685d140b7a82d870d43ae5b5b4d0a5560c864cf0ef2cc59d7b6ed3afb46b3aea0f4d35329678b2c328"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-1.8.2.tar.gz" }
