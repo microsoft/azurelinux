@@ -1,7 +1,7 @@
 Summary:        Implementation of ASN.1 types and codecs in Python programming language
 Name:           python-pyasn1
 Version:        0.4.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,10 @@ Patch0:         CVE-2026-30922.patch
 Patch1:         CVE-2026-59884.patch
 Patch2:         CVE-2026-59885.patch
 Patch3:         CVE-2026-59886.patch
+Patch4:         CVE-2026-119194.patch
+Patch5:         CVE-2026-119195.patch
+Patch6:         CVE-2026-119196.patch
+Patch7:         CVE-2026-119197.patch
 BuildArch:      noarch
 
 %description
@@ -45,6 +49,9 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 %{python3_sitelib}/*
 
 %changelog
+* Fri Nov 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.4.8-4
+- Patch for CVE-2026-119197, CVE-2026-119196, CVE-2026-119195, CVE-2026-119194
+
 * Fri Jul 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.4.8-3
 - Patch for CVE-2026-59886, CVE-2026-59885, CVE-2026-59884
 
