@@ -1,0 +1,6 @@
+# Pin to Fedora f45 perl-Storable-3.41 to pick up the CVE-2026-57433 fix.
+# f43 and f44 still ship 3.37 without it; perl itself is built with
+# dual_life 0, so the installed Storable comes from this package.
+# https://src.fedoraproject.org/rpms/perl-Storable/c/30ba7e64ff
+[components.perl-Storable]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "45" }, upstream-commit = "30ba7e64ffed514a3779fd4ea6c793ac4e927487" }
