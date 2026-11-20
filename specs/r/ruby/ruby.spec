@@ -3,7 +3,7 @@
 
 %global major_version 3
 %global minor_version 4
-%global teeny_version 12
+%global teeny_version 13
 %global major_minor_version %{major_version}.%{minor_version}
 
 %global ruby_version %{major_minor_version}.%{teeny_version}
@@ -180,7 +180,7 @@
 Summary: An interpreter of object-oriented scripting language
 Name: ruby
 Version: %{ruby_version}%{?development_release}
-Release: 38%{?dist}
+Release: 40%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -1891,9 +1891,20 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 
 %changelog
+* Thu Nov 19 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.13-34
+- Update to Ruby 3.4.13
+- Fixes the following bugs in Regexp and String case conversion
+- Resolves: CGHSA-34m4-m9fh-gqp5 (VE-2026-132825)
+- Resolves: GHSA-7x2q-68qv-6p8x
+- Resolves: GHSA-87fm-7w84-j2px
+- Resolves: GHSA-wpqw-5qxg-m68r
+- Resolves: GHSA-3p8q-wmhx-vm2w
+- Resolves: GHSA-7whj-cfh7-xgm4
+- Resolves: GHSA-pvgc-g7gj-pv6h
+
 * Fri Oct 23 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.12-33
 - Update to Ruby 3.4.12
-- Fixes the following bugs in Omigumo regexp compilation
+- Fixes the following bugs in Onigumo regexp compilation
 - Resolves: CVE-2026-89078
 - Resolves: CVE-2026-93577
 - Resolves: CVE-2026-97229
