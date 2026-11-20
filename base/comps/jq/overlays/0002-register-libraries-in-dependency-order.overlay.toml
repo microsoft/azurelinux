@@ -1,0 +1,13 @@
+# The CVE-2026-44777 fix in 1.8.2 (f58787c) registers an imported library before its
+# dependencies, so block_drop_unreferenced can free definitions that are still referenced.
+# Upstream fixed this regression after 1.8.2 on master only; drop once a jq release includes it.
+
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [{ url = "https://github.com/jqlang/jq/commit/12cdd950e9c6abc45df90cbed15b86eda4ec5669" }]
+
+[[overlays]]
+description = "Backport jq 12cdd950e9 to fix a regression from the CVE-2026-44777 fix"
+type = "patch-add"
+source = "../jq-CVE-2026-44777-regression.patch"
