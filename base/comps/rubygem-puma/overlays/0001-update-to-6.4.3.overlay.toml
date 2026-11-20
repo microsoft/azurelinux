@@ -1,0 +1,66 @@
+# Fedora does not package rubygem-puma 6.4.3 on f43/f44 yet. Update to the upstream
+# release for this CVE fix:
+# CVE-2024-45614
+# Remove this overlay once the imported Fedora spec packages 6.4.3 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 6.4.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "6.4.3"
+
+[[overlays]]
+description = "Remove the obsolete puma-6.4.2.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(puma-6\.4\.2\.gem\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete puma-6.4.2-tests.txz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(puma-6\.4\.2-tests\.txz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete puma-6.4.2-examples.txz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(puma-6\.4\.2-examples\.txz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Take test/ and examples/ from the upstream v6.4.3 tag archive instead of generated tarballs"
+type = "spec-update-tag"
+tag = "Source1"
+value = "https://github.com/puma/puma/archive/v%{version}/%{gem_name}-%{version}.tar.gz"
+
+[[overlays]]
+description = "Drop the generated examples tarball; examples/ now comes from Source1"
+type = "spec-remove-tag"
+tag = "Source3"
+value = "%{gem_name}-%{version}-examples.txz"
+
+# The tag archive unpacks to the same %{gem_name}-%{version}/ directory as the gem, so it can't
+# be unpacked by %setup -b 1. No structured overlay edits %setup options, hence the anchored
+# whole-line replacement.
+[[overlays]]
+description = "Stop unpacking Source1 and Source3 with %setup"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%setup -q -n  %\{gem_name\}-%\{version\} -b 1 -b 3$'
+replacement = "%setup -q -n %{gem_name}-%{version}"
+
+# Prepended so test/ and examples/ sit in %{builddir}, where %setup -b put them, before
+# Patch3 to Patch7 (applied from %{builddir}) and %check use them.
+[[overlays]]
+description = "Extract only test/ and examples/ from the tag archive to %{builddir}"
+type = "spec-prepend-lines"
+section = "%prep"
+lines = [
+  "# Test suite and examples from the upstream tag archive",
+  "tar -xzf %{SOURCE1} -C %{builddir} --strip-components=1 %{gem_name}-%{version}/test %{gem_name}-%{version}/examples",
+  "",
+]
