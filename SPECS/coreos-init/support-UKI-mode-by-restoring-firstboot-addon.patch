@@ -32,7 +32,7 @@ index 1acfcf0..18768d8 100755
  
  [ "$EUID" = "0" ] || { echo "Need to be root: sudo $0 $opts" > /dev/stderr ; exit 1 ; }
  
-+UKI_ADDON_DIR="/boot/EFI/Linux/acl.efi.extra.d"
++UKI_ADDON_DIR="/boot/EFI/Linux/vmlinuz-$(uname -r).efi.extra.d"
 +UKI_ADDON_TEMPLATE="/boot/acl/uki-addons/firstboot.addon.efi"
 +
 +# Detect UKI (systemd-boot) mode by the presence of the addon directory.
