@@ -1,7 +1,10 @@
-# Pin Fedora's Ruby 3.4.12 update beyond the distro snapshot to fix the
-# Onigmo bugs tracked as CVE-2026-89078, CVE-2026-93577, CVE-2026-97229,
-# and CVE-2026-110264. Drop the pin once the default snapshot includes it.
+# Pin Fedora's Ruby 3.4.13 update beyond the distro snapshot to fix
+# CVE-2026-132825 and six additional Regexp and String advisories.
+# This retains the Ruby 3.4.12 fixes for CVE-2026-89078, CVE-2026-93577,
+# CVE-2026-97229, and CVE-2026-110264. Drop the pin once the default
+# snapshot includes it.
 # https://www.ruby-lang.org/en/news/2026/10/23/regexp-fixes-for-gitlab-cves/
-# https://src.fedoraproject.org/rpms/ruby/c/d9d09f6ea1be2c855a99c97acd2286379cbba130
+# https://www.ruby-lang.org/en/news/2026/11/18/multiple-vulnerabilities-in-regexp-and-string/
+# https://src.fedoraproject.org/rpms/ruby/c/a8d7d0c7859a2934bea0d7a29796e0220065563d
 [components.ruby]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "d9d09f6ea1be2c855a99c97acd2286379cbba130" }
+spec = { type = "upstream", upstream-commit = "a8d7d0c7859a2934bea0d7a29796e0220065563d" }
