@@ -14,8 +14,8 @@
 %global __requires_exclude_from ^%{gem_instdir}/docs/jungle.*$
 
 Name: rubygem-%{gem_name}
-Version: 6.4.2
-Release: 11%{?dist}
+Version: 6.4.3
+Release: 12%{?dist}
 Summary: A simple, fast, threaded, and highly concurrent HTTP 1.1 server
 # MIT: lib/puma/sd_notify.rb
 # https://github.com/puma/puma/issues/3311
@@ -25,10 +25,9 @@ Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 # The puma gem doesn't ship with the test suite.
 # git clone https://github.com/puma/puma --no-checkout
 # cd puma && git archive -v -o puma-6.4.2-tests.txz v6.4.2 test
-Source1: %{gem_name}-%{version}-tests.txz
+Source1: https://github.com/puma/puma/archive/v%{version}/%{gem_name}-%{version}.tar.gz
 # The puma gem doesn't ship with the examples used in test suite.
 # git archive -v -o puma-6.4.2-examples.txz v6.4.2 examples
-Source3: %{gem_name}-%{version}-examples.txz
 # Set the default cipher list "PROFILE=SYSTEM".
 # https://fedoraproject.org/wiki/Packaging:CryptoPolicies
 Patch2: rubygem-puma-3.6.0-fedora-crypto-policy-cipher-list.patch
@@ -95,7 +94,10 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n  %{gem_name}-%{version} -b 1 -b 3
+# Test suite and examples from the upstream tag archive
+tar -xzf %{SOURCE1} -C %{builddir} --strip-components=1 %{gem_name}-%{version}/test %{gem_name}-%{version}/examples
+
+%setup -q -n %{gem_name}-%{version}
 
 %patch 2 -p1
 

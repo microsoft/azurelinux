@@ -1,0 +1,17 @@
+[components.rubygem-puma]
+
+# Sources for the 6.4.3 update overlay; drop together with it once Fedora ships 6.4.3 or newer.
+[[components.rubygem-puma.source-files]]
+filename = "puma-6.4.3.gem"
+hash = "e8baf137c5164f11b8563561405fc4218210707bfb15d0f21118d4be0fd0d071050c46357337a9c6fdda7ce230f3ae09ebfe9976f0a7a0243824bda7871d7a18"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/puma-6.4.3.gem" }
+
+# The gem ships neither test/ nor examples/; take both from upstream's v6.4.3 tag archive on GitHub
+# (no release assets are published). Its SHA512 was the same when downloaded from
+# archive/v6.4.3/puma-6.4.3.tar.gz and archive/refs/tags/v6.4.3.tar.gz.
+[[components.rubygem-puma.source-files]]
+filename = "puma-6.4.3.tar.gz"
+hash = "20e5800dd978dd681ed4e8dd10c2558d7d4c0cadf79ad25b7974997884cbc8797211761fb5db5303bf7a8e04907634ce9e82ad3e362ae1fff24cc7d770eb5e44"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/puma/puma/archive/v6.4.3/puma-6.4.3.tar.gz" }
