@@ -1,0 +1,56 @@
+From bbb2f9935b42192b9e63ab9bb5fc260f835390cf Mon Sep 17 00:00:00 2001
+From: Swapnil Sahu <v-swapsahu@microsoft.com>
+Date: Sat, 21 Nov 2026 03:52:51 +0000
+Subject: [PATCH] Fix numeric diagnostic formats for Go vet
+
+Use decimal formatting for response codes, SOA serials, and MX preferences.
+This preserves test assertions while satisfying the newer Go printf analyzer.
+
+---
+ plugin/dns64/dns64_test.go    | 2 +-
+ plugin/file/secondary_test.go | 2 +-
+ plugin/test/helpers.go        | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/plugin/dns64/dns64_test.go b/plugin/dns64/dns64_test.go
+index a294721..dba5137 100644
+--- a/plugin/dns64/dns64_test.go
++++ b/plugin/dns64/dns64_test.go
+@@ -507,7 +507,7 @@ func TestDNS64(t *testing.T) {
+ 			}
+ 			actual := rec.Msg
+ 			if actual.Rcode != rc {
+-				t.Fatalf("ServeDNS should return real result code %q != %q", actual.Rcode, rc)
++				t.Fatalf("ServeDNS should return real result code %d != %d", actual.Rcode, rc)
+ 			}
+ 
+ 			if !reflect.DeepEqual(actual, tc.resp) {
+diff --git a/plugin/file/secondary_test.go b/plugin/file/secondary_test.go
+index 67d151e..f309154 100644
+--- a/plugin/file/secondary_test.go
++++ b/plugin/file/secondary_test.go
+@@ -90,7 +90,7 @@ func TestShouldTransfer(t *testing.T) {
+ 		t.Fatalf("Unable to run shouldTransfer: %v", err)
+ 	}
+ 	if !should {
+-		t.Fatalf("ShouldTransfer should return true for serial: %q", soa.serial-1)
++		t.Fatalf("ShouldTransfer should return true for serial: %d", soa.serial-1)
+ 	}
+ 	// Serial equal
+ 	z.Apex.SOA = test.SOA(fmt.Sprintf("%s IN SOA bla. bla. %d 0 0 0 0 ", testZone, soa.serial))
+diff --git a/plugin/test/helpers.go b/plugin/test/helpers.go
+index f99790a..320ec34 100644
+--- a/plugin/test/helpers.go
++++ b/plugin/test/helpers.go
+@@ -239,7 +239,7 @@ func Section(tc Case, sec sect, rr []dns.RR) error {
+ 				return fmt.Errorf("MX Mx should be %q, but is %q", tt.Mx, x.Mx)
+ 			}
+ 			if x.Preference != tt.Preference {
+-				return fmt.Errorf("MX Preference should be %q, but is %q", tt.Preference, x.Preference)
++				return fmt.Errorf("MX Preference should be %d, but is %d", tt.Preference, x.Preference)
+ 			}
+ 		case *dns.NS:
+ 			tt := section[i].(*dns.NS)
+-- 
+2.45.4
+
