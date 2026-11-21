@@ -101,8 +101,8 @@ echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
 
 cd "$NAME_VER"
-go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
-go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel@v1.47.0
+go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2 \
+                            -require=go.opentelemetry.io/otel@v1.47.0
 go mod tidy
 echo "Get vendored modules"
 go mod vendor
