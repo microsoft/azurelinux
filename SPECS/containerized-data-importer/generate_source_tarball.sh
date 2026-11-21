@@ -18,7 +18,6 @@ OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # --outFolder   : folder where to copy the new tarball(s)
 # --pkgVersion  : package version
 # --vendorVersion : vendor archive version (for example, 1 for vendor-v1)
-#                   OpenTelemetry v1.47.0 requires Go 1.26+.
 #
 PARAMS=""
 while (( "$#" )); do
