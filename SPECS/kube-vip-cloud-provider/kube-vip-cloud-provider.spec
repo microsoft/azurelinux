@@ -1,7 +1,7 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
 Version:        0.0.10
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
 Group:          Applications/Text
@@ -10,14 +10,31 @@ Distribution:   Azure Linux
 Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 #Note that the source file should be renamed to the format %%{name}-%%{version}.tar.gz
 
-# Steps to manually create the vendor tarball, no download link.
+# Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# Adding the vendor folder and creating a tarball
+# The vendor-v4 tarball is the vendor-v3 tree with go.opentelemetry.io/otel upgraded to v1.47.0.
 # How to re-build this file:
-# 1. wget https://github.com/kube-vip/%%{name}/archive/refs/tags/v%%{version}tar.gz -O %%{name}-%%{version}.tar.gz
-# 2. <repo-root>/toolkit/scripts/build_go_vendor_cache.sh %%{name}-%%{version}.tar.gz
+#   1. wget https://github.com/kube-vip/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz && cd %%{name}-%%{version}
+#   3. tar -xf <path>/%%{name}-%%{version}-vendor-v3.tar.gz
+#   4. Apply Patch0 to Patch10 in order with "patch -p1 --fuzz=0" (this brings go.mod to the vendor-v3 baseline).
+#   5. go mod edit -require=go.opentelemetry.io/otel@v1.47.0 -require=go.opentelemetry.io/otel/sdk@v1.47.0
+#   6. go mod tidy
+#   7. rm -rf vendor && go mod vendor
+#   8. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -czf %%{name}-%%{version}-vendor-v4.tar.gz vendor
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - You require Go 1.26+ for OpenTelemetry v1.47.0.
+#       - The go.mod/go.sum changes from steps 5-6 are carried in Patch11.
+#       - The additional tar options generate a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
 
-Source1: %{name}-%{version}-vendor-v3.tar.gz
+Source1: %{name}-%{version}-vendor-v4.tar.gz
 
 Patch0:       CVE-2026-73500.patch
 Patch1:       CVE-2026-37236.patch
@@ -30,6 +47,7 @@ Patch7:       CVE-2026-81870.patch
 Patch8:       CVE-2026-97032.patch
 Patch9:       CVE-2026-78661.patch
 Patch10:      CVE-2026-97045.patch
+Patch11:      CVE-2026-128085.patch
 
 BuildRequires: golang
 
@@ -50,6 +68,11 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+* Fri Nov 27 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 0.0.10-14
+- Patch for CVE-2026-128085, CVE-2026-128086
+- Upgrade vendored go.opentelemetry.io/otel to v1.47.0
+- Drop SDK hunks from CVE-2026-81870 patch, already included in otel SDK v1.47.0
+
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 0.0.10-13
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
