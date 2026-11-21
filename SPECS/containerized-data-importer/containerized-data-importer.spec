@@ -18,14 +18,14 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.62.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor-v1.tar.gz
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2022-2879.patch
 Patch1:         CVE-2025-58058.patch
 Patch2:         CVE-2025-58183.patch
@@ -43,6 +43,8 @@ Patch13:        CVE-2026-116586.patch
 Patch14:        CVE-2026-116591.patch
 Patch15:        CVE-2026-97045.patch
 Patch16:        CVE-2026-116587.patch
+Patch17:        CVE-2026-128085.patch
+
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -239,6 +241,10 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Tue Nov 24 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 1.62.0-13
+- Patch for CVE-2026-128085, CVE-2026-128086
+- Upgrade vendored OpenTelemetry core and SDK modules to v1.47.0
+
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.62.0-12
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
