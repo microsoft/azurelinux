@@ -3,7 +3,11 @@
 
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
+<<<<<<< HEAD
 Version:        6.18.60.2
+=======
+Version:        6.18.64.1
+>>>>>>> d482fc3ef1 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.64.1 - branch fasttrack/3.0 (#20467))
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -35,8 +39,13 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+<<<<<<< HEAD
 * Fri Nov 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.60.2-1
 - Auto-upgrade to 6.18.60.2
+=======
+* Sat Nov 21 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.64.1-1
+- Auto-upgrade to 6.18.64.1
+>>>>>>> d482fc3ef1 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.64.1 - branch fasttrack/3.0 (#20467))
 
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.57.1-1
 - Auto-upgrade to 6.18.57.1

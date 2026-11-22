@@ -1,6 +1,10 @@
 #
 # Automatically generated file; DO NOT EDIT.
+<<<<<<< HEAD
 # Linux/x86_64 6.18.60.2 Kernel Configuration
+=======
+# Linux/x86_64 6.18.64.1 Kernel Configuration
+>>>>>>> d482fc3ef1 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.64.1 - branch fasttrack/3.0 (#20467))
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -2616,7 +2620,6 @@ CONFIG_SATA_AHCI=m
 CONFIG_SATA_MOBILE_LPM_POLICY=0
 # CONFIG_SATA_AHCI_PLATFORM is not set
 # CONFIG_AHCI_DWC is not set
-# CONFIG_SATA_INIC162X is not set
 # CONFIG_SATA_ACARD_AHCI is not set
 CONFIG_SATA_SIL24=y
 CONFIG_ATA_SFF=y
