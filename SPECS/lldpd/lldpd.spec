@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 %global rundir /run/
 
 Name:     lldpd
-Version:  1.0.22
+Version:  1.0.23
 Release:  1%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
@@ -163,6 +163,9 @@ fi
 
 
 %changelog
+* Sun Nov 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.23-1
+- Auto-upgrade to 1.0.23 - for CVE-2026-132049
+
 * Thu Jun 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.22-1
 - Auto-upgrade to 1.0.22 - for CVE-2026-46433
 

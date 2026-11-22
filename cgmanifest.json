@@ -12521,8 +12521,8 @@
         "type": "other",
         "other": {
           "name": "lldpd",
-          "version": "1.0.22",
-          "downloadUrl": "https://github.com/lldpd/lldpd/releases/download/1.0.22/lldpd-1.0.22.tar.gz"
+          "version": "1.0.23",
+          "downloadUrl": "https://github.com/lldpd/lldpd/releases/download/1.0.23/lldpd-1.0.23.tar.gz"
         }
       }
     },
