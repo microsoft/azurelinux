@@ -26,12 +26,12 @@ This is a summary of implementation choices, not a complete package manifest. Co
 
 For OEM images, KIWI automatically runs executable [`disk.sh`](disk.sh) from
 the image description after synchronizing the root tree to the assembled disk,
-with the disk as its chroot. The hook regenerates sysusers, hwdb, the journal
-catalog, and the linker cache for every OEM image built from the shared
-definition, then runs `systemd-update-done` last so first boot does not repeat
-that work.
+with the disk as its chroot. RPM triggers generate sysusers, hwdb, the journal
+catalog, and the linker cache while packages are installed. The hook stamps
+`/etc/.updated` and `/var/.updated` to match the final `/usr` for every OEM
+image built from the shared definition so first boot does not repeat that work.
 
-Fedora stamps the same markers in `config.sh`; Azure Linux uses the later
+Fedora stamps the same markers in `config.sh`; Azure Linux uses the
 assembled-disk hook because KIWI can still change `/usr` after `config.sh`.
 
 The static image test verifies that the update markers match `/usr` and the

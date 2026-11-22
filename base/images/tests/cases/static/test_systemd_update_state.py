@@ -25,7 +25,6 @@ def test_systemd_update_state_is_finalized(rootfs: Path) -> None:
         marker = rootfs / relative_path
         assert marker.is_file(), f"Missing systemd update marker: /{relative_path}"
         marker_stat = marker.stat()
-        assert marker_stat.st_size > 0, f"Empty systemd update marker: /{relative_path}"
         assert marker_stat.st_mtime_ns == usr_mtime_ns, (
             f"/{relative_path} does not match /usr and will trigger first-boot updates"
         )
