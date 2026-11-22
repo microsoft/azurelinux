@@ -1,7 +1,7 @@
-diff -up firefox-134.0.1/toolkit/moz.configure.wasi firefox-134.0.1/toolkit/moz.configure
---- firefox-134.0.1/toolkit/moz.configure.wasi	2025-01-13 14:46:04.000000000 +0100
-+++ firefox-134.0.1/toolkit/moz.configure	2025-01-17 08:39:38.870092763 +0100
-@@ -2767,7 +2776,7 @@ with only_when(requires_wasm_sandboxing
+diff -up firefox-160.0/toolkit/moz.configure.wasi firefox-160.0/toolkit/moz.configure
+--- firefox-160.0/toolkit/moz.configure.wasi	2026-11-06 11:39:59.831793570 +0100
++++ firefox-160.0/toolkit/moz.configure	2026-11-06 11:40:59.778720524 +0100
+@@ -2917,7 +2917,7 @@ with only_when(requires_wasm_sandboxing
      def wasi_sysroot_flags(wasi_sysroot):
          if wasi_sysroot:
              log.info("Using wasi sysroot in %s", wasi_sysroot)
@@ -9,10 +9,10 @@ diff -up firefox-134.0.1/toolkit/moz.configure.wasi firefox-134.0.1/toolkit/moz.
 +            return ["--sysroot=%s" % wasi_sysroot, "-nodefaultlibs",  "-lc", "-lwasi-emulated-process-clocks", "-lc++", "-lc++abi", "LIBCLANG_RT_PLACEHOLDER"]
          return []
  
-     set_config("WASI_SYSROOT", wasi_sysroot)
-diff -up firefox-134.0.1/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake.wasi firefox-134.0.1/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake
---- firefox-134.0.1/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake.wasi	2025-01-17 08:40:23.004159900 +0100
-+++ firefox-134.0.1/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake	2025-01-17 08:40:35.478178790 +0100
+     def wasm_compiler_with_flags(compiler, sysroot_flags):
+diff -up firefox-160.0/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake.wasi firefox-160.0/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake
+--- firefox-160.0/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake.wasi	2026-03-11 09:56:09.459199200 +0100
++++ firefox-160.0/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake	2026-11-06 11:40:59.779130167 +0100
 @@ -126,7 +126,7 @@ endif()
  add_custom_command(
    OUTPUT ${wasm_component_ld}
@@ -22,9 +22,9 @@ diff -up firefox-134.0.1/wasi-sdk-30/cmake/wasi-sdk-toolchain.cmake.wasi firefox
        wasm-component-ld@${wasm_component_ld_version}
    COMMAND
      cmake -E make_directory ${wasi_tmp_install}/bin
-diff -up firefox-134.0.2/wasi-sdk-30/version.py.wasi firefox-134.0.2/wasi-sdk-30/version.py
---- firefox-134.0.2/wasi-sdk-30/version.py.wasi	2025-01-16 08:03:26.042654800 +0100
-+++ firefox-134.0.2/wasi-sdk-30/version.py	2025-01-22 14:08:34.563909971 +0100
+diff -up firefox-160.0/wasi-sdk-30/version.py.wasi firefox-160.0/wasi-sdk-30/version.py
+--- firefox-160.0/wasi-sdk-30/version.py.wasi	2026-03-11 09:56:09.461966300 +0100
++++ firefox-160.0/wasi-sdk-30/version.py	2026-11-06 11:40:59.779240868 +0100
 @@ -60,6 +60,7 @@ assert parse_git_version(
  
  
