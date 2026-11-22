@@ -1,0 +1,22 @@
+# Fedora lacks lldpd 1.0.23; update the current spec to upstream 1.0.23 for CVE-2026-132049.
+# Remove this overlay once the imported Fedora spec packages 1.0.23 or newer.
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.0.23"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.0.23"
+
+[[overlays]]
+description = "Drop the [us]128 linux/types.h patch, upstream since 1.0.23"
+type = "patch-remove"
+file = "0001-include-add-us-128-to-linux-types.h.patch"
+
+[[overlays]]
+description = "Remove the obsolete 1.0.22 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(lldpd-1\.0\.22\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

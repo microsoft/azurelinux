@@ -2,3 +2,11 @@
 # https://src.fedoraproject.org/rpms/lldpd/c/b7ac9c5f16bf52e758d2894471a6a493d7d66679
 [components.lldpd]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "b7ac9c5f16bf52e758d2894471a6a493d7d66679" }
+
+# lldpd 1.0.23 is a GitHub tag archive (Fedora has no 1.0.23 yet). Downloaded from github.com and
+# codeload.github.com with identical SHA512, and its contents match the upstream 1.0.23 git tag.
+[[components.lldpd.source-files]]
+filename = "lldpd-1.0.23.tar.gz"
+hash = "90e62a4db4149957d6392b8414f08f3cf0be7183c7ee1b178ebf1491dd23671e28214a3437550a938dee900b2a06dd7bdfb2c183655f9c419734edd9bc1789e8"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/lldpd/lldpd/archive/1.0.23/lldpd-1.0.23.tar.gz" }
