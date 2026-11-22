@@ -28,11 +28,7 @@ Source0:        %{name}-%{version}.tar.gz
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-<<<<<<< HEAD
 #           -czf %%{name}-%%{version}-vendor-v3.tar.gz vendor
-=======
-#           -czf %%{name}-%%{version}-vendor-v2.tar.gz vendor
->>>>>>> 6efb84bd9b (Added upstream reference)
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
