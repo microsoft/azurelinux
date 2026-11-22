@@ -10,7 +10,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        6.18.58.mshv2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -140,6 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Wed Nov 04 2026 Jocelyn Berrendonner <jocelynb@microsoft.com> - 6.18.58.mshv2-2
+- Bump release to match kernel-mshv
+
 * Tue Nov 03 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.58.mshv2-1
 - Upgrade to 6.18.58.mshv2, which blocks vPCI IRQ affinity changes on the nested root
   partition (as in production until migration is validated)

@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        1.5.4
-Release:        2%{?dist}
+Version:        1.5.5
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
 
 Source1:        %{name}-%{version}-cargo.tar.gz
+Patch0:         CVE-2026-110602.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
@@ -57,6 +58,7 @@ tar xf %{SOURCE1} --no-same-owner
 %autopatch -p1 -m 1000 -M 1100
 popd
 %autosetup -N -n clamav-clamav-%{version}
+%autopatch -p1 -M 999
 
 %build
 export CARGO_NET_OFFLINE=true
@@ -148,6 +150,12 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Wed Nov 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.5-1
+- Auto-upgrade to 1.5.5 - for CVE-2026-76422, CVE-2026-76411, CVE-2026-76415, CVE-2026-76414, CVE-2026-76416, CVE-2026-76417, CVE-2026-76421, CVE-2026-76430, CVE-2026-76516, CVE-2026-76515
+
+* Tue Oct 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.4-3
+- Patch for CVE-2026-110602
+
 * Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.5.4-2
 - Bump release to rebuild with rust
 

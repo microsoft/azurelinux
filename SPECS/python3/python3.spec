@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -152,7 +152,7 @@ export OPT="%{extension_cflags} %{openssl_flags}"
 %make_build
 
 LD_LIBRARY_PATH=$PWD ./python Tools/remove-untrusted-wheel-roots.py \
-    --expected-removals 2 Lib/ensurepip/_bundled/pip-*.whl
+    --expected-removals 5 Lib/ensurepip/_bundled/pip-*.whl
 
 %install
 %make_install
@@ -246,6 +246,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 3.12.16-2
+- Extend ensurepip wheel cleanup to the additional emSign certificate fingerprints.
+
 * Mon Oct 26 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.12.16-1
 - Upgrade to 3.12.16 for CVE-2026-12345, CVE-2026-114583, CVE-2024-3220
 

@@ -3,7 +3,7 @@
 Summary:        Run a subprocess in a pseudo terminal
 Name:           python-%{srcname}
 Version:        0.7.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Source0:        https://pypi.io/packages/source/p/%{srcname}/%{srcname}-%{versio
 BuildArch:      noarch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 BuildRequires:  python3-setuptools
 %endif
 
@@ -37,7 +38,6 @@ python3 setup.py build
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 
 %check
-pip3 install pytest
 python3 -m pytest -v
 
 %files -n python3-ptyprocess
@@ -47,6 +47,9 @@ python3 -m pytest -v
 %{python3_sitelib}/ptyprocess-*.egg-info
 
 %changelog
+* Sun Nov 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.7.0-3
+- Use python3-pytest for tests instead of pip
+
 * Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.0-2
 - Fix package test by using pip to install test requirements
 
