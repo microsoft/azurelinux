@@ -25,7 +25,6 @@ Patch2:         0002-fix-PIDFile-handling.patch
 Patch3:         0003-Add-SSL-passphrase-dialog.patch
 Patch4:         0004-Disable-ENGINE-support.patch
 Patch5:         0005-Compile-perl-module-with-O2.patch
-Patch6:         0006-upstream-fixes.patch
 
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
