@@ -1,4 +1,13 @@
 [components.containerd]
-# Pin Fedora 44's last 2.3 release to reuse its matching source and vendor archives.
+# Pin Fedora 44's last 2.3 packaging (containerd 2.3.5); overlay 0001 moves it to upstream 2.3.7.
 # https://src.fedoraproject.org/rpms/containerd/c/91251c9edc1f8e49c11f9a4ccb872502a933afb7
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "91251c9edc1f8e49c11f9a4ccb872502a933afb7" }
+
+# Source for the 2.3.7 update overlay; drop together with it once the imported Fedora spec packages
+# 2.3.7 or newer. GitHub tag archive (the URL %{gosource} expands to); the SHA512 was identical
+# across /archive/v2.3.7/containerd-2.3.7.tar.gz and /archive/refs/tags/v2.3.7.tar.gz.
+[[components.containerd.source-files]]
+filename = "containerd-2.3.7.tar.gz"
+hash = "e8bc6bfab5a016d460e63c58d19a1c33b0b2f1f04af3ae959d07d7e239d9cfd5e8f33056823efd6cd22d6db49453d1d5bc7743e6d30c4eaf373c6bf1fbf1a89a"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/containerd/containerd/archive/v2.3.7/containerd-2.3.7.tar.gz" }
