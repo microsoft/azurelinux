@@ -1,4 +1,4 @@
 [components.firefox]
-# Import the latest Fedora 43 Firefox without advancing the distro-wide snapshot.
-# https://src.fedoraproject.org/rpms/firefox/c/7166581ea34f2b167d3662872cd3c928600bff05
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "7166581ea34f2b167d3662872cd3c928600bff05" }
+# Pin Fedora 43 firefox-160.0.1-1.fc43 for the Firefox 159.0.1, 160 and 160.0.1 security fixes.
+# https://src.fedoraproject.org/rpms/firefox/c/589aca7935d7ba1d2e385afc6d80b307451b78ae
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "589aca7935d7ba1d2e385afc6d80b307451b78ae" }
