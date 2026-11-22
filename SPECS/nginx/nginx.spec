@@ -5,8 +5,8 @@ Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.30.6
-Release:        2%{?dist}
+Version:        1.30.7
+Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -174,6 +174,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Sun Nov 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.7-1
+- Auto-upgrade to 1.30.7 - for CVEs https://nginx.org/en/CHANGES
+
 * Mon Nov 16 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.30.6-2
 - Apply upstream fixes for nginx 1.30.6.
 - Retain RFC 7540 HTTP/2 priorities and nginx 1.30.6.
