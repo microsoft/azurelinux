@@ -12,27 +12,37 @@ Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version
 
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# The vendor-v4 tarball is the vendor-v3 tree with go.opentelemetry.io/otel upgraded to v1.47.0.
 # How to re-build this file:
 #   1. wget https://github.com/kube-vip/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz && cd %%{name}-%%{version}
-#   3. tar -xf <path>/%%{name}-%%{version}-vendor-v3.tar.gz
-#   4. Apply Patch0 to Patch10 in order with "patch -p1 --fuzz=0" (this brings go.mod to the vendor-v3 baseline).
-#   5. go mod edit -require=go.opentelemetry.io/otel@v1.47.0 -require=go.opentelemetry.io/otel/sdk@v1.47.0
-#   6. go mod tidy
-#   7. rm -rf vendor && go mod vendor
-#   8. tar  --sort=name \
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod edit -modfile=go.mod -require=github.com/google/cel-go@v0.31.0 \
+#                                  -require=k8s.io/apiserver@v0.34.0 \
+#                                  -require=google.golang.org/grpc@v1.83.2 \
+#                                  -require=go.opentelemetry.io/otel@v1.47.0 \
+#                                  -require=go.opentelemetry.io/otel/sdk@v1.47.0
+#   5. go mod tidy
+#   6. go mod vendor
+#   7. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -czf %%{name}-%%{version}-vendor-v4.tar.gz vendor
 #
+# Alternatively, run the helper from this spec directory:
+#   bash generate_source_tarball.sh \
+#       --srcTarball "$(pwd)/%%{name}-%%{version}.tar.gz" \
+#       --outFolder "$(pwd)" \
+#       --pkgVersion %%{version} --vendorVersion 4
+#
 #   NOTES:
 #       - You require GNU tar version 1.28+.
 #       - You require Go 1.26+ for OpenTelemetry v1.47.0.
-#       - The go.mod/go.sum changes from steps 5-6 are carried in Patch11.
-#       - The additional tar options generate a tarball with the same hash every time regardless of the environment.
+#       - cel-go, apiserver and grpc are the upgrades from CVE-2026-84445.patch; otel and otel/sdk are for
+#         CVE-2026-128085 and CVE-2026-128086. The resulting go.mod/go.sum changes are carried in Patch2 and Patch11.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 
 Source1: %{name}-%{version}-vendor-v4.tar.gz
 
