@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.8.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,11 @@ Patch13:        CVE-2026-13201.patch
 Patch14:        CVE-2026-13622.patch
 Patch15:        CVE-2026-78661.patch
 Patch16:        CVE-2026-97045.patch
+Patch17:        0001-Add-LiveMigration-Blackout-Observability.patch
+Patch18:        0002-Fix-hotplug-volume-detach-deadlock-in-virt-handler.patch
+Patch19:        0003-Fix-cleanupAttachmentPods-fallback-keeping-useless-old-pods.patch
+Patch20:        0004-Propagate-launcher-pull-secret-to-hotplug-helper-pods.patch
+Patch21:        0005-virt-api-accept-large-identity-header-sets-with-Go-1.27.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -302,6 +307,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Mon Nov 23 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.8.4-6
+- Carry the five migration, hotplug and virt-api patches from Azure Linux PR 19696
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.4-5
 - Patch for CVE-2026-97045, CVE-2026-78661
 
