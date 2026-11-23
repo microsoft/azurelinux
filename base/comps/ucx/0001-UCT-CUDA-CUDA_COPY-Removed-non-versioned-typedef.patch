@@ -1,0 +1,18 @@
+From 693b5fa7b5e671e448431238d12265ac50953551 Mon Sep 17 00:00:00 2001
+From: rakhmets <rakhmetshin@nvidia.com>
+Date: Fri, 30 May 2025 13:13:40 +0300
+Subject: [PATCH] UCT/CUDA/CUDA_COPY: Removed non-versioned typedef.
+
+Upstream: https://github.com/openucx/ucx/commit/693b5fa7b5e671e448431238d12265ac50953551
+---
+--- a/src/uct/cuda/cuda_copy/cuda_copy_md.c
++++ b/src/uct/cuda/cuda_copy/cuda_copy_md.c
+@@ -731,7 +731,7 @@
+ static int uct_cuda_copy_md_get_dmabuf_fd(uintptr_t address, size_t length)
+ {
+ #if CUDA_VERSION >= 11070
+-    PFN_cuMemGetHandleForAddressRange get_handle_func;
++    PFN_cuMemGetHandleForAddressRange_v11070 get_handle_func;
+     CUresult cu_err;
+     int fd;
+ 

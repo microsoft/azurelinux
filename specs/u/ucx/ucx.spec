@@ -4,6 +4,12 @@
 %{!?configure_options: %global configure_options %{nil}}
 %bcond_without cma
 %bcond_with    cuda
+%{!?cuda_pkg_suffix: %global cuda_pkg_suffix 13-5}
+%{!?cuda_home: %global cuda_home /usr/local/cuda}
+%if %{with cuda}
+# Host GPU driver supplies libcuda.so.1 and libnvidia-ml.so.1 at runtime.
+%global __requires_exclude ^(libcuda|libnvidia-ml)\.so\.1.*$
+%endif
 %bcond_with    gdrcopy
 %bcond_without ib
 %bcond_with    knem
@@ -26,7 +32,7 @@
 
 Name: ucx
 Version: 1.18.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: UCX is a communication library implementing high-performance messaging
 
 License: BSD-3-Clause AND MIT AND CC-PDDC AND (BSD-3-Clause OR Apache-2.0)
@@ -57,6 +63,12 @@ Requires: %{?extra_deps}
 %endif
 
 BuildRequires: automake autoconf libtool gcc-c++
+%if %{with cuda}
+BuildRequires: cuda-cudart-devel-%{cuda_pkg_suffix}
+BuildRequires: cuda-driver-devel-%{cuda_pkg_suffix}
+BuildRequires: cuda-nvcc-%{cuda_pkg_suffix}
+BuildRequires: cuda-nvml-devel-%{cuda_pkg_suffix}
+%endif
 %if "%{_vendor}" == "suse"
 BuildRequires: libnuma-devel
 %else
@@ -95,6 +107,8 @@ BuildRequires: libibmad-devel libibumad-devel
 %endif
 
 
+Patch1: 0001-UCT-CUDA-CUDA_COPY-Removed-non-versioned-typedef.patch
+Patch2: 0002-TEST-APPS-Removed-cuCtxCreate-from-test_cuda_hook.patch
 %description
 UCX is an optimized communication framework for high-performance distributed
 applications. UCX utilizes high-speed networks, such as RDMA (InfiniBand, RoCE,
@@ -120,6 +134,8 @@ Provides header files and examples for developing with UCX.
 %prep
 %setup -q
 %patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
 # https://github.com/openucx/ucx/issues/10542
 # With ROCm 6.3+ libhsakmt is bundled with libhsa-runtime64
 # Remove this nonexistent library
@@ -147,7 +163,7 @@ export CFLAGS="$CFLAGS -std=gnu17"
            --with-rocm=%{_prefix} \
 %endif
            %_enable_arg cma cma \
-           %_with_arg cuda cuda \
+           %{?with_cuda:--with-cuda=%{cuda_home}}%{!?with_cuda:--without-cuda} \
            %_with_arg gdrcopy gdrcopy \
            %_with_arg ib verbs \
            %_with_arg mlx5 mlx5 \
@@ -178,6 +194,23 @@ chrpath -d %{buildroot}%{_libdir}/ucx/libucm_rocm.so.0.0.0
 chrpath -d %{buildroot}%{_libdir}/ucx/libuct_rocm.so.0.0.0
 %endif
 
+
+%check
+src/tools/info/ucx_info -v
+src/tools/info/ucx_info -b > ucx-build-config.txt
+%if %{with cuda}
+grep -Eq '^#define HAVE_CUDA[[:space:]]+1$' ucx-build-config.txt
+grep -Eq '^#define uct_MODULES[[:space:]]+.*:cuda' ucx-build-config.txt
+grep -Eq '^#define ucm_MODULES[[:space:]]+.*:cuda' ucx-build-config.txt
+test -s %{buildroot}%{_libdir}/ucx/libuct_cuda.so.0
+test -s %{buildroot}%{_libdir}/ucx/libucm_cuda.so.0
+test -s %{buildroot}%{_libdir}/ucx/libucx_perftest_cuda.so.0
+%else
+if grep -Eq '^#define HAVE_CUDA[[:space:]]+1$' ucx-build-config.txt; then
+    echo 'CUDA support unexpectedly enabled in default build' >&2
+    exit 1
+fi
+%endif
 %files
 %{_libdir}/lib*.so.*
 %{_bindir}/ucx_info

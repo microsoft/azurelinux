@@ -1,0 +1,2 @@
+[components.ucx]
+overlay-files = ["overlays/*.overlay.toml"]

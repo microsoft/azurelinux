@@ -1,0 +1,60 @@
+# Support opt-in `--with cuda` builds against NVIDIA's Azure Linux 4 CUDA packages
+# while preserving the default CPU/ROCm build unchanged.
+[metadata]
+category = "azl-compatibility"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Define configurable CUDA prefix/package macros and exclude host-driver SONAMEs on opt-in CUDA builds"
+type = "spec-search-replace"
+regex = '^%bcond_with\s+cuda$'
+replacement = '''%bcond_with    cuda
+%{!?cuda_pkg_suffix: %global cuda_pkg_suffix 13-5}
+%{!?cuda_home: %global cuda_home /usr/local/cuda}
+%if %{with cuda}
+# Host GPU driver supplies libcuda.so.1 and libnvidia-ml.so.1 at runtime.
+%global __requires_exclude ^(libcuda|libnvidia-ml)\.so\.1.*$
+%endif'''
+
+[[overlays]]
+description = "Add conditional CUDA BuildRequires matching NVIDIA's Azure Linux 4 repository packages"
+type = "spec-search-replace"
+regex = '^BuildRequires: automake autoconf libtool gcc-c\+\+$'
+replacement = '''BuildRequires: automake autoconf libtool gcc-c++
+%if %{with cuda}
+BuildRequires: cuda-cudart-devel-%{cuda_pkg_suffix}
+BuildRequires: cuda-driver-devel-%{cuda_pkg_suffix}
+BuildRequires: cuda-nvcc-%{cuda_pkg_suffix}
+BuildRequires: cuda-nvml-devel-%{cuda_pkg_suffix}
+%endif'''
+
+[[overlays]]
+description = "Pass explicit --with-cuda=%{cuda_home} to configure when built with CUDA"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\s+%_with_arg cuda cuda \\$'
+replacement = '           %{?with_cuda:--with-cuda=%{cuda_home}}%{!?with_cuda:--without-cuda} \'
+
+[[overlays]]
+description = "Verify compiled CUDA capability state in %check"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "%check",
+    "src/tools/info/ucx_info -v",
+    "src/tools/info/ucx_info -b > ucx-build-config.txt",
+    "%if %{with cuda}",
+    "grep -Eq '^#define HAVE_CUDA[[:space:]]+1$' ucx-build-config.txt",
+    "grep -Eq '^#define uct_MODULES[[:space:]]+.*:cuda' ucx-build-config.txt",
+    "grep -Eq '^#define ucm_MODULES[[:space:]]+.*:cuda' ucx-build-config.txt",
+    "test -s %{buildroot}%{_libdir}/ucx/libuct_cuda.so.0",
+    "test -s %{buildroot}%{_libdir}/ucx/libucm_cuda.so.0",
+    "test -s %{buildroot}%{_libdir}/ucx/libucx_perftest_cuda.so.0",
+    "%else",
+    "if grep -Eq '^#define HAVE_CUDA[[:space:]]+1$' ucx-build-config.txt; then",
+    "    echo 'CUDA support unexpectedly enabled in default build' >&2",
+    "    exit 1",
+    "fi",
+    "%endif",
+]

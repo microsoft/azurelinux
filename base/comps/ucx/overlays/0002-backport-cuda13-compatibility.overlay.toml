@@ -1,0 +1,31 @@
+# Backport upstream OpenUCX CUDA 13 compatibility fixes so ucx 1.18.1 compiles
+# cleanly against CUDA 13.x headers (where unversioned PFN_cuMemGetHandleForAddressRange
+# was removed and cuCtxCreate maps to 4-arg cuCtxCreate_v4).
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [
+    { url = "https://github.com/openucx/ucx/commit/693b5fa7b5e671e448431238d12265ac50953551" },
+    { url = "https://github.com/openucx/ucx/commit/1c6ddd6c4b36c277e068cae453a13231ccd16807" },
+]
+
+[[overlays]]
+description = "Backport OpenUCX CUDA 13 versioned PFN_cuMemGetHandleForAddressRange_v11070 typedef fix"
+type = "patch-add"
+file = "0001-UCT-CUDA-CUDA_COPY-Removed-non-versioned-typedef.patch"
+source = "../0001-UCT-CUDA-CUDA_COPY-Removed-non-versioned-typedef.patch"
+
+[[overlays]]
+description = "Backport OpenUCX removal of deprecated 3-arg cuCtxCreate in test_cuda_hook"
+type = "patch-add"
+file = "0002-TEST-APPS-Removed-cuCtxCreate-from-test_cuda_hook.patch"
+source = "../0002-TEST-APPS-Removed-cuCtxCreate-from-test_cuda_hook.patch"
+
+[[overlays]]
+description = "Apply Patch1 and Patch2 in %prep after Patch0"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P0 -p1$'
+replacement = '''%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1'''
