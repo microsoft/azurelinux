@@ -1,0 +1,61 @@
+# Support opt-in `--with cuda` builds against CUDA-enabled UCX and NVIDIA's
+# Azure Linux 4 CUDA packages while preserving the default CPU build unchanged.
+[metadata]
+category = "azl-compatibility"
+upstream-status = "needs-upstream-hook"
+
+[[overlays]]
+description = "Add opt-in cuda bcond and configurable CUDA prefix/package macros"
+type = "spec-search-replace"
+regex = '^%bcond autogen 0$'
+replacement = '''%bcond autogen 0
+%bcond cuda 0
+%{!?cuda_pkg_suffix: %global cuda_pkg_suffix 13-5}
+%{!?cuda_home: %global cuda_home /usr/local/cuda}'''
+
+[[overlays]]
+description = "Require CUDA runtime/driver headers and ucx-cuda when built with --with cuda"
+type = "spec-search-replace"
+regex = '^BuildRequires:  ucx-devel$'
+replacement = '''BuildRequires:  ucx-devel
+%if %{with cuda}
+BuildRequires:  cuda-cudart-devel-%{cuda_pkg_suffix}
+BuildRequires:  cuda-driver-devel-%{cuda_pkg_suffix}
+BuildRequires:  ucx-cuda
+Requires:       ucx-cuda
+%endif'''
+
+[[overlays]]
+description = "Exclude host-supplied libcuda and libnvidia-ml SONAMEs when built with CUDA"
+type = "spec-search-replace"
+regex = '^%global __requires_exclude lib\(mca\|ompi\|open-\(pal\|rte\|trace\)\|vt\)\.\*$'
+replacement = '%global __requires_exclude ^(lib(mca|ompi|open-(pal|rte|trace)|vt).*%{?with_cuda:|(libcuda|libnvidia-ml)\.so\.1.*})$'
+
+[[overlays]]
+description = "Configure explicit UCX and opt-in CUDA paths during %build"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\t--with-hwloc=/usr \\$'
+replacement = '''	--with-hwloc=/usr \
+%if %{with ucx}
+	--with-ucx=%{_prefix} \
+	--with-ucx-libdir=%{_libdir} \
+%endif
+%if %{with cuda}
+	--with-cuda=%{cuda_home} \
+	--with-cuda-libdir=%{cuda_home}/lib64/stubs \
+%else
+	--without-cuda \
+%endif'''
+
+[[overlays]]
+description = "Verify OPAL_CUDA_SUPPORT matches the requested cuda bcond in %check"
+type = "spec-prepend-lines"
+section = "%check"
+lines = [
+    "%if %{with cuda}",
+    "grep -Eq '^#define OPAL_CUDA_SUPPORT[[:space:]]+1$' opal/include/opal_config.h",
+    "%else",
+    "grep -Eq '^#define OPAL_CUDA_SUPPORT[[:space:]]+0$' opal/include/opal_config.h",
+    "%endif",
+]

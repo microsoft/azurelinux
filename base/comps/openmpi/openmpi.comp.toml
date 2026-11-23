@@ -1,0 +1,2 @@
+[components.openmpi]
+overlay-files = ["overlays/*.overlay.toml"]
