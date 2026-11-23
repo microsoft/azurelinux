@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        18%{?dist}
+Release:        19%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -23,9 +23,9 @@ Source0:        %{name}-%{version}.tar.gz
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor-v2.tar.gz vendor
+#           -cf %%{name}-%%{version}-vendor-v3.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor-v2.tar.gz
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 Patch0:         CVE-2017-14623.patch
 Patch1:         CVE-2024-53257.patch
 Patch2:         CVE-2026-27965.patch
@@ -47,6 +47,8 @@ Patch17:        CVE-2026-116585.patch
 Patch18:        CVE-2026-116586.patch
 Patch19:        CVE-2026-116587.patch
 Patch20:        CVE-2026-116591.patch
+Patch21:        CVE-2026-128085.patch
+BuildRequires: golang >= 1.26
 BuildRequires: golang < 1.28
 BuildRequires: hostname
 
@@ -176,6 +178,9 @@ go test -mod=vendor \
 %{_bindir}/*
 
 %changelog
+* Fri Nov 27 2026 Sushil Sati <v-Sushil.sati@microsoft.com> - 19.0.4-19
+- Patch for CVE-2026-128085 and CVE-2026-128086
+
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 19.0.4-18
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
