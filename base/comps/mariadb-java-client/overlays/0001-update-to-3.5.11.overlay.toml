@@ -17,9 +17,9 @@ value = "3.5.11"
 
 [[overlays]]
 description = "Drop the Java version parsing patch; it is included in 3.5.11"
-type = "spec-search-replace"
-regex = '^Patch:\s+0003-Fix-Java-version-parsing-for-non-standard-versions\.patch$'
-replacement = ""
+type = "spec-remove-tag"
+tag = "Patch"
+value = "0003-Fix-Java-version-parsing-for-non-standard-versions.patch"
 
 [[overlays]]
 description = "Remove the dropped patch file 0003-Fix-Java-version-parsing-for-non-standard-versions.patch"
