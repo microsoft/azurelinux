@@ -1,15 +1,4 @@
-# Pin to Fedora f43 valkey-8.1.11 to pick up CVE fixes:
-# CVE-2026-81934, CVE-2026-66373
-# https://src.fedoraproject.org/rpms/valkey/c/34189e2be4ae49ea046771ca0149cd1acccc6cae
-# The 0001 overlay updates this f43 spec to upstream 8.1.12.
+# Pin to Fedora f43's native 8.1.12 packaging, including CVE-2026-130822.
+# https://src.fedoraproject.org/rpms/valkey/c/83532a81bc79338ea6233bb5df00a3996301614e
 [components.valkey]
-spec = { type = "upstream", upstream-commit = "34189e2be4ae49ea046771ca0149cd1acccc6cae" }
-
-# Sources for the 8.1.12 update overlay; drop together with it once Fedora ships 8.1.12 or newer.
-# SHA-256 675bd143a4c42022f7ce10fb012a7a61e0a70b139ff166e3e63fca2bdf05027b matches
-# https://github.com/valkey-io/valkey-hashes.
-[[components.valkey.source-files]]
-filename = "valkey-8.1.12.tar.gz"
-hash = "537d2f39f516945456a5f04123a62f8e88b76d15de820e14b3178b30837bcb1a6475aac31cae9e6960decd17bb625ba5dcf33d56bb7aeaf4e79dfd96f871f175"
-hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/valkey-io/valkey/archive/8.1.12/valkey-8.1.12.tar.gz" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "83532a81bc79338ea6233bb5df00a3996301614e" }
