@@ -154,23 +154,23 @@ index 5cef8dbb..4db891ea 100644
 +++ b/src/main/java/com/fasterxml/jackson/core/io/NumberInput.java
 @@ -1,8 +1,5 @@
  package com.fasterxml.jackson.core.io;
- 
+
 -import ch.randelshofer.fastdoubleparser.JavaDoubleParser;
 -import ch.randelshofer.fastdoubleparser.JavaFloatParser;
 -
  import java.math.BigDecimal;
  import java.math.BigInteger;
- import java.util.regex.Pattern;
-@@ -407,7 +404,7 @@ public final class NumberInput
+
+@@ -387,7 +384,7 @@ public final class NumberInput
       * @since v2.14
       */
      public static double parseDouble(final String s, final boolean useFastParser) throws NumberFormatException {
 -        return useFastParser ? JavaDoubleParser.parseDouble(s) : Double.parseDouble(s);
 +        return Double.parseDouble(s);
      }
- 
+
      /**
-@@ -432,8 +429,7 @@ public final class NumberInput
+@@ -412,8 +409,7 @@ public final class NumberInput
       */
      public static double parseDouble(final char[] array, final int offset,
                                       final int len, final boolean useFastParser) throws NumberFormatException {
@@ -178,9 +178,9 @@ index 5cef8dbb..4db891ea 100644
 -                Double.parseDouble(new String(array, offset, len));
 +        return Double.parseDouble(new String(array, offset, len));
      }
- 
+
      /**
-@@ -458,9 +454,6 @@ public final class NumberInput
+@@ -438,9 +434,6 @@ public final class NumberInput
       * @since v2.14
       */
      public static float parseFloat(final String s, final boolean useFastParser) throws NumberFormatException {
@@ -189,8 +189,8 @@ index 5cef8dbb..4db891ea 100644
 -        }
          return Float.parseFloat(s);
      }
- 
-@@ -486,8 +479,7 @@ public final class NumberInput
+
+@@ -466,8 +459,7 @@ public final class NumberInput
       */
      public static float parseFloat(final char[] array, final int offset,
                                     final int len, final boolean useFastParser) throws NumberFormatException {
@@ -198,9 +198,9 @@ index 5cef8dbb..4db891ea 100644
 -                Float.parseFloat(new String(array, offset, len));
 +        return Float.parseFloat(new String(array, offset, len));
      }
- 
+
      /**
-@@ -510,9 +502,6 @@ public final class NumberInput
+@@ -490,9 +482,6 @@ public final class NumberInput
       * @since v2.15
       */
      public static BigDecimal parseBigDecimal(final String s, final boolean useFastParser) throws NumberFormatException {
@@ -209,8 +209,8 @@ index 5cef8dbb..4db891ea 100644
 -        }
          return BigDecimalParser.parse(s);
      }
- 
-@@ -543,9 +532,6 @@ public final class NumberInput
+
+@@ -523,9 +512,6 @@ public final class NumberInput
                                               final boolean useFastParser)
              throws NumberFormatException
      {
@@ -219,8 +219,8 @@ index 5cef8dbb..4db891ea 100644
 -        }
          return BigDecimalParser.parse(ch, off, len);
      }
- 
-@@ -569,9 +555,6 @@ public final class NumberInput
+
+@@ -549,9 +535,6 @@ public final class NumberInput
       * @since v2.15
       */
      public static BigDecimal parseBigDecimal(final char[] ch, final boolean useFastParser) throws NumberFormatException {
@@ -229,8 +229,8 @@ index 5cef8dbb..4db891ea 100644
 -        }
          return BigDecimalParser.parse(ch);
      }
- 
-@@ -596,9 +579,6 @@ public final class NumberInput
+
+@@ -576,9 +559,6 @@ public final class NumberInput
       * @since v2.15
       */
      public static BigInteger parseBigInteger(final String s, final boolean useFastParser) throws NumberFormatException {
@@ -239,8 +239,8 @@ index 5cef8dbb..4db891ea 100644
 -        }
          return new BigInteger(s);
      }
- 
-@@ -612,9 +592,6 @@ public final class NumberInput
+
+@@ -592,9 +572,6 @@ public final class NumberInput
       */
      public static BigInteger parseBigIntegerWithRadix(final String s, final int radix,
              final boolean useFastParser) throws NumberFormatException {
