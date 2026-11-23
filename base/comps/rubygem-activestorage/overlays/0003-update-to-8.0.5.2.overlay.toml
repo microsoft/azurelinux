@@ -1,0 +1,53 @@
+# Fedora does not package activestorage 8.0.5.2 on f43/f44 yet. Update to the upstream
+# release. The Rails gems require each other at the exact same version, so the
+# whole stack moves to 8.0.5.2 together.
+# CVE fixes:
+# CVE-2025-24293, CVE-2026-33173, CVE-2026-33174, CVE-2026-33195,
+# CVE-2026-33202, CVE-2026-66066, CVE-2026-122006, CVE-2026-126071,
+# CVE-2026-126074, CVE-2026-126082, CVE-2026-126084, CVE-2026-126085,
+# CVE-2026-126186, CVE-2026-126188
+# Remove this overlay once the imported Fedora spec packages 8.0.5.2 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 8.0.5.2"
+type = "spec-update-tag"
+tag = "Version"
+value = "8.0.5.2"
+
+[[overlays]]
+description = "Skip the GCS service tests; google-cloud-storage is not packaged and the new 8.0.5.2 signature tests do not skip without it"
+type = "spec-search-replace"
+regex = '^mv test/javascript_package_test\.rb\{,\.disable\}$'
+replacement = '''
+mv test/javascript_package_test.rb{,.disable}
+# Azure Linux: google-cloud-storage is not packaged. The other GCS tests in this
+# file already skip without a GCS configuration; the 8.0.5.2 signature tests do not.
+mv test/service/gcs_service_test.rb{,.disable}'''
+
+[[overlays]]
+description = "Define force_skip like upstream tools/test_common.rb; the 8.0.5.2 ImageMagick policy tests use it"
+type = "spec-search-replace"
+regex = '^touch \.\./tools/test_common\.rb$'
+replacement = "echo 'ActiveSupport::TestCase.alias_method :force_skip, :skip' > ../tools/test_common.rb"
+
+[[overlays]]
+description = "Remove the obsolete activestorage-8.0.2-js.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(activestorage-8\.0\.2-js\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete activestorage-8.0.2-tests.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(activestorage-8\.0\.2-tests\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete activestorage-8.0.2.gem source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(activestorage-8\.0\.2\.gem\) = [0-9a-f]+(?:\r?\n|$)'

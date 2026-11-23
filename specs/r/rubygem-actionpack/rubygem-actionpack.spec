@@ -5,12 +5,12 @@
 %global gem_name actionpack
 
 # Circular dependency with rubygem-{actverecord,railties}.
-%bcond_with bootstrap
+%bcond_without bootstrap
 
 Name: rubygem-%{gem_name}
 Epoch: 1
-Version: 8.0.2
-Release: 6%{?dist}
+Version: 8.0.5.2
+Release: 7%{?dist}
 Summary: Web-flow and rendering framework putting the VC in MVC (part of Rails)
 License: MIT
 URL: https://rubyonrails.org

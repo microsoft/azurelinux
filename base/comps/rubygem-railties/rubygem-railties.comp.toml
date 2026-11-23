@@ -1,1 +1,17 @@
 [components.rubygem-railties]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-railties.source-files]]
+filename = "railties-8.0.5.2.gem"
+hash = "774ba8b0f06d2593b0e545237674523dd8295cc20a35fb74f52cf0227137320308c73afccd5d8e3d9d95bcb559f7328727b78f611e9698a424a8f1e08185a054"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/railties-8.0.5.2.gem" }
+
+# Generated: the railties/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-railties.source-files]]
+filename = "railties-8.0.5.2-tests.tar.gz"
+hash = "857c050c519a5521a797eee5b7d564a63672e1ab7d56ca5924600fab14d9ee368eb218c35ad3ce50df1e0a3d8df054330b44c285f8fb8c958bef8036502e99f4"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]

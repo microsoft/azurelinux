@@ -1,0 +1,17 @@
+[components.rubygem-activerecord]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-activerecord.source-files]]
+filename = "activerecord-8.0.5.2.gem"
+hash = "fc6665cb713b99e6e399a23f4c3d5c4392adaead403128fe2be942391a161f55a2ac587b42020b89b0a8a21cbc9584cb0f6e7d14195bd4f022a91032e13bb1e9"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/activerecord-8.0.5.2.gem" }
+
+# Generated: the activerecord/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-activerecord.source-files]]
+filename = "activerecord-8.0.5.2-tests.tar.gz"
+hash = "94f3c27e225bcd0fb5f7795aceca75b3f469f0ce0ff97df9cf9e95e6a279be490056eb9748d16e2b574acbaaa3603b2451d92c121e5978044f9877522ac346fc"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]

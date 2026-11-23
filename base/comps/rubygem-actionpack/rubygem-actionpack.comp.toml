@@ -1,1 +1,17 @@
 [components.rubygem-actionpack]
+
+# Sources for the 8.0.5.2 update overlay; drop together with it once Fedora ships 8.0.5.2 or newer.
+[[components.rubygem-actionpack.source-files]]
+filename = "actionpack-8.0.5.2.gem"
+hash = "35d9a1cd1ee836a1af2020634a6321745b44f76ed084641a2d3c28c656d4efb93ac546cfde947483a5a424a339eb8187f48d7a64b529c584ea456439c1926233"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://rubygems.org/gems/actionpack-8.0.5.2.gem" }
+
+# Generated: the actionpack/test/ directory of the upstream v8.0.5.2 tag (see the Source1 comment in the spec).
+[[components.rubygem-actionpack.source-files]]
+filename = "actionpack-8.0.5.2-tests.tar.gz"
+hash = "729e571c298944fa1f5b6f76664a95bc4d0eeeececdee7244b83a7f6e3aa0603fb0b7e73ae1f4d195e15e33fe6f044e07dd1045d89f766386982653aba0e0f78"
+hash-type = "SHA512"
+origin.type = "custom"
+origin.script = "gen-tests-tarball.sh"
+origin.mock-packages = ["git"]
