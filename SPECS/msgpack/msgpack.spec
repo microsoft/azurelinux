@@ -1,13 +1,14 @@
 Summary:        MessagePack implementation for C and C++
 Name:           msgpack
 Version:        3.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://msgpack.org
 #Source0:       https://github.com/%{name}/%{name}-c/archive/cpp-%{version}.tar.gz
 Source0:        %{name}-c-cpp-%{version}.tar.gz
+Patch0:         CVE-2026-130065.patch
 %define _build_id_links none
 BuildRequires:  boost-devel
 BuildRequires:  cmake
@@ -27,6 +28,7 @@ Development files for %{name}
 
 %prep
 %setup -q -n %{name}-c-cpp-%{version}
+%patch 0 -p1
 
 %build
 mkdir build
@@ -50,6 +52,9 @@ make install DESTDIR=%{buildroot}
 %{_libdir}/*.a
 
 %changelog
+* Mon Nov 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.0-2
+- Patch for CVE-2026-130065
+
 * Thu Mar 03 2022 Minghe Ren <mingheren@microsoft.com> - 3.3.0-1
 - Upgrade to version 3.3.0
 
