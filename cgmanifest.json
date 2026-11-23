@@ -14542,8 +14542,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.30.6",
-          "downloadUrl": "https://nginx.org/download/nginx-1.30.6.tar.gz"
+          "version": "1.30.8",
+          "downloadUrl": "https://nginx.org/download/nginx-1.30.8.tar.gz"
         }
       }
     },
