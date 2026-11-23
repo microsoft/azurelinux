@@ -5,39 +5,31 @@
 %global gem_name ruby-vips
 
 Name: rubygem-%{gem_name}
-Version: 2.0.17
-Release: 18%{?dist}
+Version: 2.2.5
+Release: 6%{?dist}
 Summary: Ruby extension for the vips image processing library
 License: MIT
 URL: http://github.com/libvips/ruby-vips
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# Extracted from
-# https://github.com/libvips/ruby-vips/commit/2ecd377375ef7f0fa182253a1b06980b2a9b358d
-Patch1: %{name}-%{version}-use-nil-for-object-rb.patch
-# Extracted from
-# https://github.com/libvips/ruby-vips/commit/e0203e9ed8be27ed195b4c5b0ca87c35daff36cc
-Patch2:  %{name}-%{version}-proc-capture-for-object-rb.patch
-# https://github.com/libvips/ruby-vips/pull/407
-Patch3:  %{name}-pr407-variadic-func-call-sentinel.patch
-# Tests are not shipped with the gem, you may check them out like so:
 # git clone --no-checkout http://github.com/libvips/ruby-vips
-# cd ruby-vips && git archive -v -o ruby-vips-2.0.17-spec.txz v2.0.17 spec/
-Source1: %{gem_name}-%{version}-spec.txz
+# cd ruby-vips && git archive -v -o ruby-vips-2.2.5-spec.tar.gz v2.2.5 spec/
+Source1: %{gem_name}-%{version}-spec.tar.gz
 
 Requires: (libvips.so.42()(64bit) if libc.so.6()(64bit))
 Requires: (libvips.so.42 if libc.so.6)
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
-BuildRequires: rubygem(rspec) >= 3.3
 BuildRequires: rubygem(ffi)
+BuildRequires: rubygem(logger)
+BuildRequires: rubygem(rspec) >= 3.3
 BuildRequires: (libvips.so.42()(64bit) if libc.so.6()(64bit))
 BuildRequires: (libvips.so.42 if libc.so.6)
 BuildArch: noarch
 
 %description
-ruby-vips is a binding for the vips image processing library. It is fast and
-it can process large images without loading the whole image in memory.
+ruby-vips is a binding for the libvips image processing library. It is fast
+and it can process large images without loading the whole image in memory.
 
 
 %package doc
@@ -50,14 +42,6 @@ Documentation for %{name}.
 
 %prep
 %setup -q -n %{gem_name}-%{version} -b1
-%patch -P1 -p1
-%patch -P2 -p1
-%patch -P3 -p1
-
-# Do not use `env` in shebangs
-# https://github.com/libvips/ruby-vips/pull/245
-sed -i 's|/usr/bin/env ruby|/usr/bin/ruby|' example/thumb.rb
-sed -i 's|/usr/bin/env ruby|/usr/bin/ruby|' example/example1.rb
 
 %build
 gem build ../%{gem_name}-%{version}.gemspec
@@ -72,10 +56,10 @@ cp -a .%{gem_dir}/* \
 # Check section disabled: Disabling checks for initial set of failures.
 exit 0
 
-pushd .%{gem_instdir}
+( cd .%{gem_instdir}
 ln -s %{_builddir}/spec .
 rspec spec
-popd
+)
 
 %files
 %dir %{gem_instdir}
@@ -91,13 +75,19 @@ popd
 %{gem_instdir}/Gemfile
 %doc %{gem_instdir}/README.md
 %{gem_instdir}/Rakefile
-%{gem_instdir}/%{gem_name}.gemspec
 %doc %{gem_instdir}/TODO
+%{gem_instdir}/ruby-vips.gemspec
 %{gem_instdir}/VERSION
 %{gem_instdir}/example
-%{gem_instdir}/install-vips.sh
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Nov 18 2025 Vít Ondruch <vondruch@redhat.com> - 2.2.5-1
+- Update to ruby-vips 2.2.5
+  Resolves: rhbz#2344206
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.17-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
