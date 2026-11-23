@@ -3,10 +3,10 @@ category = "azl-temp-workaround"
 upstream-status = "upstreamable"
 
 [[overlays]]
-description = "Update to nginx 1.30.7 for upstream security fixes until Fedora updates its stable package; see https://nginx.org/en/CHANGES-1.30"
+description = "Update to nginx 1.30.8 for upstream security fixes until Fedora updates its stable package; see https://nginx.org/en/CHANGES-1.30"
 type = "spec-update-tag"
 tag = "Version"
-value = "1.30.7"
+value = "1.30.8"
 
 [[overlays]]
 description = "Remove obsolete nginx 1.30.6 source and signature checksums"
