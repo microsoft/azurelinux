@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.62.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,9 @@ Patch13:        CVE-2026-116586.patch
 Patch14:        CVE-2026-116591.patch
 Patch15:        CVE-2026-97045.patch
 Patch16:        CVE-2026-116587.patch
+# Test backport of https://github.com/kubevirt/containerized-data-importer/pull/4237
+Patch17:        node-pull-use-image-volume.patch
+BuildRequires:  binutils
 # Regenerated vendor tree pulls modules whose go.mod requires go >= 1.25.
 BuildRequires:  golang >= 1.25
 BuildRequires:  golang-packaging
@@ -153,9 +156,9 @@ GOFLAGS="-buildmode=pie ${GOFLAGS}" ./hack/build/build-go.sh build \
     tools/csv-generator \
     %{nil}
 
-# Disable cgo to build static binaries, so they can run on scratch images
+# The extractor is copied into the registry disk image, which can be FROM scratch.
 CGO_ENABLED=0 ./hack/build/build-go.sh build \
-    tools/cdi-containerimage-server \
+    tools/cdi-env-extractor \
     %{nil}
  
 ./hack/build/build-manifests.sh
@@ -178,7 +181,7 @@ install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindi
 
 install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/cdi-uploadserver
 
-install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/cdi-containerimage-server
+install -p -m 0755 _out/tools/cdi-env-extractor/cdi-env-extractor %{buildroot}%{_bindir}/cdi-env-extractor
 
 install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/cdi-image-size-detection
 
@@ -190,6 +193,14 @@ install -p -m 0755 _out/tools/csv-generator/csv-generator %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_datadir}/cdi/manifests/release
 install -m 0644 _out/manifests/release/cdi-operator.yaml %{buildroot}%{_datadir}/cdi/manifests/release/
 install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/manifests/release/
+
+%check
+# The source image need not contain an ELF loader or runtime libraries.
+readelf -lWd %{buildroot}%{_bindir}/cdi-env-extractor > cdi-env-extractor.elf
+if grep -Eq '^[[:space:]]*INTERP[[:space:]]|\(NEEDED\)' cdi-env-extractor.elf; then
+    echo "cdi-env-extractor is not standalone" >&2
+    exit 1
+fi
 
 %files api
 %license LICENSE
@@ -211,7 +222,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %license LICENSE
 %doc README.md
 %{_bindir}/cdi-importer
-%{_bindir}/cdi-containerimage-server
+%{_bindir}/cdi-env-extractor
 %{_bindir}/cdi-image-size-detection
 %{_bindir}/cdi-source-update-poller
 
@@ -240,6 +251,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Mon Nov 23 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.62.0-12
+- Test the upstream image-volume backport for registry imports with node pull
+
 * Thu Nov 05 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.62.0-11
 - Patch for CVE-2026-116587
 

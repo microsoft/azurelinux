@@ -1,0 +1,1137 @@
+Subject: [PATCH] Backport registry node-pull image volumes to CDI v1.62.0
+Upstream: https://github.com/kubevirt/containerized-data-importer/pull/4237
+Upstream-head: 3cd7bfb4be7596205ef765445172729f2366380f (nav1s)
+Base: kubevirt/containerized-data-importer v1.62.0
+
+Test backport of the proposed upstream change, not a released upstream fix.
+Mount the source image read-only in the importer and run the dependency-free
+env extractor in the source image to preserve PVC label decoration.
+
+Adapt to v1.62's transfer signatures, HTTP implementation and Bazel image
+packaging. This release has neither bootc detection nor the later DataImportCron
+node-pull poller. Do not copy source environment values to the importer log.
+
+diff --git a/cmd/cdi-importer/BUILD.bazel b/cmd/cdi-importer/BUILD.bazel
+index dbac77d..de6033e 100644
+--- a/cmd/cdi-importer/BUILD.bazel
++++ b/cmd/cdi-importer/BUILD.bazel
+@@ -48,7 +48,7 @@ container_image(
+         ":cdi-importer",
+         "//cmd/openstack-populator",
+         "//cmd/ovirt-populator",
+-        "//tools/cdi-containerimage-server",
++        "//tools/cdi-env-extractor",
+         "//tools/cdi-image-size-detection",
+         "//tools/cdi-source-update-poller",
+     ],
+diff --git a/cmd/cdi-importer/importer.go b/cmd/cdi-importer/importer.go
+index 341f75f..2e5019b 100644
+--- a/cmd/cdi-importer/importer.go
++++ b/cmd/cdi-importer/importer.go
+@@ -18,8 +18,6 @@ import (
+ 	"fmt"
+ 	"os"
+ 	"strconv"
+-	"strings"
+-	"time"
+ 
+ 	v1 "k8s.io/api/core/v1"
+ 	"k8s.io/apimachinery/pkg/api/resource"
+@@ -44,57 +42,6 @@ func init() {
+ 	flag.Parse()
+ }
+ 
+-func waitForReadyFile() {
+-	const readyFileTimeoutSeconds = 60
+-	readyFile, _ := util.ParseEnvVar(common.ImporterReadyFile, false)
+-	if readyFile == "" {
+-		return
+-	}
+-	for i := 0; i < readyFileTimeoutSeconds; i++ {
+-		if _, err := os.Stat(readyFile); err == nil {
+-			return
+-		}
+-		time.Sleep(time.Second)
+-	}
+-	err := util.WriteTerminationMessage(fmt.Sprintf("Timeout waiting for file %s", readyFile))
+-	if err != nil {
+-		klog.Errorf("%+v", err)
+-	}
+-	os.Exit(1)
+-}
+-
+-func getHTTPEp(ep string) string {
+-	readyFile, err := util.ParseEnvVar(common.ImporterReadyFile, false)
+-	if err != nil {
+-		klog.Errorf("Failed parsing env var %s: %+v", common.ImporterReadyFile, err)
+-		os.Exit(1)
+-	}
+-	if len(readyFile) == 0 {
+-		return ep
+-	}
+-	imageName, err := os.ReadFile(readyFile)
+-	if err != nil {
+-		klog.Errorf("Failed reading file %s: %+v", readyFile, err)
+-		os.Exit(1)
+-	}
+-	if len(imageName) == 0 {
+-		return ep
+-	}
+-	return strings.TrimSuffix(ep, common.DiskImageName) + string(imageName)
+-}
+-
+-func touchDoneFile() {
+-	doneFile, _ := util.ParseEnvVar(common.ImporterDoneFile, false)
+-	if doneFile == "" {
+-		return
+-	}
+-	f, err := os.OpenFile(doneFile, os.O_CREATE|os.O_EXCL, 0666)
+-	if err != nil {
+-		klog.Errorf("Failed creating file %s: %+v", doneFile, err)
+-	}
+-	f.Close()
+-}
+-
+ func main() {
+ 	defer klog.Flush()
+ 
+@@ -144,7 +91,6 @@ func main() {
+ 			os.Exit(1)
+ 		}
+ 	} else {
+-		waitForReadyFile()
+ 		exitCode := handleImport(source, contentType, volumeMode, imageSize, filesystemOverhead, preallocation)
+ 		if exitCode != 0 {
+ 			os.Exit(exitCode)
+@@ -204,7 +150,6 @@ func handleImport(
+ 	termMsg.PreallocationApplied = ptr.To(processor.PreallocationApplied())
+ 	termMsg.Message = ptr.To(completeMessage)
+ 
+-	touchDoneFile()
+ 	if err := writeTerminationMessage(termMsg); err != nil {
+ 		klog.Errorf("%+v", err)
+ 		return 1
+@@ -269,7 +214,7 @@ func newDataSource(source string, contentType string, volumeMode v1.PersistentVo
+ 
+ 	switch source {
+ 	case cc.SourceHTTP:
+-		ds, err := importer.NewHTTPDataSource(getHTTPEp(ep), acc, sec, certDir, cdiv1.DataVolumeContentType(contentType))
++		ds, err := importer.NewHTTPDataSource(ep, acc, sec, certDir, cdiv1.DataVolumeContentType(contentType))
+ 		if err != nil {
+ 			errorCannotConnectDataSource(err, "http")
+ 		}
+@@ -281,7 +226,7 @@ func newDataSource(source string, contentType string, volumeMode v1.PersistentVo
+ 		}
+ 		return ds
+ 	case cc.SourceRegistry:
+-		ds := importer.NewRegistryDataSource(ep, acc, sec, certDir, insecureTLS)
++		ds := importer.NewRegistryDataSource(ep, acc, sec, certDir, insecureTLS, os.Getenv(common.ImporterPullMethod), os.Getenv(common.ImporterImageRootDir), os.Getenv(common.ImporterEnvFile))
+ 		return ds
+ 	case cc.SourceS3:
+ 		ds, err := importer.NewS3DataSource(ep, acc, sec, certDir)
+diff --git a/hack/build/build-go.sh b/hack/build/build-go.sh
+index 9d549d2..02f6553 100755
+--- a/hack/build/build-go.sh
++++ b/hack/build/build-go.sh
+@@ -55,7 +55,7 @@ elif [ "${go_opt}" == "build" ]; then
+         rm -f ${outFile}
+         rm -f ${outLink}
+         static_flag=""
+-        if [ "$tgt" == "tools/cdi-containerimage-server" ]; then
++        if [ "$tgt" == "tools/cdi-env-extractor" ]; then
+             static_flag="static"
+         fi
+         (
+diff --git a/pkg/common/common.go b/pkg/common/common.go
+index 2cec5e0..01bac89 100644
+--- a/pkg/common/common.go
++++ b/pkg/common/common.go
+@@ -127,10 +127,10 @@ const (
+ 	ImporterUUID = "IMPORTER_UUID"
+ 	// ImporterPullMethod provides a constant to capture our env variable "IMPORTER_PULL_METHOD"
+ 	ImporterPullMethod = "IMPORTER_PULL_METHOD"
+-	// ImporterReadyFile provides a constant to capture our env variable "IMPORTER_READY_FILE"
+-	ImporterReadyFile = "IMPORTER_READY_FILE"
+-	// ImporterDoneFile provides a constant to capture our env variable "IMPORTER_DONE_FILE"
+-	ImporterDoneFile = "IMPORTER_DONE_FILE"
++	// ImporterEnvFile provides a constant to capture our env variable "IMPORTER_ENV_FILE"
++	ImporterEnvFile = "IMPORTER_ENV_FILE"
++	// ImporterImageRootDir provides a constant to capture our env variable "IMPORTER_IMAGE_ROOT_DIR"
++	ImporterImageRootDir = "IMPORTER_IMAGE_ROOT_DIR"
+ 	// ImporterBackingFile provides a constant to capture our env variable "IMPORTER_BACKING_FILE"
+ 	ImporterBackingFile = "IMPORTER_BACKING_FILE"
+ 	// ImporterThumbprint provides a constant to capture our env variable "IMPORTER_THUMBPRINT"
+@@ -379,8 +379,3 @@ func (it *TerminationMessage) String() (string, error) {
+ 
+ 	return string(msg), nil
+ }
+-
+-// ServerInfo contains data to be serialized and used as the body of responses to the info endpoint of the containerimage-server.
+-type ServerInfo struct {
+-	Env []string `json:"env,omitempty"`
+-}
+diff --git a/pkg/controller/import-controller.go b/pkg/controller/import-controller.go
+index 2251173..cbaf6d1 100644
+--- a/pkg/controller/import-controller.go
++++ b/pkg/controller/import-controller.go
+@@ -85,8 +85,8 @@ type importPodEnvVar struct {
+ 	diskID             string
+ 	uuid               string
+ 	pullMethod         string
+-	readyFile          string
+-	doneFile           string
++	envFile            string
++	imageRootDir       string
+ 	backingFile        string
+ 	thumbprint         string
+ 	filesystemOverhead string
+@@ -978,22 +978,10 @@ func makeImporterContainerSpec(args *importerPodArgs) []corev1.Container {
+ 		containers[0].VolumeMounts = cc.AddImportVolumeMounts()
+ 	}
+ 	if isRegistryNodeImport(args) {
+-		containers = append(containers, corev1.Container{
+-			Name:            "server",
+-			Image:           args.importImage,
+-			ImagePullPolicy: corev1.PullPolicy(args.pullPolicy),
+-			Command:         []string{"/shared/server", "-p", "8100", "-image-dir", "/disk", "-ready-file", "/shared/ready", "-done-file", "/shared/done"},
+-			VolumeMounts: []corev1.VolumeMount{
+-				{
+-					MountPath: "/shared",
+-					Name:      "shared-volume",
+-				},
+-			},
+-		})
+-		containers[0].VolumeMounts = append(containers[0].VolumeMounts, corev1.VolumeMount{
+-			MountPath: "/shared",
+-			Name:      "shared-volume",
+-		})
++		containers[0].VolumeMounts = append(containers[0].VolumeMounts,
++			corev1.VolumeMount{Name: "shared-volume", MountPath: "/shared", ReadOnly: true},
++			corev1.VolumeMount{Name: "image-volume", MountPath: "/image", ReadOnly: true},
++		)
+ 	}
+ 	if args.scratchPvcName != nil {
+ 		containers[0].VolumeMounts = append(containers[0].VolumeMounts, corev1.VolumeMount{
+@@ -1058,12 +1046,23 @@ func makeImporterVolumeSpec(args *importerPodArgs) []corev1.Volume {
+ 		},
+ 	}
+ 	if isRegistryNodeImport(args) {
+-		volumes = append(volumes, corev1.Volume{
+-			Name: "shared-volume",
+-			VolumeSource: corev1.VolumeSource{
+-				EmptyDir: &corev1.EmptyDirVolumeSource{},
++		volumes = append(
++			volumes, corev1.Volume{
++				Name: "shared-volume",
++				VolumeSource: corev1.VolumeSource{
++					EmptyDir: &corev1.EmptyDirVolumeSource{},
++				},
+ 			},
+-		})
++			corev1.Volume{
++				Name: "image-volume",
++				VolumeSource: corev1.VolumeSource{
++					Image: &corev1.ImageVolumeSource{
++						Reference:  args.importImage,
++						PullPolicy: corev1.PullPolicy(args.pullPolicy),
++					},
++				},
++			},
++		)
+ 	}
+ 	if args.scratchPvcName != nil {
+ 		volumes = append(volumes, corev1.Volume{
+@@ -1121,18 +1120,24 @@ func makeImporterVolumeSpec(args *importerPodArgs) []corev1.Volume {
+ func makeImporterInitContainersSpec(args *importerPodArgs) []corev1.Container {
+ 	var initContainers []corev1.Container
+ 	if isRegistryNodeImport(args) {
+-		initContainers = append(initContainers, corev1.Container{
+-			Name:            "init",
+-			Image:           args.image,
+-			ImagePullPolicy: corev1.PullPolicy(args.pullPolicy),
+-			Command:         []string{"sh", "-c", "cp /usr/bin/cdi-containerimage-server /shared/server"},
+-			VolumeMounts: []corev1.VolumeMount{
+-				{
+-					MountPath: "/shared",
+-					Name:      "shared-volume",
+-				},
++		shared := []corev1.VolumeMount{{Name: "shared-volume", MountPath: "/shared"}}
++		initContainers = append(initContainers,
++			corev1.Container{
++				Name:                     "init",
++				Image:                    args.image,
++				ImagePullPolicy:          corev1.PullPolicy(args.pullPolicy),
++				Command:                  []string{"sh", "-c", "cp /usr/bin/cdi-env-extractor /shared/env-extractor"},
++				VolumeMounts:             shared,
++				TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,
+ 			},
+-		})
++			corev1.Container{
++				Name:                     "env-extractor",
++				Image:                    args.importImage,
++				ImagePullPolicy:          corev1.PullPolicy(args.pullPolicy),
++				Command:                  []string{"/shared/env-extractor", "-env-file", "/shared/env"},
++				VolumeMounts:             shared,
++				TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,
++			})
+ 	}
+ 	if args.vddkImageName != nil {
+ 		initContainers = append(initContainers, corev1.Container{
+@@ -1167,11 +1172,9 @@ func getOwnerUID(args *importerPodArgs) types.UID {
+ }
+ 
+ func setRegistryNodeImportEnvVars(args *importerPodArgs) {
+-	args.podEnvVar.source = cc.SourceHTTP
+-	args.podEnvVar.ep = "http://localhost:8100/disk.img"
+ 	args.podEnvVar.pullMethod = string(cdiv1.RegistryPullNode)
+-	args.podEnvVar.readyFile = "/shared/ready"
+-	args.podEnvVar.doneFile = "/shared/done"
++	args.podEnvVar.envFile = "/shared/env"
++	args.podEnvVar.imageRootDir = "/image"
+ }
+ 
+ func createConfigMapVolume(certVolName, objRef string) corev1.Volume {
+@@ -1242,12 +1245,12 @@ func makeImportEnv(podEnvVar *importPodEnvVar, uid types.UID) []corev1.EnvVar {
+ 			Value: podEnvVar.pullMethod,
+ 		},
+ 		{
+-			Name:  common.ImporterReadyFile,
+-			Value: podEnvVar.readyFile,
++			Name:  common.ImporterEnvFile,
++			Value: podEnvVar.envFile,
+ 		},
+ 		{
+-			Name:  common.ImporterDoneFile,
+-			Value: podEnvVar.doneFile,
++			Name:  common.ImporterImageRootDir,
++			Value: podEnvVar.imageRootDir,
+ 		},
+ 		{
+ 			Name:  common.ImporterBackingFile,
+diff --git a/pkg/controller/import-controller_test.go b/pkg/controller/import-controller_test.go
+index b2118ca..1611d44 100644
+--- a/pkg/controller/import-controller_test.go
++++ b/pkg/controller/import-controller_test.go
+@@ -936,6 +936,28 @@ var _ = Describe("Create Importer Pod", func() {
+ 		Entry("with long PVC and checkpoint names", strings.Repeat("test-pvc-", 20), strings.Repeat("repeating-checkpoint-id-", 10)),
+ 	)
+ 
++	It("should mount the node-pulled image and extract its environment before import", func() {
++		pvc := cc.CreatePvc("test", "default", map[string]string{
++			cc.AnnSource: cc.SourceRegistry, cc.AnnRegistryImportMethod: string(cdiv1.RegistryPullNode),
++		}, nil)
++		args := &importerPodArgs{pvc: pvc, podEnvVar: &importPodEnvVar{source: cc.SourceRegistry}, image: testImage, importImage: "registry.example/disk:v1", pullPolicy: testPullPolicy}
++		setRegistryNodeImportEnvVars(args)
++		Expect(args.podEnvVar.source).To(Equal(cc.SourceRegistry))
++		containers := makeImporterContainerSpec(args)
++		Expect(containers).To(HaveLen(1))
++		Expect(containers[0].VolumeMounts).To(ContainElement(corev1.VolumeMount{Name: "image-volume", MountPath: "/image", ReadOnly: true}))
++		Expect(makeImporterVolumeSpec(args)).To(ContainElement(corev1.Volume{
++			Name: "image-volume", VolumeSource: corev1.VolumeSource{Image: &corev1.ImageVolumeSource{
++				Reference: args.importImage, PullPolicy: corev1.PullPolicy(testPullPolicy),
++			}},
++		}))
++		init := makeImporterInitContainersSpec(args)
++		Expect(init).To(HaveLen(2))
++		Expect(init[0].Image).To(Equal(testImage))
++		Expect(init[1].Image).To(Equal(args.importImage))
++		Expect(init[1].Command).To(Equal([]string{"/shared/env-extractor", "-env-file", args.podEnvVar.envFile}))
++	})
++
+ 	It("should mount extra VDDK arguments ConfigMap when annotation is set", func() {
+ 		pvcName := "testPvc1"
+ 		podName := "testpod"
+@@ -983,8 +1005,8 @@ var _ = Describe("Import test env", func() {
+ 			certConfigMap:      "",
+ 			diskID:             "",
+ 			uuid:               "",
+-			readyFile:          "",
+-			doneFile:           "",
++			envFile:            "",
++			imageRootDir:       "",
+ 			backingFile:        "",
+ 			thumbprint:         "",
+ 			filesystemOverhead: "0.055",
+@@ -1177,6 +1199,7 @@ func createImportReconciler(objects ...runtime.Object) *ImportReconciler {
+ 		log:            importLog,
+ 		recorder:       rec,
+ 		featureGates:   featuregates.NewFeatureGates(cl),
++		pullPolicy:     testPullPolicy,
+ 		installerLabels: map[string]string{
+ 			common.AppKubernetesPartOfLabel:  "testing",
+ 			common.AppKubernetesVersionLabel: "v0.0.0-tests",
+@@ -1228,12 +1251,12 @@ func createImportTestEnv(podEnvVar *importPodEnvVar, uid string) []corev1.EnvVar
+ 			Value: podEnvVar.pullMethod,
+ 		},
+ 		{
+-			Name:  common.ImporterReadyFile,
+-			Value: podEnvVar.readyFile,
++			Name:  common.ImporterEnvFile,
++			Value: podEnvVar.envFile,
+ 		},
+ 		{
+-			Name:  common.ImporterDoneFile,
+-			Value: podEnvVar.doneFile,
++			Name:  common.ImporterImageRootDir,
++			Value: podEnvVar.imageRootDir,
+ 		},
+ 		{
+ 			Name:  common.ImporterBackingFile,
+diff --git a/pkg/controller/util.go b/pkg/controller/util.go
+index 39b5073..825c8c7 100644
+--- a/pkg/controller/util.go
++++ b/pkg/controller/util.go
+@@ -21,6 +21,7 @@ import (
+ 	"crypto/rsa"
+ 	"encoding/json"
+ 	"fmt"
++	"slices"
+ 	"strconv"
+ 	"strings"
+ 
+@@ -44,6 +45,9 @@ import (
+ 	"kubevirt.io/containerized-data-importer/pkg/util/cert"
+ )
+ 
++// imagePullFailureReasons is a slice that contains all of the waiting reasons that indicate that the importer pod has failed to import an image
++var imagePullFailureReasons = []string{"ImagePullBackOff", "ErrImagePull", "InvalidImageName"}
++
+ const (
+ 	// CertVolName is the name of the volume containing certs
+ 	CertVolName = "cdi-cert-vol"
+@@ -317,14 +321,11 @@ func setAnnotationsFromPodWithPrefix(anno map[string]string, pod *corev1.Pod, te
+ 
+ 	anno[cc.AnnRunningCondition] = "false"
+ 
+-	for _, status := range pod.Status.ContainerStatuses {
+-		if status.Started != nil && !(*status.Started) && status.State.Waiting != nil {
+-			switch status.State.Waiting.Reason {
+-			case "ImagePullBackOff", "ErrImagePull", "InvalidImageName":
+-				anno[prefix+".message"] = fmt.Sprintf("%s: %s", common.ImagePullFailureText, status.Image)
+-				anno[prefix+".reason"] = ImagePullFailedReason
+-				return
+-			}
++	for _, status := range slices.Concat(pod.Status.ContainerStatuses, pod.Status.InitContainerStatuses) {
++		if status.State.Waiting != nil && slices.Contains(imagePullFailureReasons, status.State.Waiting.Reason) {
++			anno[prefix+".message"] = fmt.Sprintf("%s: %s", common.ImagePullFailureText, status.Image)
++			anno[prefix+".reason"] = ImagePullFailedReason
++			return
+ 		}
+ 	}
+ 
+diff --git a/pkg/importer/http-datasource.go b/pkg/importer/http-datasource.go
+index 120ad90..9d9da94 100644
+--- a/pkg/importer/http-datasource.go
++++ b/pkg/importer/http-datasource.go
+@@ -20,8 +20,6 @@ import (
+ 	"context"
+ 	"crypto/tls"
+ 	"crypto/x509"
+-	"encoding/json"
+-	"fmt"
+ 	"io"
+ 	"io/fs"
+ 	"net/http"
+@@ -40,14 +38,11 @@ import (
+ 
+ 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
+ 	"kubevirt.io/containerized-data-importer/pkg/common"
+-	"kubevirt.io/containerized-data-importer/pkg/image"
+ 	"kubevirt.io/containerized-data-importer/pkg/util"
+ )
+ 
+ const (
+ 	tempFile          = "tmpimage"
+-	nbdkitPid         = "/tmp/nbdkit.pid"
+-	nbdkitSocket      = "/tmp/nbdkit.sock"
+ 	defaultUserAgent  = "cdi-golang-importer"
+ 	httpContentType   = "Content-Type"
+ 	httpContentLength = "Content-Length"
+@@ -79,12 +74,8 @@ type HTTPDataSource struct {
+ 	brokenForQemuImg bool
+ 	// the content length reported by the http server.
+ 	contentLength uint64
+-
+-	n image.NbdkitOperation
+ }
+ 
+-var createNbdkitCurl = image.NewNbdkitCurl
+-
+ // NewHTTPDataSource creates a new instance of the http data provider.
+ func NewHTTPDataSource(endpoint, accessKey, secKey, certDir string, contentType cdiv1.DataVolumeContentType) (*HTTPDataSource, error) {
+ 	ep, err := ParseEndpoint(endpoint)
+@@ -115,11 +106,6 @@ func NewHTTPDataSource(endpoint, accessKey, secKey, certDir string, contentType
+ 		brokenForQemuImg: brokenForQemuImg,
+ 		contentLength:    contentLength,
+ 	}
+-	httpSource.n, err = createNbdkitCurl(nbdkitPid, accessKey, secKey, certDir, nbdkitSocket, extraHeaders, secretExtraHeaders)
+-	if err != nil {
+-		cancel()
+-		return nil, err
+-	}
+ 	// We know this is a counting reader, so no need to check.
+ 	countingReader := httpReader.(*util.CountingReader)
+ 	go httpSource.pollProgress(countingReader, 10*time.Minute, time.Second)
+@@ -137,13 +123,6 @@ func (hs *HTTPDataSource) Info() (ProcessingPhase, error) {
+ 	if hs.contentType == cdiv1.DataVolumeArchive {
+ 		return ProcessingPhaseTransferDataDir, nil
+ 	}
+-	if pullMethod, _ := util.ParseEnvVar(common.ImporterPullMethod, false); pullMethod == string(cdiv1.RegistryPullNode) {
+-		hs.url, _ = url.Parse(fmt.Sprintf("nbd+unix:///?socket=%s", nbdkitSocket))
+-		if err = hs.n.StartNbdkit(hs.endpoint.String()); err != nil {
+-			return ProcessingPhaseError, err
+-		}
+-		return ProcessingPhaseConvert, nil
+-	}
+ 	return ProcessingPhaseTransferScratch, nil
+ }
+ 
+@@ -196,19 +175,7 @@ func (hs *HTTPDataSource) GetURL() *url.URL {
+ 
+ // GetTerminationMessage returns data to be serialized and used as the termination message of the importer.
+ func (hs *HTTPDataSource) GetTerminationMessage() *common.TerminationMessage {
+-	if pullMethod, _ := util.ParseEnvVar(common.ImporterPullMethod, false); pullMethod != string(cdiv1.RegistryPullNode) {
+-		return nil
+-	}
+-
+-	info, err := getServerInfo(hs.ctx, fmt.Sprintf("%s://%s/info", hs.endpoint.Scheme, hs.endpoint.Host))
+-	if err != nil {
+-		klog.Errorf("%+v", err)
+-		return nil
+-	}
+-
+-	return &common.TerminationMessage{
+-		Labels: envsToLabels(info.Env),
+-	}
++	return nil
+ }
+ 
+ // Close all readers.
+@@ -515,33 +482,3 @@ func getExtraHeadersFromSecrets() ([]string, error) {
+ 
+ 	return secretExtraHeaders, err
+ }
+-
+-func getServerInfo(ctx context.Context, infoURL string) (*common.ServerInfo, error) {
+-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, infoURL, nil)
+-	if err != nil {
+-		return nil, errors.Wrap(err, "failed to construct request for containerimage-server info")
+-	}
+-
+-	client := &http.Client{}
+-	resp, err := client.Do(req)
+-	if err != nil {
+-		return nil, errors.Wrap(err, "failed request containerimage-server info")
+-	}
+-	defer resp.Body.Close()
+-
+-	if resp.StatusCode != http.StatusOK {
+-		return nil, fmt.Errorf("failed request containerimage-server info: expected status code 200, got %d", resp.StatusCode)
+-	}
+-
+-	body, err := io.ReadAll(resp.Body)
+-	if err != nil {
+-		return nil, errors.Wrap(err, "failed to read body of containerimage-server info request")
+-	}
+-
+-	info := &common.ServerInfo{}
+-	if err := json.Unmarshal(body, info); err != nil {
+-		return nil, errors.Wrap(err, "failed to unmarshal body of containerimage-server info request")
+-	}
+-
+-	return info, nil
+-}
+diff --git a/pkg/importer/http-datasource_test.go b/pkg/importer/http-datasource_test.go
+index 0516766..d7c4f59 100644
+--- a/pkg/importer/http-datasource_test.go
++++ b/pkg/importer/http-datasource_test.go
+@@ -3,7 +3,6 @@ package importer
+ import (
+ 	"context"
+ 	"crypto/x509"
+-	"encoding/json"
+ 	"io"
+ 	"net/http"
+ 	"net/http/httptest"
+@@ -20,7 +19,6 @@ import (
+ 
+ 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
+ 	"kubevirt.io/containerized-data-importer/pkg/common"
+-	"kubevirt.io/containerized-data-importer/pkg/image"
+ 	"kubevirt.io/containerized-data-importer/pkg/util"
+ 	"kubevirt.io/containerized-data-importer/pkg/util/cert"
+ 	"kubevirt.io/containerized-data-importer/pkg/util/cert/triple"
+@@ -45,9 +43,8 @@ var _ = Describe("Http data source", func() {
+ 	)
+ 
+ 	BeforeEach(func() {
+-		createNbdkitCurl = image.NewMockNbdkitCurl
+ 		By("[BeforeEach] Creating test server")
+-		ts = createTestServer(imageDir, nil)
++		ts = createTestServer(imageDir)
+ 		dp = nil
+ 		tmpDir, err = os.MkdirTemp("", "scratch")
+ 		Expect(err).NotTo(HaveOccurred())
+@@ -188,12 +185,7 @@ var _ = Describe("Http data source", func() {
+ 		Expect(err).NotTo(HaveOccurred())
+ 	})
+ 
+-	It("GetTerminationMessage should return nil when pullMethod is not node", func() {
+-		Expect(os.Setenv(common.ImporterPullMethod, string(cdiv1.RegistryPullPod))).To(Succeed())
+-		DeferCleanup(func() {
+-			Expect(os.Unsetenv(common.ImporterPullMethod)).To(Succeed())
+-		})
+-
++	It("GetTerminationMessage should return nil", func() {
+ 		dp, err = NewHTTPDataSource(ts.URL+"/"+tinyCoreGz, "", "", "", cdiv1.DataVolumeKubeVirt)
+ 		Expect(err).NotTo(HaveOccurred())
+ 
+@@ -201,45 +193,6 @@ var _ = Describe("Http data source", func() {
+ 		Expect(termMsg).To(BeNil())
+ 	})
+ 
+-	DescribeTable("GetTerminationMessage should handle empty Env returned by http server", func(emptyEnv []string) {
+-		Expect(os.Setenv(common.ImporterPullMethod, string(cdiv1.RegistryPullNode))).To(Succeed())
+-		DeferCleanup(func() {
+-			Expect(os.Unsetenv(common.ImporterPullMethod)).To(Succeed())
+-		})
+-
+-		ts2 := createTestServer(imageDir, emptyEnv)
+-
+-		dp, err = NewHTTPDataSource(ts2.URL+"/"+tinyCoreGz, "", "", "", cdiv1.DataVolumeKubeVirt)
+-		Expect(err).NotTo(HaveOccurred())
+-
+-		termMsg := dp.GetTerminationMessage()
+-		Expect(termMsg.Labels).To(BeEmpty())
+-		Expect(termMsg.String()).To(Equal("{}"))
+-	},
+-		Entry("empty slice", []string{}),
+-		Entry("nil slice", nil),
+-	)
+-
+-	It("GetTerminationMessage should contain labels collected from the containerimage-server when pullMethod is node", func() {
+-		Expect(os.Setenv(common.ImporterPullMethod, string(cdiv1.RegistryPullNode))).To(Succeed())
+-		DeferCleanup(func() {
+-			Expect(os.Unsetenv(common.ImporterPullMethod)).To(Succeed())
+-		})
+-
+-		ts2 := createTestServer(imageDir, []string{
+-			"INSTANCETYPE_KUBEVIRT_IO_DEFAULT_INSTANCETYPE=u1.small",
+-			"INSTANCETYPE_KUBEVIRT_IO_DEFAULT_PREFERENCE=fedora",
+-		})
+-
+-		dp, err = NewHTTPDataSource(ts2.URL+"/"+tinyCoreGz, "", "", "", cdiv1.DataVolumeKubeVirt)
+-		Expect(err).NotTo(HaveOccurred())
+-
+-		termMsg := dp.GetTerminationMessage()
+-		Expect(termMsg).ToNot(BeNil())
+-		Expect(termMsg.Labels).To(HaveLen(2))
+-		Expect(termMsg.Labels).To(HaveKeyWithValue("instancetype.kubevirt.io/default-instancetype", "u1.small"))
+-		Expect(termMsg.Labels).To(HaveKeyWithValue("instancetype.kubevirt.io/default-preference", "fedora"))
+-	})
+ })
+ 
+ var _ = Describe("Http client", func() {
+@@ -484,17 +437,8 @@ var _ = Describe("http pollprogress", func() {
+ 	})
+ })
+ 
+-func createTestServer(imageDir string, env []string) *httptest.Server {
++func createTestServer(imageDir string) *httptest.Server {
+ 	mux := http.NewServeMux()
+-	mux.HandleFunc("/info", func(w http.ResponseWriter, _ *http.Request) {
+-		defer GinkgoRecover()
+-		info := common.ServerInfo{
+-			Env: env,
+-		}
+-		w.Header().Set("Content-Type", "application/json")
+-		err := json.NewEncoder(w).Encode(info)
+-		Expect(err).NotTo(HaveOccurred())
+-	})
+ 	mux.Handle("/", http.FileServer(http.Dir(imageDir)))
+ 	return httptest.NewServer(mux)
+ }
+diff --git a/pkg/importer/imageio-datasource_test.go b/pkg/importer/imageio-datasource_test.go
+index 95848dd..a99ed32 100644
+--- a/pkg/importer/imageio-datasource_test.go
++++ b/pkg/importer/imageio-datasource_test.go
+@@ -48,7 +48,7 @@ var _ = Describe("Imageio reader", func() {
+ 		newOvirtClientFunc = createMockOvirtClient
+ 		newTerminationChannel = createMockTerminationChannel
+ 		tempDir = createCert()
+-		ts = createTestServer(imageDir, nil)
++		ts = createTestServer(imageDir)
+ 		disk.SetTotalSize(1024)
+ 		disk.SetId(diskID)
+ 		it.SetPhase(ovirtsdk4.IMAGETRANSFERPHASE_TRANSFERRING)
+@@ -93,7 +93,7 @@ var _ = Describe("Imageio data source", func() {
+ 		newOvirtClientFunc = createMockOvirtClient
+ 		newTerminationChannel = createMockTerminationChannel
+ 		tempDir = createCert()
+-		ts = createTestServer(imageDir, nil)
++		ts = createTestServer(imageDir)
+ 		disk.SetTotalSize(1024)
+ 		disk.SetId(diskID)
+ 		it.SetPhase(ovirtsdk4.IMAGETRANSFERPHASE_TRANSFERRING)
+@@ -246,7 +246,7 @@ var _ = Describe("Imageio cancel", func() {
+ 		newOvirtClientFunc = createMockOvirtClient
+ 		newTerminationChannel = createMockTerminationChannel
+ 		tempDir = createCert()
+-		ts = createTestServer(imageDir, nil)
++		ts = createTestServer(imageDir)
+ 		disk.SetTotalSize(1024)
+ 		disk.SetId(diskID)
+ 		it.SetPhase(ovirtsdk4.IMAGETRANSFERPHASE_TRANSFERRING)
+@@ -386,7 +386,7 @@ var _ = Describe("imageio snapshots", func() {
+ 		newOvirtClientFunc = createMockOvirtClient
+ 		newTerminationChannel = createMockTerminationChannel
+ 		tempDir = createCert()
+-		ts = createTestServer(imageDir, nil)
++		ts = createTestServer(imageDir)
+ 		disk.SetTotalSize(diskSize)
+ 		disk.SetId(diskID)
+ 		it.SetPhase(ovirtsdk4.IMAGETRANSFERPHASE_TRANSFERRING)
+diff --git a/pkg/importer/registry-datasource.go b/pkg/importer/registry-datasource.go
+index 9886fd7..995c8ac 100644
+--- a/pkg/importer/registry-datasource.go
++++ b/pkg/importer/registry-datasource.go
+@@ -27,6 +27,7 @@ import (
+ 
+ 	"k8s.io/klog/v2"
+ 
++	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
+ 	"kubevirt.io/containerized-data-importer/pkg/common"
+ 	"kubevirt.io/containerized-data-importer/pkg/util"
+ )
+@@ -42,12 +43,15 @@ const (
+ // 1. Info -> Transfer
+ // 2. Transfer -> Convert
+ type RegistryDataSource struct {
+-	endpoint    string
+-	accessKey   string
+-	secKey      string
+-	certDir     string
+-	insecureTLS bool
+-	imageDir    string
++	endpoint     string
++	accessKey    string
++	secKey       string
++	certDir      string
++	insecureTLS  bool
++	imageDir     string
++	pullMethod   string
++	imageRootDir string
++	envFile      string
+ 	//The discovered image file in scratch space.
+ 	url *url.URL
+ 	//The discovered image info from the registry.
+@@ -55,7 +59,10 @@ type RegistryDataSource struct {
+ }
+ 
+ // NewRegistryDataSource creates a new instance of the Registry Data Source.
+-func NewRegistryDataSource(endpoint, accessKey, secKey, certDir string, insecureTLS bool) *RegistryDataSource {
++func NewRegistryDataSource(endpoint, accessKey, secKey, certDir string, insecureTLS bool, pullMethod, imageRootDir, envFile string) *RegistryDataSource {
++	if pullMethod == string(cdiv1.RegistryPullNode) {
++		return &RegistryDataSource{pullMethod: pullMethod, imageRootDir: imageRootDir, envFile: envFile}
++	}
+ 	allCertDir, err := CreateCertificateDir(certDir)
+ 	if err != nil {
+ 		klog.Infof("Error creating allCertDir %v", err)
+@@ -83,24 +90,31 @@ func (rd *RegistryDataSource) Info() (ProcessingPhase, error) {
+ 
+ // Transfer is called to transfer the data from the source registry to a temporary location.
+ func (rd *RegistryDataSource) Transfer(path string) (ProcessingPhase, error) {
+-	rd.imageDir = filepath.Join(path, containerDiskImageDir)
+-	if err := CleanAll(rd.imageDir); err != nil {
+-		return ProcessingPhaseError, err
+-	}
++	nodePull := rd.pullMethod == string(cdiv1.RegistryPullNode)
++	if nodePull {
++		if rd.imageRootDir == "" {
++			return ProcessingPhaseError, errors.New("image volume mount path is not set")
++		}
++		rd.imageDir = filepath.Join(rd.imageRootDir, containerDiskImageDir)
++	} else {
++		rd.imageDir = filepath.Join(path, containerDiskImageDir)
++		if err := CleanAll(rd.imageDir); err != nil {
++			return ProcessingPhaseError, err
++		}
+ 
+-	size, err := util.GetAvailableSpace(path)
+-	if err != nil {
+-		return ProcessingPhaseError, err
+-	}
+-	if size <= int64(0) {
+-		//Path provided is invalid.
+-		return ProcessingPhaseError, ErrInvalidPath
+-	}
++		size, err := util.GetAvailableSpace(path)
++		if err != nil {
++			return ProcessingPhaseError, err
++		}
++		if size <= int64(0) {
++			return ProcessingPhaseError, ErrInvalidPath
++		}
+ 
+-	klog.V(1).Infof("Copying registry image to scratch space.")
+-	rd.info, err = CopyRegistryImage(rd.endpoint, path, containerDiskImageDir, rd.accessKey, rd.secKey, rd.certDir, rd.insecureTLS)
+-	if err != nil {
+-		return ProcessingPhaseError, errors.Wrapf(err, "Failed to read registry image")
++		klog.V(1).Infof("Copying registry image to scratch space.")
++		rd.info, err = CopyRegistryImage(rd.endpoint, path, containerDiskImageDir, rd.accessKey, rd.secKey, rd.certDir, rd.insecureTLS)
++		if err != nil {
++			return ProcessingPhaseError, errors.Wrapf(err, "Failed to read registry image")
++		}
+ 	}
+ 
+ 	imageFile, err := getImageFileName(rd.imageDir)
+@@ -108,8 +122,26 @@ func (rd *RegistryDataSource) Transfer(path string) (ProcessingPhase, error) {
+ 		return ProcessingPhaseError, errors.Wrapf(err, "Cannot locate image file")
+ 	}
+ 
+-	// imageFile and rd.imageDir are both valid, thus the Join will be valid, and the parse will work, no need to check for parse errors
+-	rd.url, _ = url.Parse(filepath.Join(rd.imageDir, imageFile))
++	diskPath := filepath.Join(rd.imageDir, imageFile)
++	if nodePull {
++		// A symlink in the read-only source must not resolve into the importer's own filesystem.
++		diskPath, err = filepath.EvalSymlinks(diskPath)
++		if err != nil {
++			return ProcessingPhaseError, err
++		}
++		rel, err := filepath.Rel(rd.imageRootDir, diskPath)
++		if err != nil || !filepath.IsLocal(rel) {
++			return ProcessingPhaseError, errors.New("disk file resolves outside the image volume")
++		}
++		st, err := os.Stat(diskPath)
++		if err != nil {
++			return ProcessingPhaseError, err
++		}
++		if !st.Mode().IsRegular() {
++			return ProcessingPhaseError, errors.New("disk image is not a regular file")
++		}
++	}
++	rd.url = &url.URL{Path: diskPath}
+ 	klog.V(3).Infof("Successfully found file. VM disk image filename is %s", rd.url.String())
+ 	return ProcessingPhaseConvert, nil
+ }
+@@ -126,6 +158,25 @@ func (rd *RegistryDataSource) GetURL() *url.URL {
+ 
+ // GetTerminationMessage returns data to be serialized and used as the termination message of the importer.
+ func (rd *RegistryDataSource) GetTerminationMessage() *common.TerminationMessage {
++	if rd.pullMethod == string(cdiv1.RegistryPullNode) {
++		if rd.envFile == "" {
++			klog.Errorf("ImporterEnvFile environment variable is empty or not set")
++			return nil
++		}
++		data, err := os.ReadFile(rd.envFile)
++		if err != nil {
++			klog.Errorf("Failed to read env file: %v", err)
++			return nil
++		}
++		klog.V(1).Infof("Found env file: %s", rd.envFile)
++
++		envString := strings.Split(strings.TrimSpace(string(data)), "\n")
++
++		return &common.TerminationMessage{
++			Labels: envsToLabels(envString),
++		}
++	}
++
+ 	if rd.info == nil {
+ 		return nil
+ 	}
+diff --git a/pkg/importer/registry-datasource_test.go b/pkg/importer/registry-datasource_test.go
+index 6a01eb5..494970d 100644
+--- a/pkg/importer/registry-datasource_test.go
++++ b/pkg/importer/registry-datasource_test.go
+@@ -9,6 +9,8 @@ import (
+ 	. "github.com/onsi/gomega"
+ 
+ 	"github.com/containers/image/v5/types"
++
++	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
+ )
+ 
+ var (
+@@ -36,7 +38,7 @@ var _ = Describe("Registry data source", func() {
+ 	})
+ 
+ 	It("should return transfer after info is called", func() {
+-		ds = NewRegistryDataSource("", "", "", "", true)
++		ds = NewRegistryDataSource("", "", "", "", true, "", "", "")
+ 		result, err := ds.Info()
+ 		Expect(err).NotTo(HaveOccurred())
+ 		Expect(ProcessingPhaseTransferScratch).To(Equal(result))
+@@ -46,7 +48,7 @@ var _ = Describe("Registry data source", func() {
+ 		if scratchPath == "" {
+ 			scratchPath = tmpDir
+ 		}
+-		ds = NewRegistryDataSource(ep, accKey, secKey, certDir, insecureRegistry)
++		ds = NewRegistryDataSource(ep, accKey, secKey, certDir, insecureRegistry, "", "", "")
+ 
+ 		// Need to pass in a real path if we don't want scratch space needed error.
+ 		result, err := ds.Transfer(scratchPath)
+@@ -66,19 +68,35 @@ var _ = Describe("Registry data source", func() {
+ 	)
+ 
+ 	It("TransferFile should not be called", func() {
+-		ds = NewRegistryDataSource("", "", "", "", true)
++		ds = NewRegistryDataSource("", "", "", "", true, "", "", "")
+ 		result, err := ds.TransferFile("file")
+ 		Expect(err).To(HaveOccurred())
+ 		Expect(ProcessingPhaseError).To(Equal(result))
+ 	})
+ 
+-	It("GetTerminationMessage should contain labels collected from the image", func() {
+-		ds = NewRegistryDataSource("", "", "", "", true)
+-		ds.info = &types.ImageInspectInfo{
+-			Env: []string{
+-				"INSTANCETYPE_KUBEVIRT_IO_DEFAULT_INSTANCETYPE=u1.small",
+-				"INSTANCETYPE_KUBEVIRT_IO_DEFAULT_PREFERENCE=fedora",
+-			},
++	It("should convert the disk from the mounted image without scratch space", func() {
++		diskDir := filepath.Join(tmpDir, containerDiskImageDir)
++		Expect(os.Mkdir(diskDir, 0755)).To(Succeed())
++		disk := filepath.Join(diskDir, "guest.qcow2")
++		Expect(os.WriteFile(disk, []byte("disk"), 0600)).To(Succeed())
++		ds = NewRegistryDataSource("", "", "", "", false, string(cdiv1.RegistryPullNode), tmpDir, "")
++		phase, err := ds.Transfer("")
++		Expect(err).NotTo(HaveOccurred())
++		Expect(phase).To(Equal(ProcessingPhaseConvert))
++		Expect(ds.GetURL().Path).To(Equal(disk))
++	})
++
++	DescribeTable("GetTerminationMessage should contain labels collected from the image", func(method cdiv1.RegistryPullMethod) {
++		env := []string{
++			"INSTANCETYPE_KUBEVIRT_IO_DEFAULT_INSTANCETYPE=u1.small",
++			"INSTANCETYPE_KUBEVIRT_IO_DEFAULT_PREFERENCE=fedora",
++		}
++		envFile := filepath.Join(tmpDir, "env")
++		ds = NewRegistryDataSource("", "", "", "", true, string(method), tmpDir, envFile)
++		if method == cdiv1.RegistryPullNode {
++			Expect(os.WriteFile(envFile, []byte(strings.Join(env, "\n")+"\n"), 0600)).To(Succeed())
++		} else {
++			ds.info = &types.ImageInspectInfo{Env: env}
+ 		}
+ 
+ 		termMesg := ds.GetTerminationMessage()
+@@ -86,7 +104,7 @@ var _ = Describe("Registry data source", func() {
+ 		Expect(termMesg.Labels).To(HaveLen(2))
+ 		Expect(termMesg.Labels).To(HaveKeyWithValue("instancetype.kubevirt.io/default-instancetype", "u1.small"))
+ 		Expect(termMesg.Labels).To(HaveKeyWithValue("instancetype.kubevirt.io/default-preference", "fedora"))
+-	})
++	}, Entry("pod pull", cdiv1.RegistryPullPod), Entry("node pull", cdiv1.RegistryPullNode))
+ 
+ 	It("getImageFileName should return an error with non-existing image directory", func() {
+ 		_, err := getImageFileName("/invalid")
+diff --git a/pkg/operator/controller/controller_test.go b/pkg/operator/controller/controller_test.go
+index 5277f08..7273d3a 100644
+--- a/pkg/operator/controller/controller_test.go
++++ b/pkg/operator/controller/controller_test.go
+@@ -242,6 +242,7 @@ var _ = Describe("Controller", func() {
+ 				Expect(err).ToNot(HaveOccurred())
+ 				Expect(scc.Labels[common.AppKubernetesPartOfLabel]).To(Equal("testing"))
+ 				Expect(scc.Priority).To(BeNil())
++				Expect(scc.Volumes).To(ContainElement(secv1.FSTypeImage))
+ 
+ 				for _, eu := range []string{"system:serviceaccount:cdi:cdi-sa"} {
+ 					found := false
+diff --git a/pkg/operator/controller/scc.go b/pkg/operator/controller/scc.go
+index 98d5e4f..13bfb04 100644
+--- a/pkg/operator/controller/scc.go
++++ b/pkg/operator/controller/scc.go
+@@ -66,6 +66,7 @@ func setSCC(scc *secv1.SecurityContextConstraints) {
+ 		secv1.FSTypePersistentVolumeClaim,
+ 		secv1.FSProjected,
+ 		secv1.FSTypeSecret,
++		secv1.FSTypeImage,
+ 	}
+ }
+ 
+diff --git a/tools/cdi-containerimage-server/BUILD.bazel b/tools/cdi-containerimage-server/BUILD.bazel
+deleted file mode 100644
+index 5581b61..0000000
+--- a/tools/cdi-containerimage-server/BUILD.bazel
++++ /dev/null
+@@ -1,19 +0,0 @@
+-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+-
+-go_library(
+-    name = "go_default_library",
+-    srcs = ["main.go"],
+-    importpath = "kubevirt.io/containerized-data-importer/tools/cdi-containerimage-server",
+-    visibility = ["//visibility:private"],
+-    deps = [
+-        "//pkg/common:go_default_library",
+-        "//vendor/github.com/pkg/errors:go_default_library",
+-    ],
+-)
+-
+-go_binary(
+-    name = "cdi-containerimage-server",
+-    embed = [":go_default_library"],
+-    pure = "on",
+-    visibility = ["//visibility:public"],
+-)
+diff --git a/tools/cdi-containerimage-server/main.go b/tools/cdi-containerimage-server/main.go
+deleted file mode 100644
+index 8dee0d2..0000000
+--- a/tools/cdi-containerimage-server/main.go
++++ /dev/null
+@@ -1,99 +0,0 @@
+-package main
+-
+-import (
+-	"context"
+-	"encoding/json"
+-	"flag"
+-	"fmt"
+-	"log"
+-	"net"
+-	"net/http"
+-	"os"
+-	"path/filepath"
+-	"time"
+-
+-	"github.com/pkg/errors"
+-
+-	"kubevirt.io/containerized-data-importer/pkg/common"
+-)
+-
+-func printFiles(dir string) error {
+-	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+-		fmt.Println(path)
+-		return nil
+-	})
+-}
+-
+-func getImageFilename(dir string) (string, error) {
+-	entries, err := os.ReadDir(dir)
+-	if err != nil {
+-		return "", err
+-	}
+-	if len(entries) != 1 || entries[0].IsDir() {
+-		return "", errors.Errorf("Invalid container image")
+-	}
+-	return entries[0].Name(), nil
+-}
+-
+-func main() {
+-	port := flag.Int("p", 8100, "server port")
+-	directory := flag.String("image-dir", ".", "directory to serve")
+-	readyFile := flag.String("ready-file", "/shared/ready", "file to create when ready for connections")
+-	doneFile := flag.String("done-file", "/shared/done", "file created when the client is done")
+-	flag.Parse()
+-
+-	if err := printFiles(*directory); err != nil {
+-		log.Fatalf("Failed walking the directory %s: %v", *directory, err)
+-	}
+-	imageFilename, err := getImageFilename(*directory)
+-	if err != nil {
+-		log.Fatalf("Failed get image filename in %s: %v", *directory, err)
+-	}
+-
+-	mux := http.NewServeMux()
+-	mux.HandleFunc("/info", func(w http.ResponseWriter, _ *http.Request) {
+-		info := common.ServerInfo{
+-			Env: os.Environ(),
+-		}
+-		w.Header().Set("Content-Type", "application/json")
+-		err := json.NewEncoder(w).Encode(info)
+-		if err != nil {
+-			http.Error(w, err.Error(), http.StatusInternalServerError)
+-		}
+-	})
+-	mux.Handle("/", http.FileServer(http.Dir(*directory)))
+-	server := &http.Server{
+-		Handler:           mux,
+-		ReadHeaderTimeout: 10 * time.Second,
+-	}
+-	addr := fmt.Sprintf("localhost:%d", *port)
+-	listener, err := net.Listen("tcp", addr)
+-	if err != nil {
+-		log.Fatalf("Failed listening on %s err: %v", addr, err)
+-	}
+-
+-	if err := os.WriteFile(*readyFile, []byte(imageFilename), 0600); err != nil {
+-		log.Fatalf("Failed creating \"ready\" file: %v", err)
+-	}
+-	defer os.Remove(*readyFile)
+-
+-	go func() {
+-		log.Printf("Serving %s on HTTP port: %d\n", *directory, *port)
+-		if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
+-			log.Fatalf("Serve failed: %v", err)
+-		}
+-	}()
+-
+-	for {
+-		if _, err := os.Stat(*doneFile); err == nil {
+-			break
+-		}
+-		time.Sleep(time.Second)
+-	}
+-
+-	os.Remove(*doneFile)
+-	if err := server.Shutdown(context.TODO()); err != nil {
+-		log.Printf("Shutdown failed: %v\n", err)
+-	}
+-	log.Println("Importer has completed")
+-}
+diff --git a/tools/cdi-env-extractor/BUILD.bazel b/tools/cdi-env-extractor/BUILD.bazel
+new file mode 100644
+index 0000000..36a1e23
+--- /dev/null
++++ b/tools/cdi-env-extractor/BUILD.bazel
+@@ -0,0 +1,15 @@
++load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
++
++go_library(
++    name = "go_default_library",
++    srcs = ["main.go"],
++    importpath = "kubevirt.io/containerized-data-importer/tools/cdi-env-extractor",
++    visibility = ["//visibility:private"],
++)
++
++go_binary(
++    name = "cdi-env-extractor",
++    embed = [":go_default_library"],
++    pure = "on",
++    visibility = ["//visibility:public"],
++)
+diff --git a/tools/cdi-env-extractor/main.go b/tools/cdi-env-extractor/main.go
+new file mode 100644
+index 0000000..b054a88
+--- /dev/null
++++ b/tools/cdi-env-extractor/main.go
+@@ -0,0 +1,30 @@
++package main
++
++import (
++	"flag"
++	"log"
++	"os"
++	"strings"
++)
++
++func main() {
++	envFile := flag.String("env-file", "/shared/env", "file to create for saving the image environment variables")
++	flag.Parse()
++
++	envString := strings.Join(os.Environ(), "\n") + "\n"
++
++	f, err := os.OpenFile(*envFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
++	if err != nil {
++		log.Fatalf("Failed creating %s: %v", *envFile, err)
++	}
++	if _, err := f.WriteString(envString); err != nil {
++		log.Fatalf("Failed writing %s: %v", *envFile, err)
++	}
++	if err := f.Sync(); err != nil {
++		log.Fatalf("Failed syncing %s: %v", *envFile, err)
++	}
++	if err := f.Close(); err != nil {
++		log.Fatalf("Failed closing %s: %v", *envFile, err)
++	}
++	log.Printf("Extracted environment variables to %s", *envFile)
++}
