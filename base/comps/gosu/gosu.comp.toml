@@ -1,0 +1,21 @@
+# gosu — simple Go-based setuid+setgid+setgroups+exec for container entrypoints.
+# Not available in Fedora; maintained as a local spec with vendored Go dependencies
+# per the Fedora Go packaging guidelines:
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Golang/
+[components.gosu]
+spec = { type = "local", path = "gosu.spec" }
+
+[[components.gosu.source-files]]
+filename = "gosu-1.19.tar.gz"
+hash = "00ef15d982eb58d62cf67c6517d9560bb92cff5d1347f16b03e03bb3a6da08f2b85e8c3e6c23ae644f174f8da8e9154dcfe4ee379f894882e92b3602d7d079ed"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/tianon/gosu/archive/1.19/gosu-1.19.tar.gz" }
+
+[[components.gosu.source-files]]
+filename = "gosu-1.19-vendor.tar.gz"
+origin.type = "custom"
+origin.script = "generate_source_tarball.sh"
+origin.mock-packages = ["golang"]
+origin.inputs = ["gosu-1.19.tar.gz"]
+hash-type = "SHA512"
+hash = "bb263a01a6b0ad7ea5f422e4e13f34c2241e852d28cbbba24fb3f83e440863852e16e9371662bc47ec20e7f2a88a4de4c4a87cd4fa6b14c3e2cf4dab43620516"

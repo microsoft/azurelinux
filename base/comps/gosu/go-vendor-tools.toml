@@ -1,0 +1,4 @@
+# Go Vendor Tools configuration (Fedora Go packaging guidelines).
+# Drives %go_vendor_license_* macros: license detection + cumulative SPDX expression.
+[licensing]
+detector = "askalono"

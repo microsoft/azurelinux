@@ -404,6 +404,7 @@ components = [
     "google-noto-sans-cjk-vf-fonts",
     "google-noto-serif-cjk-vf-fonts",
     "google-roboto-slab-fonts",
+    "gosu",
     "gperf",
     "gperftools",
     "gpgme",
