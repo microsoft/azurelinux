@@ -1,0 +1,28 @@
+# Align python3.12's optimized build with python3.14 / Fedora's Python_built_with_gcc_O3
+# policy (-O3 + PGO + LTO while keeping the debug build at -O0).
+# https://fedoraproject.org/wiki/Changes/Python_built_with_gcc_O3
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Define optflags_optimized -O3 and strip default -O2 from global compiler flags"
+type = "spec-search-replace"
+regex = '^%undefine py_auto_byte_compile$'
+replacement = '''%global optflags_optimized -O3
+%global __global_compiler_flags %(echo '%{__global_compiler_flags}' | sed 's/-O[[:digit:]]//')
+%undefine py_auto_byte_compile'''
+
+[[overlays]]
+description = "Pass optflags_optimized (-O3) to BuildPython optimized in %build"
+type = "spec-search-replace"
+section = "%build"
+regex = '^  ""$'
+replacement = '  "%{optflags_optimized}"'
+
+[[overlays]]
+description = "Pass optflags_optimized (-O3) to InstallPython optimized in %install"
+type = "spec-search-replace"
+section = "%install"
+regex = '^  "" \\$'
+replacement = '  "%{optflags_optimized}" \'

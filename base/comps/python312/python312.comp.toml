@@ -1,0 +1,17 @@
+# Pin to Fedora f43 python3.12-3.12.16 to pick up upstream 3.12.16 and CVE-2026-19553 fixes.
+# https://src.fedoraproject.org/rpms/python3.12/c/c2c61ecd5f10f4defa4343dc48af05e0723c10db
+#
+# Use component key `python312` (`upstream-name = "python3.12"`) so the lock file is
+# `locks/python312.lock`. `locks/python3.12.lock` was deleted in commit e04e46a171, and
+# azldev v1.1.0's `FindFingerprintChanges` (`git log -- locks/<name>.lock` without
+# `--diff-filter=AM`) fails reading deleted lock commits during post-commit render.
+# The built SRPM and binary RPMs remain `python3.12*`.
+[components.python312]
+spec = { type = "upstream", upstream-name = "python3.12", upstream-commit = "c2c61ecd5f10f4defa4343dc48af05e0723c10db" }
+overlay-files = ["overlays/*.overlay.toml"]
+
+[components.python312.build]
+# Enable bootstrap until an initial python3.12 build is published in the Azure Linux 4
+# buildroot repositories (drops only the self-hosted BuildRequires: python3.12 used by
+# `make regen-all`; PGO, LTO, RPM wheels, and the %check test suite remain enabled).
+with = ["bootstrap"]

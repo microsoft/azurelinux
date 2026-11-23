@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=IDLE 3
+Comment=Python 3 Integrated Development and Learning Environment
+Exec=idle3 %F
+TryExec=idle3
+Terminal=false
+Type=Application
+Icon=idle3
+Categories=Development;IDE;
+MimeType=text/x-python;

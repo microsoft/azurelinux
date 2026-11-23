@@ -2207,6 +2207,7 @@ components = [
     "python-zstd",
     "python3-docs",
     "python3.14",
+    "python312",
     "pytz",
     "pyusb",
     "pywbem",
