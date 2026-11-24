@@ -4769,16 +4769,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "golang",
-          "version": "1.25.14",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.14-1/go1.25.14-20260819.1.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "golang-crypto",
           "version": "c07d793c2f9aacf728fe68cbd7acd73adbd04159",
           "downloadUrl": "https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz"
