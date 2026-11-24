@@ -8,6 +8,34 @@ Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/containers/skopeo
 Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/containers/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+#      go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel@v1.47.0
+#   5. go mod tidy
+#   6. go mod vendor
+#   7. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -czf %%{name}-%%{version}-vendor-v2.tar.gz vendor
+#
+# Alternatively, run the helper from this spec directory:
+#   bash generate_source_tarball.sh \
+#       --srcTarball "$(pwd)/%%{name}-%%{version}.tar.gz" \
+#       --outFolder "$(pwd)" \
+#       --pkgVersion %%{version} --vendorVersion 2
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - You require Go 1.26+ for the updated Go modules.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2022-2879.patch
 Patch1:         CVE-2024-6104.patch
