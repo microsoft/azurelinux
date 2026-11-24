@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      4.1.0.kata3
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -31,6 +31,7 @@ Patch16:      CVE-2026-48586.patch
 Patch17:      CVE-2026-55969.patch
 Patch18:      CVE-2026-63772.patch
 Patch19:      CVE-2026-94637.patch
+Patch20:      agent-expose-sev-guest.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -151,6 +152,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Nov 23 2026 Nikola Bojanic <nbojanic@microsoft.com> - 4.1.0.kata3-2
+- Backport Kata PR 591 to expose the guest SEV device to containers
+
 * Wed Nov 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata3-1
 - Upgrade to 4.1.0.kata3 and rebuild Kata-CC on OpenVMM SNP with runtime-rs
 - Ship the OpenVMM SNP runtime configs and kata-ctl; drop the CLH SNP configs
