@@ -13,7 +13,7 @@
 
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        6.6.161.1
+Version:        6.6.162.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -75,6 +75,9 @@ done
 %endif
 
 %changelog
+* Mon Nov 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.162.1-1
+- Auto-upgrade to 6.6.162.1
+
 * Wed Nov 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.161.1-1
 - Auto-upgrade to 6.6.161.1
 
