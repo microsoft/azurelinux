@@ -1,0 +1,599 @@
+From abd51dec138617c926b7efd0482366a29fd8957f Mon Sep 17 00:00:00 2001
+From: Jocelyn Berrendonner <jocelynb@microsoft.com>
+Date: Thu, 8 Oct 2026 11:18:05 -0700
+Subject: [PATCH 1/3] mode: support HGX A100 8-GPU with six NVSwitches
+
+An HGX A100 8-GPU baseboard carries six second-generation NVSwitch
+chips (NVLink 3), while HGX H100 8-GPU carries four. Passing a full
+A100 baseboard through to the VM exposes 8 GPUs and 6 NVSwitches,
+which detection rejects with "unexpected topology: 6 NVSWITCH, 8 GPU,
+0 PCI_SW_MNG".
+
+Detect (6, 8, 0) as its own "nvl3" fabric. It starts nv-fabricmanager
+with FABRIC_MODE=0 like NVL4, but without PARTITION_RAIL_POLICY: on
+A100, fabric manager (seen with 580.159.04) rejects that key with
+
+  unsupported config item PARTITION_RAIL_POLICY is specified in fabric
+  manager config file
+
+and exits with status 255 before it opens any NVSwitch. Without the
+key, it configures all GPUs and NVSwitches.
+
+NVL4 and NVL5 keep writing their rail policy as before.
+
+Signed-off-by: Jocelyn Berrendonner <jocelynb@microsoft.com>
+Assisted-by: GitHub Copilot
+---
+ src/daemon.rs | 35 ++++++++++++++++++++++-------------
+ src/main.rs   | 13 +++++++++++--
+ src/mode.rs   | 27 ++++++++++++++++++++++++++-
+ 3 files changed, 59 insertions(+), 16 deletions(-)
+
+diff --git a/src/daemon.rs b/src/daemon.rs
+index e325db5..25ad968 100644
+--- a/src/daemon.rs
++++ b/src/daemon.rs
+@@ -96,7 +96,7 @@ impl NVRC {
+ 
+     /// NVSwitch fabric manager is only needed for multi-GPU NVLink topologies.
+     /// Disabled by default since most VMs have single GPUs.
+-    pub fn nv_fabricmanager(&mut self, fabric_mode: u8, rail_policy: &str) {
++    pub fn nv_fabricmanager(&mut self, fabric_mode: u8, rail_policy: Option<&str>) {
+         // The stock config ships in the gpu extension; the editable runtime copy
+         // stays on the writable /run tmpfs.
+         let fm_config = gpu_extension::path(FM_CONFIG);
+@@ -135,14 +135,15 @@ impl NVRC {
+ 
+     /// Write FABRIC_MODE and PARTITION_RAIL_POLICY to fabricmanager.cfg.
+     /// FABRIC_MODE: 0 = bare metal (GPUs local), 1 = service VM (GPUs in tenant VMs)
+-    /// PARTITION_RAIL_POLICY: "greedy" (NVL4) or "symmetric" (NVL5, required for CC on Blackwell)
+-    fn configure_fabricmanager(&self, cfg_path: &str, fabric_mode: u8, rail_policy: &str) {
++    /// PARTITION_RAIL_POLICY: "greedy" (NVL4) or "symmetric" (NVL5, required for CC on Blackwell).
++    /// None leaves the key out: fabric manager on NVL3 (HGX A100) rejects it and exits.
++    fn configure_fabricmanager(&self, cfg_path: &str, fabric_mode: u8, rail_policy: Option<&str>) {
+         let fm = &fabric_mode.to_string();
+-        let updates = &[
+-            ("FABRIC_MODE", fm.as_str()),
+-            ("PARTITION_RAIL_POLICY", rail_policy),
+-        ];
+-        update_config_file(cfg_path, updates);
++        let mut updates = vec![("FABRIC_MODE", fm.as_str())];
++        if let Some(policy) = rail_policy {
++            updates.push(("PARTITION_RAIL_POLICY", policy));
++        }
++        update_config_file(cfg_path, &updates);
+     }
+ }
+ 
+@@ -207,7 +208,7 @@ mod tests {
+         fs::write(cfg, "FABRIC_MODE=0\n").unwrap();
+ 
+         let mut nvrc = NVRC::default();
+-        nvrc.configure_fabricmanager(cfg, FABRIC_MODE_FULL, "greedy");
++        nvrc.configure_fabricmanager(cfg, FABRIC_MODE_FULL, Some("greedy"));
+         nvrc.spawn_fabricmanager("/bin/true");
+ 
+         let content = fs::read_to_string(cfg).unwrap();
+@@ -323,7 +324,7 @@ mod tests {
+     // === Fabricmanager configuration tests ===
+ 
+     /// Run configure_fabricmanager over a config seeded with `initial`.
+-    fn configured(initial: &str, fabric_mode: u8, rail_policy: &str) -> String {
++    fn configured(initial: &str, fabric_mode: u8, rail_policy: Option<&str>) -> String {
+         use tempfile::NamedTempFile;
+ 
+         let tmpfile = NamedTempFile::new().unwrap();
+@@ -344,15 +345,23 @@ mod tests {
+         #[case] fabric_mode: u8,
+         #[case] rail_policy: &str,
+     ) {
+-        let content = configured("", fabric_mode, rail_policy);
++        let content = configured("", fabric_mode, Some(rail_policy));
+ 
+         assert!(content.contains(&format!("FABRIC_MODE={fabric_mode}")));
+         assert!(content.contains(&format!("PARTITION_RAIL_POLICY={rail_policy}")));
+     }
+ 
++    #[test]
++    fn test_configure_fabricmanager_without_rail_policy() {
++        let content = configured("", FABRIC_MODE_FULL, None);
++
++        assert!(content.contains("FABRIC_MODE=0"));
++        assert!(!content.contains("PARTITION_RAIL_POLICY"));
++    }
++
+     #[test]
+     fn test_configure_fabricmanager_updates_existing() {
+-        let content = configured("FABRIC_MODE=0\n", FABRIC_MODE_SHARED, "greedy");
++        let content = configured("FABRIC_MODE=0\n", FABRIC_MODE_SHARED, Some("greedy"));
+ 
+         assert!(content.contains("FABRIC_MODE=1"));
+         assert_eq!(
+@@ -369,7 +378,7 @@ mod tests {
+         let content = configured(
+             "# Comment\nOTHER_SETTING=value\nFABRIC_MODE=0\n",
+             FABRIC_MODE_SHARED,
+-            "greedy",
++            Some("greedy"),
+         );
+ 
+         assert!(content.contains("# Comment"));
+diff --git a/src/main.rs b/src/main.rs
+index 7c14b37..d00fbe4 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -21,6 +21,7 @@ fn mode_gpu(init: &mut NVRC, nvswitch: Option<&str>) {
+     init.setup_uvm_tools();
+ 
+     match nvswitch {
++        Some("nvl3") => mode_nvl3(init, FABRIC_MODE_FULL),
+         Some("nvl4") => mode_nvl4(init, FABRIC_MODE_FULL),
+         Some("nvl5") => mode_nvl5(init, FABRIC_MODE_FULL),
+         _ => {}
+@@ -39,11 +40,19 @@ fn mode_gpu(init: &mut NVRC, nvswitch: Option<&str>) {
+     init.health_checks();
+ }
+ 
++/// NVSwitch NVL3 mode for HGX A100 systems (second-gen NVSwitch).
++/// Fabric manager rejects PARTITION_RAIL_POLICY on this generation, so none is set.
++/// Starts fabric manager; the caller has already loaded the NVIDIA driver.
++fn mode_nvl3(init: &mut NVRC, fabric_mode: u8) {
++    init.nv_fabricmanager(fabric_mode, None);
++    init.health_checks();
++}
++
+ /// NVSwitch NVL4 mode for HGX H100/H200/H800 systems (third-gen NVSwitch).
+ /// Service VM mode for NVLink 4.0 topologies in shared virtualization.
+ /// Starts fabric manager; the caller has already loaded the NVIDIA driver.
+ fn mode_nvl4(init: &mut NVRC, fabric_mode: u8) {
+-    init.nv_fabricmanager(fabric_mode, "greedy");
++    init.nv_fabricmanager(fabric_mode, Some("greedy"));
+     init.health_checks();
+ }
+ 
+@@ -64,7 +73,7 @@ fn mode_nvl5(init: &mut NVRC, fabric_mode: u8) {
+     // NVLSM must initialize the NVLink subnet before FM can manage the fabric
+     init.nv_nvlsm();
+     init.health_checks();
+-    init.nv_fabricmanager(fabric_mode, "symmetric");
++    init.nv_fabricmanager(fabric_mode, Some("symmetric"));
+     init.health_checks();
+ }
+ 
+diff --git a/src/mode.rs b/src/mode.rs
+index 8580211..6efd8ac 100644
+--- a/src/mode.rs
++++ b/src/mode.rs
+@@ -19,7 +19,7 @@ const PCI_DEVICES: &str = "/sys/bus/pci/devices";
+ pub struct Detection {
+     /// Operating mode: "cpu", "gpu", "servicevm-nvl4", or "servicevm-nvl5"
+     pub mode: &'static str,
+-    /// NVSwitch generation when present: "nvl4" or "nvl5"
++    /// NVSwitch generation when present: "nvl3", "nvl4" or "nvl5"
+     pub nvswitch: Option<&'static str>,
+ }
+ 
+@@ -53,6 +53,17 @@ fn detect_from(pci_path: &str) -> Detection {
+                 nvswitch: None,
+             }
+         }
++        // HGX A100 8-GPU: 6 second-generation NVSwitch chips (NVLink 3).
++        (6, 8, 0) => {
++            debug!(
++                "mode: gpu FABRIC_MODE=0, {} GPU + {} NVSWITCH",
++                gpus, nvswitches
++            );
++            Detection {
++                mode: "gpu",
++                nvswitch: Some("nvl3"),
++            }
++        }
+         (4, 8, 0) => {
+             debug!(
+                 "mode: gpu FABRIC_MODE=0, {} GPU + {} NVSWITCH",
+@@ -339,6 +350,20 @@ mod tests {
+         assert_eq!(d.nvswitch, Some("nvl4"));
+     }
+ 
++    #[test]
++    fn test_detect_gpu_bare_metal_hgx_a100() {
++        let pci = TempDir::new().unwrap();
++        for i in 0..6 {
++            create_pci_device(&pci, &format!("0000:0{}:00.0", i), "0x10de\n", "0x068000\n");
++        }
++        for i in 0..8 {
++            create_pci_device(&pci, &format!("0000:4{}:00.0", i), "0x10de\n", "0x030200\n");
++        }
++        let d = detect_from(pci.path().to_str().unwrap());
++        assert_eq!(d.mode, "gpu");
++        assert_eq!(d.nvswitch, Some("nvl3"));
++    }
++
+     #[test]
+     fn test_detect_gpu_bare_metal_nvl5() {
+         let pci = TempDir::new().unwrap();
+
+From ba3fbd9223149159bfb79f780ac16cbc0050ff04 Mon Sep 17 00:00:00 2001
+From: Jocelyn Berrendonner <jocelynb@microsoft.com>
+Date: Thu, 12 Nov 2026 19:37:41 -0800
+Subject: [PATCH 2/3] daemon: fail the readiness wait when the daemon exits
+ with an error
+
+nvidia_persistenced() and nv_fabricmanager() spawn their daemon, then
+wait for its readiness marker in syslog. health_checks(), which reports
+a daemon that exited with a non-zero status, only runs after that wait.
+A daemon that dies on startup therefore surfaces as "timeout waiting
+for: ..." after 120 s (fabric manager) or 600 s (persistenced), and the
+exit status that explains it is never reported. For example, fabric
+manager exits with status 255 as soon as it rejects an item in its
+configuration file.
+
+Move the spawn-then-wait sequence onto NVRC as spawn_until_marker(),
+next to spawn_daemon() and health_checks(), and replace
+kmsg::wait_for_marker_after(). wait_for_marker() takes a check that
+runs whenever no new line is available; spawn_until_marker() passes
+health_checks(), so a non-zero exit now fails init at once, naming the
+daemon and its exit status. A daemon that forks and exits 0 is still
+accepted as before.
+
+Signed-off-by: Jocelyn Berrendonner <jocelynb@microsoft.com>
+Assisted-by: GitHub Copilot
+---
+ src/daemon.rs |  9 ++++-----
+ src/kmsg.rs   | 51 ++++++++++++++++++++++++++++++++++++---------------
+ src/nvrc.rs   | 36 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 76 insertions(+), 20 deletions(-)
+
+diff --git a/src/daemon.rs b/src/daemon.rs
+index 25ad968..fb29a1c 100644
+--- a/src/daemon.rs
++++ b/src/daemon.rs
+@@ -3,7 +3,6 @@
+ 
+ use crate::config::update_config_file;
+ use crate::gpu_extension;
+-use crate::kmsg;
+ use crate::macros::ResultExt;
+ use crate::nvrc::NVRC;
+ use std::fs;
+@@ -54,8 +53,8 @@ impl NVRC {
+     /// reducing cold-start latency. UVM persistence mode enables unified memory
+     /// optimizations. Enabled by default since most workloads benefit from it.
+     pub fn nvidia_persistenced(&mut self) {
+-        kmsg::wait_for_marker_after("Local RPC services initialized", 600, || {
+-            self.spawn_persistenced(
++        self.spawn_until_marker("Local RPC services initialized", 600, |nvrc| {
++            nvrc.spawn_persistenced(
+                 "/var/run/nvidia-persistenced",
+                 &gpu_extension::path("/bin/nvidia-persistenced"),
+             )
+@@ -105,8 +104,8 @@ impl NVRC {
+         self.configure_fabricmanager(FM_RUNTIME_CONFIG, fabric_mode, rail_policy);
+         fs::set_permissions(FM_RUNTIME_CONFIG, fs::Permissions::from_mode(0o400))
+             .or_panic(format_args!("set permissions {FM_RUNTIME_CONFIG}"));
+-        kmsg::wait_for_marker_after("FM starting NvLink Inband", 120, || {
+-            self.spawn_fabricmanager(&gpu_extension::path("/bin/nv-fabricmanager"))
++        self.spawn_until_marker("FM starting NvLink Inband", 120, |nvrc| {
++            nvrc.spawn_fabricmanager(&gpu_extension::path("/bin/nv-fabricmanager"))
+         });
+     }
+ 
+diff --git a/src/kmsg.rs b/src/kmsg.rs
+index 04235c0..2546367 100644
+--- a/src/kmsg.rs
++++ b/src/kmsg.rs
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: Apache-2.0
+ // Copyright (c) NVIDIA CORPORATION
++// Portions Copyright (c) Microsoft Corporation.
+ 
+ use crate::macros::ResultExt;
+ use std::fs::{self, File, OpenOptions};
+@@ -77,20 +78,19 @@ pub fn open_kmsg(path: &str) -> BufReader<File> {
+     BufReader::new(file)
+ }
+ 
+-/// Run `start` (spawning a daemon), then wait for its `marker`. The log is
+-/// opened first so the marker cannot be missed.
+-pub fn wait_for_marker_after(marker: &str, timeout_secs: u32, start: impl FnOnce()) {
+-    let mut reader = open_kmsg("/dev/kmsg");
+-    start();
+-    wait_for_marker(&mut reader, marker, timeout_secs);
+-}
+-
+ /// Cap on one syslog wait: the file can also be appended to directly.
+ const MAX_WAIT: Duration = Duration::from_millis(500);
+ 
+ /// Block until `marker` appears in `reader` or `timeout_secs` expires.
+-/// At end of file, waits on /dev/log (which feeds the file) instead of sleeping.
+-pub fn wait_for_marker(reader: &mut BufReader<File>, marker: &str, timeout_secs: u32) {
++/// Whenever no new line is available, runs `check` (so the caller can fail
++/// early, e.g. when the daemon it waits on has died), then waits on /dev/log
++/// (which feeds the file) instead of sleeping.
++pub fn wait_for_marker(
++    reader: &mut BufReader<File>,
++    marker: &str,
++    timeout_secs: u32,
++    mut check: impl FnMut(),
++) {
+     let deadline = Instant::now() + Duration::from_secs(timeout_secs as u64);
+     let mut line = String::new();
+ 
+@@ -105,8 +105,11 @@ pub fn wait_for_marker(reader: &mut BufReader<File>, marker: &str, timeout_secs:
+                 return;
+             }
+             Ok(n) if n > 0 => {}
+-            // EOF, WouldBlock or error: wait for the next message.
+-            _ => crate::syslog::try_poll_for(remaining.min(MAX_WAIT)),
++            // EOF, WouldBlock or error: run the check, then wait for the next message.
++            _ => {
++                check();
++                crate::syslog::try_poll_for(remaining.min(MAX_WAIT));
++            }
+         }
+     }
+ }
+@@ -234,7 +237,7 @@ mod tests {
+ 
+         let start = Instant::now();
+         let found = panic::catch_unwind(panic::AssertUnwindSafe(|| {
+-            wait_for_marker(&mut reader, MARKER, timeout_secs)
++            wait_for_marker(&mut reader, MARKER, timeout_secs, || {})
+         }))
+         .is_ok();
+         (found, start.elapsed())
+@@ -274,7 +277,7 @@ mod tests {
+     )]
+     fn test_wait_for_marker_nonexistent_file_panics() {
+         let result = panic::catch_unwind(|| {
+-            wait_for_marker(&mut open_kmsg("/nonexistent/path"), "marker", 1);
++            wait_for_marker(&mut open_kmsg("/nonexistent/path"), "marker", 1, || {});
+         });
+         assert!(result.is_err());
+     }
+@@ -294,7 +297,7 @@ mod tests {
+         let marker = "NVRC_TEST_MARKER_12345";
+ 
+         // /dev/kmsg is read from the syslog file; log the marker as syslog.rs would.
+-        wait_for_marker_after(marker, 5, || {
++        crate::nvrc::NVRC::default().spawn_until_marker(marker, 5, |_| {
+             let mut file = OpenOptions::new()
+                 .create(true)
+                 .append(true)
+@@ -303,4 +306,22 @@ mod tests {
+             writeln!(file, "{}", marker).expect("write marker");
+         });
+     }
++
++    #[test]
++    #[cfg_attr(
++        miri,
++        ignore = "open_kmsg uses O_NONBLOCK, an open flag miri does not support"
++    )]
++    fn test_wait_for_marker_check_fails_the_wait_at_once() {
++        let tmp = NamedTempFile::new().unwrap();
++        let mut reader = open_kmsg(tmp.path().to_str().unwrap());
++
++        let start = Instant::now();
++        let result = panic::catch_unwind(panic::AssertUnwindSafe(|| {
++            wait_for_marker(&mut reader, MARKER, 30, || panic!("daemon exited"))
++        }));
++
++        assert!(result.is_err());
++        assert!(start.elapsed() < Duration::from_secs(5));
++    }
+ }
+diff --git a/src/nvrc.rs b/src/nvrc.rs
+index 0f643a3..49563dc 100644
+--- a/src/nvrc.rs
++++ b/src/nvrc.rs
+@@ -1,11 +1,13 @@
+ // SPDX-License-Identifier: Apache-2.0
+ // Copyright (c) NVIDIA CORPORATION
++// Portions Copyright (c) Microsoft Corporation.
+ 
+ //! NVRC configuration state and daemon lifecycle management.
+ 
+ use std::process::Child;
+ 
+ use crate::execute::background;
++use crate::kmsg;
+ 
+ /// Central configuration state for the NVIDIA Runtime Container init.
+ /// Fields are populated from kernel command-line parameters and control
+@@ -46,6 +48,21 @@ impl NVRC {
+         self.children.push((name.into(), child));
+     }
+ 
++    /// Start a daemon through `spawn`, then wait for its readiness `marker`.
++    /// The log is opened first so the marker cannot be missed. The health
++    /// check runs while waiting: a daemon that dies on startup fails init at
++    /// once with its exit status, instead of as a timeout on the marker.
++    pub fn spawn_until_marker(
++        &mut self,
++        marker: &str,
++        timeout_secs: u32,
++        spawn: impl FnOnce(&mut Self),
++    ) {
++        let mut log = kmsg::open_kmsg("/dev/kmsg");
++        spawn(self);
++        kmsg::wait_for_marker(&mut log, marker, timeout_secs, || self.health_checks());
++    }
++
+     /// Check all background daemons haven't failed.
+     /// Exit status 0 is OK (daemon may fork and parent exits successfully).
+     /// Non-zero exit means the daemon crashed—fail init before kata-agent starts.
+@@ -148,4 +165,23 @@ mod tests {
+         std::thread::sleep(std::time::Duration::from_millis(50));
+         nvrc.health_checks();
+     }
++
++    #[test]
++    #[cfg_attr(miri, ignore = "miri cannot emulate process spawn")]
++    fn test_marker_wait_fails_at_once_when_daemon_exits_with_error() {
++        use std::time::{Duration, Instant};
++
++        let log = tempfile::NamedTempFile::new().unwrap();
++        let mut reader = kmsg::open_kmsg(log.path().to_str().unwrap());
++        let mut nvrc = NVRC::default();
++        nvrc.spawn_daemon("false", "/bin/false", &[]);
++
++        let start = Instant::now();
++        let result = panic::catch_unwind(panic::AssertUnwindSafe(|| {
++            kmsg::wait_for_marker(&mut reader, "never logged", 30, || nvrc.health_checks())
++        }));
++
++        assert!(result.is_err());
++        assert!(start.elapsed() < Duration::from_secs(10));
++    }
+ }
+
+From 79a0a3290ed63cebabfe765624f77ec250c9c86d Mon Sep 17 00:00:00 2001
+From: Jocelyn Berrendonner <jocelynb@microsoft.com>
+Date: Tue, 17 Nov 2026 16:36:30 -0800
+Subject: [PATCH 3/3] test: start nvidia-imex on GB200 (test branch only)
+
+Port of nvrc/imex-gb200 to upstream/main for hardware testing. main has
+no pcilibs-rs, so the gate is the GB200 PCI device ID (10de:2941)
+instead of Kind::Coherent(Family::Blackwell). Not for upstream; the PR
+version stays stacked on #227.
+
+GB200 without IMEX (2026-11-17): CliqueId 32766 on every GPU and NCCL
+all_reduce_perf fails with "CUDA-capable device(s) is/are busy or
+unavailable", while deviceQuery passes.
+
+Signed-off-by: Jocelyn Berrendonner <jocelynb@microsoft.com>
+Assisted-by: GitHub Copilot
+---
+ src/daemon.rs | 34 ++++++++++++++++++++++++++++++++++
+ src/main.rs   |  1 +
+ src/mode.rs   | 38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 73 insertions(+)
+
+diff --git a/src/daemon.rs b/src/daemon.rs
+index fb29a1c..4cc90db 100644
+--- a/src/daemon.rs
++++ b/src/daemon.rs
+@@ -40,6 +40,7 @@ const FM_CONFIG: &str = "/usr/share/nvidia/nvswitch/fabricmanager.cfg";
+ const FM_RUNTIME_CONFIG: &str = "/run/fabricmanager.cfg";
+ const NVLSM_CONFIG: &str = "/usr/share/nvidia/nvlsm/nvlsm.conf";
+ const DCGM_EXPORTER_COUNTERS: &str = "/etc/dcgm-exporter/default-counters.csv";
++const IMEX_BIN: &str = "/usr/bin/nvidia-imex";
+ 
+ /// FABRIC_MODE=0: full GPU passthrough, FM manages NVSwitches directly.
+ pub const FABRIC_MODE_FULL: u8 = 0;
+@@ -67,6 +68,24 @@ impl NVRC {
+         self.spawn_daemon("nvidia-persistenced", bin, &args);
+     }
+ 
++    /// nvidia-imex puts coherent Blackwell GPUs (GB200) into an IMEX clique.
++    /// Without it they keep a placeholder CliqueId and fabric memory
++    /// allocations (NCCL) fail. systemd starts it on a host; under NVRC nothing
++    /// else would. Skipped when the image doesn't ship it. The image's config
++    /// must keep it in the foreground (DAEMONIZE=0) so the tracked PID is the
++    /// daemon itself.
++    pub fn nv_imex(&mut self) {
++        self.spawn_imex(&gpu_extension::path(IMEX_BIN));
++    }
++
++    fn spawn_imex(&mut self, bin: &str) {
++        if !std::path::Path::new(bin).exists() {
++            info!("nvidia-imex: {bin} not present, skipping");
++            return;
++        }
++        self.spawn_daemon("nvidia-imex", bin, &[]);
++    }
++
+     /// nv-hostengine is the DCGM backend daemon. Only started when DCGM monitoring
+     /// is explicitly requested - not needed for basic GPU workloads.
+     pub fn nv_hostengine(&mut self) {
+@@ -197,6 +216,21 @@ mod tests {
+         nvrc.dcgm_exporter();
+     }
+ 
++    #[test]
++    #[cfg_attr(miri, ignore = "miri cannot emulate process spawn")]
++    fn test_spawn_imex_success() {
++        let mut nvrc = NVRC::default();
++        nvrc.spawn_imex("/bin/true");
++        nvrc.health_checks();
++    }
++
++    #[test]
++    fn test_spawn_imex_skipped_without_the_binary() {
++        let mut nvrc = NVRC::default();
++        nvrc.spawn_imex("/nonexistent/nvidia-imex");
++        nvrc.health_checks();
++    }
++
+     #[test]
+     #[cfg_attr(miri, ignore = "miri cannot emulate process spawn")]
+     fn test_nv_fabricmanager_gpu_mode() {
+diff --git a/src/main.rs b/src/main.rs
+index d00fbe4..a0bd274 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -24,6 +24,7 @@ fn mode_gpu(init: &mut NVRC, nvswitch: Option<&str>) {
+         Some("nvl3") => mode_nvl3(init, FABRIC_MODE_FULL),
+         Some("nvl4") => mode_nvl4(init, FABRIC_MODE_FULL),
+         Some("nvl5") => mode_nvl5(init, FABRIC_MODE_FULL),
++        _ if mode::imex_fabric() => init.nv_imex(),
+         _ => {}
+     }
+ 
+diff --git a/src/mode.rs b/src/mode.rs
+index 6efd8ac..8032922 100644
+--- a/src/mode.rs
++++ b/src/mode.rs
+@@ -135,6 +135,27 @@ fn count_gpus_from(pci_path: &str) -> usize {
+         .count()
+ }
+ 
++/// GB200 GPU PCI device ID. Coherent-NVLink Blackwell GPUs join an IMEX clique
++/// through nvidia-imex; without it they keep a placeholder CliqueId.
++const GB200_DEVICE_ID: &str = "0x2941";
++
++/// Whether the VM has GB200 GPUs, which need nvidia-imex.
++pub fn imex_fabric() -> bool {
++    imex_fabric_from(PCI_DEVICES)
++}
++
++fn imex_fabric_from(pci_path: &str) -> bool {
++    let Ok(entries) = fs::read_dir(pci_path) else {
++        return false;
++    };
++    entries.flatten().any(|e| {
++        let read = |f: &str| fs::read_to_string(e.path().join(f)).unwrap_or_default();
++        read("vendor").trim() == "0x10de"
++            && read("class").trim().starts_with("0x03")
++            && read("device").trim() == GB200_DEVICE_ID
++    })
++}
++
+ /// Count NVLink management NICs (SW_MNG marker in PCI VPD).
+ /// Scans Mellanox (0x15b3) PCI devices and checks VPD directly,
+ /// avoiding dependency on IB drivers being loaded.
+@@ -236,6 +257,23 @@ mod tests {
+         assert_eq!(count_gpus_from(tmpdir.path().to_str().unwrap()), 1);
+     }
+ 
++    #[rstest::rstest]
++    #[case::gb200("0x2941\n", true)]
++    #[case::h100("0x2330\n", false)]
++    fn test_imex_fabric(#[case] device: &str, #[case] expected: bool) {
++        let tmpdir = TempDir::new().unwrap();
++        create_pci_device(&tmpdir, "0000:81:00.0", "0x10de\n", "0x030200\n");
++        fs::write(tmpdir.path().join("0000:81:00.0/device"), device).unwrap();
++        assert_eq!(imex_fabric_from(tmpdir.path().to_str().unwrap()), expected);
++    }
++
++    #[test]
++    fn test_imex_fabric_no_gpus() {
++        let tmpdir = TempDir::new().unwrap();
++        assert!(!imex_fabric_from(tmpdir.path().to_str().unwrap()));
++        assert!(!imex_fabric_from("/nonexistent/path"));
++    }
++
+     #[test]
+     fn test_count_gpus_multiple() {
+         let tmpdir = TempDir::new().unwrap();

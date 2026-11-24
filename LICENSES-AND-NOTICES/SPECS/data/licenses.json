@@ -2309,6 +2309,7 @@
                 "jsonbuilder",
                 "jx",
                 "kata-containers-cc",
+                "kata-nvrc",
                 "kata-packages-uvm",
                 "kata-packages-uvm-hpc",
                 "keras",

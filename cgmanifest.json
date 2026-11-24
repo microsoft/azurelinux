@@ -8320,6 +8320,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kata-nvrc",
+          "version": "0.1.7^20261109git77ce29c",
+          "downloadUrl": "https://github.com/NVIDIA/nvrc/archive/77ce29cac2a7d1b943b9349a630e4d27640c3e6a.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kbd",
           "version": "2.2.0",
           "downloadUrl": "http://ftp.altlinux.org/pub/people/legion/kbd/kbd-2.2.0.tar.xz"
