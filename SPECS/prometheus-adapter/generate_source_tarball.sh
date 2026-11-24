@@ -14,7 +14,7 @@ set -e
 SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PKG_VERSION=""
-VENDOR_VERSION="2"
+VENDOR_VERSION=""
 
 # parameters:
 #
@@ -23,7 +23,10 @@ VENDOR_VERSION="2"
 #                 and should be replaced with the new/modified src code
 # --outFolder   : folder where to copy the new tarball(s)
 # --pkgVersion  : package version
-# --vendorVersion : vendor version
+# --vendorVersion : vendor tarball version; must match the -vN suffix of
+#                   Source1 in prometheus-adapter.spec (e.g. 2 -> prometheus-adapter-<ver>-vendor-v2.tar.gz)
+#
+# Usage: ./generate_source_tarball.sh --pkgVersion <ver> --vendorVersion <n> [--outFolder <dir>]
 #
 PARAMS=""
 while (( "$#" )); do
@@ -85,6 +88,11 @@ if [ -z "$PKG_VERSION" ]; then
     exit 1
 fi
 
+if [ -z "$VENDOR_VERSION" ]; then
+    echo "--vendorVersion parameter cannot be empty"
+    exit 1
+fi
+
 echo "-- create temp folder"
 TEMPDIR=$(mktemp -d)
 function cleanup {
@@ -120,7 +128,12 @@ go mod vendor
 # Ship only the vendor tree; Source0 stays pristine and the go.mod/go.sum
 # changes are carried by the spec's patches.
 VENDOR_TARBALL="$OUT_FOLDER/prometheus-adapter-$PKG_VERSION-vendor-v$VENDOR_VERSION.tar.gz"
-tar -czf "$VENDOR_TARBALL" vendor
+echo "Tar vendored modules"
+tar  --sort=name \
+     --mtime="2021-04-26 00:00Z" \
+     --owner=0 --group=0 --numeric-owner \
+     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+     -czf "$VENDOR_TARBALL" vendor
 
 cd "$START_DIR"
 rm -rf "$TEMPDIR"

@@ -34,7 +34,7 @@ Source0:        https://github.com/kubernetes-sigs/%{name}/archive/refs/tags/v%{
 #         with the 3.0-dev branch.
 #       - Steps 2-8 are also automated by generate_source_tarball.sh:
 #           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
-#               --outFolder /tmp --pkgVersion %%{version}
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 2
 Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2026-73500.patch
 Patch1:         CVE-2026-37236.patch
