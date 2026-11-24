@@ -7,14 +7,14 @@
 
 %define _missing_build_ids_terminate_build 0
 
-%global srctag v1.9.0-1
-%global sha 0238166fefcc8e22c0a66a67a317f556c34c283d
+%global srctag v1.9.0-2
+%global sha 740242aaab012e3e54426576df791727b9328ee0
 %global msvm_version 26.0.37
 
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
-Version:        1.9.0
-Release:        2%{?dist}
+Version:        1.9.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -307,6 +307,9 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 %{_bindir}/virt-tests
 
 %changelog
+* Tue Nov 24 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.9.1-1
+- Upgrade spec to v1.9.1-1 (upstream v1.9.1 plus OpenVMM changes)
+
 * Sat Nov 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.0-2
 - Patch for CVE-2026-97032, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-56852, CVE-2026-39821, CVE-2026-33814, CVE-2026-13622, CVE-2026-83530, CVE-2026-78669
 
