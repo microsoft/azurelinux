@@ -5,7 +5,7 @@
 Summary:        Open source, general-purpose policy engine
 Name:           opa
 Version:        0.63.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
@@ -14,26 +14,54 @@ License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/open-policy-agent/opa
-#Source0:       https://github.com/open-policy-agent/%{name}/archive/refs/tags/v%{version}.tar.gz
+#Source0:       https://github.com/open-policy-agent/%%{name}/archive/refs/tags/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/open-policy-agent/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel@v1.47.0 \
+#                                  -require=go.opentelemetry.io/otel/sdk@v1.47.0
+#   5. go mod tidy
+#   6. go mod vendor
+#   7. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%%d/PaxHeaders/%%f,delete=atime,delete=ctime \
+#           -czf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+# Alternatively, run the helper from this spec directory:
+#   bash generate_source_tarball.sh \
+#       --srcTarball "$(pwd)/%%{name}-%%{version}.tar.gz" \
+#       --outFolder "$(pwd)" \
+#       --pkgVersion %%{version} --vendorVersion 1
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - You require Go 1.26+ for OpenTelemetry v1.47.0.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+Source1:        %{name}-%{version}-vendor.tar.gz
 # Make telemetry opt-out
 Patch0:         0001-Make-telemetry-opt-out.patch
 # Skip tests requiring network
 Patch1:         0001-Skip-tests-requiring-network.patch
-Patch2:         CVE-2023-45288.patch
-Patch3:         CVE-2025-46569.patch
-Patch4:         CVE-2025-11065.patch
-Patch5:         CVE-2026-39821.patch
-Patch6:         CVE-2026-56852.patch
-Patch7:         CVE-2026-78659.patch
-Patch8:         CVE-2026-78660.patch
-Patch9:         CVE-2026-78669.patch
-Patch10:        CVE-2026-78663.patch
-Patch11:        CVE-2026-97032.patch
-Patch12:        CVE-2026-81869.patch
-Patch13:        CVE-2026-116591.patch
+Patch2:         CVE-2025-46569.patch
+Patch3:         CVE-2025-11065.patch
+Patch4:         CVE-2026-39821.patch
+Patch5:         CVE-2026-56852.patch
+Patch6:         CVE-2026-78659.patch
+Patch7:         CVE-2026-78660.patch
+Patch8:         CVE-2026-78669.patch
+Patch9:         CVE-2026-78663.patch
+Patch10:        CVE-2026-97032.patch
+Patch11:        CVE-2026-116591.patch
+Patch12:        CVE-2026-128086.patch
 # Warn users about WebAssembly missing
-BuildRequires:  golang
+BuildRequires:  golang >= 1.26.0
 BuildRequires:  make
  
 %description
@@ -44,7 +72,10 @@ that enables unified, context-aware policy enforcement across the entire
 stack.
  
 %prep
-%autosetup -p1
+%autosetup -N
+rm -rf vendor
+tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 mv internal/jwx/LICENSE LICENSE-jwx
 
 %build
@@ -65,6 +96,11 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Mon Nov 23 2026 Sushil Sati <v-Sushil.sati@microsoft.com> - 0.63.0-8
+- Patch for CVE-2026-128086 by upgrading vendored go.opentelemetry.io/otel to v1.47.0
+- Drop CVE-2023-45288.patch, CVE-2026-81869.patch
+- Modified CVE-2026-78660.patch, CVE-2026-78663.patch, CVE-2026-78669.patch
+
 * Wed Nov 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.63.0-7
 - Patch for CVE-2026-116591
 
@@ -108,7 +144,7 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.50.2-2
 - Bump release to rebuild with go 1.19.8
 
-* Mon Mar 27 2023 Dallas Delaney <dadelan@microsoft.com> - 0.50.2-1
+* Wed Mar 29 2023 Dallas Delaney <dadelan@microsoft.com> - 0.50.2-1
 - Update to version 0.50.2
 
 * Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.31.0-9

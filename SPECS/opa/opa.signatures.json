@@ -1,5 +1,6 @@
 {
-  "Signatures": {
-    "opa-0.63.0.tar.gz": "0639466031325de698c61d55850c35d14a7a260ead5d5a06540ee142950818b0"
-  }
+ "Signatures": {
+  "opa-0.63.0-vendor.tar.gz": "600921e209a93aebfc7f8806d2d471d3d4d818f7af965c275e100844c4f1ae35",
+  "opa-0.63.0.tar.gz": "0639466031325de698c61d55850c35d14a7a260ead5d5a06540ee142950818b0"
+ }
 }
