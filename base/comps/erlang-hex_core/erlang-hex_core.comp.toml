@@ -1,0 +1,4 @@
+# Pin to Fedora f44 erlang-hex_core-0.21.1 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/erlang-hex_core/c/c73be37d37a2927ad16d867b6b6951c2974271c5
+[components.erlang-hex_core]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "c73be37d37a2927ad16d867b6b6951c2974271c5" }
