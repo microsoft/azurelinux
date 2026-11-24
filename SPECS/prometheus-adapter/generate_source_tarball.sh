@@ -2,7 +2,7 @@
 
 # The flow of this script is as such:
 # 1. Download prometheus-adapter tarball to a temp working directory and extract it.
-# 2. Bump the modules carrying CVE fixes (grpc, cel-go and their transitive deps).
+# 2. Bump the modules carrying CVE fixes (grpc, cel-go, otel and their transitive deps).
 # 3. Then we run go mod vendor.
 # 4. We tar the resulting vendor/ tree only.
 #
@@ -14,6 +14,7 @@ set -e
 SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PKG_VERSION=""
+VENDOR_VERSION="2"
 
 # parameters:
 #
@@ -22,6 +23,7 @@ PKG_VERSION=""
 #                 and should be replaced with the new/modified src code
 # --outFolder   : folder where to copy the new tarball(s)
 # --pkgVersion  : package version
+# --vendorVersion : vendor version
 #
 PARAMS=""
 while (( "$#" )); do
@@ -53,6 +55,15 @@ while (( "$#" )); do
             exit 1
         fi
         ;;
+        --vendorVersion)
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            VENDOR_VERSION=$2
+            shift 2
+        else
+            echo "Error: Argument for $1 is missing" >&2
+            exit 1
+        fi
+        ;;
         -*|--*=) # unsupported flags
         echo "Error: Unsupported flag $1" >&2
         exit 1
@@ -67,6 +78,7 @@ done
 echo "--srcTarball   -> $SRC_TARBALL"
 echo "--outFolder    -> $OUT_FOLDER"
 echo "--pkgVersion   -> $PKG_VERSION"
+echo "--vendorVersion -> $VENDOR_VERSION"
 
 if [ -z "$PKG_VERSION" ]; then
     echo "--pkgVersion parameter cannot be empty"
@@ -93,19 +105,23 @@ cd "prometheus-adapter-$PKG_VERSION"
 # Bump the modules carrying the CVE fixes. grpc v1.83.2 requires go >= 1.25 and
 # x/crypto v0.57.0 requires go >= 1.26, so raise the language level to match.
 # x/crypto must be pinned explicitly; MVS alone only selects v0.55.0.
+# Likewise otel/sdk, which MVS alone leaves at v1.44.0.
 go mod edit -go=1.26.0
 go mod edit \
     -require=google.golang.org/grpc@v1.83.2 \
     -require=github.com/google/cel-go@v0.31.0 \
-    -require=golang.org/x/crypto@v0.57.0
+    -require=golang.org/x/crypto@v0.57.0 \
+    -require=go.opentelemetry.io/otel@v1.47.0 \
+    -require=go.opentelemetry.io/otel/sdk@v1.47.0
 
 go mod tidy
 go mod vendor
 
 # Ship only the vendor tree; Source0 stays pristine and the go.mod/go.sum
 # changes are carried by the spec's patches.
-tar -czf "$OUT_FOLDER/prometheus-adapter-$PKG_VERSION-vendor.tar.gz" vendor
+VENDOR_TARBALL="$OUT_FOLDER/prometheus-adapter-$PKG_VERSION-vendor-v$VENDOR_VERSION.tar.gz"
+tar -czf "$VENDOR_TARBALL" vendor
 
 cd "$START_DIR"
 rm -rf "$TEMPDIR"
-echo "Vendor tarball $OUT_FOLDER/prometheus-adapter-$PKG_VERSION-vendor.tar.gz successfully created!"
+echo "Vendor tarball $VENDOR_TARBALL successfully created!"
