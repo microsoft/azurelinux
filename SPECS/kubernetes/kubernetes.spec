@@ -45,7 +45,7 @@ Source1:        kubelet.service
 #         "go mod vendor" would copy the 30 staging modules into "vendor", which upstream does not do.
 #       - Steps 2-8 are also automated by generate_source_tarball.sh:
 #           ./generate_source_tarball.sh --srcTarball %%{name}-v%%{version}.tar.gz \
-#               --outFolder /tmp --pkgVersion %%{version}
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 2
 Source2:        %{name}-v%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2024-28180.patch
 Patch1:         CVE-2025-27144.patch
@@ -335,7 +335,7 @@ fi
 
 %changelog
 * Mon Nov 23 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.30.10-35
-- Patch for CVE-2026-128085 and CVE-2026-128086 
+- Patch for CVE-2026-128085 and CVE-2026-128086
 
 * Thu Nov 05 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.30.10-34
 - Patch for CVE-2026-116587

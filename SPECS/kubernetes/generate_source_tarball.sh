@@ -24,8 +24,10 @@ GO_DIRECTIVE="1.26.0"
 #                   and should be replaced with the new/modified src code
 # --outFolder     : folder where to copy the new tarball(s)
 # --pkgVersion    : package version
-# --vendorVersion : optional vendor revision; when set the tarball is named
-#                   "<name>-v<pkgVersion>-vendor-v<vendorVersion>.tar.gz"
+# --vendorVersion : vendor tarball version; must match the -vN suffix of
+#                   Source2 in kubernetes.spec (e.g. 2 -> kubernetes-v<ver>-vendor-v2.tar.gz)
+#
+# Usage: ./generate_source_tarball.sh --srcTarball <tarball> --pkgVersion <ver> --vendorVersion <n> [--outFolder <dir>]
 #
 PARAMS=""
 while (( "$#" )); do
@@ -87,6 +89,11 @@ if [ -z "$PKG_VERSION" ]; then
     exit 1
 fi
 
+if [ -z "$VENDOR_VERSION" ]; then
+    echo "--vendorVersion parameter cannot be empty"
+    exit 1
+fi
+
 echo "-- create temp folder"
 tmpdir=$(mktemp -d)
 function cleanup {
@@ -104,12 +111,7 @@ mkdir -p $TARBALL_FOLDER
 pushd $TARBALL_FOLDER > /dev/null
 
 PKG_NAME="kubernetes"
-# Only revisions after the first carry a "-vN" suffix.
-VENDOR_SUFFIX=""
-if [ -n "$VENDOR_VERSION" ]; then
-    VENDOR_SUFFIX="-v$VENDOR_VERSION"
-fi
-VENDOR_TARBALL="$OUT_FOLDER/$PKG_NAME-v$PKG_VERSION-vendor$VENDOR_SUFFIX.tar.gz"
+VENDOR_TARBALL="$OUT_FOLDER/$PKG_NAME-v$PKG_VERSION-vendor-v$VENDOR_VERSION.tar.gz"
 
 echo "Unpacking source tarball..."
 # The kubernetes source tarball has no top-level directory.
@@ -151,7 +153,7 @@ go work vendor
 
 echo ""
 echo "========================="
-echo "Tar vendored tarball"
+echo "Tar vendored modules"
 tar  --sort=name \
      --mtime="2021-04-26 00:00Z" \
      --owner=0 --group=0 --numeric-owner \
