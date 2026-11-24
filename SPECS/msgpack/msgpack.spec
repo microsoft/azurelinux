@@ -27,8 +27,7 @@ Requires:       %{name} = %{version}
 Development files for %{name}
 
 %prep
-%setup -q -n %{name}-c-cpp-%{version}
-%patch 0 -p1
+%autosetup -p1 -n %{name}-c-cpp-%{version}
 
 %build
 mkdir build
