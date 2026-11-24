@@ -5,9 +5,19 @@
 # Quit on failure
 set -e
 
+get_param() {
+    if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+        echo "$2"
+    else
+        echo "Error: argument for ($1) is missing." >&2
+        return 1
+    fi
+}
+
 PKG_VERSION=""
 SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VENDOR_VERSION="2"
 
 # parameters:
 #
@@ -16,44 +26,33 @@ OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #                 and should be replaced with the new/modified src code
 # --outFolder   : folder where to copy the new tarball(s)
 # --pkgVersion  : package version
+# --vendorVersion : vendor tarball version
 #
-PARAMS=""
 while (( "$#" )); do
     case "$1" in
         --srcTarball)
-        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-            SRC_TARBALL=$2
-            shift 2
-        else
-            echo "Error: Argument for $1 is missing" >&2
-            exit 1
-        fi
+        SRC_TARBALL="$(get_param "$1" "$2")"
+        shift 2
         ;;
         --outFolder)
-        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-            OUT_FOLDER=$2
-            shift 2
-        else
-            echo "Error: Argument for $1 is missing" >&2
-            exit 1
-        fi
+        OUT_FOLDER="$(get_param "$1" "$2")"
+        shift 2
         ;;
         --pkgVersion)
-        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-            PKG_VERSION=$2
-            shift 2
-        else
-            echo "Error: Argument for $1 is missing" >&2
-            exit 1
-        fi
+        PKG_VERSION="$(get_param "$1" "$2")"
+        shift 2
         ;;
-        -*|--*=) # unsupported flags
-        echo "Error: Unsupported flag $1" >&2
+        --vendorVersion)
+        VENDOR_VERSION="$(get_param "$1" "$2")"
+        shift 2
+        ;;
+        -*)
+        echo "Error: unsupported flag $1." >&2
         exit 1
         ;;
-        *) # preserve positional arguments
-        PARAMS="$PARAMS $1"
-        shift
+        *)
+        echo "Error: unsupported argument $1." >&2
+        exit 1
         ;;
   esac
 done
@@ -61,30 +60,47 @@ done
 echo "--srcTarball   -> $SRC_TARBALL"
 echo "--outFolder    -> $OUT_FOLDER"
 echo "--pkgVersion   -> $PKG_VERSION"
+echo "--vendorVersion -> $VENDOR_VERSION"
 
 if [ -z "$PKG_VERSION" ]; then
-    echo "--pkgVersion parameter cannot be empty"
+    echo "Error: --pkgVersion parameter cannot be empty." >&2
     exit 1
 fi
+
+if [ -z "$VENDOR_VERSION" ]; then
+    echo "Error: --vendorVersion parameter cannot be empty." >&2
+    exit 1
+fi
+
+if [ ! -f "$SRC_TARBALL" ]; then
+    echo "Error: --srcTarball is not a file." >&2
+    exit 1
+fi
+
+SRC_TARBALL="$(realpath "$SRC_TARBALL")"
+mkdir -p "$OUT_FOLDER"
+OUT_FOLDER="$(realpath "$OUT_FOLDER")"
 
 echo "-- create temp folder"
 tmpdir=$(mktemp -d)
 function cleanup {
     echo "+++ cleanup -> remove $tmpdir"
-    rm -rf $tmpdir
+    rm -rf "$tmpdir"
 }
 trap cleanup EXIT
 
-pushd $tmpdir > /dev/null
+pushd "$tmpdir" > /dev/null
 
 NAME_VER="skopeo-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor.tar.gz"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor-v$VENDOR_VERSION.tar.gz"
 
 echo "Unpacking source tarball..."
-tar -xf $SRC_TARBALL
+tar -xf "$SRC_TARBALL"
 
 cd "$NAME_VER"
-go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+go mod edit -modfile=go.mod \
+    -require=google.golang.org/grpc@v1.83.2 \
+    -require=go.opentelemetry.io/otel@v1.47.0
 go mod tidy
 echo "Get vendored modules"
 go mod vendor
@@ -98,3 +114,4 @@ tar  --sort=name \
 
 popd > /dev/null
 echo "skopeo vendored modules are available at $VENDOR_TARBALL"
+echo "SHA256: $(sha256sum "$VENDOR_TARBALL")."
