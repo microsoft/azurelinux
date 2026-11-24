@@ -79,6 +79,11 @@ if [ -z "$PKG_VERSION" ]; then
     exit 1
 fi
 
+if [ -z "$VENDOR_VERSION" ]; then
+    echo "--vendorVersion parameter cannot be empty"
+    exit 1
+fi
+
 SRC_TARBALL="$(cd "$(dirname "$SRC_TARBALL")" && pwd)/$(basename "$SRC_TARBALL")"
 OUT_FOLDER="$(cd "$OUT_FOLDER" && pwd)"
 
@@ -93,7 +98,7 @@ trap cleanup EXIT
 pushd $tmpdir > /dev/null
 
 NAME_VER="opa-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor.tar.gz"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor-v$VENDOR_VERSION.tar.gz"
 
 echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL

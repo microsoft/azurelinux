@@ -30,7 +30,7 @@ Source0:        %{name}-%{version}.tar.gz
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%%d/PaxHeaders/%%f,delete=atime,delete=ctime \
-#           -czf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -czf %%{name}-%%{version}-vendor-v1.tar.gz vendor
 #
 # Alternatively, run the helper from this spec directory:
 #   bash generate_source_tarball.sh \
@@ -44,7 +44,7 @@ Source0:        %{name}-%{version}.tar.gz
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v1.tar.gz
 # Make telemetry opt-out
 Patch0:         0001-Make-telemetry-opt-out.patch
 # Skip tests requiring network
@@ -72,10 +72,7 @@ that enables unified, context-aware policy enforcement across the entire
 stack.
  
 %prep
-%autosetup -N
-rm -rf vendor
-tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1
+%autosetup -a 1 -p1
 mv internal/jwx/LICENSE LICENSE-jwx
 
 %build
