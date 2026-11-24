@@ -36,6 +36,7 @@ Patch5:         CVE-2026-78669.patch
 Patch6:         CVE-2026-97032.patch
 
 BuildRequires:  golang
+Requires:       openssl-libs
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
@@ -71,6 +72,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %changelog
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 3.10.182-7
 - Remove 'BuildRequires: golang < 1.25' pin to build with the default Go toolchain.
+- Add 'Requires: openssl-libs'; Go 1.27 systemcrypto loads libcrypto at runtime.
 
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.10.182-6
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
