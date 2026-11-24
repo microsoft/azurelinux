@@ -13,6 +13,8 @@ OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 GRPC_VERSION="v1.83.2"
 CEL_GO_VERSION="v0.31.0"
 X_CRYPTO_VERSION="v0.57.0"
+# otel/sdk must be pinned too; MVS alone leaves it at v1.44.0.
+OTEL_VERSION="v1.47.0"
 GO_DIRECTIVE="1.26.0"
 
 # parameters:
@@ -120,7 +122,9 @@ echo "Bumping vendored modules..."
 go mod edit -go=$GO_DIRECTIVE go.mod
 go mod edit -require=google.golang.org/grpc@$GRPC_VERSION \
             -require=github.com/google/cel-go@$CEL_GO_VERSION \
-            -require=golang.org/x/crypto@$X_CRYPTO_VERSION go.mod
+            -require=golang.org/x/crypto@$X_CRYPTO_VERSION \
+            -require=go.opentelemetry.io/otel@$OTEL_VERSION \
+            -require=go.opentelemetry.io/otel/sdk@$OTEL_VERSION go.mod
 
 for module in staging/src/k8s.io/*/; do
     go mod edit -go=$GO_DIRECTIVE "$module/go.mod"
@@ -130,6 +134,10 @@ for module in staging/src/k8s.io/*/; do
         go mod edit -require=github.com/google/cel-go@$CEL_GO_VERSION "$module/go.mod"
     grep -q 'golang.org/x/crypto v' "$module/go.mod" && \
         go mod edit -require=golang.org/x/crypto@$X_CRYPTO_VERSION "$module/go.mod"
+    grep -q 'go.opentelemetry.io/otel v' "$module/go.mod" && \
+        go mod edit -require=go.opentelemetry.io/otel@$OTEL_VERSION "$module/go.mod"
+    grep -q 'go.opentelemetry.io/otel/sdk v' "$module/go.mod" && \
+        go mod edit -require=go.opentelemetry.io/otel/sdk@$OTEL_VERSION "$module/go.mod"
 done
 
 go work edit -go=$GO_DIRECTIVE
