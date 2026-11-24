@@ -7,7 +7,7 @@
 
 %define _missing_build_ids_terminate_build 0
 
-%global srctag v1.9.0-2
+%global srctag v1.9.1-1
 %global sha 740242aaab012e3e54426576df791727b9328ee0
 %global msvm_version 26.0.37
 
