@@ -6,12 +6,13 @@ Name: tzdata
 Version: 2026f
 %define tzdata_version 2026f
 %define tzcode_version 2026f
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: LicenseRef-Fedora-Public-Domain AND (GPL-2.0-only WITH ClassPath-exception-2.0)
 URL: https://www.iana.org/time-zones
 Source0: ftp://ftp.iana.org/tz/releases/tzdata%{tzdata_version}.tar.gz
 Source1: ftp://ftp.iana.org/tz/releases/tzcode%{tzcode_version}.tar.gz
 
+Patch001: 0001-Revert-zonenow.tab-to-2026a-mostly.patch
 Patch002: 0002-Fix-have-snprintf-error.patch
 
 BuildRequires: make
@@ -43,6 +44,7 @@ This package contains timezone information for use by Java runtimes.
 %prep
 %setup -q -c -a 1
 
+%patch -p1 -P 1
 %patch -p1 -P 2
 
 # zic now defaults to "-b slim" to control data bloat.
@@ -145,6 +147,15 @@ echo ============END TESTING===========
 %{_datadir}/javazi-1.8
 
 %changelog
+* Mon Nov 02 2026 Patsy Griffin <patsy@redhat.com> - 2026f-1
+  Update to tzdata-2026f (#2562623)
+  - Cuba will not fall back on 2026-11-01.  Cuba will stay on -04
+    through 2027-11-07.
+  - There will be no more leap seconds.  The leap seconds tables will
+    no longer expire.
+  - Improve 1965/1966 data for Brazil.
+  - Revert temporary zonenow.tab changes.
+
 * Mon Oct 05 2026 Patsy Griffin <patsy@redhat.com> - 2026e-1
   Update to tzdata-2026e (#2544693)
   - Manitoba moves to permanent -05 on 2026-10-31.
