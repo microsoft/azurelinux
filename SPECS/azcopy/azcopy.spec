@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
 Version:        10.25.1
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,7 +26,7 @@ Source0:        https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        azure-storage-%{name}-%{version}-vendor-v2.tar.gz
+Source1:        azure-storage-%{name}-%{version}-vendor-v3.tar.gz
 Patch0:         CVE-2025-30204.patch
 Patch1:         CVE-2024-51744.patch
 Patch2:         CVE-2026-84445.patch
@@ -35,6 +35,7 @@ Patch4:         CVE-2026-78669.patch
 Patch5:         CVE-2026-116585.patch
 Patch6:         CVE-2026-116586.patch
 Patch7:         CVE-2026-116587.patch
+Patch8:         CVE-2026-128085.patch
 
 BuildRequires: golang
 BuildRequires:  git
@@ -71,6 +72,9 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Fri Nov 27 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 10.25.1-13
+- Patch for CVE-2026-128085 and CVE-2026-128086
+
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 10.25.1-12
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
