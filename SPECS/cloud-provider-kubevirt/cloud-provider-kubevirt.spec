@@ -1,7 +1,7 @@
 Summary:        Package to create the cloud-provider-kubevirt binary.
 Name:           cloud-provider-kubevirt
 Version:        0.5.1
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubevirt/cloud-provider-kubevirt/
 Group:          System/Management
@@ -17,14 +17,19 @@ Source0:        https://github.com/kubevirt/cloud-provider-kubevirt/archive/refs
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. Apply golang-version-upgrade.patch
-#   5. go mod vendor
-#   6. tar  --sort=name \
+#   5. go mod edit -require=google.golang.org/grpc@v1.83.2 \
+#                  -require=github.com/google/cel-go@v0.31.0 \
+#                  -require=go.opentelemetry.io/otel@v1.47.0 \
+#                  -require=go.opentelemetry.io/otel/sdk@v1.47.0
+#   6. go mod tidy
+#   7. go mod vendor
+#   8. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -czf %%{name}-%%{version}-vendor-v4.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor-v3.tar.gz
+Source1:        %{name}-%{version}-vendor-v4.tar.gz
 Patch0:         initialization-and-configuration-handling.patch
 Patch1:         single-ip-address-for-node.patch
 Patch2:         golang-version-upgrade.patch
@@ -39,6 +44,7 @@ Patch10:        CVE-2026-78669.patch
 Patch11:        CVE-2026-97032.patch
 Patch12:        CVE-2026-78661.patch
 Patch13:        CVE-2026-97045.patch
+Patch14:        CVE-2026-128085.patch
 %global debug_package %{nil}
 BuildRequires:  golang
 
@@ -79,6 +85,9 @@ make test
 %{_bindir}/kubevirt-cloud-controller-manager
 
 %changelog
+* Wed Nov 25 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.5.1-13
+- Patch for CVE-2026-128085 and CVE-2026-128086 
+
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 0.5.1-12
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
