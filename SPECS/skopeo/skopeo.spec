@@ -73,7 +73,7 @@ make test-unit-local
 
 %changelog
 * Fri Nov 27 2026 Sushil Sati <v-Sushil.sati@microsoft.com> - 1.14.4-18
-- Patch for CVE-2026-128085 and CVE-2026-128086
+- Patch for CVE-2026-128085 and CVE-2026-128086 by upgrading vendored go.opentelemetry.io/otel to v1.47.0
 
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.14.4-17
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
