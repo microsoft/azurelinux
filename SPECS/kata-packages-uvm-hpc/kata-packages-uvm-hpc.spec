@@ -9,10 +9,11 @@ Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 
 # The GPU UVM is built on top of the regular Kata UVM package set. Its init process is
-# NVRC (which starts the NVIDIA services and then the kata-agent), so systemd is installed
-# but not run as PID 1. NVRC, the kata-agent, the NVIDIA userspace and the NVIDIA kernel
-# modules are added to the rootfs by the image builder, not by this metapackage.
+# NVRC (kata-nvrc, which starts the NVIDIA services and then the kata-agent), so systemd
+# is installed but not run as PID 1. The kata-agent, the NVIDIA userspace and the NVIDIA
+# kernel modules are added to the rootfs by the image builder, not by this metapackage.
 Requires:       e2fsprogs
+Requires:       kata-nvrc
 Requires:       kata-packages-uvm
 
 %description
