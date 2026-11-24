@@ -1,3 +1,4 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Lemenkov <lemenkov@gmail.com>
 Date: Tue, 15 Dec 2020 16:35:56 +0100
 Subject: [PATCH] Skip deps
@@ -5,10 +6,10 @@ Subject: [PATCH] Skip deps
 Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
 
 diff --git a/bootstrap b/bootstrap
-index 25b93563..3b4c8440 100755
+index 901334c2..20657ed9 100755
 --- a/bootstrap
 +++ b/bootstrap
-@@ -40,15 +40,6 @@ main(Args) ->
+@@ -40,14 +40,6 @@ main(Args) ->
      os:putenv("REBAR_PROFILE", "bootstrap"),
      compile_vendored(),
  
@@ -16,15 +17,14 @@ index 25b93563..3b4c8440 100755
 -    BaseDeps = [{providers, []}
 -               ,{getopt, []}
 -               ,{cf, []}
--               ,{erlware_commons, ["ec_dictionary.erl", "ec_vsn.erl"]}
--               ,{certifi, ["certifi_pt.erl"]}],
+-               ,{erlware_commons, ["ec_dictionary.erl", "ec_vsn.erl"]}],
 -    Deps = get_deps(),
 -    [fetch_and_compile(Dep, Deps) || Dep <- BaseDeps],
 -
      %% Build rebar3 modules with compile:file
      bootstrap_rebar3(),
  
-@@ -70,7 +61,6 @@ main(Args) ->
+@@ -69,7 +61,6 @@ main(Args) ->
      code:add_pathsa(DepsPaths),
  
      rebar3:run(["clean", "-a"]),
