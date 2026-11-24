@@ -1,10 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-<<<<<<< HEAD
-# Linux/arm64 6.18.60.2 Kernel Configuration
-=======
 # Linux/arm64 6.18.64.1 Kernel Configuration
->>>>>>> d482fc3ef1 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.18.64.1 - branch fasttrack/3.0 (#20467))
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
