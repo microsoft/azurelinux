@@ -1,4 +1,4 @@
-# Pin to Fedora f43 fluidsynth-2.6.1 to pick up upstream CVE fixes.
-# https://src.fedoraproject.org/rpms/fluidsynth/c/d401246cd202ab9fc9005cf7e0efd20354584ad9
+# Pin to Fedora f43 fluidsynth-2.6.3-1.fc43 for the CVE-2026-111123 fix.
+# https://src.fedoraproject.org/rpms/fluidsynth/c/91aed30ddf82ee02fa45d413f01aa65037c94270
 [components.fluidsynth]
-spec = { type = "upstream", upstream-commit = "d401246cd202ab9fc9005cf7e0efd20354584ad9" }
+spec = { type = "upstream", upstream-commit = "91aed30ddf82ee02fa45d413f01aa65037c94270" }
