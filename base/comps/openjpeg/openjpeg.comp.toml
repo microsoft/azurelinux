@@ -1,0 +1,4 @@
+# Pin to Fedora f44 openjpeg-2.5.4-5.fc44 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/openjpeg/c/d356e889ec350478f3ddefbb175cc8a2388ed98f
+[components.openjpeg]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "d356e889ec350478f3ddefbb175cc8a2388ed98f" }

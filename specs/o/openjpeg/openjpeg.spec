@@ -20,7 +20,7 @@
 
 Name:           openjpeg
 Version:        2.5.4
-Release: 5%{?dist}
+Release: 10%{?dist}
 Summary:        C-Library for JPEG 2000
 
 # windirent.h is MIT, the rest is BSD
@@ -32,6 +32,8 @@ Source0:        https://github.com/uclouvain/openjpeg/archive/v%{version}/%{name
 Source1:        data.tar.xz
 %endif
 Source9999: openjpeg.azl.macros
+# Apply proposed fix for CVE-2026-107080
+Patch0:         https://github.com/uclouvain/openjpeg/pull/1674.patch
 
 
 BuildRequires:  cmake
@@ -461,6 +463,18 @@ rm -rf %{buildroot}%{mingw64_datadir}/doc
 
 
 %changelog
+* Wed Oct 28 2026 Sandro Mani <manisandro@gmail.com> - 2.5.4-5
+- Apply proposed fix for CVE-2026-107080
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 08 2025 Sandro Mani <manisandro@gmail.com> - 2.5.4-2
+- Rebuild (libtiff)
+
 * Mon Sep 22 2025 Sandro Mani <manisandro@gmail.com> - 2.5.4-1
 - Update to 2.5.4
 
