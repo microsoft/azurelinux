@@ -7,7 +7,7 @@ set -e
 
 PKG_VERSION=""
 SRC_TARBALL=""
-VENDOR_VERSION="2"
+VENDOR_VERSION="3"
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # parameters:
@@ -102,7 +102,9 @@ tar -xf $SRC_TARBALL
 
 echo "Vendor go modules..."
 cd $NAME_VER
-go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2 \
+                            -require=go.opentelemetry.io/otel@v1.47.0 \
+                            -require=go.opentelemetry.io/otel/sdk@v1.47.0
 go mod tidy
 # gRPC 1.83.2 pushes the "go" directive to 1.25.0, which also moves GODEBUG defaults to the
 # 1.25 baseline. That makes crypto/x509 reject the negative-serial EC-ACC root vendored by

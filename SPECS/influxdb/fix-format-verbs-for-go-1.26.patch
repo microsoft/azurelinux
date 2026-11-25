@@ -1,0 +1,46 @@
+From d87cd9860fbccf7bb68b81b07159b23049bcce4c Mon Sep 17 00:00:00 2001
+From: WeblWabl <devandbenz@gmail.com>
+Date: Mon, 18 May 2026 21:34:47 +0000
+Subject: [PATCH] fix format verbs rejected by go vet at go 1.26
+
+Use %d for the integer LogicalOperator and %v for the slice of logged
+entries. Both were passed to %q, which go vet reports as a printf error
+once the go directive is 1.26; go test runs that check, so the predicate
+and v1/services/retention packages fail to build their tests.
+
+Azure Linux: required because the go.opentelemetry.io/otel v1.47.0
+upgrade raises the go directive to 1.26. Only the two hunks from the
+upstream commit that touch these files are backported.
+
+Upstream-reference: https://github.com/influxdata/influxdb/commit/75f7dfc7322fe68e31aba93c06e6192da6ce7716
+---
+ predicate/logical.go                  | 2 +-
+ v1/services/retention/service_test.go | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/predicate/logical.go b/predicate/logical.go
+index 21311be..41d3d72 100644
+--- a/predicate/logical.go
++++ b/predicate/logical.go
+@@ -23,7 +23,7 @@ func (op LogicalOperator) Value() (datatypes.Node_Logical, error) {
+ 	default:
+ 		return 0, &errors.Error{
+ 			Code: errors.EInvalid,
+-			Msg:  fmt.Sprintf("the logical operator %q is invalid", op),
++			Msg:  fmt.Sprintf("the logical operator %d is invalid", op),
+ 		}
+ 	}
+ }
+diff --git a/v1/services/retention/service_test.go b/v1/services/retention/service_test.go
+index 8ae1816..2593343 100644
+--- a/v1/services/retention/service_test.go
++++ b/v1/services/retention/service_test.go
+@@ -33,7 +33,7 @@ func TestService_OpenDisabled(t *testing.T) {
+ 	}
+ 
+ 	if s.LogBuf.Len() > 0 {
+-		t.Fatalf("service logged %q, didn't expect any logging", s.LogBuf.All())
++		t.Fatalf("service logged %v, didn't expect any logging", s.LogBuf.All())
+ 	}
+ }
+ 
