@@ -21,7 +21,7 @@ index 3f92054..6ec846f 100644
 -	$(SED) -e 's:@SBINDIR@:$(SBINDIR):' $? > $@
 +	$(SED) -e 's:@SBINDIR@:$(SBINDIR):; s:@DBROOT@:$(DBROOT):' $? > $@
  
- install: install_systemd install_iface install_etc
+ install_etc: $(DESTDIR)$(HOMEDIR) $(ETC_DEST_FILES)
  
 diff --git a/etc/systemd/iscsi-starter.service.template b/etc/systemd/iscsi-starter.service.template
 index 5e97941..d3ea7cd 100644

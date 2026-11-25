@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 %global open_iscsi_version	2.1
-%global open_iscsi_build	11
-%global commit0			4b3e853ab468a95d8a035efa8fc4298a6c6318a3
+%global open_iscsi_build	13
+%global commit0			40f6b2944f8a8553ad57975d1f2bb512cc23d7d1
 %global shortcommit0		%(c=%{commit0}; echo ${c:0:7})
 
 # Disable python2 build by default
@@ -151,14 +151,14 @@ rm $RPM_BUILD_ROOT/etc/iscsi/initiatorname.iscsi
 rm $RPM_BUILD_ROOT/etc/udev/rules.d/50-iscsi-firmware-login.rules
 rm $RPM_BUILD_ROOT/usr/lib/systemd/system-generators/ibft-rule-generator
 rm $RPM_BUILD_ROOT/%{_sbindir}/brcm_iscsiuio
-rm $RPM_BUILD_ROOT/%{_sbindir}/iscsi-gen-initiatorname
+
 rm $RPM_BUILD_ROOT/%{_sbindir}/iscsi_discovery
 rm $RPM_BUILD_ROOT/%{_sbindir}/iscsi_fw_login
 rm $RPM_BUILD_ROOT/%{_sbindir}/iscsi_offload
-rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi-gen-initiatorname.8
+
 rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi_discovery.8
 rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi_fw_login.8
-rm $RPM_BUILD_ROOT/var/lib/iscsi/ifaces/iface.example
+
 
 %{__install} -d $RPM_BUILD_ROOT%{_libexecdir}
 %{__install} -pm 755 etc/systemd/iscsi-mark-root-nodes $RPM_BUILD_ROOT%{_libexecdir}
@@ -243,6 +243,8 @@ systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || 
 %{_mandir}/man8/iscsistart.8.gz
 %{_libdir}/libopeniscsiusr.so.*
 
+%{_sbindir}/iscsi-gen-initiatorname
+%{_mandir}/man8/iscsi-gen-initiatorname.8.gz
 %files iscsiuio
 %{_sbindir}/iscsiuio
 %{_unitdir}/iscsiuio.service
