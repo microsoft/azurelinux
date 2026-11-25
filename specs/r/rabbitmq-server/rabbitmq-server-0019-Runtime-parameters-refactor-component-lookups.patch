@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Mon, 27 Apr 2026 20:25:32 -0700
+Subject: [PATCH 19/41] Runtime parameters: refactor `component` lookups
+
+(cherry picked from commit 8ea4591468a5d89f6f6de72c36e55eed6f93a22c)
+(cherry picked from commit a87125ceef5eeec07b63b5fb60702a1f5f360616)
+
+[Backport to 4.0.9: clean cherry-pick. Same to_atom/1 hardening for the
+runtime parameter component lookup, taken together with the
+CVE-2026-67227 fix.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/rabbit/src/rabbit_runtime_parameters.erl | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/deps/rabbit/src/rabbit_runtime_parameters.erl b/deps/rabbit/src/rabbit_runtime_parameters.erl
+index f919ad3969..4a24471672 100644
+--- a/deps/rabbit/src/rabbit_runtime_parameters.erl
++++ b/deps/rabbit/src/rabbit_runtime_parameters.erl
+@@ -383,13 +383,20 @@ global_info_keys() -> [name, value].
+ %%---------------------------------------------------------------------------
+ 
+ lookup_component(Component) ->
+-    case rabbit_registry:lookup_module(
+-           runtime_parameter, rabbit_data_coercion:to_atom(Component)) of
+-        {error, not_found} -> {errors,
+-                               [{"component ~ts not found", [Component]}]};
+-        {ok, Module}       -> {ok, Module}
++    try rabbit_data_coercion:to_existing_atom(Component) of
++        ComponentAtom ->
++            case rabbit_registry:lookup_module(
++                   runtime_parameter, ComponentAtom) of
++                {error, not_found} -> component_not_found(Component);
++                {ok, Module}       -> {ok, Module}
++            end
++    catch
++        error:badarg -> component_not_found(Component)
+     end.
+ 
++component_not_found(Component) ->
++    {errors, [{"component ~ts not found", [Component]}]}.
++
+ flatten_errors(L) ->
+     case [{F, A} || I <- lists:flatten([L]), {error, F, A} <- [I]] of
+         [] -> ok;

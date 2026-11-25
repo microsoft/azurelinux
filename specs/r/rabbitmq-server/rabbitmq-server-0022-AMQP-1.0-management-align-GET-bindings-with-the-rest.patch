@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Wed, 24 Jun 2026 10:00:15 -0700
+Subject: [PATCH 22/41] AMQP 1.0 management: align `GET /bindings` with the
+ rest of the bindings handlers
+
+(cherry picked from commit 93998ec20bb7444d8f65a450b5a0f9ab9b104788)
+
+(cherry picked from commit 341e3f2795ebd1f816e712530f651a3221d23ad9)
+
+[Backport to 4.0.9: hand-applied only the handle_http_req/8 GET
+[<<"bindings">>] hunk: binding_checks/5 now runs before the binding
+list is returned. The -ifdef(TEST) export, the rabbitmq_amqp_client
+test helper and the test suites are not taken. Fixes CVE-2026-61837.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/rabbit/src/rabbit_amqp_management.erl | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/deps/rabbit/src/rabbit_amqp_management.erl b/deps/rabbit/src/rabbit_amqp_management.erl
+index e60c967fe7..29944519c6 100644
+--- a/deps/rabbit/src/rabbit_amqp_management.erl
++++ b/deps/rabbit/src/rabbit_amqp_management.erl
+@@ -366,9 +366,9 @@ handle_http_req(<<"GET">>,
+                              <<"key">> := Key},
+                 null,
+                 Vhost,
+-                _User,
++                User,
+                 _ConnPid,
+-                PermCaches) ->
++                PermCaches0) ->
+     {DstKind,
+      DstNameBin} = case QueryMap of
+                        #{<<"dste">> := DstX} ->
+@@ -378,10 +378,11 @@ handle_http_req(<<"GET">>,
+                        _ ->
+                            throw(<<"400">>,
+                                  "missing 'dste' or 'dstq' in query: ~tp",
+-                                 QueryMap)
++                                 [QueryMap])
+                    end,
+     SrcXName = exchange_resource(Vhost, SrcXNameBin),
+     DstName = rabbit_misc:r(Vhost, DstKind, DstNameBin),
++    PermCaches = binding_checks(SrcXName, DstName, Key, User, PermCaches0),
+     Bindings0 = rabbit_binding:list_for_source_and_destination(SrcXName, DstName),
+     Bindings = [B || B = #binding{key = K} <- Bindings0, K =:= Key],
+     RespPayload = encode_bindings(Bindings),

@@ -1,0 +1,97 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Sat, 11 Apr 2026 02:11:50 -0700
+Subject: [PATCH 41/41] Follow-up to #16020: integrate the special value of `0`
+
+as we already do in the Stream Protocol and elsewhere
+in RabbitMQ protocol implementations.
+
+(cherry picked from commit 6567e80ee72ef8e66b5170190cfc89100de8ce81)
+(cherry picked from commit 5879a5089b0bcfb14e845eb19849e6cae2709c21)
+
+[Backport to 4.0.9: only negotiate_frame_max/2 is added to the
+-ifdef(TEST) export list (4.0.9 has no clean_subscriptions/4); test
+suite changes are dropped. Part of the CVE-2026-67225 fix.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../src/rabbit_stream_reader.erl              | 19 ++++++++++++++-----
+ .../src/rabbit_stream_core.erl                | 13 +++++++++++--
+ 2 files changed, 25 insertions(+), 7 deletions(-)
+
+diff --git a/deps/rabbitmq_stream/src/rabbit_stream_reader.erl b/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
+index c8cf5bb281..9870f34732 100644
+--- a/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
++++ b/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
+@@ -106,7 +106,8 @@
+          close_sent/3]).
+ -ifdef(TEST).
+ -export([ensure_token_expiry_timer/2,
+-         evaluate_state_after_secret_update/4]).
++         evaluate_state_after_secret_update/4,
++         negotiate_frame_max/2]).
+ -endif.
+ 
+ callback_mode() ->
+@@ -1424,10 +1425,8 @@ handle_frame_pre_auth(_Transport,
+                       {tune, FrameMax, Heartbeat}) ->
+     rabbit_log_connection:debug("Tuning response ~tp ~tp ",
+                                 [FrameMax, Heartbeat]),
+-    %% The client must not negotiate a frame_max larger than the
+-    %% value advertised by the server, so clamp it to the configured
+-    %% ceiling before pushing the negotiated value into the parser.
+-    NegotiatedFrameMax = min(FrameMax, ConfiguredFrameMax),
++    %% 0 on either side means "no limit" and must not be clamped to 0.
++    NegotiatedFrameMax = negotiate_frame_max(FrameMax, ConfiguredFrameMax),
+     CoreState = rabbit_stream_core:set_frame_max(NegotiatedFrameMax,
+                                                  CoreState0),
+     Parent = self(),
+@@ -1534,6 +1533,16 @@ handle_frame_pre_auth(_Transport, Connection, State, Command) ->
+                                   [Command]),
+     {Connection#stream_connection{connection_step = failure}, State}.
+ 
++%% 0 on either side means "no limit"; fall back to the other value.
++-spec negotiate_frame_max(non_neg_integer(), non_neg_integer()) ->
++    non_neg_integer().
++negotiate_frame_max(0, Configured) ->
++    Configured;
++negotiate_frame_max(Client, 0) ->
++    Client;
++negotiate_frame_max(Client, Configured) ->
++    min(Client, Configured).
++
+ auth_fail(Username, Msg, Args, Connection, ConnectionState) ->
+     notify_auth_result(Username,
+                        user_authentication_failure,
+diff --git a/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl b/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
+index 28e8d75b18..d377414e5e 100644
+--- a/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
++++ b/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
+@@ -173,7 +173,7 @@
+ 
+ -spec init(#{frame_max => non_neg_integer() | unlimited} | term()) -> state().
+ init(Opts) when is_map(Opts) ->
+-    FrameMax = maps:get(frame_max, Opts, unlimited),
++    FrameMax = normalise_frame_max(maps:get(frame_max, Opts, unlimited)),
+     #?MODULE{cfg = #cfg{frame_max = FrameMax}};
+ init(_) ->
+     #?MODULE{cfg = #cfg{frame_max = unlimited}}.
+@@ -183,7 +183,16 @@ init(_) ->
+ %% the initial ceiling.
+ -spec set_frame_max(non_neg_integer() | unlimited, state()) -> state().
+ set_frame_max(FrameMax, #?MODULE{cfg = Cfg} = State) ->
+-    State#?MODULE{cfg = Cfg#cfg{frame_max = FrameMax}}.
++    State#?MODULE{cfg = Cfg#cfg{frame_max = normalise_frame_max(FrameMax)}}.
++
++%% `frame_max` = 0 means "no limit" (AMQP 0-9-1 convention);
++%% the parser expresses that as the atom `unlimited`.
++-spec normalise_frame_max(non_neg_integer() | unlimited) ->
++    pos_integer() | unlimited.
++normalise_frame_max(0) ->
++    unlimited;
++normalise_frame_max(FrameMax) ->
++    FrameMax.
+ 
+ -spec next_command(state()) -> {command(), state()} | empty.
+ next_command(#?MODULE{commands = Commands0} = State) ->

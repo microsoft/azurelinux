@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 4 Nov 2026 18:27:09 +0100
+Subject: [PATCH 21/41] Escape "-" in topic permission variables
+
+The CVE-2026-44838 fix escapes regex metacharacters in expanded topic
+permission variables, but not "-". Inside a "[...]" character class
+"-" forms a range, so a client ID such as "a-z" substituted into a
+template like "^[{client_id}]-sensors$" still widens the pattern.
+
+Upstream fixed this in eb7e0e2ad6 ("Improve `rabbit_re`, adopt it in
+more places"), which moves the escaping into a new rabbit_re:escape/1
+and adds "-" to the escaped set. 4.0.9 has no rabbit_re, so add "-" to
+escape_regex_char/1 directly and port the upstream test case.
+
+Fixes CVE-2026-67407.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/rabbit/src/rabbit_auth_backend_internal.erl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/deps/rabbit/src/rabbit_auth_backend_internal.erl b/deps/rabbit/src/rabbit_auth_backend_internal.erl
+index d55956f9b6..3f1ff6322c 100644
+--- a/deps/rabbit/src/rabbit_auth_backend_internal.erl
++++ b/deps/rabbit/src/rabbit_auth_backend_internal.erl
+@@ -197,7 +197,7 @@ escape_regex_char(C)
+   when C =:= $\\; C =:= $^; C =:= $$; C =:= $.;
+        C =:= $|; C =:= $?; C =:= $*; C =:= $+;
+        C =:= $(; C =:= $); C =:= $[; C =:= $];
+-       C =:= ${; C =:= $} ->
++       C =:= ${; C =:= $}; C =:= $- ->
+     <<$\\, C>>;
+ escape_regex_char(C) ->
+     <<C>>.

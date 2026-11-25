@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David Ansari <david.ansari@gmx.de>
+Date: Thu, 23 Jul 2026 14:15:01 +0200
+Subject: [PATCH 15/17] Match exact symbol length when detecting AMQP 1.0 body
+ sections
+
+In server_mode, the parser recognised the symbolic message body
+descriptors (amqp:data:binary, amqp:amqp-sequence:list and
+amqp:amqp-value:*) by their textual prefix only, ignoring the encoded
+symbol length. A described value whose descriptor merely started with
+one of these names was therefore classified as the corresponding
+standard body section.
+
+(cherry picked from commit c9b4b10c2dbf0f1c89f10b482ac8b45f84dc5954)
+(cherry picked from commit d5186e66e056960f58e2d0fbee2fcc66e1ed6fb9)
+
+[Backport to 4.0.9: only the two new server_mode test cases are added to binary_parser_SUITE; the other cases in the upstream test list come from unrelated later commits.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/amqp10_common/src/amqp10_binary_parser.erl | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/deps/amqp10_common/src/amqp10_binary_parser.erl b/deps/amqp10_common/src/amqp10_binary_parser.erl
+index c8e07513db..96de6df33e 100644
+--- a/deps/amqp10_common/src/amqp10_binary_parser.erl
++++ b/deps/amqp10_common/src/amqp10_binary_parser.erl
+@@ -248,17 +248,17 @@ pm(<<?DESCRIBED, ?CODE_ULONG, ?DESCRIPTOR_CODE_AMQP_SEQUENCE:64, _Rest/binary>>,
+     reached_body(B, ?DESCRIPTOR_CODE_AMQP_SEQUENCE);
+ pm(<<?DESCRIBED, ?CODE_ULONG, ?DESCRIPTOR_CODE_AMQP_VALUE:64, _Rest/binary>>, true, B) ->
+     reached_body(B, ?DESCRIPTOR_CODE_AMQP_VALUE);
+-pm(<<?DESCRIBED, ?CODE_SYM_8, _S:8, "amqp:data:binary", _Rest/binary>>, true, B) ->
++pm(<<?DESCRIBED, ?CODE_SYM_8, 16:8, "amqp:data:binary", _Rest/binary>>, true, B) ->
+     reached_body(B, ?DESCRIPTOR_CODE_DATA);
+-pm(<<?DESCRIBED, ?CODE_SYM_8, _S:8, "amqp:amqp-sequence:list", _Rest/binary>>, true, B) ->
++pm(<<?DESCRIBED, ?CODE_SYM_8, 23:8, "amqp:amqp-sequence:list", _Rest/binary>>, true, B) ->
+     reached_body(B, ?DESCRIPTOR_CODE_AMQP_SEQUENCE);
+-pm(<<?DESCRIBED, ?CODE_SYM_8, _S:8, "amqp:amqp-value:*", _Rest/binary>>, true, B) ->
++pm(<<?DESCRIBED, ?CODE_SYM_8, 17:8, "amqp:amqp-value:*", _Rest/binary>>, true, B) ->
+     reached_body(B, ?DESCRIPTOR_CODE_AMQP_VALUE);
+-pm(<<?DESCRIBED, ?CODE_SYM_32, _S:32, "amqp:data:binary", _Rest/binary>>, true, B) ->
++pm(<<?DESCRIBED, ?CODE_SYM_32, 16:32, "amqp:data:binary", _Rest/binary>>, true, B) ->
+     reached_body(B, ?DESCRIPTOR_CODE_DATA);
+-pm(<<?DESCRIBED, ?CODE_SYM_32, _S:32, "amqp:amqp-sequence:list", _Rest/binary>>, true, B) ->
++pm(<<?DESCRIBED, ?CODE_SYM_32, 23:32, "amqp:amqp-sequence:list", _Rest/binary>>, true, B) ->
+     reached_body(B, ?DESCRIPTOR_CODE_AMQP_SEQUENCE);
+-pm(<<?DESCRIBED, ?CODE_SYM_32, _S:32, "amqp:amqp-value:*", _Rest/binary>>, true, B) ->
++pm(<<?DESCRIBED, ?CODE_SYM_32, 17:32, "amqp:amqp-value:*", _Rest/binary>>, true, B) ->
+     reached_body(B, ?DESCRIPTOR_CODE_AMQP_VALUE);
+ pm(<<?DESCRIBED, ?CODE_ULONG, ?DESCRIPTOR_CODE_PROPERTIES:64, Rest0/binary>>, O = true, B) ->
+     [Value | Rest] = pm(Rest0, O, B+10),

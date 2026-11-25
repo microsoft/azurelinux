@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Tue, 14 Apr 2026 19:02:42 -0700
+Subject: [PATCH 37/41] Web MQTT, Web STOMP: enforce login timeout for
+ WebSocket connections
+
+(cherry picked from commit f4fff6c87a357ec73eee3f83e72e0a54582d044f)
+
+(cherry picked from commit 3ff40e40817e11b4504854f7c1ebbd2b507803c5)
+
+[Backport to 4.0.9: only the Web STOMP part is applied; the Web MQTT
+handler change and the new login timeout test suites are not taken. The
+stomp.login_timeout setting already exists in 4.0.9. Part of the
+CVE-2026-67230 fix.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl b/deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl
+index 5f98feaf25..14599527b3 100644
+--- a/deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl
++++ b/deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl
+@@ -98,6 +98,8 @@ init(Req0, Opts) ->
+ websocket_init(State) ->
+     process_flag(trap_exit, true),
+     {ok, ProcessorState} = init_processor_state(State),
++    LoginTimeout = application:get_env(rabbitmq_stomp, login_timeout, 10_000),
++    erlang:send_after(LoginTimeout, self(), login_timeout),
+     {ok, rabbit_event:init_stats_timer(
+            State#state{proc_state     = ProcessorState,
+                        parse_state    = rabbit_stomp_frame:initial_state()},
+@@ -241,6 +243,13 @@ websocket_info(close_websocket, State) ->
+ websocket_info(emit_stats, State) ->
+     {ok, emit_stats(State)};
+ 
++websocket_info(login_timeout, State = #state{connection = C})
++  when C =:= none; C =:= undefined ->
++    ?LOG_ERROR("Web STOMP: closing connection (login timeout)"),
++    stop(State);
++websocket_info(login_timeout, State) ->
++    {ok, State};
++
+ websocket_info(Msg, State) ->
+     rabbit_log_connection:info("Web STOMP: unexpected message ~tp",
+                     [Msg]),

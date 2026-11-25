@@ -1,0 +1,187 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Fri, 10 Apr 2026 20:13:10 -0700
+Subject: [PATCH 39/41] Implement a stream reader TODO
+
+(cherry picked from commit e6c184a7c98bad6847f099023a73c1f9f37d3495)
+(cherry picked from commit 0d595e8b1cb72341c1effd45310d94717ac6c787)
+
+[Backport to 4.0.9: 4.0.9's reader logs through rabbit_log and has no
+{unknown, _} frame clauses, and rabbit_stream_core has no
+resolve_offset_spec response, so only the frame_too_large clauses and
+type are added. Test suite changes and the proper TEST_DEPS line are
+dropped. Part of the CVE-2026-67225 fix.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../src/rabbit_stream_reader.erl              | 20 +++++-
+ .../src/rabbit_stream_core.erl                | 62 +++++++++++++------
+ 2 files changed, 63 insertions(+), 19 deletions(-)
+
+diff --git a/deps/rabbitmq_stream/src/rabbit_stream_reader.erl b/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
+index f069e25b04..9fa98be887 100644
+--- a/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
++++ b/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
+@@ -189,7 +189,7 @@ init([KeepaliveSup,
+                 #stream_connection_state{consumers = #{},
+                                          blocked = false,
+                                          data =
+-                                             rabbit_stream_core:init(undefined)},
++                                             rabbit_stream_core:init(#{frame_max => FrameMax})},
+             Transport:setopts(RealSocket, [{active, once}]),
+             _ = rabbit_alarm:register(self(), {?MODULE, resource_alarm, []}),
+             ConnectionNegotiationStepTimeout =
+@@ -1516,6 +1516,11 @@ handle_frame_pre_auth(Transport,
+ handle_frame_pre_auth(_Transport, Connection, State, heartbeat) ->
+     rabbit_log:debug("Received heartbeat frame pre auth"),
+     {Connection, State};
++handle_frame_pre_auth(_Transport, Connection, State, {frame_too_large, Size, Max}) ->
++    rabbit_log:error("Frame size (~b bytes) exceeds maximum (~b bytes)",
++                     [Size, Max]),
++    rabbit_global_counters:increase_protocol_counter(stream, ?FRAME_TOO_LARGE, 1),
++    {Connection#stream_connection{connection_step = failure}, State};
+ handle_frame_pre_auth(_Transport, Connection, State, Command) ->
+     rabbit_log_connection:warning("unknown command ~w, closing connection.",
+                                   [Command]),
+@@ -2856,6 +2861,19 @@ handle_frame_post_auth(Transport,
+ handle_frame_post_auth(_Transport, Connection, State, heartbeat) ->
+     rabbit_log:debug("Received heartbeat frame post auth"),
+     {Connection, State};
++handle_frame_post_auth(Transport,
++                       #stream_connection{socket = S} = Connection,
++                       State,
++                       {frame_too_large, Size, Max}) ->
++    rabbit_log:error("Frame size (~b bytes) exceeds maximum (~b bytes)",
++                     [Size, Max]),
++    rabbit_global_counters:increase_protocol_counter(stream, ?FRAME_TOO_LARGE, 1),
++    Frame =
++        rabbit_stream_core:frame({request, 1,
++                                  {close, ?RESPONSE_CODE_FRAME_TOO_LARGE,
++                                   <<"frame too large">>}}),
++    send(Transport, S, Frame),
++    {Connection#stream_connection{connection_step = close_sent}, State};
+ handle_frame_post_auth(Transport,
+                        #stream_connection{socket = S} = Connection,
+                        State,
+diff --git a/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl b/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
+index fad066a2df..cae1504cec 100644
+--- a/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
++++ b/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
+@@ -26,16 +26,15 @@
+          parse_command/1]).
+ 
+ %% holds static or rarely changing fields
+--record(cfg, {}).
++-record(cfg, {frame_max :: non_neg_integer() | unlimited}).
+ -record(?MODULE,
+         {cfg :: #cfg{},
+          frames = [] :: [iodata()],
+-         %% partial data
+          data ::
+              undefined |
+-             %% this is only if the binary is smaller than 4 bytes
+              binary() |
+-             {RemainingBytes :: non_neg_integer(), iodata()},
++             {RemainingBytes :: non_neg_integer(), iodata()} |
++             {frame_too_large, non_neg_integer()},
+          commands = queue:new() :: queue:queue(command())}).
+ 
+ -opaque state() :: #?MODULE{}.
+@@ -167,11 +166,16 @@
+       [{Command :: atom(), MinVersion :: command_version(),
+         MaxVersion :: command_version()}]} |
+      {stream_stats, response_code(), Stats :: #{binary() => integer()}}} |
++    {frame_too_large, DeclaredSize :: non_neg_integer(),
++     MaxSize :: non_neg_integer()} |
+     {unknown, binary()}.
+ 
+--spec init(term()) -> state().
++-spec init(#{frame_max => non_neg_integer() | unlimited} | term()) -> state().
++init(Opts) when is_map(Opts) ->
++    FrameMax = maps:get(frame_max, Opts, unlimited),
++    #?MODULE{cfg = #cfg{frame_max = FrameMax}};
+ init(_) ->
+-    #?MODULE{cfg = #cfg{}}.
++    #?MODULE{cfg = #cfg{frame_max = unlimited}}.
+ 
+ -spec next_command(state()) -> {command(), state()} | empty.
+ next_command(#?MODULE{commands = Commands0} = State) ->
+@@ -186,36 +190,47 @@ next_command(#?MODULE{commands = Commands0} = State) ->
+ all_commands(#?MODULE{commands = Commands0} = State) ->
+     {queue:to_list(Commands0), State#?MODULE{commands = queue:new()}}.
+ 
+-%% returns frames
+ -spec incoming_data(binary(), state()) -> state().
+-%% TODO: check max frame size
+ incoming_data(<<>>,
+               #?MODULE{frames = Frames, commands = Commands} = State) ->
+     State#?MODULE{frames = [], commands = parse_frames(Frames, Commands)};
+ incoming_data(<<Size:32, Frame:Size/binary, Rem/binary>>,
+-              #?MODULE{frames = Frames, data = undefined} = State) ->
+-    incoming_data(Rem,
+-                  State#?MODULE{frames = [Frame | Frames], data = undefined});
++              #?MODULE{cfg = #cfg{frame_max = FrameMax},
++                       frames = Frames,
++                       data = undefined} = State) ->
++    case frame_size_ok(Size, FrameMax) of
++        true ->
++            incoming_data(Rem,
++                          State#?MODULE{frames = [Frame | Frames],
++                                        data = undefined});
++        false ->
++            frame_too_large(Size, FrameMax, State)
++    end;
+ incoming_data(<<Size:32, Rem/binary>>,
+-              #?MODULE{frames = Frames,
++              #?MODULE{cfg = #cfg{frame_max = FrameMax},
++                       frames = Frames,
+                        data = undefined,
+                        commands = Commands} =
+                   State) ->
+-    %% not enough data to complete frame, stash and await more data
+-    State#?MODULE{frames = [],
+-                  data = {Size - byte_size(Rem), Rem},
+-                  commands = parse_frames(Frames, Commands)};
++    case frame_size_ok(Size, FrameMax) of
++        true ->
++            State#?MODULE{frames = [],
++                          data = {Size - byte_size(Rem), Rem},
++                          commands = parse_frames(Frames, Commands)};
++        false ->
++            frame_too_large(Size, FrameMax, State)
++    end;
+ incoming_data(Data,
+               #?MODULE{frames = Frames,
+                        data = undefined,
+                        commands = Commands} =
+                   State)
+     when byte_size(Data) < 4 ->
+-    %% not enough data to even know the size required
+-    %% just stash binary and hit last clause next
+     State#?MODULE{frames = [],
+                   data = Data,
+                   commands = parse_frames(Frames, Commands)};
++incoming_data(_Data, #?MODULE{data = {frame_too_large, _}} = State) ->
++    State;
+ incoming_data(Data,
+               #?MODULE{frames = Frames,
+                        data = {Size, Partial},
+@@ -240,6 +255,17 @@ incoming_data(Data, #?MODULE{data = Partial} = State)
+     incoming_data(<<Partial/binary, Data/binary>>,
+                   State#?MODULE{data = undefined}).
+ 
++frame_size_ok(_, unlimited) ->
++    true;
++frame_size_ok(Size, FrameMax) ->
++    Size =< FrameMax.
++
++frame_too_large(Size, FrameMax, #?MODULE{frames = Frames, commands = Commands} = State) ->
++    Cmd = {frame_too_large, Size, FrameMax},
++    State#?MODULE{frames = [],
++                  data = {frame_too_large, Size},
++                  commands = queue:in(Cmd, parse_frames(Frames, Commands))}.
++
+ parse_frames(Frames, Queue) ->
+     lists:foldr(fun(Frame, Acc) -> queue:in(parse_command(Frame), Acc)
+                 end,
