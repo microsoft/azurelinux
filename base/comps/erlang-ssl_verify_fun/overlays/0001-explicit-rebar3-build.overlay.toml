@@ -1,0 +1,36 @@
+# Drop once azldev's source-processing buildroot provides erlang-srpm-macros,
+# which registers the declarative rebar3 buildsystem before spec parsing.
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Use explicit rebar3 stages because the render buildroot cannot parse BuildSystem: rebar3"
+type = "spec-remove-tag"
+tag = "BuildSystem"
+value = "rebar3"
+
+[[overlays]]
+description = "Require the rebar3 tooling used by the explicit build stages"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "erlang-rebar3"
+
+[[overlays]]
+description = "Preserve the existing compile, install and test recipe without declarative buildsystem macros"
+type = "spec-append-lines"
+section = "%description"
+lines = [
+    "",
+    "%prep",
+    "%autosetup -p1 -n %{realname}.erl-%{version}",
+    "",
+    "%build",
+    "%{erlang3_compile}",
+    "",
+    "%install",
+    "%{erlang3_install}",
+    "",
+    "%check",
+    "%{erlang3_test}",
+]
