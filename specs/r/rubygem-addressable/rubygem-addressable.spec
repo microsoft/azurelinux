@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.8.6
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: URI Implementation
 License: Apache-2.0
 URL: https://github.com/sporkmonger/addressable
@@ -18,6 +18,7 @@ BuildRequires: rubygem(public_suffix)
 BuildRequires: rubygem(rspec-its)
 BuildArch: noarch
 
+Patch0: CVE-2026-126351.patch
 %description
 Addressable is an alternative implementation to the URI implementation that is
 part of Ruby's standard library. It is flexible, offers heuristic parsing, and
@@ -34,6 +35,8 @@ Documentation for %{name}.
 
 %prep
 %setup -q -n %{gem_name}-%{version}
+
+%patch -P0 -p1
 
 %build
 gem build ../%{gem_name}-%{version}.gemspec
