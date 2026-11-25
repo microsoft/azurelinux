@@ -1,0 +1,9 @@
+[components.libupnp]
+
+# Source for the 1.14.31 update overlay; drop together with it once Fedora ships 1.14.31 or newer.
+# Official release asset; matches the published .sha1 file and the GitHub release SHA256 digest.
+[[components.libupnp.source-files]]
+filename = "libupnp-1.14.31.tar.bz2"
+hash = "2b9e5dadf5a1bdb8a4f72222ff769227e2f076c882b9f76c8013b31d16edda096e267038e0c19fbe5e11e3fec9b6297a48e2d87cbdf496e07e324950d7559fdd"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/pupnp/pupnp/releases/download/release-1.14.31/libupnp-1.14.31.tar.bz2" }
