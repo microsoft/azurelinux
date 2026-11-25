@@ -63,7 +63,7 @@ Patch27:        CVE-2026-116591.patch
 Patch28:        CVE-2026-116587.patch
 Patch29:        CVE-2026-128085.patch
 
-BuildRequires:  golang >= 1.26
+BuildRequires:  golang
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
 
