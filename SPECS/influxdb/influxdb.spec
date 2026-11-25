@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,26 +32,28 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #   1. wget https://github.com/influxdata/influxdb/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+#   4. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2 \
+#                  -require=go.opentelemetry.io/otel@v1.47.0 \
+#                  -require=go.opentelemetry.io/otel/sdk@v1.47.0
 #   5. go mod tidy
 #   6. go mod vendor
 #   7. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -czf %%{name}-%%{version}-vendor-v2.tar.gz vendor
+#           -czf %%{name}-%%{version}-vendor-v3.tar.gz vendor
 #
 #   NOTES:
 #       - Step 5 is required: bumping a module pulls in transitive dependencies that are
 #         otherwise missing from "go.sum", and "go mod vendor" fails without it. It also
-#         raises the "go" directive to 1.25.0, which gRPC 1.83.2 requires.
+#         raises the "go" directive to 1.26.0, which otel v1.47.0 requires.
 #       - The script also regenerates the static assets tarball (Source2). Those assets are
 #         not bit-reproducible and are unaffected by Go module changes, so keep publishing
 #         the existing %%{name}-%%{version}-static-data.tar.gz and discard the new one.
 #       - Steps 2-7 are also automated by generate_source_tarball.sh:
 #           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
-#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 2
-Source1:        %{name}-%{version}-vendor-v2.tar.gz
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 3
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 # Below is a manually created tarball, no download link.
 # predownloaded assets include ui assets and swager json. Used to replace fetch-assets and fetch-swagger script.
 # Use generate_source_tarbbal.sh to get this generated from a source code file.
@@ -86,8 +88,10 @@ Patch15:        CVE-2026-78663.patch
 Patch16:        CVE-2026-78669.patch
 Patch17:        CVE-2026-97032.patch
 Patch18:        remove-emudhra-ca-roots.patch
+Patch19:        CVE-2026-128085.patch
+Patch20:        fix-format-verbs-for-go-1.26.patch
 BuildRequires:  clang
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang >= 1.26
 BuildRequires:  kernel-headers
 BuildRequires:  protobuf-devel
 BuildRequires:  rust < 1.85.0
@@ -175,6 +179,10 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Nov 25 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.7.5-25
+- Patch for CVE-2026-128085 and CVE-2026-128086
+- Backport upstream fix for format verbs that go vet rejects at go 1.26
+
 * Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.7.5-24
 - Remove additional emSign G1, C1 and ECC C3 roots from the Snowflake CA bundle.
 
