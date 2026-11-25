@@ -1,0 +1,22 @@
+# Fedora f43 and f44 package DPDK 24.11.4. Update to the upstream 24.11.8
+# LTS stable release on the same spec (the ABI stays at 25.0 within the
+# 24.11 branch) for these CVE fixes:
+# CVE-2026-86561, CVE-2026-86562, CVE-2026-86563, CVE-2026-86567,
+# CVE-2026-86847, CVE-2026-86856, CVE-2026-93683
+# Remove this overlay once the imported Fedora spec packages 24.11.8 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 24.11.8"
+type = "spec-update-tag"
+tag = "Version"
+value = "24.11.8"
+
+[[overlays]]
+description = "Remove the obsolete 24.11.4 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(dpdk-24\.11\.4\.tar\.xz\) = [0-9a-f]+(?:\r?\n|$)'
