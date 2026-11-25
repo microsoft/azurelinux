@@ -7,7 +7,7 @@ set -e
 
 PKG_VERSION=""
 SRC_TARBALL=""
-VENDOR_VERSION="1"
+VENDOR_VERSION="2"
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # parameters:
@@ -102,7 +102,9 @@ tar -xf $SRC_TARBALL
 
 echo "Vendor go modules..."
 cd "$PKG_NAME"-"$PKG_VERSION"
-go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2 \
+                            -require=go.opentelemetry.io/otel@v1.47.0 \
+                            -require=go.opentelemetry.io/otel/sdk@v1.47.0
 go mod tidy
 go mod vendor
 
