@@ -17,7 +17,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.18.58.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ Group:          System Environment/Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
+Patch0:         0001-KVM-x86-Unconditionally-reset-MMU-context-when-emulating-INIT.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -165,6 +166,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Nov 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.58.mshv1-2
+- Unconditionally reset the KVM MMU context when emulating INIT
+
 * Wed Nov 04 2026 Saul Paredes <saulparedes@microsoft.com> - 6.18.58.mshv1-1
 - Upgrade to 6.18.58.mshv1 (fixes CVE-2026-98432)
 - Enable CONFIG_ARM64_ERRATUM_3821522 on aarch64, new in 6.18.58
