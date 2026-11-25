@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Seth Michael Larson <seth@python.org>
+Date: Thu, 29 Oct 2026 15:55:24 -0500
+Subject: 00500: gh-160923: Fix fetching with `-fips` property for
+ `usedforsecurity=True`
+
+---
+ .../Security/2026-10-29-15-49-06.gh-issue-160923.gCRiZ3.rst  | 5 +++++
+ Modules/_hashopenssl.c                                       | 5 +++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Security/2026-10-29-15-49-06.gh-issue-160923.gCRiZ3.rst
+
+diff --git a/Misc/NEWS.d/next/Security/2026-10-29-15-49-06.gh-issue-160923.gCRiZ3.rst b/Misc/NEWS.d/next/Security/2026-10-29-15-49-06.gh-issue-160923.gCRiZ3.rst
+new file mode 100644
+index 0000000000..8fa1bc394f
+--- /dev/null
++++ b/Misc/NEWS.d/next/Security/2026-10-29-15-49-06.gh-issue-160923.gCRiZ3.rst
+@@ -0,0 +1,5 @@
++.. cve: CVE-2026-119170
++
++Fix fetching with ``-fips`` property for ``usedforsecurity=True``
++in :mod:`hashlib`. This issue only affects Python 3.14.10, and
++all other Python versions are unaffected.
+diff --git a/Modules/_hashopenssl.c b/Modules/_hashopenssl.c
+index 09aa2af173..a87c541902 100644
+--- a/Modules/_hashopenssl.c
++++ b/Modules/_hashopenssl.c
+@@ -417,10 +417,11 @@ py_digest_by_name(PyObject *module, const char *name, enum Py_hash_type py_ht)
+     PY_EVP_MD *digest = NULL, *fresh = NULL;
+     _hashlibstate *state = get_hashlib_state(module);
+     py_hashentry_t *entry = _Py_hashtable_get(state->hashtable, name);
+-    int fips = disable_fips_property(py_ht);
+-    if (fips == -1) {
++    int disable_fips = disable_fips_property(py_ht);
++    if (disable_fips == -1) {
+         goto finally;
+     }
++    int fips = !disable_fips;
+ 
+     if (entry != NULL) {
+         PY_EVP_MD **cached = fips ? &entry->evp : &entry->evp_nosecurity;

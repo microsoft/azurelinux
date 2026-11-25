@@ -55,7 +55,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 7%{?dist}
+Release: 9%{?dist}
 License: Python-2.0.1
 
 
@@ -228,6 +228,15 @@ Provides: bundled(python3dist(zipp)) = 3.19.2
 # Remove the default -O2 flag, our flags are applied in %%build/%%install
 %global __global_compiler_flags %(echo '%{__global_compiler_flags}' | sed 's/-O[[:digit:]]//')
 
+# Timeout for tests in seconds, passed as --timeout argument, used for each test separately
+%ifarch riscv64
+# slow arch, 135 minutes
+%global test_timeout 8100
+%else
+# normal arches, 45 minutes
+%global test_timeout 2700
+%endif
+
 # Changing the shebangs of the test files confuses the tests which count with a specific data offset
 # We can't remove the executable bit, the files are run directly in other tests
 %global __brp_mangle_shebangs_exclude_from ^%{pylibdir}/test/archivetestdata/exe_with_.*$
@@ -324,6 +333,8 @@ BuildRequires: %{python_wheel_pkg_prefix}-pip-wheel >= 23.1.2
 %if %{with tests}
 BuildRequires: %{python_wheel_pkg_prefix}-setuptools-wheel >= 71
 %endif
+%else
+BuildRequires: ca-certificates
 %endif
 
 %if %{without bootstrap}
@@ -374,10 +385,20 @@ Source32: Python-%{upstream_version}-aarch64-optimized-jit_stencils.h
 Source33: Python-%{upstream_version}-x86_64-debug-jit_stencils.h
 Source34: Python-%{upstream_version}-x86_64-optimized-jit_stencils.h
 %endif
-Source9999: python3.14.azl.macros
 %global jit_stencils_source %{_sourcedir}/Python-%{upstream_version}-%{_arch}-${ConfName}-jit_stencils.h
 %global jit_stencils_filename jit_stencils-%{_arch}-redhat-linux-gnu.h
 
+# Patches for bundled wheels (declared as Sources, applied manually in %%prep):
+#
+# Use the system level root certificate instead of the one bundled in certifi
+# in the pip wheel bundled in ensurepip.
+# https://bugzilla.redhat.com/1655253
+# The same patch is a part of the RPM-packaged python-pip and python-certifi.
+Source41: pip-dummy-certifi.patch
+Source9999: python3.14.azl.macros
+
+# Patches for Python
+#
 # (Patches taken from github.com/fedora-python/cpython)
 
 # 00251 # 5ac6e7781923cbb3e4606e3bca381a1167d322e5
@@ -441,6 +462,10 @@ Patch477: 00477-raise-an-error-when-importing-stdlib-modules-compiled-for-a-diff
 # 00486 # 5ae0b81b3135319f8d75a886fb7a11fa40ac11f4
 # gh-148646: Add --enable-prebuilt-jit-stencils configure flag
 Patch486: 00486-gh-148646-add---enable-prebuilt-jit-stencils-configure-flag.patch
+
+# 00500 # 71a00312c96802a29a8b4b8ebee04ceddedcc4c5
+# gh-160923: Fix fetching with `-fips` property for `usedforsecurity=True`
+Patch500: 00500-gh-160923-fix-fetching-with--fips-property-for-usedforsecurity-true.patch
 
 # (New patches go here ^^^)
 #
@@ -598,6 +623,7 @@ License: %{libs_license}
 %else
 Provides: bundled(python3dist(pip)) = %{pip_version}
 %pip_bundled_provides
+Requires: ca-certificates
 # License combined from Python libs + pip
 License: %{libs_license} AND Apache-2.0 AND ISC AND LGPL-2.1-only AND MPL-2.0 AND (Apache-2.0 OR BSD-2-Clause)
 %endif
@@ -745,7 +771,7 @@ Requires: %{python_wheel_pkg_prefix}-setuptools-wheel >= 71
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 %setuptools_bundled_provides
 # License manually combined from Python + setuptools
-License: Python-2.0.1 AND MIT AND Apache-2.0 AND (Apache-2.0 OR BSD-2-Clause)
+License: Python-2.0.1 AND MIT AND Apache-2.0 AND (Apache-2.0 OR BSD-2-Clause) AND LGPL-3.0-only
 %endif
 
 %unversioned_obsoletes_of_python3_X_if_main test
@@ -833,6 +859,7 @@ License: %{libs_license}
 %else
 Provides: bundled(python3dist(pip)) = %{pip_version}
 %pip_bundled_provides
+Requires: ca-certificates
 # License combined from Python libs + pip
 License: %{libs_license} AND Apache-2.0 AND ISC AND LGPL-2.1-only AND MPL-2.0 AND (Apache-2.0 OR BSD-2-Clause)
 %endif
@@ -928,8 +955,8 @@ Requires: %{python_wheel_pkg_prefix}-setuptools-wheel >= 71
 %else
 Provides: bundled(python3dist(setuptools)) = %{setuptools_version}
 %setuptools_bundled_provides
-# License manually combined from Python + setuptools + wheel
-License: Python-2.0.1 AND MIT AND Apache-2.0 AND (Apache-2.0 OR BSD-2-Clause)
+# License manually combined from Python + setuptools
+License: Python-2.0.1 AND MIT AND Apache-2.0 AND (Apache-2.0 OR BSD-2-Clause) AND LGPL-3.0-only
 %endif
 
 Obsoletes: python%{pybasever}-freethreading < 3.14.0-2
@@ -980,6 +1007,16 @@ extension modules.
 
 %prep
 %autosetup -S git_am -n Python-%{upstream_version}
+
+# Apply patches to pip
+# This is done unconditionally on rpmwheels
+# so that the applicability against the current pip version is always verified,
+# even though the resulting wheel only matters when rpmwheels are disabled.
+unzip -qq Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
+# -p2 to compensate src/ prefix
+patch -p2 < %{SOURCE41}
+zip -rq Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl pip pip-%{pip_version}.dist-info
+rm -rf pip/ pip-%{pip_version}.dist-info/
 
 # Verify the second level of bundled provides is up to date
 # Arguably this should be done in %%check, but %%prep has a faster feedback loop
@@ -1496,18 +1533,18 @@ CheckPython() {
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.pythoninfo
 
   # Run the upstream test suite
-  # --timeout=2700: kill test running for longer than 45 minutes
   # test_check_probes is failing since it was introduced in 3.12.0rc1,
   # the test is skipped until it is fixed in upstream.
   # see: https://github.com/python/cpython/issues/104280#issuecomment-1669249980
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
-    -wW --slowest %{_smp_mflags} \
-    %ifarch riscv64
-    --timeout=8100 \
-    %else
-    --timeout=2700 \
-    %endif
+    -wW --slowest %{_smp_mflags} --timeout=%{test_timeout} \
     -i test_check_probes \
+
+  # Re-run the hashlib/hmac/ssl related tests with FIPS mode forced on.
+  OPENSSL_FORCE_FIPS_MODE=1 LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
+    -wW --slowest %{_smp_mflags} --timeout=%{test_timeout} \
+    test_hashlib test_hmac test_ssl \
+    -i test_case_md5_0 -i test_case_md5_1 -i test_case_md5_2 -i test_md5_rfc2202
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
 
@@ -1997,6 +2034,10 @@ CheckPython freethreading
 # ======================================================
 
 %changelog
+* Mon Nov 09 2026 Miro Hrončok <miro@hroncok.cz> - 3.14.10-2
+- Security fix for CVE-2026-119170
+- Fixes a regression in FIPS enforcement of hash algorithms
+
 * Mon Oct 26 2026 Karolina Surma <ksurma@redhat.com> - 3.14.10-1
 - Update to Python 3.14.10
 - CVE-2026-114583: tar filter allows writing outside destination via empty-named symlink
