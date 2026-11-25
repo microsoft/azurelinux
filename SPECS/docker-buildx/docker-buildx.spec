@@ -4,14 +4,14 @@ Summary:        A Docker CLI plugin for extended build capabilities with BuildKi
 Name:           docker-buildx
 # update "commit_hash" above when upgrading version
 Version:        0.14.0
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.github.com/docker/buildx
 Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Source1:        %{name}-%{version}-govendor-v2.tar.gz
 Patch0:         CVE-2025-0495.patch
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-39882.patch
@@ -30,9 +30,10 @@ Patch14:        CVE-2026-116591.patch
 Patch15:        CVE-2026-78661.patch
 Patch16:        CVE-2026-97045.patch
 Patch17:        CVE-2026-121520.patch
+Patch18:        CVE-2026-128085.patch
 
 BuildRequires: bash
-BuildRequires: golang >= 1.25
+BuildRequires: golang >= 1.26
 
 # conflicting packages
 Conflicts: docker-ce
@@ -66,6 +67,10 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Wed Nov 25 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0.14.0-22
+- Patch for CVE-2026-128085 and CVE-2026-128086
+- Rebase CVE-2026-81870 patch: drop the sdk/trace hunks already present in otel/sdk v1.47.0
+
 * Wed Nov 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.14.0-21
 - Patch for CVE-2026-121520
 

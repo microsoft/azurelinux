@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "docker-buildx-0.14.0-govendor-v1.tar.gz": "ea94a604b4e14f64697dd60384b02f842be16a72d400ab85521cb02729a38c1b",
+  "docker-buildx-0.14.0-govendor-v2.tar.gz": "0b84fc15a862fc822c8099100386e257ffe61427217b6110e459c2b04af73699",
   "docker-buildx-0.14.0.tar.gz": "9ed27d47b728288500ba2535366792d9b006354e02178688360919663f92b63e"
  }
 }
