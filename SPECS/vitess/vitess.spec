@@ -48,7 +48,6 @@ Patch18:        CVE-2026-116586.patch
 Patch19:        CVE-2026-116587.patch
 Patch20:        CVE-2026-116591.patch
 Patch21:        CVE-2026-128085.patch
-BuildRequires: golang >= 1.26
 BuildRequires: golang < 1.28
 BuildRequires: hostname
 
