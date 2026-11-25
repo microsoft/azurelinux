@@ -1,0 +1,33 @@
+From 29efc0396809384cf37bfcfb01c62e63216fa998 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Tue, 9 Dec 2025 21:13:46 +0000
+Subject: [PATCH 2/2] rockchip: rk356x: Stop overriding sdhci/mmc aliases
+
+Upstream device tree has rules where the aliases are board
+specific settings, no SoC settings. Looking at upstream
+rk356x boards there's a lot of variation in the setting of
+mmc0/mmc1 based on the device so we should not be overriding
+this here and now we sync to upstream we should just consume
+those settings, to do otherwise confuses users.
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ arch/arm/dts/rk356x-u-boot.dtsi | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/arch/arm/dts/rk356x-u-boot.dtsi b/arch/arm/dts/rk356x-u-boot.dtsi
+index 738b9673d35..f25c7970208 100644
+--- a/arch/arm/dts/rk356x-u-boot.dtsi
++++ b/arch/arm/dts/rk356x-u-boot.dtsi
+@@ -7,8 +7,6 @@
+ 
+ / {
+ 	aliases {
+-		mmc0 = &sdhci;
+-		mmc1 = &sdmmc0;
+ 		spi4 = &sfc;
+ 	};
+ 
+-- 
+2.52.0
+

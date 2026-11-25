@@ -15,8 +15,8 @@
 %global opensbi opensbi
 
 Name:     uboot-tools
-Version:  2025.10
-Release:  1%{?candidate:.%{candidate}}%{?dist}
+Version:  2026.04
+Release:  2%{?candidate:.%{candidate}}%{?dist}
 Epoch:    1
 Summary:  U-Boot utilities
 # Automatically converted from old format: GPLv2+ BSD LGPL-2.1+ LGPL-2.0+ - review is highly recommended.
@@ -26,6 +26,7 @@ ExcludeArch: s390x
 Source0:  https://ftp.denx.de/pub/u-boot/u-boot-%{version}%{?candidate:-%{candidate}}.tar.bz2
 Source1:  aarch64-boards
 Source2:  riscv64-boards
+Source3:  x86_64-boards
 Source9999: uboot-tools.azl.macros
 
 # Fedora patches to enable/disable features
@@ -43,20 +44,25 @@ Patch6:   uefi-initial-find_fdt_location-for-finding-the-DT-on-disk.patch
 Patch7:   uefi-enable-SetVariableRT-with-volotile-storage.patch
 # Enable UEFI HTTPS boot for all Fedora firmware
 Patch8:   uefi-enable-https-boot-by-default.patch
+Patch9:   efi_loader-disk-Add-EFI_PARTITION_INFO_PROTOCOL-support-for-MBR.patch
 
 # Device improvments
 # USB-PD improvements
 Patch10:  USB-PD-TCPM-improvements.patch
 # Rockchips improvements
 Patch11:  rockchip-Enable-preboot-start-for-pci-usb.patch
-Patch13:  Initial-MNT-Reform2-support.patch
+Patch12:  rockchip-rk3568-nanopi-r5-Drop-duplicated-extra-sdhc.patch
+Patch13:  rockchip-rk356x-Stop-overriding-sdhci-mmc-aliases.patch
 # Jetson fixes
 Patch14:  p3450-fix-board.patch
 Patch15:  JetsonTX2-Fix-upstream-device-tree-naming.patch
 # Fix AllWinner
 Patch16:  Allwinner-fix-booting-on-a-number-of-devices.patch
 # RPi
-Patch17:  Improve-RaspBerry-Pi-5-support-part1-Fixes.patch
+Patch20:  ARM-RPi5-Enable-PCIe.patch
+Patch21:  0001-Add-bcm2712-compat.patch
+Patch22:  ARM-RPi-PCIe-fixes.patch
+Patch23:  raspberrypi-Add-quirk-for-RPi5-2Gb-rev-1.0.patch
 
 BuildRequires:  bc
 BuildRequires:  bison
@@ -78,6 +84,7 @@ BuildRequires:  swig
 %if %{with toolsonly}
 %ifarch aarch64
 BuildRequires:  arm-trusted-firmware-armv8
+BuildRequires:  optee-os-firmware-armv8
 BuildRequires:  crust-firmware
 BuildRequires:  python3-pyelftools
 BuildRequires:  xxd
@@ -110,12 +117,21 @@ BuildArch:   noarch
 %description -n uboot-images-riscv64
 U-Boot firmware binaries for riscv64 boards
 %endif
+
+%ifarch x86_64
+%package     -n uboot-images-x86_64
+Summary:     U-Boot firmware images for x86_64 boards
+BuildArch:   noarch
+
+%description -n uboot-images-x86_64
+U-Boot firmware binaries for x86_64 boards
+%endif
 %endif
 
 %prep
 %autosetup -p1 -n u-boot-%{version}%{?candidate:-%{candidate}}
 
-cp %SOURCE1 %SOURCE2 .
+cp %SOURCE1 %SOURCE2 %SOURCE3 .
 
 %build
 mkdir builds
@@ -129,7 +145,7 @@ mkdir builds
 export OPENSBI=%{_datadir}/%{opensbi}/generic/firmware/fw_dynamic.bin
 %endif
 
-%ifarch aarch64 riscv64
+%ifarch aarch64 riscv64 x86_64
 for board in $(cat %{_arch}-boards)
 do
   echo "Building board: $board"
@@ -234,11 +250,26 @@ do
 done
 %endif
 
+%ifarch x86_64
+for board in $(ls builds)
+do
+ for file in u-boot.rom
+ do
+  if [ -f builds/$(echo $board)/$(echo $file) ]; then
+    install -pD -m 0644 builds/$(echo $board)/$(echo $file) %{buildroot}%{_datadir}/uboot/$(echo $board)/$(echo $file)
+  fi
+ done
+done
+%endif
+
 # Bit of a hack to remove binaries we don't use as they're large
 for board in $(ls builds)
 do
   rm -f %{buildroot}%{_datadir}/uboot/$(echo $board)/u-boot.dtb
   if [ -f %{buildroot}%{_datadir}/uboot/$(echo $board)/u-boot-sunxi-with-spl.bin ]; then
+    rm -f %{buildroot}%{_datadir}/uboot/$(echo $board)/u-boot{,-dtb}.*
+  fi
+  if [ -f %{buildroot}%{_datadir}/uboot/$(echo $board)/u-boot-rockchip.bin ]; then
     rm -f %{buildroot}%{_datadir}/uboot/$(echo $board)/u-boot{,-dtb}.*
   fi
 done
@@ -280,9 +311,71 @@ install -p -m 0755 builds/tools/env/fw_printenv %{buildroot}%{_bindir}
 %dir %{_datadir}/uboot/
 %{_datadir}/uboot/*
 %endif
+
+%ifarch x86_64
+%files -n uboot-images-x86_64
+%license Licenses/*
+%dir %{_datadir}/uboot/
+%{_datadir}/uboot/*
+%endif
 %endif
 
 %changelog
+* Sat Apr 11 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-2
+- Fix PCIe/USB on Raspberry Pi 4 (rhbz#2448365)
+- Fix detection of some revisions of RPi5
+
+* Tue Apr 07 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-1
+- Update to 2026.04 GA
+
+* Sun Mar 29 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-0.9.rc5
+- Enable NVME booting on RPi5
+
+* Tue Mar 24 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-0.8.rc5
+- Update to 2026.04 RC5
+
+* Sat Mar 14 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-0.7.rc4
+- Raspberry Pi fixes
+
+* Tue Mar 10 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-0.6.rc4
+- Update to 2026.04 RC4
+
+* Fri Feb 27 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-0.5.rc3
+- Update to 2026.04 RC3
+
+* Tue Feb 17 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-0.4.rc2
+- Add initial bcm2712d0 identification
+
+* Mon Feb 09 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-0.3.rc2
+- Update to 2026.04 RC2
+
+* Tue Jan 27 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.04-0.2.rc1
+- Update to 2026.04 RC1
+
+* Mon Jan 19 2026 Javier Martinez Canillas <javierm@redhat.com> - 1:2026.01-3
+- Add a uboot-images-x86_64 subpackage
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2026.01-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 06 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.01-1
+- Update to 2026.01 GA
+
+* Mon Dec 29 2025 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.01-0.4.rc5
+- Update to 2026.01 RC5
+
+* Mon Dec 08 2025 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.01-0.3.rc4
+- Update to 2026.01 RC4
+
+* Fri Nov 28 2025 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.01-0.2.rc3
+- Updates for RPi
+
+* Mon Nov 24 2025 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2026.01-0.1.rc3
+- Update to 2026.01 RC3
+
+* Thu Oct 16 2025 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2025.10-2
+- Drop residual Rockchip firmware (saves ~150Mb)
+
 * Mon Oct 13 2025 Peter Robinson <pbrobinson@fedoraproject.org> - 1:2025.10-1
 - Update to 2025.10 GA (rhbz#2401964)
 - Fix booting when using FW device-tree (rhbz#2402498)

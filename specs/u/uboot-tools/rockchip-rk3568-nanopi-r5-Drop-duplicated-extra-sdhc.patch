@@ -1,0 +1,39 @@
+From aef38432fbc93621b434836b95b10c28aa880e84 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Tue, 9 Dec 2025 20:51:06 +0000
+Subject: [PATCH 1/2] rockchip: rk3568-nanopi-r5: Drop duplicated/extra sdhci
+
+The pinctrl settings are now upstream, with the upstream
+voltage supplies, and the HS200 mode is confirmed to work
+fine but the HS400 mode had reported issues so let's just
+consume what the upstream DT has now as it's all known good.
+
+Reported-by: Dusty Mabe <dusty@dustymabe.com>
+Tested-by: Dusty Mabe <dusty@dustymabe.com>
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ arch/arm/dts/rk3568-nanopi-r5s-u-boot.dtsi | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/arch/arm/dts/rk3568-nanopi-r5s-u-boot.dtsi b/arch/arm/dts/rk3568-nanopi-r5s-u-boot.dtsi
+index 64c43374c04..7e24be1a5e7 100644
+--- a/arch/arm/dts/rk3568-nanopi-r5s-u-boot.dtsi
++++ b/arch/arm/dts/rk3568-nanopi-r5s-u-boot.dtsi
+@@ -12,14 +12,6 @@
+ 	/delete-property/ vpcie3v3-supply;
+ };
+ 
+-&sdhci {
+-	cap-mmc-highspeed;
+-	mmc-hs200-1_8v;
+-	mmc-hs400-1_8v;
+-	mmc-hs400-enhanced-strobe;
+-	pinctrl-0 = <&emmc_bus8 &emmc_clk &emmc_cmd &emmc_datastrobe>;
+-};
+-
+ &vcc5v0_usb_host {
+ 	/delete-property/ regulator-always-on;
+ 	/delete-property/ regulator-boot-on;
+-- 
+2.52.0
+
