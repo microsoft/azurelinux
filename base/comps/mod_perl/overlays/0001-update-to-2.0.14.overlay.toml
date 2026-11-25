@@ -1,0 +1,29 @@
+# Fedora f43 and f44 lack mod_perl 2.0.14; update the f43 spec to the upstream 2.0.14 security
+# release for CVE-2026-116001, CVE-2026-116005, CVE-2026-116032, CVE-2026-116043,
+# CVE-2026-116772 and CVE-2026-116799.
+# Remove this overlay once the imported Fedora spec packages 2.0.14 or newer.
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.0.14"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.0.14"
+
+[[overlays]]
+description = "Drop the 32-bit build fix; 2.0.14 includes it (I32 namelen)"
+type = "patch-remove"
+file = "mod_perl-32bit-ftbs.patch"
+
+[[overlays]]
+description = "Remove the obsolete 2.0.13 signature, now downloaded for 2.0.14"
+type = "file-remove"
+file = "mod_perl-2.0.13.tar.gz.asc"
+
+[[overlays]]
+description = "Remove the obsolete mod_perl-2.0.13.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(mod_perl-2\.0\.13\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

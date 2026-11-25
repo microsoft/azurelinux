@@ -1,0 +1,16 @@
+[components.mod_perl]
+
+# Sources for the 2.0.14 overlay; remove them together with it once Fedora packages 2.0.14 or newer.
+# The SHA512 matches the published mod_perl-2.0.14.tar.gz.sha512, and the signature verifies with
+# Steve Hay's release key, which is in the KEYS file the spec already ships (%gpgverify checks it too).
+[[components.mod_perl.source-files]]
+filename = "mod_perl-2.0.14.tar.gz"
+hash = "aa9b383ea97e43b49dfe03c51e9fc2ed99e2f294957d8834fbfcb38a410112dd46f334a0c5694aa079c029080bc6b622e4304756034a248426a9136f2c671504"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://downloads.apache.org/perl/mod_perl-2.0.14.tar.gz" }
+
+[[components.mod_perl.source-files]]
+filename = "mod_perl-2.0.14.tar.gz.asc"
+hash = "f6356572a978628596a86e5101aec708394a5e9f36d86f57bc5e65b101d27c69c7360bf8d054feb67fbd9e8f94b88c4718b4b3ce129869c02154cdcc962709e7"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://downloads.apache.org/perl/mod_perl-2.0.14.tar.gz.asc" }
