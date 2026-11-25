@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 20%{?dist}
+Release: 21%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -14,7 +14,7 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: %{name}-%{version}-govendor-v2.tar.gz
+Source1: %{name}-%{version}-govendor-v3.tar.gz
 Source2: containerd.service
 Source3: containerd.toml
 Patch0: fix_cc_tests_for_golang1.21.patch
@@ -43,11 +43,13 @@ Patch22:CVE-2026-116585.patch
 Patch23:CVE-2026-116586.patch
 Patch24:CVE-2026-116587.patch
 Patch25:CVE-2026-116591.patch
+Patch26:CVE-2026-128085.patch
+Patch27:fix-printf-wrong-type-arg.patch
 
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang >= 1.25
+BuildRequires: golang >= 1.26
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -103,6 +105,11 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Mon Nov 23 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.7.7-21
+- Patch for CVE-2026-128085 and CVE-2026-128086 by upgrading vendored go.opentelemetry.io/otel to v1.47.0
+- Drop the otel/sdk hunks from CVE-2026-81870.patch, already fixed in otel/sdk v1.47.0
+- Fix printf wrong-type vet error surfaced by the go 1.26 directive
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-20
 - Patch for CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
 

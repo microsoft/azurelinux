@@ -7,7 +7,7 @@ set -e
 
 PKG_VERSION=""
 SRC_TARBALL=""
-VENDOR_VERSION="1"
+VENDOR_VERSION=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # parameters:
@@ -17,7 +17,10 @@ OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #                   and should be replaced with the new/modified src code
 # --outFolder     : folder where to copy the new tarball(s)
 # --pkgVersion    : package version
-# --vendorVersion : vendor version
+# --vendorVersion : vendor tarball version; must match the -vN suffix of
+#                   Source1 in moby-containerd-cc.spec (e.g. 3 -> moby-containerd-cc-<ver>-govendor-v3.tar.gz)
+#
+# Usage: ./generate_source_tarball.sh --srcTarball <tarball> --pkgVersion <ver> --vendorVersion <n> [--outFolder <dir>]
 #
 PARAMS=""
 while (( "$#" )); do
@@ -79,6 +82,11 @@ if [ -z "$PKG_VERSION" ]; then
     exit 1
 fi
 
+if [ -z "$VENDOR_VERSION" ]; then
+    echo "--vendorVersion parameter cannot be empty"
+    exit 1
+fi
+
 echo "-- create temp folder"
 tmpdir=$(mktemp -d)
 function cleanup {
@@ -108,12 +116,15 @@ go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel/exporters/otlp/otl
 go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc@v1.44.0
 go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp@v1.44.0
 go mod edit -modfile=go.mod -require=github.com/klauspost/cpuid/v2@v2.1.0
+go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel@v1.47.0
+# otel/sdk must be pinned too; MVS alone leaves it at v1.44.0.
+go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel/sdk@v1.47.0
 go mod tidy
 go mod vendor
 
 echo ""
 echo "========================="
-echo "Tar vendored tarball"
+echo "Tar vendored modules"
 tar  --sort=name \
      --mtime="2021-04-26 00:00Z" \
      --owner=0 --group=0 --numeric-owner \

@@ -1,0 +1,26 @@
+From 27f0b12937b7c8fc04b8a638143b9880f6b2e88d Mon Sep 17 00:00:00 2001
+From: Sergey Kanzhelev <S.Kanzhelev@live.com>
+Date: Sun, 22 Mar 2026 22:52:10 +0000
+Subject: [PATCH] fix linter issues
+
+Upstream-reference: https://github.com/containerd/containerd/commit/27f0b12937b7c8fc04b8a638143b9880f6b2e88d.patch
+---
+ snapshots/storage/bolt.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/snapshots/storage/bolt.go b/snapshots/storage/bolt.go
+index 894ac2e..454490e 100644
+--- a/snapshots/storage/bolt.go
++++ b/snapshots/storage/bolt.go
+@@ -402,7 +402,7 @@ func CommitActive(ctx context.Context, key, name string, usage snapshots.Usage,
+ 
+ 			// Updates parent back link to use new key
+ 			if err := pbkt.Put(parentKey(pid, id), []byte(name)); err != nil {
+-				return fmt.Errorf("failed to update parent link %q from %q to %q: %w", pid, key, name, err)
++				return fmt.Errorf("failed to update parent link %v from %q to %q: %w", pid, key, name, err)
+ 			}
+ 		}
+ 
+-- 
+2.45.4
+
