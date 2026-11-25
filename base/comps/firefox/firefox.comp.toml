@@ -1,4 +1,4 @@
 [components.firefox]
-# Pin Fedora 43 firefox-160.0.1-1.fc43 for the Firefox 159.0.1, 160 and 160.0.1 security fixes.
-# https://src.fedoraproject.org/rpms/firefox/c/589aca7935d7ba1d2e385afc6d80b307451b78ae
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "589aca7935d7ba1d2e385afc6d80b307451b78ae" }
+# Pin Fedora 43 firefox-161.0-1.fc43 for the Firefox 161 security fixes (MFSA 2026-131).
+# https://src.fedoraproject.org/rpms/firefox/c/0f14f59c4aaca6ab770c37f8b4ed6d38fffb1a8c
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "0f14f59c4aaca6ab770c37f8b4ed6d38fffb1a8c" }
