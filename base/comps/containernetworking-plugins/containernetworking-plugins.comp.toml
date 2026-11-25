@@ -1,0 +1,4 @@
+# Pin to Fedora f43 containernetworking-plugins-1.10.0-1.fc43 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/containernetworking-plugins/c/78a30a99769767d73f930b9599bd5ec8e8bea232
+[components.containernetworking-plugins]
+spec = { type = "upstream", upstream-commit = "78a30a99769767d73f930b9599bd5ec8e8bea232" }
