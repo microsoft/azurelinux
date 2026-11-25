@@ -3,14 +3,14 @@
 Summary:        The open-source application container engine client.
 Name:           docker-cli
 Version:        25.0.7
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Tools/Container
 URL:            https://github.com/docker/cli
 Source0:        https://github.com/docker/cli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Source1:        %{name}-%{version}-govendor-v2.tar.gz
 Patch0:         disable_manpage_vendor.patch
 Patch1:         CVE-2024-24786.patch
 Patch2:         CVE-2025-11065.patch
@@ -20,9 +20,10 @@ Patch5:         CVE-2026-17106.patch
 Patch6:         CVE-2026-78669.patch
 Patch7:         CVE-2026-92543.patch
 Patch8:         CVE-2026-116591.patch
+Patch9:         CVE-2026-128086.patch
 BuildRequires:  git
 BuildRequires:  go-md2man
-BuildRequires:  golang
+BuildRequires:  golang >= 1.26.0
 BuildRequires:  make
 Requires:       /bin/sh
 Requires:       tar
@@ -35,7 +36,10 @@ Obsoletes:      moby-cli < %{version}-%{release}
 %{summary}
 
 %prep
-%autosetup -n cli-%{version} -a 1 -p1
+%autosetup -n cli-%{version} -N
+rm -rf vendor
+tar -xf "%{SOURCE1}"
+%autopatch -p1
 
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_builddir}/cli-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
@@ -87,6 +91,9 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Wed Nov 25 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 25.0.7-8
+- Patch for CVE-2026-128086
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.7-7
 - Patch for CVE-2026-116591
 
