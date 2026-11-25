@@ -1,0 +1,4 @@
+# Pin to Fedora f43 sqlite-3.50.2-4.fc43 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/sqlite/c/facf33d043cfb3ed37b08f83c2c3f1dc36b31a8e
+[components.sqlite]
+spec = { type = "upstream", upstream-commit = "facf33d043cfb3ed37b08f83c2c3f1dc36b31a8e" }
