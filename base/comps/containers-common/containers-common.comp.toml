@@ -1,0 +1,11 @@
+[components.containers-common]
+
+# Source for the 0.67.3 update overlay; drop together with it once Fedora ships 0.67.3 or newer.
+# GitHub tag archive of container-libs common/v0.67.3. Downloaded from github.com/containers and
+# codeload.github.com/podman-container-tools with the same SHA512, and its contents match
+# `git archive common/v0.67.3`. The same URL scheme for common/v0.67.2 reproduces Fedora's lookaside hash.
+[[components.containers-common.source-files]]
+filename = "v0.67.3.tar.gz"
+hash = "9f5d8cee7f14afb2c0f5bba58634661dc4217d7169491d1bc56c297694245248ced8b34d1def8a3151f6dc19b5da3f20f6635850c633f4dffbec0394e8893e55"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/containers/container-libs/archive/refs/tags/common/v0.67.3.tar.gz" }

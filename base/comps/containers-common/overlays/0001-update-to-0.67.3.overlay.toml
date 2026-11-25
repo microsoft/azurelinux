@@ -1,0 +1,20 @@
+# Fedora f43/f44 still package containers-common 0.67.2. Update the f43 spec to upstream
+# container-libs common/v0.67.3 for the default seccomp profile fix:
+# CVE-2026-123876
+# Remove this overlay once the imported Fedora spec packages 0.67.3 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 0.67.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.67.3"
+
+[[overlays]]
+description = "Remove the obsolete v0.67.2.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(v0\.67\.2\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
