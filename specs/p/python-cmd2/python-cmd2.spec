@@ -5,7 +5,7 @@
 
 Name:             python-%{pypi_name}
 Version:          2.5.11
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary:          Extra features for standard library's cmd module
 
 License:          MIT
@@ -70,9 +70,6 @@ Requires:         /usr/bin/which
 %pyproject_save_files -l cmd2
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %pytest
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}

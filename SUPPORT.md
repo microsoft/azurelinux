@@ -1,7 +1,7 @@
 # Support
 
 > [!NOTE]
-> Azure Linux 4.0 is generally available (GA).
+> Azure Linux 4 is generally available (GA).
 > Your feedback is welcome and helps shape the product, so please share it through [GitHub issues](https://github.com/microsoft/azurelinux/issues) and [GitHub Discussions](https://github.com/microsoft/azurelinux/discussions).
 
 ## Bugs, docs, and feature requests

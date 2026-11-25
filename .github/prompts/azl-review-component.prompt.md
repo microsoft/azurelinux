@@ -15,4 +15,6 @@ Follow the component structure and review guidance in the [azldev-comp-toml skil
 2. Read the component's `.comp.toml` file (or inline definition in `components.toml`)
 3. Run through the `azldev-comp-toml` skill's **Review checklist**, using the
 	`azldev-overlays` skill for the overlay-specific checks
-4. Produce a structured report grouped by severity: **Errors** (must-fix), **Warnings** (should-fix), **Info** (suggestions)
+4. If reviewing changes, use the [patch review guidance](../instructions/patch-review.instructions.md)
+   for newly added `.patch` files belonging to the component, excluding generated `specs/` output.
+5. Produce a structured report grouped by severity: **Errors** (must-fix), **Warnings** (should-fix), **Info** (suggestions)

@@ -5,13 +5,13 @@ spec = { type = "upstream", upstream-commit = "6ebadb853abcd63dcd144ee6068757317
 
 # Remove these downloads together with the version overlay once Fedora catches up.
 [[components.nginx.source-files]]
-filename = "nginx-1.30.7.tar.gz"
-hash = "2565b5c837050e958f70fb0f73c48e2bca4542ad349fd356f46fb0c72610bc6e"
+filename = "nginx-1.30.8.tar.gz"
+hash = "f867314ada32e717b949930859656c48a72dc6657aec598db58af2f98a40e1c1"
 hash-type = "SHA256"
-origin = { type = "download", uri = "https://nginx.org/download/nginx-1.30.7.tar.gz" }
+origin = { type = "download", uri = "https://nginx.org/download/nginx-1.30.8.tar.gz" }
 
 [[components.nginx.source-files]]
-filename = "nginx-1.30.7.tar.gz.asc"
-hash = "444f746ca0b38553b154d8f4b8b02a2272ba60c1541d5d8d5d9cab61efb1e99d"
+filename = "nginx-1.30.8.tar.gz.asc"
+hash = "70fcf719f447b549d434a152eaa9c85b3dab2f4d737b55a6d04edcdad48b4825"
 hash-type = "SHA256"
-origin = { type = "download", uri = "https://nginx.org/download/nginx-1.30.7.tar.gz.asc" }
+origin = { type = "download", uri = "https://nginx.org/download/nginx-1.30.8.tar.gz.asc" }

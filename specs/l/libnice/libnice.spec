@@ -3,7 +3,7 @@
 
 Name:           libnice
 Version:        0.1.22
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary:        GLib ICE implementation
 
 License:        LGPL-2.1-or-later OR MPL-1.1
@@ -79,9 +79,6 @@ sed \
 
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 # Temporarily make the upstream test-suite run on Intel arches only because we
 # are getting random crashes in Koji on secondary arches but I have not been
 # able to reproduce them locally so far.

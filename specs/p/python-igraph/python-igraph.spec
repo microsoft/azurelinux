@@ -5,7 +5,7 @@
 Name:       python-igraph
 Version:    0.11.9
 %global igraph_version 0.9
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:    Python bindings for igraph
 
 License:    GPL-2.0-or-later
@@ -78,9 +78,6 @@ documentation needed to develop application with %{name}.
 %pyproject_save_files -l igraph
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 %pytest -v
 
 %files -n python3-igraph -f %{pyproject_files}

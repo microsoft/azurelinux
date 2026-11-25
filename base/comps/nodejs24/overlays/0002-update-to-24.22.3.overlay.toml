@@ -1,0 +1,47 @@
+# Retain the current Fedora f43 spec while updating to the 24.22.3 security release.
+# Remove this overlay once the imported spec is updated.
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update Node.js to 24.22.3"
+type = "spec-update-tag"
+tag = "Version"
+value = "24.22.3"
+
+[[overlays]]
+description = "Update the source paths in generated version comments"
+type = "spec-search-replace"
+regex = '^# Version from node-v24\.22\.1/'
+replacement = '# Version from node-v24.22.3/'
+
+[[overlays]]
+description = "Update the bundled Brotli version"
+type = "spec-search-replace"
+regex = '^%nodejs_define_version brotli 1\.2\.0$'
+replacement = '%nodejs_define_version brotli 1.2.1'
+
+[[overlays]]
+description = "Update the bundled llhttp version"
+type = "spec-search-replace"
+regex = '^%nodejs_define_version llhttp 9\.4\.3$'
+replacement = '%nodejs_define_version llhttp 9.4.4'
+
+[[overlays]]
+description = "Update the bundled Undici version"
+type = "spec-search-replace"
+regex = '^%nodejs_define_version nodejs-undici 7\.30\.1$'
+replacement = '%nodejs_define_version nodejs-undici 7.30.2'
+
+[[overlays]]
+description = "Update the bundled SQLite version"
+type = "spec-search-replace"
+regex = '^%nodejs_define_version sqlite 3\.53\.4$'
+replacement = '%nodejs_define_version sqlite 3.54.1'
+
+[[overlays]]
+description = "Remove the obsolete 24.22.1 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(node-v24\.22\.1-stripped\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

@@ -1,0 +1,5 @@
+[components.clamav]
+
+# Import Fedora's 1.4.7 packaging and norar sources instead of maintaining a local version bump.
+# https://src.fedoraproject.org/rpms/clamav/c/ec6cdfebcae0e1f45dd446669490402fb9e08644?branch=f43
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "ec6cdfebcae0e1f45dd446669490402fb9e08644" }

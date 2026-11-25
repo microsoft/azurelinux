@@ -6,7 +6,7 @@
 
 Name:           perl-XML-Catalog
 Version:        %(echo '%{cpan_version}' | tr -d 'v')
-Release: 38%{?dist}
+Release: 39%{?dist}
 Summary:        Resolve public identifiers and remap system identifiers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XML-Catalog
@@ -78,9 +78,6 @@ EOF
 chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 make test
 
 %files

@@ -1,0 +1,70 @@
+From c53fe556dd48694e8e6dcd5e5881925c783528fe Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Sun, 1 Nov 2026 20:02:27 -0800
+Subject: [PROPOSED] Revert zonenow.tab to 2026a, mostly
+
+Coalesce regions that as of today are identical for the planned future.
+This undoes most of the temporary zonenow.tab changes that were
+needed only from March to today, by reverting zonenow.tab to the
+state it had in 2026a, except with different comments (column 4)
+for some entries to document the new timekeeping in Canada.
+Problem reported by Sam James in:
+https://lists.iana.org/hyperkitty/list/tz@iana.org/thread/CBEK3HXYBOXGD34ZFDSF64QIDT7ZWGBB/
+* zonenow.tab (America/Vancouver): Remove; now coalesced with
+America/Phoenix.
+(America/Edmonton): Remove; now coalesced with America/Mexico_City.
+(America/Winnipeg): Remove; now coalesced with America/Jamaica.
+Update comments accordingly.
+---
+ zonenow.tab | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/zonenow.tab b/zonenow.tab
+index bd3a2787..5f1c50dc 100644
+--- a/zonenow.tab
++++ b/zonenow.tab
+@@ -58,23 +58,17 @@ XX	-2504-13005	Pacific/Pitcairn	Pitcairn
+ # -08/-07 - PST/PDT (North America DST)
+ XX	+340308-1181434	America/Los_Angeles	Pacific (PST/PDT) - US; Mexico near US border
+ #
+-# -08/-07 - PST/PDT (North America DST) until 2026-11-01 02:00; then MST
+-XX	+4916-12307	America/Vancouver	Mountain Standard (MST) - British Columbia (most areas)
+-#
+ # -07 - MST
+-XX	+332654-1120424	America/Phoenix	Mountain Standard (MST) - Arizona; western Mexico; Yukon
++XX	+332654-1120424	America/Phoenix	Mountain Standard (MST) - western Mexico; Arizona; BC, Yukon
+ #
+ # -07/-06 - MST/MDT (North America DST)
+ XX	+394421-1045903	America/Denver	Mountain (MST/MDT) - US; Mexico near US border; western Nunavut
+ #
+-# -07/-06 - MST/MDT (North America DST) until 2026-11-01 02:00; then CST
+-XX	+5333-11328	America/Edmonton	Central Standard (CST) - Alberta, NWT, and some neighbors
+-#
+ # -06
+ XX	-0054-08936	Pacific/Galapagos	Galápagos
+ #
+ # -06 - CST
+-XX	+1924-09909	America/Mexico_City	Central Standard (CST) - Saskatchewan; central Mexico; Central America
++XX	+1924-09909	America/Mexico_City	Central Standard (CST) - central Mexico; Central America; west central Canada
+ #
+ # -06/-05 (Chile DST)
+ XX	-2709-10926	Pacific/Easter	Easter Island
+@@ -82,14 +76,11 @@ XX	-2709-10926	Pacific/Easter	Easter Island
+ # -06/-05 - CST/CDT (North America DST)
+ XX	+415100-0873900	America/Chicago	Central (CST/CDT) - US; Mexico near US border; central Nunavut
+ #
+-# -06/-05 - CST/CDT (North America DST) until 2026-11-01 02:00; then EST
+-XX	+4953-09709	America/Winnipeg	Eastern Standard (EST) - Manitoba, northwestern Ontario
+-#
+ # -05
+ XX	-1203-07703	America/Lima	eastern South America
+ #
+ # -05 - EST
+-XX	+175805-0764736	America/Jamaica	Eastern Standard (EST) - Caymans; Jamaica; eastern Mexico; Panama
++XX	+175805-0764736	America/Jamaica	Eastern Standard (EST) - Jamaica, Panama, E Mexico, Caymans; Manitoba, NW ON
+ #
+ # -05/-04 - CST/CDT (Cuba DST)
+ XX	+2308-08222	America/Havana	Cuba
+-- 
+2.56.0
+
