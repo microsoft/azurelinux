@@ -23,3 +23,6 @@ expression = "BSD-3-Clause"
 path = "vendor/github.com/shibumi/go-pathspec/GO-LICENSE"
 sha256sum = "dd26a7abddd02e2d0aba97805b31f248ef7835d9e10da289b22e3b8ab78b324d"
 expression = "BSD-3-Clause"
+
+[archive.dependency_overrides]
+"golang.org/x/sys" = "v0.49.0"
