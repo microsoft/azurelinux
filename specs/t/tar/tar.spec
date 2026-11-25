@@ -13,7 +13,7 @@ Summary: GNU file archiving program
 Name: tar
 Epoch: 2
 Version: 1.35
-Release: 9%{?dist}
+Release: 13%{?dist}
 License: GPL-3.0-or-later
 URL: https://www.gnu.org/software/tar/
 
@@ -27,8 +27,69 @@ Patch3:  tar-1.29-wildcards.patch
 Patch4:  tar-1.28-atime-rofs.patch
 Patch9:  tar-1.28-document-exclude-mistakes.patch
 Patch10: tar-1.33-fix-capabilities-test.patch
-Patch11: tar-1.35-add-forgotten-tests-from-upstream.patch
-Patch12: tar-1.35-revert-fix-savannah-bug-633567.patch
+Patch11: tar-1.35-padding-zeros.patch
+Patch12: tar-1.30-disk-read-error.patch
+Patch13: tar-1.35-fix-spurious-diagnostic-during-extraction-of-.-with-keep-newer-files.patch
+Patch14: tar-1.35-add-forgotten-tests-from-upstream.patch
+Patch15: tar-1.35-revert-fix-savannah-bug-633567.patch
+# Source: https://cgit.git.savannah.gnu.org/cgit/tar.git/diff/?id=5114218025b4562392dd260e2533d3fa2bc0220e
+Patch16: tar-1.35-Fix-Savane-bug-64581.patch
+# Source: https://cgit.git.savannah.gnu.org/cgit/tar.git/diff/?id=4e742fc8674064a9fa00d4483d06aca48d5b0463
+Patch22: tar-1.35-no-overwrite-dir-no-overwrite-even-temporarily.patch
+#tar commits from upstream
+# 56fb4a96ca43c247261b8c04dd65592f990f98ac
+# 7c241126f14975c7f5df4268b434f276fc7f8842
+# bdd773d028cd21f9b76b8cc306c57e0db3607e82
+# cdb586803b762d9021db2ae8bf5dad3f9b8e4f77
+# 915a8077af12a3eaf7800dbb1a4259783d9933ca
+# 8fca2d35e88d10f0ddcb36720e88f40ac57f67f0
+# e1445cfdf0dfd2f792532afc1eb18b01523dbfb4
+# 75b03fdff48916bd0654677ed21379bdb0db016d
+# 8767b1c84a910cce562059abad5bbf14e72434a0
+#Gnulib commits from upstream to bring openat2 support
+# 0b97ffdf32bdab909d02449043447237273df75e
+# c706216fec5a509bf9b1214892de01aa9303ade0
+# c6502cda83752ff2235d2064c213e7a9e2214201
+# 5746cd1cdbb2caf0e321ea79041885fc7ef22423
+# 3d23c8df2582a6b0e44e048d431ecb00a14667ec
+# a209366ed34eca8ede481ec1b1c4e22f614c448d
+# 8e85114bf1d51d9ea54a89f058c3a2cfa0c19c5e
+# 6bff6c3741209e933e721e81e1b5c5abdbd4389a
+# 24d2acd301cea7cde1928c84f926a54707e945d5
+# 4e1fa851f4f43f749d18b83500757f5bcf1f47bd
+# 20074698382b7e4f049f52bbdeaf6a39508a8601
+# d1aeb7388926e045bdec0f7934c5522c4745f02c
+# 45b6e6898d1f931bfca41d961289bd6ac33238e5
+Patch23: tar-1.35-CVE-2025-45582.patch
+# merely a preparation to apply Patch27, the change is obsoleted by it
+Patch24: tar-1.35-tar-one-top-level-DIR-must-be-relative.patch
+# Source: https://cgit.git.savannah.gnu.org/cgit/tar.git/commit/?id=08c3fc2e9337094aff01a511170fd35fdb8f1ee3
+# Fixes build with acl 2.4.0
+Patch25: tar-1.35-Avoid-acl_-prefix-for-functions.patch
+#Upstream commits
+# b009124ffde415515081db844d7a104e1d1c6c58
+# b8d8a61b25588caca4efaf9bdd2e3f1a49da77e3
+# 67981bbb1587803bb1e029393d2228492cef8c4f
+# 19a3a73e8c48bd3c59cbea9b5ed6780fc6836c6d
+Patch26: tar-1.35-CVE-2026-5704.patch
+#Upstream commits
+# bfc33463942060316f70f275471ed202b0076972
+# b4fc9ca13617411c5db57286a3ff534bd40acdc1
+# 67c8dff6968aae58fcdfb05268eb1b4c07308f1a
+# 55e8233438b3c13294109df502a9b220a9a3f4f5
+# 0470c109c08f466d8332ba3326070554b4d81aa1
+# 1b91f5f66f8e6c490eef0fdee50f652cfe155844
+# 325b899214ac13519153318e66c889a31c15342d
+# 1980e032afe60c5fe0e5df573457885ece4e69d5
+# e335e2c8b102f83b63ffd373f0b88401da3ebe6c
+# part of 941f62b2
+# Also "by the way" fixes CVE-2026-18508.
+Patch27: tar-1.35-fix-absolute-one-top-level.patch
+#Upstream commits
+# 0714d2f082104005a1c70ee6ec4175194943ea88
+# d479b2cc9160d9c2fb61afbc9ee70c2faadf80db
+# b17665b2c0548c77b6cd8d2d5b61e4c4fcc4f770
+Patch28: tar-1.35-CVE-2026-18477.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -127,6 +188,33 @@ make check || (
 
 
 %changelog
+* Mon Sep  7 2026 Pavel Cahyna <pcahyna@redhat.com> - 2:1.35-9
+- Backport upstream fix for CVE-2026-5704 (file injection hidden from -t) (fedora#2527317)
+- Fix --one-top-level with absolute path (broken by the CVE-2025-45582 fix) (fedora#2498061)
+  Also fixes CVE-2026-18508 (escape from --one-top-level via hardlinks) (fedora#2509845).
+- Backport upstream patches for CVE-2026-18477, fixes a bug
+  where incremental restore with cyclic renames between backups
+  may create a temporary directory at an archive-controlled path
+  outside the extraction tree. (fedora#2509846)
+  The fix for CVE-2025-45582 already prevents exploiting
+  this problem, so it is more a correctness and hardening change.
+  
+* Wed Jan 21 2026 Pavel Cahyna <pcahyna@redhat.com> - 2:1.35-8
+- Backport upstream fix for savannah bug 65838, commit 1e6ce98e (fedora#2427654)
+- added "padding with zeros" info message (#2089298)
+- do not report disk error as file shrank (#2089316)
+- upstream fix for savannah bug 64581, commit 51142180
+  (crash with TAR_OPTIONS) (fedora#2389217)
+- Backport fix for regression in the --no-overwrite-dir option
+  Upstream commit 4e742fc8674064a9fa00d4483d06aca48d5b0463, discussed
+  in https://www.mail-archive.com/bug-tar@gnu.org/msg06445.html
+- Backport upstream changes to jailify extraction directory
+  Includes related gnulib changes to add openat2
+  Fixes CVE-2025-45582 (fedora#2380007)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.35-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.35-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

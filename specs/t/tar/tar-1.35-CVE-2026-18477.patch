@@ -1,0 +1,445 @@
+diff --git a/NEWS b/NEWS
+index 45fedbf5..f4621d7f 100644
+--- a/NEWS
++++ b/NEWS
+@@ -13,6 +13,10 @@ version 1.35.90 (git)
+ ** When extracting, tar no longer follows symbolic links to targets
+    outside the working directory.
+ 
++** When extracting from an incremental dump, tar now strips leading '/'
++   from names of temporary directories specified by 'X' entries,
++   unless --absolute-names (-P) is used.
++
+ ** tar no longer fails merely if an extraction directory is unreadable
+    on Linux kernels.
+ 
+diff --git a/THANKS b/THANKS
+index b9e4ce54..f12d98c7 100644
+--- a/THANKS
++++ b/THANKS
+@@ -330,6 +330,7 @@ Manuel Munier		Manuel.Munier@loria.fr
+ Marc Boucher		marc@cam.org
+ Marc Ewing		marc@redhat.com
+ Marcin Matuszewski	marcin@frodo.nask.org.pl
++Marcin Wyczechowski	mwyczechowski@afine.com
+ Marcus Daniels		marcus@sysc.pdx.edu
+ Mark Bynum		bynum@cennas.nhmfl.gov
+ Mark Clements		mpc@mbsmm.com
+@@ -367,6 +368,7 @@ Michael Schmidt		michael@muc.de
+ Michael Schwingen	m.schwingen@stochastik.rwth-aachen.de
+ Michael Smolsky		fnsiguc@astro.weizmann.ac.il
+ Michal Žejdl		zejdl@suas.cz
++Michał Majchrowicz	mmajchrowicz@afine.com
+ Mike Muuss		mike@brl.mil
+ Mike Nolan		nolan@lpl.arizona.edu
+ Mike Rogers		mike@demon.net
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 38645b2c..45152c49 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -30,6 +30,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/gnu -I../ -I../gnu
+ AM_CFLAGS = $(GNULIB_WARN_CFLAGS) $(WERROR_CFLAGS)
+ 
+ noinst_HEADERS = \
++ mkdtempat.h\
+  paxlib.h\
+  rmt.h\
+  system.h\
+@@ -38,6 +39,7 @@ noinst_HEADERS = \
+  xattr-at.h
+ 
+ libtar_a_SOURCES = \
++  mkdtempat.c\
+   paxerror.c paxexit-status.c paxlib.h paxnames.c \
+   rtapelib.c \
+   rmt.h \
+diff --git a/lib/mkdtempat.c b/lib/mkdtempat.c
+new file mode 100644
+index 00000000..e35b9bba
+--- /dev/null
++++ b/lib/mkdtempat.c
+@@ -0,0 +1,45 @@
++/* Copyright 2026 Free Software Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify it
++   under the terms of the GNU General Public License as published by the
++   Free Software Foundation; either version 3 of the License, or (at your
++   option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License along
++   with this program. If not, see <http://www.gnu.org/licenses/>.
++
++   Written by Paul Eggert.  */
++
++#include <config.h>
++
++#include "mkdtempat.h"
++
++#include <tempname.h>
++
++#include <stddef.h>
++#include <sys/stat.h>
++
++static int
++try_dir (char *tmpl, void *flags)
++{
++  int *pdirfd = flags;
++  return mkdirat (*pdirfd, tmpl, S_IRUSR | S_IWUSR | S_IXUSR);
++}
++
++/* Relative to the directory DIRFD if XTEMPLATE is relative,
++   generate a unique temporary directory from XTEMPLATE.
++   The last six characters of XTEMPLATE must be "XXXXXX";
++   replace them with a string that makes the generated directory unique.
++   Create the directory mode 700, and return its name.
++   On failure, return NULL and set errno.  */
++char *
++mkdtempat (int dirfd, char *xtemplate)
++{
++  return (try_tempname_len (xtemplate, 0, &dirfd, try_dir, 6) < 0
++	  ? NULL : xtemplate);
++}
+diff --git a/lib/mkdtempat.h b/lib/mkdtempat.h
+new file mode 100644
+index 00000000..03a18dc1
+--- /dev/null
++++ b/lib/mkdtempat.h
+@@ -0,0 +1 @@
++char *mkdtempat (int, char *);
+diff --git a/src/incremen.c b/src/incremen.c
+index 194d5cb1..a808e1c4 100644
+--- a/src/incremen.c
++++ b/src/incremen.c
+@@ -19,6 +19,7 @@
+ 
+ #include <system.h>
+ #include <hash.h>
++#include <mkdtempat.h>
+ #include <quotearg.h>
+ #include "common.h"
+ 
+@@ -1653,13 +1654,16 @@ purge_directory (char const *directory_name)
+       if (*arc == 'X')
+ 	{
+ #define TEMP_DIR_TEMPLATE "tar.XXXXXX"
+-	  size_t len = strlen (arc + 1);
++	  char *d = safer_name_suffix (arc + 1, false, absolute_names_option);
++	  size_t len = strlen (d);
+ 	  temp_stub = xrealloc (temp_stub, len + 1 + sizeof TEMP_DIR_TEMPLATE);
+-	  memcpy (temp_stub, arc + 1, len);
+-	  temp_stub[len] = '/';
+-	  memcpy (temp_stub + len + 1, TEMP_DIR_TEMPLATE,
++	  char *copy_end = mempcpy (temp_stub, d, len);
++	  *copy_end = '/';
++	  memcpy (copy_end + !ISSLASH (copy_end[-1]), TEMP_DIR_TEMPLATE,
+ 		  sizeof TEMP_DIR_TEMPLATE);
+-	  if (!mkdtemp (temp_stub))
++	  struct fdbase f = fdbase (temp_stub);
++	  if (f.fd == BADFD
++	      || !mkdtempat (f.fd, temp_stub + (f.base - temp_stub)))
+ 	    {
+ 	      ERROR ((0, errno,
+ 		      _("Cannot create temporary directory using template %s"),
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index b9ed8270..6031d7a1 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -209,6 +209,8 @@ TESTSUITE_AT = \
+  rename04.at\
+  rename05.at\
+  rename06.at\
++ rename08.at\
++ rename09.at\
+  remfiles01.at\
+  remfiles02.at\
+  remfiles03.at\
+diff --git a/tests/rename08.at b/tests/rename08.at
+new file mode 100644
+index 00000000..5452fb4f
+--- /dev/null
++++ b/tests/rename08.at
+@@ -0,0 +1,131 @@
++# Process this file with autom4te to create testsuite. -*- Autotest -*-
++
++# Test suite for GNU tar.
++# Copyright 2006-2026 Free Software Foundation, Inc.
++
++# This file is part of GNU tar.
++
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Description: Handling of cyclic renames in incremental archives.
++
++AT_SETUP([cyclic renames])
++AT_KEYWORDS([incremental rename rename08 cyclic-rename])
++
++AT_TAR_CHECK([
++AT_SORT_PREREQ
++
++mkdir foo
++genfile --file foo/file1
++genfile --file foo/file2
++
++mkdir foo/a
++genfile --file foo/a/filea
++
++mkdir foo/b
++genfile --file foo/b/fileb
++
++mkdir foo/c
++genfile --file foo/c/filec
++
++sleep 1
++
++echo "First dump"
++echo "First dump">&2
++tar -g incr -cf arch.1 -v foo 2>tmperr
++sort tmperr >&2
++
++# Shuffle directories:
++(cd foo
++mv a $$
++mv c a
++mv b c
++mv $$ b)
++
++echo "Second dump"
++echo "Second dump" >&2
++tar -g incr -cf arch.2 -v foo 2>tmperr
++sort tmperr >&2
++
++mkdir -p restoreparent/restore
++cd restoreparent
++tar xfg ../arch.1 /dev/null --warning=no-timestamp -C restore
++
++echo "Begin directory listing 1"
++( cd restore; find foo ) | sort
++echo "End directory listing 1"
++
++tar xfgv ../arch.2 /dev/null --warning=no-timestamp -C restore
++echo Begin directory listing 2
++( cd restore ; find foo ) | sort
++echo End directory listing 2
++],
++[0],
++[First dump
++foo/
++foo/a/
++foo/b/
++foo/c/
++foo/file1
++foo/file2
++foo/a/filea
++foo/b/fileb
++foo/c/filec
++Second dump
++foo/
++foo/a/
++foo/b/
++foo/c/
++Begin directory listing 1
++foo
++foo/a
++foo/a/filea
++foo/b
++foo/b/fileb
++foo/c
++foo/c/filec
++foo/file1
++foo/file2
++End directory listing 1
++foo/
++foo/a/
++foo/b/
++foo/c/
++Begin directory listing 2
++foo
++foo/a
++foo/a/filec
++foo/b
++foo/b/filea
++foo/c
++foo/c/fileb
++foo/file1
++foo/file2
++End directory listing 2
++],
++[First dump
++tar: foo/a: Directory is new
++tar: foo/b: Directory is new
++tar: foo/c: Directory is new
++tar: foo: Directory is new
++Second dump
++tar: foo/a: Directory has been renamed from 'foo/c'
++tar: foo/b: Directory has been renamed from 'foo/a'
++tar: foo/c: Directory has been renamed from 'foo/b'
++],
++[],[],[gnu, oldgnu, posix])
++
++AT_CLEANUP
++
++# End of rename03.at
+diff --git a/tests/rename09.at b/tests/rename09.at
+new file mode 100644
+index 00000000..8346ff0a
+--- /dev/null
++++ b/tests/rename09.at
+@@ -0,0 +1,129 @@
++# Process this file with autom4te to create testsuite. -*- Autotest -*-
++
++# Test suite for GNU tar.
++# Copyright 2006-2026 Free Software Foundation, Inc.
++
++# This file is part of GNU tar.
++
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Description: Handling of cyclic renames in incremental archives.
++
++AT_SETUP([cyclic renames])
++AT_KEYWORDS([incremental rename rename09 cyclic-rename])
++
++AT_TAR_CHECK([
++AT_SORT_PREREQ
++
++mkdir foo
++genfile --file foo/file1
++genfile --file foo/file2
++
++mkdir foo/a
++genfile --file foo/a/filea
++
++mkdir foo/b
++genfile --file foo/b/fileb
++
++mkdir foo/c
++genfile --file foo/c/filec
++
++sleep 1
++
++echo "First dump"
++echo "First dump">&2
++tar -g incr -cf arch.1 -v foo 2>tmperr
++sort tmperr >&2
++
++# Shuffle directories:
++(cd foo
++mv a $$
++mv c a
++mv b c
++mv $$ b)
++
++echo "Second dump"
++echo "Second dump" >&2
++tar -g incr -cf arch.2 -v foo 2>tmperr
++sort tmperr >&2
++
++tar xfg arch.1 /dev/null --warning=no-timestamp --one-top-level=restore
++
++echo "Begin directory listing 1"
++( cd restore; find foo ) | sort
++echo "End directory listing 1"
++
++tar xfgv arch.2 /dev/null --warning=no-timestamp --one-top-level=restore
++echo Begin directory listing 2
++( cd restore ; find foo ) | sort
++echo End directory listing 2
++],
++[0],
++[First dump
++foo/
++foo/a/
++foo/b/
++foo/c/
++foo/file1
++foo/file2
++foo/a/filea
++foo/b/fileb
++foo/c/filec
++Second dump
++foo/
++foo/a/
++foo/b/
++foo/c/
++Begin directory listing 1
++foo
++foo/a
++foo/a/filea
++foo/b
++foo/b/fileb
++foo/c
++foo/c/filec
++foo/file1
++foo/file2
++End directory listing 1
++foo/
++foo/a/
++foo/b/
++foo/c/
++Begin directory listing 2
++foo
++foo/a
++foo/a/filec
++foo/b
++foo/b/filea
++foo/c
++foo/c/fileb
++foo/file1
++foo/file2
++End directory listing 2
++],
++[First dump
++tar: foo/a: Directory is new
++tar: foo/b: Directory is new
++tar: foo/c: Directory is new
++tar: foo: Directory is new
++Second dump
++tar: foo/a: Directory has been renamed from 'foo/c'
++tar: foo/b: Directory has been renamed from 'foo/a'
++tar: foo/c: Directory has been renamed from 'foo/b'
++],
++[],[],[gnu, oldgnu, posix])
++
++AT_CLEANUP
++
++# End of rename03.at
+diff --git a/tests/testsuite.at b/tests/testsuite.at
+index 0cc7adda..e4edaba5 100644
+--- a/tests/testsuite.at
++++ b/tests/testsuite.at
+@@ -401,6 +401,8 @@ m4_include([rename03.at])
+ m4_include([rename04.at])
+ m4_include([rename05.at])
+ m4_include([rename06.at])
++m4_include([rename08.at])
++m4_include([rename09.at])
+ m4_include([chtype.at])
+ 
+ AT_BANNER([Ignore failing reads])

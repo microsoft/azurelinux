@@ -1,0 +1,2421 @@
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/aclocal.m4 tar-1.35-rhel-10.2-clean/aclocal.m4
+--- a/aclocal.m4	2026-01-12 10:58:21.423872843 +0100
++++ b/aclocal.m4	2026-01-12 11:21:32.618583108 +0100
+@@ -1339,6 +1339,7 @@
+ m4_include([m4/open-slash.m4])
+ m4_include([m4/open.m4])
+ m4_include([m4/openat.m4])
++m4_include([m4/openat2.m4])
+ m4_include([m4/opendir.m4])
+ m4_include([m4/parse-datetime.m4])
+ m4_include([m4/pathmax.m4])
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/doc/tar.texi tar-1.35-rhel-10.2-clean/doc/tar.texi
+--- a/doc/tar.texi	2026-01-12 10:53:18.080261058 +0100
++++ b/doc/tar.texi	2026-01-12 11:00:38.055598907 +0100
+@@ -12952,26 +12952,31 @@
+ When @command{tar} extracts from an archive, by default it writes into
+ files relative to the working directory.  If the archive was generated
+ by an untrusted user, that user therefore can write into any file
+-under the working directory.  If the working directory contains a
+-symbolic link to another directory, the untrusted user can also write
+-into any file under the referenced directory.  When extracting from an
++under the working directory.  When extracting from an
+ untrusted archive, it is therefore good practice to create an empty
+-directory and run @command{tar} in that directory.
+-
+-When extracting from two or more untrusted archives, each one should
+-be extracted independently, into different empty directories.
+-Otherwise, the first archive could create a symbolic link into an area
+-outside the working directory, and the second one could follow the
+-link and overwrite data that is not under the working directory.  For
+-example, when restoring from a series of incremental dumps, the
+-archives should have been created by a trusted process, as otherwise
+-the incremental restores might alter data outside the working
+-directory.
++directory and run @command{tar} in that directory.  You can use the
++@option{--directory} (@option{-C}) option to specify the working
++directory (@pxref{directory}).
++
++When extracting from an archive, @command{tar} rejects attempts to
++modify files outside the working directory.
++For example, if a symbolic link points outside the working directory,
++@command{tar} refuses to follow the link, regardless of whether the
++symbolic link existed before @command{tar} was run.
++Therefore, when extracting from two or more untrusted archives,
++each one can be extracted in turn, into the same initially-empty directory.
++Even if an earlier archive creates a symbolic link that
++points outside the working directory,
++@command{tar} will reject any later attempts to follow that symbolic link.
++However, this safety mechanism applies only to @command{tar} itself:
++it does not apply to other programs you may run later, which will
++ordinarily follow symbolic links even if they escape the working directory.
+ 
+ If you use the @option{--absolute-names} (@option{-P}) option when
+ extracting, @command{tar} respects any file names in the archive, even
+-file names that begin with @file{/} or contain @file{..}.  As this
+-lets the archive overwrite any file in your system that you can write,
++file names that begin with @file{/}, contain @file{..}, or that follow
++a symbolic link to escape the extraction directory.  As this lets the
++archive overwrite any file in your system that you can write,
+ the @option{--absolute-names} (@option{-P}) option should be used only
+ for trusted archives.
+ 
+@@ -13041,7 +13046,7 @@
+ being archived.
+ 
+ @item
+-Extract from an untrusted archive only into an otherwise-empty
++Extract from untrusted archives only into an otherwise-empty
+ directory.  This directory and its parent should be accessible only to
+ trusted users.  For example:
+ 
+@@ -13054,8 +13059,6 @@
+ @end group
+ @end example
+ 
+-As a corollary, do not do an incremental restore from an untrusted archive.
+-
+ @item
+ Do not let untrusted users access files extracted from untrusted
+ archives without checking first for problems such as setuid programs.
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/gnu/fcntl.in.h tar-1.35-rhel-10.2-clean/gnu/fcntl.in.h
+--- a/gnu/fcntl.in.h	2026-01-12 10:53:53.929214788 +0100
++++ b/gnu/fcntl.in.h	2026-01-12 11:01:04.788453365 +0100
+@@ -238,6 +238,46 @@
+ # endif
+ #endif
+ 
++#if @GNULIB_OPENAT2@
++# if !defined RESOLVE_NO_XDEV && defined __has_include
++#  if __has_include (<linux/openat2.h>)
++#   include <linux/openat2.h>
++#  endif
++# endif
++# ifndef RESOLVE_NO_XDEV
++struct open_how
++{
++#  ifdef __UINT64_TYPE__
++  __UINT64_TYPE__ flags, mode, resolve;
++#  else
++  unsigned long long int flags, mode, resolve;
++#  endif
++};
++#  define RESOLVE_NO_XDEV	0x01
++#  define RESOLVE_NO_MAGICLINKS	0x02
++#  define RESOLVE_NO_SYMLINKS	0x04
++#  define RESOLVE_BENEATH	0x08
++#  define RESOLVE_IN_ROOT	0x10
++#  define RESOLVE_CACHED	0x20
++# endif
++
++# if !@HAVE_OPENAT2@
++_GL_FUNCDECL_SYS (openat2, int,
++                  (int fd, char const *file, struct open_how const *how,
++                   size_t size)
++		  _GL_ARG_NONNULL ((2, 3)));
++# endif
++_GL_CXXALIAS_SYS (openat2, int,
++                  (int fd, char const *file, struct open_how const *how,
++                   size_t size));
++_GL_CXXALIASWARN (openat2);
++#elif defined GNULIB_POSIXCHECK
++# undef openat2
++# if HAVE_RAW_DECL_OPENAT2
++_GL_WARN_ON_USE (openat2, "openat2 is not portable - "
++                 "use gnulib module openat2 for portability");
++# endif
++#endif
+ 
+ /* Fix up the FD_* macros, only known to be missing on mingw.  */
+ 
+@@ -445,6 +485,15 @@
+ # define AT_NO_AUTOMOUNT 0
+ #endif
+ 
++/* errno when openat+O_NOFOLLOW fails because the file is a symlink.  */
++#if defined __FreeBSD__ || defined __FreeBSD_kernel__ || defined __DragonFly__
++# define _GL_OPENAT_ESYMLINK EMLINK
++#elif defined __NetBSD__
++# define _GL_OPENAT_ESYMLINK EFTYPE
++#else
++# define _GL_OPENAT_ESYMLINK ELOOP
++#endif
++
+ #endif /* _@GUARD_PREFIX@_FCNTL_H */
+ #endif /* _@GUARD_PREFIX@_FCNTL_H */
+ #endif
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/gnu/Makefile.am tar-1.35-rhel-10.2-clean/gnu/Makefile.am
+--- a/gnu/Makefile.am	2026-01-12 10:54:04.333486876 +0100
++++ b/gnu/Makefile.am	2026-01-12 11:01:15.084777442 +0100
+@@ -86,6 +86,7 @@
+ #  modechange \
+ #  obstack \
+ #  openat \
++#  openat2 \
+ #  parse-datetime \
+ #  priv-set \
+ #  progname \
+@@ -935,10 +936,12 @@
+ 	      -e 's/@''GNULIB_NONBLOCKING''@/$(GL_GNULIB_NONBLOCKING)/g' \
+ 	      -e 's/@''GNULIB_OPEN''@/$(GL_GNULIB_OPEN)/g' \
+ 	      -e 's/@''GNULIB_OPENAT''@/$(GL_GNULIB_OPENAT)/g' \
++	      -e 's/@''GNULIB_OPENAT2''@/$(GL_GNULIB_OPENAT2)/g' \
+ 	      -e 's/@''GNULIB_MDA_CREAT''@/$(GL_GNULIB_MDA_CREAT)/g' \
+ 	      -e 's/@''GNULIB_MDA_OPEN''@/$(GL_GNULIB_MDA_OPEN)/g' \
+ 	      -e 's|@''HAVE_FCNTL''@|$(HAVE_FCNTL)|g' \
+ 	      -e 's|@''HAVE_OPENAT''@|$(HAVE_OPENAT)|g' \
++	      -e 's|@''HAVE_OPENAT2''@|$(HAVE_OPENAT2)|g' \
+ 	      -e 's|@''REPLACE_CREAT''@|$(REPLACE_CREAT)|g' \
+ 	      -e 's|@''REPLACE_FCNTL''@|$(REPLACE_FCNTL)|g' \
+ 	      -e 's|@''REPLACE_OPEN''@|$(REPLACE_OPEN)|g' \
+@@ -2060,6 +2063,14 @@
+ 
+ ## end   gnulib module openat-safer
+ 
++## begin gnulib module openat2
++
++if GL_COND_OBJ_OPENAT2
++libgnu_a_SOURCES += openat2.c
++endif
++
++## end   gnulib module openat2
++
+ ## begin gnulib module opendir
+ 
+ if GL_COND_OBJ_OPENDIR
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/gnu/openat2.c tar-1.35-rhel-10.2-clean/gnu/openat2.c
+--- a/gnu/openat2.c	1970-01-01 01:00:00.000000000 +0100
++++ b/gnu/openat2.c	2026-01-12 11:01:04.592447169 +0100
+@@ -0,0 +1,596 @@
++/* Open a file, with more flags than openat
++   Copyright 2025 Free Software Foundation, Inc.
++
++   This file is free software: you can redistribute it and/or modify
++   it under the terms of the GNU Lesser General Public License as
++   published by the Free Software Foundation; either version 2.1 of the
++   License, or (at your option) any later version.
++
++   This file is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public License
++   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
++
++/* written by Paul Eggert  */
++
++#include <config.h>
++
++#include <fcntl.h>
++
++#include "eloop-threshold.h"
++#include "filename.h"
++#include "ialloc.h"
++#include "idx.h"
++#include "verify.h"
++
++#include <errno.h>
++#include <limits.h>
++#include <stdckdint.h>
++#include <string.h>
++#include <sys/stat.h>
++#include <unistd.h>
++
++#if defined __linux__ || defined __ANDROID__
++# include <sys/syscall.h>
++# include <linux/version.h>
++# if HAVE_SYS_VFS_H && HAVE_FSTATFS && HAVE_STRUCT_STATFS_F_TYPE
++#  include <sys/vfs.h>
++/* Linux-specific constant from coreutils src/fs.h.  */
++#  define S_MAGIC_PROC 0x9FA0
++# endif
++#endif
++
++/* FSTAT_O_PATH_BUG is true if fstat fails on O_PATH file descriptors.
++   Although it can be dicey to use static checks for Linux kernel versions,
++   due to the dubious practice of building on newer kernels for older ones,
++   do it here anyway as the buggy kernels are rare (all EOLed by 2016)
++   and builders for them are unlikely to use the dubious practice.
++   Circa 2030 we should remove the old-kernel workarounds entirely.  */
++#ifdef LINUX_VERSION_CODE
++# define FSTAT_O_PATH_BUG (KERNEL_VERSION (2, 6, 39) <= LINUX_VERSION_CODE \
++                           && LINUX_VERSION_CODE < KERNEL_VERSION (3, 6, 0))
++#else
++# define FSTAT_O_PATH_BUG false
++#endif
++
++#ifndef E2BIG
++# define E2BIG EINVAL
++#endif
++
++#ifndef ENOTCAPABLE /* A FreeBSD error number.  */
++# define ENOTCAPABLE 0
++#endif
++
++#ifndef PATH_MAX
++# define PATH_MAX IDX_MAX
++#endif
++
++#ifndef O_ASYNC
++# define O_ASYNC 0
++#endif
++#ifndef O_CLOFORK
++# define O_CLOFORK 0
++#endif
++#ifndef O_LARGEFILE
++# define O_LARGEFILE 0
++#endif
++#ifndef O_NOCLOBBER
++# define O_NOCLOBBER 0
++#endif
++#ifndef O_PATH
++# define O_PATH 0
++#endif
++#ifndef O_RESOLVE_BENEATH /* A FreeBSD flag.  */
++# define O_RESOLVE_BENEATH 0
++#endif
++#ifndef O_TMPFILE
++# define O_TMPFILE 0
++#endif
++#if O_PATH
++enum { O_PATHSEARCH = O_PATH };
++#else
++enum { O_PATHSEARCH = O_SEARCH };
++#endif
++
++/* Return true if the memory region at S of size N contains only zeros.  */
++static bool
++memiszero (void const *s, idx_t n)
++{
++  /* Keep it simple, as N is typically zero.  */
++  char const *p = s;
++  for (idx_t i = 0; i < n; i++)
++    if (p[i])
++      return false;
++  return true;
++}
++
++/* Return the negative of errno, helping the compiler about its sign.  */
++static int
++negative_errno (void)
++{
++  int err = -errno;
++  assume (err < 0);
++  return err;
++}
++
++/* Make *BUF, which is of size BUFSIZE and which is heap-allocated
++   if not equal to STACKBUF, large enough to hold an object of NGROW + NTAIL.
++   Keep the last NTAIL bytes of *BUF; the rest of *BUF becomes uninitialized.
++   NTAIL must not exceed BUFSIZE.
++   Return the resulting buffer size, or a negative errno value
++   if the buffer could not be grown.  */
++static ptrdiff_t
++maybe_grow (char **buf, idx_t bufsize, char *stackbuf,
++            idx_t ngrow, idx_t ntail)
++{
++  if (ngrow <= bufsize - ntail)
++    return bufsize;
++
++  idx_t needed;
++  if (ckd_add (&needed, ngrow, ntail))
++    return -ENOMEM;
++  idx_t s = ckd_add (&s, needed, needed >> 1) ? needed : s;
++  char *newbuf = imalloc (s);
++  if (!newbuf)
++    return negative_errno ();
++  char *oldbuf = *buf;
++  memcpy (newbuf + s - ntail, oldbuf + bufsize - ntail, ntail);
++  if (oldbuf != stackbuf)
++    free (oldbuf);
++  *buf = newbuf;
++  return s;
++}
++
++/* Store DIRFD's file status into *ST.
++   DIRFD is either AT_FDCWD or a nonnegative file descriptor.
++   Return 0 on success, -1 (setting errno) on failure.  */
++static int
++dirstat (int dirfd, struct stat *st)
++{
++  /* Use fstatat only if fstat is buggy.  fstatat is a bit slower,
++     and using it only on buggy hosts means openat2 need not depend on
++     Gnulib's fstatat module, as all systems with the fstat bug have
++     an fstatat that works well enough. */
++#if FSTAT_O_PATH_BUG
++  return fstatat (dirfd, ".", st);
++#else
++  return dirfd < 0 ? stat (".", st) : fstat (dirfd, st);
++#endif
++}
++
++/* Like openat2 (*FD, FILENAME, h, sizeof h) where h is
++   (struct open_how) { .flags = FLAGS, .resolve = RESOLVE, .mode = MODE },
++   except trust h's contents, advance *FD as we go,
++   use and update *BUF (originally pointing to a buffer of size BUFSIZE,
++   though it may be changed to point to a freshly allocated heap buffer),
++   and return the negative of the errno value on failure.
++   *FD and *BUF can be updated even on failure.
++   BUFSIZE must be at least 2.  */
++static int
++do_openat2 (int *fd, char const *filename,
++            int flags, char resolve, mode_t mode,
++            char **buf, idx_t bufsize)
++{
++  int dfd = *fd;
++
++  /* RESOLVED_CACHED cannot be implemented properly in user space,
++     so pretend nothing is cached.  */
++  if (resolve & RESOLVE_CACHED)
++    return -EAGAIN;
++
++  /* Put the file name being processed (including trailing NUL) at buffer end,
++     to simplify symlink resolution.  */
++  idx_t filenamelen = strlen (filename);
++  if (!filenamelen)
++    return -ENOENT;
++  idx_t filenamesize = filenamelen + 1;
++  if (PATH_MAX < filenamesize)
++    return -ENAMETOOLONG;
++  char *stackbuf = *buf;
++  bufsize = maybe_grow (buf, bufsize, stackbuf, filenamesize, 0);
++  if (bufsize < 0)
++    return bufsize;
++
++  /* Pointer to buffer end.  A common access is E[-I] where I is a
++     negative index relative to buffer end.  */
++  char *e = *buf + bufsize;
++  memcpy (&e[-filenamesize], filename, filenamesize);
++
++  /* Directory depth below DFD.  This is -1 if ".." ascended above
++     DFD at any point in the past, which can happen only if
++     neither RESOLVE_BENEATH nor RESOLVE_IN_ROOT is in effect.  */
++  ptrdiff_t depth = 0;
++
++  /* DFD's device.  UNKNOWN_DDEV if not acquired yet.  If the actual
++     device number equals UNKNOWN_DDEV the code still works,
++     albeit more slowly.  */
++  dev_t const UNKNOWN_DEV = -1;
++  dev_t ddev = UNKNOWN_DEV;
++
++  long int maxlinks = resolve & RESOLVE_NO_SYMLINKS ? 0 : __eloop_threshold ();
++
++  /* Iterates through file name components, possibly expanded by
++     symlink contents.  */
++  while (true)
++    {
++      /* Make progress in interpreting &E[-FILENAMESIZE] as a file name.
++         If relative, it is relative to *FD.
++         FILENAMESIZE is positive.
++
++         Start by computing sizes of strings at the file name's end.
++         Use negations of sizes to index into E.
++         Here is an example file name and sizes of the trailing strings:
++
++           ///usr//bin/.////cat
++           F  G  H             1
++
++         As the '1' indicates, all sizes are positive
++         and include the trailing NUL at E[-1].
++
++         If there are file name components (the typical case),
++         -F <= -G < -H <= -1 and the first component
++         starts at E[-G] and ends just before E[-H].
++         Otherwise if the file name is nonempty,
++         -F < -G = -H = -1 and &E[-F] is a file system root.
++         Otherwise it is Solaris and we resolved an empty final symlink, and
++         -F = -G = -H = -1 and the empty file name is equivalent to ".".
++
++         F = G means the file name is relative to *FD;
++         otherwise the file name is not relative.
++
++         F (i.e., FILENAMESIZE) is the size of the file name.  &E[-F] is what
++         is typically passed next to openat (with E[-H] set to NUL).
++
++         G is the size of the file name's suffix that starts with the name's
++         first component; &E[-G] addresses the first component.
++
++         H is the size of the suffix after the first component, i.e.,
++         E[-H] is the slash or NUL after the first component.
++
++         If there is no component, G and H are both 1.  */
++      idx_t f = filenamesize;
++      idx_t g = f - FILE_SYSTEM_PREFIX_LEN (&e[-f]);
++      while (ISSLASH (e[-g]))
++        g--;
++      if (f != g)
++        {
++          /* The file name is not relative.  */
++          if (resolve & RESOLVE_BENEATH)
++            return -EXDEV;
++          if (resolve & RESOLVE_IN_ROOT)
++            f = g;
++          if (*fd != dfd)
++            {
++              /* A non-relative symlink had been resolved at positive depth.
++                 Forget its parent directory.  */
++              close (*fd);
++              *fd = dfd;
++            }
++        }
++      idx_t h = g;
++      while (h > 1)
++        {
++          h--;
++          if (ISSLASH (e[-h]))
++            break;
++        }
++
++      /* Properties of the file name through the first component's end,
++         or to file name end if there is no component.  */
++      bool leading_dot = e[-f] == '.';
++      bool dot_or_empty = f - h == leading_dot;
++      bool dotdot = leading_dot & (f - h == 2) & (e[-h - 1] == '.');
++      bool dotdot_as_dot = dotdot & !depth & !!(resolve & RESOLVE_IN_ROOT);
++      bool dotlike = dot_or_empty | dotdot_as_dot;
++
++      if (dotdot & !depth & !!(resolve & RESOLVE_BENEATH))
++        return -EXDEV;
++
++      /* NEXTF is the value of FILENAMESIZE next time through the loop,
++         unless a symlink intervenes.  */
++      idx_t nextf = h;
++      while (ISSLASH (e[-nextf]))
++        nextf--;
++
++      /* FINAL means this is the last time through the loop,
++         unless a symlink intervenes.  */
++      bool final = nextf == 1;
++
++      if (!final & dotlike)
++        {
++          /* A non-final component that acts like "."; skip it.  */
++          filenamesize = nextf;
++        }
++      else if (!final & dotdot & (depth == 1))
++        {
++          /* A non-final ".." in a name like "x/../y/z" when "x" is an
++             existing non-symlink directory.  As an optimization,
++             resolve it like "y/z".  */
++          close (*fd);
++          *fd = dfd;
++          depth = 0;
++          filenamesize = nextf;
++        }
++      else
++        {
++          if (dotlike)
++            {
++              /* This is empty or the last component, and acts like ".".
++                 Use "." regardless of whether it was "" or "." or "..".  */
++              f = sizeof ".";
++              e[-f] = '.';
++            }
++
++          /* Open the current component, as either an internal directory or
++             the final open.  Do not follow symlinks.  */
++          char eh = e[-h];
++          int subflags = ((!final
++                           ? O_PATHSEARCH | O_CLOEXEC | O_CLOFORK
++                           : flags)
++                          | O_NOFOLLOW | (eh ? O_DIRECTORY : 0));
++          e[-h] = '\0';
++          int subfd = openat (*fd, &e[-f], subflags, mode);
++
++          if (subfd < 0)
++            {
++              int openerr = negative_errno ();
++              if (! ((openerr == -_GL_OPENAT_ESYMLINK)
++                     | (!!(subflags & O_DIRECTORY) & (openerr == -ENOTDIR))))
++                return openerr;
++
++              /* Likely a symlink.
++                 Try to read symlink contents into buffer start.
++                 But if the root prefix might be needed,
++                 leave room for it at buffer start.  */
++              idx_t rootlen = f - g;
++              char *slink;
++              ssize_t slinklen;
++              for (idx_t more = rootlen + 1; ; more = bufsize - f + 1)
++                {
++                  bufsize = maybe_grow (buf, bufsize, stackbuf, more, f);
++                  if (bufsize < 0)
++                    return bufsize;
++                  e = *buf + bufsize;
++                  slink = *buf + rootlen;
++                  idx_t slinksize = bufsize - f - rootlen;
++                  slinklen = readlinkat (*fd, &e[-f], slink, slinksize);
++                  if (slinklen < 0)
++                    {
++                      int readlinkerr = negative_errno ();
++                      return readlinkerr == -EINVAL ? -ENOTDIR : readlinkerr;
++                    }
++                  if (slinklen < slinksize)
++                    break;
++                }
++
++              if (maxlinks <= 0)
++                return -_GL_OPENAT_ESYMLINK;
++              maxlinks--;
++
++              /* A symlink and the symlink loop count is not exhausted.
++                 Fail now if magic and if RESOLVE_NO_MAGIC_LINKS.  */
++#ifdef S_MAGIC_PROC
++              if (resolve & RESOLVE_NO_MAGICLINKS)
++                {
++                  bool relative = IS_RELATIVE_FILE_NAME (&e[-f]);
++                  struct statfs st;
++                  int r;
++                  if (relative)
++                    r = *fd < 0 ? statfs (".", &st) : fstatfs (*fd, &st);
++                  else
++                    {
++                      char eg = e[-g];
++                      e[-g] = '\0';
++                      r = statfs (&e[-f], &st);
++                      e[-g] = eg;
++                    }
++                  if (r < 0)
++                    return negative_errno ();
++                  if (st.f_type == S_MAGIC_PROC)
++                    return -_GL_OPENAT_ESYMLINK;
++                }
++#endif
++
++              /* Compute KEPT, the number of trailing bytes in the file
++                 name that will be appended to the symlink contents.  */
++              idx_t kept;
++              if (slinklen == 0)
++                {
++                  /* On Solaris empty symlinks act like ".".
++                     On other platforms that allow them,
++                     they fail with ENOENT.  */
++#ifdef __sun
++                  slink[slinklen] = '\0';  /* For IS_RELATIVE_FILE_NAME.  */
++                  kept = nextf;
++#else
++                  return -ENOENT;
++#endif
++                }
++              else if (ISSLASH (slink[slinklen - 1]))
++                {
++                  /* Skip any leading slashes in the kept bytes.
++                     This can matter if the symlink contains only slashes,
++                     because "//" and "/" can be distinct directories.  */
++                  kept = nextf;
++                }
++              else
++                {
++                  e[-h] = eh;
++                  kept = h;
++                }
++
++              if (ISSLASH ('\\'))
++                slink[slinklen] = '\0';  /* For IS_RELATIVE_FILE_NAME.  */
++
++              /* Compute the new file name by concatenating:
++                  - Any old root prefix if the symlink contents are relative.
++                  - The symlink contents.
++                  - The last KEPT bytes of the old file name.
++                 The KEPT part is already in place.  */
++              char const *prefix;  /* [old root prefix +] symlink contents */
++              idx_t prefixlen;
++              if (IS_RELATIVE_FILE_NAME (slink))
++                {
++                  prefix = memmove (*buf, &e[-f], rootlen);
++                  prefixlen = rootlen + slinklen;
++                }
++              else
++                {
++                  if (*fd != dfd)
++                    {
++                      close (*fd);
++                      *fd = dfd;
++                    }
++                  prefix = slink;
++                  prefixlen = slinklen;
++                }
++              filenamesize = prefixlen + kept;
++              if (PATH_MAX < filenamesize)
++                return -ENAMETOOLONG;
++              memmove (&e[-filenamesize], prefix, prefixlen);
++            }
++          else
++            {
++              if (*fd != dfd)
++                close (*fd);
++              *fd = subfd;
++
++              /* SUBFD is open to the file named by the current component.
++                 If requested, require it to be in the same file system.  */
++              if (resolve & RESOLVE_NO_XDEV)
++                {
++                  struct stat st;
++                  if (ddev == UNKNOWN_DEV)
++                    {
++                      if (dirstat (dfd, &st) < 0)
++                        return negative_errno ();
++                      ddev = st.st_dev;
++                    }
++                  if (dirstat (subfd, &st) < 0)
++                    return negative_errno ();
++                  if (st.st_dev != ddev)
++                    return -EXDEV;
++                }
++
++              if (final)
++                {
++                  *fd = dfd;
++                  return subfd;
++                }
++
++              /* The component cannot be dotlike here, so if the depth is
++                 nonnegative adjust it by +1 or -1.  */
++              if (0 <= depth)
++                depth += dotdot ? -1 : 1;
++
++              filenamesize = nextf;
++            }
++        }
++    }
++}
++
++/* Like openat (DFD, FILENAME, HOW->flags, HOW->mode),
++   but with extra flags in *HOW, which is of size HOWSIZE.  */
++int
++openat2 (int dfd, char const *filename,
++         struct open_how const *how, size_t howsize)
++{
++  int r;
++
++#ifdef SYS_openat2
++  r = syscall (SYS_openat2, dfd, filename, how, howsize);
++  if (! (r < 0 && errno == ENOSYS))
++    return r;
++
++  /* Keep going, to support the dubious practice of compiling for an
++     older kernel.  The openat2 syscall was introduced in Linux 5.6.
++     Linux 5.4 LTS is EOLed at the end of 2025, so perhaps after that
++     we can simply return the syscall result instead of continuing.  */
++#endif
++
++  /* Check for invalid arguments.  Once the size test has succeeded,
++     *HOW's members are safe to access, so use & and | as there is
++     little point to using && or || when invalid arguments are rare.
++     (Other parts of this file also use & and | for similar reasons.)
++     These checks mimic those of the Linux kernel: when the Linux
++     kernel is overly generous, these checks are too.  */
++  if (howsize < sizeof *how)
++    r = -EINVAL;
++  else if (!memiszero (how + 1, howsize - sizeof *how))
++    r = -E2BIG;
++  else if ((how->flags
++            & ~ (O_CLOFORK | O_CLOEXEC | O_DIRECTORY
++                 | O_NOFOLLOW | O_PATH
++                 | (how->flags & O_PATH
++                    ? 0
++                    : (O_ACCMODE | O_APPEND | O_ASYNC | O_BINARY
++                       | O_CREAT | O_DIRECT | O_DSYNC | O_EXCL
++                       | O_IGNORE_CTTY | O_LARGEFILE | O_NDELAY
++                       | O_NOATIME | O_NOCLOBBER | O_NOCTTY
++                       | O_NOLINK | O_NOLINKS | O_NONBLOCK | O_NOTRANS
++                       | O_RSYNC | O_SYNC
++                       | O_TEXT | O_TMPFILE | O_TRUNC | O_TTY_INIT))))
++           | (!!(how->flags & O_CREAT)
++              & !!(how->flags & (O_DIRECTORY | O_TMPFILE)))
++           | (!!(how->flags & O_TMPFILE & ~O_DIRECTORY)
++              & ((how->flags & (O_ACCMODE | O_PATH)) != O_WRONLY)
++              & ((how->flags & (O_ACCMODE | O_PATH)) != O_RDWR))
++           | (how->mode
++              & ~ (how->flags & (O_CREAT | (O_TMPFILE & ~O_DIRECTORY))
++                   ? (S_ISUID | S_ISGID | S_ISVTX
++                      | S_IRWXU | S_IRWXG | S_IRWXO)
++                   : 0))
++           | (how->resolve
++              & ~ (RESOLVE_BENEATH | RESOLVE_CACHED | RESOLVE_IN_ROOT
++                   | RESOLVE_NO_MAGICLINKS | RESOLVE_NO_SYMLINKS
++                   | RESOLVE_NO_XDEV))
++           | ((how->resolve & (RESOLVE_BENEATH | RESOLVE_IN_ROOT))
++              == (RESOLVE_BENEATH | RESOLVE_IN_ROOT)))
++    r = -EINVAL;
++  else
++    {
++      /* Args are valid so it is safe to use narrower types.  */
++      int flags = how->flags;
++      char resolve = how->resolve;
++      mode_t mode = how->mode;
++
++      int fd;
++
++      /* For speed use a single openat if it suffices.  */
++      if (O_RESOLVE_BENEATH ? !(resolve & ~RESOLVE_BENEATH) : !resolve)
++        {
++          fd = openat (dfd, filename,
++                       flags | (resolve ? O_RESOLVE_BENEATH : 0), mode);
++
++          /* Return FD now unless openat failed with an errno that might
++             be an O_RESOLVE_BENEATH failure.  On platforms with
++             ENOTCAPABLE that is the errno; otherwise, this is macOS 15
++             where EACCES is the errno.  */
++          if (! (fd < 0 && resolve
++                 && errno == (ENOTCAPABLE ? ENOTCAPABLE : EACCES)))
++            return fd;
++        }
++
++      fd = dfd;
++      char stackbuf[256];
++      char *buf = stackbuf;
++
++      r = do_openat2 (&fd, filename, flags, resolve, mode,
++                      &buf, sizeof stackbuf);
++
++      if (fd != dfd)
++        close (fd);
++      if (buf != stackbuf)
++        free (buf);
++    }
++
++  if (r < 0)
++    {
++      errno = -r;
++      return -1;
++    }
++  return r;
++}
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/m4/fcntl_h.m4 tar-1.35-rhel-10.2-clean/m4/fcntl_h.m4
+--- a/m4/fcntl_h.m4	2026-01-12 10:53:54.545230950 +0100
++++ b/m4/fcntl_h.m4	2026-01-12 11:01:05.428473586 +0100
+@@ -1,6 +1,6 @@
+-# serial 20
+-# Configure fcntl.h.
+-dnl Copyright (C) 2006-2007, 2009-2023 Free Software Foundation, Inc.
++# fcntl_h.m4
++# serial 21
++dnl Copyright (C) 2006-2007, 2009-2025 Free Software Foundation, Inc.
+ dnl This file is free software; the Free Software Foundation
+ dnl gives unlimited permission to copy and/or distribute it,
+ dnl with or without modifications, as long as this notice is preserved.
+@@ -23,7 +23,7 @@
+   dnl corresponding gnulib module is not in use, if it is not common
+   dnl enough to be declared everywhere.
+   gl_WARN_ON_USE_PREPARE([[#include <fcntl.h>
+-    ]], [fcntl openat])
++    ]], [fcntl openat openat2])
+ ])
+ 
+ # gl_FCNTL_MODULE_INDICATOR([modulename])
+@@ -50,6 +50,7 @@
+     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_NONBLOCKING])
+     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_OPEN])
+     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_OPENAT])
++    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_OPENAT2])
+     dnl Support Microsoft deprecated alias function names by default.
+     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MDA_CREAT], [1])
+     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MDA_OPEN], [1])
+@@ -63,6 +64,7 @@
+   dnl Assume proper GNU behavior unless another module says otherwise.
+   HAVE_FCNTL=1;          AC_SUBST([HAVE_FCNTL])
+   HAVE_OPENAT=1;         AC_SUBST([HAVE_OPENAT])
++  HAVE_OPENAT2=0;        AC_SUBST([HAVE_OPENAT2])
+   REPLACE_CREAT=0;       AC_SUBST([REPLACE_CREAT])
+   REPLACE_FCNTL=0;       AC_SUBST([REPLACE_FCNTL])
+   REPLACE_OPEN=0;        AC_SUBST([REPLACE_OPEN])
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/m4/gnulib-comp.m4 tar-1.35-rhel-10.2-clean/m4/gnulib-comp.m4
+--- a/m4/gnulib-comp.m4	2026-01-12 10:53:56.897292603 +0100
++++ b/m4/gnulib-comp.m4	2026-01-12 11:01:07.740546556 +0100
+@@ -237,6 +237,7 @@
+   # Code from module openat-die:
+   # Code from module openat-h:
+   # Code from module openat-safer:
++  # Code from module openat2:
+   # Code from module opendir:
+   # Code from module opendirat:
+   # Code from module parse-datetime:
+@@ -1064,6 +1065,13 @@
+   gl_FCNTL_MODULE_INDICATOR([openat])
+   gl_OPENAT_SAFER
+   gl_MODULE_INDICATOR([openat-safer])
++  gl_FUNC_OPENAT2
++  gl_CONDITIONAL([GL_COND_OBJ_OPENAT2],
++                 [test $HAVE_OPENAT2 = 0])
++  AM_COND_IF([GL_COND_OBJ_OPENAT], [
++    gl_PREREQ_OPENAT2
++  ])
++  gl_FCNTL_MODULE_INDICATOR([openat2])
+   gl_FUNC_OPENDIR
+   gl_CONDITIONAL([GL_COND_OBJ_OPENDIR],
+                  [test $HAVE_OPENDIR = 0 || test $REPLACE_OPENDIR = 1])
+@@ -2020,6 +2028,7 @@
+   lib/openat-safer.c
+   lib/openat.c
+   lib/openat.h
++  lib/openat2.c
+   lib/opendir-safer.c
+   lib/opendir.c
+   lib/opendirat.c
+@@ -2386,6 +2395,7 @@
+   m4/open-slash.m4
+   m4/open.m4
+   m4/openat.m4
++  m4/openat2.m4
+   m4/opendir.m4
+   m4/parse-datetime.m4
+   m4/pathmax.m4
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/m4/openat2.m4 tar-1.35-rhel-10.2-clean/m4/openat2.m4
+--- a/m4/openat2.m4	1970-01-01 01:00:00.000000000 +0100
++++ b/m4/openat2.m4	2026-01-12 11:01:04.596447295 +0100
+@@ -0,0 +1,33 @@
++# openat2.m4
++# serial 1
++
++dnl Copyright 2025 Free Software Foundation, Inc.
++dnl This file is free software; the Free Software Foundation
++dnl gives unlimited permission to copy and/or distribute it,
++dnl with or without modifications, as long as this notice is preserved.
++dnl This file is offered as-is, without any warranty.
++
++# Written by Paul Eggert.
++
++AC_DEFUN([gl_FUNC_OPENAT2],
++[
++  AC_REQUIRE([gl_FCNTL_H_DEFAULTS])
++  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
++  AC_REQUIRE([gl_FCNTL_O_FLAGS])
++  AC_CHECK_FUNCS_ONCE([openat2])
++  AS_CASE([$ac_cv_func_openat2],
++    [yes], [HAVE_OPENAT2=1])
++])
++
++# Prerequisites of lib/openat2.c.
++AC_DEFUN([gl_PREREQ_OPENAT2],
++[
++  AC_CHECK_FUNCS_ONCE([fstatfs])
++  AC_CHECK_HEADERS_ONCE([sys/vfs.h])
++  AS_CASE([$ac_cv_func_fstatfs,$ac_cv_header_sys_vfs_h],
++    [yes,yes],
++    [AC_CHECK_MEMBERS([struct statfs.f_type], [], [],
++       [[$ac_includes_default
++         #include <sys/vfs.h>
++       ]])])
++])
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/NEWS tar-1.35-rhel-10.2-clean/NEWS
+--- a/NEWS	2026-01-12 10:57:17.342316401 +0100
++++ b/NEWS	2026-01-12 11:00:38.051598778 +0100
+@@ -1,10 +1,16 @@
+-GNU tar NEWS - User visible changes. 2025-07-26
++GNU tar NEWS - User visible changes. 2026-01-09
+ Please send GNU tar bug reports to <bug-tar@gnu.org>
+ 
+ version 1.35.90 (git)
+ 
+ * Bug fixes
+ 
++** When extracting, tar no longer follows symbolic links to targets
++   outside the working directory.
++
++** tar no longer fails merely if an extraction directory is unreadable
++   on Linux kernels.
++
+ ** --no-overwrite-dir no longer changes permissions of existing directories,
+    not even temporarily.  This matches the documentation better and avoids
+    some permissions glitches.
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/common.h tar-1.35-rhel-10.2-clean/src/common.h
+--- a/src/common.h	2026-01-12 10:53:18.296266888 +0100
++++ b/src/common.h	2026-01-12 11:00:38.163602399 +0100
+@@ -401,7 +401,7 @@
+ 
+ /* Flags for reading, searching, and fstatatting files.  */
+ GLOBAL int open_read_flags;
+-GLOBAL int open_searchdir_flags;
++GLOBAL struct open_how open_searchdir_how;
+ GLOBAL int fstatat_flags;
+ 
+ GLOBAL int seek_option;
+@@ -644,6 +644,7 @@
+ #define ASSIGN_STRING_N(s,v) assign_string_n (s, v, sizeof (v))
+ int unquote_string (char *str);
+ char *zap_slashes (char *name);
++idx_t dotslashlen (char const *);
+ char *normalize_filename (int cdidx, const char *name);
+ void normalize_filename_x (char *name);
+ void replace_prefix (char **pname, const char *samp, size_t slen,
+@@ -722,10 +723,17 @@
+ size_t blocking_read (int fd, void *buf, size_t count);
+ size_t blocking_write (int fd, void const *buf, size_t count);
+ 
++/* Not valid as the first argument to openat.
++   It is a negative integer not equal to AT_FDCWD.  */
++enum { BADFD = AT_FDCWD == -1 ? -2 : -1 };
++
+ extern int chdir_current;
+-extern int chdir_fd;
+ int chdir_arg (char const *dir);
+ void chdir_do (int dir);
++struct chdir_id { int err; dev_t st_dev; ino_t st_ino; } chdir_id (void);
++struct fdbase { int fd; char const *base; } fdbase (char const *);
++struct fdbase fdbase1 (char const *);
++void fdbase_clear (void);
+ int chdir_count (void);
+ 
+ void close_diag (char const *name);
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/compare.c tar-1.35-rhel-10.2-clean/src/compare.c
+--- a/src/compare.c	2026-01-12 10:53:18.296266888 +0100
++++ b/src/compare.c	2026-01-12 11:00:38.163602399 +0100
+@@ -218,7 +218,9 @@
+ 	}
+       else
+ 	{
+-	  diff_handle = openat (chdir_fd, file_name, open_read_flags);
++	  struct fdbase f = fdbase (file_name);
++	  diff_handle = (f.fd == BADFD ? -1
++			 : openat (f.fd, f.base, open_read_flags));
+ 
+ 	  if (diff_handle < 0)
+ 	    {
+@@ -239,7 +241,7 @@
+ 		  && stat_data.st_size != 0)
+ 		{
+ 		  struct timespec atime = get_stat_atime (&stat_data);
+-		  if (set_file_atime (diff_handle, chdir_fd, file_name, atime)
++		  if (set_file_atime (diff_handle, f.fd, f.base, atime)
+ 		      != 0)
+ 		    utime_error (file_name);
+ 		}
+@@ -274,9 +276,9 @@
+   char buf[1024];
+   size_t len = strlen (current_stat_info.link_name);
+   char *linkbuf = len < sizeof buf ? buf : xmalloc (len + 1);
+-
+-  ssize_t status = readlinkat (chdir_fd, current_stat_info.file_name,
+-			       linkbuf, len + 1);
++  struct fdbase f = fdbase (current_stat_info.file_name);
++  ssize_t status = (f.fd == BADFD ? -1
++		    : readlinkat (f.fd, f.base, linkbuf, len + 1));
+ 
+   if (status < 0)
+     {
+@@ -403,7 +405,7 @@
+ diff_multivol (void)
+ {
+   struct stat stat_data;
+-  int fd, status;
++  int status;
+   off_t offset;
+ 
+   if (current_stat_info.had_trailing_slash)
+@@ -433,7 +435,8 @@
+     }
+ 
+ 
+-  fd = openat (chdir_fd, current_stat_info.file_name, open_read_flags);
++  struct fdbase f = fdbase (current_stat_info.file_name);
++  int fd = f.fd == BADFD ? -1 : openat (f.fd, f.base, open_read_flags);
+ 
+   if (fd < 0)
+     {
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/create.c tar-1.35-rhel-10.2-clean/src/create.c
+--- a/src/create.c	2026-01-12 10:57:17.346316499 +0100
++++ b/src/create.c	2026-01-12 11:00:38.163602399 +0100
+@@ -1376,8 +1376,10 @@
+ 		    {
+ 		      if (! st.orig_file_name)
+ 			{
+-			  int fd = openat (chdir_fd, p->name,
+-					   open_searchdir_flags);
++			  struct fdbase f = fdbase (p->name);
++			  int fd = (f.fd == BADFD ? -1
++				    : openat (f.fd, f.base,
++					      open_searchdir_how.flags));
+ 			  if (fd < 0)
+ 			    {
+ 			      file_removed_diag (p->name, !p->parent,
+@@ -1579,9 +1581,18 @@
+       gettext ("");
+     }
+ 
+-  while ((fd = openat (dir ? dir->fd : chdir_fd, file, flags)) < 0
+-	 && open_failure_recover (dir))
+-    continue;
++  do
++    {
++      if (dir)
++	fd = openat (dir->fd, file, flags);
++      else
++	{
++	  struct fdbase f = fdbase (file);
++	  fd = f.fd == BADFD ? -1 : openat (f.fd, f.base, flags);
++	}
++    }
++  while (fd < 0 && open_failure_recover (dir));
++
+   return fd;
+ }
+ 
+@@ -1595,7 +1606,7 @@
+   struct tar_stat_info *parent = st->parent;
+   if (parent && ! parent->fd)
+     {
+-      int parentfd = openat (st->fd, "..", open_searchdir_flags);
++      int parentfd = openat (st->fd, "..", open_searchdir_how.flags);
+       struct stat parentstat;
+ 
+       if (parentfd < 0)
+@@ -1610,8 +1621,9 @@
+ 
+       if (parentfd < 0)
+ 	{
+-	  int origfd = openat (chdir_fd, parent->orig_file_name,
+-			       open_searchdir_flags);
++	  struct fdbase f = fdbase (parent->orig_file_name);
++	  int origfd = (f.fd == BADFD ? -1
++			: openat (f.fd, f.base, open_searchdir_how.flags));
+ 	  if (0 <= origfd)
+ 	    {
+ 	      if (fstat (parentfd, &parentstat) == 0
+@@ -1644,7 +1656,6 @@
+   bool is_dir;
+   struct tar_stat_info const *parent = st->parent;
+   bool top_level = ! parent;
+-  int parentfd = top_level ? chdir_fd : parent->fd;
+   void (*diag) (char const *) = 0;
+ 
+   if (interactive_option && !confirm ("add", p))
+@@ -1656,12 +1667,24 @@
+ 
+   transform_name (&st->file_name, XFORM_REGFILE);
+ 
+-  if (parentfd < 0 && ! top_level)
++  struct fdbase f;
++  if (top_level)
++    f = fdbase (name);
++  else
+     {
+-      errno = - parentfd;
++      /* Avoid a compound literal here, to work around a bug
++	 in Oracle Developer Studio 12.6 (sparc64).  */
++      f.fd = parent->fd;
++      f.base = name;
++    }
++
++  if (!top_level && parent->fd < 0)
++    {
++      errno = - parent->fd;
+       diag = open_diag;
+     }
+-  else if (fstatat (parentfd, name, &st->stat, fstatat_flags) != 0)
++  else if (f.fd == BADFD
++	   || fstatat (f.fd, f.base, &st->stat, fstatat_flags) != 0)
+     diag = stat_diag;
+   else if (file_dumpable_p (&st->stat))
+     {
+@@ -1737,9 +1760,9 @@
+       bool ok;
+       struct stat st2;
+ 
+-      xattrs_acls_get (parentfd, name, st, !is_dir);
+-      xattrs_selinux_get (parentfd, name, st, fd);
+-      xattrs_xattrs_get (parentfd, name, st, fd);
++      xattrs_acls_get (f.fd, f.base, st, !is_dir);
++      xattrs_selinux_get (f.fd, f.base, st, fd);
++      xattrs_xattrs_get (f.fd, f.base, st, fd);
+ 
+       if (is_dir)
+ 	{
+@@ -1757,7 +1780,15 @@
+ 	  ok = dump_dir (st);
+ 
+ 	  fd = st->fd;
+-	  parentfd = top_level ? chdir_fd : parent->fd;
++	  if (top_level)
++	    f = fdbase (name);
++	  else
++	    {
++	      /* Avoid a compound literal here, to work around a bug
++		 in Oracle Developer Studio 12.6 (sparc64).  */
++	      f.fd = parent->fd;
++	      f.base = name;
++	    }
+ 	}
+       else
+ 	{
+@@ -1798,9 +1829,9 @@
+ 	    }
+ 	  else if (fd == 0)
+ 	    {
+-	      if (parentfd < 0 && ! top_level)
++	      if (!top_level && parent->fd < 0)
+ 		{
+-		  errno = - parentfd;
++		  errno = - parent->fd;
+ 		  ok = false;
+ 		}
+ 	    }
+@@ -1851,7 +1882,7 @@
+ 	    }
+ 	  else if (atime_preserve_option == replace_atime_preserve
+ 		   && timespec_cmp (st->atime, get_stat_atime (&st2)) != 0
+-		   && set_file_atime (fd, parentfd, name, st->atime) != 0
++		   && set_file_atime (fd, f.fd, f.base, st->atime) != 0
+ 		   && errno != EROFS )
+ 	    utime_error (p);
+ 	}
+@@ -1865,7 +1896,7 @@
+ #ifdef HAVE_READLINK
+   else if (S_ISLNK (st->stat.st_mode))
+     {
+-      st->link_name = areadlinkat_with_size (parentfd, name, st->stat.st_size);
++      st->link_name = areadlinkat_with_size (f.fd, f.base, st->stat.st_size);
+       if (!st->link_name)
+ 	{
+ 	  if (errno == ENOMEM)
+@@ -1878,8 +1909,8 @@
+ 	  < strlen (st->link_name))
+ 	write_long_link (st);
+ 
+-      xattrs_selinux_get (parentfd, name, st, 0);
+-      xattrs_xattrs_get (parentfd, name, st, 0);
++      xattrs_selinux_get (f.fd, f.base, st, 0);
++      xattrs_xattrs_get (f.fd, f.base, st, 0);
+ 
+       block_ordinal = current_block_ordinal ();
+       st->stat.st_size = 0;	/* force 0 size on symlink */
+@@ -1901,23 +1932,23 @@
+   else if (S_ISCHR (st->stat.st_mode))
+     {
+       type = CHRTYPE;
+-      xattrs_acls_get (parentfd, name, st, true);
+-      xattrs_selinux_get (parentfd, name, st, 0);
+-      xattrs_xattrs_get (parentfd, name, st, 0);
++      xattrs_acls_get (f.fd, f.base, st, true);
++      xattrs_selinux_get (f.fd, f.base, st, 0);
++      xattrs_xattrs_get (f.fd, f.base, st, 0);
+     }
+   else if (S_ISBLK (st->stat.st_mode))
+     {
+       type = BLKTYPE;
+-      xattrs_acls_get (parentfd, name, st, true);
+-      xattrs_selinux_get (parentfd, name, st, 0);
+-      xattrs_xattrs_get (parentfd, name, st, 0);
++      xattrs_acls_get (f.fd, f.base, st, true);
++      xattrs_selinux_get (f.fd, f.base, st, 0);
++      xattrs_xattrs_get (f.fd, f.base, st, 0);
+     }
+   else if (S_ISFIFO (st->stat.st_mode))
+     {
+       type = FIFOTYPE;
+-      xattrs_acls_get (parentfd, name, st, true);
+-      xattrs_selinux_get (parentfd, name, st, 0);
+-      xattrs_xattrs_get (parentfd, name, st, 0);
++      xattrs_acls_get (f.fd, f.base, st, true);
++      xattrs_selinux_get (f.fd, f.base, st, 0);
++      xattrs_xattrs_get (f.fd, f.base, st, 0);
+     }
+   else if (S_ISSOCK (st->stat.st_mode))
+     {
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/exclist.c tar-1.35-rhel-10.2-clean/src/exclist.c
+--- a/src/exclist.c	2026-01-12 10:53:18.296266888 +0100
++++ b/src/exclist.c	2026-01-12 11:00:38.163602399 +0100
+@@ -79,7 +79,7 @@
+     return;
+   for (file = excfile_head; file; file = file->next)
+     {
+-      if (faccessat (dir ? dir->fd : chdir_fd, file->name, F_OK, 0) == 0)
++      if (faccessat (dir->fd, file->name, F_OK, 0) == 0)
+ 	{
+ 	  FILE *fp;
+ 	  struct exclude *ex = NULL;
+@@ -178,12 +178,7 @@
+ 	    break;
+ 
+ 	  if (!rname)
+-	    {
+-	      rname = name;
+-	      /* Skip leading ./ */
+-	      while (*rname == '.' && ISSLASH (rname[1]))
+-		rname += 2;
+-	    }
++	    rname = name + dotslashlen (name);
+ 	  if ((result = excluded_file_name (ep->excluded, rname)))
+ 	    break;
+ 
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/extract.c tar-1.35-rhel-10.2-clean/src/extract.c
+--- a/src/extract.c	2026-01-12 10:57:17.346316499 +0100
++++ b/src/extract.c	2026-01-12 11:00:38.163602399 +0100
+@@ -246,7 +246,8 @@
+       if (result == 0 || implemented (errno))
+ 	return result;
+     }
+-  return fchmodat (chdir_fd, file, mode, atflag);
++  struct fdbase f = fdbase (file);
++  return f.fd == BADFD ? -1 : fchmodat (f.fd, f.base, mode, atflag);
+ }
+ 
+ /* A version of fd_i_chmod which gracefully handles several common error
+@@ -295,16 +296,18 @@
+       if (result == 0 || implemented (errno))
+ 	return result;
+     }
+-  return fchownat (chdir_fd, file, uid, gid, atflag);
++  struct fdbase f = fdbase (file);
++  return f.fd == BADFD ? -1 : fchownat (f.fd, f.base, uid, gid, atflag);
+ }
+ 
+ /* Use fstat if possible, fstatat otherwise.  */
+ static int
+ fd_stat (int fd, char const *file, struct stat *st, int atflag)
+ {
+-  return (0 <= fd
+-	  ? fstat (fd, st)
+-	  : fstatat (chdir_fd, file, st, atflag));
++  if (0 <= fd)
++    return fstat (fd, st);
++  struct fdbase f = fdbase (file);
++  return f.fd == BADFD ? -1 : fstatat (f.fd, f.base, st, atflag);
+ }
+ 
+ /* Set the mode for FILE_NAME to MODE.
+@@ -402,7 +405,15 @@
+ 	ts[0].tv_nsec = UTIME_OMIT;
+       ts[1] = st->mtime;
+ 
+-      if (fdutimensat (fd, chdir_fd, file_name, ts, atflag) == 0)
++      int r;
++      if (0 <= fd)
++	r = futimens (fd, ts);
++      if (fd < 0 || (r < 0 && errno == ENOSYS))
++	{
++	  struct fdbase f = fdbase (file_name);
++	  r = f.fd == BADFD ? -1 : utimensat (f.fd, f.base, ts, atflag);
++	}
++      if (r == 0)
+ 	{
+ 	  if (incremental_option)
+ 	    check_time (file_name, ts[0]);
+@@ -522,8 +533,9 @@
+       if (data->interdir)
+ 	{
+ 	  struct stat real_st;
+-	  if (fstatat (chdir_fd, data->file_name,
+-		       &real_st, data->atflag) != 0)
++	  struct fdbase f = fdbase (data->file_name);
++	  if (f.fd == BADFD
++	      || fstatat (f.fd, f.base, &real_st, data->atflag) != 0)
+ 	    {
+ 	      stat_error (data->file_name);
+ 	    }
+@@ -604,7 +616,8 @@
+   for (data = delayed_set_stat_head; data; data = data->next)
+     {
+       struct stat st;
+-      if (fstatat (chdir_fd, data->file_name, &st, data->atflag) != 0)
++      struct fdbase f = fdbase (data->file_name);
++      if (f.fd == BADFD || fstatat (f.fd, f.base, &st, data->atflag) != 0)
+ 	{
+ 	  stat_error (data->file_name);
+ 	  return;
+@@ -718,7 +731,8 @@
+       *cursor = '\0';		/* truncate the name there */
+       desired_mode = MODE_RWX & ~ newdir_umask;
+       mode = desired_mode | (we_are_root ? 0 : MODE_WXUSR);
+-      status = mkdirat (chdir_fd, file_name, mode);
++      struct fdbase f = fdbase (file_name);
++      status = f.fd == BADFD ? -1 : mkdirat (f.fd, f.base, mode);
+ 
+       if (status == 0)
+ 	{
+@@ -761,8 +775,9 @@
+      process may have created it, so check whether it exists now.  */
+   *parent_end = '\0';
+   struct stat st;
+-  int stat_status = fstatat (chdir_fd, file_name, &st, 0);
+-  if (!stat_status && !S_ISDIR (st.st_mode))
++  struct fdbase f = fdbase (file_name);
++  int stat_status = f.fd == BADFD ? -1 : fstatat (f.fd, f.base, &st, 0);
++  if (! (stat_status < 0 || S_ISDIR (st.st_mode)))
+     stat_status = -1;
+   if (stat_status)
+     {
+@@ -918,7 +933,8 @@
+ #ifdef HAVE_XATTRS
+   if ((xattrs_option > 0) && st->xattr_map.xm_size)
+     {
+-      int r = mknodat (chdir_fd, file_name, mode, 0);
++      struct fdbase f = fdbase (file_name);
++      int r = f.fd == BADFD ? -1 : mknodat (f.fd, f.base, mode, 0);
+       if (r < 0)
+ 	return r;
+       xattrs_xattrs_set (st, file_name, typeflag, 0);
+@@ -962,7 +978,8 @@
+ 
+       if (check_for_renamed_directories)
+ 	{
+-	  if (fstatat (chdir_fd, data->file_name, &st, data->atflag) != 0)
++	  struct fdbase f = fdbase (data->file_name);
++	  if (f.fd == BADFD || fstatat (f.fd, f.base, &st, data->atflag) != 0)
+ 	    {
+ 	      stat_error (data->file_name);
+ 	      skip_this_one = 1;
+@@ -1010,8 +1027,9 @@
+ is_directory_link (char const *file_name, struct stat *st)
+ {
+   char buf[1];
+-  return (0 <= readlinkat (chdir_fd, file_name, buf, sizeof buf)
+-	  && fstatat (chdir_fd, file_name, st, 0) == 0
++  struct fdbase f = fdbase (file_name);
++  return (f.fd != BADFD && 0 <= readlinkat (f.fd, f.base, buf, sizeof buf)
++	  && fstatat (f.fd, f.base, st, 0) == 0
+ 	  && S_ISDIR (st->st_mode));
+ }
+ 
+@@ -1050,12 +1068,14 @@
+   /* Save 'root device' to avoid purging mount points. */
+   if (one_file_system_option && root_device == 0)
+     {
+-      struct stat st;
+-
+-      if (fstatat (chdir_fd, ".", &st, 0) != 0)
+-	stat_diag (".");
++      struct chdir_id id = chdir_id ();
++      if (id.err)
++	{
++	  errno = id.err;
++	  stat_diag (".");
++	}
+       else
+-	root_device = st.st_dev;
++	root_device = id.st_dev;
+     }
+ 
+   if (incremental_option)
+@@ -1068,7 +1088,8 @@
+ 
+   for (;;)
+     {
+-      status = mkdirat (chdir_fd, file_name, mode);
++      struct fdbase f = fdbase (file_name);
++      status = f.fd == BADFD ? -1 : mkdirat (f.fd, f.base, mode);
+       if (status == 0)
+ 	{
+ 	  current_mode = mode & ~ current_umask;
+@@ -1175,21 +1196,24 @@
+ 	}
+     }
+ 
++  struct fdbase f = fdbase (file_name);
++
+   /* If O_NOFOLLOW is needed but does not work, check for a symlink
+      separately.  There's a race condition, but that cannot be avoided
+      on hosts lacking O_NOFOLLOW.  */
+   if (! HAVE_WORKING_O_NOFOLLOW
+-      && overwriting_old_files && ! dereference_option)
++      && overwriting_old_files && ! dereference_option
++      && f.fd != BADFD)
+     {
+       char buf[1];
+-      if (0 <= readlinkat (chdir_fd, file_name, buf, sizeof buf))
++      if (0 <= readlinkat (f.fd, f.base, buf, sizeof buf))
+ 	{
+ 	  errno = ELOOP;
+ 	  return -1;
+ 	}
+     }
+ 
+-  fd = openat (chdir_fd, file_name, openflag, mode);
++  fd = f.fd == BADFD ? -1 : openat (f.fd, f.base, openflag, mode);
+   if (0 <= fd)
+     {
+       if (openflag & O_EXCL)
+@@ -1355,7 +1379,8 @@
+   if (!delayed_link_table)
+     return false;
+ 
+-  if (fstatat (chdir_fd, name, &st, AT_SYMLINK_NOFOLLOW))
++  struct fdbase f = fdbase (name);
++  if (f.fd == BADFD || fstatat (f.fd, f.base, &st, AT_SYMLINK_NOFOLLOW))
+     {
+       if (errno != ENOENT)
+ 	stat_error (name);
+@@ -1381,8 +1406,16 @@
+   int fd;
+   struct stat st;
+ 
+-  while ((fd = openat (chdir_fd, file_name, O_WRONLY | O_CREAT | O_EXCL, 0)) < 0)
++  for (;;)
+     {
++      struct fdbase f = fdbase (file_name);
++      if (f.fd != BADFD)
++	{
++	  fd = openat (f.fd, f.base, O_WRONLY | O_CREAT | O_EXCL, 0);
++	  if (0 <= fd)
++	    break;
++	}
++
+       if (errno == EEXIST && find_delayed_link_source (file_name))
+ 	{
+ 	  /* The placeholder file has already been created.  This means
+@@ -1404,7 +1437,7 @@
+ 	  open_error (file_name);
+ 	  return -1;
+ 	}
+-      }
++    }
+ 
+   if (fstat (fd, &st) != 0)
+     {
+@@ -1481,15 +1514,23 @@
+ 
+   do
+     {
+-      struct stat st1, st2;
+-      int e;
+-      int status = linkat (chdir_fd, link_name, chdir_fd, file_name, 0);
+-      e = errno;
++      struct stat st, st1;
++      int status;
++
++      struct fdbase f = fdbase (file_name), f1;
++      if (f.fd == BADFD)
++	status = -1;
++      else
++	{
++	  f1 = fdbase1 (link_name);
++	  status = (f1.fd == BADFD ? -1
++		    : linkat (f1.fd, f1.base, f.fd, f.base, 0));
++	}
+ 
+       if (status == 0)
+ 	{
+ 	  if (delayed_link_table
+-	      && fstatat (chdir_fd, link_name, &st1, AT_SYMLINK_NOFOLLOW) == 0)
++	      && fstatat (f1.fd, f1.base, &st1, AT_SYMLINK_NOFOLLOW) == 0)
+ 	    {
+ 	      struct delayed_link dl1;
+ 	      dl1.ino = st1.st_ino;
+@@ -1509,15 +1550,15 @@
+ 
+ 	  return 0;
+ 	}
+-      else if ((e == EEXIST && strcmp (link_name, file_name) == 0)
+-	       || ((fstatat (chdir_fd, link_name, &st1, AT_SYMLINK_NOFOLLOW)
+-		    == 0)
+-		   && (fstatat (chdir_fd, file_name, &st2, AT_SYMLINK_NOFOLLOW)
+-		       == 0)
+-		   && st1.st_dev == st2.st_dev
+-		   && st1.st_ino == st2.st_ino))
+-	return 0;
+ 
++      int e = errno;
++      if ((e == EEXIST && strcmp (link_name, file_name) == 0)
++	  || (f.fd != BADFD && f1.fd != BADFD
++	      && fstatat (f1.fd, f1.base, &st1, AT_SYMLINK_NOFOLLOW) == 0
++	      && fstatat (f.fd, f.base, &st, AT_SYMLINK_NOFOLLOW) == 0
++	      && st1.st_dev == st.st_dev
++	      && st1.st_ino == st.st_ino))
++	return 0;
+       errno = e;
+     }
+   while ((rc = maybe_recoverable (file_name, false, &interdir_made))
+@@ -1544,7 +1585,10 @@
+ 	  || contains_dot_dot (current_stat_info.link_name)))
+     return create_placeholder_file (file_name, true, &interdir_made);
+ 
+-  while (symlinkat (current_stat_info.link_name, chdir_fd, file_name) != 0)
++  for (struct fdbase f;
++       ((f = fdbase (file_name)).fd == BADFD
++	|| symlinkat (current_stat_info.link_name, f.fd, f.base) != 0);
++       )
+     switch (maybe_recoverable (file_name, false, &interdir_made))
+       {
+       case RECOVER_OK:
+@@ -1584,8 +1628,10 @@
+   mode_t mode = (current_stat_info.stat.st_mode & (MODE_RWX | S_IFBLK | S_IFCHR)
+ 		 & ~ (0 < same_owner_option ? S_IRWXG | S_IRWXO : 0));
+ 
+-  while (mknodat (chdir_fd, file_name, mode, current_stat_info.stat.st_rdev)
+-	 != 0)
++  for (struct fdbase f;
++       ((f = fdbase (file_name)).fd == BADFD
++	|| mknodat (f.fd, f.base, mode, current_stat_info.stat.st_rdev) != 0);
++       )
+     switch (maybe_recoverable (file_name, false, &interdir_made))
+       {
+       case RECOVER_OK:
+@@ -1614,7 +1660,10 @@
+   mode_t mode = (current_stat_info.stat.st_mode & MODE_RWX
+ 		 & ~ (0 < same_owner_option ? S_IRWXG | S_IRWXO : 0));
+ 
+-  while (mkfifoat (chdir_fd, file_name, mode) != 0)
++  for (struct fdbase f;
++       ((f = fdbase (file_name)).fd == BADFD
++	|| mkfifoat (f.fd, f.base, mode) != 0);
++       )
+     switch (maybe_recoverable (file_name, false, &interdir_made))
+       {
+       case RECOVER_OK:
+@@ -1837,7 +1886,7 @@
+ apply_delayed_link (struct delayed_link *ds)
+ {
+   struct string_list *sources = ds->sources;
+-  char const *valid_source = 0;
++  char const *valid_source = NULL;
+ 
+   chdir_do (ds->change_dir);
+ 
+@@ -1849,25 +1898,30 @@
+       /* Make sure the placeholder file is still there.  If not,
+ 	 don't create a link, as the placeholder was probably
+ 	 removed by a later extraction.  */
+-      if (fstatat (chdir_fd, source, &st, AT_SYMLINK_NOFOLLOW) == 0
++      struct fdbase f = fdbase (source);
++      if (f.fd != BADFD && fstatat (f.fd, f.base, &st, AT_SYMLINK_NOFOLLOW) == 0
+ 	  && st.st_dev == ds->dev
+ 	  && st.st_ino == ds->ino
+ 	  && BIRTHTIME_EQ (get_stat_birthtime (&st), ds->birthtime))
+ 	{
+ 	  /* Unlink the placeholder, then create a hard link if possible,
+ 	     a symbolic link otherwise.  */
+-	  if (unlinkat (chdir_fd, source, 0) != 0)
++	  struct fdbase f1;
++	  if (unlinkat (f.fd, f.base, 0) != 0)
+ 	    unlink_error (source);
+ 	  else if (valid_source
+-		   && (linkat (chdir_fd, valid_source, chdir_fd, source, 0)
+-		       == 0))
++		   && ((f1 = f.fd == BADFD ? f : fdbase1 (valid_source)).fd
++		       != BADFD)
++		   && linkat (f1.fd, f1.base, f.fd, f.base, 0) == 0)
+ 	    ;
+ 	  else if (!ds->is_symlink)
+ 	    {
+-	      if (linkat (chdir_fd, ds->target, chdir_fd, source, 0) != 0)
++	      f1 = f.fd == BADFD ? f : fdbase1 (ds->target);
++	      if (f1.fd == BADFD
++		  || linkat (f1.fd, f1.base, f.fd, f.base, 0) != 0)
+ 		link_error (ds->target, source);
+ 	    }
+-	  else if (symlinkat (ds->target, chdir_fd, source) != 0)
++	  else if (symlinkat (ds->target, f.fd, f.base) != 0)
+ 	    symlink_error (ds->target, source);
+ 	  else
+ 	    {
+@@ -1943,9 +1997,14 @@
+ bool
+ rename_directory (char *src, char *dst)
+ {
+-  if (renameat (chdir_fd, src, chdir_fd, dst) == 0)
+-    fixup_delayed_set_stat (src, dst);
+-  else
++  struct fdbase f1 = fdbase1 (src);
++  struct fdbase f = f1.fd == BADFD ? f1 : fdbase (dst);
++  if (f.fd != BADFD && renameat (f1.fd, f1.base, f.fd, f.base) == 0)
++    {
++      fdbase_clear ();
++      fixup_delayed_set_stat (src, dst);
++    }
++  else if (f1.fd != BADFD)
+     {
+       int e = errno;
+ 
+@@ -1954,8 +2013,13 @@
+ 	case ENOENT:
+ 	  if (make_directories (dst, NULL) == 0)
+ 	    {
+-	      if (renameat (chdir_fd, src, chdir_fd, dst) == 0)
+-		return true;
++	      f = fdbase (dst);
++	      if (f.fd != BADFD
++		  && renameat (f1.fd, f1.base, f.fd, f.base) == 0)
++		{
++		  fdbase_clear ();
++		  return true;
++		}
+ 	      e = errno;
+ 	    }
+ 	  break;
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/misc.c tar-1.35-rhel-10.2-clean/src/misc.c
+--- a/src/misc.c	2026-01-12 10:53:18.296266888 +0100
++++ b/src/misc.c	2026-01-12 11:00:38.163602399 +0100
+@@ -269,6 +269,30 @@
+   return name;
+ }
+ 
++/* The number of file name slashes at the start of the string F.  */
++static idx_t
++slashlen (char const *f)
++{
++  idx_t i = 0;
++  while (ISSLASH (f[i]))
++    i++;
++  return i;
++}
++
++/* The length of the longest initial prefix of F that consists
++   entirely of a sequence of '.'s each followed by one or more slashes.
++   This prefix acts like the working directory, i.e., the file name F
++   acts like "." if 0 < dotslashlen (F) == strlen (F), and acts like
++   &F[dotslashlen (F)] otherwise.  */
++idx_t
++dotslashlen (char const *f)
++{
++  idx_t i = 0;
++  while (f[i] == '.' && ISSLASH (f[i + 1]))
++    i += 2 + slashlen (&f[i + 2]);
++  return i;
++}
++
+ /* Normalize FILE_NAME by removing redundant slashes and "."
+    components, including redundant trailing slashes.
+    Leave ".." alone, as it may be significant in the presence
+@@ -279,8 +303,6 @@
+ normalize_filename_x (char *file_name)
+ {
+   char *name = file_name + FILE_SYSTEM_PREFIX_LEN (file_name);
+-  char *p;
+-  char const *q;
+   char c;
+ 
+   /* Don't squeeze leading "//" to "/", on hosts where they're distinct.  */
+@@ -288,16 +310,20 @@
+ 	   && ISSLASH (*name) && ISSLASH (name[1]) && ! ISSLASH (name[2]));
+ 
+   /* Omit redundant leading "." components.  */
+-  for (q = p = name; (*p = *q) == '.' && ISSLASH (q[1]); p += !*q)
+-    for (q += 2; ISSLASH (*q); q++)
+-      continue;
++  char *p = name;
++  char const *q = name + dotslashlen (name);
++
++  if (p < q && !*q)
++    q = ".";  /* NAME is nonempty and equivalent to ".".  */
+ 
+   /* Copy components from Q to P, omitting redundant slashes and
+      internal "."  components.  */
+   while ((*p++ = c = *q++) != '\0')
+     if (ISSLASH (c))
+-      while (ISSLASH (q[*q == '.']))
+-	q += (*q == '.') + 1;
++      {
++	q += slashlen (q);
++	q += dotslashlen (q);
++      }
+ 
+   /* Omit redundant trailing "." component and slash.  */
+   if (2 < p - name)
+@@ -581,7 +607,8 @@
+ static char *before_backup_name;
+ static char *after_backup_name;
+ 
+-/* Return 1 if FILE_NAME is obviously "." or "/".  */
++/* Return 1 if FILE_NAME must identify a working or root directory.
++   FILE_NAME should not be empty.  */
+ bool
+ must_be_dot_or_slash (char const *file_name)
+ {
+@@ -589,6 +616,7 @@
+ 
+   if (ISSLASH (file_name[0]))
+     {
++      /* It must be a root directory if all components are "." or "..".  */
+       for (;;)
+ 	if (ISSLASH (file_name[1]))
+ 	  file_name++;
+@@ -600,31 +628,32 @@
+     }
+   else
+     {
+-      while (file_name[0] == '.' && ISSLASH (file_name[1]))
+-	{
+-	  file_name += 2;
+-	  while (ISSLASH (*file_name))
+-	    file_name++;
+-	}
+-
+-      return ! file_name[0] || (file_name[0] == '.' && ! file_name[1]);
++      /* It must be a working directory if it is "." or "",
++	 after skipping ^(\./+)* ERE.  */
++      file_name += dotslashlen (file_name);
++      return ! file_name[file_name[0] == '.'];
+     }
+ }
+ 
+-/* Some implementations of rmdir let you remove '.' or '/'.
+-   Report an error with errno set to zero for obvious cases of this;
+-   otherwise call rmdir.  */
++/* Act like rmdir (FILENAME) relative to chdir_fd, i.e., like rmdir (F).
++   However, reject attempts to remove a root directory
++   even on systems that allow such a thing.
++   Also, do not try to change the removed directory's status later.  */
+ static int
+-safer_rmdir (const char *file_name)
++safer_rmdir (const char *file_name, struct fdbase f)
+ {
+-  if (must_be_dot_or_slash (file_name))
++  if (f.fd == BADFD)
++    return -1; /* Preserve errno.  */
++
++  if (IS_ABSOLUTE_FILE_NAME (f.base))
+     {
+-      errno = 0;
++      errno = EBUSY;
+       return -1;
+     }
+ 
+-  if (unlinkat (chdir_fd, file_name, AT_REMOVEDIR) == 0)
++  if (f.fd != BADFD && unlinkat (f.fd, f.base, AT_REMOVEDIR) == 0)
+     {
++      fdbase_clear ();
+       remove_delayed_set_stat (file_name);
+       return 0;
+     }
+@@ -646,10 +675,15 @@
+      non-directory.  */
+   bool try_unlink_first = cannot_unlink_dir ();
+ 
++  struct fdbase f = fdbase (file_name);
++
+   if (try_unlink_first)
+     {
+-      if (unlinkat (chdir_fd, file_name, 0) == 0)
+-	return 1;
++      if (f.fd != BADFD && unlinkat (f.fd, f.base, 0) == 0)
++	{
++	  fdbase_clear ();
++	  return 1;
++	}
+ 
+       /* POSIX 1003.1-2001 requires EPERM when attempting to unlink a
+ 	 directory without appropriate privileges, but many Linux
+@@ -658,13 +692,16 @@
+ 	return 0;
+     }
+ 
+-  if (safer_rmdir (file_name) == 0)
++  if (safer_rmdir (file_name, f) == 0)
+     return 1;
+ 
+   switch (errno)
+     {
+     case ENOTDIR:
+-      return !try_unlink_first && unlinkat (chdir_fd, file_name, 0) == 0;
++      if (try_unlink_first || f.fd == BADFD || unlinkat (f.fd, f.base, 0) < 0)
++	return 0;
++      fdbase_clear ();
++      return 1;
+ 
+     case 0:
+     case EEXIST:
+@@ -705,7 +742,7 @@
+ 	      }
+ 
+ 	    free (directory);
+-	    return safer_rmdir (file_name) == 0;
++	    return safer_rmdir (file_name, fdbase (file_name)) == 0;
+ 	  }
+ 	}
+       break;
+@@ -755,13 +792,27 @@
+       && (S_ISBLK (file_stat.st_mode) || S_ISCHR (file_stat.st_mode)))
+     return true;
+ 
+-  after_backup_name = find_backup_file_name (chdir_fd, file_name, backup_type);
++  struct fdbase f = fdbase (file_name);
++  if (f.fd == BADFD)
++    {
++      open_error (file_name);
++      return false;
++    }
++  idx_t subdirlen = f.base - file_name;
++  after_backup_name = find_backup_file_name (f.fd, f.base, backup_type);
+   if (! after_backup_name)
+     xalloc_die ();
++  idx_t after_backup_namelen = strlen (after_backup_name);
++  after_backup_name = xrealloc (after_backup_name,
++				subdirlen + after_backup_namelen + 1);
++  memmove (after_backup_name + subdirlen, after_backup_name,
++	   after_backup_namelen + 1);
++  memcpy (after_backup_name, file_name, subdirlen);
+ 
+-  if (renameat (chdir_fd, before_backup_name, chdir_fd, after_backup_name)
+-      == 0)
++  if (renameat (f.fd, f.base, f.fd, &after_backup_name[subdirlen]) == 0)
+     {
++      if (S_ISLNK (file_stat.st_mode))
++	fdbase_clear ();
+       if (verbose_option)
+ 	fprintf (stdlis, _("Renaming %s to %s\n"),
+ 		 quote_n (0, before_backup_name),
+@@ -787,8 +838,11 @@
+ {
+   if (after_backup_name)
+     {
+-      if (renameat (chdir_fd, after_backup_name, chdir_fd, before_backup_name)
+-	  != 0)
++      struct fdbase f = fdbase (before_backup_name);
++      if (f.fd == BADFD
++	  || (renameat (f.fd, &after_backup_name[f.base - before_backup_name],
++			f.fd, f.base)
++	      != 0))
+ 	{
+ 	  int e = errno;
+ 	  ERROR ((0, e, _("%s: Cannot rename to %s"),
+@@ -809,7 +863,8 @@
+ int
+ deref_stat (char const *name, struct stat *buf)
+ {
+-  return fstatat (chdir_fd, name, buf, fstatat_flags);
++  struct fdbase f = fdbase (name);
++  return f.fd == BADFD ? -1 : fstatat (f.fd, f.base, buf, fstatat_flags);
+ }
+ 
+ /* Read from FD into the buffer BUF with COUNT bytes.  Attempt to fill
+@@ -890,6 +945,11 @@
+      the working directory.  If zero, the directory needs to be opened
+      to be used.  */
+   int fd;
++
++  /* If ID.err is zero, the directory's identity;
++     if positive, a failure indication with errno = ID.err;
++     if negative, no attempt has been made yet to get the identity.  */
++  struct chdir_id id;
+ };
+ 
+ /* A vector of chdir targets.  wd[0] is the initial working directory.  */
+@@ -922,33 +982,37 @@
+   return wd_count - 1;
+ }
+ 
++/* Grow the WD table by at least one entry.  */
++static void
++grow_wd (void)
++{
++  if (wd_alloc == 0)
++    wd_alloc = 2;
++  wd = x2nrealloc (wd, &wd_alloc, sizeof *wd);
++
++  if (! wd_count)
++    {
++      wd[wd_count].name = ".";
++      wd[wd_count].abspath = NULL;
++      wd[wd_count].fd = AT_FDCWD;
++      wd[wd_count].id.err = -1;
++      wd_count++;
++    }
++}
++
+ /* DIR is the operand of a -C option; add it to vector of chdir targets,
+    and return the index of its location.  */
+ int
+ chdir_arg (char const *dir)
+ {
+   if (wd_count == wd_alloc)
+-    {
+-      if (wd_alloc == 0)
+-	wd_alloc = 2;
+-      wd = x2nrealloc (wd, &wd_alloc, sizeof *wd);
+-
+-      if (! wd_count)
+-	{
+-	  wd[wd_count].name = ".";
+-	  wd[wd_count].abspath = NULL;
+-	  wd[wd_count].fd = AT_FDCWD;
+-	  wd_count++;
+-	}
+-    }
++    grow_wd ();
+ 
+   /* Optimize the common special case of the working directory,
+      or the working directory as a prefix.  */
+   if (dir[0])
+     {
+-      while (dir[0] == '.' && ISSLASH (dir[1]))
+-	for (dir += 2;  ISSLASH (*dir);  dir++)
+-	  continue;
++      dir += dotslashlen (dir);
+       if (! dir[dir[0] == '.'])
+ 	return wd_count - 1;
+     }
+@@ -956,6 +1020,7 @@
+   wd[wd_count].name = dir;
+   wd[wd_count].abspath = NULL;
+   wd[wd_count].fd = 0;
++  wd[wd_count].id.err = -1;
+   return wd_count++;
+ }
+ 
+@@ -966,7 +1031,7 @@
+    similar locations for fstatat, etc.  This is an open file
+    descriptor, or AT_FDCWD if the working directory is current.  It is
+    valid until the next invocation of chdir_do.  */
+-int chdir_fd = AT_FDCWD;
++static int chdir_fd = AT_FDCWD;
+ 
+ /* Change to directory I, in a virtual way.  This does not actually
+    invoke chdir; it merely sets chdir_fd to an int suitable as the
+@@ -986,7 +1051,7 @@
+ 	  if (! IS_ABSOLUTE_FILE_NAME (curr->name))
+ 	    chdir_do (i - 1);
+ 	  fd = openat (chdir_fd, curr->name,
+-		       open_searchdir_flags & ~ O_NOFOLLOW);
++		       open_searchdir_how.flags & ~O_NOFOLLOW);
+ 	  if (fd < 0)
+ 	    open_fatal (curr->name);
+ 
+@@ -1027,6 +1092,186 @@
+       chdir_fd = fd;
+     }
+ }
++
++/* Return the identity of the current directory.  */
++struct chdir_id
++chdir_id (void)
++{
++  if (!wd)
++    grow_wd ();
++
++  struct wd *curr = &wd[chdir_current];
++  if (curr->id.err < 0)
++    {
++      struct stat st;
++      curr->id = ((chdir_fd < 0 ? stat (".", &st) : fstat (chdir_fd, &st)) < 0
++		  ? (struct chdir_id) { .err = errno }
++		  : (struct chdir_id) { .st_dev = st.st_dev,
++		                        .st_ino = st.st_ino });
++    }
++  return curr->id;
++}
++
++/* Caches of recent calls to fdbase and fdbase1.  */
++static struct fdbase_cache
++{
++  /* Length of subdirectory name, which need not be null-terminated.
++     If the length is zero, no subdir is cached here:
++     SUBDIR (if nonnull) is merely a buffer available for use later,
++     and CHDIR_CURRENT and FD are irrelevant.  */
++  idx_t subdirlen;
++
++  /* Index of ancestor of this subdirectory.  */
++  idx_t chdir_current;
++
++  /* Buffer containing name of subdirectory relative to the ancestor.  */
++  char *subdir;
++
++  /* Number of bytes allocated for SUBDIR.  */
++  idx_t subdiralloc;
++
++  /* FD of subdirectory.  */
++  int fd;
++} fdbase_cache[2];
++
++/* Clear the fdbase cache.  Call this after any action that might
++   invalidate the cache.  Such actions include removing or renaming
++   directories or symlinks to directories.  Call this if in doubt,
++   e.g., if it is not known whether a removed directory entry is a
++   symlink to a directory.  */
++void
++fdbase_clear (void)
++{
++  for (int i = 0; i < 2; i++)
++    {
++      struct fdbase_cache *c = &fdbase_cache[i];
++      if (c->subdirlen)
++	{
++	  if (0 <= c->fd)
++	    close (c->fd);
++	  c->subdirlen = 0;
++	}
++    }
++}
++
++/* Starting from the directory FD, open a subdirectory SUBDIR for search.
++   If extracting or diffing and --absolute-names (-P) is not in effect,
++   do not let the subdirectory escape FD, i.e., the subdirectory must
++   be at or under FD in the directory hierarchy.  */
++static int
++open_subdir (int fd, char const *subdir)
++{
++  return openat2 (fd, subdir, &open_searchdir_how, sizeof open_searchdir_how);
++}
++
++/* Return an fd open to FILE_NAME's parent directory,
++   along with the base name of FILE_NAME.
++   Use the alternate cache if ALTERNATE, the main cache otherwise.
++   If FILE_NAME is relative, it is relative to chdir_fd.
++   Return AT_FDCWD if FILE_NAME is relative to the working directory.
++   Return BADFD (setting errno) on failure.  */
++static struct fdbase
++fdbase_opendir (char const *file_name, bool alternate)
++{
++  char const *name = file_name;
++
++  /* Skip past leading "./"s,
++     but not past the last "./" if that ends the name.  */
++  idx_t dslen = dotslashlen (name);
++  if (dslen)
++    {
++      name += dslen;
++      if (!*name)
++	for (name--; *--name != '.'; )
++	  continue;
++    }
++
++  /* For files immediately under CHDIR_FD, and for root directories,
++     just use CHDIR_FD and NAME.  */
++  char const *base = last_component (name);
++  idx_t subdirlen = base - name;
++  if (!subdirlen | !*base)
++    return (struct fdbase) { .fd = chdir_fd, .base = name };
++
++  struct fdbase_cache *c = &fdbase_cache[alternate];
++  int fd = c->fd;
++  bool submatch = (0 < c->subdirlen && c->subdirlen <= subdirlen
++		   && c->chdir_current == chdir_current
++		   && !ISSLASH (name[c->subdirlen])
++		   && memcmp (c->subdir, name, c->subdirlen) == 0);
++
++  if (! (submatch && c->subdirlen == subdirlen))
++    {
++      /* Copy the new directory's name into the cache.  */
++      char *subdir = c->subdir;
++      if (c->subdiralloc <= subdirlen)
++	c->subdir = subdir = xpalloc (subdir, &c->subdiralloc,
++				      subdirlen - c->subdiralloc + 1, -1, 1);
++      char *p = mempcpy (subdir, name, subdirlen);
++      *p = '\0';
++
++      if (submatch && c->subdirlen < subdirlen
++	  && !ISSLASH (subdir[c->subdirlen]))
++	{
++	  /* The new directory is a subdirectory of the old,
++	     so open relative to FD rather than to chdir_fd.  */
++	  int subfd = open_subdir (fd, &subdir[c->subdirlen]);
++	  if (subfd < 0)
++	    {
++	      /* Keep the old directory cached and report open failure,
++		 unless EMFILE means it's possible that falling
++		 through to close the old directory would mean we
++		 could successfully retry from the chdir_fd level.
++	         When reporting failure, there is no need to
++	         null-terminate the old directory, since the code does
++	         not assume null termination.  */
++	      if (errno != EMFILE)
++		return (struct fdbase) { .fd = BADFD, .base = base };
++	    }
++	  else
++	    {
++	      /* Replace the old directory with the new one.  */
++	      close (fd);
++	      c->fd = subfd;
++	      c->subdirlen = subdirlen;
++	      return (struct fdbase) { .fd = subfd, .base = base };
++	    }
++	}
++
++      /* Remove any old directory info,
++	 and add new info if the new directory can be opened.  */
++      if (0 < c->subdirlen)
++	close (fd);
++      fd = open_subdir (chdir_fd, c->subdir);
++      if (fd < 0)
++	{
++	  if (BADFD != -1 && fd < 0)
++	    fd = BADFD;
++	  c->subdirlen = 0;
++	}
++      else
++	{
++	  c->chdir_current = chdir_current;
++	  c->fd = fd;
++	  c->subdirlen = subdirlen;
++	}
++    }
++
++  return (struct fdbase) { .fd = fd, .base = base };
++}
++
++struct fdbase
++fdbase (char const *name)
++{
++  return fdbase_opendir (name, false);
++}
++
++struct fdbase
++fdbase1 (char const *name)
++{
++  return fdbase_opendir (name, true);
++}
++
+ 
+ const char *
+ tar_dirname (void)
+@@ -1310,7 +1555,9 @@
+ {
+   char *ret = NULL;
+   DIR *dir = NULL;
+-  int fd = openat (chdir_fd, name, open_read_flags | O_DIRECTORY);
++  struct fdbase f = fdbase (name);
++  int fd = (f.fd == BADFD ? -1
++	    : openat (f.fd, f.base, open_read_flags | O_DIRECTORY));
+   if (fd < 0)
+     {
+       if (!must_exist && errno == ENOENT)
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/names.c tar-1.35-rhel-10.2-clean/src/names.c
+--- a/src/names.c	2026-01-12 10:53:18.296266888 +0100
++++ b/src/names.c	2026-01-12 11:00:38.167602527 +0100
+@@ -1797,8 +1797,9 @@
+ 	}
+       if (S_ISDIR (st.stat.st_mode))
+ 	{
+-	  int dir_fd = openat (chdir_fd, name->name,
+-			       open_read_flags | O_DIRECTORY);
++	  struct fdbase f = fdbase (name->name);
++	  int dir_fd = (f.fd == BADFD ? -1
++			: openat (f.fd, f.base, open_read_flags | O_DIRECTORY));
+ 	  if (dir_fd < 0)
+ 	    open_diag (name->name);
+ 	  else
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/tar.c tar-1.35-rhel-10.2-clean/src/tar.c
+--- a/src/tar.c	2026-01-12 10:53:18.300266996 +0100
++++ b/src/tar.c	2026-01-12 11:00:38.167602527 +0100
+@@ -2614,16 +2614,29 @@
+   if (recursive_unlink_option)
+     old_files_option = UNLINK_FIRST_OLD_FILES;
+ 
+-  /* Flags for accessing files to be read from or copied into.  POSIX says
+-     O_NONBLOCK has unspecified effect on most types of files, but in
+-     practice it never harms and sometimes helps.  */
++  /* Flags for accessing files to be read from, searched, or statted.  */
+   {
+-    int base_open_flags =
+-      (O_BINARY | O_CLOEXEC | O_NOCTTY | O_NONBLOCK
+-       | (dereference_option ? 0 : O_NOFOLLOW)
+-       | (atime_preserve_option == system_atime_preserve ? O_NOATIME : 0));
+-    open_read_flags = O_RDONLY | base_open_flags;
+-    open_searchdir_flags = O_SEARCH | O_DIRECTORY | base_open_flags;
++    int noatime_flag = (atime_preserve_option == system_atime_preserve
++			? O_NOATIME : 0);
++    int nofollow_flag = dereference_option ? 0 : O_NOFOLLOW;
++
++    /* POSIX says O_NONBLOCK has unspecified effect on most types of
++       files, but in practice it harms only with O_PATH and sometimes
++       helps otherwise.  */
++    open_read_flags = (O_RDONLY | O_BINARY | O_CLOEXEC | O_NOCTTY | O_NONBLOCK
++		       | noatime_flag | nofollow_flag);
++
++#if defined O_PATH && O_SEARCH == O_RDONLY
++    int search_flags = O_PATH; /* openat2 rejects O_PATH | O_NOATIME.  */
++#else
++    int search_flags = O_SEARCH | noatime_flag;
++#endif
++    open_searchdir_how.flags = (search_flags | nofollow_flag
++				| O_BINARY | O_CLOEXEC | O_DIRECTORY);
++    if (!absolute_names_option
++	&& (subcommand_option == EXTRACT_SUBCOMMAND
++	    || subcommand_option == DIFF_SUBCOMMAND))
++      open_searchdir_how.resolve = RESOLVE_BENEATH;
+   }
+   fstatat_flags = dereference_option ? 0 : AT_SYMLINK_NOFOLLOW;
+ 
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/unlink.c tar-1.35-rhel-10.2-clean/src/unlink.c
+--- a/src/unlink.c	2026-01-12 10:53:18.300266996 +0100
++++ b/src/unlink.c	2026-01-12 11:00:38.167602527 +0100
+@@ -117,7 +117,10 @@
+ 	      else
+ 		fname = p->file_name;
+ 
+-	      if (unlinkat (chdir_fd, fname, AT_REMOVEDIR) != 0)
++	      struct fdbase f = fdbase (fname);
++	      if (f.fd != BADFD && unlinkat (f.fd, f.base, AT_REMOVEDIR) == 0)
++		fdbase_clear ();
++	      else
+ 		{
+ 		  switch (errno)
+ 		    {
+@@ -143,7 +146,10 @@
+ 	    }
+ 	  else
+ 	    {
+-	      if (unlinkat (chdir_fd, p->file_name, 0) != 0 && errno != ENOENT)
++	      struct fdbase f = fdbase (p->file_name);
++	      if (f.fd != BADFD && unlinkat (f.fd, f.base, 0) == 0)
++		fdbase_clear ();
++	      else if (errno != ENOENT)
+ 		unlink_error (p->file_name);
+ 	    }
+ 	  dunlink_reclaim (p);
+@@ -178,11 +184,12 @@
+ 	  else
+ 	    fname = p->file_name;
+ 
+-	  if (unlinkat (chdir_fd, fname, AT_REMOVEDIR) != 0)
+-	    {
+-	      if (errno != ENOENT)
+-		rmdir_error (fname);
+-	    }
++	  struct fdbase f = fdbase (fname);
++	  if (f.fd != BADFD && unlinkat (f.fd, f.base, AT_REMOVEDIR) == 0)
++	    fdbase_clear ();
++	  else if (errno != ENOENT)
++	    rmdir_error (fname);
++
+ 	  dunlink_reclaim (p);
+ 	  dunlink_count--;
+ 	  p = next;
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/update.c tar-1.35-rhel-10.2-clean/src/update.c
+--- a/src/update.c	2026-01-12 10:53:18.300266996 +0100
++++ b/src/update.c	2026-01-12 11:00:38.167602527 +0100
+@@ -49,7 +49,8 @@
+ static void
+ append_file (char *file_name)
+ {
+-  int handle = openat (chdir_fd, file_name, O_RDONLY | O_BINARY);
++  struct fdbase f = fdbase (file_name);
++  int handle = f.fd == BADFD ? -1 : openat (f.fd, f.base, O_RDONLY | O_BINARY);
+ 
+   if (handle < 0)
+     {
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/src/xattrs.c tar-1.35-rhel-10.2-clean/src/xattrs.c
+--- a/src/xattrs.c	2026-01-12 10:53:18.300266996 +0100
++++ b/src/xattrs.c	2026-01-12 11:00:38.167602527 +0100
+@@ -299,7 +299,8 @@
+       /* No "default" IEEE 1003.1e ACL set for directory.  At this moment,
+          FILE_NAME may already have inherited default acls from parent
+          directory;  clean them up. */
+-      if (acl_delete_def_file_at (chdir_fd, file_name))
++      struct fdbase f1 = fdbase (file_name);
++      if (f1.fd == BADFD || acl_delete_def_file_at (f1.fd, f1.base))
+         WARNOPT (WARN_XATTR_WRITE,
+                 (0, errno,
+                  _("acl_delete_def_file_at: Cannot drop default POSIX ACLs "
+@@ -316,7 +317,8 @@
+       return;
+     }
+ 
+-  if (acl_set_file_at (chdir_fd, file_name, type, acl) == -1)
++  struct fdbase f = fdbase (file_name);
++  if (f.fd == BADFD || acl_set_file_at (f.fd, f.base, type, acl) == -1)
+     /* warn even if filesystem does not support acls */
+     WARNOPT (WARN_XATTR_WRITE,
+ 	     (0, errno,
+@@ -619,13 +621,16 @@
+     {
+       const char *sysname = "setxattrat";
+       int ret = -1;
++      struct fdbase f = fdbase (file_name);
+ 
+-      if (typeflag != SYMTYPE)
+-        ret = setxattrat (chdir_fd, file_name, attr, ptr, len, 0);
++      if (f.fd == BADFD)
++	ret = -1;
++      else if (typeflag != SYMTYPE)
++	ret = setxattrat (f.fd, f.base, attr, ptr, len, 0);
+       else
+         {
+           sysname = "lsetxattr";
+-          ret = lsetxattrat (chdir_fd, file_name, attr, ptr, len, 0);
++	  ret = lsetxattrat (f.fd, f.base, attr, ptr, len, 0);
+         }
+ 
+       if (ret == -1)
+@@ -679,14 +684,17 @@
+       if (!st->cntx_name)
+         return;
+ 
+-      if (typeflag != SYMTYPE)
++      struct fdbase f = fdbase (file_name);
++      if (f.fd == BADFD)
++	ret = -1;
++      else if (typeflag != SYMTYPE)
+         {
+-          ret = setfileconat (chdir_fd, file_name, st->cntx_name);
++	  ret = setfileconat (f.fd, f.base, st->cntx_name);
+           sysname = "setfileconat";
+         }
+       else
+         {
+-          ret = lsetfileconat (chdir_fd, file_name, st->cntx_name);
++	  ret = lsetfileconat (f.fd, f.base, st->cntx_name);
+           sysname = "lsetfileconat";
+         }
+ 
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/tests/extrac31.at tar-1.35-rhel-10.2-clean/tests/extrac31.at
+--- a/tests/extrac31.at	1970-01-01 01:00:00.000000000 +0100
++++ b/tests/extrac31.at	2026-01-12 11:00:38.167602527 +0100
+@@ -0,0 +1,55 @@
++# Test suite for GNU tar.                             -*- Autotest -*-
++# Copyright 2025 Free Software Foundation, Inc.
++#
++# This file is part of GNU tar.
++#
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++AT_SETUP([extracting untrusted incremental])
++AT_KEYWORDS([extract extrac31 --absolute-names])
++
++
++AT_TAR_CHECK([
++
++# Extraction should not escape the extraction directory
++# even when extracting multiple times to the same directory.
++(umask 022 && mkdir -p dira/sub dirb/sym dirb/sub/sym ext victimdir victimexp)
++ln -s .. dira/sub/dotdot
++ln -s ../sub dira/sub/dot
++ln -s dotdot/sub dira/sub/anotherdot
++ln -s ../victimdir dira/sym
++ln -s dotdot/../victimdir dira/sub/sym
++echo b1 >dirb/sym/file1
++echo b2 >dirb/sub/sym/file2
++echo v >victimdir/expected
++echo v >victimdir/file1
++echo v >victimdir/file2
++cp victimdir/* victimexp
++tar -cf a.tar -C dira sub sym
++tar -cf b.tar -C dirb sym/file1 sub/sym/file2
++tar -xf a.tar -C ext
++echo status1=$?
++tar -xf b.tar -C ext
++echo status2=$?
++diff victimdir victimexp
++],
++[],
++[status1=0
++status2=2
++],
++[tar: sym/file1: Cannot open: Invalid cross-device link
++tar: sub/sym/file2: Cannot open: Invalid cross-device link
++tar: Exiting with failure status due to previous errors
++])
++AT_CLEANUP
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/tests/Makefile.am tar-1.35-rhel-10.2-clean/tests/Makefile.am
+--- a/tests/Makefile.am	2026-01-12 10:57:17.346316499 +0100
++++ b/tests/Makefile.am	2026-01-12 11:00:38.167602527 +0100
+@@ -127,6 +127,7 @@
+  extrac25.at\
+  extrac27.at\
+  extrac30.at\
++ extrac31.at\
+  filerem01.at\
+  filerem02.at\
+  dirrem01.at\
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.2-e290431e-clean/tests/testsuite.at tar-1.35-rhel-10.2-clean/tests/testsuite.at
+--- a/tests/testsuite.at	2026-01-12 10:57:17.346316499 +0100
++++ b/tests/testsuite.at	2026-01-12 11:00:38.171602657 +0100
+@@ -351,6 +351,7 @@
+ m4_include([extrac25.at])
+ m4_include([extrac27.at])
+ m4_include([extrac30.at])
++m4_include([extrac31.at])
+ 
+ m4_include([backup01.at])
+ 

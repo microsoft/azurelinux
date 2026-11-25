@@ -1,0 +1,66 @@
+diff --git a/NEWS b/NEWS
+index 77112313..5eadfe9d 100644
+--- a/NEWS
++++ b/NEWS
+@@ -1,8 +1,13 @@
+-GNU tar NEWS - User visible changes. 2026-01-09
++GNU tar NEWS - User visible changes. 2026-01-30
+ Please send GNU tar bug reports to <bug-tar@gnu.org>
+ 
+ version 1.35.90 (git)
+ 
++* Changes to behavior
++
++** --one-top-level=DIR now requires DIR to be relative.
++   Previously this restriction was alluded to in the manual but not enforced.
++
+ * Bug fixes
+ 
+ ** When extracting, tar no longer follows symbolic links to targets
+diff --git a/doc/tar.texi b/doc/tar.texi
+index 6c1b17db..9b04b94b 100644
+--- a/doc/tar.texi
++++ b/doc/tar.texi
+@@ -3272,10 +3272,14 @@ directory.
+ @opsummary{one-top-level}
+ @item --one-top-level[=@var{dir}]
+ Tells @command{tar} to create a new directory beneath the extraction directory
+-(or the one passed to @option{-C}) and use it to guard against
+-tarbombs.  In the absence of @var{dir} argument, the name of the new directory
+-will be equal to the base name of the archive (file name minus the
+-archive suffix, if recognized).  Any member names that do not begin
++(or the one passed to @option{-C}) and use it to prevent @command{tar}
++from modifying files outside that directory.
++If @var{dir} is present, it must be a relative file name.
++If it is absent, the name of the new directory
++is the base name of the archive minus any recognized archive suffix.
++If multiple @option{-C} options are present,
++each has its own subdirectory with the same name.
++Any member names that do not begin
+ with that directory name (after
+ transformations from @option{--transform} and
+ @option{--strip-components}) will be prefixed with it.  Recognized
+diff --git a/src/tar.c b/src/tar.c
+index 272c63b2..9a5fbd0b 100644
+--- a/src/tar.c
++++ b/src/tar.c
+@@ -2595,7 +2595,7 @@ decode_options (int argc, char **argv)
+ 	    one_top_level_option = false;
+ 	}
+ 
+-      if (one_top_level_option && !one_top_level_dir)
++      if (!one_top_level_dir && one_top_level_option)
+ 	{
+ 	  /* If the user wants to guarantee that everything is under one
+ 	     directory, determine its name now and let it be created later.  */
+@@ -2608,6 +2608,10 @@ decode_options (int argc, char **argv)
+ 			  _("Cannot deduce top-level directory name; "
+ 			    "please set it explicitly with --one-top-level=DIR")));
+ 	}
++
++      if (one_top_level_dir && !IS_RELATIVE_FILE_NAME (one_top_level_dir))
++	USAGE_ERROR ((0, 0,
++		     _("--one-top-level=DIR must use a relative file name")));
+     }
+ 
+   /* If ready to unlink hierarchies, so we are for simpler files.  */
