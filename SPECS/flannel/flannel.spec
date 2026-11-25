@@ -3,14 +3,16 @@
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
 Version:        0.24.2
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/flannel-io/flannel
 Source0:        https://github.com/flannel-io/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor-v2.tar.gz
+# Generate with Go >= 1.26; bump vendor revisions to avoid overwriting existing blobs.
+# The archive contains unpatched modules; %prep applies the patches.
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 Patch0:         CVE-2023-44487.patch
 Patch1:         CVE-2025-30204.patch
 Patch2:         CVE-2024-51744.patch
@@ -24,10 +26,12 @@ Patch9:         CVE-2026-78660.patch
 Patch10:        CVE-2026-78669.patch
 Patch11:        CVE-2026-81870.patch
 Patch12:        CVE-2026-97032.patch
+Patch13:        CVE-2026-128085.patch
+Patch14:        CVE-2026-128085-auto-sdk.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang >= 1.26
 BuildRequires:  kernel-headers
 
 %description
@@ -60,6 +64,13 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
+* Wed Nov 25 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.24.2-35
+- Upgrade OpenTelemetry modules to 1.47.0 for CVE-2026-128085 and CVE-2026-128086
+- Regenerate vendored sources and require Go 1.26
+- Preserve the exporter backport and remove superseded SDK hunks from CVE-2026-81870
+- Backport the replacement-rune truncation fix to auto/sdk
+- Complete CVE-2026-81870 redaction for direct gRPC-client logging
+
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-34
 - Patch for CVE-2026-97032, CVE-2026-81870, CVE-2026-78669, CVE-2026-78660, CVE-2026-78659
 
