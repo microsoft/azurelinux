@@ -14,6 +14,35 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd confidential-containers-containerd-%%{version}
+#   4. go mod edit -require=google.golang.org/grpc@v1.83.2 \
+#                  -require=go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.69.0 \
+#                  -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace@v1.44.0 \
+#                  -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc@v1.44.0 \
+#                  -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp@v1.44.0 \
+#                  -require=github.com/klauspost/cpuid/v2@v2.1.0 \
+#                  -require=go.opentelemetry.io/otel@v1.47.0 \
+#                  -require=go.opentelemetry.io/otel/sdk@v1.47.0
+#   5. go mod tidy
+#   6. go mod vendor
+#   7. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -czf %%{name}-%%{version}-govendor-v3.tar.gz vendor
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - The tarball holds only "vendor"; the matching go.mod/go.sum edits are carried by
+#         CVE-2026-84304.patch and CVE-2026-128085.patch.
+#       - Steps 2-7 are also automated by generate_source_tarball.sh:
+#           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 3
 Source1: %{name}-%{version}-govendor-v3.tar.gz
 Source2: containerd.service
 Source3: containerd.toml
