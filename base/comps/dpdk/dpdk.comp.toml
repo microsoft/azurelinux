@@ -1,0 +1,10 @@
+[components.dpdk]
+
+# Official 24.11.8 LTS release tarball. It matches the MD5 published on
+# https://core.dpdk.org/download/, and fast.dpdk.org and static.dpdk.org
+# served the same SHA512.
+[[components.dpdk.source-files]]
+filename = "dpdk-24.11.8.tar.xz"
+hash = "967e0c78b1557b8d01d3769b0f033e66770935cf3c52c6ac3efd99f25a3b7e56e2e6b9738f36109c8e876470cabacdcff990268242ca05956aa1ebc38cc36f50"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://fast.dpdk.org/rel/dpdk-24.11.8.tar.xz" }
