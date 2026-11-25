@@ -1,0 +1,67 @@
+From c6d2d5d141f4b5446343f73fb3acabfa47065c0e Mon Sep 17 00:00:00 2001
+From: Marcin Juszkiewicz <mjuszkiewicz@redhat.com>
+Date: Tue, 13 Oct 2026 10:51:50 +0200
+Subject: [PATCH] Implement my_timer_cycles() on riscv64
+
+There is no cycle counter for riscv64, so my_timer_cycles() returns 0 and
+performance_schema logs MY-011037 at every startup. That also makes mtr
+fail every test which restarts the server.
+
+The cycle CSR (rdcycle) is not readable from user mode on Linux, so use
+the time CSR instead - a fixed frequency counter, just like cntvct_el0
+used on aarch64.
+
+Assisted-by: LLM
+
+Upstream-status: https://github.com/mysql/mysql-server/pull/851
+
+---
+ include/my_rdtsc.h |  1 +
+ mysys/my_rdtsc.cc  | 13 +++++++++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/include/my_rdtsc.h b/include/my_rdtsc.h
+index 95baeb3f827..92e1a6d4677 100644
+--- a/include/my_rdtsc.h
++++ b/include/my_rdtsc.h
+@@ -138,5 +138,6 @@ void my_timer_init(MY_TIMER_INFO *mti);
+ #define MY_TIMER_ROUTINE_ASM_AARCH64 28
+ #define MY_TIMER_ROUTINE_GET_THREAD_TIMES 29
+ #define MY_TIMER_ROUTINE_ASM_S390X 30
++#define MY_TIMER_ROUTINE_ASM_RISCV64 31
+ 
+ #endif
+diff --git a/mysys/my_rdtsc.cc b/mysys/my_rdtsc.cc
+index 7b4583124d8..e33a6e9eee5 100644
+--- a/mysys/my_rdtsc.cc
++++ b/mysys/my_rdtsc.cc
+@@ -175,6 +175,17 @@ ulonglong my_timer_cycles() {
+     __asm __volatile__("stckf %0" : "=Q"(result) : : "cc");
+     return result;
+   }
++#elif defined(__GNUC__) && defined(__riscv) && __riscv_xlen == 64
++  {
++    /*
++      The cycle CSR (rdcycle) is not readable from user mode on Linux,
++      so use the time CSR instead. Like cntvct_el0 on aarch64 it is not
++      a cycle count but a fixed frequency counter.
++    */
++    ulonglong result;
++    __asm __volatile__("rdtime %0" : "=r"(result));
++    return result;
++  }
+ #elif defined(HAVE_SYS_TIMES_H) && defined(HAVE_GETHRTIME)
+   /* gethrtime may appear as either cycle or nanosecond counter */
+   return (ulonglong)gethrtime();
+@@ -506,6 +517,8 @@ void my_timer_init(MY_TIMER_INFO *mti) {
+   mti->cycles.routine = MY_TIMER_ROUTINE_ASM_AARCH64;
+ #elif defined(__GNUC__) && defined(__s390x__)
+   mti->cycles.routine = MY_TIMER_ROUTINE_ASM_S390X;
++#elif defined(__GNUC__) && defined(__riscv) && __riscv_xlen == 64
++  mti->cycles.routine = MY_TIMER_ROUTINE_ASM_RISCV64;
+ #elif defined(HAVE_SYS_TIMES_H) && defined(HAVE_GETHRTIME)
+   mti->cycles.routine = MY_TIMER_ROUTINE_GETHRTIME;
+ #else
+-- 
+2.56.0
+
