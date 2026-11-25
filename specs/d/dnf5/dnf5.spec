@@ -13,7 +13,7 @@
 
 Name:           dnf5
 Version:        %{project_version_prime}.%{project_version_major}.%{project_version_minor}.%{project_version_micro}
-Release: 10%{?dist}
+Release: 13%{?dist}
 Summary:        Command-line package manager
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/dnf5
@@ -36,6 +36,8 @@ Patch14:        0014-dnfdaemon-Avoid-timeout-on-repo-key-import.patch
 Patch15:        0015-dnfdaemon-Add-repo_key_imported-informational-signal.patch
 Patch16:        0016-dnfdaemon-Document-interactive-option-in-D-Bus-API.patch
 Patch17:        0017-fix-rpm-report-unexpected-implicit-rpm-transaction-e.patch
+Patch18:        0018-dnfdaemon-enforce-session-sender-ownership.patch
+Patch19:        0019-dnfdaemon-authorize-command-line-specs.patch
 
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
@@ -281,7 +283,7 @@ BuildRequires:  python3-devel
 %endif
 
 Provides: tdnf = %{version}-%{release}
-Patch18: 0018-repo-suppress-transient-signing-key-warning.patch
+Patch20: 0020-repo-suppress-transient-signing-key-warning.patch
 %description
 DNF5 is a command-line package manager that automates the process of installing,
 upgrading, configuring, and removing computer programs in a consistent manner.
@@ -1079,6 +1081,13 @@ mkdir -p %{buildroot}%{_libdir}/libdnf5/plugins
 
 ln -sr %{buildroot}%{_bindir}/dnf5 %{buildroot}%{_bindir}/tdnf
 %changelog
+* Thu Nov 12 2026 Marek Blaha <mblaha@redhat.com> - 5.2.18.0-7
+- dnf5daemon-server: Authorize command line specs (CVE-2026-123177)
+
+* Fri Nov 06 2026 Marek Blaha <mblaha@redhat.com> - 5.2.18.0-6
+- dnf5daemon-server: Enforce session sender ownership (CVE-2026-111253,
+  bug #2567312)
+
 * Tue Aug 18 2026 Petr Pisar <ppisar@redhat.com> - 5.2.18.0-5
 - Report uneexpected implicit RPM transaction elements instead of a crash
   (bug #2350481)

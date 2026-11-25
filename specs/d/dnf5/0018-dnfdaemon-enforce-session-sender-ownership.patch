@@ -1,0 +1,216 @@
+From 06a0be00f34c5968dd632c4d238ed394ab8c1740 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Fri, 16 Oct 2026 10:47:54 +0000
+Subject: [PATCH 1/2] dnf5daemon-server: Unify exception message handling
+
+Consolidate the repeated exception-message extraction into one helper.
+This removes duplicated catch blocks in the dispatcher.
+---
+ dnf5daemon-server/threads_manager.hpp | 28 +++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/dnf5daemon-server/threads_manager.hpp b/dnf5daemon-server/threads_manager.hpp
+index 3b5f7d418..e01d6718b 100644
+--- a/dnf5daemon-server/threads_manager.hpp
++++ b/dnf5daemon-server/threads_manager.hpp
+@@ -45,6 +45,18 @@ public:
+     void join_threads(const bool only_finished);
+     void finish();
+ 
++private:
++    static std::string current_exception_message() {
++        try {
++            throw;
++        } catch (const std::exception & ex) {
++            return ex.what();
++        } catch (...) {
++            return "Unknown exception caught";
++        }
++    }
++
++public:
+     template <class S>
+     void handle_method(
+         S & service,
+@@ -74,20 +86,16 @@ public:
+                     reply = (service.*method)(call);
+                 } catch (const sdbus::Error & ex) {
+                     reply = call.createErrorReply(ex);
+-                } catch (const std::exception & ex) {
+-                    reply = call.createErrorReply(sdbus::Error(dnfdaemon::ERROR, ex.what()));
+                 } catch (...) {
+-                    reply = call.createErrorReply(sdbus::Error(dnfdaemon::ERROR, "Unknown exception caught"));
++                    reply = call.createErrorReply(sdbus::Error(dnfdaemon::ERROR, current_exception_message()));
+                 }
+                 bool success = false;
+                 std::string error_msg;
+                 try {
+                     reply.send();
+                     success = true;
+-                } catch (const std::exception & e) {
+-                    error_msg = e.what();
+                 } catch (...) {
+-                    error_msg = "Unknown exception caught";
++                    error_msg = current_exception_message();
+                 }
+                 if (!success) {
+                     std::cerr << fmt::format(
+@@ -144,10 +152,8 @@ public:
+                 std::string error_msg;
+                 try {
+                     reply.send();
+-                } catch (const std::exception & e) {
+-                    error_msg = e.what();
+                 } catch (...) {
+-                    error_msg = "Unknown exception caught";
++                    error_msg = current_exception_message();
+                 }
+ 
+                 if (error_msg.empty()) {
+@@ -188,10 +194,8 @@ public:
+                 try {
+                     (service.*method)(signal);
+                     success = true;
+-                } catch (const std::exception & ex) {
+-                    error_msg = ex.what();
+                 } catch (...) {
+-                    error_msg = "Unknown exception caught";
++                    error_msg = current_exception_message();
+                 }
+                 if (!success) {
+                     std::cerr << fmt::format(
+-- 
+2.56.0
+
+
+From b23787434655ba332dc9920e634f6d3e7b87b427 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Fri, 16 Oct 2026 10:49:01 +0000
+Subject: [PATCH 2/2] dnf5daemon-server: Enforce session sender ownership
+
+Reject session-bound D-Bus method calls when the caller is not the
+sender that opened the session. Cover both normal and file-descriptor
+dispatch paths, and add a regression test using two independent
+system-bus connections.
+---
+ dnf5daemon-server/threads_manager.hpp         | 34 +++++++++++++
+ .../api/dbus/session-sender-ownership.feature | 48 +++++++++++++++++++
+ 2 files changed, 82 insertions(+)
+ create mode 100644 integration-tests/dnf-behave-tests/dnf/api/dbus/session-sender-ownership.feature
+
+diff --git a/dnf5daemon-server/threads_manager.hpp b/dnf5daemon-server/threads_manager.hpp
+index e01d6718b..06bdc9292 100644
+--- a/dnf5daemon-server/threads_manager.hpp
++++ b/dnf5daemon-server/threads_manager.hpp
+@@ -56,6 +56,30 @@ private:
+         }
+     }
+ 
++    template <class S>
++    static bool sender_matches_session(S & service, sdbus::MethodCall & call) {
++        if constexpr (requires { service.get_session(); }) {
++            return call.getSender() == service.get_session().get_sender();
++        } else {
++            return true;
++        }
++    }
++
++    static void send_authorization_error(sdbus::MethodCall & call) {
++        auto reply = call.createErrorReply(sdbus::Error(
++            dnfdaemon::ERROR, "Session method can only be called by the D-Bus sender that opened the session."));
++        try {
++            reply.send();
++        } catch (...) {
++            std::cerr << fmt::format(
++                             "Error sending D-Bus authorization error reply to {}:{}() call: {}",
++                             call.getInterfaceName(),
++                             call.getMemberName(),
++                             current_exception_message())
++                      << std::endl;
++        }
++    }
++
+ public:
+     template <class S>
+     void handle_method(
+@@ -63,6 +87,11 @@ public:
+         sdbus::MethodReply (S::*method)(sdbus::MethodCall &),
+         sdbus::MethodCall & call,
+         std::optional<std::string> thread_locale = std::nullopt) {
++        if (!sender_matches_session(service, call)) {
++            send_authorization_error(call);
++            return;
++        }
++
+         auto worker = std::thread(
+             [this](
+                 S & service,
+@@ -125,6 +154,11 @@ public:
+         void (S::*method)(sdbus::MethodCall &, const std::string &),
+         sdbus::MethodCall & call,
+         std::optional<std::string> thread_locale = std::nullopt) {
++        if (!sender_matches_session(service, call)) {
++            send_authorization_error(call);
++            return;
++        }
++
+         auto worker = std::thread(
+             [this](
+                 S & service,
+diff --git a/integration-tests/dnf-behave-tests/dnf/api/dbus/session-sender-ownership.feature b/integration-tests/dnf-behave-tests/dnf/api/dbus/session-sender-ownership.feature
+new file mode 100644
+index 000000000..d12536826
+--- /dev/null
++++ b/integration-tests/dnf-behave-tests/dnf/api/dbus/session-sender-ownership.feature
+@@ -0,0 +1,48 @@
++@dnf5daemon
++@not.with_mode=dnf5
++Feature: D-Bus session sender ownership
++
++  Scenario: Reject session method calls from a different D-Bus sender
++    When I execute python libdnf5 dbus api script with session
++      """
++      import os
++
++      owner_repo = dbus.Interface(
++          bus.get_object(DNFDAEMON_BUS_NAME, session),
++          dbus_interface=IFACE_REPO)
++      owner_repo.list({{}})
++
++      foreign_bus = dbus.SystemBus(private=True)
++      try:
++          assert bus.get_unique_name() != foreign_bus.get_unique_name()
++
++          foreign_repo = dbus.Interface(
++              foreign_bus.get_object(DNFDAEMON_BUS_NAME, session),
++              dbus_interface=IFACE_REPO)
++          try:
++              foreign_repo.list({{}})
++          except dbus.exceptions.DBusException as error:
++              assert error.get_dbus_name() == "org.rpm.dnf.v0.Error"
++              assert "Session method can only be called by the D-Bus sender that opened the session." in str(error)
++          else:
++              raise AssertionError("foreign D-Bus sender was allowed to call a session method")
++
++          foreign_rpm = dbus.Interface(
++              foreign_bus.get_object(DNFDAEMON_BUS_NAME, session),
++              dbus_interface=IFACE_RPM)
++          read_fd, write_fd = os.pipe()
++          try:
++              foreign_rpm.list_fd({{}}, dbus.types.UnixFd(write_fd))
++          except dbus.exceptions.DBusException as error:
++              assert error.get_dbus_name() == "org.rpm.dnf.v0.Error"
++              assert "Session method can only be called by the D-Bus sender that opened the session." in str(error)
++          else:
++              raise AssertionError("foreign D-Bus sender was allowed to call a file descriptor session method")
++          finally:
++              os.close(read_fd)
++              os.close(write_fd)
++      finally:
++          foreign_bus.close()
++          assert dbus.Boolean(True) == iface_session.close_session(session)
++      """
++    Then the exit code is 0
+-- 
+2.56.0
+

@@ -6,4 +6,4 @@ commits = [{ url = "https://github.com/rpm-software-management/dnf5/commit/98b43
 [[overlays]]
 description = "Suppress the recoverable metadata signing-key warning before key import without hiding final verification failures"
 type = "patch-add"
-source = "../0018-repo-suppress-transient-signing-key-warning.patch"
+source = "../0020-repo-suppress-transient-signing-key-warning.patch"

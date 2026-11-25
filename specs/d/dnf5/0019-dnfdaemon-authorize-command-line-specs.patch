@@ -1,0 +1,508 @@
+From 5d47d28443fcc2a1d3bec61aede02a16b8a595a7 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Thu, 5 Nov 2026 16:41:23 +0000
+Subject: [PATCH 1/3] daemon: report list_fd errors through completion signal
+
+The D-Bus reply with transfer_id is sent before list_fd() runs in its
+worker thread, so an exception escaping the method cannot be reported as
+a D-Bus error. The worker swallowed it and the client was left waiting
+for WRITE_TO_FD_FINISHED signal forever.
+
+Wrap the whole transfer in try/catch and report option decoding,
+repository loading, package filtering, and serialization failures
+through the completion signal.
+
+Reset the owning sdbus::UnixFd before emitting the signal so the
+descriptor is closed exactly once; the old raw close() left the UnixFd
+owner unaware and its destructor closed the same descriptor a second
+time.
+---
+ dnf5daemon-server/services/rpm/rpm.cpp | 72 ++++++++++++++------------
+ 1 file changed, 39 insertions(+), 33 deletions(-)
+
+diff --git a/dnf5daemon-server/services/rpm/rpm.cpp b/dnf5daemon-server/services/rpm/rpm.cpp
+index b3b313086..1e0f302a8 100644
+--- a/dnf5daemon-server/services/rpm/rpm.cpp
++++ b/dnf5daemon-server/services/rpm/rpm.cpp
+@@ -611,42 +611,48 @@ sdbus::MethodReply Rpm::list(sdbus::MethodCall & call) {
+ }
+ 
+ void Rpm::list_fd(sdbus::MethodCall & call, const std::string & transfer_id) {
+-    // read options from dbus call
+-    dnfdaemon::KeyValueMap options;
+-    call >> options;
+-    // get the output pipe file descriptor
+-    sdbus::UnixFd dbus_unix_fd;
+-    call >> dbus_unix_fd;
+-
+-    int out_fd = dbus_unix_fd.get();
+-
+-    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
+-    session.fill_sack(interactive);
+-
+-    auto query = filter_packages(options);
+-
+-    std::vector<std::string> package_attrs =
+-        dnfdaemon::key_value_map_get<std::vector<std::string>>(options, "package_attrs", std::vector<std::string>());
+     std::string error_msg;
+-    for (const auto & pkg : query) {
+-        std::string jsonstr;
+-        try {
+-            jsonstr = package_to_json(pkg, package_attrs) + "\n";
+-        } catch (const std::exception & ex) {
+-            error_msg = fmt::format(
+-                "Error serializing package \"{0}\" from repo \"{1}\": {2}",
+-                pkg.get_nevra(),
+-                pkg.get_repo_id(),
+-                ex.what());
+-            break;
+-        }
+-        std::string write_error;
+-        if (!dnfdaemon::write_to_fd(jsonstr, out_fd, write_error)) {
+-            error_msg = fmt::format("Error writing package list to the fd: {}", write_error);
+-            break;
++    sdbus::UnixFd dbus_unix_fd;
++
++    try {
++        // read options from dbus call
++        dnfdaemon::KeyValueMap options;
++        call >> options;
++        // get the output pipe file descriptor
++        call >> dbus_unix_fd;
++
++        int out_fd = dbus_unix_fd.get();
++        bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++        session.fill_sack(interactive);
++        auto query = filter_packages(options);
++        std::vector<std::string> package_attrs = dnfdaemon::key_value_map_get<std::vector<std::string>>(
++            options, "package_attrs", std::vector<std::string>());
++
++        for (const auto & pkg : query) {
++            std::string jsonstr;
++            try {
++                jsonstr = package_to_json(pkg, package_attrs) + "\n";
++            } catch (const std::exception & ex) {
++                error_msg = fmt::format(
++                    "Error serializing package \"{0}\" from repo \"{1}\": {2}",
++                    pkg.get_nevra(),
++                    pkg.get_repo_id(),
++                    ex.what());
++                break;
++            }
++            std::string write_error;
++            if (!dnfdaemon::write_to_fd(jsonstr, out_fd, write_error)) {
++                error_msg = fmt::format("Error writing package list to the fd: {}", write_error);
++                break;
++            }
+         }
++    } catch (const std::exception & ex) {
++        error_msg = ex.what();
++    } catch (...) {
++        error_msg = "Unknown error while listing packages.";
+     }
+-    close(out_fd);
++
++    dbus_unix_fd.reset();
+ 
+     // signal client that the transfer has finished and the output file descriptor is closed
+     auto dbus_object = get_session().get_dbus_object();
+-- 
+2.56.0
+
+
+From 683bae57a9f0b6a1c2bacdf25761fa504d1037a9 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Thu, 5 Nov 2026 07:59:41 +0000
+Subject: [PATCH 2/3] utils: add command-line package specification classifier
+
+Goal::Impl::add_spec() previously combined the internal URL helper with a
+local ".rpm" suffix check to decide whether a package specification refers
+to a command-line package. That classification needs to be reused by callers
+that must authorize external package inputs before libdnf5 opens or
+downloads them.
+
+Move the predicate to libdnf5::utils::is_cmdline_package_spec(), expose it
+through the public libdnf5 utility API, and use it from Goal and
+RepoSack. The function performs no filesystem or network I/O and
+recognizes supported URLs and non-URL paths ending in ".rpm". Add tests
+for scheme support, case insensitivity, query strings, and local paths.
+
+This centralizes the existing behavior without changing it.
+---
+ include/libdnf5/utils/patterns.hpp   |  9 +++++++++
+ libdnf5/base/goal.cpp                |  3 +--
+ libdnf5/repo/repo_sack.cpp           |  6 +++++-
+ libdnf5/utils/patterns.cpp           |  8 ++++++++
+ test/libdnf5/utils/test_patterns.cpp | 15 +++++++++++++++
+ test/libdnf5/utils/test_patterns.hpp |  2 ++
+ 6 files changed, 40 insertions(+), 3 deletions(-)
+
+diff --git a/include/libdnf5/utils/patterns.hpp b/include/libdnf5/utils/patterns.hpp
+index cbeeb20f2..b6a800fad 100644
+--- a/include/libdnf5/utils/patterns.hpp
++++ b/include/libdnf5/utils/patterns.hpp
+@@ -38,6 +38,15 @@ LIBDNF_API bool is_glob_pattern(const char * pattern) noexcept;
+ /// @return True if a given pattern is a file path
+ LIBDNF_API bool is_file_pattern(const std::string & pattern) noexcept;
+ 
++/// @brief Check if a given package specification is a command-line package.
++///
++/// A command-line package specification is either a supported URL or a local path
++/// ending in ".rpm".
++///
++/// @param spec Text package specification to be tested
++/// @return True if a given specification is a command-line package
++LIBDNF_API bool is_cmdline_package_spec(const std::string & spec);
++
+ }  // namespace libdnf5::utils
+ 
+ #endif  // LIBDNF5_UTILS_PATTERNS_HPP
+diff --git a/libdnf5/base/goal.cpp b/libdnf5/base/goal.cpp
+index 208b429a2..2f7389bac 100644
+--- a/libdnf5/base/goal.cpp
++++ b/libdnf5/base/goal.cpp
+@@ -475,8 +475,7 @@ void Goal::Impl::add_spec(GoalAction action, const std::string & spec, const Goa
+         group_specs.push_back(
+             std::make_tuple(action, libdnf5::transaction::TransactionItemReason::USER, group_spec, group_settings));
+     } else {
+-        const std::string_view ext(".rpm");
+-        if (libdnf5::utils::url::is_url(spec) || (spec.length() > ext.length() && spec.ends_with(ext))) {
++        if (libdnf5::utils::is_cmdline_package_spec(spec)) {
+             // spec is a remote rpm file or a local rpm file
+             if (action == GoalAction::REMOVE) {
+                 throw RuntimeError(M_("Unsupported argument for REMOVE action: {}"), spec);
+diff --git a/libdnf5/repo/repo_sack.cpp b/libdnf5/repo/repo_sack.cpp
+index d63eb0aa0..361c5d65e 100644
+--- a/libdnf5/repo/repo_sack.cpp
++++ b/libdnf5/repo/repo_sack.cpp
+@@ -50,6 +50,7 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+ #include "libdnf5/utils/bgettext/bgettext-mark-domain.h"
+ #include "libdnf5/utils/fs/file.hpp"
+ #include "libdnf5/utils/fs/temp.hpp"
++#include "libdnf5/utils/patterns.hpp"
+ 
+ extern "C" {
+ #include <solv/testcase.h>
+@@ -230,9 +231,12 @@ std::map<std::string, libdnf5::rpm::Package> RepoSack::add_cmdline_packages(
+     std::vector<std::string> rpm_filepaths;
+     const std::string_view ext(".rpm");
+     for (const auto & spec : paths) {
++        if (!libdnf5::utils::is_cmdline_package_spec(spec)) {
++            continue;
++        }
+         if (libdnf5::utils::url::is_url(spec)) {
+             rpm_urls.emplace_back(spec);
+-        } else if (spec.length() > ext.length() && spec.ends_with(ext)) {
++        } else {
+             rpm_filepaths.emplace_back(spec);
+         }
+     }
+diff --git a/libdnf5/utils/patterns.cpp b/libdnf5/utils/patterns.cpp
+index 0ad551dcb..52b1ce266 100644
+--- a/libdnf5/utils/patterns.cpp
++++ b/libdnf5/utils/patterns.cpp
+@@ -19,7 +19,10 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+ 
+ #include "libdnf5/utils/patterns.hpp"
+ 
++#include "utils/url.hpp"
++
+ #include <cstring>
++#include <string_view>
+ 
+ namespace libdnf5::utils {
+ 
+@@ -31,4 +34,9 @@ bool is_file_pattern(const std::string & pattern) noexcept {
+     return pattern[0] == '/' || (pattern[0] == '*' && pattern[1] == '/');
+ }
+ 
++bool is_cmdline_package_spec(const std::string & spec) {
++    constexpr std::string_view rpm_extension(".rpm");
++    return url::is_url(spec) || (spec.length() > rpm_extension.length() && spec.ends_with(rpm_extension));
++}
++
+ }  // namespace libdnf5::utils
+diff --git a/test/libdnf5/utils/test_patterns.cpp b/test/libdnf5/utils/test_patterns.cpp
+index ccb58f7ab..7075c4a51 100644
+--- a/test/libdnf5/utils/test_patterns.cpp
++++ b/test/libdnf5/utils/test_patterns.cpp
+@@ -42,3 +42,18 @@ void UtilsPatternsTest::test_is_glob_pattern() {
+     CPPUNIT_ASSERT(is_glob_pattern("glob[sdf]_pattern"));
+     CPPUNIT_ASSERT(is_glob_pattern("glob?_pattern"));
+ }
++
++
++void UtilsPatternsTest::test_is_cmdline_package_spec() {
++    CPPUNIT_ASSERT(!is_cmdline_package_spec(""));
++    CPPUNIT_ASSERT(!is_cmdline_package_spec("pkg"));
++    CPPUNIT_ASSERT(!is_cmdline_package_spec(".rpm"));
++    CPPUNIT_ASSERT(!is_cmdline_package_spec("gopher://example.com/pkg"));
++    CPPUNIT_ASSERT(is_cmdline_package_spec("gopher://example.com/pkg.rpm"));
++    CPPUNIT_ASSERT(is_cmdline_package_spec("/repository/pkg.rpm"));
++    CPPUNIT_ASSERT(is_cmdline_package_spec("file:///repository/pkg.rpm"));
++    CPPUNIT_ASSERT(is_cmdline_package_spec("FILE:///repository/pkg.rpm"));
++    CPPUNIT_ASSERT(is_cmdline_package_spec("http://example.com/pkg?marker.rpm"));
++    CPPUNIT_ASSERT(is_cmdline_package_spec("https://example.com/pkg"));
++    CPPUNIT_ASSERT(is_cmdline_package_spec("ftp://example.com/pkg"));
++}
+diff --git a/test/libdnf5/utils/test_patterns.hpp b/test/libdnf5/utils/test_patterns.hpp
+index f35e1be95..eac03956a 100644
+--- a/test/libdnf5/utils/test_patterns.hpp
++++ b/test/libdnf5/utils/test_patterns.hpp
+@@ -27,11 +27,13 @@ class UtilsPatternsTest : public CppUnit::TestCase {
+     CPPUNIT_TEST_SUITE(UtilsPatternsTest);
+     CPPUNIT_TEST(test_is_file_pattern);
+     CPPUNIT_TEST(test_is_glob_pattern);
++    CPPUNIT_TEST(test_is_cmdline_package_spec);
+     CPPUNIT_TEST_SUITE_END();
+ 
+ public:
+     void test_is_file_pattern();
+     void test_is_glob_pattern();
++    void test_is_cmdline_package_spec();
+ };
+ 
+ #endif  // LIBDNF5_TEST_UTILS_PATTERNS_HPP
+-- 
+2.56.0
+
+
+From a5b8f442d7caab5710fb7cdf49507f27535215fb Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Thu, 5 Nov 2026 17:06:41 +0000
+Subject: [PATCH 3/3] rpm: authorize command-line package specifications
+
+Rpm.list(), Rpm.list_fd(), install(), upgrade(), downgrade(), and
+reinstall() accepted URL and local .rpm specifications without an
+authorization check. Those specifications can reach libdnf5's
+command-line package loader during repository loading or Goal
+resolution, before the existing transaction-execution check.
+
+Classify the submitted specifications with the public libdnf5 predicate
+and check POLKIT_EXECUTE_RPM_TRANSACTION using the actual D-Bus sender
+before loading repository data or queueing any Goal request. Direct
+package actions default to interactive authorization so clients receive
+the Polkit prompt immediately; repository-only operations remain
+unchanged.
+---
+ .../interfaces/org.rpm.dnf.v0.rpm.Rpm.xml     | 20 ++++++++
+ .../polkit/org.rpm.dnf.v0.policy              |  4 +-
+ dnf5daemon-server/services/rpm/rpm.cpp        | 47 +++++++++++++++++++
+ dnf5daemon-server/services/rpm/rpm.hpp        |  2 +
+ 4 files changed, 71 insertions(+), 2 deletions(-)
+
+diff --git a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml
+index ba22c94c0..fb045b7ba 100644
+--- a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml
++++ b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml
+@@ -58,6 +58,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+ 
+             - patterns: list of strings
+                 any package matching to any of patterns is returned
++                Patterns that are URLs or local `.rpm` paths require authorization
++                before the daemon loads them.
+             - scope: string (default "all")
+                 limit packages to one of "all", "installed", "available", "upgrades", "upgradable"
+             - arch: list of strings
+@@ -118,6 +120,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+         @options: an array of key/value pairs to modify install behavior
+ 
+         Mark packages specified by @pkg_specs for installation.
++        URL or local `.rpm` specifications require authorization before they
++        are queued.
+ 
+         Following @options are supported:
+ 
+@@ -127,6 +131,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+                 Whether solver can skip packages with broken dependencies to resolve transaction
+             - skip_unavailable: boolean, default false
+                 Whether nonexisting packages can be skipped.
++            - interactive: boolean, default true
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
+ 
+         Unknown options are ignored.
+     -->
+@@ -141,11 +147,15 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+         @options: an array of key/value pairs to modify upgrade behavior
+ 
+         Mark packages specified by @pkg_specs for upgrade.
++        URL or local `.rpm` specifications require authorization before they
++        are queued.
+ 
+         Following @options are supported:
+ 
+             - repo_ids: list of strings
+                 Identifiers of the repos from which the packages could be upgraded.
++            - interactive: boolean, default true
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
+ 
+         Unknown options are ignored.
+     -->
+@@ -188,9 +198,14 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+         @options: an array of key/value pairs to modify downgrade behavior
+ 
+         Mark packages specified by @pkg_specs for downgrade.
++        URL or local `.rpm` specifications require authorization before they
++        are queued.
+ 
+         Following @options are supported:
+ 
++            - interactive: boolean, default true
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
++
+         Unknown options are ignored.
+     -->
+     <method name="downgrade">
+@@ -204,9 +219,14 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+         @options: an array of key/value pairs to modify reinstall behavior
+ 
+         Mark packages specified by @pkg_specs for reinstall.
++        URL or local `.rpm` specifications require authorization before they
++        are queued.
+ 
+         Following @options are supported:
+ 
++            - interactive: boolean, default true
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
++
+         Unknown options are ignored.
+     -->
+     <method name="reinstall">
+diff --git a/dnf5daemon-server/polkit/org.rpm.dnf.v0.policy b/dnf5daemon-server/polkit/org.rpm.dnf.v0.policy
+index 8c57de2e2..9cb649783 100644
+--- a/dnf5daemon-server/polkit/org.rpm.dnf.v0.policy
++++ b/dnf5daemon-server/polkit/org.rpm.dnf.v0.policy
+@@ -27,8 +27,8 @@
+   </action>
+ 
+   <action id="org.rpm.dnf.v0.rpm.execute_transaction">
+-    <description>Execute rpm transaction</description>
+-    <message>Authentication is required to execute a rpm transaction.</message>
++    <description>Execute untrusted rpm transaction</description>
++    <message>Authentication is required to execute an rpm transaction with untrusted packages or access package files from local paths or URLs.</message>
+     <defaults>
+         <allow_any>auth_admin</allow_any>
+         <allow_inactive>auth_admin</allow_inactive>
+diff --git a/dnf5daemon-server/services/rpm/rpm.cpp b/dnf5daemon-server/services/rpm/rpm.cpp
+index 1e0f302a8..7300c4c4a 100644
+--- a/dnf5daemon-server/services/rpm/rpm.cpp
++++ b/dnf5daemon-server/services/rpm/rpm.cpp
+@@ -24,6 +24,7 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+ 
+ #include "libdnf5/comps/environment/query.hpp"
+ #include "libdnf5/comps/group/query.hpp"
++#include "libdnf5/utils/patterns.hpp"
+ 
+ #include <libdnf5/rpm/package_query.hpp>
+ #include <libdnf5/rpm/package_set.hpp>
+@@ -383,6 +384,17 @@ std::vector<std::string> get_filter_patterns(dnfdaemon::KeyValueMap options, con
+     return filter_patterns;
+ }
+ 
++bool Rpm::authorize_cmdline_package_specs(
++    const std::vector<std::string> & specs, const std::string & sender, bool interactive) {
++    for (const auto & spec : specs) {
++        if (libdnf5::utils::is_cmdline_package_spec(spec)) {
++            return session.check_authorization(dnfdaemon::POLKIT_EXECUTE_RPM_TRANSACTION, sender, interactive);
++        }
++    }
++
++    return true;
++}
++
+ libdnf5::rpm::PackageQuery resolve_nevras(libdnf5::rpm::PackageQuery base_query, std::vector<std::string> nevras) {
+     libdnf5::rpm::PackageQuery result(base_query.get_base(), libdnf5::sack::ExcludeFlags::APPLY_EXCLUDES, true);
+     libdnf5::ResolveSpecSettings settings;
+@@ -592,6 +604,12 @@ sdbus::MethodReply Rpm::list(sdbus::MethodCall & call) {
+     call >> options;
+ 
+     bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++    const auto patterns =
++        dnfdaemon::key_value_map_get<std::vector<std::string>>(options, "patterns", std::vector<std::string>{});
++    if (!authorize_cmdline_package_specs(patterns, call.getSender(), interactive)) {
++        throw std::runtime_error("Not authorized");
++    }
++
+     session.fill_sack(interactive);
+ 
+     auto query = filter_packages(options);
+@@ -623,6 +641,12 @@ void Rpm::list_fd(sdbus::MethodCall & call, const std::string & transfer_id) {
+ 
+         int out_fd = dbus_unix_fd.get();
+         bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", false);
++        const auto patterns =
++            dnfdaemon::key_value_map_get<std::vector<std::string>>(options, "patterns", std::vector<std::string>{});
++        if (!authorize_cmdline_package_specs(patterns, call.getSender(), interactive)) {
++            throw std::runtime_error("Not authorized");
++        }
++
+         session.fill_sack(interactive);
+         auto query = filter_packages(options);
+         std::vector<std::string> package_attrs = dnfdaemon::key_value_map_get<std::vector<std::string>>(
+@@ -698,6 +722,12 @@ sdbus::MethodReply Rpm::downgrade(sdbus::MethodCall & call) {
+     // read options from dbus call
+     dnfdaemon::KeyValueMap options;
+     call >> options;
++
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", true);
++    if (!authorize_cmdline_package_specs(specs, call.getSender(), interactive)) {
++        throw std::runtime_error("Not authorized");
++    }
++
+     std::vector<std::string> repo_ids = dnfdaemon::key_value_map_get<std::vector<std::string>>(options, "repo_ids", {});
+ 
+     // fill the goal
+@@ -720,6 +750,11 @@ sdbus::MethodReply Rpm::install(sdbus::MethodCall & call) {
+     dnfdaemon::KeyValueMap options;
+     call >> options;
+ 
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", true);
++    if (!authorize_cmdline_package_specs(specs, call.getSender(), interactive)) {
++        throw std::runtime_error("Not authorized");
++    }
++
+     libdnf5::GoalSetting skip_broken;
+     if (options.find("skip_broken") != options.end()) {
+         skip_broken = dnfdaemon::key_value_map_get<bool>(options, "skip_broken") ? libdnf5::GoalSetting::SET_TRUE
+@@ -759,6 +794,12 @@ sdbus::MethodReply Rpm::upgrade(sdbus::MethodCall & call) {
+     // read options from dbus call
+     dnfdaemon::KeyValueMap options;
+     call >> options;
++
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", true);
++    if (!authorize_cmdline_package_specs(specs, call.getSender(), interactive)) {
++        throw std::runtime_error("Not authorized");
++    }
++
+     std::vector<std::string> repo_ids = dnfdaemon::key_value_map_get<std::vector<std::string>>(options, "repo_ids", {});
+ 
+     // fill the goal
+@@ -784,6 +825,12 @@ sdbus::MethodReply Rpm::reinstall(sdbus::MethodCall & call) {
+     // read options from dbus call
+     dnfdaemon::KeyValueMap options;
+     call >> options;
++
++    bool interactive = dnfdaemon::key_value_map_get<bool>(options, "interactive", true);
++    if (!authorize_cmdline_package_specs(specs, call.getSender(), interactive)) {
++        throw std::runtime_error("Not authorized");
++    }
++
+     std::vector<std::string> repo_ids = dnfdaemon::key_value_map_get<std::vector<std::string>>(options, "repo_ids", {});
+ 
+     // fill the goal
+diff --git a/dnf5daemon-server/services/rpm/rpm.hpp b/dnf5daemon-server/services/rpm/rpm.hpp
+index 3d680c206..858fbbcec 100644
+--- a/dnf5daemon-server/services/rpm/rpm.hpp
++++ b/dnf5daemon-server/services/rpm/rpm.hpp
+@@ -35,6 +35,8 @@ public:
+ 
+ private:
+     libdnf5::rpm::PackageQuery filter_packages(const dnfdaemon::KeyValueMap & options);
++    bool authorize_cmdline_package_specs(
++        const std::vector<std::string> & specs, const std::string & sender, bool interactive);
+ 
+     sdbus::MethodReply list(sdbus::MethodCall & call);
+     sdbus::MethodReply install(sdbus::MethodCall & call);
+-- 
+2.56.0
+

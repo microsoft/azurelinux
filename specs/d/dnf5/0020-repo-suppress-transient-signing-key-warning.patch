@@ -59,13 +59,13 @@ index 1d13928c9b..63d81ecac7 100644
 --- a/libdnf5/repo/repo_downloader.cpp
 +++ b/libdnf5/repo/repo_downloader.cpp
 @@ -19,6 +19,7 @@
- 
+
  #include "repo_downloader.hpp"
- 
+
 +#include "repo_pgp.hpp"
  #include "utils/fs/utils.hpp"
  #include "utils/string.hpp"
- 
+
 @@ -83,6 +84,11 @@ int RepoDownloader::end_cb_full_download(void * data, LrTransferStatus status, c
          }
      }
@@ -96,7 +96,7 @@ index 1d13928c9b..63d81ecac7 100644
 +    cbd.suppress_keyring_errors = suppress_keyring_errors;
      std::filesystem::create_directories(cbd.destination);
      cbd.temp_download_target = libdnf5::utils::fs::TempDir{cbd.destination, "tmpdir"};
- 
+
 diff --git a/libdnf5/repo/repo_downloader.hpp b/libdnf5/repo/repo_downloader.hpp
 index 363bf0eeeb..8f90927218 100644
 --- a/libdnf5/repo/repo_downloader.hpp
@@ -104,7 +104,7 @@ index 363bf0eeeb..8f90927218 100644
 @@ -80,6 +80,8 @@ class RepoDownloader {
      // Download the previously added repos.
      std::unordered_map<Repo *, std::vector<std::string>> download();
- 
+
 +    void set_suppress_keyring_errors(bool suppress) { suppress_keyring_errors = suppress; }
 +
  private:
@@ -116,15 +116,15 @@ index 363bf0eeeb..8f90927218 100644
          bool is_in_sync;
 +        bool suppress_keyring_errors{false};
      };
- 
+
      static LibrepoHandle init_local_handle(const DownloadData & download_data);
 @@ -110,6 +113,7 @@ class RepoDownloader {
      static int mirror_failure_cb(void * data, const char * msg, const char * url, const char * metadata);
- 
+
      std::vector<CallbackData> callback_data;
 +    bool suppress_keyring_errors{false};
  };
- 
+
  }  // namespace libdnf5::repo
 diff --git a/libdnf5/repo/repo_pgp.cpp b/libdnf5/repo/repo_pgp.cpp
 index fa998d55bb..aa14002a4e 100644
@@ -132,12 +132,12 @@ index fa998d55bb..aa14002a4e 100644
 +++ b/libdnf5/repo/repo_pgp.cpp
 @@ -25,9 +25,14 @@
  #include "libdnf5/utils/fs/temp.hpp"
- 
+
  #include <memory>
 +#include <string_view>
- 
+
  namespace libdnf5::repo {
- 
+
 +bool is_signing_key_not_found_error(const char * msg) {
 +    return msg && std::string_view(msg).ends_with("Signing key not found");
 +}
@@ -152,7 +152,7 @@ index e5a1924983..1b0b478d83 100644
 @@ -40,6 +40,12 @@ class Key : public libdnf5::rpm::KeyInfo {
      Key(const LrGpgKey * key, const LrGpgSubkey * subkey, const std::string & url, const std::string & path);
  };
- 
+
 +// Check whether an error message from librepo indicates a missing signing
 +// key (resolvable by importing the repo's gpgkey).  String-based because
 +// librepo currently uses LRE_BADGPG for all GPG errors; replace with a
@@ -178,7 +178,7 @@ index 0881108853..d854c41b0e 100644
          }
 @@ -644,6 +643,7 @@ void RepoSack::Impl::update_and_load_repos(libdnf5::repo::RepoQuery & repos, boo
          }
- 
+
          RepoDownloader repo_downloader{};
 +        repo_downloader.set_suppress_keyring_errors(import_keys);
          for (const auto & repo : repos_for_processing) {
@@ -365,7 +365,7 @@ index ee4615d9d7..1011248ebb 100644
 @@ -46,10 +46,12 @@ class DownloadCallbacks : public libdnf5::repo::DownloadCallbacks {
          return nullptr;
      }
- 
+
 -    int end([[maybe_unused]] void * user_cb_data, [[maybe_unused]] TransferStatus status, const char * error_message)
 -        override {
 +    int end([[maybe_unused]] void * user_cb_data, TransferStatus status, const char * error_message) override {
@@ -376,13 +376,13 @@ index ee4615d9d7..1011248ebb 100644
 +        }
          return 0;
      }
- 
+
 @@ -84,6 +86,7 @@ class DownloadCallbacks : public libdnf5::repo::DownloadCallbacks {
- 
+
      int end_cnt = 0;
      std::string end_error_message;
 +    std::vector<std::string> end_error_messages;
- 
+
      int progress_cnt = 0;
      int fastest_mirror_cnt = 0;
 @@ -94,9 +97,10 @@ class RepoCallbacks : public libdnf5::repo::RepoCallbacks {
@@ -392,11 +392,11 @@ index ee4615d9d7..1011248ebb 100644
 -        return true;
 +        return accept_key_import;
      }
- 
+
 +    bool accept_key_import{true};
      int repokey_import_cnt = 0;
  };
- 
+
 @@ -206,3 +210,72 @@ void RepoTest::test_load_repos_load_available_system() {
      CPPUNIT_ASSERT_EQUAL(0, dl_callbacks_ptr->fastest_mirror_cnt);
      CPPUNIT_ASSERT_EQUAL(0, dl_callbacks_ptr->handle_mirror_failure_cnt);
@@ -481,7 +481,7 @@ index 90dec8a9d6..7125b68b81 100644
 +    CPPUNIT_TEST(test_load_repo_gpgcheck_no_keyring_error);
 +    CPPUNIT_TEST(test_load_repo_gpgcheck_refused_key_shows_error);
      CPPUNIT_TEST_SUITE_END();
- 
+
  public:
 @@ -44,6 +46,8 @@ class RepoTest : public BaseTestCase {
      void test_load_repos_invalid_type();
@@ -490,5 +490,5 @@ index 90dec8a9d6..7125b68b81 100644
 +    void test_load_repo_gpgcheck_no_keyring_error();
 +    void test_load_repo_gpgcheck_refused_key_shows_error();
  };
- 
+
  #endif
