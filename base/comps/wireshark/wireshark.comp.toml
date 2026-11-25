@@ -1,1 +1,4 @@
+# Pin to Fedora f44 wireshark-4.6.10-1.fc44 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/wireshark/c/fb8fc87921b809bffec9f83626d323988a75fbb0
 [components.wireshark]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "fb8fc87921b809bffec9f83626d323988a75fbb0" }
