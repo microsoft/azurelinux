@@ -4,7 +4,7 @@
 
 Summary:        iSCSI daemon and utility programs
 Name:           iscsi-initiator-utils
-Version:        2.1.12
+Version:        2.1.13
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -278,6 +278,9 @@ systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || 
 %endif
 
 %changelog
+* Wed Nov 25 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.13-1
+- Auto-upgrade to 2.1.13 - for CVE-2026-18728, CVE-2026-18727, CVE-2026-18726
+
 * Wed Aug 05 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.1.12-1
 - Update source to v2.1.12 to fix CVE-2026-44943 and CVE-2026-44944
 - Rebase downstream patches onto v2.1.12
