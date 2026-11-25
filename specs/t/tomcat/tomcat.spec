@@ -44,7 +44,7 @@
 %global jspspec 3.1
 %global major_version 10
 %global minor_version 1
-%global micro_version 61
+%global micro_version 62
 %global packdname apache-tomcat-%{version}-src
 %global servletspec 6.0
 %global elspec 5.0
@@ -536,6 +536,10 @@ install -m0644 -D tomcat.sysusers.conf %{buildroot}%{_sysusersdir}/tomcat.conf
 %{appdir}/ROOT
 
 %changelog
+* Thu Nov 19 2026 Packit <hello@packit.dev> - 1:10.1.62-1
+- Update to version 10.1.62
+- Resolves: rhbz#2573703
+
 * Mon Oct 12 2026 Packit <hello@packit.dev> - 1:10.1.61-1
 - Update to version 10.1.61
 - Resolves: rhbz#2549499

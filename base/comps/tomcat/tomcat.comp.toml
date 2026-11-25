@@ -1,4 +1,4 @@
-# Pin to Fedora f43 tomcat-10.1.61 to pick up upstream CVE fixes.
-# https://src.fedoraproject.org/rpms/tomcat/c/22329c2ab47f1902e8c50aa82327a5dfcb8e75e4
+# Pin to Fedora f43 tomcat-10.1.62-1.fc43 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/tomcat/c/818e75cbee88add1e5584fc5fa3608ef594ce3c8
 [components.tomcat]
-spec = { type = "upstream", upstream-commit = "22329c2ab47f1902e8c50aa82327a5dfcb8e75e4" }
+spec = { type = "upstream", upstream-commit = "818e75cbee88add1e5584fc5fa3608ef594ce3c8" }
