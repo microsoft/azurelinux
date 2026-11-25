@@ -1,0 +1,4 @@
+# Pin to Fedora f43 buildah-1.43.6-1.fc43 for the vendored containers/common v0.67.3 seccomp fix.
+# https://src.fedoraproject.org/rpms/buildah/c/0edbdaed8664c17d82d101331b1d9d05a4953a4f
+[components.buildah]
+spec = { type = "upstream", upstream-commit = "0edbdaed8664c17d82d101331b1d9d05a4953a4f" }
