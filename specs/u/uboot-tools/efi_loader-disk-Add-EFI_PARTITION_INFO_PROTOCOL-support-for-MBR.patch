@@ -1,0 +1,1527 @@
+From patchwork Thu Feb 12 20:44:55 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Javier Martinez Canillas <javierm@redhat.com>
+X-Patchwork-Id: 2196073
+X-Patchwork-Delegate: xypron.glpk@gmx.de
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256
+ header.s=mimecast20190719 header.b=M08L6hzk;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fBnPT0HVFz1xpY
+	for <incoming@patchwork.ozlabs.org>; Fri, 13 Feb 2026 07:45:33 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 9EBDE83CBD;
+	Thu, 12 Feb 2026 21:45:24 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.b="M08L6hzk";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 8974683A47; Thu, 12 Feb 2026 21:45:22 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+ DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+ RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 7E31E83A47
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 21:45:20 +0100 (CET)
+Authentication-Results: phobos.denx.de; dmarc=pass (p=quarantine dis=none)
+ header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=javierm@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1770929119;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S6JyvxxSpXUNmI9GDQelVfUGS2Vr6p4xYVoHBmqDRO4=;
+ b=M08L6hzkFNXjuHlFimbMxmHgJwW5wxi0OcKZpqTKseSSk9XFw5Tbot1PyKxyME29M1aVE1
+ fchnLEWeC5LA4dmQWJtGue65Jo+n5rzB9ajylqpEC+allPouIT8V0Ly+zmkCzilaHf6NIi
+ oplVPru8tj3iihAGQjHlCZ6XgAql5/E=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-335-3zvVriYDN9SIyFSsJQjxiA-1; Thu, 12 Feb 2026 15:45:18 -0500
+X-MC-Unique: 3zvVriYDN9SIyFSsJQjxiA-1
+X-Mimecast-MFC-AGG-ID: 3zvVriYDN9SIyFSsJQjxiA_1770929117
+Received: by mail-wm1-f72.google.com with SMTP id
+ 5b1f17b1804b1-4836cf00787so7129125e9.1
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 12:45:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20230601; t=1770929116; x=1771533916;
+ h=content-transfer-encoding:mime-version:references:in-reply-to
+ :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+ :to:cc:subject:date:message-id:reply-to;
+ bh=S6JyvxxSpXUNmI9GDQelVfUGS2Vr6p4xYVoHBmqDRO4=;
+ b=Eod9LLiNScRhd3XlKNMJhjNGvozAyo99aF3LF7MIM7fs7iC9WzWCU/B+TgMcugoDcg
+ DA1iC1Nx3VkhUSUF8HG810KXYxqbTcrX4IWnzo3nd09l75a2qC2Xw9pebk27ZOACsBv1
+ giVAkrd2ParG4DdoUmgW92FkzT9WX0u757WKnVaqxd5HXtM3IKuYynXgPvwr5/p9gPNo
+ jXjjayEXZKOJk6XhKSafh5fHO8xLGTQ8rsLsEZhHocu5IVOSKNXCLmMvbEKDBXXAgYE8
+ zWiwVMBc64yiSrhahXpKr7D+blcr/pZDQPxCcgdLUX0iJyceesM6R2IZ6pYZuCXPGCk3
+ a9Gg==
+X-Gm-Message-State: AOJu0YwH1PlLeO0/XgF/mMf/g/lE+GyfpI/MjPf/0PU3rdeiXQpdJPUz
+ G5WvCCtlS1vmGJTAKrzWTseKTrQsEEEHedmZQnkwG8wGDLwOvaPjF4sEWroRcMzuHT2S6hV9adg
+ lut8JHG4ub1cFn6WsthFDVSaxrfDWsHM+s2aSe3N3Ps/zvEXJAO4YrVWmpsC1BCC42Xfv1uoa7V
+ 6VbJXF3tbhbY7LD12S1T5QE5E/yIEkJrQ/VGuxnQ==
+X-Gm-Gg: AZuq6aJVehGB2WfhOpktCDZfE01vwUOJ0rY37hYZLG6DQXUquUml+5dwR/s9b6gjfj4
+ KG75k31diC/zgMJpDUFeT7nOJYYydrnSUdvF58YDEK3d97+/qds8Bdz5h0xkaUEjLVBFONFaj0x
+ RlkN5VXVE3eot3u8TpLtZhoOmZSILa9h+4wtWZOWZdP+/pQHvzOkMSLQ8PNFcbvRaz3qvLfwW7u
+ E643TGOPAus9otHRC8RXdX98ujUAk3XZjaPokr0HUb8h5j1rsiwnixthskNIdC9utjHaPBrslUA
+ KpmXNdXKuK66UJl+0lz+PkqXr6/nKXQw4l+IRD+cddiyhq20f5l32ZPjz4+C3784ldOgZGBHyvk
+ aFomh5Kgd3S/2GvDNCUXh7sTBG6daTZqvbdrW9sDjlOEBsmk=
+X-Received: by 2002:a05:600c:a14:b0:47e:e97e:11aa with SMTP id
+ 5b1f17b1804b1-48365fdec4amr61669725e9.4.1770929116626;
+ Thu, 12 Feb 2026 12:45:16 -0800 (PST)
+X-Received: by 2002:a05:600c:a14:b0:47e:e97e:11aa with SMTP id
+ 5b1f17b1804b1-48365fdec4amr61669345e9.4.1770929116203;
+ Thu, 12 Feb 2026 12:45:16 -0800 (PST)
+Received: from localhost (62-151-111-63.jazzfree.ya.com. [62.151.111.63])
+ by smtp.gmail.com with ESMTPSA id
+ ffacd0b85a97d-43796ac82f7sm466079f8f.28.2026.02.12.12.45.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Feb 2026 12:45:15 -0800 (PST)
+From: Javier Martinez Canillas <javierm@redhat.com>
+To: u-boot@lists.denx.de
+Cc: Heinrich Schuchardt <xypron.glpk@gmx.de>, eballetb@redhat.com,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Tom Rini <trini@konsulko.com>,
+ Javier Martinez Canillas <javierm@redhat.com>
+Subject: [PATCH v2 1/7] disk: part_dos: Move header to the main include
+ directory
+Date: Thu, 12 Feb 2026 21:44:55 +0100
+Message-ID: <20260212204511.619392-2-javierm@redhat.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260212204511.619392-1-javierm@redhat.com>
+References: <20260212204511.619392-1-javierm@redhat.com>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: IPRNvMIm13yQ-FtMhxNzZkK7Dpa5P_eKViUiJ6XWg7c_1770929117
+X-Mimecast-Originator: redhat.com
+content-type: text/plain; charset="US-ASCII"; x-default=true
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+There are two different struct definitions for MBR partition table
+entries: one in part_dos.h and a nearly identical one in part_efi.h.
+
+To enable future consolidation of these two structures, move part_dos.h
+to the main include directory. This makes it accessible from other parts
+of the codebase, such as part_efi.h, and is the first step toward removing
+the redundant definition.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+Reviewed-by: Tom Rini <trini@konsulko.com>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+---
+
+(no changes since v1)
+
+ disk/part_dos.c              | 2 +-
+ {disk => include}/part_dos.h | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename {disk => include}/part_dos.h (100%)
+
+diff --git a/disk/part_dos.c b/disk/part_dos.c
+index 18dd35c9b98e..2545cc6bf5d2 100644
+--- a/disk/part_dos.c
++++ b/disk/part_dos.c
+@@ -19,7 +19,7 @@
+ #include <vsprintf.h>
+ #include <asm/unaligned.h>
+ #include <linux/compiler.h>
+-#include "part_dos.h"
++#include <part_dos.h>
+ #include <part.h>
+ 
+ #define DOS_PART_DEFAULT_SECTOR 512
+diff --git a/disk/part_dos.h b/include/part_dos.h
+similarity index 100%
+rename from disk/part_dos.h
+rename to include/part_dos.h
+
+From patchwork Thu Feb 12 20:44:56 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Javier Martinez Canillas <javierm@redhat.com>
+X-Patchwork-Id: 2196075
+X-Patchwork-Delegate: xypron.glpk@gmx.de
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256
+ header.s=mimecast20190719 header.b=dYbdqd5S;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fBnPf2cYPz1xpY
+	for <incoming@patchwork.ozlabs.org>; Fri, 13 Feb 2026 07:45:42 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id EC7FC83DB6;
+	Thu, 12 Feb 2026 21:45:27 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.b="dYbdqd5S";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id AD3B983D71; Thu, 12 Feb 2026 21:45:26 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+ DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,
+ RCVD_IN_VALIDITY_RPBL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+ autolearn_force=no version=3.4.2
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 6B82283A47
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 21:45:24 +0100 (CET)
+Authentication-Results: phobos.denx.de; dmarc=pass (p=quarantine dis=none)
+ header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=javierm@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1770929122;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+JHhKRwKgjcBzLn3rJkmebNMGs1jkBQEwco60cqbAIo=;
+ b=dYbdqd5SVUmMU3A5E7zG1qsLhXdL0egjfI2F2hN01Az7hW6JxGHzwCg66yoFReabrcxIAA
+ IOhNGVcI6+rGlxhDgmizAgb+soqz3+hbF9tJ+XVJ0kb4cjoPoMZ6560z68Z5WYn9LeYrcU
+ +YuwGcPbIJXOkiI4OWeI45a9bWV/GRM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-YB2GYX2RP3OXo6t0_Zre2g-1; Thu, 12 Feb 2026 15:45:20 -0500
+X-MC-Unique: YB2GYX2RP3OXo6t0_Zre2g-1
+X-Mimecast-MFC-AGG-ID: YB2GYX2RP3OXo6t0_Zre2g_1770929120
+Received: by mail-wm1-f71.google.com with SMTP id
+ 5b1f17b1804b1-4806cfffca6so2094715e9.2
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 12:45:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20230601; t=1770929119; x=1771533919;
+ h=content-transfer-encoding:mime-version:references:in-reply-to
+ :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+ :to:cc:subject:date:message-id:reply-to;
+ bh=+JHhKRwKgjcBzLn3rJkmebNMGs1jkBQEwco60cqbAIo=;
+ b=PHJ6nl+VJBgi4wdUK5jajmvkVU6nK63cxFvYbfY7wOEVXaAkfO19aM+8y1TFF8N0Wk
+ WXbVzz82QFSrokme964OkS9dzPHeZmPP+VI6NJ4LLectMM4A/Kr+Uq0YsO2jzJ5cEk+o
+ OouPIUMK+oo3P3KrVz+gNJFMUMxdyiMuJg27OVVbecxc4t+q7ZsoxQBSisj6w7xCZYwZ
+ pS6NDeGtn9hRSJFxy6I0GQZLtGsUV1FfjBx7Bg1+aZX0yFJYMW9mBYrDZObDmOyk/XrJ
+ GirozlvQyuOKoBS34p0gXxiikK+6WgryWdgGHc8Nxuec5EpT9A2Gxk4gYpkC1Tk+1iHJ
+ juOQ==
+X-Gm-Message-State: AOJu0Yyj+ufQ5SlZTNm4oVJqHR6RTbMuSxDeiXajbabT+GC6c1AVa+p5
+ b1PGOZJYeV4piG3o/s4Kl1yhaQF2EBfmJE7eo31qhULj6ScpE9xH/HHuz3ffmBaKAp9HiAuK/Fy
+ sCb5g15Jl+fk92+r6gldzGoCdNZ5QDJQx3bFIgvfoe7MRaUaviGcr//7QHKdI4SkTbH8nHX5ksx
+ NbPalo2JU8/AJ6f/DZ8mXH9192JDMl+1DX6QSODA==
+X-Gm-Gg: AZuq6aKsRAjfpDXVwgBWbGFhcWIBuWE1o6dKK4EOCHn2jShszywfxqZ9ScpwX9Qd5GV
+ T/gCPeGZBmfoL5+PGT+SCHsx2OMU6JHFJmEpY8juD3fnuy9WbY20vwwvPN3NfFQF2BPrnrDJstL
+ bd48535mWasY4ZcAaQpJ3Iet00uca72AgitvYpSwbXsuxjBMRNbCqLRFZ2mS/BPvOj63BdMbdBz
+ 8ZQBSTxkiYZ8iZDwYgyu2Jc/LmD6WBSTJ3Gpu6Qada7kVk9qZVrx6lWfGjlVfn90nMas+dFd/vh
+ MLIXSiN0rcSorLkzt3UH7CCL3Txj6usnD16lod9g38A2WTHt7U/K3pkyuJX9cGvBvqhNi/vwDVy
+ TzJ378iHgvG26b5SN7tpTZWXDvlBI9/lLcNgiW7uBK2eUy+E=
+X-Received: by 2002:a05:600c:6216:b0:475:da1a:5418 with SMTP id
+ 5b1f17b1804b1-48370e1892dmr6888905e9.1.1770929118785;
+ Thu, 12 Feb 2026 12:45:18 -0800 (PST)
+X-Received: by 2002:a05:600c:6216:b0:475:da1a:5418 with SMTP id
+ 5b1f17b1804b1-48370e1892dmr6888635e9.1.1770929118344;
+ Thu, 12 Feb 2026 12:45:18 -0800 (PST)
+Received: from localhost (62-151-111-63.jazzfree.ya.com. [62.151.111.63])
+ by smtp.gmail.com with ESMTPSA id
+ 5b1f17b1804b1-48371a298ebsm1026155e9.13.2026.02.12.12.45.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Feb 2026 12:45:17 -0800 (PST)
+From: Javier Martinez Canillas <javierm@redhat.com>
+To: u-boot@lists.denx.de
+Cc: Heinrich Schuchardt <xypron.glpk@gmx.de>, eballetb@redhat.com,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Tom Rini <trini@konsulko.com>,
+ Javier Martinez Canillas <javierm@redhat.com>
+Subject: [PATCH v2 2/7] disk: part_dos: Align dos_partition_t with struct
+ partition
+Date: Thu, 12 Feb 2026 21:44:56 +0100
+Message-ID: <20260212204511.619392-3-javierm@redhat.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260212204511.619392-1-javierm@redhat.com>
+References: <20260212204511.619392-1-javierm@redhat.com>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: fPt7jBSAujrv4TDFANb7Za8r3XesZKgoNdRV6-QyxLM_1770929120
+X-Mimecast-Originator: redhat.com
+content-type: text/plain; charset="US-ASCII"; x-default=true
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+The dos_partition_t struct defined in part_dos.h is nearly identical to
+the struct partition defined in part_efi.h. They differ primarily in how
+define their starting sector and number of sectors fields.
+
+The former uses unsigned char arrays while the latter uses __le32 types.
+Using __le32 is preferable, as it removes the ambiguity and potential
+misuse of a raw byte array. This also aligns the structure with how the
+Linux kernel defines it nowadays, which is the original source of it.
+
+To prepare for future consolidation where one of the data structures can
+be removed, this change aligns both definitions and updates all accessors
+for dos_partition_t.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+Reviewed-by: Tom Rini <trini@konsulko.com>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+---
+
+(no changes since v1)
+
+ disk/part_dos.c    | 16 ++++++++--------
+ include/part_dos.h |  6 +++---
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/disk/part_dos.c b/disk/part_dos.c
+index 2545cc6bf5d2..60c3d6773696 100644
+--- a/disk/part_dos.c
++++ b/disk/part_dos.c
+@@ -49,8 +49,8 @@ static int get_bootable(dos_partition_t *p)
+ static void print_one_part(dos_partition_t *p, lbaint_t ext_part_sector,
+ 			   int part_num, unsigned int disksig)
+ {
+-	lbaint_t lba_start = ext_part_sector + get_unaligned_le32(p->start4);
+-	lbaint_t lba_size  = get_unaligned_le32(p->size4);
++	lbaint_t lba_start = ext_part_sector + get_unaligned_le32(&p->start_sect);
++	lbaint_t lba_size  = get_unaligned_le32(&p->nr_sects);
+ 
+ 	printf("%3d\t%-10" LBAFlength "u\t%-10" LBAFlength
+ 		"u\t%08x-%02x\t%02x%s%s\n",
+@@ -185,7 +185,7 @@ static void print_partition_extended(struct blk_desc *desc,
+ 	for (i = 0; i < 4; i++, pt++) {
+ 		if (is_extended (pt->sys_ind)) {
+ 			lbaint_t lba_start
+-				= get_unaligned_le32 (pt->start4) + relative;
++				= get_unaligned_le32 (&pt->start_sect) + relative;
+ 
+ 			print_partition_extended(desc, lba_start,
+ 						 !ext_part_sector ? lba_start :
+@@ -252,8 +252,8 @@ static int part_get_info_extended(struct blk_desc *desc,
+ 			else
+ 				info->blksz = DOS_PART_DEFAULT_SECTOR;
+ 			info->start = (lbaint_t)(ext_part_sector +
+-					get_unaligned_le32(pt->start4));
+-			info->size  = (lbaint_t)get_unaligned_le32(pt->size4);
++					get_unaligned_le32(&pt->start_sect));
++			info->size  = (lbaint_t)get_unaligned_le32(&pt->nr_sects);
+ 			part_set_generic_name(desc, part_num,
+ 					      (char *)info->name);
+ 			/* sprintf(info->type, "%d, pt->sys_ind); */
+@@ -281,7 +281,7 @@ static int part_get_info_extended(struct blk_desc *desc,
+ 	for (i = 0; i < 4; i++, pt++) {
+ 		if (is_extended (pt->sys_ind)) {
+ 			lbaint_t lba_start
+-				= get_unaligned_le32 (pt->start4) + relative;
++				= get_unaligned_le32 (&pt->start_sect) + relative;
+ 
+ 			return part_get_info_extended(desc, lba_start,
+ 				 ext_part_sector == 0 ? lba_start : relative,
+@@ -356,8 +356,8 @@ static void mbr_fill_pt_entry(dos_partition_t *pt, lbaint_t start,
+ 	pt->sys_ind = sys_ind;
+ 	lba_to_chs(start, &pt->cyl, &pt->head, &pt->sector);
+ 	lba_to_chs(start + size - 1, &pt->end_cyl, &pt->end_head, &pt->end_sector);
+-	put_unaligned_le32(relative, &pt->start4);
+-	put_unaligned_le32(size, &pt->size4);
++	put_unaligned_le32(relative, &pt->start_sect);
++	put_unaligned_le32(size, &pt->nr_sects);
+ }
+ 
+ int write_mbr_partitions(struct blk_desc *dev,
+diff --git a/include/part_dos.h b/include/part_dos.h
+index 505582242281..92956d530637 100644
+--- a/include/part_dos.h
++++ b/include/part_dos.h
+@@ -30,8 +30,8 @@ typedef struct dos_partition {
+ 	unsigned char end_head;		/* end head				*/
+ 	unsigned char end_sector;	/* end sector				*/
+ 	unsigned char end_cyl;		/* end cylinder				*/
+-	unsigned char start4[4];	/* starting sector counting from 0	*/
+-	unsigned char size4[4];		/* nr of sectors in partition		*/
+-} dos_partition_t;
++	__le32 start_sect;		/* starting sector counting from 0	*/
++	__le32 nr_sects;		/* nr of sectors in partition		*/
++} __packed dos_partition_t;
+ 
+ #endif	/* _DISK_PART_DOS_H */
+
+From patchwork Thu Feb 12 20:44:57 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Javier Martinez Canillas <javierm@redhat.com>
+X-Patchwork-Id: 2196076
+X-Patchwork-Delegate: xypron.glpk@gmx.de
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256
+ header.s=mimecast20190719 header.b=BA1s+RGr;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fBnPp58C0z1xpY
+	for <incoming@patchwork.ozlabs.org>; Fri, 13 Feb 2026 07:45:50 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 7B72183D6C;
+	Thu, 12 Feb 2026 21:45:31 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.b="BA1s+RGr";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 746B383DCA; Thu, 12 Feb 2026 21:45:28 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+ DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+ RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 5530183D5D
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 21:45:25 +0100 (CET)
+Authentication-Results: phobos.denx.de; dmarc=pass (p=quarantine dis=none)
+ header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=javierm@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1770929124;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Z20qoABZ2CA0QB1vSCQ9Zi0sSxjQk09IoYggdGSkk+8=;
+ b=BA1s+RGrwDr/TEIy+o2PIceUdQqRl3qVdbvtqEiQUkRaSKapQmHGivAIRINY01taYdYbB0
+ SN8alBOJXSRwu06AVevHmTtf6r405BOObsvG+GMcgRDBuQHCQsnAJtUgYqCi4F1ZAIuZAz
+ N6cKNk/82uz1uvZZI41oQaWuxGJhLDQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-77-vmYbA8MxOhGm7H0pLYSNNQ-1; Thu, 12 Feb 2026 15:45:23 -0500
+X-MC-Unique: vmYbA8MxOhGm7H0pLYSNNQ-1
+X-Mimecast-MFC-AGG-ID: vmYbA8MxOhGm7H0pLYSNNQ_1770929122
+Received: by mail-wm1-f71.google.com with SMTP id
+ 5b1f17b1804b1-4802bb29400so1840395e9.0
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 12:45:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20230601; t=1770929121; x=1771533921;
+ h=content-transfer-encoding:mime-version:references:in-reply-to
+ :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+ :to:cc:subject:date:message-id:reply-to;
+ bh=Z20qoABZ2CA0QB1vSCQ9Zi0sSxjQk09IoYggdGSkk+8=;
+ b=YJfxqP6T8bhZW92hERHkB3MvPk/gXKjxfEpYVgs0qVihCR4KQl48eJ9lQ7qzd2rkVk
+ r+UDla75n6vV+LfUpHBbC7FonSPWupdmpR2vWwBOmL9y4ZHeHz8BIS1eXp+OKwpK08cn
+ 4904imCf9QvQZB96E606ve9scnNMXOEmSRqt7quZsfqdyxlLokK37BCn6T0IyJMCUE1R
+ SNNGpN9IQkOn0pZ4v2HlfnHYxyB/Mvue5BCQ4xxW95J9TOH1YthNhUDMcO4iDBxSxMJt
+ DGV6p5dftTDzN6Dp1ZYdmFcdTWfyBTu51yDFc/1RWyrm5bvSl+ENTZDUvDsOSBeK0Fde
+ Wx0w==
+X-Gm-Message-State: AOJu0YxMHUtABNTlkRFOdGzFu9MJ64TtLhj8xmx635ppf5CUgbUDzQbd
+ DATpja1NR293MioXJftAPiBiN16kO483XYhH8jMwzA3DqRUiWiFdlDMSFQwiJOox20C/mRqriIe
+ BqUhSMvrLOUHivcBRzM/SvtEV4D66wlHybyhjPmKegY8noi54JSCw7zwn39oR0s1IAD7lVHZV+8
+ ZTKsugLxjXj1hQKj+Ja+X8VFaaygUp9AK5MsHCGQ==
+X-Gm-Gg: AZuq6aJHG9R7bFYNPYl0wIyZrxpHmA1jiGc8EJdibVyJLZYx0dWJsRl0kM3Y3Q1K+gN
+ uDHI6RXzGRExYCn/QNNnSalbgTCK3QrVRIYJ8dPsAkQef/PJ9qr4HE0/6DsNGYEFAeYHgusivO5
+ 31BfOhcLDUSQxkbjkN13dFdaNjjE4miCouOdDyFufmHBod4lMI6JzcqMVGGF9HWqdnR9ExuxJRy
+ pYl3tFbPN8bDvjVB1cGltoY9o8XYJ/ZggskvGJ+LyI9KpA71e3NSYOtXW6Qjg6pEHxB9K9FX5eY
+ ZYYEagXvRQAyYRwofPLhtcYC7JDmUE3keLMcb5BiSkw0kPdKBzpEaix8NHCGahHxeHWMgDRK8rm
+ GoxKw18NS81D1z4Ryk8OA2LMDzJQ2M/qFXXmhasi+8Vmz6wo=
+X-Received: by 2002:a05:600c:3b8b:b0:483:43d8:8d68 with SMTP id
+ 5b1f17b1804b1-48371040571mr7338495e9.28.1770929121290;
+ Thu, 12 Feb 2026 12:45:21 -0800 (PST)
+X-Received: by 2002:a05:600c:3b8b:b0:483:43d8:8d68 with SMTP id
+ 5b1f17b1804b1-48371040571mr7338015e9.28.1770929120726;
+ Thu, 12 Feb 2026 12:45:20 -0800 (PST)
+Received: from localhost (62-151-111-63.jazzfree.ya.com. [62.151.111.63])
+ by smtp.gmail.com with ESMTPSA id
+ 5b1f17b1804b1-48370a3ecadsm3205185e9.3.2026.02.12.12.45.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Feb 2026 12:45:20 -0800 (PST)
+From: Javier Martinez Canillas <javierm@redhat.com>
+To: u-boot@lists.denx.de
+Cc: Heinrich Schuchardt <xypron.glpk@gmx.de>, eballetb@redhat.com,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Tom Rini <trini@konsulko.com>,
+ Javier Martinez Canillas <javierm@redhat.com>
+Subject: [PATCH v2 3/7] disk: part_efi: Remove redundant struct partition
+ definition
+Date: Thu, 12 Feb 2026 21:44:57 +0100
+Message-ID: <20260212204511.619392-4-javierm@redhat.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260212204511.619392-1-javierm@redhat.com>
+References: <20260212204511.619392-1-javierm@redhat.com>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: waoFTyp5Nb4lUw3OUZ2FyujC5g1lrXxsAubBNTuInkI_1770929122
+X-Mimecast-Originator: redhat.com
+content-type: text/plain; charset="US-ASCII"; x-default=true
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+Now that dos_partition_t and struct partition are identical, the duplicated
+data structure definition in the part_efi.h header can just be removed.
+
+This results in a single, shared definition for MBR partition table
+entries, instead of having the same definition in two different places.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+Reviewed-by: Tom Rini <trini@konsulko.com>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+---
+
+(no changes since v1)
+
+ disk/part_efi.c    |  4 ++--
+ include/part_efi.h | 19 +++----------------
+ 2 files changed, 5 insertions(+), 18 deletions(-)
+
+diff --git a/disk/part_efi.c b/disk/part_efi.c
+index fb1ed534f861..d8b17ec2e91a 100644
+--- a/disk/part_efi.c
++++ b/disk/part_efi.c
+@@ -51,7 +51,7 @@ static inline u32 efi_crc32(const void *buf, u32 len)
+  * Private function prototypes
+  */
+ 
+-static int pmbr_part_valid(struct partition *part);
++static int pmbr_part_valid(dos_partition_t *part);
+ static int is_pmbr_valid(legacy_mbr * mbr);
+ static int is_gpt_valid(struct blk_desc *desc, u64 lba, gpt_header *pgpt_head,
+ 			gpt_entry **pgpt_pte);
+@@ -990,7 +990,7 @@ int write_mbr_and_gpt_partitions(struct blk_desc *desc, void *buf)
+  *
+  * Returns: 1 if EFI GPT partition type is found.
+  */
+-static int pmbr_part_valid(struct partition *part)
++static int pmbr_part_valid(dos_partition_t *part)
+ {
+ 	if (part->sys_ind == EFI_PMBR_OSTYPE_EFI_GPT &&
+ 		get_unaligned_le32(&part->start_sect) == 1UL) {
+diff --git a/include/part_efi.h b/include/part_efi.h
+index fb402df6f13e..2cea50880465 100644
+--- a/include/part_efi.h
++++ b/include/part_efi.h
+@@ -18,6 +18,7 @@
+ #define _DISK_PART_EFI_H
+ 
+ #include <efi.h>
++#include <part_dos.h>
+ 
+ #define MSDOS_MBR_SIGNATURE 0xAA55
+ #define MSDOS_MBR_BOOT_CODE_SIZE 440
+@@ -77,20 +78,6 @@
+ /* linux/include/efi.h */
+ typedef u16 efi_char16_t;
+ 
+-/* based on linux/include/genhd.h */
+-struct partition {
+-	u8 boot_ind;		/* 0x80 - active */
+-	u8 head;		/* starting head */
+-	u8 sector;		/* starting sector */
+-	u8 cyl;			/* starting cylinder */
+-	u8 sys_ind;		/* What partition type */
+-	u8 end_head;		/* end head */
+-	u8 end_sector;		/* end sector */
+-	u8 end_cyl;		/* end cylinder */
+-	__le32 start_sect;	/* starting sector counting from 0 */
+-	__le32 nr_sects;	/* nr of sectors in partition */
+-} __packed;
+-
+ /* based on linux/fs/partitions/efi.h */
+ typedef struct _gpt_header {
+ 	__le64 signature;
+@@ -134,7 +121,7 @@ typedef struct _legacy_mbr {
+ 	u8 boot_code[MSDOS_MBR_BOOT_CODE_SIZE];
+ 	__le32 unique_mbr_signature;
+ 	__le16 unknown;
+-	struct partition partition_record[4];
++	dos_partition_t partition_record[4];
+ 	__le16 signature;
+ } __packed legacy_mbr;
+ 
+@@ -153,7 +140,7 @@ struct efi_partition_info {
+ 	u8 system;
+ 	u8 reserved[7];
+ 	union {
+-		struct partition mbr;
++		dos_partition_t mbr;
+ 		gpt_entry gpt;
+ 	} info;
+ } __packed;
+
+From patchwork Thu Feb 12 20:44:58 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Javier Martinez Canillas <javierm@redhat.com>
+X-Patchwork-Id: 2196078
+X-Patchwork-Delegate: xypron.glpk@gmx.de
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256
+ header.s=mimecast20190719 header.b=J5tYWIoS;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fBnPz3lP9z1xpY
+	for <incoming@patchwork.ozlabs.org>; Fri, 13 Feb 2026 07:45:59 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 6EA0B83DE0;
+	Thu, 12 Feb 2026 21:45:32 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.b="J5tYWIoS";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id C528883D5D; Thu, 12 Feb 2026 21:45:29 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+ DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+ RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 4B9CE83CB5
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 21:45:27 +0100 (CET)
+Authentication-Results: phobos.denx.de; dmarc=pass (p=quarantine dis=none)
+ header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=javierm@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1770929126;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bPjEhwKqFdW3U76c2HevInzAo01+HnpgzrClJb7Nnk8=;
+ b=J5tYWIoSAac7QMkkaFeTCGrdNfmD9F4jyvLt/zobEIB3yEXpem+8uuAz/TdKtMn7VZKd+4
+ 3IgdjJaClD8H0PRWv1BnLurHWAu9Nep/Hn6J0U+25AAKbmFMOYR0l9H0hhsqjEJaAylLI5
+ D1XXpQRiUSwIjg1TK+DI9lLjvyw6fLg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-529-0AO64U2fMIulHGSIT6_11Q-1; Thu, 12 Feb 2026 15:45:25 -0500
+X-MC-Unique: 0AO64U2fMIulHGSIT6_11Q-1
+X-Mimecast-MFC-AGG-ID: 0AO64U2fMIulHGSIT6_11Q_1770929124
+Received: by mail-wm1-f69.google.com with SMTP id
+ 5b1f17b1804b1-4806cfffca6so2095595e9.2
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 12:45:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20230601; t=1770929123; x=1771533923;
+ h=content-transfer-encoding:mime-version:references:in-reply-to
+ :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+ :to:cc:subject:date:message-id:reply-to;
+ bh=bPjEhwKqFdW3U76c2HevInzAo01+HnpgzrClJb7Nnk8=;
+ b=Mlmn2bM8QhrsLtdfnQXe4S4+JGGSgjMrUu4KMtfyk1zuU2V8Y0O0hZgnzFRlQX7vup
+ Fv+Pylodj2C26N5G4kxvbaCu+WAjVGlu/vqjFongMlrBkSFeAok8s3R3DyoR6chPlURe
+ /mzYAZBS+LHnr4j7SRlRmzttKUIYGevvlQCU9W1XYh9QkoR0aiBPxryo+ZEV0zDwVaKz
+ k2kA8CKF/LTXLgdysC1Irapyptqg3OdeUQebLIXRk9h9MVbUHMs7CYIpI9PVy4AYs9I7
+ Kym7uuBhHlD61zD9EHM1yzUP0HdG+2sTPyMauPrTgrP36f0HshUttLnpRRjUlaatmblE
+ /kYQ==
+X-Gm-Message-State: AOJu0YzXkSYpQgltNZ8LEtb86aWlBgn8aucDevLURqMwu09K6XCzfnsK
+ //LbGoqrp2VfSx1wuXt2OsV3Y3X7ABh2R4jPCR4IFokp0Tpiod3uRFVOalSYx9Yro5JmO7G7/G8
+ cULQZY1vawD0lRM6cKyd2pxI2wnjdKCu0eHXK5ggwqwtNYm8Uy/Wctilt4xWWQfygsNvYxoQohy
+ K9V86zXlM9UOGm3wC3XTBMWZ4RqJE7fpbwd9yJdQ==
+X-Gm-Gg: AZuq6aKfWA5QCLcyJi8y+zQ9cPXwrhzFGEcVA2q9MMfocDH3bK8rH0oMCdh0VVvMaSH
+ ditGUn73/JrE0K5qiz33ZAOc/wlrl/puVwvk/BTLEF2apkQuE+E77GYmTqfNlfw1ewVDDbzTKwB
+ EL5aPj5MIZfdlqSGFCqCTUAfKDwUW5C3kiyX6ffECRcXrxPadjP5FdXMH5yYAXGYpA+yda9hmK2
+ EqvQvQ7aSY8SkCTOgm3o4XhQyEeq08uhhuCax17ufxJEH6/A4+P9m3nsHFLwz3lzOqomJL750Bz
+ 0KfX5waeWcVRte4gqqHqdQX+B+jlk6tV7Cl3rwEmzWL0k+iC9ZTVwol8JWQy2tFJU9adocRRicN
+ WOj6oDjoDGCtdAGe/w3510tfA7bnlnRTorIHUxVgIKzBZTxc=
+X-Received: by 2002:a05:600c:3591:b0:47d:4047:f377 with SMTP id
+ 5b1f17b1804b1-4837105571fmr7012255e9.36.1770929123396;
+ Thu, 12 Feb 2026 12:45:23 -0800 (PST)
+X-Received: by 2002:a05:600c:3591:b0:47d:4047:f377 with SMTP id
+ 5b1f17b1804b1-4837105571fmr7011845e9.36.1770929122948;
+ Thu, 12 Feb 2026 12:45:22 -0800 (PST)
+Received: from localhost (62-151-111-63.jazzfree.ya.com. [62.151.111.63])
+ by smtp.gmail.com with ESMTPSA id
+ 5b1f17b1804b1-4836ff00332sm17387105e9.2.2026.02.12.12.45.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Feb 2026 12:45:22 -0800 (PST)
+From: Javier Martinez Canillas <javierm@redhat.com>
+To: u-boot@lists.denx.de
+Cc: Heinrich Schuchardt <xypron.glpk@gmx.de>, eballetb@redhat.com,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Tom Rini <trini@konsulko.com>,
+ Javier Martinez Canillas <javierm@redhat.com>
+Subject: [PATCH v2 4/7] disk: part_dos: Document part_get_info_extended()
+ helper function
+Date: Thu, 12 Feb 2026 21:44:58 +0100
+Message-ID: <20260212204511.619392-5-javierm@redhat.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260212204511.619392-1-javierm@redhat.com>
+References: <20260212204511.619392-1-javierm@redhat.com>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: Dyj6ufKcNBtp6Udp_DaMo04rNsitDldaoJP5Fednswk_1770929124
+X-Mimecast-Originator: redhat.com
+content-type: text/plain; charset="US-ASCII"; x-default=true
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+The function receives many parameters but these are not documented.
+Add a description for these to make it easier to follow what it does.
+
+Suggested-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+---
+
+(no changes since v1)
+
+ disk/part_dos.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/disk/part_dos.c b/disk/part_dos.c
+index 60c3d6773696..a69ad8962106 100644
+--- a/disk/part_dos.c
++++ b/disk/part_dos.c
+@@ -196,7 +196,18 @@ static void print_partition_extended(struct blk_desc *desc,
+ 	return;
+ }
+ 
+-/*  Print a partition that is relative to its Extended partition table
++/**
++ * part_get_info_extended() - get partition info for a DOS partition
++ *
++ * @desc:		Block device descriptor
++ * @ext_part_sector:	Partition table sector
++ * @relative:		Relative offset for the partition
++ * @part_num:		Current partition number
++ * @which_part:		Target partition number
++ * @info:		Returns a pointer to the partition info
++ * @disksig:		Disk signature
++ *
++ * Return:		0 on success, negative on error
+  */
+ static int part_get_info_extended(struct blk_desc *desc,
+ 				  lbaint_t ext_part_sector, lbaint_t relative,
+
+From patchwork Thu Feb 12 20:44:59 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Javier Martinez Canillas <javierm@redhat.com>
+X-Patchwork-Id: 2196079
+X-Patchwork-Delegate: xypron.glpk@gmx.de
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256
+ header.s=mimecast20190719 header.b=X64nf7Id;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fBnQ94NWtz1xpY
+	for <incoming@patchwork.ozlabs.org>; Fri, 13 Feb 2026 07:46:09 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 24F0583DEC;
+	Thu, 12 Feb 2026 21:45:36 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.b="X64nf7Id";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 6707D83D5D; Thu, 12 Feb 2026 21:45:34 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+ DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,
+ RCVD_IN_VALIDITY_RPBL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+ autolearn_force=no version=3.4.2
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 285B483DCA
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 21:45:32 +0100 (CET)
+Authentication-Results: phobos.denx.de; dmarc=pass (p=quarantine dis=none)
+ header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=javierm@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1770929130;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ff3LnV4UpKOVSsEDELJfWMsPJFExXBzVTn+uK1DlVDo=;
+ b=X64nf7Idq0IC6rq5QkAhzdoKAq1RzdGUvWBHjLjUSLDWlcok3jYxz32+Ont2J+TKWSlx0M
+ lyEf/LovfONlSBLSpomI6xe6vna4ITWMphG3frkMM4we8yg5UUSfkiSIaQqkdYKICxx3GV
+ CUYjQoiZaQ+wITnRfL9mpryGB1TMfI0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-678-61p4FokNOB2qRsK1M2e80A-1; Thu, 12 Feb 2026 15:45:29 -0500
+X-MC-Unique: 61p4FokNOB2qRsK1M2e80A-1
+X-Mimecast-MFC-AGG-ID: 61p4FokNOB2qRsK1M2e80A_1770929127
+Received: by mail-wm1-f72.google.com with SMTP id
+ 5b1f17b1804b1-4831192e66aso1746855e9.2
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 12:45:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20230601; t=1770929127; x=1771533927;
+ h=content-transfer-encoding:mime-version:references:in-reply-to
+ :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+ :to:cc:subject:date:message-id:reply-to;
+ bh=ff3LnV4UpKOVSsEDELJfWMsPJFExXBzVTn+uK1DlVDo=;
+ b=DDGCl1TE5tPqoOr2KPoOfk39RHL1ZaD8jfVdiMWF5ZLSGKR5Pmewf9p21Uq310k/m8
+ +Et7G5SMn0F1awEkR08/+9KGMtEBz8gQfDctk0DXyUzdjBT07cDlMWZfIWXtAucrR3EM
+ ZObggH/ZxYhWnolaPIoqq8FbA419RW5kbn/fJJVQcUrZIgctqIQ9qBNkVABiks00Eqfy
+ yY6wsKXo3+++q9iBEmO4u8SvASbbC/sFYwV58I+B4pUWtUAjUH9dW8k/AyCPYMK6wwK0
+ cDC5k8Ohz9u3ssDvkTd2U1ooV75oKJ6ogcd+wuAKfbnjmEKsHrOx2T0vGmx8ybHLFrp7
+ hLhw==
+X-Gm-Message-State: AOJu0YxIREPOvTHbSafr0oKr4MzjXub6LmsEMMujdEC2s9Y2GUoQ3a8E
+ NLfIciRr9WpTUOZBco+qBMv9SFrQyEWyi5jAIaYzeDpy7QOvZxmGM03Fwa/i55w3JQ6KNNRBk3i
+ PiuaHJQkjHvD+GA9cChOrz3xY9xepOnu85tqA5XCSMJEJOjWyU7EkTIJul3kR6LUH3c2Vjpj1ES
+ M7NIFd8wutqk/V0zTZKICQ8JzuTAs8wtRFWpsBbQ==
+X-Gm-Gg: AZuq6aJNbfMvAL3+LMrE/y4kxFd4rSG9MJmF+VF7pDOLR07CPE5m9mKi5OLfna9jYj0
+ Pb+sGmubx66I/F2nCdm/TcxEMQTRGWKEhHaHUVAFCnkmoaMvYLxU+p4kWUeHZ8lzk2DTPNXPmBr
+ EFRhPTL6vQ2eRMmXx/71jifHSX8g7OpFJVcBprqwkyoFLfr4Dfb0iJ3QBalpV7ecf+rdXcwqW5u
+ TG9ZrqLNsT4LHqSP6WmYSdlvyeibEeENLfpzl1UmMPlEF7DaAUQpzqDhU+HVb3+fqtD60MsaiIJ
+ mgW+FZrodLaL0cwGEMcJymamGJdIj7M/rGKnMFRwxiUtKV8aYVMppk+iADMVQy4nwvawjcTj2eO
+ 9CCsMFOABA/DhhV5kFsWSxHVFce1cFc7hMlLUxOPOlbABMKM=
+X-Received: by 2002:a05:600c:8b4c:b0:480:5678:1fdd with SMTP id
+ 5b1f17b1804b1-4837105240amr5961245e9.12.1770929126639;
+ Thu, 12 Feb 2026 12:45:26 -0800 (PST)
+X-Received: by 2002:a05:600c:8b4c:b0:480:5678:1fdd with SMTP id
+ 5b1f17b1804b1-4837105240amr5960775e9.12.1770929126070;
+ Thu, 12 Feb 2026 12:45:26 -0800 (PST)
+Received: from localhost (62-151-111-63.jazzfree.ya.com. [62.151.111.63])
+ by smtp.gmail.com with ESMTPSA id
+ 5b1f17b1804b1-4835dcfaae1sm112461635e9.10.2026.02.12.12.45.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Feb 2026 12:45:24 -0800 (PST)
+From: Javier Martinez Canillas <javierm@redhat.com>
+To: u-boot@lists.denx.de
+Cc: Heinrich Schuchardt <xypron.glpk@gmx.de>, eballetb@redhat.com,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Tom Rini <trini@konsulko.com>,
+ Javier Martinez Canillas <javierm@redhat.com>,
+ Casey Connolly <casey.connolly@linaro.org>,
+ Jan Kiszka <jan.kiszka@siemens.com>, Javier Tia <javier.tia@linaro.org>,
+ Rasmus Villemoes <ravi@prevas.dk>,
+ Varadarajan Narayanan <quic_varada@quicinc.com>
+Subject: [PATCH v2 5/7] disk: part_dos: Refactor to allow retrieving raw MBR
+ partition data
+Date: Thu, 12 Feb 2026 21:44:59 +0100
+Message-ID: <20260212204511.619392-6-javierm@redhat.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260212204511.619392-1-javierm@redhat.com>
+References: <20260212204511.619392-1-javierm@redhat.com>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: Zs6NXSgdnPvAWNkwYY8acCGlkSTO_JLJJjyY6Cc_c5o_1770929127
+X-Mimecast-Originator: redhat.com
+content-type: text/plain; charset="US-ASCII"; x-default=true
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+Refactor the part_get_info_extended() helper function (which already
+recursively traverses DOS partitions) to optionally return the raw MBR
+partition structure (dos_partition_t).
+
+This allows other subsystems, such as EFI, to retrieve the partition
+details in the legacy MBR format.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+---
+
+(no changes since v1)
+
+ disk/part_dos.c | 66 ++++++++++++++++++++++++++++++-------------------
+ include/part.h  | 14 +++++++++++
+ 2 files changed, 55 insertions(+), 25 deletions(-)
+
+diff --git a/disk/part_dos.c b/disk/part_dos.c
+index a69ad8962106..4e1d01b2f21e 100644
+--- a/disk/part_dos.c
++++ b/disk/part_dos.c
+@@ -204,7 +204,8 @@ static void print_partition_extended(struct blk_desc *desc,
+  * @relative:		Relative offset for the partition
+  * @part_num:		Current partition number
+  * @which_part:		Target partition number
+- * @info:		Returns a pointer to the partition info
++ * @info:		Returns partition information (optional)
++ * @mbr:		Returns MBR partition entry (optional)
+  * @disksig:		Disk signature
+  *
+  * Return:		0 on success, negative on error
+@@ -212,7 +213,9 @@ static void print_partition_extended(struct blk_desc *desc,
+ static int part_get_info_extended(struct blk_desc *desc,
+ 				  lbaint_t ext_part_sector, lbaint_t relative,
+ 				  int part_num, int which_part,
+-				  struct disk_partition *info, uint disksig)
++				  struct disk_partition *info,
++				  dos_partition_t *mbr,
++				  uint disksig)
+ {
+ 	ALLOC_CACHE_ALIGN_BUFFER(unsigned char, buffer, desc->blksz);
+ 	struct disk_partition wdinfo = { 0 };
+@@ -243,9 +246,11 @@ static int part_get_info_extended(struct blk_desc *desc,
+ 	if (CONFIG_IS_ENABLED(PARTITION_UUIDS) && !ext_part_sector)
+ 		disksig = get_unaligned_le32(&buffer[DOS_PART_DISKSIG_OFFSET]);
+ 
+-	ret = part_get_info_whole_disk(desc, &wdinfo);
+-	if (ret)
+-		return ret;
++	if (info) {
++		ret = part_get_info_whole_disk(desc, &wdinfo);
++		if (ret)
++			return ret;
++	}
+ 
+ 	/* Print all primary/logical partitions */
+ 	pt = (dos_partition_t *) (buffer + DOS_PART_TBL_OFFSET);
+@@ -258,25 +263,29 @@ static int part_get_info_extended(struct blk_desc *desc,
+ 		    (pt->sys_ind != 0) &&
+ 		    (part_num == which_part) &&
+ 		    (ext_part_sector == 0 || is_extended(pt->sys_ind) == 0)) {
+-			if (wdinfo.blksz > DOS_PART_DEFAULT_SECTOR)
+-				info->blksz = wdinfo.blksz;
+-			else
+-				info->blksz = DOS_PART_DEFAULT_SECTOR;
+-			info->start = (lbaint_t)(ext_part_sector +
+-					get_unaligned_le32(&pt->start_sect));
+-			info->size  = (lbaint_t)get_unaligned_le32(&pt->nr_sects);
+-			part_set_generic_name(desc, part_num,
+-					      (char *)info->name);
+-			/* sprintf(info->type, "%d, pt->sys_ind); */
+-			strcpy((char *)info->type, "U-Boot");
+-			info->bootable = get_bootable(pt);
+-			if (CONFIG_IS_ENABLED(PARTITION_UUIDS)) {
+-				char str[12];
+-
+-				sprintf(str, "%08x-%02x", disksig, part_num);
+-				disk_partition_set_uuid(info, str);
++			if (info) {
++				if (wdinfo.blksz > DOS_PART_DEFAULT_SECTOR)
++					info->blksz = wdinfo.blksz;
++				else
++					info->blksz = DOS_PART_DEFAULT_SECTOR;
++				info->start = (lbaint_t)(ext_part_sector +
++							 get_unaligned_le32(&pt->start_sect));
++				info->size  = (lbaint_t)get_unaligned_le32(&pt->nr_sects);
++				part_set_generic_name(desc, part_num,
++						      (char *)info->name);
++				/* sprintf(info->type, "%d, pt->sys_ind); */
++				strcpy((char *)info->type, "U-Boot");
++				info->bootable = get_bootable(pt);
++				if (CONFIG_IS_ENABLED(PARTITION_UUIDS)) {
++					char str[12];
++
++					sprintf(str, "%08x-%02x", disksig, part_num);
++					disk_partition_set_uuid(info, str);
++				}
++				info->sys_ind = pt->sys_ind;
+ 			}
+-			info->sys_ind = pt->sys_ind;
++			if (mbr)
++				memcpy(mbr, pt, sizeof(*mbr));
+ 			return 0;
+ 		}
+ 
+@@ -296,7 +305,8 @@ static int part_get_info_extended(struct blk_desc *desc,
+ 
+ 			return part_get_info_extended(desc, lba_start,
+ 				 ext_part_sector == 0 ? lba_start : relative,
+-				 part_num, which_part, info, disksig);
++						      part_num, which_part, info,
++						      mbr, disksig);
+ 		}
+ 	}
+ 
+@@ -328,7 +338,13 @@ static void __maybe_unused part_print_dos(struct blk_desc *desc)
+ static int __maybe_unused part_get_info_dos(struct blk_desc *desc, int part,
+ 					    struct disk_partition *info)
+ {
+-	return part_get_info_extended(desc, 0, 0, 1, part, info, 0);
++	return part_get_info_extended(desc, 0, 0, 1, part, info, NULL, 0);
++}
++
++int __maybe_unused part_get_mbr(struct blk_desc *desc, int part,
++				dos_partition_t *mbr)
++{
++	return part_get_info_extended(desc, 0, 0, 1, part, NULL, mbr, 0);
+ }
+ 
+ int is_valid_dos_buf(void *buf)
+diff --git a/include/part.h b/include/part.h
+index daebbbc2e68f..aed089d00f64 100644
+--- a/include/part.h
++++ b/include/part.h
+@@ -704,6 +704,20 @@ int write_mbr_partitions(struct blk_desc *dev,
+ int layout_mbr_partitions(struct disk_partition *p, int count,
+ 			  lbaint_t total_sectors);
+ 
++/**
++ * part_get_mbr() - get the MBR partition record of a partition
++ *
++ * This function reads the MBR partition record for a given block
++ * device and partition number.
++ *
++ * @desc:	block device descriptor
++ * @part:	partition number for which to return the partition record
++ * @mbr:	MBR partition record
++ *
++ * Return:	0 on success, otherwise error
++ */
++int part_get_mbr(struct blk_desc *desc, int part, dos_partition_t *mbr);
++
+ #endif
+ 
+ #if CONFIG_IS_ENABLED(PARTITIONS)
+
+From patchwork Thu Feb 12 20:45:00 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Javier Martinez Canillas <javierm@redhat.com>
+X-Patchwork-Id: 2196081
+X-Patchwork-Delegate: xypron.glpk@gmx.de
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256
+ header.s=mimecast20190719 header.b=CXh1R16n;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fBnQL1mV3z1xpY
+	for <incoming@patchwork.ozlabs.org>; Fri, 13 Feb 2026 07:46:18 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 6A7A983E23;
+	Thu, 12 Feb 2026 21:45:37 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.b="CXh1R16n";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 25BE383DCA; Thu, 12 Feb 2026 21:45:35 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+ DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+ RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 1AAD383E0E
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 21:45:32 +0100 (CET)
+Authentication-Results: phobos.denx.de; dmarc=pass (p=quarantine dis=none)
+ header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=javierm@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1770929131;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nNjQvj1OQyXmpQck0MdOvmZkbrrtxuGX+BU9idYKd1w=;
+ b=CXh1R16nLtuvQM4hrBIxjhSHIyoL+FE+c0pSw99A6IXlI6xmOuQW9KoKDT9CxbM2o6l64i
+ Lld3X+nt3JiIYD6BZ2S8YypCfFIzLQigemEh0BLeTQZcyO5OfD5E2SudI12AeMdoiBNHok
+ QVkd2nQGhdXlUG0Ng4359SXSndFIUQY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-QlI7NAj-NfijxFR_h3kSLw-1; Thu, 12 Feb 2026 15:45:30 -0500
+X-MC-Unique: QlI7NAj-NfijxFR_h3kSLw-1
+X-Mimecast-MFC-AGG-ID: QlI7NAj-NfijxFR_h3kSLw_1770929129
+Received: by mail-wm1-f71.google.com with SMTP id
+ 5b1f17b1804b1-4836abfc742so1508575e9.0
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 12:45:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20230601; t=1770929129; x=1771533929;
+ h=content-transfer-encoding:mime-version:references:in-reply-to
+ :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+ :to:cc:subject:date:message-id:reply-to;
+ bh=nNjQvj1OQyXmpQck0MdOvmZkbrrtxuGX+BU9idYKd1w=;
+ b=llcDwYegjoIEhn6PZnNJcdvuwebTuLH2QMwq8O3yUaL0cMKevQMQUxVBuZQAWK94IL
+ XzQXGWudh1uJkKFwaa4/Mc5Tb27C1FnyRyLsLdyra+3pVC2/RPHx8CSfAyoxJEWDj29f
+ AoP64ikpFEfJqx7pS6GXpxNv33o/aTpU6csxwxwcgm24uhnMW12CltxnRqRvfTPkoI7g
+ IEOwVHbkXzScshhFRsrvj1KMBODo0sUXpKVUkkTzYF+J8Eht5wuEfx2W/YRA/YE6N/3M
+ 4jpK7jRRSctl4kbkU4xj6GqrOz8w/s5pBh4W+ub+7LCaBvYXnXwju5n11WHK90Rztp8y
+ aB8w==
+X-Gm-Message-State: AOJu0Yx3ZBOu12CkiWurvKY9fl93bNeUIvbPsQmCpE3b7MxLUfLQ1PUu
+ yItOTwCveeMk3qyPFi4epHE1jfG4mdbirwxzjYQGLwPS2zcotpdWiEbBW9qBS5dq0m61pbF8LQj
+ nIodT1ebZL2GQm+6qvVd58otQRnlhQsKQ8gf/OBT/ijwa3Rx8lWe5p4AsGXEgnGRt5qVMYCX5dj
+ jvFUA5HJHIcHBJB0NM7s6HhL30fEKmpyq93tKIzQ==
+X-Gm-Gg: AZuq6aKhKITvZU6/PVQqTrBpXNKigbnRw2yx1L7X49i14AUzii76qmgVxmhwRaZyj0W
+ l98JiHxoPKCAFnd9v/g83awH/o1zF++zgoRnhiK1ffrfpiRKimHo88HpJ5yS5RFHVsfqe7v0nhc
+ O9nU2g7wy72tL/zah9GtWej6kCRaJr2/3xtqPer4NSa7WkrjsZd8DCKoee8JacZFAyqxEFDAF9D
+ /kUPpxG17Y5KwwLwMR1X7Lqr0NAgBvrIqFXXE1crXIHDZT3mor5V3pg0h6bJpucD7c5TDFUE8U2
+ qSmMEJXLjsniInklMOeHzNafr/a3we6fYBXUWndJB2IQdVRyt7n2082dsNerHw4c1iqI0ohL9/0
+ PFpxmC4y7zqUNKGSBX7tVGe+rQavVb7EOEcTS1olKUMOdJdw=
+X-Received: by 2002:a05:600c:1e24:b0:471:1765:839c with SMTP id
+ 5b1f17b1804b1-4837103de29mr6040675e9.20.1770929128770;
+ Thu, 12 Feb 2026 12:45:28 -0800 (PST)
+X-Received: by 2002:a05:600c:1e24:b0:471:1765:839c with SMTP id
+ 5b1f17b1804b1-4837103de29mr6040365e9.20.1770929128288;
+ Thu, 12 Feb 2026 12:45:28 -0800 (PST)
+Received: from localhost (62-151-111-63.jazzfree.ya.com. [62.151.111.63])
+ by smtp.gmail.com with ESMTPSA id
+ 5b1f17b1804b1-48371a49dc7sm790085e9.31.2026.02.12.12.45.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Feb 2026 12:45:27 -0800 (PST)
+From: Javier Martinez Canillas <javierm@redhat.com>
+To: u-boot@lists.denx.de
+Cc: Heinrich Schuchardt <xypron.glpk@gmx.de>, eballetb@redhat.com,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Tom Rini <trini@konsulko.com>,
+ Javier Martinez Canillas <javierm@redhat.com>,
+ Maks Mishin <maks.mishinfz@gmail.com>, Simon Glass <sjg@chromium.org>
+Subject: [PATCH v2 6/7] efi_loader: disk: Extend EFI_PARTITION_INFO_PROTOCOL
+ to support MBR
+Date: Thu, 12 Feb 2026 21:45:00 +0100
+Message-ID: <20260212204511.619392-7-javierm@redhat.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260212204511.619392-1-javierm@redhat.com>
+References: <20260212204511.619392-1-javierm@redhat.com>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: We4wNEbtQuTUTq6Fkgi3HWr3Fx0Twiws4fhF79FLAjg_1770929129
+X-Mimecast-Originator: redhat.com
+content-type: text/plain; charset="US-ASCII"; x-default=true
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+The EFI_PARTITION_INFO_PROTOCOL provides detailed information about
+partitions. The UEFI specification mentions that both GPT and MBR
+partition schemes are supported, but the U-Boot implementation only
+supports the former.
+
+This can cause compatibility issues for platforms whose boot ROM only
+supports MBR. This change adds support for MBR partition tables to
+the protocol, making U-Boot compatible with systems that require a
+legacy MBR table.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+---
+
+(no changes since v1)
+
+ lib/efi_loader/efi_disk.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/lib/efi_loader/efi_disk.c b/lib/efi_loader/efi_disk.c
+index 130c4db9606f..f8a57539ec61 100644
+--- a/lib/efi_loader/efi_disk.c
++++ b/lib/efi_loader/efi_disk.c
+@@ -475,9 +475,12 @@ static efi_status_t efi_disk_add_dev(
+ #if CONFIG_IS_ENABLED(DOS_PARTITION)
+ 		case PART_TYPE_DOS:
+ 			info->type = PARTITION_TYPE_MBR;
+-
+-			/* TODO: implement support for MBR partition types */
+-			log_debug("EFI_PARTITION_INFO_PROTOCOL doesn't support MBR\n");
++			ret = part_get_mbr(desc, part, &info->info.mbr);
++			if (ret) {
++				log_debug("get MBR for part %d failed %ld\n",
++					  part, ret);
++				goto error;
++			}
+ 			break;
+ #endif
+ 		default:
+
+From patchwork Thu Feb 12 20:45:01 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Javier Martinez Canillas <javierm@redhat.com>
+X-Patchwork-Id: 2196083
+X-Patchwork-Delegate: xypron.glpk@gmx.de
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256
+ header.s=mimecast20190719 header.b=K6JFFWCC;
+	dkim-atps=neutral
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fBnQW1B8dz1xpY
+	for <incoming@patchwork.ozlabs.org>; Fri, 13 Feb 2026 07:46:27 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 231CA83DCA;
+	Thu, 12 Feb 2026 21:45:40 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Authentication-Results: phobos.denx.de;
+	dkim=pass (1024-bit key;
+ unprotected) header.d=redhat.com header.i=@redhat.com header.b="K6JFFWCC";
+	dkim-atps=neutral
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 3141883CB5; Thu, 12 Feb 2026 21:45:38 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+ DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+ RCVD_IN_VALIDITY_CERTIFIED_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.2
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 1B34B83DCA
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 21:45:35 +0100 (CET)
+Authentication-Results: phobos.denx.de; dmarc=pass (p=quarantine dis=none)
+ header.from=redhat.com
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=javierm@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1770929134;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Uzth/JYhZQo4r4//T8emgWZVZm/bXIkkXnaaipOOtQA=;
+ b=K6JFFWCCuKeI1ZKoYJUObvYuFU3fFf5MA5CmbK8sWJhpN9YSoNda1XGpaGgAgsBw0bdAjH
+ MnCxyKn4ZABnQsOIdMa0q6s6/gnN96vs75++V36hOfoyRStRE8T9+asbRMxveYPdRMyvQs
+ 1o6W+E+jS3HIy6G8ypSoFXaERQubEQE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-575-DyRrz8U1Nc2Dhf_C2-u59Q-1; Thu, 12 Feb 2026 15:45:33 -0500
+X-MC-Unique: DyRrz8U1Nc2Dhf_C2-u59Q-1
+X-Mimecast-MFC-AGG-ID: DyRrz8U1Nc2Dhf_C2-u59Q_1770929132
+Received: by mail-wm1-f71.google.com with SMTP id
+ 5b1f17b1804b1-4836fbfa35cso1540525e9.1
+ for <u-boot@lists.denx.de>; Thu, 12 Feb 2026 12:45:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20230601; t=1770929132; x=1771533932;
+ h=content-transfer-encoding:mime-version:references:in-reply-to
+ :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+ :to:cc:subject:date:message-id:reply-to;
+ bh=Uzth/JYhZQo4r4//T8emgWZVZm/bXIkkXnaaipOOtQA=;
+ b=cgBeHneczx+FwIfm03Jo06/xJatukg23+ShOHMzh2/LvMzSQ1oMpQ9enwH1ThJg/xH
+ 2FztTNsExFJTliM9no2oKUdotF8MRbQzN73VD7/aZT4wGTSXAZjIhB3MTzPbabfdTxl+
+ B+uh2qbe9xmpWa4lSzVQUAPwqqNzRAfpeKeA7z48ZbJN/oBKJCs2k5QJfWbMM6ZRRtvl
+ 2sIraDTmA2s6dNy67qh8HQspWYcnLDUT1/uwGkOKUwPAa7m6uaVMoUiT8/AB+38YlXWK
+ ophRGI1c+eJIDtVDWiLVZ/NrOCMnBaxO5W3NBL/0tyiqoMyFx+WrAPgR1yRI0SjvHycH
+ A6iQ==
+X-Gm-Message-State: AOJu0Yx3jZd3LowLsdIjs3w22rew9I2MKfW9uETZbGjphhXvPP415xL1
+ OKn0EUOXxKpEGejTnHi5Lnx6AOlAYjXNQdUn716on/PFBp8FloBE8q2+IwnLmaJhATcWNiCG0MZ
+ bk4fFcWVoBUAGyQNkxUVtu5n7K3lleJ5QfzDAyTRBLT/iPtnDTjwHTyqQfQDpkmAHMn32gPH7jX
+ Wz7jMMjBrdUEEkcx0nCyOl3n5hbVVoxpmKPrtRzA==
+X-Gm-Gg: AZuq6aLWggZDCdxC2AaYYJlCzv3JCZKWEeh+i/o7hZ4xIdVs90toqoqf/b9kIsmXmwk
+ RZPFZSOHMb3nvGTWF8uQmNzVbhWbBtW2g1n5b7nlZ5l7zsWoslgmbAmLz0Bb++pf2giKVCUW+jE
+ 6+c3KKt4mseNjUVfSJj2tj1ZVn7o7tsGe8sL9bP5WhPyPRN7TLjLvvfTwCY8ZMJWZWeP0OX0zYG
+ 5nIqyd/2X0ECtdfmC73HQ42BeE7xkvyiLyg15/3t/2cyIkYC4wjeeYKaCSzLc+ytAyxgpW7trXx
+ Va0O+YRFnMhZem5b8/hVwGMK/48AdIhtb06vUWa0OLJQ1RrDzNlyr5iM6Mm8VzmJlZqjLYPK45E
+ 9NcemVchEtGiXKLKXgzW7mqUsTGnzqNq8GD6ESrhlJ0l6i68=
+X-Received: by 2002:a05:600c:8119:b0:480:4d39:84b3 with SMTP id
+ 5b1f17b1804b1-48370e175c2mr5638335e9.6.1770929131799;
+ Thu, 12 Feb 2026 12:45:31 -0800 (PST)
+X-Received: by 2002:a05:600c:8119:b0:480:4d39:84b3 with SMTP id
+ 5b1f17b1804b1-48370e175c2mr5638055e9.6.1770929131312;
+ Thu, 12 Feb 2026 12:45:31 -0800 (PST)
+Received: from localhost (62-151-111-63.jazzfree.ya.com. [62.151.111.63])
+ by smtp.gmail.com with ESMTPSA id
+ 5b1f17b1804b1-48370ac3564sm6753225e9.5.2026.02.12.12.45.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Feb 2026 12:45:29 -0800 (PST)
+From: Javier Martinez Canillas <javierm@redhat.com>
+To: u-boot@lists.denx.de
+Cc: Heinrich Schuchardt <xypron.glpk@gmx.de>, eballetb@redhat.com,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Tom Rini <trini@konsulko.com>,
+ Javier Martinez Canillas <javierm@redhat.com>
+Subject: [PATCH v2 7/7] efi_selftest: Enhance MBR test for
+ PARTITION_INFO_PROTOCOL
+Date: Thu, 12 Feb 2026 21:45:01 +0100
+Message-ID: <20260212204511.619392-8-javierm@redhat.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260212204511.619392-1-javierm@redhat.com>
+References: <20260212204511.619392-1-javierm@redhat.com>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: yunYq1YIsh16Z4DQJL5hOi7pdkGhTA9a43HFld0F1eg_1770929132
+X-Mimecast-Originator: redhat.com
+content-type: text/plain; charset="US-ASCII"; x-default=true
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+The EFI_PARTITION_INFO_PROTOCOL test was added before the protocol fully
+supported MBR partitions. As a result, it lacked specific checks for the
+content of the raw MBR partition record.
+
+Now that MBR support has been implemented, enhance the selftest to provide
+coverage for the MBR entries too.
+
+This verifies that the protocol correctly reads and exposes MBR partition
+records and prevents this functionality to regress due future changes.
+
+Signed-off-by: Javier Martinez Canillas <javierm@redhat.com>
+Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Reviewed-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+---
+
+(no changes since v1)
+
+ lib/efi_selftest/efi_selftest_block_device.c | 26 ++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/lib/efi_selftest/efi_selftest_block_device.c b/lib/efi_selftest/efi_selftest_block_device.c
+index f145e58a267a..9c4be834eebb 100644
+--- a/lib/efi_selftest/efi_selftest_block_device.c
++++ b/lib/efi_selftest/efi_selftest_block_device.c
+@@ -19,6 +19,7 @@
+ #include "efi_selftest_disk_image.h"
+ #include <asm/cache.h>
+ #include <part_efi.h>
++#include <part.h>
+ 
+ /* Block size of compressed disk image */
+ #define COMPRESSED_DISK_IMAGE_BLOCK_SIZE 8
+@@ -319,6 +320,25 @@ static int execute(void)
+ 	u64 pos;
+ 	char block_io_aligned[1 << LB_BLOCK_SIZE] __aligned(1 << LB_BLOCK_SIZE);
+ 
++	/*
++	 * The test disk image is defined in efi_selftest_disk_image.h,
++	 * it contains a single FAT12 partition of 127 sectors size.
++	 */
++	static const dos_partition_t mbr_expected = {
++		.boot_ind = 0x00,
++		.head = 0x00,
++		.sector = 0x02,
++		.cyl = 0x00,
++		.sys_ind = 0x01, /* FAT12 */
++		.end_head = 0x02,
++		.end_sector = 0x02,
++		.end_cyl = 0x00,
++		/* LBA 1 */
++		.start_sect = cpu_to_le32(1),
++		/* Size 127 sectors (0x7f) */
++		.nr_sects = cpu_to_le32(127),
++	};
++
+ 	/* Connect controller to virtual disk */
+ 	ret = boottime->connect_controller(disk_handle, NULL, NULL, 1);
+ 	if (ret != EFI_SUCCESS) {
+@@ -405,6 +425,12 @@ static int execute(void)
+ 		return EFI_ST_FAILURE;
+ 	}
+ 
++	/* Compare the obtained MBR with the expected one for the test partition */
++	if (memcmp(&part_info->info.mbr, &mbr_expected, sizeof(mbr_expected))) {
++		efi_st_error("MBR partition record mismatch\n");
++		return EFI_ST_FAILURE;
++	}
++
+ 	/* Open the simple file system protocol */
+ 	ret = boottime->open_protocol(handle_partition,
+ 				      &guid_simple_file_system_protocol,

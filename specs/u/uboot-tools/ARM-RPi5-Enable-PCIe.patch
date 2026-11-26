@@ -1,0 +1,2027 @@
+From patchwork Fri Feb 27 15:23:26 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202409
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsY408lKz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:23:35 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 15CF383EB3;
+	Fri, 27 Feb 2026 16:23:33 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id CD42E83E8E; Fri, 27 Feb 2026 16:23:31 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 2240A83CDF
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:29 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id EAEE468B05; Fri, 27 Feb 2026 16:23:26 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 1/9] ARM: bcm283x: Add bcm2712 PCIe memory window
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152326.EAEE468B05@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:26 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Torsten Duwe <duwe@suse.de>
+
+Add a mapping region for the PCIe bus address spaces to the BCM2712
+memory controller setup. Generously merging the PCIe address spaces
+works sufficiently well for a boot loader.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ arch/arm/mach-bcm283x/init.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-bcm283x/init.c b/arch/arm/mach-bcm283x/init.c
+index 7a1de22e0ae..7a2faaa4de6 100644
+--- a/arch/arm/mach-bcm283x/init.c
++++ b/arch/arm/mach-bcm283x/init.c
+@@ -18,7 +18,7 @@
+ #ifdef CONFIG_ARM64
+ #include <asm/armv8/mmu.h>
+ 
+-#define MEM_MAP_MAX_ENTRIES (4)
++#define MEM_MAP_MAX_ENTRIES (5)
+ 
+ static struct mm_region bcm283x_mem_map[MEM_MAP_MAX_ENTRIES] = {
+ 	{
+@@ -83,6 +83,14 @@ static struct mm_region bcm2712_mem_map[MEM_MAP_MAX_ENTRIES] = {
+ 		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
+ 			 PTE_BLOCK_NON_SHARE |
+ 			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
++	}, {
++		/* Whole PCIe section */
++		.virt = 0x1800000000UL,
++		.phys = 0x1800000000UL,
++		.size = 0x0800000000UL,
++		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
++			 PTE_BLOCK_NON_SHARE |
++			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
+ 	}, {
+ 		/* SoC bus */
+ 		.virt = 0x107c000000UL,
+
+From patchwork Fri Feb 27 15:23:29 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202410
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsYB682xz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:23:42 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 5E6F583E88;
+	Fri, 27 Feb 2026 16:23:34 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id A94A183EE8; Fri, 27 Feb 2026 16:23:33 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id CBDFA83E88
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:30 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 7C72C68BFE; Fri, 27 Feb 2026 16:23:29 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 2/9] pci: brcmstb: Fix PCIe bus numbers
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152329.7C72C68BFE@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:29 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Andrea della Porta <andrea.porta@suse.com>
+
+The linux kernel assigns a new domain for every Root Complex where bus
+numbering starts from 0 for each domain. U-Boot does not have domains
+and uses a flattened bus numbering scheme instead. This means that any
+device or bridge on the second enumerated RC will receive a bus number
+equal to the last assigned one +1. This bus number contributes to the
+address written into the index register, which will select the
+configuration space to be read. Compensate for this contribution by
+subtracting the base bus number.
+
+Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ drivers/pci/pcie_brcmstb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index f089c48f028..47c0802df23 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -125,7 +125,7 @@ static int brcm_pcie_config_address(const struct udevice *dev, pci_dev_t bdf,
+ 				    uint offset, void **paddress)
+ {
+ 	struct brcm_pcie *pcie = dev_get_priv(dev);
+-	unsigned int pci_bus = PCI_BUS(bdf);
++	unsigned int pci_bus = PCI_BUS(bdf) - dev_seq(dev);
+ 	unsigned int pci_dev = PCI_DEV(bdf);
+ 	unsigned int pci_func = PCI_FUNC(bdf);
+ 	int idx;
+
+From patchwork Fri Feb 27 15:23:31 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202411
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsYM0tXtz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:23:51 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 98AF483E96;
+	Fri, 27 Feb 2026 16:23:36 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id C1F7983EF9; Fri, 27 Feb 2026 16:23:34 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id AAFE683E76
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:32 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 9A6CD68C7B; Fri, 27 Feb 2026 16:23:31 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 3/9] pci: brcmstb: Support different variants using a cfg
+ struct
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152331.9A6CD68C7B@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:31 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Torsten Duwe <duwe@suse.de>
+
+The Linux kernel driver already had support for multiple hardware
+variants when the bcm2712 was added (see e.g. linux commit
+10dbedad3c818 which is the last in a longer set of changes). This
+patch brings in this required infrastructure and adds a
+differentiation between 2711 and 2712 register layouts on top.
+It also accounts for the bcm2712 reset logic quirk that the software
+init bit must not remain set, albeit the reset control location is
+only corrected in patch#6 of this series.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ .../mach-bcm283x/include/mach/acpi/bcm2711.h  |   6 +-
+ drivers/pci/pcie_brcmstb.c                    | 122 ++++++++++++++++--
+ 2 files changed, 114 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm/mach-bcm283x/include/mach/acpi/bcm2711.h b/arch/arm/mach-bcm283x/include/mach/acpi/bcm2711.h
+index a86875b1833..6eb5389b858 100644
+--- a/arch/arm/mach-bcm283x/include/mach/acpi/bcm2711.h
++++ b/arch/arm/mach-bcm283x/include/mach/acpi/bcm2711.h
+@@ -70,6 +70,7 @@
+ #define PCIE_MISC_RC_BAR2_CONFIG_HI               0x4038
+ #define PCIE_MISC_RC_BAR3_CONFIG_LO               0x403c
+ #define  RC_BAR3_CONFIG_LO_SIZE_MASK                0x1f
++#define PCIE_MISC_PCIE_CTRL			  0x4064
+ #define PCIE_MISC_PCIE_STATUS                     0x4068
+ #define  STATUS_PCIE_PORT_MASK                      0x80
+ #define  STATUS_PCIE_PORT_SHIFT                        7
+@@ -107,7 +108,10 @@
+ #define PCIE_MSI_INTR2_MASK_SET               0x4510
+ 
+ #define PCIE_RGR1_SW_INIT_1                   0x9210
+-#define PCIE_EXT_CFG_INDEX                    0x9000
++#define  RGR1_SW_INIT_1_PERST_MASK			0x1
++#define  RGR1_SW_INIT_1_PERSTB_MASK			0x4
++#define  RGR1_SW_INIT_1_INIT_MASK			0x2
++
+ /* A small window pointing at the ECAM of the device selected by CFG_INDEX */
+ #define PCIE_EXT_CFG_DATA                     0x8000
+ 
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index 47c0802df23..261f8790528 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -49,6 +49,28 @@
+ #define SSC_STATUS_PLL_LOCK_MASK			0x800
+ #define SSC_STATUS_PLL_LOCK_SHIFT			11
+ 
++enum {
++	RGR1_SW_INIT_1,
++	EXT_CFG_INDEX,
++	EXT_CFG_DATA,
++	PCIE_HARD_DEBUG,
++};
++
++enum brcm_pcie_type {
++	BCM2711,
++	BCM2712
++};
++
++struct brcm_pcie;
++
++struct brcm_pcie_cfg_data {
++	const int *offsets;
++	const enum brcm_pcie_type type;
++	void (*perst_set)(struct brcm_pcie *pcie, u32 val);
++	void (*bridge_sw_init_set)(struct brcm_pcie *pcie, u32 val);
++	bool (*rc_mode)(struct brcm_pcie *pcie);
++};
++
+ /**
+  * struct brcm_pcie - the PCIe controller state
+  * @base: Base address of memory mapped IO registers of the controller
+@@ -61,6 +83,7 @@ struct brcm_pcie {
+ 
+ 	int			gen;
+ 	bool			ssc;
++	const struct brcm_pcie_cfg_data *pcie_cfg;
+ };
+ 
+ /**
+@@ -104,6 +127,36 @@ static bool brcm_pcie_rc_mode(struct brcm_pcie *pcie)
+ 	return (val & STATUS_PCIE_PORT_MASK) >> STATUS_PCIE_PORT_SHIFT;
+ }
+ 
++static void brcm_pcie_perst_set_generic(struct brcm_pcie *pcie, u32 val)
++{
++	if (val)
++		setbits_le32(pcie->base + pcie->pcie_cfg->offsets[RGR1_SW_INIT_1],
++			     RGR1_SW_INIT_1_PERST_MASK);
++	else
++		clrbits_le32(pcie->base + pcie->pcie_cfg->offsets[RGR1_SW_INIT_1],
++			     RGR1_SW_INIT_1_PERST_MASK);
++}
++
++static void brcm_pcie_perst_set_2712(struct brcm_pcie *pcie, u32 val)
++{
++	u32 tmp;
++
++	/* Perst bit has moved and assert value is 0 */
++	tmp = readl(pcie->base + PCIE_MISC_PCIE_CTRL);
++	u32p_replace_bits(&tmp, !val, RGR1_SW_INIT_1_PERSTB_MASK);
++	writel(tmp, pcie->base + PCIE_MISC_PCIE_CTRL);
++}
++
++static void brcm_pcie_bridge_sw_init_set_generic(struct brcm_pcie *pcie, u32 val)
++{
++	if (val)
++		setbits_le32(pcie->base + pcie->pcie_cfg->offsets[RGR1_SW_INIT_1],
++			     RGR1_SW_INIT_1_INIT_MASK);
++	else
++		clrbits_le32(pcie->base + pcie->pcie_cfg->offsets[RGR1_SW_INIT_1],
++			     RGR1_SW_INIT_1_INIT_MASK);
++}
++
+ /**
+  * brcm_pcie_link_up() - Check whether the PCIe link is up
+  * @pcie: Pointer to the PCIe controller state
+@@ -150,8 +203,8 @@ static int brcm_pcie_config_address(const struct udevice *dev, pci_dev_t bdf,
+ 	/* For devices, write to the config space index register */
+ 	idx = PCIE_ECAM_OFFSET(pci_bus, pci_dev, pci_func, 0);
+ 
+-	writel(idx, pcie->base + PCIE_EXT_CFG_INDEX);
+-	*paddress = pcie->base + PCIE_EXT_CFG_DATA + offset;
++	writel(idx, pcie->base + pcie->pcie_cfg->offsets[EXT_CFG_INDEX]);
++	*paddress = pcie->base + pcie->pcie_cfg->offsets[EXT_CFG_DATA] + offset;
+ 
+ 	return 0;
+ }
+@@ -365,8 +418,9 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 	 * e.g. BCM7278, the fundamental reset should not be asserted here.
+ 	 * This will need to be changed when support for other SoCs is added.
+ 	 */
+-	setbits_le32(base + PCIE_RGR1_SW_INIT_1,
+-		     PCIE_RGR1_SW_INIT_1_INIT_MASK | PCIE_RGR1_SW_INIT_1_PERST_MASK);
++	pcie->pcie_cfg->bridge_sw_init_set(pcie, 1);
++	if (pcie->pcie_cfg->type != BCM2712)
++		pcie->pcie_cfg->perst_set(pcie, 1);
+ 	/*
+ 	 * The delay is a safety precaution to preclude the reset signal
+ 	 * from looking like a glitch.
+@@ -374,9 +428,9 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 	udelay(100);
+ 
+ 	/* Take the bridge out of reset */
+-	clrbits_le32(base + PCIE_RGR1_SW_INIT_1, PCIE_RGR1_SW_INIT_1_INIT_MASK);
++	pcie->pcie_cfg->bridge_sw_init_set(pcie, 0);
+ 
+-	clrbits_le32(base + PCIE_MISC_HARD_PCIE_HARD_DEBUG,
++	clrbits_le32(base + pcie->pcie_cfg->offsets[PCIE_HARD_DEBUG],
+ 		     PCIE_HARD_DEBUG_SERDES_IDDQ_MASK);
+ 
+ 	/* Wait for SerDes to be stable */
+@@ -426,8 +480,7 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 		brcm_pcie_set_gen(pcie, pcie->gen);
+ 
+ 	/* Unassert the fundamental reset */
+-	clrbits_le32(pcie->base + PCIE_RGR1_SW_INIT_1,
+-		     PCIE_RGR1_SW_INIT_1_PERST_MASK);
++	pcie->pcie_cfg->perst_set(pcie, 0);
+ 
+ 	/*
+ 	 * Wait for 100ms after PERST# deassertion; see PCIe CEM specification
+@@ -446,7 +499,7 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 		return -EINVAL;
+ 	}
+ 
+-	if (!brcm_pcie_rc_mode(pcie)) {
++	if (!pcie->pcie_cfg->rc_mode(pcie)) {
+ 		printf("PCIe misconfigured; is in EP mode\n");
+ 		return -EINVAL;
+ 	}
+@@ -514,14 +567,25 @@ static int brcm_pcie_remove(struct udevice *dev)
+ 	void __iomem *base = pcie->base;
+ 
+ 	/* Assert fundamental reset */
+-	setbits_le32(base + PCIE_RGR1_SW_INIT_1, PCIE_RGR1_SW_INIT_1_PERST_MASK);
++	setbits_le32(base + pcie->pcie_cfg->offsets[RGR1_SW_INIT_1],
++		     PCIE_RGR1_SW_INIT_1_PERST_MASK);
+ 
+ 	/* Turn off SerDes */
+-	setbits_le32(base + PCIE_MISC_HARD_PCIE_HARD_DEBUG,
++	setbits_le32(base + pcie->pcie_cfg->offsets[PCIE_HARD_DEBUG],
+ 		     PCIE_HARD_DEBUG_SERDES_IDDQ_MASK);
+ 
+ 	/* Shutdown bridge */
+-	setbits_le32(base + PCIE_RGR1_SW_INIT_1, PCIE_RGR1_SW_INIT_1_INIT_MASK);
++	pcie->pcie_cfg->bridge_sw_init_set(pcie, 1);
++
++	/*
++	 * For the controllers that are utilizing reset for bridge Sw init,
++	 * such as BCM2712, reset should be deasserted after assertion.
++	 * Leaving it in asserted state may lead to unexpected hangs in
++	 * the Linux Kernel driver because it do not perform reset initialization
++	 * and start accessing device memory.
++	 */
++	if (pcie->pcie_cfg->type == BCM2712)
++		pcie->pcie_cfg->bridge_sw_init_set(pcie, 0);
+ 
+ 	return 0;
+ }
+@@ -546,6 +610,7 @@ static int brcm_pcie_of_to_plat(struct udevice *dev)
+ 	else
+ 		pcie->gen = max_link_speed;
+ 
++	pcie->pcie_cfg = (const struct brcm_pcie_cfg_data *)dev_get_driver_data(dev);
+ 	return 0;
+ }
+ 
+@@ -554,8 +619,39 @@ static const struct dm_pci_ops brcm_pcie_ops = {
+ 	.write_config	= brcm_pcie_write_config,
+ };
+ 
++static const int pcie_offsets[] = {
++	[RGR1_SW_INIT_1] = 0x9210,
++	[EXT_CFG_INDEX]  = 0x9000,
++	[EXT_CFG_DATA]   = 0x8000,
++	[PCIE_HARD_DEBUG] = 0x4204,
++};
++
++static const struct brcm_pcie_cfg_data bcm2711_cfg = {
++	.offsets	= pcie_offsets,
++	.type		= BCM2711,
++	.perst_set	= brcm_pcie_perst_set_generic,
++	.bridge_sw_init_set = brcm_pcie_bridge_sw_init_set_generic,
++	.rc_mode	= brcm_pcie_rc_mode,
++};
++
++static const int pcie_offsets_bcm2712[] = {
++	[RGR1_SW_INIT_1] = 0x0,
++	[EXT_CFG_INDEX] = 0x9000,
++	[EXT_CFG_DATA] = 0x8000,
++	[PCIE_HARD_DEBUG] = 0x4304,
++};
++
++static const struct brcm_pcie_cfg_data bcm2712_cfg = {
++	.offsets	= pcie_offsets_bcm2712,
++	.type		= BCM2712,
++	.perst_set	= brcm_pcie_perst_set_2712,
++	.bridge_sw_init_set = brcm_pcie_bridge_sw_init_set_generic,
++	.rc_mode	= brcm_pcie_rc_mode,
++};
++
+ static const struct udevice_id brcm_pcie_ids[] = {
+-	{ .compatible = "brcm,bcm2711-pcie" },
++	{ .compatible = "brcm,bcm2711-pcie", .data = (ulong)&bcm2711_cfg },
++	{ .compatible = "brcm,bcm2712-pcie", .data = (ulong)&bcm2712_cfg },
+ 	{ }
+ };
+ 
+
+From patchwork Fri Feb 27 15:23:34 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202412
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsYX5WvXz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:24:00 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id D5E9983F14;
+	Fri, 27 Feb 2026 16:23:38 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 30D3883F0A; Fri, 27 Feb 2026 16:23:37 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 2C96983E76
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:35 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 4A0BE68D07; Fri, 27 Feb 2026 16:23:34 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 4/9] pci: brcmstb: Add RPi5 reset facilities
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152334.4A0BE68D07@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:34 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Torsten Duwe <duwe@suse.de>
+
+A driver for Broadcom reset controllers ported from
+linux/drivers/reset/reset-brcmstb.c to U-Boot.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ configs/rpi_arm64_defconfig   |  1 +
+ drivers/reset/Kconfig         |  7 +++
+ drivers/reset/Makefile        |  1 +
+ drivers/reset/reset-brcmstb.c | 97 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 106 insertions(+)
+ create mode 100644 drivers/reset/reset-brcmstb.c
+
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index 69e8e72c5d7..153d7ed301e 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -44,6 +44,7 @@ CONFIG_BCMGENET=y
+ CONFIG_PCI_BRCMSTB=y
+ CONFIG_PINCTRL=y
+ # CONFIG_PINCTRL_GENERIC is not set
++CONFIG_RESET_BRCMSTB=y
+ CONFIG_DM_RNG=y
+ CONFIG_RNG_IPROC200=y
+ # CONFIG_REQUIRE_SERIAL_CONSOLE is not set
+diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
+index 2fd91d6299c..46ffc103320 100644
+--- a/drivers/reset/Kconfig
++++ b/drivers/reset/Kconfig
+@@ -64,6 +64,13 @@ config RESET_BCM6345
+ 	help
+ 	  Support reset controller on BCM6345.
+ 
++config RESET_BRCMSTB
++	bool "Generic Reset controller driver for Broadcom"
++	help
++	  This enables reset controller for Broadcom devices.
++	  If you wish to use reset resources managed by the Broadcom
++	  Reset Controller, say Y here. Otherwise, say N.
++
+ config RESET_UNIPHIER
+ 	bool "Reset controller driver for UniPhier SoCs"
+ 	depends on ARCH_UNIPHIER
+diff --git a/drivers/reset/Makefile b/drivers/reset/Makefile
+index ee5b009d134..ebf3d7425a4 100644
+--- a/drivers/reset/Makefile
++++ b/drivers/reset/Makefile
+@@ -13,6 +13,7 @@ obj-$(CONFIG_RESET_AIROHA) += reset-airoha.o
+ obj-$(CONFIG_RESET_TI_SCI) += reset-ti-sci.o
+ obj-$(CONFIG_RESET_HSDK) += reset-hsdk.o
+ obj-$(CONFIG_RESET_BCM6345) += reset-bcm6345.o
++obj-$(CONFIG_RESET_BRCMSTB) += reset-brcmstb.o
+ obj-$(CONFIG_RESET_UNIPHIER) += reset-uniphier.o
+ obj-$(CONFIG_RESET_AST2500) += reset-ast2500.o
+ obj-$(CONFIG_RESET_AST2600) += reset-ast2600.o
+diff --git a/drivers/reset/reset-brcmstb.c b/drivers/reset/reset-brcmstb.c
+new file mode 100644
+index 00000000000..7861f7c9baf
+--- /dev/null
++++ b/drivers/reset/reset-brcmstb.c
+@@ -0,0 +1,97 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Broadcom STB generic reset controller
++ *
++ * Copyright (C) 2024 EPAM Systems
++ *
++ * Moved from linux kernel:
++ * Author: Florian Fainelli <f.fainelli@gmail.com>
++ * Copyright (C) 2018 Broadcom
++ */
++
++#include <asm/io.h>
++#include <dm.h>
++#include <errno.h>
++#include <linux/bitops.h>
++#include <linux/delay.h>
++#include <log.h>
++#include <malloc.h>
++#include <reset-uclass.h>
++
++struct brcmstb_reset {
++	void __iomem *base;
++};
++
++#define SW_INIT_SET 0x00
++#define SW_INIT_CLEAR 0x04
++#define SW_INIT_STATUS 0x08
++
++#define SW_INIT_BIT(id) BIT((id) & 0x1f)
++#define SW_INIT_BANK(id) ((id) >> 5)
++
++#define usleep_range(a, b) udelay((b))
++
++/* A full bank contains extra registers that we are not utilizing but still
++ * qualify as a single bank.
++ */
++#define SW_INIT_BANK_SIZE 0x18
++
++static int brcmstb_reset_assert(struct reset_ctl *rst)
++{
++	unsigned int off = SW_INIT_BANK(rst->id) * SW_INIT_BANK_SIZE;
++	struct brcmstb_reset *priv = dev_get_priv(rst->dev);
++
++	writel_relaxed(SW_INIT_BIT(rst->id), priv->base + off + SW_INIT_SET);
++	return 0;
++}
++
++static int brcmstb_reset_deassert(struct reset_ctl *rst)
++{
++	unsigned int off = SW_INIT_BANK(rst->id) * SW_INIT_BANK_SIZE;
++	struct brcmstb_reset *priv = dev_get_priv(rst->dev);
++
++	writel_relaxed(SW_INIT_BIT(rst->id), priv->base + off + SW_INIT_CLEAR);
++	/* Maximum reset delay after de-asserting a line and seeing block
++	 * operation is typically 14us for the worst case, build some slack
++	 * here.
++	 */
++	usleep_range(100, 200);
++	return 0;
++}
++
++static int brcmstb_reset_status(struct reset_ctl *rst)
++{
++	unsigned int off = SW_INIT_BANK(rst->id) * SW_INIT_BANK_SIZE;
++	struct brcmstb_reset *priv = dev_get_priv(rst->dev);
++
++	return readl_relaxed(priv->base + off + SW_INIT_STATUS) &
++			SW_INIT_BIT(rst->id);
++}
++
++struct reset_ops brcmstb_reset_reset_ops = {
++	.rst_assert = brcmstb_reset_assert,
++	.rst_deassert = brcmstb_reset_deassert,
++	.rst_status = brcmstb_reset_status};
++
++static int brcmstb_reset_probe(struct udevice *dev)
++{
++	struct brcmstb_reset *priv = dev_get_priv(dev);
++
++	priv->base = dev_remap_addr(dev);
++	if (!priv->base)
++		return -EINVAL;
++
++	return 0;
++}
++
++static const struct udevice_id brcmstb_reset_ids[] = {
++	{.compatible = "brcm,brcmstb-reset"}, {/* sentinel */}};
++
++U_BOOT_DRIVER(brcmstb_reset) = {
++	.name = "brcmstb-reset",
++	.id = UCLASS_RESET,
++	.of_match = brcmstb_reset_ids,
++	.ops = &brcmstb_reset_reset_ops,
++	.probe = brcmstb_reset_probe,
++	.priv_auto = sizeof(struct brcmstb_reset),
++};
+
+From patchwork Fri Feb 27 15:23:36 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202413
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsYk0pstz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:24:10 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 327F183E8E;
+	Fri, 27 Feb 2026 16:23:41 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id B384283F20; Fri, 27 Feb 2026 16:23:39 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 865C483E76
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:37 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id C7C2E68D0A; Fri, 27 Feb 2026 16:23:36 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 5/9] pci: brcmstb: Add RPi5 rescal reset facilities
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152336.C7C2E68D0A@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:36 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Torsten Duwe <duwe@suse.de>
+
+A driver for Broadcom rescal reset controllers ported from
+linux/drivers/reset/reset-brcmstb-rescal.c to U-Boot.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ configs/rpi_arm64_defconfig          |   1 +
+ drivers/reset/Kconfig                |   7 ++
+ drivers/reset/Makefile               |   1 +
+ drivers/reset/reset-brcmstb-rescal.c | 103 +++++++++++++++++++++++++++
+ 4 files changed, 112 insertions(+)
+ create mode 100644 drivers/reset/reset-brcmstb-rescal.c
+
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index 153d7ed301e..38af5029403 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -45,6 +45,7 @@ CONFIG_PCI_BRCMSTB=y
+ CONFIG_PINCTRL=y
+ # CONFIG_PINCTRL_GENERIC is not set
+ CONFIG_RESET_BRCMSTB=y
++CONFIG_RESET_BRCMSTB_RESCAL=y
+ CONFIG_DM_RNG=y
+ CONFIG_RNG_IPROC200=y
+ # CONFIG_REQUIRE_SERIAL_CONSOLE is not set
+diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
+index 46ffc103320..b7d2d4b18d5 100644
+--- a/drivers/reset/Kconfig
++++ b/drivers/reset/Kconfig
+@@ -71,6 +71,13 @@ config RESET_BRCMSTB
+ 	  If you wish to use reset resources managed by the Broadcom
+ 	  Reset Controller, say Y here. Otherwise, say N.
+ 
++config RESET_BRCMSTB_RESCAL
++	bool "Generic Rescal Reset controller driver for Broadcom"
++	help
++	  Support rescal reset controller on Broadcom.
++	  If you wish to use reset resources managed by the Broadcom
++	  Reset Controller, say Y here. Otherwise, say N.
++
+ config RESET_UNIPHIER
+ 	bool "Reset controller driver for UniPhier SoCs"
+ 	depends on ARCH_UNIPHIER
+diff --git a/drivers/reset/Makefile b/drivers/reset/Makefile
+index ebf3d7425a4..c7a9da3268d 100644
+--- a/drivers/reset/Makefile
++++ b/drivers/reset/Makefile
+@@ -14,6 +14,7 @@ obj-$(CONFIG_RESET_TI_SCI) += reset-ti-sci.o
+ obj-$(CONFIG_RESET_HSDK) += reset-hsdk.o
+ obj-$(CONFIG_RESET_BCM6345) += reset-bcm6345.o
+ obj-$(CONFIG_RESET_BRCMSTB) += reset-brcmstb.o
++obj-$(CONFIG_RESET_BRCMSTB_RESCAL) += reset-brcmstb-rescal.o
+ obj-$(CONFIG_RESET_UNIPHIER) += reset-uniphier.o
+ obj-$(CONFIG_RESET_AST2500) += reset-ast2500.o
+ obj-$(CONFIG_RESET_AST2600) += reset-ast2600.o
+diff --git a/drivers/reset/reset-brcmstb-rescal.c b/drivers/reset/reset-brcmstb-rescal.c
+new file mode 100644
+index 00000000000..fc8fcfa8b3f
+--- /dev/null
++++ b/drivers/reset/reset-brcmstb-rescal.c
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Broadcom STB generic reset controller
++ *
++ * Copyright (C) 2024 EPAM Systems
++ * Moved from linux kernel:
++ * Copyright (C) 2018-2020 Broadcom
++ */
++
++#include <asm/io.h>
++#include <dm.h>
++#include <dm/device_compat.h>
++#include <errno.h>
++#include <linux/bitops.h>
++#include <linux/delay.h>
++#include <linux/iopoll.h>
++#include <log.h>
++#include <malloc.h>
++#include <reset-uclass.h>
++
++#define BRCM_RESCAL_START 0x0
++#define BRCM_RESCAL_START_BIT BIT(0)
++#define BRCM_RESCAL_CTRL 0x4
++#define BRCM_RESCAL_STATUS 0x8
++#define BRCM_RESCAL_STATUS_BIT BIT(0)
++
++struct brcm_rescal_reset {
++	void __iomem *base;
++};
++
++/* Also doubles a deassert */
++static int brcm_rescal_reset_set(struct reset_ctl *rst)
++{
++	struct brcm_rescal_reset *data = dev_get_priv(rst->dev);
++	void __iomem *base = data->base;
++	u32 reg;
++	int ret;
++
++	reg = readl(base + BRCM_RESCAL_START);
++	writel(reg | BRCM_RESCAL_START_BIT, base + BRCM_RESCAL_START);
++	reg = readl(base + BRCM_RESCAL_START);
++	if (!(reg & BRCM_RESCAL_START_BIT)) {
++		dev_err(rst->dev, "failed to start SATA/PCIe rescal\n");
++		return -EIO;
++	}
++
++	ret = readl_poll_timeout(base + BRCM_RESCAL_STATUS, reg,
++				 (reg & BRCM_RESCAL_STATUS_BIT), 100);
++	if (ret) {
++		dev_err(rst->dev, "time out on SATA/PCIe rescal\n");
++		return ret;
++	}
++
++	reg = readl(base + BRCM_RESCAL_START);
++	writel(reg & ~BRCM_RESCAL_START_BIT, base + BRCM_RESCAL_START);
++
++	dev_dbg(rst->dev, "SATA/PCIe rescal success\n");
++	return 0;
++}
++
++/* A dummy function - deassert/reset does all the work */
++static int brcm_rescal_reset_assert(struct reset_ctl *rst)
++{
++	return 0;
++}
++
++static int brcm_rescal_reset_xlate(struct reset_ctl *reset_ctl,
++				   struct ofnode_phandle_args *args)
++{
++	/* This is needed if #reset-cells == 0. */
++	return 0;
++}
++
++static const struct reset_ops brcm_rescal_reset_ops = {
++	.rst_deassert = brcm_rescal_reset_set,
++	.rst_assert = brcm_rescal_reset_assert,
++	.of_xlate = brcm_rescal_reset_xlate,
++};
++
++static int brcm_rescal_reset_probe(struct udevice *dev)
++{
++	struct brcm_rescal_reset *data = dev_get_priv(dev);
++
++	data->base = dev_remap_addr(dev);
++	if (!data->base)
++		return -EINVAL;
++
++	return 0;
++}
++
++static const struct udevice_id brcm_rescal_reset_of_match[] = {
++	{.compatible = "brcm,bcm7216-pcie-sata-rescal"},
++	{},
++};
++
++U_BOOT_DRIVER(brcmstb_reset_rescal) = {
++	.name = "brcmstb-reset-rescal",
++	.id = UCLASS_RESET,
++	.of_match = brcm_rescal_reset_of_match,
++	.ops = &brcm_rescal_reset_ops,
++	.probe = brcm_rescal_reset_probe,
++	.priv_auto = sizeof(struct brcm_rescal_reset),
++};
+
+From patchwork Fri Feb 27 15:23:41 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202414
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsYt68Kqz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:24:18 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 720AC83F37;
+	Fri, 27 Feb 2026 16:23:46 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 0745683E76; Fri, 27 Feb 2026 16:23:44 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 1851083F2D
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:42 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 3B6C468D13; Fri, 27 Feb 2026 16:23:41 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 6/9] pci: brcmstb: Get and use bridge and rescal reset
+ properties
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152341.3B6C468D13@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:41 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Torsten Duwe <duwe@suse.de>
+
+Check whether the device tree has nodes for the two reset controls and use
+them if so.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ drivers/pci/pcie_brcmstb.c | 51 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index 261f8790528..1f97cda5cc7 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -21,6 +21,7 @@
+ #include <linux/bitfield.h>
+ #include <linux/log2.h>
+ #include <linux/iopoll.h>
++#include <reset.h>
+ 
+ /* PCIe parameters */
+ #define BRCM_NUM_PCIE_OUT_WINS				4
+@@ -83,6 +84,8 @@ struct brcm_pcie {
+ 
+ 	int			gen;
+ 	bool			ssc;
++	struct reset_ctl	rescal;
++	struct reset_ctl	bridge_reset;
+ 	const struct brcm_pcie_cfg_data *pcie_cfg;
+ };
+ 
+@@ -147,6 +150,34 @@ static void brcm_pcie_perst_set_2712(struct brcm_pcie *pcie, u32 val)
+ 	writel(tmp, pcie->base + PCIE_MISC_PCIE_CTRL);
+ }
+ 
++static void brcm_pcie_get_resets_dt(struct udevice *dev)
++{
++	struct brcm_pcie *pcie = dev_get_priv(dev);
++	int ret;
++
++	ret = reset_get_by_name(dev, "rescal", &pcie->rescal);
++	if (ret) {
++		printf("Unable to get rescal reset\n");
++		return;
++	}
++
++	ret = reset_get_by_name(dev, "bridge", &pcie->bridge_reset);
++	if (ret) {
++		printf("Unable to get bridge reset\n");
++		return;
++	}
++}
++
++static void brcm_pcie_do_reset(struct udevice *dev)
++{
++	struct brcm_pcie *pcie = dev_get_priv(dev);
++	int ret;
++
++	ret = reset_deassert(&pcie->rescal);
++	if (ret)
++		printf("failed to deassert 'rescal'\n");
++}
++
+ static void brcm_pcie_bridge_sw_init_set_generic(struct brcm_pcie *pcie, u32 val)
+ {
+ 	if (val)
+@@ -157,6 +188,14 @@ static void brcm_pcie_bridge_sw_init_set_generic(struct brcm_pcie *pcie, u32 val
+ 			     RGR1_SW_INIT_1_INIT_MASK);
+ }
+ 
++static void brcm_pcie_bridge_sw_init_set_2712(struct brcm_pcie *pcie, u32 val)
++{
++	if (val)
++		reset_assert(&pcie->bridge_reset);
++	else
++		reset_deassert(&pcie->bridge_reset);
++}
++
+ /**
+  * brcm_pcie_link_up() - Check whether the PCIe link is up
+  * @pcie: Pointer to the PCIe controller state
+@@ -413,6 +452,12 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 	u16 nlw, cls, lnksta;
+ 	u32 tmp;
+ 
++	/*
++	 * Ensure rescal reset for BCM2712 is really disabled.
++	 */
++	if (pcie->pcie_cfg->type == BCM2712)
++		brcm_pcie_do_reset(dev);
++
+ 	/*
+ 	 * Reset the bridge, assert the fundamental reset. Note for some SoCs,
+ 	 * e.g. BCM7278, the fundamental reset should not be asserted here.
+@@ -611,6 +656,10 @@ static int brcm_pcie_of_to_plat(struct udevice *dev)
+ 		pcie->gen = max_link_speed;
+ 
+ 	pcie->pcie_cfg = (const struct brcm_pcie_cfg_data *)dev_get_driver_data(dev);
++
++	if (pcie->pcie_cfg->type == BCM2712)
++		brcm_pcie_get_resets_dt(dev);
++
+ 	return 0;
+ }
+ 
+@@ -645,7 +694,7 @@ static const struct brcm_pcie_cfg_data bcm2712_cfg = {
+ 	.offsets	= pcie_offsets_bcm2712,
+ 	.type		= BCM2712,
+ 	.perst_set	= brcm_pcie_perst_set_2712,
+-	.bridge_sw_init_set = brcm_pcie_bridge_sw_init_set_generic,
++	.bridge_sw_init_set = brcm_pcie_bridge_sw_init_set_2712,
+ 	.rc_mode	= brcm_pcie_rc_mode,
+ };
+ 
+
+From patchwork Fri Feb 27 15:23:44 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202415
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=2a01:238:438b:c500:173d:9f52:ddab:ee01; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de
+ [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsZ44DGBz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:24:28 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id ABFF483E76;
+	Fri, 27 Feb 2026 16:23:47 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 50B0483F4C; Fri, 27 Feb 2026 16:23:47 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 7317F83F2A
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:45 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id 3E13168D0D; Fri, 27 Feb 2026 16:23:44 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 7/9] pci: brcmstb: Fix iBAR size calculation
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152344.3E13168D0D@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:44 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Torsten Duwe <duwe@suse.de>
+
+Fix inbound window size calculation, like Linux commit 25a98c7270156.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ drivers/pci/pcie_brcmstb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index 1f97cda5cc7..8a25fb04563 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -105,8 +105,8 @@ static int brcm_pcie_encode_ibar_size(u64 size)
+ 	if (log2_in >= 12 && log2_in <= 15)
+ 		/* Covers 4KB to 32KB (inclusive) */
+ 		return (log2_in - 12) + 0x1c;
+-	else if (log2_in >= 16 && log2_in <= 37)
+-		/* Covers 64KB to 32GB, (inclusive) */
++	else if (log2_in >= 16 && log2_in <= 36)
++		/* Covers 64KB to 64GB, (inclusive) */
+ 		return log2_in - 15;
+ 
+ 	/* Something is awry so disable */
+
+From patchwork Fri Feb 27 15:23:48 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202416
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsZG0Fbrz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:24:38 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id E5B4883F4D;
+	Fri, 27 Feb 2026 16:23:52 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id D7A5283F4D; Fri, 27 Feb 2026 16:23:51 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id E27D683F2A
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:49 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id BFF2568BFE; Fri, 27 Feb 2026 16:23:48 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 8/9] pci: brcmstb: rework iBAR handling
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152348.BFF2568BFE@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:48 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Torsten Duwe <duwe@suse.de>
+
+Rework the setup of inbound PCIe windows: use the convenience functions
+from Linux kernel commit ae6476c6de187 to calculate the BAR offsets and
+factor out the setup code into a separate function.
+
+The Linux kernel first allocates and populates an array of inbound_win[]
+and sets the BARs from it later, while U-Boot does it all on the fly,
+in one go, so the code is not 1:1 comparable.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ drivers/pci/pcie_brcmstb.c | 107 ++++++++++++++++++++++++++++++-------
+ 1 file changed, 88 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index 8a25fb04563..e5c848c9e8e 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -50,6 +50,29 @@
+ #define SSC_STATUS_PLL_LOCK_MASK			0x800
+ #define SSC_STATUS_PLL_LOCK_SHIFT			11
+ 
++#define PCIE_RC_PL_PHY_CTL_15				0x184c
++#define PCIE_RC_PL_PHY_CTL_15_DIS_PLL_PD_MASK		0x400000
++#define PCIE_RC_PL_PHY_CTL_15_PM_CLK_PERIOD_MASK	0xff
++
++#define PCIE_MISC_UBUS_CTRL				0x40a4
++#define  PCIE_MISC_UBUS_CTRL_UBUS_PCIE_REPLY_ERR_DIS_MASK	BIT(13)
++#define  PCIE_MISC_UBUS_CTRL_UBUS_PCIE_REPLY_DECERR_DIS_MASK	BIT(19)
++#define PCIE_MISC_AXI_READ_ERROR_DATA			0x4170
++#define PCIE_MISC_UBUS_TIMEOUT				0x40A8
++#define PCIE_MISC_RC_CONFIG_RETRY_TIMEOUT		0x405c
++#define PCIE_MISC_RC_BAR4_CONFIG_LO			0x40d4
++#define PCIE_MISC_RC_BAR4_CONFIG_HI			0x40d8
++#define PCIE_MISC_UBUS_BAR_CONFIG_REMAP_HI_MASK		0xff
++#define PCIE_MISC_UBUS_BAR4_CONFIG_REMAP_HI		0x4110
++#define PCIE_MISC_UBUS_BAR_CONFIG_REMAP_ENABLE		0x1
++#define PCIE_MISC_UBUS_BAR_CONFIG_REMAP_LO_MASK		0xfffff000
++#define PCIE_MISC_UBUS_BAR4_CONFIG_REMAP_LO		0x410c
++
++#define PCIE_MISC_UBUS_BAR1_CONFIG_REMAP		0x40ac
++#define PCIE_MISC_UBUS_BAR2_CONFIG_REMAP		0x40b4
++#define  PCIE_MISC_UBUS_BAR2_CONFIG_REMAP_ACCESS_ENABLE_MASK	BIT(0)
++#define  MISC_CTRL_PCIE_RCB_MPS_MODE_MASK		0x400
++
+ enum {
+ 	RGR1_SW_INIT_1,
+ 	EXT_CFG_INDEX,
+@@ -437,17 +460,75 @@ static void brcm_pcie_set_outbound_win(struct brcm_pcie *pcie,
+ 	writel(tmp, base + PCIE_MEM_WIN0_LIMIT_HI(win));
+ }
+ 
++static u32 brcm_bar_reg_offset(int bar)
++{
++	if (bar <= 3)
++		return PCIE_MISC_RC_BAR1_CONFIG_LO + 8 * (bar - 1);
++	else
++		return PCIE_MISC_RC_BAR4_CONFIG_LO + 8 * (bar - 4);
++}
++
++static u32 brcm_ubus_reg_offset(int bar)
++{
++	if (bar <= 3)
++		return PCIE_MISC_UBUS_BAR1_CONFIG_REMAP + 8 * (bar - 1);
++	else
++		return PCIE_MISC_UBUS_BAR4_CONFIG_REMAP_LO + 8 * (bar - 4);
++}
++
++static void brcm_pcie_set_inbound_windows(struct udevice *dev)
++{
++	struct brcm_pcie *pcie = dev_get_priv(dev);
++	void __iomem *base = pcie->base;
++	int i, ibar_no, ret;
++	u32 tmp;
++
++	ibar_no = 0;
++	/* pre-2712 chips leave the first entry empty */
++	if (pcie->pcie_cfg->type != BCM2712)
++		ibar_no++;
++
++	/* program inbound windows from OF property "dma-regions" */
++	for (i = 0; i < 7; i++, ibar_no++) {
++		u64 bar_cpu, bar_size, bar_pci;
++		struct pci_region region;
++		int ubus_bar_offset, rc_bar_offset;
++
++		ret = pci_get_dma_regions(dev, &region, i);
++		if (ret)	/* no region #i? Then we're done. */
++			break;
++		ubus_bar_offset = brcm_ubus_reg_offset(ibar_no + 1);
++		rc_bar_offset = brcm_bar_reg_offset(ibar_no + 1);
++
++		bar_pci = region.bus_start;
++		bar_cpu = region.phys_start;
++		bar_size = region.size;
++
++		tmp = lower_32_bits(bar_pci);
++		u32p_replace_bits(&tmp, brcm_pcie_encode_ibar_size(bar_size),
++				  RC_BAR2_CONFIG_LO_SIZE_MASK);
++		writel(tmp, base + rc_bar_offset);
++		writel(upper_32_bits(bar_pci), base + rc_bar_offset + 4);
++
++		tmp = lower_32_bits(bar_cpu) &
++				PCIE_MISC_UBUS_BAR_CONFIG_REMAP_LO_MASK;
++		tmp |= PCIE_MISC_UBUS_BAR_CONFIG_REMAP_ENABLE;
++		writel(tmp, base + ubus_bar_offset);
++
++		tmp = upper_32_bits(bar_cpu) &
++			PCIE_MISC_UBUS_BAR_CONFIG_REMAP_HI_MASK;
++		writel(tmp, base + ubus_bar_offset + 4);
++	}
++}
++
+ static int brcm_pcie_probe(struct udevice *dev)
+ {
+ 	struct udevice *ctlr = pci_get_controller(dev);
+ 	struct pci_controller *hose = dev_get_uclass_priv(ctlr);
+ 	struct brcm_pcie *pcie = dev_get_priv(dev);
+ 	void __iomem *base = pcie->base;
+-	struct pci_region region;
+ 	bool ssc_good = false;
+ 	int num_out_wins = 0;
+-	u64 rc_bar2_offset, rc_bar2_size;
+-	unsigned int scb_size_val;
+ 	int i, ret;
+ 	u16 nlw, cls, lnksta;
+ 	u32 tmp;
+@@ -488,23 +569,9 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 			MISC_CTRL_CFG_READ_UR_MODE_MASK |
+ 			MISC_CTRL_MAX_BURST_SIZE_128);
+ 
+-	pci_get_dma_regions(dev, &region, 0);
+-	rc_bar2_offset = region.bus_start - region.phys_start;
+-	rc_bar2_size = 1ULL << fls64(region.size - 1);
+-
+-	tmp = lower_32_bits(rc_bar2_offset);
+-	u32p_replace_bits(&tmp, brcm_pcie_encode_ibar_size(rc_bar2_size),
+-			  RC_BAR2_CONFIG_LO_SIZE_MASK);
+-	writel(tmp, base + PCIE_MISC_RC_BAR2_CONFIG_LO);
+-	writel(upper_32_bits(rc_bar2_offset),
+-	       base + PCIE_MISC_RC_BAR2_CONFIG_HI);
+-
+-	scb_size_val = rc_bar2_size ?
+-		       ilog2(rc_bar2_size) - 15 : 0xf; /* 0xf is 1GB */
+-
++	/* Enable 32GB memory to be accessed from PCIe in the SCB0 */
+ 	tmp = readl(base + PCIE_MISC_MISC_CTRL);
+-	u32p_replace_bits(&tmp, scb_size_val,
+-			  MISC_CTRL_SCB0_SIZE_MASK);
++	u32p_replace_bits(&tmp, 20, MISC_CTRL_SCB0_SIZE_MASK);
+ 	writel(tmp, base + PCIE_MISC_MISC_CTRL);
+ 
+ 	/* Disable the PCIe->GISB memory window (RC_BAR1) */
+@@ -521,6 +588,8 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 	/* Clear any interrupts we find on boot */
+ 	writel(0xffffffff, base + PCIE_MSI_INTR2_CLR);
+ 
++	brcm_pcie_set_inbound_windows(dev);
++
+ 	if (pcie->gen)
+ 		brcm_pcie_set_gen(pcie, pcie->gen);
+ 
+
+From patchwork Fri Feb 27 15:23:52 2026
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Torsten Duwe <duwe@lst.de>
+X-Patchwork-Id: 2202417
+Return-Path: <u-boot-bounces@lists.denx.de>
+X-Original-To: incoming@patchwork.ozlabs.org
+Delivered-To: patchwork-incoming@legolas.ozlabs.org
+Authentication-Results: legolas.ozlabs.org;
+ spf=pass (sender SPF authorized) smtp.mailfrom=lists.denx.de
+ (client-ip=85.214.62.61; helo=phobos.denx.de;
+ envelope-from=u-boot-bounces@lists.denx.de; receiver=patchwork.ozlabs.org)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519)
+	(No client certificate requested)
+	by legolas.ozlabs.org (Postfix) with ESMTPS id 4fMsZR5GzHz1xy2
+	for <incoming@patchwork.ozlabs.org>; Sat, 28 Feb 2026 02:24:47 +1100 (AEDT)
+Received: from h2850616.stratoserver.net (localhost [IPv6:::1])
+	by phobos.denx.de (Postfix) with ESMTP id 2D46783EDF;
+	Fri, 27 Feb 2026 16:23:57 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de;
+ spf=pass smtp.mailfrom=u-boot-bounces@lists.denx.de
+Received: by phobos.denx.de (Postfix, from userid 109)
+ id 5671E83F63; Fri, 27 Feb 2026 16:23:56 +0100 (CET)
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on phobos.denx.de
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+ RCVD_IN_DNSWL_BLOCKED,RCVD_IN_VALIDITY_RPBL_BLOCKED,
+ RCVD_IN_VALIDITY_SAFE_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+ autolearn_force=no version=3.4.2
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by phobos.denx.de (Postfix) with ESMTPS id 300CA83F56
+ for <u-boot@lists.denx.de>; Fri, 27 Feb 2026 16:23:54 +0100 (CET)
+Authentication-Results: phobos.denx.de;
+ dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: phobos.denx.de; spf=pass smtp.mailfrom=duwe@lst.de
+Received: by verein.lst.de (Postfix, from userid 2005)
+ id F152968D16; Fri, 27 Feb 2026 16:23:52 +0100 (CET)
+In-Reply-To: <20260227152046.42DE068B05@verein.lst.de>
+References: <20260227152046.42DE068B05@verein.lst.de>
+From: Torsten Duwe <duwe@lst.de>
+Subject: [PATCH 9/9] pci: brcmstb: Adapt to AXI bridge
+To: Peter Robinson <pbrobinson@gmail.com>,
+ Matthias Brugger <mbrugger@suse.com>
+Cc: =?unknown-8bit?q?Tom_Rini_=3Ctrini=40konsulko=2Ecom=3E=2C=22Jan_=C4=8Cer?=
+	=?unknown-8bit?q?m=C3=A1k=22_=3Csairon=40sairon=2Ecz=3E=2CAndrea_della_Port?=
+	=?unknown-8bit?q?a_=3Candrea=2Eporta=40suse=2Ecom=3E=2C=22Ivan_T=2E_Ivanov?=
+	=?unknown-8bit?q?=22_=3Ciivanov=40suse=2Ede=3E=2C_Stanimir_Varbanov_=3Cstan?=
+	=?unknown-8bit?q?imir=2Evarbanov=40suse=2Ecom=3E=2C_Oleksii_Moisieiev_=3COl?=
+	=?unknown-8bit?q?eksii=5FMoisieiev=40epam=2Ecom=3E=2C_Volodymyr_Babchuk_=3C?=
+	=?unknown-8bit?q?volodymyr=5Fbabchuk=40epam=2Ecom=3E=2C_Marek_Vasut_=3Cmare?=
+	=?unknown-8bit?q?k=2Evasut+renesas=40mailbox=2Eorg=3E=2CPaul_Barker_=3Cpaul?=
+	=?unknown-8bit?q?=2Ebarker=2Ect=40bp=2Erenesas=2Ecom=3E=2CPatrice_Chotard_?=
+	=?unknown-8bit?q?=3Cpatrice=2Echotard=40foss=2Est=2Ecom=3E=2CChristian_Mara?=
+	=?unknown-8bit?q?ngi_=3Cansuelsmth=40gmail=2Ecom=3E=2CPatrick_Delaunay_=3Cp?=
+	=?unknown-8bit?q?atrick=2Edelaunay=40foss=2Est=2Ecom=3E=2CHuan_Zhou_=3Cme?=
+	=?unknown-8bit?q?=40per1cycle=2Eorg=3E=2CGabriel_Fernandez_=3Cgabriel=2Efer?=
+	=?unknown-8bit?q?nandez=40foss=2Est=2Ecom=3E=2CKever_Yang_=3Ckever=2Eyang?=
+	=?unknown-8bit?q?=40rock-chips=2Ecom=3E=2CJonas_Karlman_=3Cjonas=40kwiboo?=
+	=?unknown-8bit?q?=2Ese=3E=2CJoseph_Chen_=3Cchenjh=40rock-chips=2Ecom=3E=2CE?=
+	=?unknown-8bit?q?laine_Zhang_=3Czhangqing=40rock-chips=2Ecom=3E=2C_u-boot?=
+	=?unknown-8bit?q?=40lists=2Edenx=2Ede?=
+Message-Id: <20260227152352.F152968D16@verein.lst.de>
+Date: Fri, 27 Feb 2026 16:23:52 +0100 (CET)
+X-BeenThere: u-boot@lists.denx.de
+X-Mailman-Version: 2.1.39
+Precedence: list
+List-Id: U-Boot discussion <u-boot.lists.denx.de>
+List-Unsubscribe: <https://lists.denx.de/options/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=unsubscribe>
+List-Archive: <https://lists.denx.de/pipermail/u-boot/>
+List-Post: <mailto:u-boot@lists.denx.de>
+List-Help: <mailto:u-boot-request@lists.denx.de?subject=help>
+List-Subscribe: <https://lists.denx.de/listinfo/u-boot>,
+ <mailto:u-boot-request@lists.denx.de?subject=subscribe>
+Errors-To: u-boot-bounces@lists.denx.de
+Sender: "U-Boot" <u-boot-bounces@lists.denx.de>
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+
+From: Torsten Duwe <duwe@suse.de>
+
+Fix-ups for the BCM root complex when it is located behind an AXI
+bridge and clocked with 54MHz.  Some are from kernel commit
+377bced88c326, some where picked by Oleksii off a now-stale older
+branch. All reworked for the simpler setup code in U-Boot.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
+---
+ .../mach-bcm283x/include/mach/acpi/bcm2711.h  |  1 +
+ drivers/pci/pcie_brcmstb.c                    | 64 ++++++++++++++++++-
+ 2 files changed, 64 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-bcm283x/include/mach/acpi/bcm2711.h b/arch/arm/mach-bcm283x/include/mach/acpi/bcm2711.h
+index 6eb5389b858..869482eaffe 100644
+--- a/arch/arm/mach-bcm283x/include/mach/acpi/bcm2711.h
++++ b/arch/arm/mach-bcm283x/include/mach/acpi/bcm2711.h
+@@ -54,6 +54,7 @@
+ #define  MISC_CTRL_CFG_READ_UR_MODE_MASK          0x2000
+ #define  MISC_CTRL_MAX_BURST_SIZE_MASK            0x300000
+ #define  MISC_CTRL_MAX_BURST_SIZE_128             0x0
++#define  MISC_CTRL_MAX_BURST_SIZE_128_2712		0x100000
+ #define  MISC_CTRL_SCB0_SIZE_MASK                 0xf8000000
+ 
+ #define PCIE_MISC_CPU_2_PCIE_MEM_WIN0_LO          0x400c
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index e5c848c9e8e..bd1dd17e690 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -521,6 +521,30 @@ static void brcm_pcie_set_inbound_windows(struct udevice *dev)
+ 	}
+ }
+ 
++static void brcm_pcie_munge_pll(struct brcm_pcie *pcie)
++{
++	u32 tmp;
++	int ret, i;
++	u8 regs[] =  { 0x16,   0x17,   0x18,   0x19,   0x1b,   0x1c,   0x1e };
++	u16 data[] = { 0x50b9, 0xbda1, 0x0094, 0x97b4, 0x5030, 0x5030, 0x0007 };
++
++	ret = brcm_pcie_mdio_write(pcie->base, MDIO_PORT0, SET_ADDR_OFFSET,
++				   0x1600);
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		brcm_pcie_mdio_read(pcie->base, MDIO_PORT0, regs[i], &tmp);
++		debug("PCIE MDIO pre_refclk 0x%02x = 0x%04x\n",
++		      regs[i], tmp);
++	}
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		brcm_pcie_mdio_write(pcie->base, MDIO_PORT0, regs[i], data[i]);
++		brcm_pcie_mdio_read(pcie->base, MDIO_PORT0, regs[i], &tmp);
++		debug("PCIE MDIO post_refclk 0x%02x = 0x%04x\n",
++		      regs[i], tmp);
++	}
++
++	udelay(200);
++}
++
+ static int brcm_pcie_probe(struct udevice *dev)
+ {
+ 	struct udevice *ctlr = pci_get_controller(dev);
+@@ -562,18 +586,56 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 	/* Wait for SerDes to be stable */
+ 	udelay(100);
+ 
++	if (pcie->pcie_cfg->type == BCM2712) {
++		/* Allow a 54MHz (xosc) refclk source */
++		brcm_pcie_munge_pll(pcie);
++		/* Fix for L1SS errata */
++		tmp = readl(base + PCIE_RC_PL_PHY_CTL_15);
++		tmp &= ~PCIE_RC_PL_PHY_CTL_15_PM_CLK_PERIOD_MASK;
++		/* PM clock period is 18.52ns (round down) */
++		tmp |= 0x12;
++		writel(tmp, base + PCIE_RC_PL_PHY_CTL_15);
++	}
++
++	tmp = (pcie->pcie_cfg->type == BCM2712) ?
++			MISC_CTRL_MAX_BURST_SIZE_128_2712 :
++			MISC_CTRL_MAX_BURST_SIZE_128;
+ 	/* Set SCB_MAX_BURST_SIZE, CFG_READ_UR_MODE, SCB_ACCESS_EN */
+ 	clrsetbits_le32(base + PCIE_MISC_MISC_CTRL,
+ 			MISC_CTRL_MAX_BURST_SIZE_MASK,
+ 			MISC_CTRL_SCB_ACCESS_EN_MASK |
+ 			MISC_CTRL_CFG_READ_UR_MODE_MASK |
+-			MISC_CTRL_MAX_BURST_SIZE_128);
++			MISC_CTRL_PCIE_RCB_MPS_MODE_MASK |
++			tmp);
+ 
+ 	/* Enable 32GB memory to be accessed from PCIe in the SCB0 */
+ 	tmp = readl(base + PCIE_MISC_MISC_CTRL);
+ 	u32p_replace_bits(&tmp, 20, MISC_CTRL_SCB0_SIZE_MASK);
+ 	writel(tmp, base + PCIE_MISC_MISC_CTRL);
+ 
++	if (pcie->pcie_cfg->type == BCM2712) {
++		/* Suppress AXI error responses and return 1s for read failures */
++		tmp = readl(base + PCIE_MISC_UBUS_CTRL);
++		u32p_replace_bits(&tmp, 1, PCIE_MISC_UBUS_CTRL_UBUS_PCIE_REPLY_ERR_DIS_MASK);
++		u32p_replace_bits(&tmp, 1, PCIE_MISC_UBUS_CTRL_UBUS_PCIE_REPLY_DECERR_DIS_MASK);
++		writel(tmp, base + PCIE_MISC_UBUS_CTRL);
++		writel(0xffffffff, base + PCIE_MISC_AXI_READ_ERROR_DATA);
++
++		/*
++		 * Adjust timeouts. The UBUS timeout also affects CRS
++		 * completion retries, as the request will get terminated if
++		 * either timeout expires, so both have to be a large value
++		 * (in clocks of 750MHz).
++		 * Set UBUS timeout to 250ms, then set RC config retry timeout
++		 * to be ~240ms.
++		 *
++		 * Setting CRSVis=1 will stop the core from blocking on a CRS
++		 * response, but does require the device to be well-behaved...
++		 */
++		writel(0xB2D0000, base + PCIE_MISC_UBUS_TIMEOUT);
++		writel(0xABA0000, base + PCIE_MISC_RC_CONFIG_RETRY_TIMEOUT);
++	}
++
+ 	/* Disable the PCIe->GISB memory window (RC_BAR1) */
+ 	clrbits_le32(base + PCIE_MISC_RC_BAR1_CONFIG_LO,
+ 		     RC_BAR1_CONFIG_LO_SIZE_MASK);
+From 9e0fc68de1424b3db495f8a661d578435c4137c1 Mon Sep 17 00:00:00 2001
+From: Torsten Duwe <duwe@lst.de>
+Date: Mon, 2 Mar 2026 13:59:40 +0100
+Subject: [PATCH] Fix NVMe for non-zero bus offsets
+
+Hi all,
+
+working on the RPi5 I found that the U-Boot NVMe code is lacking a significant
+feature. The NVMe protocol heavily relies on device access into main memory,
+in the medieval times of computing this was called "bus master DMA". The NVMe
+device must generate memory addresses and read or write contents there. The
+current U-Boot code does in no way account for PCIe bridges in the path that
+add an offset to such "inbound accesses". Consequently, U-Boot can only boot
+from NVMe on platforms where this address offset is zero.
+(These are surprisingly many!)
+
+This proposed patch uses the already existent dev_phys_to_bus(), which can
+dig up the correct offset from associated DT nodes and subtract it. I have
+no strong opinion on the macro naming, and whether it should silently pull
+in the "dev" from the outer scope or have it better passed explicitly.
+
+Signed-off-by: Torsten Duwe <duwe@lst.de>
+---
+ drivers/nvme/nvme.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/nvme/nvme.c b/drivers/nvme/nvme.c
+index 2b14437f69c..039fbe0bc75 100644
+--- a/drivers/nvme/nvme.c
++++ b/drivers/nvme/nvme.c
+@@ -12,6 +12,7 @@
+ #include <log.h>
+ #include <malloc.h>
+ #include <memalign.h>
++#include <phys2bus.h>
+ #include <time.h>
+ #include <dm/device-internal.h>
+ #include <linux/compat.h>
+@@ -27,6 +28,8 @@
+ #define IO_TIMEOUT		30
+ #define MAX_PRP_POOL		512
+ 
++#define BUS_ADDR(a)		dev_phys_to_bus(dev->udev, (a))
++
+ static int nvme_wait_csts(struct nvme_dev *dev, u32 mask, u32 val)
+ {
+ 	int timeout;
+@@ -91,12 +94,12 @@ static int nvme_setup_prps(struct nvme_dev *dev, u64 *prp2,
+ 	i = 0;
+ 	while (nprps) {
+ 		if ((i == (prps_per_page - 1)) && nprps > 1) {
+-			*(prp_pool + i) = cpu_to_le64((ulong)prp_pool +
+-					page_size);
++			*(prp_pool + i) = cpu_to_le64(BUS_ADDR((ulong)prp_pool +
++								page_size));
+ 			i = 0;
+ 			prp_pool += page_size;
+ 		}
+-		*(prp_pool + i++) = cpu_to_le64(dma_addr);
++		*(prp_pool + i++) = cpu_to_le64(BUS_ADDR(dma_addr));
+ 		dma_addr += page_size;
+ 		nprps--;
+ 	}
+@@ -393,8 +396,8 @@ static int nvme_configure_admin_queue(struct nvme_dev *dev)
+ 	dev->ctrl_config |= NVME_CC_IOSQES | NVME_CC_IOCQES;
+ 
+ 	writel(aqa, &dev->bar->aqa);
+-	nvme_writeq((ulong)nvmeq->sq_cmds, &dev->bar->asq);
+-	nvme_writeq((ulong)nvmeq->cqes, &dev->bar->acq);
++	nvme_writeq(BUS_ADDR((ulong)nvmeq->sq_cmds), &dev->bar->asq);
++	nvme_writeq(BUS_ADDR((ulong)nvmeq->cqes), &dev->bar->acq);
+ 
+ 	result = nvme_enable_ctrl(dev);
+ 	if (result)
+@@ -420,7 +423,7 @@ static int nvme_alloc_cq(struct nvme_dev *dev, u16 qid,
+ 
+ 	memset(&c, 0, sizeof(c));
+ 	c.create_cq.opcode = nvme_admin_create_cq;
+-	c.create_cq.prp1 = cpu_to_le64((ulong)nvmeq->cqes);
++	c.create_cq.prp1 = cpu_to_le64(BUS_ADDR((ulong)nvmeq->cqes));
+ 	c.create_cq.cqid = cpu_to_le16(qid);
+ 	c.create_cq.qsize = cpu_to_le16(nvmeq->q_depth - 1);
+ 	c.create_cq.cq_flags = cpu_to_le16(flags);
+@@ -437,7 +440,7 @@ static int nvme_alloc_sq(struct nvme_dev *dev, u16 qid,
+ 
+ 	memset(&c, 0, sizeof(c));
+ 	c.create_sq.opcode = nvme_admin_create_sq;
+-	c.create_sq.prp1 = cpu_to_le64((ulong)nvmeq->sq_cmds);
++	c.create_sq.prp1 = cpu_to_le64(BUS_ADDR((ulong)nvmeq->sq_cmds));
+ 	c.create_sq.sqid = cpu_to_le16(qid);
+ 	c.create_sq.qsize = cpu_to_le16(nvmeq->q_depth - 1);
+ 	c.create_sq.sq_flags = cpu_to_le16(flags);
+@@ -458,14 +461,14 @@ int nvme_identify(struct nvme_dev *dev, unsigned nsid,
+ 	memset(&c, 0, sizeof(c));
+ 	c.identify.opcode = nvme_admin_identify;
+ 	c.identify.nsid = cpu_to_le32(nsid);
+-	c.identify.prp1 = cpu_to_le64(dma_addr);
++	c.identify.prp1 = cpu_to_le64(BUS_ADDR(dma_addr));
+ 
+ 	length -= (page_size - offset);
+ 	if (length <= 0) {
+ 		c.identify.prp2 = 0;
+ 	} else {
+ 		dma_addr += (page_size - offset);
+-		c.identify.prp2 = cpu_to_le64(dma_addr);
++		c.identify.prp2 = cpu_to_le64(BUS_ADDR(dma_addr));
+ 	}
+ 
+ 	c.identify.cns = cpu_to_le32(cns);
+@@ -490,7 +493,7 @@ int nvme_get_features(struct nvme_dev *dev, unsigned fid, unsigned nsid,
+ 	memset(&c, 0, sizeof(c));
+ 	c.features.opcode = nvme_admin_get_features;
+ 	c.features.nsid = cpu_to_le32(nsid);
+-	c.features.prp1 = cpu_to_le64(dma_addr);
++	c.features.prp1 = cpu_to_le64(BUS_ADDR(dma_addr));
+ 	c.features.fid = cpu_to_le32(fid);
+ 
+ 	ret = nvme_submit_admin_cmd(dev, &c, result);
+@@ -516,7 +519,7 @@ int nvme_set_features(struct nvme_dev *dev, unsigned fid, unsigned dword11,
+ 
+ 	memset(&c, 0, sizeof(c));
+ 	c.features.opcode = nvme_admin_set_features;
+-	c.features.prp1 = cpu_to_le64(dma_addr);
++	c.features.prp1 = cpu_to_le64(BUS_ADDR(dma_addr));
+ 	c.features.fid = cpu_to_le32(fid);
+ 	c.features.dword11 = cpu_to_le32(dword11);
+ 
+@@ -785,8 +788,8 @@ static ulong nvme_blk_rw(struct udevice *udev, lbaint_t blknr,
+ 		c.rw.slba = cpu_to_le64(slba);
+ 		slba += lbas;
+ 		c.rw.length = cpu_to_le16(lbas - 1);
+-		c.rw.prp1 = cpu_to_le64(temp_buffer);
+-		c.rw.prp2 = cpu_to_le64(prp2);
++		c.rw.prp1 = cpu_to_le64(BUS_ADDR(temp_buffer));
++		c.rw.prp2 = cpu_to_le64(BUS_ADDR(prp2));
+ 		status = nvme_submit_sync_cmd(dev->queues[NVME_IO_Q],
+ 				&c, NULL, IO_TIMEOUT);
+ 		if (status)
+-- 
+2.53.0
+
+From 253adf9d1bbf0a166f63b30f6ce38cac69239a34 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Sun, 29 Mar 2026 20:28:41 +0100
+Subject: [PATCH] rpi: enable nvme
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ configs/rpi_arm64_defconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configs/rpi_arm64_defconfig b/configs/rpi_arm64_defconfig
+index 38af5029403..ed4ae6ff522 100644
+--- a/configs/rpi_arm64_defconfig
++++ b/configs/rpi_arm64_defconfig
+@@ -15,7 +15,7 @@ CONFIG_BOOTSTD_DEFAULTS=y
+ CONFIG_OF_BOARD_SETUP=y
+ CONFIG_FDT_SIMPLEFB=y
+ CONFIG_USE_PREBOOT=y
+-CONFIG_PREBOOT="pci enum; usb start;"
++CONFIG_PREBOOT="pci enum; usb start; nvme scan;"
+ CONFIG_SYS_PBSIZE=1049
+ # CONFIG_DISPLAY_CPUINFO is not set
+ # CONFIG_DISPLAY_BOARDINFO is not set
+@@ -41,6 +41,7 @@ CONFIG_MMC_SDHCI_SDMA=y
+ CONFIG_MMC_SDHCI_BCM2835=y
+ CONFIG_MMC_SDHCI_BCMSTB=y
+ CONFIG_BCMGENET=y
++CONFIG_NVME_PCI=y
+ CONFIG_PCI_BRCMSTB=y
+ CONFIG_PINCTRL=y
+ # CONFIG_PINCTRL_GENERIC is not set
+-- 
+2.53.0
+

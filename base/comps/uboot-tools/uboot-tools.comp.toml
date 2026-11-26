@@ -1,5 +1,8 @@
+# Pin to Fedora f44 uboot-tools-2026.04-2.fc44 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/uboot-tools/c/ae35a50b2f9b3c381d68f870284b353d8c2afded
 [components.uboot-tools]
-# Release: 1%{?candidate:.%{candidate}}%{?dist}
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "ae35a50b2f9b3c381d68f870284b353d8c2afded" }
+# Release: 2%{?candidate:.%{candidate}}%{?dist}
 release = { calculation = "manual" }
 
 [components.uboot-tools.build]
