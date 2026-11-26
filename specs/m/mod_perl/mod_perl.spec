@@ -16,8 +16,8 @@
 %global regenerate_xs 0
 
 Name:           mod_perl
-Version:        2.0.13
-Release: 14%{?dist}
+Version: 2.0.14
+Release: 15%{?dist}
 Summary:        An embedded Perl interpreter for the Apache HTTP Server
 # other files:                  ASL 2.0
 ## Not in binary packages
@@ -36,7 +36,6 @@ Source4:        perl.module.conf
 # Normalize documentation encoding
 Patch0:         mod_perl-2.0.12-Convert-documentation-to-UTF-8.patch
 Patch1:         mod_perl-2.0.4-inline.patch
-Patch2:         mod_perl-32bit-ftbs.patch
 
 BuildRequires:  lmdb-devel
 BuildRequires:  openldap-devel
