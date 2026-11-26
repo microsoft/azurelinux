@@ -1,0 +1,22 @@
+# These Fedora-derived specs rely on Java filesystem macros, but their
+# java-devel dependency resolves to msopenjdk on AZL, which does not pull in
+# javapackages-filesystem. Require it explicitly to provide:
+#   systemtap: %{_jvmdir} -- JDK location passed to configure
+#   vtk:       %{_javadir} -- directory containing vtk.jar
+#   zbar:      %{_jnidir} -- directory containing the JNI binding jar
+# Without these macros, RPM packaging fails because file-list paths contain unexpanded macros.
+#
+# Remove this group when msopenjdk pulls in javapackages-filesystem.
+[component-groups.javapackages-filesystem-buildrequires]
+description = "Explicit Java filesystem build dependency for components with Java support"
+components = ["vtk", "systemtap", "zbar"]
+
+[component-groups.javapackages-filesystem-buildrequires.metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[component-groups.javapackages-filesystem-buildrequires.default-component-config.overlays]]
+description = "Require javapackages-filesystem alongside java-devel when Java support is enabled"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+java-devel\s*$'
+replacement = "BuildRequires: java-devel\nBuildRequires: javapackages-filesystem"
