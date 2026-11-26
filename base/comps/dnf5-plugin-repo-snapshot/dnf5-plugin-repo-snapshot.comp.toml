@@ -1,0 +1,8 @@
+[components.dnf5-plugin-repo-snapshot]
+spec = { type = "local", path = "dnf5-plugin-repo-snapshot.spec" }
+
+[[components.dnf5-plugin-repo-snapshot.source-files]]
+filename = "dnf5-plugin-repo-snapshot-0.1.0.tar.gz"
+hash = "2be01242b047a26511d358cccb1963e29a2ac077b8137df327b3393154cde89f"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://github.com/microsoft/dnf5-plugin-repo-snapshot/releases/download/v0.1.0/dnf5-plugin-repo-snapshot-0.1.0.tar.gz" }
