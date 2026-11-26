@@ -228,6 +228,28 @@ wsl = true
 [images.wsl.properties]
 openssl-fips-provider = "symcrypt"
 
+# ---- bootc -------------------------------------------------------------
+#
+# A bootable container image (https://bootc-dev.github.io/bootc/): an OCI
+# image that carries a kernel and bootloader payload and is installed to disk
+# and updated with `bootc`. It is a container artifact, not a disk image, so
+# it is not machine-bootable by itself.
+
+[images.bootc-base]
+description = "bootc Base Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "bootc-base" }
+architectures = ["x86_64", "aarch64"]
+tests.tests = [{ name = "static-image-checks" }]
+
+[images.bootc-base.capabilities]
+machine-bootable = false
+container = true
+systemd = true
+runtime-package-management = true
+
+[images.bootc-base.properties]
+openssl-fips-provider = "symcrypt"
+
 [images.vm-iso-installer]
 description = "VM ISO Installer"
 definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", profile = "vm-iso-installer" }
