@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:     lldpd
-Version:  1.0.22
-Release: 5%{?dist}
+Version: 1.0.23
+Release: 6%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 License:  ISC
 
@@ -15,7 +15,6 @@ Source3:  %{name}-fedora.sysconfig
 Source4:  %{name}-systemd-sysusers.conf
 
 # https://github.com/lldpd/lldpd/pull/805
-Patch0:   0001-include-add-us-128-to-linux-types.h.patch
 
 BuildRequires: autoconf automake libtool
 BuildRequires: check-devel
