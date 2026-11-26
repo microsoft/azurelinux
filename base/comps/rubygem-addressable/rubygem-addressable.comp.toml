@@ -1,0 +1,2 @@
+[components.rubygem-addressable]
+overlay-files = ["overlays/*.overlay.toml"]
