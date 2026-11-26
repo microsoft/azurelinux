@@ -16,7 +16,7 @@
 Summary: Library that implements an embeddable SQL database engine
 Name: sqlite
 Version: %{rpmver}
-Release: 7%{?dist}
+Release: 9%{?dist}
 License: blessing
 URL: http://www.sqlite.org/
 
@@ -27,6 +27,17 @@ Source2: http://www.sqlite.org/%{year}/sqlite-autoconf-%{realver}.tar.gz
 Patch1: sqlite-3.6.23-lemon-system-template.patch
 Patch2: sqlite-3.49.0-fix-lemon-missing-cflags.patch
 Patch3: sqlite-3.50.2-CVE-2026-11822-CVE-2026-11824.patch
+Patch4: sqlite-3.50.2-CVE-2026-119371.patch
+Patch5: sqlite-3.50.2-CVE-2026-119372.patch
+Patch6: sqlite-3.50.2-CVE-2026-119373.patch
+Patch7: sqlite-3.50.2-CVE-2026-119374.patch
+Patch8: sqlite-3.50.2-CVE-2026-119375.patch
+Patch9: sqlite-3.50.2-CVE-2026-119376.patch
+Patch10: sqlite-3.50.2-CVE-2026-119377.patch
+Patch11: sqlite-3.50.2-CVE-2026-119378.patch
+Patch12: sqlite-3.50.2-CVE-2026-119379.patch
+Patch13: sqlite-3.50.2-CVE-2026-119586.patch
+Patch14: sqlite-3.50.2-CVE-2026-119591.patch
 
 BuildRequires: make
 BuildRequires: gcc gcc-c++
@@ -176,6 +187,17 @@ This package contains the analysis program for %{name}.
 %patch -P 1 -p1
 %patch -P 2 -p1
 %patch -P 3 -p1
+%patch -P 4 -p1
+%patch -P 5 -p1
+%patch -P 6 -p1
+%patch -P 7 -p1
+%patch -P 8 -p1
+%patch -P 9 -p1
+%patch -P 10 -p1
+%patch -P 11 -p1
+%patch -P 12 -p1
+%patch -P 13 -p1
+%patch -P 14 -p1
 
 # The atof test is failing on the i686 architecture, when binary configured with
 # --enable-rtree option. Failing part is text->real conversion and
@@ -354,6 +376,10 @@ make test
 %endif
 
 %changelog
+* Wed Nov 18 2026 Petr Khartskhaev <pkhartsk@redhat.com> - 3.50.2-4
+- Fix CVE-2026-119371, CVE-2026-119372, CVE-2026-119373, CVE-2026-119374, CVE-2026-119375,
+      CVE-2026-119376, CVE-2026-119377, CVE-2026-119378, CVE-2026-119379, CVE-2026-119586, CVE-2026-119591
+
 * Mon Aug 10 2026 Petr Khartskhaev <pkhartsk@redhat.com> - 3.50.2-3
 - Fix CVE-2026-11822 and CVE-2026-11824
 
