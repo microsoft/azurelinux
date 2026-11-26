@@ -14,7 +14,7 @@
     "azure-mcp-server": {
       "args": [
         "-y",
-        "@azure/mcp@latest",
+        "@azure/mcp@3.0.0-beta.47",
         "server",
         "start",
         "--tool",
@@ -66,7 +66,7 @@
     "microsoft-azure-devops-mcp": {
       "args": [
         "-y",
-        "@azure-devops/mcp@latest",
+        "@azure-devops/mcp@2.10.0",
         "$AZURE_DEVOPS_ORG",
         "-d",
         "$AZURE_DEVOPS_DOMAIN"
