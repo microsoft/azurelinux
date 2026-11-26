@@ -3,7 +3,7 @@
 
 Name:           rocm-rpm-macros
 Version:        6.4.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        ROCm RPM macros
 License:        GPL-2.0-or-later
 
@@ -40,7 +40,6 @@ Requires:       Modules
 Requires:       environment-modules
 %endif
 # Only infra files
-BuildArch: noarch
 # ROCm only working on x86_64
 ExclusiveArch:  x86_64
 %description

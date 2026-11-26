@@ -1,0 +1,23 @@
+# rocm-rpm-macros is BuildArch: noarch with ExclusiveArch: x86_64, and its
+# -modules subpackage requires rocm-llvm-filesystem, which is only built for
+# x86_64. rpm does not record ExclusiveArch in binary RPM headers, and our
+# publishing copies every noarch RPM into every arch repo, so the subpackages
+# land in the aarch64 repo and rocm-rpm-macros-modules fails repoclosure
+# (https://github.com/microsoft/azurelinux/issues/18985).
+#
+# BuildArch is set on the main package, so the whole build has to become
+# arch-specific. Every consumer is already x86_64-only. debug_package is
+# already %{nil} in the spec. Same approach as vmaf-models (see
+# vmaf.comp.toml). Drop this overlay once publishing honors the SRPM's
+# ExclusiveArch for noarch packages.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://github.com/microsoft/azurelinux/issues/18985" }]
+
+[[overlays]]
+description = "Make rocm-rpm-macros arch-specific so it is not published to aarch64"
+type = "spec-remove-tag"
+tag = "BuildArch"
+value = "noarch"
