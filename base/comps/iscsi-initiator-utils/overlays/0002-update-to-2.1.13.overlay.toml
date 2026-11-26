@@ -1,0 +1,72 @@
+# Fedora f43 and f44 package open-iscsi 2.1.11. Update to the upstream 2.1.13
+# patch release on the same spec for these CVE fixes:
+# CVE-2026-18726, CVE-2026-18727, CVE-2026-18728, CVE-2026-44943,
+# CVE-2026-44944
+# The spec builds Version from %{open_iscsi_version}.%{open_iscsi_build} and
+# Source0 from %{commit0}, so those globals are updated instead of the
+# Version tag. The Fedora patches and %install/%files changes follow what
+# Fedora rawhide did for 2.1.13.
+# Remove this overlay once the imported Fedora spec packages 2.1.13 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.1.13 (Version 6.2.1.13)"
+type = "spec-search-replace"
+regex = '^%global open_iscsi_build\s+11$'
+replacement = "%global open_iscsi_build\t13"
+
+[[overlays]]
+description = "Build from the upstream 2.1.13 tag commit"
+type = "spec-search-replace"
+regex = '^%global commit0\s+4b3e853ab468a95d8a035efa8fc4298a6c6318a3$'
+replacement = "%global commit0\t\t\t40f6b2944f8a8553ad57975d1f2bb512cc23d7d1"
+
+[[overlays]]
+description = "Rebase patch 0003: etc/Makefile context changed in 2.1.12"
+type = "file-search-replace"
+file = "0003-Use-DBROOT-in-iscsi-starter.-Include-iscsi-starter-i.patch"
+regex = '(?m)^ install: install_systemd install_iface install_etc$'
+replacement = ' install_etc: $(DESTDIR)$(HOMEDIR) $(ETC_DEST_FILES)'
+
+[[overlays]]
+description = "Rebase patch 0007: iscsid.conf gained the tcp.congestion_control block in 2.1.12"
+type = "file-search-replace"
+file = "0007-Disable-Data-Digests.patch"
+regex = '(?m)^ # For multipath configurations, you may want more than one session to be$'
+replacement = ' # When using iSCSI over long range links with high round-trip time'
+
+[[overlays]]
+description = "Rebase patch 0010: version strings are 2.1.13 and 6.2.1.13"
+type = "file-search-replace"
+file = "0010-use-Red-Hat-version-string-to-match-RPM-package-vers.patch"
+regex = '2\.1\.11'
+replacement = '2.1.13'
+
+# Since 2.1.12, iscsi-init.service runs iscsi-gen-initiatorname to create
+# /etc/iscsi/initiatorname.iscsi, so the script and its man page must ship.
+[[overlays]]
+description = "Keep iscsi-gen-initiatorname and its man page, iscsi-init.service needs them"
+type = "spec-search-replace"
+section = "%install"
+regex = '^rm \$RPM_BUILD_ROOT/(%\{_sbindir\}/iscsi-gen-initiatorname|usr/share/man/man8/iscsi-gen-initiatorname\.8)$'
+
+[[overlays]]
+description = "Package iscsi-gen-initiatorname and its man page"
+type = "spec-append-lines"
+section = "%files"
+lines = ["%{_sbindir}/iscsi-gen-initiatorname", "%{_mandir}/man8/iscsi-gen-initiatorname.8.gz"]
+
+[[overlays]]
+description = "2.1.12 no longer installs iface.example, so there is nothing to remove"
+type = "spec-search-replace"
+section = "%install"
+regex = '^rm \$RPM_BUILD_ROOT/var/lib/iscsi/ifaces/iface\.example$'
+
+[[overlays]]
+description = "Remove the obsolete 2.1.11 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(open-iscsi-4b3e853\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

@@ -1,3 +1,12 @@
 [components.iscsi-initiator-utils]
 # Release: 0.git%{shortcommit0}%{?dist}.2
 release = { calculation = "manual" }
+
+# open-iscsi 2.1.13 is only published as a GitHub tag archive (no release
+# assets). Downloaded from github.com/.../archive and codeload.github.com with
+# the same SHA512, which also matches Fedora rawhide's sources entry.
+[[components.iscsi-initiator-utils.source-files]]
+filename = "open-iscsi-40f6b29.tar.gz"
+hash = "dbb1ba500614a5f3f8c6a809806caf65e58746c710682d8e69deaef114186f91fc6a6c74c752661249d6770ef870a8ea78e6bde4c8e7f676e3d2f73704cf97b0"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/open-iscsi/open-iscsi/archive/40f6b2944f8a8553ad57975d1f2bb512cc23d7d1.tar.gz" }

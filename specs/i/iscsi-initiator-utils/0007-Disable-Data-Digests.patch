@@ -46,7 +46,7 @@ index ec4d4df..e009c29 100644
 +# The default is to never use HeaderDigests.
  #
  
- # For multipath configurations, you may want more than one session to be
+ # When using iSCSI over long range links with high round-trip time
 diff --git a/usr/idbm.c b/usr/idbm.c
 index ca4a4ec..32e99bc 100644
 --- a/usr/idbm.c
