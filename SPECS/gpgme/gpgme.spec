@@ -1,13 +1,14 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
 Version:        1.23.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ and LGPLv2+ and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.gnupg.org/(it)/related_software/gpgme/index.html
 Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2026-129975.patch
 BuildRequires:  gnupg2
 BuildRequires:  libassuan-devel >= 2.4.2
 BuildRequires:  libgpg-error-devel >= 1.36
@@ -83,6 +84,9 @@ cd tests
 %{python3_sitearch}/gpg-%{version}-*
 
 %changelog
+* Thu Nov 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.23.2-3
+- Patch for CVE-2026-129975
+
 * Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 1.23.2-2
 - Fix python3-gpg files location
 
