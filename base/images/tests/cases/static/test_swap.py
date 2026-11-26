@@ -158,7 +158,8 @@ def test_no_zram_swap_kernel_cmdline(
     zram-generator activates a default ``zram0`` swap device when the
     kernel command line carries ``systemd.zram`` with no value, or any
     value other than ``0``/``false``/``no``/``off`` — independent of any
-    on-disk ``zram-generator.conf``.
+    on-disk ``zram-generator.conf``. For UKI images, the fixture reads
+    options from the embedded ``.cmdline`` section.
     """
     enabling_entries: list[str] = []
     options_by_entry = parse_boot_entry_kernel_options(boot_entry_option_lines)

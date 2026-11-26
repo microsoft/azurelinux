@@ -19,6 +19,7 @@ import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import pefile
 import pytest
 from utils.container_runtime import (
     AssertHttpServer,
@@ -41,7 +42,9 @@ from utils.extract import (
     mount_container_image,
     mount_vm_image,
     mount_wsl_image,
+    read_bytes_confined,
     read_text_confined,
+    resolve_path_confined,
     unmount_container_image,
     unmount_vm_image,
     unmount_wsl_image,
@@ -313,20 +316,36 @@ def partition_table(disk_info: DiskInfo | None, image_type: str) -> list[Partiti
     return disk_info.partitions
 
 
+def _uki_cmdline(data: bytes, uki: Path) -> bytes | None:
+    try:
+        pe = pefile.PE(data=data, fast_load=True)
+    except pefile.PEFormatError as exc:
+        raise pefile.PEFormatError(f"Invalid UKI PE {uki}: {exc}") from exc
+    try:
+        for section in pe.sections:
+            if section.Name.rstrip(b"\0") == b".cmdline":
+                if section.PointerToRawData + section.SizeOfRawData > len(data):
+                    raise pefile.PEFormatError(f"Invalid UKI PE {uki}: truncated .cmdline section")
+                # pefile trims raw padding only for nonzero virtual sizes.
+                return section.get_data(ignore_padding=bool(section.Misc_VirtualSize))
+        return None
+    finally:
+        pe.close()
+
+
 @pytest.fixture(scope="session")
 def boot_entry_option_lines(rootfs: Path) -> dict[Path, list[str]]:
-    """Raw kernel option lines keyed by BLS boot entry path."""
+    """Return kernel options keyed by Type #1 BLS entry or Type #2 UKI path.
+
+    Type #1 entries keep an ``options`` line in loader/entries text files.
+    Type #2 UKIs (UAPI.5) embed the command line in the PE ``.cmdline`` section.
+    Addon command lines are excluded; a UKI without ``.cmdline`` fails boot-option checks.
+    """
     entries_dirs = (
         rootfs / "boot" / "loader" / "entries",
         rootfs / "boot" / "efi" / "loader" / "entries",
     )
-    entries = sorted(
-        {
-            entry
-            for entries_dir in entries_dirs
-            for entry in entries_dir.glob("*.conf")
-        }
-    )
+    entries = sorted({entry for entries_dir in entries_dirs for entry in entries_dir.glob("*.conf")})
     option_lines_by_entry: dict[Path, list[str]] = {}
     for entry in entries:
         option_lines: list[str] = []
@@ -336,6 +355,19 @@ def boot_entry_option_lines(rootfs: Path) -> dict[Path, list[str]]:
             if fields and fields[0] == "options":
                 option_lines.append(fields[1] if len(fields) > 1 else "")
         option_lines_by_entry[entry] = option_lines
+
+    # Type #2 UKIs carry their options in the binary, unlike Type #1 text entries.
+    # Do not include loader/addons or <uki>.extra.d addon command lines.
+    uki_dir = resolve_path_confined(rootfs, "boot/efi/EFI/Linux")
+    for uki in sorted(uki_dir.iterdir()) if uki_dir.is_dir() else ():
+        if uki.name.startswith(".") or uki.suffix.lower() != ".efi":
+            continue
+        relative_uki = uki.relative_to(rootfs).as_posix()
+        if not resolve_path_confined(rootfs, relative_uki).is_file():
+            continue
+        cmdline = _uki_cmdline(read_bytes_confined(rootfs, relative_uki), uki)
+        # Missing .cmdline leaves no options line, so boot-option checks fail loudly.
+        option_lines_by_entry[uki] = [cmdline.decode("utf-8").rstrip("\0 \t\r\n\v\f")] if cmdline is not None else []
     return option_lines_by_entry
 
 
