@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "FALLBACK: omit only pkg/sys.TestSetPositiveOomScoreAdjustment so the rest of the tests can run; the containerized build may prevent the requested OOM score change"
+type = "patch-add"
+source = "../fallback-positive-oom-score-adjustment.patch"

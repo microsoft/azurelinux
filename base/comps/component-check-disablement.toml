@@ -5,7 +5,6 @@ description = "Components with check failures during initial distro bringup"
 components = [
     "bats",
     "breezy",
-    "containerd",
     "dnf",
     "elfutils",
     "fontconfig",
