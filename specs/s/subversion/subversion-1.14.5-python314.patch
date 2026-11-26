@@ -1,51 +1,234 @@
-"The interpreter internally avoids some reference count modifications when
-loading objects onto the operands stack by borrowing references when
-possible. This can lead to smaller reference count values compared to
-previous Python versions."
 
-https://docs.python.org/3.14/whatsnew/3.14.html#whatsnew314-refcount
+Skip refcount-counting tests for Python 3.14. See:
+https://lists.apache.org/thread/vpg0ttrm5p51c8sfpry15mz2zff8h8o8
 
-diff --git a/subversion/bindings/swig/python/tests/mergeinfo.py b/subversion/bindings/swig/python/tests/mergeinfo.py
-index 873fc52..ab4da18 100644
---- a/subversion/bindings/swig/python/tests/mergeinfo.py
-+++ b/subversion/bindings/swig/python/tests/mergeinfo.py
-@@ -138,8 +138,8 @@ class SubversionMergeinfoTestCase(unittest.TestCase):
+--- subversion-1.14.5/subversion/bindings/swig/python/tests/mergeinfo.py.10
++++ subversion-1.14.5/subversion/bindings/swig/python/tests/mergeinfo.py
+@@ -18,7 +18,7 @@
+ # under the License.
+ #
+ #
+-import unittest, os, sys, gc
++import unittest, os, sys, weakref, gc
+ from svn import core, repos, fs
+ import utils
+ 
+@@ -125,6 +125,9 @@
+       }
+     self.compare_mergeinfo_catalogs(mergeinfo, expected_mergeinfo)
+ 
++  @unittest.skipIf(utils.HAS_DEFERRED_REFCOUNT,
++                   "Reference counting tests skipped because of deferred "
++                   "reference counting")
+   def test_mergeinfo_leakage__incorrect_range_t_refcounts(self):
+     """Ensure that the ref counts on svn_merge_range_t objects returned by
+        svn_mergeinfo_parse() are correct."""
+@@ -138,7 +141,8 @@
          # ....and now 3 (incref during iteration of each range object)
  
          refcount = sys.getrefcount(r)
 -        # ....and finally, 4 (getrefcount() also increfs)
--        expected = 4
-+        # ....and finally, 4 (getrefcount() also increfs, but not as of 3.14)
-+        expected = 3 if sys.version_info >= (3, 14) else 4
++        # ....and finally, 4 (getrefcount() also increfs, unless deferred 
++        #                     reference counting)
+         expected = 4
  
          # Note: if path and index are not '/trunk' and 0 respectively, then
-         # only some of the range objects are leaking, which is, as far as
-diff --git a/subversion/bindings/swig/python/tests/repository.py b/subversion/bindings/swig/python/tests/repository.py
-index e764ec5..d180c75 100644
---- a/subversion/bindings/swig/python/tests/repository.py
-+++ b/subversion/bindings/swig/python/tests/repository.py
-@@ -429,13 +429,14 @@ class SubversionRepositoryTestCase(unittest.TestCase):
+@@ -150,8 +154,49 @@
+           "cause: incorrect Py_INCREF/Py_DECREF usage in libsvn_swig_py/"
+           "swigutil_py.c." % (expected, refcount, path, i)))
+ 
++  def test_mergeinfo_leakage__incorrect_range_t_weakrefs(self):
++    """Ensure that the ref counts on svn_merge_range_t objects returned by
++       svn_mergeinfo_parse() are correct."""
++    # When reference counting is working properly, each svn_merge_range_t in
++    # the returned mergeinfo will have a ref count of 1...
++    mergeinfo = core.svn_mergeinfo_parse(self.TEXT_MERGEINFO1)
++    merge_range_refdict = weakref.WeakValueDictionary()
++    merge_range_indexes = []
++    n_merge_range = 0 
++    for (path, rangelist) in core._as_list(mergeinfo.items()):
++      # ....and now 2 (incref during iteration of rangelist)
++
++      for (i, r) in enumerate(rangelist):
++        # ....and now 3 (incref during iteration of each range object)
++
++        idx = (path, i)
++        merge_range_refdict[idx] = r
++        merge_range_indexes.append(idx) 
++        n_merge_range += 1
++
++        # Note: if path and index are not '/trunk' and 0 respectively, then
++        # only some of the range objects are leaking, which is, as far as
++        # leaks go, even more impressive.
++
++    del rangelist, r
++    gc.collect()
++    # Now (strong) reference count of all svn_merge_range_t should be 1
++    # again and those objects should not be removed yet.
++    for idx in merge_range_indexes:
++      self.assertIn(idx, merge_range_refdict, (
++          "Refarence count error on svn_merge_info_t object for "
++          "(path: %s, index: %d). It should still exists because "
++          "mergeinfo holds its reference, but after GC, it already "
++          "removed." % idx))
+     del mergeinfo
+     gc.collect()
++    if merge_range_refdict:
++      # certainly memory leak, but we want to listing up leaked objects
++      # before raise an assertion error.  
++      self.assertFalse(merge_range_refdict,
++         "Memory leak! All svn_merge_range_t object holded "
++         "by mergeinfo object should be removed, but at least "
++         "one object still alive.")
+ 
+   def test_mergeinfo_leakage__lingering_range_t_objects_after_del(self):
+     """Ensure that there are no svn_merge_range_t objects being tracked by
+@@ -162,6 +207,9 @@
+        objects will be garbage collected and thus, not appear in the list of
+        objects returned by gc.get_objects()."""
+     mergeinfo = core.svn_mergeinfo_parse(self.TEXT_MERGEINFO1)
++    lingering = get_svn_merge_range_t_objects()
++    self.assertNotEqual(lingering, list())
++    del lingering
+     del mergeinfo
+     gc.collect()
+     lingering = get_svn_merge_range_t_objects()
+--- subversion-1.14.5/subversion/bindings/swig/python/tests/repository.py.10
++++ subversion-1.14.5/subversion/bindings/swig/python/tests/repository.py
+@@ -87,15 +87,32 @@
+ 
+ class BatonCollector(repos.ChangeCollector):
+   """A ChangeCollector with collecting batons, too"""
++
+   def __init__(self, fs_ptr, root, pool=None, notify_cb=None):
++
++    def get_expected_baton_refcount():
++      """determine expected refcount of batons within a batoun_tuple,
++         by using dumy object"""
++      self.open_root(-1, None)
++      for baton_tuple in self.batons: 
++        rc = sys.getrefcount(baton_tuple[2])
++        break
++      return rc
++    
+     repos.ChangeCollector.__init__(self, fs_ptr, root, pool, notify_cb)
+-    self.batons = []
+     self.close_called = False
+     self.abort_called = False
++    # temporary values for get_expected_baton_refcount
++    self.batons = []
++    self.expected_baton_refcount = 0
++    # determin expected_baton_refcount
++    self.expected_baton_refcount = get_expected_baton_refcount()
++    # re-initialize the values after calling get_expected_baton_refcount()
++    self.batons = []
+ 
+   def open_root(self, base_revision, dir_pool=None):
+     bt = repos.ChangeCollector.open_root(self, base_revision, dir_pool)
+-    self.batons.append((b'dir baton', b'', bt, sys.getrefcount(bt)))
++    self.batons.append((b'dir baton', b'', bt, self.expected_baton_refcount))
+     return bt
+ 
+   def add_directory(self, path, parent_baton,
+@@ -104,14 +121,14 @@
+                                              copyfrom_path,
+                                              copyfrom_revision,
+                                              dir_pool)
+-    self.batons.append((b'dir baton', path, bt, sys.getrefcount(bt)))
++    self.batons.append((b'dir baton', path, bt, self.expected_baton_refcount))
+     return bt
+ 
+   def open_directory(self, path, parent_baton, base_revision,
+                      dir_pool=None):
+     bt = repos.ChangeCollector.open_directory(self, path, parent_baton,
+                                               base_revision, dir_pool)
+-    self.batons.append((b'dir baton', path, bt, sys.getrefcount(bt)))
++    self.batons.append((b'dir baton', path, bt, self.expected_baton_refcount))
+     return bt
+ 
+   def add_file(self, path, parent_baton,
+@@ -119,13 +136,13 @@
+     bt = repos.ChangeCollector.add_file(self, path, parent_baton,
+                                         copyfrom_path, copyfrom_revision,
+                                         file_pool)
+-    self.batons.append((b'file baton', path, bt, sys.getrefcount(bt)))
++    self.batons.append((b'file baton', path, bt, self.expected_baton_refcount))
+     return bt
+ 
+   def open_file(self, path, parent_baton, base_revision, file_pool=None):
+     bt = repos.ChangeCollector.open_file(self, path, parent_baton,
+                                          base_revision, file_pool)
+-    self.batons.append((b'file baton', path, bt, sys.getrefcount(bt)))
++    self.batons.append((b'file baton', path, bt, self.expected_baton_refcount))
+     return bt
+ 
+   def close_edit(self, pool=None):
+@@ -138,7 +155,7 @@
+ 
+ class BatonCollectorErrorOnClose(BatonCollector):
+   """Same as BatonCollector, but raises an Exception when close the
+-     file/dir specfied by error_path"""
++     file/dir specified by error_path"""
+   def __init__(self, fs_ptr, root, pool=None, notify_cb=None, error_path=b''):
+     BatonCollector.__init__(self, fs_ptr, root, pool, notify_cb)
+     self.error_path = error_path
+@@ -429,29 +446,33 @@
      root = fs.revision_root(self.fs, self.rev)
      editor = BatonCollector(self.fs, root)
      e_ptr, e_baton = delta.make_editor(editor)
-+    expected = 1 if sys.version_info >= (3, 14) else 2
++    refcount_at_first = sys.getrefcount(e_ptr)
      repos.replay(root, e_ptr, e_baton)
-     for baton in editor.batons:
-       self.assertEqual(sys.getrefcount(baton[2]), 2,
+-    for baton in editor.batons:
+-      self.assertEqual(sys.getrefcount(baton[2]), 2,
++    for baton_tuple in editor.batons:
++      # baton_tuple: 4-tuple(baton_type: bytes, node: bytes, bt: baton,
++      #                      expected_refcount_of_bt: int)
++      self.assertEqual(sys.getrefcount(baton_tuple[2]), baton_tuple[3],
                         "leak on baton %s after replay without errors"
-                        % repr(baton))
+-                       % repr(baton))
++                       % repr(baton_tuple))
      del e_baton
 -    self.assertEqual(sys.getrefcount(e_ptr), 2,
-+    self.assertEqual(sys.getrefcount(e_ptr), expected,
++    self.assertEqual(sys.getrefcount(e_ptr), refcount_at_first,
                       "leak on editor baton after replay without errors")
  
      editor = BatonCollectorErrorOnClose(self.fs, root,
-@@ -451,7 +452,7 @@ class SubversionRepositoryTestCase(unittest.TestCase):
-       self.assertEqual(sys.getrefcount(baton[2]), 2,
+                                         error_path=b'branches/v1x')
+     e_ptr, e_baton = delta.make_editor(editor)
++    refcount_at_first = sys.getrefcount(e_ptr)
+     self.assertRaises(SubversionException, repos.replay, root, e_ptr, e_baton)
+     batons = editor.batons
+     # As svn_repos_replay calls neither close_edit callback nor abort_edit
+-    # if an error has occured during processing, references of Python objects
+-    # in decendant batons may live until e_baton is deleted.
++    # if an error has occurred during processing, references of Python objects
++    # in descendant batons may live until e_baton is deleted.
+     del e_baton
+-    for baton in batons:
+-      self.assertEqual(sys.getrefcount(baton[2]), 2,
++    for baton_tuple in batons:
++      self.assertEqual(sys.getrefcount(baton_tuple[2]), baton_tuple[3],
                         "leak on baton %s after replay with an error"
-                        % repr(baton))
+-                       % repr(baton))
 -    self.assertEqual(sys.getrefcount(e_ptr), 2,
-+    self.assertEqual(sys.getrefcount(e_ptr), expected,
++                       % repr(baton_tuple))
++    self.assertEqual(sys.getrefcount(e_ptr), refcount_at_first,
                       "leak on editor baton after replay with an error")
  
    def test_delta_editor_apply_textdelta_handler_refcount(self):
+--- subversion-1.14.5/subversion/bindings/swig/python/tests/utils.py.10
++++ subversion-1.14.5/subversion/bindings/swig/python/tests/utils.py
+@@ -95,3 +95,13 @@
+ 
+ def is_defaultencoding_utf8():
+   return codecs_eq(sys.getdefaultencoding(), 'utf-8')
++
++def get_holded_refcount_by_getrefcount():
++  "get refcount holded by sys.getrefcount() if its arg is a local variable"
++  a = []
++  rv = sys.getrefcount(a) - 1
++  return rv
++
++HAS_DEFERRED_REFCOUNT = not get_holded_refcount_by_getrefcount()
++
++del get_holded_refcount_by_getrefcount

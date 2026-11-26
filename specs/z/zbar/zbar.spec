@@ -9,7 +9,7 @@
 
 Name:		zbar
 Version:	0.23.93
-Release: 13%{?dist}
+Release: 18%{?dist}
 Summary:	Bar code reader
 
 License:	LGPL-2.1-or-later
@@ -31,12 +31,13 @@ BuildRequires:	make
 BuildRequires:	python3-gobject-devel
 BuildRequires:	qt5-qtbase-devel
 BuildRequires:	qt5-qtx11extras-devel
-BuildRequires:	xmlto
 %if %{JAVA}
 BuildRequires:	java-devel
 %endif
 BuildRequires:	python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  xmlto
+BuildRequires:  gobject-introspection-devel
 
 %description
 ZBar Bar Code Reader is an open source software suite for reading bar
@@ -168,6 +169,7 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/
 %files libs -f zbar.lang
 %license COPYING LICENSE.md
 %{_libdir}/libzbar.so.0*
+%{_libdir}/girepository-1.0/ZBar-1.0.typelib
 
 %files devel
 %doc HACKING.md TODO.md
@@ -184,19 +186,16 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/
 %{_includedir}/zbar/Video.h
 %{_includedir}/zbar/Window.h
 %{_includedir}/zbar/Processor.h
+%{_datadir}/gir-1.0/ZBar-1.0.gir
 
 %files gtk
 %{_libdir}/libzbargtk.so.*
 %{_bindir}/zbarcam-gtk
 
-
-
 %files gtk-devel
 %{_libdir}/libzbargtk.so
 %{_libdir}/pkgconfig/zbar-gtk.pc
 %{_includedir}/zbar/zbargtk.h
-
-
 
 %files qt
 %{_libdir}/libzbarqt.so.*
@@ -218,6 +217,18 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/
 %{_docdir}/test_python.py
 
 %changelog
+* Tue Aug 04 2026 Gwyn Ciesla <gwync@protonmail.com> - 0.23.93-13
+- Rebuild for Python 3.15.0b4
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.23.93-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 0.23.93-11
+- Rebuilt for Python 3.15
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.23.93-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 05 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 0.23.93-9
 - Fix Qt overlinking
 
