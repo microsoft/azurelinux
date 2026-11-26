@@ -1,4 +1,7 @@
+# Pin to Fedora f43 dnf5-5.2.18.0-7.fc43 for the dnf5daemon-server CVE fixes.
+# https://src.fedoraproject.org/rpms/dnf5/c/16227bd669ec19a30f49531682a2f225972e9496
 [components.dnf5]
+spec = { type = "upstream", upstream-commit = "16227bd669ec19a30f49531682a2f225972e9496" }
 
 [components.dnf5.build]
 # Disable RedHat subscription manager plugin
