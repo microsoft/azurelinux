@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-num-bigint-0.5.1-1 (FEDORA-2026-49adf7234d).
+# https://src.fedoraproject.org/rpms/rust-num-bigint/c/9fb0f1ad1706fba7718e7f92bbf39fe6c42560e5
+[components.rust-num-bigint]
+spec = { type = "upstream", upstream-commit = "9fb0f1ad1706fba7718e7f92bbf39fe6c42560e5" }
