@@ -1,0 +1,53 @@
+# Fedora f44 moved to containerd 2.4 and f43 carries 2.2, so neither has 2.3.7. Update the
+# pinned f44 2.3.5 spec to the upstream 2.3.7 patch release for these CVE fixes:
+# CVE-2026-53493, CVE-2026-95839 (containerd), CVE-2026-56852 (golang.org/x/text 0.41.0),
+# CVE-2026-84304, CVE-2026-84445 (google.golang.org/grpc 1.83.2)
+#
+# Upstream commits vendor/ in the release tag. Fedora's containerd-2.3.5-vendor.tar.bz2 has
+# the same vendor/, go.mod and go.sum as the 2.3.5 tag (diff -r shows no difference), and
+# `go mod vendor` on the 2.3.7 tag reproduces its vendor/ exactly, so build from the in-tree
+# vendor/ (%goprep -k keeps it) and drop the separate vendor archive. go-vendor-tools.toml
+# still applies: the 2.3.7 module set and the two license files it hashes are unchanged.
+# Remove this overlay once the imported Fedora spec packages 2.3.7 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 2.3.7"
+type = "spec-update-tag"
+tag = "Version"
+value = "2.3.7"
+
+[[overlays]]
+description = "Drop the separate vendor archive; the release tarball ships vendor/"
+type = "spec-remove-tag"
+tag = "Source1"
+value = "%{archivename}-vendor.tar.bz2"
+
+[[overlays]]
+description = "Keep the upstream vendor/ directory, which %goprep deletes by default"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%goprep -p1$'
+replacement = "%goprep -k -p1"
+
+[[overlays]]
+description = "Do not unpack the dropped vendor archive"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^tar -xf %\{S:1\}$'
+replacement = "# vendor/ comes from the upstream release tarball"
+
+[[overlays]]
+description = "Remove the obsolete containerd-2.3.5.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(containerd-2\.3\.5\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
+
+[[overlays]]
+description = "Remove the obsolete containerd-2.3.5-vendor.tar.bz2 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(containerd-2\.3\.5-vendor\.tar\.bz2\) = [0-9a-f]+(?:\r?\n|$)'
