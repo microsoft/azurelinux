@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-ruzstd-0.9.1-1 (FEDORA-2026-9e7597548d).
+# https://src.fedoraproject.org/rpms/rust-ruzstd/c/71251d4805edc6d9f5588702adbbed78d9b1a8cb
+[components.rust-ruzstd]
+spec = { type = "upstream", upstream-commit = "71251d4805edc6d9f5588702adbbed78d9b1a8cb" }
