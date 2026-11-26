@@ -1,0 +1,497 @@
+diff --git a/NEWS b/NEWS
+index 5eadfe9d..ffb4f54f 100644
+--- a/NEWS
++++ b/NEWS
+@@ -20,6 +20,10 @@ version 1.35.90 (git)
+    not even temporarily.  This matches the documentation better and avoids
+    some permissions glitches.
+ 
++** tar no longer behaves erratically when reading nonzero size fields
++   in archive headers representing special files, fifos, and symlinks.
++   Although these size fields are typically zero, POSIX allows some to
++   be nonzero, and in practice they do not count data blocks.
+ 
+ version 1.35 - Sergey Poznyakoff, 2023-07-18
+ 
+diff --git a/THANKS b/THANKS
+index aee0a924..b9e4ce54 100644
+--- a/THANKS
++++ b/THANKS
+@@ -38,6 +38,7 @@ Andrey A. Chernov	ache@astral.msk.su
+ Andy Gay		andy@rdl.co.uk
+ Antonio Jose Coutinho	ajc@di.uminho.pt
+ Anthony G. Basile	blueness@gentoo.org
++Antonio Teixeira	antonio.teixeira@suse.com
+ Ariel Faigon		ariel@engr.sgi.com
+ Arne Wichmann		aw@math.uni-sb.de
+ Arnold Robbins		arnold@gnu.org
+diff --git a/src/extract.c b/src/extract.c
+index cfaf5daf..4685f83c 100644
+--- a/src/extract.c
++++ b/src/extract.c
+@@ -1056,7 +1056,7 @@ safe_dir_mode (struct stat const *st)
+ /* Extractor functions for various member types */
+ 
+ static int
+-extract_dir (char *file_name, int typeflag)
++extract_dir (char *file_name, MAYBE_UNUSED int typeflag)
+ {
+   int status;
+   mode_t mode;
+@@ -1081,8 +1081,6 @@ extract_dir (char *file_name, int typeflag)
+   if (incremental_option)
+     /* Read the entry and delete files that aren't listed in the archive.  */
+     purge_directory (file_name);
+-  else if (typeflag == GNUTYPE_DUMPDIR)
+-    skip_member ();
+ 
+   mode = safe_dir_mode (&current_stat_info.stat);
+ 
+@@ -1266,10 +1264,7 @@ extract_file (char *file_name, int typeflag)
+     {
+       fd = sys_exec_command (file_name, 'f', &current_stat_info);
+       if (fd < 0)
+-	{
+-	  skip_member ();
+-	  return 0;
+-	}
++	return 0;
+     }
+   else
+     {
+@@ -1289,7 +1284,6 @@ extract_file (char *file_name, int typeflag)
+ 	  int recover = maybe_recoverable (file_name, true, &interdir_made);
+ 	  if (recover != RECOVER_OK)
+ 	    {
+-	      skip_member ();
+ 	      if (recover == RECOVER_SKIP)
+ 		return 0;
+ 	      open_error (file_name);
+@@ -1337,6 +1331,7 @@ extract_file (char *file_name, int typeflag)
+       }
+ 
+   skim_file (size, false);
++  current_stat_info.skipped = true;
+ 
+   mv_end ();
+ 
+@@ -1869,15 +1864,10 @@ extract_archive (void)
+   typeflag = sparse_member_p (&current_stat_info) ?
+                   GNUTYPE_SPARSE : current_header->header.typeflag;
+ 
+-  if (prepare_to_extract (current_stat_info.file_name, typeflag, &fun))
+-    {
+-      if (fun (current_stat_info.file_name, typeflag) == 0)
+-	return;
+-    }
+-  else
+-    skip_member ();
+-
+-  if (backup_option)
++  bool ok = prepare_to_extract (current_stat_info.file_name, typeflag, &fun)
++            && fun (current_stat_info.file_name, typeflag) == 0;
++  skip_member ();
++  if (!ok && backup_option)
+     undo_last_backup ();
+ }
+ 
+diff --git a/src/incremen.c b/src/incremen.c
+index 7bcfdb93..194d5cb1 100644
+--- a/src/incremen.c
++++ b/src/incremen.c
+@@ -1625,8 +1625,8 @@ dumpdir_ok (char *dumpdir)
+ 
+ /* Examine the directories under directory_name and delete any
+    files that were not there at the time of the back-up. */
+-static bool
+-try_purge_directory (char const *directory_name)
++void
++purge_directory (char const *directory_name)
+ {
+   char *current_dir;
+   char *cur, *arc, *p;
+@@ -1634,18 +1634,18 @@ try_purge_directory (char const *directory_name)
+   struct dumpdir *dump;
+ 
+   if (!is_dumpdir (&current_stat_info))
+-    return false;
++    return;
+ 
+   current_dir = tar_savedir (directory_name, 0);
+ 
+   if (!current_dir)
+     /* The directory doesn't exist now.  It'll be created.  In any
+        case, we don't have to delete any files out of it.  */
+-    return false;
++    return;
+ 
+   /* Verify if dump directory is sane */
+   if (!dumpdir_ok (current_stat_info.dumpdir))
+-    return false;
++    return;
+ 
+   /* Process renames */
+   for (arc = current_stat_info.dumpdir; *arc; arc += strlen (arc) + 1)
+@@ -1666,7 +1666,7 @@ try_purge_directory (char const *directory_name)
+ 		      quote (temp_stub)));
+ 	      free (temp_stub);
+ 	      free (current_dir);
+-	      return false;
++	      return;
+ 	    }
+ 	}
+       else if (*arc == 'R')
+@@ -1700,7 +1700,7 @@ try_purge_directory (char const *directory_name)
+ 	      free (current_dir);
+ 	      /* FIXME: Make sure purge_directory(dst) will return
+ 		 immediately */
+-	      return false;
++	      return;
+ 	    }
+ 	}
+     }
+@@ -1758,14 +1758,6 @@ try_purge_directory (char const *directory_name)
+   dumpdir_free (dump);
+ 
+   free (current_dir);
+-  return true;
+-}
+-
+-void
+-purge_directory (char const *directory_name)
+-{
+-  if (!try_purge_directory (directory_name))
+-    skip_member ();
+ }
+ 
+ void
+diff --git a/src/list.c b/src/list.c
+index e9a68159..7d7cde5a 100644
+--- a/src/list.c
++++ b/src/list.c
+@@ -437,20 +437,15 @@ read_header (union block **return_block, struct tar_stat_info *info,
+       if ((status = tar_checksum (header, false)) != HEADER_SUCCESS)
+ 	break;
+ 
+-      /* Good block.  Decode file size and return.  */
+-
+-      if (header->header.typeflag == LNKTYPE)
+-	info->stat.st_size = 0;	/* links 0 size on tape */
+-      else
++      info->stat.st_size = OFF_FROM_HEADER (header->header.size);
++      if (info->stat.st_size < 0)
+ 	{
+-	  info->stat.st_size = OFF_FROM_HEADER (header->header.size);
+-	  if (info->stat.st_size < 0)
+-	    {
+-	      status = HEADER_FAILURE;
+-	      break;
+-	    }
++	  status = HEADER_FAILURE;
++	  break;
+ 	}
+ 
++      info->skipped = false;
++
+       if (header->header.typeflag == GNUTYPE_LONGNAME
+ 	  || header->header.typeflag == GNUTYPE_LONGLINK
+ 	  || header->header.typeflag == XHDTYPE
+@@ -513,11 +508,15 @@ read_header (union block **return_block, struct tar_stat_info *info,
+ 		}
+ 
+ 	      *bp = '\0';
++	      info->skipped = true;
+ 	    }
+ 	  else if (header->header.typeflag == XHDTYPE
+ 		   || header->header.typeflag == SOLARIS_XHDTYPE)
+-	    xheader_read (&info->xhdr, header,
+-			  OFF_FROM_HEADER (header->header.size));
++	    {
++	      xheader_read (&info->xhdr, header,
++			    OFF_FROM_HEADER (header->header.size));
++	      info->skipped = true;
++	    }
+ 	  else if (header->header.typeflag == XGLTYPE)
+ 	    {
+ 	      struct xheader xhdr;
+@@ -531,6 +530,7 @@ read_header (union block **return_block, struct tar_stat_info *info,
+ 			    OFF_FROM_HEADER (header->header.size));
+ 	      xheader_decode_global (&xhdr);
+ 	      xheader_destroy (&xhdr);
++	      info->skipped = true;
+ 	      if (mode == read_header_x_global)
+ 		{
+ 		  status = HEADER_SUCCESS_EXTENDED;
+@@ -547,6 +547,22 @@ read_header (union block **return_block, struct tar_stat_info *info,
+ 	  struct posix_header const *h = &header->header;
+ 	  char namebuf[sizeof h->prefix + 1 + NAME_FIELD_SIZE + 1];
+ 
++	  switch (h->typeflag)
++	    {
++	    /* For these file types, although POSIX does not specify the
++	       meaning of the size, it does say there should be no data,
++	       so treat the size as zero.  */
++	    case BLKTYPE: case CHRTYPE: case FIFOTYPE:
++
++	    /* For these file types, POSIX requires that the size be zero.
++	       Be generous and accept any size as zero, as some
++	       nonconforming programs generate nonzero size fields along
++	       with no data.  */
++	    case LNKTYPE: case SYMTYPE:
++
++	      info->stat.st_size = 0;
++	    }
++
+ 	  free (recent_long_name);
+ 
+ 	  if (next_long_name)
+@@ -1440,6 +1456,24 @@ skip_member (void)
+   skim_member (false);
+ }
+ 
++static bool
++member_is_dir (struct tar_stat_info *info, char typeflag)
++{
++  switch (typeflag)
++    {
++    case AREGTYPE:
++    case REGTYPE:
++    case CONTTYPE:
++      return info->had_trailing_slash;
++
++    case DIRTYPE:
++      return true;
++
++    default:
++      return false;
++    }
++}
++
+ /* Skip the current member in the archive.
+    If MUST_COPY, always copy instead of skipping.  */
+ void
+@@ -1447,17 +1481,18 @@ skim_member (bool must_copy)
+ {
+   if (!current_stat_info.skipped)
+     {
+-      char save_typeflag = current_header->header.typeflag;
+       set_next_block_after (current_header);
+ 
+       mv_begin_read (&current_stat_info);
+ 
+       if (current_stat_info.is_sparse)
+ 	sparse_skim_file (&current_stat_info, must_copy);
+-      else if (save_typeflag != DIRTYPE)
++      else if (!member_is_dir (&current_stat_info,
++			       current_header->header.typeflag))
+ 	skim_file (current_stat_info.stat.st_size, must_copy);
+ 
+       mv_end ();
++      current_stat_info.skipped = true;
+     }
+ }
+ 
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 311a4315..b9ed8270 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -128,6 +128,8 @@ TESTSUITE_AT = \
+  extrac27.at\
+  extrac30.at\
+  extrac31.at\
++ extrac32.at\
++ extrac34.at\
+  filerem01.at\
+  filerem02.at\
+  dirrem01.at\
+@@ -235,6 +237,7 @@ TESTSUITE_AT = \
+  shortupd.at\
+  shortrec.at\
+  sigpipe.at\
++ skipdir.at\
+  sparse01.at\
+  sparse02.at\
+  sparse03.at\
+diff --git a/tests/extrac32.at b/tests/extrac32.at
+new file mode 100644
+index 00000000..af40916d
+--- /dev/null
++++ b/tests/extrac32.at
+@@ -0,0 +1,48 @@
++# Check for file injection bug with symlinks. -*- Autotest -*-
++
++# Copyright 2026 Free Software Foundation, Inc.
++
++# This file is part of GNU tar.
++
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Thanks to Guillermo de Angel for the bug report and test cases; see:
++# https://lists.gnu.org/r/bug-tar/2026-03/msg00007.html
++
++AT_SETUP([skip file injection])
++AT_KEYWORDS([injection])
++AT_DATA([archive.in],
++[/Td6WFoAAATm1rRGBMDbAYAcIQEcAAAAAAAAACYr+9LgDf8A010AMZhKvfVdtHe4Rxjj7M03ek97
++UgeKfJ0ORqYg0XDFntWxdTH4PYrTOo9CoqBrnTM2NcwFBrRVr7aFwdd56vddyAw2QGDjxgNexDU3
++ImTi/+z8ZOLMi/+AybdEpd5aA/M9Maa+8tQ84bySzSAwrmxMWJJ6W9IKvsqfiRa3TrD51v44PZU/
++KLVKpocS56n/O3g+b+hiZwaysR0eLO+tiU8FB/e3PEq3vTtDFVi/YfZMieBWSzomSX9eF13K1yPY
++UuWgp7VokXqduL0YGNVV40MTPG9oAAAApD6mpajengIAAfcBgBwAAOM4xw6xxGf7AgAAAAAEWVo=
++])
++AT_CHECK([base64 --help >/dev/null 2>&1 || AT_SKIP_TEST
++xz --help >/dev/null 2>&1 || AT_SKIP_TEST
++base64 -d < archive.in | xz -c -d > archive.tar
++])
++AT_CHECK([tar tf archive.tar],
++[0],
++[carrier_entry
++injected.txt
++marker.txt
++])
++AT_CHECK([tar xvf archive.tar],
++[0],
++[carrier_entry
++injected.txt
++marker.txt
++])
++AT_CLEANUP
+diff --git a/tests/extrac34.at b/tests/extrac34.at
+new file mode 100644
+index 00000000..1cedb463
+--- /dev/null
++++ b/tests/extrac34.at
+@@ -0,0 +1,40 @@
++# Check hard link with nonzero size field in tarball. -*- Autotest -*-
++
++# Copyright 2026 Free Software Foundation, Inc.
++
++# This file is part of GNU tar.
++
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Check extracting from a nonconforming tarball that has
++# a hard link with nonzero size.
++
++AT_SETUP([hard link with a nonzero size field])
++AT_KEYWORDS([extract extrac34 hard link])
++AT_DATA([archive.in],
++[/Td6WFoAAATm1rRGBMBwgFAhARwAAAAAAAAAAAbKrCjgJ/8AaF0AMIAzUBhoiawFdYeRen4lxlj0
++QWRLpUM+28ArRsXVY5bGv4H5kijsqiJ4Z9YIVhZd01+IppF+AkltS60aB8fuUW35Tp/3XzUx9Mq2
++4ypJFzvcgHXsSIvc9L+mmTDuHzhvJQ/oe7ya8QAASbOfD7CgZcIAAYwBgFAAAEWxohaxxGf7AgAA
++AAAEWVo=
++])
++AT_CHECK([base64 --help >/dev/null 2>&1 || AT_SKIP_TEST
++xz --help >/dev/null 2>&1 || AT_SKIP_TEST
++base64 -d < archive.in | xz -c -d > archive.tar
++])
++AT_CHECK([mkdir dir
++])
++AT_CHECK([tar -C dir -xf archive.tar || exit 1
++cmp dir/a dir/b
++])
++AT_CLEANUP
+diff --git a/tests/skipdir.at b/tests/skipdir.at
+new file mode 100644
+index 00000000..0bc38e4f
+--- /dev/null
++++ b/tests/skipdir.at
+@@ -0,0 +1,56 @@
++# Process this file with autom4te to create testsuite. -*- Autotest -*-
++
++# Test suite for GNU tar.
++# Copyright 2025-2026 Free Software Foundation, Inc.
++
++# This file is part of GNU tar.
++
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Description: determining member type when listing and extracting
++# should follow the same principles.
++#
++# Until version 1.35 the same archive member could have been processed
++# as a directory when extracting and as a regular file when being
++# skipped during listing.
++#
++# References: https://savannah.gnu.org/patch/index.php?10100
++
++AT_SETUP([skip directory members])
++AT_KEYWORDS([skipdir])
++AT_DATA([archive.in],
++[/Td6WFoAAATm1rRGAgAhARwAAAAQz1jM4Cf/AG1dADedyh4ubnxHHIi7Cen6orusgKqY3paKeQwp
++3//HS9EIT7Hm+MsndXfRntXVt8mu8oDpLOfC+AB9VldyCtp2jqOfTwa455qfGAcONPn6WWDgsaAh
++O2Y6ptXuaF/vdaNkub7SkOBME8jHYITT5QAAAAAAHtdcflb5Zw8AAYkBgFAAAPYgb0axxGf7AgAA
++AAAEWVo=
++])
++AT_CHECK([base64 --help >/dev/null 2>&1 || AT_SKIP_TEST
++xz --help >/dev/null 2>&1 || AT_SKIP_TEST
++base64 -d < archive.in | xz -c -d > archive.tar
++])
++AT_CHECK([tar tf archive.tar],
++[0],
++[owo1/
++owo2/
++])
++AT_CHECK([tar vxf archive.tar],
++[0],
++[owo1/
++owo2/
++])
++AT_CHECK([tar -xvf archive.tar --exclude owo1],
++[0],
++[owo2/
++])
++AT_CLEANUP
+diff --git a/tests/testsuite.at b/tests/testsuite.at
+index fd8b8b59..0cc7adda 100644
+--- a/tests/testsuite.at
++++ b/tests/testsuite.at
+@@ -352,6 +352,8 @@ m4_include([extrac25.at])
+ m4_include([extrac27.at])
+ m4_include([extrac30.at])
+ m4_include([extrac31.at])
++m4_include([extrac32.at])
++m4_include([extrac34.at])
+ 
+ m4_include([backup01.at])
+ 
+@@ -475,6 +477,7 @@ m4_include([shortupd.at])
+ m4_include([grow.at])
+ m4_include([sigpipe.at])
+ m4_include([comperr.at])
++m4_include([skipdir.at])
+ 
+ AT_BANNER([Removing files after archiving])
+ m4_include([remfiles01.at])

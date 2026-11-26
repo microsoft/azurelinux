@@ -1,0 +1,4 @@
+# Pin to Fedora f44 tar-1.35-9.fc44 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/tar/c/4c7ae1a344f671aa036a47bd02600f8ff6876113
+[components.tar]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "4c7ae1a344f671aa036a47bd02600f8ff6876113" }

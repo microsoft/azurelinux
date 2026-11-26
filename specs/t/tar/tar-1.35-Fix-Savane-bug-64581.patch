@@ -1,0 +1,48 @@
+From 5114218025b4562392dd260e2533d3fa2bc0220e Mon Sep 17 00:00:00 2001
+From: Sergey Poznyakoff <gray@gnu.org>
+Date: Tue, 22 Aug 2023 18:18:31 +0300
+Subject: [PATCH] Fix Savane bug #64581
+
+This reverts commit 4f3824743f50808a0079e6057107de53c4a25f22.
+---
+ lib/wordsplit.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/lib/wordsplit.c b/lib/wordsplit.c
+index 56837c32..f0c26a9b 100644
+--- a/lib/wordsplit.c
++++ b/lib/wordsplit.c
+@@ -472,7 +472,7 @@ wsnode_remove (struct wordsplit *wsp, struct wordsplit_node *node)
+ static struct wordsplit_node *
+ wsnode_tail (struct wordsplit_node *p)
+ {
+-  while (p->next)
++  while (p && p->next)
+     p = p->next;
+   return p;
+ }
+@@ -572,15 +572,15 @@ coalesce_segment (struct wordsplit *wsp, struct wordsplit_node *node)
+   size_t len = 0;
+   char *buf, *cur;
+ 
+-  for (p = node; p->flags & _WSNF_JOIN; )
++  if (!(node->flags & _WSNF_JOIN))
++    return 0;
++
++  for (p = node; p && (p->flags & _WSNF_JOIN); p = p->next)
+     {
+       len += wsnode_len (p);
+-      p = p->next;
+-      if (!p)
+-	break;
+     }
+-  if (p == node)
+-    return 0;
++  if (p)
++    len += wsnode_len (p);
+   end = p;
+ 
+   buf = malloc (len + 1);
+-- 
+2.39.5
+
