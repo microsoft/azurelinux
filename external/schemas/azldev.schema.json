@@ -150,6 +150,11 @@
           "title": "Source files",
           "description": "Source files to download for this component"
         },
+        "go-vendor": {
+          "$ref": "#/$defs/GoVendorConfig",
+          "title": "Go vendoring",
+          "description": "Convert a Go application spec and generate its vendor archive during source preparation"
+        },
         "packages": {
           "additionalProperties": {
             "$ref": "#/$defs/PackageConfig"
@@ -677,6 +682,35 @@
           "type": "array",
           "title": "Image-build inputs",
           "description": "Repos and repo-sets made available to kiwi when building images"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GoVendorConfig": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enabled",
+          "description": "Enable Go application vendoring"
+        },
+        "module-dir": {
+          "type": "string",
+          "title": "Module directory",
+          "description": "Relative module directory within the prepared source tree; defaults to its root"
+        },
+        "tool-config": {
+          "type": "string",
+          "title": "Tool configuration",
+          "description": "Inline go-vendor-tools TOML for dependency overrides and licensing settings"
+        },
+        "prep-packages": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Prep packages",
+          "description": "Additional RPM packages needed to execute the upstream prep section in mock"
         }
       },
       "additionalProperties": false,
