@@ -1,0 +1,4 @@
+# Pin to Fedora f44 dbus-1.16.4 to pick up the upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/dbus/c/5a7e51280a6c6d11193bc4a3cf6ed0d6b93ec533
+[components.dbus]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "5a7e51280a6c6d11193bc4a3cf6ed0d6b93ec533" }
