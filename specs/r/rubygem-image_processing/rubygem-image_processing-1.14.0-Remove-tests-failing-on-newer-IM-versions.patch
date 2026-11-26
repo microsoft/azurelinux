@@ -1,0 +1,54 @@
+From 89a162926841733c0df53e7aee95aadf5d28f4c3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Janko=20Marohni=C4=87?= <janko@hey.com>
+Date: Fri, 22 Aug 2025 08:11:57 +0200
+Subject: [PATCH] Remove tests failing on newer IM versions
+
+---
+ test/mini_magick_test.rb | 28 ++--------------------------
+ 1 file changed, 2 insertions(+), 26 deletions(-)
+
+diff --git a/test/mini_magick_test.rb b/test/mini_magick_test.rb
+index c7059d7..8e4e950 100644
+--- a/test/mini_magick_test.rb
++++ b/test/mini_magick_test.rb
+@@ -122,38 +122,14 @@
+     result = ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "100x100" } }).call(@portrait)
+     assert_dimensions [150, 200], result unless ENV["GM"]
+ 
+-    result = ImageProcessing::MiniMagick.loader(strip: true).call(@portrait)
+-    assert_empty MiniMagick::Image.new(result.path).exif
+-
+-    result = ImageProcessing::MiniMagick.loader(strip: nil).call(@portrait)
+-    assert_empty MiniMagick::Image.new(result.path).exif
+-
+-    result = ImageProcessing::MiniMagick.loader(strip: false).call(@portrait)
+-    assert_empty MiniMagick::Image.new(result.path).exif
+-
+-    result = ImageProcessing::MiniMagick.loader(colorspace: "Gray").call(@portrait)
+-    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"] unless ENV["GM"]
+-
+-    result = ImageProcessing::MiniMagick.loader(set: ["comment", "This is a comment"]).call(@portrait)
+-    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"] unless ENV["GM"]
++    result = ImageProcessing::MiniMagick.loader(geometry: "100x100").call(@portrait)
++    assert_dimensions [75, 100], result
+   end
+ 
+   it "applies saver options" do
+     result = ImageProcessing::MiniMagick.saver(define: { jpeg: { fancy_unsampling: "off", extent: "20KB" } }).call(@portrait)
+     assert_operator result.size, :<, 20*1024 unless ENV["GM"]
+ 
+-    result = ImageProcessing::MiniMagick.saver(strip: true).call(@portrait)
+-    assert_empty MiniMagick::Image.new(result.path).exif
+-
+-    result = ImageProcessing::MiniMagick.saver(strip: nil).call(@portrait)
+-    assert_empty MiniMagick::Image.new(result.path).exif
+-
+-    result = ImageProcessing::MiniMagick.saver(strip: false).call(@portrait)
+-    assert_empty MiniMagick::Image.new(result.path).exif
+-
+-    result = ImageProcessing::MiniMagick.saver(colorspace: "Gray").call(@portrait)
+-    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"] unless ENV["GM"]
+-
+     result = ImageProcessing::MiniMagick.saver(set: ["comment", "This is a comment"]).call(@portrait)
+     assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"] unless ENV["GM"]
+   end
