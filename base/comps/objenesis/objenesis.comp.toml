@@ -1,0 +1,8 @@
+[components.objenesis]
+
+# GitHub tag archive for 3.6 (same SHA512 on repeated downloads).
+[[components.objenesis.source-files]]
+filename = "3.6.tar.gz"
+hash = "9662d98da15c5720f5587eb793c818b22e86f26121e3d21fa0fe7cb5ccad8ea03fe917885e0c09ae166b27ce1e5c9788dc53f16d8f15c6706c9ac1124f617646"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/easymock/objenesis/archive/3.6.tar.gz" }
