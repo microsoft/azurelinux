@@ -1,0 +1,21 @@
+# Fedora f43 packages libarchive 3.8.4 and f44 packages 3.8.8. Update to the
+# upstream 3.8.9 patch release on the same f43 spec for these CVE fixes:
+# CVE-2026-4111, CVE-2026-4424, CVE-2026-4426, CVE-2026-5121, CVE-2026-14164,
+# CVE-2026-15028, CVE-2026-16517, CVE-2026-17591
+# Remove this overlay once the imported Fedora spec packages 3.8.9 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 3.8.9"
+type = "spec-update-tag"
+tag = "Version"
+value = "3.8.9"
+
+[[overlays]]
+description = "Remove the obsolete 3.8.4 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libarchive-3\.8\.4\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

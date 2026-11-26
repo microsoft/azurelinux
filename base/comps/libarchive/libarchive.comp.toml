@@ -1,0 +1,9 @@
+[components.libarchive]
+
+# Upstream release tarball; same SHA512 as the v3.8.9 GitHub release asset and
+# the Fedora rawhide sources file.
+[[components.libarchive.source-files]]
+filename = "libarchive-3.8.9.tar.gz"
+hash = "4f3975dfdbd05ef2c6e0cd7534a3174542ed99dbd3ea8ced6cc0b65358f912bf3d695a63316293a2d37b2420db918774145f8d6634dbe012eaa9c30d6721bfb9"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://libarchive.org/downloads/libarchive-3.8.9.tar.gz" }
