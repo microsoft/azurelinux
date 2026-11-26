@@ -1,6 +1,6 @@
 Summary:        GitHub official command line tool
 Name:           gh
-Version:        2.105.0
+Version:        2.106.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -14,7 +14,6 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 Source1:        %{name}-%{version}-vendor.tar.gz
 
 Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
-Patch8:         CVE-2026-77299.patch
 
 BuildRequires:  golang >= 1.27.0
 BuildRequires:  git
@@ -61,6 +60,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Thu Nov 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.106.0-1
+- Auto-upgrade to 2.106.0 - for CVEs
+
 * Mon Nov 23 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.105.0-1
 - Upgrade to 2.105.0 for CVE-2026-128085, CVE-2026-128086
 - Remove patches for CVE-2026-78659, CVE-2026-78660, CVE-2026-78661, CVE-2026-78669, CVE-2026-97032, CVE-2026-97045, CVE-2026-116591, fixed in 2.105.0
