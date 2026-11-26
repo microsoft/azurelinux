@@ -14,17 +14,15 @@
 %endif
 
 Name:		postgresql%{pgversion}-%{sname}
-Version:	0.8.0
-Release: 4%{?dist}
+Version: 0.8.7
+Release: 5%{?dist}
 Summary:	Open-source vector similarity search for Postgres
 License:	PostgreSQL
 URL:		https://github.com/%{sname}/%{sname}/
 Source0:	https://github.com/%{sname}/%{sname}/archive/refs/tags/v%{version}.tar.gz
 
-# Upstream commits for compatiblity with PG18 present on master branch
-# not yet included in any tag or release
-Patch0:		78ed8f1.patch
-Patch1:		2c53c30.patch
+
+
 
 %if %?postgresql_default
 %global pkgname %{sname}
