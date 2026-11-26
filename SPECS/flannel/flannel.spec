@@ -27,7 +27,6 @@ Patch10:        CVE-2026-78669.patch
 Patch11:        CVE-2026-81870.patch
 Patch12:        CVE-2026-97032.patch
 Patch13:        CVE-2026-128085.patch
-Patch14:        CVE-2026-128085-auto-sdk.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
