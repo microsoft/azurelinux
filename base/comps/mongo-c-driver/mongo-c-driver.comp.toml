@@ -1,4 +1,4 @@
-# Pin to Fedora f43 mongo-c-driver-1.30.15-1 to pick up upstream CVE fixes.
-# https://src.fedoraproject.org/rpms/mongo-c-driver/c/ef28e626a1890adb6251cd74336489acfc674d25
+# Pin to Fedora f43 mongo-c-driver-1.30.16-1.fc43 to pick up upstream CVE fixes.
+# https://src.fedoraproject.org/rpms/mongo-c-driver/c/1a3db412053f8e7c27609909e7733dd908e79d90
 [components.mongo-c-driver]
-spec = { type = "upstream", upstream-commit = "ef28e626a1890adb6251cd74336489acfc674d25" }
+spec = { type = "upstream", upstream-commit = "1a3db412053f8e7c27609909e7733dd908e79d90" }
