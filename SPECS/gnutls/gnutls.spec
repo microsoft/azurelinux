@@ -1,13 +1,14 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.8.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
+Patch0:         fix-dtls-stress-link.patch
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  libtasn1-devel
@@ -90,6 +91,10 @@ echo 'exit 77' > tests/slow/test-ciphers-openssl.sh
 %{_mandir}/man3/*
 
 %changelog
+* Thu Nov 26 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.8.14-2
+- Fix dtls-stress test linking without the duplicate libutils main function.
+- Downstream fix for the linker failure reported in upstream issue #2027.
+
 * Thu Nov 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.14-1
 - Auto-upgrade to 3.8.14 - for CVE-2026-127231, CVE-2026-127039, CVE-2026-127040
 

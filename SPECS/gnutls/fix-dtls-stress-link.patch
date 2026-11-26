@@ -1,0 +1,44 @@
+From: Kanishk Bansal <kanbansal@microsoft.com>
+Subject: [PATCH] tests: keep dtls-stress independent of libutils
+
+dtls-stress provides its own main() and must not link libutils.la, which
+provides the main()/doit() test harness. Upstream commit 71e0766988088043
+removed its explicit LDADD and made it inherit libutils.la, causing
+duplicate main and undefined doit linker errors during make check.
+
+Restore the target-specific linker flags using the renamed DEPS_LDADD.
+Update Makefile.in as well so release tarballs need no autoreconf.
+
+Upstream-issue: https://gitlab.com/gnutls/gnutls/-/issues/2027
+The issue reports the same linker errors on GnuTLS 3.8.14 in pkgsrc.
+Its separate NetBSD timer_t compilation problem is not addressed here.
+
+Upstream-reference: https://gitlab.com/gnutls/gnutls/-/commit/71e0766988088043fdc7377808003e24b7e72f27
+Status: downstream correction of the linker regression above.
+Drop when upstream restores a libutils-free link rule for dtls-stress.
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -523,6 +523,7 @@ dist_check_SCRIPTS += dtls/dtls.sh dtls/dtls-resume.sh #dtls/dtls-nb
+ indirect_tests += dtls-stress
+ 
+ dtls_stress_SOURCES = dtls/dtls-stress.c
++dtls_stress_LDADD = ../lib/libgnutls.la $(DEPS_LDADD)
+ 
+ dist_check_SCRIPTS += fastopen.sh pkgconfig.sh starttls.sh starttls-ftp.sh starttls-smtp.sh \
+ 	starttls-lmtp.sh starttls-pop3.sh starttls-xmpp.sh starttls-nntp.sh starttls-sieve.sh \
+diff --git a/tests/Makefile.in b/tests/Makefile.in
+--- a/tests/Makefile.in
++++ b/tests/Makefile.in
+@@ -1158,8 +1158,8 @@ dtls_sliding_window_OBJECTS = dtls-sliding-window.$(OBJEXT)
+ am__dtls_stress_SOURCES_DIST = dtls/dtls-stress.c
+ @WINDOWS_FALSE@am_dtls_stress_OBJECTS = dtls/dtls-stress.$(OBJEXT)
+ dtls_stress_OBJECTS = $(am_dtls_stress_OBJECTS)
+-dtls_stress_LDADD = $(LDADD)
+-dtls_stress_DEPENDENCIES = ../lib/libgnutls.la libutils.la \
++dtls_stress_LDADD = ../lib/libgnutls.la $(DEPS_LDADD)
++dtls_stress_DEPENDENCIES = ../lib/libgnutls.la \
+ 	$(am__DEPENDENCIES_2)
+ dtls_with_seccomp_SOURCES = dtls-with-seccomp.c
+ dtls_with_seccomp_OBJECTS = dtls-with-seccomp.$(OBJEXT)
