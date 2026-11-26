@@ -1,0 +1,37 @@
+# pcp 7.2 ships the CIFS agent itself and obsoletes pcp-pmda-cifs, but when the old
+# pcp-pmda-cifs is erased during the upgrade its %preun still runs cifs/Remove, which
+# unregisters the agent pcp just installed: CIFS metrics silently stop. Record whether the
+# agent is registered before that erase hook runs, and if it was, leave a .NeedInstall
+# marker afterwards so pmcd installs the agent again at its next start (the upgrade already
+# marks pmcd for restart). Not fixed in Fedora rawhide or upstream PCP as of 2026-11-11.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "pcp: re-register the CIFS agent that the obsoleted pcp-pmda-cifs unregisters"
+type = "spec-search-replace"
+section = "%post"
+regex = '^%\{rebuild_pmns "\$PCP_PMNS_DIR" \.NeedRebuild\}$'
+replacement = '''%{rebuild_pmns "$PCP_PMNS_DIR" .NeedRebuild}
+
+%triggerun -- pcp-pmda-cifs < 7.1.6
+# Note whether the CIFS agent is registered before pcp-pmda-cifs's %%preun removes it.
+if grep -q '^[[:space:]]*cifs[[:space:]]' %{_confdir}/pmcd/pmcd.conf 2>/dev/null
+then
+    mkdir -p %{_localstatedir}/lib/rpm-state/pcp &&
+    touch %{_localstatedir}/lib/rpm-state/pcp/cifs-registered
+fi
+:
+
+%triggerpostun -- pcp-pmda-cifs < 7.1.6
+# pcp now ships the CIFS agent; have pmcd install it again at its next start.
+if [ -f %{_localstatedir}/lib/rpm-state/pcp/cifs-registered ]
+then
+    PCP_PMDAS_DIR=%{_pmdasdir}
+    %{install_file "$PCP_PMDAS_DIR/cifs" .NeedInstall}
+    rm -f %{_localstatedir}/lib/rpm-state/pcp/cifs-registered
+    rmdir %{_localstatedir}/lib/rpm-state/pcp 2>/dev/null
+fi
+:'''
