@@ -1,3 +1,12 @@
 [components.'mariadb10.11']
 # Release: 2%{?with_debug:.debug}%{?dist}
 release = { calculation = "manual" }
+
+# Upstream release tarball; SHA512 matches archive.mariadb.org sha512sums.txt
+# and the tarball verifies against its .asc (MariaDB Signing Key
+# 177F4010FE56CA3336300305F1656F24C74CD1D8).
+[[components.'mariadb10.11'.source-files]]
+filename = "mariadb-10.11.19.tar.gz"
+hash = "99eacc01cd65f93ba9136d75d9b751a6bf35b4a44843f74e9064b26255f3e1683db7556b08df1a74bee04a492945b216d85bb19eeb5eecf0cafd0ce237365af3"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://archive.mariadb.org/mariadb-10.11.19/source/mariadb-10.11.19.tar.gz" }

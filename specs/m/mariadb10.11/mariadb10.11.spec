@@ -3,7 +3,7 @@
 
 # Plain package name for cases, where %%{name} differs (e.g. for versioned packages)
 %global majorname mariadb
-%define package_version 10.11.18
+%define package_version 10.11.19
 %define majorversion %(echo %{package_version} | cut -d'.' -f1-2 )
 
 # Set if this package will be the default one in distribution
@@ -18,7 +18,7 @@
 # The last version on which the full testsuite has been run
 # In case of further rebuilds of that version, don't require full testsuite to be run
 # run only "main" suite
-%global last_tested_version 10.11.18
+%global last_tested_version 10.11.19
 # Set to 1 to force run the testsuite even if it was already tested in current version
 %global force_run_testsuite 0
 
@@ -265,8 +265,8 @@ Patch13:          %{majorname}-libfmt.patch
 Patch14:          %{majorname}-mtr.patch
 #   Patch15: mark RISC-V64 as 64-bit architecture
 Patch15:          mark-RISC-V64-as-64-bit-architecture.patch
-#   Patch16: fix default Galera configuation file
-Patch16:          upstream_0a66c466f1772945d46b12bd340e1bd9adff4e9b.patch
+Patch16: mariadb-MDEV-40955-mysql_client_test-no-dns.patch
+
 
 # This macro is used for package/sub-package names in the entire specfile
 %if %?mariadb_default
@@ -892,8 +892,9 @@ rm -r storage/rocksdb/
 
 %patch -P14 -p1
 %patch -P15 -p1
-
 %patch -P16 -p1
+
+
 
 # generate a list of tests that fail, but are not disabled by upstream
 cat %{SOURCE50} | tee -a mysql-test/unstable-tests

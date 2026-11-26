@@ -54,32 +54,27 @@ Type=notify
 User=mysql
 Group=mysql
 
-# Use an environment file to pass variable _WSREP_NEW_CLUSTER
-EnvironmentFile=-@INSTALL_RUNDATADIR@/wsrep-new-cluster
-# Use an environment file to pass variable _WSREP_START_POSITION
-EnvironmentFile=-@INSTALL_RUNDATADIR@/wsrep-start-position
+# Use an environment file to pass variable _WSREP_NEW_CLUSTER.
+# Must not be writable by mysql user.
+EnvironmentFile=-@INSTALL_RUNDIR@/mariadb-wsrep-new-cluster
 
 ExecStartPre=@libexecdir@/mariadb-check-socket --defaults-group-suffix=.%I
 ExecStartPre=@libexecdir@/mariadb-prepare-db-dir --defaults-group-suffix=.%I %n
 
-# Perform automatic wsrep recovery. When server is started without wsrep,
-# galera_recovery simply returns an empty string. In any case, however,
-# the script is not expected to return with a non-zero status.
-# It is always safe to remove @INSTALL_RUNDATADIR@/wsrep-start-position
-# environment file.
-# Do not panic if galera_recovery script is not available. (MDEV-10538)
-ExecStartPre=/bin/sh -c "[ ! -e @bindir@/galera_recovery ] && VAR= || \
- VAR=`@bindir@/galera_recovery`; [ $? -eq 0 ] \
- && echo _WSREP_START_POSITION=$VAR > @INSTALL_RUNDATADIR@/wsrep-start-position || exit 1"
-
 # MYSQLD_OPTS here is for users to set in /etc/systemd/system/@DAEMON_NAME@@.service.d/MY_SPECIAL.conf
 # Note: we set --basedir to prevent probes that might trigger SELinux alarms,
 # per bug #547485
-ExecStart=@libexecdir@/mariadbd --defaults-group-suffix=.%I --basedir=@prefix@ $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $_WSREP_START_POSITION
+# Perform automatic wsrep recovery. When server is started without wsrep,
+# galera_recovery simply returns an empty string. In any case, however, it is
+# not expected to return a non-zero status.
+# Do not panic if galera_recovery script is not available. (MDEV-10538)
+ExecStart=/bin/sh -c "set -f; [ ! -e @bindir@/galera_recovery ] && VAR= || \
+ VAR=`@bindir@/galera_recovery`; [ $? -eq 0 ] || exit 1; \
+ exec @libexecdir@/mariadbd --defaults-group-suffix=.%I --basedir=@prefix@ $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $VAR"
 ExecStartPost=@libexecdir@/mariadb-check-upgrade --defaults-group-suffix=.%I
 
-# Unset _WSREP_START_POSITION environment variable.
-ExecStartPost=/bin/rm -f @INSTALL_RUNDATADIR@/wsrep-start-position
+# Set the name explicitly, otherwise it would be the first name from ExecStart
+SyslogIdentifier=mariadbd
 
 # Setting this to true can break replication and the Type=notify settings
 # See also bind-address MariaDB option.
