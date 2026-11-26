@@ -18,7 +18,7 @@ BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 
-Patch0:         remove_openssl_macro.patch
+Patch0:		remove_openssl_macro.patch
 Patch1:		CVE-2024-8006.patch
 Patch2:		CVE-2023-7256.patch
 Patch3:		CVE-2025-11961.patch
@@ -28,17 +28,17 @@ Patch6:		CVE-2026-89157.patch
 Patch7:		CVE-2026-89160.patch
 Patch8:		CVE-2026-81405.patch
 Patch9:		CVE-2026-81406.patch
-Patch10:		CVE-2026-81407.patch
-Patch11:		CVE-2026-81408.patch
-Patch12:		CVE-2026-81409.patch
-Patch13:		CVE-2026-81411.patch
-Patch14:		CVE-2026-81413.patch
-Patch15:		CVE-2026-81414.patch
-Patch16:		CVE-2026-81415.patch
-Patch17:		CVE-2026-81416.patch
-Patch18:		CVE-2026-81417.patch
-Patch19:		CVE-2026-81418.patch
-Patch20:		CVE-2026-81419.patch
+Patch10:	CVE-2026-81407.patch
+Patch11:	CVE-2026-81408.patch
+Patch12:	CVE-2026-81409.patch
+Patch13:	CVE-2026-81411.patch
+Patch14:	CVE-2026-81413.patch
+Patch15:	CVE-2026-81414.patch
+Patch16:	CVE-2026-81415.patch
+Patch17:	CVE-2026-81416.patch
+Patch18:	CVE-2026-81417.patch
+Patch19:	CVE-2026-81418.patch
+Patch20:	CVE-2026-81419.patch
 
 %description
 Nmap ("Network Mapper") is a free and open source utility for network discovery and security auditing.
@@ -84,7 +84,9 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 
 %changelog
 * Thu Nov 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 7.95-7
-- Patch for CVE-2026-81419, CVE-2026-81418, CVE-2026-81417, CVE-2026-81416, CVE-2026-81415, CVE-2026-81414, CVE-2026-81413, CVE-2026-81411, CVE-2026-81409, CVE-2026-81408, CVE-2026-81407, CVE-2026-81406, CVE-2026-81405
+- Patch for CVE-2026-81419, CVE-2026-81418, CVE-2026-81417, CVE-2026-81416, CVE-2026-81415,
+  CVE-2026-81414, CVE-2026-81413, CVE-2026-81411, CVE-2026-81409, CVE-2026-81408, CVE-2026-81407,
+  CVE-2026-81406, CVE-2026-81405
 
 * Thu Sep 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 7.95-6
 - Patch for CVE-2026-89160, CVE-2026-89157
