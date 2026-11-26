@@ -1,0 +1,17 @@
+# Fedora 3.14.10-2 re-runs test_hashlib, test_hmac and test_ssl with
+# OPENSSL_FORCE_FIPS_MODE=1. Azure Linux does not ship Red Hat's fips.so; the
+# forced FIPS mode loads the registered SymCrypt-OpenSSL provider instead,
+# where HMAC-MD5 fails with "[Provider routines] invalid mode" rather than
+# being reported as unavailable, so OpenSSLRFCTestCase.test_md5_rfc2202
+# errors out. Fedora already skips the other MD5 cases of this run; skip this
+# one too. Drop this overlay once the test handles the SymCrypt behavior.
+
+[metadata]
+category = "azl-disable-unsupported-tests"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Skip test_md5_rfc2202 in the forced FIPS test run (SymCrypt provider)"
+type = "spec-search-replace"
+regex = '^    -i test_case_md5_0 -i test_case_md5_1 -i test_case_md5_2$'
+replacement = '    -i test_case_md5_0 -i test_case_md5_1 -i test_case_md5_2 -i test_md5_rfc2202'
