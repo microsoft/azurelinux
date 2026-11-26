@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-zip0.6-0.6.6-8 (FEDORA-2026-a011e63a06).
+# https://src.fedoraproject.org/rpms/rust-zip0.6/c/7887fa07550f93b848f997b0d4ad5815c15e108e
+[components.'rust-zip0.6']
+spec = { type = "upstream", upstream-commit = "7887fa07550f93b848f997b0d4ad5815c15e108e" }

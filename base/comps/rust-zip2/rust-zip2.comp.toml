@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-zip2-2.4.2-7 (FEDORA-2026-a011e63a06).
+# https://src.fedoraproject.org/rpms/rust-zip2/c/31fafbd64e2eadba8f882b291e229eb0058a3944
+[components.rust-zip2]
+spec = { type = "upstream", upstream-commit = "31fafbd64e2eadba8f882b291e229eb0058a3944" }

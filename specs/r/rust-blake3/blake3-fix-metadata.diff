@@ -1,5 +1,5 @@
 --- blake3-1.8.7/Cargo.toml	2006-07-24T01:21:28+00:00
-+++ blake3-1.8.7/Cargo.toml	2026-08-23T23:55:38.868648+00:00
++++ blake3-1.8.7/Cargo.toml	2026-10-28T22:54:43.653262+00:00
 @@ -26,7 +26,7 @@
  description = "the BLAKE3 hash function"
  documentation = "https://docs.rs/blake3"
@@ -9,3 +9,12 @@
  repository = "https://github.com/BLAKE3-team/BLAKE3"
  
  [package.metadata.docs.rs]
+@@ -77,7 +77,7 @@
+ version = "1.0.0"
+ 
+ [dependencies.constant_time_eq]
+-version = "0.4.2"
++version = ">=0.4.2, <0.7.0"
+ default-features = false
+ 
+ [dependencies.digest]
