@@ -1,0 +1,4 @@
+# Pin to Fedora f43 docker-compose-5.8.0-1.fc43 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/docker-compose/c/8618d491039865f70cd831f3d45491f2ea42f94a
+[components.docker-compose]
+spec = { type = "upstream", upstream-commit = "8618d491039865f70cd831f3d45491f2ea42f94a" }
