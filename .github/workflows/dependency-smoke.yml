@@ -30,7 +30,6 @@ jobs:
           - scripts/ci/components
           - scripts/ci/control-tower
           - scripts/ci/render-specs-check
-          - scripts/ci/spec-review
           - scripts/mcps
     steps:
       - name: Checkout
