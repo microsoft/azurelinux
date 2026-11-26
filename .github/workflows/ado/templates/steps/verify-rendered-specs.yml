@@ -36,7 +36,7 @@ steps:
       # parsing so component names beginning with `-` (none today) are
       # unambiguous. `env AZLDEV_ALLOW_ROOT=1` is inline per
       # .github/instructions/ado-pipeline.instructions.md.
-      xargs -x -n 50000 -d '\n' env AZLDEV_ALLOW_ROOT=1 azldev component render --check-only -- \
+      sg mock -c 'xargs -x -n 50000 -d "\n" env AZLDEV_ALLOW_ROOT=1 azldev component render --check-only --' \
         < "$RENDER_SET_FILE"
       echo "##[endgroup]"
     env:

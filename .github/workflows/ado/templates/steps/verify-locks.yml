@@ -8,9 +8,9 @@
 steps:
   - script: |
       set -euo pipefail
-      scripts/ci/control-tower/verify_locks.sh \
+      sg mock -c 'scripts/ci/control-tower/verify_locks.sh \
         --output-file "$BUILD_ARTIFACTSTAGINGDIRECTORY/lock-update.json" \
-        --publish-dir "$OB_OUTPUT_DIR"
+        --publish-dir "$OB_OUTPUT_DIR"'
     env:
       OB_OUTPUT_DIR: $(ob_outputDirectory)
     displayName: "Verify lock files are up to date"
