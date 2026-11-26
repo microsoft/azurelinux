@@ -1,0 +1,79 @@
+# Fedora f43/f44 package vim 9.2.1302, which is still affected. Update the current
+# 4.0 spec (f43 9.2.1129) in-line to upstream patchlevel 9.2.1393 (bug and security
+# fixes only) for CVE-2026-134832, fixed by patch 9.2.1352 ('tagsecure' can be
+# bypassed by escapes, GHSA-j6wv-2276-36jq). The f43 dist-git bump (pixman for
+# image rendering, rebased patches) is left for a separate change.
+# Remove this overlay once the imported Fedora spec packages 9.2.1352 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream patchlevel 1393"
+type = "spec-search-replace"
+regex = '^%define patchlevel 1129$'
+replacement = "%define patchlevel 1393"
+
+[[overlays]]
+description = "Build from the upstream GitHub tag archive"
+type = "spec-update-tag"
+tag = "Source0"
+value = "https://github.com/vim/vim/archive/v%{baseversion}.%{patchlevel}/vim-%{baseversion}.%{patchlevel}.tar.gz"
+
+[[overlays]]
+description = "Use the top directory of the GitHub tag archive"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%setup -q -b 0 -n %\{vimdir\}$'
+replacement = "%setup -q -b 0 -n vim-%{baseversion}.%{patchlevel}"
+
+[[overlays]]
+description = "Move the README files to the top directory like upstream's make unixall"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "# The upstream tarball (make unixall) has the READMEdir files in the top directory",
+    "mv READMEdir/* .",
+    "rmdir READMEdir",
+    "",
+]
+
+# Since patch 9.2.1161 configure links pixman (image rendering) by default whenever
+# pixman-1.pc is in the buildroot (gtk3-devel pulls it in through cairo-devel), and
+# +image now needs it. Keep it off in all three builds so the runtime dependencies
+# stay as in 9.2.1129; +image and +image_popup are then not built.
+[[overlays]]
+description = "Keep pixman disabled for the minimal and enhanced builds"
+type = "spec-search-replace"
+section = "%build"
+regex = '^  --disable-hardcopy-pango \\$'
+replacement = "  --disable-hardcopy-pango \\\n  --disable-pixman \\"
+
+[[overlays]]
+description = "Keep pixman disabled for the GUI build"
+type = "spec-search-replace"
+section = "%build"
+regex = '^  --enable-hardcopy-pango \\$'
+replacement = "  --enable-hardcopy-pango \\\n  --disable-pixman \\"
+
+# 9.2.1393's config.h.in has more defines after DYNAMIC_GPM, so the old end-of-file
+# hunk no longer applies. Use Fedora's rebase of the same patch from
+# https://src.fedoraproject.org/rpms/vim/c/3a42255103564974ced9a3a1ab7262e7263372a3
+# (only context, paths and timestamps change; trailing blanks stripped for lint).
+[[overlays]]
+description = "Drop the vim-crypto-warning.patch rebased for 9.2.1129"
+type = "file-remove"
+file = "vim-crypto-warning.patch"
+
+[[overlays]]
+description = "Add Fedora's vim-crypto-warning.patch rebased for 9.2.1202 and newer"
+type = "file-add"
+file = "vim-crypto-warning.patch"
+source = "vim-crypto-warning.patch"
+
+[[overlays]]
+description = "Remove the obsolete vim-9.2-1129.tar.bz2 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(vim-9\.2-1129\.tar\.bz2\) = [0-9a-f]+(?:\r?\n|$)'

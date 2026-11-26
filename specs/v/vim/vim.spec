@@ -34,7 +34,7 @@
 %define baseversion 9.2
 # get bug url from /etc/os-release
 %define bugurl %(source /etc/os-release; echo ${BUG_REPORT_URL})
-%define patchlevel 1129
+%define patchlevel 1393
 %define vimdir vim92
 
 %if %{with desktop_file}
@@ -46,7 +46,7 @@ Summary: The VIM editor
 URL:     https://www.vim.org/
 Name: vim
 Version: %{baseversion}.%{patchlevel}
-Release: 6%{?dist}
+Release: 7%{?dist}
 Epoch: 2
 # swift.vim contains Apache 2.0 with runtime library exception:
 # which is taken as Apache-2.0 WITH Swift-exception - reported to legal as https://gitlab.com/fedora/legal/fedora-license-data/-/issues/188
@@ -57,7 +57,7 @@ Epoch: 2
 # resolution: take it as OPUBL-1.0, the license won't be added to allowed license list, but if a project uses it for documentation
 # and don't use license options mentioned in the OPUBL 1.0 license text (which both are the case for Vim), the license is allowed
 License: Vim AND LGPL-2.1-or-later AND MIT AND GPL-1.0-only AND (GPL-2.0-only OR Vim) AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-or-later AND GPL-3.0-or-later AND OPUBL-1.0 AND Apache-2.0 WITH Swift-exception
-Source0: ftp://ftp.vim.org/pub/vim/unix/vim-%{baseversion}-%{patchlevel}.tar.bz2
+Source0: https://github.com/vim/vim/archive/v%{baseversion}.%{patchlevel}/vim-%{baseversion}.%{patchlevel}.tar.gz
 Source1: virc
 Source2: vimrc
 Source3: gvim16.png
@@ -399,7 +399,7 @@ vim-common package.
 
 
 %prep
-%setup -q -b 0 -n %{vimdir}
+%setup -q -b 0 -n vim-%{baseversion}.%{patchlevel}
 
 # use %%{__python3} macro for defining shebangs in python3 tests
 sed -i -e 's,/usr/bin/python3,%{__python3},' %{PATCH6}
@@ -429,6 +429,10 @@ perl -pi -e "s,bin/nawk,bin/awk,g" runtime/tools/mve.awk
 #%%patch -P 10001 -p1 -b .flakytests
 %endif
 
+
+# The upstream tarball (make unixall) has the READMEdir files in the top directory
+mv READMEdir/* .
+rmdir READMEdir
 
 %build
 cd src
@@ -473,6 +477,7 @@ perl -pi -e "s/vimrc/virc/"  os_unix.h
   --disable-canberra \
   --disable-gpm \
   --disable-hardcopy-pango \
+  --disable-pixman \
   --disable-libsodium \
   --disable-netbeans \
   --disable-perlinterp \
@@ -515,6 +520,7 @@ mv -f os_unix.h.save os_unix.h
   --exec-prefix=%{_prefix} \
   --disable-canberra \
   --disable-hardcopy-pango \
+  --disable-pixman \
   --disable-tclinterp \
   --prefix=%{_prefix} \
   --with-compiledby="%{bugurl}" \
@@ -579,6 +585,7 @@ cp vim enhanced-vim
   --enable-fail-if-missing \
   --enable-fips-warning \
   --enable-hardcopy-pango \
+  --disable-pixman \
   --enable-multibyte \
   --enable-python3interp=dynamic \
   --enable-socketserver \

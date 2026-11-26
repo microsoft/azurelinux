@@ -3,3 +3,17 @@
 # (default ON when fedora is set); flip it off via build.without.
 [components.vim]
 build.without = ["gpm"]
+
+# Source for the 9.2.1393 overlay; drop together with it once the imported Fedora
+# spec packages 9.2.1352 or newer. Upstream publishes no per-patchlevel tarball and
+# Fedora's tarball comes from `make unixall` in a git checkout. This is the GitHub
+# archive of tag v9.2.1393 (05a88f86b84f); it was downloaded from three URL forms
+# with the same SHA512. Compared with Fedora's vim-9.2-1129.tar.bz2 it has the same
+# build files; make unixall only adds the README files from READMEdir at the top
+# level (the overlay moves them the same way) and the src/auto/config.mk and
+# config.h placeholders, which %configure regenerates.
+[[components.vim.source-files]]
+filename = "vim-9.2.1393.tar.gz"
+hash = "790cdf30f5b2d511fad286fae4562f01abfbb15cc477dd2f623ad38ee1bbe7f1b126014219086543cbd263cbc9cb59f9e6f980ce7c48f6047b57fb2406023761"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/vim/vim/archive/v9.2.1393/vim-9.2.1393.tar.gz" }
