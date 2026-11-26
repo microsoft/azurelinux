@@ -20,6 +20,7 @@ Patch0:         issue5158.patch
 Patch1:         CVE-2026-19654.patch
 Patch2:         CVE-2026-78002.patch
 Patch3:         CVE-2026-129829.patch
+Patch4:         CVE-2026-129837.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -207,7 +208,7 @@ fi
 
 %changelog
 * Mon Nov 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.2308.0-8
-- Patch for CVE-2026-129829
+- Patch for CVE-2026-129829, CVE-2026-129837
 
 * Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.2308.0-7
 - Patch for CVE-2026-78002
