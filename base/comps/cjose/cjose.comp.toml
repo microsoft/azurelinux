@@ -1,0 +1,9 @@
+[components.cjose]
+
+# Upstream release tarball; the SHA256 matches the digest of the v0.6.2.6
+# GitHub release asset.
+[[components.cjose.source-files]]
+filename = "cjose-0.6.2.6.tar.gz"
+hash = "dd6dbdadc3de030cc0f8ea931c3a255e132c628cd29269e274b546704e3e0409546e404b509c77e316a92da3ff7fb6f7efa8beef5e38e4d35462dfa94f08bd10"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/OpenIDC/cjose/releases/download/v0.6.2.6/cjose-0.6.2.6.tar.gz" }

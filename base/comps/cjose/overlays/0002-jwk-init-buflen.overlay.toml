@@ -1,0 +1,14 @@
+# 0.6.2.6 reads the *_buflen variables uninitialized on early error paths of
+# the EC and RSA JWK import (undefined behaviour, and a -Werror build failure
+# with clang). Fixed on the 0.6.2.x branch for 0.6.2.8.
+# Remove this overlay once the imported Fedora spec packages 0.6.2.8 or newer.
+
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [{ url = "https://github.com/OpenIDC/cjose/commit/aca8acb871213efebe746405fd11aadabf32f555" }]
+
+[[overlays]]
+description = "Backport cjose aca8acb871 to initialize the JWK import buffer lengths"
+type = "patch-add"
+source = "../cjose-0.6.2.6-jwk-init-buflen.patch"
