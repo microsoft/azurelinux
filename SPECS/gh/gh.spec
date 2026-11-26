@@ -14,6 +14,7 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 Source1:        %{name}-%{version}-vendor.tar.gz
 
 Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
+Patch8:         CVE-2026-77299.patch
 
 BuildRequires:  golang >= 1.27.0
 BuildRequires:  git
@@ -61,7 +62,7 @@ make test
 
 %changelog
 * Thu Nov 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.106.0-1
-- Auto-upgrade to 2.106.0 - for CVEs
+- Auto-upgrade to 2.106.0 - for GHSA-45h6-2fh4-pr93, GHSA-4946-22jg-pg7m, GHSA-5v78-vjjq-j2fj, GHSA-3j6c-526c-w465, GHSA-q2rq-2r2v-2jm5, GHSA-mjfw-qpmw-c8p9, GHSA-mrhx-xw2w-4289
 
 * Mon Nov 23 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.105.0-1
 - Upgrade to 2.105.0 for CVE-2026-128085, CVE-2026-128086
