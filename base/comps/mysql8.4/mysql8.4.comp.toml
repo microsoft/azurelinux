@@ -1,3 +1,5 @@
+# Pin to Fedora f43 mysql8.4-8.4.13.1-1.fc43 for the CVE fixes: https://src.fedoraproject.org/rpms/mysql8.4/c/2f33a9e930779e01a5bdd507d7dce837fa2a3775
 [components.'mysql8.4']
+spec = { type = "upstream", upstream-commit = "2f33a9e930779e01a5bdd507d7dce837fa2a3775" }
 # Release: 1%{?with_debug:.debug}%{?dist}
 release = { calculation = "manual" }

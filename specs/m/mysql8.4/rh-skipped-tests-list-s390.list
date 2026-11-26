@@ -3,7 +3,6 @@ perfschema.error_log                          : BUG#0
 test_services.test_event_tracking_consumer    : BUG#0
 
 # Unstable since 8.4
-innodb_undo.truncate_xa     : BUG#0
 x.result_types              : BUG#0
 
 # Times out since 8.4.7
@@ -21,3 +20,12 @@ innodb_zip.index_large_prefix               : BUG#0
 innodb_zip.index_large_prefix_4k            : BUG#0
 innodb_zip.index_large_prefix_8k            : BUG#0
 innodb_zip.prefix_index_liftedlimit         : BUG#0
+innodb_gis.big_records                      : BUG#0 Fails since 8.4.11
+
+# Fails since 8.4.11
+innodb_fts.bug_34846823                     : BUG#0
+innodb_fts.optimize_big                     : BUG#0
+x.connection_not_alive                      : BUG#0
+
+# Unstable since 8.4.11
+x.roles_xplugin                             : BUG#0

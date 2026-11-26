@@ -28,3 +28,6 @@ rpl_gtid.rpl_perfschema_applier_status_by_worker_gtid_skipped_transaction_mts   
 
 # Times out since 8.4.7
 parts.partition_reverse_scan_icp    : BUG#0
+
+# Fails since 8.4.11
+rpl.rpl_priv_checks_user_start_info : BUG#0

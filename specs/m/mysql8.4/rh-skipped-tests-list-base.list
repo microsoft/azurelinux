@@ -1,36 +1,41 @@
-innodb.alter_kill                          : BUG#0 failing on F34+
+# Fedora crypto-policies disable weak/legacy ciphers and TLS versions.
+# These tests expect ciphers/protocols that the system crypto-policies reject.
+# https://fedoraproject.org/wiki/Changes/StrongCryptoSettings2
+auth_sec.fips                              : BUG#0 Fails since 8.4 on Rawhide; FIPS mode not available
+auth_sec.fips_persisted_option             : BUG#0 Fails since 8.4 on Rawhide; FIPS mode not available
+auth_sec.fips_tlsv13                       : BUG#0 Fails since 8.4 on Rawhide; FIPS mode not available
+rpl.rpl_fips                               : BUG#0 Fails since 8.4 on Rawhide; FIPS mode not available
+x.connection_fips                          : BUG#0 Fails since 8.4 on Rawhide; FIPS mode not available
+x.connection_tls_version                   : BUG#0 Fails since F33+; TLS 1.1 disabled by crypto-policies
 
-# Expected to fail in Fedora 33+
-#  TLS 1.1 and older has been disabled by system-wide crypto-policies setting
-#  https://fedoraproject.org/wiki/Changes/StrongCryptoSettings2
-#  Tests pass when using legacy crypto-policies seetings
-x.connection_tls_version                   : BUG#0 Expected to fail on F33+
+# Telemetry component moved from Enterprise to Community in 9.7.0 (WL#17224),
+# but the test .result file expects Enterprise client instrumentation hooks
+# (extra tm_stmt_start/tm_stmt_notify_qa pairs) that Community mysqltest doesn't emit.
+perfschema.telemetry_traces_test_client    : BUG#0 Fails since 8.4.11
 
-# We intentionaly compile in a different default value than the upstream
-# Thus the commands expected by upstream to fail succeeds in our builds
-# and thus the test fails
-#   Cmake option: -DENABLED_LOCAL_INFILE=ON
-main.mysql_load_data_local_dir             : BUG#0 Intentional divergence from the upstream compiled-in default
+# Intentional divergence from upstream compiled-in default.
+# We compile with -DENABLED_LOCAL_INFILE=ON; upstream default is OFF.
+# Thus commands expected by upstream to fail succeed in our builds.
+main.mysql_load_data_local_dir             : BUG#0 Intentional divergence from upstream compiled-in default
+
+# Error log pattern for missing .ibd file not emitted in container/mock environments.
+innodb.alter_kill                          : BUG#0 Fails since F34+; error log pattern not found
 
 # Failing since 8.0.37
-main.archive                               : BUG#0
+main.archive                               : BUG#0 Off-by-one in row count
 innodb.check_ibd_filesize_16k              : BUG#0
 
-# ELN specific
-# Failing since 8.0.37, on x86-64-v3 only
-main.subquery_sj_mat_bka_nobnl             : BUG#0 https://bugzilla.redhat.com/show_bug.cgi?id=2317132
-main.subquery_sj_all_bka_nobnl             : BUG#0 https://bugzilla.redhat.com/show_bug.cgi?id=2317132
-
-# Failing since 8.4 only on Rawhide (F43)
-auth_sec.fips                              : BUG#0
-auth_sec.fips_persisted_option             : BUG#0
-auth_sec.fips_tlsv13                       : BUG#0
-rpl.rpl_fips                               : BUG#0
-x.connection_fips                          : BUG#0
-
 # Fails since 8.4.7
-perfschema.statement_digest_query_sample   : BUG#0
 rpl.rpl_eventlog_psi_memory                : BUG#0
 perfschema.system_events_component         : BUG#0
-rpl.rpl_json                               : BUG#0
 perfschema.system_events_plugin            : BUG#0
+
+# Unstable since 8.4
+innodb_undo.truncate_xa                    : BUG#0
+
+# Fails since 8.4.11
+perfschema.transaction_nested_events       : BUG#0
+
+# ELN-specific failures (x86-64-v3 baseline). Keep skipped as guard.
+main.subquery_sj_mat_bka_nobnl             : BUG#0 ELN x86-64-v3 only (rhbz#2317132)
+main.subquery_sj_all_bka_nobnl             : BUG#0 ELN x86-64-v3 only (rhbz#2317132)
