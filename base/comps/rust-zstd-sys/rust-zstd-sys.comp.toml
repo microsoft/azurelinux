@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rust-zstd-sys-2.1.2-1 (FEDORA-2026-965f6f4669).
+# https://src.fedoraproject.org/rpms/rust-zstd-sys/c/91c5e5006ff1985d6970e364511f684cd9857fd6
+[components.rust-zstd-sys]
+spec = { type = "upstream", upstream-commit = "91c5e5006ff1985d6970e364511f684cd9857fd6" }
