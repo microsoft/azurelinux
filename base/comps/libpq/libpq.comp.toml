@@ -1,0 +1,14 @@
+[components.libpq]
+
+# Sources for the 18.7 update overlay; drop together with it once Fedora ships 18.7 or newer.
+[[components.libpq.source-files]]
+filename = "postgresql-18.7.tar.bz2"
+hash = "01222962db225e240f95da5857f591c023a4ae58c3080444bc5565f48de3bb7c7f89273ffd02ba829349891c103e031ca96fb147be0f3c3f8d1fdf67f6ada750"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://ftp.postgresql.org/pub/source/v18.7/postgresql-18.7.tar.bz2" }
+
+[[components.libpq.source-files]]
+filename = "postgresql-18.7.tar.bz2.sha256"
+hash = "8afe07d8b532d9832d282559c600540d938e06235bb3a096b92094ad120383d0323277cdeadd04cc4f0393adb1406e6719b845c60f82553a5f452a9fdc89d95f"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://ftp.postgresql.org/pub/source/v18.7/postgresql-18.7.tar.bz2.sha256" }
