@@ -1,0 +1,6 @@
+[components.python-authlib]
+# Use Fedora 44 for the JWE decompression fix and subsequent security fixes.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "97b3394f7f6bf64bf89638075279098d6be4e8c3" }
+
+# The optional client test suite requires httpx2, which Azure Linux does not ship.
+build.without = ["tests_clients"]

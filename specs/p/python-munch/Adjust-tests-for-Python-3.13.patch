@@ -1,0 +1,32 @@
+From c5563ce5c0328e4a59d676cdf35740567978742b Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Wed, 5 Jun 2024 09:40:17 +0200
+Subject: [PATCH] Adjust tests for Python 3.13
+
+---
+ tests/test_munch.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/tests/test_munch.py b/tests/test_munch.py
+index 9dadcee..70fa82c 100644
+--- a/tests/test_munch.py
++++ b/tests/test_munch.py
+@@ -225,6 +225,15 @@ def test_reserved_attributes(attrname):
+         assert attr == 'munch'
+     elif attrname == '__dict__':
+         assert attr == {}
++    elif attrname == '__static_attributes__':
++        # Python 3.13: added __static_attributes__ attribute, populated by the
++        # compiler, containing a tuple of names of attributes of this class
++        # which are accessed through self.X from any function in its body.
++        assert isinstance(attr, tuple)
++    elif attrname == '__firstlineno__':
++        # Python 3.13: added __firstlineno__ attribute, populated by the
++        # compiler, containing the line number of the first line of the class definition
++        assert isinstance(attr, int)
+     else:
+         assert callable(attr)
+ 
+-- 
+2.44.0
+
