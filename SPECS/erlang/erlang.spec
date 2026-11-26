@@ -2,7 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.21
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,14 @@ Patch28:        CVE-2026-68956.patch
 Patch29:        CVE-2026-89422.patch
 Patch30:        CVE-2026-105236.patch
 Patch31:        CVE-2026-94200.patch
+Patch32:        CVE-2026-116225.patch
+Patch33:        CVE-2026-116293.patch
+Patch34:        CVE-2026-116295.patch
+Patch35:        CVE-2026-116382.patch
+Patch36:        CVE-2026-117642.patch
+Patch37:        CVE-2026-119443.patch
+Patch38:        CVE-2026-120961.patch
+Patch39:        CVE-2026-124286.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
@@ -86,6 +94,9 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+* Thu Nov 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-10
+- Patch for CVE-2026-124286, CVE-2026-120961, CVE-2026-119443, CVE-2026-117642, CVE-2026-116382, CVE-2026-116295, CVE-2026-116293, CVE-2026-116225
+
 * Mon Nov 09 2026 Akhila Guruju <v-guakhila@microsoft.com> - 26.2.5.21-9
 - Fix CVE-2026-42792.patch to preserve errno during epmd error logging
 
