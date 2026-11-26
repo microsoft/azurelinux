@@ -19,14 +19,14 @@ interactive user exists (e.g., cloud-init users created after boot).
 
 Signed-off-by: Mayank Singh <mayansingh@microsoft.com>
 ---
- systemd/system-generators/flatcar-autologin-generator | 45 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 41 insertions(+), 4 deletions(-)
+ systemd/system-generators/flatcar-autologin-generator | 46 ++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 42 insertions(+), 4 deletions(-)
 
 diff --git a/systemd/system-generators/flatcar-autologin-generator b/systemd/system-generators/flatcar-autologin-generator
 index 1234567..abcdefg 100755
 --- a/systemd/system-generators/flatcar-autologin-generator
 +++ b/systemd/system-generators/flatcar-autologin-generator
-@@ -18,22 +18,63 @@
+@@ -18,22 +18,64 @@
      DEST="$1"
  fi
  
@@ -63,7 +63,8 @@ index 1234567..abcdefg 100755
 +                break
 +            fi
 +        done
-+        [ -z "$skip" ] && echo "$name" && return
++        [ -n "$skip" ] && continue
++        echo "$name" && return
 +    done < /etc/passwd
 +}
 +
