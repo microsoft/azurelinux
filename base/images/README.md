@@ -21,3 +21,18 @@ grep -E 'name="(glibc|coreutils|bash|systemd|systemd-networkd|systemd-resolved|d
 ```
 
 This is a summary of implementation choices, not a complete package manifest. Container, distroless, minimal OS, WSL, Marketplace, and installer images can select different packages. [images.toml](images.toml) maps each image to its definition and profile; follow those definitions for the current selections. Update this summary when changing one of the choices above.
+
+## OEM image systemd update state
+
+For OEM images, KIWI automatically runs executable [`disk.sh`](disk.sh) from
+the image description after synchronizing the root tree to the assembled disk,
+with the disk as its chroot. RPM triggers generate sysusers, hwdb, the journal
+catalog, and the linker cache while packages are installed. The hook stamps
+`/etc/.updated` and `/var/.updated` to match the final `/usr` for every OEM
+image built from the shared definition so first boot does not repeat that work.
+
+Fedora stamps the same markers in `config.sh`; Azure Linux uses the
+assembled-disk hook because KIWI can still change `/usr` after `config.sh`.
+
+The static image test verifies that the update markers match `/usr` and the
+generated databases are present and current for every machine-bootable image.
