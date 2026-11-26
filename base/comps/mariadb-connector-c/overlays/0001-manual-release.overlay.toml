@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Increment the manual release for the Fedora f43 retag at the same version"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?with_debug:.debug}%{?dist}"
