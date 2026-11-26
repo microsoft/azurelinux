@@ -6,8 +6,8 @@
 
 Name: rubygem-%{gem_name}
 Epoch: 1
-Version: 8.0.2
-Release: 6%{?dist}
+Version: 8.0.5.2
+Release: 7%{?dist}
 Summary: Object-relational mapper framework (part of Rails)
 License: MIT
 URL: https://rubyonrails.org

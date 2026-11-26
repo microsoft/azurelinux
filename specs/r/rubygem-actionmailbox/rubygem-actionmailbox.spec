@@ -4,8 +4,8 @@
 %global gem_name actionmailbox
 
 Name: rubygem-%{gem_name}
-Version: 8.0.2
-Release: 5%{?dist}
+Version: 8.0.5.2
+Release: 6%{?dist}
 Summary: Inbound email handling framework
 License: MIT
 URL: https://rubyonrails.org
