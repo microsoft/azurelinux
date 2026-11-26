@@ -24,6 +24,7 @@ from utils.container_runtime import (
     AssertHttpServer,
     ContainerExecResult,
     ContainerInstance,
+    ExecCommand,
     ExecShell,
     WaitForHttp,
     WriteFile,
@@ -55,7 +56,7 @@ from utils.pytest_plugin import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Iterator
 
     from python_on_whales import DockerClient
     from utils.types import DiskInfo, PartitionInfo
@@ -423,7 +424,7 @@ def running_container(
 def container_exec(
     podman_client: DockerClient,
     running_container: ContainerInstance,
-) -> Callable[[list[str]], ContainerExecResult]:
+) -> ExecCommand:
     """Callable to execute commands in the running test container.
 
     Usage::
@@ -433,11 +434,12 @@ def container_exec(
             assert result.exit_code == 0
             assert "hello" in result.output
     """
-    def _exec(command: list[str]) -> ContainerExecResult:
+    def _exec(command: list[str], *, command_for_log: list[str] | None = None) -> ContainerExecResult:
         return exec_in_container(
             podman_client,
             running_container.container_name,
             command,
+            command_for_log=command_for_log,
         )
     return _exec
 
@@ -453,11 +455,14 @@ def container_exec_shell(podman_client: DockerClient, running_container: Contain
             assert result.exit_code == 0
             assert "hello" in result.output
     """
-    def _exec_shell(command: str, *, shell: str = "bash") -> ContainerExecResult:
+    def _exec_shell(
+        command: str, *, shell: str = "bash", command_for_log: str | None = None,
+    ) -> ContainerExecResult:
         return exec_in_container(
             podman_client,
             running_container.container_name,
             [shell, "-c", command],
+            command_for_log=[shell, "-c", command_for_log] if command_for_log is not None else None,
         )
     return _exec_shell
 
@@ -514,8 +519,15 @@ def client_server_exec_shell(
     podman_client.network.create(network_name)
 
     def _exec_shell_for(container: ContainerInstance) -> ExecShell:
-        def _exec_shell(command: str, *, shell: str = "bash") -> ContainerExecResult:
-            return exec_in_container(podman_client, container.container_name, [shell, "-c", command])
+        def _exec_shell(
+            command: str, *, shell: str = "bash", command_for_log: str | None = None,
+        ) -> ContainerExecResult:
+            return exec_in_container(
+                podman_client,
+                container.container_name,
+                [shell, "-c", command],
+                command_for_log=[shell, "-c", command_for_log] if command_for_log is not None else None,
+            )
         return _exec_shell
 
     suffix = uuid.uuid4().hex[:12]

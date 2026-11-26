@@ -77,8 +77,15 @@ def test_nginx_runs_as_pid1_without_override(podman_client: DockerClient, contai
     instance = create_container(podman_client, container_image_ref, command=None)
     try:
 
-        def exec_shell(command: str, shell: str = "bash") -> ContainerExecResult:
-            return exec_in_container(podman_client, instance.container_name, [shell, "-c", command])
+        def exec_shell(
+            command: str, shell: str = "bash", *, command_for_log: str | None = None,
+        ) -> ContainerExecResult:
+            return exec_in_container(
+                podman_client,
+                instance.container_name,
+                [shell, "-c", command],
+                command_for_log=[shell, "-c", command_for_log] if command_for_log is not None else None,
+            )
 
         result = _poll_http_response(exec_shell)
         assert result.exit_code == 0, f"HTTP probe to nginx failed: {result.output}"
