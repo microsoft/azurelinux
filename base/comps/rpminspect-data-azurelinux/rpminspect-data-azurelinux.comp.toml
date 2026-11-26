@@ -1,0 +1,7 @@
+[components.rpminspect-data-azurelinux]
+# Built from Fedora's own rpminspect-data-fedora package (same upstream
+# "rpminspect-data-*" pattern as rpminspect-data-centos) rather than a
+# from-scratch local spec. The Azure Linux fileinfo/capabilities/yaml
+# content is introduced via patch-add overlays, the standard RPM
+# mechanism for adding new files to a Source0 tarball.
+spec = { type = "upstream", upstream-name = "rpminspect-data-fedora", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "3640556c799c057b8544e569d5ac611efb485db0" }

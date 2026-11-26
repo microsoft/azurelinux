@@ -1,4 +1,20 @@
-# Fedora's configuration for the rpmlint utility.
+# Azure Linux's configuration for the rpmlint utility, extended from
+# Fedora's own configs/Fedora/fedora.toml.
+#
+# Package validation must disable rpmlint's host configuration autoloading
+# and load only this fragment explicitly:
+#
+#   CONFIG_DISABLE_AUTOLOADING=1 rpmlint --config azurelinux.toml <rpm>...
+#
+# `--config` is single-valued (repeating it keeps only the last occurrence),
+# so passing this fragment alongside any other baseline cannot reliably
+# order them; load only this file. rpmlint's own configdefaults.toml always
+# loads regardless of CONFIG_DISABLE_AUTOLOADING, but sets
+# `ReleaseExtension = ""` and `Filters = []`, so it never contends with the
+# settings below. Without CONFIG_DISABLE_AUTOLOADING, a validation host with
+# its own (unpatched) rpmlint installed still autoloads that host's Fedora
+# baseline, whose `not-standard-release-extension` suppression hides invalid
+# releases independent of this fragment.
 
 # When checking that various files that should be compressed are
 # indeed compressed, look for this filename extension
@@ -19,7 +35,7 @@ MaxLineLength = 80
 PythonDefaultVersion = ""
 
 # Regexp string with expected suffix in Release tags.
-ReleaseExtension = '\.(fc|rhe?l|el)\d+(?=\.|$)'
+ReleaseExtension = '\.azl4(?=[.~+]|$)'
 
 # Whether to want default start/stop runlevels specified in init scripts
 UseDefaultRunlevels = false
@@ -63,6 +79,7 @@ ValidShells = [
 ]
 
 Filters = [
+    '.*incorrect-fsf-address.*',
     '.*invalid-license.*',  # AZL: no curated license allow-list yet; remove once azurelinux-license-data ships
 # FIXME - the commented lines are from openSUSE config
 #         Are they relevant for Fedora too?
@@ -70,7 +87,7 @@ Filters = [
 ## Stuff autobuild takes care about
 #    '.*invalid-version.*',
 #    '.*invalid-packager.*',
-    '.*not-standard-release-extension.*',
+
 #    '.*invalid-buildhost.*',
     '.*executable-in-library-package.*',
     '.*non-versioned-file-in-library-package.*',
@@ -353,6 +370,78 @@ Filters = [
     ' info-files-without-install-info-postun ',
     ' postin-without-install-info ',
 ]
+
+StandardUsers = [
+        "_apt", "abrt", "activemq", "adm", "aeolus", "aesmd", "amandabackup", "apache", "arpwatch", "ats",
+        "avahi", "avahi-autoipd", "bacula", "beagleindex", "bin", "cassandra", "ccache", "ceilometer", "ceph", "cephadm",
+        "chrony", "cimsrvr", "cinder", "clamav", "clamupdate", "colord", "condor", "coroqnetd", "cyrus", "daemon",
+        "dbus", "debuginfod", "desktop", "dhcpd", "distcache", "dnsconfd", "dovecot", "elasticsearch", "exim", "fax",
+        "firebird", "frontpage", "frr", "ftp", "games", "ganesha", "gdm", "geoclue", "glance", "gluster",
+        "gopher", "hacluster", "haldaemon", "halt", "haproxy", "heat", "hsqldb", "ident", "jbosson-agent", "jetty",
+        "jonas", "kea", "keylime", "keystone", "kojibuilder", "ldap", "lighttpd", "lldpd", "lp", "luci",
+        "mail", "mailman", "mailnull", "majordomo", "mongodb", "munge", "munin", "myproxy", "mysql", "named",
+        "netdump", "news", "nginx", "nobody", "nocpulse", "nova", "nscd", "nslcd", "ntp", "nut",
+        "ods", "openvswitch", "operator", "oprofile", "ovirt", "ovirtagent", "pcp", "pegasus", "pesign", "piranha",
+        "pkcsslotd", "pkiuser", "plasmalogin", "plocate", "polkituser", "postfix", "postgres", "prelude-manager", "privoxy", "pulse",
+        "puppet", "pvm", "qat", "qemu", "qgs", "quagga", "quantum", "rabbitmq", "radiusd", "radvd",
+        "retrace", "rhevm", "ricci", "root", "rpc", "rpcuser", "rpm", "rtkit", "sabayon", "saned",
+        "sanlock", "sddm", "setroubleshoot", "shutdown", "smmsp", "smtpq", "snortd", "sphinx", "squid", "sshd",
+        "sssd", "stap-server", "swift", "sync", "systemd-network", "systemd-resolve", "tcpdump", "tlog", "tomcat", "tss",
+        "unbound", "usbmuxd", "uucp", "uuidd", "valkey", "varnish", "vcsa", "vdsm", "vhostmd", "virtlogin",
+        "wallaby", "webalizer", "wildfly", "wireshark", "wnn", "xfs",
+]
+
+StandardGroups = [
+        "_apt", "abrt", "activemq", "adm", "aeolus", "aesmd", "apache", "arpwatch", "ats", "audio",
+        "avahi", "avahi-autoipd", "bacula", "beagleindex", "bin", "cassandra", "ccache", "cdrom", "ceilometer", "ceph",
+        "cephadm", "chrony", "cimsrvr", "cinder", "clamav", "clamupdate", "colord", "condor", "console", "coroqnetd",
+        "daemon", "dbus", "debuginfod", "desktop", "dhcpcd", "dhcpd", "dialout", "dip", "disk", "distcache",
+        "dnsconfd", "dnsmasq", "dovecot", "elasticsearch", "exim", "fax", "firebird", "floppy", "frontpage", "frr",
+        "ftp", "games", "ganesha", "gdm", "geoclue", "glance", "gluster", "gopher", "haclient", "haldaemon",
+        "haproxy", "heat", "hsqldb", "ident", "input", "jbosson", "jetty", "jonas", "kea", "keylime",
+        "keystone", "kojibuilder", "ldap", "libstoragemgmt", "lighttpd", "lldpd", "lock", "lp", "luci", "mail",
+        "mailman", "mailnull", "majordomo", "man", "mem", "mock", "mongodb", "munge", "munin", "myproxy",
+        "mysql", "named", "netdump", "news", "nobody", "nocpulse", "nova", "nscd", "ntp", "nut",
+        "ods", "openvswitch", "oprofile", "ovirt", "ovirtagent", "pcp", "pegasus", "pesign", "piranha", "pkcs11",
+        "pkiuser", "plasmalogin", "plocate", "polkitd", "polkituser", "popusers", "postdrop", "postfix", "postgres", "pppusers",
+        "prelude-manager", "printadmin", "privoxy", "pulse", "puppet", "pvm", "qat", "qemu", "qgs", "quagga",
+        "quaggavt", "quantum", "rabbitmq", "radiusd", "radvd", "realtime", "render", "retrace", "rhevm", "ricci",
+        "root", "rpc", "rpcuser", "rpm", "rtkit", "sabayon", "saned", "sanlock", "saslauth", "screen",
+        "sddm", "setroubleshoot", "sgx", "slipusers", "slocate", "smmsp", "smtpq", "snortd", "squid", "sshd",
+        "sssd", "stap-server", "stapdev", "stapsys", "stapusr", "swift", "sys", "systemd-journal", "systemd-network", "systemd-resolve",
+        "tape", "tcpdump", "telegraf", "tlog", "tomcat", "tss", "tty", "unbound", "usbmuxd", "users",
+        "usershares", "utempter", "utmp", "uucp", "uuidd", "valkey", "varnish", "vcsa", "vhostmd", "video",
+        "virtlogin", "virusgroup", "wallaby", "wbpriv", "webalizer", "wheel", "wildfly", "wine", "wireshark", "wnn",
+        "xfs",
+]
+
+[Scoring]
+not-standard-release-extension = 1
+
+[WarnOnFunction]
+
+[WarnOnFunction.crypto-policy-non-compliance-openssl]
+f_name = "SSL_CTX_set_cipher_list"
+good_param = "PROFILE=SYSTEM"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""
+
+[WarnOnFunction.crypto-policy-non-compliance-gnutls-1]
+f_name = "gnutls_priority_set_direct"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""
+
+[WarnOnFunction.crypto-policy-non-compliance-gnutls-2]
+f_name = "gnutls_priority_init"
+good_param = "SYSTEM"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""
 
 [DanglingSymlinkExceptions."/usr/share/doc/licenses/"]
 path = "/usr/share/doc/licenses/"

@@ -1,0 +1,165 @@
+# Extend Fedora's rpmlint policy for Azure Linux in place.
+#
+# A separate, parallel azurelinux.toml fragment (loaded instead of
+# fedora.toml) would silently drop every Fedora-generic setting that Azure
+# Linux still wants (Checks, SystemLibPaths, BadnessThreshold, the bulk of
+# Filters, ...), and leave two same-purpose files with overlapping, hard to
+# reason about authority. Instead, rename fedora.toml to azurelinux.toml and
+# patch only what genuinely differs for Azure Linux: the release-extension
+# pattern, a couple of additional Filters suppressions, and an extended
+# StandardUsers/StandardGroups allow-list. Everything else (Checks,
+# SystemLibPaths, ValidShells, the bulk of Filters, etc.) is inherited
+# unchanged from Fedora.
+
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Rename the Fedora rpmlint policy fragment; Azure Linux owns and extends it in place instead of shipping a parallel file."
+type = "file-rename"
+file = "fedora.toml"
+replacement = "azurelinux.toml"
+
+[[overlays]]
+description = "Point Source1 at the renamed policy fragment."
+type = "spec-update-tag"
+tag = "Source1"
+value = "azurelinux.toml"
+
+[[overlays]]
+description = "Re-brand the file header and document the loading requirement: validation must disable rpmlint's host configuration autoloading and load only this fragment, since --config is single-valued and a host's own (unpatched) rpmlint would otherwise still autoload its Fedora baseline."
+type = "file-search-replace"
+file = "azurelinux.toml"
+regex = '''(?m)^# Fedora's configuration for the rpmlint utility\.$'''
+replacement = '''# Azure Linux's configuration for the rpmlint utility, extended from
+# Fedora's own configs/Fedora/fedora.toml.
+#
+# Package validation must disable rpmlint's host configuration autoloading
+# and load only this fragment explicitly:
+#
+#   CONFIG_DISABLE_AUTOLOADING=1 rpmlint --config azurelinux.toml <rpm>...
+#
+# `--config` is single-valued (repeating it keeps only the last occurrence),
+# so passing this fragment alongside any other baseline cannot reliably
+# order them; load only this file. rpmlint's own configdefaults.toml always
+# loads regardless of CONFIG_DISABLE_AUTOLOADING, but sets
+# `ReleaseExtension = ""` and `Filters = []`, so it never contends with the
+# settings below. Without CONFIG_DISABLE_AUTOLOADING, a validation host with
+# its own (unpatched) rpmlint installed still autoloads that host's Fedora
+# baseline, whose `not-standard-release-extension` suppression hides invalid
+# releases independent of this fragment.'''
+
+[[overlays]]
+description = "Azure Linux package releases use the .azl4 suffix instead of Fedora's .fcNN/.rhelN/.elnN suffixes."
+type = "file-search-replace"
+file = "azurelinux.toml"
+regex = '(?m)^ReleaseExtension = .*$'
+replacement = "ReleaseExtension = '\\.azl4(?=[.~+]|$)'"
+
+[[overlays]]
+description = "Re-enable release-extension validation so the Azure Linux policy can enforce .azl4 releases."
+type = "file-search-replace"
+file = "azurelinux.toml"
+regex = "(?m)^    '.*not-standard-release-extension.*',$"
+
+[[overlays]]
+description = "Suppress the incorrect-fsf-address finding. Historical license texts frequently carry the FSF's former postal address, which downstream packagers cannot correct (Fedora disables this suppression by default; Azure Linux re-enables it)."
+type = "file-search-replace"
+file = "azurelinux.toml"
+regex = '(?m)^Filters = \[$'
+replacement = '''Filters = [
+    '.*incorrect-fsf-address.*','''
+
+[[overlays]]
+description = "Add Azure Linux's extended StandardUsers/StandardGroups allow-list ahead of the file's first TOML table header (keys placed after a [table] header would otherwise become members of that table, not top-level keys). rpmlint's configdefaults.toml ships no StandardUsers/StandardGroups, and with host autoloading disabled, Fedora's own users-groups.toml fragment (which this list is based on) is never loaded either -- without this, ordinary Azure Linux packages that install as a system user/group (e.g. apache, dbus) trigger false non-standard-uid/non-standard-gid findings. Carries Fedora's users-groups.toml list plus every non-root owner/group named in a %attr() or %defattr() anywhere under specs/, including dash-mode entries and owners/groups that only appear via a %{macro} resolved through that same spec's %global/%define (e.g. clamav's %{updateuser} -> clamupdate, nginx's %{nginx_user} -> nginx), so this does not need to grow reactively as individual packages are flagged. Regenerate with: for pat in '%attr\\(([0-9]+|-),[^,)]*,[^,)]*\\)' '%defattr\\([^)]*\\)'; do grep -rhoE \"$pat\" specs --include='*.spec'; done, then resolve any %{...} owner/group fields against %global/%define lines in the same file."
+type = "file-search-replace"
+file = "azurelinux.toml"
+regex = '(?m)^\[DanglingSymlinkExceptions\."/usr/share/doc/licenses/"\]$'
+replacement = '''StandardUsers = [
+        "_apt", "abrt", "activemq", "adm", "aeolus", "aesmd", "amandabackup", "apache", "arpwatch", "ats",
+        "avahi", "avahi-autoipd", "bacula", "beagleindex", "bin", "cassandra", "ccache", "ceilometer", "ceph", "cephadm",
+        "chrony", "cimsrvr", "cinder", "clamav", "clamupdate", "colord", "condor", "coroqnetd", "cyrus", "daemon",
+        "dbus", "debuginfod", "desktop", "dhcpd", "distcache", "dnsconfd", "dovecot", "elasticsearch", "exim", "fax",
+        "firebird", "frontpage", "frr", "ftp", "games", "ganesha", "gdm", "geoclue", "glance", "gluster",
+        "gopher", "hacluster", "haldaemon", "halt", "haproxy", "heat", "hsqldb", "ident", "jbosson-agent", "jetty",
+        "jonas", "kea", "keylime", "keystone", "kojibuilder", "ldap", "lighttpd", "lldpd", "lp", "luci",
+        "mail", "mailman", "mailnull", "majordomo", "mongodb", "munge", "munin", "myproxy", "mysql", "named",
+        "netdump", "news", "nginx", "nobody", "nocpulse", "nova", "nscd", "nslcd", "ntp", "nut",
+        "ods", "openvswitch", "operator", "oprofile", "ovirt", "ovirtagent", "pcp", "pegasus", "pesign", "piranha",
+        "pkcsslotd", "pkiuser", "plasmalogin", "plocate", "polkituser", "postfix", "postgres", "prelude-manager", "privoxy", "pulse",
+        "puppet", "pvm", "qat", "qemu", "qgs", "quagga", "quantum", "rabbitmq", "radiusd", "radvd",
+        "retrace", "rhevm", "ricci", "root", "rpc", "rpcuser", "rpm", "rtkit", "sabayon", "saned",
+        "sanlock", "sddm", "setroubleshoot", "shutdown", "smmsp", "smtpq", "snortd", "sphinx", "squid", "sshd",
+        "sssd", "stap-server", "swift", "sync", "systemd-network", "systemd-resolve", "tcpdump", "tlog", "tomcat", "tss",
+        "unbound", "usbmuxd", "uucp", "uuidd", "valkey", "varnish", "vcsa", "vdsm", "vhostmd", "virtlogin",
+        "wallaby", "webalizer", "wildfly", "wireshark", "wnn", "xfs",
+]
+
+StandardGroups = [
+        "_apt", "abrt", "activemq", "adm", "aeolus", "aesmd", "apache", "arpwatch", "ats", "audio",
+        "avahi", "avahi-autoipd", "bacula", "beagleindex", "bin", "cassandra", "ccache", "cdrom", "ceilometer", "ceph",
+        "cephadm", "chrony", "cimsrvr", "cinder", "clamav", "clamupdate", "colord", "condor", "console", "coroqnetd",
+        "daemon", "dbus", "debuginfod", "desktop", "dhcpcd", "dhcpd", "dialout", "dip", "disk", "distcache",
+        "dnsconfd", "dnsmasq", "dovecot", "elasticsearch", "exim", "fax", "firebird", "floppy", "frontpage", "frr",
+        "ftp", "games", "ganesha", "gdm", "geoclue", "glance", "gluster", "gopher", "haclient", "haldaemon",
+        "haproxy", "heat", "hsqldb", "ident", "input", "jbosson", "jetty", "jonas", "kea", "keylime",
+        "keystone", "kojibuilder", "ldap", "libstoragemgmt", "lighttpd", "lldpd", "lock", "lp", "luci", "mail",
+        "mailman", "mailnull", "majordomo", "man", "mem", "mock", "mongodb", "munge", "munin", "myproxy",
+        "mysql", "named", "netdump", "news", "nobody", "nocpulse", "nova", "nscd", "ntp", "nut",
+        "ods", "openvswitch", "oprofile", "ovirt", "ovirtagent", "pcp", "pegasus", "pesign", "piranha", "pkcs11",
+        "pkiuser", "plasmalogin", "plocate", "polkitd", "polkituser", "popusers", "postdrop", "postfix", "postgres", "pppusers",
+        "prelude-manager", "printadmin", "privoxy", "pulse", "puppet", "pvm", "qat", "qemu", "qgs", "quagga",
+        "quaggavt", "quantum", "rabbitmq", "radiusd", "radvd", "realtime", "render", "retrace", "rhevm", "ricci",
+        "root", "rpc", "rpcuser", "rpm", "rtkit", "sabayon", "saned", "sanlock", "saslauth", "screen",
+        "sddm", "setroubleshoot", "sgx", "slipusers", "slocate", "smmsp", "smtpq", "snortd", "squid", "sshd",
+        "sssd", "stap-server", "stapdev", "stapsys", "stapusr", "swift", "sys", "systemd-journal", "systemd-network", "systemd-resolve",
+        "tape", "tcpdump", "telegraf", "tlog", "tomcat", "tss", "tty", "unbound", "usbmuxd", "users",
+        "usershares", "utempter", "utmp", "uucp", "uuidd", "valkey", "varnish", "vcsa", "vhostmd", "video",
+        "virtlogin", "virusgroup", "wallaby", "wbpriv", "webalizer", "wheel", "wildfly", "wine", "wireshark", "wnn",
+        "xfs",
+]
+
+[DanglingSymlinkExceptions."/usr/share/doc/licenses/"]'''
+
+[[overlays]]
+description = "Score not-standard-release-extension as fatal. rpmlint 2.8.0 emits that diagnostic as a warning (score 0 by default), so with BadnessThreshold = -1 a release-extension violation alone would not fail validation even with the Filters suppression removed above; Fedora's own scoring.toml (not loaded by this harness, which loads only this single fragment) doesn't set a score for it either. A positive Scoring entry is required to actually fail on it."
+type = "file-search-replace"
+file = "azurelinux.toml"
+regex = '(?m)^\[DanglingSymlinkExceptions\."/usr/share/doc/licenses/"\]$'
+replacement = '''[Scoring]
+not-standard-release-extension = 1
+
+[DanglingSymlinkExceptions."/usr/share/doc/licenses/"]'''
+
+[[overlays]]
+description = "Incorporate Fedora's warn-on-functions.toml WarnOnFunction rules (crypto-policy-non-compliance-openssl/gnutls-1/gnutls-2) directly into this fragment. Normally rpmlint autoloads every *.toml in the config directory, picking up warn-on-functions.toml alongside fedora.toml, but this harness disables autoloading and passes only --config azurelinux.toml (see the header above), so that separate file is never read and these BinariesCheck diagnostics would otherwise silently disappear. Anchored on the same stable [DanglingSymlinkExceptions...] table header the StandardUsers/Scoring overlays above already key off of, rather than on Fedora's help-text prose, which can change wording independent of policy."
+type = "file-search-replace"
+file = "azurelinux.toml"
+regex = '(?m)^\[DanglingSymlinkExceptions\."/usr/share/doc/licenses/"\]$'
+replacement = '''[WarnOnFunction]
+
+[WarnOnFunction.crypto-policy-non-compliance-openssl]
+f_name = "SSL_CTX_set_cipher_list"
+good_param = "PROFILE=SYSTEM"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""
+
+[WarnOnFunction.crypto-policy-non-compliance-gnutls-1]
+f_name = "gnutls_priority_set_direct"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""
+
+[WarnOnFunction.crypto-policy-non-compliance-gnutls-2]
+f_name = "gnutls_priority_init"
+good_param = "SYSTEM"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""
+
+[DanglingSymlinkExceptions."/usr/share/doc/licenses/"]'''

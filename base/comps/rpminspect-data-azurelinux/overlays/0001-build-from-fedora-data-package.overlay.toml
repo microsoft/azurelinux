@@ -1,0 +1,96 @@
+# Patch Azure Linux content into Fedora's rpminspect-data-fedora package
+# rather than maintaining it as a separate local spec. New files (fileinfo,
+# capabilities, meson.build edits) are added via patch-add, the standard RPM
+# mechanism for introducing brand-new files into a Source0 tarball (PatchN /
+# %autosetup), as opposed to azldev's archive-overlay file-remove /
+# file-search-replace, which cannot add brand-new files to an archive.
+# azurelinux.yaml itself is NOT a patched-in frozen copy: %prep derives it
+# fresh from fedora.yaml every build (cp), with only the Azure Linux deltas
+# (patches/0004-azurelinux-deltas.patch) applied on top, so upstream policy
+# fixes are inherited automatically whenever this pin is bumped.
+
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Rename the pinned Fedora package to the Azure Linux component name."
+type = "spec-set-tag"
+tag = "Name"
+value = "rpminspect-data-azurelinux"
+
+[[overlays]]
+description = "Source0/Source1 use %{name} in their URLs; pin them to the literal upstream filename so renaming Name above doesn't change which tarball/signature rpmbuild expects to find in SOURCES. Use %{url} (the rpminspect-data-fedora repo, same as the URL tag) rather than a hardcoded repo path -- the original upstream spec pointed at github.com/rpminspect/rpminspect's releases, but the v%{version} release and its assets actually live in the rpminspect-data-fedora repo itself."
+type = "spec-set-tag"
+tag = "Source0"
+value = "%{url}/releases/download/v%{version}/rpminspect-data-fedora-%{version}.tar.gz"
+
+[[overlays]]
+description = "See Source0 above: pin Source1 (the detached signature) to the same literal upstream filename, using %{url}."
+type = "spec-set-tag"
+tag = "Source1"
+value = "%{url}/releases/download/v%{version}/rpminspect-data-fedora-%{version}.tar.gz.asc"
+
+[[overlays]]
+description = "Bare %autosetup defaults to extracting %{name}-%{version}, but renaming Name above means that no longer matches the archive's actual top-level directory (rpminspect-data-fedora-%{version}). Disable %autosetup's automatic %autopatch (-N) so we can apply patches 0-2 (fileinfo, capabilities, meson.build) up front, derive azurelinux.yaml as a fresh copy of fedora.yaml (so upstream policy fixes are inherited whenever this pin is bumped, rather than frozen into a patch), and only then apply the Azure Linux delta patch on top of that freshly-copied file. Force -p1 explicitly throughout: without it, patch(1) guesses the strip level by matching the '---' side against an existing file, which is ambiguous for new-file patches (source /dev/null has nothing to match) and was observed to apply inconsistently."
+type = "spec-search-replace"
+regex = '^%autosetup$'
+replacement = """%autosetup -n rpminspect-data-fedora-%{version} -p1 -N
+%autopatch -q -p1 -M2
+
+# Derive azurelinux.yaml from Fedora's own fedora.yaml instead of patching
+# in a frozen copy, so upstream policy fixes are inherited automatically
+# whenever this pin is bumped; only the Azure Linux deltas (Patch3) are
+# maintained separately.
+cp -p fedora.yaml azurelinux.yaml
+%patch -P3 -p1"""
+
+[[overlays]]
+description = "fedora-license-data is a Fedora-specific legal/policy artifact not available on Azure Linux; license inspection is disabled (see the azurelinux.yaml patch) until azurelinux-license-data ships."
+type = "spec-remove-tag"
+tag = "Requires"
+value = "fedora-license-data >= 1.7"
+
+[[overlays]]
+description = "html401-dtds has no provider in the Azure Linux 4 component tree. It's a general-purpose local DTD catalog for the HTML 4.01 doctype (not referenced by any key in azurelinux.yaml -- the xml inspection validates well-formedness only and doesn't consult it), so dropping it only means rpminspect itself may fall back to fetching that specific DTD over the network when it inspects a package shipping an HTML-4.01-doctype document; it does not disable any inspection."
+type = "spec-remove-tag"
+tag = "Requires"
+value = "html401-dtds"
+
+[[overlays]]
+description = "The rc shell (Plan 9/Unix rc, github.com/rakitzis/rc) has no provider in the Azure Linux 4 component tree. It's listed in azurelinux.yaml's shellsyntax.shells allow-list below only to recognize #!/usr/bin/rc scripts for syntax checking; see the azurelinux-deltas patch, which also drops it from that list so rpminspect doesn't attempt to exec a shell that isn't installed (no AZL package is expected to ship rc scripts)."
+type = "spec-remove-tag"
+tag = "Requires"
+value = "rc"
+
+[[overlays]]
+description = "Explicit hard dependency on rpminspect-data-generic for the generic.json placeholder license database referenced by azurelinux.yaml (license inspection is currently disabled, but keep the reference valid for when it is enabled)."
+type = "spec-add-tag"
+tag = "Requires"
+value = "rpminspect-data-generic >= 2.1"
+
+[[overlays]]
+description = "The inherited policy leaves the virus inspection enabled, but librpminspect only Recommends clamav-data (a weak dependency), so a clean install with install_weak_deps=0 (see distro/mock/azl4/azurelinux-4.0.tpl) lacks the ClamAV signature database and hits a fatal load error at inspection time. Require it explicitly."
+type = "spec-insert-tag"
+tag = "Requires"
+value = "clamav-data"
+
+[[overlays]]
+description = "Add the Azure Linux st_mode/setuid-setgid allow-list as fileinfo/AZURELINUX4."
+type = "patch-add"
+source = "patches/0001-add-fileinfo.patch"
+
+[[overlays]]
+description = "Add the Azure Linux file-capability allow-list as capabilities/AZURELINUX4."
+type = "patch-add"
+source = "patches/0002-add-capabilities.patch"
+
+[[overlays]]
+description = "Install azurelinux.yaml (also renamed to rpminspect.yaml, the file rpminspect loads by default without -c) alongside the upstream-installed fedora.yaml."
+type = "patch-add"
+source = "patches/0003-install-azurelinux-yaml.patch"
+
+[[overlays]]
+description = "Apply the Azure Linux deltas on top of the fedora.yaml copy generated in %prep: force product_release=AZURELINUX4 (our .azl4 release suffix doesn't follow Fedora's fcNN dist-tag convention so auto-detection can't be relied on), point licensedb at the generic placeholder, disable license/manpage inspections until Azure Linux ships curated policy data for them, override the vendor/build-host metadata checks (Azure Linux sets %vendor to 'Microsoft Corporation', and its build-host domain policy isn't defined yet), and drop rc from shellsyntax.shells (its Requires was removed above since Azure Linux doesn't package it; leaving it in the allow-list would make rpminspect try to exec a shell that isn't installed)."
+type = "patch-add"
+source = "patches/0004-azurelinux-deltas.patch"

@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Fri, 20 Jan 2023 13:34:24 -0500
+Subject: [PATCH] build: version the shared objects
+
+It's really weird that meson doesn't default do doing this
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+(cherry picked from commit b92cbab48a7f1f79b6095382d605692f9cee93a6)
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.build b/meson.build
+index bd4c72f..28918cc 100644
+--- a/meson.build
++++ b/meson.build
+@@ -18,6 +18,7 @@ cdson = library('cdson', 'cdson.h',
+                 'src/dump.c', 'src/sniff.c', 'src/fetch.c',
+                 'src/allocation.h', 'src/unicode.h', 'src/unicode.c',
+                 dependencies: deps,
++                version: meson.project_version(),
+                 install: true)
+ pkg = import('pkgconfig')
+ pkg.generate(cdson)
