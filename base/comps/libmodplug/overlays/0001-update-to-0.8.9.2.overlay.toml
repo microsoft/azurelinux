@@ -1,0 +1,31 @@
+# Fedora f43 and f44 package libmodplug 0.8.9.0. Update to the upstream
+# 0.8.9.2 bug-fix and security release on the same spec for these CVE fixes:
+# CVE-2026-75904, CVE-2026-108577, CVE-2026-111270, CVE-2026-111271,
+# CVE-2026-133491
+# Remove this overlay once the imported Fedora spec packages 0.8.9.2 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 0.8.9.2"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.8.9.2"
+
+# 0.8.9.2 already defaults to /etc/timidity.cfg and
+# /usr/share/timidity/instruments in src/load_pat.cpp, so only the README
+# hunks of the timidity paths patch are still needed.
+[[overlays]]
+description = "timiditypaths patch: drop the src/load_pat.cpp hunk, upstream since 0.8.9.2"
+type = "file-search-replace"
+file = "libmodplug-0.8.9.0-timiditypaths.patch"
+regex = '(?s)diff -up libmodplug-0\.8\.9\.0/src/load_pat\.cpp~.*'
+replacement = ''
+
+[[overlays]]
+description = "Remove the obsolete 0.8.9.0 source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libmodplug-0\.8\.9\.0\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'

@@ -1,0 +1,9 @@
+[components.libmodplug]
+
+# Official 0.8.9.2 release tarball from the project's SourceForge download
+# area; it matches the MD5 and SHA1 that SourceForge publishes for the file.
+[[components.libmodplug.source-files]]
+filename = "libmodplug-0.8.9.2.tar.gz"
+hash = "30b41ec5dedbbf844eaeca079f191394b5a1bfee2e63ab706fba4613993789d4e88e1d3c7fda5cb76125a97da62ebd95c0a316034fa70c1affdeecb6f0043845"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://downloads.sourceforge.net/project/modplug-xmms/libmodplug/0.8.9.2/libmodplug-0.8.9.2.tar.gz" }

@@ -19,17 +19,3 @@ diff -up libmodplug-0.8.9.0/README~ libmodplug-0.8.9.0/README
  
        MMABC_NO_RANDOM_PICK when not set and the abc file contains multiple songs
         (X:n) the first song to be played will be picked at random another click
-diff -up libmodplug-0.8.9.0/src/load_pat.cpp~ libmodplug-0.8.9.0/src/load_pat.cpp
---- libmodplug-0.8.9.0/src/load_pat.cpp~	2017-04-24 16:10:17.000000000 +0300
-+++ libmodplug-0.8.9.0/src/load_pat.cpp	2017-04-25 10:13:08.701929258 +0300
-@@ -52,8 +52,8 @@
- #define PATHFORPAT	"C:\\TIMIDITY\\INSTRUMENTS"
- #else
- #define DIRDELIM		'/'
--#define TIMIDITYCFG	"/usr/local/share/timidity/timidity.cfg"
--#define PATHFORPAT	"/usr/local/share/timidity/instruments"
-+#define TIMIDITYCFG	"/etc/timidity.cfg"
-+#define PATHFORPAT	"/usr/share/timidity/instruments"
- #endif
- 
- #define PAT_ENV_PATH2CFG			"MMPAT_PATH_TO_CFG"
