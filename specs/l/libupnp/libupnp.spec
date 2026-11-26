@@ -1,14 +1,14 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-Version: 1.14.30
+Version: 1.14.31
 Summary: Universal Plug and Play (UPnP) SDK
 Name: libupnp
-Release: 4%{?dist}
+Release: 5%{?dist}
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD
 URL: https://github.com/pupnp/pupnp
-Source: %{url}/archive/release-%{version}/%{name}-%{version}.tar.gz
+Source: %{url}/releases/download/release-%{version}/%{name}-%{version}.tar.bz2
 
 BuildRequires: gcc
 BuildRequires: make
@@ -29,7 +29,7 @@ The libupnp-devel package contains the files necessary for development with
 the UPnP SDK libraries.
 
 %prep
-%autosetup -p1 -n pupnp-release-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 
 %build

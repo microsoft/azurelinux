@@ -1,0 +1,34 @@
+# Fedora does not package libupnp 1.14.31 on f43/f44 yet. Update to the upstream
+# 1.14.31 bugfix release for this CVE fix:
+# CVE-2026-41682
+# Use the official release tarball instead of the GitHub tag archive.
+# Remove this overlay once the imported Fedora spec packages 1.14.31 or newer.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Update to upstream 1.14.31"
+type = "spec-update-tag"
+tag = "Version"
+value = "1.14.31"
+
+[[overlays]]
+description = "Use the official release tarball as Source"
+type = "spec-search-replace"
+regex = '/archive/release-%\{version\}/%\{name\}-%\{version\}\.tar\.gz$'
+replacement = "/releases/download/release-%{version}/%{name}-%{version}.tar.bz2"
+
+[[overlays]]
+description = "Unpack the release tarball directory"
+type = "spec-search-replace"
+section = "%prep"
+regex = '-n pupnp-release-%\{version\}'
+replacement = "-n %{name}-%{version}"
+
+[[overlays]]
+description = "Remove the obsolete libupnp-1.14.30.tar.gz source checksum"
+type = "file-search-replace"
+file = "sources"
+regex = '(?m)^SHA512 \(libupnp-1\.14\.30\.tar\.gz\) = [0-9a-f]+(?:\r?\n|$)'
