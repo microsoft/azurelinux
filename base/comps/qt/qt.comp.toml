@@ -1,0 +1,5 @@
+# Pin to Fedora f43 qt-4.8.7-81 and carry backports of upstream Qt CVE fixes
+# (overlays/); Qt 4.8 is EOL upstream.
+# https://src.fedoraproject.org/rpms/qt/c/b5aae7c8ce80d838aa40649979cd9c68db96e990
+[components.qt]
+spec = { type = "upstream", upstream-commit = "b5aae7c8ce80d838aa40649979cd9c68db96e990" }
