@@ -1,0 +1,63 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 4 Nov 2026 18:32:28 +0100
+Subject: [PATCH 32/41] JMS topic selector: bound LIKE pattern matching
+
+LIKE expressions in x-jms-topic binding selectors come from clients and
+are turned into PCRE patterns that sjx_evaluator ran with plain re:run/3,
+without match or recursion limits. An authenticated user that can bind
+and publish could use a pathological selector to keep scheduler CPU busy.
+
+Upstream fixed this in 051ae4f6d3 ("Use rabbit_re in JMS plugin") and
+549cfbfc19 ("Use rabbit_re for pattern matching in JMS plugin"), which
+depend on rabbit_re, a module 4.0.9 does not have. Apply the same limits
+directly: match_limit and match_limit_recursion of 50000, a 1024 byte cap
+on generated patterns, and treat a pattern that fails to compile as no
+match instead of crashing in re:run/3.
+
+Fixes CVE-2026-67413.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../rabbitmq_jms_topic_exchange/src/sjx_evaluator.erl | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/deps/rabbitmq_jms_topic_exchange/src/sjx_evaluator.erl b/deps/rabbitmq_jms_topic_exchange/src/sjx_evaluator.erl
+index 94a09db7a9..0124894602 100644
+--- a/deps/rabbitmq_jms_topic_exchange/src/sjx_evaluator.erl
++++ b/deps/rabbitmq_jms_topic_exchange/src/sjx_evaluator.erl
+@@ -15,6 +15,10 @@
+ 
+ -module(sjx_evaluator).
+ 
++%% The same limits as rabbit_re in later RabbitMQ versions.
++-define(MATCH_LIMIT, 50000).
++-define(MAX_PATTERN_LENGTH, 1024).
++
+ -export([evaluate/2]).
+ %% Evaluation function
+ %%
+@@ -100,9 +104,13 @@ isLike(undefined, _Patt) -> undefined;
+ isLike(L, {regex, MP}) -> patt_match(L, MP);
+ isLike(L, {Patt, Esc}) -> patt_match(L, pattern_of(Patt, Esc)).
+ 
++patt_match(_L, error) -> false;
+ patt_match(L, MP) ->
+   BS = byte_size(L),
+-  case re:run(L, MP, [{capture, first}]) of
++  %% LIKE patterns come from client-supplied selectors, so bound backtracking.
++  case re:run(L, MP, [{capture, first},
++                      {match_limit, ?MATCH_LIMIT},
++                      {match_limit_recursion, ?MATCH_LIMIT}]) of
+     {match, [{0, BS}]} -> true;
+     _                  -> false
+   end.
+@@ -163,6 +171,7 @@ escape($\\) -> "\\\\";
+ escape(Ch)  -> Ch.
+ 
+ compile_re(error) -> error;
++compile_re(MatchMany) when length(MatchMany) > ?MAX_PATTERN_LENGTH -> error;
+ compile_re(MatchMany) ->
+     case re:compile(MatchMany)
+     of  {ok, Rx} -> Rx;

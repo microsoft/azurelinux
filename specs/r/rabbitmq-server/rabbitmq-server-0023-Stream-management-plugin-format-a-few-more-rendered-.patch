@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Fri, 12 Jun 2026 17:09:05 -0700
+Subject: [PATCH 23/41] Stream management plugin: format a few more rendered
+ values with `fmt_string`
+
+(cherry picked from commit 1ab24f33b41d4d241312584200ff430e76881348)
+(cherry picked from commit a92f3b8487e84f390ec94ce5034b0467c84ae558)
+
+[Backport to 4.0.9: clean cherry-pick. Fixes CVE-2026-67239 (stored XSS
+via TLS peer certificate fields in the stream connection page).]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../priv/www/js/tmpl/streamConnection.ejs                   | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/deps/rabbitmq_stream_management/priv/www/js/tmpl/streamConnection.ejs b/deps/rabbitmq_stream_management/priv/www/js/tmpl/streamConnection.ejs
+index 571293bf48..cb0db258c3 100644
+--- a/deps/rabbitmq_stream_management/priv/www/js/tmpl/streamConnection.ejs
++++ b/deps/rabbitmq_stream_management/priv/www/js/tmpl/streamConnection.ejs
+@@ -99,15 +99,15 @@
+ <table class="facts">
+   <tr>
+     <th>Peer Certificate Issuer</th>
+-    <td><%= connection.peer_cert_issuer %></td>
++    <td><%= fmt_string(connection.peer_cert_issuer) %></td>
+   </tr>
+   <tr>
+     <th>Peer Certificate Subject</th>
+-    <td><%= connection.peer_cert_subject %></td>
++    <td><%= fmt_string(connection.peer_cert_subject) %></td>
+   </tr>
+   <tr>
+     <th>Peer Certificate Validity</th>
+-    <td><%= connection.peer_cert_validity %></td>
++    <td><%= fmt_string(connection.peer_cert_validity) %></td>
+   </tr>
+ </table>
+ <% } %>

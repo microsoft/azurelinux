@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Mon, 13 Apr 2026 19:08:30 -0700
+Subject: [PATCH 38/41] Web MQTT, Web STOMP: set Cowboy's `max_frame_size`
+
+Conflicts:
+	deps/rabbitmq_web_mqtt/src/rabbit_web_mqtt_handler.erl
+	deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl
+
+(cherry picked from commit d1d34f83c179cbf9f656389c0ec4477d994833a0)
+
+(cherry picked from commit 205680bf7c42ae33170bd1a6f8d75fec364f475e)
+
+[Backport to 4.0.9: only the Web STOMP part is applied, by hand because
+4.0.9's init/2 has no check_origin wrapper. Cowboy's WebSocket
+max_frame_size is set once at init to the STOMP max_frame_size plus
+4096 bytes. The later 593842bc27 ('Web STOMP: align these limits with
+Web MQTT') lowers this to 64 KiB before authentication and raises it
+after login through a set_options command, but Cowboy 2.12.0, bundled
+with 4.0.9, ignores max_frame_size in set_options, so that change is
+not taken. Together with the login timeout this bounds unauthenticated
+Web STOMP connections in time and in frame size. Fixes CVE-2026-67230.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl b/deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl
+index 14599527b3..79fa38ade9 100644
+--- a/deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl
++++ b/deps/rabbitmq_web_stomp/src/rabbit_web_stomp_handler.erl
+@@ -82,7 +82,10 @@ init(Req0, Opts) ->
+             end
+     end,
+     WsOpts0 = proplists:get_value(ws_opts, Opts, #{}),
+-    WsOpts  = maps:merge(#{compress => true}, WsOpts0),
++    MaxFrameSize = application:get_env(
++        rabbitmq_stomp, max_frame_size, ?DEFAULT_MAX_FRAME_SIZE) + 4096,
++    WsOpts = maps:merge(#{compress => true,
++                           max_frame_size => MaxFrameSize}, WsOpts0),
+     {?MODULE, Req, #state{
+         frame_type         = proplists:get_value(type, Opts, text),
+         heartbeat_sup      = KeepaliveSup,

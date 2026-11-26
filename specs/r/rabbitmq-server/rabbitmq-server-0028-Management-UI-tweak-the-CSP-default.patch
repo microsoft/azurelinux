@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Fri, 25 Sep 2026 16:58:18 -0700
+Subject: [PATCH 28/41] Management UI: tweak the CSP default
+
+(cherry picked from commit 2cc93405e5d392a791a1c91510f0b543c3324dd6)
+(cherry picked from commit 3042365de1dcf6ceeaee1ca1945f0e8c0250260c)
+(cherry picked from commit 27be68b85ec329c8d8d28949fe4a8a7f202b5c20)
+
+[Backport to 4.0.9: applied by hand. 4.0.9 keeps its script-src value,
+which still needs 'unsafe-eval' and 'unsafe-inline', and only gains
+base-uri 'none'; the reason passed to initiate_logout/2 is escaped with
+fmt_escape_html/1. Fixes CVE-2026-67421.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/rabbitmq_management/Makefile            | 2 +-
+ deps/rabbitmq_management/priv/www/js/main.js | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/deps/rabbitmq_management/Makefile b/deps/rabbitmq_management/Makefile
+index 1aad4366fc..af76000109 100644
+--- a/deps/rabbitmq_management/Makefile
++++ b/deps/rabbitmq_management/Makefile
+@@ -12,7 +12,7 @@ define PROJECT_ENV
+ 
+ 	    {cors_allow_origins, []},
+ 	    {cors_max_age, 1800},
+-	    {content_security_policy, "script-src 'self' 'unsafe-eval' 'unsafe-inline'; object-src 'self'"},
++	    {content_security_policy, "script-src 'self' 'unsafe-eval' 'unsafe-inline'; object-src 'self'; base-uri 'none'"},
+ 	    {max_http_body_size, 10000000},
+ 	    {delegate_count, 5},
+ 	    {require_auth_for_api_reference, false}
+diff --git a/deps/rabbitmq_management/priv/www/js/main.js b/deps/rabbitmq_management/priv/www/js/main.js
+index 22c9f47bc1..8fe079083a 100644
+--- a/deps/rabbitmq_management/priv/www/js/main.js
++++ b/deps/rabbitmq_management/priv/www/js/main.js
+@@ -1438,7 +1438,7 @@ function check_bad_response(req, full_page_404) {
+ 
+         if (error == 'bad_request' || error == 'not_found' || error == 'not_authorised' || error == 'not_authorized') {
+             if ((req.status == 401 || req.status == 403) && oauth.enabled) {
+-              initiate_logout(oauth, reason);
++              initiate_logout(oauth, fmt_escape_html(reason));
+             } else {
+               show_popup('warn', fmt_escape_html(reason));
+             }

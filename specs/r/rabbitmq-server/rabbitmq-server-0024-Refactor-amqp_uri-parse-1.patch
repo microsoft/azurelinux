@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Mon, 13 Apr 2026 17:41:17 -0700
+Subject: [PATCH 24/41] Refactor `amqp_uri:parse/1`
+
+(cherry picked from commit c3b950b3561aba71c371a87c01c9d1c182b43ea6)
+(cherry picked from commit 5b1b5f304ab92dc368be956b211d4d43acf1e4a9)
+
+[Backport to 4.0.9: clean cherry-pick. Fixes CVE-2026-67222 (atom
+exhaustion via the auth_mechanism URI parameter).]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/amqp_client/src/amqp_uri.erl | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/deps/amqp_client/src/amqp_uri.erl b/deps/amqp_client/src/amqp_uri.erl
+index 20361075cb..07fb3819fc 100644
+--- a/deps/amqp_client/src/amqp_uri.erl
++++ b/deps/amqp_client/src/amqp_uri.erl
+@@ -248,13 +248,16 @@ find_integer_parameter(Value) ->
+     end.
+ 
+ find_boolean_parameter(Value) ->
+-    Bool = list_to_atom(Value),
+-    case is_boolean(Bool) of
+-        true  -> return(Bool);
+-        false -> fail({require_boolean, Bool})
++    case Value of
++        "true"  -> return(true);
++        "false" -> return(false);
++        _       -> fail({require_boolean, Value})
+     end.
+ 
+-find_atom_parameter(Value) -> return(list_to_atom(Value)).
++find_atom_parameter(Value) ->
++    try return(list_to_existing_atom(Value))
++    catch error:badarg -> fail({invalid_atom_parameter, Value})
++    end.
+ 
+ mechanisms(ParsedUri) ->
+     Query = proplists:get_value('query', ParsedUri),
+@@ -262,12 +265,17 @@ mechanisms(ParsedUri) ->
+                      []    -> ["plain", "amqplain"];
+                      Mechs -> Mechs
+                  end,
+-    [case [list_to_atom(T) || T <- string:tokens(Mech, ":")] of
++    [case [safe_mechanism_token(T) || T <- string:tokens(Mech, ":")] of
+          [F]    -> fun (R, P, S) -> amqp_auth_mechanisms:F(R, P, S) end;
+          [M, F] -> fun (R, P, S) -> M:F(R, P, S) end;
+          L      -> throw({not_mechanism, L})
+      end || Mech <- Mechanisms].
+ 
++safe_mechanism_token(T) ->
++    try list_to_existing_atom(T)
++    catch error:badarg -> throw({unknown_mechanism, T})
++    end.
++
+ %% --=: Plain state monad implementation start :=--
+ run_state_monad(FunList, State) ->
+     lists:foldl(fun (Fun, StateN) -> Fun(StateN) end, State, FunList).

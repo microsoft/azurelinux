@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Tue, 14 Jul 2026 20:01:00 -0700
+Subject: [PATCH 26/41] Federation: more strict when validating URIs
+
+(cherry picked from commit 32f3650fc7097bf491a791d9e04fb87536eadc7b)
+(cherry picked from commit 8673c63338a88dfb2657932850069e044ecac1b0)
+
+[Backport to 4.0.9: the module still lives in deps/rabbitmq_federation
+in 4.0.9; resolved the include block (4.0.9 has none) by taking the
+upstream includes, which resolve to the local rabbit_federation.hrl and
+amqp_client.hrl. Test changes and the rabbitmq_federation_common
+Makefile are dropped. Fixes CVE-2026-67412.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../src/rabbit_federation_parameters.erl      | 31 +++++++++++++++----
+ 1 file changed, 25 insertions(+), 6 deletions(-)
+
+diff --git a/deps/rabbitmq_federation/src/rabbit_federation_parameters.erl b/deps/rabbitmq_federation/src/rabbit_federation_parameters.erl
+index 02c498d69d..24bef26756 100644
+--- a/deps/rabbitmq_federation/src/rabbit_federation_parameters.erl
++++ b/deps/rabbitmq_federation/src/rabbit_federation_parameters.erl
+@@ -9,6 +9,9 @@
+ -behaviour(rabbit_runtime_parameter).
+ -behaviour(rabbit_policy_validator).
+ 
++-include("rabbit_federation.hrl").
++-include_lib("amqp_client/include/amqp_client.hrl").
++
+ -export([validate/5, notify/5, notify_clear/4]).
+ -export([register/0, unregister/0, validate_policy/1, adjust/1]).
+ 
+@@ -45,10 +48,10 @@ validate(_VHost, <<"federation-upstream-set">>, Name, Term0, _User) ->
+         shared_validation()], Upstream)
+      || Upstream <- Term];
+ 
+-validate(_VHost, <<"federation-upstream">>, Name, Term0, _User) ->
++validate(_VHost, <<"federation-upstream">>, Name, Term0, User) ->
+     Term = rabbit_data_coercion:to_proplist(Term0),
+     rabbit_parameter_validation:proplist(
+-      Name, [{<<"uri">>, fun validate_uri/2, mandatory} |
++      Name, [{<<"uri">>, validate_uri(User), mandatory} |
+             shared_validation()], Term);
+ 
+ validate(_VHost, _Component, Name, _Term, _User) ->
+@@ -93,18 +96,21 @@ shared_validation() ->
+      {<<"channel-use-mode">>, rabbit_parameter_validation:enum(
+                               ['multiple', 'single']), optional}].
+ 
+-validate_uri(Name, Term) when is_binary(Term) ->
++validate_uri(User) ->
++    fun (Name, Term) -> validate_uri(Name, Term, User) end.
++
++validate_uri(Name, Term, User) when is_binary(Term) ->
+     case rabbit_parameter_validation:binary(Name, Term) of
+         ok -> case amqp_uri:parse(binary_to_list(Term)) of
+-                  {ok, _}    -> ok;
++                  {ok, Params} -> validate_uri_vhost_access(Params, User);
+                   {error, E} -> {error, "\"~ts\" not a valid URI: ~tp", [Term, E]}
+               end;
+         E  -> E
+     end;
+-validate_uri(Name, Term) ->
++validate_uri(Name, Term, User) ->
+     case rabbit_parameter_validation:list(Name, Term) of
+         ok -> case [V || U <- Term,
+-                         V <- [validate_uri(Name, U)],
++                         V <- [validate_uri(Name, U, User)],
+                          element(1, V) =:= error] of
+                   []      -> ok;
+                   [E | _] -> E
+@@ -112,6 +118,19 @@ validate_uri(Name, Term) ->
+         E  -> E
+     end.
+ 
++%% A direct URI carries its own virtual host; check access to it here.
++validate_uri_vhost_access(#amqp_params_direct{}, none) ->
++    ok;
++validate_uri_vhost_access(#amqp_params_direct{virtual_host = VHost}, User = #user{}) ->
++    try rabbit_access_control:check_vhost_access(User, VHost, undefined, #{}) of
++        ok -> ok
++    catch
++        _:_ -> {error, "user \"~ts\" may not connect to vhost \"~ts\"",
++                [User#user.username, VHost]}
++    end;
++validate_uri_vhost_access(_Params, _User) ->
++    ok.
++
+ %%----------------------------------------------------------------------------
+ 
+ validate_policy([{<<"federation-upstream-set">>, Value}])

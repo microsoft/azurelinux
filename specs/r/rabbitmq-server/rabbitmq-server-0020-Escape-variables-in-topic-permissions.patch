@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Tue, 10 Feb 2026 13:35:03 -0800
+Subject: [PATCH 20/41] Escape '{variables}' in topic permissions
+
+(cherry picked from commit 839d9d40542cb22529c6b0921b9d03c46c092ab2)
+
+[Backport to 4.0.9: clean cherry-pick. Fixes CVE-2026-44838: 4.0.9-4
+fixed CVE-2026-44839, not this one, so topic permission variables were
+still expanded unescaped.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ deps/rabbit/src/rabbit_auth_backend_internal.erl | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/deps/rabbit/src/rabbit_auth_backend_internal.erl b/deps/rabbit/src/rabbit_auth_backend_internal.erl
+index 86e1df0688..d55956f9b6 100644
+--- a/deps/rabbit/src/rabbit_auth_backend_internal.erl
++++ b/deps/rabbit/src/rabbit_auth_backend_internal.erl
+@@ -183,12 +183,25 @@ expand_topic_permission(Permission, ToExpand) when is_map(ToExpand) ->
+     Closing = <<"}">>,
+     ReplaceFun = fun(K, V, Acc) ->
+                     Placeholder = <<Opening/binary, K/binary, Closing/binary>>,
+-                    binary:replace(Acc, Placeholder, V, [global])
++                    binary:replace(Acc, Placeholder, escape_regex(V), [global])
+                  end,
+     maps:fold(ReplaceFun, Permission, ToExpand);
+ expand_topic_permission(Permission, _ToExpand) ->
+     Permission.
+ 
++-spec escape_regex(binary()) -> binary().
++escape_regex(Bin) when is_binary(Bin) ->
++    << <<(escape_regex_char(C))/binary>> || <<C>> <= Bin >>.
++
++escape_regex_char(C)
++  when C =:= $\\; C =:= $^; C =:= $$; C =:= $.;
++       C =:= $|; C =:= $?; C =:= $*; C =:= $+;
++       C =:= $(; C =:= $); C =:= $[; C =:= $];
++       C =:= ${; C =:= $} ->
++    <<$\\, C>>;
++escape_regex_char(C) ->
++    <<C>>.
++
+ permission_index(configure) -> #permission.configure;
+ permission_index(write)     -> #permission.write;
+ permission_index(read)      -> #permission.read.

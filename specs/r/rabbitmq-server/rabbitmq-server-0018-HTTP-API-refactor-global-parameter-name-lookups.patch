@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Mon, 27 Apr 2026 19:48:11 -0700
+Subject: [PATCH 18/41] HTTP API: refactor global parameter name lookups
+
+(cherry picked from commit b92b642d1eb73dae7727b1f677683fd3acf8d0d5)
+(cherry picked from commit 8fbe6d8112427e85fb9a9206b3eb6e9a3ddd3e39)
+
+[Backport to 4.0.9: clean cherry-pick. Fixes CVE-2026-67227 (atom
+exhaustion via the global-parameters :name path segment).]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../src/rabbit_mgmt_wm_global_parameter.erl              | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/deps/rabbitmq_management/src/rabbit_mgmt_wm_global_parameter.erl b/deps/rabbitmq_management/src/rabbit_mgmt_wm_global_parameter.erl
+index 49072a331d..847f1ecff1 100644
+--- a/deps/rabbitmq_management/src/rabbit_mgmt_wm_global_parameter.erl
++++ b/deps/rabbitmq_management/src/rabbit_mgmt_wm_global_parameter.erl
+@@ -52,7 +52,7 @@ accept_content(ReqData0, Context = #context{user = #user{username = Username}})
+           Val = if is_map(Value) -> maps:to_list(Value);
+                     true         -> Value
+                 end,
+-          rabbit_runtime_parameters:set_global(name(ReqData), Val, Username),
++          rabbit_runtime_parameters:set_global(raw_name(ReqData), Val, Username),
+           {true, ReqData, Context}
+       end).
+ 
+@@ -68,4 +68,9 @@ is_authorized(ReqData, Context) ->
+ parameter(ReqData) ->
+     rabbit_runtime_parameters:lookup_global(name(ReqData)).
+ 
+-name(ReqData)      -> rabbit_data_coercion:to_atom(rabbit_mgmt_util:id(name, ReqData)).
++name(ReqData) ->
++    try rabbit_data_coercion:to_existing_atom(rabbit_mgmt_util:id(name, ReqData))
++    catch error:badarg -> undefined
++    end.
++
++raw_name(ReqData) -> rabbit_mgmt_util:id(name, ReqData).

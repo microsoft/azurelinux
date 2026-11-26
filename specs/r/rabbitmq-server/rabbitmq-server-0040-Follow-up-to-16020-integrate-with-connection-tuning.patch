@@ -1,0 +1,85 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Fri, 10 Apr 2026 22:07:38 -0700
+Subject: [PATCH 40/41] Follow-up to #16020: integrate with connection tuning
+
+(cherry picked from commit 07d79d44b8eac705b894c28b31cb4caff7d62668)
+(cherry picked from commit ae99e7ed762c22086f304467e4cf86fa829eddaa)
+
+[Backport to 4.0.9: src applies cleanly; the test suite changes
+conflict and are dropped. Part of the CVE-2026-67225 fix: the parser
+now enforces the frame_max negotiated in Tune.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../rabbitmq_stream/src/rabbit_stream_reader.erl | 16 ++++++++++++----
+ .../src/rabbit_stream_core.erl                   |  8 ++++++++
+ 2 files changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/deps/rabbitmq_stream/src/rabbit_stream_reader.erl b/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
+index 9fa98be887..c8cf5bb281 100644
+--- a/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
++++ b/deps/rabbitmq_stream/src/rabbit_stream_reader.erl
+@@ -1416,12 +1416,20 @@ handle_frame_pre_auth(Transport,
+ handle_frame_pre_auth(_Transport,
+                       #stream_connection{helper_sup = SupPid,
+                                          socket = Sock,
+-                                         name = ConnectionName} =
++                                         name = ConnectionName,
++                                         frame_max = ConfiguredFrameMax} =
+                           Connection,
+-                      #stream_connection_state{blocked = Blocked} = State,
++                      #stream_connection_state{blocked = Blocked,
++                                               data = CoreState0} = State,
+                       {tune, FrameMax, Heartbeat}) ->
+     rabbit_log_connection:debug("Tuning response ~tp ~tp ",
+                                 [FrameMax, Heartbeat]),
++    %% The client must not negotiate a frame_max larger than the
++    %% value advertised by the server, so clamp it to the configured
++    %% ceiling before pushing the negotiated value into the parser.
++    NegotiatedFrameMax = min(FrameMax, ConfiguredFrameMax),
++    CoreState = rabbit_stream_core:set_frame_max(NegotiatedFrameMax,
++                                                 CoreState0),
+     Parent = self(),
+     %% sending a message to the main process so the heartbeat frame is sent from this main process
+     %% otherwise heartbeat frames can interleave with chunk delivery
+@@ -1448,10 +1456,10 @@ handle_frame_pre_auth(_Transport,
+             ok
+     end,
+     {Connection#stream_connection{connection_step = tuned,
+-                                  frame_max = FrameMax,
++                                  frame_max = NegotiatedFrameMax,
+                                   heartbeat = Heartbeat,
+                                   heartbeater = Heartbeater},
+-     State};
++     State#stream_connection_state{data = CoreState}};
+ handle_frame_pre_auth(Transport,
+                       #stream_connection{user = User,
+                                          socket = S,
+diff --git a/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl b/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
+index cae1504cec..28e8d75b18 100644
+--- a/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
++++ b/deps/rabbitmq_stream_common/src/rabbit_stream_core.erl
+@@ -19,6 +19,7 @@
+ -include("rabbit_stream.hrl").
+ 
+ -export([init/1,
++         set_frame_max/2,
+          incoming_data/2,
+          next_command/1,
+          all_commands/1,
+@@ -177,6 +178,13 @@ init(Opts) when is_map(Opts) ->
+ init(_) ->
+     #?MODULE{cfg = #cfg{frame_max = unlimited}}.
+ 
++%% Updates the frame_max enforced by the parser. Called by the
++%% reader after TUNE so the negotiated value is enforced instead of
++%% the initial ceiling.
++-spec set_frame_max(non_neg_integer() | unlimited, state()) -> state().
++set_frame_max(FrameMax, #?MODULE{cfg = Cfg} = State) ->
++    State#?MODULE{cfg = Cfg#cfg{frame_max = FrameMax}}.
++
+ -spec next_command(state()) -> {command(), state()} | empty.
+ next_command(#?MODULE{commands = Commands0} = State) ->
+     case queue:out(Commands0) of

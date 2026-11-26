@@ -1,0 +1,4 @@
+# Pin to Fedora f43 rabbitmq-server-4.0.9-7.fc43 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/rabbitmq-server/c/7063bacb4efddb45928aa6bdc0f26df2e496eb04
+[components.rabbitmq-server]
+spec = { type = "upstream", upstream-commit = "7063bacb4efddb45928aa6bdc0f26df2e496eb04" }

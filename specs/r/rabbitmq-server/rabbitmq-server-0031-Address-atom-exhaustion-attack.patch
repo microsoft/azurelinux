@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Marcial Rosales <marcial.rosales@broadcom.com>
+Date: Wed, 15 Apr 2026 09:22:18 +0200
+Subject: [PATCH 31/41] Address atom exhaustion attack
+
+(cherry picked from commit ca36babb7c169c451ded51408c86673e9a312363)
+(cherry picked from commit 150bee6c33da57bce107fc373d20247003f07ed1)
+
+[Backport to 4.0.9: hand-ported: 4.0.9 filters tag scopes with a local
+matching_scopes_without_prefix/2 and its rabbit_data_coercion has no
+to_existing_atom/1, so safe_to_atom/1 calls binary_to_existing_atom/2
+directly. Tag scopes that do not name an existing atom are ignored, as
+upstream. The unit_SUITE changes are dropped. Fixes CVE-2026-66071.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../src/rabbit_auth_backend_oauth2.erl                | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/deps/rabbitmq_auth_backend_oauth2/src/rabbit_auth_backend_oauth2.erl b/deps/rabbitmq_auth_backend_oauth2/src/rabbit_auth_backend_oauth2.erl
+index cb107eb508..a6fb8e0c94 100644
+--- a/deps/rabbitmq_auth_backend_oauth2/src/rabbit_auth_backend_oauth2.erl
++++ b/deps/rabbitmq_auth_backend_oauth2/src/rabbit_auth_backend_oauth2.erl
+@@ -654,7 +654,16 @@ find_claim_in_token(Claim, Token) ->
+ tags_from(DecodedToken) ->
+     Scopes    = maps:get(?SCOPE_JWT_FIELD, DecodedToken, []),
+     TagScopes = matching_scopes_without_prefix(Scopes, ?TAG_SCOPE_PREFIX),
+-    lists:usort(lists:map(fun rabbit_data_coercion:to_atom/1, TagScopes)).
++    lists:usort(lists:filtermap(fun safe_to_atom/1, TagScopes)).
++
++safe_to_atom(Bin) when is_binary(Bin) ->
++    try
++        {true, binary_to_existing_atom(Bin, utf8)}
++    catch
++        error:badarg -> false
++    end;
++safe_to_atom(_) ->
++    false.
+ 
+ matching_scopes_without_prefix(Scopes, PrefixPattern) ->
+     PatternLength = byte_size(PrefixPattern),

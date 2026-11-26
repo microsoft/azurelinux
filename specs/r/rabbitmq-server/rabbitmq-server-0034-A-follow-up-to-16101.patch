@@ -1,0 +1,107 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Wed, 17 Jun 2026 11:31:35 -0700
+Subject: [PATCH 34/41] A follow-up to #16101
+
+Refactor, deeper integrate the RFC 4514 escaping
+of the DN and its "components".
+
+(cherry picked from commit 36f636ca3a254fb25f9cd1d4a735fdabdc5be405)
+(cherry picked from commit 22d43308cd0575e0aba0441f6badcd199c302189)
+
+[Backport to 4.0.9: one conflict in dn_lookup/2: 4.0.9 logs with
+rabbit_log_ldap:warning/2, which is kept, and the fallback now returns
+escaped_user_dn(Username). Fixes CVE-2026-67223.]
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ .../src/rabbit_auth_backend_ldap.erl          | 19 ++++++++++++-------
+ .../src/rabbit_auth_backend_ldap_util.erl     |  3 +++
+ .../src/rabbit_ldap_rfc4514.erl               |  4 ++--
+ 3 files changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/deps/rabbitmq_auth_backend_ldap/src/rabbit_auth_backend_ldap.erl b/deps/rabbitmq_auth_backend_ldap/src/rabbit_auth_backend_ldap.erl
+index 68a2438d84..87e491d7f0 100644
+--- a/deps/rabbitmq_auth_backend_ldap/src/rabbit_auth_backend_ldap.erl
++++ b/deps/rabbitmq_auth_backend_ldap/src/rabbit_auth_backend_ldap.erl
+@@ -23,7 +23,8 @@
+ -export([get_connections/0]).
+ 
+ %% for tests
+--export([purge_connections/0]).
++-export([purge_connections/0,
++         fill_user_dn_pattern/1, escaped_user_dn/1]).
+ 
+ -define(L(F, A),  log("LDAP "         ++ F, A)).
+ -define(L1(F, A), log("    LDAP "     ++ F, A)).
+@@ -868,9 +869,7 @@ username_to_dn_prebind(Username) ->
+               fun (LDAP) -> dn_lookup(Username, LDAP) end).
+ 
+ username_to_dn(Username, LDAP,  postbind) -> dn_lookup(Username, LDAP);
+-username_to_dn(Username, _LDAP, _When)    ->
+-    ADArgs = rabbit_auth_backend_ldap_util:get_active_directory_args(Username),
+-    fill_dn(env(user_dn_pattern), [{username, Username}] ++ ADArgs).
++username_to_dn(Username, _LDAP, _When)    -> escaped_user_dn(Username).
+ 
+ dn_lookup(Username, LDAP) ->
+     Filled = fill_user_dn_pattern(Username),
+@@ -888,7 +887,8 @@ dn_lookup(Username, LDAP) ->
+         {ok, {eldap_search_result, Entries, _Referrals, _Controls}} ->
+             rabbit_log_ldap:warning("Searching for DN for ~ts, got back ~tp",
+                                [Filled, Entries]),
+-            Filled;
++            %% Used as a bind DN, so RFC 4514-escape substituted values.
++            escaped_user_dn(Username);
+         {error, _} = E ->
+             exit(E)
+     end.
+@@ -897,12 +897,17 @@ fill_user_dn_pattern(Username) ->
+     ADArgs = rabbit_auth_backend_ldap_util:get_active_directory_args(Username),
+     fill(env(user_dn_pattern), [{username, Username}] ++ ADArgs).
+ 
++%% The user DN built from `user_dn_pattern' with RFC 4514-escaped
++%% substitutions. A no-op for usernames without DN-special characters.
++escaped_user_dn(Username) ->
++    ADArgs = rabbit_auth_backend_ldap_util:get_active_directory_args(Username),
++    fill_dn(env(user_dn_pattern), [{username, Username}] ++ ADArgs).
++
+ simple_bind_fill_pattern(Username) ->
+     simple_bind_fill_pattern(env(user_bind_pattern), Username).
+ 
+ simple_bind_fill_pattern(none, Username) ->
+-    ADArgs = rabbit_auth_backend_ldap_util:get_active_directory_args(Username),
+-    fill_dn(env(user_dn_pattern), [{username, Username}] ++ ADArgs);
++    escaped_user_dn(Username);
+ simple_bind_fill_pattern(Pattern, Username) ->
+     ADArgs = rabbit_auth_backend_ldap_util:get_active_directory_args(Username),
+     fill_dn(Pattern, [{username, Username}] ++ ADArgs).
+diff --git a/deps/rabbitmq_auth_backend_ldap/src/rabbit_auth_backend_ldap_util.erl b/deps/rabbitmq_auth_backend_ldap/src/rabbit_auth_backend_ldap_util.erl
+index 533924ee68..8f5c6b1f9e 100644
+--- a/deps/rabbitmq_auth_backend_ldap/src/rabbit_auth_backend_ldap_util.erl
++++ b/deps/rabbitmq_auth_backend_ldap/src/rabbit_auth_backend_ldap_util.erl
+@@ -9,6 +9,9 @@
+ 
+ -export([fill/2, get_active_directory_args/1]).
+ 
++%% Raw substitution without escaping. Safe only for non-DN sinks (ACL string
++%% comparisons, eldap:equalityMatch/2 filter values). To build a DN, use
++%% rabbit_ldap_rfc4514:fill_dn/2, which RFC 4514-escapes substituted values.
+ fill(Fmt, []) ->
+     binary_to_list(iolist_to_binary(Fmt));
+ 
+diff --git a/deps/rabbitmq_auth_backend_ldap/src/rabbit_ldap_rfc4514.erl b/deps/rabbitmq_auth_backend_ldap/src/rabbit_ldap_rfc4514.erl
+index 6cb2f13262..fd6c795047 100644
+--- a/deps/rabbitmq_auth_backend_ldap/src/rabbit_ldap_rfc4514.erl
++++ b/deps/rabbitmq_auth_backend_ldap/src/rabbit_ldap_rfc4514.erl
+@@ -8,8 +8,8 @@
+ %% RFC 4514 — String Representation of Distinguished Names.
+ %%
+ %% This module escapes values for safe inclusion in DN attribute value
+-%% positions, preventing DN injection when untrusted input (usernames,
+-%% vhost names, resource names) is substituted into DN templates.
++%% positions when input such as usernames, vhost names, or resource names is
++%% substituted into DN templates.
+ -module(rabbit_ldap_rfc4514).
+ 
+ -export([escape_value/1, fill_dn/2]).

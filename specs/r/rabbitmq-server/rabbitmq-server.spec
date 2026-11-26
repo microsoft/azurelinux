@@ -10,7 +10,7 @@
 
 Name: rabbitmq-server
 Version: 4.0.9
-Release: 9%{?dist}
+Release: 12%{?dist}
 License: MPL-2.0
 Source0: https://github.com/rabbitmq/rabbitmq-server/releases/download/v%{version}/%{name}_%{version}.orig.tar.xz
 Source1: https://github.com/rabbitmq/rabbitmq-server/releases/download/v%{version}/%{name}_%{version}.orig.tar.xz.asc
@@ -33,6 +33,34 @@ Patch10: rabbitmq-server-0010-HTTP-API-refactor-read_complete_body-1.patch
 Patch11: rabbitmq-server-0011-Remove-deprecated-endpoint.patch
 Patch12: rabbitmq-server-0012-Remove-deprecated-endpoint.patch
 Patch13: rabbitmq-server-0013-AMQP-0-9-1-apply-configure-checks-to-passive-queue-e.patch
+Patch14: rabbitmq-server-0014-rabbit_access_control-update_state-2-rebuild-user-ta.patch
+Patch15: rabbitmq-server-0015-Match-exact-symbol-length-when-detecting-AMQP-1.0-bo.patch
+Patch16: rabbitmq-server-0016-Parse-MQTT-properties-strictly.patch
+Patch17: rabbitmq-server-0017-OAuth-2-improve-robustness-of-a-token-refresh-path.patch
+Patch18: rabbitmq-server-0018-HTTP-API-refactor-global-parameter-name-lookups.patch
+Patch19: rabbitmq-server-0019-Runtime-parameters-refactor-component-lookups.patch
+Patch20: rabbitmq-server-0020-Escape-variables-in-topic-permissions.patch
+Patch21: rabbitmq-server-0021-Escape-in-topic-permission-variables.patch
+Patch22: rabbitmq-server-0022-AMQP-1.0-management-align-GET-bindings-with-the-rest.patch
+Patch23: rabbitmq-server-0023-Stream-management-plugin-format-a-few-more-rendered-.patch
+Patch24: rabbitmq-server-0024-Refactor-amqp_uri-parse-1.patch
+Patch25: rabbitmq-server-0025-Restrict-AMQP-URI-auth_mechanism-to-a-fixed-mechanis.patch
+Patch26: rabbitmq-server-0026-Federation-more-strict-when-validating-URIs.patch
+Patch27: rabbitmq-server-0027-Introduce-rabbit_nodes-resolve_member-1.patch
+Patch28: rabbitmq-server-0028-Management-UI-tweak-the-CSP-default.patch
+Patch29: rabbitmq-server-0029-MQTT-Web-MQTT-refactor-socket-handling.patch
+Patch30: rabbitmq-server-0030-Limit-the-number-of-user-tags-to-3.patch
+Patch31: rabbitmq-server-0031-Address-atom-exhaustion-attack.patch
+Patch32: rabbitmq-server-0032-JMS-topic-selector-bound-LIKE-pattern-matching.patch
+Patch33: rabbitmq-server-0033-LDAP-handle-DN-template-values-per-RFC-4514.patch
+Patch34: rabbitmq-server-0034-A-follow-up-to-16101.patch
+Patch35: rabbitmq-server-0035-ldap-escape-down-level-logon-names-by-parts.patch
+Patch36: rabbitmq-server-0036-LDAP-escape-DN-template-values-not-whole-non-DN-bind.patch
+Patch37: rabbitmq-server-0037-Web-MQTT-Web-STOMP-enforce-login-timeout-for-WebSock.patch
+Patch38: rabbitmq-server-0038-Web-MQTT-Web-STOMP-set-Cowboy-s-max_frame_size.patch
+Patch39: rabbitmq-server-0039-Implement-a-stream-reader-TODO.patch
+Patch40: rabbitmq-server-0040-Follow-up-to-16020-integrate-with-connection-tuning.patch
+Patch41: rabbitmq-server-0041-Follow-up-to-16020-integrate-the-special-value-of-0.patch
 
 URL: https://www.rabbitmq.com/
 BuildRequires: elixir
@@ -190,6 +218,18 @@ rm -f %{_rabbit_libdir}/lib/rabbitmq_server-%{version}/ebin/rabbit.{rel,script,b
 
 
 %changelog
+* Wed Nov 04 2026 Peter Lemenkov <lemenkov@gmail.com> - 4.0.9-7
+- Backport fixes for CVE-2026-44838, CVE-2026-61837, CVE-2026-66071,
+  CVE-2026-66073, CVE-2026-67222, CVE-2026-67223, CVE-2026-67225,
+  CVE-2026-67226, CVE-2026-67227, CVE-2026-67230, CVE-2026-67239,
+  CVE-2026-67407, CVE-2026-67411, CVE-2026-67412, CVE-2026-67413,
+  CVE-2026-67421
+
+* Mon Nov 02 2026 Peter Lemenkov <lemenkov@gmail.com> - 4.0.9-6
+- Backport fixes for CVE-2026-67409 (rhbz#2559734), CVE-2026-67416
+  (rhbz#2561690), CVE-2026-67418 (rhbz#2561691) and CVE-2026-67420
+  (rhbz#2544007)
+
 * Thu Jul 30 2026 Peter Lemenkov <lemenkov@gmail.com> - 4.0.9-5
 - Fixed CVE-2026-57212, CVE-2026-57213, CVE-2026-57215, CVE-2026-57217,
   CVE-2026-57219, CVE-2026-57221
