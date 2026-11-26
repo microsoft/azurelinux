@@ -13,18 +13,8 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         pathrs-tolerate-dot-separated-localversions.patch
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-41602.patch
-Patch3:         CVE-2026-84304.patch
-Patch4:         CVE-2026-107324.patch
-Patch5:         CVE-2026-61801.patch
-Patch6:         CVE-2026-78659.patch
-Patch7:         CVE-2026-78660.patch
-Patch8:         CVE-2026-78663.patch
-Patch9:         CVE-2026-78669.patch
-Patch10:        CVE-2026-97032.patch
-Patch11:        CVE-2026-81870.patch
-Patch12:        CVE-2026-107325.patch
-Patch13:        CVE-2026-116591.patch
-Patch14:        CVE-2026-95838.patch
+Patch3:         CVE-2026-107324.patch
+Patch4:         CVE-2026-107325.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang >= 1.25
 BuildRequires:  protobuf-compiler
