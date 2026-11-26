@@ -1,3 +1,6 @@
+# Pin to Fedora f43 krb5-1.22.3-1.fc43 to pick up CVE fixes.
+# https://src.fedoraproject.org/rpms/krb5/c/971711a13a6f73534a67632738677f02f4e08804
 [components.krb5]
+spec = { type = "upstream", upstream-commit = "971711a13a6f73534a67632738677f02f4e08804" }
 # Release: %{krb5_release}
 release = { calculation = "manual" }
