@@ -134,6 +134,7 @@
         <package name="filesystem" />
         <package name="findutils" />
         <package name="gdbm" />
+        <package name="golang-msft-telemetry-policy" />
         <package name="grep" />
         <package name="logrotate" />
         <package name="ncurses-libs" />
