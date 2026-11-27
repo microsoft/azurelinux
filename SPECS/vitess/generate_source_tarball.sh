@@ -16,12 +16,14 @@ get_param() {
 PKG_VERSION=""
 SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VENDOR_VERSION="3"
 
 # parameters:
 #
 # --srcTarball  : src tarball file
 # --outFolder   : folder where to copy the new tarball(s)
 # --pkgVersion  : package version
+# --vendorVersion : vendor tarball version
 #
 while (( "$#" )); do
     case "$1" in
@@ -37,8 +39,16 @@ while (( "$#" )); do
         PKG_VERSION="$(get_param "$1" "$2")"
         shift 2
         ;;
+        --vendorVersion)
+        VENDOR_VERSION="$(get_param "$1" "$2")"
+        shift 2
+        ;;
         -*)
         echo "Error: unsupported flag $1." >&2
+        exit 1
+        ;;
+        *)
+        echo "Error: unsupported argument $1." >&2
         exit 1
         ;;
   esac
@@ -47,9 +57,15 @@ done
 echo "--srcTarball   -> $SRC_TARBALL"
 echo "--outFolder    -> $OUT_FOLDER"
 echo "--pkgVersion   -> $PKG_VERSION"
+echo "--vendorVersion -> $VENDOR_VERSION"
 
 if [ -z "$PKG_VERSION" ]; then
     echo "Error: --pkgVersion parameter cannot be empty." >&2
+    exit 1
+fi
+
+if [ -z "$VENDOR_VERSION" ]; then
+    echo "Error: --vendorVersion parameter cannot be empty." >&2
     exit 1
 fi
 
@@ -59,6 +75,7 @@ if [ ! -f "$SRC_TARBALL" ]; then
 fi
 
 SRC_TARBALL="$(realpath "$SRC_TARBALL")"
+mkdir -p "$OUT_FOLDER"
 OUT_FOLDER="$(realpath "$OUT_FOLDER")"
 
 echo "Creating a tempdir."
@@ -72,12 +89,19 @@ trap cleanup EXIT
 pushd "$tmpdir" > /dev/null
 
 NAME_VER="vitess-$PKG_VERSION"
-VENDOR_TARBALL="$(realpath "$OUT_FOLDER/$NAME_VER-vendor.tar.gz")"
+VENDOR_TARBALL="$(realpath -m "$OUT_FOLDER/$NAME_VER-vendor-v$VENDOR_VERSION.tar.gz")"
 
 echo "Unpacking the source tarball."
 tar -xf "$SRC_TARBALL"
 
 cd "$NAME_VER"
+
+go mod edit -modfile=go.mod \
+    -require=google.golang.org/grpc@v1.83.2 \
+    -require=go.opentelemetry.io/otel@v1.47.0 \
+    -require=go.opentelemetry.io/otel/sdk@v1.47.0
+go mod tidy
+
 echo "Getting the vendored modules."
 go mod vendor
 
