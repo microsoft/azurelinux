@@ -1,14 +1,42 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.4
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/containers/skopeo
 Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/containers/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+#      go mod edit -modfile=go.mod -require=go.opentelemetry.io/otel@v1.47.0
+#   5. go mod tidy
+#   6. go mod vendor
+#   7. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -czf %%{name}-%%{version}-vendor-v2.tar.gz vendor
+#
+# Alternatively, run the helper from this spec directory:
+#   bash generate_source_tarball.sh \
+#       --srcTarball "$(pwd)/%%{name}-%%{version}.tar.gz" \
+#       --outFolder "$(pwd)" \
+#       --pkgVersion %%{version} --vendorVersion 2
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - You require Go 1.26+ for the updated Go modules.
+#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
+#         See: https://reproducible-builds.org/docs/archives/
+#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2022-2879.patch
 Patch1:         CVE-2024-6104.patch
 Patch2:         CVE-2024-9676.patch
@@ -30,6 +58,7 @@ Patch17:        CVE-2026-116585.patch
 Patch18:        CVE-2026-116586.patch
 Patch19:        CVE-2026-116587.patch
 Patch20:        CVE-2026-116591.patch
+Patch21:        CVE-2026-128085.patch
 
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -71,6 +100,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Fri Nov 27 2026 Sushil Sati <v-Sushil.sati@microsoft.com> - 1.14.4-18
+- Patch for CVE-2026-128085 and CVE-2026-128086 by upgrading vendored go.opentelemetry.io/otel to v1.47.0
+
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.14.4-17
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
