@@ -1,0 +1,84 @@
+From 24f644ea26c2ebb7b14c3baa2aa92d37fde3095f Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Wed, 21 Oct 2026 18:54:06 -0700
+Subject: [PATCH] KVM: x86: Unconditionally reset MMU context when emulating
+ INIT
+
+[ Upstream commit c7c288d178cb0b78d3464a616b16b1aa0b316049 ]
+
+Force an MMU reset when emulating an INIT even if paging was already
+disabled, as the MMU page role includes guest_mode (L2), i.e. an INIT while
+L2 is running with CR0.PG=0 will result in KVM running L1 with a stale MMU
+context.
+
+Alternatively, the reset could be scoped strictly to paging being enabled
+or L2 being active, but SMM is also encoded in the page role.  Even though
+it _should_ be impossible for the vCPU to be INIT'd while SMM is active,
+there's zero value in not handling SMM.  At that point, the only scenario
+where KVM _doesn't_ need to reset the MMU context is on an INIT with the
+vCPU running in Real Mode or Unpaged Protect Mode, and while INIT in those
+modes is somewhat common, it's far from a hot path and re-initializing the
+MMU is not expensive, especially when the role isn't changing (KVM elides
+most of the re-configuration in that case).
+
+Note, like the Fixes commit, this bug only affects nested SVM as INIT is an
+unconditional intercept on VMX, i.e. it's impossible to emulate INIT while
+L2 is active.
+
+Temporarily keep the guest TLB flush when CR0.PG is being cleared even
+though it is fully redundant with the flush that is emitted on all INIT
+events (KVM itself only does RESET when a vCPU is being created, i.e. when
+CR0.PG must be '0').
+
+Fixes: ed129ec9057f ("KVM: x86: forcibly leave nested mode on vCPU reset")
+Reported-by: Stefan Teodorescu <fane@google.com>
+Reported-by: Oren Yomtov <thenameisoren@gmail.com>
+Reported-by: Chris Mason <mason@kernel.org>
+Cc: stable@vger.kernel.org
+Cc: Yosry Ahmed <yosry@kernel.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Message-ID: <20261022015407.279870-2-seanjc@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/x86/kvm/x86.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0a6fb6e08d1b..3ca396316d3c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12278,18 +12278,23 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	kvm_x86_call(set_efer)(vcpu, 0);
+ 	kvm_x86_call(update_exception_bitmap)(vcpu);
+ 
++	if (old_cr0 & X86_CR0_PG)
++		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
++
+ 	/*
+-	 * On the standard CR0/CR4/EFER modification paths, there are several
+-	 * complex conditions determining whether the MMU has to be reset and/or
+-	 * which PCIDs have to be flushed.  However, CR0.WP and the paging-related
+-	 * bits in CR4 and EFER are irrelevant if CR0.PG was '0'; and a reset+flush
+-	 * is needed anyway if CR0.PG was '1' (which can only happen for INIT, as
+-	 * CR0 will be '0' prior to RESET).  So we only need to check CR0.PG here.
++	 * Unconditionally reset the MMU, even though super strictly speaking,
++	 * a MMU reset is only necessary if and only one of the page role bits
++	 * is changing.  All of the CR0/CR4/EFER bits effectively get covered
++	 * by checking CR0.PG=1, as CR0.WP and the paging-related bits in CR4
++	 * and EFER are irrelevant if CR0.PG was '0'.  Subtly, if the vCPU was
++	 * in guest mode (L2) or SMM (although emulating INIT in SMM _should_
++	 * be impossible), an MMU reset is also necessary as "guest mode" and
++	 * "smm" are both encoded in the shadow page role.  As a result, the
++	 * only scenarios where an MMU reset is *not* needed is if the vCPU is
++	 * in Real Mode or Unpaged Protected Mode, and micro-optimizing those
++	 * paths are not worth the risk of running with a stale MMU context.
+ 	 */
+-	if (old_cr0 & X86_CR0_PG) {
+-		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
+-		kvm_mmu_reset_context(vcpu);
+-	}
++	kvm_mmu_reset_context(vcpu);
+ 
+ 	/*
+ 	 * Intel's SDM states that all TLB entries are flushed on INIT.  AMD's

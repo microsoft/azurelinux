@@ -487,6 +487,12 @@ func (c *Chroot) MoveOutFile(srcPath string, destPath string) (err error) {
 // Run runs a given function inside the Chroot. This function will synchronize
 // with all other Chroots to ensure only one Chroot command is executed at a given time.
 func (c *Chroot) Run(toRun func() error) (err error) {
+	return c.RunWithEnvironment(toRun, nil)
+}
+
+// RunWithEnvironment runs a function with explicitly supplied environment variables
+// in addition to the minimal chroot environment. Run does not inherit these variables.
+func (c *Chroot) RunWithEnvironment(toRun func() error, extraEnv []string) (err error) {
 	// Only a single chroot can be active at a given time for a single GO application.
 	// acquire a global mutex to ensure this behavior.
 	inChrootMutex.Lock()
@@ -494,7 +500,8 @@ func (c *Chroot) Run(toRun func() error) (err error) {
 
 	// Alter the environment variables while inside the chroot, upon exit restore them.
 	originalEnv := shell.CurrentEnvironment()
-	shell.SetEnvironment(defaultChrootEnv)
+	chrootEnv := append([]string{}, defaultChrootEnv...)
+	shell.SetEnvironment(append(chrootEnv, extraEnv...))
 	defer shell.SetEnvironment(originalEnv)
 
 	err = c.UnsafeRun(toRun)
