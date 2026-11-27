@@ -1,13 +1,13 @@
 Summary:        SSL sockets with IO::Socket interface
 Name:           perl-IO-Socket-SSL
-Version:        2.084
-Release:        2%{?dist}
+Version:        2.099
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            https://metacpan.org/release/IO-Socket-SSL
-Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/S/SU/SULLR/IO-Socket-SSL-%{version}.tar.gz
 Source1:        LICENSE.PTR
-Patch0:         0001-fixed-test-fail-with-OpenSSL-3.2.patch
+Patch0:         CVE-2026-129892.patch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildArch:      noarch
@@ -72,6 +72,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Mon Nov 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.099-1
+- Upgrade to 2.099 for CVE-2026-129891 and CVE-2026-129892
+
 * Wed May 13 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.084-2
 - Fix ptests failure.
 

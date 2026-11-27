@@ -1,6 +1,6 @@
 {
-  "Signatures": {
-    "LICENSE.PTR": "da6b04a3b1a60a5dad9b29f897559e370a7698ee2268f5528cd9afacccb5518f",
-    "IO-Socket-SSL-2.084.tar.gz": "a60d1e04e192363155329560498abd3412c3044295dae092d27fb6e445c71ce1"
-  }
+ "Signatures": {
+  "IO-Socket-SSL-2.099.tar.gz": "a0be800ff4852b1567ee5500e772417ad7a360abff80c01b5b875c15d44be832",
+  "LICENSE.PTR": "da6b04a3b1a60a5dad9b29f897559e370a7698ee2268f5528cd9afacccb5518f"
+ }
 }
