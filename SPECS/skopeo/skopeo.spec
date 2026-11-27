@@ -1,7 +1,7 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.4
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,7 +36,7 @@ Patch20:        CVE-2026-116591.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  go-md2man
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang
 BuildRequires:  gpgme-devel
 BuildRequires:  libassuan-devel
 BuildRequires:  pkgconfig
@@ -71,6 +71,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.14.4-17
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.4-16
 - Patch for CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
 

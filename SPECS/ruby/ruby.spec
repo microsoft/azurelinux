@@ -4,7 +4,7 @@
 %global gem_dir %{_datadir}/ruby/gems
 
 # Default package version defined separately, because the %%version macro gets overwritten by 'Version' tags of the subpackages.
-%global ruby_version            3.3.13
+%global ruby_version            3.3.14
 %define ruby_version_majmin     %(echo %{ruby_version} | cut -d. -f1-2)
 
 %global rubygems_version        3.5.22
@@ -88,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -408,6 +408,10 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Thu Nov 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.14-12
+- Upgrade to 3.3.14 to fix GHSA-34m4-m9fh-gqp5, GHSA-7x2q-68qv-6p8x, GHSA-87fm-7w84-j2px,
+  GHSA-wpqw-5qxg-m68r, GHSA-3p8q-wmhx-vm2w, GHSA-7whj-cfh7-xgm4, GHSA-pvgc-g7gj-pv6h
+
 * Sat Oct 24 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.13-11
 - Upgrade to 3.3.13 to fix CVE-2026-89078, CVE-2026-93577, CVE-2026-97229, CVE-2026-110264
 - Remove patches for CVEs already fixed upstream

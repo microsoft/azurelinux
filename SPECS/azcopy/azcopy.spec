@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
 Version:        10.25.1
-Release:        10%{?dist}
+Release:        12%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,8 +32,11 @@ Patch1:         CVE-2024-51744.patch
 Patch2:         CVE-2026-84445.patch
 Patch3:         CVE-2026-78660.patch
 Patch4:         CVE-2026-78669.patch
+Patch5:         CVE-2026-116585.patch
+Patch6:         CVE-2026-116586.patch
+Patch7:         CVE-2026-116587.patch
 
-BuildRequires: golang >= 1.25
+BuildRequires: golang
 BuildRequires:  git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -68,6 +71,12 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 10.25.1-12
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
+
+* Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.25.1-11
+- Patch for CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
+
 * Mon Oct 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.25.1-10
 - Patch for CVE-2026-78669, CVE-2026-78660
 

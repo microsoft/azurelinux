@@ -1,7 +1,7 @@
 Summary:        Dasel (short for data-selector) allows you to query and modify data structures using selector strings. Comparable to jq, yq, and xmlstarlet, but for any data format.
 Name:           dasel
 Version:        2.8.1
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,7 +21,8 @@ Patch9:         CVE-2026-42502.patch
 Patch10:        fix-go-mod-language-version.patch
 Patch11:        CVE-2026-78661.patch
 Patch12:        CVE-2026-97045.patch
-BuildRequires:  golang >= 1.22
+Patch13:        CVE-2026-77299.patch
+BuildRequires:  golang
 
 %description
 Say good bye to learning new tools just to work with a different data format.
@@ -54,6 +55,12 @@ go test ./...
 %{_bindir}/dasel
 
 %changelog
+* Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.8.1-8
+- Remove 'BuildRequires: golang >= 1.22' pin; the default Go toolchain satisfies it.
+
+* Wed Nov 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.8.1-7
+- Patch for CVE-2026-77299
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.8.1-6
 - Patch for CVE-2026-97045, CVE-2026-78661
 

@@ -20,7 +20,7 @@
 Summary:        Linux Kernel for Kata UVMs running GPU and HPC workloads
 Name:           kernel-uvm-hpc
 Version:        6.18.58.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,7 @@ Group:          System Environment/Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/kernel-uvm-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
+Patch0:         0001-KVM-x86-Unconditionally-reset-MMU-context-when-emulating-INIT.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -177,6 +178,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Nov 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.58.mshv1-2
+- Unconditionally reset the KVM MMU context when emulating INIT
+
 * Wed Nov 04 2026 Jocelyn Berrendonner <jocelynb@microsoft.com> - 6.18.58.mshv1-1
 - Original version for Azure Linux.
 - License verified.

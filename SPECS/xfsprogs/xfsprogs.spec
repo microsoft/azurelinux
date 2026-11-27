@@ -1,13 +1,14 @@
 Summary:        Utilities for managing the XFS filesystem
 Name:           xfsprogs
 Version:        6.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ and LGPLv2+
 URL:            https://xfs.wiki.kernel.org/
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-108472.patch
 BuildRequires:  gettext
 BuildRequires:  readline-devel
 BuildRequires:  inih-devel
@@ -83,6 +84,9 @@ find %{buildroot}/%{_lib64dir} -name '*.a' -delete
 %defattr(-,root,root)
 
 %changelog
+* Mon Nov 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.0-2
+- Patch for CVE-2026-108472
+
 * Thu Feb 08 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.0-1
 - Upgrade to version 6.6.0
 - Remove faulty check section
