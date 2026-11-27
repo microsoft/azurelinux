@@ -78,13 +78,17 @@ trap cleanup EXIT
 pushd $tmpdir > /dev/null
 
 NAME_VER="flannel-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor-v2.tar.gz"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor-v3.tar.gz"
 
 echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
 
 cd "$NAME_VER"
-go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+# OpenTelemetry v1.47.0 requires Go 1.26; pin the SDK as well as the root module.
+go mod edit -modfile=go.mod -go=1.26.0 \
+    -require=google.golang.org/grpc@v1.83.2 \
+    -require=go.opentelemetry.io/otel@v1.47.0 \
+    -require=go.opentelemetry.io/otel/sdk@v1.47.0
 go mod tidy
 echo "Get vendored modules"
 go mod vendor
@@ -94,7 +98,7 @@ tar  --sort=name \
      --mtime="2021-04-26 00:00Z" \
      --owner=0 --group=0 --numeric-owner \
      --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-     -cf "$VENDOR_TARBALL" vendor
+     -czf "$VENDOR_TARBALL" vendor
 
 popd > /dev/null
 echo "flannel vendored modules are available at $VENDOR_TARBALL"
