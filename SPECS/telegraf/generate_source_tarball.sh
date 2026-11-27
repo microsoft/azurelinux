@@ -2,7 +2,10 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -e
+set -eo pipefail
+umask 022
+export LC_ALL=C
+export GOWORK=off GOTOOLCHAIN=local
 
 get_param() {
     if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
@@ -15,13 +18,16 @@ get_param() {
 
 PKG_VERSION=""
 SRC_TARBALL=""
-OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VENDOR_VERSION="4"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+OUT_FOLDER="${SCRIPT_DIR}"
 
 # parameters:
 #
 # --srcTarball  : src tarball file
 # --outFolder   : folder where to copy the new tarball(s)
 # --pkgVersion  : package version
+# --vendorVersion : vendor archive revision (default: 4)
 #
 while (( "$#" )); do
     case "$1" in
@@ -37,8 +43,16 @@ while (( "$#" )); do
         PKG_VERSION="$(get_param "$1" "$2")"
         shift 2
         ;;
+        --vendorVersion)
+        VENDOR_VERSION="$(get_param "$1" "$2")"
+        shift 2
+        ;;
         -*)
         echo "Error: unsupported flag $1." >&2
+        exit 1
+        ;;
+        *)
+        echo "Error: unsupported argument $1." >&2
         exit 1
         ;;
   esac
@@ -47,6 +61,7 @@ done
 echo "--srcTarball   -> $SRC_TARBALL"
 echo "--outFolder    -> $OUT_FOLDER"
 echo "--pkgVersion   -> $PKG_VERSION"
+echo "--vendorVersion -> $VENDOR_VERSION"
 
 if [ -z "$PKG_VERSION" ]; then
     echo "Error: --pkgVersion parameter cannot be empty." >&2
@@ -58,7 +73,13 @@ if [ ! -f "$SRC_TARBALL" ]; then
     exit 1
 fi
 
+if [[ ! "$VENDOR_VERSION" =~ ^[0-9]+$ ]]; then
+    echo "Error: --vendorVersion must be numeric." >&2
+    exit 1
+fi
+
 SRC_TARBALL="$(realpath "$SRC_TARBALL")"
+mkdir -p "$OUT_FOLDER"
 OUT_FOLDER="$(realpath "$OUT_FOLDER")"
 
 echo "Creating a tempdir."
@@ -72,23 +93,36 @@ trap cleanup EXIT
 pushd "$tmpdir" > /dev/null
 
 NAME_VER="telegraf-$PKG_VERSION"
-VENDOR_TARBALL="$(realpath "$OUT_FOLDER/$NAME_VER-vendor.tar.gz")"
+VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor-v$VENDOR_VERSION.tar.gz"
 
 echo "Unpacking the source tarball."
 tar -xf "$SRC_TARBALL"
 
 cd "$NAME_VER"
+
+# Preserve the existing Kubernetes/gRPC, RabbitMQ and Thrift security upgrades.
+for patchfile in CVE-2026-84445.patch CVE-2026-77411.patch CVE-2026-66055.patch; do
+    patch --batch --forward --fuzz=0 -p1 < "$SCRIPT_DIR/$patchfile"
+done
+
+go mod edit -modfile=go.mod -go=1.26.0 -toolchain=none \
+    -require=google.golang.org/grpc@v1.83.2 \
+    -require=go.opentelemetry.io/otel@v1.47.0 \
+    -require=go.opentelemetry.io/otel/metric@v1.47.0 \
+    -require=go.opentelemetry.io/otel/trace@v1.47.0 \
+    -require=go.opentelemetry.io/otel/sdk@v1.47.0 \
+    -require=go.opentelemetry.io/otel/sdk/metric@v1.47.0
+go mod tidy -go=1.26.0
+
 echo "Getting the vendored modules."
 go mod vendor
-
-mkdir -p "$OUT_FOLDER"
 
 echo "Tar vendored modules."
 tar  --sort=name \
      --mtime="2021-04-26 00:00Z" \
      --owner=0 --group=0 --numeric-owner \
      --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-     -cf "$VENDOR_TARBALL" vendor
+     -cf - vendor | gzip -n > "$VENDOR_TARBALL"
 
 echo "Telegraf vendored modules are available at ($VENDOR_TARBALL)."
 echo "SHA256: $(sha256sum "$VENDOR_TARBALL")."

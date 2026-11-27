@@ -1,15 +1,16 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        38%{?dist}
+Release:        39%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarbbal.sh script to get the vendored sources.
-Source1:        %{name}-%{version}-vendor-v3.tar.gz
+# Generate with Go 1.26+ using generate_source_tarball.sh:
+# --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version} --vendorVersion 4
+Source1:        %{name}-%{version}-vendor-v4.tar.gz
 
 Patch0:         CVE-2024-35255.patch
 Patch1:         CVE-2024-37298.patch
@@ -63,8 +64,9 @@ Patch46:        CVE-2026-116587.patch
 Patch47:        CVE-2026-116591.patch
 Patch48:        CVE-2026-78661.patch
 Patch49:        CVE-2026-97045.patch
+Patch50:        CVE-2026-128085.patch
 
-BuildRequires:  golang
+BuildRequires:  golang >= 1.26
 BuildRequires:  systemd-devel
 Requires:       logrotate
 Requires:       procps-ng
@@ -127,6 +129,10 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Wed Nov 25 2026 vijayender Putta <v-vijputta@microsoft.com> - 1.31.0-39
+- Fix CVE-2026-128085 and CVE-2026-128086 with OpenTelemetry v1.47.0
+- Regenerate vendor-v4 with matching dependency pins and require Go 1.26
+
 * Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 1.31.0-38
 - Remove additional emSign G1, C1 and ECC C3 roots from the vendored CA bundle.
 
