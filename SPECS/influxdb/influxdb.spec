@@ -98,7 +98,7 @@ Patch25:        CVE-2026-114456.patch
 Patch26:        CVE-2026-128085.patch
 Patch27:        fix-format-verbs-for-go-1.26.patch
 BuildRequires:  clang
-BuildRequires:  golang >= 1.26
+BuildRequires:  golang
 BuildRequires:  kernel-headers
 BuildRequires:  protobuf-devel
 BuildRequires:  rust < 1.85.0
