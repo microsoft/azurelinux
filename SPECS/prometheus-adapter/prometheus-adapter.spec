@@ -1,7 +1,7 @@
 Summary:        Kubernetes Custom, Resource, and External Metric APIs implemented to work with Prometheus.
 Name:           prometheus-adapter
 Version:        0.12.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,14 +16,16 @@ Source0:        https://github.com/kubernetes-sigs/%{name}/archive/refs/tags/v%{
 #   4. go mod edit -go=1.26.0
 #   5. go mod edit -require=google.golang.org/grpc@v1.83.2 \
 #                  -require=github.com/google/cel-go@v0.31.0 \
-#                  -require=golang.org/x/crypto@v0.57.0
+#                  -require=golang.org/x/crypto@v0.57.0 \
+#                  -require=go.opentelemetry.io/otel@v1.47.0 \
+#                  -require=go.opentelemetry.io/otel/sdk@v1.47.0
 #   6. go mod tidy
 #   7. rm -rf vendor && go mod vendor
 #   8. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -czf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -czf %%{name}-%%{version}-vendor-v2.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
@@ -32,8 +34,8 @@ Source0:        https://github.com/kubernetes-sigs/%{name}/archive/refs/tags/v%{
 #         with the 3.0-dev branch.
 #       - Steps 2-8 are also automated by generate_source_tarball.sh:
 #           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
-#               --outFolder /tmp --pkgVersion %%{version}
-Source1:        %{name}-%{version}-vendor.tar.gz
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 2
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2026-73500.patch
 Patch1:         CVE-2026-37236.patch
 Patch2:         CVE-2026-84304.patch
@@ -43,6 +45,7 @@ Patch5:         CVE-2026-78660.patch
 Patch6:         CVE-2026-78663.patch
 Patch7:         CVE-2026-78669.patch
 Patch8:         CVE-2026-97032.patch
+Patch9:         CVE-2026-128085.patch
 BuildRequires:  golang >= 1.26
 
 %description
@@ -81,6 +84,9 @@ make test
 %doc README.md RELEASE.md
 
 %changelog
+* Mon Nov 23 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.12.0-13
+- Patch for CVE-2026-128085 and CVE-2026-128086
+
 * Tue Oct 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-12
 - Patch for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
 
