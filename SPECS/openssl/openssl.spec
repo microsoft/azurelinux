@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.7
-Release: 7%{?dist}
+Release: 9%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -106,6 +106,11 @@ Patch131: CVE-2026-75806.patch
 Patch132: CVE-2026-77696.patch
 Patch133: CVE-2026-84782.patch
 Patch134: CVE-2026-84784.patch
+Patch135: CVE-2026-107496.patch
+Patch136: CVE-2026-88822.patch
+Patch137: CVE-2026-88823.patch
+Patch138: CVE-2026-95692.patch
+Patch139: CVE-2026-107493.patch
 License: Apache-2.0
 URL: http://www.openssl.org/
 
@@ -401,6 +406,12 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Mon Nov 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-9
+- Patch for CVE-2026-107493
+
+* Tue Nov 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-8
+- Patch for CVE-2026-95692, CVE-2026-88823, CVE-2026-88822, CVE-2026-107496
+
 * Sat Oct 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-7
 - Patch for CVE-2026-84784, CVE-2026-84782, CVE-2026-77696, CVE-2026-75806, CVE-2026-75805, CVE-2026-75804, CVE-2026-72897, CVE-2026-54875, CVE-2026-54873, CVE-2026-54872, CVE-2026-42772, CVE-2026-35189
 
