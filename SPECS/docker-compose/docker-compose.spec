@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
 Version:        2.27.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,9 +9,9 @@ Group:          Tools/Container
 URL:            https://github.com/docker/compose
 Source0:        https://github.com/docker/compose/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Leverage the `generate_source_tarball.sh` to create the vendor sources
-# NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
-# After fixing any possible CVE for the vendored source, we must bump v1 -> v2
-Source1:        %{name}-%{version}-govendor-v2.tar.gz
+# Vendor archive revisions must be bumped for CVE updates to avoid overwriting existing blobs.
+# Generate with Go >= 1.26; the archive contains unpatched modules and %prep applies the patches.
+Source1:        %{name}-%{version}-govendor-v3.tar.gz
 Patch0:         CVE-2024-10846.patch
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-39882.patch
@@ -31,8 +31,9 @@ Patch15:        CVE-2026-116591.patch
 Patch16:        CVE-2026-78661.patch
 Patch17:        CVE-2026-97045.patch
 Patch18:        CVE-2026-121520.patch
+Patch19:        CVE-2026-128085.patch
 
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang >= 1.26
 Requires:       docker-cli
 Obsoletes:      moby-compose < %{version}-%{release}
 Provides:       moby-compose = %{version}-%{release}
@@ -64,6 +65,11 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Tue Nov 24 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.27.0-19
+- Upgrade OpenTelemetry modules to 1.47.0 for CVE-2026-128085 and CVE-2026-128086
+- Regenerate vendored sources and require Go 1.26
+- Preserve exporter backports and remove superseded SDK hunks from CVE-2026-81870
+
 * Wed Nov 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-18
 - Patch for CVE-2026-121520
 
