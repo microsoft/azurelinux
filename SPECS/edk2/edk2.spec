@@ -56,7 +56,7 @@ Distribution:   Azure Linux
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    22%{?dist}
+Release:    23%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        https://www.tianocore.org
@@ -172,6 +172,7 @@ Patch1034: CVE-2026-84782.patch
 Patch1035: CVE-2026-75806.patch
 Patch1036: CVE-2026-77696.patch
 Patch1037: CVE-2026-97631.patch
+Patch1038: CVE-2026-107493.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -819,6 +820,9 @@ done
 %endif
 
 %changelog
+* Tue Nov 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-23
+- Patch for CVE-2026-107493
+
 * Mon Nov 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-22
 - Patch for CVE-2026-97631
 
