@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.12.15
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,8 +11,8 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # We're using pre-populated GO dependencies from this tarball, since network is disabled during build time.
 # How to re-build this file:
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
-# 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
-Source1:        %{name}-%{version}-vendor-v3.tar.gz
+# 2. With Go 1.26+, run <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version} --vendorVersion 4
+Source1:        %{name}-%{version}-vendor-v4.tar.gz
 Patch0:         CVE-2024-45338.patch
 Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2025-30204.patch
@@ -45,8 +45,9 @@ Patch28:        CVE-2026-116587.patch
 Patch29:        CVE-2026-116591.patch
 Patch30:        CVE-2026-78661.patch
 Patch31:        CVE-2026-97045.patch
+Patch32:        CVE-2026-128085.patch
 
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang >= 1.26
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
 Requires:       %{name}-cmctl
@@ -136,6 +137,11 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Wed Nov 25 2026 vijayender Putta <v-vijputta@microsoft.com> - 1.12.15-17
+- Fix CVE-2026-128085 and CVE-2026-128086 with OpenTelemetry v1.47.0
+- Upgrade the controller and webhook SDK, regenerate vendor-v4, and require Go 1.26
+- Retain OTLP exporter backports; SDK v1.47.0 includes the CVE-2026-81870 SDK fixes
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-16
 - Patch for CVE-2026-97045, CVE-2026-78661, CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
 
