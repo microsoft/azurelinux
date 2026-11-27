@@ -1,1 +1,4 @@
-[components.systemd]
+# Use Fedora's standalone systemd test suite instead of the package's dist-git plan.
+[components.systemd.tests.tmt]
+source = { git-url = "https://src.fedoraproject.org/tests/systemd.git", ref = "531c815646006b8503e547f2da10862426d1d5b4" }
+plan = "/plans/ci"
