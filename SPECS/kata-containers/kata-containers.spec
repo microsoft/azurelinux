@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        4.1.0.kata2
+Version:        4.4.0.kata1
 Release:        1%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
@@ -127,6 +127,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Fri Nov 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.0.kata1-1
+- Auto-upgrade to 4.4.0.kata1
+
 * Thu Nov 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata2-1
 - Auto-upgrade to 4.1.0.kata2
 
