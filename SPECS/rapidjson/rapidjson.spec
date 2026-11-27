@@ -1,7 +1,7 @@
 Summary:        A fast JSON parser/generator for C++ with both SAX/DOM style API
 Name:           rapidjson
 Version:        1.1.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD and JSON and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Patch0:         0000-Supress-implicit-fallthrough-in-GCC.patch
 Patch1:         0001-Onley-apply-to-GCC-7.patch
 Patch2:         0002-Correct-object-copying-in-document_h.patch
 Patch3:         CVE-2024-38517.patch
+Patch4:         CVE-2026-137415.patch
 %global debug_package %{nil}
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -53,6 +54,9 @@ make test
 %{_datadir}
 
 %changelog
+* Fri Nov 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.1.0-9
+- Patch for CVE-2026-137415
+
 * Wed Jul 17 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 1.1.0-8
 - Patch CVE-2024-38517
 
