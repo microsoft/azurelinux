@@ -30236,8 +30236,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.1244",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.1244.tar.gz"
+          "version": "9.2.1393",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.1393.tar.gz"
         }
       }
     },
