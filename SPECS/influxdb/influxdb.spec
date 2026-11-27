@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -91,7 +91,7 @@ Patch18:        remove-emudhra-ca-roots.patch
 Patch19:        CVE-2026-128085.patch
 Patch20:        fix-format-verbs-for-go-1.26.patch
 BuildRequires:  clang
-BuildRequires:  golang >= 1.26
+BuildRequires:  golang
 BuildRequires:  kernel-headers
 BuildRequires:  protobuf-devel
 BuildRequires:  rust < 1.85.0
@@ -179,9 +179,12 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-* Wed Nov 25 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.7.5-25
+* Wed Nov 25 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.7.5-26
 - Patch for CVE-2026-128085 and CVE-2026-128086
 - Backport upstream fix for format verbs that go vet rejects at go 1.26
+
+* Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.7.5-25
+- Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
 * Tue Nov 10 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.7.5-24
 - Remove additional emSign G1, C1 and ECC C3 roots from the Snowflake CA bundle.

@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.7.7
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,7 +31,7 @@ Patch14:       CVE-2026-97032.patch
 Patch15:       CVE-2026-78661.patch
 Patch16:       CVE-2026-97045.patch
 
-BuildRequires:  golang >= 1.23
+BuildRequires:  golang
 
 %description
 This is an ingress controller that can be run on Azure Kubernetes Service (AKS) to allow an Azure Application Gateway
@@ -57,6 +57,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.7.7-9
+- Remove 'BuildRequires: golang >= 1.23' pin; the default Go toolchain satisfies it.
+
 * Wed Nov 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-8
 - Patch for CVE-2026-97045, CVE-2026-78661
 

@@ -3,7 +3,7 @@
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.8
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ Patch12:        CVE-2025-68471.patch
 Patch13:        CVE-2026-24401.patch
 Patch14:        CVE-2026-34933.patch
 Patch15:        CVE-2024-52615.patch
+Patch16:        CVE-2026-59987.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
@@ -432,6 +433,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Nov 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.8-10
+- Patch for CVE-2026-59987
+
 * Wed Oct 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.8-9
 - Patch for CVE-2024-52615
 
