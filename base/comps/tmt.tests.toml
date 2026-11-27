@@ -1,0 +1,13 @@
+[default-component-config.tests.tmt]
+kind = "functional"
+required-capabilities = ["machine-bootable"]
+
+# To enable TMT runs for a package, add [components.<name>.tests.tmt]
+# below using its source component name. An empty table uses the defaults above
+# and runs TMT plans from the component's pinned dist-git repository.
+# Before opting in, verify that its enabled dist-git plans run on an Azure Linux 4
+# guest and exercise the package's candidate RPMs.
+[components.bash.tests.tmt]
+[components.hostname.tests.tmt]
+[components.selinux-policy.tests.tmt]
+[components.util-linux.tests.tmt]
