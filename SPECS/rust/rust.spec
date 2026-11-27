@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.98.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,7 @@ Patch4:         CVE-2026-2006.patch
 Patch5:         CVE-2026-34743.patch
 Patch6:         CVE-2026-66033.patch
 Patch7:         CVE-2026-7598.patch
+Patch8:         CVE-2026-123533.patch
 
 # Note: the stage0 bootstrap toolchain (cargo/rustc/rust-std tarballs) is packaged
 # separately in rust-bootstrap, to keep this SRPM's size down. See SPECS/rust-bootstrap.
@@ -211,6 +212,9 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 %{_libdir}/rustlib/src
 
 %changelog
+* Tue Nov 17 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 1.98.1-2
+- Patch CVE-2026-123533
+
 * Thu Sep 10 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.98.1-1
 - Upgrade to 1.98.1
 
