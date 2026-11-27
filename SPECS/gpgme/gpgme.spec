@@ -39,7 +39,7 @@ Requires:       python3
 %{summary}.
 
 %prep
-%autosetup
+%autosetup -p1
 sed -i 's/defined(__FreeBSD__)/defined(__FreeBSD__) || defined(__GLIBC__)/g' src/posix-io.c
 
 %build
