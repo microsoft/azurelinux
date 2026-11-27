@@ -88,8 +88,16 @@ Patch15:        CVE-2026-78663.patch
 Patch16:        CVE-2026-78669.patch
 Patch17:        CVE-2026-97032.patch
 Patch18:        remove-emudhra-ca-roots.patch
-Patch19:        CVE-2026-128085.patch
-Patch20:        fix-format-verbs-for-go-1.26.patch
+Patch19:        CVE-2026-116585.patch
+Patch20:        CVE-2026-116586.patch
+Patch21:        CVE-2026-116587.patch
+Patch22:        CVE-2026-116591.patch
+Patch23:        CVE-2026-78661.patch
+Patch24:        CVE-2026-97045.patch
+Patch25:        CVE-2026-114456.patch
+Patch26:        CVE-2026-128085.patch
+Patch27:        fix-format-verbs-for-go-1.26.patch
+
 BuildRequires:  clang
 BuildRequires:  golang
 BuildRequires:  kernel-headers
@@ -180,7 +188,8 @@ go test ./...
 
 %changelog
 * Wed Nov 25 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.7.5-26
-- Patch for CVE-2026-128085 and CVE-2026-128086
+- Patch for CVE-2026-97045, CVE-2026-78661, CVE-2026-116591, CVE-2026-116587, CVE-2026-116586,
+  CVE-2026-116585, CVE-2026-114456, CVE-2026-128085 and CVE-2026-128086
 - Backport upstream fix for format verbs that go vet rejects at go 1.26
 
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.7.5-25
