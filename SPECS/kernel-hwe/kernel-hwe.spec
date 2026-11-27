@@ -30,7 +30,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-hwe
-Version:        6.18.60.2
+Version:        6.18.64.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -430,8 +430,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Fri Nov 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.60.2-1
-- Auto-upgrade to 6.18.60.2
+* Sat Nov 21 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.64.1-1
+- Auto-upgrade to 6.18.64.1
 
 * Sat Oct 17 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.57.1-1
 - Auto-upgrade to 6.18.57.1

@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
-Version:        2.102.0
-Release:        4%{?dist}
+Version:        2.105.0
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,17 +14,11 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 Source1:        %{name}-%{version}-vendor.tar.gz
 
 Patch0:         0001-Fix-false-negative-in-TestMigrationWriteErrors-when-.patch
-Patch1:         CVE-2026-78659.patch
-Patch2:         CVE-2026-78660.patch
-Patch3:         CVE-2026-78669.patch
-Patch4:         CVE-2026-97032.patch
-Patch5:         CVE-2026-116591.patch
-Patch6:         CVE-2026-78661.patch
-Patch7:         CVE-2026-97045.patch
 Patch8:         CVE-2026-77299.patch
 
-BuildRequires:  golang >= 1.26.5
+BuildRequires:  golang
 BuildRequires:  git
+BuildRequires:  tzdata
 Requires:       git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -67,6 +61,15 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 2.105.0-2
+- Remove 'BuildRequires: golang >= 1.27.0' pin; the default Go toolchain satisfies it.
+
+* Mon Nov 23 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.105.0-1
+- Upgrade to 2.105.0 for CVE-2026-128085, CVE-2026-128086
+- Remove patches for CVE-2026-78659, CVE-2026-78660, CVE-2026-78661, CVE-2026-78669, CVE-2026-97032, CVE-2026-97045, CVE-2026-116591, fixed in 2.105.0
+- Update the minimum Go build requirement to 1.27.0 for gh 2.105.0
+- Add tzdata to provide IANA timezone data required by the test suite
+
 * Wed Nov 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.102.0-4
 - Patch for CVE-2026-77299
 

@@ -18,7 +18,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        6.18.58.mshv2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -29,6 +29,7 @@ Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
 Source5:        config_aarch64
+Patch0:         0001-KVM-x86-Unconditionally-reset-MMU-context-when-emulating-INIT.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -265,6 +266,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Nov 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.58.mshv2-3
+- Unconditionally reset the KVM MMU context when emulating INIT
+
 * Wed Nov 04 2026 Jocelyn Berrendonner <jocelynb@microsoft.com> - 6.18.58.mshv2-2
 - x86_64: enable CONFIG_MLX5_SF and CONFIG_MLX5_VFIO_PCI for GPU and InfiniBand
   passthrough on L1VH hosts

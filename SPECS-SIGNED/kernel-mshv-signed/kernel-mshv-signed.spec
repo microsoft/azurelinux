@@ -10,7 +10,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        6.18.58.mshv2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -140,6 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Tue Nov 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.58.mshv2-3
+- Bump release to match kernel-mshv
+
 * Wed Nov 04 2026 Jocelyn Berrendonner <jocelynb@microsoft.com> - 6.18.58.mshv2-2
 - Bump release to match kernel-mshv
 

@@ -4410,8 +4410,8 @@
         "type": "other",
         "other": {
           "name": "gh",
-          "version": "2.102.0",
-          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.102.0.tar.gz"
+          "version": "2.105.0",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.105.0.tar.gz"
         }
       }
     },
@@ -4740,16 +4740,6 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.12",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.12-1/go1.23.12-20250806.6.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
           "version": "1.24.13",
           "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz"
         }
@@ -4772,16 +4762,6 @@
           "name": "golang",
           "version": "1.27.4",
           "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.27.4-1/go1.27.4-20261110.2.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.25.14",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.14-1/go1.25.14-20260819.1.src.tar.gz"
         }
       }
     },
@@ -8401,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.18.60.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.60.2.tar.gz"
+          "version": "6.18.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.64.1.tar.gz"
         }
       }
     },
@@ -8411,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.18.60.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.60.2.tar.gz"
+          "version": "6.18.64.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.64.1.tar.gz"
         }
       }
     },
