@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 20%{?dist}
+Release: 21%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -14,7 +14,36 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1: %{name}-%{version}-govendor-v2.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd confidential-containers-containerd-%%{version}
+#   4. go mod edit -require=google.golang.org/grpc@v1.83.2 \
+#                  -require=go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.69.0 \
+#                  -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace@v1.44.0 \
+#                  -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc@v1.44.0 \
+#                  -require=go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp@v1.44.0 \
+#                  -require=github.com/klauspost/cpuid/v2@v2.1.0 \
+#                  -require=go.opentelemetry.io/otel@v1.47.0 \
+#                  -require=go.opentelemetry.io/otel/sdk@v1.47.0
+#   5. go mod tidy
+#   6. go mod vendor
+#   7. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -czf %%{name}-%%{version}-govendor-v3.tar.gz vendor
+#
+#   NOTES:
+#       - You require GNU tar version 1.28+.
+#       - The tarball holds only "vendor"; the matching go.mod/go.sum edits are carried by
+#         CVE-2026-84304.patch and CVE-2026-128085.patch.
+#       - Steps 2-7 are also automated by generate_source_tarball.sh:
+#           ./generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz \
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 3
+Source1: %{name}-%{version}-govendor-v3.tar.gz
 Source2: containerd.service
 Source3: containerd.toml
 Patch0: fix_cc_tests_for_golang1.21.patch
@@ -43,11 +72,13 @@ Patch22:CVE-2026-116585.patch
 Patch23:CVE-2026-116586.patch
 Patch24:CVE-2026-116587.patch
 Patch25:CVE-2026-116591.patch
+Patch26:CVE-2026-128085.patch
+Patch27:fix-printf-wrong-type-arg.patch
 
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang >= 1.25
+BuildRequires: golang >= 1.26
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -103,6 +134,11 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Mon Nov 23 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.7.7-21
+- Patch for CVE-2026-128085 and CVE-2026-128086 by upgrading vendored go.opentelemetry.io/otel to v1.47.0
+- Drop the otel/sdk hunks from CVE-2026-81870.patch, already fixed in otel/sdk v1.47.0
+- Fix printf wrong-type vet error surfaced by the go 1.26 directive
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.7-20
 - Patch for CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
 
