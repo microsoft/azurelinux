@@ -1,7 +1,7 @@
 Summary:        Reference implementation of the iCalendar data type and serialization format
 Name:           libical
 Version:        3.0.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2 OR MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,8 @@ URL:            https://libical.github.io/libical/
 Source:         https://github.com/%{name}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2026-88383.patch
 Patch1:         CVE-2026-111269.patch
+Patch2:         CVE-2026-136199.patch
+Patch3:         CVE-2026-134761.patch
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -126,6 +128,9 @@ make test ARGS="-V"
 %{_datadir}/vala/vapi/libical-glib.vapi
 
 %changelog
+* Thu Nov 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.10-4
+- Patch for CVE-2026-136199, CVE-2026-134761
+
 * Tue Oct 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.10-3
 - Patch for CVE-2026-111269
 
