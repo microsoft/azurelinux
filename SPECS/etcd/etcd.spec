@@ -1,6 +1,6 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.5.35
+Version:        3.5.36
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -143,6 +143,10 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Sat Nov 21 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.5.36-1
+- Upgrade to 3.5.36 for go CVEs
+- Bundeled go updated to 1.26.11
+
 * Wed Oct 21 2026 jykanase <v-jykanase@microsoft.com> - 3.5.35-1
 - Upgrade to 3.5.35 for CVE-2026-97032, CVE-2026-78669, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659
 
