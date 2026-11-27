@@ -4,7 +4,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.9.5
-Release:        26%{?dist}
+Release:        27%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,7 +30,7 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor-v5.tar.gz
+Source1:        %{name}-%{version}-vendor-v6.tar.gz
 # Fixed issue in pTest through below patch
 Patch0:         update-format-function-checks-in-panic-go.patch
 Patch1:         CVE-2022-3064.patch
@@ -61,6 +61,7 @@ Patch25:        CVE-2026-116585.patch
 Patch26:        CVE-2026-116586.patch
 Patch27:        CVE-2026-116591.patch
 Patch28:        CVE-2026-116587.patch
+Patch29:        CVE-2026-128085.patch
 
 BuildRequires:  golang
 BuildRequires:  kernel-headers
@@ -92,6 +93,9 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Fri Nov 27 2026 Sushil Sati <v-Sushil.sati@microsoft.com> - 1.9.5-27
+- Patch for CVE-2026-128085 and CVE-2026-128086
+
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.9.5-26
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
