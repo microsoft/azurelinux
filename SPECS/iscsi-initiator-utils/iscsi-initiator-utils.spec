@@ -4,7 +4,7 @@
 
 Summary:        iSCSI daemon and utility programs
 Name:           iscsi-initiator-utils
-Version:        2.1.12
+Version:        2.1.13
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -27,7 +27,6 @@ Patch06: 0006-iscsid.conf-Fedora-Red-Hat-defaults.patch
 Patch07: 0007-Disable-Data-Digests.patch
 Patch08: 0008-Revert-iscsiadm-return-error-when-login-fails.patch
 Patch09: 0009-Coverity-scan-fixes.patch
-Patch10: 0010-use-Red-Hat-version-string-to-match-RPM-package-vers.patch
  
 # libiscsi, deprecated but still needed until UDisks2 is converted to libopeniscsiusr
 Patch101: 0101-libiscsi.patch
@@ -278,6 +277,10 @@ systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || 
 %endif
 
 %changelog
+* Wed Nov 25 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.13-1
+- Auto-upgrade to 2.1.13 - for CVE-2026-18728, CVE-2026-18727, CVE-2026-18726
+- Drop Fedora-only version rewrite so binaries report the Azure Linux 2.1.13 package version
+
 * Wed Aug 05 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.1.12-1
 - Update source to v2.1.12 to fix CVE-2026-44943 and CVE-2026-44944
 - Rebase downstream patches onto v2.1.12
