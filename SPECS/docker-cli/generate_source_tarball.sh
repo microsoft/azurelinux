@@ -7,7 +7,7 @@ set -e
 
 PKG_VERSION=""
 SRC_TARBALL=""
-VENDOR_VERSION="1"
+VENDOR_VERSION="2"
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # parameters:
@@ -105,6 +105,9 @@ cd cli-"$PKG_VERSION"
 cp man/tools.go .
 ./scripts/vendor init
 go mod edit -modfile=vendor.mod -require=github.com/cpuguy83/go-md2man/v2@v2.0.3
+go mod edit -modfile=vendor.mod \
+    -require=go.opentelemetry.io/otel@v1.47.0 \
+    -require=go.opentelemetry.io/otel/sdk@v1.47.0
 #go mod tidy -modfile=vendor.mod
 #go mod vendor -modfile=vendor.mod
 ./scripts/vendor update
@@ -116,7 +119,7 @@ tar  --sort=name \
      --mtime="2021-04-26 00:00Z" \
      --owner=0 --group=0 --numeric-owner \
      --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-     -czf "$VENDOR_TARBALL" vendor.mod vendor.sum vendor
+    -czf "$VENDOR_TARBALL" vendor
 
 popd > /dev/null
 echo "$PKG_NAME vendored modules are available at $VENDOR_TARBALL"
