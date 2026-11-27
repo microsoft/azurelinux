@@ -6,7 +6,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,21 +20,23 @@ Source0:        %{name}-%{version}.tar.gz
 #   1. wget https://github.com/coredns/coredns/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2
+#   4. go mod edit -modfile=go.mod -require=google.golang.org/grpc@v1.83.2 \
+#                                  -require=go.opentelemetry.io/otel@v1.47.0
 #   5. go mod tidy
 #   6. go mod vendor
 #   7. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor-v2.tar.gz vendor
+#           -czf %%{name}-%%{version}-vendor-v3.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
+#       - You require Go 1.26+ for OpenTelemetry v1.47.0.
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor-v2.tar.gz
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
 # Patch to fix the package test suite due to external akamai update
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
 Patch0:         coredns-example-net-test.patch
@@ -62,6 +64,8 @@ Patch21:        CVE-2026-78660.patch
 Patch22:        CVE-2026-78669.patch
 Patch23:        CVE-2026-97032.patch
 Patch24:        CVE-2026-116591.patch
+Patch25:        CVE-2026-128085.patch
+Patch26:        coredns-go-vet-format.patch
 
 BuildRequires:  golang
 
@@ -103,6 +107,11 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
+* Tue Nov 24 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 1.11.4-26
+- Patch for CVE-2026-128085, CVE-2026-128086
+- Upgrade vendored go.opentelemetry.io/otel to v1.47.0
+- Fix numeric diagnostic formats for Go vet compatibility
+
 * Tue Nov 24 2026 Muhammad Falak R Wani <mwani@microsoft.com> - 1.11.4-25
 - Remove 'BuildRequires: golang >= 1.25' pin; the default Go toolchain satisfies it.
 
