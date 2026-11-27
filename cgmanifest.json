@@ -13973,7 +13973,7 @@
         "other": {
           "name": "mtools",
           "version": "4.0.43",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/mtools/mtools-4.0.43.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/mtools/mtools-4.0.43.tar.gz"
         }
       }
     },

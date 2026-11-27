@@ -5,7 +5,7 @@ Name: mtools
 Version: 4.0.43
 Release: 3%{?dist}
 License: GPLv3+
-Source0: ftp://ftp.gnu.org/gnu/mtools/mtools-%{version}.tar.gz
+Source0: https://ftp.gnu.org/gnu/mtools/mtools-%{version}.tar.gz
 Url: https://www.gnu.org/software/mtools/
 Patch0: mtools-3.9.6-config.patch
 Patch1: CVE-2026-137327.patch
