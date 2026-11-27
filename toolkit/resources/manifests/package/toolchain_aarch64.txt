@@ -145,9 +145,9 @@ gnupg2-debuginfo-2.4.9-3.azl3.aarch64.rpm
 gnupg2-lang-2.4.9-3.azl3.aarch64.rpm
 gperf-3.1-5.azl3.aarch64.rpm
 gperf-debuginfo-3.1-5.azl3.aarch64.rpm
-gpgme-1.23.2-2.azl3.aarch64.rpm
-gpgme-debuginfo-1.23.2-2.azl3.aarch64.rpm
-gpgme-devel-1.23.2-2.azl3.aarch64.rpm
+gpgme-1.23.2-3.azl3.aarch64.rpm
+gpgme-debuginfo-1.23.2-3.azl3.aarch64.rpm
+gpgme-devel-1.23.2-3.azl3.aarch64.rpm
 grep-3.11-2.azl3.aarch64.rpm
 grep-debuginfo-3.11-2.azl3.aarch64.rpm
 grep-lang-3.11-2.azl3.aarch64.rpm
@@ -539,7 +539,7 @@ python3-Cython-3.0.5-3.azl3.aarch64.rpm
 python3-debuginfo-3.12.16-2.azl3.aarch64.rpm
 python3-devel-3.12.16-2.azl3.aarch64.rpm
 python3-flit-core-3.9.0-1.azl3.noarch.rpm
-python3-gpg-1.23.2-2.azl3.aarch64.rpm
+python3-gpg-1.23.2-3.azl3.aarch64.rpm
 python3-jinja2-3.1.2-3.azl3.noarch.rpm
 python3-libcap-ng-0.8.4-1.azl3.aarch64.rpm
 python3-libmount-2.40.2-7.azl3.aarch64.rpm
