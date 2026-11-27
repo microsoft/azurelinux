@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,7 +27,9 @@ Source1:        kubelet.service
 #   4. Raise the "go" directive to 1.26.0 in "go.mod", "go.work" and every "staging/src/k8s.io/*/go.mod".
 #   5. go mod edit -require=google.golang.org/grpc@v1.83.2 \
 #                  -require=github.com/google/cel-go@v0.31.0 \
-#                  -require=golang.org/x/crypto@v0.57.0
+#                  -require=golang.org/x/crypto@v0.57.0 \
+#                  -require=go.opentelemetry.io/otel@v1.47.0 \
+#                  -require=go.opentelemetry.io/otel/sdk@v1.47.0
 #      Repeat for each "staging/src/k8s.io/*/go.mod" that already pins the module.
 #   6. go mod tidy
 #   7. rm -rf vendor && go work vendor
@@ -35,7 +37,7 @@ Source1:        kubelet.service
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -czf %%{name}-v%%{version}-vendor.tar.gz vendor
+#           -czf %%{name}-v%%{version}-vendor-v2.tar.gz vendor
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
@@ -43,8 +45,8 @@ Source1:        kubelet.service
 #         "go mod vendor" would copy the 30 staging modules into "vendor", which upstream does not do.
 #       - Steps 2-8 are also automated by generate_source_tarball.sh:
 #           ./generate_source_tarball.sh --srcTarball %%{name}-v%%{version}.tar.gz \
-#               --outFolder /tmp --pkgVersion %%{version}
-Source2:        %{name}-v%{version}-vendor.tar.gz
+#               --outFolder /tmp --pkgVersion %%{version} --vendorVersion 2
+Source2:        %{name}-v%{version}-vendor-v2.tar.gz
 Patch0:         CVE-2024-28180.patch
 Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2024-51744.patch
@@ -73,6 +75,7 @@ Patch24:        CVE-2026-116591.patch
 Patch25:        CVE-2026-2270.patch
 Patch26:        CVE-2026-97045.patch
 Patch27:        CVE-2026-116587.patch
+Patch28:        CVE-2026-128085.patch
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-21%{?dist}
@@ -331,6 +334,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Mon Nov 23 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.30.10-35
+- Patch for CVE-2026-128085 and CVE-2026-128086
+
 * Thu Nov 05 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.30.10-34
 - Patch for CVE-2026-116587
 
