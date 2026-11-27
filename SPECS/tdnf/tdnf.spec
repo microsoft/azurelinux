@@ -4,7 +4,7 @@
 Summary:        dnf equivalent using C libs
 Name:           tdnf
 Version:        3.5.8
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -242,6 +242,10 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Mon Nov 16 2026 Saul Paredes <saulparedes@microsoft.com> - 3.5.8-9
+- Remove kernel-uvm from installonlypkgs: it installs to fixed paths, so installing a
+  second version alongside the old one fails with file conflicts
+
 * Fri Aug 22 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 3.5.8-8
 - Add kernel-hwe installonlypkgs entry
 
