@@ -1,0 +1,295 @@
+From 149c517040e01a4153dbdaefffe1cae05b2fa42d Mon Sep 17 00:00:00 2001
+From: Konstantin Taranov <kotaranov@microsoft.com>
+Date: Wed, 17 Dec 2025 15:57:00 +0100
+Subject: [PATCH 4/7] providers/mana: Retrieve queue type from queue ID
+
+Use the two least significant bits of the queue ID to identify
+the queue type. This simplifies QP lookup during CQE processing.
+Use helper functions to retrieve the required queue for QPs.
+
+Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+---
+ providers/mana/cq.c   | 40 ++++++++++++++++++----------------------
+ providers/mana/mana.h | 22 +++++++++++++++++++++-
+ providers/mana/qp.c   | 41 ++++++++++++++---------------------------
+ providers/mana/wr.c   | 11 ++++++-----
+ 4 files changed, 59 insertions(+), 55 deletions(-)
+
+diff --git a/providers/mana/cq.c b/providers/mana/cq.c
+index 8683e03..372c503 100644
+--- a/providers/mana/cq.c
++++ b/providers/mana/cq.c
+@@ -249,8 +249,8 @@ static inline bool get_next_signal_psn(struct mana_qp *qp, uint32_t *psn)
+ static inline int advance_send_completions(struct mana_qp *qp, uint32_t psn,
+ 					   struct ibv_wc *wc, int nwc)
+ {
+-	struct mana_gdma_queue *recv_queue = &qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER];
+-	struct mana_gdma_queue *send_queue = &qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER];
++	struct mana_gdma_queue *recv_queue = mana_ib_get_rreq(qp);
++	struct mana_gdma_queue *send_queue = mana_ib_get_sreq(qp);
+ 	struct rc_sq_shadow_wqe *shadow_wqe;
+ 	int produced = 0;
+ 
+@@ -285,9 +285,9 @@ static inline int advance_send_completions(struct mana_qp *qp, uint32_t psn,
+ }
+ 
+ static inline int handle_rc_requester_cqe(struct mana_qp *qp, struct gdma_cqe *cqe,
+-				  struct ibv_wc *wc, int nwc, bool *consumed)
++					  struct ibv_wc *wc, int nwc, bool *consumed)
+ {
+-	struct mana_gdma_queue *recv_queue = &qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER];
++	struct mana_gdma_queue *recv_queue = mana_ib_get_rreq(qp);
+ 	uint32_t syndrome = cqe->rdma_cqe.rc_armed_completion.syndrome;
+ 	uint32_t psn = cqe->rdma_cqe.rc_armed_completion.psn;
+ 	uint32_t arm_psn;
+@@ -313,10 +313,10 @@ static inline int handle_rc_requester_cqe(struct mana_qp *qp, struct gdma_cqe *c
+ 	return produced;
+ }
+ 
+-static inline int handle_rc_responder_cqe(struct mana_qp *qp, struct gdma_cqe *cqe,
+-					  struct ibv_wc *wc)
++static inline int handle_responder_cqe(struct mana_qp *qp, struct gdma_cqe *cqe,
++				       struct ibv_wc *wc)
+ {
+-	struct mana_gdma_queue *recv_queue = &qp->rc_qp.queues[USER_RC_RECV_QUEUE_RESPONDER];
++	struct mana_gdma_queue *recv_queue = mana_ib_get_rresp(qp);
+ 	struct rc_rq_shadow_wqe *shadow_wqe;
+ 
+ 	shadow_wqe = (struct rc_rq_shadow_wqe *)shadow_queue_get_next_to_consume(&qp->shadow_rq);
+@@ -360,16 +360,12 @@ static inline int handle_rc_responder_cqe(struct mana_qp *qp, struct gdma_cqe *c
+ 	return 1;
+ }
+ 
+-static inline bool error_cqe_is_send(struct mana_qp *qp, struct gdma_cqe *cqe)
++static inline bool error_cqe_is_send(struct gdma_cqe *cqe)
+ {
+-	if (cqe->is_sq &&
+-	    qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER].id == cqe->wqid)
+-		return true;
+-	if (!cqe->is_sq &&
+-	    qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER].id == cqe->wqid)
+-		return true;
+-
+-	return false;
++	if (cqe->is_sq)
++		return ((cqe->wqid & QUEUE_TYPE_MASK) != QUEUE_TYPE_SRESP);
++
++	return ((cqe->wqid & QUEUE_TYPE_MASK) == QUEUE_TYPE_RREQ);
+ }
+ 
+ static inline uint32_t error_cqe_get_psn(struct gdma_cqe *cqe)
+@@ -377,10 +373,10 @@ static inline uint32_t error_cqe_get_psn(struct gdma_cqe *cqe)
+ 	return cqe->rdma_cqe.error.psn;
+ }
+ 
+-static inline int handle_rc_error_cqe(struct mana_qp *qp, struct gdma_cqe *cqe,
+-				      struct ibv_wc *wc, int nwc, bool *consumed)
++static inline int handle_error_cqe(struct mana_qp *qp, struct gdma_cqe *cqe,
++				   struct ibv_wc *wc, int nwc, bool *consumed)
+ {
+-	bool is_send_error = error_cqe_is_send(qp, cqe);
++	bool is_send_error = error_cqe_is_send(cqe);
+ 	uint32_t psn = error_cqe_get_psn(cqe);
+ 	struct shadow_queue *queue_with_error;
+ 	struct shadow_wqe_header *shadow_wqe;
+@@ -438,17 +434,17 @@ out:
+ static inline int mana_handle_cqe(struct mana_context *ctx, struct gdma_cqe *cqe,
+ 				  struct ibv_wc *wc, int nwc, bool *consumed)
+ {
+-	struct mana_qp *qp = mana_get_qp(ctx, cqe->wqid, cqe->is_sq);
++	struct mana_qp *qp = mana_get_qp(ctx, cqe->wqid & (~QUEUE_TYPE_MASK), cqe->is_sq);
+ 
+ 	if (unlikely(!qp))
+ 		return 0;
+ 
+ 	if (cqe->rdma_cqe.cqe_type == CQE_TYPE_ERROR)
+-		return handle_rc_error_cqe(qp, cqe, wc, nwc, consumed);
++		return handle_error_cqe(qp, cqe, wc, nwc, consumed);
+ 	else if (cqe->rdma_cqe.cqe_type == CQE_TYPE_ARMED_CMPL)
+ 		return handle_rc_requester_cqe(qp, cqe, wc, nwc, consumed);
+ 	else
+-		return handle_rc_responder_cqe(qp, cqe, wc);
++		return handle_responder_cqe(qp, cqe, wc);
+ }
+ 
+ static inline int gdma_read_cqe(struct mana_cq *cq, struct gdma_cqe *cqe)
+diff --git a/providers/mana/mana.h b/providers/mana/mana.h
+index 6769fd5..970c302 100644
+--- a/providers/mana/mana.h
++++ b/providers/mana/mana.h
+@@ -52,7 +52,12 @@ enum user_queue_types {
+ 	USER_RC_QUEUE_TYPE_MAX = 4,
+ };
+ 
+-
++#define QUEUE_TYPE_MASK 0x3
++#define QUEUE_TYPE_SREQ 0x0
++#define QUEUE_TYPE_SRESP 0x1
++#define QUEUE_TYPE_SMMQ 0x2
++#define QUEUE_TYPE_RRESP 0x0
++#define QUEUE_TYPE_RREQ 0x1
+ 
+ static inline uint32_t align_hw_size(uint32_t size)
+ {
+@@ -142,6 +147,21 @@ struct mana_qp {
+ 	bool on_err_list_recv;
+ };
+ 
++static inline struct mana_gdma_queue *mana_ib_get_rresp(struct mana_qp *qp)
++{
++	return &qp->rc_qp.queues[USER_RC_RECV_QUEUE_RESPONDER];
++}
++
++static inline struct mana_gdma_queue *mana_ib_get_rreq(struct mana_qp *qp)
++{
++	return &qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER];
++}
++
++static inline struct mana_gdma_queue *mana_ib_get_sreq(struct mana_qp *qp)
++{
++	return &qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER];
++}
++
+ struct mana_wq {
+ 	struct ibv_wq ibwq;
+ 
+diff --git a/providers/mana/qp.c b/providers/mana/qp.c
+index af05e34..a408e83 100644
+--- a/providers/mana/qp.c
++++ b/providers/mana/qp.c
+@@ -160,35 +160,25 @@ static void mana_remove_qid(struct mana_table *qp_table, uint32_t qid)
+ 
+ static int mana_store_qp(struct mana_context *ctx, struct mana_qp *qp)
+ {
+-	uint32_t sreq = qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER].id;
+-	uint32_t srep = qp->rc_qp.queues[USER_RC_SEND_QUEUE_RESPONDER].id;
+-	uint32_t rreq = qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER].id;
+-	uint32_t rrep = qp->rc_qp.queues[USER_RC_RECV_QUEUE_RESPONDER].id;
++	struct mana_gdma_queue *sq = mana_ib_get_sreq(qp);
++	struct mana_gdma_queue *rq = mana_ib_get_rresp(qp);
++	uint32_t sqid = sq->id & (~QUEUE_TYPE_MASK);
++	uint32_t rqid = rq->id & (~QUEUE_TYPE_MASK);
+ 	int ret;
+ 
+ 	pthread_mutex_lock(&ctx->qp_table_mutex);
+-	ret = mana_store_qid(ctx->qp_stable, qp, sreq);
++	ret = mana_store_qid(ctx->qp_stable, qp, sqid);
+ 	if (ret)
+ 		goto error;
+-	ret = mana_store_qid(ctx->qp_stable, qp, srep);
++	ret = mana_store_qid(ctx->qp_rtable, qp, rqid);
+ 	if (ret)
+ 		goto remove_sreq;
+-	ret = mana_store_qid(ctx->qp_rtable, qp, rreq);
+-	if (ret)
+-		goto remove_srep;
+-	ret = mana_store_qid(ctx->qp_rtable, qp, rrep);
+-	if (ret)
+-		goto remove_rreq;
+ 
+ 	pthread_mutex_unlock(&ctx->qp_table_mutex);
+ 	return 0;
+ 
+-remove_rreq:
+-	mana_remove_qid(ctx->qp_rtable, rreq);
+-remove_srep:
+-	mana_remove_qid(ctx->qp_stable, srep);
+ remove_sreq:
+-	mana_remove_qid(ctx->qp_stable, sreq);
++	mana_remove_qid(ctx->qp_stable, sqid);
+ error:
+ 	pthread_mutex_unlock(&ctx->qp_table_mutex);
+ 	return ret;
+@@ -196,16 +186,14 @@ error:
+ 
+ static void mana_remove_qp(struct mana_context *ctx, struct mana_qp *qp)
+ {
+-	uint32_t sreq = qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER].id;
+-	uint32_t srep = qp->rc_qp.queues[USER_RC_SEND_QUEUE_RESPONDER].id;
+-	uint32_t rreq = qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER].id;
+-	uint32_t rrep = qp->rc_qp.queues[USER_RC_RECV_QUEUE_RESPONDER].id;
++	struct mana_gdma_queue *sq = mana_ib_get_sreq(qp);
++	struct mana_gdma_queue *rq = mana_ib_get_rresp(qp);
++	uint32_t sqid = sq->id & (~QUEUE_TYPE_MASK);
++	uint32_t rqid = rq->id & (~QUEUE_TYPE_MASK);
+ 
+ 	pthread_mutex_lock(&ctx->qp_table_mutex);
+-	mana_remove_qid(ctx->qp_stable, sreq);
+-	mana_remove_qid(ctx->qp_stable, srep);
+-	mana_remove_qid(ctx->qp_rtable, rreq);
+-	mana_remove_qid(ctx->qp_rtable, rrep);
++	mana_remove_qid(ctx->qp_stable, sqid);
++	mana_remove_qid(ctx->qp_rtable, rqid);
+ 	pthread_mutex_unlock(&ctx->qp_table_mutex);
+ }
+ 
+@@ -394,8 +382,7 @@ static void mana_ib_modify_rc_qp(struct mana_qp *qp, struct ibv_qp_attr *attr, i
+ 			if (attr_mask & IBV_QP_SQ_PSN) {
+ 				qp->rc_qp.sq_ssn = 1;
+ 				qp->rc_qp.sq_psn = attr->sq_psn;
+-				gdma_arm_normal_cqe(&qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER],
+-						    attr->sq_psn);
++				gdma_arm_normal_cqe(mana_ib_get_rreq(qp), attr->sq_psn);
+ 			}
+ 			break;
+ 		default:
+diff --git a/providers/mana/wr.c b/providers/mana/wr.c
+index a9a5fe5..afff20a 100644
+--- a/providers/mana/wr.c
++++ b/providers/mana/wr.c
+@@ -139,7 +139,7 @@ static int mana_ib_rc_post_recv(struct ibv_qp *ibqp, struct ibv_recv_wr *wr,
+ 	struct mana_context *mc = container_of(verbs_get_ctx(ibqp->context),
+ 					struct mana_context, ibv_ctx);
+ 	struct mana_qp *qp = container_of(ibqp, struct mana_qp, ibqp.qp);
+-	struct mana_gdma_queue *wq = &qp->rc_qp.queues[USER_RC_RECV_QUEUE_RESPONDER];
++	struct mana_gdma_queue *wq = mana_ib_get_rresp(qp);
+ 	struct shadow_wqe_header *shadow_wqe;
+ 	struct gdma_wqe wqe_info;
+ 	uint8_t wqe_cnt = 0;
+@@ -282,6 +282,7 @@ mana_ib_rc_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
+ {
+ 	bool signaled = ((wr->send_flags & IBV_SEND_SIGNALED) != 0) || qp->sq_sig_all;
+ 	enum  gdma_work_req_flags flags = GDMA_WORK_REQ_NONE;
++	struct mana_gdma_queue *wq = mana_ib_get_sreq(qp);
+ 	struct extra_large_wqe extra_wqe = {0};
+ 	struct rdma_send_oob send_oob = {0};
+ 	struct gdma_wqe gdma_wqe = {0};
+@@ -297,7 +298,7 @@ mana_ib_rc_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
+ 		struct rdma_recv_oob recv_oob = {0};
+ 
+ 		recv_oob.psn_start = qp->rc_qp.sq_psn;
+-		ret = gdma_post_rq_wqe(&qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER], wr->sg_list,
++		ret = gdma_post_rq_wqe(mana_ib_get_rreq(qp), wr->sg_list,
+ 				       &recv_oob, num_sge, GDMA_WORK_REQ_CHECK_SN, &gdma_wqe);
+ 		if (ret) {
+ 			verbs_err(verbs_get_ctx(qp->ibqp.qp.context),
+@@ -305,7 +306,7 @@ mana_ib_rc_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
+ 			goto cleanup;
+ 		}
+ 		shadow_wqe->read_posted_wqe_size_in_bu = gdma_wqe.size_in_bu;
+-		gdma_ring_recv_doorbell(&qp->rc_qp.queues[USER_RC_RECV_QUEUE_REQUESTER], 1);
++		gdma_ring_recv_doorbell(mana_ib_get_rreq(qp), 1);
+ 		// for reads no sge to use dummy sgl
+ 		num_sge = 0;
+ 	}
+@@ -345,7 +346,7 @@ mana_ib_rc_post_send_request(struct mana_qp *qp, struct ibv_send_wr *wr,
+ 		goto cleanup;
+ 	}
+ 
+-	ret = gdma_post_sq_wqe(&qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER], wr->sg_list,
++	ret = gdma_post_sq_wqe(wq, wr->sg_list,
+ 			       &send_oob, oob_sge, num_sge, MTU_SIZE(qp->mtu), flags, &gdma_wqe);
+ 	if (ret) {
+ 		verbs_err(verbs_get_ctx(qp->ibqp.qp.context),
+@@ -416,7 +417,7 @@ static int mana_ib_rc_post_send(struct ibv_qp *ibqp, struct ibv_send_wr *wr,
+ 
+ cleanup:
+ 	if (ring)
+-		gdma_ring_send_doorbell(&qp->rc_qp.queues[USER_RC_SEND_QUEUE_REQUESTER]);
++		gdma_ring_send_doorbell(mana_ib_get_sreq(qp));
+ 	pthread_spin_unlock(&qp->sq_lock);
+ 	if (bad_wr && ret)
+ 		*bad_wr = wr;
+-- 
+2.45.4
+

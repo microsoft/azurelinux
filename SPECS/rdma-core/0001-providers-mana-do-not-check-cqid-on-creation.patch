@@ -1,0 +1,40 @@
+From c228c1c98315d529318aa31be1fcc85bbae2d130 Mon Sep 17 00:00:00 2001
+From: Konstantin Taranov <kotaranov@microsoft.com>
+Date: Wed, 24 Dec 2025 11:27:52 +0100
+Subject: [PATCH 1/7] providers/mana: do not check cqid on creation
+
+Do not check whether cqid is assigned as mana_ib
+over ethernet assigns it later at QP creation.
+
+Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+---
+ providers/mana/cq.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/providers/mana/cq.c b/providers/mana/cq.c
+index 1d2396a..d481d86 100644
+--- a/providers/mana/cq.c
++++ b/providers/mana/cq.c
+@@ -84,18 +84,10 @@ struct ibv_cq *mana_create_cq(struct ibv_context *context, int cqe,
+ 		goto free_mem;
+ 	}
+ 
+-	if (flags & MANA_IB_CREATE_RNIC_CQ) {
+-		cq->cqid = resp.cqid;
+-		if (cq->cqid == UINT32_MAX) {
+-			errno = ENODEV;
+-			goto destroy_cq;
+-		}
+-	}
++	cq->cqid = resp.cqid;
+ 
+ 	return &cq->ibcq;
+ 
+-destroy_cq:
+-	ibv_cmd_destroy_cq(&cq->ibcq);
+ free_mem:
+ 	if (cq->buf_external)
+ 		ctx->extern_alloc.free(cq->buf, ctx->extern_alloc.data);
+-- 
+2.45.4
+
