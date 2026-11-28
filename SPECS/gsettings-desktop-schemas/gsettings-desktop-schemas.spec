@@ -3,18 +3,22 @@
 Summary:        A collection of GSettings schemas
 Name:           gsettings-desktop-schemas
 Version:        45.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # no homepage exists for this component
 URL:            https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas
 Source0:        https://download.gnome.org/sources/%{name}/45/%{name}-%{version}.tar.xz
+
 BuildRequires:  gettext
 BuildRequires:  glib2-devel >= 2.31.0
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  meson
+
 Requires:       glib2 >= 2.31.0
+Requires:       glib-schemas
+
 # Recommend the default fonts set in the schemas
 Recommends:     font(cantarell)
 Recommends:     font(sourcecodepro)
@@ -44,7 +48,23 @@ and header files for developing applications that use %{name}.
 
 %check
 # Test that the schemas compile
-glib-compile-schemas --dry-run --strict %{buildroot}%{_datadir}/glib-2.0/schemas
+glib-compile-schemas --dry-run --strict \
+    %{buildroot}%{_datadir}/glib-2.0/schemas
+
+%post
+# We don't want to use the --strict flag here, as we don't control the content
+# of schemas installed by other packages.
+glib-compile-schemas %{_datadir}/glib-2.0/schemas
+
+%postun
+schemas="$(ls -A %{_datadir}/glib-2.0/schemas/*.gschema.xml 2> /dev/null)"
+if [ "$schemas" != "" ]; then
+    # We don't want to use the --strict flag here, as we don't control the
+    # content of schemas installed by other packages.
+    glib-compile-schemas %{_datadir}/glib-2.0/schemas
+else
+    rm -rf %{_datadir}/glib-2.0/schemas/gschemas.compiled
+fi
 
 %files -f %{name}.lang
 %doc AUTHORS MAINTAINERS NEWS README
@@ -61,6 +81,13 @@ glib-compile-schemas --dry-run --strict %{buildroot}%{_datadir}/glib-2.0/schemas
 %{_datadir}/gir-1.0/GDesktopEnums-3.0.gir
 
 %changelog
+* Tue Aug 20 2024 Devin Anderson <danderson@microsoft.com> - 45.0-2
+- Add explicit dependency on 'glib-schemas'.
+- Refresh compiled schemas after installation and uninstallation; otherwise,
+  the schemas won't be picked up by 'gsettings' and Gnome libraries that make
+  use of the schemas.  Note that, when not installed by a package manager, the
+  'meson' build in 'gsettings-desktop-schemas' will do this in post-install.
+
 * Thu Feb 1 2024 Sumedh Sharma <sumsharma@microsoft.com> - 45.0-1
 - Upgrade to version 45.0
 
