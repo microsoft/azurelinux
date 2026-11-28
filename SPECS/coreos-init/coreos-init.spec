@@ -1,6 +1,6 @@
 Name:           coreos-init
 Version:        0.0.1
-Release:        2%{?dist}
+Release:        5%{?dist}
 Summary:        Init scripts for Flatcar (systemd units, scripts, configs)
 
 License:        BSD-3-Clause
@@ -15,8 +15,10 @@ BuildArch:      noarch
 
 # tarball matches the ebuild SRC_URI pattern:
 Source0:        https://github.com/flatcar/init/archive/%{commit}/init-%{commit}.tar.gz#/%{name}-%{version}-%{shortcommit}.tar.gz
+Source1:        test-autologin-generator.py
 Patch0:         support-UKI-mode-by-restoring-firstboot-addon.patch
 Patch1:         Add-noop-sysupdate-transfer-config.patch
+Patch2:         autologin-use-provisioned-user.patch
 # optional tests, analogous to IUSE=test
 %bcond_without tests
 
@@ -79,6 +81,7 @@ find %{buildroot} -type f -o -type l \
 # Upstream includes a tests/ directory; if tests are wired via Makefile, run them.
 # If this fails in Azure Linux, replace with the repo’s actual test invocation.
 %{__make} test
+python3 %{SOURCE1} systemd/system-generators/flatcar-autologin-generator
 %endif
 
 %post
@@ -99,6 +102,22 @@ find %{buildroot} -type f -o -type l \
 %doc README.md
 
 %changelog
+* Thu Nov 12 2026 Mayank Singh <mayansingh@microsoft.com> - 0.0.1-5
+- Return success when the autologin user search finds no eligible user.
+- Preserve passwd file-open failures instead of treating them as no match.
+- Test no-match handling with and without autologin and preserve user selection.
+
+* Mon Jun 29 2026 Jiri Appl <jiria@microsoft.com> - 0.0.1-4
+- Fix support-UKI-mode-by-restoring-firstboot-addon patch to derive the UKI
+  addon directory from the kernel version (vmlinuz-<version>.efi.extra.d)
+  instead of the obsolete acl.efi.extra.d, so flatcar-reset correctly detects
+  UKI mode and re-arms the firstboot (Ignition) addon.
+
+* Tue May 06 2026 Mayank Singh <mayansingh@microsoft.com> - 0.0.1-3
+- Add patch: flatcar-autologin-generator uses provisioned user instead of
+  hardcoded core. Fixes getty failures on ACL Phase 2 where core has
+  /sbin/nologin.
+
 * Mon Feb 02 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.0.1-2
 - Cleanup unwanted files
 
