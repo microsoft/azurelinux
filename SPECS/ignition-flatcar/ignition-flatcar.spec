@@ -24,7 +24,7 @@ Version:                2.22.0
 %global dracutlibdir %{_prefix}/lib/dracut
 
 Name:           ignition-flatcar
-Release:        8%{?dist}
+Release:        9%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        First boot installer and configuration tool
@@ -33,36 +33,37 @@ Summary:        First boot installer and configuration tool
 License:        Apache-2.0
 URL:            %{gourl}
 Source0:        https://github.com/coreos/ignition/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Patch0:         0001-sed-s-coreos-flatcar.patch
 Patch1:         0002-config-add-ignition-translation.patch
 Patch2:         0003-mod-add-flatcar-ignition-0.36.2.patch
 Patch3:         0004-sum-go-mod-tidy.patch
-Patch4:         0005-vendor-go-mod-vendor.patch
-Patch5:         0006-config-v3_6-convert-ignition-2.x-to-3.x.patch
-Patch6:         0007-internal-prv-cmdline-backport-flatcar-patch.patch
-Patch7:         0008-provider-qemu-apply-fw_cfg-patch.patch
-Patch8:         0009-config-3_6-test-add-ignition-2.x-test-cases.patch
-Patch9:         0010-internal-disk-fs-ignore-fs-format-mismatches-for-the.patch
-Patch10:        0011-VMware-Fix-guestinfo.-.config.data-and-.config.url-v.patch
-Patch11:        0012-config-version-handle-configuration-version-1.patch
-Patch12:        0013-config-util-add-cloud-init-detection-to-initial-pars.patch
-Patch13:        0014-Revert-drop-OEM-URI-support.patch
-Patch14:        0015-internal-resource-url-support-btrfs-as-OEM-partition.patch
-Patch15:        0016-translation-support-OEM-and-oem.patch
-Patch16:        0017-revert-internal-oem-drop-noop-OEMs.patch
-Patch17:        0018-docs-Add-re-added-platforms-to-docs-to-pass-tests.patch
-Patch18:        0019-usr-share-oem-oem.patch
-Patch19:        0020-internal-exec-stages-mount-Mount-oem.patch
-Patch20:        CVE-2026-27141.patch
-Patch21:        CVE-2026-39821.patch
-Patch22:        CVE-2026-29181.patch
-Patch23:        CVE-2026-33814.patch
-Patch24:        CVE-2026-56852.patch
-Patch25:        CVE-2026-78660.patch
-Patch26:        CVE-2026-78669.patch
-Patch27:        CVE-2026-116585.patch
-Patch28:        CVE-2026-116586.patch
-Patch29:        CVE-2026-116587.patch
+Patch4:         0006-config-v3_6-convert-ignition-2.x-to-3.x.patch
+Patch5:         0007-internal-prv-cmdline-backport-flatcar-patch.patch
+Patch6:         0008-provider-qemu-apply-fw_cfg-patch.patch
+Patch7:         0009-config-3_6-test-add-ignition-2.x-test-cases.patch
+Patch8:         0010-internal-disk-fs-ignore-fs-format-mismatches-for-the.patch
+Patch9:         0011-VMware-Fix-guestinfo.-.config.data-and-.config.url-v.patch
+Patch10:        0012-config-version-handle-configuration-version-1.patch
+Patch11:        0013-config-util-add-cloud-init-detection-to-initial-pars.patch
+Patch12:        0014-Revert-drop-OEM-URI-support.patch
+Patch13:        0015-internal-resource-url-support-btrfs-as-OEM-partition.patch
+Patch14:        0016-translation-support-OEM-and-oem.patch
+Patch15:        0017-revert-internal-oem-drop-noop-OEMs.patch
+Patch16:        0018-docs-Add-re-added-platforms-to-docs-to-pass-tests.patch
+Patch17:        0019-usr-share-oem-oem.patch
+Patch18:        0020-internal-exec-stages-mount-Mount-oem.patch
+Patch19:        CVE-2026-27141.patch
+Patch20:        CVE-2026-39821.patch
+Patch21:        CVE-2026-33814.patch
+Patch22:        CVE-2026-56852.patch
+Patch23:        CVE-2026-78660.patch
+Patch24:        CVE-2026-78669.patch
+Patch25:        CVE-2026-116585.patch
+Patch26:        CVE-2026-116586.patch
+Patch27:        CVE-2026-116587.patch
+Patch28:        CVE-2026-128085.patch
+Patch29:        fix-systemd-version-format-verb.patch
 
 BuildRequires: libblkid-devel
 BuildRequires: systemd-rpm-macros
@@ -121,7 +122,10 @@ This package contains the grub2 config which is compatable with bootupd.
 %endif
 
 %prep
-%autosetup -p1 -n ignition-%{version}
+%autosetup -N -n ignition-%{version}
+rm -rf vendor
+tar -xzf %{SOURCE1}
+%autopatch -p1
 
 %build
 export LDFLAGS="-X github.com/flatcar/ignition/v2/internal/version.Raw=%{version} -X github.com/flatcar/ignition/v2/internal/distro.selinuxRelabel=false "
@@ -211,6 +215,11 @@ VERSION=%{version} GOARCH=%{goarch} ./test
 %endif
 
 %changelog
+* Wed Nov 25 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.22.0-9
+- Patch for CVE-2026-128085 and CVE-2026-128086
+- Remove CVE-2026-29181 patch, fixed upstream in otel v1.41.0
+- Backport upstream fix for a format verb that go vet rejects at go 1.26
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.22.0-8
 - Patch for CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
 

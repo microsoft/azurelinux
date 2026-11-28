@@ -1,0 +1,31 @@
+From bfe6b1a6e1b6a3d3d1d7a48d3a944c2347ddaa9d Mon Sep 17 00:00:00 2001
+From: Steven Presti <spresti@redhat.com>
+Date: Fri, 13 Mar 2026 17:44:10 +0000
+Subject: [PATCH] internal/exec/stages/files/units: fix formating error cought
+ downstream
+
+The systemdVersion variable is an int and should use %d format
+specifier, not %q (which is for strings).
+
+Azure Linux: required once the go directive moves to 1.26 for the
+go.opentelemetry.io/otel v1.47.0 upgrade, because go vet then reports
+this as a printf error and the %check test script aborts on it.
+
+Upstream-reference: https://github.com/coreos/ignition/commit/cdb793589c05cf8601daa6f5ace1aa607468b2d7
+---
+ internal/exec/stages/files/units.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/internal/exec/stages/files/units.go b/internal/exec/stages/files/units.go
+index 22c84a2..b5a3010 100644
+--- a/internal/exec/stages/files/units.go
++++ b/internal/exec/stages/files/units.go
+@@ -45,7 +45,7 @@ func (s *stage) warnOnOldSystemdVersion() error {
+ 		return err
+ 	}
+ 	if systemdVersion < 240 {
+-		s.Logger.Warning("The version of systemd (%q) is less than 240. Enabling/disabling instantiated units may not work. See https://github.com/flatcar/ignition/issues/586 for more information.", systemdVersion)
++		s.Logger.Warning("The version of systemd (%d) is less than 240. Enabling/disabling instantiated units may not work. See https://github.com/flatcar/ignition/issues/586 for more information.", systemdVersion)
+ 	}
+ 	return nil
+ }

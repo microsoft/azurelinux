@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "ignition-flatcar-2.22.0-govendor-v1.tar.gz": "5809869c7ffee6dbaf2c948c913f6367decedd923a26dc1bcadad0cbda6cbe2b",
   "ignition-flatcar-2.22.0.tar.gz": "17cc36327d3d5a47282adeabbf4abb7bff144d5a4b277741c81f39f18ad64185"
  }
 }
