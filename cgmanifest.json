@@ -12921,8 +12921,8 @@
         "type": "other",
         "other": {
           "name": "m2crypto",
-          "version": "0.38.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-0.38.0.tar.gz"
+          "version": "0.48.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/89/7a/06ed5c66d63506bc77a7823d56e5e6b4ad3143f3fca2337c46d8b2c191f5/m2crypto-0.48.0.tar.gz"
         }
       }
     },
