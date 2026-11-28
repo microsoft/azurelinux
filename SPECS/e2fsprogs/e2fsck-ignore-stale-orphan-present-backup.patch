@@ -1,0 +1,52 @@
+From 24a11cc371a46ca9e68aed8f2cf4aabd22ea81eb Mon Sep 17 00:00:00 2001
+From: Theodore Ts'o <tytso@mit.edu>
+Date: Tue, 30 May 2023 13:50:52 -0400
+Subject: [PATCH] e2fsck: Suppress "orphan file is clean" message in preen mode
+
+The e2fsck report, "Feature orphan_present is set but orphan file is
+clean" is intended to request permission before removing the r/o
+compat feature, orphan_present.  However, it is normal if the orphan
+file is empty, and removing the r/o compat feature is a good thing so
+that the file system can be mounted on older kernels.
+
+When a file system with an orphan_file feature is mounted, the
+orphan_present feature is set, and it is cleared when the file system
+is cleanly unmounted.  If the system crashes when there are no inodes
+in the orphan file, e2fsck should just silently clear the flag in
+preen mode.
+
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+---
+ e2fsck/problem.c | 2 +-
+ e2fsck/super.c   | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/e2fsck/problem.c b/e2fsck/problem.c
+index 6ad6fb8..013ace2 100644
+--- a/e2fsck/problem.c
++++ b/e2fsck/problem.c
+@@ -2327,7 +2327,7 @@ static struct e2fsck_problem problem_table[] = {
+ 	/* orphan_present set but orphan file is empty */
+ 	{ PR_6_ORPHAN_PRESENT_CLEAN_FILE,
+ 	  N_("Feature orphan_present is set but orphan file is clean.\n"),
+-	  PROMPT_CLEAR, PR_PREEN_OK },
++	  PROMPT_CLEAR, PR_PREEN_OK | PR_NO_OK | PR_PREEN_NOMSG },
+ 
+ 	/* orphan_present set but orphan_file is not */
+ 	{ PR_6_ORPHAN_PRESENT_NO_FILE,
+diff --git a/e2fsck/super.c b/e2fsck/super.c
+index 9495e02..be40dd8 100644
+--- a/e2fsck/super.c
++++ b/e2fsck/super.c
+@@ -1388,7 +1388,8 @@ void check_super_block(e2fsck_t ctx)
+  * away.
+  */
+ #define FEATURE_RO_COMPAT_IGNORE	(EXT2_FEATURE_RO_COMPAT_LARGE_FILE| \
+-					 EXT4_FEATURE_RO_COMPAT_DIR_NLINK)
++					 EXT4_FEATURE_RO_COMPAT_DIR_NLINK| \
++					 EXT4_FEATURE_RO_COMPAT_ORPHAN_PRESENT)
+ #define FEATURE_INCOMPAT_IGNORE		(EXT3_FEATURE_INCOMPAT_EXTENTS| \
+ 					 EXT3_FEATURE_INCOMPAT_RECOVER)
+ 
+-- 
+2.56.0.windows.4

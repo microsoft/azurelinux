@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "e2fsprogs-1.47.0.tar.gz": "6667afde56eef0c6af26684974400e4d2288ea49e9441bf5e6229195d51a3578"
+  "e2fsprogs-1.47.0.tar.gz": "6667afde56eef0c6af26684974400e4d2288ea49e9441bf5e6229195d51a3578",
+  "orphan-file-recovery-image.gz": "8474ae52355e9f08c339c3aeb0280e6003d335787770ad15293658cfa9f46965",
+  "orphan-file-recovery-test.sh": "b8196800e2fa48813eca7c87e48af4cfb3cb526b3994410f683d13361196b4cd"
  }
 }

@@ -1,0 +1,59 @@
+From db87cf4cdd9960a270ae7df80204dc93016664bc Mon Sep 17 00:00:00 2001
+From: Theodore Ts'o <tytso@mit.edu>
+Date: Mon, 9 Dec 2024 17:19:26 -0500
+Subject: [PATCH] e2fsck: clear the orphan_file while processing it
+
+Previously, we cleared the orphan file after pass 5.  This was
+unfortunate, because it means that the file system is left in a
+corrupted state after running "e2fsck -E journal_only".  By fixing
+this, we can also remove a spurious "Orpan file... is not clean"
+report from e2fsck.
+
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+
+The upstream test fixture was added after 1.47.0; it is exercised
+separately by the package's orphan-file recovery regression test.
+---
+ e2fsck/super.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/e2fsck/super.c b/e2fsck/super.c
+index d6bbb6317..cfc0919a2 100644
+--- a/e2fsck/super.c
++++ b/e2fsck/super.c
+@@ -424,7 +424,16 @@ static int process_orphan_block(ext2_filsys fs,
+ 		ino = ext2fs_le32_to_cpu(bdata[j]);
+ 		if (release_orphan_inode(ctx, &ino, pd->block_buf))
+ 			goto return_abort;
++		bdata[j] = 0;
+ 	}
++	if (ext2fs_has_feature_metadata_csum(fs->super)) {
++		tail->ob_checksum =
++			ext2fs_cpu_to_le32(ext2fs_do_orphan_file_block_csum(fs,
++				    pd->ino, pd->generation, blk, pd->buf));
++	}
++	pd->errcode = io_channel_write_blk64(fs->io, blk, 1, pd->buf);
++	if (pd->errcode)
++		goto return_abort;
+ 	return 0;
+ }
+ 
+@@ -465,6 +474,8 @@ static int process_orphan_file(e2fsck_t ctx, char *block_buf)
+ 	pd.ctx = ctx;
+ 	pd.abort = 0;
+ 	pd.errcode = 0;
++	pd.ino = orphan_inum;
++	pd.generation = orphan_inode.i_generation;
+ 	retval = ext2fs_block_iterate3(fs, orphan_inum,
+ 				       BLOCK_FLAG_DATA_ONLY | BLOCK_FLAG_HOLE,
+ 				       orphan_buf, process_orphan_block, &pd);
+@@ -482,6 +493,9 @@ static int process_orphan_file(e2fsck_t ctx, char *block_buf)
+ 				orphan_inum);
+ 		}
+ 		ret = 1;
++	} else {
++		ext2fs_clear_feature_orphan_present(fs->super);
++		ext2fs_mark_super_dirty(fs);
+ 	}
+ out:
+ 	ext2fs_free_mem(&orphan_buf);
