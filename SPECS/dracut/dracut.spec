@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        13%{?dist}
+Release:        14%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -31,6 +31,7 @@ Source11:       50-noxattr.conf
 Source12:       90livenet/azl-liveos-artifacts-download.service
 Source13:       90livenet/azl-liveos-artifacts-download.sh
 Source14:       90overlayfs/azl-configure-selinux.sh
+Source15:       test-fips-selftests.sh
 
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Azure Linux team to allow skipping the user confirmation prompt during
@@ -65,6 +66,7 @@ Patch:          avoid-mktemp-collisions-with-find-not-path.patch
 # - References: https://github.com/dracut-ng/dracut-ng/pull/262  
 #               https://github.com/dracut-ng/dracut-ng/commit/e0e5424a7b5e387ccb70e47ffea5a59716bf7b76  
 Patch:          fix-dracut-systemd-include-systemd-cryptsetup.patch
+Patch:          0017-fips-use-kernel-crypto-selftests.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -105,6 +107,11 @@ Requires:       nss
 %description fips
 This package requires everything which is needed to build an
 initramfs with dracut, which does an integrity check.
+Verified kernel-hwe RPM targets built with CONFIG_CRYPTO_SELFTESTS=y,
+CONFIG_CRYPTO_FIPS=y and CONFIG_CRYPTO_MANAGER=y use automatic kernel crypto
+self-tests instead of tcrypt when booting in FIPS mode. Other kernels retain
+their legacy tcrypt and module-loading behavior. Kernel-image integrity checks
+remain enabled. The change takes effect in regenerated initramfs images.
 
 %package hostonly
 Summary:        dracut configuration needed to build an initramfs with hostonly enabled
@@ -181,6 +188,9 @@ cp %{SOURCE1} .
     --disable-documentation
 
 %make_build
+
+%check
+bash %{SOURCE15} .
 
 %install
 %make_install %{?_smp_mflags} libdir=%{_libdir}
@@ -324,6 +334,11 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue Nov 24 2026 Suresh Thelkar <sthelkar@microsoft.com> - 102-14
+- Use verified kernel crypto self-tests only for kernel-hwe FIPS boots.
+- Preserve other kernels' legacy tcrypt and module-loading behavior.
+- Add regression tests for HWE-only selection and crypto module-load failures.
+
 * Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 102-13
 - Remove old dracut-validate-instmods-calls patch to support both 6.6 and 6.12 versions.
 

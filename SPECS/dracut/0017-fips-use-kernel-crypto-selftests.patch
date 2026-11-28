@@ -1,0 +1,120 @@
+From: Suresh Thelkar <sthelkar@microsoft.com>
+Date: Tue, 24 Nov 2026 10:14:00 +0000
+Subject: [PATCH] fips: use verified kernel crypto self-tests only for HWE
+
+Newer kernels enable automatic crypto tests with CONFIG_CRYPTO_SELFTESTS,
+independently of the optional tcrypt test/benchmark module. In FIPS mode
+the kernel panics on crypto self-test failure and gates algorithm use on
+successful testing.
+
+Select this path only when the target kernel image is owned by kernel-hwe
+in the target RPM database and its configuration explicitly enables
+self-tests, FIPS support and the built-in crypto manager. Bind the selection
+to the target kernel release in the initramfs and require the running kernel
+to have FIPS mode enabled. Retain the legacy path for all other kernels.
+
+Use a pipefail wrapper only on the verified HWE self-test path to propagate
+module-load failures and preserve the built-in algorithm fallback. Leave
+the original module-loading helper and legacy behavior unchanged.
+Kernel-image HMAC verification is unchanged.
+
+--- a/modules.d/01fips/module-setup.sh
++++ b/modules.d/01fips/module-setup.sh
+@@ -12,7 +12,28 @@
+ 
+ # called by dracut
+ installkernel() {
+-    local _fipsmodules _mod _bootfstype
++    local _fipsmodules _mod _bootfstype _kernel_config _kernel_package
++    rm -f "${initdir}/etc/fips-kernel-selftests" || return 1
++    _kernel_config="${dracutsysrootdir}/boot/config-${kernel}"
++    if [[ -f "${srcmods}/config" ]]; then
++        _kernel_config="${srcmods}/config"
++    fi
++
++    # Do not use check_kernel_config: it succeeds when the config is missing.
++    if [[ -f "$_kernel_config" ]] \
++        && grep -qx 'CONFIG_CRYPTO_SELFTESTS=y' "$_kernel_config" \
++        && grep -qx 'CONFIG_CRYPTO_FIPS=y' "$_kernel_config" \
++        && grep -qx 'CONFIG_CRYPTO_MANAGER=y' "$_kernel_config"; then
++        if ! command -v rpm > /dev/null \
++            || ! _kernel_package=$(rpm --root "${dracutsysrootdir:-/}" \
++                -qf --qf '%{NAME}\n' "/boot/vmlinuz-${kernel}"); then
++            dwarn "Cannot verify HWE kernel package for ${kernel}; retaining legacy FIPS checks"
++        elif [[ $_kernel_package == kernel-hwe ]]; then
++            dinfo "Using HWE kernel crypto self-tests for ${kernel}"
++            printf '%s\n' "$kernel" > "${initdir}/etc/fips-kernel-selftests" || return 1
++        fi
++    fi
++
+     if [[ -f "${srcmods}/modules.fips" ]]; then
+         read -d '' -r _fipsmodules < "${srcmods}/modules.fips"
+     else
+@@ -40,6 +61,9 @@
+     fi
+ 
+     for _mod in $_fipsmodules; do
++        if [[ $_mod == tcrypt && -f "${initdir}/etc/fips-kernel-selftests" ]]; then
++            continue
++        fi
+         if hostonly='' instmods -c -s "$_mod"; then
+             echo "$_mod" >> "${initdir}/etc/fipsmodules"
+             echo "blacklist $_mod" >> "${initdir}/etc/fips.conf"
+--- a/modules.d/01fips/fips.sh
++++ b/modules.d/01fips/fips.sh
+@@ -88,11 +88,29 @@
+         done
+ }
+ 
++fips_hwe_modprobe() (
++    set -o pipefail
++    nonfatal_modprobe "$@"
++)
++
+ fips_load_crypto() {
+     local _k
+     local _v
+     local _module
+     local _found
++    local _kernel_selftests=0
++    local _modprobe=nonfatal_modprobe
++
++    if [ -f /etc/fips-kernel-selftests ]; then
++        if ! read -r _k < /etc/fips-kernel-selftests \
++            || [ "$_k" != "$(uname -r)" ] \
++            || ! grep -qx 1 /proc/sys/crypto/fips_enabled; then
++            warn "Kernel FIPS self-test prerequisites are not satisfied"
++            return 1
++        fi
++        _kernel_selftests=1
++        _modprobe=fips_hwe_modprobe
++    fi
+ 
+     read -d '' -r FIPSMODULES < /etc/fipsmodules
+ 
+@@ -99,7 +117,7 @@
+     fips_info "Loading and integrity checking all crypto modules"
+     for _module in $FIPSMODULES; do
+         if [ "$_module" != "tcrypt" ]; then
+-            if ! nonfatal_modprobe "${_module}" 2> /tmp/fips.modprobe_err; then
++            if ! "$_modprobe" "${_module}" 2> /tmp/fips.modprobe_err; then
+                 # check if kernel provides generic algo
+                 _found=0
+                 while read -r _k _ _v || [ -n "$_k" ]; do
+@@ -117,9 +135,13 @@
+         cp /etc/fips.conf /run/modprobe.d/fips.conf
+     fi
+ 
+-    fips_info "Self testing crypto algorithms"
+-    modprobe tcrypt || return 1
+-    rmmod tcrypt
++    if [ "$_kernel_selftests" = 1 ]; then
++        fips_info "Using kernel crypto self-tests at algorithm registration"
++    else
++        fips_info "Self testing crypto algorithms"
++        modprobe tcrypt || return 1
++        rmmod tcrypt
++    fi
+ }
+ 
+ do_fips() {
