@@ -439,7 +439,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 10.1.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -663,7 +663,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-21%{?dist}
+BuildRequires: glibc-static >= 2.38-22%{?dist}
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-devel-static
 %endif
@@ -3603,6 +3603,9 @@ fi
 # endif !tools_only
 %endif
 %changelog
+* Wed Nov 18 2026 Aditya Singh <v-aditysing@microsoft.com> - 10.1.0-3
+- Bump to rebuild with updated glibc
+
 * Thu Oct 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.1.0-2
 - Patch for CVE-2026-93834, CVE-2026-81627
 

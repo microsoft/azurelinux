@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.98.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,7 +65,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-21%{?dist}
+BuildRequires:  glibc-static >= 2.38-22%{?dist}
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -211,6 +211,9 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 %{_libdir}/rustlib/src
 
 %changelog
+* Wed Nov 18 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.98.1-2
+- Bump to rebuild with updated glibc
+
 * Thu Sep 10 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.98.1-1
 - Upgrade to 1.98.1
 

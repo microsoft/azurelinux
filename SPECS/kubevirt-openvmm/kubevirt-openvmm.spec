@@ -14,7 +14,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt-openvmm
 Version:        1.9.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,7 +40,7 @@ Source3:        x64-confidential.json
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-21%{?dist}
+BuildRequires:  glibc-static >= 2.38-22%{?dist}
 BuildRequires:  golang >= 1.26
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -307,6 +307,9 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}/openvmm/uefi-templates/x64-confide
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Nov 18 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.9.0-3
+- Bump to rebuild with updated glibc
+
 * Sat Nov 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.0-2
 - Patch for CVE-2026-97032, CVE-2026-78663, CVE-2026-78660, CVE-2026-78659, CVE-2026-56852, CVE-2026-39821, CVE-2026-33814, CVE-2026-13622, CVE-2026-83530, CVE-2026-78669
 
