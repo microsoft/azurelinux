@@ -7,14 +7,14 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.32.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/kubernetes-sigs/cri-tools
 Source0:        https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Source1:        %{name}-%{version}-govendor-v2.tar.gz
 Patch0:         CVE-2026-35469.patch
 Patch1:         CVE-2026-84304.patch
 Patch2:         CVE-2026-37236.patch
@@ -22,10 +22,11 @@ Patch3:         CVE-2026-78660.patch
 Patch4:         CVE-2026-78669.patch
 Patch5:         CVE-2026-78661.patch
 Patch6:         CVE-2026-97045.patch
+Patch7:         CVE-2026-128085.patch
 
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang >= 1.26
 
 %description
 cri-tools aims to provide a series of debugging and validation tools for Kubelet CRI, which includes:
@@ -56,6 +57,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Wed Nov 25 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.32.0-12
+- Patch for CVE-2026-128085 and CVE-2026-128086
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-11
 - Patch for CVE-2026-97045, CVE-2026-78661
 
