@@ -2,12 +2,13 @@
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
 Version:        2.1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/e/%{pkgname}/%{pkgname}-%{version}.tar.gz
+Patch0:         fix-remote-module-test-isolation.patch
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-hatchling
 BuildRequires:  python%{python3_pkgversion}-hatch-vcs
@@ -15,7 +16,6 @@ BuildRequires:  python%{python3_pkgversion}-pathspec
 BuildRequires:  python%{python3_pkgversion}-pluggy
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools_scm
-BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-trove-classifiers
 BuildRequires:  python%{python3_pkgversion}-wheel
 %if %{with check}
@@ -43,7 +43,7 @@ a minimal and fast API targetting the following uses:
 -write scripts to administer multiple hosts
 
 %prep
-%autosetup -n %{pkgname}-%{version}
+%autosetup -p1 -n %{pkgname}-%{version}
 
 find . -type f -a \( -name '*.py' -o -name 'py.*' \) \
    -exec sed -i '1{/^#!/d}' {} \; \
@@ -53,10 +53,7 @@ find . -type f -a \( -name '*.py' -o -name 'py.*' \) \
 
 %build
 %pyproject_wheel
-make -C doc html PYTHONPATH=$(pwd)/src
-# remove hidden file
-rm doc/_build/html/.buildinfo
- 
+
 %install
 %pyproject_install
 %pyproject_save_files %{pkgname}
@@ -70,10 +67,13 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 %files -n python%{python3_pkgversion}-%{pkgname} -f %{pyproject_files}
 %doc README.rst
-%doc doc/_build/html
 %license %{python3_sitelib}/%{pkgname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
+* Mon Nov 16 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.1.1-3
+- Remove stale remote modules between parametrized tests and remove
+  the unnecessary Sphinx documentation build dependency.
+
 * Mon Feb 24 2025 Andrew Phelps <anphel@microsoft.com> - 2.1.1-2
 - Fix tomli/packaging conflict seen during package test setup
 

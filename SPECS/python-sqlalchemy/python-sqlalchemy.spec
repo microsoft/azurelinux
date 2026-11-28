@@ -21,7 +21,7 @@
 Summary:        Modular and flexible ORM library for python
 Name:           python-sqlalchemy
 Version:        2.0.27
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

@@ -1,0 +1,14 @@
+From: Copilot <223556219+Copilot@users.noreply.github.com>
+Subject: [PATCH] Remove stale remote module between parametrized tests
+
+diff --git a/testing/test_gateway.py b/testing/test_gateway.py
+index 2c3c2e8..2a7f5b3 100646
+--- a/testing/test_gateway.py
++++ b/testing/test_gateway.py
+@@ -127,6 +127,7 @@ class TestBasicGateway:
+             )
+         )
+
++        sys.modules.pop("remote", None)
+         monkeypatch.syspath_prepend(tmp_path)
+         import remote  # type: ignore[import-not-found]
