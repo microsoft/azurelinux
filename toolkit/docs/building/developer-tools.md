@@ -14,3 +14,10 @@ sudo make containerized-rpmbuild
 # To see optional arguments and usage
 sudo make containerized-rpmbuild-help
 ```
+
+## Using devcontainer
+
+If you don't want to install all the tooling in your main OS or you want a fully ready dev environment then you can benefit from devcontainer.
+Assuming you are using VsCode and have docker or podman installed.
+
+If you open repository in VsCode (on Windows check out your code inside WSL) it will suggest you to reopen it in a [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers). The container is based on the latest ubuntu image, it will install all [prerequisites](prerequisites-ubuntu.md) for building and is fully ready to build packages.
