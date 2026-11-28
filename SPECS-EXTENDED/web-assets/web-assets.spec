@@ -4,7 +4,7 @@
 
 Name:           web-assets
 Version:        5
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        A simple framework for bits pushed to browsers
 BuildArch:      noarch
 
@@ -84,15 +84,20 @@ systemctl reload-or-try-restart httpd.service || :
 
 %files devel
 %{_rpmconfigdir}/macros.d/macros.web-assets
-%doc LICENSE README.devel
+%license LICENSE
+%doc README.devel
 
 %if 0%{?enable_httpd}
 %files httpd
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/web-assets.conf
-%doc LICENSE
+%license LICENSE
 %endif
 
 %changelog
+* Fri Oct 03 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 5-13
+- Fix for license path issue
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
