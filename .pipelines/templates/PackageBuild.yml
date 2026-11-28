@@ -13,7 +13,8 @@ parameters:
   # Names of pipeline variables forwarded into package builds that run %check when isCheckBuild is "true".
   # Package code can read these values, so forward only narrowly scoped credentials: for pip, authenticate
   # with PipAuthenticateCheckFeed.yml as the last PipAuthenticate before this template, never the job token.
-  # Each value must be set, defined, and at least 8 characters (shorter values cannot be redacted safely).
+  # PIP_INDEX_URL is optional; other values must be set and defined. Present values must be at
+  # least 8 characters (shorter values cannot be redacted safely).
   # Values are redacted from build logs on a best-effort basis; logs are published even if redaction fails.
   - name: checkEnvPassthrough
     type: object
@@ -233,21 +234,31 @@ steps:
         run_check_arg="RUN_CHECK=y"
         check_env_names="${{ join(' ', parameters.checkEnvPassthrough) }}"
         if [[ -n "$check_env_names" ]]; then
+          available_check_env_names=()
           for check_env_name in $check_env_names; do
             check_env_value="$(printenv "$check_env_name" || true)"
             # An undefined pipeline variable maps to its unexpanded macro text. The comparison string is
             # built at runtime because Azure Pipelines would expand a literal macro in this script.
             if [[ -z "$check_env_value" || "$check_env_value" == "\$($check_env_name)" ]]; then
+              if [[ "$check_env_name" == PIP_INDEX_URL ]]; then
+                echo "##[warning]PIP_INDEX_URL is unavailable; package builds and tests will use pip's configured/default index."
+                unset "$check_env_name"
+                continue
+              fi
               echo "##[error]Check environment variable '$check_env_name' is not set, is empty, or is undefined." >&2
               exit 1
             fi
+            available_check_env_names+=("$check_env_name")
           done
           unset check_env_value
-          # Reject values too short to redact before any package runs.
-          python3 "${{ parameters.buildRepoRoot }}/toolkit/scripts/redact_env_values.py" "$check_env_names" || exit 1
-          # Preserve only the listed names; values never appear in command arguments.
-          sudo_env_args+=("--preserve-env=${check_env_names// /,}")
-          check_env_args+=("CHECK_ENV_PASSTHROUGH=$check_env_names")
+          check_env_names="${available_check_env_names[*]}"
+          if [[ -n "$check_env_names" ]]; then
+            # Reject values too short to redact before any package runs.
+            python3 "${{ parameters.buildRepoRoot }}/toolkit/scripts/redact_env_values.py" "$check_env_names" || exit 1
+            # Preserve only the listed names; values never appear in command arguments.
+            sudo_env_args+=("--preserve-env=${check_env_names// /,}")
+            check_env_args+=("CHECK_ENV_PASSTHROUGH=$check_env_names")
+          fi
         fi
       elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
         run_check_arg="RUN_CHECK=n"

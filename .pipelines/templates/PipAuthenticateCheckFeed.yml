@@ -18,19 +18,31 @@ parameters:
     default: "https://pkgs.dev.azure.com/mariner-org/_packaging/MarinerFeed/pypi/simple/"
 
 steps:
+  # Never forward an earlier job-token credential if feed-only authentication is skipped or fails.
+  - bash: |
+      echo "##vso[task.setvariable variable=PIP_INDEX_URL;issecret=true]"
+    displayName: "Reset package-check pip feed credential"
+
   - task: PipAuthenticate@1
     displayName: "Authenticate package-check pip feed"
+    continueOnError: true
     inputs:
       azureDevOpsServiceConnection: ${{ parameters.serviceConnection }}
       feedUrl: ${{ parameters.feedUrl }}
 
   # In service-connection mode PipAuthenticate sets PIP_INDEX_URL as a plain variable, unless an
   # earlier step already made it a secret. Map it explicitly so both cases work, then (re-)register
-  # it as a secret so pipeline logs mask it. An unset variable leaves the macro text unexpanded,
-  # which the https check rejects (the script must not spell the macro: ADO would expand it).
+  # it as a secret so pipeline logs mask it. Build/test without an index if authentication is
+  # unavailable; construct the unset macro at runtime so Azure Pipelines cannot expand it here.
   - bash: |
+      pip_index_name=PIP_INDEX_URL
+      if [[ -z "${CHECK_FEED_INDEX_URL:-}" || "$CHECK_FEED_INDEX_URL" == "\$($pip_index_name)" ]]; then
+        echo "##[warning]No authenticated pip index is available; package builds and tests will use pip's configured/default index."
+        echo "##vso[task.setvariable variable=PIP_INDEX_URL;issecret=true]"
+        exit 0
+      fi
       if [[ "${CHECK_FEED_INDEX_URL:-}" != https://* ]]; then
-        echo "##[error]PipAuthenticate did not set PIP_INDEX_URL." >&2
+        echo "##[error]Authenticated pip index must use HTTPS." >&2
         exit 1
       fi
       echo "##vso[task.setvariable variable=PIP_INDEX_URL;issecret=true]${CHECK_FEED_INDEX_URL}"
