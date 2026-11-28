@@ -1,46 +1,37 @@
 version = 2
-# Explicitly defining no adjustment to Linux OOM Killer
 oom_score = 0
 [plugins."io.containerd.grpc.v1.cri"]
-  # Enable SELinux labeling support for pods and containers
   enable_selinux = true
-  # Use same infra container image as AKS does for pod sandboxes
   sandbox_image = "mcr.microsoft.com/oss/kubernetes/pause:3.6"
   [plugins."io.containerd.grpc.v1.cri".containerd]
-    # Set default snapshotter to erofs-snapshotter
     snapshotter = "erofs"
-    # Allow snapshot annotations
     disable_snapshot_annotations = false
-    # Explicitly define using runc for runtime
     default_runtime_name = "runc"
     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-      # Set default snapshotter to erofs for this runtime 
       snapshotter = "erofs"
-      # Explicitly define using runc v2 shim
       runtime_type = "io.containerd.runc.v2"
-    # Section is configured by AKS but not strictly required in general
-    # [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-      # BinaryName = "/usr/bin/runc"
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+      BinaryName = "/usr/bin/runc"
     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.untrusted]
-      # Explicitly define using runc v2 shim for runtime named "untrusted"
       runtime_type = "io.containerd.runc.v2"
-    # Section is configured in AKS but not strictly required in general
-    # [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.untrusted.options]
-      # BinaryName = "/usr/bin/runc"
-  # Section is configured in AKS but not strictly required in general
-  # [plugins."io.containerd.grpc.v1.cri".registry]
-    # config_path = "/etc/containerd/certs.d"
-  # Section is configured in AKS but not strictly required in general
-  # [plugins."io.containerd.grpc.v1.cri".registry.headers]
-    # X-Meta-Source-Client = ["azure/aks"]
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.untrusted.options]
+      BinaryName = "/usr/bin/runc"
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    config_path = "/etc/containerd/certs.d"
+  [plugins."io.containerd.grpc.v1.cri".registry.headers]
+    X-Meta-Source-Client = ["azure/aks"]
   [plugins."io.containerd.grpc.v1.cri".cni]
-    # Set default locations for cni binary and config files
     bin_dir = "/usr/libexec/cni"
     conf_dir = "/etc/cni/net.d"
     conf_template = ""
-# Section is configured in AKS but not strictly required in general
-# [metrics]
-  # address = "0.0.0.0:10257"
+[metrics]
+  address = "0.0.0.0:10257"
+
+[plugins."io.containerd.image-verifier.v1.bindir"]
+  bin_dir = "/usr/libexec/verifier"
+  max_verifiers = 10
+  per_verifier_timeout = "10s"
+
 
 [plugins."io.containerd.snapshotter.v1.erofs"]
   # Optional: Additional mount options for overlayfs
