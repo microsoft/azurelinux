@@ -1,7 +1,7 @@
 Summary:        Fast compression and decompression library
 Name:           snappy
 Version:        1.1.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,8 @@ URL:            https://github.com/google/snappy
 Source0:        https://github.com/google/snappy/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Patch0:         detect_system_gtest.patch
+Patch1:         build-with-rtti.patch
+BuildRequires:  binutils
 BuildRequires:  cmake >= 3.3
 BuildRequires:  gcc-c++
 BuildRequires:  gmock-devel
@@ -55,6 +57,7 @@ cd build
 %check
 cd build
 make test
+nm -D --defined-only libsnappy.so | grep -q '_ZTIN6snappy6SourceE'
 
 %post -p /sbin/ldconfig
 
@@ -74,6 +77,10 @@ make test
 %{_libdir}/cmake/Snappy/
 
 %changelog
+* Thu Oct 01 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.1.10-3
+- Enable RTTI to preserve the public C++ ABI required by Snappy consumers.
+- Verify that typeinfo for snappy::Source is exported.
+
 * Thu Feb 29 2024 Andrew Phelps <anphel@microsoft.com> - 1.1.10-2
 - Ensure building with C++ standard 14 to resolve build break
 
