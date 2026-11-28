@@ -1,32 +1,48 @@
-%global git_date 20200619
+%global git_date 20241011
+%global git_commit 5930b9a4d5b6dd12af897eb52be9674d9c2ebd6d
+%{?git_commit:%global git_commit_hash %(c=%{git_commit}; echo ${c:0:7})}
+
 %global _python_bytecompile_extra 0
 Summary:        System-wide crypto policies
 Name:           crypto-policies
 Version:        %{git_date}
-Release:        5%{?dist}
+Release:        1%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://gitlab.com/redhat-crypto/fedora-crypto-policies
-Source0:        https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/f32-updates/fedora-crypto-policies-f32-updates.tar.gz
+Source0:        https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/%{git_commit_hash}/%{name}-git%{git_commit_hash}.tar.gz
 BuildRequires:  asciidoc
 BuildRequires:  bind
 BuildRequires:  gnutls-utils >= 3.6.0
 BuildRequires:  java-devel
+BuildRequires:  nss-tools
 BuildRequires:  libxslt
 BuildRequires:  openssl
-BuildRequires:  perl-generators
+BuildRequires:  openssh-clients
 BuildRequires:  perl-interpreter
-BuildRequires:  python3-devel
+BuildRequires:  perl-generators
 BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(File::Which)
 BuildRequires:  perl(File::pushd)
-Conflicts:      gnutls < 3.6.11
+BuildRequires:  python3-devel >= 3.6
+BuildRequires:  python3-pytest
+#BuildRequires:  python3-pylint
+BuildRequires:  python3-flake8
+BuildRequires:  python3-coverage
+BuildRequires:  codespell
+BuildRequires:  make
+BuildRequires:  krb5-devel
+BuildRequires:  sequoia-policy-config
+Conflicts:      gnutls < 3.7.3
 Conflicts:      libreswan < 3.28
-Conflicts:      nss < 3.44
-Conflicts:      openssh < 8.2p1
+Conflicts:      nss < 3.90.0
+Conflicts:      openssh < 9.0p1-5
 BuildArch:      noarch
+
+# Most users want this
+Recommends: crypto-policies-scripts
 
 %description
 This package provides pre-built configuration files with
@@ -36,6 +52,9 @@ such as SSL/TLS libraries.
 %package scripts
 Summary:        Tool to switch between crypto policies
 Requires:       %{name} = %{version}-%{release}
+Recommends: grubby
+Obsoletes: fips-mode-setup < 20200702-1.c40cede
+Provides: fips-mode-setup = %{version}-%{release}
 
 %description scripts
 This package provides a tool update-crypto-policies, which applies
@@ -43,23 +62,16 @@ the policies provided by the crypto-policies package. These can be
 either the pre-built policies from the base package or custom policies
 defined in simple policy definition files.
 
-%package -n fips-mode-setup
-Summary:        Enable or disable system FIPS mode
-Requires:       %{name} = %{version}-%{release}
-Requires:       %{name}-scripts = %{version}-%{release}
-Requires:       dracut
-Requires:       grubby
-
-%description -n fips-mode-setup
-The package provides a tool to enable or disable the system FIPS mode.
-
 %prep
-%autosetup -n fedora-crypto-policies-f32-updates
+%autosetup -n fedora-crypto-policies-%{git_commit_hash}-%{git_commit}
 # Fix path to asciidoc xsl documents
 # asciidoc installs these in %{_sysconfdir} by default, not %{_datadir}
 sed -i 's#/usr/share/asciidoc#%{_sysconfdir}/asciidoc#g' Makefile
 
 %build
+sed -i "s/MIN_RSA_DEFAULT = .*/MIN_RSA_DEFAULT = 'RequiredRSASize'/" \
+    python/policygenerators/openssh.py
+grep "MIN_RSA_DEFAULT = 'RequiredRSASize'" python/policygenerators/openssh.py
 %make_build
 
 %install
@@ -76,6 +88,12 @@ make DESTDIR=%{buildroot} DIR=%{_datarootdir}/crypto-policies MANDIR=%{_mandir} 
 install -p -m 644 default-config %{buildroot}%{_sysconfdir}/crypto-policies/config
 touch %{buildroot}%{_sysconfdir}/crypto-policies/state/current
 touch %{buildroot}%{_sysconfdir}/crypto-policies/state/CURRENT.pol
+
+# Drop pre-generated GOST-ONLY & BSI policies, we do not need to ship the files
+rm -rf %{buildroot}%{_datarootdir}/crypto-policies/GOST-ONLY
+rm -rf %{buildroot}%{_datarootdir}/crypto-policies/BSI
+# Same for the experimental test-only TEST-FEDORA41
+rm -rf %{buildroot}%{_datarootdir}/crypto-policies/TEST-FEDORA41
 
 # Create back-end configs for mounting with read-only /etc/
 for d in LEGACY DEFAULT NEXT FUTURE FIPS ; do
@@ -146,9 +164,15 @@ end
 %ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/nss.config
 %ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/bind.config
 %ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/java.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/javasystem.config
 %ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/krb5.config
 %ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/libreswan.config
 %ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/libssh.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/sequoia.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/rpm-sequoia.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/openssl_fips.config
+# %verify(not mode) comes from the fact
+# these turn into symlinks and back to regular files at will, see bz1898986
 
 %ghost %{_sysconfdir}/crypto-policies/state/current
 %ghost %{_sysconfdir}/crypto-policies/state/CURRENT.pol
@@ -160,6 +184,8 @@ end
 %{_datarootdir}/crypto-policies/FUTURE
 %{_datarootdir}/crypto-policies/FIPS
 %{_datarootdir}/crypto-policies/EMPTY
+%{_datarootdir}/crypto-policies/FEDORA38
+%{_datarootdir}/crypto-policies/TEST-FEDORA39
 %{_datarootdir}/crypto-policies/back-ends
 %{_datarootdir}/crypto-policies/default-config
 %{_datarootdir}/crypto-policies/reload-cmds.sh
@@ -172,13 +198,16 @@ end
 %{_mandir}/man8/update-crypto-policies.8*
 %{_datarootdir}/crypto-policies/python
 
-%files -n fips-mode-setup
 %{_bindir}/fips-mode-setup
 %{_bindir}/fips-finish-install
 %{_mandir}/man8/fips-mode-setup.8*
 %{_mandir}/man8/fips-finish-install.8*
 
 %changelog
+* Mon Nov 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 20250714-1
+- Upgrade to Fedora40 version due to gnutls version compatibility. Source: Fedora 40
+- License verified
+
 * Wed Mar 01 2023 Muhammad Falak <mwani@microsoft.com> - 20200619-5
 - Switch to autosetup
 - License verified
