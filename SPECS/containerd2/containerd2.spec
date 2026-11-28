@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.3.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -30,6 +30,7 @@ Patch10: CVE-2026-116585.patch
 Patch11: CVE-2026-116586.patch
 Patch12: CVE-2026-116587.patch
 Patch13: CVE-2026-116591.patch
+Patch14: cri-inherit-pod-mcs.patch
 
 %{?systemd_requires}
 
@@ -110,6 +111,10 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Nov 17 2026 Sean Dougherty <sdougherty@microsoft.com> - 2.3.7-3
+- Preserve pod MCS categories for nonprivileged container SELinux type-only overrides
+- Retain shared category reservations during container creation and sandbox recovery
+
 * Tue Nov 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.7-2
 - Patch for CVE-2026-116591, CVE-2026-116587, CVE-2026-116586, CVE-2026-116585
 
